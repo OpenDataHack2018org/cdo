@@ -1,0 +1,127 @@
+#! /bin/sh
+#
+# default configuration options and compiler flags for different hosts
+# LIBS="-lm -lz" is necessary for configuration with HDF5
+#
+if test -z "$1" ; then
+  HOSTNAME=`hostname`
+else
+  HOSTNAME=$1
+fi
+#
+set -x
+#
+case "${HOSTNAME}" in
+# ia64-xxx-linux
+    ds*)
+	./configure --prefix=$HOME/local \
+                    --with-netcdf=/pool/ia64/netcdf/netcdf-3.6.0-p1 \
+                    CC=icc CFLAGS="-g -O2 -Wall -fno-alias -DMIN_BUF_SIZE=4194304"
+	;;
+    wasser*)
+	./configure --prefix=$HOME/local \
+                    --with-netcdf=/home/dkrz/m214089/local/ia64 \
+                    CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
+	;;
+# i686-suse-linux
+    linux)
+	./configure --prefix=$HOME/local \
+                    --enable-dap --with-netcdf=$HOME/local \
+                    CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	;;
+    tolken | gata)
+# opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
+	            --with-netcdf=/scratch/localA/m214003/local \
+                    --with-hdf5=/scratch/localA/m214003/local \
+	            CC=gcc CFLAGS="-ansi -g -D_REENTRANT -O2 -Wall " LIBS="-lm -lz"
+	;;
+    regio01)
+# opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
+	            --with-netcdf=/client \
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	;;
+# i386-pc-solaris2.10
+    yun)
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/YUN \
+                    --with-netcdf=/client \
+                    CC=cc CFLAGS="-g -mt -fast"
+	;;
+# sparc-sun-solaris2.6
+    regen | gardiken)
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN \
+                    --with-netcdf=/pf/m/m214089/local/SUN \
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	;;
+# sparc-sun-solaris2.8
+    xxf)
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN \
+                    --with-netcdf=/client \
+                    CC=cc CFLAGS="-g -mt -fast"
+	;;
+# sparc-sun-solaris2.9
+    executor | yang | yin)
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN64 \
+                    --with-netcdf=/pf/m/m214089/yang/local/SunOS64 \
+                    CC=cc CFLAGS="-g -mt -fast -xtarget=native -xarch=v9a"
+	;;
+# sx6-nec-superux12.2
+    cs*)
+	./configure --prefix=$HOME/local \
+         	    --with-netcdf=/pool/netcdf/netcdf-3.6.0-p1 \
+		    CC=c++ \
+                    CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
+	;;
+    sx6)
+	./configure --host=sx6 --prefix=$HOME/local/SX6 \
+                    --with-netcdf=/pool/SX-6/netcdf/netcdf-3.6.0-p1 \
+		    CC=sxc++ AR=sxar \
+                    CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
+	;;
+    es)
+	./configure --host=sx6 --prefix=$HOME/local/ES \
+                    --with-netcdf=/S/n010/home010/c0148/local/SX \
+		    CC=esc++ AR=esar \
+                    CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
+	;;
+# mips-sgi-irix6.5
+    ecgate1)
+	./configure --prefix=$HOME/local \
+ 	            --with-netcdf=/home/ms/spdekplb/hmk/include,/home/ms/spdekplb/hmk/lib64 \
+	            CC=cc CFLAGS="-O -64"
+	;;
+# 5000-fujitsu-uxpv4.1_ES
+    vpp5*)
+	./configure --prefix=$HOME \
+	            --with-netcdf=$HOME/PROJ \
+	            CC=vcc CFLAGS="-O -Wv,-m3 -K4"
+	;;
+# powerpc-ibm-aix5.2.0.0
+    ecgate)
+	./configure --prefix=$HOME/local \
+                    --with-netcdf=/home/ms/spdekplb/hmk/local/AIX \
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	;;
+# powerpc-ibm-aix5.1.0.0
+    hpcd*)
+	./configure --prefix=$HOME/local \
+                    --with-netcdf=/usr/local/lib/netcdf-3.5.0/LP64 \
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	;;
+# powerpc-ibm-aix5.2.0.0
+    p020et01)
+	./configure --prefix=$HOME/local \
+                    --with-netcdf=/uhome/mpikornb \
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	;;
+# hppa2.0w-hp-hpux11.11
+    moon)
+        ./configure --prefix=$HOME/local \
+                    --with-netcdf=/S/n010/home010/c0148/local \
+	            CC=cc CFLAGS="-g -fast"
+	;;
+    *)
+	echo "configuration for hostname $HOSTNAME not found!"
+	;;
+esac

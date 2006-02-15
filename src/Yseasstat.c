@@ -1,0 +1,415 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+
+#include <stdio.h>
+#include <math.h>
+
+#include "cdi.h"
+#include "cdo.h"
+#include "pstream.h"
+#include "functs.h"
+#include "field.h"
+#include "dmemory.h"
+
+/*
+@BeginDoc
+
+@BeginModule
+
+@Name      = Yseasstat
+@Title     = Multi-year seasonally statistics
+@Section   = Statistical description of the data
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = yseasmin yseasmax yseasmean yseasavg yseasstd
+
+@EndModule
+
+
+@BeginOperator_yseasmin
+
+@Title     = Multi-year seasonally minimum
+
+@BeginDesciption
+@IfMan
+o(1,x) = min{i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = min{i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = min{i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = min{i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDesciption
+
+@EndOperator
+
+
+@BeginOperator_yseasmax
+
+@Title     = Multi-year seasonally maximum
+
+@BeginDesciption
+@IfMan
+o(1,x) = max{i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = max{i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = max{i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = max{i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDesciption
+
+@EndOperator
+
+
+@BeginOperator_yseasmean
+
+@Title     = Multi-year seasonally mean
+
+@BeginDesciption
+@IfMan
+o(1,x) = mean{i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = mean{i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = mean{i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = mean{i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDesciption
+
+@EndOperator
+
+
+@BeginOperator_yseasavg
+
+@Title     = Multi-year seasonally average
+
+@BeginDesciption
+@IfMan
+o(1,x) = avg{i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = avg{i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = avg{i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = avg{i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDesciption
+
+@EndOperator
+
+
+@BeginOperator_yseasstd
+
+@Title     = Multi-year seasonally standard deviation
+
+@BeginDesciption
+@IfMan
+o(1,x) = sqrt{var{i(t,x), month(i(t)) = 12, 01, 02}}
+o(2,x) = sqrt{var{i(t,x), month(i(t)) = 03, 04, 05}}
+o(3,x) = sqrt{var{i(t,x), month(i(t)) = 06, 07, 08}}
+o(4,x) = sqrt{var{i(t,x), month(i(t)) = 09, 10, 11}}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\}} \\
+o(\mbox{2},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\}} \\
+o(\mbox{3},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\}} \\
+o(\mbox{4},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDesciption
+
+@EndOperator
+
+@EndDoc
+*/
+
+#define  NSEAS       4
+
+void *Yseasstat(void *argument)
+{
+  static char func[] = "Yseasstat";
+  int operatorID;
+  int operfunc;
+  int gridsize;
+  int varID;
+  int recID;
+  int gridID;
+  int vdate, vtime;
+  int year, month, seas;
+  int nrecs, nrecords;
+  int levelID;
+  int tsID;
+  int otsID;
+  long nsets[NSEAS];
+  int streamID1, streamID2;
+  int vlistID1, vlistID2, taxisID1, taxisID2;
+  int nmiss;
+  int nvars, nlevel;
+  int *recVarID, *recLevelID;
+  int vdates[NSEAS], vtimes[NSEAS];
+  double missval;
+  FIELD **vars1[NSEAS], **vars2[NSEAS];
+  FIELD field;
+
+  cdoInitialize(argument);
+
+  cdoOperatorAdd("yseasmin",  func_min,  0, NULL);
+  cdoOperatorAdd("yseasmax",  func_max,  0, NULL);
+  cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
+  cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("yseasstd",  func_std,  0, NULL);
+
+  operatorID = cdoOperatorID();
+  operfunc = cdoOperatorFunc(operatorID);
+
+  for ( seas = 0; seas < NSEAS; seas++ )
+    {
+      vars1[seas] = NULL;
+      vars2[seas] = NULL;
+      nsets[seas] = 0;
+    }
+
+  streamID1 = streamOpenRead(cdoStreamName(0));
+  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
+
+  vlistID1 = streamInqVlist(streamID1);
+  vlistID2 = vlistDuplicate(vlistID1);
+
+  taxisID1 = vlistInqTaxis(vlistID1);
+  taxisID2 = taxisNew(TAXIS_ABSOLUTE);
+  vlistDefTaxis(vlistID2, taxisID2);
+
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+
+  streamDefVlist(streamID2, vlistID2);
+
+  nvars    = vlistNvars(vlistID1);
+  nrecords = vlistNrecs(vlistID1);
+
+  recVarID   = (int *) malloc(nrecords*sizeof(int));
+  recLevelID = (int *) malloc(nrecords*sizeof(int));
+
+  gridsize = vlistGridsizeMax(vlistID1);
+  field.ptr = (double *) malloc(gridsize*sizeof(double));
+
+  tsID = 0;
+  otsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+    {
+      vdate = taxisInqVdate(taxisID1);
+      vtime = taxisInqVtime(taxisID1);
+      year  =  vdate / 10000;
+      month = (vdate - year*10000) / 100;
+      if ( month < 0 || month > 16 )
+	cdoAbort("month %d out of range!", month);
+
+      if ( month <= 12 )
+	seas = (month % 12) / 3;
+      else
+	seas = month - 13;
+
+      if ( seas < 0 || seas > 3 )
+	cdoAbort("Season %d out of range!", seas+1);
+
+      vdates[seas] = vdate;
+      vtimes[seas] = vtime;
+
+      if ( vars1[seas] == NULL )
+	{
+	  vars1[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  if ( operfunc == func_std )
+	    vars2[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      gridID   = vlistInqVarGrid(vlistID1, varID);
+	      gridsize = gridInqSize(gridID);
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      missval  = vlistInqVarMissval(vlistID1, varID);
+
+	      vars1[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      if ( operfunc == func_std )
+		vars2[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		{
+		  vars1[seas][varID][levelID].grid    = gridID;
+		  vars1[seas][varID][levelID].nmiss   = 0;
+		  vars1[seas][varID][levelID].missval = missval;
+		  vars1[seas][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  if ( operfunc == func_std )
+		    {
+		      vars2[seas][varID][levelID].grid    = gridID;
+		      vars2[seas][varID][levelID].nmiss   = 0;
+		      vars2[seas][varID][levelID].missval = missval;
+		      vars2[seas][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		    }
+		}
+	    }
+	}
+
+      for ( recID = 0; recID < nrecs; recID++ )
+	{
+	  streamInqRecord(streamID1, &varID, &levelID);
+
+	  recVarID[recID]   = varID;
+	  recLevelID[recID] = levelID;
+
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+
+	  if ( nsets[seas] == 0 )
+	    {
+	      streamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
+	      vars1[seas][varID][levelID].nmiss = nmiss;
+	    }
+	  else
+	    {
+	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	      field.grid    = vars1[seas][varID][levelID].grid;
+	      field.missval = vars1[seas][varID][levelID].missval;
+
+	      if ( operfunc == func_std )
+		{
+		  farsumq(&vars2[seas][varID][levelID], field);
+		  farsum(&vars1[seas][varID][levelID], field);
+		}
+	      else
+		{
+		  farfun(&vars1[seas][varID][levelID], field, operfunc);
+		}
+	    }
+	}
+
+      if ( nsets[seas] == 0 && operfunc == func_std )
+	for ( varID = 0; varID < nvars; varID++ )
+	  {
+	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevel; levelID++ )
+	      farmoq(&vars2[seas][varID][levelID], vars1[seas][varID][levelID]);
+	  }
+
+      nsets[seas]++;
+      tsID++;
+    }
+
+  for ( seas = 0; seas < NSEAS; seas++ )
+    if ( nsets[seas] )
+      {
+	if ( operfunc == func_mean || operfunc == func_avg )
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		farcmul(&vars1[seas][varID][levelID], 1.0/nsets[seas]);
+	    }
+	else if ( operfunc == func_std )
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+	    }
+
+	taxisDefVdate(taxisID2, vdates[seas]);
+	taxisDefVtime(taxisID2, vtimes[seas]);
+	streamDefTimestep(streamID2, otsID++);
+
+	for ( recID = 0; recID < nrecords; recID++ )
+	  {
+	    varID    = recVarID[recID];
+	    levelID  = recLevelID[recID];
+
+	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
+	      {
+		streamDefRecord(streamID2, varID, levelID);
+		streamWriteRecord(streamID2, vars1[seas][varID][levelID].ptr,
+				  vars1[seas][varID][levelID].nmiss);
+	      }
+	  }
+      }
+
+  for ( seas = 0; seas < NSEAS; seas++ )
+    {
+      if ( vars1[seas] != NULL )
+	{
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		{
+		  free(vars1[seas][varID][levelID].ptr);
+		  if ( operfunc == func_std ) free(vars2[seas][varID][levelID].ptr);
+		}
+	      
+	      free(vars1[seas][varID]);
+	      if ( operfunc == func_std ) free(vars2[seas][varID]);
+	    }
+	}
+    }
+
+  if ( field.ptr ) free(field.ptr);
+
+  if ( recVarID   ) free(recVarID);
+  if ( recLevelID ) free(recLevelID);
+
+  streamClose(streamID2);
+  streamClose(streamID1);
+
+  cdoFinish();
+
+  return (0);
+}

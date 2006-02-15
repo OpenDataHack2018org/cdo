@@ -1,0 +1,452 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+
+#include <ctype.h>
+#include <string.h>
+#include <math.h>
+
+#include "cdi.h"
+#include "cdo.h"
+#include "cdo_int.h"
+#include "pstream.h"
+#include "functs.h"
+#include "vinterp.h"
+
+/*
+@BeginDoc
+
+@BeginModule
+
+@Name      = Vertint
+@Title     = Vertical interpolation
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = ml2pl ml2hl
+
+@EndModule
+
+
+@BeginOperator_ml2pl
+
+@Title     = Model to pressure level interpolation
+@Parameter = levels
+
+@BeginDesciption
+Interpolate fields on hybrid model level to pressure level.
+The input file must contain the log. surface pressure (LSP/code152)
+or the surface pressure (APS/code134).
+To interpolate the temperature or the geopotential height
+to pressure level, the orography (GEOSP/code129) is also needed.
+@EndDesciption
+
+@BeginParameter
+@Item = levels
+FLOAT  Pressure levels in pascal
+@EndParameter
+
+@BeginEnvironment
+@Item = EXTRAPOLATE
+If set to 1 extrapolate missing values.
+@EndEnvironment
+
+@EndOperator
+
+
+@BeginOperator_ml2hl
+
+@Title     = Model to height level interpolation
+@Parameter = levels
+
+@BeginDesciption
+Interpolate fields on hybrid model level to height level.
+The input file must contain the log. surface pressure (LSP/code152)
+or the surface pressure (APS/code134).
+To interpolate the temperature or the geopotential height
+to height level, the orography (GEOSP/code129) is also needed.
+@EndDesciption
+
+@BeginParameter
+@Item = levels
+FLOAT  Height levels in meter (max level: 65535 m)
+@EndParameter
+
+@BeginEnvironment
+@Item = EXTRAPOLATE
+If set to 1 extrapolate missing values.
+@EndEnvironment
+
+@EndOperator
+
+@EndDoc
+*/
+
+
+void *Vertint(void *argument)
+{
+  static char func[] = "Vertint";
+  int ML2PL, ML2HL;
+  int operatorID;
+  int streamID1, streamID2;
+  int vlistID1, vlistID2;
+  int gridsize, ngp = 0;
+  int recID, nrecs;
+  int i, offset;
+  int tsID, varID, levelID;
+  int nvars;
+  int zaxisIDp, zaxisIDh = -1, nzaxis;
+  int ngrids, gridID, zaxisID;
+  int nplev, nhlev = 0, nhlevp1 = 0, nlevel, maxlev;
+  int *vert_index = NULL;
+  int nvct;
+  int geop_needed = FALSE;
+  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
+  int code;
+  int **varnmiss = NULL, *pnmiss = NULL;
+  int *varinterp = NULL;
+  char varname[128];
+  double missval;
+  double *plev = NULL, *phlev = NULL, *vct = NULL;
+  double *single1, *single2;
+  double **vardata1 = NULL, **vardata2 = NULL;
+  double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
+  char *envstring;
+  int Extrapolate = 0;
+  int taxisID1, taxisID2;
+
+  cdoInitialize(argument);
+
+  ML2PL = cdoOperatorAdd("ml2pl", 0, 0, "pressure levels in pascal");
+  ML2HL = cdoOperatorAdd("ml2hl", 0, 0, "height levels in meter");
+
+  operatorID = cdoOperatorID();
+
+  envstring = getenv("EXTRAPOLATE");
+
+  if ( envstring )
+    {
+      if ( isdigit((int) envstring[0]) )
+	{
+	  Extrapolate = atoi(envstring);
+	  if ( Extrapolate == 1 )
+	    cdoPrint("Extrapolation of missing values enabled!");
+	}
+    }
+
+  operatorInputArg(cdoOperatorEnter(operatorID));
+
+  nplev = operatorArgc();
+  plev  = (double *) malloc(nplev*sizeof(double));
+  for ( i = 0; i < nplev; i++ )
+    plev[i] = atof(operatorArgv()[i]);
+
+  streamID1 = streamOpenRead(cdoStreamName(0));
+  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
+
+  vlistID1 = streamInqVlist(streamID1);
+  vlistID2 = vlistDuplicate(vlistID1);
+
+  taxisID1 = vlistInqTaxis(vlistID1);
+  taxisID2 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID2, taxisID2);
+
+  ngrids  = vlistNgrids(vlistID1);
+  for ( i = 0; i < ngrids; i++ )
+    {
+      gridID = vlistGrid(vlistID1, i);
+      if ( gridInqType(gridID) != GRID_SPECTRAL )
+	{
+	  ngp = gridInqSize(gridID);
+	  break;
+	}
+    }
+
+  /* check gridsize */
+  for ( i = 0; i < ngrids; i++ )
+    {
+      gridID = vlistGrid(vlistID1, i);
+      if ( gridInqType(gridID) != GRID_SPECTRAL )
+	{
+	  if ( ngp != gridInqSize(gridID) )
+	    cdoAbort("Grids have different size!");
+	}
+    }
+
+  if ( operatorID == ML2HL )
+    zaxisIDp = zaxisNew(ZAXIS_HEIGHT, nplev);
+  else
+    zaxisIDp = zaxisNew(ZAXIS_PRESSURE, nplev);
+
+  zaxisDefLevels(zaxisIDp, plev);
+  nzaxis  = vlistNzaxis(vlistID1);
+  for ( i = 0; i < nzaxis; i++ )
+    {
+      zaxisID = vlistZaxis(vlistID1, i);
+      nlevel  = zaxisInqSize(zaxisID);
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
+	{
+	  nvct = zaxisInqVctSize(zaxisID);
+	  if ( nlevel == (nvct/2 - 1) )
+	    {
+	      zaxisIDh = zaxisID;
+	      nhlev    = nlevel;
+	      nhlevp1  = nhlev + 1;
+
+	      vct = (double *) malloc(nvct*sizeof(double));
+	      memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+
+	      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+	      break;
+	    }
+	}
+    }
+
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+
+  streamDefVlist(streamID2, vlistID2);
+
+  nvars = vlistNvars(vlistID1);
+
+  vardata1  = (double **) malloc(nvars*sizeof(double*));
+  vardata2  = (double **) malloc(nvars*sizeof(double*));
+  varnmiss  = (int **) malloc(nvars*sizeof(int*));
+  varinterp = (int *) malloc(nvars*sizeof(int));
+
+  maxlev   = nhlev > nplev ? nhlev : nplev;
+
+  if ( Extrapolate == 0 )
+    pnmiss   = (int *) malloc(nplev*sizeof(int));
+
+  if ( zaxisIDh != -1 && ngp > 0 )
+    {
+      vert_index = (int *) malloc(ngp*nplev*sizeof(int));
+      ps_prog    = (double *) malloc(ngp*sizeof(double));
+      full_press = (double *) malloc(ngp*nhlev*sizeof(double));
+      half_press = (double *) malloc(ngp*nhlevp1*sizeof(double));
+    }
+  else
+    cdoWarning("No data on hybrid model level found!");
+
+  if ( operatorID == ML2HL )
+    {
+      phlev = (double *) malloc(nplev*sizeof(double));
+      h2p(phlev, plev, nplev);
+      memcpy(plev, phlev, nplev*sizeof(double));
+      free(phlev);
+    }
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      gridID  = vlistInqVarGrid(vlistID1, varID);
+      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+
+      code = vlistInqVarCode(vlistID1, varID);
+      if ( code <= 0 )
+	{
+	  size_t ll, len;
+	  vlistInqVarName(vlistID1, varID, varname);
+	  len = strlen(varname);
+	  for ( ll = 0; ll < len; ll++ )
+	    varname[ll] = tolower(varname[ll]);
+
+	  if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
+	  else if ( strcmp(varname, "st")      == 0 ) code = 130;
+	  else if ( strcmp(varname, "aps")     == 0 ) code = 134;
+	  else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
+	  else if ( strcmp(varname, "geopoth") == 0 ) code = 156;
+	}
+
+      if ( code == 129 ) geopID    = varID;
+      if ( code == 130 ) tempID    = varID;
+      if ( code == 134 ) psID      = varID;
+      if ( code == 152 ) lnpsID    = varID;
+      if ( code == 156 ) gheightID = varID;
+
+      if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+	cdoAbort("spectral data on model level unsupported!");
+
+      if ( gridInqType(gridID) == GRID_SPECTRAL )
+	cdoAbort("spectral data unsupported!");
+
+      gridsize = gridInqSize(gridID);
+      nlevel   = zaxisInqSize(zaxisID);
+      vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
+
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel > 1 )
+	{
+	  varinterp[varID] = TRUE;
+	  vardata2[varID]  = (double *) malloc(gridsize*nplev*sizeof(double));
+	  varnmiss[varID]  = (int *) malloc(maxlev*sizeof(int));
+	}
+      else
+	{
+	  varinterp[varID] = FALSE;
+	  vardata2[varID]  = vardata1[varID];
+	  varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
+	}
+    }
+
+  if ( tempID != -1 || gheightID != -1 ) geop_needed = TRUE;
+
+  if ( zaxisIDh != -1 && geop_needed )
+    {
+      geop = (double *) malloc(ngp*sizeof(double));
+      if ( geopID == -1 )
+	{
+	  cdoWarning("Orography not found - using zero orography!");
+	  memset(geop, 0, ngp*sizeof(double));
+	}
+    }
+
+  if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
+    cdoAbort("Temperature not found, needed to compute geopotheight!");
+
+  if ( zaxisIDh != -1 && lnpsID == -1 )
+    {
+      if ( psID != -1 )
+	cdoWarning("LOG surface pressure (code 152) not found - using surface pressure (code 134)!");
+      else
+	cdoAbort("Surface pressure not found!");
+    }
+
+  tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+    {
+      taxisCopyTimestep(taxisID2, taxisID1);
+
+      streamDefTimestep(streamID2, tsID);
+
+      for ( recID = 0; recID < nrecs; recID++ )
+	{
+	  streamInqRecord(streamID1, &varID, &levelID);
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  offset   = gridsize*levelID;
+	  single1  = vardata1[varID] + offset;
+	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+	}
+
+      if ( zaxisIDh != -1 )
+	{
+	  if ( geop_needed && geopID != -1 )
+	    memcpy(geop, vardata1[geopID], ngp*sizeof(double));
+
+	  if ( lnpsID != -1 )
+	    for ( i = 0; i < ngp; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
+	  else if ( psID != -1 )
+	    memcpy(ps_prog, vardata1[psID], ngp*sizeof(double));
+
+	  /* check range of ps_prog */
+	  {
+	    double minval = ps_prog[0];
+	    double maxval = ps_prog[0];
+	    for ( i = 1; i < ngp; i++ )
+	      {
+		if      ( ps_prog[i] > maxval ) maxval = ps_prog[i];
+		else if ( ps_prog[i] < minval ) minval = ps_prog[i];
+	      }
+
+	    if ( minval < 20000 || maxval > 150000 )
+	      cdoWarning("surface pressure out of range (min=%g max=%g)\n", minval, maxval);
+	  }
+
+	  presh(full_press, half_press, vct, ps_prog, nhlev, ngp);
+
+	  genind(vert_index, plev, full_press, ngp, nplev, nhlev);
+
+	  if ( Extrapolate == 0 )
+	    genindmiss(vert_index, plev, ngp, nplev, ps_prog, pnmiss);
+	}
+
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  gridID   = vlistInqVarGrid(vlistID1, varID);
+	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	  missval  = vlistInqVarMissval(vlistID1, varID);
+	  gridsize = gridInqSize(gridID);
+	  nlevel   = zaxisInqSize(zaxisID);
+	  if ( varinterp[varID] )
+	    {
+	      if ( varID == tempID )
+		{
+		  interp_T(geop, vardata1[varID], vardata2[varID],
+			   full_press, half_press, vert_index,
+			   plev, nplev, ngp, nlevel, missval);
+		}
+	      else if ( varID == gheightID )
+		{
+		  interp_Z(geop, vardata1[varID], vardata2[varID],
+			   full_press, half_press, vert_index, vardata1[tempID],
+			   plev, nplev, ngp, nlevel, missval);
+		}
+	      else
+		{
+		  interp_X(vardata1[varID], vardata2[varID], full_press,
+			   vert_index, plev, nplev, ngp, nlevel, missval);
+		}
+
+	      if ( Extrapolate == 0 )
+		memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
+	    }
+	}
+
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
+	    {
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      offset   = gridsize*levelID;
+	      single2  = vardata2[varID] + offset;
+	      streamDefRecord(streamID2, varID, levelID);
+	      streamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
+	    }
+	}
+
+      tsID++;
+    }
+
+  streamClose(streamID2);
+  streamClose(streamID1);
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      free(varnmiss[varID]);
+      free(vardata1[varID]);
+      if ( varinterp[varID] ) free(vardata2[varID]);
+    }
+
+  free(varinterp);
+  free(varnmiss);
+  free(vardata2);
+  free(vardata1);
+
+  if ( pnmiss     ) free(pnmiss);
+
+  if ( geop       ) free(geop);
+  if ( ps_prog    ) free(ps_prog);
+  if ( vert_index ) free(vert_index);
+  if ( full_press ) free(full_press);
+  if ( half_press ) free(half_press);
+  if ( vct        ) free(vct);
+  if ( plev       ) free(plev);
+
+  cdoFinish();
+
+  return (0);
+}

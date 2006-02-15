@@ -1,0 +1,350 @@
+2006-03-??  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.6
+	* New module: Histogram (histcount, histsum, histmean) <- docu missing
+	* Cat: the output file must not exist anymore
+	* Zonstat: add support for GRID_GENERIC if ny > 1
+	* remaplib: change read/write of grid corners (bug fix)
+	* Spectral: rename sp2gp2/gp2sp2 to sp2gpl/gp2spl
+	* namelist: update
+	* Version 0.9.12 released
+	
+2006-02-01  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.5
+	* use marco DBL_IS_EQUAL to check floating-point equality
+	* use taxisCopyTimestep if posible
+	* New operator: sp2gp2 (Spectral) for ERA40 data
+	* New operator: gp2sp2 (Spectral) for ERA40 data
+	* New operator: replace (Replace)
+	* New operator: specinfo to print info for spectral transformation
+	* New module: Selstat (selmin, selmax, selsum, selmean, selavg, selstd)
+	* New module: Mergegrid (mergegrid) <- docu missing
+	* Runstat: adjust date and time
+	* Merge: duplicate taxis (bug fix)
+	* Vertint: abort for different grids (bug fix)
+	* Gradsdes: set XYHEADER to 644 (bug fix Holger)
+	* Remap: add GME grid support
+	* Remap: use environment variable NORMLIZE_OPT (bug fix)
+	* Cat: set tsID2 to 1 for input files with constant data only
+	* zaxis: add vct support for hybrid levels
+	* remaplib: change max_subseg from 10000 to 100000
+	* Selrec: add IEG support
+	* Version 0.9.11 released
+
+2005-12-14  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.4
+	* IEG support
+	* New operator: ifthenelse (Cond2)
+	* Timer: option -T
+	* Gradsdes: IEG 32 support
+	* Selbox: add rotated grids
+	* Diff: change date and time format to ISO
+	* Gradsdes: bug fix for lonlat grids from N->S (Thibaut Gridel)
+	* Inttime: abort if units is not minutes, hours or days (bug fix)
+	* Settime: add all available calendars
+	* Inttime: add all available calendars
+	* fourier: made ifax and trig local (bug fix)
+	* Version 0.9.10 released
+
+2005-10-18  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.2
+	* remapcon: replace gridbox_area after remapping
+	* intgrid: init array2 with zero
+	* Timsort: OpenMP version
+	* gradsdes: bug fix for ZDEF
+	* pstream: mt safe
+	* New operator: gradsdes2 (Gradsdes)
+	* New module: Ensstat (ensmin ensmax enssum ensmean ensavg ensstd ensvar)
+	* New operator: remap (Remap)
+	* New operator: gencon (Remap)
+	* New operator: outputf (Output)
+	* New operator: enlarge (Enlarge)
+	* Arith: support of constant species
+	* zaxis: add bounds
+	* Version 0.9.9 released
+	
+2005-07-17  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.1
+	* Arith:
+            - filling up 1. record or timestep of 1. or 2. stream if needed
+	* New operator: setlevel (Set)
+	* New operator: chlevel, chlevelv, chlevelc (Change)
+	* Inttime: change date and time format to ISO
+	* Cond: bug fix (change taxisID1 to taxisID2)
+	* Condc: bug fix (else if statemants)
+	* Compc: bug fix (else if statemants)
+	* Copy: bug fix (taxisID2)
+	* gridWeights: bug fix for non global gaussian grids
+	* replace args2intarr by args2intlist
+	* replace args2fltarr by args2fltlist
+	* Speedup remap and remapcon on NEC sx6
+	* Speedup spectral transformation (replace phcs by jspleg1)
+	* Version 0.9.8 released
+
+2005-05-26  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.0
+	* Speedup Remap with masks by saving MAX_REMAPS maps
+	* Speedup remapcon
+	    - remap_conserv (change malloc to realloc)
+	    - store_link_cnsrv (change search loop)
+	* Setmiss: setctomiss with NaN
+	* Info, Sinfo, Showinfo, Settime, Seltime: change date and time format to ISO
+	* New module: Maskbox (masklonlatbox, maskindexbox)
+	* New module: Arithdays (muldpm, divdpm, muldpy, divdpy)
+	* New operator: setcalendar (Settime)
+	* New operator: setgridarea (Setgrid)
+	* New operator: seltabnum (Select)
+	* Cond: bug fix (filling up the first file)
+	* setmissval: bug fix
+	* farstd, farcstd: bug fix (for missing values)
+	* gridWeights: calculate area weights for LONLAT grids
+	* rename Expr.c to Exprf.c
+	* change function cdoOperatorID
+	* field.h: bug fix for MUL with 0
+	* bug fix in all Modules (define timestep)
+	* Version 0.9.7 released
+
+2005-04-03  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.8.9
+	* support for rotated grids
+	* New module: Detrend (detrend)
+	* New module: Trend (trend)
+	* New module: Subtrend (subtrend)
+	* New module: Timsort (timsort)
+	* New module: Ydaystat (ydaymin, ydaymax, ydaymean, ydayavg, ydaystd)
+	* New module: Ymonarith (ymonadd, ymonsub, ymonmul, ymondiv)
+	* rename Lm* to Ymon* and Ls* to Yseas*
+	* Splityear: change filename for doubled years
+	* Version 0.9.6 released
+
+2005-02-17  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.8.8
+	* bug fix for taxis with remap, copy, setgrid
+	* New operator: shifttime (shift time steps)
+	* changing all integer level to floating point
+	* Vertint: check range of surface pressure
+	* Sinfo: print data type and file type
+	* Invert: extended for curivilinear grids
+	* pstream: add function pstreamInqFiletype
+	* Reduced grids: read/write record if -R is used
+	* Version 0.9.5 released
+	
+2005-01-03  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.8.7
+	* New operator: setmissval (set the missing value)
+	* New operator: setpartab (set the parameter table)
+	* Docu for operator infov, sinfov and diffv
+	* Version 0.9.4 released
+
+2004-12-17  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.8.6
+	* New operator: gradsdes for GRIB, SERVICE and EXTRA files
+	* Setmiss: float (4 Byte reals) support
+	* Invert: bug fix
+	* Selbox: buf fix (add gridDefNvertex)
+	* grid.c: using grids from other datafile
+	* grid.c: generate grid from PINGO file
+	* fourier.c: multi threaded version of fft_set
+	* configure: checks for pthread and malloc library
+	* Version 0.9.3 released
+
+2004-11-17  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.8.5
+	* New module: Seasstat (seasmin, seasmax, seassum, seasmean, seasavg, seasstd)
+	* New module: Lsstat (lsmean, lsavg, lsmin, lsmax, lsstd)
+	* New operator: Selseas
+	* New operator: Splitseas
+	* Seldate: change parameter to start date and optional end date
+	* readline: add parameter max length
+	* grid.c: generate grid from CDI file
+	* remapcon: Bug fix for NORMALIZE_OPT and missing values
+	* pthread_create: check return value
+	* Version 0.9.2 released
+
+2004-10-14  Uwe Schulzweida  <schulzweida@dkrz.de>
+	
+	* changes for CDI library version 0.8.4
+	* use compNlon to compute nlon from nlat
+	* pipeInqTimestep: Bug fix for Timstat in pipes
+	* Select: Print message if isel not found
+	* Timstat: add missing value support
+	* Runstat: add missing value support
+	* Lmstat: add missing value support
+	* Inttime: add missing value support
+	* Intyear: add missing value support
+	* Vertstat: add missing value support
+	* new operator: timmean, yearmean, monmean, daymean, hourmean
+	* new operator: runmean
+	* new operator: lmmean
+	* new operator: vertmean
+	* new operator: map (source code from PINGO)
+	* new operator: setreftime
+	* new operator: selrec
+	* new operator: splityear
+	* netCDF2 support
+	* Version 0.9.1 released
+
+2004-09-08  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.8.3
+	* new module: Vertint (ml2pl, ml2hl)
+	* new module: Outputgmt (outputcenter, outputbounds)
+	* new operator: settaxis, settunits
+	* Arith, Cond, Comp:
+		input stream2 can only have 1 record or 1 timestep
+	* Inttime: set ntsteps to 1 if ijulinc = 0
+	* Timstat: set ntsteps to 1 for tim*
+	* seltimestep: set ntsteps to 1 if nsel = 1
+	* replace all streamCopyRecord by streamReadRecord and streamWriteRecord for piping
+	* Version 0.9.0 released
+	
+2004-07-09  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.8.2
+	* new module: Remap (remapcon, remapbil, remapbic, remapdis)
+	* new module: Setgatt (setgatt, setgatts)
+	* new module: Sort (sortcode, sortvar, sortlevel)
+	* new module: Writegrid
+	* new module: Vertstat (vertmin, vertmax, vertsum, vertavg, vertstd)
+	* new operator: delcode, delvar
+	* Timstat, Lmstat: use absolute timeaxis for output
+	* bug fix for use alias names in pipeline
+	* sellonlatbox: bug fix for selection out of bounds
+	* new option -v: Print extra details for some operators
+	* new option -R: Convert reduced to regular grid
+	* Version 0.8.9 released
+	
+2004-05-21  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.8.1
+	* Timstat, Runstat, Lmstat: extended for variables with TIME_CONSTANT
+	* pipeDefTimestep: compute nrecs for TIME_VARIABLE
+	* Splittime: bug fix for splithour and splitmon
+	* new operator: chvar, setvar
+	* new module: Intyear
+	* Version 0.8.8 released
+
+2004-04-19  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.8.0
+	* Arith: new operator (min and max)
+	* Arith: extended for missing values
+	* Arithc: extended for missing values
+	* Selindexbox: extended for curivilinear grids
+	* new module: Fillmiss
+	* new module: Varrms
+	* new module: Fldrms
+	* new module: Setgridtype
+	* bug fix: setmisstoc
+	* bug fix: Change, Set, Settime - change copy to read/write
+	* Version 0.8.7 released
+	
+2004-03-14  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.7.9
+	* change format for online help information
+	* new module: Change (chcode)
+	* new module: Set (setcode)
+	* new module: Settime (setdate, settime, setyear, setmon, setday)
+	* new module: Runstat (runmin, runmax, runsum, runavg, runstd)
+	* new module: Merstat (mermin, mermax, mersum, meravg, mermean, mervar, merstd)
+	* new module: Zonstat (zonmin, zonmax, zonsum, zonavg, zonmean, zonvar, zonstd)
+	* new module: Fldstat (fldmin, fldmax, fldsum, fldavg, fldmean, fldvar, fldstd)
+	* new module: Cond  (ifthen,  ifnotthen)
+	* new module: Condc (ifthenc, ifnotthenc)
+	* Select: select float levels instead of integer
+	* Infos: rename infos to sinfo and vinfo to infov
+	* Timstat: bug fix (calculate timerange)
+	* Version 0.8.6 released
+
+2004-01-05  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.7.8
+	* New module: Cat (cat)
+	* New module: Selbox (selindexbox, sellonlatbox)
+	* New module: Merge (merge)
+	* New module: Output (output, outputint, outputsrv, outputext)
+	* New module: Genvar (random, const)
+	* New module: Arithconst (addc, subc, mulc, divc)
+	* New module: Math (sqr sqrt exp log log10 sin cos tan asin acos atan)
+	* New module: Ninfo (nyear nmon ndate ntime ncode nvar nlevel)
+	* New module: Showinfo (showyear showmon showdate showtime showcode showvar showlevel)
+	* gridFromName: add default grid name r<LON>x<LAT>
+	* Copy: changed from one to unlimited inputfiles
+	* Split: bug fix for splitcode
+	* Version 0.8.5 released
+	
+2003-12-14  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.7.7
+	* pipe bug fix
+	* New module: Lmstat (lmean, lmavg, lmmin, lmmax, lmstd)
+	* New module: Splitrec
+	* Version 0.8.4 released
+
+2003-10-29  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.7.5
+	* Version 0.8.3 released
+
+2003-10-12  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for CDI library version 0.7.4
+	* changes for CDI library version 0.7.2 (HDF test interface)
+	* New operator: intarea, setctomiss, setmisstoc, setrangetomiss
+	* Version 0.8.2 released
+	
+2003-09-22  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* New operator: interpolate (source from PINGO)
+	* Version 0.8.1 released
+	
+2003-09-10  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* renamed to CDO (Climate Data Operators)
+	* changes for CDI library version 0.7.0
+	* replace info with vlist
+	* New operator: splithour, splitday, splitmon
+	* Version 0.8.0 released
+
+2003-07-30  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* changes for gdi library version 0.6.0
+	* Info.c: handle missing values
+	* Version 0.7.0 released
+	
+2003-06-25  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* gdi library version 0.5.11
+	* New operator: intgridtraj, mastrfu
+	* Version 0.6.4 released
+
+2003-06-23  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* New operator: intgrid, intpoint, inttime
+	* Version 0.6.3 released
+
+2003-06-12  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* gdi library version 0.5.9
+	* grib library version 0.4.5
+	* Version 0.6.2 released
+	
+2003-05-17  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* add module Spectral with operator sp2gp, gp2sp and sp2sp
+	* Version 0.6.1 released
+	
+2003-04-06  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* Version 0.6.0 released

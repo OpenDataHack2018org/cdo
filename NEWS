@@ -1,0 +1,8 @@
+CDO NEWS
+--------
+
+Version 0.9.3 (17 Dec 2004):
+* Support of PINGO grid description files.
+* New operator: gradsdes
+  Creates a GrADS data descriptor file.
+  Supported file formats are GRIB, SERVICE and EXTRA.
