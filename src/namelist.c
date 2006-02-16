@@ -167,6 +167,30 @@ void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, 
 }
 
 
+int namelistNum(NAMELIST *nml, const char *name)
+{
+  NML_ENTRY *entry;
+  int i, nocc = 0;
+
+  if ( nml == NULL ) return (nocc);
+
+  for ( i = 0; i < nml->size; i++ )
+    {
+      entry = nml->entry[i];
+      if ( strcmp(name, entry->name) == 0 )
+	{
+	  nocc = entry->occ;
+	  break;
+	}
+    }
+
+  if ( i == nml->size )
+    fprintf(stderr, "Namelist entry %s not found in %s\n", name, nml->name);
+
+  return (nocc);
+}
+
+
 static void getnite(void)
 {
   int nst, i, j;

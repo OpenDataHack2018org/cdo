@@ -55,5 +55,6 @@ void namelistDebug(int debug);
 void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, size_t size);
 void namelistPrint(NAMELIST *nml);
 void namelistRead(NAMELIST *nml);
+int  namelistNum(NAMELIST *nml, const char *name);
 
 #endif  /* _NAMELIST_H */
