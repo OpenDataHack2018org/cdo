@@ -21,48 +21,31 @@
 #include "cdo_int.h"
 #include "namelist.h"
 
-#define  NPARAM  5
 
 void *Nmltest(void *argument)
 {
+  NAMELIST *nml;
   int i1[5] = {-99, -99, -99, -99, -99};
   int i2    = -99;
   char lop[99] = "";
   double dm = 0;
-  const int nparam = NPARAM;
-  int pocc[NPARAM];
-  int plen[NPARAM], ptyp[NPARAM], pdis[NPARAM];
-  char *pnam[NPARAM];
-  int i;
   char *var[3];
 
   cdoInitialize(argument);
 
-  for ( i = 0; i < nparam; i++ ) pocc[i] = 0;
+  nml = namelistNew("SELECT");
 
-  for ( i = 0; i < 3; i++ ) var[i] = NULL;
+  namelistAdd(nml, "i1",  NML_INT,    0, i1,   sizeof(i1)/sizeof(int));
+  namelistAdd(nml, "i2",  NML_INT,    1, &i2,  sizeof(i2)/sizeof(int));
+  namelistAdd(nml, "lop", NML_TEXT,   2, lop,  sizeof(lop)/sizeof(char));
+  namelistAdd(nml, "dm",  NML_DOUBLE, 1, &dm,  sizeof(dm)/sizeof(double));
+  namelistAdd(nml, "var", NML_WORD,   0, var,  sizeof(var)/sizeof(char *));
 
-  i = 0;
-  pnam[i] = "i1";  ptyp[i] = NML_INT;    plen[i] = 5; pdis[i] = 0; i++;
-  pnam[i] = "i2";  ptyp[i] = NML_INT;    plen[i] = 1; pdis[i] = 1; i++;
-  pnam[i] = "lop"; ptyp[i] = NML_TEXT;   plen[i] = 99; pdis[i] = 2; i++;
-  pnam[i] = "dm";  ptyp[i] = NML_DOUBLE; plen[i] = 1; pdis[i] = 1; i++;
-  pnam[i] = "var"; ptyp[i] = NML_WORD;   plen[i] = 3; pdis[i] = 0; i++;
+  namelistRead(nml);
 
-  for ( i = 0; i < nparam; i++)
-    printf("%4s %4d %4d %4d %4d\n", pnam[i], ptyp[i], plen[i], pdis[i], pocc[i]);
+  namelistPrint(nml);
 
-  namelist(nparam, pnam, ptyp, plen, pocc, pdis, i1, &i2, lop, &dm, var);
-  
-  for ( i = 0; i < nparam; i++)
-    printf("%4s %4d %4d %4d %4d\n", pnam[i], ptyp[i], plen[i], pdis[i], pocc[i]);
-  
-  printf("&NAMEL\n");
-  printf(" I1 = %d %d %d %d %d,\n", i1[0], i1[1], i1[2], i1[3], i1[4]);
-  printf(" I2 = %d,\n", i2);
-  printf(" LOP = '%s',\n", lop);
-  printf(" VAR = %s, %s, %s\n", var[0], var[1], var[2]);
-  printf(" DM = %#g/\n", dm);
+  namelistDelete(nml);
 
   cdoFinish();
 

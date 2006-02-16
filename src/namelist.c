@@ -23,7 +23,23 @@
 
 #include "namelist.h"
 
+
+char *strdup(const char *s);
 int readline(FILE *fp, char *line, int len);
+
+
+#define  func_1         -1 /* nptype */
+#define  func_2         -2 /* nptype */
+#define  func_3         -3 /* nptype */
+#define  NML_NIX         0 /* nptype */
+#define  NML_TEXTU       5
+#define  NML_TEXTL       6
+#define  NML_NPR         7
+#define  NML_NUMBER      8 /* nptype */
+#define  NML_KEYWORD     9 /* nptype */
+
+#define  PRINT_NOT       1
+#define  PRINT_ALL       2
 
 #undef   TRUE
 #define  TRUE   1
@@ -41,13 +57,11 @@ struct PGMSTAT
 {
   int pdis;
   int intract;
-  int nfpm;
-  char *prog;
 };
 
 struct PGMSTAT pgmstat;
 
-#define MAXLINL 267
+#define MAXLINL 1024
 
 struct NAMELINE
 {
@@ -58,36 +72,98 @@ struct NAMELINE
 struct NAMELINE nameline;
 
 
-static void namelist_init(NAMELIST *namelist)
+static void namelist_init(NAMELIST *namelist, const char *name)
 {
-  static char func[] = "namelist_init";
-
   namelist->size = 0;
+  namelist->name = strdup(name);
 }
 
 
-NAMELIST *namelistNew()
+NAMELIST *namelistNew(const char *name)
 {
-  static char func[] = "namelistNew";  
   NAMELIST *namelist;
 
   namelist = (NAMELIST *) malloc(sizeof(NAMELIST));
 
-  namelist_init(namelist);
+  namelist_init(namelist, name);
 
   return (namelist);
 }
 
 
-void namelistDelete(NAMELIST *namelist)
+void namelistDelete(NAMELIST *nml)
 {
-  static char func[] = "namelistDelete";  
+  int i;
 
-  if ( namelist )
+  if ( nml )
     {
-      /*     if ( namelist->name )     free(namelist->name);*/
-      free(namelist);
+      for ( i = 0; i < nml->size; i++ )
+	{
+	  if ( nml->entry[i]->name ) free(nml->entry[i]->name);
+	  free(nml->entry[i]);
+	}
+      
+      if ( nml->name ) free(nml->name);
+      free(nml);
     }
+}
+
+
+void namelistPrint(NAMELIST *nml)
+{
+  NML_ENTRY *entry;
+  int i, j, nout;
+
+  if ( nml == NULL ) return;
+
+  fprintf(stdout, "Namelist: %s\n", nml->name);
+  fprintf(stdout, " Num  Name       Type  Size   Dis   Occ  Entries\n");
+
+  for ( i = 0; i < nml->size; i++ )
+    {
+      entry = nml->entry[i];
+      fprintf(stdout, "%4d  %-10s %4d  %4d  %4d  %4d ",
+	      i+1, nml->entry[i]->name, nml->entry[i]->type, (int)nml->entry[i]->size,
+	      nml->entry[i]->dis, nml->entry[i]->occ);
+      nout = nml->entry[i]->occ;
+      if ( nout > 8 ) nout = 8;
+      if      ( entry->type >= NML_TEXT )
+	fprintf(stdout, " '%s'", ((char *)entry->ptr));
+      else if ( entry->type == NML_WORD )
+	for ( j = 0; j < nout; j++ )
+	  fprintf(stdout, " %s", ((char **)entry->ptr)[j]);
+      else if ( entry->type == NML_INT )
+	for ( j = 0; j < nout; j++ )
+	  fprintf(stdout, " %d", ((int *)entry->ptr)[j]);
+      else if ( entry->type == NML_DOUBLE )
+	for ( j = 0; j < nout; j++ )
+	  fprintf(stdout, " %g", ((double *)entry->ptr)[j]);
+      
+      fprintf(stdout, "\n");
+    }
+}
+
+
+void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, size_t size)
+{
+  NML_ENTRY *nml_entry;
+
+  if ( nml->size >= MAX_NML_ENTRY )
+    {
+      fprintf(stderr, "Too much namelist entries in %s! (Max = %d)\n", nml->name, MAX_NML_ENTRY);
+      return;
+    }
+
+  nml_entry = (NML_ENTRY *) malloc(sizeof(NML_ENTRY));
+
+  nml_entry->name = strdup(name);
+  nml_entry->type = type;
+  nml_entry->ptr  = ptr;
+  nml_entry->size = size;
+  nml_entry->dis  = dis;
+  nml_entry->occ  = 0;
+
+  nml->entry[nml->size++] = nml_entry;
 }
 
 
@@ -111,7 +187,7 @@ static void getnite(void)
 	             (nameline.linelc[i] == '$')  ||
 		     (nameline.linelc[i] == '&') )
 	    {
-	      nameline.nptype = func_nkw;
+	      nameline.nptype = NML_KEYWORD;
 	      nameline.namitf = i;
 	      for ( j = nameline.namitf+1; j < MAXLINL; j++ )
 		{
@@ -147,7 +223,7 @@ static void getnite(void)
 		     nameline.linelc[i] == '-'  ||
 		     nameline.linelc[i] == '.' )
 	    {
-	      nameline.nptype = func_nir;
+	      nameline.nptype = NML_NUMBER;
 	      nameline.namitf = i;
 	      for ( j = i+1; j < MAXLINL; j++)
 		{
@@ -177,13 +253,13 @@ static void getnite(void)
       nst = 0;
     }
 
-  nameline.nptype = func_nix;
+  nameline.nptype = NML_NIX;
 }
 
 
 static void rdnlsgl(void *var, int ntyp, int nlen, int *nocc)
 {
-  if ( nameline.nptype == func_nir )
+  if ( nameline.nptype == NML_NUMBER )
     {
       if ( *nocc >= nlen )
 	{
@@ -215,10 +291,10 @@ static void rdnlsgl(void *var, int ntyp, int nlen, int *nocc)
       if      ( ntyp == NML_TEXT )
 	for (i=*nocc; i<newnocc; i++)
 	  ((char *)var)[i] = nameline.lineac[nameline.namitf+1+j++];
-      else if ( ntyp == func_ntu )
+      else if ( ntyp == NML_TEXTU )
 	for (i=*nocc; i<newnocc; i++)
 	  ((char *)var)[i] = nameline.lineuc[nameline.namitf+1+j++];
-      else if ( ntyp == func_ntl )
+      else if ( ntyp == NML_TEXTL )
 	for (i=*nocc; i<newnocc; i++)
 	  ((char *)var)[i] = nameline.linelc[nameline.namitf+1+j++];
       else
@@ -252,96 +328,77 @@ static void rdnlsgl(void *var, int ntyp, int nlen, int *nocc)
 }
 
 
-static void rdnlscdo(void *var, int ntyp, int nlen, int nocc, int nlst, char *cpnam, int ife)
+static void nml_print_entry(NML_ENTRY *entry, int ife)
 {
-  char namout[24];
   int nout, j;
 
-  if ( nlst == -1 ) return;
+  if ( entry->size == -1 ) return;
 
-  strcpy(namout, cpnam);
+  if ( entry->type == NML_NPR ) return;
 
-  if ( ntyp == func_npr ) return;
-
-  if ( ife == func_all )
-    nout = nocc;
+  if ( ife == PRINT_ALL )
+    nout = entry->occ;
   else
     {
-      nout = MAX(nocc, nlst);
+      nout = MAX(entry->occ, entry->dis);
       if ( nout == 0 ) return;
     }
 
-  printf(" %-24s", namout);
+  printf(" %-24s", entry->name);
 
-  if      ( ntyp >= NML_TEXT )
-    printf("'%s'", ((char *)var));
-  else if ( ntyp == NML_WORD )
+  if      ( entry->type >= NML_TEXT )
+    printf("'%s'", ((char *)entry->ptr));
+  else if ( entry->type == NML_WORD )
     for ( j = 0; j < nout; j++ )
-      printf(" %s", ((char **)var)[j]);
-  else if ( ntyp == NML_INT )
+      printf(" %s", ((char **)entry->ptr)[j]);
+  else if ( entry->type == NML_INT )
     for ( j = 0; j < nout; j++ )
-      printf(" %d", ((int *)var)[j]);
-  else if ( ntyp == NML_DOUBLE )
+      printf(" %d", ((int *)entry->ptr)[j]);
+  else if ( entry->type == NML_DOUBLE )
     for ( j = 0; j < nout; j++ )
-      printf(" %g", ((double *)var)[j]);
+      printf(" %g", ((double *)entry->ptr)[j]);
 
   printf("\n");
 }
 
 
-static void rdnlout(int ipl, char *cn[], int nt[], int nl[], int nc[], int no[], int ife, void *vparam[])
+static void nml_print(NAMELIST *nml, int ife)
 {
   int i;
 
-  for ( i = 0; i < ipl; i++ )
-    rdnlscdo(vparam[i], nt[i], nl[i], nc[i], no[i], cn[i], ife);
+  for ( i = 0; i < nml->size; i++ )
+    nml_print_entry(nml->entry[i], ife);
 }
 
 
-void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ...)
+void namelistRead(NAMELIST *nml)
 {
   /*
     cn  name
     nt  type
-    nl  length
-    nc  count
-    no  list
+    nl  size length
+    nc  occ count
+    no  dis list
   */
-  const int numpar = 99;
   int clear = FALSE;
   int j, jj, match = -1, wordmatch = -1;
   size_t len;
-  int index;
   char namecx[16], *pnamecx = NULL;
-  void *vparam[99];
-  va_list ap;
+  int nparam;
 
-  if ( nparam > numpar )
-    {
-      fprintf(stderr, "Too much parameter in namelist!\n");
-      return;
-    }
-
-  va_start(ap, no);
-
-  for ( index = 0; index < nparam; index++ )
-    vparam[index] = va_arg(ap, void *);
-
-  va_end(ap);
+  nparam = nml->size;
 
   nameline.namitl = MAXLINL;
-
-  if ( pgmstat.nfpm < 0 ) goto L3000;
 
  L2000:
 
   getnite();
 
-  if ( nameline.nptype == func_nix )
+  if ( nameline.nptype == NML_NIX )
     {
       goto L3000;
     }
-  else if ( nameline.nptype == func_nkw )
+  else if ( nameline.nptype == NML_KEYWORD )
     {
       memset(namecx, '\0', 16);
       len = nameline.namitl - nameline.namitf + 1;
@@ -354,8 +411,7 @@ void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ..
           if ( nameline.namitf < nameline.namitl)
 	    pnamecx = &nameline.linelc[nameline.namitf+1];
           if ( strncmp(pnamecx, "select", 6) == 0 || 
-	       strncmp(pnamecx, "params", 6) == 0 || 
-	       strncmp(pnamecx, pgmstat.prog, strlen(pgmstat.prog)) == 0 )
+	       strncmp(pnamecx, "params", 6) == 0 )
 	    goto L2000;
 
 	  goto L3000;
@@ -375,11 +431,11 @@ void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ..
       match = -1;
       for ( j = 0; j < nparam; j++ )
 	{
-	  if ( strlen(cn[j]) == len )
-	    if ( strncmp(pnamecx, cn[j], len) == 0 )
+	  if ( strlen(nml->entry[j]->name) == len )
+	    if ( strncmp(pnamecx, nml->entry[j]->name, len) == 0 )
 	      {
 		jj = j;
-		while ( nt[jj] == func_npr ) jj--;
+		while ( nml->entry[jj]->type == NML_NPR ) jj--;
 		if ( match == -1 )
 		  match = jj;
 		else if ( match != jj )
@@ -400,7 +456,7 @@ void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ..
           printf(" * unidentified or ambiguous parameter <%s>\n", namecx);
 	  printf(" * valid parameters and values specified so far are\n");
 
-	  rdnlout(nparam, cn, nt, nl, nc, no, func_all, vparam);
+	  nml_print(nml, PRINT_ALL);
 
           if ( ! pgmstat.intract )
 	    {
@@ -410,8 +466,8 @@ void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ..
         }
       else
 	{
-          if ( clear ) nc[match] = 0;
-	  if ( nt[match] == NML_WORD )
+          if ( clear ) nml->entry[match]->occ = 0;
+	  if ( nml->entry[match]->type == NML_WORD )
 	    wordmatch = match;
 	  else
 	    wordmatch = -1;
@@ -423,14 +479,14 @@ void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ..
     L777:
       j = match;
 
-      rdnlsgl(vparam[j], nt[j], nl[j], &nc[j]);
+      rdnlsgl(nml->entry[j]->ptr, nml->entry[j]->type, nml->entry[j]->size, &nml->entry[j]->occ);
 
-      if ( nameline.nptype != nt[j] )
+      if ( nameline.nptype != nml->entry[j]->type )
 	{
           printf(" * value ignored for parameter <%s> %5d\n", namecx, nameline.nptype);
 	  printf(" * valid parameters and values specified so far are\n");
 
-	  rdnlout(nparam, cn, nt, nl, nc, no, func_all, vparam);
+	  nml_print(nml, PRINT_ALL);
 
           if ( ! pgmstat.intract )
 	    {
@@ -443,7 +499,8 @@ void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ..
 
  L3000:
 
-  if ( pgmstat.pdis == func_not ) return;
+  if ( pgmstat.pdis == PRINT_NOT ) return;
 
-  rdnlout(nparam, cn, nt, nl, nc, no, pgmstat.pdis, vparam);
+  nml_print(nml, pgmstat.pdis);
 }
+

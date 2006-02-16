@@ -18,37 +18,42 @@
 #ifndef _NAMELIST_H
 #define _NAMELIST_H
 
-#define  func_1      -1
-#define  func_2      -2
-#define  func_3      -3
+#include <stdio.h>
 
-#define  func_nix     1
-#define  func_not     2
-#define  func_all     8
 
-#define  NML_INT     -1
-#define  NML_DOUBLE  -2
-#define  func_npr     0
-#define  NML_WORD   143
-#define  NML_TEXT   144
-#define  func_ntu   145
-#define  func_ntl   146
-#define  func_nir   147
-#define  func_nkw   148
+#define  NML_INT         1
+#define  NML_DOUBLE      2
+#define  NML_WORD        3
+#define  NML_TEXT        4
+
+#define MAX_NML_ENTRY  256
+
+struct _NML_ENTRY
+{
+  char *name;
+  void *ptr;
+  int type;
+  int occ;
+  int dis;
+  size_t size;
+};
+
+typedef struct _NML_ENTRY  NML_ENTRY;
 
 struct _NAMELIST
 {
   int size;
+  char *name;
+  NML_ENTRY *entry[MAX_NML_ENTRY];
 };
 
-typedef struct _NAMELIST NAMELIST;
+typedef struct _NAMELIST   NAMELIST;
 
-NAMELIST *namelistNew(void);
-void      namelistDelete(NAMELIST *nml);
-void      namelistDebug(int debug);
-void      namelistAdd(NAMELIST *nml, char *name);
-void      namelistPrint(NAMELIST *nml);
-
-void namelist(int nparam, char *cn[], int nt[], int nl[], int nc[], int no[], ...);
+NAMELIST *namelistNew(const char *name);
+void namelistDelete(NAMELIST *nml);
+void namelistDebug(int debug);
+void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, size_t size);
+void namelistPrint(NAMELIST *nml);
+void namelistRead(NAMELIST *nml);
 
 #endif  /* _NAMELIST_H */
