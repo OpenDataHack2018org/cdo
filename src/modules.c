@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -116,6 +116,7 @@ void *Vargen(void *argument);
 void *Varrms(void *argument);
 void *Vertint(void *argument);
 void *Vertstat(void *argument);
+void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
 void *Ydaystat(void *argument);
@@ -213,6 +214,7 @@ void *Zonstat(void *argument);
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertstd"}
+#define  WindOperators          {"uv2dv", "dv2uv"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
 #define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaymean", "ydayavg", "ydaystd"}
@@ -308,6 +310,7 @@ static MODULES Modules[] =
   { Varrms,         NULL,              VarrmsOperators,         2,  1 },
   { Vertint,        VertintHelp,       VertintOperators,        1,  1 },
   { Vertstat,       VertstatHelp,      VertstatOperators,       1,  1 },
+  { Wind,           NULL,              WindOperators,           1,  1 },
   { Writegrid,      NULL,              WritegridOperators,      1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,    1,  1 },
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,       1,  1 },

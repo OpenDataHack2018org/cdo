@@ -160,6 +160,7 @@ cdo_SOURCES = Arith.c		\
               Varrms.c  	\
               Vertint.c 	\
               Vertstat.c 	\
+              Wind.c         	\
               Writegrid.c 	\
               Writerandom.c 	\
               Ydaystat.c  	\
@@ -269,22 +270,23 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Test.$(OBJEXT) Timsort.$(OBJEXT) Timstat.$(OBJEXT) \
 	Trend.$(OBJEXT) Trms.$(OBJEXT) Vardup.$(OBJEXT) \
 	Vargen.$(OBJEXT) Varrms.$(OBJEXT) Vertint.$(OBJEXT) \
-	Vertstat.$(OBJEXT) Writegrid.$(OBJEXT) Writerandom.$(OBJEXT) \
-	Ydaystat.$(OBJEXT) Ymonarith.$(OBJEXT) Ymonstat.$(OBJEXT) \
-	Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) cdilib.$(OBJEXT) \
-	commandline.$(OBJEXT) exception.$(OBJEXT) expr_yacc.$(OBJEXT) \
-	expr_lex.$(OBJEXT) expr.$(OBJEXT) cdo.$(OBJEXT) \
-	cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) field.$(OBJEXT) \
-	fieldc.$(OBJEXT) field2.$(OBJEXT) fieldmer.$(OBJEXT) \
-	fieldzon.$(OBJEXT) grid.$(OBJEXT) history.$(OBJEXT) \
-	institution.$(OBJEXT) interpol.$(OBJEXT) modules.$(OBJEXT) \
-	namelist.$(OBJEXT) normal.$(OBJEXT) pipe.$(OBJEXT) \
-	process.$(OBJEXT) remaplib.$(OBJEXT) timer.$(OBJEXT) \
-	realtime.$(OBJEXT) pstream.$(OBJEXT) table.$(OBJEXT) \
-	userlog.$(OBJEXT) util.$(OBJEXT) legendre.$(OBJEXT) \
-	fourier.$(OBJEXT) specspace.$(OBJEXT) readline.$(OBJEXT) \
-	julian.$(OBJEXT) vinterp.$(OBJEXT) zaxis.$(OBJEXT) \
-	pthread_debug.$(OBJEXT) color.$(OBJEXT) list.$(OBJEXT)
+	Vertstat.$(OBJEXT) Wind.$(OBJEXT) Writegrid.$(OBJEXT) \
+	Writerandom.$(OBJEXT) Ydaystat.$(OBJEXT) Ymonarith.$(OBJEXT) \
+	Ymonstat.$(OBJEXT) Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) \
+	cdilib.$(OBJEXT) commandline.$(OBJEXT) exception.$(OBJEXT) \
+	expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) expr.$(OBJEXT) \
+	cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) \
+	field.$(OBJEXT) fieldc.$(OBJEXT) field2.$(OBJEXT) \
+	fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) grid.$(OBJEXT) \
+	history.$(OBJEXT) institution.$(OBJEXT) interpol.$(OBJEXT) \
+	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
+	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
+	timer.$(OBJEXT) realtime.$(OBJEXT) pstream.$(OBJEXT) \
+	table.$(OBJEXT) userlog.$(OBJEXT) util.$(OBJEXT) \
+	legendre.$(OBJEXT) fourier.$(OBJEXT) specspace.$(OBJEXT) \
+	readline.$(OBJEXT) julian.$(OBJEXT) vinterp.$(OBJEXT) \
+	zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
+	list.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES =
 cdo_LDFLAGS =
@@ -334,25 +336,25 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Trms.Po ./$(DEPDIR)/Vardup.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Vargen.Po ./$(DEPDIR)/Varrms.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Vertint.Po ./$(DEPDIR)/Vertstat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Writegrid.Po ./$(DEPDIR)/Writerandom.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ydaystat.Po ./$(DEPDIR)/Ymonarith.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ymonstat.Po ./$(DEPDIR)/Yseasstat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Zonstat.Po ./$(DEPDIR)/cdilib.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/cdo.Po ./$(DEPDIR)/cdo_pthread.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/cdo_vlist.Po ./$(DEPDIR)/color.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/commandline.Po ./$(DEPDIR)/exception.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/expr.Po ./$(DEPDIR)/expr_lex.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/expr_yacc.Po ./$(DEPDIR)/field.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/field2.Po ./$(DEPDIR)/fieldc.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/fieldmer.Po ./$(DEPDIR)/fieldzon.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/fourier.Po ./$(DEPDIR)/grid.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/history.Po ./$(DEPDIR)/institution.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/interpol.Po ./$(DEPDIR)/julian.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/legendre.Po ./$(DEPDIR)/list.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/modules.Po ./$(DEPDIR)/namelist.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/normal.Po ./$(DEPDIR)/pipe.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/process.Po ./$(DEPDIR)/pstream.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/pthread_debug.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Wind.Po ./$(DEPDIR)/Writegrid.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Writerandom.Po ./$(DEPDIR)/Ydaystat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Ymonarith.Po ./$(DEPDIR)/Ymonstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Yseasstat.Po ./$(DEPDIR)/Zonstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/cdilib.Po ./$(DEPDIR)/cdo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/cdo_pthread.Po ./$(DEPDIR)/cdo_vlist.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/color.Po ./$(DEPDIR)/commandline.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/exception.Po ./$(DEPDIR)/expr.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/expr_lex.Po ./$(DEPDIR)/expr_yacc.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/field.Po ./$(DEPDIR)/field2.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/fieldc.Po ./$(DEPDIR)/fieldmer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/fieldzon.Po ./$(DEPDIR)/fourier.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/grid.Po ./$(DEPDIR)/history.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/institution.Po ./$(DEPDIR)/interpol.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/julian.Po ./$(DEPDIR)/legendre.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/list.Po ./$(DEPDIR)/modules.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/namelist.Po ./$(DEPDIR)/normal.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/pipe.Po ./$(DEPDIR)/process.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/pstream.Po ./$(DEPDIR)/pthread_debug.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/readline.Po ./$(DEPDIR)/realtime.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/remaplib.Po ./$(DEPDIR)/specspace.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/table.Po ./$(DEPDIR)/timer.Po \
@@ -506,6 +508,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Varrms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writerandom.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ydaystat.Po@am__quote@

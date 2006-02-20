@@ -80,6 +80,7 @@ cdo_SOURCES = Arith.c		\
               Varrms.c  	\
               Vertint.c 	\
               Vertstat.c 	\
+              Wind.c         	\
               Writegrid.c 	\
               Writerandom.c 	\
               Ydaystat.c  	\
