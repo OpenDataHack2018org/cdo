@@ -326,10 +326,17 @@ void *Remap(void *argument)
     {
       read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &remaps[0].grid, &remaps[0].vars);
       nremaps = 1;
+      gridsize = remaps[0].grid.grid1_size;
       remaps[0].gridID = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
-      for ( i = 0; i < remaps[0].gridsize; i++ )
+      if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_nvgp;
+      if ( gridsize != remaps[0].gridsize )
+	cdoAbort("Size of data grid and weights from %s differ!", remap_file);
+
+      if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_size;
+
+      for ( i = 0; i < gridsize; i++ )
         if ( remaps[0].grid.grid1_mask[i] == FALSE )
           remaps[0].nmiss++;
 
@@ -431,7 +438,8 @@ void *Remap(void *argument)
 
 	  gridID1 = vlistInqVarGrid(vlistID1, varID);
 
-	  if ( map_type != MAP_TYPE_CONSERV && gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
+	  if ( map_type != MAP_TYPE_CONSERV && 
+	       gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
 	    cdoAbort("Only conservative remapping is available to remap between GME grids!");
 	  /*
 	  if ( gridIsRotated(gridID1) && map_type != MAP_TYPE_CONSERV )

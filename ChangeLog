@@ -4,6 +4,7 @@
 	* New module: Histogram (histcount, histsum, histmean) <- docu missing
 	* Cat: the output file must not exist anymore
 	* Zonstat: add support for GRID_GENERIC if ny > 1
+	* read_remap_scrip: if GME grid, read GME mask (bug fix [Luis])
 	* remaplib: change read/write of grid corners (bug fix)
 	* Spectral: rename sp2gp2/gp2sp2 to sp2gpl/gp2spl
 	* namelist: update

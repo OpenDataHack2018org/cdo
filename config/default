@@ -37,7 +37,6 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS="-ansi -g -D_REENTRANT -O2 -Wall " LIBS="-lm -lz"
 	;;
     regio01)
-# opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
 	            --with-netcdf=/client \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"

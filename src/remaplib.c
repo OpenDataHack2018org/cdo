@@ -5279,6 +5279,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   size_t count[2];
   double weights[4];
 
+  int gridID1_gme_c = -1;
+
 
   /* open file and read some global information */
 
@@ -5348,9 +5350,9 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
     {
       cdoPrint("convention = %s", convention);
       if ( strcmp(convention, "NCAR-CSM") == 0 )
-        cdoAbort("unsupported output file convention");
+        cdoAbort("unsupported file convention");
       else
-        cdoAbort("unknown output file convention");
+        cdoAbort("unknown file convention");
     }
 
   /* read some additional global attributes */
@@ -5366,7 +5368,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   grid2_name[attlen] = 0;
  
   if ( cdoVerbose )
-    cdoPrint("Remapping between: %s and %d", grid1_name, grid2_name);
+    cdoPrint("Remapping between: %s and %s", grid1_name, grid2_name);
 
   /* read dimension information */
 
@@ -5421,7 +5423,15 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   rg->pinit = FALSE;
   remapGridInitPointer(rg);
 
+  if ( gridInqType(gridID1) == GRID_GME )
+    {
+      rg->grid1_nvgp = gridInqSize(gridID1);
+      gridID1_gme_c = gridToCell(gridID1);
+    }
+
   remapGridRealloc(rv->map_type, rg);
+
+  if ( gridInqType(gridID1) == GRID_GME ) gridInqMask(gridID1_gme_c, rg->grid1_vgpm);    
 
   rv->pinit = TRUE;
   for ( i = 0; i < 4; i++ ) rv->wts[i] = NULL;
