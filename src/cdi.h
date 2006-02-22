@@ -228,6 +228,7 @@ void    vlistDefAttribute(int vlistID, const char *attname, const char *attstrin
 /*      vlistDefVar: Create a new Variable */
 int     vlistDefVar(int vlistID, int gridID, int zaxisID, int timeID);
 
+void    vlistChangeVarGrid(int vlistID, int varID, int gridID);
 void    vlistChangeVarZaxis(int vlistID, int varID, int zaxisID);
 
 void    vlistInqVar(int vlistID, int varID, int *gridID, int *zaxisID, int *timeID);

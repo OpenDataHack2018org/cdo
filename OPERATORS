@@ -1,4 +1,3 @@
-test
 ===========================
 CDO  Climate Data Operators
 ===========================
@@ -323,9 +322,9 @@ Operator catalog:
    Spectral transformation
 -------------------------------------------------------------
       Spectral   sp2gp           Spectral to gridpoint
-      Spectral   sp2gp2          Spectral to gridpoint (version 2)
+      Spectral   sp2gpl          Spectral to gridpoint linear
       Spectral   gp2sp           Gridpoint to spectral
-      Spectral   gp2sp2          Gridpoint to spectral (version 2)
+      Spectral   gp2spl          Gridpoint to spectral linear
       Spectral   sp2sp           Spectral to spectral
       Spectral   spcut           Cut spectral wave number
 -------------------------------------------------------------

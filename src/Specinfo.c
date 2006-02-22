@@ -140,7 +140,7 @@ void *Specinfo(void *argument)
       if ( *parg == '=' ) *parg++;
       if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
       trunc2 = atoi(parg);
-      nlat2  = trunc2nlat2(trunc2);
+      nlat2  = trunc2nlat_linear(trunc2);
       nlon2  = compNlon(nlat2);
       ngp2   = nlon2*nlat2;
       ni2    = (int) sqrt((double)ngp2/10) - 1;

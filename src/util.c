@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>   /* tolower */
 
 #include "cdo.h"
 #include "modules.h"
@@ -152,4 +153,17 @@ void input_int(char *arg, int intarr[], int maxint, int *nintfound)
     intarr[nint++] = atoi(++arg);
     
   *nintfound = nint;
+}
+
+
+void strtolower(char *str)
+{
+  int i, len;
+
+  if ( str )
+    {
+      len = (int) strlen(str);
+      for ( i = 0; i < len; i++ )
+	str[i] = tolower((int) str[i]);
+    }
 }

@@ -1246,7 +1246,7 @@ int nlat2trunc(int nlat)
 }
 
 
-int nlat2trunc2(int nlat)
+int nlat2trunc_linear(int nlat)
 {
   int trunc;
 
@@ -1274,9 +1274,9 @@ int trunc2nlat(int trunc)
 }
 
 
-int trunc2nlat2(int trunc)
+int trunc2nlat_linear(int trunc)
 {
-  static char func[] = "trunc2nlat2";
+  static char func[] = "trunc2nlat_linear";
   int nlat, nlat2;
 
   nlat = NINT((trunc*2.+1.)/2.);
@@ -1395,7 +1395,7 @@ int gridFromName(const char *gridname)
 	  if      ( strncmp(pline, "grid", 4) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( strncmp(pline, "spec", 4) == 0 ) grid.type = GRID_SPECTRAL;
       
-	  grid.ysize = trunc2nlat2(grid.trunc);
+	  grid.ysize = trunc2nlat_linear(grid.trunc);
 	  grid.xsize = compNlon(grid.ysize);
 
 	  if ( grid.type == GRID_GAUSSIAN )

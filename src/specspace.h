@@ -8,12 +8,28 @@ typedef struct {
   double *trig;
   double *poli;
   double *pold;
+  double *rcoslat; /* only for scaluv */
 }
 SPTRANS;
+
+typedef struct {
+  int trunc;
+  int fdim;
+  double *f1;
+  double *f2;
+}
+DVTRANS;
 
 
 SPTRANS *sptrans_new(int nlon, int nlat, int trunc);
 void sptrans_delete(SPTRANS *sptrans);
+
+DVTRANS *dvtrans_new(int ntr);
+void dvtrans_delete(DVTRANS *dvtrans);
+
+void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev,
+		 int gridID1, double *sd, double *svo,
+		 int gridID2, double *gu, double *gv);
 
 void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut);
 void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut);

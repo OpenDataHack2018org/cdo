@@ -42,8 +42,8 @@
 @BeginDesciption
 Merges all variables from ifile2 to ifile1 and write the result to ofile.
 Only the non missing values of ifile2 will be used.
-The grid of ifile2 musst be smaller or equal to the grid of ifile1.
-All gridpoints of ifile2 musst fit to the grid of ifile1.
+The grid of ifile2 must be smaller or equal to the grid of ifile1.
+All gridpoints of ifile2 must fit to the grid of ifile1.
 Both input files must have the same variables and the same number of timesteps.
 @EndDesciption
 

@@ -252,7 +252,7 @@ void *Spectral(void *argument)
 	  if ( operatorID == GP2SP )
 	    trunc = nlat2trunc(gridInqYsize(gridID1));
 	  else
-	    trunc = nlat2trunc2(gridInqYsize(gridID1));
+	    trunc = nlat2trunc_linear(gridInqYsize(gridID1));
 
 	  if ( gridIDsp != -1 )
 	    if ( trunc != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
@@ -290,7 +290,7 @@ void *Spectral(void *argument)
 	      if ( operatorID == SP2GP )
 		trunc = nlat2trunc(gridInqYsize(gridIDgp));
 	      else
-		trunc = nlat2trunc2(gridInqYsize(gridIDgp));
+		trunc = nlat2trunc_linear(gridInqYsize(gridIDgp));
 
 	      if ( gridInqTrunc(gridIDsp) != trunc ) gridIDgp = -1;
 	    }
@@ -438,6 +438,7 @@ void *Spectral(void *argument)
 
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
+  if ( vars )   free(vars);
 
   listDelete(ilist);
 

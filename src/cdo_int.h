@@ -52,6 +52,8 @@
 #define M_LN10		2.30258509299404568402	/* log_e 10 */
 #endif
 
+void strtolower(char *str);
+
 void print_pthread_info(void);
 
 void cdoProcessTime(double *utime, double *stime);
@@ -61,9 +63,9 @@ char   *commandLine(void);
 int     readline(FILE *fp, char *line, int len);
 
 int nlat2trunc(int nlat);
-int nlat2trunc2(int nlat);
+int nlat2trunc_linear(int nlat);
 int trunc2nlat(int trunc);
-int trunc2nlat2(int trunc);
+int trunc2nlat_linear(int trunc);
 int compNlon(int nlat);
 
 void    decode_date(int date, int *year, int *month, int *day);

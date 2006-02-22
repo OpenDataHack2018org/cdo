@@ -1,6 +1,7 @@
 2006-03-??  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 0.9.6
+	* New module: Wind (uv2dv, dv2uv) <- docu missing
 	* New module: Histogram (histcount, histsum, histmean) <- docu missing
 	* Cat: the output file must not exist anymore
 	* Zonstat: add support for GRID_GENERIC if ny > 1

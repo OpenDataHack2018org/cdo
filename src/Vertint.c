@@ -258,11 +258,9 @@ void *Vertint(void *argument)
       code = vlistInqVarCode(vlistID1, varID);
       if ( code <= 0 )
 	{
-	  size_t ll, len;
 	  vlistInqVarName(vlistID1, varID, varname);
-	  len = strlen(varname);
-	  for ( ll = 0; ll < len; ll++ )
-	    varname[ll] = tolower(varname[ll]);
+
+	  strtolower(varname);
 
 	  if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
 	  else if ( strcmp(varname, "st")      == 0 ) code = 130;
@@ -271,11 +269,11 @@ void *Vertint(void *argument)
 	  else if ( strcmp(varname, "geopoth") == 0 ) code = 156;
 	}
 
-      if ( code == 129 ) geopID    = varID;
-      if ( code == 130 ) tempID    = varID;
-      if ( code == 134 ) psID      = varID;
-      if ( code == 152 ) lnpsID    = varID;
-      if ( code == 156 ) gheightID = varID;
+      if      ( code == 129 ) geopID    = varID;
+      else if ( code == 130 ) tempID    = varID;
+      else if ( code == 134 ) psID      = varID;
+      else if ( code == 152 ) lnpsID    = varID;
+      else if ( code == 156 ) gheightID = varID;
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("spectral data on model level unsupported!");
