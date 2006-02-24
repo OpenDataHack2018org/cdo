@@ -62,10 +62,10 @@ void    setCommandLine(int argc, char **argv);
 char   *commandLine(void);
 int     readline(FILE *fp, char *line, int len);
 
-int nlat2trunc(int nlat);
-int nlat2trunc_linear(int nlat);
-int trunc2nlat(int trunc);
-int trunc2nlat_linear(int trunc);
+int nlat2ntr(int nlat);
+int nlat2ntr_linear(int nlat);
+int ntr2nlat(int ntr);
+int ntr2nlat_linear(int ntr);
 int compNlon(int nlat);
 
 void    decode_date(int date, int *year, int *month, int *day);

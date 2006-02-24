@@ -62,7 +62,7 @@ typedef struct {
   int     prec;
   int     isRotated;              /* TRUE for rotated grids         */
   int     type;
-  int     trunc;
+  int     ntr;
   int    *rowlon;
   size_t  nvertex;
   size_t  size;
@@ -99,7 +99,7 @@ void gridInit(GRID *grid)
   grid->ypole         = 0;
   grid->prec          = 0;
   grid->isRotated     = FALSE;
-  grid->trunc         = 0;
+  grid->ntr         = 0;
   grid->nvertex       = 0;
   grid->def_xfirst    = FALSE;
   grid->def_yfirst    = FALSE;
@@ -322,16 +322,16 @@ int gridDefine(GRID grid)
       }
     case GRID_SPECTRAL:
       {
-	if ( grid.trunc == 0 )
+	if ( grid.ntr == 0 )
 	  Error(func, "truncation undefined!");
 	if ( grid.size == 0 )
-	  grid.size = (grid.trunc+1) * (grid.trunc+2);
+	  grid.size = (grid.ntr+1) * (grid.ntr+2);
 
 	gridID = gridNew(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
 
-	gridDefTrunc(gridID, grid.trunc);
+	gridDefTrunc(gridID, grid.ntr);
 	
 	break;
       }
@@ -1236,56 +1236,56 @@ int gridFromPingo(FILE *gfp, const char *dname)
 }
 
 
-int nlat2trunc(int nlat)
+int nlat2ntr(int nlat)
 {
-  int trunc;
+  int ntr;
 
-  trunc = (nlat*2 - 1) / 3;
+  ntr = (nlat*2 - 1) / 3;
 
-  return (trunc);
+  return (ntr);
 }
 
 
-int nlat2trunc_linear(int nlat)
+int nlat2ntr_linear(int nlat)
 {
-  int trunc;
+  int ntr;
 
-  trunc = (nlat*2 - 1) / 2;
+  ntr = (nlat*2 - 1) / 2;
 
-  return (trunc);
+  return (ntr);
 }
 
 
-int trunc2nlat(int trunc)
+int ntr2nlat(int ntr)
 {
-  static char func[] = "trunc2nlat";
+  static char func[] = "ntr2nlat";
   int nlat, nlat2;
 
-  nlat = NINT((trunc*3.+1.)/2.);
+  nlat = NINT((ntr*3.+1.)/2.);
   if ( (nlat % 2) > 0 )
     {
       nlat  = nlat + 1;
-      nlat2 = NINT(((trunc+1)*3.+1.)/2.);
+      nlat2 = NINT(((ntr+1)*3.+1.)/2.);
       if ( nlat == nlat2 )
-	Error(func, "Computation of latitudes failed for truncation %d", trunc);
+	Error(func, "Computation of latitudes failed for truncation %d", ntr);
     }
 
   return (nlat);
 }
 
 
-int trunc2nlat_linear(int trunc)
+int ntr2nlat_linear(int ntr)
 {
-  static char func[] = "trunc2nlat_linear";
+  static char func[] = "ntr2nlat_linear";
   int nlat, nlat2;
 
-  nlat = NINT((trunc*2.+1.)/2.);
+  nlat = NINT((ntr*2.+1.)/2.);
   if ( (nlat % 2) > 0 )
     {
       nlat  = nlat + 1;
-      nlat2 = NINT(((trunc+1)*2.+1.)/2.);
+      nlat2 = NINT(((ntr+1)*2.+1.)/2.);
       if ( nlat == nlat2 )
-	Error(func, "Computation of latitudes failed for truncation %d", trunc);
+	Error(func, "Computation of latitudes failed for truncation %d", ntr);
     }
 
   return (nlat);
@@ -1390,12 +1390,12 @@ int gridFromName(const char *gridname)
       pline = &gridname[2];
       if ( isdigit((int) *pline) )
 	{
-	  grid.trunc = atoi(pline);
+	  grid.ntr = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 	  if      ( strncmp(pline, "grid", 4) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( strncmp(pline, "spec", 4) == 0 ) grid.type = GRID_SPECTRAL;
       
-	  grid.ysize = trunc2nlat_linear(grid.trunc);
+	  grid.ysize = ntr2nlat_linear(grid.ntr);
 	  grid.xsize = compNlon(grid.ysize);
 
 	  if ( grid.type == GRID_GAUSSIAN )
@@ -1410,12 +1410,12 @@ int gridFromName(const char *gridname)
       pline = &gridname[1];
       if ( isdigit((int) *pline) )
 	{
-	  grid.trunc = atoi(pline);
+	  grid.ntr = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 	  if      ( strncmp(pline, "grid", 4) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( strncmp(pline, "spec", 4) == 0 ) grid.type = GRID_SPECTRAL;
       
-	  grid.ysize = trunc2nlat(grid.trunc);
+	  grid.ysize = ntr2nlat(grid.ntr);
 	  grid.xsize = compNlon(grid.ysize);
 
 	  if ( grid.type == GRID_GAUSSIAN )

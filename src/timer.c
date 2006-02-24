@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -182,7 +182,7 @@ int timer_new(char *text)
       for ( it = 0; it < MAX_TIMER; it++ )
 	fprintf(stderr, "timer %3d:  %s\n", it, rt[it].text);
 
-      fprintf(stderr, "timer_new: MAX_TIMER to small!\n");
+      fprintf(stderr, "timer_new: MAX_TIMER too small!\n");
     }
 
   it = top_timer;

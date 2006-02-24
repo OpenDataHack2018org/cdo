@@ -170,7 +170,7 @@ INTEGER  Comma separated list of wave numbers
 @EndDoc
 */
 
-#define  MAX_TRUNC  9999
+#define  MAX_NTR  9999
 
 void *Spectral(void *argument)
 {
@@ -188,12 +188,12 @@ void *Spectral(void *argument)
   int gridID;
   int nmiss;
   int ncut = 0;
-  int *wnums = NULL, waves[MAX_TRUNC];
+  int *wnums = NULL, waves[MAX_NTR];
   int *vars;
   int lcopy = FALSE;
   double *array1 = NULL, *array2 = NULL;
   int taxisID1, taxisID2;
-  int nlon, nlat, trunc;
+  int nlon, nlat, ntr;
   SPTRANS *sptrans = NULL;
   LIST *ilist = listNew(INT_LIST);
 
@@ -250,17 +250,17 @@ void *Spectral(void *argument)
       if ( gridID1 != -1 )
 	{
 	  if ( operatorID == GP2SP )
-	    trunc = nlat2trunc(gridInqYsize(gridID1));
+	    ntr = nlat2ntr(gridInqYsize(gridID1));
 	  else
-	    trunc = nlat2trunc_linear(gridInqYsize(gridID1));
+	    ntr = nlat2ntr_linear(gridInqYsize(gridID1));
 
 	  if ( gridIDsp != -1 )
-	    if ( trunc != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
+	    if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
 
 	  if ( gridIDsp == -1 )
 	    {
-	      gridIDsp = gridNew(GRID_SPECTRAL, (trunc+1)*(trunc+2));
-	      gridDefTrunc(gridIDsp, trunc);
+	      gridIDsp = gridNew(GRID_SPECTRAL, (ntr+1)*(ntr+2));
+	      gridDefTrunc(gridIDsp, ntr);
 	    }
 	}
 
@@ -271,11 +271,11 @@ void *Spectral(void *argument)
 
       gridID2 = gridIDsp;
 
-      nlon  = gridInqXsize(gridID1);
-      nlat  = gridInqYsize(gridID1);
-      trunc = gridInqTrunc(gridID2);
+      nlon = gridInqXsize(gridID1);
+      nlat = gridInqYsize(gridID1);
+      ntr  = gridInqTrunc(gridID2);
 
-      sptrans = sptrans_new(nlon, nlat, trunc);
+      sptrans = sptrans_new(nlon, nlat, ntr, 0);
     }
   else if ( operatorID == SP2GP || operatorID == SP2GPL )
     {   
@@ -288,11 +288,11 @@ void *Spectral(void *argument)
 	  if ( gridIDgp != -1 )
 	    {
 	      if ( operatorID == SP2GP )
-		trunc = nlat2trunc(gridInqYsize(gridIDgp));
+		ntr = nlat2ntr(gridInqYsize(gridIDgp));
 	      else
-		trunc = nlat2trunc_linear(gridInqYsize(gridIDgp));
+		ntr = nlat2ntr_linear(gridInqYsize(gridIDgp));
 
-	      if ( gridInqTrunc(gridIDsp) != trunc ) gridIDgp = -1;
+	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
 	    }
 
 	  if ( gridIDgp == -1 )
@@ -308,11 +308,11 @@ void *Spectral(void *argument)
 
 	  gridID2 = gridIDgp;
 
-	  trunc = gridInqTrunc(gridID1);
-	  nlon  = gridInqXsize(gridID2);
-	  nlat  = gridInqYsize(gridID2);
+	  ntr  = gridInqTrunc(gridID1);
+	  nlon = gridInqXsize(gridID2);
+	  nlat = gridInqYsize(gridID2);
       
-	  sptrans = sptrans_new(nlon, nlat, trunc);
+	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
 	}
     }
   else if ( operatorID == SP2SP )
@@ -322,10 +322,10 @@ void *Spectral(void *argument)
       operatorInputArg("truncation");
       if ( gridID1 != -1 )
 	{
-	  int trunc = atoi(operatorArgv()[0]);
-	  int nsp = (trunc+1)*(trunc+2);
+	  int ntr = atoi(operatorArgv()[0]);
+	  int nsp = (ntr+1)*(ntr+2);
 	  gridIDsp = gridNew(GRID_SPECTRAL, nsp);
-	  gridDefTrunc(gridIDsp, trunc);
+	  gridDefTrunc(gridIDsp, ntr);
 	}
       else
 	cdoAbort("No spectral data found!");
@@ -342,11 +342,11 @@ void *Spectral(void *argument)
 	{
 	  ncut = args2intlist(operatorArgc(), operatorArgv(), ilist);
 	  wnums = (int *) listArrayPtr(ilist);
-	  for ( i = 0; i < MAX_TRUNC; i++ ) waves[i] = 1;
+	  for ( i = 0; i < MAX_NTR; i++ ) waves[i] = 1;
 	  for ( i = 0; i < ncut; i++ )
 	    {
 	      j = wnums[i] - 1;
-	      if ( j < 0 || j >= MAX_TRUNC )
+	      if ( j < 0 || j >= MAX_NTR )
 		cdoAbort("wave number %d out of range!", wnums[i]);
 	      waves[j] = 0;
 	    }

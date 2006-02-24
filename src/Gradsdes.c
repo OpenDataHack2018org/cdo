@@ -869,7 +869,7 @@ void *Gradsdes(void *argument)
   /* TITLE */
 
   res = 0;
-  if ( gridtype == GRID_GAUSSIAN ) res = nlat2trunc(ysize);
+  if ( gridtype == GRID_GAUSSIAN ) res = nlat2ntr(ysize);
 
   if ( res )
     fprintf(gdp, "TITLE  %s  T%d grid\n", datfile, res);

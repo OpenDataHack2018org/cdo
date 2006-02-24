@@ -44,6 +44,8 @@
 @Title     = u and v wind to divergence and vorticity
 
 @BeginDesciption
+Calculate spherical harmonic coefficients of divergence and vorticity
+from U and V wind.
 @EndDesciption
 
 @EndOperator
@@ -54,6 +56,7 @@
 @Title     = Divergence and vorticity to u and v wind
 
 @BeginDesciption
+Calculate U and V wind on a gaussian grid from divergence and vorticity.
 @EndDesciption
 
 @EndOperator
@@ -71,7 +74,7 @@ void *Wind(void *argument)
   int streamID1, streamID2;
   int nrecs, nvars;
   int tsID, recID, varID, levelID;
-  int nlev, gridsize;
+  int nlev = 0, gridsize;
   int index, ngrids;
   int vlistID1, vlistID2;
   int gridIDsp = -1, gridIDgp = -1;
@@ -80,7 +83,7 @@ void *Wind(void *argument)
   int nmiss;
   int lcopy = FALSE;
   int taxisID1, taxisID2;
-  int nlon, nlat, trunc;
+  int nlon, nlat, ntr;
   int code;
   int varID1 = -1, varID2 = -1;
   int offset;
@@ -116,6 +119,18 @@ void *Wind(void *argument)
       if ( operatorID == UV2DV ) 
 	{
 	  /* search for u and v wind */
+	  code = vlistInqVarCode(vlistID1, varID);
+	  if ( code <= 0 )
+	    {
+	      vlistInqVarName(vlistID1, varID, varname);
+	      strtolower(varname);
+
+	      if      ( strcmp(varname, "u") == 0 ) code = 131;
+	      else if ( strcmp(varname, "v") == 0 ) code = 132;
+	    }
+
+	  if      ( code == 131 ) varID1 = varID;
+	  else if ( code == 132 ) varID2 = varID;
 	}
       else
 	{
@@ -124,7 +139,6 @@ void *Wind(void *argument)
 	  if ( code <= 0 )
 	    {
 	      vlistInqVarName(vlistID1, varID, varname);
-
 	      strtolower(varname);
 
 	      if      ( strcmp(varname, "sd")  == 0 ) code = 155;
@@ -163,78 +177,99 @@ void *Wind(void *argument)
   /* define output grid */
   if ( operatorID == UV2DV )
     {
-      gridID1 = gridIDgp;
+      if ( varID1 == -1 ) cdoWarning("U-wind not found!");
+      if ( varID2 == -1 ) cdoWarning("V-wind not found!");
 
-      if ( gridID1 != -1 )
+      if ( varID1 != -1 && varID2 != -1 )
 	{
-	  trunc = nlat2trunc(gridInqYsize(gridID1));
+	  gridID1 = vlistInqVarGrid(vlistID1, varID1);
 
-	  if ( gridIDsp != -1 )
-	    if ( trunc != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
+	  if ( gridInqType(gridID1) != GRID_GAUSSIAN )
+	    cdoAbort("U-wind is not on gaussian grid!");
 
-	  if ( gridIDsp == -1 )
+	  if ( gridID1 != vlistInqVarGrid(vlistID1, varID2) )
+	    cdoAbort("U and V wind must have the same grid represention!");
+
+	  if ( gridID1 != -1 )
 	    {
-	      gridIDsp = gridNew(GRID_SPECTRAL, (trunc+1)*(trunc+2));
-	      gridDefTrunc(gridIDsp, trunc);
+	      ntr = nlat2ntr(gridInqYsize(gridID1));
+
+	      if ( gridIDsp != -1 )
+		if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
+
+	      if ( gridIDsp == -1 )
+		{
+		  gridIDsp = gridNew(GRID_SPECTRAL, (ntr+1)*(ntr+2));
+		  gridDefTrunc(gridIDsp, ntr);
+		}
 	    }
+
+	  if ( gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED )
+	    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
+
+	  if ( gridIDsp == -1 ) cdoAbort("No Gaussian grid data found!");
+
+	  gridID2 = gridIDsp;
+
+	  vlistChangeVarGrid(vlistID2, varID1, gridID2);
+	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
+	  vlistDefVarCode(vlistID2, varID1, 155);
+	  vlistDefVarCode(vlistID2, varID2, 138);
+	  /* define varname aso. !!! */
+
+	  nlon = gridInqXsize(gridID1);
+	  nlat = gridInqYsize(gridID1);
+	  ntr  = gridInqTrunc(gridID2);
+
+	  sptrans = sptrans_new(nlon, nlat, ntr, 1);
 	}
-
-      if ( gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED )
-	cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
-
-      if ( gridIDsp == -1 ) cdoAbort("No Gaussian grid data found!");
-
-      gridID2 = gridIDsp;
-
-      nlon  = gridInqXsize(gridID1);
-      nlat  = gridInqYsize(gridID1);
-      trunc = gridInqTrunc(gridID2);
-
-      sptrans = sptrans_new(nlon, nlat, trunc);
     }
   else
     {   
       if ( varID1 == -1 ) cdoWarning("Divergence not found!");
       if ( varID2 == -1 ) cdoWarning("Vorticity not found!");
 
-      gridID1 = vlistInqVarGrid(vlistID1, varID2);
-
-      if ( gridInqType(gridID1) != GRID_SPECTRAL )
-	cdoAbort("Vorticity is not on spectral grid!");
-
-      if ( gridID1 != vlistInqVarGrid(vlistID1, varID1) )
-	cdoAbort("Divergence and vorticity must have the same grid represention!");
-
-      if ( gridIDgp != -1 )
+      if ( varID1 != -1 && varID2 != -1 )
 	{
-	  trunc = nlat2trunc(gridInqYsize(gridIDgp));
+	  gridID1 = vlistInqVarGrid(vlistID1, varID2);
+
+	  if ( gridInqType(gridID1) != GRID_SPECTRAL )
+	    cdoAbort("Vorticity is not on spectral grid!");
+
+	  if ( gridID1 != vlistInqVarGrid(vlistID1, varID1) )
+	    cdoAbort("Divergence and vorticity must have the same grid represention!");
+
+	  if ( gridIDgp != -1 )
+	    {
+	      ntr = nlat2ntr(gridInqYsize(gridIDgp));
 	      
-	  if ( gridInqTrunc(gridIDsp) != trunc ) gridIDgp = -1;
-	}
+	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
+	    }
 
-      if ( gridIDgp == -1 )
-	{
-	  char gridname[20];
+	  if ( gridIDgp == -1 )
+	    {
+	      char gridname[20];
 
-	  sprintf(gridname, "t%dgrid", gridInqTrunc(gridID1));
+	      sprintf(gridname, "t%dgrid", gridInqTrunc(gridID1));
+	  
+	      gridIDgp = gridFromName(gridname);
+	    }
 
-	  gridIDgp = gridFromName(gridname);
-	}
+	  gridID2 = gridIDgp;
 
-      gridID2 = gridIDgp;
+	  vlistChangeVarGrid(vlistID2, varID1, gridID2);
+	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
+	  vlistDefVarCode(vlistID2, varID1, 131);
+	  vlistDefVarCode(vlistID2, varID2, 132);
+	  /* define varname aso. !!! */
 
-      vlistChangeVarGrid(vlistID2, varID1, gridID2);
-      vlistChangeVarGrid(vlistID2, varID2, gridID2);
-      vlistDefVarCode(vlistID2, varID1, 131);
-      vlistDefVarCode(vlistID2, varID2, 132);
-      /* define varname aso. !!! */
-
-      trunc = gridInqTrunc(gridID1);
-      nlon  = gridInqXsize(gridID2);
-      nlat  = gridInqYsize(gridID2);
+	  ntr  = gridInqTrunc(gridID1);
+	  nlon = gridInqXsize(gridID2);
+	  nlat = gridInqYsize(gridID2);
       
-      sptrans = sptrans_new(nlon, nlat, trunc);
-      dvtrans = dvtrans_new(trunc);
+	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
+	  dvtrans = dvtrans_new(ntr);
+	}
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -251,15 +286,18 @@ void *Wind(void *argument)
       array2 = (double *) malloc(gridsize*sizeof(double));
     }
 
-  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
+  if ( varID1 != -1 && varID2 != -1 )
+    {
+      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID1));
 
-  gridsize = gridInqSize(gridID1);
-  ivar1 = (double *) malloc(nlev*gridsize*sizeof(double));
-  ivar2 = (double *) malloc(nlev*gridsize*sizeof(double));
-
-  gridsize = gridInqSize(gridID2);
-  ovar1 = (double *) malloc(nlev*gridsize*sizeof(double));
-  ovar2 = (double *) malloc(nlev*gridsize*sizeof(double));
+      gridsize = gridInqSize(gridID1);
+      ivar1 = (double *) malloc(nlev*gridsize*sizeof(double));
+      ivar2 = (double *) malloc(nlev*gridsize*sizeof(double));
+  
+      gridsize = gridInqSize(gridID2);
+      ovar1 = (double *) malloc(nlev*gridsize*sizeof(double));
+      ovar2 = (double *) malloc(nlev*gridsize*sizeof(double));
+    }
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -272,7 +310,7 @@ void *Wind(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( varID == varID1 || varID == varID2 )
+	  if ( (varID1 != -1 && varID2 != -1) && (varID == varID1 || varID == varID2) )
 	    {
 	      streamReadRecord(streamID1, array1, &nmiss);
 	      if ( nmiss ) cdoAbort("missing values unsupported for spectral data!");
@@ -299,27 +337,45 @@ void *Wind(void *argument)
 		}
 	    }
 	}
-      /*
-	if ( operatorID == UV2DV )
-	uv2dv(sptrans, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);	      
-	else if ( operatorID == DV2UV )
-	dv2uv(sptrans, dvtrans, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
-      */
-      if ( operatorID == DV2UV )
-	trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
 
-      gridsize = gridInqSize(gridID2);
-      for ( levelID = 0; levelID < nlev; levelID++ )
+      if ( varID1 != -1 && varID2 != -1 )
 	{
-	  offset = gridsize*levelID;
-	  streamDefRecord(streamID2, varID1, levelID);
-	  streamWriteRecord(streamID2, ovar1+offset, 0);
-	}
-      for ( levelID = 0; levelID < nlev; levelID++ )
-	{
-	  offset = gridsize*levelID;
-	  streamDefRecord(streamID2, varID2, levelID);
-	  streamWriteRecord(streamID2, ovar2+offset, 0);
+	  if ( operatorID == UV2DV )
+	    trans_uv2dv(sptrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
+	  else if ( operatorID == DV2UV )
+	    trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
+
+	  gridsize = gridInqSize(gridID2);
+	  if ( operatorID == UV2DV )
+	    {
+	      for ( levelID = 0; levelID < nlev; levelID++ )
+		{
+		  offset = gridsize*levelID;
+		  streamDefRecord(streamID2, varID2, levelID);
+		  streamWriteRecord(streamID2, ovar2+offset, 0);
+		}
+	      for ( levelID = 0; levelID < nlev; levelID++ )
+		{
+		  offset = gridsize*levelID;
+		  streamDefRecord(streamID2, varID1, levelID);
+		  streamWriteRecord(streamID2, ovar1+offset, 0);
+		}
+	    }
+	  else if ( operatorID == DV2UV )
+	    {
+	      for ( levelID = 0; levelID < nlev; levelID++ )
+		{
+		  offset = gridsize*levelID;
+		  streamDefRecord(streamID2, varID1, levelID);
+		  streamWriteRecord(streamID2, ovar1+offset, 0);
+		}
+	      for ( levelID = 0; levelID < nlev; levelID++ )
+		{
+		  offset = gridsize*levelID;
+		  streamDefRecord(streamID2, varID2, levelID);
+		  streamWriteRecord(streamID2, ovar2+offset, 0);
+		}
+	    }
 	}
 
       tsID++;
@@ -337,7 +393,7 @@ void *Wind(void *argument)
   if ( ovar2 ) free(ovar2);
 
   sptrans_delete(sptrans);
-  if ( operatorID == DV2UV ) dvtrans_delete(dvtrans);
+  if ( dvtrans ) dvtrans_delete(dvtrans);
 
   cdoFinish();
 

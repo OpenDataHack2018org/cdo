@@ -257,7 +257,7 @@ void phcs(double *pnm, double *hnm, int waves, double pmu,
 }
 
 
-/* to slow for nec, 2.0 instead of 2.3 GFlops ( vector length to small ) */
+/* to slow for nec, 2.0 instead of 2.3 GFlops ( vector length too small ) */
 void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc, int nt)
 {
   int lev, jm, jn, latn, lats, nsp2, is;
@@ -430,7 +430,7 @@ void sp2sp(double *arrayIn, int truncIn, double *arrayOut, int truncOut)
 /* Cut spectral wave numbers                */
 /* ======================================== */
 
-void spcut(double *arrayIn, double *arrayOut, int trunc, int waves[])
+void spcut(double *arrayIn, double *arrayOut, int trunc, int *waves)
 {
   int n, m;
 

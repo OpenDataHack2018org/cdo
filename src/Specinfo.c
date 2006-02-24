@@ -51,7 +51,7 @@
 @EndDoc
 */
 
-#define NSP2TRUNC(nsp) ((int) ((((sqrt((double)(4*nsp+1)))-3)/2)))
+#define NSP2NTR(nsp) ((int) ((((sqrt((double)(4*nsp+1)))-3)/2)))
 
 
 static void fac(int nlonin, int *nlonout, int *ierr)
@@ -120,8 +120,8 @@ void *Specinfo(void *argument)
 {
   char arg[128], *parg;
   int len, i, nout1 = 0, nout2 = 0;
-  int trunc1 = 0, nsp1 = 0, nlat1 = 0, nlon1 = 0, ngp1 = 0, ni1 = 0, ngp_gme1 = 0;
-  int trunc2 = 0, nsp2 = 0, nlat2 = 0, nlon2 = 0, ngp2 = 0, ni2 = 0, ngp_gme2 = 0;
+  int ntr1 = 0, nsp1 = 0, nlat1 = 0, nlon1 = 0, ngp1 = 0, ni1 = 0, ngp_gme1 = 0;
+  int ntr2 = 0, nsp2 = 0, nlat2 = 0, nlon2 = 0, ngp2 = 0, ni2 = 0, ngp_gme2 = 0;
 
   cdoInitialize(argument);
 
@@ -139,8 +139,8 @@ void *Specinfo(void *argument)
       parg = &arg[2];
       if ( *parg == '=' ) *parg++;
       if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      trunc2 = atoi(parg);
-      nlat2  = trunc2nlat_linear(trunc2);
+      ntr2   = atoi(parg);
+      nlat2  = ntr2nlat_linear(ntr2);
       nlon2  = compNlon(nlat2);
       ngp2   = nlon2*nlat2;
       ni2    = (int) sqrt((double)ngp2/10) - 1;
@@ -152,8 +152,8 @@ void *Specinfo(void *argument)
       parg = &arg[1];
       if ( *parg == '=' ) *parg++;
       if ( ! isdigit((int) *parg) ) cdoAbort("Wrong parameter: %s", arg);
-      trunc1 = atoi(parg);
-      nlat1  = trunc2nlat(trunc1);
+      ntr1   = atoi(parg);
+      nlat1  = ntr2nlat(ntr1);
       nlon1  = compNlon(nlat1);
       ngp1   = nlon1*nlat1;
       ni1    = (int) sqrt((double)ngp1/10) - 1;
@@ -171,16 +171,16 @@ void *Specinfo(void *argument)
       ngp_gme2 = (ni2+1)*(ni2+1)*10;
       nsp1   = ngp_gme1 / 2;
       nsp2   = ngp_gme2 / 2;
-      trunc1 = NSP2TRUNC(nsp1);
-      trunc2 = NSP2TRUNC(nsp2);
-      nlat1  = trunc1 + trunc1%2;
-      nlat2  = trunc2 + trunc2%2;
+      ntr1   = NSP2NTR(nsp1);
+      ntr2   = NSP2NTR(nsp2);
+      nlat1  = ntr1 + ntr1%2;
+      nlat2  = ntr2 + ntr2%2;
       nlon1  = nlat2nlon(nlat1);
       nlon2  = nlat2nlon(nlat2);
       nlat1  = nlon1 / 2;
       nlat2  = nlon2 / 2;
-      trunc1 = (nlat1*2-1)/3;
-      trunc2 = (nlat2*2-1)/2;
+      ntr1   = (nlat1*2-1)/3;
+      ntr2   = (nlat2*2-1)/2;
       nout1  = TRUE;
       nout2  = TRUE;
     }
@@ -195,8 +195,8 @@ void *Specinfo(void *argument)
       nlon2  = nlat2nlon(nlat2);
       nlat1  = nlon1 / 2;
       nlat2  = nlon2 / 2;
-      trunc1 = (nlat1*2-1)/3;
-      trunc2 = (nlat2*2-1)/2;
+      ntr1   = (nlat1*2-1)/3;
+      ntr2   = (nlat2*2-1)/2;
       ngp1   = nlon1*nlat1;
       ngp2   = nlon2*nlat2;
       ni1    = (int) sqrt((double)ngp1/10) - 1;
@@ -217,8 +217,8 @@ void *Specinfo(void *argument)
       nlon2  = nlat2nlon(nlat2);
       nlat1  = nlon1 / 2;
       nlat2  = nlon2 / 2;
-      trunc1 = (nlat1*2-1)/3;
-      trunc2 = (nlat2*2-1)/2;
+      ntr1   = (nlat1*2-1)/3;
+      ntr2   = (nlat2*2-1)/2;
       ngp1   = nlon1*nlat1;
       ngp2   = nlon2*nlat2;
       ni1    = (int) sqrt((double)ngp1/10) - 1;
@@ -229,8 +229,8 @@ void *Specinfo(void *argument)
   else
     cdoAbort("Unsupported parameter: %s", arg);
 
-  nsp1     = (trunc1+1)*(trunc1+2);
-  nsp2     = (trunc2+1)*(trunc2+2);
+  nsp1     = (ntr1+1)*(ntr1+2);
+  nsp2     = (ntr2+1)*(ntr2+2);
   ngp1     = nlon1*nlat1;
   ngp2     = nlon2*nlat2;
   ngp_gme1 = (ni1+1)*(ni1+1)*10;
@@ -239,10 +239,10 @@ void *Specinfo(void *argument)
   fprintf(stdout, "truncation     nsp  nlat  nlon      ngp   ni  ngp_gme\n");
 
   if ( nout1 ) fprintf(stdout, "   T%-4d  %8d %5d %5d %8d %4d %8d\n",
-		       trunc1, nsp1, nlat1, nlon1, ngp1, ni1, ngp_gme1);
+		       ntr1, nsp1, nlat1, nlon1, ngp1, ni1, ngp_gme1);
 
   if ( nout2 ) fprintf(stdout, "   TL%-4d %8d %5d %5d %8d %4d %8d\n",
-		       trunc2, nsp2, nlat2, nlon2, ngp2, ni2, ngp_gme2);
+		       ntr2, nsp2, nlat2, nlon2, ngp2, ni2, ngp_gme2);
 
   cdoFinish();
 
