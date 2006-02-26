@@ -204,9 +204,9 @@ static void getnite(void)
 	{
 	  if ( nameline.linelc[i] == 0 ) break;
 
-          if      (   nameline.linelc[i] == ' ' ) ;
-	  else if (   nameline.linelc[i] == '=' ) ;
-          else if (   nameline.linelc[i] == ',' ) ;
+          if      (   nameline.linelc[i] == ' ' ) continue;
+	  else if (   nameline.linelc[i] == '=' ) continue;
+          else if (   nameline.linelc[i] == ',' ) continue;
           else if ( ((nameline.linelc[i] >= 'a')  &&
 		     (nameline.linelc[i] <= 'z')) ||
 	             (nameline.linelc[i] == '$')  ||
@@ -252,11 +252,11 @@ static void getnite(void)
 	      nameline.namitf = i;
 	      for ( j = i+1; j < MAXLINL; j++)
 		{
-		  if ( nameline.linelc[j] >= '0' && nameline.linelc[j] <= '9' ) ;
-	          else if ( nameline.linelc[j] == '+' ) ;
-		  else if ( nameline.linelc[j] == '-' ) ;
-         	  else if ( nameline.linelc[j] == '.' ) ;
-		  else if ( nameline.linelc[j] == 'e' ) ;
+		  if ( nameline.linelc[j] >= '0' && nameline.linelc[j] <= '9' ) continue;
+	          else if ( nameline.linelc[j] == '+' ) continue;
+		  else if ( nameline.linelc[j] == '-' ) continue;
+         	  else if ( nameline.linelc[j] == '.' ) continue;
+		  else if ( nameline.linelc[j] == 'e' ) continue;
                   else
 		    {
 		      nameline.namitl = j - 1;
@@ -337,7 +337,7 @@ static void rdnlsgl(void *var, int ntyp, int nlen, int *nocc)
       if ( *nocc < nlen )
 	{
 	  len = nameline.namitl - nameline.namitf + 1;
-	  ((char **)var)[*nocc] = (char*) calloc(len+1, sizeof(char));
+	  ((char **)var)[*nocc] = (char*) calloc((size_t)len+1, sizeof(char));
 	  for ( i = 0; i < len; i++ )
 	    ((char **)var)[*nocc][i] = nameline.lineac[nameline.namitf+i];
 	  *nocc += 1;
@@ -357,7 +357,7 @@ static void nml_print_entry(NML_ENTRY *entry, int ife)
 {
   int nout, j;
 
-  if ( entry->size == -1 ) return;
+  if ( entry->size == 0 ) return;
 
   if ( entry->type == NML_NPR ) return;
 
@@ -426,7 +426,7 @@ void namelistRead(NAMELIST *nml)
   else if ( nameline.nptype == NML_KEYWORD )
     {
       memset(namecx, '\0', 16);
-      len = nameline.namitl - nameline.namitf + 1;
+      len = (size_t) (nameline.namitl - nameline.namitf + 1);
 
       if ( nameline.lineac[nameline.namitf] == '$' || 
 	   nameline.lineac[nameline.namitf] == '&' )
@@ -504,7 +504,7 @@ void namelistRead(NAMELIST *nml)
     L777:
       j = match;
 
-      rdnlsgl(nml->entry[j]->ptr, nml->entry[j]->type, nml->entry[j]->size, &nml->entry[j]->occ);
+      rdnlsgl(nml->entry[j]->ptr, nml->entry[j]->type, (int)nml->entry[j]->size, &nml->entry[j]->occ);
 
       if ( nameline.nptype != nml->entry[j]->type )
 	{
