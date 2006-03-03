@@ -123,13 +123,12 @@ void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
   static char func[] = "legini";
   int waves, dimsp, dimpnm;
   int jgl, jm, jn, is;
-  int isp, latn, lats, pdim;
+  int isp, latn, lats;
   double *gmu, *gwt, *pnm, *work;
 
   waves  =  ntr + 1;
   dimsp  = (ntr + 1)*(ntr + 2);
   dimpnm = (ntr + 1)*(ntr + 4)/2;
-  pdim   = dimsp / 2 * nlat;
 
   gmu  = (double *) malloc(nlat * sizeof(double));
   gwt  = (double *) malloc(nlat * sizeof(double));
@@ -164,7 +163,7 @@ void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
 	      latn += nlat;
 	      isp++;
 	    }
-	  isp += 1;
+	  isp++;
 	}
     }
 

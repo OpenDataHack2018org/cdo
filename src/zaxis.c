@@ -184,6 +184,8 @@ int zaxisFromFile(FILE *gfp)
 	    zaxis.type = ZAXIS_DEPTH_BELOW_LAND;
 	  else if ( strncmp(pline, "isentropic", 10)  == 0 )
 	    zaxis.type = ZAXIS_ISENTROPIC;
+	  else if ( strncmp(pline, "surface", 7)  == 0 )
+	    zaxis.type = ZAXIS_SURFACE;
 	  else
 	    Warning(func, "Invalid zaxisname : %s", pline);
 	}

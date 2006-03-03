@@ -3,6 +3,7 @@
 	* using CDI library version 0.9.6
 	* New module: Wind (uv2dv, dv2uv) <- docu missing
 	* New module: Histogram (histcount, histsum, histmean) <- docu missing
+	* New operator: sinfop (Sinfo)
 	* Cat: the output file must not exist anymore
 	* Zonstat: add support for GRID_GENERIC if ny > 1
 	* read_remap_scrip: if GME grid, read GME mask (bug fix [Luis])

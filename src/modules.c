@@ -188,7 +188,7 @@ void *Zonstat(void *argument);
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", "showlevel"}
-#define  SinfoOperators         {"sinfo", "sinfov"}
+#define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
 #define  SpecinfoOperators      {"specinfo"}
 #define  SpectralOperators      {"gp2sp", "gp2spl", "sp2gp", "sp2gpl", "sp2sp", "spcut"}

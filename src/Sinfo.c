@@ -32,7 +32,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = sinfo sinfov
+@Operators = sinfo sinfov sinfop
 
 @EndModule
 
@@ -136,7 +136,7 @@ static void printFiletype(int streamID)
 
 void *Sinfo(void *argument)
 {
-  int SINFO, SINFOV;
+  int SINFO, SINFOV, SINFOP;
   int operatorID;
   int indf;
   int varID;
@@ -165,6 +165,7 @@ void *Sinfo(void *argument)
 
   SINFO  = cdoOperatorAdd("sinfo",  0, 0, NULL);
   SINFOV = cdoOperatorAdd("sinfov", 0, 0, NULL);
+  SINFOP = cdoOperatorAdd("sinfop", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -179,7 +180,10 @@ void *Sinfo(void *argument)
 
       if ( operatorID == SINFOV )
 	fprintf(stdout,
-		"%6d : Institut Source  Table   Time   Typ  Grid Size Num  Levels Num Varname\n",  -(indf+1));
+		"%6d : Institut Source   Varname      Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
+      else if ( operatorID == SINFOP )
+	fprintf(stdout,
+		"%6d : Institut Source   Param     Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
       else
 	fprintf(stdout,
 		"%6d : Institut Source  Table Code   Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
@@ -210,10 +214,12 @@ void *Sinfo(void *argument)
 	  else
 	    fprintf(stdout, "unknown  ");
 
-	  fprintf(stdout, "%4d", tableInqNum(vlistInqVarTable(vlistID, varID)));
-
-	  if ( operatorID != SINFOV )
-	    fprintf(stdout, "%5d", code);
+	  if ( operatorID == SINFOV )
+	    fprintf(stdout, "%-10s", varname);
+	  else if ( operatorID == SINFOP )
+	    fprintf(stdout, "%03d.%03d ", tableInqNum(vlistInqVarTable(vlistID, varID)), code);
+	  else
+	    fprintf(stdout, "%4d %4d", tableInqNum(vlistInqVarTable(vlistID, varID)), code);
 
 	  timeID = vlistInqVarTime(vlistID, varID);
 	  if ( timeID == TIME_CONSTANT )
@@ -242,9 +248,6 @@ void *Sinfo(void *argument)
 	  levelsize = zaxisInqSize(zaxisID);
 	  fprintf(stdout, " %6d", levelsize);
 	  fprintf(stdout, " %3d", zaxisID + 1);
-	    
-	  if ( operatorID == SINFOV )
-	    fprintf(stdout, "  %-10s", varname);
 
 	  fprintf(stdout, "\n");
 	}
