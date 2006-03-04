@@ -33,11 +33,17 @@ double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const do
   return value;
 }
 
-void intlinarr2(int nxm, int nym,  double **fieldm, const double *xm, const double *ym,
+
+void intlinarr2(double missval,
+		int nxm, int nym,  double **fieldm, const double *xm, const double *ym,
 		int nx, int ny, double **field, const double *x, const double *y)
 {
   int i, ii, j , jj;
   double ymin, ymax;
+
+  for ( j = 0; j < ny; j++ )
+    for ( i = 0; i < nx; i++ )
+      field[j][i] = missval;
 
   for ( jj = 1; jj < nym; jj++ )
     {
@@ -100,18 +106,28 @@ void intlinarr(int nxm, double *ym, double *xm, int nx, double *y, double *x)
 }
 
 
-void intgrid(int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
+void intgrid(FIELD *field1, FIELD *field2)
 {
   static char func[] = "intgrid";
   int nlonIn, nlatIn;
   int nlonOut, nlatOut;
   int ilat, ilon;
+  int gridIDin, gridIDout;
+  int i, nmiss;
   double *lonIn, *latIn;
   double *lonOut, *latOut;
   double **fieldIn;
   double **field;
   double *array = NULL;
+  double *arrayIn, *arrayOut;
+  double missval;
   /* static int index = 0; */
+
+  gridIDin  = field1->grid;
+  gridIDout = field2->grid;
+  arrayIn   = field1->ptr;
+  arrayOut  = field2->ptr;
+  missval   = field1->missval;
 
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
@@ -179,8 +195,15 @@ void intgrid(int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 	for ( ilon = 0; ilon < nlonOut; ilon++ )
 	  fieldOut[ilat][ilon] = 0;
 
-      intlinarr2(nlonIn, nlatIn, fieldIn, lonIn, latIn,
+      intlinarr2(missval,
+		 nlonIn, nlatIn, fieldIn, lonIn, latIn,
 		 nlonOut, nlatOut, fieldOut, lonOut, latOut);
+
+      nmiss = 0;
+      for ( i = 0; i < nlatOut*nlonOut; i++ )
+	if ( DBL_IS_EQUAL(arrayOut[i], missval) ) nmiss++;
+
+      field2->nmiss = nmiss;
 
       free(fieldOut);
     }
@@ -470,11 +493,11 @@ void interpolate(FIELD *field1, FIELD *field2)
   double faclon1, faclon2, faclat1, faclat2;
   int nlon, nlat, out_nlon, out_nlat;
 
-  gridIDi    = field1->grid;
-  gridIDo    = field2->grid;
-  arrayIn    = field1->ptr;
-  arrayOut   = field2->ptr;
-  missval = field1->missval;
+  gridIDi  = field1->grid;
+  gridIDo  = field2->grid;
+  arrayIn  = field1->ptr;
+  arrayOut = field2->ptr;
+  missval  = field1->missval;
 
   gridsize_i = gridInqSize(gridIDi);
   gridsize_o = gridInqSize(gridIDo);

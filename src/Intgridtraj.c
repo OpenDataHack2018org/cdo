@@ -68,6 +68,8 @@ void *Intgridtraj(void *argument)
   double **vardata1, **vardata2, *vardatap;
   double xpos, ypos;
   char *posfile;
+  double missval;
+  FIELD field1, field2;
   FILE *fp;
 
   cdoInitialize(argument);
@@ -187,6 +189,7 @@ void *Intgridtraj(void *argument)
 		{
 		  varID    = recVarID[recID];
 		  levelID  = recLevelID[recID];
+		  missval  = vlistInqVarMissval(vlistID1, varID);
 		  gridID1  = vlistInqVarGrid(vlistID1, varID);
 		  gridsize = gridInqSize(gridID1);
 		  offset   = gridsize*levelID;
@@ -196,7 +199,15 @@ void *Intgridtraj(void *argument)
 		  for ( i = 0; i < gridsize; i++ )
 		    array[i] = single1[i]*fac1 + single2[i]*fac2;
 
-		  intgrid(gridID1, array, gridID2, &point);
+		  field1.grid    = gridID1;
+		  field1.nmiss   = nmiss;
+		  field1.missval = missval;
+		  field1.ptr     = array;
+		  field2.grid    = gridID2;
+		  field2.ptr     = &point;
+		  field2.nmiss   = 0;
+
+		  intgrid(&field1, &field2);
 
 		  streamDefRecord(streamID2, varID, levelID);
 		  streamWriteRecord(streamID2, &point, nmiss);

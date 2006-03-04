@@ -197,7 +197,7 @@ void *Intgrid(void *argument)
 	  field2.nmiss   = 0;
 
 	  if ( operatorID == INTGRID || operatorID == INTPOINT )
-	    intgrid(gridID1, array1, gridID2, array2);
+	    intgrid(&field1, &field2);
 	  else if ( operatorID == INTERPOLATE )
 	    interpolate(&field1, &field2);
 
