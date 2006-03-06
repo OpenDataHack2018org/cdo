@@ -1,4 +1,4 @@
-2006-03-??  Uwe Schulzweida  <schulzweida@dkrz.de>
+2006-03-08  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 0.9.6
 	* New module: Wind (uv2dv, dv2uv) <- docu missing
