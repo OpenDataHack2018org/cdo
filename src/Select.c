@@ -47,9 +47,9 @@
 @Title     = Select codes
 @Parameter = codes
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a code in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = codes
@@ -64,9 +64,9 @@ INTEGER  Comma separated list of codes
 @Title     = Delete codes
 @Parameter = codes
 
-@BeginDesciption
+@BeginDescription
 Deletes all fields with a code in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = codes
@@ -81,9 +81,9 @@ INTEGER  Comma separated list of codes
 @Title     = Select variables
 @Parameter = vars
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a variable name in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = vars
@@ -98,9 +98,9 @@ STRING  Comma separated list of variable names
 @Title     = Delete variables
 @Parameter = vars
 
-@BeginDesciption
+@BeginDescription
 Deletes all fields with a variable name in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = vars
@@ -115,9 +115,9 @@ STRING  Comma separated list of variable names
 @Title     = Select levels
 @Parameter = levels
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a level in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = levels
@@ -132,9 +132,9 @@ FLOAT  Comma separated list of levels
 @Title     = Select grids
 @Parameter = grids
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a grid in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grids
@@ -149,9 +149,9 @@ INTEGER  Comma separated list of grids
 @Title     = Select grid by name
 @Parameter = gridnames
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a grid name in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = gridnames
@@ -166,9 +166,9 @@ STRING  Comma separated list of grid names
 @Title     = Select zaxis
 @Parameter = zaxis
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a zaxis in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = zaxis
@@ -183,9 +183,9 @@ INTEGER  Comma separated list of zaxis
 @Title     = Select zaxis by name
 @Parameter = zaxisnames
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a zaxis name in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = zaxisnames
@@ -200,9 +200,9 @@ STRING  Comma separated list of zaxis names
 @Title     = Select parameter table number
 @Parameter = tabnum
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a table number in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = tabnum

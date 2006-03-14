@@ -44,7 +44,7 @@
 
 @Title     = Multi-year seasonally minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = min{i(t,x), month(i(t)) = 12, 01, 02}
 o(2,x) = min{i(t,x), month(i(t)) = 03, 04, 05}
@@ -61,7 +61,7 @@ o(\mbox{4},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -70,7 +70,7 @@ o(\mbox{4},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 @Title     = Multi-year seasonally maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = max{i(t,x), month(i(t)) = 12, 01, 02}
 o(2,x) = max{i(t,x), month(i(t)) = 03, 04, 05}
@@ -87,7 +87,7 @@ o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -96,7 +96,7 @@ o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 @Title     = Multi-year seasonally mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = mean{i(t,x), month(i(t)) = 12, 01, 02}
 o(2,x) = mean{i(t,x), month(i(t)) = 03, 04, 05}
@@ -113,7 +113,7 @@ o(\mbox{4},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -122,7 +122,7 @@ o(\mbox{4},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\
 
 @Title     = Multi-year seasonally average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = avg{i(t,x), month(i(t)) = 12, 01, 02}
 o(2,x) = avg{i(t,x), month(i(t)) = 03, 04, 05}
@@ -139,7 +139,7 @@ o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -148,7 +148,7 @@ o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 @Title     = Multi-year seasonally standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = sqrt{var{i(t,x), month(i(t)) = 12, 01, 02}}
 o(2,x) = sqrt{var{i(t,x), month(i(t)) = 03, 04, 05}}
@@ -165,7 +165,7 @@ o(\mbox{4},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10,
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -43,9 +43,9 @@
 @Title     = Histogram sum
 @Parameter = bins
 
-@BeginDesciption
+@BeginDescription
 Only usable for 2D fields.
-@EndDesciption
+@EndDescription
 
 @BeginParameter bins
 @Item = bins

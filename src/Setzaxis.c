@@ -42,9 +42,9 @@
 @Title     = Set zaxis
 @Parameter = zaxis
 
-@BeginDesciption
+@BeginDescription
 Sets the zaxis information for all variables.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = zaxis

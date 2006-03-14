@@ -42,9 +42,9 @@
 @Title     = Set grid
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 Sets the grid information for all variables.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -59,9 +59,9 @@ STRING  Grid description file or name of the target grid
 @Title     = Set grid type
 @Parameter = gridtype
 
-@BeginDesciption
+@BeginDescription
 Sets the grid type for all grids to a user given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = gridtype
@@ -76,10 +76,10 @@ STRING  New grid type (curvilinear or cell)
 @Title     = Set grid area weights
 @Parameter = areafile
 
-@BeginDesciption
+@BeginDescription
 Sets the area weights of the first grid in ifile with the same
 size as in areafile.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = areafile

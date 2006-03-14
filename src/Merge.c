@@ -39,10 +39,10 @@
 
 @Title     = Merge files
 
-@BeginDesciption
+@BeginDescription
 Merges all variables of ifiles to ofile. Each input file must have different variables 
 with the same number of timesteps.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

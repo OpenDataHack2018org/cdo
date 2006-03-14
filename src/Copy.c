@@ -41,9 +41,9 @@
 
 @Title     = Copy files
 
-@BeginDesciption
+@BeginDescription
 Copies all input files to ofile. Each input file must have the same variables with complete timesteps.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -44,7 +44,7 @@
 
 @Title     = GrADS data descriptor file
 
-@BeginDesciption
+@BeginDescription
 Creates a GrADS data descriptor file. Supported file formats
 are GRIB, SERVICE, EXTRA and IEG. For GRIB files the GrADS map
 file is also generated. This is a machine specific version 1 map.
@@ -52,7 +52,7 @@ For SERVICE and EXTRA files the grid must be specified with
 the CDO option '-g <grid>'.
 This operator takes ifile in order to create filenames for
 the descriptor (ifile.ctl) and the map (ifile.gmp) file.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -60,7 +60,7 @@ the descriptor (ifile.ctl) and the map (ifile.gmp) file.
 
 @Title     = GrADS data descriptor file (version 2 map)
 
-@BeginDesciption
+@BeginDescription
 Creates a GrADS data descriptor file. Supported file formats
 are GRIB, SERVICE, EXTRA and IEG. For GRIB files the GrADS map
 file is also generated. This is a machine independent version 2 map.
@@ -68,7 +68,7 @@ For SERVICE and EXTRA files the grid must be specified with
 the CDO option '-g <grid>'.
 This operator takes ifile in order to create filenames for
 the descriptor (ifile.ctl) and the map (ifile.gmp) file.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

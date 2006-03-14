@@ -47,10 +47,10 @@
 @Title     = Select records
 @Parameter = records
 
-@BeginDesciption
+@BeginDescription
 Selects all fields with a record number in a user given list.
 This operator does not work on netCDF data!
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = records

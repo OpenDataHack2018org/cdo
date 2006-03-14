@@ -45,9 +45,9 @@
 @Title     = Year interpolation
 @Parameter = years
 
-@BeginDesciption
+@BeginDescription
 Linear interpolation between two years.
-@EndDesciption
+@EndDescription
 
 @BeginParameter years
 @Item = years

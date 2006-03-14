@@ -40,7 +40,7 @@
 
 @Title     = Time minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = min{i(t',x'), x'=x}
 @EndifMan
@@ -49,7 +49,7 @@ o(1,x) = min{i(t',x'), x'=x}
 o(1,x) = \mbox{\bf min}\{i(t',x'), x' = x\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -58,7 +58,7 @@ o(1,x) = \mbox{\bf min}\{i(t',x'), x' = x\}
 
 @Title     = Time maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = max{i(t',x'), x'=x}
 @EndifMan
@@ -67,7 +67,7 @@ o(1,x) = max{i(t',x'), x'=x}
 o(1,x) = \mbox{\bf max}\{i(t',x'), x' = x\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -76,7 +76,7 @@ o(1,x) = \mbox{\bf max}\{i(t',x'), x' = x\}
 
 @Title     = Time sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = sum{i(t,x)}
 @EndifMan
@@ -85,7 +85,7 @@ o(1,x) = sum{i(t,x)}
 o(1,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -94,7 +94,7 @@ o(1,x) = \sum\limits_{t=1}^{n} i(t',x)
 
 @Title     = Time mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = mean{i(t',x'), x'=x}
 @EndifMan
@@ -103,7 +103,7 @@ o(1,x) = mean{i(t',x'), x'=x}
 o(1,x) = \mbox{\bf mean}\{i(t',x'), x' = x\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -112,7 +112,7 @@ o(1,x) = \mbox{\bf mean}\{i(t',x'), x' = x\}
 
 @Title     = Time average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = avg{i(t',x'), x'=x}
 @EndifMan
@@ -121,7 +121,7 @@ o(1,x) = avg{i(t',x'), x'=x}
 o(1,x) = \mbox{\bf avg}\{i(t',x'), x' = x\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -130,7 +130,7 @@ o(1,x) = \mbox{\bf avg}\{i(t',x'), x' = x\}
 
 @Title     = Time standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(1,x) = sqrt{var{i(t',x'), x'=x}}
 @EndifMan
@@ -139,7 +139,7 @@ o(1,x) = sqrt{var{i(t',x'), x'=x}}
 o(1,x) = \sqrt{\mbox{\bf var}\{i(t',x'), x' = x\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -150,7 +150,7 @@ o(1,x) = \sqrt{\mbox{\bf var}\{i(t',x'), x' = x\}}
 
 @Title     = Yearly minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same year, it is
 
@@ -162,7 +162,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -171,7 +171,7 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Yearly maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same year, it is
 
@@ -183,7 +183,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -192,7 +192,7 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Yearly sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same year, it is
 
@@ -204,7 +204,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -213,7 +213,7 @@ o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 
 @Title     = Yearly mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same year, it is
 
@@ -225,7 +225,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -234,7 +234,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Yearly average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same year, it is
 
@@ -246,7 +246,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -255,7 +255,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Yearly standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same year, it is
 
@@ -267,7 +267,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -278,7 +278,7 @@ o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 
 @Title     = Monthly minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -290,7 +290,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -299,7 +299,7 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Monthly maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -311,7 +311,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -320,7 +320,7 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Monthly sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -332,7 +332,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -341,7 +341,7 @@ o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 
 @Title     = Monthly mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -353,7 +353,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -362,7 +362,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Monthly average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -374,7 +374,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -383,7 +383,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Monthly standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -395,7 +395,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -406,7 +406,7 @@ o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 
 @Title     = Daily minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -418,7 +418,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -427,7 +427,7 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Daily maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -439,7 +439,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -448,7 +448,7 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Daily sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same month, it is
 
@@ -460,7 +460,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -469,7 +469,7 @@ o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 
 @Title     = Daily mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -481,7 +481,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -490,7 +490,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Daily average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -502,7 +502,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -511,7 +511,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Daily standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -523,7 +523,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -534,7 +534,7 @@ o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 
 @Title     = Hourly minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same hour, it is
 
@@ -546,7 +546,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -555,7 +555,7 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Hourly maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same hour, it is
 
@@ -567,7 +567,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -576,7 +576,7 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Hourly sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same hour, it is
 
@@ -588,7 +588,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -597,7 +597,7 @@ o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 
 @Title     = Hourly mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -609,7 +609,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -618,7 +618,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Hourly average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same day, it is
 
@@ -630,7 +630,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -639,7 +639,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 
 @Title     = Hourly standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t_1, ...,t_n of field of the same hour, it is
 
@@ -651,7 +651,7 @@ For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of field of the s
 o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

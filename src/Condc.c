@@ -40,7 +40,7 @@
 @Title     = If then constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / c      if i(t,x) NE 0  AND  i(t,x) NE miss
 o(t,x) =
@@ -55,7 +55,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -70,7 +70,7 @@ FLOAT  Constant
 @Title     = If not then constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / c      if i(t,x) EQ 0  AND  i(t,x) NE miss
 o(t,x) =
@@ -85,7 +85,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c

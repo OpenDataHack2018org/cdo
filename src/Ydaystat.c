@@ -44,7 +44,7 @@
 
 @Title     = Multi-year daily minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(001,x) = min{i(t,x), day(i(t)) = 001}
                  ...
@@ -59,7 +59,7 @@ o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -68,7 +68,7 @@ o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 
 @Title     = Multi-year daily maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(001,x) = max{i(t,x), day(i(t)) = 001}
                  ...
@@ -83,7 +83,7 @@ o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -92,7 +92,7 @@ o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 
 @Title     = Multi-year daily mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(001,x) = mean{i(t,x), day(i(t)) = 001}
                  ...
@@ -107,7 +107,7 @@ o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -116,7 +116,7 @@ o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 
 @Title     = Multi-year daily average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(001,x) = avg{i(t,x), day(i(t)) = 001}
                  ...
@@ -131,7 +131,7 @@ o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -140,7 +140,7 @@ o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 
 @Title     = Multi-year daily standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(001,x) = sqrt{var{i(t,x), day(i(t)) = 001}}
                  ...
@@ -155,7 +155,7 @@ o(\mbox{366},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\}}
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

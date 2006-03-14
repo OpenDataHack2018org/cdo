@@ -43,7 +43,7 @@
 
 @Title     = Spectral to gridpoint
 
-@BeginDesciption
+@BeginDescription
 Convert all spectral fields to Gaussian grid.
 The number of latitudes of the resulting Gaussian grid
 is calculated from the triangular truncation by:
@@ -56,7 +56,7 @@ is calculated from the triangular truncation by:
    \mbox{nlat} = NINT((\mbox{trunc}*\fbox{3} + 1.)/2.)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -65,7 +65,7 @@ is calculated from the triangular truncation by:
 
 @Title     = Spectral to gridpoint linear
 
-@BeginDesciption
+@BeginDescription
 Convert all spectral fields to Gaussian grid.
 The number of latitudes of the resulting Gaussian grid
 is calculated from the triangular truncation by:
@@ -80,7 +80,7 @@ is calculated from the triangular truncation by:
 @EndifDoc
 
 Use this operator to convert ERA40 data e.g. from TL159 to N80.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -89,7 +89,7 @@ Use this operator to convert ERA40 data e.g. from TL159 to N80.
 
 @Title     = Gridpoint to spectral
 
-@BeginDesciption
+@BeginDescription
 Convert all Gaussian gridpoint fields to spectral.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
@@ -102,7 +102,7 @@ is calculated from the number of latitudes by:
    \mbox{trunc} = (\mbox{nlat}*2 - 1) / \fbox{3}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -111,7 +111,7 @@ is calculated from the number of latitudes by:
 
 @Title     = Gridpoint to spectral linear
 
-@BeginDesciption
+@BeginDescription
 Convert all Gaussian gridpoint fields to spectral.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
@@ -127,7 +127,7 @@ is calculated from the number of latitudes by:
 
 Use this operator to convert ERA40 data e.g. from N80 to TL159
 instead of T106.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -137,11 +137,11 @@ instead of T106.
 @Title     = Spectral to spectral
 @Parameter = trunc
 
-@BeginDesciption
+@BeginDescription
 Change the triangular truncation of all spectral fields.
 The operator performs downward conversion by cutting the resolution.
 Upward conversions are achieved by filling in zeros.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = trunc
@@ -156,9 +156,9 @@ INTEGER  New spectral resolution
 @Title     = Cut spectral wave number
 @Parameter = wnums
 
-@BeginDesciption
+@BeginDescription
 Set the user defined wave numbers to zero.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = wnums

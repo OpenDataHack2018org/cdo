@@ -41,9 +41,9 @@
 
 @Title     = Split years
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each year.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

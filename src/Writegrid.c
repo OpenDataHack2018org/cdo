@@ -41,9 +41,9 @@
 
 @Title     = Write grid
 
-@BeginDesciption
+@BeginDescription
 Write the grid information to a file (SCRIP netCDF).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

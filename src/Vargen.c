@@ -42,9 +42,9 @@
 @Title     = Constant variable
 @Parameter = const grid
 
-@BeginDesciption
+@BeginDescription
 Generates a constant variable.
-@EndDesciption
+@EndDescription
 
 @BeginParameter const
 @Item = const
@@ -61,9 +61,9 @@ STRING  Grid description file or name
 @Title     = Variable with random values
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 Generates a variable with rectangularly distrubuted random numbers in the interval [0,1].
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid

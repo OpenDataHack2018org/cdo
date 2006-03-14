@@ -39,7 +39,7 @@
 
 @Title     = Differences of two files
 
-@BeginDesciption
+@BeginDescription
 Print statistics over differences of two files.
 For each pair of fields the operator print in one line the:
 @BeginItemize
@@ -54,7 +54,7 @@ For each pair of fields the operator print in one line the:
 @Item = maximum absolute difference of coefficient pairs
 @Item = maximum relative difference of non-zero coefficient pairs with equal signs
 @EndItemize
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -63,10 +63,10 @@ For each pair of fields the operator print in one line the:
 
 @Title     = Differences of two files
 
-@BeginDesciption
+@BeginDescription
 The same as operator diff. Using the name instead of the code number
 to identify the variable.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

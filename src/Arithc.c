@@ -40,11 +40,11 @@
 @Title     = Add by constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) + c
 @EndMath
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -59,11 +59,11 @@ FLOAT  Constant
 @Title     = Subtract by constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) - c
 @EndMath
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -78,11 +78,11 @@ FLOAT  Constant
 @Title     = Multiply by constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) * c
 @EndMath
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -97,11 +97,11 @@ FLOAT  Constant
 @Title     = Divide by constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) / c
 @EndMath
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c

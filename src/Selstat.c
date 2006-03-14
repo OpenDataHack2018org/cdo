@@ -41,7 +41,7 @@
 @Title     = Time range minimum
 @Parameter = nsets [noffset] [nskip]
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range, it is
@@ -55,7 +55,7 @@ selected time range, it is
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter noffset
 @Item = nsets
@@ -74,7 +74,7 @@ INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @Title     = Time range maximum
 @Parameter = nsets [noffset] [nskip]
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range, it is
@@ -88,7 +88,7 @@ selected time range, it is
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter noffset
 @Item = nsets
@@ -107,7 +107,7 @@ INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @Title     = Time range sum
 @Parameter = nsets [noffset] [nskip]
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range, it is
@@ -121,7 +121,7 @@ selected time range, it is
 o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter noffset
 @Item = nsets
@@ -140,7 +140,7 @@ INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @Title     = Time range mean
 @Parameter = nsets [noffset] [nskip]
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range, it is
@@ -154,7 +154,7 @@ selected time range, it is
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter noffset
 @Item = nsets
@@ -173,7 +173,7 @@ INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @Title     = Time range average
 @Parameter = nsets [noffset] [nskip]
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range, it is
@@ -187,7 +187,7 @@ selected time range, it is
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter noffset
 @Item = nsets
@@ -206,7 +206,7 @@ INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @Title     = Time range standard deviation
 @Parameter = nsets [noffset] [nskip]
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range, it is
@@ -220,7 +220,7 @@ selected time range, it is
 o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x'), t_1 < t' \le t_n\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter noffset
 @Item = nsets

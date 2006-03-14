@@ -41,9 +41,9 @@
 
 @Title     = Split hours
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each hour.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,9 +52,9 @@ Splits a file into pieces, one for each hour.
 
 @Title     = Split days
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each day.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -63,9 +63,9 @@ Splits a file into pieces, one for each day.
 
 @Title     = Split months
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each month.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -74,9 +74,9 @@ Splits a file into pieces, one for each month.
 
 @Title     = Split seasons
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each season.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -40,7 +40,7 @@
 
 @Title     = Subtract trend
 
-@BeginDesciption
+@BeginDescription
 This operator is for subtracting a trend computed by the operator trend.
 @IfMan
 The typical call for detrend the data in ifile and to store the detrended data in ofile is:
@@ -66,7 +66,7 @@ It is
 o(t,x) = i_1(t,x) - (i_2(1,x) + i_3(1,x) \cdot t)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

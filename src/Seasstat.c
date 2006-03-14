@@ -40,7 +40,7 @@
 
 @Title     = Seasonally minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 year and season, where december belongs to the northern hemispheric
@@ -58,7 +58,7 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
 @EndifDoc
 Be careful about the first and the last timestep, they may be incorrect
 DJF values.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -67,7 +67,7 @@ DJF values.
 
 @Title     = Seasonally maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 year and season, where december belongs to the northern hemispheric
@@ -85,7 +85,7 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
 @EndifDoc
 Be careful about the first and the last timestep, they may be incorrect
 DJF values.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -94,7 +94,7 @@ DJF values.
 
 @Title     = Seasonally sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 year and season, where december belongs to the northern hemispheric
@@ -112,7 +112,7 @@ o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
 @EndifDoc
 Be careful about the first and the last timestep, they may be incorrect
 DJF values.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -121,7 +121,7 @@ DJF values.
 
 @Title     = Seasonally mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 year and season, where december belongs to the northern hemispheric
@@ -139,7 +139,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
 @EndifDoc
 Be careful about the first and the last timestep, they may be incorrect
 DJF values.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -148,7 +148,7 @@ DJF values.
 
 @Title     = Seasonally average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 year and season, where december belongs to the northern hemispheric
@@ -166,7 +166,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 @EndifDoc
 Be careful about the first and the last timestep, they may be incorrect
 DJF values.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -175,7 +175,7 @@ DJF values.
 
 @Title     = Seasonally standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of timesteps of the same 
 year and season, where december belongs to the northern hemispheric
@@ -193,7 +193,7 @@ o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x'), t_1 < t' \le t_n\}}
 @EndifDoc
 Be careful about the first and the last timestep, they may be incorrect
 DJF values.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

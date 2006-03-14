@@ -40,9 +40,9 @@
 
 @Title     = Show years
 
-@BeginDesciption
+@BeginDescription
 Prints all different years.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -51,9 +51,9 @@ Prints all different years.
 
 @Title     = Show months
 
-@BeginDesciption
+@BeginDescription
 Prints all different months.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -62,9 +62,9 @@ Prints all different months.
 
 @Title     = Show dates
 
-@BeginDesciption
+@BeginDescription
 Prints all different dates.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -73,9 +73,9 @@ Prints all different dates.
 
 @Title     = Show timesteps
 
-@BeginDesciption
+@BeginDescription
 Prints all timesteps.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -84,9 +84,9 @@ Prints all timesteps.
 
 @Title     = Show codes
 
-@BeginDesciption
+@BeginDescription
 Prints the code of all different variables.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -95,9 +95,9 @@ Prints the code of all different variables.
 
 @Title     = Show variable names
 
-@BeginDesciption
+@BeginDescription
 Print all different variable names.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -106,9 +106,9 @@ Print all different variable names.
 
 @Title     = Show levels
 
-@BeginDesciption
+@BeginDescription
 Prints all levels for each variable.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

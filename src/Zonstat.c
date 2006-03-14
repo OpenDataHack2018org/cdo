@@ -40,9 +40,9 @@
 
 @Title     = Zonal minimum
 
-@BeginDesciption
+@BeginDescription
 For every latitude the minimum over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -50,9 +50,9 @@ For every latitude the minimum over all longitudes is computed.
 
 @Title     = Zonal maximum
 
-@BeginDesciption
+@BeginDescription
 For every latitude the maximum over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -60,9 +60,9 @@ For every latitude the maximum over all longitudes is computed.
 
 @Title     = Zonal sum
 
-@BeginDesciption
+@BeginDescription
 For every latitude the sum over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -70,9 +70,9 @@ For every latitude the sum over all longitudes is computed.
 
 @Title     = Zonal mean
 
-@BeginDesciption
+@BeginDescription
 For every latitude the mean over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -80,9 +80,9 @@ For every latitude the mean over all longitudes is computed.
 
 @Title     = Zonal average
 
-@BeginDesciption
+@BeginDescription
 For every latitude the average over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -90,9 +90,9 @@ For every latitude the average over all longitudes is computed.
 
 @Title     = Zonal variance
 
-@BeginDesciption
+@BeginDescription
 For every latitude the variance over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -100,9 +100,9 @@ For every latitude the variance over all longitudes is computed.
 
 @Title     = Zonal standard deviation
 
-@BeginDesciption
+@BeginDescription
 For every latitude the standard deviation over all longitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

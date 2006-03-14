@@ -43,9 +43,9 @@
 @Title     = Set global attribute
 @Parameter = attname attstring
 
-@BeginDesciption
+@BeginDescription
 Sets one user defined global text attribute.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = attname,attstring
@@ -60,10 +60,10 @@ STRING  Name and text of the global attribute
 @Title     = Set global attributes
 @Parameter = attfile
 
-@BeginDesciption
+@BeginDescription
 Sets user defined global text attributes. The name and text
 of the global attrubutes are read from a file.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = attfile

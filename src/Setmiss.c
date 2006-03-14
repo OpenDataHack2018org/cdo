@@ -47,7 +47,7 @@ int isnan(const double x);
 @Title     = Set a new missing value
 @Parameter = miss
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / miss   if i(t,x) EQ miss
 o(t,x) = 
@@ -62,7 +62,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = miss
@@ -77,7 +77,7 @@ FLOAT  New missing value
 @Title     = Set constant to missing value
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / miss   if i(t,x) EQ c
 o(t,x) = 
@@ -92,7 +92,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -107,7 +107,7 @@ FLOAT  Constant
 @Title     = Set missing value to constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / c      if i(t,x) EQ miss
 o(t,x) = 
@@ -122,7 +122,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -137,7 +137,7 @@ FLOAT  Constant
 @Title     = Set range to missing value
 @Parameter = rmin rmax
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / miss   if i(t,x) GE rmin AND i(t,x) LE rmax
 o(t,x) = 
@@ -152,7 +152,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter rmax
 @Item = rmin

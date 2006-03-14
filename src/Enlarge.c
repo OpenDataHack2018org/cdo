@@ -41,9 +41,9 @@
 @Title     = Enlarge
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 Enlarge all fields of ifile to a user given grid.
-@EndDesciption
+@EndDescription
 
 @BeginParameter grid
 @Item = grid

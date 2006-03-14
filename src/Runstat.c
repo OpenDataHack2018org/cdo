@@ -46,7 +46,7 @@
 @Title     = Running minimum
 @Parameter = nts
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
@@ -55,7 +55,7 @@ o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 o(t+(nts-1)/2,x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nts
@@ -70,7 +70,7 @@ INTEGER  Number of timesteps
 @Title     = Running maximum
 @Parameter = nts
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
@@ -79,7 +79,7 @@ o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 o(t+(nts-1)/2,x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nts
@@ -94,7 +94,7 @@ INTEGER  Number of timesteps
 @Title     = Running sum
 @Parameter = nts
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
@@ -103,7 +103,7 @@ o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 o(t+(nts-1)/2,x) = \sum \{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nts
@@ -118,7 +118,7 @@ INTEGER  Number of timesteps
 @Title     = Running mean
 @Parameter = nts
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
@@ -127,7 +127,7 @@ o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 o(t+(nts-1)/2,x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nts
@@ -142,7 +142,7 @@ INTEGER  Number of timesteps
 @Title     = Running average
 @Parameter = nts
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
@@ -151,7 +151,7 @@ o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 o(t+(nts-1)/2,x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nts
@@ -166,7 +166,7 @@ INTEGER  Number of timesteps
 @Title     = Running standard deviation
 @Parameter = nts
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t+(nts-1)/2,x) = sqrt{var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}}
 @EndifMan
@@ -175,7 +175,7 @@ o(t+(nts-1)/2,x) = sqrt{var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}}
 o(t+(nts-1)/2,x) = \sqrt{\mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nts

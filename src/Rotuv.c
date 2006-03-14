@@ -43,11 +43,11 @@
 @Title     = Backward rotation
 @Parameter = u v ...
 
-@BeginDesciption
+@BeginDescription
 Operator to perform a backward transformation of velocity
 components u and v from an rotated spherical system to a
 geographical system
-@EndDesciption
+@EndDescription
 
 @BeginParameter u
 @Item = u,v,...

@@ -53,11 +53,11 @@ Constansts: M_PI, M_E
 @Title     = Evaluate expressions
 @Parameter = instr
 
-@BeginDesciption
+@BeginDescription
 This Operator arithmetically processes every timestep of ifile.
 The processing instructions are read from the parameter.
 Each individual assignment statement must end with a semi-colon.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = instr
@@ -76,10 +76,10 @@ cdo -expr,'var1=aprl+aprc;var2=ts-273.15;' ifile ofile
 @Title     = Evaluate expressions from script file
 @Parameter = filename
 
-@BeginDesciption
+@BeginDescription
 This Operator arithmetically processes every timestep of ifile.
 Contrary to expr the processing instructions are read from a file.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = filename

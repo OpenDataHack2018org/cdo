@@ -41,9 +41,9 @@
 
 @Title     = Add multi-year monthly time averages
 
-@BeginDesciption
+@BeginDescription
 Add a time series and a multi-year monthly time averages.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,9 +52,9 @@ Add a time series and a multi-year monthly time averages.
 
 @Title     = Subtract multi-year monthly time averages
 
-@BeginDesciption
+@BeginDescription
 Subtract a time series and a multi-year monthly time averages.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -63,9 +63,9 @@ Subtract a time series and a multi-year monthly time averages.
 
 @Title     = Multiply multi-year monthly time averages
 
-@BeginDesciption
+@BeginDescription
 Multiply a time series and a multi-year monthly time averages.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -74,9 +74,9 @@ Multiply a time series and a multi-year monthly time averages.
 
 @Title     = Divide multi-year monthly time averages
 
-@BeginDesciption
+@BeginDescription
 Divide a time series and a multi-year monthly time averages.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

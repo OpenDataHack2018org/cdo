@@ -40,9 +40,9 @@
 
 @Title     = Number of years
 
-@BeginDesciption
+@BeginDescription
 Prints the number of different years.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -51,9 +51,9 @@ Prints the number of different years.
 
 @Title     = Number of months
 
-@BeginDesciption
+@BeginDescription
 Prints the number of different combinations of years and months.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -62,9 +62,9 @@ Prints the number of different combinations of years and months.
 
 @Title     = Number of dates
 
-@BeginDesciption
+@BeginDescription
 Prints the number of different dates.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -73,9 +73,9 @@ Prints the number of different dates.
 
 @Title     = Number of timesteps
 
-@BeginDesciption
+@BeginDescription
 Prints the number of timesteps.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -84,9 +84,9 @@ Prints the number of timesteps.
 
 @Title     = Number of codes
 
-@BeginDesciption
+@BeginDescription
 Prints the number of different codes.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -95,9 +95,9 @@ Prints the number of different codes.
 
 @Title     = Number of variables
 
-@BeginDesciption
+@BeginDescription
 Prints the number of different variables.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -105,9 +105,9 @@ Prints the number of different variables.
 
 @Title     = Number of levels
 
-@BeginDesciption
+@BeginDescription
 Prints the number of levels for each variable.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

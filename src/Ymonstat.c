@@ -44,7 +44,7 @@
 
 @Title     = Multi-year monthly minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(01,x) = min{i(t,x), month(i(t)) = 01}
                  ...
@@ -59,7 +59,7 @@ o(\mbox{12},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -68,7 +68,7 @@ o(\mbox{12},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 @Title     = Multi-year monthly maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(01,x) = max{i(t,x), month(i(t)) = 01}
                  ...
@@ -83,7 +83,7 @@ o(\mbox{12},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -92,7 +92,7 @@ o(\mbox{12},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 @Title     = Multi-year monthly mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(01,x) = mean{i(t,x), month(i(t)) = 01}
                  ...
@@ -107,7 +107,7 @@ o(\mbox{12},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -116,7 +116,7 @@ o(\mbox{12},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 @Title     = Multi-year monthly average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(01,x) = avg{i(t,x), month(i(t)) = 01}
                  ...
@@ -131,7 +131,7 @@ o(\mbox{12},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -140,7 +140,7 @@ o(\mbox{12},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 @Title     = Multi-year monthly standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(01,x) = sqrt{var{i(t,x), month(i(t)) = 01}}
                  ...
@@ -155,7 +155,7 @@ o(\mbox{12},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\}}
 \end{array}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

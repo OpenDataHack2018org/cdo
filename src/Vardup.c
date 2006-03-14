@@ -41,9 +41,9 @@
 
 @Title     = Duplicate variables
 
-@BeginDesciption
+@BeginDescription
 Duplicate all variables.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -53,9 +53,9 @@ Duplicate all variables.
 @Title     = Multiply variables
 @Parameter = nmul
 
-@BeginDesciption
+@BeginDescription
 Multiply all variables.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = nmul

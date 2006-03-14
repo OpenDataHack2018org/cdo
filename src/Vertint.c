@@ -46,13 +46,13 @@
 @Title     = Model to pressure level interpolation
 @Parameter = levels
 
-@BeginDesciption
+@BeginDescription
 Interpolate fields on hybrid model level to pressure level.
 The input file must contain the log. surface pressure (LSP/code152)
 or the surface pressure (APS/code134).
 To interpolate the temperature or the geopotential height
 to pressure level, the orography (GEOSP/code129) is also needed.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = levels
@@ -72,13 +72,13 @@ If set to 1 extrapolate missing values.
 @Title     = Model to height level interpolation
 @Parameter = levels
 
-@BeginDesciption
+@BeginDescription
 Interpolate fields on hybrid model level to height level.
 The input file must contain the log. surface pressure (LSP/code152)
 or the surface pressure (APS/code134).
 To interpolate the temperature or the geopotential height
 to height level, the orography (GEOSP/code129) is also needed.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = levels

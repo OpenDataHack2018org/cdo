@@ -42,9 +42,9 @@
 @Title     = Set parameter table
 @Parameter = table
 
-@BeginDesciption
+@BeginDescription
 Sets the parameter table for all variables.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = table
@@ -59,9 +59,9 @@ STRING  Parameter table file or name
 @Title     = Set code
 @Parameter = code
 
-@BeginDesciption
+@BeginDescription
 Sets the code for all variables to the same given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = code
@@ -76,9 +76,9 @@ INTEGER Code number
 @Title     = Set variable name
 @Parameter = name
 
-@BeginDesciption
+@BeginDescription
 Sets the name of the first variable.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = name
@@ -93,9 +93,9 @@ STRING  Variable name
 @Title     = Set level
 @Parameter = level
 
-@BeginDesciption
+@BeginDescription
 Sets the first level of all variables.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = level

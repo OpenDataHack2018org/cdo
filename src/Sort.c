@@ -41,9 +41,9 @@
 
 @Title     = Sort by code number
 
-@BeginDesciption
+@BeginDescription
 Sorts all variables by the code number.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,9 +52,9 @@ Sorts all variables by the code number.
 
 @Title     = Sort by variable name
 
-@BeginDesciption
+@BeginDescription
 Sorts all variables by the name.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -63,9 +63,9 @@ Sorts all variables by the name.
 
 @Title     = Sort by level
 
-@BeginDesciption
+@BeginDescription
 Sorts the levels of all variables.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

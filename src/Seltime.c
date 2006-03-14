@@ -47,9 +47,9 @@
 @Title     = Select timesteps
 @Parameter = timesteps
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a timestep in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = timesteps
@@ -64,9 +64,9 @@ INTEGER  Comma separated list of timesteps
 @Title     = Select times
 @Parameter = times
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a time in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = times
@@ -81,9 +81,9 @@ STRING  Comma separated list of times (format HH:MM)
 @Title     = Select hours
 @Parameter = hours
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a hour in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = hours
@@ -98,9 +98,9 @@ INTEGER  Comma separated list of hours
 @Title     = Select days
 @Parameter = days
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a day in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = days
@@ -115,9 +115,9 @@ INTEGER  Comma separated list of days
 @Title     = Select months
 @Parameter = months
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a month in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = months
@@ -132,9 +132,9 @@ INTEGER  Comma separated list of months
 @Title     = Select seasons
 @Parameter = seasons
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a month of a season in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = seasons
@@ -149,9 +149,9 @@ STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
 @Title     = Select years
 @Parameter = years
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a year in a user given list.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = years
@@ -166,9 +166,9 @@ INTEGER  Comma separated list of years
 @Title     = Select dates
 @Parameter = date1 [date2]
 
-@BeginDesciption
+@BeginDescription
 Selects all timesteps with a date in a given range.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = date1

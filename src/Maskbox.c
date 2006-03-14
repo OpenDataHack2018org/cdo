@@ -43,11 +43,11 @@
 @Title     = Mask lon/lat box
 @Parameter = lon1 lon2 lat1 lat2
 
-@BeginDesciption
+@BeginDescription
 Masks a longitude/latitude box of the rectangular understood field. The elements
 inside the box are untouched, the elements outside are set to missing value.
 The user has to give the longitudes and latitudes of the edges of the box.
-@EndDesciption
+@EndDescription
 
 @BeginParameter lon1
 @Item = lon1
@@ -68,12 +68,12 @@ FLOAT  Northern or southern latitude
 @Title     = Mask index box
 @Parameter = idx1 idx2 idy1 idy2
 
-@BeginDesciption
+@BeginDescription
 Masks an index box of the rectangular understood field. The elements inside
 the box are untouched, the elements outside are set to missing value.
 The user has to give the indexes of the edges of the box. The index of the
 left edge may be greater then that of the right edge.
-@EndDesciption
+@EndDescription
 
 @BeginParameter idx1
 @Item = idx1

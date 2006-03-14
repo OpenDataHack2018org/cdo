@@ -44,8 +44,8 @@
 
 @Title     = Ensemble minimum
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -53,8 +53,8 @@
 
 @Title     = Ensemble maximum
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -62,8 +62,8 @@
 
 @Title     = Ensemble sum
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -71,8 +71,8 @@
 
 @Title     = Ensemble mean
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -80,8 +80,8 @@
 
 @Title     = Ensemble average
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -89,8 +89,8 @@
 
 @Title     = Ensemble variance
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -98,8 +98,8 @@
 
 @Title     = Ensemble standard deviation
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 

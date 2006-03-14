@@ -33,7 +33,7 @@
 @Arguments = ifile ofile
 @Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldvar
 
-@BeginDesciption
+@BeginDescription
 In this program there is the different notion of "mean" and "average"
 to distinguish two different kinds of treatment of missing values:
 While computing the mean, only the not missing values are considered
@@ -81,7 +81,7 @@ In this chapter the abbreviations as in the following table are used:
 \end{eqnarray*}
 }}
 
-@EndDesciption
+@EndDescription
 
 @EndModule
 
@@ -90,7 +90,7 @@ In this chapter the abbreviations as in the following table are used:
 
 @Title     = Field minimum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = min{i(t',x'), t'=t}
 @EndifMan
@@ -99,7 +99,7 @@ o(t,1) = min{i(t',x'), t'=t}
 o(t,1) = \mbox{\bf min}\{i(t',x'), t' = t\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -107,7 +107,7 @@ o(t,1) = \mbox{\bf min}\{i(t',x'), t' = t\}
 
 @Title     = Field maximum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = max{i(t',x'), t'=t}
 @EndifMan
@@ -116,7 +116,7 @@ o(t,1) = max{i(t',x'), t'=t}
 o(t,1) = \mbox{\bf max}\{i(t',x'), t' = t\}
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -124,7 +124,7 @@ o(t,1) = \mbox{\bf max}\{i(t',x'), t' = t\}
 
 @Title     = Field sum
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = sum{i(t,x)}
 @EndifMan
@@ -133,7 +133,7 @@ o(t,1) = sum{i(t,x)}
 o(t,1) = \sum\limits_x i(t,x)
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -141,7 +141,7 @@ o(t,1) = \sum\limits_x i(t,x)
 
 @Title     = Field mean
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = mean{i(t',x'), t'=t}
 @EndifMan
@@ -151,7 +151,7 @@ o(t,1) = \mbox{\bf mean}\{i(t',x'), t' = t\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -159,7 +159,7 @@ weighted by area weights obtained by the input field.
 
 @Title     = Field average
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = avg{i(t',x'), t'=t}
 @EndifMan
@@ -169,7 +169,7 @@ o(t,1) = \mbox{\bf avg}\{i(t',x'), t' = t\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -177,7 +177,7 @@ weighted by area weights obtained by the input field.
 
 @Title     = Field variance
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = var{i(t',x'), t'=t}
 @EndifMan
@@ -187,7 +187,7 @@ o(t,1) = \mbox{\bf var}\{i(t',x'), t' = t\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -195,7 +195,7 @@ weighted by area weights obtained by the input field.
 
 @Title     = Field standard deviation
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 o(t,1) = sqrt{var{i(t',x'), t'=t}}
 @EndifMan
@@ -205,7 +205,7 @@ o(t,1) = \sqrt{\mbox{\bf var}\{i(t',x'), t' = t\}}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

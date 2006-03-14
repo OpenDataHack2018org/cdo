@@ -42,9 +42,9 @@
 @Title     = Set halo
 @Parameter = lhalo rhalo
 
-@BeginDesciption
+@BeginDescription
 Set the left and right halo.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = lahlo

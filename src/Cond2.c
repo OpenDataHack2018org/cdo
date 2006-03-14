@@ -34,8 +34,8 @@
 @Arguments = ifile1 ifile2 ifile3 ofile
 @Operators = ifthenelse
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndModule
 
@@ -44,7 +44,7 @@
 
 @Title     = If then else
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           / i_2(t,x) if i_1(t,x) NE 0  AND  i_1(t,x) NE miss
 o(t,x) = <  i_3(t,x) if i_1(t,x) EQ 0  AND  i_1(t,x) NE miss
@@ -60,7 +60,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -40,7 +40,7 @@
 
 @Title     = Trend
 
-@BeginDesciption
+@BeginDescription
 @IfMan
 The values of the input file ifile are assumed to be distributed as
 N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the
@@ -71,7 +71,7 @@ Thus the estimation for \begin{math}a\end{math} is stored in ofile1 and that for
 \begin{math}b\end{math} is stored in ofile2.
 To subtract the trend from the data see operator subtrend.
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

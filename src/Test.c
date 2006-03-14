@@ -40,8 +40,8 @@
 @Title     = 
 @Parameter = 
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @BeginParameter
 @Item = 

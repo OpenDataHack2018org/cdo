@@ -44,9 +44,9 @@
 @Title     = Time interpolation
 @Parameter = date time [inc]
 
-@BeginDesciption
+@BeginDescription
 Linear interpolation between timesteps.
-@EndDesciption
+@EndDescription
 
 @BeginParameter date
 @Item = date

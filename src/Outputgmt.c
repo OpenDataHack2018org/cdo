@@ -49,8 +49,8 @@
 
 @Title     = Output grid center
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 
@@ -59,8 +59,8 @@
 
 @Title     = Output grid bounds
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 

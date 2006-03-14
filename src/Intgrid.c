@@ -44,9 +44,9 @@
 @Title     = Interpolate
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 Grid interpolation from PINGO (only rectangular grids).
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -61,9 +61,9 @@ STRING  Grid description file or name of the target grid
 @Title     = Grid interpolation
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 Linear interpolation of regular grids.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -78,9 +78,9 @@ STRING  Grid description file or name of the target grid
 @Title     = Point interpolation
 @Parameter = long lat
 
-@BeginDesciption
+@BeginDescription
 Linear point interpolation.
-@EndDesciption
+@EndDescription
 
 @BeginParameter long
 @Item = long

@@ -41,10 +41,10 @@
 
 @Title     = Concatenate files
 
-@BeginDesciption
+@BeginDescription
 Concatenate ifiles and add the result at the end of ofile.
 Each input file must have the same variables with complete timesteps.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -44,9 +44,9 @@
 @Title     = Conservative remapping
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 SCRIP first order conservative remapping.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -70,9 +70,9 @@ the output weights; other options are 'none' and 'destarea'
 @Title     = Bilinear interpolation
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 SCRIP bilinear interpolation (only rectangular grids).
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -87,9 +87,9 @@ STRING  Grid description file or name of the target grid
 @Title     = Bicubic interpolation
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 SCRIP bicubic interpolation (only rectangular grids).
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -104,9 +104,9 @@ STRING  Grid description file or name of the target grid
 @Title     = Distance-weighted averaging
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 SCRIP distance-weighted average of the four nearest neighbor values.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -121,10 +121,10 @@ STRING  Grid description file or name of the target grid
 @Title     = Generate conservative interpolation weights
 @Parameter = grid
 
-@BeginDesciption
+@BeginDescription
 Generate SCRIP first order conservative interpolation weights and write the result to
 a file.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = grid
@@ -148,10 +148,10 @@ the output weights; other options are 'none' and 'destarea'
 @Title     = Remapping
 @Parameter = grid weights
 
-@BeginDesciption
+@BeginDescription
 Remapping with the interpolation weights from a netCDF file.
 The netCDF file must follow the SCRIP convention.
-@EndDesciption
+@EndDescription
 
 @BeginParameter weights
 @Item = grid

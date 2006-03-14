@@ -43,9 +43,9 @@
 @Title     = Set date
 @Parameter = date
 
-@BeginDesciption
+@BeginDescription
 Sets the date in every timestep to the same given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter date
 @Item = date
@@ -60,9 +60,9 @@ STRING  New date (format YYYY-MM-DD)
 @Title     = Set time
 @Parameter = time
 
-@BeginDesciption
+@BeginDescription
 Sets the time in every timestep to the same given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter timr
 @Item = time
@@ -77,9 +77,9 @@ STRING  New time (format HH:MM)
 @Title     = Set day
 @Parameter = day
 
-@BeginDesciption
+@BeginDescription
 Sets the day in every timestep to the same given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter day
 @Item = day
@@ -94,9 +94,9 @@ INTEGER  Value of the new day
 @Title     = Set month
 @Parameter = month
 
-@BeginDesciption
+@BeginDescription
 Sets the month in every timestep to the same given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter month
 @Item = month
@@ -111,9 +111,9 @@ INTEGER  Value of the new month
 @Title     = Set year
 @Parameter = year
 
-@BeginDesciption
+@BeginDescription
 Sets the year in every timestep to the same given value.
-@EndDesciption
+@EndDescription
 
 @BeginParameter year
 @Item = year
@@ -128,9 +128,9 @@ INTEGER  Value of the new year
 @Title     = Set time units
 @Parameter = units
 
-@BeginDesciption
+@BeginDescription
 Sets the time units.
-@EndDesciption
+@EndDescription
 
 @BeginParameter units
 @Item = units
@@ -145,9 +145,9 @@ STRING  Base units of the time axis (minutes, hours, days, months, years).
 @Title     = Set time axis
 @Parameter = date time [inc]
 
-@BeginDesciption
+@BeginDescription
 Sets the time axis.
-@EndDesciption
+@EndDescription
 
 @BeginParameter date
 @Item = date
@@ -166,9 +166,9 @@ STRING  Optional increment (e.g. 12hour) [default: 0hour]
 @Title     = Set reference time
 @Parameter = date time
 
-@BeginDesciption
+@BeginDescription
 Sets the reference time of an relative time axis.
-@EndDesciption
+@EndDescription
 
 @BeginParameter date
 @Item = date
@@ -185,9 +185,9 @@ STRING  Reference time (format HH:MM)
 @Title     = Set calendar
 @Parameter = calendar
 
-@BeginDesciption
+@BeginDescription
 Sets the calendar.
-@EndDesciption
+@EndDescription
 
 @BeginParameter calendar
 @Item = calendar
@@ -202,9 +202,9 @@ STRING  Calendar (standard, 360days, 365days, 366days)
 @Title     = Shift timesteps
 @Parameter = sval
 
-@BeginDesciption
+@BeginDescription
 Shifts all timesteps by the parameter sval.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = sval

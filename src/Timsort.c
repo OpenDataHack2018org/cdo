@@ -44,7 +44,7 @@
 
 @Title     = Sort over the time
 
-@BeginDesciption
+@BeginDescription
 Sorts for every field position the elements in ascending order.
 After sorting it is
 
@@ -56,7 +56,7 @@ o(t_1,x) < o(t_2,x)      forall (t_1<t_2),x
 o(t_1,x) < o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -30,23 +30,39 @@
 @Section   = Mathematical functions
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = sqr sqrt exp log log10 sin cos tan asin acos atan
+@Operators = abs sqr sqrt exp log log10 sin cos tan asin acos atan
 
 @EndModule
+
+
+@BeginOperator_abs
+
+@Title     = Absolute value
+
+@BeginDescription
+@IfDoc
+@BeginMath
+o(t,x) = abs{i(t,x)}
+@EndMath
+@EndifDoc
+Calculates the absolute value of i(t,x).
+@EndDescription
+
+@EndOperator
 
 
 @BeginOperator_sqr
 
 @Title     = Square
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = {i(t,x)}^2
 @EndMath
 @EndifDoc
 Calculates the value of i(t,x) raised to the power of 2.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -55,14 +71,14 @@ Calculates the value of i(t,x) raised to the power of 2.
 
 @Title     = Square root
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = \sqrt{i(t,x)}
 @EndMath
 @EndifDoc
 Calculates the non-negative square root of i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -71,14 +87,14 @@ Calculates the non-negative square root of i(t,x).
 
 @Title     = Exp
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = e^{i(t,x)}
 @EndMath
 @EndifDoc
 Calculates e (the base of natural logarithms) raised to the power of i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -87,14 +103,14 @@ Calculates e (the base of natural logarithms) raised to the power of i(t,x).
 
 @Title     = Logarithm
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = log(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the natural logarithm of i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -103,14 +119,14 @@ Calculates the natural logarithm of i(t,x).
 
 @Title     = Logarithm base 10
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = log_{10}(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the base-10 logarithm of i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -119,14 +135,14 @@ Calculates the base-10 logarithm of i(t,x).
 
 @Title     = Sine
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = \sin(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the sine of i(t,x), where i(t,x) is given in radians.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -135,14 +151,14 @@ Calculates the sine of i(t,x), where i(t,x) is given in radians.
 
 @Title     = Cosine
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = \cos(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the cosine of i(t,x), where i(t,x) is given in radians.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -151,14 +167,14 @@ Calculates the cosine of i(t,x), where i(t,x) is given in radians.
 
 @Title     = Tangent
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = \tan(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the tangent of i(t,x), where i(t,x) is given in radians.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -167,14 +183,14 @@ Calculates the tangent of i(t,x), where i(t,x) is given in radians.
 
 @Title     = Arcus sine
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = asin(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the arcus sine of i(t,x); that is the value whose sine is i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -183,14 +199,14 @@ Calculates the arcus sine of i(t,x); that is the value whose sine is i(t,x).
 
 @Title     = Arcus cosine
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = acos(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the arcus cosine of i(t,x); that is the value whose cosine is i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -199,14 +215,14 @@ Calculates the arcus cosine of i(t,x); that is the value whose cosine is i(t,x).
 
 @Title     = Arcus tangent
 
-@BeginDesciption
+@BeginDescription
 @IfDoc
 @BeginMath
 o(t,x) = atan(i(t,x))
 @EndMath
 @EndifDoc
 Calculates the arcus tangent of i(t,x); that is the value whose tangent is i(t,x).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -217,7 +233,7 @@ Calculates the arcus tangent of i(t,x); that is the value whose tangent is i(t,x
 void *Math(void *argument)
 {
   static char func[] = "Math";
-  enum {SQR, SQRT, EXP, LOG, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
+  enum {ABS, SQR, SQRT, EXP, LOG, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
   int operatorID;
   int operfunc;
   int streamID1, streamID2;
@@ -234,6 +250,7 @@ void *Math(void *argument)
 
   cdoInitialize(argument);
 
+  cdoOperatorAdd("abs",   ABS,   0, NULL);
   cdoOperatorAdd("sqr",   SQR,   0, NULL);
   cdoOperatorAdd("sqrt",  SQRT,  0, NULL);
   cdoOperatorAdd("exp",   EXP,   0, NULL);
@@ -289,13 +306,17 @@ void *Math(void *argument)
 
 	  switch ( operfunc )
 	    {
+	    case ABS:
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : fabs(array1[i]);
+	      break;
 	    case SQR:
 	      for ( i = 0; i < gridsize; i++ )
-		array2[i] = MUL(array1[i], array1[i]);
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : MUL(array1[i], array1[i]);
 	      break;
 	    case SQRT:
 	      for ( i = 0; i < gridsize; i++ )
-		array2[i] = ROOT(array1[i]);
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : ROOT(array1[i]);
 	      break;
 	    case EXP:
 	      for ( i = 0; i < gridsize; i++ )

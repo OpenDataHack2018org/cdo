@@ -41,10 +41,10 @@
 
 @Title     = Replace variables
 
-@BeginDesciption
+@BeginDescription
 Replaces all variables of ifile2 in ifile1 and write the result to ofile.
 Both input files must have the same number of timesteps.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

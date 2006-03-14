@@ -41,9 +41,9 @@
 
 @Title     = Meridional minimum
 
-@BeginDesciption
+@BeginDescription
 For every longitude the minimum over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -51,9 +51,9 @@ For every longitude the minimum over all latitudes is computed.
 
 @Title     = Meridional maximum
 
-@BeginDesciption
+@BeginDescription
 For every longitude the maximum over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -61,9 +61,9 @@ For every longitude the maximum over all latitudes is computed.
 
 @Title     = Meridional sum
 
-@BeginDesciption
+@BeginDescription
 For every longitude the sum over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -71,9 +71,9 @@ For every longitude the sum over all latitudes is computed.
 
 @Title     = Meridional mean
 
-@BeginDesciption
+@BeginDescription
 For every longitude the mean over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -81,9 +81,9 @@ For every longitude the mean over all latitudes is computed.
 
 @Title     = Meridional average
 
-@BeginDesciption
+@BeginDescription
 For every longitude the average over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -91,9 +91,9 @@ For every longitude the average over all latitudes is computed.
 
 @Title     = Meridional variance
 
-@BeginDesciption
+@BeginDescription
 For every longitude the variance over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -101,9 +101,9 @@ For every longitude the variance over all latitudes is computed.
 
 @Title     = Meridional standard deviation
 
-@BeginDesciption
+@BeginDescription
 For every longitude the standard deviation over all latitudes is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

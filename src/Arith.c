@@ -41,11 +41,11 @@
 
 @Title     = Add two fields
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i_1(t,x) + i_2(t,x)
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -54,11 +54,11 @@ o(t,x) = i_1(t,x) + i_2(t,x)
 
 @Title     = Subtract two fields
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i_1(t,x) - i_2(t,x)
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -67,11 +67,11 @@ o(t,x) = i_1(t,x) - i_2(t,x)
 
 @Title     = Multiply two fields
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i_1(t,x) * i_2(t,x)
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -80,11 +80,11 @@ o(t,x) = i_1(t,x) * i_2(t,x)
 
 @Title     = Divide two fields
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i_1(t,x) / i_2(t,x)
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -93,11 +93,11 @@ o(t,x) = i_1(t,x) / i_2(t,x)
 
 @Title     = Minimum of two fields
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = MIN(i_1(t,x), i_2(t,x))
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -106,11 +106,11 @@ o(t,x) = MIN(i_1(t,x), i_2(t,x))
 
 @Title     = Maximum of two fields
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = MAX(i_1(t,x), i_2(t,x))
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

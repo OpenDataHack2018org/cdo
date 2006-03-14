@@ -44,9 +44,9 @@
 
 @Title     = Invert latitude
 
-@BeginDesciption
+@BeginDescription
 Invert the latitude of a field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -55,31 +55,31 @@ Invert the latitude of a field.
 
 @Title     = Invert longitude
 
-@BeginDesciption
+@BeginDescription
 Invert the longitude of a field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
 
 @BeginOperator_invertlatdes
 
-@Title     = Invert latitude decription
+@Title     = Invert latitude description
 
-@BeginDesciption
-Invert only the latitude decription of a field.
-@EndDesciption
+@BeginDescription
+Invert only the latitude description of a field.
+@EndDescription
 
 @EndOperator
 
 
 @BeginOperator_invertlondes
 
-@Title     = Invert longitude decription
+@Title     = Invert longitude description
 
-@BeginDesciption
-Invert only the longitude decription of a field.
-@EndDesciption
+@BeginDescription
+Invert only the longitude description of a field.
+@EndDescription
 
 @EndOperator
 
@@ -88,9 +88,9 @@ Invert only the longitude decription of a field.
 
 @Title     = Invert latitude data
 
-@BeginDesciption
+@BeginDescription
 Invert only the latitude data of a field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -99,9 +99,9 @@ Invert only the latitude data of a field.
 
 @Title     = Invert longitude data
 
-@BeginDesciption
+@BeginDescription
 Invert only the longitude data of a field.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

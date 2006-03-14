@@ -43,8 +43,8 @@
 
 @Title     = Spectral information
 
-@BeginDesciption
-@EndDesciption
+@BeginDescription
+@EndDescription
 
 @EndOperator
 

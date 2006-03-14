@@ -34,9 +34,9 @@
 @Arguments = ifile1 ifile2 ofile
 @Operators = ifthen ifnotthen
 
-@BeginDesciption
+@BeginDescription
 A value not equal to zero is treated as "true", zero is treated a "false".
-@EndDesciption
+@EndDescription
 
 @EndModule
 
@@ -45,7 +45,7 @@ A value not equal to zero is treated as "true", zero is treated a "false".
 
 @Title     = If then
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / i_2(t,x) if i_1(t,x) NE 0  AND  i_1(t,x) NE miss
 o(t,x) =
@@ -60,7 +60,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -69,7 +69,7 @@ o(t,x) = \left\{
 
 @Title     = If not then
 
-@BeginDesciption
+@BeginDescription
 @IfMan
          / i_2(t,x) if i_1(t,x) EQ 0  AND  i_1(t,x) NE miss
 o(t,x) = 
@@ -85,7 +85,7 @@ o(t,x) = \left\{
 @EndMath
 @EndifDoc
 
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

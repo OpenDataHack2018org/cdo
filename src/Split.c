@@ -41,9 +41,9 @@
 
 @Title     = Split codes
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each code.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,9 +52,9 @@ Splits a file into pieces, one for each code.
 
 @Title     = Split variables
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each variable.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -63,9 +63,9 @@ Splits a file into pieces, one for each variable.
 
 @Title     = Split levels
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each level.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -74,9 +74,9 @@ Splits a file into pieces, one for each level.
 
 @Title     = Split grids
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each grid.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -85,9 +85,9 @@ Splits a file into pieces, one for each grid.
 
 @Title     = Split zaxis
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each zaxis.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

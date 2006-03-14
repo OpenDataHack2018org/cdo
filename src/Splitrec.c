@@ -41,9 +41,9 @@
 
 @Title     = Split records
 
-@BeginDesciption
+@BeginDescription
 Splits a file into pieces, one for each record.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

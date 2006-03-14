@@ -41,7 +41,7 @@
 
 @Title     = Equal
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i_1(t,x) EQ i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
 o(t,x) = <    0   if i_1(t,x) NE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
@@ -57,7 +57,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -66,7 +66,7 @@ o(t,x) = \left\{
 
 @Title     = Not equal
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i_1(t,x) NE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
 o(t,x) = <    0   if i_1(t,x) EQ i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
@@ -82,7 +82,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -91,7 +91,7 @@ o(t,x) = \left\{
 
 @Title     = Less equal
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i_1(t,x) LE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
 o(t,x) = <    0   if i_1(t,x) GT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
@@ -107,7 +107,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -116,7 +116,7 @@ o(t,x) = \left\{
 
 @Title     = Less then
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i_1(t,x) LT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
 o(t,x) = <    0   if i_1(t,x) GE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
@@ -132,7 +132,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -141,7 +141,7 @@ o(t,x) = \left\{
 
 @Title     = Greater equal
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i_1(t,x) GE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
 o(t,x) = <    0   if i_1(t,x) LT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
@@ -157,7 +157,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -166,7 +166,7 @@ o(t,x) = \left\{
 
 @Title     = Greater then
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i_1(t,x) GT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
 o(t,x) = <    0   if i_1(t,x) LE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
@@ -182,7 +182,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

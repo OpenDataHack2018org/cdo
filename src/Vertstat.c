@@ -40,9 +40,9 @@
 
 @Title     = Vertical minimum
 
-@BeginDesciption
+@BeginDescription
 For every gridpoint the minimum over all levels is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -51,9 +51,9 @@ For every gridpoint the minimum over all levels is computed.
 
 @Title     = Vertical maximum
 
-@BeginDesciption
+@BeginDescription
 For every gridpoint the maximum over all levels is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -62,9 +62,9 @@ For every gridpoint the maximum over all levels is computed.
 
 @Title     = Vertical sum
 
-@BeginDesciption
+@BeginDescription
 For every gridpoint the sum over all levels is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -73,9 +73,9 @@ For every gridpoint the sum over all levels is computed.
 
 @Title     = Vertical mean
 
-@BeginDesciption
+@BeginDescription
 For every gridpoint the mean over all levels is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -84,9 +84,9 @@ For every gridpoint the mean over all levels is computed.
 
 @Title     = Vertical average
 
-@BeginDesciption
+@BeginDescription
 For every gridpoint the average over all levels is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -95,9 +95,9 @@ For every gridpoint the average over all levels is computed.
 
 @Title     = Vertical standard deviation
 
-@BeginDesciption
+@BeginDescription
 For every gridpoint the standard deviation over all levels is computed.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

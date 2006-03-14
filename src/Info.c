@@ -39,7 +39,7 @@
 
 @Title     = File information
 
-@BeginDesciption
+@BeginDescription
 Prints simple statistics for each field of a file.
 For each field the operator print in one line the:
 @BeginItemize
@@ -52,7 +52,7 @@ For each field the operator print in one line the:
 @Item = minimum, mean and maximum
 @EndItemize
 The mean value is computed without the use of area weight!
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -61,10 +61,10 @@ The mean value is computed without the use of area weight!
 
 @Title     = File information
 
-@BeginDesciption
+@BeginDescription
 The same as operator info. Using the name instead of the code number
 to identify the variable.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -73,10 +73,10 @@ to identify the variable.
 
 @Title     = Print simple map
 
-@BeginDesciption
+@BeginDescription
 Prints simple statistics and a map for each field of a file.
 The map will be printed only for fields on a rectangular grid.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -39,7 +39,7 @@
 @Title     = Equal constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i(t,x) EQ c     AND  i(t,x),c NE miss
 o(t,x) = <    0   if i(t,x) NE c     AND  i(t,x),c NE miss
@@ -55,7 +55,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -70,7 +70,7 @@ FLOAT  Constant
 @Title     = Not equal constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i(t,x) NE c     AND  i(t,x),c NE miss
 o(t,x) = <    0   if i(t,x) EQ c     AND  i(t,x),c NE miss
@@ -86,7 +86,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -101,7 +101,7 @@ FLOAT  Constant
 @Title     = Less equal constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i(t,x) LE c     AND  i(t,x),c NE miss
 o(t,x) = <    0   if i(t,x) GT c     AND  i(t,x),c NE miss
@@ -117,7 +117,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -132,7 +132,7 @@ FLOAT  Constant
 @Title     = Less then constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i(t,x) LT c     AND  i(t,x),c NE miss
 o(t,x) = <    0   if i(t,x) GE c     AND  i(t,x),c NE miss
@@ -148,7 +148,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -163,7 +163,7 @@ FLOAT  Constant
 @Title     = Greater equal constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i(t,x) GE c     AND  i(t,x),c NE miss
 o(t,x) = <    0   if i(t,x) LT c     AND  i(t,x),c NE miss
@@ -179,7 +179,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c
@@ -194,7 +194,7 @@ FLOAT  Constant
 @Title     = Greater then constant
 @Parameter = c
 
-@BeginDesciption
+@BeginDescription
 @IfMan
           /   1   if i(t,x) GT c     AND  i(t,x),c NE miss
 o(t,x) = <    0   if i(t,x) LE c     AND  i(t,x),c NE miss
@@ -210,7 +210,7 @@ o(t,x) = \left\{
 \end{array}   \right.
 @EndMath
 @EndifDoc
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = c

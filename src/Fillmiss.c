@@ -42,9 +42,9 @@
 
 @Title     = Fill missing values
 
-@BeginDesciption
+@BeginDescription
 Fill missing values by interpolation of the neightbours.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

@@ -1,3 +1,9 @@
+2006-05-??  Uwe Schulzweida  <schulzweida@dkrz.de>
+
+	* using CDI library version 0.9.7
+	* New operator: abs (Math) [Reiner Schnur]
+	* Version 0.9.12 released
+
 2006-03-08  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 0.9.6

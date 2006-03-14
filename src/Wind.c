@@ -43,10 +43,10 @@
 
 @Title     = U and V wind to divergence and vorticity
 
-@BeginDesciption
+@BeginDescription
 Calculate spherical harmonic coefficients of divergence and vorticity
 from U and V wind.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -55,9 +55,9 @@ from U and V wind.
 
 @Title     = Divergence and vorticity to U and V wind
 
-@BeginDesciption
+@BeginDescription
 Calculate U and V wind on a gaussian grid from divergence and vorticity.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

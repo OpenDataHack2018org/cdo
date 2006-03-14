@@ -41,11 +41,11 @@
 
 @Title     = Variable description
 
-@BeginDesciption
+@BeginDescription
 Prints a table with a description of all variables.
 For each variable the operator print in one line the
 code, name, description and units.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -54,9 +54,9 @@ code, name, description and units.
 
 @Title     = Grid description
 
-@BeginDesciption
+@BeginDescription
 Prints the description of all grids in a file.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -64,9 +64,9 @@ Prints the description of all grids in a file.
 
 @Title     = Vertical coordinate table
 
-@BeginDesciption
+@BeginDescription
 Prints the vertical coordinate table.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

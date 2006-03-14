@@ -41,7 +41,7 @@
 
 @Title     = Short file information
 
-@BeginDesciption
+@BeginDescription
 Prints short information for each variable of a file.
 For each variable the operator print in one line the:
 @BeginItemize
@@ -51,7 +51,7 @@ For each variable the operator print in one line the:
 @Item = horizontal grid size and number
 @Item = vertical grid size and number
 @EndItemize
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -60,10 +60,10 @@ For each variable the operator print in one line the:
 
 @Title     = Short file information
 
-@BeginDesciption
+@BeginDescription
 The same as operator sinfo. Using the name instead of the code number
 to identify the variable.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

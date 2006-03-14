@@ -38,11 +38,11 @@
 
 @Title     = ASCII output
 
-@BeginDesciption
+@BeginDescription
 Prints all values to standard output.
 Each row has 6 elements with the C-style format "%13.6g".
 
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,11 +52,11 @@ Each row has 6 elements with the C-style format "%13.6g".
 @Title     = Formatted output
 @Parameter = format nelem
 
-@BeginDesciption
+@BeginDescription
 Prints all values to standard output.
 The format and number of elements for each column
 can be specified by the parameters.
-@EndDesciption
+@EndDescription
 
 @BeginParameter format
 @Item = format
@@ -72,9 +72,9 @@ INTEGER Number of elements for each row
 
 @Title     = Integer output
 
-@BeginDesciption
+@BeginDescription
 Prints all values rounded to the nearest intergers to standard output.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -83,10 +83,10 @@ Prints all values rounded to the nearest intergers to standard output.
 
 @Title     = SERVICE output
 
-@BeginDesciption
+@BeginDescription
 Prints all values to standard output.
 Each field with a header of 8 integers (SERVICE likely).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -95,10 +95,10 @@ Each field with a header of 8 integers (SERVICE likely).
 
 @Title     = EXTRA output
 
-@BeginDesciption
+@BeginDescription
 Prints all values to standard output.
 Each field with a header of 4 integers (EXTRA likely).
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

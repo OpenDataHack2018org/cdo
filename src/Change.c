@@ -43,9 +43,9 @@
 @Title     = Change code
 @Parameter = ocode ncode ...
 
-@BeginDesciption
+@BeginDescription
 Changes some user given codes to new user given values.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = ocode,ncode,...
@@ -60,9 +60,9 @@ INTEGER  Pairs of old and new code
 @Title     = Change variable name
 @Parameter = ovar nvar ...
 
-@BeginDesciption
+@BeginDescription
 Changes some user given variable names to new user given names.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = ovar,nvar,...
@@ -77,9 +77,9 @@ STRING  Pairs of old and new variable name
 @Title     = Change level
 @Parameter = olevel nlevel ...
 
-@BeginDesciption
+@BeginDescription
 Changes some user given levels to new user given values.
-@EndDesciption
+@EndDescription
 
 @BeginParameter
 @Item = olevel,nlevel,...
@@ -94,9 +94,9 @@ FLOAT  Pairs of old and new level
 @Title     = Change level of one code
 @Parameter = code olevel nlevel
 
-@BeginDesciption
+@BeginDescription
 Changes one level of a user given code number.
-@EndDesciption
+@EndDescription
 
 @BeginParameter olevel
 @Item = code
@@ -115,9 +115,9 @@ FLOAT   New level
 @Title     = Change level of one variable
 @Parameter = var olevel nlevel
 
-@BeginDesciption
+@BeginDescription
 Changes one level of a user given variable.
-@EndDesciption
+@EndDescription
 
 @BeginParameter olevel
 @Item = var

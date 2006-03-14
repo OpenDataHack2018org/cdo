@@ -40,10 +40,10 @@
 
 @Title     = Mass stream function
 
-@BeginDesciption
+@BeginDescription
 Compute the mass stream function (ECHAM code272).
 The input field must be a zonal mean of v-velocity (code132) on pressure levels.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

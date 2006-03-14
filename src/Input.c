@@ -39,11 +39,11 @@
 
 @Title     = SERVICE input
 
-@BeginDesciption
+@BeginDescription
 Read fields with ascii numbers from standard input and stores them in ofile.
 Each field must have a header of 8 integers (SERVICE likely).
 The numbers that are read are exactly that ones which are written out by outputsrv.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,11 +52,11 @@ The numbers that are read are exactly that ones which are written out by outputs
 
 @Title     = EXTRA input
 
-@BeginDesciption
+@BeginDescription
 Read fields with ascii numbers from standard input and stores them in ofile.
 Each field with a header of 4 integers (EXTRA likely).
 The numbers that are read are exactly that ones which are written out by outputsrv.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

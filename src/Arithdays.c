@@ -39,11 +39,11 @@
 
 @Title     = Multiply with days per month
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) * days\_per\_month
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -52,11 +52,11 @@ o(t,x) = i(t,x) * days\_per\_month
 
 @Title     = Divide by days per month
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) / days\_per\_month
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -65,11 +65,11 @@ o(t,x) = i(t,x) / days\_per\_month
 
 @Title     = Multiply with days per year
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) * days\_per\_year
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
@@ -78,11 +78,11 @@ o(t,x) = i(t,x) * days\_per\_year
 
 @Title     = Divide by days per year
 
-@BeginDesciption
+@BeginDescription
 @BeginMath
 o(t,x) = i(t,x) / days\_per\_year
 @EndMath
-@EndDesciption
+@EndDescription
 
 @EndOperator
 

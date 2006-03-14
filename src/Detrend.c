@@ -40,7 +40,7 @@
 
 @Title     = Detrend
 
-@BeginDesciption
+@BeginDescription
 Every time series in ifile is linearly detrended.
 @IfMan
 For every field element x only those timesteps t belong
@@ -66,7 +66,7 @@ o(t,x) = i(t,x) - (a(x) + b(x)t)
 @EndifDoc
 This operator has to keep the fields of all timesteps concurrently in the memory.
 If not enough memory is available, use the operators trend and subtrend.
-@EndDesciption
+@EndDescription
 
 @EndOperator
 
