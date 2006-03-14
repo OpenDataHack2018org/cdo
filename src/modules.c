@@ -158,7 +158,7 @@ void *Zonstat(void *argument);
                                  "invertlatdata", "invertlondata"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MastrfuOperators       {"mastrfu"}
-#define  MathOperators          {"sqr", "sqrt", "exp", "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
+#define  MathOperators          {"abs", "sqr", "sqrt", "exp", "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd"}
