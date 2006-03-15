@@ -1,6 +1,7 @@
 2006-05-??  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 0.9.7
+	* New module: Mergetime [Stefanie Legutke]
 	* New operator: abs (Math) [Reiner Schnur]
 	* Version 0.9.12 released
 

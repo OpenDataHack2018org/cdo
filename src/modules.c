@@ -70,6 +70,7 @@ void *Mastrfu(void *argument);
 void *Math(void *argument);
 void *Merge(void *argument);
 void *Mergegrid(void *argument);
+void *Mergetime(void *argument);
 void *Merstat(void *argument);
 void *Ninfo(void *argument);
 void *Nmltest(void *argument);
@@ -161,6 +162,7 @@ void *Zonstat(void *argument);
 #define  MathOperators          {"abs", "sqr", "sqrt", "exp", "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
+#define  MergetimeOperators     {"mergetime"}
 #define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "nvar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
@@ -264,6 +266,7 @@ static MODULES Modules[] =
   { Math,           MathHelp,          MathOperators,           1,  1 },
   { Merge,          MergeHelp,         MergeOperators,         -1,  1 },
   { Mergegrid,      NULL,              MergegridOperators,      2,  1 },
+  { Mergetime,      NULL,              MergetimeOperators,     -1,  1 },
   { Merstat,        MerstatHelp,       MerstatOperators,        1,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,          1,  0 },
   { Nmltest,        NULL,              NmltestOperators,        0,  0 },

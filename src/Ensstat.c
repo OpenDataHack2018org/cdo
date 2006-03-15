@@ -177,14 +177,15 @@ void *Ensstat(void *argument)
       ef[fileID].vlistID = vlistID;
     }
 
+  /* check that the contents is always the same */
+  for ( fileID = 1; fileID < nfiles; fileID++ )
+    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, func_hrd);
+
   vlistID1 = ef[0].vlistID;
   vlistID2 = vlistDuplicate(vlistID1);
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
-
-  for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(vlistID1, ef[fileID].vlistID, func_hrd);
 
   streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));

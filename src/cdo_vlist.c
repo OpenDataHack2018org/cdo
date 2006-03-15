@@ -35,7 +35,7 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
     for ( varID = 0; varID < nvars; varID++ )
       {
 	if ( vlistInqVarCode(vlistID1, varID) != vlistInqVarCode(vlistID2, varID) )
-	  cdoAbort("Input files have different structure!");
+	  cdoAbort("Input streams have different structure!");
 
 	if ( gridInqSize(vlistInqVarGrid(vlistID1, varID)) !=
 	     gridInqSize(vlistInqVarGrid(vlistID2, varID)) )
@@ -45,7 +45,7 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
     for ( varID = 0; varID < nvars; varID++ )
       {
 	if ( vlistInqVarCode(vlistID1, varID) != vlistInqVarCode(vlistID2, varID) )
-	  cdoAbort("Input files have different structure!");
+	  cdoAbort("Input streams have different structure!");
 
 	if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
 	     zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )

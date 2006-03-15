@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(cdo, 0.9.12, schulzweida@dkrz.de)
+AC_INIT(cdo, 0.9.13, schulzweida@dkrz.de)
 
 CONFIG_ABORT=yes
 
