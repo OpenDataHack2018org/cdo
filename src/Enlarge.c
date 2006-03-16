@@ -15,6 +15,8 @@
   GNU General Public License for more details.
 */
 
+#include <string.h>
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -61,20 +63,25 @@ void *Enlarge(void *argument)
   static char func[] = "Enlarge";
   int streamID1, streamID2;
   int vlistID1, vlistID2;
-  int gridID2;
+  int gridID1, gridID2;
   int i, index, ngrids;
   int recID, nrecs;
   int tsID, varID, levelID;
   int taxisID1, taxisID2;
   int nmiss;
   int gridsize1, gridsize2;
-  double *array;
+  int xsize1, ysize1, xsize2, ysize2;
+  int ix, iy;
+  int linfo = TRUE;
+  double *array1, *array2;
 
   cdoInitialize(argument);
 
   operatorCheckArgc(1);
 
   gridID2 = cdoDefineGrid(operatorArgv()[0]);
+  xsize2 = gridInqXsize(gridID2);
+  ysize2 = gridInqYsize(gridID2);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -101,7 +108,8 @@ void *Enlarge(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  array = (double *) malloc(gridsize2*sizeof(double));
+  array1 = (double *) malloc(gridsize2*sizeof(double));
+  array2 = (double *) malloc(gridsize2*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -113,16 +121,51 @@ void *Enlarge(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, array, &nmiss);
+	  streamReadRecord(streamID1, array1, &nmiss);
 
 	  if ( nmiss > 0 ) cdoAbort("missing values unsupported for this operator!");
 
-	  gridsize1 = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  for ( i = gridsize1; i < gridsize2; i++ )
-	    array[i] = array[gridsize1-1];
+	  gridID1 = vlistInqVarGrid(vlistID1, varID);
+	  xsize1 = gridInqXsize(gridID1);
+	  ysize1 = gridInqYsize(gridID1);
+	  gridsize1 = gridInqSize(gridID1);
 
+	  printf("%d %d %d %d\n", xsize1, ysize1, xsize2, ysize2);
+	  if ( xsize1 == 1 && ysize1 == ysize2 && xsize1*ysize1 == gridsize1 )
+	    {
+	      if ( linfo )
+		{
+		  cdoPrint("Enlarge zonal");
+		  linfo = FALSE;
+		}
+	      
+	      for ( iy = 0; iy < ysize2; iy++ )
+		for ( ix = 0; ix < xsize2; ix++ )
+		  array2[ix+iy*xsize2] = array1[iy];
+	    }
+	  else if ( ysize1 == 1 && xsize1 == xsize2 && xsize1*ysize1 == gridsize1 )
+	    {
+	      if ( linfo )
+		{
+		  cdoPrint("Enlarge meridional");
+		  linfo = FALSE;
+		}
+	      
+	      for ( iy = 0; iy < ysize2; iy++ )
+		for ( ix = 0; ix < xsize2; ix++ )
+		  array2[ix+iy*xsize2] = array1[ix];
+	    }
+	  else
+	    {
+	      memcpy(array2, array1, gridsize1*sizeof(double));
+	      for ( i = gridsize1; i < gridsize2; i++ )
+		{
+		  array2[i] = array1[gridsize1-1];
+		}
+	    }
+	    
 	  streamDefRecord(streamID2, varID,  levelID);
-	  streamWriteRecord(streamID2, array, nmiss);
+	  streamWriteRecord(streamID2, array2, nmiss);
 	}
       tsID++;
     }
@@ -130,7 +173,8 @@ void *Enlarge(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( array ) free(array);
+  if ( array1 ) free(array1);
+  if ( array2 ) free(array2);
 
   cdoFinish();
 
