@@ -1,9 +1,10 @@
 2006-05-??  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 0.9.7
-	* New module: Mergetime [Stefanie Legutke]
-	* New operator: abs (Math) [Reiner Schnur]
-	* enlarge: update for zonal and meridional data [Wolfgang Mueller]
+	* New module: Mergetime [request: Stefanie Legutke]
+	* New operator: abs (Math) [request: Reiner Schnur]
+	* enlarge: update for zonal and meridional data [request: Wolfgang Mueller]
+	* gradsdes: bug fix for unsorted GRIB data [report: Stefan Bauer]
 	* Version 0.9.12 released
 
 2006-03-08  Uwe Schulzweida  <schulzweida@dkrz.de>

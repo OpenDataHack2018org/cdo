@@ -81,7 +81,7 @@ the descriptor (ifile.ctl) and the map (ifile.gmp) file.
 
 /* Byte swap requested number of 4 byte elements */
 
-void gabswp (void *r, int cnt) {
+static void gabswp (void *r, int cnt) {
 int i;
 char *ch1,*ch2,*ch3,*ch4,cc1,cc2;
 
@@ -107,7 +107,7 @@ char *ch1,*ch2,*ch3,*ch4,cc1,cc2;
  *                      Wesley Ebisuzaki
  */
 
-float ibm2flt(unsigned char *ibm) {
+static float ibm2flt(unsigned char *ibm) {
 
 	int positive, power;
 	unsigned int abspower;
@@ -145,7 +145,7 @@ float ibm2flt(unsigned char *ibm) {
  * doesn't handle subnormal numbers
  */
 
-int flt2ibm(float x, unsigned char *ibm) {
+static int flt2ibm(float x, unsigned char *ibm) {
 
 	int sign, exp, i;
 	double mant;
@@ -232,6 +232,7 @@ void *Gradsdes(void *argument)
   int gridtype = -1;
   int nvars, ngrids, nzaxis, nlev;
   int nvarsout;
+  int ntsteps;
   int index;
   int vlistID, tsID, varID;
   int recID, levelID;
@@ -262,9 +263,11 @@ void *Gradsdes(void *argument)
   int dt=1, iik=0;
   int gridsize = 0;
   int nmiss;
+  int nrecsout = 0;
   int maxrecs = 0;
-  int *intnum = NULL;
   int *vars = NULL;
+  int *recoffset = NULL;
+  int *intnum = NULL;
   float *fltnum = NULL;
   double *array = NULL;
   double xfirst, yfirst, xinc, yinc;
@@ -476,9 +479,10 @@ void *Gradsdes(void *argument)
 
   vlistID = streamInqVlist(streamID);
 
-  nvars  = vlistNvars(vlistID);
-  ngrids = vlistNgrids(vlistID);
-  nzaxis = vlistNzaxis(vlistID);
+  nvars   = vlistNvars(vlistID);
+  ntsteps = vlistNtsteps(vlistID);
+  ngrids  = vlistNgrids(vlistID);
+  nzaxis  = vlistNzaxis(vlistID);
 
   filetype  = streamInqFiletype(streamID);
   byteorder = streamInqByteorder(streamID);
@@ -504,13 +508,20 @@ void *Gradsdes(void *argument)
   /* select all variables with used gridID */
 
   vars = (int *) malloc(nvars*sizeof(int));
+  recoffset = (int *) malloc(nvars*sizeof(int));
   nvarsout = 0;
+  nrecsout = 0;
   for ( varID = 0; varID < nvars; varID++ )
     {
       if ( vlistInqVarGrid(vlistID, varID) == gridID )
 	{
-	  nvarsout++;
 	  vars[varID] = TRUE;
+	  recoffset[varID] = nrecsout;
+	  nvarsout++;
+	  nrecsout += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+	  if ( ntsteps != 1 && vlistInqVarTime(vlistID, varID) == TIME_CONSTANT )
+	    cdoAbort("Unsupported GrADS record structure! Variable %d has only 1 time step.",
+		     vlistInqVarCode(vlistID, varID));
 	}
       else
 	{
@@ -669,23 +680,24 @@ void *Gradsdes(void *argument)
 
       if ( filetype == FILETYPE_GRB )
 	{
+	  nrecords += nrecsout;
+	  if ( nrecords >= maxrecs )
+	    {
+	      maxrecs += nrecords;
+	      intnum = (int *) realloc(intnum, 3*maxrecs*sizeof(int));
+	      fltnum = (float *) realloc(fltnum, 3*maxrecs*sizeof(float));
+	    }
+
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID, &varID, &levelID);
 	      if ( vars[varID] == TRUE )
 		{
 		  streamReadRecord(streamID, array, &nmiss);
-	      
-		  if ( nrecords >= maxrecs )
-		    {
-		      maxrecs += 1000;
-		      intnum = (int *) realloc(intnum, 3*maxrecs*sizeof(int));
-		      fltnum = (float *) realloc(fltnum, 3*maxrecs*sizeof(float));
-		    }
-		  
-		  streamInqGinfo(streamID, &intnum[3*nrecords], &fltnum[3*nrecords]);
 
-		  nrecords += 1;
+		  index = 3*(tsID*nrecsout + recoffset[varID] + levelID);
+	      
+		  streamInqGinfo(streamID, &intnum[index], &fltnum[index]);
 		}
 	    }
 	}
@@ -1066,6 +1078,7 @@ void *Gradsdes(void *argument)
   streamClose(streamID);
 
   if ( vars ) free(vars);
+  if ( recoffset ) free(recoffset);
   if ( array ) free(array);
   if ( intnum ) free(intnum);
   if ( fltnum ) free(fltnum);
