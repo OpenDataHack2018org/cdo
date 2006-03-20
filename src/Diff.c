@@ -92,7 +92,7 @@ void *Diff(void *argument)
   int vlistID1, vlistID2;
   int taxisID;
   int nmiss1, nmiss2;
-  int ndrec = 0, ngrec = 0;
+  int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[128];
   int year, month, day, hour, minute;
   double *array1, *array2;
@@ -201,12 +201,15 @@ void *Diff(void *argument)
 	  fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
 	  fprintf(stdout, "%#12.5g%#12.5g\n", absm, relm);
 	  ngrec++;
-	  if ( absm > 0 || relm > 0 ) ndrec++;
+	  if ( absm > 0     || relm > 0     ) ndrec++;
+	  if ( absm > 1.e-3 || relm > 1.e-3 ) nd2rec++;
 	}
       tsID++;
     }
 
   fprintf(stdout, "  %d of %d records differ\n", ndrec, ngrec);
+  if ( ndrec != nd2rec )
+    fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
   /*  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec); */
 
   streamClose(streamID1);

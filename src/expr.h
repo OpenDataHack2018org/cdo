@@ -1,5 +1,8 @@
 #include <stdio.h>
+
+#ifndef fileno
 int fileno(FILE *stream);
+#endif
 
 #ifndef strdupx
 #ifndef strdup
