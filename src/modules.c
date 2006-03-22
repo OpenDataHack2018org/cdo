@@ -169,8 +169,9 @@ void *Zonstat(void *argument);
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld"}
 #define  OutputgmtOperators     {"outputcenter", "outputbounds", "outputboundscpt"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
-#define  RemapOperators         {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1", \
-                                 "gencon", "genbil", "genbic", "gendis", "remap"}
+#define  RemapOperators         {"remap"}
+#define    InterpolateOperators {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
+#define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runstd"}
@@ -204,11 +205,11 @@ void *Zonstat(void *argument);
 #define  TestOperators          {"test"}
 #define  Test2Operators         {"test2"}
 #define  TimsortOperators       {"timsort"}
-#define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timstd",  \
-                                 "yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearstd", \
-	   	                 "monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monstd",  \
-		                 "daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "daystd",  \
-		                 "hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourstd"}
+#define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timstd"}
+#define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearstd"}
+#define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monstd"}
+#define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "daystd"}
+#define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourstd"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
 #define  VardupOperators        {"vardup", "varmul"}
@@ -235,7 +236,7 @@ static MODULES Modules[] =
   { Arith,          ArithHelp,         ArithOperators,          2,  1 },
   { Arithc,         ArithcHelp,        ArithcOperators,         1,  1 },
   { Arithdays,      ArithdaysHelp,     ArithdaysOperators,      1,  1 },
-  { Cat,            CatHelp,           CatOperators,           -1,  1 },
+  { Cat,            CopyHelp,          CatOperators,           -1,  1 },
   { Change,         ChangeHelp,        ChangeOperators,         1,  1 },
   { Comp,           CompHelp,          CompOperators,           2,  1 },
   { Compc,          CompcHelp,         CompcOperators,          1,  1 },
@@ -274,6 +275,8 @@ static MODULES Modules[] =
   { Outputgmt,      NULL,              OutputgmtOperators,      1,  0 },
   { Pinfo,          NULL,              PinfoOperators,          1,  1 },
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
+  { Remap,          InterpolateHelp,   InterpolateOperators,    1,  1 },
+  { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,        2,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,          1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,        1,  1 },
@@ -296,9 +299,9 @@ static MODULES Modules[] =
   { Specinfo,       NULL,              SpecinfoOperators,       0,  0 },
   { Spectral,       SpectralHelp,      SpectralOperators,       1,  1 },
   { Split,          SplitHelp,         SplitOperators,          1,  1 },
-  { Splitrec,       SplitrecHelp,      SplitrecOperators,       1,  1 },
+  { Splitrec,       SplitHelp,         SplitrecOperators,       1,  1 },
   { Splittime,      SplittimeHelp,     SplittimeOperators,      1,  1 },
-  { Splityear,      SplityearHelp,     SplityearOperators,      1,  1 },
+  { Splityear,      SplittimeHelp,     SplityearOperators,      1,  1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,       3,  1 },
   { Template1,      NULL,              Template1Operators,      1,  1 },
   { Template2,      NULL,              Template2Operators,      1,  1 },
@@ -306,6 +309,10 @@ static MODULES Modules[] =
   { Test2,          NULL,              Test2Operators,          2,  1 },
   { Timsort,        TimsortHelp,       TimsortOperators,        1,  1 },
   { Timstat,        TimstatHelp,       TimstatOperators,        1,  1 },
+  { Timstat,        YearstatHelp,      YearstatOperators,       1,  1 },
+  { Timstat,        MonstatHelp,       MonstatOperators,        1,  1 },
+  { Timstat,        DaystatHelp,       DaystatOperators,        1,  1 },
+  { Timstat,        HourstatHelp,      HourstatOperators,       1,  1 },
   { Trend,          TrendHelp,         TrendOperators,          1,  2 },
   { Trms,           NULL,              TrmsOperators,           2,  1 },
   { Vardup,         VardupHelp,        VardupOperators,         1,  1 },
@@ -313,7 +320,7 @@ static MODULES Modules[] =
   { Varrms,         NULL,              VarrmsOperators,         2,  1 },
   { Vertint,        VertintHelp,       VertintOperators,        1,  1 },
   { Vertstat,       VertstatHelp,      VertstatOperators,       1,  1 },
-  { Wind,           NULL,              WindOperators,           1,  1 },
+  { Wind,           WindHelp,          WindOperators,           1,  1 },
   { Writegrid,      NULL,              WritegridOperators,      1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,    1,  1 },
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,       1,  1 },

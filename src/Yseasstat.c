@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,17 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Yseasstat  yseasmin        Multi-year seasonally minimum
+      Yseasstat  yseasmax        Multi-year seasonally maximum
+      Yseasstat  yseasmean       Multi-year seasonally mean
+      Yseasstat  yseasavg        Multi-year seasonally average
+      Yseasstat  yseasstd        Multi-year seasonally standard deviation
+*/
+
+
 #include <stdio.h>
 #include <math.h>
 
@@ -25,152 +36,6 @@
 #include "field.h"
 #include "dmemory.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Yseasstat
-@Title     = Multi-year seasonally statistics
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = yseasmin yseasmax yseasmean yseasavg yseasstd
-
-@EndModule
-
-
-@BeginOperator_yseasmin
-
-@Title     = Multi-year seasonally minimum
-
-@BeginDescription
-@IfMan
-o(1,x) = min{i(t,x), month(i(t)) = 12, 01, 02}
-o(2,x) = min{i(t,x), month(i(t)) = 03, 04, 05}
-o(3,x) = min{i(t,x), month(i(t)) = 06, 07, 08}
-o(4,x) = min{i(t,x), month(i(t)) = 09, 10, 11}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_yseasmax
-
-@Title     = Multi-year seasonally maximum
-
-@BeginDescription
-@IfMan
-o(1,x) = max{i(t,x), month(i(t)) = 12, 01, 02}
-o(2,x) = max{i(t,x), month(i(t)) = 03, 04, 05}
-o(3,x) = max{i(t,x), month(i(t)) = 06, 07, 08}
-o(4,x) = max{i(t,x), month(i(t)) = 09, 10, 11}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_yseasmean
-
-@Title     = Multi-year seasonally mean
-
-@BeginDescription
-@IfMan
-o(1,x) = mean{i(t,x), month(i(t)) = 12, 01, 02}
-o(2,x) = mean{i(t,x), month(i(t)) = 03, 04, 05}
-o(3,x) = mean{i(t,x), month(i(t)) = 06, 07, 08}
-o(4,x) = mean{i(t,x), month(i(t)) = 09, 10, 11}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_yseasavg
-
-@Title     = Multi-year seasonally average
-
-@BeginDescription
-@IfMan
-o(1,x) = avg{i(t,x), month(i(t)) = 12, 01, 02}
-o(2,x) = avg{i(t,x), month(i(t)) = 03, 04, 05}
-o(3,x) = avg{i(t,x), month(i(t)) = 06, 07, 08}
-o(4,x) = avg{i(t,x), month(i(t)) = 09, 10, 11}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{1},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
-o(\mbox{2},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
-o(\mbox{3},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
-o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_yseasstd
-
-@Title     = Multi-year seasonally standard deviation
-
-@BeginDescription
-@IfMan
-o(1,x) = sqrt{var{i(t,x), month(i(t)) = 12, 01, 02}}
-o(2,x) = sqrt{var{i(t,x), month(i(t)) = 03, 04, 05}}
-o(3,x) = sqrt{var{i(t,x), month(i(t)) = 06, 07, 08}}
-o(4,x) = sqrt{var{i(t,x), month(i(t)) = 09, 10, 11}}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{1},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\}} \\
-o(\mbox{2},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\}} \\
-o(\mbox{3},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\}} \\
-o(\mbox{4},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  NSEAS       4
 

@@ -15,6 +15,16 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Ymonarith  ymonadd         Add multi-year monthly time averages
+      Ymonarith  ymonsub         Subtract multi-year monthly time averages
+      Ymonarith  ymonmul         Multiply multi-year monthly time averages
+      Ymonarith  ymondiv         Divide multi-year monthly time averages
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,66 +32,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Ymonarith
-@Title     = Multi-year monthly arithmetic
-@Section   = Arithmetic
-@Class     = Arithmetic
-@Arguments = ifile1 ifile2 ofile
-@Operators = ymonadd ymonsub ymonmul ymondiv
-
-@EndModule
-
-
-@BeginOperator_ymonadd
-
-@Title     = Add multi-year monthly time averages
-
-@BeginDescription
-Add a time series and a multi-year monthly time averages.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymonsub
-
-@Title     = Subtract multi-year monthly time averages
-
-@BeginDescription
-Subtract a time series and a multi-year monthly time averages.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymonmul
-
-@Title     = Multiply multi-year monthly time averages
-
-@BeginDescription
-Multiply a time series and a multi-year monthly time averages.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymondiv
-
-@Title     = Divide multi-year monthly time averages
-
-@BeginDescription
-Divide a time series and a multi-year monthly time averages.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  MAX_MON    20
 

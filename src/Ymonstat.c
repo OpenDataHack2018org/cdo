@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,17 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Ymonstat   ymonmin         Multi-year monthly minimum
+      Ymonstat   ymonmax         Multi-year monthly maximum
+      Ymonstat   ymonmean        Multi-year monthly mean
+      Ymonstat   ymonavg         Multi-year monthly average
+      Ymonstat   ymonstd         Multi-year monthly standard deviation
+*/
+
+
 #include <stdio.h>
 #include <math.h>
 
@@ -25,142 +36,6 @@
 #include "field.h"
 #include "dmemory.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Ymonstat
-@Title     = Multi-year monthly statistics
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = ymonmin ymonmax ymonmean ymonavg ymonstd
-
-@EndModule
-
-
-@BeginOperator_ymonmin
-
-@Title     = Multi-year monthly minimum
-
-@BeginDescription
-@IfMan
-o(01,x) = min{i(t,x), month(i(t)) = 01}
-                 ...
-o(12,x) = min{i(t,x), month(i(t)) = 12}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{01},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
-\vdots \\
-o(\mbox{12},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymonmax
-
-@Title     = Multi-year monthly maximum
-
-@BeginDescription
-@IfMan
-o(01,x) = max{i(t,x), month(i(t)) = 01}
-                 ...
-o(12,x) = max{i(t,x), month(i(t)) = 12}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{01},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
-\vdots \\
-o(\mbox{12},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymonmean
-
-@Title     = Multi-year monthly mean
-
-@BeginDescription
-@IfMan
-o(01,x) = mean{i(t,x), month(i(t)) = 01}
-                 ...
-o(12,x) = mean{i(t,x), month(i(t)) = 12}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{01},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
-\vdots \\
-o(\mbox{12},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymonavg
-
-@Title     = Multi-year monthly average
-
-@BeginDescription
-@IfMan
-o(01,x) = avg{i(t,x), month(i(t)) = 01}
-                 ...
-o(12,x) = avg{i(t,x), month(i(t)) = 12}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{01},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
-\vdots \\
-o(\mbox{12},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ymonstd
-
-@Title     = Multi-year monthly standard deviation
-
-@BeginDescription
-@IfMan
-o(01,x) = sqrt{var{i(t,x), month(i(t)) = 01}}
-                 ...
-o(12,x) = sqrt{var{i(t,x), month(i(t)) = 12}}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{01},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\}} \\
-\vdots \\
-o(\mbox{12},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\}} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  NMONTH     17
 

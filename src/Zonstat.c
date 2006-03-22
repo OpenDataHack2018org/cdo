@@ -15,99 +15,24 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Zonstat    zonmin          Zonal minimum
+      Zonstat    zonmax          Zonal maximum
+      Zonstat    zonsum          Zonal sum
+      Zonstat    zonmean         Zonal mean
+      Zonstat    zonavg          Zonal average
+      Zonstat    zonstd          Zonal standard deviation
+      Zonstat    zonvar          Zonal variance
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Zonstat
-@Title     = Zonal statistic
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonvar
-
-@EndModule
-
-
-@BeginOperator_zonmin
-
-@Title     = Zonal minimum
-
-@BeginDescription
-For every latitude the minimum over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_zonmax
-
-@Title     = Zonal maximum
-
-@BeginDescription
-For every latitude the maximum over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_zonsum
-
-@Title     = Zonal sum
-
-@BeginDescription
-For every latitude the sum over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_zonmean
-
-@Title     = Zonal mean
-
-@BeginDescription
-For every latitude the mean over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_zonavg
-
-@Title     = Zonal average
-
-@BeginDescription
-For every latitude the average over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_zonvar
-
-@Title     = Zonal variance
-
-@BeginDescription
-For every latitude the variance over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_zonstd
-
-@Title     = Zonal standard deviation
-
-@BeginDescription
-For every latitude the standard deviation over all longitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Zonstat(void *argument)

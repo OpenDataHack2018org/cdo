@@ -144,14 +144,14 @@ static void usage(void)
 
 static void cdoPrintHelp(char *phelp[], char *xoperator)
 {
-  int lprint, lopdoc;
-
   if ( phelp == NULL )
     printf("No help available for this operator!\n");
   else
     {
+      /*
       if ( xoperator )
 	{
+	  int lopdoc;
 	  lopdoc = FALSE;
 	  while ( *phelp )
 	    {
@@ -177,14 +177,18 @@ static void cdoPrintHelp(char *phelp[], char *xoperator)
 	    printf("%s: No help available!\n", xoperator);
 	}
       else
+      */
 	{
+	  int lprint;
 	  while ( *phelp )
 	    {
 	      lprint = TRUE;
 	      if ( *phelp[0] == '\0' )
 		if ( *(phelp+1) )
 		  if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
+
 	      if ( lprint ) printf("%s\n", *phelp);
+
 	      phelp++;
 	    }
 	}

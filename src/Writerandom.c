@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Writerandom writerandom
+*/
+
+
 #include <string.h>
 #include <math.h>
 
@@ -22,23 +29,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Writerandom
-@Title     = Write random
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = writerandom
-
-@EndModule
-
-@EndDoc
-*/
 
 
 void *Writerandom(void *argument)

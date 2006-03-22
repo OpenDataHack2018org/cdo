@@ -15,6 +15,12 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"

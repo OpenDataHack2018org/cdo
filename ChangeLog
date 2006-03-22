@@ -5,6 +5,8 @@
 	* New operator: abs (Math) [request: Reiner Schnur]
 	* enlarge: update for zonal and meridional data [request: Wolfgang Mueller]
 	* gradsdes: bug fix for unsorted GRIB data [report: Stefan Bauer]
+	* change help info format
+	* extent macro UNCHANGED_RECORD to cdoDefaultDataType and cdoDefaultByteorder
 	* Version 0.9.12 released
 
 2006-03-08  Uwe Schulzweida  <schulzweida@dkrz.de>

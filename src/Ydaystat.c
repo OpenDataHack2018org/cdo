@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,17 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Ydaystat   ydaymin         Multi-year daily minimum
+      Ydaystat   ydaymax         Multi-year daily maximum
+      Ydaystat   ydaymean        Multi-year daily mean
+      Ydaystat   ydayavg         Multi-year daily average
+      Ydaystat   ydaystd         Multi-year daily standard deviation
+*/
+
+
 #include <stdio.h>
 #include <math.h>
 
@@ -25,142 +36,6 @@
 #include "field.h"
 #include "dmemory.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Ydaystat
-@Title     = Multi-year daily statistics
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = ydaymin ydaymax ydaymean ydayavg ydaystd
-
-@EndModule
-
-
-@BeginOperator_ydaymin
-
-@Title     = Multi-year daily minimum
-
-@BeginDescription
-@IfMan
-o(001,x) = min{i(t,x), day(i(t)) = 001}
-                 ...
-o(366,x) = min{i(t,x), day(i(t)) = 366}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
-\vdots \\
-o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ydaymax
-
-@Title     = Multi-year daily maximum
-
-@BeginDescription
-@IfMan
-o(001,x) = max{i(t,x), day(i(t)) = 001}
-                 ...
-o(366,x) = max{i(t,x), day(i(t)) = 366}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
-\vdots \\
-o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ydaymean
-
-@Title     = Multi-year daily mean
-
-@BeginDescription
-@IfMan
-o(001,x) = mean{i(t,x), day(i(t)) = 001}
-                 ...
-o(366,x) = mean{i(t,x), day(i(t)) = 366}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
-\vdots \\
-o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ydayavg
-
-@Title     = Multi-year daily average
-
-@BeginDescription
-@IfMan
-o(001,x) = avg{i(t,x), day(i(t)) = 001}
-                 ...
-o(366,x) = avg{i(t,x), day(i(t)) = 366}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
-\vdots \\
-o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ydaystd
-
-@Title     = Multi-year daily standard deviation
-
-@BeginDescription
-@IfMan
-o(001,x) = sqrt{var{i(t,x), day(i(t)) = 001}}
-                 ...
-o(366,x) = sqrt{var{i(t,x), day(i(t)) = 366}}
-@EndifMan
-@IfDoc
-@BeginMath
-\begin{array}{c}
-o(\mbox{001},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\}} \\
-\vdots \\
-o(\mbox{366},x) = \sqrt{\mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\}} \\
-\end{array}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  NDAY       373
 
