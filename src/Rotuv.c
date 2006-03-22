@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Rotuv      rotuvb          Backward rotation
+*/
+
+
 #include <string.h>
 #include <ctype.h>
 
@@ -22,42 +29,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Rotuv
-@Title     = Rottion
-@Section   = Other
-@Arguments = ifile ofile
-@Operators = rotuvb
-
-@EndModule
-
-
-@BeginOperator_rotuvb
-
-@Title     = Backward rotation
-@Parameter = u v ...
-
-@BeginDescription
-Operator to perform a backward transformation of velocity
-components u and v from an rotated spherical system to a
-geographical system
-@EndDescription
-
-@BeginParameter u
-@Item = u,v,...
-STRINGS  Pairs of zonal and meridional velocity components
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void usvs_to_uv(double us, double vs, double phi, double rla,

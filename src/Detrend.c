@@ -15,63 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Detrend    detrend         Detrend
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Detrend
-@Title     = Detrend
-@Section   = Regression
-@Class     = Regression
-@Arguments = ifile ofile
-@Operators = detrend
-
-@EndModule
-
-
-@BeginOperator_detrend
-
-@Title     = Detrend
-
-@BeginDescription
-Every time series in ifile is linearly detrended.
-@IfMan
-For every field element x only those timesteps t belong
-to the sample S(x), which have i(t,x) NE miss.
-@EndifMan
-@IfDoc
-For every field element \begin{math}x\end{math} only those timesteps \begin{math}t\end{math} belong
-to the sample \begin{math}S(x)\end{math}, which have \begin{math}i(t,x) \neq \mbox{miss}\end{math}.
-With
-@BeginMath
-a(x) = \frac{1}{\#S(x)} \sum\limits_{t \in S(x)}i(t,x) - b(x)\left(\frac{1}{\#S(x)} \sum\limits_{t \in S(x)}t\right)
-@EndMath
-and
-@BeginMath
-b(x) = \frac{\sum\limits_{t \in S(x)}\left(i(t,x) - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}i(t',x)\right)
-                                     \left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)}
-            {\sum\limits_{t \in S(x)}\left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)^{2}}
-@EndMath
-it is
-@BeginMath
-o(t,x) = i(t,x) - (a(x) + b(x)t)
-@EndMath
-@EndifDoc
-This operator has to keep the fields of all timesteps concurrently in the memory.
-If not enough memory is available, use the operators trend and subtrend.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 #define  NALLOC_INC  1000

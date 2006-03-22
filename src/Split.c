@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,84 +15,23 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Split      splitcode       Split codes
+      Split      splitvar        Split variables
+      Split      splitlevel      Split levels
+      Split      splitgrid       Split grids
+      Split      splitzaxis      Split zaxis
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Split
-@Title     = Split
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifile oprefix
-@Operators = splitcode splitvar splitlevel splitgrid splitzaxis
-
-@EndModule
-
-
-@BeginOperator_splitcode
-
-@Title     = Split codes
-
-@BeginDescription
-Splits a file into pieces, one for each code.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitvar
-
-@Title     = Split variables
-
-@BeginDescription
-Splits a file into pieces, one for each variable.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitlevel
-
-@Title     = Split levels
-
-@BeginDescription
-Splits a file into pieces, one for each level.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitgrid
-
-@Title     = Split grids
-
-@BeginDescription
-Splits a file into pieces, one for each grid.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitzaxis
-
-@Title     = Split zaxis
-
-@BeginDescription
-Splits a file into pieces, one for each zaxis.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Split(void *argument)

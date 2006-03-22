@@ -15,6 +15,17 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Change     chcode          Change code
+      Change     chvar           Change variable name
+      Change     chlevel         Change level
+      Change     chlevelc        Change level of one code
+      Change     chlevelv        Change level of one variable
+*/
+
+
 #include <string.h>
 #include <math.h>   /* fabs */
 
@@ -23,115 +34,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Change
-@Title     = Change
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = chcode chvar chlevel chlevelc chlevelv
-
-@EndModule
-
-
-@BeginOperator_chcode
-
-@Title     = Change code
-@Parameter = ocode ncode ...
-
-@BeginDescription
-Changes some user given codes to new user given values.
-@EndDescription
-
-@BeginParameter
-@Item = ocode,ncode,...
-INTEGER  Pairs of old and new code
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_chvar
-
-@Title     = Change variable name
-@Parameter = ovar nvar ...
-
-@BeginDescription
-Changes some user given variable names to new user given names.
-@EndDescription
-
-@BeginParameter
-@Item = ovar,nvar,...
-STRING  Pairs of old and new variable name
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_chlevel
-
-@Title     = Change level
-@Parameter = olevel nlevel ...
-
-@BeginDescription
-Changes some user given levels to new user given values.
-@EndDescription
-
-@BeginParameter
-@Item = olevel,nlevel,...
-FLOAT  Pairs of old and new level
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_chlevelc
-
-@Title     = Change level of one code
-@Parameter = code olevel nlevel
-
-@BeginDescription
-Changes one level of a user given code number.
-@EndDescription
-
-@BeginParameter olevel
-@Item = code
-INTEGER Code number
-@Item = olevel
-FLOAT   Old level
-@Item = nlevel
-FLOAT   New level
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_chlevelv
-
-@Title     = Change level of one variable
-@Parameter = var olevel nlevel
-
-@BeginDescription
-Changes one level of a user given variable.
-@EndDescription
-
-@BeginParameter olevel
-@Item = var
-STRING Variable name
-@Item = olevel
-FLOAT  Old level
-@Item = nlevel
-FLOAT  New level
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  MAXARG     16384
 

@@ -15,100 +15,24 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Merstat    mermin          Meridional minimum
+      Merstat    mermax          Meridional maximum
+      Merstat    mersum          Meridional sum
+      Merstat    mermean         Meridional mean
+      Merstat    meravg          Meridional average
+      Merstat    merstd          Meridional standard deviation
+      Merstat    mervar          Meridional variance
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Merstat
-@Title     = Meridional statistic
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Class     = Arithmetic
-@Arguments = ifile ofile
-@Operators = mermin mermax mersum mermean meravg merstd mervar
-
-@EndModule
-
-
-@BeginOperator_mermin
-
-@Title     = Meridional minimum
-
-@BeginDescription
-For every longitude the minimum over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_mermax
-
-@Title     = Meridional maximum
-
-@BeginDescription
-For every longitude the maximum over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_mersum
-
-@Title     = Meridional sum
-
-@BeginDescription
-For every longitude the sum over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_mermean
-
-@Title     = Meridional mean
-
-@BeginDescription
-For every longitude the mean over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_meravg
-
-@Title     = Meridional average
-
-@BeginDescription
-For every longitude the average over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_mervar
-
-@Title     = Meridional variance
-
-@BeginDescription
-For every longitude the variance over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_merstd
-
-@Title     = Meridional standard deviation
-
-@BeginDescription
-For every longitude the standard deviation over all latitudes is computed.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Merstat(void *argument)

@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Setgatt    setgatt         Set global attribute
+      Setgatt    setgatts        Set global attributes
+*/
+
+
 #include <string.h>
 #include <ctype.h>
 
@@ -23,57 +31,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Setgatt
-@Title     = Set global attribute
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = setgatt setgatts
-
-@EndModule
-
-
-@BeginOperator_setgatt
-
-@Title     = Set global attribute
-@Parameter = attname attstring
-
-@BeginDescription
-Sets one user defined global text attribute.
-@EndDescription
-
-@BeginParameter
-@Item = attname,attstring
-STRING  Name and text of the global attribute
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setgatts
-
-@Title     = Set global attributes
-@Parameter = attfile
-
-@BeginDescription
-Sets user defined global text attributes. The name and text
-of the global attrubutes are read from a file.
-@EndDescription
-
-@BeginParameter
-@Item = attfile
-STRING  File name which contains global attributes
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Setgatt(void *argument)
 {

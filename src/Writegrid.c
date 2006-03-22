@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      writegrid Write grid
 */
 
 
@@ -28,33 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Setgrid
-@Title     = Set grid type
-@Section   = Information
-@Class     = Information
-@Arguments = ifile ofile
-@Operators = writegrid
-
-@EndModule
-
-
-@BeginOperator_writegrid
-
-@Title     = Write grid
-
-@BeginDescription
-Write the grid information to a file (SCRIP netCDF).
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Writegrid(void *argument)
 {

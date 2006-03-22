@@ -15,39 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Merge      merge           Merge datasets with different fields
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Merge
-@Title     = Merge
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifiles ofile
-@Operators = merge
-
-@EndModule
-
-
-@BeginOperator_merge
-
-@Title     = Merge files
-
-@BeginDescription
-Merges all variables of ifiles to ofile. Each input file must have different variables 
-with the same number of timesteps.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Merge(void *argument)
 {

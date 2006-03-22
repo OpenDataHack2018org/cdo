@@ -15,63 +15,17 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Diff       diff            Compare two datasets
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Diff
-@Title     = Differences
-@Section   = Information
-@Class     = Information
-@Arguments = ifile1 ifile2
-@Operators = diff diffv
-
-@EndModule
-
-
-@BeginOperator_diff
-
-@Title     = Differences of two files
-
-@BeginDescription
-Print statistics over differences of two files.
-For each pair of fields the operator print in one line the:
-@BeginItemize
-@Item = field number
-@Item = date and time
-@Item = code
-@Item = level
-@Item = size of the grid
-@Item = number of missing values
-@Item = occurrence of coefficient pairs with different signs
-@Item = occurrence of zero values
-@Item = maximum absolute difference of coefficient pairs
-@Item = maximum relative difference of non-zero coefficient pairs with equal signs
-@EndItemize
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_diffv
-
-@Title     = Differences of two files
-
-@BeginDescription
-The same as operator diff. Using the name instead of the code number
-to identify the variable.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Diff(void *argument)

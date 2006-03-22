@@ -15,6 +15,12 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -23,39 +29,6 @@
 #include "pstream.h"
 #include "list.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Histogram
-@Title     = Histogram
-@Section   = Other
-@Class     = Other
-@Arguments = ifile ofile
-@Operators = histcount histsum histmean
-
-@EndModule
-
-
-@BeginOperator_histsum
-
-@Title     = Histogram sum
-@Parameter = bins
-
-@BeginDescription
-Only usable for 2D fields.
-@EndDescription
-
-@BeginParameter bins
-@Item = bins
-FLOAT  Bounds of the bins (minimum 2 values)
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Histogram(void *argument)
 {

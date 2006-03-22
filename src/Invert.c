@@ -15,6 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Invert     invertlat       Invert latitude
+      Invert     invertlon       Invert longitude
+      Invert     invertlatdes    Invert latitude description
+      Invert     invertlondes    Invert longitude description
+      Invert     invertlatdata   Invert latitude data
+      Invert     invertlondata   Invert longitude data
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 
@@ -24,89 +36,6 @@
 #include "pstream.h"
 #include "functs.h"
 #include "error.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Invert
-@Title     = Invert
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = invertlat invertlon invertlatdes invertlondes invertlatdata invertlondata
-
-@EndModule
-
-
-@BeginOperator_invertlat
-
-@Title     = Invert latitude
-
-@BeginDescription
-Invert the latitude of a field.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_invertlon
-
-@Title     = Invert longitude
-
-@BeginDescription
-Invert the longitude of a field.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_invertlatdes
-
-@Title     = Invert latitude description
-
-@BeginDescription
-Invert only the latitude description of a field.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_invertlondes
-
-@Title     = Invert longitude description
-
-@BeginDescription
-Invert only the longitude description of a field.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_invertlatdata
-
-@Title     = Invert latitude data
-
-@BeginDescription
-Invert only the latitude data of a field.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_invertlondata
-
-@Title     = Invert longitude data
-
-@BeginDescription
-Invert only the longitude data of a field.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void invertLonDes(int vlistID)

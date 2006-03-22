@@ -15,103 +15,20 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Arithc     addc            Add by constant
+      Arithc     subc            Subtract by constant
+      Arithc     mulc            Multiply by constant
+      Arithc     divc            Divide by constant
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Arithc
-@Title     = Arithmetic with a constant
-@Section   = Arithmetic
-@Class     = Arithmetic
-@Arguments = ifile ofile
-@Operators = addc subc mulc divc
-
-@EndModule
-
-
-@BeginOperator_addc
-
-@Title     = Add by constant
-@Parameter = c
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) + c
-@EndMath
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_subc
-
-@Title     = Subtract by constant
-@Parameter = c
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) - c
-@EndMath
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_mulc
-
-@Title     = Multiply by constant
-@Parameter = c
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) * c
-@EndMath
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_divc
-
-@Title     = Divide by constant
-@Parameter = c
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) / c
-@EndMath
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Arithc(void *argument)

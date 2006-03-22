@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,104 +15,25 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Ninfo      ncode           Number of codes
+      Ninfo      nvar            Number of variables
+      Ninfo      nlevel          Number of levels
+      Ninfo      nyear           Number of years
+      Ninfo      nmon            Number of months
+      Ninfo      ndate           Number of dates
+      Ninfo      ntime           Number of timesteps
+*/
+
+
 #include <stdio.h>
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Ninfo
-@Title     = 
-@Section   = Information
-@Class     = Information
-@Arguments = ifile
-@Operators = nyear nmon ndate ntime ncode nvar nlevel
-
-@EndModule
-
-
-@BeginOperator_nyear
-
-@Title     = Number of years
-
-@BeginDescription
-Prints the number of different years.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_nmon
-
-@Title     = Number of months
-
-@BeginDescription
-Prints the number of different combinations of years and months.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ndate
-
-@Title     = Number of dates
-
-@BeginDescription
-Prints the number of different dates.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ntime
-
-@Title     = Number of timesteps
-
-@BeginDescription
-Prints the number of timesteps.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ncode
-
-@Title     = Number of codes
-
-@BeginDescription
-Prints the number of different codes.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_nvar
-
-@Title     = Number of variables
-
-@BeginDescription
-Prints the number of different variables.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_nlevel
-
-@Title     = Number of levels
-
-@BeginDescription
-Prints the number of levels for each variable.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Ninfo(void *argument)
 {

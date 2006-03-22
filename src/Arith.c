@@ -15,107 +15,24 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Arith      add             Add two fields
+      Arith      sub             Subtract two fields
+      Arith      mul             Multiply two fields
+      Arith      div             Divide two fields
+      Arith      min             Minimum of two fields
+      Arith      max             Maximum of two fields
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Arith
-@Title     = Arithmetic on two files
-@Section   = Arithmetic
-@Class     = Arithmetic
-@Arguments = ifile1 ifile2 ofile
-@Operators = add sub mul div min max
-
-@EndModule
-
-
-@BeginOperator_add
-
-@Title     = Add two fields
-
-@BeginDescription
-@BeginMath
-o(t,x) = i_1(t,x) + i_2(t,x)
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sub
-
-@Title     = Subtract two fields
-
-@BeginDescription
-@BeginMath
-o(t,x) = i_1(t,x) - i_2(t,x)
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_mul
-
-@Title     = Multiply two fields
-
-@BeginDescription
-@BeginMath
-o(t,x) = i_1(t,x) * i_2(t,x)
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_div
-
-@Title     = Divide two fields
-
-@BeginDescription
-@BeginMath
-o(t,x) = i_1(t,x) / i_2(t,x)
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_min
-
-@Title     = Minimum of two fields
-
-@BeginDescription
-@BeginMath
-o(t,x) = MIN(i_1(t,x), i_2(t,x))
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_max
-
-@Title     = Maximum of two fields
-
-@BeginDescription
-@BeginMath
-o(t,x) = MAX(i_1(t,x), i_2(t,x))
-@EndMath
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Arith(void *argument)

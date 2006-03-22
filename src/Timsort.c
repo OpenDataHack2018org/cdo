@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -14,6 +14,13 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
+
+/*
+   This module contains the following operators:
+
+     Timsort    timsort         Sort over the time
+*/
+
 
 #include <stdio.h>
 #include <math.h>
@@ -27,41 +34,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Timsort
-@Title     = Timsort
-@Section   = Sorting
-@Arguments = ifile ofile
-@Operators = timsort
-@EndModule
-
-@BeginOperator_timsort
-
-@Title     = Sort over the time
-
-@BeginDescription
-Sorts for every field position the elements in ascending order.
-After sorting it is
-
-@IfMan
-o(t_1,x) < o(t_2,x)      forall (t_1<t_2),x
-@EndifMan
-@IfDoc
-@BeginMath
-o(t_1,x) < o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 #define  NALLOC_INC  1000

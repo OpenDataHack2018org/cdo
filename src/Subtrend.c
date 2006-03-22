@@ -15,63 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+     Subtrend   subtrend        Subtract trend
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Subtrend
-@Title     = Subtrend
-@Section   = Regression
-@Class     = Regression
-@Arguments = ifile1 ifile2 ifile3 ofile
-@Operators = subtrend
-
-@EndModule
-
-
-@BeginOperator_subtrend
-
-@Title     = Subtract trend
-
-@BeginDescription
-This operator is for subtracting a trend computed by the operator trend.
-@IfMan
-The typical call for detrend the data in ifile and to store the detrended data in ofile is:
-
-  cdo trend ifile afile bfile
-  cdo subtrend ifile afile bfile ofile
-
-It is
-
-o(t,x) = i_1(t,x) - (i_2(1,x) + i_3(1,x)*t)
-@EndifMan
-@IfDoc
-The typical call for detrend the data in ifile and to store the detrended data in ofile is
-
-\begin{verbatim}
-  cdo trend ifile afile bfile
-  cdo subtrend ifile afile bfile ofile
-\end{verbatim}
-
-It is
-
-@BeginMath
-o(t,x) = i_1(t,x) - (i_2(1,x) + i_3(1,x) \cdot t)
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Subtrend(void *argument)

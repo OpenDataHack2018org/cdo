@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Selbox     sellonlatbox    Select lon/lat box
+      Selbox     selindexbox     Select index box
+*/
+
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -22,72 +30,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Selbox
-@Title     = Selects a box
-@Section   = Selection
-@Class     = Selection
-@Arguments = ifile ofile
-@Operators = sellonlatbox selindexbox
-
-@EndModule
-
-
-@BeginOperator_sellonlatbox
-
-@Title     = Select lon/lat box
-@Parameter = lon1 lon2 lat1 lat2
-
-@BeginDescription
-Selects a longitude/latitude box of the rectangular understood field.
-The user has to give the longitudes and latitudes of the edges of the box.
-@EndDescription
-
-@BeginParameter lon1
-@Item = lon1
-FLOAT  Western longitude
-@Item = lon2
-FLOAT  Eastern longitude
-@Item = lat1
-FLOAT  Southern or northern latitude
-@Item = lat2
-FLOAT  Northern or southern latitude
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selindexbox
-
-@Title     = Select index box
-@Parameter = idx1 idx2 idy1 idy2
-
-@BeginDescription
-Selects an index box of the rectangular understood field. The user
-has to give the indexes of the edges of the box. The index of the
-left edge may be greater then that of the right edge.
-@EndDescription
-
-@BeginParameter idx1
-@Item = idx1
-INTEGER  Index of first longitude
-@Item = idx2
-INTEGER  Index of last longitude
-@Item = idy1
-INTEGER  Index of first latitude
-@Item = idy2
-INTEGER  Index of last latitude
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 static int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)

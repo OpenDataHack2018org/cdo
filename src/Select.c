@@ -15,6 +15,22 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Select     selcode         Select codes
+      Select     delcode         Delete codes
+      Select     selvar          Select variables
+      Select     delvar          Delete variables
+      Select     sellevel        Select levels
+      Select     selgrid         Select grids
+      Select     selgridname     Select grid by name
+      Select     selzaxis        Select zaxis
+      Select     selzaxisname    Select zaxis by name
+      Select     seltabnum       Select parameter table number
+*/
+
+
 #include <string.h>
 #include <math.h>   /* fabs */
 
@@ -26,193 +42,6 @@
 #include "util.h"
 #include "functs.h"
 #include "list.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Select
-@Title     = Select
-@Section   = Selection
-@Class     = Selection
-@Arguments = ifile ofile
-@Operators = selcode delcode selvar delvar sellevel selgrid selgridname selzaxis selzaxisname seltabnum
-
-@EndModule
-
-
-@BeginOperator_selcode
-
-@Title     = Select codes
-@Parameter = codes
-
-@BeginDescription
-Selects all fields with a code in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = codes
-INTEGER  Comma separated list of codes
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_delcode
-
-@Title     = Delete codes
-@Parameter = codes
-
-@BeginDescription
-Deletes all fields with a code in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = codes
-INTEGER  Comma separated list of codes
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selvar
-
-@Title     = Select variables
-@Parameter = vars
-
-@BeginDescription
-Selects all fields with a variable name in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = vars
-STRING  Comma separated list of variable names
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_delvar
-
-@Title     = Delete variables
-@Parameter = vars
-
-@BeginDescription
-Deletes all fields with a variable name in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = vars
-STRING  Comma separated list of variable names
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_sellevel
-
-@Title     = Select levels
-@Parameter = levels
-
-@BeginDescription
-Selects all fields with a level in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = levels
-FLOAT  Comma separated list of levels
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selgrid
-
-@Title     = Select grids
-@Parameter = grids
-
-@BeginDescription
-Selects all fields with a grid in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = grids
-INTEGER  Comma separated list of grids
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selgridname
-
-@Title     = Select grid by name
-@Parameter = gridnames
-
-@BeginDescription
-Selects all fields with a grid name in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = gridnames
-STRING  Comma separated list of grid names
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selzaxis
-
-@Title     = Select zaxis
-@Parameter = zaxis
-
-@BeginDescription
-Selects all fields with a zaxis in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = zaxis
-INTEGER  Comma separated list of zaxis
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selzaxisname
-
-@Title     = Select zaxis by name
-@Parameter = zaxisnames
-
-@BeginDescription
-Selects all fields with a zaxis name in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = zaxisnames
-STRING  Comma separated list of zaxis names
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_seltabnum
-
-@Title     = Select parameter table number
-@Parameter = tabnum
-
-@BeginDescription
-Selects all fields with a table number in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = tabnum
-INTEGER  Comma separated list of table numbers
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Select(void *argument)

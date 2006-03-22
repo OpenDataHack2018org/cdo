@@ -15,46 +15,19 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Setzaxis   setzaxis        Set zaxis
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Setzaxis
-@Title     = Set zaxis type
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = setzaxis
-
-@EndModule
-
-
-@BeginOperator_setzaxis
-
-@Title     = Set zaxis
-@Parameter = zaxis
-
-@BeginDescription
-Sets the zaxis information for all variables.
-@EndDescription
-
-@BeginParameter
-@Item = zaxis
-STRING  Zaxis description file or name of the target zaxis
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Setzaxis(void *argument)

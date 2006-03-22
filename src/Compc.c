@@ -15,212 +15,23 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Compc      eqc             Equal constant
+      Compc      nec             Not equal constant
+      Compc      lec             Less equal constant
+      Compc      ltc             Less then constant
+      Compc      gec             Greater equal constant
+      Compc      gtc             Greater then constant
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Compc
-@Title     = Comparison with a constant
-@Section   = Comparisons
-@Class     = Comparison
-@Arguments = ifile ofile
-@Operators = eqc nec lec ltc gec gtc
-
-@EndModule
-
-@BeginOperator_eqc
-
-@Title     = Equal constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-          /   1   if i(t,x) EQ c     AND  i(t,x),c NE miss
-o(t,x) = <    0   if i(t,x) NE c     AND  i(t,x),c NE miss
-          \  miss if i(t,x) EQ miss  OR   c EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) = \mbox{c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}      \\
-  0   & \mbox{if} \;\; i(t,x) \neq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_nec
-
-@Title     = Not equal constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-          /   1   if i(t,x) NE c     AND  i(t,x),c NE miss
-o(t,x) = <    0   if i(t,x) EQ c     AND  i(t,x),c NE miss
-          \  miss if i(t,x) EQ miss  OR   c EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) \neq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) = \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_lec
-
-@Title     = Less equal constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-          /   1   if i(t,x) LE c     AND  i(t,x),c NE miss
-o(t,x) = <    0   if i(t,x) GT c     AND  i(t,x),c NE miss
-          \  miss if i(t,x) EQ miss  OR   c EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) \leq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) > \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_ltc
-
-@Title     = Less then constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-          /   1   if i(t,x) LT c     AND  i(t,x),c NE miss
-o(t,x) = <    0   if i(t,x) GE c     AND  i(t,x),c NE miss
-          \  miss if i(t,x) EQ miss  OR   c EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) < \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_gec
-
-@Title     = Greater equal constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-          /   1   if i(t,x) GE c     AND  i(t,x),c NE miss
-o(t,x) = <    0   if i(t,x) LT c     AND  i(t,x),c NE miss
-          \  miss if i(t,x) EQ miss  OR   c EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) < \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_gtc
-
-@Title     = Greater then constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-          /   1   if i(t,x) GT c     AND  i(t,x),c NE miss
-o(t,x) = <    0   if i(t,x) LE c     AND  i(t,x),c NE miss
-          \  miss if i(t,x) EQ miss  OR   c EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i(t,x) > \mbox{\sl c}    & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i(t,x) \leq \mbox{\sl c} & \wedge \;\; i(t,x), \mbox{\sl c} \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{miss} & \vee   \;\; \mbox{\sl c} = \mbox{miss}          \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Compc(void *argument)
 {

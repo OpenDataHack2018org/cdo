@@ -15,40 +15,19 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Mastrfu    mastrfu         Mass stream function
+*/
+
+
 #include <math.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Mastrfu
-@Title     = Mass stream function
-@Section   = Other
-@Arguments = ifile ofile
-@Operators = mastrfu
-
-@EndModule
-
-
-@BeginOperator_mastrfu
-
-@Title     = Mass stream function
-
-@BeginDescription
-Compute the mass stream function (ECHAM code272).
-The input field must be a zonal mean of v-velocity (code132) on pressure levels.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 static void mastrfu(int gridID, int zaxisID, double *array1, double *array2)

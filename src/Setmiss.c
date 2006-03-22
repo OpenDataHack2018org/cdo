@@ -15,6 +15,16 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Setmiss    setmissval      Set a new missing value
+      Setmiss    setctomiss      Set constant to missing value
+      Setmiss    setmisstoc      Set missing value to constant
+      Setmiss    setrtomiss      Set range to missing value
+*/
+
+
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
 #endif
@@ -27,144 +37,6 @@ int isnan(const double x);
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Setmiss
-@Title     = Set missing data
-@Section   = Missing values
-@Arguments = ifile ofile
-@Operators = setmissval setctomiss setmisstoc setrtomiss
-
-@EndModule
-
-
-@BeginOperator_setmissval
-
-@Title     = Set a new missing value
-@Parameter = miss
-
-@BeginDescription
-@IfMan
-         / miss   if i(t,x) EQ miss
-o(t,x) = 
-         \ i(t,x) if i(t,x) NE miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{\sl miss}      \\
- i(t,x)      & \mbox{if} \;\; i(t,x) \neq \mbox{\sl miss}   \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = miss
-FLOAT  New missing value
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setctomiss
-
-@Title     = Set constant to missing value
-@Parameter = c
-
-@BeginDescription
-@IfMan
-         / miss   if i(t,x) EQ c
-o(t,x) = 
-         \ i(t,x) if i(t,x) NE c
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{\sl c}      \\
- i(t,x)      & \mbox{if} \;\; i(t,x) \neq \mbox{\sl c}   \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setmisstoc
-
-@Title     = Set missing value to constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-         / c      if i(t,x) EQ miss
-o(t,x) = 
-         \ i(t,x) if i(t,x) NE miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
- \mbox{\sl c} & \mbox{if} \;\; i(t,x) = \mbox{miss}     \\
- i(t,x)       & \mbox{if} \;\; i(t,x) \neq \mbox{miss}  \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setrtomiss
-
-@Title     = Set range to missing value
-@Parameter = rmin rmax
-
-@BeginDescription
-@IfMan
-         / miss   if i(t,x) GE rmin AND i(t,x) LE rmax
-o(t,x) = 
-         \ i(t,x) if i(t,x) LT rmin AND i(t,x) GT rmax
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
- \mbox{miss}   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl rmin} \wedge i(t,x) \leq \mbox{\sl rmax}  \\
- i(t,x) & \mbox{if} \;\; i(t,x) < \mbox{\sl rmin} \vee i(t,x) > \mbox{\sl rmax}  \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter rmax
-@Item = rmin
-FLOAT  Lower bound
-@Item = rmax
-FLOAT  Upper bound
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Setmiss(void *argument)

@@ -15,82 +15,20 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Cond       ifthen          If then
+      Cond       ifnotthen       If not then
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Cond
-@Title     = 
-@Section   = Conditions
-@Class     = Comparison
-@Arguments = ifile1 ifile2 ofile
-@Operators = ifthen ifnotthen
-
-@BeginDescription
-A value not equal to zero is treated as "true", zero is treated a "false".
-@EndDescription
-
-@EndModule
-
-
-@BeginOperator_ifthen
-
-@Title     = If then
-
-@BeginDescription
-@IfMan
-         / i_2(t,x) if i_1(t,x) NE 0  AND  i_1(t,x) NE miss
-o(t,x) =
-         \ miss     if i_1(t,x) EQ 0  OR   i_1(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-   i_2(t,x) & \mbox{if} \;\;  i_1(t,x) \neq 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
-\mbox{miss} & \mbox{if} \;\;  i_1(t,x)    = 0 & \vee   \;\; i_1(t,x)    = \mbox{miss} \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ifnotthen
-
-@Title     = If not then
-
-@BeginDescription
-@IfMan
-         / i_2(t,x) if i_1(t,x) EQ 0  AND  i_1(t,x) NE miss
-o(t,x) = 
-         \ miss     if i_1(t,x) NE 0  OR   i_1(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-   i_2(t,x) & \mbox{if} \;\;  i_1(t,x)    = 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
-\mbox{miss} & \mbox{if} \;\;  i_1(t,x) \neq 0 & \vee   \;\; i_1(t,x)    = \mbox{miss} \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Cond(void *argument)

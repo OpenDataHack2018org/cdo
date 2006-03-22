@@ -15,226 +15,23 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Selstat    selmin          Time range minimum
+      Selstat    selmax          Time range maximum
+      Selstat    selsum          Time range sum
+      Selstat    selmean         Time range mean
+      Selstat    selavg          Time range average
+      Selstat    selstd          Time range standard deviation
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Selstat
-@Title     = 
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = selmin selmax selsum selmean selavg selstd
-
-@EndModule
-
-
-@BeginOperator_selmin
-
-@Title     = Time range minimum
-@Parameter = nsets [noffset] [nskip]
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range, it is
-
-o(t,x) = min{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range, it is
-@BeginMath
-o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter noffset
-@Item = nsets
-INTEGER  Number of input timesteps for each output timestep
-@Item = noffset
-INTEGER  Number of input timesteps skipped before the first timestep range (optional)
-@Item = nskip
-INTEGER  Number of input timesteps skipped between timestep ranges (optional)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selmax
-
-@Title     = Time range maximum
-@Parameter = nsets [noffset] [nskip]
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range, it is
-
-o(t,x) = max{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range, it is
-@BeginMath
-o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter noffset
-@Item = nsets
-INTEGER  Number of input timesteps for each output timestep
-@Item = noffset
-INTEGER  Number of input timesteps skipped before the first timestep range (optional)
-@Item = nskip
-INTEGER  Number of input timesteps skipped between timestep ranges (optional)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selsum
-
-@Title     = Time range sum
-@Parameter = nsets [noffset] [nskip]
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range, it is
-
-o(t,x) = sum{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range, it is
-@BeginMath
-o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter noffset
-@Item = nsets
-INTEGER  Number of input timesteps for each output timestep
-@Item = noffset
-INTEGER  Number of input timesteps skipped before the first timestep range (optional)
-@Item = nskip
-INTEGER  Number of input timesteps skipped between timestep ranges (optional)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selmean
-
-@Title     = Time range mean
-@Parameter = nsets [noffset] [nskip]
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range, it is
-
-o(t,x) = mean{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range, it is
-@BeginMath
-o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter noffset
-@Item = nsets
-INTEGER  Number of input timesteps for each output timestep
-@Item = noffset
-INTEGER  Number of input timesteps skipped before the first timestep range (optional)
-@Item = nskip
-INTEGER  Number of input timesteps skipped between timestep ranges (optional)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selavg
-
-@Title     = Time range average
-@Parameter = nsets [noffset] [nskip]
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range, it is
-
-o(t,x) = avg{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range, it is
-@BeginMath
-o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter noffset
-@Item = nsets
-INTEGER  Number of input timesteps for each output timestep
-@Item = noffset
-INTEGER  Number of input timesteps skipped before the first timestep range (optional)
-@Item = nskip
-INTEGER  Number of input timesteps skipped between timestep ranges (optional)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selstd
-
-@Title     = Time range standard deviation
-@Parameter = nsets [noffset] [nskip]
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-selected time range, it is
-
-o(t,x) = sqrt{var{i(t',x), t1 < t' <= tn}}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-selected time range, it is
-@BeginMath
-o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x'), t_1 < t' \le t_n\}}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter noffset
-@Item = nsets
-INTEGER  Number of input timesteps for each output timestep
-@Item = noffset
-INTEGER  Number of input timesteps skipped before the first timestep range (optional)
-@Item = nskip
-INTEGER  Number of input timesteps skipped between timestep ranges (optional)
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Selstat(void *argument)

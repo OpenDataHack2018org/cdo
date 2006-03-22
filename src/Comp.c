@@ -15,179 +15,24 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Comp       eq              Equal
+      Comp       ne              Not equal
+      Comp       le              Less equal
+      Comp       lt              Less than
+      Comp       ge              Greater equal
+      Comp       gt              Greater than
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Comp
-@Title     = Comparison of two fields
-@Section   = Comparisons
-@Class     = Comparison
-@Arguments = ifile1 ifile2 ofile
-@Operators = eq  ne  le  lt  ge  gt
-
-@EndModule
-
-
-@BeginOperator_eq
-
-@Title     = Equal
-
-@BeginDescription
-@IfMan
-          /   1   if i_1(t,x) EQ i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-o(t,x) = <    0   if i_1(t,x) NE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-          \  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i_1(t,x) = i_2(t,x)    & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i_1(t,x) \neq i_2(t,x) & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i_1(t,x) = \mbox{miss} & \vee   \;\; i_2(t,x) = \mbox{miss}        \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ne
-
-@Title     = Not equal
-
-@BeginDescription
-@IfMan
-          /   1   if i_1(t,x) NE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-o(t,x) = <    0   if i_1(t,x) EQ i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-          \  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i_1(t,x) \neq i_2(t,x) & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i_1(t,x) = i_2(t,x)    & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i_1(t,x) = \mbox{miss} & \vee   \;\; i_2(t,x) = \mbox{miss}        \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_le
-
-@Title     = Less equal
-
-@BeginDescription
-@IfMan
-          /   1   if i_1(t,x) LE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-o(t,x) = <    0   if i_1(t,x) GT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-          \  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i_1(t,x) \leq i_2(t,x) & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i_1(t,x) > i_2(t,x)    & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i_1(t,x) = \mbox{miss} & \vee   \;\; i_2(t,x) = \mbox{miss}        \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_lt
-
-@Title     = Less then
-
-@BeginDescription
-@IfMan
-          /   1   if i_1(t,x) LT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-o(t,x) = <    0   if i_1(t,x) GE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-          \  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i_1(t,x) < i_2(t,x)    & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i_1(t,x) \geq i_2(t,x) & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i_1(t,x) = \mbox{miss} & \vee   \;\; i_2(t,x) = \mbox{miss}        \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_ge
-
-@Title     = Greater equal
-
-@BeginDescription
-@IfMan
-          /   1   if i_1(t,x) GE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-o(t,x) = <    0   if i_1(t,x) LT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-          \  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i_1(t,x) \geq i_2(t,x) & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i_1(t,x) < i_2(t,x)    & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i_1(t,x) = \mbox{miss} & \vee   \;\; i_2(t,x) = \mbox{miss}        \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_gt
-
-@Title     = Greater then
-
-@BeginDescription
-@IfMan
-          /   1   if i_1(t,x) GT i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-o(t,x) = <    0   if i_1(t,x) LE i_2(t,x)  AND  i_1(t,x),i_2(t,x) NE miss
-          \  miss if i_1(t,x) EQ miss      OR   i_2(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-  1   & \mbox{if} \;\; i_1(t,x) > i_2(t,x)    & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
-  0   & \mbox{if} \;\; i_1(t,x) \leq i_2(t,x) & \wedge \;\; i_1(t,x), i_2(t,x) \neq \mbox{miss}  \\
- \mbox{miss} & \mbox{if} \;\; i_1(t,x) = \mbox{miss} & \vee   \;\; i_2(t,x) = \mbox{miss}        \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Comp(void *argument)

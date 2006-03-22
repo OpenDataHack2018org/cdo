@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Intyear    intyear         Year interpolation
+*/
+
+
 #include <string.h>
 #include <ctype.h>
 
@@ -24,40 +31,6 @@
 #include "pstream.h"
 #include "interpol.h"
 #include "list.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Intyear
-@Title     = Year interpolation
-@Section   = Interpolation
-@Class     = Interpolation
-@Arguments = ifile1 ifile2 ofile
-@Operators = intyear
-
-@EndModule
-
-
-@BeginOperator_intyear
-
-@Title     = Year interpolation
-@Parameter = years
-
-@BeginDescription
-Linear interpolation between two years.
-@EndDescription
-
-@BeginParameter years
-@Item = years
-INTEGER  Comma separated list of years
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Intyear(void *argument)

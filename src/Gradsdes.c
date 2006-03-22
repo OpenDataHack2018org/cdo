@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Gradsdes   gradsdes        GrADS data descriptor file
+      Gradsdes   gradsdes2       GrADS data descriptor file (version 2 map)
+*/
+
+
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
 #endif
@@ -26,54 +34,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Gradsdes
-@Title     = GrADS data descriptor file
-@Section   = Other
-@Arguments = ifile
-@Operators = gradsdes gradsdes2
-
-@EndModule
-
-
-@BeginOperator_gradsdes
-
-@Title     = GrADS data descriptor file
-
-@BeginDescription
-Creates a GrADS data descriptor file. Supported file formats
-are GRIB, SERVICE, EXTRA and IEG. For GRIB files the GrADS map
-file is also generated. This is a machine specific version 1 map.
-For SERVICE and EXTRA files the grid must be specified with
-the CDO option '-g <grid>'.
-This operator takes ifile in order to create filenames for
-the descriptor (ifile.ctl) and the map (ifile.gmp) file.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_gradsdes2
-
-@Title     = GrADS data descriptor file (version 2 map)
-
-@BeginDescription
-Creates a GrADS data descriptor file. Supported file formats
-are GRIB, SERVICE, EXTRA and IEG. For GRIB files the GrADS map
-file is also generated. This is a machine independent version 2 map.
-For SERVICE and EXTRA files the grid must be specified with
-the CDO option '-g <grid>'.
-This operator takes ifile in order to create filenames for
-the descriptor (ifile.ctl) and the map (ifile.gmp) file.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
 #define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */

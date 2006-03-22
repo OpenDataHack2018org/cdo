@@ -15,95 +15,21 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Output     output          ASCII output
+      Output     outputf         Formatted output
+      Output     outputint       Integer output
+      Output     outputsrv       SERVICE output
+      Output     outputext       EXTRA output
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Output
-@Title     = Formatted output
-@Section   = Formatted I/O
-@Arguments = ifiles
-@Operators = output outputf outputint outputsrv outputext
-
-@EndModule
-
-
-@BeginOperator_output
-
-@Title     = ASCII output
-
-@BeginDescription
-Prints all values to standard output.
-Each row has 6 elements with the C-style format "%13.6g".
-
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_outputf
-
-@Title     = Formatted output
-@Parameter = format nelem
-
-@BeginDescription
-Prints all values to standard output.
-The format and number of elements for each column
-can be specified by the parameters.
-@EndDescription
-
-@BeginParameter format
-@Item = format
-STRING C-style format for one element
-@Item = nelem
-INTEGER Number of elements for each row
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_outputint
-
-@Title     = Integer output
-
-@BeginDescription
-Prints all values rounded to the nearest intergers to standard output.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_outputsrv
-
-@Title     = SERVICE output
-
-@BeginDescription
-Prints all values to standard output.
-Each field with a header of 8 integers (SERVICE likely).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_outputext
-
-@Title     = EXTRA output
-
-@BeginDescription
-Prints all values to standard output.
-Each field with a header of 4 integers (EXTRA likely).
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Output(void *argument)

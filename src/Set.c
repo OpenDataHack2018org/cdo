@@ -15,97 +15,22 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Set        setpartab       Set parameter table
+      Set        setcode         Set code
+      Set        setvar          Set variable name
+      Set        setlevel        Set level
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Set
-@Title     = Set
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = setpartab setcode setvar setlevel
-
-@EndModule
-
-
-@BeginOperator_setpartab
-
-@Title     = Set parameter table
-@Parameter = table
-
-@BeginDescription
-Sets the parameter table for all variables.
-@EndDescription
-
-@BeginParameter
-@Item = table
-STRING  Parameter table file or name
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setcode
-
-@Title     = Set code
-@Parameter = code
-
-@BeginDescription
-Sets the code for all variables to the same given value.
-@EndDescription
-
-@BeginParameter
-@Item = code
-INTEGER Code number
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setvar
-
-@Title     = Set variable name
-@Parameter = name
-
-@BeginDescription
-Sets the name of the first variable.
-@EndDescription
-
-@BeginParameter
-@Item = name
-STRING  Variable name
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setlevel
-
-@Title     = Set level
-@Parameter = level
-
-@BeginDescription
-Sets the first level of all variables.
-@EndDescription
-
-@BeginParameter
-@Item = level
-FLOAT New level
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Set(void *argument)

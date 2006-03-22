@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Sort sortcode  Sort by code number
+*/
+
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -23,54 +30,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Sort
-@Title     = Sort
-@Section   = Sorting
-@Arguments = ifile ofile
-@Operators = 
-
-@EndModule
-
-
-@BeginOperator_sortcode
-
-@Title     = Sort by code number
-
-@BeginDescription
-Sorts all variables by the code number.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sortvar
-
-@Title     = Sort by variable name
-
-@BeginDescription
-Sorts all variables by the name.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sortlevel
-
-@Title     = Sort by level
-
-@BeginDescription
-Sorts the levels of all variables.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 typedef struct
 {

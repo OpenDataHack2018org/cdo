@@ -15,6 +15,16 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Splittime  splithour       Split hours
+      Splittime  splitday        Split days
+      Splittime  splitmon        Split months
+      Splittime  splitseas       Split seasons
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,66 +32,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Splittime
-@Title     = 
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifile oprefix
-@Operators = splithour splitday splitmon splitseas
-
-@EndModule
-
-
-@BeginOperator_splithour
-
-@Title     = Split hours
-
-@BeginDescription
-Splits a file into pieces, one for each hour.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitday
-
-@Title     = Split days
-
-@BeginDescription
-Splits a file into pieces, one for each day.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitmon
-
-@Title     = Split months
-
-@BeginDescription
-Splits a file into pieces, one for each month.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_splitseas
-
-@Title     = Split seasons
-
-@BeginDescription
-Splits a file into pieces, one for each season.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  MAX_STREAMS 32
 

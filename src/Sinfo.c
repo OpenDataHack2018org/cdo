@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Sinfo      sinfo           Short dataset information
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 #include "cdi.h"

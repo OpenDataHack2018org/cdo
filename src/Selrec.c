@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Selrec     selrec          Select records
+*/
+
+
 #include <string.h>
 #include <math.h>   /* fabs */
 
@@ -26,41 +33,6 @@
 #include "util.h"
 #include "functs.h"
 #include "list.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Selrec
-@Title     = Selrec
-@Section   = Selection
-@Class     = Selection
-@Arguments = ifile ofile
-@Operators = selrec
-
-@EndModule
-
-
-@BeginOperator_selrec
-
-@Title     = Select records
-@Parameter = records
-
-@BeginDescription
-Selects all fields with a record number in a user given list.
-This operator does not work on netCDF data!
-@EndDescription
-
-@BeginParameter
-@Item = records
-INTEGER  Comma separated list of records
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Selrec(void *argument)

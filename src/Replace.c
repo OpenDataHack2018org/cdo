@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Replace    replace         Replace variables
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,34 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Replace
-@Title     = Replace
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifile1 ifile2 ofile
-@Operators = replace
-
-@EndModule
-
-
-@BeginOperator_replace
-
-@Title     = Replace variables
-
-@BeginDescription
-Replaces all variables of ifile2 in ifile1 and write the result to ofile.
-Both input files must have the same number of timesteps.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define MAX_VARS 999
 

@@ -15,6 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Spectral   sp2gp           Spectral to gridpoint
+      Spectral   sp2gpl          Spectral to gridpoint linear
+      Spectral   gp2sp           Gridpoint to spectral
+      Spectral   gp2spl          Gridpoint to spectral linear
+      Spectral   sp2sp           Spectral to spectral
+      Spectral   spcut           Cut spectral wave number
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -24,151 +36,6 @@
 #include "specspace.h"
 #include "list.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Spectral
-@Title     = Spectral transformation
-@Section   = Spectral transformation
-@Class     = Transformation
-@Arguments = ifile ofile
-@Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp spcut
-
-@EndModule
-
-
-@BeginOperator_sp2gp
-
-@Title     = Spectral to gridpoint
-
-@BeginDescription
-Convert all spectral fields to Gaussian grid.
-The number of latitudes of the resulting Gaussian grid
-is calculated from the triangular truncation by:
-@IfMan
-
-   nlat = NINT((trunc*3 + 1.)/2.)
-@EndifMan
-@IfDoc
-@BeginMath
-   \mbox{nlat} = NINT((\mbox{trunc}*\fbox{3} + 1.)/2.)
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sp2gpl
-
-@Title     = Spectral to gridpoint linear
-
-@BeginDescription
-Convert all spectral fields to Gaussian grid.
-The number of latitudes of the resulting Gaussian grid
-is calculated from the triangular truncation by:
-@IfMan
-
-   nlat = NINT((trunc*2 + 1.)/2.)
-@EndifMan
-@IfDoc
-@BeginMath
-   \mbox{nlat} = NINT((\mbox{trunc}*\fbox{2} + 1.)/2.)
-@EndMath
-@EndifDoc
-
-Use this operator to convert ERA40 data e.g. from TL159 to N80.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_gp2sp
-
-@Title     = Gridpoint to spectral
-
-@BeginDescription
-Convert all Gaussian gridpoint fields to spectral.
-The triangular truncation of the resulting spherical harmonics
-is calculated from the number of latitudes by:
-@IfMan
-
-   trunc = (nlat*2 - 1) / 3
-@EndifMan
-@IfDoc
-@BeginMath
-   \mbox{trunc} = (\mbox{nlat}*2 - 1) / \fbox{3}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_gp2spl
-
-@Title     = Gridpoint to spectral linear
-
-@BeginDescription
-Convert all Gaussian gridpoint fields to spectral.
-The triangular truncation of the resulting spherical harmonics
-is calculated from the number of latitudes by:
-@IfMan
-
-   trunc = (nlat*2 - 1) / 2
-@EndifMan
-@IfDoc
-@BeginMath
-   \mbox{trunc} = (\mbox{nlat}*2 - 1) / \fbox{2}
-@EndMath
-@EndifDoc
-
-Use this operator to convert ERA40 data e.g. from N80 to TL159
-instead of T106.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sp2sp
-
-@Title     = Spectral to spectral
-@Parameter = trunc
-
-@BeginDescription
-Change the triangular truncation of all spectral fields.
-The operator performs downward conversion by cutting the resolution.
-Upward conversions are achieved by filling in zeros.
-@EndDescription
-
-@BeginParameter
-@Item = trunc
-INTEGER  New spectral resolution
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_spcut
-
-@Title     = Cut spectral wave number
-@Parameter = wnums
-
-@BeginDescription
-Set the user defined wave numbers to zero.
-@EndDescription
-
-@BeginParameter
-@Item = wnums
-INTEGER  Comma separated list of wave numbers
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  MAX_NTR  9999
 

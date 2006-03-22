@@ -15,79 +15,20 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Arithdays  muldpm          Multiply with days per month
+      Arithdays  divdpm          Divide by days per month
+      Arithdays  muldpy          Multiply with days per year
+      Arithdays  divdpy          Divide by days per year
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Arithdays
-@Title     = Arithmetic with days
-@Section   = Arithmetic
-@Class     = Arithmetic
-@Arguments = ifile ofile
-@Operators = muldpm divdpm muldpy divdpy
-
-@EndModule
-
-
-@BeginOperator_muldpm
-
-@Title     = Multiply with days per month
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) * days\_per\_month
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_divdpm
-
-@Title     = Divide by days per month
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) / days\_per\_month
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_muldpy
-
-@Title     = Multiply with days per year
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) * days\_per\_year
-@EndMath
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_divdpy
-
-@Title     = Divide by days per year
-
-@BeginDescription
-@BeginMath
-o(t,x) = i(t,x) / days\_per\_year
-@EndMath
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Arithdays(void *argument)

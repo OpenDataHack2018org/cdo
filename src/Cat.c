@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Copy       cat             Concatenate datasets
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,34 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Cat
-@Title     = Concatenate
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifiles ofile
-@Operators = cat
-
-@EndModule
-
-
-@BeginOperator_cat
-
-@Title     = Concatenate files
-
-@BeginDescription
-Concatenate ifiles and add the result at the end of ofile.
-Each input file must have the same variables with complete timesteps.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Cat(void *argument)
 {

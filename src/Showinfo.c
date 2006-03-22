@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,105 +15,24 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Showinfo   showcode        Show codes
+      Showinfo   showvar         Show variable names
+      Showinfo   showlevel       Show levels
+      Showinfo   showyear        Show years
+      Showinfo   showmon         Show months
+      Showinfo   showdate        Show dates
+      Showinfo   showtime        Show timesteps
+*/
+
+
 #include <stdio.h>
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Showinfo
-@Title     = 
-@Section   = Information
-@Class     = Information
-@Arguments = ifile
-@Operators = showyear showmon showdate showtime showcode showvar showlevel
-
-@EndModule
-
-
-@BeginOperator_showyear
-
-@Title     = Show years
-
-@BeginDescription
-Prints all different years.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_showmon
-
-@Title     = Show months
-
-@BeginDescription
-Prints all different months.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_showdate
-
-@Title     = Show dates
-
-@BeginDescription
-Prints all different dates.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_showtime
-
-@Title     = Show timesteps
-
-@BeginDescription
-Prints all timesteps.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_showcode
-
-@Title     = Show codes
-
-@BeginDescription
-Prints the code of all different variables.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_showvar
-
-@Title     = Show variable names
-
-@BeginDescription
-Print all different variable names.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_showlevel
-
-@Title     = Show levels
-
-@BeginDescription
-Prints all levels for each variable.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Showinfo(void *argument)

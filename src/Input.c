@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,53 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+*/
+
+
 #include <stdio.h>
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Input
-@Title     = Formatted input
-@Section   = Formatted I/O
-@Arguments = ofile
-@Operators = inputsrv inputext
-
-@EndModule
-
-
-@BeginOperator_inputsrv
-
-@Title     = SERVICE input
-
-@BeginDescription
-Read fields with ascii numbers from standard input and stores them in ofile.
-Each field must have a header of 8 integers (SERVICE likely).
-The numbers that are read are exactly that ones which are written out by outputsrv.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_inputext
-
-@Title     = EXTRA input
-
-@BeginDescription
-Read fields with ascii numbers from standard input and stores them in ofile.
-Each field with a header of 4 integers (EXTRA likely).
-The numbers that are read are exactly that ones which are written out by outputsrv.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Input(void *argument)
 {

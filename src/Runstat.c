@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -14,6 +14,18 @@
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 */
+
+/*
+   This module contains the following operators:
+
+      Runstat    runmin          Running minimum
+      Runstat    runmax          Running maximum
+      Runstat    runsum          Running sum
+      Runstat    runmean         Running mean
+      Runstat    runavg          Running average
+      Runstat    runstd          Running standard deviation
+*/
+
 
 #include <stdio.h>
 #include <math.h>
@@ -27,166 +39,6 @@
 #include "field.h"
 #include "dmemory.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Runstat
-@Title     = 
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = runmin runmax runsum runmean runavg runstd
-@EndModule
-
-
-@BeginOperator_runmin
-
-@Title     = Running minimum
-@Parameter = nts
-
-@BeginDescription
-@IfMan
-o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = nts
-INTEGER  Number of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_runmax
-
-@Title     = Running maximum
-@Parameter = nts
-
-@BeginDescription
-@IfMan
-o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = nts
-INTEGER  Number of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_runsum
-
-@Title     = Running sum
-@Parameter = nts
-
-@BeginDescription
-@IfMan
-o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t+(nts-1)/2,x) = \sum \{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = nts
-INTEGER  Number of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_runmean
-
-@Title     = Running mean
-@Parameter = nts
-
-@BeginDescription
-@IfMan
-o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = nts
-INTEGER  Number of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_runavg
-
-@Title     = Running average
-@Parameter = nts
-
-@BeginDescription
-@IfMan
-o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = nts
-INTEGER  Number of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_runstd
-
-@Title     = Running standard deviation
-@Parameter = nts
-
-@BeginDescription
-@IfMan
-o(t+(nts-1)/2,x) = sqrt{var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t+(nts-1)/2,x) = \sqrt{\mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = nts
-INTEGER  Number of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@EndDoc
-*/
 
 typedef struct {
   int      date;

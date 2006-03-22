@@ -15,6 +15,21 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Interpolate remapcon        Conservative remapping
+      Interpolate remapbil        Bilinear interpolation
+      Interpolate remapbic        Bicubic interpolation
+      Interpolate remapdis        Distance-weighted averaging
+      Genweights gencon          Generate conservative interpolation weights
+      Genweights genbil          Generate bilinear interpolation weights
+      Genweights genbic          Generate bicubic interpolation weights
+      Genweights gendis          Generate distance-weighted averaging weights
+      Remap      remap           SCRIP grid remapping
+*/
+
+
 #include <string.h>
 #include <math.h>
 
@@ -24,146 +39,6 @@
 #include "pstream.h"
 #include "remap.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Remap
-@Title     = SCRIP interpolation
-@Section   = Interpolation
-@Class     = Interpolation
-@Arguments = ifile ofile
-@Operators = remapcon remapbil remapbic remapdis gencon remap
-
-@EndModule
-
-
-@BeginOperator_remapcon
-
-@Title     = Conservative remapping
-@Parameter = grid
-
-@BeginDescription
-SCRIP first order conservative remapping.
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@BeginEnvironment
-@Item = NORMALIZE_OPT
-This variable is used to choose the normalization
-of the remapping. By default, NORMALIZE_OPT is set to be
-'fracarea' and will include the destination area fraction in
-the output weights; other options are 'none' and 'destarea'
-(for more information see \cite{SCRIP}).
-@EndEnvironment
-
-@EndOperator
-
-
-@BeginOperator_remapbil
-
-@Title     = Bilinear interpolation
-@Parameter = grid
-
-@BeginDescription
-SCRIP bilinear interpolation (only rectangular grids).
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_remapbic
-
-@Title     = Bicubic interpolation
-@Parameter = grid
-
-@BeginDescription
-SCRIP bicubic interpolation (only rectangular grids).
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_remapdis
-
-@Title     = Distance-weighted averaging
-@Parameter = grid
-
-@BeginDescription
-SCRIP distance-weighted average of the four nearest neighbor values.
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_gencon
-
-@Title     = Generate conservative interpolation weights
-@Parameter = grid
-
-@BeginDescription
-Generate SCRIP first order conservative interpolation weights and write the result to
-a file.
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@BeginEnvironment
-@Item = NORMALIZE_OPT
-This variable is used to choose the normalization
-of the remapping. By default, NORMALIZE_OPT is set to be
-'fracarea' and will include the destination area fraction in
-the output weights; other options are 'none' and 'destarea'
-(for more information see \cite{SCRIP}).
-@EndEnvironment
-
-@EndOperator
-
-
-@BeginOperator_remap
-
-@Title     = Remapping
-@Parameter = grid weights
-
-@BeginDescription
-Remapping with the interpolation weights from a netCDF file.
-The netCDF file must follow the SCRIP convention.
-@EndDescription
-
-@BeginParameter weights
-@Item = grid
-STRING  Grid description file or name of the target grid
-@Item = weights
-STRING  Interpolation weights (SCRIP netCDF file)
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 void gme_grid_restore(double *p, int ni, int nd);
 

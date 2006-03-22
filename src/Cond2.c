@@ -15,57 +15,19 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Cond2      ifthenelse      If then else
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Cond2
-@Title     = 
-@Section   = Conditions
-@Class     = Comparison
-@Arguments = ifile1 ifile2 ifile3 ofile
-@Operators = ifthenelse
-
-@BeginDescription
-@EndDescription
-
-@EndModule
-
-
-@BeginOperator_ifthenelse
-
-@Title     = If then else
-
-@BeginDescription
-@IfMan
-          / i_2(t,x) if i_1(t,x) NE 0  AND  i_1(t,x) NE miss
-o(t,x) = <  i_3(t,x) if i_1(t,x) EQ 0  AND  i_1(t,x) NE miss
-          \ miss     if i_1(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-   i_2(t,x) & \mbox{if} \;\;  i_1(t,x) \neq 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
-   i_3(t,x) & \mbox{if} \;\;  i_1(t,x)    = 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
-\mbox{miss} & \mbox{if} \;\;  i_1(t,x)    = \mbox{miss} \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Cond2(void *argument)

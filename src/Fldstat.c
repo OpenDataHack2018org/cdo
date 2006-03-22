@@ -15,202 +15,24 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Fldstat    fldmin          Field minimum
+      Fldstat    fldmax          Field maximum
+      Fldstat    fldsum          Field sum
+      Fldstat    fldmean         Field mean
+      Fldstat    fldavg          Field average
+      Fldstat    fldstd          Field standard deviation
+      Fldstat    fldvar          Field variance
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Fldstat
-@Title     = Field statistic
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldvar
-
-@BeginDescription
-In this program there is the different notion of "mean" and "average"
-to distinguish two different kinds of treatment of missing values:
-While computing the mean, only the not missing values are considered
-to belong to the sample with the side effect of a probably reduced sample
-size. Computing the average is just adding the sample members and divide
-the result by the sample size. For example, the mean of 1, 2, miss and 3
-is (1+2+3)/3 = 2, whereas the average is (1+2+miss+3)/4 = miss/4 = miss.
-If there are no missing values in the sample, the average and the mean are
-identical.
-In this chapter the abbreviations as in the following table are used:
-
-\vspace{3mm}
-
-\fbox{\parbox{15cm}{
-\begin{eqnarray*}
-\begin{array}{l}
-\makebox[3cm][l]{{\bf mean} resp. {\bf avg}} \\
-\end{array}
- &  &
- n^{-1} \sum_{i=1}^{n} x_i 
-\\
-\begin{array}{l}
-\makebox[3cm][l]{{\bf mean} resp. {\bf avg}} \\
-\mbox{weighted by} \\
-\{w_i, i=1, ..., n\}  \\
-\end{array}
- & &
-  \left ( \sum_{j=1}^{n} w_j \right )^{-1} \sum\limits_{i=1}^{n} w_i \, x_i \\
-\\
-\begin{array}{l}
-%\makebox[3cm][l]{Standard deviation} \\
-\makebox[3cm][l]{Variance} \\
-\makebox[3cm][l]{{\bf var}} \\
-\end{array}
- &  &
- n^{-1} \sum_{i=1}^{n} (x_i - \overline{x})^2
-\\
-\begin{array}{l}
-\makebox[3cm][l]{{\bf var} weighted by} \\
-\{w_i, i=1, ..., n\}  \\
-\end{array}
- & &
-  \left ( \sum_{j=1}^{n} w_j \right )^{-1} \sum\limits_{i=1}^{n} w_i \, 
-  \left ( x_i - \left ( \sum_{j=1}^{n} w_j \right )^{-1} \sum\limits_{j=1}^{n} w_j \, x_j \right)^2 \\
-\end{eqnarray*}
-}}
-
-@EndDescription
-
-@EndModule
-
-
-@BeginOperator_fldmin
-
-@Title     = Field minimum
-
-@BeginDescription
-@IfMan
-o(t,1) = min{i(t',x'), t'=t}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \mbox{\bf min}\{i(t',x'), t' = t\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_fldmax
-
-@Title     = Field maximum
-
-@BeginDescription
-@IfMan
-o(t,1) = max{i(t',x'), t'=t}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \mbox{\bf max}\{i(t',x'), t' = t\}
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_fldsum
-
-@Title     = Field sum
-
-@BeginDescription
-@IfMan
-o(t,1) = sum{i(t,x)}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \sum\limits_x i(t,x)
-@EndMath
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_fldmean
-
-@Title     = Field mean
-
-@BeginDescription
-@IfMan
-o(t,1) = mean{i(t',x'), t'=t}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \mbox{\bf mean}\{i(t',x'), t' = t\}
-@EndMath
-@EndifDoc
-weighted by area weights obtained by the input field.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_fldavg
-
-@Title     = Field average
-
-@BeginDescription
-@IfMan
-o(t,1) = avg{i(t',x'), t'=t}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \mbox{\bf avg}\{i(t',x'), t' = t\}
-@EndMath
-@EndifDoc
-weighted by area weights obtained by the input field.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_fldvar
-
-@Title     = Field variance
-
-@BeginDescription
-@IfMan
-o(t,1) = var{i(t',x'), t'=t}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \mbox{\bf var}\{i(t',x'), t' = t\}
-@EndMath
-@EndifDoc
-weighted by area weights obtained by the input field.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_fldstd
-
-@Title     = Field standard deviation
-
-@BeginDescription
-@IfMan
-o(t,1) = sqrt{var{i(t',x'), t'=t}}
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,1) = \sqrt{\mbox{\bf var}\{i(t',x'), t' = t\}}
-@EndMath
-@EndifDoc
-weighted by area weights obtained by the input field.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Fldstat(void *argument)

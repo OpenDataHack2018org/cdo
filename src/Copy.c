@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Copy       copy            Copy datasets
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,33 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Copy
-@Title     = Copy
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifiles ofile
-@Operators = copy
-
-@EndModule
-
-
-@BeginOperator_copy
-
-@Title     = Copy files
-
-@BeginDescription
-Copies all input files to ofile. Each input file must have the same variables with complete timesteps.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Copy(void *argument)
 {

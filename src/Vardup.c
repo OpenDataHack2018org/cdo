@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Vardup     vardup          Duplicate variables
+      Vardup     varmul          Multiply variables
+*/
+
+
 #include <string.h>
 #include <math.h>
 
@@ -22,50 +30,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Vardup
-@Title     = Variable duplication
-@Section   = Generation of variables
-@Arguments = ifile ofile
-@Operators = vardup varmul
-
-@EndModule
-
-
-@BeginOperator_vardup
-
-@Title     = Duplicate variables
-
-@BeginDescription
-Duplicate all variables.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_varmul
-
-@Title     = Multiply variables
-@Parameter = nmul
-
-@BeginDescription
-Multiply all variables.
-@EndDescription
-
-@BeginParameter
-@Item = nmul
-INTEGER  Number of multiplications
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Vardup(void *argument)

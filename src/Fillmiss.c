@@ -15,6 +15,12 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -23,33 +29,6 @@
 #include "pstream.h"
 #include "interpol.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Fillmiss
-@Title     = Fill missing values
-@Section   = Interpolation
-@Class     = Interpolation
-@Arguments = ifile ofile
-@Operators = fillmiss
-
-@EndModule
-
-
-@BeginOperator_fillmiss
-
-@Title     = Fill missing values
-
-@BeginDescription
-Fill missing values by interpolation of the neightbours.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void fillmiss(FIELD *field1, FIELD *field2)
 {

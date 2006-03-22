@@ -15,6 +15,20 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Seltime    seltimestep     Select timesteps
+      Seltime    seltime         Select times
+      Seltime    selhour         Select hours
+      Seltime    selday          Select days
+      Seltime    selmon          Select months
+      Seltime    selyear         Select years
+      Seltime    selseas         Select seasons
+      Seltime    seldate         Select dates
+*/
+
+
 #include <string.h>
 #include <ctype.h>
 
@@ -27,160 +41,6 @@
 #include "functs.h"
 #include "list.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Seltime
-@Title     = Select time
-@Section   = Selection
-@Class     = Selection
-@Arguments = ifile ofile
-@Operators = seltimestep seltime selhour selday selmon selseas selyear seldate
-
-@EndModule
-
-
-@BeginOperator_seltimestep
-
-@Title     = Select timesteps
-@Parameter = timesteps
-
-@BeginDescription
-Selects all timesteps with a timestep in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = timesteps
-INTEGER  Comma separated list of timesteps
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_seltime
-
-@Title     = Select times
-@Parameter = times
-
-@BeginDescription
-Selects all timesteps with a time in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = times
-STRING  Comma separated list of times (format HH:MM)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selhour
-
-@Title     = Select hours
-@Parameter = hours
-
-@BeginDescription
-Selects all timesteps with a hour in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = hours
-INTEGER  Comma separated list of hours
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selday
-
-@Title     = Select days
-@Parameter = days
-
-@BeginDescription
-Selects all timesteps with a day in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = days
-INTEGER  Comma separated list of days
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selmon
-
-@Title     = Select months
-@Parameter = months
-
-@BeginDescription
-Selects all timesteps with a month in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = months
-INTEGER  Comma separated list of months
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selseas
-
-@Title     = Select seasons
-@Parameter = seasons
-
-@BeginDescription
-Selects all timesteps with a month of a season in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = seasons
-STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_selyear
-
-@Title     = Select years
-@Parameter = years
-
-@BeginDescription
-Selects all timesteps with a year in a user given list.
-@EndDescription
-
-@BeginParameter
-@Item = years
-INTEGER  Comma separated list of years
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_seldate
-
-@Title     = Select dates
-@Parameter = date1 [date2]
-
-@BeginDescription
-Selects all timesteps with a date in a given range.
-@EndDescription
-
-@BeginParameter
-@Item = date1
-STRING  Start date (format YYYY-MM-DD)
-@Item = date2
-STRING  End date (format YYYY-MM-DD)
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  NOPERATORS   8
 

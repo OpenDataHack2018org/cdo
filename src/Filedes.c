@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,15 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Filedes    vardes          Variable description
+      Filedes    griddes         Grid description
+      Filedes    vct             Vertical coordinate table
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,56 +31,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Filedes
-@Title     = File description
-@Section   = Information
-@Class     = Information
-@Arguments = ifile
-@Operators = vardes griddes vct
-
-@EndModule
-
-
-@BeginOperator_vardes
-
-@Title     = Variable description
-
-@BeginDescription
-Prints a table with a description of all variables.
-For each variable the operator print in one line the
-code, name, description and units.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_griddes
-
-@Title     = Grid description
-
-@BeginDescription
-Prints the description of all grids in a file.
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_vct
-
-@Title     = Vertical coordinate table
-
-@BeginDescription
-Prints the vertical coordinate table.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
 #define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */

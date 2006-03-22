@@ -15,190 +15,23 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Seasstat   seasmin         Seasonally minimum
+      Seasstat   seasmax         Seasonally maximum
+      Seasstat   seassum         Seasonally sum
+      Seasstat   seasmean        Seasonally mean
+      Seasstat   seasavg         Seasonally average
+      Seasstat   seasstd         Seasonally standard deviation
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Seasstat
-@Title     = 
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = seasmin seasmax seassum seasmean seasavg seasstd
-
-@EndModule
-
-
-@BeginOperator_seasmin
-
-@Title     = Seasonally minimum
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-
-o(t,x) = min{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-@BeginMath
-o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-Be careful about the first and the last timestep, they may be incorrect
-DJF values.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_seasmax
-
-@Title     = Seasonally maximum
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-
-o(t,x) = max{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-@BeginMath
-o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-Be careful about the first and the last timestep, they may be incorrect
-DJF values.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_seassum
-
-@Title     = Seasonally sum
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-
-o(t,x) = sum{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-@BeginMath
-o(t,x) = \sum\limits_{t=1}^{n} i(t',x)
-@EndMath
-@EndifDoc
-Be careful about the first and the last timestep, they may be incorrect
-DJF values.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_seasmean
-
-@Title     = Seasonally mean
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-
-o(t,x) = mean{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-@BeginMath
-o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-Be careful about the first and the last timestep, they may be incorrect
-DJF values.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_seasavg
-
-@Title     = Seasonally average
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-
-o(t,x) = avg{i(t',x), t1 < t' <= tn}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-@BeginMath
-o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
-@EndMath
-@EndifDoc
-Be careful about the first and the last timestep, they may be incorrect
-DJF values.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_seasstd
-
-@Title     = Seasonally standard deviation
-
-@BeginDescription
-@IfMan
-For every adjacent sequence t1, ...., tn of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-
-o(t,x) = sqrt{var{i(t',x), t1 < t' <= tn}}
-@EndifMan
-@IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
-year and season, where december belongs to the northern hemispheric
-winter of the next year, it is
-@BeginMath
-o(t,x) = \sqrt{\mbox{\bf var}\{i(t',x'), t_1 < t' \le t_n\}}
-@EndMath
-@EndifDoc
-Be careful about the first and the last timestep, they may be incorrect
-DJF values.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Seasstat(void *argument)

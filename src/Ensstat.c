@@ -15,6 +15,19 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Ensstat    ensmin          Ensemble minimum
+      Ensstat    ensmax          Ensemble maximum
+      Ensstat    enssum          Ensemble sum
+      Ensstat    ensmean         Ensemble mean
+      Ensstat    ensavg          Ensemble average
+      Ensstat    ensstd          Ensemble standard deviation
+      Ensstat    ensvar          Ensemble variance
+*/
+
+
 #if defined (_OPENMP)
 #  include <omp.h>
 #endif
@@ -24,87 +37,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Ensstat
-@Title     = Ensemble statistic
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifiles ofile
-@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensvar
-
-@EndModule
-
-
-@BeginOperator_ensmin
-
-@Title     = Ensemble minimum
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_ensmax
-
-@Title     = Ensemble maximum
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_enssum
-
-@Title     = Ensemble sum
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_ensmean
-
-@Title     = Ensemble mean
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_ensavg
-
-@Title     = Ensemble average
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_ensvar
-
-@Title     = Ensemble variance
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@BeginOperator_ensstd
-
-@Title     = Ensemble standard deviation
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Ensstat(void *argument)
 {

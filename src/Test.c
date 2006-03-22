@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -21,36 +21,6 @@
 #include "cdo.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = 
-@Title     = 
-@Section   = 
-@Arguments = ifile ofile
-@Operators = 
-
-@EndModule
-
-
-@BeginOperator_
-
-@Title     = 
-@Parameter = 
-
-@BeginDescription
-@EndDescription
-
-@BeginParameter
-@Item = 
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Test(void *argument)
 {

@@ -15,87 +15,19 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Condc      ifthenc         If then constant
+      Condc      ifnotthenc      If not then constant
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Condc
-@Title     = 
-@Section   = Conditions
-@Class     = Comparison
-@Arguments = ifile ofile
-@Operators = ifthenc ifnotthenc
-
-@EndModule
-
-
-@BeginOperator_ifthenc
-
-@Title     = If then constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-         / c      if i(t,x) NE 0  AND  i(t,x) NE miss
-o(t,x) =
-         \ miss   if i(t,x) EQ 0  OR   i(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-\mbox{c}    & \mbox{if} \;\;  i(t,x) \neq 0 & \wedge \;\; i(t,x) \neq \mbox{miss} \\
-\mbox{miss} & \mbox{if} \;\;  i(t,x)    = 0 & \vee   \;\; i(t,x)    = \mbox{miss} \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_ifnotthenc
-
-@Title     = If not then constant
-@Parameter = c
-
-@BeginDescription
-@IfMan
-         / c      if i(t,x) EQ 0  AND  i(t,x) NE miss
-o(t,x) =
-         \ miss   if i(t,x) NE 0  OR   i(t,x) EQ miss
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \left\{
-\begin{array}{cll}
-\mbox{c}    & \mbox{if} \;\;  i(t,x)    = 0 & \wedge \;\; i(t,x) \neq \mbox{miss} \\
-\mbox{miss} & \mbox{if} \;\;  i(t,x) \neq 0 & \vee   \;\; i(t,x)    = \mbox{miss} \\
-\end{array}   \right.
-@EndMath
-@EndifDoc
-@EndDescription
-
-@BeginParameter
-@Item = c
-FLOAT  Constant
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Condc(void *argument)
 {

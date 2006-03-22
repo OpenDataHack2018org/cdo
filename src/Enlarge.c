@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Enlarge    enlarge         Enlarge fields
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,40 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Enlarge
-@Title     = Enlarge
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = enlarge
-
-@EndModule
-
-
-@BeginOperator_enlarge
-
-@Title     = Enlarge
-@Parameter = grid
-
-@BeginDescription
-Enlarge all fields of ifile to a user given grid.
-@EndDescription
-
-@BeginParameter grid
-@Item = grid
-STRING  Grid description file or name
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Enlarge(void *argument)

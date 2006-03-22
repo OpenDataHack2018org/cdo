@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Inttime    inttime         Time interpolation
+*/
+
+
 #include <string.h>
 #include <ctype.h>  /* isdigit */
 
@@ -23,44 +30,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "interpol.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Inttime
-@Title     = Time interpolation
-@Section   = Interpolation
-@Class     = Interpolation
-@Arguments = ifile ofile
-@Operators = inttime
-
-@EndModule
-
-
-@BeginOperator_inttime
-
-@Title     = Time interpolation
-@Parameter = date time [inc]
-
-@BeginDescription
-Linear interpolation between timesteps.
-@EndDescription
-
-@BeginParameter date
-@Item = date
-INTEGER  Start date (format YYYY-MM-DD)
-@Item = time
-INTEGER  Start time (format HH:MM)
-@Item = inc
-STRING   Optional increment (minutes, hours or days) [default: 0hour]
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Inttime(void *argument)

@@ -15,68 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Trend      trend           Trend
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Trend
-@Title     = Trend
-@Section   = Regression
-@Class     = Regression
-@Arguments = ifile ofile1 ofile2
-@Operators = trend
-
-@EndModule
-
-
-@BeginOperator_trend
-
-@Title     = Trend
-
-@BeginDescription
-@IfMan
-The values of the input file ifile are assumed to be distributed as
-N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the
-parameter a and b.
-For every field element x only those timesteps t belong
-to the sample S(x), which have i(t,x) NE miss.
-The estimation for a is stored in ofile1 and that for b is stored in ofile2.
-To subtract the trend from the data see operator subtrend.
-@EndifMan
-@IfDoc
-The values of the input file ifile are assumed to be distributed as
-\begin{math}N(a+b t,\sigma^2)\end{math} with unknown \begin{math}a\end{math},
-\begin{math}b\end{math} and \begin{math}\sigma^2\end{math}. This operator estimates the
-parameter \begin{math}a\end{math} and \begin{math}b\end{math}.
-For every field element \begin{math}x\end{math} only those timesteps \begin{math}t\end{math} belong
-to the sample \begin{math}S(x)\end{math}, which have \begin{math}i(t,x) \neq \mbox{miss}\end{math}.
-With
-@BeginMath
-o_1(1,x) = \frac{1}{\#S(x)} \sum\limits_{t \in S(x)}i(t,x) - b(x)\left(\frac{1}{\#S(x)} \sum\limits_{t \in S(x)}t\right)
-@EndMath
-and
-@BeginMath
-o_2(1,x) = \frac{\sum\limits_{t \in S(x)}\left(i(t,x) - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}i(t',x)\right)
-                                     \left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)}
-            {\sum\limits_{t \in S(x)}\left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)^{2}}
-@EndMath
-Thus the estimation for \begin{math}a\end{math} is stored in ofile1 and that for 
-\begin{math}b\end{math} is stored in ofile2.
-To subtract the trend from the data see operator subtrend.
-@EndifDoc
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Trend(void *argument)

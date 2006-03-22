@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+     Splittime  splityear       Split years
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -22,33 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Splityear
-@Title     = 
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifile oprefix
-@Operators = splityear
-
-@EndModule
-
-
-@BeginOperator_splityear
-
-@Title     = Split years
-
-@BeginDescription
-Splits a file into pieces, one for each year.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define MAX_YEARS 99999
 

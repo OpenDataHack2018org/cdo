@@ -15,42 +15,16 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Merge grid
-@Title     = Merge grid
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifile1 ifile2 ofile
-@Operators = mergegrid
-
-@EndModule
-
-
-@BeginOperator_mergegrid
-
-@Title     = Merge grid
-
-@BeginDescription
-Merges all variables from ifile2 to ifile1 and write the result to ofile.
-Only the non missing values of ifile2 will be used.
-The grid of ifile2 must be smaller or equal to the grid of ifile1.
-All gridpoints of ifile2 must fit to the grid of ifile1.
-Both input files must have the same variables and the same number of timesteps.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 static void gen_index(int gridID1, int gridID2, int *index)

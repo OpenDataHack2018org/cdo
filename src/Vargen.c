@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Vargen     const           Constant variable
+      Vargen     random          Variable with random values
+*/
+
+
 #include <string.h>
 #include <math.h>
 
@@ -22,58 +30,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Vargen
-@Title     = 
-@Section   = Generation of variables
-@Arguments = ofile
-@Operators = const random
-
-@EndModule
-
-
-@BeginOperator_const
-
-@Title     = Constant variable
-@Parameter = const grid
-
-@BeginDescription
-Generates a constant variable.
-@EndDescription
-
-@BeginParameter const
-@Item = const
-FLOAT   Constant
-@Item = grid
-STRING  Grid description file or name
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_random
-
-@Title     = Variable with random values
-@Parameter = grid
-
-@BeginDescription
-Generates a variable with rectangularly distrubuted random numbers in the interval [0,1].
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Vargen(void *argument)

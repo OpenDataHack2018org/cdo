@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Specinfo specinfo  Spectral information
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -24,32 +31,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Specinfo
-@Title     = Sectral information
-@Section   = Information
-@Class     = Information
-@Arguments = 
-@Operators = specinfo
-
-@EndModule
-
-
-@BeginOperator_specinfo
-
-@Title     = Spectral information
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 #define NSP2NTR(nsp) ((int) ((((sqrt((double)(4*nsp+1)))-3)/2)))
 

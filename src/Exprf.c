@@ -15,6 +15,20 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Exprf      expr            Evaluate expressions
+      Exprf      exprf           Evaluate expressions from script file
+*/
+/*
+Operatoren: +, -, *, \
+Functions: sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
+Functions: min, max, avg, std, var
+Constansts: M_PI, M_E
+*/
+
+
 #include <string.h>    /* memcpy */
 #include <sys/types.h> /* stat */
 #include <sys/stat.h>  /* stat */
@@ -26,80 +40,6 @@
 #include "pstream.h"
 #include "expr.h"
 
-/*
-Operatoren: +, -, *, \
-Functions: sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
-Functions: min, max, avg, std, var
-Constansts: M_PI, M_E
-*/
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Expr
-@Title     = Arithmetic processor
-@Section   = Arithmetic processor
-@Class     = Arithmetic
-@Arguments = ifile ofile
-@Operators = expr exprf
-
-@EndModule
-
-
-@BeginOperator_expr
-
-@Title     = Evaluate expressions
-@Parameter = instr
-
-@BeginDescription
-This Operator arithmetically processes every timestep of ifile.
-The processing instructions are read from the parameter.
-Each individual assignment statement must end with a semi-colon.
-@EndDescription
-
-@BeginParameter
-@Item = instr
-STRING  Processing instructions
-@EndParameter
-
-@BeginExample
-cdo -expr,'var1=aprl+aprc;var2=ts-273.15;' ifile ofile
-@EndExample
-
-@EndOperator
-
-
-@BeginOperator_exprf
-
-@Title     = Evaluate expressions from script file
-@Parameter = filename
-
-@BeginDescription
-This Operator arithmetically processes every timestep of ifile.
-Contrary to expr the processing instructions are read from a file.
-@EndDescription
-
-@BeginParameter
-@Item = filename
-STRING  File with processing instructions
-@EndParameter
-
-@BeginExample
-cdo -expr,myexpr ifile ofile
-
-and the ASCII file myexpr contains e.g:
-#############################
-var1 = aprl + aprc;
-var2 = ts - 273.15;
-#############################
-@EndExample
-
-@EndOperator
-
-@EndDoc
-*/
 
 void *Expr(void *argument)
 {

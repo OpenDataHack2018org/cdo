@@ -15,94 +15,23 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Vertstat   vertmin         Vertical minimum
+      Vertstat   vertmax         Vertical maximum
+      Vertstat   vertsum         Vertical sum
+      Vertstat   vertmean        Vertical mean
+      Vertstat   vertavg         Vertical average
+      Vertstat   vertstd         Vertical standard deviation
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Vertstat
-@Title     = Vertical statistic
-@Section   = Statistical description of the data
-@Class     = Statistic
-@Arguments = ifile ofile
-@Operators = vertmin vertmax vertsum vertmean vertavg vertstd
-
-@EndModule
-
-
-@BeginOperator_vertmin
-
-@Title     = Vertical minimum
-
-@BeginDescription
-For every gridpoint the minimum over all levels is computed.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_vertmax
-
-@Title     = Vertical maximum
-
-@BeginDescription
-For every gridpoint the maximum over all levels is computed.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_vertsum
-
-@Title     = Vertical sum
-
-@BeginDescription
-For every gridpoint the sum over all levels is computed.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_vertmean
-
-@Title     = Vertical mean
-
-@BeginDescription
-For every gridpoint the mean over all levels is computed.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_vertavg
-
-@Title     = Vertical average
-
-@BeginDescription
-For every gridpoint the average over all levels is computed.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_vertstd
-
-@Title     = Vertical standard deviation
-
-@BeginDescription
-For every gridpoint the standard deviation over all levels is computed.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Vertstat(void *argument)

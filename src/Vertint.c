@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Vertint    ml2pl           Model to pressure level interpolation
+      Vertint    ml2hl           Model to height level interpolation
+*/
+
+
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
@@ -25,75 +33,6 @@
 #include "pstream.h"
 #include "functs.h"
 #include "vinterp.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Vertint
-@Title     = Vertical interpolation
-@Section   = Interpolation
-@Class     = Interpolation
-@Arguments = ifile ofile
-@Operators = ml2pl ml2hl
-
-@EndModule
-
-
-@BeginOperator_ml2pl
-
-@Title     = Model to pressure level interpolation
-@Parameter = levels
-
-@BeginDescription
-Interpolate fields on hybrid model level to pressure level.
-The input file must contain the log. surface pressure (LSP/code152)
-or the surface pressure (APS/code134).
-To interpolate the temperature or the geopotential height
-to pressure level, the orography (GEOSP/code129) is also needed.
-@EndDescription
-
-@BeginParameter
-@Item = levels
-FLOAT  Pressure levels in pascal
-@EndParameter
-
-@BeginEnvironment
-@Item = EXTRAPOLATE
-If set to 1 extrapolate missing values.
-@EndEnvironment
-
-@EndOperator
-
-
-@BeginOperator_ml2hl
-
-@Title     = Model to height level interpolation
-@Parameter = levels
-
-@BeginDescription
-Interpolate fields on hybrid model level to height level.
-The input file must contain the log. surface pressure (LSP/code152)
-or the surface pressure (APS/code134).
-To interpolate the temperature or the geopotential height
-to height level, the orography (GEOSP/code129) is also needed.
-@EndDescription
-
-@BeginParameter
-@Item = levels
-FLOAT  Height levels in meter (max level: 65535 m)
-@EndParameter
-
-@BeginEnvironment
-@Item = EXTRAPOLATE
-If set to 1 extrapolate missing values.
-@EndEnvironment
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Vertint(void *argument)

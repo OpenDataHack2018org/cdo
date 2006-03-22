@@ -15,220 +15,28 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Math       abs             Absolute value
+      Math       sqr             Square
+      Math       sqrt            Square root
+      Math       exp             Exp
+      Math       log             Logarithm
+      Math       log10           Logarithm base 10
+      Math       sin             Sine
+      Math       cos             Cosine
+      Math       tan             Tangent
+      Math       asin            Arcus sine
+      Math       acos            Arcus cosine
+      Math       atan            Arcus tangent
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Math
-@Title     = Mathematical functions
-@Section   = Mathematical functions
-@Class     = Arithmetic
-@Arguments = ifile ofile
-@Operators = abs sqr sqrt exp log log10 sin cos tan asin acos atan
-
-@EndModule
-
-
-@BeginOperator_abs
-
-@Title     = Absolute value
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = abs{i(t,x)}
-@EndMath
-@EndifDoc
-Calculates the absolute value of i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sqr
-
-@Title     = Square
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = {i(t,x)}^2
-@EndMath
-@EndifDoc
-Calculates the value of i(t,x) raised to the power of 2.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sqrt
-
-@Title     = Square root
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = \sqrt{i(t,x)}
-@EndMath
-@EndifDoc
-Calculates the non-negative square root of i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_exp
-
-@Title     = Exp
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = e^{i(t,x)}
-@EndMath
-@EndifDoc
-Calculates e (the base of natural logarithms) raised to the power of i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_log
-
-@Title     = Logarithm
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = log(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the natural logarithm of i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_log10
-
-@Title     = Logarithm base 10
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = log_{10}(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the base-10 logarithm of i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sin
-
-@Title     = Sine
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = \sin(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the sine of i(t,x), where i(t,x) is given in radians.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_cos
-
-@Title     = Cosine
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = \cos(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the cosine of i(t,x), where i(t,x) is given in radians.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_tan
-
-@Title     = Tangent
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = \tan(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the tangent of i(t,x), where i(t,x) is given in radians.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_asin
-
-@Title     = Arcus sine
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = asin(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the arcus sine of i(t,x); that is the value whose sine is i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_acos
-
-@Title     = Arcus cosine
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = acos(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the arcus cosine of i(t,x); that is the value whose cosine is i(t,x).
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_atan
-
-@Title     = Arcus tangent
-
-@BeginDescription
-@IfDoc
-@BeginMath
-o(t,x) = atan(i(t,x))
-@EndMath
-@EndifDoc
-Calculates the arcus tangent of i(t,x); that is the value whose tangent is i(t,x).
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Math(void *argument)

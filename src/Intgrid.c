@@ -15,6 +15,13 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Intgrid    interpolate     Interpolate
+*/
+
+
 #include <string.h>
 #include <math.h>
 
@@ -23,76 +30,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "interpol.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Intgrid
-@Title     = Grid interpolation
-@Section   = Interpolation
-@Class     = Interpolation
-@Arguments = ifile ofile
-@Operators = interpolate
-
-@EndModule
-
-
-@BeginOperator_interpolate
-
-@Title     = Interpolate
-@Parameter = grid
-
-@BeginDescription
-Grid interpolation from PINGO (only rectangular grids).
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_intgrid
-
-@Title     = Grid interpolation
-@Parameter = grid
-
-@BeginDescription
-Linear interpolation of regular grids.
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_intpoint
-
-@Title     = Point interpolation
-@Parameter = long lat
-
-@BeginDescription
-Linear point interpolation.
-@EndDescription
-
-@BeginParameter long
-@Item = long
-FLOAT  Longitude of the point
-@Item = lat
-FLOAT  Latitude of the point
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Intgrid(void *argument)

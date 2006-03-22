@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,22 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Settime    setdate         Set date
+      Settime    settime         Set time
+      Settime    setday          Set day
+      Settime    setmon          Set month
+      Settime    setyear         Set year
+      Settime    settunits       Set time units
+      Settime    settaxis        Set time axis
+      Settime    setreftime      Set reference time
+      Settime    setcalendar     Set calendar
+      Settime    shifttime       Shift timesteps
+*/
+
+
 #include <string.h>
 #include <ctype.h>  /* isdigit */
 
@@ -22,199 +38,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Settime
-@Title     = Set time
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = setdate settime setday setmon setyear settunits settaxis setreftime setcalendar shifttime
-
-@EndModule
-
-
-@BeginOperator_setdate
-
-@Title     = Set date
-@Parameter = date
-
-@BeginDescription
-Sets the date in every timestep to the same given value.
-@EndDescription
-
-@BeginParameter date
-@Item = date
-STRING  New date (format YYYY-MM-DD)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_settime
-
-@Title     = Set time
-@Parameter = time
-
-@BeginDescription
-Sets the time in every timestep to the same given value.
-@EndDescription
-
-@BeginParameter timr
-@Item = time
-STRING  New time (format HH:MM)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setday
-
-@Title     = Set day
-@Parameter = day
-
-@BeginDescription
-Sets the day in every timestep to the same given value.
-@EndDescription
-
-@BeginParameter day
-@Item = day
-INTEGER  Value of the new day
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setmon
-
-@Title     = Set month
-@Parameter = month
-
-@BeginDescription
-Sets the month in every timestep to the same given value.
-@EndDescription
-
-@BeginParameter month
-@Item = month
-INTEGER  Value of the new month
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setyear
-
-@Title     = Set year
-@Parameter = year
-
-@BeginDescription
-Sets the year in every timestep to the same given value.
-@EndDescription
-
-@BeginParameter year
-@Item = year
-INTEGER  Value of the new year
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_settunits
-
-@Title     = Set time units
-@Parameter = units
-
-@BeginDescription
-Sets the time units.
-@EndDescription
-
-@BeginParameter units
-@Item = units
-STRING  Base units of the time axis (minutes, hours, days, months, years).
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_settaxis
-
-@Title     = Set time axis
-@Parameter = date time [inc]
-
-@BeginDescription
-Sets the time axis.
-@EndDescription
-
-@BeginParameter date
-@Item = date
-STRING  Start date (format YYYY-MM-DD)
-@Item = time
-STRING  Start time (format HH:MM)
-@Item = inc
-STRING  Optional increment (e.g. 12hour) [default: 0hour]
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setreftime
-
-@Title     = Set reference time
-@Parameter = date time
-
-@BeginDescription
-Sets the reference time of an relative time axis.
-@EndDescription
-
-@BeginParameter date
-@Item = date
-STRING  Reference date (format YYYY-MM-DD)
-@Item = time
-STRING  Reference time (format HH:MM)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setcalendar
-
-@Title     = Set calendar
-@Parameter = calendar
-
-@BeginDescription
-Sets the calendar.
-@EndDescription
-
-@BeginParameter calendar
-@Item = calendar
-STRING  Calendar (standard, 360days, 365days, 366days)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_shifttime
-
-@Title     = Shift timesteps
-@Parameter = sval
-
-@BeginDescription
-Shifts all timesteps by the parameter sval.
-@EndDescription
-
-@BeginParameter
-@Item = sval
-STRING   Shift value (e.g. -3hour)
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Settime(void *argument)

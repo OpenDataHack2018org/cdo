@@ -15,81 +15,20 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Setgrid    setgrid         Set grid
+      Setgrid    setgridtype     Set grid type
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Setgrid
-@Title     = Set grid type
-@Section   = Manipulating the header/field
-@Class     = Manipulation
-@Arguments = ifile ofile
-@Operators = setgrid setgridtype
-
-@EndModule
-
-
-@BeginOperator_setgrid
-
-@Title     = Set grid
-@Parameter = grid
-
-@BeginDescription
-Sets the grid information for all variables.
-@EndDescription
-
-@BeginParameter
-@Item = grid
-STRING  Grid description file or name of the target grid
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setgridtype
-
-@Title     = Set grid type
-@Parameter = gridtype
-
-@BeginDescription
-Sets the grid type for all grids to a user given value.
-@EndDescription
-
-@BeginParameter
-@Item = gridtype
-STRING  New grid type (curvilinear or cell)
-@EndParameter
-
-@EndOperator
-
-
-@BeginOperator_setgridarea
-
-@Title     = Set grid area weights
-@Parameter = areafile
-
-@BeginDescription
-Sets the area weights of the first grid in ifile with the same
-size as in areafile.
-@EndDescription
-
-@BeginParameter
-@Item = areafile
-STRING  File with area weights
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Setgrid(void *argument)

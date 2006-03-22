@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2005 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,40 +15,19 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Split      splitrec        Split records
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Splitrec
-@Title     = 
-@Section   = File operations
-@Class     = File operation
-@Arguments = ifile oprefix
-@Operators = splitrec
-
-@EndModule
-
-
-@BeginOperator_splitrec
-
-@Title     = Split records
-
-@BeginDescription
-Splits a file into pieces, one for each record.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void *Splitrec(void *argument)

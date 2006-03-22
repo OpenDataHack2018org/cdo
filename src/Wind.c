@@ -15,6 +15,14 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Wind       uv2dv           U and V wind to divergence and vorticity
+      Wind       dv2uv           Divergence and vorticity to U and V wind
+*/
+
+
 #include <string.h>
 
 #include "cdi.h"
@@ -23,47 +31,6 @@
 #include "pstream.h"
 #include "specspace.h"
 #include "list.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Wind
-@Title     = Spectral transformation
-@Section   = Spectral transformation
-@Class     = Transformation
-@Arguments = ifile ofile
-@Operators = uv2dv dv2uv
-
-@EndModule
-
-
-@BeginOperator_uv2dv
-
-@Title     = U and V wind to divergence and vorticity
-
-@BeginDescription
-Calculate spherical harmonic coefficients of divergence and vorticity
-from U and V wind.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_dv2uv
-
-@Title     = Divergence and vorticity to U and V wind
-
-@BeginDescription
-Calculate U and V wind on a gaussian grid from divergence and vorticity.
-@EndDescription
-
-@EndOperator
-
-
-@EndDoc
-*/
 
 
 void *Wind(void *argument)

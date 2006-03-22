@@ -15,12 +15,10 @@
   GNU General Public License for more details.
 */
 
-#include "cdi.h"
-#include "cdo.h"
-#include "cdo_int.h"
-#include "pstream.h"
-#include "color.h"
+/*
+   This module contains the following operators:
 
+*/
 /*
   Output center or bounderies for GMT plotting
 
@@ -31,41 +29,12 @@
     - outputboundscpt:
 */
 
-/*
-@BeginDoc
 
-@BeginModule
-
-@Name      = Outputgmt
-@Title     = Formatted GMT output
-@Section   = Formatted I/O
-@Arguments = ifiles
-@Operators = outputcenter outputbounds
-
-@EndModule
-
-
-@BeginOperator_outputcenter
-
-@Title     = Output grid center
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_outputbounds
-
-@Title     = Output grid bounds
-
-@BeginDescription
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
+#include "cdi.h"
+#include "cdo.h"
+#include "cdo_int.h"
+#include "pstream.h"
+#include "color.h"
 
 
 void *Outputgmt(void *argument)

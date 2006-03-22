@@ -15,6 +15,12 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+*/
+
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -22,41 +28,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Sethalo
-@Title     = Set halo
-@Section   = Selection
-@Arguments = ifile ofile
-@Operators = sethalo
-
-@EndModule
-
-
-@BeginOperator_sethalo
-
-@Title     = Set halo
-@Parameter = lhalo rhalo
-
-@BeginDescription
-Set the left and right halo.
-@EndDescription
-
-@BeginParameter
-@Item = lahlo
-INTEGER  left halo
-@Item = rhalo
-INTEGER  right halo
-@EndParameter
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 static int gengrid(int gridID1, int lhalo, int rhalo)

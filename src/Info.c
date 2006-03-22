@@ -15,73 +15,18 @@
   GNU General Public License for more details.
 */
 
+/*
+   This module contains the following operators:
+
+      Info       info            Dataset information
+      Info       map             Dataset information and simple map
+*/
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Info
-@Title     = Information and simple statistics
-@Section   = Information
-@Class     = Information
-@Arguments = ifiles
-@Operators = info infov map
-
-@EndModule
-
-
-@BeginOperator_info
-
-@Title     = File information
-
-@BeginDescription
-Prints simple statistics for each field of a file.
-For each field the operator print in one line the:
-@BeginItemize
-@Item = field number
-@Item = date and time
-@Item = code
-@Item = level
-@Item = size of the grid
-@Item = number of missing values
-@Item = minimum, mean and maximum
-@EndItemize
-The mean value is computed without the use of area weight!
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_infov
-
-@Title     = File information
-
-@BeginDescription
-The same as operator info. Using the name instead of the code number
-to identify the variable.
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_map
-
-@Title     = Print simple map
-
-@BeginDescription
-Prints simple statistics and a map for each field of a file.
-The map will be printed only for fields on a rectangular grid.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 
 void printMap(int nlon, int nlat, double *array, double missval, double min, double max)
