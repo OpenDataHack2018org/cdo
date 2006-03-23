@@ -47,8 +47,10 @@ void *Vardup(void *argument)
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
+  int **varnmiss;
   double *single;
   double **vardata;
+  double *array;
   int taxisID1, taxisID2;
 
   cdoInitialize(argument);
@@ -87,13 +89,16 @@ void *Vardup(void *argument)
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
-  vardata  = (double **) malloc(nvars*sizeof(double*));
+  array    = (double *) malloc(gridsize*sizeof(double));
+  vardata  = (double **) malloc(nvars*sizeof(double *));
+  varnmiss = (int **) malloc(nvars*sizeof(int *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      vardata[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
+      vardata[varID]  = (double *) malloc(gridsize*nlevel*sizeof(double));
+      varnmiss[varID] = (int *) malloc(nlevel*sizeof(int));
     }
 
   for ( i = 1; i < nmul; i++ )
@@ -127,6 +132,7 @@ void *Vardup(void *argument)
 	  single   = vardata[varID] + offset;
   
 	  streamReadRecord(streamID1, single, &nmiss);
+	  varnmiss[varID][levelID] = nmiss;
 	}
 
       for ( i = 0; i < nmul; i++ )
@@ -139,9 +145,12 @@ void *Vardup(void *argument)
 	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	    offset   = gridsize*levelID;
 	    single   = vardata[varID] + offset;
+	    nmiss    = varnmiss[varID][levelID];
+
+	    memcpy(array, single, gridsize*sizeof(double));
 
 	    streamDefRecord(streamID2,  varID2,  levelID);
-	    streamWriteRecord(streamID2, single, nmiss);
+	    streamWriteRecord(streamID2, array, nmiss);
 	  }
 
       tsID++;
@@ -151,7 +160,10 @@ void *Vardup(void *argument)
   streamClose(streamID1);
 
   for ( varID = 0; varID < nvars; varID++ )  free(vardata[varID]);
+  for ( varID = 0; varID < nvars; varID++ )  free(varnmiss[varID]);
   free(vardata);
+  free(varnmiss);
+  free(array);
 
   cdoFinish();
 
