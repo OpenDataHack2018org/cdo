@@ -18,8 +18,8 @@
 /*
    This module contains the following operators:
 
-      Vargen     const           Constant variable
-      Vargen     random          Variable with random values
+      Vargen     const           Create a constant field
+      Vargen     random          Field with random values
 */
 
 

@@ -109,9 +109,9 @@ void *Timsort(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  gridID  = vlistInqVarGrid(vlistID1, varID);
+	  missval = vlistInqVarMissval(vlistID1, varID);
+	  nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
 	  vars[tsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
 
@@ -144,6 +144,8 @@ void *Timsort(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
+      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
       gridID   = vlistInqVarGrid(vlistID1, varID);
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
