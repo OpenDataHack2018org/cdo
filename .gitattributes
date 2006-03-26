@@ -54,6 +54,7 @@ src/Mastrfu.c -text
 src/Math.c -text
 src/Merge.c -text
 src/Mergegrid.c -text
+src/Mergetime.c -text
 src/Merstat.c -text
 src/Ninfo.c -text
 src/Nmltest.c -text
