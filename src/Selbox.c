@@ -418,6 +418,7 @@ void *Selbox(void *argument)
   int nmiss;
   int *vars;
   int i;
+  int ndiffgrids;
   int lat1, lat2, lon11, lon12, lon21, lon22;
   double missval;
   double *array1 = NULL, *array2 = NULL;
@@ -436,6 +437,11 @@ void *Selbox(void *argument)
   vlistID1 = streamInqVlist(streamID1);
 
   ngrids = vlistNgrids(vlistID1);
+  ndiffgrids = 0;
+  for ( index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      ndiffgrids++;
+
   for ( index = 0; index < ngrids; index++ )
     {
       gridID1  = vlistGrid(vlistID1, index);
@@ -450,7 +456,7 @@ void *Selbox(void *argument)
     cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   if ( index == ngrids ) cdoAbort("No regular grid found!");
-  if ( ngrids > 1 )      cdoAbort("Too much different grids!");
+  if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
 
   operatorInputArg(cdoOperatorEnter(operatorID));
   if ( operatorID == SELLONLATBOX )

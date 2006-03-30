@@ -441,7 +441,7 @@ static void checkStreamCnt(void)
   streamCnt = streamInCnt + streamOutCnt;
 
   if ( Process[processID].streamCnt > streamCnt )
-    Error(processInqPrompt(), "Too much streams!"
+    Error(processInqPrompt(), "Too many streams!"
 	  " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
   if ( Process[processID].streamCnt < streamCnt )

@@ -53,6 +53,8 @@ void *Output(void *argument)
   int hour, minute;
   int year, month, day;
   int nelem = 0;
+  int index;
+  int ndiffgrids;
   const char *format = NULL;
   double level;
   double *xvals = NULL, *yvals = NULL;
@@ -88,7 +90,13 @@ void *Output(void *argument)
       vlistID = streamInqVlist(streamID);
 
       ngrids = vlistNgrids(vlistID);
-      if ( ngrids > 1 ) cdoAbort("Too many different grids!");
+      ndiffgrids = 0;
+      for ( index = 1; index < ngrids; index++ )
+	if ( vlistGrid(vlistID, 0) != vlistGrid(vlistID, index) )
+	  ndiffgrids++;
+
+      if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+
       gridID = vlistGrid(vlistID, 0);
       gridsize = gridInqSize(gridID);
 

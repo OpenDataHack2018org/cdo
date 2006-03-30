@@ -11,6 +11,7 @@
 	* Timsort: bug fix for time constant fields
 	* Math: rename log to ln
 	* Change help info format
+	* Selbox, Maskbox, Fldrms, Mergegrid, Zonstat, Fldstat, Output: check number of different grids
 	* extent macro UNCHANGED_RECORD to cdoDefaultDataType and cdoDefaultByteorder
 	* remove module docu from source code
 	* Version 0.9.13 released
@@ -44,7 +45,7 @@
 	* Runstat: adjust date and time
 	* Merge: duplicate taxis (bug fix)
 	* Vertint: abort for different grids (bug fix)
-	* Gradsdes: set XYHEADER to 644 (bug fix Holger)
+	* Gradsdes: set XYHEADER to 644 (bug report: Holger)
 	* Remap: add GME grid support
 	* Remap: use environment variable NORMLIZE_OPT (bug fix)
 	* Cat: set tsID2 to 1 for input files with constant data only
@@ -62,7 +63,7 @@
 	* Gradsdes: IEG 32 support
 	* Selbox: add rotated grids
 	* Diff: change date and time format to ISO
-	* Gradsdes: bug fix for lonlat grids from N->S (Thibaut Gridel)
+	* Gradsdes: bug fix for lonlat grids from N->S (report: Thibaut Gridel)
 	* Inttime: abort if units is not minutes, hours or days (bug fix)
 	* Settime: add all available calendars
 	* Inttime: add all available calendars

@@ -49,6 +49,7 @@ void *Fldstat(void *argument)
   int lim;
   int needWeights = FALSE;
   int nmiss;
+  int ndiffgrids;
   double slon, slat;
   double sglval;
   FIELD field;
@@ -90,10 +91,15 @@ void *Fldstat(void *argument)
   gridDefYvals(gridID2, &slat);
 
   ngrids = vlistNgrids(vlistID1);
-  index = 0;
+  ndiffgrids = 0;
+  for ( index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      ndiffgrids++;
 
-  vlistChangeGridIndex(vlistID2, index, gridID2);
-  if ( ngrids > 1 ) cdoAbort("Too many different grids!");
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+
+  for ( index = 0; index < ngrids; index++ )
+    vlistChangeGridIndex(vlistID2, index, gridID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));

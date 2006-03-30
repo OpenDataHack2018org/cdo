@@ -161,7 +161,9 @@ void *Mergegrid(void *argument)
   int gridsize1, gridsize2;
   int gridID1, gridID2;
   int taxisID1, taxisID3;
-  int i, *index = NULL;
+  int index;
+  int i, *gindex = NULL;
+  int ndiffgrids;
   double missval1, missval2;
   double *array1, *array2;
 
@@ -181,11 +183,19 @@ void *Mergegrid(void *argument)
 
   vlistCompare(vlistID1, vlistID2, func_code);
 
-  if ( vlistNgrids(vlistID1) != 1 )
-    cdoAbort("Too many different grids in %s", cdoStreamName(0));
+  ndiffgrids = 0;
+  for ( index = 1; index < vlistNgrids(vlistID1); index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
+      ndiffgrids++;
 
-  if ( vlistNgrids(vlistID2) != 1 )
-    cdoAbort("Too many different grids in %s", cdoStreamName(1));
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s", cdoStreamName(0));
+
+  ndiffgrids = 0;
+  for ( index = 1; index < vlistNgrids(vlistID2); index++ )
+    if ( vlistGrid(vlistID2, 0) != vlistGrid(vlistID2, index))
+      ndiffgrids++;
+
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s", cdoStreamName(1));
 
   gridID1 = vlistGrid(vlistID1, 0);
   gridID2 = vlistGrid(vlistID2, 0);
@@ -195,9 +205,9 @@ void *Mergegrid(void *argument)
 
   array1 = (double *) malloc(gridsize1*sizeof(double));
   array2 = (double *) malloc(gridsize2*sizeof(double));
-  index = (int *) malloc(gridsize2*sizeof(int));
+  gindex = (int *) malloc(gridsize2*sizeof(int));
 
-  gen_index(gridID1, gridID2, index);
+  gen_index(gridID1, gridID2, gindex);
 
   vlistID3 = vlistDuplicate(vlistID1);
 
@@ -235,9 +245,9 @@ void *Mergegrid(void *argument)
 
 	  for ( i = 0; i < gridsize2; i++ )
 	    {
-	      if ( index[i] >= 0 && !DBL_IS_EQUAL(array2[i], missval2) )
+	      if ( gindex[i] >= 0 && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
-		  array1[index[i]] = array2[i];
+		  array1[gindex[i]] = array2[i];
 		}
 	    }
 
@@ -259,7 +269,7 @@ void *Mergegrid(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
  
-  if ( index ) free(index);
+  if ( gindex ) free(gindex);
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
 

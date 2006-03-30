@@ -48,6 +48,7 @@ void *Zonstat(void *argument)
   int recID, nrecs;
   int tsID, varID, levelID;
   int lim;
+  int ndiffgrids;
   int taxisID1, taxisID2;
   FIELD field1, field2;
 
@@ -75,7 +76,13 @@ void *Zonstat(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
-  if ( ngrids > 1 ) cdoAbort("Too many different grids!");
+  ndiffgrids = 0;
+  for ( index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      ndiffgrids++;
+
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
   if ( gridInqType(gridID1) != GRID_LONLAT &&
@@ -84,7 +91,8 @@ void *Zonstat(void *argument)
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   gridID2 = gridToZonal(gridID1);
-  vlistChangeGridIndex(vlistID2, index, gridID2);
+  for ( index = 0; index < ngrids; index++ )
+    vlistChangeGridIndex(vlistID2, index, gridID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));

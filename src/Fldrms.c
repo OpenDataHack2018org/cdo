@@ -38,6 +38,7 @@ void *Fldrms(void *argument)
   int recID, nrecs;
   int tsID, varID, levelID;
   int lim;
+  int ndiffgrids;
   int needWeights = FALSE;
   double slon, slat;
   double sglval;
@@ -71,6 +72,11 @@ void *Fldrms(void *argument)
   gridDefYvals(gridID3, &slat);
 
   ngrids = vlistNgrids(vlistID1);
+  ndiffgrids = 0;
+  for ( index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      ndiffgrids++;
+
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
   gridID2 = vlistGrid(vlistID2, index);
@@ -83,8 +89,10 @@ void *Fldrms(void *argument)
        gridInqType(gridID1) != GRID_GAUSSIAN )
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
-  vlistChangeGridIndex(vlistID3, index, gridID3);
-  if ( ngrids > 1 ) cdoAbort("Too many different grids!");
+  for ( index = 0; index < ngrids; index++ )
+    vlistChangeGridIndex(vlistID3, index, gridID3);
+
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));

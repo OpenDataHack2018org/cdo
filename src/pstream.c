@@ -166,7 +166,7 @@ static int pstream_from_pointer(PSTREAM *ptr)
 	    Message(func, "Pointer %p has idx %d from pstream list", ptr, idx);
 	}
       else
-	Warning(func, "Too much open pstreams (limit is %d)!", _pstream_max);
+	Warning(func, "Too many open pstreams (limit is %d)!", _pstream_max);
 
       PSTREAM_UNLOCK
     }
@@ -468,7 +468,7 @@ int pstreamOpenRead(const char *argument)
 	      nfiles = 0;
 	      while ( readline(pfp, line, 4096) )
 		{
-		  if ( nfiles >= 16384 ) cdoAbort("Too much input files (limit: 16384)");
+		  if ( nfiles >= 16384 ) cdoAbort("Too many input files (limit: 16384)");
 		  fnames[nfiles++] = strdupx(line);
 		}
 
