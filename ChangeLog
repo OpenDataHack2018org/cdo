@@ -5,6 +5,8 @@
 	* New operator: abs (Math) [request: Reiner Schnur]
 	* enlarge: update for zonal and meridional data [request: Wolfgang Mueller]
 	* gradsdes: bug fix for unsorted GRIB data [report: Stefan Bauer]
+	* splitzaxis: generate file name from zaxisID+1 (bug report: Martina Stockhaus)
+	* splitgrid:  generate file name from gridID+1
 	* Vardup: bug fix for missing values
 	* Timsort: bug fix for time constant fields
 	* Math: rename log to ln
@@ -22,7 +24,7 @@
 	* Intgrid: missing value support for intgrid
 	* Cat: the output file must not exist anymore
 	* Zonstat: add support for GRID_GENERIC if ny > 1
-	* read_remap_scrip: if GME grid, read GME mask (bug fix [Luis])
+	* read_remap_scrip: if GME grid, read GME mask (bug report Luis)
 	* remaplib: change read/write of grid corners (bug fix)
 	* Spectral: rename sp2gp2/gp2sp2 to sp2gpl/gp2spl
 	* namelist: update

@@ -259,7 +259,7 @@ void *Split(void *argument)
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
-	  sprintf(filename+nchars, "%02d", gridIDs[index]);
+	  sprintf(filename+nchars, "%02d", gridIDs[index]+1);
 	  sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
@@ -301,7 +301,7 @@ void *Split(void *argument)
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
-	  sprintf(filename+nchars, "%02d", zaxisIDs[index]);
+	  sprintf(filename+nchars, "%02d", zaxisIDs[index]+1);
 	  sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
