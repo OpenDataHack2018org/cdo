@@ -21,15 +21,15 @@
       Math       abs             Absolute value
       Math       sqr             Square
       Math       sqrt            Square root
-      Math       exp             Exp
-      Math       log             Logarithm
-      Math       log10           Logarithm base 10
+      Math       exp             Exponential
+      Math       ln              Natural logarithm
+      Math       log10           Base 10 logarithm
       Math       sin             Sine
       Math       cos             Cosine
       Math       tan             Tangent
-      Math       asin            Arcus sine
-      Math       acos            Arcus cosine
-      Math       atan            Arcus tangent
+      Math       asin            Arc sine
+      Math       acos            Arc cosine
+      Math       atan            Arc tangent
 */
 
 
@@ -42,7 +42,7 @@
 void *Math(void *argument)
 {
   static char func[] = "Math";
-  enum {ABS, SQR, SQRT, EXP, LOG, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
+  enum {ABS, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
   int operatorID;
   int operfunc;
   int streamID1, streamID2;
@@ -63,7 +63,7 @@ void *Math(void *argument)
   cdoOperatorAdd("sqr",   SQR,   0, NULL);
   cdoOperatorAdd("sqrt",  SQRT,  0, NULL);
   cdoOperatorAdd("exp",   EXP,   0, NULL);
-  cdoOperatorAdd("log",   LOG,   0, NULL);
+  cdoOperatorAdd("ln",    LN,   0, NULL);
   cdoOperatorAdd("log10", LOG10, 0, NULL);
   cdoOperatorAdd("sin",   SIN,   0, NULL);
   cdoOperatorAdd("cos",   COS,   0, NULL);
@@ -131,7 +131,7 @@ void *Math(void *argument)
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : exp(array1[i]);
 	      break;
-	    case LOG:
+	    case LN:
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 ? missval1 : log(array1[i]);
 	      break;

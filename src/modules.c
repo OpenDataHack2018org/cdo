@@ -159,7 +159,7 @@ void *Zonstat(void *argument);
                                  "invertlatdata", "invertlondata"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MastrfuOperators       {"mastrfu"}
-#define  MathOperators          {"abs", "sqr", "sqrt", "exp", "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
+#define  MathOperators          {"abs", "sqr", "sqrt", "exp", "ln", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
@@ -283,7 +283,7 @@ static MODULES Modules[] =
   { Seasstat,       SeasstatHelp,      SeasstatOperators,       1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,         1,  1 },
   { Select,         SelectHelp,        SelectOperators,         1,  1 },
-  { Selrec,         SelrecHelp,        SelrecOperators,         1,  1 },
+  { Selrec,         SelectHelp,        SelrecOperators,         1,  1 },
   { Selstat,        SelstatHelp,       SelstatOperators,        1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,        1,  1 },
   { Set,            SetHelp,           SetOperators,            1,  1 },
@@ -341,6 +341,7 @@ static char *opalias[][2] =
   {"gp2sp2",              "gp2spl"   },
   {"sp2gp2",              "sp2gpl"   },
   {"infos",               "sinfo"    },
+  {"log",                 "ln"       },
   {"lmean",               "ymonmean" },
   {"lmmean",              "ymonmean" },
   {"lmavg",               "ymonavg"  },

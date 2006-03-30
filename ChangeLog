@@ -7,6 +7,7 @@
 	* gradsdes: bug fix for unsorted GRIB data [report: Stefan Bauer]
 	* Vardup: bug fix for missing values
 	* Timsort: bug fix for time constant fields
+	* Math: rename log to ln
 	* Change help info format
 	* extent macro UNCHANGED_RECORD to cdoDefaultDataType and cdoDefaultByteorder
 	* remove module docu from source code
