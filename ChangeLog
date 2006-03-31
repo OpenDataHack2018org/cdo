@@ -3,6 +3,7 @@
 	* using CDI library version 0.9.7
 	* New module: Mergetime [request: Stefanie Legutke]
 	* New operator: abs (Math) [request: Reiner Schnur]
+	* New module: Enlargegrid [request: Tom Hardy] <- docu missing
 	* enlarge: update for zonal and meridional data [request: Wolfgang Mueller]
 	* gradsdes: bug fix for unsorted GRIB data [report: Stefan Bauer]
 	* splitzaxis: generate file name from zaxisID+1 (bug report: Martina Stockhaus)

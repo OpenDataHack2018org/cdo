@@ -16,6 +16,7 @@ cdo_SOURCES = Arith.c		\
               Detrend.c		\
               Diff.c		\
               Enlarge.c     	\
+              Enlargegrid.c     \
               Ensstat.c     	\
               Exprf.c     	\
               Filedes.c 	\

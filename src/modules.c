@@ -50,6 +50,7 @@ void *Copy(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
 void *Enlarge(void *argument);
+void *Enlargegrid(void *argument);
 void *Ensstat(void *argument);
 void *Expr(void *argument);
 void *Filedes(void *argument);
@@ -141,6 +142,7 @@ void *Zonstat(void *argument);
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffv"}
 #define  EnlargeOperators       {"enlarge"}
+#define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd"}
 #define  ExprOperators          {"expr", "exprf"}
 #define  FiledesOperators       {"filedes", "griddes", "zaxisdes", "vct", "vardes", "timedes", "vlist"}
@@ -247,6 +249,7 @@ static MODULES Modules[] =
   { Detrend,        DetrendHelp,       DetrendOperators,        1,  1 },
   { Diff,           DiffHelp,          DiffOperators,           2,  0 },
   { Enlarge,        EnlargeHelp,       EnlargeOperators,        1,  1 },
+  { Enlargegrid,    NULL,              EnlargegridOperators,    1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       -1,  1 },
   { Expr,           ExprHelp,          ExprOperators,           1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,        1,  0 },
