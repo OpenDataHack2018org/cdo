@@ -48,8 +48,9 @@ void *Merstat(void *argument)
   int recID, nrecs;
   int tsID, varID, levelID;
   int lim;
-  FIELD field1, field2;
+  int ndiffgrids;
   int taxisID1, taxisID2;
+  FIELD field1, field2;
 
   cdoInitialize(argument);
 
@@ -75,6 +76,13 @@ void *Merstat(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
+  ndiffgrids = 0;
+  for ( index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      ndiffgrids++;
+
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
+
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
   if ( gridInqType(gridID1) != GRID_LONLAT &&

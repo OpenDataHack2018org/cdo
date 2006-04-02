@@ -12,7 +12,7 @@
 	* Timsort: bug fix for time constant fields
 	* Math: rename log to ln
 	* Change help info format
-	* Selbox, Maskbox, Fldrms, Mergegrid, Zonstat, Fldstat, Output: check number of different grids
+	* Selbox, Maskbox, Fldrms, Mergegrid, Zonstat, Merstat, Output: check number of different grids
 	* extent macro UNCHANGED_RECORD to cdoDefaultDataType and cdoDefaultByteorder
 	* remove module docu from source code
 	* Version 0.9.13 released

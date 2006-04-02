@@ -49,7 +49,6 @@ void *Fldstat(void *argument)
   int lim;
   int needWeights = FALSE;
   int nmiss;
-  int ndiffgrids;
   double slon, slat;
   double sglval;
   FIELD field;
@@ -91,12 +90,6 @@ void *Fldstat(void *argument)
   gridDefYvals(gridID2, &slat);
 
   ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
-
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
   for ( index = 0; index < ngrids; index++ )
     vlistChangeGridIndex(vlistID2, index, gridID2);
