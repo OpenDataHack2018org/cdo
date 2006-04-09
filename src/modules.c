@@ -128,7 +128,7 @@ void *Yseasstat(void *argument);
 void *Zonstat(void *argument);
 
 
-#define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max"}
+#define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy"}
 #define  CatOperators           {"cat"}

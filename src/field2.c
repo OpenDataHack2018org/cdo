@@ -22,15 +22,16 @@
 
 void farfun(FIELD *field1, FIELD field2, int function)
 {
-  if      ( function == func_add  ) faradd(field1, field2);
-  else if ( function == func_min  ) farmin(field1, field2);
-  else if ( function == func_max  ) farmax(field1, field2);
-  else if ( function == func_sum  ) farsum(field1, field2);
-  else if ( function == func_mean ) farsum(field1, field2);
-  else if ( function == func_avg  ) faradd(field1, field2);
-  else if ( function == func_sub  ) farsub(field1, field2);
-  else if ( function == func_mul  ) farmul(field1, field2);
-  else if ( function == func_div  ) fardiv(field1, field2);
+  if      ( function == func_add   ) faradd(field1, field2);
+  else if ( function == func_min   ) farmin(field1, field2);
+  else if ( function == func_max   ) farmax(field1, field2);
+  else if ( function == func_sum   ) farsum(field1, field2);
+  else if ( function == func_mean  ) farsum(field1, field2);
+  else if ( function == func_avg   ) faradd(field1, field2);
+  else if ( function == func_sub   ) farsub(field1, field2);
+  else if ( function == func_mul   ) farmul(field1, field2);
+  else if ( function == func_div   ) fardiv(field1, field2);
+  else if ( function == func_atan2 ) faratan2(field1, field2);
   else cdoAbort("function %d not implemented!", function);
 }
 
@@ -243,6 +244,31 @@ void fardiv(FIELD *field1, FIELD field2)
 
   for ( i = 0; i < len; i++ ) 
     array1[i] = DIV(array1[i], array2[i]);
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+}
+
+
+void faratan2(FIELD *field1, FIELD field2)
+{
+  static char func[] = "fardiv";
+  int    i, len;
+  int    grid1    = field1->grid;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  for ( i = 0; i < len; i++ ) 
+    array1[i] = DBL_IS_EQUAL(array1[i],missval1) || DBL_IS_EQUAL(array2[i],missval2) ? missval1 : atan2(array1[i], array2[i]);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )

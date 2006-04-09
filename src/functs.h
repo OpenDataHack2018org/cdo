@@ -22,6 +22,8 @@
 #define  func_mul   43
 #define  func_div   44
 
+#define  func_atan2 50
+
 #define  func_month 84
 #define  func_year  85
 #define  func_time  86

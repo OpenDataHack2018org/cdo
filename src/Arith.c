@@ -24,6 +24,7 @@
       Arith      div             Divide two fields
       Arith      min             Minimum of two fields
       Arith      max             Maximum of two fields
+      Arith      atan2           Arc tangent of two fields
 */
 
 
@@ -56,12 +57,13 @@ void *Arith(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("add", func_add, 0, NULL);
-  cdoOperatorAdd("sub", func_sub, 0, NULL);
-  cdoOperatorAdd("mul", func_mul, 0, NULL);
-  cdoOperatorAdd("div", func_div, 0, NULL);
-  cdoOperatorAdd("min", func_min, 0, NULL);
-  cdoOperatorAdd("max", func_max, 0, NULL);
+  cdoOperatorAdd("add",   func_add,   0, NULL);
+  cdoOperatorAdd("sub",   func_sub,   0, NULL);
+  cdoOperatorAdd("mul",   func_mul,   0, NULL);
+  cdoOperatorAdd("div",   func_div,   0, NULL);
+  cdoOperatorAdd("min",   func_min,   0, NULL);
+  cdoOperatorAdd("max",   func_max,   0, NULL);
+  cdoOperatorAdd("atan2", func_atan2, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);

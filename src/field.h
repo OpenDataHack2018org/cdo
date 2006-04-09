@@ -101,5 +101,6 @@ void farmax(FIELD *field1, FIELD field2);
 void farstd(FIELD *field1, FIELD field2, FIELD field3);
 void farcstd(FIELD *field1, FIELD field2, double rconst1);
 void farmoq(FIELD *field1, FIELD field2);
+void faratan2(FIELD *field1, FIELD field2);
 
 #endif  /* _FIELD_H */

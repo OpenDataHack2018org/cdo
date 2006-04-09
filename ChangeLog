@@ -2,6 +2,7 @@
 
 	* using CDI library version 0.9.7
 	* New module: Mergetime [request: Stefanie Legutke]
+	* New operator: atan2 (Arith) [request: Tom Hardy]
 	* New operator: abs (Math) [request: Reiner Schnur]
 	* New module: Enlargegrid [request: Tom Hardy] <- docu missing
 	* enlarge: update for zonal and meridional data [request: Wolfgang Mueller]
