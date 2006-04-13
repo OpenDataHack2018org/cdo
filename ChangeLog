@@ -5,9 +5,10 @@
 	* New operator: atan2 (Arith) [request: Tom Hardy]
 	* New operator: abs (Math) [request: Reiner Schnur]
 	* New module: Enlargegrid [request: Tom Hardy] <- docu missing
+	* setzaxis: set MAX_LINE_LEN from 1024 to 65536 [bug report: Martine Michou]
 	* enlarge: update for zonal and meridional data [request: Wolfgang Mueller]
 	* gradsdes: bug fix for unsorted GRIB data [report: Stefan Bauer]
-	* splitzaxis: generate file name from zaxisID+1 (bug report: Martina Stockhaus)
+	* splitzaxis: generate file name from zaxisID+1 [bug report: Martina Stockhaus]
 	* splitgrid:  generate file name from gridID+1
 	* Vardup: bug fix for missing values
 	* Timsort: bug fix for time constant fields

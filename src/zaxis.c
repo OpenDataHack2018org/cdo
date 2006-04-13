@@ -27,6 +27,8 @@
 
 #define UNDEFID -1
 
+#define MAX_LINE_LEN 65536
+
 
 typedef struct {
   double *vals;
@@ -151,13 +153,13 @@ static char *skipSeparator(char *pline)
 int zaxisFromFile(FILE *gfp)
 {
   static char func[] = "zaxisFromFile";
-  char line[1024], *pline;
+  char line[MAX_LINE_LEN], *pline;
   int zaxisID;
   ZAXIS zaxis;
 
   zaxisInit(&zaxis);
 
-  while ( readline(gfp, line, 1024) )
+  while ( readline(gfp, line, MAX_LINE_LEN) )
     {
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
@@ -224,7 +226,7 @@ int zaxisFromFile(FILE *gfp)
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >levels<");
 			  break;
@@ -259,7 +261,7 @@ int zaxisFromFile(FILE *gfp)
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >vct<");
 			  break;
@@ -294,7 +296,7 @@ int zaxisFromFile(FILE *gfp)
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >lbounds<");
 			  break;
@@ -329,7 +331,7 @@ int zaxisFromFile(FILE *gfp)
 		  pline = skipSeparator(pline);
 		  if ( strlen(pline) == 0 )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >ubounds<");
 			  break;
@@ -385,7 +387,7 @@ int cdoDefineZaxis(const char *zaxisfile)
 
 void defineZaxis(const char *zaxisarg)
 {
-  char zaxisfile[1024];
+  char zaxisfile[4096];
   int nfile = 0;
 
   while ( getoptname(zaxisfile, zaxisarg, nfile++) == 0 )

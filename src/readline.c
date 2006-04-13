@@ -25,7 +25,11 @@ int readline(FILE *fp, char *line, int len)
     {
       if ( ichar == '\n' ) break;
       line[ipos++] = ichar;
-      if ( ipos >= len ) break;
+      if ( ipos >= len )
+	{
+	  fprintf(stderr, "readline Warning: end of line not found (maxlen = %d)!\n", len);
+	  break;
+	}
     }
   line[ipos] = 0;
 

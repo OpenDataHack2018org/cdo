@@ -49,6 +49,9 @@ void extClose(int fileID);
 
 #define UNDEFID -1
 
+#define MAX_LINE_LEN 65536
+
+
 typedef struct {
   double *xvals;
   double *yvals;
@@ -513,7 +516,7 @@ double *readfield4(GRID *grid, int record, char *format, char *filename)
 int gridFromFile(FILE *gfp, const char *dname)
 {
   static char func[] = "gridFromFile";
-  char line[1024], *pline;
+  char line[MAX_LINE_LEN], *pline;
   /* char path[4096]; */
   int gridID = -1;
   int size;
@@ -521,7 +524,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
   gridInit(&grid);
 
-  while ( readline(gfp, line, 1024) )
+  while ( readline(gfp, line, MAX_LINE_LEN) )
     {
       if ( line[0] == '#' ) continue;
       if ( line[0] == '\0' ) continue;
@@ -882,7 +885,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  grid.yvals = (double *) malloc(grid.size*sizeof(double));
 	  for ( i = 0; i < (int) grid.size; i++ )
 	    {
-	      if ( ! readline(gfp, line, 1024) )
+	      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 		{
 		  Warning(func, "Incomplete commmand: >gridlatlon<");
 		  break;
@@ -914,7 +917,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >xvals<");
 			  break;
@@ -951,7 +954,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >yvals<");
 			  break;
@@ -988,7 +991,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >xbounds<");
 			  break;
@@ -1028,7 +1031,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  fval = strtod(pline, &endptr);
 		  if ( pline == endptr )
 		    {
-		      if ( ! readline(gfp, line, 1024) )
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
 			  Warning(func, "Incomplete commmand: >ybounds<");
 			  break;
@@ -1809,7 +1812,7 @@ int cdoDefineGrid(const char *gridfile)
 
 void defineGrid(const char *gridarg)
 {
-  char gridfile[1024];
+  char gridfile[4096];
   int nfile = 0;
 
   while ( getoptname(gridfile, gridarg, nfile++) == 0 )

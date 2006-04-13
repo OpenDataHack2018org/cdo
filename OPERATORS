@@ -7,99 +7,46 @@ Operator catalog:
 -------------------------------------------------------------
    Information
 -------------------------------------------------------------
-      Info       info            File information
-      Info       infov           File information
-      Info       map             Print simple map
-      Sinfo      sinfo           Short file information
-      Sinfo      sinfov          Short file information
-      Diff       diff            Differences of two files
-      Diff       diffv           Differences of two files
+      Info       info            Dataset information
+      Info       map             Dataset information and simple map
+      Sinfo      sinfo           Short dataset information
+      Diff       diff            Compare two datasets
+      Ninfo      ncode           Number of codes
+      Ninfo      nvar            Number of variables
+      Ninfo      nlevel          Number of levels
       Ninfo      nyear           Number of years
       Ninfo      nmon            Number of months
       Ninfo      ndate           Number of dates
       Ninfo      ntime           Number of timesteps
-      Ninfo      ncode           Number of codes
-      Ninfo      nvar            Number of variables
-      Ninfo      nlevel          Number of levels
+      Showinfo   showcode        Show codes
+      Showinfo   showvar         Show variable names
+      Showinfo   showlevel       Show levels
       Showinfo   showyear        Show years
       Showinfo   showmon         Show months
       Showinfo   showdate        Show dates
       Showinfo   showtime        Show timesteps
-      Showinfo   showcode        Show codes
-      Showinfo   showvar         Show variable names
-      Showinfo   showlevel       Show levels
       Filedes    vardes          Variable description
       Filedes    griddes         Grid description
       Filedes    vct             Vertical coordinate table
 -------------------------------------------------------------
    File operations
 -------------------------------------------------------------
-      Copy       copy            Copy files
-      Cat        cat             Concatenate files
+      Copy       copy            Copy datasets
+      Copy       cat             Concatenate datasets
       Replace    replace         Replace variables
-      Merge      merge           Merge files
+      Merge      merge           Merge datasets with different fields
+      Merge      mergetime       Merge datasets sorted by date and time
       Split      splitcode       Split codes
       Split      splitvar        Split variables
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split zaxis
+      Split      splitrec        Split records
       Splittime  splithour       Split hours
       Splittime  splitday        Split days
       Splittime  splitmon        Split months
       Splittime  splitseas       Split seasons
-      Splityear  splityear       Split years
-      Splitrec   splitrec        Split records
--------------------------------------------------------------
-   Formatted I/O
--------------------------------------------------------------
-      Output     output          ASCII output
-      Output     outputf         Formatted output
-      Output     outputint       Integer output
-      Output     outputsrv       SERVICE output
-      Output     outputext       EXTRA output
--------------------------------------------------------------
-   Generation of variables
--------------------------------------------------------------
-      Vargen     const           Constant variable
-      Vargen     random          Variable with random values
-      Vardup     vardup          Duplicate variables
-      Vardup     varmul          Multiply variables
--------------------------------------------------------------
-   Manipulating the header/field
--------------------------------------------------------------
-      Set        setpartab       Set parameter table
-      Set        setcode         Set code
-      Set        setvar          Set variable name
-      Set        setlevel        Set level
-      Settime    setdate         Set date
-      Settime    settime         Set time
-      Settime    setday          Set day
-      Settime    setmon          Set month
-      Settime    setyear         Set year
-      Settime    settunits       Set time units
-      Settime    settaxis        Set time axis
-      Settime    setreftime      Set reference time
-      Settime    setcalendar     Set calendar
-      Settime    shifttime       Shift timesteps
-      Change     chcode          Change code
-      Change     chvar           Change variable name
-      Change     chlevel         Change level
-      Change     chlevelc        Change level of one code
-      Change     chlevelv        Change level of one variable
-      Setgrid    setgrid         Set grid
-      Setgrid    setgridtype     Set grid type
-      Setzaxis   setzaxis        Set zaxis
-      Setgatt    setgatt         Set global attribute
-      Setgatt    setgatts        Set global attributes
-      Invert     invertlat       Invert latitude
-      Invert     invertlon       Invert longitude
-      Invert     invertlatdes    Invert latitude decription
-      Invert     invertlondes    Invert longitude decription
-      Invert     invertlatdata   Invert latitude data
-      Invert     invertlondata   Invert longitude data
-      Maskbox    masklonlatbox   Mask lon/lat box
-      Maskbox    maskindexbox    Mask index box
-      Enlarge    enlarge         Enlarge
+      Splittime  splityear       Split years
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
@@ -113,40 +60,78 @@ Operator catalog:
       Select     selzaxis        Select zaxis
       Select     selzaxisname    Select zaxis by name
       Select     seltabnum       Select parameter table number
-      Selrec     selrec          Select records
-      Seltime    seltimestep     Select timesteps
+      Select     selrec          Select records
+      Seltime    seltimestep     Select time steps
       Seltime    seltime         Select times
       Seltime    selhour         Select hours
       Seltime    selday          Select days
       Seltime    selmon          Select months
-      Seltime    selseas         Select seasons
       Seltime    selyear         Select years
+      Seltime    selseas         Select seasons
       Seltime    seldate         Select dates
       Selbox     sellonlatbox    Select lon/lat box
       Selbox     selindexbox     Select index box
 -------------------------------------------------------------
-   Missing values
+   Modification
 -------------------------------------------------------------
+      Set        setpartab       Set parameter table
+      Set        setcode         Set code number
+      Set        setvar          Set variable name
+      Set        setlevel        Set level
+      Settime    setdate         Set date
+      Settime    settime         Set time
+      Settime    setday          Set day
+      Settime    setmon          Set month
+      Settime    setyear         Set year
+      Settime    settunits       Set time units
+      Settime    settaxis        Set time axis
+      Settime    setreftime      Set reference time
+      Settime    setcalendar     Set calendar
+      Settime    shifttime       Shift time steps
+      Change     chcode          Change code number
+      Change     chvar           Change variable name
+      Change     chlevel         Change level
+      Change     chlevelc        Change level of one code
+      Change     chlevelv        Change level of one variable
+      Setgrid    setgrid         Set grid
+      Setgrid    setgridtype     Set grid type
+      Setzaxis   setzaxis        Set zaxis
+      Setgatt    setgatt         Set global attribute
+      Setgatt    setgatts        Set global attributes
+      Invert     invertlat       Invert latitude
+      Invert     invertlon       Invert longitude
+      Invert     invertlatdes    Invert latitude description
+      Invert     invertlondes    Invert longitude description
+      Invert     invertlatdata   Invert latitude data
+      Invert     invertlondata   Invert longitude data
+      Maskbox    masklonlatbox   Mask lon/lat box
+      Maskbox    maskindexbox    Mask index box
+      Enlarge    enlarge         Enlarge fields
       Setmiss    setmissval      Set a new missing value
       Setmiss    setctomiss      Set constant to missing value
       Setmiss    setmisstoc      Set missing value to constant
       Setmiss    setrtomiss      Set range to missing value
 -------------------------------------------------------------
-   Sorting
--------------------------------------------------------------
-      Timsort    timsort         Sort over the time
--------------------------------------------------------------
-   Arithmetic processor
+   Arithmetic
 -------------------------------------------------------------
       Exprf      expr            Evaluate expressions
       Exprf      exprf           Evaluate expressions from script file
--------------------------------------------------------------
-   Arithmetic
--------------------------------------------------------------
-      Arithc     addc            Add by constant
-      Arithc     subc            Subtract by constant
-      Arithc     mulc            Multiply by constant
-      Arithc     divc            Divide by constant
+      Math       abs             Absolute value
+      Math       sqr             Square
+      Math       sqrt            Square root
+      Math       exp             Exponential
+      Math       ln              Natural logarithm
+      Math       log10           Base 10 logarithm
+      Math       sin             Sine
+      Math       cos             Cosine
+      Math       tan             Tangent
+      Math       asin            Arc sine
+      Math       acos            Arc cosine
+      Math       atan            Arc tangent
+      Arithc     addc            Add a constant
+      Arithc     subc            Subtract a constant
+      Arithc     mulc            Multiply with a constant
+      Arithc     divc            Divide by a constant
       Arith      add             Add two fields
       Arith      sub             Subtract two fields
       Arith      mul             Multiply two fields
@@ -162,28 +147,14 @@ Operator catalog:
       Arithdays  muldpy          Multiply with days per year
       Arithdays  divdpy          Divide by days per year
 -------------------------------------------------------------
-   Mathematical functions
--------------------------------------------------------------
-      Math       sqr             Square
-      Math       sqrt            Square root
-      Math       exp             Exp
-      Math       log             Logarithm
-      Math       log10           Logarithm base 10
-      Math       sin             Sine
-      Math       cos             Cosine
-      Math       tan             Tangent
-      Math       asin            Arcus sine
-      Math       acos            Arcus cosine
-      Math       atan            Arcus tangent
--------------------------------------------------------------
-   Comparisons
+   Comparison
 -------------------------------------------------------------
       Comp       eq              Equal
       Comp       ne              Not equal
       Comp       le              Less equal
-      Comp       lt              Less then
+      Comp       lt              Less than
       Comp       ge              Greater equal
-      Comp       gt              Greater then
+      Comp       gt              Greater than
       Compc      eqc             Equal constant
       Compc      nec             Not equal constant
       Compc      lec             Less equal constant
@@ -191,7 +162,7 @@ Operator catalog:
       Compc      gec             Greater equal constant
       Compc      gtc             Greater then constant
 -------------------------------------------------------------
-   Conditions
+   Condition
 -------------------------------------------------------------
       Cond       ifthen          If then
       Cond       ifnotthen       If not then
@@ -199,8 +170,15 @@ Operator catalog:
       Condc      ifthenc         If then constant
       Condc      ifnotthenc      If not then constant
 -------------------------------------------------------------
-   Statistical description of the data
+   Statistical values
 -------------------------------------------------------------
+      Ensstat    ensmin          Ensemble minimum
+      Ensstat    ensmax          Ensemble maximum
+      Ensstat    enssum          Ensemble sum
+      Ensstat    ensmean         Ensemble mean
+      Ensstat    ensavg          Ensemble average
+      Ensstat    ensstd          Ensemble standard deviation
+      Ensstat    ensvar          Ensemble variance
       Fldstat    fldmin          Field minimum
       Fldstat    fldmax          Field maximum
       Fldstat    fldsum          Field sum
@@ -228,42 +206,48 @@ Operator catalog:
       Vertstat   vertmean        Vertical mean
       Vertstat   vertavg         Vertical average
       Vertstat   vertstd         Vertical standard deviation
-      Timstat    timmin          Time minimum
-      Timstat    timmax          Time maximum
-      Timstat    timsum          Time sum
-      Timstat    timmean         Time mean
-      Timstat    timavg          Time average
-      Timstat    timstd          Time standard deviation
-      Timstat    hourmin         Hourly minimum
-      Timstat    hourmax         Hourly maximum
-      Timstat    hoursum         Hourly sum
-      Timstat    hourmean        Hourly mean
-      Timstat    houravg         Hourly average
-      Timstat    hourstd         Hourly standard deviation
-      Timstat    daymin          Daily minimum
-      Timstat    daymax          Daily maximum
-      Timstat    daysum          Daily sum
-      Timstat    daymean         Daily mean
-      Timstat    dayavg          Daily average
-      Timstat    daystd          Daily standard deviation
-      Timstat    monmin          Monthly minimum
-      Timstat    monmax          Monthly maximum
-      Timstat    monsum          Monthly sum
-      Timstat    monmean         Monthly mean
-      Timstat    monavg          Monthly average
-      Timstat    monstd          Monthly standard deviation
-      Timstat    yearmin         Yearly minimum
-      Timstat    yearmax         Yearly maximum
-      Timstat    yearsum         Yearly sum
-      Timstat    yearmean        Yearly mean
-      Timstat    yearavg         Yearly average
-      Timstat    yearstd         Yearly standard deviation
       Selstat    selmin          Time range minimum
       Selstat    selmax          Time range maximum
       Selstat    selsum          Time range sum
       Selstat    selmean         Time range mean
       Selstat    selavg          Time range average
       Selstat    selstd          Time range standard deviation
+      Runstat    runmin          Running minimum
+      Runstat    runmax          Running maximum
+      Runstat    runsum          Running sum
+      Runstat    runmean         Running mean
+      Runstat    runavg          Running average
+      Runstat    runstd          Running standard deviation
+      Timstat    timmin          Time minimum
+      Timstat    timmax          Time maximum
+      Timstat    timsum          Time sum
+      Timstat    timmean         Time mean
+      Timstat    timavg          Time average
+      Timstat    timstd          Time standard deviation
+      Hourstat   hourmin         Hourly minimum
+      Hourstat   hourmax         Hourly maximum
+      Hourstat   hoursum         Hourly sum
+      Hourstat   hourmean        Hourly mean
+      Hourstat   houravg         Hourly average
+      Hourstat   hourstd         Hourly standard deviation
+      Daystat    daymin          Daily minimum
+      Daystat    daymax          Daily maximum
+      Daystat    daysum          Daily sum
+      Daystat    daymean         Daily mean
+      Daystat    dayavg          Daily average
+      Daystat    daystd          Daily standard deviation
+      Monstat    monmin          Monthly minimum
+      Monstat    monmax          Monthly maximum
+      Monstat    monsum          Monthly sum
+      Monstat    monmean         Monthly mean
+      Monstat    monavg          Monthly average
+      Monstat    monstd          Monthly standard deviation
+      Yearstat   yearmin         Yearly minimum
+      Yearstat   yearmax         Yearly maximum
+      Yearstat   yearsum         Yearly sum
+      Yearstat   yearmean        Yearly mean
+      Yearstat   yearavg         Yearly average
+      Yearstat   yearstd         Yearly standard deviation
       Seasstat   seasmin         Seasonally minimum
       Seasstat   seasmax         Seasonally maximum
       Seasstat   seassum         Seasonally sum
@@ -285,19 +269,6 @@ Operator catalog:
       Yseasstat  yseasmean       Multi-year seasonally mean
       Yseasstat  yseasavg        Multi-year seasonally average
       Yseasstat  yseasstd        Multi-year seasonally standard deviation
-      Runstat    runmin          Running minimum
-      Runstat    runmax          Running maximum
-      Runstat    runsum          Running sum
-      Runstat    runmean         Running mean
-      Runstat    runavg          Running average
-      Runstat    runstd          Running standard deviation
-      Ensstat    ensmin          Ensemble minimum
-      Ensstat    ensmax          Ensemble maximum
-      Ensstat    enssum          Ensemble sum
-      Ensstat    ensmean         Ensemble mean
-      Ensstat    ensavg          Ensemble average
-      Ensstat    ensstd          Ensemble standard deviation
-      Ensstat    ensvar          Ensemble variance
 -------------------------------------------------------------
    Regression
 -------------------------------------------------------------
@@ -307,19 +278,22 @@ Operator catalog:
 -------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------
-      Remap      remapcon        Conservative remapping
-      Remap      remapbil        Bilinear interpolation
-      Remap      remapbic        Bicubic interpolation
-      Remap      remapdis        Distance-weighted averaging
-      Remap      gencon          Generate conservative interpolation weights
-      Remap      remap           Remapping
+      Interpolate remapbil        Bilinear interpolation
+      Interpolate remapbic        Bicubic interpolation
+      Interpolate remapcon        Conservative remapping
+      Interpolate remapdis        Distance-weighted averaging
+      Genweights genbil          Generate bilinear interpolation weights
+      Genweights genbic          Generate bicubic interpolation weights
+      Genweights gencon          Generate conservative interpolation weights
+      Genweights gendis          Generate distance-weighted averaging weights
+      Remap      remap           SCRIP grid remapping
       Intgrid    interpolate     Interpolate
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation
       Inttime    inttime         Time interpolation
       Intyear    intyear         Year interpolation
 -------------------------------------------------------------
-   Spectral transformation
+   Transformation
 -------------------------------------------------------------
       Spectral   sp2gp           Spectral to gridpoint
       Spectral   sp2gpl          Spectral to gridpoint linear
@@ -327,9 +301,21 @@ Operator catalog:
       Spectral   gp2spl          Gridpoint to spectral linear
       Spectral   sp2sp           Spectral to spectral
       Spectral   spcut           Cut spectral wave number
+      Wind       uv2dv           U and V wind to divergence and vorticity
+      Wind       dv2uv           Divergence and vorticity to U and V wind
 -------------------------------------------------------------
-   Other
+   Miscellaneous
 -------------------------------------------------------------
+      Timsort    timsort         Sort over the time
+      Output     output          ASCII output
+      Output     outputf         Formatted output
+      Output     outputint       Integer output
+      Output     outputsrv       SERVICE output
+      Output     outputext       EXTRA output
+      Vargen     const           Create a constant field
+      Vargen     random          Field with random values
+      Vardup     vardup          Duplicate variables
+      Vardup     varmul          Multiply variables
       Gradsdes   gradsdes        GrADS data descriptor file
       Gradsdes   gradsdes2       GrADS data descriptor file (version 2 map)
       Rotuv      rotuvb          Backward rotation
