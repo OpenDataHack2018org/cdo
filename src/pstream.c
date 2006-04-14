@@ -338,7 +338,9 @@ int pstreamOpenRead(const char *argument)
       pstreamptr->rthreadID = pthread_self();
       pstreamptr->pipe   = pipeNew();
  
-      fprintf(stderr, "%s: Started child process \"%s\".\n", processInqPrompt(), newarg+1);
+      if ( ! cdoSilentMode )
+	fprintf(stderr, "%s: Started child process \"%s\".\n", processInqPrompt(), newarg+1);
+
       /*
       if ( PTHREAD_Debug )
 	{
@@ -1047,9 +1049,10 @@ void cdoFinish(void)
   nvars = processInqVarNum();
   ntimesteps = processInqTimesteps();
 
-  fprintf(stderr, "%s : Processed %d variable%s %d timestep%s.",
-	  processInqPrompt(), nvars, nvars > 1 ? "s" : "",
-	  ntimesteps, ntimesteps > 1 ? "s" : "");
+  if ( ! cdoSilentMode )
+    fprintf(stderr, "%s : Processed %d variable%s %d timestep%s.",
+	    processInqPrompt(), nvars, nvars > 1 ? "s" : "",
+	    ntimesteps, ntimesteps > 1 ? "s" : "");
 
   processStartTime(&s_utime, &s_stime);
   cdoProcessTime(&e_utime, &e_stime);
@@ -1084,7 +1087,10 @@ void cdoFinish(void)
   if ( cdoBenchmark )
     fprintf(stderr, " ( %.2fs %.2fs %.2fs %s)\n", c_usertime, c_systime, c_cputime, memstring);
   else
-    fprintf(stderr, " ( %.2fs %s)\n", c_cputime, memstring);
+    {
+      if ( ! cdoSilentMode )
+	fprintf(stderr, " ( %.2fs %s)\n", c_cputime, memstring);
+    }
 
   if ( cdoBenchmark && processID == 0 )
     fprintf(stderr, "total: user %.2fs  sys %.2fs  cpu %.2fs  mem%s\n",

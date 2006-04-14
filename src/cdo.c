@@ -61,6 +61,7 @@ int cdoDefaultTimeType  = CDI_UNDEFID;
 int cdoDefaultByteorder = CDI_UNDEFID;
 int cdoDefaultTableID   = CDI_UNDEFID;
 
+int cdoSilentMode  = FALSE;
 int cdoRegulargrid = FALSE;
 int cdoBenchmark   = FALSE;
 int cdoTimer       = FALSE;
@@ -117,6 +118,7 @@ static void usage(void)
   fprintf(stderr, "                   (4/8 for nc, nc2, srv, ext, ieg; 1/2/3 for grb)\n");
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
   fprintf(stderr, "    -r             Convert from absolute to relative time axis\n");
+  fprintf(stderr, "    -s             Silent mode\n");
   fprintf(stderr, "    -t <partab>    Parameter table name or file\n");
   fprintf(stderr, "                   Predefined tables: ");
   for ( id = 0; id < tableInqNumber(); id++ )
@@ -220,6 +222,7 @@ static void cdoSetDebug(int level)
 #endif
 }
 
+
 static int cdoOptind = 1;
 static char *cdoOptarg;
 
@@ -270,11 +273,13 @@ static int cdoGetopt(int argc, char * const argv[], const char *optstring)
   return (optval);
 }
 
+
 #undef  IsBigendian
 #define IsBigendian()  ( u_byteorder.c[sizeof(long) - 1] )
 
 #define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
 #define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */
+
 
 static void setDefaultDataType(char *datatypestr)
 {
@@ -324,6 +329,7 @@ static void setDefaultDataType(char *datatypestr)
     }
 }
 
+
 void setDefaultFileType(char *filetypestr, int labort)
 {
   if ( filetypestr )
@@ -362,12 +368,14 @@ void setDefaultFileType(char *filetypestr, int labort)
     }
 }
 
+
 int cdoFiletype(void)
 {
   if ( cdoDefaultFileType == CDI_UNDEFID )
     {
-      cdoPrint("Set default filetype to GRIB");
       cdoDefaultFileType = FILETYPE_GRB;
+      if ( ! cdoSilentMode )
+	cdoPrint("Set default filetype to GRIB");
     }
 
   return (cdoDefaultFileType);
@@ -405,7 +413,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:p:g:i:l:m:t:D:abdhRrTVvz")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:p:g:i:l:m:t:D:abdhRrsTVvz")) != -1 )
     {
       switch (c)
 	{
@@ -449,6 +457,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'r':
 	  cdoDefaultTimeType = TAXIS_RELATIVE;
+	  break;
+	case 's':
+	  cdoSilentMode = TRUE;
 	  break;
 	case 'T':
 	  cdoTimer = TRUE;

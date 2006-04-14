@@ -51,6 +51,7 @@ extern int cdoDefaultByteorder;
 extern int cdoDefaultTableID;
 extern int cdoDefaultInstID;
 
+extern int cdoSilentMode;
 extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;
