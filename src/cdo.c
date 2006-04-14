@@ -102,7 +102,7 @@ static void usage(void)
   fprintf(stderr, "    -a             Convert from relative to absolute time axis\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Grid name or file. Available grids: \n");
-  fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, ni<NI>\n");
+  fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");

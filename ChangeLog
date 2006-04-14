@@ -17,6 +17,7 @@
 	* Selbox, Maskbox, Fldrms, Mergegrid, Zonstat, Merstat, Output: check number of different grids
 	* extent macro UNCHANGED_RECORD to cdoDefaultDataType and cdoDefaultByteorder
 	* remove module docu from source code
+	* rename default grid name "ni" to "gme"
 	* add option -s for silent mode [request: Martina Stockhaus]
 	* Version 0.9.13 released
 

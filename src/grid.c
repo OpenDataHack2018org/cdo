@@ -1444,6 +1444,30 @@ int gridFromName(const char *gridname)
 	  grid.def_yfirst = TRUE;
 	}
     }
+  else if ( gridname[0] == 'g' && gridname[1] == 'm' && gridname[2] == 'e' ) /* gme<NI> */
+    {
+      pline = &gridname[3];
+      if ( isdigit((int) *pline) )
+	{
+	  grid.type = GRID_GME;
+	  grid.ni   = atoi(pline);
+	  grid.nd   = 10;
+	  factorni(grid.ni, &grid.ni2, &grid.ni3);
+	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
+	}
+    }
+  else if ( gridname[0] == 'n' && gridname[1] == 'i' ) /* ni<NI> */
+    {
+      pline = &gridname[2];
+      if ( isdigit((int) *pline) )
+	{
+	  grid.type = GRID_GME;
+	  grid.ni   = atoi(pline);
+	  grid.nd   = 10;
+	  factorni(grid.ni, &grid.ni2, &grid.ni3);
+	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
+	}
+    }
   else if ( gridname[0] == 'g' ) /* g<LON>x<LAT> */
     {
       pline = &gridname[1];
@@ -1457,24 +1481,13 @@ int gridFromName(const char *gridname)
 	  while ( isdigit((int) *pline) ) pline++;
 	}
     }
-  else if ( gridname[0] == 'n' && gridname[1] == 'i' )
-    {
-      pline = &gridname[2];
-      if ( isdigit((int) *pline) )
-	{
-	  grid.type = GRID_GME;
-	  grid.ni   = atoi(pline);
-	  grid.nd   = 10;
-	  factorni(grid.ni, &grid.ni2, &grid.ni3);
-	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
-	}
-    }
 
   if ( grid.type != -1 )
     gridID = gridDefine(grid);
 
   return (gridID);
 }
+
 
 static void nce(int istat)
 {
