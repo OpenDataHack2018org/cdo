@@ -119,7 +119,7 @@ void *Fldstat(void *argument)
 
 	  field.grid = vlistInqVarGrid(vlistID1, varID);
 	  field.size = gridInqSize(field.grid);
-	  if ( field.grid != lastgrid )
+	  if ( needWeights && field.grid != lastgrid )
 	    {
 	      lastgrid = field.grid;
 	      if ( needWeights ) gridWeights(field.grid, field.weight);

@@ -157,6 +157,7 @@ void *Setgrid(void *argument)
 	  else if ( gridtype == GRID_CELL )        gridID2 = gridToCell(gridID1);
 	  else cdoAbort("%s grid unsupported!", gridname);
 
+	  /*	  gridCompress(gridID2); */
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
 	}
     }

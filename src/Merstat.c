@@ -50,6 +50,7 @@ void *Merstat(void *argument)
   int lim;
   int ndiffgrids;
   int taxisID1, taxisID2;
+  int needWeights = FALSE;
   FIELD field1, field2;
 
   cdoInitialize(argument);
@@ -64,6 +65,10 @@ void *Merstat(void *argument)
  
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  if ( operfunc == func_mean || operfunc == func_avg ||
+       operfunc == func_var  || operfunc == func_std )
+    needWeights = TRUE;
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -102,7 +107,9 @@ void *Merstat(void *argument)
 
   lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double *) malloc(lim*sizeof(double));
-  field1.weight = (double *) malloc(lim*sizeof(double));
+  field1.weight = NULL;
+  if ( needWeights )
+    field1.weight = (double *) malloc(lim*sizeof(double));
 
   field2.ptr  = (double *) malloc(nlonmax*sizeof(double));
   field2.grid = gridID2;
@@ -120,7 +127,7 @@ void *Merstat(void *argument)
 	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  if ( field1.grid != lastgrid )
+	  if ( needWeights && field1.grid != lastgrid )
 	    {
 	      lastgrid = field1.grid;
 	      gridWeights(field1.grid, field1.weight);

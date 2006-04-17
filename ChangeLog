@@ -12,6 +12,7 @@
 	* splitgrid:  generate file name from gridID+1
 	* Vardup: bug fix for missing values
 	* Timsort: bug fix for time constant fields
+	* Merstat: call gridWeights only if needed
 	* Math: rename log to ln
 	* Change help info format
 	* Selbox, Maskbox, Fldrms, Mergegrid, Zonstat, Merstat, Output: check number of different grids
