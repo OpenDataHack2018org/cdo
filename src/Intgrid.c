@@ -53,7 +53,7 @@ void *Intgrid(void *argument)
 
   cdoInitialize(argument);
 
-  INTGRID     = cdoOperatorAdd("intgrid", 0, 0, NULL);
+  INTGRID     = cdoOperatorAdd("intgridbil", 0, 0, NULL);
   INTPOINT    = cdoOperatorAdd("intpoint", 0, 0, NULL);
   INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
 

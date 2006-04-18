@@ -153,7 +153,7 @@ void *Zonstat(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"inputsrv", "inputext"}
-#define  IntgridOperators       {"intgrid", "intpoint", "interpolate", "intarea"}
+#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
 #define  IntyearOperators       {"intyear"}
@@ -337,27 +337,28 @@ static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
 
 static char *opalias[][2] =
 {
-  {"anomaly",             "ymonsub"  },
-  {"ggstat",              "info"     },
-  {"ggstats",             "sinfo"    },
-  {"globavg",             "fldavg"   },
-  {"gp2sp2",              "gp2spl"   },
-  {"sp2gp2",              "sp2gpl"   },
-  {"infos",               "sinfo"    },
-  {"log",                 "ln"       },
-  {"lmean",               "ymonmean" },
-  {"lmmean",              "ymonmean" },
-  {"lmavg",               "ymonavg"  },
-  {"lmstd",               "ymonstd"  },
-  {"lsmean",              "yseasmean"},
-  {"remaplin",            "remapbil" },
-  {"remapcub",            "remapbic" },
-  {"remapbilinear",       "remapbil" },
-  {"remapbicubic",        "remapbic" },
-  {"remapconservative",   "remapcon" },
-  {"remapdistance",       "remapdis" },
-  {"sort",                "timsort"  },
-  {"vinfos",              "sinfov"   },
+  {"anomaly",             "ymonsub"    },
+  {"ggstat",              "info"       },
+  {"ggstats",             "sinfo"      },
+  {"globavg",             "fldavg"     },
+  {"gp2sp2",              "gp2spl"     },
+  {"sp2gp2",              "sp2gpl"     },
+  {"infos",               "sinfo"      },
+  {"intgrid",             "intgridbil" },
+  {"log",                 "ln"         },
+  {"lmean",               "ymonmean"   },
+  {"lmmean",              "ymonmean"   },
+  {"lmavg",               "ymonavg"    },
+  {"lmstd",               "ymonstd"    },
+  {"lsmean",              "yseasmean"  },
+  {"remaplin",            "remapbil"   },
+  {"remapcub",            "remapbic"   },
+  {"remapbilinear",       "remapbil"   },
+  {"remapbicubic",        "remapbic"   },
+  {"remapconservative",   "remapcon"   },
+  {"remapdistance",       "remapdis"   },
+  {"sort",                "timsort"    },
+  {"vinfos",              "sinfov"     },
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
