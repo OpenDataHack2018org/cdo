@@ -305,7 +305,7 @@ void *Sinfo(void *argument)
 		}
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "latitude  : first = %.9g  last = %.9g", latfirst, latlast);
-	      if ( !DBL_IS_EQUAL(latinc, 0) )
+	      if ( !DBL_IS_EQUAL(latinc, 0) && gridtype == GRID_LONLAT )
 		fprintf(stdout, "  inc = %.9g", latinc);
 	      fprintf(stdout, "\n");
 

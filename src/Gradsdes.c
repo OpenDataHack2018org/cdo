@@ -702,6 +702,8 @@ void *Gradsdes(void *argument)
   ysize  = gridInqYsize(gridID);
   yfirst = gridInqYval(gridID, 0);
   yinc   = gridInqYinc(gridID);
+  if ( gridtype == GRID_GAUSSIAN ) yinc = 0;
+
   if ( DBL_IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
     {
       yvals = (double *) malloc(ysize*sizeof(double));
