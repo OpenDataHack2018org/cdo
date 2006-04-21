@@ -138,6 +138,7 @@ void *Mastrfu(void *argument)
   vlistDefVarCode(vlistID2, 0, 272);
   vlistDefVarName(vlistID2, 0, "mastrfu");
   vlistDefVarLongname(vlistID2, 0, "mass stream function");
+  vlistDefVarUnits(vlistID2, 0, "kg/s");
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));

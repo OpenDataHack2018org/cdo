@@ -12,6 +12,7 @@
 	* splitgrid:  generate file name from gridID+1
 	* Vardup: bug fix for missing values
 	* Timsort: bug fix for time constant fields
+	* Mastrfu: set units to [kg/s] [report: Rita Seiffert]
 	* Merstat: call gridWeights only if needed
 	* Vertint: use args2fltlist to read parameter list
 	* Math: rename log to ln
