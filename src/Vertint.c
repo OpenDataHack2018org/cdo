@@ -33,6 +33,7 @@
 #include "pstream.h"
 #include "functs.h"
 #include "vinterp.h"
+#include "list.h"
 
 
 void *Vertint(void *argument)
@@ -66,6 +67,7 @@ void *Vertint(void *argument)
   char *envstring;
   int Extrapolate = 0;
   int taxisID1, taxisID2;
+  LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
@@ -88,10 +90,8 @@ void *Vertint(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  nplev = operatorArgc();
-  plev  = (double *) malloc(nplev*sizeof(double));
-  for ( i = 0; i < nplev; i++ )
-    plev[i] = atof(operatorArgv()[i]);
+  nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
+  plev  = (double *) listArrayPtr(flist);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -381,7 +381,8 @@ void *Vertint(void *argument)
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
   if ( vct        ) free(vct);
-  if ( plev       ) free(plev);
+
+  listDelete(flist);
 
   cdoFinish();
 

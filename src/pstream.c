@@ -1076,7 +1076,8 @@ void cdoFinish(void)
 	  muindex++;
 	}
 
-      sprintf(memstring, " %ld%c ", memmax, mu[muindex]);
+      if ( memmax )
+	sprintf(memstring, " %ld%c ", memmax, mu[muindex]);
 
       processEndTime(&p_usertime, &p_systime);
       p_cputime  = p_usertime + p_systime;

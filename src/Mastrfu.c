@@ -124,7 +124,7 @@ void *Mastrfu(void *argument)
 
   gridID = vlistInqVarGrid(vlistID1, 0);
   if ( gridInqXsize(gridID) > 1 )
-    cdoAbort("Grid muss be a zonal mean!");
+    cdoAbort("Grid must be a zonal mean!");
 
   gridsize = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);

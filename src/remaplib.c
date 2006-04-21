@@ -111,6 +111,8 @@ void remapGridFree(REMAPGRID *rg)
       free(rg->bin_lats);
       free(rg->bin_lons);
     }
+  else
+    fprintf(stderr, "remapGridFree Warning: grid not initialized!\n");
 
 } /* remapGridFree */
 
@@ -130,6 +132,8 @@ void remapVarsFree(REMAPVARS *rv)
       for ( i = 0; i < 4; i++ )
 	if ( rv->wts[i] ) free(rv->wts[i]);
     }
+  else
+    fprintf(stderr, "remapVarsFree Warning: vars not initialized!\n");
 
 } /* remapVarsFree */
 

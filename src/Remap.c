@@ -527,8 +527,11 @@ void *Remap(void *argument)
   if ( grad1_lon ) free(grad1_lon);
   if ( grad1_lat ) free(grad1_lat);
 
-  remapVarsFree(&remaps[r].vars);
-  remapGridFree(&remaps[r].grid);
+  for ( r = 0; r < nremaps; r++ )
+    {
+      remapVarsFree(&remaps[r].vars);
+      remapGridFree(&remaps[r].grid);
+    }
 
   if ( remaps ) free(remaps);
 

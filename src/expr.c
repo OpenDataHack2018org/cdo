@@ -217,7 +217,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       p->gridID  = p1->gridID;
       p->zaxisID = p1->zaxisID;
       p->missval = p1->missval;
-      if ( nlev2 != 1 ) cdoAbort("nlev2 = %d muss be 1!", nlev2);
+      if ( nlev2 != 1 ) cdoAbort("nlev2 = %d must be 1!", nlev2);
     }
   else if ( nlev2 > nlev1 )
     {
@@ -225,7 +225,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       p->gridID  = p2->gridID;
       p->zaxisID = p2->zaxisID;
       p->missval = p2->missval;
-      if ( nlev1 != 1 ) cdoAbort("nlev1 = %d muss be 1!", nlev1);
+      if ( nlev1 != 1 ) cdoAbort("nlev1 = %d must be 1!", nlev1);
     }
   else
     {
