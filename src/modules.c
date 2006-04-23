@@ -152,7 +152,7 @@ void *Zonstat(void *argument);
 #define  GradsdesOperators      {"gradsdes", "gradsdes2", "dumpmap"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
-#define  InputOperators         {"inputsrv", "inputext"}
+#define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
