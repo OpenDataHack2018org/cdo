@@ -36,7 +36,7 @@
 #include "pstream.h"
 
 
-int input_iarray(int nval, int *array)
+static int input_iarray(int nval, int *array)
 {
   int i, n;
   int ival = 0;
@@ -53,7 +53,7 @@ int input_iarray(int nval, int *array)
 }
 
 
-int input_darray(int nval, double *array)
+static int input_darray(int nval, double *array)
 {
   int i, n;
   int ival = 0;
