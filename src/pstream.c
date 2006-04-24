@@ -644,6 +644,9 @@ void pstreamClose(int pstreamID)
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
+  if ( pstreamptr == NULL )
+    Error(func, "Internal problem stream %d not open!", pstreamID);
+
   if ( pstreamptr->ispipe )
     {
 #if  defined  (HAVE_LIBPTHREAD)

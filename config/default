@@ -47,12 +47,6 @@ case "${HOSTNAME}" in
                     --with-netcdf=/client \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
-# sparc-sun-solaris2.6
-    regen | gardiken)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN \
-                    --with-netcdf=/pf/m/m214089/local/SUN \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
-	;;
 # sparc-sun-solaris2.8
     xxf)
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN \
@@ -62,7 +56,7 @@ case "${HOSTNAME}" in
 # sparc-sun-solaris2.9
     executor | yang | yin)
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN64 \
-                    --with-netcdf=/pf/m/m214089/yang/local/SunOS64 \
+                    --with-netcdf=/scratch/small/m214/m214089/local/SunOS64 \
                     CC=cc CFLAGS="-g -mt -fast -xtarget=native -xarch=v9a"
 	;;
 # sx6-nec-superux12.2

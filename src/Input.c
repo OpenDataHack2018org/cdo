@@ -18,11 +18,6 @@
 /*
    This module contains the following operators:
 
-*/
-
-/*
-   This module contains the following operators:
-
       Input     input          ASCII input
       Input     inputsrv       SERVICE input
       Input     inputext       EXTRA input
@@ -82,7 +77,7 @@ void *Input(void *argument)
   int nrecs;
   int levelID;
   int tsID, taxisID = 0;
-  int streamID = 0;
+  int streamID = -1;
   int vlistID;
   int nmiss = 0;
   int code = 0, code0 = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
@@ -130,6 +125,9 @@ void *Input(void *argument)
 	  cdoPrint("Enter all %d elements of record %d!\n", gridsize, nrecs+1);
 	  
 	  rval = input_darray(gridsize, array);
+	  if ( feof(stdin) && nrecs == 0 )
+	    cdoAbort("To few input elements (%d of %d)!", rval, gridsize);
+
 	  if ( feof(stdin) ) break;
 	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
 	}
@@ -141,6 +139,8 @@ void *Input(void *argument)
 		   " of record %d (or EOF(=^D))!\n", nrecs+1);
 
 	  rval = input_iarray(4, ihead);
+	  if ( feof(stdin) && nrecs == 0 )
+	    cdoAbort("To few header elements (%d of %d)!", rval, 4);
 	  if ( feof(stdin) ) break;
 	  if ( rval != 4 ) cdoAbort("Invalid header input!");
 
@@ -183,6 +183,8 @@ void *Input(void *argument)
 		   " of record %d (or EOF(=^D))!\n", nrecs+1);
 
 	  rval = input_iarray(8, ihead);
+	  if ( feof(stdin) && nrecs == 0 )
+	    cdoAbort("To few header elements (%d of %d)!", rval, 8);
 	  if ( feof(stdin) ) break;
 	  if ( rval != 8 ) cdoAbort("Invalid header input!");
 
@@ -255,7 +257,7 @@ void *Input(void *argument)
       tsID++;
     }
 
-  streamClose(streamID);
+  if ( streamID >= 0 ) streamClose(streamID);
 
   if ( array ) free(array);
 

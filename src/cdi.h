@@ -110,15 +110,15 @@ void    cdiDefCompress(int level);
 
 /* STREAM control routines */
 
-/*      streamOpenRead: Open a file for reading */
-int     streamOpenRead(const char *filename);
+/*      streamOpenRead: Open a dataset for reading */
+int     streamOpenRead(const char *path);
 
-/*      streamOpenWrite: Open a file for writing */
-int     streamOpenWrite(const char *filename, int filetype);
+/*      streamOpenWrite: Create a new dataset */
+int     streamOpenWrite(const char *path, int filetype);
 
-int     streamOpenAppend(const char *filename);
+int     streamOpenAppend(const char *path);
 
-/*      streamClose: Close an Open file */
+/*      streamClose: Close an open dataset */
 void    streamClose(int streamID);
 
 /*      streamDefVlist: Define the Vlist for a stream */
@@ -236,12 +236,12 @@ int     vlistInqVarGrid(int vlistID, int varID);
 int     vlistInqVarZaxis(int vlistID, int varID);
 int     vlistInqVarTime(int vlistID, int varID);
 
-/*      vlistDefVarCode: Define the Code number of a variable */
+/*      vlistDefVarCode: Define the code number of a Variable */
 void    vlistDefVarCode(int vlistID, int varID, int code);
 
 int     vlistInqVarCode(int vlistID, int varID);
 
-/*      vlistDefVarDatatype: Define the data type of a variable */
+/*      vlistDefVarDatatype: Define the data type of a Variable */
 void    vlistDefVarDatatype(int vlistID, int varID, int datatype);
 
 int     vlistInqVarDatatype(int vlistID, int varID);
@@ -253,12 +253,12 @@ int     vlistInqVarModel(int vlistID, int varID);
 void    vlistDefVarTable(int vlistID, int varID, int tableID);
 int     vlistInqVarTable(int vlistID, int varID);
 
-/*      vlistDefVarName: Define the name of a variable */
+/*      vlistDefVarName: Define the name of a Variable */
 void    vlistDefVarName(int vlistID, int varID, const char *name);
 
 void    vlistInqVarName(int vlistID, int varID, char *name);
 
-/*      vlistDefVarLongname: Define the long name of a variable */
+/*      vlistDefVarLongname: Define the long name of a Variable */
 void    vlistDefVarLongname(int vlistID, int varID, const char *longname);
 
 void    vlistDefVarStdname(int vlistID, int varID, const char *stdname);
@@ -266,12 +266,12 @@ void    vlistDefVarStdname(int vlistID, int varID, const char *stdname);
 void    vlistInqVarLongname(int vlistID, int varID, char *longname);
 void    vlistInqVarStdname(int vlistID, int varID, char *stdname);
 
-/*      vlistDefVarUnits: Define the units of a variable */
+/*      vlistDefVarUnits: Define the units of a Variable */
 void    vlistDefVarUnits(int vlistID, int varID, const char *units);
 
 void    vlistInqVarUnits(int vlistID, int varID, char *units);
 
-/*      vlistDefVarMissval: Define the missing value of a variable */
+/*      vlistDefVarMissval: Define the missing value of a Variable */
 void    vlistDefVarMissval(int vlistID, int varID, double missval);
 
 double  vlistInqVarMissval(int vlistID, int varID);
@@ -300,22 +300,25 @@ int     vlistFindLevel(int vlistID, int fvarID, int flevelID);
 void    gridName(int gridtype, char *gridname);
 char   *gridNamePtr(int gridtype);
 
+void    gridCompress(int gridID);
+
+void    gridDefMask(int gridID, int *mask);
+int     gridInqMask(int gridID, int *mask);
+
+void    gridPrint(int gridID);
+int     gridSize(void);
+
 /*      gridNew: Create a new Grid */
 int     gridNew(int gridtype, int size);
+
+/*      gridDuplicate: Duplicate a Grid */
+int     gridDuplicate(int gridID);
 
 /*      gridInqType: Get the type of a Grid */
 int     gridInqType(int gridID);
 
 /*      gridInqSize: Get the size of a Grid */
 int     gridInqSize(int gridID);
-
-/*      gridDuplicate: Duplicate a Grid */
-int     gridDuplicate(int gridID);
-
-void    gridCompress(int gridID);
-
-void    gridPrint(int gridID);
-int     gridSize(void);
 
 /*      gridDefXsize: Define the size of a X-axis */
 void    gridDefXsize(int gridID, int xsize);
@@ -337,10 +340,6 @@ int     gridInqXvals(int gridID, double *xvals);
 
 /*      gridDefYvals: Define the values of a Y-axis */
 void    gridDefYvals(int gridID, double *yvals);
-
-int     gridInqMask(int gridID, int *mask);
-
-void    gridDefMask(int gridID, int *mask);
 
 /*      gridInqYvals: Get all values of a Y-axis */
 int     gridInqYvals(int gridID, double *yvals);
@@ -608,6 +607,7 @@ int     tableInqModel(int tableID);
 
 void    tableInqPar(int tableID, int code, char *name, char *longname, char *units);
 
+int     tableInqParCode(int tableID, char *name, int *code);
 int     tableInqParName(int tableID, int code, char *name);
 int     tableInqParLongname(int tableID, int code, char *longname);
 int     tableInqParUnits(int tableID, int code, char *units);

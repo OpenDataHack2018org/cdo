@@ -41,7 +41,7 @@ void *Splitrec(void *argument)
   int varID2, levelID2;
   int vlistID1, vlistID2;
   char *filesuffix;
-  char filename[1024];
+  char filename[4096];
   int index;
   int lcopy = FALSE;
   int gridsize;
@@ -84,8 +84,8 @@ void *Splitrec(void *argument)
 	  vlistCopyFlag(vlistID2, vlistID1);
 
 	  index++;
-	  sprintf(filename+nchars, "%05d", index);
-	  sprintf(filename+nchars+5, "%s", filesuffix);
+	  sprintf(filename+nchars, "%06d", index);
+	  sprintf(filename+nchars+6, "%s", filesuffix);
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
