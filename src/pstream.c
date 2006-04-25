@@ -668,7 +668,9 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
 	  pthread_cond_signal(pipe->tsInq);
-
+	 
+	  pthread_cond_signal(pipe->recInq);
+	 
 	  pthread_mutex_lock(pipe->mutex);
 	  pstreamptr->isopen = FALSE;
 	  pthread_mutex_unlock(pipe->mutex);     

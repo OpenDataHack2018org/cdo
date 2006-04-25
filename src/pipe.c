@@ -405,6 +405,7 @@ void pipeDefRecord(PSTREAM *pstreamptr, int varID, int levelID)
   while ( pipe->recIDr < pipe->recIDw )
     {
       if ( pipe->tsIDw != pipe->tsIDr ) break;
+      if ( pipe->EOP == TRUE ) break;
       if ( PipeDebug ) Message(func, "%s wait of recInq %d", pname, pipe->recIDr);
       pthread_cond_wait(pipe->recInq, pipe->mutex);
     }

@@ -21,6 +21,7 @@
 	* Change help info format
 	* Selbox, Maskbox, Mergegrid, Zonstat, Merstat: check number of different grids
 	* extent macro UNCHANGED_RECORD to cdoDefaultDataType and cdoDefaultByteorder
+	* pipeDefRecord, pstreamClose bug fix for seltimestep in pipes
 	* remove module docu from source code
 	* rename default grid name "ni" to "gme"
 	* rename operator intgrid to intgridbil

@@ -172,8 +172,8 @@ void *Zonstat(void *argument);
 #define  OutputgmtOperators     {"outputcenter", "outputbounds", "outputboundscpt"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RemapOperators         {"remap"}
-#define    InterpolateOperators {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
-#define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
+#define  RemapgridHelpOperators {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
+#define  GenweightsOperators    {"gencon", "genbil", "genbic", "gendis"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runstd"}
@@ -259,7 +259,7 @@ static MODULES Modules[] =
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
   { Histogram,      NULL,              HistogramOperators,      1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
-  { Input,          NULL,              InputOperators,          0,  1 },
+  { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,    1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,        1,  1 },
@@ -278,7 +278,7 @@ static MODULES Modules[] =
   { Outputgmt,      NULL,              OutputgmtOperators,      1,  0 },
   { Pinfo,          NULL,              PinfoOperators,          1,  1 },
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
-  { Remap,          InterpolateHelp,   InterpolateOperators,    1,  1 },
+  { Remap,          RemapgridHelp,     RemapgridHelpOperators,  1,  1 },
   { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,        2,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,          1,  1 },
@@ -321,7 +321,7 @@ static MODULES Modules[] =
   { Vardup,         VardupHelp,        VardupOperators,         1,  1 },
   { Vargen,         VargenHelp,        VargenOperators,         0,  1 },
   { Varrms,         NULL,              VarrmsOperators,         2,  1 },
-  { Vertint,        VertintHelp,       VertintOperators,        1,  1 },
+  { Vertint,        IntvertHelp,       VertintOperators,        1,  1 },
   { Vertstat,       VertstatHelp,      VertstatOperators,       1,  1 },
   { Wind,           WindHelp,          WindOperators,           1,  1 },
   { Writegrid,      NULL,              WritegridOperators,      1,  1 },  /* no cdi output */

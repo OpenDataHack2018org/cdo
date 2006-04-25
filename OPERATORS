@@ -17,14 +17,14 @@ Operator catalog:
       Ninfo      nyear           Number of years
       Ninfo      nmon            Number of months
       Ninfo      ndate           Number of dates
-      Ninfo      ntime           Number of timesteps
+      Ninfo      ntime           Number of time steps
       Showinfo   showcode        Show codes
       Showinfo   showvar         Show variable names
       Showinfo   showlevel       Show levels
       Showinfo   showyear        Show years
       Showinfo   showmon         Show months
       Showinfo   showdate        Show dates
-      Showinfo   showtime        Show timesteps
+      Showinfo   showtime        Show time steps
       Filedes    vardes          Variable description
       Filedes    griddes         Grid description
       Filedes    vct             Vertical coordinate table
@@ -138,6 +138,7 @@ Operator catalog:
       Arith      div             Divide two fields
       Arith      min             Minimum of two fields
       Arith      max             Maximum of two fields
+      Arith      atan2           Arc tangent of two fields
       Ymonarith  ymonadd         Add multi-year monthly time averages
       Ymonarith  ymonsub         Subtract multi-year monthly time averages
       Ymonarith  ymonmul         Multiply multi-year monthly time averages
@@ -278,16 +279,17 @@ Operator catalog:
 -------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------
-      Interpolate remapbil        Bilinear interpolation
-      Interpolate remapbic        Bicubic interpolation
-      Interpolate remapcon        Conservative remapping
-      Interpolate remapdis        Distance-weighted averaging
+      Remapgrid  remapbil        Bilinear interpolation
+      Remapgrid  remapbic        Bicubic interpolation
+      Remapgrid  remapcon        Conservative remapping
+      Remapgrid  remapdis        Distance-weighted averaging
       Genweights genbil          Generate bilinear interpolation weights
       Genweights genbic          Generate bicubic interpolation weights
       Genweights gencon          Generate conservative interpolation weights
       Genweights gendis          Generate distance-weighted averaging weights
       Remap      remap           SCRIP grid remapping
-      Intgrid    interpolate     Interpolate
+      Intgrid    interpolate     PINGO grid interpolation
+      Intgrid    intgridbil      Bilinear grid interpolation
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation
       Inttime    inttime         Time interpolation
@@ -300,20 +302,25 @@ Operator catalog:
       Spectral   gp2sp           Gridpoint to spectral
       Spectral   gp2spl          Gridpoint to spectral linear
       Spectral   sp2sp           Spectral to spectral
-      Spectral   spcut           Cut spectral wave number
       Wind       uv2dv           U and V wind to divergence and vorticity
       Wind       dv2uv           Divergence and vorticity to U and V wind
 -------------------------------------------------------------
-   Miscellaneous
+   Formatted I/O
 -------------------------------------------------------------
-      Timsort    timsort         Sort over the time
+      Input      input           ASCII input
+      Input      inputsrv        SERVICE input
+      Input      inputext        EXTRA input
       Output     output          ASCII output
       Output     outputf         Formatted output
       Output     outputint       Integer output
       Output     outputsrv       SERVICE output
       Output     outputext       EXTRA output
+-------------------------------------------------------------
+   Miscellaneous
+-------------------------------------------------------------
+      Timsort    timsort         Sort over the time
       Vargen     const           Create a constant field
-      Vargen     random          Field with random values
+      Vargen     random          Create field with random values
       Vardup     vardup          Duplicate variables
       Vardup     varmul          Multiply variables
       Gradsdes   gradsdes        GrADS data descriptor file
