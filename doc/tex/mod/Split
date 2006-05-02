@@ -1,0 +1,92 @@
+@BeginModule
+@NewPage
+@Name      = Split
+@Title     = Split a dataset
+@Section   = File operations
+@Class     = File operation
+@Arguments = ifile oprefix
+@Operators = splitcode splitvar splitlevel splitgrid splitzaxis splitrec
+
+@BeginDescription
+This module splits a dataset to several files with names
+formed from the field header information and @file{oprefix}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_splitcode
+@Title     = Split codes
+
+@BeginDescription
+Splits a dataset into pieces, one for each different code number.
+Appends three digits with the code number to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitvar
+@Title     = Split variables
+
+@BeginDescription
+Splits a dataset into pieces, one for each variable name.
+Appends a string with the variable name to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitlevel
+@Title     = Split levels
+
+@BeginDescription
+Splits a dataset into pieces, one for each different level.
+Appends six digits with the level to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitgrid
+@Title     = Split grids
+
+@BeginDescription
+Splits a dataset into pieces, one for each different grid.
+Appends two digits with the grid number to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitzaxis
+@Title     = Split zaxis
+
+@BeginDescription
+Splits a dataset into pieces, one for each different zaxis.
+Appends two digits with the zaxis number to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitrec
+@Title     = Split records
+
+@BeginDescription
+Splits a dataset into pieces, one for each record.
+Appends six digits with the record number to @file{oprefix} to 
+form the output file names.
+@EndDescription
+
+
+@BeginExample
+Assumed the input GRIB dataset has 3 variables, e.g. code number 129, 130 and 139.
+To split this dataset into 3 pieces, one for each code number use:
+@BeginVerbatim
+   cdo splitcode ifile code
+@EndVerbatim
+Result of '{\tt dir code*}':
+@BeginVerbatim
+   code129.grb code130.grb code139.grb
+@EndVerbatim
+@EndExample

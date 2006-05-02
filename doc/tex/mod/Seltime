@@ -1,0 +1,125 @@
+@BeginModule
+@NewPage
+@Name      = Seltime
+@Title     = Select time steps
+@Section   = Selection
+@Class     = Selection
+@Arguments = ifile ofile
+@Operators = seltimestep seltime selhour selday selmon selyear selseas seldate
+
+@BeginDescription
+This module selects some time steps from @file{ifile} and write the result to @file{ofile}.
+Which time steps are selected depends on the actual operator name and the parameters.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_seltimestep
+@Title     = Select time steps
+@Parameter = timesteps
+
+@BeginDescription
+Selects all time steps with a time step in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seltime
+@Title     = Select times
+@Parameter = times
+
+@BeginDescription
+Selects all time steps with a time in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selhour
+@Title     = Select hours
+@Parameter = hours
+
+@BeginDescription
+Selects all time steps with a hour in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selday
+@Title     = Select days
+@Parameter = days
+
+@BeginDescription
+Selects all time steps with a day in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selmon
+@Title     = Select months
+@Parameter = months
+
+@BeginDescription
+Selects all time steps with a month in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selyear
+@Title     = Select years
+@Parameter = years
+
+@BeginDescription
+Selects all time steps with a year in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selseas
+@Title     = Select seasons
+@Parameter = seasons
+
+@BeginDescription
+Selects all time steps with a month of a season in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seldate
+@Title     = Select dates
+@Parameter = date1 [date2]
+
+@BeginDescription
+Selects all time steps with a date in a user given range.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = timesteps
+INTEGER  Comma separated list of time steps
+@Item = times
+STRING   Comma separated list of times (format HH:MM)
+@Item = hours
+INTEGER  Comma separated list of hours
+@Item = days
+INTEGER  Comma separated list of days
+@Item = months
+INTEGER  Comma separated list of months
+@Item = years
+INTEGER  Comma separated list of years
+@Item = seasons
+STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
+@Item = date1
+STRING   Start date (format YYYY-MM-DD)
+@Item = date2
+STRING   End date (format YYYY-MM-DD)
+@EndParameter
+
+
+#@BeginExample
+#@BeginVerbatim
+#   cdo seltimestep,6/8
+#   cdo selmon,6/8
+#   cdo selseas,JJA
+#@EndVerbatim
+#@EndExample

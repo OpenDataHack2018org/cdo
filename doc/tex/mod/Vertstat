@@ -1,0 +1,77 @@
+@BeginModule
+@NewPage
+@Name      = Vertstat
+@Title     = Vertical statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = vertmin vertmax vertsum vertmean vertavg vertstd
+
+@BeginDescription
+This module computes statistical values over all levels of the input variables.
+According to actual operator name the vertical minimum, maximum, sum, average, 
+standard deviation or variance is written to @file{ofile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_vertmin
+@Title     = Vertical minimum
+
+@BeginDescription
+For every gridpoint the minimum over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertmax
+@Title     = Vertical maximum
+
+@BeginDescription
+For every gridpoint the maximum over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertsum
+@Title     = Vertical sum
+
+@BeginDescription
+For every gridpoint the sum over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertmean
+@Title     = Vertical mean
+
+@BeginDescription
+For every gridpoint the mean over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertavg
+@Title     = Vertical average
+
+@BeginDescription
+For every gridpoint the average over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertstd
+@Title     = Vertical standard deviation
+
+@BeginDescription
+For every gridpoint the standard deviation over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the vertical sum of all input variables, use:
+@BeginVerbatim
+   cdo vertsum ifile ofile
+@EndVerbatim
+@EndExample

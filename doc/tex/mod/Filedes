@@ -1,0 +1,83 @@
+@BeginModule
+@NewPage
+@Name      = Filedes
+@Title     = Dataset description
+@Section   = Information
+@Class     = Information
+@Arguments = ifile
+@Operators = vardes griddes vct
+
+@BeginDescription
+This module prints, according to the actual operator name, the description
+of the variables, the grids or the vertical coordinate table.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_vardes
+@Title     = Variable description
+
+@BeginDescription
+Prints a table with a description of all variables.
+For each variable the operator print in one line the
+code, name, description and units.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_griddes
+@Title     = Grid description
+
+@BeginDescription
+Prints the description of all grids in a file.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vct
+@Title     = Vertical coordinate table
+
+@BeginDescription
+Prints the vertical coordinate table.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+Assumed the input dataset has 3 variables with the name geosp, t and tslm1.
+To print the description of these variables use:
+@BeginVerbatim
+   cdo vardes ifile
+@EndVerbatim
+Result:
+@BeginVerbatim
+   129  geosp         surface geopotential (orography) [m^2/s^2]
+   130  t             temperature [K]
+   139  tslm1         surface temperature of land [K]
+@EndVerbatim
+Assumed all variables of the dataset are on a T21 gausssian grid.
+To print the description of this grid use:
+@BeginVerbatim
+   cdo griddes ifile
+@EndVerbatim
+Result:
+@BeginVerbatim
+   gridtype  : gaussian
+   gridsize  : 2048
+   xname     : lon
+   xlongname : longitude
+   xunits    : degrees_east
+   yname     : lat
+   ylongname : latitude
+   yunits    : degrees_north
+   xsize     : 64
+   ysize     : 32
+   xfirst    : 0
+   xinc      : 5.625
+   yvals     : 85.76058 80.26877 74.74454 69.21297 63.67863 58.1429 52.6065
+               47.06964 41.53246 35.99507 30.4575 24.91992 19.38223 13.84448
+               8.306702 2.768903 -2.768903 -8.306702 -13.84448 -19.38223
+               -24.91992 -30.4575 -35.99507 -41.53246 -47.06964 -52.6065
+               -58.1429 -63.67863 -69.21297 -74.74454 -80.26877 -85.76058
+@EndVerbatim
+@EndExample

@@ -1,0 +1,139 @@
+@BeginModule
+@NewPage
+@Name      = Daystat
+@Title     = Daily statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = daymin daymax daysum daymean dayavg daystd
+
+@BeginDescription
+This module computes statistical values over time steps of the same day.
+Depending on the actual operator name the minimum, maximum, sum, average
+or standard deviation of time steps of the same day is written to @file{ofile}.
+The date information for a time step in @file{ofile} is the date of the last 
+contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_daymin
+@Title     = Daily minimum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = min{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_daymax
+@Title     = Daily maximum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = max{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_daysum
+@Title     = Daily sum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = sum{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_daymean
+@Title     = Daily mean
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = mean{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_dayavg
+@Title     = Daily average
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = avg{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_daystd
+@Title     = Daily standard deviation
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = std{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the daily mean of a time series, use:
+@BeginVerbatim
+   cdo daymean ifile ofile
+@EndVerbatim
+@EndExample

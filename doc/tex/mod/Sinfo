@@ -1,0 +1,69 @@
+@BeginModule
+@NewPage
+@Name      = Sinfo
+@Title     = Short info
+@Section   = Information
+@Class     = Information
+@Arguments = ifile
+@Operators = sinfo -sinfov sinfop
+
+@BeginDescription
+This module writes information about the structure of all input datasets to 
+standard output. The information displayed depends on the actual operator name.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_sinfo
+@Title     = Short dataset information
+
+@BeginDescription
+Prints short information of a dataset. The information is divided into
+4 sections. Section 1 prints for each variable in one line the:
+@BeginItemize
+@Item = institute and source
+@Item = parameter table and code number
+@Item = horizontal grid size and number
+@Item = number of vertical levels and zaxis number
+@EndItemize
+Section 2 and 3 gives a short overview of all horizontal and vertical grids.
+And the last section contains short information of the time axis.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sinfov
+@Title     = Short dataset information
+
+@BeginDescription
+The same as operator @oper{sinfo} but using the name instead of the code number
+and parameter table to identify the variables.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To print short information of a dataset use:
+@BeginVerbatim
+   cdo sinfo ifile
+@EndVerbatim
+This is the result of an ECHAM5 dataset with 3 variables and 12 time steps:
+@BeginVerbatim
+    -1 : Institut Source  Table Code   Time   Typ  Grid Size Num  Levels Num
+     1 : MPIMET   ECHAM5.3  128  129 constant R4       2048   1       1   1
+     2 : MPIMET   ECHAM5.3  128  130 variable R4       2048   1       4   2
+     3 : MPIMET   ECHAM5.3  128  139 variable R4       2048   1       1   1
+   Horizontal grids :
+     1 : gaussian     > size      : dim = 2048  nlon = 64  nlat = 32
+                        longitude : first = 0  last = 354.375  inc = 5.625
+                        latitude  : first = 85.7605871  last = -85.7605871
+   Vertical grids :
+     1 : surface                 : 0
+     2 : pressure             Pa : 92500 85000 50000 20000
+   Time axis :  12 steps
+   YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM
+   1987-01-31 12:00   1987-02-28 12:00   1987-03-31 12:00   1987-04-30 12:00
+   1987-05-31 12:00   1987-06-30 12:00   1987-07-31 12:00   1987-08-31 12:00
+   1987-09-30 12:00   1987-10-31 12:00   1987-11-30 12:00   1987-12-31 12:00
+@EndVerbatim
+@EndExample

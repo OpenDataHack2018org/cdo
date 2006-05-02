@@ -1,0 +1,139 @@
+@BeginModule
+@NewPage
+@Name      = Hourstat
+@Title     = Hourly statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = hourmin hourmax hoursum hourmean houravg hourstd
+
+@BeginDescription
+This module computes statistical values over time steps of the same hour.
+Depending on the actual operator name the minimum, maximum, sum, average 
+or standard deviation of time steps of the same hour is written to @file{ofile}.
+The date information for a time step in @file{ofile} is the date of the last 
+contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_hourmin
+@Title     = Hourly minimum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = min{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_hourmax
+@Title     = Hourly maximum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = max{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_hoursum
+@Title     = Hourly sum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = sum{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_hourmean
+@Title     = Hourly mean
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = mean{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_houravg
+@Title     = Hourly average
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = avg{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_hourstd
+@Title     = Hourly standard deviation
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = std{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the hourly mean of a time series, use:
+@BeginVerbatim
+   cdo hourmean ifile ofile
+@EndVerbatim
+@EndExample

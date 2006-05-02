@@ -1,0 +1,84 @@
+@BeginModule
+@NewPage
+@Name      = Ninfo
+@Title     = Print numbers
+@Section   = Information
+@Class     = Information
+@Arguments = ifile
+@Operators = ncode nvar nlevel nyear nmon ndate ntime
+@EndModule
+
+
+@BeginOperator_ncode
+@Title     = Number of codes
+
+@BeginDescription
+Prints the number of variables with different code numbers.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_nvar
+@Title     = Number of variables
+
+@BeginDescription
+Prints the number of variables with different names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_nlevel
+@Title     = Number of levels
+
+@BeginDescription
+Prints the number of levels for each variable.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_nyear
+
+@Title     = Number of years
+@BeginDescription
+Prints the number of different years.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_nmon
+@Title     = Number of months
+
+@BeginDescription
+Prints the number of different combinations of years and months.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ndate
+@Title     = Number of dates
+
+@BeginDescription
+Prints the number of different dates.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ntime
+@Title     = Number of time steps
+
+@BeginDescription
+Prints the number of time steps.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To print the number of variables in a dataset use:
+@BeginVerbatim
+   cdo nvar ifile
+@EndVerbatim
+To print the number of month in a dataset use:
+@BeginVerbatim
+   cdo nmon ifile
+@EndVerbatim
+@EndExample

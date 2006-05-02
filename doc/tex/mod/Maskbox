@@ -1,0 +1,72 @@
+@BeginModule
+@NewPage
+@Name      = Maskbox
+@Title     = Masks a box
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = masklonlatbox maskindexbox
+
+@BeginDescription
+Masks a box of the rectangular understood field. The elements inside 
+the box are untouched, the elements outside are set to missing value.
+All input fields must have the same horizontal grid.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_masklonlatbox
+@Title     = Mask lon/lat box
+@Parameter = lon1 lon2 lat1 lat2
+
+@BeginDescription
+Masks a longitude/latitude box. The user has to give the 
+longitudes and latitudes of the edges of the box.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_maskindexbox
+@Title     = Mask index box
+@Parameter = idx1 idx2 idy1 idy2
+
+@BeginDescription
+Masks an index box. The user has to give the indexes of the 
+edges of the box. The index of the left edge may be greater 
+then that of the right edge.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter idx1
+@Item = lon1
+FLOAT    Western longitude
+@Item = lon2
+FLOAT    Eastern longitude
+@Item = lat1
+FLOAT    Southern or northern latitude
+@Item = lat2
+FLOAT    Northern or southern latitude
+@Item = idx1
+INTEGER  Index of first longitude
+@Item = idx2
+INTEGER  Index of last longitude
+@Item = idy1
+INTEGER  Index of first latitude
+@Item = idy2
+INTEGER  Index of last latitude
+@EndParameter
+
+
+@BeginExample
+To mask the region with the longitudes from 120E to 90W and
+latitudes from 20N to 20S on all input fields use:
+@BeginVerbatim
+   cdo masklonlatbox,120,-90,20,-20 ifile ofile
+@EndVerbatim
+If the input dataset has fields on a T21 gaussian grid, the same box can
+be masked with @oper{maskindexbox} by:
+@BeginVerbatim
+   cdo maskindexbox,23,48,13,20 ifile ofile
+@EndVerbatim
+@EndExample

@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+S1=$1
+S2=$2
+if [ -z $S1 ] ; then
+  echo "missing arg 1"
+  exit
+fi
+if [ -z $S2 ] ; then
+  echo "missing arg 2"
+  exit
+fi
+#
+  FILES=`ls [A-Z]* 2> /dev/null`
+  for FILE in $FILES ; do
+    grep -c $S1 $FILE > /dev/null
+    status=$?
+    if [ $status -eq 0 ] ; then
+      echo "  change file : $FILE"
+      mv $FILE $FILE.bak
+      sed -e "s/$1/$2/g" < $FILE.bak > $FILE
+    fi
+  done
+#
+exit

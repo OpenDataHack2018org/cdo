@@ -1,0 +1,26 @@
+@BeginModule
+@NewPage
+@Name      = Histogram
+@Title     = Histogram
+@Section   = Other
+@Class     = Other
+@Arguments = ifile ofile
+@Operators = histcount histsum histmean
+@EndModule
+
+
+@BeginOperator_histsum
+
+@Title     = Histogram sum
+@Parameter = bins
+
+@BeginDescription
+Only usable for 2D fields.
+@EndDescription
+
+@BeginParameter bins
+@Item = bins
+FLOAT  Bounds of the bins (minimum 2 values)
+@EndParameter
+
+@EndOperator

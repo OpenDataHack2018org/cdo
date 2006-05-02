@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+#set -xe
+FILE=$1
+MAP=orthox
+#
+if [ $MAP == "ortho" ] ; then
+  PROJ=-JG-20/60/19
+else
+  PROJ=-JN1/20
+fi
+#
+#cdo outputbounds $FILE > tmp1
+cp $FILE tmp1
+#
+gmtset PAPER_MEDIA = Custom_500x170
+#
+pscoast -P -JG-20/60/5.6 -Rg   -B0g30 -Dc -G150/150/150 -K -X0.1 -Y0.1  > plot.ps
+psxy    -P -JG-20/60/5.6 -Rg -M tmp1 -W2p,cyan          -O -K >> plot.ps
+pscoast -P -JN1/11 -Rg   -B0g30 -Dc -G150/150/150 -O -K -X6 >> plot.ps
+psxy    -P -JN1/11 -Rg -M tmp1 -W2p,cyan          -O  >> plot.ps
+#
+rm -f tmp1

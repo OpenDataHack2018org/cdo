@@ -1,0 +1,140 @@
+@BeginModule
+@NewPage
+@Name      = Ensstat
+@Title     = Statistical values over an ensemble
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifiles ofile
+@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensvar
+
+@BeginDescription
+This module computes statistical values over an ensemble of input files.
+Depending on the actual operator name the minimum, maximum, sum, average
+or standard deviation over all input files is written to @file{ofile}.
+The date information for a time step in @file{ofile} is the date of the
+first input file.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_ensmin
+@Title     = Ensemble minimum
+
+@BeginDescription
+@IfMan
+o(t,x) = min{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf min}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+@BeginOperator_ensmax
+@Title     = Ensemble maximum
+
+@BeginDescription
+@IfMan
+o(t,x) = max{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf max}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_enssum
+@Title     = Ensemble sum
+
+@BeginDescription
+@IfMan
+o(t,x) = sum{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf sum}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ensmean
+@Title     = Ensemble mean
+
+@BeginDescription
+@IfMan
+o(t,x) = mean{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf mean}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ensavg
+@Title     = Ensemble average
+
+@BeginDescription
+@IfMan
+o(t,x) = avg{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf avg}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ensvar
+@Title     = Ensemble variance
+
+@BeginDescription
+@IfMan
+o(t,x) = var{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf var}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ensstd
+@Title     = Ensemble standard deviation
+
+@BeginDescription
+@IfMan
+o(t,x) = std{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf std}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the ensemble mean over 6 input files, use:
+@BeginVerbatim
+   cdo ensmean ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
+@EndVerbatim
+Or shorter with filename substitution:
+@BeginVerbatim
+   cdo ensmean ifile[1-6] ofile
+@EndVerbatim
+@EndExample

@@ -1,0 +1,25 @@
+@BeginModule
+@Name      = Setzaxis
+@Title     = Set zaxis type
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = setzaxis
+@EndModule
+
+
+@BeginOperator_setzaxis
+@Title     = Set zaxis
+@Parameter = zaxis
+
+@BeginDescription
+This operator sets the zaxis description of all variables with the
+same number of level as the new zaxis.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = zaxis
+STRING  Zaxis description file or name of the target zaxis
+@EndParameter

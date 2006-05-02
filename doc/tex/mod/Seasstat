@@ -1,0 +1,147 @@
+@BeginModule
+@NewPage
+@Name      = Seasstat
+@Title     = Seasonally statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = seasmin seasmax seassum seasmean seasavg seasstd
+
+@BeginDescription
+This module computes statistical values over time steps of the same season.
+Depending on the actual operator name the minimum, maximum, sum, average 
+or standard deviation of time steps of the same season is written to @file{ofile}.
+The date information for a time step in @file{ofile} is the date of the last 
+contributing time step in @file{ifile}. Be careful about the first and
+the last output time step, they may be incorrect values if the seasons
+have incomplete time steps.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_seasmin
+@Title     = Seasonally minimum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+
+o(t,x) = min{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seasmax
+@Title     = Seasonally maximum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+
+o(t,x) = max{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seassum
+@Title     = Seasonally sum
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+
+o(t,x) = sum{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seasmean
+@Title     = Seasonally mean
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+
+o(t,x) = mean{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seasavg
+@Title     = Seasonally average
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+
+o(t,x) = avg{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seasstd
+@Title     = Seasonally standard deviation
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+
+o(t,x) = std{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the seasonally mean of a time series, use:
+@BeginVerbatim
+   cdo seasmean ifile ofile
+@EndVerbatim
+@EndExample

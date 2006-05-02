@@ -1,0 +1,138 @@
+\section{Usage}
+
+This section descibes how to use CDO.
+The syntax is:
+\begin{verbatim}
+   cdo  [Options]  [Operators]
+\end{verbatim}
+
+
+\subsection{Options}
+
+All options musst be pleace before the first operator.
+The following options are available for all operators:
+
+\begin{tabbing}
+\makebox[1.5in][l]{\hspace*{1cm}\sl -a}
+         \= Convert from relative to absolute time axis. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -f $<$format$>$}
+         \> Set the output file format. The valid file formats are: \\
+         \> \parbox[r]{3in}{
+              \vspace*{1mm}
+              \hspace*{0cm}\begin{tabular}{|l|l|}
+              \hline
+              \rowcolor[gray]{.9}
+              {\bf File format} & \sl $<$format$>$ \\
+               GRIB version 1   & {\tt grb} \\
+               netCDF           & {\tt nc}  \\
+               netCDF version 2 & {\tt nc2} \\
+               SERVICE          & {\tt srv} \\
+               EXTRA            & {\tt ext} \\
+               IEG              & {\tt ieg} \\
+              \hline
+              \end{tabular}
+              \vspace*{1mm}
+            } \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -g $<$grid$>$}
+         \> Define the default grid description by name or from file. \\
+         \> Available grid names are: {\tt t}$<$RES$>${\tt grid}, {\tt r}$<$NX$>${\tt x}$<$NY$>$, {\tt gme}$<$NI$>$ \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -h}
+         \> Help information for the operators. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -m $<$missval$>$}
+         \> Set the default missing value (default: {\tt-9e+33}). \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -p $<$prec$>$}
+         \> Set the precision of the output data in bytes. The valid precisions \\
+         \> depends on the file format:\\
+         \> \parbox[r]{3in}{
+              \vspace*{1mm}
+              \hspace*{0cm}\begin{tabular}{|l|l|}
+              \hline
+              \rowcolor[gray]{.9}
+                \sl $<$format$>$ & \sl $<$prec$>$ \\
+                {\tt grb}                    & {\tt 1/2/3} \\
+                {\tt nc, nc2, srv, ext, ieg} & {\tt 4/8}   \\
+              \hline
+              \end{tabular}
+              \vspace*{1mm}
+            } \\
+         \> For {\tt srv}, {\tt ext} and {\tt ieg} format a {\tt L} or {\tt B} can be added \\
+         \> to set the byteorder to Little or Big endian. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -R}
+         \> Convert GRIB data from reduced to regular grid. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -r}
+         \> Convert from absolute to relative time axis. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -t $<$partab$>$}
+         \> Set the default parameter table name or file.\\
+         \> Predefined tables are:  {\tt echam4 echam5 mpiom1}\\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -V}
+         \> Print the version number. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -v}
+         \> Print extra details for some operators. \\
+\end{tabbing}
+
+
+\subsection{Operators}
+
+There are more than 250 operators available.
+% See section {\bf \htmlref{Operator catalog}{opercat}} for a short overview of all operators.
+A detailed description of all operators can be found in the
+{\bf \htmlref{Reference Manual}{refman}} section.
+
+
+\subsection{Combining operators}
+
+All operators with one output stream can pipe the result
+directly to an other operator.
+The operator must begin with "-", in order to combine it with others.
+This can improve the performance by:
+\begin{itemize}
+\item reducing unnecessary disk I/O
+\item parallel processing
+\end{itemize}
+Use
+\begin{verbatim}
+   cdo sub -dayavg ifile2 -timavg ifile1 ofile
+\end{verbatim}
+instead of
+\begin{verbatim}
+   cdo timavg ifile1 tmp1
+   cdo dayavg ifile2 tmp2
+   cdo sub tmp2 tmp1 ofile
+   rm tmp1 tmp2
+\end{verbatim}
+
+
+\subsection{Operator parameter}
+
+Some operators needs one or more parameter.
+
+\begin{itemize}
+\item STRING
+
+Unquoted characters without blanks and tabs.
+The following command select variables with the name {\tt pressure} and {\tt tsurf}:
+\begin{verbatim}
+   cdo selvar,pressure,tsurf ifile ofile
+\end{verbatim}
+
+\item FLOAT
+
+Floating point number in any representation.
+The following command sets the range between {\tt 0} and {\tt 273.15}
+of all fields to missing value:
+\begin{verbatim}
+   cdo setrtomiss,0,273.15 ifile ofile
+\end{verbatim}
+
+\item INTEGER
+
+A list of integers can be specified by {\it first/last[/inc]}.
+To select the days 5, 6, 7, 8 and 9 use:
+\begin{verbatim}
+   cdo selday,5/9 ifile ofile
+\end{verbatim}
+This is the same as:
+\begin{verbatim}
+   cdo selday,5,6,7,8,9 ifile ofile
+\end{verbatim}
+\end{itemize}

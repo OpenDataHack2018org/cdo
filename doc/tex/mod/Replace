@@ -1,0 +1,28 @@
+@BeginModule
+@Name      = Replace
+@Title     = Replace variables
+@Section   = File operations
+@Class     = File operation
+@Arguments = ifile1 ifile2 ofile
+@Operators = replace
+@EndModule
+
+
+@BeginOperator_replace
+@Title     = Replace variables
+
+@BeginDescription
+Replaces all variables of @file{ifile2} in @file{ifile1} and write the result to @file{ofile}.
+Both input datasets must have the same number of time steps.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+Assumed the first input dataset @file{ifile1} has 3 variables with the name geosp, t and tslm1
+and the second input dataset @file{ifile2} has only the variable tslm1.
+To replace the variable tslm1 in @file{ifile1} with tslm1 from @file{ifile2} use:
+@BeginVerbatim
+   cdo replace ifile1 ifile2 ofile
+@EndVerbatim
+@EndExample

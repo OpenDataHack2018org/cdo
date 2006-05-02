@@ -1,0 +1,54 @@
+@BeginModule
+@NewPage
+@Name      = Copy
+@Title     = Copy datasets
+@Section   = File operations
+@Class     = File operation
+@Arguments = ifiles ofile
+@Operators = copy cat
+
+@BeginDescription
+This module contains operators to copy or concatenate datasets.
+Each input dataset must have the  same variables with complete time steps.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_copy
+@Title     = Copy datasets
+
+@BeginDescription
+Copies all input datasets to @file{ofile}. 
+@EndDescription
+@EndOperator
+
+@BeginOperator_cat
+@Title     = Concatenate datasets
+
+@BeginDescription
+Concatenates all input datasets and add the result at the end 
+of @file{ofile}. If @file{ofile} does not exist it will be created.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To change the format of a dataset to netCDF use:
+@BeginVerbatim
+   cdo -f nc copy ifile ofile.nc
+@EndVerbatim
+Add the option '-r' to create an relative time axis, if you need the
+resulting netCDF file in GrADS:
+@BeginVerbatim
+   cdo -r -f nc copy ifile ofile.nc
+@EndVerbatim
+To concatenate 3 datasets with different time steps of the same variables use:
+@BeginVerbatim
+   cdo copy ifile1 ifile2 ifile3 ofile
+@EndVerbatim
+If the output dataset already exist and you will extent it 
+with more time steps use:
+@BeginVerbatim
+   cdo cat ifile1 ifile2 ifile3 ofile
+@EndVerbatim
+@EndExample

@@ -1,0 +1,47 @@
+@BeginModule
+@NewPage
+@Name      = Enlarge
+@Title     = Enlarge fields
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = enlarge
+@EndModule
+
+
+@BeginOperator_enlarge
+@Title     = Enlarge fields
+@Parameter = grid
+
+@BeginDescription
+Enlarge all fields of @file{ifile} to a user given grid. Normally only the last 
+field element is used for the enlargement. If however the input and output
+grid are rectangular, a zonal or meridional enlargement is possible.
+Zonal enlargement takes place, if the xsize of the input field is 1 and 
+the ysize of both grids are the same. For meridional enlargement the ysize
+must be 1 and the xsize of both grids must have the same size.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter grid
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
+
+
+@BeginExample
+Assumed you want to add two datasets. The first dataset is on a
+T21 grid (2048 field elements) and the second dataset is only a
+global mean (1 field element).
+Before you can add these two datasets the second dataset must be
+enlarged to the grid size of the first dataset:
+@BeginVerbatim
+   cdo enlarge,t21grid ifile2 tmpfile
+   cdo add ifile1 tmpfile ofile
+@EndVerbatim
+Or shorter with pipes:
+@BeginVerbatim
+   cdo add ifile1 -enlarge,t21grid ifile2 ofile
+@EndVerbatim
+@EndExample

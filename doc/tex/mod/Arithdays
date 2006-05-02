@@ -1,0 +1,73 @@
+@BeginModule
+@NewPage
+@Name      = Arithdays
+@Title     = Arithmetic with days
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile ofile
+@Operators = muldpm divdpm muldpy divdpy
+
+@BeginDescription
+This module multiplies or divides each time step of a dataset with the corresponding
+days per month or days per year.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_muldpm
+@Title     = Multiply with days per month
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) * days\_per\_month
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_divdpm
+@Title     = Divide by days per month
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) / days\_per\_month
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_muldpy
+@Title     = Multiply with days per year
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) * days\_per\_year
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_divdpy
+@Title     = Divide by days per year
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) / days\_per\_year
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+Assumed the input dataset is a monthly mean time series.
+To compute the yearly mean from the correct weighted monthly mean use:
+@BeginVerbatim
+   cdo muldpm ifile tmpfile1
+   cdo yearavg tmpfile1 tmpfile2
+   cdo mulc,12 -divdpy tmpfile2 ofile
+@EndVerbatim
+Or all in one command line:
+@BeginVerbatim
+   cdo mulc,12 -divdpy -yearavg -muldpm ifile ofile
+@EndVerbatim
+@EndExample

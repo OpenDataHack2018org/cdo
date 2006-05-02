@@ -1,0 +1,18 @@
+@BeginModule
+@NewPage
+@Name      = Setgrid
+@Title     = Set grid type
+@Section   = Information
+@Class     = Information
+@Arguments = ifile ofile
+@Operators = writegrid
+@EndModule
+
+
+@BeginOperator_writegrid
+@Title     = Write grid
+
+@BeginDescription
+Write the grid information to a file (SCRIP netCDF).
+@EndDescription
+@EndOperator

@@ -1,0 +1,13 @@
+rm -f *~
+rm -f cdo.aux cdo.cps cdo.fn cdo.html cdo.ky cdo.pdf cdo.pgs cdo.tp
+rm -f cdo.cp cdo.dvi cdo.fns cdo.info cdo.log cdo.pg cdo.ps cdo.toc cdo.vr
+rm -f cdo_over.texi cdo_ref.texi cdo_rmenu.texi
+rm -f cdo.out cdo.idx cdo.ilg cdo.ind 
+rm -f cdo*.aux cdo.tpt cdo.ist
+rm -f cdo_refcard.aux cdo_refcard.dvi cdo_refcard.log cdo_refcard.ps cdo_refcard.pdf
+rm -f test.ist test.ind test.ilg test.tpt test.toc test.pdf
+rm -f test.out test.log test.idx test.aux
+rm -f ref_man_*.tex ref_list_*.tex catalog.tex cdo_ref_over.tex
+rm -f operator_help.h OPERATORS
+rm -f cdo_refcard.tex
+rm -f x.log cdo_class

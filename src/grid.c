@@ -67,10 +67,10 @@ typedef struct {
   int     type;
   int     ntr;
   int    *rowlon;
-  size_t  nvertex;
-  size_t  size;
-  size_t  xsize;
-  size_t  ysize;
+  int     nvertex;
+  int     size;
+  int     xsize;
+  int     ysize;
   int     def_xfirst;
   int     def_yfirst;
   int     def_xlast;
@@ -102,7 +102,7 @@ void gridInit(GRID *grid)
   grid->ypole         = 0;
   grid->prec          = 0;
   grid->isRotated     = FALSE;
-  grid->ntr         = 0;
+  grid->ntr           = 0;
   grid->nvertex       = 0;
   grid->def_xfirst    = FALSE;
   grid->def_yfirst    = FALSE;
@@ -975,6 +975,11 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  double fval;
 	  char *endptr;
 
+	  if ( grid.nvertex == 0 )
+	    {
+	      if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
+	    }
+
 	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_CELL )
 	    size = grid.size;
 	  else
@@ -1014,6 +1019,11 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  int i = 0;
 	  double fval;
 	  char *endptr;
+
+	  if ( grid.nvertex == 0 )
+	    {
+	      if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
+	    }
 
 	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_CELL )
 	    size = grid.size;

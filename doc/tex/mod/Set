@@ -1,0 +1,75 @@
+@BeginModule
+@NewPage
+@Name      = Set
+@Title     = Set field info
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = setpartab setcode setvar setlevel
+
+@BeginDescription
+This module sets some field information. Depending on the actual
+operator name the parameter table, code number, variable name or
+level is set.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_setpartab
+@Title     = Set parameter table
+@Parameter = table
+
+@BeginDescription
+Sets the parameter table for all variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setcode
+@Title     = Set code number
+@Parameter = code
+
+@BeginDescription
+Sets the code number for all variables to the same given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setvar
+@Title     = Set variable name
+@Parameter = name
+
+@BeginDescription
+Sets the name of the first variable.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setlevel
+@Title     = Set level
+@Parameter = level
+
+@BeginDescription
+Sets the first level of all variables.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = table
+STRING   Parameter table file or name
+@Item = code
+INTEGER  Code number
+@Item = name
+STRING   Variable name
+@Item = level
+FLOAT    New level
+@EndParameter
+
+
+@BeginExample
+To assign the parameter table echam5 to the input dataset use:
+@BeginVerbatim
+   cdo setpartab,echam5 ifile ofile
+@EndVerbatim
+@EndExample

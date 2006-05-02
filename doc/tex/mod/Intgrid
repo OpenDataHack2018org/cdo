@@ -1,0 +1,72 @@
+@BeginModule
+@NewPage
+@Name      = Intgrid
+@Title     = Grid interpolation
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = interpolate intgridbil
+
+
+@BeginDescription
+This module contains operators to interpolate all input fields to a new grid.
+All interpolation methods in this module work only on rectangular grids.
+@EndModule
+
+
+@BeginOperator_interpolate
+@Title     = PINGO grid interpolation
+@Parameter = grid
+
+@BeginDescription
+This is the grid interpolation from PINGO.
+@IfDoc
+The basis of the interpolation is an underlying continuous field
+which is constructed in the following way. For two neighboured
+longitudes @math{x_1} and @math{x_2} and two neighboured latitudes
+@math{y_1} and @math{y_2} of the input grid every point at
+longitude @math{x} and latidude @math{y} with @math{x_1 \le x \le x_2}
+and @math{y_1 \le y \le y_2} is assigned the value
+\begin{eqnarray*}
+a & = & a_{11} + (a_{21}-a_{11}) \frac{x-x_1}{x_2-x_1} + (a_{12}-a_{11}) \frac{y-y_1}{y_2-y_1} \\
+  &   & {}+ (a_{22}-a_{21}-a_{12}+a_{11}) \frac{(x-x_1)(y-y_1)}{(x_2-x_1)(y_2-y_1)}
+\end{eqnarray*}
+where $a_{ij}$ is the value at longitude @math{x_i} and latitude
+@math{y_j}. If one of the four values $a_{11}$, $a_{12}$, $a_{21}$, $a_{22}$ is the
+missing value, then @math{a} is also the missing value.
+Afterwards the underlying continuous field is expanded by a half 
+mesh width.
+@EndIfDoc
+For a detailed description of this interpolation method see @cite{PINGO}.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_intgridbil
+@Title     = Bilinear grid interpolation
+@Parameter = grid
+
+@BeginDescription
+Performs a bilinear interpolation on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_intpoint
+@Title     = Point interpolation
+@Parameter = long lat
+
+@BeginDescription
+Linear point interpolation.
+@EndDescription
+%@Item = long
+%FLOAT  Longitude of the point
+%@Item = lat
+%FLOAT  Latitude of the point
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter

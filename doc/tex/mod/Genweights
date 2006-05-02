@@ -1,0 +1,100 @@
+@BeginModule
+@NewPage
+@Name      = Genweights
+@Title     = Generate SCRIP grid interpolation weights
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = genbil genbic gencon gendis
+
+@BeginDescription
+Grid interpolation can be a very time consuming process. Especially if the
+data is on an unstructured or on a large grid. In this case the SCRIP 
+interpolation process can be split into two parts. First generation of the
+interpolation weights, this is the most time consuming part. These interpolation 
+weights can be reused for every remapping process. 
+This method works only if all input fields are on the same grid and a possibly
+mask (missing values) does not change. This module contains operators to 
+generate SCRIP interpolation weights of the first input field.
+Each operator is using a different interpolation method.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_genbil
+@Name      = genbil
+@Title     = Generate bilinear interpolation weights
+@Parameter = grid
+
+@BeginDescription
+Generates bilinear interpolation weights and write the result to a file. 
+This interpolation method works only on rectangular grids.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_genbic
+@Name      = genbic
+@Title     = Generate bicubic interpolation weights
+@Parameter = grid
+
+@BeginDescription
+Generates bicubic interpolation weights and write the result to a file.
+This interpolation method works only on rectangular grids.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gencon
+@Title     = Generate conservative interpolation weights
+@Parameter = grid
+
+@BeginDescription
+Generates first order conservative interpolation weights and
+write the result to a file.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gendis
+@Name      = gendis
+@Title     = Generate distance-weighted averaging weights
+@Parameter = grid
+
+@BeginDescription
+Generates distance-weighted average weights of the four
+nearest neighbor values and write the result to a file.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
+
+
+@BeginEnvironment
+@Item = NORMALIZE_OPT
+This variable is used to choose the normalization of the conservative 
+interpolation. By default, NORMALIZE_OPT is set to be 'fracarea' and will
+include the destination area fraction in the output weights; other 
+options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
+@EndEnvironment
+
+
+@BeginNote
+For this program the author has converted the original Fortran 90 SCRIP 
+software to ANSI C. In case of any problems send a bug report to CDO and
+not to SCRIP!
+@EndNote
+
+
+@BeginExample
+Say @file{ifile} contains fields on a rectangular grid.
+Remap all fields bilinear to a T42 gaussian grid:
+@BeginVerbatim
+   cdo genbil,t42grid ifile remapweights.nc
+   cdo remap,t42grid,remapweights ifile ofile
+@EndVerbatim
+@EndExample

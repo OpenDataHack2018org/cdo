@@ -1,0 +1,76 @@
+@BeginModule
+@NewPage
+@Name      = Arithc
+@Title     = Arithmetic with a constant
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile ofile
+@Operators = addc subc mulc divc
+
+@BeginDescription
+This module performs simple arithmetic with all field elements of a dataset and 
+a constant. The header and date information in @file{ofile} is the same as in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_addc
+@Title     = Add a constant
+@Parameter = c
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) + c
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_subc
+@Title     = Subtract a constant
+@Parameter = c
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) - c
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_mulc
+@Title     = Multiply with a constant
+@Parameter = c
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) * c
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_divc
+@Title     = Divide by a constant
+@Parameter = c
+
+@BeginDescription
+@BeginMath
+o(t,x) = i(t,x) / c
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = c
+FLOAT  Constant
+@EndParameter
+
+
+@BeginExample
+To sum all input fields with the constant -273.15 use:
+@BeginVerbatim
+   cdo addc,-273.15 ifile ofile
+@EndVerbatim
+@EndExample

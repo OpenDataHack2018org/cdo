@@ -32,7 +32,7 @@
 #include "cdo_int.h"
 
 
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
 #include "pstream_int.h"
 #include "pthread_debug.h"
 #endif
@@ -216,7 +216,7 @@ static void cdoSetDebug(int level)
 
   if ( level == 1 || level &  32 ) cdoDebug = 1;
   if ( level == 1 || level &  64 ) pstreamDebug(1);
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
   if ( level == 1 || level & 128 ) pipeDebug(1);
   if ( level == 1 || level & 256 ) Pthread_debug(1);
 #endif
@@ -392,6 +392,7 @@ int main(int argc, char *argv[])
   int DebugLevel = 0;
   int lstop = FALSE;
   int noff = 0;
+  int status = 0;
   char *operatorName = NULL;
   char *operatorArg = NULL;
   char *argument = NULL;
@@ -496,6 +497,7 @@ int main(int argc, char *argv[])
 	{
 	  fprintf(stderr, "\nno operator given\n\n");
 	  usage();
+	  status = 1;
 	}
 
       if ( Help ) usage();
@@ -563,7 +565,7 @@ int main(int argc, char *argv[])
 	  omp_get_num_procs(), omp_get_max_threads());
 #endif
 
-  if ( lstop ) return (1);
+  if ( lstop ) return (status);
 
   if ( cdoTimer )
     {
@@ -596,5 +598,5 @@ int main(int argc, char *argv[])
 
   if ( cdoTimer ) timer_report();
 
-  return (0);
+  return (status);
 }

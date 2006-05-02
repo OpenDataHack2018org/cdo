@@ -1,0 +1,315 @@
+\section{Grid description}
+
+In some situations it is necessary to give a description of a horizontal grid.
+These situations are
+
+\begin{itemize}
+\item Changing the grid description (operator: \htmlref{setgrid}{setgrid})
+\item Horizontal interpolation (operator: \htmlref{interpolate}{interpolate}, \htmlref{remap*}{INTERPOLATE} and \htmlref{gen*}{GENWEIGHTS})
+\item Generating variables (operator: \htmlref{const}{const}, \htmlref{random}{random})
+\end{itemize}
+
+There are several possibilities to define a horizontal grid. Predefined grids are available
+for global regular, gaussian or icosahedral grids.
+
+\subsection{Predefined grids}
+
+The following pre-defined grid names are available: 
+{\tt r<NX>x<NY>}, {\tt t<RES>grid} and {\tt gme<NI>}
+
+\subsection*{Global regular grid: {\tt r<NX>x<NY>}}
+    {\tt r<NX>x<NY>} defines a global regular grid.
+    The number of the longitutes {\tt <NX>} and the latitudes {\tt <NY>}
+    can be selected at will.
+    The longitudes starts at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
+    The latitudes go from south to north with an increment of (180/{\tt <NY>})$^\circ$.
+
+\subsection*{Global gaussian grid: {\tt t<RES>grid}}
+    {\tt t<RES>grid} defines a global gaussian grid.
+    Each valid triangular resolution can be used for {\tt <RES>}.
+    The longitudes starts at 0$^\circ$ with an increment of (360/nlon)$^\circ$.
+    The gaussian latitudes go from north to south.
+
+%\subsection*{Spherical harmonics: t$<$RES$>$spec}
+%    t$<$RES$>$spec defines the spectral coefficients of a global gaussian grid.
+%    Each valid triangular resolution can be used for $<$RES$>$.
+
+\subsection*{Global icosahedral-hexagonal GME grid: {\tt gme<NI>}}
+    {\tt gme<NI>} defines a global icosahedral-hexagonal GME grid.
+    {\tt NI} is the number of intervals on a main triangle side.
+
+\subsection{Grids from data files}
+
+You can use the grid description from an other datafile.
+The format of the datafile and the grid of the data field musst
+be supported by this program.
+Use the operator '\htmlref{sinfo}{sinfo}' to get short informations about
+your variables and the grids.
+If there are more then one grid in the datafile the grid description of
+the first variable will be used.
+
+\subsection{SCRIP grids}
+
+SCRIP is a Spherical Coordinate Remapping and Interpolation Package.
+It is using a common grid description in netCDF.
+You can use it to describe curvilinear grids or unstructured grid cells.
+For more information about this format see \cite{SCRIP}.
+This grid description format is only available if the program was compiled
+with netCDF support.
+
+\vspace{2mm}
+
+%\begin{minipage}[t]{\textwidth}
+SCRIP grid description example of a curvilinear MPIOM1 GROB3 grid (only the netCDF header):
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    netcdf grob3s {
+    dimensions:
+            grid_size = 12120 ;
+            grid_xsize = 120 ;
+            grid_ysize = 101 ;
+            grid_corners = 4 ;
+            grid_rank = 2 ;
+    variables:
+            int grid_dims(grid_rank) ;
+            float grid_center_lat(grid_ysize, grid_xsize) ;
+                    grid_center_lat:units = "degrees" ;
+                    grid_center_lat:bounds = "grid_corner_lat" ;
+            float grid_center_lon(grid_ysize, grid_xsize) ;
+                    grid_center_lon:units = "degrees" ;
+                    grid_center_lon:bounds = "grid_corner_lon" ;
+            int grid_imask(grid_ysize, grid_xsize) ;
+                    grid_imask:units = "unitless" ;
+                    grid_imask:coordinates = "grid_center_lon grid_center_lat" ;
+            float grid_corner_lat(grid_ysize, grid_xsize, grid_corners) ;
+                    grid_corner_lat:units = "degrees" ;
+            float grid_corner_lon(grid_ysize, grid_xsize, grid_corners) ;
+                    grid_corner_lon:units = "degrees" ;
+
+    // global attributes:
+                    :title = "grob3s" ;
+    }
+\end{lstlisting}
+%\end{minipage}
+
+\subsection{PINGO grids}
+
+PINGO is using a very simple grid description in ASCII format.
+You can use it to describe regular longitude/latitude or global gaussian grids.
+All PINGO grid description files are supported. 
+For more information about this format see \cite{PINGO}.
+
+\vspace{2mm}
+
+%\begin{minipage}[t]{\textwidth}
+PINGO grid description example of a T21 gaussian grid:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    Grid Description File
+    (Comments start at non digit characters and end at end of line)
+    First part: The dimensions.
+    64 32 = Number of longitudes and latitudes
+    Second part: The listed longitudes.
+    2 means equidistant longitudes
+    0.000000 5.625000 = Most western and second most western longitude
+    Third part: The listed latitudes.
+    32 means all 32 latitudes are given in the following list:
+     85.761  80.269  74.745  69.213  63.679  58.143  52.607  47.070
+     41.532  35.995  30.458  24.920  19.382  13.844   8.307   2.769
+     -2.769  -8.307 -13.844 -19.382 -24.920 -30.458 -35.995 -41.532
+    -47.070 -52.607 -58.143 -63.679 -69.213 -74.745 -80.269 -85.761
+\end{lstlisting}
+%\end{minipage}
+
+\subsection{CDO grids}
+
+The \CDO grid description is an ASCII formatted file.
+It is a common grid description for all available grids.
+The following keywords can be used to describe a grid:
+
+\vspace{3mm}
+\begin{tabular}[b]{lll}
+gridtype     & STRING       & type of the grid (gaussian, lonlat, curvilinear, cell) \\
+gridsize     & INTEGER      & size of the grid \\
+xsize        & INTEGER      & size in x direction (number of longitudes) \\
+ysize        & INTEGER      & size in y direction (number of latitudes) \\
+xvals        & FLOAT ARRAY  & x values of the grid \\
+yvals        & FLOAT ARRAY  & y values of the grid \\
+xnpole       & FLOAT        & x value of the north pole (rotated grid) \\
+ynpole       & FLOAT        & y value of the north pole (rotated grid) \\
+nvertex      & INTEGER      & number of the vertices for all grid cells \\
+xbounds      & FLOAT ARRAY  & x bounds of each gridbox \\
+ybounds      & FLOAT ARRAY  & y bounds of each gridbox \\
+%xname        & STRING       & name of the x axis \\
+%xlongname    & STRING       & longname of the x axis \\
+%xunits       & STRING       & units of the x axis \\
+%yname        & STRING       & name of the y axis \\
+%ylongname    & STRING       & longname of the y axis \\
+%yunits       & STRING       & units of the y axis \\
+xfirst, xinc & FLOAT, FLOAT & macros to define xvals with a constant increment \\
+yfirst, yinc & FLOAT, FLOAT & macros to define yvals with a constant increment \\
+\end{tabular}
+
+\vspace{4mm}
+
+Which keywords are necessary depents on the gridtype.
+The next table gives an overview of the default values or the array size for the different
+grid types.
+
+%\vspace{2mm}
+%\begin{tabular}[b]{|c|c|c|c|c|c|c|c|c|}
+%\hline
+%gridtype    & gridsize     & xsize & ysize & xvals    & yvals    & nvertex & xbounds     & ybounds \\
+%\hline
+%\hline
+%gaussian    & xsize*ysize  & nlon  & nlat  & xsize    & ysize    & 2       & 2*xsize     & 2*ysize \\
+%\hline
+%lonlat      & xsize*ysize  & nlon  & nlat  & xsize    & ysize    & 2       & 2*xsize     & 2*ysize \\
+%\hline 
+%curvilinear & xsize*ysize  & nlon  & nlat  & gridsize & gridsize & 4       & 4*gridsize  & 4*gridsize \\
+%\hline
+%cell        & ncell        &       &       & gridsize & gridsize & nv      & nv*gridsize & nv*gridsize \\
+%\hline
+%\end{tabular}
+%\vspace{2mm}
+
+\vspace{2mm}
+\hspace{2cm}
+\begin{tabular}[c]{|l||c|c|c|c|}
+\hline
+gridtype   & lonlat      & gaussian    & curvilinear & cell \\
+\hline
+\hline
+gridsize   & xsize*ysize & xsize*ysize & xsize*ysize & {\bf ncell} \\
+\hline
+xsize      & {\bf nlon} & {\bf nlon} & {\bf nlon} & gridsize \\
+\hline
+ysize      & {\bf nlat} & {\bf nlat} & {\bf nlat} & gridsize \\
+\hline
+xvals      & xsize & xsize & gridsize & gridsize \\
+\hline
+yvals      & ysize & ysize & gridsize & gridsize \\
+\hline
+xnpole     & 0     &       &          &          \\
+\hline
+ynpole     & 90    &       &          &          \\
+\hline
+nvertex    & 2 & 2 & 4 & {\bf nv} \\
+\hline
+xbounds    & 2*xsize & 2*xsize & 4*gridsize & nv*gridsize \\
+\hline
+ybounds    & 2*ysize & 2*ysize & 4*gridsize & nv*gridsize \\
+\hline
+%xname      &  &  &  &  \\
+%\hline
+%xlongname  &  &  &  &  \\
+%\hline
+%xunits     &  &  &  &  \\
+%\hline
+%yname      &  &  &  &  \\
+%\hline
+%ylongname  &  &  &  &  \\
+%\hline
+%yunits     &  &  &  &  \\
+%\hline
+\end{tabular}
+
+\vspace{3mm}
+
+The keywords nvertex, xbounds and ybounds are optional if the area weights are not needed.
+
+\vspace{2mm}
+
+%\begin{minipage}[t]{\textwidth}
+\CDO grid description example of a T21 gaussian grid:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    gridtype = gaussian
+    xsize    = 64
+    ysize    = 32
+    xfirst   =  0
+    xinc     = 5.625
+    yvals    = 85.76  80.27  74.75  69.21  63.68  58.14  52.61  47.07
+               41.53  36.00  30.46  24.92  19.38  13.84   8.31   2.77
+               -2.77  -8.31 -13.84 -19.38 -24.92 -30.46 -36.00 -41.53
+              -47.07 -52.61 -58.14 -63.68 -69.21 -74.75 -80.27 -85.76
+\end{lstlisting}
+%\end{minipage}
+
+\vspace{2mm}
+
+%\begin{minipage}[t]{\textwidth}
+\CDO grid description example of a global regular grid with 60x30 points:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    gridtype = lonlat
+    xsize    =   60
+    ysize    =   30
+    xfirst   = -177
+    xinc     =    6
+    yfirst   =  -87
+    yinc     =    6
+\end{lstlisting}
+%\end{minipage}
+
+\vspace{2mm}
+
+For a lon/lat grid with an rotated pole, the north pole must be defined.
+As far as you define the keywords xnpole/ynpole all coordinate values
+are for the rotated system.
+
+\vspace{2mm}
+
+%\begin{minipage}[t]{\textwidth}
+\CDO grid description example of a regional rotated lon/lat grid:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    gridtype = lonlat
+    xsize    = 81
+    ysize    = 91
+    xfirst   =  -19.5
+    xinc     =    0.5
+    yfirst   =  -25.0
+    yinc     =    0.5
+    xnpole   = -170
+    ynpole   =   32.5
+\end{lstlisting}
+%\end{minipage}
+
+Example \CDO description of a curvilinear grid and unstructured grid cells can be found
+in \htmlref{Appendix A}{appendixa}.
+
+%#define  GRID_GENERIC             1
+%#define  GRID_GAUSSIAN            2
+%#define  GRID_GAUSSIAN_REDUCED    3
+%#define  GRID_LONLAT              4
+%#define  GRID_SPECTRAL            5
+%#define  GRID_FOURIER             6
+%#define  GRID_TRIANGULAR          7
+%#define  GRID_TRAJECTORY          8
+%#define  GRID_CELL                9
+%#define  GRID_CURVILINEAR        10
+
+%gaussian   curv cell
+%regular    curv cell
+%triangular      cell
+
+%regular (regelmaessig)
+%square (quadratisches) grid is a grid formed by tiling the plane regularly with squares
+%A triangular grid, also called an isometric grid (Gardner 1986, pp. 209-210), is a grid fo
+%rmed by tiling the plane regularly with equilateral triangles. 
+
+%quadrilateral (vierseitige)
+
+%rectangular (rechteckig)
+%  gaussian
+%  regular lon/lat
+
+%nonrectangular
+
+%  triangular
+%  hexagonal (GME)
+%  curvilinear (krummlinig)
+%  generic
+
+% retilinear (geradlinig)
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "cdo"
+%%% End: 

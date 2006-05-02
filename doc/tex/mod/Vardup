@@ -1,0 +1,35 @@
+@BeginModule
+@Name      = Vardup
+@Title     = Variable duplication
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = vardup varmul
+
+@BeginDescription
+Duplicates all variables of a dataset.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_vardup
+@Title     = Duplicate variables
+
+@BeginDescription
+Duplicates all variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_varmul
+@Title     = Multiply variables
+@Parameter = nmul
+
+@BeginDescription
+Multiplies all variables.
+@EndDescription
+@EndOperator
+
+@BeginParameter
+@Item = nmul
+INTEGER  Number of multiplications
+@EndParameter

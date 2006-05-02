@@ -1,0 +1,160 @@
+@BeginModule
+@NewPage
+@Name      = Select
+@Title     = Select fields
+@Section   = Selection
+@Class     = Selection
+@Arguments = ifile ofile
+@Operators = selcode delcode selvar delvar sellevel selgrid selgridname selzaxis selzaxisname seltabnum selrec
+
+@BeginDescription
+This module selects some fields from @file{ifile} and write the result to @file{ofile}.
+Which fields are selected depends on the actual operator name and the parameters.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_selcode
+@Title     = Select codes
+@Parameter = codes
+
+@BeginDescription
+Selects all fields with a code number in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_delcode
+@Title     = Delete codes
+@Parameter = codes
+
+@BeginDescription
+Deletes all fields with a code number in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selvar
+@Title     = Select variables
+@Parameter = vars
+
+@BeginDescription
+Selects all fields with a variable name in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_delvar
+@Title     = Delete variables
+@Parameter = vars
+
+@BeginDescription
+Deletes all fields with a variable name in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sellevel
+@Title     = Select levels
+@Parameter = levels
+
+@BeginDescription
+Selects all fields with a level in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selgrid
+@Title     = Select grids
+@Parameter = grids
+
+@BeginDescription
+Selects all fields with a grid in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selgridname
+@Title     = Select grid by name
+@Parameter = gridnames
+
+@BeginDescription
+Selects all fields with a grid name in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selzaxis
+@Title     = Select zaxis
+@Parameter = zaxis
+
+@BeginDescription
+Selects all fields with a zaxis in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selzaxisname
+@Title     = Select zaxis by name
+@Parameter = zaxisnames
+
+@BeginDescription
+Selects all fields with a zaxis name in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_seltabnum
+@Title     = Select parameter table number
+@Parameter = tabnum
+
+@BeginDescription
+Selects all fields with a parameter table number in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selrec
+@Title     = Select records
+@Parameter = records
+
+@BeginDescription
+Selects all fields with a record number in a user given list.
+This operator does not work on netCDF data!
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = codes
+INTEGER  Comma separated list of code numbers
+@Item = vars
+STRING   Comma separated list of variable names
+@Item = levels
+FLOAT    Comma separated list of levels
+@Item = grids
+INTEGER  Comma separated list of grid numbers
+@Item = gridnames
+STRING   Comma separated list of grid names
+@Item = zaxis
+INTEGER  Comma separated list of zaxis numbers
+@Item = zaxisnames
+STRING   Comma separated list of zaxis names
+@Item = tabnum
+INTEGER  Comma separated list of table numbers
+@Item = records
+INTEGER  Comma separated list of records
+@EndParameter
+
+
+@BeginExample
+Assumed the input dataset has 3 variables with the code number 129, 130 and 139.
+To select the variables with the code number 129 and 139 use:
+@BeginVerbatim
+   cdo selcode,129,139 ifile ofile
+@EndVerbatim
+You can also select the code number 129 and 139 by deleting the code number 130:
+@BeginVerbatim
+   cdo delcode,130 ifile ofile
+@EndVerbatim
+@EndExample

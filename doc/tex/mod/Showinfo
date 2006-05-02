@@ -1,0 +1,92 @@
+@BeginModule
+@NewPage
+@Name      = Showinfo
+@Title     = Show
+@Section   = Information
+@Class     = Information
+@Arguments = ifile
+@Operators = showcode showvar showlevel showyear showmon showdate showtime
+@EndModule
+
+
+@BeginOperator_showcode
+
+@Title     = Show codes
+@BeginDescription
+Prints the code number of all different variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showvar
+
+@Title     = Show variable names
+@BeginDescription
+Prints the name of all different variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showlevel
+
+@Title     = Show levels
+@BeginDescription
+Prints all levels for each variable.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showyear
+@Title     = Show years
+
+@BeginDescription
+Prints all different years.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showmon
+@Title     = Show months
+
+@BeginDescription
+Prints all different months.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showdate
+@Title     = Show dates
+
+@BeginDescription
+Prints all different dates.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showtime
+@Title     = Show time steps
+
+@BeginDescription
+Prints all time steps.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To print the code number of all variables in a dataset use:
+@BeginVerbatim
+   cdo showcode ifile
+@EndVerbatim
+This is an example result of a dataset with tree variables:
+@BeginVerbatim
+   129 130 139
+@EndVerbatim
+To print all months in a dataset use:
+@BeginVerbatim
+   cdo showmon ifile
+@EndVerbatim
+This is an examples result of a dataset with an annual cycle:
+@BeginVerbatim
+   1 2 3 4 5 6 7 8 9 10 11 12
+@EndVerbatim
+@EndExample

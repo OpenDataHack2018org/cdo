@@ -1,0 +1,44 @@
+@BeginModule
+@NewPage
+@Name      = Vargen
+@Title     = Generate a field
+@Section   = Miscellaneous
+@Arguments = ofile
+@Operators = const random
+
+@BeginDescription
+Generates a dataset with one field. The size of the field
+is specified by the user given grid description.
+According to  the actual operator name all field elements
+are constant or filled with random numbers.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_const
+@Title     = Create a constant field
+@Parameter = const grid
+
+@BeginDescription
+Creates a constant field. All field elements of the grid
+have the same value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_random
+@Title     = Create field with random values
+@Parameter = grid
+
+@BeginDescription
+Creates a field with rectangularly distrubuted random numbers in the interval [0,1].
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = const
+FLOAT   Constant
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter

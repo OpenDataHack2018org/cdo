@@ -1,0 +1,87 @@
+@BeginModule
+@NewPage
+@Name      = Zonstat
+@Title     = Zonal statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonvar
+
+@BeginDescription
+This module computes zonal statistical values of the input fields.
+According to the actual operator name the zonal minimum, maximum, 
+sum, average, standard deviation or variance is written to @file{ofile}.
+All input fields must have the same rectangular grid. 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_zonmin
+@Title     = Zonal minimum
+
+@BeginDescription
+For every latitude the minimum over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonmax
+@Title     = Zonal maximum
+
+@BeginDescription
+For every latitude the maximum over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonsum
+@Title     = Zonal sum
+
+@BeginDescription
+For every latitude the sum over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonmean
+@Title     = Zonal mean
+
+@BeginDescription
+For every latitude the mean over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonavg
+@Title     = Zonal average
+
+@BeginDescription
+For every latitude the average over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonvar
+@Title     = Zonal variance
+
+@BeginDescription
+For every latitude the variance over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zonstd
+@Title     = Zonal standard deviation
+
+@BeginDescription
+For every latitude the standard deviation over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the zonal mean of all input fields, use:
+@BeginVerbatim
+   cdo zonmean ifile ofile
+@EndVerbatim
+@EndExample

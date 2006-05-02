@@ -1,0 +1,45 @@
+@BeginModule
+@Name      = Cond2
+@Title     = Condition with tree fields
+@Section   = Condition
+@Class     = Comparison
+@Arguments = ifile1 ifile2 ifile3 ofile
+@Operators = ifthenelse
+
+@BeginDescription
+This operator conditional selects fields from @file{ifile2} or @file{ifile3} and writes the result to @file{ofile}.
+A value not equal to zero is treated as "true", zero is treated as "false".
+@EndDescription
+@EndModule
+
+
+@BeginOperator_ifthenelse
+@Title     = If then else
+
+@BeginDescription
+@IfMan
+          / i_2(t,x) if i_1(t,x) NE 0  AND  i_1(t,x) NE miss
+o(t,x) = <  i_3(t,x) if i_1(t,x) EQ 0  AND  i_1(t,x) NE miss
+          \ miss     if i_1(t,x) EQ miss
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \left\{
+\begin{array}{cll}
+   i_2(t,x) & \mbox{if} \;\;  i_1(t,x) \neq 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
+   i_3(t,x) & \mbox{if} \;\;  i_1(t,x)    = 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
+\mbox{miss} & \mbox{if} \;\;  i_1(t,x)    = \mbox{miss} \\
+\end{array}   \right.
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+
+
+@BeginExample
+@BeginVerbatim
+   cdo ifthenelse ifile1 ifile2 ifile3 ofile
+@EndVerbatim
+@EndExample

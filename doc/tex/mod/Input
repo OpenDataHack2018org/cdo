@@ -1,0 +1,66 @@
+@BeginModule
+@NewPage
+@Name      = Input
+@Title     = Formatted input
+@Section   = Formatted I/O
+@Arguments = ofile
+@Operators = input inputsrv inputext
+
+@BeginDescription
+This modules reads time series of one 2D variable from standard input.
+All input fields must have the same horizontal grid. The format of the 
+input depends on the actual operator name.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_input
+@Title     = ASCII input
+@Parameter = grid
+
+@BeginDescription
+Read fields with ASCII numbers from standard input and stores them
+in @file{ofile}. The numbers that are read are exactly that ones which 
+are written out by @mod{output}.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_inputsrv
+@Title     = SERVICE input
+
+@BeginDescription
+Read fields with ASCII numbers from standard input and stores them 
+in @file{ofile}. Each field must have a header of 8 integers (SERVICE likely).
+The numbers that are read are exactly that ones which are written 
+out by @mod{outputsrv}.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_inputext
+@Title     = EXTRA input
+
+@BeginDescription
+Read fields with ASCII numbers from standard input and stores them 
+in @file{ofile}. Each field with a header of 4 integers (EXTRA likely).
+The numbers that are read are exactly that ones which are written 
+out by @mod{outputext}.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Grid description file or name
+@EndParameter
+
+
+@BeginExample
+Assumed an ASCII dataset contains a field on a global regular 
+grid with 32 longitude and 16 latitudes (512 elements).
+To create a GRIB dataset from the ASCII dataset use:
+@BeginVerbatim
+   cdo -f grb input,r32x16 ofile.grb < my_ascii_data
+@EndVerbatim
+@EndExample

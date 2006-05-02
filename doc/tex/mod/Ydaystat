@@ -1,0 +1,133 @@
+@BeginModule
+@NewPage
+@Name      = Ydaystat
+@Title     = Multi-year daily statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = ydaymin ydaymax ydaymean ydayavg ydaystd
+
+@BeginDescription
+This module writes to @file{ofile}, according to the actual operator name,
+the minimum, maximum, sum, average or standard deviation of each 
+day of year in @file{ifile}. The date information in an output field is 
+the date of the last contributing input field.
+@EndModule
+
+
+@BeginOperator_ydaymin
+@Title     = Multi-year daily minimum
+
+@BeginDescription
+@IfMan
+o(001,x) = min{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = min{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaymax
+@Title     = Multi-year daily maximum
+
+@BeginDescription
+@IfMan
+o(001,x) = max{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = max{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaymean
+@Title     = Multi-year daily mean
+
+@BeginDescription
+@IfMan
+o(001,x) = mean{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = mean{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydayavg
+@Title     = Multi-year daily average
+
+@BeginDescription
+@IfMan
+o(001,x) = avg{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = avg{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaystd
+@Title     = Multi-year daily standard deviation
+
+@BeginDescription
+@IfMan
+o(001,x) = std{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = std{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the daily mean over all input years, use:
+@BeginVerbatim
+   cdo ydaymean ifile ofile
+@EndVerbatim
+@EndExample

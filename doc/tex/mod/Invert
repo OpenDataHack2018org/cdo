@@ -1,0 +1,76 @@
+@BeginModule
+@NewPage
+@Name      = Invert
+@Title     = Invert fields
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = invertlat invertlon invertlatdes invertlondes invertlatdata invertlondata
+
+@BeginDescription
+This module inverts 2D fields on a rectangular grid. Depending on the actual 
+operator name the field, only the data or only the grid description is inverted.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_invertlat
+@Title     = Invert latitude
+
+@BeginDescription
+Inverts the latitude of a field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_invertlon
+@Title     = Invert longitude
+
+@BeginDescription
+Inverts the longitude of a field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_invertlatdes
+@Title     = Invert latitude description
+
+@BeginDescription
+Inverts only the latitude description of a field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_invertlondes
+@Title     = Invert longitude description
+
+@BeginDescription
+Inverts only the longitude description of a field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_invertlatdata
+@Title     = Invert latitude data
+
+@BeginDescription
+Inverts only the latitude data of a field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_invertlondata
+@Title     = Invert longitude data
+
+@BeginDescription
+Inverts only the longitude data of a field.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To invert the latitudes of a 2D field from N->S to S->N use:
+@BeginVerbatim
+   cdo invertlat ifile ofile
+@EndVerbatim
+@EndExample

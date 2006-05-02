@@ -1,0 +1,51 @@
+\newcommand{\cdologo}{\includegraphics{logo/cdo_logo}}
+\vspace*{0mm}
+%{\Large\bf{CDO reference card}}
+{\LARGE\bf{CDO Reference Card}}
+%{\raisebox{-2.5mm}{\scalebox{0.25}{\cdologo}}}{\LARGE\bf{\ Reference Card}}
+
+\setlength{\unitlength}{1in}
+\begin{picture}(3.95,0.0)
+\linethickness{2pt}
+\put(0,0.0){\line(1,0){3.95}}
+\end{picture}
+\begin{flushright}
+{\small{Climate Data Operators \\ Version 0.9.13 \\ May 2006}}
+\end{flushright}
+
+\vspace*{0mm}
+{\small{Uwe Schulzweida \\ Max-Planck-Institute for Meteorology}}
+
+\begin{picture}(3.95,0.0)
+\linethickness{1pt}
+\put(0,0.0){\line(1,0){3.95}}
+\end{picture}
+\subsection*{Syntax}
+\framebox[3.95in][l]{
+{\bf{cdo \ \ [Options] \ \ Operators}}
+}
+
+\subsection*{Options}
+\noindent
+\begin{tabular*}{3.95in}{|l|l|} \hline
+\makebox[0.85in][l]{{\bf{-a}}                  } & \makebox[2.76in][l]{Convert from relative to absolute time axis} \\ \hline
+\makebox[0.85in][l]{{\bf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Output file format (grb, nc, nc2, srv, ext, ieg)} \\ \hline
+\makebox[0.85in][l]{{\bf{-g}} $<\!grid\!>$     } & \makebox[2.76in][l]{Grid name or file} \\
+                                                 & Available grids: t$<$RES$>$grid, r$<$NX$>$x$<$NY$>$ \\ \hline
+\makebox[0.85in][l]{{\bf{-h}}                  } & \makebox[2.76in][l]{Help information for the operators} \\ \hline
+\makebox[0.85in][l]{{\bf{-m}} $<\!missval\!>$  } & \makebox[2.76in][l]{Set the default missing value (default: {\tt-9e+33})} \\ \hline 
+\makebox[0.85in][l]{{\bf{-p}} $<\!prec\!>$     } & \makebox[2.76in][l]{Set the precision of the output data in bytes} \\
+                                                 & (4/8 for nc, nc2, srv, ext; 1/2/3 for grb) \\ \hline
+\makebox[0.85in][l]{{\bf{-R}}                  } & \makebox[2.76in][l]{Convert GRIB data from reduced to regular grid} \\ \hline
+\makebox[0.85in][l]{{\bf{-r}}                  } & \makebox[2.76in][l]{Convert from absolute to relative time axis} \\ \hline
+\makebox[0.85in][l]{{\bf{-t}} $<\!table\!>$    } & \makebox[2.76in][l]{Set the parameter table name or file} \\
+                                                 & Predefined tables:  echam4 echam5 mpiom1 \\ \hline
+\makebox[0.85in][l]{{\bf{-V}}                  } & \makebox[2.76in][l]{Print the version number} \\ \hline
+\makebox[0.85in][l]{{\bf{-v}}                  } & \makebox[2.76in][l]{Print extra details for some operators} \\ \hline
+\end{tabular*}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "cdo_refcard"
+%%% End: 

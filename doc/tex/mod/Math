@@ -1,0 +1,226 @@
+@BeginModule
+@NewPage
+@Name      = Math
+@Title     = Mathematical functions
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile ofile
+@Operators = abs sqr sqrt exp ln log10 sin cos tan asin acos atan
+
+@BeginDescription
+This module contains some standard mathematical functions.
+All trigonometric functions calculate with radians.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_abs
+@Title     = Absolute value
+
+@BeginDescription
+@IfMan
+o(t,x) = abs(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{abs}(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the absolute value of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sqr
+@Title     = Square
+
+@BeginDescription
+@IfMan
+o(t,x) = i(t,x)**2
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = {i(t,x)}^2
+@EndMath
+@EndifDoc
+@C Calculates the value of i(t,x) raised to the power of 2.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sqrt
+@Title     = Square root
+
+@BeginDescription
+@IfMan
+o(t,x) = sqrt(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \sqrt{i(t,x)}
+@EndMath
+@EndifDoc
+@C Calculates the non-negative square root of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_exp
+@Title     = Exponential
+
+@BeginDescription
+@IfMan
+o(t,x) = e**i(t,x)
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{e}^{i(t,x)}
+@EndMath
+@EndifDoc
+@C Calculates e (the base of natural logarithms) raised to the power of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ln
+@Title     = Natural logarithm
+
+@BeginDescription
+@IfMan
+o(t,x) = ln(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \ln(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the natural logarithm of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_log10
+@Title     = Base 10 logarithm
+
+@BeginDescription
+@IfMan
+o(t,x) = log10(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \log_{10}(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the base-10 logarithm of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sin
+@Title     = Sine
+
+@BeginDescription
+@IfMan
+o(t,x) = sin(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \sin(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the sine of i(t,x), where i(t,x) is given in radians.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_cos
+@Title     = Cosine
+
+@BeginDescription
+@IfMan
+o(t,x) = cos(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \cos(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the cosine of i(t,x), where i(t,x) is given in radians.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_tan
+@Title     = Tangent
+
+@BeginDescription
+@IfMan
+o(t,x) = tan(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \tan(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the tangent of i(t,x), where i(t,x) is given in radians.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_asin
+@Title     = Arc sine
+
+@BeginDescription
+@IfMan
+o(t,x) = asin(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \arcsin(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the arcus sine of i(t,x); that is the value whose sine is i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_acos
+@Title     = Arc cosine
+
+@BeginDescription
+@IfMan
+o(t,x) = acos(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \arccos(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the arcus cosine of i(t,x); that is the value whose cosine is i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_atan
+@Title     = Arc tangent
+
+@BeginDescription
+@IfMan
+o(t,x) = atan(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \arctan(i(t,x))
+@EndMath
+@EndifDoc
+@C Calculates the arcus tangent of i(t,x); that is the value whose tangent is i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To calculate the square root for all field elements use:
+@BeginVerbatim
+   cdo sqrt ifile ofile
+@EndVerbatim
+@EndExample

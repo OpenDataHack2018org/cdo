@@ -1,0 +1,55 @@
+@BeginModule
+@NewPage
+@Name      = Merge
+@Title     = Merge datasets
+@Section   = File operations
+@Class     = File operation
+@Arguments = ifiles ofile
+@Operators = merge mergetime
+
+@BeginDescription
+This module reads datasets from several input files,
+merges them and writes the resulting dataset to @file{ofile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_merge
+@Title     = Merge datasets with different fields
+
+@BeginDescription
+Merges time series of different fields from several input datasets.
+The number of fields per time step written to @file{ofile}
+is the sum of the field numbers per time step in all input datasets.
+The time series on all input datasets must have different fields
+and the same number of time steps.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_mergetime
+@Title     = Merge datasets sorted by date and time
+
+@BeginDescription
+Merges all time steps of all input files sorted by date and time.
+After this operation every input time step is in @file{ofile} and
+all time steps are sorted by date and time.
+Each input file must have the same variables.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+Assumed you have 3 datasets with the same number of time steps
+and each dataset has different variables.
+To merge these datasets to a new dataset use:
+@BeginVerbatim
+   cdo merge ifile1 ifile2 ifile3 ofile
+@EndVerbatim
+Assumed you have split a 6 hourly dataset with @oper{splithour}.
+This produces four datasets one for each hour.
+The following command merges them together:
+@BeginVerbatim
+   cdo mergetime ifile1 ifile2 ifile3 ifile4 ofile
+@EndVerbatim
+@EndExample

@@ -20,7 +20,7 @@
 #endif
 
 #if  defined  (HAVE_PTHREAD_H)
-#include <pthread.h>
+#  include <pthread.h>
 #endif
 
 #include <stdio.h>
@@ -78,7 +78,7 @@ static PROCESS Process[MAX_PROCESS];
 
 static int NumProcess = 0;
 
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -88,18 +88,18 @@ int processCreate(void)
   static char func[] = "processCreate";
   int processID;
 
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
   processID = NumProcess++;
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
 
   if ( processID >= MAX_PROCESS )
     Error(func, "Limit of %d processes reached!", MAX_PROCESS);
 
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
   Process[processID].threadID     = (int) pthread_self();
 #endif
   Process[processID].nstream      = 0;
@@ -124,7 +124,7 @@ int processSelf(void)
 {
   static char func[] = "processSelf";
   int processID = 0;
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
   int thID = (int) pthread_self();
 
   for ( processID = 0; processID < NumProcess; processID++ )

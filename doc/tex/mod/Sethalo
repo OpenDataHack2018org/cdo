@@ -1,0 +1,28 @@
+@BeginModule
+@NewPage
+@Name      = Sethalo
+@Title     = Set halo
+@Section   = Selection
+@Arguments = ifile ofile
+@Operators = sethalo
+
+@EndModule
+
+
+@BeginOperator_sethalo
+
+@Title     = Set halo
+@Parameter = lhalo rhalo
+
+@BeginDescription
+Set the left and right halo.
+@EndDescription
+
+@BeginParameter
+@Item = lahlo
+INTEGER  left halo
+@Item = rhalo
+INTEGER  right halo
+@EndParameter
+
+@EndOperator

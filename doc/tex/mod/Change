@@ -1,0 +1,91 @@
+@BeginModule
+@NewPage
+@Name      = Change
+@Title     = Change field header
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = chcode chvar chlevel chlevelc chlevelv
+
+@BeginDescription
+This module reads fields from @file{ifile}, changes some header values
+and writes the results to @file{ofile}. The kind of changes depends on 
+the actual operator name.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_chcode
+@Title     = Change code number
+@Parameter = oldcode newcode [...]
+
+@BeginDescription
+Changes some user given code numbers to new user given values.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_chvar
+@Title     = Change variable name
+@Parameter = ovar nvar ...
+
+@BeginDescription
+Changes some user given variable names to new user given names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_chlevel
+@Title     = Change level
+@Parameter = oldlev newlev ...
+
+@BeginDescription
+Changes some user given levels to new user given values.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_chlevelc
+@Title     = Change level of one code
+@Parameter = code oldlev newlev
+
+@BeginDescription
+Changes one level of a user given code number.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_chlevelv
+@Title     = Change level of one variable
+@Parameter = var oldlev newlev
+
+@BeginDescription
+Changes one level of a user given variable.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = code
+INTEGER  Code number
+@Item = oldcode,newcode,...
+INTEGER  Pairs of old and new code numbers
+@Item = var
+STRING   Variable name
+@Item = ovar,nvar,...
+STRING   Pairs of old and new variable names
+@Item = oldlev
+FLOAT    Old level
+@Item = newlev
+FLOAT    New level
+@Item = oldlev,newlev,...
+FLOAT    Pairs of old and new levels
+@EndParameter
+
+
+@BeginExample
+To change the code number 98 to 179 and 99 to 211 use:
+@BeginVerbatim
+   cdo chcode,98,179,99,211 ifile ofile
+@EndVerbatim
+@EndExample

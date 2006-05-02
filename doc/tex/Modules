@@ -1,0 +1,71 @@
+Info          Information
+Sinfo	      Information
+Diff	      Information
+Ninfo	      Information
+Showinfo      Information
+Filedes       Information
+Copy	      File operations
+Replace	      File operations
+Merge	      File operations
+Split	      File operations
+Splittime     File operations
+Select        Selection
+Seltime       Selection
+Selbox        Selection
+Set           Modification
+Settime       Modification
+Change        Modification
+Setgrid       Modification
+Setzaxis      Modification
+Setgatt       Modification
+Invert        Modification
+Maskbox       Modification
+Enlarge       Modification
+Setmiss       Modification
+Exprf	      Arithmetic
+Math	      Arithmetic
+Arithc        Arithmetic
+Arith	      Arithmetic
+Ymonarith     Arithmetic
+Arithdays     Arithmetic
+Comp	      Comparison
+Compc	      Comparison
+Cond          Condition
+Cond2         Condition
+Condc         Condition
+Ensstat       Statistical values
+Fldstat       Statistical values
+Zonstat       Statistical values
+Merstat       Statistical values
+Vertstat      Statistical values
+Selstat       Statistical values
+Runstat       Statistical values
+Timstat       Statistical values
+Hourstat      Statistical values
+Daystat       Statistical values
+Monstat       Statistical values
+Yearstat      Statistical values
+Seasstat      Statistical values
+Ydaystat      Statistical values
+Ymonstat      Statistical values
+Yseasstat     Statistical values
+Detrend       Regression
+Trend         Regression
+Subtrend      Regression
+Remapgrid     Interpolation
+Genweights    Interpolation
+Remap         Interpolation
+Intgrid       Interpolation
+Vertint       Interpolation
+Inttime       Interpolation
+Intyear       Interpolation
+Spectral      Transformation
+Wind          Transformation
+Input         Formatted I/O
+Output        Formatted I/O
+Timsort       Miscellaneous
+Vargen        Miscellaneous
+Vardup        Miscellaneous
+Gradsdes      Miscellaneous
+Rotuv         Miscellaneous
+Mastrfu       Miscellaneous

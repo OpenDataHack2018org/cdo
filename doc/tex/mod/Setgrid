@@ -1,0 +1,65 @@
+@BeginModule
+@NewPage
+@Name      = Setgrid
+@Title     = Set grid type
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = setgrid setgridtype
+
+@BeginDescription
+This module sets the grid description of all fields with the same grid size
+as the new grid.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_setgrid
+@Title     = Set grid
+@Parameter = grid
+
+@BeginDescription
+Sets the grid description of all fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setgridtype
+@Title     = Set grid type
+@Parameter = gridtype
+
+@BeginDescription
+Sets the grid type of all grids to a user given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setgridarea
+@Title     = Set grid area weights
+@Parameter = areafile
+
+@BeginDescription
+Sets the area weights of the first grid in @file{ifile} with the same
+size as in areafile.
+@EndDescription
+@Item = areafile
+STRING  File with area weights
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@Item = gridtype
+STRING  Target grid type (curvilinear or cell)
+@EndParameter
+
+
+@BeginExample
+Assumed a dataset has fields with 2048 gridpoints without or with wrong
+grid description,
+To set the grid description of all input fields to a T21 gaussian grid (2048 gridpoints) use:
+@BeginVerbatim
+   cdo setgrid,t21grid ifile ofile
+@EndVerbatim
+@EndExample

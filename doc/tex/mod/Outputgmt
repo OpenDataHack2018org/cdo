@@ -1,0 +1,28 @@
+@BeginModule
+@NewPage
+@Name      = Outputgmt
+@Title     = Formatted GMT output
+@Section   = Formatted I/O
+@Arguments = ifiles
+@Operators = outputcenter outputbounds
+@EndModule
+
+
+@BeginOperator_outputcenter
+
+@Title     = Output grid center
+
+@BeginDescription
+@EndDescription
+
+@EndOperator
+
+
+@BeginOperator_outputbounds
+
+@Title     = Output grid bounds
+
+@BeginDescription
+@EndDescription
+
+@EndOperator

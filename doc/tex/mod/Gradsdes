@@ -1,0 +1,73 @@
+@BeginModule
+@NewPage
+@Name      = Gradsdes
+@Title     = GrADS data descriptor file
+@Section   = Miscellaneous
+@Arguments = ifile
+@Operators = gradsdes gradsdes2
+
+@BeginDescription
+Creates a GrADS data descriptor file. Supported file formats
+are GRIB, SERVICE, EXTRA and IEG. For GRIB files the GrADS map
+file is also generated.
+For SERVICE and EXTRA files the grid must be specified with
+the CDO option '-g <grid>'.
+This operator takes @file{ifile} in order to create filenames for
+the descriptor (@file{ifile.ctl}) and the map (@file{ifile.gmp}) file.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_gradsdes
+@Title     = GrADS data descriptor file
+
+@BeginDescription
+Creates a GrADS data descriptor file. Generated a machine
+specific version 1 GrADS map file for GRIB datasets.
+@EndDescription
+@EndOperator
+
+@BeginOperator_gradsdes2
+@Title     = GrADS data descriptor file (version 2 map)
+
+@BeginDescription
+Creates a GrADS data descriptor file. Generated a machine 
+independent version 2 GrADS map file for GRIB datasets.
+This map file can be used only with GrADS version 1.8 or newer. 
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To create a GrADS data descriptor file from a GRIB dataset use:
+@BeginVerbatim
+   cdo gradsdes ifile.grb
+@EndVerbatim
+This will create a descriptor file with the name @file{ifile.ctl}
+and the map file @file{ifile.gmp}.
+
+Assumed the input GRIB dataset has 3 variables over 12 time steps on a T21 grid.
+The contents of the resulting GrADS data description file is approximately:
+@BeginListing
+   DSET  ^ifile.grb
+   DTYPE  GRIB
+   INDEX  ^ifile.gmp
+   XDEF 64 LINEAR 0.000000 5.625000
+   YDEF 32 LEVELS -85.761 -80.269 -74.745 -69.213 -63.679 -58.143
+                  -52.607 -47.070 -41.532 -35.995 -30.458 -24.920
+                  -19.382 -13.844  -8.307  -2.769   2.769   8.307
+                   13.844  19.382  24.920  30.458  35.995  41.532
+                   47.070  52.607  58.143  63.679  69.213  74.745
+                   80.269  85.761
+   ZDEF 4 LEVELS 925 850 500 200
+   TDEF 12 LINEAR 12:00Z1jan1987 1mo
+   TITLE  ifile.grb  T21 grid
+   OPTIONS yrev
+   UNDEF  -9e+33
+   VARS  3
+   geosp    0  129,1,0  surface geopotential (orography)  [m^2/s^2]
+   t        4  130,99,0  temperature  [K]
+   tslm1    0  139,1,0  surface temperature of land  [K]
+   ENDVARS
+@EndListing
+@EndExample

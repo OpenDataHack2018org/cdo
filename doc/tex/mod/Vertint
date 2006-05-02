@@ -1,0 +1,60 @@
+@BeginModule
+@NewPage
+@Name      = Intvert
+@Title     = Vertical interpolation
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = ml2pl ml2hl
+
+@BeginDescription
+Interpolate 3D variables on hybrid model level to pressure or height level.
+The input file must contain the log. surface pressure (LSP/code152)
+or the surface pressure (APS/code134).
+To interpolate the temperature or the geopotential height, 
+the orography (GEOSP/code129) is also needed.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_ml2pl
+@Title     = Model to pressure level interpolation
+@Parameter = plevels
+
+@BeginDescription
+Interpolate 3D variables on hybrid model level to pressure level.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ml2hl
+@Title     = Model to height level interpolation
+@Parameter = hlevels
+
+@BeginDescription
+Interpolate 3D variables on hybrid model level to height level.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = plevels
+FLOAT  Pressure levels in pascal
+@Item = hlevels
+FLOAT  Height levels in meter (max level: 65535 m)
+@EndParameter
+
+
+@BeginEnvironment
+@Item = EXTRAPOLATE
+If set to 1 extrapolate missing values.
+@EndEnvironment
+
+
+@BeginExample
+To interpolate hybrid model level data to pressure levels of
+925, 850, 500 and 200 hPa, use:
+@BeginVerbatim
+   cdo ml2pl,92500,85000,50000,20000 ifile ofile
+@EndVerbatim
+@EndExample

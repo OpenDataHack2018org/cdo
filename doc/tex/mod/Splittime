@@ -1,0 +1,84 @@
+@BeginModule
+@NewPage
+@Name      = Splittime
+@Title     = Split time steps of a dataset
+@Section   = File operations
+@Class     = File operation
+@Arguments = ifile oprefix
+@Operators = splithour splitday splitmon splitseas splityear
+
+@BeginDescription
+This module splits time steps of a dataset to several files with names
+formed from the field header information and @file{oprefix}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_splithour
+@Title     = Split hours
+
+@BeginDescription
+Splits a file into pieces, one for each different hour.
+Appends two digits with the hour to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitday
+@Title     = Split days
+
+@BeginDescription
+Splits a file into pieces, one for each different day.
+Appends two digits with the day to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitmon
+@Title     = Split months
+
+@BeginDescription
+Splits a file into pieces, one for each different month.
+Appends two digits with the month to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitseas
+@Title     = Split seasons
+
+@BeginDescription
+Splits a file into pieces, one for each different season.
+Appends tree characters with the season to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splityear
+@Title     = Split years
+
+@BeginDescription
+Splits a file into pieces, one for each different year.
+Appends four digits with the year to @file{oprefix} to 
+form the output file names.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+Assumed the input GRIB dataset has time steps from
+january to december. To split each month with all
+variables into one separat file use:
+@BeginVerbatim
+   cdo splitmon ifile mon
+@EndVerbatim
+Result of '{\tt dir mon*}':
+@BeginVerbatim
+   mon01.grb  mon02.grb  mon03.grb  mon04.grb  mon05.grb  mon06.grb
+   mon07.grb  mon08.grb  mon09.grb  mon10.grb  mon11.grb  mon12.grb
+@EndVerbatim
+@EndExample

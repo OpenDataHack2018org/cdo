@@ -1,0 +1,159 @@
+@BeginModule
+@NewPage
+@Name      = Settime
+@Title     = Set time
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = setdate settime setday setmon setyear settunits settaxis setreftime setcalendar shifttime
+
+@BeginDescription
+This module sets the time axis or part of the time axis. Which part of the
+time axis is overwritten depends on the actual operator name.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_setdate
+@Title     = Set date
+@Parameter = date
+
+@BeginDescription
+Sets the date in every time step to the same given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_settime
+@Title     = Set time
+@Parameter = time
+
+@BeginDescription
+Sets the time in every time step to the same given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setday
+@Title     = Set day
+@Parameter = day
+
+@BeginDescription
+Sets the day in every time step to the same given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setmon
+@Title     = Set month
+@Parameter = month
+
+@BeginDescription
+Sets the month in every time step to the same given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setyear
+@Title     = Set year
+@Parameter = year
+
+@BeginDescription
+Sets the year in every time step to the same given value.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_settunits
+@Title     = Set time units
+@Parameter = units
+
+@BeginDescription
+Sets the base units of an relative time axis.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_settaxis
+@Title     = Set time axis
+@Parameter = date time [inc]
+
+@BeginDescription
+Sets the time axis.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setreftime
+@Title     = Set reference time
+@Parameter = date time
+
+@BeginDescription
+Sets the reference time of an relative time axis.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setcalendar
+@Title     = Set calendar
+@Parameter = calendar
+
+@BeginDescription
+Sets the calendar of an relative time axis.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_shifttime
+@Title     = Shift time steps
+@Parameter = sval
+
+@BeginDescription
+Shifts all time steps by the parameter sval.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = day
+INTEGER  Value of the new day
+@Item = month
+INTEGER  Value of the new month
+@Item = year
+INTEGER  Value of the new year
+@Item = units
+STRING  Base units of the time axis (minutes, hours, days, months, years).
+@Item = date
+STRING  Date (format YYYY-MM-DD)
+@Item = time
+STRING  Time (format HH:MM)
+@Item = inc
+STRING  Optional increment (e.g. 12hour) [default: 0hour]
+@Item = calendar
+STRING  Calendar (standard, 360days, 365days, 366days)
+@Item = sval
+STRING   Shift value (e.g. -3hour)
+@EndParameter
+
+
+@BeginExample
+To set the time axis to 1987-01-16 12:00 with an increment of one
+month for each time step use:
+@BeginVerbatim
+   cdo settaxis,1987-01-16,12:00,1mon ifile ofile
+@EndVerbatim
+Result of '{\tt cdo showdate ofile}' for a dataset with 12 timesteps:
+@BeginVerbatim
+   1987-01-16 1987-02-16 1987-03-16 1987-04-16 1987-05-16 1987-06-16 \
+   1987-07-16 1987-08-16 1987-09-16 1987-10-16 1987-11-16 1987-12-16
+@EndVerbatim
+To shift this time axis by -15 days use:
+@BeginVerbatim
+   cdo shifttime,-15days ifile ofile
+@EndVerbatim
+Result of '{\tt cdo showdate ofile}':
+@BeginVerbatim
+   1987-01-01 1987-02-01 1987-03-01 1987-04-01 1987-05-01 1987-06-01 \
+   1987-07-01 1987-08-01 1987-09-01 1987-10-01 1987-11-01 1987-12-01
+@EndVerbatim
+@EndExample

@@ -1,0 +1,118 @@
+@BeginModule
+@NewPage
+@Name      = Arith
+@Title     = Arithmetic on two datasets
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile1 ifile2 ofile
+@Operators = add sub mul div min max atan2
+
+@BeginDescription
+This module performs simple arithmetic of two datasets.
+The header and date information in @file{ofile} is the same as in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_add
+@Title     = Add two fields
+
+@BeginDescription
+@BeginMath
+o(t,x) = i_1(t,x) + i_2(t,x)
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sub
+
+@Title     = Subtract two fields
+@BeginDescription
+@BeginMath
+o(t,x) = i_1(t,x) - i_2(t,x)
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_mul
+@Title     = Multiply two fields
+
+@BeginDescription
+@BeginMath
+o(t,x) = i_1(t,x) * i_2(t,x)
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_div
+@Title     = Divide two fields
+
+@BeginDescription
+@BeginMath
+o(t,x) = i_1(t,x) / i_2(t,x)
+@EndMath
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_min
+@Title     = Minimum of two fields
+
+@BeginDescription
+@IfMan
+o(t,x) = min(i_1(t,x), i_2(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{min}(i_1(t,x), i_2(t,x))
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_max
+@Title     = Maximum of two fields
+
+@BeginDescription
+@IfMan
+o(t,x) = max(i_1(t,x), i_2(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{max}(i_1(t,x), i_2(t,x))
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_atan2
+@Title     = Arc tangent of two fields
+
+@BeginDescription
+The @math{atan2} operator calculates the arc tangent of two fields. The result is
+in radians, which is between -PI and PI (inclusive).
+
+@IfMan
+o(t,x) = atan2(i_1(t,x), i_2(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{atan2}(i_1(t,x), i_2(t,x))
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To sum all fields of the first input file with the corresponding
+fields of the second input file use:
+@BeginVerbatim
+   cdo add ifile1 ifile2 ofile
+@EndVerbatim
+@EndExample

@@ -1,0 +1,92 @@
+@BeginModule
+@NewPage
+@Name      = Output
+@Title     = Formatted output
+@Section   = Formatted I/O
+@Arguments = ifiles
+@Operators = output outputf outputint outputsrv outputext
+
+@BeginDescription
+This modules prints all values of all input datasets to standard output.
+All input fields must have the same horizontal grid. The format of the 
+output depends on the actual operator name.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_output
+@Title     = ASCII output
+
+@BeginDescription
+Prints all values to standard output.
+Each row has 6 elements with the C-style format "%13.6g".
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_outputf
+@Title     = Formatted output
+@Parameter = format nelem
+
+@BeginDescription
+Prints all values to standard output.
+The format and number of elements for each row can be specified by the parameters.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_outputint
+@Title     = Integer output
+
+@BeginDescription
+Prints all values rounded to the nearest interger to standard output.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_outputsrv
+@Title     = SERVICE output
+
+@BeginDescription
+Prints all values to standard output.
+Each field with a header of 8 integers (SERVICE likely).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_outputext
+@Title     = EXTRA output
+
+@BeginDescription
+Prints all values to standard output.
+Each field with a header of 4 integers (EXTRA likely).
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = format
+STRING  C-style format for one element (e.g. \%13.6g)
+@Item = nelem
+INTEGER Number of elements for each row
+@EndParameter
+
+
+@BeginExample
+To print all field elements of a dataset formatted with "%8.4g"
+and 8 values per line use:
+@BeginVerbatim
+   cdo outputf,%8.4g,8 ifile
+@EndVerbatim
+Example result of a dataset with one field on 64 grid points:
+@BeginVerbatim
+   261.7     262   257.8   252.5   248.8   247.7   246.3   246.1
+   250.6   252.6   253.9   254.8     252   246.6   249.7   257.9
+   273.4   266.2   259.8   261.6   257.2   253.4     251   263.7
+   267.5   267.4   272.2   266.7   259.6   255.2   272.9   277.1
+   275.3   275.5   276.4   278.4     282   269.6   278.7   279.5
+   282.3   284.5   280.3   280.3     280   281.5   284.7   283.6
+   292.9   290.5   293.9   292.6   292.7   292.8   294.1   293.6
+   293.8   292.6   291.2   292.6   293.2   292.8     291   291.2
+@EndVerbatim 
+@EndExample

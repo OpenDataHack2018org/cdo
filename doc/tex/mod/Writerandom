@@ -1,0 +1,9 @@
+@BeginModule
+@NewPage
+@Name      = Writerandom
+@Title     = Write random
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = writerandom
+@EndModule

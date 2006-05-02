@@ -1,0 +1,38 @@
+\section{Time axis}
+
+A time axis describes the time for every timestep.
+Two time types are available: absolute time and relative time.
+\CDO tries to maintain the actual type of the time axis for all operators.
+The operators for time range statistic (monavg, ymonavg, ...) are
+creating an absolute time axis.
+
+\subsection{Absolute time}
+
+The absolute time axis has the current time to each time step.
+It can be used without knowledge of the calendar.
+This is preferably used by climate models.
+In netCDF files the relative time axis is to be recognized by the 
+unit of the time: {"{\tt day as \%Y\%m\%d.\%f}"}.
+
+\subsection{Relative time}
+
+A relative time is the time relative to a fixed reference time.
+The current time results from the reference time and the elapsed interval.
+The result depends on the used calendar.
+\CDO supports the standard gregorian, 360 days, 365 days and 366 days calendars.
+The relative time axis is preferably used by weather forecast models.
+In netCDF files the relative time axis is to be recognized by the 
+unit of the time: {"{\it time-units} {\tt since} {\it reference-time}"},
+e.g "{\tt days sincs 1989-6-15 12:00}".
+
+\subsection{Conversion of the time}
+
+Some programs which work with netCDF data can only process relative time axes.
+Therefore it can be necessary to convert an absolute into a relative time axis.
+With the \CDO option '-r' can be made this conversion for each operator.
+To convert a relative into an absolute time axis use the \CDO option '-a'.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

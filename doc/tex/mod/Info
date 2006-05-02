@@ -1,0 +1,76 @@
+@BeginModule
+@NewPage
+@Name      = Info
+@Title     = Info and simple statistics
+@Section   = Information
+@Class     = Information
+@Arguments = ifiles
+@Operators = info -infov map
+
+@BeginDescription
+This module writes information about the structure and 
+contents of all input datasets to standard output.
+The information displayed depends on the actual operator name.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_info
+@Title     = Dataset information
+
+@BeginDescription
+Prints information and simple statistics for each field of all input datasets.
+For each field the operator print in one line the:
+@BeginItemize
+@Item = Date and Time
+@Item = Code number and Level
+@Item = Size of the grid and number of Missing values
+@Item = Minimum, Mean and Maximum \\
+The mean value is computed without the use of area weights!
+@EndItemize
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_infov
+@Title     = Dataset information
+
+@BeginDescription
+The same as operator @oper{info} but using the name instead of the code number
+to identify the variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_map
+@Title     = Dataset information and simple map
+
+@BeginDescription
+Prints information, simple statistic and a map for each field of all input datasets.
+The map will be printed only for fields on a rectangular grid.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To print information and simple statistics for each field of a dataset use:
+@BeginVerbatim
+   cdo info ifile
+@EndVerbatim
+This is an example result of a dataset with one 2D variable over 12 time steps:
+@BeginVerbatim
+   -1 :       Date  Time Code Level  Size  Miss :  Minimum     Mean  Maximum
+    1 : 1987-01-31 12:00 139      0  2048  1361 :   232.77   266.65   305.31
+    2 : 1987-02-28 12:00 139      0  2048  1361 :   233.64   267.11   307.15
+    3 : 1987-03-31 12:00 139      0  2048  1361 :   225.31   267.52   307.67
+    4 : 1987-04-30 12:00 139      0  2048  1361 :   215.68   268.65   310.47
+    5 : 1987-05-31 12:00 139      0  2048  1361 :   215.78   271.53   312.49
+    6 : 1987-06-30 12:00 139      0  2048  1361 :   212.89   272.80   314.18
+    7 : 1987-07-31 12:00 139      0  2048  1361 :   209.52   274.29   316.34
+    8 : 1987-08-31 12:00 139      0  2048  1361 :   210.48   274.41   315.83
+    9 : 1987-09-30 12:00 139      0  2048  1361 :   210.48   272.37   312.86
+   10 : 1987-10-31 12:00 139      0  2048  1361 :   219.46   270.53   309.51
+   11 : 1987-11-30 12:00 139      0  2048  1361 :   230.98   269.85   308.61
+   12 : 1987-12-31 12:00 139      0  2048  1361 :   241.25   269.94   309.27
+@EndVerbatim
+@EndExample

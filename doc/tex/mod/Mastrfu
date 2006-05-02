@@ -1,0 +1,29 @@
+@BeginModule
+@Name      = Mastrfu
+@Title     = Mass stream function
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = mastrfu
+@EndModule
+
+
+@BeginOperator_mastrfu
+@Title     = Mass stream function
+
+@BeginDescription
+This is a special operator for the post processing of
+the atmospheric general circulation model ECHAM.
+It computes the mass stream function (code number 272).
+The input dataset must be a zonal mean of v-velocity
+(code number 132) on pressure levels.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the mass stream function from a zonal mean 
+v-velocity dataset use:
+@BeginVerbatim
+   cdo mastrfu ifile ofile
+@EndVerbatim
+@EndExample

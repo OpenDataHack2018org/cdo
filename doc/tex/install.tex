@@ -1,0 +1,95 @@
+\section{Building from sources}
+
+This section describe how to build \CDO from the sources on a UNIX system.
+\CDO is using the GNU configure and build system to compile the source code.
+The only requirement is a functioning ANSI C compiler.
+
+%First go to the \href{http://www.mpimet.mpg.de/~cdo/download.html}{\tt download} page
+%({\tt http://www.mpimet.mpg.de/\~\,cdo/download.html}) to get the latest distribution,
+First go to the \href{http://www.mpimet.mpg.de/~cdo}{\tt download} page
+({\tt http://www.mpimet.mpg.de/\~\,cdo}) to get the latest distribution,
+if you did not have it already.
+
+To take full advantage of \CDO's features the following additional
+library should be installed.
+
+\begin{itemize}
+\item Unidata \href{http://www.unidata.ucar.edu/packages/netcdf/index.html}{netCDF} library
+      ({\tt http://www.unidata.ucar.edu/packages/netcdf/index.html})
+      version 3 or higher.
+      This is needed to read/write netCDF files with \CDO. 
+\end{itemize}
+
+%This section is divided into the following sections:
+%<ul>
+%<li>\ref install_src_unix  "Compiling from source on Unix"
+%<li>\ref install_bin_unix  "Installing the binaries on Unix"
+%<li>\ref build_tools       "Tools used to develop CDO"
+%</ul>
+
+
+\subsection{Compilation}
+
+Compilation is now done by performing the following steps:
+
+\begin{enumerate}
+\item Unpack the archive, unless you already have done that:
+   
+\begin{verbatim}
+    gunzip cdo-$VERSION.tar.gz    # uncompress the archive
+    tar xf cdo-$VERSION.tar       # unpack it
+    cd cdo-$VERSION
+\end{verbatim}
+
+\item Run the configure script:
+ 
+\begin{verbatim}
+    ./configure
+\end{verbatim}
+
+Or with netCDF support:
+ 
+\begin{verbatim}
+    ./configure --with-netcdf=<netCDF root directory>
+\end{verbatim}
+
+For an overview of other configuration options use
+
+\begin{verbatim}
+    ./configure --help
+\end{verbatim}
+
+\item Compile the program by running make:
+
+\begin{verbatim}
+    make
+\end{verbatim}
+
+\end{enumerate}
+
+The program should compile without problems and the binary ({\tt cdo}) 
+should be available in the {\tt src} directory of the distribution.
+
+
+\subsection{Installation}
+
+After the compilation of the source code do a {\tt make install},
+possibly as root if the destination permissions require that.
+
+\begin{verbatim}
+    make install
+\end{verbatim} 
+
+The binary is installed into the directory {\tt $<$prefix$>$/bin}.
+
+{\tt $<$prefix$>$} defaults to {\tt /usr/local} but can be changed with 
+the {\tt --prefix} option of the configure script. 
+
+Alternatively, you can also copy the binary from the {\tt src} directory
+manually to some {\tt bin} directory in your search path.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "missval"
+%%% End: 

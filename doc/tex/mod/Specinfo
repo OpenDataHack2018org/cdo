@@ -1,0 +1,17 @@
+@BeginModule
+@NewPage
+@Name      = Specinfo
+@Title     = Sectral information
+@Section   = Information
+@Class     = Information
+@Arguments = 
+@Operators = specinfo
+@EndModule
+
+
+@BeginOperator_specinfo
+@Title     = Spectral information
+
+@BeginDescription
+@EndDescription
+@EndOperator

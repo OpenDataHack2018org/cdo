@@ -1,0 +1,6 @@
+latex cdo_refcard
+dvips -Ppdf cdo_refcard
+ps2pdf cdo_refcard.ps cdo_refcard.pdf
+pstops -p a4 '2:0R@.7(0.2cm,29.6cm)+1R@.7(0.2cm,15cm)' cdo_refcard.ps cdo_refcard2.ps
+mv cdo_refcard2.ps cdo_refcard.ps
+ps2pdf cdo_refcard.ps cdo_refcard.pdf

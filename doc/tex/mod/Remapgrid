@@ -1,0 +1,93 @@
+@BeginModule
+@NewPage
+@Name      = Remapgrid
+@Title     = SCRIP grid interpolation
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = remapbil remapbic remapcon remapdis
+
+@BeginDescription
+This module contains operators to interpolate all input fields to a new grid.
+Each operator is using a different remapping method. The interpolation is based
+on a special SCRIP library version. For a detailed description of the remapping 
+methods see @cite{SCRIP}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_remapbil
+@Name      = remapbil
+@Title     = Bilinear interpolation
+@Parameter = grid
+
+@BeginDescription
+Performs a bilinear interpolation on all input fields.
+This interpolation method works only on rectangular grids.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remapbic
+@Name      = remapbic
+@Title     = Bicubic interpolation
+@Parameter = grid
+
+@BeginDescription
+Performs a bicubic interpolation on all input fields.
+This interpolation method works only on rectangular grids.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remapcon
+@Name      = remapcon
+@Title     = Conservative remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a first order conservative remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remapdis
+@Name      = remapdis
+@Title     = Distance-weighted averaging
+@Parameter = grid
+
+@BeginDescription
+Performs a distance-weighted average of the four nearest neighbor values on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = grid
+STRING  Target grid description file or name
+@EndParameter
+
+
+@BeginEnvironment
+@Item = NORMALIZE_OPT
+This variable is used to choose the normalization of the conservative 
+remapping. By default, NORMALIZE_OPT is set to be 'fracarea' and will
+include the destination area fraction in the output weights; other 
+options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
+@EndEnvironment
+
+
+@BeginNote
+For this program the author has converted the original Fortran 90 SCRIP 
+software to ANSI C. In case of any problems send a bug report to CDO and
+not to SCRIP!
+@EndNote
+
+
+@BeginExample
+Say @file{ifile} contains fields on a rectangular grid.
+Remap all fields bilinear to a T42 gaussian grid:
+@BeginVerbatim
+   cdo remapbil,t42grid ifile ofile
+@EndVerbatim
+@EndExample

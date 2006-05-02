@@ -1,0 +1,134 @@
+@BeginModule
+@NewPage
+@Name      = Runstat
+@Title     = Running statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = runmin runmax runsum runmean runavg runstd
+
+@BeginDescription
+This module computes running statistical values over a selected number
+of time steps. Depending on the actual operator name the minimum, 
+maximum, sum, average or standard deviation of a selected number 
+of consecutive time steps read from @file{ifile} is written to @file{ofile}.
+The date information in @file{ofile} is the date of the medium contributing 
+time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_runmin
+@Title     = Running minimum
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runmax
+@Title     = Running maximum
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runsum
+@Title     = Running sum
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runmean
+@Title     = Running mean
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runavg
+@Title     = Running average
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runstd
+@Title     = Running standard deviation
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = sqrt{var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = nts
+INTEGER  Number of time steps
+@EndParameter
+
+
+@BeginExample
+To compute the running mean over 9 time steps, use:
+@BeginVerbatim
+   cdo runmean,9 ifile ofile
+@EndVerbatim
+@EndExample

@@ -1,0 +1,35 @@
+@BeginModule
+@NewPage
+@Name      = Timsort
+@Title     = Timsort
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = timsort
+@EndModule
+
+
+@BeginOperator_timsort
+@Title     = Sort over the time
+
+@BeginDescription
+Sorts for every field position the elements in ascending order over all time steps.
+After sorting it is:
+
+@IfMan
+o(t_1,x) < o(t_2,x)      forall (t_1<t_2),x
+@EndifMan
+@IfDoc
+@BeginMath
+o(t_1,x) < o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To sort all field elements of a dataset over all time steps use:
+@BeginVerbatim
+   cdo timsort ifile ofile
+@EndVerbatim
+@EndExample

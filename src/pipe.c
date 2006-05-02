@@ -24,7 +24,7 @@
 #include "error.h"
 #include "dmemory.h"
 
-#if  defined  (HAVE_PTHREAD_H)
+#if  defined  (HAVE_LIBPTHREAD)
 
 static int PipeDebug = 0;
 

@@ -1,0 +1,67 @@
+@BeginModule
+@NewPage
+@Name      = Setgatt
+@Title     = Set global attribute
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = setgatt setgatts
+
+@BeginDescription
+This module sets global text attributes of a dataset. Depending on the actual 
+operator name the attributes are read from a file or can be specified by parameter.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_setgatt
+@Title     = Set global attribute
+@Parameter = attname attstring
+
+@BeginDescription
+Sets one user defined global text attribute.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setgatts
+@Title     = Set global attributes
+@Parameter = attfile
+
+@BeginDescription
+Sets user defined global text attributes. The name and text
+of the global attributes are read from a file.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = attname,attstring
+STRING  Name and text of the global attribute (without spaces!)
+@Item = attfile
+STRING  File name which contains global text attributes
+@EndParameter
+
+
+@BeginNote
+From the supported data formats only netCDF can work with global attributes.
+@EndNote
+
+
+@BeginExample
+To set the global text attribute "myatt" to "myattcontents" in a netCDF file use:
+@BeginVerbatim
+   cdo setgatt,myatt,myattcontents ifile ofile
+@EndVerbatim
+Result of '{\tt ncdump -h ofile}':
+@BeginVerbatim
+netcdf ofile {
+dimensions: ...
+
+variables: ...
+
+// global attributes:
+                :myatt = "myattcontens" ;
+}
+@EndVerbatim
+@EndExample
