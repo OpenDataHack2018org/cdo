@@ -1528,7 +1528,7 @@ int gridFromNCfile(const char *gridfile)
 
   nc_type xtype;
   size_t attlen;
-  size_t grid_rank;
+  size_t grid_rank, grid_size, grid_nvertex;
   int grid_dims[2];
   GRID grid;
 
@@ -1543,9 +1543,9 @@ int gridFromNCfile(const char *gridfile)
        nc_inq_dimid(nc_file_id, "grid_rank", &nc_gridrank_id)    == NC_NOERR &&
        nc_inq_dimid(nc_file_id, "grid_corners", &nc_gridcorn_id) == NC_NOERR )
     {
-      nce(nc_inq_dimlen(nc_file_id, nc_gridsize_id, &grid.size));
+      nce(nc_inq_dimlen(nc_file_id, nc_gridsize_id, &grid_size)); grid.size = (int) grid_size;
       nce(nc_inq_dimlen(nc_file_id, nc_gridrank_id, &grid_rank));
-      nce(nc_inq_dimlen(nc_file_id, nc_gridcorn_id, &grid.nvertex));
+      nce(nc_inq_dimlen(nc_file_id, nc_gridcorn_id, &grid_nvertex)); grid.nvertex = (int) grid_nvertex;
   
       nce(nc_inq_varid(nc_file_id, "grid_dims", &nc_griddims_id));
       nce(nc_get_var_int(nc_file_id, nc_griddims_id, grid_dims));
