@@ -47,7 +47,8 @@ For a detailed description of this interpolation method see @cite{PINGO}.
 @Parameter = grid
 
 @BeginDescription
-Performs a bilinear interpolation on all input fields.
+Performs a bilinear interpolation on all input fields. This is a faster
+implementation than @oper{remapbil}. Missing values are not supported yet!
 @EndDescription
 @EndOperator
 
@@ -70,3 +71,12 @@ Linear point interpolation.
 @Item = grid
 STRING  Target grid description file or name
 @EndParameter
+
+
+@BeginExample
+Say @file{ifile} contains fields on a rectangular grid.
+To interpolate all fields bilinear to a T42 gaussian grid, use:
+@BeginVerbatim
+   cdo intgridbil,t42grid ifile ofile
+@EndVerbatim
+@EndExample

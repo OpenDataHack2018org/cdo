@@ -72,6 +72,29 @@ Operator catalog:
       Selbox     sellonlatbox    Select lon/lat box
       Selbox     selindexbox     Select index box
 -------------------------------------------------------------
+   Conditional selection
+-------------------------------------------------------------
+      Cond       ifthen          If then
+      Cond       ifnotthen       If not then
+      Cond2      ifthenelse      If then else
+      Condc      ifthenc         If then constant
+      Condc      ifnotthenc      If not then constant
+-------------------------------------------------------------
+   Comparison
+-------------------------------------------------------------
+      Comp       eq              Equal
+      Comp       ne              Not equal
+      Comp       le              Less equal
+      Comp       lt              Less than
+      Comp       ge              Greater equal
+      Comp       gt              Greater than
+      Compc      eqc             Equal constant
+      Compc      nec             Not equal constant
+      Compc      lec             Less equal constant
+      Compc      ltc             Less then constant
+      Compc      gec             Greater equal constant
+      Compc      gtc             Greater then constant
+-------------------------------------------------------------
    Modification
 -------------------------------------------------------------
       Set        setpartab       Set parameter table
@@ -139,37 +162,14 @@ Operator catalog:
       Arith      min             Minimum of two fields
       Arith      max             Maximum of two fields
       Arith      atan2           Arc tangent of two fields
-      Ymonarith  ymonadd         Add multi-year monthly time averages
-      Ymonarith  ymonsub         Subtract multi-year monthly time averages
-      Ymonarith  ymonmul         Multiply multi-year monthly time averages
-      Ymonarith  ymondiv         Divide multi-year monthly time averages
+      Ymonarith  ymonadd         Add multi-year monthly time average
+      Ymonarith  ymonsub         Subtract multi-year monthly time average
+      Ymonarith  ymonmul         Multiply multi-year monthly time average
+      Ymonarith  ymondiv         Divide multi-year monthly time average
       Arithdays  muldpm          Multiply with days per month
       Arithdays  divdpm          Divide by days per month
       Arithdays  muldpy          Multiply with days per year
       Arithdays  divdpy          Divide by days per year
--------------------------------------------------------------
-   Comparison
--------------------------------------------------------------
-      Comp       eq              Equal
-      Comp       ne              Not equal
-      Comp       le              Less equal
-      Comp       lt              Less than
-      Comp       ge              Greater equal
-      Comp       gt              Greater than
-      Compc      eqc             Equal constant
-      Compc      nec             Not equal constant
-      Compc      lec             Less equal constant
-      Compc      ltc             Less then constant
-      Compc      gec             Greater equal constant
-      Compc      gtc             Greater then constant
--------------------------------------------------------------
-   Condition
--------------------------------------------------------------
-      Cond       ifthen          If then
-      Cond       ifnotthen       If not then
-      Cond2      ifthenelse      If then else
-      Condc      ifthenc         If then constant
-      Condc      ifnotthenc      If not then constant
 -------------------------------------------------------------
    Statistical values
 -------------------------------------------------------------

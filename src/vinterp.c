@@ -30,14 +30,14 @@ void h2p(double *phlev, double *hlev, int nphlev)
 
   for ( k = 0; k < nphlev; k++ )
     {
-      height  = (double) hlev[k];
+      height  = hlev[k];
       /*
 	unitsel == 1 : hlev[k] is given in meters
 	unitsel == 2 : hlev[k] is given in kilometers
 	h2p needs meters (MKSC-standard)
       */
 
-      exp_arg = (double) (height / SCALEHEIGHT);
+      exp_arg = height / SCALEHEIGHT;
 
       phlev[k] = SCALESLP * exp(exp_arg);
     }

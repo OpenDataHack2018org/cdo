@@ -1,14 +1,14 @@
 @BeginModule
 @NewPage
 @Name      = Cond
-@Title     = Condition with two fields
-@Section   = Condition
-@Class     = Comparison
+@Title     = Conditional select one field
+@Section   = Conditional selection
 @Arguments = ifile1 ifile2 ofile
 @Operators = ifthen ifnotthen
 
 @BeginDescription
-This module conditional selects fields from @file{ifile2} and writes the result to @file{ofile}.
+This module conditional selects field elements from @file{ifile2} and writes the 
+result to @file{ofile}. The fields in @file{ifile1} are handled as a mask. 
 A value not equal to zero is treated as "true", zero is treated as "false".
 @EndDescription
 @EndModule
@@ -59,6 +59,8 @@ o(t,x) = \left\{
 
 
 @BeginExample
+To select all field elements of @file{ifile2} if the corresponding field
+element of @file{ifile1} is greater than 0, use:
 @BeginVerbatim
    cdo ifthen ifile1 ifile2 ofile
 @EndVerbatim

@@ -1,13 +1,13 @@
 @BeginModule
 @Name      = Cond2
-@Title     = Condition with tree fields
-@Section   = Condition
-@Class     = Comparison
+@Title     = Conditional select  two fields
+@Section   = Conditional selection
 @Arguments = ifile1 ifile2 ifile3 ofile
 @Operators = ifthenelse
 
 @BeginDescription
-This operator conditional selects fields from @file{ifile2} or @file{ifile3} and writes the result to @file{ofile}.
+This operator conditional selects field elements from @file{ifile2} or @file{ifile3} and 
+writes the result to @file{ofile}. The fields in @file{ifile1} are handled as a mask.
 A value not equal to zero is treated as "true", zero is treated as "false".
 @EndDescription
 @EndModule
@@ -36,9 +36,9 @@ o(t,x) = \left\{
 @EndOperator
 
 
-
-
 @BeginExample
+To select all field elements of @file{ifile2} if the corresponding field
+element of @file{ifile1} is greater than 0 and from @file{ifile3} otherwise, use:
 @BeginVerbatim
    cdo ifthenelse ifile1 ifile2 ifile3 ofile
 @EndVerbatim

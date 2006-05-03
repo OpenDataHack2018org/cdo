@@ -1,14 +1,14 @@
 @BeginModule
 @NewPage
 @Name      = Condc
-@Title     = Condition with a field and a constant
-@Section   = Condition
-@Class     = Comparison
+@Title     = Conditional select a constant
+@Section   = Conditional selection
 @Arguments = ifile ofile
 @Operators = ifthenc ifnotthenc
 
 @BeginDescription
-This module creates fields with a constant or missing value.
+This module creates fields with a constant value or missing value.
+The fields in @file{ifile1} are handled as a mask.
 A value not equal to zero is treated as "true", zero is treated as "false".
 @EndDescription
 @EndModule
@@ -67,7 +67,9 @@ FLOAT  Constant
 
 
 @BeginExample
+To create fields with the constant value 7 if the corresponding field element
+of @file{ifile} is greater than 0, use:
 @BeginVerbatim
-   cdo ifthenc,7 ifile1 ifile2 ofile
+   cdo ifthenc,7 ifile ofile
 @EndVerbatim
 @EndExample

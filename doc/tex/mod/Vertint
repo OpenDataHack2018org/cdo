@@ -22,7 +22,7 @@ the orography (GEOSP/code129) is also needed.
 @Parameter = plevels
 
 @BeginDescription
-Interpolate 3D variables on hybrid model level to pressure level.
+Interpolates 3D variables on hybrid model level to pressure level.
 @EndDescription
 @EndOperator
 
@@ -32,7 +32,10 @@ Interpolate 3D variables on hybrid model level to pressure level.
 @Parameter = hlevels
 
 @BeginDescription
-Interpolate 3D variables on hybrid model level to height level.
+Interpolates 3D variables on hybrid model level to height level.
+The procedure is the same as for operator @oper{mh2pl} except that 
+the pressure levels are calculated from the heights by:
+@math{plev = 101325*exp(hlev/-7000)}
 @EndDescription
 @EndOperator
 

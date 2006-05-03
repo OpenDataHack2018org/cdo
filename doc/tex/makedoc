@@ -991,7 +991,7 @@ sub print_description {
 	  $line =~ s/ ifiles / {\\tt ifiles} /og;
 	  $line =~ s/\@math\{([^}]*)\}/\\begin{math}\1\\end{math}/og;
 	  $line =~ s/\@file\{([^}]*)\}/{\\tt \1}/og;
-	  $line =~ s/\@oper\{([^}]*)\}/{\\bf \1}/og;
+	  $line =~ s/\@oper\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@var\{([^}]*)\}/{\\it \1}/og;
 	  $line =~ s/\@mod\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;

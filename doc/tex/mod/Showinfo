@@ -1,11 +1,16 @@
 @BeginModule
 @NewPage
 @Name      = Showinfo
-@Title     = Show
+@Title     = Show variables, levels or times
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
 @Operators = showcode showvar showlevel showyear showmon showdate showtime
+
+@BeginDescription
+This module prints, according to the actual operator name,
+the variables, levels or times of the input dataset.
+@EndDescription
 @EndModule
 
 

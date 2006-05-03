@@ -19,40 +19,44 @@ by a call of the module @mod{YMONSTAT}.
 
 
 @BeginOperator_ymonadd
-@Title     = Add multi-year monthly time averages
+@Title     = Add multi-year monthly time average
 
 @BeginDescription
-Adds a time series and a multi-year monthly time averages.
+Adds a time series and a multi-year monthly time average.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_ymonsub
-@Title     = Subtract multi-year monthly time averages
+@Title     = Subtract multi-year monthly time average
 
 @BeginDescription
-Subtracts a time series and a multi-year monthly time averages.
+Subtracts a time series and a multi-year monthly time average.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_ymonmul
-@Title     = Multiply multi-year monthly time averages
+@Title     = Multiply multi-year monthly time average
 
 @BeginDescription
-Multiplies a time series and a multi-year monthly time averages.
+Multiplies a time series and a multi-year monthly time average.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_ymondiv
-@Title     = Divide multi-year monthly time averages
+@Title     = Divide multi-year monthly time average
 
 @BeginDescription
-Divides a time series and a multi-year monthly time averages.
+Divides a time series and a multi-year monthly time average.
 @EndDescription
 @EndOperator
 
 
-#@BeginExample
-#@EndExample
+@BeginExample
+To subtract a multi-year monthly time average from a time series, use:
+@BeginVerbatim
+   cdo ymonsub ifile -ymonavg ifile ofile
+@EndVerbatim
+@EndExample

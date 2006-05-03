@@ -12,6 +12,11 @@ Splittime     File operations
 Select        Selection
 Seltime       Selection
 Selbox        Selection
+Cond          Conditional selection
+Cond2         Conditional selection
+Condc         Conditional selection
+Comp	      Comparison
+Compc	      Comparison
 Set           Modification
 Settime       Modification
 Change        Modification
@@ -28,11 +33,6 @@ Arithc        Arithmetic
 Arith	      Arithmetic
 Ymonarith     Arithmetic
 Arithdays     Arithmetic
-Comp	      Comparison
-Compc	      Comparison
-Cond          Condition
-Cond2         Condition
-Condc         Condition
 Ensstat       Statistical values
 Fldstat       Statistical values
 Zonstat       Statistical values

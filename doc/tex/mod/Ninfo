@@ -1,11 +1,16 @@
 @BeginModule
 @NewPage
 @Name      = Ninfo
-@Title     = Print numbers
+@Title     = Print the number of variables, levels or times
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
 @Operators = ncode nvar nlevel nyear nmon ndate ntime
+
+@BeginDescription
+This module prints, according to the actual operator name,
+the number of variables, levels or times of the input dataset.
+@EndDescription
 @EndModule
 
 
