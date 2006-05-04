@@ -8,9 +8,9 @@
 @Operators = info -infov map
 
 @BeginDescription
-This module writes information about the structure and 
-contents of all input datasets to standard output.
-The information displayed depends on the actual operator name.
+This module writes information about the structure and contents 
+of all input datasets to standard output. The information displayed 
+depends on the actual operator name.
 @EndDescription
 @EndModule
 
@@ -19,8 +19,8 @@ The information displayed depends on the actual operator name.
 @Title     = Dataset information
 
 @BeginDescription
-Prints information and simple statistics for each field of all input datasets.
-For each field the operator print in one line the:
+Prints information and simple statistics for each field of all
+input datasets. For each field the operator print in one line the:
 @BeginItemize
 @Item = Date and Time
 @Item = Code number and Level
@@ -36,8 +36,8 @@ The mean value is computed without the use of area weights!
 @Title     = Dataset information
 
 @BeginDescription
-The same as operator @oper{info} but using the name instead of the code number
-to identify the variables.
+The same as operator @oper{info} but using the name instead of the code
+number to identify the variables.
 @EndDescription
 @EndOperator
 
@@ -46,8 +46,8 @@ to identify the variables.
 @Title     = Dataset information and simple map
 
 @BeginDescription
-Prints information, simple statistic and a map for each field of all input datasets.
-The map will be printed only for fields on a rectangular grid.
+Prints information, simple statistic and a map for each field of all input
+datasets. The map will be printed only for fields on a rectangular grid.
 @EndDescription
 @EndOperator
 

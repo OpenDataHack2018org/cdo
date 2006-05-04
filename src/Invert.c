@@ -350,10 +350,7 @@ void *Invert(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
 
   array1 = (double *) malloc(gridsize*sizeof(double));
-  if ( operfunc1 == func_all || operfunc1 == func_fld )
-    array2 = (double *) malloc(gridsize*sizeof(double));
-  else
-    array2 = array1;
+  array2 = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -376,6 +373,10 @@ void *Invert(void *argument)
 		invertLatData(array1, array2, gridID1);
 	      else
 		invertLonData(array1, array2, gridID1);
+	    }
+	  else
+	    {
+	      memcpy(array2, array1, gridsize*sizeof(double));
 	    }
 
 	  streamDefRecord(streamID2, varID, levelID);

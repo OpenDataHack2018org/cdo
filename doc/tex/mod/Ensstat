@@ -10,9 +10,8 @@
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
 Depending on the actual operator name the minimum, maximum, sum, average
-or standard deviation over all input files is written to @file{ofile}.
-The date information for a time step in @file{ofile} is the date of the
-first input file.
+or standard deviation over all input files is written to @file{ofile}. The date 
+information for a time step in @file{ofile} is the date of the first input file.
 @EndDescription
 @EndModule
 

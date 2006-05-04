@@ -8,8 +8,8 @@
 
 @BeginDescription
 This module conditional selects field elements from @file{ifile2} and writes the 
-result to @file{ofile}. The fields in @file{ifile1} are handled as a mask. 
-A value not equal to zero is treated as "true", zero is treated as "false".
+result to @file{ofile}. The fields in @file{ifile1} are handled as a mask. A value 
+not equal to zero is treated as "true", zero is treated as "false".
 @EndDescription
 @EndModule
 

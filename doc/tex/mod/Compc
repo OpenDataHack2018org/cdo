@@ -10,8 +10,7 @@
 @BeginDescription
 This module compares all fields of dataset with a constant. The resulting
 field is a mask with 1 if the comparison is true and 0 if the comparison 
-is false. The type of the comparison depends on the
-actual operator name.
+is false. The type of the comparison depends on the actual operator name.
 @EndDescription
 @EndModule
 

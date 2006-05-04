@@ -8,8 +8,8 @@
 @Operators = diff -diffv
 
 @BeginDescription
-Compares the contents of two datasets field by field.
-The input datasets must have the same structure and the fields must have 
+Compares the contents of two datasets field by field. The input
+datasets must have the same structure and the fields must have 
 the same header information and dimensions.
 @EndDescription
 @EndModule

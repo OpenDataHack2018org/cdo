@@ -7,9 +7,9 @@
 @Operators = setmissval setctomiss setmisstoc setrtomiss
 
 @BeginDescription
-This module sets part of a field to missing value or
-missing values to a constant value. Which part of the
-field is set depends on the actual operator name.
+This module sets part of a field to missing value or missing values
+to a constant value. Which part of the field is set depends on the 
+actual operator name.
 @EndDescription
 @EndModule
 

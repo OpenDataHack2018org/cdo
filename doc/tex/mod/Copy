@@ -8,8 +8,8 @@
 @Operators = copy cat
 
 @BeginDescription
-This module contains operators to copy or concatenate datasets.
-Each input dataset must have the  same variables with complete time steps.
+This module contains operators to copy or concatenate datasets. Each
+input dataset must have the same variables with complete time steps.
 @EndDescription
 @EndModule
 

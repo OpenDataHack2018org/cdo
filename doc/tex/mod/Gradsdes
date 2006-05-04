@@ -7,13 +7,11 @@
 @Operators = gradsdes gradsdes2
 
 @BeginDescription
-Creates a GrADS data descriptor file. Supported file formats
-are GRIB, SERVICE, EXTRA and IEG. For GRIB files the GrADS map
-file is also generated.
-For SERVICE and EXTRA files the grid must be specified with
-the CDO option '-g <grid>'.
-This operator takes @file{ifile} in order to create filenames for
-the descriptor (@file{ifile.ctl}) and the map (@file{ifile.gmp}) file.
+Creates a GrADS data descriptor file. Supported file formats are GRIB,
+SERVICE, EXTRA and IEG. For GRIB files the GrADS map file is also 
+generated. For SERVICE and EXTRA files the grid must be specified with
+the CDO option '-g <grid>'. This operator takes @file{ifile} in order to create 
+filenames for the descriptor (@file{ifile.ctl}) and the map (@file{ifile.gmp}) file.
 @EndDescription
 @EndModule
 

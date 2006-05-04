@@ -37,7 +37,7 @@ o_2(1,x) = \frac{\sum\limits_{t \in S(x)}\left(i(t,x) - \frac{1}{\#S(x)} \sum\li
             {\sum\limits_{t \in S(x)}\left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)^{2}}
 @EndDisplayMath
 @EndifDoc
-Thus the estimation for @math{a} is stored in @file{ofile1} and that for @math{b} is 
-stored in @file{ofile2}. To subtract the trend from the data see operator @mod{subtrend}.
+Thus the estimation for @math{a} is stored in @file{ofile1} and that for @math{b} is stored 
+in @file{ofile2}. To subtract the trend from the data see operator @mod{subtrend}.
 @EndDescription
 @EndOperator

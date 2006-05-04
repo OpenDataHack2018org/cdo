@@ -8,8 +8,8 @@
 
 @BeginDescription
 This module creates fields with a constant value or missing value.
-The fields in @file{ifile1} are handled as a mask.
-A value not equal to zero is treated as "true", zero is treated as "false".
+The fields in @file{ifile1} are handled as a mask. A value not equal 
+to zero is treated as "true", zero is treated as "false".
 @EndDescription
 @EndModule
 

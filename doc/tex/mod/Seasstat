@@ -12,9 +12,9 @@ This module computes statistical values over time steps of the same season.
 Depending on the actual operator name the minimum, maximum, sum, average 
 or standard deviation of time steps of the same season is written to @file{ofile}.
 The date information for a time step in @file{ofile} is the date of the last 
-contributing time step in @file{ifile}. Be careful about the first and
-the last output time step, they may be incorrect values if the seasons
-have incomplete time steps.
+contributing time step in @file{ifile}. Be careful about the first and the last 
+output time step, they may be incorrect values if the seasons have incomplete 
+time steps.
 @EndDescription
 @EndModule
 
