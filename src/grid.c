@@ -182,7 +182,7 @@ int gridDefine(GRID grid)
 
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
-	gridID = gridNew(grid.type, grid.size);
+	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
 
@@ -275,7 +275,7 @@ int gridDefine(GRID grid)
       {
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
-	gridID = gridNew(grid.type, grid.size);
+	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
 
@@ -330,7 +330,7 @@ int gridDefine(GRID grid)
 	if ( grid.size == 0 )
 	  grid.size = (grid.ntr+1) * (grid.ntr+2);
 
-	gridID = gridNew(grid.type, grid.size);
+	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
 
@@ -344,7 +344,7 @@ int gridDefine(GRID grid)
 	if ( grid.ni == 0 ) Error(func, "ni undefined!");
 	if ( grid.size == 0 ) Error(func, "size undefined!");
 
-	gridID = gridNew(grid.type, grid.size);
+	gridID = gridCreate(grid.type, grid.size);
 
 	gridDefPrec(gridID, grid.prec);
 

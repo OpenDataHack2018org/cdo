@@ -145,7 +145,7 @@ void *Zonstat(void *argument);
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd"}
 #define  ExprOperators          {"expr", "exprf"}
-#define  FiledesOperators       {"filedes", "griddes", "zaxisdes", "vct", "vardes", "timedes", "vlist"}
+#define  FiledesOperators       {"filedes", "griddes", "zaxisdes", "vct", "vardes", "taxisdes", "vlist"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd"}
@@ -219,7 +219,7 @@ void *Zonstat(void *argument);
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertstd"}
-#define  WindOperators          {"uv2dv", "dv2uv"}
+#define  WindOperators          {"uv2dv", "dv2uv", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
 #define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaymean", "ydayavg", "ydaystd"}

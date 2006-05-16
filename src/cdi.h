@@ -166,11 +166,11 @@ void    streamInqGinfo(int streamID, int *intnum, float *fltnum);
 
 /* VLIST routines */
 
-/*      vlistNew: Create a variable list */
-int     vlistNew(void);
+/*      vlistCreate: Create a variable list */
+int     vlistCreate(void);
 
-/*      vlistFree: Delete a variable list */
-void    vlistFree(int vlistID);
+/*      vlistDestroy: Delete a variable list */
+void    vlistDestroy(int vlistID);
 
 /*      vlistDuplicate: Duplicate a variable list */
 int     vlistDuplicate(int vlistID);
@@ -308,8 +308,8 @@ int     gridInqMask(int gridID, int *mask);
 void    gridPrint(int gridID);
 int     gridSize(void);
 
-/*      gridNew: Create a new Grid */
-int     gridNew(int gridtype, int size);
+/*      gridCreate: Create a new Grid */
+int     gridCreate(int gridtype, int size);
 
 /*      gridDuplicate: Duplicate a Grid */
 int     gridDuplicate(int gridID);
@@ -453,8 +453,8 @@ int     gridToCurvilinear(int gridID);
 
 void    zaxisName(int zaxistype, char *gridname);
 
-/*      zaxisNew: Create a new Z-axis */
-int     zaxisNew(int leveltype, int size);
+/*      zaxisCreate: Create a new Z-axis */
+int     zaxisCreate(int leveltype, int size);
 
 /*      zaxisInqType: Get the type of a Z-axis */
 int     zaxisInqType(int zaxisID);
@@ -519,8 +519,8 @@ void    zaxisChangeType(int zaxisID, int leveltype);
 
 /* TAXIS routines */
 
-/*      taxisNew: Create a new T-axis */
-int     taxisNew(int timetype);
+/*      taxisCreate: Create a new T-axis */
+int     taxisCreate(int timetype);
 
 int     taxisDuplicate(int taxisID);
 

@@ -282,7 +282,7 @@ void *Select(void *argument)
 	}
     }
 
-  vlistID2 = vlistNew();
+  vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -332,6 +332,8 @@ void *Select(void *argument)
        
       tsID++;
     }
+
+  vlistDestroy(vlistID2);
 
   streamClose(streamID2);
   streamClose(streamID1);

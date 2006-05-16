@@ -75,14 +75,14 @@ void *Vertstat(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
-  vlistID2 = vlistNew();
+  vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  zaxisID = zaxisNew(ZAXIS_SURFACE, 1);
+  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
   nzaxis  = vlistNzaxis(vlistID1);
   for ( i = 0; i < nzaxis; i++ )
     if ( zaxisInqSize(vlistZaxis(vlistID1, i)) > 1 )
@@ -92,6 +92,7 @@ void *Vertstat(void *argument)
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
+  vlistDestroy(vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
 

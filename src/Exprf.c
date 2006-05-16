@@ -114,7 +114,7 @@ void *Expr(void *argument)
 
   nvars = vlistNvars(vlistID1);
 
-  vlistID2 = vlistNew();
+  vlistID2 = vlistCreate();
 
   prs_arg.init = 1;
   prs_arg.vlistID1 = vlistID1;
@@ -248,6 +248,8 @@ void *Expr(void *argument)
 
       tsID++;
     }
+
+  vlistDestroy(vlistID2);
 
   streamClose(streamID2);
   streamClose(streamID1);

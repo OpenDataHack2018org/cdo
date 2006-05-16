@@ -57,7 +57,7 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
   gridtype = gridInqType(gridID1);
   prec     = gridInqPrec(gridID1);
 
-  gridID2 = gridNew(gridtype, nlon2*nlat2);
+  gridID2 = gridCreate(gridtype, nlon2*nlat2);
   gridDefXsize(gridID2, nlon2);
   gridDefYsize(gridID2, nlat2);
 

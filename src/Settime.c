@@ -218,11 +218,15 @@ void *Settime(void *argument)
   if ( operatorID == SETREFTIME )
     {
       if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
-	cdoPrint("Changing absolute to relative time axis!");
+	{
+	  cdoPrint("Changing absolute to relative time axis!");
 
-      taxisID2 = taxisNew(TAXIS_RELATIVE);
-      if ( operatorArgc() != 3 ) tunit = taxisInqTunit(taxisID1);
-      taxisDefTunit(taxisID2, tunit);
+	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
+	  if ( operatorArgc() != 3 ) tunit = taxisInqTunit(taxisID1);
+	  taxisDefTunit(taxisID2, tunit);
+	}
+      else
+	taxisID2 = taxisDuplicate(taxisID1);
     }
   else if ( operatorID == SETCALENDAR )
     {
@@ -236,7 +240,7 @@ void *Settime(void *argument)
 	    cdoAbort("This operator does not work on an absolute time axis!");
 	 */
 	  cdoPrint("Changing absolute to relative time axis!");
-	  taxisID2 = taxisNew(TAXIS_RELATIVE);
+	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
 	}
       else
 	taxisID2 = taxisDuplicate(taxisID1);

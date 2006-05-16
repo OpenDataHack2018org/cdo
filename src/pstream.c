@@ -930,7 +930,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  if ( cdoTimer ) timer_stop(timer_read);
 
 	  vlistCompare(vlistIDold, vlistIDnew, func_hrd);
-	  vlistFree(vlistIDold);
+	  vlistDestroy(vlistIDold);
 #if  defined  (HAVE_LIBPTHREAD)
 	  pthread_mutex_unlock(&streamOpenReadMutex);
 #endif

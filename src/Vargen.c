@@ -70,18 +70,19 @@ void *Vargen(void *argument)
 
   gridID  = cdoDefineGrid(gridfile);
 
-  zaxisID = zaxisNew(ZAXIS_SURFACE, 1);
+  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
-  vlistID = vlistNew();
+  vlistID = vlistCreate();
   varID   = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
 
-  taxisID = taxisNew(TAXIS_ABSOLUTE);
+  taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID, taxisID);
 
   streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
   if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(0));
 
   streamDefVlist(streamID, vlistID);
+  vlistDestroy(vlistID);
 
   gridsize = gridInqSize(gridID);
   array = (double *) malloc(gridsize*sizeof(double));

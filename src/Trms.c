@@ -106,7 +106,7 @@ void *Trms(void *argument)
 
   slon = 0;
   slat = 0;
-  gridID3 = gridNew(GRID_LONLAT, 1);
+  gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
   gridDefXvals(gridID3, &slon);
@@ -124,7 +124,7 @@ void *Trms(void *argument)
 
   if ( pvarID == -1 ) cdoAbort("pressure variable missing!");
 
-  vlistID3 = vlistNew();
+  vlistID3 = vlistCreate();
   vlistCopyFlag(vlistID3, vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -273,6 +273,8 @@ void *Trms(void *argument)
   streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
+
+  vlistDestroy(vlistID3);
 
   if ( field1.weight ) free(field1.weight);
 

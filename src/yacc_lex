@@ -1,0 +1,2 @@
+bison -y -o expr_yacc.c -d expr_yacc.y
+flex -oexpr_lex.c expr_lex.l

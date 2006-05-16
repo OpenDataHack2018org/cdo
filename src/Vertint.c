@@ -126,9 +126,9 @@ void *Vertint(void *argument)
     }
 
   if ( operatorID == ML2HL )
-    zaxisIDp = zaxisNew(ZAXIS_HEIGHT, nplev);
+    zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
   else
-    zaxisIDp = zaxisNew(ZAXIS_PRESSURE, nplev);
+    zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
 
   zaxisDefLevels(zaxisIDp, plev);
   nzaxis  = vlistNzaxis(vlistID1);

@@ -49,7 +49,7 @@ void *Cond2(void *argument)
   double *array1, *array2, *array3, *array4;
   int **varnmiss1 = NULL;
   double **vardata1 = NULL;
-  int taxisID2, taxisID3, taxisID4;
+  int taxisID2, taxisID4;
 
   cdoInitialize(argument);
 
@@ -70,7 +70,6 @@ void *Cond2(void *argument)
   vlistID4 = vlistDuplicate(vlistID2);
 
   taxisID2 = vlistInqTaxis(vlistID2);
-  taxisID3 = vlistInqTaxis(vlistID3);
   taxisID4 = taxisDuplicate(taxisID2);
   vlistDefTaxis(vlistID4, taxisID4);
 

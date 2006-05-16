@@ -1397,7 +1397,7 @@ yyreturn:
 
 nodeType *con(double value)
 {
-  nodeType *p;
+  nodeType *p = NULL;
   size_t nodeSize;
 
   /* allocate node */
@@ -1414,7 +1414,7 @@ nodeType *con(double value)
 
 nodeType *var(char *nm)
 {
-  nodeType *p;
+  nodeType *p = NULL;
   size_t nodeSize;
 
   /* allocate node */
@@ -1431,7 +1431,7 @@ nodeType *var(char *nm)
 
 nodeType *fun(char *fname, nodeType *op)
 {
-  nodeType *p;
+  nodeType *p = NULL;
   size_t nodeSize;
 
   /* allocate node */
@@ -1450,7 +1450,7 @@ nodeType *fun(char *fname, nodeType *op)
 nodeType *opr(int oper, int nops, ...)
 {
   va_list ap;
-  nodeType *p;
+  nodeType *p = NULL;
   size_t nodeSize;
   int i;
 

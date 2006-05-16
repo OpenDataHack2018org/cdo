@@ -126,7 +126,7 @@ void *Spectral(void *argument)
 
 	  if ( gridIDsp == -1 )
 	    {
-	      gridIDsp = gridNew(GRID_SPECTRAL, (ntr+1)*(ntr+2));
+	      gridIDsp = gridCreate(GRID_SPECTRAL, (ntr+1)*(ntr+2));
 	      gridDefTrunc(gridIDsp, ntr);
 	    }
 	}
@@ -191,7 +191,7 @@ void *Spectral(void *argument)
 	{
 	  int ntr = atoi(operatorArgv()[0]);
 	  int nsp = (ntr+1)*(ntr+2);
-	  gridIDsp = gridNew(GRID_SPECTRAL, nsp);
+	  gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
 	  gridDefTrunc(gridIDsp, ntr);
 	}
       else

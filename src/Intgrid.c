@@ -70,7 +70,7 @@ void *Intgrid(void *argument)
       operatorCheckArgc(2);
       slon = atof(operatorArgv()[0]);
       slat = atof(operatorArgv()[1]);
-      gridID2 = gridNew(GRID_LONLAT, 1);
+      gridID2 = gridCreate(GRID_LONLAT, 1);
       gridDefXsize(gridID2, 1);
       gridDefYsize(gridID2, 1);
       gridDefXvals(gridID2, &slon);

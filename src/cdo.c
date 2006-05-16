@@ -140,7 +140,7 @@ static void usage(void)
   fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2006 Uwe Schulzweida\n", VERSION);
   fprintf(stderr, "  Available from http://www.mpimet.mpg.de/~cdo\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
-  fprintf(stderr, "  Report bugs to schulzweida@dkrz.de.\n");
+  fprintf(stderr, "  Report bugs to uwe.schulzweida@zmaw.de\n");
 }
 
 

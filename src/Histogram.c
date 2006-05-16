@@ -84,7 +84,7 @@ void *Histogram(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   /* create zaxis for output bins */
-  zaxisID2 = zaxisNew(ZAXIS_GENERIC, nbins);
+  zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nbins);
   bins = (double *) malloc(nbins*sizeof(double));
   for ( i = 0; i < nbins; i++ ) bins[i] = (fltarr[i]+fltarr[i+1])/2;
   zaxisDefLevels(zaxisID2, bins);

@@ -65,7 +65,7 @@ void *Varrms(void *argument)
 
   slon = 0;
   slat = 0;
-  gridID3 = gridNew(GRID_LONLAT, 1);
+  gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
   gridDefXvals(gridID3, &slon);
@@ -76,7 +76,7 @@ void *Varrms(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     vlistDefFlag(vlistID1, varID, 0, TRUE);
 
-  vlistID3 = vlistNew();
+  vlistID3 = vlistCreate();
   vlistCopyFlag(vlistID3, vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -100,6 +100,7 @@ void *Varrms(void *argument)
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
+  vlistDestroy(vlistID3);
 
   vardata1 = (double **) malloc(nvars*sizeof(double*));
   vardata2 = (double **) malloc(nvars*sizeof(double*));

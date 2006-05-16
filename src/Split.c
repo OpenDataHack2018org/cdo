@@ -124,7 +124,7 @@ void *Split(void *argument)
 		    }
 		}
 	    }
-	  vlistID2 = vlistNew();
+	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
@@ -157,7 +157,7 @@ void *Split(void *argument)
 	      vlistDefFlag(vlistID1, varID, levID, TRUE);
 	    }
 
-	  vlistID2 = vlistNew();
+	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
@@ -212,7 +212,7 @@ void *Split(void *argument)
 		    }
 		}
 	    }
-	  vlistID2 = vlistNew();
+	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
@@ -255,7 +255,7 @@ void *Split(void *argument)
 		    }
 		}
 	    }
-	  vlistID2 = vlistNew();
+	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
@@ -297,7 +297,7 @@ void *Split(void *argument)
 		    }
 		}
 	    }
-	  vlistID2 = vlistNew();
+	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
@@ -357,7 +357,10 @@ void *Split(void *argument)
   streamClose(streamID1);
 
   for ( index = 0; index < nsplit; index++ )
-    streamClose(streamIDs[index]);
+    {
+      vlistDestroy(vlistIDs[index]);
+      streamClose(streamIDs[index]);
+    }
  
   if ( ! lcopy )
     if ( array ) free(array);

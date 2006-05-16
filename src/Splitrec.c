@@ -80,7 +80,7 @@ void *Splitrec(void *argument)
 	  vlistClearFlag(vlistID1);
 	  vlistDefFlag(vlistID1, varID, levelID, TRUE);
 
-	  vlistID2 = vlistNew();
+	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 
 	  index++;
@@ -110,7 +110,7 @@ void *Splitrec(void *argument)
 	    }
 
 	  streamClose(streamID2);
-	  vlistFree(vlistID2);
+	  vlistDestroy(vlistID2);
 	}
 
       tsID++;

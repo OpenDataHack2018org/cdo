@@ -130,7 +130,7 @@ void *Timstat(void *argument)
   if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(vlistID2, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisNew(TAXIS_ABSOLUTE);
+  taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

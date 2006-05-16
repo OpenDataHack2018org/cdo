@@ -83,7 +83,7 @@ void *Fldstat(void *argument)
 
   slon = 0;
   slat = 0;
-  gridID2 = gridNew(GRID_LONLAT, 1);
+  gridID2 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   gridDefXvals(gridID2, &slon);

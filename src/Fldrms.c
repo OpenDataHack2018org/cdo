@@ -65,7 +65,7 @@ void *Fldrms(void *argument)
 
   slon = 0;
   slat = 0;
-  gridID3 = gridNew(GRID_LONLAT, 1);
+  gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
   gridDefXvals(gridID3, &slon);

@@ -14,6 +14,7 @@
 #include "specspace.h"
 
 
+#define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)
 #define  C_EARTH_RADIUS  (6371000.0)
 double PlanetRadius = C_EARTH_RADIUS;
 
@@ -500,6 +501,29 @@ void dv2uv(double *d, double *o, double *u, double *v, double *f, double *g,
       d += nsp;
       o += nsp;
     }
+}
+
+
+void dv2ps(double *div, double *pot, int nlev, int ntr)
+{
+  int l,m,n;
+
+  for ( l = 0; l <  nlev; l++ )
+    for ( m = 0; m <= ntr; m++ )
+      for ( n = m; n <= ntr; n++ )
+	{
+	  if ( n > 0 )
+	    {
+	      *pot++ = *div++ * SQUARE_RADIUS / (n*n + n);
+	      *pot++ = *div++ * SQUARE_RADIUS / (n*n + n);
+	    }
+	  else
+	    {
+	      *pot++ = 0.0;
+	      *pot++ = 0.0;
+	      div += 2;
+	    }
+	}
 }
 
 

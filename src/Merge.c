@@ -72,7 +72,7 @@ void *Merge(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
 
-  vlistID2 = vlistNew();
+  vlistID2 = vlistCreate();
   vlistCopy(vlistID2, vlistIDs[0]);
   /*  for ( index = 1; index < nmerge; index++ ) vlistCat(vlistID2, vlistIDs[index]); */
   for ( index = 1; index < nmerge; index++ ) vlistMerge(vlistID2, vlistIDs[index]);
@@ -84,6 +84,7 @@ void *Merge(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
   streamDefVlist(streamID2, vlistID2);
+  vlistDestroy(vlistID2);
 
   if ( ! lcopy )
     {

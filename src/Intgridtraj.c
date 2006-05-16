@@ -114,7 +114,7 @@ void *Intgridtraj(void *argument)
       vardata2[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
     }
 
-  gridID2 = gridNew(GRID_TRAJECTORY, 1);
+  gridID2 = gridCreate(GRID_TRAJECTORY, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
   gridDefXvals(gridID2, &xpos);

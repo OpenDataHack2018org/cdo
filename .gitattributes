@@ -251,8 +251,10 @@ src/exception.c -text
 src/expr.c -text
 src/expr.h -text
 src/expr_lex.c -text
+src/expr_lex.l -text
 src/expr_yacc.c -text
 src/expr_yacc.h -text
+src/expr_yacc.y -text
 src/field.c -text
 src/field.h -text
 src/field2.c -text
@@ -298,4 +300,5 @@ src/util.c -text
 src/util.h -text
 src/vinterp.c -text
 src/vinterp.h -text
+src/yacc_lex -text
 src/zaxis.c -text

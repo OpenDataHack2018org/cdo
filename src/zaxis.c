@@ -106,7 +106,7 @@ int zaxisDefine(ZAXIS zaxis)
 
   if ( zaxis.size == 0 ) Error(func, "zaxis size undefined!");
 
-  zaxisID = zaxisNew(zaxis.type, zaxis.size);
+  zaxisID = zaxisCreate(zaxis.type, zaxis.size);
 
   if ( zaxis.vals )
     {

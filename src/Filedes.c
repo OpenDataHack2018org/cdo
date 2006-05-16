@@ -37,7 +37,7 @@
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, ZAXISDES, VCT, VARDES, TIMEDES, FILEDES, VLIST;
+  int GRIDDES, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -49,9 +49,9 @@ void *Filedes(void *argument)
 
   GRIDDES  = cdoOperatorAdd("griddes",  0, 0, NULL);
   ZAXISDES = cdoOperatorAdd("zaxisdes", 0, 0, NULL);
+  TAXISDES = cdoOperatorAdd("taxisdes", 0, 0, NULL);
   VCT      = cdoOperatorAdd("vct",      0, 0, NULL);
   VARDES   = cdoOperatorAdd("vardes",   0, 0, NULL);
-  TIMEDES  = cdoOperatorAdd("timedes",  0, 0, NULL);
   FILEDES  = cdoOperatorAdd("filedes",  0, 0, NULL);
   VLIST    = cdoOperatorAdd("vlist",    0, 0, NULL);
 
@@ -75,6 +75,106 @@ void *Filedes(void *argument)
     {
       for ( index = 0; index < nzaxis; index++ )
 	zaxisPrint(vlistZaxis(vlistID, index));
+    }
+  else if ( operatorID == TAXISDES )
+    {
+      int vdate, vtime, ntsteps, nrecs;
+      int year, month, day, hour, minute;
+      int taxisID, tsID;
+
+      taxisID = vlistInqTaxis(vlistID);
+      ntsteps = vlistNtsteps(vlistID);
+
+      fprintf(stdout, "   Time axis  : ");
+      if ( taxisInqType(taxisID) == TAXIS_RELATIVE )
+	fprintf(stdout, "relative");
+      else if ( taxisInqType(taxisID) == TAXIS_ABSOLUTE )
+	fprintf(stdout, "absolute");
+      else
+	fprintf(stdout, "unknown");
+      fprintf(stdout, "\n");
+
+      taxisID = vlistInqTaxis(vlistID);
+
+      if ( ntsteps != 0 )
+	{
+	  if ( ntsteps == CDI_UNDEFID )
+	    fprintf(stdout, "   Time steps :  unlimited\n");
+	  else
+	    fprintf(stdout, "   Time steps :  %d\n", ntsteps);
+
+	  if ( taxisID != CDI_UNDEFID )
+	    {
+	      int calendar, unit;
+
+	      if ( taxisInqType(taxisID) == TAXIS_RELATIVE )
+		{
+		  vdate = taxisInqRdate(taxisID);
+		  vtime = taxisInqRtime(taxisID);
+
+		  decode_date(vdate, &year, &month, &day);
+		  decode_time(vtime, &hour, &minute);
+
+		  fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d",
+			  year, month, day, hour, minute);
+		      
+		  unit = taxisInqTunit(taxisID);
+		  if ( unit != CDI_UNDEFID )
+		    {
+		      if ( unit == TUNIT_YEAR )
+			fprintf(stdout, "  Units = years");
+		      else if ( unit == TUNIT_MONTH )
+			fprintf(stdout, "  Units = months");
+		      else if ( unit == TUNIT_DAY )
+			fprintf(stdout, "  Units = days");
+		      else if ( unit == TUNIT_HOUR )
+			fprintf(stdout, "  Units = hours");
+		      else if ( unit == TUNIT_MINUTE )
+			fprintf(stdout, "  Units = minutes");
+		      else if ( unit == TUNIT_SECOND )
+			fprintf(stdout, "  Units = seconds");
+		      else
+			fprintf(stdout, "  Units = unknown");
+		    }
+	      
+		  calendar = taxisInqCalendar(taxisID);
+		  if ( calendar != CDI_UNDEFID )
+		    {
+		      if ( calendar == CALENDAR_STANDARD )
+			fprintf(stdout, "  Calendar = STANDARD");
+		      else if ( calendar == CALENDAR_NONE )
+			fprintf(stdout, "  Calendar = NONE");
+		      else if ( calendar == CALENDAR_360DAYS )
+			fprintf(stdout, "  Calendar = 360DAYS");
+		      else if ( calendar == CALENDAR_365DAYS )
+			fprintf(stdout, "  Calendar = 365DAYS");
+		      else if ( calendar == CALENDAR_366DAYS )
+			fprintf(stdout, "  Calendar = 366DAYS");
+		      else
+			fprintf(stdout, "  Calendar = unknown");
+		    }
+
+		  fprintf(stdout, "\n");
+		}
+	    }
+
+	  fprintf(stdout, "  time verification time        lower bound        upper bound\n");
+	  fprintf(stdout, "  step  YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM\n");
+
+	  tsID = 0;
+	  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	    {
+	      vdate = taxisInqVdate(taxisID);
+	      vtime = taxisInqVtime(taxisID);
+
+	      decode_date(vdate, &year, &month, &day);
+	      decode_time(vtime, &hour, &minute);
+
+	      tsID++;
+	      fprintf(stdout, " %5d %4.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID, year, month, day, hour, minute);
+	      fprintf(stdout, "\n");
+	    }
+	}
     }
   else if ( operatorID == VCT )
     {
