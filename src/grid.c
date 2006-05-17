@@ -543,8 +543,10 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_CURVILINEAR;
 	  else if ( strncmp(pline, "cell", 4)  == 0 )
 	    grid.type = GRID_CELL;
+	  else if ( strncmp(pline, "gme", 3)  == 0 )
+	    grid.type = GRID_GME;
 	  else
-	    Warning(func, "Invalid gridname : %s", pline);
+	    Warning(func, "Invalid grid name : %s", pline);
 	}
       else if ( strncmp(pline, "gridprec", 8)  == 0 )
 	{
@@ -581,6 +583,11 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( strncmp(pline, "nvertex", 7)  == 0 )
 	{
 	  grid.nvertex = atol(skipSeparator(pline + 7));
+	}
+      else if ( strncmp(pline, "ni", 2)  == 0 )
+	{
+	  grid.ni = atol(skipSeparator(pline + 2));
+          grid.nd = 10;
 	}
       else if ( strncmp(pline, "xsize", 5)  == 0 )
 	{

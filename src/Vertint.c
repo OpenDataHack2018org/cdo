@@ -54,7 +54,7 @@ void *Vertint(void *argument)
   int *vert_index = NULL;
   int nvct;
   int geop_needed = FALSE;
-  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
+  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1/*, gheightID = -1*/;
   int code;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
@@ -67,6 +67,7 @@ void *Vertint(void *argument)
   char *envstring;
   int Extrapolate = 0;
   int taxisID1, taxisID2;
+  int lhavevct;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
@@ -132,6 +133,7 @@ void *Vertint(void *argument)
 
   zaxisDefLevels(zaxisIDp, plev);
   nzaxis  = vlistNzaxis(vlistID1);
+  lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
       zaxisID = vlistZaxis(vlistID1, i);
@@ -141,15 +143,27 @@ void *Vertint(void *argument)
 	  nvct = zaxisInqVctSize(zaxisID);
 	  if ( nlevel == (nvct/2 - 1) )
 	    {
-	      zaxisIDh = zaxisID;
-	      nhlev    = nlevel;
-	      nhlevp1  = nhlev + 1;
+	      if ( lhavevct == FALSE )
+		{
+		  lhavevct = TRUE;
+		  zaxisIDh = zaxisID;
+		  nhlev    = nlevel;
+		  nhlevp1  = nhlev + 1;
+	      
+		  vct = (double *) malloc(nvct*sizeof(double));
+		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
 
-	      vct = (double *) malloc(nvct*sizeof(double));
-	      memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+		}
+	      else
+		{
+		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+		  printf("zaxisID %d %d\n", zaxisID, i);
+		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 
-	      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-	      break;
+		  printf("zaxisID %d %d\n", zaxisID, i);
+		}
 	    }
 	}
     }
@@ -205,14 +219,14 @@ void *Vertint(void *argument)
 	  else if ( strcmp(varname, "st")      == 0 ) code = 130;
 	  else if ( strcmp(varname, "aps")     == 0 ) code = 134;
 	  else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
-	  else if ( strcmp(varname, "geopoth") == 0 ) code = 156;
+	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
 
       if      ( code == 129 ) geopID    = varID;
       else if ( code == 130 ) tempID    = varID;
       else if ( code == 134 ) psID      = varID;
       else if ( code == 152 ) lnpsID    = varID;
-      else if ( code == 156 ) gheightID = varID;
+      /* else if ( code == 156 ) gheightID = varID; */
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("spectral data on model level unsupported!");
@@ -238,7 +252,7 @@ void *Vertint(void *argument)
 	}
     }
 
-  if ( tempID != -1 || gheightID != -1 ) geop_needed = TRUE;
+  if ( tempID != -1 /*|| gheightID != -1*/ ) geop_needed = TRUE;
 
   if ( zaxisIDh != -1 && geop_needed )
     {
@@ -250,7 +264,7 @@ void *Vertint(void *argument)
 	}
     }
 
-  if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
+  if ( zaxisIDh != -1 && /* gheightID != -1 && */ tempID == -1 )
     cdoAbort("Temperature not found, needed to compute geopotheight!");
 
   if ( zaxisIDh != -1 && lnpsID == -1 )
@@ -325,12 +339,14 @@ void *Vertint(void *argument)
 			   full_press, half_press, vert_index,
 			   plev, nplev, ngp, nlevel, missval);
 		}
+	      /*
 	      else if ( varID == gheightID )
 		{
 		  interp_Z(geop, vardata1[varID], vardata2[varID],
 			   full_press, half_press, vert_index, vardata1[tempID],
 			   plev, nplev, ngp, nlevel, missval);
 		}
+	      */
 	      else
 		{
 		  interp_X(vardata1[varID], vardata2[varID], full_press,
