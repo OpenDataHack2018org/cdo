@@ -32,9 +32,6 @@
 #include "pstream.h"
 
 
-#define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
-#define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */
-
 void *Filedes(void *argument)
 {
   int GRIDDES, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST;

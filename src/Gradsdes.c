@@ -35,10 +35,6 @@
 #include "pstream.h"
 
 
-#define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
-#define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */
-
-
 /* Byte swap requested number of 4 byte elements */
 
 static void gabswp (void *r, int cnt) {

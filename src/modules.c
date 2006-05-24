@@ -172,8 +172,8 @@ void *Zonstat(void *argument);
 #define  OutputgmtOperators     {"outputcenter", "outputbounds", "outputboundscpt"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RemapOperators         {"remap"}
-#define  RemapgridHelpOperators {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
-#define  GenweightsOperators    {"gencon", "genbil", "genbic", "gendis"}
+#define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
+#define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runstd"}
@@ -278,7 +278,7 @@ static MODULES Modules[] =
   { Outputgmt,      NULL,              OutputgmtOperators,      1,  0 },
   { Pinfo,          NULL,              PinfoOperators,          1,  1 },
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
-  { Remap,          RemapgridHelp,     RemapgridHelpOperators,  1,  1 },
+  { Remap,          RemapgridHelp,     RemapgridOperators,      1,  1 },
   { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,        2,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,          1,  1 },

@@ -5,7 +5,7 @@
 %\usepackage[pdftex]{hyperref}
 \usepackage{graphics}
 
-\newcommand{\CDO}{{\sf CDO\ }}
+\newcommand{\CDO}{{\bfseries\sffamily CDO\ }}
 \newcommand{\cdologo}{\includegraphics{logo/cdo_logo}}
 
 % To define headers and footers
@@ -27,7 +27,7 @@
 \fancyhead[LO,RE]{\slshape \leftmark}
 \fancyhead[LE,RO]{\slshape \rightmark}
 \fancyfoot[LE,RO]{\Large\thepage}
-\fancyfoot[LO,RE]{\raisebox{-2.8mm}{\scalebox{0.17}{\cdologo}}}
+%\fancyfoot[LO,RE]{\raisebox{-2.8mm}{\scalebox{0.17}{\cdologo}}}
 \fancypagestyle{plain}{%
   \fancyhead{} % get rid of headers
   \renewcommand{\headrulewidth}{0pt}
@@ -135,7 +135,7 @@
 
 \begin{titlepage}
 \vspace*{50mm}
-{\Huge\bf{CDO User's Guide}}
+{\Huge\CDO} {\Huge\bf User's Guide}
 
 \setlength{\unitlength}{1cm}
 \begin{picture}(16,0.4)
@@ -145,7 +145,7 @@
 \end{picture}
 
 \begin{flushright}
-\large\bf{Climate Data Operators \\ Version 0.9.13 \\ May 2006}
+\large\bf{Climate Data Operators \\ Version 1.0.0 \\ June 2006}
 \end{flushright}
 
 \vfill

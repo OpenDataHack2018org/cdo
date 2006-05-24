@@ -4,6 +4,7 @@
 	* New operator: dv2ps (Wind) [request: Luis Kornblueh]
 	* setreftime: use taxisDuplicate to copy bounds [report: Ivonne Anders]
 	* Vertint: remove special treatment for geopoth
+	* configure: check compiler version
 	* Version 1.0.0 released
 
 2006-05-04  Uwe Schulzweida  <schulzweida@dkrz.de>

@@ -77,9 +77,6 @@ to identify the variable.
 @EndDoc
 */
 
-#define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
-#define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */
-
 static void printFiletype(int streamID)
 {
   int filetype;

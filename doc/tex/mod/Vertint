@@ -10,8 +10,8 @@
 @BeginDescription
 Interpolate 3D variables on hybrid model level to pressure or height level.
 The input file must contain the log. surface pressure (LSP/code152) or the 
-surface pressure (APS/code134). To interpolate the temperature or the 
-geopotential height, the orography (GEOSP/code129) is also needed.
+surface pressure (APS/code134). To interpolate the temperature,
+the orography (GEOSP/code129) is also needed.
 @EndDescription
 @EndModule
 

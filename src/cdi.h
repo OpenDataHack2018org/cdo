@@ -7,6 +7,11 @@ extern "C" {
 
 #define  CDI_UNDEFID             -1
 
+/* Byte order */
+
+#define  CDI_BIGENDIAN            0   /* Byte order BIGENDIAN     */
+#define  CDI_LITTLEENDIAN         1   /* Byte order LITTLEENDIAN  */
+
 /* Error identifier */
 
 #define  CDI_ESYSTEM            -10   /* Operating system error           */
@@ -96,11 +101,11 @@ extern "C" {
 
 /* CDI control routines */
 
-const char *cdiStringError(int cdiErrno);
+char   *cdiStringError(int cdiErrno);
 
 void    cdiDebug(int debug);
 
-const char *cdiLibraryVersion(void);
+char   *cdiLibraryVersion(void);
 void    cdiPrintVersion(void);
 
 void    cdiDefMissval(double missval);
@@ -127,11 +132,19 @@ void    streamDefVlist(int streamID, int vlistID);
 /*      streamInqVlist: Get the Vlist of a stream */
 int     streamInqVlist(int streamID);
 
+/*      streamInqFiletype: Get the filetype */
 int     streamInqFiletype(int streamID);
+
+/*      streamDefByteorder: Define the byteorder */
 void    streamDefByteorder(int streamID, int byteorder);
+
+/*      streamInqByteorder: Get the byteorder */
 int     streamInqByteorder(int streamID);
 
+/*      streamDefTimestep: Define time step */
 int     streamDefTimestep(int streamID, int tsID);
+
+/*      streamInqTimestep: Get time step */
 int     streamInqTimestep(int streamID, int tsID);
 
 char   *streamFilename(int streamID);
@@ -169,7 +182,7 @@ void    streamInqGinfo(int streamID, int *intnum, float *fltnum);
 /*      vlistCreate: Create a variable list */
 int     vlistCreate(void);
 
-/*      vlistDestroy: Delete a variable list */
+/*      vlistDestroy: Destroy a variable list */
 void    vlistDestroy(int vlistID);
 
 /*      vlistDuplicate: Duplicate a variable list */
@@ -212,8 +225,13 @@ int     vlistZaxisIndex(int vlistID, int zaxisID);
 void    vlistChangeZaxisIndex(int vlistID, int index, int zaxisID);
 void    vlistChangeZaxis(int vlistID, int zaxisID1, int zaxisID2);
 int     vlistNrecs(int vlistID);
+
+/*      vlistDefTaxis: Define the time axis of a variable list */
 void    vlistDefTaxis(int vlistID, int taxisID);
+
+/*      vlistInqTaxis: Get the time axis of a variable list */
 int     vlistInqTaxis(int vlistID);
+
 void    vlistDefTable(int vlistID, int tableID);
 int     vlistInqTable(int vlistID);
 void    vlistDefInstitut(int vlistID, int instID);
@@ -308,8 +326,11 @@ int     gridInqMask(int gridID, int *mask);
 void    gridPrint(int gridID);
 int     gridSize(void);
 
-/*      gridCreate: Create a new Grid */
+/*      gridCreate: Create a horizontal Grid */
 int     gridCreate(int gridtype, int size);
+
+/*      gridDestroy: Destroy a horizontal Grid */
+void    gridDestroy(int gridID);
 
 /*      gridDuplicate: Duplicate a Grid */
 int     gridDuplicate(int gridID);
@@ -453,8 +474,11 @@ int     gridToCurvilinear(int gridID);
 
 void    zaxisName(int zaxistype, char *gridname);
 
-/*      zaxisCreate: Create a new Z-axis */
+/*      zaxisCreate: Create a vertical Z-axis */
 int     zaxisCreate(int leveltype, int size);
+
+/*      zaxisDestroy: Destroy a vertical Z-axis */
+void    zaxisDestroy(int zaxisID);
 
 /*      zaxisInqType: Get the type of a Z-axis */
 int     zaxisInqType(int zaxisID);
@@ -519,8 +543,11 @@ void    zaxisChangeType(int zaxisID, int leveltype);
 
 /* TAXIS routines */
 
-/*      taxisCreate: Create a new T-axis */
+/*      taxisCreate: Create a Time axis */
 int     taxisCreate(int timetype);
+
+/*      taxisDestroy: Destroy a Time axis */
+void    taxisDestroy(int taxisID);
 
 int     taxisDuplicate(int taxisID);
 

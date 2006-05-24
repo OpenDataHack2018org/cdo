@@ -78,6 +78,9 @@ static void version(void)
 #if defined (COMPILER)
   fprintf(stderr, "Compiler: %s\n", COMPILER);
 #endif
+#if defined (COMP_VERSION)
+  fprintf(stderr, " version: %s\n", COMP_VERSION);
+#endif
 #if defined (USER_NAME) && defined(HOST_NAME)
   fprintf(stderr, "Compiled: by %s on %s %s %s\n", USER_NAME, HOST_NAME, __DATE__, __TIME__);
 #endif
@@ -276,9 +279,6 @@ static int cdoGetopt(int argc, char * const argv[], const char *optstring)
 
 #undef  IsBigendian
 #define IsBigendian()  ( u_byteorder.c[sizeof(long) - 1] )
-
-#define  CDI_BIGENDIAN            0   /* Data type BIGENDIAN     */
-#define  CDI_LITTLEENDIAN         1   /* Data type LITTLEENDIAN  */
 
 
 static void setDefaultDataType(char *datatypestr)
