@@ -14,6 +14,7 @@ $refcard    = "cdo_refcard.tex";
 $class      = "cdo_class";
 #
 open(README,   ">OPERATORS");
+open(CDOHTML,   ">cdo_oper.html");
 open(HELPFILE, ">$help");
 open(TCFILE,   ">$catalog");
 open(TROVER,   ">$refover");
@@ -44,6 +45,7 @@ print README "$prog  $longname\n";
 print README "===========================\n";
 print README "\n";
 print README "Operator catalog:\n\n";
+print CDOHTML "<H2 align=\"center\">CDO  -  Climate Data Operators</H2>\n";
 print TCFILE "\\chapter*{\\label{opercat}Operator catalog}\n";
 print TCFILE "\\addcontentsline{toc}{chapter}{Operator catalog}\n";
 print TCFILE "\n";
@@ -215,6 +217,8 @@ while (<MOFILE>) {
       $reflist   = "ref_list_${shortname}.tex";
       open(TRLIST, ">$reflist");
 
+      print CDOHTML "<A NAME=\"${shortname}\"></A><H3>$chap</H3>\n";
+
       print TRLIST "\n";
       print TRLIST "Here is a short overview of all operators in this section:\\\\\n";
       print TRLIST "\n";
@@ -283,6 +287,8 @@ while (<MOFILE>) {
 
     print TRLIST "\\noindent\n";
     print TRLIST "\\begin{tabular*}{13cm}{ll}\n";
+
+    print CDOHTML "<table WIDTH=\"60%\" border=\"0\">\n";
 
     print TRCARD "\\noindent\n";
     print TRCARD "\\begin{tabular*}{$len1}{|l|l|} \\hline\n";
@@ -549,6 +555,10 @@ while (<MOFILE>) {
 
 	if ( $norefoper == 0 ) {
 	  printf README ("      %-10s %-15s %s\n", $modulefile, $operator, $otitle);
+	  print CDOHTML "<tr>\n";
+	  print CDOHTML "<td WIDTH=\"30%\" BGCOLOR=\"#FFF1B3\"> $operator </A> </td>\n";
+	  print CDOHTML "<td WIDTH=\"70%\" BGCOLOR=\"#FFFFCC\"> $otitle </td>\n";
+	  print CDOHTML "</tr>\n";
 	}
 
  	print TCFILE "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operator}{$operator}} ";
@@ -860,6 +870,8 @@ while (<MOFILE>) {
     print TCFILE "\\end{tabular*}\n";
     print TCFILE "\\vspace{1mm}\n";
     print TCFILE "\n";
+
+    print CDOHTML "</table>\n";
 
     print TRLIST "\\end{tabular*}\n";
     print TRLIST "\\vspace{1mm}\n";

@@ -30,20 +30,23 @@ AC_CHECK_LIB(malloc, mallinfo)
 # Checks for the availability of ANSI-C99 functions
 AC_CHECK_FUNCS(isnan)
 
-# Checks for compiler, username and hostname
+# Checks for compiler
 COMPILER="$CC $CFLAGS"
 AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
 
-if test "$CC" = "gcc" ;   then COMP_VERSION=`$CC --version | head -n 1`; fi;
-if test "$CC" = "g++" ;   then COMP_VERSION=`$CC --version | head -n 1`; fi;
-if test "$CC" = "icc" ;   then COMP_VERSION=`$CC -V 2>&1   | head -n 1`; fi;
-if test "$CC" = "sxc++" ; then COMP_VERSION=`$CC -V 2>&1   | tail -n 1`; fi;
-if test "$CC" = "xlc_r" ; then COMP_VERSION=`$CC    2>&1   | head -n 1`; fi;
-if test "$CC" = "cc" ;    then COMP_VERSION=`$CC -V 2>&1   | head -n 1`; fi;
+# Check compiler version
+case "$CC" in
+  gcc)    COMP_VERSION=`$CC --version | head -n 1`;;
+  g++)    COMP_VERSION=`$CC --version | head -n 1`;;
+  sxc++)  COMP_VERSION=`$CC -V 2>&1   | tail -n 1`;;
+  xlc*)   COMP_VERSION=`$CC    2>&1   | head -n 1`;;
+  *)      COMP_VERSION=`$CC -V 2>&1   | head -n 1`;;
+esac
 
 if test -z "$COMP_VERSION" ; then COMP_VERSION="unknown"; fi;
 AC_DEFINE_UNQUOTED(COMP_VERSION, ["$COMP_VERSION"], [Compiler version])
 
+# Checks for username and hostname
 USERNAME=$LOGNAME
 if test -z "$USERNAME" ; then USERNAME=$USER; fi;
 if test -z "$USERNAME" ; then USERNAME="unknown"; fi;
