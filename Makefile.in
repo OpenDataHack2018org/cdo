@@ -80,7 +80,7 @@ am__quote = @am__quote@
 install_sh = @install_sh@
 SUBDIRS = src
 #
-EXTRA_DIST = config/default OPERATORS
+EXTRA_DIST = config/default OPERATORS doc/cdo.pdf doc/cdo_refcard.pdf
 #
 CLEANFILES = `ls *~`
 subdir = .
@@ -231,7 +231,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/config
+	$(mkinstalldirs) $(distdir)/config $(distdir)/doc
 	@list='$(DISTFILES)'; for file in $$list; do \
 	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \

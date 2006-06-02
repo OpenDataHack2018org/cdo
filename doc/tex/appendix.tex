@@ -1,6 +1,80 @@
 \appendix
 
-\chapter{\label{appendixa}Grid description examples}
+\chapter{\label{appendixpingo}Hints for PINGO user}
+
+Some \CDO operators have the same name as in PINGO but
+the meaning is different.
+The following table gives an overview of those operators.
+
+\vspace{2mm}
+\begin{tabular}[c]{|l||l|l|}
+\hline
+Operator name  & \CDO                   & PINGO \\
+\hline
+\hline
+mean           & Mean of two fields     & Time mean \\
+\hline
+min            & Minimum of two fields  & Time minimum \\
+\hline
+max            & Maximum of two fields  & Time maximum \\
+\hline
+daymean        & Daily mean             & Multi-year daily mean \\
+\hline
+daymin         & Daily minimum          & Multi-year daily minimum \\
+\hline
+daymax         & Daily maximum          & Multi-year daily maximum \\
+\hline
+monmean        & Monthly mean           & Multi-year monthly mean \\
+\hline
+monmin         & Monthly minimum        & Multi-year monthly minimum \\
+\hline
+monmax         & Monthly maximum        & Multi-year monthly maximum \\
+\hline
+seasmean       & Seasonally mean        & Multi-year seasonally mean \\
+\hline
+\end{tabular}
+\vspace{2mm}
+
+There are also some \CDO operators with the same functionality
+as in PINGO but the name is different.
+The following table gives an overview of those operators.
+
+\vspace{2mm}
+\begin{tabular}[c]{|l||l|l|}
+\hline
+                             & \CDO       & PINGO \\
+\hline
+\hline
+Maximum of two fields        & max        & max2 \\
+\hline
+Minimum of two fields        & min        & min2 \\
+\hline
+Field mean, min, max         & fldmean, fldmin, fldmax    & meanr minr, maxr\\
+\hline
+Time mean, min, max          & timmean, timmin, timmax    & mean, min, max \\
+\hline
+Daily mean, min, max         & daymean, daymin, daymax    & daymeans, daymins, daymaxs \\
+\hline
+Monthly mean, min, max       & monmean, monmin, monmax    & monmeans, monmins, monmaxs \\
+\hline
+Yearly mean, min, max        & yearmean, yearmin, yearmax   & yearmeans, yearmins, yearmaxs \\
+\hline
+Running mean                 & runmean    & runmeans \\
+\hline
+Seasonally mean              & seasmean   & seasmeans \\
+\hline
+Multi-year daily mean        & ydaymean   & daymean  \\
+\hline
+Multi-year monthly mean      & ymonmean   & monmean  \\
+\hline
+Multi-year seasonally mean   & yseasmean  & seasmean  \\
+\hline
+\end{tabular}
+\vspace{2mm}
+
+
+
+\chapter{\label{appendixgrid}Grid description examples}
 
 \section{Example of a curvilinear grid description}
 Here is an example for the \CDO description of a curvilinear grid.

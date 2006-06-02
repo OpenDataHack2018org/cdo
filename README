@@ -6,7 +6,7 @@ CDO - Climate Data Operators
      was developed at the Max-Planck-Institute for Meteorology.
      CDO is a collection of Operators to manipulate and analyse 
      Climate model Data.
-     Supported file formats are GRIB, netCDF, SERVICE, EXTRA and IEG.
+     Supported data formats are GRIB, netCDF, SERVICE, EXTRA and IEG.
 
      CDO is licensed under the GNU General Public License, version 2.
      Read the file COPYING in the source distribution for details.
