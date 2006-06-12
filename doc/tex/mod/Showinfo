@@ -82,7 +82,7 @@ To print the code number of all variables in a dataset use:
 @BeginVerbatim
    cdo showcode ifile
 @EndVerbatim
-This is an example result of a dataset with tree variables:
+This is an example result of a dataset with 3 variables:
 @BeginVerbatim
    129 130 139
 @EndVerbatim

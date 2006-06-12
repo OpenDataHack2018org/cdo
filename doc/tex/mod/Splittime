@@ -52,7 +52,7 @@ form the output file names.
 
 @BeginDescription
 Splits a file into pieces, one for each different season.
-Appends tree characters with the season to @file{oprefix} to 
+Appends three characters with the season to @file{oprefix} to 
 form the output file names.
 @EndDescription
 @EndOperator
