@@ -54,6 +54,7 @@ void *Seasstat(void *argument)
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
+  int newseas, oldmon = 0, newmon;
   double missval;
   FIELD **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
   FIELD field;
@@ -137,6 +138,7 @@ void *Seasstat(void *argument)
   while ( TRUE )
     {
       nsets = 0;
+      newseas = FALSE;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
 	  vdate = taxisInqVdate(taxisID1);
@@ -154,9 +156,20 @@ void *Seasstat(void *argument)
 	  if ( seas < 0 || seas > 3 )
 	    cdoAbort("Season %d out of range!", seas+1);
 
-	  if ( nsets == 0 ) seas0 = seas;
+	  newmon = month;
+	  if ( newmon == 12 ) newmon = 0;
 
-	  if ( seas != seas0 ) break;
+	  if ( nsets == 0 )
+	    {
+	      seas0 = seas;
+	      oldmon = newmon;
+	    }
+
+	  if ( newmon < oldmon ) newseas = TRUE;
+
+	  if ( (seas != seas0) || newseas ) break;
+
+	  oldmon = newmon;
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
