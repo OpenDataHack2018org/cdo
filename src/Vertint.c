@@ -263,10 +263,10 @@ void *Vertint(void *argument)
 	  memset(geop, 0, ngp*sizeof(double));
 	}
     }
-
-  if ( zaxisIDh != -1 && /* gheightID != -1 && */ tempID == -1 )
+  /*
+  if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
     cdoAbort("Temperature not found, needed to compute geopotheight!");
-
+  */
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
       if ( psID != -1 )
