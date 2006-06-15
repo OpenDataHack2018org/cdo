@@ -358,7 +358,7 @@ static char *SelectHelp[] = {
     "    gridnames   STRING   Comma separated list of grid names",
     "    zaxis       INTEGER  Comma separated list of zaxis numbers",
     "    zaxisnames  STRING   Comma separated list of zaxis names",
-    "    tabnum      INTEGER  Comma separated list of table numbers",
+    "    tabnum      INTEGER  Comma separated list of parameter table numbers",
     "    records     INTEGER  Comma separated list of records",
     NULL
 };

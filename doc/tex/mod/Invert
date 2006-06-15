@@ -69,7 +69,7 @@ Inverts only the longitude data of a field.
 
 
 @BeginExample
-To invert the latitudes of a 2D field from N->S to S->N use:
+To invert the latitudes of a 2D field from N->S to S->N, use:
 @BeginVerbatim
    cdo invertlat ifile ofile
 @EndVerbatim

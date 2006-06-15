@@ -141,7 +141,7 @@ INTEGER  Comma separated list of zaxis numbers
 @Item = zaxisnames
 STRING   Comma separated list of zaxis names
 @Item = tabnum
-INTEGER  Comma separated list of table numbers
+INTEGER  Comma separated list of parameter table numbers
 @Item = records
 INTEGER  Comma separated list of records
 @EndParameter
@@ -153,7 +153,7 @@ To select the variables with the code number 129 and 139 use:
 @BeginVerbatim
    cdo selcode,129,139 ifile ofile
 @EndVerbatim
-You can also select the code number 129 and 139 by deleting the code number 130:
+You can also select the code number 129 and 139 by deleting the code number 130 with:
 @BeginVerbatim
    cdo delcode,130 ifile ofile
 @EndVerbatim
