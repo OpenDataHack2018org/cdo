@@ -18,10 +18,8 @@
 /*
    This module contains the following operators:
 
-      Arithdays  muldpm          Multiply with days per month
-      Arithdays  divdpm          Divide by days per month
-      Arithdays  muldpy          Multiply with days per year
-      Arithdays  divdpy          Divide by days per year
+      Arithlat   mulcoslat       Multiply with cos(lat)
+      Arithlat   divcoslat       Divide by cos(lat)
 */
 
 
@@ -30,35 +28,41 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+#include <math.h>
 
-void *Arithdays(void *argument)
+#ifndef  M_PI
+#define  M_PI		3.14159265358979323846	/* pi */
+#endif
+
+#ifndef  DEG2RAD
+#define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
+#endif
+
+void *Arithlat(void *argument)
 {
-  static char func[] = "Arithdays";
+  static char func[] = "Arithlat";
   int operatorID;
-  int operfunc, operfunc2;
+  int operfunc;
   int streamID1, streamID2;
-  int gridsize;
+  int gridsize, gridtype;
+  int gridID, gridID0 = -1;
+  int nlon = 0, nlat = 0, i, j;
   int nrecs, recID;
   int tsID;
   int varID, levelID;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
-  int vdate;
-  int year, month, day;
-  int calendar;
-  double rconst;
-  FIELD field;
+  int nmiss;
+  double *scale = NULL;
+  double *array = NULL;
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("muldpm", func_mul, func_month, NULL);
-  cdoOperatorAdd("divdpm", func_div, func_month, NULL);
-  cdoOperatorAdd("muldpy", func_mul, func_year,  NULL);
-  cdoOperatorAdd("divdpy", func_div, func_year,  NULL);
+  cdoOperatorAdd("mulcoslat", func_mul, 0, NULL);
+  cdoOperatorAdd("divcoslat", func_div, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
-  operfunc2 = cdoOperatorIntval(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -70,8 +74,6 @@ void *Arithdays(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  calendar = taxisInqCalendar(taxisID1);
-
   if ( operfunc == func_mul || operfunc == func_div )
     nospec(vlistID1);
 
@@ -82,41 +84,56 @@ void *Arithdays(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
-  field.ptr    = (double *) malloc(gridsize*sizeof(double));
-  field.weight = NULL;
+  array = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
 
-      decode_date(vdate, &year, &month, &day);
-
-      if ( operfunc2 == func_month )
-	rconst = days_per_month(calendar, year, month);
-      else
-	rconst = days_per_year(calendar, year);
-
-      if ( cdoVerbose )
-	cdoPrint("calendar %d  year %d  month %d  result %g",
-		 calendar, year, month, rconst);
-
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field.ptr, &field.nmiss);
+	  streamReadRecord(streamID1, array, &nmiss);
+	  
+	  gridID = vlistInqVarGrid(vlistID1, varID);
 
-	  field.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field.missval = vlistInqVarMissval(vlistID1, varID);
+	  if ( gridID != gridID0 )
+	    {
+	      gridtype = gridInqType(gridID);
+	      if ( gridtype != GRID_LONLAT && gridtype != GRID_GAUSSIAN )
+		{
+		  if ( gridInqType(gridID) == GRID_GAUSSIAN_REDUCED )
+		    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
+		  else
+		    cdoAbort("LONLAT or GAUSSIAN grid not found!");
+		}
 
-	  farcfun(&field, rconst, operfunc);
+	      gridsize = gridInqSize(gridID);
+	      nlon = gridInqXsize(gridID);
+	      nlat = gridInqYsize(gridID);
+
+	      scale = (double *) realloc(scale, nlat*sizeof(double));
+	      gridInqYvals(gridID, scale);
+
+	      if ( operfunc == func_mul )
+		for ( j = 0; j < nlat; j++ ) scale[j] = cos(scale[j]*DEG2RAD);
+	      else
+		for ( j = 0; j < nlat; j++ ) scale[j] = 1./cos(scale[j]*DEG2RAD);
+
+	      if ( cdoVerbose ) for ( j = 0; j < nlat; j++ ) cdoPrint("coslat  %3d  %g", j+1, scale[j]);
+		  
+	      gridID0 = gridID;
+	    }
+
+	  for ( j = 0; j < nlat; j++ )
+	    for ( i = 0; i < nlon; i++ )
+	      array[i+j*nlon] *= scale[j];
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, field.ptr, field.nmiss);
+	  streamWriteRecord(streamID2, array, nmiss);
 	}
       tsID++;
     }
@@ -124,7 +141,8 @@ void *Arithdays(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( field.ptr ) free(field.ptr);
+  if ( array ) free(array);
+  if ( scale ) free(scale);
 
   cdoFinish();
 

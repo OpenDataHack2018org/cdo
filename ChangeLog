@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.0.0
 	* New operator: dv2ps (Wind) [request: Luis Kornblueh]
+	* New module: Arithlat (mulcoslat, divcoslat) <- docu missing
 	* setreftime: use taxisDuplicate to copy bounds [report: Ivonne Anders]
 	* Seasstat: bug fix for datasets with only 1 season [report: Simon Blessing]
 	* Vertint: remove special treatment for geopoth

@@ -146,6 +146,7 @@ doc/tex/usage.tex -text
 src/Arith.c -text
 src/Arithc.c -text
 src/Arithdays.c -text
+src/Arithlat.c -text
 src/Cat.c -text
 src/Change.c -text
 src/Comp.c -text

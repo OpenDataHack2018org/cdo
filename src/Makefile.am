@@ -5,6 +5,7 @@ bin_PROGRAMS = cdo
 cdo_SOURCES = Arith.c		\
 	      Arithc.c 		\
 	      Arithdays.c 	\
+	      Arithlat.c        \
 	      Cat.c		\
 	      Change.c		\
 	      Comp.c 		\

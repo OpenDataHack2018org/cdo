@@ -39,6 +39,7 @@ MODULES;
 void *Arith(void *argument);
 void *Arithc(void *argument);
 void *Arithdays(void *argument);
+void *Arithlat(void *argument);
 void *Cat(void *argument);
 void *Change(void *argument);
 void *Comp(void *argument);
@@ -131,6 +132,7 @@ void *Zonstat(void *argument);
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy"}
+#define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
 #define  ChangeOperators        {"chcode", "chvar", "chlevel", "chlevelc", "chlevelv"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
@@ -238,6 +240,7 @@ static MODULES Modules[] =
   { Arith,          ArithHelp,         ArithOperators,          2,  1 },
   { Arithc,         ArithcHelp,        ArithcOperators,         1,  1 },
   { Arithdays,      ArithdaysHelp,     ArithdaysOperators,      1,  1 },
+  { Arithlat,       NULL,              ArithlatOperators,       1,  1 },
   { Cat,            CopyHelp,          CatOperators,           -1,  1 },
   { Change,         ChangeHelp,        ChangeOperators,         1,  1 },
   { Comp,           CompHelp,          CompOperators,           2,  1 },
