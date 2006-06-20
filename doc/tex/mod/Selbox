@@ -15,7 +15,7 @@ All input fields must have the same horizontal grid.
 
 
 @BeginOperator_sellonlatbox
-@Title     = Select lon/lat box
+@Title     = Select a longitude latitude box
 @Parameter = lon1 lon2 lat1 lat2
 
 @BeginDescription
@@ -26,7 +26,7 @@ longitudes and latitudes of the edges of the box.
 
 
 @BeginOperator_selindexbox
-@Title     = Select index box
+@Title     = Select an index box
 @Parameter = idx1 idx2 idy1 idy2
 
 @BeginDescription

@@ -8,7 +8,7 @@
 @Operators = vardes griddes vct
 
 @BeginDescription
-This module prints, according to the actual operator name, the description
+This module prints, according to the actual operator, the description
 of the variables, the grids or the vertical coordinate table.
 @EndDescription
 @EndModule
@@ -19,7 +19,7 @@ of the variables, the grids or the vertical coordinate table.
 
 @BeginDescription
 Prints a table with a description of all variables.
-For each variable the operator print in one line the
+For each variable the operator prints one line listing the
 code, name, description and units.
 @EndDescription
 @EndOperator
@@ -44,7 +44,7 @@ Prints the vertical coordinate table.
 
 
 @BeginExample
-Assumed the input dataset has 3 variables with the name geosp, t and tslm1.
+Assume an input dataset having three variables with the names geosp, t and tslm1.
 To print the description of these variables use:
 @BeginVerbatim
    cdo vardes ifile
@@ -55,8 +55,8 @@ Result:
    130  t             temperature [K]
    139  tslm1         surface temperature of land [K]
 @EndVerbatim
-Assumed all variables of the dataset are on a T21 gausssian grid.
-To print the description of this grid use:
+Assume all variables of the dataset are on a T21 gausssian grid.
+To print the grid description of this dataset use:
 @BeginVerbatim
    cdo griddes ifile
 @EndVerbatim

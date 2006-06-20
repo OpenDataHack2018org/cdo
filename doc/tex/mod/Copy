@@ -26,7 +26,7 @@ Copies all input datasets to @file{ofile}.
 @Title     = Concatenate datasets
 
 @BeginDescription
-Concatenates all input datasets and add the result at the end 
+Concatenates all input datasets and append the result to the end 
 of @file{ofile}. If @file{ofile} does not exist it will be created.
 @EndDescription
 @EndOperator
@@ -37,8 +37,9 @@ To change the format of a dataset to netCDF use:
 @BeginVerbatim
    cdo -f nc copy ifile ofile.nc
 @EndVerbatim
-Add the option '-r' to create an relative time axis, if you need the
-resulting netCDF file in GrADS:
+Add the option '-r' to create a relative time axis,
+as is required for proper recognition by GrADS or Ferret:
+%if you need the resulting netCDF file in GrADS:
 @BeginVerbatim
    cdo -r -f nc copy ifile ofile.nc
 @EndVerbatim
@@ -46,7 +47,7 @@ To concatenate 3 datasets with different time steps of the same variables use:
 @BeginVerbatim
    cdo copy ifile1 ifile2 ifile3 ofile
 @EndVerbatim
-If the output dataset already exist and you will extent it 
+If the output dataset already exist and you wish to extend it 
 with more time steps use:
 @BeginVerbatim
    cdo cat ifile1 ifile2 ifile3 ofile

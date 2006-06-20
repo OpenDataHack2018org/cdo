@@ -34,20 +34,20 @@ and the same number of time steps.
 Merges all time steps of all input files sorted by date and time.
 After this operation every input time step is in @file{ofile} and
 all time steps are sorted by date and time.
-Each input file must have the same variables.
+Each input file must have the same variables and different time steps.
 @EndDescription
 @EndOperator
 
 
 @BeginExample
-Assumed you have 3 datasets with the same number of time steps
-and each dataset has different variables.
+Assume three datasets with the same number of time steps
+and each dataset with different variables.
 To merge these datasets to a new dataset use:
 @BeginVerbatim
    cdo merge ifile1 ifile2 ifile3 ofile
 @EndVerbatim
-Assumed you have split a 6 hourly dataset with @oper{splithour}.
-This produces four datasets one for each hour.
+Assume you have split a 6 hourly dataset with @oper{splithour}.
+This produces four datasets one for each hours.
 The following command merges them together:
 @BeginVerbatim
    cdo mergetime ifile1 ifile2 ifile3 ifile4 ofile

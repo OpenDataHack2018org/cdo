@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module sets the time axis or part of the time axis. Which part of the
-time axis is overwritten depends on the actual operator name.
+time axis is overwritten depends on the actual operator.
 @EndDescription
 @EndModule
 
@@ -69,7 +69,7 @@ Sets the year in every time step to the same given value.
 @Parameter = units
 
 @BeginDescription
-Sets the base units of an relative time axis.
+Sets the base units of a relative time axis.
 @EndDescription
 @EndOperator
 

@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module sets some field information. Depending on the actual
-operator name the parameter table, code number, variable name or
+operator the parameter table, code number, variable name or
 level is set.
 @EndDescription
 @EndModule

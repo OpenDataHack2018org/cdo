@@ -8,7 +8,7 @@
 @Operators = showcode showvar showlevel showyear showmon showdate showtime
 
 @BeginDescription
-This module prints, according to the actual operator name,
+This module prints, according to the actual operator,
 the variables, levels or times of the input dataset.
 @EndDescription
 @EndModule
@@ -82,7 +82,7 @@ To print the code number of all variables in a dataset use:
 @BeginVerbatim
    cdo showcode ifile
 @EndVerbatim
-This is an example result of a dataset with 3 variables:
+This is an example result of a dataset with three variables:
 @BeginVerbatim
    129 130 139
 @EndVerbatim

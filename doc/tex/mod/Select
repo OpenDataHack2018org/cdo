@@ -8,8 +8,8 @@
 @Operators = selcode delcode selvar delvar sellevel selgrid selgridname selzaxis selzaxisname seltabnum selrec
 
 @BeginDescription
-This module selects some fields from @file{ifile} and write the result to @file{ofile}.
-Which fields are selected depends on the actual operator name and the parameters.
+This module selects some fields from @file{ifile} and writes them to @file{ofile}.
+The fields selected depend on the actual operator and the parameters.
 @EndDescription
 @EndModule
 
@@ -19,7 +19,7 @@ Which fields are selected depends on the actual operator name and the parameters
 @Parameter = codes
 
 @BeginDescription
-Selects all fields with a code number in a user given list.
+Selects all fields with code numbers in a user given list.
 @EndDescription
 @EndOperator
 
@@ -29,7 +29,7 @@ Selects all fields with a code number in a user given list.
 @Parameter = codes
 
 @BeginDescription
-Deletes all fields with a code number in a user given list.
+Deletes all fields with code numbers in a user given list.
 @EndDescription
 @EndOperator
 
@@ -39,7 +39,7 @@ Deletes all fields with a code number in a user given list.
 @Parameter = vars
 
 @BeginDescription
-Selects all fields with a variable name in a user given list.
+Selects all fields with variable names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -49,7 +49,7 @@ Selects all fields with a variable name in a user given list.
 @Parameter = vars
 
 @BeginDescription
-Deletes all fields with a variable name in a user given list.
+Deletes all fields with variable names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -59,7 +59,7 @@ Deletes all fields with a variable name in a user given list.
 @Parameter = levels
 
 @BeginDescription
-Selects all fields with a level in a user given list.
+Selects all fields with levels in a user given list.
 @EndDescription
 @EndOperator
 
@@ -69,7 +69,7 @@ Selects all fields with a level in a user given list.
 @Parameter = grids
 
 @BeginDescription
-Selects all fields with a grid in a user given list.
+Selects all fields with grids in a user given list.
 @EndDescription
 @EndOperator
 
@@ -79,7 +79,7 @@ Selects all fields with a grid in a user given list.
 @Parameter = gridnames
 
 @BeginDescription
-Selects all fields with a grid name in a user given list.
+Selects all fields with grid names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -89,7 +89,7 @@ Selects all fields with a grid name in a user given list.
 @Parameter = zaxis
 
 @BeginDescription
-Selects all fields with a zaxis in a user given list.
+Selects all fields with zaxes in a user given list.
 @EndDescription
 @EndOperator
 
@@ -99,7 +99,7 @@ Selects all fields with a zaxis in a user given list.
 @Parameter = zaxisnames
 
 @BeginDescription
-Selects all fields with a zaxis name in a user given list.
+Selects all fields with zaxis names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -109,7 +109,7 @@ Selects all fields with a zaxis name in a user given list.
 @Parameter = tabnum
 
 @BeginDescription
-Selects all fields with a parameter table number in a user given list.
+Selects all fields with parameter table numbers in a user given list.
 @EndDescription
 @EndOperator
 
@@ -119,8 +119,8 @@ Selects all fields with a parameter table number in a user given list.
 @Parameter = records
 
 @BeginDescription
-Selects all fields with a record number in a user given list.
-This operator does not work on netCDF data!
+Selects all fields with record numbers in a user given list.
+This operator can not be used with netCDF data!
 @EndDescription
 @EndOperator
 
@@ -148,7 +148,7 @@ INTEGER  Comma separated list of records
 
 
 @BeginExample
-Assumed the input dataset has 3 variables with the code number 129, 130 and 139.
+Assume an input dataset has three variables with the code numbers 129, 130 and 139.
 To select the variables with the code number 129 and 139 use:
 @BeginVerbatim
    cdo selcode,129,139 ifile ofile

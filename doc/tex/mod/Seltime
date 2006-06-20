@@ -8,8 +8,8 @@
 @Operators = seltimestep seltime selhour selday selmon selyear selseas seldate
 
 @BeginDescription
-This module selects some time steps from @file{ifile} and write the result to @file{ofile}.
-Which time steps are selected depends on the actual operator name and the parameters.
+This module selects user specified time steps from @file{ifile} and writes them to @file{ofile}.
+The time steps selected depend on the actual operator and the parameters.
 @EndDescription
 @EndModule
 

@@ -1,8 +1,12 @@
 \chapter{Introduction}
 
-\CDO is a collection of Operators to manipulate and analyse Climate model Data.
-There are a lot of operators for doing standard processing like simple statistic,
-arithmetic, selection and interpolation on datasets from climate and forecast models.
+The Climate Data Operators (\CDO) software is a collection of many operators
+for standard processing of climate and forecast model output.
+The operators include simple statistical and arithmetic functions, data selection
+and subsampling tools, and spatial interpolation.
+%\CDO is a collection of Operators to manipulate and analyse Climate model Data.
+%There are a lot of operators for doing standard processing like simple statistic,
+%arithmetic, selection and interpolation on datasets from climate and forecast models.
 %The operators are primarily designed to aid manipulation and analysis of gridded scientific data
 \CDO was developed to have the same set of processing functions for \htmlref{GRIB}{GRIB} and \htmlref{netCDF}{netCDF}
 datasets in one package.
@@ -15,7 +19,8 @@ There are some limitations for GRIB and netCDF datasets.
 A GRIB dataset must be consistent, similar to netCDF.
 That means all time steps must have the same variables, and
 within a time step each variable may occur only once.
-NetCDF datasets are supported only with 2D, 3D and 4D variables and the attributes should follow the
+NetCDF datasets are supported only with 2-dimensional, 3-dimensional and 4-dimensional
+variables and the attributes should follow the
 \href{http://ftp.unidata.ucar.edu/software/netcdf/docs/conventions.html}
      {GDT, COARDS or CF Conventions}.
 
@@ -26,15 +31,15 @@ those operators.
 
 The main \CDO features are:
 \begin{itemize}
-\item There are more than 250 operators available.
-\item Modular design and easily extendable with new operators.
-\item Very simple UNIX command line interface.
+\item More than 250 operators available
+\item Modular design and easily extendable with new operators
+\item Very simple UNIX command line interface
 \item A dataset can be processed by several operators,
       without storing the interim results in files % (No disk I/O).
-\item All operators handle datasets with missing values.
-\item Fast processing of large datasets.
-\item Support of many different grid types.
-\item Tested on many UNIX/Linux systems, Cygwin, and MacOS X.
+\item All operators handle datasets with missing values
+\item Fast processing of large datasets
+\item Support of many different grid types
+\item Tested on many UNIX/Linux systems, Cygwin, and MacOS-X
 %item Free available and runs on all UNIX platforms.
 \end{itemize}
 

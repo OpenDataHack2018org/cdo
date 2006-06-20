@@ -9,7 +9,7 @@
 @BeginDescription
 This modules reads time series of one 2D variable from standard input.
 All input fields must have the same horizontal grid. The format of the 
-input depends on the actual operator name.
+input depends on the actual operator.
 @EndDescription
 @EndModule
 

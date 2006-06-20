@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module computes running statistical values over a selected number
-of time steps. Depending on the actual operator name the minimum, maximum,
+of time steps. Depending on the actual operator the minimum, maximum,
 sum, average or standard deviation of a selected number of consecutive 
 time steps read from @file{ifile} is written to @file{ofile}. The date information 
 in @file{ofile} is the date of the medium contributing time step in @file{ifile}.

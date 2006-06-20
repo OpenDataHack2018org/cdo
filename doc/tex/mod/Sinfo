@@ -1,25 +1,25 @@
 @BeginModule
 @NewPage
 @Name      = Sinfo
-@Title     = Short info
+@Title     = Short information
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = sinfo -sinfov sinfop
+@Operators = sinfo sinfov sinfop
 
 @BeginDescription
 This module writes information about the structure of all input datasets to 
-standard output. The information displayed depends on the actual operator name.
+standard output. The information displayed depends on the actual operator.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_sinfo
-@Title     = Short dataset information
+@Title     = Short dataset information listed by code number
 
 @BeginDescription
 Prints short information of a dataset. The information is divided into
-4 sections. Section 1 prints for each variable in one line the:
+4 sections. Section 1 prints one line per variable with the following information:
 @BeginItemize
 @Item = institute and source
 @Item = parameter table and code number
@@ -33,7 +33,7 @@ And the last section contains short information of the time axis.
 
 
 @BeginOperator_sinfov
-@Title     = Short dataset information
+@Title     = Short dataset information listed by variable name
 
 @BeginDescription
 The same as operator @oper{sinfo} but using the name instead of the code number

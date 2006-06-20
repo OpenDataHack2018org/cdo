@@ -8,7 +8,7 @@
 @Operators = yseasmin yseasmax yseasmean yseasavg yseasstd
 
 @BeginDescription
-This module writes to @file{ofile}, according to the actual operator name,
+This module writes to @file{ofile}, according to the actual operator,
 the minimum, maximum, sum, average or standard deviation  of each 
 season in @file{ifile}. The date information in an output field is the date
 of the last contributing input field.

@@ -9,7 +9,7 @@
 @BeginDescription
 Generates a dataset with one field. The size of the field
 is specified by the user given grid description.
-According to  the actual operator name all field elements
+According to the actual operator all field elements
 are constant or filled with random numbers.
 @EndDescription
 @EndModule

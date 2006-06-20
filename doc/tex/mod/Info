@@ -1,26 +1,26 @@
 @BeginModule
 @NewPage
 @Name      = Info
-@Title     = Info and simple statistics
+@Title     = Information and simple statistics
 @Section   = Information
 @Class     = Information
 @Arguments = ifiles
-@Operators = info -infov map
+@Operators = info infov map
 
 @BeginDescription
 This module writes information about the structure and contents 
 of all input datasets to standard output. The information displayed 
-depends on the actual operator name.
+depends on the actual operator.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_info
-@Title     = Dataset information
+@Title     = Dataset information listed by code number
 
 @BeginDescription
 Prints information and simple statistics for each field of all
-input datasets. For each field the operator print in one line the:
+input datasets. For each field the operator prints one line with the following elements:
 @BeginItemize
 @Item = Date and Time
 @Item = Code number and Level
@@ -33,7 +33,7 @@ The mean value is computed without the use of area weights!
 
 
 @BeginOperator_infov
-@Title     = Dataset information
+@Title     = Dataset information listed by variable name
 
 @BeginDescription
 The same as operator @oper{info} but using the name instead of the code
@@ -46,7 +46,7 @@ number to identify the variables.
 @Title     = Dataset information and simple map
 
 @BeginDescription
-Prints information, simple statistic and a map for each field of all input
+Prints information, simple statistics and a map for each field of all input
 datasets. The map will be printed only for fields on a rectangular grid.
 @EndDescription
 @EndOperator

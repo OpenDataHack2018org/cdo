@@ -7,10 +7,10 @@ Operator catalog:
 -------------------------------------------------------------
    Information
 -------------------------------------------------------------
-      Info       info            Dataset information
+      Info       info            Dataset information listed by code number
       Info       map             Dataset information and simple map
-      Sinfo      sinfo           Short dataset information
-      Diff       diff            Compare two datasets
+      Sinfo      sinfo           Short dataset information listed by code number
+      Diff       diff            Compare two datasets listed by code number
       Ninfo      ncode           Number of codes
       Ninfo      nvar            Number of variables
       Ninfo      nlevel          Number of levels
@@ -69,8 +69,8 @@ Operator catalog:
       Seltime    selyear         Select years
       Seltime    selseas         Select seasons
       Seltime    seldate         Select dates
-      Selbox     sellonlatbox    Select lon/lat box
-      Selbox     selindexbox     Select index box
+      Selbox     sellonlatbox    Select a longitude latitude box
+      Selbox     selindexbox     Select an index box
 -------------------------------------------------------------
    Conditional selection
 -------------------------------------------------------------

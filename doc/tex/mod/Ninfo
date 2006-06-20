@@ -8,7 +8,7 @@
 @Operators = ncode nvar nlevel nyear nmon ndate ntime
 
 @BeginDescription
-This module prints, according to the actual operator name,
+This module prints, according to the actual operator,
 the number of variables, levels or times of the input dataset.
 @EndDescription
 @EndModule

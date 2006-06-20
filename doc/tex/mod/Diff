@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile1 ifile2
-@Operators = diff -diffv
+@Operators = diff diffv
 
 @BeginDescription
 Compares the contents of two datasets field by field. The input
@@ -16,11 +16,11 @@ the same header information and dimensions.
 
 
 @BeginOperator_diff
-@Title     = Compare two datasets
+@Title     = Compare two datasets listed by code number
 
 @BeginDescription
-Prints statistic over differences of two datasets.
-For each pair of fields the operator print in one line the:
+Provides statistics on differences between two datasets.
+For each pair of fields the operator prints one line with the following information:
 @BeginItemize
 @Item = date and time
 @Item = code number and level
@@ -35,7 +35,7 @@ For each pair of fields the operator print in one line the:
 
 
 @BeginOperator_diffv
-@Title     = Compare two datasets
+@Title     = Compare two datasets listed by variable name
 
 @BeginDescription
 The same as operator @oper{diff}. Using the name instead of the code number

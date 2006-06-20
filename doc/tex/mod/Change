@@ -10,7 +10,7 @@
 @BeginDescription
 This module reads fields from @file{ifile}, changes some header values
 and writes the results to @file{ofile}. The kind of changes depends on 
-the actual operator name.
+the actual operator.
 @EndDescription
 @EndModule
 

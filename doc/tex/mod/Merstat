@@ -10,7 +10,7 @@
 
 @BeginDescription
 This module computes meridional statistical values of the input fields.
-According to the actual operator name the meridional minimum, maximum,
+According to the actual operator the meridional minimum, maximum,
 sum, average, standard deviation or variance is written to @file{ofile}.
 All input fields must have the same rectangular grid. 
 @EndDescription

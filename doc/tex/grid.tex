@@ -1,7 +1,6 @@
 \section{Grid description}
 
-In some situations it is necessary to give a description of a horizontal grid.
-These situations are
+In the following situations it is necessary to give a description of a horizontal grid:
 
 \begin{itemize}
 \item Changing the grid description (operator: \htmlref{setgrid}{setgrid})
@@ -9,7 +8,7 @@ These situations are
 \item Generating variables (operator: \htmlref{const}{const}, \htmlref{random}{random})
 \end{itemize}
 
-There are several possibilities to define a horizontal grid.
+As now described, there are several possibilities to define a horizontal grid.
 Predefined grids are available for global regular, gaussian or icosahedral-hexagonal GME grids.
 
 
@@ -42,7 +41,7 @@ The following pre-defined grid names are available:
 \subsection{Grids from data files}
 
 You can use the grid description from an other datafile.
-The format of the datafile and the grid of the data field musst
+The format of the datafile and the grid of the data field must
 be supported by this program.
 Use the operator '\htmlref{sinfo}{sinfo}' to get short informations about
 your variables and the grids.
@@ -94,9 +93,9 @@ SCRIP grid description example of a curvilinear MPIOM1 GROB3 grid (only the netC
 
 \subsection{PINGO grids}
 
-PINGO is using a very simple grid description in ASCII format.
-You can use it to describe regular longitude/latitude or global gaussian grids.
-All PINGO grid description files are supported. 
+PINGO uses a very simple grid description in ASCII format
+to describe regular longitude/latitude or global gaussian grids.
+All PINGO grid description files are supported by \CDO. 
 For more information about this format see \cite{PINGO}.
 
 \vspace{2mm}
@@ -122,8 +121,9 @@ PINGO grid description example of a T21 gaussian grid:
 
 \subsection{CDO grids}
 
-The \CDO grid description is an ASCII formatted file.
-It is a common grid description for all available grids.
+All supported grids can be also described with the \CDO description ASCII formatted file.
+%The \CDO grid description is an ASCII formatted file.
+%It is a common grid description for all available grids.
 The following keywords can be used to describe a grid:
 
 \vspace{3mm}
@@ -151,8 +151,8 @@ yfirst, yinc & FLOAT, FLOAT & macros to define yvals with a constant increment \
 
 \vspace{4mm}
 
-Which keywords are necessary depents on the gridtype.
-The next table gives an overview of the default values or the array size for the different
+Which keywords are necessary depends on the gridtype.
+The following table gives an overview of the default values or the array size for the different
 grid types.
 
 %\vspace{2mm}
@@ -272,7 +272,7 @@ are for the rotated system.
 \end{lstlisting}
 %\end{minipage}
 
-Example \CDO description of a curvilinear grid and unstructured grid cells can be found
+Example \CDO descriptions of a curvilinear and an unstructured grid can be found
 in \htmlref{Appendix B}{appendixgrid}.
 
 %#define  GRID_GENERIC             1
@@ -310,7 +310,3 @@ in \htmlref{Appendix B}{appendixgrid}.
 
 % retilinear (geradlinig)
 
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "cdo"
-%%% End: 

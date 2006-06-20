@@ -11,7 +11,7 @@
 This module compares two datasets field by field. The resulting
 field is a mask with 1 if the comparison is true and 0 if the
 comparison is false. The type of the comparison depends on the
-actual operator name.
+actual operator.
 @EndDescription
 @EndModule
 

@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module inverts 2D fields on a rectangular grid. Depending on the actual 
-operator name the field, only the data or only the grid description is inverted.
+operator the field, only the data or only the grid description is inverted.
 @EndDescription
 @EndModule
 

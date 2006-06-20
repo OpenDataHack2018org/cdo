@@ -3,16 +3,16 @@
 All operators can handle missing values.
 The default missing value for GRIB, SERVICE, EXTRA and IEG files is $-9e+33$. 
 The \CDO option '-m $<$missval$>$' overwrites the default missing value.
-In netCDF files the variable attribute '\_FillValue' is used as missing value.
+In netCDF files the variable attribute '\_FillValue' is used as a missing value.
 The operator '\htmlref{setmissval}{setmissval}' can be used to set a new missing value.
 
-The use of the missing value is shown in the following tables,
-where for each operation one table is printed.
-The operations are applied to arbitrarily number $a$, $b$, the special case $0$,
+The \CDO use of the missing value is shown in the following tables,
+where one table is printed for each operation.
+The operations are applied to arbitrary numbers $a$, $b$, the special case $0$,
 and the missing value $miss$.
 %Gray fields are of particular interest.
 For example the table named "addition" shows that the sum of an
-arbitrarily number $a$ and the missing value is the missing value,
+arbitrary number $a$ and the missing value is the missing value,
 and the table named "multiplication" shows that $0$ multiplied by missing
 value results in $0$.
 
@@ -105,24 +105,19 @@ value results in $0$.
 \vspace{2mm}
 
 The handling of missing values by the operations "minimum" and "maximum" may
-be surprising, but is turned out that the definition given here is more 
-related to what is expected in practice. Mathematical functions (e.g. $log$, $sqrt$, etc.)
+be surprising, but the definition given here is more consistent with that
+expected in practice. Mathematical functions (e.g. $log$, $sqrt$, etc.)
 return the missing value if an argument is the missing value or
 an argument is out of range.
 
-All statistics functions ignore missing values, treading them as not belonging
+All statistical functions ignore missing values, treading them as not belonging
 to the sample, with the side-effect of a reduced sample size.
 
 \subsection{Mean and average}
 
 An artificial distinction is made between the notions mean and average.
-The mean is regarded as a statistic function, whereas the average is found simply
+The mean is regarded as a statistical function, whereas the average is found simply
 by adding the sample members and dividing the result by the sample size.
 For example, the mean of 1, 2, $miss$ and 3 is $(1+2+3)/3=2$,
 whereas the average is $(1+2+miss+3)/4=miss/4=miss$.
 If there are no missing values in the sample, the average and mean are identical.
-
-%%% Local Variables: 
-%%% mode: latex
-%%% TeX-master: "partab"
-%%% End: 

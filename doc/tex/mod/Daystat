@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module computes statistical values over time steps of the same day.
-Depending on the actual operator name the minimum, maximum, sum, average
+Depending on the actual operator the minimum, maximum, sum, average
 or standard deviation of time steps of the same day is written to @file{ofile}.
 The date information for a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.

@@ -9,12 +9,12 @@ The syntax is:
 
 \subsection{Options}
 
-All options musst be pleace before the first operator.
+All options must be pleaced before the first operator.
 The following options are available for all operators:
 
 \begin{tabbing}
 \makebox[1.5in][l]{\hspace*{1cm}\sl -a}
-         \= Convert from relative to absolute time axis. \\
+         \= Convert from a relative to an absolute time axis. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -f $<$format$>$}
          \> Set the output file format. The valid file formats are: \\
          \> \parbox[r]{3in}{
@@ -60,7 +60,7 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}\sl -R}
          \> Convert GRIB data from reduced to regular grid. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -r}
-         \> Convert from absolute to relative time axis. \\
+         \> Convert from an absolute to a relative time axis. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -t $<$partab$>$}
          \> Set the default parameter table name or file.\\
          \> Predefined tables are:  {\tt echam4 echam5 mpiom1}\\
@@ -104,13 +104,13 @@ instead of
 
 \subsection{Operator parameter}
 
-Some operators needs one or more parameter.
+Some operators need one or more parameter.
 
 \begin{itemize}
 \item STRING
 
 Unquoted characters without blanks and tabs.
-The following command select variables with the name {\tt pressure} and {\tt tsurf}:
+The following command select variables with the names {\tt pressure} and {\tt tsurf}:
 \begin{verbatim}
    cdo selvar,pressure,tsurf ifile ofile
 \end{verbatim}
