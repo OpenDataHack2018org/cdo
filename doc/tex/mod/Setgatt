@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module sets global text attributes of a dataset. Depending on the actual 
-operator the attributes are read from a file or can be specified by parameter.
+operator the attributes are read from a file or can be specified by a parameter.
 @EndDescription
 @EndModule
 

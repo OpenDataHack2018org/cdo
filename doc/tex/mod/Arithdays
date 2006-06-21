@@ -59,7 +59,7 @@ o(t,x) = i(t,x) / days\_per\_year
 
 
 @BeginExample
-Assumed the input dataset is a monthly mean time series.
+Assume an input dataset is a monthly mean time series.
 To compute the yearly mean from the correct weighted monthly mean use:
 @BeginVerbatim
    cdo muldpm ifile tmpfile1

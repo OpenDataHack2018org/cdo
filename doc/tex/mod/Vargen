@@ -27,7 +27,7 @@ have the same value.
 
 
 @BeginOperator_random
-@Title     = Create field with random values
+@Title     = Create a field with random values
 @Parameter = grid
 
 @BeginDescription

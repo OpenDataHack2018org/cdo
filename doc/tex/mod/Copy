@@ -39,7 +39,6 @@ To change the format of a dataset to netCDF use:
 @EndVerbatim
 Add the option '-r' to create a relative time axis,
 as is required for proper recognition by GrADS or Ferret:
-%if you need the resulting netCDF file in GrADS:
 @BeginVerbatim
    cdo -r -f nc copy ifile ofile.nc
 @EndVerbatim

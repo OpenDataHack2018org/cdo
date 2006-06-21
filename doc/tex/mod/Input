@@ -57,7 +57,7 @@ STRING  Grid description file or name
 
 
 @BeginExample
-Assumed an ASCII dataset contains a field on a global regular 
+Assume an ASCII dataset contains a field on a global regular 
 grid with 32 longitude and 16 latitudes (512 elements).
 To create a GRIB dataset from the ASCII dataset use:
 @BeginVerbatim

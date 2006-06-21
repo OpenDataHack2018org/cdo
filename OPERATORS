@@ -8,9 +8,12 @@ Operator catalog:
    Information
 -------------------------------------------------------------
       Info       info            Dataset information listed by code number
+      Info       infov           Dataset information listed by variable name
       Info       map             Dataset information and simple map
       Sinfo      sinfo           Short dataset information listed by code number
+      Sinfo      sinfov          Short dataset information listed by variable name
       Diff       diff            Compare two datasets listed by code number
+      Diff       diffv           Compare two datasets listed by variable name
       Ninfo      ncode           Number of codes
       Ninfo      nvar            Number of variables
       Ninfo      nlevel          Number of levels
@@ -56,10 +59,10 @@ Operator catalog:
       Select     delvar          Delete variables
       Select     sellevel        Select levels
       Select     selgrid         Select grids
-      Select     selgridname     Select grid by name
-      Select     selzaxis        Select zaxis
-      Select     selzaxisname    Select zaxis by name
-      Select     seltabnum       Select parameter table number
+      Select     selgridname     Select grids by name
+      Select     selzaxis        Select zaxes
+      Select     selzaxisname    Select zaxes by name
+      Select     seltabnum       Select parameter table numbers
       Select     selrec          Select records
       Seltime    seltimestep     Select time steps
       Seltime    seltime         Select times
@@ -69,7 +72,7 @@ Operator catalog:
       Seltime    selyear         Select years
       Seltime    selseas         Select seasons
       Seltime    seldate         Select dates
-      Selbox     sellonlatbox    Select a longitude latitude box
+      Selbox     sellonlatbox    Select a longitude/latitude box
       Selbox     selindexbox     Select an index box
 -------------------------------------------------------------
    Conditional selection
@@ -127,8 +130,8 @@ Operator catalog:
       Invert     invertlondes    Invert longitude description
       Invert     invertlatdata   Invert latitude data
       Invert     invertlondata   Invert longitude data
-      Maskbox    masklonlatbox   Mask lon/lat box
-      Maskbox    maskindexbox    Mask index box
+      Maskbox    masklonlatbox   Mask a longitude/latitude box
+      Maskbox    maskindexbox    Mask an index box
       Enlarge    enlarge         Enlarge fields
       Setmiss    setmissval      Set a new missing value
       Setmiss    setctomiss      Set constant to missing value
@@ -320,7 +323,7 @@ Operator catalog:
 -------------------------------------------------------------
       Timsort    timsort         Sort over the time
       Vargen     const           Create a constant field
-      Vargen     random          Create field with random values
+      Vargen     random          Create a field with random values
       Vardup     vardup          Duplicate variables
       Vardup     varmul          Multiply variables
       Gradsdes   gradsdes        GrADS data descriptor file

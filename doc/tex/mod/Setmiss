@@ -119,7 +119,7 @@ FLOAT  Upper bound
 
 
 @BeginExample
-Assumed the input dataset has one field with the temperature
+Assume an input dataset has one field with the temperature
 in the range from 246 to 304 Kelvin. To set all values
 below 273.15 Kelvin to missing value use:
 @BeginVerbatim

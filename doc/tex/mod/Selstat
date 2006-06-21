@@ -158,7 +158,7 @@ INTEGER  Number of input time steps skipped between time step ranges (optional)
 
 
 @BeginExample
-Assumed the input dataset has monthly means over several years.
+Assume an input dataset has monthly means over several years.
 To compute seasonal means from monthly means the first two
 month must be skipped:
 @BeginVerbatim

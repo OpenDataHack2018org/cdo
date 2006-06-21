@@ -36,7 +36,7 @@ the names u and v or the code numbers 131 and 132.
 
 
 @BeginExample
-Assumed a dataset has at least spherical harmonic coefficients
+Assume a dataset has at least spherical harmonic coefficients
 of divergence and vorticity.
 To transform the spectral divergence and vorticity to U and V wind, use:
 @BeginVerbatim

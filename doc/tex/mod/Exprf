@@ -81,9 +81,9 @@ STRING  File with processing instructions
 
 
 @BeginExample
-Assumed the input dataset contains at least the variables 'aprl', 'aprc'
-and 'ts'. To create a new variable (var1) with the sum
-of 'aprl' and 'aprc' and a variable (var2) which convert
+Assume an input dataset contains at least the variables 'aprl', 'aprc'
+and 'ts'. To create a new variable 'var1' with the sum
+of 'aprl' and 'aprc' and a variable 'var2' which convert
 the temperature 'ts' from Kelvin to Celsius use:
 @BeginVerbatim
    cdo expr,'var1=aprl+aprc;var2=ts-273.15;' ifile ofile

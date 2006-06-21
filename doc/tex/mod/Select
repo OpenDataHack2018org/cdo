@@ -75,7 +75,7 @@ Selects all fields with grids in a user given list.
 
 
 @BeginOperator_selgridname
-@Title     = Select grid by name
+@Title     = Select grids by name
 @Parameter = gridnames
 
 @BeginDescription
@@ -85,8 +85,8 @@ Selects all fields with grid names in a user given list.
 
 
 @BeginOperator_selzaxis
-@Title     = Select zaxis
-@Parameter = zaxis
+@Title     = Select zaxes
+@Parameter = zaxes
 
 @BeginDescription
 Selects all fields with zaxes in a user given list.
@@ -95,7 +95,7 @@ Selects all fields with zaxes in a user given list.
 
 
 @BeginOperator_selzaxisname
-@Title     = Select zaxis by name
+@Title     = Select zaxes by name
 @Parameter = zaxisnames
 
 @BeginDescription
@@ -105,8 +105,8 @@ Selects all fields with zaxis names in a user given list.
 
 
 @BeginOperator_seltabnum
-@Title     = Select parameter table number
-@Parameter = tabnum
+@Title     = Select parameter table numbers
+@Parameter = tabnums
 
 @BeginDescription
 Selects all fields with parameter table numbers in a user given list.
@@ -136,11 +136,11 @@ FLOAT    Comma separated list of levels
 INTEGER  Comma separated list of grid numbers
 @Item = gridnames
 STRING   Comma separated list of grid names
-@Item = zaxis
+@Item = zaxes
 INTEGER  Comma separated list of zaxis numbers
 @Item = zaxisnames
 STRING   Comma separated list of zaxis names
-@Item = tabnum
+@Item = tabnums
 INTEGER  Comma separated list of parameter table numbers
 @Item = records
 INTEGER  Comma separated list of records
