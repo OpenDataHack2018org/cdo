@@ -29,11 +29,10 @@ case "${HOSTNAME}" in
                     --enable-dap --with-netcdf=$HOME/local \
                     CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall"
 	;;
-    tolken | gata)
+    gata)
 # opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
-	            --with-netcdf=/scratch/localA/m214003/local \
-                    --with-hdf5=/scratch/localA/m214003/local \
+	            --with-netcdf=/client \
 	            CC=gcc CFLAGS="-ansi -g -D_REENTRANT -O2 -Wall " LIBS="-lm -lz"
 	;;
     regio01)
@@ -67,7 +66,7 @@ case "${HOSTNAME}" in
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
     sx6)
-	./configure --host=sx6 --prefix=$HOME/local/SX6 \
+	./configure --host=sx6 --prefix=$HOME/local \
                     --with-netcdf=/pool/SX-6/netcdf/netcdf-3.6.0-p1 \
 		    CC=sxc++ AR=sxar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
