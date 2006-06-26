@@ -462,7 +462,7 @@ static void checkStreamCnt(void)
     }  
 }
 
-#define  MAX_ARGV  1024
+#define  MAX_ARGV  8192
 
 static void setStreams(const char *argument)
 {

@@ -1,3 +1,8 @@
+2006-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* process: set MAX_ARGS from 1024 to 8192
+	* Version 1.0.1 released
+
 2006-06-15  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 1.0.0
