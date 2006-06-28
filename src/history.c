@@ -24,7 +24,7 @@
 static char *ghistory = NULL;
 static size_t ghistorysize = 0;
 
-static char strtime[20];
+static char strtime[32];
 
 void init_strtime()
 {
@@ -36,9 +36,10 @@ void init_strtime()
   if ( tp != -1 )
     {
       ltime = localtime(&tp);
-      (void) strftime(strtime, 20, "%d %b %Y : ", ltime);
+      (void) strftime(strtime, sizeof(strtime), "%a %b %d %H:%M:%S %Y: ", ltime);
     }
 }
+
 
 char *get_strtimeptr()
 {
@@ -47,6 +48,7 @@ char *get_strtimeptr()
 
   return (strtime);
 }
+
 
 void cdoInqHistory(int fileID)
 {
@@ -72,10 +74,9 @@ void cdoInqHistory(int fileID)
 	  /* printf("%d %d\n", len, ghistorysize); */
 	  ghistorysize = len;
 	}
-      ghistory[ghistorysize] = '\n';
-      ghistorysize += 1;
     }
 }
+
 
 void cdoDefHistory(int fileID, char *histstring)
 {
@@ -83,17 +84,20 @@ void cdoDefHistory(int fileID, char *histstring)
   char *history = NULL;
   size_t historysize = 0;
   char *strtimeptr;
-  int strtimelen;
 
   strtimeptr = get_strtimeptr();
-  strtimelen = strlen(strtimeptr);
   
-  historysize = ghistorysize+strtimelen+strlen(histstring)+1;
+  historysize = ghistorysize+strlen(strtimeptr)+strlen(histstring)+2;
   history = (char *) malloc(historysize);
 
-  strncpy(history, ghistory, ghistorysize);
-  strncpy(history+ghistorysize, strtimeptr, strtimelen);
-  strcpy(history+ghistorysize+strtimelen, histstring);
+  strcpy(history, strtimeptr);
+  strcat(history, histstring);
+  if ( ghistory )
+    {
+      strcat(history, "\n");
+      strcat(history, ghistory);
+    }
+
   streamDefHistory(fileID, strlen(history), history);
   
   free(history);

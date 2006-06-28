@@ -158,11 +158,7 @@ void *Vertint(void *argument)
 	      else
 		{
 		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		  printf("zaxisID %d %d\n", zaxisID, i);
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
 		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
-
-		  printf("zaxisID %d %d\n", zaxisID, i);
 		}
 	    }
 	}
