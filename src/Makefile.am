@@ -56,6 +56,7 @@ cdo_SOURCES = Arith.c		\
               Selstat.c 	\
               Seltime.c 	\
 	      Set.c		\
+	      Setbox.c		\
 	      Setgatt.c		\
 	      Setgrid.c		\
 	      Sethalo.c		\

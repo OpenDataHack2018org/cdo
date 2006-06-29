@@ -90,6 +90,7 @@ void *Selrec(void *argument);
 void *Selstat(void *argument);
 void *Seltime(void *argument);
 void *Set(void *argument);
+void *Setbox(void *argument);
 void *Setgatt(void *argument);
 void *Setgrid(void *argument);
 void *Sethalo(void *argument);
@@ -187,6 +188,7 @@ void *Zonstat(void *argument);
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime"}
 #define  SetOperators           {"setpartab", "setcode", "setvar", "setlevel"}
+#define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}
 #define  SethaloOperators       {"sethalo"}
@@ -293,6 +295,7 @@ static MODULES Modules[] =
   { Selstat,        SelstatHelp,       SelstatOperators,        1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,        1,  1 },
   { Set,            SetHelp,           SetOperators,            1,  1 },
+  { Setbox,         NULL,              SetboxOperators,         1,  1 },
   { Setgatt,        SetgattHelp,       SetgattOperators,        1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,        1,  1 },
   { Sethalo,        NULL,              SethaloOperators,        1,  1 },

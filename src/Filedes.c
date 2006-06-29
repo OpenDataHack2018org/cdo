@@ -34,7 +34,7 @@
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST;
+  int GRIDDES, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST, PARTAB;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -51,6 +51,7 @@ void *Filedes(void *argument)
   VARDES   = cdoOperatorAdd("vardes",   0, 0, NULL);
   FILEDES  = cdoOperatorAdd("filedes",  0, 0, NULL);
   VLIST    = cdoOperatorAdd("vlist",    0, 0, NULL);
+  PARTAB   = cdoOperatorAdd("partab",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
 

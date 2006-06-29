@@ -199,6 +199,7 @@ src/Selrec.c -text
 src/Selstat.c -text
 src/Seltime.c -text
 src/Set.c -text
+src/Setbox.c -text
 src/Setgatt.c -text
 src/Setgrid.c -text
 src/Sethalo.c -text
