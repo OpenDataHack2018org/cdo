@@ -148,7 +148,7 @@ void *Zonstat(void *argument);
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd"}
 #define  ExprOperators          {"expr", "exprf"}
-#define  FiledesOperators       {"filedes", "griddes", "zaxisdes", "vct", "vardes", "taxisdes", "vlist"}
+#define  FiledesOperators       {"filedes", "griddes", "zaxisdes", "vct", "vardes", "taxisdes", "vlist", "partab"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd"}

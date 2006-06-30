@@ -1,5 +1,6 @@
 2006-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* namelist update
 	* history format changed to nco
 	* process: set MAX_ARGS from 1024 to 8192
 	* Version 1.0.1 released

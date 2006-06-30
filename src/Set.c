@@ -31,6 +31,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "namelist.h"
 
 
 void *Set(void *argument)
@@ -47,6 +48,7 @@ void *Set(void *argument)
   int gridsize;
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int tableID = -1;
+  int tableformat = 0;
   char *newname = NULL, *partab = NULL;
   double newlevel = 0;
   double *levels = NULL;
@@ -72,8 +74,57 @@ void *Set(void *argument)
     }
   else if ( operatorID == SETPARTAB )
     {
+      FILE *fp;
+      size_t fsize;
+      char *parbuf = NULL;
       partab = operatorArgv()[0];
+      fp = fopen(partab, "r");
+      if ( fp != NULL )
+	{
+	  fseek(fp, 0L, SEEK_END);
+	  fsize = (size_t) ftell(fp);
+	  printf("fsize %d\n", (int) fsize);
+	  parbuf = (char *) malloc(fsize+1);
+	  fseek(fp, 0L, SEEK_SET);
+	  fread(parbuf, fsize, 1, fp);
+	  parbuf[fsize] = 0;
+	  fseek(fp, 0L, SEEK_SET);
+
+	  if ( atoi(parbuf) == 0 )
+	    {
+	      NAMELIST *nml;
+	      int code, table;
+	      char *datatype = NULL;
+	      char *name = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
+	      nml = namelistNew("parameter");
+	      nml->dis = 0;
+
+	      namelistAdd(nml, "code",      NML_INT,  0, &code, 1);
+	      namelistAdd(nml, "table",     NML_INT,  0, &table, 1);
+	      namelistAdd(nml, "datatype",  NML_WORD, 0, &datatype, 1);
+	      namelistAdd(nml, "name",      NML_WORD, 0, &name, 1);
+	      namelistAdd(nml, "stdname",   NML_WORD, 0, &stdname, 1);
+	      namelistAdd(nml, "longname",  NML_TEXT, 0, longname, 256);
+	      namelistAdd(nml, "units",     NML_TEXT, 0, units, 256);
+	      
+	      while ( ! feof(fp) )
+		{
+		  namelistClear(nml);
+
+		  namelistRead(fp, nml);
+		  namelistPrint(nml);
+		}
+
+	      namelistDelete(nml);
+
+	      tableformat = 1;
+	    }
+	  fclose(fp);
+	  free(parbuf);
+	}
+
       tableID = defineTable(partab);
+      tableWrite("xxx", tableID);
     }
   else if ( operatorID == SETLEVEL )
     {

@@ -39,8 +39,8 @@ int readline(FILE *fp, char *line, int len);
 #define  NML_NUMBER      8 /* nptype */
 #define  NML_KEYWORD     9 /* nptype */
 
-#define  PRINT_NOT       1
 #define  PRINT_ALL       2
+#define  PRINT_MIN       3
 
 #undef   TRUE
 #define  TRUE   1
@@ -56,26 +56,16 @@ int readline(FILE *fp, char *line, int len);
 
 struct PGMSTAT
 {
-  int pdis;
   int intract;
 };
 
 struct PGMSTAT pgmstat;
 
-#define MAXLINL 1024
-
-struct NAMELINE
-{
-  int nptype, namitf, namitl;
-  char lineac[MAXLINL], lineuc[MAXLINL], linelc[MAXLINL];
-};
-
-struct NAMELINE nameline;
-
 
 static void namelist_init(NAMELIST *namelist, const char *name)
 {
   namelist->size = 0;
+  namelist->dis  = 1;
   namelist->name = strdup(name);
 }
 
@@ -94,18 +84,46 @@ NAMELIST *namelistNew(const char *name)
 
 void namelistDelete(NAMELIST *nml)
 {
-  int i;
+  int i, iocc;
 
   if ( nml )
     {
       for ( i = 0; i < nml->size; i++ )
 	{
 	  if ( nml->entry[i]->name ) free(nml->entry[i]->name);
+	  if ( nml->entry[i]->type == NML_WORD )
+	    for ( iocc = 0; iocc < nml->entry[i]->occ; iocc++ )
+	      {
+		if ( ((char **)nml->entry[i]->ptr)[iocc] )
+		  free(((char **)nml->entry[i]->ptr)[iocc]);
+	      }
+
 	  free(nml->entry[i]);
 	}
       
       if ( nml->name ) free(nml->name);
       free(nml);
+    }
+}
+
+
+void namelistClear(NAMELIST *nml)
+{
+  int i, iocc;
+
+  if ( nml )
+    {
+      for ( i = 0; i < nml->size; i++ )
+	{
+	  if ( nml->entry[i]->type == NML_WORD )
+	    for ( iocc = 0; iocc < nml->entry[i]->occ; iocc++ )
+	      {
+		if ( ((char **)nml->entry[i]->ptr)[iocc] )
+		  free(((char **)nml->entry[i]->ptr)[iocc]);
+	      }
+
+	  nml->entry[i]->occ = 0;
+	}
     }
 }
 
@@ -127,9 +145,22 @@ void namelistPrint(NAMELIST *nml)
 	      i+1, nml->entry[i]->name, nml->entry[i]->type, (int)nml->entry[i]->size,
 	      nml->entry[i]->dis, nml->entry[i]->occ);
       nout = nml->entry[i]->occ;
-      if ( nout > 8 ) nout = 8;
+      if ( entry->type >= NML_TEXT )
+	{
+	  if ( nout > 32 ) nout = 32;
+	}
+      else
+	{
+	  if ( nout > 8 ) nout = 8;
+	}
+
       if      ( entry->type >= NML_TEXT )
-	fprintf(stdout, " '%s'", ((char *)entry->ptr));
+	{
+	  fprintf(stdout, " '");
+	  for ( j = 0; j < nout; j++ )
+	    fprintf(stdout, "%c", ((char *)entry->ptr)[j]);
+	  fprintf(stdout, "'");
+	}
       else if ( entry->type == NML_WORD )
 	for ( j = 0; j < nout; j++ )
 	  fprintf(stdout, " %s", ((char **)entry->ptr)[j]);
@@ -192,164 +223,166 @@ int namelistNum(NAMELIST *nml, const char *name)
 }
 
 
-static void getnite(void)
+static void getnite(FILE *nmlfp, NAMELIST *nml)
 {
   int nst, i, j;
 
-  nst = nameline.namitl + 1;
+  nst = nml->line.namitl + 1;
 
   while ( TRUE )
     {
-      for ( i = nst; i < MAXLINL; i++ )
+      for ( i = nst; i < MAX_LINE_LEN; i++ )
 	{
-	  if ( nameline.linelc[i] == 0 ) break;
+	  if ( nml->line.linelc[i] == 0 ) break;
 
-          if      (   nameline.linelc[i] == ' ' ) continue;
-	  else if (   nameline.linelc[i] == '=' ) continue;
-          else if (   nameline.linelc[i] == ',' ) continue;
-          else if ( ((nameline.linelc[i] >= 'a')  &&
-		     (nameline.linelc[i] <= 'z')) ||
-	             (nameline.linelc[i] == '$')  ||
-		     (nameline.linelc[i] == '&') )
+          if      (   nml->line.linelc[i] == ' ' ) continue;
+	  else if (   nml->line.linelc[i] == '=' ) continue;
+          else if (   nml->line.linelc[i] == ',' ) continue;
+          else if ( ((nml->line.linelc[i] >= 'a')  &&
+		     (nml->line.linelc[i] <= 'z')) ||
+	             (nml->line.linelc[i] == '_')  ||
+	             (nml->line.linelc[i] == '$')  ||
+		     (nml->line.linelc[i] == '&') )
 	    {
-	      nameline.nptype = NML_KEYWORD;
-	      nameline.namitf = i;
-	      for ( j = nameline.namitf+1; j < MAXLINL; j++ )
+	      nml->line.nptype = NML_KEYWORD;
+	      nml->line.namitf = i;
+	      for ( j = nml->line.namitf+1; j < MAX_LINE_LEN; j++ )
 		{
-		  if ( !(islower((int) nameline.linelc[j]) ||
-			 isdigit((int) nameline.linelc[j])) )
+		  if ( !(islower((int) nml->line.linelc[j]) ||
+			 (((int) nml->line.linelc[j]) == '_') ||
+			 isdigit((int) nml->line.linelc[j])) )
 		    {
-		      nameline.namitl = j - 1;
+		      nml->line.namitl = j - 1;
 		      return;
 		    }
 		}
-	      nameline.namitl = MAXLINL;
+	      nml->line.namitl = MAX_LINE_LEN;
 	      return;
 	    }
-          else if ( nameline.linelc[i] == '\'' ||
-		    nameline.linelc[i] == '\"' ||
-		    nameline.linelc[i] == '`'  ||
-		    nameline.linelc[i] == '/' )
+          else if ( nml->line.linelc[i] == '\'' ||
+		    nml->line.linelc[i] == '\"' ||
+		    nml->line.linelc[i] == '`'  ||
+		    nml->line.linelc[i] == '/' )
 	    {
-	      nameline.nptype = NML_TEXT;
-	      nameline.namitf = i;
-	      for ( j = nameline.namitf+1; j < MAXLINL; j++ )
-		if (nameline.linelc[j] == nameline.linelc[nameline.namitf])
+	      nml->line.nptype = NML_TEXT;
+	      nml->line.namitf = i;
+	      for ( j = nml->line.namitf+1; j < MAX_LINE_LEN; j++ )
+		if (nml->line.linelc[j] == nml->line.linelc[nml->line.namitf])
 		  {
- 		    nameline.namitl = j;
+ 		    nml->line.namitl = j;
 		    return;
 		  }
-	      nameline.namitl = MAXLINL + 1;
+	      nml->line.namitl = MAX_LINE_LEN + 1;
 	      return;
 	    }
-          else if ( (nameline.linelc[i] >= '0'  &&
-		     nameline.linelc[i] <= '9') ||
-		     nameline.linelc[i] == '+'  ||
-		     nameline.linelc[i] == '-'  ||
-		     nameline.linelc[i] == '.' )
+          else if ( (nml->line.linelc[i] >= '0'  &&
+		     nml->line.linelc[i] <= '9') ||
+		     nml->line.linelc[i] == '+'  ||
+		     nml->line.linelc[i] == '-'  ||
+		     nml->line.linelc[i] == '.' )
 	    {
-	      nameline.nptype = NML_NUMBER;
-	      nameline.namitf = i;
-	      for ( j = i+1; j < MAXLINL; j++)
+	      nml->line.nptype = NML_NUMBER;
+	      nml->line.namitf = i;
+	      for ( j = i+1; j < MAX_LINE_LEN; j++)
 		{
-		  if ( nameline.linelc[j] >= '0' && nameline.linelc[j] <= '9' ) continue;
-	          else if ( nameline.linelc[j] == '+' ) continue;
-		  else if ( nameline.linelc[j] == '-' ) continue;
-         	  else if ( nameline.linelc[j] == '.' ) continue;
-		  else if ( nameline.linelc[j] == 'e' ) continue;
+		  if ( nml->line.linelc[j] >= '0' && nml->line.linelc[j] <= '9' ) continue;
+	          else if ( nml->line.linelc[j] == '+' ) continue;
+		  else if ( nml->line.linelc[j] == '-' ) continue;
+         	  else if ( nml->line.linelc[j] == '.' ) continue;
+		  else if ( nml->line.linelc[j] == 'e' ) continue;
                   else
 		    {
-		      nameline.namitl = j - 1;
+		      nml->line.namitl = j - 1;
 		      return;
 		    }
 		}
-	      nameline.namitl = MAXLINL;
+	      nml->line.namitl = MAX_LINE_LEN;
 	      return;
 	    }
         }
 
-      if ( ! readline(stdin, nameline.lineac, MAXLINL) ) break;
+      if ( ! readline(nmlfp, nml->line.lineac, MAX_LINE_LEN) ) break;
 
-      for ( i = 0; i < MAXLINL; i++ )
+      for ( i = 0; i < MAX_LINE_LEN; i++ )
 	{
-	  nameline.linelc[i] = tolower(nameline.lineac[i]);
-	  nameline.lineuc[i] = toupper(nameline.lineac[i]);
+	  nml->line.linelc[i] = tolower(nml->line.lineac[i]);
+	  nml->line.lineuc[i] = toupper(nml->line.lineac[i]);
         }
       nst = 0;
     }
 
-  nameline.nptype = NML_NIX;
+  nml->line.nptype = NML_NIX;
 }
 
 
-static void rdnlsgl(void *var, int ntyp, int nlen, int *nocc)
+static void rdnlsgl(NAMELIST *nml, void *var, int ntyp, int nlen, int *nocc)
 {
-  if ( nameline.nptype == NML_NUMBER )
+  if ( nml->line.nptype == NML_NUMBER )
     {
       if ( *nocc >= nlen )
 	{
-	  nameline.nptype = func_1;
+	  nml->line.nptype = func_1;
           return;
 	}
       else if ( ntyp == NML_INT )
 	{
-	  ((int *)var)[*nocc] = atoi(&nameline.lineac[nameline.namitf]);
+	  ((int *)var)[*nocc] = atoi(&nml->line.lineac[nml->line.namitf]);
           *nocc += 1;
 	}
       else if ( ntyp == NML_DOUBLE )
 	{
-	  ((double *)var)[*nocc] = atof(&nameline.lineac[nameline.namitf]);
+	  ((double *)var)[*nocc] = atof(&nml->line.lineac[nml->line.namitf]);
           *nocc += 1;
 	}
       else
 	{
-          nameline.nptype = func_2;
+          nml->line.nptype = func_2;
           return;
         }
     }
-  else if ( nameline.nptype == NML_TEXT )
+  else if ( nml->line.nptype == NML_TEXT )
     {
       int i, j=0, newnocc;
 
-      newnocc = MIN(nlen, *nocc+nameline.namitl-nameline.namitf-1);
+      newnocc = MIN(nlen, *nocc+nml->line.namitl-nml->line.namitf-1);
 
       if      ( ntyp == NML_TEXT )
 	for (i=*nocc; i<newnocc; i++)
-	  ((char *)var)[i] = nameline.lineac[nameline.namitf+1+j++];
+	  ((char *)var)[i] = nml->line.lineac[nml->line.namitf+1+j++];
       else if ( ntyp == NML_TEXTU )
 	for (i=*nocc; i<newnocc; i++)
-	  ((char *)var)[i] = nameline.lineuc[nameline.namitf+1+j++];
+	  ((char *)var)[i] = nml->line.lineuc[nml->line.namitf+1+j++];
       else if ( ntyp == NML_TEXTL )
 	for (i=*nocc; i<newnocc; i++)
-	  ((char *)var)[i] = nameline.linelc[nameline.namitf+1+j++];
+	  ((char *)var)[i] = nml->line.linelc[nml->line.namitf+1+j++];
       else
 	{
-	  nameline.nptype = func_3;
+	  nml->line.nptype = func_3;
 	  return;
 	}
 
       *nocc = newnocc;
     }
-  else if ( nameline.nptype == NML_WORD )
+  else if ( nml->line.nptype == NML_WORD )
     {
       int i, len;
 
       if ( *nocc < nlen )
 	{
-	  len = nameline.namitl - nameline.namitf + 1;
+	  len = nml->line.namitl - nml->line.namitf + 1;
 	  ((char **)var)[*nocc] = (char*) calloc((size_t)len+1, sizeof(char));
 	  for ( i = 0; i < len; i++ )
-	    ((char **)var)[*nocc][i] = nameline.lineac[nameline.namitf+i];
+	    ((char **)var)[*nocc][i] = nml->line.lineac[nml->line.namitf+i];
 	  *nocc += 1;
 	}
     }
   else
     {
-      fprintf(stderr, "Namelist parameter type %d unknown!\n", nameline.nptype);
+      fprintf(stderr, "Namelist parameter type %d unknown!\n", nml->line.nptype);
       return;
     }
 
-  nameline.nptype = ntyp;
+  nml->line.nptype = ntyp;
 }
 
 
@@ -372,7 +405,12 @@ static void nml_print_entry(NML_ENTRY *entry, int ife)
   printf(" %-24s", entry->name);
 
   if      ( entry->type >= NML_TEXT )
-    printf("'%s'", ((char *)entry->ptr));
+    {
+      printf("'");
+      for ( j = 0; j < nout; j++ )
+	printf("%c", ((char *)entry->ptr)[j]);
+      printf("'");
+    }
   else if ( entry->type == NML_WORD )
     for ( j = 0; j < nout; j++ )
       printf(" %s", ((char **)entry->ptr)[j]);
@@ -395,8 +433,9 @@ static void nml_print(NAMELIST *nml, int ife)
     nml_print_entry(nml->entry[i], ife);
 }
 
+#define  MAX_WORD_LEN  256
 
-void namelistRead(NAMELIST *nml)
+void namelistRead(FILE *nmlfp, NAMELIST *nml)
 {
   /*
     cn  name
@@ -408,42 +447,44 @@ void namelistRead(NAMELIST *nml)
   int clear = FALSE;
   int j, jj, match = -1, wordmatch = -1;
   size_t len;
-  char namecx[16], *pnamecx = NULL;
+  char namecx[MAX_WORD_LEN], *pnamecx = NULL;
   int nparam;
 
   nparam = nml->size;
 
-  nameline.namitl = MAXLINL;
+  nml->line.namitl = MAX_LINE_LEN;
 
  L2000:
 
-  getnite();
+  getnite(nmlfp, nml);
 
-  if ( nameline.nptype == NML_NIX )
+  if ( nml->line.nptype == NML_NIX )
     {
       goto L3000;
     }
-  else if ( nameline.nptype == NML_KEYWORD )
+  else if ( nml->line.nptype == NML_KEYWORD )
     {
-      memset(namecx, '\0', 16);
-      len = (size_t) (nameline.namitl - nameline.namitf + 1);
+      memset(namecx, '\0', MAX_WORD_LEN);
+      len = (size_t) (nml->line.namitl - nml->line.namitf + 1);
 
-      if ( nameline.lineac[nameline.namitf] == '$' || 
-	   nameline.lineac[nameline.namitf] == '&' )
+      if ( nml->line.lineac[nml->line.namitf] == '$' || 
+	   nml->line.lineac[nml->line.namitf] == '&' )
 	{
-          if ( nameline.namitl-nameline.namitf > 16 ) goto L3000;
+          if ( nml->line.namitl-nml->line.namitf > MAX_WORD_LEN ) goto L3000;
 
-          if ( nameline.namitf < nameline.namitl)
-	    pnamecx = &nameline.linelc[nameline.namitf+1];
+          if ( nml->line.namitf < nml->line.namitl)
+	    pnamecx = &nml->line.linelc[nml->line.namitf+1];
+
           if ( strncmp(pnamecx, "select", 6) == 0 || 
-	       strncmp(pnamecx, "params", 6) == 0 )
-	    goto L2000;
+	       strncmp(pnamecx, "params", 6) == 0 || 
+	       strncmp(pnamecx, nml->name, strlen(nml->name)) == 0 ) goto L2000;
 
 	  goto L3000;
         }
-      if ( nameline.namitl-nameline.namitf >= 16 ) goto L3000;
 
-      pnamecx = &nameline.linelc[nameline.namitf];
+      if ( nml->line.namitl-nml->line.namitf >= MAX_WORD_LEN ) goto L3000;
+
+      pnamecx = &nml->line.linelc[nml->line.namitf];
       strncpy(namecx, pnamecx, len);
 
       if ( len == 5 )
@@ -474,7 +515,7 @@ void namelistRead(NAMELIST *nml)
 	  if ( wordmatch >= 0 )
 	    {
 	      match = wordmatch;
-	      nameline.nptype = NML_WORD;
+	      nml->line.nptype = NML_WORD;
 	      goto L777;
 	    }
 
@@ -504,11 +545,11 @@ void namelistRead(NAMELIST *nml)
     L777:
       j = match;
 
-      rdnlsgl(nml->entry[j]->ptr, nml->entry[j]->type, (int)nml->entry[j]->size, &nml->entry[j]->occ);
+      rdnlsgl(nml, nml->entry[j]->ptr, nml->entry[j]->type, (int)nml->entry[j]->size, &nml->entry[j]->occ);
 
-      if ( nameline.nptype != nml->entry[j]->type )
+      if ( nml->line.nptype != nml->entry[j]->type )
 	{
-          printf(" * value ignored for parameter <%s> %5d\n", namecx, nameline.nptype);
+          printf(" * value ignored for parameter <%s> %5d\n", namecx, nml->line.nptype);
 	  printf(" * valid parameters and values specified so far are\n");
 
 	  nml_print(nml, PRINT_ALL);
@@ -524,8 +565,8 @@ void namelistRead(NAMELIST *nml)
 
  L3000:
 
-  if ( pgmstat.pdis == PRINT_NOT ) return;
+  if ( nml->dis == 0 ) return;
 
-  nml_print(nml, pgmstat.pdis);
+  nml_print(nml, PRINT_MIN);
 }
 

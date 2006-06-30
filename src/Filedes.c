@@ -221,6 +221,53 @@ void *Filedes(void *argument)
 	  fprintf(stdout, "\n");
 	}   
     }
+  else if ( operatorID == PARTAB )
+    {
+      int varID, code, tabnum, tableID, prec;
+      char *pstr = NULL;
+      char varname[128], varlongname[128], varstdname[128], varunits[128];
+
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  fprintf(stdout, "&parameter\n");
+
+	  varname[0]     = 0;
+	  varlongname[0] = 0;
+	  varunits[0]    = 0;
+	  code     = vlistInqVarCode(vlistID, varID);
+	  tableID  = vlistInqVarTable(vlistID, varID);
+	  tabnum   = tableInqNum(tableID);
+	  vlistInqVarName(vlistID, varID, varname);
+	  vlistInqVarStdname(vlistID, varID, varstdname);
+	  vlistInqVarLongname(vlistID, varID, varlongname);
+	  vlistInqVarUnits(vlistID, varID, varunits);
+
+	  prec = vlistInqVarDatatype(vlistID, varID);
+	  if      ( prec == DATATYPE_PACK  ) pstr = "P0";
+	  else if ( prec == DATATYPE_PACK1 ) pstr = "P1";
+	  else if ( prec == DATATYPE_PACK2 ) pstr = "P2";
+	  else if ( prec == DATATYPE_PACK3 ) pstr = "P3";
+	  else if ( prec == DATATYPE_REAL4 ) pstr = "R4";
+	  else if ( prec == DATATYPE_REAL8 ) pstr = "R8";
+	  else if ( prec == DATATYPE_INT1  ) pstr = "I1";
+	  else if ( prec == DATATYPE_INT2  ) pstr = "I2";
+	  else if ( prec == DATATYPE_INT4  ) pstr = "I4";
+
+	  fprintf(stdout, "  NAME=%s\n", varname);
+	  if ( code > 0 )  fprintf(stdout, "  CODE=%d\n", code);
+	  if ( tabnum > 0 ) fprintf(stdout, "  TABLE=%d\n", tabnum);
+	  if ( strlen(varstdname) )
+	    fprintf(stdout, "  STD_NAME=\"%s\"\n", varstdname);
+	  if ( strlen(varlongname) )
+	    fprintf(stdout, "  LONG_NAME=\"%s\"\n", varlongname);
+	  if ( strlen(varunits) )
+	    fprintf(stdout, "  UNITS=\"%s\"\n", varunits);
+
+	  if ( pstr ) fprintf(stdout, "  DATATYPE=%s\n", pstr);
+
+	  fprintf(stdout, "&\n");
+	}   
+    }
   else if ( operatorID == FILEDES )
     {
       int filetype;

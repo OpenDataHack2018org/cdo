@@ -28,6 +28,14 @@
 
 #define MAX_NML_ENTRY  256
 
+#define MAX_LINE_LEN  4096
+
+struct _NML_LINE
+{
+  int nptype, namitf, namitl;
+  char lineac[MAX_LINE_LEN], lineuc[MAX_LINE_LEN], linelc[MAX_LINE_LEN];
+};
+
 struct _NML_ENTRY
 {
   char *name;
@@ -38,12 +46,15 @@ struct _NML_ENTRY
   size_t size;
 };
 
+typedef struct _NML_LINE   NML_LINE;
 typedef struct _NML_ENTRY  NML_ENTRY;
 
 struct _NAMELIST
 {
   int size;
+  int dis;
   char *name;
+  NML_LINE line;
   NML_ENTRY *entry[MAX_NML_ENTRY];
 };
 
@@ -51,10 +62,11 @@ typedef struct _NAMELIST   NAMELIST;
 
 NAMELIST *namelistNew(const char *name);
 void namelistDelete(NAMELIST *nml);
+void namelistClear(NAMELIST *nml);
 void namelistDebug(int debug);
 void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, size_t size);
 void namelistPrint(NAMELIST *nml);
-void namelistRead(NAMELIST *nml);
+void namelistRead(FILE *nmlfp, NAMELIST *nml);
 int  namelistNum(NAMELIST *nml, const char *name);
 
 #endif  /* _NAMELIST_H */

@@ -47,7 +47,7 @@ void *Nmltest(void *argument)
   namelistAdd(nml, "dm",  NML_DOUBLE, 1, &dm,  sizeof(dm)/sizeof(double));
   namelistAdd(nml, "var", NML_WORD,   0, var,  sizeof(var)/sizeof(char *));
 
-  namelistRead(nml);
+  namelistRead(stdin, nml);
 
   namelistPrint(nml);
 
