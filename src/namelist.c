@@ -121,6 +121,8 @@ void namelistClear(NAMELIST *nml)
 		if ( ((char **)nml->entry[i]->ptr)[iocc] )
 		  free(((char **)nml->entry[i]->ptr)[iocc]);
 	      }
+	  else if ( nml->entry[i]->type == NML_TEXT )
+	    ((char *)nml->entry[i]->ptr)[0] = 0;
 
 	  nml->entry[i]->occ = 0;
 	}
@@ -136,12 +138,12 @@ void namelistPrint(NAMELIST *nml)
   if ( nml == NULL ) return;
 
   fprintf(stdout, "Namelist: %s\n", nml->name);
-  fprintf(stdout, " Num  Name       Type  Size   Dis   Occ  Entries\n");
+  fprintf(stdout, " Num  Name             Type  Size   Dis   Occ  Entries\n");
 
   for ( i = 0; i < nml->size; i++ )
     {
       entry = nml->entry[i];
-      fprintf(stdout, "%4d  %-10s %4d  %4d  %4d  %4d ",
+      fprintf(stdout, "%4d  %-16s %4d  %4d  %4d  %4d ",
 	      i+1, nml->entry[i]->name, nml->entry[i]->type, (int)nml->entry[i]->size,
 	      nml->entry[i]->dis, nml->entry[i]->occ);
       nout = nml->entry[i]->occ;
@@ -155,12 +157,7 @@ void namelistPrint(NAMELIST *nml)
 	}
 
       if      ( entry->type >= NML_TEXT )
-	{
-	  fprintf(stdout, " '");
-	  for ( j = 0; j < nout; j++ )
-	    fprintf(stdout, "%c", ((char *)entry->ptr)[j]);
-	  fprintf(stdout, "'");
-	}
+	fprintf(stdout, "'%s'", ((char *)entry->ptr));
       else if ( entry->type == NML_WORD )
 	for ( j = 0; j < nout; j++ )
 	  fprintf(stdout, " %s", ((char **)entry->ptr)[j]);
@@ -176,14 +173,15 @@ void namelistPrint(NAMELIST *nml)
 }
 
 
-void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, size_t size)
+int namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, size_t size)
 {
   NML_ENTRY *nml_entry;
+  int entry = 0;
 
   if ( nml->size >= MAX_NML_ENTRY )
     {
       fprintf(stderr, "Too many namelist entries in %s! (Max = %d)\n", nml->name, MAX_NML_ENTRY);
-      return;
+      return (-1);
     }
 
   nml_entry = (NML_ENTRY *) malloc(sizeof(NML_ENTRY));
@@ -195,7 +193,10 @@ void namelistAdd(NAMELIST *nml, const char *name, int type, int dis, void *ptr, 
   nml_entry->dis  = dis;
   nml_entry->occ  = 0;
 
+  entry = nml->size;
   nml->entry[nml->size++] = nml_entry;
+
+  return (entry);
 }
 
 
@@ -226,6 +227,7 @@ int namelistNum(NAMELIST *nml, const char *name)
 static void getnite(FILE *nmlfp, NAMELIST *nml)
 {
   int nst, i, j;
+  int linelen;
 
   nst = nml->line.namitl + 1;
 
@@ -303,7 +305,9 @@ static void getnite(FILE *nmlfp, NAMELIST *nml)
 
       if ( ! readline(nmlfp, nml->line.lineac, MAX_LINE_LEN) ) break;
 
-      for ( i = 0; i < MAX_LINE_LEN; i++ )
+      linelen = strlen(nml->line.lineac);
+
+      for ( i = 0; i < linelen+1; i++ )
 	{
 	  nml->line.linelc[i] = tolower(nml->line.lineac[i]);
 	  nml->line.lineuc[i] = toupper(nml->line.lineac[i]);
@@ -346,6 +350,7 @@ static void rdnlsgl(NAMELIST *nml, void *var, int ntyp, int nlen, int *nocc)
 
       newnocc = MIN(nlen, *nocc+nml->line.namitl-nml->line.namitf-1);
 
+      ((char *)var)[newnocc] = 0;
       if      ( ntyp == NML_TEXT )
 	for (i=*nocc; i<newnocc; i++)
 	  ((char *)var)[i] = nml->line.lineac[nml->line.namitf+1+j++];
@@ -405,12 +410,8 @@ static void nml_print_entry(NML_ENTRY *entry, int ife)
   printf(" %-24s", entry->name);
 
   if      ( entry->type >= NML_TEXT )
-    {
-      printf("'");
-      for ( j = 0; j < nout; j++ )
-	printf("%c", ((char *)entry->ptr)[j]);
-      printf("'");
-    }
+    for ( j = 0; j < nout; j++ )
+      printf("'%s'", ((char *)entry->ptr));
   else if ( entry->type == NML_WORD )
     for ( j = 0; j < nout; j++ )
       printf(" %s", ((char **)entry->ptr)[j]);

@@ -187,7 +187,7 @@ void *Zonstat(void *argument);
 #define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selstd"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime"}
-#define  SetOperators           {"setpartab", "setcode", "setvar", "setlevel"}
+#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setvar", "setlevel"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}

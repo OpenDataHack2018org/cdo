@@ -37,7 +37,7 @@
 void *Set(void *argument)
 {
   static char func[] = "Set";
-  int SETPARTAB, SETCODE, SETVAR, SETLEVEL;
+  int SETPARTAB, SETPARTABV, SETCODE, SETVAR, SETLEVEL;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1;
@@ -56,10 +56,11 @@ void *Set(void *argument)
 
   cdoInitialize(argument);
 
-  SETPARTAB = cdoOperatorAdd("setpartab", 0, 0, "parameter table");
-  SETCODE   = cdoOperatorAdd("setcode",   0, 0, "code");
-  SETVAR    = cdoOperatorAdd("setvar",    0, 0, "variable name");
-  SETLEVEL  = cdoOperatorAdd("setlevel",  0, 0, "level");
+  SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table");
+  SETPARTABV = cdoOperatorAdd("setpartabv", 0, 0, "parameter table");
+  SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code");
+  SETVAR     = cdoOperatorAdd("setvar",     0, 0, "variable name");
+  SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
 
   operatorID = cdoOperatorID();
 
@@ -77,54 +78,30 @@ void *Set(void *argument)
       FILE *fp;
       size_t fsize;
       char *parbuf = NULL;
+
       partab = operatorArgv()[0];
       fp = fopen(partab, "r");
       if ( fp != NULL )
 	{
 	  fseek(fp, 0L, SEEK_END);
 	  fsize = (size_t) ftell(fp);
-	  printf("fsize %d\n", (int) fsize);
 	  parbuf = (char *) malloc(fsize+1);
 	  fseek(fp, 0L, SEEK_SET);
 	  fread(parbuf, fsize, 1, fp);
 	  parbuf[fsize] = 0;
 	  fseek(fp, 0L, SEEK_SET);
 
-	  if ( atoi(parbuf) == 0 )
-	    {
-	      NAMELIST *nml;
-	      int code, table;
-	      char *datatype = NULL;
-	      char *name = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
-	      nml = namelistNew("parameter");
-	      nml->dis = 0;
+	  if ( atoi(parbuf) == 0 ) tableformat = 1;
 
-	      namelistAdd(nml, "code",      NML_INT,  0, &code, 1);
-	      namelistAdd(nml, "table",     NML_INT,  0, &table, 1);
-	      namelistAdd(nml, "datatype",  NML_WORD, 0, &datatype, 1);
-	      namelistAdd(nml, "name",      NML_WORD, 0, &name, 1);
-	      namelistAdd(nml, "stdname",   NML_WORD, 0, &stdname, 1);
-	      namelistAdd(nml, "longname",  NML_TEXT, 0, longname, 256);
-	      namelistAdd(nml, "units",     NML_TEXT, 0, units, 256);
-	      
-	      while ( ! feof(fp) )
-		{
-		  namelistClear(nml);
-
-		  namelistRead(fp, nml);
-		  namelistPrint(nml);
-		}
-
-	      namelistDelete(nml);
-
-	      tableformat = 1;
-	    }
 	  fclose(fp);
 	  free(parbuf);
 	}
 
-      tableID = defineTable(partab);
-      tableWrite("xxx", tableID);
+      if ( tableformat == 0 ) tableID = defineTable(partab);
+    }
+  else if ( operatorID == SETPARTABV )
+    {
+      tableformat = 1;
     }
   else if ( operatorID == SETLEVEL )
     {
@@ -151,11 +128,120 @@ void *Set(void *argument)
     {
       vlistDefVarName(vlistID2, 0, newname);
     }
-  else if ( operatorID == SETPARTAB )
+  else if ( operatorID == SETPARTAB || operatorID == SETPARTABV )
     {
       nvars = vlistNvars(vlistID2);
-      for ( varID = 0; varID < nvars; varID++ )
-	vlistDefVarTable(vlistID2, varID, tableID);
+
+      if ( tableformat == 0 )
+	{
+	  for ( varID = 0; varID < nvars; varID++ )
+	    vlistDefVarTable(vlistID2, varID, tableID);
+	}
+      else
+	{
+	  FILE *fp;
+	  NAMELIST *nml;
+	  int nml_code, nml_new_code, nml_table, nml_datatype, nml_name, nml_new_name, nml_stdname;
+	  int nml_longname, nml_units;
+	  int locc, i;
+	  int code, new_code, table;
+	  int nml_index = 0;
+	  char *datatype = NULL;
+	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
+	  char varname[256];
+
+	  partab = operatorArgv()[0];
+	  fp = fopen(partab, "r");
+	  if ( fp == NULL ) cdoAbort("Internal problem! Parameter table %s not available", partab);
+
+	  nml = namelistNew("parameter");
+	  nml->dis = 0;
+
+	  nml_code     = namelistAdd(nml, "code",          NML_INT,  0, &code, 1);
+	  nml_new_code = namelistAdd(nml, "new_code",      NML_INT,  0, &new_code, 1);
+	  nml_table    = namelistAdd(nml, "table",         NML_INT,  0, &table, 1);
+	  nml_datatype = namelistAdd(nml, "datatype",      NML_WORD, 0, &datatype, 1);
+	  nml_name     = namelistAdd(nml, "name",          NML_WORD, 0, &name, 1);
+	  nml_new_name = namelistAdd(nml, "new_name",      NML_WORD, 0, &new_name, 1);
+	  nml_stdname  = namelistAdd(nml, "standard_name", NML_WORD, 0, &stdname, 1);
+	  nml_longname = namelistAdd(nml, "long_name",     NML_TEXT, 0, longname, sizeof(longname));
+	  nml_units    = namelistAdd(nml, "units",         NML_TEXT, 0, units, sizeof(units));
+	      
+	  while ( ! feof(fp) )
+	    {
+	      namelistClear(nml);
+
+	      namelistRead(fp, nml);
+
+	      locc = FALSE;
+	      for ( i = 0; i < nml->size; i++ )
+		{
+		  if ( nml->entry[i]->occ ) { locc = TRUE; break; }
+		}
+
+	      if ( locc )
+		{
+		  namelistPrint(nml);
+
+		  nml_index++;
+
+		  if ( operatorID == SETPARTAB )
+		    {
+		      if ( nml->entry[nml_code]->occ == 0 )
+			{
+			  cdoPrint("Parameter %d skipped, code number not found!", nml_index);
+			  continue;
+			}
+
+		      for ( varID = 0; varID < nvars; varID++ )
+			{
+			  if ( vlistInqVarCode(vlistID2, varID) == code ) break;
+			}
+		    }
+		  else
+		    {
+		      if ( nml->entry[nml_name]->occ == 0 )
+			{
+			  cdoWarning("Parameter %d skipped, variable name not found!", nml_index);
+			  continue;
+			}
+
+		      for ( varID = 0; varID < nvars; varID++ )
+			{
+			  vlistInqVarName(vlistID2, varID, varname);
+			  if ( strcmp(varname, name) == 0 ) break;
+			}
+		    }
+
+		  if ( varID < nvars )
+		    {
+		      if ( nml->entry[nml_code]->occ )     vlistDefVarCode(vlistID2, varID, code);
+		      if ( nml->entry[nml_new_code]->occ ) vlistDefVarCode(vlistID2, varID, new_code);
+		      if ( nml->entry[nml_name]->occ )     vlistDefVarName(vlistID2, varID, name);
+		      if ( nml->entry[nml_new_name]->occ ) vlistDefVarName(vlistID2, varID, new_name);
+		      if ( nml->entry[nml_stdname]->occ )  vlistDefVarStdname(vlistID2, varID, stdname);
+		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
+		      if ( nml->entry[nml_units]->occ )    vlistDefVarUnits(vlistID2, varID, units);
+		    }
+		  else
+		    {
+		      if ( cdoVerbose )
+			{
+			  if ( operatorID == SETPARTAB )
+			    cdoPrint("Code %d not found!", code);
+			  else
+			    cdoPrint("Variable %s not found!", name);
+			}
+		    }
+		}
+	      else
+		break;
+	    }
+	  
+	  namelistDelete(nml);
+
+	  fclose(fp);
+	}
     }
   else if ( operatorID == SETLEVEL )
     {
