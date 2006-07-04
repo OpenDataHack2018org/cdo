@@ -146,6 +146,7 @@ void *Set(void *argument)
 	  int locc, i;
 	  int code, new_code, table;
 	  int nml_index = 0;
+	  int tabnum;
 	  char *datatype = NULL;
 	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
 	  char varname[256];
@@ -181,7 +182,7 @@ void *Set(void *argument)
 
 	      if ( locc )
 		{
-		  namelistPrint(nml);
+		  /* namelistPrint(nml); */
 
 		  nml_index++;
 
@@ -193,10 +194,19 @@ void *Set(void *argument)
 			  continue;
 			}
 
-		      for ( varID = 0; varID < nvars; varID++ )
-			{
-			  if ( vlistInqVarCode(vlistID2, varID) == code ) break;
-			}
+		      if ( nml->entry[nml_table]->occ == 0 )
+			for ( varID = 0; varID < nvars; varID++ )
+			  {
+			    if ( vlistInqVarCode(vlistID2, varID) == code ) break;
+			  }
+		      else
+			for ( varID = 0; varID < nvars; varID++ )
+			  {
+			    tableID = vlistInqVarTable(vlistID2, varID);
+			    tabnum  = tableInqNum(tableID);
+			    if ( vlistInqVarCode(vlistID2, varID) == code &&
+				 tabnum == table ) break;
+			  }
 		    }
 		  else
 		    {
@@ -228,7 +238,12 @@ void *Set(void *argument)
 		      if ( cdoVerbose )
 			{
 			  if ( operatorID == SETPARTAB )
-			    cdoPrint("Code %d not found!", code);
+			    {
+			      if ( nml->entry[nml_table]->occ == 0 )
+				cdoPrint("Code %d not found!", code);
+			      else
+				cdoPrint("Code %d and table %d not found!", code, table);
+			    }
 			  else
 			    cdoPrint("Variable %s not found!", name);
 			}

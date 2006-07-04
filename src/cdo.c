@@ -506,6 +506,8 @@ int main(int argc, char *argv[])
 
   if ( Debug )
     {
+      char *envstr;
+
       if ( DebugLevel == 0 ) DebugLevel = 1;
       cdoSetDebug(DebugLevel);
       fprintf(stderr, "\n");
@@ -513,6 +515,16 @@ int main(int argc, char *argv[])
       fprintf(stderr, "cdoDefaultDataType  = %d\n", cdoDefaultDataType);
       fprintf(stderr, "cdoDefaultByteorder = %d\n", cdoDefaultByteorder);
       fprintf(stderr, "cdoDefaultTableID   = %d\n", cdoDefaultTableID);
+      fprintf(stderr, "\n");
+
+      envstr = getenv("HOSTTYPE");
+      if ( envstr ) fprintf(stderr, "HOSTTYPE            = %s\n", envstr);
+      envstr = getenv("VENDOR");
+      if ( envstr ) fprintf(stderr, "VENDOR              = %s\n", envstr);
+      envstr = getenv("OSTYPE");
+      if ( envstr ) fprintf(stderr, "OSTYPE              = %s\n", envstr);
+      envstr = getenv("MACHTYPE");
+      if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
       fprintf(stderr, "\n");
 
 #if defined (__STDC__)

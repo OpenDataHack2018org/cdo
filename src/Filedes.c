@@ -254,10 +254,10 @@ void *Filedes(void *argument)
 	  else if ( prec == DATATYPE_INT4  ) pstr = "I4";
 
 	  fprintf(stdout, "  NAME=%s\n", varname);
-	  if ( code > 0 )  fprintf(stdout, "  CODE=%d\n", code);
+	  if ( code   > 0 ) fprintf(stdout, "  CODE=%d\n", code);
 	  if ( tabnum > 0 ) fprintf(stdout, "  TABLE=%d\n", tabnum);
 	  if ( strlen(varstdname) )
-	    fprintf(stdout, "  STD_NAME=\"%s\"\n", varstdname);
+	    fprintf(stdout, "  STANDARD_NAME=\"%s\"\n", varstdname);
 	  if ( strlen(varlongname) )
 	    fprintf(stdout, "  LONG_NAME=\"%s\"\n", varlongname);
 	  if ( strlen(varunits) )

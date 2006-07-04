@@ -1,5 +1,7 @@
 2006-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* New operator: setpartabv
+	* add new parameter table format
 	* namelist update
 	* history format changed to nco
 	* process: set MAX_ARGS from 1024 to 8192
