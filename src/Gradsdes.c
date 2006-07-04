@@ -475,7 +475,7 @@ void *Gradsdes(void *argument)
 	  recoffset[varID] = nrecsout;
 	  nvarsout++;
 	  nrecsout += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
-	  if ( ntsteps != 1 && vlistInqVarTime(vlistID, varID) == TIME_CONSTANT )
+	  if ( ntsteps != 1 && ntsteps != 0 && vlistInqVarTime(vlistID, varID) == TIME_CONSTANT )
 	    cdoAbort("Unsupported GrADS record structure! Variable %d has only 1 time step.",
 		     vlistInqVarCode(vlistID, varID));
 	}

@@ -2,6 +2,7 @@
 
 	* New operator: setpartabv
 	* add new parameter table format
+	* gradsdes: fix bug for only one record without time (report: Angelika Heil)
 	* namelist update
 	* history format changed to nco
 	* process: set MAX_ARGS from 1024 to 8192
