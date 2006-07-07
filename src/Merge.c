@@ -84,7 +84,6 @@ void *Merge(void *argument)
 
   vlistDefTaxis(vlistID2, taxisID2);
   streamDefVlist(streamID2, vlistID2);
-  vlistDestroy(vlistID2);
 
   if ( ! lcopy )
     {
@@ -143,6 +142,8 @@ void *Merge(void *argument)
     streamClose(streamIDs[index]);
 
   streamClose(streamID2);
+
+  vlistDestroy(vlistID2);
 
   if ( streamIDs ) free(streamIDs);
   if ( vlistIDs  ) free(vlistIDs);

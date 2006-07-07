@@ -82,7 +82,6 @@ void *Vargen(void *argument)
   if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(0));
 
   streamDefVlist(streamID, vlistID);
-  vlistDestroy(vlistID);
 
   gridsize = gridInqSize(gridID);
   array = (double *) malloc(gridsize*sizeof(double));
@@ -111,6 +110,8 @@ void *Vargen(void *argument)
     }
 
   streamClose(streamID);
+
+  vlistDestroy(vlistID);
 
   if ( array ) free(array);
 

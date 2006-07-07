@@ -92,7 +92,6 @@ void *Vertstat(void *argument)
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
-  vlistDestroy(vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
 
@@ -236,6 +235,8 @@ void *Vertstat(void *argument)
 
   streamClose(streamID2);
   streamClose(streamID1);
+
+  vlistDestroy(vlistID2);
 
   cdoFinish();
 

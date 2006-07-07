@@ -100,7 +100,6 @@ void *Varrms(void *argument)
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
-  vlistDestroy(vlistID3);
 
   vardata1 = (double **) malloc(nvars*sizeof(double*));
   vardata2 = (double **) malloc(nvars*sizeof(double*));
@@ -179,6 +178,8 @@ void *Varrms(void *argument)
   streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
+
+  vlistDestroy(vlistID3);
 
   if ( field1.weight ) free(field1.weight);
 

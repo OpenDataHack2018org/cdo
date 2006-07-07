@@ -333,11 +333,11 @@ void *Select(void *argument)
       tsID++;
     }
 
-  vlistDestroy(vlistID2);
-
   streamClose(streamID2);
   streamClose(streamID1);
  
+  vlistDestroy(vlistID2);
+
   if ( ! lcopy )
     if ( array ) free(array);
 

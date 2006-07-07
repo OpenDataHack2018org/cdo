@@ -2,6 +2,7 @@
 
 	* New operator: setpartabv
 	* add new parameter table format
+	* merge: move vlistDestroy after streamClose (report: Matthias Cuntz)
 	* gradsdes: fix bug for only one record without time (report: Angelika Heil)
 	* namelist update
 	* history format changed to nco

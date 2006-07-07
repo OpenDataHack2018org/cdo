@@ -239,7 +239,6 @@ void *Input(void *argument)
 	  if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(0));
 
 	  streamDefVlist(streamID, vlistID);
-	  vlistDestroy(vlistID);
 	}
 
       vdate = date;
@@ -258,7 +257,11 @@ void *Input(void *argument)
       tsID++;
     }
 
-  if ( streamID >= 0 ) streamClose(streamID);
+  if ( streamID >= 0 )
+    {
+      streamClose(streamID);
+      vlistDestroy(vlistID);
+    }
 
   if ( array ) free(array);
 
