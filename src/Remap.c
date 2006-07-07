@@ -22,11 +22,11 @@
       Interpolate remapbil        Bilinear interpolation
       Interpolate remapbic        Bicubic interpolation
       Interpolate remapdis        Distance-weighted averaging
-      Genweights gencon          Generate conservative interpolation weights
-      Genweights genbil          Generate bilinear interpolation weights
-      Genweights genbic          Generate bicubic interpolation weights
-      Genweights gendis          Generate distance-weighted averaging weights
-      Remap      remap           SCRIP grid remapping
+      Genweights  gencon          Generate conservative interpolation weights
+      Genweights  genbil          Generate bilinear interpolation weights
+      Genweights  genbic          Generate bicubic interpolation weights
+      Genweights  gendis          Generate distance-weighted averaging weights
+      Remap       remap           SCRIP grid remapping
 */
 
 

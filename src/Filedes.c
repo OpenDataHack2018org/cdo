@@ -229,7 +229,7 @@ void *Filedes(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  fprintf(stdout, "&parameter\n");
+	  fprintf(stdout, "&PARAMETER\n");
 
 	  varname[0]     = 0;
 	  varlongname[0] = 0;
@@ -253,17 +253,17 @@ void *Filedes(void *argument)
 	  else if ( prec == DATATYPE_INT2  ) pstr = "I2";
 	  else if ( prec == DATATYPE_INT4  ) pstr = "I4";
 
-	  fprintf(stdout, "  NAME=%s\n", varname);
 	  if ( code   > 0 ) fprintf(stdout, "  CODE=%d\n", code);
 	  if ( tabnum > 0 ) fprintf(stdout, "  TABLE=%d\n", tabnum);
+	  fprintf(stdout, "  NAME=%s\n", varname);
 	  if ( strlen(varstdname) )
-	    fprintf(stdout, "  STANDARD_NAME=\"%s\"\n", varstdname);
+	    fprintf(stdout, "  STANDARD_NAME=%s\n", varstdname);
 	  if ( strlen(varlongname) )
 	    fprintf(stdout, "  LONG_NAME=\"%s\"\n", varlongname);
 	  if ( strlen(varunits) )
 	    fprintf(stdout, "  UNITS=\"%s\"\n", varunits);
 
-	  if ( pstr ) fprintf(stdout, "  DATATYPE=%s\n", pstr);
+	  /* if ( pstr ) fprintf(stdout, "  DATATYPE=%s\n", pstr); */
 
 	  fprintf(stdout, "&\n");
 	}   

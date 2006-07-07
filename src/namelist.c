@@ -95,7 +95,10 @@ void namelistDelete(NAMELIST *nml)
 	    for ( iocc = 0; iocc < nml->entry[i]->occ; iocc++ )
 	      {
 		if ( ((char **)nml->entry[i]->ptr)[iocc] )
-		  free(((char **)nml->entry[i]->ptr)[iocc]);
+		  {
+		    free(((char **)nml->entry[i]->ptr)[iocc]);
+		    ((char **)nml->entry[i]->ptr)[iocc] = NULL;
+		  }
 	      }
 
 	  free(nml->entry[i]);
@@ -119,7 +122,10 @@ void namelistClear(NAMELIST *nml)
 	    for ( iocc = 0; iocc < nml->entry[i]->occ; iocc++ )
 	      {
 		if ( ((char **)nml->entry[i]->ptr)[iocc] )
-		  free(((char **)nml->entry[i]->ptr)[iocc]);
+		  {
+		    free(((char **)nml->entry[i]->ptr)[iocc]);
+		    ((char **)nml->entry[i]->ptr)[iocc] = NULL;
+		  }
 	      }
 	  else if ( nml->entry[i]->type == NML_TEXT )
 	    ((char *)nml->entry[i]->ptr)[0] = 0;
@@ -243,6 +249,7 @@ static void getnite(FILE *nmlfp, NAMELIST *nml)
           else if ( ((nml->line.linelc[i] >= 'a')  &&
 		     (nml->line.linelc[i] <= 'z')) ||
 	             (nml->line.linelc[i] == '_')  ||
+	             (nml->line.linelc[i] == '/')  ||
 	             (nml->line.linelc[i] == '$')  ||
 		     (nml->line.linelc[i] == '&') )
 	    {
@@ -263,8 +270,7 @@ static void getnite(FILE *nmlfp, NAMELIST *nml)
 	    }
           else if ( nml->line.linelc[i] == '\'' ||
 		    nml->line.linelc[i] == '\"' ||
-		    nml->line.linelc[i] == '`'  ||
-		    nml->line.linelc[i] == '/' )
+		    nml->line.linelc[i] == '`')
 	    {
 	      nml->line.nptype = NML_TEXT;
 	      nml->line.namitf = i;
@@ -399,19 +405,17 @@ static void nml_print_entry(NML_ENTRY *entry, int ife)
 
   if ( entry->type == NML_NPR ) return;
 
-  if ( ife == PRINT_ALL )
-    nout = entry->occ;
-  else
-    {
-      nout = MAX(entry->occ, entry->dis);
-      if ( nout == 0 ) return;
-    }
+  nout = entry->occ;
+
+  if ( ife != PRINT_ALL )
+    if ( entry->occ > entry->dis ) nout = entry->dis;
+
+  if ( nout == 0 ) return;
 
   printf(" %-24s", entry->name);
 
   if      ( entry->type >= NML_TEXT )
-    for ( j = 0; j < nout; j++ )
-      printf("'%s'", ((char *)entry->ptr));
+    printf("'%s'", ((char *)entry->ptr));
   else if ( entry->type == NML_WORD )
     for ( j = 0; j < nout; j++ )
       printf(" %s", ((char **)entry->ptr)[j]);
@@ -468,7 +472,8 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
       memset(namecx, '\0', MAX_WORD_LEN);
       len = (size_t) (nml->line.namitl - nml->line.namitf + 1);
 
-      if ( nml->line.lineac[nml->line.namitf] == '$' || 
+      if ( nml->line.lineac[nml->line.namitf] == '/' || 
+	   nml->line.lineac[nml->line.namitf] == '$' || 
 	   nml->line.lineac[nml->line.namitf] == '&' )
 	{
           if ( nml->line.namitl-nml->line.namitf > MAX_WORD_LEN ) goto L3000;
@@ -478,7 +483,10 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
 
           if ( strncmp(pnamecx, "select", 6) == 0 || 
 	       strncmp(pnamecx, "params", 6) == 0 || 
-	       strncmp(pnamecx, nml->name, strlen(nml->name)) == 0 ) goto L2000;
+	       strncmp(pnamecx, nml->name, strlen(nml->name)) == 0 )
+	    {
+	      goto L2000;
+	    }
 
 	  goto L3000;
         }
@@ -545,20 +553,18 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
     {
     L777:
       j = match;
+      wordmatch = -1;
 
       rdnlsgl(nml, nml->entry[j]->ptr, nml->entry[j]->type, (int)nml->entry[j]->size, &nml->entry[j]->occ);
 
       if ( nml->line.nptype != nml->entry[j]->type )
 	{
-          printf(" * value ignored for parameter <%s> %5d\n", namecx, nml->line.nptype);
+	  printf(" * value ignored for parameter <%s> %d\n", namecx, nml->line.nptype);
 	  printf(" * valid parameters and values specified so far are\n");
 
 	  nml_print(nml, PRINT_ALL);
 
-          if ( ! pgmstat.intract )
-	    {
-	      fprintf(stderr, "Namelist error!\n");
-	    }
+	  if ( ! pgmstat.intract ) fprintf(stderr, "Namelist error!\n");
         }
     }
 
