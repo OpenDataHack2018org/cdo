@@ -295,7 +295,7 @@ static MODULES Modules[] =
   { Selstat,        SelstatHelp,       SelstatOperators,        1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,        1,  1 },
   { Set,            SetHelp,           SetOperators,            1,  1 },
-  { Setbox,         NULL,              SetboxOperators,         1,  1 },
+  { Setbox,         SetboxHelp,        SetboxOperators,         1,  1 },
   { Setgatt,        SetgattHelp,       SetgattOperators,        1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,        1,  1 },
   { Sethalo,        NULL,              SethaloOperators,        1,  1 },

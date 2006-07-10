@@ -19,6 +19,7 @@
    This module contains the following operators:
 
       Setbox     setclonlatbox   Set lon/lat box to constant
+      Setbox     setcindexbox    Set index box to constant
 */
 
 
@@ -40,7 +41,7 @@ static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
 
   operatorCheckArgc(5);
 
-  *constant=atof(operatorArgv()[0]);
+  *constant = atof(operatorArgv()[0]);
   xlon1 = atof(operatorArgv()[1]);
   xlon2 = atof(operatorArgv()[2]);
   xlat1 = atof(operatorArgv()[3]);
@@ -110,17 +111,18 @@ static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
 }
 
 
-static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22, double *constant)
 {
   int nlon1, nlat1;
   int temp;
 
-  operatorCheckArgc(4);
+  operatorCheckArgc(5);
 
-  *lon11 = atoi(operatorArgv()[0]);
-  *lon12 = atoi(operatorArgv()[1]);
-  *lat1  = atoi(operatorArgv()[2]);
-  *lat2  = atoi(operatorArgv()[3]);
+  *constant = atof(operatorArgv()[0]);
+  *lon11 = atoi(operatorArgv()[1]);
+  *lon12 = atoi(operatorArgv()[2]);
+  *lat1  = atoi(operatorArgv()[3]);
+  *lat2  = atoi(operatorArgv()[4]);
 
   if ( *lat1 > *lat2 )
     {
@@ -203,7 +205,7 @@ static void setcbox(double constant, double *array, int gridID,
 void *Setbox(void *argument)
 {
   static char func[] = "Setcbox";
-  int SETCLONLATBOX;
+  int SETCLONLATBOX, SETCINDEXBOX;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
@@ -215,6 +217,7 @@ void *Setbox(void *argument)
   int nmiss;
   int *vars;
   int i;
+  int ndiffgrids;
   int lat1, lat2, lon11, lon12, lon21, lon22;
   double missval;
   double constant;
@@ -224,6 +227,8 @@ void *Setbox(void *argument)
   cdoInitialize(argument);
 
   SETCLONLATBOX = cdoOperatorAdd("setclonlatbox", 0, 0, "constant, western and eastern longitude and southern and northern latitude");
+  SETCINDEXBOX  = cdoOperatorAdd("setcindexbox",  0, 0, "constant, index of first and last longitude and index of first and last latitude");
+
 
   operatorID = cdoOperatorID();
 
@@ -233,22 +238,33 @@ void *Setbox(void *argument)
   vlistID1 = streamInqVlist(streamID1);
 
   ngrids = vlistNgrids(vlistID1);
+  ndiffgrids = 0;
+  for ( index = 1; index < ngrids; index++ )
+    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
+      ndiffgrids++;
+
   for ( index = 0; index < ngrids; index++ )
     {
       gridID   = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
+      if ( operatorID == SETCINDEXBOX && gridtype == GRID_CURVILINEAR ) break;
+      if ( operatorID == SETCINDEXBOX && gridtype == GRID_GENERIC &&
+	   gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0 ) break;
     }
 
   if ( gridInqType(gridID) == GRID_GAUSSIAN_REDUCED )
     cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
 
   if ( index == ngrids ) cdoAbort("No regular grid found!");
-  if ( ngrids > 1 )      cdoAbort("Too much different grids!");
+  if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  genlonlatbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22, &constant);
+  if ( operatorID == SETCLONLATBOX )
+    genlonlatbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22, &constant);
+  else
+    genindexbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22, &constant);
 
   vlistID2 = vlistDuplicate(vlistID1);
 

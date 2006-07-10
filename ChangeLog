@@ -1,3 +1,4 @@
+
 2006-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* New operator: setpartabv
@@ -6,7 +7,8 @@
 	* merge: move vlistDestroy after streamClose (report: Matthias Cuntz)
 	* gradsdes: fix bug for only one record without time (report: Angelika Heil)
 	* namelist update
-	* history format changed to nco
+	* New module: Setbox (Etienne Tourigny)
+	* history format changed to nco (Etienne Tourigny)
 	* process: set MAX_ARGS from 1024 to 8192
 	* Version 1.0.1 released
 

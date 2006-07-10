@@ -25,6 +25,7 @@ Setzaxis      Modification
 Setgatt       Modification
 Invert        Modification
 Maskbox       Modification
+Setbox        Modification
 Enlarge       Modification
 Setmiss       Modification
 Exprf	      Arithmetic

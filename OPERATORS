@@ -132,6 +132,8 @@ Operator catalog:
       Invert     invertlondata   Invert longitude data
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
+      Setcbox    setclonlatbox   Set a longitude/latitude box to constant
+      Setcbox    setcindexbox    Set an index box to constant
       Enlarge    enlarge         Enlarge fields
       Setmiss    setmissval      Set a new missing value
       Setmiss    setctomiss      Set constant to missing value

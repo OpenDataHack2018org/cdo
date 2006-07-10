@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = Maskbox
-@Title     = Masks a box
+@Title     = Mask a box
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
