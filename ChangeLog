@@ -1,14 +1,17 @@
 
 2006-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* using CDI library version 1.0.1
+	* New operator: setrcaname, seloperator for RCA GRIB datasets [Frida Brantvall]
+	* New operator: selltype, setltype, chltype, showltype [together with Frida Brantvall]
 	* New operator: setpartabv
 	* add new parameter table format
-	* fix problems on cygwin (report: Mark Hadfield)
-	* merge: move vlistDestroy after streamClose (report: Matthias Cuntz)
-	* gradsdes: fix bug for only one record without time (report: Angelika Heil)
+	* fix problems on cygwin [report: Mark Hadfield]
+	* merge: move vlistDestroy after streamClose [report: Matthias Cuntz]
+	* gradsdes: fix bug for only one record without time [report: Angelika Heil]
 	* namelist update
-	* New module: Setbox (Etienne Tourigny)
-	* history format changed to nco (Etienne Tourigny)
+	* New module: Setbox [Etienne Tourigny)
+	* history format changed to nco [Etienne Tourigny)
 	* process: set MAX_ARGS from 1024 to 8192
 	* Version 1.0.1 released
 

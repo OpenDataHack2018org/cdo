@@ -195,6 +195,7 @@ src/Runstat.c -text
 src/Seasstat.c -text
 src/Selbox.c -text
 src/Select.c -text
+src/Seloperator.c -text
 src/Selrec.c -text
 src/Selstat.c -text
 src/Seltime.c -text
@@ -204,6 +205,7 @@ src/Setgatt.c -text
 src/Setgrid.c -text
 src/Sethalo.c -text
 src/Setmiss.c -text
+src/Setrcaname.c -text
 src/Settime.c -text
 src/Setzaxis.c -text
 src/Showinfo.c -text

@@ -68,6 +68,9 @@ void    setCommandLine(int argc, char **argv);
 char   *commandLine(void);
 int     readline(FILE *fp, char *line, int len);
 
+int ztype2ltype(int zaxistype);
+int ltype2ztype(int ltype);
+
 int nlat2ntr(int nlat);
 int nlat2ntr_linear(int nlat);
 int ntr2nlat(int ntr);

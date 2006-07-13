@@ -25,6 +25,7 @@
       Showinfo   showmon         Show months
       Showinfo   showdate        Show dates
       Showinfo   showtime        Show timesteps
+      Showinfo   showltype       Show level types
 */
 
 
@@ -37,12 +38,14 @@
 
 void *Showinfo(void *argument)
 {
-  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWLEVEL;
+  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWLEVEL, SHOWLTYPE;
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
   int nrecs, nvars, nout;
   int nlevs, levelID;
+  int ntypes, ltype;
+  int zaxistype, index, nzaxis;
   int tsID, ndate, date0 = 0;
   int taxisID;
   int streamID;
@@ -60,6 +63,7 @@ void *Showinfo(void *argument)
   SHOWCODE  = cdoOperatorAdd("showcode",  0, 0, NULL);
   SHOWVAR   = cdoOperatorAdd("showvar",   0, 0, NULL);
   SHOWLEVEL = cdoOperatorAdd("showlevel", 0, 0, NULL);
+  SHOWLTYPE = cdoOperatorAdd("showltype", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -187,7 +191,21 @@ void *Showinfo(void *argument)
 	  fprintf(stdout, "\n");
 	}
     }
+  else if ( operatorID == SHOWLTYPE )
+    {
+      nzaxis = vlistNzaxis(vlistID);
+      for ( index = 0; index < nzaxis; index++ )
+	{
+	  zaxisID = vlistZaxis(vlistID, index);
 
+	  zaxistype = zaxisInqType(zaxisID);
+
+	  ltype = ztype2ltype(zaxistype);
+
+	  if ( ltype != -1 ) fprintf(stdout, " %d", ltype);
+	}
+      fprintf(stdout, "\n"); 
+    }
   streamClose(streamID);
 
   cdoFinish();

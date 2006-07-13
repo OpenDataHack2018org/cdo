@@ -395,3 +395,30 @@ void defineZaxis(const char *zaxisarg)
       (void) cdoDefineZaxis(zaxisfile);
     }
 }
+
+
+int ztype2ltype(int zaxistype)
+{
+  int ltype;
+
+  ltype = -1;
+  if      ( zaxistype == ZAXIS_HEIGHT   )  ltype = 105;
+  else if ( zaxistype == ZAXIS_PRESSURE )  ltype = 100;
+  else if ( zaxistype == ZAXIS_SURFACE  )  ltype =   0;
+  else cdoWarning("zaxis type %d not supported", zaxistype);
+
+  return (ltype);
+}
+
+
+int ltype2ztype(int ltype)
+{
+  int zaxistype = -1;
+
+  if      ( ltype == 105 ) zaxistype = ZAXIS_HEIGHT;
+  else if ( ltype == 100 ) zaxistype = ZAXIS_PRESSURE;
+  else if ( ltype ==   0 ) zaxistype = ZAXIS_SURFACE;
+  else cdoWarning("GRIB level type %d not supported", ltype);
+
+  return (zaxistype);
+}

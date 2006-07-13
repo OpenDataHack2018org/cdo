@@ -28,6 +28,7 @@
       Select     selzaxis        Select zaxis
       Select     selzaxisname    Select zaxis by name
       Select     seltabnum       Select parameter table number
+      Select     selltype        Select level type 
 */
 
 
@@ -47,7 +48,7 @@
 void *Select(void *argument)
 {
   const char func[] = "Select";
-  int SELCODE, SELVAR, SELLEVEL, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME;
+  int SELCODE, SELVAR, SELLEVEL, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME, SELLTYPE; 
   int SELTABNUM, DELCODE, DELVAR;
   int operatorID;
   int streamID1, streamID2;
@@ -72,6 +73,7 @@ void *Select(void *argument)
   int nmiss;
   double *array = NULL;
   int taxisID1, taxisID2;
+  int zaxistype, ltype;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
 
@@ -87,6 +89,7 @@ void *Select(void *argument)
   SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 0, "table number");
   DELCODE      = cdoOperatorAdd("delcode",      0, 0, "codes");
   DELVAR       = cdoOperatorAdd("delvar",       0, 0, "vars");
+  SELLTYPE     = cdoOperatorAdd("selltype",     0, 0, "GRIB level types"); 
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -239,6 +242,18 @@ void *Select(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
+	      else if ( operatorID == SELLTYPE )
+		{
+		  zaxistype = zaxisInqType(zaxisID);
+
+		  ltype = ztype2ltype(zaxistype);
+
+		  if ( intarr[isel] == ltype )
+		    {
+		      vlistDefFlag(vlistID1, varID, levID, TRUE);
+		      selfound[isel] = TRUE;
+		    }
+		}
 	    }
 	}
     }
@@ -278,6 +293,10 @@ void *Select(void *argument)
 	  else if ( operatorID == SELTABNUM )
 	    {
 	      cdoWarning("Table number %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELLTYPE )
+	    {
+	      cdoWarning("GRIB level type %d not found!", intarr[isel]);
 	    }
 	}
     }

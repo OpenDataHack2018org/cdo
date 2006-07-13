@@ -22,6 +22,7 @@
       Set        setcode         Set code
       Set        setvar          Set variable name
       Set        setlevel        Set level
+      Set        setltype        Set GRIB level type
 */
 
 
@@ -37,7 +38,7 @@
 void *Set(void *argument)
 {
   static char func[] = "Set";
-  int SETPARTAB, SETPARTABV, SETCODE, SETVAR, SETLEVEL;
+  int SETPARTAB, SETPARTABV, SETCODE, SETVAR, SETLEVEL, SETLTYPE;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1;
@@ -49,6 +50,7 @@ void *Set(void *argument)
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int tableID = -1;
   int tableformat = 0;
+  int zaxistype;
   char *newname = NULL, *partab = NULL;
   double newlevel = 0;
   double *levels = NULL;
@@ -61,11 +63,12 @@ void *Set(void *argument)
   SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code");
   SETVAR     = cdoOperatorAdd("setvar",     0, 0, "variable name");
   SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
+  SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
 
   operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
-  if ( operatorID == SETCODE )
+  if ( operatorID == SETCODE || operatorID == SETLTYPE )
     {
       newval = atoi(operatorArgv()[0]);
     }
@@ -272,6 +275,23 @@ void *Set(void *argument)
 	  zaxisDefLevels(zaxisID2, levels);
 	  vlistChangeZaxis(vlistID2, index, zaxisID2);
 	  free(levels);
+	}
+    }
+  else if ( operatorID == SETLTYPE )
+    {
+      nzaxis = vlistNzaxis(vlistID2);
+      for ( index = 0; index < nzaxis; index++ )
+	{
+	  zaxisID1 = vlistZaxis(vlistID2, index);
+	  zaxisID2 = zaxisDuplicate(zaxisID1);
+
+	  zaxistype = ltype2ztype(newval);
+
+	  if ( zaxistype != -1 )
+	    {
+	      zaxisChangeType(zaxisID2, zaxistype);
+	      vlistChangeZaxis(vlistID2, index, zaxisID2);
+	    }
 	}
     }
 

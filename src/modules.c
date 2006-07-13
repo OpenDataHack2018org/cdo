@@ -86,6 +86,7 @@ void *Runstat(void *argument);
 void *Seasstat(void *argument);
 void *Selbox(void *argument);
 void *Select(void *argument);
+void *Seloperator(void *argument);
 void *Selrec(void *argument);
 void *Selstat(void *argument);
 void *Seltime(void *argument);
@@ -95,6 +96,7 @@ void *Setgatt(void *argument);
 void *Setgrid(void *argument);
 void *Sethalo(void *argument);
 void *Setmiss(void *argument);
+void *Setrcaname(void *argument);
 void *Settime(void *argument);
 void *Setzaxis(void *argument);
 void *Showinfo(void *argument);
@@ -135,7 +137,7 @@ void *Zonstat(void *argument);
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy"}
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
-#define  ChangeOperators        {"chcode", "chvar", "chlevel", "chlevelc", "chlevelv"}
+#define  ChangeOperators        {"chcode", "chvar", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
 #define  CondOperators          {"ifthen",  "ifnotthen"}
@@ -183,20 +185,22 @@ void *Zonstat(void *argument);
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelectOperators        {"selcode", "selvar", "sellevel", "selgrid", "selgridname", \
-                                 "selzaxis", "selzaxisname", "seltabnum", "delcode", "delvar"}
+                                 "selzaxis", "selzaxisname", "seltabnum", "delcode", "delvar", "selltype"}
+#define  SeloperatorOperators   {"seloperator"}
 #define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selstd"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime"}
-#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setvar", "setlevel"}
+#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setvar", "setlevel", "setltype"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}
 #define  SethaloOperators       {"sethalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss"}
+#define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
-#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", "showlevel"}
+#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", "showlevel", "showltype"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
 #define  SpecinfoOperators      {"specinfo"}
@@ -291,6 +295,7 @@ static MODULES Modules[] =
   { Seasstat,       SeasstatHelp,      SeasstatOperators,       1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,         1,  1 },
   { Select,         SelectHelp,        SelectOperators,         1,  1 },
+  { Seloperator,    NULL,              SeloperatorOperators,    1,  1 },
   { Selrec,         SelectHelp,        SelrecOperators,         1,  1 },
   { Selstat,        SelstatHelp,       SelstatOperators,        1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,        1,  1 },
@@ -299,6 +304,7 @@ static MODULES Modules[] =
   { Setgatt,        SetgattHelp,       SetgattOperators,        1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,        1,  1 },
   { Sethalo,        NULL,              SethaloOperators,        1,  1 },
+  { Setrcaname,     NULL,              SetrcanameOperators,     1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,        1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,        1,  1 },
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,       1,  1 },

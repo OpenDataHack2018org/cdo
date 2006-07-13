@@ -23,6 +23,7 @@
       Change     chlevel         Change level
       Change     chlevelc        Change level of one code
       Change     chlevelv        Change level of one variable
+      Change     chltype         Change GRIB level type 
 */
 
 
@@ -40,7 +41,7 @@
 void *Change(void *argument)
 {
   static char func[] = "Change";
-  int CHCODE, CHVAR, CHLEVEL, CHLEVELC, CHLEVELV;
+  int CHCODE, CHVAR, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
@@ -56,8 +57,9 @@ void *Change(void *argument)
   int nmiss;
   int gridsize;
   int nfound;
-  int nzaxis, zaxisID1, zaxisID2, k, nlevs, index;
+  int nzaxis, zaxisID1, zaxisID2, k, nlevs, index; 
   double chlevels[MAXARG];
+  int  chltypes[MAXARG];              
   double *levels = NULL;
   double *array = NULL;
 
@@ -68,6 +70,7 @@ void *Change(void *argument)
   CHLEVEL  = cdoOperatorAdd("chlevel",  0, 0, "pairs of old and new level");
   CHLEVELC = cdoOperatorAdd("chlevelc", 0, 0, "code number, old and new level");
   CHLEVELV = cdoOperatorAdd("chlevelv", 0, 0, "variable name, old and new level");
+  CHLTYPE  = cdoOperatorAdd("chltype",  0, 0, "pairs of old and new type");          
 
   operatorID = cdoOperatorID();
 
@@ -108,6 +111,12 @@ void *Change(void *argument)
       chvar = operatorArgv()[0];
       chlevels[0] = atof(operatorArgv()[1]);
       chlevels[1] = atof(operatorArgv()[2]);
+    }
+  else if ( operatorID == CHLTYPE )                  
+    {
+      if ( nch%2 ) cdoAbort("Odd number of input arguments!");
+      for ( i = 0; i < nch; i++ )
+	chltypes[i] = atoi(operatorArgv()[i]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -215,6 +224,35 @@ void *Change(void *argument)
 	cdoAbort("Level %g not found!", chlevels[0]);
 
       free(levels);
+    }
+  else if ( operatorID == CHLTYPE )                
+    {
+      int zaxistype, zaxistype1, zaxistype2, ltype1, ltype2;
+
+      nzaxis = vlistNzaxis(vlistID2);
+      for ( index = 0; index < nzaxis; index++ )
+	{
+	  zaxisID1 = vlistZaxis(vlistID2, index);
+	  zaxisID2 = zaxisDuplicate(zaxisID1);
+
+	  zaxistype = zaxisInqType(zaxisID2);
+
+	  for ( i = 0; i < nch; i += 2 )
+	    {
+	      ltype1 = chltypes[i];
+	      ltype2 = chltypes[i+1];
+
+	      zaxistype1 = ltype2ztype(ltype1);
+	      zaxistype2 = ltype2ztype(ltype2);
+
+	      if ( zaxistype1 != -1 && zaxistype2 != -1 )
+		if ( zaxistype1 == zaxistype )
+		  {
+		    zaxisChangeType(zaxisID2, zaxistype2);
+		    vlistChangeZaxis(vlistID2, index, zaxisID2);
+		  }
+	    }
+	}
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

@@ -52,6 +52,7 @@ cdo_SOURCES = Arith.c		\
               Seasstat.c 	\
               Selbox.c  	\
               Select.c  	\
+              Seloperator.c  	\
               Selrec.c  	\
               Selstat.c 	\
               Seltime.c 	\
@@ -61,6 +62,7 @@ cdo_SOURCES = Arith.c		\
 	      Setgrid.c		\
 	      Sethalo.c		\
               Setmiss.c 	\
+              Setrcaname.c 	\
 	      Settime.c		\
 	      Setzaxis.c	\
               Showinfo.c	\
