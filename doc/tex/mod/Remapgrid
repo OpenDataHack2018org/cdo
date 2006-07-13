@@ -57,7 +57,8 @@ Performs a first order conservative remapping on all input fields.
 @Parameter = grid
 
 @BeginDescription
-Performs a distance-weighted average of the four nearest neighbor values on all input fields.
+Performs a distance-weighted average of the four nearest neighbor 
+values on all input fields.
 @EndDescription
 @EndOperator
 
