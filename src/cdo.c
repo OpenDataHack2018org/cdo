@@ -25,7 +25,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
-#include <unistd.h>  /* sysconf */
+#include <sys/time.h>       /* getrlimit */
+#include <sys/resource.h>   /* getrlimit */
+#include <unistd.h>         /* getrlimit sysconf */
 
 #include "cdi.h"
 #include "cdo.h"
@@ -70,6 +72,27 @@ int cdoDebug       = 0;
 
 int timer_total, timer_read, timer_write;
 int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
+
+
+#define PRINT_RLIMIT(resource) \
+      { \
+	int status; \
+	struct rlimit rlim; \
+	status = getrlimit(resource, &rlim); \
+	if ( status == 0 ) \
+	  { \
+	    if ( sizeof(rlim_t) > sizeof(long) ) \
+	      { \
+		fprintf(stderr, "CUR %-15s = %llu\n", #resource, (long long) rlim.rlim_cur); \
+		fprintf(stderr, "MAX %-15s = %llu\n", #resource, (long long) rlim.rlim_max); \
+	      } \
+	    else \
+	      { \
+		fprintf(stderr, "CUR %-15s = %lu\n", #resource, (long) rlim.rlim_cur); \
+		fprintf(stderr, "MAX %-15s = %lu\n", #resource, (long) rlim.rlim_max); \
+	      } \
+	  } \
+      }
 
 
 static void version(void)
@@ -568,6 +591,46 @@ int main(int argc, char *argv[])
 
       fprintf(stderr, "\n");
 
+#if defined (RLIMIT_FSIZE)
+      PRINT_RLIMIT(RLIMIT_FSIZE);
+#endif
+#if defined (RLIMIT_NOFILE)
+      PRINT_RLIMIT(RLIMIT_NOFILE);
+#endif
+#if defined (RLIMIT_STACK)
+      PRINT_RLIMIT(RLIMIT_STACK);
+#endif
+      fprintf(stderr, "\n");
+    }
+
+#if defined (RLIMIT_STACK)
+  {
+#define  MIN_STACK_SIZE  67108864L  /* 64MB */
+    int status;
+    struct rlimit rlim;
+    status = getrlimit(RLIMIT_STACK, &rlim);
+
+    if ( status == 0 && rlim.rlim_cur < MIN_STACK_SIZE )
+      {
+	rlim.rlim_cur = MIN_STACK_SIZE;
+
+	status = setrlimit(RLIMIT_STACK, &rlim);
+	if ( Debug )
+	  {
+	    if ( status == 0 )
+	      {
+		fprintf(stderr, "Set stack size to %ld\n", MIN_STACK_SIZE);
+		PRINT_RLIMIT(RLIMIT_STACK);
+	      }
+	    else
+	      fprintf(stderr, "Set stack size to %ld failed!\n", MIN_STACK_SIZE);
+	  }
+      }
+  }
+#endif
+
+  if ( Debug )
+    {
       print_pthread_info();
     }
 

@@ -2,6 +2,7 @@
 2006-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.1
+	* set MIN_STACK_SIZE to 64MB
 	* New operator: setrcaname, seloperator for RCA GRIB datasets [Frida Brantvall]
 	* New operator: selltype, setltype, chltype, showltype [together with Frida Brantvall]
 	* New operator: setpartabv
