@@ -26,6 +26,7 @@
 
 void *Setrcaname(void *argument)
 {
+  static char func[] = "Setrcaname";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;
@@ -39,8 +40,13 @@ void *Setrcaname(void *argument)
   int nvars;
   int zaxisID, ltype, code, zaxistype, nlev;
   int level;
+  int lcopy = FALSE;
+  int gridsize, nmiss;
+  double *array = NULL;
 
   cdoInitialize(argument);
+
+  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorInputArg("file name with RCA names");
   rcsnames = operatorArgv();
@@ -79,7 +85,7 @@ void *Setrcaname(void *argument)
 		      if ( nlev != 1 )
 			{
 			  cdoWarning("Number of levels must be 1 for level type 105!");
-			  cdoWarning("Maybe environment variable SPLIT_LYTPE_105 is not set.");
+			  cdoWarning("Maybe environment variable SPLIT_LTYPE_105 is not set.");
 			  continue;
 			}
 		      level = (int) zaxisInqLevel(zaxisID, 0);
@@ -118,6 +124,12 @@ void *Setrcaname(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  if ( ! lcopy )
+    {
+      gridsize = vlistGridsizeMax(vlistID1);
+      array = (double *) malloc(gridsize*sizeof(double));
+    }
+
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
@@ -129,14 +141,28 @@ void *Setrcaname(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
-	  
-	  streamCopyRecord(streamID2, streamID1); 
+
+	  if ( lcopy )
+	    {
+	      streamCopyRecord(streamID2, streamID1);
+	    }
+	  else
+	    {
+	      streamReadRecord(streamID1, array, &nmiss);
+	      streamWriteRecord(streamID2, array, nmiss);
+	    }
 	}
+
       tsID++;
     }
 
   streamClose(streamID1);
   streamClose(streamID2);
+
+  vlistDestroy(vlistID2);
+
+  if ( ! lcopy )
+    if ( array ) free(array);
 
   cdoFinish();
 

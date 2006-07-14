@@ -309,6 +309,18 @@ void *Filedes(void *argument)
 	      printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
 	    }
 	   break;
+	case FILETYPE_IEG:
+	  printf("  IEG data\n");
+	  switch ( streamInqByteorder(streamID) )
+	    {
+	    case CDI_BIGENDIAN:
+	      printf("  byteorder is BIGENDIAN\n"); break;
+	    case CDI_LITTLEENDIAN:
+	      printf("  byteorder is LITTLEENDIAN\n"); break;
+	    default:
+	      printf("  byteorder %d undefined\n", streamInqByteorder(streamID)); break;
+	    }
+	   break;
 	default:
 	  printf("  unsupported filetype %d\n" , filetype);
 	}

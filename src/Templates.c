@@ -25,13 +25,19 @@
 
 void *Template1(void *argument)
 {
+  static char func[] = "Template1";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
+  int lcopy = FALSE;
+  int gridsize, nmiss;
+  double *array = NULL;
 
   cdoInitialize(argument);
+
+  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -48,6 +54,12 @@ void *Template1(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  if ( ! lcopy )
+    {
+      gridsize = vlistGridsizeMax(vlistID1);
+      array = (double *) malloc(gridsize*sizeof(double));
+    }
+
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
@@ -60,13 +72,27 @@ void *Template1(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
 	  
-	  streamCopyRecord(streamID2, streamID1); 
+	  if ( lcopy )
+	    {
+	      streamCopyRecord(streamID2, streamID1);
+	    }
+	  else
+	    {
+	      streamReadRecord(streamID1, array, &nmiss);
+	      streamWriteRecord(streamID2, array, nmiss);
+	    }
 	}
+
       tsID++;
     }
 
   streamClose(streamID1);
   streamClose(streamID2);
+
+  vlistDestroy(vlistID2);
+
+  if ( ! lcopy )
+    if ( array ) free(array);
 
   cdoFinish();
 
@@ -121,11 +147,14 @@ void *Template2(void *argument)
 	  streamReadRecord(streamID1, array, &nmiss);
 	  streamWriteRecord(streamID2, array, nmiss);
 	}
+
       tsID++;
     }
 
   streamClose(streamID1);
   streamClose(streamID2);
+
+  vlistDestroy(vlistID2);
 
   if ( array ) free(array);
 

@@ -25,6 +25,7 @@
 
 void *Seloperator(void *argument)
 {
+  static char func[] = "Seloperator";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;
@@ -36,8 +37,13 @@ void *Seloperator(void *argument)
   int levID, ltype = 0;
   int varID2, levelID2;
   int sellevel, selcode, selltype, zaxistype;
+  int lcopy = FALSE;
+  int gridsize, nmiss;
+  double *array = NULL;
 
   cdoInitialize(argument);
+
+  if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorInputArg("code, ltype, level");
 
@@ -104,6 +110,12 @@ void *Seloperator(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  if ( ! lcopy )
+    {
+      gridsize = vlistGridsizeMax(vlistID1);
+      array = (double *) malloc(gridsize*sizeof(double));
+    }
+
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
@@ -121,14 +133,28 @@ void *Seloperator(void *argument)
 
 	      streamDefRecord(streamID2, varID2, levelID2);
 	  
-	      streamCopyRecord(streamID2, streamID1);
+	      if ( lcopy )
+		{
+		  streamCopyRecord(streamID2, streamID1);
+		}
+	      else
+		{
+		  streamReadRecord(streamID1, array, &nmiss);
+		  streamWriteRecord(streamID2, array, nmiss);
+		}
 	    }
 	}
+
       tsID++;
     }
 
   streamClose(streamID1);
   streamClose(streamID2);
+
+  vlistDestroy(vlistID2);
+
+  if ( ! lcopy )
+    if ( array ) free(array);
 
   cdoFinish();
 
