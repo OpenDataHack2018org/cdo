@@ -9,6 +9,7 @@
 	* fix problems on cygwin [report: Mark Hadfield]
 	* merge: move vlistDestroy after streamClose [report: Matthias Cuntz]
 	* gradsdes: fix bug for only one record without time [report: Angelika Heil]
+	* gradsdes: fix problem for variable names with - character
 	* namelist update
 	* New module: Setbox [Etienne Tourigny)
 	* history format changed to nco [Etienne Tourigny)

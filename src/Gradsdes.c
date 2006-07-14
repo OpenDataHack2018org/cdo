@@ -887,6 +887,15 @@ void *Gradsdes(void *argument)
 	  ltype   = zaxisInqType(zaxisID);
 	  nlev    = zaxisInqSize(zaxisID);
 	  vlistInqVarName(vlistID, varID, varname);
+
+	  len = strlen(varname);
+	  for ( i = 0; i < len; i++ )
+	    if ( varname[i] == '-' ) break;
+
+	  if ( i < len )
+	    for ( j = i; j < len; j++ )
+	      varname[j] = varname[j+1];
+
 	  vlistInqVarLongname(vlistID, varID, varlongname);
 	  vlistInqVarUnits(vlistID, varID, varunits);
 	  fprintf(gdp, "%-15s", varname);
