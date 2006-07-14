@@ -608,22 +608,28 @@ int main(int argc, char *argv[])
 #define  MIN_STACK_SIZE  67108864L  /* 64MB */
     int status;
     struct rlimit rlim;
+    rlim_t min_stack_size = MIN_STACK_SIZE;
+
     status = getrlimit(RLIMIT_STACK, &rlim);
 
-    if ( status == 0 && rlim.rlim_cur < MIN_STACK_SIZE )
+    if ( status == 0 )
       {
-	rlim.rlim_cur = MIN_STACK_SIZE;
-
-	status = setrlimit(RLIMIT_STACK, &rlim);
-	if ( Debug )
+	if ( min_stack_size > rlim.rlim_max ) min_stack_size = rlim.rlim_max;
+	if ( rlim.rlim_cur < min_stack_size )
 	  {
-	    if ( status == 0 )
+	    rlim.rlim_cur = min_stack_size;
+
+	    status = setrlimit(RLIMIT_STACK, &rlim);
+	    if ( Debug )
 	      {
-		fprintf(stderr, "Set stack size to %ld\n", MIN_STACK_SIZE);
-		PRINT_RLIMIT(RLIMIT_STACK);
+		if ( status == 0 )
+		  {
+		    fprintf(stderr, "Set stack size to %ld\n", MIN_STACK_SIZE);
+		    PRINT_RLIMIT(RLIMIT_STACK);
+		  }
+		else
+		  fprintf(stderr, "Set stack size to %ld failed!\n", MIN_STACK_SIZE);
 	      }
-	    else
-	      fprintf(stderr, "Set stack size to %ld failed!\n", MIN_STACK_SIZE);
 	  }
       }
   }
