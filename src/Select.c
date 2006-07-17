@@ -22,13 +22,14 @@
       Select     delcode         Delete codes
       Select     selvar          Select variables
       Select     delvar          Delete variables
+      Select     selstdname       Select variables by CF name
       Select     sellevel        Select levels
       Select     selgrid         Select grids
       Select     selgridname     Select grid by name
       Select     selzaxis        Select zaxis
       Select     selzaxisname    Select zaxis by name
       Select     seltabnum       Select parameter table number
-      Select     selltype        Select level type 
+      Select     selltype        Select GRIB level type 
 */
 
 
@@ -49,7 +50,7 @@ void *Select(void *argument)
 {
   const char func[] = "Select";
   int SELCODE, SELVAR, SELLEVEL, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME, SELLTYPE; 
-  int SELTABNUM, DELCODE, DELVAR;
+  int SELTABNUM, DELCODE, DELVAR, SELSTDNAME;
   int operatorID;
   int streamID1, streamID2;
   int tsID, nrecs;
@@ -61,9 +62,10 @@ void *Select(void *argument)
   int *intarr = NULL, nsel = 0;
   int *selfound = NULL;
   double *fltarr = NULL;
-  char varname[128];
-  char gridname[128];
-  char zaxisname[128];
+  char varname[256];
+  char stdname[256];
+  char gridname[256];
+  char zaxisname[256];
   char **argnames = NULL;
   int vlistID1 = -1, vlistID2 = -1;
   int isel;
@@ -81,6 +83,7 @@ void *Select(void *argument)
 
   SELCODE      = cdoOperatorAdd("selcode",      0, 0, "codes");
   SELVAR       = cdoOperatorAdd("selvar",       0, 0, "vars");
+  SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 0, "standard names");
   SELLEVEL     = cdoOperatorAdd("sellevel",     0, 0, "levels");
   SELGRID      = cdoOperatorAdd("selgrid",      0, 0, "gridIDs");
   SELGRIDNAME  = cdoOperatorAdd("selgridname",  0, 0, "grid names");
@@ -97,21 +100,33 @@ void *Select(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SELVAR || operatorID == DELVAR ||
+  if ( operatorID == SELVAR || operatorID == DELVAR || operatorID == SELSTDNAME ||
        operatorID == SELGRIDNAME || operatorID == SELZAXISNAME )
     {
       nsel     = operatorArgc();
       argnames = operatorArgv();
+
+      if ( cdoVerbose )
+	for ( i = 0; i < nsel; i++ )
+	  printf("name %d = %s\n", i+1, argnames[i]);
     }
   else if ( operatorID == SELLEVEL )
     {
       nsel = args2fltlist(operatorArgc(), operatorArgv(), flist);
       fltarr = (double *) listArrayPtr(flist);
+
+      if ( cdoVerbose )
+	for ( i = 0; i < nsel; i++ )
+	  printf("flt %d = %g\n", i+1, fltarr[i]);
     }
   else
     {
       nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
       intarr = (int *) listArrayPtr(ilist);
+
+      if ( cdoVerbose )
+	for ( i = 0; i < nsel; i++ )
+	  printf("int %d = %d\n", i+1, intarr[i]);
     }
 
   if ( nsel )
@@ -120,17 +135,6 @@ void *Select(void *argument)
       for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
     }
 
-  if ( cdoVerbose )
-    {
-      printf("nsel = %d\n", nsel);
-      for ( i = 0; i < nsel; i++ )
-	if ( operatorID == SELVAR )
-	  printf("name %d = %s\n", i+1, argnames[i]);
-	else if ( operatorID == SELLEVEL )
-	  printf("flt %d = %g\n", i+1, fltarr[i]);
-	else
-	  printf("int %d = %d\n", i+1, intarr[i]);
-    }
   /*
   if ( nsel == 0 )
     cdoAbort("missing code argument!");
@@ -145,6 +149,7 @@ void *Select(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
     {
       vlistInqVarName(vlistID1, varID, varname);
+      vlistInqVarStdname(vlistID1, varID, stdname);
       code    = vlistInqVarCode(vlistID1, varID);
       tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
       gridID  = vlistInqVarGrid(vlistID1, varID);
@@ -173,6 +178,14 @@ void *Select(void *argument)
 	      else if ( operatorID == SELVAR )
 		{
 		  if ( strcmp(argnames[isel], varname) == 0 )
+		    {
+		      vlistDefFlag(vlistID1, varID, levID, TRUE);
+		      selfound[isel] = TRUE;
+		    }
+		}
+	      else if ( operatorID == SELSTDNAME )
+		{
+		  if ( strcmp(argnames[isel], stdname) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
@@ -264,11 +277,15 @@ void *Select(void *argument)
 	{
 	  if ( operatorID == SELCODE || operatorID == DELCODE )
 	    {
-	      cdoWarning("Code %d not found!", intarr[isel]);
+	      cdoWarning("Code number %d not found!", intarr[isel]);
 	    }
 	  else if ( operatorID == SELVAR || operatorID == DELVAR )
 	    {
-	      cdoWarning("Variable %s not found!", argnames[isel]);
+	      cdoWarning("Variable name %s not found!", argnames[isel]);
+	    }
+	  else if ( operatorID == SELSTDNAME )
+	    {
+	      cdoWarning("Variable with standard name %s not found!", argnames[isel]);
 	    }
 	  else if ( operatorID == SELLEVEL )
 	    {

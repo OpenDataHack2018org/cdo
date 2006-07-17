@@ -265,7 +265,7 @@ void *Filedes(void *argument)
 
 	  /* if ( pstr ) fprintf(stdout, "  DATATYPE=%s\n", pstr); */
 
-	  fprintf(stdout, "&\n");
+	  fprintf(stdout, "/\n");
 	}   
     }
   else if ( operatorID == FILEDES )

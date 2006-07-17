@@ -20,6 +20,7 @@
 
       Showinfo   showcode        Show codes
       Showinfo   showvar         Show variable names
+      Showinfo   showstdname     Show variable standard names
       Showinfo   showlevel       Show levels
       Showinfo   showyear        Show years
       Showinfo   showmon         Show months
@@ -38,13 +39,13 @@
 
 void *Showinfo(void *argument)
 {
-  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWLEVEL, SHOWLTYPE;
+  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE;
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
   int nrecs, nvars, nout;
   int nlevs, levelID;
-  int ntypes, ltype;
+  int ltype;
   int zaxistype, index, nzaxis;
   int tsID, ndate, date0 = 0;
   int taxisID;
@@ -52,18 +53,20 @@ void *Showinfo(void *argument)
   int vlistID;
   int year, month, day, hour, minute;
   int month0 = 0, nmonth, year0 = 0, nyear;
-  char varname[128];
+  char varname[256];
+  char stdname[256];
 
   cdoInitialize(argument);
 
-  SHOWYEAR  = cdoOperatorAdd("showyear",  0, 0, NULL);
-  SHOWMON   = cdoOperatorAdd("showmon",   0, 0, NULL);
-  SHOWDATE  = cdoOperatorAdd("showdate",  0, 0, NULL);
-  SHOWTIME  = cdoOperatorAdd("showtime",  0, 0, NULL);
-  SHOWCODE  = cdoOperatorAdd("showcode",  0, 0, NULL);
-  SHOWVAR   = cdoOperatorAdd("showvar",   0, 0, NULL);
-  SHOWLEVEL = cdoOperatorAdd("showlevel", 0, 0, NULL);
-  SHOWLTYPE = cdoOperatorAdd("showltype", 0, 0, NULL);
+  SHOWYEAR    = cdoOperatorAdd("showyear",      0, 0, NULL);
+  SHOWMON     = cdoOperatorAdd("showmon",       0, 0, NULL);
+  SHOWDATE    = cdoOperatorAdd("showdate",      0, 0, NULL);
+  SHOWTIME    = cdoOperatorAdd("showtime",      0, 0, NULL);
+  SHOWCODE    = cdoOperatorAdd("showcode",      0, 0, NULL);
+  SHOWVAR     = cdoOperatorAdd("showvar",       0, 0, NULL);
+  SHOWSTDNAME = cdoOperatorAdd("showstdname",   0, 0, NULL);
+  SHOWLEVEL   = cdoOperatorAdd("showlevel",     0, 0, NULL);
+  SHOWLTYPE   = cdoOperatorAdd("showltype",     0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -177,6 +180,18 @@ void *Showinfo(void *argument)
 	{
 	  vlistInqVarName(vlistID, varID, varname);
 	  fprintf(stdout, " %s", varname);
+	}
+      fprintf(stdout, "\n");
+    }
+  else if ( operatorID == SHOWSTDNAME )
+    {
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  vlistInqVarStdname(vlistID, varID, stdname);
+	  if ( stdname[0] != 0 )
+	    fprintf(stdout, " %s", stdname);
+	  else
+	    fprintf(stdout, " unknown");
 	}
       fprintf(stdout, "\n");
     }

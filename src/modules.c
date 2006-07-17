@@ -184,7 +184,7 @@ void *Zonstat(void *argument);
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runstd"}
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelectOperators        {"selcode", "selvar", "sellevel", "selgrid", "selgridname", \
+#define  SelectOperators        {"selcode", "selvar", "selstdname", "sellevel", "selgrid", "selgridname", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delcode", "delvar", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selstd"}
@@ -200,7 +200,8 @@ void *Zonstat(void *argument);
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
-#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", "showlevel", "showltype"}
+#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", \
+                                 "showstdname", "showlevel", "showltype"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
 #define  SpecinfoOperators      {"specinfo"}

@@ -256,6 +256,8 @@ void *Info(void *argument)
 
       vlistID = streamInqVlist(streamID);
 
+      if ( vlistNvars(vlistID) == 0 ) continue;
+
       gridsize = vlistGridsizeMax(vlistID);
 
       array = (double *) malloc(gridsize*sizeof(double));
