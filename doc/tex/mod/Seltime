@@ -110,9 +110,9 @@ INTEGER  Comma separated list of years
 @Item = seasons
 STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
 @Item = date1
-STRING   Start date (format YYYY-MM-DD)
+STRING   Start date (format YYYY-MM-DDThh:mm)
 @Item = date2
-STRING   End date (format YYYY-MM-DD)
+STRING   End date (format YYYY-MM-DDThh:mm)
 @EndParameter
 
 

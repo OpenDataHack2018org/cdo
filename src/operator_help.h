@@ -403,14 +403,14 @@ static char *SeltimeHelp[] = {
     "",
     "PARAMETER",
     "    timesteps  INTEGER  Comma separated list of time steps",
-    "    times      STRING   Comma separated list of times (format HH:MM)",
+    "    times      STRING   Comma separated list of times (format hh:mm)",
     "    hours      INTEGER  Comma separated list of hours",
     "    days       INTEGER  Comma separated list of days",
     "    months     INTEGER  Comma separated list of months",
     "    years      INTEGER  Comma separated list of years",
     "    seasons    STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)",
-    "    date1      STRING   Start date (format YYYY-MM-DD)",
-    "    date2      STRING   End date (format YYYY-MM-DD)",
+    "    date1      STRING   Start date (format YYYY-MM-DDThh:mm)",
+    "    date2      STRING   End date (format YYYY-MM-DDThh:mm)",
     NULL
 };
 
@@ -1830,7 +1830,8 @@ static char *RemapgridHelp[] = {
     "    remapcon  Conservative remapping",
     "              Performs a first order conservative remapping on all input fields.",
     "    remapdis  Distance-weighted averaging",
-    "              Performs a distance-weighted average of the four nearest neighbor values on all input fields.",
+    "              Performs a distance-weighted average of the four nearest neighbor ",
+    "              values on all input fields.",
     "",
     "PARAMETER",
     "    grid  STRING  Target grid description file or name",
@@ -1977,7 +1978,7 @@ static char *InttimeHelp[] = {
     "",
     "PARAMETER",
     "    date  STRING  Start date (format YYYY-MM-DD)",
-    "    time  STRING  Start time (format HH:MM)",
+    "    time  STRING  Start time (format hh:mm)",
     "    inc   STRING  Optional increment (minutes, hours or days) [default: 0hour]",
     NULL
 };

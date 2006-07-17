@@ -29,6 +29,7 @@
 #define  func_time  86
 #define  func_date  87
 #define  func_step  88
+#define  func_datetime 89
 
 #define  func_lon   98
 #define  func_lat   99

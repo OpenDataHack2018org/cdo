@@ -54,7 +54,7 @@ void *Seltime(void *argument)
   int streamID1, streamID2;
   int tsID, tsID2, nrecs;
   int recID, varID, levelID;
-  int *intarr, nsel = 0, selval;
+  int *intarr, nsel = 0, selival;
   int vlistID1 = -1, vlistID2 = -1;
   int taxisID1, taxisID2;
   int vdate, vtime;
@@ -62,15 +62,18 @@ void *Seltime(void *argument)
   int i;
   int lcopy = FALSE;
   int gridsize;
+  int status;
   int nmiss;
   int year, month, day, hour, minute;
+  double selfval = 0, *fltarr, fval;
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
+  LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
   SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
-  SELDATE     = cdoOperatorAdd("seldate",     func_date,     1, "start date and end date (format YYYY-MM-DD)");
+  SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm)");
   SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm)");
   SELHOUR     = cdoOperatorAdd("selhour",     func_time,   100, "hours");
   SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
@@ -79,7 +82,8 @@ void *Seltime(void *argument)
   SELSEAS     = cdoOperatorAdd("selseas",     func_date,   100, "seasons");
 
   moddat[SELTIMESTEP] =          1;
-  moddat[SELDATE]     = 1000000000;
+  /*  moddat[SELDATE]     = 1000000000; */
+  moddat[SELDATE]     =          0;
   moddat[SELTIME]     =      10000;
   moddat[SELHOUR]     =        100;
   moddat[SELDAY]      =        100;
@@ -144,12 +148,25 @@ void *Seltime(void *argument)
 	{
 	  if ( strchr(operatorArgv()[i], '-') == NULL )
 	    {
-	      listSetInt(ilist, i, atoi(operatorArgv()[i]));
+	      listSetFlt(flist, i, atof(operatorArgv()[i]));
 	    }
 	  else
 	    {
-	      sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
-	      listSetInt(ilist, i, year*10000 + month*100 + day);
+	      year = 0; month = 0; day = 0; hour = 0; minute = 0;
+	      if ( strchr(operatorArgv()[i], 'T') == NULL )
+		{
+		  status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
+		  listSetFlt(flist, i, year*10000 + month*100 + day);
+		}
+	      else
+		{
+		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d", &year, &month, &day, &hour, &minute);
+		  /* fprintf(stderr, "status = %d\n", status); */
+		  fval = hour*100 + minute;
+		  if ( fval ) fval /= 10000;
+		  fval += year*10000 + month*100 + day;
+		  listSetFlt(flist, i, fval);
+		}
 	    }
 	}
     }
@@ -174,11 +191,15 @@ void *Seltime(void *argument)
     nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
 
   intarr = (int *) listArrayPtr(ilist);
+  fltarr = (double *) listArrayPtr(flist);
 
   if ( cdoVerbose )
     {
       for ( i = 0; i < nsel; i++ )
-	cdoPrint("intarr entry: %d %d", i, intarr[i]);
+	if ( operatorID == SELDATE )
+	  cdoPrint("fltarr entry: %d %14.4f", i, fltarr[i]);
+	else
+	  cdoPrint("intarr entry: %d %d", i, intarr[i]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -211,30 +232,34 @@ void *Seltime(void *argument)
       vtime = taxisInqVtime(taxisID1);
 
       copytimestep = FALSE;
-      selval = -1;
+      selival = -1;
 
       if ( operfunc == func_step )
 	{
-	  selval = tsID + 1;
-	  if ( selval > intarr[nsel-1] ) break;
+	  selival = tsID + 1;
+	  if ( selival > intarr[nsel-1] ) break;
 	}
       else if ( operfunc == func_date )
 	{
-	  selval = (vdate/intval)%moddat[operatorID];
+	  selival = (vdate/intval)%moddat[operatorID];
 	}
       else if ( operfunc == func_time )
 	{
-	  selval = (vtime/intval)%moddat[operatorID];
+	  selival = (vtime/intval)%moddat[operatorID];
+	}
+      else if ( operfunc == func_datetime )
+	{
+	  selfval = vdate + vtime/10000.;
 	}
 
       if ( operatorID == SELDATE )
 	{
-	  if ( selval >= intarr[0] && selval <= intarr[nsel-1] ) copytimestep = TRUE;
+	  if ( selfval >= fltarr[0] && selfval <= fltarr[nsel-1] ) copytimestep = TRUE;
 	}
       else
 	{
 	  for ( i = 0; i < nsel; i++ )
-	    if ( selval == intarr[i] )
+	    if ( selival == intarr[i] )
 	      {
 		copytimestep = TRUE;
 		break;

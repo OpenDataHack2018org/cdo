@@ -3,6 +3,7 @@
 
 	* using CDI library version 1.0.1
 	* set MIN_STACK_SIZE to 64MB
+	* seldate: set date format to YYYY-MM-DDThh:mm [request: Martina Stockhaus]
 	* New operator: setrcaname, seloperator for RCA GRIB datasets [Frida Brantvall]
 	* New operator: selltype, setltype, chltype, showltype [together with Frida Brantvall]
 	* New operator: setpartabv
