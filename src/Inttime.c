@@ -58,7 +58,7 @@ void *Inttime(void *argument)
 
   cdoInitialize(argument);
 
-  operatorInputArg("date,time<,increment> (format YYYY-MM-DD,HH:MM)");
+  operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm)");
   if ( operatorArgc() < 2 ) cdoAbort("Not enough arguments!");
 
   datestr = operatorArgv()[0];

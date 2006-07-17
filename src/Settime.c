@@ -70,10 +70,10 @@ void *Settime(void *argument)
   SETMON      = cdoOperatorAdd("setmon",      0, 0, "month");
   SETDAY      = cdoOperatorAdd("setday",      0, 0, "day");
   SETDATE     = cdoOperatorAdd("setdate",     0, 0, "date (format YYYY-MM-DD)");
-  SETTIME     = cdoOperatorAdd("settime",     0, 0, "time (format HH:MM)");
+  SETTIME     = cdoOperatorAdd("settime",     0, 0, "time (format hh:mm)");
   SETTUNITS   = cdoOperatorAdd("settunits",   0, 0, "time units (minutes, hours, days, months, years)");
-  SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,HH:MM)");
-  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time (format YYYY-MM-DD,HH:MM)");
+  SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,hh:mm)");
+  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time (format YYYY-MM-DD,hh:mm)");
   SETCALENDAR = cdoOperatorAdd("setcalendar", 0, 0, "calendar (standard, 360days, 365days, 366days)");
   SHIFTTIME   = cdoOperatorAdd("shifttime",   0, 0, "shift value");
 

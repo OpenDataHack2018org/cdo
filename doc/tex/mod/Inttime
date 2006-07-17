@@ -21,7 +21,7 @@ This operator performs linear interpolation between time steps.
 @Item = date
 STRING  Start date (format YYYY-MM-DD)
 @Item = time
-STRING  Start time (format HH:MM)
+STRING  Start time (format hh:mm)
 @Item = inc
 STRING  Optional increment (minutes, hours or days) [default: 0hour]
 @EndParameter

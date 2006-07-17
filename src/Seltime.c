@@ -71,7 +71,7 @@ void *Seltime(void *argument)
 
   SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
   SELDATE     = cdoOperatorAdd("seldate",     func_date,     1, "start date and end date (format YYYY-MM-DD)");
-  SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format HH:MM)");
+  SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm)");
   SELHOUR     = cdoOperatorAdd("selhour",     func_time,   100, "hours");
   SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
   SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");

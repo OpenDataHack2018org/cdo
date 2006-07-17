@@ -157,7 +157,7 @@ void *Filedes(void *argument)
 	    }
 
 	  fprintf(stdout, "  time verification time        lower bound        upper bound\n");
-	  fprintf(stdout, "  step  YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM   YYYY-MM-DD HH:MM\n");
+	  fprintf(stdout, "  step  YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm\n");
 
 	  tsID = 0;
 	  while ( (nrecs = streamInqTimestep(streamID, tsID)) )

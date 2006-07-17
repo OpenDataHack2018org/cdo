@@ -98,7 +98,7 @@ Selects all time steps with a date in a user given range.
 @Item = timesteps
 INTEGER  Comma separated list of time steps
 @Item = times
-STRING   Comma separated list of times (format HH:MM)
+STRING   Comma separated list of times (format hh:mm)
 @Item = hours
 INTEGER  Comma separated list of hours
 @Item = days
