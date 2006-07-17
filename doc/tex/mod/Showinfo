@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = showcode showvar showlevel showyear showmon showdate showtime
+@Operators = showcode showvar showstdname showlevel showyear showmon showdate showtime
 
 @BeginDescription
 This module prints, according to the actual operator,
@@ -28,6 +28,15 @@ Prints the code number of all different variables.
 @Title     = Show variable names
 @BeginDescription
 Prints the name of all different variables.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showstdname
+
+@Title     = Show standard names
+@BeginDescription
+Prints the standard name of all different variables.
 @EndDescription
 @EndOperator
 

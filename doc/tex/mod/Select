@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selvar delvar sellevel selgrid selgridname selzaxis selzaxisname seltabnum selrec
+@Operators = selcode delcode selvar delvar selstdname sellevel selgrid selgridname selzaxis selzaxisname seltabnum selrec
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -50,6 +50,16 @@ Selects all fields with variable names in a user given list.
 
 @BeginDescription
 Deletes all fields with variable names in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selstdname
+@Title     = Select standard names
+@Parameter = stdnames
+
+@BeginDescription
+Selects all fields with standard names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -130,6 +140,8 @@ This operator can not be used with netCDF data!
 INTEGER  Comma separated list of code numbers
 @Item = vars
 STRING   Comma separated list of variable names
+@Item = stdnames
+STRING   Comma separated list of standard names
 @Item = levels
 FLOAT    Comma separated list of levels
 @Item = grids
