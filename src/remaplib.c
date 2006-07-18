@@ -131,6 +131,25 @@ void remapVarsFree(REMAPVARS *rv)
       free(rv->grid2_add);
       for ( i = 0; i < 4; i++ )
 	if ( rv->wts[i] ) free(rv->wts[i]);
+
+      if ( rv->links.option == TRUE )
+	{
+	  rv->links.option = FALSE;
+
+	  if ( rv->links.max_loops )
+	    {
+	      free(rv->links.num_links);
+	      for ( i = 0; i < rv->links.max_loops; i++ )
+		{
+		  free(rv->links.src_add[i]);
+		  free(rv->links.dst_add[i]);
+		  free(rv->links.w_index[i]);
+		}
+	      free(rv->links.src_add);
+	      free(rv->links.dst_add);
+	      free(rv->links.w_index);
+	    }
+	}
     }
   else
     fprintf(stderr, "remapVarsFree Warning: vars not initialized!\n");
@@ -986,6 +1005,14 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
   for ( i = 0; i < rv->num_wts; i++ )
     rv->wts[i] = (double *) realloc(rv->wts[i], rv->max_links*sizeof(double));
 
+  rv->links.option = 0;
+  rv->links.max_links = 0;
+  rv->links.max_loops = 0;
+  rv->links.num_links = NULL;
+  rv->links.src_add = NULL;
+  rv->links.dst_add = NULL;
+  rv->links.w_index = NULL;
+
 } /* remapVarsInit */
 
 /*****************************************************************************/
@@ -1028,7 +1055,8 @@ void resize_remap_vars(REMAPVARS *rv, int increment)
 */
 void remap(double *dst_array, double missval, int dst_size, int num_links, double **map_wts, int num_wts,
 	   int *dst_add, int *src_add, 
-	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3)
+	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
+	   REMAPLINK links)
 {
   /*
     input arrays:
@@ -1076,13 +1104,30 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
 
   if ( iorder == 1 )   /* first order remapping */
     {
-      /* Unvectorized loop: (0.1-44% CPU time) Unvectorizable dependency */
-      for ( n = 0; n < num_links; n++ )
+      if ( links.option == TRUE )
 	{
-	  /*
-	  printf("%5d %5d %5d %g# dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[0][n]);
-	  */
-          dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
+	  int j;
+	  for ( j = 0; j < links.max_loops; j++ )
+	    {
+#ifdef SX
+#pragma cdir nodep
+#endif
+	      for ( n = 0; n < links.num_links[j]; n++ )
+		{
+		  dst_array[links.dst_add[j][n]] += src_array[links.src_add[j][n]]*map_wts[0][links.w_index[j][n]];
+		}
+	    }
+	}
+      else
+	{
+	  /* Unvectorized loop: Unvectorizable dependency */
+	  for ( n = 0; n < num_links; n++ )
+	    {
+	      /*
+		printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[0][n]);
+	      */
+	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
+	    }
 	}
     }
   else                 /* second order remapping */
@@ -2020,7 +2065,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
       nbr_dist[n] = bignum;
     }
 
-  /* Unvectorized loop: break (86% CPU time) (num_neighbors is constant 4) */
+  /* Unvectorized loop: break (num_neighbors is constant 4) */
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
       /* find distance to this point */
@@ -4888,6 +4933,79 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
 } /* sort_add */
+
+
+/*****************************************************************************/
+
+void reorder_links(REMAPVARS *rv)
+{
+  static char func[] = "reorder_links";
+  int j, nval = 0, max_loops = 0;
+  int lastval;
+  int nlinks;
+  int max_links = 0;
+  int n;
+
+  printf("reorder_links\n");
+  rv->links.option = TRUE;
+
+  lastval = -1;
+  for ( n = 0; n < rv->num_links; n++ )
+    {
+      if ( rv->grid2_add[n] == lastval ) nval++;
+      else
+	{
+	  if ( nval > max_loops ) max_loops = nval;
+	  nval = 1;
+	  max_links++;
+	  lastval = rv->grid2_add[n];
+	}
+    }
+
+  rv->links.max_links = max_links;
+  rv->links.max_loops = max_loops;
+
+  printf("num_links %d  max_links %d  maxval %d\n", rv->num_links, max_links, max_loops);
+
+  rv->links.num_links = (int *) malloc(max_loops*sizeof(int));
+  rv->links.dst_add   = (int **) malloc(max_loops*sizeof(int *));
+  rv->links.src_add   = (int **) malloc(max_loops*sizeof(int *));
+  rv->links.w_index   = (int **) malloc(max_loops*sizeof(int *));
+  for ( j = 0; j < max_loops; j++ )
+    {
+      rv->links.dst_add[j] = (int *) malloc(max_links*sizeof(int));
+      rv->links.src_add[j] = (int *) malloc(max_links*sizeof(int));
+      rv->links.w_index[j] = (int *) malloc(max_links*sizeof(int));
+    }
+
+  for ( j = 0; j < max_loops; j++ )
+    {
+      nval = 0;
+      lastval = -1;
+      nlinks = 0;
+
+      for ( n = 0; n < rv->num_links; n++ )
+	{
+	  if ( rv->grid2_add[n] == lastval ) nval++;
+	  else
+	    {
+	      nval = 1;
+	      lastval = rv->grid2_add[n];
+	    }
+	  
+	  if ( nval == j+1 )
+	    {
+	      rv->links.dst_add[j][nlinks] = rv->grid2_add[n];
+	      rv->links.src_add[j][nlinks] = rv->grid1_add[n];
+	      rv->links.w_index[j][nlinks] = n;
+	      nlinks++;
+	    }
+	}
+
+      rv->links.num_links[j] = nlinks;
+      printf("loop %d  nlinks %d\n", j+1, nlinks);
+    }
+}
 
 
 /*****************************************************************************/

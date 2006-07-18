@@ -64,6 +64,7 @@ void *Remap(void *argument)
   int norm_opt = NORM_OPT_NONE;
   int map_type = -1;
   int max_remaps = 0;
+  int remap_test = 0;
   int lgridboxinfo = TRUE;
   char varname[128];
   double missval;
@@ -102,6 +103,19 @@ void *Remap(void *argument)
 	  max_remaps = ival;
 	  if ( cdoVerbose )
 	    cdoPrint("Set MAX_REMAPS to %d", max_remaps);
+	}
+    }
+
+  envstring = getenv("REMAP_TEST");
+  if ( envstring )
+    {
+      int ival;
+      ival = atoi(envstring);
+      if ( ival > 0 )
+	{
+	  remap_test = ival;
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_TEST to %d", remap_test);
 	}
     }
 
@@ -410,6 +424,8 @@ void *Remap(void *argument)
 		       remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, remaps[r].vars.wts);
 	      	      
 	      if ( lwrite_remap ) goto WRITE_REMAP;
+
+	      if ( remap_test ) reorder_links(&remaps[r].vars);
 	    }
 
 	  if ( gridInqType(gridID1) == GRID_GME )
@@ -428,7 +444,7 @@ void *Remap(void *argument)
 	  else
 	    remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
-		  array1, grad1_lat, grad1_lon, grad1_latlon);
+		  array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links);
 
 	  gridsize2 = gridInqSize(gridID2);
 

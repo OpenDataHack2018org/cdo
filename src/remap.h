@@ -74,6 +74,17 @@ typedef struct {
 REMAPGRID;
 
 typedef struct {
+  int   option;
+  int   max_links;
+  int   max_loops;
+  int  *num_links;
+  int **src_add;
+  int **dst_add;
+  int **w_index;
+}
+REMAPLINK;
+
+typedef struct {
   int   pinit;            /* TRUE if the pointers are initialized     */
   int   max_links;        /* current size of link arrays              */
   int   num_links;        /* actual number of links for remapping     */
@@ -86,6 +97,8 @@ typedef struct {
   int  *grid2_add;        /* grid2 address for each link              */
 
   double *wts[4];         /* map weights for each link [max_links][num_wts] */
+
+  REMAPLINK  links;
 }
 REMAPVARS;
 
@@ -107,7 +120,8 @@ void remapGridFree(REMAPGRID *rg);
 void remap(double *dst_array, double missval, int dst_size, int dst_array_dim,
 	   double **map_wts, int map_wts_dim,
 	   int *dst_add, int *src_add, 
-	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3);
+	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
+	   REMAPLINK links);
 
 void remap_con1(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
 		int *dst_add, int *src_add, double *src_array);
@@ -123,6 +137,8 @@ void resize_remap_vars(REMAPVARS *rv, int increment);
 void remap_stat(REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval);
 void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 		     double *grad1_lon, double *grad1_latlon);
+
+void reorder_links(REMAPVARS *rv);
 
 void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights);
 

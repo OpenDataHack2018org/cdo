@@ -25,8 +25,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
+#if ! defined (SX)
 #include <sys/time.h>       /* getrlimit */
 #include <sys/resource.h>   /* getrlimit */
+#endif
 #include <unistd.h>         /* getrlimit sysconf */
 
 #include "cdi.h"
