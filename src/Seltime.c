@@ -146,7 +146,14 @@ void *Seltime(void *argument)
       if ( nsel < 1 ) cdoAbort("Not enough arguments!");
       for ( i = 0; i < nsel; i++)
 	{
-	  if ( strchr(operatorArgv()[i], '-') == NULL )
+	  if      ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
+	    {
+	      if ( i == 0 )
+		listSetFlt(flist, i, -99999999999.);
+	      else
+		listSetFlt(flist, i,  99999999999.);
+	    }
+	  else if ( strchr(operatorArgv()[i], '-') == NULL )
 	    {
 	      listSetFlt(flist, i, atof(operatorArgv()[i]));
 	    }
