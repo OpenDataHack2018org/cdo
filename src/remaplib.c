@@ -136,10 +136,10 @@ void remapVarsFree(REMAPVARS *rv)
 	{
 	  rv->links.option = FALSE;
 
-	  if ( rv->links.max_loops )
+	  if ( rv->links.num_blks )
 	    {
 	      free(rv->links.num_links);
-	      for ( i = 0; i < rv->links.max_loops; i++ )
+	      for ( i = 0; i < rv->links.num_blks; i++ )
 		{
 		  free(rv->links.src_add[i]);
 		  free(rv->links.dst_add[i]);
@@ -1007,7 +1007,7 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
 
   rv->links.option = 0;
   rv->links.max_links = 0;
-  rv->links.max_loops = 0;
+  rv->links.num_blks = 0;
   rv->links.num_links = NULL;
   rv->links.src_add = NULL;
   rv->links.dst_add = NULL;
@@ -1107,7 +1107,7 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
       if ( links.option == TRUE )
 	{
 	  int j;
-	  for ( j = 0; j < links.max_loops; j++ )
+	  for ( j = 0; j < links.num_blks; j++ )
 	    {
 #ifdef SX
 #pragma cdir nodep
@@ -4940,13 +4940,14 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
 void reorder_links(REMAPVARS *rv)
 {
   static char func[] = "reorder_links";
-  int j, nval = 0, max_loops = 0;
+  int j, nval = 0, num_blks = 0;
   int lastval;
   int nlinks;
   int max_links = 0;
   int n;
 
   printf("reorder_links\n");
+  printf("rv->num_links %d\n", rv->num_links);
   rv->links.option = TRUE;
 
   lastval = -1;
@@ -4955,30 +4956,34 @@ void reorder_links(REMAPVARS *rv)
       if ( rv->grid2_add[n] == lastval ) nval++;
       else
 	{
-	  if ( nval > max_loops ) max_loops = nval;
+	  if ( nval > num_blks ) num_blks = nval;
 	  nval = 1;
 	  max_links++;
 	  lastval = rv->grid2_add[n];
 	}
     }
 
-  rv->links.max_links = max_links;
-  rv->links.max_loops = max_loops;
+  if ( num_blks )
+    {
+      rv->links.max_links = max_links;
+      rv->links.num_blks = num_blks;
 
-  printf("num_links %d  max_links %d  maxval %d\n", rv->num_links, max_links, max_loops);
+      printf("num_links %d  max_links %d  num_blks %d\n", rv->num_links, max_links, num_blks);
 
-  rv->links.num_links = (int *) malloc(max_loops*sizeof(int));
-  rv->links.dst_add   = (int **) malloc(max_loops*sizeof(int *));
-  rv->links.src_add   = (int **) malloc(max_loops*sizeof(int *));
-  rv->links.w_index   = (int **) malloc(max_loops*sizeof(int *));
-  for ( j = 0; j < max_loops; j++ )
+      rv->links.num_links = (int *) malloc(num_blks*sizeof(int));
+      rv->links.dst_add   = (int **) malloc(num_blks*sizeof(int *));
+      rv->links.src_add   = (int **) malloc(num_blks*sizeof(int *));
+      rv->links.w_index   = (int **) malloc(num_blks*sizeof(int *));
+    }
+
+  for ( j = 0; j < num_blks; j++ )
     {
       rv->links.dst_add[j] = (int *) malloc(max_links*sizeof(int));
       rv->links.src_add[j] = (int *) malloc(max_links*sizeof(int));
       rv->links.w_index[j] = (int *) malloc(max_links*sizeof(int));
     }
 
-  for ( j = 0; j < max_loops; j++ )
+  for ( j = 0; j < num_blks; j++ )
     {
       nval = 0;
       lastval = -1;

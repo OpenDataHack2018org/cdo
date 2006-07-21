@@ -261,6 +261,8 @@ void *Remap(void *argument)
 	}
       else
 	cdoAbort("unsupported mapping method (map_type = %d)", map_type);
+
+      if ( remap_test ) reorder_links(&remaps[0].vars);
     }
 
   switch ( operfunc )

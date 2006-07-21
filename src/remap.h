@@ -76,7 +76,7 @@ REMAPGRID;
 typedef struct {
   int   option;
   int   max_links;
-  int   max_loops;
+  int   num_blks;
   int  *num_links;
   int **src_add;
   int **dst_add;

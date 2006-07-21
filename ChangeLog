@@ -3,6 +3,7 @@
 
 	* using CDI library version 1.0.1
 	* set MIN_STACK_SIZE to 64MB
+	* seldate: use parameter - for min and max val
 	* seldate: set date format to YYYY-MM-DDThh:mm [request: Martina Stockhaus]
 	* New operator: selstdname, showstdname [request: Martina Stockhaus]
 	* New operator: setrcaname, seloperator for RCA GRIB datasets [Frida Brantvall]
