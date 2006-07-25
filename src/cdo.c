@@ -1,5 +1,5 @@
 /*
-  This file is part of CDO. CDO is a collection of Operators to
+  This file is part of CD. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
   Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
@@ -128,6 +128,8 @@ static void usage(void)
   fprintf(stderr, "\n");
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
+  fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
+  fprintf(stderr, "                   (32/64 for nc, nc2, srv, ext, ieg; 8/16/24 for grb)\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Grid name or file. Available grids: \n");
   fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>\n");
@@ -142,8 +144,10 @@ static void usage(void)
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
+  /*
   fprintf(stderr, "    -p <prec>      Set the precision of the output data in bytes\n");
   fprintf(stderr, "                   (4/8 for nc, nc2, srv, ext, ieg; 1/2/3 for grb)\n");
+  */
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
   fprintf(stderr, "    -r             Convert from an absolute to a relative time axis\n");
   fprintf(stderr, "    -s             Silent mode\n");
@@ -314,13 +318,69 @@ static void setDefaultDataType(char *datatypestr)
   if ( isdigit((int) *datatypestr) )
     {
       datatype = atoi(datatypestr);
+      if ( datatype < 10 )
+	datatypestr += 1;
+      else
+	datatypestr += 2;
+
+      if      ( datatype > 0 && datatype < 32 ) cdoDefaultDataType = datatype;
+      else if ( datatype == 32 )
+	{
+	  if ( cdoDefaultFileType == FILETYPE_GRB )
+	    cdoDefaultDataType = DATATYPE_PACK32;
+	  else
+	    cdoDefaultDataType = DATATYPE_FLT32;
+	}
+      else if ( datatype == 64 ) cdoDefaultDataType = DATATYPE_FLT64;
+      else
+	{
+	  fprintf(stderr, "Unsupported datatype %d!\n", datatype);
+	  fprintf(stderr, "Use 32/64 for filetype nc, srv, ext, ieg and 1-32 for grb.\n");
+	  exit(EXIT_FAILURE);
+	}
+    }
+
+  if ( *datatypestr == 'l' || *datatypestr == 'L' )
+    {
+      if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
+      datatypestr++;
+    }
+
+  if ( *datatypestr == 'b' || *datatypestr == 'B' )
+    {
+      if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
+      datatypestr++;
+    }
+
+  if ( *datatypestr == 'z' || *datatypestr == 'Z' )
+    {
+      int level = 6;
+      datatypestr++;
+      if ( isdigit((int) *datatypestr) )
+	{
+	  level = atoi(datatypestr);
+	  datatypestr++;	      
+	}
+      cdiDefCompress(level);
+    }
+}
+
+
+static void setDefaultDataTypeByte(char *datatypestr)
+{
+  static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
+  int datatype = -1;
+
+  if ( isdigit((int) *datatypestr) )
+    {
+      datatype = atoi(datatypestr);
       datatypestr++;
 
-      if      ( datatype == 1 ) cdoDefaultDataType = DATATYPE_PACK1;
-      else if ( datatype == 2 ) cdoDefaultDataType = DATATYPE_PACK2;
-      else if ( datatype == 3 ) cdoDefaultDataType = DATATYPE_PACK3;
-      else if ( datatype == 4 ) cdoDefaultDataType = DATATYPE_REAL4;
-      else if ( datatype == 8 ) cdoDefaultDataType = DATATYPE_REAL8;
+      if      ( datatype == 1 ) cdoDefaultDataType = DATATYPE_PACK8;
+      else if ( datatype == 2 ) cdoDefaultDataType = DATATYPE_PACK16;
+      else if ( datatype == 3 ) cdoDefaultDataType = DATATYPE_PACK24;
+      else if ( datatype == 4 ) cdoDefaultDataType = DATATYPE_FLT32;
+      else if ( datatype == 8 ) cdoDefaultDataType = DATATYPE_FLT64;
       else
 	{
 	  fprintf(stderr, "Unsupported datatype %d!\n", datatype);
@@ -439,7 +499,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:p:g:i:l:m:t:D:abdhRrsTVvz")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:p:g:i:l:m:t:D:aBdhRrsTVvz")) != -1 )
     {
       switch (c)
 	{
@@ -447,6 +507,9 @@ int main(int argc, char *argv[])
 	  cdoDefaultTimeType = TAXIS_ABSOLUTE;
 	  break;
 	case 'b':
+	  setDefaultDataType(cdoOptarg);
+	  break;
+	case 'B':
 	  cdoBenchmark = TRUE;
 	  break;
 	case 'd':
@@ -475,7 +538,7 @@ int main(int argc, char *argv[])
 	  cdiDefMissval(atof(cdoOptarg));
 	  break;
 	case 'p':
-	  setDefaultDataType(cdoOptarg);
+	  setDefaultDataTypeByte(cdoOptarg);
 	  break;
 	case 'R':
 	  cdoRegulargrid = TRUE;

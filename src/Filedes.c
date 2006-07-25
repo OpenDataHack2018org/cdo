@@ -224,7 +224,7 @@ void *Filedes(void *argument)
   else if ( operatorID == PARTAB )
     {
       int varID, code, tabnum, tableID, prec;
-      char *pstr = NULL;
+      char pstr[4];
       char varname[128], varlongname[128], varstdname[128], varunits[128];
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -243,15 +243,14 @@ void *Filedes(void *argument)
 	  vlistInqVarUnits(vlistID, varID, varunits);
 
 	  prec = vlistInqVarDatatype(vlistID, varID);
-	  if      ( prec == DATATYPE_PACK  ) pstr = "P0";
-	  else if ( prec == DATATYPE_PACK1 ) pstr = "P1";
-	  else if ( prec == DATATYPE_PACK2 ) pstr = "P2";
-	  else if ( prec == DATATYPE_PACK3 ) pstr = "P3";
-	  else if ( prec == DATATYPE_REAL4 ) pstr = "R4";
-	  else if ( prec == DATATYPE_REAL8 ) pstr = "R8";
-	  else if ( prec == DATATYPE_INT1  ) pstr = "I1";
-	  else if ( prec == DATATYPE_INT2  ) pstr = "I2";
-	  else if ( prec == DATATYPE_INT4  ) pstr = "I4";
+	  if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");
+	  else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
+	  else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
+	  else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
+	  else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
+	  else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
+	  else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");
+	  else                                strcpy(pstr, "-1");
 
 	  if ( code   > 0 ) fprintf(stdout, "  CODE=%d\n", code);
 	  if ( tabnum > 0 ) fprintf(stdout, "  TABLE=%d\n", tabnum);

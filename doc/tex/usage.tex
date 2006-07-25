@@ -15,6 +15,23 @@ The following options are available for all operators:
 \begin{tabbing}
 \makebox[1.5in][l]{\hspace*{1cm}\sl -a}
          \= Convert from a relative to an absolute time axis. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -b $<$nbits$>$}
+         \> Set the number of bits for the output precision. The valid precisions depends \\
+         \> on the file format:\\
+         \> \parbox[r]{3in}{
+              \vspace*{1mm}
+              \hspace*{0cm}\begin{tabular}{|l|l|}
+              \hline
+              \rowcolor[gray]{.9}
+                \sl $<$format$>$ & \sl $<$nbits$>$ \\
+                {\tt grb}                    & {\tt 8/16/24} \\
+                {\tt nc, nc2, srv, ext, ieg} & {\tt 32/64}   \\
+              \hline
+              \end{tabular}
+              \vspace*{1mm}
+            } \\
+         \> For {\tt srv}, {\tt ext} and {\tt ieg} format a {\tt L} or {\tt B} can be added to set the byteorder \\
+         \> to Little or Big endian. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -f $<$format$>$}
          \> Set the output file format. The valid file formats are: \\
          \> \parbox[r]{3in}{
@@ -40,23 +57,6 @@ The following options are available for all operators:
          \> Help information for the operators. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -m $<$missval$>$}
          \> Set the default missing value (default: {\tt-9e+33}). \\
-\makebox[1.5in][l]{\hspace*{1cm}\sl -p $<$prec$>$}
-         \> Set the precision of the output data in bytes. The valid precisions depends \\
-         \> on the file format:\\
-         \> \parbox[r]{3in}{
-              \vspace*{1mm}
-              \hspace*{0cm}\begin{tabular}{|l|l|}
-              \hline
-              \rowcolor[gray]{.9}
-                \sl $<$format$>$ & \sl $<$prec$>$ \\
-                {\tt grb}                    & {\tt 1/2/3} \\
-                {\tt nc, nc2, srv, ext, ieg} & {\tt 4/8}   \\
-              \hline
-              \end{tabular}
-              \vspace*{1mm}
-            } \\
-         \> For {\tt srv}, {\tt ext} and {\tt ieg} format a {\tt L} or {\tt B} can be added to set the byteorder \\
-         \> to Little or Big endian. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -R}
          \> Convert GRIB data from reduced to regular grid. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -r}

@@ -447,7 +447,7 @@ void *Gradsdes(void *argument)
        filetype != FILETYPE_EXT &&
        filetype != FILETYPE_IEG &&
        filetype != FILETYPE_GRB )
-    cdoAbort("unsupported file format!");
+    cdoAbort("Unsupported file format!");
 
   /* find the first lonlat or Gaussian grid */
 
@@ -879,7 +879,7 @@ void *Gradsdes(void *argument)
 	       filetype == FILETYPE_IEG )
 	    {
 	      prec = vlistInqVarDatatype(vlistID, varID);
-	      if ( prec != DATATYPE_REAL4 )
+	      if ( prec != DATATYPE_FLT32 )
 		cdoAbort("datatype must be 4 bytes!");
 	    }
 

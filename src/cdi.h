@@ -37,11 +37,40 @@ extern "C" {
 #define  DATATYPE_PACK1           1
 #define  DATATYPE_PACK2           2
 #define  DATATYPE_PACK3           3
-#define  DATATYPE_REAL4           4
-#define  DATATYPE_REAL8           5
-#define  DATATYPE_INT1            6
-#define  DATATYPE_INT2            7
-#define  DATATYPE_INT4            8
+#define  DATATYPE_PACK4           4
+#define  DATATYPE_PACK5           5
+#define  DATATYPE_PACK6           6
+#define  DATATYPE_PACK7           7
+#define  DATATYPE_PACK8           8
+#define  DATATYPE_PACK9           9
+#define  DATATYPE_PACK10         10
+#define  DATATYPE_PACK11         11
+#define  DATATYPE_PACK12         12
+#define  DATATYPE_PACK13         13
+#define  DATATYPE_PACK14         14
+#define  DATATYPE_PACK15         15
+#define  DATATYPE_PACK16         16
+#define  DATATYPE_PACK17         17
+#define  DATATYPE_PACK18         18
+#define  DATATYPE_PACK19         19
+#define  DATATYPE_PACK20         20
+#define  DATATYPE_PACK21         21
+#define  DATATYPE_PACK22         22
+#define  DATATYPE_PACK23         23
+#define  DATATYPE_PACK24         24
+#define  DATATYPE_PACK25         25
+#define  DATATYPE_PACK26         26
+#define  DATATYPE_PACK27         27
+#define  DATATYPE_PACK28         28
+#define  DATATYPE_PACK29         29
+#define  DATATYPE_PACK30         30
+#define  DATATYPE_PACK31         31
+#define  DATATYPE_PACK32         32
+#define  DATATYPE_FLT32         132
+#define  DATATYPE_FLT64         164
+#define  DATATYPE_INT8          208
+#define  DATATYPE_INT16         216
+#define  DATATYPE_INT32         232
 
 /* GRID types */
 
@@ -51,7 +80,7 @@ extern "C" {
 #define  GRID_LONLAT              4
 #define  GRID_SPECTRAL            5
 #define  GRID_FOURIER             6
-#define  GRID_GME                 7
+#define  GRID_GME                 7  /* Icosahedral-hexagonal GME Grid */
 #define  GRID_TRAJECTORY          8
 #define  GRID_CELL                9
 #define  GRID_CURVILINEAR        10
