@@ -78,7 +78,7 @@ void *Input(void *argument)
   int levelID;
   int tsID, taxisID = 0;
   int streamID = -1;
-  int vlistID;
+  int vlistID = -1;
   int nmiss = 0;
   int code = 0, code0 = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
   int output_filetype = FILETYPE_GRB;

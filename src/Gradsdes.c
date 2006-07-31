@@ -198,7 +198,7 @@ void *Gradsdes(void *argument)
   int ltype, code;
   const char *datfile;
   char ctlfile[1024];
-  size_t len;
+  int len;
   char varname[256], varlongname[256], varunits[256];
   FILE *gdp;
   int yrev = FALSE;
@@ -516,7 +516,7 @@ void *Gradsdes(void *argument)
     }
 
   strcpy(ctlfile, cdoStreamName(0));
-  len = strlen(ctlfile);
+  len = (int) strlen(ctlfile);
   if ( len > 4 )
     {
       if ( filetype == FILETYPE_SRV )
@@ -555,7 +555,7 @@ void *Gradsdes(void *argument)
     {
       fprintf(gdp, "DTYPE  GRIB\n");
 
-      len = strlen(ctlfile);
+      len = (int) strlen(ctlfile);
       strcpy(&ctlfile[len-4], ".gmp");
       
       fprintf(gdp, "INDEX  ^%s\n", ctlfile);
@@ -888,7 +888,7 @@ void *Gradsdes(void *argument)
 	  nlev    = zaxisInqSize(zaxisID);
 	  vlistInqVarName(vlistID, varID, varname);
 
-	  len = strlen(varname);
+	  len = (int) strlen(varname);
 	  for ( i = 0; i < len; i++ )
 	    if ( varname[i] == '-' ) break;
 
