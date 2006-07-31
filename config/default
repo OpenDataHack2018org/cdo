@@ -16,6 +16,7 @@ case "${HOSTNAME}" in
     ds*)
 	./configure --prefix=$HOME/local \
                     --with-netcdf=/pool/ia64/netcdf/netcdf-3.6.0-p1 \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias -DMIN_BUF_SIZE=4194304"
 	;;
     wasser*)
@@ -27,13 +28,15 @@ case "${HOSTNAME}" in
     linux)
 	./configure --prefix=$HOME/local \
                     --enable-dap --with-netcdf=$HOME/local \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
                     CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall"
 	;;
     gata)
 # opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
 	            --with-netcdf=/client \
-	            CC=gcc CFLAGS="-ansi -g -D_REENTRANT -O2 -Wall " LIBS="-lm -lz"
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/LINUX/include"  LIBS=$HOME/local/LINUX/lib/libsz.a \
+	            CC=gcc CFLAGS="-ansi -g -D_REENTRANT -O2 -Wall "
 	;;
     regio01)
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
@@ -50,6 +53,7 @@ case "${HOSTNAME}" in
     xxf)
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN \
                     --with-netcdf=/client \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include"  LIBS=$HOME/local/SUN/lib/libsz.a \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
 # sparc-sun-solaris2.9
