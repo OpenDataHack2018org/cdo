@@ -72,6 +72,7 @@ int cdoTimer       = FALSE;
 int cdoVerbose     = FALSE;
 int cdoDebug       = 0;
 
+
 int timer_total, timer_read, timer_write;
 int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
@@ -361,7 +362,7 @@ static void setDefaultDataType(char *datatypestr)
 	  level = atoi(datatypestr);
 	  datatypestr++;	      
 	}
-      cdiDefCompress(level);
+      cdiDefCompress(COMPRESS_GZIP, level);
     }
 }
 
@@ -410,7 +411,7 @@ static void setDefaultDataTypeByte(char *datatypestr)
 	  level = atoi(datatypestr);
 	  datatypestr++;	      
 	}
-      cdiDefCompress(level);
+      cdiDefCompress(COMPRESS_GZIP, level);
     }
 }
 
@@ -467,6 +468,19 @@ int cdoFiletype(void)
 }
 
 
+void defineCompress(const char *arg)
+{
+  size_t len = strlen(arg);
+
+  if      ( strncmp(arg, "szip", len) == 0 )
+    cdiDefCompress(COMPRESS_SZIP, 0);
+  else if ( strncmp(arg, "gzip", len) == 0 )
+    cdiDefCompress(COMPRESS_GZIP, 6);
+  else
+    fprintf(stderr, "Compression %s unsupported!\n", arg);
+}
+
+
 int main(int argc, char *argv[])
 {
   static char func[] = "main";
@@ -499,7 +513,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:p:g:i:l:m:t:D:aBdhRrsTVvz")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:p:g:i:l:m:t:D:z:aBdhRrsTuVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -563,7 +577,10 @@ int main(int argc, char *argv[])
 	  cdoVerbose = TRUE;
 	  break;
 	case 'z':
-	  cdiDefCompress(6);
+	  defineCompress(cdoOptarg);
+          break;
+	case 'Z':
+	  cdiDefCompress(COMPRESS_GZIP, 6);
 	  break;
 	case ':':
 	  fprintf(stderr, "\nmissing parameter for one of the options\n\n");	  

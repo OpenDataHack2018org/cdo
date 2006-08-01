@@ -31,6 +31,12 @@ extern "C" {
 #define  FILETYPE_H5              7   /* File type HDF5                   */
 #define  FILETYPE_IEG             8   /* File type IEG                    */
 
+/* Compress types */
+
+#define  COMPRESS_SZIP            1
+#define  COMPRESS_GZIP            2
+#define  COMPRESS_BZIP2           3
+
 /* Data types */
 
 #define  DATATYPE_PACK            0
@@ -140,7 +146,7 @@ void    cdiPrintVersion(void);
 void    cdiDefMissval(double missval);
 double  cdiInqMissval(void);
 int     cdiDefGlobal(const char *string, int val);
-void    cdiDefCompress(int level);
+void    cdiDefCompress(int type, int level);
 
 /* STREAM control routines */
 
