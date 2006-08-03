@@ -2,6 +2,7 @@
 2006-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.1
+	* add option -b to set the number of bits for the output precision
 	* support of 1 to 32 bit GRIB data
 	* set MIN_STACK_SIZE to 64MB
 	* seldate: use parameter - for min and max val

@@ -130,7 +130,7 @@ static void usage(void)
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (32/64 for nc, nc2, srv, ext, ieg; 8/16/24 for grb)\n");
+  fprintf(stderr, "                   (32/64 for nc, nc2, srv, ext, ieg; 1 - 32 for grb)\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Grid name or file. Available grids: \n");
   fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>\n");

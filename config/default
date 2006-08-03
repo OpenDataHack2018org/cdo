@@ -36,7 +36,7 @@ case "${HOSTNAME}" in
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
 	            --with-netcdf=/client \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/LINUX/include"  LIBS=$HOME/local/LINUX/lib/libsz.a \
-	            CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall "
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall "
 	;;
     regio01)
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
