@@ -1,5 +1,10 @@
 
-	
+2006-09-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.0.2
+	* Seltime: print warning message if parameter not found
+	* Version 1.0.2 released
+
 2006-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.1

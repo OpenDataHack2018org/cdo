@@ -59,11 +59,12 @@ void *Seltime(void *argument)
   int taxisID1, taxisID2;
   int vdate, vtime;
   int copytimestep;
-  int i;
+  int i, isel;
   int lcopy = FALSE;
   int gridsize;
   int status;
   int nmiss;
+  int *selfound = NULL;
   int year, month, day, hour, minute;
   double selfval = 0, *fltarr, fval;
   double *array = NULL;
@@ -200,6 +201,12 @@ void *Seltime(void *argument)
   intarr = (int *) listArrayPtr(ilist);
   fltarr = (double *) listArrayPtr(flist);
 
+  if ( nsel )
+    {
+      selfound = (int *) malloc(nsel*sizeof(int));
+      for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
+    }
+
   if ( cdoVerbose )
     {
       for ( i = 0; i < nsel; i++ )
@@ -261,7 +268,12 @@ void *Seltime(void *argument)
 
       if ( operatorID == SELDATE )
 	{
-	  if ( selfval >= fltarr[0] && selfval <= fltarr[nsel-1] ) copytimestep = TRUE;
+	  if ( selfval >= fltarr[0] && selfval <= fltarr[nsel-1] )
+	    {
+	      copytimestep = TRUE;
+	      selfound[0]      = TRUE;
+	      selfound[nsel-1] = TRUE;
+	    }
 	}
       else
 	{
@@ -269,6 +281,7 @@ void *Seltime(void *argument)
 	    if ( selival == intarr[i] )
 	      {
 		copytimestep = TRUE;
+		selfound[i] = TRUE;
 		break;
 	      }
 	}
@@ -303,6 +316,48 @@ void *Seltime(void *argument)
  
   if ( ! lcopy )
     if ( array ) free(array);
+
+  for ( isel = 0; isel < nsel; isel++ )
+    {
+      if ( selfound[isel] == FALSE )
+	{
+	  if ( operatorID == SELTIMESTEP )
+	    {
+	      cdoWarning("Time step %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELDATE )
+	    {
+	      cdoWarning("Date between %g and %g not found!", fltarr[0], fltarr[nsel-1]);
+	    }
+	  else if ( operatorID == SELTIME )
+	    {
+	      cdoWarning("Time %g not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELHOUR )
+	    {
+	      cdoWarning("Hour %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELDAY )
+	    {
+	      cdoWarning("Day %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELMON )
+	    {
+	      cdoWarning("Month %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELYEAR )
+	    {
+	      cdoWarning("Year %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELSEAS )
+	    {
+	      if ( isel < 3 )
+		cdoWarning("Month %d not found!", intarr[isel]);
+	    }
+	}
+    }
+
+  if ( selfound ) free(selfound);
 
   listDelete(ilist);
 
