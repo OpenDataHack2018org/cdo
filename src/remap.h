@@ -13,8 +13,8 @@
 #define  RESTRICT_LATLON    2
 
 
-#define  DEG2RAD  (pi/180.)   /* conversion for deg to rad */
-#define  RAD2DEG  (180./pi)   /* conversion for rad to deg */
+#define  DEG2RAD  (PI/180.)   /* conversion for deg to rad */
+#define  RAD2DEG  (180./PI)   /* conversion for rad to deg */
 
 
 typedef struct {

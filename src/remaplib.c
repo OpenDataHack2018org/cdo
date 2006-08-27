@@ -43,6 +43,8 @@
 
 */
 
+/* #define REMAPTEST 1 */
+
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
 #endif
@@ -61,17 +63,17 @@
 
 /* constants */
 
-#define  zero     0.0
-#define  one      1.0
-#define  two      2.0
-#define  three    3.0
-#define  half     0.5
-#define  quart    0.25
-#define  bignum   1.e+20
-#define  tiny     1.e-14
-#define  pi       3.14159265359
-#define  pi2      two*pi
-#define  pih      half*pi
+#define  ZERO     0.0
+#define  ONE      1.0
+#define  TWO      2.0
+#define  THREE    3.0
+#define  HALF     0.5
+#define  QUART    0.25
+#define  BIGNUM   1.e+20
+#define  TINY     1.e-14
+#define  PI       3.14159265359
+#define  PI2      TWO*PI
+#define  PIH      HALF*PI
 
 
 extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
@@ -170,8 +172,8 @@ void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corn
 
   for ( i = 0; i < xsize; i++ )
     {
-      minlon = grid_center_lon[i] - half*dlon;
-      maxlon = grid_center_lon[i] + half*dlon;
+      minlon = grid_center_lon[i] - HALF*dlon;
+      maxlon = grid_center_lon[i] + HALF*dlon;
       for ( j = 0; j < ysize; j++ )
 	{
 	  index = j*4*xsize + 4*i;
@@ -562,55 +564,55 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 
   for ( i = 0; i < rg->grid1_size; i++ )
     {
-      if ( rg->grid1_center_lon[i] > pi2 )  rg->grid1_center_lon[i] -= pi2;
-      if ( rg->grid1_center_lon[i] < zero ) rg->grid1_center_lon[i] += pi2;
+      if ( rg->grid1_center_lon[i] > PI2 )  rg->grid1_center_lon[i] -= PI2;
+      if ( rg->grid1_center_lon[i] < ZERO ) rg->grid1_center_lon[i] += PI2;
     }
   for ( i = 0; i < rg->grid2_size; i++ )
     {
-      if ( rg->grid2_center_lon[i] > pi2 )  rg->grid2_center_lon[i] -= pi2;
-      if ( rg->grid2_center_lon[i] < zero ) rg->grid2_center_lon[i] += pi2;
+      if ( rg->grid2_center_lon[i] > PI2 )  rg->grid2_center_lon[i] -= PI2;
+      if ( rg->grid2_center_lon[i] < ZERO ) rg->grid2_center_lon[i] += PI2;
     }
 
   if ( rg->grid1_corners )
     for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
       {
-	if ( rg->grid1_corner_lon[i] > pi2 )  rg->grid1_corner_lon[i] -= pi2;
-	if ( rg->grid1_corner_lon[i] < zero ) rg->grid1_corner_lon[i] += pi2;
+	if ( rg->grid1_corner_lon[i] > PI2 )  rg->grid1_corner_lon[i] -= PI2;
+	if ( rg->grid1_corner_lon[i] < ZERO ) rg->grid1_corner_lon[i] += PI2;
       }
 
   if ( rg->grid2_corners )
     for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
       {
-	if ( rg->grid2_corner_lon[i] > pi2 )  rg->grid2_corner_lon[i] -= pi2;
-	if ( rg->grid2_corner_lon[i] < zero ) rg->grid2_corner_lon[i] += pi2;
+	if ( rg->grid2_corner_lon[i] > PI2 )  rg->grid2_corner_lon[i] -= PI2;
+	if ( rg->grid2_corner_lon[i] < ZERO ) rg->grid2_corner_lon[i] += PI2;
       }
 
   /*  make sure input latitude range is within the machine values for +/- pi/2 */
 
   for ( i = 0; i < rg->grid1_size; i++ )
     {
-      if ( rg->grid1_center_lat[i] >  pih ) rg->grid1_center_lat[i] =  pih;
-      if ( rg->grid1_center_lat[i] < -pih ) rg->grid1_center_lat[i] = -pih;
+      if ( rg->grid1_center_lat[i] >  PIH ) rg->grid1_center_lat[i] =  PIH;
+      if ( rg->grid1_center_lat[i] < -PIH ) rg->grid1_center_lat[i] = -PIH;
     }
 
   if ( rg->grid1_corners )
     for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
       {
-	if ( rg->grid1_corner_lat[i] >  pih ) rg->grid1_corner_lat[i] =  pih;
-	if ( rg->grid1_corner_lat[i] < -pih ) rg->grid1_corner_lat[i] = -pih;
+	if ( rg->grid1_corner_lat[i] >  PIH ) rg->grid1_corner_lat[i] =  PIH;
+	if ( rg->grid1_corner_lat[i] < -PIH ) rg->grid1_corner_lat[i] = -PIH;
       }
   
   for ( i = 0; i < rg->grid2_size; i++ )
     {
-      if ( rg->grid2_center_lat[i] >  pih ) rg->grid2_center_lat[i] =  pih;
-      if ( rg->grid2_center_lat[i] < -pih ) rg->grid2_center_lat[i] = -pih;
+      if ( rg->grid2_center_lat[i] >  PIH ) rg->grid2_center_lat[i] =  PIH;
+      if ( rg->grid2_center_lat[i] < -PIH ) rg->grid2_center_lat[i] = -PIH;
     }
 
   if ( rg->grid2_corners )
     for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
       {
-	if ( rg->grid2_corner_lat[i] >  pih ) rg->grid2_corner_lat[i] =  pih;
-	if ( rg->grid2_corner_lat[i] < -pih ) rg->grid2_corner_lat[i] = -pih;
+	if ( rg->grid2_corner_lat[i] >  PIH ) rg->grid2_corner_lat[i] =  PIH;
+	if ( rg->grid2_corner_lat[i] < -PIH ) rg->grid2_corner_lat[i] = -PIH;
       }
 
   /*  compute bounding boxes for restricting future grid searches */
@@ -657,7 +659,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      ip1 = 1;
 	      /* but if it is not, correct */
 	      e_add = (j - 1)*nx + ip1 - 1;
-	      if ( fabs(rg->grid1_center_lat[e_add] - rg->grid1_center_lat[n]) > pih ) ip1 = i;
+	      if ( fabs(rg->grid1_center_lat[e_add] - rg->grid1_center_lat[n]) > PIH ) ip1 = i;
 	    }
 
           if ( j < ny )
@@ -668,7 +670,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      jp1 = 1;
 	      /* but if it is not, correct */
 	      n_add = (jp1 - 1)*nx + i - 1;
-	      if ( fabs(rg->grid1_center_lat[n_add] - rg->grid1_center_lat[n]) > pih ) jp1 = j;
+	      if ( fabs(rg->grid1_center_lat[n_add] - rg->grid1_center_lat[n]) > PIH ) jp1 = j;
 	    }
 
           n_add  = (jp1 - 1)*nx + i - 1;
@@ -745,7 +747,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      ip1 = 1;
 	      /* but if it is not, correct */
 	      e_add = (j - 1)*nx + ip1 - 1;
-	      if ( fabs(rg->grid2_center_lat[e_add] - rg->grid2_center_lat[n]) > pih ) ip1 = i;
+	      if ( fabs(rg->grid2_center_lat[e_add] - rg->grid2_center_lat[n]) > PIH ) ip1 = i;
 	    }
 
           if ( j < ny )
@@ -756,7 +758,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      jp1 = 1;
 	      /* but if it is not, correct */
 	      n_add = (jp1 - 1)*nx + i - 1;
-	      if ( fabs(rg->grid2_center_lat[n_add] - rg->grid2_center_lat[n]) > pih ) jp1 = j;
+	      if ( fabs(rg->grid2_center_lat[n_add] - rg->grid2_center_lat[n]) > PIH ) jp1 = j;
 	    }
 
           n_add = (jp1 - 1)*nx + i - 1;
@@ -791,39 +793,39 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
 
   for ( n = 0; n < rg->grid1_size; n++ )
-    if ( fabs(rg->grid1_bound_box[4*n+3] - rg->grid1_bound_box[4*n+2]) > pi )
+    if ( fabs(rg->grid1_bound_box[4*n+3] - rg->grid1_bound_box[4*n+2]) > PI )
       {
-	rg->grid1_bound_box[4*n+2] = zero;
-	rg->grid1_bound_box[4*n+3] = pi2;
+	rg->grid1_bound_box[4*n+2] = ZERO;
+	rg->grid1_bound_box[4*n+3] = PI2;
       }
 
   for ( n = 0; n < rg->grid2_size; n++ )
-    if ( fabs(rg->grid2_bound_box[4*n+3] - rg->grid2_bound_box[4*n+2]) > pi )
+    if ( fabs(rg->grid2_bound_box[4*n+3] - rg->grid2_bound_box[4*n+2]) > PI )
       {
-        rg->grid2_bound_box[4*n+2] = zero;
-        rg->grid2_bound_box[4*n+3] = pi2;
+        rg->grid2_bound_box[4*n+2] = ZERO;
+        rg->grid2_bound_box[4*n+3] = PI2;
       }
 
   /* try to check for cells that overlap poles */
 
   for ( n = 0; n < rg->grid1_size; n++ )
     if ( rg->grid1_center_lat[n] > rg->grid1_bound_box[4*n+1] )
-      rg->grid1_bound_box[4*n+1] = pih;
+      rg->grid1_bound_box[4*n+1] = PIH;
 
   for ( n = 0; n < rg->grid1_size; n++ )
     if ( rg->grid1_center_lat[n] < rg->grid1_bound_box[4*n+0] )
-      rg->grid1_bound_box[4*n+0] = -pih;
+      rg->grid1_bound_box[4*n+0] = -PIH;
 
   for ( n = 0; n < rg->grid2_size; n++ )
     if ( rg->grid2_center_lat[n] > rg->grid2_bound_box[4*n+1] )
-      rg->grid2_bound_box[4*n+1] = pih;
+      rg->grid2_bound_box[4*n+1] = PIH;
 
   for ( n = 0; n < rg->grid2_size; n++ )
     if ( rg->grid2_center_lat[n] < rg->grid2_bound_box[4*n+0] )
-      rg->grid2_bound_box[4*n+0] = -pih;
-
+      rg->grid2_bound_box[4*n+0] = -PIH;
 
   /* ##################### */
+#ifdef REMAPTEST
   /*
   nx = rg->grid1_dims[0];
   ny = rg->grid1_dims[1];
@@ -847,6 +849,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	     RAD2DEG*rg->grid2_bound_box[4*n+2], RAD2DEG*rg->grid2_bound_box[4*n+3]);
     }
   */
+#endif
 
   /*
     set up and assign address ranges to search bins in order to 
@@ -864,14 +867,14 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       rg->bin_lats  = (double *) realloc(rg->bin_lats, 2*nbins*sizeof(double));
       rg->bin_lons  = (double *) realloc(rg->bin_lons, 2*nbins*sizeof(double));
 
-      dlat = pi/rg->num_srch_bins;
+      dlat = PI/rg->num_srch_bins;
 
       for ( n = 0; n < rg->num_srch_bins; n++ )
 	{
-	  rg->bin_lats[2*n+0] = (n  )*dlat - pih;
-	  rg->bin_lats[2*n+1] = (n+1)*dlat - pih;
-	  rg->bin_lons[2*n+0] = zero;
-	  rg->bin_lons[2*n+1] = pi2;
+	  rg->bin_lats[2*n+0] = (n  )*dlat - PIH;
+	  rg->bin_lats[2*n+1] = (n+1)*dlat - PIH;
+	  rg->bin_lons[2*n+0] = ZERO;
+	  rg->bin_lons[2*n+1] = PI2;
 	  rg->bin_addr1[2*n+0] = rg->grid1_size;
 	  rg->bin_addr1[2*n+1] = 0;
 	  rg->bin_addr2[2*n+0] = rg->grid2_size;
@@ -898,8 +901,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else if ( rg->restrict_type == RESTRICT_LATLON )
     {
-      dlat = pi /rg->num_srch_bins;
-      dlon = pi2/rg->num_srch_bins;
+      dlat = PI /rg->num_srch_bins;
+      dlon = PI2/rg->num_srch_bins;
 
       nbins = rg->num_srch_bins*rg->num_srch_bins;
 
@@ -915,8 +918,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       for ( j = 0; j < rg->num_srch_bins; j++ )
 	for ( i = 0; i < rg->num_srch_bins; i++ )
 	  {
-	    rg->bin_lats[2*n+0]  = (j  )*dlat - pih;
-	    rg->bin_lats[2*n+1]  = (j+1)*dlat - pih;
+	    rg->bin_lats[2*n+0]  = (j  )*dlat - PIH;
+	    rg->bin_lats[2*n+1]  = (j+1)*dlat - PIH;
 	    rg->bin_lons[2*n+0]  = (i  )*dlon;
 	    rg->bin_lons[2*n+1]  = (i+1)*dlon;
 	    rg->bin_addr1[2*n+0] = rg->grid1_size;
@@ -1100,7 +1103,7 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
 #pragma cdir nodep
 #endif
   for ( n = 0; n < num_links; n++ )
-    if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = zero;
+    if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
   if ( iorder == 1 )   /* first order remapping */
     {
@@ -1203,7 +1206,7 @@ void remap_con1(double *dst_array, double missval, int dst_size, int num_links, 
   for ( i = 0; i < dst_size; i++ ) dst_array[i] = missval;
 
   for ( n = 0; n < num_links; n++ )
-    if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = zero;
+    if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
   for ( i = 0; i < dst_size; i++ )
     {
@@ -1337,6 +1340,10 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   nx = src_grid_dims[0];
   ny = src_grid_dims[1];
 
+#ifdef REMAPTEST
+  printf("min_add, max_add, nx, ny %d %d %d %d\n", min_add, max_add, nx, ny);
+#endif
+
   /* srch_loop */
   /* Unvectorized loop: break and return */
   for ( srch_add = min_add; srch_add <= max_add; srch_add++ )
@@ -1387,14 +1394,14 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	  */
 
           vec1_lon = src_lons[0] - plon;
-          if      ( vec1_lon >  pi ) src_lons[0] -= pi2;
-          else if ( vec1_lon < -pi ) src_lons[0] += pi2;
+          if      ( vec1_lon >  PI ) src_lons[0] -= PI2;
+          else if ( vec1_lon < -PI ) src_lons[0] += PI2;
 
           for ( n = 1; n < 4; n++ )
 	    {
 	      vec1_lon = src_lons[n] - src_lons[0];
-	      if      ( vec1_lon >  pi ) src_lons[n] -= pi2;
-	      else if ( vec1_lon < -pi ) src_lons[n] += pi2;
+	      if      ( vec1_lon >  PI ) src_lons[n] -= PI2;
+	      else if ( vec1_lon < -PI ) src_lons[n] += PI2;
 	    }
 
           /* corner_loop */
@@ -1415,19 +1422,19 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
 	      /* check for 0,2pi crossings */
 
-	      if      ( vec1_lon >  three*pih ) vec1_lon -= pi2;
-	      else if ( vec1_lon < -three*pih ) vec1_lon += pi2;
+	      if      ( vec1_lon >  THREE*PIH ) vec1_lon -= PI2;
+	      else if ( vec1_lon < -THREE*PIH ) vec1_lon += PI2;
 
-	      if      ( vec2_lon >  three*pih ) vec2_lon -= pi2;
-	      else if ( vec2_lon < -three*pih ) vec2_lon += pi2;
+	      if      ( vec2_lon >  THREE*PIH ) vec2_lon -= PI2;
+	      else if ( vec2_lon < -THREE*PIH ) vec2_lon += PI2;
 
 	      cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
 
 	      /*
-		if cross product is less than zero, this cell doesn't work
+		if cross product is less than ZERO, this cell doesn't work
 	      */
 	      if ( n == 0 ) cross_product_last = cross_product;
-	      if ( cross_product*cross_product_last < zero ) break;
+	      if ( cross_product*cross_product_last < ZERO ) break;
 
 	      cross_product_last = cross_product;
 
@@ -1452,17 +1459,16 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
     } /* srch_loop */
 
   /*
-       if no cell found, point is likely either in a box that
-       straddles either pole or is outside the grid.  fall back
-       to a distance-weighted average of the four closest
-       points.  go ahead and compute weights here, but store
-       in src_lats and return -add to prevent the parent
-       routine from computing bilinear weights
+    If no cell found, point is likely either in a box that straddles either 
+    pole or is outside the grid. Fall back to a distance-weighted average 
+    of the four closest points. Go ahead and compute weights here, but store
+    in src_lats and return -add to prevent the parent routine from computing 
+    bilinear weights.
   */
-      
+
   /*
-    !print *,'Could not find location for ',plat,plon
-    !print *,'Using nearest-neighbor average for this point'
+    printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
+    printf("Using nearest-neighbor average for this point\n");
   */
 
   coslat_dst = cos(plat);
@@ -1470,8 +1476,8 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   coslon_dst = cos(plon);
   sinlon_dst = sin(plon);
 
-  dist_min = bignum;
-  for ( n = 0; n < 4; n++ ) src_lats[n] = bignum;
+  dist_min = BIGNUM;
+  for ( n = 0; n < 4; n++ ) src_lats[n] = BIGNUM;
   for ( srch_add = min_add; srch_add <= max_add; srch_add++ )
     {
       distance = acos(coslat_dst*cos(src_center_lat[srch_add])*
@@ -1499,7 +1505,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
         }
     }
 
-  for ( n = 0; n < 4; n++ ) src_lons[n] = one/(src_lats[n] + tiny);
+  for ( n = 0; n < 4; n++ ) src_lons[n] = ONE/(src_lats[n] + TINY);
   distance = 0.0;
   for ( n = 0; n < 4; n++ ) distance += src_lons[n];
   for ( n = 0; n < 4; n++ ) src_lats[n] = src_lons[n]/distance;
@@ -1604,10 +1610,12 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  if point found, find local i,j coordinates for weights  */
-
+#ifdef REMAPTEST
+      printf("%d %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
+#endif
       if ( src_add[0] > 0 )
 	{
-          rg->grid2_frac[dst_add] = one;
+          rg->grid2_frac[dst_add] = ONE;
 
 	  /*  iterate to find i,j for bilinear approximation  */
 
@@ -1619,17 +1627,17 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
           dph2 = src_lons[3] - src_lons[0];
           dph3 = src_lons[2] - src_lons[1];
 
-          if ( dph1 >  three*pih ) dph1 -= pi2;
-          if ( dph2 >  three*pih ) dph2 -= pi2;
-          if ( dph3 >  three*pih ) dph3 -= pi2;
-          if ( dph1 < -three*pih ) dph1 += pi2;
-          if ( dph2 < -three*pih ) dph2 += pi2;
-          if ( dph3 < -three*pih ) dph3 += pi2;
+          if ( dph1 >  THREE*PIH ) dph1 -= PI2;
+          if ( dph2 >  THREE*PIH ) dph2 -= PI2;
+          if ( dph3 >  THREE*PIH ) dph3 -= PI2;
+          if ( dph1 < -THREE*PIH ) dph1 += PI2;
+          if ( dph2 < -THREE*PIH ) dph2 += PI2;
+          if ( dph3 < -THREE*PIH ) dph3 += PI2;
 
           dph3 = dph3 - dph2;
 
-          iguess = half;
-          jguess = half;
+          iguess = HALF;
+          jguess = HALF;
 
 	  /* Unvectorized loop: break */
           for ( iter = 0; iter < max_iter; iter++ )
@@ -1637,8 +1645,8 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
 	      dphp = plon - src_lons[0];
 
-	      if ( dphp >  three*pih ) dphp -= pi2;
-	      if ( dphp < -three*pih ) dphp += pi2;
+	      if ( dphp >  THREE*PIH ) dphp -= PI2;
+	      if ( dphp < -THREE*PIH ) dphp += PI2;
 
 	      dphp = dphp - dph1*iguess - dph2*jguess - dph3*iguess*jguess;
 
@@ -1662,10 +1670,10 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	    {
 	      /* successfully found i,j - compute weights */
 
-	      wgts[0] = (one-iguess)*(one-jguess);
-	      wgts[1] = iguess*(one-jguess);
+	      wgts[0] = (ONE-iguess)*(ONE-jguess);
+	      wgts[1] = iguess*(ONE-jguess);
 	      wgts[2] = iguess*jguess;
-	      wgts[3] = (one-iguess)*jguess;
+	      wgts[3] = (ONE-iguess)*jguess;
 
 	      store_link_bilin(rv, dst_add, src_add, wgts);
 	    }
@@ -1693,7 +1701,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	      if ( rg->grid1_mask[src_add[n]-1] )
 		icount++;
 	      else
-		src_lats[n] = zero;
+		src_lats[n] = ZERO;
 	    }
 
           if ( icount > 0 )
@@ -1706,7 +1714,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	      wgts[2] = src_lats[2]/sum_wgts;
 	      wgts[3] = src_lats[3]/sum_wgts;
 
-	      rg->grid2_frac[dst_add] = one;
+	      rg->grid2_frac[dst_add] = ONE;
 
 	      store_link_bilin(rv, dst_add, src_add, wgts);
 	    }
@@ -1822,7 +1830,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 
       if ( src_add[0] > 0 )
 	{
-          rg->grid2_frac[dst_add] = one;
+          rg->grid2_frac[dst_add] = ONE;
 
 	  /*  iterate to find i,j for bilinear approximation  */
 
@@ -1834,25 +1842,25 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
           dph2 = src_lons[3] - src_lons[0];
           dph3 = src_lons[2] - src_lons[1];
 
-          if ( dph1 >  three*pih ) dph1 -= pi2;
-          if ( dph2 >  three*pih ) dph2 -= pi2;
-          if ( dph3 >  three*pih ) dph3 -= pi2;
-          if ( dph1 < -three*pih ) dph1 += pi2;
-          if ( dph2 < -three*pih ) dph2 += pi2;
-          if ( dph3 < -three*pih ) dph3 += pi2;
+          if ( dph1 >  THREE*PIH ) dph1 -= PI2;
+          if ( dph2 >  THREE*PIH ) dph2 -= PI2;
+          if ( dph3 >  THREE*PIH ) dph3 -= PI2;
+          if ( dph1 < -THREE*PIH ) dph1 += PI2;
+          if ( dph2 < -THREE*PIH ) dph2 += PI2;
+          if ( dph3 < -THREE*PIH ) dph3 += PI2;
 
           dph3 = dph3 - dph2;
 
-          iguess = half;
-          jguess = half;
+          iguess = HALF;
+          jguess = HALF;
 
           for ( iter = 0; iter < max_iter; iter++ )
 	    {
 	      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
 	      dphp = plon - src_lons[0];
 
-	      if ( dphp >  three*pih ) dphp -= pi2;
-	      if ( dphp < -three*pih ) dphp += pi2;
+	      if ( dphp >  THREE*PIH ) dphp -= PI2;
+	      if ( dphp < -THREE*PIH ) dphp += PI2;
 
 	      dphp = dphp - dph1*iguess - dph2*jguess - dph3*iguess*jguess;
 
@@ -1876,38 +1884,38 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	    {
 	      /* successfully found i,j - compute weights */
 
-	      wgts[0][0] = (one - jguess*jguess*(three-two*jguess))*
-		           (one - iguess*iguess*(three-two*iguess));
-	      wgts[0][1] = (one - jguess*jguess*(three-two*jguess))*
-                                  iguess*iguess*(three-two*iguess);
-	      wgts[0][2] =        jguess*jguess*(three-two*jguess)*
-                                  iguess*iguess*(three-two*iguess);
-	      wgts[0][3] =        jguess*jguess*(three-two*jguess)*
-                           (one - iguess*iguess*(three-two*iguess));
-	      wgts[1][0] = (one - jguess*jguess*(three-two*jguess))*
-                                  iguess*(iguess-one)*(iguess-one);
-	      wgts[1][1] = (one - jguess*jguess*(three-two*jguess))*
-                                  iguess*iguess*(iguess-one);
-	      wgts[1][2] =        jguess*jguess*(three-two*jguess)*
-                                  iguess*iguess*(iguess-one);
-	      wgts[1][3] =        jguess*jguess*(three-two*jguess)*
-                                  iguess*(iguess-one)*(iguess-one);
-	      wgts[2][0] =        jguess*(jguess-one)*(jguess-one)*
-                           (one - iguess*iguess*(three-two*iguess));
-	      wgts[2][1] =        jguess*(jguess-one)*(jguess-one)*
-                                  iguess*iguess*(three-two*iguess);
-	      wgts[2][2] =        jguess*jguess*(jguess-one)*
-                                  iguess*iguess*(three-two*iguess);
-	      wgts[2][3] =        jguess*jguess*(jguess-one)*
-                           (one - iguess*iguess*(three-two*iguess));
-	      wgts[3][0] =        iguess*(iguess-one)*(iguess-one)*
-                                  jguess*(jguess-one)*(jguess-one);
-              wgts[3][1] =        iguess*iguess*(iguess-one)*
-                                  jguess*(jguess-one)*(jguess-one);
-	      wgts[3][2] =        iguess*iguess*(iguess-one)*
-                                  jguess*jguess*(jguess-one);
-	      wgts[3][3] =        iguess*(iguess-one)*(iguess-one)*
-                                  jguess*jguess*(jguess-one);
+	      wgts[0][0] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
+		           (ONE - iguess*iguess*(THREE-TWO*iguess));
+	      wgts[0][1] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
+                                  iguess*iguess*(THREE-TWO*iguess);
+	      wgts[0][2] =        jguess*jguess*(THREE-TWO*jguess)*
+                                  iguess*iguess*(THREE-TWO*iguess);
+	      wgts[0][3] =        jguess*jguess*(THREE-TWO*jguess)*
+                           (ONE - iguess*iguess*(THREE-TWO*iguess));
+	      wgts[1][0] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
+                                  iguess*(iguess-ONE)*(iguess-ONE);
+	      wgts[1][1] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
+                                  iguess*iguess*(iguess-ONE);
+	      wgts[1][2] =        jguess*jguess*(THREE-TWO*jguess)*
+                                  iguess*iguess*(iguess-ONE);
+	      wgts[1][3] =        jguess*jguess*(THREE-TWO*jguess)*
+                                  iguess*(iguess-ONE)*(iguess-ONE);
+	      wgts[2][0] =        jguess*(jguess-ONE)*(jguess-ONE)*
+                           (ONE - iguess*iguess*(THREE-TWO*iguess));
+	      wgts[2][1] =        jguess*(jguess-ONE)*(jguess-ONE)*
+                                  iguess*iguess*(THREE-TWO*iguess);
+	      wgts[2][2] =        jguess*jguess*(jguess-ONE)*
+                                  iguess*iguess*(THREE-TWO*iguess);
+	      wgts[2][3] =        jguess*jguess*(jguess-ONE)*
+                           (ONE - iguess*iguess*(THREE-TWO*iguess));
+	      wgts[3][0] =        iguess*(iguess-ONE)*(iguess-ONE)*
+                                  jguess*(jguess-ONE)*(jguess-ONE);
+              wgts[3][1] =        iguess*iguess*(iguess-ONE)*
+                                  jguess*(jguess-ONE)*(jguess-ONE);
+	      wgts[3][2] =        iguess*iguess*(iguess-ONE)*
+                                  jguess*jguess*(jguess-ONE);
+	      wgts[3][3] =        iguess*(iguess-ONE)*(iguess-ONE)*
+                                  jguess*jguess*(jguess-ONE);
 
 	      store_link_bicub(rv, dst_add, src_add, wgts);
 	    }
@@ -1930,7 +1938,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	      if ( rg->grid1_mask[src_add[n]-1] )
 		icount++;
 	      else
-		src_lats[n] = zero;
+		src_lats[n] = ZERO;
 	    }
 
           if ( icount > 0 )
@@ -1939,11 +1947,11 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	      sum_wgts = 0.0;
 	      for ( n = 0; n < 4; n++ ) sum_wgts += src_lats[n];
 	      for ( n = 0; n < 4; n++ ) wgts[0][n] = src_lats[n]/sum_wgts;
-	      for ( n = 0; n < 4; n++ ) wgts[1][n] = zero;
-	      for ( n = 0; n < 4; n++ ) wgts[2][n] = zero;
-	      for ( n = 0; n < 4; n++ ) wgts[3][n] = zero;
+	      for ( n = 0; n < 4; n++ ) wgts[1][n] = ZERO;
+	      for ( n = 0; n < 4; n++ ) wgts[2][n] = ZERO;
+	      for ( n = 0; n < 4; n++ ) wgts[3][n] = ZERO;
 
-	      rg->grid2_frac[dst_add] = one;
+	      rg->grid2_frac[dst_add] = ONE;
 	      store_link_bicub(rv, dst_add, src_add, wgts);
 	    }
         }
@@ -1998,8 +2006,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
   /*  loop over source grid and find nearest neighbors */
 
   /*
-    restrict the search using search bins
-    expand the bins to catch neighbors
+    restrict the search using search bins expand the bins to catch neighbors
   */
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
@@ -2062,7 +2069,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
   for ( n = 0; n < num_neighbors; n++ )
     {
       nbr_add[n]  = 0;
-      nbr_dist[n] = bignum;
+      nbr_dist[n] = BIGNUM;
     }
 
   /* Unvectorized loop: break (num_neighbors is constant 4) */
@@ -2203,7 +2210,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
          compute weights based on inverse distance
          if mask is false, eliminate those points
       */
-      dist_tot = zero;
+      dist_tot = ZERO;
       for ( n = 0; n < num_neighbors; n++ )
 	{
 	  nbr_mask[n] = FALSE;
@@ -2212,7 +2219,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
 	  if ( nbr_add[n] > 0 )
 	    if ( rg->grid1_mask[nbr_add[n]-1] )
 	      {
-		nbr_dist[n] = one/nbr_dist[n];
+		nbr_dist[n] = ONE/nbr_dist[n];
 		dist_tot = dist_tot + nbr_dist[n];
 		nbr_mask[n] = TRUE;
 	      }
@@ -2226,7 +2233,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
 	    {
 	      wgtstmp = nbr_dist[n]/dist_tot;
 	      store_link_nbr(rv, nbr_add[n]-1, dst_add, wgtstmp);
-	      rg->grid2_frac[dst_add] = one;
+	      rg->grid2_frac[dst_add] = ONE;
 	    }
 	}
 
@@ -2346,7 +2353,7 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
   /* initialize distance and address arrays */
 
   nbr_add[0]  = 0;
-  nbr_dist[0] = bignum;
+  nbr_dist[0] = BIGNUM;
 
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
@@ -2476,7 +2483,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
          compute weights based on inverse distance
          if mask is false, eliminate those points
       */
-      dist_tot = zero;
+      dist_tot = ZERO;
 
       nbr_mask = FALSE;
 
@@ -2484,7 +2491,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
       if ( nbr_add > 0 )
 	if ( rg->grid1_mask[nbr_add-1] )
 	  {
-	    nbr_dist = one/nbr_dist;
+	    nbr_dist = ONE/nbr_dist;
 	    dist_tot = dist_tot + nbr_dist;
 	    nbr_mask = TRUE;
 	  }
@@ -2495,7 +2502,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
 	{
 	  wgtstmp = nbr_dist/dist_tot;
 	  store_link_nbr1(rv, nbr_add-1, dst_add, wgtstmp);
-	  rg->grid2_frac[dst_add] = one;
+	  rg->grid2_frac[dst_add] = ONE;
 	}
 
     } /* grid_loop1 */
@@ -2580,22 +2587,22 @@ void pole_intersection(int *location,
   *intrsct_lon = endlon;
 
   loutside = FALSE;
-  s1 = zero;
+  s1 = ZERO;
 
   /* convert coordinates */
 
   srch_corner_x = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
   srch_corner_y = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
 
-  if ( beglat > zero )
+  if ( beglat > ZERO )
     {
-      pi4 = quart*pi;
-      rns = one;
+      pi4 = QUART*PI;
+      rns = ONE;
     }
   else
     {
-      pi4 = -quart*pi;
-      rns = -one;
+      pi4 = -QUART*PI;
+      rns = -ONE;
     }
 
   if ( *luse_last )
@@ -2605,19 +2612,19 @@ void pole_intersection(int *location,
     }
   else
     {
-      x1 = rns*two*sin(pi4 - half*beglat)*cos(beglon);
-      y1 =     two*sin(pi4 - half*beglat)*sin(beglon);
+      x1 = rns*TWO*sin(pi4 - HALF*beglat)*cos(beglon);
+      y1 =     TWO*sin(pi4 - HALF*beglat)*sin(beglon);
       *luse_last = TRUE;
     }
 
-  x2 = rns*two*sin(pi4 - half*endlat)*cos(endlon);
-  y2 =     two*sin(pi4 - half*endlat)*sin(endlon);
+  x2 = rns*TWO*sin(pi4 - HALF*endlat)*cos(endlon);
+  y2 =     TWO*sin(pi4 - HALF*endlat)*sin(endlon);
 
   for ( n = 0; n < srch_corners*num_srch_cells; n++ )
     {
-      srch_corner_x[n] = rns*two*sin(pi4 - half*srch_corner_lat[n])*
+      srch_corner_x[n] = rns*TWO*sin(pi4 - HALF*srch_corner_lat[n])*
 	                         cos(srch_corner_lon[n]);
-      srch_corner_y[n] =     two*sin(pi4 - half*srch_corner_lat[n])*
+      srch_corner_y[n] =     TWO*sin(pi4 - HALF*srch_corner_lat[n])*
 	                         sin(srch_corner_lon[n]);
     }
 
@@ -2625,8 +2632,8 @@ void pole_intersection(int *location,
   begy = y1;
   endx = x2;
   endy = y2;
-  begsegx = rns*two*sin(pi4 - half*begseg[0])*cos(begseg[1]);
-  begsegy =     two*sin(pi4 - half*begseg[0])*sin(begseg[1]);
+  begsegx = rns*TWO*sin(pi4 - HALF*begseg[0])*cos(begseg[1]);
+  begsegy =     TWO*sin(pi4 - HALF*begseg[0])*sin(begseg[1]);
   *intrsct_x = endx;
   *intrsct_y = endy;
 
@@ -2644,7 +2651,7 @@ void pole_intersection(int *location,
 	  for ( cell=0; cell < num_srch_cells; cell++ )
 	    if ( srch_add[cell] == *location )
 	      {
-		eps = tiny;
+		eps = TINY;
 		goto after_srch_loop;
 	      }
 	}
@@ -2681,12 +2688,12 @@ void pole_intersection(int *location,
 	      cross_product = vec1_x*vec2_y - vec2_x*vec1_y;
 
 	      /*
-		if the cross product for a side is zero, the point 
+		if the cross product for a side is ZERO, the point 
                   lies exactly on the side or the length of a side
-                  is zero.  if the length is zero set det > 0.
+                  is ZERO.  if the length is ZERO set det > 0.
                   otherwise, perform another cross 
                   product between the side and the segment itself. 
-	        if this cross product is also zero, the line is 
+	        if this cross product is also ZERO, the line is 
 	          coincident with the cell boundary - perform the 
                   dot product and only choose the cell if the dot 
                   product is positive (parallel vs anti-parallel).
@@ -2700,7 +2707,7 @@ void pole_intersection(int *location,
 		      cross_product = vec1_x*vec2_y - vec2_x*vec1_y;
 		    }
 		  else
-		    cross_product = one;
+		    cross_product = ONE;
 
 		  if ( DBL_IS_EQUAL(cross_product, 0) )
 		    {
@@ -2710,9 +2717,9 @@ void pole_intersection(int *location,
 		    }
 		}
 
-	      /* if cross product is less than zero, this cell doesn't work */
+	      /* if cross product is less than ZERO, this cell doesn't work */
 
-	      if ( cross_product < zero ) break; /* corner_loop */
+	      if ( cross_product < ZERO ) break; /* corner_loop */
 	     
 	    } /* corner_loop */
 
@@ -2731,10 +2738,10 @@ void pole_intersection(int *location,
 		  x2 = begx;
 		  y2 = begy;
 		  *location = -1;
-		  eps  = -tiny;
+		  eps  = -TINY;
 		}
 	      else
-		eps  = tiny;
+		eps  = TINY;
             
 	      goto after_srch_loop;
 	    }
@@ -2755,7 +2762,7 @@ void pole_intersection(int *location,
 
       /* reached the end of the segment and still outside the grid return no intersection */
 
-      if ( s1 >= one )
+      if ( s1 >= ONE )
 	{
           free(srch_corner_y);
           free(srch_corner_x);
@@ -2793,10 +2800,10 @@ void pole_intersection(int *location,
       determ = mat1*mat4 - mat2*mat3;
 
       /*
-         if the determinant is zero, the segments are either 
+         if the determinant is ZERO, the segments are either 
            parallel or coincident.  coincidences were detected 
            above so do nothing.
-         if the determinant is non-zero, solve for the linear 
+         if the determinant is non-ZERO, solve for the linear 
            parameters s for the intersection point on each line 
            segment.
          if 0<s1,s2<1 then the segment intersects with this side.
@@ -2808,7 +2815,7 @@ void pole_intersection(int *location,
           s1 = (rhs1*mat4 - mat2*rhs2)/determ;
           s2 = (mat1*rhs2 - rhs1*mat3)/determ;
 
-          if ( s2 >= zero && s2 <= one && s1 > zero && s1 <= one )
+          if ( s2 >= ZERO && s2 <= ONE && s1 > ZERO && s1 <= ONE )
 	    {
 	      /*
 		recompute intersection based on full segment
@@ -2833,7 +2840,7 @@ void pole_intersection(int *location,
 
 	      /*
 		sometimes due to roundoff, the previous 
-		determinant is non-zero, but the lines
+		determinant is non-ZERO, but the lines
 		are actually coincident.  if this is the
 		case, skip the rest.
 	      */
@@ -2856,19 +2863,19 @@ void pole_intersection(int *location,
 		 /* convert back to lat/lon coordinates */
 
 		 *intrsct_lon = rns*atan2(*intrsct_y, *intrsct_x);
-		 if ( *intrsct_lon < zero ) 
-		   *intrsct_lon = *intrsct_lon + pi2;
+		 if ( *intrsct_lon < ZERO ) 
+		   *intrsct_lon = *intrsct_lon + PI2;
 		 
 		 if ( fabs(*intrsct_x) > 1.e-10 )
-		   *intrsct_lat = (pi4 - asin(rns*half*(*intrsct_x)/cos(*intrsct_lon)))*two;
+		   *intrsct_lat = (pi4 - asin(rns*HALF*(*intrsct_x)/cos(*intrsct_lon)))*TWO;
 		 else if ( fabs(*intrsct_y) > 1.e-10 )
-		   *intrsct_lat = (pi4 - asin(half*(*intrsct_y)/sin(*intrsct_lon)))*two;
+		   *intrsct_lat = (pi4 - asin(HALF*(*intrsct_y)/sin(*intrsct_lon)))*TWO;
 		 else
-		   *intrsct_lat = two*pi4;
+		   *intrsct_lat = TWO*pi4;
 
 		 /* add offset in transformed space for next pass. */
 
-		 if ( s1 - eps/determ < one )
+		 if ( s1 - eps/determ < ONE )
 		   {
 		     *intrsct_x = *intrsct_x - mat1*(eps/determ);
 		     *intrsct_y = *intrsct_y - mat3*(eps/determ);
@@ -2920,7 +2927,7 @@ void pole_intersection(int *location,
 
       cross_product = begsegx*(endy-begsegy) - begsegy*(endx-begsegx);
       *intrsct_lat = begseg[0];
-      if ( cross_product*(*intrsct_lat) > zero )
+      if ( cross_product*(*intrsct_lat) > ZERO )
 	{
           *intrsct_lon = beglon    + *avoid_pole_offset;
           begseg[1]    = begseg[1] + *avoid_pole_offset;
@@ -2937,7 +2944,7 @@ void pole_intersection(int *location,
   else
     {
       *avoid_pole_count  = 0;
-      *avoid_pole_offset = tiny;
+      *avoid_pole_offset = TINY;
     }
 
   /*
@@ -2952,25 +2959,25 @@ void pole_intersection(int *location,
       if ( *intrsct_lat > north_thresh || *intrsct_lat < south_thresh )
 	*lthresh = FALSE;
     }
-  else if ( beglat > zero && *intrsct_lat < north_thresh )
+  else if ( beglat > ZERO && *intrsct_lat < north_thresh )
     {
       mat4 = endlat - begseg[0];
       mat3 = endlon - begseg[1];
-      if ( mat3 >  pi ) mat3 = mat3 - pi2;
-      if ( mat3 < -pi ) mat3 = mat3 + pi2;
-      *intrsct_lat = north_thresh - tiny;
+      if ( mat3 >  PI ) mat3 = mat3 - PI2;
+      if ( mat3 < -PI ) mat3 = mat3 + PI2;
+      *intrsct_lat = north_thresh - TINY;
       s1 = (north_thresh - begseg[0])/mat4;
       *intrsct_lon = begseg[1] + s1*mat3;
       *luse_last = FALSE;
       *lthresh = TRUE;
     }
-  else if ( beglat < zero && *intrsct_lat > south_thresh )
+  else if ( beglat < ZERO && *intrsct_lat > south_thresh )
     {
       mat4 = endlat - begseg[0];
       mat3 = endlon - begseg[1];
-      if ( mat3 >  pi ) mat3 = mat3 - pi2;
-      if ( mat3 < -pi ) mat3 = mat3 + pi2;
-      *intrsct_lat = south_thresh + tiny;
+      if ( mat3 >  PI ) mat3 = mat3 - PI2;
+      if ( mat3 < -PI ) mat3 = mat3 + PI2;
+      *intrsct_lat = south_thresh + TINY;
       s1 = (south_thresh - begseg[0])/mat4;
       *intrsct_lon = begseg[1] + s1*mat3;
       *luse_last = FALSE;
@@ -3076,12 +3083,12 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 
   lat2 = endlat;
   lon2 = endlon;
-  if ( (lon2-lon1) > three*pih )
-    lon2 = lon2 - pi2;
-  else if ( (lon2-lon1) < -three*pih )
-    lon2 = lon2 + pi2;
+  if ( (lon2-lon1) > THREE*PIH )
+    lon2 = lon2 - PI2;
+  else if ( (lon2-lon1) < -THREE*PIH )
+    lon2 = lon2 + PI2;
 
-  s1 = zero;
+  s1 = ZERO;
 
   /*
      search for location of this segment in ocean grid using cross
@@ -3098,7 +3105,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	   if ( srch_add[cell] == *last_loc )
 	     {
                *location = *last_loc;
-               eps = tiny;
+               eps = TINY;
                goto after_srch_loop;
 	     }
        }
@@ -3134,22 +3141,22 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 
 	      /* check for 0,2pi crossings */
 
-	      if      ( vec1_lon >  pi ) vec1_lon -= pi2;
-	      else if ( vec1_lon < -pi ) vec1_lon += pi2;
+	      if      ( vec1_lon >  PI ) vec1_lon -= PI2;
+	      else if ( vec1_lon < -PI ) vec1_lon += PI2;
 
-	      if      ( vec2_lon >  pi ) vec2_lon -= pi2;
-	      else if ( vec2_lon < -pi ) vec2_lon += pi2;
+	      if      ( vec2_lon >  PI ) vec2_lon -= PI2;
+	      else if ( vec2_lon < -PI ) vec2_lon += PI2;
 
 	      cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
 
 	      /*
-	       if the cross product for a side is zero, the point 
+	       if the cross product for a side is ZERO, the point 
                  lies exactly on the side or the side is degenerate
-                 (zero length).  if degenerate, set the cross 
+                 (ZERO length).  if degenerate, set the cross 
                  product to a positive number.  otherwise perform 
                  another cross product between the side and the 
                  segment itself. 
-	       if this cross product is also zero, the line is 
+	       if this cross product is also ZERO, the line is 
                  coincident with the cell boundary - perform the 
                  dot product and only choose the cell if the dot 
                  product is positive (parallel vs anti-parallel).
@@ -3161,13 +3168,13 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		      vec2_lat = lat2 - lat1;
 		      vec2_lon = lon2 - lon1;
 
-		      if      ( vec2_lon >  pi ) vec2_lon -= pi2;
-		      else if ( vec2_lon < -pi ) vec2_lon += pi2;
+		      if      ( vec2_lon >  PI ) vec2_lon -= PI2;
+		      else if ( vec2_lon < -PI ) vec2_lon += PI2;
 
 		      cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
 		    }
 		  else
-		    cross_product = one;
+		    cross_product = ONE;
 
 		  if ( DBL_IS_EQUAL(cross_product, 0) )
 		    {
@@ -3177,9 +3184,9 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		    }
 		}
 
-	      /* if cross product is less than zero, this cell doesn't work */
+	      /* if cross product is less than ZERO, this cell doesn't work */
 
-	      if ( cross_product < zero ) break; /* corner_loop */
+	      if ( cross_product < ZERO ) break; /* corner_loop */
 
 	    } /* corner_loop */
 
@@ -3198,10 +3205,10 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		  lat2 = beglat;
 		  lon2 = beglon;
 		  *location = -1;
-		  eps  = -tiny;
+		  eps  = -TINY;
 		}
 	      else
-		eps  = tiny;
+		eps  = TINY;
 
 	      goto after_srch_loop;
 	    }
@@ -3222,7 +3229,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 
       /* reached the end of the segment and still outside the grid return no intersection */
 
-      if ( s1 >= one ) return;
+      if ( s1 >= ONE ) return;
 
     } /* srch_loop */
 
@@ -3252,22 +3259,22 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
       rhs1 = grdlat1 - lat1;
       rhs2 = grdlon1 - lon1;
 
-      if      ( mat3 >  pi ) mat3 -= pi2;
-      else if ( mat3 < -pi ) mat3 += pi2;
+      if      ( mat3 >  PI ) mat3 -= PI2;
+      else if ( mat3 < -PI ) mat3 += PI2;
 
-      if      ( mat4 >  pi ) mat4 -= pi2;
-      else if ( mat4 < -pi ) mat4 += pi2;
+      if      ( mat4 >  PI ) mat4 -= PI2;
+      else if ( mat4 < -PI ) mat4 += PI2;
 
-      if      ( rhs2 >  pi ) rhs2 -= pi2;
-      else if ( rhs2 < -pi ) rhs2 += pi2;
+      if      ( rhs2 >  PI ) rhs2 -= PI2;
+      else if ( rhs2 < -PI ) rhs2 += PI2;
 
       determ = mat1*mat4 - mat2*mat3;
 
       /*
-         if the determinant is zero, the segments are either 
+         if the determinant is ZERO, the segments are either 
            parallel or coincident.  coincidences were detected 
            above so do nothing.
-         if the determinant is non-zero, solve for the linear 
+         if the determinant is non-ZERO, solve for the linear 
            parameters s for the intersection point on each line 
            segment.
          if 0<s1,s2<1 then the segment intersects with this side.
@@ -3279,7 +3286,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	  s1 = (rhs1*mat4 - mat2*rhs2)/determ;
 	  s2 = (mat1*rhs2 - rhs1*mat3)/determ;
 
-	  if ( s2 >= zero && s2 <= one && s1 > zero && s1 <= one )
+	  if ( s2 >= ZERO && s2 <= ONE && s1 > ZERO && s1 <= ONE )
 	    {
 	      /*
 		recompute intersection based on full segment
@@ -3300,17 +3307,17 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		  rhs2 = grdlon1 - endlon;
 		}
 
-	      if      ( mat3 >  pi ) mat3 -= pi2;
-	      else if ( mat3 < -pi ) mat3 += pi2;
+	      if      ( mat3 >  PI ) mat3 -= PI2;
+	      else if ( mat3 < -PI ) mat3 += PI2;
 
-	      if      ( rhs2 > pi  ) rhs2 -= pi2;
-	      else if ( rhs2 < -pi ) rhs2 += pi2;
+	      if      ( rhs2 > PI  ) rhs2 -= PI2;
+	      else if ( rhs2 < -PI ) rhs2 += PI2;
 
 	      determ = mat1*mat4 - mat2*mat3;
 
 	      /*
 		sometimes due to roundoff, the previous 
-		determinant is non-zero, but the lines
+		determinant is non-ZERO, but the lines
 		are actually coincident.  if this is the
 		case, skip the rest.
 	      */
@@ -3320,7 +3327,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		  s2 = (mat1*rhs2 - rhs1*mat3)/determ;
 
 		  offset = s1 + eps/determ;
-		  if ( offset > one ) offset = one;
+		  if ( offset > ONE ) offset = ONE;
 
 		  if ( ! loutside )
 		    {
@@ -3356,9 +3363,9 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
       if ( *intrsct_lat < north_thresh || *intrsct_lat > south_thresh )
 	*lthresh = FALSE;
     }
-  else if ( lat1 > zero && *intrsct_lat > north_thresh )
+  else if ( lat1 > ZERO && *intrsct_lat > north_thresh )
     {
-      *intrsct_lat = north_thresh + tiny;
+      *intrsct_lat = north_thresh + TINY;
       *intrsct_lat_off = north_thresh + eps*mat1;
       s1 = (*intrsct_lat - begseg[0])/mat1;
       *intrsct_lon     = begseg[1] + s1*mat3;
@@ -3366,9 +3373,9 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
       *last_loc = *location;
       *lthresh = TRUE;
     }
-  else if ( lat1 < zero && *intrsct_lat < south_thresh )
+  else if ( lat1 < ZERO && *intrsct_lat < south_thresh )
     {
-      *intrsct_lat = south_thresh - tiny;
+      *intrsct_lat = south_thresh - TINY;
       *intrsct_lat_off = south_thresh + eps*mat1;
       s1 = (*intrsct_lat - begseg[0])/mat1;
       *intrsct_lon     = begseg[1] + s1*mat3;
@@ -3415,10 +3422,10 @@ void line_integral(double *weights, int num_wts,
   costh2 = cos(theta2);
 
   dphi = in_phi1 - in_phi2;
-  if      ( dphi >  pi ) dphi -= pi2;
-  else if ( dphi < -pi ) dphi += pi2;
+  if      ( dphi >  PI ) dphi -= PI2;
+  else if ( dphi < -PI ) dphi += PI2;
       
-  dphi = half*dphi;
+  dphi = HALF*dphi;
 
   /*
      the first weight is the area overlap integral. the second and
@@ -3433,51 +3440,51 @@ void line_integral(double *weights, int num_wts,
      the third and fifth weights are for the second-order phi gradient
      component.  must be careful of longitude range.
   */
-  f1 = half*(costh1*sinth1 + theta1);
-  f2 = half*(costh2*sinth2 + theta2);
+  f1 = HALF*(costh1*sinth1 + theta1);
+  f2 = HALF*(costh2*sinth2 + theta2);
 
   phi1 = in_phi1 - grid1_lon;
-  if      ( phi1 >  pi ) phi1 -= pi2;
-  else if ( phi1 < -pi ) phi1 += pi2;
+  if      ( phi1 >  PI ) phi1 -= PI2;
+  else if ( phi1 < -PI ) phi1 += PI2;
 
   phi2 = in_phi2 - grid1_lon;
-  if      ( phi2 >  pi ) phi2 -= pi2;
-  else if ( phi2 < -pi ) phi2 += pi2;
+  if      ( phi2 >  PI ) phi2 -= PI2;
+  else if ( phi2 < -PI ) phi2 += PI2;
 
-  if ( (phi2-phi1) <  pi && (phi2-phi1) > -pi )
+  if ( (phi2-phi1) <  PI && (phi2-phi1) > -PI )
     weights[2] = dphi*(phi1*f1 + phi2*f2);
   else
     {
-      if ( phi1 > zero )
-	fac = pi;
+      if ( phi1 > ZERO )
+	fac = PI;
       else
-	fac = -pi;
+	fac = -PI;
 
       fint = f1 + (f2-f1)*(fac-phi1)/fabs(dphi);
-      weights[2] = half*phi1*(phi1-fac)*f1 -
-	           half*phi2*(phi2+fac)*f2 +
-	           half*fac*(phi1+phi2)*fint;
+      weights[2] = HALF*phi1*(phi1-fac)*f1 -
+	           HALF*phi2*(phi2+fac)*f2 +
+	           HALF*fac*(phi1+phi2)*fint;
     }
 
   phi1 = in_phi1 - grid2_lon;
-  if      ( phi1 >  pi ) phi1 -= pi2;
-  else if ( phi1 < -pi ) phi1 += pi2;
+  if      ( phi1 >  PI ) phi1 -= PI2;
+  else if ( phi1 < -PI ) phi1 += PI2;
 
   phi2 = in_phi2 - grid2_lon;
-  if      ( phi2 >  pi ) phi2 -= pi2;
-  else if ( phi2 < -pi ) phi2 += pi2;
+  if      ( phi2 >  PI ) phi2 -= PI2;
+  else if ( phi2 < -PI ) phi2 += PI2;
 
-  if ( (phi2-phi1) <  pi  && (phi2-phi1) > -pi )
+  if ( (phi2-phi1) <  PI  && (phi2-phi1) > -PI )
     weights[num_wts+2] = dphi*(phi1*f1 + phi2*f2);
   else
     {
-      if ( phi1 > zero ) fac =  pi;
-      else               fac = -pi;
+      if ( phi1 > ZERO ) fac =  PI;
+      else               fac = -PI;
 
       fint = f1 + (f2-f1)*(fac-phi1)/fabs(dphi);
-      weights[num_wts+2] = half*phi1*(phi1-fac)*f1 -
-                           half*phi2*(phi2+fac)*f2 +
-                           half*fac*(phi1+phi2)*fint;
+      weights[num_wts+2] = HALF*phi1*(phi1-fac)*f1 -
+                           HALF*phi2*(phi2+fac)*f2 +
+                           HALF*fac*(phi1+phi2)*fint;
     }
 
 }  /* line_integral */
@@ -3500,7 +3507,7 @@ void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
   /* local variables */
   int nlink, min_link, max_link; /* link index */
 
-  /*   if all weights are zero, do not bother storing the link */
+  /*   if all weights are ZERO, do not bother storing the link */
 
   if ( DBL_IS_EQUAL(weights[0], 0) && DBL_IS_EQUAL(weights[1], 0) && DBL_IS_EQUAL(weights[2], 0) &&
        DBL_IS_EQUAL(weights[3], 0) && DBL_IS_EQUAL(weights[4], 0) && DBL_IS_EQUAL(weights[5], 0) ) return;
@@ -3659,7 +3666,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   double intrsct_x, intrsct_y;  /* x,y for intersection */
   /* variables necessary if segment manages to hit pole */
   int avoid_pole_count = 0;  /* count attempts to avoid pole */
-  double avoid_pole_offset = tiny;  /* endpoint offset to avoid pole */
+  double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
 
 
   if ( cdoTimer ) timer_start(timer_remap_con);
@@ -3702,14 +3709,14 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   for ( n = 0; n < grid1_size; n++ )
     {
-      grid1_centroid_lat[n] = zero;
-      grid1_centroid_lon[n] = zero;
+      grid1_centroid_lat[n] = ZERO;
+      grid1_centroid_lon[n] = ZERO;
     }
 
   for ( n = 0; n < grid2_size; n++ )
     {
-      grid2_centroid_lat[n] = zero;
-      grid2_centroid_lon[n] = zero;
+      grid2_centroid_lat[n] = ZERO;
+      grid2_centroid_lon[n] = ZERO;
     }
 
   /*   integrate around each cell on grid1 */
@@ -3719,7 +3726,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   lthresh = FALSE;
   luse_last = FALSE;
   avoid_pole_count = 0;
-  avoid_pole_offset = tiny;
+  avoid_pole_offset = TINY;
 
   srch_corners = grid2_corners;
   max_srch_cells = 0;
@@ -3819,7 +3826,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
           /*
 	    if this is a constant-longitude segment, skip the rest 
-	    since the line integral contribution will be zero.
+	    since the line integral contribution will be ZERO.
           */
           if ( !DBL_IS_EQUAL(endlon, beglon) )
 	    {
@@ -3913,7 +3920,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   lthresh = FALSE;
   luse_last = FALSE;
   avoid_pole_count = 0;
-  avoid_pole_offset = tiny;
+  avoid_pole_offset = TINY;
 
   srch_corners = grid1_corners;
   max_srch_cells = 0;
@@ -4011,7 +4018,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
           /*
 	    if this is a constant-longitude segment, skip the rest 
-	    since the line integral contribution will be zero.
+	    since the line integral contribution will be ZERO.
           */
           if ( !DBL_IS_EQUAL(endlon, beglon) )
 	    {
@@ -4109,17 +4116,17 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   */
 
   /* North Pole */
-  weights[0] =  pi2;
-  weights[1] =  pi*pi;
-  weights[2] =  zero;
-  weights[3] =  pi2;
-  weights[4] =  pi*pi;
-  weights[5] =  zero;
+  weights[0] =  PI2;
+  weights[1] =  PI*PI;
+  weights[2] =  ZERO;
+  weights[3] =  PI2;
+  weights[4] =  PI*PI;
+  weights[5] =  ZERO;
 
   grid1_add = -1;
   /* pole_loop1 */
   for ( n = 0; n < grid1_size; n++ )
-    if ( rg->grid1_area[n] < -three*pih && rg->grid1_center_lat[n] > zero )
+    if ( rg->grid1_area[n] < -THREE*PIH && rg->grid1_center_lat[n] > ZERO )
       {
 	grid1_add = n;
 #ifndef SX
@@ -4130,7 +4137,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   grid2_add = -1;
   /* pole_loop2 */
   for ( n = 0; n < grid2_size; n++ )
-    if ( rg->grid2_area[n] < -three*pih && rg->grid2_center_lat[n] > zero )
+    if ( rg->grid2_area[n] < -THREE*PIH && rg->grid2_center_lat[n] > ZERO )
       {
 	grid2_add = n;
 #ifndef SX
@@ -4161,17 +4168,17 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
     }
 
   /* South Pole */
-  weights[0] =  pi2;
-  weights[1] = -pi*pi;
-  weights[2] =  zero;
-  weights[3] =  pi2;
-  weights[4] = -pi*pi;
-  weights[5] =  zero;
+  weights[0] =  PI2;
+  weights[1] = -PI*PI;
+  weights[2] =  ZERO;
+  weights[3] =  PI2;
+  weights[4] = -PI*PI;
+  weights[5] =  ZERO;
 
   grid1_add = -1;
   /* pole_loop3 */
   for ( n = 0; n < grid1_size; n++ )
-    if ( rg->grid1_area[n] < -three*pih && rg->grid1_center_lat[n] < zero )
+    if ( rg->grid1_area[n] < -THREE*PIH && rg->grid1_center_lat[n] < ZERO )
       {
 	grid1_add = n;
 #ifndef SX
@@ -4182,7 +4189,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   grid2_add = -1;
   /* pole_loop4 */
   for ( n = 0; n < grid2_size; n++ )
-    if ( rg->grid2_area[n] < -three*pih && rg->grid2_center_lat[n] < zero )
+    if ( rg->grid2_area[n] < -THREE*PIH && rg->grid2_center_lat[n] < ZERO )
       {
 	grid2_add = n;
 #ifndef SX
@@ -4241,9 +4248,9 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  weights[0] = rv->wts[0][n]; weights[1] = rv->wts[1][n]; weights[2] = rv->wts[2][n];
 
           if ( !DBL_IS_EQUAL(rg->grid2_area[grid2_add], 0) )
-	    norm_factor = one/rg->grid2_area[grid2_add];
+	    norm_factor = ONE/rg->grid2_area[grid2_add];
           else
-            norm_factor = zero;
+            norm_factor = ZERO;
 
 	  rv->wts[0][n] =  weights[0]*norm_factor;
 	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
@@ -4261,9 +4268,9 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  weights[0] = rv->wts[0][n]; weights[1] = rv->wts[1][n]; weights[2] = rv->wts[2][n];
 
           if ( !DBL_IS_EQUAL(rg->grid2_frac[grid2_add], 0) )
-	    norm_factor = one/rg->grid2_frac[grid2_add];
+	    norm_factor = ONE/rg->grid2_frac[grid2_add];
           else
-            norm_factor = zero;
+            norm_factor = ZERO;
 
 	  rv->wts[0][n] =  weights[0]*norm_factor;
 	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
@@ -4280,7 +4287,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  grid1_add = rv->grid1_add[n]; grid2_add = rv->grid2_add[n];
 	  weights[0] = rv->wts[0][n]; weights[1] = rv->wts[1][n]; weights[2] = rv->wts[2][n];
 
-          norm_factor = one;
+          norm_factor = ONE;
 
 	  rv->wts[0][n] =  weights[0]*norm_factor;
 	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
@@ -4312,15 +4319,15 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  if ( rg->grid1_area[n] < -.01 )
 	    cdoPrint("Grid 1 area error: %d %g", n, rg->grid1_area[n]);
 
-	  if ( grid1_centroid_lat[n] < -pih-.01 || grid1_centroid_lat[n] > pih+.01 )
+	  if ( grid1_centroid_lat[n] < -PIH-.01 || grid1_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Grid 1 centroid lat error: %d %g", n, grid1_centroid_lat[n]);
 	}
     }
 
   for ( n = 0; n < grid1_size; n++ )
     {
-      grid1_centroid_lat[n] = zero;
-      grid1_centroid_lon[n] = zero;
+      grid1_centroid_lat[n] = ZERO;
+      grid1_centroid_lon[n] = ZERO;
     }
 
   if ( lcheck )
@@ -4329,15 +4336,15 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	{
 	  if ( rg->grid2_area[n] < -.01 )
 	    cdoPrint("Grid 2 area error: %d %g", n, rg->grid2_area[n]);
-	  if ( grid2_centroid_lat[n] < -pih-.01 || grid2_centroid_lat[n] > pih+.01 )
+	  if ( grid2_centroid_lat[n] < -PIH-.01 || grid2_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Grid 2 centroid lat error: %d %g", n, grid2_centroid_lat[n]);
 	}
     }
 
   for ( n = 0; n < grid2_size; n++ )
     {
-      grid2_centroid_lat[n] = zero;
-      grid2_centroid_lon[n] = zero;
+      grid2_centroid_lat[n] = ZERO;
+      grid2_centroid_lon[n] = ZERO;
     }
 
   if ( lcheck )
@@ -4373,7 +4380,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
         if ( rv->norm_opt == NORM_OPT_DESTAREA )
           norm_factor = rg->grid2_frac[grid2_add];
         else if ( rv->norm_opt == NORM_OPT_FRACAREA )
-          norm_factor = one;
+          norm_factor = ONE;
         else if ( rv->norm_opt == NORM_OPT_NONE )
 	  norm_factor = rg->grid2_area[grid2_add];
 
@@ -4536,14 +4543,14 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 
   for ( n = 0; n < grid1_size; n++ )
     {
-      grad1_lat[n] = zero;
-      grad1_lon[n] = zero;
-      grad1_latlon[n] = zero;
+      grad1_lat[n] = ZERO;
+      grad1_lon[n] = ZERO;
+      grad1_latlon[n] = ZERO;
 
       if ( rg.grid1_mask[n] )
 	{
-	  delew = half;
-	  delns = half;
+	  delew = HALF;
+	  delns = HALF;
 
 	  j = n/nx + 1;
 	  i = n - (j-1)*nx + 1;
@@ -4558,12 +4565,12 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 	  if ( jp1 > ny )
 	    {
               jp1 = j;
-              delns = one;
+              delns = ONE;
             }
 	  if ( jm1 < 1 )
 	    {
               jm1 = j;
-              delns = one;
+              delns = ONE;
             }
 
 	  in  = (jp1-1)*nx + i - 1;
@@ -4581,12 +4588,12 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 	  if ( ! rg.grid1_mask[ie] )
 	    {
               ie = n;
-              delew = one;
+              delew = ONE;
             }
 	  if ( ! rg.grid1_mask[iw] )
 	    {
               iw = n;
-              delew = one;
+              delew = ONE;
             }
  
 	  grad1_lat[n] = delew*(array[ie] - array[iw]);
@@ -4596,44 +4603,44 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 	  if ( ! rg.grid1_mask[in] )
 	    {
               in = n;
-              delns = one;
+              delns = ONE;
             }
 	  if ( ! rg.grid1_mask[is] )
 	    {
               is = n;
-              delns = one;
+              delns = ONE;
             }
  
 	  grad1_lon[n] = delns*(array[in] - array[is]);
 
 	  /* compute ij-gradient */
 
-	  delew = half;
+	  delew = HALF;
 	  if ( jp1 == j || jm1 == j )
-	    delns = one;
+	    delns = ONE;
 	  else 
-	    delns = half;
+	    delns = HALF;
 
 	  if ( ! rg.grid1_mask[ine] )
 	    {
               if ( in != n )
 		{
 		  ine = in;
-		  delew = one;
+		  delew = ONE;
 		}
               else if ( ie != n )
 		{
 		  ine = ie;
 		  inw = iw;
-		  if ( inw == n ) delew = one;
-		  delns = one;
+		  if ( inw == n ) delew = ONE;
+		  delns = ONE;
 		}
               else
 		{
 		  ine = n;
 		  inw = iw;
-		  delew = one;
-		  delns = one;
+		  delew = ONE;
+		  delns = ONE;
 		}
 	    }
 
@@ -4642,21 +4649,21 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
               if ( in != n )
 		{
 		  inw = in;
-		  delew = one;
+		  delew = ONE;
 		}
               else if ( iw != n )
 		{
 		  inw = iw;
 		  ine = ie;
-		  if ( ie == n ) delew = one;
-		  delns = one;
+		  if ( ie == n ) delew = ONE;
+		  delns = ONE;
 		}
               else
 		{
 		  inw = n;
 		  ine = ie;
-		  delew = one;
-		  delns = one;
+		  delew = ONE;
+		  delns = ONE;
 		}
 	    }
 
@@ -4667,21 +4674,21 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
               if ( is != n )
 		{
 		  ise = is;
-		  delew = one;
+		  delew = ONE;
 		}
               else if ( ie != n )
 		{
 		  ise = ie;
 		  isw = iw;
-		  if ( isw == n ) delew = one;
-		  delns = one;
+		  if ( isw == n ) delew = ONE;
+		  delns = ONE;
 		}
               else
 		{
 		  ise = n;
 		  isw = iw;
-		  delew = one;
-		  delns = one;
+		  delew = ONE;
+		  delns = ONE;
 		}
 	    }
 
@@ -4690,21 +4697,21 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
               if ( is != n )
 		{
 		  isw = is;
-		  delew = one;
+		  delew = ONE;
 		}
               else if ( iw != n )
 		{
 		  isw = iw;
 		  ise = ie;
-		  if ( ie == n ) delew = one;
-		  delns = one;
+		  if ( ie == n ) delew = ONE;
+		  delns = ONE;
 		}
               else
 		{
 		  isw = n;
 		  ise = ie;
-		  delew = one;
-		  delns = one;
+		  delew = ONE;
+		  delns = ONE;
 		}
 	    }
 
