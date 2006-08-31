@@ -789,8 +789,18 @@ void pstreamDefVlist(int pstreamID, int vlistID)
       if ( cdoDefaultDataType != CDI_UNDEFID )
 	{
 	  int varID, nvars = vlistNvars(vlistID);
+
 	  for ( varID = 0; varID < nvars; varID++ )
 	    vlistDefVarDatatype(vlistID, varID, cdoDefaultDataType);
+
+	  if ( cdoDefaultDataType == DATATYPE_FLT64 )
+	    {
+	      for ( varID = 0; varID < nvars; varID++ )
+		{
+		  vlistDefVarAddoffset(vlistID, varID, 0.0);
+		  vlistDefVarScalefactor(vlistID, varID, 1.0);
+		}
+	    }
 	}
       vlistDefAttribute(vlistID, "CDO", cdoComment());
       if ( cdoTimer ) timer_start(timer_write);

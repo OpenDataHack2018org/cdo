@@ -3,6 +3,7 @@
 
 	* using CDI library version 1.0.2
 	* Seltime: print warning message if parameter not found
+	* pstreamDefVlist: unpack netCDF data if datatype = FLT64
 	* Version 1.0.2 released
 
 2006-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
@@ -23,8 +24,8 @@
 	* gradsdes: fix bug for only one record without time [report: Angelika Heil]
 	* gradsdes: fix problem for variable names with - character
 	* namelist update
-	* New module: Setbox [Etienne Tourigny)
-	* history format changed to nco [Etienne Tourigny)
+	* New module: Setbox [Etienne Tourigny]
+	* history format changed to nco [Etienne Tourigny]
 	* process: set MAX_ARGS from 1024 to 8192
 	* Version 1.0.1 released
 
