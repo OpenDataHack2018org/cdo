@@ -143,7 +143,7 @@ void *Zonstat(void *argument);
 #define  CondOperators          {"ifthen",  "ifnotthen"}
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
-#define  CopyOperators          {"copy"}
+#define  CopyOperators          {"copy", "selall"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffv"}
 #define  EnlargeOperators       {"enlarge"}

@@ -33,9 +33,12 @@
 void *Copy(void *argument)
 {
   static char func[] = "Copy";
+  int COPY, SELALL;
+  int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID1, tsID2, recID, varID, levelID;
+  int lcopy = FALSE;
   int gridsize;
   int vlistID1, vlistID2;
   int nmiss;
@@ -44,6 +47,13 @@ void *Copy(void *argument)
   double *array = NULL;
 
   cdoInitialize(argument);
+
+  COPY    = cdoOperatorAdd("copy",   0, 0, NULL);
+  SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
+
+  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+
+  operatorID = cdoOperatorID();
 
   streamCnt = cdoStreamCnt();
   nfiles = streamCnt - 1;
@@ -84,12 +94,20 @@ void *Copy(void *argument)
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2,  varID,  levelID);
 	  
-	      streamReadRecord(streamID1, array, &nmiss);
-	      streamWriteRecord(streamID2, array, nmiss);
+	      if ( lcopy && operatorID == SELALL )
+		{
+		  streamCopyRecord(streamID2, streamID1);
+		}
+	      else
+		{
+		  streamReadRecord(streamID1, array, &nmiss);
+		  streamWriteRecord(streamID2, array, nmiss);
+		}
 	    }
 	  tsID1++;
 	  tsID2++;
 	}
+
       streamClose(streamID1);
     }
 

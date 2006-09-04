@@ -22,7 +22,7 @@
       Select     delcode         Delete codes
       Select     selvar          Select variables
       Select     delvar          Delete variables
-      Select     selstdname       Select variables by CF name
+      Select     selstdname      Select variables by CF standard name
       Select     sellevel        Select levels
       Select     selgrid         Select grids
       Select     selgridname     Select grid by name

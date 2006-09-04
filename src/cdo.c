@@ -513,7 +513,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:p:g:i:l:m:t:D:z:aBdhRrsTuVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:p:g:i:l:m:t:D:z:aBdhRrsTVvZ")) != -1 )
     {
       switch (c)
 	{
