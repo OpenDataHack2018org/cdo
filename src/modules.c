@@ -154,7 +154,7 @@ void *Zonstat(void *argument);
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd"}
-#define  GradsdesOperators      {"gradsdes", "gradsdes2", "dumpmap"}
+#define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
@@ -354,6 +354,7 @@ static char *opalias[][2] =
   {"ggstat",              "info"       },
   {"ggstats",             "sinfo"      },
   {"globavg",             "fldavg"     },
+  {"gradsdes",            "gradsdes2"  },
   {"gp2sp2",              "gp2spl"     },
   {"sp2gp2",              "sp2gpl"     },
   {"infos",               "sinfo"      },

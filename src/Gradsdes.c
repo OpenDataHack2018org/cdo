@@ -180,7 +180,7 @@ static int flt2ibm(float x, unsigned char *ibm) {
 void *Gradsdes(void *argument)
 {
   static char func[] = "Gradsdes";
-  int GRADSDES, GRADSDES2, DUMPMAP;
+  int GRADSDES1, GRADSDES2, DUMPMAP;
   int operatorID;
   int streamID = 0;
   int gridID = -1, zaxisID;
@@ -276,7 +276,7 @@ void *Gradsdes(void *argument)
       
   cdoInitialize(argument);
 
-  GRADSDES  = cdoOperatorAdd("gradsdes",  0, 0, NULL);
+  GRADSDES1 = cdoOperatorAdd("gradsdes1",  0, 0, NULL);
   GRADSDES2 = cdoOperatorAdd("gradsdes2", 0, 0, NULL);
   DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 
