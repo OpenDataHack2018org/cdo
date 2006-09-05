@@ -1,4 +1,5 @@
 
+
 #define  NORM_OPT_NONE      1
 #define  NORM_OPT_DESTAREA  2
 #define  NORM_OPT_FRACAREA  3
@@ -21,6 +22,7 @@ typedef struct {
   int      pinit;            /* TRUE if the pointers are initialized     */
   int      gridID1;
   int      gridID2;
+  int      no_fall_back;
   int      grid1_size, grid2_size; /* total points on each grid */
   int      grid1_rank, grid2_rank; /* rank of each grid */
   int      grid1_corners, grid2_corners; /* number of corners for each grid cell */

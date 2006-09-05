@@ -362,6 +362,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   double tmp_lats[4], tmp_lons[4];  /* temps for computing bounding boxes */
 
 
+  rg->no_fall_back = FALSE;
+
   if ( map_type == MAP_TYPE_CONSERV )
     {
       rg->luse_grid1_corners = TRUE;
@@ -391,6 +393,85 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
       else
 	{
+	  if ( gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1) &&
+	       map_type != MAP_TYPE_CONSERV )
+	    {
+	      /*
+	      int gridIDnew;
+	      int nx, ny, nxp2, nyp2;
+	      double *xvals, *yvals;
+
+	      nx = gridInqXsize(gridID1);
+	      ny = gridInqYsize(gridID1);
+	      nxp2 = nx+2;
+	      nyp2 = ny+2;
+
+	      xvals = (double *) malloc(nxp2*sizeof(double));
+	      yvals = (double *) malloc(nyp2*sizeof(double));
+	      gridInqXvals(gridID1, xvals+1);
+	      gridInqYvals(gridID1, yvals+1);
+
+	      gridIDnew = gridCreate(GRID_LONLAT, nxp2*nyp2);
+	      gridDefXsize(gridIDnew, nxp2);
+	      gridDefYsize(gridIDnew, nyp2);
+	      
+	      xvals[0] = xvals[1] - gridInqXinc(gridID1);
+	      xvals[nxp2-1] = xvals[nx] + gridInqXinc(gridID1);
+
+	      yvals[0] = yvals[1] - gridInqYinc(gridID1);
+	      yvals[nyp2-1] = yvals[ny] + gridInqYinc(gridID1);
+
+	      gridDefXvals(gridIDnew, xvals);
+	      gridDefYvals(gridIDnew, yvals);
+
+	      free(xvals);
+              free(yvals);
+
+	      gridDefXpole(gridIDnew, gridInqXpole(gridID1));
+	      gridDefYpole(gridIDnew, gridInqYpole(gridID1));
+	      */
+	      int gridIDnew;
+	      int nx, ny, nxp4, nyp4;
+	      double *xvals, *yvals;
+
+	      nx = gridInqXsize(gridID1);
+	      ny = gridInqYsize(gridID1);
+	      nxp4 = nx+4;
+	      nyp4 = ny+4;
+
+	      xvals = (double *) malloc(nxp4*sizeof(double));
+	      yvals = (double *) malloc(nyp4*sizeof(double));
+	      gridInqXvals(gridID1, xvals+2);
+	      gridInqYvals(gridID1, yvals+2);
+
+	      gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
+	      gridDefXsize(gridIDnew, nxp4);
+	      gridDefYsize(gridIDnew, nyp4);
+	      
+	      xvals[0] = xvals[2] - 2*gridInqXinc(gridID1);
+	      xvals[1] = xvals[2] - gridInqXinc(gridID1);
+	      xvals[nxp4-2] = xvals[nx+1] + gridInqXinc(gridID1);
+	      xvals[nxp4-1] = xvals[nx+1] + 2*gridInqXinc(gridID1);
+
+	      yvals[0] = yvals[2] - 2*gridInqYinc(gridID1);
+	      yvals[1] = yvals[2] - gridInqYinc(gridID1);
+	      yvals[nyp4-2] = yvals[ny+1] + gridInqYinc(gridID1);
+	      yvals[nyp4-1] = yvals[ny+1] + 2*gridInqYinc(gridID1);
+
+	      gridDefXvals(gridIDnew, xvals);
+	      gridDefYvals(gridIDnew, yvals);
+
+	      free(xvals);
+              free(yvals);
+
+	      gridDefXpole(gridIDnew, gridInqXpole(gridID1));
+	      gridDefYpole(gridIDnew, gridInqYpole(gridID1));
+
+	      rg->gridID1 = gridIDnew;
+
+	      rg->no_fall_back = TRUE;
+	    }
+
 	  gridID1 = gridToCurvilinear(rg->gridID1);
 	  lgrid1_gen_bounds = TRUE;
 	}
@@ -1465,6 +1546,8 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
     in src_lats and return -add to prevent the parent routine from computing 
     bilinear weights.
   */
+
+  if ( rg->no_fall_back ) return;
 
   /*
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);

@@ -2,6 +2,7 @@
 2006-09-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.2
+	* remapbil, remapbic: speedup for regional lonlat grids
 	* Seltime: print warning message if parameter not found
 	* pstreamDefVlist: unpack netCDF data if datatype = FLT64
 	* Version 1.0.2 released

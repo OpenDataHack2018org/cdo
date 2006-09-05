@@ -66,6 +66,7 @@ void *Remap(void *argument)
   int max_remaps = 0;
   int remap_test = 0;
   int lgridboxinfo = TRUE;
+  int grid1sizemax;
   char varname[128];
   double missval;
   double *array1 = NULL, *array2 = NULL;
@@ -187,6 +188,8 @@ void *Remap(void *argument)
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
+  gridID1 = vlistGrid(vlistID1, 0);
+
   if ( max_remaps == 0 )
     {
       nzaxis = vlistNzaxis(vlistID1);
@@ -219,7 +222,13 @@ void *Remap(void *argument)
       remaps[0].gridID = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
+
+      if ( gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1) &&
+	   map_type != MAP_TYPE_CONSERV )
+	remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
+
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_nvgp;
+
       if ( gridsize != remaps[0].gridsize )
 	cdoAbort("Size of data grid and weights from %s differ!", remap_file);
 
@@ -291,17 +300,17 @@ void *Remap(void *argument)
       cdoAbort("unknown mapping method");
     }
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  grid1sizemax = vlistGridsizeMax(vlistID1);
 
   if ( map_type == MAP_TYPE_BICUBIC )
     {
-      grad1_lat    = (double *) malloc(gridsize*sizeof(double));
-      grad1_lon    = (double *) malloc(gridsize*sizeof(double));
-      grad1_latlon = (double *) malloc(gridsize*sizeof(double));
+      grad1_lat    = (double *) malloc(grid1sizemax*sizeof(double));
+      grad1_lon    = (double *) malloc(grid1sizemax*sizeof(double));
+      grad1_latlon = (double *) malloc(grid1sizemax*sizeof(double));
     }
 
-  array1 = (double *) malloc(gridsize*sizeof(double));
-  imask  = (int *) malloc(gridsize*sizeof(int));
+  array1 = (double *) malloc(grid1sizemax*sizeof(double));
+  imask  = (int *) malloc(grid1sizemax*sizeof(int));
 
   gridsize = gridInqSize(gridID2);
   array2   = (double *) malloc(gridsize*sizeof(double));
@@ -338,6 +347,56 @@ void *Remap(void *argument)
 	  */
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
+
+	  if ( gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1) &&
+	       map_type != MAP_TYPE_CONSERV )
+	    {
+	      int gridsize_new;
+	      int nx, ny;
+	      nx = gridInqXsize(gridID1);
+	      ny = gridInqYsize(gridID1);
+	      /* gridsize_new = gridsize + 2*(nx+1) + 2*(ny+1); */
+	      gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
+	      /*
+	      fprintf(stderr, "Data on rotated grid found!\n");
+	      fprintf(stderr, "gridsize %d %d %d %d\n", gridsize, gridsize_new, nx, ny);
+	      */
+	      if ( gridsize_new > grid1sizemax )
+		{
+		  grid1sizemax = gridsize_new;
+		  array1 = (double *) realloc(array1, grid1sizemax*sizeof(double));
+		  imask  = (int *) realloc(imask, grid1sizemax*sizeof(int));
+
+		  if ( map_type == MAP_TYPE_BICUBIC )
+		    {
+		      grad1_lat    = (double *) realloc(grad1_lat, grid1sizemax*sizeof(double));
+		      grad1_lon    = (double *) realloc(grad1_lon, grid1sizemax*sizeof(double));
+		      grad1_latlon = (double *) realloc(grad1_latlon, grid1sizemax*sizeof(double));
+		    }
+		}
+	      
+	      for ( j = ny-1; j >= 0; j-- )
+		for ( i = nx-1; i >= 0; i-- )
+		  array1[(j+2)*(nx+4)+i+2] = array1[j*nx+i];
+	      /*		  array1[(j+1)*(nx+2)+i+1] = array1[j*nx+i];*/
+	      /*
+	      for ( j = 0; j < ny+2; j++ ) array1[j*(nx+2)+0]      = missval;
+	      for ( j = 0; j < ny+2; j++ ) array1[j*(nx+2)+nx+1]   = missval;
+	      for ( i = 0; i < nx+2; i++ ) array1[     0*(nx+2)+i] = missval;
+	      for ( i = 0; i < nx+2; i++ ) array1[(ny+1)*(nx+2)+i] = missval;
+	      */
+	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+0]      = missval;
+	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+1]      = missval;
+	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+nx+2]   = missval;
+	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+nx+3]   = missval;
+	      for ( i = 0; i < nx+4; i++ ) array1[     0*(nx+4)+i] = missval;
+	      for ( i = 0; i < nx+4; i++ ) array1[     1*(nx+4)+i] = missval;
+	      for ( i = 0; i < nx+4; i++ ) array1[(ny+2)*(nx+4)+i] = missval;
+	      for ( i = 0; i < nx+4; i++ ) array1[(ny+3)*(nx+4)+i] = missval;
+
+	      gridsize = gridsize_new;
+	      nmiss1 += 4*(nx+2) + 4*(ny+2);
+	    }
 
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(array1[i], missval) )
