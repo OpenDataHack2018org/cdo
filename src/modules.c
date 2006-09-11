@@ -280,7 +280,7 @@ static MODULES Modules[] =
   { Math,           MathHelp,          MathOperators,           1,  1 },
   { Merge,          MergeHelp,         MergeOperators,         -1,  1 },
   { Mergegrid,      NULL,              MergegridOperators,      2,  1 },
-  { Mergetime,      NULL,              MergetimeOperators,     -1,  1 },
+  { Mergetime,      MergeHelp,         MergetimeOperators,     -1,  1 },
   { Merstat,        MerstatHelp,       MerstatOperators,        1,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,          1,  0 },
   { Nmltest,        NULL,              NmltestOperators,        0,  0 },

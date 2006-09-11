@@ -5,6 +5,7 @@
 	* set alias gradsdes to gradsdes2
 	* rename gradsdes to gradsdes1
 	* add option -z szip to compress GRIB records with SZIP
+	* use DBL_IS_EQUAL to compare floating point
 	* remapbil, remapbic: improvement and speedup for regional lonlat grids
 	* Seltime: print warning message if parameter not found
 	* pstreamDefVlist: unpack netCDF data if datatype = FLT64

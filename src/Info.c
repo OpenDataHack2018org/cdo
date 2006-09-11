@@ -309,7 +309,7 @@ void *Info(void *argument)
 
 	      fprintf(stdout, "%7d %7d :", gridsize, nmiss);
 
-	      if ( gridInqType(gridID) == GRID_SPECTRAL ||
+	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0) )
 		{
 		  fprintf(stdout, "            %#12.5g\n", array[0]);

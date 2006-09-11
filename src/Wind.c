@@ -187,7 +187,7 @@ void *Wind(void *argument)
 	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
 	  vlistDefVarCode(vlistID2, varID1, 155);
 	  vlistDefVarCode(vlistID2, varID2, 138);
-	  /* define varname aso. !!! */
+	  /* define varname also !!! */
 
 	  nlon = gridInqXsize(gridID1);
 	  nlat = gridInqYsize(gridID1);
@@ -233,7 +233,7 @@ void *Wind(void *argument)
 	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
 	  vlistDefVarCode(vlistID2, varID1, 131);
 	  vlistDefVarCode(vlistID2, varID2, 132);
-	  /* define varname aso. !!! */
+	  /* define varname also !!! */
 
 	  ntr  = gridInqTrunc(gridID1);
 	  nlon = gridInqXsize(gridID2);

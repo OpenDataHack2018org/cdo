@@ -40,7 +40,7 @@ void hsv_to_rgb (int rgb[], double h, double s, double v)
   int i;
   double f, p, q, t, rr = 0, gg = 0, bb = 0;
 	
-  if (s == 0.0)
+  if ( !(fabs(s) > 0) )
     rgb[0] = rgb[1] = rgb[2] = (int) floor (255.999 * v);
   else {
     while (h >= 360.0) h -= 360.0;
@@ -307,7 +307,7 @@ int cptRead(FILE *fp, CPT *cpt)
 	}
 		
 	dz = cpt->lut[n].z_high - cpt->lut[n].z_low;
-	if (dz == 0.0) {
+	if ( !(fabs(dz) > 0) ) {
 	  fprintf (stderr, "%s: Z-slice with dz = 0\n", func);
 	  return (READERR);
 	}
@@ -343,7 +343,7 @@ int cptRead(FILE *fp, CPT *cpt)
   cpt->lut = (LUT *) realloc((void *)cpt->lut, (size_t)n*sizeof (LUT));
   ncolors = n;
   for (i = annot = 0, gap = FALSE; i < ncolors - 1; i++) {
-    if (cpt->lut[i].z_high != cpt->lut[i+1].z_low) gap = TRUE;
+    if ( fabs(cpt->lut[i].z_high - cpt->lut[i+1].z_low) > 0 ) gap = TRUE;
     annot += cpt->lut[i].annot;
   }
 

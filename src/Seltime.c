@@ -171,7 +171,7 @@ void *Seltime(void *argument)
 		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d", &year, &month, &day, &hour, &minute);
 		  /* fprintf(stderr, "status = %d\n", status); */
 		  fval = hour*100 + minute;
-		  if ( fval ) fval /= 10000;
+		  if ( fabs(fval) > 0 ) fval /= 10000;
 		  fval += year*10000 + month*100 + day;
 		  listSetFlt(flist, i, fval);
 		}
