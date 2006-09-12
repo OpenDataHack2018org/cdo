@@ -114,6 +114,7 @@ cdo_SOURCES = Arith.c		\
               history.c		\
               institution.c 	\
               interpol.c 	\
+              job.c 	\
               modules.c		\
               namelist.c 	\
               normal.c		\

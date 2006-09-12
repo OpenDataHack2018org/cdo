@@ -194,6 +194,7 @@ cdo_SOURCES = Arith.c		\
               history.c		\
               institution.c 	\
               interpol.c 	\
+              job.c 	\
               modules.c		\
               namelist.c 	\
               normal.c		\
@@ -287,14 +288,14 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	field.$(OBJEXT) fieldc.$(OBJEXT) field2.$(OBJEXT) \
 	fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) grid.$(OBJEXT) \
 	history.$(OBJEXT) institution.$(OBJEXT) interpol.$(OBJEXT) \
-	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
-	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
-	timer.$(OBJEXT) realtime.$(OBJEXT) pstream.$(OBJEXT) \
-	table.$(OBJEXT) userlog.$(OBJEXT) util.$(OBJEXT) \
-	legendre.$(OBJEXT) fourier.$(OBJEXT) specspace.$(OBJEXT) \
-	readline.$(OBJEXT) julian.$(OBJEXT) vinterp.$(OBJEXT) \
-	zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
-	list.$(OBJEXT)
+	job.$(OBJEXT) modules.$(OBJEXT) namelist.$(OBJEXT) \
+	normal.$(OBJEXT) pipe.$(OBJEXT) process.$(OBJEXT) \
+	remaplib.$(OBJEXT) timer.$(OBJEXT) realtime.$(OBJEXT) \
+	pstream.$(OBJEXT) table.$(OBJEXT) userlog.$(OBJEXT) \
+	util.$(OBJEXT) legendre.$(OBJEXT) fourier.$(OBJEXT) \
+	specspace.$(OBJEXT) readline.$(OBJEXT) julian.$(OBJEXT) \
+	vinterp.$(OBJEXT) zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) \
+	color.$(OBJEXT) list.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES =
 cdo_LDFLAGS =
@@ -361,11 +362,12 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/fieldzon.Po ./$(DEPDIR)/fourier.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/grid.Po ./$(DEPDIR)/history.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/institution.Po ./$(DEPDIR)/interpol.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/julian.Po ./$(DEPDIR)/legendre.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/list.Po ./$(DEPDIR)/modules.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/namelist.Po ./$(DEPDIR)/normal.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/pipe.Po ./$(DEPDIR)/process.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/pstream.Po ./$(DEPDIR)/pthread_debug.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/job.Po ./$(DEPDIR)/julian.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/legendre.Po ./$(DEPDIR)/list.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/modules.Po ./$(DEPDIR)/namelist.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/normal.Po ./$(DEPDIR)/pipe.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/process.Po ./$(DEPDIR)/pstream.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/pthread_debug.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/readline.Po ./$(DEPDIR)/realtime.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/remaplib.Po ./$(DEPDIR)/specspace.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/table.Po ./$(DEPDIR)/timer.Po \
@@ -553,6 +555,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/history.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/institution.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interpol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/job.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/julian.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/legendre.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/list.Po@am__quote@

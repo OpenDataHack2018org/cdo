@@ -72,6 +72,9 @@ int cdoTimer       = FALSE;
 int cdoVerbose     = FALSE;
 int cdoDebug       = 0;
 
+int cdoExpMode     = -1;
+char *cdoExpName   = NULL;
+
 
 int timer_total, timer_read, timer_write;
 int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
@@ -177,7 +180,7 @@ static void usage(void)
 }
 
 
-static void cdoPrintHelp(char *phelp[], char *xoperator)
+static void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 {
   if ( phelp == NULL )
     printf("No help available for this operator!\n");
@@ -513,7 +516,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:p:g:i:l:m:t:D:z:aBdhRrsTVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:p:g:i:l:m:t:D:z:aBdhRrsTVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -533,6 +536,18 @@ int main(int argc, char *argv[])
 	  Debug = 1;
 	  DebugLevel = atoi(cdoOptarg);
 	  break;
+	case 'e':
+	  {
+	  char host[1024];
+	  gethostname(host, sizeof(host));
+	  cdoExpName = cdoOptarg;
+	  /* printf("host: %s %s\n", host, cdoExpName); */
+	  if ( strcmp(host, cdoExpName) == 0 )
+	    cdoExpMode = CDO_EXP_REMOTE;
+	  else
+            cdoExpMode = CDO_EXP_LOCAL;
+          break;
+	  }
 	case 'f':
 	  setDefaultFileType(cdoOptarg, 1);
 	  break;
@@ -730,36 +745,84 @@ int main(int argc, char *argv[])
 
   if ( lstop ) return (status);
 
-  if ( cdoTimer )
-    {
-      timer_total      = timer_new("total");
-      timer_read       = timer_new("read");
-      timer_write      = timer_new("write");
-      timer_remap      = timer_new("remap");
-      timer_remap_con  = timer_new("remap con");
-      timer_remap_con2 = timer_new("remap con2");
-      timer_remap_con3 = timer_new("remap con3");
-    }
-
-  if ( cdoTimer ) timer_start(timer_total);
-
   if ( cdoDefaultTableID != CDI_UNDEFID ) cdiDefTableID(cdoDefaultTableID);
 
   operatorName = getOperatorName(operatorArg);
 
   if ( Help )
-    cdoPrintHelp(operatorHelp(operatorName), operatorName);
+    {
+      cdoPrintHelp(operatorHelp(operatorName)/*, operatorName*/);
+    }
+  else if ( cdoExpMode == CDO_EXP_LOCAL )
+    {
+      char commandline[65536];
+      int i;
+      char jobname[1024];
+      char jobfilename[1024];
+      FILE *jobfilep;
+
+      commandline[0] = 0;
+      strcat(commandline, "/pf/m/m214003/cdt/work/cdo/src/cdo ");
+      for ( i = 1; i < argc; i++ )
+	{
+	  strcat(commandline, argv[i]);
+	  strcat(commandline, " ");
+	}
+      /* printf("command: >%s<\n", commandline);*/
+
+      jobfilename[0] = 0;
+      strcat(jobfilename, "cdojob.sh");
+
+      jobfilep = fopen(jobfilename, "w");
+
+      if ( jobfilep == NULL )
+	{
+	  fprintf(stderr, "Open failed on %s\n", jobfilename);
+	  perror(jobfilename);
+          exit(EXIT_FAILURE);
+	}
+
+      fprintf(jobfilep, "#! /bin/bash\n");
+      fprintf(jobfilep, "uname -s\n");
+      fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-x86:$LD_LIBRARY_PATH\n");
+      fprintf(jobfilep, "%s\n", commandline);
+
+      fclose(jobfilep);
+
+      sprintf(jobname, "cdo_%s", cdoExpName); 
+
+      job_submit(cdoExpName, jobfilename, jobname);
+
+      sprintf(commandline, "rm -r %s\n", jobfilename);
+      system(commandline);
+    }
   else
-    operatorModule(operatorName)(argument);
+    {
+      if ( cdoTimer )
+	{
+	  timer_total      = timer_new("total");
+	  timer_read       = timer_new("read");
+	  timer_write      = timer_new("write");
+	  timer_remap      = timer_new("remap");
+	  timer_remap_con  = timer_new("remap con");
+	  timer_remap_con2 = timer_new("remap con2");
+	  timer_remap_con3 = timer_new("remap con3");
+	}
+
+      if ( cdoTimer ) timer_start(timer_total);
+
+      operatorModule(operatorName)(argument);
+
+      if ( cdoTimer ) timer_stop(timer_total);
+
+      if ( cdoTimer ) timer_report();
+    }
 
   if ( argument ) free(argument);
   /* problems with alias!!! if ( operatorName ) free(operatorName); */ 
 
   /* malloc_stats(); */
 
-  if ( cdoTimer ) timer_stop(timer_total);
-
-  if ( cdoTimer ) timer_report();
 
   return (status);
 }

@@ -58,6 +58,9 @@ char *strdup(const char *s);
 #define M_LN10		2.30258509299404568402	/* log_e 10 */
 #endif
 
+#define CDO_EXP_LOCAL   1
+#define CDO_EXP_REMOTE  2
+
 void strtolower(char *str);
 
 void print_pthread_info(void);
@@ -92,5 +95,7 @@ int     defineTable(char *tablearg);
 void    userlog(const char *prompt, double cputime);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
+
+void job_submit(const char *expname, const char *jobfilename, const char *jobname);
 
 #endif  /* _CDO_INT_H */

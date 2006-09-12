@@ -272,6 +272,7 @@ src/history.c -text
 src/institution.c -text
 src/interpol.c -text
 src/interpol.h -text
+src/job.c -text
 src/julian.c -text
 src/legendre.c -text
 src/list.c -text
