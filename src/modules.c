@@ -231,10 +231,10 @@ void *Zonstat(void *argument);
 #define  WindOperators          {"uv2dv", "dv2uv", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
-#define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaymean", "ydayavg", "ydaystd"}
+#define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydaystd"}
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
-#define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonmean", "ymonavg", "ymonstd"}
-#define  YseasstatOperators     {"yseasmin", "yseasmax", "yseasmean", "yseasavg", "yseasstd"}
+#define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd"}
+#define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd"}
 #define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd"}
 
 

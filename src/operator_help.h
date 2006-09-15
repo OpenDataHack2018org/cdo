@@ -1652,7 +1652,7 @@ static char *SeasstatHelp[] = {
 
 static char *YdaystatHelp[] = {
     "NAME",
-    "    ydaymin, ydaymax, ydaymean, ydayavg, ydaystd - ",
+    "    ydaymin, ydaymax, ydaysum, ydaymean, ydayavg, ydaystd - ",
     "    Multi-year daily statistical values",
     "",
     "SYNOPSIS",
@@ -1673,6 +1673,10 @@ static char *YdaystatHelp[] = {
     "              o(001,x) = max{i(t,x), day(i(t)) = 001}",
     "                               ...",
     "              o(366,x) = max{i(t,x), day(i(t)) = 366}",
+    "    ydaysum   Multi-year daily sum",
+    "              o(001,x) = sum{i(t,x), day(i(t)) = 001}",
+    "                               ...",
+    "              o(366,x) = sum{i(t,x), day(i(t)) = 366}",
     "    ydaymean  Multi-year daily mean",
     "              o(001,x) = mean{i(t,x), day(i(t)) = 001}",
     "                               ...",
@@ -1690,7 +1694,7 @@ static char *YdaystatHelp[] = {
 
 static char *YmonstatHelp[] = {
     "NAME",
-    "    ymonmin, ymonmax, ymonmean, ymonavg, ymonstd - ",
+    "    ymonmin, ymonmax, ymonsum, ymonmean, ymonavg, ymonstd - ",
     "    Multi-year monthly statistical values",
     "",
     "SYNOPSIS",
@@ -1711,6 +1715,10 @@ static char *YmonstatHelp[] = {
     "              o(01,x) = max{i(t,x), month(i(t)) = 01}",
     "                               ...",
     "              o(12,x) = max{i(t,x), month(i(t)) = 12}",
+    "    ymonsum   Multi-year monthly sum",
+    "              o(01,x) = sum{i(t,x), month(i(t)) = 01}",
+    "                               ...",
+    "              o(12,x) = sum{i(t,x), month(i(t)) = 12}",
     "    ymonmean  Multi-year monthly mean",
     "              o(01,x) = mean{i(t,x), month(i(t)) = 01}",
     "                               ...",
@@ -1728,7 +1736,7 @@ static char *YmonstatHelp[] = {
 
 static char *YseasstatHelp[] = {
     "NAME",
-    "    yseasmin, yseasmax, yseasmean, yseasavg, yseasstd - ",
+    "    yseasmin, yseasmax, yseassum, yseasmean, yseasavg, yseasstd - ",
     "    Multi-year seasonally statistical values",
     "",
     "SYNOPSIS",
@@ -1751,6 +1759,11 @@ static char *YseasstatHelp[] = {
     "               o(2,x) = max{i(t,x), month(i(t)) = 03, 04, 05}",
     "               o(3,x) = max{i(t,x), month(i(t)) = 06, 07, 08}",
     "               o(4,x) = max{i(t,x), month(i(t)) = 09, 10, 11}",
+    "    yseassum   Multi-year seasonally sum",
+    "               o(1,x) = sum{i(t,x), month(i(t)) = 12, 01, 02}",
+    "               o(2,x) = sum{i(t,x), month(i(t)) = 03, 04, 05}",
+    "               o(3,x) = sum{i(t,x), month(i(t)) = 06, 07, 08}",
+    "               o(4,x) = sum{i(t,x), month(i(t)) = 09, 10, 11}",
     "    yseasmean  Multi-year seasonally mean",
     "               o(1,x) = mean{i(t,x), month(i(t)) = 12, 01, 02}",
     "               o(2,x) = mean{i(t,x), month(i(t)) = 03, 04, 05}",

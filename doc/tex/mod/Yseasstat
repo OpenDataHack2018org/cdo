@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = yseasmin yseasmax yseasmean yseasavg yseasstd
+@Operators = yseasmin yseasmax yseassum yseasmean yseasavg yseasstd
 
 @BeginDescription
 This module writes to @file{ofile}, according to the actual operator,
@@ -57,6 +57,30 @@ o(\mbox{1},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\}
 o(\mbox{2},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
 o(\mbox{3},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
 o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yseassum
+@Title     = Multi-year seasonally sum
+
+@BeginDescription
+@IfMan
+o(1,x) = sum{i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = sum{i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = sum{i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = sum{i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc

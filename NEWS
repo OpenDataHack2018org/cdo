@@ -1,8 +1,93 @@
 CDO NEWS
 --------
 
-Version 0.9.3 (17 Dec 2004):
-* Support of PINGO grid description files.
-* New operator: gradsdes
-  Creates a GrADS data descriptor file.
-  Supported file formats are GRIB, SERVICE and EXTRA.
+Version 1.0.2 (18 September 2006):
+
+  * Rename operator gradsdes to gradsdes1 and set the alias gradsdes to gradsdes2
+  * Remapping of rotated lonlat grids with remapbi* and genbi* has been changed at the bounds.
+    Generated interpolation weights with older CDO versions can't be used anymore and must
+    be recalculated with genbi*.
+  * New operators:
+      o int - Convert to integer value
+      o nint - Convert to nearest integer value
+
+Version 1.0.1 (1 August 2006):
+
+  * New CDO option '-b' to set the number of bits for the output precision
+  * New operators:
+      o selstdname - Select standard names
+      o showstdname - Show standard names
+      o setclonlatbox - Set a longitude/latitude box to constant [Etienne Tourigny]
+      o setcindexbox - Set an index box to constant
+
+Version 1.0.0 (15 June 2006):
+
+  * New operators:
+      o dv2ps - Divergence and vorticity to velocity potential and stream function
+
+Version 0.9.13 (4 May 2006):
+
+  * New operators:
+      o mergetime - Merge datasets sorted by date and time
+      o input, inputext, inputsrv - ASCII input
+      o abs - Absolute value
+      o atan2 - Arc tangent of two fields
+
+Version 0.9.12 (6 March 2006):
+
+  * New operators:
+      o uv2dv, dv2uv - Wind transformation
+
+Version 0.9.11 (1 Februar 2006):
+
+  * Support of GME grids
+  * New operators:
+      o selmin, selmax, selsum, selmean, selavg, selstd - Time range statistic
+      o sp2gpl, gp2spl - Spectral transformation of TL-Model data (e.g. ERA40)
+      o replace - Replace variables
+
+Version 0.9.10 (19 December 2005):
+
+  * Support of REMO IEG format
+  * New operators:
+      o ifthenelse - IF ifile1 THEN ifile2 ELSE ifile3
+
+Version 0.9.9 (19 October 2005):
+
+  * New operators:
+      o ensmin, ensmax, enssum, ensmean, ensavg, ensstd, ensvar - Ensemble statistic
+      o gradsdes2 - Creates a GrADS data descriptor file with a portable GrADS map
+      o enlarge - Enlarge all fields to a user given grid
+      o gencon - Generate conservative interpolation weights
+      o remap - Remapping with the interpolation weights from a netCDF file 
+
+Version 0.9.8 (19 July 2005):
+
+  * New operators:
+      o setlevel - Set level
+      o chlevel - Change level 
+      o chlevelc - Change level of one code
+      o chlevelv - Change level of one variable
+
+Version 0.9.7 (26 May 2005):
+
+  * New operators:
+      o setcalendar - Set calendar
+      o masklonlatbox - Mask lon/lat box
+      o maskindexbox - Mask index box
+      o muldpm - Multiply with days per month
+      o divdpm - Divide with days per month
+ 
+
+Version 0.9.6 (4 April 2005):
+
+  * Support of rotated regular grids.
+  * New operator:
+      o detrend - Linear detrending of time series. 
+
+Version 0.9.4 (3 Jan 2005):
+ 
+  * Support of PINGO grid description files. 
+  * New operator: 
+      o gradsdes - Creates a GrADS data descriptor file.
+                   Supported file formats are GRIB, SERVICE and EXTRA. 

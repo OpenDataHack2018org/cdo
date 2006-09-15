@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ydaymin ydaymax ydaymean ydayavg ydaystd
+@Operators = ydaymin ydaymax ydaysum ydaymean ydayavg ydaystd
 
 @BeginDescription
 This module writes to @file{ofile}, according to the actual operator,
@@ -52,6 +52,28 @@ o(366,x) = max{i(t,x), day(i(t)) = 366}
 o(\mbox{001},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
 \vdots \\
 o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaysum
+@Title     = Multi-year daily sum
+
+@BeginDescription
+@IfMan
+o(001,x) = sum{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = sum{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf sum}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf sum}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc

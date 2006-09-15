@@ -20,6 +20,7 @@
 
       Yseasstat  yseasmin        Multi-year seasonally minimum
       Yseasstat  yseasmax        Multi-year seasonally maximum
+      Yseasstat  yseassum        Multi-year seasonally sum
       Yseasstat  yseasmean       Multi-year seasonally mean
       Yseasstat  yseasavg        Multi-year seasonally average
       Yseasstat  yseasstd        Multi-year seasonally standard deviation
@@ -69,6 +70,7 @@ void *Yseasstat(void *argument)
 
   cdoOperatorAdd("yseasmin",  func_min,  0, NULL);
   cdoOperatorAdd("yseasmax",  func_max,  0, NULL);
+  cdoOperatorAdd("yseassum",  func_sum,  0, NULL);
   cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
   cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
   cdoOperatorAdd("yseasstd",  func_std,  0, NULL);

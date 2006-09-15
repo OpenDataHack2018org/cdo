@@ -20,6 +20,7 @@
 
       Ydaystat   ydaymin         Multi-year daily minimum
       Ydaystat   ydaymax         Multi-year daily maximum
+      Ydaystat   ydaysum         Multi-year daily sum
       Ydaystat   ydaymean        Multi-year daily mean
       Ydaystat   ydayavg         Multi-year daily average
       Ydaystat   ydaystd         Multi-year daily standard deviation
@@ -70,6 +71,7 @@ void *Ydaystat(void *argument)
 
   cdoOperatorAdd("ydaymin",  func_min,  0, NULL);
   cdoOperatorAdd("ydaymax",  func_max,  0, NULL);
+  cdoOperatorAdd("ydaysum",  func_sum,  0, NULL);
   cdoOperatorAdd("ydaymean", func_mean, 0, NULL);
   cdoOperatorAdd("ydayavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ydaystd",  func_std,  0, NULL);

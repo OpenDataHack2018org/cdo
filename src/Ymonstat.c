@@ -20,6 +20,7 @@
 
       Ymonstat   ymonmin         Multi-year monthly minimum
       Ymonstat   ymonmax         Multi-year monthly maximum
+      Ymonstat   ymonsum         Multi-year monthly sum
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
       Ymonstat   ymonstd         Multi-year monthly standard deviation
@@ -69,6 +70,7 @@ void *Ymonstat(void *argument)
 
   cdoOperatorAdd("ymonmin",  func_min,  0, NULL);
   cdoOperatorAdd("ymonmax",  func_max,  0, NULL);
+  cdoOperatorAdd("ymonsum",  func_sum,  0, NULL);
   cdoOperatorAdd("ymonmean", func_mean, 0, NULL);
   cdoOperatorAdd("ymonavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ymonstd",  func_std,  0, NULL);

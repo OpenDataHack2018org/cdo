@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ymonmin ymonmax ymonmean ymonavg ymonstd
+@Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonstd
 
 @BeginDescription
 This module writes to @file{ofile}, according to the actual operator,
@@ -53,6 +53,28 @@ o(12,x) = max{i(t,x), month(i(t)) = 12}
 o(\mbox{01},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
 \vdots \\
 o(\mbox{12},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ymonsum
+@Title     = Multi-year monthly sum
+
+@BeginDescription
+@IfMan
+o(01,x) = sum{i(t,x), month(i(t)) = 01}
+                 ...
+o(12,x) = sum{i(t,x), month(i(t)) = 12}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{01},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+\vdots \\
+o(\mbox{12},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc
