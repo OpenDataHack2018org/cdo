@@ -5,7 +5,7 @@
 @Section   = Arithmetic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = abs sqr sqrt exp ln log10 sin cos tan asin acos atan
+@Operators = abs int nint sqr sqrt exp ln log10 sin cos tan asin acos atan
 
 @BeginDescription
 This module contains some standard mathematical functions.
@@ -27,6 +27,40 @@ o(t,x) = \mbox{abs}(i(t,x))
 @EndMath
 @EndifDoc
 @C Calculates the absolute value of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_int
+@Title     = Integer value
+
+@BeginDescription
+@IfMan
+o(t,x) = int(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{int}(i(t,x))
+@EndMath
+@EndifDoc
+@C Convert to integer value of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_nint
+@Title     = Nearest integer value
+
+@BeginDescription
+@IfMan
+o(t,x) = nint(i(t,x))
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{nint}(i(t,x))
+@EndMath
+@EndifDoc
+@C Evaluate the nearest integer value of i(t,x).
 @EndDescription
 @EndOperator
 

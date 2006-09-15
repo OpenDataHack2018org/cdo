@@ -42,7 +42,7 @@
 void *Math(void *argument)
 {
   static char func[] = "Math";
-  enum {ABS, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
+  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
   int operatorID;
   int operfunc;
   int streamID1, streamID2;
@@ -60,10 +60,12 @@ void *Math(void *argument)
   cdoInitialize(argument);
 
   cdoOperatorAdd("abs",   ABS,   0, NULL);
+  cdoOperatorAdd("int",   FINT,  0, NULL);
+  cdoOperatorAdd("nint",  FNINT, 0, NULL);
   cdoOperatorAdd("sqr",   SQR,   0, NULL);
   cdoOperatorAdd("sqrt",  SQRT,  0, NULL);
   cdoOperatorAdd("exp",   EXP,   0, NULL);
-  cdoOperatorAdd("ln",    LN,   0, NULL);
+  cdoOperatorAdd("ln",    LN,    0, NULL);
   cdoOperatorAdd("log10", LOG10, 0, NULL);
   cdoOperatorAdd("sin",   SIN,   0, NULL);
   cdoOperatorAdd("cos",   COS,   0, NULL);
@@ -118,6 +120,14 @@ void *Math(void *argument)
 	    case ABS:
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : fabs(array1[i]);
+	      break;
+	    case FINT:
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : (int)(array1[i]);
+	      break;
+	    case FNINT:
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : NINT(array1[i]);
 	      break;
 	    case SQR:
 	      for ( i = 0; i < gridsize; i++ )

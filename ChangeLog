@@ -4,6 +4,7 @@
 	* using CDI library version 1.0.2
 	* set alias gradsdes to gradsdes2
 	* rename gradsdes to gradsdes1
+	* New operator: int and nint (Math) [request: Joerg Wegner]
 	* add option -e exp to test DRMAA
 	* add option -z szip to compress GRIB records with SZIP
 	* use DBL_IS_EQUAL to compare floating point
