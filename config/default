@@ -29,7 +29,7 @@ case "${HOSTNAME}" in
 	./configure --prefix=$HOME/local \
                     --enable-dap --with-netcdf=$HOME/local \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
-                    CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall"
+                    CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
 	;;
     gata)
 # opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
