@@ -8,6 +8,9 @@ Version 1.0.2 (18 September 2006):
     Generated interpolation weights with older CDO versions can't be used anymore and must
     be recalculated with genbi*.
   * New operators:
+      o ydaysum - Multi-year daily sum
+      o ymonsum - Multi-year monthly sum
+      o yseassum - Multi-year seasonally sum
       o int - Convert to integer value
       o nint - Convert to nearest integer value
 

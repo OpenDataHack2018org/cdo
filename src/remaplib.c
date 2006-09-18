@@ -381,6 +381,177 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   rg->gridID1 = gridID1;
   rg->gridID2 = gridID2;
 
+  if ( map_type != MAP_TYPE_CONSERV &&
+       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
+	(gridInqType(gridID1) == GRID_LONLAT && rg->non_global)) )
+    {
+      /*
+	int gridIDnew;
+	int nx, ny, nxp2, nyp2;
+	double *xvals, *yvals;
+	
+	nx = gridInqXsize(gridID1);
+	ny = gridInqYsize(gridID1);
+	nxp2 = nx+2;
+	nyp2 = ny+2;
+
+	xvals = (double *) malloc(nxp2*sizeof(double));
+	yvals = (double *) malloc(nyp2*sizeof(double));
+	gridInqXvals(gridID1, xvals+1);
+	gridInqYvals(gridID1, yvals+1);
+
+	gridIDnew = gridCreate(GRID_LONLAT, nxp2*nyp2);
+	gridDefXsize(gridIDnew, nxp2);
+	gridDefYsize(gridIDnew, nyp2);
+	      
+	xvals[0] = xvals[1] - gridInqXinc(gridID1);
+	xvals[nxp2-1] = xvals[nx] + gridInqXinc(gridID1);
+
+	yvals[0] = yvals[1] - gridInqYinc(gridID1);
+	yvals[nyp2-1] = yvals[ny] + gridInqYinc(gridID1);
+
+	gridDefXvals(gridIDnew, xvals);
+	gridDefYvals(gridIDnew, yvals);
+
+	free(xvals);
+	free(yvals);
+
+	gridDefXpole(gridIDnew, gridInqXpole(gridID1));
+	gridDefYpole(gridIDnew, gridInqYpole(gridID1));
+      */
+      int gridIDnew;
+      int nx, ny, nxp4, nyp4;
+      double *xvals, *yvals;
+
+      nx = gridInqXsize(gridID1);
+      ny = gridInqYsize(gridID1);
+      nxp4 = nx+4;
+      nyp4 = ny+4;
+
+      xvals = (double *) malloc(nxp4*sizeof(double));
+      yvals = (double *) malloc(nyp4*sizeof(double));
+      gridInqXvals(gridID1, xvals+2);
+      gridInqYvals(gridID1, yvals+2);
+
+      gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
+      gridDefXsize(gridIDnew, nxp4);
+      gridDefYsize(gridIDnew, nyp4);
+	      
+      xvals[0] = xvals[2] - 2*gridInqXinc(gridID1);
+      xvals[1] = xvals[2] - gridInqXinc(gridID1);
+      xvals[nxp4-2] = xvals[nx+1] + gridInqXinc(gridID1);
+      xvals[nxp4-1] = xvals[nx+1] + 2*gridInqXinc(gridID1);
+
+      yvals[0] = yvals[2] - 2*gridInqYinc(gridID1);
+      yvals[1] = yvals[2] - gridInqYinc(gridID1);
+      yvals[nyp4-2] = yvals[ny+1] + gridInqYinc(gridID1);
+      yvals[nyp4-1] = yvals[ny+1] + 2*gridInqYinc(gridID1);
+
+      gridDefXvals(gridIDnew, xvals);
+      gridDefYvals(gridIDnew, yvals);
+
+      free(xvals);
+      free(yvals);
+
+      if ( gridIsRotated(gridID1) )
+	{
+	  gridDefXpole(gridIDnew, gridInqXpole(gridID1));
+	  gridDefYpole(gridIDnew, gridInqYpole(gridID1));
+	}
+
+      gridID1 = gridIDnew;
+      rg->gridID1 = gridIDnew;
+      
+      rg->no_fall_back = TRUE;
+    }
+
+  if ( map_type != MAP_TYPE_CONSERV &&
+       (gridInqType(gridID1) == GRID_CURVILINEAR && rg->non_global) )
+    {
+      int gridIDnew;
+      int gridsize, gridsize_new;
+      int nx, ny, nxp4, nyp4;
+      double xinc, yinc;
+      double *xvals, *yvals;
+
+      gridsize = gridInqSize(gridID1);
+      nx = gridInqXsize(gridID1);
+      ny = gridInqYsize(gridID1);
+      nxp4 = nx+4;
+      nyp4 = ny+4;
+      gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
+
+      xvals = (double *) malloc(gridsize_new*sizeof(double));
+      yvals = (double *) malloc(gridsize_new*sizeof(double));
+      gridInqXvals(gridID1, xvals);
+      gridInqYvals(gridID1, yvals);
+
+      gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
+      gridDefXsize(gridIDnew, nxp4);
+      gridDefYsize(gridIDnew, nyp4);
+
+      for ( j = ny-1; j >= 0; j-- )
+	for ( i = nx-1; i >= 0; i-- )
+	  xvals[(j+2)*(nx+4)+i+2] = xvals[j*nx+i];
+
+      for ( j = ny-1; j >= 0; j-- )
+	for ( i = nx-1; i >= 0; i-- )
+	  yvals[(j+2)*(nx+4)+i+2] = yvals[j*nx+i];
+
+      for ( j = 2; j < nyp4-2; j++ )
+	{
+	  xinc = xvals[j*nxp4+3] - xvals[j*nxp4+2];
+	  yinc = yvals[j*nxp4+3] - yvals[j*nxp4+2];
+	  xvals[j*nxp4+0] = xvals[j*nxp4+2] - xinc*2; 
+	  xvals[j*nxp4+1] = xvals[j*nxp4+2] - xinc; 
+	  yvals[j*nxp4+0] = yvals[j*nxp4+2] - yinc*2; 
+	  yvals[j*nxp4+1] = yvals[j*nxp4+2] - yinc; 
+	  xinc = xvals[j*nxp4+nxp4-4] - xvals[j*nxp4+nxp4-3];
+	  yinc = yvals[j*nxp4+nxp4-4] - yvals[j*nxp4+nxp4-3];
+	  xvals[j*nxp4+nxp4-2] = xvals[j*nxp4+nxp4-3] + xinc; 
+	  xvals[j*nxp4+nxp4-1] = xvals[j*nxp4+nxp4-3] + xinc*2; 
+	  yvals[j*nxp4+nxp4-2] = yvals[j*nxp4+nxp4-3] + yinc; 
+	  yvals[j*nxp4+nxp4-1] = yvals[j*nxp4+nxp4-3] + yinc*2; 
+	}
+
+      for ( i = 0; i < nxp4; i++ )
+	{
+	  xinc = xvals[3*nxp4+i] - xvals[2*nxp4+i];
+	  yinc = yvals[3*nxp4+i] - yvals[2*nxp4+i];
+	  xvals[0*nxp4+i] = xvals[2*nxp4+i] - xinc*2;
+	  xvals[1*nxp4+i] = xvals[2*nxp4+i] - xinc;
+	  yvals[0*nxp4+i] = yvals[2*nxp4+i] - yinc*2;
+	  yvals[1*nxp4+i] = yvals[2*nxp4+i] - yinc;
+	  xinc = xvals[(nyp4-4)*nxp4+i] - xvals[(nyp4-3)*nxp4+i];
+	  yinc = yvals[(nyp4-4)*nxp4+i] - yvals[(nyp4-3)*nxp4+i];
+	  xvals[(nyp4-2)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] + xinc;
+	  xvals[(nyp4-1)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] + xinc*2;
+	  yvals[(nyp4-2)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] + yinc;
+	  yvals[(nyp4-1)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] + yinc*2;
+	}
+
+      {
+	FILE *fp;
+	fp = fopen("xvals.asc", "w");
+	for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", xvals[i]);
+	fclose(fp);
+	fp = fopen("yvals.asc", "w");
+	for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", yvals[i]);
+	fclose(fp);
+      }
+
+      gridDefXvals(gridIDnew, xvals);
+      gridDefYvals(gridIDnew, yvals);
+
+      free(xvals);
+      free(yvals);
+
+      gridID1 = gridIDnew;
+      rg->gridID1 = gridIDnew;
+      
+      rg->no_fall_back = TRUE;
+    }
+
   if ( gridInqType(rg->gridID1) != GRID_CELL && gridInqType(rg->gridID1) != GRID_CURVILINEAR )
     {
       if ( gridInqType(rg->gridID1) == GRID_GME )
@@ -393,85 +564,6 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
       else
 	{
-	  if ( gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1) &&
-	       map_type != MAP_TYPE_CONSERV )
-	    {
-	      /*
-	      int gridIDnew;
-	      int nx, ny, nxp2, nyp2;
-	      double *xvals, *yvals;
-
-	      nx = gridInqXsize(gridID1);
-	      ny = gridInqYsize(gridID1);
-	      nxp2 = nx+2;
-	      nyp2 = ny+2;
-
-	      xvals = (double *) malloc(nxp2*sizeof(double));
-	      yvals = (double *) malloc(nyp2*sizeof(double));
-	      gridInqXvals(gridID1, xvals+1);
-	      gridInqYvals(gridID1, yvals+1);
-
-	      gridIDnew = gridCreate(GRID_LONLAT, nxp2*nyp2);
-	      gridDefXsize(gridIDnew, nxp2);
-	      gridDefYsize(gridIDnew, nyp2);
-	      
-	      xvals[0] = xvals[1] - gridInqXinc(gridID1);
-	      xvals[nxp2-1] = xvals[nx] + gridInqXinc(gridID1);
-
-	      yvals[0] = yvals[1] - gridInqYinc(gridID1);
-	      yvals[nyp2-1] = yvals[ny] + gridInqYinc(gridID1);
-
-	      gridDefXvals(gridIDnew, xvals);
-	      gridDefYvals(gridIDnew, yvals);
-
-	      free(xvals);
-              free(yvals);
-
-	      gridDefXpole(gridIDnew, gridInqXpole(gridID1));
-	      gridDefYpole(gridIDnew, gridInqYpole(gridID1));
-	      */
-	      int gridIDnew;
-	      int nx, ny, nxp4, nyp4;
-	      double *xvals, *yvals;
-
-	      nx = gridInqXsize(gridID1);
-	      ny = gridInqYsize(gridID1);
-	      nxp4 = nx+4;
-	      nyp4 = ny+4;
-
-	      xvals = (double *) malloc(nxp4*sizeof(double));
-	      yvals = (double *) malloc(nyp4*sizeof(double));
-	      gridInqXvals(gridID1, xvals+2);
-	      gridInqYvals(gridID1, yvals+2);
-
-	      gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
-	      gridDefXsize(gridIDnew, nxp4);
-	      gridDefYsize(gridIDnew, nyp4);
-	      
-	      xvals[0] = xvals[2] - 2*gridInqXinc(gridID1);
-	      xvals[1] = xvals[2] - gridInqXinc(gridID1);
-	      xvals[nxp4-2] = xvals[nx+1] + gridInqXinc(gridID1);
-	      xvals[nxp4-1] = xvals[nx+1] + 2*gridInqXinc(gridID1);
-
-	      yvals[0] = yvals[2] - 2*gridInqYinc(gridID1);
-	      yvals[1] = yvals[2] - gridInqYinc(gridID1);
-	      yvals[nyp4-2] = yvals[ny+1] + gridInqYinc(gridID1);
-	      yvals[nyp4-1] = yvals[ny+1] + 2*gridInqYinc(gridID1);
-
-	      gridDefXvals(gridIDnew, xvals);
-	      gridDefYvals(gridIDnew, yvals);
-
-	      free(xvals);
-              free(yvals);
-
-	      gridDefXpole(gridIDnew, gridInqXpole(gridID1));
-	      gridDefYpole(gridIDnew, gridInqYpole(gridID1));
-
-	      rg->gridID1 = gridIDnew;
-
-	      rg->no_fall_back = TRUE;
-	    }
-
 	  gridID1 = gridToCurvilinear(rg->gridID1);
 	  lgrid1_gen_bounds = TRUE;
 	}

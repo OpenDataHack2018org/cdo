@@ -65,6 +65,7 @@ void *Remap(void *argument)
   int map_type = -1;
   int max_remaps = 0;
   int remap_test = 0;
+  int remap_non_global = 0;
   int lgridboxinfo = TRUE;
   int grid1sizemax;
   char varname[128];
@@ -117,6 +118,19 @@ void *Remap(void *argument)
 	  remap_test = ival;
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_TEST to %d", remap_test);
+	}
+    }
+
+  envstring = getenv("REMAP_NON_GLOBAL");
+  if ( envstring )
+    {
+      int ival;
+      ival = atoi(envstring);
+      if ( ival > 0 )
+	{
+	  remap_non_global = ival;
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_NON_GLOBAL to %d", remap_non_global);
 	}
     }
 
@@ -223,9 +237,14 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
-      if ( gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1) &&
-	   map_type != MAP_TYPE_CONSERV )
-	remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
+      if ( map_type != MAP_TYPE_CONSERV &&
+	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
+	    (gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
+	    (gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
+	{
+	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
+	  remaps[0].grid.non_global = TRUE;
+	}
 
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_nvgp;
 
@@ -348,8 +367,10 @@ void *Remap(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 
-	  if ( gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1) &&
-	       map_type != MAP_TYPE_CONSERV )
+	  if ( map_type != MAP_TYPE_CONSERV &&
+	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
+		(gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
+		(gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
 	    {
 	      int gridsize_new;
 	      int nx, ny;
@@ -429,6 +450,14 @@ void *Remap(void *argument)
 
 	      if ( remaps[r].gridID != gridID1 )
 		{
+		  remaps[r].grid.non_global = FALSE;
+		  if ( map_type != MAP_TYPE_CONSERV &&
+		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
+			(gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
+			(gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
+		    {
+		      remaps[r].grid.non_global = TRUE;
+		    }
 		  /*
 		    remaps[r].grid.luse_grid1_area = FALSE;
 		    remaps[r].grid.luse_grid2_area = FALSE;
