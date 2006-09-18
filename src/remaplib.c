@@ -486,7 +486,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       gridInqXvals(gridID1, xvals);
       gridInqYvals(gridID1, yvals);
 
-      gridIDnew = gridCreate(GRID_LONLAT, nxp4*nyp4);
+      gridIDnew = gridCreate(GRID_CURVILINEAR, nxp4*nyp4);
       gridDefXsize(gridIDnew, nxp4);
       gridDefYsize(gridIDnew, nyp4);
 
@@ -502,32 +502,40 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	{
 	  xinc = xvals[j*nxp4+3] - xvals[j*nxp4+2];
 	  yinc = yvals[j*nxp4+3] - yvals[j*nxp4+2];
+	  xinc = 0;
+	  yinc = 0;
 	  xvals[j*nxp4+0] = xvals[j*nxp4+2] - xinc*2; 
 	  xvals[j*nxp4+1] = xvals[j*nxp4+2] - xinc; 
 	  yvals[j*nxp4+0] = yvals[j*nxp4+2] - yinc*2; 
 	  yvals[j*nxp4+1] = yvals[j*nxp4+2] - yinc; 
 	  xinc = xvals[j*nxp4+nxp4-4] - xvals[j*nxp4+nxp4-3];
 	  yinc = yvals[j*nxp4+nxp4-4] - yvals[j*nxp4+nxp4-3];
-	  xvals[j*nxp4+nxp4-2] = xvals[j*nxp4+nxp4-3] + xinc; 
-	  xvals[j*nxp4+nxp4-1] = xvals[j*nxp4+nxp4-3] + xinc*2; 
-	  yvals[j*nxp4+nxp4-2] = yvals[j*nxp4+nxp4-3] + yinc; 
-	  yvals[j*nxp4+nxp4-1] = yvals[j*nxp4+nxp4-3] + yinc*2; 
+	  xinc = 0;
+	  yinc = 0;
+	  xvals[j*nxp4+nxp4-2] = xvals[j*nxp4+nxp4-3] - xinc; 
+	  xvals[j*nxp4+nxp4-1] = xvals[j*nxp4+nxp4-3] - xinc*2; 
+	  yvals[j*nxp4+nxp4-2] = yvals[j*nxp4+nxp4-3] - yinc; 
+	  yvals[j*nxp4+nxp4-1] = yvals[j*nxp4+nxp4-3] - yinc*2; 
 	}
 
       for ( i = 0; i < nxp4; i++ )
 	{
 	  xinc = xvals[3*nxp4+i] - xvals[2*nxp4+i];
 	  yinc = yvals[3*nxp4+i] - yvals[2*nxp4+i];
+	  xinc = 0;
+	  yinc = 0;
 	  xvals[0*nxp4+i] = xvals[2*nxp4+i] - xinc*2;
 	  xvals[1*nxp4+i] = xvals[2*nxp4+i] - xinc;
 	  yvals[0*nxp4+i] = yvals[2*nxp4+i] - yinc*2;
 	  yvals[1*nxp4+i] = yvals[2*nxp4+i] - yinc;
 	  xinc = xvals[(nyp4-4)*nxp4+i] - xvals[(nyp4-3)*nxp4+i];
 	  yinc = yvals[(nyp4-4)*nxp4+i] - yvals[(nyp4-3)*nxp4+i];
-	  xvals[(nyp4-2)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] + xinc;
-	  xvals[(nyp4-1)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] + xinc*2;
-	  yvals[(nyp4-2)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] + yinc;
-	  yvals[(nyp4-1)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] + yinc*2;
+	  xinc = 0;
+	  yinc = 0;
+	  xvals[(nyp4-2)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] - xinc;
+	  xvals[(nyp4-1)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] - xinc*2;
+	  yvals[(nyp4-2)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] - yinc;
+	  yvals[(nyp4-1)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] - yinc*2;
 	}
 
       {
