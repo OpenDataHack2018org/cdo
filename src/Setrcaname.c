@@ -64,7 +64,7 @@ void *Setrcaname(void *argument)
     {
       while ( readline(fp, line, MAX_LINE_LEN) )
 	{
-	  fscanf(fp, "%d\t%d\t%d\t%s\t%s\t%s", &scode, &sltype, &slevel, sname, sdescription, sunits);
+	  sscanf(line, "%d\t%d\t%d\t%s\t%s\t%s", &scode, &sltype, &slevel, sname, sdescription, sunits);
 	  /*
 	  printf("%s\n", line);
 	  printf("%d:%d:%d:%s:%s:%s\n", scode, sltype, slevel, sname, sdescription, sunits);
@@ -84,7 +84,7 @@ void *Setrcaname(void *argument)
 		    {
 		      if ( nlev != 1 )
 			{
-			  cdoWarning("Number of levels must be 1 for level type 105!");
+			  cdoWarning("Number of levels should be 1 for level type 105!");
 			  cdoWarning("Maybe environment variable SPLIT_LTYPE_105 is not set.");
 			  continue;
 			}

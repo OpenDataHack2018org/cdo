@@ -97,12 +97,14 @@ case "${HOSTNAME}" in
     ecgate)
 	./configure --prefix=$HOME/local \
                     --with-netcdf=/home/ms/spdekplb/hmk/local/AIX \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix5.3.0.0
     hpc*)
 	./configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/lib/netcdf-3.5.0/LP64 \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix5.2.0.0

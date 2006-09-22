@@ -125,11 +125,10 @@ void *Input(void *argument)
 	  cdoPrint("Enter all %d elements of record %d!\n", gridsize, nrecs+1);
 	  
 	  rval = input_darray(gridsize, array);
-	  if ( feof(stdin) && nrecs == 0 )
+	  if ( rval != gridsize )
 	    cdoAbort("To few input elements (%d of %d)!", rval, gridsize);
 
 	  if ( feof(stdin) ) break;
-	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
 	}
       else if ( operatorID == INPUTEXT )
 	{

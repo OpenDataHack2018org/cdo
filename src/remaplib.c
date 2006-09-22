@@ -76,6 +76,8 @@
 #define  PIH      HALF*PI
 
 
+double intlin(double x, double y1, double x1, double y2, double x2);
+
 extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
 
@@ -385,40 +387,6 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
        ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	(gridInqType(gridID1) == GRID_LONLAT && rg->non_global)) )
     {
-      /*
-	int gridIDnew;
-	int nx, ny, nxp2, nyp2;
-	double *xvals, *yvals;
-	
-	nx = gridInqXsize(gridID1);
-	ny = gridInqYsize(gridID1);
-	nxp2 = nx+2;
-	nyp2 = ny+2;
-
-	xvals = (double *) malloc(nxp2*sizeof(double));
-	yvals = (double *) malloc(nyp2*sizeof(double));
-	gridInqXvals(gridID1, xvals+1);
-	gridInqYvals(gridID1, yvals+1);
-
-	gridIDnew = gridCreate(GRID_LONLAT, nxp2*nyp2);
-	gridDefXsize(gridIDnew, nxp2);
-	gridDefYsize(gridIDnew, nyp2);
-	      
-	xvals[0] = xvals[1] - gridInqXinc(gridID1);
-	xvals[nxp2-1] = xvals[nx] + gridInqXinc(gridID1);
-
-	yvals[0] = yvals[1] - gridInqYinc(gridID1);
-	yvals[nyp2-1] = yvals[ny] + gridInqYinc(gridID1);
-
-	gridDefXvals(gridIDnew, xvals);
-	gridDefYvals(gridIDnew, yvals);
-
-	free(xvals);
-	free(yvals);
-
-	gridDefXpole(gridIDnew, gridInqXpole(gridID1));
-	gridDefYpole(gridIDnew, gridInqYpole(gridID1));
-      */
       int gridIDnew;
       int nx, ny, nxp4, nyp4;
       double *xvals, *yvals;
@@ -471,7 +439,6 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       int gridIDnew;
       int gridsize, gridsize_new;
       int nx, ny, nxp4, nyp4;
-      double xinc, yinc;
       double *xvals, *yvals;
 
       gridsize = gridInqSize(gridID1);
@@ -500,44 +467,30 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 
       for ( j = 2; j < nyp4-2; j++ )
 	{
-	  xinc = xvals[j*nxp4+3] - xvals[j*nxp4+2];
-	  yinc = yvals[j*nxp4+3] - yvals[j*nxp4+2];
-	  xinc = 0;
-	  yinc = 0;
-	  xvals[j*nxp4+0] = xvals[j*nxp4+2] - xinc*2; 
-	  xvals[j*nxp4+1] = xvals[j*nxp4+2] - xinc; 
-	  yvals[j*nxp4+0] = yvals[j*nxp4+2] - yinc*2; 
-	  yvals[j*nxp4+1] = yvals[j*nxp4+2] - yinc; 
-	  xinc = xvals[j*nxp4+nxp4-4] - xvals[j*nxp4+nxp4-3];
-	  yinc = yvals[j*nxp4+nxp4-4] - yvals[j*nxp4+nxp4-3];
-	  xinc = 0;
-	  yinc = 0;
-	  xvals[j*nxp4+nxp4-2] = xvals[j*nxp4+nxp4-3] - xinc; 
-	  xvals[j*nxp4+nxp4-1] = xvals[j*nxp4+nxp4-3] - xinc*2; 
-	  yvals[j*nxp4+nxp4-2] = yvals[j*nxp4+nxp4-3] - yinc; 
-	  yvals[j*nxp4+nxp4-1] = yvals[j*nxp4+nxp4-3] - yinc*2; 
+	  xvals[j*nxp4+0] = intlin(3.0, xvals[j*nxp4+3], 0.0, xvals[j*nxp4+2], 1.0);
+	  xvals[j*nxp4+1] = intlin(2.0, xvals[j*nxp4+3], 0.0, xvals[j*nxp4+2], 1.0); 
+	  yvals[j*nxp4+0] = intlin(3.0, yvals[j*nxp4+3], 0.0, yvals[j*nxp4+2], 1.0); 
+	  yvals[j*nxp4+1] = intlin(2.0, yvals[j*nxp4+3], 0.0, yvals[j*nxp4+2], 1.0); 
+
+	  xvals[j*nxp4+nxp4-2] = intlin(2.0, xvals[j*nxp4+nxp4-4], 0.0, xvals[j*nxp4+nxp4-3], 1.0); 
+	  xvals[j*nxp4+nxp4-1] = intlin(3.0, xvals[j*nxp4+nxp4-4], 0.0, xvals[j*nxp4+nxp4-3], 1.0); 
+	  yvals[j*nxp4+nxp4-2] = intlin(2.0, yvals[j*nxp4+nxp4-4], 0.0, yvals[j*nxp4+nxp4-3], 1.0); 
+	  yvals[j*nxp4+nxp4-1] = intlin(3.0, yvals[j*nxp4+nxp4-4], 0.0, yvals[j*nxp4+nxp4-3], 1.0); 
 	}
 
       for ( i = 0; i < nxp4; i++ )
 	{
-	  xinc = xvals[3*nxp4+i] - xvals[2*nxp4+i];
-	  yinc = yvals[3*nxp4+i] - yvals[2*nxp4+i];
-	  xinc = 0;
-	  yinc = 0;
-	  xvals[0*nxp4+i] = xvals[2*nxp4+i] - xinc*2;
-	  xvals[1*nxp4+i] = xvals[2*nxp4+i] - xinc;
-	  yvals[0*nxp4+i] = yvals[2*nxp4+i] - yinc*2;
-	  yvals[1*nxp4+i] = yvals[2*nxp4+i] - yinc;
-	  xinc = xvals[(nyp4-4)*nxp4+i] - xvals[(nyp4-3)*nxp4+i];
-	  yinc = yvals[(nyp4-4)*nxp4+i] - yvals[(nyp4-3)*nxp4+i];
-	  xinc = 0;
-	  yinc = 0;
-	  xvals[(nyp4-2)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] - xinc;
-	  xvals[(nyp4-1)*nxp4+i] = xvals[(nyp4-3)*nxp4+i] - xinc*2;
-	  yvals[(nyp4-2)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] - yinc;
-	  yvals[(nyp4-1)*nxp4+i] = yvals[(nyp4-3)*nxp4+i] - yinc*2;
-	}
+	  xvals[0*nxp4+i] = intlin(3.0, xvals[3*nxp4+i], 0.0, xvals[2*nxp4+i], 1.0);
+	  xvals[1*nxp4+i] = intlin(2.0, xvals[3*nxp4+i], 0.0, xvals[2*nxp4+i], 1.0);
+	  yvals[0*nxp4+i] = intlin(3.0, yvals[3*nxp4+i], 0.0, yvals[2*nxp4+i], 1.0);
+	  yvals[1*nxp4+i] = intlin(2.0, yvals[3*nxp4+i], 0.0, yvals[2*nxp4+i], 1.0);
 
+	  xvals[(nyp4-2)*nxp4+i] = intlin(2.0, xvals[(nyp4-4)*nxp4+i], 0.0, xvals[(nyp4-3)*nxp4+i], 1.0);
+	  xvals[(nyp4-1)*nxp4+i] = intlin(3.0, xvals[(nyp4-4)*nxp4+i], 0.0, xvals[(nyp4-3)*nxp4+i], 1.0);
+	  yvals[(nyp4-2)*nxp4+i] = intlin(2.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
+	  yvals[(nyp4-1)*nxp4+i] = intlin(3.0, yvals[(nyp4-4)*nxp4+i], 0.0, yvals[(nyp4-3)*nxp4+i], 1.0);
+	}
+      /*
       {
 	FILE *fp;
 	fp = fopen("xvals.asc", "w");
@@ -547,7 +500,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	for ( i = 0; i < gridsize_new; i++ ) fprintf(fp, "%g\n", yvals[i]);
 	fclose(fp);
       }
-
+      */
       gridDefXvals(gridIDnew, xvals);
       gridDefYvals(gridIDnew, yvals);
 

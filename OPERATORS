@@ -23,6 +23,7 @@ Operator catalog:
       Ninfo      ntime           Number of time steps
       Showinfo   showcode        Show codes
       Showinfo   showvar         Show variable names
+      Showinfo   showstdname     Show standard names
       Showinfo   showlevel       Show levels
       Showinfo   showyear        Show years
       Showinfo   showmon         Show months
@@ -57,6 +58,7 @@ Operator catalog:
       Select     delcode         Delete codes
       Select     selvar          Select variables
       Select     delvar          Delete variables
+      Select     selstdname      Select standard names
       Select     sellevel        Select levels
       Select     selgrid         Select grids
       Select     selgridname     Select grids by name
@@ -132,8 +134,8 @@ Operator catalog:
       Invert     invertlondata   Invert longitude data
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
-      Setcbox    setclonlatbox   Set a longitude/latitude box to constant
-      Setcbox    setcindexbox    Set an index box to constant
+      Setbox     setclonlatbox   Set a longitude/latitude box to constant
+      Setbox     setcindexbox    Set an index box to constant
       Enlarge    enlarge         Enlarge fields
       Setmiss    setmissval      Set a new missing value
       Setmiss    setctomiss      Set constant to missing value
@@ -145,6 +147,8 @@ Operator catalog:
       Exprf      expr            Evaluate expressions
       Exprf      exprf           Evaluate expressions from script file
       Math       abs             Absolute value
+      Math       int             Integer value
+      Math       nint            Nearest integer value
       Math       sqr             Square
       Math       sqrt            Square root
       Math       exp             Exponential
@@ -262,16 +266,19 @@ Operator catalog:
       Seasstat   seasstd         Seasonally standard deviation
       Ydaystat   ydaymin         Multi-year daily minimum
       Ydaystat   ydaymax         Multi-year daily maximum
+      Ydaystat   ydaysum         Multi-year daily sum
       Ydaystat   ydaymean        Multi-year daily mean
       Ydaystat   ydayavg         Multi-year daily average
       Ydaystat   ydaystd         Multi-year daily standard deviation
       Ymonstat   ymonmin         Multi-year monthly minimum
       Ymonstat   ymonmax         Multi-year monthly maximum
+      Ymonstat   ymonsum         Multi-year monthly sum
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
       Ymonstat   ymonstd         Multi-year monthly standard deviation
       Yseasstat  yseasmin        Multi-year seasonally minimum
       Yseasstat  yseasmax        Multi-year seasonally maximum
+      Yseasstat  yseassum        Multi-year seasonally sum
       Yseasstat  yseasmean       Multi-year seasonally mean
       Yseasstat  yseasavg        Multi-year seasonally average
       Yseasstat  yseasstd        Multi-year seasonally standard deviation
@@ -328,7 +335,7 @@ Operator catalog:
       Vargen     random          Create a field with random values
       Vardup     vardup          Duplicate variables
       Vardup     varmul          Multiply variables
-      Gradsdes   gradsdes        GrADS data descriptor file
-      Gradsdes   gradsdes2       GrADS data descriptor file (version 2 map)
+      Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
+      Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
       Rotuv      rotuvb          Backward rotation
       Mastrfu    mastrfu         Mass stream function
