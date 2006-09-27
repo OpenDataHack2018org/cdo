@@ -33,6 +33,7 @@
 
 struct _PSTREAM {
   int     self;
+  int     mode;
   int     fileID;
   int     vlistID;
   int     tsID;

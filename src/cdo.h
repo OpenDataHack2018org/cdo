@@ -58,6 +58,8 @@ extern int cdoTimer;
 extern int cdoVerbose;
 extern int cdoDebug;
 
+extern int cdoExpMode;
+
 void    cdiError(int cdiErrno, const char *fmt, ...);
 void    cdoAbort(const char *fmt, ...);
 void    cdoWarning(const char *fmt, ...);

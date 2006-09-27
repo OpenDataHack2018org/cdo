@@ -517,6 +517,7 @@ int pstreamOpenRead(const char *argument)
       */
       cdoInqHistory(fileID);
 
+      pstreamptr->mode   = 'r';
       pstreamptr->name   = filename;
       pstreamptr->fileID = fileID;
     }
@@ -586,6 +587,8 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	streamDefInstID(fileID, cdoDefaultInstID);
       */
       strcpy(filename, argument);
+
+      pstreamptr->mode   = 'w';
       pstreamptr->name   = filename;
       pstreamptr->fileID = fileID;
     }
@@ -711,6 +714,16 @@ void pstreamClose(int pstreamID)
 	Message(func, "%s fileID %d\n", pstreamptr->name, pstreamptr->fileID);
 
       streamClose(pstreamptr->fileID);
+
+      if ( cdoExpMode == CDO_EXP_REMOTE )
+	{
+	  if ( pstreamptr->mode == 'w' )
+	    {
+	      fprintf(stderr, "start data transfer of %s\n", pstreamptr->name);
+	      fprintf(stderr, "finish data transfer of %s\n", pstreamptr->name);
+	      fprintf(stderr, "remove remote file %s\n", pstreamptr->name);
+	    }
+	}
 
       pstream_delete_entry(pstreamptr);
     }

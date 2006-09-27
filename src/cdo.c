@@ -784,6 +784,8 @@ int main(int argc, char *argv[])
 
       fprintf(jobfilep, "#! /bin/bash\n");
       fprintf(jobfilep, "uname -s\n");
+      fprintf(jobfilep, "pwd\n");
+      fprintf(jobfilep, "cd tmp\n");
       fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-x86:$LD_LIBRARY_PATH\n");
       fprintf(jobfilep, "%s\n", commandline);
 

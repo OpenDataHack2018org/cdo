@@ -225,3 +225,86 @@ void job_submit(const char *expname, const char *jobfilename, const char *jobnam
 #endif
 }
 
+
+
+#if  defined  (HAVE_LIBCURL)
+#  include <curl/curl.h>
+#  include <curl/types.h>
+#  include <curl/easy.h>
+#endif
+
+struct FtpFile {
+  char *filename;
+  FILE *stream;
+};
+
+int my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+  struct FtpFile *out=(struct FtpFile *)stream;
+  if(out && !out->stream) {
+    out->stream=fopen(out->filename, "wb");
+    if(!out->stream)
+      return -1;
+  }
+  return fwrite(buffer, size, nmemb, out->stream);
+}
+
+
+int ftpput()
+{
+#if  defined  (HAVE_LIBCURL)
+  CURL *curl;
+  CURLcode res;
+  struct FtpFile ftpfile={
+    "b_eff.c", /* name to store the file as if succesful */
+    NULL
+  };
+
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+
+  curl = curl_easy_init();
+
+  if(curl) {
+    curl_easy_setopt(curl, CURLOPT_NETRC, CURL_NETRC_REQUIRED);
+
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+    curl_easy_setopt(curl, CURLOPT_FTP_SSL, CURLFTPSSL_CONTROL); 
+    curl_easy_setopt(curl, CURLOPT_FTPSSLAUTH, CURLFTPAUTH_TLS);
+
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+    curl_easy_setopt(curl, CURLOPT_SSLKEYPASSWD, "");
+
+    curl_easy_setopt(curl, CURLOPT_URL,
+		     "ftp://qftps.zmaw.de/small/m214/m214089/benchmark/b_eff.c");
+
+    /* define callback */
+
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, my_fwrite);
+
+    /* set a pointer to struct to pass to the callback */
+
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &ftpfile);
+
+    res = curl_easy_perform(curl);
+
+    curl_easy_cleanup(curl);
+
+    if(CURLE_OK != res) {
+      fprintf(stderr, "curl told us %d\n", res);
+    }
+
+  }
+
+  if(ftpfile.stream)
+    fclose(ftpfile.stream);
+
+  curl_global_cleanup();
+#else
+  fprintf(stderr, "CURL library not available!\n");
+#endif
+
+  return 0;
+}
