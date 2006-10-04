@@ -131,7 +131,12 @@ int processSelf(void)
     if ( Process[processID].threadID == thID ) break;
 
   if ( processID == NumProcess )
-    Error(func, "Internal problem, process not found!");
+    {
+      if ( NumProcess > 0 )
+	Error(func, "Internal problem, process not found!");
+      else
+	processID = 0;
+    }
 #endif
 
   return (processID);
