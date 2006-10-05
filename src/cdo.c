@@ -74,6 +74,7 @@ int cdoDebug       = 0;
 
 int cdoExpMode     = -1;
 char *cdoExpName   = NULL;
+const char *cdojobfiles  = "ftp_files";
 
 
 int timer_total, timer_read, timer_write;
@@ -786,6 +787,8 @@ int main(int argc, char *argv[])
       fprintf(jobfilep, "uname -s\n");
       fprintf(jobfilep, "pwd\n");
       fprintf(jobfilep, "cd tmp\n");
+      fprintf(jobfilep, "rm -f %s\n", cdojobfiles);
+      fprintf(jobfilep, "echo $LD_LIBRARY_PATH\n");
       fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-x86:$LD_LIBRARY_PATH\n");
       fprintf(jobfilep, "%s\n", commandline);
 

@@ -1,6 +1,9 @@
 2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.3
+	* remaplib.sort_add: don't sort if num_links <= 1
+	* remaplib.remap_bi?: check that src_add is valid
+	* Remap: use REMAP_NON_GLOBAL only for gridsize > 1
 	* Version 1.0.3 released
 
 2006-09-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

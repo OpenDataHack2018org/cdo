@@ -383,7 +383,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   rg->gridID1 = gridID1;
   rg->gridID2 = gridID2;
 
-  if ( map_type != MAP_TYPE_CONSERV &&
+  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(rg->gridID1) > 1 &&
        ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	(gridInqType(gridID1) == GRID_LONLAT && rg->non_global)) )
     {
@@ -433,7 +433,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       rg->no_fall_back = TRUE;
     }
 
-  if ( map_type != MAP_TYPE_CONSERV &&
+  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(rg->gridID1) > 1 &&
        (gridInqType(gridID1) == GRID_CURVILINEAR && rg->non_global) )
     {
       int gridIDnew;
@@ -1742,7 +1742,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 
       if ( src_add[0] > 0 )
 	for ( n = 0; n < 4; n++ )
-	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check if src_add is valid first */
+	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
 	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  if point found, find local i,j coordinates for weights  */
@@ -1830,17 +1830,26 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	}
       else if ( src_add[0] < 0 )
 	{
+	  int lstore = TRUE;
+
           for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -1*src_add[n] : src_add[n];
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
-	      if ( rg->grid1_mask[src_add[n]-1] )
-		icount++;
+	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+		{
+		  if ( rg->grid1_mask[src_add[n]-1] )
+		    icount++;
+		  else
+		    src_lats[n] = ZERO;
+		}
 	      else
-		src_lats[n] = ZERO;
+		{
+		  lstore = FALSE;
+		}
 	    }
 
-          if ( icount > 0 )
+          if ( lstore && icount > 0 )
 	    {
 	      /* renormalize weights */
 	      sum_wgts = 0.0;
@@ -1959,7 +1968,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 
       if ( src_add[0] > 0 )
 	for ( n = 0; n < 4; n++ )
-	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check if src_add is valid first */
+	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
 	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  if point found, find local i,j coordinates for weights  */
@@ -2067,17 +2076,26 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	}
       else if ( src_add[0] < 0 )
 	{
+	  int lstore = TRUE;
+
           for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -1*src_add[n] : src_add[n];
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
-	      if ( rg->grid1_mask[src_add[n]-1] )
-		icount++;
+	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+		{
+		  if ( rg->grid1_mask[src_add[n]-1] )
+		    icount++;
+		  else
+		    src_lats[n] = ZERO;
+		}
 	      else
-		src_lats[n] = ZERO;
+		{
+		  lstore = FALSE;
+		}
 	    }
 
-          if ( icount > 0 )
+          if ( lstore && icount > 0 )
 	    {
 	      /* renormalize weights */
 	      sum_wgts = 0.0;
@@ -2088,6 +2106,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	      for ( n = 0; n < 4; n++ ) wgts[3][n] = ZERO;
 
 	      rg->grid2_frac[dst_add] = ONE;
+
 	      store_link_bicub(rv, dst_add, src_add, wgts);
 	    }
         }
@@ -4889,7 +4908,7 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
   int i, n;
   double wgttmp[4];        /* temp for holding wts during swap   */
 
-  if ( num_links == 0 ) return;
+  if ( num_links <= 1 ) return;
 
   /*
   for ( n = 0; n < num_links; n++ )

@@ -237,7 +237,7 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
-      if ( map_type != MAP_TYPE_CONSERV &&
+      if ( map_type != MAP_TYPE_CONSERV && remaps[0].gridsize > 1 &&
 	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	    (gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
 	    (gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
@@ -367,7 +367,7 @@ void *Remap(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 
-	  if ( map_type != MAP_TYPE_CONSERV &&
+	  if ( map_type != MAP_TYPE_CONSERV && gridsize > 1 &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 		(gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
 		(gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
@@ -451,7 +451,7 @@ void *Remap(void *argument)
 	      if ( remaps[r].gridID != gridID1 )
 		{
 		  remaps[r].grid.non_global = FALSE;
-		  if ( map_type != MAP_TYPE_CONSERV &&
+		  if ( map_type != MAP_TYPE_CONSERV && remaps[r].gridsize > 1 &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 			(gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
 			(gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
