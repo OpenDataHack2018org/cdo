@@ -23,7 +23,7 @@ STRING  Start date (format YYYY-MM-DD)
 @Item = time
 STRING  Start time (format hh:mm)
 @Item = inc
-STRING  Optional increment (minutes, hours or days) [default: 0hour]
+STRING  Optional increment (minutes, hours, days, months, years) [default: 0hour]
 @EndParameter
 @EndOperator
 

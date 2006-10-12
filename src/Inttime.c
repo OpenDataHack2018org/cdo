@@ -96,10 +96,8 @@ void *Inttime(void *argument)
 	  if      ( strncmp(unit, "minutes", len) == 0 ) incunit =    60;
 	  else if ( strncmp(unit, "hours", len)   == 0 ) incunit =  3600;
 	  else if ( strncmp(unit, "days", len)    == 0 ) incunit = 86400;
-	  /*
 	  else if ( strncmp(unit, "months", len)  == 0 ) incunit =     1;
 	  else if ( strncmp(unit, "years", len)   == 0 ) incunit =    12;
-	  */
 	  else cdoAbort("unsupported time unit >%s<", unit);
 	}
     }
@@ -265,8 +263,28 @@ void *Inttime(void *argument)
 		  streamWriteRecord(streamID2, array, nmiss3);
 		}
 	    }
+
 	  if ( ijulinc == 0 ) break;
-	  julval += ijulinc;
+
+	  if ( incunit == 1 || incunit == 12 )
+	    {
+	      decode_julval(dpy, julval, &vdate, &vtime);
+
+	      decode_date(vdate, &year, &month, &day);
+	      
+	      month += ijulinc;
+
+	      while ( month > 12 ) { month -= 12; year++; }
+	      while ( month <  1 ) { month += 12; year--; }
+
+	      vdate = year*10000 + month*100 + day;
+		
+	      julval = encode_julval(dpy, vdate, vtime);
+	    }
+	  else
+	    {
+	      julval += ijulinc;
+	    }
 	}
 
       julval1 = julval2;

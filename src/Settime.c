@@ -293,9 +293,7 @@ void *Settime(void *argument)
 		}
 	      else
 		{
-		  year  = vdate/10000;
-		  month = (vdate - year*10000) / 100;
-		  day   =  vdate - year*10000 - month*100;
+		  decode_date(vdate, &year, &month, &day);
 	      
 		  month += ijulinc;
 
@@ -322,17 +320,8 @@ void *Settime(void *argument)
 	      
 	      month += ijulinc;
 
-	      while ( month > 12 )
-		{
-		  month -= 12;
-		  year++;
-		}
-
-	      while ( month < 1 )
-		{
-		  month += 12;
-		  year--;
-		}
+	      while ( month > 12 ) { month -= 12; year++; }
+	      while ( month <  1 ) { month += 12; year--; }
 
 	      vdate = year*10000 + month*100 + day;
 	    }

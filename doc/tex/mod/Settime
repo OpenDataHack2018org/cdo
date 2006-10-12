@@ -122,13 +122,13 @@ INTEGER  Value of the new month
 @Item = year
 INTEGER  Value of the new year
 @Item = units
-STRING   Base units of the time axis (minutes, hours, days, months, years).
+STRING   Base units of the time axis (minutes, hours, days, months, years)
 @Item = date
 STRING   Date (format YYYY-MM-DD)
 @Item = time
 STRING   Time (format HH:MM)
 @Item = inc
-STRING   Optional increment (e.g. 12hour) [default: 0hour]
+STRING   Optional increment (minutes, hours, days, months, years) [default: 0hour]
 @Item = calendar
 STRING   Calendar (standard, 360days, 365days, 366days)
 @Item = sval
