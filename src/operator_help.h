@@ -688,7 +688,7 @@ static char *SettimeHelp[] = {
     "    units     STRING   Base units of the time axis (minutes, hours, days, months, years).",
     "    date      STRING   Date (format YYYY-MM-DD)",
     "    time      STRING   Time (format HH:MM)",
-    "    inc       STRING   Optional increment (e.g. 12hour) [default: 0hour]",
+    "    inc       STRING   Optional increment (minutes, hours, days, months, years) [default: 0hour]",
     "    calendar  STRING   Calendar (standard, 360days, 365days, 366days)",
     "    sval      STRING   Shift value (e.g. -3hour)",
     NULL
@@ -2002,7 +2002,7 @@ static char *InttimeHelp[] = {
     "PARAMETER",
     "    date  STRING  Start date (format YYYY-MM-DD)",
     "    time  STRING  Start time (format hh:mm)",
-    "    inc   STRING  Optional increment (minutes, hours or days) [default: 0hour]",
+    "    inc   STRING  Optional increment (minutes, hours, days, months, years) [default: 0hour]",
     NULL
 };
 
