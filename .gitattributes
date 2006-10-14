@@ -251,6 +251,7 @@ src/config.h.in -text
 src/dmemory.h -text
 src/dtypes.h -text
 src/error.h -text
+src/etopo.h -text
 src/exception.c -text
 src/expr.c -text
 src/expr.h -text
