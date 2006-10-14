@@ -129,12 +129,18 @@ void intgrid(FIELD *field1, FIELD *field2)
   arrayOut  = field2->ptr;
   missval   = field1->missval;
 
+  if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
+    cdoAbort("Source grid has no values");
+
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   lonIn = (double *) malloc(nlonIn*sizeof(double));
   latIn = (double *) malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
+
+  if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
+    cdoAbort("Target grid has no values");
 
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
@@ -511,6 +517,12 @@ void interpolate(FIELD *field1, FIELD *field2)
   lat_array = (double *) malloc((nlat + 2) * sizeof(double));
   lon = lon_array + 1;
   lat = lat_array + 1;
+
+  if ( ! (gridInqXvals(gridIDi, NULL) && gridInqYvals(gridIDi, NULL)) )
+    cdoAbort("Source grid has no values");
+
+  if ( ! (gridInqXvals(gridIDo, NULL) && gridInqYvals(gridIDo, NULL)) )
+    cdoAbort("Target grid has no values");
 
   gridInqXvals(gridIDi, lon);
   gridInqYvals(gridIDi, lat);

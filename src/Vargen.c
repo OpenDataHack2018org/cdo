@@ -35,14 +35,18 @@
 void *Vargen(void *argument)
 {
   static char func[] = "Vargen";
-  int RANDOM, CONST;
+  int RANDOM, CONST, TOPO;
   int operatorID;
   int streamID;
   int nrecs;
   int tsID, recID, varID, levelID;
   int gridsize, i;
   int vlistID;
-  int gridID, zaxisID, taxisID;
+  int gridID = -1, zaxisID, taxisID;
+  double etopo_scale = 3;
+  short etopo[] = {
+#include "etopo.h"
+  };
   const char *gridfile;
   double rconst = 0.0;
   double *array;
@@ -51,24 +55,42 @@ void *Vargen(void *argument)
 
   RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name");
   CONST  = cdoOperatorAdd("const",  0, 0, "constant value, grid description file or name");
+  TOPO   = cdoOperatorAdd("topo",   0, 0, "");
 
   operatorID = cdoOperatorID();
 
-  operatorInputArg(cdoOperatorEnter(operatorID));
-
   if ( operatorID == RANDOM )
     {
+      operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(1);
       gridfile = operatorArgv()[0];
+      gridID  = cdoDefineGrid(gridfile);
     }
-  else
+  else if ( operatorID == CONST )
     {
+      operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(2);
       rconst = atof(operatorArgv()[0]);
       gridfile = operatorArgv()[1];
+      gridID  = cdoDefineGrid(gridfile);
+    }
+  else if ( operatorID == TOPO )
+    {
+      int nlon, nlat, i;
+      double lon[720], lat[360];
+      nlon = 720;
+      nlat = 360;
+      gridID = gridCreate(GRID_LONLAT, nlon*nlat);
+      gridDefXsize(gridID, nlon);
+      gridDefYsize(gridID, nlat);
+
+      for ( i = 0; i < nlon; i++ ) lon[i] = -179.75 + i*0.5;
+      for ( i = 0; i < nlat; i++ ) lat[i] = -89.75 + i*0.5;
+
+      gridDefXvals(gridID, lon);
+      gridDefYvals(gridID, lat);
     }
 
-  gridID  = cdoDefineGrid(gridfile);
 
   zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
@@ -100,11 +122,16 @@ void *Vargen(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    array[i] = rand()/(RAND_MAX+1.0);
 	}
-      else
+      else if ( operatorID == CONST )
 	{
 	  for ( i = 0; i < gridsize; i++ )
 	    array[i] = rconst;
 	}
+      else if ( operatorID == TOPO )
+	{
+	  for ( i = 0; i < gridsize; i++ )
+	    array[i] = etopo[i]/etopo_scale;
+	}      
 
       streamWriteRecord(streamID, array, 0);
     }

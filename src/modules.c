@@ -224,7 +224,7 @@ void *Zonstat(void *argument);
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
 #define  VardupOperators        {"vardup", "varmul"}
-#define  VargenOperators        {"random", "const"}
+#define  VargenOperators        {"random", "const", "topo"}
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertstd"}

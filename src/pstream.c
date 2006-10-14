@@ -787,8 +787,6 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
-  pstreamptr->vlistID = vlistID;
-
 #if  defined  (HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     {

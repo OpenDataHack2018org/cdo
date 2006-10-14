@@ -18,7 +18,8 @@
 /*
    This module contains the following operators:
 
-      Intgrid    interpolate     Interpolate
+      Intgrid    interpolate     PINGO grid interpolation
+      Intgrid    intgridbil      Bilinear grid interpolation
 */
 
 
