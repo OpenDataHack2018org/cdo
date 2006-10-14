@@ -159,6 +159,7 @@ cdo_SOURCES = Arith.c		\
               vinterp.h 	\
               namelist.h 	\
               util.h		\
+              etopo.h		\
 	      cdi.h
 #
 cdo_LDADD = $(LDFLAGS) -lm
