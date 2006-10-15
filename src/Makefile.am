@@ -31,6 +31,7 @@ cdo_SOURCES = Arith.c		\
               Intgrid.c 	\
               Intgridtraj.c 	\
               Inttime.c 	\
+              Inttime2.c 	\
               Intyear.c 	\
               Invert.c  	\
               Maskbox.c 	\

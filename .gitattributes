@@ -172,6 +172,7 @@ src/Input.c -text
 src/Intgrid.c -text
 src/Intgridtraj.c -text
 src/Inttime.c -text
+src/Inttime2.c -text
 src/Intyear.c -text
 src/Invert.c -text
 src/Makefile.am -text
