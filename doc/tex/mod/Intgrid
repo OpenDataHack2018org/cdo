@@ -11,6 +11,7 @@
 @BeginDescription
 This module contains operators to interpolate all input fields to a new grid.
 All interpolation methods in this module work only on rectangular grids.
+@EndDescription
 @EndModule
 
 
@@ -48,7 +49,8 @@ For a detailed description of this interpolation method see @cite{PINGO}.
 
 @BeginDescription
 Performs a bilinear interpolation on all input fields. This implementation
-is a faster than @oper{remapbil}. Missing values are not supported yet!
+is faster than @oper{remapbil}. The complete source grid must be inside
+the target grid. Missing values are not supported yet!
 @EndDescription
 @EndOperator
 

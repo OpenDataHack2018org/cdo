@@ -305,6 +305,7 @@ Operator catalog:
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation
       Inttime    inttime         Time interpolation
+      Inttime    intntime        Time interpolation
       Intyear    intyear         Year interpolation
 -------------------------------------------------------------
    Transformation

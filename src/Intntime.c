@@ -18,12 +18,9 @@
 /*
    This module contains the following operators:
 
-      Inttime2   inttime2        Time interpolation
+      Intntime   intntime        Time interpolation
 */
 
-
-#include <string.h>
-#include <ctype.h>  /* isdigit */
 
 #include "cdi.h"
 #include "cdo.h"
@@ -32,9 +29,9 @@
 #include "interpol.h"
 
 
-void *Inttime2(void *argument)
+void *Intntime(void *argument)
 {
-  static char func[] = "Inttime2";
+  static char func[] = "Intntime";
   int streamID1, streamID2;
   int nrecs, nvars, nlevel;
   int i, nrecords;

@@ -111,7 +111,7 @@ cdo_SOURCES = Arith.c		\
               Intgrid.c 	\
               Intgridtraj.c 	\
               Inttime.c 	\
-              Inttime2.c 	\
+              Intntime.c 	\
               Intyear.c 	\
               Invert.c  	\
               Maskbox.c 	\
@@ -263,7 +263,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) Gradsdes.$(OBJEXT) \
 	Histogram.$(OBJEXT) Info.$(OBJEXT) Input.$(OBJEXT) \
 	Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) Inttime.$(OBJEXT) \
-	Inttime2.$(OBJEXT) Intyear.$(OBJEXT) Invert.$(OBJEXT) \
+	Intntime.$(OBJEXT) Intyear.$(OBJEXT) Invert.$(OBJEXT) \
 	Maskbox.$(OBJEXT) Mastrfu.$(OBJEXT) Math.$(OBJEXT) \
 	Merge.$(OBJEXT) Mergegrid.$(OBJEXT) Mergetime.$(OBJEXT) \
 	Merstat.$(OBJEXT) Ninfo.$(OBJEXT) Nmltest.$(OBJEXT) \
@@ -322,7 +322,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Gradsdes.Po ./$(DEPDIR)/Histogram.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Info.Po ./$(DEPDIR)/Input.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Intgrid.Po ./$(DEPDIR)/Intgridtraj.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Inttime.Po ./$(DEPDIR)/Inttime2.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Intntime.Po ./$(DEPDIR)/Inttime.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Intyear.Po ./$(DEPDIR)/Invert.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Maskbox.Po ./$(DEPDIR)/Mastrfu.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Math.Po ./$(DEPDIR)/Merge.Po \
@@ -473,8 +473,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Intgrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Intgridtraj.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Intntime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Inttime.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Inttime2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Intyear.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Invert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Maskbox.Po@am__quote@

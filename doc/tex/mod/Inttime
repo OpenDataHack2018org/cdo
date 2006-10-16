@@ -5,7 +5,11 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = inttime
+@Operators = inttime intntime
+
+@BeginDescription
+This module performs linear interpolation between time steps.
+@EndDescription
 @EndModule
 
 
@@ -14,8 +18,23 @@
 @Parameter = date time [inc]
 
 @BeginDescription
-This operator performs linear interpolation between time steps.
+This operator creates a new dataset by linear interpolation between time steps.
+The user has to define the start date/time with an optional increment.
 @EndDescription
+@EndOperator
+
+
+@BeginOperator_intntime
+@Title     = Time interpolation
+@Parameter = n
+
+@BeginDescription
+This operator performs linear interpolation between time steps.
+The user has to define the number of time steps form one time step
+to the next.
+@EndDescription
+@EndOperator
+
 
 @BeginParameter date
 @Item = date
@@ -24,14 +43,19 @@ STRING  Start date (format YYYY-MM-DD)
 STRING  Start time (format hh:mm)
 @Item = inc
 STRING  Optional increment (minutes, hours, days, months, years) [default: 0hour]
+@Item = n
+INTEGER Number of time steps from one time step to the next
 @EndParameter
-@EndOperator
 
 
 @BeginExample
 Assumed a 6 hourly dataset starts at 1987-01-01 12:00.
-To interpolate this time series to a 2 hourly dataset, use:
+To interpolate this time series to a one hourly dataset, use:
 @BeginVerbatim
-   cdo inttime,1987-01-01,12:00,2hour ifile ofile
+   cdo inttime,1987-01-01,12:00,1hour ifile ofile
+@EndVerbatim
+The same result with @oper{intntime}:
+@BeginVerbatim
+   cdo intntime,6 ifile ofile
 @EndVerbatim
 @EndExample

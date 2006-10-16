@@ -65,7 +65,7 @@ void *Input(void *argument);
 void *Intgrid(void *argument);
 void *Intgridtraj(void *argument);
 void *Inttime(void *argument);
-void *Inttime2(void *argument);
+void *Intntime(void *argument);
 void *Intyear(void *argument);
 void *Invert(void *argument);
 void *Maskbox(void *argument);
@@ -162,7 +162,7 @@ void *Zonstat(void *argument);
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
-#define  Inttime2Operators      {"inttime2"}
+#define  IntntimeOperators      {"intntime"}
 #define  IntyearOperators       {"intyear"}
 #define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", \
                                  "invertlatdata", "invertlondata"}
@@ -275,7 +275,7 @@ static MODULES Modules[] =
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,    1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,        1,  1 },
-  { Inttime2,       NULL,              Inttime2Operators,       1,  1 },
+  { Intntime,       InttimeHelp,       IntntimeOperators,       1,  1 },
   { Intyear,        IntyearHelp,       IntyearOperators,        2,  1 },
   { Invert,         InvertHelp,        InvertOperators,         1,  1 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,        1,  1 },

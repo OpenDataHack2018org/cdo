@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Intyear
 @Title     = Year interpolation
 @Section   = Interpolation
