@@ -365,7 +365,7 @@ void    gridCompress(int gridID);
 void    gridDefMask(int gridID, int *mask);
 int     gridInqMask(int gridID, int *mask);
 
-void    gridPrint(int gridID);
+void    gridPrint(int gridID, int opt);
 int     gridSize(void);
 
 /*      gridCreate: Create a horizontal Grid */

@@ -54,8 +54,4 @@ To interpolate this time series to a one hourly dataset, use:
 @BeginVerbatim
    cdo inttime,1987-01-01,12:00,1hour ifile ofile
 @EndVerbatim
-The same result with @oper{intntime}:
-@BeginVerbatim
-   cdo intntime,6 ifile ofile
-@EndVerbatim
 @EndExample

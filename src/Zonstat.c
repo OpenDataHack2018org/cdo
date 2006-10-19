@@ -87,7 +87,7 @@ void *Zonstat(void *argument)
   gridID1 = vlistGrid(vlistID1, index);
   if ( gridInqType(gridID1) != GRID_LONLAT &&
        gridInqType(gridID1) != GRID_GAUSSIAN &&
-       (gridInqType(gridID1) == GRID_GENERIC && gridInqYsize(gridID1) <= 1) )
+       !(gridInqType(gridID1) == GRID_GENERIC && gridInqYsize(gridID1) <= 1) )
     cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
   gridID2 = gridToZonal(gridID1);

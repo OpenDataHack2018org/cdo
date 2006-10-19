@@ -18,13 +18,13 @@
 /*
    This module contains the following operators:
 
-      Gradsdes   gradsdes        GrADS data descriptor file
+      Gradsdes   gradsdes1       GrADS data descriptor file (version 1 map)
       Gradsdes   gradsdes2       GrADS data descriptor file (version 2 map)
 */
 
 
 #if  defined  (HAVE_CONFIG_H)
-#  include "config.h"
+#  include "config.h" /* VERSION */
 #endif
 
 #include <string.h>
@@ -533,7 +533,7 @@ void *Gradsdes(void *argument)
   gdp = fopen(ctlfile, "w");
   if ( gdp == NULL ) cdoAbort("Open failed on %s", ctlfile);
 
-  fprintf(gdp, "* Generated automatically by cdo version %s\n", VERSION);
+  fprintf(gdp, "* Generated automatically by CDO version %s\n", VERSION);
   fprintf(gdp, "*\n");
 
   /* DSET */

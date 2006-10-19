@@ -817,6 +817,8 @@ void pstreamDefVlist(int pstreamID, int vlistID)
       if ( cdoTimer ) timer_start(timer_write);
       streamDefVlist(pstreamptr->fileID, vlistID);
       if ( cdoTimer ) timer_stop(timer_write);
+
+      pstreamptr->vlistID = vlistID; /* used for -r/-a */
     }
 }
 

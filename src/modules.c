@@ -75,6 +75,7 @@ void *Merge(void *argument);
 void *Mergegrid(void *argument);
 void *Mergetime(void *argument);
 void *Merstat(void *argument);
+void *Mrotuv(void *argument);
 void *Ninfo(void *argument);
 void *Nmltest(void *argument);
 void *Output(void *argument);
@@ -151,7 +152,7 @@ void *Zonstat(void *argument);
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd"}
 #define  ExprOperators          {"expr", "exprf"}
-#define  FiledesOperators       {"filedes", "griddes", "zaxisdes", "vct", "vardes", "taxisdes", "vlist", "partab"}
+#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vardes", "taxisdes", "vlist", "partab"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd"}
@@ -173,6 +174,7 @@ void *Zonstat(void *argument);
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
 #define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd"}
+#define  MrotuvOperators        {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "nvar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld"}
@@ -285,6 +287,7 @@ static MODULES Modules[] =
   { Mergegrid,      NULL,              MergegridOperators,      2,  1 },
   { Mergetime,      MergeHelp,         MergetimeOperators,     -1,  1 },
   { Merstat,        MerstatHelp,       MerstatOperators,        1,  1 },
+  { Mrotuv,         NULL,              MrotuvOperators,         2,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,          1,  0 },
   { Nmltest,        NULL,              NmltestOperators,        0,  0 },
   { Output,         OutputHelp,        OutputOperators,        -1,  0 },

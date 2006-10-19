@@ -34,7 +34,7 @@
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST, PARTAB;
+  int GRIDDES, GRIDDES2, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST, PARTAB;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -45,6 +45,7 @@ void *Filedes(void *argument)
   cdoInitialize(argument);
 
   GRIDDES  = cdoOperatorAdd("griddes",  0, 0, NULL);
+  GRIDDES2 = cdoOperatorAdd("griddes2", 0, 0, NULL);
   ZAXISDES = cdoOperatorAdd("zaxisdes", 0, 0, NULL);
   TAXISDES = cdoOperatorAdd("taxisdes", 0, 0, NULL);
   VCT      = cdoOperatorAdd("vct",      0, 0, NULL);
@@ -64,10 +65,12 @@ void *Filedes(void *argument)
   ngrids = vlistNgrids(vlistID);
   nzaxis = vlistNzaxis(vlistID);
 
-  if ( operatorID == GRIDDES )
+  if ( operatorID == GRIDDES || operatorID == GRIDDES2 )
     {
+      int opt = 0;
+      if ( operatorID == GRIDDES ) opt = 1;
       for ( index = 0; index < ngrids; index++ )
-	gridPrint(vlistGrid(vlistID, index));
+	gridPrint(vlistGrid(vlistID, index), opt);
     }
   else if ( operatorID == ZAXISDES )
     {
