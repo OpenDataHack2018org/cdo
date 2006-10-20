@@ -137,7 +137,7 @@ void *Outputgmt(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  if ( gridInqType(gridID) == GRID_CELL )
+  if ( gridInqType(gridID) != GRID_CELL )
     {
       if ( nlon == 1 && nlat  > 1 && nlev > 1 ) lzon = TRUE;
       if ( nlon  > 1 && nlat == 1 && nlev > 1 ) lmer = TRUE;
@@ -227,7 +227,7 @@ void *Outputgmt(void *argument)
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		{
-		  if ( !DBL_IS_EQUAL(array[i], missval) )
+		  /* if ( !DBL_IS_EQUAL(array[i], missval) ) */
 		    {
 		      if ( lzon )
 			fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i], level, array[i]);
