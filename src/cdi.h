@@ -104,6 +104,7 @@ extern "C" {
 #define  ZAXIS_ISENTROPIC         8
 #define  ZAXIS_TRAJECTORY         9
 #define  ZAXIS_ALTITUDE          10
+#define  ZAXIS_SIGMA             11
 
 /* TAXIS types */
 
