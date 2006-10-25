@@ -43,20 +43,32 @@ char *strdup(const char *s);
 */
 #endif
 
-#ifndef DBL_IS_EQUAL
+#ifndef  DBL_IS_EQUAL
 /*
-#define DBL_IS_EQUAL(x,y) (fabs(x - y) <= 2.0*(y*DBL_EPSILON + DBL_MIN))
+#define  DBL_IS_EQUAL(x,y) (fabs(x - y) <= 2.0*(y*DBL_EPSILON + DBL_MIN))
 */
-#define DBL_IS_EQUAL(x,y) (!(fabs(x - y) > 0))
+#define  DBL_IS_EQUAL(x,y) (!(fabs(x - y) > 0))
 #endif
 
-#ifndef M_PI
-#define M_PI		3.14159265358979323846	/* pi */
+#ifndef  M_PI
+#define  M_PI		3.14159265358979323846	/* pi */
 #endif
 
-#ifndef M_LN10
-#define M_LN10		2.30258509299404568402	/* log_e 10 */
+#ifndef  M_LN10
+#define  M_LN10		2.30258509299404568402	/* log_e 10 */
 #endif
+
+
+#ifndef  RAD2DEG
+#define  RAD2DEG  (180./M_PI)   /* conversion for rad to deg */
+#endif
+
+#ifndef  DEG2RAD
+#define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
+#endif
+
+#define  IX2D(y,x,nx)  ((y)*(nx)+(x))
+
 
 #define CDO_EXP_LOCAL   1
 #define CDO_EXP_REMOTE  2

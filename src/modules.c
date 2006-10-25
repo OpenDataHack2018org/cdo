@@ -178,7 +178,7 @@ void *Zonstat(void *argument);
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "nvar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld"}
-#define  OutputgmtOperators     {"outputcenter", "outputbounds", "outputboundscpt"}
+#define  OutputgmtOperators     {"outputcenter", "outputbounds", "outputboundscpt", "outputvector"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
