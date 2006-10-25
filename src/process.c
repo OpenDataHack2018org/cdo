@@ -647,7 +647,7 @@ void operatorInputArg(const char *enter)
     {
       lreadline = 1;
 
-      if ( enter ) Message(processInqPrompt(), "Enter %s >", enter);
+      if ( enter ) fprintf(stderr, "%-16s : Enter %s > ", processInqPrompt(), enter);
 
       while ( lreadline )
 	{

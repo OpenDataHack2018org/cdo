@@ -487,9 +487,9 @@ static int operatorInqModID(char *operatorName)
 	      }
 	  }
       if ( error )
-	fprintf(stdout, "(not found)\n") ;
+	fprintf(stderr, "(not found)\n") ;
       else
-	fprintf(stdout, "\n");
+	fprintf(stderr, "\n");
 
       exit(EXIT_FAILURE);
     }

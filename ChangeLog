@@ -1,7 +1,7 @@
 2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.3
-	* New operator: intntime [request: Michael Boettinger]	
+	* New operator: intntime [request: Michael Boettinger]
 	* New operator: mrotuvb [request: Helmuth Haak]
 	* New operator: outputvector [request: Helmuth Haak]
 	* inttime: extention for months and years [request: Holger Goettel]
