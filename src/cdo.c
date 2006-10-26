@@ -761,9 +761,10 @@ int main(int argc, char *argv[])
       char jobname[1024];
       char jobfilename[1024];
       FILE *jobfilep;
+      int ftpget(const char *target, const char *source);
 
       commandline[0] = 0;
-      strcat(commandline, "/pf/m/m214003/cdt/work/cdo/src/cdo ");
+      strcat(commandline, "/pf/m/m214003/cdt/work/cdo/build/GRID_AMD64/src/cdo ");
       for ( i = 1; i < argc; i++ )
 	{
 	  strcat(commandline, argv[i]);
@@ -786,10 +787,12 @@ int main(int argc, char *argv[])
       fprintf(jobfilep, "#! /bin/bash\n");
       fprintf(jobfilep, "uname -s\n");
       fprintf(jobfilep, "pwd\n");
-      fprintf(jobfilep, "cd tmp\n");
+      fprintf(jobfilep, "ls -l /pf/m/m214003/tmp\n");
+      fprintf(jobfilep, "cd /scratch/small/m214/m214003/tmp\n");
+      fprintf(jobfilep, "cd /pf/m/m214003/tmp\n");
       fprintf(jobfilep, "rm -f %s\n", cdojobfiles);
       fprintf(jobfilep, "echo $LD_LIBRARY_PATH\n");
-      fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-x86:$LD_LIBRARY_PATH\n");
+      fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-amd64:$LD_LIBRARY_PATH\n");
       fprintf(jobfilep, "%s\n", commandline);
 
       fclose(jobfilep);
@@ -800,6 +803,8 @@ int main(int argc, char *argv[])
 
       sprintf(commandline, "rm -r %s\n", jobfilename);
       system(commandline);
+
+      ftpget(cdojobfiles, cdojobfiles);
     }
   else
     {

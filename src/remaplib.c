@@ -71,7 +71,7 @@
 #define  QUART    0.25
 #define  BIGNUM   1.e+20
 #define  TINY     1.e-14
-#define  PI       3.14159265359
+#define  PI       M_PI
 #define  PI2      TWO*PI
 #define  PIH      HALF*PI
 
@@ -5182,17 +5182,16 @@ void reorder_links(REMAPVARS *rv)
 #endif
 
 
+#if  defined  (HAVE_LIBNETCDF)
 static void nce(int istat)
 {
   /*
     This routine provides a simple interface to netCDF error message routine.
   */
-#if  defined  (HAVE_LIBNETCDF)
 
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
-
-#endif
 }
+#endif
 
 
 void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMAPVARS rv)

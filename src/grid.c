@@ -1506,17 +1506,17 @@ int gridFromName(const char *gridname)
 }
 
 
+#if  defined  (HAVE_LIBNETCDF)
 static void nce(int istat)
 {
   /*
     This routine provides a simple interface to netCDF error message routine.
   */
-#if  defined  (HAVE_LIBNETCDF)
 
   if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
-
-#endif
 }
+#endif
+
 
 int gridFromNCfile(const char *gridfile)
 {

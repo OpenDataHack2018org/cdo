@@ -719,9 +719,15 @@ void pstreamClose(int pstreamID)
 	{
 	  if ( pstreamptr->mode == 'w' )
 	    {
+	      extern const char *cdojobfiles;
+	      FILE *fp = fopen(cdojobfiles, "a");
+	      fprintf(fp, "%s\n", pstreamptr->name);
+	      fclose(fp);
+	      /*
 	      fprintf(stderr, "start data transfer of %s\n", pstreamptr->name);
 	      fprintf(stderr, "finish data transfer of %s\n", pstreamptr->name);
 	      fprintf(stderr, "remove remote file %s\n", pstreamptr->name);
+	      */
 	    }
 	}
 

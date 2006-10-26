@@ -234,7 +234,7 @@ void job_submit(const char *expname, const char *jobfilename, const char *jobnam
 #endif
 
 struct FtpFile {
-  char *filename;
+  const char *filename;
   FILE *stream;
 };
 
@@ -250,15 +250,20 @@ int my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 }
 
 
-int ftpput()
+int ftpget(const char *target, const char *source)
 {
 #if  defined  (HAVE_LIBCURL)
   CURL *curl;
   CURLcode res;
   struct FtpFile ftpfile={
-    "b_eff.c", /* name to store the file as if succesful */
+    NULL, /* name to store the file as if succesful */
     NULL
   };
+  char filename[8196] = "ftp://qftps.zmaw.de/pf/m/m214003/tmp/";
+
+  strcat(filename, source);
+
+  ftpfile.filename = target;
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -277,8 +282,7 @@ int ftpput()
 
     curl_easy_setopt(curl, CURLOPT_SSLKEYPASSWD, "");
 
-    curl_easy_setopt(curl, CURLOPT_URL,
-		     "ftp://qftps.zmaw.de/small/m214/m214089/benchmark/b_eff.c");
+    curl_easy_setopt(curl, CURLOPT_URL, filename);
 
     /* define callback */
 

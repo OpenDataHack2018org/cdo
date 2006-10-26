@@ -14,10 +14,6 @@
 #define  RESTRICT_LATLON    2
 
 
-#define  DEG2RAD  (PI/180.)   /* conversion for deg to rad */
-#define  RAD2DEG  (180./PI)   /* conversion for rad to deg */
-
-
 typedef struct {
   int      pinit;            /* TRUE if the pointers are initialized     */
   int      gridID1;
