@@ -533,8 +533,10 @@ void *Gradsdes(void *argument)
   gdp = fopen(ctlfile, "w");
   if ( gdp == NULL ) cdoAbort("Open failed on %s", ctlfile);
 
+#if defined (VERSION)
   fprintf(gdp, "* Generated automatically by CDO version %s\n", VERSION);
   fprintf(gdp, "*\n");
+#endif
 
   /* DSET */
 

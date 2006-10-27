@@ -36,6 +36,8 @@ void userlog(const char *prompt, double cputime)
   int len, slen, olen, pos;
   int loper;
   char logstring[MAX_LEN];
+  int status;
+  struct flock mylock;
 
   memset(logstring, 0, MAX_LEN);
 
@@ -90,8 +92,19 @@ void userlog(const char *prompt, double cputime)
       return;
     }
 
-  fcntl(logfileno, F_WRLCK);
-  write(logfileno, logstring, slen);
+  mylock.l_type   = F_WRLCK;
+  mylock.l_whence = SEEK_SET;
+  mylock.l_start  = 0;
+  mylock.l_len    = 0;
+
+  status = fcntl(logfileno, F_SETLKW, &mylock);
+  if ( status == 0 )
+    {
+      write(logfileno, logstring, slen);
+
+      mylock.l_type   = F_UNLCK;
+      status = fcntl(logfileno, F_SETLKW, &mylock);
+    }
 
   close(logfileno);
 
