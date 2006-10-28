@@ -184,6 +184,7 @@ src/Merge.c -text
 src/Mergegrid.c -text
 src/Mergetime.c -text
 src/Merstat.c -text
+src/Mrotuv.c -text
 src/Ninfo.c -text
 src/Nmltest.c -text
 src/Output.c -text
