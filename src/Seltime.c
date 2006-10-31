@@ -89,7 +89,7 @@ void *Seltime(void *argument)
   moddat[SELHOUR]     =        100;
   moddat[SELDAY]      =        100;
   moddat[SELMON]      =        100;
-  moddat[SELYEAR]     =      10000;
+  moddat[SELYEAR]     = 1000000000;
   moddat[SELSEAS]     =        100;
 
   operatorID = cdoOperatorID();

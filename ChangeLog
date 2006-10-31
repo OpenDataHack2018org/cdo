@@ -4,9 +4,10 @@
 	* New operator: intntime [request: Michael Boettinger]
 	* New operator: mrotuvb [request: Helmuth Haak]
 	* New operator: outputvector [request: Helmuth Haak]
+	* selyear: bug fix for years > 9999 [report: Uwe Mikolajewicz]
 	* inttime: extention for months and years [request: Holger Goettel]
 	* outputcenter: support of zonal and meridional fields
-	* zonavg: bug fix for non gaussian or lonlat grids
+	* zonavg: bug fix for non gaussian or non lonlat grids
 	* remaplib.sort_add: don't sort if num_links <= 1
 	* remaplib.remap_bi?: check that src_add is valid
 	* Remap: use REMAP_NON_GLOBAL only for gridsize > 1
