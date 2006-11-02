@@ -758,10 +758,15 @@ int main(int argc, char *argv[])
     {
       char commandline[65536];
       int i;
+      int status;
       char jobname[1024];
       char jobfilename[1024];
-      FILE *jobfilep;
-      int ftpget(const char *target, const char *source);
+      char ftp_url[4096];
+      char ftpfile[1024];
+      char tmppath[]  = "/localA/m214003/tmp/";
+      char tmppath2[] = "/scratch/localA/m214003/tmp/";
+      FILE *jobfilep, *ftpfilep;
+      int ftpget(int flag, const char *url, const char *path, const char *target, const char *source);
 
       commandline[0] = 0;
       strcat(commandline, "/pf/m/m214003/cdt/work/cdo/build/GRID_AMD64/src/cdo ");
@@ -785,13 +790,13 @@ int main(int argc, char *argv[])
 	}
 
       fprintf(jobfilep, "#! /bin/bash\n");
-      fprintf(jobfilep, "uname -s\n");
-      fprintf(jobfilep, "pwd\n");
-      fprintf(jobfilep, "ls -l /pf/m/m214003/tmp\n");
-      fprintf(jobfilep, "cd /scratch/small/m214/m214003/tmp\n");
-      fprintf(jobfilep, "cd /pf/m/m214003/tmp\n");
+      fprintf(jobfilep, "#uname -s\n");
+      fprintf(jobfilep, "#pwd\n");
+      fprintf(jobfilep, "#ls -l %s\n", tmppath2);
+      fprintf(jobfilep, "rm -f %s*\n", tmppath2);
+      fprintf(jobfilep, "cd %s\n", tmppath2);
       fprintf(jobfilep, "rm -f %s\n", cdojobfiles);
-      fprintf(jobfilep, "echo $LD_LIBRARY_PATH\n");
+      fprintf(jobfilep, "#echo $LD_LIBRARY_PATH\n");
       fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-amd64:$LD_LIBRARY_PATH\n");
       fprintf(jobfilep, "%s\n", commandline);
 
@@ -801,10 +806,29 @@ int main(int argc, char *argv[])
 
       job_submit(cdoExpName, jobfilename, jobname);
 
-      sprintf(commandline, "rm -r %s\n", jobfilename);
+      sprintf(commandline, "rm -f %s\n", jobfilename);
       system(commandline);
 
-      ftpget(cdojobfiles, cdojobfiles);
+      sprintf(commandline, "rm -f %s\n", cdojobfiles);
+      system(commandline);
+
+      sprintf(ftp_url, "ftp://%s.zmaw.de", cdoExpName);
+
+      status = ftpget(0, ftp_url, tmppath, cdojobfiles, cdojobfiles);
+
+      if ( status == 0 )
+	{
+	  ftpfilep = fopen(cdojobfiles, "r");
+	  if ( ftpfilep )
+	    {
+	      while ( fscanf(ftpfilep, "%s\n", ftpfile) == 1 )
+		{
+		  ftpget(1, ftp_url, tmppath, ftpfile, ftpfile);
+		}
+
+	      fclose(ftpfilep);
+	    }
+	}
     }
   else
     {

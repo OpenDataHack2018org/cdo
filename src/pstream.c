@@ -494,8 +494,23 @@ int pstreamOpenRead(const char *argument)
       else
 	{
 	  len = strlen(argument);
-	  filename = (char *) malloc(len+1);
-	  strcpy(filename, argument);
+
+	  if ( cdoExpMode == CDO_EXP_REMOTE )
+	    {
+	      char datapath[] = "/scratch/localA/m214003/data/";
+	      len += strlen(datapath);
+
+	      filename = (char *) malloc(len+1);
+
+	      strcpy(filename, datapath);
+	      strcat(filename, argument);
+	    }
+	  else
+	    {
+	      filename = (char *) malloc(len+1);
+
+	      strcpy(filename, argument);
+	    }
 	}
 
       if ( PSTREAM_Debug ) Message(func, "file %s", filename);
