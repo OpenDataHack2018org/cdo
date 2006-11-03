@@ -189,6 +189,7 @@ Operator catalog:
       Ensstat    ensavg          Ensemble average
       Ensstat    ensstd          Ensemble standard deviation
       Ensstat    ensvar          Ensemble variance
+      Ensstat    enspctl         Ensemble percentiles
       Fldstat    fldmin          Field minimum
       Fldstat    fldmax          Field maximum
       Fldstat    fldsum          Field sum
@@ -196,6 +197,7 @@ Operator catalog:
       Fldstat    fldavg          Field average
       Fldstat    fldstd          Field standard deviation
       Fldstat    fldvar          Field variance
+      Fldstat    fldpctl         Field percentiles
       Zonstat    zonmin          Zonal minimum
       Zonstat    zonmax          Zonal maximum
       Zonstat    zonsum          Zonal sum
@@ -203,6 +205,7 @@ Operator catalog:
       Zonstat    zonavg          Zonal average
       Zonstat    zonstd          Zonal standard deviation
       Zonstat    zonvar          Zonal variance
+      Zonstat    zonpctl         Zonal percentiles
       Merstat    mermin          Meridional minimum
       Merstat    mermax          Meridional maximum
       Merstat    mersum          Meridional sum
@@ -210,6 +213,7 @@ Operator catalog:
       Merstat    meravg          Meridional average
       Merstat    merstd          Meridional standard deviation
       Merstat    mervar          Meridional variance
+      Merstat    merpctl         Meridional percentiles
       Vertstat   vertmin         Vertical minimum
       Vertstat   vertmax         Vertical maximum
       Vertstat   vertsum         Vertical sum
@@ -222,66 +226,84 @@ Operator catalog:
       Selstat    selmean         Time range mean
       Selstat    selavg          Time range average
       Selstat    selstd          Time range standard deviation
+      Selpctl    selpctl         Time range percentiles
       Runstat    runmin          Running minimum
       Runstat    runmax          Running maximum
       Runstat    runsum          Running sum
       Runstat    runmean         Running mean
       Runstat    runavg          Running average
       Runstat    runstd          Running standard deviation
+      Runpctl    runpctl         Running percentiles
       Timstat    timmin          Time minimum
       Timstat    timmax          Time maximum
       Timstat    timsum          Time sum
       Timstat    timmean         Time mean
       Timstat    timavg          Time average
       Timstat    timstd          Time standard deviation
+      Timpctl    timpctl         Time percentiles
       Hourstat   hourmin         Hourly minimum
       Hourstat   hourmax         Hourly maximum
       Hourstat   hoursum         Hourly sum
       Hourstat   hourmean        Hourly mean
       Hourstat   houravg         Hourly average
       Hourstat   hourstd         Hourly standard deviation
+      Hourpctl   hourpctl        Hourly percentiles
       Daystat    daymin          Daily minimum
       Daystat    daymax          Daily maximum
       Daystat    daysum          Daily sum
       Daystat    daymean         Daily mean
       Daystat    dayavg          Daily average
       Daystat    daystd          Daily standard deviation
+      Daypctl    daypctl         Daily percentiles
       Monstat    monmin          Monthly minimum
       Monstat    monmax          Monthly maximum
       Monstat    monsum          Monthly sum
       Monstat    monmean         Monthly mean
       Monstat    monavg          Monthly average
       Monstat    monstd          Monthly standard deviation
+      Monpctl    monpctl         Monthly percentiles
       Yearstat   yearmin         Yearly minimum
       Yearstat   yearmax         Yearly maximum
       Yearstat   yearsum         Yearly sum
       Yearstat   yearmean        Yearly mean
       Yearstat   yearavg         Yearly average
       Yearstat   yearstd         Yearly standard deviation
-      Seasstat   seasmin         Seasonally minimum
-      Seasstat   seasmax         Seasonally maximum
-      Seasstat   seassum         Seasonally sum
-      Seasstat   seasmean        Seasonally mean
-      Seasstat   seasavg         Seasonally average
-      Seasstat   seasstd         Seasonally standard deviation
+      Yearpctl   yearpctl        Yearly percentiles
+      Seasstat   seasmin         Seasonal minimum
+      Seasstat   seasmax         Seasonal maximum
+      Seasstat   seassum         Seasonal sum
+      Seasstat   seasmean        Seasonal mean
+      Seasstat   seasavg         Seasonal average
+      Seasstat   seasstd         Seasonal standard deviation
+      Seaspctl   seaspctl        Seasonal percentiles
       Ydaystat   ydaymin         Multi-year daily minimum
       Ydaystat   ydaymax         Multi-year daily maximum
       Ydaystat   ydaysum         Multi-year daily sum
       Ydaystat   ydaymean        Multi-year daily mean
       Ydaystat   ydayavg         Multi-year daily average
       Ydaystat   ydaystd         Multi-year daily standard deviation
+      Ydaypctl   ydaypctl        Multi-year daily percentiles
       Ymonstat   ymonmin         Multi-year monthly minimum
       Ymonstat   ymonmax         Multi-year monthly maximum
       Ymonstat   ymonsum         Multi-year monthly sum
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
       Ymonstat   ymonstd         Multi-year monthly standard deviation
-      Yseasstat  yseasmin        Multi-year seasonally minimum
-      Yseasstat  yseasmax        Multi-year seasonally maximum
-      Yseasstat  yseassum        Multi-year seasonally sum
-      Yseasstat  yseasmean       Multi-year seasonally mean
-      Yseasstat  yseasavg        Multi-year seasonally average
-      Yseasstat  yseasstd        Multi-year seasonally standard deviation
+      Ymonpctl   ymonpctl        Multi-year monthly percentiles
+      Yseasstat  yseasmin        Multi-year seasonal minimum
+      Yseasstat  yseasmax        Multi-year seasonal maximum
+      Yseasstat  yseassum        Multi-year seasonal sum
+      Yseasstat  yseasmean       Multi-year seasonal mean
+      Yseasstat  yseasavg        Multi-year seasonal average
+      Yseasstat  yseasstd        Multi-year seasonal standard deviation
+      Yseaspctl  yseaspctl       Multi-year seasonal percentiles
+      Ydrunstat  ydrunmin        Multi-year daily running minimum
+      Ydrunstat  ydrunmax        Multi-year daily running maximum
+      Ydrunstat  ydrunsum        Multi-year daily running sum
+      Ydrunstat  ydrunmean       Multi-year daily running mean
+      Ydrunstat  ydrunavg        Multi-year daily running average
+      Ydrunstat  ydrunstd        Multi-year daily running standard deviation
+      Ydrunpctl  ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
    Regression
 -------------------------------------------------------------
@@ -331,12 +353,12 @@ Operator catalog:
 -------------------------------------------------------------
    Miscellaneous
 -------------------------------------------------------------
+      Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
+      Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
       Timsort    timsort         Sort over the time
       Vargen     const           Create a constant field
       Vargen     random          Create a field with random values
       Vardup     vardup          Duplicate variables
       Vardup     varmul          Multiply variables
-      Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
-      Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
       Rotuv      rotuvb          Backward rotation
       Mastrfu    mastrfu         Mass stream function

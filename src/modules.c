@@ -84,12 +84,21 @@ void *Pinfo(void *argument);
 void *Remap(void *argument);
 void *Replace(void *argument);
 void *Rotuv(void *argument);
+/* RQ */
+void *Runpctl(void *argument);
+/* QR */
 void *Runstat(void *argument);
+/* RQ */
+void *Seaspctl(void *argument);
+/* QR */
 void *Seasstat(void *argument);
 void *Selbox(void *argument);
 void *Select(void *argument);
 void *Seloperator(void *argument);
 void *Selrec(void *argument);
+/* RQ */
+void *Selpctl(void *argument);
+/* QR */
 void *Selstat(void *argument);
 void *Seltime(void *argument);
 void *Set(void *argument);
@@ -116,6 +125,9 @@ void *Template2(void *argument);
 void *Test(void *argument);
 void *Test2(void *argument);
 void *Timsort(void *argument);
+/* RQ */
+void *Timpctl(void *argument);
+/* QR */
 void *Timstat(void *argument);
 void *Trend(void *argument);
 void *Trms(void *argument);
@@ -127,9 +139,22 @@ void *Vertstat(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
+/* RQ */
+void *Ydaypctl(void *argument);
+/* QR */
 void *Ydaystat(void *argument);
+/* RQ */
+void *Ydrunpctl(void *argument);
+void *Ydrunstat(void *argument);
+/* QR */
 void *Ymonarith(void *argument);
+/* RQ */
+void *Ymonpctl(void *argument);
+/* QR */
 void *Ymonstat(void *argument);
+/* RQ */
+void *Yseaspctl(void *argument);
+/* QR */
 void *Yseasstat(void *argument);
 void *Zonstat(void *argument);
 
@@ -150,12 +175,12 @@ void *Zonstat(void *argument);
 #define  DiffOperators          {"diff", "diffv"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
-#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd"}
+#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
 #define  ExprOperators          {"expr", "exprf"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vardes", "taxisdes", "vlist", "partab"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
-#define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd"}
+#define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
@@ -173,7 +198,7 @@ void *Zonstat(void *argument);
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
-#define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd"}
+#define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd", "merpctl"}
 #define  MrotuvOperators        {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "nvar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
@@ -185,12 +210,21 @@ void *Zonstat(void *argument);
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
+/* RQ */
+#define  RunpctlOperators       {"runpctl"}
+/* QR */
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runstd"}
+/* RQ */
+#define  SeaspctlOperators      {"seaspctl"}
+/* QR */
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelectOperators        {"selcode", "selvar", "selstdname", "sellevel", "selgrid", "selgridname", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delcode", "delvar", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
+/* RQ */
+#define  SelpctlOperators       {"selpctl"}
+/* QR */
 #define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selstd"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime"}
@@ -220,6 +254,13 @@ void *Zonstat(void *argument);
 #define  TestOperators          {"test"}
 #define  Test2Operators         {"test2"}
 #define  TimsortOperators       {"timsort"}
+/* RQ */
+#define  TimpctlOperators       {"timpctl"}
+#define    YearpctlOperators    {"yearpctl"}
+#define    MonpctlOperators     {"monpctl"}
+#define    DaypctlOperators     {"daypctl"}
+#define    HourpctlOperators    {"hourpctl"}
+/* QR */
 #define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timstd"}
 #define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearstd"}
 #define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monstd"}
@@ -235,11 +276,24 @@ void *Zonstat(void *argument);
 #define  WindOperators          {"uv2dv", "dv2uv", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
+/* RQ */
+#define  YdaypctlOperators      {"ydaypctl"}
+/* QR */
 #define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydaystd"}
+/* RQ */
+#define  YdrunpctlOperators     {"ydrunpctl"}
+#define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunstd"}
+/* QR */
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
+/* RQ */
+#define  YmonpctlOperators      {"ymonpctl"}
+/* QR */
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd"}
+/* RQ */
+#define  YseaspctlOperators     {"yseaspctl"}
+/* QR */
 #define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd"}
-#define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd"}
+#define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonpctl"}
 
 
 static MODULES Modules[] =
@@ -298,12 +352,21 @@ static MODULES Modules[] =
   { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,        2,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,          1,  1 },
+  /* RQ */
+  { Runpctl,        RunpctlHelp,       RunpctlOperators,        1,  1 },
+  /* QR */
   { Runstat,        RunstatHelp,       RunstatOperators,        1,  1 },
+  /* RQ */
+  { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,       3,  1 },
+  /* QR */
   { Seasstat,       SeasstatHelp,      SeasstatOperators,       1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,         1,  1 },
   { Select,         SelectHelp,        SelectOperators,         1,  1 },
   { Seloperator,    NULL,              SeloperatorOperators,    1,  1 },
   { Selrec,         SelectHelp,        SelrecOperators,         1,  1 },
+  /* RQ */
+  { Selpctl,        SelpctlHelp,       SelpctlOperators,        3,  1 },
+  /* QR */
   { Selstat,        SelstatHelp,       SelstatOperators,        1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,        1,  1 },
   { Set,            SetHelp,           SetOperators,            1,  1 },
@@ -329,6 +392,13 @@ static MODULES Modules[] =
   { Template2,      NULL,              Template2Operators,      1,  1 },
   { Test,           NULL,              TestOperators,           1,  1 },
   { Test2,          NULL,              Test2Operators,          2,  1 },
+  /* RQ */
+  { Timpctl,        TimpctlHelp,       TimpctlOperators,        3,  1 },
+  { Timpctl,        YearpctlHelp,      YearpctlOperators,       3,  1 },
+  { Timpctl,        MonpctlHelp,       MonpctlOperators,        3,  1 },
+  { Timpctl,        DaypctlHelp,       DaypctlOperators,        3,  1 },
+  { Timpctl,        HourpctlHelp,      HourpctlOperators,       3,  1 },
+  /* QR */
   { Timsort,        TimsortHelp,       TimsortOperators,        1,  1 },
   { Timstat,        TimstatHelp,       TimstatOperators,        1,  1 },
   { Timstat,        YearstatHelp,      YearstatOperators,       1,  1 },
@@ -345,9 +415,22 @@ static MODULES Modules[] =
   { Wind,           WindHelp,          WindOperators,           1,  1 },
   { Writegrid,      NULL,              WritegridOperators,      1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,    1,  1 },
+  /* RQ */
+  { Ydaypctl,       YdaypctlHelp,      YdaypctlOperators,       3,  1 },
+  /* QR */
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,       1,  1 },
+  /* RQ */
+  { Ydrunpctl,      Ydrunpctl,         YdrunpctlOperators,      3,  1 },
+  { Ydrunstat,      Ydrunstat,         YdrunstatOperators,      1,  1 },
+  /* QR */
   { Ymonarith,      YmonarithHelp,     YmonarithOperators,      2,  1 },
+  /* RQ */
+  { Ymonpctl,       YmonpctlHelp,      YmonpctlOperators,       3,  1 },
+  /* QR */
   { Ymonstat,       YmonstatHelp,      YmonstatOperators,       1,  1 },
+  /* RQ */
+  { Yseaspctl,      YseaspctlHelp,     YseaspctlOperators,      3,  1 },
+  /* QR */
   { Yseasstat,      YseasstatHelp,     YseasstatOperators,      1,  1 },
   { Zonstat,        ZonstatHelp,       ZonstatOperators,        1,  1 },
 };

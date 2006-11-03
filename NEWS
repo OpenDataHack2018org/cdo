@@ -1,6 +1,12 @@
 CDO NEWS
 --------
 
+Version 1.0.3 (3 November 2006):
+
+  * New operators:
+      o intntime - Time interpolation
+      o mrotuvb - Backward transformation of velocity components U and V from MPIOM
+
 Version 1.0.2 (18 September 2006):
 
   * Rename operator gradsdes to gradsdes1 and set the alias gradsdes to gradsdes2

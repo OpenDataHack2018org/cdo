@@ -10,6 +10,9 @@
 #define  func_mean  14
 #define  func_var   15
 #define  func_std   16
+/* RQ */
+#define  func_pctl  17
+/* QR */
 
 #define  func_fld   21
 

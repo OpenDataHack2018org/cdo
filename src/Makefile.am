@@ -50,12 +50,15 @@ cdo_SOURCES = Arith.c		\
               Remap.c  	        \
               Replace.c  	\
               Rotuv.c     	\
+              Runpctl.c  	\
               Runstat.c  	\
+              Seaspctl.c 	\
               Seasstat.c 	\
               Selbox.c  	\
               Select.c  	\
               Seloperator.c  	\
               Selrec.c  	\
+              Selpctl.c 	\
               Selstat.c 	\
               Seltime.c 	\
 	      Set.c		\
@@ -79,6 +82,7 @@ cdo_SOURCES = Arith.c		\
               Subtrend.c        \
               Templates.c    	\
               Test.c    	\
+              Timpctl.c 	\
               Timsort.c 	\
               Timstat.c 	\
               Trend.c  		\
@@ -91,9 +95,14 @@ cdo_SOURCES = Arith.c		\
               Wind.c         	\
               Writegrid.c 	\
               Writerandom.c 	\
+              Ydaypctl.c  	\
               Ydaystat.c  	\
+              Ydrunpctl.c  	\
+              Ydrunstat.c  	\
 	      Ymonarith.c       \
+              Ymonpctl.c  	\
               Ymonstat.c  	\
+              Yseaspctl.c  	\
               Yseasstat.c  	\
               Zonstat.c 	\
 	      cdilib.c 		\
@@ -162,6 +171,10 @@ cdo_SOURCES = Arith.c		\
               namelist.h 	\
               util.h		\
               etopo.h		\
+              percentiles.c	\
+              percentiles.h	\
+              nth_element.c	\
+              nth_element.h	\
 	      cdi.h
 #
 cdo_LDADD = $(LDFLAGS) -lm
