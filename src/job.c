@@ -345,6 +345,7 @@ int my_progress_func(int *stdout_is_tty,
 
 int ftpget(int flag, const char *url, const char *path, const char *target, const char *source)
 {
+  int status = 0;
 #if  defined  (HAVE_LIBCURL)
   CURL *curl;
   CURLcode res;
@@ -356,7 +357,6 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
   char filename[8196];
   char ftpcommand[1024];
   char errorbuffer[CURL_ERROR_SIZE];
-  int status = 0;
   int stdout_is_tty = 0;
   char prompt[1024];
 

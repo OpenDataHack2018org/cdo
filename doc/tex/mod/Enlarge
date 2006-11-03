@@ -40,7 +40,7 @@ enlarged to the grid size of the first dataset:
    cdo enlarge,t21grid ifile2 tmpfile
    cdo add ifile1 tmpfile ofile
 @EndVerbatim
-Or shorter with pipes:
+Or shorter using operator piping:
 @BeginVerbatim
    cdo add ifile1 -enlarge,t21grid ifile2 ofile
 @EndVerbatim
