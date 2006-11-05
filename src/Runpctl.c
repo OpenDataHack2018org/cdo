@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Brockmann Consult
+  Copyright (C) 2006 Brockmann Consult
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -33,13 +33,6 @@
 #include "field.h"
 #include "dmemory.h"
 #include "nth_element.h"
-
-typedef struct {
-  int      date;
-  int      time;
-  int      julval;
-}
-DATETIME;
 
 
 void *Runpctl(void *argument)
@@ -179,7 +172,7 @@ void *Runpctl(void *argument)
                   
                   if ( j > 0 )
                     {
-                      vars1[0][varID][levelID].ptr[i] = nth_element(array, j, ceil(j*(pn/100.0))-1);
+                      vars1[0][varID][levelID].ptr[i] = nth_element(array, j, (int)ceil(j*(pn/100.0))-1);
                     }
                   else
                     {

@@ -420,8 +420,8 @@ static MODULES Modules[] =
   /* QR */
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,       1,  1 },
   /* RQ */
-  { Ydrunpctl,      Ydrunpctl,         YdrunpctlOperators,      3,  1 },
-  { Ydrunstat,      Ydrunstat,         YdrunstatOperators,      1,  1 },
+  { Ydrunpctl,      YdrunpctlHelp,     YdrunpctlOperators,      3,  1 },
+  { Ydrunstat,      YdrunstatHelp,     YdrunstatOperators,      1,  1 },
   /* QR */
   { Ymonarith,      YmonarithHelp,     YmonarithOperators,      2,  1 },
   /* RQ */

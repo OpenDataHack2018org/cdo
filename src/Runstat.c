@@ -40,14 +40,6 @@
 #include "dmemory.h"
 
 
-typedef struct {
-  int      date;
-  int      time;
-  int      julval;
-}
-DATETIME;
-
-
 void datetime_avg(int dpy, int ndates, DATETIME *datetime)
 {
   int vdate, vtime;

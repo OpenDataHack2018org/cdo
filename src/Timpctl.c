@@ -49,7 +49,6 @@ static void timpctl(int operatorID)
   int tsID;
   int otsID;
   long nsets;
-  int i;
   int streamID1, streamID2, streamID3, streamID4;
   int vlistID1, vlistID2, vlistID3, vlistID4, taxisID1, taxisID2, taxisID3, taxisID4;
   int nmiss;
@@ -255,7 +254,6 @@ static void timpctl(int operatorID)
 
 void *Timpctl(void *argument)
 {
-  static const char func[] = "Timpctl";
   int operatorID;
   
   cdoInitialize(argument);
@@ -269,6 +267,7 @@ void *Timpctl(void *argument)
   operatorID = cdoOperatorID();
   
   timpctl(operatorID);
+
   cdoFinish();
 
   return (0);

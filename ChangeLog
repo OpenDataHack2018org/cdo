@@ -1,5 +1,6 @@
 2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* processSelf: lock/unlock NumProcess (bug fix)
 	* Version 1.0.4 released
 	
 2006-11-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

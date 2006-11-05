@@ -127,6 +127,8 @@ int processSelf(void)
 #if  defined  (HAVE_LIBPTHREAD)
   int thID = (int) pthread_self();
 
+  pthread_mutex_lock(&processMutex);
+
   for ( processID = 0; processID < NumProcess; processID++ )
     if ( Process[processID].threadID == thID ) break;
 
@@ -137,6 +139,9 @@ int processSelf(void)
       else
 	processID = 0;
     }
+
+  pthread_mutex_unlock(&processMutex);  
+
 #endif
 
   return (processID);

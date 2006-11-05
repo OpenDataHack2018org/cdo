@@ -18,6 +18,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <math.h>
+
+#include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "nth_element.h"
@@ -146,7 +148,7 @@ static double histGetPercentile(const HISTOGRAM *hist, int p)
     }
   else
     {
-      return nth_element(DBL_PTR(hist->ptr), hist->nsamp, ceil(s) - 1);
+      return (double)nth_element(DBL_PTR(hist->ptr), hist->nsamp, ceil(s) - 1);
     } 
 }
 
@@ -182,7 +184,7 @@ HISTOGRAM_SET *hsetCreate(int nvars)
 void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
 {
   static const char func[] = "hsetCreateVarLevels";
-  int i, nvars, nhists, nbins, levelID, histID;
+  int nvars, nhists, nbins, levelID, histID;
   HISTOGRAM *hists;
   
   nbins = histGetEnvNBins();

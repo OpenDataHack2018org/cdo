@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Brockmann Consult
+  Copyright (C) 2006 Brockmann Consult
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -42,7 +42,7 @@ void *Selpctl(void *argument)
   int gridID, varID, levelID, recID;
   int tsID;
   int otsID;
-  int nsets;
+  int nsets = 0;
   int i;
   int streamID1, streamID2, streamID3, streamID4;
   int vlistID1, vlistID2, vlistID3, vlistID4, taxisID1, taxisID2, taxisID3, taxisID4;

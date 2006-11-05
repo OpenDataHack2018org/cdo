@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Brockmann Consult
+  Copyright (C) 2006 Brockmann Consult
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -41,14 +41,6 @@
 #include "dmemory.h"
 
 #define NDAY 373
-
-
-typedef struct {
-  int      date;
-  int      time;
-  int      julval;
-}
-DATETIME;
 
 
 typedef struct {
@@ -398,7 +390,8 @@ static void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
 {
   static const char func[] = "ydstatCreateVars1";
   int varID, levelID, nvars, nlevels;
-  int gridID, gridsize, missval;
+  int gridID, gridsize;
+  double missval;
 
   nvars = vlistNvars(stats->vlist);
   
@@ -427,7 +420,8 @@ static void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
 {
   static const char func[] = "ydstatCreateVars2";
   int varID, levelID, nvars, nlevels;
-  int gridID, gridsize, missval;
+  int gridID, gridsize;
+  double missval;
 
   nvars = vlistNvars(stats->vlist);
   
@@ -455,9 +449,8 @@ static void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
 static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
   FIELD **vars1, FIELD **vars2, int nsets, int operfunc)
 {
-  static char func[] = "ydstatUpdate";
   int varID, levelID, nvars, nlevels;
-  int gridID, gridsize;
+  int gridsize;
   int year, month, day, dayoy;
 
   nvars = vlistNvars(stats->vlist);

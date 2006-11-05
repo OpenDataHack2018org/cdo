@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Brockmann Consult
+  Copyright (C) 2006 Brockmann Consult
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -38,8 +38,6 @@
 void *Yseaspctl(void *argument)
 {
   static char func[] = "Yseaspctl";
-  int operatorID;
-  int operfunc;
   int gridsize;
   int varID;
   int recID;
@@ -118,7 +116,7 @@ void *Yseaspctl(void *argument)
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
-  while ( nrecs = streamInqTimestep(streamID2, tsID) )
+  while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != streamInqTimestep(streamID3, tsID) )
         cdoAbort("Number of records in time step %d of %s and %s are different!", tsID+1, cdoStreamName(1), cdoStreamName(2));
@@ -192,7 +190,7 @@ void *Yseaspctl(void *argument)
     }
 
   tsID = 0;
-  while ( nrecs = streamInqTimestep(streamID1, tsID) )
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);

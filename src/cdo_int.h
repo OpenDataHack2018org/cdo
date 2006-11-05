@@ -92,6 +92,15 @@ int ntr2nlat(int ntr);
 int ntr2nlat_linear(int ntr);
 int compNlon(int nlat);
 
+typedef struct {
+  int      date;
+  int      time;
+  int      julval;
+}
+DATETIME;
+
+void    datetime_avg(int dpy, int ndates, DATETIME *datetime);
+
 void    decode_date(int date, int *year, int *month, int *day);
 void    decode_time(int time, int *hour, int *minute);
 double  encode_julval(int dpy, int date, int time);
