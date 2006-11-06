@@ -1,6 +1,17 @@
 CDO NEWS
 --------
 
+Version 1.0.4 (7 November 2006):
+
+  * New operators:
+      o ydrunmin, ydrunmax, ydrunsum, ydrunmean, ydrunavg, ydrunstd - 
+        Multi-year daily running statistical values
+      o timpctl, hourpctl, daypctl, monpctl, yearpctl, selpctl, runpctl, seaspctl - 
+        Percentile values for different time steps
+      o ydaypctl, ymonpctl, yseaspctl, ydrunpctl - 
+        Multi-year percentile values for different time steps
+      o enspctl, fldpctl, zonpctl,merpctl - Ensemble and field percentiles 
+
 Version 1.0.3 (3 November 2006):
 
   * New operators:

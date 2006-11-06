@@ -1,0 +1,57 @@
+@BeginModule
+@Name      = Ydrunpctl
+@Title     = Multi-year daily running percentile values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = ydrunpctl
+
+@BeginDescription
+This module writes to @file{ofile} running percentile values for each
+day of year in @file{ifile}. A certain percentile is computed for all
+time steps in those running windows whose medium time steps correspond
+to the same day of year. The date information in an output field is
+the date of the last contributing input field.
+@EndModule
+
+
+@BeginOperator_ydrunpctl
+@Title     = Multi-year daily running percentiles
+@Parameter = p
+@Parameter = nts
+
+@BeginDescription
+@IfMan
+o(001,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+                 ...
+o(366,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@Item = nts
+INTEGER  Number of time steps
+@EndParameter
+
+
+@BeginExample
+Assume the input data provide daily measurements. To compute the daily
+90th percentile over all input years for a running window of five days,
+use:
+@BeginVerbatim
+   cdo ydrunpctl,90,5 ifile ofile
+@EndVerbatim
+@EndExample

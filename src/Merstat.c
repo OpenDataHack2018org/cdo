@@ -25,6 +25,7 @@
       Merstat    meravg          Meridional average
       Merstat    merstd          Meridional standard deviation
       Merstat    mervar          Meridional variance
+      Merstat    merpctl         Meridional percentiles
 */
 
 
@@ -52,6 +53,9 @@ void *Merstat(void *argument)
   int taxisID1, taxisID2;
   int needWeights = FALSE;
   FIELD field1, field2;
+  /* RQ */
+  int pn = 0;
+  /* QR */
 
   cdoInitialize(argument);
 
@@ -62,9 +66,23 @@ void *Merstat(void *argument)
   cdoOperatorAdd("meravg",  func_avg,  0, NULL);
   cdoOperatorAdd("mervar",  func_var,  0, NULL);
   cdoOperatorAdd("merstd",  func_std,  0, NULL);
+  /* RQ */
+  cdoOperatorAdd("merpctl", func_pctl, 0, NULL);
+  /* QR */
  
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  /* RQ */
+  if ( operfunc == func_pctl )
+    {
+      operatorInputArg("percentile number");
+      pn = atoi(operatorArgv()[0]);
+      
+      if ( pn < 1 || pn > 99 )
+        cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+    }
+  /* QR */
 
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std )
@@ -135,7 +153,12 @@ void *Merstat(void *argument)
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 	  field2.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  merfun(field1, &field2, operfunc);
+	  /* RQ */
+	  if ( operfunc == func_pctl )
+	    merpctl(field1, & field2, pn);
+	  else  
+	    merfun(field1, &field2, operfunc);
+	  /* QR */  
 
 	  streamDefRecord(streamID2, varID,  levelID);
 	  streamWriteRecord(streamID2, field2.ptr, field2.nmiss);

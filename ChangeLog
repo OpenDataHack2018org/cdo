@@ -1,7 +1,24 @@
-2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2006-11-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* processSelf: lock/unlock NumProcess (bug fix)
+	* pstreamOpenRead: move mutex_unlock after cdoInqHistory
 	* Version 1.0.4 released
+
+2006-11-06  Ralf Quast  <ralf.quast@brockmann-consult.de>
+
+	* New module: Ydrunstat (ydrun -min, -max, -sum, -mean, -avg, -qstd)
+	* New module: Timpctl (tim-, hour-, day-, mon-, year- pctl)
+	* New module: Selpctl (selpctl)
+	* New module: Runpctl (runpctl)
+	* New module: Seaspctl (seaspctl)
+	* New module: Ydaypctl (ydaypctl)
+	* New module: Ymonpctl (ymonpctl)
+	* New module: Yseaspctl (yseaspctl)
+	* New module: Ydrunpctl (ydrunpctl)
+	* New operator: enspctl (Ensstat)
+	* New operator: fldpctl (Fldstat)
+	* New operator: zonpctl (Zonstat)
+	* New operator: merpctl (Merstat)	
 	
 2006-11-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

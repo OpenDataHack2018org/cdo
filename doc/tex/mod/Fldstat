@@ -5,12 +5,13 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldvar
+@Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldvar fldpctl
 
 @BeginDescription
 This module computes statistical values of the input fields.
 According to the actual operator the field minimum, maximum,
-sum, average, standard deviation or variance is written to @file{ofile}.
+sum, average, standard deviation, variance or a certain percentile
+is written to @file{ofile}.
 @EndDescription
 @EndModule
 
@@ -152,9 +153,40 @@ weighted by area weights obtained by the input field.
 @EndOperator
 
 
+@BeginOperator_fldpctl
+@Title     = Field percentiles
+@Parameter = p
+
+@BeginDescription
+@IfMan
+For every gridpoint x_1, ..., x_n of the same field, it is:
+
+o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}
+@EndifMan
+@IfDoc
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+@BeginMath
+o(t,1) = \mbox{\bf pth percentile} \{i(t,x'), x_1 < x' \leq x_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@EndParameter
+
+
 @BeginExample
 To compute the field mean of all input fields, use:
 @BeginVerbatim
    cdo fldmean ifile ofile
+@EndVerbatim
+
+To compute the 90th percentile of all input fields, use:
+@BeginVerbatim
+   cdo fldpctl,90 ifile ofile
 @EndVerbatim
 @EndExample

@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = Seasstat
-@Title     = Seasonally statistical values
+@Title     = Seasonal statistical values
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
@@ -20,11 +20,11 @@ time steps.
 
 
 @BeginOperator_seasmin
-@Title     = Seasonally minimum
+@Title     = Seasonal minimum
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
 
 o(t,x) = min{i(t',x), t1 < t' <= tn}
 @EndifMan
@@ -40,11 +40,11 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seasmax
-@Title     = Seasonally maximum
+@Title     = Seasonal maximum
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
 
 o(t,x) = max{i(t',x), t1 < t' <= tn}
 @EndifMan
@@ -60,11 +60,11 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seassum
-@Title     = Seasonally sum
+@Title     = Seasonal sum
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
 
 o(t,x) = sum{i(t',x), t1 < t' <= tn}
 @EndifMan
@@ -80,11 +80,11 @@ o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seasmean
-@Title     = Seasonally mean
+@Title     = Seasonal mean
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
 
 o(t,x) = mean{i(t',x), t1 < t' <= tn}
 @EndifMan
@@ -100,11 +100,11 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seasavg
-@Title     = Seasonally average
+@Title     = Seasonal average
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
 
 o(t,x) = avg{i(t',x), t1 < t' <= tn}
 @EndifMan
@@ -120,11 +120,11 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginOperator_seasstd
-@Title     = Seasonally standard deviation
+@Title     = Seasonal standard deviation
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same month, it is
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
 
 o(t,x) = std{i(t',x), t1 < t' <= tn}
 @EndifMan
@@ -140,7 +140,7 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}
 
 
 @BeginExample
-To compute the seasonally mean of a time series, use:
+To compute the seasonal mean of a time series, use:
 @BeginVerbatim
    cdo seasmean ifile ofile
 @EndVerbatim

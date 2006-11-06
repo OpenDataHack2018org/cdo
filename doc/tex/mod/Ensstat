@@ -5,13 +5,14 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifiles ofile
-@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensvar
+@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensvar enspctl
 
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
-Depending on the actual operator the minimum, maximum, sum, average
-or standard deviation over all input files is written to @file{ofile}. The date 
-information for a time step in @file{ofile} is the date of the first input file.
+Depending on the actual operator the minimum, maximum, sum, average,
+standard deviation, or a certain percentile over all input files is written
+to @file{ofile}. The date information for a time step in @file{ofile} is
+the date of the first input file.
 @EndDescription
 @EndModule
 
@@ -127,6 +128,29 @@ o(t,x) = \mbox{\bf std}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndOperator
 
 
+@BeginOperator_enspctl
+@Title     = Ensemble percentiles
+@Parameter = p
+
+@BeginDescription
+@IfMan
+o(t,x) = pth percentile {i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf pth percentile} \{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@EndParameter
+
+
 @BeginExample
 To compute the ensemble mean over 6 input files, use:
 @BeginVerbatim
@@ -135,5 +159,14 @@ To compute the ensemble mean over 6 input files, use:
 Or shorter with filename substitution:
 @BeginVerbatim
    cdo ensmean ifile[1-6] ofile
+@EndVerbatim
+
+To compute the 50th percentile (median) over 6 input files, use:
+@BeginVerbatim
+   cdo enspctl,50 ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
+@EndVerbatim
+Or shorter with filename substitution:
+@BeginVerbatim
+   cdo enspctl,50 ifile[1-6] ofile
 @EndVerbatim
 @EndExample

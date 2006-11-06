@@ -6,13 +6,14 @@
 @Class     = Statistic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = mermin mermax mersum mermean meravg merstd mervar
+@Operators = mermin mermax mersum mermean meravg merstd mervar merpctl
 
 @BeginDescription
 This module computes meridional statistical values of the input fields.
 According to the actual operator the meridional minimum, maximum,
-sum, average, standard deviation or variance is written to @file{ofile}.
-All input fields must have the same rectangular grid. 
+sum, average, standard deviation, variance or a certain percentile is
+written to @file{ofile}. All input fields must have the same rectangular
+grid. 
 @EndDescription
 @EndModule
 
@@ -80,9 +81,30 @@ For every longitude the standard deviation over all latitudes is computed.
 @EndOperator
 
 
+@BeginOperator_merpctl
+@Title     = Meridional percentiles
+@Parameter = p
+
+@BeginDescription
+For every longitude the pth percentile over all latitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@EndParameter
+
+
 @BeginExample
 To compute the meridional mean of all input fields, use:
 @BeginVerbatim
    cdo mermean ifile ofile
+@EndVerbatim
+
+To compute the 50th meridional percentile (median) of all input fields, use:
+@BeginVerbatim
+   cdo merpctl,50 ifile ofile
 @EndVerbatim
 @EndExample

@@ -48,6 +48,9 @@ double fldavg(FIELD field);
 double fldmean(FIELD field);
 double fldstd(FIELD field);
 double fldvar(FIELD field);
+/* RQ */
+double fldpctl(FIELD field, int k);
+/* QR */
 
 /* fieldzon.c */
 
@@ -59,6 +62,9 @@ void zonavg(FIELD field1, FIELD *field2);
 void zonmean(FIELD field1, FIELD *field2);
 void zonstd(FIELD field1, FIELD *field2);
 void zonvar(FIELD field1, FIELD *field2);
+/* RQ */
+void zonpctl(FIELD field1, FIELD *field2, int k);
+/* QR */
 
 /* fieldmer.c */
 
@@ -70,6 +76,9 @@ void meravg(FIELD field1, FIELD *field2);
 void mermean(FIELD field1, FIELD *field2);
 void merstd(FIELD field1, FIELD *field2);
 void mervar(FIELD field1, FIELD *field2);
+/* RQ */
+void merpctl(FIELD field1, FIELD *field2, int k);
+/* QR */
 
 void fldrms(FIELD field1, FIELD field2, FIELD *field3);
 

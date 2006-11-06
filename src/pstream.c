@@ -519,9 +519,6 @@ int pstreamOpenRead(const char *argument)
       pthread_mutex_lock(&streamOpenReadMutex);
 #endif
       fileID = streamOpenRead(filename);
-#if  defined  (HAVE_LIBPTHREAD)
-      pthread_mutex_unlock(&streamOpenReadMutex);
-#endif
       if ( fileID < 0 ) cdiError(fileID, "Open failed on >%s<", filename);
 
       if ( cdoDefaultFileType == CDI_UNDEFID )
@@ -531,6 +528,9 @@ int pstreamOpenRead(const char *argument)
 	cdoDefaultInstID = streamInqInstID(fileID);
       */
       cdoInqHistory(fileID);
+#if  defined  (HAVE_LIBPTHREAD)
+      pthread_mutex_unlock(&streamOpenReadMutex);
+#endif
 
       pstreamptr->mode   = 'r';
       pstreamptr->name   = filename;

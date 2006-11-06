@@ -5,13 +5,14 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonvar
+@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonvar zonpctl
 
 @BeginDescription
 This module computes zonal statistical values of the input fields.
 According to the actual operator the zonal minimum, maximum, 
-sum, average, standard deviation or variance is written to @file{ofile}.
-All input fields must have the same rectangular grid. 
+sum, average, standard deviation, variance or a certain percentile
+is written to @file{ofile}. All input fields must have the same
+rectangular grid. 
 @EndDescription
 @EndModule
 
@@ -79,9 +80,30 @@ For every latitude the standard deviation over all longitudes is computed.
 @EndOperator
 
 
+@BeginOperator_zonpctl
+@Title     = Zonal percentiles
+@Parameter = p
+
+@BeginDescription
+For every latitude the pth percentile over all longitudes is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@EndParameter
+
+
 @BeginExample
 To compute the zonal mean of all input fields, use:
 @BeginVerbatim
    cdo zonmean ifile ofile
+@EndVerbatim
+
+To compute the 50th meridional percentile (median) of all input fields, use:
+@BeginVerbatim
+   cdo zonpctl,50 ifile ofile
 @EndVerbatim
 @EndExample

@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Seaspctl   seaspctl        Seasonally percentiles
+      Seaspctl   seaspctl        Seasonal percentiles
 */
 
 

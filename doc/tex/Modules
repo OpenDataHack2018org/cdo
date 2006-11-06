@@ -40,16 +40,29 @@ Zonstat       Statistical values
 Merstat       Statistical values
 Vertstat      Statistical values
 Selstat       Statistical values
+Selpctl       Statistical values
 Runstat       Statistical values
+Runpctl       Statistical values
 Timstat       Statistical values
+Timpctl       Statistical values
 Hourstat      Statistical values
+Hourpctl      Statistical values
 Daystat       Statistical values
+Daypctl       Statistical values
 Monstat       Statistical values
+Monpctl       Statistical values
 Yearstat      Statistical values
+Yearpctl      Statistical values
 Seasstat      Statistical values
+Seaspctl      Statistical values
 Ydaystat      Statistical values
+Ydaypctl      Statistical values
 Ymonstat      Statistical values
+Ymonpctl      Statistical values
 Yseasstat     Statistical values
+Yseaspctl     Statistical values
+Ydrunstat     Statistical values
+Ydrunpctl     Statistical values
 Detrend       Regression
 Trend         Regression
 Subtrend      Regression
@@ -64,9 +77,9 @@ Spectral      Transformation
 Wind          Transformation
 Input         Formatted I/O
 Output        Formatted I/O
+Gradsdes      Miscellaneous
 Timsort       Miscellaneous
 Vargen        Miscellaneous
 Vardup        Miscellaneous
-Gradsdes      Miscellaneous
 Rotuv         Miscellaneous
 Mastrfu       Miscellaneous

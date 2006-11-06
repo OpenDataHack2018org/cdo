@@ -25,6 +25,7 @@
       Ensstat    ensavg          Ensemble average
       Ensstat    ensstd          Ensemble standard deviation
       Ensstat    ensvar          Ensemble variance
+      Ensstat    enspctl         Ensemble percentiles
 */
 
 
@@ -40,7 +41,7 @@
 
 void *Ensstat(void *argument)
 {
-  static char func[] = "Enstat";
+  static char func[] = "Ensstat";
   int operatorID;
   int operfunc;
   int i;
@@ -66,7 +67,9 @@ void *Ensstat(void *argument)
     double *array;
   } ens_file_t;
   ens_file_t *ef = NULL;
-
+  /* RQ */
+  int pn = 0;
+  /* QR */
 
   cdoInitialize(argument);
 
@@ -77,10 +80,24 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ensvar",  func_var,  0, NULL);
   cdoOperatorAdd("ensstd",  func_std,  0, NULL);
+  /* RQ */
+  cdoOperatorAdd("enspctl", func_pctl,  0, NULL);
+  /* QR */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
+  /* RQ */
+  if ( operfunc == func_pctl )
+    {
+      operatorInputArg("percentile number");
+      pn = atoi(operatorArgv()[0]);
+      
+      if ( pn < 1 || pn > 99 )
+        cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+    }
+  /* QR */
+    
   nfiles = cdoStreamCnt() - 1;
 
   if ( cdoVerbose )
@@ -180,7 +197,12 @@ void *Ensstat(void *argument)
 		    field[ompthID].nmiss++;
 		}
 
-	      array2[i] = fldfun(field[ompthID], operfunc);
+	      /* RQ */
+	      if ( operfunc == func_pctl )
+	        array2[i] = fldpctl(field[ompthID], pn);
+	      else  
+	        array2[i] = fldfun(field[ompthID], operfunc);
+	      /* QR */
 
 	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) ) nmiss++;
 	    }

@@ -18,7 +18,9 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "cdi.h"
-
+/* RQ */
+#include "nth_element.h"
+/* QR */
 
 double fldfun(FIELD field, int function)
 {
@@ -35,7 +37,6 @@ double fldfun(FIELD field, int function)
 
   return rval;
 }
-
 
 double fldmin(FIELD field)
 {
@@ -345,3 +346,41 @@ void varrms(FIELD field, FIELD field2, FIELD *field3)
   field3->ptr[0] = ravg;
   field3->nmiss  = rnmiss;
 }
+
+/* RQ */
+double fldpctl(FIELD field, int p)
+{
+  static const char func[] = "fldpctl";
+  
+  int    len     = field.size;
+  int    nmiss   = field.nmiss;
+  double missval = field.missval;
+  double *array  = field.ptr;
+  double *array2;
+	
+  int i, j;
+  double pctl = missval;
+  
+  if ( len - nmiss > 0 )
+    {
+      if ( nmiss > 0 )
+        {
+          array2 = (double *) malloc((len - nmiss)*sizeof(double));
+          
+          for ( i = 0, j = 0; i < len; i++ ) 
+            if ( !DBL_IS_EQUAL(array[i], missval) )
+              array2[j++] = array[i];
+
+          pctl = nth_element(array2, j, (int)ceil(j*(p/100.0))-1);
+          
+          free(array2);	  
+        }
+      else
+        {
+          pctl = nth_element(array, len, (int)ceil(len*(p/100.0))-1);
+        }
+    }
+
+  return pctl;
+}
+/* QR */

@@ -25,6 +25,7 @@
       Fldstat    fldavg          Field average
       Fldstat    fldstd          Field standard deviation
       Fldstat    fldvar          Field variance
+      Fldstat    fldpctl         Field percentiles
 */
 
 
@@ -53,6 +54,9 @@ void *Fldstat(void *argument)
   double sglval;
   FIELD field;
   int taxisID1, taxisID2;
+  /* RQ */
+  int pn = 0;
+  /* QR */
 
   cdoInitialize(argument);
 
@@ -63,9 +67,23 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldavg",  func_avg,  0, NULL);
   cdoOperatorAdd("fldvar",  func_var,  0, NULL);
   cdoOperatorAdd("fldstd",  func_std,  0, NULL);
+  /* RQ */
+  cdoOperatorAdd("fldpctl", func_pctl,  0, NULL);
+  /* QR */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  /* RQ */
+  if ( operfunc == func_pctl )
+    {
+      operatorInputArg("percentile number");
+      pn = atoi(operatorArgv()[0]);
+      
+      if ( pn < 1 || pn > 99 )
+        cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+    }
+  /* QR */
 
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std )
@@ -126,7 +144,12 @@ void *Fldstat(void *argument)
 	    }
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  sglval = fldfun(field, operfunc);
+	  /* RQ */
+	  if ( operfunc == func_pctl )
+	    sglval = fldpctl(field, pn);
+	  else  
+	    sglval = fldfun(field, operfunc);
+	  /* QR */  
 
 	  if ( DBL_IS_EQUAL(sglval, field.missval) )
 	    nmiss = 1;

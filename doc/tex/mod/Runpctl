@@ -1,0 +1,61 @@
+@BeginModule
+@NewPage
+@Name      = Runpctl
+@Title     = Running percentile values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile1 ifile2 ifile3 ofile
+@Operators = runpctl
+
+@BeginDescription
+This module computes running percentiles over a selected number of time
+steps in @file{ifile1}.
+The algorithm uses histograms with minimum and maximum bounds given in
+@file{ifile2} and @file{ifile3}, respectively. The default number of
+histogram bins is 100. The default can be overridden by setting the
+environment variable CDO_PCTL_NBINS to a different value. The files
+@file{ifile2} and @file{ifile3} must be the result of corresponding
+runmin and runmax operations, respectively.
+The date information in @file{ofile} is the date of the medium contributing
+time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_runpctl
+@Title     = Running percentiles
+@Parameter = p nts
+
+@BeginDescription
+@IfMan
+o(t+(nts-1)/2,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@Item = nts
+INTEGER  Number of time steps
+@EndParameter
+
+
+@BeginExample
+To compute the running 50th percentile (median) over 9 time steps, use:
+@BeginVerbatim
+   cdo runmin,9 ifile minfile
+   cdo runmax,9 ifile maxfile
+   cdo runpctl,50,9 ifile minfile maxfile ofile
+@EndVerbatim
+Or shorter using operator piping:
+@BeginVerbatim
+   cdo runpctl,50,9 ifile -runmin,9 ifile -runmax,9 ifile ofile
+@EndVerbatim
+@EndExample

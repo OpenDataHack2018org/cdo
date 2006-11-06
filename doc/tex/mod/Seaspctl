@@ -1,0 +1,65 @@
+@BeginModule
+@NewPage
+@Name      = Seaspctl
+@Title     = Seasonal percentile values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile1 ifile2 ifile3 ofile
+@Operators = seaspctl
+
+@BeginDescription
+This module computes percentiles over all time steps in @file{ifile1}
+of the same season.
+The algorithm uses histograms with minimum and maximum bounds given in
+@file{ifile2} and @file{ifile3}, respectively. The default number of
+histogram bins is 100. The default can be overridden by setting the
+environment variable CDO_PCTL_NBINS to a different value. The files
+@file{ifile2} and @file{ifile3} must be the result of corresponding
+seasmin and seasmax operations, respectively.
+The date information for a time step in @file{ofile} is the date of the
+last contributing time step in @file{ifile1}. Be careful about the first
+and the last output time step, they may be incorrect values if the seasons
+have incomplete time steps.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_seaspctl
+@Title     = Seasonal percentiles
+@Parameter = p
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same season, it is
+
+o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+the same season, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf pth percentile}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@EndParameter
+
+
+@BeginExample
+To compute the seasonal 90th percentile of a time series, use:
+@BeginVerbatim
+   cdo seasmin ifile minfile
+   cdo seasmax ifile maxfile
+   cdo seaspctl,90 ifile minfile maxfile ofile
+@EndVerbatim
+Or shorter using operator piping:
+@BeginVerbatim
+   cdo seaspctl,90 ifile -seasmin ifile -seasmax ifile ofile
+@EndVerbatim
+@EndExample

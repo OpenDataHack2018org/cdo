@@ -25,6 +25,7 @@
       Zonstat    zonavg          Zonal average
       Zonstat    zonstd          Zonal standard deviation
       Zonstat    zonvar          Zonal variance
+      Zonstat    zonpctl         Zonal percentiles
 */
 
 
@@ -51,6 +52,9 @@ void *Zonstat(void *argument)
   int ndiffgrids;
   int taxisID1, taxisID2;
   FIELD field1, field2;
+  /* RQ */
+  int pn = 0;
+  /* QR */
 
   cdoInitialize(argument);
 
@@ -61,9 +65,23 @@ void *Zonstat(void *argument)
   cdoOperatorAdd("zonavg",  func_avg,  0, NULL);
   cdoOperatorAdd("zonvar",  func_var,  0, NULL);
   cdoOperatorAdd("zonstd",  func_std,  0, NULL);
+  /* RQ */
+  cdoOperatorAdd("zonpctl", func_pctl, 0, NULL);
+  /* QR */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  /* RQ */
+  if ( operfunc == func_pctl )
+    {
+      operatorInputArg("percentile number");
+      pn = atoi(operatorArgv()[0]);
+      
+      if ( pn < 1 || pn > 99 )
+        cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+    }
+  /* QR */
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -123,7 +141,12 @@ void *Zonstat(void *argument)
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 	  field2.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  zonfun(field1, &field2, operfunc);
+	  /* RQ */
+	  if ( operfunc == func_pctl )
+	    zonpctl(field1, & field2, pn);
+	  else  
+	    zonfun(field1, &field2, operfunc);
+	  /* QR */  
 
 	  streamDefRecord(streamID2, varID,  levelID);
 	  streamWriteRecord(streamID2, field2.ptr, field2.nmiss);

@@ -880,6 +880,10 @@ while (<MOFILE>) {
 
     print TRCARD "\\rowcolor[gray]{.9}\n";
     print TRCARD "\\makebox[$len2][r]{Syntax} ";
+    if ( "$opername" eq "selpctl" )  {
+      $marguments =~ s/ifile/in/og;
+      $marguments =~ s/ofile/out/og;
+    }
     if ( $xopercnt == 1 ) {
       print TRCARD "& \\hspace*{0mm}{\\bf $opername}{\\sl $operpara} \ {\\tt $marguments} ";
     } else {
@@ -996,6 +1000,7 @@ sub print_description {
       $docline = $line;
       if ( $man == 0 ) {
 	if ( $math == 0 && $verb == 0 && $text == 0 ) {
+	  $line =~ s/CDO_PCTL_NBINS/CDO\\_PCTL\\_NBINS/og;
 	  $line =~ s/\@newline/ \\\\/og;
 	  $line =~ s/ ifile / {\\tt ifile} /og;
 	  $line =~ s/ ifile1 / {\\tt ifile1} /og;

@@ -148,7 +148,7 @@ static double histGetPercentile(const HISTOGRAM *hist, int p)
     }
   else
     {
-      return (double)nth_element(DBL_PTR(hist->ptr), hist->nsamp, ceil(s) - 1);
+      return (double)nth_element(DBL_PTR(hist->ptr), hist->nsamp, (int)ceil(s) - 1);
     } 
 }
 

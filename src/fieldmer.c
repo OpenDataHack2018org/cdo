@@ -18,7 +18,9 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "cdi.h"
-
+/* RQ */
+#include "nth_element.h"
+/* QR */
 
 void merfun(FIELD field1, FIELD *field2, int function)
 {
@@ -322,3 +324,61 @@ void merstd(FIELD field1, FIELD *field2)
 
   field2->nmiss  = rnmiss;
 }
+
+/* RQ */
+void merpctl(FIELD field1, FIELD *field2, int p)
+{
+  static const char func[] = "merpctl";
+
+  int i, j, l, nx, ny, rnmiss = 0;
+  int    grid    = field1.grid;
+  int    nmiss   = field1.nmiss;
+  double missval = field1.missval;
+  double *array  = field1.ptr;
+  double *array2;
+
+  nx = gridInqXsize(grid);
+  ny = gridInqYsize(grid);
+  
+  array2 = (double *) malloc(nx*sizeof(double));
+  
+  if ( nmiss > 0 )
+    {
+      for ( i = 0; i < nx; i++ )
+        {
+          for ( j = 0, l = 0; j < ny; j++ )
+	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
+	      array2[l++] = array[j*nx+i];
+	    
+          if ( l > 0 )
+            {
+              field2->ptr[i] = nth_element(array2, l, (int)ceil(l*(p/100.0))-1);
+            }
+          else
+            {
+              field2->ptr[i] = missval;
+              rnmiss++;
+            }
+        }
+    }
+  else
+    {
+      for ( i = 0; i < nx; i++ )
+      	{
+          if ( ny > 0 )
+            {
+              for ( j = 0; j < ny; j++ )
+                array2[j] = array[j*nx+i];
+              field2->ptr[i] = nth_element(array2, ny, (int)ceil(ny*(p/100.0))-1);
+            }
+          else
+            {
+              field2->ptr[i] = missval;
+              rnmiss++;
+            }
+      	}
+    }
+
+  field2->nmiss = rnmiss;
+}
+/* QR */

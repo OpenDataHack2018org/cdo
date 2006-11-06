@@ -55,6 +55,7 @@ doc/tex/mod/Cond -text
 doc/tex/mod/Cond2 -text
 doc/tex/mod/Condc -text
 doc/tex/mod/Copy -text
+doc/tex/mod/Daypctl -text
 doc/tex/mod/Daystat -text
 doc/tex/mod/Detrend -text
 doc/tex/mod/Diff -text
@@ -67,6 +68,7 @@ doc/tex/mod/Fldstat -text
 doc/tex/mod/Genweights -text
 doc/tex/mod/Gradsdes -text
 doc/tex/mod/Histogram -text
+doc/tex/mod/Hourpctl -text
 doc/tex/mod/Hourstat -text
 doc/tex/mod/Info -text
 doc/tex/mod/Input -text
@@ -81,6 +83,7 @@ doc/tex/mod/Merge -text
 doc/tex/mod/Mergegrid -text
 doc/tex/mod/Mergetime -text
 doc/tex/mod/Merstat -text
+doc/tex/mod/Monpctl -text
 doc/tex/mod/Monstat -text
 doc/tex/mod/Ninfo -text
 doc/tex/mod/Output -text
@@ -89,10 +92,13 @@ doc/tex/mod/Remap -text
 doc/tex/mod/Remapgrid -text
 doc/tex/mod/Replace -text
 doc/tex/mod/Rotuv -text
+doc/tex/mod/Runpctl -text
 doc/tex/mod/Runstat -text
+doc/tex/mod/Seaspctl -text
 doc/tex/mod/Seasstat -text
 doc/tex/mod/Selbox -text
 doc/tex/mod/Select -text
+doc/tex/mod/Selpctl -text
 doc/tex/mod/Selstat -text
 doc/tex/mod/Seltime -text
 doc/tex/mod/Set -text
@@ -110,6 +116,7 @@ doc/tex/mod/Spectral -text
 doc/tex/mod/Split -text
 doc/tex/mod/Splittime -text
 doc/tex/mod/Subtrend -text
+doc/tex/mod/Timpctl -text
 doc/tex/mod/Timsort -text
 doc/tex/mod/Timstat -text
 doc/tex/mod/Trend -text
@@ -120,10 +127,16 @@ doc/tex/mod/Vertstat -text
 doc/tex/mod/Wind -text
 doc/tex/mod/Writegrid -text
 doc/tex/mod/Writerandom -text
+doc/tex/mod/Ydaypctl -text
 doc/tex/mod/Ydaystat -text
+doc/tex/mod/Ydrunpctl -text
+doc/tex/mod/Ydrunstat -text
+doc/tex/mod/Yearpctl -text
 doc/tex/mod/Yearstat -text
 doc/tex/mod/Ymonarith -text
+doc/tex/mod/Ymonpctl -text
 doc/tex/mod/Ymonstat -text
+doc/tex/mod/Yseaspctl -text
 doc/tex/mod/Yseasstat -text
 doc/tex/mod/Zonstat -text
 doc/tex/mod/chdoc -text

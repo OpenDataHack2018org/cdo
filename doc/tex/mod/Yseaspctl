@@ -1,0 +1,66 @@
+@BeginModule
+@NewPage
+@Name      = Yseaspctl
+@Title     = Multi-year seasonal percentile values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile1 ifile2 ifile3 ofile
+@Operators = yseaspctl
+
+@BeginDescription
+This module writes to @file{ofile} a certain percentile of each season
+in @file{ifile1}.
+The algorithm uses histograms with minimum and maximum bounds given in
+@file{ifile2} and @file{ifile3}, respectively. The default number of
+histogram bins is 100. The default can be overridden by setting the
+environment variable CDO_PCTL_NBINS to a different value. The files
+@file{ifile2} and @file{ifile3} must be the result of corresponding
+yseasmin and yseasmax operations, respectively.
+The date information in an output field is the date of the last
+contributing input field.
+@EndModule
+
+
+@BeginOperator_yseaspctl
+@Title     = Multi-year seasonal percentiles
+@Parameter = p
+
+@BeginDescription
+@IfMan
+o(1,x) = pth percentile {i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = pth percentile {i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = pth percentile {i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = pth percentile {i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = p
+INTEGER  Percentile number in {1, ..., 99}
+@EndParameter
+
+
+@BeginExample
+To compute the seasonal 90th percentile over all input years, use:
+@BeginVerbatim
+   cdo yseasmin ifile minfile
+   cdo yseasmax ifile maxfile
+   cdo yseaspctl,90 ifile minfile maxfile ofile
+@EndVerbatim
+Or shorter using operator piping:
+@BeginVerbatim
+   cdo yseaspctl,90 ifile -yseasmin ifile -yseasmax ifile ofile
+@EndVerbatim
+@EndExample

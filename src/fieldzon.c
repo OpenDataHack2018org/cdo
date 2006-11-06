@@ -18,6 +18,9 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "cdi.h"
+/* RQ */
+#include "nth_element.h"
+/* QR */
 
 
 void zonfun(FIELD field1, FIELD *field2, int function)
@@ -316,3 +319,61 @@ void zonstd(FIELD field1, FIELD *field2)
 
   field2->nmiss  = rnmiss;
 }
+
+/* RQ */
+void zonpctl(FIELD field1, FIELD *field2, int p)
+{
+  static const char func[] = "zonpctl";
+
+  int i, j, l, nx, ny, rnmiss = 0;
+  int    grid    = field1.grid;
+  int    nmiss   = field1.nmiss;
+  double missval = field1.missval;
+  double *array  = field1.ptr;
+  double *array2;
+
+  nx = gridInqXsize(grid);
+  ny = gridInqYsize(grid);
+  
+  if ( nmiss > 0 )
+    {
+      array2 = (double *) malloc(nx*sizeof(double));
+      
+      for ( j = 0; j < ny; j++ )
+        {
+          for ( i = 0, l = 0; i < nx; i++ )
+            if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
+              array2[l++] = array[j*nx+i];
+	    
+          if ( l > 0 )
+            {
+              field2->ptr[j] = nth_element(array2, l, (int)ceil(l*(p/100.0))-1);
+            }
+          else
+            {
+              field2->ptr[j] = missval;
+              rnmiss++;
+            }
+        }
+        
+      free(array2);
+    }
+  else
+    {
+      for ( j = 0; j < ny; j++ )
+        {
+          if ( nx > 0 )
+            {
+              field2->ptr[j] = nth_element(&array[j*nx], nx, (int)ceil(nx*(p/100.0))-1);
+            }
+          else
+            {
+              field2->ptr[j] = missval;
+              rnmiss++;
+            }
+        }
+    }
+
+  field2->nmiss = rnmiss;
+}
+/* QR */

@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = Yseasstat
-@Title     = Multi-year seasonally statistical values
+@Title     = Multi-year seasonal statistical values
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
@@ -17,7 +17,7 @@ of the last contributing input field.
 
 
 @BeginOperator_yseasmin
-@Title     = Multi-year seasonally minimum
+@Title     = Multi-year seasonal minimum
 
 @BeginDescription
 @IfMan
@@ -41,7 +41,7 @@ o(\mbox{4},x) = \mbox{\bf min}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginOperator_yseasmax
-@Title     = Multi-year seasonally maximum
+@Title     = Multi-year seasonal maximum
 
 @BeginDescription
 @IfMan
@@ -65,7 +65,7 @@ o(\mbox{4},x) = \mbox{\bf max}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginOperator_yseassum
-@Title     = Multi-year seasonally sum
+@Title     = Multi-year seasonal sum
 
 @BeginDescription
 @IfMan
@@ -89,7 +89,7 @@ o(\mbox{4},x) = \mbox{\bf sum}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginOperator_yseasmean
-@Title     = Multi-year seasonally mean
+@Title     = Multi-year seasonal mean
 
 @BeginDescription
 @IfMan
@@ -113,7 +113,7 @@ o(\mbox{4},x) = \mbox{\bf mean}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\
 
 
 @BeginOperator_yseasavg
-@Title     = Multi-year seasonally average
+@Title     = Multi-year seasonal average
 
 @BeginDescription
 @IfMan
@@ -137,7 +137,7 @@ o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginOperator_yseasstd
-@Title     = Multi-year seasonally standard deviation
+@Title     = Multi-year seasonal standard deviation
 
 @BeginDescription
 @IfMan
@@ -161,7 +161,7 @@ o(\mbox{4},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginExample
-To compute the seasonally mean over all input years, use:
+To compute the seasonal mean over all input years, use:
 @BeginVerbatim
    cdo yseasmean ifile ofile
 @EndVerbatim
