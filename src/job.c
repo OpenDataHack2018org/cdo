@@ -160,12 +160,16 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
   if ( stdout_is_tty )
     {
       fprintf(stdout, "%s job %s ", expname, jobid);
-      fprintf(stdout, "submitted");
+      fprintf(stdout, "submitted ");
       fflush(stdout);
     }
 
   if ( stdout_is_tty )
     {
+      int iwait;
+      const char waitc[] = "|/-\\";
+
+      iwait = 0;
       while ( 1 )
 	{
 	  sleep (1);
@@ -179,13 +183,16 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 	       stat == DRMAA_PS_USER_ON_HOLD ||
 	       stat == DRMAA_PS_USER_SYSTEM_ON_HOLD )
 	    {
-	      fprintf(stdout, "\b\b\b\b\b\b\b\b\bqueued   ");
+	      fprintf(stdout, "\b\b\b\b\b\b\b\b\b\bqueued   ");
+	      fprintf(stdout, "%c", (int)waitc[iwait%4]);
 	      fflush(stdout);
+              iwait++;
 	    }
 	  else
 	    break;
 	}
 
+      iwait = 0;
       while ( 1 )
 	{
 	  sleep (1);
@@ -196,8 +203,10 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 
 	  if ( stat == DRMAA_PS_RUNNING )
 	    {
-	      fprintf(stdout, "\b\b\b\b\b\b\b\b\brunning  ");
+	      fprintf(stdout, "\b\b\b\b\b\b\b\b\b\brunning  ");
+	      fprintf(stdout, "%c", (int)waitc[iwait%4]);
 	      fflush(stdout);
+              iwait++;
 	    }
 	  else
 	    break;
@@ -233,7 +242,7 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 	  drmaa_wexitstatus(&exit_status, stat, NULL, 0);
 	  if ( stdout_is_tty )
 	    {
-	      fprintf(stdout, "\b\b\b\b\b\b\b\b\bfinished\n");
+	      fprintf(stdout, "\b\b\b\b\b\b\b\b\b\bfinished  \n");
 	    } 
 
 	  if ( exit_status )

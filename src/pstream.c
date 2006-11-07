@@ -273,7 +273,8 @@ static int pstreamFindID(const char *name)
       pstreamptr = pstream_to_pointer(pstreamID);
 
       if ( pstreamptr )
-	if ( strcmp(pstreamptr->name, name) == 0 ) break;
+	if ( pstreamptr->name )
+	  if ( strcmp(pstreamptr->name, name) == 0 ) break;
     }
 
   if ( pstreamID == _pstream_max ) pstreamID = -1;
