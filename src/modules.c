@@ -518,20 +518,26 @@ static int operatorInqModID(char *operatorName)
   int i, j, modID = -1;
 
   if ( operatorName )
-    for ( i = 0; i < NumModules; i++ )
-      {
-	j = 0;
-	for ( j = 0; j < MAX_MOD_OPERATORS; j++ )
-	  {
-	    if ( Modules[i].operators[j] == NULL ) break;
-	    if ( strcmp(operatorName, Modules[i].operators[j]) == 0 )
-	      {
-		modID = i;
-		break;
-	      }
-	  }
-	if ( modID != -1 ) break;
-      }
+    {
+      for ( i = 0; i < NumModules; i++ )
+	{
+	  j = 0;
+	  for ( j = 0; j < MAX_MOD_OPERATORS; j++ )
+	    {
+	      if ( Modules[i].operators[j] == NULL ) break;
+
+	      if ( operatorName[0] == Modules[i].operators[j][0] )
+		{
+		  if ( strcmp(operatorName, Modules[i].operators[j]) == 0 )
+		    {
+		      modID = i;
+		      break;
+		    }
+		}
+	    }
+	  if ( modID != -1 ) break;
+	}
+    }
   
   if ( modID == -1 )
     {

@@ -197,7 +197,13 @@ void *Remap(void *argument)
 	   gridInqType(gridID1) != GRID_GME         &&
 	   gridInqType(gridID1) != GRID_CURVILINEAR &&
 	   gridInqType(gridID1) != GRID_CELL )
-	cdoAbort("Remapping of %s data failed!", gridNamePtr(gridInqType(gridID1)) );
+	{
+	  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
+	    cdoAbort("Remapping of %s data failed! Use CDO option -R to convert reduced to regular grid!",
+		     gridNamePtr(gridInqType(gridID1)));
+	  else
+	    cdoAbort("Remapping of %s data failed!", gridNamePtr(gridInqType(gridID1)));
+	}
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }

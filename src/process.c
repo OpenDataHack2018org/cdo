@@ -319,7 +319,7 @@ static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 	  streamInCnt  = operatorStreamInCnt(opername);
 	  streamOutCnt = operatorStreamOutCnt(opername);
 	  if ( streamInCnt == -1 )
-	    Error(processInqPrompt(), "Operator %s needs umlimited input streams.", opername);
+	    Error(processInqPrompt(), "Operator %s needs unlimited input streams.", opername);
 	  if ( streamOutCnt != 1 )
 	    Error(processInqPrompt(), "Operator %s must use only 1 output stream in pipes.", opername);
 	  globArgc++;
@@ -355,7 +355,7 @@ static int getStreamCnt(int argc, char *argv[])
 	  streamInCnt  = operatorStreamInCnt(opername);
 	  streamOutCnt = operatorStreamOutCnt(opername);
 	  if ( streamInCnt == -1 )
-	    Error(processInqPrompt(), "Operator %s needs umlimited input streams.", opername);
+	    Error(processInqPrompt(), "Operator %s needs unlimited input streams.", opername);
 	  if ( streamOutCnt != 1 )
 	    Error(processInqPrompt(), "Operator %s must use only 1 output stream in pipes.", opername);
 	  globArgc++;
@@ -397,7 +397,7 @@ static void setStreamNames(int argc, char *argv[])
 	  streamInCnt  = operatorStreamInCnt(opername);
 	  streamOutCnt = operatorStreamOutCnt(opername);
 	  if ( streamInCnt == -1 )
-	    Error(processInqPrompt(), "Operator %s needs umlimited input streams.", opername);
+	    Error(processInqPrompt(), "Operator %s needs unlimited input streams.", opername);
 	  if ( streamOutCnt != 1 )
 	    Error(processInqPrompt(), "Operator %s must use only 1 output stream in pipes.", opername);
 	  globArgc++;

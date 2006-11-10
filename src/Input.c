@@ -118,13 +118,14 @@ void *Input(void *argument)
 	  time     = 0;
 	  
 	  if ( nrecs == 0 )
-	    {
-	      array = (double *) malloc(gridsize*sizeof(double));
-	    }
+	    array = (double *) malloc(gridsize*sizeof(double));
 	  
 	  cdoPrint("Enter all %d elements of record %d!\n", gridsize, nrecs+1);
 	  
 	  rval = input_darray(gridsize, array);
+
+	  if ( nrecs > 0 && rval == 0 ) break;
+
 	  if ( rval != gridsize )
 	    cdoAbort("To few input elements (%d of %d)!", rval, gridsize);
 

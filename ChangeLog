@@ -1,5 +1,7 @@
 2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* input: bug fix
+	* operatorInqModID: speed up
 	* pstreamFindID: check pstreamptr->name before use (bug fix)
 	* Version 1.0.5 released
 
