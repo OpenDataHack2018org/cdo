@@ -1142,13 +1142,13 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
   for ( i = 0; i < rv->num_wts; i++ )
     rv->wts[i] = (double *) realloc(rv->wts[i], rv->max_links*sizeof(double));
 
-  rv->links.option = 0;
+  rv->links.option    = FALSE;
   rv->links.max_links = 0;
-  rv->links.num_blks = 0;
+  rv->links.num_blks  = 0;
   rv->links.num_links = NULL;
-  rv->links.src_add = NULL;
-  rv->links.dst_add = NULL;
-  rv->links.w_index = NULL;
+  rv->links.src_add   = NULL;
+  rv->links.dst_add   = NULL;
+  rv->links.w_index   = NULL;
 
 } /* remapVarsInit */
 
@@ -5892,4 +5892,11 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   cdoWarning("netCDF library not available!");
 #endif
 
+  rv->links.option    = FALSE;
+  rv->links.max_links = 0;
+  rv->links.num_blks  = 0;
+  rv->links.num_links = NULL;
+  rv->links.src_add   = NULL;
+  rv->links.dst_add   = NULL;
+  rv->links.w_index   = NULL;
 }  /* read_remap_scrip */
