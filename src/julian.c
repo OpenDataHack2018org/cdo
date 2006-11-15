@@ -55,9 +55,12 @@ static void julday_to_gregdate(
     int			*day		/* Gregorian day (1-31) (out) */
     )
 {
-    long	ja, jb;
+#if INT_MAX <= 0X7FFF
+    long	ja, jb, jd;
+#else
+    int		ja, jb, jd;
+#endif
     int		jc;
-    long	jd;
     int		je, iday, imonth, iyear;
     double	xc;
 
@@ -65,18 +68,18 @@ static void julday_to_gregdate(
 	ja = julday;
     else
     {
-	int	ia = (int) (((julday - 1867216) - 0.25) / 36524.25);
+	int	ia = ((julday - 1867216) - 0.25) / 36524.25;
 
 	ja = julday + 1 + ia - (int)(0.25 * ia);
     }
 
     jb = ja + 1524;
     xc = ((jb - 2439870) - 122.1) / 365.25;
-    jc = (long) (6680.0 + xc);
+    jc = 6680.0 + xc;
     jd = 365 * jc + (int)(0.25 * jc);
-    je = (int) ((jb - jd) / 30.6001);
+    je = (int)((jb - jd) / 30.6001);
 
-    iday = (int) (jb - jd - (int)(30.6001 * je));
+    iday = (int)(jb - jd - (int)(30.6001 * je));
 
     imonth = je - 1;
     if (imonth > 12)
@@ -105,11 +108,19 @@ static unsigned long gregdate_to_julday(
     int		day	/* Gregorian day (1-31) */
     )
 {
+#if INT_MAX <= 0X7FFF
     long		igreg = 15 + 31 * (10 + (12 * 1582));
+    long		iy;	/* signed, origin 0 year */
+    long		ja;	/* Julian century */
+    long		jm;	/* Julian month */
+    long		jy;	/* Julian year */
+#else
+    int			igreg = 15 + 31 * (10 + (12 * 1582));
     int			iy;	/* signed, origin 0 year */
     int			ja;	/* Julian century */
     int			jm;	/* Julian month */
     int			jy;	/* Julian year */
+#endif
     unsigned long	julday;	/* returned Julian day number */
 
     /*
@@ -141,7 +152,7 @@ static unsigned long gregdate_to_julday(
     if (jy >= 0)
     {
 	julday += 365 * jy;
-	julday += jy / 4;
+	julday += 0.25 * jy;
     }
     else
     {
@@ -215,11 +226,17 @@ static void decomp(
 	    break;
 	}
 
+	/* value = basis[i] * modf((value+0.0000001)/basis[i], count+i); */
 	value = basis[i] * modf(value/basis[i], count+i);
     }
 
-    for (i++; i < nbasis; i++)
-	count[i] = 0;
+    if (i >= nbasis) {
+	count[--i] += value;
+    }
+    else {
+	for (i++; i < nbasis; i++)
+	    count[i] = 0;
+    }
 }
 
 
@@ -236,8 +253,8 @@ static void dectime(
 	float	*second)
 {
     long	days;
-    int  	hours;
-    int 	minutes;
+    long	hours;
+    long	minutes;
     double	seconds;
     double	uncer;		/* uncertainty of input value */
     typedef union
@@ -255,32 +272,38 @@ static void dectime(
 	}	    ind;
     } Basis;
     Basis	counts;
-    static Basis	basis;
-
-    basis.ind.days      = 86400;
-    basis.ind.hours12   = 43200;
-    basis.ind.hours     = 3600;
-    basis.ind.minutes10 = 600;
-    basis.ind.minutes   = 60;
-    basis.ind.seconds10 = 10;
-    basis.ind.seconds   = 1;
+    static Basis	basis = {{86400, 43200, 3600, 600, 60, 10, 1}};
 
     uncer = ldexp(value < 0 ? -value : value, -DBL_MANT_DIG);
 
-    days = (long) floor(value/86400.0);
-    value -= days * 86400.0;		/* make positive excess */
+    days = floor(value/basis.ind.days);
+    value -= days * basis.ind.days;		/* make positive excess */
 
     decomp(value, uncer, sizeof(basis.vec)/sizeof(basis.vec[0]),
 	   basis.vec, counts.vec);
 
-    days   += (long) counts.ind.days;
-    hours   = (int)counts.ind.hours12 * 12 + (int)counts.ind.hours;
+    days += counts.ind.days;
+    hours = (int)counts.ind.hours12 * 12 + (int)counts.ind.hours;
     minutes = (int)counts.ind.minutes10 * 10 + (int)counts.ind.minutes;
     seconds = (int)counts.ind.seconds10 * 10 + counts.ind.seconds;
+
+    seconds = (float)seconds;
+
+    if ((float)seconds >= 60) {
+	seconds -= 60;
+	if (++minutes >= 60) {
+	    minutes -= 60;
+	    if (++hours >= 24) {
+		hours -= 24;
+		days++;
+	    }
+	}
+    }
 
     *second = seconds;
     *minute = minutes;
     *hour = hours;
+
     julday_to_gregdate(gregdate_to_julday(2001, 1, 1) + days, year, month, day);
 }
 
@@ -417,9 +440,11 @@ void decode_julval(int dpy, double value, int *date, int *time)
     dectimeXXX(dpy, value, &year, &month, &day, &hour, &minute, &sec);
   else
     dectime(value, &year, &month, &day, &hour, &minute, &sec);
-
+  /*
+  fprintf(stdout, "%d %d %d %d %d %g\n", year, month, day, hour, minute, (double)sec);
+  */
   *date = year*10000 + month*100 + day;
-  *time = hour*100 + minute;
+  *time = hour*100 + minute/* + (int) ((double)sec/60+0.5)*/;
 }
 
 
@@ -495,3 +520,57 @@ int days_per_year(int calendar, int year)
   
   return (daysperyear);
 }
+
+/*
+int main(void)
+{
+  int nmin = 120000;
+  int vdate0 = 20001201, vtime0 = 0;
+  int vdate, vtime;
+  int dpy = 0;
+  int ijulinc = 60;
+  int i, j = 0;
+  int year, mon, day, hour, min;
+  double julval;
+
+  printf("start time: %8d %4d\n", vdate0, vtime0);
+
+  julval = encode_julval(dpy, vdate0, vtime0);
+  for ( i = 0; i < nmin; i++ )
+    {
+      decode_date(vdate0, &year, &mon, &day);
+      decode_time(vtime0, &hour, &min);
+
+      if ( ++min >= 60 )
+	{
+	  min = 0;
+	  if ( ++hour >= 24 )
+	    {
+	      hour = 0;
+	      if ( ++day >= 32 )
+		{
+		  day = 1;
+		  if ( ++mon >= 13 )
+		    {
+		      mon = 1;
+		      year++;
+		    }
+		}
+	    }
+	}
+
+      vdate0 = year*10000 + mon*100 + day;
+      vtime0 = hour*100 + min;
+
+      julval += ijulinc;
+      decode_julval(dpy, julval, &vdate, &vtime);
+      if ( vdate0 != vdate || vtime0 != vtime )
+	printf("%4d %8d %4d %8d %4d %30.15f\n",
+	       ++j, vdate0, vtime0, vdate, vtime, julval);
+    }
+
+  printf("stop time: %8d %4d\n", vdate0, vtime0);
+
+  return (0);
+}
+*/

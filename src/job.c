@@ -53,7 +53,7 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   
   len1 = strlen(host);
   len2 = strlen(dir);
-  len = len1+len2+1;
+  len = len1+len2+2;
 
   output_path = (char *) malloc(len*sizeof(char));
   strcpy(output_path, host);

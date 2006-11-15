@@ -330,6 +330,9 @@ void *Settime(void *argument)
 	      julval = encode_julval(dpy, vdate, vtime);
 	      julval += ijulinc;
 	      decode_julval(dpy, julval, &vdate, &vtime);
+	      if ( cdoVerbose )
+		cdoPrint("julval, ijulinc, vdate, vtime: %g %d %d %d\n",
+			 julval, ijulinc, vdate, vtime);
 	    }
 	}
       else if ( operatorID == SETREFTIME )

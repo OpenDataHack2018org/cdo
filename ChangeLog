@@ -1,9 +1,10 @@
 2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remap: initialize links.option (bug fix) [report: Luis Kornblueh]
+	* update date/time conversion from udunits (bug fix) [report: Oliver Krueger]
 	* input: bug fix
-	* operatorInqModID: speed up
 	* pstreamFindID: check pstreamptr->name before use (bug fix)
+	* operatorInqModID: speed up
 	* Version 1.0.5 released
 
 2006-11-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
