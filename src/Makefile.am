@@ -175,6 +175,13 @@ cdo_SOURCES = Arith.c		\
               percentiles.h	\
               nth_element.c	\
               nth_element.h	\
+	      eca.h		\
+	      eca.c		\
+	      ecautil.h		\
+	      ecautil.c		\
+	      EcaOperators.c	\
+	      Hi.c		\
+	      Tchill.c          \
 	      cdi.h
 #
 cdo_LDADD = $(LDFLAGS) -lm

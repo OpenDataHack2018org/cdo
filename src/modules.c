@@ -157,6 +157,50 @@ void *Yseaspctl(void *argument);
 /* QR */
 void *Yseasstat(void *argument);
 void *Zonstat(void *argument);
+/* RQ */
+void *EcaCfd(void *argument);
+void *EcaCsu(void *argument);
+void *EcaCwdi(void *argument);
+void *EcaCwfi(void *argument);
+void *EcaEtr(void *argument);
+void *EcaFd(void *argument);
+void *EcaGsl(void *argument);
+void *EcaHd(void *argument);
+void *EcaHwdi(void *argument);
+void *EcaHwfi(void *argument);
+void *EcaId(void *argument);
+void *EcaSu(void *argument);
+void *EcaTr(void *argument);
+void *EcaTg10p(void *argument);
+void *EcaTg90p(void *argument);
+void *EcaTn10p(void *argument);
+void *EcaTn90p(void *argument);
+void *EcaTx10p(void *argument);
+void *EcaTx90p(void *argument);
+
+void *EcaCdd(void *argument);
+void *EcaCwd(void *argument);
+void *EcaRr1(void *argument);
+void *EcaR10mm(void *argument);
+void *EcaR20mm(void *argument);
+void *EcaR75p(void *argument);
+void *EcaR75ptot(void *argument);
+void *EcaR90p(void *argument);
+void *EcaR90ptot(void *argument);
+void *EcaR95p(void *argument);
+void *EcaR95ptot(void *argument);
+void *EcaR99p(void *argument);
+void *EcaR99ptot(void *argument);
+void *EcaRx1day(void *argument);
+void *EcaRx5day(void *argument);
+void *EcaSdii(void *argument);
+
+void *EcaFdns(void *argument);
+void *EcaStrwind(void *argument);
+
+void *Hi(void *argument);
+void *Tchill(void *argument);
+/* QR */
 
 
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
@@ -294,6 +338,51 @@ void *Zonstat(void *argument);
 /* QR */
 #define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd"}
 #define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonpctl"}
+
+/* RQ */
+#define  EcaCfdOperators        {"eca_cfd"}
+#define  EcaCsuOperators        {"eca_csu"}
+#define  EcaCwfiOperators       {"eca_cwfi"}
+#define  EcaHwdiOperators       {"eca_hwdi"}
+#define  EcaEtrOperators        {"eca_etr"}
+#define  EcaFdOperators         {"eca_fd"}
+#define  EcaGslOperators        {"eca_gsl"}
+#define  EcaHdOperators         {"eca_hd"}
+#define  EcaCwdiOperators       {"eca_cwdi"}
+#define  EcaHwfiOperators       {"eca_hwfi"}
+#define  EcaIdOperators         {"eca_id"}
+#define  EcaSuOperators         {"eca_su"}
+#define  EcaTrOperators         {"eca_tr"}
+#define  EcaTg10pOperators      {"eca_tg10p"}
+#define  EcaTg90pOperators      {"eca_tg90p"}
+#define  EcaTn10pOperators      {"eca_tn10p"}
+#define  EcaTn90pOperators      {"eca_tn90p"}
+#define  EcaTx10pOperators      {"eca_tx10p"}
+#define  EcaTx90pOperators      {"eca_tx90p"}
+
+#define  EcaCddOperators        {"eca_cdd"}
+#define  EcaCwdOperators        {"eca_cwd"}
+#define  EcaRr1Operators        {"eca_rr1"}
+#define  EcaR10mmOperators      {"eca_r10mm"}
+#define  EcaR20mmOperators      {"eca_r20mm"}
+#define  EcaR75pOperators       {"eca_r75p"}
+#define  EcaR75ptotOperators    {"eca_r75ptot"}
+#define  EcaR90pOperators       {"eca_r90p"}
+#define  EcaR90ptotOperators    {"eca_r90ptot"}
+#define  EcaR95pOperators       {"eca_r95p"}
+#define  EcaR95ptotOperators    {"eca_r95ptot"}
+#define  EcaR99pOperators       {"eca_r99p"}
+#define  EcaR99ptotOperators    {"eca_r99ptot"}
+#define  EcaRx1dayOperators     {"eca_rx1day"}
+#define  EcaRx5dayOperators     {"eca_rx5day"}
+#define  EcaSdiiOperators       {"eca_sdii"}
+
+#define  EcaFdnsOperators       {"eca_fdns"}
+#define  EcaStrwindOperators    {"eca_strwind"}
+
+#define  HiOperators            {"hi"}
+#define  TchillOperators        {"tchill"}
+/* QR */
 
 
 static MODULES Modules[] =
@@ -433,6 +522,48 @@ static MODULES Modules[] =
   /* QR */
   { Yseasstat,      YseasstatHelp,     YseasstatOperators,      1,  1 },
   { Zonstat,        ZonstatHelp,       ZonstatOperators,        1,  1 },
+  /* RQ */
+  { EcaCfd,         NULL,              EcaCfdOperators,         1,  1 },
+  { EcaCsu,         NULL,              EcaCsuOperators,         1,  1 },
+  { EcaCwdi,        NULL,              EcaCwdiOperators,        2,  1 },
+  { EcaCwfi,        NULL,              EcaCwfiOperators,        2,  1 },
+  { EcaEtr,         NULL,              EcaEtrOperators,         2,  1 },
+  { EcaFd,          NULL,              EcaFdOperators,          1,  1 },
+  { EcaGsl,         NULL,              EcaGslOperators,         1,  1 },
+  { EcaHd,          NULL,              EcaHdOperators,          1,  1 },
+  { EcaHwdi,        NULL,              EcaHwdiOperators,        2,  1 },
+  { EcaHwfi,        NULL,              EcaHwfiOperators,        2,  1 },
+  { EcaId,          NULL,              EcaIdOperators,          1,  1 },
+  { EcaSu,          NULL,              EcaSuOperators,          1,  1 },
+  { EcaTr,          NULL,              EcaTrOperators,          1,  1 },
+  { EcaTg10p,       NULL,              EcaTg10pOperators,       2,  1 },
+  { EcaTg90p,       NULL,              EcaTg90pOperators,       2,  1 },
+  { EcaTn10p,       NULL,              EcaTn10pOperators,       2,  1 },
+  { EcaTn90p,       NULL,              EcaTn90pOperators,       2,  1 },
+  { EcaTx10p,       NULL,              EcaTx10pOperators,       2,  1 },
+  { EcaTx90p,       NULL,              EcaTx90pOperators,       2,  1 },
+  { EcaCdd,         NULL,              EcaCddOperators,         1,  1 },
+  { EcaCwd,         NULL,              EcaCwdOperators,         1,  1 },
+  { EcaRr1,         NULL,              EcaRr1Operators,         1,  1 },
+  { EcaR10mm,       NULL,              EcaR10mmOperators,       1,  1 },
+  { EcaR20mm,       NULL,              EcaR20mmOperators,       1,  1 },
+  { EcaR75p,        NULL,              EcaR75pOperators,        2,  1 },
+  { EcaR75ptot,     NULL,              EcaR75ptotOperators,     2,  1 },
+  { EcaR90p,        NULL,              EcaR90pOperators,        2,  1 },
+  { EcaR90ptot,     NULL,              EcaR90ptotOperators,     2,  1 },
+  { EcaR95p,        NULL,              EcaR95pOperators,        2,  1 },
+  { EcaR95ptot,     NULL,              EcaR95ptotOperators,     2,  1 },
+  { EcaR99p,        NULL,              EcaR99pOperators,        2,  1 },
+  { EcaR99ptot,     NULL,              EcaR99ptotOperators,     2,  1 },
+  { EcaRx1day,      NULL,              EcaRx1dayOperators,      1,  1 },
+  { EcaRx5day,      NULL,              EcaRx5dayOperators,      1,  1 },
+  { EcaSdii,        NULL,              EcaSdiiOperators,        1,  1 },
+  { EcaFdns,        NULL,              EcaFdnsOperators,        2,  1 },
+  { EcaStrwind,     NULL,              EcaStrwindOperators,     1,  1 },
+
+  { Hi,             NULL,              HiOperators,             3,  1 },
+  { Tchill,         NULL,              TchillOperators,         2,  1 },
+  /* QR */
 };
 
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
@@ -462,6 +593,9 @@ static char *opalias[][2] =
   {"remapdistance",       "remapdis"   },
   {"sort",                "timsort"    },
   {"vinfos",              "sinfov"     },
+  /* RQ */
+  {"eca_r1mm",            "eca_rr1"    },
+  /* QR */  
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));

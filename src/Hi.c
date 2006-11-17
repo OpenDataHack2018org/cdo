@@ -1,0 +1,201 @@
+/*
+  This file is part of CDO. CDO is a collection of Operators to
+  manipulate and analyse Climate model Data.
+
+  Copyright (C) 2006 Brockmann Consult
+  See COPYING file for copying and redistribution conditions.
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; version 2 of the License.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+*/
+
+/*
+   This module contains the following operators:
+
+      Hi         hi              Compute the humidity index
+*/
+
+
+#include <string.h>
+#include <math.h>
+
+#include "cdi.h"
+#include "cdo.h"
+#include "cdo_int.h"
+#include "pstream.h"
+
+#define TO_DEGREE_CELSIUS(x) ((x) - 273.15)
+#define TO_KELVIN(x) ((x) + 273.15)
+
+
+static double humidityIndex(double t, double e, double r, double missval)
+{
+  const double c = TO_DEGREE_CELSIUS(t);
+  const double a = 0.01 * r * e * 6.112 * pow(10.0, 7.5 * c / (237.7 + c));
+  
+  return TO_KELVIN(c + (5.0 / 9.0) * (a - 10.0));
+}
+
+
+static void farexpr(FIELD *field1, FIELD field2, FIELD field3, double (*expression)(double, double, double, double))
+{
+  static char func[] = "farexpr";
+  int   i, len;
+  const int     grid1    = field1->grid;
+  const int     nmiss1   = field1->nmiss;
+  const double  missval1 = field1->missval;
+  double       *array1   = field1->ptr;
+  const int     grid2    = field2.grid;
+  const int     nmiss2   = field2.nmiss;
+  const double  missval2 = field2.missval;
+  const double *array2   = field2.ptr;
+  const int     grid3    = field3.grid;
+  const int     nmiss3   = field3.nmiss;
+  const double  missval3 = field3.missval;
+  const double *array3   = field3.ptr;
+
+  len = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  if ( nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0 )
+    {
+      for ( i = 0; i < len; i++ )
+        if ( DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array2[i], missval2) || DBL_IS_EQUAL(array3[i], missval3))  
+	  array1[i] = missval1;
+	else
+	  array1[i] = expression(array1[i], array2[i], array3[i], missval1);
+    }
+  else
+    {
+      for ( i = 0; i < len; i++ )
+        array1[i] = expression(array1[i], array2[i], array3[i], missval1);  
+    }
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+}
+
+   
+void *Hi(void *argument)
+{
+  static char func[] = "Hi";
+  enum {FILL_NONE, FILL_REC, FILL_TS};
+  int streamIDm, streamIDs, streamID1, streamID2, streamID3, streamID4;
+  int gridsize;
+  int nrecs, nrecs2, nrecs3, nvars = 0, nlev, recID;
+  int tsID;
+  int varID, levelID;
+  int offset;
+  int vlistID1, vlistID2, vlistID3, vlistID4;
+  int taxisID1, taxisID2, taxisID3, taxisID4;
+  int filltype = FILL_NONE;
+  FIELD field1, field2, field3;
+
+  cdoInitialize(argument);
+  cdoOperatorAdd("hi", 0, 0, NULL);
+
+  streamID1 = streamOpenRead(cdoStreamName(0));
+  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
+  streamID2 = streamOpenRead(cdoStreamName(1));
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+  streamID3 = streamOpenRead(cdoStreamName(2));
+  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
+
+  streamIDm = streamID1;
+  streamIDs = streamID2;
+
+  vlistID1 = streamInqVlist(streamID1);
+  vlistID2 = streamInqVlist(streamID2);
+  vlistID3 = streamInqVlist(streamID3);
+
+  taxisID1 = vlistInqTaxis(vlistID1);
+  taxisID2 = vlistInqTaxis(vlistID2);
+  taxisID3 = vlistInqTaxis(vlistID3);
+
+  vlistCompare(vlistID1, vlistID2, func_sft);
+  vlistCompare(vlistID1, vlistID3, func_sft);
+  
+  nospec(vlistID1);
+
+  gridsize = vlistGridsizeMax(vlistID1);
+
+  field1.ptr = (double *) malloc(gridsize*sizeof(double));
+  field2.ptr = (double *) malloc(gridsize*sizeof(double));
+  field3.ptr = (double *) malloc(gridsize*sizeof(double));
+
+  if ( cdoVerbose )
+    cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d",
+	     vlistNtsteps(vlistID1), vlistNtsteps(vlistID2), vlistNtsteps(vlistID3));
+
+  vlistID4 = vlistDuplicate(vlistID1);
+
+  taxisID4 = taxisDuplicate(taxisID1);
+  vlistDefTaxis(vlistID4, taxisID4);
+
+  streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
+  if ( streamID4 < 0 ) cdiError(streamID4, "Open failed on %s", cdoStreamName(3));
+
+  streamDefVlist(streamID4, vlistID4);
+
+  tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+    {
+      nrecs2 = streamInqTimestep(streamID2, tsID);
+      nrecs3 = streamInqTimestep(streamID3, tsID);
+      if ( nrecs2 == 0 || nrecs3 == 0 )
+        cdoAbort("Input streams have different number of timesteps!");
+
+      taxisCopyTimestep(taxisID4, taxisID1);
+      streamDefTimestep(streamID4, tsID);
+
+      for ( recID = 0; recID < nrecs; recID++ )
+	{
+	  streamInqRecord(streamID1, &varID, &levelID);
+	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
+
+	  streamInqRecord(streamID2, &varID, &levelID);
+	  streamReadRecord(streamID2, field2.ptr, &field2.nmiss);
+
+	  streamInqRecord(streamID3, &varID, &levelID);
+	  streamReadRecord(streamID3, field3.ptr, &field3.nmiss);
+
+	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
+	  field1.missval = vlistInqVarMissval(vlistID1, varID);
+
+	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
+	  field2.missval = vlistInqVarMissval(vlistID2, varID);
+
+	  field3.grid    = vlistInqVarGrid(vlistID3, varID);
+	  field3.missval = vlistInqVarMissval(vlistID3, varID);
+
+	  farexpr(&field1, field2, field3, humidityIndex);
+
+	  streamDefRecord(streamID4, varID, levelID);
+	  streamWriteRecord(streamID4, field1.ptr, field1.nmiss);
+	}
+
+      tsID++;
+    }
+
+  streamClose(streamID4);
+  streamClose(streamID3);
+  streamClose(streamID2);
+  streamClose(streamID1);
+
+  if ( field1.ptr ) free(field1.ptr);
+  if ( field2.ptr ) free(field2.ptr);
+  if ( field3.ptr ) free(field3.ptr);
+
+  cdoFinish();
+
+  return (0);
+}

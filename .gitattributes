@@ -170,6 +170,7 @@ src/Condc.c -text
 src/Copy.c -text
 src/Detrend.c -text
 src/Diff.c -text
+src/EcaOperators.c -text
 src/Enlarge.c -text
 src/Enlargegrid.c -text
 src/Ensstat.c -text
@@ -179,6 +180,7 @@ src/Fillmiss.c -text
 src/Fldrms.c -text
 src/Fldstat.c -text
 src/Gradsdes.c -text
+src/Hi.c -text
 src/Histogram.c -text
 src/Info.c -text
 src/Input.c -text
@@ -236,6 +238,7 @@ src/Splitrec.c -text
 src/Splittime.c -text
 src/Splityear.c -text
 src/Subtrend.c -text
+src/Tchill.c -text
 src/Templates.c -text
 src/Test.c -text
 src/Timpctl.c -text
@@ -274,6 +277,10 @@ src/commandline.c -text
 src/config.h.in -text
 src/dmemory.h -text
 src/dtypes.h -text
+src/eca.c -text
+src/eca.h -text
+src/ecautil.c -text
+src/ecautil.h -text
 src/error.h -text
 src/etopo.h -text
 src/exception.c -text
