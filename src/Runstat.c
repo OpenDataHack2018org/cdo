@@ -323,8 +323,13 @@ void *Runstat(void *argument)
 	  free(vars1[its][varID]);
 	  if ( operfunc == func_std ) free(vars2[its][varID]);
 	}
+      /* RQ */
+      free(vars1[its]);
+      if ( operfunc == func_std ) free(vars2[its]);
+      /* QR */
     }
 
+  free(datetime);
   free(vars1);
   if ( operfunc == func_std ) free(vars2);
 

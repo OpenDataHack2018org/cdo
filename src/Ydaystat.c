@@ -268,6 +268,10 @@ void *Ydaystat(void *argument)
 	      free(vars1[dayoy][varID]);
 	      if ( operfunc == func_std ) free(vars2[dayoy][varID]);
 	    }
+	  /* RQ */
+	  free(vars1[dayoy]);
+	  if ( operfunc == func_std ) free(vars2[dayoy]);
+	  /* QR */ 
 	}
     }
 

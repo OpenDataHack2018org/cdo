@@ -265,6 +265,10 @@ void *Yseasstat(void *argument)
 	      free(vars1[seas][varID]);
 	      if ( operfunc == func_std ) free(vars2[seas][varID]);
 	    }
+	  /* RQ */
+	  free(vars1[seas]);
+	  if ( operfunc == func_std ) free(vars2[seas]);
+	  /* QR */ 
 	}
     }
 

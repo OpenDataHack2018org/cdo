@@ -260,6 +260,10 @@ void *Ymonstat(void *argument)
 	      free(vars1[month][varID]);
 	      if ( operfunc == func_std ) free(vars2[month][varID]);
 	    }
+	  /* RQ */
+	  free(vars1[month]);
+	  if ( operfunc == func_std ) free(vars2[month]);
+	  /* QR */ 
 	}
     }
 

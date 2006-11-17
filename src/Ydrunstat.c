@@ -317,6 +317,8 @@ void *Ydrunstat(void *argument)
   free(vars1);
   if ( operfunc == func_std ) free(vars2);
 
+  if ( datetime ) free(datetime);
+
   if ( recVarID   ) free(recVarID);
   if ( recLevelID ) free(recLevelID);
 

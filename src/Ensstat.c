@@ -230,7 +230,10 @@ void *Ensstat(void *argument)
   if ( array2 ) free(array2);
 
   for ( i = 0; i < ompNumThreads; i++ )
-    if ( field[i].ptr ) free(field[i].ptr);
+    {
+      if ( field[i].ptr ) free(field[i].ptr);
+      if ( field[i].weight ) free(field[i].weight);
+    }
 
   if ( field ) free(field);
 
