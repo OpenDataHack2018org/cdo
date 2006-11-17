@@ -68,14 +68,14 @@ static void julday_to_gregdate(
 	ja = julday;
     else
     {
-	int	ia = ((julday - 1867216) - 0.25) / 36524.25;
+      int ia = (int)(((julday - 1867216) - 0.25) / 36524.25);
 
-	ja = julday + 1 + ia - (int)(0.25 * ia);
+      ja = julday + 1 + ia - (int)(0.25 * ia);
     }
 
     jb = ja + 1524;
     xc = ((jb - 2439870) - 122.1) / 365.25;
-    jc = 6680.0 + xc;
+    jc = (int) (6680.0 + xc);
     jd = 365 * jc + (int)(0.25 * jc);
     je = (int)((jb - jd) / 30.6001);
 
@@ -152,7 +152,7 @@ static unsigned long gregdate_to_julday(
     if (jy >= 0)
     {
 	julday += 365 * jy;
-	julday += 0.25 * jy;
+	julday += (unsigned long) 0.25 * jy;
     }
     else
     {
@@ -276,13 +276,13 @@ static void dectime(
 
     uncer = ldexp(value < 0 ? -value : value, -DBL_MANT_DIG);
 
-    days = floor(value/basis.ind.days);
+    days = (long) floor(value/basis.ind.days);
     value -= days * basis.ind.days;		/* make positive excess */
 
     decomp(value, uncer, sizeof(basis.vec)/sizeof(basis.vec[0]),
 	   basis.vec, counts.vec);
 
-    days += counts.ind.days;
+    days += (long) counts.ind.days;
     hours = (int)counts.ind.hours12 * 12 + (int)counts.ind.hours;
     minutes = (int)counts.ind.minutes10 * 10 + (int)counts.ind.minutes;
     seconds = (int)counts.ind.seconds10 * 10 + counts.ind.seconds;

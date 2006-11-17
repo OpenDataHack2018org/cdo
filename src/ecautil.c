@@ -219,12 +219,12 @@ static void selcompc(FIELD *field, double c, int (*compare)(double, double))
     if ( DBL_IS_EQUAL(array[i], missval) ) field->nmiss++;
 }
 
-
+/*
 static int and(double a, double b)
 {
   return a <= b;
 }
-
+*/
 
 static int le(double a, double b)
 {
