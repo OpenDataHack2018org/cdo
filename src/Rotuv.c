@@ -161,7 +161,7 @@ void *Rotuv(void *argument)
     {
       gridID = vlistInqVarGrid(vlistID1, varID);
       if ( ! (gridInqType(gridID) == GRID_LONLAT && gridIsRotated(gridID)) )
-	cdoAbort("only rotated lon/lat grids supported");
+	cdoAbort("Only rotated lon/lat grids supported");
 
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -243,6 +243,11 @@ void *Rotuv(void *argument)
 	    vsvar = vardata[varID];
 
 	  varID2 = varID;
+
+	  if ( cdoVerbose )
+	    cdoPrint("Using code %d [%d](u) and code %d [%d](v)",
+		     vlistInqVarCode(vlistID1, varID1), chcodes[i],
+		     vlistInqVarCode(vlistID1, varID2), chcodes[i+1]);
 	  
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);

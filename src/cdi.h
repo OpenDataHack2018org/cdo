@@ -1,6 +1,8 @@
 #ifndef  _CDI_H
 #define  _CDI_H
 
+#include <sys/types.h>
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -186,6 +188,7 @@ int     streamInqTimestep(int streamID, int tsID);
 char   *streamFilename(int streamID);
 char   *streamFilesuffix(int filetype);
 int     streamNtsteps(int streamID);
+off_t   streamNvals(int streamID);
 
 
 /* STREAM var I/O routines */
