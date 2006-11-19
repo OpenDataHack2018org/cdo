@@ -27,6 +27,7 @@
       Showinfo   showdate        Show dates
       Showinfo   showtime        Show timesteps
       Showinfo   showltype       Show level types
+      Showinfo   showformat      Show file format
 */
 
 
@@ -39,7 +40,7 @@
 
 void *Showinfo(void *argument)
 {
-  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE;
+  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
@@ -67,6 +68,7 @@ void *Showinfo(void *argument)
   SHOWSTDNAME = cdoOperatorAdd("showstdname",   0, 0, NULL);
   SHOWLEVEL   = cdoOperatorAdd("showlevel",     0, 0, NULL);
   SHOWLTYPE   = cdoOperatorAdd("showltype",     0, 0, NULL);
+  SHOWFORMAT  = cdoOperatorAdd("showformat",    0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -221,6 +223,11 @@ void *Showinfo(void *argument)
 	}
       fprintf(stdout, "\n"); 
     }
+  else if ( operatorID == SHOWFORMAT )
+    {
+      printFiletype(streamID);
+    }
+
   streamClose(streamID);
 
   cdoFinish();

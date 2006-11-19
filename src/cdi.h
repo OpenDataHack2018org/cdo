@@ -293,6 +293,9 @@ int     vlistInqVarGrid(int vlistID, int varID);
 int     vlistInqVarZaxis(int vlistID, int varID);
 int     vlistInqVarTime(int vlistID, int varID);
 
+void    vlistDefVarSzip(int vlistID, int varID, int szip);
+int     vlistInqVarSzip(int vlistID, int varID);
+
 /*      vlistDefVarCode: Define the code number of a Variable */
 void    vlistDefVarCode(int vlistID, int varID, int code);
 

@@ -285,7 +285,7 @@ void *Tchill(void *argument);
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", \
-                                 "showstdname", "showlevel", "showltype"}
+                                 "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
 #define  SpecinfoOperators      {"specinfo"}
