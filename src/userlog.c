@@ -419,9 +419,9 @@ void dumplogs(const char *logfilename)
 	  nvals0   = GET_UINT8(lognvals);
 
 	  if ( sizeof(INT64) > sizeof(long) )
-	    fprintf(stdout, "%6d %10d %10d %10.2f %19lld\n", yyyymm0, ncdo0, noper0, cputime0, (long long)nvals0);
+	    fprintf(stdout, "%6d %10d %10d %20.2f %19lld\n", yyyymm0, ncdo0, noper0, cputime0, (long long)nvals0);
 	  else
-	    fprintf(stdout, "%6d %10d %10d %10.2f %19ld\n", yyyymm0, ncdo0, noper0, cputime0, (long)nvals0);
+	    fprintf(stdout, "%6d %10d %10d %20.2f %19ld\n", yyyymm0, ncdo0, noper0, cputime0, (long)nvals0);
 	}
 
       free(buffer);
