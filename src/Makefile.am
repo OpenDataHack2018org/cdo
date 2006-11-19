@@ -34,6 +34,7 @@ cdo_SOURCES = Arith.c		\
               Intntime.c 	\
               Intyear.c 	\
               Invert.c  	\
+              Log.c  	        \
               Maskbox.c 	\
               Mastrfu.c 	\
               Math.c   		\

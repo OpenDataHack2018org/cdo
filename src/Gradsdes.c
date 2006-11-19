@@ -106,7 +106,7 @@ static int flt2ibm(float x, unsigned char *ibm) {
 	int sign, exp, i;
 	double mant;
 
-	if ( DBL_IS_EQUAL(x, 0) ) {
+	if ( !(fabs((double)x) > 0) ) {
 		ibm[0] = ibm[1] = ibm[2] = ibm[3] = 0;
 		return 0;
 	}
@@ -276,7 +276,7 @@ void *Gradsdes(void *argument)
       
   cdoInitialize(argument);
 
-  GRADSDES1 = cdoOperatorAdd("gradsdes1",  0, 0, NULL);
+  GRADSDES1 = cdoOperatorAdd("gradsdes1", 0, 0, NULL);
   GRADSDES2 = cdoOperatorAdd("gradsdes2", 0, 0, NULL);
   DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 

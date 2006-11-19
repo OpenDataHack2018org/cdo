@@ -68,6 +68,7 @@ void *Inttime(void *argument);
 void *Intntime(void *argument);
 void *Intyear(void *argument);
 void *Invert(void *argument);
+void *Log(void *argument);
 void *Maskbox(void *argument);
 void *Mastrfu(void *argument);
 void *Math(void *argument);
@@ -236,6 +237,7 @@ void *Tchill(void *argument);
 #define  IntyearOperators       {"intyear"}
 #define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", \
                                  "invertlatdata", "invertlondata"}
+#define  LogOperators           {"dumplogs"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MastrfuOperators       {"mastrfu"}
 #define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
@@ -423,6 +425,7 @@ static MODULES Modules[] =
   { Intntime,       InttimeHelp,       IntntimeOperators,       1,  1 },
   { Intyear,        IntyearHelp,       IntyearOperators,        2,  1 },
   { Invert,         InvertHelp,        InvertOperators,         1,  1 },
+  { Log,            NULL,              LogOperators,            1,  0 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,        1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,        1,  1 },
   { Math,           MathHelp,          MathOperators,           1,  1 },

@@ -729,6 +729,9 @@ void pstreamClose(int pstreamID)
       if ( PSTREAM_Debug )
 	Message(func, "%s fileID %d\n", pstreamptr->name, pstreamptr->fileID);
 
+      if ( pstreamptr->mode == 'r' )
+	processAddNvals(streamNvals(pstreamptr->fileID));
+
       streamClose(pstreamptr->fileID);
 
       if ( cdoExpMode == CDO_EXP_REMOTE )
@@ -739,11 +742,6 @@ void pstreamClose(int pstreamID)
 	      FILE *fp = fopen(cdojobfiles, "a");
 	      fprintf(fp, "%s\n", pstreamptr->name);
 	      fclose(fp);
-	      /*
-	      fprintf(stderr, "start data transfer of %s\n", pstreamptr->name);
-	      fprintf(stderr, "finish data transfer of %s\n", pstreamptr->name);
-	      fprintf(stderr, "remove remote file %s\n", pstreamptr->name);
-	      */
 	    }
 	}
 
@@ -1132,7 +1130,8 @@ void cdoFinish(void)
       processEndTime(&p_usertime, &p_systime);
       p_cputime  = p_usertime + p_systime;
 
-      userlog(processInqPrompt(), p_cputime); 
+      cdologs(processNums(), p_cputime, processInqNvals()); 
+      cdolog(processInqPrompt(), p_cputime); 
     }
 
   if ( cdoBenchmark )

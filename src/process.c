@@ -77,9 +77,11 @@ PROCESS;
 static PROCESS Process[MAX_PROCESS];
 
 static int NumProcess = 0;
+static off_t ProcessNvals = 0;
 
 #if  defined  (HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t processNvalsMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 
@@ -145,6 +147,60 @@ int processSelf(void)
 #endif
 
   return (processID);
+}
+
+
+int processNums(void)
+{
+  static char func[] = "processNums";
+  int pnums = 0;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_lock(&processMutex);
+#endif
+
+  pnums = NumProcess;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_unlock(&processMutex);  
+#endif
+
+  return (pnums);
+}
+
+
+void processAddNvals(off_t nvals)
+{
+  static char func[] = "processAddNvals";
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_lock(&processNvalsMutex);
+#endif
+
+  ProcessNvals += nvals;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_unlock(&processNvalsMutex);  
+#endif
+}
+
+
+off_t processInqNvals(void)
+{
+  static char func[] = "processInqNvals";
+  off_t nvals = 0;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_lock(&processNvalsMutex);
+#endif
+
+  nvals = ProcessNvals;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_unlock(&processNvalsMutex);  
+#endif
+
+  return (nvals);
 }
 
 

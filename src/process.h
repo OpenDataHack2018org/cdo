@@ -34,6 +34,10 @@ void processStartTime(double *utime, double *stime);
 void processEndTime(double *utime, double *stime);
 void processAccuTime(double utime, double stime);
 
+void processAddNvals(off_t nvals);
+off_t processInqNvals(void);
+int processNums(void);
+
 int  processInqChildNum(void);
 
 const char *processOperatorArg(void);
