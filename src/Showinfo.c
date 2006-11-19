@@ -225,7 +225,7 @@ void *Showinfo(void *argument)
     }
   else if ( operatorID == SHOWFORMAT )
     {
-      printFiletype(streamID);
+      printFiletype(streamID, vlistID);
     }
 
   streamClose(streamID);

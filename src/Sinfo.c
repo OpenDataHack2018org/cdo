@@ -77,7 +77,7 @@ to identify the variable.
 @EndDoc
 */
 
-void printFiletype(int streamID)
+void printFiletype(int streamID, int vlistID)
 {
   int filetype;
 
@@ -122,9 +122,7 @@ void printFiletype(int streamID)
 
   if ( filetype == FILETYPE_GRB )
     {
-      int vlistID, nvars, varID;
-
-      vlistID = streamInqVlist(streamID);
+      int nvars, varID;
 
       nvars = vlistNvars(vlistID);
 
@@ -185,7 +183,7 @@ void *Sinfo(void *argument)
       vlistID = streamInqVlist(streamID);
 
       printf("   File format: ");
-      printFiletype(streamID);
+      printFiletype(streamID, vlistID);
 
       if ( operatorID == SINFOV )
 	fprintf(stdout,

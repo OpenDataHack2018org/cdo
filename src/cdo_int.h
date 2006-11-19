@@ -118,7 +118,7 @@ void    cdologs(int noper, double cputime, off_t nvals);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 
-void printFiletype(int streamID);
+void printFiletype(int streamID, int vlistID);
 
 void job_submit(const char *expname, const char *jobfilename, const char *jobname);
 
