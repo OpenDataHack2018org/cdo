@@ -130,8 +130,8 @@ static double **createVars(int nvars, int nts)
 {
   static const char func[] = "createVars";
   
-  double *array = malloc(sizeof(double[nvars * nts]));
-  double **vars = malloc(sizeof(double*[nvars]));
+  double *array = (double *) malloc(sizeof(double[nvars * nts]));
+  double **vars = (double **) malloc(sizeof(double*[nvars]));
   
   int i;
   
@@ -184,7 +184,7 @@ static int submitCdoCommand(const char *argument)
   static const char func[] = "submitCdoCommand";
   
   const char *cdoPath = getCdoPath();
-  char *cdoCommand = malloc(strlen(cdoPath) + strlen(" ") + strlen(argument) + 1);
+  char *cdoCommand = (char *) malloc(strlen(cdoPath) + strlen(" ") + strlen(argument) + 1);
   
   int status;
   

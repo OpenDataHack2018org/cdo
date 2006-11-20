@@ -64,7 +64,7 @@ static void histBinValue(HISTOGRAM *hist, double value)
   
   assert( hist->step > 0 );
 
-  bin = MIN((value - hist->min) / hist->step, hist->nbins - 1);
+  bin = MIN((int)((value - hist->min) / hist->step), hist->nbins - 1);
   INT_PTR(hist->ptr)[bin]++;
 }
 
