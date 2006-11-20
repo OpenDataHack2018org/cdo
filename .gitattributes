@@ -311,6 +311,7 @@ src/cdo.h -text
 src/cdo_int.h -text
 src/cdo_pthread.c -text
 src/cdo_vlist.c -text
+src/cdotest.c -text
 src/color.c -text
 src/color.h -text
 src/commandline.c -text
