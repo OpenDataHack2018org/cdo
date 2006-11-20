@@ -1,0 +1,30 @@
+@BeginModule
+@Name      = EcaCfd
+@Title     = Maximum no. of consecutive frost days
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_cfd
+
+@BeginDescription
+Let @file{ifile} be a time series of daily minimum temperatures TN,
+then counted is the largest number of consecutive days where
+TN < 0° Celsius. Note that TN must be given in units of kelvin.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_cfd
+@Title     = Maximum no. of consecutive frost days
+@EndOperator
+
+
+@BeginExample
+To get the largest number of consecutive frost days for a time
+series of daily minimum temperatures, use:
+@BeginVerbatim
+   cdo eca_cfd tnfile ofile
+@EndVerbatim
+@EndExample

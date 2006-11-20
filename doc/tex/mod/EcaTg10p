@@ -1,0 +1,34 @@
+@BeginModule
+@NewPage
+@Name      = EcaTg10p
+@Title     = Percentage of time TG < 10th percentile of daily mean temperature (cold days)
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_tg10p
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily mean temperatures TG, and
+@file{ifile2} be the 10th percentile TGn10 of daily mean temperatures
+for any period used as reference. Then calculated is the percentage
+of time where TG < TGn10. Note that both TG and TGn10 must be given
+in the same units.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_tg10p
+@Title     = Percentage of time TG < 10th percentile of daily mean temperature (cold days)
+@EndOperator
+
+
+@BeginExample
+To compute the percentage of time where the daily mean temperature
+is less than the 10th percentile of the daily mean temperature for
+a given reference period, use:
+@BeginVerbatim
+   cdo eca_tg10p tgfile tgn10file ofile
+@EndVerbatim
+@EndExample

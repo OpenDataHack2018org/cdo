@@ -1,0 +1,39 @@
+@BeginModule
+@NewPage
+@Name      = EcaTr
+@Title     = No. of tropical nights
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_tr
+
+@BeginDescription
+Let @file{ifile} be a time series of daily minimum temperatures TN,
+then counted is the number of days where TN > T. The number T is
+an optional parameter with default T = 20° Celsius. Note that TN
+must be given in units of kelvin.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_tr
+@Title     = No. of tropical nights
+@Parameter = [T]
+@EndOperator
+
+
+@BeginParameter
+@Item = T
+DOUBLE   Temperature threshold (° Celsius, default: T = 20° Celsius)
+@EndParameter
+
+
+@BeginExample
+To get the number of tropical nights for a time series of daily
+minimum temperatures, use:
+@BeginVerbatim
+   cdo eca_tr tnfile ofile
+@EndVerbatim
+@EndExample

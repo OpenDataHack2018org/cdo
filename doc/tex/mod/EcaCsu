@@ -1,0 +1,39 @@
+@BeginModule
+@NewPage
+@Name      = EcaCsu
+@Title     = Maximum no. of consecutive summer days
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_csu
+
+@BeginDescription
+Let @file{ifile} be a time series of daily maximum temperatures TX,
+then counted is the largest number of consecutive days where TX > T.
+The number T is an optional parameter with default T = 25° Celsius.
+Note that TN must be given in units of kelvin.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_csu
+@Title     = Maximum no. of consecutive summer days
+@Parameter = T
+@EndOperator
+
+
+@BeginParameter
+@Item = T
+FLOAT   Temperature threshold in Celsius
+@EndParameter
+
+
+@BeginExample
+To get the largest number of consecutive summer days for a time
+series of daily minimum temperatures, use:
+@BeginVerbatim
+   cdo eca_csu txfile ofile
+@EndVerbatim
+@EndExample

@@ -1,0 +1,34 @@
+@BeginModule
+@NewPage
+@Name      = EcaTg90p
+@Title     = Percentage of time TG > 90th percentile of daily mean temperature (warm days)
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_tg90p
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily mean temperatures TG, and
+@file{ifile2} be the 90th percentile TGn90 of daily mean temperatures
+for any period used as reference. Then calculated is the percentage
+of time where TG > TGn90. Note that both TG and TGn90 must be given
+in the same units.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_tg90p
+@Title     = Percentage of time TG > 90th percentile of daily mean temperature (warm days)
+@EndOperator
+
+
+@BeginExample
+To compute the percentage of time where the daily mean temperature
+is greater than the 90th percentile of the daily mean temperature for
+a given reference period, use:
+@BeginVerbatim
+   cdo eca_tg90p tgfile tgn90file ofile
+@EndVerbatim
+@EndExample

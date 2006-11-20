@@ -62,7 +62,7 @@ static void farexpr(FIELD *field1, FIELD field2, FIELD field3, double (*expressi
 
   len = gridInqSize(grid1);
 
-  if ( len != gridInqSize(grid2) )
+  if ( len != gridInqSize(grid2) || len != gridInqSize(grid3) )
     cdoAbort("Fields have different gridsize (%s)", func);
 
   if ( nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0 )
@@ -91,13 +91,11 @@ void *Hi(void *argument)
   enum {FILL_NONE, FILL_REC, FILL_TS};
   int streamIDm, streamIDs, streamID1, streamID2, streamID3, streamID4;
   int gridsize;
-  int nrecs, nrecs2, nrecs3, nvars = 0, nlev, recID;
+  int nrecs, nrecs2, nrecs3, recID;
   int tsID;
   int varID, levelID;
-  int offset;
   int vlistID1, vlistID2, vlistID3, vlistID4;
   int taxisID1, taxisID2, taxisID3, taxisID4;
-  int filltype = FILL_NONE;
   FIELD field1, field2, field3;
 
   cdoInitialize(argument);

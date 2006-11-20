@@ -1,0 +1,30 @@
+@BeginModule
+@NewPage
+@Name      = EcaR10mm
+@Title     = No. of days with precipitation > 10 mm
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_r10mm
+
+@BeginDescription
+Let @file{ifile} be a time series of daily precipitation amounts RR,
+then counted is the number of days where RR > 10 mm. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_r10mm
+@Title     = No. of days with precipitation > 10 mm
+@EndOperator
+
+
+@BeginExample
+To get the number of days with precipitation greater than 10 mm for
+a time series of daily precipitation amounts, use:
+@BeginVerbatim
+   cdo eca_r10mm rrfile ofile
+@EndVerbatim
+@EndExample

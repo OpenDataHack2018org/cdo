@@ -1,0 +1,24 @@
+@BeginModule
+@NewPage
+@Name      = EcaR75ptot
+@Title     = Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_r75ptot
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily precipitation amounts RR,
+and @file{ifile2} be the 75th percentile RRn75 of daily precipitation
+amounts at wet days for any period used as reference. Then calculated
+is the ratio of the precipitation sum at wet days with RR > RRn75
+to the total precipitation sum. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_r75ptot
+@Title     = Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)
+@EndOperator

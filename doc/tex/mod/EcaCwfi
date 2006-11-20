@@ -1,0 +1,42 @@
+@BeginModule
+@Name      = EcaCwfi
+@Title     = Cold-spell days
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_cwfi
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily mean temperatures TG, and 
+@file{ifile2} be the 10th percentile TGn10 of daily mean temperatures
+for any period used as reference. Then counted is the number of days
+where, in intervals of at least nday consecutive days, TG < TGn10. The
+number nday is an optional parameter with default nday = 6. A further
+output variable is the the number of cold-spell periods longer than or
+equal to nday days. Note that both TG and TGn10 must be given in the
+same units.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_cwfi
+@Title     = Cold wave duration index
+@Parameter = [nday]
+@EndOperator
+
+
+@BeginParameter
+@Item = nday
+INTEGER  Number of consecutive days (default: nday = 6)
+@EndParameter
+
+
+@BeginExample
+To compute the number of cold-spell days for a time series of
+daily mean temperatures, use:
+@BeginVerbatim
+   cdo eca_cwfi tgfile tgn10file ofile
+@EndVerbatim
+@EndExample

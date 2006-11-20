@@ -57,7 +57,6 @@ static void num(FIELD *field1, const FIELD *field2, double mode)
   const double  missval1 = field1->missval;
   double       *array1   = field1->ptr;
   const int     grid2    = field2->grid;
-  const int     nmiss2   = field2->nmiss;
   const double  missval2 = field2->missval;
   const double *array2   = field2->ptr;
   
@@ -219,12 +218,6 @@ static void selcompc(FIELD *field, double c, int (*compare)(double, double))
     if ( DBL_IS_EQUAL(array[i], missval) ) field->nmiss++;
 }
 
-/*
-static int and(double a, double b)
-{
-  return a <= b;
-}
-*/
 
 static int le(double a, double b)
 {
@@ -264,89 +257,89 @@ static int ne(double a, double b)
 
 void farnum(FIELD *field1, FIELD field2)
 {
-  return num(field1, &field2, 0.0);
+  num(field1, &field2, 0.0);
 }
 
 
 void farnum2(FIELD *field1, FIELD field2)
 {
-  return num(field1, &field2, 1.0);
+  num(field1, &field2, 1.0);
 }
 
 
 void farnum3(FIELD *field1, FIELD field2, double n)
 {
-  return num(field1, &field2, n);
+  num(field1, &field2, n);
 }
 
 
 void farselle(FIELD *field1, FIELD field2)
 {
-  return selcomp(field1, &field2, le);
+  selcomp(field1, &field2, le);
 }
 
 
 void farsellt(FIELD *field1, FIELD field2)
 {
-  return selcomp(field1, &field2, lt);
+  selcomp(field1, &field2, lt);
 }
 
 
 void farselge(FIELD *field1, FIELD field2)
 {
-  return selcomp(field1, &field2, ge);
+  selcomp(field1, &field2, ge);
 }
 
 
 void farselgt(FIELD *field1, FIELD field2)
 {
-  return selcomp(field1, &field2, gt);
+  selcomp(field1, &field2, gt);
 }
 
 
 void farseleq(FIELD *field1, FIELD field2)
 {
-  return selcomp(field1, &field2, eq);
+  selcomp(field1, &field2, eq);
 }
 
 
 void farselne(FIELD *field1, FIELD field2)
 {
-  return selcomp(field1, &field2, ne);
+  selcomp(field1, &field2, ne);
 }
 
 
 void farsellec(FIELD *field, double c)
 {
-  return selcompc(field, c, le);
+  selcompc(field, c, le);
 }
 
 
 void farselltc(FIELD *field, double c)
 {
-  return selcompc(field, c, lt);
+  selcompc(field, c, lt);
 }
 
 
 void farselgec(FIELD *field, double c)
 {
-  return selcompc(field, c, ge);
+  selcompc(field, c, ge);
 }
 
 
 void farseleqc(FIELD *field, double c)
 {
-  return selcompc(field, c, eq);
+  selcompc(field, c, eq);
 }
 
 
 void farselnec(FIELD *field, double c)
 {
-  return selcompc(field, c, ne);
+  selcompc(field, c, ne);
 }
 
 
 void farselgtc(FIELD *field, double c)
 {
-  return selcompc(field, c, gt);
+  selcompc(field, c, gt);
 }

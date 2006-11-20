@@ -63,6 +63,43 @@ Yseasstat     Statistical values
 Yseaspctl     Statistical values
 Ydrunstat     Statistical values
 Ydrunpctl     Statistical values
+EcaCdd        ECA indices
+EcaCfd        ECA indices
+EcaCsu        ECA indices
+EcaCwd        ECA indices
+EcaCwdi       ECA indices
+EcaCwfi       ECA indices
+EcaEtr        ECA indices
+EcaFd         ECA indices
+EcaFdns       ECA indices
+EcaGsl        ECA indices
+EcaHd         ECA indices
+EcaHwdi       ECA indices
+EcaHwfi       ECA indices
+EcaId         ECA indices
+EcaR10mm      ECA indices
+EcaR20mm      ECA indices
+EcaR75p       ECA indices
+EcaR75ptot    ECA indices
+EcaR90p       ECA indices
+EcaR90ptot    ECA indices
+EcaR95p       ECA indices
+EcaR95ptot    ECA indices
+EcaR99p       ECA indices
+EcaR99ptot    ECA indices
+EcaRr1        ECA indices
+EcaRx1day     ECA indices
+EcaRx5day     ECA indices
+EcaSdii       ECA indices
+EcaStrwind    ECA indices
+EcaSu         ECA indices
+EcaTg10p      ECA indices
+EcaTg90p      ECA indices
+EcaTn10p      ECA indices
+EcaTn90p      ECA indices
+EcaTr         ECA indices
+EcaTx10p      ECA indices
+EcaTx90p      ECA indices
 Detrend       Regression
 Trend         Regression
 Subtrend      Regression
@@ -83,3 +120,5 @@ Vargen        Miscellaneous
 Vardup        Miscellaneous
 Rotuv         Miscellaneous
 Mastrfu       Miscellaneous
+Hi            Miscellaneous
+Tchill        Miscellaneous

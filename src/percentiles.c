@@ -40,9 +40,9 @@ static int histGetEnvNBins()
   return str != NULL ? MAX(atoi(str), NBINS_MINIMUM) : NBINS_DEFAULT;
 }
 
+
 static void histDefBounds(HISTOGRAM *hist, double a, double b)
 {
-  static const char func[] = "histDefBounds";
   int i;
   
   assert( hist != NULL );
@@ -57,9 +57,9 @@ static void histDefBounds(HISTOGRAM *hist, double a, double b)
     INT_PTR(hist->ptr)[i] = 0;
 }
 
+
 static void histBinValue(HISTOGRAM *hist, double value)
 {
-  static const char func[] = "histBinValue";
   int bin;
   
   assert( hist->step > 0 );
@@ -68,7 +68,8 @@ static void histBinValue(HISTOGRAM *hist, double value)
   INT_PTR(hist->ptr)[bin]++;
 }
 
-static int histBin(HISTOGRAM *hist)
+
+static void histBin(HISTOGRAM *hist)
 {
   static const char func[] = "histBin";
   int i;
@@ -88,10 +89,9 @@ static int histBin(HISTOGRAM *hist)
   free(values);
 }
 
+
 static int histAddValue(HISTOGRAM *hist, double value)
 {
-  static const char func[] = "histAddValue";
-  
   assert( hist != NULL );
   assert( hist->nbins > 0 );
 
@@ -120,9 +120,9 @@ static int histAddValue(HISTOGRAM *hist, double value)
   return 0;
 }
 
+
 static double histGetPercentile(const HISTOGRAM *hist, int p)
 {
-  static const char func[] = "histGetPercentile";
   double s, t;
   int i = 0, count = 0;
   
@@ -152,6 +152,7 @@ static double histGetPercentile(const HISTOGRAM *hist, int p)
     } 
 }
 
+
 HISTOGRAM_SET *hsetCreate(int nvars)
 {
   static const char func[] = "hsetCreate";
@@ -180,6 +181,7 @@ HISTOGRAM_SET *hsetCreate(int nvars)
   
   return hset;
 }
+
 
 void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
 {
@@ -232,6 +234,7 @@ void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
     }
 }
 
+
 void hsetDestroy(HISTOGRAM_SET *hset)
 {
   static const char func[] = "hsetDestroy";
@@ -259,6 +262,7 @@ void hsetDestroy(HISTOGRAM_SET *hset)
       hset = NULL;  
     }
 }
+
 
 void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const FIELD *field1, const FIELD *field2)
 {
@@ -315,6 +319,7 @@ void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const FI
     }
 }
 
+
 void hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const FIELD *field)
 {
   static const char func[] = "hsetAddVarLevelValues";
@@ -367,6 +372,7 @@ void hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const FI
   if ( nign )  
     cdoWarning("%d out of %d grid values are out of bounds and have been ignored (%s)", nign, nhists, func);
 }
+
 
 void hsetGetVarLevelPercentiles(FIELD *field, const HISTOGRAM_SET *hset, int varID, int levelID, int p)
 {

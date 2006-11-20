@@ -1,0 +1,30 @@
+@BeginModule
+@NewPage
+@Name      = EcaRr1
+@Title     = No. of wet days
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_rr1
+
+@BeginDescription
+Let @file{ifile} be a time series of daily precipitation amounts RR,
+then counted is the number of days where RR > 1 mm. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_rr1
+@Title     = No. of wet days
+@EndOperator
+
+
+@BeginExample
+To get the number of wet days for a time series of daily precipitation
+amounts, use:
+@BeginVerbatim
+   cdo eca_rr1 rrfile ofile
+@EndVerbatim
+@EndExample

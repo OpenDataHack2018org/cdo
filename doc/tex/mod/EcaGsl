@@ -1,0 +1,44 @@
+@BeginModule
+@Name      = EcaGsl
+@Title     = Growing season length
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_gsl
+
+@BeginDescription
+Let @file{ifile} be a time series of daily mean temperatures TG,
+then counted are the number of days between the first occurrence
+of at least nday consecutive days with TG > T and the first occurrence
+after 1 July of at least nday consecutive days with TG < T. The
+numbers nday and T are optional parameter with default nday = 6
+and T = 5° Celsius. Further output variables are the start and end
+dates of the growing season. Note that TG must be given in units of
+kelvin.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_gsl
+@Title     = Intra-period extreme temperature rang
+@Parameter = [nday] [T]
+@EndOperator
+
+
+@BeginParameter
+@Item = nday
+INTEGER  Number of consecutive days (default: nday = 6)
+@Item = T
+DOUBLE   Temperature threshold (° Celsius, default: T = 5° Celsius)
+@EndParameter
+
+
+@BeginExample
+To get the growing season length for a time series of daily
+mean temperatures, use:
+@BeginVerbatim
+   cdo eca_gsl tgfile ofile
+@EndVerbatim
+@EndExample

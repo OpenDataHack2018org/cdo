@@ -23,7 +23,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "dtypes.h"
-#include "eca.h"
+#include "ecacore.h"
 #include "ecautil.h"
 
 #define FIRST_VAR_ID 0

@@ -1,0 +1,33 @@
+@BeginModule
+@NewPage
+@Name      = EcaR99p
+@Title     = Percent of time RR > 99th percentile of daily precipitation amount (extremely wet days)
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_r99p
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily precipitation amounts RR,
+and @file{ifile2} be the 99th percentile RRn99 of daily precipitation
+amounts at wet days for any period used as reference. Then calculated
+is the percentage of wet days with RR > RRn99. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_r99p
+@Title     = Percent of time RR > 95th percentile of daily precipitation amount (extremely wet days)
+@EndOperator
+
+
+@BeginExample
+To compute the percentage of wet days where the daily precipitation
+amount is greater than the 99th percentile of the daily precipitation
+amount at wet days for a given reference period, use:
+@BeginVerbatim
+   cdo eca_r99p rrfile rrn99file ofile
+@EndVerbatim
+@EndExample

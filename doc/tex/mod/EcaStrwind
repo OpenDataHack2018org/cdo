@@ -1,0 +1,31 @@
+@BeginModule
+@NewPage
+@Name      = EcaStrwind
+@Title     = No. of strong wind days 
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_strwind
+
+@BeginDescription
+Let @file{ifile} be a time series of daily maximum wind speeds WX,
+then counted is the number of days where WX > V. The value of V
+corresponds to the wind speed at the Beaufort number indicated by
+the optional parameter bnum. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_strwind
+@Title     = No. of strong wind days 
+@Parameter = [bnum]
+@EndOperator
+
+
+@BeginParameter
+@Item = bnum
+INTEGER  Beaufort number, possible values are 6 (strong breeze), 9 (strong gale)
+         and 12 (hurricane). The default is bnum = 6.
+@EndParameter

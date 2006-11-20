@@ -1,0 +1,39 @@
+@BeginModule
+@NewPage
+@Name      = EcaSu
+@Title     = No. of summer days
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_su
+
+@BeginDescription
+Let @file{ifile} be a time series of daily maximum temperatures TX,
+then counted is the number of days where TX > T. The number T is
+an optional parameter with default T = 25° Celsius. Note that TX
+must be given in units of kelvin.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_su
+@Title     = No. of summer days
+@Parameter = [T]
+@EndOperator
+
+
+@BeginParameter
+@Item = T
+DOUBLE   Temperature threshold (° Celsius, default: T = 25° Celsius)
+@EndParameter
+
+
+@BeginExample
+To get the number of summer days for a time series of daily
+maximum temperatures, use:
+@BeginVerbatim
+   cdo eca_su txfile ofile
+@EndVerbatim
+@EndExample

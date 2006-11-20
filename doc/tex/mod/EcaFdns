@@ -1,0 +1,23 @@
+@BeginModule
+@NewPage
+@Name      = EcaFdns
+@Title     = No. of frost days without surface snow 
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_fdns
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily minimum temperatures TN
+and @file{ifile2} be a corresponding series of daily surface snow
+amounts. Then counted is the number of days where TN < 0° Celsius
+and the surface snow amount is less than 1 cm.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_fdns
+@Title     = No. of frost days without surface snow
+@EndOperator

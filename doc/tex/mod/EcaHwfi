@@ -1,0 +1,43 @@
+@BeginModule
+@NewPage
+@Name      = EcaHwfi
+@Title     = Warm-spell days
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_hwfi
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily mean temperatures TG, and 
+@file{ifile2} be the 90th percentile TGn90 of daily mean temperatures
+for any period used as reference. Then counted is the number of days
+where, in intervals of at least nday consecutive days, TG > TGn90. The
+number nday is an optional parameter with default nday = 6. A further
+output variable is the the number of warm-spell periods longer than or
+equal to nday days. Note that both TG and TGn90 must be given in the
+same units.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_hwfi
+@Title     = Heat wave duration index
+@Parameter = [nday]
+@EndOperator
+
+
+@BeginParameter
+@Item = nday
+INTEGER  Number of consecutive days (default: nday = 6)
+@EndParameter
+
+
+@BeginExample
+To compute the number of warm-spell days for a time series of
+daily mean temperatures, use:
+@BeginVerbatim
+   cdo eca_hwfi tgfile tgn90file ofile
+@EndVerbatim
+@EndExample

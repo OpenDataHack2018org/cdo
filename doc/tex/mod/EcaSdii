@@ -1,0 +1,31 @@
+@BeginModule
+@NewPage
+@Name      = EcaSdii
+@Title     = Simple daily intensity index
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_sdii
+
+@BeginDescription
+Let @file{ifile} be a time series of daily precipitation amounts RR,
+then the mean precipitation amount at wet days (RR > 1 mm) is written
+to @file{ofile}. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_sdii
+@Title     = Simple daily intensity index
+@EndOperator
+
+
+@BeginExample
+To get the daily intensity index for a time series of daily precipitation
+amounts, use:
+@BeginVerbatim
+   cdo eca_sdii rrfile ofile
+@EndVerbatim
+@EndExample

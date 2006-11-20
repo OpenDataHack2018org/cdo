@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2006 Brockmann Consult
+  Copyright (C) 2003-2006 Brockmann Consult
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -62,10 +62,11 @@
 
 #include "cdo.h"
 #include "cdo_int.h"
-#include "eca.h"
+#include "ecacore.h"
 #include "ecautil.h"
 
 
+#define TO_DEG_CELSIUS(x) ((x) - 273.15)
 #define TO_KELVIN(x) ((x) + 273.15)
 
 
@@ -76,7 +77,7 @@ static const char CSU_NAME[]         = "consecutive_summer_days";
 static const char CSU_LONGNAME[]     = "greatest number of consecutive summer days";
 
 static const char CWDI_NAME[]        = "cold_wave_duration_index";
-static const char CWDI_LONGNAME[]    = "number of days with Tmin more than %1.0f deg. below mean of reference period";
+static const char CWDI_LONGNAME[]    = "number of days with Tmin more than %1.0f degree Celsius below mean of reference period";
 static const char CWDI_NAME2[]       = "to_be_defined";
 static const char CWDI_LONGNAME2[]   = "to be defined";
 
@@ -103,7 +104,7 @@ static const char HD_NAME[]          = "heating_degree_days";
 static const char HD_LONGNAME[]      = "Heating degree days";
 
 static const char HWDI_NAME[]        = "heat_wave_duration_index";
-static const char HWDI_LONGNAME[]    = "number of days with Tmax more than %1.0f deg. above mean of reference period";
+static const char HWDI_LONGNAME[]    = "number of days with Tmax more than %1.0f degree Celsius above mean of reference period";
 static const char HWDI_NAME2[]       = "to_be_defined";
 static const char HWDI_LONGNAME2[]   = "to be defined";
 
@@ -218,7 +219,6 @@ static const char STRWIND3_LONGNAME2[] = "to be defined";
 
 void *EcaCfd(void *argument)
 {
-  static const char func[] = "EcaCfd";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -246,8 +246,6 @@ void *EcaCfd(void *argument)
 
 void *EcaCsu(void *argument)
 {
-  static const char func[] = "EcaCsu";
-  char *longname;
   double argT = 25.0;
   ECA_REQUEST_1 request;
   
@@ -255,11 +253,9 @@ void *EcaCsu(void *argument)
   cdoOperatorAdd("eca_csu", 0, 17, NULL);
 
   if ( operatorArgc() > 0 ) argT = atof(operatorArgv()[0]);
-  longname = (char *) malloc(strlen(CSU_LONGNAME) + 40);
-  sprintf(longname, CSU_LONGNAME);
 
   request.var1.name     = CSU_NAME;
-  request.var1.longname = longname;
+  request.var1.longname = CSU_LONGNAME;
   request.var1.units    = NULL;
   request.var1.f1       = farselgtc;
   request.var1.f1arg    = TO_KELVIN(argT);
@@ -272,8 +268,6 @@ void *EcaCsu(void *argument)
   request.var2.h3       = NULL;
   
   eca1(&request);
-  
-  free(longname);
   cdoFinish();
   
   return (0);
@@ -325,7 +319,6 @@ void *EcaCwdi(void *argument)
 
 void *EcaCwfi(void *argument)
 {
-  static const char func[] = "EcaCwfi";
   int argN = 6;
   ECA_REQUEST_2 request;
   
@@ -359,7 +352,6 @@ void *EcaCwfi(void *argument)
 
 void *EcaEtr(void *argument)
 {
-  static const char func[] = "EcaEtr";
   ECA_REQUEST_3 request;
   
   cdoInitialize(argument);
@@ -381,7 +373,6 @@ void *EcaEtr(void *argument)
 
 void *EcaFd(void *argument)
 {
-  static const char func[] = "EcaFd";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -409,14 +400,15 @@ void *EcaFd(void *argument)
 
 void *EcaGsl(void *argument)
 {
-  static const char func[] = "EcaGsl";
+  int argN = 6; 
   double argT = 5.0;
   ECA_REQUEST_4 request;
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_gsl", 0, 8, NULL);
   
-  if ( operatorArgc() > 0 ) argT = atof(operatorArgv()[0]);
+  if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
+  if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
   
   request.name      = GSL_NAME;
   request.longname  = GSL_LONGNAME;
@@ -431,7 +423,7 @@ void *EcaGsl(void *argument)
   request.s1arg     = TO_KELVIN(argT);
   request.s2        = farselltc;
   request.s2arg     = TO_KELVIN(argT);
-  request.consecutiveDays = 6;    
+  request.consecutiveDays = argN;    
    
   eca4(&request);
   cdoFinish();
@@ -442,7 +434,6 @@ void *EcaGsl(void *argument)
 
 void *EcaHd(void *argument)
 {
-  static const char func[] = "EcaHd";
   double argT1 = 17.0;
   double argT2 = 17.0;
   ECA_REQUEST_1 request;
@@ -453,10 +444,7 @@ void *EcaHd(void *argument)
   if ( operatorArgc() > 0 ) 
     {
       argT1 = atof(operatorArgv()[0]);
-      if ( DBL_IS_EQUAL(argT1, 20.0) )
-        argT2 = 15.0;
-      else
-        argT2 = argT1;
+      argT2 = argT1;
     }
   if ( operatorArgc() > 1 ) 
     argT2 = atof(operatorArgv()[1]);
@@ -464,7 +452,7 @@ void *EcaHd(void *argument)
   request.var1.name     = HD_NAME;
   request.var1.longname = HD_LONGNAME;
   request.var1.units    = NULL;
-  request.var1.f1       = farsellec; 
+  request.var1.f1       = farselltc; 
   request.var1.f1arg    = TO_KELVIN(argT2);
   request.var1.f2       = farsum;
   request.var1.f3       = NULL;
@@ -526,7 +514,6 @@ void *EcaHwdi(void *argument)
 
 void *EcaHwfi(void *argument)
 {
-  static const char func[] = "EcaHwfi";
   int argN = 6;
   ECA_REQUEST_2 request;
   
@@ -560,7 +547,6 @@ void *EcaHwfi(void *argument)
 
 void *EcaId(void *argument)
 {
-  static const char func[] = "EcaId";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -624,7 +610,6 @@ void *EcaSu(void *argument)
 
 void *EcaTg10p(void *argument)
 {
-  static const char func[] = "EcaTg10p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -650,7 +635,6 @@ void *EcaTg10p(void *argument)
 
 void *EcaTg90p(void *argument)
 {
-  static const char func[] = "EcaTg90p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -676,7 +660,6 @@ void *EcaTg90p(void *argument)
 
 void *EcaTn10p(void *argument)
 {
-  static const char func[] = "EcaTn10p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -702,7 +685,6 @@ void *EcaTn10p(void *argument)
 
 void *EcaTn90p(void *argument)
 {
-  static const char func[] = "EcaTn90p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -730,7 +712,7 @@ void *EcaTr(void *argument)
 {
   static const char func[] = "EcaTr";
   char *longname;
-  double argT = 20.0;
+  double argT = TO_KELVIN(20.0);
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -764,7 +746,6 @@ void *EcaTr(void *argument)
 
 void *EcaTx10p(void *argument)
 {
-  static const char func[] = "EcaTx10p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -790,7 +771,6 @@ void *EcaTx10p(void *argument)
 
 void *EcaTx90p(void *argument)
 {
-  static const char func[] = "EcaTx90p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -819,7 +799,6 @@ void *EcaTx90p(void *argument)
 
 void *EcaCdd(void *argument)
 {
-  static const char func[] = "EcaCdd";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -851,7 +830,6 @@ void *EcaCdd(void *argument)
 
 void *EcaCwd(void *argument)
 {
-  static const char func[] = "EcaCwd";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -883,7 +861,6 @@ void *EcaCwd(void *argument)
 
 void *EcaR10mm(void *argument)
 {
-  static const char func[] = "EcaR10mm";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -911,7 +888,6 @@ void *EcaR10mm(void *argument)
 
 void *EcaR20mm(void *argument)
 {
-  static const char func[] = "EcaR20mm";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -939,7 +915,6 @@ void *EcaR20mm(void *argument)
 
 void *EcaR75p(void *argument)
 {
-  static const char func[] = "EcaR75p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -966,7 +941,6 @@ void *EcaR75p(void *argument)
 
 void *EcaR75ptot(void *argument)
 {
-  static const char func[] = "EcaR75ptot";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -993,7 +967,6 @@ void *EcaR75ptot(void *argument)
 
 void *EcaR90p(void *argument)
 {
-  static const char func[] = "EcaR90p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1020,7 +993,6 @@ void *EcaR90p(void *argument)
 
 void *EcaR90ptot(void *argument)
 {
-  static const char func[] = "EcaR90ptot";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1047,7 +1019,6 @@ void *EcaR90ptot(void *argument)
 
 void *EcaR95p(void *argument)
 {
-  static const char func[] = "EcaR95p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1074,7 +1045,6 @@ void *EcaR95p(void *argument)
 
 void *EcaR95ptot(void *argument)
 {
-  static const char func[] = "EcaR95ptot";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1101,7 +1071,6 @@ void *EcaR95ptot(void *argument)
 
 void *EcaR99p(void *argument)
 {
-  static const char func[] = "EcaR99p";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1128,7 +1097,6 @@ void *EcaR99p(void *argument)
 
 void *EcaR99ptot(void *argument)
 {
-  static const char func[] = "EcaR99ptot";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1155,7 +1123,6 @@ void *EcaR99ptot(void *argument)
 
 void *EcaRr1(void *argument)
 {
-  static const char func[] = "EcaRr1";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -1183,12 +1150,11 @@ void *EcaRr1(void *argument)
 
 void *EcaRx1day(void *argument)
 {
-  static const char func[] = "EcaRx1day";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  if ( operatorArgc() > 0 && !strcmp("m", operatorArgv()[0]) )
-    cdoOperatorAdd("eca_rx1day", 0, 6,  NULL); /* monthly */
+  if ( operatorArgc() > 0 && 'm' == operatorArgv()[0][0] )
+    cdoOperatorAdd("eca_rx1day", 0, 6,  NULL); /* monthly mode */
   else 
     cdoOperatorAdd("eca_rx1day", 0, 17, NULL);
 
@@ -1213,7 +1179,6 @@ void *EcaRx1day(void *argument)
 
 void *EcaRx5day(void *argument)
 {
-  static const char func[] = "EcaRx5day";
   double argX = 50.0;
   ECA_REQUEST_1 request;
   
@@ -1246,7 +1211,6 @@ void *EcaRx5day(void *argument)
 
 void *EcaSdii(void *argument)
 {
-  static const char func[] = "EcaSdii";
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -1274,7 +1238,6 @@ void *EcaSdii(void *argument)
 
 void *EcaFdns(void *argument)
 {
-  static const char func[] = "EcaFdns";
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
@@ -1302,9 +1265,9 @@ void *EcaFdns(void *argument)
 
 void *EcaStrwind(void *argument)
 {
-  static const char func[] = "EcaStrwind";
   const char *name, *longname, *name2, *longname2;
   double maxWind;
+  int beaufort = 0;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -1315,25 +1278,35 @@ void *EcaStrwind(void *argument)
   name2     = STRWIND_NAME2;
   longname2 = STRWIND_LONGNAME2;
   maxWind   = 10.5; /* strong breeze */
-
+  
   if ( operatorArgc() > 0 )
+    beaufort = atoi(operatorArgv()[0]);
+    
+  switch (beaufort)
     {
-      if (!strcmp("sg", operatorArgv()[0]) )
-        {
-          name      = STRWIND2_NAME;
-          longname  = STRWIND2_LONGNAME;
-          name2     = STRWIND2_NAME2;
-          longname2 = STRWIND3_LONGNAME2;
-          maxWind   = 20.5; /* strong gale */
-        }	
-      else if (!strcmp("h", operatorArgv()[0]) )
-        {
-          name      = STRWIND3_NAME;
-          longname  = STRWIND3_LONGNAME;
-          name2     = STRWIND3_NAME2;
-          longname2 = STRWIND3_LONGNAME2;
-          maxWind   = 32.5; /* hurricane */	
-        }
+      case 9:  /* strong gale */
+        name      = STRWIND2_NAME;
+        longname  = STRWIND2_LONGNAME;
+        name2     = STRWIND2_NAME2;
+        longname2 = STRWIND3_LONGNAME2;
+        maxWind   = 20.5;
+	break;
+	
+      case 12: /* hurricane */
+        name      = STRWIND3_NAME;
+        longname  = STRWIND3_LONGNAME;
+        name2     = STRWIND3_NAME2;
+        longname2 = STRWIND3_LONGNAME2;
+        maxWind   = 32.5;
+        break;
+        	
+      default: /* strong breeze */
+        name      = STRWIND_NAME;
+        longname  = STRWIND_LONGNAME;
+        name2     = STRWIND_NAME2;
+        longname2 = STRWIND_LONGNAME2;
+        maxWind   = 10.5;
+	break;
     }
       
   request.var1.name     = name;

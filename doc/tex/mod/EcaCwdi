@@ -1,0 +1,45 @@
+@BeginModule
+@NewPage
+@Name      = EcaCwdi
+@Title     = Cold wave duration index
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_cwdi
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily minimum temperatures TN,
+and let @file{ifile2} be the mean TNnorm of daily minimum temperatures
+for any period used as reference. Then counted is the number of days
+where, in intervals of at least nday consecutive days, TN < TNnorm - T.
+The numbers nday and T are optional parameters with default nday = 6
+and T = 5° Celsius. A further output variable is the the number of cold
+waves longer than or equal to nday days. Note that both TN and TNnorm
+must be given in the same units.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_cwdi
+@Title     = Cold wave duration index
+@Parameter = [nday] [T]
+@EndOperator
+
+
+@BeginParameter
+@Item = nday
+INTEGER  Number of consecutive days (default: nday = 6)
+@Item = T
+FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)
+@EndParameter
+
+
+@BeginExample
+To compute the cold wave duration index for a time series of daily
+minimum temperatures, use:
+@BeginVerbatim
+   cdo eca_cwdi tnfile tnnormfile ofile
+@EndVerbatim
+@EndExample

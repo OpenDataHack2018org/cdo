@@ -265,9 +265,9 @@ void cdologs(int noper, double cputime, off_t nvals)
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
   int status;
-  int yyyymm = 0;
+  int date = 0;
   int ncdo = 0;
-  int yyyymm0 = 0, ncdo0, noper0;
+  int date0 = 0, ncdo0, noper0;
   double cputime0;
   INT64 nvals0;
   unsigned char logbuf[LOGSIZE];
@@ -288,8 +288,8 @@ void cdologs(int noper, double cputime, off_t nvals)
   if ( date_and_time_in_sec != -1 )
     {
       date_and_time = localtime(&date_and_time_in_sec);
-      (void) strftime(timestr, sizeof(timestr), "%Y%m", date_and_time);
-      yyyymm = atoi(timestr);
+      (void) strftime(timestr, sizeof(timestr), "%Y%m%d", date_and_time);
+      date = atoi(timestr);
     }
 
   errno = 0;
@@ -320,13 +320,13 @@ void cdologs(int noper, double cputime, off_t nvals)
       status = (int) lseek(logfileno, (off_t) (bufsize-logsize), SEEK_SET);
       status = (int) read(logfileno, logbuf, logsize);
 
-      yyyymm0  = GET_UINT4(logdate);
+      date0    = GET_UINT4(logdate);
       ncdo0    = GET_UINT4(logncdo);
       noper0   = GET_UINT4(lognoper);
       cputime0 = (double) ibm2flt(logctime);
       nvals0   = GET_UINT8(lognvals);
 
-      if ( yyyymm == yyyymm0 )
+      if ( date == date0 )
 	{
 	  ncdo = ncdo0;
 	  noper += noper0;
@@ -336,11 +336,11 @@ void cdologs(int noper, double cputime, off_t nvals)
 	}
     }
 
-  if ( yyyymm >= yyyymm0 )
+  if ( date >= date0 )
     {
       ncdo++;
 
-      PUT_UINT4(logdate, yyyymm);
+      PUT_UINT4(logdate, date);
       PUT_UINT4(logncdo, ncdo);
       PUT_UINT4(lognoper, noper);
       flt2ibm((float)cputime, logctime); 
@@ -371,7 +371,7 @@ void dumplogs(const char *logfilename)
   static const char func[] = "dumplogs";
   int  logfileno;
   int status;
-  int yyyymm0 = 0, ncdo0, noper0;
+  int date0 = 0, ncdo0, noper0;
   int nlogs;
   int i;
   double cputime0;
@@ -412,16 +412,16 @@ void dumplogs(const char *logfilename)
       for ( i = 0; i < nlogs; i++ )
 	{
 	  memcpy(logbuf, &buffer[i*logsize], logsize);
-	  yyyymm0  = GET_UINT4(logdate);
+	  date0    = GET_UINT4(logdate);
 	  ncdo0    = GET_UINT4(logncdo);
 	  noper0   = GET_UINT4(lognoper);
 	  cputime0 = (double) ibm2flt(logctime);
 	  nvals0   = GET_UINT8(lognvals);
 
 	  if ( sizeof(INT64) > sizeof(long) )
-	    fprintf(stdout, "%6d %10d %10d %20.2f %19lld\n", yyyymm0, ncdo0, noper0, cputime0, (long long)nvals0);
+	    fprintf(stdout, "%8d %10d %10d %20.2f %19lld\n", date0, ncdo0, noper0, cputime0, (long long)nvals0);
 	  else
-	    fprintf(stdout, "%6d %10d %10d %20.2f %19ld\n", yyyymm0, ncdo0, noper0, cputime0, (long)nvals0);
+	    fprintf(stdout, "%8d %10d %10d %20.2f %19ld\n", date0, ncdo0, noper0, cputime0, (long)nvals0);
 	}
 
       free(buffer);

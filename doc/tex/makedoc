@@ -252,6 +252,7 @@ while (<MOFILE>) {
     foreach $tag (@hkeys) {
       $ntag = $tag;
       $ntag =~ s/^-//;
+      $ntag =~ s/_/\\_/;
       print TRFILE "\\index{$ntag}\n";
     }
     print TRFILE "\\label{$modname}\n";
@@ -358,7 +359,7 @@ while (<MOFILE>) {
       $lblock = 0;
       $opname = "";
       foreach $tag (@doclines) {
-	($kword, $value) = split("_", $tag);
+	($kword, $value) = split("_", $tag,2);
 	$kword = uc($kword);
 	if ( $lblock == 0 ) {
 	  if ( "$kword" eq "\@BEGINOPERATOR" ) {
@@ -445,7 +446,9 @@ while (<MOFILE>) {
 	$parameter = @oper_parameter[$i];
 	printf HELPFILE ("    \"    %s%s  %s\",\n",
 			 $operator, $parameter, $marguments);
-	print TRFILE "\\hspace*{8mm}{\\bf $operator}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
+	$operatorx = $operator;
+	$operatorx =~ s/_/\\_/;
+	print TRFILE "\\hspace*{8mm}{\\bf $operatorx}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
       }
     } else {
       $parameter = @oper_parameter[0];
@@ -500,7 +503,7 @@ while (<MOFILE>) {
       $lblock = 0;
       $opname = "";
       foreach $tag (@doclines) {
-	($kword, $value) = split("_", $tag);
+	($kword, $value) = split("_", $tag, 2);
 	$kword = uc($kword);
 	if ( $lblock == 0 ) {
 	  if ( "$kword" eq "\@BEGINOPERATOR" ) {
@@ -535,7 +538,9 @@ while (<MOFILE>) {
 	if ( $xopercnt == 1 ) {
 	  print TRFILE "\\begin{defalist}{\\bf $maxitem \\ }\n";
 	}
-	print TRFILE "\\item[{\\bf $operator}\\ \\ \\hfill]\n";
+	$operatorx = $operator;
+	$operatorx =~ s/_/\\_/;
+	print TRFILE "\\item[{\\bf $operatorx}\\ \\ \\hfill]\n";
 	print TRFILE "$otitle \\\\\n";
       }
 
@@ -562,16 +567,18 @@ while (<MOFILE>) {
 	  print CDOHTML "</tr>\n";
 	}
 
- 	print TCFILE "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operator}{$operator}} ";
+	$operatorx = $operator;
+	$operatorx =~ s/_/\\_/;
+ 	print TCFILE "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
  	print TCFILE "& $otitle ";
  	print TCFILE "\\\\ \n";
 
- 	print TRLIST "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operator}{$operator}} ";
+ 	print TRLIST "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
  	print TRLIST "& $otitle ";
  	print TRLIST "\\\\ \n";
 
 	if ( $norefoper == 0 ) {
-	  print TRCARD "\\makebox[$len2][l]{\\bf {$operator}} ";
+	  print TRCARD "\\makebox[$len2][l]{\\bf {$operatorx}} ";
 	  print TRCARD "& \\makebox[$len3][l]{$otitle} ";
 	  print TRCARD "\\\\ \n";
 	}
@@ -884,8 +891,10 @@ while (<MOFILE>) {
       $marguments =~ s/ifile/in/og;
       $marguments =~ s/ofile/out/og;
     }
+    $opernamex = $opername;
+    $opernamex =~ s/_/\\_/;
     if ( $xopercnt == 1 ) {
-      print TRCARD "& \\hspace*{0mm}{\\bf $opername}{\\sl $operpara} \ {\\tt $marguments} ";
+      print TRCARD "& \\hspace*{0mm}{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments} ";
     } else {
       print TRCARD "& \\hspace*{0mm}{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments} ";
     }

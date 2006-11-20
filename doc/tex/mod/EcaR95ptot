@@ -1,0 +1,24 @@
+@BeginModule
+@NewPage
+@Name      = EcaR95ptot
+@Title     = Percent of annual total precipitation due to events with RR > 95th percentile of daily precipitation amount (very wet days)
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_r95ptot
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily precipitation amounts RR,
+and @file{ifile2} be the 95th percentile RRn95 of daily precipitation
+amounts at wet days for any period used as reference. Then calculated
+is the ratio of the precipitation sum at wet days with RR > RRn95
+to the total precipitation sum. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_r95ptot
+@Title     = Percent of annual total precipitation due to events with RR > 95th percentile of daily precipitation amount (very wet days)
+@EndOperator

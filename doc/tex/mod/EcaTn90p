@@ -1,0 +1,34 @@
+@BeginModule
+@NewPage
+@Name      = EcaTn90p
+@Title     = Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile1 ifile2 ofile
+@Operators = eca_tn90p
+
+@BeginDescription
+Let @file{ifile1} be a time series of daily minimum temperatures TN, and
+@file{ifile2} be the 90th percentile TNn90 of daily minimum temperatures
+for any period used as reference. Then calculated is the percentage
+of time where TN > TNn90. Note that both TN and TNn90 must be given
+in the same units.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile1}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_tn90p
+@Title     = Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)
+@EndOperator
+
+
+@BeginExample
+To compute the percentage of time where the daily minimum temperature
+is greater than the 90th percentile of the daily minimum temperature for
+a given reference period, use:
+@BeginVerbatim
+   cdo eca_tn90p tnfile tnn90file ofile
+@EndVerbatim
+@EndExample

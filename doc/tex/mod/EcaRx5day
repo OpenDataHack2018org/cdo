@@ -1,0 +1,43 @@
+@BeginModule
+@NewPage
+@Name      = EcaRx5day
+@Title     = Maximum 5-day precipitation total
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_rx5day
+
+@BeginDescription
+Let @file{ifile} be a time series of 5-day precipitation totals RR,
+then the maximum of RR is written to @file{ofile}. A further output
+variable is the number of 5 day period with precipitation totals
+greater than x mm, where x is an optional parameter with default
+x = 50 mm.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_rx5day
+@Title     = Maximum 5-day precipitation total
+@Parameter = [x]
+@EndOperator
+
+
+@BeginParameter
+@Item = x
+DOUBLE   Precipitation threshold (mm, default: x = 50 mm)
+@EndParameter
+
+
+@BeginExample
+To get the maximum of a time series of 5-day precipitation totals, use:
+@BeginVerbatim
+   cdo eca_rx5day rrfile ofile
+@EndVerbatim
+Apart from metadata information, the above operation yields the same as:
+@BeginVerbatim
+   cdo timmax rrfile ofile
+@EndVerbatim
+@EndExample

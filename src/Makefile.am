@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 #
-bin_PROGRAMS = cdo
+bin_PROGRAMS = cdo              \
+               cdotest
 #
 cdo_SOURCES = Arith.c		\
 	      Arithc.c 		\
@@ -176,16 +177,23 @@ cdo_SOURCES = Arith.c		\
               percentiles.h	\
               nth_element.c	\
               nth_element.h	\
-	      eca.h		\
-	      eca.c		\
+	      ecacore.h		\
+	      ecacore.c		\
 	      ecautil.h		\
 	      ecautil.c		\
-	      EcaOperators.c	\
+	      EcaIndices.c	\
 	      Hi.c		\
 	      Tchill.c          \
 	      cdi.h
 #
 cdo_LDADD = $(LDFLAGS) -lm
+#
+cdotest_LDADD = $(LDFLAGS) -lm
+#
+cdotest_SOURCES = cdi.h 	\
+		  cdilib.c 	\
+		  cdo_int.h 	\
+		  cdotest.c
 #
 userlog.o: userlog.c
 	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c `test -f '$<' || echo '$(srcdir)/'`$<

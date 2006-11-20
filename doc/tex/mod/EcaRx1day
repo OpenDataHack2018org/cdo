@@ -1,0 +1,49 @@
+@BeginModule
+@NewPage
+@Name      = EcaRx1day
+@Title     = Maximum daily precipitation
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_rx1day
+
+@BeginDescription
+Let @file{ifile} be a time series of daily precipitation amounts RR,
+then the maximum of RR is written to @file{ofile}. If the optional
+parameter mode is set to 'm', then maximum daily precipitation
+amounts are determined for each month. 
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_rx1day
+@Title     = Maximum daily precipitation
+@Parameter = [mode]
+@EndOperator
+
+
+@BeginParameter
+@Item = T
+CHAR     Operation mode (optional). If mode = 'm' then maximum daily
+         precipitation amounts are determined for each month
+@EndParameter
+
+
+@BeginExample
+To get the maximum of a time series of daily precipitation amounts, use:
+@BeginVerbatim
+   cdo eca_rx1day rrfile ofile
+@EndVerbatim
+If you are interested in the maximum daily precipitation for each month,
+use:
+@BeginVerbatim
+   cdo eca_rx1day,m rrfile ofile
+@EndVerbatim
+Apart from metadata information, both operations yield the same as:
+@BeginVerbatim
+   cdo timmax rrfile ofile
+   cdo monmax rrfile ofile
+@EndVerbatim
+@EndExample
