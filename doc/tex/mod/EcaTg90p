@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaTg90p
 @Title     = Percentage of time TG > 90th percentile of daily mean temperature (warm days)
 @Section   = ECA indices

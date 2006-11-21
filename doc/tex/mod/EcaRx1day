@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaRx1day
 @Title     = Maximum daily precipitation
 @Section   = ECA indices
@@ -26,8 +25,7 @@ the last contributing time step in @file{ifile}.
 
 @BeginParameter
 @Item = T
-CHAR     Operation mode (optional). If mode = 'm' then maximum daily
-         precipitation amounts are determined for each month
+STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month
 @EndParameter
 
 

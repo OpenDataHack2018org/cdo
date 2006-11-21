@@ -31,7 +31,7 @@ the last contributing time step in @file{ifile}.
 @Item = nday
 INTEGER  Number of consecutive days (default: nday = 6)
 @Item = T
-DOUBLE   Temperature threshold (° Celsius, default: T = 5° Celsius)
+FLOAT    Temperature threshold (° Celsius, default: T = 5° Celsius)
 @EndParameter
 
 

@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaR99ptot
 @Title     = Percent of annual total precipitation due to events with RR > 99th percentile of daily precipitation amount (extremely wet days)
 @Section   = ECA indices

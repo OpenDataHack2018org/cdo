@@ -27,7 +27,7 @@ the last contributing time step in @file{ifile}.
 
 @BeginParameter
 @Item = x
-DOUBLE   Precipitation threshold (mm, default: x = 50 mm)
+FLOAT   Precipitation threshold (mm, default: x = 50 mm)
 @EndParameter
 
 

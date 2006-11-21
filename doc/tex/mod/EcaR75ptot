@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaR75ptot
 @Title     = Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)
 @Section   = ECA indices

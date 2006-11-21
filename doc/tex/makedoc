@@ -247,7 +247,10 @@ while (<MOFILE>) {
        print TRFILE "\n\\newpage\n";
     }
     $modname = uc($mname);
-    print TRFILE "\\subsection{$modname - $mtitle}\n";
+    $mtitlem = $mtitle;
+    $mtitlem =~ s/</\$<\$/og;
+    $mtitlem =~ s/>/\$>\$/og;
+    print TRFILE "\\subsection{$modname - $mtitlem}\n";
 #    print TRFILE "\\index{$modname}\n";
     foreach $tag (@hkeys) {
       $ntag = $tag;
@@ -573,8 +576,11 @@ while (<MOFILE>) {
  	print TCFILE "& $otitle ";
  	print TCFILE "\\\\ \n";
 
+	$otitlem = $otitle;
+	$otitlem =~ s/</\$<\$/og;
+	$otitlem =~ s/>/\$>\$/og;
  	print TRLIST "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
- 	print TRLIST "& $otitle ";
+ 	print TRLIST "& $otitlem ";
  	print TRLIST "\\\\ \n";
 
 	if ( $norefoper == 0 ) {

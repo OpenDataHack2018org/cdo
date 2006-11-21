@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaSu
 @Title     = No. of summer days
 @Section   = ECA indices
@@ -26,7 +25,7 @@ the last contributing time step in @file{ifile}.
 
 @BeginParameter
 @Item = T
-DOUBLE   Temperature threshold (° Celsius, default: T = 25° Celsius)
+FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)
 @EndParameter
 
 

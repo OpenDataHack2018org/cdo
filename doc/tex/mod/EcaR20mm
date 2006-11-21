@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaR20mm
 @Title     = No. of days with precipitation > 20 mm
 @Section   = ECA indices

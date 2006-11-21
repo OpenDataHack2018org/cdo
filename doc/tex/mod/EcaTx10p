@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaTx10p
 @Title     = Percentage of time TX < 10th percentile of daily maximum temperature (cold days)
 @Section   = ECA indices

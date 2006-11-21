@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaTn90p
 @Title     = Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)
 @Section   = ECA indices

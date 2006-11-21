@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaSdii
 @Title     = Simple daily intensity index
 @Section   = ECA indices

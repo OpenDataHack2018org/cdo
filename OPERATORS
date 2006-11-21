@@ -305,6 +305,46 @@ Operator catalog:
       Ydrunstat  ydrunstd        Multi-year daily running standard deviation
       Ydrunpctl  ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
+   ECA indices
+-------------------------------------------------------------
+      EcaCdd     eca_cdd         Maximum no. of consecutive dry days
+      EcaCfd     eca_cfd         Maximum no. of consecutive frost days
+      EcaCsu     eca_csu         Maximum no. of consecutive summer days
+      EcaCwd     eca_cwd         Maximum no. of consecutive wet days
+      EcaCwdi    eca_cwdi        Cold wave duration index
+      EcaCwfi    eca_cwfi        Cold wave duration index
+      EcaEtr     eca_etr         Intra-period extreme temperature range
+      EcaFd      eca_fd          No. of frost days
+      EcaFdns    eca_fdns        No. of frost days without surface snow
+      EcaGsl     eca_gsl         Intra-period extreme temperature rang
+      EcaHd      eca_hd          Heating degree days
+      EcaHwdi    eca_hwdi        Heat wave duration index
+      EcaHwfi    eca_hwfi        Heat wave duration index
+      EcaId      eca_id          No. of ice days
+      EcaR10mm   eca_r10mm       No. of days with precipitation > 10 mm
+      EcaR20mm   eca_r20mm       No. of days with precipitation > 20 mm
+      EcaR75p    eca_r75p        Percent of time RR > 75th percentile of daily precipitation amount (moderate wet days)
+      EcaR75ptot eca_r75ptot     Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)
+      EcaR90p    eca_r90p        Percent of time RR > 90th percentile of daily precipitation amount
+      EcaR90ptot eca_r90ptot     Percent of annual total precipitation due to events with RR > 90th percentile of daily precipitation amount
+      EcaR95p    eca_r95p        Percent of time RR > 95th percentile of daily precipitation amount (very wet days)
+      EcaR95ptot eca_r95ptot     Percent of annual total precipitation due to events with RR > 95th percentile of daily precipitation amount (very wet days)
+      EcaR99p    eca_r99p        Percent of time RR > 95th percentile of daily precipitation amount (extremely wet days)
+      EcaR99ptot eca_r99ptot     Percent of annual total precipitation due to events with RR > 99th percentile of daily precipitation amount (extremely wet days)
+      EcaRr1     eca_rr1         No. of wet days
+      EcaRx1day  eca_rx1day      Maximum daily precipitation
+      EcaRx5day  eca_rx5day      Maximum 5-day precipitation total
+      EcaSdii    eca_sdii        Simple daily intensity index
+      EcaStrwind eca_strwind     No. of strong wind days
+      EcaSu      eca_su          No. of summer days
+      EcaTg10p   eca_tg10p       Percentage of time TG < 10th percentile of daily mean temperature (cold days)
+      EcaTg90p   eca_tg90p       Percentage of time TG > 90th percentile of daily mean temperature (warm days)
+      EcaTn10p   eca_tn10p       Percentage of time TN < 10th percentile of daily minimum temperature (cold nights)
+      EcaTn90p   eca_tn90p       Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)
+      EcaTr      eca_tr          No. of tropical nights
+      EcaTx10p   eca_tx10p       Percentage of time TX < 10th percentile of daily maximum temperature (cold days)
+      EcaTx90p   eca_tx90p       Percentage of time TX > 90th percentile of daily maximum temperature (warm days)
+-------------------------------------------------------------
    Regression
 -------------------------------------------------------------
       Detrend    detrend         Detrend
@@ -362,3 +402,5 @@ Operator catalog:
       Vardup     varmul          Multiply variables
       Rotuv      rotuvb          Backward rotation
       Mastrfu    mastrfu         Mass stream function
+      Hi         hi              Humidity index
+      Tchill     tchill          Windchill temperature

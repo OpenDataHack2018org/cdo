@@ -26,6 +26,5 @@ the last contributing time step in @file{ifile}.
 
 @BeginParameter
 @Item = bnum
-INTEGER  Beaufort number, possible values are 6 (strong breeze), 9 (strong gale)
-         and 12 (hurricane). The default is bnum = 6.
+INTEGER  Beaufort number, possible values are 6 (strong breeze), 9 (strong gale) and 12 (hurricane). The default is bnum = 6.
 @EndParameter

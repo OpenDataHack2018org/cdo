@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = EcaR90ptot
 @Title     = Percent of annual total precipitation due to events with RR > 90th percentile of daily precipitation amount
 @Section   = ECA indices

@@ -20,13 +20,13 @@ the last contributing time step in @file{ifile}.
 
 @BeginOperator_eca_csu
 @Title     = Maximum no. of consecutive summer days
-@Parameter = T
+@Parameter = [T]
 @EndOperator
 
 
 @BeginParameter
 @Item = T
-FLOAT   Temperature threshold in Celsius
+FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)
 @EndParameter
 
 

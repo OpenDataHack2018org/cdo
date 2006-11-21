@@ -27,9 +27,9 @@ the last contributing time step in @file{ifile}.
 
 @BeginParameter
 @Item = T1
-DOUBLE   Temperature limit (° Celsius, default: T1 = 17° Celsius)
+FLOAT   Temperature limit (° Celsius, default: T1 = 17° Celsius)
 @Item = T2
-DOUBLE   Temperature limit (° Celsius, default: T2 = T1)
+FLOAT   Temperature limit (° Celsius, default: T2 = T1)
 @EndParameter
 
 
