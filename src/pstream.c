@@ -1116,6 +1116,7 @@ void cdoFinish(void)
       int mu[] = {'B', 'K', 'M', 'G', 'T'};
       int muindex = 0;
       long memmax;
+      extern int cdoLogOff;
 
       memmax = memTotal();
       while ( memmax > 9999 )
@@ -1130,8 +1131,11 @@ void cdoFinish(void)
       processEndTime(&p_usertime, &p_systime);
       p_cputime  = p_usertime + p_systime;
 
-      cdologs(processNums(), p_cputime, processInqNvals()); 
-      cdolog(processInqPrompt(), p_cputime); 
+      if ( cdoLogOff == 0 )
+	{
+	  cdologs(processNums(), p_cputime, processInqNvals()); 
+	  cdolog(processInqPrompt(), p_cputime); 
+	}
     }
 
   if ( cdoBenchmark )

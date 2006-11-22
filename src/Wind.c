@@ -187,7 +187,12 @@ void *Wind(void *argument)
 	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
 	  vlistDefVarCode(vlistID2, varID1, 155);
 	  vlistDefVarCode(vlistID2, varID2, 138);
-	  /* define varname also !!! */
+	  vlistDefVarName(vlistID2, varID1, "sd");
+	  vlistDefVarName(vlistID2, varID2, "svo");
+	  vlistDefVarLongname(vlistID2, varID1, "divergence");
+	  vlistDefVarLongname(vlistID2, varID2, "vorticity");
+	  vlistDefVarUnits(vlistID2, varID1, "1/s");
+	  vlistDefVarUnits(vlistID2, varID2, "1/s");
 
 	  nlon = gridInqXsize(gridID1);
 	  nlat = gridInqYsize(gridID1);
@@ -233,7 +238,12 @@ void *Wind(void *argument)
 	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
 	  vlistDefVarCode(vlistID2, varID1, 131);
 	  vlistDefVarCode(vlistID2, varID2, 132);
-	  /* define varname also !!! */
+	  vlistDefVarName(vlistID2, varID1, "u");
+	  vlistDefVarName(vlistID2, varID2, "v");
+	  vlistDefVarLongname(vlistID2, varID1, "u-velocity");
+	  vlistDefVarLongname(vlistID2, varID2, "v-velocity");
+	  vlistDefVarUnits(vlistID2, varID1, "m/s");
+	  vlistDefVarUnits(vlistID2, varID2, "m/s");
 
 	  ntr  = gridInqTrunc(gridID1);
 	  nlon = gridInqXsize(gridID2);
@@ -260,7 +270,12 @@ void *Wind(void *argument)
 
 	  vlistDefVarCode(vlistID2, varID1, 149);
 	  vlistDefVarCode(vlistID2, varID2, 148);
-	  /* define varname aso. !!! */
+	  vlistDefVarName(vlistID2, varID1, "velopot");
+	  vlistDefVarName(vlistID2, varID2, "stream");
+	  vlistDefVarLongname(vlistID2, varID1, "velocity potential");
+	  vlistDefVarLongname(vlistID2, varID2, "streamfunction");
+	  vlistDefVarUnits(vlistID2, varID1, "m^2/s");
+	  vlistDefVarUnits(vlistID2, varID2, "m^2/s");
 
 	  ntr  = gridInqTrunc(gridID1);
 	  gridID2 = gridID1;

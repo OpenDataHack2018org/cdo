@@ -5,13 +5,22 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = showcode showvar showstdname showlevel showyear showmon showdate showtime
+@Operators = showformat showcode showvar showstdname showlevel showyear showmon showdate showtime
 
 @BeginDescription
 This module prints, according to the actual operator,
-the variables, levels or times of the input dataset.
+the format, variables, levels or times of the input dataset.
 @EndDescription
 @EndModule
+
+
+@BeginOperator_showformat
+
+@Title     = Show file format
+@BeginDescription
+Prints the file format of the input dataset.
+@EndDescription
+@EndOperator
 
 
 @BeginOperator_showcode

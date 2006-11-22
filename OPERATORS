@@ -21,6 +21,7 @@ Operator catalog:
       Ninfo      nmon            Number of months
       Ninfo      ndate           Number of dates
       Ninfo      ntime           Number of time steps
+      Showinfo   showformat      Show file format
       Showinfo   showcode        Show codes
       Showinfo   showvar         Show variable names
       Showinfo   showstdname     Show standard names

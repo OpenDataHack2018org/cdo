@@ -65,6 +65,7 @@ int cdoDefaultTimeType  = CDI_UNDEFID;
 int cdoDefaultByteorder = CDI_UNDEFID;
 int cdoDefaultTableID   = CDI_UNDEFID;
 
+int cdoLogOff      = FALSE;
 int cdoSilentMode  = FALSE;
 int cdoRegulargrid = FALSE;
 int cdoBenchmark   = FALSE;
@@ -116,9 +117,6 @@ static void version(void)
 #endif
   cdiPrintVersion();
   fprintf(stderr, "\n");
-/*
-  1.00   XX XXX 2006 : initial version
-*/
 }
 
 
@@ -187,49 +185,17 @@ static void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
     printf("No help available for this operator!\n");
   else
     {
-      /*
-      if ( xoperator )
+      int lprint;
+      while ( *phelp )
 	{
-	  int lopdoc;
-	  lopdoc = FALSE;
-	  while ( *phelp )
-	    {
-	      if ( lopdoc == FALSE )
-		if ( strncmp(*phelp, "@Begin_", 7) == 0 )
-		  {
-		    if ( strcmp((*phelp)+7, xoperator) == 0 ) lopdoc = TRUE;
-		    phelp++;
-		    continue;
-		  }
+	  lprint = TRUE;
+	  if ( *phelp[0] == '\0' )
+	    if ( *(phelp+1) )
+	      if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
+	  
+	  if ( lprint ) printf("%s\n", *phelp);
 
-	      if ( lopdoc == TRUE )
-		{
-		  if ( strncmp(*phelp, "@End_", 5) == 0 ) break;
-
-		  printf("%s\n", *phelp);
-		}
-
-	      phelp++;
-	    }
-
-	  if ( lopdoc == FALSE )
-	    printf("%s: No help available!\n", xoperator);
-	}
-      else
-      */
-	{
-	  int lprint;
-	  while ( *phelp )
-	    {
-	      lprint = TRUE;
-	      if ( *phelp[0] == '\0' )
-		if ( *(phelp+1) )
-		  if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
-
-	      if ( lprint ) printf("%s\n", *phelp);
-
-	      phelp++;
-	    }
+	  phelp++;
 	}
     }
 }
@@ -604,6 +570,19 @@ int main(int argc, char *argv[])
 	  break;
 	}
     }
+
+  {
+      char *envstr;
+      envstr = getenv("CDO_LOG_OFF");
+      if ( envstr )
+	{
+	  if ( atoi(envstr) == 1 )
+	    {
+	      cdoLogOff = TRUE;
+	      fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
+	    }
+	}
+  }
 
   if ( Debug || Version ) version();
 

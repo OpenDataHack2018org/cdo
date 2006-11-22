@@ -4,6 +4,7 @@
 	* New operator: showformat (Showinfo) [request: Helmuth Haak]
 	* remap: initialize links.option (bug fix) [report: Luis Kornblueh]
 	* update date/time conversion from udunits (bug fix) [report: Oliver Krueger]
+	* Wind.c: define name, longname and units [report: Chiara Cagnazzo]
 	* input: bug fix
 	* pstreamFindID: check pstreamptr->name before use (bug fix)
 	* operatorInqModID: speed up
