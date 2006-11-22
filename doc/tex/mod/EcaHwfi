@@ -23,7 +23,7 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_hwfi
-@Title     = Heat wave duration index
+@Title     = Warm-spell days
 @Parameter = [nday]
 @EndOperator
 

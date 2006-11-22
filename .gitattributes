@@ -140,6 +140,7 @@ doc/tex/mod/Selpctl -text
 doc/tex/mod/Selstat -text
 doc/tex/mod/Seltime -text
 doc/tex/mod/Set -text
+doc/tex/mod/Setbox -text
 doc/tex/mod/Setgatt -text
 doc/tex/mod/Setgrid -text
 doc/tex/mod/Sethalo -text
