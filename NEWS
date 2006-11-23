@@ -1,6 +1,14 @@
 CDO NEWS
 --------
 
+Version 1.0.5 (?? November 2006):
+
+  * New operators:
+      o showformat - Show file format
+      o tchill - Windchill temperature
+      o hi - Humidity index
+      o eca_* - ECA Indices of Daily Temperature and Precipitation Extremes
+
 Version 1.0.4 (7 November 2006):
 
   * New operators:

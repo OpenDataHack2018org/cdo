@@ -170,6 +170,12 @@ void *Inttime(void *argument)
       streamReadRecord(streamID1, single1, &nmiss1[varID][levelID]);
     }
 
+  if ( cdoVerbose )
+    {
+      cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      cdoPrint("julval1  = %f", julval1);
+    }
+
   if ( julval1 > julval )
     cdoWarning("start time %d %d out of range!", vdate, vtime);
 
@@ -180,6 +186,11 @@ void *Inttime(void *argument)
       if ( nrecs == 0 ) break;
 
       julval2 = encode_julval(dpy, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      if ( cdoVerbose )
+	{
+	  cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+	  cdoPrint("julval2  = %f", julval2);
+	}
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -209,8 +220,8 @@ void *Inttime(void *argument)
 		  */
 		  decode_date(vdate, &year, &month, &day);
 		  decode_time(vtime, &hour, &minute);
-		  cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d",
-			   year, month, day, hour, minute);
+		  cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d  %f  %d",
+			   year, month, day, hour, minute, julval, dpy);
 		}
 
 	      taxisDefVdate(taxisID2, vdate);
@@ -240,10 +251,10 @@ void *Inttime(void *argument)
 			  if ( !DBL_IS_EQUAL(single1[i], missval1) &&
 			       !DBL_IS_EQUAL(single2[i], missval2) )
 			    array[i] = single1[i]*fac1 + single2[i]*fac2;
-			  else if ( DBL_IS_EQUAL(single1[i], missval1) &&
+			  else if (  DBL_IS_EQUAL(single1[i], missval1) &&
 				    !DBL_IS_EQUAL(single2[i], missval2) && fac2 >= 0.5 )
 			    array[i] = single2[i];
-			  else if ( DBL_IS_EQUAL(single2[i], missval2) &&
+			  else if (  DBL_IS_EQUAL(single2[i], missval2) &&
 				    !DBL_IS_EQUAL(single1[i], missval1) && fac1 >= 0.5 )
 			    array[i] = single1[i];
 			  else

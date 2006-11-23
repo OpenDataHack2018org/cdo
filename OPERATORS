@@ -313,14 +313,14 @@ Operator catalog:
       EcaCsu     eca_csu         Maximum no. of consecutive summer days
       EcaCwd     eca_cwd         Maximum no. of consecutive wet days
       EcaCwdi    eca_cwdi        Cold wave duration index
-      EcaCwfi    eca_cwfi        Cold wave duration index
+      EcaCwfi    eca_cwfi        Cold-spell days
       EcaEtr     eca_etr         Intra-period extreme temperature range
       EcaFd      eca_fd          No. of frost days
       EcaFdns    eca_fdns        No. of frost days without surface snow
       EcaGsl     eca_gsl         Intra-period extreme temperature rang
       EcaHd      eca_hd          Heating degree days
       EcaHwdi    eca_hwdi        Heat wave duration index
-      EcaHwfi    eca_hwfi        Heat wave duration index
+      EcaHwfi    eca_hwfi        Warm-spell days
       EcaId      eca_id          No. of ice days
       EcaR10mm   eca_r10mm       No. of days with precipitation > 10 mm
       EcaR20mm   eca_r20mm       No. of days with precipitation > 20 mm

@@ -68,9 +68,9 @@ static void julday_to_gregdate(
 	ja = julday;
     else
     {
-      int ia = (int)(((julday - 1867216) - 0.25) / 36524.25);
+      int ia = (int) (((julday - 1867216) - 0.25) / 36524.25);
 
-      ja = julday + 1 + ia - (int)(0.25 * ia);
+	ja = julday + 1 + ia - (int)(0.25 * ia);
     }
 
     jb = ja + 1524;
@@ -152,7 +152,7 @@ static unsigned long gregdate_to_julday(
     if (jy >= 0)
     {
 	julday += 365 * jy;
-	julday += (unsigned long) 0.25 * jy;
+	julday += (unsigned long) (0.25 * jy);
     }
     else
     {
