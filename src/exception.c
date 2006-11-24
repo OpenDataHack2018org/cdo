@@ -14,7 +14,7 @@ void cdiError(int cdiErrno, const char *fmt, ...)
   va_start(args, fmt);
 
   printf("\n");
-   fprintf(stderr, "%s : ", processInqPrompt());
+   fprintf(stderr, "%s: ", processInqPrompt());
   vfprintf(stderr, fmt, args);
    fprintf(stderr, "\n");
 
@@ -63,7 +63,7 @@ void cdoPrint(const char *fmt, ...)
 	
   va_start(args, fmt);
 
-   fprintf(stderr, "%s : ", processInqPrompt());
+   fprintf(stderr, "%s: ", processInqPrompt());
   vfprintf(stderr, fmt, args);
    fprintf(stderr, "\n");
 

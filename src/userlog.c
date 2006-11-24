@@ -265,17 +265,17 @@ void cdologs(int noper, double cputime, off_t nvals)
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
   int status;
-  int date = 0;
-  int ncdo = 0;
-  int date0 = 0, ncdo0, noper0;
+  int date = 0, ncdo = 0, nhours = 0;
+  int date0 = 0, ncdo0, noper0, nhours0;
   double cputime0;
   INT64 nvals0;
   unsigned char logbuf[LOGSIZE];
-  unsigned char *logdate  =  logbuf;
-  unsigned char *logncdo  = &logbuf[4];
-  unsigned char *lognoper = &logbuf[8];
-  unsigned char *logctime = &logbuf[12];
-  unsigned char *lognvals = &logbuf[16];
+  unsigned char *logdate   =  logbuf;
+  unsigned char *logncdo   = &logbuf[4];
+  unsigned char *lognoper  = &logbuf[8];
+  unsigned char *logctime  = &logbuf[12];
+  unsigned char *lognvals  = &logbuf[16];
+  unsigned char *lognhours = &logbuf[24];
   const size_t logsize = LOGSIZE;
   size_t bufsize;
   struct flock mylock;
@@ -325,10 +325,12 @@ void cdologs(int noper, double cputime, off_t nvals)
       noper0   = GET_UINT4(lognoper);
       cputime0 = (double) ibm2flt(logctime);
       nvals0   = GET_UINT8(lognvals);
+      nhours0  = GET_UINT4(lognhours);
 
       if ( date == date0 )
 	{
 	  ncdo = ncdo0;
+	  nhours = nhours0;
 	  noper += noper0;
 	  cputime += cputime0;
 	  nvals += (off_t) nvals0;
@@ -340,11 +342,14 @@ void cdologs(int noper, double cputime, off_t nvals)
     {
       ncdo++;
 
+      while ( cputime > 3600 ) { cputime -= 3600; nhours++; }
+
       PUT_UINT4(logdate, date);
       PUT_UINT4(logncdo, ncdo);
       PUT_UINT4(lognoper, noper);
-      flt2ibm((float)cputime, logctime); 
+      flt2ibm((float)cputime, logctime);
       PUT_UINT8(lognvals, nvals);
+      PUT_UINT4(lognhours, nhours);
 
       mylock.l_type   = F_WRLCK;
       status = fcntl(logfileno, F_SETLKW, &mylock);
@@ -371,17 +376,18 @@ void dumplogs(const char *logfilename)
   static const char func[] = "dumplogs";
   int  logfileno;
   int status;
-  int date0 = 0, ncdo0, noper0;
+  int date0 = 0, ncdo0, noper0, nhours0;
   int nlogs;
   int i;
   double cputime0;
   INT64 nvals0;
   unsigned char logbuf[LOGSIZE];
-  unsigned char *logdate  =  logbuf;
-  unsigned char *logncdo  = &logbuf[4];
-  unsigned char *lognoper = &logbuf[8];
-  unsigned char *logctime = &logbuf[12];
-  unsigned char *lognvals = &logbuf[16];
+  unsigned char *logdate   =  logbuf;
+  unsigned char *logncdo   = &logbuf[4];
+  unsigned char *lognoper  = &logbuf[8];
+  unsigned char *logctime  = &logbuf[12];
+  unsigned char *lognvals  = &logbuf[16];
+  unsigned char *lognhours = &logbuf[24];
   unsigned char *buffer = NULL;
   const size_t logsize = LOGSIZE;
   size_t bufsize;
@@ -417,11 +423,12 @@ void dumplogs(const char *logfilename)
 	  noper0   = GET_UINT4(lognoper);
 	  cputime0 = (double) ibm2flt(logctime);
 	  nvals0   = GET_UINT8(lognvals);
+	  nhours0  = GET_UINT4(lognhours);
 
 	  if ( sizeof(INT64) > sizeof(long) )
-	    fprintf(stdout, "%8d %10d %10d %20.2f %19lld\n", date0, ncdo0, noper0, cputime0, (long long)nvals0);
+	    fprintf(stdout, "%8d %10d %10d %19lld %10d %8.2f\n", date0, ncdo0, noper0, (long long)nvals0, nhours0, cputime0);
 	  else
-	    fprintf(stdout, "%8d %10d %10d %20.2f %19ld\n", date0, ncdo0, noper0, cputime0, (long)nvals0);
+	    fprintf(stdout, "%8d %10d %10d %19ld %10d %8.2f\n", date0, ncdo0, noper0, (long)nvals0, nhours0, cputime0);
 	}
 
       free(buffer);

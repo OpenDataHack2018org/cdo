@@ -1098,7 +1098,7 @@ void cdoFinish(void)
   ntimesteps = processInqTimesteps();
 
   if ( ! cdoSilentMode )
-    fprintf(stderr, "%s : Processed %d variable%s %d timestep%s.",
+    fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",
 	    processInqPrompt(), nvars, nvars > 1 ? "s" : "",
 	    ntimesteps, ntimesteps > 1 ? "s" : "");
 
