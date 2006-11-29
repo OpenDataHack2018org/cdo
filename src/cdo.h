@@ -58,7 +58,11 @@ extern int cdoTimer;
 extern int cdoVerbose;
 extern int cdoDebug;
 
+extern int cdoCompress;
+
 extern int cdoExpMode;
+
+extern int cdoDisableFilesuffix;
 
 void    cdiError(int cdiErrno, const char *fmt, ...);
 void    cdoAbort(const char *fmt, ...);
@@ -103,6 +107,7 @@ void    cdoDefHistory(int fileID, char *histstring);
 int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
 
+int     vlistIsSzipped(int vlistID);
 void    vlistCompare(int vlistID1, int vlistID2, int function);
 
 void gridWeights(int gridID, double *weights);

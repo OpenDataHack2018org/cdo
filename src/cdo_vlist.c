@@ -65,3 +65,25 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
   else
     cdoAbort("Internal problem! Invalid function %d", function);
 }
+
+
+int vlistIsSzipped(int vlistID)
+{
+  int lszip = FALSE;
+  int nvars, varID;
+
+  nvars = vlistNvars(vlistID);
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( vlistInqVarSzip(vlistID, varID) )
+	{
+	  lszip = TRUE;
+	  break;
+	}
+    }      
+
+  return (lszip);
+}
+
+

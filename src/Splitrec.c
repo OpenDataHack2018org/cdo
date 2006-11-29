@@ -40,7 +40,7 @@ void *Splitrec(void *argument)
   int tsID, recID, levelID;
   int varID2, levelID2;
   int vlistID1, vlistID2;
-  char *filesuffix;
+  char filesuffix[32];
   char filename[4096];
   int index;
   int lcopy = FALSE;
@@ -61,7 +61,15 @@ void *Splitrec(void *argument)
 
   strcpy(filename, cdoStreamName(1));
   nchars = strlen(filename);
-  filesuffix = streamFilesuffix(cdoDefaultFileType);
+
+  filesuffix[0] = 0;
+  if ( cdoDisableFilesuffix == FALSE )
+    {
+      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
+      if ( cdoDefaultFileType == FILETYPE_GRB )
+	if ( vlistIsSzipped(vlistID1) || cdoCompress == COMPRESS_SZIP )
+	  strcat(filesuffix, ".sz");
+    }
 
   if ( ! lcopy )
     {
@@ -85,7 +93,7 @@ void *Splitrec(void *argument)
 
 	  index++;
 	  sprintf(filename+nchars, "%06d", index);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+6, "%s", filesuffix);
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);

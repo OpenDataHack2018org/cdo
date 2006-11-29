@@ -50,7 +50,7 @@ void *Split(void *argument)
   int  *vlistIDs = NULL, *streamIDs = NULL;
   int  itmp[999];
   double ftmp[999];
-  char *filesuffix;
+  char filesuffix[32];
   char filename[1024];
   int nsplit = 0;
   int index;
@@ -83,7 +83,15 @@ void *Split(void *argument)
 
   strcpy(filename, cdoStreamName(1));
   nchars = strlen(filename);
-  filesuffix = streamFilesuffix(cdoDefaultFileType);
+
+  filesuffix[0] = 0;
+  if ( cdoDisableFilesuffix == FALSE )
+    {
+      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
+      if ( cdoDefaultFileType == FILETYPE_GRB )
+	if ( vlistIsSzipped(vlistID1) || cdoCompress == COMPRESS_SZIP )
+	  strcat(filesuffix, ".sz");
+    }
 
   if ( operatorID == SPLITCODE )
     {
@@ -129,7 +137,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%03d", codes[index]);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+3, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
@@ -165,7 +173,7 @@ void *Split(void *argument)
 	  filename[nchars] = '\0';
 	  vlistInqVarName(vlistID1, varID, varname);
 	  strcat(filename, varname);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    strcat(filename, filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
@@ -219,7 +227,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%06g", levels[index]);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+6, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
@@ -263,7 +271,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", gridIDs[index]+1);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
@@ -306,7 +314,7 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", zaxisIDs[index]+1);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);

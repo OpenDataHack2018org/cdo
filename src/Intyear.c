@@ -48,7 +48,7 @@ void *Intyear(void *argument)
   int nmiss1, nmiss2, nmiss3;
   int *iyears, nyears = 0, *streamIDs = NULL;
   int nchars;
-  char *filesuffix;
+  char filesuffix[32];
   char filename[1024];
   double fac1, fac2;
   double missval1, missval2;
@@ -92,12 +92,20 @@ void *Intyear(void *argument)
 
   strcpy(filename, cdoStreamName(2));
   nchars = strlen(filename);
-  filesuffix = streamFilesuffix(cdoDefaultFileType);
+
+  filesuffix[0] = 0;
+  if ( cdoDisableFilesuffix == FALSE )
+    {
+      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
+      if ( cdoDefaultFileType == FILETYPE_GRB )
+	if ( vlistIsSzipped(vlistID1) || cdoCompress == COMPRESS_SZIP )
+	  strcat(filesuffix, ".sz");
+    }
 
   for ( iy = 0; iy < nyears; iy++ )
     {
       sprintf(filename+nchars, "%04d", iyears[iy]);
-      if ( cdoDisableFilesuffix == FALSE )
+      if ( filesuffix[0] )
 	sprintf(filename+nchars+4, "%s", filesuffix);
       /*	  printf("filename %s\n", filename); */
       streamIDs[iy] = streamOpenWrite(filename, cdoFiletype());

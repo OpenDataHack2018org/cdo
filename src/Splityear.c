@@ -41,7 +41,7 @@ void *Splityear(void *argument)
   int nrecs;
   int tsID, tsID2, recID, levelID;
   int vlistID1, vlistID2;
-  char *filesuffix;
+  char filesuffix[32];
   char filename[1024];
   int vdate;
   int year1, year2;
@@ -68,7 +68,15 @@ void *Splityear(void *argument)
 
   strcpy(filename, cdoStreamName(1));
   nchars = strlen(filename);
-  filesuffix = streamFilesuffix(cdoDefaultFileType);
+
+  filesuffix[0] = 0;
+  if ( cdoDisableFilesuffix == FALSE )
+    {
+      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
+      if ( cdoDefaultFileType == FILETYPE_GRB )
+	if ( vlistIsSzipped(vlistID1) || cdoCompress == COMPRESS_SZIP )
+	  strcat(filesuffix, ".sz");
+    }
 
   if ( ! lcopy )
     {
@@ -109,7 +117,7 @@ void *Splityear(void *argument)
 
 	  sprintf(filename+nchars, "%04d", year1);
 	  if ( ic > 0 ) sprintf(filename+strlen(filename), "_%d", ic+1);
-	  if ( cdoDisableFilesuffix == FALSE )
+	  if ( filesuffix[0] )
 	    sprintf(filename+strlen(filename), "%s", filesuffix);
 	  
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);

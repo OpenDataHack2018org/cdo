@@ -48,7 +48,7 @@ void *Splittime(void *argument)
   int tsID, recID, levelID;
   int vlistID1, vlistID2;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
-  char *filesuffix;
+  char filesuffix[32];
   char filename[1024];
   char *Seas[4] = {"DJF", "MAM", "JJA", "SON"};
   int index = 0;
@@ -88,7 +88,15 @@ void *Splittime(void *argument)
 
   strcpy(filename, cdoStreamName(1));
   nchars = strlen(filename);
-  filesuffix = streamFilesuffix(cdoDefaultFileType);
+
+  filesuffix[0] = 0;
+  if ( cdoDisableFilesuffix == FALSE )
+    {
+      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
+      if ( cdoDefaultFileType == FILETYPE_GRB )
+	if ( vlistIsSzipped(vlistID1) || cdoCompress == COMPRESS_SZIP )
+	  strcat(filesuffix, ".sz");
+    }
 
   if ( ! lcopy )
     {
@@ -134,13 +142,13 @@ void *Splittime(void *argument)
 	  if ( operatorID == SPLITSEAS )
 	    {
 	      sprintf(filename+nchars, "%3s", Seas[index]);
-	      if ( cdoDisableFilesuffix == FALSE )
+	      if ( filesuffix[0] )
 		sprintf(filename+nchars+3, "%s", filesuffix);
 	    }
 	  else
 	    {
 	      sprintf(filename+nchars, "%02d", index);
-	      if ( cdoDisableFilesuffix == FALSE )
+	      if ( filesuffix[0] )
 		sprintf(filename+nchars+2, "%s", filesuffix);
 	    }
 

@@ -8,6 +8,7 @@
 	* Wind.c: define name, longname and units [report: Chiara Cagnazzo]
 	* add env CDO_DISABLE_HISTORY [request: Bjørge Solli]
 	* add env CDO_DISABLE_FILESUFFIX [request: Heiner Widmann]
+	* add suffix .sz for SZIP compressed files [request: Monika Esch]
 	* input: bug fix
 	* pstreamFindID: check pstreamptr->name before use (bug fix)
 	* operatorInqModID: speed up

@@ -67,6 +67,7 @@ int cdoDefaultTableID   = CDI_UNDEFID;
 
 int cdoDisableFilesuffix = FALSE;
 int cdoDisableHistory = FALSE;
+int cdoCompress    = 0;
 int cdoLogOff      = FALSE;
 int cdoSilentMode  = FALSE;
 int cdoRegulargrid = FALSE;
@@ -445,9 +446,15 @@ void defineCompress(const char *arg)
   size_t len = strlen(arg);
 
   if      ( strncmp(arg, "szip", len) == 0 )
-    cdiDefCompress(COMPRESS_SZIP, 0);
+    {
+      cdoCompress = COMPRESS_SZIP;
+      cdiDefCompress(COMPRESS_SZIP, 0);
+    }
   else if ( strncmp(arg, "gzip", len) == 0 )
-    cdiDefCompress(COMPRESS_GZIP, 6);
+    {
+      cdoCompress = COMPRESS_GZIP;
+      cdiDefCompress(COMPRESS_GZIP, 6);
+    }
   else
     fprintf(stderr, "Compression %s unsupported!\n", arg);
 }
