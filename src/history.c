@@ -19,6 +19,7 @@
 #include <time.h>
 
 #include "cdi.h"
+#include "cdo.h"
 #include "cdo_int.h"
 
 static char *ghistory = NULL;
@@ -84,6 +85,7 @@ void cdoDefHistory(int fileID, char *histstring)
   char *history = NULL;
   size_t historysize = 0;
   char *strtimeptr;
+  extern int cdoDisableHistory;
 
   strtimeptr = get_strtimeptr();
   
@@ -92,11 +94,13 @@ void cdoDefHistory(int fileID, char *histstring)
 
   strcpy(history, strtimeptr);
   strcat(history, histstring);
-  if ( ghistory )
-    {
-      strcat(history, "\n");
-      strcat(history, ghistory);
-    }
+
+  if ( cdoDisableHistory == FALSE )
+    if ( ghistory )
+      {
+	strcat(history, "\n");
+	strcat(history, ghistory);
+      }
 
   streamDefHistory(fileID, strlen(history), history);
   

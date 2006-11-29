@@ -97,7 +97,8 @@ void *Intyear(void *argument)
   for ( iy = 0; iy < nyears; iy++ )
     {
       sprintf(filename+nchars, "%04d", iyears[iy]);
-      sprintf(filename+nchars+4, "%s", filesuffix);
+      if ( cdoDisableFilesuffix == FALSE )
+	sprintf(filename+nchars+4, "%s", filesuffix);
       /*	  printf("filename %s\n", filename); */
       streamIDs[iy] = streamOpenWrite(filename, cdoFiletype());
       if ( streamIDs[iy] < 0 ) cdiError(streamIDs[iy], "Open failed on %s", filename);

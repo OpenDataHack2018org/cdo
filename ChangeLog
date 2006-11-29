@@ -7,6 +7,7 @@
 	* rotuvb: change coordinates to geographic (bug fix) [report: Klaus Wyser]
 	* Wind.c: define name, longname and units [report: Chiara Cagnazzo]
 	* add env CDO_DISABLE_HISTORY [request: Bjørge Solli]
+	* add env CDO_DISABLE_FILESUFFIX [request: Heiner Widmann]
 	* input: bug fix
 	* pstreamFindID: check pstreamptr->name before use (bug fix)
 	* operatorInqModID: speed up

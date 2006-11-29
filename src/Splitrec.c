@@ -85,7 +85,8 @@ void *Splitrec(void *argument)
 
 	  index++;
 	  sprintf(filename+nchars, "%06d", index);
-	  sprintf(filename+nchars+6, "%s", filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    sprintf(filename+nchars+6, "%s", filesuffix);
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 

@@ -65,6 +65,7 @@ int cdoDefaultTimeType  = CDI_UNDEFID;
 int cdoDefaultByteorder = CDI_UNDEFID;
 int cdoDefaultTableID   = CDI_UNDEFID;
 
+int cdoDisableFilesuffix = FALSE;
 int cdoDisableHistory = FALSE;
 int cdoLogOff      = FALSE;
 int cdoSilentMode  = FALSE;
@@ -574,6 +575,7 @@ int main(int argc, char *argv[])
 
   {
       char *envstr;
+
       envstr = getenv("CDO_LOG_OFF");
       if ( envstr )
 	{
@@ -584,6 +586,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
 	    }
 	}
+
       envstr = getenv("CDO_DISABLE_HISTORY");
       if ( envstr )
 	{
@@ -592,6 +595,17 @@ int main(int argc, char *argv[])
 	      cdoDisableHistory = TRUE;
 	      if ( cdoVerbose )
 		fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
+	    }
+	}
+
+      envstr = getenv("CDO_DISABLE_FILESUFFIX");
+      if ( envstr )
+	{
+	  if ( atoi(envstr) == 1 )
+	    {
+	      cdoDisableFilesuffix = TRUE;
+	      if ( cdoVerbose )
+		fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
 	    }
 	}
   }

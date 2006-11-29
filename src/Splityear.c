@@ -109,7 +109,8 @@ void *Splityear(void *argument)
 
 	  sprintf(filename+nchars, "%04d", year1);
 	  if ( ic > 0 ) sprintf(filename+strlen(filename), "_%d", ic+1);
-	  sprintf(filename+strlen(filename), "%s", filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    sprintf(filename+strlen(filename), "%s", filesuffix);
 	  
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 

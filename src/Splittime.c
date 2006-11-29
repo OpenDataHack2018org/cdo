@@ -134,12 +134,14 @@ void *Splittime(void *argument)
 	  if ( operatorID == SPLITSEAS )
 	    {
 	      sprintf(filename+nchars, "%3s", Seas[index]);
-	      sprintf(filename+nchars+3, "%s", filesuffix);
+	      if ( cdoDisableFilesuffix == FALSE )
+		sprintf(filename+nchars+3, "%s", filesuffix);
 	    }
 	  else
 	    {
 	      sprintf(filename+nchars, "%02d", index);
-	      sprintf(filename+nchars+2, "%s", filesuffix);
+	      if ( cdoDisableFilesuffix == FALSE )
+		sprintf(filename+nchars+2, "%s", filesuffix);
 	    }
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);

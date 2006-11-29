@@ -129,7 +129,8 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%03d", codes[index]);
-	  sprintf(filename+nchars+3, "%s", filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    sprintf(filename+nchars+3, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
@@ -164,7 +165,8 @@ void *Split(void *argument)
 	  filename[nchars] = '\0';
 	  vlistInqVarName(vlistID1, varID, varname);
 	  strcat(filename, varname);
-	  strcat(filename, filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    strcat(filename, filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
@@ -217,7 +219,8 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%06g", levels[index]);
-	  sprintf(filename+nchars+6, "%s", filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    sprintf(filename+nchars+6, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
@@ -260,7 +263,8 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", gridIDs[index]+1);
-	  sprintf(filename+nchars+2, "%s", filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
@@ -302,7 +306,8 @@ void *Split(void *argument)
 	  vlistIDs[index] = vlistID2;
 
 	  sprintf(filename+nchars, "%02d", zaxisIDs[index]+1);
-	  sprintf(filename+nchars+2, "%s", filesuffix);
+	  if ( cdoDisableFilesuffix == FALSE )
+	    sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 

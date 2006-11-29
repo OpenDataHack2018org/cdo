@@ -122,4 +122,6 @@ void printFiletype(int streamID, int vlistID);
 
 void job_submit(const char *expname, const char *jobfilename, const char *jobname);
 
+extern int cdoDisableFilesuffix;
+
 #endif  /* _CDO_INT_H */
