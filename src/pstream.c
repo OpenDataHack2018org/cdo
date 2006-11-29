@@ -549,6 +549,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
   int pstreamID;
   int ispipe;
   PSTREAM *pstreamptr;
+  extern int cdoDisableHistory;
 
   PSTREAM_INIT
 
@@ -594,7 +595,8 @@ int pstreamOpenWrite(const char *argument, int filetype)
 #endif
       if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument);
 
-      cdoDefHistory(fileID, commandLine());
+      if ( cdoDisableHistory == FALSE )
+	cdoDefHistory(fileID, commandLine());
 
       if ( cdoDefaultByteorder != CDI_UNDEFID )
 	streamDefByteorder(fileID, cdoDefaultByteorder);

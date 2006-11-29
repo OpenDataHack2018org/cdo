@@ -4,7 +4,9 @@
 	* New operator: showformat (Showinfo) [request: Helmuth Haak]
 	* remap: initialize links.option (bug fix) [report: Luis Kornblueh]
 	* update date/time conversion from udunits (bug fix) [report: Oliver Krueger]
+	* rotuvb: change coordinates to geographic (bug fix) [report: Klaus Wyser]
 	* Wind.c: define name, longname and units [report: Chiara Cagnazzo]
+	* add env CDO_DISABLE_HISTORY [request: Bjørge Solli]
 	* input: bug fix
 	* pstreamFindID: check pstreamptr->name before use (bug fix)
 	* operatorInqModID: speed up

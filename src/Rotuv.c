@@ -31,6 +31,8 @@
 #include "pstream.h"
 
 
+double rls_to_rl(double phis, double rlas, double polphi, double pollam);
+double phs_to_ph(double phis, double rlas, double polphi);
 void usvs_to_uv(double us, double vs, double phi, double rla,
 		double polphi, double pollam, double *u, double *v);
 
@@ -39,6 +41,7 @@ static void rot_uv_back(int gridID, double *us, double *vs)
   static char func[] = "rot_uv_back";
   int i, ilat, ilon, nlat, nlon;
   double u, v;
+  double xval, yval;
   double xpole, ypole;
   double *xvals, *yvals;
 
@@ -58,7 +61,11 @@ static void rot_uv_back(int gridID, double *us, double *vs)
     for ( ilon = 0; ilon < nlon; ilon++ )
       {
 	i = ilat*nlon + ilon;
-	usvs_to_uv(us[i], vs[i], yvals[ilat], xvals[ilon], ypole, xpole, &u, &v);
+
+        xval = rls_to_rl(yvals[ilat], xvals[ilon], ypole, xpole);
+        yval = phs_to_ph(yvals[ilat], xvals[ilon], ypole);
+
+	usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
 	/*
 	if ( i%100 == 0 )
 	fprintf(stderr, "%d %d %g %g %g %g %g %g %g %g\n",

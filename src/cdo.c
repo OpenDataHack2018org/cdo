@@ -1,5 +1,5 @@
 /*
-  This file is part of CD. CDO is a collection of Operators to
+  This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
   Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
@@ -65,6 +65,7 @@ int cdoDefaultTimeType  = CDI_UNDEFID;
 int cdoDefaultByteorder = CDI_UNDEFID;
 int cdoDefaultTableID   = CDI_UNDEFID;
 
+int cdoDisableHistory = FALSE;
 int cdoLogOff      = FALSE;
 int cdoSilentMode  = FALSE;
 int cdoRegulargrid = FALSE;
@@ -579,7 +580,18 @@ int main(int argc, char *argv[])
 	  if ( atoi(envstr) == 1 )
 	    {
 	      cdoLogOff = TRUE;
-	      fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
+	      if ( cdoVerbose )
+		fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
+	    }
+	}
+      envstr = getenv("CDO_DISABLE_HISTORY");
+      if ( envstr )
+	{
+	  if ( atoi(envstr) == 1 )
+	    {
+	      cdoDisableHistory = TRUE;
+	      if ( cdoVerbose )
+		fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
 	    }
 	}
   }
