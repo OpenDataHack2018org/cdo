@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaR99p
-@Title     = Percent of time RR > 99th percentile of daily precipitation amount (extremely wet days)
+@Title     = Extremely wet days wrt 99th percentile of reference period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -19,7 +19,7 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_r99p
-@Title     = Percent of time RR > 95th percentile of daily precipitation amount (extremely wet days)
+@Title     = Extremely wet days wrt 99th percentile of reference period
 @EndOperator
 
 

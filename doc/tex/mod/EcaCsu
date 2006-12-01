@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaCsu
-@Title     = Maximum no. of consecutive summer days
+@Title     = Consecutive summer days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -19,7 +19,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_csu
-@Title     = Maximum no. of consecutive summer days
+@Title     = Consecutive summer days
 @Parameter = [T]
 @EndOperator
 

@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaTn90p
-@Title     = Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)
+@Title     = Warm nights wrt 90th percentile of reference period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -19,7 +19,7 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_tn90p
-@Title     = Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)
+@Title     = Warm nights wrt 90th percentile of reference period
 @EndOperator
 
 

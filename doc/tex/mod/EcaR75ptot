@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaR75ptot
-@Title     = Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)
+@Title     = Precipitation fraction due to R75p days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -19,5 +19,5 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_r75ptot
-@Title     = Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)
+@Title     = Precipitation fraction due to R75p days
 @EndOperator

@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaRx5day
-@Title     = Maximum 5-day precipitation total
+@Title     = Highest five-day precipitation amount
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -20,7 +20,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_rx5day
-@Title     = Maximum 5-day precipitation total
+@Title     = Highest five-day precipitation amount
 @Parameter = [x]
 @EndOperator
 

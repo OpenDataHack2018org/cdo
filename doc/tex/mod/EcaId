@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaId
-@Title     = No. of ice days
+@Title     = Ice days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -17,7 +17,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_id
-@Title     = No. of ice days
+@Title     = Ice days
 @EndOperator
 
 

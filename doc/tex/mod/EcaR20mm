@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaR20mm
-@Title     = No. of days with precipitation > 20 mm
+@Title     = Very heavy precipitation days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -16,7 +16,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_r20mm
-@Title     = No. of days with precipitation > 20 mm
+@Title     = Very heavy precipitation days
 @EndOperator
 
 

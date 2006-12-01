@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaR10mm
-@Title     = No. of days with precipitation > 10 mm
+@Title     = Heavy precipitation days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -17,7 +17,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_r10mm
-@Title     = No. of days with precipitation > 10 mm
+@Title     = Heavy precipitation days
 @EndOperator
 
 

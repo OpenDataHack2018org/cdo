@@ -22,7 +22,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_gsl
-@Title     = Intra-period extreme temperature rang
+@Title     = Growing season length
 @Parameter = [nday] [T]
 @EndOperator
 

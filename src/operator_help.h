@@ -2219,7 +2219,7 @@ static char *YdrunpctlHelp[] = {
 
 static char *EcaCddHelp[] = {
     "NAME",
-    "    eca_cdd - Maximum no. of consecutive dry days",
+    "    eca_cdd - Consecutive dry days",
     "",
     "SYNOPSIS",
     "    eca_cdd  ifile ofile",
@@ -2236,7 +2236,7 @@ static char *EcaCddHelp[] = {
 
 static char *EcaCfdHelp[] = {
     "NAME",
-    "    eca_cfd - Maximum no. of consecutive frost days",
+    "    eca_cfd - Consecutive frost days",
     "",
     "SYNOPSIS",
     "    eca_cfd  ifile ofile",
@@ -2252,7 +2252,7 @@ static char *EcaCfdHelp[] = {
 
 static char *EcaCsuHelp[] = {
     "NAME",
-    "    eca_csu - Maximum no. of consecutive summer days",
+    "    eca_csu - Consecutive summer days",
     "",
     "SYNOPSIS",
     "    eca_csu[,T]  ifile ofile",
@@ -2272,7 +2272,7 @@ static char *EcaCsuHelp[] = {
 
 static char *EcaCwdHelp[] = {
     "NAME",
-    "    eca_cwd - Maximum no. of consecutive wet days",
+    "    eca_cwd - Consecutive wet days",
     "",
     "SYNOPSIS",
     "    eca_cwd  ifile ofile",
@@ -2314,7 +2314,7 @@ static char *EcaCwdiHelp[] = {
 
 static char *EcaCwfiHelp[] = {
     "NAME",
-    "    eca_cwfi - Cold-spell days",
+    "    eca_cwfi - Cold wave duration index",
     "",
     "SYNOPSIS",
     "    eca_cwfi[,nday]  ifile1 ifile2 ofile",
@@ -2355,7 +2355,7 @@ static char *EcaEtrHelp[] = {
 
 static char *EcaFdHelp[] = {
     "NAME",
-    "    eca_fd - No. of frost days",
+    "    eca_fd - Frost days",
     "",
     "SYNOPSIS",
     "    eca_fd  ifile ofile",
@@ -2371,7 +2371,7 @@ static char *EcaFdHelp[] = {
 
 static char *EcaFdnsHelp[] = {
     "NAME",
-    "    eca_fdns - No. of frost days without surface snow",
+    "    eca_fdns - Frost days where no snow",
     "",
     "SYNOPSIS",
     "    eca_fdns  ifile1 ifile2 ofile",
@@ -2460,7 +2460,7 @@ static char *EcaHwdiHelp[] = {
 
 static char *EcaHwfiHelp[] = {
     "NAME",
-    "    eca_hwfi - Warm-spell days",
+    "    eca_hwfi - Heat wave duration index",
     "",
     "SYNOPSIS",
     "    eca_hwfi[,nday]  ifile1 ifile2 ofile",
@@ -2484,7 +2484,7 @@ static char *EcaHwfiHelp[] = {
 
 static char *EcaIdHelp[] = {
     "NAME",
-    "    eca_id - No. of ice days",
+    "    eca_id - Ice days",
     "",
     "SYNOPSIS",
     "    eca_id  ifile ofile",
@@ -2500,7 +2500,7 @@ static char *EcaIdHelp[] = {
 
 static char *EcaR10mmHelp[] = {
     "NAME",
-    "    eca_r10mm - No. of days with precipitation > 10 mm",
+    "    eca_r10mm - Heavy precipitation days",
     "",
     "SYNOPSIS",
     "    eca_r10mm  ifile ofile",
@@ -2515,7 +2515,7 @@ static char *EcaR10mmHelp[] = {
 
 static char *EcaR20mmHelp[] = {
     "NAME",
-    "    eca_r20mm - No. of days with precipitation > 20 mm",
+    "    eca_r20mm - Very heavy precipitation days",
     "",
     "SYNOPSIS",
     "    eca_r20mm  ifile ofile",
@@ -2530,8 +2530,7 @@ static char *EcaR20mmHelp[] = {
 
 static char *EcaR75pHelp[] = {
     "NAME",
-    "    eca_r75p - ",
-    "    Percent of time RR > 75th percentile of daily precipitation amount (moderate wet days)",
+    "    eca_r75p - Moderate wet days wrt 75th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_r75p  ifile1 ifile2 ofile",
@@ -2548,8 +2547,7 @@ static char *EcaR75pHelp[] = {
 
 static char *EcaR75ptotHelp[] = {
     "NAME",
-    "    eca_r75ptot - ",
-    "    Percent of annual total precipitation due to events with RR > 75th percentile of daily precipitation amount (moderate wet days)",
+    "    eca_r75ptot - Precipitation fraction due to R75p days",
     "",
     "SYNOPSIS",
     "    eca_r75ptot  ifile1 ifile2 ofile",
@@ -2567,7 +2565,7 @@ static char *EcaR75ptotHelp[] = {
 
 static char *EcaR90pHelp[] = {
     "NAME",
-    "    eca_r90p - Percent of time RR > 90th percentile of daily precipitation amount",
+    "    eca_r90p - Very wet days wrt 90th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_r90p  ifile1 ifile2 ofile",
@@ -2584,8 +2582,7 @@ static char *EcaR90pHelp[] = {
 
 static char *EcaR90ptotHelp[] = {
     "NAME",
-    "    eca_r90ptot - ",
-    "    Percent of annual total precipitation due to events with RR > 90th percentile of daily precipitation amount",
+    "    eca_r90ptot - Precipitation fraction due to R90p days",
     "",
     "SYNOPSIS",
     "    eca_r90ptot  ifile1 ifile2 ofile",
@@ -2603,8 +2600,7 @@ static char *EcaR90ptotHelp[] = {
 
 static char *EcaR95pHelp[] = {
     "NAME",
-    "    eca_r95p - ",
-    "    Percent of time RR > 95th percentile of daily precipitation amount (very wet days)",
+    "    eca_r95p - Very wet days wrt 95th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_r95p  ifile1 ifile2 ofile",
@@ -2621,8 +2617,7 @@ static char *EcaR95pHelp[] = {
 
 static char *EcaR95ptotHelp[] = {
     "NAME",
-    "    eca_r95ptot - ",
-    "    Percent of annual total precipitation due to events with RR > 95th percentile of daily precipitation amount (very wet days)",
+    "    eca_r95ptot - Precipitation fraction due to R95p days",
     "",
     "SYNOPSIS",
     "    eca_r95ptot  ifile1 ifile2 ofile",
@@ -2640,8 +2635,7 @@ static char *EcaR95ptotHelp[] = {
 
 static char *EcaR99pHelp[] = {
     "NAME",
-    "    eca_r99p - ",
-    "    Percent of time RR > 99th percentile of daily precipitation amount (extremely wet days)",
+    "    eca_r99p - Extremely wet days wrt 99th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_r99p  ifile1 ifile2 ofile",
@@ -2658,8 +2652,7 @@ static char *EcaR99pHelp[] = {
 
 static char *EcaR99ptotHelp[] = {
     "NAME",
-    "    eca_r99ptot - ",
-    "    Percent of annual total precipitation due to events with RR > 99th percentile of daily precipitation amount (extremely wet days)",
+    "    eca_r99ptot - Precipitation fraction due to R99p days",
     "",
     "SYNOPSIS",
     "    eca_r99ptot  ifile1 ifile2 ofile",
@@ -2677,7 +2670,7 @@ static char *EcaR99ptotHelp[] = {
 
 static char *EcaRr1Help[] = {
     "NAME",
-    "    eca_rr1 - No. of wet days",
+    "    eca_rr1 - Wet days",
     "",
     "SYNOPSIS",
     "    eca_rr1  ifile ofile",
@@ -2692,7 +2685,7 @@ static char *EcaRr1Help[] = {
 
 static char *EcaRx1dayHelp[] = {
     "NAME",
-    "    eca_rx1day - Maximum daily precipitation",
+    "    eca_rx1day - Highest one-day precipitation amount",
     "",
     "SYNOPSIS",
     "    eca_rx1day[,mode]  ifile ofile",
@@ -2712,7 +2705,7 @@ static char *EcaRx1dayHelp[] = {
 
 static char *EcaRx5dayHelp[] = {
     "NAME",
-    "    eca_rx5day - Maximum 5-day precipitation total",
+    "    eca_rx5day - Highest five-day precipitation amount",
     "",
     "SYNOPSIS",
     "    eca_rx5day[,x]  ifile ofile",
@@ -2749,7 +2742,7 @@ static char *EcaSdiiHelp[] = {
 
 static char *EcaStrwindHelp[] = {
     "NAME",
-    "    eca_strwind - No. of strong wind days",
+    "    eca_strwind - Strong wind days",
     "",
     "SYNOPSIS",
     "    eca_strwind[,bnum]  ifile ofile",
@@ -2769,7 +2762,7 @@ static char *EcaStrwindHelp[] = {
 
 static char *EcaSuHelp[] = {
     "NAME",
-    "    eca_su - No. of summer days",
+    "    eca_su - Summer days",
     "",
     "SYNOPSIS",
     "    eca_su[,T]  ifile ofile",
@@ -2789,8 +2782,7 @@ static char *EcaSuHelp[] = {
 
 static char *EcaTg10pHelp[] = {
     "NAME",
-    "    eca_tg10p - ",
-    "    Percentage of time TG < 10th percentile of daily mean temperature (cold days)",
+    "    eca_tg10p - Cold days wrt 10th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_tg10p  ifile1 ifile2 ofile",
@@ -2808,8 +2800,7 @@ static char *EcaTg10pHelp[] = {
 
 static char *EcaTg90pHelp[] = {
     "NAME",
-    "    eca_tg90p - ",
-    "    Percentage of time TG > 90th percentile of daily mean temperature (warm days)",
+    "    eca_tg90p - Warm days wrt 90th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_tg90p  ifile1 ifile2 ofile",
@@ -2827,8 +2818,7 @@ static char *EcaTg90pHelp[] = {
 
 static char *EcaTn10pHelp[] = {
     "NAME",
-    "    eca_tn10p - ",
-    "    Percentage of time TN < 10th percentile of daily minimum temperature (cold nights)",
+    "    eca_tn10p - Cold nights wrt 10th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_tn10p  ifile1 ifile2 ofile",
@@ -2846,8 +2836,7 @@ static char *EcaTn10pHelp[] = {
 
 static char *EcaTn90pHelp[] = {
     "NAME",
-    "    eca_tn90p - ",
-    "    Percentage of time TN > 90th percentile of daily minimum temperature (warm nights)",
+    "    eca_tn90p - Warm nights wrt 90th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_tn90p  ifile1 ifile2 ofile",
@@ -2865,7 +2854,7 @@ static char *EcaTn90pHelp[] = {
 
 static char *EcaTrHelp[] = {
     "NAME",
-    "    eca_tr - No. of tropical nights",
+    "    eca_tr - Tropical nights",
     "",
     "SYNOPSIS",
     "    eca_tr[,T]  ifile ofile",
@@ -2885,8 +2874,7 @@ static char *EcaTrHelp[] = {
 
 static char *EcaTx10pHelp[] = {
     "NAME",
-    "    eca_tx10p - ",
-    "    Percentage of time TX < 10th percentile of daily maximum temperature (cold days)",
+    "    eca_tx10p - Cold days wrt 10th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_tx10p  ifile1 ifile2 ofile",
@@ -2904,8 +2892,7 @@ static char *EcaTx10pHelp[] = {
 
 static char *EcaTx90pHelp[] = {
     "NAME",
-    "    eca_tx90p - ",
-    "    Percentage of time TX > 90th percentile of daily maximum temperature (warm days)",
+    "    eca_tx90p - Warm days wrt 90th percentile of reference period",
     "",
     "SYNOPSIS",
     "    eca_tx90p  ifile1 ifile2 ofile",

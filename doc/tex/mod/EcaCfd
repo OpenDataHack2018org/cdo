@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaCfd
-@Title     = Maximum no. of consecutive frost days
+@Title     = Consecutive frost days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -17,7 +17,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_cfd
-@Title     = Maximum no. of consecutive frost days
+@Title     = Consecutive frost days
 @EndOperator
 
 
