@@ -510,7 +510,7 @@ void eca2(const ECA_REQUEST_2 *request)
         {
 	  if ( !streamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
-            
+          /*
           ivdate1 = taxisInqVdate(itaxisID1);
           ivdate2 = taxisInqVdate(itaxisID2);
           if ( ivdate1 != ivdate2 )
@@ -520,7 +520,7 @@ void eca2(const ECA_REQUEST_2 *request)
           ivtime2 = taxisInqVtime(itaxisID2);
           if ( ivtime1 != ivtime2 )
             cdoAbort("Input streams have different verification times for time step %d!", itsID+1);
-
+	  */
           if ( nsets == 0 ) indate1 = (INT64)ivdate1*10000 + ivtime1;
           indate2 = (INT64)ivdate1*10000 + ivtime1;
 

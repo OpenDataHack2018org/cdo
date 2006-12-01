@@ -1,4 +1,9 @@
-2006-11-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2006-12-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* ecacore: update [Ralf Quast]
+
+
+2006-11-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.4
 	* New operator: showformat (Showinfo) [request: Helmuth Haak]
