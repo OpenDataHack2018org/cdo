@@ -30,7 +30,6 @@ extern "C" {
 #define  FILETYPE_NC2             4   /* File type netCDF version 2       */
 #define  FILETYPE_SRV             5   /* File type SERVICE                */
 #define  FILETYPE_EXT             6   /* File type EXTRA                  */
-#define  FILETYPE_H5              7   /* File type HDF5                   */
 #define  FILETYPE_IEG             8   /* File type IEG                    */
 
 /* Compress types */

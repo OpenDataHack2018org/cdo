@@ -399,8 +399,6 @@ void setDefaultFileType(char *filetypestr, int labort)
       else if ( strncmp(filetypestr, "srv", 3)  == 0 ) cdoDefaultFileType = FILETYPE_SRV;
       else if ( strncmp(filetypestr, "ext", 3)  == 0 ) cdoDefaultFileType = FILETYPE_EXT;
       else if ( strncmp(filetypestr, "ieg", 3)  == 0 ) cdoDefaultFileType = FILETYPE_IEG;
-      else if ( strncmp(filetypestr, "h5",  2)  == 0 ) cdoDefaultFileType = FILETYPE_H5;
-      else if ( strncmp(filetypestr, "hdf5", 4) == 0 ) cdoDefaultFileType = FILETYPE_H5;
       else
 	{
 	  if ( labort )
