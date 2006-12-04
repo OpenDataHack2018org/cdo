@@ -18,6 +18,7 @@
 #ifndef _CDO_INT_H
 #define _CDO_INT_H
 
+#include <assert.h>
 #include <stdio.h>
 #include <math.h>
 #include <float.h>

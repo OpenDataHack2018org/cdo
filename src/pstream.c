@@ -44,7 +44,7 @@ extern int timer_read, timer_write;
 
 static int PSTREAM_Debug = 0;
 
-#define  MAX_PSTREAMS  1024
+#define  MAX_PSTREAMS  4096
 
 static int _pstream_max = MAX_PSTREAMS;
 
@@ -84,13 +84,15 @@ typedef struct _pstreamPtrToIdx {
 } pstreamPtrToIdx;
 
 
-static pstreamPtrToIdx *_pstreamList;
-static pstreamPtrToIdx *_pstreamAvail = 0;
+static pstreamPtrToIdx *_pstreamList  = NULL;
+static pstreamPtrToIdx *_pstreamAvail = NULL;
 
 
 static void pstream_list_new(void)
 {
   static char func[] = "pstream_list_new";
+
+  assert(_pstreamList == NULL);
 
   _pstreamList = (pstreamPtrToIdx *) malloc(_pstream_max*sizeof(pstreamPtrToIdx));
 }

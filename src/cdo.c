@@ -617,24 +617,6 @@ int main(int argc, char *argv[])
 
   if ( Debug || Version ) version();
 
-  if ( cdoOptind < argc )
-    {
-      operatorArg = argv[cdoOptind];
-      argument = makeArgument(argc-cdoOptind, &argv[cdoOptind]);
-    }
-  else
-    {
-      if ( ! Version && ! Help )
-	{
-	  fprintf(stderr, "\nno operator given\n\n");
-	  usage();
-	  status = 1;
-	}
-
-      if ( Help ) usage();
-      lstop = TRUE;
-    }
-
   if ( Debug )
     {
       char *envstr;
@@ -753,6 +735,25 @@ int main(int argc, char *argv[])
   fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d\n",
 	  omp_get_num_procs(), omp_get_max_threads());
 #endif
+
+
+  if ( cdoOptind < argc )
+    {
+      operatorArg = argv[cdoOptind];
+      argument = makeArgument(argc-cdoOptind, &argv[cdoOptind]);
+    }
+  else
+    {
+      if ( ! Version && ! Help )
+	{
+	  fprintf(stderr, "\nno operator given\n\n");
+	  usage();
+	  status = 1;
+	}
+
+      if ( Help ) usage();
+      lstop = TRUE;
+    }
 
   if ( lstop ) return (status);
 
