@@ -17,7 +17,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_fd
-@Title     = Frost days where no snow
+@Title     = Frost days
 @EndOperator
 
 

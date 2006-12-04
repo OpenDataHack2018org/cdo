@@ -2314,7 +2314,7 @@ static char *EcaCwdiHelp[] = {
 
 static char *EcaCwfiHelp[] = {
     "NAME",
-    "    eca_cwfi - Cold wave duration index",
+    "    eca_cwfi - Cold-spell days",
     "",
     "SYNOPSIS",
     "    eca_cwfi[,nday]  ifile1 ifile2 ofile",
@@ -2460,7 +2460,7 @@ static char *EcaHwdiHelp[] = {
 
 static char *EcaHwfiHelp[] = {
     "NAME",
-    "    eca_hwfi - Heat wave duration index",
+    "    eca_hwfi - Warm-spell days",
     "",
     "SYNOPSIS",
     "    eca_hwfi[,nday]  ifile1 ifile2 ofile",

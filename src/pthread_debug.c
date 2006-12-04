@@ -91,8 +91,10 @@ void print_pthread_mutexattr(const char *caller,  pthread_mutexattr_t *m_attr)
   POUT3(caller, kind, PTHREAD_MUTEX_FAST_NP, PTHREAD_MUTEX_RECURSIVE_NP, PTHREAD_MUTEX_ERRORCHECK_NP);
 #endif
 
+#if defined (_POSIX_THREAD_PROCESS_SHARED)
   pthread_mutexattr_getpshared(m_attr, &pshared);
   POUT2(caller, pshared, PTHREAD_PROCESS_SHARED, PTHREAD_PROCESS_PRIVATE);
+#endif
 }
 
 
@@ -100,8 +102,10 @@ void print_pthread_condattr(const char *caller, pthread_condattr_t *c_attr)
 {
   int pshared;
 
+#if defined (_POSIX_THREAD_PROCESS_SHARED)
   pthread_condattr_getpshared(c_attr, &pshared);
   POUT2(caller, pshared, PTHREAD_PROCESS_SHARED, PTHREAD_PROCESS_PRIVATE);
+#endif
 }
 
 
