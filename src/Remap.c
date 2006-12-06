@@ -134,35 +134,6 @@ void *Remap(void *argument)
 	}
     }
 
-  if ( operfunc == REMAPCON || operfunc == REMAPCON1 || operfunc == REMAPCONF )
-    {
-      norm_opt = NORM_OPT_FRACAREA;
-
-      envstring = getenv("NORMALIZE_OPT");
-
-      if ( envstring )
-        {
-	  if ( strcmp(envstring, "fracarea") == 0 )
-	    norm_opt = NORM_OPT_FRACAREA;
-	  else if ( strcmp(envstring, "destarea") == 0 )
-	    norm_opt = NORM_OPT_DESTAREA;
-	  else if ( strcmp(envstring, "none") == 0 )
-	    norm_opt = NORM_OPT_NONE;
-	  else
-	    cdoWarning("NORMALIZE_OPT=%s unsupported!\n", envstring);
-	}
-
-      if ( cdoVerbose )
-        {
-	  if ( norm_opt == NORM_OPT_FRACAREA )
-	    cdoPrint("Normalization option: fracarea");
-	  else if ( norm_opt == NORM_OPT_DESTAREA )
-	    cdoPrint("Normalization option: destarea");
-	  else
-	    cdoPrint("Normalization option: none");
-	}
-    }
-
   if ( operfunc == REMAPXXX )
     {
       operatorInputArg("grid description file or name, remap file (SCRIP netCDF)");
@@ -297,6 +268,35 @@ void *Remap(void *argument)
 	cdoAbort("unsupported mapping method (map_type = %d)", map_type);
 
       if ( remap_test ) reorder_links(&remaps[0].vars);
+    }
+
+  if ( operfunc == REMAPCON || operfunc == REMAPCON1 || operfunc == REMAPCONF )
+    {
+      norm_opt = NORM_OPT_FRACAREA;
+
+      envstring = getenv("NORMALIZE_OPT");
+
+      if ( envstring )
+        {
+	  if ( strcmp(envstring, "fracarea") == 0 )
+	    norm_opt = NORM_OPT_FRACAREA;
+	  else if ( strcmp(envstring, "destarea") == 0 )
+	    norm_opt = NORM_OPT_DESTAREA;
+	  else if ( strcmp(envstring, "none") == 0 )
+	    norm_opt = NORM_OPT_NONE;
+	  else
+	    cdoWarning("NORMALIZE_OPT=%s unsupported!\n", envstring);
+	}
+
+      if ( cdoVerbose )
+        {
+	  if ( norm_opt == NORM_OPT_FRACAREA )
+	    cdoPrint("Normalization option: fracarea");
+	  else if ( norm_opt == NORM_OPT_DESTAREA )
+	    cdoPrint("Normalization option: destarea");
+	  else
+	    cdoPrint("Normalization option: none");
+	}
     }
 
   switch ( operfunc )

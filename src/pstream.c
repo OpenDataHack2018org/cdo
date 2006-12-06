@@ -812,8 +812,9 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 #if  defined  (HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
     {
+      int vlistIDcp = vlistDuplicate(vlistID);
       /*    pipeDefVlist(pstreamptr, vlistID);*/
-      pipeDefVlist(pstreamptr, vlistDuplicate(vlistID));
+      pipeDefVlist(pstreamptr, vlistIDcp);
     }
   else
 #endif

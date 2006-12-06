@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.0.5
 	* eca: Titles update
+	* remap: set norm_opt after read_remap_scrip (bug fix) [report: Andreas Sterl]
 	* cdo: FP_FAST_FMA bug fix [report: Sunpoet]
 	* ecacore: update [Ralf Quast]
 	* Version 1.0.6 released
