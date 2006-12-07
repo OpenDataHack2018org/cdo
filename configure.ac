@@ -38,6 +38,7 @@ AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
 case "$CC" in
   gcc)    COMP_VERSION=`$CC --version | head -n 1`;;
   g++)    COMP_VERSION=`$CC --version | head -n 1`;;
+  icc)    COMP_VERSION=`$CC --version | head -n 1`;;
   sxc++)  COMP_VERSION=`$CC -V 2>&1   | tail -n 1`;;
   xlc*)   COMP_VERSION=`$CC    2>&1   | head -n 1`;;
   *)      COMP_VERSION=`$CC -V 2>&1   | head -n 1`;;
