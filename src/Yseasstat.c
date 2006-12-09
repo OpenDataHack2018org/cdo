@@ -23,6 +23,7 @@
       Yseasstat  yseassum        Multi-year seasonally sum
       Yseasstat  yseasmean       Multi-year seasonally mean
       Yseasstat  yseasavg        Multi-year seasonally average
+      Yseasstat  yseasvar        Multi-year seasonally variance
       Yseasstat  yseasstd        Multi-year seasonally standard deviation
 */
 
@@ -73,6 +74,7 @@ void *Yseasstat(void *argument)
   cdoOperatorAdd("yseassum",  func_sum,  0, NULL);
   cdoOperatorAdd("yseasmean", func_mean, 0, NULL);
   cdoOperatorAdd("yseasavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("yseasvar",  func_var,  0, NULL);
   cdoOperatorAdd("yseasstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
@@ -134,7 +136,7 @@ void *Yseasstat(void *argument)
       if ( vars1[seas] == NULL )
 	{
 	  vars1[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -145,7 +147,7 @@ void *Yseasstat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -154,7 +156,7 @@ void *Yseasstat(void *argument)
 		  vars1[seas][varID][levelID].nmiss   = 0;
 		  vars1[seas][varID][levelID].missval = missval;
 		  vars1[seas][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		  if ( operfunc == func_std )
+		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[seas][varID][levelID].grid    = gridID;
 		      vars2[seas][varID][levelID].nmiss   = 0;
@@ -185,7 +187,7 @@ void *Yseasstat(void *argument)
 	      field.grid    = vars1[seas][varID][levelID].grid;
 	      field.missval = vars1[seas][varID][levelID].missval;
 
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  farsumq(&vars2[seas][varID][levelID], field);
 		  farsum(&vars1[seas][varID][levelID], field);
@@ -197,7 +199,7 @@ void *Yseasstat(void *argument)
 	    }
 	}
 
-      if ( nsets[seas] == 0 && operfunc == func_std )
+      if ( nsets[seas] == 0 && (operfunc == func_std || operfunc == func_var) )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -222,13 +224,16 @@ void *Yseasstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		farcmul(&vars1[seas][varID][levelID], 1.0/nsets[seas]);
 	    }
-	else if ( operfunc == func_std )
+	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+		if ( operfunc == func_std )
+		  farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+		else
+		  farcvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
 	    }
 
 	taxisDefVdate(taxisID2, vdates[seas]);
@@ -259,16 +264,15 @@ void *Yseasstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[seas][varID][levelID].ptr);
-		  if ( operfunc == func_std ) free(vars2[seas][varID][levelID].ptr);
+		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[seas][varID]);
-	      if ( operfunc == func_std ) free(vars2[seas][varID]);
+	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas][varID]);
 	    }
-	  /* RQ */
+
 	  free(vars1[seas]);
-	  if ( operfunc == func_std ) free(vars2[seas]);
-	  /* QR */ 
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas]);
 	}
     }
 

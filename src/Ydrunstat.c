@@ -23,6 +23,7 @@
       Ydrunstat    ydrunsum          Multi-year daily running sum
       Ydrunstat    ydrunmean         Multi-year daily running mean
       Ydrunstat    ydrunavg          Multi-year daily running average
+      Ydrunstat    ydrunvar          Multi-year daily running variance
       Ydrunstat    ydrunstd          Multi-year daily running standard deviation
 */
 
@@ -98,6 +99,7 @@ void *Ydrunstat(void *argument)
   cdoOperatorAdd("ydrunsum",  func_sum,  0, NULL);
   cdoOperatorAdd("ydrunmean", func_mean, 0, NULL);
   cdoOperatorAdd("ydrunavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("ydrunvar",  func_var,  0, NULL);
   cdoOperatorAdd("ydrunstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
@@ -134,13 +136,13 @@ void *Ydrunstat(void *argument)
   
   stats = ydstatCreate(vlistID1);
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
-  if ( operfunc == func_std )
+  if ( operfunc == func_std || operfunc == func_var )
     vars2 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
   
   for ( its = 0; its < ndates; its++ )
     {
       vars1[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
 	vars2[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -151,7 +153,7 @@ void *Ydrunstat(void *argument)
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  vars1[its][varID] = (FIELD *) malloc(nlevels*sizeof(FIELD));
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[its][varID] = (FIELD *) malloc(nlevels*sizeof(FIELD));
 
 	  for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -160,7 +162,7 @@ void *Ydrunstat(void *argument)
 	      vars1[its][varID][levelID].nmiss   = 0;
 	      vars1[its][varID][levelID].missval = missval;
 	      vars1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  vars2[its][varID][levelID].grid    = gridID;
 		  vars2[its][varID][levelID].nmiss   = 0;
@@ -193,7 +195,7 @@ void *Ydrunstat(void *argument)
 	  streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
 	  vars1[tsID][varID][levelID].nmiss = nmiss;
 
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
 	      for ( inp = 0; inp < tsID; inp++ )
@@ -219,21 +221,21 @@ void *Ydrunstat(void *argument)
       vdate = datetime[ndates].date;
       vtime = datetime[ndates].time;
       
-      if ( operfunc == func_std )   
+      if ( operfunc == func_std || operfunc == func_var )   
         ydstatUpdate(stats, vdate, vtime, vars1[0], vars2[0], ndates, operfunc);
       else
         ydstatUpdate(stats, vdate, vtime, vars1[0], NULL, ndates, operfunc);
         
       datetime[ndates] = datetime[0];
       vars1[ndates] = vars1[0];
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
         vars2[ndates] = vars2[0];
 
       for ( inp = 0; inp < ndates; inp++ )
 	{
 	  datetime[inp] = datetime[inp+1];
 	  vars1[inp] = vars1[inp+1];
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[inp] = vars2[inp+1];
 	}
 
@@ -250,7 +252,7 @@ void *Ydrunstat(void *argument)
 	  streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
 	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
 
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      for ( inp = 0; inp < ndates-1; inp++ )
 		{
@@ -303,19 +305,19 @@ void *Ydrunstat(void *argument)
 	  for ( levelID = 0; levelID < nlevels; levelID++ )
 	    {
 	      free(vars1[its][varID][levelID].ptr);
-	      if ( operfunc == func_std ) free(vars2[its][varID][levelID].ptr);
+	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[its][varID][levelID].ptr);
 	    }
 
 	  free(vars1[its][varID]);
-	  if ( operfunc == func_std ) free(vars2[its][varID]);
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[its][varID]);
 	}
 	free(vars1[its]);
-	if ( operfunc == func_std ) free(vars2[its]);
+	if ( operfunc == func_std || operfunc == func_var ) free(vars2[its]);
     }
   
   ydstatDestroy(stats);
   free(vars1);
-  if ( operfunc == func_std ) free(vars2);
+  if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
   if ( datetime ) free(datetime);
 
@@ -475,7 +477,7 @@ static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
   if ( stats->vars1[dayoy] == NULL )
     {
       ydstatCreateVars1(stats, dayoy);
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
 	ydstatCreateVars2(stats, dayoy);
     }
 
@@ -493,7 +495,7 @@ static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 	      memcpy(stats->vars1[dayoy][varID][levelID].ptr, vars1[varID][levelID].ptr, gridsize * sizeof(double));
 	      stats->vars1[dayoy][varID][levelID].nmiss = vars1[varID][levelID].nmiss;
 	       
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 	        {
 	          memcpy(stats->vars2[dayoy][varID][levelID].ptr, vars2[varID][levelID].ptr, gridsize * sizeof(double));
 	          stats->vars2[dayoy][varID][levelID].nmiss = vars2[varID][levelID].nmiss;
@@ -501,7 +503,7 @@ static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 	    }
 	  else
 	    {
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 	        {
 		  farsum(&stats->vars1[dayoy][varID][levelID], vars1[varID][levelID]);
 		  farsum(&stats->vars2[dayoy][varID][levelID], vars2[varID][levelID]);
@@ -546,6 +548,17 @@ static void ydstatFinalize(YDAY_STATS *stats, int operfunc)
 	          nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
 	          for ( levelID = 0; levelID < nlevels; levelID++ )
 		    farcstd(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID],
+		      1.0 / stats->nsets[dayoy]);
+	        }
+	      break;
+	      
+	    case func_var:
+	      for ( varID = 0; varID < nvars; varID++ )
+	        {
+	          if ( vlistInqVarTime(stats->vlist, varID) == TIME_CONSTANT ) continue;
+	          nlevels = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
+	          for ( levelID = 0; levelID < nlevels; levelID++ )
+		    farcvar(&stats->vars1[dayoy][varID][levelID], stats->vars2[dayoy][varID][levelID],
 		      1.0 / stats->nsets[dayoy]);
 	        }
 	      break;

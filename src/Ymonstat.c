@@ -23,6 +23,7 @@
       Ymonstat   ymonsum         Multi-year monthly sum
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
+      Ymonstat   ymonvar         Multi-year monthly variance
       Ymonstat   ymonstd         Multi-year monthly standard deviation
 */
 
@@ -73,6 +74,7 @@ void *Ymonstat(void *argument)
   cdoOperatorAdd("ymonsum",  func_sum,  0, NULL);
   cdoOperatorAdd("ymonmean", func_mean, 0, NULL);
   cdoOperatorAdd("ymonavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("ymonvar",  func_var,  0, NULL);
   cdoOperatorAdd("ymonstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
@@ -129,7 +131,7 @@ void *Ymonstat(void *argument)
       if ( vars1[month] == NULL )
 	{
 	  vars1[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -140,7 +142,7 @@ void *Ymonstat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[month][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[month][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -149,7 +151,7 @@ void *Ymonstat(void *argument)
 		  vars1[month][varID][levelID].nmiss   = 0;
 		  vars1[month][varID][levelID].missval = missval;
 		  vars1[month][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		  if ( operfunc == func_std )
+		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[month][varID][levelID].grid    = gridID;
 		      vars2[month][varID][levelID].nmiss   = 0;
@@ -180,7 +182,7 @@ void *Ymonstat(void *argument)
 	      field.grid    = vars1[month][varID][levelID].grid;
 	      field.missval = vars1[month][varID][levelID].missval;
 
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  farsumq(&vars2[month][varID][levelID], field);
 		  farsum(&vars1[month][varID][levelID], field);
@@ -192,7 +194,7 @@ void *Ymonstat(void *argument)
 	    }
 	}
 
-      if ( nsets[month] == 0 && operfunc == func_std )
+      if ( nsets[month] == 0 && operfunc == func_std || operfunc == func_var )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -217,13 +219,16 @@ void *Ymonstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		farcmul(&vars1[month][varID][levelID], 1.0/nsets[month]);
 	    }
-	else if ( operfunc == func_std )
+	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+		if ( operfunc == func_std )
+		  farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+	      else
+		  farcvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
 	    }
 
 	taxisDefVdate(taxisID2, vdates[month]);
@@ -254,16 +259,15 @@ void *Ymonstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[month][varID][levelID].ptr);
-		  if ( operfunc == func_std ) free(vars2[month][varID][levelID].ptr);
+		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[month][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[month][varID]);
-	      if ( operfunc == func_std ) free(vars2[month][varID]);
+	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[month][varID]);
 	    }
-	  /* RQ */
+
 	  free(vars1[month]);
-	  if ( operfunc == func_std ) free(vars2[month]);
-	  /* QR */ 
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[month]);
 	}
     }
 

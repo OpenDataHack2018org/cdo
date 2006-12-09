@@ -23,6 +23,7 @@
       Runstat    runsum          Running sum
       Runstat    runmean         Running mean
       Runstat    runavg          Running average
+      Runstat    runvar          Running variance
       Runstat    runstd          Running standard deviation
 */
 
@@ -111,6 +112,7 @@ void *Runstat(void *argument)
   cdoOperatorAdd("runsum",  func_sum,  0, NULL);
   cdoOperatorAdd("runmean", func_mean, 0, NULL);
   cdoOperatorAdd("runavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("runvar",  func_var,  0, NULL);
   cdoOperatorAdd("runstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
@@ -146,13 +148,13 @@ void *Runstat(void *argument)
 
   datetime = (DATETIME *) malloc((ndates+1)*sizeof(DATETIME));
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
-  if ( operfunc == func_std )
+  if ( operfunc == func_std || operfunc == func_var )
     vars2 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
 
   for ( its = 0; its < ndates; its++ )
     {
       vars1[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
 	vars2[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -163,7 +165,7 @@ void *Runstat(void *argument)
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  vars1[its][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[its][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -172,7 +174,7 @@ void *Runstat(void *argument)
 	      vars1[its][varID][levelID].nmiss   = 0;
 	      vars1[its][varID][levelID].missval = missval;
 	      vars1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  vars2[its][varID][levelID].grid    = gridID;
 		  vars2[its][varID][levelID].nmiss   = 0;
@@ -205,7 +207,7 @@ void *Runstat(void *argument)
 	  streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
 	  vars1[tsID][varID][levelID].nmiss = nmiss;
 
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
 	      for ( inp = 0; inp < tsID; inp++ )
@@ -235,13 +237,16 @@ void *Runstat(void *argument)
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      farcmul(&vars1[0][varID][levelID], 1.0/ndates);
 	  }
-      else if ( operfunc == func_std )
+      else if ( operfunc == func_std || operfunc == func_var )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      farcstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
+	      if ( operfunc == func_std )
+		farcstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
+	      else
+		farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
 	  }
 
       datetime_avg(dpy, ndates, datetime);
@@ -264,14 +269,14 @@ void *Runstat(void *argument)
 
       datetime[ndates] = datetime[0];
       vars1[ndates] = vars1[0];
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
         vars2[ndates] = vars2[0];
 
       for ( inp = 0; inp < ndates; inp++ )
 	{
 	  datetime[inp] = datetime[inp+1];
 	  vars1[inp] = vars1[inp+1];
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[inp] = vars2[inp+1];
 	}
 
@@ -288,7 +293,7 @@ void *Runstat(void *argument)
 	  streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
 	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
 
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      for ( inp = 0; inp < ndates-1; inp++ )
 		{
@@ -317,21 +322,20 @@ void *Runstat(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      free(vars1[its][varID][levelID].ptr);
-	      if ( operfunc == func_std ) free(vars2[its][varID][levelID].ptr);
+	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[its][varID][levelID].ptr);
 	    }
 
 	  free(vars1[its][varID]);
-	  if ( operfunc == func_std ) free(vars2[its][varID]);
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[its][varID]);
 	}
-      /* RQ */
+
       free(vars1[its]);
-      if ( operfunc == func_std ) free(vars2[its]);
-      /* QR */
+      if ( operfunc == func_std || operfunc == func_var ) free(vars2[its]);
     }
 
   free(datetime);
   free(vars1);
-  if ( operfunc == func_std ) free(vars2);
+  if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
   if ( recVarID   ) free(recVarID);
   if ( recLevelID ) free(recLevelID);

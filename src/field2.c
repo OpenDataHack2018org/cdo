@@ -354,7 +354,7 @@ void farmax(FIELD *field1, FIELD field2)
 }
 
 
-void farstd(FIELD *field1, FIELD field2, FIELD field3)
+void farvar(FIELD *field1, FIELD field2, FIELD field3)
 {
   static char func[] = "farstd";
   int    i, len;
@@ -396,6 +396,37 @@ void farstd(FIELD *field1, FIELD field2, FIELD field3)
 	array1[i] = missval1;
 	field1->nmiss++;
       }
+}
+
+
+void farstd(FIELD *field1, FIELD field2, FIELD field3)
+{
+  static char func[] = "farstd";
+  int    i, len;
+  int    grid1    = field1->grid;
+  int    nmiss1   = field1->nmiss;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+  int    nmiss2   = field2.nmiss;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+  double *array3  = field3.ptr;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  farvar(field1, field2, field3);
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0.0 )
+      {
+	array1[i] = missval1;
+	field1->nmiss++;
+      }
     else
       {
 	array1[i] = sqrt(array1[i]);
@@ -403,9 +434,9 @@ void farstd(FIELD *field1, FIELD field2, FIELD field3)
 }
 
 
-void farcstd(FIELD *field1, FIELD field2, double rconst1)
+void farcvar(FIELD *field1, FIELD field2, double rconst1)
 {
-  static char func[] = "farcstd";
+  static char func[] = "farcvar";
   int    i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -436,6 +467,36 @@ void farcstd(FIELD *field1, FIELD field2, double rconst1)
 	  array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
 	}
     }
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0.0 )
+      {
+	array1[i] = missval1;
+	field1->nmiss++;
+      }
+}
+
+
+void farcstd(FIELD *field1, FIELD field2, double rconst1)
+{
+  static char func[] = "farcstd";
+  int    i, len;
+  int    grid1    = field1->grid;
+  int    nmiss1   = field1->nmiss;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+  int    nmiss2   = field2.nmiss;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  farcvar(field1, field2, rconst1);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )

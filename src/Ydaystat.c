@@ -23,6 +23,7 @@
       Ydaystat   ydaysum         Multi-year daily sum
       Ydaystat   ydaymean        Multi-year daily mean
       Ydaystat   ydayavg         Multi-year daily average
+      Ydaystat   ydayvar         Multi-year daily variance
       Ydaystat   ydaystd         Multi-year daily standard deviation
 */
 
@@ -74,6 +75,7 @@ void *Ydaystat(void *argument)
   cdoOperatorAdd("ydaysum",  func_sum,  0, NULL);
   cdoOperatorAdd("ydaymean", func_mean, 0, NULL);
   cdoOperatorAdd("ydayavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("ydayvar",  func_var,  0, NULL);
   cdoOperatorAdd("ydaystd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
@@ -137,7 +139,7 @@ void *Ydaystat(void *argument)
       if ( vars1[dayoy] == NULL )
 	{
 	  vars1[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -148,7 +150,7 @@ void *Ydaystat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -157,7 +159,7 @@ void *Ydaystat(void *argument)
 		  vars1[dayoy][varID][levelID].nmiss   = 0;
 		  vars1[dayoy][varID][levelID].missval = missval;
 		  vars1[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		  if ( operfunc == func_std )
+		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[dayoy][varID][levelID].grid    = gridID;
 		      vars2[dayoy][varID][levelID].nmiss   = 0;
@@ -188,7 +190,7 @@ void *Ydaystat(void *argument)
 	      field.grid    = vars1[dayoy][varID][levelID].grid;
 	      field.missval = vars1[dayoy][varID][levelID].missval;
 
-	      if ( operfunc == func_std )
+	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  farsumq(&vars2[dayoy][varID][levelID], field);
 		  farsum(&vars1[dayoy][varID][levelID], field);
@@ -200,7 +202,7 @@ void *Ydaystat(void *argument)
 	    }
 	}
 
-      if ( nsets[dayoy] == 0 && operfunc == func_std )
+      if ( nsets[dayoy] == 0 && (operfunc == func_std || operfunc == func_var) )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -225,13 +227,16 @@ void *Ydaystat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		farcmul(&vars1[dayoy][varID][levelID], 1.0/nsets[dayoy]);
 	    }
-	else if ( operfunc == func_std )
+	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		if ( operfunc == func_std )
+		  farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		else
+		  farcvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
 	    }
 
 	taxisDefVdate(taxisID2, vdates[dayoy]);
@@ -262,16 +267,15 @@ void *Ydaystat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[dayoy][varID][levelID].ptr);
-		  if ( operfunc == func_std ) free(vars2[dayoy][varID][levelID].ptr);
+		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[dayoy][varID]);
-	      if ( operfunc == func_std ) free(vars2[dayoy][varID]);
+	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy][varID]);
 	    }
-	  /* RQ */
+
 	  free(vars1[dayoy]);
-	  if ( operfunc == func_std ) free(vars2[dayoy]);
-	  /* QR */ 
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy]);
 	}
     }
 

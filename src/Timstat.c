@@ -23,30 +23,35 @@
       Timstat    timsum          Time sum
       Timstat    timmean         Time mean
       Timstat    timavg          Time average
+      Timstat    timvar          Time variance
       Timstat    timstd          Time standard deviation
       Hourstat   hourmin         Hourly minimum
       Hourstat   hourmax         Hourly maximum
       Hourstat   hoursum         Hourly sum
       Hourstat   hourmean        Hourly mean
       Hourstat   houravg         Hourly average
+      Hourstat   hourvar         Hourly variance
       Hourstat   hourstd         Hourly standard deviation
       Daystat    daymin          Daily minimum
       Daystat    daymax          Daily maximum
       Daystat    daysum          Daily sum
       Daystat    daymean         Daily mean
       Daystat    dayavg          Daily average
+      Daystat    dayvar          Daily variance
       Daystat    daystd          Daily standard deviation
       Monstat    monmin          Monthly minimum
       Monstat    monmax          Monthly maximum
       Monstat    monsum          Monthly sum
       Monstat    monmean         Monthly mean
       Monstat    monavg          Monthly average
+      Monstat    monvar          Monthly variance
       Monstat    monstd          Monthly standard deviation
       Yearstat   yearmin         Yearly minimum
       Yearstat   yearmax         Yearly maximum
       Yearstat   yearsum         Yearly sum
       Yearstat   yearmean        Yearly mean
       Yearstat   yearavg         Yearly average
+      Yearstat   yearvar         Yearly variance
       Yearstat   yearstd         Yearly standard deviation
 */
 
@@ -90,30 +95,35 @@ void *Timstat(void *argument)
   cdoOperatorAdd("timsum",   func_sum,  17, NULL);
   cdoOperatorAdd("timmean",  func_mean, 17, NULL);
   cdoOperatorAdd("timavg",   func_avg,  17, NULL);
+  cdoOperatorAdd("timvar",   func_var,  17, NULL);
   cdoOperatorAdd("timstd",   func_std,  17, NULL);
   cdoOperatorAdd("yearmin",  func_min,   8, NULL);
   cdoOperatorAdd("yearmax",  func_max,   8, NULL);
   cdoOperatorAdd("yearsum",  func_sum,   8, NULL);
   cdoOperatorAdd("yearmean", func_mean,  8, NULL);
   cdoOperatorAdd("yearavg",  func_avg,   8, NULL);
+  cdoOperatorAdd("yearvar",  func_var,   8, NULL);
   cdoOperatorAdd("yearstd",  func_std,   8, NULL);
   cdoOperatorAdd("monmin",   func_min,   6, NULL);
   cdoOperatorAdd("monmax",   func_max,   6, NULL);
   cdoOperatorAdd("monsum",   func_sum,   6, NULL);
   cdoOperatorAdd("monmean",  func_mean,  6, NULL);
   cdoOperatorAdd("monavg",   func_avg,   6, NULL);
+  cdoOperatorAdd("monvar",   func_var,   6, NULL);
   cdoOperatorAdd("monstd",   func_std,   6, NULL);
   cdoOperatorAdd("daymin",   func_min,   4, NULL);
   cdoOperatorAdd("daymax",   func_max,   4, NULL);
   cdoOperatorAdd("daysum",   func_sum,   4, NULL);
   cdoOperatorAdd("daymean",  func_mean,  4, NULL);
   cdoOperatorAdd("dayavg",   func_avg,   4, NULL);
+  cdoOperatorAdd("dayvar",   func_var,   4, NULL);
   cdoOperatorAdd("daystd",   func_std,   4, NULL);
   cdoOperatorAdd("hourmin",  func_min,   2, NULL);
   cdoOperatorAdd("hourmax",  func_max,   2, NULL);
   cdoOperatorAdd("hoursum",  func_sum,   2, NULL);
   cdoOperatorAdd("hourmean", func_mean,  2, NULL);
   cdoOperatorAdd("houravg",  func_avg,   2, NULL);
+  cdoOperatorAdd("hourvar",  func_var,   2, NULL);
   cdoOperatorAdd("hourstd",  func_std,   2, NULL);
 
   operatorID = cdoOperatorID();
@@ -150,7 +160,7 @@ void *Timstat(void *argument)
 
   vars1 = (FIELD **) malloc(nvars*sizeof(FIELD *));
   samp1 = (FIELD **) malloc(nvars*sizeof(FIELD *));
-  if ( operfunc == func_std )
+  if ( operfunc == func_std || operfunc == func_var )
     vars2 = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -162,7 +172,7 @@ void *Timstat(void *argument)
 
       vars1[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
       samp1[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
 	vars2[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -175,7 +185,7 @@ void *Timstat(void *argument)
 	  samp1[varID][levelID].nmiss   = 0;
 	  samp1[varID][levelID].missval = missval;
 	  samp1[varID][levelID].ptr     = NULL;
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      vars2[varID][levelID].grid    = gridID;
 	      vars2[varID][levelID].nmiss   = 0;
@@ -250,7 +260,7 @@ void *Timstat(void *argument)
 			  samp1[varID][levelID].ptr[i]++;
 		    }
 
-		  if ( operfunc == func_std )
+		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      farsumq(&vars2[varID][levelID], field);
 		      farsum(&vars1[varID][levelID], field);
@@ -262,7 +272,7 @@ void *Timstat(void *argument)
 		}
 	    }
 
-	  if ( nsets == 0 && operfunc == func_std )
+	  if ( nsets == 0 && (operfunc == func_std || operfunc == func_var) )
 	    for ( varID = 0; varID < nvars; varID++ )
 	      {
 		if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -292,7 +302,7 @@ void *Timstat(void *argument)
 		  fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
 	      }
 	  }
-      else if ( operfunc == func_std )
+      else if ( operfunc == func_std || operfunc == func_var )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -300,11 +310,21 @@ void *Timstat(void *argument)
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
-		  farcstd(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		  {
+		    printf("farcstd\n");
+		    if ( operfunc == func_std )
+		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		    else
+		      farcvar(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		  }
 		else
 		  {
+		    printf("farstd\n");
 		    farinv(&samp1[varID][levelID]);
-		    farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
+		    if ( operfunc == func_std )
+		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
+		    else
+		      farvar(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
 		  }
 	      }
 	  }
@@ -335,17 +355,17 @@ void *Timstat(void *argument)
 	{
 	  free(vars1[varID][levelID].ptr);
 	  if ( samp1[varID][levelID].ptr ) free(samp1[varID][levelID].ptr);
-	  if ( operfunc == func_std ) free(vars2[varID][levelID].ptr);
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID][levelID].ptr);
 	}
 
       free(vars1[varID]);
       free(samp1[varID]);
-      if ( operfunc == func_std ) free(vars2[varID]);
+      if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID]);
     }
 
   free(vars1);
   free(samp1);
-  if ( operfunc == func_std ) free(vars2);
+  if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
   if ( field.ptr ) free(field.ptr);
 

@@ -23,6 +23,7 @@
       Selstat    selsum          Time range sum
       Selstat    selmean         Time range mean
       Selstat    selavg          Time range average
+      Selstat    selvar          Time range variance
       Selstat    selstd          Time range standard deviation
 */
 
@@ -65,6 +66,7 @@ void *Selstat(void *argument)
   cdoOperatorAdd("selsum",  func_sum,  0, NULL);
   cdoOperatorAdd("selmean", func_mean, 0, NULL);
   cdoOperatorAdd("selavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("selvar",  func_var,  0, NULL);
   cdoOperatorAdd("selstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
@@ -107,7 +109,7 @@ void *Selstat(void *argument)
 
   vars1 = (FIELD **) malloc(nvars*sizeof(FIELD *));
   samp1 = (FIELD **) malloc(nvars*sizeof(FIELD *));
-  if ( operfunc == func_std )
+  if ( operfunc == func_std || operfunc == func_var )
     vars2 = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
   for ( varID = 0; varID < nvars; varID++ )
@@ -119,7 +121,7 @@ void *Selstat(void *argument)
 
       vars1[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
       samp1[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-      if ( operfunc == func_std )
+      if ( operfunc == func_std || operfunc == func_var )
 	vars2[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -132,7 +134,7 @@ void *Selstat(void *argument)
 	  samp1[varID][levelID].nmiss   = 0;
 	  samp1[varID][levelID].missval = missval;
 	  samp1[varID][levelID].ptr     = NULL;
-	  if ( operfunc == func_std )
+	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      vars2[varID][levelID].grid    = gridID;
 	      vars2[varID][levelID].nmiss   = 0;
@@ -212,7 +214,7 @@ void *Selstat(void *argument)
 			  samp1[varID][levelID].ptr[i]++;
 		    }
 
-		  if ( operfunc == func_std )
+		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      farsumq(&vars2[varID][levelID], field);
 		      farsum(&vars1[varID][levelID], field);
@@ -224,7 +226,7 @@ void *Selstat(void *argument)
 		}
 	    }
 
-	  if ( nsets == 0 && operfunc == func_std )
+	  if ( nsets == 0 && (operfunc == func_std || operfunc == func_var) )
 	    for ( varID = 0; varID < nvars; varID++ )
 	      {
 		if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -253,7 +255,7 @@ void *Selstat(void *argument)
 		  fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
 	      }
 	  }
-      else if ( operfunc == func_std )
+      else if ( operfunc == func_std || operfunc == func_var )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -261,11 +263,19 @@ void *Selstat(void *argument)
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
-		  farcstd(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		  {
+		    if ( operfunc == func_std )
+		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		    else
+		      farcvar(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
+		  }
 		else
 		  {
 		    farinv(&samp1[varID][levelID]);
-		    farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
+		    if ( operfunc == func_std )
+		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
+		    else
+		      farvar(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
 		  }
 	      }
 	  }
@@ -307,17 +317,17 @@ void *Selstat(void *argument)
 	{
 	  free(vars1[varID][levelID].ptr);
 	  if ( samp1[varID][levelID].ptr ) free(samp1[varID][levelID].ptr);
-	  if ( operfunc == func_std ) free(vars2[varID][levelID].ptr);
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID][levelID].ptr);
 	}
 
       free(vars1[varID]);
       free(samp1[varID]);
-      if ( operfunc == func_std ) free(vars2[varID]);
+      if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID]);
     }
 
   free(vars1);
   free(samp1);
-  if ( operfunc == func_std ) free(vars2);
+  if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
   if ( field.ptr ) free(field.ptr);
 

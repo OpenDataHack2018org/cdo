@@ -259,11 +259,11 @@ void *Tchill(void *argument);
 /* RQ */
 #define  RunpctlOperators       {"runpctl"}
 /* QR */
-#define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runstd"}
+#define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runvar",  "runstd"}
 /* RQ */
 #define  SeaspctlOperators      {"seaspctl"}
 /* QR */
-#define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasstd"}
+#define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelectOperators        {"selcode", "selvar", "selstdname", "sellevel", "selgrid", "selgridname", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delcode", "delvar", "selltype"}
@@ -271,7 +271,7 @@ void *Tchill(void *argument);
 /* RQ */
 #define  SelpctlOperators       {"selpctl"}
 /* QR */
-#define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selstd"}
+#define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selvar",  "selstd"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime"}
 #define  SetOperators           {"setpartab", "setpartabv", "setcode", "setvar", "setlevel", "setltype"}
@@ -307,38 +307,38 @@ void *Tchill(void *argument);
 #define    DaypctlOperators     {"daypctl"}
 #define    HourpctlOperators    {"hourpctl"}
 /* QR */
-#define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timstd"}
-#define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearstd"}
-#define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monstd"}
-#define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "daystd"}
-#define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourstd"}
+#define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timstd"}
+#define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearstd"}
+#define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monstd"}
+#define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "daystd"}
+#define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourstd"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
 #define  VardupOperators        {"vardup", "varmul"}
 #define  VargenOperators        {"random", "const", "topo"}
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl"}
-#define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertstd"}
+#define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertvar", "vertstd"}
 #define  WindOperators          {"uv2dv", "dv2uv", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
 /* RQ */
 #define  YdaypctlOperators      {"ydaypctl"}
 /* QR */
-#define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydaystd"}
+#define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydayvar", "ydaystd"}
 /* RQ */
 #define  YdrunpctlOperators     {"ydrunpctl"}
-#define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunstd"}
+#define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunvar", "ydrunstd"}
 /* QR */
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
 /* RQ */
 #define  YmonpctlOperators      {"ymonpctl"}
 /* QR */
-#define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonstd"}
+#define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonvar", "ymonstd"}
 /* RQ */
 #define  YseaspctlOperators     {"yseaspctl"}
 /* QR */
-#define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasstd"}
+#define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasvar", "yseasstd"}
 #define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonpctl"}
 
 /* RQ */
