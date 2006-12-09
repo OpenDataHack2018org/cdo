@@ -188,44 +188,46 @@ Operator catalog:
       Ensstat    enssum          Ensemble sum
       Ensstat    ensmean         Ensemble mean
       Ensstat    ensavg          Ensemble average
-      Ensstat    ensstd          Ensemble standard deviation
       Ensstat    ensvar          Ensemble variance
+      Ensstat    ensstd          Ensemble standard deviation
       Ensstat    enspctl         Ensemble percentiles
       Fldstat    fldmin          Field minimum
       Fldstat    fldmax          Field maximum
       Fldstat    fldsum          Field sum
       Fldstat    fldmean         Field mean
       Fldstat    fldavg          Field average
-      Fldstat    fldstd          Field standard deviation
       Fldstat    fldvar          Field variance
+      Fldstat    fldstd          Field standard deviation
       Fldstat    fldpctl         Field percentiles
       Zonstat    zonmin          Zonal minimum
       Zonstat    zonmax          Zonal maximum
       Zonstat    zonsum          Zonal sum
       Zonstat    zonmean         Zonal mean
       Zonstat    zonavg          Zonal average
-      Zonstat    zonstd          Zonal standard deviation
       Zonstat    zonvar          Zonal variance
+      Zonstat    zonstd          Zonal standard deviation
       Zonstat    zonpctl         Zonal percentiles
       Merstat    mermin          Meridional minimum
       Merstat    mermax          Meridional maximum
       Merstat    mersum          Meridional sum
       Merstat    mermean         Meridional mean
       Merstat    meravg          Meridional average
-      Merstat    merstd          Meridional standard deviation
       Merstat    mervar          Meridional variance
+      Merstat    merstd          Meridional standard deviation
       Merstat    merpctl         Meridional percentiles
       Vertstat   vertmin         Vertical minimum
       Vertstat   vertmax         Vertical maximum
       Vertstat   vertsum         Vertical sum
       Vertstat   vertmean        Vertical mean
       Vertstat   vertavg         Vertical average
+      Vertstat   vertvar         Vertical variance
       Vertstat   vertstd         Vertical standard deviation
       Selstat    selmin          Time range minimum
       Selstat    selmax          Time range maximum
       Selstat    selsum          Time range sum
       Selstat    selmean         Time range mean
       Selstat    selavg          Time range average
+      Selstat    selvar          Time range variance
       Selstat    selstd          Time range standard deviation
       Selpctl    selpctl         Time range percentiles
       Runstat    runmin          Running minimum
@@ -233,6 +235,7 @@ Operator catalog:
       Runstat    runsum          Running sum
       Runstat    runmean         Running mean
       Runstat    runavg          Running average
+      Runstat    runvar          Running variance
       Runstat    runstd          Running standard deviation
       Runpctl    runpctl         Running percentiles
       Timstat    timmin          Time minimum
@@ -240,6 +243,7 @@ Operator catalog:
       Timstat    timsum          Time sum
       Timstat    timmean         Time mean
       Timstat    timavg          Time average
+      Timstat    timvar          Time variance
       Timstat    timstd          Time standard deviation
       Timpctl    timpctl         Time percentiles
       Hourstat   hourmin         Hourly minimum
@@ -247,6 +251,7 @@ Operator catalog:
       Hourstat   hoursum         Hourly sum
       Hourstat   hourmean        Hourly mean
       Hourstat   houravg         Hourly average
+      Hourstat   hourvar         Hourly variance
       Hourstat   hourstd         Hourly standard deviation
       Hourpctl   hourpctl        Hourly percentiles
       Daystat    daymin          Daily minimum
@@ -254,6 +259,7 @@ Operator catalog:
       Daystat    daysum          Daily sum
       Daystat    daymean         Daily mean
       Daystat    dayavg          Daily average
+      Daystat    dayvar          Daily variance
       Daystat    daystd          Daily standard deviation
       Daypctl    daypctl         Daily percentiles
       Monstat    monmin          Monthly minimum
@@ -261,6 +267,7 @@ Operator catalog:
       Monstat    monsum          Monthly sum
       Monstat    monmean         Monthly mean
       Monstat    monavg          Monthly average
+      Monstat    monvar          Monthly variance
       Monstat    monstd          Monthly standard deviation
       Monpctl    monpctl         Monthly percentiles
       Yearstat   yearmin         Yearly minimum
@@ -268,6 +275,7 @@ Operator catalog:
       Yearstat   yearsum         Yearly sum
       Yearstat   yearmean        Yearly mean
       Yearstat   yearavg         Yearly average
+      Yearstat   yearvar         Yearly variance
       Yearstat   yearstd         Yearly standard deviation
       Yearpctl   yearpctl        Yearly percentiles
       Seasstat   seasmin         Seasonal minimum
@@ -275,6 +283,7 @@ Operator catalog:
       Seasstat   seassum         Seasonal sum
       Seasstat   seasmean        Seasonal mean
       Seasstat   seasavg         Seasonal average
+      Seasstat   seasvar         Seasonal variance
       Seasstat   seasstd         Seasonal standard deviation
       Seaspctl   seaspctl        Seasonal percentiles
       Ydaystat   ydaymin         Multi-year daily minimum
@@ -282,6 +291,7 @@ Operator catalog:
       Ydaystat   ydaysum         Multi-year daily sum
       Ydaystat   ydaymean        Multi-year daily mean
       Ydaystat   ydayavg         Multi-year daily average
+      Ydaystat   ydayvar         Multi-year daily variance
       Ydaystat   ydaystd         Multi-year daily standard deviation
       Ydaypctl   ydaypctl        Multi-year daily percentiles
       Ymonstat   ymonmin         Multi-year monthly minimum
@@ -289,6 +299,7 @@ Operator catalog:
       Ymonstat   ymonsum         Multi-year monthly sum
       Ymonstat   ymonmean        Multi-year monthly mean
       Ymonstat   ymonavg         Multi-year monthly average
+      Ymonstat   ymonvar         Multi-year monthly variance
       Ymonstat   ymonstd         Multi-year monthly standard deviation
       Ymonpctl   ymonpctl        Multi-year monthly percentiles
       Yseasstat  yseasmin        Multi-year seasonal minimum
@@ -296,6 +307,7 @@ Operator catalog:
       Yseasstat  yseassum        Multi-year seasonal sum
       Yseasstat  yseasmean       Multi-year seasonal mean
       Yseasstat  yseasavg        Multi-year seasonal average
+      Yseasstat  yseasvar        Multi-year seasonal variance
       Yseasstat  yseasstd        Multi-year seasonal standard deviation
       Yseaspctl  yseaspctl       Multi-year seasonal percentiles
       Ydrunstat  ydrunmin        Multi-year daily running minimum
@@ -303,6 +315,7 @@ Operator catalog:
       Ydrunstat  ydrunsum        Multi-year daily running sum
       Ydrunstat  ydrunmean       Multi-year daily running mean
       Ydrunstat  ydrunavg        Multi-year daily running average
+      Ydrunstat  ydrunvar        Multi-year daily running variance
       Ydrunstat  ydrunstd        Multi-year daily running standard deviation
       Ydrunpctl  ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------

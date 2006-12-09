@@ -5,12 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = vertmin vertmax vertsum vertmean vertavg vertstd
+@Operators = vertmin vertmax vertsum vertmean vertavg vertvar vertstd
 
 @BeginDescription
 This module computes statistical values over all levels of the input variables.
-According to actual operator the vertical minimum, maximum, sum, average, 
-standard deviation or variance is written to @file{ofile}.
+According to actual operator the vertical minimum, maximum, sum, average, variance
+or standard deviation is written to @file{ofile}.
 @EndDescription
 @EndModule
 
@@ -56,6 +56,15 @@ For every gridpoint the mean over all levels is computed.
 
 @BeginDescription
 For every gridpoint the average over all levels is computed.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_vertvar
+@Title     = Vertical variance
+
+@BeginDescription
+For every gridpoint the variance over all levels is computed.
 @EndDescription
 @EndOperator
 

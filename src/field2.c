@@ -44,7 +44,7 @@ void faradd(FIELD *field1, FIELD field2)
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  double *weight1 = field1->weight;
+  /*  double *weight1 = field1->weight; */
   int    grid2    = field2.grid;
   int    nmiss2   = field2.nmiss;
   double missval2 = field2.missval;
@@ -80,7 +80,7 @@ void farsum(FIELD *field1, FIELD field2)
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  double *weight1 = field1->weight;
+  /*  double *weight1 = field1->weight; */
   int    grid2    = field2.grid;
   int    nmiss2   = field2.nmiss;
   double missval2 = field2.missval;
@@ -122,7 +122,7 @@ void farsumq(FIELD *field1, FIELD field2)
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
-  double *weight1 = field1->weight;
+  /*  double *weight1 = field1->weight; */
   int    grid2    = field2.grid;
   int    nmiss2   = field2.nmiss;
   double missval2 = field2.missval;
@@ -404,14 +404,9 @@ void farstd(FIELD *field1, FIELD field2, FIELD field3)
   static char func[] = "farstd";
   int    i, len;
   int    grid1    = field1->grid;
-  int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
   int    grid2    = field2.grid;
-  int    nmiss2   = field2.nmiss;
-  double missval2 = field2.missval;
-  double *array2  = field2.ptr;
-  double *array3  = field3.ptr;
 
   len    = gridInqSize(grid1);
 
@@ -483,13 +478,9 @@ void farcstd(FIELD *field1, FIELD field2, double rconst1)
   static char func[] = "farcstd";
   int    i, len;
   int    grid1    = field1->grid;
-  int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
   int    grid2    = field2.grid;
-  int    nmiss2   = field2.nmiss;
-  double missval2 = field2.missval;
-  double *array2  = field2.ptr;
 
   len    = gridInqSize(grid1);
 

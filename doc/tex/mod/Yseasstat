@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = yseasmin yseasmax yseassum yseasmean yseasavg yseasstd
+@Operators = yseasmin yseasmax yseassum yseasmean yseasavg yseasvar yseasstd
 
 @BeginDescription
 This module writes to @file{ofile}, according to the actual operator,
-the minimum, maximum, sum, average or standard deviation  of each 
+the minimum, maximum, sum, average, variance or standard deviation  of each 
 season in @file{ifile}. The date information in an output field is the date
 of the last contributing input field.
 @EndDescription
@@ -129,6 +129,30 @@ o(\mbox{1},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\}
 o(\mbox{2},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
 o(\mbox{3},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
 o(\mbox{4},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yseasvar
+@Title     = Multi-year seasonal variance
+
+@BeginDescription
+@IfMan
+o(1,x) = var{i(t,x), month(i(t)) = 12, 01, 02}
+o(2,x) = var{i(t,x), month(i(t)) = 03, 04, 05}
+o(3,x) = var{i(t,x), month(i(t)) = 06, 07, 08}
+o(4,x) = var{i(t,x), month(i(t)) = 09, 10, 11}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{1},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12, 01, 02}\} \\
+o(\mbox{2},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{03, 04, 05}\} \\
+o(\mbox{3},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{06, 07, 08}\} \\
+o(\mbox{4},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\} \\
 \end{array}
 @EndMath
 @EndifDoc

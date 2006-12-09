@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ydaymin ydaymax ydaysum ydaymean ydayavg ydaystd
+@Operators = ydaymin ydaymax ydaysum ydaymean ydayavg ydayvar ydaystd
 
 @BeginDescription
 This module writes to @file{ofile}, according to the actual operator,
-the minimum, maximum, sum, average or standard deviation of each 
+the minimum, maximum, sum, average, variance or standard deviation of each 
 day of year in @file{ifile}. The date information in an output field is 
 the date of the last contributing input field.
 @EndModule
@@ -118,6 +118,28 @@ o(366,x) = avg{i(t,x), day(i(t)) = 366}
 o(\mbox{001},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
 \vdots \\
 o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydayvar
+@Title     = Multi-year daily variance
+
+@BeginDescription
+@IfMan
+o(001,x) = var{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = var{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc

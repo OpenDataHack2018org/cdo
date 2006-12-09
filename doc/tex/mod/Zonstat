@@ -5,12 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = zonmin zonmax zonsum zonmean zonavg zonstd zonvar zonpctl
+@Operators = zonmin zonmax zonsum zonmean zonavg zonvar zonstd zonpctl
 
 @BeginDescription
 This module computes zonal statistical values of the input fields.
 According to the actual operator the zonal minimum, maximum, 
-sum, average, standard deviation, variance or a certain percentile
+sum, average, variance, standard deviation or a certain percentile
 is written to @file{ofile}. All input fields must have the same
 rectangular grid. 
 @EndDescription

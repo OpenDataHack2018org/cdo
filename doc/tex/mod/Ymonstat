@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonstd
+@Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonvar ymonstd
 
 @BeginDescription
 This module writes to @file{ofile}, according to the actual operator,
-the minimum, maximum, sum, average or standard deviation  of each 
+the minimum, maximum, sum, average, variance or standard deviation  of each 
 month of year in @file{ifile}. The date information in an output field is 
 the date of the last contributing input field.
 @EndDescription
@@ -119,6 +119,28 @@ o(12,x) = avg{i(t,x), month(i(t)) = 12}
 o(\mbox{01},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
 \vdots \\
 o(\mbox{12},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ymonvar
+@Title     = Multi-year monthly variance
+
+@BeginDescription
+@IfMan
+o(01,x) = var{i(t,x), month(i(t)) = 01}
+                 ...
+o(12,x) = var{i(t,x), month(i(t)) = 12}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{01},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+\vdots \\
+o(\mbox{12},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc

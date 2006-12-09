@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifiles ofile
-@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensvar enspctl
+@Operators = ensmin ensmax enssum ensmean ensavg ensvar ensstd enspctl
 
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
-Depending on the actual operator the minimum, maximum, sum, average,
+Depending on the actual operator the minimum, maximum, sum, average, variance,
 standard deviation, or a certain percentile over all input files is written
 to @file{ofile}. The date information for a time step in @file{ofile} is
 the date of the first input file.

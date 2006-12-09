@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = hourmin hourmax hoursum hourmean houravg hourstd
+@Operators = hourmin hourmax hoursum hourmean houravg hourvar hourstd
 
 @BeginDescription
 This module computes statistical values over time steps of the same hour.
-Depending on the actual operator the minimum, maximum, sum, average 
+Depending on the actual operator the minimum, maximum, sum, average, variance
 or standard deviation of time steps of the same hour is written to @file{ofile}.
 The date information for a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.
@@ -106,6 +106,25 @@ o(t,x) = avg{i(t',x), t_1<t'<=t_n}
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_hourvar
+@Title     = Hourly variance
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same hour, it is
+
+o(t,x) = var{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same hour, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

@@ -5,12 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = selmin selmax selsum selmean selavg selstd
+@Operators = selmin selmax selsum selmean selavg selvar selstd
 
 @BeginDescription
 This module computes statistical values for a selected number of time steps.
-According to the actual operator the average, minimum, maximum, sum, average 
-or standard deviation of the selected time steps is written to @file{ofile}.
+According to the actual operator the average, minimum, maximum, sum, average,
+variance or standard deviation of the selected time steps is written to @file{ofile}.
 The date information for a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.
 @EndDescription
@@ -127,6 +127,28 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
+@BeginOperator_selvar
+@Title     = Time range variance
+@Parameter = nsets [noffset] [nskip]
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t1, ...., tn of time steps of the same 
+selected time range, it is
+
+o(t,x) = var{i(t',x), t1 < t' <= tn}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+selected time range, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_selstd
 @Title     = Time range standard deviation
 @Parameter = nsets [noffset] [nskip]
@@ -136,7 +158,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 For every adjacent sequence t1, ...., tn of time steps of the same 
 selected time range, it is
 
-o(t,x) = sqrt{var{i(t',x), t1 < t' <= tn}}
+o(t,x) = std{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 

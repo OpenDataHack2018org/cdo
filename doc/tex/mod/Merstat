@@ -6,12 +6,12 @@
 @Class     = Statistic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = mermin mermax mersum mermean meravg merstd mervar merpctl
+@Operators = mermin mermax mersum mermean meravg mervar merstd merpctl
 
 @BeginDescription
 This module computes meridional statistical values of the input fields.
 According to the actual operator the meridional minimum, maximum,
-sum, average, standard deviation, variance or a certain percentile is
+sum, average, variance, standard deviation or a certain percentile is
 written to @file{ofile}. All input fields must have the same rectangular
 grid. 
 @EndDescription

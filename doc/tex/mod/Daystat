@@ -5,11 +5,11 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = daymin daymax daysum daymean dayavg daystd
+@Operators = daymin daymax daysum daymean dayavg dayvar daystd
 
 @BeginDescription
 This module computes statistical values over time steps of the same day.
-Depending on the actual operator the minimum, maximum, sum, average
+Depending on the actual operator the minimum, maximum, sum, average, variance
 or standard deviation of time steps of the same day is written to @file{ofile}.
 The date information for a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.
@@ -106,6 +106,25 @@ o(t,x) = avg{i(t',x), t_1<t'<=t_n}
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_dayvar
+@Title     = Daily variance
+
+@BeginDescription
+@IfMan
+For every adjacent sequence t_1, ...,t_n of time steps of the same day, it is
+
+o(t,x) = var{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same day, it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

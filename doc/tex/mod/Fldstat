@@ -5,12 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldvar fldpctl
+@Operators = fldmin fldmax fldsum fldmean fldavg fldvar fldstd fldpctl
 
 @BeginDescription
 This module computes statistical values of the input fields.
 According to the actual operator the field minimum, maximum,
-sum, average, standard deviation, variance or a certain percentile
+sum, average, variance, standard deviation or a certain percentile
 is written to @file{ofile}.
 @EndDescription
 @EndModule
