@@ -311,7 +311,6 @@ void *Timstat(void *argument)
 	      {
 		if ( samp1[varID][levelID].ptr == NULL )
 		  {
-		    printf("farcstd\n");
 		    if ( operfunc == func_std )
 		      farcstd(&vars1[varID][levelID], vars2[varID][levelID], 1.0/nsets);
 		    else
@@ -319,7 +318,6 @@ void *Timstat(void *argument)
 		  }
 		else
 		  {
-		    printf("farstd\n");
 		    farinv(&samp1[varID][levelID]);
 		    if ( operfunc == func_std )
 		      farstd(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID]);
