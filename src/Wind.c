@@ -38,7 +38,7 @@
 void *Wind(void *argument)
 {
   static char func[] = "Wind";
-  int UV2DV, DV2UV, DV2PS;
+  int UV2DV, UV2DVL, DV2UV, DV2UVL, DV2PS;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
@@ -64,9 +64,11 @@ void *Wind(void *argument)
 
   cdoInitialize(argument);
 
-  UV2DV = cdoOperatorAdd("uv2dv", 0, 0, NULL);
-  DV2UV = cdoOperatorAdd("dv2uv", 0, 0, NULL);
-  DV2PS = cdoOperatorAdd("dv2ps", 0, 0, NULL);
+  UV2DV  = cdoOperatorAdd("uv2dv",  0, 0, NULL);
+  UV2DVL = cdoOperatorAdd("uv2dvl", 0, 0, NULL);
+  DV2UV  = cdoOperatorAdd("dv2uv",  0, 0, NULL);
+  DV2UVL = cdoOperatorAdd("dv2uvl", 0, 0, NULL);
+  DV2PS  = cdoOperatorAdd("dv2ps",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -147,7 +149,7 @@ void *Wind(void *argument)
     }
 
   /* define output grid */
-  if ( operatorID == UV2DV )
+  if ( operatorID == UV2DV || operatorID == UV2DVL )
     {
       if ( varID1 == -1 ) cdoWarning("U-wind not found!");
       if ( varID2 == -1 ) cdoWarning("V-wind not found!");
@@ -164,7 +166,10 @@ void *Wind(void *argument)
 
 	  if ( gridID1 != -1 )
 	    {
-	      ntr = nlat2ntr(gridInqYsize(gridID1));
+	      if ( operatorID == UV2DVL )
+		ntr = nlat2ntr(gridInqYsize(gridID1));
+	      else
+		ntr = nlat2ntr_linear(gridInqYsize(gridID1));
 
 	      if ( gridIDsp != -1 )
 		if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
@@ -201,7 +206,7 @@ void *Wind(void *argument)
 	  sptrans = sptrans_new(nlon, nlat, ntr, 1);
 	}
     }
-  else if ( operatorID == DV2UV )
+  else if ( operatorID == DV2UV || operatorID == DV2UVL )
     {   
       if ( varID1 == -1 ) cdoWarning("Divergence not found!");
       if ( varID2 == -1 ) cdoWarning("Vorticity not found!");
@@ -218,7 +223,10 @@ void *Wind(void *argument)
 
 	  if ( gridIDgp != -1 )
 	    {
-	      ntr = nlat2ntr(gridInqYsize(gridIDgp));
+	      if ( operatorID == DV2UVL )
+		ntr = nlat2ntr(gridInqYsize(gridIDgp));
+	      else
+		ntr = nlat2ntr_linear(gridInqYsize(gridIDgp));
 	      
 	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
 	    }
@@ -344,9 +352,9 @@ void *Wind(void *argument)
 
       if ( varID1 != -1 && varID2 != -1 )
 	{
-	  if ( operatorID == UV2DV )
+	  if ( operatorID == UV2DV || operatorID == UV2DVL )
 	    trans_uv2dv(sptrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
-	  else if ( operatorID == DV2UV )
+	  else if ( operatorID == DV2UV || operatorID == DV2UVL )
 	    trans_dv2uv(sptrans, dvtrans, nlev, gridID1, ivar1, ivar2, gridID2, ovar1, ovar2);
 	  else if ( operatorID == DV2PS )
 	    {
@@ -355,7 +363,7 @@ void *Wind(void *argument)
 	    }
 
 	  gridsize = gridInqSize(gridID2);
-	  if ( operatorID == UV2DV || operatorID == DV2PS )
+	  if ( operatorID == UV2DV || operatorID == UV2DVL || operatorID == DV2PS )
 	    {
 	      for ( levelID = 0; levelID < nlev; levelID++ )
 		{
@@ -370,7 +378,7 @@ void *Wind(void *argument)
 		  streamWriteRecord(streamID2, ovar1+offset, 0);
 		}
 	    }
-	  else if ( operatorID == DV2UV )
+	  else if ( operatorID == DV2UV || operatorID == DV2UVL )
 	    {
 	      for ( levelID = 0; levelID < nlev; levelID++ )
 		{

@@ -3,6 +3,7 @@
 	* using CDI library version 1.0.5
 	* New operator: vertvar, timvar, yearvar, monvar, dayvar, hourvar
 	* New operator: runvar, seasvar, selvar, ydayvar, ydrunvar, ymonvar, yseasvar
+	* New operator: dv2uvl, uv2dvl
 	* eca: Titles update
 	* remap: set norm_opt after read_remap_scrip (bug fix) [report: Andreas Sterl]
 	* cdo: FP_FAST_FMA bug fix [report: Sunpoet]
