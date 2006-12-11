@@ -88,7 +88,7 @@ void *Wind(void *argument)
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( operatorID == UV2DV )
+      if ( operatorID == UV2DV || operatorID == UV2DVL )
 	{
 	  /* search for u and v wind */
 	  code = vlistInqVarCode(vlistID1, varID);
@@ -104,7 +104,7 @@ void *Wind(void *argument)
 	  if      ( code == 131 ) varID1 = varID;
 	  else if ( code == 132 ) varID2 = varID;
 	}
-      else if ( operatorID == DV2UV || operatorID == DV2PS )
+      else if ( operatorID == DV2UV || operatorID == DV2UVL || operatorID == DV2PS )
 	{
 	  /* search for divergence and vorticity */
 	  code = vlistInqVarCode(vlistID1, varID);
@@ -166,7 +166,7 @@ void *Wind(void *argument)
 
 	  if ( gridID1 != -1 )
 	    {
-	      if ( operatorID == UV2DVL )
+	      if ( operatorID == UV2DV )
 		ntr = nlat2ntr(gridInqYsize(gridID1));
 	      else
 		ntr = nlat2ntr_linear(gridInqYsize(gridID1));
@@ -223,10 +223,12 @@ void *Wind(void *argument)
 
 	  if ( gridIDgp != -1 )
 	    {
-	      if ( operatorID == DV2UVL )
+	      if ( operatorID == DV2UV )
 		ntr = nlat2ntr(gridInqYsize(gridIDgp));
 	      else
 		ntr = nlat2ntr_linear(gridInqYsize(gridIDgp));
+
+	      printf("ntr = %d\n", ntr);
 	      
 	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
 	    }
@@ -235,7 +237,10 @@ void *Wind(void *argument)
 	    {
 	      char gridname[20];
 
-	      sprintf(gridname, "t%dgrid", gridInqTrunc(gridID1));
+	      if ( operatorID == DV2UV )
+		sprintf(gridname, "t%dgrid", gridInqTrunc(gridIDsp));
+	      else
+		sprintf(gridname, "tl%dgrid", gridInqTrunc(gridIDsp));
 	  
 	      gridIDgp = gridFromName(gridname);
 	    }
