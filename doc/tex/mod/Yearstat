@@ -150,9 +150,18 @@ o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 @EndOperator
 
 
+@BeginNote
+The operators yearmean and yearavg computes only an arithmetical mean!
+@EndNote
+
+
 @BeginExample
 To compute the yearly mean of a time series, use:
 @BeginVerbatim
    cdo yearmean ifile ofile
+@EndVerbatim
+To compute the yearly mean from the correct weighted monthly mean, use:
+@BeginVerbatim
+   cdo mulc,12 -divdpy -yearmean -muldpm ifile ofile
 @EndVerbatim
 @EndExample

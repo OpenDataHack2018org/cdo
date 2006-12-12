@@ -12,7 +12,7 @@ Let @file{ifile1} be a time series of daily mean temperatures TG, and
 for any period used as reference. Then counted is the number of days
 where, in intervals of at least nday consecutive days, TG < TGn10. The
 number nday is an optional parameter with default nday = 6. A further
-output variable is the the number of cold-spell periods longer than or
+output variable is the number of cold-spell periods longer than or
 equal to nday days. Note that both TG and TGn10 must be given in the
 same units.
 The date information for a time step in @file{ofile} is the date of

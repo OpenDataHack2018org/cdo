@@ -26,6 +26,7 @@
       Seltime    selyear         Select years
       Seltime    selseas         Select seasons
       Seltime    seldate         Select dates
+      Seltime    selsmon         Select single month
 */
 
 
@@ -47,7 +48,7 @@
 void *Seltime(void *argument)
 {
   const char func[] = "Seltime";
-  int SELTIMESTEP, SELDATE, SELTIME, SELHOUR, SELDAY, SELMON, SELYEAR, SELSEAS;
+  int SELTIMESTEP, SELDATE, SELTIME, SELHOUR, SELDAY, SELMON, SELYEAR, SELSEAS, SELSMON;
   int operatorID;
   int operfunc, intval;
   int moddat[NOPERATORS];
@@ -59,17 +60,28 @@ void *Seltime(void *argument)
   int taxisID1, taxisID2;
   int vdate, vtime;
   int copytimestep;
+  int copy_nts2 = FALSE;
   int i, isel;
   int lcopy = FALSE;
   int gridsize;
   int status;
   int nmiss;
+  int ncts = 0, nts, it;
   int *selfound = NULL;
   int year, month, day, hour, minute;
+  int nts1 = 0, nts2 = 0;
+  int its1 = 0, its2 = 0;
   double selfval = 0, *fltarr, fval;
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
+  int gridID;
+  int nvars, nlevel;
+  int process_nts1 = FALSE, process_nts2 = FALSE;
+  int *vdate_list = NULL, *vtime_list = NULL;
+  double missval;
+  double *single;
+  FIELD ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -81,6 +93,7 @@ void *Seltime(void *argument)
   SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");
   SELYEAR     = cdoOperatorAdd("selyear",     func_date, 10000, "years");
   SELSEAS     = cdoOperatorAdd("selseas",     func_date,   100, "seasons");
+  SELSMON     = cdoOperatorAdd("selsmon",     func_date,   100, "month[,nts1[,nts2]]");
 
   moddat[SELTIMESTEP] =          1;
   /*  moddat[SELDATE]     = 1000000000; */
@@ -91,6 +104,7 @@ void *Seltime(void *argument)
   moddat[SELMON]      =        100;
   moddat[SELYEAR]     = 1000000000;
   moddat[SELSEAS]     =        100;
+  moddat[SELSMON]     =        100;
 
   operatorID = cdoOperatorID();
 
@@ -201,6 +215,20 @@ void *Seltime(void *argument)
   intarr = (int *) listArrayPtr(ilist);
   fltarr = (double *) listArrayPtr(flist);
 
+  if ( operatorID == SELSMON )
+    {
+      if ( nsel > 1 ) nts1 = intarr[1];
+      if ( nsel > 2 ) nts2 = intarr[2];
+      else            nts2 = nts1;
+
+      if ( nsel > 3 ) cdoAbort("Too many parameters");
+
+      if ( cdoVerbose )
+	cdoPrint("mon=%d  nts1=%d  nts2=%d\n", intarr[0], nts1, nts2);
+
+      nsel = 1;
+    }
+
   if ( nsel )
     {
       selfound = (int *) malloc(nsel*sizeof(int));
@@ -236,6 +264,37 @@ void *Seltime(void *argument)
     {
       gridsize = vlistGridsizeMax(vlistID1);
       array = (double *) malloc(gridsize*sizeof(double));
+    }
+
+  nvars = vlistNvars(vlistID1);
+      
+  if ( operatorID == SELSMON && nts1 )
+    {
+      vdate_list = (int *) malloc(nts1*sizeof(int));
+      vtime_list = (int *) malloc(nts1*sizeof(int));
+      vars  = (FIELD ***) malloc(nts1*sizeof(FIELD **));
+
+      for ( tsID = 0; tsID < nts1; tsID++ )
+	{
+	  vars[tsID] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      gridID  = vlistInqVarGrid(vlistID1, varID);
+	      missval = vlistInqVarMissval(vlistID1, varID);
+	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      gridsize = gridInqSize(gridID);
+
+	      vars[tsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
+
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		{
+		  vars[tsID][varID][levelID].grid    = gridID;
+		  vars[tsID][varID][levelID].missval = missval;
+		  vars[tsID][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		}
+	    }
+	}
     }
 
   tsID  = 0;
@@ -286,8 +345,73 @@ void *Seltime(void *argument)
 	      }
 	}
 
-      if ( copytimestep )
+      if ( operatorID == SELSMON && copytimestep == FALSE )
 	{
+	  copy_nts2 = FALSE;
+
+	  if ( process_nts1 == TRUE )
+	    {
+	      process_nts2 = TRUE;
+	      its2 = 0;
+	      process_nts1 = FALSE;
+	    }
+
+	  if ( process_nts2 == TRUE )
+	    {
+	      if ( its2++ < nts2 )
+		{
+		  copy_nts2 = TRUE;
+		}
+	      else
+		process_nts2 = FALSE;
+	    }
+	}
+
+      if ( copytimestep || copy_nts2 )
+	{
+	  /*
+	  printf("%d %04d %d %d %d %d %d\n", vdate, vtime, its2, nts2, copytimestep, copy_nts2, ncts);
+	  */
+	  if ( operatorID == SELSMON )
+	    if ( ncts == 0 && nts1 > 0 )
+	      {
+		nts = nts1;
+		if ( its1 < nts1 )
+		  {
+		    nts = its1;
+		    cdoWarning("%d timesteps missing before month %d!", nts1-its1, intarr[0]);
+		  }
+
+		for ( it = 0; it < nts; it++ )
+		  {
+		    taxisDefVdate(taxisID2, vdate_list[it]);
+		    taxisDefVtime(taxisID2, vtime_list[it]);
+		    streamDefTimestep(streamID2, tsID2++);
+
+		    for ( varID = 0; varID < nvars; varID++ )
+		      {
+			nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+			for ( levelID = 0; levelID < nlevel; levelID++ )
+			  {
+			    streamDefRecord(streamID2, varID, levelID);
+			    single =  vars[it][varID][levelID].ptr;
+			    nmiss  =  vars[it][varID][levelID].nmiss;
+
+			    streamWriteRecord(streamID2, single, nmiss);
+			  }
+		      }
+		  }
+
+		its1 = 0;
+	      }
+
+	  ncts++;
+	  if ( process_nts2 == FALSE )
+	    {
+	      its2 = 0;
+	      process_nts1 = TRUE;
+	    }
+
 	  taxisCopyTimestep(taxisID2, taxisID1);
 
 	  streamDefTimestep(streamID2, tsID2++);
@@ -307,6 +431,49 @@ void *Seltime(void *argument)
 		}
 	    }
 	}
+      else
+	{
+	  ncts = 0;
+
+	  if ( operatorID == SELSMON && nts1 > 0 )
+	    {
+	      nts = nts1-1;
+	      if ( its1 <= nts )
+		nts = its1;
+	      else
+		for ( it = 0; it < nts; it++ )
+		  {
+		    vdate_list[it] = vdate_list[it+1];
+		    vtime_list[it] = vtime_list[it+1];
+		    for ( varID = 0; varID < nvars; varID++ )
+		      {
+			gridID   = vlistInqVarGrid(vlistID1, varID);
+			gridsize = gridInqSize(gridID);
+			nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+			for ( levelID = 0; levelID < nlevel; levelID++ )
+			  {
+			    memcpy(vars[it][varID][levelID].ptr,
+				   vars[it+1][varID][levelID].ptr,
+				   gridsize*sizeof(double));
+			    vars[it][varID][levelID].nmiss = vars[it+1][varID][levelID].nmiss;
+			  }
+		      }
+		  }
+
+	      vdate_list[nts] = taxisInqVdate(taxisID1);
+	      vtime_list[nts] = taxisInqVtime(taxisID1);
+
+	      for ( recID = 0; recID < nrecs; recID++ )
+		{
+		  streamInqRecord(streamID1, &varID, &levelID);
+		  single =  vars[nts][varID][levelID].ptr;
+		  streamReadRecord(streamID1, single, &nmiss);
+		  vars[nts][varID][levelID].nmiss = nmiss;
+		}
+
+	      its1++;
+	    }
+	}
        
       tsID++;
     }
@@ -314,6 +481,10 @@ void *Seltime(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
  
+  if ( operatorID == SELSMON )
+    if ( its2 < nts2 )
+      cdoWarning("%d timesteps missing after the last month!", nts2-its2);
+
   if ( ! lcopy )
     if ( array ) free(array);
 
@@ -360,6 +531,27 @@ void *Seltime(void *argument)
   if ( selfound ) free(selfound);
 
   listDelete(ilist);
+
+  if ( operatorID == SELSMON && nts1 )
+    {
+      for ( tsID = 0; tsID < nts1; tsID++ )
+	{
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		if ( vars[tsID][varID][levelID].ptr )
+		  free(vars[tsID][varID][levelID].ptr);
+
+	      free(vars[tsID][varID]);
+	    }
+	  free(vars[tsID]);
+	}
+
+      if ( vars  ) free(vars);
+      if ( vdate_list ) free(vdate_list);
+      if ( vtime_list ) free(vtime_list);
+    }
 
   cdoFinish();
 

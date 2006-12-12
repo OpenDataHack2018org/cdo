@@ -54,3 +54,9 @@ INTEGER  Number of input time steps skipped before the first time step range (op
 @Item = nskip
 INTEGER  Number of input time steps skipped between time step ranges (optional)
 @EndParameter
+
+
+@BeginEnvironment
+@Item = CDO_PCTL_NBINS
+Sets the number of histogram bins. The default number is 100.
+@EndEnvironment

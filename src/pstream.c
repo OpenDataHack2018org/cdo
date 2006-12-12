@@ -890,6 +890,8 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 {
   PSTREAM *pstreamptr;
 
+  if ( data == NULL ) cdoAbort("Data pointer not allocaced (pstreamReadRecord)!");
+
   pstreamptr = pstream_to_pointer(pstreamID);
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -908,6 +910,8 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 {
   PSTREAM *pstreamptr;
+
+  if ( data == NULL ) cdoAbort("Data pointer not allocaced (pstreamWriteRecord)!");
 
   pstreamptr = pstream_to_pointer(pstreamID);
 

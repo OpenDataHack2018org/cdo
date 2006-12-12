@@ -54,6 +54,12 @@ INTEGER  Number of time steps
 @EndParameter
 
 
+@BeginEnvironment
+@Item = CDO_PCTL_NBINS
+Sets the number of histogram bins. The default number is 100.
+@EndEnvironment
+
+
 @BeginExample
 Assume the input data provide daily measurements. To compute the daily
 90th percentile over all input years for a running window of five days,

@@ -8,7 +8,7 @@
 @Operators = eca_etr
 
 @BeginDescription
-Let @file{ifile1} and @{ifile2} be time series of maximum and minimum
+Let @file{ifile1} and @file{ifile2} be time series of maximum and minimum
 temperatures TX and TN, respectively. Then the extreme temperature
 range is the difference of the maximum of TX and the minimum of TN.
 Note that TX and TN must be given in the same units.

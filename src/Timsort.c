@@ -198,6 +198,7 @@ void *Timsort(void *argument)
 	    }
 	  free(vars[tsID][varID]);
 	}
+      free(vars[tsID]);      
     }
 
   if ( vars  ) free(vars);

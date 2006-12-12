@@ -48,6 +48,12 @@ INTEGER  Percentile number in {1, ..., 99}
 @EndParameter
 
 
+@BeginEnvironment
+@Item = CDO_PCTL_NBINS
+Sets the number of histogram bins. The default number is 100.
+@EndEnvironment
+
+
 @BeginExample
 To compute the daily 90th percentile of a time series, use:
 @BeginVerbatim
