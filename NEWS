@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.0.7 (?? January 2007):
+
+   * New operators:
+      o Select single month - selsmon
+
 Version 1.0.6 (12 December 2006):
 
    * New operators:

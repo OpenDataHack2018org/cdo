@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = seltimestep seltime selhour selday selmon selyear selseas seldate
+@Operators = seltimestep seltime selhour selday selmon selyear selseas seldate selsmon
 
 @BeginDescription
 This module selects user specified time steps from @file{ifile} and writes them to @file{ofile}.
@@ -94,6 +94,16 @@ Selects all time steps with a date in a user given range.
 @EndOperator
 
 
+@BeginOperator_selsmon
+@Title     = Select single month
+@Parameter = month [nts1] [nts2]
+
+@BeginDescription
+Selects a month and optional an unlimited number of time steps before and after this month.
+@EndDescription
+@EndOperator
+
+
 @BeginParameter
 @Item = timesteps
 INTEGER  Comma separated list of time steps
@@ -113,6 +123,10 @@ STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
 STRING   Start date (format YYYY-MM-DDThh:mm)
 @Item = date2
 STRING   End date (format YYYY-MM-DDThh:mm)
+@Item = nts1
+INTEGER  Number of time steps before the selected month [default: 0]
+@Item = nts2
+INTEGER  Number of time steps after the selected month [default: nts1]
 @EndParameter
 
 
