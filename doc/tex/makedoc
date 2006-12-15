@@ -229,14 +229,14 @@ while (<MOFILE>) {
       print TROVER "\\input{ref_intro_${shortname}}\n";
       print TROVER "\\input{ref_list_${shortname}}\n";
       print TROVER "\\input{ref_man_${shortname}}\n\n";
-      if ( $chap eq "ECA indices" ) {
-	print "find eca!";
-	$refskip = 1;
-      }
-      else {
+#      if ( $chap eq "ECA indices" ) {
+#	print "find eca!";
+#	$refskip = 1;
+#      }
+#      else {
 	print TRCARD "\\subsubsection*{$chap}\n";
 	$refskip = 0;
-      }
+#      }
 #      print TCFILE "\\begin{tabular*}{13cm}{ll}\n";
 #      print TCFILE "\\hspace*{30mm} &  \\\\ \n";
 

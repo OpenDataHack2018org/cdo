@@ -43,10 +43,12 @@ void *Vargen(void *argument)
   int gridsize, i;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
+#if defined (__GNUC__)
   double etopo_scale = 3;
   short etopo[] = {
 #include "etopo.h"
   };
+#endif
   const char *gridfile;
   double rconst = 0.0;
   double *array;
@@ -129,8 +131,12 @@ void *Vargen(void *argument)
 	}
       else if ( operatorID == TOPO )
 	{
+#if defined (__GNUC__)
 	  for ( i = 0; i < gridsize; i++ )
-	    array[i] = etopo[i]/etopo_scale;
+	    array[i] = (double)etopo[i]/etopo_scale;
+#else
+	  cdoAbort("Operator not available with non GNUC compiler!");
+#endif
 	}      
 
       streamWriteRecord(streamID, array, 0);

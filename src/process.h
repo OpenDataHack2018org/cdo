@@ -18,6 +18,8 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H
 
+#include <sys/types.h> /* off_t */
+
 int  processSelf(void);
 int  processCreate(void);
 void processDelete(void);

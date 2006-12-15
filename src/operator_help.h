@@ -1465,6 +1465,10 @@ static char *SelpctlHelp[] = {
     "    nsets    INTEGER  Number of input time steps for each output time step",
     "    noffset  INTEGER  Number of input time steps skipped before the first time step range (optional)",
     "    nskip    INTEGER  Number of input time steps skipped between time step ranges (optional)",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -1578,6 +1582,10 @@ static char *TimpctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -1652,6 +1660,10 @@ static char *HourpctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -1726,6 +1738,10 @@ static char *DaypctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -1800,6 +1816,10 @@ static char *MonpctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -1874,6 +1894,10 @@ static char *YearpctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -1952,6 +1976,10 @@ static char *SeaspctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -2025,6 +2053,10 @@ static char *YdaypctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -2098,6 +2130,10 @@ static char *YmonpctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -2179,6 +2215,10 @@ static char *YseaspctlHelp[] = {
     "",
     "PARAMETER",
     "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -2260,697 +2300,10 @@ static char *YdrunpctlHelp[] = {
     "PARAMETER",
     "    p    INTEGER  Percentile number in {1, ..., 99}",
     "    nts  INTEGER  Number of time steps",
-    NULL
-};
-
-static char *EcaCddHelp[] = {
-    "NAME",
-    "    eca_cdd - Consecutive dry days",
     "",
-    "SYNOPSIS",
-    "    eca_cdd  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then counted is the largest number of consecutive days where",
-    "    RR < 1 mm. A further output variable is the number of dry periods",
-    "    of at least 5 days.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaCfdHelp[] = {
-    "NAME",
-    "    eca_cfd - Consecutive frost days",
-    "",
-    "SYNOPSIS",
-    "    eca_cfd  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily minimum temperatures TN,",
-    "    then counted is the largest number of consecutive days where",
-    "    TN < 0° Celsius. Note that TN must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaCsuHelp[] = {
-    "NAME",
-    "    eca_csu - Consecutive summer days",
-    "",
-    "SYNOPSIS",
-    "    eca_csu[,T]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum temperatures TX,",
-    "    then counted is the largest number of consecutive days where TX > T.",
-    "    The number T is an optional parameter with default T = 25° Celsius.",
-    "    Note that TN must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)",
-    NULL
-};
-
-static char *EcaCwdHelp[] = {
-    "NAME",
-    "    eca_cwd - Consecutive wet days",
-    "",
-    "SYNOPSIS",
-    "    eca_cwd  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then counted is the largest number of consecutive days where",
-    "    RR > 1 mm. A further output variable is the number of wet periods",
-    "    of at least 5 days.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaCwdiHelp[] = {
-    "NAME",
-    "    eca_cwdi - Cold wave duration index",
-    "",
-    "SYNOPSIS",
-    "    eca_cwdi[,nday[,T]]  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily minimum temperatures TN,",
-    "    and let ifile2 be the mean TNnorm of daily minimum temperatures",
-    "    for any period used as reference. Then counted is the number of days",
-    "    where, in intervals of at least nday consecutive days, TN < TNnorm - T.",
-    "    The numbers nday and T are optional parameters with default nday = 6",
-    "    and T = 5° Celsius. A further output variable is the the number of cold",
-    "    waves longer than or equal to nday days. Note that both TN and TNnorm",
-    "    must be given in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    "",
-    "PARAMETER",
-    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    "    T     FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)",
-    NULL
-};
-
-static char *EcaCwfiHelp[] = {
-    "NAME",
-    "    eca_cwfi - Cold-spell days",
-    "",
-    "SYNOPSIS",
-    "    eca_cwfi[,nday]  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily mean temperatures TG, and ",
-    "    ifile2 be the 10th percentile TGn10 of daily mean temperatures",
-    "    for any period used as reference. Then counted is the number of days",
-    "    where, in intervals of at least nday consecutive days, TG < TGn10. The",
-    "    number nday is an optional parameter with default nday = 6. A further",
-    "    output variable is the the number of cold-spell periods longer than or",
-    "    equal to nday days. Note that both TG and TGn10 must be given in the",
-    "    same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    "",
-    "PARAMETER",
-    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    NULL
-};
-
-static char *EcaEtrHelp[] = {
-    "NAME",
-    "    eca_etr - Intra-period extreme temperature range",
-    "",
-    "SYNOPSIS",
-    "    eca_etr  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 and @{ifile2} be time series of maximum and minimum",
-    "    temperatures TX and TN, respectively. Then the extreme temperature",
-    "    range is the difference of the maximum of TX and the minimum of TN.",
-    "    Note that TX and TN must be given in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time steps in ifile1 and ifile2.",
-    NULL
-};
-
-static char *EcaFdHelp[] = {
-    "NAME",
-    "    eca_fd - Frost days",
-    "",
-    "SYNOPSIS",
-    "    eca_fd  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily minimum temperatures TN,",
-    "    then counted is the number of days where TN < 0° Celsius. Note",
-    "    that TN must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaFdnsHelp[] = {
-    "NAME",
-    "    eca_fdns - Frost days where no snow",
-    "",
-    "SYNOPSIS",
-    "    eca_fdns  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily minimum temperatures TN",
-    "    and ifile2 be a corresponding series of daily surface snow",
-    "    amounts. Then counted is the number of days where TN < 0° Celsius",
-    "    and the surface snow amount is less than 1 cm.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaGslHelp[] = {
-    "NAME",
-    "    eca_gsl - Growing season length",
-    "",
-    "SYNOPSIS",
-    "    eca_gsl[,nday[,T]]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily mean temperatures TG,",
-    "    then counted are the number of days between the first occurrence",
-    "    of at least nday consecutive days with TG > T and the first occurrence",
-    "    after 1 July of at least nday consecutive days with TG < T. The",
-    "    numbers nday and T are optional parameter with default nday = 6",
-    "    and T = 5° Celsius. Further output variables are the start and end",
-    "    dates of the growing season. Note that TG must be given in units of",
-    "    kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    "    T     FLOAT    Temperature threshold (° Celsius, default: T = 5° Celsius)",
-    NULL
-};
-
-static char *EcaHdHelp[] = {
-    "NAME",
-    "    eca_hd - Heating degree days",
-    "",
-    "SYNOPSIS",
-    "    eca_hd[,T1[,T2]]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily mean temperatures TG, then",
-    "    the heating degree days are defined as the sum of T1 - TG, where only",
-    "    values TG < T2 are considered. If T1 and T2 are omitted, a temperature",
-    "    of 17° Celsius is used for both parameters. If only T1 is given, T2 is",
-    "    set to T1. Note that TG must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    T1  FLOAT   Temperature limit (° Celsius, default: T1 = 17° Celsius)",
-    "    T2  FLOAT   Temperature limit (° Celsius, default: T2 = T1)",
-    NULL
-};
-
-static char *EcaHwdiHelp[] = {
-    "NAME",
-    "    eca_hwdi - Heat wave duration index",
-    "",
-    "SYNOPSIS",
-    "    eca_hwdi[,nday[,T]]  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily maximum temperatures TX,",
-    "    and let ifile2 be the mean TXnorm of daily maximum temperatures",
-    "    for any period used as reference. Then counted is the number of days",
-    "    where, in intervals of at least nday consecutive days, TX > TXnorm + T.",
-    "    The numbers nday and T are optional parameters with default nday = 6",
-    "    and T = 5° Celsius. A further output variable is the the number of heat",
-    "    waves longer than or equal to nday days. Note that both TX and TXnorm",
-    "    must be given in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    "",
-    "PARAMETER",
-    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    "    T     FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)",
-    NULL
-};
-
-static char *EcaHwfiHelp[] = {
-    "NAME",
-    "    eca_hwfi - Warm-spell days",
-    "",
-    "SYNOPSIS",
-    "    eca_hwfi[,nday]  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily mean temperatures TG, and ",
-    "    ifile2 be the 90th percentile TGn90 of daily mean temperatures",
-    "    for any period used as reference. Then counted is the number of days",
-    "    where, in intervals of at least nday consecutive days, TG > TGn90. The",
-    "    number nday is an optional parameter with default nday = 6. A further",
-    "    output variable is the the number of warm-spell periods longer than or",
-    "    equal to nday days. Note that both TG and TGn90 must be given in the",
-    "    same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    "",
-    "PARAMETER",
-    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
-    NULL
-};
-
-static char *EcaIdHelp[] = {
-    "NAME",
-    "    eca_id - Ice days",
-    "",
-    "SYNOPSIS",
-    "    eca_id  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum temperatures TX,",
-    "    then counted is the number of days where TX < 0° Celsius. Note",
-    "    that TX must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaR10mmHelp[] = {
-    "NAME",
-    "    eca_r10mm - Heavy precipitation days",
-    "",
-    "SYNOPSIS",
-    "    eca_r10mm  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then counted is the number of days where RR > 10 mm. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaR20mmHelp[] = {
-    "NAME",
-    "    eca_r20mm - Very heavy precipitation days",
-    "",
-    "SYNOPSIS",
-    "    eca_r20mm  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then counted is the number of days where RR > 20 mm. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaR75pHelp[] = {
-    "NAME",
-    "    eca_r75p - Moderate wet days wrt 75th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_r75p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 75th percentile RRn75 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the percentage of wet days with RR > RRn75. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR75ptotHelp[] = {
-    "NAME",
-    "    eca_r75ptot - Precipitation fraction due to R75p days",
-    "",
-    "SYNOPSIS",
-    "    eca_r75ptot  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 75th percentile RRn75 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the ratio of the precipitation sum at wet days with RR > RRn75",
-    "    to the total precipitation sum. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR90pHelp[] = {
-    "NAME",
-    "    eca_r90p - Very wet days wrt 90th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_r90p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 90th percentile RRn90 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the percentage of wet days with RR > RRn90. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR90ptotHelp[] = {
-    "NAME",
-    "    eca_r90ptot - Precipitation fraction due to R90p days",
-    "",
-    "SYNOPSIS",
-    "    eca_r90ptot  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 90th percentile RRn90 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the ratio of the precipitation sum at wet days with RR > RRn90",
-    "    to the total precipitation sum. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR95pHelp[] = {
-    "NAME",
-    "    eca_r95p - Very wet days wrt 95th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_r95p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 95th percentile RRn95 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the percentage of wet days with RR > RRn95. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR95ptotHelp[] = {
-    "NAME",
-    "    eca_r95ptot - Precipitation fraction due to R95p days",
-    "",
-    "SYNOPSIS",
-    "    eca_r95ptot  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 95th percentile RRn95 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the ratio of the precipitation sum at wet days with RR > RRn95",
-    "    to the total precipitation sum. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR99pHelp[] = {
-    "NAME",
-    "    eca_r99p - Extremely wet days wrt 99th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_r99p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 99th percentile RRn99 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the percentage of wet days with RR > RRn99. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaR99ptotHelp[] = {
-    "NAME",
-    "    eca_r99ptot - Precipitation fraction due to R99p days",
-    "",
-    "SYNOPSIS",
-    "    eca_r99ptot  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily precipitation amounts RR,",
-    "    and ifile2 be the 99th percentile RRn99 of daily precipitation",
-    "    amounts at wet days for any period used as reference. Then calculated",
-    "    is the ratio of the precipitation sum at wet days with RR > RRn99",
-    "    to the total precipitation sum. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaRr1Help[] = {
-    "NAME",
-    "    eca_rr1 - Wet days",
-    "",
-    "SYNOPSIS",
-    "    eca_rr1  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then counted is the number of days where RR > 1 mm. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaRx1dayHelp[] = {
-    "NAME",
-    "    eca_rx1day - Highest one-day precipitation amount",
-    "",
-    "SYNOPSIS",
-    "    eca_rx1day[,mode]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then the maximum of RR is written to ofile. If the optional",
-    "    parameter mode is set to 'm', then maximum daily precipitation",
-    "    amounts are determined for each month. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    T  STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month",
-    NULL
-};
-
-static char *EcaRx5dayHelp[] = {
-    "NAME",
-    "    eca_rx5day - Highest five-day precipitation amount",
-    "",
-    "SYNOPSIS",
-    "    eca_rx5day[,x]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of 5-day precipitation totals RR,",
-    "    then the maximum of RR is written to ofile. A further output",
-    "    variable is the number of 5 day period with precipitation totals",
-    "    greater than x mm, where x is an optional parameter with default",
-    "    x = 50 mm.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    x  FLOAT   Precipitation threshold (mm, default: x = 50 mm)",
-    NULL
-};
-
-static char *EcaSdiiHelp[] = {
-    "NAME",
-    "    eca_sdii - Simple daily intensity index",
-    "",
-    "SYNOPSIS",
-    "    eca_sdii  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily precipitation amounts RR,",
-    "    then the mean precipitation amount at wet days (RR > 1 mm) is written",
-    "    to ofile. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaStrwindHelp[] = {
-    "NAME",
-    "    eca_strwind - Strong wind days",
-    "",
-    "SYNOPSIS",
-    "    eca_strwind[,bnum]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum wind speeds WX,",
-    "    then counted is the number of days where WX > V. The value of V",
-    "    corresponds to the wind speed at the Beaufort number indicated by",
-    "    the optional parameter bnum. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    bnum  INTEGER  Beaufort number, possible values are 6 (strong breeze), 9 (strong gale) and 12 (hurricane). The default is bnum = 6.",
-    NULL
-};
-
-static char *EcaSuHelp[] = {
-    "NAME",
-    "    eca_su - Summer days",
-    "",
-    "SYNOPSIS",
-    "    eca_su[,T]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum temperatures TX,",
-    "    then counted is the number of days where TX > T. The number T is",
-    "    an optional parameter with default T = 25° Celsius. Note that TX",
-    "    must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)",
-    NULL
-};
-
-static char *EcaTg10pHelp[] = {
-    "NAME",
-    "    eca_tg10p - Cold days wrt 10th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_tg10p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily mean temperatures TG, and",
-    "    ifile2 be the 10th percentile TGn10 of daily mean temperatures",
-    "    for any period used as reference. Then calculated is the percentage",
-    "    of time where TG < TGn10. Note that both TG and TGn10 must be given",
-    "    in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaTg90pHelp[] = {
-    "NAME",
-    "    eca_tg90p - Warm days wrt 90th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_tg90p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily mean temperatures TG, and",
-    "    ifile2 be the 90th percentile TGn90 of daily mean temperatures",
-    "    for any period used as reference. Then calculated is the percentage",
-    "    of time where TG > TGn90. Note that both TG and TGn90 must be given",
-    "    in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaTn10pHelp[] = {
-    "NAME",
-    "    eca_tn10p - Cold nights wrt 10th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_tn10p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily minimum temperatures TN, and",
-    "    ifile2 be the 10th percentile TNn10 of daily minimum temperatures",
-    "    for any period used as reference. Then calculated is the percentage",
-    "    of time where TN < TNn10. Note that both TN and TNn10 must be given",
-    "    in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaTn90pHelp[] = {
-    "NAME",
-    "    eca_tn90p - Warm nights wrt 90th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_tn90p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily minimum temperatures TN, and",
-    "    ifile2 be the 90th percentile TNn90 of daily minimum temperatures",
-    "    for any period used as reference. Then calculated is the percentage",
-    "    of time where TN > TNn90. Note that both TN and TNn90 must be given",
-    "    in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaTrHelp[] = {
-    "NAME",
-    "    eca_tr - Tropical nights",
-    "",
-    "SYNOPSIS",
-    "    eca_tr[,T]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily minimum temperatures TN,",
-    "    then counted is the number of days where TN > T. The number T is",
-    "    an optional parameter with default T = 20° Celsius. Note that TN",
-    "    must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 20° Celsius)",
-    NULL
-};
-
-static char *EcaTx10pHelp[] = {
-    "NAME",
-    "    eca_tx10p - Cold days wrt 10th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_tx10p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily maximum temperatures TX, and",
-    "    ifile2 be the 10th percentile TNx10 of daily maximum temperatures",
-    "    for any period used as reference. Then calculated is the percentage",
-    "    of time where TX < TXn10. Note that both TX and TXn10 must be given",
-    "    in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
-    NULL
-};
-
-static char *EcaTx90pHelp[] = {
-    "NAME",
-    "    eca_tx90p - Warm days wrt 90th percentile of reference period",
-    "",
-    "SYNOPSIS",
-    "    eca_tx90p  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily maximum temperatures TX, and",
-    "    ifile2 be the 90th percentile TXn90 of daily maximum temperatures",
-    "    for any period used as reference. Then calculated is the percentage",
-    "    of time where TX > TXn90. Note that both TX and TXn90 must be given",
-    "    in the same units.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile1.",
+    "ENVIRONMENT",
+    "    CDO_PCTL_NBINS",
+    "        Sets the number of histogram bins. The default number is 100.",
     NULL
 };
 
@@ -3504,5 +2857,696 @@ static char *TchillHelp[] = {
     "    Let ifile1 and ifile2 be time series of temperature and",
     "    wind speed records, then a corresponding time series of resulting",
     "    windchil temperatures is written to ofile.",
+    NULL
+};
+
+static char *EcaCddHelp[] = {
+    "NAME",
+    "    eca_cdd - Consecutive dry days",
+    "",
+    "SYNOPSIS",
+    "    eca_cdd  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then counted is the largest number of consecutive days where",
+    "    RR < 1 mm. A further output variable is the number of dry periods",
+    "    of at least 5 days.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaCfdHelp[] = {
+    "NAME",
+    "    eca_cfd - Consecutive frost days",
+    "",
+    "SYNOPSIS",
+    "    eca_cfd  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily minimum temperatures TN,",
+    "    then counted is the largest number of consecutive days where",
+    "    TN < 0° Celsius. Note that TN must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaCsuHelp[] = {
+    "NAME",
+    "    eca_csu - Consecutive summer days",
+    "",
+    "SYNOPSIS",
+    "    eca_csu[,T]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum temperatures TX,",
+    "    then counted is the largest number of consecutive days where TX > T.",
+    "    The number T is an optional parameter with default T = 25° Celsius.",
+    "    Note that TN must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)",
+    NULL
+};
+
+static char *EcaCwdHelp[] = {
+    "NAME",
+    "    eca_cwd - Consecutive wet days",
+    "",
+    "SYNOPSIS",
+    "    eca_cwd  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then counted is the largest number of consecutive days where",
+    "    RR > 1 mm. A further output variable is the number of wet periods",
+    "    of at least 5 days.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaCwdiHelp[] = {
+    "NAME",
+    "    eca_cwdi - Cold wave duration index",
+    "",
+    "SYNOPSIS",
+    "    eca_cwdi[,nday[,T]]  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily minimum temperatures TN,",
+    "    and let ifile2 be the mean TNnorm of daily minimum temperatures",
+    "    for any period used as reference. Then counted is the number of days",
+    "    where, in intervals of at least nday consecutive days, TN < TNnorm - T.",
+    "    The numbers nday and T are optional parameters with default nday = 6",
+    "    and T = 5° Celsius. A further output variable is the number of cold",
+    "    waves longer than or equal to nday days. Note that both TN and TNnorm",
+    "    must be given in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    "",
+    "PARAMETER",
+    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
+    "    T     FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)",
+    NULL
+};
+
+static char *EcaCwfiHelp[] = {
+    "NAME",
+    "    eca_cwfi - Cold-spell days",
+    "",
+    "SYNOPSIS",
+    "    eca_cwfi[,nday]  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily mean temperatures TG, and ",
+    "    ifile2 be the 10th percentile TGn10 of daily mean temperatures",
+    "    for any period used as reference. Then counted is the number of days",
+    "    where, in intervals of at least nday consecutive days, TG < TGn10. The",
+    "    number nday is an optional parameter with default nday = 6. A further",
+    "    output variable is the number of cold-spell periods longer than or",
+    "    equal to nday days. Note that both TG and TGn10 must be given in the",
+    "    same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    "",
+    "PARAMETER",
+    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
+    NULL
+};
+
+static char *EcaEtrHelp[] = {
+    "NAME",
+    "    eca_etr - Intra-period extreme temperature range",
+    "",
+    "SYNOPSIS",
+    "    eca_etr  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 and ifile2 be time series of maximum and minimum",
+    "    temperatures TX and TN, respectively. Then the extreme temperature",
+    "    range is the difference of the maximum of TX and the minimum of TN.",
+    "    Note that TX and TN must be given in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time steps in ifile1 and ifile2.",
+    NULL
+};
+
+static char *EcaFdHelp[] = {
+    "NAME",
+    "    eca_fd - Frost days",
+    "",
+    "SYNOPSIS",
+    "    eca_fd  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily minimum temperatures TN,",
+    "    then counted is the number of days where TN < 0° Celsius. Note",
+    "    that TN must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaFdnsHelp[] = {
+    "NAME",
+    "    eca_fdns - Frost days where no snow",
+    "",
+    "SYNOPSIS",
+    "    eca_fdns  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily minimum temperatures TN",
+    "    and ifile2 be a corresponding series of daily surface snow",
+    "    amounts. Then counted is the number of days where TN < 0° Celsius",
+    "    and the surface snow amount is less than 1 cm.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaGslHelp[] = {
+    "NAME",
+    "    eca_gsl - Growing season length",
+    "",
+    "SYNOPSIS",
+    "    eca_gsl[,nday[,T]]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily mean temperatures TG,",
+    "    then counted are the number of days between the first occurrence",
+    "    of at least nday consecutive days with TG > T and the first occurrence",
+    "    after 1 July of at least nday consecutive days with TG < T. The",
+    "    numbers nday and T are optional parameter with default nday = 6",
+    "    and T = 5° Celsius. Further output variables are the start and end",
+    "    dates of the growing season. Note that TG must be given in units of",
+    "    kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
+    "    T     FLOAT    Temperature threshold (° Celsius, default: T = 5° Celsius)",
+    NULL
+};
+
+static char *EcaHdHelp[] = {
+    "NAME",
+    "    eca_hd - Heating degree days",
+    "",
+    "SYNOPSIS",
+    "    eca_hd[,T1[,T2]]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily mean temperatures TG, then",
+    "    the heating degree days are defined as the sum of T1 - TG, where only",
+    "    values TG < T2 are considered. If T1 and T2 are omitted, a temperature",
+    "    of 17° Celsius is used for both parameters. If only T1 is given, T2 is",
+    "    set to T1. Note that TG must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    T1  FLOAT   Temperature limit (° Celsius, default: T1 = 17° Celsius)",
+    "    T2  FLOAT   Temperature limit (° Celsius, default: T2 = T1)",
+    NULL
+};
+
+static char *EcaHwdiHelp[] = {
+    "NAME",
+    "    eca_hwdi - Heat wave duration index",
+    "",
+    "SYNOPSIS",
+    "    eca_hwdi[,nday[,T]]  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily maximum temperatures TX,",
+    "    and let ifile2 be the mean TXnorm of daily maximum temperatures",
+    "    for any period used as reference. Then counted is the number of days",
+    "    where, in intervals of at least nday consecutive days, TX > TXnorm + T.",
+    "    The numbers nday and T are optional parameters with default nday = 6",
+    "    and T = 5° Celsius. A further output variable is the number of heat",
+    "    waves longer than or equal to nday days. Note that both TX and TXnorm",
+    "    must be given in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    "",
+    "PARAMETER",
+    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
+    "    T     FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)",
+    NULL
+};
+
+static char *EcaHwfiHelp[] = {
+    "NAME",
+    "    eca_hwfi - Warm-spell days",
+    "",
+    "SYNOPSIS",
+    "    eca_hwfi[,nday]  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily mean temperatures TG, and ",
+    "    ifile2 be the 90th percentile TGn90 of daily mean temperatures",
+    "    for any period used as reference. Then counted is the number of days",
+    "    where, in intervals of at least nday consecutive days, TG > TGn90. The",
+    "    number nday is an optional parameter with default nday = 6. A further",
+    "    output variable is the number of warm-spell periods longer than or",
+    "    equal to nday days. Note that both TG and TGn90 must be given in the",
+    "    same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    "",
+    "PARAMETER",
+    "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
+    NULL
+};
+
+static char *EcaIdHelp[] = {
+    "NAME",
+    "    eca_id - Ice days",
+    "",
+    "SYNOPSIS",
+    "    eca_id  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum temperatures TX,",
+    "    then counted is the number of days where TX < 0° Celsius. Note",
+    "    that TX must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaR10mmHelp[] = {
+    "NAME",
+    "    eca_r10mm - Heavy precipitation days",
+    "",
+    "SYNOPSIS",
+    "    eca_r10mm  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then counted is the number of days where RR > 10 mm. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaR20mmHelp[] = {
+    "NAME",
+    "    eca_r20mm - Very heavy precipitation days",
+    "",
+    "SYNOPSIS",
+    "    eca_r20mm  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then counted is the number of days where RR > 20 mm. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaR75pHelp[] = {
+    "NAME",
+    "    eca_r75p - Moderate wet days wrt 75th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_r75p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 75th percentile RRn75 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the percentage of wet days with RR > RRn75. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR75ptotHelp[] = {
+    "NAME",
+    "    eca_r75ptot - Precipitation fraction due to R75p days",
+    "",
+    "SYNOPSIS",
+    "    eca_r75ptot  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 75th percentile RRn75 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the ratio of the precipitation sum at wet days with RR > RRn75",
+    "    to the total precipitation sum. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR90pHelp[] = {
+    "NAME",
+    "    eca_r90p - Very wet days wrt 90th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_r90p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 90th percentile RRn90 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the percentage of wet days with RR > RRn90. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR90ptotHelp[] = {
+    "NAME",
+    "    eca_r90ptot - Precipitation fraction due to R90p days",
+    "",
+    "SYNOPSIS",
+    "    eca_r90ptot  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 90th percentile RRn90 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the ratio of the precipitation sum at wet days with RR > RRn90",
+    "    to the total precipitation sum. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR95pHelp[] = {
+    "NAME",
+    "    eca_r95p - Very wet days wrt 95th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_r95p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 95th percentile RRn95 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the percentage of wet days with RR > RRn95. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR95ptotHelp[] = {
+    "NAME",
+    "    eca_r95ptot - Precipitation fraction due to R95p days",
+    "",
+    "SYNOPSIS",
+    "    eca_r95ptot  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 95th percentile RRn95 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the ratio of the precipitation sum at wet days with RR > RRn95",
+    "    to the total precipitation sum. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR99pHelp[] = {
+    "NAME",
+    "    eca_r99p - Extremely wet days wrt 99th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_r99p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 99th percentile RRn99 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the percentage of wet days with RR > RRn99. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaR99ptotHelp[] = {
+    "NAME",
+    "    eca_r99ptot - Precipitation fraction due to R99p days",
+    "",
+    "SYNOPSIS",
+    "    eca_r99ptot  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily precipitation amounts RR,",
+    "    and ifile2 be the 99th percentile RRn99 of daily precipitation",
+    "    amounts at wet days for any period used as reference. Then calculated",
+    "    is the ratio of the precipitation sum at wet days with RR > RRn99",
+    "    to the total precipitation sum. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaRr1Help[] = {
+    "NAME",
+    "    eca_rr1 - Wet days",
+    "",
+    "SYNOPSIS",
+    "    eca_rr1  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then counted is the number of days where RR > 1 mm. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaRx1dayHelp[] = {
+    "NAME",
+    "    eca_rx1day - Highest one-day precipitation amount",
+    "",
+    "SYNOPSIS",
+    "    eca_rx1day[,mode]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then the maximum of RR is written to ofile. If the optional",
+    "    parameter mode is set to 'm', then maximum daily precipitation",
+    "    amounts are determined for each month. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    T  STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month",
+    NULL
+};
+
+static char *EcaRx5dayHelp[] = {
+    "NAME",
+    "    eca_rx5day - Highest five-day precipitation amount",
+    "",
+    "SYNOPSIS",
+    "    eca_rx5day[,x]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of 5-day precipitation totals RR,",
+    "    then the maximum of RR is written to ofile. A further output",
+    "    variable is the number of 5 day period with precipitation totals",
+    "    greater than x mm, where x is an optional parameter with default",
+    "    x = 50 mm.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    x  FLOAT   Precipitation threshold (mm, default: x = 50 mm)",
+    NULL
+};
+
+static char *EcaSdiiHelp[] = {
+    "NAME",
+    "    eca_sdii - Simple daily intensity index",
+    "",
+    "SYNOPSIS",
+    "    eca_sdii  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily precipitation amounts RR,",
+    "    then the mean precipitation amount at wet days (RR > 1 mm) is written",
+    "    to ofile. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *EcaStrwindHelp[] = {
+    "NAME",
+    "    eca_strwind - Strong wind days",
+    "",
+    "SYNOPSIS",
+    "    eca_strwind[,bnum]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum wind speeds WX,",
+    "    then counted is the number of days where WX > V. The value of V",
+    "    corresponds to the wind speed at the Beaufort number indicated by",
+    "    the optional parameter bnum. ",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    bnum  INTEGER  Beaufort number, possible values are 6 (strong breeze), 9 (strong gale) and 12 (hurricane). The default is bnum = 6.",
+    NULL
+};
+
+static char *EcaSuHelp[] = {
+    "NAME",
+    "    eca_su - Summer days",
+    "",
+    "SYNOPSIS",
+    "    eca_su[,T]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum temperatures TX,",
+    "    then counted is the number of days where TX > T. The number T is",
+    "    an optional parameter with default T = 25° Celsius. Note that TX",
+    "    must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)",
+    NULL
+};
+
+static char *EcaTg10pHelp[] = {
+    "NAME",
+    "    eca_tg10p - Cold days wrt 10th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_tg10p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily mean temperatures TG, and",
+    "    ifile2 be the 10th percentile TGn10 of daily mean temperatures",
+    "    for any period used as reference. Then calculated is the percentage",
+    "    of time where TG < TGn10. Note that both TG and TGn10 must be given",
+    "    in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaTg90pHelp[] = {
+    "NAME",
+    "    eca_tg90p - Warm days wrt 90th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_tg90p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily mean temperatures TG, and",
+    "    ifile2 be the 90th percentile TGn90 of daily mean temperatures",
+    "    for any period used as reference. Then calculated is the percentage",
+    "    of time where TG > TGn90. Note that both TG and TGn90 must be given",
+    "    in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaTn10pHelp[] = {
+    "NAME",
+    "    eca_tn10p - Cold nights wrt 10th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_tn10p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily minimum temperatures TN, and",
+    "    ifile2 be the 10th percentile TNn10 of daily minimum temperatures",
+    "    for any period used as reference. Then calculated is the percentage",
+    "    of time where TN < TNn10. Note that both TN and TNn10 must be given",
+    "    in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaTn90pHelp[] = {
+    "NAME",
+    "    eca_tn90p - Warm nights wrt 90th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_tn90p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily minimum temperatures TN, and",
+    "    ifile2 be the 90th percentile TNn90 of daily minimum temperatures",
+    "    for any period used as reference. Then calculated is the percentage",
+    "    of time where TN > TNn90. Note that both TN and TNn90 must be given",
+    "    in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaTrHelp[] = {
+    "NAME",
+    "    eca_tr - Tropical nights",
+    "",
+    "SYNOPSIS",
+    "    eca_tr[,T]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily minimum temperatures TN,",
+    "    then counted is the number of days where TN > T. The number T is",
+    "    an optional parameter with default T = 20° Celsius. Note that TN",
+    "    must be given in units of kelvin.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 20° Celsius)",
+    NULL
+};
+
+static char *EcaTx10pHelp[] = {
+    "NAME",
+    "    eca_tx10p - Cold days wrt 10th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_tx10p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily maximum temperatures TX, and",
+    "    ifile2 be the 10th percentile TNx10 of daily maximum temperatures",
+    "    for any period used as reference. Then calculated is the percentage",
+    "    of time where TX < TXn10. Note that both TX and TXn10 must be given",
+    "    in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
+    NULL
+};
+
+static char *EcaTx90pHelp[] = {
+    "NAME",
+    "    eca_tx90p - Warm days wrt 90th percentile of reference period",
+    "",
+    "SYNOPSIS",
+    "    eca_tx90p  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily maximum temperatures TX, and",
+    "    ifile2 be the 90th percentile TXn90 of daily maximum temperatures",
+    "    for any period used as reference. Then calculated is the percentage",
+    "    of time where TX > TXn90. Note that both TX and TXn90 must be given",
+    "    in the same units.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile1.",
     NULL
 };

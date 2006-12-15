@@ -319,46 +319,6 @@ Operator catalog:
       Ydrunstat  ydrunstd        Multi-year daily running standard deviation
       Ydrunpctl  ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
-   ECA indices
--------------------------------------------------------------
-      EcaCdd     eca_cdd         Consecutive dry days
-      EcaCfd     eca_cfd         Consecutive frost days
-      EcaCsu     eca_csu         Consecutive summer days
-      EcaCwd     eca_cwd         Consecutive wet days
-      EcaCwdi    eca_cwdi        Cold wave duration index
-      EcaCwfi    eca_cwfi        Cold-spell days
-      EcaEtr     eca_etr         Intra-period extreme temperature range
-      EcaFd      eca_fd          Frost days
-      EcaFdns    eca_fdns        Frost days where no snow
-      EcaGsl     eca_gsl         Growing season length
-      EcaHd      eca_hd          Heating degree days
-      EcaHwdi    eca_hwdi        Heat wave duration index
-      EcaHwfi    eca_hwfi        Warm-spell days
-      EcaId      eca_id          Ice days
-      EcaR10mm   eca_r10mm       Heavy precipitation days
-      EcaR20mm   eca_r20mm       Very heavy precipitation days
-      EcaR75p    eca_r75p        Moderate wet days wrt 75th percentile of reference period
-      EcaR75ptot eca_r75ptot     Precipitation fraction due to R75p days
-      EcaR90p    eca_r90p        Very wet days wrt 90th percentile of reference period
-      EcaR90ptot eca_r90ptot     Precipitation fraction due to R90p days
-      EcaR95p    eca_r95p        Very wet days wrt 95th percentile of reference period
-      EcaR95ptot eca_r95ptot     Precipitation fraction due to R95p days
-      EcaR99p    eca_r99p        Extremely wet days wrt 99th percentile of reference period
-      EcaR99ptot eca_r99ptot     Precipitation fraction due to R99p days
-      EcaRr1     eca_rr1         Wet days
-      EcaRx1day  eca_rx1day      Highest one-day precipitation amount
-      EcaRx5day  eca_rx5day      Highest five-day precipitation amount
-      EcaSdii    eca_sdii        Simple daily intensity index
-      EcaStrwind eca_strwind     Strong wind days
-      EcaSu      eca_su          Summer days
-      EcaTg10p   eca_tg10p       Cold days wrt 10th percentile of reference period
-      EcaTg90p   eca_tg90p       Warm days wrt 90th percentile of reference period
-      EcaTn10p   eca_tn10p       Cold nights wrt 10th percentile of reference period
-      EcaTn90p   eca_tn90p       Warm nights wrt 90th percentile of reference period
-      EcaTr      eca_tr          Tropical nights
-      EcaTx10p   eca_tx10p       Cold days wrt 10th percentile of reference period
-      EcaTx90p   eca_tx90p       Warm days wrt 90th percentile of reference period
--------------------------------------------------------------
    Regression
 -------------------------------------------------------------
       Detrend    detrend         Detrend
@@ -418,3 +378,43 @@ Operator catalog:
       Mastrfu    mastrfu         Mass stream function
       Hi         hi              Humidity index
       Tchill     tchill          Windchill temperature
+-------------------------------------------------------------
+   ECA indices
+-------------------------------------------------------------
+      EcaCdd     eca_cdd         Consecutive dry days
+      EcaCfd     eca_cfd         Consecutive frost days
+      EcaCsu     eca_csu         Consecutive summer days
+      EcaCwd     eca_cwd         Consecutive wet days
+      EcaCwdi    eca_cwdi        Cold wave duration index
+      EcaCwfi    eca_cwfi        Cold-spell days
+      EcaEtr     eca_etr         Intra-period extreme temperature range
+      EcaFd      eca_fd          Frost days
+      EcaFdns    eca_fdns        Frost days where no snow
+      EcaGsl     eca_gsl         Growing season length
+      EcaHd      eca_hd          Heating degree days
+      EcaHwdi    eca_hwdi        Heat wave duration index
+      EcaHwfi    eca_hwfi        Warm-spell days
+      EcaId      eca_id          Ice days
+      EcaR10mm   eca_r10mm       Heavy precipitation days
+      EcaR20mm   eca_r20mm       Very heavy precipitation days
+      EcaR75p    eca_r75p        Moderate wet days wrt 75th percentile of reference period
+      EcaR75ptot eca_r75ptot     Precipitation fraction due to R75p days
+      EcaR90p    eca_r90p        Very wet days wrt 90th percentile of reference period
+      EcaR90ptot eca_r90ptot     Precipitation fraction due to R90p days
+      EcaR95p    eca_r95p        Very wet days wrt 95th percentile of reference period
+      EcaR95ptot eca_r95ptot     Precipitation fraction due to R95p days
+      EcaR99p    eca_r99p        Extremely wet days wrt 99th percentile of reference period
+      EcaR99ptot eca_r99ptot     Precipitation fraction due to R99p days
+      EcaRr1     eca_rr1         Wet days
+      EcaRx1day  eca_rx1day      Highest one-day precipitation amount
+      EcaRx5day  eca_rx5day      Highest five-day precipitation amount
+      EcaSdii    eca_sdii        Simple daily intensity index
+      EcaStrwind eca_strwind     Strong wind days
+      EcaSu      eca_su          Summer days
+      EcaTg10p   eca_tg10p       Cold days wrt 10th percentile of reference period
+      EcaTg90p   eca_tg90p       Warm days wrt 90th percentile of reference period
+      EcaTn10p   eca_tn10p       Cold nights wrt 10th percentile of reference period
+      EcaTn90p   eca_tn90p       Warm nights wrt 90th percentile of reference period
+      EcaTr      eca_tr          Tropical nights
+      EcaTx10p   eca_tx10p       Cold days wrt 10th percentile of reference period
+      EcaTx90p   eca_tx90p       Warm days wrt 90th percentile of reference period

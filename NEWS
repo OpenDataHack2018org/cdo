@@ -1,30 +1,39 @@
 CDO NEWS
 --------
 
-Version 1.0.5 (?? November 2006):
+Version 1.0.6 (12 December 2006):
+
+   * New operators:
+      o Variance for all statistic modules
+         - vertvar, timvar, yearvar, monvar, dayvar, hourvar,
+           runvar, seasvar, selvar, ydayvar, ydrunvar, ymonvar, yseasvar
+
+Developer version 1.0.5 (30 November 2006):
 
   * New operators:
-      o showformat - Show file format
-      o tchill - Windchill temperature
-      o hi - Humidity index
-      o eca_* - ECA Indices of Daily Temperature and Precipitation Extremes
+      o Show file format - showformat 
+      o Windchill temperature - tchill
+      o Humidity index - hi
+      o ECA Indices of Daily Temperature and Precipitation Extremes
+        - eca_* (37 different indices!)
 
-Version 1.0.4 (7 November 2006):
-
-  * New operators:
-      o ydrunmin, ydrunmax, ydrunsum, ydrunmean, ydrunavg, ydrunstd - 
-        Multi-year daily running statistical values
-      o timpctl, hourpctl, daypctl, monpctl, yearpctl, selpctl, runpctl, seaspctl - 
-        Percentile values for different time steps
-      o ydaypctl, ymonpctl, yseaspctl, ydrunpctl - 
-        Multi-year percentile values for different time steps
-      o enspctl, fldpctl, zonpctl,merpctl - Ensemble and field percentiles 
-
-Version 1.0.3 (3 November 2006):
+Developer version 1.0.4 (7 November 2006):
 
   * New operators:
-      o intntime - Time interpolation
-      o mrotuvb - Backward transformation of velocity components U and V from MPIOM
+      o Multi-year daily running statistical values
+         - ydrunmin, ydrunmax, ydrunsum, ydrunmean, ydrunavg, ydrunstd
+      o Percentile values for different time ranges
+         - timpctl, hourpctl, daypctl, monpctl, yearpctl, selpctl, runpctl, seaspctl
+      o Multi-year percentile values
+         - ydaypctl, ymonpctl, yseaspctl, ydrunpctl
+      o Ensemble and field percentiles
+         - enspctl, fldpctl, zonpctl, merpctl
+
+Developer version 1.0.3 (3 November 2006):
+
+  * New operators:
+      o Time interpolation - intntime 
+      o Backward transformation of velocity components U and V from MPIOM - mrotuvb
 
 Version 1.0.2 (18 September 2006):
 

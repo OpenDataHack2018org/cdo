@@ -300,18 +300,18 @@ void cdologs(int noper, double cputime, off_t nvals)
       return;
     }
 
-  mylock.l_type   = F_RDLCK;
+  mylock.l_type   = F_WRLCK;
   mylock.l_whence = SEEK_SET;
   mylock.l_start  = 0;
   mylock.l_len    = 0;
 
   status = fcntl(logfileno, F_SETLKW, &mylock);
   errno = 0;
-  if ( status != 0 ) return;
+  if ( status != 0 ) goto endlabel;
 
   status = fstat(logfileno, &filestat);
   errno = 0;
-  if ( status != 0 ) return;
+  if ( status != 0 ) goto endlabel;
 
   bufsize = (size_t) filestat.st_size;
 
@@ -350,15 +350,17 @@ void cdologs(int noper, double cputime, off_t nvals)
       flt2ibm((float)cputime, logctime);
       PUT_UINT8(lognvals, nvals);
       PUT_UINT4(lognhours, nhours);
-
+      /*
       mylock.l_type   = F_WRLCK;
       status = fcntl(logfileno, F_SETLKW, &mylock);
-  
+      */
       status = (int) write(logfileno, logbuf, logsize);
     }
 
+ endlabel:
+
   mylock.l_type   = F_UNLCK;
-  status = fcntl(logfileno, F_SETLKW, &mylock);
+  status = fcntl(logfileno, F_SETLK, &mylock);
 
   close(logfileno);
 

@@ -63,6 +63,28 @@ Yseasstat     Statistical values
 Yseaspctl     Statistical values
 Ydrunstat     Statistical values
 Ydrunpctl     Statistical values
+Detrend       Regression
+Trend         Regression
+Subtrend      Regression
+Remapgrid     Interpolation
+Genweights    Interpolation
+Remap         Interpolation
+Intgrid       Interpolation
+Vertint       Interpolation
+Inttime       Interpolation
+Intyear       Interpolation
+Spectral      Transformation
+Wind          Transformation
+Input         Formatted I/O
+Output        Formatted I/O
+Gradsdes      Miscellaneous
+Timsort       Miscellaneous
+Vargen        Miscellaneous
+Vardup        Miscellaneous
+Rotuv         Miscellaneous
+Mastrfu       Miscellaneous
+Hi            Miscellaneous
+Tchill        Miscellaneous
 EcaCdd        ECA indices
 EcaCfd        ECA indices
 EcaCsu        ECA indices
@@ -100,25 +122,3 @@ EcaTn90p      ECA indices
 EcaTr         ECA indices
 EcaTx10p      ECA indices
 EcaTx90p      ECA indices
-Detrend       Regression
-Trend         Regression
-Subtrend      Regression
-Remapgrid     Interpolation
-Genweights    Interpolation
-Remap         Interpolation
-Intgrid       Interpolation
-Vertint       Interpolation
-Inttime       Interpolation
-Intyear       Interpolation
-Spectral      Transformation
-Wind          Transformation
-Input         Formatted I/O
-Output        Formatted I/O
-Gradsdes      Miscellaneous
-Timsort       Miscellaneous
-Vargen        Miscellaneous
-Vardup        Miscellaneous
-Rotuv         Miscellaneous
-Mastrfu       Miscellaneous
-Hi            Miscellaneous
-Tchill        Miscellaneous

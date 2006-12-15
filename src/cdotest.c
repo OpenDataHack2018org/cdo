@@ -130,8 +130,8 @@ static double **createVars(int nvars, int nts)
 {
   static const char func[] = "createVars";
   
-  double *array = (double *) malloc(sizeof(double[nvars * nts]));
-  double **vars = (double **) malloc(sizeof(double*[nvars]));
+  double *array = (double *) malloc(nvars*nts*sizeof(double));
+  double **vars = (double **) malloc(nvars*sizeof(double));
   
   int i;
   

@@ -49,18 +49,18 @@ case "${HOSTNAME}" in
                     --with-netcdf=/client \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
-# sparc-sun-solaris2.8
+# sparc-sun-solaris2.10
     xxf)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN \
-                    --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
-                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include"  LIBS=$HOME/local/SUN/lib/libsz.a \
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
+                    --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
 # sparc-sun-solaris2.9
     executor | yang | yin)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/SUN64 \
-                    --with-netcdf=/scratch/small/m214/m214089/local/SunOS64 \
-                    CC=cc CFLAGS="-g -mt -fast -xtarget=native -xarch=v9a"
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
+                    --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include"  LIBS=$HOME/local/SUN/lib/libsz.a \
+                    CC=cc CFLAGS="-g -mt -fast"
 	;;
 # sx6-nec-superux12.2
     cs*)
