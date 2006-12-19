@@ -248,7 +248,7 @@ void *Tchill(void *argument);
 #define  MrotuvOperators        {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "nvar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
-#define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld"}
+#define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld", "outputarr"}
 #define  OutputgmtOperators     {"outputcenter", "outputbounds", "outputboundscpt", "outputvector"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RemapOperators         {"remap"}

@@ -35,7 +35,7 @@
 void *Output(void *argument)
 {
   static char func[] = "Output";
-  int OUTPUT, OUTPUTINT, OUTPUTSRV, OUTPUTEXT, OUTPUTF, OUTPUTTS, OUTPUTFLD;
+  int OUTPUT, OUTPUTINT, OUTPUTSRV, OUTPUTEXT, OUTPUTF, OUTPUTTS, OUTPUTFLD, OUTPUTARR;
   int operatorID;
   int i;
   int indf;
@@ -71,6 +71,7 @@ void *Output(void *argument)
   OUTPUTF   = cdoOperatorAdd("outputf",   0, 0, NULL);
   OUTPUTTS  = cdoOperatorAdd("outputts",  0, 0, NULL);
   OUTPUTFLD = cdoOperatorAdd("outputfld", 0, 0, NULL);
+  OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -202,6 +203,14 @@ void *Output(void *argument)
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(array[i], missval) )
 		      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, yvals[i], xvals[i], array[i]);
+		}
+	      else if ( operatorID == OUTPUTARR )
+		{
+		  for ( i = 0; i < gridsize; i++ )
+		    {
+		      fprintf(stdout, "  arr[%d] = %12.6g;\n", i, array[i]);
+		      nout++;
+		    }
 		}
 	      else
 		{
