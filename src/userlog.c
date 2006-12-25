@@ -21,6 +21,9 @@
 
 #define  MAX_LEN  65536
 
+#define  LOGSSIZE  32
+#define  LOGOSIZE  40
+
 void cdolog(const char *prompt, double cputime)
 {
 #if defined (LOGPATH)
@@ -253,10 +256,10 @@ static int flt2ibm(float x, unsigned char *ibm) {
                                (*(xb+6) = (iv) >>  8), \
                                (*(xb+7) = (iv)))
 
+
 void cdologs(int noper, double cputime, off_t nvals)
 {
 #if defined (LOGPATH)
-#define  LOGSIZE  32
 #define  XSTRING(x)	#x
 #define  STRING(x)	XSTRING(x)
   char logfilename[] = STRING(LOGPATH) "/cdo.logs";
@@ -269,14 +272,14 @@ void cdologs(int noper, double cputime, off_t nvals)
   int date0 = 0, ncdo0, noper0, nhours0;
   double cputime0;
   INT64 nvals0;
-  unsigned char logbuf[LOGSIZE];
+  unsigned char logbuf[LOGSSIZE];
   unsigned char *logdate   =  logbuf;
   unsigned char *logncdo   = &logbuf[4];
   unsigned char *lognoper  = &logbuf[8];
   unsigned char *logctime  = &logbuf[12];
   unsigned char *lognvals  = &logbuf[16];
   unsigned char *lognhours = &logbuf[24];
-  const size_t logsize = LOGSIZE;
+  const size_t logsize = LOGSSIZE;
   size_t bufsize;
   struct flock mylock;
   struct stat filestat;
@@ -342,7 +345,7 @@ void cdologs(int noper, double cputime, off_t nvals)
     {
       ncdo++;
 
-      while ( cputime > 3600 ) { cputime -= 3600; nhours++; }
+      while ( cputime >= 3600 ) { cputime -= 3600; nhours++; }
 
       PUT_UINT4(logdate, date);
       PUT_UINT4(logncdo, ncdo);
@@ -350,10 +353,7 @@ void cdologs(int noper, double cputime, off_t nvals)
       flt2ibm((float)cputime, logctime);
       PUT_UINT8(lognvals, nvals);
       PUT_UINT4(lognhours, nhours);
-      /*
-      mylock.l_type   = F_WRLCK;
-      status = fcntl(logfileno, F_SETLKW, &mylock);
-      */
+
       status = (int) write(logfileno, logbuf, logsize);
     }
 
@@ -374,7 +374,6 @@ void cdologs(int noper, double cputime, off_t nvals)
 
 void dumplogs(const char *logfilename)
 {
-#define  LOGSIZE  32
   static const char func[] = "dumplogs";
   int  logfileno;
   int status;
@@ -383,7 +382,7 @@ void dumplogs(const char *logfilename)
   int i;
   double cputime0;
   INT64 nvals0;
-  unsigned char logbuf[LOGSIZE];
+  unsigned char logbuf[LOGSSIZE];
   unsigned char *logdate   =  logbuf;
   unsigned char *logncdo   = &logbuf[4];
   unsigned char *lognoper  = &logbuf[8];
@@ -391,7 +390,7 @@ void dumplogs(const char *logfilename)
   unsigned char *lognvals  = &logbuf[16];
   unsigned char *lognhours = &logbuf[24];
   unsigned char *buffer = NULL;
-  const size_t logsize = LOGSIZE;
+  const size_t logsize = LOGSSIZE;
   size_t bufsize;
   struct stat filestat;
 
@@ -428,9 +427,373 @@ void dumplogs(const char *logfilename)
 	  nhours0  = GET_UINT4(lognhours);
 
 	  if ( sizeof(INT64) > sizeof(long) )
-	    fprintf(stdout, "%8d %10d %10d %19lld %10d %8.2f\n", date0, ncdo0, noper0, (long long)nvals0, nhours0, cputime0);
+	    fprintf(stdout, "%8d %10d %10d %19lld %10d %8.2f\n",
+		    date0, ncdo0, noper0, (long long)nvals0, nhours0, cputime0);
 	  else
-	    fprintf(stdout, "%8d %10d %10d %19ld %10d %8.2f\n", date0, ncdo0, noper0, (long)nvals0, nhours0, cputime0);
+	    fprintf(stdout, "%8d %10d %10d %19ld %10d %8.2f\n",
+		    date0, ncdo0, noper0, (long)nvals0, nhours0, cputime0);
+	}
+
+      free(buffer);
+    }
+
+  close(logfileno);
+
+  errno = 0;
+
+  return;
+}
+
+
+void daylogs(const char *logfilename)
+{
+  static const char func[] = "dumplogs";
+  int  logfileno;
+  int status;
+  int date0 = 0, ncdo0, noper0, nhours0;
+  int nlogs;
+  int i;
+  double cputime0;
+  INT64 nvals0;
+  unsigned char logbuf[LOGSSIZE];
+  unsigned char *logdate   =  logbuf;
+  unsigned char *logncdo   = &logbuf[4];
+  unsigned char *lognoper  = &logbuf[8];
+  unsigned char *logctime  = &logbuf[12];
+  unsigned char *lognvals  = &logbuf[16];
+  unsigned char *lognhours = &logbuf[24];
+  unsigned char *buffer = NULL;
+  const size_t logsize = LOGSSIZE;
+  size_t bufsize;
+  struct stat filestat;
+
+  errno = 0;
+  logfileno = open(logfilename, O_RDONLY);
+  if ( errno )
+    {
+      cdoAbort("Open failed on %s", logfilename);
+      errno = 0;
+      return;
+    }
+
+  status = fstat(logfileno, &filestat);
+  errno = 0;
+  if ( status != 0 ) return;
+
+  bufsize = (size_t) filestat.st_size;
+
+  if ( bufsize > 0 )
+    {
+      buffer = (unsigned char *) malloc(bufsize);
+
+      status = (int) read(logfileno, buffer, bufsize);
+
+      fprintf(stdout, "# day           noper         size [MB]    time [s]\n");
+      nlogs = bufsize / logsize;
+      for ( i = 0; i < nlogs; i++ )
+	{
+	  memcpy(logbuf, &buffer[i*logsize], logsize);
+	  date0    = GET_UINT4(logdate);
+	  ncdo0    = GET_UINT4(logncdo);
+	  noper0   = GET_UINT4(lognoper);
+	  cputime0 = (double) ibm2flt(logctime);
+	  nvals0   = GET_UINT8(lognvals);
+	  nhours0  = GET_UINT4(lognhours);
+
+	  fprintf(stdout, "%8d %12d %12d %12d\n",
+		  date0, noper0, (int)(8*nvals0/(1024*1024)), (int) (nhours0*3600.+cputime0));
+	}
+
+      free(buffer);
+    }
+
+  close(logfileno);
+
+  errno = 0;
+
+  return;
+}
+
+
+void monlogs(const char *logfilename)
+{
+  static const char func[] = "dumplogs";
+  int  logfileno;
+  int status;
+  int date0 = 0, ncdo0, noper0, nhours0;
+  int nlogs;
+  int i;
+  double cputime0;
+  INT64 nvals0;
+  unsigned char logbuf[LOGSSIZE];
+  unsigned char *logdate   =  logbuf;
+  unsigned char *logncdo   = &logbuf[4];
+  unsigned char *lognoper  = &logbuf[8];
+  unsigned char *logctime  = &logbuf[12];
+  unsigned char *lognvals  = &logbuf[16];
+  unsigned char *lognhours = &logbuf[24];
+  unsigned char *buffer = NULL;
+  int ymon = 0, ymon0 = 0;
+  unsigned int noper = 0;
+  double size = 0, cputime = 0;
+  const size_t logsize = LOGSSIZE;
+  size_t bufsize;
+  struct stat filestat;
+
+  errno = 0;
+  logfileno = open(logfilename, O_RDONLY);
+  if ( errno )
+    {
+      cdoAbort("Open failed on %s", logfilename);
+      errno = 0;
+      return;
+    }
+
+  status = fstat(logfileno, &filestat);
+  errno = 0;
+  if ( status != 0 ) return;
+
+  bufsize = (size_t) filestat.st_size;
+
+  if ( bufsize > 0 )
+    {
+      buffer = (unsigned char *) malloc(bufsize);
+
+      status = (int) read(logfileno, buffer, bufsize);
+
+      fprintf(stdout, "# month         noper         size [GB]    time [h]\n");
+      nlogs = bufsize / logsize;
+      for ( i = 0; i < nlogs; i++ )
+	{
+	  memcpy(logbuf, &buffer[i*logsize], logsize);
+	  date0    = GET_UINT4(logdate);
+	  ncdo0    = GET_UINT4(logncdo);
+	  noper0   = GET_UINT4(lognoper);
+	  cputime0 = (double) ibm2flt(logctime);
+	  nvals0   = GET_UINT8(lognvals);
+	  nhours0  = GET_UINT4(lognhours);
+
+	  if ( i == 0 ) ymon0 = date0/100;
+	  ymon = date0/100;
+
+	  if ( ymon != ymon0 )
+	    {
+	      if ( i )
+		fprintf(stdout, "%6d   %12u %12d %12d\n",
+			ymon0, noper, (int)(8*size/(1024*1024*1024)), (int) (cputime/3600));
+		
+	      noper = 0;
+	      size  = 0;
+              cputime = 0;
+	    }
+	  noper += noper0;
+	  size += nvals0;
+	  cputime += (nhours0*3600.+cputime0);
+	  
+	  ymon0 = ymon;
+	}
+      fprintf(stdout, "%6d   %12u %12d %12d\n",
+	      ymon0, noper, (int)(8*size/(1024*1024*1024)), (int) (cputime/3600));
+      
+      free(buffer);
+    }
+
+  close(logfileno);
+
+  errno = 0;
+
+  return;
+}
+
+const char *processInqOpername2(int processID);
+
+void cdologo(int noper, double cputime, off_t nvals)
+{
+  static char func[] = "cdologo";
+#if defined (LOGPATH)
+#define  XSTRING(x)	#x
+#define  STRING(x)	XSTRING(x)
+  char logfilename[] = STRING(LOGPATH) "/cdo.logo";
+  int  logfileno;
+  int status;
+  int nhours = 0;
+  int nhours0 = 0;
+  double cputime0 = 0;
+  INT64 nvals0 = 0;
+  unsigned char logbuf[LOGOSIZE];
+  unsigned char *logname   =  logbuf;
+  unsigned char *lognocc   = &logbuf[16];
+  unsigned char *lognvals  = &logbuf[20];
+  unsigned char *lognhours = &logbuf[28];
+  unsigned char *logctime  = &logbuf[32];
+  unsigned char *buffer = NULL;
+  const size_t logsize = LOGOSIZE;
+  size_t bufsize, newbufsize;
+  struct flock mylock;
+  struct stat filestat;
+  int nocc = 0;
+  int i, nbuf;
+  int processID;
+  int ofound[256];
+  const char *oname[256];
+
+  for ( processID = 0; processID < noper; processID++ )
+    {
+      ofound[processID] = FALSE;
+      oname[processID] = processInqOpername2(processID);
+    }
+
+  nvals /= noper;
+  cputime /= noper;
+
+  memset(logbuf, 0, logsize);
+
+  errno = 0;
+  logfileno = open(logfilename, O_RDWR);
+  if ( errno )
+    {
+      errno = 0;
+      return;
+    }
+
+  mylock.l_type   = F_WRLCK;
+  mylock.l_whence = SEEK_SET;
+  mylock.l_start  = 0;
+  mylock.l_len    = 0;
+
+  status = fcntl(logfileno, F_SETLKW, &mylock);
+  errno = 0;
+  if ( status != 0 ) goto endlabel;
+
+  status = fstat(logfileno, &filestat);
+  errno = 0;
+  if ( status != 0 ) goto endlabel;
+
+  bufsize = (size_t) filestat.st_size;
+
+  newbufsize = bufsize + noper*logsize;
+  buffer = (unsigned char *) malloc(newbufsize);
+  if ( bufsize > 0 )
+    status = (int) read(logfileno, buffer, bufsize);
+
+  for ( processID = 0; processID < noper; processID++ )
+    {
+      nbuf = (int) (bufsize / logsize);
+
+      for ( i = 0; i < nbuf; i++ )
+	{
+	  memcpy(logbuf, buffer+i*logsize, logsize);
+	  nocc     = GET_UINT4(lognocc);
+	  nvals0   = GET_UINT8(lognvals);
+	  nhours0  = GET_UINT4(lognhours);
+	  cputime0 = (double) ibm2flt(logctime);
+
+	  if ( strcmp((const char*)logname, oname[processID]) == 0 ) break;
+	}
+
+      if ( i == nbuf )
+	{
+	  nocc     = 0;
+	  nvals0   = 0;
+          nhours0  = 0;
+          cputime0 = 0;
+	  bufsize += logsize;
+	  strcpy((char *)logname, oname[processID]);
+	}
+
+      nocc++;
+	  
+      nvals0   += (off_t) nvals;
+      nhours0  += nhours;
+      cputime0 += cputime;
+      while ( cputime0 >= 3600 ) { cputime0 -= 3600; nhours0++; }
+
+      PUT_UINT4(lognocc, nocc);
+      PUT_UINT8(lognvals, nvals0);
+      PUT_UINT4(lognhours, nhours0);
+      flt2ibm((float)cputime0, logctime);
+
+      memcpy(buffer+i*logsize, logbuf, logsize);
+    }
+
+  status = (int) lseek(logfileno, 0, SEEK_SET);
+  status = (int) write(logfileno, buffer, bufsize);
+
+  free(buffer);
+
+ endlabel:
+
+  mylock.l_type   = F_UNLCK;
+  status = fcntl(logfileno, F_SETLK, &mylock);
+
+  close(logfileno);
+
+  errno = 0;
+
+  return;
+
+#endif
+}
+
+
+void dumplogo(const char *logfilename)
+{
+  static const char func[] = "dumplogs";
+  int  logfileno;
+  int status;
+  int nocc;
+  int nhours0;
+  int nlogs;
+  int i;
+  double cputime0;
+  INT64 nvals0;
+  unsigned char logbuf[LOGOSIZE];
+  unsigned char *logname   =  logbuf;
+  unsigned char *lognocc   = &logbuf[16];
+  unsigned char *lognvals  = &logbuf[20];
+  unsigned char *lognhours = &logbuf[28];
+  unsigned char *logctime  = &logbuf[32];
+  unsigned char *buffer = NULL;
+  const size_t logsize = LOGOSIZE;
+  size_t bufsize;
+  struct stat filestat;
+
+  errno = 0;
+  logfileno = open(logfilename, O_RDONLY);
+  if ( errno )
+    {
+      cdoAbort("Open failed on %s", logfilename);
+      errno = 0;
+      return;
+    }
+
+  status = fstat(logfileno, &filestat);
+  errno = 0;
+  if ( status != 0 ) return;
+
+  bufsize = (size_t) filestat.st_size;
+
+  if ( bufsize > 0 )
+    {
+      buffer = (unsigned char *) malloc(bufsize);
+
+      status = (int) read(logfileno, buffer, bufsize);
+
+      nlogs = bufsize / logsize;
+      for ( i = 0; i < nlogs; i++ )
+	{
+	  memcpy(logbuf, &buffer[i*logsize], logsize);
+	  nocc     = GET_UINT4(lognocc);
+	  nvals0   = GET_UINT8(lognvals);
+	  nhours0  = GET_UINT4(lognhours);
+	  cputime0 = (double) ibm2flt(logctime);
+
+	  if ( sizeof(INT64) > sizeof(long) )
+	    fprintf(stdout, "%4d  %-16s %12d %19lld %10d %8.2f\n",
+		    i+1, logname, nocc, (long long)nvals0, nhours0, cputime0);
+	  else
+	    fprintf(stdout, "%4d  %-16s %12d %19ld %10d %8.2f\n",
+		    i+1, logname, nocc, (long)nvals0, nhours0, cputime0);
 	}
 
       free(buffer);

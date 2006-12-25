@@ -237,7 +237,7 @@ void *Tchill(void *argument);
 #define  IntyearOperators       {"intyear"}
 #define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", \
                                  "invertlatdata", "invertlondata"}
-#define  LogOperators           {"dumplogs"}
+#define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MastrfuOperators       {"mastrfu"}
 #define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
@@ -320,7 +320,7 @@ void *Tchill(void *argument);
 #define  VertintOperators       {"ml2pl", "ml2hl"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertvar", "vertstd"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
-#define  WritegridOperators     {"writegrid"}
+#define  WritegridOperators     {"writegrid", "gridarea"}
 #define  WriterandomOperators   {"writerandom"}
 /* RQ */
 #define  YdaypctlOperators      {"ydaypctl"}

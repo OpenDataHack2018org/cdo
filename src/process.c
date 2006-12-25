@@ -268,6 +268,12 @@ int processInqStreamID(int streamindex)
 }
 
 
+const char *processInqOpername2(int processID)
+{
+  return (Process[processID].operatorName);
+}
+
+
 const char *processInqOpername(void)
 {
   int processID = processSelf();

@@ -44,6 +44,7 @@ int  processInqChildNum(void);
 
 const char *processOperatorArg(void);
 const char *processInqOpername(void);
+const char *processInqOpername2(int processID);
 const char *processInqPrompt(void);
 
 #endif  /* _PROCESS_H */

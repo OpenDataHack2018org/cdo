@@ -318,7 +318,7 @@ int pstreamOpenRead(const char *argument)
     {
 #if  defined  (HAVE_LIBPTHREAD)
       char *newarg;
-      char *pipename = (char *) malloc(10);
+      char *pipename = (char *) malloc(16);
       int rval;
       pthread_t thrID;
       pthread_attr_t attr;
@@ -330,7 +330,7 @@ int pstreamOpenRead(const char *argument)
       free(operatorArg);
 
       len = strlen(argument);
-      newarg = (char *) malloc(len+11);
+      newarg = (char *) malloc(len+16);
       strcpy(newarg, argument);
       sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
       newarg[len] = ' ';
@@ -1141,6 +1141,7 @@ void cdoFinish(void)
       if ( cdoLogOff == 0 )
 	{
 	  cdologs(processNums(), p_cputime, processInqNvals()); 
+	  cdologo(processNums(), p_cputime, processInqNvals()); 
 	  cdolog(processInqPrompt(), p_cputime); 
 	}
     }

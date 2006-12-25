@@ -116,6 +116,7 @@ int     defineTable(char *tablearg);
 
 void    cdolog(const char *prompt, double cputime);
 void    cdologs(int noper, double cputime, off_t nvals);
+void    cdologo(int noper, double cputime, off_t nvals);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 
