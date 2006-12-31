@@ -15,6 +15,11 @@
   GNU General Public License for more details.
 */
 
+
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include "pipe.h"
@@ -74,6 +79,7 @@ static void pipe_init(PIPE *pipe)
   pipe->tsIDr   = -1;
   pipe->tsIDw   = -1;
 
+  pipe->nvals   = 0;
   pipe->nmiss   = 0;
   pipe->data    = NULL;
   pipe->hasdata = 0;
@@ -527,6 +533,7 @@ void pipeReadRecord(PSTREAM *pstreamptr, double *data, int *nmiss)
 
       vlistID = pstreamptr->vlistID;
       gridsize = gridInqSize(vlistInqVarGrid(vlistID, pipe->varID));
+      pipe->nvals += gridsize;
       memcpy(data, pipe->data, gridsize*sizeof(double));
       *nmiss = pipe->nmiss;
     }

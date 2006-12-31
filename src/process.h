@@ -36,8 +36,11 @@ void processStartTime(double *utime, double *stime);
 void processEndTime(double *utime, double *stime);
 void processAccuTime(double utime, double stime);
 
+void processDefCputime(int processID, double cputime);
+double processInqCputime(int processID);
+
 void processAddNvals(off_t nvals);
-off_t processInqNvals(void);
+off_t processInqNvals(int processID);
 int processNums(void);
 
 int  processInqChildNum(void);

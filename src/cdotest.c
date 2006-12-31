@@ -214,19 +214,19 @@ static void testEcaFd()
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(vars[0][0] == 0);
+  assert(DBL_IS_EQUAL(vars[0][0], 0));
 
   writeNcFile("in.nc", array, 4);
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(vars[0][0] == 1);
+  assert(DBL_IS_EQUAL(vars[0][0], 1));
 
   writeNcFile("in.nc", array, 5);
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(vars[0][0] == 2);
+  assert(DBL_IS_EQUAL(vars[0][0], 2));
   
   destroyVars(vars);
 }
@@ -246,15 +246,15 @@ static void testEcaSu()
 
   submitCdoCommand("eca_su in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(vars[0][0] == 2);
+  assert(DBL_IS_EQUAL(vars[0][0], 2));
 
   submitCdoCommand("eca_su,20.0 in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(vars[0][0] == 4);
+  assert(DBL_IS_EQUAL(vars[0][0], 4));
 
   submitCdoCommand("eca_su,30.0 in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(vars[0][0] == 0);
+  assert(DBL_IS_EQUAL(vars[0][0], 0));
   
   destroyVars(vars);
 }

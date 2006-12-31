@@ -21,7 +21,6 @@
 
 #include "cdo.h"
 #include "modules.h"
-#include "process.h"
 #include "dmemory.h"
 
 char *getProgname(char *string)

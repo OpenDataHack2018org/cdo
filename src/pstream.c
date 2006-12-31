@@ -30,11 +30,11 @@ int pclose(FILE *stream);
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
+#include "dtypes.h"
 #include "modules.h"
 #include "pstream_int.h"
 #include "cdo_int.h"
 #include "util.h"
-#include "process.h"
 #include "pipe.h"
 #include "error.h"
 #include "dmemory.h"
@@ -55,6 +55,8 @@ static int _pstream_init = FALSE;
 #if  defined  (HAVE_LIBPTHREAD)
 #include <pthread.h>
 #include "pthread_debug.h"
+
+static int pthreadScope = 0;
 
 static pthread_mutex_t streamOpenReadMutex  = PTHREAD_MUTEX_INITIALIZER;
 static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -324,6 +326,7 @@ int pstreamOpenRead(const char *argument)
       pthread_attr_t attr;
       size_t len;
       size_t stacksize;
+      int status;
 
       operatorArg = getOperator(argument);
       operatorName = getOperatorName(operatorArg);
@@ -344,14 +347,22 @@ int pstreamOpenRead(const char *argument)
       if ( ! cdoSilentMode )
 	fprintf(stderr, "%s: Started child process \"%s\".\n", processInqPrompt(), newarg+1);
 
-      /*
-      if ( PTHREAD_Debug )
-	{
-	}
-      */
-      pthread_attr_init(&attr);
-      /*      pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
-      pthread_attr_getstacksize(&attr, &stacksize);
+      status = pthread_attr_init(&attr);
+      if ( status ) SysError(func, "pthread_attr_init failed for '%s'\n", newarg+1);
+      status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+      if ( status ) SysError(func, "pthread_attr_setdetachstate failed for '%s'\n", newarg+1);
+
+      /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
+      /* if ( status ) SysError(func, "pthread_attr_setinheritsched failed for '%s'\n", newarg+1); */
+
+      pthread_attr_getscope(&attr, &pthreadScope);
+
+      /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
+      /* if ( status ) SysError(func, "pthread_attr_setscope failed for '%s'\n", newarg+1); */
+      /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
+      /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
+
+      status = pthread_attr_getstacksize(&attr, &stacksize);
       if ( stacksize < 2097152 )
 	{
 	  stacksize = 2097152;
@@ -699,6 +710,7 @@ void pstreamClose(int pstreamID)
 
 	  pthread_join(pstreamptr->wthreadID, NULL);
 
+	  processAddNvals(pipe->nvals);
 	  pipeDelete(pipe);
 	  pstream_delete_entry(pstreamptr);
 	}
@@ -732,7 +744,9 @@ void pstreamClose(int pstreamID)
 	Message(func, "%s fileID %d\n", pstreamptr->name, pstreamptr->fileID);
 
       if ( pstreamptr->mode == 'r' )
-	processAddNvals(streamNvals(pstreamptr->fileID));
+	{
+	  processAddNvals(streamNvals(pstreamptr->fileID));
+	}
 
       streamClose(pstreamptr->fileID);
 
@@ -1088,6 +1102,7 @@ void cdoFinish(void)
   int processID = processSelf();
   int sindex, pstreamID;
   int nstream;
+  INT64 nvals;
   int nvars, ntimesteps;
   char memstring[32] = {""};
   double s_utime, s_stime;
@@ -1101,20 +1116,55 @@ void cdoFinish(void)
     Message(func, "process %d  thread %ld", processID, pthread_self());
 #endif
 
+  nvals = processInqNvals(processID);
   nvars = processInqVarNum();
   ntimesteps = processInqTimesteps();
 
   if ( ! cdoSilentMode )
+    {
+      if ( nvals > 0 )
+	{
+	  if ( sizeof(INT64) > sizeof(long) )
+	    fprintf(stderr, "%s: Processed %lld value%s from %d variable%s over %d timestep%s.",
+		    processInqPrompt(),
+		    nvals, nvals > 1 ? "s" : "",
+		    nvars, nvars > 1 ? "s" : "",
+		    ntimesteps, ntimesteps > 1 ? "s" : "");
+	  else
+	    fprintf(stderr, "%s: Processed %ld value%s from %d variable%s over %d timestep%s.",
+		    processInqPrompt(),
+		    nvals, nvals > 1 ? "s" : "",
+		    nvars, nvars > 1 ? "s" : "",
+		    ntimesteps, ntimesteps > 1 ? "s" : "");
+	}
+      else
+	fprintf(stderr, "%s: Processed %d variable%s over %d timestep%s.",
+		processInqPrompt(),
+		nvars, nvars > 1 ? "s" : "",
+		ntimesteps, ntimesteps > 1 ? "s" : "");
+    }
+  /*
     fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",
 	    processInqPrompt(), nvars, nvars > 1 ? "s" : "",
 	    ntimesteps, ntimesteps > 1 ? "s" : "");
-
+  */
   processStartTime(&s_utime, &s_stime);
   cdoProcessTime(&e_utime, &e_stime);
 
   c_usertime = e_utime - s_utime;
   c_systime  = e_stime - s_stime;
   c_cputime  = c_usertime + c_systime;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  if ( pthreadScope == PTHREAD_SCOPE_PROCESS )
+    {
+      c_usertime /= processNums();
+      c_systime  /= processNums();
+      c_cputime  /= processNums();
+    }
+#endif
+
+  processDefCputime(processID, c_cputime);  
 
   processAccuTime(c_usertime, c_systime);
 
@@ -1140,8 +1190,8 @@ void cdoFinish(void)
 
       if ( cdoLogOff == 0 )
 	{
-	  cdologs(processNums(), p_cputime, processInqNvals()); 
-	  cdologo(processNums(), p_cputime, processInqNvals()); 
+	  cdologs(processNums()); 
+	  cdologo(processNums()); 
 	  cdolog(processInqPrompt(), p_cputime); 
 	}
     }

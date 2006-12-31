@@ -14,6 +14,7 @@
 
 #include "cdo.h"
 #include "dtypes.h"
+#include "process.h"
 
 #if ! defined (VERSION)
 #  define  VERSION  "0.0.1"
@@ -257,7 +258,7 @@ static int flt2ibm(float x, unsigned char *ibm) {
                                (*(xb+7) = (iv)))
 
 
-void cdologs(int noper, double cputime, off_t nvals)
+void cdologs(int noper)
 {
 #if defined (LOGPATH)
 #define  XSTRING(x)	#x
@@ -283,6 +284,17 @@ void cdologs(int noper, double cputime, off_t nvals)
   size_t bufsize;
   struct flock mylock;
   struct stat filestat;
+  off_t nvals;
+  int processID;
+  double cputime;
+
+  nvals = 0;
+  cputime = 0;
+  for ( processID = 0; processID < noper; processID++ )
+    {
+      cputime += processInqCputime(processID);
+      nvals += processInqNvals(processID);
+    }
 
   memset(logbuf, 0, logsize);
 
@@ -605,9 +617,8 @@ void monlogs(const char *logfilename)
   return;
 }
 
-const char *processInqOpername2(int processID);
 
-void cdologo(int noper, double cputime, off_t nvals)
+void cdologo(int noper)
 {
   static char func[] = "cdologo";
 #if defined (LOGPATH)
@@ -634,17 +645,16 @@ void cdologo(int noper, double cputime, off_t nvals)
   int nocc = 0;
   int i, nbuf;
   int processID;
-  int ofound[256];
+  off_t onvals[256];
+  double ocputime[256];
   const char *oname[256];
 
   for ( processID = 0; processID < noper; processID++ )
     {
-      ofound[processID] = FALSE;
-      oname[processID] = processInqOpername2(processID);
+      ocputime[processID] = processInqCputime(processID);
+      onvals[processID]   = processInqNvals(processID);
+      oname[processID]    = processInqOpername2(processID);
     }
-
-  nvals /= noper;
-  cputime /= noper;
 
   memset(logbuf, 0, logsize);
 
@@ -703,9 +713,9 @@ void cdologo(int noper, double cputime, off_t nvals)
 
       nocc++;
 	  
-      nvals0   += (off_t) nvals;
+      nvals0   += (off_t) onvals[processID];
       nhours0  += nhours;
-      cputime0 += cputime;
+      cputime0 += ocputime[processID];
       while ( cputime0 >= 3600 ) { cputime0 -= 3600; nhours0++; }
 
       PUT_UINT4(lognocc, nocc);

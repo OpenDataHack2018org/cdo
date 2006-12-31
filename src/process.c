@@ -57,7 +57,9 @@ typedef struct {
   double   s_stime;
   double   a_utime;
   double   a_stime;
+  double   cputime;
 
+  off_t    nvals;
   int      nvars;
   int      ntimesteps;
   int      streamCnt;
@@ -77,11 +79,9 @@ PROCESS;
 static PROCESS Process[MAX_PROCESS];
 
 static int NumProcess = 0;
-static off_t ProcessNvals = 0;
 
 #if  defined  (HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_mutex_t processNvalsMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
 
@@ -110,6 +110,7 @@ int processCreate(void)
   cdoProcessTime(&Process[processID].s_utime, &Process[processID].s_stime);
   Process[processID].a_utime      = 0;
   Process[processID].a_stime      = 0;
+  Process[processID].cputime      = 0;
 
   Process[processID].oargc        = 0;
   Process[processID].xoperator    = NULL;
@@ -172,33 +173,18 @@ int processNums(void)
 void processAddNvals(off_t nvals)
 {
   static char func[] = "processAddNvals";
+  int processID = processSelf();
 
-#if  defined  (HAVE_LIBPTHREAD)
-  pthread_mutex_lock(&processNvalsMutex);
-#endif
-
-  ProcessNvals += nvals;
-
-#if  defined  (HAVE_LIBPTHREAD)
-  pthread_mutex_unlock(&processNvalsMutex);  
-#endif
+  Process[processID].nvals += nvals;
 }
 
 
-off_t processInqNvals(void)
+off_t processInqNvals(int processID)
 {
   static char func[] = "processInqNvals";
   off_t nvals = 0;
 
-#if  defined  (HAVE_LIBPTHREAD)
-  pthread_mutex_lock(&processNvalsMutex);
-#endif
-
-  nvals = ProcessNvals;
-
-#if  defined  (HAVE_LIBPTHREAD)
-  pthread_mutex_unlock(&processNvalsMutex);  
-#endif
+  nvals = Process[processID].nvals;
 
   return (nvals);
 }
@@ -218,6 +204,18 @@ void processAddStream(int streamID)
     Error(func, "limit of %d streams per process reached!", MAX_STREAM);
 
   Process[processID].streams[sindex] = streamID;
+}
+
+
+void processDefCputime(int processID, double cputime)
+{
+  Process[processID].cputime = cputime;
+}
+
+
+double processInqCputime(int processID)
+{
+  return (Process[processID].cputime);
 }
 
 
@@ -565,6 +563,7 @@ static void setStreams(const char *argument)
 
   streamCnt = getStreamCnt(argc, argv);
 
+  Process[processID].nvals = 0;
   Process[processID].nvars = 0;
   Process[processID].ntimesteps = 0;
 

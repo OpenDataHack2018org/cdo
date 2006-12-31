@@ -22,6 +22,7 @@
 #  include "config.h"
 #endif
 
+#include <sys/types.h>
 
 #if  defined  (HAVE_LIBPTHREAD)
 
@@ -64,6 +65,7 @@ struct _PIPE {
   int hasdata, usedata;
   struct _PSTREAM *pstreamptr_in;
   int nmiss;
+  /* unsigned long */ off_t nvals;
   double *data;
   pthread_mutex_t *mutex;
   pthread_cond_t *tsDef, *tsInq, *vlistDef, *isclosed;

@@ -115,8 +115,8 @@ void    defineInstitution(char *instarg);
 int     defineTable(char *tablearg);
 
 void    cdolog(const char *prompt, double cputime);
-void    cdologs(int noper, double cputime, off_t nvals);
-void    cdologo(int noper, double cputime, off_t nvals);
+void    cdologs(int noper);
+void    cdologo(int noper);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 
