@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaCwdi
-@Title     = Cold wave duration index
+@Title     = Cold wave duration index wrt mean of reference period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -23,7 +23,7 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_cwdi
-@Title     = Cold wave duration index
+@Title     = Cold wave duration index wrt mean of reference period
 @Parameter = [nday] [T]
 @EndOperator
 

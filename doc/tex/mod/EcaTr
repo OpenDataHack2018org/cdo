@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaTr
-@Title     = Tropical nights
+@Title     = Tropical nights index per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -19,7 +19,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_tr
-@Title     = Tropical nights
+@Title     = Tropical nights index per time period
 @Parameter = [T]
 @EndOperator
 

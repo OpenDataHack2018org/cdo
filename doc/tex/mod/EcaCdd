@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaCdd
-@Title     = Consecutive dry days
+@Title     = Consecutive dry days index per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -10,8 +10,8 @@
 @BeginDescription
 Let @file{ifile} be a time series of daily precipitation amounts RR,
 then counted is the largest number of consecutive days where
-RR < 1 mm. A further output variable is the number of dry periods
-of at least 5 days.
+RR is less than 1 mm. A further output variable is the number of dry
+periods of more than 5 days.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
@@ -19,13 +19,13 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_cdd
-@Title     = Consecutive dry days
+@Title     = Consecutive dry days index per time period
 @EndOperator
 
 
 @BeginExample
-To get the largest number of consecutive dry days for a time
-series of daily precipitation amounts, use:
+To get the largest number of consecutive dry days for a time series
+of daily precipitation amounts, use:
 @BeginVerbatim
    cdo eca_cdd rrfile ofile
 @EndVerbatim

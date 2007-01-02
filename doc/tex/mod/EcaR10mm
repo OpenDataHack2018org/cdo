@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaR10mm
-@Title     = Heavy precipitation days
+@Title     = Heavy precipitation days index per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -9,7 +9,7 @@
 
 @BeginDescription
 Let @file{ifile} be a time series of daily precipitation amounts RR,
-then counted is the number of days where RR > 10 mm. 
+then counted is the number of days where RR is at least 10 mm. 
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
@@ -17,7 +17,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_r10mm
-@Title     = Heavy precipitation days
+@Title     = Heavy precipitation days index per time period
 @EndOperator
 
 

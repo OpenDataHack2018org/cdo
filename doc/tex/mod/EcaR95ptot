@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaR95ptot
-@Title     = Precipitation fraction due to R95p days
+@Title     = Precipitation percent due to R95p days
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -19,5 +19,5 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_r95ptot
-@Title     = Precipitation fraction due to R95p days
+@Title     = Precipitation percent due to R95p days
 @EndOperator

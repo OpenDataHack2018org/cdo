@@ -1,0 +1,32 @@
+@BeginModule
+@NewPage
+@Name      = EcaStrwin
+@Title     = Strong wind days index per time period 
+@Section   = ECA indices
+@Class     = ECA index
+@Arguments = ifile ofile
+@Operators = eca_strwin
+
+@BeginDescription
+Let @file{ifile} be a time series of daily maximum horizontal wind speeds
+VX, then counted is the number of days where VX > V. The horizontal wind
+speed V is an optional parameter with default V = 10.5 m/s. Note that both
+VX and V must be given in units of m/s. Also note that the horizontal wind
+speed is defined as the square root of the sum of squares of the zonal and
+meridional wind speeds.
+The date information for a time step in @file{ofile} is the date of
+the last contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_strwin
+@Title     = Strong wind days index per time period
+@Parameter = [v]
+@EndOperator
+
+
+@BeginParameter
+@Item = v
+DOUBLE   Horizontal wind speed threshold (m/s, default v = 10.5 m/s)
+@EndParameter

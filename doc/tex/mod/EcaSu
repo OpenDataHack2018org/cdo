@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaSu
-@Title     = Summer days
+@Title     = Summer days index per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -18,7 +18,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_su
-@Title     = Summer days
+@Title     = Summer days index per time period
 @Parameter = [T]
 @EndOperator
 

@@ -87,7 +87,7 @@ doc/tex/mod/EcaRr1 -text
 doc/tex/mod/EcaRx1day -text
 doc/tex/mod/EcaRx5day -text
 doc/tex/mod/EcaSdii -text
-doc/tex/mod/EcaStrwind -text
+doc/tex/mod/EcaStrwin -text
 doc/tex/mod/EcaSu -text
 doc/tex/mod/EcaTg10p -text
 doc/tex/mod/EcaTg90p -text
@@ -155,7 +155,6 @@ doc/tex/mod/Spectral -text
 doc/tex/mod/Split -text
 doc/tex/mod/Splittime -text
 doc/tex/mod/Subtrend -text
-doc/tex/mod/Tchill -text
 doc/tex/mod/Timpctl -text
 doc/tex/mod/Timsort -text
 doc/tex/mod/Timstat -text
@@ -164,6 +163,7 @@ doc/tex/mod/Vardup -text
 doc/tex/mod/Vargen -text
 doc/tex/mod/Vertint -text
 doc/tex/mod/Vertstat -text
+doc/tex/mod/Wcl -text
 doc/tex/mod/Wind -text
 doc/tex/mod/Writegrid -text
 doc/tex/mod/Writerandom -text

@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaTx10p
-@Title     = Cold days wrt 10th percentile of reference period
+@Title     = Very cold days percent wrt 10th percentile of reference period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -19,7 +19,7 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_tx10p
-@Title     = Cold days wrt 10th percentile of reference period
+@Title     = Very old days percent wrt 10th percentile of reference period
 @EndOperator
 
 

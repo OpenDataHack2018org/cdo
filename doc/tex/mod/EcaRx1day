@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaRx1day
-@Title     = Highest one-day precipitation amount
+@Title     = Highest one-day precipitation amount per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -18,13 +18,13 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_rx1day
-@Title     = Highest one-day precipitation amount
+@Title     = Highest one-day precipitation amount per time period
 @Parameter = [mode]
 @EndOperator
 
 
 @BeginParameter
-@Item = T
+@Item = mode
 STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month
 @EndParameter
 

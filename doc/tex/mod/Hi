@@ -1,20 +1,21 @@
 @BeginModule
 @NewPage
 @Name      = Hi
-@Title     = Humidity index 
+@Title     = Humidity index (°C)
 @Section   = Miscellaneous
 @Class     = Arithmetic
 @Arguments = ifile1 ifile2 ifile3 ofile
 @Operators = hi
- 
+
 @BeginDescription
 Let @file{ifile1}, @file{ifile2} and @file{ifile3} be time series
-of temperature, steam pressure and relative humidity, then a corresponding
-time series of resulting humidity index values is written to @file{ofile}.
+of temperature, vapour pressure and relative humidity records.
+Then a corresponding time series of resulting humidity index values
+is written to @file{ofile}.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_hi
-@Title     = Humidity index 
+@Title     = Humidity index (°C)
 @EndOperator

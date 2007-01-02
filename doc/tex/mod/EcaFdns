@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaFdns
-@Title     = Frost days where no snow
+@Title     = Frost days where no snow index per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -19,5 +19,5 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_fdns
-@Title     = Frost days where no snow
+@Title     = Frost days where no snow index per time period
 @EndOperator

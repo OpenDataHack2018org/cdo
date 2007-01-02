@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = EcaCwd
-@Title     = Consecutive wet days
+@Title     = Consecutive wet days index per time period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile ofile
@@ -9,8 +9,8 @@
 @BeginDescription
 Let @file{ifile} be a time series of daily precipitation amounts RR,
 then counted is the largest number of consecutive days where
-RR > 1 mm. A further output variable is the number of wet periods
-of at least 5 days.
+RR is at least 1 mm. A further output variable is the number of wet
+periods of more than 5 days.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
@@ -18,7 +18,7 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginOperator_eca_cwd
-@Title     = Consecutive wet days
+@Title     = Consecutive wet days index per time period
 @EndOperator
 
 
