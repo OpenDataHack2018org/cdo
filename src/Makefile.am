@@ -183,7 +183,7 @@ cdo_SOURCES = Arith.c		\
 	      ecautil.c		\
 	      EcaIndices.c	\
 	      Hi.c		\
-	      Tchill.c          \
+	      Wct.c             \
 	      cdi.h
 #
 cdo_LDADD = $(LDFLAGS) -lm

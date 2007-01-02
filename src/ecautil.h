@@ -21,6 +21,15 @@
 #include "field.h"
 
 /**
+ * Computes the day-of-year correspnding a given Gregorian date.
+ * 
+ * @param date a Gregorian date in the form YYYYMMDD
+ * 
+ * @return the day-of-year
+ */
+unsigned long day_of_year(int date);
+
+/**
  * Counts the number of nonmissing values in a field. The result
  * of the operation is computed according to the following rules:
  * 
@@ -51,16 +60,15 @@ void farnum(FIELD *field1, FIELD field2);
  */  
 void farnum2(FIELD *field1, FIELD field2);
 
-
 /**
  * Counts the number of values in series of at least n consecutive
  * nonmissing values. The result of the operation is computed according
  * to the following rules:
  * 
  * field1  field2  result
- * a       b       a + 1 if b > n; a + n if b = n; a if b < n
+ * a       b       b < n ? a : b > n ? a + 1 : a + n
  * a       miss    a
- * miss    b       b if b > n; n if b = n; 0 if b < n
+ * miss    b       b < n ? 0 : b
  * miss    miss    0    
  * 
  * @param field1 the 1st input field, also holds the result
@@ -71,12 +79,27 @@ void farnum2(FIELD *field1, FIELD field2);
 void farnum3(FIELD *field1, FIELD field2, double n);
 
 /**
+ * Selects field elements according to a given mask. The result of
+ * the operation is computed according to the following rules:
+ * 
+ * field1  field2  result
+ * a       b       b != 0.0 ? a : miss
+ * a       miss    miss
+ * miss    b       miss
+ * miss    miss    miss    
+ * 
+ * @param field1  the input field, also holds the result
+ * @param field2  the mask
+ */  
+void farsel(FIELD *field1, FIELD field2);
+
+/**
  * Selects all field elements that are less than or equal to the
  * corresponding element of a reference field. The result of the
  * operation is computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       a if a <= b; miss otherwise
+ * a       b       a <= b ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -92,7 +115,7 @@ void farselle(FIELD *field1, FIELD field2);
  * operation is computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       a if a < b; miss otherwise
+ * a       b       a < b ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -108,7 +131,7 @@ void farsellt(FIELD *field1, FIELD field2);
  * the operation is computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       a if a >= b; miss otherwise
+ * a       b       a >= b ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -124,7 +147,7 @@ void farselge(FIELD *field1, FIELD field2);
  * operation is computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       a if a > b; miss otherwise
+ * a       b       a > b ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -140,7 +163,7 @@ void farselgt(FIELD *field1, FIELD field2);
  * operation is computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       a if a = b; miss otherwise
+ * a       b       a == b ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -156,7 +179,7 @@ void farseleq(FIELD *field1, FIELD field2);
  * operation is computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       a if a != b; miss otherwise
+ * a       b       a != b ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -172,7 +195,7 @@ void farselne(FIELD *field1, FIELD field2);
  * according to the following rules:
  * 
  * field  c      result
- * a      c      a if a <= c; miss otherwise
+ * a      c      a <= c ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    
@@ -188,7 +211,7 @@ void farsellec(FIELD *field, double c);
  * according to the following rules:
  * 
  * field  c      result
- * a      c      a if a < c; miss otherwise
+ * a      c      a < c ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    
@@ -204,7 +227,7 @@ void farselltc(FIELD *field, double c);
  * according to the following rules:
  * 
  * field  c      result
- * a      c      a if a >= c; miss otherwise
+ * a      c      a >= c ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    
@@ -220,7 +243,7 @@ void farselgec(FIELD *field, double c);
  * according to the following rules:
  * 
  * field  c      result
- * a      c      a if a > c; miss otherwise
+ * a      c      a > c ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    
@@ -236,7 +259,7 @@ void farselgtc(FIELD *field, double c);
  * according to the following rules:
  * 
  * field  c      result
- * a      c      a if a = c; miss otherwise
+ * a      c      a == c ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    
@@ -252,7 +275,7 @@ void farseleqc(FIELD *field, double c);
  * according to the following rules:
  * 
  * field  c      result
- * a      c      a if a != c; miss otherwise
+ * a      c      a != c ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    

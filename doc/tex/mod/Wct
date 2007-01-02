@@ -1,0 +1,20 @@
+@BeginModule
+@Name      = Wct
+@Title     = Windchill temperature (°C)
+@Section   = Miscellaneous
+@Class     = Arithmetic
+@Arguments = ifile1 ifile2 ofile
+@Operators = wct
+
+@BeginDescription
+Let @file{ifile1} and @file{ifile2} be time series of temperature and wind
+speed records, then a corresponding time series of resulting windchill
+temperatures is written to @file{ofile}. Note that the temperature and
+wind speed records must be given in units of °C and m/s, respectively.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_wct
+@Title     = Windchill temperature (°C)
+@EndOperator

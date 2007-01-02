@@ -54,7 +54,11 @@
       EcaSdii     eca_sdii     SDII     simple daily intensity index
       
       EcaFdns     eca_fdns              frost days without surface snow 
-      EcaStrwind  eca_strwind           number of strong-wind days 
+
+      EcaStrwin   eca_strwin            number of strong-wind days
+      EcaStrbre   eca_strbre            number of strong-breeze days 
+      EcaStrgal   eca_strgal            number of strong-gale days 
+      EcaHurr     eca_hurr              number of hurricane days 
 */
 
 #include <stdio.h>
@@ -70,148 +74,195 @@
 #define TO_KELVIN(x) ((x) + 273.15)
 
 
-static const char CFD_NAME[]         = "consecutive_frost_days";
-static const char CFD_LONGNAME[]     = "greatest number of consecutive frost days";
+static const char CFD_NAME[]         = "consecutive_frost_days_index_per_time_period";
+static const char CFD_LONGNAME[]     = "Consecutive frost days index is the greatest number of consecutive frost days in a given time period. Frost days is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char CFD_UNITS[]        = "No.";
 
-static const char CSU_NAME[]         = "consecutive_summer_days";
-static const char CSU_LONGNAME[]     = "greatest number of consecutive summer days";
+static const char CSU_NAME[]         = "consecutive_summer_days_index_per_time_period";
+static const char CSU_LONGNAME[]     = "Consecutive summer days index is the greatest number of consecutive summer days in a given time period. Summer days is the number of days where maximum of temperature is above 25 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char CSU_UNITS[]        = "No.";
 
-static const char CWDI_NAME[]        = "cold_wave_duration_index";
-static const char CWDI_LONGNAME[]    = "number of days with Tmin more than %1.0f degree Celsius below mean of reference period";
-static const char CWDI_NAME2[]       = "to_be_defined";
-static const char CWDI_LONGNAME2[]   = "to be defined";
+static const char CWDI_NAME[]        = "cold_wave_duration_index_wrt_mean_of_reference_period";
+static const char CWDI_LONGNAME[]    = "This is the number of days per time period where in intervals of at least %d consecutive days the daily minimum temperature is more than %1.0f degrees below a reference value. The reference value is calculated  as the mean of minimum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char CWDI_UNITS[]       = "No.";
+static const char CWDI_NAME2[]       = "cold_waves_per_time_period";
+static const char CWDI_LONGNAME2[]   = "Number of cold waves per time period. The time period should be defined by the bounds of the time coordinate.";
+static const char CWDI_UNITS2[]      = "No.";
 
-static const char CWFI_NAME[]        = "cold_spell_days";
-static const char CWFI_LONGNAME[]    = "number of days with Tmean below 10th percentile of reference period";
-static const char CWFI_NAME2[]       = "to_be_defined";
-static const char CWFI_LONGNAME2[]   = "to be defined";
+static const char CWFI_NAME[]        = "cold_spell_days_index_wrt_10th_percentile_of_reference_period";
+static const char CWFI_LONGNAME[]    = "This is the number of days per time period where in intervals of at least %d consecutive days the daily mean temperature is below a reference value. The reference value is calculated  as the 10th percentile of daily mean temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char CWFI_UNITS[]       = "No.";
+static const char CWFI_NAME2[]       = "cold_spell_periods_per_time_period";
+static const char CWFI_LONGNAME2[]   = "Number of cold spell periods per time period. The time period should be defined by the bounds of the time coordinate.";
+static const char CWFI_UNITS2[]      = "No.";
 
 static const char ETR_NAME[]         = "intra_period_extreme_temperature_range";
-static const char ETR_LONGNAME[]     = "extreme temperature range in observation period";
+static const char ETR_LONGNAME[]     = "Difference between the absolute extreme temperatures in observation period. The time period should be defined by the bounds of the time coordinate.";
 static const char ETR_UNITS[]        = "K";
 
-static const char FD_NAME[]          = "frost_days";
-static const char FD_LONGNAME[]      = "number of days with Tmin below 0 degree Celsius";
+static const char FD_NAME[]          = "frost_days_index_per_time_period";
+static const char FD_LONGNAME[]      = "Frost days index is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char FD_UNITS[]         = "No.";
 
-static const char GSL_NAME[]         = "growing_season_length";
-static const char GSL_LONGNAME[]     = "growing season length";
-static const char GSL_NAME2[]        = "to_be_defined";
-static const char GSL_LONGNAME2[]    = "to be defined";
-static const char GSL_NAME3[]        = "to_be_defined";
-static const char GSL_LONGNAME3[]    = "to be defined";
+static const char GSL_NAME[]         = "growing_season_length_index";
+static const char GSL_LONGNAME[]     = "Counted are the number of days per calendar year between the first occurrence of at least %d consecutive days where the daily mean temperature is above %1.0f degree Celsius and the first occurrence of at least %d consecutive days after 1st of July where the daily mean temperature is below %1.0f degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char GSL_UNITS[]        = "No.";
+static const char GSL_NAME2[]        = "day_of_year_of_growing_season_start";
+static const char GSL_LONGNAME2[]    = "Day of year of growing season start. The time period should be defined by the bounds of the time coordinate.";
+static const char GSL_UNITS2[]       = "No.";
 
-static const char HD_NAME[]          = "heating_degree_days";
-static const char HD_LONGNAME[]      = "Heating degree days";
+static const char HD_NAME[]          = "heating_degree_days_per_time_period";
+static const char HD_LONGNAME[]      = "Heating degree days relates the outside temperature with the room temperature during the heating period. It is the sum of the difference between room temperature X and daily mean temperature Y on days where Y is below a given constant A. X is 20 degree Celsius and A is 15 degree Celsius according to VDI guidelines. According to ECAD both X and A are 17 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char HD_UNITS[]         = "No.";
 
-static const char HWDI_NAME[]        = "heat_wave_duration_index";
-static const char HWDI_LONGNAME[]    = "number of days with Tmax more than %1.0f degree Celsius above mean of reference period";
-static const char HWDI_NAME2[]       = "to_be_defined";
-static const char HWDI_LONGNAME2[]   = "to be defined";
+static const char HWDI_NAME[]        = "heat_wave_duration_index_wrt_mean_of_reference_period";
+static const char HWDI_LONGNAME[]    = "This is the number of days per time period where in intervals of at least %d consecutive days the daily maximum temperature is more than %1.0f degrees above a reference value. The reference value is calculated  as the mean of maximum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char HWDI_UNITS[]       = "No.";
+static const char HWDI_NAME2[]       = "heat_waves_per_time_period";
+static const char HWDI_LONGNAME2[]   = "Number of heat waves per time period. The time period should be defined by the bounds of the time coordinate.";
+static const char HWDI_UNITS2[]      = "No.";
 
-static const char HWFI_NAME[]        = "warm_spell_days";
-static const char HWFI_LONGNAME[]    = "number of days with Tmean above 90th percentile of reference period";
-static const char HWFI_NAME2[]       = "to_be_defined";
-static const char HWFI_LONGNAME2[]   = "to be defined";
+static const char HWFI_NAME[]        = "warm_spell_days_index_wrt_90th_percentile_of_reference_period";
+static const char HWFI_LONGNAME[]    = "This is the number of days per time period where in intervals of at least %d consecutive days the daily mean temperature is above a reference value. The reference value is calculated  as the 90th percentile of daily mean temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char HWFI_UNITS[]       = "No.";
+static const char HWFI_NAME2[]       = "warm_spell_periods_per_time_period";
+static const char HWFI_LONGNAME2[]   = "Number of warm spell periods per time period. The time period should be defined by the bounds of the time coordinate.";
+static const char HWFI_UNITS2[]      = "No.";
 
-static const char ID_NAME[]          = "ice_days";
-static const char ID_LONGNAME[]      = "number of days with Tmax below 0 degree Celsius";
+static const char ID_NAME[]          = "ice_days_index_per_time_period";
+static const char ID_LONGNAME[]      = "Ice days index is the number of days where maximum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char ID_UNITS[]         = "No.";
 
-static const char SU_NAME[]          = "summer_days";
-static const char SU_LONGNAME[]      = "number of days with Tmax above %1.0f degree Celsius";
+static const char SU_NAME[]          = "summer_days_index_per_time_period";
+static const char SU_LONGNAME[]      = "Summer days index is the number of days where maximum of temperature is above %1.0f degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char SU_UNITS[]         = "No.";
 
-static const char TG10P_NAME[]       = "cold_days_wrt_10th_percentile_of_reference_period";
-static const char TG10P_LONGNAME[]   = "percentage of time with Tmean below 10th percentile of reference period";
+static const char TG10P_NAME[]       = "cold_days_percent_wrt_10th_percentile_of_reference_period";
+static const char TG10P_LONGNAME[]   = "This is the percent of time per time period where daily mean temperature is below a reference value. The reference value is calculated  as the 10th percentile of daily mean temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char TG10P_UNITS[]      = "Percent";
 
-static const char TG90P_NAME[]       = "warm_days_wrt_90th_percentile_of_reference_period";
-static const char TG90P_LONGNAME[]   = "percentage of time with Tmean above 90th percentile of reference period";
+static const char TG90P_NAME[]       = "warm_days_percent_wrt_90th_percentile_of_reference_period";
+static const char TG90P_LONGNAME[]   = "This is the percent of time per time period where daily mean  temperature is above a reference value. The reference value is calculated  as the 90th percentile of daily mean temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char TG90P_UNITS[]      = "Percent";
 
-static const char TN10P_NAME[]       = "cold_nights_wrt_10th_percentile_of_reference_period";
-static const char TN10P_LONGNAME[]   = "percentage of time with Tmin below 10th percentile of reference period";
+static const char TN10P_NAME[]       = "cold_nights_percent_wrt_10th_percentile_of_reference_period";
+static const char TN10P_LONGNAME[]   = "This is the percent of time per time period where daily minimum  temperature is below a reference value. The reference value is calculated  as the 10th percentile of daily minimum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char TN10P_UNITS[]      = "Percent";
 
-static const char TN90P_NAME[]       = "warm_nights_wrt_90th_percentile_of_reference_period";
-static const char TN90P_LONGNAME[]   = "percentage of time with Tmin above 90th percentile of reference period";
+static const char TN90P_NAME[]       = "warm_nights_percent_wrt_90th_percentile_of_reference_period";
+static const char TN90P_LONGNAME[]   = "This is the percent of time per time period where daily minimum  temperature is above a reference value. The reference value is calculated  as the 90th percentile of daily minimum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char TN90P_UNITS[]      = "Percent";
 
-static const char TR_NAME[]          = "tropical_nights";
-static const char TR_LONGNAME[]      = "number of days with Tmin above %1.0f degree Celsius";
+static const char TR_NAME[]          = "tropical_nights_index_per_time_period";
+static const char TR_LONGNAME[]      = "Tropical nights index is the number of days where minimum of temperature is above %1.0f degree Celsius. The time period should be defined by the bounds of the time coordinate.";
+static const char TR_UNITS[]         = "No.";
 
-static const char TX10P_NAME[]       = "cold_days_wrt_10th_percentile_of_reference_period";
-static const char TX10P_LONGNAME[]   = "percentage of time with Tmax below 10th percentile of reference period";
+static const char TX10P_NAME[]       = "very_cold_days_percent_wrt_10th_percentile_of_reference_period";
+static const char TX10P_LONGNAME[]   = "This is the percent of time per time period where daily maximum temperature is below a reference value. The reference value is calculated  as the 10th percentile of daily maximum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char TX10P_UNITS[]      = "Percent";
 
-static const char TX90P_NAME[]       = "warm_days_wrt_90th_percentile_of_reference_period";
-static const char TX90P_LONGNAME[]   = "percentage of time with Tmax above 90th percentile of reference period";
+static const char TX90P_NAME[]       = "very_warm_days_percent_wrt_90th_percentile_of_reference_period";
+static const char TX90P_LONGNAME[]   = "This is the percent of time per time period where daily maximum  temperature is above a reference value. The reference value is calculated  as the 90th percentile of daily maximum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char TX90P_UNITS[]      = "Percent";
 
-static const char CDD_NAME[]         = "consecutive_dry_days";
-static const char CDD_LONGNAME[]     = "greatest number of consecutive days with daily precipitation below 1 mm";
-static const char CDD_NAME2[]        = "to_be_defined";
-static const char CDD_LONGNAME2[]    = "to be defined";
+static const char CDD_NAME[]         = "consecutive_dry_days_index_per_time_period";
+static const char CDD_LONGNAME[]     = "Consecutive dry days is the greatest number of consecutive days per time period with daily precipitation amount  below 1 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char CDD_UNITS[]        = "No.";
+static const char CDD_NAME2[]        = "number of_cdd_periods_with more_than_5days_per_time_period";
+static const char CDD_LONGNAME2[]    = "Number of cdd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CDD_UNITS2[]       = "No.";
 
-static const char CWD_NAME[]         = "consecutive_wet_days";
-static const char CWD_LONGNAME[]     = "greatest number of consecutive days with daily precipitation above 1 mm";
-static const char CWD_NAME2[]        = "to_be_defined";
-static const char CWD_LONGNAME2[]    = "to be defined";
+static const char CWD_NAME[]         = "consecutive_wet_days_index_per_time_period";
+static const char CWD_LONGNAME[]     = "Consecutive wet days is the greatest number of consecutive days per time period with daily precipitation above 1 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char CWD_UNITS[]        = "No.";
+static const char CWD_NAME2[]        = "number of_cwd_periods_with more_than_5days_per_time_period";
+static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CWD_UNITS2[]       = "No.";
 
-static const char R10MM_NAME[]       = "heavy_precipitation_days";
-static const char R10MM_LONGNAME[]   = "number of days with daily precipitation exceeding 10 mm";
+static const char R10MM_NAME[]       = "heavy_precipitation_days_index_per_time_period";
+static const char R10MM_LONGNAME[]   = "Heavy precipitation days is the number of days per time period with daily precipitation sum exceeding 10 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char R10MM_UNITS[]      = "No.";
 
-static const char R20MM_NAME[]       = "very_heavy_precipitation_days";
-static const char R20MM_LONGNAME[]   = "number of days with daily precipitation exceeding 20 mm";
+static const char R20MM_NAME[]       = "very_heavy_precipitation_days_index_per_time_period";
+static const char R20MM_LONGNAME[]   = "Very heavy precipitation days is the number of days with daily precipitation sum exceeding 20 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char R20MM_UNITS[]      = "No.";
 
 static const char R75P_NAME[]        = "moderate_wet_days_wrt_75th_percentile_of_reference_period";
-static const char R75P_LONGNAME[]    = "percentage of time with precipitation sum above 75th percentile of reference period";
+static const char R75P_LONGNAME[]    = "This is the percent of time per time period of wet days (daily sum at least 1 mm / day) where daily precipitation amount of a wet day is above a reference value. The reference value is calculated  as the 75th percentile of all wet days of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char R75P_UNITS[]       = "Percent";
 
-static const char R75PTOT_NAME[]     = "precipitation_fraction_due_to_R75p_days";
-static const char R75PTOT_LONGNAME[] = "percentage of total precipitation due to moderate wet days";
+static const char R75PTOT_NAME[]     = "precipitation_percent_due_to_R75p_days";
+static const char R75PTOT_LONGNAME[] = "Percentage of  total precipitation amount per time period due to moderate_wet_days_wrt_75th_percentile_of_reference_period. The time period should be defined by the bounds of the time coordinate.";
+static const char R75PTOT_UNITS[]    = "Percent";
 
-static const char R90P_NAME[]        = "very_wet_days_wrt_90th_percentile_of_reference_period";
-static const char R90P_LONGNAME[]    = "percentage of time with precipitation sum above 90th percentile of reference period";
+static const char R90P_NAME[]        = "wet_days_wrt_90th_percentile_of_reference_period";
+static const char R90P_LONGNAME[]    = "This is the percent of time per time period of wet days (daily sum at least 1 mm / day) where daily precipitation amount of a wet day is above a reference value. The reference value is calculated  as the 90th percentile of all wet days of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char R90P_UNITS[]       = "Percent";
 
-static const char R90PTOT_NAME[]     = "precipitation_fraction_due_to_R90p_days";
-static const char R90PTOT_LONGNAME[] = "percentage of total precipitation due to very wet days";
+static const char R90PTOT_NAME[]     = "precipitation_percent_due_to_R90p_days";
+static const char R90PTOT_LONGNAME[] = "Percentage of  total precipitation  amount per time period  due towet_days_wrt_90th_percentile_of_reference_period. The time period should be defined by the bounds of the time coordinate.";
+static const char R90PTOT_UNITS[]    = "Percent";
 
 static const char R95P_NAME[]        = "very_wet_days_wrt_95th_percentile_of_reference_period";
-static const char R95P_LONGNAME[]    = "percentage of time with precipitation sum above 95th percentile of reference period";
+static const char R95P_LONGNAME[]    = "This is the percent of time per time period of wet days (daily sum at least 1 mm / day) where daily precipitation amount of a wet day is above a reference value. The reference value is calculated  as the 95th percentile of all wet days of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char R95P_UNITS[]       = "Percent";
 
-static const char R95PTOT_NAME[]     =  "precipitation_fraction_due_to_R95p_days";
-static const char R95PTOT_LONGNAME[] =  "percentage of total precipitation due to very wet days";
+static const char R95PTOT_NAME[]     = "precipitation_percent_due_to_R95p_days";
+static const char R95PTOT_LONGNAME[] = "Percentage of  total  precipitation amount per time period  due to  very_wet_days_wrt_95th_percentile_of_reference_period. The time period should be defined by the bounds of the time coordinate.";
+static const char R95PTOT_UNITS[]    = "Percent";
 
 static const char R99P_NAME[]        = "extremely_wet_days_wrt_99th_percentile_of_reference_period";
-static const char R99P_LONGNAME[]    = "percentage of time with precipitation sum above 99th percentile of reference period";
+static const char R99P_LONGNAME[]    = "This is the percent of time per time period of wet days (daily sum at least 1 mm / day) where daily precipitation amount of a wet day is above a reference value. The reference value is calculated  as the 99th percentile of all wet days of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
+static const char R99P_UNITS[]       = "Percent";
 
-static const char R99PTOT_NAME[]     = "precipitation_fraction_due_to_R99p_days";
-static const char R99PTOT_LONGNAME[] = "percentage of total precipitation due to extremely wet days";
+static const char R99PTOT_NAME[]     = "precipitation_percent_due_to_R99p_days";
+static const char R99PTOT_LONGNAME[] = "percentage of  total  precipitation amount per time period  due to  extremely_wet_days_wrt_99th_percentile_of_reference_period. The time period should be defined by the bounds of the time coordinate.";
+static const char R99PTOT_UNITS[]    = "Percent";
 
-static const char RR1_NAME[]         = "wet_days";
-static const char RR1_LONGNAME[]     = "number of days with daily precipitation exceeding 1 mm";
+static const char RR1_NAME[]         = "wet_days_index_per_time_period";
+static const char RR1_LONGNAME[]     = "Wet days index is the number of days per time period with daily precipitation of at least 1 mm.  The time period should be defined by the bounds of the time coordinate.";
+static const char RR1_UNITS[]        = "No.";
 
-static const char RX1DAY_NAME[]      = "highest_one_day_precipitation_amount";
-static const char RX1DAY_LONGNAME[]  = "highest precipitation sum for one day interval";
-static const char RX1DAY_UNITS[]     = "kg/m2";
+static const char RX1DAY_NAME[]      = "highest_one_day_precipitation_amount_per_time_period";
+static const char RX1DAY_LONGNAME[]  = "Highest one  day precipitation  is the maximum of one day precipitation amount in a given time period. The time period should be defined by the bounds of the time coordinate.";
+static const char RX1DAY_UNITS[]     = "mm per day";
 
-static const char RX5DAY_NAME[]      = "highest_five_day_precipitation_amount";
-static const char RX5DAY_LONGNAME[]  = "highest precipitation sum for five day interval";
-static const char RX5DAY_UNITS[]     = "kg/m2";
-static const char RX5DAY_NAME2[]     = "to_be_defined";
-static const char RX5DAY_LONGNAME2[] = "to be defined";
+static const char RX5DAY_NAME[]      = "highest_five_day_precipitation_amount_per_time_period";
+static const char RX5DAY_LONGNAME[]  = "Highest precipitation amount  for five day interval (including the calendar day as the last day). The time period should be defined by the bounds of the time coordinate.";
+static const char RX5DAY_UNITS[]     = "mm per 5 day";
+static const char RX5DAY_NAME2[]     = "number_of_5day_heavy_precipitation_periods_per_time_period";
+static const char RX5DAY_LONGNAME2[] = "Number of 5day periods in given time period with precipitation amount exceeding %1.0f mm / 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char RX5DAY_UNITS2[]    = "No.";
 
-static const char SDII_NAME[]        = "simple_daily_intensity_index";
-static const char SDII_LONGNAME[]    = "mean precipitation amount on wet days";
-static const char SDII_UNITS[]       = "kg/m2";
+static const char SDII_NAME[]        = "simple_daily_intensitiy_index_per_time_period";
+static const char SDII_LONGNAME[]    = "Simple daily intensity index is the mean of precipitation amount on wet days. A wet day is a day with precipitation sum of at least 1 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char SDII_UNITS[]       = "mm";
 
-static const char FDNS_NAME[]        = "frost_days_where_no_snow";       
-static const char FDNS_LONGNAME[]    = "number of days with Tmin below 0 degree Celsius and no snowcover";       
+static const char FDNS_NAME[]        = "frost_days_where_no_snow_index_per_time_period";       
+static const char FDNS_LONGNAME[]    = "Frost days where no snow index is the number of days without snowcover and where the minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";       
+static const char FDNS_UNITS[]       = "No.";
 
-static const char STRWIND_NAME[]       = "strong_breeze_days";
-static const char STRWIND_LONGNAME[]   = "number of days with maximum wind speed above 10.5 m/s";
-static const char STRWIND_NAME2[]      = "to_be_defined";
-static const char STRWIND_LONGNAME2[]  = "to be defined";
-static const char STRWIND2_NAME[]      = "strong_gale_days";
-static const char STRWIND2_LONGNAME[]  = "number of days with maximum wind speed above 20.5 m/s";
-static const char STRWIND2_NAME2[]     = "to_be_defined";
-static const char STRWIND2_LONGNAME2[] = "to be defined";
-static const char STRWIND3_NAME[]      = "hurricane_days";
-static const char STRWIND3_LONGNAME[]  = "number of days with maximum wind speed above 32.5 m/s";
-static const char STRWIND3_NAME2[]     = "to_be_defined";
-static const char STRWIND3_LONGNAME2[] = "to be defined";
+static const char STRWIN_NAME[]      = "strong_wind_days_index_per_time_period";
+static const char STRWIN_LONGNAME[]  = "Strong wind days index is the number of days per time period where maximum wind speed is above %1.0f m/s. The time period should be defined by the bounds of the time coordinate.";
+static const char STRWIN_UNITS[]     = "No.";
+static const char STRWIN_NAME2[]     = "consecutive_strong_wind_days_index_per_time_period";
+static const char STRWIN_LONGNAME2[] = "Greatest number of consecutive strong wind days per time period. The time period should be defined by the bounds of the time coordinate.";
+static const char STRWIN_UNITS2[]    = "No.";
+
+static const char STRBRE_NAME[]      = "strong_breeze_days_index_per_time_period";
+static const char STRBRE_LONGNAME[]  = "Strong breeze days index is the number of days per time period where maximum wind speed is above 10.5 m/s. The time period should be defined by the bounds of the time coordinate.";
+static const char STRBRE_NAME2[]     = "consecutive_strong_breeze_days_index_per_time_period";
+static const char STRBRE_LONGNAME2[] = "Greatest number of consecutive strong breeze days per time period. The time period should be defined by the bounds of the time coordinate.";
+
+static const char STRGAL_NAME[]      = "strong_gale_days_index_per_time_period";
+static const char STRGAL_LONGNAME[]  = "Strong gale days index is the number of days per time period where maximum wind speed is above 20.5 m/s. The time period should be defined by the bounds of the time coordinate.";
+static const char STRGAL_NAME2[]     = "consecutive_strong_gale_days_index_per_time_period";
+static const char STRGAL_LONGNAME2[] = "Greatest number of consecutive strong gale days per time period. The time period should be defined by the bounds of the time coordinate.";
+
+static const char HURR_NAME[]        = "hurricane_days_index_per_time_period";
+static const char HURR_LONGNAME[]    = "Hurricane days index is the number of days per time period where maximum wind speed is above 32.5 m/s. The time period should be defined by the bounds of the time coordinate.";
+static const char HURR_NAME2[]       = "consecutive_hurricane_days_index_per_time_period";
+static const char HURR_LONGNAME2[]   = "Greatest number of consecutive hurricane days per time period. The time period should be defined by the bounds of the time coordinate.";
 
 
 /* ECA temperature indices */
@@ -288,12 +339,12 @@ void *EcaCwdi(void *argument)
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
   
-  longname = (char *) malloc(strlen(CWDI_LONGNAME) + 40);
-  sprintf(longname, CWDI_LONGNAME, argT);
+  longname = (char *) malloc(strlen(CWDI_LONGNAME) + 80);
+  sprintf(longname, CWDI_LONGNAME, argN, argT);
 
   request.var1.name     = CWDI_NAME;
   request.var1.longname = longname;
-  request.var1.units    = NULL;
+  request.var1.units    = CWDI_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = farcsub;
   request.var1.f2arg    = argT;
@@ -304,6 +355,7 @@ void *EcaCwdi(void *argument)
   request.var1.epilog   = NONE;
   request.var2.name     = CWDI_NAME2;
   request.var2.longname = CWDI_LONGNAME2;
+  request.var2.units    = CWDI_UNITS2;
   request.var2.h1       = farseleqc;
   request.var2.h1arg    = argN;
   request.var2.h2       = farnum;
@@ -319,6 +371,8 @@ void *EcaCwdi(void *argument)
 
 void *EcaCwfi(void *argument)
 {
+  static const char func[] = "EcaCwfi";
+  char *longname;
   int argN = 6;
   ECA_REQUEST_2 request;
   
@@ -327,9 +381,12 @@ void *EcaCwfi(void *argument)
 
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
 
+  longname = (char *) malloc(strlen(CWFI_LONGNAME) + 40);
+  sprintf(longname, CWFI_LONGNAME, argN);
+
   request.var1.name     = CWFI_NAME;
-  request.var1.longname = CWFI_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.longname = longname;
+  request.var1.units    = CWFI_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farsellt;
@@ -339,11 +396,14 @@ void *EcaCwfi(void *argument)
   request.var1.epilog   = NONE;
   request.var2.name     = CWFI_NAME2;
   request.var2.longname = CWFI_LONGNAME2;
+  request.var2.units    = CWFI_UNITS2;
   request.var2.h1       = farseleqc;
   request.var2.h1arg    = argN;
   request.var2.h2       = farnum;
    
   eca2(&request);
+  
+  free(longname);
   cdoFinish();
   
   return (0);
@@ -400,6 +460,8 @@ void *EcaFd(void *argument)
 
 void *EcaGsl(void *argument)
 {
+  static const char func[] = "EcaGsl";
+  char *longname;
   int argN = 6; 
   double argT = 5.0;
   ECA_REQUEST_4 request;
@@ -409,16 +471,16 @@ void *EcaGsl(void *argument)
   
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
+
+  longname = (char *) malloc(strlen(GSL_LONGNAME) + 160);
+  sprintf(longname, GSL_LONGNAME, argN, argT, argN, argT);
   
   request.name      = GSL_NAME;
-  request.longname  = GSL_LONGNAME;
-  request.units     = NULL;
+  request.longname  = longname;
+  request.units     = GSL_UNITS;
   request.name2     = GSL_NAME2;
   request.longname2 = GSL_LONGNAME2;
-  request.units2    = NULL;
-  request.name3     = GSL_NAME3;
-  request.longname3 = GSL_LONGNAME3;
-  request.units3    = NULL;
+  request.units2    = GSL_UNITS2;
   request.s1        = farselgtc; 
   request.s1arg     = TO_KELVIN(argT);
   request.s2        = farselltc;
@@ -426,6 +488,8 @@ void *EcaGsl(void *argument)
   request.consecutiveDays = argN;    
    
   eca4(&request);
+  
+  free(longname);
   cdoFinish();
   
   return (0);
@@ -434,8 +498,8 @@ void *EcaGsl(void *argument)
 
 void *EcaHd(void *argument)
 {
-  double argT1 = 17.0;
-  double argT2 = 17.0;
+  double argX = 17.0;
+  double argA = 17.0;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -443,21 +507,21 @@ void *EcaHd(void *argument)
 
   if ( operatorArgc() > 0 ) 
     {
-      argT1 = atof(operatorArgv()[0]);
-      argT2 = argT1;
+      argX = atof(operatorArgv()[0]);
+      argA = argX;
     }
   if ( operatorArgc() > 1 ) 
-    argT2 = atof(operatorArgv()[1]);
+    argA = atof(operatorArgv()[1]);
   
   request.var1.name     = HD_NAME;
   request.var1.longname = HD_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = HD_UNITS;
   request.var1.f1       = farselltc; 
-  request.var1.f1arg    = TO_KELVIN(argT2);
+  request.var1.f1arg    = TO_KELVIN(argA);
   request.var1.f2       = farsum;
   request.var1.f3       = NULL;
   request.var1.mulc     = -1.0;    
-  request.var1.addc     = TO_KELVIN(argT1);
+  request.var1.addc     = TO_KELVIN(argX);
   request.var1.epilog   = NONE;    
   request.var2.h2       = NULL; 
   request.var2.h3       = NULL; 
@@ -483,12 +547,12 @@ void *EcaHwdi(void *argument)
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
   
-  longname = (char *) malloc(strlen(HWDI_LONGNAME) + 40);
-  sprintf(longname, HWDI_LONGNAME, argT);
+  longname = (char *) malloc(strlen(HWDI_LONGNAME) + 80);
+  sprintf(longname, HWDI_LONGNAME, argN, argT);
   
   request.var1.name     = HWDI_NAME;
   request.var1.longname = longname;
-  request.var1.units    = NULL;
+  request.var1.units    = HWDI_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = farcadd;
   request.var1.f2arg    = argT;
@@ -499,6 +563,7 @@ void *EcaHwdi(void *argument)
   request.var1.epilog   = NONE;
   request.var2.name     = HWDI_NAME2;
   request.var2.longname = HWDI_LONGNAME2;
+  request.var2.units    = HWDI_UNITS2;
   request.var2.h1       = farseleqc;
   request.var2.h1arg    = argN;
   request.var2.h2       = farnum;
@@ -514,6 +579,8 @@ void *EcaHwdi(void *argument)
 
 void *EcaHwfi(void *argument)
 {
+  static const char func[] = "EcaHwfi";
+  char *longname;
   int argN = 6;
   ECA_REQUEST_2 request;
   
@@ -522,9 +589,12 @@ void *EcaHwfi(void *argument)
 
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
 
+  longname = (char *) malloc(strlen(HWFI_LONGNAME) + 40);
+  sprintf(longname, HWFI_LONGNAME, argN);
+
   request.var1.name     = HWFI_NAME;
-  request.var1.longname = HWFI_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.longname = longname;
+  request.var1.units    = HWFI_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farselgt;
@@ -534,11 +604,14 @@ void *EcaHwfi(void *argument)
   request.var1.epilog   = NONE;
   request.var2.name     = HWFI_NAME2;
   request.var2.longname = HWFI_LONGNAME2;
+  request.var2.units    = HWFI_UNITS2;
   request.var2.h1       = farseleqc;
   request.var2.h1arg    = argN;
   request.var2.h2       = farnum;
    
   eca2(&request);
+  
+  free(longname);
   cdoFinish();
   
   return (0);
@@ -554,7 +627,7 @@ void *EcaId(void *argument)
 
   request.var1.name     = ID_NAME;
   request.var1.longname = ID_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = ID_UNITS;
   request.var1.f1       = farselltc;
   request.var1.f1arg    = TO_KELVIN(0.0);
   request.var1.f2       = farnum;
@@ -617,7 +690,7 @@ void *EcaTg10p(void *argument)
 
   request.var1.name     = TG10P_NAME;
   request.var1.longname = TG10P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = TG10P_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farsellt;
@@ -642,7 +715,7 @@ void *EcaTg90p(void *argument)
 
   request.var1.name     = TG90P_NAME;
   request.var1.longname = TG90P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = TG90P_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farselgt;
@@ -667,7 +740,7 @@ void *EcaTn10p(void *argument)
 
   request.var1.name     = TN10P_NAME;
   request.var1.longname = TN10P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = TN10P_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farsellt;
@@ -692,7 +765,7 @@ void *EcaTn90p(void *argument)
 
   request.var1.name     = TN90P_NAME;
   request.var1.longname = TN90P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = TN90P_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farselgt;
@@ -712,7 +785,7 @@ void *EcaTr(void *argument)
 {
   static const char func[] = "EcaTr";
   char *longname;
-  double argT = TO_KELVIN(20.0);
+  double argT = 20.0;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
@@ -724,7 +797,7 @@ void *EcaTr(void *argument)
  
   request.var1.name     = TR_NAME;
   request.var1.longname = longname;
-  request.var1.units    = NULL;
+  request.var1.units    = TR_UNITS;
   request.var1.f1       = farselgtc;
   request.var1.f1arg    = TO_KELVIN(argT);
   request.var1.f2       = farnum;
@@ -753,7 +826,7 @@ void *EcaTx10p(void *argument)
 
   request.var1.name     = TX10P_NAME;
   request.var1.longname = TX10P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = TX10P_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farsellt;
@@ -778,7 +851,7 @@ void *EcaTx90p(void *argument)
  
   request.var1.name     = TX90P_NAME;
   request.var1.longname = TX90P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = TX90P_UNITS;
   request.var1.f1       = NULL;
   request.var1.f2       = NULL;
   request.var1.f3       = farselgt;
@@ -806,7 +879,7 @@ void *EcaCdd(void *argument)
 
   request.var1.name     = CDD_NAME;
   request.var1.longname = CDD_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = CDD_UNITS;
   request.var1.f1       = farselltc;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = farnum2;
@@ -816,6 +889,7 @@ void *EcaCdd(void *argument)
   request.var1.epilog   = NONE;
   request.var2.name     = CDD_NAME2;
   request.var2.longname = CDD_LONGNAME2;
+  request.var2.units    = CDD_UNITS2;
   request.var2.h1       = farseleqc;
   request.var2.h1arg    = 6;
   request.var2.h2       = NULL;
@@ -837,7 +911,7 @@ void *EcaCwd(void *argument)
 
   request.var1.name     = CWD_NAME;
   request.var1.longname = CWD_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = CWD_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = farnum2;
@@ -847,6 +921,7 @@ void *EcaCwd(void *argument)
   request.var1.epilog   = NONE;
   request.var2.name     = CWD_NAME2;
   request.var2.longname = CWD_LONGNAME2;
+  request.var2.units    = CWD_UNITS2;
   request.var2.h1       = farseleqc;
   request.var2.h1arg    = 6;
   request.var2.h2       = NULL;
@@ -868,7 +943,7 @@ void *EcaR10mm(void *argument)
   
   request.var1.name     = R10MM_NAME;
   request.var1.longname = R10MM_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R10MM_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 10.0;
   request.var1.f2       = farnum;
@@ -895,7 +970,7 @@ void *EcaR20mm(void *argument)
 
   request.var1.name     = R20MM_NAME;
   request.var1.longname = R20MM_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R20MM_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 20.0;
   request.var1.f2       = farnum;
@@ -922,7 +997,7 @@ void *EcaR75p(void *argument)
 
   request.var1.name     = R75P_NAME;
   request.var1.longname = R75P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R75P_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -948,7 +1023,7 @@ void *EcaR75ptot(void *argument)
 
   request.var1.name     = R75PTOT_NAME;
   request.var1.longname = R75PTOT_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R75PTOT_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -974,7 +1049,7 @@ void *EcaR90p(void *argument)
 
   request.var1.name     = R90P_NAME;
   request.var1.longname = R90P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R90P_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -1000,7 +1075,7 @@ void *EcaR90ptot(void *argument)
 
   request.var1.name     = R90PTOT_NAME;
   request.var1.longname = R90PTOT_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R90PTOT_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -1026,7 +1101,7 @@ void *EcaR95p(void *argument)
 
   request.var1.name     = R95P_NAME;
   request.var1.longname = R95P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R95P_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -1052,7 +1127,7 @@ void *EcaR95ptot(void *argument)
 
   request.var1.name     = R95PTOT_NAME;
   request.var1.longname = R95PTOT_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R95PTOT_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -1078,7 +1153,7 @@ void *EcaR99p(void *argument)
 
   request.var1.name     = R99P_NAME;
   request.var1.longname = R99P_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = R99P_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = NULL;
@@ -1130,7 +1205,7 @@ void *EcaRr1(void *argument)
 
   request.var1.name     = RR1_NAME;
   request.var1.longname = RR1_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = RR1_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = 1.0;
   request.var1.f2       = farnum;
@@ -1153,8 +1228,13 @@ void *EcaRx1day(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  if ( operatorArgc() > 0 && 'm' == operatorArgv()[0][0] )
-    cdoOperatorAdd("eca_rx1day", 0, 6,  NULL); /* monthly mode */
+  if ( operatorArgc() > 0 )
+    {
+      if ( 'm' == operatorArgv()[0][0] )
+        cdoOperatorAdd("eca_rx1day", 0, 6,  NULL); /* monthly mode */
+      else
+        cdoWarning("Parameter value '%s' is invalid. The only valid value is 'm' indicating monthly mode. Operating in yearly mode now.");
+    }
   else 
     cdoOperatorAdd("eca_rx1day", 0, 17, NULL);
 
@@ -1179,11 +1259,17 @@ void *EcaRx1day(void *argument)
 
 void *EcaRx5day(void *argument)
 {
+  static const char func[] = "EcaRx5day";
+  char *longname;
   double argX = 50.0;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
   if ( operatorArgc() > 0 ) argX = atof(operatorArgv()[0]);
+  
+  longname = (char *) malloc(strlen(RX5DAY_LONGNAME2) + 40);
+  sprintf(longname, RX5DAY_LONGNAME2, argX);
+  
   cdoOperatorAdd("eca_rx5day", 0, 17, NULL);
 
   request.var1.name     = RX5DAY_NAME;
@@ -1196,13 +1282,16 @@ void *EcaRx5day(void *argument)
   request.var1.addc     = 0.0; 
   request.var1.epilog   = NONE;
   request.var2.name     = RX5DAY_NAME2;
-  request.var2.longname = RX5DAY_LONGNAME2;
+  request.var2.longname = longname;
+  request.var2.units    = RX5DAY_UNITS2;
   request.var2.h1       = farselgec;
   request.var2.h1arg    = argX;
   request.var2.h2       = farnum;
   request.var2.h3       = NULL;
    
   eca1(&request);
+  
+  free(longname);
   cdoFinish();
   
   return (0);
@@ -1245,7 +1334,7 @@ void *EcaFdns(void *argument)
 
   request.var1.name     = FDNS_NAME;
   request.var1.longname = FDNS_LONGNAME;
-  request.var1.units    = NULL;
+  request.var1.units    = FDNS_UNITS;
   request.var1.f1       = farsellec;
   request.var1.f1arg    = TO_KELVIN(0.0);
   request.var1.f2       = farsellec;
@@ -1263,55 +1352,25 @@ void *EcaFdns(void *argument)
 }
 
 
-void *EcaStrwind(void *argument)
+void *EcaStrwin(void *argument)
 {
-  const char *name, *longname, *name2, *longname2;
-  double maxWind;
-  int beaufort = 0;
+  static const char func[] = "EcaStrwin";
+  char *longname;
+  double maxWind = 10.5;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_strwind", 0, 17, NULL);
+  cdoOperatorAdd("eca_strwin", 0, 17, NULL);
 
-  name      = STRWIND_NAME;
-  longname  = STRWIND_LONGNAME;
-  name2     = STRWIND_NAME2;
-  longname2 = STRWIND_LONGNAME2;
-  maxWind   = 10.5; /* strong breeze */
-  
   if ( operatorArgc() > 0 )
-    beaufort = atoi(operatorArgv()[0]);
-    
-  switch (beaufort)
-    {
-      case 9:  /* strong gale */
-        name      = STRWIND2_NAME;
-        longname  = STRWIND2_LONGNAME;
-        name2     = STRWIND2_NAME2;
-        longname2 = STRWIND3_LONGNAME2;
-        maxWind   = 20.5;
-	break;
-	
-      case 12: /* hurricane */
-        name      = STRWIND3_NAME;
-        longname  = STRWIND3_LONGNAME;
-        name2     = STRWIND3_NAME2;
-        longname2 = STRWIND3_LONGNAME2;
-        maxWind   = 32.5;
-        break;
-        	
-      default: /* strong breeze */
-        name      = STRWIND_NAME;
-        longname  = STRWIND_LONGNAME;
-        name2     = STRWIND_NAME2;
-        longname2 = STRWIND_LONGNAME2;
-        maxWind   = 10.5;
-	break;
-    }
-      
-  request.var1.name     = name;
+    maxWind = atof(operatorArgv()[0]);
+
+  longname = (char *) malloc(strlen(STRWIN_LONGNAME) + 40);
+  sprintf(longname, STRWIN_LONGNAME, maxWind);
+         
+  request.var1.name     = STRWIN_NAME;
   request.var1.longname = longname;
-  request.var1.units    = NULL;
+  request.var1.units    = STRWIN_UNITS;
   request.var1.f1       = farselgec;
   request.var1.f1arg    = maxWind;
   request.var1.f2       = farnum;
@@ -1319,8 +1378,110 @@ void *EcaStrwind(void *argument)
   request.var1.mulc     = 0.0;    
   request.var1.addc     = 0.0;    
   request.var1.epilog   = NONE;
-  request.var2.name     = name2;
-  request.var2.longname = longname2;
+  request.var2.name     = STRWIN_NAME2;
+  request.var2.longname = STRWIN_LONGNAME2;
+  request.var2.units    = STRWIN_UNITS2;
+  request.var2.h1       = farselgec;
+  request.var2.h1arg    = maxWind;
+  request.var2.h2       = farnum2;
+  request.var2.h3       = farmax;
+   
+  eca1(&request);
+  
+  free(longname);
+  cdoFinish();
+  
+  return (0);
+}
+
+
+void *EcaStrbre(void *argument)
+{
+  static const double maxWind = 10.5;
+  ECA_REQUEST_1 request;
+  
+  cdoInitialize(argument);
+  cdoOperatorAdd("eca_strbre", 0, 17, NULL);
+         
+  request.var1.name     = STRBRE_NAME;
+  request.var1.longname = STRBRE_LONGNAME;
+  request.var1.units    = STRWIN_UNITS;
+  request.var1.f1       = farselgec;
+  request.var1.f1arg    = maxWind;
+  request.var1.f2       = farnum;
+  request.var1.f3       = NULL;
+  request.var1.mulc     = 0.0;    
+  request.var1.addc     = 0.0;    
+  request.var1.epilog   = NONE;
+  request.var2.name     = STRBRE_NAME2;
+  request.var2.longname = STRBRE_LONGNAME2;
+  request.var2.units    = STRWIN_UNITS2;
+  request.var2.h1       = farselgec;
+  request.var2.h1arg    = maxWind;
+  request.var2.h2       = farnum2;
+  request.var2.h3       = farmax;
+   
+  eca1(&request);
+  cdoFinish();
+  
+  return (0);
+}
+
+
+void *EcaStrgal(void *argument)
+{
+  static const double maxWind = 20.5;
+  ECA_REQUEST_1 request;
+  
+  cdoInitialize(argument);
+  cdoOperatorAdd("eca_strgal", 0, 17, NULL);
+         
+  request.var1.name     = STRBRE_NAME;
+  request.var1.longname = STRBRE_LONGNAME;
+  request.var1.units    = STRWIN_UNITS;
+  request.var1.f1       = farselgec;
+  request.var1.f1arg    = maxWind;
+  request.var1.f2       = farnum;
+  request.var1.f3       = NULL;
+  request.var1.mulc     = 0.0;    
+  request.var1.addc     = 0.0;    
+  request.var1.epilog   = NONE;
+  request.var2.name     = STRBRE_NAME2;
+  request.var2.longname = STRBRE_LONGNAME2;
+  request.var2.units    = STRWIN_UNITS2;
+  request.var2.h1       = farselgec;
+  request.var2.h1arg    = maxWind;
+  request.var2.h2       = farnum2;
+  request.var2.h3       = farmax;
+   
+  eca1(&request);
+  cdoFinish();
+  
+  return (0);
+}
+
+
+void *EcaHurr(void *argument)
+{
+  static const double maxWind = 32.5;
+  ECA_REQUEST_1 request;
+  
+  cdoInitialize(argument);
+  cdoOperatorAdd("eca_hurr", 0, 17, NULL);
+         
+  request.var1.name     = HURR_NAME;
+  request.var1.longname = HURR_LONGNAME;
+  request.var1.units    = STRWIN_UNITS;
+  request.var1.f1       = farselgec;
+  request.var1.f1arg    = maxWind;
+  request.var1.f2       = farnum;
+  request.var1.f3       = NULL;
+  request.var1.mulc     = 0.0;    
+  request.var1.addc     = 0.0;    
+  request.var1.epilog   = NONE;
+  request.var2.name     = HURR_NAME2;
+  request.var2.longname = HURR_LONGNAME2;
+  request.var2.units    = STRWIN_UNITS2;
   request.var2.h1       = farselgec;
   request.var2.h1arg    = maxWind;
   request.var2.h2       = farnum2;

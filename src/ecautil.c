@@ -24,6 +24,102 @@
 
 
 /**
+ * Convert a Gregorian/Julian date to a Julian day number.
+ *
+ * The Gregorian calendar was adopted midday, October 15, 1582.
+ */
+static unsigned long gregdate_to_julday(
+    int		year,	/* Gregorian year */
+    int		month,	/* Gregorian month (1-12) */
+    int		day	/* Gregorian day (1-31) */
+    )
+{
+#if INT_MAX <= 0X7FFF
+    long		igreg = 15 + 31 * (10 + (12 * 1582));
+    long		iy;	/* signed, origin 0 year */
+    long		ja;	/* Julian century */
+    long		jm;	/* Julian month */
+    long		jy;	/* Julian year */
+#else
+    int			igreg = 15 + 31 * (10 + (12 * 1582));
+    int			iy;	/* signed, origin 0 year */
+    int			ja;	/* Julian century */
+    int			jm;	/* Julian month */
+    int			jy;	/* Julian year */
+#endif
+    unsigned long	julday;	/* returned Julian day number */
+
+    /*
+     * Because there is no 0 BC or 0 AD, assume the user wants the start of 
+     * the common era if they specify year 0.
+     */
+    if (year == 0)
+	year = 1;
+
+    iy = year;
+    if (year < 0)
+	iy++;
+    if (month > 2)
+    {
+	jy = iy;
+	jm = month + 1;
+    }
+    else
+    {
+	jy = iy - 1;
+	jm = month + 13;
+    }
+
+    /*
+     *  Note: SLIGHTLY STRANGE CONSTRUCTIONS REQUIRED TO AVOID PROBLEMS WITH
+     *        OPTIMISATION OR GENERAL ERRORS UNDER VMS!
+     */
+    julday = day + (int)(30.6001 * jm);
+    if (jy >= 0)
+    {
+	julday += 365 * jy;
+	julday += (unsigned long) (0.25 * jy);
+    }
+    else
+    {
+	double		xi = 365.25 * jy;
+
+	if ((int)xi != xi)
+	    xi -= 1;
+	julday += (int)xi;
+    }
+    julday += 1720995;
+
+    if (day + (31* (month + (12 * iy))) >= igreg)
+    {
+	ja = jy/100;
+	julday -= ja;
+	julday += 2;
+	julday += ja/4;
+    }
+
+    return julday;
+}
+
+
+/**
+ * Computes the day-of-year correspnding a given Gregorian date.
+ * 
+ * @param date a Gregorian date in the form YYYYMMDD
+ * 
+ * @return the day-of-year
+ */
+unsigned long day_of_year(int date)
+{
+  const int year = date / 10000;
+  const int month = (date - year * 10000) / 100;
+  const int day = date - year * 10000 - month * 100;
+ 
+  return gregdate_to_julday(year, month, day) - gregdate_to_julday(year, 1, 1) + 1;
+}
+
+
+/**
  * Counts the number of nonmissing values. The result of the operation
  * is computed according to the following rules:
  * 
@@ -38,9 +134,9 @@
  * miss    b       1     1
  * miss    miss    1     0
  * 
- * a       b       n     a + 1 if b > n; a + n if b = n; a if b < n
+ * a       b       n     b < n ? a : b > n ? a + 1 : a + n
  * a       miss    n     a
- * miss    b       n     b if b > n; n if b = n; 0 if b < n
+ * miss    b       n     b < n ? 0 : b
  * miss    miss    n     0    
  * 
  * @param field1 the 1st input field, also holds the result
@@ -124,7 +220,7 @@ static void num(FIELD *field1, const FIELD *field2, double mode)
  * computed according to the following rules:
  * 
  * field1  field2  result
- * a       b       comp(a, b) is true; miss otherwise
+ * a       b       comp(a, b) ? a : miss
  * a       miss    miss
  * miss    b       miss
  * miss    miss    miss    
@@ -176,7 +272,7 @@ static void selcomp(FIELD *field1, const FIELD *field2, int (*compare)(double, d
  * following rules:
  * 
  * field  c      result
- * a      c      comp(a, c) is true; miss otherwise
+ * a      c      comp(a, c) ? a : miss
  * a      miss   miss
  * miss   c      miss
  * miss   miss   miss    
@@ -273,6 +369,41 @@ void farnum3(FIELD *field1, FIELD field2, double n)
 }
 
 
+void farsel(FIELD *field1, FIELD field2)
+{
+  static const char func[] = "farsel";
+  int   i, len;
+  const int     grid1    = field1->grid;
+  const double  missval1 = field1->missval;
+  double       *array1   = field1->ptr;
+  const int     grid2    = field2.grid;
+  const int     nmiss2   = field2.nmiss;
+  const double  missval2 = field2.missval;
+  const double *array2   = field2.ptr;
+  
+  len = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  if ( nmiss2 > 0 )
+    {
+      for ( i = 0; i < len; i++ )
+        if ( DBL_IS_EQUAL(array2[i], missval2) || array2[i] == 0.0 ) 
+          array1[i] = missval1;
+    }
+  else
+    {
+      for ( i = 0; i < len; i++ )
+        if ( array2[i] == 0.0 ) array1[i] = missval1;
+    }
+      
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+}
+
+
 void farselle(FIELD *field1, FIELD field2)
 {
   selcomp(field1, &field2, le);
@@ -343,3 +474,7 @@ void farselgtc(FIELD *field, double c)
 {
   selcompc(field, c, gt);
 }
+
+
+
+

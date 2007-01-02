@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Hi         hi              Compute the humidity index
+      Hi      hi           Compute the humidity index
 */
 
 
@@ -30,16 +30,23 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#define TO_DEGREE_CELSIUS(x) ((x) - 273.15)
-#define TO_KELVIN(x) ((x) + 273.15)
+
+static const char HI_NAME[]     = "hum_index";
+static const char HI_LONGNAME[] = "Humindex describes empirically in units of temperature how the temperature and humidity influence the wellness of a human being. HI = T + 5/9 * (A - 10) with A = e * (6.112 * 10 ** ((7.5 * T)/(237.7 + T)) * R), T  = air temperature in degree Celsius, R = relative humidity, e = vapour pressure. Humindex is only defined for temperatures of at least 26 degree Celsius and relative humidity of at least 40 percent.";
+static const char HI_UNITS[]    = "Celsius";
+
+static const int FIRST_VAR = 0;
 
 
 static double humidityIndex(double t, double e, double r, double missval)
 {
-  const double c = TO_DEGREE_CELSIUS(t);
-  const double a = 0.01 * r * e * 6.112 * pow(10.0, 7.5 * c / (237.7 + c));
+  static const double tmin = 26.0;
+  static const double hmin = 0.40;
   
-  return TO_KELVIN(c + (5.0 / 9.0) * (a - 10.0));
+  if ( t < tmin || r < hmin )
+    return missval;
+    
+  return t + (5.0 / 9.0) * ((0.01 * r * e * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t))) - 10.0);
 }
 
 
@@ -88,12 +95,13 @@ static void farexpr(FIELD *field1, FIELD field2, FIELD field3, double (*expressi
 void *Hi(void *argument)
 {
   static char func[] = "Hi";
-  enum {FILL_NONE, FILL_REC, FILL_TS};
-  int streamIDm, streamIDs, streamID1, streamID2, streamID3, streamID4;
+  int streamID1, streamID2, streamID3, streamID4;
   int gridsize;
   int nrecs, nrecs2, nrecs3, recID;
   int tsID;
-  int varID, levelID;
+  int gridID, zaxisID;
+  int varID1, varID2, varID3, varID4;
+  int levelID1, levelID2, levelID3;
   int vlistID1, vlistID2, vlistID3, vlistID4;
   int taxisID1, taxisID2, taxisID3, taxisID4;
   FIELD field1, field2, field3;
@@ -107,9 +115,6 @@ void *Hi(void *argument)
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
   streamID3 = streamOpenRead(cdoStreamName(2));
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
-
-  streamIDm = streamID1;
-  streamIDs = streamID2;
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = streamInqVlist(streamID2);
@@ -134,10 +139,21 @@ void *Hi(void *argument)
     cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d",
 	     vlistNtsteps(vlistID1), vlistNtsteps(vlistID2), vlistNtsteps(vlistID3));
 
-  vlistID4 = vlistDuplicate(vlistID1);
+  vlistID4 = vlistCreate();
+  gridID   = vlistInqVarGrid(vlistID1, FIRST_VAR);
+  zaxisID  = vlistInqVarZaxis(vlistID1, FIRST_VAR);
+  varID4   = vlistDefVar(vlistID4, gridID, zaxisID, TIME_VARIABLE);
 
-  taxisID4 = taxisDuplicate(taxisID1);
+  taxisID4 = taxisCreate(TAXIS_RELATIVE);
+  taxisDefTunit(taxisID4, TUNIT_SECOND);
+  taxisDefCalendar(taxisID4, CALENDAR_PROLEPTIC);
+  taxisDefRdate(taxisID4, 19550101);
+  taxisDefRtime(taxisID4, 0);
   vlistDefTaxis(vlistID4, taxisID4);
+
+  vlistDefVarName(vlistID4, varID4, HI_NAME);
+  vlistDefVarLongname(vlistID4, varID4, HI_LONGNAME);
+  vlistDefVarUnits(vlistID4, varID4, HI_UNITS);
 
   streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
   if ( streamID4 < 0 ) cdiError(streamID4, "Open failed on %s", cdoStreamName(3));
@@ -157,27 +173,33 @@ void *Hi(void *argument)
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  streamInqRecord(streamID1, &varID1, &levelID1);
 	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
 
-	  streamInqRecord(streamID2, &varID, &levelID);
+	  streamInqRecord(streamID2, &varID2, &levelID2);
 	  streamReadRecord(streamID2, field2.ptr, &field2.nmiss);
-
-	  streamInqRecord(streamID3, &varID, &levelID);
+	  
+	  streamInqRecord(streamID3, &varID3, &levelID3);
 	  streamReadRecord(streamID3, field3.ptr, &field3.nmiss);
+	  
+	  if ( varID1 != varID2 || varID1 != varID3 || levelID1 != levelID2 || levelID1 != levelID3 )
+	    cdoAbort("Input streams have different structure!");
+	    
+          if ( varID1 != FIRST_VAR )
+            continue;
+            
+	  field1.grid    = vlistInqVarGrid(vlistID1, varID1);
+	  field1.missval = vlistInqVarMissval(vlistID1, varID1);
 
-	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
+	  field2.grid    = vlistInqVarGrid(vlistID2, varID2);
+	  field2.missval = vlistInqVarMissval(vlistID2, varID2);
 
-	  field2.grid    = vlistInqVarGrid(vlistID2, varID);
-	  field2.missval = vlistInqVarMissval(vlistID2, varID);
-
-	  field3.grid    = vlistInqVarGrid(vlistID3, varID);
-	  field3.missval = vlistInqVarMissval(vlistID3, varID);
+	  field3.grid    = vlistInqVarGrid(vlistID3, varID3);
+	  field3.missval = vlistInqVarMissval(vlistID3, varID3);
 
 	  farexpr(&field1, field2, field3, humidityIndex);
-
-	  streamDefRecord(streamID4, varID, levelID);
+	  
+	  streamDefRecord(streamID4, varID4, levelID1);
 	  streamWriteRecord(streamID4, field1.ptr, field1.nmiss);
 	}
 

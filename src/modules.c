@@ -197,10 +197,13 @@ void *EcaRx5day(void *argument);
 void *EcaSdii(void *argument);
 
 void *EcaFdns(void *argument);
-void *EcaStrwind(void *argument);
+void *EcaStrwin(void *argument);
+void *EcaStrbre(void *argument);
+void *EcaStrgal(void *argument);
+void *EcaHurr(void *argument);
 
 void *Hi(void *argument);
-void *Tchill(void *argument);
+void *Wct(void *argument);
 /* QR */
 
 
@@ -380,10 +383,14 @@ void *Tchill(void *argument);
 #define  EcaSdiiOperators       {"eca_sdii"}
 
 #define  EcaFdnsOperators       {"eca_fdns"}
-#define  EcaStrwindOperators    {"eca_strwind"}
+
+#define  EcaStrwinOperators     {"eca_strwin"}
+#define  EcaStrbreOperators     {"eca_strbre"}
+#define  EcaStrgalOperators     {"eca_strgal"}
+#define  EcaHurrOperators       {"eca_hurr"}
 
 #define  HiOperators            {"hi"}
-#define  TchillOperators        {"tchill"}
+#define  WctOperators           {"wct"}
 /* QR */
 
 
@@ -562,10 +569,13 @@ static MODULES Modules[] =
   { EcaRx5day,      EcaRx5dayHelp,     EcaRx5dayOperators,      1,  1 },
   { EcaSdii,        EcaSdiiHelp,       EcaSdiiOperators,        1,  1 },
   { EcaFdns,        EcaFdnsHelp,       EcaFdnsOperators,        2,  1 },
-  { EcaStrwind,     EcaStrwindHelp,    EcaStrwindOperators,     1,  1 },
+  { EcaStrwin,      EcaStrwinHelp,     EcaStrwinOperators,      1,  1 },
+  { EcaStrbre,      NULL,              EcaStrbreOperators,      1,  1 },
+  { EcaStrgal,      NULL,              EcaStrgalOperators,      1,  1 },
+  { EcaHurr,        NULL,              EcaHurrOperators,        1,  1 },
 
   { Hi,             HiHelp,            HiOperators,             3,  1 },
-  { Tchill,         TchillHelp,        TchillOperators,         2,  1 },
+  { Wct,            WctHelp,           WctOperators,            2,  1 },
   /* QR */
 };
 

@@ -1,3 +1,8 @@
+2007-01-02  Ralf Quast  <ralf.quast@brockmann-consult.de>
+
+	* rename tchill to wct
+	* split eca_strwind into eca_strwin, eca_strbre, eca_strgal and eca_hurr
+
 2006-12-14  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.5

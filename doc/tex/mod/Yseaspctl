@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Yseaspctl
 @Title     = Multi-year seasonal percentile values
 @Section   = Statistical values

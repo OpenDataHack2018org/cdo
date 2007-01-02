@@ -264,7 +264,7 @@ cdo_SOURCES = Arith.c		\
 	      ecautil.c		\
 	      EcaIndices.c	\
 	      Hi.c		\
-	      Tchill.c          \
+	      Wct.c             \
 	      cdi.h
 
 #
@@ -335,7 +335,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	vinterp.$(OBJEXT) zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) \
 	color.$(OBJEXT) list.$(OBJEXT) percentiles.$(OBJEXT) \
 	nth_element.$(OBJEXT) ecacore.$(OBJEXT) ecautil.$(OBJEXT) \
-	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Tchill.$(OBJEXT)
+	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Wct.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES =
 cdo_LDFLAGS =
@@ -390,13 +390,13 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Specinfo.Po ./$(DEPDIR)/Spectral.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Split.Po ./$(DEPDIR)/Splitrec.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Splittime.Po ./$(DEPDIR)/Splityear.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Subtrend.Po ./$(DEPDIR)/Tchill.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Templates.Po ./$(DEPDIR)/Test.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timpctl.Po ./$(DEPDIR)/Timsort.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timstat.Po ./$(DEPDIR)/Trend.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Trms.Po ./$(DEPDIR)/Vardup.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Vargen.Po ./$(DEPDIR)/Varrms.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Vertint.Po ./$(DEPDIR)/Vertstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Subtrend.Po ./$(DEPDIR)/Templates.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Test.Po ./$(DEPDIR)/Timpctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timsort.Po ./$(DEPDIR)/Timstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Trend.Po ./$(DEPDIR)/Trms.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Vardup.Po ./$(DEPDIR)/Vargen.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Varrms.Po ./$(DEPDIR)/Vertint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Vertstat.Po ./$(DEPDIR)/Wct.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Wind.Po ./$(DEPDIR)/Writegrid.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Writerandom.Po ./$(DEPDIR)/Ydaypctl.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Ydaystat.Po ./$(DEPDIR)/Ydrunpctl.Po \
@@ -581,7 +581,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Splittime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Splityear.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Subtrend.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tchill.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Templates.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timpctl.Po@am__quote@
@@ -594,6 +593,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Varrms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writerandom.Po@am__quote@

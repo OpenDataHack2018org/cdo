@@ -53,7 +53,7 @@ void eca1(const ECA_REQUEST_1 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  FIELD *var12 = NULL, *samp1 = NULL, *var13 = NULL, *var21 = NULL, *var23 = NULL, *var;
+  FIELD *var12 = NULL, *samp1 = NULL, *samp2 = NULL, *var13 = NULL, *var21 = NULL, *var23 = NULL, *var;
   FIELD field1, field2;
   
   intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
@@ -83,12 +83,18 @@ void eca1(const ECA_REQUEST_1 *request)
         vlistDefVarName(ovlistID, varID, request->var2.name);
       if ( IS_SET(request->var2.longname) ) 
         vlistDefVarLongname(ovlistID, varID, request->var2.longname);
+      if ( IS_SET(request->var2.units) ) 
+        vlistDefVarUnits(ovlistID, varID, request->var2.units);
     }
     
   if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID = vlistInqTaxis(ivlistID);
-  otaxisID = taxisCreate(TAXIS_ABSOLUTE);
+  otaxisID = taxisCreate(TAXIS_RELATIVE);
+  taxisDefTunit(otaxisID, TUNIT_SECOND);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefRdate(otaxisID, 19550101);
+  taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -113,6 +119,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
   var12 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   samp1 = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  samp2 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   if ( IS_SET(request->var1.f3) ) 
     var13 = (FIELD *) malloc(nlevels*sizeof(FIELD));
     
@@ -131,7 +138,12 @@ void eca1(const ECA_REQUEST_1 *request)
       samp1[levelID].grid    = gridID;
       samp1[levelID].nmiss   = 0;
       samp1[levelID].missval = missval;
-      samp1[levelID].ptr     = NULL;
+      samp1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+      samp2[levelID].grid    = gridID;
+      samp2[levelID].nmiss   = 0;
+      samp2[levelID].missval = missval;
+      samp2[levelID].ptr     = NULL;
 
       if ( IS_SET(request->var1.f3) )
         {
@@ -188,8 +200,9 @@ void eca1(const ECA_REQUEST_1 *request)
                   for ( i = 0; i < gridsize; i++ )
                     {
                       var12[levelID].ptr[i] = missval;
-                      if ( IS_SET(samp1[levelID].ptr) )
-                        samp1[levelID].ptr[i] = 0.0;
+                      samp1[levelID].ptr[i] = missval;
+                      if ( IS_SET(samp2[levelID].ptr) )
+                        samp2[levelID].ptr[i] = 0.0;
                       if ( IS_SET(request->var1.f3) ) 
                         var13[levelID].ptr[i] = missval;
                       if ( IS_SET(request->var2.h2) )
@@ -198,6 +211,7 @@ void eca1(const ECA_REQUEST_1 *request)
                         var23[levelID].ptr[i] = missval;
                     }
                   var12[levelID].nmiss = gridsize;
+                  samp1[levelID].nmiss = gridsize;
                   if ( IS_SET(request->var1.f3) )
                     var13[levelID].nmiss = gridsize;
                   if ( IS_SET(request->var2.h2) )
@@ -209,6 +223,8 @@ void eca1(const ECA_REQUEST_1 *request)
               streamReadRecord(istreamID, field1.ptr, &field1.nmiss);
               field1.grid    = var12[levelID].grid;
               field1.missval = var12[levelID].missval;
+              
+              farnum(&samp1[levelID], field1);
 
               if ( IS_SET(request->var2.h2) )
                 {
@@ -221,19 +237,19 @@ void eca1(const ECA_REQUEST_1 *request)
               if ( IS_SET(request->var1.f1) ) 
                 request->var1.f1(&field1, request->var1.f1arg);
               
-              if ( field1.nmiss > 0 || IS_SET(samp1[levelID].ptr) )
+              if ( field1.nmiss > 0 || IS_SET(samp2[levelID].ptr) )
                 {
-                  if ( IS_NOT_SET(samp1[levelID].ptr) )
+                  if ( IS_NOT_SET(samp2[levelID].ptr) )
                     {
-                      samp1[levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+                      samp2[levelID].ptr = (double *) malloc(gridsize*sizeof(double));
                       for ( i = 0; i < gridsize; i++ )
-                        samp1[levelID].ptr[i] = nsets;
+                        samp2[levelID].ptr[i] = nsets;
                     }
                   for ( i = 0; i < gridsize; i++ )
                     {
                       if ( DBL_IS_EQUAL(field1.ptr[i], field1.missval) )
                         continue;
-                      samp1[levelID].ptr[i]++;
+                      samp2[levelID].ptr[i]++;
                     }
                 }
               
@@ -288,10 +304,10 @@ void eca1(const ECA_REQUEST_1 *request)
             else 
               var = &var12[levelID];
               
-            if ( IS_NOT_SET(samp1[levelID].ptr) )
+            if ( IS_NOT_SET(samp2[levelID].ptr) )
               farcdiv(var, nsets);
             else
-              fardiv(var, samp1[levelID]);
+              fardiv(var, samp2[levelID]);
               
             if ( request->var1.epilog == PERCENT_OF_TIME )
               farcmul(var, 100.0);
@@ -310,6 +326,8 @@ void eca1(const ECA_REQUEST_1 *request)
                 var = &var13[levelID];
               else 
                 var = &var12[levelID];
+              
+              farsel(var, samp1[levelID]);
                
               streamDefRecord(ostreamID, varID, levelID);
               streamWriteRecord(ostreamID, var->ptr, var->nmiss);
@@ -324,6 +342,8 @@ void eca1(const ECA_REQUEST_1 *request)
                   else 
                     var = &var21[levelID];
                   
+                  farsel(var, samp1[levelID]);
+                  
                   streamDefRecord(ostreamID, varID, levelID);
                   streamWriteRecord(ostreamID, var->ptr, var->nmiss);
                }
@@ -336,10 +356,12 @@ void eca1(const ECA_REQUEST_1 *request)
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
       free(var12[levelID].ptr);
-      if ( IS_SET(samp1[levelID].ptr) ) free(samp1[levelID].ptr);
+      free(samp1[levelID].ptr);
+      if ( IS_SET(samp2[levelID].ptr) ) free(samp2[levelID].ptr);
     }  
   free(var12);
   free(samp1);
+  free(samp2);
   
   if ( IS_SET(var13) ) 
     {
@@ -379,8 +401,7 @@ void eca2(const ECA_REQUEST_2 *request)
   INT64 intvdat;
   INT64 indate1 = 0, indate2;
   int gridsize;
-  int ivdate1 = 0, ivtime1 = 0;
-  int ivdate2 = 0, ivtime2 = 0;
+  int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, levelID, recID;
@@ -392,8 +413,8 @@ void eca2(const ECA_REQUEST_2 *request)
   int ivlistID1, ivlistID2, ovlistID, itaxisID1, itaxisID2, otaxisID;
   int nlevels;
   int *recVarID, *recLevelID;
-  double missval;
-  FIELD *var14 = NULL, *samp1 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
+  double missval1, missval2;
+  FIELD *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
   FIELD field1, field2;
   
   intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
@@ -429,13 +450,19 @@ void eca2(const ECA_REQUEST_2 *request)
         vlistDefVarName(ovlistID, varID, request->var2.name);
       if ( IS_SET(request->var2.longname) ) 
         vlistDefVarLongname(ovlistID, varID, request->var2.longname);
+      if ( IS_SET(request->var2.units) ) 
+        vlistDefVarUnits(ovlistID, varID, request->var2.units);
     }
 
   if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
-  otaxisID  = taxisCreate(TAXIS_ABSOLUTE);
+  otaxisID = taxisCreate(TAXIS_RELATIVE);
+  taxisDefTunit(otaxisID, TUNIT_SECOND);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefRdate(otaxisID, 19550101);
+  taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
@@ -453,10 +480,13 @@ void eca2(const ECA_REQUEST_2 *request)
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
 
   nlevels = zaxisInqSize(zaxisID);
-  missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
-
+  missval1 = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
+  missval2 = vlistInqVarMissval(ivlistID2, FIRST_VAR_ID);
+  
   var14 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   samp1 = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  samp2 = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  samp3 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   
   if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
     total  = (FIELD *) malloc(nlevels*sizeof(FIELD));
@@ -469,33 +499,43 @@ void eca2(const ECA_REQUEST_2 *request)
     {
       var14[levelID].grid    = gridID;
       var14[levelID].nmiss   = 0;
-      var14[levelID].missval = missval;
+      var14[levelID].missval = missval1;
       var14[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
       
       samp1[levelID].grid    = gridID;
       samp1[levelID].nmiss   = 0;
-      samp1[levelID].missval = missval;
-      samp1[levelID].ptr     = NULL;
+      samp1[levelID].missval = missval1;
+      samp1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+      samp2[levelID].grid    = gridID;
+      samp2[levelID].nmiss   = 0;
+      samp2[levelID].missval = missval1;
+      samp2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+      samp3[levelID].grid    = gridID;
+      samp3[levelID].nmiss   = 0;
+      samp3[levelID].missval = missval1;
+      samp3[levelID].ptr     = NULL;
       
       if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
         {
           total[levelID].grid    = gridID;
           total[levelID].nmiss   = 0;
-          total[levelID].missval = missval;
+          total[levelID].missval = missval1;
           total[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
         }
       if ( IS_SET(request->var1.f5) )
         {
           var15[levelID].grid    = gridID;
           var15[levelID].nmiss   = 0;
-          var15[levelID].missval = missval;
+          var15[levelID].missval = missval1;
           var15[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
         }
       if ( IS_SET(request->var2.h2) )
         {
           var22[levelID].grid    = gridID;
           var22[levelID].nmiss   = 0;
-          var22[levelID].missval = missval;
+          var22[levelID].missval = missval1;
           var22[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
         }
     }
@@ -510,19 +550,9 @@ void eca2(const ECA_REQUEST_2 *request)
         {
 	  if ( !streamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
-          /*
-          ivdate1 = taxisInqVdate(itaxisID1);
-          ivdate2 = taxisInqVdate(itaxisID2);
-          if ( ivdate1 != ivdate2 )
-            cdoAbort("Input streams have different verification dates for time step %d!", itsID+1);
             
-          ivtime1 = taxisInqVtime(itaxisID1);
-          ivtime2 = taxisInqVtime(itaxisID2);
-          if ( ivtime1 != ivtime2 )
-            cdoAbort("Input streams have different verification times for time step %d!", itsID+1);
-	  */
-          if ( nsets == 0 ) indate1 = (INT64)ivdate1*10000 + ivtime1;
-          indate2 = (INT64)ivdate1*10000 + ivtime1;
+          if ( nsets == 0 ) indate1 = (INT64)ivdate*10000 + ivtime;
+          indate2 = (INT64)ivdate*10000 + ivtime;
 
           if ( indate2/intvdat != indate1/intvdat ) break;
 
@@ -542,17 +572,21 @@ void eca2(const ECA_REQUEST_2 *request)
                 {
                   for ( i = 0; i < gridsize; i++ )
                     {
-                      var14[levelID].ptr[i] = missval;
-                      if ( IS_SET(samp1[levelID].ptr) )
-                        samp1[levelID].ptr[i] = 0.0;
+                      var14[levelID].ptr[i] = missval1;
+                      samp1[levelID].ptr[i] = missval1;
+                      samp2[levelID].ptr[i] = missval1;
+                      if ( IS_SET(samp3[levelID].ptr) )
+                        samp3[levelID].ptr[i] = 0.0;
                       if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
                         total[levelID].ptr[i] = 0.0;
                       if ( IS_SET(request->var1.f5) ) 
-                        var15[levelID].ptr[i] = missval;
+                        var15[levelID].ptr[i] = missval1;
                       if ( IS_SET(request->var2.h2) ) 
-                        var22[levelID].ptr[i] = missval;
+                        var22[levelID].ptr[i] = missval1;
                     }
                   var14[levelID].nmiss = gridsize;
+                  samp1[levelID].nmiss = gridsize;
+                  samp2[levelID].nmiss = gridsize;
                   if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
                     total[levelID].nmiss = gridsize;
                   if ( IS_SET(request->var1.f5) )
@@ -562,12 +596,15 @@ void eca2(const ECA_REQUEST_2 *request)
                 }
 
               streamReadRecord(istreamID1, field1.ptr, &field1.nmiss);
-              field1.grid    = var14[levelID].grid;
-              field1.missval = var14[levelID].missval;
-
+              field1.grid    = gridID;
+              field1.missval = missval1;
+              
               streamReadRecord(istreamID2, field2.ptr, &field2.nmiss);
-              field2.grid    = var14[levelID].grid;
-              field2.missval = var14[levelID].missval;
+              field2.grid    = gridID;
+              field2.missval = missval2;
+
+              farnum(&samp1[levelID], field1);
+              farnum(&samp2[levelID], field2);
 
               if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
                 farsum(&total[levelID], field1);
@@ -578,19 +615,19 @@ void eca2(const ECA_REQUEST_2 *request)
               if ( IS_SET(request->var1.f2) )
                 request->var1.f2(&field2, request->var1.f2arg);
 
-              if ( field1.nmiss > 0 || IS_SET(samp1[levelID].ptr) )
+              if ( field1.nmiss > 0 || IS_SET(samp3[levelID].ptr) )
                 {
-                  if ( IS_NOT_SET(samp1[levelID].ptr) )
+                  if ( IS_NOT_SET(samp3[levelID].ptr) )
                     {
-                      samp1[levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+                      samp3[levelID].ptr = (double *) malloc(gridsize*sizeof(double));
                       for ( i = 0; i < gridsize; i++ )
-                        samp1[levelID].ptr[i] = nsets;
+                        samp3[levelID].ptr[i] = nsets;
                     }
                   for ( i = 0; i < gridsize; i++ )
                     {
                       if ( DBL_IS_EQUAL(field1.ptr[i], field1.missval) )
                         continue;
-                      samp1[levelID].ptr[i]++;
+                      samp3[levelID].ptr[i]++;
                     }
                 }
               
@@ -614,8 +651,8 @@ void eca2(const ECA_REQUEST_2 *request)
                 request->var1.f5(&var15[levelID], var14[levelID], request->var1.f5arg);              
             }
 
-          ovdate = ivdate1;
-          ovtime = ivtime1;
+          ovdate = ivdate;
+          ovtime = ivtime;
           nsets++;
           itsID++;
         }
@@ -630,10 +667,10 @@ void eca2(const ECA_REQUEST_2 *request)
 	    else
 	      var = &var14[levelID];
 	  
-            if ( IS_NOT_SET(samp1[levelID].ptr) )
+            if ( IS_NOT_SET(samp3[levelID].ptr) )
               farcdiv(var, nsets);
             else
-              fardiv(var, samp1[levelID]);
+              fardiv(var, samp3[levelID]);
 
 	    if ( request->var1.epilog == PERCENT_OF_TIME )
 	      farcmul(var, 100.0);
@@ -663,7 +700,10 @@ void eca2(const ECA_REQUEST_2 *request)
                 var = &var15[levelID];
               else 
                 var = &var14[levelID];
-               
+              
+              farsel(var, samp1[levelID]);
+              farsel(var, samp2[levelID]);
+              
               streamDefRecord(ostreamID, varID, levelID);
               streamWriteRecord(ostreamID, var->ptr, var->nmiss);
             }
@@ -673,6 +713,9 @@ void eca2(const ECA_REQUEST_2 *request)
               for ( levelID = 0; levelID < nlevels; levelID++ )
                 {
                   var = &var22[levelID];
+                  
+                  farsel(var, samp1[levelID]);
+                  farsel(var, samp2[levelID]);
                   
                   streamDefRecord(ostreamID, varID, levelID);
                   streamWriteRecord(ostreamID, var->ptr, var->nmiss);
@@ -686,10 +729,14 @@ void eca2(const ECA_REQUEST_2 *request)
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
       free(var14[levelID].ptr);
-      if ( IS_SET(samp1[levelID].ptr) ) free(samp1[levelID].ptr);
+      free(samp1[levelID].ptr);
+      free(samp2[levelID].ptr);
+      if ( IS_SET(samp3[levelID].ptr) ) free(samp3[levelID].ptr);
     }
   free(var14);
   free(samp1);
+  free(samp2);
+  free(samp3);
   
   if ( IS_SET(total) ) 
     {
@@ -776,7 +823,11 @@ void eca3(const ECA_REQUEST_3 *request)
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
-  otaxisID  = taxisCreate(TAXIS_ABSOLUTE);
+  otaxisID = taxisCreate(TAXIS_RELATIVE);
+  taxisDefTunit(otaxisID, TUNIT_SECOND);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefRdate(otaxisID, 19550101);
+  taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
@@ -943,7 +994,7 @@ void eca4(const ECA_REQUEST_4 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  FIELD *var1 = NULL, *var2 = NULL, *sdat = NULL, *edat = NULL, *var3 = NULL, *done = NULL;
+  FIELD *var1 = NULL, *var2 = NULL, *sdat = NULL, *edat = NULL, *var3 = NULL;
   FIELD field;
   
   intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
@@ -975,18 +1026,15 @@ void eca4(const ECA_REQUEST_4 *request)
     vlistDefVarUnits(ovlistID, varID, request->units2);
 
   varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
-  
-  if ( IS_SET(request->name3) ) 
-    vlistDefVarName(ovlistID, varID, request->name3);
-  if ( IS_SET(request->longname3) ) 
-    vlistDefVarLongname(ovlistID, varID, request->longname3);
-  if ( IS_SET(request->units3) ) 
-    vlistDefVarUnits(ovlistID, varID, request->units3);
-    
+      
   if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID = vlistInqTaxis(ivlistID);
-  otaxisID = taxisCreate(TAXIS_ABSOLUTE);
+  otaxisID = taxisCreate(TAXIS_RELATIVE);
+  taxisDefTunit(otaxisID, TUNIT_SECOND);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefRdate(otaxisID, 19550101);
+  taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -1010,7 +1058,6 @@ void eca4(const ECA_REQUEST_4 *request)
   var3 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   sdat = (FIELD *) malloc(nlevels*sizeof(FIELD));
   edat = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  done = (FIELD *) malloc(nlevels*sizeof(FIELD));
     
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
@@ -1038,11 +1085,6 @@ void eca4(const ECA_REQUEST_4 *request)
       edat[levelID].nmiss   = 0;
       edat[levelID].missval = missval;
       edat[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      done[levelID].grid    = gridID;
-      done[levelID].nmiss   = 0;
-      done[levelID].missval = missval;
-      done[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
     }
 
   indate2 = 0;
@@ -1081,14 +1123,12 @@ void eca4(const ECA_REQUEST_4 *request)
                       var3[levelID].ptr[i] = missval;
                       sdat[levelID].ptr[i] = missval;
                       edat[levelID].ptr[i] = missval;
-                      done[levelID].ptr[i] = 0.0;
                     }
                   var1[levelID].nmiss = gridsize;
                   var2[levelID].nmiss = gridsize;
                   var3[levelID].nmiss = gridsize;
                   sdat[levelID].nmiss = gridsize;
                   edat[levelID].nmiss = gridsize;
-                  done[levelID].nmiss = 0;
                 }
 
               streamReadRecord(istreamID, field.ptr, &field.nmiss);
@@ -1105,23 +1145,8 @@ void eca4(const ECA_REQUEST_4 *request)
                   farnum2(&var1[levelID], field);
                   
                   for ( i = 0; i < gridsize; i++ )
-                    {
-                      if ( done[levelID].ptr[i] != 1.0 )
-                        {
-                          if ( var1[levelID].ptr[i] == request->consecutiveDays )
-                            {
-                              var3[levelID].ptr[i] = 0.0;
-                              done[levelID].ptr[i] = 1.0;
-                            } 
-                        }  
-                      else 
-                        {
-                          if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) )
-                            sdat[levelID].ptr[i] = ivdate;
-                            
-                          var3[levelID].ptr[i] += 1.0;
-                        }  
-                    }
+                    if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) && var1[levelID].ptr[i] == request->consecutiveDays )
+                      sdat[levelID].ptr[i] = ivdate;
                 }
               else
                 {
@@ -1129,26 +1154,21 @@ void eca4(const ECA_REQUEST_4 *request)
                   farnum2(&var2[levelID], field);
 
                   for ( i = 0; i < gridsize; i++ )
-                    {
-                      if ( done[levelID].ptr[i] != 1.0 )
-                        continue;
-                        
-                      if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) )
-                        sdat[levelID].ptr[i] = ivdate;
-                         
-                      if ( var2[levelID].ptr[i] == 0.0 )
-                        edat[levelID].ptr[i] = ivdate;
-                        
-                      if ( var2[levelID].ptr[i] < request->consecutiveDays )
-                        var3[levelID].ptr[i] += 1.0;
-                      else
-                        {
-                          assert(var2[levelID].ptr[i] == request->consecutiveDays);
-                          var3[levelID].ptr[i] = var3[levelID].ptr[i] - (request->consecutiveDays - 1);
-                          done[levelID].ptr[i] = 0.0;
-                        } 
-                    }
+                    if ( DBL_IS_EQUAL(edat[levelID].ptr[i], missval) && var2[levelID].ptr[i] == request->consecutiveDays )
+                      edat[levelID].ptr[i] = ivdate;
                 }
+                
+
+                for ( i = 0; i < gridsize; i++ )
+                  {
+                    if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) )
+                      continue;
+                    if ( DBL_IS_EQUAL(edat[levelID].ptr[i], missval) )
+                      continue;
+                    
+                    var3[levelID].ptr[i] = day_of_year(edat[levelID].ptr[i]) - day_of_year(sdat[levelID].ptr[i]) - request->consecutiveDays;
+                    sdat[levelID].ptr[i] = day_of_year(sdat[levelID].ptr[i]) + 1;
+                  }
                 
                 var3[levelID].nmiss = 0;
                 sdat[levelID].nmiss = 0;
@@ -1190,12 +1210,6 @@ void eca4(const ECA_REQUEST_4 *request)
               streamDefRecord(ostreamID, varID, levelID);
               streamWriteRecord(ostreamID, sdat[levelID].ptr, sdat[levelID].nmiss);
             }
-          varID = 2;
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              streamDefRecord(ostreamID, varID, levelID);
-              streamWriteRecord(ostreamID, edat[levelID].ptr, edat[levelID].nmiss);
-            }
         }
 
       if ( nrecs == 0 ) break;
@@ -1208,14 +1222,12 @@ void eca4(const ECA_REQUEST_4 *request)
       free(var3[levelID].ptr);
       free(sdat[levelID].ptr);
       free(edat[levelID].ptr);
-      free(done[levelID].ptr);
     }  
   free(var1);
   free(var2);
   free(var3);
   free(sdat);
   free(edat);
-  free(done);
   
   if ( IS_SET(field.ptr) ) free(field.ptr);
 

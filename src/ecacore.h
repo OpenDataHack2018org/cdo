@@ -86,6 +86,7 @@ ECA_MAJOR_REQUEST_ELEMENT_1;
 typedef struct {
   const char *name;
   const char *longname;
+  const char *units;
   ECA_FUNC_1  h1;
   double      h1arg;
   ECA_FUNC_2  h2;
@@ -153,6 +154,7 @@ ECA_MAJOR_REQUEST_ELEMENT_2;
  * 
  * name      the name of the output variable
  * longname  the longname of the output variable
+ * units     the units of the output variable
  * h1        the 1st field operator
  * h1arg     the argument of the 1st field operator
  * h2        the 2nd field operator
@@ -160,6 +162,7 @@ ECA_MAJOR_REQUEST_ELEMENT_2;
 typedef struct {
   const char *name;
   const char *longname;
+  const char *units;
   ECA_FUNC_1  h1;
   double      h1arg;
   ECA_FUNC_2  h2;
@@ -228,9 +231,6 @@ typedef struct {
   const char *name2;
   const char *longname2;
   const char *units2;
-  const char *name3;
-  const char *longname3;
-  const char *units3;
   ECA_FUNC_1  s1;
   double      s1arg;
   ECA_FUNC_1  s2;

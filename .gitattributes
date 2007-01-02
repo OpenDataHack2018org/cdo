@@ -163,7 +163,7 @@ doc/tex/mod/Vardup -text
 doc/tex/mod/Vargen -text
 doc/tex/mod/Vertint -text
 doc/tex/mod/Vertstat -text
-doc/tex/mod/Wcl -text
+doc/tex/mod/Wct -text
 doc/tex/mod/Wind -text
 doc/tex/mod/Writegrid -text
 doc/tex/mod/Writerandom -text
@@ -280,7 +280,6 @@ src/Splitrec.c -text
 src/Splittime.c -text
 src/Splityear.c -text
 src/Subtrend.c -text
-src/Tchill.c -text
 src/Templates.c -text
 src/Test.c -text
 src/Timpctl.c -text
@@ -293,6 +292,7 @@ src/Vargen.c -text
 src/Varrms.c -text
 src/Vertint.c -text
 src/Vertstat.c -text
+src/Wct.c -text
 src/Wind.c -text
 src/Writegrid.c -text
 src/Writerandom.c -text

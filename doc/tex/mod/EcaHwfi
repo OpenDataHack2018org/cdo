@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = EcaHwfi
-@Title     = Warm-spell days index wrt 90th percentile of reference period
+@Title     = Warm spell days index wrt 90th percentile of reference period
 @Section   = ECA indices
 @Class     = ECA index
 @Arguments = ifile1 ifile2 ofile
@@ -23,7 +23,7 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginOperator_eca_hwfi
-@Title     = Warm-spell days index wrt 90th percentile of reference period
+@Title     = Warm spell days index wrt 90th percentile of reference period
 @Parameter = [nday]
 @EndOperator
 
