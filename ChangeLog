@@ -1,3 +1,8 @@
+2007-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gradsdes: process only the first 2GB of a GRIB file
+	* Version 1.0.7 released
+
 2007-01-02  Ralf Quast  <ralf.quast@brockmann-consult.de>
 
 	* rename tchill to wct

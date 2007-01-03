@@ -218,6 +218,7 @@ void *Gradsdes(void *argument)
   int idmn, idhh, idmm, idyy, iddd;
   int dt=1, iik=0;
   int gridsize = 0;
+  long checksize = 0;
   int nmiss;
   int nrecsout = 0;
   int maxrecs = 0;
@@ -656,12 +657,23 @@ void *Gradsdes(void *argument)
 		  index = 3*(tsID*nrecsout + recoffset[varID] + levelID);
 	      
 		  streamInqGinfo(streamID, &intnum[index], &fltnum[index]);
+
+		  checksize = (long)intnum[index] + gridsize*intnum[index+2]/8;
+		  if ( checksize < 0L || checksize > 2147483647L )
+		    {
+		      nrecords -= nrecsout;
+		      cdoWarning("GRIB file to large for GrADS! Only the first %d time steps (2GB) are processed.",
+				 tsID);
+		      goto LABEL_STOP;
+		    }
 		}
 	    }
 	}
 
       tsID++;
     }
+
+ LABEL_STOP:
 
   /* XDEF */
 
@@ -1006,7 +1018,7 @@ void *Gradsdes(void *argument)
 	  }
 
 	  for ( i = 0; i < indx.intnum; i++ )
-	    PutInt(map,bcnt, intnum[i]);
+	    PutInt(map, bcnt, intnum[i]);
 
 	  for ( i = 0; i < indx.fltnum; i++)
 	    {
