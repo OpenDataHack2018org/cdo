@@ -1,5 +1,6 @@
 2007-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* New operator: read_e5ini (test version)
 	* gradsdes: process only the first 2GB of a GRIB file
 	* Version 1.0.7 released
 

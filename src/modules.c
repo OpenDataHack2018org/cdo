@@ -50,6 +50,7 @@ void *Condc(void *argument);
 void *Copy(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
+void *Echam5ini(void *argument);
 void *Enlarge(void *argument);
 void *Enlargegrid(void *argument);
 void *Ensstat(void *argument);
@@ -221,6 +222,7 @@ void *Wct(void *argument);
 #define  CopyOperators          {"copy", "selall"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffv"}
+#define  Echam5iniOperators     {"read_e5ini", "write_e5ini"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
@@ -414,6 +416,7 @@ static MODULES Modules[] =
   { Copy,           CopyHelp,          CopyOperators,          -1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,        1,  1 },
   { Diff,           DiffHelp,          DiffOperators,           2,  0 },
+  { Echam5ini,      NULL,              Echam5iniOperators,      1,  1 },
   { Enlarge,        EnlargeHelp,       EnlargeOperators,        1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,    1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       -1,  1 },

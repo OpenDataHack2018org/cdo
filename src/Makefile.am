@@ -17,6 +17,7 @@ cdo_SOURCES = Arith.c		\
 	      Copy.c		\
               Detrend.c		\
               Diff.c		\
+              Echam5ini.c     	\
               Enlarge.c     	\
               Enlargegrid.c     \
               Ensstat.c     	\
