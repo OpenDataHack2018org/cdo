@@ -49,7 +49,7 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 
 	if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
 	     zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )
-	  cdoAbort("Number of level of the input fields do not match!");
+	  cdoAbort("Number of levels of the input fields do not match!");
       }
   else if ( function == func_sft )
     for ( varID = 0; varID < nvars; varID++ )
@@ -60,7 +60,7 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 
 	if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
 	     zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )
-	  cdoAbort("Number of level of the input fields do not match!");
+	  cdoAbort("Number of levels of the input fields do not match!");
       }
   else
     cdoAbort("Internal problem! Invalid function %d", function);
