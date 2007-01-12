@@ -212,6 +212,7 @@ src/Copy.c -text
 src/Detrend.c -text
 src/Diff.c -text
 src/EcaIndices.c -text
+src/Echam5ini.c -text
 src/Enlarge.c -text
 src/Enlargegrid.c -text
 src/Ensstat.c -text
