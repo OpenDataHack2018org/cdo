@@ -70,6 +70,7 @@ doc/tex/mod/EcaFd -text
 doc/tex/mod/EcaFdns -text
 doc/tex/mod/EcaGsl -text
 doc/tex/mod/EcaHd -text
+doc/tex/mod/EcaHurr -text
 doc/tex/mod/EcaHwdi -text
 doc/tex/mod/EcaHwfi -text
 doc/tex/mod/EcaId -text
@@ -87,6 +88,8 @@ doc/tex/mod/EcaRr1 -text
 doc/tex/mod/EcaRx1day -text
 doc/tex/mod/EcaRx5day -text
 doc/tex/mod/EcaSdii -text
+doc/tex/mod/EcaStrbre -text
+doc/tex/mod/EcaStrgal -text
 doc/tex/mod/EcaStrwin -text
 doc/tex/mod/EcaSu -text
 doc/tex/mod/EcaTg10p -text

@@ -114,6 +114,9 @@ EcaRx1day     ECA indices
 EcaRx5day     ECA indices
 EcaSdii       ECA indices
 EcaStrwin     ECA indices
+EcaStrbre     ECA indices
+EcaStrgal     ECA indices
+EcaHurr       ECA indices
 EcaSu         ECA indices
 EcaTg10p      ECA indices
 EcaTg90p      ECA indices
