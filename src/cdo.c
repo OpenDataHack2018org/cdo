@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -78,7 +78,7 @@ int cdoDebug       = 0;
 
 int cdoExpMode     = -1;
 char *cdoExpName   = NULL;
-const char *cdojobfiles  = "ftp_files";
+void exp_run(int argc, char *argv[], char *cdoExpName);
 
 
 int timer_total, timer_read, timer_write;
@@ -767,79 +767,7 @@ int main(int argc, char *argv[])
     }
   else if ( cdoExpMode == CDO_EXP_LOCAL )
     {
-      char commandline[65536];
-      int i;
-      int status;
-      char jobname[1024];
-      char jobfilename[1024];
-      char ftp_url[4096];
-      char ftpfile[1024];
-      char tmppath[]  = "/localA/m214003/tmp/";
-      char tmppath2[] = "/scratch/localA/m214003/tmp/";
-      FILE *jobfilep, *ftpfilep;
-      int ftpget(int flag, const char *url, const char *path, const char *target, const char *source);
-
-      commandline[0] = 0;
-      strcat(commandline, "/pf/m/m214003/cdt/work/cdo/build/GRID_AMD64/src/cdo ");
-      for ( i = 1; i < argc; i++ )
-	{
-	  strcat(commandline, argv[i]);
-	  strcat(commandline, " ");
-	}
-      /* printf("command: >%s<\n", commandline);*/
-
-      jobfilename[0] = 0;
-      strcat(jobfilename, "cdojob.sh");
-
-      jobfilep = fopen(jobfilename, "w");
-
-      if ( jobfilep == NULL )
-	{
-	  fprintf(stderr, "Open failed on %s\n", jobfilename);
-	  perror(jobfilename);
-          exit(EXIT_FAILURE);
-	}
-
-      fprintf(jobfilep, "#! /bin/bash\n");
-      fprintf(jobfilep, "#uname -s\n");
-      fprintf(jobfilep, "#pwd\n");
-      fprintf(jobfilep, "#ls -l %s\n", tmppath2);
-      fprintf(jobfilep, "rm -f %s*\n", tmppath2);
-      fprintf(jobfilep, "cd %s\n", tmppath2);
-      fprintf(jobfilep, "rm -f %s\n", cdojobfiles);
-      fprintf(jobfilep, "#echo $LD_LIBRARY_PATH\n");
-      fprintf(jobfilep, "setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/lx24-amd64:$LD_LIBRARY_PATH\n");
-      fprintf(jobfilep, "%s\n", commandline);
-
-      fclose(jobfilep);
-
-      sprintf(jobname, "cdo_%s", cdoExpName); 
-
-      job_submit(cdoExpName, jobfilename, jobname);
-
-      sprintf(commandline, "rm -f %s\n", jobfilename);
-      system(commandline);
-
-      sprintf(commandline, "rm -f %s\n", cdojobfiles);
-      system(commandline);
-
-      sprintf(ftp_url, "ftp://%s.zmaw.de", cdoExpName);
-
-      status = ftpget(0, ftp_url, tmppath, cdojobfiles, cdojobfiles);
-
-      if ( status == 0 )
-	{
-	  ftpfilep = fopen(cdojobfiles, "r");
-	  if ( ftpfilep )
-	    {
-	      while ( fscanf(ftpfilep, "%s\n", ftpfile) == 1 )
-		{
-		  ftpget(1, ftp_url, tmppath, ftpfile, ftpfile);
-		}
-
-	      fclose(ftpfilep);
-	    }
-	}
+      exp_run(argc, argv, cdoExpName);
     }
   else
     {

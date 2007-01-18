@@ -1,7 +1,6 @@
 #! /bin/sh
 #
 # default configuration options and compiler flags for different hosts
-# LIBS="-lm -lz" is necessary for configuration with HDF5
 #
 if test -z "$1" ; then
   HOSTNAME=`hostname`
@@ -9,7 +8,7 @@ else
   HOSTNAME=$1
 fi
 #
-set -x
+#set -x
 #
 case "${HOSTNAME}" in
 # ia64-xxx-linux
@@ -45,8 +44,9 @@ case "${HOSTNAME}" in
 	;;
 # i386-pc-solaris2.10
     yun)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/YUN \
+	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10-x86 \
                     --with-netcdf=/client \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris10-x86/include"  LIBS=$HOME/local/solaris10-x86/lib/libsz.a \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
 # sparc-sun-solaris2.10
@@ -60,7 +60,7 @@ case "${HOSTNAME}" in
 	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
                     --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include"  LIBS=$HOME/local/SUN/lib/libsz.a \
-                    CC=cc CFLAGS="-g -mt -fast"
+                    CC=cc CFLAGS="-g -mt -fast -xtarget=ultra3"
 	;;
 # sx6-nec-superux12.2
     cs*)

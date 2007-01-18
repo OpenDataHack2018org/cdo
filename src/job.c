@@ -13,6 +13,7 @@
 #  include "drmaa.h"
 #endif
 
+#define  GRID_TMPDIR  "/opt/griddata/tmp"
 
 #if  defined  (HAVE_LIBDRMAA)
 static drmaa_job_template_t *create_job_template(const char *expname, const char *jobfilename, const char *jobname)
@@ -39,7 +40,7 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
 
   /* determine hostname */
 
-  gethostname(host, 255);  
+  gethostname(host, sizeof(host));  
 
   /* determine current path */
 
@@ -52,13 +53,14 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   /* generate DRMAA conform output path */
   
   len1 = strlen(host);
-  len2 = strlen(dir);
+  /*len2 = strlen(dir);*/
+  len2 = strlen(GRID_TMPDIR);
   len = len1+len2+2;
 
   output_path = (char *) malloc(len*sizeof(char));
   strcpy(output_path, host);
   strcat(output_path, ":");
-  strcat(output_path, dir);
+  strcat(output_path, GRID_TMPDIR);
 
   /* need to allow chdir on execution host, not thread save! */
 
@@ -79,7 +81,8 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   drmaa_set_attribute(job, DRMAA_JS_STATE, "drmaa_active", NULL, 0);
 
   /* working directory on execution host */
-  drmaa_set_attribute(job, DRMAA_WD, dir, NULL, 0);
+  drmaa_set_attribute(job, DRMAA_WD, GRID_TMPDIR, NULL, 0);
+  /* drmaa_set_attribute(job, DRMAA_WD, "/opt/griddata/tmp", NULL, 0); */
 
   /* path for output */
   drmaa_set_attribute(job, DRMAA_OUTPUT_PATH, output_path, NULL, 0);
@@ -198,7 +201,7 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 	  sleep (1);
 	
 	  errnum = drmaa_job_ps(jobid, &stat, status, DRMAA_ERROR_STRING_BUFFER);
-         
+
 	  if ( errnum != DRMAA_ERRNO_SUCCESS ) break;
 
 	  if ( stat == DRMAA_PS_RUNNING )
@@ -233,6 +236,7 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
   if ( aborted )
     {
       fprintf(stderr, "job %s never ran\n", jobid);
+      return 1;
     }
   else
     {
@@ -284,13 +288,16 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
   {
     char commandline[1024];
 
-    sprintf(commandline, "cat %s.o%s | grep -v tty  | grep -v shell\n", jobname, jobid);
+    sprintf(commandline, "pwd; echo $HOST; uname -a\n");
     system(commandline);
 
-    sprintf(commandline, "cat %s.e%s | grep -v cannot | grep -v resize | grep -v rm\n", jobname, jobid);
+    sprintf(commandline, "cat %s/%s.o%s | grep -v tty  | grep -v shell\n", GRID_TMPDIR, jobname, jobid);
     system(commandline);
 
-    sprintf(commandline, "rm -f %s.o%s %s.e%s\n", jobname, jobid, jobname, jobid);
+    sprintf(commandline, "cat %s/%s.e%s | grep -v cannot | grep -v resize | grep -v rm\n", GRID_TMPDIR, jobname, jobid);
+    system(commandline);
+
+    sprintf(commandline, "rm -f %s/%s.o%s %s/%s.e%s\n", GRID_TMPDIR, jobname, jobid, GRID_TMPDIR, jobname, jobid);
     system(commandline);
   }
 
@@ -299,15 +306,16 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 #endif
 
 
-void job_submit(const char *expname, const char *jobfilename, const char *jobname)
+int job_submit(const char *expname, const char *jobfilename, const char *jobname)
 {
+  int status = 0;
 #if  defined  (HAVE_LIBDRMAA)
-  int status;
 
   status = drmaa_submit(expname, jobfilename, jobname);
 #else
   fprintf(stderr, "DRMAA library not available!\n");
 #endif
+  return (status);
 }
 
 
@@ -387,7 +395,10 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
 
   if ( flag )
     {
+      /*
       sprintf(prompt, "Download %-40s ", filename);
+      */
+      sprintf(prompt, "Download %-30s ", source);
       fprintf(stdout, "%s     ", prompt);
     }
 
@@ -466,4 +477,249 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
 #endif
 
   return (status);
+}
+
+
+int ftprmd(const char *url, const char *path)
+{
+  int status = 0;
+#if  defined  (HAVE_LIBCURL)
+  CURL *curl;
+  CURLcode res;
+  struct curl_slist* commands = NULL ;
+  char filename[8196];
+  char ftpcommand[1024];
+  char errorbuffer[CURL_ERROR_SIZE];
+
+  sprintf(ftpcommand, "RMD %s\n", path);
+  commands = curl_slist_append(commands, ftpcommand) ;
+
+  sprintf(filename, "%s%s", url, path);
+
+  curl_global_init(CURL_GLOBAL_DEFAULT);
+
+  curl = curl_easy_init();
+
+  if ( curl )
+    {
+      curl_easy_setopt(curl, CURLOPT_NETRC, CURL_NETRC_REQUIRED);
+
+      if ( cdoVerbose )
+	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+      else
+	curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+
+      curl_easy_setopt(curl, CURLOPT_FTP_SSL, CURLFTPSSL_CONTROL); 
+      curl_easy_setopt(curl, CURLOPT_FTPSSLAUTH, CURLFTPAUTH_TLS);
+
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+
+      curl_easy_setopt(curl, CURLOPT_SSLKEYPASSWD, "");
+
+      curl_easy_setopt(curl, CURLOPT_URL, filename);
+
+      curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorbuffer);
+
+      curl_easy_setopt(curl, CURLOPT_POSTQUOTE, commands);
+
+      res = curl_easy_perform(curl);
+
+      curl_slist_free_all(commands);
+
+      curl_easy_cleanup(curl);
+
+      if ( CURLE_OK != res )
+	{
+	  status = -2;
+	}
+    }
+  else
+    {
+      status = -1;
+    }
+
+  curl_global_cleanup();
+
+#else
+  fprintf(stderr, "CURL library not available!\n");
+#endif
+
+  return (status);
+}
+
+
+#define  DEFAULT_CDO_REMOTE_PATH  "/client/bin/cdo"
+const char *cdojobfiles  = "ftp_files";
+
+void exp_run(int argc, char *argv[], char *cdoExpName)
+{
+  char commandline[65536];
+  int i;
+  int status;
+  char jobname[1024];
+  char jobfilename[1024];
+  char ftp_url[4096];
+  char ftpfile[1024];
+  char ftppath[4096];
+  char tmppath[4096];
+  char tmpdir[1024];
+  FILE *jobfilep, *ftpfilep;
+  char *envstr;
+  size_t len;
+  char host[1024];
+
+  gethostname(host, sizeof(host));
+
+  sprintf(tmpdir, "cdo_%s_%d", host, (int) getpid());
+  /*
+  printf("tmpdir: >%s<\n", tmpdir);
+  */
+
+  envstr = getenv("CDO_REMOTE_PATH");
+  if ( envstr )
+    {
+      if ( cdoVerbose )
+	fprintf(stderr, "CDO_REMOTE_PATH        = %s\n", envstr);
+
+      strcpy(commandline, envstr);
+    }
+  else
+    {
+      strcpy(commandline, DEFAULT_CDO_REMOTE_PATH);
+    }
+
+  envstr = getenv("CDO_REMOTE_TMP");
+  if ( envstr )
+    {
+      if ( cdoVerbose )
+	fprintf(stderr, "CDO_REMOTE_TMP         = %s\n", envstr);
+
+      strcpy(tmppath, envstr);
+    }
+  else
+    {
+      sprintf(tmppath, "/%s/tmp", cdoExpName);
+    }
+
+  envstr = getenv("CDO_REMOTE_FTP");
+  if ( envstr )
+    {
+      if ( cdoVerbose )
+	fprintf(stderr, "CDO_REMOTE_FTP         = %s\n", envstr);
+
+      strcpy(ftppath, envstr);
+    }
+  else
+    {
+      strcpy(ftppath, tmppath);
+    }
+
+  len = strlen("scratch");
+  if ( strlen(tmppath) > len+1 )
+    if ( strncmp(tmppath+1, "scratch", len) == 0 )
+      {
+	strcpy(ftppath, tmppath+len+1);
+      }
+
+  len = strlen(cdoExpName);
+  if ( strlen(tmppath) > len+1 )
+    if ( strncmp(tmppath+1, cdoExpName, len) == 0 )
+      {
+	strcpy(ftppath, tmppath+len+1);
+      }
+
+  strcat(tmppath, "/");
+  strcat(ftppath, "/");
+
+  strcat(tmppath, tmpdir);
+  strcat(ftppath, tmpdir);
+
+  strcat(tmppath, "/");
+  strcat(ftppath, "/");
+
+  if ( cdoVerbose )
+    {
+      fprintf(stdout, "tmppath: >%s<\n", tmppath);
+      fprintf(stdout, "ftppath: >%s<\n", ftppath);
+    }
+
+  for ( i = 1; i < argc; i++ )
+    {
+      strcat(commandline, " ");
+      strcat(commandline, argv[i]);
+    }
+  /*
+  printf("command: >%s<\n", commandline);
+  */
+  sprintf(jobfilename, "%s/cdojob_%s_%d.sh", GRID_TMPDIR, host, (int) getpid());
+
+  jobfilep = fopen(jobfilename, "w");
+
+  if ( jobfilep == NULL )
+    {
+      fprintf(stderr, "Open failed on %s\n", jobfilename);
+      perror(jobfilename);
+      exit(EXIT_FAILURE);
+    }
+
+  fprintf(jobfilep, "#!/bin/csh\n"); /* not used !!! */
+  fprintf(jobfilep, "#uname -s\n");
+  fprintf(jobfilep, "#pwd\n");
+  fprintf(jobfilep, "#env\n");
+  fprintf(jobfilep, "#echo\n");
+  fprintf(jobfilep, "#echo $SHELL\n");
+  fprintf(jobfilep, "#ls -l %s\n", tmppath);
+  fprintf(jobfilep, "mkdir %s\n", tmppath);
+  fprintf(jobfilep, "cd %s\n", tmppath);
+  fprintf(jobfilep, "#echo $LD_LIBRARY_PATH\n");
+  fprintf(jobfilep, "#setenv LD_LIBRARY_PATH /opt/gridware/sge/lib/${SGE_ARCH}:$LD_LIBRARY_PATH\n");
+  fprintf(jobfilep, "%s\n", commandline);
+  
+  fclose(jobfilep);
+      
+  /*sprintf(jobname, "cdo_%s", cdoExpName); */
+  sprintf(jobname, "cdo_%s_%s", host, cdoExpName);
+
+  if ( cdoVerbose)
+    {
+      sprintf(commandline, "cat %s\n", jobfilename);
+      system(commandline);
+    }
+
+  status = job_submit(cdoExpName, jobfilename, jobname);
+  if ( status != 0 )
+    {
+      fprintf(stderr, "Abort: %s job failed!\n", cdoExpName);
+      exit(EXIT_FAILURE);
+    }
+
+  sprintf(commandline, "rm -f %s\n", jobfilename);
+  system(commandline);
+
+  sprintf(commandline, "rm -f %s\n", cdojobfiles);
+  system(commandline);
+
+  sprintf(ftp_url, "ftp://%s.zmaw.de", cdoExpName);
+
+  status = ftpget(0, ftp_url, ftppath, cdojobfiles, cdojobfiles);
+
+  if ( status == 0 )
+    {
+      ftpfilep = fopen(cdojobfiles, "r");
+      if ( ftpfilep )
+	{
+	  while ( fscanf(ftpfilep, "%s\n", ftpfile) == 1 )
+	    {
+	      ftpget(1, ftp_url, ftppath, ftpfile, ftpfile);
+	    }
+
+	  fclose(ftpfilep);
+	}
+    }
+
+  sprintf(commandline, "rm -f %s\n", cdojobfiles);
+  system(commandline);
+
+  status = ftprmd(ftp_url, ftppath);
 }
