@@ -288,16 +288,16 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
   {
     char commandline[1024];
 
-    sprintf(commandline, "pwd; echo $HOST; uname -a\n");
+    sprintf(commandline, "cat %s/%s.o%s | grep -v tty  | grep -v shell | grep -v SunOS | grep -v logout\n",
+	    GRID_TMPDIR, jobname, jobid);
     system(commandline);
 
-    sprintf(commandline, "cat %s/%s.o%s | grep -v tty  | grep -v shell\n", GRID_TMPDIR, jobname, jobid);
+    sprintf(commandline, "cat %s/%s.e%s | grep -v cannot | grep -v resize | grep -v rm\n",
+	    GRID_TMPDIR, jobname, jobid);
     system(commandline);
 
-    sprintf(commandline, "cat %s/%s.e%s | grep -v cannot | grep -v resize | grep -v rm\n", GRID_TMPDIR, jobname, jobid);
-    system(commandline);
-
-    sprintf(commandline, "rm -f %s/%s.o%s %s/%s.e%s\n", GRID_TMPDIR, jobname, jobid, GRID_TMPDIR, jobname, jobid);
+    sprintf(commandline, "rm -f %s/%s.o%s %s/%s.e%s\n",
+    GRID_TMPDIR, jobname, jobid, GRID_TMPDIR, jobname, jobid);
     system(commandline);
   }
 
