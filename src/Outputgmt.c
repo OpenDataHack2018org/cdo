@@ -46,7 +46,7 @@
 void *Outputgmt(void *argument)
 {
   static char func[] = "Outputgmt";
-  int OUTPUTCENTER, OUTPUTBOUNDS, OUTPUTBOUNDSCPT, OUTPUTVECTOR;
+  int OUTPUTCENTER,  OUTPUTCENTERCPT, OUTPUTBOUNDS, OUTPUTBOUNDSCPT, OUTPUTVECTOR;
   int operatorID;
   int i, j;
   int varID0, varID, recID;
@@ -80,6 +80,7 @@ void *Outputgmt(void *argument)
   cdoInitialize(argument);
 
   OUTPUTCENTER    = cdoOperatorAdd("outputcenter",    0, 0, NULL);
+  OUTPUTCENTERCPT = cdoOperatorAdd("outputcentercpt", 0, 0, NULL);
   OUTPUTBOUNDS    = cdoOperatorAdd("outputbounds",    0, 0, NULL);
   OUTPUTBOUNDSCPT = cdoOperatorAdd("outputboundscpt", 0, 0, NULL);
   OUTPUTVECTOR    = cdoOperatorAdd("outputvector",    0, 0, NULL);
@@ -97,7 +98,7 @@ void *Outputgmt(void *argument)
   if ( operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT )
     luse_grid_corner = TRUE;
 
-  if ( operatorID == OUTPUTBOUNDSCPT )
+  if ( operatorID == OUTPUTCENTERCPT || operatorID == OUTPUTBOUNDSCPT )
     {
       char *cpt_file;
 
@@ -254,11 +255,35 @@ void *Outputgmt(void *argument)
 	  fprintf(stdout, "# Level = %g\n", level);
 	  fprintf(stdout, "#\n");
 
-	  if ( operatorID == OUTPUTCENTER )
+	  if ( operatorID == OUTPUTCENTER || operatorID == OUTPUTCENTERCPT )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		{
-		  /* if ( !DBL_IS_EQUAL(array[i], missval) ) */
+		  if ( operatorID == OUTPUTCENTERCPT )
+		    {
+		      int r = 0, g = 0, b = 0, n;
+
+		      if ( !DBL_IS_EQUAL(array[i], missval) )
+			{
+			  for ( n = 0; n < cpt.ncolors; n++ )
+			    if ( array[i] > cpt.lut[n].z_low && array[i] <= cpt.lut[n].z_high ) break;
+
+			  if ( n == cpt.ncolors )
+			    {
+			      r = cpt.bfn[0].rgb[0];  g = cpt.bfn[0].rgb[1];  b = cpt.bfn[0].rgb[2];
+			    }
+			  else
+			    {
+			      r = cpt.lut[n].rgb_high[0];  g = cpt.lut[n].rgb_high[1];  b = cpt.lut[n].rgb_high[2];
+			    }
+			}
+		      else
+			{
+			  r = cpt.bfn[2].rgb[0];  g = cpt.bfn[2].rgb[1];  b = cpt.bfn[2].rgb[2]; 
+			}
+		    }
+
+		  if ( operatorID == OUTPUTCENTER ) 
 		    {
 		      if ( lzon )
 			fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i], level, array[i]);
@@ -266,6 +291,15 @@ void *Outputgmt(void *argument)
 			fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], level, array[i]);
 		      else
 			fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i]);
+		    }
+		  else
+		    {
+		      if ( lzon )
+			fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i], level, array[i]);
+		      else if ( lmer )
+			fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], level, array[i]);
+		      else
+			fprintf(stdout, " %g  %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
 		    }
 		}
 	      fprintf(stdout, "#\n");

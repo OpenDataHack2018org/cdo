@@ -64,7 +64,7 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
 
   /* need to allow chdir on execution host, not thread save! */
 
-  setenv("SGE_DRMAA_ALLOW_CWD", "yes", 1);
+  /* setenv("SGE_DRMAA_ALLOW_CWD", "yes", 1); */
 
   /* allocate job template */
 
@@ -494,7 +494,9 @@ int ftprmd(const char *url, const char *path)
   sprintf(ftpcommand, "RMD %s\n", path);
   commands = curl_slist_append(commands, ftpcommand) ;
 
-  sprintf(filename, "%s%s", url, path);
+  /* sprintf(filename, "%s%s/tmp", url, path); */
+  sprintf(filename, "%s/tmp", url); /* dummy parameter, not used! */
+  /* sprintf(filename, "%s", url);*/
 
   curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -521,7 +523,7 @@ int ftprmd(const char *url, const char *path)
 
       curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errorbuffer);
 
-      curl_easy_setopt(curl, CURLOPT_POSTQUOTE, commands);
+      curl_easy_setopt(curl, CURLOPT_PREQUOTE, commands);
 
       res = curl_easy_perform(curl);
 
