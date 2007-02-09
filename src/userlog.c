@@ -688,6 +688,7 @@ void cdologo(int noper)
 
   for ( processID = 0; processID < noper; processID++ )
     {
+      if ( oname[processID] == NULL ) break; /* baustelle !! */
       nbuf = (int) (bufsize / logsize);
 
       for ( i = 0; i < nbuf; i++ )

@@ -8,7 +8,7 @@ else
   HOSTNAME=$1
 fi
 #
-#set -x
+set -x
 #
 case "${HOSTNAME}" in
 # ia64-xxx-linux

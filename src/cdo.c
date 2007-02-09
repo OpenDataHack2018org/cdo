@@ -175,7 +175,7 @@ static void usage(void)
   fprintf(stderr, "  Operands:\n");
   fprintf(stderr, "    The path name of the input/output files for the operator.\n");
   fprintf(stderr, "\n");
-  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2006 Uwe Schulzweida\n", VERSION);
+  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2007 Uwe Schulzweida\n", VERSION);
   fprintf(stderr, "  Available from http://www.mpimet.mpg.de/cdo\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
   fprintf(stderr, "  Report bugs to Uwe.Schulzweida@zmaw.de\n");
