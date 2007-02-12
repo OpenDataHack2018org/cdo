@@ -411,6 +411,9 @@ Operator catalog:
       EcaRx5day  eca_rx5day      Highest five-day precipitation amount per time period
       EcaSdii    eca_sdii        Simple daily intensity index per time period
       EcaStrwin  eca_strwin      Strong wind days index per time period
+      EcaStrbre  eca_strbre      Strong breeze days index per time period
+      EcaStrgal  eca_strgal      Strong gale days index per time period
+      EcaHurr    eca_hurr        Hurricane days index per time period
       EcaSu      eca_su          Summer days index per time period
       EcaTg10p   eca_tg10p       Cold days percent wrt 10th percentile of reference period
       EcaTg90p   eca_tg90p       Warm days percent wrt 90th percentile of reference period

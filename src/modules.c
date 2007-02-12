@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -573,9 +573,9 @@ static MODULES Modules[] =
   { EcaSdii,        EcaSdiiHelp,       EcaSdiiOperators,        1,  1 },
   { EcaFdns,        EcaFdnsHelp,       EcaFdnsOperators,        2,  1 },
   { EcaStrwin,      EcaStrwinHelp,     EcaStrwinOperators,      1,  1 },
-  { EcaStrbre,      NULL,              EcaStrbreOperators,      1,  1 },
-  { EcaStrgal,      NULL,              EcaStrgalOperators,      1,  1 },
-  { EcaHurr,        NULL,              EcaHurrOperators,        1,  1 },
+  { EcaStrbre,      EcaStrbreHelp,     EcaStrbreOperators,      1,  1 },
+  { EcaStrgal,      EcaStrgalHelp,     EcaStrgalOperators,      1,  1 },
+  { EcaHurr,        EcaHurrHelp,       EcaHurrOperators,        1,  1 },
 
   { Hi,             HiHelp,            HiOperators,             3,  1 },
   { Wct,            WctHelp,           WctOperators,            2,  1 },

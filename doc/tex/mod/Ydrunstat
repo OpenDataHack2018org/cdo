@@ -10,10 +10,18 @@
 @BeginDescription
 This module writes to @file{ofile} running statistical values for each
 day of year in @file{ifile}. Depending on the actual operator, the minimum,
-maximum, sum, average, variance or standard deviation of all time steps in those
-running windows whose medium time steps correspond to the same day of year
-is computed. The date information in an output field is the date of the
-last contributing input field.
+maximum, sum, average, variance or standard deviation of all time steps in
+running windows of wich the medium time step corresponds to a certain day of
+year is computed. The date information in an output field is the date of the
+medium time step in the last contributing running window.
+Note that the operator must be applied to a continuous time series of daily
+measurements in order to yield physically meaningful results. Also note that
+the output time series begins (nts-1)/2 time steps after the first time step
+of the input time series and ends (nts-1)/2 time steps before the last.
+For input data which are complete but not continuous, such as time series of
+daily measurements for the same month or season within different years, the
+operator yields physically meaningful results only if the input time series
+does include the (nts-1)/2 days before and after each period of interest.
 @EndModule
 
 
@@ -23,16 +31,16 @@ last contributing input field.
 
 @BeginDescription
 @IfMan
-o(001,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = min{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -46,16 +54,16 @@ o(\mbox{366},x) = \mbox{\bf min}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 @BeginDescription
 @IfMan
-o(001,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = max{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -69,16 +77,16 @@ o(\mbox{366},x) = \mbox{\bf max}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 @BeginDescription
 @IfMan
-o(001,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = sum{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -92,16 +100,16 @@ o(\mbox{366},x) = \mbox{\bf sum}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 @BeginDescription
 @IfMan
-o(001,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = mean{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -115,16 +123,16 @@ o(\mbox{366},x) = \mbox{\bf mean}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{da
 
 @BeginDescription
 @IfMan
-o(001,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = avg{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -138,16 +146,16 @@ o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 @BeginDescription
 @IfMan
-o(001,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -161,16 +169,16 @@ o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 @BeginDescription
 @IfMan
-o(001,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 001}
+o(001,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[i(t+(nts-1)/2)] = 001}
                  ...
-o(366,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day(t+(nts-1)/2) = 366}
+o(366,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
 @BeginMath
 \begin{array}{c}
-o(\mbox{001},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{001}\} \\
+o(\mbox{001},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
-o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}(t+(nts-1)/2) = \mbox{366}\} \\
+o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
@@ -185,15 +193,15 @@ INTEGER  Number of time steps
 
 
 @BeginExample
-Assume the input data provide daily measurements. To compute the daily mean
-over all input years for a running window of five days, use:
+Assume the input data provide a continuous time series of daily measurements. To compute
+the running multi-year daily mean over all input time steps for a running window of five
+days, use:
 @BeginVerbatim
    cdo ydrunmean,5 ifile ofile
 @EndVerbatim
-Note that except for the standard deviation the result of the operators in
-this module is equivalent to a composition of corresponding operators from
-the @mod{YDAYSTAT} and @mod{RUNSTAT} modules. For instance, the above command yields the
-same result as:
+Note that except for the standard deviation the results of the operators in this module
+are equivalent to a composition of corresponding operators from the @mod{YDAYSTAT} and
+@mod{RUNSTAT} modules. For instance, the above command yields the same result as:
 @BeginVerbatim
    cdo ydaymean -runmean,5 ifile ofile
 @EndVerbatim
