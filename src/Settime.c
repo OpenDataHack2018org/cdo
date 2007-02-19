@@ -159,7 +159,7 @@ void *Settime(void *argument)
 	  size_t len;
 	  char *unit = operatorArgv()[0];
 	  incperiod = atoi(unit);
-	  if ( unit[0] == '-' ) unit++;
+	  if ( unit[0] == '-' || unit[0] == '+' ) unit++;
 	  while ( isdigit((int) *unit) ) unit++;
 	  len = strlen(unit);      
 	  if      ( strncmp(unit, "minutes", len) == 0 ) { incunit =    60; tunit = TUNIT_MINUTE;}

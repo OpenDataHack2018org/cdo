@@ -85,6 +85,7 @@ cdo_SOURCES = Arith.c		\
               Subtrend.c        \
               Templates.c    	\
               Test.c    	\
+              Tests.c    	\
               Timpctl.c 	\
               Timsort.c 	\
               Timstat.c 	\
@@ -185,6 +186,8 @@ cdo_SOURCES = Arith.c		\
 	      EcaIndices.c	\
 	      Hi.c		\
 	      Wct.c             \
+	      statistic.c       \
+	      statistic.h       \
 	      cdi.h
 #
 cdo_LDADD = $(LDFLAGS) -lm

@@ -1411,6 +1411,7 @@ static double  converge = 1.e-10;  /* convergence criterion */
    in the source grid and returns the corners needed for a bilinear
    interpolation.
 */
+static
 void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons, 
 		 double plat, double plon, int *src_grid_dims,
 		 double *src_center_lat, double *src_center_lon,
@@ -1654,6 +1655,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   associated with one destination point in the appropriate address 
   and weight arrays and resizes those arrays if necessary.
 */
+static
 void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
 {
   /*
@@ -1880,6 +1882,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
   associated with one destination point in the appropriate address 
   and weight arrays and resizes those arrays if necessary.
 */
+static
 void store_link_bicub(REMAPVARS *rv, int dst_add, int *src_add, double weights[4][4])
 {
   /*
@@ -2127,6 +2130,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
    this routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
 */
+static
 void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
 		     double coslat_dst, double coslon_dst, double sinlat_dst, double sinlon_dst,
 		     int *src_bin_add,
@@ -2262,6 +2266,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
   the appropriate address and weight arrays and resizes those
   arrays if necessary.
 */
+static
 void store_link_nbr(REMAPVARS *rv, int add1, int add2, double weights)
 {
   /*
@@ -2412,6 +2417,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
    this routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
 */
+static
 void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
 		      double coslat_dst, double coslon_dst, double sinlat_dst, double sinlon_dst,
 		      int *src_bin_add, 
@@ -2534,6 +2540,7 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
   the appropriate address and weight arrays and resizes those
   arrays if necessary.
 */
+static
 void store_link_nbr1(REMAPVARS *rv, int add1, int add2, double weights)
 {
   /*
@@ -2686,6 +2693,7 @@ static double south_thresh =-2.00;  /* threshold for coord transf. */
     equivalent projection) is performed to treat polar cells more
     accurately.
 */
+static
 void pole_intersection(int *location,
 		       double *intrsct_lat, double *intrsct_lon, int *lcoinc, int *lthresh,
 		       double beglat, double beglon, double endlat, double endlon,
@@ -3154,6 +3162,7 @@ void pole_intersection(int *location,
    for an intersection must have already been restricted in the
    calling routine.
 */
+static
 void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
 		  double beglat, double beglon, double endlat, double endlon, double *begseg,
 		  int lbegin, int lrevers,
@@ -3547,6 +3556,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
    that results in the interpolation weights.  the line is defined
    by the input lat/lon of the endpoints.
 */
+static
 void line_integral(double *weights, int num_wts, 
 		   double in_phi1, double in_phi2, double theta1, double theta2,
 		   double grid1_lon, double grid2_lon)
@@ -3650,6 +3660,7 @@ void line_integral(double *weights, int num_wts,
     the appropriate address and weight arrays and resizes those
     arrays if necessary.
 */
+static
 void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
 		      int *link_add1[2], int *link_add2[2])
 {

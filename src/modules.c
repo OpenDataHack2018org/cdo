@@ -126,6 +126,7 @@ void *Template1(void *argument);
 void *Template2(void *argument);
 void *Test(void *argument);
 void *Test2(void *argument);
+void *Tests(void *argument);
 void *Timsort(void *argument);
 /* RQ */
 void *Timpctl(void *argument);
@@ -304,6 +305,7 @@ void *Wct(void *argument);
 #define  Template2Operators     {"template2"}
 #define  TestOperators          {"test"}
 #define  Test2Operators         {"test2"}
+#define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fischer"}
 #define  TimsortOperators       {"timsort"}
 /* RQ */
 #define  TimpctlOperators       {"timpctl"}
@@ -494,6 +496,7 @@ static MODULES Modules[] =
   { Template2,      NULL,              Template2Operators,      1,  1 },
   { Test,           NULL,              TestOperators,           1,  1 },
   { Test2,          NULL,              Test2Operators,          2,  1 },
+  { Tests,          NULL,              TestsOperators,          1,  1 },
   /* RQ */
   { Timpctl,        TimpctlHelp,       TimpctlOperators,        3,  1 },
   { Timpctl,        YearpctlHelp,      YearpctlOperators,       3,  1 },

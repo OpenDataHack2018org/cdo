@@ -286,6 +286,7 @@ src/Splityear.c -text
 src/Subtrend.c -text
 src/Templates.c -text
 src/Test.c -text
+src/Tests.c -text
 src/Timpctl.c -text
 src/Timsort.c -text
 src/Timstat.c -text
@@ -381,6 +382,8 @@ src/remap.h -text
 src/remaplib.c -text
 src/specspace.c -text
 src/specspace.h -text
+src/statistic.c -text
+src/statistic.h -text
 src/table.c -text
 src/timer.c -text
 src/userlog.c -text
