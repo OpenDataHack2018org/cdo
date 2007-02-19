@@ -239,9 +239,9 @@ void *Seltime(void *argument)
     {
       for ( i = 0; i < nsel; i++ )
 	if ( operatorID == SELDATE )
-	  cdoPrint("fltarr entry: %d %14.4f", i, fltarr[i]);
+	  cdoPrint("fltarr entry: %d %14.4f", i+1, fltarr[i]);
 	else
-	  cdoPrint("intarr entry: %d %d", i, intarr[i]);
+	  cdoPrint("intarr entry: %d %d", i+1, intarr[i]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -502,7 +502,7 @@ void *Seltime(void *argument)
 	    }
 	  else if ( operatorID == SELTIME )
 	    {
-	      cdoWarning("Time %g not found!", intarr[isel]);
+	      cdoWarning("Time %d not found!", intarr[isel]);
 	    }
 	  else if ( operatorID == SELHOUR )
 	    {
