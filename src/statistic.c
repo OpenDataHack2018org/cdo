@@ -1,9 +1,12 @@
+/* This source code is copied from PINGO version 1.5 */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
 #include <math.h>
 
 #include "cdo.h"
+#include "cdo_int.h"
 #include "statistic.h"
 
 void make_symmetric_matrix_triangular (double **a, int n,
@@ -119,7 +122,7 @@ make_symmetric_matrix_triangular (double **a, int n,
 	{
 	  for (k = 0; k < i; k++)
 	    scale += fabs (a[i][k]);
-	  if (!scale)
+	  if ( DBL_IS_EQUAL(scale, 0) )
 	    e[i] = a[i][i - 1];
 	  else
 	    {
@@ -172,10 +175,11 @@ make_symmetric_matrix_triangular (double **a, int n,
 	}
       */
     }
+
   d[0] = e[0] = 0;
   for (i = 0; i < n; i++)
     {
-      if (d[i])
+      if ( fabs(d[i]) > 0 )
 	{
 	  for (j = 0; j < i; j++)
 	    {
@@ -267,12 +271,14 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
 	      f = s * e[i];
 	      b = c * e[i];
 	      e[i + 1] = r = pythagoras (f, g);
-	      if (r == 0)
+
+	      if ( DBL_IS_EQUAL(r, 0) )
 		{
 		  d[i + 1] -= p;
 		  e[m] = 0;
 		  break;
 		}
+
 	      s = f / r;
 	      c = g / r;
 	      g = d[i + 1] - p;
@@ -287,8 +293,9 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
 		  a[k][i] = c * a[k][i] - s * f;
 		}
 	    }
-	  if (r == 0 && i >= l)
-	    continue;
+
+	  if ( DBL_IS_EQUAL(r, 0) && i >= l ) continue;
+
 	  d[l] -= p;
 	  e[l] = g;
 	  e[m] = 0;
@@ -365,7 +372,7 @@ int
 lu_decomposition (double **a, int n, int *index, int *sign)
 {
   static char func[] = "decomposition";
-  int i, imax, j, k;
+  int i, imax = 0, j, k;
   double big, sum, temp;
   double *v;
 
@@ -377,8 +384,9 @@ lu_decomposition (double **a, int n, int *index, int *sign)
       for (j = 0; j < n; j++)
 	if ((temp = fabs (a[i][j])) > big)
 	  big = temp;
-      if (!big)
-	return 0;
+
+      if ( DBL_IS_EQUAL(big, 0) ) return 0;
+
       v[i] = 1 / big;
     }
   for (j = 0; j < n; j++)
@@ -415,8 +423,9 @@ lu_decomposition (double **a, int n, int *index, int *sign)
 	  v[imax] = v[j];
 	}
       index[j] = imax;
-      if (!a[j][j])
-	return 0;
+
+      if ( DBL_IS_EQUAL(a[j][j], 0) ) return 0;
+
       if (j != n)
 	{
 	  temp = 1 / a[j][j];
@@ -440,11 +449,12 @@ lu_backsubstitution (double **a, int n, int *index, double *b)
       ip = index[i];
       sum = b[ip];
       b[ip] = b[i];
+
       if (ii)
-	for (j = ii; j < i; j++)
-	  sum -= a[i][j] * b[j];
-      else if (sum)
+	for (j = ii; j < i; j++) sum -= a[i][j] * b[j];
+      else if ( fabs(sum) > 0 )
 	ii = i;
+
       b[i] = sum;
     }
   for (i = n - 1; i >= 0; i--)
@@ -682,9 +692,9 @@ incomplete_beta (double a, double b, double x, char *prompt)
       exit (4);
     }
 
-  c = x == 0 || x == 1 ? 0 :
-    exp (lngamma (a + b) - lngamma (a) - lngamma (b) + a * log (x) +
-	 b * log (1 - x));
+  c = (DBL_IS_EQUAL(x, 0) || DBL_IS_EQUAL(x, 1)) ? 0 :
+    exp (lngamma (a + b) - lngamma (a) - lngamma (b) + a * log (x) + b * log (1 - x));
+
   if (x < (a + 1) / (a + b + 2))
     return c * beta_help (a, b, x, prompt) / a;
   else
@@ -768,9 +778,9 @@ normal_inv (double p, char *prompt)
       exit (4);
     }
 
-  if (p == last_p)
+  if ( DBL_IS_EQUAL(p, last_p) )
     return last_x;
-  if (p == 0.5)
+  if ( DBL_IS_EQUAL(p, 0.5) )
     return 0;
   else if (p < 0.5)
     return -normal_inv (1 - p, prompt);
@@ -837,9 +847,9 @@ student_t_inv (double n, double p, char *prompt)
       exit (4);
     }
 
-  if (n == last_n && p == last_p)
+  if ( DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p) )
     return last_x;
-  if (p == 0.5)
+  if ( DBL_IS_EQUAL(p, 0.5) )
     return 0;
   else if (p < 0.5)
     return -student_t_inv (n, 1 - p, prompt);
@@ -904,9 +914,10 @@ chi_square_inv (double n, double p, char *prompt)
       exit (4);
     }
 
-  if (n == last_n && p == last_p)
+  if ( DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p) )
     return last_x;
-  if (n == last_last_n && p == last_last_p)
+
+  if (DBL_IS_EQUAL(n, last_last_n) && DBL_IS_EQUAL(p, last_last_p) )
     return last_last_x;
 
   x = n;
@@ -948,7 +959,7 @@ chi_square_constants (double n, double p, double *c1, double *c2, char *prompt)
       exit (4);
     }
 
-  if (n == last_n && p == last_p)
+  if ( DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p) )
     {
       *c1 = last_c1;
       *c2 = last_c2;
@@ -1029,9 +1040,10 @@ beta_distr_inv (double a, double b, double p, char *prompt)
       exit (4);
     }
 
-  if (a == last_a && b == last_b && p == last_p)
+  if ( DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b) && DBL_IS_EQUAL(p, last_p) )
     return last_x;
-  if (a == last_last_a && b == last_last_b && p == last_last_p)
+
+  if ( DBL_IS_EQUAL(a, last_last_a) && DBL_IS_EQUAL(b, last_last_b) && DBL_IS_EQUAL(p, last_last_p) )
     return last_last_x;
 
   x = a / (a + b);
@@ -1082,7 +1094,7 @@ beta_distr_constants (double a, double b, double p, double *c1, double *c2,
       exit (4);
     }
 
-  if (a == last_a && b == last_b && p == last_p)
+  if ( DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b) && DBL_IS_EQUAL(p, last_p) )
     {
       *c1 = last_c1;
       *c2 = last_c2;
