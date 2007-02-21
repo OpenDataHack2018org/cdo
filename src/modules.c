@@ -305,7 +305,7 @@ void *Wct(void *argument);
 #define  Template2Operators     {"template2"}
 #define  TestOperators          {"test"}
 #define  Test2Operators         {"test2"}
-#define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fischer"}
+#define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fisher"}
 #define  TimsortOperators       {"timsort"}
 /* RQ */
 #define  TimpctlOperators       {"timpctl"}

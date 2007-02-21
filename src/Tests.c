@@ -21,21 +21,62 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "statistic.h"
 
 
 void *Tests(void *argument)
 {
   static char func[] = "Tests";
+  int NORMAL, STUDENTT, CHISQUARE, BETA, FISHER;
+  int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
+  int i;
   int tsID, recID, varID, levelID;
   int vlistID1, vlistID2;
   int gridsize;
   int nmiss;
   int taxisID1, taxisID2;
-  double *array = NULL;
+  double degree_of_freedom = 0, p = 0, q = 0, n = 0, d = 0;
+  double missval;
+  double *array1 = NULL, *array2 = NULL;
 
   cdoInitialize(argument);
+
+  NORMAL    = cdoOperatorAdd("normal",    0, 0, NULL);
+  STUDENTT  = cdoOperatorAdd("studentt",  0, 0, "degree of freedom");
+  CHISQUARE = cdoOperatorAdd("chisquare", 0, 0, "degree of freedom");
+  BETA      = cdoOperatorAdd("beta",      0, 0, "p and q");
+  FISHER    = cdoOperatorAdd("fisher",    0, 0, "degree of freedom of nominator and of denominator");
+
+  operatorID = cdoOperatorID();
+
+  if ( operatorID == STUDENTT || operatorID == CHISQUARE )
+    {
+      operatorInputArg(cdoOperatorEnter(operatorID));
+
+      operatorCheckArgc(1);
+
+      degree_of_freedom = atof(operatorArgv()[0]);
+    }
+  else if ( operatorID == BETA )
+    {
+      operatorInputArg(cdoOperatorEnter(operatorID));
+
+      operatorCheckArgc(2);
+
+      p = atof(operatorArgv()[0]);
+      q = atof(operatorArgv()[1]);
+    }
+  else if ( operatorID == FISHER )
+    {
+      operatorInputArg(cdoOperatorEnter(operatorID));
+
+      operatorCheckArgc(2);
+
+      n = atof(operatorArgv()[0]);
+      d = atof(operatorArgv()[1]);
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -53,7 +94,8 @@ void *Tests(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = (double *) malloc(gridsize*sizeof(double));
+  array1 = (double *) malloc(gridsize*sizeof(double));
+  array2 = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -64,11 +106,49 @@ void *Tests(void *argument)
 	       
       for ( recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
+	  streamInqRecord(streamID1, &varID, &levelID);	  
+	  streamReadRecord(streamID1, array1, &nmiss);
+
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  missval = vlistInqVarMissval(vlistID1, varID);
+
+	  if ( operatorID == NORMAL )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
+		  normal(array1[i], "tests");
+	    }
+	  else if ( operatorID == STUDENTT )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
+		  student_t(degree_of_freedom, array1[i], "tests");
+	    }
+	  else if ( operatorID == CHISQUARE )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
+		  chi_square(degree_of_freedom, array1[i], "tests");
+	    }
+	  else if ( operatorID == BETA )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
+		  beta_distr(p, q, array1[i], "tests");
+	    }
+	  else if ( operatorID == FISHER )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
+		  fisher(n, d, array1[i], "tests");
+	    }
+	  else
+	    {
+	      cdoAbort("Internal problem, operator not implemented!");
+	    }
+
 	  streamDefRecord(streamID2,  varID,  levelID);
-	  
-	  streamReadRecord(streamID1, array, &nmiss);
-	  streamWriteRecord(streamID2, array, nmiss);
+	  streamWriteRecord(streamID2, array2, nmiss);
 	}
 
       tsID++;
@@ -79,7 +159,8 @@ void *Tests(void *argument)
 
   vlistDestroy(vlistID2);
 
-  if ( array ) free(array);
+  if ( array1 ) free(array1);
+  if ( array2 ) free(array2);
 
   cdoFinish();
 
