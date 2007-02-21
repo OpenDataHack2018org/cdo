@@ -71,7 +71,7 @@ void *Seltime(void *argument)
   int year, month, day, hour, minute;
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
-  double selfval = 0, *fltarr, fval;
+  double selfval = 0, *fltarr, fval = 0;
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
@@ -157,6 +157,8 @@ void *Seltime(void *argument)
     }
   else if ( operatorID == SELDATE )
     {
+      int set2 = TRUE;
+
       nsel = operatorArgc();
       if ( nsel < 1 ) cdoAbort("Not enough arguments!");
       for ( i = 0; i < nsel; i++)
@@ -164,13 +166,16 @@ void *Seltime(void *argument)
 	  if      ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
 	    {
 	      if ( i == 0 )
-		listSetFlt(flist, i, -99999999999.);
+		fval = -99999999999.;
 	      else
-		listSetFlt(flist, i,  99999999999.);
+		fval =  99999999999.;
+
+	      listSetFlt(flist, i,  fval);
 	    }
 	  else if ( strchr(operatorArgv()[i], '-') == NULL )
 	    {
-	      listSetFlt(flist, i, atof(operatorArgv()[i]));
+	      fval = atof(operatorArgv()[i]);
+	      listSetFlt(flist, i, fval);
 	    }
 	  else
 	    {
@@ -178,7 +183,11 @@ void *Seltime(void *argument)
 	      if ( strchr(operatorArgv()[i], 'T') == NULL )
 		{
 		  status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
-		  listSetFlt(flist, i, year*10000 + month*100 + day);
+		  fval = year*10000 + month*100 + day;
+
+		  if ( nsel > 1 && i > 0 ) fval += 0.999;
+
+		  listSetFlt(flist, i, fval);
 		}
 	      else
 		{
@@ -188,8 +197,16 @@ void *Seltime(void *argument)
 		  if ( fabs(fval) > 0 ) fval /= 10000;
 		  fval += year*10000 + month*100 + day;
 		  listSetFlt(flist, i, fval);
+		  set2 = FALSE;
 		}
 	    }
+	}
+
+      if ( nsel == 1 && set2 == TRUE )
+	{
+	  fval += 0.999;
+	  listSetFlt(flist, nsel, fval);
+	  nsel = 2;
 	}
     }
   else if ( operatorID == SELTIME )
@@ -498,7 +515,8 @@ void *Seltime(void *argument)
 	    }
 	  else if ( operatorID == SELDATE )
 	    {
-	      cdoWarning("Date between %g and %g not found!", fltarr[0], fltarr[nsel-1]);
+	      if ( isel == 0 )
+		cdoWarning("Date between %14.4f and %14.4f not found!", fltarr[0], fltarr[nsel-1]);
 	    }
 	  else if ( operatorID == SELTIME )
 	    {
