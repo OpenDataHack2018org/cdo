@@ -107,11 +107,10 @@ case "${HOSTNAME}" in
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
-# powerpc-ibm-aix5.2.0.0
-# --with-netcdf=/rhome/for0adm (q32!)
+# powerpc-ibm-aix5.3.0.0
     p020et01)
 	./configure --prefix=$HOME/local \
-                    --with-netcdf=/uhome/mpikornb \
+                    --with-netcdf=/uhome/mpischul \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # hppa2.0w-hp-hpux11.11
