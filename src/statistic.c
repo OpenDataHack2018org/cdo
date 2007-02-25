@@ -31,7 +31,7 @@ eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
   int i, j;
   double temp;
 
-  e = malloc (n * sizeof (double));
+  e = (double *) malloc (n * sizeof (double));
 
   make_symmetric_matrix_triangular (a, n, eig_val, e, prompt);
 
@@ -263,7 +263,7 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
 	  g = (d[l + 1] - d[l]) / (2 * e[l]);
 	  r = pythagoras (g, 1);
 	  g = d[m] - d[l] + e[l] 
-            / (g + (g ? (g >= 0 ? fabs (r) : -fabs (r)) : r));
+            / (g + (fabs(g) > 0 ? (g >= 0 ? fabs (r) : -fabs (r)) : r));
 	  s = c = 1;
 	  p = 0;
 	  for (i = m - 1; i >= l; i--)

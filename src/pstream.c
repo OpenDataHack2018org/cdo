@@ -1134,7 +1134,7 @@ void cdoFinish(void)
 	  else
 	    fprintf(stderr, "%s: Processed %ld value%s from %d variable%s over %d timestep%s.",
 		    processInqPrompt(),
-		    nvals, nvals > 1 ? "s" : "",
+		    (long) nvals, nvals > 1 ? "s" : "",
 		    nvars, nvars > 1 ? "s" : "",
 		    ntimesteps, ntimesteps > 1 ? "s" : "");
 	}
