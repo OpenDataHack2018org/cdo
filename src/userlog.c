@@ -25,6 +25,23 @@
 #define  LOGSSIZE  32
 #define  LOGOSIZE  40
 
+
+static void filestatus(struct flock *lock)
+{
+  switch(lock->l_type) {
+    case F_UNLCK:
+      printf("Status: F_UNLCK\n");
+      break;
+    case F_RDLCK:
+      printf("Status: F_RDLCK (PID: %d)\n", lock->l_pid);
+      break;
+    case F_WRLCK:
+      printf("Status: F_WRLCK (PID: %d)\n", lock->l_pid);
+      break;
+  }
+}
+
+
 void cdolog(const char *prompt, double cputime)
 {
 #if defined (LOGPATH)
@@ -41,6 +58,7 @@ void cdolog(const char *prompt, double cputime)
   int len, slen, olen, pos;
   int loper;
   char logstring[MAX_LEN];
+  int i;
   int status;
   struct flock mylock;
 
@@ -102,13 +120,22 @@ void cdolog(const char *prompt, double cputime)
   mylock.l_start  = 0;
   mylock.l_len    = 0;
 
+  /*
   status = fcntl(logfileno, F_SETLKW, &mylock);
+  */
+  for ( i = 0; i < 100; i++ )
+    {
+      status = fcntl(logfileno, F_SETLK, &mylock);
+      if ( status == 0 ) break;
+      usleep(10000);
+    }
+
   if ( status == 0 )
     {
       write(logfileno, logstring, slen);
 
       mylock.l_type   = F_UNLCK;
-      status = fcntl(logfileno, F_SETLKW, &mylock);
+      status = fcntl(logfileno, F_SETLK, &mylock);
     }
 
   close(logfileno);
@@ -268,6 +295,7 @@ void cdologs(int noper)
   char timestr[30];
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
+  int i;
   int status;
   int date = 0, ncdo = 0, nhours = 0;
   int date0 = 0, ncdo0, noper0, nhours0;
@@ -315,12 +343,26 @@ void cdologs(int noper)
       return;
     }
 
+  /*
+    memset(&mylock, 0, sizeof(struct flock));
+    status = fcntl(logfileno, F_GETLK, &mylock);
+    filestatus(&mylock);
+  */
+
   mylock.l_type   = F_WRLCK;
   mylock.l_whence = SEEK_SET;
   mylock.l_start  = 0;
   mylock.l_len    = 0;
 
+  /*
   status = fcntl(logfileno, F_SETLKW, &mylock);
+  */
+  for ( i = 0; i < 100; i++ )
+    {
+      status = fcntl(logfileno, F_SETLK, &mylock);
+      if ( status == 0 ) break;
+      usleep(10000);
+    }
   errno = 0;
   if ( status != 0 ) goto endlabel;
 
@@ -371,7 +413,7 @@ void cdologs(int noper)
 
  endlabel:
 
-  mylock.l_type   = F_UNLCK;
+  mylock.l_type = F_UNLCK;
   status = fcntl(logfileno, F_SETLK, &mylock);
 
   close(logfileno);
@@ -404,6 +446,7 @@ void dumplogs(const char *logfilename)
   unsigned char *buffer = NULL;
   const size_t logsize = LOGSSIZE;
   size_t bufsize;
+  struct flock mylock;
   struct stat filestat;
 
   errno = 0;
@@ -414,6 +457,10 @@ void dumplogs(const char *logfilename)
       errno = 0;
       return;
     }
+
+  memset(&mylock, 0, sizeof(struct flock));
+  status = fcntl(logfileno, F_GETLK, &mylock);
+  filestatus(&mylock);
 
   status = fstat(logfileno, &filestat);
   errno = 0;
@@ -626,6 +673,7 @@ void cdologo(int noper)
 #define  STRING(x)	XSTRING(x)
   char logfilename[] = STRING(LOGPATH) "/cdo.logo";
   int  logfileno;
+  int i;
   int status;
   int nhours = 0;
   int nhours0 = 0;
@@ -643,7 +691,7 @@ void cdologo(int noper)
   struct flock mylock;
   struct stat filestat;
   int nocc = 0;
-  int i, nbuf;
+  int nbuf;
   int processID;
   off_t onvals[256];
   double ocputime[256];
@@ -671,7 +719,15 @@ void cdologo(int noper)
   mylock.l_start  = 0;
   mylock.l_len    = 0;
 
+  /*
   status = fcntl(logfileno, F_SETLKW, &mylock);
+  */
+  for ( i = 0; i < 100; i++ )
+    {
+      status = fcntl(logfileno, F_SETLK, &mylock);
+      if ( status == 0 ) break;
+      usleep(10000);
+    }
   errno = 0;
   if ( status != 0 ) goto endlabel;
 
@@ -734,7 +790,7 @@ void cdologo(int noper)
 
  endlabel:
 
-  mylock.l_type   = F_UNLCK;
+  mylock.l_type = F_UNLCK;
   status = fcntl(logfileno, F_SETLK, &mylock);
 
   close(logfileno);
@@ -767,6 +823,7 @@ void dumplogo(const char *logfilename)
   unsigned char *buffer = NULL;
   const size_t logsize = LOGOSIZE;
   size_t bufsize;
+  struct flock mylock;
   struct stat filestat;
 
   errno = 0;
@@ -777,6 +834,10 @@ void dumplogo(const char *logfilename)
       errno = 0;
       return;
     }
+
+  memset(&mylock, 0, sizeof(struct flock));
+  status = fcntl(logfileno, F_GETLK, &mylock);
+  filestatus(&mylock);
 
   status = fstat(logfileno, &filestat);
   errno = 0;
