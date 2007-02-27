@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -148,6 +148,7 @@ void *Sinfo(void *argument)
   int varID;
   int gridsize = 0;
   int gridID, zaxisID, code;
+  int zaxistype, ltype;
   int vdate, vtime;
   int nrecs, nvars, ngrids, nzaxis, ntsteps;
   int levelID, levelsize;
@@ -383,13 +384,18 @@ void *Sinfo(void *argument)
       for ( index = 0; index < nzaxis; index++)
 	{
 	  zaxisID   = vlistZaxis(vlistID, index);
+	  zaxistype = zaxisInqType(zaxisID);
+	  ltype     = zaxisInqLtype(zaxisID);
 	  levelsize = zaxisInqSize(zaxisID);
 	  /* zaxisInqLongname(zaxisID, longname); */
-	  zaxisName(zaxisInqType(zaxisID), longname);
+	  zaxisName(zaxistype, longname);
 	  longname[16] = 0;
 	  zaxisInqUnits(zaxisID, units);
 	  units[12] = 0;
-	  nbyte0    = fprintf(stdout, "  %4d : %-16s  %5s : ", zaxisID+1, longname, units);
+	  if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
+	    nbyte0    = fprintf(stdout, "  %4d : %-10s  (ltype=%3d) : ", zaxisID+1, longname, ltype);
+	  else
+	    nbyte0    = fprintf(stdout, "  %4d : %-16s  %5s : ", zaxisID+1, longname, units);
 	  nbyte = nbyte0;
 	  for ( levelID = 0; levelID < levelsize; levelID++ )
 	    {

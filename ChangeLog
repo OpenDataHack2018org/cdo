@@ -4,6 +4,7 @@
 	* Add docu for dv2uvl and uv2dvl
 	* New operator: read_e5ini (test version)
 	* taxisCopyTimestep: bug fix [report: Harald Anlauf]
+	* sinfo: print ltype for GRIB records on GENERIC zaxis
 	* seldate: bug fix [report: Michael Hofstätter]
 	* vlistCompare: check grid orientation for func_sft
 	* gradsdes: process only the first 2GB of a GRIB file

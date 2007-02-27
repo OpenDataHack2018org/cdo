@@ -523,7 +523,7 @@ int     gridToCurvilinear(int gridID);
 void    zaxisName(int zaxistype, char *gridname);
 
 /*      zaxisCreate: Create a vertical Z-axis */
-int     zaxisCreate(int leveltype, int size);
+int     zaxisCreate(int zaxistype, int size);
 
 /*      zaxisDestroy: Destroy a vertical Z-axis */
 void    zaxisDestroy(int zaxisID);
@@ -573,8 +573,11 @@ void    zaxisInqLongname(int zaxisID, char *longname);
 void    zaxisInqUnits(int zaxisID, char *units);
 
 void    zaxisDefPrec(int zaxisID, int prec);
-
 int     zaxisInqPrec(int zaxisID);
+
+void    zaxisDefLtype(int zaxisID, int ltype);
+int     zaxisInqLtype(int zaxisID);
+
 const double *zaxisInqLevelsPtr(int zaxisID);
 void    zaxisDefVct(int zaxisID, int size, const double *vct);
 int     zaxisInqVctSize(int zaxisID);
@@ -587,7 +590,7 @@ double  zaxisInqUbound(int zaxisID, int index);
 void    zaxisDefLbounds(int zaxisID, double *lbounds);
 void    zaxisDefUbounds(int zaxisID, double *ubounds);
 void    zaxisDefWeights(int zaxisID, double *weights);
-void    zaxisChangeType(int zaxisID, int leveltype);
+void    zaxisChangeType(int zaxisID, int zaxistype);
 
 /* TAXIS routines */
 
