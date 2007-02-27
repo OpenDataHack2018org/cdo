@@ -4584,8 +4584,8 @@ void remap_stat(REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, doub
 
   ns = 0;
   sum = 0;
-  minval = DBL_MAX;
-  maxval = DBL_MIN;
+  minval =  DBL_MAX;
+  maxval = -DBL_MAX;
   for ( n = 0; n < rg.grid1_size; n++ )
     {
       if ( !DBL_IS_EQUAL(array1[n], missval) )
@@ -4601,8 +4601,8 @@ void remap_stat(REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, doub
 
   ns = 0;
   sum = 0;
-  minval = DBL_MAX;
-  maxval = DBL_MIN;
+  minval =  DBL_MAX;
+  maxval = -DBL_MAX;
   for ( n = 0; n < rg.grid2_size; n++ )
     {
       if ( !DBL_IS_EQUAL(array2[n], missval) )

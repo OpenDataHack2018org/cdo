@@ -79,12 +79,14 @@ double fldmax(FIELD field)
 
   if ( nmiss > 0 )
     {
-      rmax = DBL_MIN;
-      for ( i = 0; i < len; i++ ) 
+      rmax = -DBL_MAX;
+      for ( i = 0; i < len; i++ )
+	{
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] > rmax ) rmax = array[i];
+	}
 
-      if ( DBL_IS_EQUAL(rmax, DBL_MIN) )
+      if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
 	rmax = missval;
     }
   else

@@ -92,12 +92,12 @@ void mermax(FIELD field1, FIELD *field2)
     {
       if ( nmiss > 0 )
 	{
-	  rmax = DBL_MIN;
+	  rmax = -DBL_MAX;
 	  for ( j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] > rmax ) rmax = array[j*nx+i];
 
-	  if ( DBL_IS_EQUAL(rmax, DBL_MIN) )
+	  if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
 	    {
 	      rnmiss++;
 	      rmax = missval;
