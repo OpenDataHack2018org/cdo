@@ -36,7 +36,7 @@ calculated from the triangular truncation by:
 
 
 @BeginOperator_sp2gpl
-@Title     = Spectral to gridpoint linear
+@Title     = Spectral to gridpoint (linear)
 
 @BeginDescription
 Convert all fields with spectral coefficients to regular gaussian
@@ -80,7 +80,7 @@ is calculated from the number of latitudes by:
 
 
 @BeginOperator_gp2spl
-@Title     = Gridpoint to spectral linear
+@Title     = Gridpoint to spectral (linear)
 
 @BeginDescription
 Convert all gaussian gridpoint fields to spectral coefficients.

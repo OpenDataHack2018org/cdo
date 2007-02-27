@@ -1,7 +1,9 @@
 2007-02-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.6
+	* Add docu for dv2uvl and uv2dvl
 	* New operator: read_e5ini (test version)
+	* taxisCopyTimestep: bug fix [report: Harald Anlauf]
 	* seldate: bug fix [report: Michael Hofstätter]
 	* vlistCompare: check grid orientation for func_sft
 	* gradsdes: process only the first 2GB of a GRIB file

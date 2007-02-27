@@ -296,9 +296,11 @@ void *Echam5ini(void *argument)
 
   if ( operatorID == READ_E5INI )
     {
-      VAR *vars;
+      VAR *vars = NULL;
 
       filetype = read_echam5ini(cdoStreamName(0), &vars);
+
+      if ( vars == NULL ) cdoAbort("Unsupported file type!");
       
       if ( filetype == filetype_ml )
 	nvars = nvars_ml+1;
