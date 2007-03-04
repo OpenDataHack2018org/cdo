@@ -214,14 +214,17 @@ void *Gradsdes(void *argument)
   double *levels, level0, levinc = 0;
   double missval = 0;
   char Time[30], Incr[10] = {"1mn"}, *IncrKey[] = {"mn","hr","dy","mo","yr"};
-  int imn, imns = 0, ihh, ihhs = 0, iyy, iyys = 0, imm, imms = 0, idd, idds = 0;
+  int imn, ihh, iyy, imm, idd;
+  int imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
+  int imn0 = 0, ihh0 = 0, iyy0 = 0, imm0 = 0, idd0 = 0;
   int idmn, idhh, idmm, idyy, iddd;
-  int dt=1, iik=0;
+  int dt=1, iik=0, mdt = 0;
   int gridsize = 0;
   long checksize = 0;
   int nmiss;
   int nrecsout = 0;
   int maxrecs = 0;
+  int monavg = -1;
   int *vars = NULL;
   int *recoffset = NULL;
   int *intnum = NULL;
@@ -590,8 +593,12 @@ void *Gradsdes(void *argument)
 	  idds =  vdate - iyys*10000 - imms*100;
      
 	  if ( imms < 1 || imms > 12 )  imms=1;
-	  sprintf (Time, "%02d:%02dZ%02d%s%04d",
-		   ihhs, imns, idds, cmons[imms-1], iyys);
+
+	  ihh0 = ihhs;
+	  imn0 = imns;
+	  iyy0 = iyys;
+	  imm0 = imms;
+	  idd0 = idds;
 	}
 
       if ( tsID == 1 )
@@ -634,7 +641,44 @@ void *Gradsdes(void *argument)
 	    }
 
 	  if ( dt <= 0 ) dt = 1;
-	  sprintf (Incr, "%d%s", dt, IncrKey[iik]);
+	}
+
+      if ( tsID > 0 && tsID < 6 && iik != 3 && (monavg == TRUE || monavg == -1) )
+	{
+	  ihh =  vtime / 100;
+	  imn =  vtime - ihh*100;
+	  iyy =  vdate / 10000;
+	  imm = (vdate - iyy*10000) / 100;
+	  idd =  vdate - iyy*10000 - imm*100;
+
+	  idmn = imn - imns;
+	  idhh = ihh - ihhs;
+	  iddd = idd - idds;
+	  idmm = imm - imms;
+	  idyy = iyy - iyys;
+
+	  if ( iddd < 0 ) iddd *= -1;
+	  if ( idyy > 0 ) idmm += idyy*12;
+
+	  if ( idmn == 0 && idhh == 0 && (iddd == 0 || idd > 27 ) &&
+	       idmm > 0 && (mdt == 0 || idmm == mdt) )
+	    {
+	      mdt = idmm;
+	      monavg = TRUE;
+	    }
+	  else
+	    {
+	      monavg = FALSE;
+	    }
+	  /*
+	  printf("monavg %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d\n",
+		 tsID, monavg, mdt, imm , imms, idmm, iyy, iyys, idyy, idd, idds, iddd);
+	  */
+          imns = imn;
+          ihhs = ihh;
+	  idds = idd;
+          imms = imm;
+          iyys = iyy;
 	}
 
       if ( filetype == FILETYPE_GRB )
@@ -847,6 +891,16 @@ void *Gradsdes(void *argument)
   free(levels);
 
   /* TDEF */
+
+  if ( monavg == TRUE )
+    {
+      dt = mdt;
+      iik = 3;
+      if ( idd0 > 28 ) idd0 = 1;
+    }
+
+  sprintf (Time, "%02d:%02dZ%02d%s%04d", ihh0, imn0, idd0, cmons[imm0-1], iyy0);
+  sprintf (Incr, "%d%s", dt, IncrKey[iik]);
   
   fprintf (gdp, "TDEF %d LINEAR %s %s\n", tsID, Time, Incr);
 
