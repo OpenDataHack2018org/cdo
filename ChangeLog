@@ -6,7 +6,7 @@
 	* taxisCopyTimestep: bug fix [report: Harald Anlauf]
 	* sinfo: print ltype for GRIB records on GENERIC zaxis
 	* seldate: bug fix [report: Michael Hofstätter]
-	* fldmax: bug fix if all values < 0 [report: Karin Meier-Fleischer]
+	* fldmax: bug fix if all values < 0 and missvals [report: Karin Meier-Fleischer]
 	* vlistCompare: check grid orientation for func_sft
 	* gradsdes: process only the first 2GB of a GRIB file
 	* Version 1.0.7 released

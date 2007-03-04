@@ -122,6 +122,6 @@ void    gridWrite(FILE *fp, int gridID);
 
 void printFiletype(int streamID, int vlistID);
 
-void job_submit(const char *expname, const char *jobfilename, const char *jobname);
+void job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath);
 
 #endif  /* _CDO_INT_H */

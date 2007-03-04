@@ -2,10 +2,23 @@
 #
 # default configuration options and compiler flags for different hosts
 #
+SGE_MODE=off
+SGE_SUFFIX=sge
+#
+CONFPATH=`echo $0 | cut -c 1-6`
+if [ "$CONFPATH" != "../../" ] ; then
+CONFPATH='./'
+fi
+#
 if test -z "$1" ; then
   HOSTNAME=`hostname`
 else
-  HOSTNAME=$1
+  if [ "$1" == "$SGE_SUFFIX" ] ; then
+    SGE_MODE=on
+    HOSTNAME=`hostname`
+  else
+    HOSTNAME=$1
+  fi
 fi
 #
 set -x
@@ -13,109 +26,118 @@ set -x
 case "${HOSTNAME}" in
 # ia64-xxx-linux
     ds*)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/pool/ia64/netcdf/netcdf-3.6.0-p1 \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias -DMIN_BUF_SIZE=4194304"
 	;;
     wasser*)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/home/dkrz/m214089/local/ia64 \
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # i686-suse-linux
     linux)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
                     --enable-dap --with-netcdf=$HOME/local \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
                     CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
 	;;
     gata)
 # opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
+        if [ "$SGE_MODE" == "off" ] ; then
+ 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
 	            --with-netcdf=/client \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/LINUX/include"  LIBS=$HOME/local/LINUX/lib/libsz.a \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+        else
+ 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
+                    --program-suffix=_${SGE_SUFFIX} \
+	            --with-netcdf=/client \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/LINUX/include -DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
+                    LIBS="$HOME/local/LINUX/lib/libsz.a -L/opt/gridware/sge/lib/lx24-x86 -ldrmaa -ldl -L/usr/lib -lcurl" \
+                    CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+        fi
 	;;
     regio01)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
+	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
 	            --with-netcdf=/client \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
 	;;
 # i386-pc-solaris2.10
     yun)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10-x86 \
+	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10-x86 \
                     --with-netcdf=/client \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris10-x86/include"  LIBS=$HOME/local/solaris10-x86/lib/libsz.a \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
 # sparc-sun-solaris2.10
     xxf)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
+	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
                     --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
                     CC=cc CFLAGS="-g -mt -fast"
 	;;
 # sparc-sun-solaris2.9
     executor | yang | yin)
-	./configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
+	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
                     --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include"  LIBS=$HOME/local/SUN/lib/libsz.a \
                     CC=cc CFLAGS="-g -mt -fast -xtarget=ultra3"
 	;;
 # sx6-nec-superux12.2
     cs*)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
          	    --with-netcdf=/pool/netcdf/netcdf-3.6.0-p1 \
 		    CC=c++ \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
     sx6)
-	./configure --host=sx6 --prefix=$HOME/local \
+	${CONFPATH}configure --host=sx6 --prefix=$HOME/local \
                     --with-netcdf=/pool/SX-6/netcdf/netcdf-3.6.0-p1 \
 		    CC=sxc++ AR=sxar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
     es)
-	./configure --host=sx6 --prefix=$HOME/local/ES \
+	${CONFPATH}configure --host=sx6 --prefix=$HOME/local/ES \
                     --with-netcdf=/S/n010/home010/c0148/local/SX \
 		    CC=esc++ AR=esar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
 # mips-sgi-irix6.5
     ecgate1)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
  	            --with-netcdf=/home/ms/spdekplb/hmk/include,/home/ms/spdekplb/hmk/lib64 \
 	            CC=cc CFLAGS="-O -64"
 	;;
 # 5000-fujitsu-uxpv4.1_ES
     vpp5*)
-	./configure --prefix=$HOME \
+	${CONFPATH}configure --prefix=$HOME \
 	            --with-netcdf=$HOME/PROJ \
 	            CC=vcc CFLAGS="-O -Wv,-m3 -K4"
 	;;
 # powerpc-ibm-aix5.2.0.0
     ecgate)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/home/ms/spdekplb/hmk/local/AIX \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix5.3.0.0
     hpc*)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/lib/netcdf-3.5.0/LP64 \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix5.3.0.0
     p020et01)
-	./configure --prefix=$HOME/local \
+	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/uhome/mpischul \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # hppa2.0w-hp-hpux11.11
     moon)
-        ./configure --prefix=$HOME/local \
+        ${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/S/n010/home010/c0148/local \
 	            CC=cc CFLAGS="-g -fast"
 	;;

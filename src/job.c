@@ -15,8 +15,10 @@
 
 #define  GRID_TMPDIR  "/opt/griddata/tmp"
 
+int ftpget(int flag, const char *url, const char *path, const char *target, const char *source);
+
 #if  defined  (HAVE_LIBDRMAA)
-static drmaa_job_template_t *create_job_template(const char *expname, const char *jobfilename, const char *jobname)
+static drmaa_job_template_t *create_job_template(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath)
 {
   static char func[] = "create_job_template";
   drmaa_job_template_t *job = NULL;
@@ -58,8 +60,11 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   len = len1+len2+2;
 
   output_path = (char *) malloc(len*sizeof(char));
+  /*
   strcpy(output_path, host);
   strcat(output_path, ":");
+  */
+  strcpy(output_path, ":");
   strcat(output_path, GRID_TMPDIR);
 
   /* need to allow chdir on execution host, not thread save! */
@@ -81,17 +86,17 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   drmaa_set_attribute(job, DRMAA_JS_STATE, "drmaa_active", NULL, 0);
 
   /* working directory on execution host */
-  drmaa_set_attribute(job, DRMAA_WD, GRID_TMPDIR, NULL, 0);
-  /* drmaa_set_attribute(job, DRMAA_WD, "/opt/griddata/tmp", NULL, 0); */
+  /* drmaa_set_attribute(job, DRMAA_WD, GRID_TMPDIR, NULL, 0); */
+  drmaa_set_attribute(job, DRMAA_WD, tmppath, NULL, 0);
 
   /* path for output */
-  drmaa_set_attribute(job, DRMAA_OUTPUT_PATH, output_path, NULL, 0);
+  /* drmaa_set_attribute(job, DRMAA_OUTPUT_PATH, output_path, NULL, 0); */
 
   /* join output/error file */
   drmaa_set_attribute(job, DRMAA_JOIN_FILES, "n", NULL, 0);
 
   /* transfer files */
-  drmaa_set_attribute(job, DRMAA_TRANSFER_FILES, "ieo", NULL, 0);
+  /* drmaa_set_attribute(job, DRMAA_TRANSFER_FILES, "ieo", NULL, 0); */
   
   /* some native SGE commands necessary */
   sprintf(attr, "-cwd -b n -q %s.q", expname);
@@ -115,7 +120,7 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
 
 
 #if  defined  (HAVE_LIBDRMAA)
-static int drmaa_submit(const char *expname, const char *jobfilename, const char *jobname)
+static int drmaa_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath)
 {
   char status[DRMAA_ERROR_STRING_BUFFER];
   char jobid[DRMAA_JOBNAME_BUFFER], jobout[DRMAA_JOBNAME_BUFFER];
@@ -141,7 +146,7 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 
   /* submit some sequential jobs */
 
-  if ( !(job = create_job_template(expname, jobfilename, jobname)) )
+  if ( !(job = create_job_template(expname, jobfilename, jobname, tmppath)) )
     {
       fprintf(stderr, "create_job_template() failed\n");
       return 1;
@@ -287,17 +292,31 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 
   {
     char commandline[1024];
+    char ftp_url[4096];
+    char outname[1024];
+    char errname[1024];
+    int status;
 
-    sprintf(commandline, "cat %s/%s.o%s | grep -v tty  | grep -v shell | grep -v SunOS | grep -v logout\n",
-	    GRID_TMPDIR, jobname, jobid);
-    system(commandline);
+    sprintf(ftp_url, "ftp://%s.zmaw.de", expname);
 
-    sprintf(commandline, "cat %s/%s.e%s | grep -v cannot | grep -v resize | grep -v rm\n",
-	    GRID_TMPDIR, jobname, jobid);
-    system(commandline);
+    sprintf(outname, "%s.o%s", jobname, jobid);
+    sprintf(errname, "%s.e%s", jobname, jobid);
 
-    sprintf(commandline, "rm -f %s/%s.o%s %s/%s.e%s\n",
-    GRID_TMPDIR, jobname, jobid, GRID_TMPDIR, jobname, jobid);
+    status = ftpget(0, ftp_url, ftppath, outname, outname);
+    if ( status == 0 )
+      {
+	sprintf(commandline, "cat %s | grep -v tty  | grep -v shell | grep -v SunOS | grep -v logout\n", outname);
+	system(commandline);
+      }
+
+    status = ftpget(0, ftp_url, ftppath, errname, errname);
+    if ( status == 0 )
+      {
+	sprintf(commandline, "cat %s | grep -v cannot | grep -v resize | grep -v rm\n", errname);
+	system(commandline);
+      }
+
+    sprintf(commandline, "rm -f %s %s\n", outname, errname);
     system(commandline);
   }
 
@@ -306,12 +325,12 @@ static int drmaa_submit(const char *expname, const char *jobfilename, const char
 #endif
 
 
-int job_submit(const char *expname, const char *jobfilename, const char *jobname)
+int job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath)
 {
   int status = 0;
 #if  defined  (HAVE_LIBDRMAA)
 
-  status = drmaa_submit(expname, jobfilename, jobname);
+  status = drmaa_submit(expname, jobfilename, jobname, tmppath, ftppath);
 #else
   fprintf(stderr, "DRMAA library not available!\n");
 #endif
@@ -565,6 +584,8 @@ void exp_run(int argc, char *argv[], char *cdoExpName)
   char ftpfile[1024];
   char ftppath[4096];
   char tmppath[4096];
+  char ftppath0[4096];
+  char tmppath0[4096];
   char tmpdir[1024];
   FILE *jobfilep, *ftpfilep;
   char *envstr;
@@ -634,6 +655,9 @@ void exp_run(int argc, char *argv[], char *cdoExpName)
   strcat(tmppath, "/");
   strcat(ftppath, "/");
 
+  strcpy(tmppath0, tmppath);
+  strcpy(ftppath0, ftppath);
+
   strcat(tmppath, tmpdir);
   strcat(ftppath, tmpdir);
 
@@ -689,7 +713,7 @@ void exp_run(int argc, char *argv[], char *cdoExpName)
       system(commandline);
     }
 
-  status = job_submit(cdoExpName, jobfilename, jobname);
+  status = job_submit(cdoExpName, jobfilename, jobname, tmppath0, ftppath0);
   if ( status != 0 )
     {
       fprintf(stderr, "Abort: %s job failed!\n", cdoExpName);
