@@ -115,6 +115,19 @@ static void version(void)
 #if defined (COMP_VERSION)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
 #endif
+#if defined (HAVE_LIBSZ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL)
+  fprintf(stderr, "    with:");
+#if defined (HAVE_LIBSZ)
+  fprintf(stderr, " libsz");
+#endif
+#if defined (HAVE_LIBDRMAA)
+  fprintf(stderr, " libdrmaa");
+#endif
+#if defined (HAVE_LIBCURL)
+  fprintf(stderr, " libcurl");
+#endif
+  fprintf(stderr, "\n");
+#endif
 #if defined (USER_NAME) && defined(HOST_NAME)
   fprintf(stderr, "Compiled: by %s on %s %s %s\n", USER_NAME, HOST_NAME, __DATE__, __TIME__);
 #endif

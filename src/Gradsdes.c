@@ -896,7 +896,7 @@ void *Gradsdes(void *argument)
     {
       dt = mdt;
       iik = 3;
-      if ( idd0 > 28 ) idd0 = 1;
+      /* if ( idd0 > 28 ) idd0 = 1; */
     }
 
   sprintf (Time, "%02d:%02dZ%02d%s%04d", ihh0, imn0, idd0, cmons[imm0-1], iyy0);

@@ -1,10 +1,18 @@
 CDO NEWS
 --------
 
-Version 1.0.7 (?? January 2007):
+Version 1.0.7 (8 March 2007):
 
    * New operators:
+      o Divergence and vorticity to U and V wind (linear) - dv2uvl
+      o U and V wind to divergence and vorticity (linear) - uv2dvl
       o Select single month - selsmon
+   * Changed operators:
+      o tchill is renamed to wct
+      o eca_strwind is split into eca_strwin, eca_strbre, eca_strgal and eca_hurr
+   * Fixed bugs:
+      o fldmax has had wrong results if the field has
+        missing values and all other values are less than zero.
 
 Version 1.0.6 (12 December 2006):
 
