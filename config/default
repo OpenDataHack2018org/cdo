@@ -98,14 +98,14 @@ case "${HOSTNAME}" in
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
                     --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
-                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include"  LIBS=$HOME/local/SUN/lib/libsz.a \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris8/include"  LIBS=$HOME/local/solaris8/lib/libsz.a \
                     CC=cc CFLAGS="-g -mt -fast -xtarget=ultra3"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
                     --program-suffix=_${SGE_SUFFIX} \
                     --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
-                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/SUN/include -DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/local/include" \
-                    LIBS="$HOME/local/SUN/lib/libsz.a  -L/opt/gridware/sge/lib/sol-sparc -ldrmaa -ldl -L/usr/local/lib -lcurl" \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris8/include -DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/local/include" \
+                    LIBS="$HOME/local/solaris8/lib/libsz.a  -L/opt/gridware/sge/lib/sol-sparc -ldrmaa -ldl -L/usr/local/lib -lcurl" \
                     CC=cc CFLAGS="-g -mt -fast -xtarget=ultra3"
         fi
 	;;
@@ -147,17 +147,18 @@ case "${HOSTNAME}" in
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
-# powerpc-ibm-aix5.3.0.0
+# powerpc-ibm-aix6.0.0.0
     hpc*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/lib/netcdf-3.5.0/LP64 \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
 	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
-# powerpc-ibm-aix5.3.0.0
-    p020et01)
+# powerpc-ibm-aix6.0.0.0
+    dwd)
+    p???et01)
 	${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/uhome/mpischul \
+                    --with-netcdf=/uhome/mpischul/local \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # hppa2.0w-hp-hpux11.11
