@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selvar delvar selstdname sellevel selgrid selgridname selzaxis selzaxisname seltabnum selrec
+@Operators = selcode delcode selvar delvar selstdname sellevel selgrid selgridname selzaxis selzaxisname selltype seltabnum selrec
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -114,6 +114,16 @@ Selects all fields with zaxis names in a user given list.
 @EndOperator
 
 
+@BeginOperator_selltype
+@Title     = Select GRIB level types
+@Parameter = ltypes
+
+@BeginDescription
+Selects all fields with GRIB level type in a user given list.
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_seltabnum
 @Title     = Select parameter table numbers
 @Parameter = tabnums
@@ -144,6 +154,8 @@ STRING   Comma separated list of variable names
 STRING   Comma separated list of standard names
 @Item = levels
 FLOAT    Comma separated list of levels
+@Item = ltypes
+INTEGER  Comma separated list of GRIB level types
 @Item = grids
 INTEGER  Comma separated list of grid numbers
 @Item = gridnames

@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = showformat showcode showvar showstdname showlevel showyear showmon showdate showtime
+@Operators = showformat showcode showvar showstdname showlevel showltype showyear showmon showdate showtime
 
 @BeginDescription
 This module prints, according to the actual operator,
@@ -55,6 +55,15 @@ Prints the standard name of all different variables.
 @Title     = Show levels
 @BeginDescription
 Prints all levels for each variable.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showltype
+
+@Title     = Show GRIB level types
+@BeginDescription
+Prints the GRIB level type for all different z-axis.
 @EndDescription
 @EndOperator
 

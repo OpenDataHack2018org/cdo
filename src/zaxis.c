@@ -397,14 +397,35 @@ void defineZaxis(const char *zaxisarg)
 }
 
 
+int zaxis2ltype(int zaxisID)
+{
+  int ltype;
+  int zaxistype;
+
+  zaxistype = zaxisInqType(zaxisID);
+
+  ltype = zaxisInqLtype(zaxisID);
+
+  if ( ltype <= 0 ) ltype = ztype2ltype(zaxistype);
+
+  return (ltype);
+}
+
+
 int ztype2ltype(int zaxistype)
 {
   int ltype;
 
   ltype = -1;
-  if      ( zaxistype == ZAXIS_HEIGHT   )  ltype = 105;
-  else if ( zaxistype == ZAXIS_PRESSURE )  ltype = 100;
-  else if ( zaxistype == ZAXIS_SURFACE  )  ltype =   0;
+  if      ( zaxistype == ZAXIS_SURFACE           )  ltype =   1;
+  else if ( zaxistype == ZAXIS_PRESSURE          )  ltype = 100;
+  else if ( zaxistype == ZAXIS_ALTITUDE          )  ltype = 103;
+  else if ( zaxistype == ZAXIS_HEIGHT            )  ltype = 105;
+  else if ( zaxistype == ZAXIS_SIGMA             )  ltype = 107;
+  else if ( zaxistype == ZAXIS_HYBRID            )  ltype = 109;
+  else if ( zaxistype == ZAXIS_DEPTH_BELOW_LAND  )  ltype = 111;
+  else if ( zaxistype == ZAXIS_ISENTROPIC        )  ltype = 113;
+  else if ( zaxistype == ZAXIS_DEPTH_BELOW_SEA   )  ltype = 160;
   else cdoWarning("zaxis type %d not supported", zaxistype);
 
   return (ltype);
@@ -415,9 +436,16 @@ int ltype2ztype(int ltype)
 {
   int zaxistype = -1;
 
-  if      ( ltype == 105 ) zaxistype = ZAXIS_HEIGHT;
-  else if ( ltype == 100 ) zaxistype = ZAXIS_PRESSURE;
+  if      ( ltype ==   1 ) zaxistype = ZAXIS_SURFACE;
   else if ( ltype ==   0 ) zaxistype = ZAXIS_SURFACE;
+  else if ( ltype == 100 ) zaxistype = ZAXIS_PRESSURE;
+  else if ( ltype == 103 ) zaxistype = ZAXIS_ALTITUDE;
+  else if ( ltype == 105 ) zaxistype = ZAXIS_HEIGHT;
+  else if ( ltype == 107 ) zaxistype = ZAXIS_SIGMA;
+  else if ( ltype == 109 ) zaxistype = ZAXIS_HYBRID;
+  else if ( ltype == 111 ) zaxistype = ZAXIS_DEPTH_BELOW_LAND;
+  else if ( ltype == 113 ) zaxistype = ZAXIS_ISENTROPIC;
+  else if ( ltype == 160 ) zaxistype = ZAXIS_DEPTH_BELOW_SEA;
   else cdoWarning("GRIB level type %d not supported", ltype);
 
   return (zaxistype);

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@ void *Seloperator(void *argument)
   int nvars, nlevs, code, zaxisID, selfound = FALSE;
   int levID, ltype = 0;
   int varID2, levelID2;
-  int sellevel, selcode, selltype, zaxistype;
+  int sellevel, selcode, selltype;
   int lcopy = FALSE;
   int gridsize, nmiss;
   double *array = NULL;
@@ -64,9 +64,8 @@ void *Seloperator(void *argument)
       code    = vlistInqVarCode(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
       nlevs   = zaxisInqSize(zaxisID);
-      zaxistype = zaxisInqType(zaxisID);
 
-      ltype = ztype2ltype(zaxistype);
+      ltype = zaxis2ltype(zaxisID);
 
       for ( levID = 0; levID < nlevs; levID++ )
 	{

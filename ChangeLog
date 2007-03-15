@@ -1,3 +1,10 @@
+2007-05-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.0.7
+	* replace ztype2ltype with zaxis2ltype
+	* selltype: extent to all ltypes (request: Patrick Samuelsson)
+	* Version 1.0.8 released
+
 2007-03-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.6

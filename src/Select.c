@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -75,7 +75,7 @@ void *Select(void *argument)
   int nmiss;
   double *array = NULL;
   int taxisID1, taxisID2;
-  int zaxistype, ltype;
+  int ltype;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
 
@@ -257,9 +257,7 @@ void *Select(void *argument)
 		}
 	      else if ( operatorID == SELLTYPE )
 		{
-		  zaxistype = zaxisInqType(zaxisID);
-
-		  ltype = ztype2ltype(zaxistype);
+		  ltype = zaxis2ltype(zaxisID);
 
 		  if ( intarr[isel] == ltype )
 		    {

@@ -26,6 +26,7 @@ Operator catalog:
       Showinfo   showvar         Show variable names
       Showinfo   showstdname     Show standard names
       Showinfo   showlevel       Show levels
+      Showinfo   showltype       Show GRIB level types
       Showinfo   showyear        Show years
       Showinfo   showmon         Show months
       Showinfo   showdate        Show dates
@@ -61,6 +62,7 @@ Operator catalog:
       Select     delvar          Delete variables
       Select     selstdname      Select standard names
       Select     sellevel        Select levels
+      Select     selltype        Select GRIB level types
       Select     selgrid         Select grids
       Select     selgridname     Select grids by name
       Select     selzaxis        Select zaxes
