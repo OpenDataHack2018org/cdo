@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -446,7 +446,7 @@ int ltype2ztype(int ltype)
   else if ( ltype == 111 ) zaxistype = ZAXIS_DEPTH_BELOW_LAND;
   else if ( ltype == 113 ) zaxistype = ZAXIS_ISENTROPIC;
   else if ( ltype == 160 ) zaxistype = ZAXIS_DEPTH_BELOW_SEA;
-  else cdoWarning("GRIB level type %d not supported", ltype);
+  else                     zaxistype = ZAXIS_GENERIC;
 
   return (zaxistype);
 }

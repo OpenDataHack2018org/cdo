@@ -1,6 +1,12 @@
 CDO NEWS
 --------
 
+Version 1.0.8 (?? May 2007):
+
+   * New operators:
+      o Show GRIB level types - showltype
+      o Select GRIB level types - selltype
+
 Version 1.0.7 (8 March 2007):
 
    * New operators:
