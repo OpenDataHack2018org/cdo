@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setpartab setcode setvar setlevel
+@Operators = setpartab setcode setvar setlevel setltype
 
 @BeginDescription
 This module sets some field information. Depending on the actual
@@ -55,6 +55,16 @@ Sets the first level of all variables.
 @EndOperator
 
 
+@BeginOperator_setltype
+@Title     = Set GRIB level type
+@Parameter = ltype
+
+@BeginDescription
+Sets the GRIB level type of all variables.
+@EndDescription
+@EndOperator
+
+
 @BeginParameter
 @Item = table
 STRING   Parameter table file or name
@@ -64,6 +74,8 @@ INTEGER  Code number
 STRING   Variable name
 @Item = level
 FLOAT    New level
+@Item = ltype
+INTEGER  GRIB level type
 @EndParameter
 
 

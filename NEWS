@@ -6,6 +6,7 @@ Version 1.0.8 (?? May 2007):
    * New operators:
       o Show GRIB level types - showltype
       o Select GRIB level types - selltype
+      o Set GRIB level type - setltype
 
 Version 1.0.7 (8 March 2007):
 

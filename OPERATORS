@@ -62,11 +62,11 @@ Operator catalog:
       Select     delvar          Delete variables
       Select     selstdname      Select standard names
       Select     sellevel        Select levels
-      Select     selltype        Select GRIB level types
       Select     selgrid         Select grids
       Select     selgridname     Select grids by name
       Select     selzaxis        Select zaxes
       Select     selzaxisname    Select zaxes by name
+      Select     selltype        Select GRIB level types
       Select     seltabnum       Select parameter table numbers
       Select     selrec          Select records
       Seltime    seltimestep     Select time steps
@@ -110,6 +110,7 @@ Operator catalog:
       Set        setcode         Set code number
       Set        setvar          Set variable name
       Set        setlevel        Set level
+      Set        setltype        Set GRIB level type
       Settime    setdate         Set date
       Settime    settime         Set time
       Settime    setday          Set day
