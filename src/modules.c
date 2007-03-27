@@ -63,6 +63,7 @@ void *Gradsdes(void *argument);
 void *Histogram(void *argument);
 void *Info(void *argument);
 void *Input(void *argument);
+void *Inteta(void *argument);
 void *Intgrid(void *argument);
 void *Intgridtraj(void *argument);
 void *Inttime(void *argument);
@@ -236,6 +237,7 @@ void *Wct(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
+#define  IntetaOperators        {"hetaeta"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
