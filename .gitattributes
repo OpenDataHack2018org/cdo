@@ -349,7 +349,6 @@ src/fieldzon.c -text
 src/fourier.c -text
 src/functs.h -text
 src/grid.c -text
-src/hetaeta.c -text
 src/history.c -text
 src/institution.c -text
 src/interpol.c -text

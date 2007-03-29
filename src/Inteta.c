@@ -52,6 +52,7 @@ const double g = 9.81;
 
 FILE *old, *new;
 
+/* Source from Luis Kornblueh */
 void interpolate_linear(int n, double *xa, double *ya, double x, double *y)
 {
   int klo, khi, k;
@@ -75,6 +76,7 @@ void interpolate_linear(int n, double *xa, double *ya, double x, double *y)
   return;
 }
 
+/* Source from Luis Kornblueh */
 double esat(double temperature)
 {
   double zes;
@@ -92,7 +94,7 @@ double esat(double temperature)
   return es;
 }
 
-
+/* Source from Luis Kornblueh */
 void hetaeta(int in_nlev, double *in_ah, double *in_bh,
              double in_fis, double in_ps, 
              double *in_t, double *in_q, double *in_u,   double *in_v,  double *in_cl,double *in_ci, double *in_cc,
@@ -102,6 +104,7 @@ void hetaeta(int in_nlev, double *in_ah, double *in_bh,
 	     double *cl, double *ci, double *cc,
 	     double *tscor, double *pscor, double *secor)
 {
+  static char func[] = "hetaeta";
   double epsm1i, zdff, zdffl, ztv, zb, zbb, zc, zps;
   double zsump, zsumpp, zsumt, zsumtp;
   double dfi, fiadj, dteta;
@@ -581,7 +584,7 @@ int main (int argc, char *argv[])
 void *Inteta(void *argument)
 {
   static char func[] = "Inteta";
-  int ML2PL, ML2HL;
+  int INTETA;
   int operatorID;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
@@ -590,11 +593,11 @@ void *Inteta(void *argument)
   int i, offset;
   int tsID, varID, levelID;
   int nvars;
-  int zaxisIDp, zaxisIDh = -1, nzaxis;
+  int zaxisID2, zaxisIDh = -1, nzaxis;
   int ngrids, gridID, zaxisID;
   int nplev, nhlev = 0, nhlevp1 = 0, nlevel, maxlev;
   int *vert_index = NULL;
-  int nvct;
+  int nvct1, nvct2;
   int geop_needed = FALSE;
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1/*, gheightID = -1*/;
   int code;
@@ -602,7 +605,7 @@ void *Inteta(void *argument)
   int *varinterp = NULL;
   char varname[128];
   double missval;
-  double *plev = NULL, *phlev = NULL, *vct = NULL;
+  double *plev = NULL, *phlev = NULL;
   double *single1, *single2;
   double **vardata1 = NULL, **vardata2 = NULL;
   double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
@@ -611,30 +614,69 @@ void *Inteta(void *argument)
   int taxisID1, taxisID2;
   int lhavevct;
   LIST *flist = listNew(FLT_LIST);
+  int nlev1, nlev2;
+  double *vct1 = NULL, *vct2 = NULL;
+  double *a1 = NULL, *b1 = NULL, *a2 = NULL, *b2 = NULL;
+  double fis1, ps1, *t1, *q1, *u1, *v1, *cl1, *ci1, *cc1;
+  double fis2, ps2, *t2, *q2, *u2, *v2, *cl2, *ci2, *cc2;
+  double tscor, pscor, secor; 
 
   cdoInitialize(argument);
 
-  ML2PL = cdoOperatorAdd("ml2pl", 0, 0, "pressure levels in pascal");
-  ML2HL = cdoOperatorAdd("ml2hl", 0, 0, "height levels in meter");
+  INTETA = cdoOperatorAdd("inteta", 0, 0, "VCT file name");
 
   operatorID = cdoOperatorID();
 
-  envstring = getenv("EXTRAPOLATE");
-
-  if ( envstring )
-    {
-      if ( isdigit((int) envstring[0]) )
-	{
-	  Extrapolate = atoi(envstring);
-	  if ( Extrapolate == 1 )
-	    cdoPrint("Extrapolation of missing values enabled!");
-	}
-    }
-
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  nplev = args2fltlist(operatorArgc(), operatorArgv(), flist);
-  plev  = (double *) listArrayPtr(flist);
+  if ( operatorID == INTETA )
+    {
+      const char *fname = operatorArgv()[0];
+      char line[1024], *pline;
+      int num, i = 0;
+      int maxvct = 8192;
+      
+      FILE *fp;
+
+      fp = fopen(fname, "r");
+      if ( fp == NULL ) perror(fname);
+
+      vct2 = (double *) malloc(maxvct*sizeof(double));
+
+      while ( readline(fp, line, 1024) )
+	{
+          if ( line[0] == '#' ) continue;
+          if ( line[0] == '\0' ) continue;
+
+	  pline = line;
+	  num = (int) strtod(pline, &pline);
+	  if ( pline == NULL ) cdoAbort("Format error in VCT file %s!", fname);
+	  if ( num != i ) cdoWarning("Inconsistent VCT file, entry %d is %d.", i, num);
+
+	  vct2[i] = strtod(pline, &pline);
+	  if ( pline == NULL ) cdoAbort("Format error in VCT file %s!", fname);
+
+	  vct2[i+maxvct/2] = strtod(pline, &pline);
+
+	  i++;
+	}
+
+      fclose(fp);
+
+      a2 = vct2;
+      b2 = vct2 + i;
+      nvct2 = 2*i;
+      nlev2 = i - 1;
+
+      for ( i = 0; i < nlev2+1; ++i )
+	vct2[i+nvct2/2] = vct2[i+maxvct/2];
+
+      vct2 = (double *) realloc(vct2, 2*i*sizeof(double));
+
+      if ( cdoVerbose )
+	for ( i = 0; i < nlev2+1; ++i )
+	  fprintf(stdout, "vct2: %5d %25.17f %25.17f\n", i, vct2[i], vct2[nvct2/2+i]);
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -668,12 +710,9 @@ void *Inteta(void *argument)
 	}
     }
 
-  if ( operatorID == ML2HL )
-    zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
-  else
-    zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
+  zaxisID2 = zaxisCreate(ZAXIS_HEIGHT, nlev2);
+  zaxisDefVct(zaxisID2, nvct2, vct2);
 
-  zaxisDefLevels(zaxisIDp, plev);
   nzaxis  = vlistNzaxis(vlistID1);
   lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
@@ -682,8 +721,8 @@ void *Inteta(void *argument)
       nlevel  = zaxisInqSize(zaxisID);
       if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
 	{
-	  nvct = zaxisInqVctSize(zaxisID);
-	  if ( nlevel == (nvct/2 - 1) )
+	  nvct1 = zaxisInqVctSize(zaxisID);
+	  if ( nlevel == (nvct1/2 - 1) )
 	    {
 	      if ( lhavevct == FALSE )
 		{
@@ -692,15 +731,21 @@ void *Inteta(void *argument)
 		  nhlev    = nlevel;
 		  nhlevp1  = nhlev + 1;
 	      
-		  vct = (double *) malloc(nvct*sizeof(double));
-		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		  vct1 = (double *) malloc(nvct1*sizeof(double));
+		  memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
 
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+		  vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
+
+		  a1 = vct1;
+		  b1 = vct1 + nvct1/2;
+		  if ( cdoVerbose )
+		    for ( i = 0; i < nvct1/2; ++i )
+		      fprintf(stdout, "vct1: %5d %25.17f %25.17f\n", i, vct1[i], vct1[nvct1/2+i]);
 		}
 	      else
 		{
-		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+		  if ( memcmp(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double)) == 0 )
+		    vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 		}
 	    }
 	}
@@ -732,7 +777,7 @@ void *Inteta(void *argument)
     }
   else
     cdoWarning("No data on hybrid model level found!");
-
+  /*
   if ( operatorID == ML2HL )
     {
       phlev = (double *) malloc(nplev*sizeof(double));
@@ -740,7 +785,7 @@ void *Inteta(void *argument)
       memcpy(plev, phlev, nplev*sizeof(double));
       free(phlev);
     }
-
+  */
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID  = vlistInqVarGrid(vlistID1, varID);
@@ -854,7 +899,7 @@ void *Inteta(void *argument)
 	      cdoWarning("surface pressure out of range (min=%g max=%g)\n", minval, maxval);
 	  }
 
-	  presh(full_press, half_press, vct, ps_prog, nhlev, ngp);
+	  presh(full_press, half_press, vct1, ps_prog, nhlev, ngp);
 
 	  genind(vert_index, plev, full_press, ngp, nplev, nhlev);
 
@@ -887,8 +932,16 @@ void *Inteta(void *argument)
 	      */
 	      else
 		{
-		  interp_X(vardata1[varID], vardata2[varID], full_press,
-			   vert_index, plev, nplev, ngp, nlevel, missval);
+		  hetaeta(nlev1, a1, b1,
+			  fis1, ps1,
+			  t1, q1, u1, v1, cl1, ci1, cc1,
+			  nlev2, a2, b2,
+			  fis2, &ps2,
+			  t2, q2, u2, v2, cl2, ci2, cc2,
+			  &tscor, &pscor, &secor);
+  /*
+		  (vardata1[varID], vardata2[varID], full_press,
+		  vert_index, plev, nplev, ngp, nlevel, missval);*/
 		}
 
 	      if ( Extrapolate == 0 )
@@ -934,7 +987,8 @@ void *Inteta(void *argument)
   if ( vert_index ) free(vert_index);
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
-  if ( vct        ) free(vct);
+  if ( vct1       ) free(vct1);
+  if ( vct2       ) free(vct2);
 
   listDelete(flist);
 

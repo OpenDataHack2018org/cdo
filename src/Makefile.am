@@ -127,7 +127,6 @@ cdo_SOURCES = Arith.c		\
               fieldmer.c  	\
               fieldzon.c  	\
               grid.c		\
-              hetaeta.c		\
               history.c		\
               institution.c 	\
               interpol.c 	\

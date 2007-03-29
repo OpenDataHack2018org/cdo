@@ -237,7 +237,7 @@ void *Wct(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntetaOperators        {"hetaeta"}
+#define  IntetaOperators        {"inteta"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
@@ -433,6 +433,7 @@ static MODULES Modules[] =
   { Histogram,      NULL,              HistogramOperators,      1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
+  { Inteta,         NULL,              IntetaOperators,         1,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,    1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,        1,  1 },
