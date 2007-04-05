@@ -595,7 +595,7 @@ void *Inteta(void *argument)
   int nvars;
   int zaxisID2, zaxisIDh = -1, nzaxis;
   int ngrids, gridID, zaxisID;
-  int nplev, nhlev = 0, nhlevp1 = 0, nlevel, maxlev;
+  int nlevel, maxlev;
   int *vert_index = NULL;
   int nvct1, nvct2;
   int geop_needed = FALSE;
@@ -614,7 +614,8 @@ void *Inteta(void *argument)
   int taxisID1, taxisID2;
   int lhavevct;
   LIST *flist = listNew(FLT_LIST);
-  int nlev1, nlev2;
+  int nlev1, nlev2, nlev2p1;
+  double *lev2;
   double *vct1 = NULL, *vct2 = NULL;
   double *a1 = NULL, *b1 = NULL, *a2 = NULL, *b2 = NULL;
   double fis1, ps1, *t1, *q1, *u1, *v1, *cl1, *ci1, *cc1;
@@ -667,6 +668,7 @@ void *Inteta(void *argument)
       b2 = vct2 + i;
       nvct2 = 2*i;
       nlev2 = i - 1;
+      nlev2p1 = nlev2 + 1;
 
       for ( i = 0; i < nlev2+1; ++i )
 	vct2[i+nvct2/2] = vct2[i+maxvct/2];
@@ -710,7 +712,11 @@ void *Inteta(void *argument)
 	}
     }
 
-  zaxisID2 = zaxisCreate(ZAXIS_HEIGHT, nlev2);
+  zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nlev2);
+  lev2 = (double *) malloc(nlev2*sizeof(double));
+  for ( i = 0; i < nlev2; ++i ) lev2[i] = i+1;
+  zaxisDefLevels(zaxisID2, lev2);
+  free(lev2);
   zaxisDefVct(zaxisID2, nvct2, vct2);
 
   nzaxis  = vlistNzaxis(vlistID1);
@@ -728,8 +734,7 @@ void *Inteta(void *argument)
 		{
 		  lhavevct = TRUE;
 		  zaxisIDh = zaxisID;
-		  nhlev    = nlevel;
-		  nhlevp1  = nhlev + 1;
+		  nlev1    = nlevel;
 	      
 		  vct1 = (double *) malloc(nvct1*sizeof(double));
 		  memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
@@ -763,26 +768,26 @@ void *Inteta(void *argument)
   varnmiss  = (int **) malloc(nvars*sizeof(int*));
   varinterp = (int *) malloc(nvars*sizeof(int));
 
-  maxlev   = nhlev > nplev ? nhlev : nplev;
+  maxlev   = nlev1 > nlev2 ? nlev1 : nlev2;
 
   if ( Extrapolate == 0 )
-    pnmiss   = (int *) malloc(nplev*sizeof(int));
+    pnmiss   = (int *) malloc(nlev2*sizeof(int));
 
   if ( zaxisIDh != -1 && ngp > 0 )
     {
-      vert_index = (int *) malloc(ngp*nplev*sizeof(int));
+      vert_index = (int *) malloc(ngp*nlev2*sizeof(int));
       ps_prog    = (double *) malloc(ngp*sizeof(double));
-      full_press = (double *) malloc(ngp*nhlev*sizeof(double));
-      half_press = (double *) malloc(ngp*nhlevp1*sizeof(double));
+      full_press = (double *) malloc(ngp*nlev2*sizeof(double));
+      half_press = (double *) malloc(ngp*nlev2p1*sizeof(double));
     }
   else
     cdoWarning("No data on hybrid model level found!");
   /*
   if ( operatorID == ML2HL )
     {
-      phlev = (double *) malloc(nplev*sizeof(double));
-      h2p(phlev, plev, nplev);
-      memcpy(plev, phlev, nplev*sizeof(double));
+      phlev = (double *) malloc(nlev2*sizeof(double));
+      h2p(phlev, plev, nlev2);
+      memcpy(plev, phlev, nlev2*sizeof(double));
       free(phlev);
     }
   */
@@ -821,10 +826,10 @@ void *Inteta(void *argument)
       nlevel   = zaxisInqSize(zaxisID);
       vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
 
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel > 1 )
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel > 1 && nlevel == nlev1 )
 	{
 	  varinterp[varID] = TRUE;
-	  vardata2[varID]  = (double *) malloc(gridsize*nplev*sizeof(double));
+	  vardata2[varID]  = (double *) malloc(gridsize*nlev2*sizeof(double));
 	  varnmiss[varID]  = (int *) malloc(maxlev*sizeof(int));
 	}
       else
@@ -857,6 +862,22 @@ void *Inteta(void *argument)
       else
 	cdoAbort("Surface pressure not found!");
     }
+
+  t1 = (double *) malloc(nlev1*sizeof(double));
+  q1 = (double *) malloc(nlev1*sizeof(double));
+  u1 = (double *) malloc(nlev1*sizeof(double));
+  v1 = (double *) malloc(nlev1*sizeof(double));
+  cl1 = (double *) malloc(nlev1*sizeof(double));
+  ci1 = (double *) malloc(nlev1*sizeof(double));
+  cc1 = (double *) malloc(nlev1*sizeof(double));
+
+  t2 = (double *) malloc(nlev2*sizeof(double));
+  q2 = (double *) malloc(nlev2*sizeof(double));
+  u2 = (double *) malloc(nlev2*sizeof(double));
+  v2 = (double *) malloc(nlev2*sizeof(double));
+  cl2 = (double *) malloc(nlev2*sizeof(double));
+  ci2 = (double *) malloc(nlev2*sizeof(double));
+  cc2 = (double *) malloc(nlev2*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -898,13 +919,14 @@ void *Inteta(void *argument)
 	    if ( minval < 20000 || maxval > 150000 )
 	      cdoWarning("surface pressure out of range (min=%g max=%g)\n", minval, maxval);
 	  }
+	  /*
+	  presh(full_press, half_press, vct1, ps_prog, nlev1, ngp);
 
-	  presh(full_press, half_press, vct1, ps_prog, nhlev, ngp);
-
-	  genind(vert_index, plev, full_press, ngp, nplev, nhlev);
+	  genind(vert_index, plev, full_press, ngp, nlev2, nlev1);
 
 	  if ( Extrapolate == 0 )
-	    genindmiss(vert_index, plev, ngp, nplev, ps_prog, pnmiss);
+	    genindmiss(vert_index, plev, ngp, nlev2, ps_prog, pnmiss);
+	  */
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -916,22 +938,36 @@ void *Inteta(void *argument)
 	  nlevel   = zaxisInqSize(zaxisID);
 	  if ( varinterp[varID] )
 	    {
+	      /*
 	      if ( varID == tempID )
 		{
 		  interp_T(geop, vardata1[varID], vardata2[varID],
 			   full_press, half_press, vert_index,
-			   plev, nplev, ngp, nlevel, missval);
+			   plev, nlev2, ngp, nlevel, missval);
 		}
-	      /*
 	      else if ( varID == gheightID )
 		{
 		  interp_Z(geop, vardata1[varID], vardata2[varID],
 			   full_press, half_press, vert_index, vardata1[tempID],
-			   plev, nplev, ngp, nlevel, missval);
+			   plev, nlev2, ngp, nlevel, missval);
 		}
-	      */
 	      else
+	      */
 		{
+		  fis1 = 0;
+		  ps1  = 0;
+		  fis2 = 0;
+		  for ( i = 0; i < nlev1; ++i )
+		    {
+		      t1[i] = 0;
+		      q1[i] = 0;
+		      u1[i] = 0;
+		      v1[i] = 0;
+		      cl1[i] = 0;
+		      ci1[i] = 0;
+		      cc1[i] = 0;
+		    }
+
 		  hetaeta(nlev1, a1, b1,
 			  fis1, ps1,
 			  t1, q1, u1, v1, cl1, ci1, cc1,
@@ -941,11 +977,12 @@ void *Inteta(void *argument)
 			  &tscor, &pscor, &secor);
   /*
 		  (vardata1[varID], vardata2[varID], full_press,
-		  vert_index, plev, nplev, ngp, nlevel, missval);*/
+		  vert_index, plev, nlev2, ngp, nlevel, missval);*/
 		}
-
+		/*
 	      if ( Extrapolate == 0 )
-		memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
+		memcpy(varnmiss[varID], pnmiss, nlev2*sizeof(int));
+		*/
 	    }
 	}
 
