@@ -63,7 +63,6 @@ void *Gradsdes(void *argument);
 void *Histogram(void *argument);
 void *Info(void *argument);
 void *Input(void *argument);
-void *Inteta(void *argument);
 void *Intgrid(void *argument);
 void *Intgridtraj(void *argument);
 void *Inttime(void *argument);
@@ -85,6 +84,7 @@ void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pinfo(void *argument);
 void *Remap(void *argument);
+void *Remapeta(void *argument);
 void *Replace(void *argument);
 void *Rotuv(void *argument);
 /* RQ */
@@ -237,7 +237,6 @@ void *Wct(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntetaOperators        {"inteta"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
@@ -262,6 +261,7 @@ void *Wct(void *argument);
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
+#define  RemapetaOperators      {"remapeta"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
 /* RQ */
@@ -433,7 +433,6 @@ static MODULES Modules[] =
   { Histogram,      NULL,              HistogramOperators,      1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
-  { Inteta,         NULL,              IntetaOperators,         1,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,    1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,        1,  1 },
@@ -457,6 +456,7 @@ static MODULES Modules[] =
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
   { Remap,          RemapgridHelp,     RemapgridOperators,      1,  1 },
   { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },
+  { Remapeta,       NULL,              RemapetaOperators,       1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,        2,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,          1,  1 },
   /* RQ */

@@ -30,7 +30,6 @@ cdo_SOURCES = Arith.c		\
               Histogram.c 	\
               Info.c		\
               Input.c		\
-              Inteta.c    	\
               Intgrid.c 	\
               Intgridtraj.c 	\
               Inttime.c 	\
@@ -52,6 +51,7 @@ cdo_SOURCES = Arith.c		\
               Outputgmt.c  	\
               Pinfo.c  	        \
               Remap.c  	        \
+              Remapeta.c    	\
               Replace.c  	\
               Rotuv.c     	\
               Runpctl.c  	\
@@ -127,6 +127,7 @@ cdo_SOURCES = Arith.c		\
               fieldmer.c  	\
               fieldzon.c  	\
               grid.c		\
+              hetaeta.c		\
               history.c		\
               institution.c 	\
               interpol.c 	\

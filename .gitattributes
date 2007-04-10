@@ -229,7 +229,6 @@ src/Hi.c -text
 src/Histogram.c -text
 src/Info.c -text
 src/Input.c -text
-src/Inteta.c -text
 src/Intgrid.c -text
 src/Intgridtraj.c -text
 src/Intntime.c -text
@@ -253,6 +252,7 @@ src/Output.c -text
 src/Outputgmt.c -text
 src/Pinfo.c -text
 src/Remap.c -text
+src/Remapeta.c -text
 src/Replace.c -text
 src/Rotuv.c -text
 src/Runpctl.c -text
@@ -349,6 +349,7 @@ src/fieldzon.c -text
 src/fourier.c -text
 src/functs.h -text
 src/grid.c -text
+src/hetaeta.c -text
 src/history.c -text
 src/institution.c -text
 src/interpol.c -text

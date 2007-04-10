@@ -1,6 +1,7 @@
 2007-05-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.7
+	* New operator: remapeta
 	* replace ztype2ltype with zaxis2ltype
 	* ltype2ztype: set default zaxis type to ZAXIS_GENERIC
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]
