@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -28,11 +28,9 @@
 */
 
 
-#include <stdio.h>
-#include <math.h>
-
 #include "cdi.h"
 #include "cdo.h"
+#include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
 #include "field.h"
@@ -47,6 +45,7 @@ void *Ymonstat(void *argument)
   int operatorID;
   int operfunc;
   int gridsize;
+  int i;
   int varID;
   int recID;
   int gridID;
@@ -64,7 +63,7 @@ void *Ymonstat(void *argument)
   int *recVarID, *recLevelID;
   int vdates[NMONTH], vtimes[NMONTH];
   double missval;
-  FIELD **vars1[NMONTH], **vars2[NMONTH];
+  FIELD **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
   FIELD field;
 
   cdoInitialize(argument);
@@ -84,6 +83,7 @@ void *Ymonstat(void *argument)
     {
       vars1[month] = NULL;
       vars2[month] = NULL;
+      samp1[month] = NULL;
       nsets[month] = 0;
     }
 
@@ -131,6 +131,7 @@ void *Ymonstat(void *argument)
       if ( vars1[month] == NULL )
 	{
 	  vars1[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  samp1[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
@@ -142,6 +143,7 @@ void *Ymonstat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[month][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      samp1[month][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[month][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
@@ -151,6 +153,10 @@ void *Ymonstat(void *argument)
 		  vars1[month][varID][levelID].nmiss   = 0;
 		  vars1[month][varID][levelID].missval = missval;
 		  vars1[month][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  samp1[month][varID][levelID].grid    = gridID;
+		  samp1[month][varID][levelID].nmiss   = 0;
+		  samp1[month][varID][levelID].missval = missval;
+		  samp1[month][varID][levelID].ptr     = NULL;
 		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[month][varID][levelID].grid    = gridID;
@@ -175,12 +181,38 @@ void *Ymonstat(void *argument)
 	    {
 	      streamReadRecord(streamID1, vars1[month][varID][levelID].ptr, &nmiss);
 	      vars1[month][varID][levelID].nmiss = nmiss;
+
+	      if ( nmiss > 0 || samp1[month][varID][levelID].ptr )
+		{
+		  if ( samp1[month][varID][levelID].ptr == NULL )
+		    samp1[month][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( DBL_IS_EQUAL(vars1[month][varID][levelID].ptr[i], vars1[month][varID][levelID].missval) )
+		      samp1[month][varID][levelID].ptr[i] = 0;
+		    else
+		      samp1[month][varID][levelID].ptr[i] = 1;
+		}
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
 	      field.grid    = vars1[month][varID][levelID].grid;
 	      field.missval = vars1[month][varID][levelID].missval;
+
+	      if ( field.nmiss > 0 || samp1[month][varID][levelID].ptr )
+		{
+		  if ( samp1[month][varID][levelID].ptr == NULL )
+		    {
+		      samp1[month][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+		      for ( i = 0; i < gridsize; i++ )
+			samp1[month][varID][levelID].ptr[i] = nsets[month];
+		    }
+		  
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[month][varID][levelID].missval) )
+		      samp1[month][varID][levelID].ptr[i]++;
+		}
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
@@ -194,7 +226,7 @@ void *Ymonstat(void *argument)
 	    }
 	}
 
-      if ( nsets[month] == 0 && operfunc == func_std || operfunc == func_var )
+      if ( nsets[month] == 0 && (operfunc == func_std || operfunc == func_var) )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
@@ -217,7 +249,12 @@ void *Ymonstat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcmul(&vars1[month][varID][levelID], 1.0/nsets[month]);
+		{
+		  if ( samp1[month][varID][levelID].ptr == NULL )
+		    farcmul(&vars1[month][varID][levelID], 1.0/nsets[month]);
+		  else
+		    fardiv(&vars1[month][varID][levelID], samp1[month][varID][levelID]);
+		}
 	    }
 	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -225,10 +262,23 @@ void *Ymonstat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		if ( operfunc == func_std )
-		  farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
-	      else
-		  farcvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+		{
+		  if ( samp1[month][varID][levelID].ptr == NULL )
+		    {
+		      if ( operfunc == func_std )
+			farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+		      else
+			farcvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+		    }
+		  else
+		    {
+		      farinv(&samp1[month][varID][levelID]);
+		      if ( operfunc == func_std )
+			farstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID]);
+		      else
+			farvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID]);
+		    }
+		}
 	    }
 
 	taxisDefVdate(taxisID2, vdates[month]);
@@ -259,25 +309,28 @@ void *Ymonstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[month][varID][levelID].ptr);
+		  if ( samp1[month][varID][levelID].ptr ) free(samp1[month][varID][levelID].ptr);
 		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[month][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[month][varID]);
+	      free(samp1[month][varID]);
 	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[month][varID]);
 	    }
 
 	  free(vars1[month]);
+	  free(samp1[month]);
 	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[month]);
 	}
     }
+
+  streamClose(streamID2);
+  streamClose(streamID1);
 
   if ( field.ptr ) free(field.ptr);
 
   if ( recVarID   ) free(recVarID);
   if ( recLevelID ) free(recLevelID);
-
-  streamClose(streamID2);
-  streamClose(streamID1);
 
   cdoFinish();
 

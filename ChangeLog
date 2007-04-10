@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.0.7
 	* New operator: remapeta
+	* Ymonstat: bug fix for missing values [report: Ivonne Anders]
 	* replace ztype2ltype with zaxis2ltype
 	* ltype2ztype: set default zaxis type to ZAXIS_GENERIC
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]

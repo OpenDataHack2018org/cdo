@@ -8,6 +8,10 @@ Version 1.0.8 (?? May 2007):
       o Show GRIB level types - showltype
       o Select GRIB level types - selltype
       o Set GRIB level type - setltype
+   * Fixed bugs:
+      o Module Ymonstat gave wrong results with missing values
+        Affected operators: ymonmean, ymonstd, ymonvar
+      o ieglib has had a memory leak when writing IEG data
 
 Version 1.0.7 (8 March 2007):
 

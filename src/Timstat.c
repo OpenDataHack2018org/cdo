@@ -365,13 +365,13 @@ void *Timstat(void *argument)
   free(samp1);
   if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
+  streamClose(streamID2);
+  streamClose(streamID1);
+
   if ( field.ptr ) free(field.ptr);
 
   if ( recVarID   ) free(recVarID);
   if ( recLevelID ) free(recLevelID);
-
-  streamClose(streamID2);
-  streamClose(streamID1);
 
   cdoFinish();
 
