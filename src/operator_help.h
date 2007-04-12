@@ -2513,6 +2513,21 @@ static char *IntgridHelp[] = {
     NULL
 };
 
+static char *RemapetaHelp[] = {
+    "NAME",
+    "    remapeta - Remap model level",
+    "",
+    "SYNOPSIS",
+    "    remapeta,vct[,oro]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "",
+    "PARAMETER",
+    "    vct  STRING  Filename of an ASCII dataset with the vertical coordinate table",
+    "    oro  STRING  Filename with the orography of the target dataset",
+    NULL
+};
+
 static char *IntvertHelp[] = {
     "NAME",
     "    ml2pl, ml2hl - Vertical interpolation",

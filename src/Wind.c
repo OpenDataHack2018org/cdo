@@ -227,8 +227,6 @@ void *Wind(void *argument)
 		ntr = nlat2ntr(gridInqYsize(gridIDgp));
 	      else
 		ntr = nlat2ntr_linear(gridInqYsize(gridIDgp));
-
-	      printf("ntr = %d\n", ntr);
 	      
 	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
 	    }

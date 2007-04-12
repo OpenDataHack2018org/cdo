@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Inteta     inteta          Model to model level interpolation
+      Remapeta     remapeta          Model to model level interpolation
 */
 
 

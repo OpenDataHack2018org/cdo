@@ -246,6 +246,7 @@ void *Wct(void *argument);
                                  "invertlatdata", "invertlondata"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
+#define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
 #define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
 #define  MergeOperators         {"merge"}
@@ -441,6 +442,7 @@ static MODULES Modules[] =
   { Invert,         InvertHelp,        InvertOperators,         1,  1 },
   { Log,            NULL,              LogOperators,            1,  0 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,        1,  1 },
+  { Maskbox,        MaskboxHelp,       MaskregionOperators,     1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,        1,  1 },
   { Math,           MathHelp,          MathOperators,           1,  1 },
   { Merge,          MergeHelp,         MergeOperators,         -1,  1 },
@@ -456,7 +458,7 @@ static MODULES Modules[] =
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
   { Remap,          RemapgridHelp,     RemapgridOperators,      1,  1 },
   { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },
-  { Remapeta,       NULL,              RemapetaOperators,       1,  1 },
+  { Remapeta,       RemapetaHelp,      RemapetaOperators,       1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,        2,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,          1,  1 },
   /* RQ */

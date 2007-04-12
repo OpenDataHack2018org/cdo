@@ -15,6 +15,7 @@
 /*
 #define  NGP    100000
 #define  OUTPUT 1
+#define  OPOINT 34179
 */
 
 #include <math.h>
@@ -101,40 +102,32 @@ void hetaeta(int ltq, int ngp,
   static char func[] = "hetaeta";
   double epsm1i, zdff, zdffl, ztv, zb, zbb, zc, zps;
   double zsump, zsumpp, zsumt, zsumtp;
-  double dfi, fiadj, dteta;
+  double dfi, fiadj= 0, dteta = 0;
   double pbl_lim, pbl_lim_need;
   int jblt, jjblt;
   int k, iv, ij, ijk, ijk1, ijk2;
   int jlev = 0, jlevr = 0, jnop;
-
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
   double *af1, *bf1, *etaf1, *pf1, *lnpf1;
   double *tv1, *theta1, *rh1;
   double *etah2, *ph2, *lnph2, *fi2;
-  double *af2, *bf2, *etaf2, *pf2, *lnpf2;
-
+  double *af2, *bf2, *etaf2, *pf2/*, *lnpf2*/;
   double *zvar;
-  double *rh_pbl;
-  double *theta_pbl;
+  double *rh_pbl = NULL;
+  double *theta_pbl = NULL;
   double **vars_pbl = NULL;
-
   double *rh2;
-
   double *w1, *w2;
-  double t, q, fi;
-
   double *wgt;
   int *idx;
-
   int *jl1, *jl2;
-  
   int nlev1p1;
   int nlev2p1;
-
   int lpsmod = 1;
   int klo;
-
 #if defined (OUTPUT)
+  double t, q, fi;
+
   old = fopen("old.dat","w");
   new = fopen("new.dat","w");
 #endif
@@ -142,34 +135,31 @@ void hetaeta(int ltq, int ngp,
   nlev1p1 = nlev1+1;
   nlev2p1 = nlev2+1;
 
-  /* etah1  = (double *) malloc(nlev1p1*sizeof(double)); */			   
-  ph1    = (double *) malloc(nlev1p1*sizeof(double));			   
+  /* etah1  = (double *) malloc(nlev1p1*sizeof(double)); */
+  ph1    = (double *) malloc(nlev1p1*sizeof(double));
   lnph1  = (double *) malloc(nlev1p1*sizeof(double));
-  fi1    = (double *) malloc(nlev1p1*sizeof(double));			   
-										   
-  af1    = (double *) malloc(nlev1*sizeof(double));				   
-  bf1    = (double *) malloc(nlev1*sizeof(double));				   
-										   
-  etaf1  = (double *) malloc(nlev1*sizeof(double));				   
-  pf1    = (double *) malloc(nlev1*sizeof(double));				   
-  lnpf1  = (double *) malloc(nlev1*sizeof(double));				   
-										   
-  tv1    = (double *) malloc(nlev1*sizeof(double));				   
-  theta1 = (double *) malloc(nlev1*sizeof(double));				   
-  rh1    = (double *) malloc(nlev1*sizeof(double));				   
-  zvar   = (double *) malloc(nlev1*sizeof(double));				   
-  										   
+  fi1    = (double *) malloc(nlev1p1*sizeof(double));
+
+  af1    = (double *) malloc(nlev1*sizeof(double));
+  bf1    = (double *) malloc(nlev1*sizeof(double));
+  etaf1  = (double *) malloc(nlev1*sizeof(double));
+  pf1    = (double *) malloc(nlev1*sizeof(double));
+  lnpf1  = (double *) malloc(nlev1*sizeof(double));
+  tv1    = (double *) malloc(nlev1*sizeof(double));
+  theta1 = (double *) malloc(nlev1*sizeof(double));
+  rh1    = (double *) malloc(nlev1*sizeof(double));
+  zvar   = (double *) malloc(nlev1*sizeof(double));
+
   etah2     = (double *) malloc(nlev2p1*sizeof(double));
   ph2       = (double *) malloc(nlev2p1*sizeof(double));
   lnph2     = (double *) malloc(nlev2p1*sizeof(double));
   fi2       = (double *) malloc(nlev2p1*sizeof(double));
-										   
-  af2       = (double *) malloc(nlev2*sizeof(double));				   
-  bf2       = (double *) malloc(nlev2*sizeof(double));				   
-										   
+
+  af2       = (double *) malloc(nlev2*sizeof(double));
+  bf2       = (double *) malloc(nlev2*sizeof(double));
   etaf2     = (double *) malloc(nlev2*sizeof(double));
   pf2       = (double *) malloc(nlev2*sizeof(double));
-  lnpf2     = (double *) malloc(nlev2*sizeof(double));
+  /* lnpf2     = (double *) malloc(nlev2*sizeof(double)); */
 
   if ( ltq )
     {
@@ -186,14 +176,12 @@ void hetaeta(int ltq, int ngp,
       for ( iv = 0; iv < nvars; ++iv )
 	vars_pbl[iv] = (double *) malloc(nlev2*sizeof(double));
     }
-										   
-  rh2      = (double *) malloc(nlev2*sizeof(double));				   
-										   
-  w1       = (double *) malloc(nlev2*sizeof(double));				   
-  w2       = (double *) malloc(nlev2*sizeof(double));				   
-										   
-  jl1      = (int *)    malloc(nlev2*sizeof(int));				   
-  jl2      = (int *)    malloc(nlev2*sizeof(int));                                  
+
+  rh2      = (double *) malloc(nlev2*sizeof(double));
+  w1       = (double *) malloc(nlev2*sizeof(double));
+  w2       = (double *) malloc(nlev2*sizeof(double));
+  jl1      = (int *)    malloc(nlev2*sizeof(int));
+  jl2      = (int *)    malloc(nlev2*sizeof(int));
   
 
   /******* set coordinate system ETA's, A's, B's
@@ -309,15 +297,15 @@ void hetaeta(int ltq, int ngp,
 	    }
 	}
 #if defined (OUTPUT)
-      if ( ij == 0 )
+      if ( ij == OPOINT )
 	for ( k = nlev1-1; k >= 0; --k )
 	  { 
 	    ijk = k*ngp+ij;
 	    if ( ltq ) { t = t1[ijk]; q = q1[ijk]; fi = fi1[k]; }
 	    else       { t = 0; q = 0; fi = 0; }
-	    fprintf(old, "%3d %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f\n", 
-		    k, fi/g, pf1[k], t, q,
-		    vars1[0][ijk], vars1[1][ijk], vars1[2][ijk], vars1[3][ijk], vars1[4][ijk]);
+	    fprintf(old, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi/g, pf1[k], t, q);
+	    for ( iv = 0; iv < nvars; ++iv ) fprintf(old, " %18.10f", vars1[iv][ijk]);
+	    fprintf(old, "\n");
 	  }
 #endif
 
@@ -330,6 +318,7 @@ void hetaeta(int ltq, int ngp,
 	{
 	  for ( k = nlev1-2; k > 0; --k )
 	    {
+	      /* find index for regression, 1 <= jlev <= nlevec-2 */
 	      jlev = k;
 	      if (fis2[ij] < fi1[k]) break;
 	    }
@@ -401,7 +390,7 @@ void hetaeta(int ltq, int ngp,
       for ( k = 0; k < nlev2; ++k )
 	{
 	  pf2[k]   = af2[k]+bf2[k]* ps2[ij];
-	  lnpf2[k] = log(pf2[k]);
+	  /* lnpf2[k] = log(pf2[k]); */
 	}
 
       /******* find reference geopotential,  */
@@ -581,15 +570,15 @@ void hetaeta(int ltq, int ngp,
 	}
 
 #if defined (OUTPUT)
-      if ( ij == 0 )
+      if ( ij == OPOINT )
 	for ( k = nlev2-1; k >= 0; --k )
 	  { 
 	    ijk = k*ngp+ij;
 	    if ( ltq ) { t = t2[ijk]; q = q2[ijk]; fi = fi2[k]; }
 	    else       { t = 0; q = 0; fi = 0; }
-	    fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f %18.10f\n", 
-		    k, fi/g, pf2[k], t, q,
-		    vars2[0][ijk], vars2[1][ijk], vars2[2][ijk], vars2[3][ijk], vars2[4][ijk]);
+	    fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi/g, pf2[k], t, q);
+	    for ( iv = 0; iv < nvars; ++iv ) fprintf(new, " %18.10f", vars2[iv][ijk]);
+	    fprintf(new, "\n");
 	  }
 #endif
 
@@ -636,7 +625,7 @@ void hetaeta(int ltq, int ngp,
       free(rh_pbl); 
     }   
 
-  free(lnpf2);     
+  /* free(lnpf2); */
   free(pf2);       
   free(etaf2);     
 

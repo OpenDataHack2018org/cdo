@@ -31,6 +31,87 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+#define MAX_LINE 256
+#define MAX_VALS 64000
+
+int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
+{
+  static char func[] = "ReadCoords";
+  double xcoord, ycoord;
+  int z = 0, number = 0, jumpedlines = 0;
+  int i = 0;
+  int nox;
+  char xchar, ychar;
+  char line[MAX_LINE];
+  char *linep;
+
+  while ( readline(fp, line, MAX_LINE) )
+    {
+      nox = 0;
+      i = 0;
+      xcoord = 0;
+      if ( line[0] == '#' ) 
+         { 
+           jumpedlines++;
+           continue;
+         }  
+      if ( line[0] == '\0' )
+         { 
+           jumpedlines++;
+           continue;
+         }  
+      if ( line[0] == '&' ) break;
+	 
+      linep = &line[0];
+     
+      xcoord = strtod(linep, &linep);
+      
+      if ( xcoord == 0 ) 
+	{
+	  nox = 1;
+	  jumpedlines++;
+	}
+      
+      while( ( ( isdigit( *linep ) == FALSE ) && ( *linep!='-' )) && ( i < 64) )
+	{	  
+	  if ( ( nox == 0 ) && ( *linep == NULL ) ) 
+	    {
+	      cdoAbort(" y value missing in file %s at  line %d", polyfile, (number+jumpedlines+1));
+	      break;
+	    }
+          if ( ( isspace( *linep) == FALSE && ( *linep!='-' ) ) && ( linep != NULL ) && (nox == 0) ) 
+	    cdoWarning("unknown character in file %s at line %d", polyfile, (number+jumpedlines+1) );
+
+          linep++;
+	  i++;
+	}    
+      if ( ( i >= 63 ) && ( number != 0 ) ) cdoAbort( "Wrong value format in file %s at line %d", polyfile, (number+jumpedlines+1) );
+    
+      ycoord = strtod(linep, NULL);
+     
+      xvals[number] = xcoord;
+      yvals[number] = ycoord;
+
+      number++;
+    }
+
+ 
+  if ( ( number != 0 )&& ( ! ( DBL_IS_EQUAL ( xvals[0], xvals[number-1] ) && DBL_IS_EQUAL ( yvals[0], yvals[number-1] ) ) ) )
+    {
+      xvals[number] = xvals[0];
+      yvals[number] = yvals[0];
+      number++;
+    }
+  
+
+  if ( cdoVerbose ) 
+    {
+      for ( z = 0; z < number; z++ )  fprintf(stderr, "%d %g %g\n",  (z+1),  xvals[z], yvals[z]);
+    }
+
+  return number;
+}
+
 
 static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
@@ -182,7 +263,7 @@ static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon1
 }
 
 
-static void maskbox(double missval, double *array, int gridID,
+static void maskbox(int *mask, int gridID,
 		   int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int nlon, nlat;
@@ -193,16 +274,103 @@ static void maskbox(double missval, double *array, int gridID,
 
   for ( ilat = 0; ilat < nlat; ilat++ )
     for ( ilon = 0; ilon < nlon; ilon++ )
-      if ( ! (lat1 <= ilat && ilat <= lat2 && 
+      if (  (lat1 <= ilat && ilat <= lat2 && 
 	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
-	array[nlon*ilat + ilon] = missval;
+	mask[nlon*ilat + ilon] = 0;
 }
 
+static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
+{
+  static char func[] = "maskregion";
+  int i, j;
+  int nlon, nlat;
+  int ilat, ilon;
+  int c;
+  double *xvals, *yvals;
+  double xval, yval;
+  double xmin, xmax, ymin, ymax;
+
+  nlon = gridInqXsize(gridID);
+  nlat = gridInqYsize(gridID);
+
+  xvals = (double *) malloc(nlon*sizeof(double));
+  yvals = (double *) malloc(nlat*sizeof(double));
+
+  gridInqXvals(gridID, xvals);
+  gridInqYvals(gridID, yvals);  
+
+  xmin = xvals[0];
+  ymin = yvals[0];
+
+  for ( i = 0; i < nofcoords; i++)
+    {
+      if(xvals[i] < xmin) xmin = xvals[i];
+      if(yvals[i] < ymin) ymin = yvals[i];
+      if(xvals[i] > xmax) xmax = xvals[i];
+      if(yvals[i] > ymax) ymax = yvals[i];
+    }
+
+  for ( ilat = 0; ilat < nlat; ilat++ )
+    {
+      yval = yvals[ilat];
+      for ( ilon = 0; ilon < nlon; ilon++ )
+	{
+          c = 0;
+	  xval = xvals[ilon];
+	  if(!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
+	  
+	  
+          if ( c == 0)
+	    {
+	      for (i = 0, j = nofcoords-1; i < nofcoords; j = i++)
+	    
+	      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
+		   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
+		  ((xval) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
+		c = !c;
+	    }
+
+	  if ( c == 0 )
+	    {
+	      for (i = 0, j = nofcoords-1; i < nofcoords; j = i++)
+		{
+		  if ( xvals[ilon] > 180 )
+		    {
+                         if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
+	                      ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
+		              ((xval-360) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
+			   c = !c;
+		    }
+		}
+	    }
+ 
+	  if ( c == 0 )
+	    {
+	      for ( i = 0, j = nofcoords-1; i< nofcoords; j = i++)
+		{		
+		  if ( xval<0 )
+		    {
+		      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
+			   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
+			  ((xval+360) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
+			c = !c;
+		    }
+		}
+	    }
+	     
+	  if( c != 0 ) mask[nlon*ilat+ilon] =  0;
+	}
+    }
+      
+  free(xvals);
+  free(yvals);
+
+}
 
 void *Maskbox(void *argument)
 {
   static char func[] = "Maskbox";
-  int MASKLONLATBOX, MASKINDEXBOX;
+  int MASKLONLATBOX, MASKINDEXBOX, MASKREGION;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
@@ -213,18 +381,24 @@ void *Maskbox(void *argument)
   int index, ngrids, gridtype;
   int nmiss;
   int *vars;
-  int i;
+  int i, i2;
   int ndiffgrids;
   int lat1, lat2, lon11, lon12, lon21, lon22;
+  int number = 0, nfiles;
+  int nlon, nlat;
   double missval;
+  int *mask;
   double *array;
   int taxisID1, taxisID2;
+  double *xcoords, *ycoords;
+  FILE *fp;
+  const char *polyfile;
 
   cdoInitialize(argument);
 
   MASKLONLATBOX = cdoOperatorAdd("masklonlatbox", 0, 0, "western and eastern longitude and southern and northern latitude");
   MASKINDEXBOX  = cdoOperatorAdd("maskindexbox",  0, 0, "index of first and last longitude and index of first and last latitude");
-
+  MASKREGION    = cdoOperatorAdd("maskregion",    0, 0, "limiting coordinates of the region");
   operatorID = cdoOperatorID();
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -256,11 +430,6 @@ void *Maskbox(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == MASKLONLATBOX )
-    genlonlatbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
-  else
-    genindexbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
-
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -283,7 +452,41 @@ void *Maskbox(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID);
-  array = (double *) malloc(gridsize*sizeof(double));
+  array = ( double  * ) malloc ( gridsize*sizeof(double) );
+  mask  = ( int * )     malloc ( gridsize*sizeof(int) );
+  for( i=0;  i < gridsize; i++) mask[i] = 1;
+ 
+  if ( operatorID == MASKLONLATBOX )
+    {
+      genlonlatbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+      maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+    }
+  if ( operatorID == MASKINDEXBOX )
+    {
+      genindexbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+      maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
+    }
+  if ( operatorID == MASKREGION )
+    {
+     
+      nfiles = operatorArgc();
+      for ( i2 = 0; i2 < nfiles; i2++ )
+	{
+	  polyfile = operatorArgv()[i2];
+	  fp = fopen(polyfile, "r");
+	  number  = !number;
+	  xcoords = (double *) malloc( MAX_VALS*sizeof(double) );
+	  ycoords = (double *) malloc( MAX_VALS*sizeof(double) );
+	  if ( fp == 0 ) cdoAbort("Open failed on %s", polyfile);   
+	  while ( number != 0 )
+	    {
+	      number = ReadCoords (xcoords, ycoords, polyfile, fp );
+	      if ( ( number != 0 ) && ( number < 3) ) cdoAbort( "Too less values in file %s", polyfile );
+	      if (   number != 0 ) maskregion(mask, gridID, xcoords, ycoords, number);
+	    }
+	  fclose(fp); 
+	}
+    }
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -299,11 +502,15 @@ void *Maskbox(void *argument)
 	  if ( vars[varID] )
 	    {
 	      streamReadRecord(streamID1, array, &nmiss);
-
-	      missval = vlistInqVarMissval(vlistID1, varID);
-	      maskbox(missval, array, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
-
+              missval = vlistInqVarMissval(vlistID1, varID);
+             
+	      for ( i = 0; i < gridsize; i++ )
+		{
+		  if( mask[i] != 0 ) array[i] = missval;
+		}
+		
 	      nmiss = 0;
+
 	      for ( i = 0; i < gridsize; i++ )
 		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 
@@ -319,6 +526,7 @@ void *Maskbox(void *argument)
 
   if ( vars  ) free(vars);
   if ( array ) free(array);
+  if ( mask )  free(mask);
 
   cdoFinish();
 

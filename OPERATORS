@@ -342,6 +342,7 @@ Operator catalog:
       Remap      remap           SCRIP grid remapping
       Intgrid    interpolate     PINGO grid interpolation
       Intgrid    intgridbil      Bilinear grid interpolation
+      Remapeta   remapeta        Remap model level
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation
       Inttime    inttime         Time interpolation

@@ -70,6 +70,7 @@ Remapgrid     Interpolation
 Genweights    Interpolation
 Remap         Interpolation
 Intgrid       Interpolation
+Remapeta      Interpolation
 Vertint       Interpolation
 Inttime       Interpolation
 Intyear       Interpolation
