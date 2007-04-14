@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -20,11 +20,13 @@
 
       Maskbox    masklonlatbox   Mask lon/lat box
       Maskbox    maskindexbox    Mask index box
+      Maskbox    maskregions     Mask regions
 */
 
 
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -32,22 +34,18 @@
 #include "pstream.h"
 
 #define MAX_LINE 256
-#define MAX_VALS 64000
+#define MAX_VALS 1048576
 
 int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 {
-  static char func[] = "ReadCoords";
   double xcoord, ycoord;
   int z = 0, number = 0, jumpedlines = 0;
   int i = 0;
-  int nox;
-  char xchar, ychar;
   char line[MAX_LINE];
   char *linep;
 
   while ( readline(fp, line, MAX_LINE) )
     {
-      nox = 0;
       i = 0;
       xcoord = 0;
       if ( line[0] == '#' ) 
@@ -68,18 +66,17 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
       
       if ( xcoord == 0 ) 
 	{
-	  nox = 1;
 	  jumpedlines++;
 	}
       
       while( ( ( isdigit( *linep ) == FALSE ) && ( *linep!='-' )) && ( i < 64) )
 	{	  
-	  if ( ( nox == 0 ) && ( *linep == NULL ) ) 
+	  if ( *linep == 0 ) 
 	    {
 	      cdoAbort(" y value missing in file %s at  line %d", polyfile, (number+jumpedlines+1));
 	      break;
 	    }
-          if ( ( isspace( *linep) == FALSE && ( *linep!='-' ) ) && ( linep != NULL ) && (nox == 0) ) 
+          if ( ( isspace( *linep) == FALSE && ( *linep!='-' ) ) && ( linep != NULL ) ) 
 	    cdoWarning("unknown character in file %s at line %d", polyfile, (number+jumpedlines+1) );
 
           linep++;
@@ -301,6 +298,8 @@ static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, 
 
   xmin = xvals[0];
   ymin = yvals[0];
+  xmax = xvals[0];
+  ymax = yvals[0];
 
   for ( i = 0; i < nofcoords; i++)
     {
@@ -367,6 +366,7 @@ static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, 
 
 }
 
+
 void *Maskbox(void *argument)
 {
   static char func[] = "Maskbox";
@@ -385,7 +385,6 @@ void *Maskbox(void *argument)
   int ndiffgrids;
   int lat1, lat2, lon11, lon12, lon21, lon22;
   int number = 0, nfiles;
-  int nlon, nlat;
   double missval;
   int *mask;
   double *array;
@@ -468,24 +467,27 @@ void *Maskbox(void *argument)
     }
   if ( operatorID == MASKREGION )
     {
-     
+      xcoords = (double *) malloc( MAX_VALS*sizeof(double) );
+      ycoords = (double *) malloc( MAX_VALS*sizeof(double) );
       nfiles = operatorArgc();
+     
       for ( i2 = 0; i2 < nfiles; i2++ )
 	{
 	  polyfile = operatorArgv()[i2];
 	  fp = fopen(polyfile, "r");
-	  number  = !number;
-	  xcoords = (double *) malloc( MAX_VALS*sizeof(double) );
-	  ycoords = (double *) malloc( MAX_VALS*sizeof(double) );
+	 
 	  if ( fp == 0 ) cdoAbort("Open failed on %s", polyfile);   
-	  while ( number != 0 )
+	  while ( TRUE )
 	    {
 	      number = ReadCoords (xcoords, ycoords, polyfile, fp );
-	      if ( ( number != 0 ) && ( number < 3) ) cdoAbort( "Too less values in file %s", polyfile );
-	      if (   number != 0 ) maskregion(mask, gridID, xcoords, ycoords, number);
+	      if ( number == 0 ) break;
+	      if ( number < 3 ) cdoAbort( "Too less values in file %s", polyfile );
+	      maskregion(mask, gridID, xcoords, ycoords, number);
 	    }
 	  fclose(fp); 
 	}
+      if ( xcoords ) free ( xcoords );
+      if ( ycoords ) free ( ycoords );
     }
 
   tsID = 0;

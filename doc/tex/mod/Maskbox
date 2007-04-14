@@ -60,7 +60,7 @@ INTEGER  Index of last latitude
 
 @BeginExample
 To mask the region with the longitudes from 120E to 90W and
-latitudes from 20N to 20S on all input fields use:
+latitudes from 20N to 20S on all input fields, use:
 @BeginVerbatim
    cdo masklonlatbox,120,-90,20,-20 ifile ofile
 @EndVerbatim

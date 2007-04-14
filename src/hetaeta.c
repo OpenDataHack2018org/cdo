@@ -1,17 +1,3 @@
-/* local */
-/* 0.788u 0.308s 0:17.40 6.2%   1000 loops */
-/* 7.180u 0.000s 0:07.20 99.7%  100000 loops ohne output */
-/* 5.852u 0.004s 0:05.88 99.4%  100000 loops ohne output -O2 */
-/* 5.884u 0.004s 0:05.90 99.6%  100000 loops ohne output -O2 C_04 */
-/* 5.280u 0.280s 0:05.57 99.8%  100000 loops ohne output -O2 C_05 */
-/* 4.680u 0.368s 0:05.08 99.2%  100000 loops ohne output -O2 C_06 */
-
-/* SX6 */
-/* 15.67u 0.06s 0:28.11 55.9%   100000 loops ohne output  C_05 */
-/*  9.97u 0.09s 0:15.98 62.9%   100000 loops ohne output  C_06 */
-
-
-
 /*
 #define  NGP    100000
 #define  OUTPUT 1
@@ -22,16 +8,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-const double ap0 = 100000.0;
-const double apr = 101325.0;
+const double ap0  = 100000.0;
+const double apr  = 101325.0;
 const double aipr = 1.0/101325.0;
 
 /* pressure of reference geopotential */
 const double p_firef = 40000.0;
 
 const double epsilon = 0.622;
-const double rair = 287.04;
-const double cpair = 1004.6;
+const double rair    = 287.04;
+const double cpair   = 1004.6;
 
 const double eta_pbl = 0.8;
 
@@ -68,7 +54,6 @@ static int int_index(int n, double *x1, double x2)
 }
 
 
-/* Source from Luis Kornblueh */
 static double esat(double temperature)
 {
   double zes;
@@ -87,8 +72,7 @@ static double esat(double temperature)
   return es;
 }
 
-/* Source from Luis Kornblueh */
-/* Uwe Schulzweida: 3D version */
+/* Source from INTERA */
 void hetaeta(int ltq, int ngp,
 	     int nlev1, double *ah1, double *bh1,
              double *fis1, double *ps1, 

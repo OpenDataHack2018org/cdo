@@ -442,7 +442,7 @@ static MODULES Modules[] =
   { Invert,         InvertHelp,        InvertOperators,         1,  1 },
   { Log,            NULL,              LogOperators,            1,  0 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,        1,  1 },
-  { Maskbox,        MaskboxHelp,       MaskregionOperators,     1,  1 },
+  { Maskbox,        MaskregionHelp,    MaskregionOperators,     1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,        1,  1 },
   { Math,           MathHelp,          MathOperators,           1,  1 },
   { Merge,          MergeHelp,         MergeOperators,         -1,  1 },

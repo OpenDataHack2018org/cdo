@@ -843,6 +843,28 @@ static char *InvertHelp[] = {
     NULL
 };
 
+static char *MaskregionHelp[] = {
+    "NAME",
+    "    maskregion - Mask regions",
+    "",
+    "SYNOPSIS",
+    "    maskregion,regions  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Masks an unlimited number of regions. The elements inside ",
+    "    the region are untouched, the elements outside are set to missing value.",
+    "    All input fields must have the same horizontal grid.",
+    "    The user has to give ASCII formatted files with different regions.",
+    "    Each file contains one or more polygons. Each polygon point",
+    "    have one line with the longitute and latitude value. ",
+    "    The different polygons inside a file are separated by a line",
+    "    with the character '&'.",
+    "",
+    "PARAMETER",
+    "    regions  STRING Comma separated list of ASCII formatted files with different regions",
+    NULL
+};
+
 static char *MaskboxHelp[] = {
     "NAME",
     "    masklonlatbox, maskindexbox - Mask a box",
@@ -2523,8 +2545,8 @@ static char *RemapetaHelp[] = {
     "DESCRIPTION",
     "",
     "PARAMETER",
-    "    vct  STRING  Filename of an ASCII dataset with the vertical coordinate table",
-    "    oro  STRING  Filename with the orography of the target dataset",
+    "    vct  STRING  File name of an ASCII dataset with the vertical coordinate table",
+    "    oro  STRING  File name with the orography of the target dataset",
     NULL
 };
 
