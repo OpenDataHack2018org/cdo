@@ -69,14 +69,14 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 	  jumpedlines++;
 	}
       
-      while( ( ( isdigit( *linep ) == FALSE ) && ( *linep!='-' )) && ( i < 64) )
+      while( ( ( isdigit( (int) *linep ) == FALSE ) && ( *linep!='-' )) && ( i < 64) )
 	{	  
 	  if ( *linep == 0 ) 
 	    {
 	      cdoAbort(" y value missing in file %s at  line %d", polyfile, (number+jumpedlines+1));
 	      break;
 	    }
-          if ( ( isspace( *linep) == FALSE && ( *linep!='-' ) ) && ( linep != NULL ) ) 
+          if ( ( isspace( (int) *linep) == FALSE && ( *linep!='-' ) ) && ( linep != NULL ) ) 
 	    cdoWarning("unknown character in file %s at line %d", polyfile, (number+jumpedlines+1) );
 
           linep++;
@@ -275,6 +275,7 @@ static void maskbox(int *mask, int gridID,
 	      ((lon11 <= ilon && ilon <= lon12) || (lon21 <= ilon && ilon <= lon22))) )
 	mask[nlon*ilat + ilon] = 0;
 }
+
 
 static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
