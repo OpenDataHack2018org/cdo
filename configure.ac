@@ -76,11 +76,12 @@ fi
 #  Compile interface with internal GRIB library
 #
 AC_ARG_WITH([grib],
-            [AC_HELP_STRING([--with-grib],
-                            [Use the internal GRIB library [default=yes]])],,
-            AC_DEFINE(HAVE_LIBGRIB, [1], [Define to 1 for GRIB interface]))
+            [AC_HELP_STRING([--with-grib], [Use the internal GRIB library [default=yes]])],,
+             with_grib="yes")
 
-if test -z "$with_grib" ; then with_grib=yes ; fi
+if test "${with_grib}" = "yes" ; then
+  AC_DEFINE(HAVE_LIBGRIB, [1], [Define to 1 for GRIB interface])
+fi
 
 AC_MSG_CHECKING([for GRIB support])
 AC_MSG_RESULT($with_grib)
@@ -91,9 +92,11 @@ AC_MSG_RESULT($with_grib)
 AC_ARG_WITH([service],
             [AC_HELP_STRING([--with-service],
                             [Use the internal SERVICE library [default=yes]])],,
-            AC_DEFINE(HAVE_LIBSERVICE, [1], [Define to 1 for SERVICE interface]))
+             with_service="yes")
 
-if test -z "$with_service" ; then with_service=yes ; fi
+if test "${with_service}" = "yes" ; then
+  AC_DEFINE(HAVE_LIBSERVICE, [1], [Define to 1 for SERVICE interface])
+fi
 
 AC_MSG_CHECKING([for SERVICE support])
 AC_MSG_RESULT($with_service)
@@ -104,9 +107,11 @@ AC_MSG_RESULT($with_service)
 AC_ARG_WITH([extra],
             [AC_HELP_STRING([--with-extra],
                             [Use the internal EXTRA library [default=yes]])],,
-            AC_DEFINE(HAVE_LIBEXTRA, [1], [Define to 1 for EXTRA interface]))
+             with_extra="yes")
 
-if test -z "$with_extra" ; then with_extra=yes ; fi
+if test "${with_extra}" = "yes" ; then
+  AC_DEFINE(HAVE_LIBEXTRA, [1], [Define to 1 for EXTRA interface])
+fi
 
 AC_MSG_CHECKING([for EXTRA support])
 AC_MSG_RESULT($with_extra)
@@ -117,9 +122,11 @@ AC_MSG_RESULT($with_extra)
 AC_ARG_WITH([ieg],
             [AC_HELP_STRING([--with-ieg],
                             [Use the internal IEG library [default=yes]])],,
-            AC_DEFINE(HAVE_LIBIEG, [1], [Define to 1 for IEG interface]))
+             with_ieg="yes")
 
-if test -z "$with_ieg" ; then with_ieg=yes ; fi
+if test "${with_ieg}" = "yes" ; then
+  AC_DEFINE(HAVE_LIBIEG, [1], [Define to 1 for IEG interface])
+fi
 
 AC_MSG_CHECKING([for IEG support])
 AC_MSG_RESULT($with_ieg)

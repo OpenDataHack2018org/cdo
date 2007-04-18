@@ -4822,14 +4822,16 @@ if test "${with_grib+set}" = set; then
   withval="$with_grib"
 
 else
+  with_grib="yes"
+fi;
+
+if test "${with_grib}" = "yes" ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBGRIB 1
 _ACEOF
 
-fi;
-
-if test -z "$with_grib" ; then with_grib=yes ; fi
+fi
 
 echo "$as_me:$LINENO: checking for GRIB support" >&5
 echo $ECHO_N "checking for GRIB support... $ECHO_C" >&6
@@ -4845,14 +4847,16 @@ if test "${with_service+set}" = set; then
   withval="$with_service"
 
 else
+  with_service="yes"
+fi;
+
+if test "${with_service}" = "yes" ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBSERVICE 1
 _ACEOF
 
-fi;
-
-if test -z "$with_service" ; then with_service=yes ; fi
+fi
 
 echo "$as_me:$LINENO: checking for SERVICE support" >&5
 echo $ECHO_N "checking for SERVICE support... $ECHO_C" >&6
@@ -4868,14 +4872,16 @@ if test "${with_extra+set}" = set; then
   withval="$with_extra"
 
 else
+  with_extra="yes"
+fi;
+
+if test "${with_extra}" = "yes" ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBEXTRA 1
 _ACEOF
 
-fi;
-
-if test -z "$with_extra" ; then with_extra=yes ; fi
+fi
 
 echo "$as_me:$LINENO: checking for EXTRA support" >&5
 echo $ECHO_N "checking for EXTRA support... $ECHO_C" >&6
@@ -4891,14 +4897,16 @@ if test "${with_ieg+set}" = set; then
   withval="$with_ieg"
 
 else
+  with_ieg="yes"
+fi;
+
+if test "${with_ieg}" = "yes" ; then
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_LIBIEG 1
 _ACEOF
 
-fi;
-
-if test -z "$with_ieg" ; then with_ieg=yes ; fi
+fi
 
 echo "$as_me:$LINENO: checking for IEG support" >&5
 echo $ECHO_N "checking for IEG support... $ECHO_C" >&6
