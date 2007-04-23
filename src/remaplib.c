@@ -2978,7 +2978,7 @@ void pole_intersection(int *location,
           s1 = (rhs1*mat4 - mat2*rhs2)/determ;
           s2 = (mat1*rhs2 - rhs1*mat3)/determ;
 
-          if ( s2 >= ZERO && s2 <= ONE && s1 > ZERO && s1 <= ONE )
+          if ( s2 >= ZERO && s2 <= ONE && s1 >= ZERO && s1 <= ONE )
 	    {
 	      /*
 		recompute intersection based on full segment
@@ -3450,7 +3450,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	  s1 = (rhs1*mat4 - mat2*rhs2)/determ;
 	  s2 = (mat1*rhs2 - rhs1*mat3)/determ;
 
-	  if ( s2 >= ZERO && s2 <= ONE && s1 > ZERO && s1 <= ONE )
+	  if ( s2 >= ZERO && s2 <= ONE && s1 >= ZERO && s1 <= ONE )
 	    {
 	      /*
 		recompute intersection based on full segment
