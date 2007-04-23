@@ -4,6 +4,7 @@
 	* New operator: remapeta
 	* Ymonstat: bug fix for missing values [report: Ivonne Anders]
 	* remapcon: bug fix in intersection (s1 >= ZERO) [report: Joerg Wegner]
+	* remapcon: speed up by increasing BABY_STEP from 0.001 to 0.01
 	* replace ztype2ltype with zaxis2ltype
 	* ltype2ztype: set default zaxis type to ZAXIS_GENERIC
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]

@@ -63,6 +63,9 @@
 
 /* constants */
 
+/*#define  BABY_STEP  0.001 */ /* original value !!! */
+#define  BABY_STEP  0.01
+
 #define  ZERO     0.0
 #define  ONE      1.0
 #define  TWO      2.0
@@ -2722,6 +2725,7 @@ void pole_intersection(int *location,
   */
   /* local variables */
   int n, next_n, cell;
+  int ioffset;
   int loutside; /* flags points outside grid */
 
   double pi4, rns;           /*  north/south conversion */
@@ -2823,6 +2827,7 @@ void pole_intersection(int *location,
 
       for ( cell = 0; cell < num_srch_cells; cell++ ) /* cell_loop  */
 	{
+	  ioffset = cell*srch_corners;
 	  for ( n = 0; n < srch_corners; n++ ) /* corner_loop */
 	    {
 	      next_n = (n+1)%srch_corners;
@@ -2833,10 +2838,10 @@ void pole_intersection(int *location,
 		and search point.  if all the cross products are 
 		positive, the point is contained in the cell.
 	      */
-	      vec1_x = srch_corner_x[cell*srch_corners+next_n] - srch_corner_x[cell*srch_corners+n];
-	      vec1_y = srch_corner_y[cell*srch_corners+next_n] - srch_corner_y[cell*srch_corners+n];
-	      vec2_x = x1 - srch_corner_x[cell*srch_corners+n];
-	      vec2_y = y1 - srch_corner_y[cell*srch_corners+n];
+	      vec1_x = srch_corner_x[ioffset+next_n] - srch_corner_x[ioffset+n];
+	      vec1_y = srch_corner_y[ioffset+next_n] - srch_corner_y[ioffset+n];
+	      vec2_x = x1 - srch_corner_x[ioffset+n];
+	      vec2_y = y1 - srch_corner_y[ioffset+n];
 
 	      /* if endpoint coincident with vertex, offset the endpoint */
 
@@ -2844,8 +2849,8 @@ void pole_intersection(int *location,
 		{
 		  x1 = x1 + 1.e-10*(x2 - x1);
 		  y1 = y1 + 1.e-10*(y2 - y1);
-		  vec2_x = x1 - srch_corner_x[cell*srch_corners+n];
-		  vec2_y = y1 - srch_corner_y[cell*srch_corners+n];
+		  vec2_x = x1 - srch_corner_x[ioffset+n];
+		  vec2_y = y1 - srch_corner_y[ioffset+n];
 		}
 
 	      cross_product = vec1_x*vec2_y - vec2_x*vec1_y;
@@ -2919,7 +2924,7 @@ void pole_intersection(int *location,
        part of the segment lies inside the grid.  
      */
       loutside = TRUE;
-      s1 = s1 + 0.001;
+      s1 = s1 + BABY_STEP;
       x1 = begx + s1*(x2 - begx);
       y1 = begy + s1*(y2 - begy);
 
@@ -2942,14 +2947,16 @@ void pole_intersection(int *location,
     must check all sides for coincidences or intersections
   */
 
+  ioffset = cell*srch_corners;
+
   for ( n = 0; n < srch_corners; n++ ) /* intrsct_loop */
     {
       next_n = (n+1)%srch_corners;
 
-      grdy1 = srch_corner_y[cell*srch_corners+n];
-      grdy2 = srch_corner_y[cell*srch_corners+next_n];
-      grdx1 = srch_corner_x[cell*srch_corners+n];
-      grdx2 = srch_corner_x[cell*srch_corners+next_n];
+      grdy1 = srch_corner_y[ioffset+n];
+      grdy2 = srch_corner_y[ioffset+next_n];
+      grdx1 = srch_corner_x[ioffset+n];
+      grdx2 = srch_corner_x[ioffset+next_n];
 
       /* set up linear system to solve for intersection */
 
@@ -3387,7 +3394,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	part of the segment lies inside the grid.  
       */
       loutside = TRUE;
-      s1 = s1 + 0.001;
+      s1 = s1 + BABY_STEP;
       lat1 = beglat + s1*(endlat - beglat);
       lon1 = beglon + s1*(lon2   - beglon);
 
@@ -3405,14 +3412,16 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
     must check all sides for coincidences or intersections
   */
 
+  ioffset = cell*srch_corners;
+
   for ( n = 0; n < srch_corners; n++ ) /* intrsct_loop */
     {
       next_n = (n+1)%srch_corners;
 
-      grdlon1 = srch_corner_lon[cell*srch_corners+n];
-      grdlon2 = srch_corner_lon[cell*srch_corners+next_n];
-      grdlat1 = srch_corner_lat[cell*srch_corners+n];
-      grdlat2 = srch_corner_lat[cell*srch_corners+next_n];
+      grdlon1 = srch_corner_lon[ioffset+n];
+      grdlon2 = srch_corner_lon[ioffset+next_n];
+      grdlat1 = srch_corner_lat[ioffset+n];
+      grdlat2 = srch_corner_lat[ioffset+next_n];
 
       /* set up linear system to solve for intersection */
 
@@ -3780,6 +3789,8 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   int lcheck = TRUE;
 
+  int ioffset;
+  int grid1_addm4, grid2_addm4;
   int max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
 
   int grid1_size;
@@ -3918,16 +3929,18 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
       /* further restrict searches using bounding boxes */
 
       num_srch_cells = 0;
+      grid1_addm4 = grid1_add*4;
       for ( grid2_add = min_add; grid2_add <= max_add; grid2_add++ )
 	{
-          srch_mask[grid2_add] = (rg->grid2_bound_box[4*grid2_add+0] <= 
-				  rg->grid1_bound_box[4*grid1_add+1])  &&
-	                         (rg->grid2_bound_box[4*grid2_add+1] >= 
-                                  rg->grid1_bound_box[4*grid1_add+0])  &&
-                                 (rg->grid2_bound_box[4*grid2_add+2] <= 
-                                  rg->grid1_bound_box[4*grid1_add+3])  &&
-                                 (rg->grid2_bound_box[4*grid2_add+3] >= 
-                                  rg->grid1_bound_box[4*grid1_add+2]);
+	  grid2_addm4 = grid2_add*4;
+          srch_mask[grid2_add] = (rg->grid2_bound_box[grid2_addm4+0] <= 
+				  rg->grid1_bound_box[grid1_addm4+1])  &&
+	                         (rg->grid2_bound_box[grid2_addm4+1] >= 
+                                  rg->grid1_bound_box[grid1_addm4+0])  &&
+                                 (rg->grid2_bound_box[grid2_addm4+2] <= 
+                                  rg->grid1_bound_box[grid1_addm4+3])  &&
+                                 (rg->grid2_bound_box[grid2_addm4+3] >= 
+                                  rg->grid1_bound_box[grid1_addm4+2]);
 
           if ( srch_mask[grid2_add] ) num_srch_cells++;
         }
@@ -3950,16 +3963,20 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	if ( srch_mask[grid2_add] )
 	  {
             srch_add[n] = grid2_add;
+	    ioffset = grid2_add*srch_corners;
+
 	    /* Unvectorized loop */
 	    for ( k = 0; k < srch_corners; k++ )
 	      {
-		srch_corner_lat[n*srch_corners+k] = rg->grid2_corner_lat[grid2_add*srch_corners+k];
-		srch_corner_lon[n*srch_corners+k] = rg->grid2_corner_lon[grid2_add*srch_corners+k];
+		srch_corner_lat[n*srch_corners+k] = rg->grid2_corner_lat[ioffset+k];
+		srch_corner_lon[n*srch_corners+k] = rg->grid2_corner_lon[ioffset+k];
 	      }
             n++;
           }
 
       /* integrate around this cell */
+
+      ioffset = grid1_add*grid1_corners;
 
       for ( corner = 0; corner < grid1_corners; corner++ )
 	{
@@ -3967,10 +3984,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
           /* define endpoints of the current segment */
 
-          beglat = rg->grid1_corner_lat[grid1_add*grid1_corners+corner];
-          beglon = rg->grid1_corner_lon[grid1_add*grid1_corners+corner];
-          endlat = rg->grid1_corner_lat[grid1_add*grid1_corners+next_corn];
-          endlon = rg->grid1_corner_lon[grid1_add*grid1_corners+next_corn];
+          beglat = rg->grid1_corner_lat[ioffset+corner];
+          beglon = rg->grid1_corner_lon[ioffset+corner];
+          endlat = rg->grid1_corner_lat[ioffset+next_corn];
+          endlon = rg->grid1_corner_lon[ioffset+next_corn];
           lrevers = FALSE;
 
           /* 
@@ -3979,10 +3996,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
           */
           if ( (endlat < beglat) || (DBL_IS_EQUAL(endlat, beglat) && endlon < beglon) )
 	    {
-	      beglat = rg->grid1_corner_lat[grid1_add*grid1_corners+next_corn];
-	      beglon = rg->grid1_corner_lon[grid1_add*grid1_corners+next_corn];
-	      endlat = rg->grid1_corner_lat[grid1_add*grid1_corners+corner];
-	      endlon = rg->grid1_corner_lon[grid1_add*grid1_corners+corner];
+	      beglat = rg->grid1_corner_lat[ioffset+next_corn];
+	      beglon = rg->grid1_corner_lon[ioffset+next_corn];
+	      endlat = rg->grid1_corner_lat[ioffset+corner];
+	      endlon = rg->grid1_corner_lon[ioffset+corner];
 	      lrevers = TRUE;
 	    }
 
@@ -4112,16 +4129,18 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
       /* further restrict searches using bounding boxes */
 
       num_srch_cells = 0;
+      grid2_addm4 = grid2_add*4;
       for ( grid1_add = min_add; grid1_add <= max_add; grid1_add++ )
 	{
-          srch_mask[grid1_add] = (rg->grid1_bound_box[4*grid1_add+0] <= 
-                                  rg->grid2_bound_box[4*grid2_add+1])  &&
-                                 (rg->grid1_bound_box[4*grid1_add+1] >= 
-                                  rg->grid2_bound_box[4*grid2_add+0])  &&
-                                 (rg->grid1_bound_box[4*grid1_add+2] <= 
-                                  rg->grid2_bound_box[4*grid2_add+3])  &&
-                                 (rg->grid1_bound_box[4*grid1_add+3] >= 
-                                  rg->grid2_bound_box[4*grid2_add+2]);
+	  grid1_addm4 = grid1_add*4;
+          srch_mask[grid1_add] = (rg->grid1_bound_box[grid1_addm4+0] <= 
+                                  rg->grid2_bound_box[grid2_addm4+1])  &&
+                                 (rg->grid1_bound_box[grid1_addm4+1] >= 
+                                  rg->grid2_bound_box[grid2_addm4+0])  &&
+                                 (rg->grid1_bound_box[grid1_addm4+2] <= 
+                                  rg->grid2_bound_box[grid2_addm4+3])  &&
+                                 (rg->grid1_bound_box[grid1_addm4+3] >= 
+                                  rg->grid2_bound_box[grid2_addm4+2]);
 
           if ( srch_mask[grid1_add] ) num_srch_cells++;
         }
@@ -4144,24 +4163,28 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	if ( srch_mask[grid1_add] )
 	  {
             srch_add[n] = grid1_add;
+	    ioffset = grid1_add*srch_corners;
+
 	    for ( k = 0; k < srch_corners; k++ )
 	      {
-		srch_corner_lat[n*srch_corners+k] = rg->grid1_corner_lat[grid1_add*srch_corners+k];
-		srch_corner_lon[n*srch_corners+k] = rg->grid1_corner_lon[grid1_add*srch_corners+k];
+		srch_corner_lat[n*srch_corners+k] = rg->grid1_corner_lat[ioffset+k];
+		srch_corner_lon[n*srch_corners+k] = rg->grid1_corner_lon[ioffset+k];
 	      }
             n++;
 	  }
 
       /* integrate around this cell */
 
+      ioffset = grid2_add*grid2_corners;
+
       for ( corner = 0; corner < grid2_corners; corner++ )
 	{
           next_corn = (corner+1)%grid2_corners;
 
-          beglat = rg->grid2_corner_lat[grid2_add*grid2_corners+corner];
-          beglon = rg->grid2_corner_lon[grid2_add*grid2_corners+corner];
-          endlat = rg->grid2_corner_lat[grid2_add*grid2_corners+next_corn];
-          endlon = rg->grid2_corner_lon[grid2_add*grid2_corners+next_corn];
+          beglat = rg->grid2_corner_lat[ioffset+corner];
+          beglon = rg->grid2_corner_lon[ioffset+corner];
+          endlat = rg->grid2_corner_lat[ioffset+next_corn];
+          endlon = rg->grid2_corner_lon[ioffset+next_corn];
           lrevers = FALSE;
 
 	  /*
@@ -4171,10 +4194,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
           if ( (endlat < beglat) || (DBL_IS_EQUAL(endlat, beglat) && endlon < beglon) )
 	    {
-	      beglat = rg->grid2_corner_lat[grid2_add*grid2_corners+next_corn];
-	      beglon = rg->grid2_corner_lon[grid2_add*grid2_corners+next_corn];
-	      endlat = rg->grid2_corner_lat[grid2_add*grid2_corners+corner];
-	      endlon = rg->grid2_corner_lon[grid2_add*grid2_corners+corner];
+	      beglat = rg->grid2_corner_lat[ioffset+next_corn];
+	      beglon = rg->grid2_corner_lon[ioffset+next_corn];
+	      endlat = rg->grid2_corner_lat[ioffset+corner];
+	      endlon = rg->grid2_corner_lon[ioffset+corner];
 	      lrevers = TRUE;
 	    }
 
