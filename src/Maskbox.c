@@ -64,7 +64,7 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
      
       xcoord = strtod(linep, &linep);
       
-      if ( xcoord == 0 ) 
+      if ( ! (fabs(xcoord) > 0) ) 
 	{
 	  jumpedlines++;
 	}
