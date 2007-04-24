@@ -63,7 +63,7 @@
 
 /* constants */
 
-/*#define  BABY_STEP  0.001 */ /* original value !!! */
+/* #define  BABY_STEP  0.001 */ /* original value */
 #define  BABY_STEP  0.01
 
 #define  ZERO     0.0
