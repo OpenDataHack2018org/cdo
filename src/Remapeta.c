@@ -72,7 +72,7 @@ void *Remapeta(void *argument)
   double *single2;
   int taxisID1, taxisID2;
   int lhavevct;
-  int nlev1 = 0, nlev2 = 0, nlev2p1;
+  int nlevh1 = 0, nlevh2 = 0, nlevh2p1;
   double *lev2;
   double *vct1 = NULL, *vct2 = NULL;
   double *a1 = NULL, *b1 = NULL, *a2 = NULL, *b2 = NULL;
@@ -131,16 +131,16 @@ void *Remapeta(void *argument)
       a2 = vct2;
       b2 = vct2 + i;
       nvct2 = 2*i;
-      nlev2 = i - 1;
-      nlev2p1 = nlev2 + 1;
+      nlevh2 = i - 1;
+      nlevh2p1 = nlevh2 + 1;
 
-      for ( i = 0; i < nlev2+1; ++i )
+      for ( i = 0; i < nlevh2+1; ++i )
 	vct2[i+nvct2/2] = vct2[i+maxvct/2];
 
       vct2 = (double *) realloc(vct2, 2*i*sizeof(double));
 
       if ( cdoVerbose )
-	for ( i = 0; i < nlev2+1; ++i )
+	for ( i = 0; i < nlevh2+1; ++i )
 	  fprintf(stdout, "vct2: %5d %25.17f %25.17f\n", i, vct2[i], vct2[nvct2/2+i]);
 
       if ( operatorArgc() == 2 )
@@ -219,9 +219,9 @@ void *Remapeta(void *argument)
 	}
     }
 
-  zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nlev2);
-  lev2 = (double *) malloc(nlev2*sizeof(double));
-  for ( i = 0; i < nlev2; ++i ) lev2[i] = i+1;
+  zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nlevh2);
+  lev2 = (double *) malloc(nlevh2*sizeof(double));
+  for ( i = 0; i < nlevh2; ++i ) lev2[i] = i+1;
   zaxisDefLevels(zaxisID2, lev2);
   free(lev2);
 
@@ -243,7 +243,7 @@ void *Remapeta(void *argument)
 		{
 		  lhavevct = TRUE;
 		  zaxisIDh = zaxisID;
-		  nlev1    = nlevel;
+		  nlevh1    = nlevel;
 	      
 		  vct1 = (double *) malloc(nvct1*sizeof(double));
 		  memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
@@ -280,19 +280,28 @@ void *Remapeta(void *argument)
     {
       gridID  = vlistInqVarGrid(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      nlevel  = zaxisInqSize(zaxisID);
 
-      code = vlistInqVarCode(vlistID1, varID);
+      /* code = vlistInqVarCode(vlistID1, varID); */
+      code = -1;
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
 
 	  strtolower(varname);
 
-	  if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
-	  else if ( strcmp(varname, "st")      == 0 ) code = 130;
-	  else if ( strcmp(varname, "sq")      == 0 ) code = 133;
-	  else if ( strcmp(varname, "aps")     == 0 ) code = 134;
-	  else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
+	  if ( nlevel == 1 )
+	    {
+	      if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
+	      else if ( strcmp(varname, "aps")     == 0 ) code = 134;
+	      else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
+	    }
+
+	  if ( nlevel == nlevh1 )
+	    {
+	      if      ( strcmp(varname, "t")       == 0 ) code = 130;
+	      else if ( strcmp(varname, "q")       == 0 ) code = 133;
+	    }
 	}
 
       if      ( code == 129 ) geopID    = varID;
@@ -307,9 +316,8 @@ void *Remapeta(void *argument)
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
 
-      nlevel   = zaxisInqSize(zaxisID);
 
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nlev1 )
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nlevh1 )
 	{
 	  if ( ! (code == 130 || code == 133) )
 	    varids[nvars3D++] = varID;
@@ -347,11 +355,11 @@ void *Remapeta(void *argument)
       pscor = (double *) malloc(ngp*sizeof(double));
       secor = (double *) malloc(ngp*sizeof(double));
 
-      t1    = (double *) malloc(ngp*nlev1*sizeof(double));
-      q1    = (double *) malloc(ngp*nlev1*sizeof(double));
+      t1    = (double *) malloc(ngp*nlevh1*sizeof(double));
+      q1    = (double *) malloc(ngp*nlevh1*sizeof(double));
 
-      t2    = (double *) malloc(ngp*nlev2*sizeof(double));
-      q2    = (double *) malloc(ngp*nlev2*sizeof(double));
+      t2    = (double *) malloc(ngp*nlevh2*sizeof(double));
+      q2    = (double *) malloc(ngp*nlevh2*sizeof(double));
     }
 
   if ( nvars3D )
@@ -361,14 +369,14 @@ void *Remapeta(void *argument)
 
       for ( varID = 0; varID < nvars3D; ++varID )
 	{
-	  vars1[varID] = (double *) malloc(ngp*nlev1*sizeof(double));
-	  vars2[varID] = (double *) malloc(ngp*nlev2*sizeof(double));
+	  vars1[varID] = (double *) malloc(ngp*nlevh1*sizeof(double));
+	  vars2[varID] = (double *) malloc(ngp*nlevh2*sizeof(double));
 	}
     }
 
   if ( zaxisIDh != -1 && geopID == -1 )
     {
-      cdoWarning("Orography not found - using zero orography!");
+      cdoWarning("Orography (geosp) not found - using zero orography!");
       memset(fis1, 0, ngp*sizeof(double));
     }
 
@@ -377,7 +385,7 @@ void *Remapeta(void *argument)
     {
       presID = psID;
       if ( psID != -1 )
-	cdoWarning("LOG surface pressure (code 152) not found - using surface pressure (code 134)!");
+	cdoWarning("LOG surface pressure (lsp) not found - using surface pressure (asp)!");
       else
 	cdoAbort("Surface pressure not found!");
     }
@@ -415,7 +423,8 @@ void *Remapeta(void *argument)
 		memcpy(t1+offset, array, ngp*sizeof(double));
 	      else if ( ltq && varID == sqID )
 		memcpy(q1+offset, array, ngp*sizeof(double));
-	      else if ( zaxisID == zaxisIDh )
+	      /* else if ( zaxisID == zaxisIDh ) */
+	      else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == nlevh1 )
 		{
 		  for ( i = 0; i < nvars3D; ++i )
 		    if ( varID == varids[i] ) break;
@@ -478,10 +487,10 @@ void *Remapeta(void *argument)
 
       if ( nvars3D || ltq )
 	hetaeta(ltq, ngp,
-		nlev1, a1, b1,
+		nlevh1, a1, b1,
 		fis1, ps1,
 		t1, q1,
-		nlev2, a2, b2,
+		nlevh2, a2, b2,
 		fis2, ps2,
 		t2, q2,
 		nvars3D, vars1, vars2,

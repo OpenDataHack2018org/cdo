@@ -224,7 +224,8 @@ void *Wct(void *argument);
 #define  CopyOperators          {"copy", "selall"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffv"}
-#define  Echam5iniOperators     {"read_e5ini", "write_e5ini"}
+#define  Echam5iniOperators     {"read_e5ml",  "read_e5sfc",  "read_e5ini",  "read_e5res", \
+                                 "write_e5ml", "write_e5sfc", "write_e5ini", "write_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}

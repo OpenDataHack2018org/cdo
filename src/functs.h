@@ -27,6 +27,9 @@
 
 #define  func_atan2 50
 
+#define  func_read  60
+#define  func_write 61
+
 #define  func_month 84
 #define  func_year  85
 #define  func_time  86
