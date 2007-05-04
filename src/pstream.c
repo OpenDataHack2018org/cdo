@@ -380,7 +380,7 @@ int pstreamOpenRead(const char *argument)
       /*      pipeInqInfo(pstreamID); */
       if ( PSTREAM_Debug ) Message(func, "pipe %s", pipename);
 #else
-      cdoAbort("Cannot use pipes, pthread library not available!");
+      cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
     }
   else
@@ -736,7 +736,7 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_unlock(pipe->mutex);
 	}
 #else
-      cdoAbort("Cannot use pipes, pthread library not available!");
+      cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
     }
   else

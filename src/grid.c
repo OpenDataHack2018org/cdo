@@ -1605,7 +1605,7 @@ int gridFromNCfile(const char *gridfile)
   nce(nc_close(nc_file_id));
 
 #else
-  cdoWarning("netCDF library not available!");
+  cdoWarning("netCDF support not compiled in!");
 #endif
 
   return (gridID);
@@ -1773,7 +1773,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   nce(nc_close(nc_file_id));
 
 #else
-  Error(func, "netCDF library not available");
+  Error(func, "netCDF support not compiled in!");
 #endif
 }
 

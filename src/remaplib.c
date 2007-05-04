@@ -5533,7 +5533,7 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
   nce(nc_close(nc_file_id));
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
 }  /* write_remap_scrip */
@@ -5923,7 +5923,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_close(nc_file_id));
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
   rv->links.option    = FALSE;

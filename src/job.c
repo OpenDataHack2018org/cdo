@@ -332,7 +332,7 @@ int job_submit(const char *expname, const char *jobfilename, const char *jobname
 
   status = drmaa_submit(expname, jobfilename, jobname, tmppath, ftppath);
 #else
-  fprintf(stderr, "DRMAA library not available!\n");
+  fprintf(stderr, "DRMAA support not compiled in!\n");
 #endif
   return (status);
 }
@@ -492,7 +492,7 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
 
   if ( flag ) fprintf(stdout, "\n");
 #else
-  fprintf(stderr, "CURL library not available!\n");
+  fprintf(stderr, "CURL support not compiled in!\n");
 #endif
 
   return (status);
@@ -563,7 +563,7 @@ int ftprmd(const char *url, const char *path)
   curl_global_cleanup();
 
 #else
-  fprintf(stderr, "CURL library not available!\n");
+  fprintf(stderr, "CURL support not compiled in!\n");
 #endif
 
   return (status);

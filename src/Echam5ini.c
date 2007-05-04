@@ -252,7 +252,7 @@ int read_e5ml(const char *filename, VAR **vars)
   nvars = nvars_ml + 1;
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
   return (nvars);
@@ -293,7 +293,7 @@ int read_e5sfc(const char *filename, VAR **vars)
   nvars = 0;
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
   return (nvars);
@@ -334,7 +334,7 @@ int read_e5ini(const char *filename, VAR **vars)
   nvars = 0;
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
   return (nvars);
@@ -616,7 +616,7 @@ int read_e5res(const char *filename, VAR **vars)
   nvars = varid;
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
   return (nvars);
@@ -898,7 +898,7 @@ int write_e5res(const char *filename, VAR **vars)
   nvars = varid;
 
 #else
-  cdoAbort("netCDF library not available!");
+  cdoAbort("netCDF support not compiled in!");
 #endif
 
   return (nvars);
