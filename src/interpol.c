@@ -542,20 +542,19 @@ void interpolate(FIELD *field1, FIELD *field2)
 
   if ( nlat > 1 )
     {
-      lat[-1] = 180 - lat[0] < 2*lat[0] - lat[1] ?
-	        180 - lat[0] : 2*lat[0] - lat[1];
-      lat[nlat] = -180 - lat[nlat-1] > 2*lat[nlat-1] - lat[nlat-2] ?
-  	          -180 - lat[nlat-1] : 2*lat[nlat-1] - lat[nlat-2];
-
-       /* Uwe Schulzweida 20.9.2003 */
-      if ( lat[-1]   >  90 ) lat[-1]   =  180 - lat[0];
-      if ( lat[nlat] < -90 ) lat[nlat] = -180 - lat[nlat-1];
+      lat[-1]   = 2*lat[0] - lat[1];
+      lat[nlat] = 2*lat[nlat-1] - lat[nlat-2];
     }
   else
     {
-      lat[-1] =  180 - lat[0];
-      lat[ 1] = -180 - lat[nlat - 1];
+      lat[-1] = lat[0] - 10;
+      lat[ 1] = lat[nlat-1] + 10;
     }
+
+  if ( lat[-1]   < -90 ) lat[-1] = -99;
+  if ( lat[-1]   >  90 ) lat[-1] =  99;
+  if ( lat[nlat] < -90 ) lat[nlat] = -99;
+  if ( lat[nlat] >  90 ) lat[nlat] =  99;
 
   lono_array = (double *) malloc((out_nlon < 2 ? 4 : out_nlon + 2) * sizeof(double));
   lono = lono_array + 1;
@@ -604,20 +603,21 @@ void interpolate(FIELD *field1, FIELD *field2)
       lono[ 1] = lono[0] + 360;
     }
 
-  if (out_nlat > 1)
+  if ( out_nlat > 1 )
     {
-      lato[-1] = 180 - lato[0] < 2 * lato[0] - lato[1] ?
- 	            180 - lato[0] : 2 * lato[0] - lato[1];
-      lato[out_nlat] = -180 - lato[out_nlat - 1] >
-	                 2 * lato[out_nlat - 1] - lato[out_nlat - 2] ?
- 	                  -180 - lato[out_nlat - 1] : 2 * lato[out_nlat - 1] -
-	                  lato[out_nlat - 2];
+      lato[-1]   = 2*lato[0] - lato[1];
+      lato[out_nlat] = 2*lato[out_nlat-1] - lato[out_nlat-2];
     }
   else
     {
-      lato[-1] =  180 - lato[0];
-      lato[ 1] = -180 - lato[out_nlat - 1];
+      lato[-1] = lato[0] - 10;
+      lato[ 1] = lato[out_nlat-1] + 10;
     }
+
+  if ( lato[-1]   < -90 ) lato[-1] = -99;
+  if ( lato[-1]   >  90 ) lato[-1] =  99;
+  if ( lato[out_nlat] < -90 ) lato[out_nlat] = -99;
+  if ( lato[out_nlat] >  90 ) lato[out_nlat] =  99;
 
   nxlon = 2*nlon + 1;
   nxlat = 2*nlat + 1;
