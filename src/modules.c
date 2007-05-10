@@ -133,6 +133,7 @@ void *Timsort(void *argument);
 void *Timpctl(void *argument);
 /* QR */
 void *Timstat(void *argument);
+void *Timstat2(void *argument);
 void *Trend(void *argument);
 void *Trms(void *argument);
 void *Vardup(void *argument);
@@ -323,6 +324,7 @@ void *Wct(void *argument);
 #define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monstd"}
 #define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "daystd"}
 #define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourstd"}
+#define  Timstat2Operators      {"timcor"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
 #define  VardupOperators        {"vardup", "varmul"}
@@ -516,6 +518,7 @@ static MODULES Modules[] =
   { Timstat,        MonstatHelp,       MonstatOperators,        1,  1 },
   { Timstat,        DaystatHelp,       DaystatOperators,        1,  1 },
   { Timstat,        HourstatHelp,      HourstatOperators,       1,  1 },
+  { Timstat2,       NULL,              Timstat2Operators,       2,  1 },
   { Trend,          TrendHelp,         TrendOperators,          1,  2 },
   { Trms,           NULL,              TrmsOperators,           2,  1 },
   { Vardup,         VardupHelp,        VardupOperators,         1,  1 },
