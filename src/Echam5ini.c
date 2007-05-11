@@ -67,7 +67,7 @@ typedef struct {
 } ATTS;
 
 
-void iniatts(ATTS *atts)
+static void iniatts(ATTS *atts)
 {
   atts->naint = 0;
   atts->naflt = 0;
@@ -75,7 +75,7 @@ void iniatts(ATTS *atts)
 }
 
 
-void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
+static void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
 	       const char *longname, const char *units)
 {
   static char func[] = "inivar_ml";
@@ -91,7 +91,8 @@ void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
   if ( units )    var->units     = strdup(units);
 }
 
-void inivars_ml(VAR **vars)
+
+static void inivars_ml(VAR **vars)
 {
   static char func[] = "inivars_ml";
 
@@ -118,7 +119,7 @@ static void nce(int istat)
 #endif
 
 
-int read_e5ml(const char *filename, VAR **vars)
+static int read_e5ml(const char *filename, VAR **vars)
 {
   static char func[] = "read_e5ml";
   int nvars = 0;
@@ -278,7 +279,215 @@ int read_e5ml(const char *filename, VAR **vars)
 }
 
 
-int read_e5sfc(const char *filename, VAR **vars)
+static void write_e5ml(const char *filename, VAR *vars, int nvars)
+{
+  static char func[] = "write_e5ml";
+#if  defined  (HAVE_LIBNETCDF)
+  int nc_dim_id, nc_var_id;
+  size_t dimlen, nvals;
+  size_t start[3], count[3];
+  int dimidsp[9];
+  int varid;
+  int ilev;
+  int lon, lat;
+  int nlon, nlat, nlev, nlevp1, nvct, nsp, n2, i, iv, nvclev;
+  int lat_dimid, lon_dimid, nlev_dimid, nlevp1_dimid, nsp_dimid, nvclev_dimid, n2_dimid;
+  int gridIDgp, gridIDsp, zaxisIDml, zaxisIDsfc;
+  int gridtype, zaxistype;
+  int nc_file_id;
+  int nc_stpid, lspid;
+  char filetype[256];
+  size_t attlen;
+  double *xvals, *yvals, *levs;
+  const double *vct;
+
+  /* create file */
+  nce(nc_create(filename, NC_CLOBBER, &nc_file_id));
+
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type", strlen(strfiletype_ml), strfiletype_ml));
+
+  n2 = 2;
+
+  lon = 0; lat = 0; nsp = 0; nlev = 0;
+  for ( varid = 0; varid < nvars; ++varid )
+    {
+      gridtype  = vars[varid].gridtype;
+      zaxistype = vars[varid].zaxistype;
+
+      if ( gridtype == GRID_GAUSSIAN && lat == 0 )
+	{
+	  gridIDgp = vars[varid].gridID;
+	  lon = gridInqXsize(vars[varid].gridID);
+	  lat = gridInqYsize(vars[varid].gridID);
+	}
+      else if ( gridtype == GRID_SPECTRAL && nsp == 0 )
+	{
+	  gridIDsp = vars[varid].gridID;
+	  nsp = gridInqSize(vars[varid].gridID);
+	  nsp = nsp/2;
+	}
+
+      if ( zaxistype == ZAXIS_HYBRID && nlev == 0 )
+	{
+	  zaxisIDml = vars[varid].zaxisID;
+	  nlev = zaxisInqSize(vars[varid].zaxisID);
+	  nlevp1 = nlev + 1;
+	  nvclev = nlev + 1;
+	}
+    }
+
+  if ( lat == 0 ) cdoAbort("Gaussian grid not found!");
+  if ( nsp == 0 ) cdoAbort("Spectral data not found!");
+  if ( nlev == 0 ) cdoAbort("Hybrid level not found!");
+
+  nlon = lon;
+  nlat = lat;
+  
+  nce(nc_def_dim(nc_file_id, "lat", lat, &lat_dimid));
+
+  nce(nc_def_dim(nc_file_id, "lon", lon, &lon_dimid));
+
+  nce(nc_def_dim(nc_file_id, "nlev", nlev, &nlev_dimid));
+  nce(nc_def_dim(nc_file_id, "nlevp1", nlevp1, &nlevp1_dimid));
+
+  nce(nc_def_dim(nc_file_id, "nsp", nsp, &nsp_dimid));
+
+  nce(nc_def_dim(nc_file_id, "nvclev", nvclev, &nvclev_dimid));
+
+  nce(nc_def_dim(nc_file_id, "n2", n2, &n2_dimid));
+
+  nce(nc_enddef(nc_file_id));
+
+  /* define gaussian grid */
+
+  xvals = (double *) malloc(nlon*sizeof(double));
+  yvals = (double *) malloc(nlat*sizeof(double));
+
+  gridInqXvals(gridIDgp, xvals);
+  gridInqYvals(gridIDgp, yvals);
+
+  nce(nc_redef(nc_file_id));
+  nce(nc_def_var(nc_file_id, "lat", NC_DOUBLE, 1, &lat_dimid, &nc_var_id));
+  nce(nc_enddef(nc_file_id));
+  nce(nc_put_var_double(nc_file_id, nc_var_id, yvals));
+   
+  nce(nc_redef(nc_file_id));
+  nce(nc_def_var(nc_file_id, "lon", NC_DOUBLE, 1, &lon_dimid, &nc_var_id));
+  nce(nc_enddef(nc_file_id));
+  nce(nc_put_var_double(nc_file_id, nc_var_id, xvals));
+
+  free(xvals);
+  free(yvals);
+
+  /* define model level */
+
+  nvct = nvclev*2;
+
+  /* vct   = (double *) malloc(nvct*sizeof(double)); */
+
+  vct = zaxisInqVctPtr(zaxisIDml);
+
+  nce(nc_redef(nc_file_id));
+  nce(nc_def_var(nc_file_id, "vct_a", NC_DOUBLE, 1, &nvclev_dimid, &nc_var_id));
+  nce(nc_enddef(nc_file_id));
+  nce(nc_put_var_double(nc_file_id, nc_var_id, vct));
+
+  nce(nc_redef(nc_file_id));
+  nce(nc_def_var(nc_file_id, "vct_b", NC_DOUBLE, 1, &nvclev_dimid, &nc_var_id));
+  nce(nc_enddef(nc_file_id));
+  nce(nc_put_var_double(nc_file_id, nc_var_id, vct+nlevp1));
+
+  /* free(vct); */
+
+  lspid = -1;
+  nc_stpid = -1;
+
+  for ( varid = 0; varid < nvars; varid++ )
+    {
+      nvals = 0;
+
+      gridtype  = vars[varid].gridtype;
+      zaxistype = vars[varid].zaxistype;
+
+      ilev = zaxisInqSize(vars[varid].zaxisID);
+
+      if ( ilev == 1 )
+	{
+	  lspid = varid;
+	  if ( gridtype != GRID_SPECTRAL ) cdoAbort("%s has different gridtype!", vars[varid].name);
+	  continue;
+	}
+
+      if ( nlev != ilev )
+	cdoAbort("Unexpected number of level %d!", ilev);
+
+      if ( gridtype == GRID_GAUSSIAN )
+	{
+	  nvals = nlon*nlat;
+
+	  dimidsp[0] = lat_dimid;
+	  dimidsp[1] = nlev_dimid;
+	  dimidsp[2] = lon_dimid;
+	}
+      else if ( gridtype == GRID_SPECTRAL )
+	{
+	  nvals = nsp*2;
+
+	  dimidsp[0] = nsp_dimid;
+	  dimidsp[1] = n2_dimid;
+
+	  if ( strcmp(vars[varid].name, "STP") == 0 || strcmp(vars[varid].name, "T") == 0 )
+	    dimidsp[2] = nlevp1_dimid;
+	  else
+	    dimidsp[2] = nlev_dimid;
+	}
+      else
+	cdoAbort("Unsupported grid!");
+
+      nce(nc_redef(nc_file_id));
+      nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
+      /*
+	nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", strlen(vars[varid].longname), vars[varid].longname));*/
+      nce(nc_enddef(nc_file_id));
+
+      if (  dimidsp[2] == nlevp1_dimid ) nc_stpid = nc_var_id;
+
+      for ( i = 0; i < nlev; i++ )
+	{
+	  if ( gridtype == GRID_GAUSSIAN )
+	    {
+	      start[0] = 0;     start[1] = i;  start[2] = 0;
+	      count[0] = nlat;  count[1] = 1;  count[2] = nlon;     
+	    }
+	  else
+	    {
+	      start[0] = 0;     start[1] = 0;  start[2] = i;
+	      count[0] = nsp;   count[1] = 2;  count[2] = 1;
+	    }
+
+	  nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr+i*nvals));
+	}
+    }
+
+  if ( lspid == -1 ) cdoAbort("LSP not found!");
+  if ( nc_stpid == -1 ) cdoAbort("STP not found!");
+
+  /* write lsp */
+  start[0] = 0;    start[1] = 0;  start[2] = nlev;
+  count[0] = nsp;  count[1] = 2;  count[2] = 1;
+
+  nce(nc_get_vara_double(nc_file_id, nc_stpid, start, count, vars[lspid].ptr));
+
+  /*close input file */
+  nce(nc_close(nc_file_id));
+
+#else
+  cdoAbort("netCDF support not compiled in!");
+#endif
+}
+
+
+static int read_e5sfc(const char *filename, VAR **vars)
 {
   static char func[] = "read_e5sfc";
   int nvars = 0;
@@ -360,7 +569,7 @@ int read_e5ini(const char *filename, VAR **vars)
 }
 
 #if  defined  (HAVE_LIBNETCDF)
-void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
+static void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
 {
   static char func[] = "read_gg3d";
   int nlev, nlat, nlon, gridsize, i;
@@ -435,7 +644,7 @@ static void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, in
 #endif
 
 
-int read_e5res(const char *filename, VAR **vars, ATTS *atts)
+static int read_e5res(const char *filename, VAR **vars, ATTS *atts)
 {
   static char func[] = "read_e5res";
   int nvars = 0;
@@ -817,7 +1026,7 @@ int read_e5res(const char *filename, VAR **vars, ATTS *atts)
 }
 
 
-void write_e5res(const char *filename, VAR *vars, int nvars)
+static void write_e5res(const char *filename, VAR *vars, int nvars)
 {
   static char func[] = "write_e5res";
 #if  defined  (HAVE_LIBNETCDF)
@@ -1166,8 +1375,8 @@ void *Echam5ini(void *argument)
   static char func[] = "Echam5ini";
   int operatorID;
   int operfunc;
-  int READ_E5ML,  READ_E5SFC,  READ_E5INI,  READ_E5RES;
-  int WRITE_E5ML, WRITE_E5SFC, WRITE_E5INI, WRITE_E5RES;
+  int READ_E5ML,  READ_E5SFC,  READ_E5RES;
+  int WRITE_E5ML, WRITE_E5SFC, WRITE_E5RES;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
   int recID, varID, levelID;
@@ -1181,11 +1390,9 @@ void *Echam5ini(void *argument)
 
   READ_E5ML   = cdoOperatorAdd("read_e5ml",   func_read,  0, NULL);
   READ_E5SFC  = cdoOperatorAdd("read_e5sfc",  func_read,  0, NULL);
-  READ_E5INI  = cdoOperatorAdd("read_e5ini",  func_read,  0, NULL);
   READ_E5RES  = cdoOperatorAdd("read_e5res",  func_read,  0, NULL);
   WRITE_E5ML  = cdoOperatorAdd("write_e5ml",  func_write, 0, NULL);
   WRITE_E5SFC = cdoOperatorAdd("write_e5sfc", func_write, 0, NULL);
-  WRITE_E5INI = cdoOperatorAdd("write_e5ini", func_write, 0, NULL);
   WRITE_E5RES = cdoOperatorAdd("write_e5res", func_write, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -1203,8 +1410,6 @@ void *Echam5ini(void *argument)
 	nvars = read_e5ml(cdoStreamName(0), &vars);
       else if ( operatorID == READ_E5SFC )
 	nvars = read_e5sfc(cdoStreamName(0), &vars);
-      else if ( operatorID == READ_E5INI )
-	nvars = read_e5ini(cdoStreamName(0), &vars);
       else if ( operatorID == READ_E5RES )
 	nvars = read_e5res(cdoStreamName(0), &vars, &atts);
       else
@@ -1314,17 +1519,17 @@ void *Echam5ini(void *argument)
 	}
 
       streamClose(streamID1);
-      /*
+
       if ( operatorID == WRITE_E5ML )
 	write_e5ml(cdoStreamName(1), vars, nvars);
+      /*
       else if ( operatorID == WRITE_E5SFC )
 	write_e5sfc(cdoStreamName(1), vars, nvars);
-      else if ( operatorID == WRITE_E5INI )
-	write_e5ini(cdoStreamName(1), vars, nvars);
-	else */ if ( operatorID == WRITE_E5RES )
+      */
+      else if ( operatorID == WRITE_E5RES )
 	write_e5res(cdoStreamName(1), vars, nvars);
       else
-	cdoAbort("Internal problem!");
+	cdoAbort("Operator not implemented!");
      
     }
   else
