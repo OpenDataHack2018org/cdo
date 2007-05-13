@@ -673,7 +673,7 @@ static int read_e5res(const char *filename, VAR **vars, ATTS *atts)
   int iatt;
   int attint;
   double attflt;
-  size_t attlen;
+  size_t attlen, dimlen;
   nc_type xtype;
   char attname[256];
   const int attstringlen = 8192; char attstring[8192];
@@ -690,37 +690,48 @@ static int read_e5res(const char *filename, VAR **vars, ATTS *atts)
   /* printf("%s\n", filetype); */
 
   nce(nc_inq_dimid(nc_file_id, "lon", &lon_dimid));
-  nce(nc_inq_dimlen(nc_file_id, lon_dimid, &lon));
+  nce(nc_inq_dimlen(nc_file_id, lon_dimid, &dimlen));
+  lon = dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "lat", &lat_dimid));
-  nce(nc_inq_dimlen(nc_file_id, lat_dimid, &lat));
+  nce(nc_inq_dimlen(nc_file_id, lat_dimid, &dimlen));
+  lat = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "nhgl", &nhgl_dimid));
-  nce(nc_inq_dimlen(nc_file_id, nhgl_dimid, &nhgl));
+  nce(nc_inq_dimlen(nc_file_id, nhgl_dimid, &dimlen));
+  nhgl = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "nlevp1", &nlevp1_dimid));
-  nce(nc_inq_dimlen(nc_file_id, nlevp1_dimid, &nlevp1));
+  nce(nc_inq_dimlen(nc_file_id, nlevp1_dimid, &dimlen));
+  nlevp1 = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "spc", &spc_dimid));
-  nce(nc_inq_dimlen(nc_file_id, spc_dimid, &spc));
+  nce(nc_inq_dimlen(nc_file_id, spc_dimid, &dimlen));
+  spc = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "nvclev", &nvclev_dimid));
-  nce(nc_inq_dimlen(nc_file_id, nvclev_dimid, &nvclev));
+  nce(nc_inq_dimlen(nc_file_id, nvclev_dimid, &dimlen));
+  nvclev = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "complex", &complex_dimid));
-  nce(nc_inq_dimlen(nc_file_id, complex_dimid, &complex));
+  nce(nc_inq_dimlen(nc_file_id, complex_dimid, &dimlen));
+  complex = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "nmp1", &nmp1_dimid));
-  nce(nc_inq_dimlen(nc_file_id, nmp1_dimid, &nmp1));
+  nce(nc_inq_dimlen(nc_file_id, nmp1_dimid, &dimlen));
+  nmp1 = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "belowsurface", &belowsurface_dimid));
-  nce(nc_inq_dimlen(nc_file_id, belowsurface_dimid, &belowsurface));
+  nce(nc_inq_dimlen(nc_file_id, belowsurface_dimid, &dimlen));
+  belowsurface = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "lev", &lev_dimid));
-  nce(nc_inq_dimlen(nc_file_id, lev_dimid, &lev));
+  nce(nc_inq_dimlen(nc_file_id, lev_dimid, &dimlen));
+  lev = (int) dimlen;
 
   nce(nc_inq_dimid(nc_file_id, "ilev", &ilev_dimid));
-  nce(nc_inq_dimlen(nc_file_id, ilev_dimid, &ilev));
+  nce(nc_inq_dimlen(nc_file_id, ilev_dimid, &dimlen));
+  ilev = (int) dimlen;
 
   /*
   nce(nc_inq_dimid(nc_file_id, "surface", &surface_dimid));
@@ -733,7 +744,8 @@ static int read_e5res(const char *filename, VAR **vars, ATTS *atts)
   nce(nc_inq_dimlen(nc_file_id, height10m_dimid, &height10m));
   */
   nce(nc_inq_dimid(nc_file_id, "n2", &n2_dimid));
-  nce(nc_inq_dimlen(nc_file_id, n2_dimid, &n2));
+  nce(nc_inq_dimlen(nc_file_id, n2_dimid, &dimlen));
+  n2 = (int) dimlen;
 
   /* define gaussian grid */
 
