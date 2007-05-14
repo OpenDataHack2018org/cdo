@@ -32,10 +32,7 @@
 #endif
 
 static int nvars_ml = 4;
-static int nvars_sfc = 18;
 static const char strfiletype_ml[]  = "Initial file spectral";
-static const char strfiletype_sfc[] = "Initial file surface";
-static const char strfiletype_ini[] = "Initial file";
 static const char strfiletype_res[] = "Restart history file";
 
 
@@ -463,7 +460,7 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 	      start[0] = 0;     start[1] = 0;  start[2] = i;
 	      count[0] = nsp;   count[1] = 2;  count[2] = 1;
 	    }
-
+	  
 	  nce(nc_put_vara_double(nc_file_id, nc_var_id, start, count, vars[varid].ptr+i*nvals));
 	}
     }
@@ -475,8 +472,7 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
   start[0] = 0;    start[1] = 0;  start[2] = nlev;
   count[0] = nsp;  count[1] = 2;  count[2] = 1;
 
-  printf("lspid %d %d %g %g %g\n", nc_stpid, lspid, vars[lspid].ptr[0], vars[lspid].ptr[1], vars[lspid].ptr[2]);
-  nce(nc_get_vara_double(nc_file_id, nc_stpid, start, count, vars[lspid].ptr));
+  nce(nc_put_vara_double(nc_file_id, nc_stpid, start, count, vars[lspid].ptr));
 
   /*close input file */
   nce(nc_close(nc_file_id));
@@ -486,87 +482,6 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 #endif
 }
 
-
-static int read_e5sfc(const char *filename, VAR **vars)
-{
-  static char func[] = "read_e5sfc";
-  int nvars = 0;
-#if  defined  (HAVE_LIBNETCDF)
-  int nc_dim_id, nc_var_id;
-  size_t dimlen, nvals;
-  size_t start[3];
-  size_t count[3];
-  int nlon, nlat, nlev, nlevp1, nvct, nsp, i, iv;
-  int gridIDgp, gridIDsp, zaxisIDml, zaxisIDsfc;
-  int gridtype, zaxistype;
-  int nc_file_id;
-  char filetype[256];
-  size_t attlen;
-  double *xvals, *yvals, *vct, *levs;
-
-  /* open file and check file type */
-  nce(nc_open(filename, NC_NOWRITE, &nc_file_id));
-
-  nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "file_type", filetype));
-  nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));
-  filetype[attlen] = 0;
-
-  if ( strcmp(filetype, strfiletype_sfc) != 0 ) return (0);
-
-  printf("%s\n", filetype);
-
-  /*close input file */
-  nce(nc_close(nc_file_id));
-
-  nvars = 0;
-
-#else
-  cdoAbort("netCDF support not compiled in!");
-#endif
-
-  return (nvars);
-}
-
-
-int read_e5ini(const char *filename, VAR **vars)
-{
-  static char func[] = "read_e5ini";
-  int nvars = 0;
-#if  defined  (HAVE_LIBNETCDF)
-  int nc_dim_id, nc_var_id;
-  size_t dimlen, nvals;
-  size_t start[3];
-  size_t count[3];
-  int nlon, nlat, nlev, nlevp1, nvct, nsp, i, iv;
-  int gridIDgp, gridIDsp, zaxisIDml, zaxisIDsfc;
-  int gridtype, zaxistype;
-  int nc_file_id;
-  char filetype[256];
-  size_t attlen;
-  double *xvals, *yvals, *vct, *levs;
-
-  /* open file and check file type */
-  nce(nc_open(filename, NC_NOWRITE, &nc_file_id));
-
-  nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "file_type", filetype));
-  nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));
-  filetype[attlen] = 0;
-
-  if ( strcmp(filetype, strfiletype_ini) != 0 ) return (0);
-
-  printf("%s\n", filetype);
-
-  /*close input file */
-  nce(nc_close(nc_file_id));
-
-  nvars = 0;
-
-#else
-  cdoAbort("netCDF support not compiled in!");
-#endif
-
-  return (nvars);
-}
 
 #if  defined  (HAVE_LIBNETCDF)
 static void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
@@ -1387,8 +1302,8 @@ void *Echam5ini(void *argument)
   static char func[] = "Echam5ini";
   int operatorID;
   int operfunc;
-  int READ_E5ML,  READ_E5SFC,  READ_E5RES;
-  int WRITE_E5ML, WRITE_E5SFC, WRITE_E5RES;
+  int READ_E5ML,  READ_E5RES;
+  int WRITE_E5ML, WRITE_E5RES;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
   int recID, varID, levelID;
@@ -1401,10 +1316,8 @@ void *Echam5ini(void *argument)
   cdoInitialize(argument);
 
   READ_E5ML   = cdoOperatorAdd("read_e5ml",   func_read,  0, NULL);
-  READ_E5SFC  = cdoOperatorAdd("read_e5sfc",  func_read,  0, NULL);
   READ_E5RES  = cdoOperatorAdd("read_e5res",  func_read,  0, NULL);
   WRITE_E5ML  = cdoOperatorAdd("write_e5ml",  func_write, 0, NULL);
-  WRITE_E5SFC = cdoOperatorAdd("write_e5sfc", func_write, 0, NULL);
   WRITE_E5RES = cdoOperatorAdd("write_e5res", func_write, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -1420,12 +1333,10 @@ void *Echam5ini(void *argument)
 
       if ( operatorID == READ_E5ML )
 	nvars = read_e5ml(cdoStreamName(0), &vars);
-      else if ( operatorID == READ_E5SFC )
-	nvars = read_e5sfc(cdoStreamName(0), &vars);
       else if ( operatorID == READ_E5RES )
 	nvars = read_e5res(cdoStreamName(0), &vars, &atts);
       else
-	cdoAbort("Internal problem!");
+	cdoAbort("Operator not implemented!");
 
       if ( nvars == 0 ) cdoAbort("Unsupported file type!");
       
@@ -1534,10 +1445,6 @@ void *Echam5ini(void *argument)
 
       if ( operatorID == WRITE_E5ML )
 	write_e5ml(cdoStreamName(1), vars, nvars);
-      /*
-      else if ( operatorID == WRITE_E5SFC )
-	write_e5sfc(cdoStreamName(1), vars, nvars);
-      */
       else if ( operatorID == WRITE_E5RES )
 	write_e5res(cdoStreamName(1), vars, nvars);
       else
