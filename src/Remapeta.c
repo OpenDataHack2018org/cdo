@@ -497,11 +497,14 @@ void *Remapeta(void *argument)
 		tscor, pscor, secor);
 
 
-      varID   = geopID;
-      levelID = 0;
-      nmiss   = 0;
-      streamDefRecord(streamID2, varID, levelID);
-      streamWriteRecord(streamID2, fis2, nmiss);
+      if ( geopID != -1 )
+	{
+	  varID   = geopID;
+	  levelID = 0;
+	  nmiss   = 0;
+	  streamDefRecord(streamID2, varID, levelID);
+	  streamWriteRecord(streamID2, fis2, nmiss);
+	}
 
       if ( lnpsID != -1 )
 	for ( i = 0; i < ngp; ++i ) ps2[i] = log(ps2[i]);

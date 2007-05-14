@@ -283,22 +283,20 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 {
   static char func[] = "write_e5ml";
 #if  defined  (HAVE_LIBNETCDF)
-  int nc_dim_id, nc_var_id;
-  size_t dimlen, nvals;
+  int nc_var_id;
+  size_t nvals;
   size_t start[3], count[3];
   int dimidsp[9];
   int varid;
   int ilev;
   int lon, lat;
-  int nlon, nlat, nlev, nlevp1, nvct, nsp, n2, i, iv, nvclev;
+  int nlon, nlat, nlev, nlevp1, nvct, nsp, n2, i, nvclev;
   int lat_dimid, lon_dimid, nlev_dimid, nlevp1_dimid, nsp_dimid, nvclev_dimid, n2_dimid;
-  int gridIDgp, gridIDsp, zaxisIDml, zaxisIDsfc;
+  int gridIDgp = -1, gridIDsp, zaxisIDml = -1;
   int gridtype, zaxistype;
   int nc_file_id;
   int nc_stpid, lspid;
-  char filetype[256];
-  size_t attlen;
-  double *xvals, *yvals, *levs;
+  double *xvals, *yvals;
   const double *vct;
 
   /* create file */
@@ -308,7 +306,7 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 
   n2 = 2;
 
-  lon = 0; lat = 0; nsp = 0; nlev = 0;
+  lon = 0; lat = 0; nsp = 0; nlev = 0; nlevp1 = 0; nvclev = 0;
   for ( varid = 0; varid < nvars; ++varid )
     {
       gridtype  = vars[varid].gridtype;
@@ -414,7 +412,8 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
       if ( ilev == 1 )
 	{
 	  lspid = varid;
-	  if ( gridtype != GRID_SPECTRAL ) cdoAbort("%s has different gridtype!", vars[varid].name);
+	  if ( gridtype != GRID_SPECTRAL )
+	    cdoAbort("%s has wrong gridtype!", vars[varid].name);
 	  continue;
 	}
 
@@ -476,6 +475,7 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
   start[0] = 0;    start[1] = 0;  start[2] = nlev;
   count[0] = nsp;  count[1] = 2;  count[2] = 1;
 
+  printf("lspid %d %d %g %g %g\n", nc_stpid, lspid, vars[lspid].ptr[0], vars[lspid].ptr[1], vars[lspid].ptr[2]);
   nce(nc_get_vara_double(nc_file_id, nc_stpid, start, count, vars[lspid].ptr));
 
   /*close input file */

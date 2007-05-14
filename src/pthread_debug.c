@@ -79,32 +79,40 @@ void print_pthread_attr(const char *caller, pthread_attr_t *attr)
 
 void print_pthread_mutexattr(const char *caller,  pthread_mutexattr_t *m_attr)
 {
-  int protocol, kind, pshared;
-
 #if defined (_POSIX_THREAD_PRIO_PROTECT) && defined (_POSIX_THREAD_PRIO_INHERIT)
+  {
+  int protocol;
   pthread_mutexattr_getprotocol(m_attr, &protocol);
   POUT3(caller, protocol, PTHREAD_PRIO_INHERIT, PTHREAD_PRIO_PROTECT, PTHREAD_PRIO_NONE);
+  }
 #endif
 
-#if defined (PTHREAD_MUTEX_FAST_NP) 
+#if defined (PTHREAD_MUTEX_FAST_NP)
+  {
+  int kind;
   pthread_mutexattr_getkind_np(m_attr, &kind);
   POUT3(caller, kind, PTHREAD_MUTEX_FAST_NP, PTHREAD_MUTEX_RECURSIVE_NP, PTHREAD_MUTEX_ERRORCHECK_NP);
+  }
 #endif
 
 #if defined (_POSIX_THREAD_PROCESS_SHARED)
+  {
+  int pshared;
   pthread_mutexattr_getpshared(m_attr, &pshared);
   POUT2(caller, pshared, PTHREAD_PROCESS_SHARED, PTHREAD_PROCESS_PRIVATE);
+  }
 #endif
 }
 
 
 void print_pthread_condattr(const char *caller, pthread_condattr_t *c_attr)
 {
-  int pshared;
-
 #if defined (_POSIX_THREAD_PROCESS_SHARED)
+  {
+  int pshared;
   pthread_condattr_getpshared(c_attr, &pshared);
   POUT2(caller, pshared, PTHREAD_PROCESS_SHARED, PTHREAD_PROCESS_PRIVATE);
+  }
 #endif
 }
 
