@@ -280,6 +280,7 @@ src/Sinfo.c -text
 src/Sort.c -text
 src/Specinfo.c -text
 src/Spectral.c -text
+src/Spectrum.c -text
 src/Split.c -text
 src/Splitrec.c -text
 src/Splittime.c -text
