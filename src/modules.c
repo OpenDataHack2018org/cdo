@@ -118,6 +118,7 @@ void *Sinfo(void *argument);
 void *Sort(void *argument);
 void *Specinfo(void *argument);
 void *Spectral(void *argument);
+void *Spectrum(void *argument);
 void *Split(void *argument);
 void *Splitrec(void *argument);
 void *Splittime(void *argument);
@@ -301,6 +302,7 @@ void *Wct(void *argument);
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
 #define  SpecinfoOperators      {"specinfo"}
 #define  SpectralOperators      {"gp2sp", "gp2spl", "sp2gp", "sp2gpl", "sp2sp", "spcut"}
+#define  SpectrumOperators      {"spectrum"}
 #define  SplitOperators         {"splitcode", "splitvar", "splitlevel", "splitgrid", "splitzaxis"}
 #define  SplitrecOperators      {"splitrec"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
@@ -495,6 +497,7 @@ static MODULES Modules[] =
   { Sort,           NULL,              SortOperators,           1,  1 },
   { Specinfo,       NULL,              SpecinfoOperators,       0,  0 },
   { Spectral,       SpectralHelp,      SpectralOperators,       1,  1 },
+  { Spectrum,       NULL,              SpectrumOperators,       1,  1 },
   { Split,          SplitHelp,         SplitOperators,          1,  1 },
   { Splitrec,       SplitHelp,         SplitrecOperators,       1,  1 },
   { Splittime,      SplittimeHelp,     SplittimeOperators,      1,  1 },

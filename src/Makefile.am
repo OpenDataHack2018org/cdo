@@ -79,6 +79,7 @@ cdo_SOURCES = Arith.c		\
               Sort.c      	\
               Specinfo.c	\
               Spectral.c	\
+              Spectrum.c	\
               Split.c   	\
               Splitrec.c 	\
               Splittime.c 	\

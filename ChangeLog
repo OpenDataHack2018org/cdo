@@ -11,6 +11,10 @@
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]
 	* Version 1.0.8 released
 
+2007-04-18  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
+
+	* New operator: maskregion
+	
 2007-03-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.6

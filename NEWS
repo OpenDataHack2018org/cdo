@@ -5,6 +5,7 @@ Version 1.0.8 (?? May 2007):
 
    * New operators:
       o Remap model level - remapeta
+      o Mask region - maskregion
       o Show GRIB level types - showltype
       o Select GRIB level types - selltype
       o Set GRIB level type - setltype
