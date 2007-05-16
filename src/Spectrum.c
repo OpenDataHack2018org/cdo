@@ -34,6 +34,7 @@
 #define  NALLOC_INC  1000
 
 
+static
 void spectrum(int nrec, double *data, double *spectrum, double *real, double *imag, double *window,
 	      double wssum, int detrend, int seg_n, int seg_l)
 {
@@ -52,7 +53,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
       sumx /= nrec;
       for (k = 0; k < nrec; k++) data[k] -= sumx;
     }
-  else if (detrend == 2)
+  else if ( detrend == 2 )
     {
       sumx = sumkx = 0;
       for (k = 0; k < nrec; k++)
@@ -99,7 +100,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 	    (float) (nrec - seg_l) / (seg_n - 1) * (seg_i + 1);
 	  for (k = 0; k < seg_l; k++)
 	    imag[k] = data[offset + k];
-	  if (detrend == 3)
+	  if ( detrend == 3 )
 	    {
 	      sumx = sumkx = 0;
 	      for (k = 0; k < seg_l; k++)

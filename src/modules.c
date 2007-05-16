@@ -60,6 +60,7 @@ void *Fillmiss(void *argument);
 void *Fldrms(void *argument);
 void *Fldstat(void *argument);
 void *Gradsdes(void *argument);
+void *Harmonic(void *argument);
 void *Histogram(void *argument);
 void *Info(void *argument);
 void *Input(void *argument);
@@ -237,6 +238,7 @@ void *Wct(void *argument);
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
+#define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
@@ -436,6 +438,7 @@ static MODULES Modules[] =
   { Fldrms,         NULL,              FldrmsOperators,         2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
+  { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      NULL,              HistogramOperators,      1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },

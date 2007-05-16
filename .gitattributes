@@ -225,6 +225,7 @@ src/Fillmiss.c -text
 src/Fldrms.c -text
 src/Fldstat.c -text
 src/Gradsdes.c -text
+src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text
 src/Info.c -text
