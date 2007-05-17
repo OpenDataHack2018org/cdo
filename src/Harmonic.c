@@ -193,7 +193,8 @@ void *Harmonic(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  for ( levelID = 0; levelID < nvars; levelID++ )
+	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
 	      for ( i = 0; i < gridsize; i++ )
@@ -208,7 +209,8 @@ void *Harmonic(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  for ( levelID = 0; levelID < nvars; levelID++ )
+	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
 	      for ( i = 0; i < gridsize; i++ )
@@ -229,7 +231,7 @@ void *Harmonic(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
@@ -251,9 +253,9 @@ void *Harmonic(void *argument)
 	      offset = gridsize*levelID;
 	      for ( i = 0; i < gridsize; i++ )
 		{
-		  out[j][varID][i+offset] = work[j][varID][i+offset] || work[n_out + j][varID][i+offset]
-		              ? atan2 (work[j][varID][i+offset], work[n_out + j][varID][i+offset]) * n / (j + 1) / 2 /
-		              M_PI : missval;
+		  out[j][varID][i+offset] = work[j][varID][i+offset] || work[n_out+j][varID][i+offset]
+		              ? atan2 (work[j][varID][i+offset], work[n_out+j][varID][i+offset]) *
+		                n / (j + 1) / 2 / M_PI : missval;
 	  
 		  if ( out[j][varID][i+offset] < 0 )
 		    out[j][varID][i+offset] += n / (j + 1.);
@@ -289,7 +291,7 @@ void *Harmonic(void *argument)
 	}
     }
 
-  for ( j = 0; j < nout; j++ )
+  for ( j = 0; j < n_out; j++ )
     {
       streamID2 = streamIDs[j];
       streamClose(streamID2);
