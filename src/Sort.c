@@ -100,7 +100,7 @@ int findrec(RecInfo *recInfo[], int nrecords, int varID, int levelID)
 void *Sort(void *argument)
 {
   static char func[] = "Sort";
-  int SORTCODE, SORTVAR, SORTLEVEL;
+  int SORTCODE, SORTNAME, SORTLEVEL;
   int operatorID;
   int streamID1, streamID2;
   int nrecs;
@@ -118,7 +118,7 @@ void *Sort(void *argument)
   cdoInitialize(argument);
 
   SORTCODE  = cdoOperatorAdd("sortcode",  0, 0, NULL);
-  SORTVAR   = cdoOperatorAdd("sortvar",   0, 0, NULL);
+  SORTNAME  = cdoOperatorAdd("sortname",  0, 0, NULL);
   SORTLEVEL = cdoOperatorAdd("sortlevel", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -135,7 +135,7 @@ void *Sort(void *argument)
   /*
   if ( operatorID == SORTCODE )
       vlistSortCode(vlistID2);
-   else if ( operatorID == SORTVAR )
+   else if ( operatorID == SORTNAME )
       ;
    else if ( operatorID == SORTLEVEL )
       ;
@@ -202,7 +202,7 @@ void *Sort(void *argument)
 	{
 	  if      ( operatorID == SORTCODE )
 	    qsort(recInfo[0], nrecords, sizeof(RecInfo), cmpreccode);
-	  else if ( operatorID == SORTVAR )
+	  else if ( operatorID == SORTNAME )
 	    qsort(recInfo[0], nrecords, sizeof(RecInfo), cmprecname);
 	  else if ( operatorID == SORTLEVEL )
 	    qsort(recInfo[0], nrecords, sizeof(RecInfo), cmpreclevel);
