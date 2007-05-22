@@ -38,7 +38,7 @@
 void *Set(void *argument)
 {
   static char func[] = "Set";
-  int SETPARTAB, SETPARTABV, SETCODE, SETVAR, SETLEVEL, SETLTYPE;
+  int SETPARTAB, SETPARTABV, SETCODE, SETNAME, SETLEVEL, SETLTYPE;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1;
@@ -60,8 +60,8 @@ void *Set(void *argument)
 
   SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table");
   SETPARTABV = cdoOperatorAdd("setpartabv", 0, 0, "parameter table");
-  SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code");
-  SETVAR     = cdoOperatorAdd("setvar",     0, 0, "variable name");
+  SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
+  SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
   SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
   SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
 
@@ -72,7 +72,7 @@ void *Set(void *argument)
     {
       newval = atoi(operatorArgv()[0]);
     }
-  else if ( operatorID == SETVAR )
+  else if ( operatorID == SETNAME )
     {
       newname = operatorArgv()[0];
     }
@@ -127,7 +127,7 @@ void *Set(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	vlistDefVarCode(vlistID2, varID, newval);
     }
-  else if ( operatorID == SETVAR )
+  else if ( operatorID == SETNAME )
     {
       vlistDefVarName(vlistID2, 0, newname);
     }
