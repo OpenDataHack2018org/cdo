@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selvar delvar selstdname sellevel selgrid selgridname selzaxis selzaxisname selltype seltabnum selrec
+@Operators = selcode delcode selname delname selstdname sellevel selgrid selgridname selzaxis selzaxisname selltype seltabnum selrec
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -15,7 +15,7 @@ The fields selected depend on the actual operator and the parameters.
 
 
 @BeginOperator_selcode
-@Title     = Select codes
+@Title     = Select variables by code number
 @Parameter = codes
 
 @BeginDescription
@@ -25,7 +25,7 @@ Selects all fields with code numbers in a user given list.
 
 
 @BeginOperator_delcode
-@Title     = Delete codes
+@Title     = Delete variables by code number
 @Parameter = codes
 
 @BeginDescription
@@ -34,8 +34,8 @@ Deletes all fields with code numbers in a user given list.
 @EndOperator
 
 
-@BeginOperator_selvar
-@Title     = Select variables
+@BeginOperator_selname
+@Title     = Select variables by name
 @Parameter = vars
 
 @BeginDescription
@@ -44,8 +44,8 @@ Selects all fields with variable names in a user given list.
 @EndOperator
 
 
-@BeginOperator_delvar
-@Title     = Delete variables
+@BeginOperator_delname
+@Title     = Delete variables by name
 @Parameter = vars
 
 @BeginDescription
@@ -55,7 +55,7 @@ Deletes all fields with variable names in a user given list.
 
 
 @BeginOperator_selstdname
-@Title     = Select standard names
+@Title     = Select variables by standard name
 @Parameter = stdnames
 
 @BeginDescription

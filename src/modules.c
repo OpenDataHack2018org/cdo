@@ -279,8 +279,8 @@ void *Wct(void *argument);
 /* QR */
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelectOperators        {"selcode", "selvar", "selstdname", "sellevel", "selgrid", "selgridname", \
-                                 "selzaxis", "selzaxisname", "seltabnum", "delcode", "delvar", "selltype"}
+#define  SelectOperators        {"selcode", "selname", "selstdname", "sellevel", "selgrid", "selgridname", \
+                                 "selzaxis", "selzaxisname", "seltabnum", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 /* RQ */
 #define  SelpctlOperators       {"selpctl"}
@@ -622,6 +622,9 @@ static char *opalias[][2] =
   {"chvar",               "chname"     },
   {"ncode",               "npar"       },
   {"nvar",                "npar"       },
+  {"delvar",              "delname"    },
+  {"vardup",              "pardup"     },
+  {"varmul",              "parmul"     },
   {"sort",                "timsort"    },
   {"vinfos",              "sinfov"     },
   /* RQ */
