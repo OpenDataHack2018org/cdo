@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
    This module contains the following operators:
 
       Split      splitcode       Split codes
-      Split      splitvar        Split variables
+      Split      splitname        Split variables
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split zaxis
@@ -37,7 +37,7 @@
 void *Split(void *argument)
 {
   static char func[] = "Split";
-  int SPLITCODE, SPLITVAR, SPLITLEVEL, SPLITGRID, SPLITZAXIS;
+  int SPLITCODE, SPLITNAME, SPLITLEVEL, SPLITGRID, SPLITZAXIS;
   int operatorID;
   int nchars;
   int streamID1;
@@ -63,7 +63,7 @@ void *Split(void *argument)
   cdoInitialize(argument);
 
   SPLITCODE  = cdoOperatorAdd("splitcode",  0, 0, NULL);
-  SPLITVAR   = cdoOperatorAdd("splitvar",   0, 0, NULL);
+  SPLITNAME  = cdoOperatorAdd("splitname",  0, 0, NULL);
   SPLITLEVEL = cdoOperatorAdd("splitlevel", 0, 0, NULL);
   SPLITGRID  = cdoOperatorAdd("splitgrid",  0, 0, NULL);
   SPLITZAXIS = cdoOperatorAdd("splitzaxis", 0, 0, NULL);
@@ -146,7 +146,7 @@ void *Split(void *argument)
 	}
       if ( codes ) free(codes);
     }
-  else if ( operatorID == SPLITVAR )
+  else if ( operatorID == SPLITNAME )
     {
       char varname[128];
       nsplit = nvars;
