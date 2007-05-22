@@ -18,8 +18,8 @@
 /*
    This module contains the following operators:
 
-      Change     chcode          Change code
-      Change     chvar           Change variable name
+      Change     chcode          Change code number
+      Change     chname          Change variable name
       Change     chlevel         Change level
       Change     chlevelc        Change level of one code
       Change     chlevelv        Change level of one variable
@@ -41,7 +41,7 @@
 void *Change(void *argument)
 {
   static char func[] = "Change";
-  int CHCODE, CHVAR, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
+  int CHCODE, CHNAME, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
@@ -49,9 +49,9 @@ void *Change(void *argument)
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
   int chcodes[MAXARG], nch = 0;
-  char *chvars[MAXARG];
+  char *chnames[MAXARG];
   char varname[128];
-  char *chvar = NULL;
+  char *chname = NULL;
   int chcode = 0;
   int code, i;
   int nmiss;
@@ -65,9 +65,9 @@ void *Change(void *argument)
 
   cdoInitialize(argument);
 
-  CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code");
-  CHVAR    = cdoOperatorAdd("chvar",    0, 0, "pairs of old and new variable name");
-  CHLEVEL  = cdoOperatorAdd("chlevel",  0, 0, "pairs of old and new level");
+  CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code numbers");
+  CHNAME   = cdoOperatorAdd("chname",   0, 0, "pairs of old and new variable names");
+  CHLEVEL  = cdoOperatorAdd("chlevel",  0, 0, "pairs of old and new levels");
   CHLEVELC = cdoOperatorAdd("chlevelc", 0, 0, "code number, old and new level");
   CHLEVELV = cdoOperatorAdd("chlevelv", 0, 0, "variable name, old and new level");
   CHLTYPE  = cdoOperatorAdd("chltype",  0, 0, "pairs of old and new type");          
@@ -84,11 +84,11 @@ void *Change(void *argument)
       for ( i = 0; i < nch; i++ )
 	chcodes[i] = atoi(operatorArgv()[i]);
     }
-  else if ( operatorID == CHVAR )
+  else if ( operatorID == CHNAME )
     {
       if ( nch%2 ) cdoAbort("Odd number of input arguments!");
       for ( i = 0; i < nch; i++ )
-	chvars[i] = operatorArgv()[i];
+	chnames[i] = operatorArgv()[i];
     }
   else if ( operatorID == CHLEVEL )
     {
@@ -108,7 +108,7 @@ void *Change(void *argument)
     {
       operatorCheckArgc(3);
       
-      chvar = operatorArgv()[0];
+      chname = operatorArgv()[0];
       chlevels[0] = atof(operatorArgv()[1]);
       chlevels[1] = atof(operatorArgv()[2]);
     }
@@ -140,15 +140,15 @@ void *Change(void *argument)
 	      vlistDefVarCode(vlistID2, varID, chcodes[i+1]);
 	}
     }
-  else if ( operatorID == CHVAR )
+  else if ( operatorID == CHNAME )
     {
       nvars = vlistNvars(vlistID2);
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  vlistInqVarName(vlistID2, varID, varname);
 	  for ( i = 0; i < nch; i += 2 )
-	    if ( strcmp(varname, chvars[i]) == 0 )
-	      vlistDefVarName(vlistID2, varID, chvars[i+1]);
+	    if ( strcmp(varname, chnames[i]) == 0 )
+	      vlistDefVarName(vlistID2, varID, chnames[i+1]);
 	}
     }
   else if ( operatorID == CHLEVEL )
@@ -197,9 +197,9 @@ void *Change(void *argument)
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      vlistInqVarName(vlistID2, varID, varname);
-	      if ( strcmp(varname, chvar) == 0 ) break;
+	      if ( strcmp(varname, chname) == 0 ) break;
 	    }
-	  if ( varID == nvars ) cdoAbort("Variable name %s not found!", chvar);
+	  if ( varID == nvars ) cdoAbort("Variable name %s not found!", chname);
 	}
 
       zaxisID1 = vlistInqVarZaxis(vlistID2, varID);

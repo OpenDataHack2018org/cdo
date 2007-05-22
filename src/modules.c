@@ -218,7 +218,7 @@ void *Wct(void *argument);
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy"}
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
-#define  ChangeOperators        {"chcode", "chvar", "chlevel", "chlevelc", "chlevelv", "chltype"}
+#define  ChangeOperators        {"chcode", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
 #define  CondOperators          {"ifthen",  "ifnotthen"}
@@ -619,12 +619,7 @@ static char *opalias[][2] =
   {"lmavg",               "ymonavg"    },
   {"lmstd",               "ymonstd"    },
   {"lsmean",              "yseasmean"  },
-  {"remaplin",            "remapbil"   },
-  {"remapcub",            "remapbic"   },
-  {"remapbilinear",       "remapbil"   },
-  {"remapbicubic",        "remapbic"   },
-  {"remapconservative",   "remapcon"   },
-  {"remapdistance",       "remapdis"   },
+  {"chvar",               "chname"     },
   {"sort",                "timsort"    },
   {"vinfos",              "sinfov"     },
   /* RQ */
