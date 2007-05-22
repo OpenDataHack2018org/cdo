@@ -185,7 +185,7 @@ void *Harmonic(void *argument)
   if ( nts%n )
     {
       cdoAbort("The length of first harmonic (=%d)"
-	       " does not divide the number of records (=%d)!\n", n, nts);
+	       " does not divide the number of timesteps (=%d)!\n", n, nts);
     }
 
   for ( j = 0; j < n_out && 2*(j+1) < n; j++ )
@@ -248,7 +248,7 @@ void *Harmonic(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	  missval  = vlistInqVarMissval(vlistID2, varID);
-	  for ( levelID = 0; levelID < nvars; levelID++ )
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset = gridsize*levelID;
 	      for ( i = 0; i < gridsize; i++ )
