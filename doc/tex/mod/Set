@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setpartab setcode setvar setlevel setltype
+@Operators = setpartab setcode setname setlevel setltype
 
 @BeginDescription
 This module sets some field information. Depending on the actual
@@ -35,7 +35,7 @@ Sets the code number for all variables to the same given value.
 @EndOperator
 
 
-@BeginOperator_setvar
+@BeginOperator_setname
 @Title     = Set variable name
 @Parameter = name
 

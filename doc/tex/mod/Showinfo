@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = showformat showcode showvar showstdname showlevel showltype showyear showmon showdate showtime
+@Operators = showformat showcode showname showstdname showlevel showltype showyear showmon showdate showtime
 
 @BeginDescription
 This module prints, according to the actual operator,
@@ -25,14 +25,14 @@ Prints the file format of the input dataset.
 
 @BeginOperator_showcode
 
-@Title     = Show codes
+@Title     = Show code numbers
 @BeginDescription
 Prints the code number of all different variables.
 @EndDescription
 @EndOperator
 
 
-@BeginOperator_showvar
+@BeginOperator_showname
 
 @Title     = Show variable names
 @BeginDescription

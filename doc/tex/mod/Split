@@ -5,7 +5,7 @@
 @Section   = File operations
 @Class     = File operation
 @Arguments = ifile oprefix
-@Operators = splitcode splitvar splitlevel splitgrid splitzaxis splitrec
+@Operators = splitcode splitname splitlevel splitgrid splitzaxis splitrec
 
 @BeginDescription
 This module splits a dataset to several files with names
@@ -15,7 +15,7 @@ formed from the field header information and @file{oprefix}.
 
 
 @BeginOperator_splitcode
-@Title     = Split codes
+@Title     = Split code numbers
 
 @BeginDescription
 Splits a dataset into pieces, one for each different code number.
@@ -25,8 +25,8 @@ form the output file names.
 @EndOperator
 
 
-@BeginOperator_splitvar
-@Title     = Split variables
+@BeginOperator_splitname
+@Title     = Split variable names
 
 @BeginDescription
 Splits a dataset into pieces, one for each variable name.

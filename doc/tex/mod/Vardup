@@ -1,31 +1,31 @@
 @BeginModule
 @Name      = Vardup
-@Title     = Variable duplication
+@Title     = Parameter duplication
 @Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = vardup varmul
+@Operators = pardup parmul
 
 @BeginDescription
-Duplicates all variables of a dataset.
+Duplicates all parameter of a dataset.
 @EndDescription
 @EndModule
 
 
-@BeginOperator_vardup
-@Title     = Duplicate variables
+@BeginOperator_pardup
+@Title     = Duplicate parameter
 
 @BeginDescription
-Duplicates all variables.
+Duplicates all parameters.
 @EndDescription
 @EndOperator
 
 
-@BeginOperator_varmul
-@Title     = Multiply variables
+@BeginOperator_parmul
+@Title     = Multiply parameter
 @Parameter = nmul
 
 @BeginDescription
-Multiplies all variables.
+Multiplies all parameters.
 @EndDescription
 @EndOperator
 

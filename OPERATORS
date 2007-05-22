@@ -14,16 +14,15 @@ Operator catalog:
       Sinfo      sinfov          Short dataset information listed by variable name
       Diff       diff            Compare two datasets listed by code number
       Diff       diffv           Compare two datasets listed by variable name
-      Ninfo      ncode           Number of codes
-      Ninfo      nvar            Number of variables
+      Ninfo      npar            Number of parameters
       Ninfo      nlevel          Number of levels
       Ninfo      nyear           Number of years
       Ninfo      nmon            Number of months
       Ninfo      ndate           Number of dates
       Ninfo      ntime           Number of time steps
       Showinfo   showformat      Show file format
-      Showinfo   showcode        Show codes
-      Showinfo   showvar         Show variable names
+      Showinfo   showcode        Show code numbers
+      Showinfo   showname        Show variable names
       Showinfo   showstdname     Show standard names
       Showinfo   showlevel       Show levels
       Showinfo   showltype       Show GRIB level types
@@ -31,7 +30,7 @@ Operator catalog:
       Showinfo   showmon         Show months
       Showinfo   showdate        Show dates
       Showinfo   showtime        Show time steps
-      Filedes    vardes          Variable description
+      Filedes    pardes          Parameter description
       Filedes    griddes         Grid description
       Filedes    vct             Vertical coordinate table
 -------------------------------------------------------------
@@ -42,8 +41,8 @@ Operator catalog:
       Replace    replace         Replace variables
       Merge      merge           Merge datasets with different fields
       Merge      mergetime       Merge datasets sorted by date and time
-      Split      splitcode       Split codes
-      Split      splitvar        Split variables
+      Split      splitcode       Split code numbers
+      Split      splitname       Split variable names
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split zaxis
@@ -56,11 +55,11 @@ Operator catalog:
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
-      Select     selcode         Select codes
-      Select     delcode         Delete codes
-      Select     selvar          Select variables
-      Select     delvar          Delete variables
-      Select     selstdname      Select standard names
+      Select     selcode         Select variables by code number
+      Select     delcode         Delete variables by code number
+      Select     selname         Select variables by name
+      Select     delname         Delete variables by name
+      Select     selstdname      Select variables by standard name
       Select     sellevel        Select levels
       Select     selgrid         Select grids
       Select     selgridname     Select grids by name
@@ -108,7 +107,7 @@ Operator catalog:
 -------------------------------------------------------------
       Set        setpartab       Set parameter table
       Set        setcode         Set code number
-      Set        setvar          Set variable name
+      Set        setname         Set variable name
       Set        setlevel        Set level
       Set        setltype        Set GRIB level type
       Settime    setdate         Set date
@@ -122,7 +121,7 @@ Operator catalog:
       Settime    setcalendar     Set calendar
       Settime    shifttime       Shift time steps
       Change     chcode          Change code number
-      Change     chvar           Change variable name
+      Change     chname          Change variable name
       Change     chlevel         Change level
       Change     chlevelc        Change level of one code
       Change     chlevelv        Change level of one variable
@@ -137,6 +136,7 @@ Operator catalog:
       Invert     invertlondes    Invert longitude description
       Invert     invertlatdata   Invert latitude data
       Invert     invertlondata   Invert longitude data
+      Maskregion maskregion      Mask regions
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
       Setbox     setclonlatbox   Set a longitude/latitude box to constant
@@ -379,8 +379,6 @@ Operator catalog:
       Timsort    timsort         Sort over the time
       Vargen     const           Create a constant field
       Vargen     random          Create a field with random values
-      Vardup     vardup          Duplicate variables
-      Vardup     varmul          Multiply variables
       Rotuv      rotuvb          Backward rotation
       Mastrfu    mastrfu         Mass stream function
       Hi         hi              Humidity index (°C)

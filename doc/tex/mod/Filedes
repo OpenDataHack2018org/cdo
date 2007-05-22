@@ -5,17 +5,17 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = vardes griddes vct
+@Operators = pardes griddes vct
 
 @BeginDescription
 This module prints, according to the actual operator, the description
-of the variables, the grids or the vertical coordinate table.
+of the parameters, the grids or the vertical coordinate table.
 @EndDescription
 @EndModule
 
 
-@BeginOperator_vardes
-@Title     = Variable description
+@BeginOperator_pardes
+@Title     = Parameter description
 
 @BeginDescription
 Prints a table with a description of all variables.
@@ -44,10 +44,10 @@ Prints the vertical coordinate table.
 
 
 @BeginExample
-Assume an input dataset having three variables with the names geosp, t and tslm1.
-To print the description of these variables use:
+Assume an input dataset having three parameters with the names geosp, t and tslm1.
+To print the description of these parameters use:
 @BeginVerbatim
-   cdo vardes ifile
+   cdo pardes ifile
 @EndVerbatim
 Result:
 @BeginVerbatim

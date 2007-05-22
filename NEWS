@@ -9,6 +9,10 @@ Version 1.0.8 (?? May 2007):
       o Show GRIB level types - showltype
       o Select GRIB level types - selltype
       o Set GRIB level type - setltype
+   * Changed operators:
+      o Renamed chvar, selvar, delvar, showvar, setvar and splitvar
+             to chname, selname, delname, showname, setname and splitname
+      o Renamed nvar to npar and vardes to pardes
    * Fixed bugs:
       o Module Ymonstat gave wrong results with missing values
         Affected operators: ymonmean, ymonstd, ymonvar

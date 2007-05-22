@@ -9,7 +9,7 @@
 
 
 @BeginOperator_sortcode
-@Title     = Sort by code number
+@Title     = Sort variables by code number
 
 @BeginDescription
 Sorts all variables by the code number.
@@ -17,8 +17,8 @@ Sorts all variables by the code number.
 @EndOperator
 
 
-@BeginOperator_sortvar
-@Title     = Sort by variable name
+@BeginOperator_sortname
+@Title     = Sort variables by name
 
 @BeginDescription
 Sorts all variables by the name.
