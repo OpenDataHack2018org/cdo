@@ -18,8 +18,8 @@
 /*
    This module contains the following operators:
 
-      Showinfo   showcode        Show codes
-      Showinfo   showvar         Show variable names
+      Showinfo   showcode        Show code numbers
+      Showinfo   showname        Show variable names
       Showinfo   showstdname     Show variable standard names
       Showinfo   showlevel       Show levels
       Showinfo   showyear        Show years
@@ -40,7 +40,7 @@
 
 void *Showinfo(void *argument)
 {
-  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWVAR, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
+  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWNAME, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
@@ -64,7 +64,7 @@ void *Showinfo(void *argument)
   SHOWDATE    = cdoOperatorAdd("showdate",      0, 0, NULL);
   SHOWTIME    = cdoOperatorAdd("showtime",      0, 0, NULL);
   SHOWCODE    = cdoOperatorAdd("showcode",      0, 0, NULL);
-  SHOWVAR     = cdoOperatorAdd("showvar",       0, 0, NULL);
+  SHOWNAME    = cdoOperatorAdd("showname",      0, 0, NULL);
   SHOWSTDNAME = cdoOperatorAdd("showstdname",   0, 0, NULL);
   SHOWLEVEL   = cdoOperatorAdd("showlevel",     0, 0, NULL);
   SHOWLTYPE   = cdoOperatorAdd("showltype",     0, 0, NULL);
@@ -176,7 +176,7 @@ void *Showinfo(void *argument)
 	}
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWVAR )
+  else if ( operatorID == SHOWNAME )
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{

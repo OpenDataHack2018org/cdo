@@ -233,7 +233,7 @@ void *Wct(void *argument);
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
 #define  ExprOperators          {"expr", "exprf"}
-#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vardes", "taxisdes", "vlist", "partab"}
+#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
@@ -288,7 +288,7 @@ void *Wct(void *argument);
 #define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selvar",  "selstd"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime", "selsmon"}
-#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setvar", "setlevel", "setltype"}
+#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setname", "setlevel", "setltype"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}
@@ -298,7 +298,7 @@ void *Wct(void *argument);
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
-#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showvar", \
+#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showname", \
                                  "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
@@ -331,7 +331,7 @@ void *Wct(void *argument);
 #define  Timstat2Operators      {"timcor"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
-#define  VardupOperators        {"vardup", "varmul"}
+#define  VardupOperators        {"pardup", "parmul"}
 #define  VargenOperators        {"random", "const", "topo"}
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl"}
@@ -527,7 +527,7 @@ static MODULES Modules[] =
   { Timstat2,       NULL,              Timstat2Operators,       2,  1 },
   { Trend,          TrendHelp,         TrendOperators,          1,  2 },
   { Trms,           NULL,              TrmsOperators,           2,  1 },
-  { Vardup,         VardupHelp,        VardupOperators,         1,  1 },
+  { Vardup,         NULL,              VardupOperators,         1,  1 },
   { Vargen,         VargenHelp,        VargenOperators,         0,  1 },
   { Varrms,         NULL,              VarrmsOperators,         2,  1 },
   { Vertint,        IntvertHelp,       VertintOperators,        1,  1 },
@@ -625,6 +625,10 @@ static char *opalias[][2] =
   {"delvar",              "delname"    },
   {"vardup",              "pardup"     },
   {"varmul",              "parmul"     },
+  {"showvar",             "showname"   },
+  {"setvar",              "setname"    },
+  {"sortvar",             "sortname"   },
+  {"splitvar",            "splitname"  },
   {"sort",                "timsort"    },
   {"vinfos",              "sinfov"     },
   /* RQ */

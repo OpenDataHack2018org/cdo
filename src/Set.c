@@ -19,8 +19,8 @@
    This module contains the following operators:
 
       Set        setpartab       Set parameter table
-      Set        setcode         Set code
-      Set        setvar          Set variable name
+      Set        setcode         Set code number
+      Set        setname         Set variable name
       Set        setlevel        Set level
       Set        setltype        Set GRIB level type
 */
