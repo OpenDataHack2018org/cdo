@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,7 @@
 /*
    This module contains the following operators:
 
-      Ninfo      ncode           Number of codes
-      Ninfo      nvar            Number of variables
+      Ninfo      npar            Number of parameters
       Ninfo      nlevel          Number of levels
       Ninfo      nyear           Number of years
       Ninfo      nmon            Number of months
@@ -28,7 +27,6 @@
 */
 
 
-#include <stdio.h>
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -37,7 +35,7 @@
 
 void *Ninfo(void *argument)
 {
-  enum {NYEAR, NMON, NDATE, NTIME, NCODE, NVAR, NLEVEL};
+  enum {NYEAR, NMON, NDATE, NTIME, NPAR, NLEVEL};
   int operatorID;
   int operfunc;
   int varID, zaxisID;
@@ -56,8 +54,7 @@ void *Ninfo(void *argument)
   cdoOperatorAdd("nmon",   NMON,   0, NULL);
   cdoOperatorAdd("ndate",  NDATE,  0, NULL);
   cdoOperatorAdd("ntime",  NTIME,  0, NULL);
-  cdoOperatorAdd("ncode",  NCODE,  0, NULL);
-  cdoOperatorAdd("nvar",   NVAR,   0, NULL);
+  cdoOperatorAdd("npar",   NPAR,  0, NULL);
   cdoOperatorAdd("nlevel", NLEVEL, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -134,8 +131,7 @@ void *Ninfo(void *argument)
       while ( (nrecs = streamInqTimestep(streamID, tsID)) ) tsID++;
       fprintf(stdout, "%d\n", tsID);
       break;
-    case NCODE:
-    case NVAR:
+    case NPAR:
       fprintf(stdout, "%d\n", nvars);
       break;
     case NLEVEL:

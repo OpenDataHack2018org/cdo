@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = chcode chvar chlevel chlevelc chlevelv
+@Operators = chcode chname chlevel chlevelc chlevelv
 
 @BeginDescription
 This module reads fields from @file{ifile}, changes some header values
@@ -25,7 +25,7 @@ Changes some user given code numbers to new user given values.
 @EndOperator
 
 
-@BeginOperator_chvar
+@BeginOperator_chname
 @Title     = Change variable name
 @Parameter = ovar nvar ...
 

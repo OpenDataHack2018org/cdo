@@ -259,7 +259,7 @@ void *Wct(void *argument);
 #define  MergetimeOperators     {"mergetime"}
 #define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd", "merpctl"}
 #define  MrotuvOperators        {"mrotuvb"}
-#define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "nvar", "nlevel"}
+#define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld", "outputarr"}
 #define  OutputgmtOperators     {"outputcenter", "outputcentercpt", "outputbounds", "outputboundscpt", "outputvector"}
@@ -620,6 +620,8 @@ static char *opalias[][2] =
   {"lmstd",               "ymonstd"    },
   {"lsmean",              "yseasmean"  },
   {"chvar",               "chname"     },
+  {"ncode",               "npar"       },
+  {"nvar",                "npar"       },
   {"sort",                "timsort"    },
   {"vinfos",              "sinfov"     },
   /* RQ */
