@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,8 +18,8 @@
 /*
    This module contains the following operators:
 
-      Vardup     vardup          Duplicate variables
-      Vardup     varmul          Multiply variables
+      Vardup     pardup          Duplicate parameters
+      Vardup     parmul          Multiply parameters
 */
 
 
@@ -35,7 +35,7 @@
 void *Vardup(void *argument)
 {
   static char func[] = "Vardup";
-  int VARDUP, VARMUL;
+  int PARDUP, PARMUL;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nrecords;
@@ -55,16 +55,16 @@ void *Vardup(void *argument)
 
   cdoInitialize(argument);
 
-  VARDUP = cdoOperatorAdd("vardup", 0, 0, NULL);
-  VARMUL = cdoOperatorAdd("varmul", 0, 0, NULL);
+  PARDUP = cdoOperatorAdd("pardup", 0, 0, NULL);
+  PARMUL = cdoOperatorAdd("parmul", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
-  if ( operatorID == VARDUP )
+  if ( operatorID == PARDUP )
     {
       nmul = 2;
     }
-  else if ( operatorID == VARMUL )
+  else if ( operatorID == PARMUL )
     {
       operatorInputArg("number of multiply");
       nmul = atoi(operatorArgv()[0]);
