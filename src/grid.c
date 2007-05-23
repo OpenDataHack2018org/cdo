@@ -536,11 +536,20 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  pline = skipSeparator(pline + 8);
 	  if ( strncmp(pline, "lonlat", 6)  == 0 ||
 	       strncmp(pline, "latlon", 6)  == 0 )
-	    grid.type = GRID_LONLAT;
+	    {
+	      grid.type = GRID_LONLAT;
+	      grid.nvertex = 2;
+	    }
 	  else if ( strncmp(pline, "gaussian", 8)  == 0 )
-	    grid.type = GRID_GAUSSIAN;
+	    {
+	      grid.type = GRID_GAUSSIAN;
+	      grid.nvertex = 2;
+	    }
 	  else if ( strncmp(pline, "curvilinear", 11)  == 0 )
-	    grid.type = GRID_CURVILINEAR;
+	    {
+	      grid.type = GRID_CURVILINEAR;
+	      grid.nvertex = 4;
+	    }
 	  else if ( strncmp(pline, "cell", 4)  == 0 )
 	    grid.type = GRID_CELL;
 	  else if ( strncmp(pline, "gme", 3)  == 0 )

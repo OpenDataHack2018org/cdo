@@ -178,11 +178,13 @@ int zaxisFromFile(FILE *gfp)
 	    zaxis.type = ZAXIS_PRESSURE;
 	  else if ( strncmp(pline, "hybrid", 6)  == 0 )
 	    zaxis.type = ZAXIS_HYBRID;
-	  else if ( strncmp(pline, "height", 6)  == 0 )
+	  else if ( strncmp(pline, "height", 6) == 0 )
 	    zaxis.type = ZAXIS_HEIGHT;
-	  else if ( strncmp(pline, "depth below sea", 15)  == 0 )
+	  else if ( strncmp(pline, "depth below sea", 15) == 0 ||
+		    strncmp(pline, "depth_below_sea", 15) == 0 )
 	    zaxis.type = ZAXIS_DEPTH_BELOW_SEA;
-	  else if ( strncmp(pline, "depth below land", 16)  == 0 )
+	  else if ( strncmp(pline, "depth below land", 16) == 0 ||
+		    strncmp(pline, "depth_below_land", 16) == 0 )
 	    zaxis.type = ZAXIS_DEPTH_BELOW_LAND;
 	  else if ( strncmp(pline, "isentropic", 10)  == 0 )
 	    zaxis.type = ZAXIS_ISENTROPIC;
