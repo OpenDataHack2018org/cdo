@@ -193,6 +193,7 @@ int gridDefine(GRID grid)
 	  {
 	    grid.xvals = (double *) malloc(grid.xsize*sizeof(double));
 	    gridGenXvals(grid.xsize, grid.xfirst, grid.xlast, grid.xinc, grid.xvals);
+	    /*
 	    if ( grid.type == GRID_GAUSSIAN && grid.xbounds == NULL && grid.xsize > 1 )
 	      {
 		grid.nvertex = 2;
@@ -205,6 +206,7 @@ int gridDefine(GRID grid)
 		grid.xbounds[0] = 2*grid.xvals[0] - grid.xbounds[1];
 		grid.xbounds[2*grid.xsize-1] = 2*grid.xvals[grid.xsize-1] - grid.xbounds[2*(grid.xsize-1)];
 	      }
+	    */
 	  }
 
 	if ( (grid.def_yfirst || grid.def_ylast || grid.def_yinc) && grid.yvals == NULL )
@@ -212,6 +214,7 @@ int gridDefine(GRID grid)
 	    if ( ! grid.def_ylast ) grid.ylast = grid.yfirst;
 	    grid.yvals = (double *) malloc(grid.ysize*sizeof(double));
 	    gridGenYvals(grid.type, grid.ysize, grid.yfirst, grid.ylast, grid.yinc, grid.yvals);
+	    /*
 	    if ( grid.type == GRID_GAUSSIAN && grid.ybounds == NULL && grid.ysize > 1 )
 	      {
 		grid.nvertex = 2;
@@ -233,6 +236,7 @@ int gridDefine(GRID grid)
 		    grid.ybounds[grid.ysize*grid.nvertex-1] = 90;
 		  }
 	      }
+	    */
 	  }
 
 	if ( grid.xvals )
@@ -252,12 +256,14 @@ int gridDefine(GRID grid)
 
 	if ( grid.xbounds )
 	  {
+	    printf("gridDefXbounds\n");
 	    gridDefXbounds(gridID, grid.xbounds);
 	    free(grid.xbounds);
 	  }
 
 	if ( grid.ybounds )
 	  {
+	    printf("gridDefYbounds\n");
 	    gridDefYbounds(gridID, grid.ybounds);
 	    free(grid.ybounds);
 	  }
@@ -267,7 +273,6 @@ int gridDefine(GRID grid)
 	    gridDefXpole(gridID, grid.xpole);
 	    gridDefYpole(gridID, grid.ypole);
 	  }
-
 	break;
       }
     case GRID_CURVILINEAR:
