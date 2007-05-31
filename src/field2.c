@@ -538,3 +538,60 @@ void farmoq(FIELD *field1, FIELD field2)
 	array1[i] = array2[i]*array2[i];
     }
 }
+
+
+/* RQ */
+/**
+ * Counts the number of nonmissing values. The result of the operation
+ * is computed according to the following rules:
+ * 
+ * field1  field2  result
+ * a       b       a + 1
+ * a       miss    a
+ * miss    b       1
+ * miss    miss    miss
+ * 
+ * @param field1 the 1st input field, also holds the result
+ * @param field2 the 2nd input field
+ */  
+void farcount(FIELD *field1, FIELD field2)
+{
+  static char func[] = "farcount";
+  int    i, len;
+  int    grid1    = field1->grid;
+  int    nmiss1   = field1->nmiss;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  /*  double *weight1 = field1->weight; */
+  int    grid2    = field2.grid;
+  int    nmiss2   = field2.nmiss;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  if ( nmiss1 > 0 || nmiss2 > 0 )
+    {
+      for ( i = 0; i < len; i++ )
+	if ( !DBL_IS_EQUAL(array2[i], missval2) )
+	  {
+	    if ( !DBL_IS_EQUAL(array1[i], missval1) )
+	      array1[i] += 1.0;
+	    else
+	      array1[i] = 1.0;
+	  }
+
+      field1->nmiss = 0;
+      for ( i = 0; i < len; i++ )
+	if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
+    }
+  else
+    {
+      for ( i = 0; i < len; i++ ) 
+	array1[i] += 1.0;
+    }
+}
+/* QR */
