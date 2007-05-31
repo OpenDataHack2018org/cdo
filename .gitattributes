@@ -258,6 +258,7 @@ src/Replace.c -text
 src/Rotuv.c -text
 src/Runpctl.c -text
 src/Runstat.c -text
+src/Seascount.c -text
 src/Seaspctl.c -text
 src/Seasstat.c -text
 src/Selbox.c -text
@@ -290,6 +291,7 @@ src/Subtrend.c -text
 src/Templates.c -text
 src/Test.c -text
 src/Tests.c -text
+src/Timcount.c -text
 src/Timpctl.c -text
 src/Timsort.c -text
 src/Timstat.c -text
