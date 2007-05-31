@@ -67,10 +67,8 @@ doc/tex/mod/EcaCwdi -text
 doc/tex/mod/EcaCwfi -text
 doc/tex/mod/EcaEtr -text
 doc/tex/mod/EcaFd -text
-doc/tex/mod/EcaFdns -text
 doc/tex/mod/EcaGsl -text
 doc/tex/mod/EcaHd -text
-doc/tex/mod/EcaHurr -text
 doc/tex/mod/EcaHwdi -text
 doc/tex/mod/EcaHwfi -text
 doc/tex/mod/EcaId -text
@@ -88,9 +86,6 @@ doc/tex/mod/EcaRr1 -text
 doc/tex/mod/EcaRx1day -text
 doc/tex/mod/EcaRx5day -text
 doc/tex/mod/EcaSdii -text
-doc/tex/mod/EcaStrbre -text
-doc/tex/mod/EcaStrgal -text
-doc/tex/mod/EcaStrwin -text
 doc/tex/mod/EcaSu -text
 doc/tex/mod/EcaTg10p -text
 doc/tex/mod/EcaTg90p -text
@@ -102,6 +97,7 @@ doc/tex/mod/EcaTx90p -text
 doc/tex/mod/Enlarge -text
 doc/tex/mod/Ensstat -text
 doc/tex/mod/Exprf -text
+doc/tex/mod/Fdns -text
 doc/tex/mod/Filedes -text
 doc/tex/mod/Fillmiss -text
 doc/tex/mod/Fldstat -text
@@ -111,6 +107,7 @@ doc/tex/mod/Hi -text
 doc/tex/mod/Histogram -text
 doc/tex/mod/Hourpctl -text
 doc/tex/mod/Hourstat -text
+doc/tex/mod/Hurr -text
 doc/tex/mod/Info -text
 doc/tex/mod/Input -text
 doc/tex/mod/Intgrid -text
@@ -157,6 +154,9 @@ doc/tex/mod/Specinfo -text
 doc/tex/mod/Spectral -text
 doc/tex/mod/Split -text
 doc/tex/mod/Splittime -text
+doc/tex/mod/Strbre -text
+doc/tex/mod/Strgal -text
+doc/tex/mod/Strwin -text
 doc/tex/mod/Subtrend -text
 doc/tex/mod/Timpctl -text
 doc/tex/mod/Timsort -text

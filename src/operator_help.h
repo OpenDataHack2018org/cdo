@@ -2902,21 +2902,6 @@ static char *MastrfuHelp[] = {
     NULL
 };
 
-static char *HiHelp[] = {
-    "NAME",
-    "    hi - Humidity index (°C)",
-    "",
-    "SYNOPSIS",
-    "    hi  ifile1 ifile2 ifile3 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1, ifile2 and ifile3 be time series",
-    "    of temperature, vapour pressure and relative humidity records.",
-    "    Then a corresponding time series of resulting humidity index values",
-    "    is written to ofile.",
-    NULL
-};
-
 static char *WctHelp[] = {
     "NAME",
     "    wct - Windchill temperature (°C)",
@@ -2929,6 +2914,96 @@ static char *WctHelp[] = {
     "    speed records, then a corresponding time series of resulting windchill",
     "    temperatures is written to ofile. Note that the temperature and",
     "    wind speed records must be given in units of °C and m/s, respectively.",
+    NULL
+};
+
+static char *FdnsHelp[] = {
+    "NAME",
+    "    fdns - Frost days where no snow index per time period",
+    "",
+    "SYNOPSIS",
+    "    fdns  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile1 be a time series of daily minimum temperatures TN",
+    "    and ifile2 be a corresponding series of daily surface snow",
+    "    amounts. Then counted is the number of days where TN < 0° Celsius",
+    "    and the surface snow amount is less than 1 cm.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *StrwinHelp[] = {
+    "NAME",
+    "    strwin - Strong wind days index per time period",
+    "",
+    "SYNOPSIS",
+    "    strwin[,v]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum horizontal wind speeds",
+    "    VX, then counted is the number of days where VX > v. The horizontal wind",
+    "    speed v is an optional parameter with default v = 10.5 m/s. Note that both",
+    "    VX and v must be given in units of m/s. Also note that the horizontal wind",
+    "    speed is defined as the square root of the sum of squares of the zonal and",
+    "    meridional wind speeds.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    "",
+    "PARAMETER",
+    "    v  FLOAT   Horizontal wind speed threshold (m/s, default v = 10.5 m/s)",
+    NULL
+};
+
+static char *StrbreHelp[] = {
+    "NAME",
+    "    strbre - Strong breeze days index per time period",
+    "",
+    "SYNOPSIS",
+    "    strbre  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum horizontal wind speeds",
+    "    VX, then counted is the number of days where VX is greater than or equal ",
+    "    to 10.5 m/s. Note that VX is defined as the square root of the sum of squares",
+    "    of the zonal and meridional wind speeds and must be given in units of m/s.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *StrgalHelp[] = {
+    "NAME",
+    "    strgal - Strong gale days index per time period",
+    "",
+    "SYNOPSIS",
+    "    strgal  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum horizontal wind speeds",
+    "    VX, then counted is the number of days where VX is greater than or equal ",
+    "    to 20.5 m/s. Note that VX is defined as the square root of the sum of squares",
+    "    of the zonal and meridional wind speeds and must be given in units of m/s.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
+    NULL
+};
+
+static char *HurrHelp[] = {
+    "NAME",
+    "    hurr - Hurricane days index per time period",
+    "",
+    "SYNOPSIS",
+    "    hurr  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of daily maximum horizontal wind speeds",
+    "    VX, then counted is the number of days where VX is greater than or equal ",
+    "    to 32.5 m/s. Note that VX is defined as the square root of the sum of squares",
+    "    of the zonal and meridional wind speeds and must be given in units of m/s.",
+    "    The date information for a time step in ofile is the date of",
+    "    the last contributing time step in ifile.",
     NULL
 };
 
@@ -3079,23 +3154,6 @@ static char *EcaFdHelp[] = {
     "    Let ifile be a time series of daily minimum temperatures TN,",
     "    then counted is the number of days where TN < 0° Celsius. Note",
     "    that TN must be given in units of kelvin.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaFdnsHelp[] = {
-    "NAME",
-    "    eca_fdns - Frost days where no snow index per time period",
-    "",
-    "SYNOPSIS",
-    "    eca_fdns  ifile1 ifile2 ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile1 be a time series of daily minimum temperatures TN",
-    "    and ifile2 be a corresponding series of daily surface snow",
-    "    amounts. Then counted is the number of days where TN < 0° Celsius",
-    "    and the surface snow amount is less than 1 cm.",
     "    The date information for a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
     NULL
@@ -3450,79 +3508,6 @@ static char *EcaSdiiHelp[] = {
     "    Let ifile be a time series of daily precipitation amounts RR,",
     "    then the mean precipitation amount at wet days (RR > 1 mm) is written",
     "    to ofile. ",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaStrwinHelp[] = {
-    "NAME",
-    "    eca_strwin - Strong wind days index per time period",
-    "",
-    "SYNOPSIS",
-    "    eca_strwin[,v]  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum horizontal wind speeds",
-    "    VX, then counted is the number of days where VX > v. The horizontal wind",
-    "    speed v is an optional parameter with default v = 10.5 m/s. Note that both",
-    "    VX and v must be given in units of m/s. Also note that the horizontal wind",
-    "    speed is defined as the square root of the sum of squares of the zonal and",
-    "    meridional wind speeds.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    "",
-    "PARAMETER",
-    "    v  FLOAT   Horizontal wind speed threshold (m/s, default v = 10.5 m/s)",
-    NULL
-};
-
-static char *EcaStrbreHelp[] = {
-    "NAME",
-    "    eca_strbre - Strong breeze days index per time period",
-    "",
-    "SYNOPSIS",
-    "    eca_strbre  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum horizontal wind speeds",
-    "    VX, then counted is the number of days where VX is greater than or equal ",
-    "    to 10.5 m/s. Note that VX is defined as the square root of the sum of squares",
-    "    of the zonal and meridional wind speeds and must be given in units of m/s.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaStrgalHelp[] = {
-    "NAME",
-    "    eca_strgal - Strong gale days index per time period",
-    "",
-    "SYNOPSIS",
-    "    eca_strgal  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum horizontal wind speeds",
-    "    VX, then counted is the number of days where VX is greater than or equal ",
-    "    to 20.5 m/s. Note that VX is defined as the square root of the sum of squares",
-    "    of the zonal and meridional wind speeds and must be given in units of m/s.",
-    "    The date information for a time step in ofile is the date of",
-    "    the last contributing time step in ifile.",
-    NULL
-};
-
-static char *EcaHurrHelp[] = {
-    "NAME",
-    "    eca_hurr - Hurricane days index per time period",
-    "",
-    "SYNOPSIS",
-    "    eca_hurr  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of daily maximum horizontal wind speeds",
-    "    VX, then counted is the number of days where VX is greater than or equal ",
-    "    to 32.5 m/s. Note that VX is defined as the square root of the sum of squares",
-    "    of the zonal and meridional wind speeds and must be given in units of m/s.",
     "    The date information for a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
     NULL

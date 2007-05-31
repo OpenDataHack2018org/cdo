@@ -53,12 +53,12 @@
       EcaRr1      eca_rr1      RR1      number of wet days
       EcaSdii     eca_sdii     SDII     simple daily intensity index
       
-      EcaFdns     eca_fdns              frost days without surface snow 
+      Fdns        fdns                  frost days without surface snow 
 
-      EcaStrwin   eca_strwin            number of strong-wind days
-      EcaStrbre   eca_strbre            number of strong-breeze days 
-      EcaStrgal   eca_strgal            number of strong-gale days 
-      EcaHurr     eca_hurr              number of hurricane days 
+      Strwin      strwin                number of strong-wind days
+      Strbre      strbre                number of strong-breeze days 
+      Strgal      strgal                number of strong-gale days 
+      Hurr        hurr                  number of hurricane days 
 */
 
 #include <stdio.h>
@@ -464,6 +464,7 @@ void *EcaGsl(void *argument)
   char *longname;
   int argN = 6; 
   double argT = 5.0;
+  double minLandFraction = 0.5;
   ECA_REQUEST_4 request;
   
   cdoInitialize(argument);
@@ -471,6 +472,7 @@ void *EcaGsl(void *argument)
   
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
+  if ( operatorArgc() > 2 ) minLandFraction = atof(operatorArgv()[2]);
 
   longname = (char *) malloc(strlen(GSL_LONGNAME) + 160);
   sprintf(longname, GSL_LONGNAME, argN, argT, argN, argT);
@@ -485,6 +487,8 @@ void *EcaGsl(void *argument)
   request.s1arg     = TO_KELVIN(argT);
   request.s2        = farselltc;
   request.s2arg     = TO_KELVIN(argT);
+  request.s3        = farselgec;
+  request.s3arg     = minLandFraction;
   request.consecutiveDays = argN;    
    
   eca4(&request);
@@ -1325,12 +1329,12 @@ void *EcaSdii(void *argument)
 }
 
 
-void *EcaFdns(void *argument)
+void *Fdns(void *argument)
 {
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_fdns", 0, 17, NULL);
+  cdoOperatorAdd("fdns", 0, 17, NULL);
 
   request.var1.name     = FDNS_NAME;
   request.var1.longname = FDNS_LONGNAME;
@@ -1352,15 +1356,15 @@ void *EcaFdns(void *argument)
 }
 
 
-void *EcaStrwin(void *argument)
+void *Strwin(void *argument)
 {
-  static const char func[] = "EcaStrwin";
+  static const char func[] = "Strwin";
   char *longname;
   double maxWind = 10.5;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_strwin", 0, 17, NULL);
+  cdoOperatorAdd("strwin", 0, 17, NULL);
 
   if ( operatorArgc() > 0 )
     maxWind = atof(operatorArgv()[0]);
@@ -1395,13 +1399,13 @@ void *EcaStrwin(void *argument)
 }
 
 
-void *EcaStrbre(void *argument)
+void *Strbre(void *argument)
 {
   static const double maxWind = 10.5;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_strbre", 0, 17, NULL);
+  cdoOperatorAdd("strbre", 0, 17, NULL);
          
   request.var1.name     = STRBRE_NAME;
   request.var1.longname = STRBRE_LONGNAME;
@@ -1428,13 +1432,13 @@ void *EcaStrbre(void *argument)
 }
 
 
-void *EcaStrgal(void *argument)
+void *Strgal(void *argument)
 {
   static const double maxWind = 20.5;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_strgal", 0, 17, NULL);
+  cdoOperatorAdd("strgal", 0, 17, NULL);
          
   request.var1.name     = STRBRE_NAME;
   request.var1.longname = STRBRE_LONGNAME;
@@ -1461,13 +1465,13 @@ void *EcaStrgal(void *argument)
 }
 
 
-void *EcaHurr(void *argument)
+void *Hurr(void *argument)
 {
   static const double maxWind = 32.5;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_hurr", 0, 17, NULL);
+  cdoOperatorAdd("hurr", 0, 17, NULL);
          
   request.var1.name     = HURR_NAME;
   request.var1.longname = HURR_LONGNAME;

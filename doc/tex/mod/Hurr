@@ -1,11 +1,10 @@
 @BeginModule
 @NewPage
-@Name      = EcaHurr
+@Name      = Hurr
 @Title     = Hurricane days index per time period 
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = eca_hurr
+@Operators = hurr
 
 @BeginDescription
 Let @file{ifile} be a time series of daily maximum horizontal wind speeds
@@ -18,6 +17,6 @@ the last contributing time step in @file{ifile}.
 @EndModule
 
 
-@BeginOperator_eca_hurr
+@BeginOperator_hurr
 @Title     = Hurricane days index per time period
 @EndOperator

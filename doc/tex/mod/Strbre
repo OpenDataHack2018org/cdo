@@ -1,10 +1,9 @@
 @BeginModule
-@Name      = EcaStrbre
+@Name      = Strbre
 @Title     = Strong breeze days index per time period 
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = eca_strbre
+@Operators = strbre
 
 @BeginDescription
 Let @file{ifile} be a time series of daily maximum horizontal wind speeds
@@ -17,6 +16,6 @@ the last contributing time step in @file{ifile}.
 @EndModule
 
 
-@BeginOperator_eca_strbre
+@BeginOperator_strbre
 @Title     = Strong breeze days index per time period
 @EndOperator

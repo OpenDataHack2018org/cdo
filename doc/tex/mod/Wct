@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Wct
 @Title     = Windchill temperature (°C)
 @Section   = Miscellaneous

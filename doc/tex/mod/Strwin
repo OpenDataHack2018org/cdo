@@ -1,11 +1,10 @@
 @BeginModule
 @NewPage
-@Name      = EcaStrwin
+@Name      = Strwin
 @Title     = Strong wind days index per time period 
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = eca_strwin
+@Operators = strwin
 
 @BeginDescription
 Let @file{ifile} be a time series of daily maximum horizontal wind speeds
@@ -20,7 +19,7 @@ the last contributing time step in @file{ifile}.
 @EndModule
 
 
-@BeginOperator_eca_strwin
+@BeginOperator_strwin
 @Title     = Strong wind days index per time period
 @Parameter = [v]
 @EndOperator

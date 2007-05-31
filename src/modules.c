@@ -93,6 +93,7 @@ void *Runpctl(void *argument);
 /* QR */
 void *Runstat(void *argument);
 /* RQ */
+void *Seascount(void *argument);
 void *Seaspctl(void *argument);
 /* QR */
 void *Seasstat(void *argument);
@@ -132,6 +133,7 @@ void *Test2(void *argument);
 void *Tests(void *argument);
 void *Timsort(void *argument);
 /* RQ */
+void *Timcount(void *argument);
 void *Timpctl(void *argument);
 /* QR */
 void *Timstat(void *argument);
@@ -202,11 +204,11 @@ void *EcaRx1day(void *argument);
 void *EcaRx5day(void *argument);
 void *EcaSdii(void *argument);
 
-void *EcaFdns(void *argument);
-void *EcaStrwin(void *argument);
-void *EcaStrbre(void *argument);
-void *EcaStrgal(void *argument);
-void *EcaHurr(void *argument);
+void *Fdns(void *argument);
+void *Strwin(void *argument);
+void *Strbre(void *argument);
+void *Strgal(void *argument);
+void *Hurr(void *argument);
 
 void *Hi(void *argument);
 void *Wct(void *argument);
@@ -275,6 +277,7 @@ void *Wct(void *argument);
 /* QR */
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runvar",  "runstd"}
 /* RQ */
+#define  SeascountOperators     {"seascount"}
 #define  SeaspctlOperators      {"seaspctl"}
 /* QR */
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
@@ -317,6 +320,11 @@ void *Wct(void *argument);
 #define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fisher"}
 #define  TimsortOperators       {"timsort"}
 /* RQ */
+#define  TimcountOperators      {"timcount"}
+#define    YearcountOperators   {"yearcount"}
+#define    MoncountOperators    {"moncount"}
+#define    DaycountOperators    {"daycount"}
+#define    HourcountOperators   {"hourcount"}
 #define  TimpctlOperators       {"timpctl"}
 #define    YearpctlOperators    {"yearpctl"}
 #define    MonpctlOperators     {"monpctl"}
@@ -396,12 +404,12 @@ void *Wct(void *argument);
 #define  EcaRx5dayOperators     {"eca_rx5day"}
 #define  EcaSdiiOperators       {"eca_sdii"}
 
-#define  EcaFdnsOperators       {"eca_fdns"}
+#define  FdnsOperators          {"fdns"}
 
-#define  EcaStrwinOperators     {"eca_strwin"}
-#define  EcaStrbreOperators     {"eca_strbre"}
-#define  EcaStrgalOperators     {"eca_strgal"}
-#define  EcaHurrOperators       {"eca_hurr"}
+#define  StrwinOperators        {"strwin"}
+#define  StrbreOperators        {"strbre"}
+#define  StrgalOperators        {"strgal"}
+#define  HurrOperators          {"hurr"}
 
 #define  HiOperators            {"hi"}
 #define  WctOperators           {"wct"}
@@ -474,6 +482,7 @@ static MODULES Modules[] =
   /* QR */
   { Runstat,        RunstatHelp,       RunstatOperators,        1,  1 },
   /* RQ */
+  { Seascount,      NULL,              SeascountOperators,      1,  1 },
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,       3,  1 },
   /* QR */
   { Seasstat,       SeasstatHelp,      SeasstatOperators,       1,  1 },
@@ -512,6 +521,11 @@ static MODULES Modules[] =
   { Test2,          NULL,              Test2Operators,          2,  1 },
   { Tests,          NULL,              TestsOperators,          1,  1 },
   /* RQ */
+  { Timcount,       NULL,              TimcountOperators,       1,  1 },
+  { Timcount,       NULL,              YearcountOperators,      1,  1 },
+  { Timcount,       NULL,              MoncountOperators,       1,  1 },
+  { Timcount,       NULL,              DaycountOperators,       1,  1 },
+  { Timcount,       NULL,              HourcountOperators,      1,  1 },
   { Timpctl,        TimpctlHelp,       TimpctlOperators,        3,  1 },
   { Timpctl,        YearpctlHelp,      YearpctlOperators,       3,  1 },
   { Timpctl,        MonpctlHelp,       MonpctlOperators,        3,  1 },
@@ -589,13 +603,13 @@ static MODULES Modules[] =
   { EcaRx1day,      EcaRx1dayHelp,     EcaRx1dayOperators,      1,  1 },
   { EcaRx5day,      EcaRx5dayHelp,     EcaRx5dayOperators,      1,  1 },
   { EcaSdii,        EcaSdiiHelp,       EcaSdiiOperators,        1,  1 },
-  { EcaFdns,        EcaFdnsHelp,       EcaFdnsOperators,        2,  1 },
-  { EcaStrwin,      EcaStrwinHelp,     EcaStrwinOperators,      1,  1 },
-  { EcaStrbre,      EcaStrbreHelp,     EcaStrbreOperators,      1,  1 },
-  { EcaStrgal,      EcaStrgalHelp,     EcaStrgalOperators,      1,  1 },
-  { EcaHurr,        EcaHurrHelp,       EcaHurrOperators,        1,  1 },
+  { Fdns,           FdnsHelp,          FdnsOperators,           2,  1 },
+  { Strwin,         StrwinHelp,        StrwinOperators,         1,  1 },
+  { Strbre,         StrbreHelp,        StrbreOperators,         1,  1 },
+  { Strgal,         StrgalHelp,        StrgalOperators,         1,  1 },
+  { Hurr,           HurrHelp,          HurrOperators,           1,  1 },
 
-  { Hi,             HiHelp,            HiOperators,             3,  1 },
+  { Hi,             NULL,              HiOperators,             3,  1 },
   { Wct,            WctHelp,           WctOperators,            2,  1 },
   /* QR */
 };
