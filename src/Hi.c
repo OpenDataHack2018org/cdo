@@ -41,9 +41,9 @@ static const int FIRST_VAR = 0;
 static double humidityIndex(double t, double e, double r, double missval)
 {
   static const double tmin = 26.0;
-  static const double hmin = 0.40;
+  static const double rmin = 40.0;
   
-  if ( t < tmin || r < hmin )
+  if ( t < tmin || r < rmin )
     return missval;
     
   return t + (5.0 / 9.0) * ((0.01 * r * e * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t))) - 10.0);
@@ -145,8 +145,8 @@ void *Hi(void *argument)
   varID4   = vlistDefVar(vlistID4, gridID, zaxisID, TIME_VARIABLE);
 
   taxisID4 = taxisCreate(TAXIS_RELATIVE);
-  taxisDefTunit(taxisID4, TUNIT_SECOND);
-  taxisDefCalendar(taxisID4, CALENDAR_PROLEPTIC);
+  taxisDefTunit(taxisID4, TUNIT_MINUTE);
+  taxisDefCalendar(taxisID4, CALENDAR_STANDARD);
   taxisDefRdate(taxisID4, 19550101);
   taxisDefRtime(taxisID4, 0);
   vlistDefTaxis(vlistID4, taxisID4);

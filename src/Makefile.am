@@ -57,6 +57,7 @@ cdo_SOURCES = Arith.c		\
               Rotuv.c     	\
               Runpctl.c  	\
               Runstat.c  	\
+              Seascount.c 	\
               Seaspctl.c 	\
               Seasstat.c 	\
               Selbox.c  	\
@@ -89,6 +90,7 @@ cdo_SOURCES = Arith.c		\
               Templates.c    	\
               Test.c    	\
               Tests.c    	\
+              Timcount.c 	\
               Timpctl.c 	\
               Timsort.c 	\
               Timstat.c 	\
