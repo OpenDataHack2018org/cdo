@@ -91,8 +91,8 @@ void eca1(const ECA_REQUEST_1 *request)
 
   itaxisID = vlistInqTaxis(ivlistID);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
-  taxisDefTunit(otaxisID, TUNIT_SECOND);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefTunit(otaxisID, TUNIT_MINUTE);
+  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -459,8 +459,8 @@ void eca2(const ECA_REQUEST_2 *request)
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
-  taxisDefTunit(otaxisID, TUNIT_SECOND);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefTunit(otaxisID, TUNIT_MINUTE);
+  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -550,7 +550,10 @@ void eca2(const ECA_REQUEST_2 *request)
         {
 	  if ( !streamInqTimestep(istreamID2, itsID) )
 	    cdoAbort("Input streams have different number of time steps!");
-            
+
+          ivdate = taxisInqVdate(itaxisID1);
+          ivtime = taxisInqVtime(itaxisID1);
+          
           if ( nsets == 0 ) indate1 = (INT64)ivdate*10000 + ivtime;
           indate2 = (INT64)ivdate*10000 + ivtime;
 
@@ -824,8 +827,8 @@ void eca3(const ECA_REQUEST_3 *request)
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
-  taxisDefTunit(otaxisID, TUNIT_SECOND);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefTunit(otaxisID, TUNIT_MINUTE);
+  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -984,83 +987,97 @@ void eca4(const ECA_REQUEST_4 *request)
   int ovdate = 0, ovtime = 0;
   int month;
   int nrecs, nrecords;
-  int gridID, zaxisID, varID, levelID, recID;
+  int gridID, zaxisID, varID, ovarID1, ovarID2, levelID, recID;
   int itsID;
   int otsID;
   long nsets;
   int i;
-  int istreamID, ostreamID;
-  int ivlistID, ovlistID, itaxisID, otaxisID;
+  int istreamID1, istreamID2, ostreamID;
+  int ivlistID1, ivlistID2, ovlistID, itaxisID, otaxisID;
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  FIELD *var1 = NULL, *var2 = NULL, *sdat = NULL, *edat = NULL, *var3 = NULL;
-  FIELD field;
+  FIELD *num1 = NULL, *num2 = NULL, *var1 = NULL, *var2 = NULL;
+  FIELD field, mask;
+  double firstDay, finalDay;
   
   intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
 
-  istreamID = streamOpenRead(cdoStreamName(0));
-  if ( istreamID < 0 ) cdiError(istreamID, "Open failed on %s", cdoStreamName(0));
+  istreamID1 = streamOpenRead(cdoStreamName(0));
+  if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
+  istreamID2 = streamOpenRead(cdoStreamName(1));
+  if ( istreamID2 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(1));
 
-  ivlistID = streamInqVlist(istreamID);
+  ivlistID1 = streamInqVlist(istreamID1);
+  ivlistID2 = streamInqVlist(istreamID2);
   ovlistID = vlistCreate();
+
+  gridID = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
+  if ( gridID != vlistInqVarGrid(ivlistID2, FIRST_VAR_ID) ) cdoAbort("Grid sizes of the input fields do not match!");
   
-  gridID  = vlistInqVarGrid(ivlistID, FIRST_VAR_ID);
-  zaxisID = vlistInqVarZaxis(ivlistID, FIRST_VAR_ID);
-  varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
+  zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
+  ovarID1 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
   
   if ( IS_SET(request->name) )
-    vlistDefVarName(ovlistID, varID, request->name);
+    vlistDefVarName(ovlistID, ovarID1, request->name);
   if ( IS_SET(request->longname) ) 
-    vlistDefVarLongname(ovlistID, varID, request->longname);
+    vlistDefVarLongname(ovlistID, ovarID1, request->longname);
   if ( IS_SET(request->units) ) 
-    vlistDefVarUnits(ovlistID, varID, request->units);
+    vlistDefVarUnits(ovlistID, ovarID1, request->units);
 
-  varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
+  ovarID2 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
   
   if ( IS_SET(request->name2) ) 
-    vlistDefVarName(ovlistID, varID, request->name2);
+    vlistDefVarName(ovlistID, ovarID2, request->name2);
   if ( IS_SET(request->longname2) ) 
-    vlistDefVarLongname(ovlistID, varID, request->longname2);
+    vlistDefVarLongname(ovlistID, ovarID2, request->longname2);
   if ( IS_SET(request->units2) ) 
-    vlistDefVarUnits(ovlistID, varID, request->units2);
+    vlistDefVarUnits(ovlistID, ovarID2, request->units2);
 
-  varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
-      
   if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
 
-  itaxisID = vlistInqTaxis(ivlistID);
+  itaxisID = vlistInqTaxis(ivlistID1);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
-  taxisDefTunit(otaxisID, TUNIT_SECOND);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefTunit(otaxisID, TUNIT_MINUTE);
+  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
 
-  ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(1));
+  ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(ostreamID, ovlistID);
 
-  nrecords   = vlistNrecs(ivlistID);
+  nrecords   = vlistNrecs(ivlistID1);
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = gridInqSize(gridID);
 
   field.ptr = (double *) malloc(gridsize*sizeof(double));
-
+  mask.ptr = (double *) malloc(gridsize*sizeof(double));
+  
   nlevels = zaxisInqSize(zaxisID);
-  missval = vlistInqVarMissval(ivlistID, FIRST_VAR_ID);
+  missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
 
+  num1 = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  num2 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   var1 = (FIELD *) malloc(nlevels*sizeof(FIELD));
   var2 = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  var3 = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  sdat = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  edat = (FIELD *) malloc(nlevels*sizeof(FIELD));
     
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
+      num1[levelID].grid    = gridID;
+      num1[levelID].nmiss   = 0;
+      num1[levelID].missval = missval;
+      num1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+      num2[levelID].grid    = gridID;
+      num2[levelID].nmiss   = 0;
+      num2[levelID].missval = missval;
+      num2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
       var1[levelID].grid    = gridID;
       var1[levelID].nmiss   = 0;
       var1[levelID].missval = missval;
@@ -1070,30 +1087,27 @@ void eca4(const ECA_REQUEST_4 *request)
       var2[levelID].nmiss   = 0;
       var2[levelID].missval = missval;
       var2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      var3[levelID].grid    = gridID;
-      var3[levelID].nmiss   = 0;
-      var3[levelID].missval = missval;
-      var3[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      sdat[levelID].grid    = gridID;
-      sdat[levelID].nmiss   = 0;
-      sdat[levelID].missval = missval;
-      sdat[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      edat[levelID].grid    = gridID;
-      edat[levelID].nmiss   = 0;
-      edat[levelID].missval = missval;
-      edat[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
     }
-
+  
   indate2 = 0;
   itsID   = 0;
   otsID   = 0;
+
+  if ( streamInqTimestep(istreamID2, itsID) )
+    {
+      streamInqRecord(istreamID2, &varID, &levelID);
+      streamReadRecord(istreamID2, mask.ptr, &mask.nmiss);
+      mask.grid    = gridID;
+      mask.missval = vlistInqVarMissval(ivlistID2, 0);
+
+      request->s3(&mask, request->s3arg);
+    }
+  else cdoAbort("Could not read land-water mask!");
+
   while ( TRUE )
     {
       nsets = 0;
-      while ( (nrecs = streamInqTimestep(istreamID, itsID)) > 0 )
+      while ( (nrecs = streamInqTimestep(istreamID1, itsID)) > 0 )
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
@@ -1105,7 +1119,7 @@ void eca4(const ECA_REQUEST_4 *request)
 
           for ( recID = 0; recID < nrecs; recID++ )
             {
-              streamInqRecord(istreamID, &varID, &levelID);
+              streamInqRecord(istreamID1, &varID, &levelID);
 
               if ( itsID == 0 )
                 {
@@ -1113,75 +1127,49 @@ void eca4(const ECA_REQUEST_4 *request)
                   recLevelID[recID] = levelID;
                 }
               if ( varID != FIRST_VAR_ID ) continue;
-
+              
               if ( nsets == 0 )
                 {
                   for ( i = 0; i < gridsize; i++ )
                     {
+                      num1[levelID].ptr[i] = missval;
+                      num2[levelID].ptr[i] = missval;
                       var1[levelID].ptr[i] = missval;
                       var2[levelID].ptr[i] = missval;
-                      var3[levelID].ptr[i] = missval;
-                      sdat[levelID].ptr[i] = missval;
-                      edat[levelID].ptr[i] = missval;
                     }
+                  num1[levelID].nmiss = gridsize;
+                  num2[levelID].nmiss = gridsize;
                   var1[levelID].nmiss = gridsize;
                   var2[levelID].nmiss = gridsize;
-                  var3[levelID].nmiss = gridsize;
-                  sdat[levelID].nmiss = gridsize;
-                  edat[levelID].nmiss = gridsize;
                 }
 
-              streamReadRecord(istreamID, field.ptr, &field.nmiss);
-              field.grid    = var1[levelID].grid;
-              field.missval = var1[levelID].missval;
+              streamReadRecord(istreamID1, field.ptr, &field.nmiss);
+              field.grid    = num1[levelID].grid;
+              field.missval = num1[levelID].missval;
+
+              farsel(&field, mask);
               
               month = (ivdate % 10000) / 100;
-              if ( month < 1 || month > 12 )
-	        cdoAbort("month %d out of range!", month);
+              if ( month < 1 || month > 12 ) cdoAbort("month %d out of range!", month);
               
               if ( month < 7 ) 
                 {
                   request->s1(&field, request->s1arg);
-                  farnum2(&var1[levelID], field);
+                  farnum2(&num1[levelID], field);
                   
                   for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) && var1[levelID].ptr[i] == request->consecutiveDays )
-                      sdat[levelID].ptr[i] = ivdate;
+                    if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) && num1[levelID].ptr[i] == request->consecutiveDays )
+                      var1[levelID].ptr[i] = ivdate;
                 }
               else
                 {
                   request->s2(&field, request->s2arg);
-                  farnum2(&var2[levelID], field);
+                  farnum2(&num2[levelID], field);
 
                   for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(edat[levelID].ptr[i], missval) && var2[levelID].ptr[i] == request->consecutiveDays )
-                      edat[levelID].ptr[i] = ivdate;
+                    if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) && num2[levelID].ptr[i] == request->consecutiveDays )
+                      var2[levelID].ptr[i] = ivdate;
                 }
-                
-
-                for ( i = 0; i < gridsize; i++ )
-                  {
-                    if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) )
-                      continue;
-                    if ( DBL_IS_EQUAL(edat[levelID].ptr[i], missval) )
-                      continue;
-                    
-                    var3[levelID].ptr[i] = day_of_year(edat[levelID].ptr[i]) - day_of_year(sdat[levelID].ptr[i]) - request->consecutiveDays;
-                    sdat[levelID].ptr[i] = day_of_year(sdat[levelID].ptr[i]) + 1;
-                  }
-                
-                var3[levelID].nmiss = 0;
-                sdat[levelID].nmiss = 0;
-                edat[levelID].nmiss = 0;
-                for ( i = 0; i < gridsize; i++ )
-                  {
-                    if ( DBL_IS_EQUAL(var3[levelID].ptr[i], missval) )
-                      var3[levelID].nmiss++;
-                    if ( DBL_IS_EQUAL(sdat[levelID].ptr[i], missval) )
-                      sdat[levelID].nmiss++;
-                    if ( DBL_IS_EQUAL(edat[levelID].ptr[i], missval) )
-                      edat[levelID].nmiss++;
-                  }
             }
 
           ovdate = ivdate;
@@ -1191,24 +1179,52 @@ void eca4(const ECA_REQUEST_4 *request)
         }
 
       if ( nrecs == 0 && nsets == 0 ) break;
+
+          for ( levelID = 0; levelID < nlevels; levelID++ )
+            {
+              for ( i = 0; i < gridsize; i++ )
+                {
+                  if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) ) {
+                  	var2[levelID].ptr[i] = missval;
+                        continue;
+                  }
+                  if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) ) {
+                  	var2[levelID].ptr[i] = ivdate;
+                  }
+                  
+                  firstDay = (double) day_of_year(var1[levelID].ptr[i]);
+                  finalDay = (double) day_of_year(var2[levelID].ptr[i]);
+                  
+                  var1[levelID].ptr[i] = finalDay - firstDay;
+                  var2[levelID].ptr[i] = firstDay;
+                }
+                
+              var1[levelID].nmiss = 0;
+              var2[levelID].nmiss = 0;
+              for ( i = 0; i < gridsize; i++ )
+                {
+                  if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) )
+                    var1[levelID].nmiss++;
+                  if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) )
+                    var2[levelID].nmiss++;
+                }
+            }
       
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
       streamDefTimestep(ostreamID, otsID++);
 
-      if ( otsID == 1 || vlistInqVarTime(ivlistID, FIRST_VAR_ID) == TIME_VARIABLE )
+      if ( otsID == 1 || vlistInqVarTime(ivlistID1, FIRST_VAR_ID) == TIME_VARIABLE )
         {
-          varID = 0;
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
-              streamDefRecord(ostreamID, varID, levelID);
-              streamWriteRecord(ostreamID, var3[levelID].ptr, var3[levelID].nmiss);
+              streamDefRecord(ostreamID, ovarID1, levelID);
+              streamWriteRecord(ostreamID, var1[levelID].ptr, var1[levelID].nmiss);
             }
-          varID = 1;
           for ( levelID = 0; levelID < nlevels; levelID++ )
             {
-              streamDefRecord(ostreamID, varID, levelID);
-              streamWriteRecord(ostreamID, sdat[levelID].ptr, sdat[levelID].nmiss);
+              streamDefRecord(ostreamID, ovarID2, levelID);
+              streamWriteRecord(ostreamID, var2[levelID].ptr, var2[levelID].nmiss);
             }
         }
 
@@ -1217,17 +1233,15 @@ void eca4(const ECA_REQUEST_4 *request)
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
+      free(num1[levelID].ptr);
+      free(num2[levelID].ptr);
       free(var1[levelID].ptr);
       free(var2[levelID].ptr);
-      free(var3[levelID].ptr);
-      free(sdat[levelID].ptr);
-      free(edat[levelID].ptr);
     }  
+  free(num1);
+  free(num2);
   free(var1);
   free(var2);
-  free(var3);
-  free(sdat);
-  free(edat);
   
   if ( IS_SET(field.ptr) ) free(field.ptr);
 
@@ -1235,5 +1249,5 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( IS_SET(recLevelID) ) free(recLevelID);
 
   streamClose(ostreamID);
-  streamClose(istreamID);
+  streamClose(istreamID1);
 }

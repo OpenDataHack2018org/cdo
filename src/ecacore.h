@@ -29,7 +29,7 @@ ECA_EPILOG;
 
 typedef void (*ECA_FUNC_1)(FIELD *, double);
 typedef void (*ECA_FUNC_2)(FIELD *, FIELD);
-typedef void (*ECA_FUNC_3)(FIELD *, FIELD, double n);
+typedef void (*ECA_FUNC_3)(FIELD *, FIELD, double);
 
 /**
  * Structure describing a processing request of the form
@@ -235,6 +235,8 @@ typedef struct {
   double      s1arg;
   ECA_FUNC_1  s2;
   double      s2arg;
+  ECA_FUNC_1  s3;
+  double      s3arg;
   int         consecutiveDays;
 }
 ECA_REQUEST_4;

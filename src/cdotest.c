@@ -32,19 +32,19 @@
 
 static int equals(double expected, double actual, double eps)
 {
-  return fabs(expected - actual) < eps; 
+  return (int) fabs(expected - actual) < eps; 
 }
 
 
-static double humidityIndex(double t, double p, double h, double missval)
+static double humidityIndex(double t, double p, double r, double missval)
 {
   static const double tmin = 26.0;
-  static const double hmin = 0.40;
+  static const double rmin = 40.0;
   
-  if ( t < tmin || h < hmin )
+  if ( t < tmin || r < rmin )
     return missval;
     
-  return t + (5.0 / 9.0) * ((0.01 * h * p * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t))) - 10.0);
+  return t + (5.0 / 9.0) * ((0.01 * r * p * 6.112 * pow(10.0, (7.5 * t) / (237.7 + t))) - 10.0);
 }
 
 
@@ -125,7 +125,12 @@ static void writeNcFile(const char path[], const double array[], int length)
   
   for (tsID = 0; tsID < length; ++tsID)
     {
-      taxisDefVdate(taxisID, 20060101 + tsID);
+      /* TODO - find a better solution for setting the date */   
+      if ( tsID < 6 ) {
+        taxisDefVdate(taxisID, 20060625 + tsID);
+      } else {
+        taxisDefVdate(taxisID, 20060701 + tsID - 6);
+      }  
       taxisDefVtime(taxisID, 2359);
       streamDefTimestep(streamID, tsID);
       
@@ -239,19 +244,19 @@ static void testEcaFd()
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0.0));
+  assert(vars[0][0] == 0.0);
 
   writeNcFile("in.nc", array, 5);
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1.0));
+  assert(vars[0][0] == 1.0);
 
   writeNcFile("in.nc", array, 6);
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 2.0));
+  assert(vars[0][0] == 2.0);
   
   destroyVars(vars);
 }
@@ -277,21 +282,21 @@ static void testEcaSu()
 
   submitCdoCommand("eca_su in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 2.0));
+  assert(vars[0][0] == 2.0);
 
   submitCdoCommand("eca_su,20.0 in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 4.0));
+  assert(vars[0][0] == 4.0);
 
   submitCdoCommand("eca_su,30.0 in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0.0));
+  assert(vars[0][0] == 0.0);
   
   destroyVars(vars);
 }
 
 
-static void testEcaFdns()
+static void testFdns()
 {
   const double array1[] = {MISSVAL, TO_KELVIN(1.0), TO_KELVIN(-1.0), 
     TO_KELVIN(-1.0), TO_KELVIN(-1.0)};
@@ -305,45 +310,94 @@ static void testEcaFdns()
   writeNcFile("in1.nc", array1, 1);
   writeNcFile("in2.nc", array2, 1);
 
-  submitCdoCommand("eca_fdns in1.nc in2.nc out.nc");
+  submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
   assert(DBL_IS_EQUAL(vars[0][0], MISSVAL));
   
   writeNcFile("in1.nc", array1, 2);
   writeNcFile("in2.nc", array2, 2);
 
-  submitCdoCommand("eca_fdns in1.nc in2.nc out.nc");
+  submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0.0));
+  assert(vars[0][0] == 0.0);
 
   writeNcFile("in1.nc", array1, 3);
   writeNcFile("in2.nc", array2, 3);
 
-  submitCdoCommand("eca_fdns in1.nc in2.nc out.nc");
+  submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0.0));
+  assert(vars[0][0] == 0.0);
 
   writeNcFile("in1.nc", array1, 4);
   writeNcFile("in2.nc", array2, 4);
 
-  submitCdoCommand("eca_fdns in1.nc in2.nc out.nc");
+  submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1.0));
+  assert(vars[0][0] == 1.0);
 
   writeNcFile("in1.nc", array1, 5);
   writeNcFile("in2.nc", array2, 5);
 
-  submitCdoCommand("eca_fdns in1.nc in2.nc out.nc");
+  submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1.0));
+  assert(vars[0][0] == 1.0);
 
   writeNcFile("in1.nc", array1 + 4, 1);
   writeNcFile("in2.nc", array2 + 4, 1);
 
-  submitCdoCommand("eca_fdns in1.nc in2.nc out.nc");
+  submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
   assert(DBL_IS_EQUAL(vars[0][0], MISSVAL));
 
+  destroyVars(vars);
+}
+
+
+static void testEcaGsl()
+{
+  const double array1[] = {TO_KELVIN(6.0), TO_KELVIN(6.0), TO_KELVIN(6.0), TO_KELVIN(6.0), TO_KELVIN(6.0), TO_KELVIN(6.0), TO_KELVIN(6.0), 
+    TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0), TO_KELVIN(-1.0)};
+  const double array2[] = {0.5};
+  
+  int nvars = 2;
+  int nts   = 1;
+  
+  double **vars = createVars(nvars, nts);
+  
+  writeNcFile("in1.nc", array1, 14);
+  writeNcFile("in2.nc", array2, 2);
+
+  submitCdoCommand("eca_gsl in1.nc in2.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], 7.0));
+  assert(DBL_IS_EQUAL(vars[1][0], 181.0));
+
+  submitCdoCommand("eca_gsl,6,5.0,0.6 in1.nc in2.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], MISSVAL));
+  assert(DBL_IS_EQUAL(vars[1][0], MISSVAL));
+ 
+  writeNcFile("in1.nc", array1, 7);
+
+  submitCdoCommand("eca_gsl in1.nc in2.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], 1.0));
+  assert(DBL_IS_EQUAL(vars[1][0], 181.0));
+
+  writeNcFile("in1.nc", array1, 8);
+
+  submitCdoCommand("eca_gsl in1.nc in2.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], 2.0));
+  assert(DBL_IS_EQUAL(vars[1][0], 181.0));
+ 
+  writeNcFile("in1.nc", array1, 4);
+
+  submitCdoCommand("eca_gsl in1.nc in2.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], MISSVAL));
+  assert(DBL_IS_EQUAL(vars[1][0], MISSVAL));
+ 
   destroyVars(vars);
 }
 
@@ -376,13 +430,116 @@ static void testHi()
 }
 
 
+static void testTimcount()
+{
+  const double array[] = {MISSVAL, MISSVAL, TO_KELVIN(1.0), MISSVAL, 
+    TO_KELVIN(1.0), TO_KELVIN(1.0)};
+  
+  /* number of output variables and time steps */
+  int nvars = 1;
+  int nts   = 1;
+  
+  double **vars = createVars(nvars, nts);
+  
+  writeNcFile("in.nc", array, 2);
+
+  submitCdoCommand("timcount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], MISSVAL));
+
+  writeNcFile("in.nc", array, 3);
+
+  submitCdoCommand("timcount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(vars[0][0] == 1.0);
+
+  writeNcFile("in.nc", array, 5);
+
+  submitCdoCommand("timcount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(vars[0][0] == 2.0);
+
+  writeNcFile("in.nc", array, 6);
+
+  submitCdoCommand("timcount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(vars[0][0] == 3.0);
+  
+  destroyVars(vars);
+}
+
+
+static void testSeascount()
+{
+  const double array[] = {MISSVAL, MISSVAL, TO_KELVIN(1.0), MISSVAL, 
+    TO_KELVIN(1.0), TO_KELVIN(1.0)};
+  
+  /* number of output variables and time steps */
+  int nvars = 1;
+  int nts   = 1;
+  
+  double **vars = createVars(nvars, nts);
+  
+  writeNcFile("in.nc", array, 2);
+
+  submitCdoCommand("seascount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(DBL_IS_EQUAL(vars[0][0], MISSVAL));
+
+  writeNcFile("in.nc", array, 3);
+
+  submitCdoCommand("seascount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(vars[0][0] == 1.0);
+
+  writeNcFile("in.nc", array, 5);
+
+  submitCdoCommand("seascount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(vars[0][0] == 2.0);
+
+  writeNcFile("in.nc", array, 6);
+
+  submitCdoCommand("seascount in.nc out.nc");
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(vars[0][0] == 3.0);
+  
+  destroyVars(vars);
+}
+
+
+static void testWct()
+{
+  const double array1[] = {-3.1102};
+  const double array2[] = {1.9787};
+  
+  int nvars = 1;
+  int nts   = 1;
+  
+  double **vars = createVars(nvars, nts);
+  
+  writeNcFile("in1.nc", array1, 1);
+  writeNcFile("in2.nc", array2, 1);
+
+  submitCdoCommand("wct in1.nc in2.nc out.nc");
+
+  readNcFile("out.nc", vars, nvars, nts);
+  assert(equals(vars[0][0], -6.34597, 1.0e-5));
+  
+  destroyVars(vars);
+}
+
+
 int main(void)
 {
   testEcaFd();
   testEcaSu();
-  testEcaFdns();
-  
+  testEcaGsl();
+
+  testFdns();
   testHi();
+  testTimcount();
+  testWct();
   
   return 0;
 }

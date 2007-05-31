@@ -114,4 +114,8 @@ void farcstd(FIELD *field1, FIELD field2, double rconst1);
 void farmoq(FIELD *field1, FIELD field2);
 void faratan2(FIELD *field1, FIELD field2);
 
+/* RQ */
+void farcount(FIELD *field1, FIELD field2);
+/* QR */
+
 #endif  /* _FIELD_H */

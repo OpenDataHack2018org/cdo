@@ -144,9 +144,9 @@ unsigned long day_of_year(int date)
  * @param mode   the counting mode, must be an exact mathematical
  *               integer
  */  
-static void num(FIELD *field1, const FIELD *field2, double mode)
+static void count(FIELD *field1, const FIELD *field2, double mode)
 {
-  static const char func[] = "num";
+  static const char func[] = "count";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -353,19 +353,19 @@ static int ne(double a, double b)
 
 void farnum(FIELD *field1, FIELD field2)
 {
-  num(field1, &field2, 0.0);
+  count(field1, &field2, 0.0);
 }
 
 
 void farnum2(FIELD *field1, FIELD field2)
 {
-  num(field1, &field2, 1.0);
+  count(field1, &field2, 1.0);
 }
 
 
 void farnum3(FIELD *field1, FIELD field2, double n)
 {
-  num(field1, &field2, n);
+  count(field1, &field2, n);
 }
 
 
