@@ -32,18 +32,18 @@
 
 
 static const char WCT_NAME[]     = "wind_chill_temperature";
-static const char WCT_LONGNAME[] = "Windchill temperature describes the fact that low temperatures are felt to be even lower in case of wind. It is based on the rate of heat loss from exposed skin caused by wind and cold. It is calculated according to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * (SQRT(ff*3.6) - 0.0124 * ff * 3.6) with T  = air temperature in degree Celsius, ff = 10m wind speed in m/s. Windchill temperature is only defined for temperatures at or below 33 degree Celsius and wind speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
+static const char WCT_LONGNAME[] = "Windchill temperature describes the fact that low temperatures are felt to be even lower in case of wind. It is based on the rate of heat loss from exposed skin caused by wind and cold. It is calculated according to the empirical formula: 33 + (T - 33) * (0.478 + 0.237 * (SQRT(ff*3.6) - 0.0124 * ff * 3.6)) with T  = air temperature in degree Celsius, ff = 10 m wind speed in m/s. Windchill temperature is only defined for temperatures at or below 33 degree Celsius and wind speeds above 1.39 m/s. It is mainly used for freezing temperatures.";
 static const char WCT_UNITS[]    = "Celsius";
 
 static const int FIRST_VAR = 0;
 
 
-static double windchillTemperature(double t, double v, double missval)
+static double windchillTemperature(double t, double ff, double missval)
 {
   static const double tmax = 33.0; 
   static const double vmin = 1.39; /* minimum wind speed (m/s) */
   
-  return v < vmin || t > tmax ? missval : tmax + (0.478 + 0.237 * sqrt(v) - 0.0124 * v) * (t - tmax);
+  return ff < vmin || t > tmax ? missval : tmax + (t - tmax) * (0.478 + 0.237 * (sqrt(ff * 3.6) - 0.0124 * ff * 3.6));
 }
 
 
@@ -100,7 +100,7 @@ void *Wct(void *argument)
   FIELD field1, field2;
 
   cdoInitialize(argument);
-  cdoOperatorAdd("hi", 0, 0, NULL);
+  cdoOperatorAdd("wct", 0, 0, NULL);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -131,8 +131,8 @@ void *Wct(void *argument)
   varID3   = vlistDefVar(vlistID3, gridID, zaxisID, TIME_VARIABLE);
 
   taxisID3 = taxisCreate(TAXIS_RELATIVE);
-  taxisDefTunit(taxisID3, TUNIT_SECOND);
-  taxisDefCalendar(taxisID3, CALENDAR_PROLEPTIC);
+  taxisDefTunit(taxisID3, TUNIT_MINUTE);
+  taxisDefCalendar(taxisID3, CALENDAR_STANDARD);
   taxisDefRdate(taxisID3, 19550101);
   taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);
@@ -141,7 +141,7 @@ void *Wct(void *argument)
   vlistDefVarLongname(vlistID3, varID3, WCT_LONGNAME);
   vlistDefVarUnits(vlistID3, varID3, WCT_UNITS);
 
-  streamID3 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
+  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
