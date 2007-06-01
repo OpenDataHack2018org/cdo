@@ -279,6 +279,7 @@ src/Settime.c -text
 src/Setzaxis.c -text
 src/Showinfo.c -text
 src/Sinfo.c -text
+src/Smooth9.c -text
 src/Sort.c -text
 src/Specinfo.c -text
 src/Spectral.c -text

@@ -78,6 +78,7 @@ cdo_SOURCES = Arith.c		\
 	      Setzaxis.c	\
               Showinfo.c	\
               Sinfo.c   	\
+              Smooth9.c   	\
               Sort.c      	\
               Specinfo.c	\
               Spectral.c	\

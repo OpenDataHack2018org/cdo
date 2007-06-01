@@ -308,6 +308,8 @@ void *Sinfo(void *argument)
 		  fprintf(stdout, "longitude : first = %.9g  last = %.9g", lonfirst, lonlast);
 		  if ( !DBL_IS_EQUAL(loninc, 0) )
 		    fprintf(stdout, "  inc = %.9g", loninc);
+		  if ( gridIsCyclic(gridID) )
+		    fprintf(stdout, "  cyclic");
 		  fprintf(stdout, "\n");
 		}
 	      fprintf(stdout, "%*s", nbyte0, "");
@@ -349,6 +351,11 @@ void *Sinfo(void *argument)
 	  else if ( gridtype == GRID_CURVILINEAR )
 	    {
 	      fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
+	      if ( gridIsCyclic(gridID) )
+		{
+		  fprintf(stdout, "%*s", nbyte0, "");
+		  fprintf(stdout, "longitude :  cyclic\n");
+		}
 	    }
 	  else if ( gridtype == GRID_CELL )
 	    {
@@ -359,7 +366,14 @@ void *Sinfo(void *argument)
 	      if ( ysize == 0 )
 		fprintf(stdout, "size      : dim = %d\n", gridsize);
 	      else
-		fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
+		{
+		  fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
+		  if ( gridIsCyclic(gridID) )
+		    {
+		      fprintf(stdout, "%*s", nbyte0, "");
+		      fprintf(stdout, "longitude :  cyclic\n");
+		    }
+		}
 	    }
 
 	  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_CELL || gridtype == GRID_GENERIC )

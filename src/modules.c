@@ -117,6 +117,7 @@ void *Settime(void *argument);
 void *Setzaxis(void *argument);
 void *Showinfo(void *argument);
 void *Sinfo(void *argument);
+void *Smooth9(void *argument);
 void *Sort(void *argument);
 void *Specinfo(void *argument);
 void *Spectral(void *argument);
@@ -304,6 +305,7 @@ void *Wct(void *argument);
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showname", \
                                  "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
+#define  Smooth9Operators       {"smooth9"}
 #define  SortOperators          {"sortcode", "sortvar", "sortlevel"}
 #define  SpecinfoOperators      {"specinfo"}
 #define  SpectralOperators      {"gp2sp", "gp2spl", "sp2gp", "sp2gpl", "sp2sp", "spcut"}
@@ -506,6 +508,7 @@ static MODULES Modules[] =
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,       1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,       1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         -1,  0 },
+  { Smooth9,        NULL,              Smooth9Operators,        1,  1 },
   { Sort,           NULL,              SortOperators,           1,  1 },
   { Specinfo,       NULL,              SpecinfoOperators,       0,  0 },
   { Spectral,       SpectralHelp,      SpectralOperators,       1,  1 },

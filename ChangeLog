@@ -1,4 +1,4 @@
-2007-05-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2007-06-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.7
 	* New operator: remapeta
@@ -14,6 +14,12 @@
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]
 	* Version 1.0.8 released
 
+2007-05-30  Ralf Quast  <ralf.quast@brockmann-consult.de>
+
+	* New operator: timcount, hourcount, daycount, moncount, yearcount, seascount
+	* Renamed eca_fdns, eca_strwin, eca_strbre, eca_strgal, eca_hurr   
+	       to fdns, strwin, strbre, strgal, hurr
+	
 2007-04-18  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
 
 	* New operator: maskregion
