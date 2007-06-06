@@ -134,7 +134,7 @@ void *Smooth9(void *argument)
 		      avg = 0; divavg = 0; 	  		     			
 
 		      if ( ( i == 0 ) || ( i2 == 0 )  ||
-                           ( i == ( nlat - 1 ) ) || ( i2 == ( nlat -1 ) ) )
+                           ( i == ( nlat - 1 ) ) || ( i2 == ( nlon -1 ) ) )
 			{
 			  j = i2+nlon*i;
 			  if ( missing[j] )
@@ -226,7 +226,7 @@ void *Smooth9(void *argument)
 				  if ( missing[j] )
 				    {  avg += 0.3*array1[j]; divavg+= 0.3; }	
 				}
-			      else if ( i2 != (nlat-1) )
+			      else if ( i != (nlat-1) )
 				{
 				  j= ((i+1)*nlon)+i2+1-(nlon-1);
 				  if ( missing[j] )
@@ -267,6 +267,7 @@ void *Smooth9(void *argument)
 			    { avg += 0.5*array1[j]; divavg+= 0.5; }
 
 			  j = ((i+1)*nlon)+i2+1;
+			  printf("j = %d %d\n", j, nlon*nlat);
 			  if ( missing[j] )
 			    { avg += 0.3*array1[j]; divavg+= 0.3; }
 			}
