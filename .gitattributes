@@ -136,8 +136,6 @@ doc/tex/mod/Seaspctl -text
 doc/tex/mod/Seasstat -text
 doc/tex/mod/Selbox -text
 doc/tex/mod/Select -text
-doc/tex/mod/Selpctl -text
-doc/tex/mod/Selstat -text
 doc/tex/mod/Seltime -text
 doc/tex/mod/Set -text
 doc/tex/mod/Setbox -text
@@ -159,6 +157,8 @@ doc/tex/mod/Strgal -text
 doc/tex/mod/Strwin -text
 doc/tex/mod/Subtrend -text
 doc/tex/mod/Timpctl -text
+doc/tex/mod/Timselpctl -text
+doc/tex/mod/Timselstat -text
 doc/tex/mod/Timsort -text
 doc/tex/mod/Timstat -text
 doc/tex/mod/Trend -text
@@ -264,9 +264,7 @@ src/Seasstat.c -text
 src/Selbox.c -text
 src/Select.c -text
 src/Seloperator.c -text
-src/Selpctl.c -text
 src/Selrec.c -text
-src/Selstat.c -text
 src/Seltime.c -text
 src/Set.c -text
 src/Setbox.c -text
@@ -294,6 +292,8 @@ src/Test.c -text
 src/Tests.c -text
 src/Timcount.c -text
 src/Timpctl.c -text
+src/Timselpctl.c -text
+src/Timselstat.c -text
 src/Timsort.c -text
 src/Timstat.c -text
 src/Timstat2.c -text

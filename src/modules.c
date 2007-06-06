@@ -101,10 +101,6 @@ void *Selbox(void *argument);
 void *Select(void *argument);
 void *Seloperator(void *argument);
 void *Selrec(void *argument);
-/* RQ */
-void *Selpctl(void *argument);
-/* QR */
-void *Selstat(void *argument);
 void *Seltime(void *argument);
 void *Set(void *argument);
 void *Setbox(void *argument);
@@ -136,7 +132,9 @@ void *Timsort(void *argument);
 /* RQ */
 void *Timcount(void *argument);
 void *Timpctl(void *argument);
+void *Timselpctl(void *argument);
 /* QR */
+void *Timselstat(void *argument);
 void *Timstat(void *argument);
 void *Timstat2(void *argument);
 void *Trend(void *argument);
@@ -286,10 +284,6 @@ void *Wct(void *argument);
 #define  SelectOperators        {"selcode", "selname", "selstdname", "sellevel", "selgrid", "selgridname", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
-/* RQ */
-#define  SelpctlOperators       {"selpctl"}
-/* QR */
-#define  SelstatOperators       {"selmin",  "selmax",  "selsum",  "selmean",  "selavg",  "selvar",  "selstd"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime", "selsmon"}
 #define  SetOperators           {"setpartab", "setpartabv", "setcode", "setname", "setlevel", "setltype"}
@@ -332,7 +326,9 @@ void *Wct(void *argument);
 #define    MonpctlOperators     {"monpctl"}
 #define    DaypctlOperators     {"daypctl"}
 #define    HourpctlOperators    {"hourpctl"}
+#define  TimselpctlOperators    {"timselpctl"}
 /* QR */
+#define  TimselstatOperators    {"timselmin", "timselmax", "timselsum", "timselmean", "timselavg", "timselvar", "timselstd"}
 #define  TimstatOperators       {"timmin",  "timmax",  "timsum",  "timmean",  "timavg",  "timvar",  "timstd"}
 #define    YearstatOperators    {"yearmin", "yearmax", "yearsum", "yearmean", "yearavg", "yearvar", "yearstd"}
 #define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monstd"}
@@ -492,10 +488,6 @@ static MODULES Modules[] =
   { Select,         SelectHelp,        SelectOperators,         1,  1 },
   { Seloperator,    NULL,              SeloperatorOperators,    1,  1 },
   { Selrec,         SelectHelp,        SelrecOperators,         1,  1 },
-  /* RQ */
-  { Selpctl,        SelpctlHelp,       SelpctlOperators,        3,  1 },
-  /* QR */
-  { Selstat,        SelstatHelp,       SelstatOperators,        1,  1 },
   { Seltime,        SeltimeHelp,       SeltimeOperators,        1,  1 },
   { Set,            SetHelp,           SetOperators,            1,  1 },
   { Setbox,         SetboxHelp,        SetboxOperators,         1,  1 },
@@ -534,8 +526,10 @@ static MODULES Modules[] =
   { Timpctl,        MonpctlHelp,       MonpctlOperators,        3,  1 },
   { Timpctl,        DaypctlHelp,       DaypctlOperators,        3,  1 },
   { Timpctl,        HourpctlHelp,      HourpctlOperators,       3,  1 },
+  { Timselpctl,     TimselpctlHelp,    TimselpctlOperators,        3,  1 },
   /* QR */
   { Timsort,        TimsortHelp,       TimsortOperators,        1,  1 },
+  { Timselstat,     TimselstatHelp,    TimselstatOperators,     1,  1 },
   { Timstat,        TimstatHelp,       TimstatOperators,        1,  1 },
   { Timstat,        YearstatHelp,      YearstatOperators,       1,  1 },
   { Timstat,        MonstatHelp,       MonstatOperators,        1,  1 },
@@ -643,6 +637,7 @@ static char *opalias[][2] =
   {"vardup",              "pardup"     },
   {"varmul",              "parmul"     },
   {"showvar",             "showname"   },
+  {"selvar",              "selname"    },
   {"setvar",              "setname"    },
   {"sortvar",             "sortname"   },
   {"splitvar",            "splitname"  },

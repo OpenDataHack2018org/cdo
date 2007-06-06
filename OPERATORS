@@ -226,14 +226,14 @@ Operator catalog:
       Vertstat   vertavg         Vertical average
       Vertstat   vertvar         Vertical variance
       Vertstat   vertstd         Vertical standard deviation
-      Selstat    selmin          Time range minimum
-      Selstat    selmax          Time range maximum
-      Selstat    selsum          Time range sum
-      Selstat    selmean         Time range mean
-      Selstat    selavg          Time range average
-      Selstat    selvar          Time range variance
-      Selstat    selstd          Time range standard deviation
-      Selpctl    selpctl         Time range percentiles
+      Timselstat timselmin       Time range minimum
+      Timselstat timselmax       Time range maximum
+      Timselstat timselsum       Time range sum
+      Timselstat timselmean      Time range mean
+      Timselstat timselavg       Time range average
+      Timselstat timselvar       Time range variance
+      Timselstat timselstd       Time range standard deviation
+      Timselpctl timselpctl      Time range percentiles
       Runstat    runmin          Running minimum
       Runstat    runmax          Running maximum
       Runstat    runsum          Running sum

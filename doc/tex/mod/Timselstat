@@ -1,11 +1,11 @@
 @BeginModule
 @NewPage
-@Name      = Selstat
+@Name      = Timselstat
 @Title     = Time range statistical values
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = selmin selmax selsum selmean selavg selvar selstd
+@Operators = timselmin timselmax timselsum timselmean timselavg timselvar timselstd
 
 @BeginDescription
 This module computes statistical values for a selected number of time steps.
@@ -17,7 +17,7 @@ contributing time step in @file{ifile}.
 @EndModule
 
 
-@BeginOperator_selmin
+@BeginOperator_timselmin
 @Title     = Time range minimum
 @Parameter = nsets [noffset] [nskip]
 
@@ -39,7 +39,7 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
-@BeginOperator_selmax
+@BeginOperator_timselmax
 @Title     = Time range maximum
 @Parameter = nsets [noffset] [nskip]
 
@@ -61,7 +61,7 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
-@BeginOperator_selsum
+@BeginOperator_timselsum
 @Title     = Time range sum
 @Parameter = nsets [noffset] [nskip]
 
@@ -83,7 +83,7 @@ o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
-@BeginOperator_selmean
+@BeginOperator_timselmean
 @Title     = Time range mean
 @Parameter = nsets [noffset] [nskip]
 
@@ -105,7 +105,7 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
-@BeginOperator_selavg
+@BeginOperator_timselavg
 @Title     = Time range average
 @Parameter = nsets [noffset] [nskip]
 
@@ -127,7 +127,7 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
-@BeginOperator_selvar
+@BeginOperator_timselvar
 @Title     = Time range variance
 @Parameter = nsets [noffset] [nskip]
 
@@ -149,7 +149,7 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
 @EndOperator
 
 
-@BeginOperator_selstd
+@BeginOperator_timselstd
 @Title     = Time range standard deviation
 @Parameter = nsets [noffset] [nskip]
 
@@ -186,6 +186,6 @@ Assume an input dataset has monthly means over several years.
 To compute seasonal means from monthly means the first two
 month must be skipped:
 @BeginVerbatim
-   cdo selmean,3,2 ifile ofile
+   cdo timselmean,3,2 ifile ofile
 @EndVerbatim
 @EndExample

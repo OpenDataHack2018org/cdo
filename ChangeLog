@@ -5,6 +5,8 @@
         * Renamed chvar, selvar, delvar, showvar, setvar and splitvar
                to chname, selname, delname, showname, setname and splitname
         * Renamed nvar to npar and vardes to pardes
+	* Renamed selpctl to timselpctl
+	* Selstat: renamed to Timselstat
 	* Merge: bug fix for files with constant fields only [report: Christian Rodehacke]
 	* expr.ex: bug fix for mixed time constant and variable fields
 	* Ymonstat: bug fix for missing values [report: Ivonne Anders]

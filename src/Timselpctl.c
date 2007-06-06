@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Selpctl    selpctl         Time range percentiles
+      Timselpctl    timselpctl         Time range percentiles
 */
 
 
@@ -30,9 +30,9 @@
 #include "percentiles.h"
 
 
-void *Selpctl(void *argument)
+void *Timselpctl(void *argument)
 {
-  static char func[] = "Selpctl";
+  static char func[] = "Timselpctl";
   int gridsize;
   int vdate1 = 0, vtime1 = 0;
   int vdate2 = 0, vtime2 = 0;
@@ -58,7 +58,7 @@ void *Selpctl(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("selpctl", func_pctl,  0, NULL);
+  cdoOperatorAdd("timselpctl", func_pctl,  0, NULL);
 
   operatorInputArg("percentile number, nsets <,noffset <,nskip>>");
 

@@ -1,11 +1,10 @@
 @BeginModule
-@NewPage
-@Name      = Selpctl
+@Name      = Timselpctl
 @Title     = Time range percentile values
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile1 ifile2 ifile3 ofile
-@Operators = selpctl
+@Operators = timselpctl
 
 @BeginDescription
 This module computes percentile values over a selected number of time
@@ -15,14 +14,14 @@ The algorithm uses histograms with minimum and maximum bounds given in
 histogram bins is 100. The default can be overridden by setting the
 environment variable CDO_PCTL_NBINS to a different value. The files
 @file{ifile2} and @file{ifile3} must be the result of corresponding
-selmin and selmax operations, respectively.
+timselmin and timselmax operations, respectively.
 The date information for a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
 
 
-@BeginOperator_selpctl
+@BeginOperator_timselpctl
 @Title     = Time range percentiles
 @Parameter = p nsets [noffset] [nskip]
 

@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.0.8 (?? May 2007):
+Version 1.0.8 (15 June 2007):
 
    * New operators:
       o Remap model level - remapeta
@@ -12,6 +12,9 @@ Version 1.0.8 (?? May 2007):
    * Changed operators:
       o Renamed chvar, selvar, delvar, showvar, setvar and splitvar
              to chname, selname, delname, showname, setname and splitname
+      o Renamed selmin, selmax, selsum, selmean, selavg, selvar, selstd
+             to timselmin, timselmax, timselsum, timselmean, timselavg, timselvar, timselstd
+      o Renamed selpctl to timselpctl
       o Renamed nvar to npar and vardes to pardes
    * Fixed bugs:
       o Module Ymonstat gave wrong results with missing values

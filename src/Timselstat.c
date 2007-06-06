@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,13 +18,13 @@
 /*
    This module contains the following operators:
 
-      Selstat    selmin          Time range minimum
-      Selstat    selmax          Time range maximum
-      Selstat    selsum          Time range sum
-      Selstat    selmean         Time range mean
-      Selstat    selavg          Time range average
-      Selstat    selvar          Time range variance
-      Selstat    selstd          Time range standard deviation
+      Timselstat    timselmin          Time range minimum
+      Timselstat    timselmax          Time range maximum
+      Timselstat    timselsum          Time range sum
+      Timselstat    timselmean         Time range mean
+      Timselstat    timselavg          Time range average
+      Timselstat    timselvar          Time range variance
+      Timselstat    timselstd          Time range standard deviation
 */
 
 
@@ -35,9 +35,9 @@
 #include "dtypes.h"
 
 
-void *Selstat(void *argument)
+void *Timselstat(void *argument)
 {
-  static char func[] = "Selstat";
+  static char func[] = "Timselstat";
   int operatorID;
   int operfunc;
   int gridsize;
@@ -61,13 +61,13 @@ void *Selstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("selmin",  func_min,  0, NULL);
-  cdoOperatorAdd("selmax",  func_max,  0, NULL);
-  cdoOperatorAdd("selsum",  func_sum,  0, NULL);
-  cdoOperatorAdd("selmean", func_mean, 0, NULL);
-  cdoOperatorAdd("selavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("selvar",  func_var,  0, NULL);
-  cdoOperatorAdd("selstd",  func_std,  0, NULL);
+  cdoOperatorAdd("timselmin",  func_min,  0, NULL);
+  cdoOperatorAdd("timselmax",  func_max,  0, NULL);
+  cdoOperatorAdd("timselsum",  func_sum,  0, NULL);
+  cdoOperatorAdd("timselmean", func_mean, 0, NULL);
+  cdoOperatorAdd("timselavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("timselvar",  func_var,  0, NULL);
+  cdoOperatorAdd("timselstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);

@@ -145,8 +145,6 @@ cdo_SOURCES = Arith.c		\
               Select.c  	\
               Seloperator.c  	\
               Selrec.c  	\
-              Selpctl.c 	\
-              Selstat.c 	\
               Seltime.c 	\
 	      Set.c		\
 	      Setbox.c		\
@@ -175,6 +173,8 @@ cdo_SOURCES = Arith.c		\
               Timcount.c 	\
               Timpctl.c 	\
               Timsort.c 	\
+              Timselpctl.c 	\
+              Timselstat.c 	\
               Timstat.c 	\
               Timstat2.c 	\
               Trend.c  		\
@@ -317,17 +317,17 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Replace.$(OBJEXT) Rotuv.$(OBJEXT) Runpctl.$(OBJEXT) \
 	Runstat.$(OBJEXT) Seascount.$(OBJEXT) Seaspctl.$(OBJEXT) \
 	Seasstat.$(OBJEXT) Selbox.$(OBJEXT) Select.$(OBJEXT) \
-	Seloperator.$(OBJEXT) Selrec.$(OBJEXT) Selpctl.$(OBJEXT) \
-	Selstat.$(OBJEXT) Seltime.$(OBJEXT) Set.$(OBJEXT) \
-	Setbox.$(OBJEXT) Setgatt.$(OBJEXT) Setgrid.$(OBJEXT) \
-	Sethalo.$(OBJEXT) Setmiss.$(OBJEXT) Setrcaname.$(OBJEXT) \
-	Settime.$(OBJEXT) Setzaxis.$(OBJEXT) Showinfo.$(OBJEXT) \
-	Sinfo.$(OBJEXT) Smooth9.$(OBJEXT) Sort.$(OBJEXT) \
-	Specinfo.$(OBJEXT) Spectral.$(OBJEXT) Spectrum.$(OBJEXT) \
-	Split.$(OBJEXT) Splitrec.$(OBJEXT) Splittime.$(OBJEXT) \
-	Splityear.$(OBJEXT) Subtrend.$(OBJEXT) Templates.$(OBJEXT) \
-	Test.$(OBJEXT) Tests.$(OBJEXT) Timcount.$(OBJEXT) \
-	Timpctl.$(OBJEXT) Timsort.$(OBJEXT) Timstat.$(OBJEXT) \
+	Seloperator.$(OBJEXT) Selrec.$(OBJEXT) Seltime.$(OBJEXT) \
+	Set.$(OBJEXT) Setbox.$(OBJEXT) Setgatt.$(OBJEXT) \
+	Setgrid.$(OBJEXT) Sethalo.$(OBJEXT) Setmiss.$(OBJEXT) \
+	Setrcaname.$(OBJEXT) Settime.$(OBJEXT) Setzaxis.$(OBJEXT) \
+	Showinfo.$(OBJEXT) Sinfo.$(OBJEXT) Smooth9.$(OBJEXT) \
+	Sort.$(OBJEXT) Specinfo.$(OBJEXT) Spectral.$(OBJEXT) \
+	Spectrum.$(OBJEXT) Split.$(OBJEXT) Splitrec.$(OBJEXT) \
+	Splittime.$(OBJEXT) Splityear.$(OBJEXT) Subtrend.$(OBJEXT) \
+	Templates.$(OBJEXT) Test.$(OBJEXT) Tests.$(OBJEXT) \
+	Timcount.$(OBJEXT) Timpctl.$(OBJEXT) Timsort.$(OBJEXT) \
+	Timselpctl.$(OBJEXT) Timselstat.$(OBJEXT) Timstat.$(OBJEXT) \
 	Timstat2.$(OBJEXT) Trend.$(OBJEXT) Trms.$(OBJEXT) \
 	Vardup.$(OBJEXT) Vargen.$(OBJEXT) Varrms.$(OBJEXT) \
 	Vertint.$(OBJEXT) Vertstat.$(OBJEXT) Wind.$(OBJEXT) \
@@ -397,8 +397,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Seascount.Po ./$(DEPDIR)/Seaspctl.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Seasstat.Po ./$(DEPDIR)/Selbox.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Select.Po ./$(DEPDIR)/Seloperator.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Selpctl.Po ./$(DEPDIR)/Selrec.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Selstat.Po ./$(DEPDIR)/Seltime.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Selrec.Po ./$(DEPDIR)/Seltime.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Set.Po ./$(DEPDIR)/Setbox.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Setgatt.Po ./$(DEPDIR)/Setgrid.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Sethalo.Po ./$(DEPDIR)/Setmiss.Po \
@@ -412,6 +411,7 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Subtrend.Po ./$(DEPDIR)/Templates.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Test.Po ./$(DEPDIR)/Tests.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Timcount.Po ./$(DEPDIR)/Timpctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timselpctl.Po ./$(DEPDIR)/Timselstat.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Timsort.Po ./$(DEPDIR)/Timstat.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Timstat2.Po ./$(DEPDIR)/Trend.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Trms.Po ./$(DEPDIR)/Vardup.Po \
@@ -584,9 +584,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Select.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Seloperator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selrec.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Seltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Set.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Setbox.Po@am__quote@
@@ -614,6 +612,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Tests.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timcount.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timpctl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timselpctl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timselstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timsort.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timstat2.Po@am__quote@

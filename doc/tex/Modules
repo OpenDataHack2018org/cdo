@@ -40,8 +40,8 @@ Fldstat       Statistical values
 Zonstat       Statistical values
 Merstat       Statistical values
 Vertstat      Statistical values
-Selstat       Statistical values
-Selpctl       Statistical values
+Timselstat    Statistical values
+Timselpctl    Statistical values
 Runstat       Statistical values
 Runpctl       Statistical values
 Timstat       Statistical values

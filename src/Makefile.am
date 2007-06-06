@@ -64,8 +64,6 @@ cdo_SOURCES = Arith.c		\
               Select.c  	\
               Seloperator.c  	\
               Selrec.c  	\
-              Selpctl.c 	\
-              Selstat.c 	\
               Seltime.c 	\
 	      Set.c		\
 	      Setbox.c		\
@@ -94,6 +92,8 @@ cdo_SOURCES = Arith.c		\
               Timcount.c 	\
               Timpctl.c 	\
               Timsort.c 	\
+              Timselpctl.c 	\
+              Timselstat.c 	\
               Timstat.c 	\
               Timstat2.c 	\
               Trend.c  		\
