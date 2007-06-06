@@ -92,7 +92,7 @@ void *Merge(void *argument)
     }
 
   tsID = 0;
-  while ( TRUE )
+  while ( tsID >= 0 )
     {
       recID2 = 0;
       for ( index = 0; index < nmerge; index++ )
@@ -100,8 +100,23 @@ void *Merge(void *argument)
 	  streamID1 = streamIDs[index];
 	  vlistID1  = vlistIDs[index];
 
+	  if ( vlistID1 == -4711 ) continue;
+
 	  nrecs = streamInqTimestep(streamID1, tsID);
-	  if ( nrecs == 0 ) break;
+
+	  if ( nrecs == 0 )
+	    {
+	      if ( tsID == 1 )
+		{
+		  vlistIDs[index] = -4711;
+		  continue;
+		}
+	      else
+		{
+		  tsID = -4711;
+		  break;
+		}
+	    }
 
 	  if ( index == 0 )
 	    {
@@ -133,8 +148,6 @@ void *Merge(void *argument)
 	      recID2++;
 	    }
 	}
-      if ( nrecs == 0 ) break;
-
       tsID++;
     }
 
