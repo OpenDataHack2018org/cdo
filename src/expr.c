@@ -598,7 +598,7 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 	      if ( zaxisID2 == -1 )
 		zaxisID2 = zaxisID1;
 
-	      if ( timeID2 == -1 )
+	      if ( timeID2 == -1 || timeID2 == TIME_CONSTANT )
 		timeID2 = timeID1;
 	    }
 	}
