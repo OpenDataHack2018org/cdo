@@ -18,6 +18,10 @@
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]
 	* Version 1.0.8 released
 
+2007-06-07  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
+
+	* New operator: smooth9
+
 2007-05-30  Ralf Quast  <ralf.quast@brockmann-consult.de>
 
 	* New operator: timcount, hourcount, daycount, moncount, yearcount, seascount

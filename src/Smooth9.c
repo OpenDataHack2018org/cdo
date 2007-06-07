@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Smoothstat       smth9             running 9-point-average
+      Smoothstat       smooth9             running 9-point-average
 */
 
 
@@ -48,7 +48,8 @@ void *Smooth9(void *argument)
   int nlon, nlat;
   int gridtype;
   int nvars;
-  int *varIDs = NULL, *missing =  NULL; 
+  int grid_is_cyclic;
+  int *varIDs = NULL, *mask =  NULL; 
 
   cdoInitialize(argument);
 
@@ -92,14 +93,14 @@ void *Smooth9(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   array1 = (double *) malloc(gridsize*sizeof(double));
   array2 = (double *) malloc(gridsize *sizeof(double));
-  missing= (  int  *) malloc(gridsize *sizeof(int));
+  mask   = (  int  *) malloc(gridsize *sizeof(int));
  
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
-  tsID = 0;
 
+  tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
@@ -110,24 +111,26 @@ void *Smooth9(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array1, &nmiss);
-
-	  gridID =vlistInqVarGrid(vlistID1, varID);
-	  nlon = gridInqXsize(gridID);	 
-	  nlat = gridInqYsize(gridID);
 	
 	  if ( varIDs[varID] )
 	    {	    
 	      missval1 = vlistInqVarMissval(vlistID1, varID);
 	      missval2 = missval1;
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+
+	      gridID = vlistInqVarGrid(vlistID1, varID);
+	      gridsize = gridInqSize(gridID);
+	      nlon = gridInqXsize(gridID);	 
+	      nlat = gridInqYsize(gridID);
+	      grid_is_cyclic = gridIsCyclic(gridID);
 	   
 	      for ( i = 0; i < gridsize; i++) 
 		{		
-		  if ( DBL_IS_EQUAL(missval1, array1[i]) ) missing[i] = 0;
-		  else missing[i] = 1;
-		}	    
+		  if ( DBL_IS_EQUAL(missval1, array1[i]) ) mask[i] = 0;
+		  else mask[i] = 1;
+		}
+ 
 	      nmiss2=0;
-	      for ( i = 0; i < nlat; i++)
+	      for ( i = 0; i < nlat; i++ )
 		{
 		  for ( i2 = 0; i2 < nlon; i2++ )
 		    {		      
@@ -137,19 +140,19 @@ void *Smooth9(void *argument)
                            ( i == ( nlat - 1 ) ) || ( i2 == ( nlon -1 ) ) )
 			{
 			  j = i2+nlon*i;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    {
-			      avg += 1*array1[j];  divavg+= 1;					     			
+			      avg += array1[j];  divavg+= 1;					     			
 			      if ( (  i!=0 ) && ( i2!=0 ) ) 
 				{ 
 				  j = ((i-1)*nlon)+i2-1;
-				  if ( missing[j] ) 
+				  if ( mask[j] ) 
 				    { avg +=   0.3*array1[j]; divavg+=0.3;}
 				}
 			      else if ( i != 0 ) 
 				{ 
 				  j = (i-1)*nlon+i2-1+(nlon-1);
-				  if ( missing[j] ) 
+				  if ( mask[j] ) 
 				    { avg+=0.3*array1[j]; divavg+=0.3;}
 				}
 			      
@@ -157,122 +160,124 @@ void *Smooth9(void *argument)
 			      if ( i!=0 ) 
 				{
 				  j = ((i-1)*nlon)+i2;
-				  if ( missing[j] )
+				  if ( mask[j] )
 				    { avg +=  0.5*array1[j];  divavg+= 0.5; }
 				}
 			      
 			      if ( ( i!=0) && ( i2!=(nlon-1) ) ) 
 				{
 				  j = ((i-1)*nlon)+i2+1;
-				  if ( missing[j] )
-				    { avg +=   0.3*array1[j]; divavg+= 0.3;	 }
+				  if ( mask[j] )
+				    { avg +=   0.3*array1[j]; divavg+= 0.3; }
 				}
 			      else if ( i!= 0 )
 				{ 
 				  j = (i-1)*nlon+i2+1-(nlon-1);
-				  if ( missing[j] ) 
+				  if ( mask[j] ) 
 				    {avg+=0.3*array1[j]; divavg+=0.3;}
 				}
 			      
 			      if  ( i2!=0 ) 
 				{
 				  j = ((i)*nlon)+i2-1;
-				  if ( missing[j] )
+				  if ( mask[j] )
 				    {  avg +=   0.5*array1[j];  divavg+= 0.5;}
 				}
 			      else
 				{
 				  j = i*nlon-1+(nlon-1);
-				  if ( missing[j] ) 
+				  if ( mask[j] ) 
 				    { avg+=0.5*array1[j]; divavg+=0.5;}
 				}
 			      
 			      if ( i2!=(nlon-1) ) 
 				{ 
 				  j = (i*nlon)+i2+1;
-				  if ( missing[j] )
+				  if ( mask[j] )
 				    {  avg +=   0.5*array1[j]; divavg+= 0.5; } 
 				}
 			      else
 				{
 				  j = i*nlon+i2+1-(nlon-1);
-				  if (missing[j])
+				  if (mask[j])
 				    { avg+=0.5*array1[j]; divavg+=0.5;}
 				}
 			      
-			      if ( missing[j] &&  ( (i!=(nlat-1))&& (i2!=0) ) )
+			      if ( mask[j] &&  ( (i!=(nlat-1))&& (i2!=0) ) )
 				{	       
 				  j = ((i+1)*nlon+i2-1);
-				  if ( missing[j] )
+				  if ( mask[j] )
 				    { avg +=   0.3*array1[j];  divavg+= 0.3; }
 				}
 			      else if ( i!= nlat-1 ) 
 				{
 				  j= (i+1)*nlon-1+(nlon-1); 
-				  if ( missing[j] ) 
+				  if ( mask[j] ) 
 				    { avg+= 0.3*array1[j]; divavg+=0.3; }
 				}
 			      
 			      if  ( i!=(nlat-1) ) 
 				{
 				  j = ((i+1)*nlon)+i2;
-				  if ( missing[j] ) 
+				  if ( mask[j] ) 
 				    { avg += 0.5*array1[j];  divavg+= 0.5;  }
 				}
 			      
 			      if ( i!=(nlat-1) && (i2!=(nlon-1) ) )
 				{
 				  j = ((i+1)*nlon)+i2+1;
-				  if ( missing[j] )
+				  if ( mask[j] )
 				    {  avg += 0.3*array1[j]; divavg+= 0.3; }	
 				}
 			      else if ( i != (nlat-1) )
 				{
 				  j= ((i+1)*nlon)+i2+1-(nlon-1);
-				  if ( missing[j] )
+				  if ( mask[j] )
 				    {avg+=0.3*array1[j]; divavg+=0.3;}
 				}
 			    }
 			}
-		      else if ( missing[i2+nlon*i] )
+		      else if ( mask[i2+nlon*i] )
 			{			 
 			  avg += array1[i2+nlon*i]; divavg+= 1;
 			    
 			  j = ((i-1)*nlon)+i2-1;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.3*array1[j]; divavg+= 0.3; }
 
 			  j = ((i-1)*nlon)+i2;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.5*array1[j]; divavg+= 0.5; }
 
 			  j = ((i-1)*nlon)+i2+1;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.3*array1[j]; divavg+= 0.3; }
 
 			  j = ((i)*nlon)+i2-1;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.5*array1[j]; divavg+= 0.5; }
 
 			  j = (i*nlon)+i2+1;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.5*array1[j]; divavg+= 0.5; } 
 
 			  j = ((i+1)*nlon+i2-1);	        
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.3*array1[j]; divavg+= 0.3; }
 
 			  j = ((i+1)*nlon)+i2;
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.5*array1[j]; divavg+= 0.5; }
 
 			  j = ((i+1)*nlon)+i2+1;
-			  printf("j = %d %d\n", j, nlon*nlat);
-			  if ( missing[j] )
+			  if ( mask[j] )
 			    { avg += 0.3*array1[j]; divavg+= 0.3; }
 			}
-		      if ( divavg != 0 )							 
-			array2[i*nlon+i2]=avg/divavg;			
+
+		      if ( fabs(divavg) > 0 )
+			{
+			  array2[i*nlon+i2] = avg/divavg;			
+			}
 		      else 
 			{
 			  array2[i*nlon+i2] = missval2;					

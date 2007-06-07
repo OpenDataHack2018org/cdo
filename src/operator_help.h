@@ -842,6 +842,27 @@ static char *InvertHelp[] = {
     NULL
 };
 
+static char *Smooth9Help[] = {
+    "NAME",
+    "    smooth9 - 9 point smoothing",
+    "",
+    "SYNOPSIS",
+    "    smooth9  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Performs a 9 point smoothing on all fields with an rectangular grid.",
+    "    The result at each grid point is a weighted average of the grid point plus",
+    "    the 8 surrounding points. The center point receives a weight of 1.0, the ",
+    "    points at each side and above and below receive a weight of 0.5, and corner ",
+    "    points receive a weight of 0.3.",
+    "    All 9 points are multiplied by their weights and summed, then divided by ",
+    "    the total weight to obtain the smoothed value. Any missing data points are ",
+    "    not included in the sum; points beyond the grid boundary are considered to ",
+    "    be missing. Thus the final result may be the result of an averaging with less ",
+    "    than 9 points.",
+    NULL
+};
+
 static char *MaskregionHelp[] = {
     "NAME",
     "    maskregion - Mask regions",
@@ -850,15 +871,14 @@ static char *MaskregionHelp[] = {
     "    maskregion,regions  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Masks an unlimited number of regions. The elements inside ",
-    "    a region are untouched, the elements outside are set to missing value.",
-    "    A region is defined by a polygon.",
+    "    Masks different regions of a field. The elements inside a region ",
+    "    are untouched, the elements outside are set to missing value. All ",
+    "    input fields must have the same horizontal grid.",
     "    The user has to give ASCII formatted files with different regions.",
-    "    Each file can contain one or more polygons. Each polygon point",
-    "    have one line with the longitute and latitude value. ",
-    "    The different polygons inside a file are separated by a line",
-    "    with the character XX.",
-    "    All input fields must have the same horizontal grid.",
+    "    A region is defined by a polygon. Each line of a polygon description file ",
+    "    contains the longitute and latitude of one point.",
+    "    Each polygon description file can contain one or more polygons separated",
+    "    by a line with the character \\&.",
     "",
     "PARAMETER",
     "    regions  STRING Comma separated list of ASCII formatted files with different regions",

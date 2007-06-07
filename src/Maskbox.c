@@ -20,7 +20,7 @@
 
       Maskbox    masklonlatbox   Mask lon/lat box
       Maskbox    maskindexbox    Mask index box
-      Maskbox    maskregions     Mask regions
+      Maskbox    maskregion      Mask regions
 */
 
 

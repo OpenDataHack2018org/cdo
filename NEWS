@@ -5,6 +5,7 @@ Version 1.0.8 (15 June 2007):
 
    * New operators:
       o Remap model level - remapeta
+      o 9 point smoothing - smooth9
       o Mask region - maskregion
       o Show GRIB level types - showltype
       o Select GRIB level types - selltype

@@ -500,7 +500,7 @@ static MODULES Modules[] =
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,       1,  1 },
   { Showinfo,       ShowinfoHelp,      ShowinfoOperators,       1,  0 },
   { Sinfo,          SinfoHelp,         SinfoOperators,         -1,  0 },
-  { Smooth9,        NULL,              Smooth9Operators,        1,  1 },
+  { Smooth9,        Smooth9Help,       Smooth9Operators,        1,  1 },
   { Sort,           NULL,              SortOperators,           1,  1 },
   { Specinfo,       NULL,              SpecinfoOperators,       0,  0 },
   { Spectral,       SpectralHelp,      SpectralOperators,       1,  1 },

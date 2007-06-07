@@ -136,6 +136,7 @@ Operator catalog:
       Invert     invertlondes    Invert longitude description
       Invert     invertlatdata   Invert latitude data
       Invert     invertlondata   Invert longitude data
+      Smooth9    smooth9         9 point smoothing
       Maskregion maskregion      Mask regions
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
