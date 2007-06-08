@@ -80,10 +80,12 @@ void *Input(void *argument)
   int streamID = -1;
   int vlistID = -1;
   int nmiss = 0;
+  int i;
   int code = 0, code0 = 0, level = 0, date = 0, time = 0, nlon = 0, nlat = 0;
   int output_filetype = FILETYPE_GRB;
   int rval;
   int ihead[8];
+  double missval = 0;
   double levels[1];
   double *array = NULL;
 
@@ -232,6 +234,8 @@ void *Input(void *argument)
 	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
 	  vlistDefVarCode(vlistID, varID, code);
 
+	  missval = vlistInqVarMissval(vlistID, varID);
+
 	  taxisID = taxisCreate(TAXIS_ABSOLUTE);
 	  vlistDefTaxis(vlistID, taxisID);
 
@@ -250,6 +254,11 @@ void *Input(void *argument)
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  streamDefRecord(streamID, varID, levelID);
+
+	  nmiss = 0;
+	  for ( i = 0; i < gridsize; ++i )
+	    if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+
 	  streamWriteRecord(streamID, array, nmiss);
 	}
 

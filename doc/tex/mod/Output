@@ -7,7 +7,7 @@
 @Operators = output outputf outputint outputsrv outputext
 
 @BeginDescription
-This modules prints all values of all input datasets to standard output.
+This module prints all values of all input datasets to standard output.
 All input fields must have the same horizontal grid. The format of the 
 output depends on the actual operator.
 @EndDescription

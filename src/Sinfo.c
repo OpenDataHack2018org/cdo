@@ -29,53 +29,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-/*
-@BeginDoc
-
-@BeginModule
-
-@Name      = Sinfo
-@Title     = Short information
-@Section   = Information
-@Class     = Information
-@Arguments = ifile
-@Operators = sinfo sinfov sinfop
-
-@EndModule
-
-
-@BeginOperator_sinfo
-
-@Title     = Short file information
-
-@BeginDescription
-Prints short information for each variable of a file.
-For each variable the operator print in one line the:
-@BeginItemize
-@Item = variable number
-@Item = institute and source
-@Item = code and codetable
-@Item = horizontal grid size and number
-@Item = vertical grid size and number
-@EndItemize
-@EndDescription
-
-@EndOperator
-
-
-@BeginOperator_sinfov
-
-@Title     = Short file information
-
-@BeginDescription
-The same as operator sinfo. Using the name instead of the code number
-to identify the variable.
-@EndDescription
-
-@EndOperator
-
-@EndDoc
-*/
 
 void printFiletype(int streamID, int vlistID)
 {

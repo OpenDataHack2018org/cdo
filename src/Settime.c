@@ -58,6 +58,7 @@ void *Settime(void *argument)
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 0, incunit = 0;
   int year, month, day, hour, minute;
+  int day0;
   int dpy, calendar;
   int newcalendar = CALENDAR_STANDARD;
   const char *datestr, *timestr;
@@ -290,6 +291,7 @@ void *Settime(void *argument)
 	      if ( tsID1 == 0 )
 		{
 		  vdate = sdate;
+		  decode_date(vdate, &year, &month, &day0);
 		}
 	      else
 		{
@@ -299,6 +301,9 @@ void *Settime(void *argument)
 
 		  while ( month > 12 ) { month -= 12; year++; }
 		  while ( month <  1 ) { month += 12; year--; }
+
+		  if ( day0 == 31 )
+		    day = days_per_month(dpy, year, month);
 
 		  vdate = year*10000 + month*100 + day;
 		}

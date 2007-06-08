@@ -7,6 +7,7 @@
         * Renamed nvar to npar and vardes to pardes
 	* Renamed selpctl to timselpctl
 	* Selstat: renamed to Timselstat
+	* Input: bug fix for missing values [report: Thomas Bruns]
 	* Merge: bug fix for files with constant fields only [report: Christian Rodehacke]
 	* expr.ex: bug fix for mixed time constant and variable fields
 	* Ymonstat: bug fix for missing values [report: Ivonne Anders]
