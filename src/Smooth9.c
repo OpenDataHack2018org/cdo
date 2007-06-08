@@ -142,21 +142,22 @@ void *Smooth9(void *argument)
 			  j = i2+nlon*i;
 			  if ( mask[j] )
 			    {
-			      avg += array1[j];  divavg+= 1;					     			
+			      avg += array1[j];  divavg+= 1;					     		       
+			      /* upper left corner */
 			      if ( (  i!=0 ) && ( i2!=0 ) ) 
 				{ 
 				  j = ((i-1)*nlon)+i2-1;
 				  if ( mask[j] ) 
 				    { avg +=   0.3*array1[j]; divavg+=0.3;}
 				}
-			      else if ( i != 0 ) 
+			      else if ( i != 0 && grid_is_cyclic ) 
 				{ 
-				  j = (i-1)*nlon+i2-1+(nlon-1);
+				  j = (i-1)*nlon+i2-1+nlon;
 				  if ( mask[j] ) 
 				    { avg+=0.3*array1[j]; divavg+=0.3;}
 				}
 			      
-			      
+			      /* upper cell */
 			      if ( i!=0 ) 
 				{
 				  j = ((i-1)*nlon)+i2;
@@ -164,58 +165,63 @@ void *Smooth9(void *argument)
 				    { avg +=  0.5*array1[j];  divavg+= 0.5; }
 				}
 			      
+			      /* upper right corner */
 			      if ( ( i!=0) && ( i2!=(nlon-1) ) ) 
 				{
 				  j = ((i-1)*nlon)+i2+1;
 				  if ( mask[j] )
 				    { avg +=   0.3*array1[j]; divavg+= 0.3; }
 				}
-			      else if ( i!= 0 )
+			      else if ( i!= 0 && grid_is_cyclic )
 				{ 
-				  j = (i-1)*nlon+i2+1-(nlon-1);
+				  j = (i-1)*nlon+i2+1-nlon;
 				  if ( mask[j] ) 
 				    {avg+=0.3*array1[j]; divavg+=0.3;}
 				}
 			      
+			      /* left cell */
 			      if  ( i2!=0 ) 
 				{
 				  j = ((i)*nlon)+i2-1;
 				  if ( mask[j] )
 				    {  avg +=   0.5*array1[j];  divavg+= 0.5;}
 				}
-			      else
+			      else if ( grid_is_cyclic )
 				{
-				  j = i*nlon-1+(nlon-1);
+				  j = i*nlon-1+nlon;
 				  if ( mask[j] ) 
 				    { avg+=0.5*array1[j]; divavg+=0.5;}
 				}
 			      
+			      /* right cell */
 			      if ( i2!=(nlon-1) ) 
 				{ 
 				  j = (i*nlon)+i2+1;
 				  if ( mask[j] )
 				    {  avg +=   0.5*array1[j]; divavg+= 0.5; } 
 				}
-			      else
+			      else if ( grid_is_cyclic )
 				{
-				  j = i*nlon+i2+1-(nlon-1);
+				  j = i*nlon+i2+1-nlon;
 				  if (mask[j])
 				    { avg+=0.5*array1[j]; divavg+=0.5;}
 				}
 			      
+			      /* lower left corner */
 			      if ( mask[j] &&  ( (i!=(nlat-1))&& (i2!=0) ) )
 				{	       
 				  j = ((i+1)*nlon+i2-1);
 				  if ( mask[j] )
 				    { avg +=   0.3*array1[j];  divavg+= 0.3; }
 				}
-			      else if ( i!= nlat-1 ) 
+			      else if ( i!= nlat-1 && grid_is_cyclic ) 
 				{
-				  j= (i+1)*nlon-1+(nlon-1); 
+				  j= (i+1)*nlon-1+nlon; 
 				  if ( mask[j] ) 
 				    { avg+= 0.3*array1[j]; divavg+=0.3; }
 				}
 			      
+			      /* lower cell */
 			      if  ( i!=(nlat-1) ) 
 				{
 				  j = ((i+1)*nlon)+i2;
@@ -223,15 +229,16 @@ void *Smooth9(void *argument)
 				    { avg += 0.5*array1[j];  divavg+= 0.5;  }
 				}
 			      
+			      /* lower right corner */
 			      if ( i!=(nlat-1) && (i2!=(nlon-1) ) )
 				{
 				  j = ((i+1)*nlon)+i2+1;
 				  if ( mask[j] )
 				    {  avg += 0.3*array1[j]; divavg+= 0.3; }	
 				}
-			      else if ( i != (nlat-1) )
+			      else if ( i != (nlat-1) && grid_is_cyclic )
 				{
-				  j= ((i+1)*nlon)+i2+1-(nlon-1);
+				  j= ((i+1)*nlon)+i2+1-nlon;
 				  if ( mask[j] )
 				    {avg+=0.3*array1[j]; divavg+=0.3;}
 				}

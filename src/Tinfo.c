@@ -34,6 +34,7 @@
 
 void *Tinfo(void *argument)
 {
+  int vdate0, vtime0;
   int vdate, vtime;
   int nrecs, ntsteps;
   int tsID, ntimeout;
@@ -43,6 +44,9 @@ void *Tinfo(void *argument)
   int streamID;
   int vlistID;
   int year, month, day, hour, minute;
+  int calendar, unit, dpy;
+  double julval, julval0;
+	  
 
   cdoInitialize(argument);
 
@@ -65,8 +69,6 @@ void *Tinfo(void *argument)
 
       if ( taxisID != CDI_UNDEFID )
 	{
-	  int calendar, unit;
-	  
 	  if ( taxisInqType(taxisID) == TAXIS_RELATIVE )
 	    {
 	      vdate = taxisInqRdate(taxisID);
@@ -118,7 +120,11 @@ void *Tinfo(void *argument)
 	    }
 	}
 
-      fprintf(stdout, "Timestep   YYYY-MM-DD hh:mm\n");
+      calendar = taxisInqCalendar(taxisID);
+
+      dpy = calendar_dpy(calendar);
+
+      fprintf(stdout, "Timestep  YYYY-MM-DD hh:mm  Inrement\n");
 
       ntimeout = 0;
       tsID = 0;
@@ -130,8 +136,18 @@ void *Tinfo(void *argument)
 	  decode_date(vdate, &year, &month, &day);
 	  decode_time(vtime, &hour, &minute);
 
-	  fprintf(stdout, "%5d   %4.4d-%2.2d-%2.2d %2.2d:%2.2d\n", tsID+1, year, month, day, hour, minute);
-	  ntimeout++;
+	  fprintf(stdout, "%6d    %4.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID+1, year, month, day, hour, minute);
+	  if ( tsID )
+	    {
+	      julval0 = encode_julval(dpy, vdate0, vtime0);
+	      julval = encode_julval(dpy, vdate, vtime);
+	      fprintf(stdout, "  %g  %g  %g\n", julval0, julval, julval-julval0);
+	    }
+	  fprintf(stdout, "\n");
+
+	  vdate0 = vdate;
+	  vtime0 = vtime;
+
 	  tsID++;
 	}
     }
