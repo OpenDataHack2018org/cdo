@@ -5,7 +5,7 @@
 @Section   = Transformation
 @Class     = Transformation
 @Arguments = ifile ofile
-@Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp
+@Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp spcut
 
 @BeginDescription
 This module transforms fields on gaussian grids to spectral coefficients 
@@ -128,8 +128,8 @@ Set the user defined wave numbers to zero.
 @BeginParameter wnums
 @Item = trunc
 INTEGER  New spectral resolution
-@C @Item = wnums
-@C INTEGER  Comma separated list of wave numbers
+@Item = wnums
+INTEGER  Comma separated list of wave numbers
 @EndParameter
 
 

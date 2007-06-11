@@ -2650,7 +2650,7 @@ static char *IntyearHelp[] = {
 
 static char *SpectralHelp[] = {
     "NAME",
-    "    sp2gp, sp2gpl, gp2sp, gp2spl, sp2sp - Spectral transformation",
+    "    sp2gp, sp2gpl, gp2sp, gp2spl, sp2sp, spcut - Spectral transformation",
     "",
     "SYNOPSIS",
     "    sp2gp  ifile ofile",
@@ -2658,6 +2658,7 @@ static char *SpectralHelp[] = {
     "    gp2sp  ifile ofile",
     "    gp2spl  ifile ofile",
     "    sp2sp,trunc  ifile ofile",
+    "    spcut,wnums  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module transforms fields on gaussian grids to spectral coefficients ",
@@ -2697,9 +2698,12 @@ static char *SpectralHelp[] = {
     "            Change the triangular truncation of all spectral fields.",
     "            The operator performs downward conversion by cutting the resolution.",
     "            Upward conversions are achieved by filling in zeros.",
+    "    spcut   Cut spectral wave number",
+    "            Set the user defined wave numbers to zero.",
     "",
     "PARAMETER",
     "    trunc  INTEGER  New spectral resolution",
+    "    wnums  INTEGER  Comma separated list of wave numbers",
     NULL
 };
 
@@ -2759,7 +2763,7 @@ static char *InputHelp[] = {
     "    inputext  ofile",
     "",
     "DESCRIPTION",
-    "    This modules reads time series of one 2D variable from standard input.",
+    "    This module reads time series of one 2D variable from standard input.",
     "    All input fields must have the same horizontal grid. The format of the ",
     "    input depends on the actual operator.",
     "",
@@ -2796,7 +2800,7 @@ static char *OutputHelp[] = {
     "    outputext  ifiles",
     "",
     "DESCRIPTION",
-    "    This modules prints all values of all input datasets to standard output.",
+    "    This module prints all values of all input datasets to standard output.",
     "    All input fields must have the same horizontal grid. The format of the ",
     "    output depends on the actual operator.",
     "",
