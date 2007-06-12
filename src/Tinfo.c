@@ -37,13 +37,11 @@
 
 void *Tinfo(void *argument)
 {
-  int vdate0, vtime0;
+  int vdate0 = 0, vtime0 = 0;
   int vdate, vtime;
   int nrecs, ntsteps;
   int tsID, ntimeout;
-  int timeID, taxisID;
-  int nbyte, nbyte0;
-  int index;
+  int taxisID;
   int streamID;
   int vlistID;
   int year0, month0, day0, hour0, minute0;
@@ -53,7 +51,7 @@ void *Tinfo(void *argument)
   int incperiod1 = 0, incunit1 = 0;
   INT64 lperiod;
   int incperiod = 0, incunit = 0;
-  int its, igap;
+  int its = 0, igap;
   int ngaps = 0;
   int ntsm[MAX_GAPS];
   int rangetsm[MAX_GAPS][2];
@@ -285,7 +283,7 @@ void *Tinfo(void *argument)
 	}
     }
 
-  if ( cdoVerbose )
+  if ( cdoVerbose && ngaps )
     {
       fprintf(stdout, "\nFound potentially %d gaps in the time series", ngaps);
       if ( ngaps >= MAX_GAPS )
