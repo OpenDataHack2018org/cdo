@@ -960,7 +960,7 @@ static void write_e5res(const char *filename, VAR *vars, int nvars)
   int nc_var_id;
   int varid;
   size_t nvals;
-  size_t start[3], count[3];
+  size_t start[4], count[4];
   int nlon, nlat, nlev, nvct, nfc, i;
   int gridIDgp = -1, zaxisIDml = -1;
   int nc_file_id;
