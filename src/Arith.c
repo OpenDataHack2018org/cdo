@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -90,12 +90,14 @@ void *Arith(void *argument)
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
       filltype = FILL_TS;
-      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1));
+      if ( ! cdoSilentMode )
+	cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1));
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_TS;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
+      if ( ! cdoSilentMode )
+	cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
       streamIDm = streamID2;
       streamIDs = streamID1;
       vlistIDm = vlistID2;
@@ -130,13 +132,15 @@ void *Arith(void *argument)
 	  (vlistNtsteps(vlistID2) == 1 || vlistNtsteps(vlistID2) == 0) )
 	{
 	  filltype = FILL_REC;
-	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
+	  if ( ! cdoSilentMode )
+	    cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
 	}
       else if ( (vlistNtsteps(vlistID1) == 1 || vlistNtsteps(vlistID1) == 0) &&
 		 vlistNtsteps(vlistID2) != 1 && vlistNtsteps(vlistID2) != 0 )
 	{
 	  filltype = FILL_REC;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
+	  if ( ! cdoSilentMode )
+	    cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
 	  streamIDm = streamID2;
           streamIDs = streamID1;
 	  vlistIDm = vlistID2;

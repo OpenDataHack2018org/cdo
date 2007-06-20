@@ -12,13 +12,18 @@
 	* Merge: bug fix for files with constant fields only [report: Christian Rodehacke]
 	* expr.ex: bug fix for mixed time constant and variable fields
 	* Ymonstat: bug fix for missing values [report: Ivonne Anders]
+	* remapdis: bug fix if distance is zero
 	* remapcon: bug fix in intersection (s1 >= ZERO) [report: Joerg Wegner]
 	* remapcon: speed up by increasing BABY_STEP from 0.001 to 0.01
 	* interpolate: bug fix for north/south bounds > 90 or < -90 [report: Stefan Hagemann]
-	* replace ztype2ltype with zaxis2ltype
+	* replace ztype2ltype by zaxis2ltype
 	* ltype2ztype: set default zaxis type to ZAXIS_GENERIC
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]
 	* Version 1.0.8 released
+
+2007-06-12  Etienne Tourigny  <tourigny@sca.uqam.ca>
+
+	* Arith: Minor mods for silent output
 
 2007-06-07  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
 

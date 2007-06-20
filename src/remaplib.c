@@ -2204,7 +2204,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
 
 	      n = n+1;
 	      if ( plat >= rg->bin_lats[2*n+0] && plat <= rg->bin_lats[2*n+1] &&
-		   plon >= rg->bin_lons[2*n+0] && plon <= rg->bin_lons[2*n+2] )
+		   plon >= rg->bin_lons[2*n+0] && plon <= rg->bin_lons[2*n+1] )
 		{
 		  min_add = src_bin_add[2*n+0];
 		  max_add = src_bin_add[2*n+1];
@@ -2241,6 +2241,9 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
 
       distance = acos(sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
                      (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]));
+
+      /* Uwe Schulzweida: if distance is zero, set to small number */
+      if ( DBL_IS_EQUAL(distance, 0) ) distance = TINY;
       /*
          store the address and distance if this is one of the
 	 smallest four so far
@@ -2492,7 +2495,7 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
 
 	      n = n+1;
 	      if ( plat >= rg->bin_lats[2*n+0] && plat <= rg->bin_lats[2*n+1] &&
-		   plon >= rg->bin_lons[2*n+0] && plon <= rg->bin_lons[2*n+2] )
+		   plon >= rg->bin_lons[2*n+0] && plon <= rg->bin_lons[2*n+1] )
 		{
 		  min_add = src_bin_add[2*n+0];
 		  max_add = src_bin_add[2*n+1];
