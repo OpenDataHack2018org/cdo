@@ -111,8 +111,7 @@ void *Cond2(void *argument)
 	  varnmiss1[varID] = (int *) malloc(nlev*sizeof(int));
 	}
 
-      if ( ! cdoSilentMode )
-	cdoPrint("Filling up stream >%s< by copying the first timestep.", cdoStreamName(0));
+      cdoPrint("Filling up stream >%s< by copying the first timestep.", cdoStreamName(0));
     }
 
   tsID = 0;

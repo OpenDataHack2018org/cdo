@@ -20,8 +20,8 @@
 
       Select     selcode         Select codes
       Select     delcode         Delete codes
-      Select     selname          Select variables
-      Select     delname          Delete variables
+      Select     selname         Select variables
+      Select     delname         Delete variables
       Select     selstdname      Select variables by CF standard name
       Select     sellevel        Select levels
       Select     selgrid         Select grids

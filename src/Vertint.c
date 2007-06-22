@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@ void *Vertint(void *argument)
   char varname[128];
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;
+  double *ret_vct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double **vardata1 = NULL, **vardata2 = NULL;
   double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
@@ -68,6 +69,7 @@ void *Vertint(void *argument)
   int Extrapolate = 0;
   int taxisID1, taxisID2;
   int lhavevct;
+  int mono_level;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
@@ -136,9 +138,26 @@ void *Vertint(void *argument)
   lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
+      mono_level = FALSE;
+      mono_level = TRUE;
       zaxisID = vlistZaxis(vlistID1, i);
       nlevel  = zaxisInqSize(zaxisID);
+
       if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
+	{
+	  double *level;
+	  int l;
+	  level = (double *) malloc(nlevel*sizeof(double));
+	  zaxisInqLevels(zaxisID, level);
+	  for ( l = 0; l < nlevel; l++ )
+	    {
+	      if ( (l+1) != (int) (level[l]+0.5) ) break;
+	    }
+	  if ( l == nlevel ) mono_level = TRUE; 
+	  free(level);
+	}
+
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 && mono_level )
 	{
 	  nvct = zaxisInqVctSize(zaxisID);
 	  if ( nlevel == (nvct/2 - 1) )
@@ -158,6 +177,57 @@ void *Vertint(void *argument)
 	      else
 		{
 		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+		}
+	    }
+	  else if ( nlevel == (nvct - 4 - 1) )
+	    {
+	      if ( lhavevct == FALSE )
+		{
+		  int vctsize;
+		  int voff = 4;
+		  const double *pvct = zaxisInqVctPtr(zaxisID);
+
+		  if ( (int)(pvct[0]+0.5) == 100000 && pvct[voff] < pvct[voff+1] )
+		    {
+		      lhavevct = TRUE;
+		      zaxisIDh = zaxisID;
+		      nhlev    = nlevel;
+		      nhlevp1  = nhlev + 1;
+
+		      vctsize = 2*nhlevp1;
+		      vct = (double *) malloc(vctsize*sizeof(double));
+		      ret_vct = (double *) malloc(nvct*sizeof(double));
+		      memcpy(ret_vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+
+		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+
+		      /* calculate VCT for LM */
+
+		      for ( i = 0; i < vctsize/2; i++ )
+			{
+			  if ( ret_vct[voff+i] >= ret_vct[voff] && ret_vct[voff+i] <= ret_vct[3] )
+			    {
+			      vct[i] = ret_vct[0]*ret_vct[voff+i];
+			      vct[vctsize/2+i] = 0;
+			    }
+			  else
+			    {
+			      vct[i] = (ret_vct[0]*ret_vct[3]*(1-ret_vct[voff+i]))/(1-ret_vct[3]);;
+			      vct[vctsize/2+i] = (ret_vct[voff+i]-ret_vct[3])/(1-ret_vct[3]);
+			    }
+			}
+		      
+		      if ( cdoVerbose )
+			{
+			  for ( i = 0; i < vctsize/2; i++ )
+			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
+			}
+		    }
+		}
+	      else
+		{
+		  if ( memcmp(ret_vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
 		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 		}
 	    }
@@ -203,6 +273,8 @@ void *Vertint(void *argument)
     {
       gridID  = vlistInqVarGrid(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      gridsize = gridInqSize(gridID);
+      nlevel   = zaxisInqSize(zaxisID);
 
       code = vlistInqVarCode(vlistID1, varID);
       if ( code <= 0 )
@@ -218,30 +290,33 @@ void *Vertint(void *argument)
 	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
 
-      if      ( code == 129 ) geopID    = varID;
-      else if ( code == 130 ) tempID    = varID;
-      else if ( code == 134 ) psID      = varID;
-      else if ( code == 152 ) lnpsID    = varID;
+      if      ( code == 129 && nlevel == 1     ) geopID    = varID;
+      else if ( code == 130 && nlevel == nhlev ) tempID    = varID;
+      else if ( code == 134 && nlevel == 1     ) psID      = varID;
+      else if ( code == 152 && nlevel == 1     ) lnpsID    = varID;
       /* else if ( code == 156 ) gheightID = varID; */
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
-	cdoAbort("spectral data on model level unsupported!");
+	cdoAbort("Spectral data on model level unsupported!");
 
       if ( gridInqType(gridID) == GRID_SPECTRAL )
-	cdoAbort("spectral data unsupported!");
+	cdoAbort("Spectral data unsupported!");
 
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(zaxisID);
       vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
 
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel > 1 )
+      /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
+      if ( zaxisID == zaxisIDh )
 	{
 	  varinterp[varID] = TRUE;
 	  vardata2[varID]  = (double *) malloc(gridsize*nplev*sizeof(double));
 	  varnmiss[varID]  = (int *) malloc(maxlev*sizeof(int));
+	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
 	{
+	  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 )
+	    cdoWarning("Parameter %d has wrong number of levels, skipped! (code=%d nlevel=%d)",
+		       varID+1, code, nlevel);
 	  varinterp[varID] = FALSE;
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
@@ -285,6 +360,7 @@ void *Vertint(void *argument)
 	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
+	  
 	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 	}
 
@@ -393,6 +469,7 @@ void *Vertint(void *argument)
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
   if ( vct        ) free(vct);
+  if ( ret_vct    ) free(ret_vct);
 
   listDelete(flist);
 

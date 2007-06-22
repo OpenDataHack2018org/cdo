@@ -191,8 +191,12 @@ void *Filedes(void *argument)
 	      vctsize = zaxisInqVctSize(zaxisID);
 	      vct     = zaxisInqVctPtr(zaxisID);
 		
-	      for ( i = 0; i < vctsize/2; i++ )
-		fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
+	      if ( vctsize%2 == 0 )
+		for ( i = 0; i < vctsize/2; i++ )
+		  fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
+	      else
+		for ( i = 0; i < vctsize; i++ )
+		  fprintf(stdout, "%5d %25.17f\n", i, vct[i]);
 	    }
 	}
     }
