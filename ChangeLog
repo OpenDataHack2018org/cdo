@@ -24,6 +24,7 @@
 
 2007-06-12  Etienne Tourigny  <tourigny@sca.uqam.ca>
 
+	* Add new operator: splitsel
 	* Add new operator: histfreq
 	* list.c: changes to acept inf and -inf as arguments 
 

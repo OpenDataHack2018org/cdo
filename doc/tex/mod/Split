@@ -5,7 +5,7 @@
 @Section   = File operations
 @Class     = File operation
 @Arguments = ifile oprefix
-@Operators = splitcode splitname splitlevel splitgrid splitzaxis splitrec
+@Operators = splitcode splitname splitlevel splitgrid splitzaxis
 
 @BeginDescription
 This module splits a dataset to several files with names

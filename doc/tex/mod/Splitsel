@@ -1,0 +1,61 @@
+@BeginModule
+@NewPage
+@Name      = Splitsel
+@Title     = Split selected time steps
+@Section   = File operations
+@Arguments = ifile oprefix
+@Operators = splitsel
+
+@C @BeginDescription
+@C This module splits time steps of a dataset to several files with names
+@C formed from the field header information and @file{oprefix}.
+@C @EndDescription
+@EndModule
+
+
+@BeginOperator_splitsel
+@Title     = Split time selection
+@Parameter = nsets [noffset] [nskip]
+
+@BeginDescription
+@IfMan
+This operator splits a dataset into pieces, one for each adjacent
+sequence t1, ...., tn of time steps of the same selected time range.
+Appends three digits with the sequence number to @file{oprefix} to 
+form the output file names. The number of output files is limited
+to 1000.
+@EndifMan
+@IfDoc
+This operator splits a dataset into pieces, one for each adjacent
+sequence \begin{math}t_1, ...., t_n\end{math} of time steps of the same selected time range.
+Appends three digits with the sequence number to @file{oprefix} to 
+form the output file names. The number of output files is limited
+to 1000.
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter noffset
+@Item = nsets
+INTEGER  Number of input time steps for each output time step
+@Item = noffset
+INTEGER  Number of input time steps skipped before the first time step range (optional)
+@Item = nskip
+INTEGER  Number of input time steps skipped between time step ranges (optional)
+@EndParameter
+
+
+@C @BeginExample
+@C Assume the input GRIB dataset has time steps from
+@C January to December. To split each month with all
+@C variables into one separate file use:
+@C @BeginVerbatim
+@C    cdo splitmon ifile mon
+@C @EndVerbatim
+@C Result of '{\tt dir mon*}':
+@C @BeginVerbatim
+@C    mon01.grb  mon02.grb  mon03.grb  mon04.grb  mon05.grb  mon06.grb
+@C    mon07.grb  mon08.grb  mon09.grb  mon10.grb  mon11.grb  mon12.grb
+@C @EndVerbatim
+@C @EndExample

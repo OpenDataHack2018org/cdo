@@ -9,6 +9,7 @@ Replace	      File operations
 Merge	      File operations
 Split	      File operations
 Splittime     File operations
+Splitsel      File operations
 Select        Selection
 Seltime       Selection
 Selbox        Selection

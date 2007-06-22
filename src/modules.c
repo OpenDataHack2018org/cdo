@@ -120,6 +120,7 @@ void *Spectral(void *argument);
 void *Spectrum(void *argument);
 void *Split(void *argument);
 void *Splitrec(void *argument);
+void *Splitsel(void *argument);
 void *Splittime(void *argument);
 void *Splityear(void *argument);
 void *Subtrend(void *argument);
@@ -307,6 +308,7 @@ void *Wct(void *argument);
 #define  SpectrumOperators      {"spectrum"}
 #define  SplitOperators         {"splitcode", "splitvar", "splitlevel", "splitgrid", "splitzaxis"}
 #define  SplitrecOperators      {"splitrec"}
+#define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
 #define  SplityearOperators     {"splityear"}
 #define  SubtrendOperators      {"subtrend"}
@@ -447,7 +449,7 @@ static MODULES Modules[] =
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
-  { Histogram,      NULL,              HistogramOperators,      1,  1 },
+  { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
@@ -509,6 +511,7 @@ static MODULES Modules[] =
   { Spectrum,       NULL,              SpectrumOperators,       1,  1 },
   { Split,          SplitHelp,         SplitOperators,          1,  1 },
   { Splitrec,       SplitHelp,         SplitrecOperators,       1,  1 },
+  { Splitsel,       SplitselHelp,      SplitselOperators,       1,  1 },
   { Splittime,      SplittimeHelp,     SplittimeOperators,      1,  1 },
   { Splityear,      SplittimeHelp,     SplityearOperators,      1,  1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,       3,  1 },

@@ -46,12 +46,12 @@ Operator catalog:
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split zaxis
-      Split      splitrec        Split records
       Splittime  splithour       Split hours
       Splittime  splitday        Split days
       Splittime  splitmon        Split months
       Splittime  splitseas       Split seasons
       Splittime  splityear       Split years
+      Splitsel   splitsel        Split time selection
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
@@ -136,7 +136,6 @@ Operator catalog:
       Invert     invertlondes    Invert longitude description
       Invert     invertlatdata   Invert latitude data
       Invert     invertlondata   Invert longitude data
-      Smooth9    smooth9         9 point smoothing
       Maskregion maskregion      Mask regions
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
@@ -378,11 +377,16 @@ Operator catalog:
 -------------------------------------------------------------
       Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
       Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
+      Smooth9    smooth9         9 point smoothing
       Timsort    timsort         Sort over the time
       Vargen     const           Create a constant field
       Vargen     random          Create a field with random values
       Rotuv      rotuvb          Backward rotation
       Mastrfu    mastrfu         Mass stream function
+      Histogram  histcount       Histogram count
+      Histogram  histsum         Histogram sum
+      Histogram  histmean        Histogram mean
+      Histogram  histfreq        Histogram frequency
       Wct        wct             Windchill temperature (°C)
       Fdns       fdns            Frost days where no snow index per time period
       Strwin     strwin          Strong wind days index per time period

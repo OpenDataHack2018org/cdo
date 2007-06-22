@@ -185,7 +185,7 @@ void *Histogram(void *argument)
       gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       nmiss = 0;
 
-      //fix mising values
+      /* fix mising values */
       
       for ( index = 0; index < nbins; index++ )
 	{

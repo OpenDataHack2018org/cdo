@@ -234,8 +234,7 @@ static char *MergeHelp[] = {
 
 static char *SplitHelp[] = {
     "NAME",
-    "    splitcode, splitname, splitlevel, splitgrid, splitzaxis, splitrec - ",
-    "    Split a dataset",
+    "    splitcode, splitname, splitlevel, splitgrid, splitzaxis - Split a dataset",
     "",
     "SYNOPSIS",
     "    <operator>  ifile oprefix",
@@ -264,10 +263,6 @@ static char *SplitHelp[] = {
     "    splitzaxis  Split zaxis",
     "                Splits a dataset into pieces, one for each different zaxis.",
     "                Appends two digits with the zaxis number to oprefix to ",
-    "                form the output file names.",
-    "    splitrec    Split records",
-    "                Splits a dataset into pieces, one for each record.",
-    "                Appends six digits with the record number to oprefix to ",
     "                form the output file names.",
     NULL
 };
@@ -305,6 +300,27 @@ static char *SplittimeHelp[] = {
     "               Splits a file into pieces, one for each different year.",
     "               Appends four digits with the year to oprefix to ",
     "               form the output file names.",
+    NULL
+};
+
+static char *SplitselHelp[] = {
+    "NAME",
+    "    splitsel - Split selected time steps",
+    "",
+    "SYNOPSIS",
+    "    splitsel,nsets[,noffset[,nskip]]  ifile oprefix",
+    "",
+    "DESCRIPTION",
+    "    This operator splits a dataset into pieces, one for each adjacent",
+    "    sequence t1, ...., tn of time steps of the same selected time range.",
+    "    Appends three digits with the sequence number to oprefix to ",
+    "    form the output file names. The number of output files is limited",
+    "    to 1000.",
+    "",
+    "PARAMETER",
+    "    nsets    INTEGER  Number of input time steps for each output time step",
+    "    noffset  INTEGER  Number of input time steps skipped before the first time step range (optional)",
+    "    nskip    INTEGER  Number of input time steps skipped between time step ranges (optional)",
     NULL
 };
 
@@ -839,27 +855,6 @@ static char *InvertHelp[] = {
     "                   Inverts only the latitude data of a field.",
     "    invertlondata  Invert longitude data",
     "                   Inverts only the longitude data of a field.",
-    NULL
-};
-
-static char *Smooth9Help[] = {
-    "NAME",
-    "    smooth9 - 9 point smoothing",
-    "",
-    "SYNOPSIS",
-    "    smooth9  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Performs a 9 point smoothing on all fields with an rectangular grid.",
-    "    The result at each grid point is a weighted average of the grid point plus",
-    "    the 8 surrounding points. The center point receives a weight of 1.0, the ",
-    "    points at each side and above and below receive a weight of 0.5, and corner ",
-    "    points receive a weight of 0.3.",
-    "    All 9 points are multiplied by their weights and summed, then divided by ",
-    "    the total weight to obtain the smoothed value. Any missing data points are ",
-    "    not included in the sum; points beyond the grid boundary are considered to ",
-    "    be missing. Thus the final result may be the result of an averaging with less ",
-    "    than 9 points.",
     NULL
 };
 
@@ -2878,6 +2873,27 @@ static char *GradsdesHelp[] = {
     NULL
 };
 
+static char *Smooth9Help[] = {
+    "NAME",
+    "    smooth9 - 9 point smoothing",
+    "",
+    "SYNOPSIS",
+    "    smooth9  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Performs a 9 point smoothing on all fields with an rectangular grid.",
+    "    The result at each grid point is a weighted average of the grid point plus",
+    "    the 8 surrounding points. The center point receives a weight of 1.0, the ",
+    "    points at each side and above and below receive a weight of 0.5, and corner ",
+    "    points receive a weight of 0.3.",
+    "    All 9 points are multiplied by their weights and summed, then divided by ",
+    "    the total weight to obtain the smoothed value. Any missing data points are ",
+    "    not included in the sum; points beyond the grid boundary are considered to ",
+    "    be missing. Thus the final result may be the result of an averaging with less ",
+    "    than 9 points.",
+    NULL
+};
+
 static char *TimsortHelp[] = {
     "NAME",
     "    timsort - Timsort",
@@ -2949,6 +2965,33 @@ static char *MastrfuHelp[] = {
     "    general circulation model ECHAM. It computes the mass stream function ",
     "    (code number 272). The input dataset must be a zonal mean of v-velocity",
     "    (code number 132) on pressure levels.",
+    NULL
+};
+
+static char *HistogramHelp[] = {
+    "NAME",
+    "    histcount, histsum, histmean, histfreq - Histogram",
+    "",
+    "SYNOPSIS",
+    "    <operator>,bins  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module creates bins for a histogram of the input data.",
+    "    Only 2-dimentional input field are allowed. The ouput file ",
+    "    contains one vertical level for each of the bins requested.",
+    "",
+    "OPERATORS",
+    "    histcount  Histogram count",
+    "               Number of elements in the bin range.",
+    "    histsum    Histogram sum",
+    "               Sum of elements in the bin range.",
+    "    histmean   Histogram mean",
+    "               Mean of elements in the bin range.",
+    "    histfreq   Histogram frequency",
+    "               Frequency of elements in the bin range.",
+    "",
+    "PARAMETER",
+    "    bins  FLOAT  Comma separated list of bin ranges (-inf and inf valid)",
     NULL
 };
 

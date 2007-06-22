@@ -83,6 +83,7 @@ cdo_SOURCES = Arith.c		\
               Spectrum.c	\
               Split.c   	\
               Splitrec.c 	\
+              Splitsel.c 	\
               Splittime.c 	\
               Splityear.c 	\
               Subtrend.c        \
