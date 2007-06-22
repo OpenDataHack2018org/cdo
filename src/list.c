@@ -192,17 +192,22 @@ int args2fltlist(int argc, char **argv, LIST *list)
   int ival;
   int first, last, inc;
   int iarg;
-  size_t len;
+  int len;
+  double tmp_val;
 
   for ( iarg = 0; iarg < argc; iarg++ )
     {
-      len = strlen(argv[iarg]);
-      for ( i = 0; i < (int) len; i++ )
+      len = (int) strlen(argv[iarg]);
+      for ( i = 0; i < len; i++ )
 	if ( argv[iarg][i] != '/' && ! isdigit(argv[iarg][i]) ) break;
       
-      if ( i != (int) len )
+      if ( i != len )
 	{
-	  listSetFlt(list, nint++, atof(argv[iarg]));
+	  if      ( strcmp(argv[iarg],  "inf") == 0 ) tmp_val =  DBL_MAX;
+	  else if ( strcmp(argv[iarg], "-inf") == 0 ) tmp_val = -DBL_MAX;
+	  else                                        tmp_val = atof(argv[iarg]);
+
+	  listSetFlt(list, nint++, tmp_val);
 	}
       else
 	{
