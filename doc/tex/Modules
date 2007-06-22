@@ -24,7 +24,6 @@ Setgrid       Modification
 Setzaxis      Modification
 Setgatt       Modification
 Invert        Modification
-Smooth9       Modification
 Maskregion    Modification
 Maskbox       Modification
 Setbox        Modification
@@ -81,10 +80,12 @@ Wind          Transformation
 Input         Formatted I/O
 Output        Formatted I/O
 Gradsdes      Miscellaneous
+Smooth9       Miscellaneous
 Timsort       Miscellaneous
 Vargen        Miscellaneous
 Rotuv         Miscellaneous
 Mastrfu       Miscellaneous
+Histogram     Miscellaneous
 Wct           Miscellaneous
 Fdns          Miscellaneous
 Strwin        Miscellaneous

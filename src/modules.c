@@ -241,7 +241,7 @@ void *Wct(void *argument);
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
 #define  HarmonicOperators      {"harmonic"}
-#define  HistogramOperators     {"histcount", "histsum", "histmean"}
+#define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}

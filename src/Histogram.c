@@ -33,7 +33,7 @@
 void *Histogram(void *argument)
 {
   static char func[] = "Histogram";
-  int HISTCOUNT, HISTSUM, HISTMEAN;
+  int HISTCOUNT, HISTSUM, HISTMEAN, HISTFREQ;
   int operatorID;
   int streamID1, streamID2;
   int nrecs;
@@ -53,12 +53,14 @@ void *Histogram(void *argument)
   LIST *flist = listNew(FLT_LIST);
   double **vardata = NULL;
   double **varcount = NULL;
+  double **vartcount = NULL;
 
   cdoInitialize(argument);
 
   HISTCOUNT = cdoOperatorAdd("histcount", 0, 0, NULL);
   HISTSUM   = cdoOperatorAdd("histsum",   0, 0, NULL);
   HISTMEAN  = cdoOperatorAdd("histmean",  0, 0, NULL);
+  HISTFREQ  = cdoOperatorAdd("histfreq",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -86,14 +88,15 @@ void *Histogram(void *argument)
   /* create zaxis for output bins */
   zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nbins);
   bins = (double *) malloc(nbins*sizeof(double));
-  for ( i = 0; i < nbins; i++ ) bins[i] = (fltarr[i]+fltarr[i+1])/2;
+  /* for ( i = 0; i < nbins; i++ ) bins[i] = (fltarr[i]+fltarr[i+1])/2; */
+  for ( i = 0; i < nbins; i++ ) bins[i] = fltarr[i];
   zaxisDefLevels(zaxisID2, bins);
   free(bins);
   zaxisDefLbounds(zaxisID2, fltarr);
   zaxisDefUbounds(zaxisID2, fltarr+1);
   zaxisDefName(zaxisID2, "bins");
   zaxisDefLongname(zaxisID2, "histogram bins");
-  zaxisDefUnits(zaxisID2, "");
+  zaxisDefUnits(zaxisID2, "level");
 
   /* check zaxis: only 2D fields allowed */
   nzaxis = vlistNzaxis(vlistID1);
@@ -115,15 +118,18 @@ void *Histogram(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   nvars = vlistNvars(vlistID2);
-  vardata  = (double **) malloc(nvars*sizeof(double *));
-  varcount = (double **) malloc(nvars*sizeof(double *));
+  vardata   = (double **) malloc(nvars*sizeof(double *));
+  varcount  = (double **) malloc(nvars*sizeof(double *));
+  vartcount = (double **) malloc(nvars*sizeof(double *));
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
       vardata[varID]  = (double *) malloc(nbins*gridsize*sizeof(double));
       varcount[varID] = (double *) malloc(nbins*gridsize*sizeof(double));
+      vartcount[varID] = (double *) malloc(gridsize*sizeof(double));
       memset(vardata[varID], 0, nbins*gridsize*sizeof(double));
       memset(varcount[varID], 0, nbins*gridsize*sizeof(double));
+      memset(vartcount[varID], 0, gridsize*sizeof(double));
     }
 
   gridsize = vlistGridsizeMax(vlistID1);
@@ -139,46 +145,81 @@ void *Histogram(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, array, &nmiss);
 	  missval = vlistInqVarMissval(vlistID1, varID);
+
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  for ( index = 0; index < nbins; index++ )
+
+	  nmiss=0;
+	  for ( i = 0; i < gridsize; i++ )
 	    {
-	      offset = gridsize*index;
-	      for ( i = 0; i < gridsize; i++ )
+	      if ( !DBL_IS_EQUAL(array[i], missval) )
 		{
-		  if ( array[i] >= fltarr[index] && array[i] < fltarr[index+1] &&
-		       ! DBL_IS_EQUAL(array[i], missval))
+		  *(vartcount[varID]+i) += 1;
+		  index = 0;
+		  while( index < nbins )
 		    {
-		      *(vardata[varID]+offset+i) += array[i];
-		      *(varcount[varID]+offset+i) += 1;
+		      offset = gridsize*index;
+		      if ( !DBL_IS_EQUAL(*(vardata[varID]+offset+i), missval) &&
+			   array[i] >= fltarr[index] && array[i] < fltarr[index+1] )
+			{
+			  *(vardata[varID]+offset+i) += array[i];
+			  *(varcount[varID]+offset+i) += 1;
+			  break;
+			}
+		      index++;
 		    }
 		}
+	      else { /* missing value */
+		nmiss++;
+	      }
 	    }
 	}
       tsID1++;
     }
 
+
   streamDefTimestep(streamID2, 0);
 
   for ( varID = 0; varID < nvars; varID++ )
-    for ( index = 0; index < nbins; index++ )
-      {
-	streamDefRecord(streamID2,  varID,  index);
-	gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	offset   = gridsize*index;
+    {
+      missval = vlistInqVarMissval(vlistID2, varID);
+      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+      nmiss = 0;
 
-	if ( operatorID == HISTMEAN )
-	  {
-	    for ( i = 0; i < gridsize; i++ )
-	      if ( *(varcount[varID]+offset+i) > 0 )
-		*(vardata[varID]+offset+i) /= *(varcount[varID]+offset+i);	    
-	  }
-
-	if ( operatorID == HISTCOUNT )
-	  streamWriteRecord(streamID2, varcount[varID]+offset, 0);
-	else
-	  streamWriteRecord(streamID2, vardata[varID]+offset, 0);
-      }
-
+      //fix mising values
+      
+      for ( index = 0; index < nbins; index++ )
+	{
+	  streamDefRecord(streamID2,  varID,  index);
+	  offset   = gridsize*index;
+	  
+	  for ( i = 0; i < gridsize; i++ )
+	    {
+	      if ( *(vartcount[varID]+i) > 0 )
+		{
+		  if ( operatorID == HISTMEAN || operatorID == HISTFREQ )
+		    {
+		      if ( *(varcount[varID]+offset+i) > 0 ) 
+			{
+			  if ( operatorID == HISTMEAN )
+			    *(vardata[varID]+offset+i) /= *(varcount[varID]+offset+i);	    
+			  else 
+			    *(vardata[varID]+offset+i) = *(varcount[varID]+offset+i) / *(vartcount[varID]+i);
+			} 
+		    }
+		}
+	      else
+		{
+		  nmiss++;
+		  *(vardata[varID]+offset+i) = missval;
+		}
+	    }
+	  if ( operatorID == HISTCOUNT )
+	    streamWriteRecord(streamID2, varcount[varID]+offset, nmiss);
+	  else
+	    streamWriteRecord(streamID2, vardata[varID]+offset, nmiss);
+	}
+    }
+  
   streamClose(streamID1);
   streamClose(streamID2);
 
@@ -188,10 +229,12 @@ void *Histogram(void *argument)
 	{
 	  free(vardata[varID]);
 	  free(varcount[varID]);
+	  free(vartcount[varID]);
 	}
 
       free(vardata);
       free(varcount);
+      free(vartcount);
     }
 
   if ( array ) free(array);

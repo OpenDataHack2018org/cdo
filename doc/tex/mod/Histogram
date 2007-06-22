@@ -2,25 +2,59 @@
 @NewPage
 @Name      = Histogram
 @Title     = Histogram
-@Section   = Other
-@Class     = Other
+@Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = histcount histsum histmean
+@Operators = histcount histsum histmean histfreq
+
+@BeginDescription
+This module creates bins for a histogram of the input data.
+Only 2-dimentional input field are allowed. The ouput file 
+contains one vertical level for each of the bins requested.
+@EndDescription
 @EndModule
 
 
-@BeginOperator_histsum
+@BeginOperator_histcount
+@Title     = Histogram count
+@Parameter = bins
 
+@BeginDescription
+Number of elements in the bin range.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_histsum
 @Title     = Histogram sum
 @Parameter = bins
 
 @BeginDescription
-Only usable for 2D fields.
+Sum of elements in the bin range.
 @EndDescription
+@EndOperator
+
+
+@BeginOperator_histmean
+@Title     = Histogram mean
+@Parameter = bins
+
+@BeginDescription
+Mean of elements in the bin range.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_histfreq
+@Title     = Histogram frequency
+@Parameter = bins
+
+@BeginDescription
+Frequency of elements in the bin range.
+@EndDescription
+@EndOperator
+
 
 @BeginParameter bins
 @Item = bins
-FLOAT  Bounds of the bins (minimum 2 values)
+FLOAT  Comma separated list of bin ranges (-inf and inf valid)
 @EndParameter
-
-@EndOperator

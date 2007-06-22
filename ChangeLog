@@ -24,7 +24,8 @@
 
 2007-06-12  Etienne Tourigny  <tourigny@sca.uqam.ca>
 
-	* changes to list.c to acept inf and -inf as arguments 
+	* Add new operator: histfreq
+	* list.c: changes to acept inf and -inf as arguments 
 
 2007-06-07  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
 
