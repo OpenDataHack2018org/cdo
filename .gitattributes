@@ -285,6 +285,7 @@ src/Spectral.c -text
 src/Spectrum.c -text
 src/Split.c -text
 src/Splitrec.c -text
+src/Splitsel.c -text
 src/Splittime.c -text
 src/Splityear.c -text
 src/Subtrend.c -text
