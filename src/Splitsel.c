@@ -29,9 +29,6 @@
 #include "pstream.h"
 #include "dtypes.h"
 
-  /* from Splittime.c */
-//#define  MAX_STREAMS 32
-#define  MAX_STREAMS 1000
 
 void *Splitsel(void *argument)
 {
@@ -42,27 +39,20 @@ void *Splitsel(void *argument)
   int operfunc;
   int gridsize;
   int vdate = 0, vtime = 0;
-  int vdate0 = 0, vtime0 = 0;
-  int nrecs = 0, nrecords;
-  int gridID, varID, levelID, recID;
-  int tsID;
-  int otsID;
+  int nrecs = 0;
+  int varID, levelID, recID;
+  int tsID, tsID2;
   int nsets;
-  int i;
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
 /*   int ndates = 0, noffset = 0, nskip = 0, nargc; */
   double ndates, noffset, nskip;
   int i2 = 0;
   int nargc;
-  int *recVarID, *recLevelID;
-  FIELD field;
 
   /* from Splittime.c */
   int nchars;
-  int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   char *filesuffix;
   char filename[1024];
   int index = 0;
@@ -77,9 +67,6 @@ void *Splitsel(void *argument)
   operfunc = cdoOperatorFunc(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
-
-  for ( i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
-  for ( i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
 
   //  operatorInputArg("nsets <noffset <nskip>>");
 
@@ -134,7 +121,6 @@ void *Splitsel(void *argument)
       goto LABEL_END;
     }
 
-  otsID = 0;
   index = 0;
   nsets = 0;
   while ( TRUE )
@@ -149,23 +135,16 @@ void *Splitsel(void *argument)
       vtime = taxisInqVtime(taxisID1);
 
 /*       printf("vdate: %d vtime: %d\n",vdate,vtime); */
-      if ( index < 0 || index >= MAX_STREAMS )
-	cdoAbort("Index out of range!");
 
-      streamID2 = streamIDs[index];
-      if ( streamID2 < 0 )
-	{
-	  sprintf(filename+nchars, "%03d", index);
-	  sprintf(filename+nchars+3, "%s", filesuffix);
+      sprintf(filename+nchars, "%03d", index);
+      sprintf(filename+nchars+3, "%s", filesuffix);
 	  
-	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
-	  streamID2 = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", filename);
+      if ( cdoVerbose ) cdoPrint("create file %s", filename);
+      streamID2 = streamOpenWrite(filename, cdoFiletype());
+      if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", filename);
 
-	  streamDefVlist(streamID2, vlistID2);
-
-	  streamIDs[index] = streamID2;
-	}
+      streamDefVlist(streamID2, vlistID2);
+      tsID2 = 0;
 
 
 /*       printf("comp: %f %d\n",ndates*(index+1),(int)(ndates*(index+1))); */
@@ -181,7 +160,7 @@ void *Splitsel(void *argument)
 	      taxisCopyTimestep(taxisID2, taxisID1);
 	      
 /* 	      streamDefTimestep(streamID2, nsets % (int)ndates); */
-	      streamDefTimestep(streamID2,tsIDs[index]);
+	      streamDefTimestep(streamID2, tsID2);
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2,  varID,  levelID);
 	      if ( lcopy )
@@ -196,20 +175,15 @@ void *Splitsel(void *argument)
 	    }
 	  
 	  tsID++;
-	  tsIDs[index]++;	  
+	  tsID2++;	  
 	}
       
-
+      streamClose(streamID2);
 
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
 /*       for ( i = 0; i < nskip; i++ ) */
-/* 	{ */
-/* 	  nrecs = streamInqTimestep(streamID1, tsID); */
-/* 	  if ( nrecs == 0 ) break; */
-/* 	  tsID++; */
-/* 	} */
       for ( ; i2 < (int)(nskip*(index+1)); i2++ )
 	{
 	  nrecs = streamInqTimestep(streamID1, tsID);
@@ -227,19 +201,11 @@ void *Splitsel(void *argument)
 
 
   streamClose(streamID1);
-
-  for ( index = 0; index < MAX_STREAMS; index++ )
-    {
-      streamID2 = streamIDs[index];
-      if ( streamID2 >= 0 )  streamClose(streamID2);
-    }
  
   if ( ! lcopy )
     if ( array ) free(array);
 
   cdoFinish();
-
-  return (0);
 
   return (0);
 }

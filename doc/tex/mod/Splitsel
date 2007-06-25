@@ -29,8 +29,7 @@ to 1000.
 This operator splits a dataset into pieces, one for each adjacent
 sequence \begin{math}t_1, ...., t_n\end{math} of time steps of the same selected time range.
 Appends three digits with the sequence number to @file{oprefix} to 
-form the output file names. The number of output files is limited
-to 1000.
+form the output file names.
 @EndifDoc
 @EndDescription
 @EndOperator
