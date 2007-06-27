@@ -67,7 +67,6 @@ Operator catalog:
       Select     selzaxisname    Select zaxes by name
       Select     selltype        Select GRIB level types
       Select     seltabnum       Select parameter table numbers
-      Select     selrec          Select records
       Seltime    seltimestep     Select time steps
       Seltime    seltime         Select times
       Seltime    selhour         Select hours

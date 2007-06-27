@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selname delname selstdname sellevel selgrid selgridname selzaxis selzaxisname selltype seltabnum selrec
+@Operators = selcode delcode selname delname selstdname sellevel selgrid selgridname selzaxis selzaxisname selltype seltabnum
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -166,8 +166,8 @@ INTEGER  Comma separated list of zaxis numbers
 STRING   Comma separated list of zaxis names
 @Item = tabnums
 INTEGER  Comma separated list of parameter table numbers
-@Item = records
-INTEGER  Comma separated list of records
+@C @Item = records
+@C INTEGER  Comma separated list of records
 @EndParameter
 
 

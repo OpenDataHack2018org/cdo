@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -197,7 +197,7 @@ void *Gradsdes(void *argument)
   int vdate, vtime;
   int ltype, code;
   const char *datfile;
-  char ctlfile[1024];
+  char ctlfile[1024], *pctlfile;
   int len;
   char varname[256], varlongname[256], varunits[256];
   FILE *gdp;
@@ -561,10 +561,19 @@ void *Gradsdes(void *argument)
     {
       fprintf(gdp, "DTYPE  GRIB\n");
 
-      len = (int) strlen(ctlfile);
-      strcpy(&ctlfile[len-4], ".gmp");
+      pctlfile = ctlfile;
+      len = (int) strlen(pctlfile);
+      strcpy(&pctlfile[len-4], ".gmp");
       
-      fprintf(gdp, "INDEX  ^%s\n", ctlfile);
+      if ( datfile[0] == '/' )
+	fprintf(gdp, "INDEX  %s\n", pctlfile);
+      else
+	{
+	  pctlfile = strrchr(pctlfile, '/');
+	  if ( pctlfile == 0 ) pctlfile = ctlfile;
+	  else                 pctlfile++;	  
+	  fprintf(gdp, "INDEX  ^%s\n", pctlfile);
+	}
 
       gridsize = vlistGridsizeMax(vlistID);
       array = (double *) malloc(gridsize*sizeof(double));

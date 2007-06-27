@@ -27,11 +27,12 @@
 #  include "config.h"
 #endif
 
+#include <string.h>
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include <string.h>
 
 
 double arg2val(char *arg)
@@ -49,7 +50,6 @@ void *Setrange(void *argument)
   int streamID1, streamID2;
   int gridsize;
   int nrecs, recID;
-  int nvars;
   int tsID;
   int varID, levelID;
   int vlistID1, vlistID2;
@@ -57,10 +57,10 @@ void *Setrange(void *argument)
   int i;
   //  double missval, missval2 = 0;
   double missval;
-  double rconst = 0, rmin = 0, rmax = 0;
+  double rmin = 0, rmax = 0;
   double *array;
   int taxisID1, taxisID2;
-  double newval, newval2;
+  double newval = 0, newval2 = 0;
 
   cdoInitialize(argument);
 

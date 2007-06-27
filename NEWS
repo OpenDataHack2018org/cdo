@@ -1,12 +1,15 @@
 CDO NEWS
 --------
 
-Version 1.0.8 (15 June 2007):
+Version 1.0.8 (27 June 2007):
 
    * New operators:
       o Remap vertical hybrid level - remapeta
       o 9 point smoothing - smooth9
       o Mask region - maskregion
+      o Split selected time steps - splitsel
+      o Set range to constant - setrtoc, setrtoc2
+      o Histogram - histcount, histsum, histmean, histfreq
       o Show GRIB level types - showltype
       o Select GRIB level types - selltype
       o Set GRIB level type - setltype

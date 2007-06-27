@@ -17,6 +17,7 @@
 	* remapcon: bug fix in intersection (s1 >= ZERO) [report: Joerg Wegner]
 	* remapcon: speed up by increasing BABY_STEP from 0.001 to 0.01
 	* interpolate: bug fix for north/south bounds > 90 or < -90 [report: Stefan Hagemann]
+	* gradsdes: bug fix for GRIB files with absolute path [report: Matthias Büchner]
 	* replace ztype2ltype by zaxis2ltype
 	* ltype2ztype: set default zaxis type to ZAXIS_GENERIC
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]

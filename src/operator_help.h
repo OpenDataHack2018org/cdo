@@ -327,8 +327,7 @@ static char *SplitselHelp[] = {
 static char *SelectHelp[] = {
     "NAME",
     "    selcode, delcode, selname, delname, selstdname, sellevel, selgrid, ",
-    "    selgridname, selzaxis, selzaxisname, selltype, seltabnum, selrec - ",
-    "    Select fields",
+    "    selgridname, selzaxis, selzaxisname, selltype, seltabnum - Select fields",
     "",
     "SYNOPSIS",
     "    selcode,codes  ifile ofile",
@@ -343,7 +342,6 @@ static char *SelectHelp[] = {
     "    selzaxisname,zaxisnames  ifile ofile",
     "    selltype,ltypes  ifile ofile",
     "    seltabnum,tabnums  ifile ofile",
-    "    selrec,records  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module selects some fields from ifile and writes them to ofile.",
@@ -374,9 +372,6 @@ static char *SelectHelp[] = {
     "                  Selects all fields with GRIB level type in a user given list.",
     "    seltabnum     Select parameter table numbers",
     "                  Selects all fields with parameter table numbers in a user given list.",
-    "    selrec        Select records",
-    "                  Selects all fields with record numbers in a user given list.",
-    "                  This operator can not be used with netCDF data!",
     "",
     "PARAMETER",
     "    codes       INTEGER  Comma separated list of code numbers",
@@ -389,7 +384,6 @@ static char *SelectHelp[] = {
     "    zaxes       INTEGER  Comma separated list of zaxis numbers",
     "    zaxisnames  STRING   Comma separated list of zaxis names",
     "    tabnums     INTEGER  Comma separated list of parameter table numbers",
-    "    records     INTEGER  Comma separated list of records",
     NULL
 };
 
