@@ -108,6 +108,7 @@ void *Setgatt(void *argument);
 void *Setgrid(void *argument);
 void *Sethalo(void *argument);
 void *Setmiss(void *argument);
+void *Setrange(void *argument);
 void *Setrcaname(void *argument);
 void *Settime(void *argument);
 void *Setzaxis(void *argument);
@@ -294,6 +295,7 @@ void *Wct(void *argument);
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}
 #define  SethaloOperators       {"sethalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss"}
+#define  SetrangeOperators      {"setrtoc", "setrtoc2"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
@@ -498,6 +500,7 @@ static MODULES Modules[] =
   { Setgatt,        SetgattHelp,       SetgattOperators,        1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,        1,  1 },
   { Sethalo,        NULL,              SethaloOperators,        1,  1 },
+  { Setrange,       SetrangeHelp,      SetrangeOperators,       1,  1 },
   { Setrcaname,     NULL,              SetrcanameOperators,     1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,        1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,        1,  1 },

@@ -22,6 +22,7 @@ double RD            = C_EARTH_RD;
 
 int Mars = 0;
 
+
 void h2p(double *phlev, double *hlev, int nphlev)
 {
   int  k;
@@ -43,6 +44,18 @@ void h2p(double *phlev, double *hlev, int nphlev)
     }
 
 }  /* h2p */
+
+
+void p2h(double *hlev, double *plev, int nphlev)
+{
+  int  k;
+
+  for ( k = 0; k < nphlev; k++ )
+    {
+      hlev[k] = log(plev[k]/SCALESLP)*SCALEHEIGHT;
+    }
+
+}  /* p2h */
 
 
 void presh(double *fullp, double *halfp, double *vct, double *ps, int nhlev, int ngp)

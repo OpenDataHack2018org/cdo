@@ -1,4 +1,4 @@
-2007-06-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2007-06-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.7
 	* New operator: remapeta
@@ -22,10 +22,11 @@
 	* selltype, setltype, chltype: extent to all ltypes [request: Patrick Samuelsson]
 	* Version 1.0.8 released
 
-2007-06-12  Etienne Tourigny  <tourigny@sca.uqam.ca>
+2007-06-26  Etienne Tourigny  <tourigny@sca.uqam.ca>
 
 	* Add new operator: splitsel
 	* Add new operator: histfreq
+	* Add new operator: setrtoc and setrtoc2
 	* list.c: changes to acept inf and -inf as arguments 
 
 2007-06-07  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>

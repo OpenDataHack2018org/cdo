@@ -2894,6 +2894,36 @@ static char *Smooth9Help[] = {
     NULL
 };
 
+static char *SetrangeHelp[] = {
+    "NAME",
+    "    setrtoc, setrtoc2 - Set range to constant",
+    "",
+    "SYNOPSIS",
+    "    setrtoc,rmin,rmax,c  ifile ofile",
+    "    setrtoc2,rmin,rmax,c,c2  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module sets part of a field to a constant value or missing values. ",
+    "    Which part of the field is set depends on the actual operator.",
+    "",
+    "OPERATORS",
+    "    setrtoc   Set range to constant",
+    "                       / c      if i(t,x) GE rmin AND i(t,x) LE rmax",
+    "              o(t,x) = ",
+    "                       \\ i(t,x) if i(t,x) LT rmin AND i(t,x) GT rmax",
+    "    setrtoc2  Set range to constant others to constant2",
+    "                       / c      if i(t,x) GE rmin AND i(t,x) LE rmax",
+    "              o(t,x) = ",
+    "                       \\ c2     if i(t,x) LT rmin AND i(t,x) GT rmax",
+    "",
+    "PARAMETER",
+    "    rmin  FLOAT  Lower bound",
+    "    rmax  FLOAT  Upper bound",
+    "    c     FLOAT  New value - inside of range",
+    "    c2    FLOAT  New value - outside of range",
+    NULL
+};
+
 static char *TimsortHelp[] = {
     "NAME",
     "    timsort - Timsort",

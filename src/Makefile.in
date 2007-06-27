@@ -152,6 +152,7 @@ cdo_SOURCES = Arith.c		\
 	      Setgrid.c		\
 	      Sethalo.c		\
               Setmiss.c 	\
+              Setrange.c 	\
               Setrcaname.c 	\
 	      Settime.c		\
 	      Setzaxis.c	\
@@ -322,16 +323,16 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Seloperator.$(OBJEXT) Selrec.$(OBJEXT) Seltime.$(OBJEXT) \
 	Set.$(OBJEXT) Setbox.$(OBJEXT) Setgatt.$(OBJEXT) \
 	Setgrid.$(OBJEXT) Sethalo.$(OBJEXT) Setmiss.$(OBJEXT) \
-	Setrcaname.$(OBJEXT) Settime.$(OBJEXT) Setzaxis.$(OBJEXT) \
-	Showinfo.$(OBJEXT) Sinfo.$(OBJEXT) Smooth9.$(OBJEXT) \
-	Sort.$(OBJEXT) Specinfo.$(OBJEXT) Spectral.$(OBJEXT) \
-	Spectrum.$(OBJEXT) Split.$(OBJEXT) Splitrec.$(OBJEXT) \
-	Splitsel.$(OBJEXT) Splittime.$(OBJEXT) Splityear.$(OBJEXT) \
-	Subtrend.$(OBJEXT) Templates.$(OBJEXT) Test.$(OBJEXT) \
-	Tests.$(OBJEXT) Timcount.$(OBJEXT) Timpctl.$(OBJEXT) \
-	Timsort.$(OBJEXT) Timselpctl.$(OBJEXT) Timselstat.$(OBJEXT) \
-	Timstat.$(OBJEXT) Timstat2.$(OBJEXT) Tinfo.$(OBJEXT) \
-	Trend.$(OBJEXT) Trms.$(OBJEXT) Vardup.$(OBJEXT) \
+	Setrange.$(OBJEXT) Setrcaname.$(OBJEXT) Settime.$(OBJEXT) \
+	Setzaxis.$(OBJEXT) Showinfo.$(OBJEXT) Sinfo.$(OBJEXT) \
+	Smooth9.$(OBJEXT) Sort.$(OBJEXT) Specinfo.$(OBJEXT) \
+	Spectral.$(OBJEXT) Spectrum.$(OBJEXT) Split.$(OBJEXT) \
+	Splitrec.$(OBJEXT) Splitsel.$(OBJEXT) Splittime.$(OBJEXT) \
+	Splityear.$(OBJEXT) Subtrend.$(OBJEXT) Templates.$(OBJEXT) \
+	Test.$(OBJEXT) Tests.$(OBJEXT) Timcount.$(OBJEXT) \
+	Timpctl.$(OBJEXT) Timsort.$(OBJEXT) Timselpctl.$(OBJEXT) \
+	Timselstat.$(OBJEXT) Timstat.$(OBJEXT) Timstat2.$(OBJEXT) \
+	Tinfo.$(OBJEXT) Trend.$(OBJEXT) Trms.$(OBJEXT) Vardup.$(OBJEXT) \
 	Vargen.$(OBJEXT) Varrms.$(OBJEXT) Vertint.$(OBJEXT) \
 	Vertstat.$(OBJEXT) Wind.$(OBJEXT) Writegrid.$(OBJEXT) \
 	Writerandom.$(OBJEXT) Ydaypctl.$(OBJEXT) Ydaystat.$(OBJEXT) \
@@ -404,46 +405,47 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Set.Po ./$(DEPDIR)/Setbox.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Setgatt.Po ./$(DEPDIR)/Setgrid.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Sethalo.Po ./$(DEPDIR)/Setmiss.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setrcaname.Po ./$(DEPDIR)/Settime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setzaxis.Po ./$(DEPDIR)/Showinfo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Sinfo.Po ./$(DEPDIR)/Smooth9.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Sort.Po ./$(DEPDIR)/Specinfo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Spectral.Po ./$(DEPDIR)/Spectrum.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Split.Po ./$(DEPDIR)/Splitrec.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Splitsel.Po ./$(DEPDIR)/Splittime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Splityear.Po ./$(DEPDIR)/Subtrend.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Templates.Po ./$(DEPDIR)/Test.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Tests.Po ./$(DEPDIR)/Timcount.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timpctl.Po ./$(DEPDIR)/Timselpctl.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timselstat.Po ./$(DEPDIR)/Timsort.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timstat.Po ./$(DEPDIR)/Timstat2.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Tinfo.Po ./$(DEPDIR)/Trend.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Trms.Po ./$(DEPDIR)/Vardup.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Vargen.Po ./$(DEPDIR)/Varrms.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Vertint.Po ./$(DEPDIR)/Vertstat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Wct.Po ./$(DEPDIR)/Wind.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Writegrid.Po ./$(DEPDIR)/Writerandom.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ydaypctl.Po ./$(DEPDIR)/Ydaystat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ydrunpctl.Po ./$(DEPDIR)/Ydrunstat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ymonarith.Po ./$(DEPDIR)/Ymonpctl.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ymonstat.Po ./$(DEPDIR)/Yseaspctl.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Yseasstat.Po ./$(DEPDIR)/Zonstat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/cdilib.Po ./$(DEPDIR)/cdo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/cdo_pthread.Po ./$(DEPDIR)/cdo_vlist.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/cdotest.Po ./$(DEPDIR)/color.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/commandline.Po ./$(DEPDIR)/ecacore.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/ecautil.Po ./$(DEPDIR)/exception.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/expr.Po ./$(DEPDIR)/expr_lex.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/expr_yacc.Po ./$(DEPDIR)/field.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/field2.Po ./$(DEPDIR)/fieldc.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/fieldmer.Po ./$(DEPDIR)/fieldzon.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/fourier.Po ./$(DEPDIR)/grid.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/hetaeta.Po ./$(DEPDIR)/history.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/institution.Po ./$(DEPDIR)/interpol.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/job.Po ./$(DEPDIR)/julian.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/legendre.Po ./$(DEPDIR)/list.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/modules.Po ./$(DEPDIR)/namelist.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/normal.Po ./$(DEPDIR)/nth_element.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Setrange.Po ./$(DEPDIR)/Setrcaname.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Settime.Po ./$(DEPDIR)/Setzaxis.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Showinfo.Po ./$(DEPDIR)/Sinfo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Smooth9.Po ./$(DEPDIR)/Sort.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Specinfo.Po ./$(DEPDIR)/Spectral.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Spectrum.Po ./$(DEPDIR)/Split.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Splitrec.Po ./$(DEPDIR)/Splitsel.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Splittime.Po ./$(DEPDIR)/Splityear.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Subtrend.Po ./$(DEPDIR)/Templates.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Test.Po ./$(DEPDIR)/Tests.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timcount.Po ./$(DEPDIR)/Timpctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timselpctl.Po ./$(DEPDIR)/Timselstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timsort.Po ./$(DEPDIR)/Timstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timstat2.Po ./$(DEPDIR)/Tinfo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Trend.Po ./$(DEPDIR)/Trms.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Vardup.Po ./$(DEPDIR)/Vargen.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Varrms.Po ./$(DEPDIR)/Vertint.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Vertstat.Po ./$(DEPDIR)/Wct.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Wind.Po ./$(DEPDIR)/Writegrid.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Writerandom.Po ./$(DEPDIR)/Ydaypctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Ydaystat.Po ./$(DEPDIR)/Ydrunpctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Ydrunstat.Po ./$(DEPDIR)/Ymonarith.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Ymonpctl.Po ./$(DEPDIR)/Ymonstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Yseaspctl.Po ./$(DEPDIR)/Yseasstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Zonstat.Po ./$(DEPDIR)/cdilib.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/cdo.Po ./$(DEPDIR)/cdo_pthread.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/cdo_vlist.Po ./$(DEPDIR)/cdotest.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/color.Po ./$(DEPDIR)/commandline.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/ecacore.Po ./$(DEPDIR)/ecautil.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/exception.Po ./$(DEPDIR)/expr.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/expr_lex.Po ./$(DEPDIR)/expr_yacc.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/field.Po ./$(DEPDIR)/field2.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/fieldc.Po ./$(DEPDIR)/fieldmer.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/fieldzon.Po ./$(DEPDIR)/fourier.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/grid.Po ./$(DEPDIR)/hetaeta.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/history.Po ./$(DEPDIR)/institution.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/interpol.Po ./$(DEPDIR)/job.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/julian.Po ./$(DEPDIR)/legendre.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/list.Po ./$(DEPDIR)/modules.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/namelist.Po ./$(DEPDIR)/normal.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/nth_element.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/percentiles.Po ./$(DEPDIR)/pipe.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/process.Po ./$(DEPDIR)/pstream.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/pthread_debug.Po \
@@ -596,6 +598,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Setgrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sethalo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Setmiss.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Setrange.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Setrcaname.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Settime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Setzaxis.Po@am__quote@

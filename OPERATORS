@@ -378,6 +378,8 @@ Operator catalog:
       Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
       Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
       Smooth9    smooth9         9 point smoothing
+      Setrange   setrtoc         Set range to constant
+      Setrange   setrtoc2        Set range to constant others to constant2
       Timsort    timsort         Sort over the time
       Vargen     const           Create a constant field
       Vargen     random          Create a field with random values

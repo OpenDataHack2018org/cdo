@@ -148,7 +148,6 @@ void *Timselstat(void *argument)
     {
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
-      tsID++;
     }
 
   if ( tsID < noffset )

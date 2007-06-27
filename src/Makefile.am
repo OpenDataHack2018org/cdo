@@ -71,6 +71,7 @@ cdo_SOURCES = Arith.c		\
 	      Setgrid.c		\
 	      Sethalo.c		\
               Setmiss.c 	\
+              Setrange.c 	\
               Setrcaname.c 	\
 	      Settime.c		\
 	      Setzaxis.c	\
