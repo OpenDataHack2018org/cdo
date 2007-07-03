@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -33,10 +33,95 @@
 #include "interpol.h"
 
 
+int genBoxGrid(int gridID1, int xavg, int yavg)
+{
+  static char func[] = "genBoxGrid";
+  int i, j, i1;
+  int gridID2, gridtype;
+  int gridsize1, xsize1, ysize1;
+  int gridsize2, xsize2, ysize2;
+  double *xvals1, *yvals1, *xvals2, *yvals2;
+  double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
+  double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
+
+  gridtype = gridInqType(gridID1);
+  gridsize1 = gridInqSize(gridID1);
+  xsize1 = gridInqXsize(gridID1);
+  ysize1 = gridInqYsize(gridID1);
+
+  printf("grid1 %d %d %d\n", gridsize1, xsize1, ysize1);
+
+  xsize2 = xsize1/xavg;
+  ysize2 = ysize1/yavg;
+  if ( xsize1%xavg ) xsize2++;
+  if ( ysize1%yavg ) ysize2++;
+  gridsize2 = xsize2*ysize2;
+
+  if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
+    {
+      xvals1 = (double *) malloc(xsize1*sizeof(double));
+      yvals1 = (double *) malloc(ysize1*sizeof(double));
+      xvals2 = (double *) malloc(xsize2*sizeof(double));
+      yvals2 = (double *) malloc(ysize2*sizeof(double));
+      gridInqXvals(gridID1, xvals1);
+      gridInqYvals(gridID1, yvals1);
+
+      if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
+	{
+	  grid1_corner_lon = (double *) malloc(2*xsize1*sizeof(double));
+	  grid1_corner_lat = (double *) malloc(2*ysize1*sizeof(double));
+	  grid2_corner_lon = (double *) malloc(2*xsize2*sizeof(double));
+	  grid2_corner_lat = (double *) malloc(2*ysize2*sizeof(double));
+	  gridInqXbounds(gridID1, grid1_corner_lon);
+	  gridInqYbounds(gridID1, grid1_corner_lat);
+	}
+
+      j = 0;
+      for ( i = 0; i < xsize1; i += xavg )
+	{
+	  i1 = i+(xavg-1);
+	  if ( i1 >= xsize1-1 ) i1 = xsize1-1; 
+	  xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2;
+	  printf("x %d %d %d %g", i, i1, j, xvals2[j]);
+	  if ( grid2_corner_lon )
+	    {
+	      grid2_corner_lon[2*j] = grid1_corner_lon[i];
+	      grid2_corner_lon[2*j] = grid1_corner_lon[i];
+	      printf(" %g%g", grid2_corner_lon[2*j], grid2_corner_lon[2*(j+1)]);
+	    }
+	  printf("\n");
+	  j++;
+	}
+      j = 0;
+      for ( i = 0; i < ysize1; i += yavg )
+	{
+	  i1 = i+(yavg-1);
+	  if ( i1 >= ysize1-1 ) i1 = ysize1-1; 
+	  yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
+	  printf("y %d %d %d %g\n", i, i1, j, yvals2[j]);
+	  j++;
+	}
+	
+    }
+  else
+    {
+      cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
+    }
+
+  printf("grid2 %d %d %d\n", gridsize2, xsize2, ysize2);
+
+  gridID2 = gridCreate(gridtype, gridsize2);
+  gridDefXsize(gridID2, xsize2);
+  gridDefYsize(gridID2, ysize2);
+
+  return gridID2;
+}
+
+
 void *Intgrid(void *argument)
 {
   static char func[] = "Intgrid";
-  int INTGRID, INTPOINT, INTERPOLATE;
+  int INTGRID, INTPOINT, INTERPOLATE, BOXAVG;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, ngrids;
@@ -44,8 +129,9 @@ void *Intgrid(void *argument)
   int tsID, recID, varID, levelID;
   int gridsize;
   int vlistID1, vlistID2;
-  int gridID1 = -1, gridID2;
+  int gridID1 = -1, gridID2 = -1;
   int nmiss;
+  int xavg, yavg;
   double missval;
   double slon, slat;
   double *array1 = NULL, *array2 = NULL;
@@ -54,9 +140,10 @@ void *Intgrid(void *argument)
 
   cdoInitialize(argument);
 
-  INTGRID     = cdoOperatorAdd("intgridbil", 0, 0, NULL);
-  INTPOINT    = cdoOperatorAdd("intpoint", 0, 0, NULL);
+  INTGRID     = cdoOperatorAdd("intgridbil",  0, 0, NULL);
+  INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
+  BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -65,7 +152,7 @@ void *Intgrid(void *argument)
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
     }
-  else
+  else if ( operatorID == INTPOINT )
     {
       operatorInputArg("longitude and latitude");
       operatorCheckArgc(2);
@@ -76,6 +163,13 @@ void *Intgrid(void *argument)
       gridDefYsize(gridID2, 1);
       gridDefXvals(gridID2, &slon);
       gridDefYvals(gridID2, &slat);
+    }
+  else if ( operatorID == BOXAVG )
+    {
+      operatorInputArg("xavg, yavg");
+      operatorCheckArgc(2);
+      xavg = atoi(operatorArgv()[0]);
+      yavg = atoi(operatorArgv()[1]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -93,12 +187,27 @@ void *Intgrid(void *argument)
     {
       gridID1 = vlistGrid(vlistID1, index);
 
-      if ( gridInqType(gridID1) != GRID_LONLAT &&
-	   gridInqType(gridID1) != GRID_GAUSSIAN )
-	cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+      if ( operatorID == BOXAVG )
+	{
+	  if ( index == 0 )
+	    {
+	      if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN &&
+		   gridInqType(gridID1) != GRID_CURVILINEAR   )
+		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
 
-      if ( gridIsRotated(gridID1) )
-	cdoAbort("Rotated grids not supported!");
+	      gridID2 = genBoxGrid(gridID1, xavg, yavg);
+	    }
+	  else
+	    cdoAbort("Too many different grids!");
+	}
+      else
+	{
+	  if ( gridInqType(gridID1) != GRID_LONLAT && gridInqType(gridID1) != GRID_GAUSSIAN )
+	    cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
+
+	  if ( gridIsRotated(gridID1) )
+	    cdoAbort("Rotated grids not supported!");
+	}
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }

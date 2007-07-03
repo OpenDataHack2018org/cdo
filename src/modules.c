@@ -246,7 +246,7 @@ void *Wct(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea"}
+#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
 #define  IntntimeOperators      {"intntime"}
@@ -642,6 +642,7 @@ static char *opalias[][2] =
   {"chvar",               "chname"     },
   {"ncode",               "npar"       },
   {"nvar",                "npar"       },
+  {"vardes",              "pardes"     },
   {"delvar",              "delname"    },
   {"vardup",              "pardup"     },
   {"varmul",              "parmul"     },

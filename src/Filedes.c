@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Filedes    vardes          Variable description
+      Filedes    pardes          Parameter description
       Filedes    griddes         Grid description
       Filedes    vct             Vertical coordinate table
 */
@@ -34,7 +34,7 @@
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, GRIDDES2, ZAXISDES, VCT, VARDES, TAXISDES, FILEDES, VLIST, PARTAB;
+  int GRIDDES, GRIDDES2, ZAXISDES, VCT, PARDES, TAXISDES, FILEDES, VLIST, PARTAB;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -49,7 +49,7 @@ void *Filedes(void *argument)
   ZAXISDES = cdoOperatorAdd("zaxisdes", 0, 0, NULL);
   TAXISDES = cdoOperatorAdd("taxisdes", 0, 0, NULL);
   VCT      = cdoOperatorAdd("vct",      0, 0, NULL);
-  VARDES   = cdoOperatorAdd("vardes",   0, 0, NULL);
+  PARDES   = cdoOperatorAdd("pardes",   0, 0, NULL);
   FILEDES  = cdoOperatorAdd("filedes",  0, 0, NULL);
   VLIST    = cdoOperatorAdd("vlist",    0, 0, NULL);
   PARTAB   = cdoOperatorAdd("partab",   0, 0, NULL);
@@ -204,7 +204,7 @@ void *Filedes(void *argument)
     {
       vlistPrint(vlistID);
     }
-  else if ( operatorID == VARDES )
+  else if ( operatorID == PARDES )
     {
       int varID, code;
       char varname[128], varlongname[128], varunits[128];
