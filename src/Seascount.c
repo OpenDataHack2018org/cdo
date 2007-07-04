@@ -46,7 +46,6 @@ void *Seascount(void *argument)
   int year, month, seas, seas0 = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
-  int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
   int newseas, oldmon = 0, newmon;
@@ -160,6 +159,7 @@ void *Seascount(void *argument)
                 {
                   for ( i = 0; i < gridsize; i++ )
                     vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
+		  vars1[varID][levelID].nmiss = gridsize;
                 }
 
               streamReadRecord(streamID1, field.ptr, &field.nmiss);

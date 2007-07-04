@@ -148,6 +148,7 @@ void *Timcount(void *argument)
 		{
 		  for ( i = 0; i < gridsize; i++ )
 		    vars1[varID][levelID].ptr[i] = vars1[varID][levelID].missval;
+		  vars1[varID][levelID].nmiss = gridsize;
 		}
 
               streamReadRecord(streamID1, field.ptr, &field.nmiss);

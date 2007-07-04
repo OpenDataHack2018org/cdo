@@ -1,3 +1,12 @@
+2007-09-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.0.8
+	* Version 1.0.9 released
+
+2007-07-04  Ralf Quast  <ralf.quast@brockmann-consult.de>
+
+	* Timcount and Seascount: bug fix for missing values
+
 2007-06-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.7
