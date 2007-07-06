@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -149,6 +149,11 @@ void *Merge(void *argument)
 	    }
 	}
       tsID++;
+
+      for ( index = 0; index < nmerge; index++ )
+	if ( vlistIDs[index] != -4711 ) break;
+
+      if ( index == nmerge ) tsID = -4711;
     }
 
   for ( index = 0; index < nmerge; index++ )
