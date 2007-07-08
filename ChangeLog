@@ -1,7 +1,8 @@
 2007-09-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.8
-	* Merge: bug fix for all files with constant fields only [report: Jan Keller]
+	* splitname: bug fix [report: Daniel Klocke]
+	* merge: bug fix for all files with constant fields only [report: Jan Keller]
 	* Version 1.0.9 released
 
 2007-07-04  Ralf Quast  <ralf.quast@brockmann-consult.de>
