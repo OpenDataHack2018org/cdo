@@ -13,19 +13,8 @@ static int month_365[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static int month_366[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 
-void decode_date(int date, int *year, int *month, int *day)
-{
-  *year   =  date / 10000;
-  *month  = (date - *year*10000) / 100;
-  *day    =  date - *year*10000 - *month*100;
-}
-
-
-void decode_time(int time, int *hour, int *minute)
-{
-  *hour   =  time / 100;
-  *minute =  time - *hour*100;
-}
+void decode_date(int date, int *year, int *month, int *day);
+void decode_time(int time, int *hour, int *minute);
 
 
 /*
