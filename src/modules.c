@@ -615,7 +615,7 @@ static MODULES Modules[] =
   { Strgal,         StrgalHelp,        StrgalOperators,         1,  1 },
   { Hurr,           HurrHelp,          HurrOperators,           1,  1 },
 
-  { Hi,             NULL,              HiOperators,             3,  1 },
+  /*  { Hi,             NULL,              HiOperators,             3,  1 }, */
   { Wct,            WctHelp,           WctOperators,            2,  1 },
   /* QR */
 };
