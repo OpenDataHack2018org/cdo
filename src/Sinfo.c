@@ -480,7 +480,7 @@ void *Sinfo(void *argument)
 	      decode_date(vdate, &year, &month, &day);
 	      decode_time(vtime, &hour, &minute);
 
-	      fprintf(stdout, "   %4.4d-%2.2d-%2.2d %2.2d:%2.2d", year, month, day, hour, minute);
+	      fprintf(stdout, " %6.4d-%2.2d-%2.2d %2.2d:%2.2d", year, month, day, hour, minute);
 	      ntimeout++;
 	      tsID++;
 	    }
