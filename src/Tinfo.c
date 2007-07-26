@@ -147,7 +147,7 @@ void *Tinfo(void *argument)
 	  decode_date(vdate, &year, &month, &day);
 	  decode_time(vtime, &hour, &minute);
 
-	  fprintf(stdout, "%6d    %4.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID+1, year, month, day, hour, minute);
+	  fprintf(stdout, "%6d  %6.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID+1, year, month, day, hour, minute);
 	  if ( tsID )
 	    {
 	      char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
