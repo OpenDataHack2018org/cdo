@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -71,6 +71,7 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
       {
 	int gridID1, gridID2;
 	int xsize, ysize;
+
 	gridID1 = vlistInqVarGrid(vlistID1, 0);
 	gridID2 = vlistInqVarGrid(vlistID2, 0);
 
@@ -81,25 +82,28 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 
 	    if ( ysize == gridInqYsize(gridID2) )
 	      {
-		double *yvals1, *yvals2;
-
-		yvals1 = (double *) malloc(ysize*sizeof(double));
-		yvals2 = (double *) malloc(ysize*sizeof(double));
-
-		gridInqYvals(gridID1, yvals1);
-		gridInqYvals(gridID2, yvals2);
-		
-		if ( DBL_IS_EQUAL(yvals1[0], yvals2[ysize-1]) &&
-		     DBL_IS_EQUAL(yvals1[ysize-1], yvals2[0]) )
+		if ( ysize > 1 )
 		  {
-		    if ( yvals1[0] > yvals2[0] )
-		      cdoWarning("Grid orientation differ! First grid: N->S; second grid: S->N");
-		    else
-		      cdoWarning("Grid orientation differ! First grid: S->N; second grid: N->S");
-		  }
+		    double *yvals1, *yvals2;
 
-		free(yvals1);
-		free(yvals2);
+		    yvals1 = (double *) malloc(ysize*sizeof(double));
+		    yvals2 = (double *) malloc(ysize*sizeof(double));
+
+		    gridInqYvals(gridID1, yvals1);
+		    gridInqYvals(gridID2, yvals2);
+		
+		    if ( DBL_IS_EQUAL(yvals1[0], yvals2[ysize-1]) &&
+			 DBL_IS_EQUAL(yvals1[ysize-1], yvals2[0]) )
+		      {
+			if ( yvals1[0] > yvals2[0] )
+			  cdoWarning("Grid orientation differ! First grid: N->S; second grid: S->N");
+			else
+			  cdoWarning("Grid orientation differ! First grid: S->N; second grid: N->S");
+		      }
+
+		    free(yvals1);
+		    free(yvals2);
+		  }
 	      }
 	    else
 	      cdoWarning("ysize of input grids differ!");

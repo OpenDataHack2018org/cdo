@@ -537,7 +537,7 @@ int main(void)
   testEcaGsl();
 
   testFdns();
-  testHi();
+  /* testHi(); */
   testTimcount();
   testWct();
   

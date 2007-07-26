@@ -580,7 +580,7 @@ static MODULES Modules[] =
   { EcaCwfi,        EcaCwfiHelp,       EcaCwfiOperators,        2,  1 },
   { EcaEtr,         EcaEtrHelp,        EcaEtrOperators,         2,  1 },
   { EcaFd,          EcaFdHelp,         EcaFdOperators,          1,  1 },
-  { EcaGsl,         EcaGslHelp,        EcaGslOperators,         1,  1 },
+  { EcaGsl,         EcaGslHelp,        EcaGslOperators,         2,  1 },
   { EcaHd,          EcaHdHelp,         EcaHdOperators,          1,  1 },
   { EcaHwdi,        EcaHwdiHelp,       EcaHwdiOperators,        2,  1 },
   { EcaHwfi,        EcaHwfiHelp,       EcaHwfiOperators,        2,  1 },

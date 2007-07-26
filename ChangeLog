@@ -1,6 +1,7 @@
 2007-09-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.8
+	* cdotest: bug fix in eca_gsl/module.c -> 2 input streams [report: Harald Anlauf]
 	* splitname: bug fix [report: Daniel Klocke]
 	* merge: bug fix for all files with constant fields only [report: Jan Keller]
 	* Version 1.0.9 released
