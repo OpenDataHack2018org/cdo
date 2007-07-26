@@ -397,6 +397,7 @@ src/specspace.h -text
 src/statistic.c -text
 src/statistic.h -text
 src/table.c -text
+src/timebase.h -text
 src/timer.c -text
 src/userlog.c -text
 src/util.c -text

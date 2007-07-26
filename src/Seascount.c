@@ -43,7 +43,7 @@ void *Seascount(void *argument)
   int otsID;
   long nsets;
   int i;
-  int year, month, seas, seas0 = 0;
+  int year, month, day, seas, seas0 = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nvars, nlevel;
@@ -115,8 +115,7 @@ void *Seascount(void *argument)
         {
           vdate = taxisInqVdate(taxisID1);
           vtime = taxisInqVtime(taxisID1);
-          year  =  vdate / 10000;
-          month = (vdate - year*10000) / 100;
+	  decode_date(vdate, &year, &month, &day);
           if ( month < 0 || month > 16 )
             cdoAbort("Month %d out of range!", month);
 

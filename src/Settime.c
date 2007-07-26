@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -96,7 +96,7 @@ void *Settime(void *argument)
       else
 	{
 	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-	  sdate = year*10000 + month*100 + day;
+	  sdate = encode_date(year, month, day);
 	}
 
       if ( strchr(timestr, ':') == NULL )
@@ -106,7 +106,7 @@ void *Settime(void *argument)
       else
 	{
 	  sscanf(timestr, "%d:%d", &hour, &minute);
-	  stime = hour*100 + minute;
+	  stime = encode_time(hour, minute);
 	}
 
       if ( operatorArgc() == 3 )
@@ -305,7 +305,7 @@ void *Settime(void *argument)
 		  if ( day0 == 31 )
 		    day = days_per_month(dpy, year, month);
 
-		  vdate = year*10000 + month*100 + day;
+		  vdate = encode_date(year, month, day);
 		}
 	    }
 	  else
@@ -328,7 +328,7 @@ void *Settime(void *argument)
 	      while ( month > 12 ) { month -= 12; year++; }
 	      while ( month <  1 ) { month += 12; year--; }
 
-	      vdate = year*10000 + month*100 + day;
+	      vdate = encode_date(year, month, day);
 	    }
 	  else
 	    {
@@ -361,7 +361,7 @@ void *Settime(void *argument)
 	  if ( operatorID == SETMON  ) month = newval;
 	  if ( operatorID == SETDAY  ) day   = newval;
       
-	  vdate = year*10000 + month*100 + day;
+	  vdate = encode_date(year, month, day);
 
 	  if ( operatorID == SETDATE  ) vdate = newval;
 	  if ( operatorID == SETTIME  ) vtime = newval;

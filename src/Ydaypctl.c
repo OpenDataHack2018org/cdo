@@ -27,10 +27,9 @@
 
 #include "cdi.h"
 #include "cdo.h"
+#include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 #include "field.h"
-#include "dmemory.h"
 #include "percentiles.h"
 
 #define  NDAY       373
@@ -130,9 +129,7 @@ void *Ydaypctl(void *argument)
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      year  =  vdate / 10000;
-      month = (vdate - year*10000) / 100;
-      day   =  vdate - year*10000 - month*100;
+      decode_date(vdate, &year, &month, &day);
 
       if ( month >= 1 && month <= 12 )
 	dayoy = (month-1)*31 + day;
@@ -198,9 +195,7 @@ void *Ydaypctl(void *argument)
 
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      year  =  vdate / 10000;
-      month = (vdate - year*10000) / 100;
-      day   =  vdate - year*10000 - month*100;
+      decode_date(vdate, &year, &month, &day);
 
       if ( month >= 1 && month <= 12 )
 	dayoy = (month-1)*31 + day;

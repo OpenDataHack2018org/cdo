@@ -27,10 +27,9 @@
 
 #include "cdi.h"
 #include "cdo.h"
+#include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 #include "field.h"
-#include "dmemory.h"
 #include "percentiles.h"
 
 #define  NSEAS       4
@@ -43,7 +42,7 @@ void *Yseaspctl(void *argument)
   int recID;
   int gridID;
   int vdate, vtime;
-  int year, month, seas;
+  int year, month, day, seas;
   int nrecs, nrecords;
   int levelID;
   int tsID;
@@ -129,8 +128,7 @@ void *Yseaspctl(void *argument)
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      year  =  vdate / 10000;
-      month = (vdate - year*10000) / 100;
+      decode_date(vdate, &year, &month, &day);
       if ( month < 0 || month > 16 )
 	cdoAbort("Month %d out of range!", month);
 
@@ -195,8 +193,7 @@ void *Yseaspctl(void *argument)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
       
-      year  =  vdate / 10000;
-      month = (vdate - year*10000) / 100;
+      decode_date(vdate, &year, &month, &day);
       if ( month < 0 || month > 16 )
 	cdoAbort("Month %d out of range!", month);
 

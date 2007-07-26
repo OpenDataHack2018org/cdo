@@ -43,7 +43,7 @@ void *Ninfo(void *argument)
   int nrecs, nvars;
   int levelsize;
   int tsID, ndate, date0 = 0;
-  int mon0 = 0, mon, nmon, year0 = 0, year, nyear;
+  int day, mon0 = 0, mon, nmon, year0 = 0, year, nyear;
   int taxisID;
   int streamID;
   int vlistID;
@@ -77,7 +77,7 @@ void *Ninfo(void *argument)
 	{
 	  vdate = taxisInqVdate(taxisID);
 
-	  year = vdate/10000;
+	  decode_date(vdate, &year, &mon, &day);
 	 
 	  if ( tsID == 0 || year0 != year )
 	    {
@@ -96,8 +96,7 @@ void *Ninfo(void *argument)
 	{
 	  vdate = taxisInqVdate(taxisID);
 
-	  year = vdate/10000;
-	  mon  = (vdate - year*10000) / 100;
+	  decode_date(vdate, &year, &mon, &day);
 	 
 	  if ( tsID == 0 || mon0 != mon )
 	    {

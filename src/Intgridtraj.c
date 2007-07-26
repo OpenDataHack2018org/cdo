@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -42,8 +42,8 @@ int readnextpos(FILE *fp, double *julval, double *xpos, double *ypos)
 
   if ( stat != EOF )
     {
-      date = year*10000 + month*100 + day;
-      time = hour*100 + minute;
+      date = encode_date(year, month, day);
+      time = encode_time(hour, minute);
       *julval = encode_julval(0, date, time);
     }
 

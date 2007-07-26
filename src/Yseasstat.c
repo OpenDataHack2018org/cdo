@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -33,10 +33,9 @@
 
 #include "cdi.h"
 #include "cdo.h"
+#include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 #include "field.h"
-#include "dmemory.h"
 
 
 #define  NSEAS       4
@@ -51,7 +50,7 @@ void *Yseasstat(void *argument)
   int recID;
   int gridID;
   int vdate, vtime;
-  int year, month, seas;
+  int year, month, day, seas;
   int nrecs, nrecords;
   int levelID;
   int tsID;
@@ -117,8 +116,7 @@ void *Yseasstat(void *argument)
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
-      year  =  vdate / 10000;
-      month = (vdate - year*10000) / 100;
+      decode_date(vdate, &year, &month, &day);
       if ( month < 0 || month > 16 )
 	cdoAbort("month %d out of range!", month);
 

@@ -13,8 +13,12 @@ static int month_365[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static int month_366[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 
+
 void decode_date(int date, int *year, int *month, int *day);
+int encode_date(int year, int month, int day);
+
 void decode_time(int time, int *hour, int *minute);
+int encode_time(int hour, int minute);
 
 
 /*
@@ -432,7 +436,6 @@ void decode_julval(int dpy, double value, int *date, int *time)
   /*
   fprintf(stdout, "%d %d %d %d %d %g\n", year, month, day, hour, minute, (double)sec);
   */
-  *date = year*10000 + month*100 + day;
-  *time = hour*100 + minute/* + (int) ((double)sec/60+0.5)*/;
+  *date = encode_date(year, month, day);
+  *time = encode_time(hour, minute);
 }
-

@@ -136,7 +136,7 @@ void *Tinfo(void *argument)
 
       dpy = calendar_dpy(calendar);
 
-      fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement\n");
+      fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement   YYYY-MM-DD hh:mm  YYYY-MM-DD hh:mm  Difference\n");
 
       tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -227,7 +227,7 @@ void *Tinfo(void *argument)
 				  if ( day0 == 31 )
 				    day = days_per_month(dpy, year, month);
 
-				  ndate = year*10000 + month*100 + day;
+				  ndate = encode_date(year, month, day);
 				  ntime = vtime0;
 				  if ( ndate >= vdate ) break;
 				  /* printf("\n1 %d %d\n", ndate, ntime); */

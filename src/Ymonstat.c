@@ -32,9 +32,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 #include "field.h"
-#include "dmemory.h"
 
 
 #define  NMONTH     17
@@ -50,7 +48,7 @@ void *Ymonstat(void *argument)
   int recID;
   int gridID;
   int vdate, vtime;
-  int year, month;
+  int year, month, day;
   int nrecs, nrecords;
   int levelID;
   int tsID;
@@ -120,8 +118,7 @@ void *Ymonstat(void *argument)
 
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      year  =  vdate / 10000;
-      month = (vdate - year*10000) / 100;
+      decode_date(vdate, &year, &month, &day);
       if ( month < 0 || month >= NMONTH )
 	cdoAbort("month %d out of range!", month);
 

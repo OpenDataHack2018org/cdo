@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 #include <math.h>
 #include <float.h>
 
+#include "timebase.h"
 #include "field.h"
 #include "functs.h"
 #include "dmemory.h"
@@ -103,10 +104,9 @@ DATETIME;
 
 void    datetime_avg(int dpy, int ndates, DATETIME *datetime);
 
-void    decode_date(int date, int *year, int *month, int *day);
-void    decode_time(int time, int *hour, int *minute);
-double  encode_julval(int dpy, int date, int time);
-void    decode_julval(int dpy, double value, int *date, int *time);
+double encode_julval(int dpy, int date, int time);
+void decode_julval(int dpy, double value, int *date, int *time);
+
 int     days_per_month(int calendar, int year, int month);
 int     days_per_year(int calendar, int year);
 int     calendar_dpy(int calendar);

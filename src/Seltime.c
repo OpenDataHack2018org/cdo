@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -183,7 +183,7 @@ void *Seltime(void *argument)
 	      if ( strchr(operatorArgv()[i], 'T') == NULL )
 		{
 		  status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
-		  fval = year*10000 + month*100 + day;
+		  fval = encode_date(year, month, day);
 
 		  if ( nsel > 1 && i > 0 ) fval += 0.999;
 
@@ -193,9 +193,9 @@ void *Seltime(void *argument)
 		{
 		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d", &year, &month, &day, &hour, &minute);
 		  /* fprintf(stderr, "status = %d\n", status); */
-		  fval = hour*100 + minute;
+		  fval = encode_time(hour, minute);
 		  if ( fabs(fval) > 0 ) fval /= 10000;
-		  fval += year*10000 + month*100 + day;
+		  fval += encode_date(year, month, day);
 		  listSetFlt(flist, i, fval);
 		  set2 = FALSE;
 		}

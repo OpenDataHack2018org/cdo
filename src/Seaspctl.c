@@ -43,7 +43,7 @@ void *Seaspctl(void *argument)
   int tsID;
   int otsID;
   long nsets;
-  int year, month, seas, seas0 = 0;
+  int year, month, day, seas, seas0 = 0;
   int streamID1, streamID2, streamID3, streamID4;
   int vlistID1, vlistID2, vlistID3, vlistID4, taxisID1, taxisID2, taxisID3, taxisID4;
   int nmiss;
@@ -165,8 +165,7 @@ void *Seaspctl(void *argument)
 	{
 	  vdate1 = taxisInqVdate(taxisID1);
 	  vtime1 = taxisInqVtime(taxisID1);
-	  year  = vdate1 / 10000;
-	  month = (vdate1 - year * 10000) / 100;
+	  decode_date(vdate1, &year, &month, &day);
 	  if ( month < 0 || month > 16 )
 	    cdoAbort("Month %d out of range!", month);
 
