@@ -185,6 +185,7 @@ cdo_SOURCES = Arith.c		\
               vinterp.h 	\
               namelist.h 	\
               util.h		\
+              timebase.h	\
               etopo.h		\
               percentiles.c	\
               percentiles.h	\

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,8 @@ void *Cond(void *argument)
   static char func[] = "Cond";
   int IFTHEN, IFNOTTHEN;
   int operatorID;
+  enum {FILL_NONE, FILL_TS, FILL_REC};
+  int filltype = FILL_NONE;
   int streamID1, streamID2, streamID3;
   int gridsize;
   int nrecs, nrecs2, nvars = 0, nlev, recID;
@@ -45,7 +47,6 @@ void *Cond(void *argument)
   int vlistID1, vlistID2, vlistID3;
   int nmiss1, nmiss2, nmiss3;
   int i;
-  int lptype = 0;
   double missval1 = -9.E33;
   double *array1, *array2, *array3;
   int **varnmiss1 = NULL;
@@ -72,19 +73,27 @@ void *Cond(void *argument)
   taxisID3 = taxisDuplicate(taxisID2);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  if ( vlistNrecs(vlistID2) == 1 && vlistNrecs(vlistID1) != 1 )
-    lptype = 2;
-  else
-    vlistCompare(vlistID1, vlistID2, func_sft);
+  if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
+    {
+      filltype = FILL_REC;
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
+    }
 
+  if ( filltype == FILL_NONE )
+    vlistCompare(vlistID1, vlistID2, func_sft);
+  
   nospec(vlistID1);
+  nospec(vlistID2);
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  gridsize = vlistGridsizeMax(vlistID2);
+
+  if ( filltype == FILL_REC && gridsize != gridInqSize(vlistGrid(vlistID1, 0)) )
+    cdoAbort("Stream1 >%s< has wrong gridsize!", cdoStreamName(0));
 
   array1 = (double *) malloc(gridsize*sizeof(double));
   array2 = (double *) malloc(gridsize*sizeof(double));
@@ -93,27 +102,31 @@ void *Cond(void *argument)
   if ( cdoVerbose )
     cdoPrint("Number of timesteps: file1 %d, file2 %d", vlistNtsteps(vlistID1), vlistNtsteps(vlistID2));
 
-  if ( vlistNtsteps(vlistID1) == 1 && vlistNtsteps(vlistID2) != 1 && lptype == 0 )
+  if ( filltype == FILL_NONE )
     {
-      lptype = 1;
-      nvars  = vlistNvars(vlistID1);
-      vardata1  = (double **) malloc(nvars*sizeof(double *));
-      varnmiss1 = (int **) malloc(nvars*sizeof(int *));
-      for ( varID = 0; varID < nvars; varID++ )
+      if ( (vlistNtsteps(vlistID1) == 1 || vlistNtsteps(vlistID1) == 0) &&
+	    vlistNtsteps(vlistID2) != 1 && vlistNtsteps(vlistID2) != 0 )
 	{
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  vardata1[varID]  = (double *) malloc(nlev*gridsize*sizeof(double));
-	  varnmiss1[varID] = (int *) malloc(nlev*sizeof(int));
-	}
+	  filltype = FILL_TS;
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
 
-      cdoPrint("Filling up stream >%s< by copying the first timestep.", cdoStreamName(0));
+	  nvars  = vlistNvars(vlistID1);
+	  vardata1  = (double **) malloc(nvars*sizeof(double *));
+	  varnmiss1 = (int **) malloc(nvars*sizeof(int *));
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      vardata1[varID]  = (double *) malloc(nlev*gridsize*sizeof(double));
+	      varnmiss1[varID] = (int *) malloc(nlev*sizeof(int));
+	    }
+	}
     }
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
-      if ( tsID == 0 || lptype == 0 )
+      if ( tsID == 0 || filltype == FILL_NONE )
 	{
 	  nrecs2 = streamInqTimestep(streamID1, tsID);
 	  if ( nrecs2 == 0 )
@@ -129,15 +142,15 @@ void *Cond(void *argument)
 	  streamInqRecord(streamID2, &varID, &levelID);
 	  streamReadRecord(streamID2, array2, &nmiss2);
 
-	  if ( tsID == 0 || lptype == 0 )
+	  if ( tsID == 0 || filltype == FILL_NONE )
 	    {
-	      if ( recID == 0 || lptype != 2 )
+	      if ( recID == 0 || filltype != FILL_REC )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  streamReadRecord(streamID1, array1, &nmiss1);
 		}
 
-	      if ( lptype == 1 )
+	      if ( filltype == FILL_TS )
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 		  offset   = gridsize*levelID;
@@ -145,7 +158,7 @@ void *Cond(void *argument)
 		  varnmiss1[varID][levelID] = nmiss1;
 		}
 	    }
-	  else if ( lptype == 1 )
+	  else if ( filltype == FILL_TS )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      offset   = gridsize*levelID;
@@ -155,7 +168,7 @@ void *Cond(void *argument)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 
-	  if ( recID == 0 || lptype != 2 )
+	  if ( recID == 0 || filltype != FILL_REC )
 	    {
 	      /* gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID)); */
 	      missval1  = vlistInqVarMissval(vlistID1, varID);

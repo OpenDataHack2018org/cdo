@@ -93,20 +93,21 @@ case "${HOSTNAME}" in
                     --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
                     CC=cc CFLAGS="-g -mt -fast -xarch=v9"
 	;;
-# sparc-sun-solaris2.9
+# sparc-sun-solaris2.9 chnaged to
+# sparc-sun-solaris2.10
     executor | yang | yin)
         if [ "$SGE_MODE" = "off" ] ; then
- 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
-                    --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
-                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris8/include"  LIBS=$HOME/local/solaris8/lib/libsz.a \
-                    CC=cc CFLAGS="-g -mt -fast -xtarget=ultra3"
+ 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
+                    --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris10/include"  LIBS=$HOME/local/solaris10/lib/libsz.a \
+                    CC=cc CFLAGS="-g -mt -fast -xarch=v9"
         else
- 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris8 \
+ 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
                     --program-suffix=_${SGE_SUFFIX} \
-                    --with-netcdf=/sw/solaris8/netcdf-3.6.1 \
-                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris8/include -DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/local/include" \
-                    LIBS="$HOME/local/solaris8/lib/libsz.a  -L/opt/gridware/sge/lib/sol-sparc -ldrmaa -ldl -L/usr/local/lib -lcurl" \
-                    CC=cc CFLAGS="-g -mt -fast -xtarget=ultra3"
+                    --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris10/include -DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/local/include" \
+                    LIBS="$HOME/local/solaris10/lib/libsz.a  -L/opt/gridware/sge/lib/sol-sparc64 -ldrmaa -ldl -L/sw/solaris10/curl-7.16.4-cc/lib -lcurl" \
+                    CC=cc CFLAGS="-g -mt -fast -xarch=v9"
         fi
 	;;
 # sx6-nec-superux12.2
