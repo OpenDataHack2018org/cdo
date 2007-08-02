@@ -23,7 +23,7 @@
 
 
 #include <string.h>
-#include <stdlib.h>
+#include <stdlib.h>  /* qsort */
 
 #include "cdi.h"
 #include "cdo.h"

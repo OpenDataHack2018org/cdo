@@ -253,7 +253,8 @@ void *Wct(void *argument);
 #define  IntyearOperators       {"intyear"}
 #define  InvertOperators        {"invertlat", "invertlon", "invertlatdes", "invertlondes", \
                                  "invertlatdata", "invertlondata"}
-#define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo"}
+#define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", \
+                                 "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}

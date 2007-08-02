@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdlib.h>  /* qsort */
 
 #include "cdo.h"
 #include "dtypes.h"
@@ -803,15 +804,88 @@ void cdologo(int noper)
 }
 
 
-void dumplogo(const char *logfilename)
+typedef struct
 {
-  static const char func[] = "dumplogs";
+  int      nocc;
+  INT64    nvals;
+  double   time;
+  double   perc;
+  char     name[128];
+}
+LogInfo;
+
+
+int cmplognocc(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  LogInfo *x = (LogInfo *) s1;
+  LogInfo *y = (LogInfo *) s2;
+
+  if      ( x->nocc < y->nocc ) cmp =  1;
+  else if ( x->nocc > y->nocc ) cmp = -1;
+
+  return (cmp);
+}
+
+
+int cmplognvals(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  LogInfo *x = (LogInfo *) s1;
+  LogInfo *y = (LogInfo *) s2;
+
+  if      ( x->nvals < y->nvals ) cmp =  1;
+  else if ( x->nvals > y->nvals ) cmp = -1;
+
+  return (cmp);
+}
+
+
+int cmplogtime(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  LogInfo *x = (LogInfo *) s1;
+  LogInfo *y = (LogInfo *) s2;
+
+  if      ( x->time < y->time ) cmp =  1;
+  else if ( x->time > y->time ) cmp = -1;
+
+  return (cmp);
+}
+
+
+int cmplogperc(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  LogInfo *x = (LogInfo *) s1;
+  LogInfo *y = (LogInfo *) s2;
+
+  if      ( x->perc < y->perc ) cmp =  1;
+  else if ( x->perc > y->perc ) cmp = -1;
+
+  return (cmp);
+}
+
+
+int cmplogname(const void *s1, const void *s2)
+{
+  LogInfo *x = (LogInfo *) s1;
+  LogInfo *y = (LogInfo *) s2;
+
+  return (strcmp(x->name, y->name));
+}
+
+
+void dumplogo(const char *logfilename, int dumptype)
+{
+  static const char func[] = "dumplogo";
   int  logfileno;
   int status;
   int nocc;
   int nhours0;
   int nlogs;
   int i;
+  int mem;
   double cputime0;
   INT64 nvals0;
   unsigned char logbuf[LOGOSIZE];
@@ -825,6 +899,7 @@ void dumplogo(const char *logfilename)
   size_t bufsize;
   struct flock mylock;
   struct stat filestat;
+  LogInfo **logInfo;
 
   errno = 0;
   logfileno = open(logfilename, O_RDONLY);
@@ -847,11 +922,17 @@ void dumplogo(const char *logfilename)
 
   if ( bufsize > 0 )
     {
+      fprintf(stdout, "# num name                     call        mem [GB]    time [h]     perc [s]\n");
       buffer = (unsigned char *) malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
       nlogs = bufsize / logsize;
+
+      logInfo    = (LogInfo **) malloc(nlogs*sizeof(LogInfo *));
+      logInfo[0] = (LogInfo *) malloc(nlogs*sizeof(LogInfo));
+      for ( i = 1; i < nlogs; i++ ) logInfo[i] = logInfo[0] + i;
+
       for ( i = 0; i < nlogs; i++ )
 	{
 	  memcpy(logbuf, &buffer[i*logsize], logsize);
@@ -860,12 +941,33 @@ void dumplogo(const char *logfilename)
 	  nhours0  = GET_UINT4(lognhours);
 	  cputime0 = (double) ibm2flt(logctime);
 
+	  strcpy(logInfo[i]->name, logname);
+	  logInfo[i]->nocc  = nocc;
+	  logInfo[i]->nvals = nvals0;
+	  logInfo[i]->time  = nhours0 + cputime0/3600;
+	  logInfo[i]->perc  = logInfo[i]->time/nocc;
+	}
+
+      if      ( dumptype == 1 )
+	qsort(logInfo[0], nlogs, sizeof(LogInfo), cmplogname);
+      else if ( dumptype == 2 )
+	qsort(logInfo[0], nlogs, sizeof(LogInfo), cmplognocc);
+      else if ( dumptype == 3 )
+	qsort(logInfo[0], nlogs, sizeof(LogInfo), cmplognvals);
+      else if ( dumptype == 4 )
+	qsort(logInfo[0], nlogs, sizeof(LogInfo), cmplogtime);
+      else if ( dumptype == 5 )
+	qsort(logInfo[0], nlogs, sizeof(LogInfo), cmplogperc);
+
+      for ( i = 0; i < nlogs; i++ )
+	{
+	  mem = (int)(8*logInfo[i]->nvals/(1024*1024*1024));
 	  if ( sizeof(INT64) > sizeof(long) )
-	    fprintf(stdout, "%4d  %-16s %12d %19lld %10d %8.2f\n",
-		    i+1, logname, nocc, (long long)nvals0, nhours0, cputime0);
+	    fprintf(stdout, "%4d  %-16s %12d %12d %12.3f %12.3f\n", i+1, logInfo[i]->name, 
+		    logInfo[i]->nocc, mem, logInfo[i]->time, logInfo[i]->perc);
 	  else
-	    fprintf(stdout, "%4d  %-16s %12d %19ld %10d %8.2f\n",
-		    i+1, logname, nocc, (long)nvals0, nhours0, cputime0);
+	    fprintf(stdout, "%4d  %-16s %12d %12d %12.3f %12.3f\n", i+1, logInfo[i]->name,
+		    logInfo[i]->nocc, mem, logInfo[i]->time, logInfo[i]->perc);
 	}
 
       free(buffer);
