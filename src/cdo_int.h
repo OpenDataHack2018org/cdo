@@ -75,6 +75,8 @@ char *strdup(const char *s);
 #define CDO_EXP_LOCAL   1
 #define CDO_EXP_REMOTE  2
 
+enum {DATE_BEGIN, DATE_END, DATE_CENTER};
+
 void strtolower(char *str);
 
 void print_pthread_info(void);

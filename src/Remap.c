@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -73,7 +73,7 @@ void *Remap(void *argument)
   double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
   REMAP *remaps;
-  char *envstring;
+  char *envstr;
   char *remap_file = NULL;
   int lwrite_remap;
 
@@ -95,11 +95,11 @@ void *Remap(void *argument)
   operfunc = cdoOperatorFunc(operatorID);
   lwrite_remap = cdoOperatorIntval(operatorID);
 
-  envstring = getenv("MAX_REMAPS");
-  if ( envstring )
+  envstr = getenv("MAX_REMAPS");
+  if ( envstr )
     {
       int ival;
-      ival = atoi(envstring);
+      ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  max_remaps = ival;
@@ -108,11 +108,11 @@ void *Remap(void *argument)
 	}
     }
 
-  envstring = getenv("REMAP_TEST");
-  if ( envstring )
+  envstr = getenv("REMAP_TEST");
+  if ( envstr )
     {
       int ival;
-      ival = atoi(envstring);
+      ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  remap_test = ival;
@@ -121,11 +121,11 @@ void *Remap(void *argument)
 	}
     }
 
-  envstring = getenv("REMAP_NON_GLOBAL");
-  if ( envstring )
+  envstr = getenv("REMAP_NON_GLOBAL");
+  if ( envstr )
     {
       int ival;
-      ival = atoi(envstring);
+      ival = atoi(envstr);
       if ( ival > 0 )
 	{
 	  remap_non_global = ival;
@@ -274,18 +274,18 @@ void *Remap(void *argument)
     {
       norm_opt = NORM_OPT_FRACAREA;
 
-      envstring = getenv("NORMALIZE_OPT");
+      envstr = getenv("NORMALIZE_OPT");
 
-      if ( envstring )
+      if ( envstr )
         {
-	  if ( strcmp(envstring, "fracarea") == 0 )
+	  if ( strcmp(envstr, "fracarea") == 0 )
 	    norm_opt = NORM_OPT_FRACAREA;
-	  else if ( strcmp(envstring, "destarea") == 0 )
+	  else if ( strcmp(envstr, "destarea") == 0 )
 	    norm_opt = NORM_OPT_DESTAREA;
-	  else if ( strcmp(envstring, "none") == 0 )
+	  else if ( strcmp(envstr, "none") == 0 )
 	    norm_opt = NORM_OPT_NONE;
 	  else
-	    cdoWarning("NORMALIZE_OPT=%s unsupported!\n", envstring);
+	    cdoWarning("NORMALIZE_OPT=%s unsupported!\n", envstr);
 	}
 
       if ( cdoVerbose )

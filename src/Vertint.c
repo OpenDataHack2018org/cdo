@@ -65,7 +65,7 @@ void *Vertint(void *argument)
   double *single1, *single2;
   double **vardata1 = NULL, **vardata2 = NULL;
   double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
-  char *envstring;
+  char *envstr;
   int Extrapolate = 0;
   int taxisID1, taxisID2;
   int lhavevct;
@@ -79,13 +79,13 @@ void *Vertint(void *argument)
 
   operatorID = cdoOperatorID();
 
-  envstring = getenv("EXTRAPOLATE");
+  envstr = getenv("EXTRAPOLATE");
 
-  if ( envstring )
+  if ( envstr )
     {
-      if ( isdigit((int) envstring[0]) )
+      if ( isdigit((int) envstr[0]) )
 	{
-	  Extrapolate = atoi(envstring);
+	  Extrapolate = atoi(envstr);
 	  if ( Extrapolate == 1 )
 	    cdoPrint("Extrapolation of missing values enabled!");
 	}

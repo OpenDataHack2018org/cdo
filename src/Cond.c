@@ -170,7 +170,6 @@ void *Cond(void *argument)
 
 	  if ( recID == 0 || filltype != FILL_REC )
 	    {
-	      /* gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID)); */
 	      missval1  = vlistInqVarMissval(vlistID1, varID);
 	    }
 

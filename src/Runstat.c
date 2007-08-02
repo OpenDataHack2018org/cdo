@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -102,8 +103,34 @@ void *Runstat(void *argument)
   DATETIME *datetime;
   int taxisID1, taxisID2;
   int calendar, dpy;
+  int runstat_date = DATE_CENTER;
+  char *envstr;
 
   cdoInitialize(argument);
+
+  envstr = getenv("RUNSTAT_DATE");
+  if ( envstr )
+    {
+      int env_date = -1;
+
+      if      ( strncmp(envstr, "begin", 5) == 0 ||
+		strncmp(envstr, "BEGIN", 5) == 0 ||
+		strncmp(envstr, "Begin", 5) == 0 )  env_date = DATE_BEGIN;
+      else if ( strncmp(envstr, "end", 3) == 0 ||
+		strncmp(envstr, "END", 3) == 0 ||
+		strncmp(envstr, "End", 3) == 0 )    env_date = DATE_END;
+      else if ( strncmp(envstr, "center", 6) == 0 ||
+		strncmp(envstr, "CENTER", 6) == 0 ||
+		strncmp(envstr, "Center", 6) == 0 ) env_date = DATE_CENTER;
+
+      if ( env_date >= 0 )
+	{
+	  runstat_date = env_date;
+
+	  if ( cdoVerbose )
+	    cdoPrint("Set RUNSTAT_DATE to %s", envstr);
+	}
+    }
 
   cdoOperatorAdd("runmin",  func_min,  0, NULL);
   cdoOperatorAdd("runmax",  func_max,  0, NULL);
@@ -247,7 +274,20 @@ void *Runstat(void *argument)
 		farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
 	  }
 
-      datetime_avg(dpy, ndates, datetime);
+      if ( runstat_date == DATE_CENTER )
+	{
+	  datetime_avg(dpy, ndates, datetime);
+	}
+      else if ( runstat_date == DATE_BEGIN )
+	{
+	  datetime[ndates].date = datetime[0].date;
+	  datetime[ndates].time = datetime[0].time;
+	}
+      else if ( runstat_date == DATE_END )
+	{
+	  datetime[ndates].date = datetime[ndates-1].date;
+	  datetime[ndates].time = datetime[ndates-1].time;
+	}
 
       taxisDefVdate(taxisID2, datetime[ndates].date);
       taxisDefVtime(taxisID2, datetime[ndates].time);
