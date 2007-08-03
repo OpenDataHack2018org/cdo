@@ -33,7 +33,7 @@ selected time range, it is
 o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf pth percentile} \{i(t',x), t_1 < t' \le t_n\}

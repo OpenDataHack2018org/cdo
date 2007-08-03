@@ -29,7 +29,7 @@ selected time range, it is
 o(t,x) = min{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
@@ -51,7 +51,7 @@ selected time range, it is
 o(t,x) = max{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
@@ -73,7 +73,7 @@ selected time range, it is
 o(t,x) = sum{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \le t_n\}
@@ -95,7 +95,7 @@ selected time range, it is
 o(t,x) = mean{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
@@ -117,7 +117,7 @@ selected time range, it is
 o(t,x) = avg{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
@@ -139,7 +139,7 @@ selected time range, it is
 o(t,x) = var{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
@@ -161,7 +161,7 @@ selected time range, it is
 o(t,x) = std{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range, it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}

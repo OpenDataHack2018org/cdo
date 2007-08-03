@@ -142,7 +142,7 @@ month for each time step use:
 @BeginVerbatim
    cdo settaxis,1987-01-16,12:00,1mon ifile ofile
 @EndVerbatim
-Result of '{\tt cdo showdate ofile}' for a dataset with 12 timesteps:
+Result of '{\tt cdo showdate ofile}' for a dataset with 12 time steps:
 @BeginVerbatim
    1987-01-16 1987-02-16 1987-03-16 1987-04-16 1987-05-16 1987-06-16 \
    1987-07-16 1987-08-16 1987-09-16 1987-10-16 1987-11-16 1987-12-16

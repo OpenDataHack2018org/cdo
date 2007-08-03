@@ -970,6 +970,8 @@ void dumplogo(const char *logfilename, int dumptype)
 		    logInfo[i]->nocc, mem, logInfo[i]->time, logInfo[i]->perc);
 	}
 
+      free(logInfo[0]);
+      free(logInfo);
       free(buffer);
     }
 
