@@ -103,7 +103,7 @@ void *Runstat(void *argument)
   DATETIME *datetime;
   int taxisID1, taxisID2;
   int calendar, dpy;
-  int runstat_date = DATE_CENTER;
+  int runstat_date = DATE_MIDDLE;
   char *envstr;
 
   cdoInitialize(argument);
@@ -113,15 +113,15 @@ void *Runstat(void *argument)
     {
       int env_date = -1;
 
-      if      ( strncmp(envstr, "begin", 5) == 0 ||
-		strncmp(envstr, "BEGIN", 5) == 0 ||
-		strncmp(envstr, "Begin", 5) == 0 )  env_date = DATE_BEGIN;
-      else if ( strncmp(envstr, "end", 3) == 0 ||
-		strncmp(envstr, "END", 3) == 0 ||
-		strncmp(envstr, "End", 3) == 0 )    env_date = DATE_END;
-      else if ( strncmp(envstr, "center", 6) == 0 ||
-		strncmp(envstr, "CENTER", 6) == 0 ||
-		strncmp(envstr, "Center", 6) == 0 ) env_date = DATE_CENTER;
+      if      ( strncmp(envstr, "first", 5) == 0 ||
+		strncmp(envstr, "FIRST", 5) == 0 ||
+		strncmp(envstr, "First", 5) == 0 )  env_date = DATE_FIRST;
+      else if ( strncmp(envstr, "last", 4) == 0 ||
+		strncmp(envstr, "LAST", 4) == 0 ||
+		strncmp(envstr, "Last", 4) == 0 )   env_date = DATE_LAST;
+      else if ( strncmp(envstr, "middle", 6) == 0 ||
+		strncmp(envstr, "MIDDLE", 6) == 0 ||
+		strncmp(envstr, "Middle", 6) == 0 ) env_date = DATE_MIDDLE;
 
       if ( env_date >= 0 )
 	{
@@ -274,16 +274,16 @@ void *Runstat(void *argument)
 		farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
 	  }
 
-      if ( runstat_date == DATE_CENTER )
+      if ( runstat_date == DATE_MIDDLE )
 	{
 	  datetime_avg(dpy, ndates, datetime);
 	}
-      else if ( runstat_date == DATE_BEGIN )
+      else if ( runstat_date == DATE_FIRST )
 	{
 	  datetime[ndates].date = datetime[0].date;
 	  datetime[ndates].time = datetime[0].time;
 	}
-      else if ( runstat_date == DATE_END )
+      else if ( runstat_date == DATE_LAST )
 	{
 	  datetime[ndates].date = datetime[ndates-1].date;
 	  datetime[ndates].time = datetime[ndates-1].time;

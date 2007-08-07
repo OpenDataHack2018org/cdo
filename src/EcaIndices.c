@@ -168,14 +168,14 @@ static const char TX90P_UNITS[]      = "Percent";
 static const char CDD_NAME[]         = "consecutive_dry_days_index_per_time_period";
 static const char CDD_LONGNAME[]     = "Consecutive dry days is the greatest number of consecutive days per time period with daily precipitation amount  below 1 mm. The time period should be defined by the bounds of the time coordinate.";
 static const char CDD_UNITS[]        = "No.";
-static const char CDD_NAME2[]        = "number of_cdd_periods_with more_than_5days_per_time_period";
+static const char CDD_NAME2[]        = "number_of_cdd_periods_with_more_than_5days_per_time_period";
 static const char CDD_LONGNAME2[]    = "Number of cdd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
 static const char CDD_UNITS2[]       = "No.";
 
 static const char CWD_NAME[]         = "consecutive_wet_days_index_per_time_period";
 static const char CWD_LONGNAME[]     = "Consecutive wet days is the greatest number of consecutive days per time period with daily precipitation above 1 mm. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS[]        = "No.";
-static const char CWD_NAME2[]        = "number of_cwd_periods_with more_than_5days_per_time_period";
+static const char CWD_NAME2[]        = "number_of_cwd_periods_with_more_than_5days_per_time_period";
 static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS2[]       = "No.";
 

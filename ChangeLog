@@ -3,6 +3,7 @@
 	* using CDI library version 1.0.8
 	* runstat: add env RUNSTAT_DATE to set output date [request: Claudia Wunram]
 	* ifthen: bug fix for masks that varies not with time [report: David Wang]
+	* eca_cdd/eca_cwd: bug fix for name2 [report: James Hoffmann]
 	* cdotest: bug fix in eca_gsl/module.c -> 2 input streams [report: Harald Anlauf]
         * use always decode_date and encode_date to decode/encode date
 	* splitname: bug fix [report: Daniel Klocke]

@@ -314,11 +314,10 @@ static char *SplitselHelp[] = {
     "    This operator splits a dataset into pieces, one for each adjacent",
     "    sequence t1, ...., tn of time steps of the same selected time range.",
     "    Appends three digits with the sequence number to oprefix to ",
-    "    form the output file names. The number of output files is limited",
-    "    to 1000.",
+    "    form the output file names.",
     "",
     "PARAMETER",
-    "    nsets    INTEGER  Number of input time steps for each output time step",
+    "    nsets    INTEGER  Number of input time steps for each output file",
     "    noffset  INTEGER  Number of input time steps skipped before the first time step range (optional)",
     "    nskip    INTEGER  Number of input time steps skipped between time step ranges (optional)",
     NULL
@@ -1531,7 +1530,7 @@ static char *RunstatHelp[] = {
     "    of time steps. Depending on the actual operator the minimum, maximum,",
     "    sum, average, variance or standard deviation of a selected number of consecutive ",
     "    time steps read from ifile is written to ofile. The date information ",
-    "    in ofile is the date of the medium contributing time step in ifile.",
+    "    in ofile is the date of the middle contributing time step in ifile.",
     "",
     "OPERATORS",
     "    runmin   Running minimum",
@@ -1551,6 +1550,11 @@ static char *RunstatHelp[] = {
     "",
     "PARAMETER",
     "    nts  INTEGER  Number of time steps",
+    "",
+    "ENVIRONMENT",
+    "    RUNSTAT_DATE",
+    "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing",
+    "        time step in ifile.",
     NULL
 };
 
