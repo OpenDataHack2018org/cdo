@@ -1,0 +1,177 @@
+@BeginModule
+@NewPage
+@Name      = Yhourstat
+@Title     = Multi-year hourly statistical values
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = yhourmin yhourmax yhoursum yhourmean yhouravg yhourvar yhourstd
+
+@BeginDescription
+This module writes to @file{ofile}, according to the actual operator,
+the minimum, maximum, sum, average, variance or standard deviation of each 
+hour and day of year in @file{ifile}. The date information in an output field is 
+the date of the last contributing input field.
+@EndModule
+
+
+@BeginOperator_yhourmin
+@Title     = Multi-year hourly minimum
+
+@BeginDescription
+@IfMan
+o(0001,x) = min{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = min{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf min}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourmax
+@Title     = Multi-year hourly maximum
+
+@BeginDescription
+@IfMan
+o(0001,x) = max{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = max{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf max}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhoursum
+@Title     = Multi-year hourly sum
+
+@BeginDescription
+@IfMan
+o(0001,x) = sum{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = sum{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf sum}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf sum}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourmean
+@Title     = Multi-year hourly mean
+
+@BeginDescription
+@IfMan
+o(0001,x) = mean{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = mean{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf mean}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhouravg
+@Title     = Multi-year hourly average
+
+@BeginDescription
+@IfMan
+o(0001,x) = avg{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = avg{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourvar
+@Title     = Multi-year hourly variance
+
+@BeginDescription
+@IfMan
+o(0001,x) = var{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = var{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourstd
+@Title     = Multi-year hourly standard deviation
+
+@BeginDescription
+@IfMan
+o(0001,x) = std{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = std{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To compute the hourly mean for all days over all input years, use:
+@BeginVerbatim
+   cdo yhourmean ifile ofile
+@EndVerbatim
+@EndExample

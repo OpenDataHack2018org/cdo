@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,13 +18,13 @@
 /*
    This module contains the following operators:
 
-      Ydaystat   ydaymin         Multi-year daily minimum
-      Ydaystat   ydaymax         Multi-year daily maximum
-      Ydaystat   ydaysum         Multi-year daily sum
-      Ydaystat   ydaymean        Multi-year daily mean
-      Ydaystat   ydayavg         Multi-year daily average
-      Ydaystat   ydayvar         Multi-year daily variance
-      Ydaystat   ydaystd         Multi-year daily standard deviation
+      Yhourstat   yhourmin         Multi-year hourly minimum
+      Yhourstat   yhourmax         Multi-year hourly maximum
+      Yhourstat   yhoursum         Multi-year hourly sum
+      Yhourstat   yhourmean        Multi-year hourly mean
+      Yhourstat   yhouravg         Multi-year hourly average
+      Yhourstat   yhourvar         Multi-year hourly variance
+      Yhourstat   yhourstd         Multi-year hourly standard deviation
 */
 
 
@@ -38,12 +38,12 @@
 #include "field.h"
 
 
-#define  NDAY       373
+#define  NHOUR       8952  /* 31*12*24 */
 
 
-void *Ydaystat(void *argument)
+void *Yhourstat(void *argument)
 {
-  static char func[] = "Ydaystat";
+  static char func[] = "Yhourstat";
   int operatorID;
   int operfunc;
   int gridsize;
@@ -51,40 +51,41 @@ void *Ydaystat(void *argument)
   int recID;
   int gridID;
   int vdate, vtime;
-  int year, month, day, dayoy;
+  int year, month, day, houroy;
+  int hour, minute;
   int nrecs, nrecords;
   int levelID;
   int tsID;
   int otsID;
-  long nsets[NDAY];
+  long nsets[NHOUR];
   int streamID1, streamID2;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
-  int vdates[NDAY], vtimes[NDAY];
+  int vdates[NHOUR], vtimes[NHOUR];
   double missval;
-  FIELD **vars1[NDAY], **vars2[NDAY];
+  FIELD **vars1[NHOUR], **vars2[NHOUR];
   FIELD field;
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ydaymin",  func_min,  0, NULL);
-  cdoOperatorAdd("ydaymax",  func_max,  0, NULL);
-  cdoOperatorAdd("ydaysum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ydaymean", func_mean, 0, NULL);
-  cdoOperatorAdd("ydayavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("ydayvar",  func_var,  0, NULL);
-  cdoOperatorAdd("ydaystd",  func_std,  0, NULL);
+  cdoOperatorAdd("yhourmin",  func_min,  0, NULL);
+  cdoOperatorAdd("yhourmax",  func_max,  0, NULL);
+  cdoOperatorAdd("yhoursum",  func_sum,  0, NULL);
+  cdoOperatorAdd("yhourmean", func_mean, 0, NULL);
+  cdoOperatorAdd("yhouravg",  func_avg,  0, NULL);
+  cdoOperatorAdd("yhourvar",  func_var,  0, NULL);
+  cdoOperatorAdd("yhourstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( houroy = 0; houroy < NHOUR; houroy++ )
     {
-      vars1[dayoy] = NULL;
-      vars2[dayoy] = NULL;
-      nsets[dayoy] = 0;
+      vars1[houroy] = NULL;
+      vars2[houroy] = NULL;
+      nsets[houroy] = 0;
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -121,23 +122,24 @@ void *Ydaystat(void *argument)
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
       decode_date(vdate, &year, &month, &day);
+      decode_time(vtime, &hour, &minute);
 
-      if ( month >= 1 && month <= 12 )
-	dayoy = (month-1)*31 + day;
+      if ( month >= 1 && month <= 12 && hour >= 0 && hour < 24 )
+	houroy = ((month-1)*31 + day - 1)*24 + hour;
       else
-	dayoy = 0;
+	houroy = 0;
 
-      if ( dayoy < 0 || dayoy >= NDAY )
-	cdoAbort("day of year %d out of range (date=%d)!", dayoy, vdate);
+      if ( houroy < 0 || houroy >= NHOUR )
+	cdoAbort("hour of year %d out of range (date=%d time=%d)!", houroy, vdate, vtime);
 
-      vdates[dayoy] = vdate;
-      vtimes[dayoy] = vtime;
+      vdates[houroy] = vdate;
+      vtimes[houroy] = vtime;
 
-      if ( vars1[dayoy] == NULL )
+      if ( vars1[houroy] == NULL )
 	{
-	  vars1[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars1[houroy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  if ( operfunc == func_std || operfunc == func_var )
-	    vars2[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	    vars2[houroy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
@@ -146,22 +148,22 @@ void *Ydaystat(void *argument)
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      vars1[houroy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      if ( operfunc == func_std || operfunc == func_var )
-		vars2[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+		vars2[houroy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  vars1[dayoy][varID][levelID].grid    = gridID;
-		  vars1[dayoy][varID][levelID].nmiss   = 0;
-		  vars1[dayoy][varID][levelID].missval = missval;
-		  vars1[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  vars1[houroy][varID][levelID].grid    = gridID;
+		  vars1[houroy][varID][levelID].nmiss   = 0;
+		  vars1[houroy][varID][levelID].missval = missval;
+		  vars1[houroy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 		  if ( operfunc == func_std || operfunc == func_var )
 		    {
-		      vars2[dayoy][varID][levelID].grid    = gridID;
-		      vars2[dayoy][varID][levelID].nmiss   = 0;
-		      vars2[dayoy][varID][levelID].missval = missval;
-		      vars2[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		      vars2[houroy][varID][levelID].grid    = gridID;
+		      vars2[houroy][varID][levelID].nmiss   = 0;
+		      vars2[houroy][varID][levelID].missval = missval;
+		      vars2[houroy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 		    }
 		}
 	    }
@@ -176,45 +178,45 @@ void *Ydaystat(void *argument)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-	  if ( nsets[dayoy] == 0 )
+	  if ( nsets[houroy] == 0 )
 	    {
-	      streamReadRecord(streamID1, vars1[dayoy][varID][levelID].ptr, &nmiss);
-	      vars1[dayoy][varID][levelID].nmiss = nmiss;
+	      streamReadRecord(streamID1, vars1[houroy][varID][levelID].ptr, &nmiss);
+	      vars1[houroy][varID][levelID].nmiss = nmiss;
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
-	      field.grid    = vars1[dayoy][varID][levelID].grid;
-	      field.missval = vars1[dayoy][varID][levelID].missval;
+	      field.grid    = vars1[houroy][varID][levelID].grid;
+	      field.missval = vars1[houroy][varID][levelID].missval;
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
-		  farsumq(&vars2[dayoy][varID][levelID], field);
-		  farsum(&vars1[dayoy][varID][levelID], field);
+		  farsumq(&vars2[houroy][varID][levelID], field);
+		  farsum(&vars1[houroy][varID][levelID], field);
 		}
 	      else
 		{
-		  farfun(&vars1[dayoy][varID][levelID], field, operfunc);
+		  farfun(&vars1[houroy][varID][levelID], field, operfunc);
 		}
 	    }
 	}
 
-      if ( nsets[dayoy] == 0 && (operfunc == func_std || operfunc == func_var) )
+      if ( nsets[houroy] == 0 && (operfunc == func_std || operfunc == func_var) )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      farmoq(&vars2[dayoy][varID][levelID], vars1[dayoy][varID][levelID]);
+	      farmoq(&vars2[houroy][varID][levelID], vars1[houroy][varID][levelID]);
 	  }
 
-      nsets[dayoy]++;
+      nsets[houroy]++;
       tsID++;
     }
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
-    if ( nsets[dayoy] )
+  for ( houroy = 0; houroy < NHOUR; houroy++ )
+    if ( nsets[houroy] )
       {
 	if ( operfunc == func_mean || operfunc == func_avg )
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -222,7 +224,7 @@ void *Ydaystat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcmul(&vars1[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		farcmul(&vars1[houroy][varID][levelID], 1.0/nsets[houroy]);
 	    }
 	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -231,13 +233,13 @@ void *Ydaystat(void *argument)
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		if ( operfunc == func_std )
-		  farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		  farcstd(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], 1.0/nsets[houroy]);
 		else
-		  farcvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		  farcvar(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], 1.0/nsets[houroy]);
 	    }
 
-	taxisDefVdate(taxisID2, vdates[dayoy]);
-	taxisDefVtime(taxisID2, vtimes[dayoy]);
+	taxisDefVdate(taxisID2, vdates[houroy]);
+	taxisDefVtime(taxisID2, vtimes[houroy]);
 	streamDefTimestep(streamID2, otsID++);
 
 	for ( recID = 0; recID < nrecords; recID++ )
@@ -248,31 +250,31 @@ void *Ydaystat(void *argument)
 	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
 	      {
 		streamDefRecord(streamID2, varID, levelID);
-		streamWriteRecord(streamID2, vars1[dayoy][varID][levelID].ptr,
-				  vars1[dayoy][varID][levelID].nmiss);
+		streamWriteRecord(streamID2, vars1[houroy][varID][levelID].ptr,
+				  vars1[houroy][varID][levelID].nmiss);
 	      }
 	  }
       }
 
-  for ( dayoy = 0; dayoy < NDAY; dayoy++ )
+  for ( houroy = 0; houroy < NHOUR; houroy++ )
     {
-      if ( vars1[dayoy] != NULL )
+      if ( vars1[houroy] != NULL )
 	{
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  free(vars1[dayoy][varID][levelID].ptr);
-		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy][varID][levelID].ptr);
+		  free(vars1[houroy][varID][levelID].ptr);
+		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[houroy][varID][levelID].ptr);
 		}
 	      
-	      free(vars1[dayoy][varID]);
-	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy][varID]);
+	      free(vars1[houroy][varID]);
+	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[houroy][varID]);
 	    }
 
-	  free(vars1[dayoy]);
-	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy]);
+	  free(vars1[houroy]);
+	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[houroy]);
 	}
     }
 

@@ -1,6 +1,7 @@
 2007-09-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.8
+	* New module: yhourstat (yhour -min/-max/-sum/-mean/-avg/-std/-var) [request: Holger Goettel]
 	* runstat: add env RUNSTAT_DATE to set output date [request: Claudia Wunram]
 	* ifthen: bug fix for masks that varies not with time [report: David Wang]
 	* eca_cdd/eca_cwd: bug fix for name2 [report: James Hoffmann]
@@ -131,7 +132,7 @@
 
 2006-11-06  Ralf Quast  <ralf.quast@brockmann-consult.de>
 
-	* New module: Ydrunstat (ydrun -min, -max, -sum, -mean, -avg, -qstd)
+	* New module: Ydrunstat (ydrun -min, -max, -sum, -mean, -avg, -std, -var)
 	* New module: Timpctl (tim-, hour-, day-, mon-, year- pctl)
 	* New module: Selpctl (selpctl)
 	* New module: Runpctl (runpctl)

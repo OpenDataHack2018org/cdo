@@ -150,6 +150,7 @@ void *Vertstat(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
+void *Yhourstat(void *argument);
 /* RQ */
 void *Ydaypctl(void *argument);
 /* QR */
@@ -352,6 +353,7 @@ void *Wct(void *argument);
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid", "gridarea"}
 #define  WriterandomOperators   {"writerandom"}
+#define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourvar", "yhourstd"}
 /* RQ */
 #define  YdaypctlOperators      {"ydaypctl"}
 /* QR */
@@ -556,6 +558,7 @@ static MODULES Modules[] =
   { Wind,           WindHelp,          WindOperators,           1,  1 },
   { Writegrid,      NULL,              WritegridOperators,      1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,    1,  1 },
+  { Yhourstat,      YhourstatHelp,     YhourstatOperators,      1,  1 },
   /* RQ */
   { Ydaypctl,       YdaypctlHelp,      YdaypctlOperators,       3,  1 },
   /* QR */

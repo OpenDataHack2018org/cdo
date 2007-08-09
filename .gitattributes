@@ -177,6 +177,7 @@ doc/tex/mod/Ydrunpctl -text
 doc/tex/mod/Ydrunstat -text
 doc/tex/mod/Yearpctl -text
 doc/tex/mod/Yearstat -text
+doc/tex/mod/Yhourstat -text
 doc/tex/mod/Ymonarith -text
 doc/tex/mod/Ymonpctl -text
 doc/tex/mod/Ymonstat -text
@@ -316,6 +317,7 @@ src/Ydaypctl.c -text
 src/Ydaystat.c -text
 src/Ydrunpctl.c -text
 src/Ydrunstat.c -text
+src/Yhourstat.c -text
 src/Ymonarith.c -text
 src/Ymonpctl.c -text
 src/Ymonstat.c -text

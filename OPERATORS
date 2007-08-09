@@ -289,6 +289,13 @@ Operator catalog:
       Seasstat   seasvar         Seasonal variance
       Seasstat   seasstd         Seasonal standard deviation
       Seaspctl   seaspctl        Seasonal percentiles
+      Yhourstat  yhourmin        Multi-year hourly minimum
+      Yhourstat  yhourmax        Multi-year hourly maximum
+      Yhourstat  yhoursum        Multi-year hourly sum
+      Yhourstat  yhourmean       Multi-year hourly mean
+      Yhourstat  yhouravg        Multi-year hourly average
+      Yhourstat  yhourvar        Multi-year hourly variance
+      Yhourstat  yhourstd        Multi-year hourly standard deviation
       Ydaystat   ydaymin         Multi-year daily minimum
       Ydaystat   ydaymax         Multi-year daily maximum
       Ydaystat   ydaysum         Multi-year daily sum

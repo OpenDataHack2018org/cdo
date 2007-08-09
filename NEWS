@@ -1,6 +1,15 @@
 CDO NEWS
 --------
 
+Version 1.0.9 (?? September 2007):
+
+   * New operators:
+      o Multi-year hourly statistical values
+         - yhourmin, yhourmax, yhoursum, yhourmean, yhouravg, yhourstd, yhourvar
+   * Fixed bugs:
+      o Operator ifthen: bug fix for masks that varies not with time
+
+
 Version 1.0.8 (27 June 2007):
 
    * New operators:
