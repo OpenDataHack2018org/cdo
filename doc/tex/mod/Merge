@@ -47,7 +47,7 @@ To merge these datasets to a new dataset use:
    cdo merge ifile1 ifile2 ifile3 ofile
 @EndVerbatim
 Assume you have split a 6 hourly dataset with @oper{splithour}.
-This produces four datasets one for each hours.
+This produces four datasets one for each hour.
 The following command merges them together:
 @BeginVerbatim
    cdo mergetime ifile1 ifile2 ifile3 ifile4 ofile

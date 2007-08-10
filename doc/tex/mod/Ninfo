@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = Ninfo
-@Title     = Print the number of variables, levels or times
+@Title     = Print the number of parameters, levels or times
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
@@ -69,9 +69,9 @@ Prints the number of time steps.
 
 
 @BeginExample
-To print the number of variable names in a dataset use:
+To print the number of parameters (variables) in a dataset use:
 @BeginVerbatim
-   cdo nname ifile
+   cdo npar ifile
 @EndVerbatim
 To print the number of month in a dataset use:
 @BeginVerbatim

@@ -4,7 +4,7 @@
 @Title     = Short information
 @Section   = Information
 @Class     = Information
-@Arguments = ifile
+@Arguments = ifiles
 @Operators = sinfo sinfov sinfop
 
 @BeginDescription
@@ -47,7 +47,7 @@ To print short information of a dataset use:
 @BeginVerbatim
    cdo sinfo ifile
 @EndVerbatim
-This is the result of an ECHAM5 dataset with 3 variables and 12 time steps:
+This is the result of an ECHAM5 dataset with 3 variables over 12 time steps:
 @BeginVerbatim
     -1 : Institut Source  Table Code   Time   Typ  Grid Size Num  Levels Num
      1 : MPIMET   ECHAM5.3  128  129 constant F32      2048   1       1   1
