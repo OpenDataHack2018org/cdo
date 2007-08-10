@@ -127,7 +127,11 @@ while (<MOFILE>) {
     open(MODFILE, "$modulefilename") || die "Open failed on module file $modulefilename: $!\n";
     $module    = "";
     $margs     = "";
-    $operators  = "";
+    $operators = "";
+    $trskip = 0;
+    $statpos = index($modulefile, "stat", 3);
+    if ( $statpos != -1 ) { $statpos += 4; }
+    if ( length($modulefile) == $statpos ) { $trskip = 1; }
     undef @doclines;
     $lblock = 0;
     while (<MODFILE>) {
@@ -236,6 +240,24 @@ while (<MOFILE>) {
 #      else {
 	print TRCARD "\\subsubsection*{$chap}\n";
 	$refskip = 0;
+      if ( $chap eq "Statistical values" ) {
+	print TRCARD "\\noindent\n";
+	print TRCARD "\\hspace*{0.5in}\n";
+	print TRCARD "\\begin{tabular*}{2.8in}{|l|l|} \\hline\n";
+	print TRCARD "\\rowcolor[gray]{.9}\n";
+	print TRCARD "\\makebox[1.8in][c]{Available statistical functions} &\n";
+	print TRCARD "\\makebox[0.65in][c]{\$<\\!STAT\\!>\$} \\\\ \\hline\n";
+	print TRCARD "minimum  & {\\bf min}   \\\\ \n";
+	print TRCARD "maximum  & {\\bf max}   \\\\ \n";
+	print TRCARD "sum      & {\\bf sum}  \\\\ \n";
+	print TRCARD "mean     & {\\bf mean}  \\\\ \n";
+	print TRCARD "average            & {\\bf avg}  \\\\ \n";
+	print TRCARD "variance           & {\\bf var}  \\\\ \n";
+	print TRCARD "standard deviation & {\\bf std}  \\\\ \n";
+	print TRCARD "\\hline\n";
+	print TRCARD "\\end{tabular*}\n";
+	print TRCARD "\\vspace{2mm}\n\n";
+      }
 #      }
 #      print TCFILE "\\begin{tabular*}{13cm}{ll}\n";
 #      print TCFILE "\\hspace*{30mm} &  \\\\ \n";
@@ -592,10 +614,25 @@ while (<MOFILE>) {
  	print TRLIST "& $otitlem ";
  	print TRLIST "\\\\ \n";
 
+	$modulname = lc($modulefile);
+	$modulname =~ s/stat//;
+	$operfunc = $operatorx;
+	$operfunc =~ s/$modulname//;
+	$statfunc = 0;
+	if ( $trskip == 1 ) {
+	  if ( $operfunc eq "min" || $operfunc eq "max" || $operfunc eq "sum" || $operfunc eq "mean" || $operfunc eq "avg" || $operfunc eq "var" || $operfunc eq "std" ) { $statfunc = 1; }
+	}
 	if ( $refskip == 0 && $norefoper == 0 ) {
-	  print TRCARD "\\makebox[$len2][l]{\\bf {$operatorx}} ";
-	  print TRCARD "& \\makebox[$len3][l]{$otitle} ";
-	  print TRCARD "\\\\ \n";
+	  if ( $statfunc == 0 ) {
+	    print TRCARD "\\makebox[$len2][l]{\\bf {$operatorx}} ";
+	    print TRCARD "& \\makebox[$len3][l]{$otitle} ";
+	    print TRCARD "\\\\ \n";
+	  }
+	  elsif ( $statfunc == 1 && $operfunc eq "min" ) {
+	    print TRCARD "\\makebox[$len2][l]{\\bf {$modulname\$<\\!STAT\\!>\$}} ";
+	    print TRCARD "& \\makebox[$len3][l]{$mtitle} ";
+	    print TRCARD "\\\\ \n";
+	  }
 	}
       } else {
  	print "$operator: TITLE not found!\n";
