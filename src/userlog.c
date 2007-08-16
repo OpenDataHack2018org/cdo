@@ -941,7 +941,7 @@ void dumplogo(const char *logfilename, int dumptype)
 	  nhours0  = GET_UINT4(lognhours);
 	  cputime0 = (double) ibm2flt(logctime);
 
-	  strcpy(logInfo[i]->name, logname);
+	  strcpy(logInfo[i]->name, (const char *)logname);
 	  logInfo[i]->nocc  = nocc;
 	  logInfo[i]->nvals = nvals0;
 	  logInfo[i]->time  = nhours0 + cputime0/3600;
