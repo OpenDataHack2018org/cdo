@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -53,6 +53,8 @@ void *Cat(void *argument)
 
   for ( indf = 0; indf < nfiles; indf++ )
     {
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf));
+
       streamID1 = streamOpenRead(cdoStreamName(indf));
       if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(indf));
 
