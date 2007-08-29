@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaTn10p
 @Title     = Cold nights percent wrt 10th percentile of reference period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile1 ifile2 ofile
 @Operators = eca_tn10p
 

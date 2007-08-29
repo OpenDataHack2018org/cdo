@@ -187,9 +187,9 @@ doc/tex/mod/Zonstat -text
 doc/tex/mod/chdoc -text
 doc/tex/partab.tex -text
 doc/tex/ref_intro_arithm.tex -text
+doc/tex/ref_intro_climat.tex -text
 doc/tex/ref_intro_compar.tex -text
 doc/tex/ref_intro_condit.tex -text
-doc/tex/ref_intro_eca_in.tex -text
 doc/tex/ref_intro_file_o.tex -text
 doc/tex/ref_intro_format.tex -text
 doc/tex/ref_intro_inform.tex -text

@@ -11,7 +11,12 @@
 Let @file{ifile1}, @file{ifile2} and @file{ifile3} be time series
 of temperature, vapour pressure and relative humidity records.
 Then a corresponding time series of resulting humidity index values
-is written to @file{ofile}.
+is written to @file{ofile}. The humidity index calculation is only
+valid for a temperature of T >= 26° C and a relative humidity of
+R >= 40 %. Whenever these conditions are not satisfied, a missing
+value is written to @{ofile}. Note that the temperature must be given
+in degrees Celsius, the vapour pressure must be given in TBD, and the
+relative humidity must be given in percent.
 @EndDescription
 @EndModule
 

@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaHd
 @Title     = Heating degree days per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_hd
 
@@ -12,7 +12,8 @@ Let @file{ifile} be a time series of daily mean temperatures TG, then
 the heating degree days are defined as the sum of T1 - TG, where only
 values TG < T2 are considered. If T1 and T2 are omitted, a temperature
 of 17° Celsius is used for both parameters. If only T1 is given, T2 is
-set to T1. Note that TG must be given in units of kelvin.
+set to T1. Note that TG must be given in units of kelvin, whereas T1
+and T2 must be given in degrees Celsius.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
@@ -27,9 +28,9 @@ the last contributing time step in @file{ifile}.
 
 @BeginParameter
 @Item = T1
-FLOAT   Temperature limit (° Celsius, default: T1 = 17° Celsius)
+DOUBLE   Temperature limit (° Celsius, default: T1 = 17° Celsius)
 @Item = T2
-FLOAT   Temperature limit (° Celsius, default: T2 = T1)
+DOUBLE   Temperature limit (° Celsius, default: T2 = T1)
 @EndParameter
 
 

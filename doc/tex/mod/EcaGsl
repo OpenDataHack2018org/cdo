@@ -1,20 +1,25 @@
 @BeginModule
+@NewPage
 @Name      = EcaGsl
 @Title     = Growing season length index
-@Section   = ECA indices
-@Class     = ECA index
-@Arguments = ifile ofile
+@Section   = Climate indices
+@Class     = Climate index
+@Arguments = ifile1 ifile2 ofile
 @Operators = eca_gsl
 
 @BeginDescription
-Let @file{ifile} be a time series of daily mean temperatures TG,
-then counted are the number of days between the first occurrence
+Let @file{ifile1} be a time series of daily mean temperatures TG,
+and @file{ifile2} be a land-water mask.
+Then counted are the number of days between the first occurrence
 of at least nday consecutive days with TG > T and the first occurrence
 after 1 July of at least nday consecutive days with TG < T. The
 numbers nday and T are optional parameter with default nday = 6
-and T = 5° Celsius. Further output variables are the start and end
-dates of the growing season. Note that TG must be given in units of
-kelvin.
+and T = 5° Celsius. The number fland is an optional parameter with
+default value fland = 0.5 and denotes the fraction of a grid point that
+must be covered by land in order to be included in the calculation. A
+further output variable is the start day of year of the growing season.
+Note that TG must be given in units of Kelvin, whereas T must be given
+in degrees Celsius.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
@@ -23,7 +28,7 @@ the last contributing time step in @file{ifile}.
 
 @BeginOperator_eca_gsl
 @Title     = Growing season length index
-@Parameter = [nday] [T]
+@Parameter = [nday] [T] [fland]
 @EndOperator
 
 
@@ -31,7 +36,9 @@ the last contributing time step in @file{ifile}.
 @Item = nday
 INTEGER  Number of consecutive days (default: nday = 6)
 @Item = T
-FLOAT    Temperature threshold (° Celsius, default: T = 5° Celsius)
+DOUBLE   Temperature threshold (° Celsius, default: T = 5° Celsius)
+@Item = fland
+DOUBLE   Land fraction threshold (default: fland = 0.5)
 @EndParameter
 
 
@@ -39,6 +46,6 @@ FLOAT    Temperature threshold (° Celsius, default: T = 5° Celsius)
 To get the growing season length for a time series of daily
 mean temperatures, use:
 @BeginVerbatim
-   cdo eca_gsl tgfile ofile
+   cdo eca_gsl tgfile maskfile ofile
 @EndVerbatim
 @EndExample

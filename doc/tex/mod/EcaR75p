@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaR75p
 @Title     = Moderate wet days wrt 75th percentile of reference period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile1 ifile2 ofile
 @Operators = eca_r75p
 

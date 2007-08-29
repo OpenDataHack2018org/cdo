@@ -1,15 +1,15 @@
 @BeginModule
 @Name      = EcaFd
 @Title     = Frost days index per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_fd
 
 @BeginDescription
 Let @file{ifile} be a time series of daily minimum temperatures TN,
 then counted is the number of days where TN < 0° Celsius. Note
-that TN must be given in units of kelvin.
+that TN must be given in units of Kelvin.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription

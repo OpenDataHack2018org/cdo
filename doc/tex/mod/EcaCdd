@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaCdd
 @Title     = Consecutive dry days index per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_cdd
 

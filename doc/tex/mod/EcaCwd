@@ -1,8 +1,8 @@
 @BeginModule
 @Name      = EcaCwd
 @Title     = Consecutive wet days index per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_cwd
 

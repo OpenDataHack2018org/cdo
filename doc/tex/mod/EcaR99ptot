@@ -1,8 +1,8 @@
 @BeginModule
 @Name      = EcaR99ptot
 @Title     = Precipitation percent due to R99p days
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile1 ifile2 ofile
 @Operators = eca_r99ptot
 

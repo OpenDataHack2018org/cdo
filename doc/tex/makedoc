@@ -731,6 +731,7 @@ while (<MOFILE>) {
 	  print HELPFILE "$line\",\n";
 #	    $line = /\sFLOAT/XXX
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
+	  $line =~ s/^DOUBLE/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
 	  print TRFILE "$line\n";
@@ -810,6 +811,7 @@ while (<MOFILE>) {
 #	  }
 #	    $line = /\sFLOAT/XXX
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
+	  $line =~ s/^DOUBLE/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
 	  $line =~ s/_/\\_/g;

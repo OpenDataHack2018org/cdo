@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Vargen
 @Title     = Generate a field
 @Section   = Miscellaneous

@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaRx5day
 @Title     = Highest five-day precipitation amount per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_rx5day
 

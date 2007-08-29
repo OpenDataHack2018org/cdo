@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaTx90p
 @Title     = Very warm days percent wrt 90th percentile of reference period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile1 ifile2 ofile
 @Operators = eca_tx90p
 

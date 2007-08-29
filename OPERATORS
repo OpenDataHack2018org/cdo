@@ -395,14 +395,14 @@ Operator catalog:
       Histogram  histsum         Histogram sum
       Histogram  histmean        Histogram mean
       Histogram  histfreq        Histogram frequency
-      Wct        wct             Windchill temperature (°C)
+      Wct        wct             Windchill temperature (Â°C)
       Fdns       fdns            Frost days where no snow index per time period
       Strwin     strwin          Strong wind days index per time period
       Strbre     strbre          Strong breeze days index per time period
       Strgal     strgal          Strong gale days index per time period
       Hurr       hurr            Hurricane days index per time period
 -------------------------------------------------------------
-   ECA indices
+   Climate indices
 -------------------------------------------------------------
       EcaCdd     eca_cdd         Consecutive dry days index per time period
       EcaCfd     eca_cfd         Consecutive frost days index per time period

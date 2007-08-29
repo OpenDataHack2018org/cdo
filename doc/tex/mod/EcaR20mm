@@ -1,8 +1,8 @@
 @BeginModule
 @Name      = EcaR20mm
 @Title     = Very heavy precipitation days index per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_r20mm
 

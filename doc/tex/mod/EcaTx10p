@@ -1,8 +1,8 @@
 @BeginModule
 @Name      = EcaTx10p
 @Title     = Very cold days percent wrt 10th percentile of reference period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile1 ifile2 ofile
 @Operators = eca_tx10p
 

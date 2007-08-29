@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaTr
 @Title     = Tropical nights index per time period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile ofile
 @Operators = eca_tr
 
@@ -11,7 +11,7 @@
 Let @file{ifile} be a time series of daily minimum temperatures TN,
 then counted is the number of days where TN > T. The number T is
 an optional parameter with default T = 20° Celsius. Note that TN
-must be given in units of kelvin.
+must be given in units of Kelvin, whereas T must be given in degrees Celsius.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription

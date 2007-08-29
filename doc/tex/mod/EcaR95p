@@ -2,8 +2,8 @@
 @NewPage
 @Name      = EcaR95p
 @Title     = Very wet days wrt 95th percentile of reference period
-@Section   = ECA indices
-@Class     = ECA index
+@Section   = Climate indices
+@Class     = Climate index
 @Arguments = ifile1 ifile2 ofile
 @Operators = eca_r95p
 
