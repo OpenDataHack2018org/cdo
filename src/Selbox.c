@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, schulzweida@dkrz.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, schulzweida@dkrz.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -226,7 +226,7 @@ static int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lo
 
 static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  static char func[] = "genindexgrid";  
+  static char func[] = "genlonlatgrid";  
   int nlon1, nlat1;
   int gridtype, gridID2;
   double *xvals1, *yvals1;
@@ -307,6 +307,7 @@ static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
 
   return (gridID2);
 }
+
 
 static int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {

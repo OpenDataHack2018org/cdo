@@ -46,21 +46,20 @@
 
 %\typearea{10}                 % Einen sinnvollen Satzspiegel aktivieren
 
-%\documentclass[DIV16,BCOR1cm,12pt,a4paper,fleqn]{scrreprt}         % for pdf output
-%\documentclass[DIV16,BCOR1cm,11pt,a4paper,twoside]{scrreprt}  % for ps output
-%\documentclass[a4paper,DIV14,BCOR1cm]{scrartcl}
 
 %Usage:
-%makeinfo cdo.tex
-%makeinfo --html --no-split cdo.tex
-%latex2html cdo.tex
-%latex2html -split=3 cdo.tex
-%texi2dvi --pdf cdo.tex
-%texi2dvi cdo.tex
-%dvips -o cdo.ps cdo.dvi
-%dvips ps+pdf
-%dvipdf
-%pdflatex
+%pdflatex cdo.tex
+%pdflatex cdo.tex
+%cat > cdo.ist << 'EOF'
+%delim_0        "{\\idxdotfill} "
+%headings_flag  1
+%heading_prefix "{\\centerline {\\Large \\bf "
+%heading_suffix "}}"
+%EOF
+%makeindex -s cdo.ist cdo.idx
+%pdflatex cdo
+%thumbpdf cdo
+%pdflatex cdo
 
 % To allow automatic selection of the right graphics type ...
 
