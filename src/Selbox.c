@@ -244,66 +244,121 @@ static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
 
-  xvals1 = (double *) malloc(nlon1*sizeof(double));
-  yvals1 = (double *) malloc(nlat1*sizeof(double));
+  if ( gridtype == GRID_CURVILINEAR )
+    {
+      xvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
+      yvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
+    }
+  else
+    {
+      xvals1 = (double *) malloc(nlon1*sizeof(double));
+      yvals1 = (double *) malloc(nlat1*sizeof(double));
+    }
 
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
 
-  xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
-  if ( DBL_IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
-  xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
-  xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
-
-  for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
-  for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
-
-  (*lon22)--;
-  xlon1 -= 360;
-  xlon2 -= 360;
-
-  for ( *lon11 = 0; xvals1[*lon11] < xlon1; (*lon11)++ );
-  for ( *lon12 = *lon11; *lon12 < nlon1 && xvals1[*lon12] < xlon2; (*lon12)++ );
-
-  (*lon12)--;
-
-  if ( *lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0 )
-    cdoAbort("Longitudinal dimension is too small!");
-
-  if ( yvals1[0] > yvals1[nlat1 - 1] )
+  if ( gridtype == GRID_CURVILINEAR )
     {
-      if ( xlat1 > xlat2 )
+      int ilon, ilat;
+      double xval, yval;
+      double xmin = 720, xmax = -720, ymin = 180, ymax = -180;
+
+      *lat1 = nlat1-1;
+      *lat2 = 0;
+      *lon11 = 0;
+      *lon12 = -1;
+      *lon21 = nlon1-1;
+      *lon22 = 0;
+
+      for ( ilat = 0; ilat < nlat1; ilat++ )
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat1; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat2; (*lat2)-- );
+	  for ( ilon = 0; ilon < nlon1; ilon++ )
+	    {
+	      xval = xvals1[ilat*nlon1 + ilon];
+	      yval = yvals1[ilat*nlon1 + ilon];
+	      if ( xval > xlon1 && xval < xmin && yval > xlat1 && yval < ymin )
+		{ xmin = xval; ymin = yval; *lon21 = ilon; *lat1  = ilat; }
+	      /*
+		if ( xval > xlon1 && xval < xmin && ilon < *lon21 ) { xmin = xval; *lon21 = ilon; } 
+	      */
+	      if ( xval < xlon2 && xval > xmax && ilon > *lon22 ) { xmax = xval; *lon22 = ilon; }
+	      /*
+	      if ( yval > xlat1 && yval < ymin ) { ymin = yval; *lat1  = ilat; }
+	      */
+	      if ( yval < xlat2 && yval > ymax ) { ymax = yval; *lat2  = ilat; }
+	      /*
+	      if ( xval > xmax ) xmax = xval;
+	      if ( xval < xmin ) xmin = xval;
+	      if ( yval > ymax ) ymax = yval;
+	      if ( yval < ymin ) ymin = yval;
+	      */
+	    }
 	}
-      else
-	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat2; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat1; (*lat2)-- );
-	}
+
+      printf(" xmin=%g, xmax=%g, ymin=%g, ymax=%g\n", xmin, xmax, ymin, ymax);
+      printf("%d %d %d %d %d %d\n", *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
     }
   else
     {
-      if ( xlat1 < xlat2 )
+      xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
+      if ( DBL_IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
+      xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
+      xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
+
+      for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
+      for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
+
+      (*lon22)--;
+      xlon1 -= 360;
+      xlon2 -= 360;
+
+      for ( *lon11 = 0; xvals1[*lon11] < xlon1; (*lon11)++ );
+      for ( *lon12 = *lon11; *lon12 < nlon1 && xvals1[*lon12] < xlon2; (*lon12)++ );
+
+      (*lon12)--;
+
+      if ( *lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0 )
+	cdoAbort("Longitudinal dimension is too small!");
+
+      if ( yvals1[0] > yvals1[nlat1 - 1] )
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat1; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat2; (*lat2)-- );
+	  if ( xlat1 > xlat2 )
+	    {
+	      for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat1; (*lat1)++ );
+	      for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat2; (*lat2)-- );
+	    }
+	  else
+	    {
+	      for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat2; (*lat1)++ );
+	      for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat1; (*lat2)-- );
+	    }
 	}
       else
 	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat2; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat1; (*lat2)-- );
+	  if ( xlat1 < xlat2 )
+	    {
+	      for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat1; (*lat1)++ );
+	      for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat2; (*lat2)-- );
+	    }
+	  else
+	    {
+	      for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat2; (*lat1)++ );
+	      for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat1; (*lat2)-- );
+	    }
 	}
     }
 
   if ( *lat2 - *lat1 + 1 <= 0 )
     cdoAbort("Latitudinal dimension is too small!");
 
-  gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
+  if ( (*lon22 - *lon21 + 1 <= 0) && (*lon12 - *lon11 + 1 <= 0) )
+    cdoAbort("Longitudinal dimension is too small!");
 
   free(xvals1);
   free(yvals1);
+
+  gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 
   return (gridID2);
 }
@@ -448,7 +503,8 @@ void *Selbox(void *argument)
       gridID1  = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
-      if ( operatorID == SELINDEXBOX && gridtype == GRID_CURVILINEAR ) break;
+      /* if ( operatorID == SELINDEXBOX && gridtype == GRID_CURVILINEAR ) break; */
+      if ( gridtype == GRID_CURVILINEAR ) break;
       if ( operatorID == SELINDEXBOX && gridtype == GRID_GENERIC &&
 	   gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0 ) break;
     }
