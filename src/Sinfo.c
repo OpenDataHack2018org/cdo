@@ -95,6 +95,7 @@ void printFiletype(int streamID, int vlistID)
 
 void *Sinfo(void *argument)
 {
+  static char func[] = "Sinfo";
   int SINFO, SINFOV, SINFOP;
   int operatorID;
   int indf;
@@ -308,6 +309,37 @@ void *Sinfo(void *argument)
 		{
 		  fprintf(stdout, "%*s", nbyte0, "");
 		  fprintf(stdout, "longitude :  cyclic\n");
+		}
+	      if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
+		{
+		  int i;
+		  double *xvals, *yvals;
+		  double xfirst, xlast, yfirst, ylast;
+		  xvals = (double *) malloc(gridsize*sizeof(double));
+		  yvals = (double *) malloc(gridsize*sizeof(double));
+
+		  gridInqXvals(gridID, xvals);
+		  gridInqYvals(gridID, yvals);
+
+		  xfirst = xvals[0];
+		  xlast  = xvals[0];
+		  yfirst = yvals[0];
+		  ylast  = yvals[0];
+		  for ( i = 1; i < gridsize; i++ )
+		    {
+		      if ( xvals[i] < xfirst ) xfirst = xvals[i];
+		      if ( xvals[i] > xlast )  xlast  = xvals[i];
+		      if ( yvals[i] < yfirst ) yfirst = yvals[i];
+		      if ( yvals[i] > ylast )  ylast  = yvals[i];
+		    }
+
+		  fprintf(stdout, "%*s", nbyte0, "");
+		  fprintf(stdout, "longitude : first = %.9g  last = %.9g\n", xfirst, xlast);
+		  fprintf(stdout, "%*s", nbyte0, "");
+		  fprintf(stdout, "latitude  : first = %.9g  last = %.9g\n", yfirst, ylast);
+
+		  free(xvals);
+		  free(yvals);
 		}
 	    }
 	  else if ( gridtype == GRID_CELL )

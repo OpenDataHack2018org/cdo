@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.0.8
 	* New module: yhourstat (yhour -min/-max/-sum/-mean/-avg/-std/-var) [request: Holger Goettel]
+	* sellonlatbox: support for curvilinear grids [request: Hannes Isaak Reuter]
 	* bug fix for cdo option -f format [report: Stephan Lorenz]
 	* runstat: add env RUNSTAT_DATE to set output date [request: Claudia Wunram]
 	* ifthen: bug fix for masks that varies not with time [report: David Wang]

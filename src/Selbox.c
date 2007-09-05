@@ -262,7 +262,9 @@ static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
     {
       int ilon, ilat;
       double xval, yval;
-      double xmin = 720, xmax = -720, ymin = 180, ymax = -180;
+      double x1 = 720, x2 = -720, x3 = -720, x4 = 720, y1 = 180, y2 = 180, y3 = -180, y4 = -180;
+      int    ix1 = 0, ix2 = 0, ix3 = 0, ix4 = 0, iy1 = 0, iy2 = 0, iy3 = 0, iy4 = 0;
+      int ixmin, ixmax, iymin, iymax;
 
       *lat1 = nlat1-1;
       *lat2 = 0;
@@ -277,27 +279,45 @@ static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
 	    {
 	      xval = xvals1[ilat*nlon1 + ilon];
 	      yval = yvals1[ilat*nlon1 + ilon];
-	      if ( xval > xlon1 && xval < xmin && yval > xlat1 && yval < ymin )
-		{ xmin = xval; ymin = yval; *lon21 = ilon; *lat1  = ilat; }
-	      /*
-		if ( xval > xlon1 && xval < xmin && ilon < *lon21 ) { xmin = xval; *lon21 = ilon; } 
-	      */
-	      if ( xval < xlon2 && xval > xmax && ilon > *lon22 ) { xmax = xval; *lon22 = ilon; }
-	      /*
-	      if ( yval > xlat1 && yval < ymin ) { ymin = yval; *lat1  = ilat; }
-	      */
-	      if ( yval < xlat2 && yval > ymax ) { ymax = yval; *lat2  = ilat; }
-	      /*
-	      if ( xval > xmax ) xmax = xval;
-	      if ( xval < xmin ) xmin = xval;
-	      if ( yval > ymax ) ymax = yval;
-	      if ( yval < ymin ) ymin = yval;
-	      */
+
+	      if ( xval >= xlon1 && xval <= xlon2 && yval >= xlat1 && yval <= xlat2 )
+		{
+		  if ( xval < x1 && yval < y1 ) { x1 = xval; y1 = yval; ix1 = ilon; iy1 = ilat; }
+		  if ( xval > x2 && yval < y2 ) { x2 = xval; y2 = yval; ix2 = ilon; iy2 = ilat; }
+		  if ( xval > x3 && yval > y3 ) { x3 = xval; y3 = yval; ix3 = ilon; iy3 = ilat; }
+		  if ( xval < x4 && yval > y4 ) { x4 = xval; y4 = yval; ix4 = ilon; iy4 = ilat; }
+		}
 	    }
 	}
+      /*
+      printf("%g %g %g %g %g %g %g %g\n",  x1, x2, x3, x4, y1, y2, y3, y4);
+      printf("%d %d %d %d %d %d %d %d\n",     ix1, ix2, ix3, ix4, iy1, iy2, iy3, iy4);
+      */
+      ixmin = ix1;
+      ixmax = ix1;
+      if ( ix2 < ixmin ) ixmin = ix2;
+      if ( ix3 < ixmin ) ixmin = ix3;
+      if ( ix4 < ixmin ) ixmin = ix4;
+      if ( ix2 > ixmax ) ixmax = ix2;
+      if ( ix3 > ixmax ) ixmax = ix3;
+      if ( ix4 > ixmax ) ixmax = ix4;
+      iymin = iy1;
+      iymax = iy1;
+      if ( iy2 < iymin ) iymin = iy2;
+      if ( iy3 < iymin ) iymin = iy3;
+      if ( iy4 < iymin ) iymin = iy4;
+      if ( iy2 > iymax ) iymax = iy2;
+      if ( iy3 > iymax ) iymax = iy3;
+      if ( iy4 > iymax ) iymax = iy4;
 
+      *lat1 = iymin;
+      *lat2 = iymax;
+      *lon21 = ixmin;
+      *lon22 = ixmax;
+      /*
       printf(" xmin=%g, xmax=%g, ymin=%g, ymax=%g\n", xmin, xmax, ymin, ymax);
       printf("%d %d %d %d %d %d\n", *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
+      */
     }
   else
     {
@@ -352,8 +372,10 @@ static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
   if ( *lat2 - *lat1 + 1 <= 0 )
     cdoAbort("Latitudinal dimension is too small!");
 
-  if ( (*lon22 - *lon21 + 1 <= 0) && (*lon12 - *lon11 + 1 <= 0) )
+  /*
+  if ( (*lon22 - *lon21 + 1 <= 0)  && (*lon12 - *lon11 + 1 <= 0)  )
     cdoAbort("Longitudinal dimension is too small!");
+  */
 
   free(xvals1);
   free(yvals1);
