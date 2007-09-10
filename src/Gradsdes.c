@@ -952,7 +952,7 @@ void *Gradsdes(void *argument)
 	    }
 
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
-	  ltype   = zaxisInqType(zaxisID);
+	  ltype   = zaxisInqLtype(zaxisID);
 	  nlev    = zaxisInqSize(zaxisID);
 	  vlistInqVarName(vlistID, varID, varname);
 
@@ -975,12 +975,13 @@ void *Gradsdes(void *argument)
 	  if ( filetype == FILETYPE_GRB )
 	    {
 	      code = vlistInqVarCode(vlistID, varID);
+	      /*	      
 	      if      ( ltype == ZAXIS_SURFACE )  ltype = 1;
 	      else if ( ltype == ZAXIS_PRESSURE ) ltype = 99;
 	      else if ( nlev == 1 )  ltype = 1;
 	      else ltype = 99;
-
-	      fprintf(gdp, "  %d,%d,%d", code, ltype, 0);
+	      */
+	      fprintf(gdp, "  %d,%d", code, ltype);
 	    }
 	  else
 	    fprintf(gdp, "  99");

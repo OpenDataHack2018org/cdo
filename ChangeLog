@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.0.8
 	* New module: yhourstat (yhour -min/-max/-sum/-mean/-avg/-std/-var) [request: Holger Goettel]
+	* gradsdes: add GRIB level type to VARS [report: Ben-Jei Tsuang]
 	* sellonlatbox: support for curvilinear grids [request: Hannes Isaak Reuter]
 	* bug fix for cdo option -f format [report: Stephan Lorenz]
 	* runstat: add env RUNSTAT_DATE to set output date [request: Claudia Wunram]
@@ -47,7 +48,7 @@
 	* Add new operator: splitsel
 	* Add new operator: histfreq
 	* Add new operator: setrtoc and setrtoc2
-	* list.c: changes to acept inf and -inf as arguments 
+	* list.c: changes to accept inf and -inf as arguments 
 
 2007-06-07  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
 
