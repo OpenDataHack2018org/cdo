@@ -301,6 +301,7 @@ src/Timselstat.c -text
 src/Timsort.c -text
 src/Timstat.c -text
 src/Timstat2.c -text
+src/Timstat3.c -text
 src/Tinfo.c -text
 src/Trend.c -text
 src/Trms.c -text

@@ -139,6 +139,7 @@ void *Timselpctl(void *argument);
 void *Timselstat(void *argument);
 void *Timstat(void *argument);
 void *Timstat2(void *argument);
+void *Timstat3(void *argument);
 void *Tinfo(void *argument);
 void *Trend(void *argument);
 void *Trms(void *argument);
@@ -342,6 +343,7 @@ void *Wct(void *argument);
 #define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "daystd"}
 #define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourstd"}
 #define  Timstat2Operators      {"timcor"}
+#define  Timstat3Operators      {"meandiff2test", "varquot2test"}
 #define  TinfoOperators         {"tinfo"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
@@ -547,6 +549,7 @@ static MODULES Modules[] =
   { Timstat,        DaystatHelp,       DaystatOperators,        1,  1 },
   { Timstat,        HourstatHelp,      HourstatOperators,       1,  1 },
   { Timstat2,       NULL,              Timstat2Operators,       2,  1 },
+  { Timstat3,       NULL,              Timstat3Operators,       2,  1 },
   { Tinfo,          NULL,              TinfoOperators,          1,  0 },
   { Trend,          TrendHelp,         TrendOperators,          1,  2 },
   { Trms,           NULL,              TrmsOperators,           2,  1 },
