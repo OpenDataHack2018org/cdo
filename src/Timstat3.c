@@ -29,17 +29,17 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#define  NWORK  5
+#define  NWORK  6
 
 void *Timstat3(void *argument)
 {
-  static char func[] = "func_cor";
+  static char func[] = "Timstat3";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
   int gridsize;
   int vdate = 0, vtime = 0;
-  int nrecs, nrecs2, nrecs3, nvars, *nlevs ;
+  int nrecs, nrecs2, nrecs3, nvars, nlevs ;
   int i;
   int tsID;
   int varID, recID, levelID, gridID;
@@ -99,21 +99,20 @@ void *Timstat3(void *argument)
   vars2  = (FIELD **)  malloc(nvars*sizeof(FIELD *));
   work   = (FIELD ***) malloc(nvars*sizeof(FIELD **));
   nofvals= (int ***)   malloc(nvars*sizeof(int **));
-  nlevs  = (int *)     malloc(nvars*sizeof(int)); 
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, 0);      
-      nlevs[varID]= zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      missval = missval1 = vlistInqVarMissval(vlistID1, varID);
+      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      missval  = missval1 = vlistInqVarMissval(vlistID1, varID);
       missval2 = vlistInqVarMissval(vlistID1, varID); 
 
-      vars1[varID] = (FIELD *)   malloc(nlevs[varID]*sizeof(FIELD));
-      vars2[varID] = (FIELD *)   malloc(nlevs[varID]*sizeof(FIELD));
-      work[varID]  = (FIELD **)  malloc(nlevs[varID]*sizeof(FIELD*));
-      nofvals[varID] = (int **)  malloc(nlevs[varID]*sizeof(int*));  
+      vars1[varID] = (FIELD *)   malloc(nlevs*sizeof(FIELD));
+      vars2[varID] = (FIELD *)   malloc(nlevs*sizeof(FIELD));
+      work[varID]  = (FIELD **)  malloc(nlevs*sizeof(FIELD*));
+      nofvals[varID] = (int **)  malloc(nlevs*sizeof(int*));  
 
-      for ( levelID = 0; levelID < nlevs[varID]; levelID++ )
+      for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  nofvals[varID][levelID] = (int *) malloc(gridsize*sizeof(int));
 	  memset(nofvals[varID][levelID], 0, gridsize*sizeof(int));
@@ -153,7 +152,7 @@ void *Timstat3(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamInqRecord(streamID2, &varID, &levelID);
 
-	  if (tsID == 0)
+	  if ( tsID == 0 )
 	    {
 	      recVarID[recID] = varID;
 	      recLevelID[recID] = levelID;	     	     
@@ -232,8 +231,8 @@ void *Timstat3(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      nlevs[varID] = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevs[varID]; levelID++ )
+      nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  free(vars1[varID][levelID].ptr);
 	  free(vars2[varID][levelID].ptr);

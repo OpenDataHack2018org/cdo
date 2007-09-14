@@ -33,7 +33,7 @@
 
 void *Timstat2(void *argument)
 {
-  static char func[] = "func_cor";
+  static char func[] = "Timstat2";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
