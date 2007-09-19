@@ -1076,8 +1076,8 @@ beta_distr_inv (double a, double b, double p, char *prompt)
   return x;
 }
 
-void
-beta_distr_constants (double a, double b, double p, double *c1, double *c2,
+
+void beta_distr_constants(double a, double b, double p, double *c1, double *c2,
 		      char *prompt)
 {
   double delta_c1, delta_c2;
@@ -1111,9 +1111,9 @@ beta_distr_constants (double a, double b, double p, double *c1, double *c2,
   while (TRUE)
     {
       a11 = -beta_distr_density (a, b, *c1, prompt);
-      a12 = beta_distr_density (a, b, *c2, prompt);
+      a12 =  beta_distr_density (a, b, *c2, prompt);
       a21 = -beta_distr_density (a + 1, b, *c1, prompt);
-      a22 = beta_distr_density (a + 1, b, *c2, prompt);
+      a22 =  beta_distr_density (a + 1, b, *c2, prompt);
       b1 =
 	p + beta_distr (a, b, *c1, prompt) - beta_distr (a, b, *c2, prompt);
       b2 =
@@ -1147,8 +1147,8 @@ beta_distr_constants (double a, double b, double p, double *c1, double *c2,
   return;
 }
 
-double
-fisher (double m, double n, double x, char *prompt)
+
+double fisher(double m, double n, double x, char *prompt)
 {
   if (m <= 0 || n <= 0)
     {
