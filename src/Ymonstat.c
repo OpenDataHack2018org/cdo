@@ -60,6 +60,8 @@ void *Ymonstat(void *argument)
   int nvars, nlevel;
   int *recVarID, *recLevelID;
   int vdates[NMONTH], vtimes[NMONTH];
+  int mon[NMONTH];
+  int nmon = 0;
   double missval;
   FIELD **vars1[NMONTH], **vars2[NMONTH], **samp1[NMONTH];
   FIELD field;
@@ -127,6 +129,7 @@ void *Ymonstat(void *argument)
 
       if ( vars1[month] == NULL )
 	{
+	  mon[nmon++] = month;
 	  vars1[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  samp1[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  if ( operfunc == func_std || operfunc == func_var )
@@ -237,64 +240,66 @@ void *Ymonstat(void *argument)
       tsID++;
     }
 
-  for ( month = 0; month < NMONTH; month++ )
-    if ( nsets[month] )
-      {
-	if ( operfunc == func_mean || operfunc == func_avg )
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  if ( samp1[month][varID][levelID].ptr == NULL )
-		    farcmul(&vars1[month][varID][levelID], 1.0/nsets[month]);
-		  else
-		    fardiv(&vars1[month][varID][levelID], samp1[month][varID][levelID]);
-		}
-	    }
-	else if ( operfunc == func_std || operfunc == func_var )
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
-	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		{
-		  if ( samp1[month][varID][levelID].ptr == NULL )
-		    {
-		      if ( operfunc == func_std )
-			farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
-		      else
-			farcvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
-		    }
-		  else
-		    {
-		      farinv(&samp1[month][varID][levelID]);
-		      if ( operfunc == func_std )
-			farstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID]);
-		      else
-			farvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID]);
-		    }
-		}
-	    }
+  for ( i = 0; i < nmon; i++ )
+    {
+      month = mon[i];
+      if ( nsets[month] == 0 ) cdoAbort("Internal problem, nsets[%d] not set!", month);
 
-	taxisDefVdate(taxisID2, vdates[month]);
-	taxisDefVtime(taxisID2, vtimes[month]);
-	streamDefTimestep(streamID2, otsID++);
-
-	for ( recID = 0; recID < nrecords; recID++ )
+      if ( operfunc == func_mean || operfunc == func_avg )
+	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    varID    = recVarID[recID];
-	    levelID  = recLevelID[recID];
-
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
+	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
-		streamDefRecord(streamID2, varID, levelID);
-		streamWriteRecord(streamID2, vars1[month][varID][levelID].ptr,
-				  vars1[month][varID][levelID].nmiss);
+		if ( samp1[month][varID][levelID].ptr == NULL )
+		  farcmul(&vars1[month][varID][levelID], 1.0/nsets[month]);
+		else
+		  fardiv(&vars1[month][varID][levelID], samp1[month][varID][levelID]);
 	      }
 	  }
-      }
+      else if ( operfunc == func_std || operfunc == func_var )
+	for ( varID = 0; varID < nvars; varID++ )
+	  {
+	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevel; levelID++ )
+	      {
+		if ( samp1[month][varID][levelID].ptr == NULL )
+		  {
+		    if ( operfunc == func_std )
+		      farcstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+		    else
+		      farcvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], 1.0/nsets[month]);
+		  }
+		else
+		  {
+		    farinv(&samp1[month][varID][levelID]);
+		    if ( operfunc == func_std )
+		      farstd(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID]);
+		    else
+		      farvar(&vars1[month][varID][levelID], vars2[month][varID][levelID], samp1[month][varID][levelID]);
+		  }
+	      }
+	  }
+
+      taxisDefVdate(taxisID2, vdates[month]);
+      taxisDefVtime(taxisID2, vtimes[month]);
+      streamDefTimestep(streamID2, otsID++);
+
+      for ( recID = 0; recID < nrecords; recID++ )
+	{
+	  varID    = recVarID[recID];
+	  levelID  = recLevelID[recID];
+	  
+	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
+	    {
+	      streamDefRecord(streamID2, varID, levelID);
+	      streamWriteRecord(streamID2, vars1[month][varID][levelID].ptr,
+				vars1[month][varID][levelID].nmiss);
+	    }
+	}
+    }
 
   for ( month = 0; month < NMONTH; month++ )
     {
