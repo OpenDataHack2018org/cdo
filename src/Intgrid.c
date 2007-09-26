@@ -33,61 +33,64 @@
 #include "interpol.h"
 
 
-int genBoxGrid(int gridID1, int xavg, int yavg)
+int genReduceGrid(int gridID1, int xinc, int yinc)
 {
-  static char func[] = "genBoxGrid";
+  static char func[] = "genReduceGrid";
   int debug = 1;
-  int i, j, i1;
+  int i, j, i1, yoff = 0, ilon, ilat, olon, olat;
   int gridID2, gridtype;
-  int gridsize1, xsize1, ysize1;
-  int gridsize2, xsize2, ysize2;
+  int gridsize1, nlon1, nlat1;
+  int gridsize2, nlon2, nlat2;
   double *xvals1, *yvals1, *xvals2, *yvals2;
   double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
 
   gridtype = gridInqType(gridID1);
   gridsize1 = gridInqSize(gridID1);
-  xsize1 = gridInqXsize(gridID1);
-  ysize1 = gridInqYsize(gridID1);
+  nlon1 = gridInqXsize(gridID1);
+  nlat1 = gridInqYsize(gridID1);
 
-  if ( debug ) printf("grid1 %d %d %d\n", gridsize1, xsize1, ysize1);
+  if ( nlat1%2 == 0 && yinc%2 == 0 ) yoff = 1;
 
-  xsize2 = xsize1/xavg;
-  ysize2 = ysize1/yavg;
-  if ( xsize1%xavg ) xsize2++;
-  if ( ysize1%yavg ) ysize2++;
-  gridsize2 = xsize2*ysize2;
+  if ( debug ) printf("grid1 %d %d %d\n", gridsize1, nlon1, nlat1);
 
-  if ( debug ) printf("grid2 %d %d %d\n", gridsize2, xsize2, ysize2);
+  nlon2 = nlon1/xinc;
+  nlat2 = nlat1/yinc;
+  if ( nlon1%xinc ) nlon2++;
+  if ( nlat1%yinc ) nlat2++;
+  gridsize2 = nlon2*nlat2;
+
+  if ( debug ) printf("grid2 %d %d %d\n", gridsize2, nlon2, nlat2);
 
   gridID2 = gridCreate(gridtype, gridsize2);
-  gridDefXsize(gridID2, xsize2);
-  gridDefYsize(gridID2, ysize2);
+  gridDefXsize(gridID2, nlon2);
+  gridDefYsize(gridID2, nlat2);
 
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
-      xvals1 = (double *) malloc(xsize1*sizeof(double));
-      yvals1 = (double *) malloc(ysize1*sizeof(double));
-      xvals2 = (double *) malloc(xsize2*sizeof(double));
-      yvals2 = (double *) malloc(ysize2*sizeof(double));
+      xvals1 = (double *) malloc(nlon1*sizeof(double));
+      yvals1 = (double *) malloc(nlat1*sizeof(double));
+      xvals2 = (double *) malloc(nlon2*sizeof(double));
+      yvals2 = (double *) malloc(nlat2*sizeof(double));
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
-
+      /*
       if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
 	{
-	  grid1_corner_lon = (double *) malloc(2*xsize1*sizeof(double));
-	  grid1_corner_lat = (double *) malloc(2*ysize1*sizeof(double));
-	  grid2_corner_lon = (double *) malloc(2*xsize2*sizeof(double));
-	  grid2_corner_lat = (double *) malloc(2*ysize2*sizeof(double));
+	  grid1_corner_lon = (double *) malloc(2*nlon1*sizeof(double));
+	  grid1_corner_lat = (double *) malloc(2*nlat1*sizeof(double));
+	  grid2_corner_lon = (double *) malloc(2*nlon2*sizeof(double));
+	  grid2_corner_lat = (double *) malloc(2*nlat2*sizeof(double));
 	  gridInqXbounds(gridID1, grid1_corner_lon);
 	  gridInqYbounds(gridID1, grid1_corner_lat);
 	}
-
+      */
+      /*
       j = 0;
-      for ( i = 0; i < xsize1; i += xavg )
+      for ( i = 0; i < nlon1; i += xinc )
 	{
-	  i1 = i+(xavg-1);
-	  if ( i1 >= xsize1-1 ) i1 = xsize1-1; 
+	  i1 = i+(xinc-1);
+	  if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
 	  xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2;
 	  if ( debug ) printf("x %d %d %d %g", i, i1, j, xvals2[j]);
 	  if ( grid2_corner_lon )
@@ -100,10 +103,10 @@ int genBoxGrid(int gridID1, int xavg, int yavg)
 	  j++;
 	}
       j = 0;
-      for ( i = 0; i < ysize1; i += yavg )
+      for ( i = 0; i < nlat1; i += yinc )
 	{
-	  i1 = i+(yavg-1);
-	  if ( i1 >= ysize1-1 ) i1 = ysize1-1; 
+	  i1 = i+(yinc-1);
+	  if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
 	  yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
 	  if ( debug ) printf("y %d %d %d %g", i, i1, j, yvals2[j]);
 	  if ( grid2_corner_lat )
@@ -115,10 +118,24 @@ int genBoxGrid(int gridID1, int xavg, int yavg)
 	  if ( debug ) printf("\n");
 	  j++;
 	}
+      */
+      olat = 0;
+      for ( ilat = yoff; ilat < nlat1; ilat+=yinc )
+	{
+	  yvals2[olat] = yvals1[ilat];
+	  olat++;
+	}
+
+      olon = 0;
+      for ( ilon = 0; ilon < nlon1; ilon+=xinc )
+	{
+	  xvals2[olon] = xvals1[ilon];
+	  olon++;
+	}
 
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
-
+      /*
       if ( grid2_corner_lon && grid2_corner_lat )
 	{
 	  gridDefNvertex(gridID2, 2);
@@ -128,6 +145,7 @@ int genBoxGrid(int gridID1, int xavg, int yavg)
 	  free(grid2_corner_lon);
 	  free(grid2_corner_lat);
 	}
+      */
     }
   else
     {
@@ -138,7 +156,7 @@ int genBoxGrid(int gridID1, int xavg, int yavg)
 }
 
 
-void boxavg(FIELD *field1, FIELD *field2, int xavg, int yavg)
+void boxavg(FIELD *field1, FIELD *field2, int xinc, int yinc)
 {
   static char func[] = "boxavg";
   int nlon1, nlat1;
@@ -151,11 +169,11 @@ void boxavg(FIELD *field1, FIELD *field2, int xavg, int yavg)
   double missval;
   /* static int index = 0; */
 
-  gridID1  = field1->grid;
+  gridID1 = field1->grid;
   gridID2 = field2->grid;
-  array1   = field1->ptr;
+  array1  = field1->ptr;
   array2  = field2->ptr;
-  missval   = field1->missval;
+  missval = field1->missval;
 
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
@@ -183,13 +201,13 @@ void boxavg(FIELD *field1, FIELD *field2, int xavg, int yavg)
 	    xfield2[ilat][ilon] = 0;
 
 	    in = 0;
-	    for ( j = 0; j < yavg; ++j )
+	    for ( j = 0; j < yinc; ++j )
 	      {
-		jj = ilat*yavg+j;
+		jj = ilat*yinc+j;
 		if ( jj >= nlat1 ) break;
-		for ( i = 0; i < xavg; ++i )
+		for ( i = 0; i < xinc; ++i )
 		  {
-		    ii = ilon*xavg+i;
+		    ii = ilon*xinc+i;
 		    if ( ii >= nlon1 ) break;
 		    in++;
 		    xfield2[ilat][ilon] += xfield1[jj][ii];
@@ -211,11 +229,73 @@ void boxavg(FIELD *field1, FIELD *field2, int xavg, int yavg)
 }
 
 
+void reducegrid(FIELD *field1, FIELD *field2, int xinc, int yinc)
+{
+  static char func[] = "reducegrid";
+  int nlon1, nlat1;
+  int nlon2, nlat2;
+  int ilat, ilon, olat, olon;
+  int gridID1, gridID2;
+  int nmiss;
+  double **xfield1;
+  double *array1, *array2;
+  double missval;
+  int i;
+  int yoff = 0;
+  double **xfield2;
+
+  gridID1 = field1->grid;
+  gridID2 = field2->grid;
+  array1  = field1->ptr;
+  array2  = field2->ptr;
+  missval = field1->missval;
+
+  nlon1 = gridInqXsize(gridID1);
+  nlat1 = gridInqYsize(gridID1);
+
+  nlon2 = gridInqXsize(gridID2);
+  nlat2 = gridInqYsize(gridID2);
+
+  xfield1 = (double **) malloc(nlat1*sizeof(double *));
+
+  for ( ilat = 0; ilat < nlat1; ilat++ )
+    xfield1[ilat] = array1 + ilat*nlon1;
+
+  xfield2 = (double **) malloc(nlat2*sizeof(double *));
+
+  for ( ilat = 0; ilat < nlat2; ilat++ )
+    xfield2[ilat] = array2 + ilat*nlon2;
+
+  if ( nlat1%2 == 0 && yinc%2 == 0 ) yoff = 1;
+
+  olat = 0;
+  for ( ilat = yoff; ilat < nlat1; ilat+=yinc )
+    {
+      olon = 0;
+      for ( ilon = 0; ilon < nlon1; ilon+=xinc )
+	{
+	  xfield2[olat][olon] = xfield1[ilat][ilon];
+	  olon++;
+	}
+      olat++;
+    }
+
+  nmiss = 0;
+  for ( i = 0; i < nlat2*nlon2; i++ )
+    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+  
+  field2->nmiss = nmiss;
+
+  free(xfield2);
+  free(xfield1);
+}
+
+
 
 void *Intgrid(void *argument)
 {
   static char func[] = "Intgrid";
-  int INTGRID, INTPOINT, INTERPOLATE, BOXAVG;
+  int INTGRID, INTPOINT, INTERPOLATE, BOXAVG, REDUCEGRID;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, ngrids;
@@ -225,7 +305,7 @@ void *Intgrid(void *argument)
   int vlistID1, vlistID2;
   int gridID1 = -1, gridID2 = -1;
   int nmiss;
-  int xavg, yavg;
+  int xinc = 0, yinc = 0;
   double missval;
   double slon, slat;
   double *array1 = NULL, *array2 = NULL;
@@ -238,6 +318,7 @@ void *Intgrid(void *argument)
   INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
+  REDUCEGRID  = cdoOperatorAdd("reducegrid",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -258,12 +339,12 @@ void *Intgrid(void *argument)
       gridDefXvals(gridID2, &slon);
       gridDefYvals(gridID2, &slat);
     }
-  else if ( operatorID == BOXAVG )
+  else if ( operatorID == REDUCEGRID || operatorID == BOXAVG )
     {
-      operatorInputArg("xavg, yavg");
+      operatorInputArg("xinc, yinc");
       operatorCheckArgc(2);
-      xavg = atoi(operatorArgv()[0]);
-      yavg = atoi(operatorArgv()[1]);
+      xinc = atoi(operatorArgv()[0]);
+      yinc = atoi(operatorArgv()[1]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -281,7 +362,7 @@ void *Intgrid(void *argument)
     {
       gridID1 = vlistGrid(vlistID1, index);
 
-      if ( operatorID == BOXAVG )
+      if ( operatorID == BOXAVG || operatorID == REDUCEGRID )
 	{
 	  if ( index == 0 )
 	    {
@@ -289,7 +370,7 @@ void *Intgrid(void *argument)
 		   gridInqType(gridID1) != GRID_CURVILINEAR   )
 		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
 
-	      gridID2 = genBoxGrid(gridID1, xavg, yavg);
+		gridID2 = genReduceGrid(gridID1, xinc, yinc);
 	    }
 	  else
 	    cdoAbort("Too many different grids!");
@@ -345,7 +426,9 @@ void *Intgrid(void *argument)
 	  else if ( operatorID == INTERPOLATE )
 	    interpolate(&field1, &field2);
 	  else if ( operatorID == BOXAVG )
-	    boxavg(&field1, &field2, xavg, yavg);
+	    boxavg(&field1, &field2, xinc, yinc);
+	  else if ( operatorID == REDUCEGRID )
+	    reducegrid(&field1, &field2, xinc, yinc);
 
 	  nmiss = field2.nmiss;
 

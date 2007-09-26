@@ -113,7 +113,7 @@ void *Writegrid(void *argument)
 
 	  vlistID2 = vlistCreate();
 	  varID = vlistDefVar(vlistID2, gridID, zaxisID, TIME_CONSTANT);
-	  vlistDefVarCode(vlistID2, varID, 11);
+	  /*	  vlistDefVarCode(vlistID2, varID, 11); */
 	  vlistDefVarName(vlistID2, varID, "area");
 	  vlistDefVarLongname(vlistID2, varID, "area");
 	  vlistDefVarUnits(vlistID2, varID, "m**2");
