@@ -36,7 +36,7 @@ Deletes all fields with code numbers in a user given list.
 
 @BeginOperator_selname
 @Title     = Select variables by name
-@Parameter = vars
+@Parameter = varnames
 
 @BeginDescription
 Selects all fields with variable names in a user given list.
@@ -46,7 +46,7 @@ Selects all fields with variable names in a user given list.
 
 @BeginOperator_delname
 @Title     = Delete variables by name
-@Parameter = vars
+@Parameter = varnames
 
 @BeginDescription
 Deletes all fields with variable names in a user given list.
@@ -148,7 +148,7 @@ This operator can not be used with netCDF data!
 @BeginParameter
 @Item = codes
 INTEGER  Comma separated list of code numbers
-@Item = vars
+@Item = varnames
 STRING   Comma separated list of variable names
 @Item = stdnames
 STRING   Comma separated list of standard names

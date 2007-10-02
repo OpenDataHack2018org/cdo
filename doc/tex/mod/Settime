@@ -89,7 +89,7 @@ Sets the time axis.
 @Parameter = date time
 
 @BeginDescription
-Sets the reference time of an relative time axis.
+Sets the reference time of a relative time axis.
 @EndDescription
 @EndOperator
 
@@ -99,7 +99,7 @@ Sets the reference time of an relative time axis.
 @Parameter = calendar
 
 @BeginDescription
-Sets the calendar of an relative time axis.
+Sets the calendar of a relative time axis.
 @EndDescription
 @EndOperator
 

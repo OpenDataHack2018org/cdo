@@ -34,7 +34,7 @@ Interpolates 3D variables on hybrid model level to pressure level.
 Interpolates 3D variables on hybrid model level to height level.
 The procedure is the same as for operator @oper{mh2pl} except that 
 the pressure levels are calculated from the heights by:
-@math{plev = 101325*exp(hlev/-7000)}
+@math{plevel = 101325*exp(hlevel/-7000)}
 @EndDescription
 @EndOperator
 

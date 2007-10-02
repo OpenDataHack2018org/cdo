@@ -9,7 +9,7 @@
 
 @BeginDescription
 Grid interpolation can be a very time consuming process. Especially if the
-data is on an unstructured or on a large grid. In this case the SCRIP 
+data is on an unstructured or on a large grid. In this case the \htmlref{SCRIP}{SCRIP}
 interpolation process can be split into two parts. First generation of the
 interpolation weights, this is the most time consuming part. These interpolation 
 weights can be reused for every remapping process. 

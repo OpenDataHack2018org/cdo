@@ -248,7 +248,7 @@ void *Wct(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "reducegrid"}
+#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  InttimeOperators       {"inttime"}
 #define  IntntimeOperators      {"intntime"}

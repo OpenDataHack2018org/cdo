@@ -13,9 +13,9 @@
 @Parameter = u v ...
 
 @BeginDescription
-This is a special operator for datsets with wind components on an rotated grid, 
+This is a special operator for datsets with wind components on a rotated grid, 
 e.g. data from the regional model REMO. It performs a backward transformation of 
-velocity components U and V from an rotated spherical system to a geographical system.
+velocity components U and V from a rotated spherical system to a geographical system.
 @EndDescription
 @EndOperator
 
@@ -27,7 +27,7 @@ STRING  Pairs of zonal and meridional velocity components (use variable names or
 
 
 @BeginExample
-To transform the u and v velocity of a dataset from an rotated
+To transform the u and v velocity of a dataset from a rotated
 spherical system to a geographical system use:
 @BeginVerbatim
    cdo rotuvb,u,v ifile ofile

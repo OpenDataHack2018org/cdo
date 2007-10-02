@@ -16,7 +16,7 @@
 @BeginDescription
 This operator remaps all input fields to a new grid. The remap type and the 
 interpolation weights of one grid are read from a netCDF file. The netCDF 
-file with the weights must follow the SCRIP convention. Normaly these weights 
+file with the weights must follow the \htmlref{SCRIP}{SCRIP} convention. Normaly these weights 
 come from a previous call to module @mod{GENWEIGHTS} or was created by the original
 SCRIP package.
 @EndDescription

@@ -33,9 +33,9 @@
 #include "interpol.h"
 
 
-int genReduceGrid(int gridID1, int xinc, int yinc)
+int genThinout(int gridID1, int xinc, int yinc)
 {
-  static char func[] = "genReduceGrid";
+  static char func[] = "genThinout";
   int debug = 1;
   int i, j, i1, yoff = 0, ilon, ilat, olon, olat;
   int gridID2, gridtype;
@@ -229,9 +229,9 @@ void boxavg(FIELD *field1, FIELD *field2, int xinc, int yinc)
 }
 
 
-void reducegrid(FIELD *field1, FIELD *field2, int xinc, int yinc)
+void thinout(FIELD *field1, FIELD *field2, int xinc, int yinc)
 {
-  static char func[] = "reducegrid";
+  static char func[] = "thinout";
   int nlon1, nlat1;
   int nlon2, nlat2;
   int ilat, ilon, olat, olon;
@@ -295,7 +295,7 @@ void reducegrid(FIELD *field1, FIELD *field2, int xinc, int yinc)
 void *Intgrid(void *argument)
 {
   static char func[] = "Intgrid";
-  int INTGRID, INTPOINT, INTERPOLATE, BOXAVG, REDUCEGRID;
+  int INTGRID, INTPOINT, INTERPOLATE, BOXAVG, THINOUT;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, ngrids;
@@ -318,7 +318,7 @@ void *Intgrid(void *argument)
   INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
-  REDUCEGRID  = cdoOperatorAdd("reducegrid",  0, 0, NULL);
+  THINOUT  = cdoOperatorAdd("thinout",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -339,7 +339,7 @@ void *Intgrid(void *argument)
       gridDefXvals(gridID2, &slon);
       gridDefYvals(gridID2, &slat);
     }
-  else if ( operatorID == REDUCEGRID || operatorID == BOXAVG )
+  else if ( operatorID == THINOUT || operatorID == BOXAVG )
     {
       operatorInputArg("xinc, yinc");
       operatorCheckArgc(2);
@@ -362,7 +362,7 @@ void *Intgrid(void *argument)
     {
       gridID1 = vlistGrid(vlistID1, index);
 
-      if ( operatorID == BOXAVG || operatorID == REDUCEGRID )
+      if ( operatorID == BOXAVG || operatorID == THINOUT )
 	{
 	  if ( index == 0 )
 	    {
@@ -370,7 +370,7 @@ void *Intgrid(void *argument)
 		   gridInqType(gridID1) != GRID_CURVILINEAR   )
 		cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
 
-		gridID2 = genReduceGrid(gridID1, xinc, yinc);
+		gridID2 = genThinout(gridID1, xinc, yinc);
 	    }
 	  else
 	    cdoAbort("Too many different grids!");
@@ -427,8 +427,8 @@ void *Intgrid(void *argument)
 	    interpolate(&field1, &field2);
 	  else if ( operatorID == BOXAVG )
 	    boxavg(&field1, &field2, xinc, yinc);
-	  else if ( operatorID == REDUCEGRID )
-	    reducegrid(&field1, &field2, xinc, yinc);
+	  else if ( operatorID == THINOUT )
+	    thinout(&field1, &field2, xinc, yinc);
 
 	  nmiss = field2.nmiss;
 

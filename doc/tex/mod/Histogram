@@ -8,7 +8,7 @@
 
 @BeginDescription
 This module creates bins for a histogram of the input data.
-Only 2-dimensional input field are allowed. The ouput file 
+Only 2-dimensional input fields are allowed. The ouput file 
 contains one vertical level for each of the bins requested.
 @EndDescription
 @EndModule
