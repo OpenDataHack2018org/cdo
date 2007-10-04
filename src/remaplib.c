@@ -64,7 +64,7 @@
 /* constants */
 
 /* #define  BABY_STEP  0.001 */ /* original value */
-#define  BABY_STEP  0.01
+#define  BABY_STEP  0.001
 
 #define  ZERO     0.0
 #define  ONE      1.0
@@ -4547,10 +4547,12 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  grid2_add = rv->grid2_add[n];
 
 	  if ( rv->wts[0][n] < -0.01 )
-	    cdoPrint("Map 1 weight < 0 %d %d %g", grid1_add, grid2_add, rv->wts[0][n]);
+	    cdoPrint("Map 1 weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+		     grid1_add, grid2_add, n, rv->wts[0][n]);
 
 	  if ( rv->norm_opt != NORM_OPT_NONE && rv->wts[0][n] > 1.01 )
-	    cdoPrint("Map 1 weight > 1 %d %d %g", grid1_add, grid2_add, rv->wts[0][n]);
+	    cdoPrint("Map 1 weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+		     grid1_add, grid2_add, n, rv->wts[0][n]);
 	}
     }
 

@@ -12,6 +12,7 @@
 	* cdotest: bug fix in eca_gsl/module.c -> 2 input streams [report: Harald Anlauf]
         * use always decode_date and encode_date to decode/encode date
 	* splitname: bug fix [report: Daniel Klocke]
+	* remapcon: bug fix reset BABY_STEP to 0.001 [report: Claas Teichmann]
 	* merge: bug fix for all files with constant fields only [report: Jan Keller]
 	* Version 1.0.9 released
 
