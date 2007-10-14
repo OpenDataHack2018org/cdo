@@ -354,6 +354,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   char units[128];
   int nbins;
   int k, nc;
+  int i4, inc;
+  int n2, n4, nele4;
   int n;      /* loop counter                  */
   int nele;   /* element loop counter          */
   int i,j;    /* logical 2d addresses          */
@@ -759,20 +761,22 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       nc = rg->grid1_corners;
       for ( i = 0; i < rg->grid1_size; i++ )
 	{
-	  rg->grid1_bound_box[4*i+0] = rg->grid1_corner_lat[i*nc];
-	  rg->grid1_bound_box[4*i+1] = rg->grid1_corner_lat[i*nc];
-	  rg->grid1_bound_box[4*i+2] = rg->grid1_corner_lon[i*nc];
-	  rg->grid1_bound_box[4*i+3] = rg->grid1_corner_lon[i*nc];
+	  i4 = i*4;
+	  inc = i*nc;
+	  rg->grid1_bound_box[i4+0] = rg->grid1_corner_lat[inc];
+	  rg->grid1_bound_box[i4+1] = rg->grid1_corner_lat[inc];
+	  rg->grid1_bound_box[i4+2] = rg->grid1_corner_lon[inc];
+	  rg->grid1_bound_box[i4+3] = rg->grid1_corner_lon[inc];
 	  for ( j = 1; j < nc; j++ )
 	    {
-	      if ( rg->grid1_corner_lat[i*nc+j] < rg->grid1_bound_box[4*i+0] )
-		rg->grid1_bound_box[4*i+0] = rg->grid1_corner_lat[i*nc+j];
-	      if ( rg->grid1_corner_lat[i*nc+j] > rg->grid1_bound_box[4*i+1] )
-		rg->grid1_bound_box[4*i+1] = rg->grid1_corner_lat[i*nc+j];
-	      if ( rg->grid1_corner_lon[i*nc+j] < rg->grid1_bound_box[4*i+2] )
-		rg->grid1_bound_box[4*i+2] = rg->grid1_corner_lon[i*nc+j];
-	      if ( rg->grid1_corner_lon[i*nc+j] > rg->grid1_bound_box[4*i+3] )
-		rg->grid1_bound_box[4*i+3] = rg->grid1_corner_lon[i*nc+j];
+	      if ( rg->grid1_corner_lat[inc+j] < rg->grid1_bound_box[i4+0] )
+		rg->grid1_bound_box[i4+0] = rg->grid1_corner_lat[inc+j];
+	      if ( rg->grid1_corner_lat[inc+j] > rg->grid1_bound_box[i4+1] )
+		rg->grid1_bound_box[i4+1] = rg->grid1_corner_lat[inc+j];
+	      if ( rg->grid1_corner_lon[inc+j] < rg->grid1_bound_box[i4+2] )
+		rg->grid1_bound_box[i4+2] = rg->grid1_corner_lon[inc+j];
+	      if ( rg->grid1_corner_lon[inc+j] > rg->grid1_bound_box[i4+3] )
+		rg->grid1_bound_box[i4+3] = rg->grid1_corner_lon[inc+j];
 	    }
 	}
     }
@@ -783,6 +787,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 
       for ( n = 0; n < rg->grid1_size; n++ )
 	{
+	  n4 = 4*n;
           /* find N,S and NE points to this grid point */
 
           j = n/nx + 1;
@@ -826,17 +831,17 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
           tmp_lons[2] = rg->grid1_center_lon[ne_add];
           tmp_lons[3] = rg->grid1_center_lon[n_add];
 
-          rg->grid1_bound_box[4*n+0] = tmp_lats[0];
-          rg->grid1_bound_box[4*n+1] = tmp_lats[0];
-          rg->grid1_bound_box[4*n+2] = tmp_lons[0];
-          rg->grid1_bound_box[4*n+3] = tmp_lons[0];
+          rg->grid1_bound_box[n4+0] = tmp_lats[0];
+          rg->grid1_bound_box[n4+1] = tmp_lats[0];
+          rg->grid1_bound_box[n4+2] = tmp_lons[0];
+          rg->grid1_bound_box[n4+3] = tmp_lons[0];
 
 	  for ( k = 1; k < 4; k++ )
 	    {
-	      if ( tmp_lats[k] < rg->grid1_bound_box[4*n+0] ) rg->grid1_bound_box[4*n+0] = tmp_lats[k];
-	      if ( tmp_lats[k] > rg->grid1_bound_box[4*n+1] ) rg->grid1_bound_box[4*n+1] = tmp_lats[k];
-	      if ( tmp_lons[k] < rg->grid1_bound_box[4*n+2] ) rg->grid1_bound_box[4*n+2] = tmp_lons[k];
-	      if ( tmp_lons[k] > rg->grid1_bound_box[4*n+3] ) rg->grid1_bound_box[4*n+3] = tmp_lons[k];
+	      if ( tmp_lats[k] < rg->grid1_bound_box[n4+0] ) rg->grid1_bound_box[n4+0] = tmp_lats[k];
+	      if ( tmp_lats[k] > rg->grid1_bound_box[n4+1] ) rg->grid1_bound_box[n4+1] = tmp_lats[k];
+	      if ( tmp_lons[k] < rg->grid1_bound_box[n4+2] ) rg->grid1_bound_box[n4+2] = tmp_lons[k];
+	      if ( tmp_lons[k] > rg->grid1_bound_box[n4+3] ) rg->grid1_bound_box[n4+3] = tmp_lons[k];
 	    }
         }
     }
@@ -847,20 +852,22 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       nc = rg->grid2_corners;
       for ( i = 0; i < rg->grid2_size; i++ )
 	{
-	  rg->grid2_bound_box[4*i+0] = rg->grid2_corner_lat[i*nc];
-	  rg->grid2_bound_box[4*i+1] = rg->grid2_corner_lat[i*nc];
-	  rg->grid2_bound_box[4*i+2] = rg->grid2_corner_lon[i*nc];
-	  rg->grid2_bound_box[4*i+3] = rg->grid2_corner_lon[i*nc];
+	  i4 = i*4;
+	  inc = i*nc;
+	  rg->grid2_bound_box[i4+0] = rg->grid2_corner_lat[inc];
+	  rg->grid2_bound_box[i4+1] = rg->grid2_corner_lat[inc];
+	  rg->grid2_bound_box[i4+2] = rg->grid2_corner_lon[inc];
+	  rg->grid2_bound_box[i4+3] = rg->grid2_corner_lon[inc];
 	  for ( j = 1; j < nc; j++ )
 	    {
-	      if ( rg->grid2_corner_lat[i*nc+j] < rg->grid2_bound_box[4*i+0] )
-		rg->grid2_bound_box[4*i+0] = rg->grid2_corner_lat[i*nc+j];
-	      if ( rg->grid2_corner_lat[i*nc+j] > rg->grid2_bound_box[4*i+1] )
-		rg->grid2_bound_box[4*i+1] = rg->grid2_corner_lat[i*nc+j];
-	      if ( rg->grid2_corner_lon[i*nc+j] < rg->grid2_bound_box[4*i+2] )
-		rg->grid2_bound_box[4*i+2] = rg->grid2_corner_lon[i*nc+j];
-	      if ( rg->grid2_corner_lon[i*nc+j] > rg->grid2_bound_box[4*i+3] )
-		rg->grid2_bound_box[4*i+3] = rg->grid2_corner_lon[i*nc+j];
+	      if ( rg->grid2_corner_lat[inc+j] < rg->grid2_bound_box[i4+0] )
+		rg->grid2_bound_box[i4+0] = rg->grid2_corner_lat[inc+j];
+	      if ( rg->grid2_corner_lat[inc+j] > rg->grid2_bound_box[i4+1] )
+		rg->grid2_bound_box[i4+1] = rg->grid2_corner_lat[inc+j];
+	      if ( rg->grid2_corner_lon[inc+j] < rg->grid2_bound_box[i4+2] )
+		rg->grid2_bound_box[i4+2] = rg->grid2_corner_lon[inc+j];
+	      if ( rg->grid2_corner_lon[inc+j] > rg->grid2_bound_box[i4+3] )
+		rg->grid2_bound_box[i4+3] = rg->grid2_corner_lon[inc+j];
 	    }
 	}
     }
@@ -871,6 +878,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 
       for ( n = 0; n < rg->grid2_size; n++ )
 	{
+	  n4 = 4*n;
 	  /* find N,S and NE points to this grid point */
 
           j = n/nx + 1;
@@ -914,17 +922,17 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
           tmp_lons[2] = rg->grid2_center_lon[ne_add];
           tmp_lons[3] = rg->grid2_center_lon[n_add];
 
-          rg->grid2_bound_box[4*n+0] = tmp_lats[0];
-          rg->grid2_bound_box[4*n+1] = tmp_lats[0];
-          rg->grid2_bound_box[4*n+2] = tmp_lons[0];
-          rg->grid2_bound_box[4*n+3] = tmp_lons[0];
+          rg->grid2_bound_box[n4+0] = tmp_lats[0];
+          rg->grid2_bound_box[n4+1] = tmp_lats[0];
+          rg->grid2_bound_box[n4+2] = tmp_lons[0];
+          rg->grid2_bound_box[n4+3] = tmp_lons[0];
 
 	  for ( k = 1; k < 4; k++ )
 	    {
-	      if ( tmp_lats[k] < rg->grid2_bound_box[4*n+0] ) rg->grid2_bound_box[4*n+0] = tmp_lats[k];
-	      if ( tmp_lats[k] > rg->grid2_bound_box[4*n+1] ) rg->grid2_bound_box[4*n+1] = tmp_lats[k];
-	      if ( tmp_lons[k] < rg->grid2_bound_box[4*n+2] ) rg->grid2_bound_box[4*n+2] = tmp_lons[k];
-	      if ( tmp_lons[k] > rg->grid2_bound_box[4*n+3] ) rg->grid2_bound_box[4*n+3] = tmp_lons[k];
+	      if ( tmp_lats[k] < rg->grid2_bound_box[n4+0] ) rg->grid2_bound_box[n4+0] = tmp_lats[k];
+	      if ( tmp_lats[k] > rg->grid2_bound_box[n4+1] ) rg->grid2_bound_box[n4+1] = tmp_lats[k];
+	      if ( tmp_lons[k] < rg->grid2_bound_box[n4+2] ) rg->grid2_bound_box[n4+2] = tmp_lons[k];
+	      if ( tmp_lons[k] > rg->grid2_bound_box[n4+3] ) rg->grid2_bound_box[n4+3] = tmp_lons[k];
 	    }
         }
     }
@@ -1019,22 +1027,28 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
 
       for ( nele = 0; nele < rg->grid1_size; nele++ )
-	for ( n = 0; n < rg->num_srch_bins; n++ )
-	  if ( rg->grid1_bound_box[4*nele+0] <= rg->bin_lats[2*n+1] &&
-	       rg->grid1_bound_box[4*nele+1] >= rg->bin_lats[2*n+0] )
-	    {
-	      rg->bin_addr1[2*n+0] = MIN(nele, rg->bin_addr1[2*n+0]);
-	      rg->bin_addr1[2*n+1] = MAX(nele, rg->bin_addr1[2*n+1]);
-	    }
+	{
+	  nele4 = nele*4;
+	  for ( n = 0; n < rg->num_srch_bins; n++ )
+	    if ( rg->grid1_bound_box[nele4+0] <= rg->bin_lats[2*n+1] &&
+		 rg->grid1_bound_box[nele4+1] >= rg->bin_lats[2*n+0] )
+	      {
+		rg->bin_addr1[2*n+0] = MIN(nele, rg->bin_addr1[2*n+0]);
+		rg->bin_addr1[2*n+1] = MAX(nele, rg->bin_addr1[2*n+1]);
+	      }
+	}
 
       for ( nele = 0; nele < rg->grid2_size; nele++ )
-	for ( n = 0; n < rg->num_srch_bins; n++ )
-	  if ( rg->grid2_bound_box[4*nele+0] <= rg->bin_lats[2*n+1] &&
-	       rg->grid2_bound_box[4*nele+1] >= rg->bin_lats[2*n+0] )
-	    {
-	      rg->bin_addr2[2*n+0] = MIN(nele, rg->bin_addr2[2*n+0]);
-	      rg->bin_addr2[2*n+1] = MAX(nele, rg->bin_addr2[2*n+1]);
-	    }
+	{
+	  nele4 = nele*4;
+	  for ( n = 0; n < rg->num_srch_bins; n++ )
+	    if ( rg->grid2_bound_box[nele4+0] <= rg->bin_lats[2*n+1] &&
+		 rg->grid2_bound_box[nele4+1] >= rg->bin_lats[2*n+0] )
+	      {
+		rg->bin_addr2[2*n+0] = MIN(nele, rg->bin_addr2[2*n+0]);
+		rg->bin_addr2[2*n+1] = MAX(nele, rg->bin_addr2[2*n+1]);
+	      }
+	}
     }
   else if ( rg->restrict_type == RESTRICT_LATLON )
     {
@@ -1055,14 +1069,15 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       for ( j = 0; j < rg->num_srch_bins; j++ )
 	for ( i = 0; i < rg->num_srch_bins; i++ )
 	  {
-	    rg->bin_lats[2*n+0]  = (j  )*dlat - PIH;
-	    rg->bin_lats[2*n+1]  = (j+1)*dlat - PIH;
-	    rg->bin_lons[2*n+0]  = (i  )*dlon;
-	    rg->bin_lons[2*n+1]  = (i+1)*dlon;
-	    rg->bin_addr1[2*n+0] = rg->grid1_size;
-	    rg->bin_addr1[2*n+1] = 0;
-	    rg->bin_addr2[2*n+0] = rg->grid2_size;
-	    rg->bin_addr2[2*n+1] = 0;
+	    n2 = 2*n;
+	    rg->bin_lats[n2+0]  = (j  )*dlat - PIH;
+	    rg->bin_lats[n2+1]  = (j+1)*dlat - PIH;
+	    rg->bin_lons[n2+0]  = (i  )*dlon;
+	    rg->bin_lons[n2+1]  = (i+1)*dlon;
+	    rg->bin_addr1[n2+0] = rg->grid1_size;
+	    rg->bin_addr1[n2+1] = 0;
+	    rg->bin_addr2[n2+0] = rg->grid2_size;
+	    rg->bin_addr2[n2+1] = 0;
 
 	    n++;
 	  }
@@ -1070,26 +1085,32 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       rg->num_srch_bins = rg->num_srch_bins*rg->num_srch_bins;
 
       for ( nele = 0; nele < rg->grid1_size; nele++ )
-	for ( n = 0; n < rg->num_srch_bins; n++ )
-	  if ( rg->grid1_bound_box[4*nele+0] <= rg->bin_lats[2*n+1] &&
-	       rg->grid1_bound_box[4*nele+1] >= rg->bin_lats[2*n+0] &&
-	       rg->grid1_bound_box[4*nele+2] <= rg->bin_lons[2*n+1] &&
-	       rg->grid1_bound_box[4*nele+3] >= rg->bin_lons[2*n+0] )
-	    {
-	      rg->bin_addr1[2*n+0] = MIN(nele,rg->bin_addr1[2*n+0]);
-	      rg->bin_addr1[2*n+1] = MAX(nele,rg->bin_addr1[2*n+1]);
-	    }
+	{
+	  nele4 = 4*nele;
+	  for ( n = 0; n < rg->num_srch_bins; n++ )
+	    if ( rg->grid1_bound_box[nele4+0] <= rg->bin_lats[2*n+1] &&
+		 rg->grid1_bound_box[nele4+1] >= rg->bin_lats[2*n+0] &&
+		 rg->grid1_bound_box[nele4+2] <= rg->bin_lons[2*n+1] &&
+		 rg->grid1_bound_box[nele4+3] >= rg->bin_lons[2*n+0] )
+	      {
+		rg->bin_addr1[2*n+0] = MIN(nele,rg->bin_addr1[2*n+0]);
+		rg->bin_addr1[2*n+1] = MAX(nele,rg->bin_addr1[2*n+1]);
+	      }
+	}
 
       for ( nele = 0; nele < rg->grid2_size; nele++ )
-	for ( n = 0; n < rg->num_srch_bins; n++ )
-	  if ( rg->grid2_bound_box[4*nele+0] <= rg->bin_lats[2*n+1] &&
-	       rg->grid2_bound_box[4*nele+1] >= rg->bin_lats[2*n+0] &&
-	       rg->grid2_bound_box[4*nele+2] <= rg->bin_lons[2*n+1] &&
-	       rg->grid2_bound_box[4*nele+3] >= rg->bin_lons[2*n+0] )
-	    {
-	      rg->bin_addr2[2*n+0] = MIN(nele,rg->bin_addr2[2*n+0]);
-	      rg->bin_addr2[2*n+1] = MAX(nele,rg->bin_addr2[2*n+1]);
-	    }
+	{
+	  nele4 = 4*nele;
+	  for ( n = 0; n < rg->num_srch_bins; n++ )
+	    if ( rg->grid2_bound_box[nele4+0] <= rg->bin_lats[2*n+1] &&
+		 rg->grid2_bound_box[nele4+1] >= rg->bin_lats[2*n+0] &&
+		 rg->grid2_bound_box[nele4+2] <= rg->bin_lons[2*n+1] &&
+		 rg->grid2_bound_box[nele4+3] >= rg->bin_lons[2*n+0] )
+	      {
+		rg->bin_addr2[2*n+0] = MIN(nele,rg->bin_addr2[2*n+0]);
+		rg->bin_addr2[2*n+1] = MAX(nele,rg->bin_addr2[2*n+1]);
+	      }
+	}
     }
   else
     cdoAbort("unknown search restriction method");
@@ -3828,6 +3849,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int     max_srch_cells;   /* num cells in restricted search arrays  */
   int     num_srch_cells;   /* num cells in restricted search arrays  */
   int     srch_corners;     /* num of corners of srch cells           */
+  int     nsrch_corners;
   int    *srch_add;         /* global address of cells in srch arrays */
   double *srch_corner_lat;  /* lat of each corner of srch cells */
   double *srch_corner_lon;  /* lon of each corner of srch cells */
@@ -3968,11 +3990,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
             srch_add[n] = grid2_add;
 	    ioffset = grid2_add*srch_corners;
 
-	    /* Unvectorized loop */
+	    nsrch_corners = n*srch_corners;
 	    for ( k = 0; k < srch_corners; k++ )
 	      {
-		srch_corner_lat[n*srch_corners+k] = rg->grid2_corner_lat[ioffset+k];
-		srch_corner_lon[n*srch_corners+k] = rg->grid2_corner_lon[ioffset+k];
+		srch_corner_lat[nsrch_corners+k] = rg->grid2_corner_lat[ioffset+k];
+		srch_corner_lon[nsrch_corners+k] = rg->grid2_corner_lon[ioffset+k];
 	      }
             n++;
           }
@@ -4168,10 +4190,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
             srch_add[n] = grid1_add;
 	    ioffset = grid1_add*srch_corners;
 
+	    nsrch_corners = n*srch_corners;
 	    for ( k = 0; k < srch_corners; k++ )
 	      {
-		srch_corner_lat[n*srch_corners+k] = rg->grid1_corner_lat[ioffset+k];
-		srch_corner_lon[n*srch_corners+k] = rg->grid1_corner_lon[ioffset+k];
+		srch_corner_lat[nsrch_corners+k] = rg->grid1_corner_lat[ioffset+k];
+		srch_corner_lon[nsrch_corners+k] = rg->grid1_corner_lon[ioffset+k];
 	      }
             n++;
 	  }
