@@ -1099,7 +1099,7 @@ void *Gradsdes(void *argument)
 	}
       else
 	{
-	  fwrite (&indx, sizeof(struct gaindx), 1, mapfp);
+	  fwrite(&indx, sizeof(struct gaindx), 1, mapfp);
 
 	  fwrite(hinum, sizeof(int), 4, mapfp);
 

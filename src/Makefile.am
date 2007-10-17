@@ -46,6 +46,7 @@ cdo_SOURCES = Arith.c		\
               Mergetime.c   	\
               Merstat.c   	\
               Mrotuv.c	 	\
+              Mrotuvb.c	 	\
               Ninfo.c 		\
               Nmltest.c 	\
               Output.c  	\

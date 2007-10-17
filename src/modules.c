@@ -79,6 +79,7 @@ void *Mergegrid(void *argument);
 void *Mergetime(void *argument);
 void *Merstat(void *argument);
 void *Mrotuv(void *argument);
+void *Mrotuvb(void *argument);
 void *Ninfo(void *argument);
 void *Nmltest(void *argument);
 void *Output(void *argument);
@@ -265,7 +266,8 @@ void *Wct(void *argument);
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
 #define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd", "merpctl"}
-#define  MrotuvOperators        {"mrotuvb"}
+#define  MrotuvOperators        {"mrotuv"}
+#define  MrotuvbOperators       {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld", "outputarr"}
@@ -474,7 +476,8 @@ static MODULES Modules[] =
   { Mergegrid,      NULL,              MergegridOperators,      2,  1 },
   { Mergetime,      MergeHelp,         MergetimeOperators,     -1,  1 },
   { Merstat,        MerstatHelp,       MerstatOperators,        1,  1 },
-  { Mrotuv,         NULL,              MrotuvOperators,         2,  1 },
+  { Mrotuv,         NULL,              MrotuvOperators,         1,  2 },
+  { Mrotuvb,        NULL,              MrotuvbOperators,        2,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,          1,  0 },
   { Nmltest,        NULL,              NmltestOperators,        0,  0 },
   { Output,         OutputHelp,        OutputOperators,        -1,  0 },

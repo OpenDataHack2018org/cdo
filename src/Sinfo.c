@@ -302,11 +302,6 @@ void *Sinfo(void *argument)
 	  else if ( gridtype == GRID_CURVILINEAR )
 	    {
 	      fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
-	      if ( gridIsCyclic(gridID) )
-		{
-		  fprintf(stdout, "%*s", nbyte0, "");
-		  fprintf(stdout, "longitude :  cyclic\n");
-		}
 	      if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
 		{
 		  int i;
@@ -331,7 +326,10 @@ void *Sinfo(void *argument)
 		    }
 
 		  fprintf(stdout, "%*s", nbyte0, "");
-		  fprintf(stdout, "longitude : first = %.9g  last = %.9g\n", xfirst, xlast);
+		  fprintf(stdout, "longitude : first = %.9g  last = %.9g", xfirst, xlast);
+		  if ( gridIsCyclic(gridID) )
+		    fprintf(stdout, "  cyclic");
+		  fprintf(stdout, "\n");
 		  fprintf(stdout, "%*s", nbyte0, "");
 		  fprintf(stdout, "latitude  : first = %.9g  last = %.9g\n", yfirst, ylast);
 
