@@ -183,7 +183,7 @@ void *Filedes(void *argument)
 	{
 	  zaxisID = vlistZaxis(vlistID, index);
 	  type = zaxisInqType(zaxisID);
-	  if ( type == ZAXIS_HYBRID )
+	  if ( type == ZAXIS_HYBRID || type == ZAXIS_HYBRID_HALF )
 	    {
 	      int i, vctsize;
 	      const double *vct;

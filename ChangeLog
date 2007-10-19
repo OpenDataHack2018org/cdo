@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.0.8
 	* New module: yhourstat (yhour -min/-max/-sum/-mean/-avg/-std/-var) [request: Holger Goettel]
+	* New operator: mrotuv [request: Uwe Mikolajewicz]
 	* ymonstat: write original order of timesteps [report: Ileana Bladé]
 	* gradsdes: add GRIB level type to VARS [report: Ben-Jei Tsuang]
 	* sellonlatbox: support for curvilinear grids [request: Hannes Isaak Reuter]

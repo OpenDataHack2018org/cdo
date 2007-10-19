@@ -145,6 +145,55 @@ void rotate_uv(double *u_i, double *v_j, int ix, int iy,
 }
 
 
+void p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y,
+		  double *gridux, double *griduy, double *gridvx, double *gridvy)
+{
+  int i, j, jp1, ip1;
+
+  
+  /* interpolate scalar to u points */
+  for ( j = 0; j < nlat; j++ )
+    for ( i = 0; i < nlon; i++ )
+      {
+	ip1 = i + 1;
+	if ( ip1 > nlon-1 ) ip1 = 0;
+
+	gridux[IX2D(j,i,nlon)] = (grid1x[IX2D(j,i,nlon)]+grid1x[IX2D(j,ip1,nlon)])*0.5;
+	if ( (grid1x[IX2D(j,i,nlon)] > 340 && grid1x[IX2D(j,ip1,nlon)] <  20) ||
+             (grid1x[IX2D(j,i,nlon)] < 20  && grid1x[IX2D(j,ip1,nlon)] > 340) )
+	  {
+	    if ( gridux[IX2D(j,i,nlon)] < 180 )
+	      gridux[IX2D(j,i,nlon)] += 180;
+	    else
+	      gridux[IX2D(j,i,nlon)] -= 180;
+	  }
+	    
+	griduy[IX2D(j,i,nlon)] = (grid1y[IX2D(j,i,nlon)]+grid1y[IX2D(j,ip1,nlon)])*0.5;
+      }
+
+  
+  /* interpolate scalar to v points */
+  for ( j = 0; j < nlat; j++ )
+    for ( i = 0; i < nlon; i++ )
+      {
+	jp1 = j + 1;
+	if ( jp1 > nlat-1 ) jp1 = nlat-1;
+
+	gridvx[IX2D(j,i,nlon)] = (grid1x[IX2D(j,i,nlon)]+grid1x[IX2D(jp1,i,nlon)])*0.5;
+	if ( (grid1x[IX2D(j,i,nlon)] > 340 && grid1x[IX2D(jp1,i,nlon)] <  20) ||
+             (grid1x[IX2D(j,i,nlon)] < 20  && grid1x[IX2D(jp1,i,nlon)] > 340) )
+	  {
+	    if ( gridvx[IX2D(j,i,nlon)] < 180 )
+	      gridvx[IX2D(j,i,nlon)] += 180;
+	    else
+	      gridvx[IX2D(j,i,nlon)] -= 180;
+	  }
+	    
+	gridvy[IX2D(j,i,nlon)] = (grid1y[IX2D(j,i,nlon)]+grid1y[IX2D(jp1,i,nlon)])*0.5;
+      }
+}
+
+
 void *Mrotuv(void *argument)
 {
   static char func[] = "Mrotuv";
@@ -154,7 +203,7 @@ void *Mrotuv(void *argument)
   int varID, varid;
   int lid, nlevs, code;
   int nvars;
-  int gridID1, gridID2, gridID3;
+  int gridID1, gridID2, gridIDu, gridIDv;
   int gridsize, gridsizex;
   int nlon, nlat;
   int vlistID1, vlistID2, vlistID3;
@@ -166,8 +215,8 @@ void *Mrotuv(void *argument)
   double *ufield = NULL, *vfield = NULL;
   double **urfield = NULL, **vrfield = NULL;
   double *uhelp = NULL, *vhelp = NULL;
-  double *grid1x = NULL, *grid2x = NULL, *grid3x = NULL, *gxhelp = NULL;
-  double *grid1y = NULL, *grid2y = NULL, *grid3y = NULL, *gyhelp = NULL;
+  double *grid1x = NULL, *gridux = NULL, *gridvx = NULL, *gxhelp = NULL;
+  double *grid1y = NULL, *griduy = NULL, *gridvy = NULL, *gyhelp = NULL;
 
   cdoInitialize(argument);
 
@@ -219,8 +268,10 @@ void *Mrotuv(void *argument)
 
   grid1x  = (double *) malloc(gridsize*sizeof(double));
   grid1y  = (double *) malloc(gridsize*sizeof(double));
-  grid3x  = (double *) malloc(gridsize*sizeof(double));
-  grid3y  = (double *) malloc(gridsize*sizeof(double));
+  gridux  = (double *) malloc(gridsize*sizeof(double));
+  griduy  = (double *) malloc(gridsize*sizeof(double));
+  gridvx  = (double *) malloc(gridsize*sizeof(double));
+  gridvy  = (double *) malloc(gridsize*sizeof(double));
 
   gridsizex = (nlon+2)*nlat;
   gxhelp  = (double *) malloc(gridsizex*sizeof(double));
@@ -228,6 +279,22 @@ void *Mrotuv(void *argument)
 
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);
+
+  p_to_uv_grid(nlon, nlat, grid1x, grid1y, gridux, griduy, gridvx, gridvy);
+
+  gridIDu = gridCreate(GRID_CURVILINEAR, nlon*nlat);
+  gridDefPrec(gridIDu, gridInqPrec(gridID1));
+  gridDefXsize(gridIDu, nlon);
+  gridDefYsize(gridIDu, nlat);
+  gridDefXvals(gridIDu, gridux);
+  gridDefYvals(gridIDu, griduy);
+
+  gridIDv = gridCreate(GRID_CURVILINEAR, nlon*nlat);
+  gridDefPrec(gridIDv, gridInqPrec(gridID1));
+  gridDefXsize(gridIDv, nlon);
+  gridDefYsize(gridIDv, nlat);
+  gridDefXvals(gridIDv, gridvx);
+  gridDefYvals(gridIDv, gridvy);
 
   for ( i = 0; i < gridsize; i++ )
     {
@@ -239,11 +306,13 @@ void *Mrotuv(void *argument)
   for ( lid = 0; lid < nlevs; lid++ ) vlistDefFlag(vlistID1, uid, lid, TRUE);
   vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
+  vlistChangeVarGrid(vlistID2, 0, gridIDu);
 
   vlistClearFlag(vlistID1);
   for ( lid = 0; lid < nlevs; lid++ ) vlistDefFlag(vlistID1, vid, lid, TRUE);
   vlistID3 = vlistCreate();
   vlistCopyFlag(vlistID3, vlistID1);
+  vlistChangeVarGrid(vlistID3, 0, gridIDv);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
@@ -327,17 +396,21 @@ void *Mrotuv(void *argument)
 	    }
 
 	  /* interpolate on u/v points */
-	  for ( j = 0; j < nlat-1; j++ )
+	  for ( j = 0; j < nlat; j++ )
 	    for ( i = 0; i < nlon; i++ )
 	      {
 		ufield[IX2D(j,i,nlon)] = (uhelp[IX2D(j,i+1,nlon+2)]+uhelp[IX2D(j,i+2,nlon+2)])*0.5;
+	      }
+
+	  for ( j = 0; j < nlat-1; j++ )
+	    for ( i = 0; i < nlon; i++ )
+	      {
 		vfield[IX2D(j,i,nlon)] = (vhelp[IX2D(j,i+1,nlon+2)]+vhelp[IX2D(j+1,i+1,nlon+2)])*0.5;
 	      }
 
 	  for ( i = 0; i < nlon; i++ )
 	    {
-	      ufield[IX2D(nlat-1,i,nlon)] = 0;
-	      vfield[IX2D(nlat-1,i,nlon)] = 0;
+	      vfield[IX2D(nlat-1,i,nlon)] = vhelp[IX2D(nlat-1,i+1,nlon+2)];
 	    }
 
 	  streamDefRecord(streamID2, 0, levelID);
@@ -359,8 +432,10 @@ void *Mrotuv(void *argument)
   if ( vrfield ) free(vrfield);
   if ( uhelp   ) free(uhelp);
   if ( vhelp   ) free(vhelp);
-  if ( grid3x  ) free(grid3x);
-  if ( grid3y  ) free(grid3y);
+  if ( gridux  ) free(gridux);
+  if ( griduy  ) free(griduy);
+  if ( gridvx  ) free(gridvx);
+  if ( gridvy  ) free(gridvy);
 
   cdoFinish();
 
