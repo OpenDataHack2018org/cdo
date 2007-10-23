@@ -1,11 +1,14 @@
 CDO NEWS
 --------
 
-Version 1.0.9 (?? October 2007):
+Version 1.0.9 (22 October 2007):
 
    * New operators:
       o Multi-year hourly statistical values
          - yhourmin, yhourmax, yhoursum, yhourmean, yhouravg, yhourstd, yhourvar
+   * Changed operators:
+      o ymonstat: write original order of timesteps
+      o gradsdes: add GRIB level type to VARS
    * Fixed bugs:
       o Operator ifthen: bug fix for masks that varies not with time
 

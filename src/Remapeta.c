@@ -72,7 +72,7 @@ void *Remapeta(void *argument)
   double *single2;
   int taxisID1, taxisID2;
   int lhavevct;
-  int nlevh1 = 0, nlevh2 = 0, nlevh2p1;
+  int nlevh1 = 0, nlevh2 = 0;
   double *lev2;
   double *vct1 = NULL, *vct2 = NULL;
   double *a1 = NULL, *b1 = NULL, *a2 = NULL, *b2 = NULL;
@@ -132,7 +132,6 @@ void *Remapeta(void *argument)
       b2 = vct2 + i;
       nvct2 = 2*i;
       nlevh2 = i - 1;
-      nlevh2p1 = nlevh2 + 1;
 
       for ( i = 0; i < nlevh2+1; ++i )
 	vct2[i+nvct2/2] = vct2[i+maxvct/2];

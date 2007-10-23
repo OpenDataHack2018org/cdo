@@ -215,8 +215,8 @@ void *Mrotuv(void *argument)
   double *ufield = NULL, *vfield = NULL;
   double **urfield = NULL, **vrfield = NULL;
   double *uhelp = NULL, *vhelp = NULL;
-  double *grid1x = NULL, *gridux = NULL, *gridvx = NULL, *gxhelp = NULL;
-  double *grid1y = NULL, *griduy = NULL, *gridvy = NULL, *gyhelp = NULL;
+  double *grid1x = NULL, *gridux = NULL, *gridvx = NULL;
+  double *grid1y = NULL, *griduy = NULL, *gridvy = NULL;
 
   cdoInitialize(argument);
 
@@ -274,8 +274,6 @@ void *Mrotuv(void *argument)
   gridvy  = (double *) malloc(gridsize*sizeof(double));
 
   gridsizex = (nlon+2)*nlat;
-  gxhelp  = (double *) malloc(gridsizex*sizeof(double));
-  gyhelp  = (double *) malloc(gridsizex*sizeof(double));
 
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);

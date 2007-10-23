@@ -1,8 +1,9 @@
-2007-10-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2007-10-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.8
 	* New module: yhourstat (yhour -min/-max/-sum/-mean/-avg/-std/-var) [request: Holger Goettel]
 	* New operator: mrotuv [request: Uwe Mikolajewicz]
+	* New operator: varquot2test and meandiff2test [request: Irene Fischer-Bruns]
 	* ymonstat: write original order of timesteps [report: Ileana Bladé]
 	* gradsdes: add GRIB level type to VARS [report: Ben-Jei Tsuang]
 	* sellonlatbox: support for curvilinear grids [request: Hannes Isaak Reuter]
