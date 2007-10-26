@@ -9,7 +9,8 @@
 Let @file{ifile1} be a time series of daily minimum temperatures TN
 and @file{ifile2} be a corresponding series of daily surface snow
 amounts. Then counted is the number of days where TN < 0° Celsius
-and the surface snow amount is less than 1 cm.
+and the surface snow amount is less than 1 cm. The temperature TN
+must be given in units of Kelvin.
 The date information for a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription

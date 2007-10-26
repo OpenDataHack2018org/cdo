@@ -1,3 +1,8 @@
+2007-10-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gradsdes: bug fix for monthly mean data with start day > 28 [report: Renate Brokopf]
+	* Version 1.0.9.1 released
+	
 2007-10-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.8
