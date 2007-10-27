@@ -43,9 +43,10 @@ YY_DECL;
 %token <varnm>  VARIABLE
 %token <fname>  FUNCTION
 
-%left GE LE EQ NE '>' '<'
+%left GE LE EQ NE '>' '<' '='
 %left '+' '-'
-%left '*' '/'  '^'
+%left '*' '/'
+%right  '^'
 %nonassoc UMINUS
 
 %type <nPtr> stmt expr stmt_list

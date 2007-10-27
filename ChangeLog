@@ -1,6 +1,7 @@
-2007-10-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2007-10-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: bug fix for monthly mean data with start day > 28 [report: Renate Brokopf]
+	* expr: change exponent precedence from left to right (bug fix)[report: Claas Teichmann]
 	* Version 1.0.9.1 released
 	
 2007-10-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
