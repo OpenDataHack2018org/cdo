@@ -22,6 +22,10 @@
 */
 
 
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h" /* large file */
+#endif
+
 #include <string.h>
 
 #include "cdi.h"
@@ -72,7 +76,7 @@ void *Cat(void *argument)
 	      fclose(fp);
 	      fileExist = TRUE;
 	    }
-	  
+
 	  if ( fileExist )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
@@ -88,7 +92,7 @@ void *Cat(void *argument)
 	  else
 	    {
 	      if ( cdoVerbose )
-		cdoPrint("Output file does not exist, creating: %s", cdoStreamName(nfiles));
+		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles));
 
 	      streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 	      if ( streamID2 < 0 )
