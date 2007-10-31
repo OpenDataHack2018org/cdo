@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@ void *Diff(void *argument)
   int varID, recID;
   int gridsize;
   int gridID, zaxisID, code, vdate, vtime;
-  int nrecs;
+  int nrecs, nrecs2;
   int levelID;
   int tsID;
   int dsgn, zero;
@@ -86,16 +86,21 @@ void *Diff(void *argument)
   indg = 0;
   tsID = 0;
   taxisID = vlistInqTaxis(vlistID1);
-  while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
+  while ( TRUE )
     {
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
+      nrecs = streamInqTimestep(streamID1, tsID);
+      if ( nrecs > 0 )
+	{
+	  vdate = taxisInqVdate(taxisID);
+	  vtime = taxisInqVtime(taxisID);
 
-      decode_date(vdate, &year, &month, &day);
-      decode_time(vtime, &hour, &minute);
+	  decode_date(vdate, &year, &month, &day);
+	  decode_time(vtime, &hour, &minute);
+	}
 
-      nrecs = streamInqTimestep(streamID2, tsID);
-      if ( nrecs == 0 ) break;
+      nrecs2 = streamInqTimestep(streamID2, tsID);
+
+      if ( nrecs == 0 || nrecs2 == 0 ) break;
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -165,6 +170,10 @@ void *Diff(void *argument)
   if ( ndrec != nd2rec )
     fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
   /*  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec); */
+  if ( nrecs == 0 && nrecs2 > 0 )
+    cdoWarning("stream2 has more time steps than stream1!");
+  if ( nrecs > 0 && nrecs2 == 0 )
+    cdoWarning("stream1 has more time steps than stream2!");
 
   streamClose(streamID1);
   streamClose(streamID2);

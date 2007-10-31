@@ -1,6 +1,12 @@
+2008-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.0.9
+	* diff: check number of time steps
+	* Version 1.1.0 released
+
 2007-10-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* cat: bug fix for large existing output files (>2GB) [report: Heinz-Dieter Hollweg]
+	* cat: bug fix for large existing output files (>2GB) on 32-bit machines [report: Heinz-Dieter Hollweg]
 	* gradsdes: bug fix for monthly mean data with start day > 28 [report: Renate Brokopf]
 	* expr: change exponent precedence from left to right (bug fix)[report: Claas Teichmann]
 	* Version 1.0.9.1 released
