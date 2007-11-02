@@ -285,7 +285,7 @@ void *Remap(void *argument)
 	  else if ( strcmp(envstr, "none") == 0 )
 	    norm_opt = NORM_OPT_NONE;
 	  else
-	    cdoWarning("NORMALIZE_OPT=%s unsupported!\n", envstr);
+	    cdoWarning("NORMALIZE_OPT=%s unsupported!", envstr);
 	}
 
       if ( cdoVerbose )
@@ -440,7 +440,7 @@ void *Remap(void *argument)
 		}	      
 	    }
 
-	  if ( cdoVerbose && r >= 0 ) cdoPrint("Using remap %d\n", r);
+	  if ( cdoVerbose && r >= 0 ) cdoPrint("Using remap %d", r);
 
 	  if ( r < 0 )
 	    {

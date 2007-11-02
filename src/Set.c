@@ -116,6 +116,7 @@ void *Set(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
+  /* vlistPrint(vlistID2);*/
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
@@ -273,6 +274,7 @@ void *Set(void *argument)
 	  zaxisInqLevels(zaxisID2, levels);
 	  levels[0] = newlevel;
 	  zaxisDefLevels(zaxisID2, levels);
+	  /* printf("lev %d %g\n", nlevs, levels[0]); */
 	  vlistChangeZaxis(vlistID2, index, zaxisID2);
 	  free(levels);
 	}
@@ -293,6 +295,7 @@ void *Set(void *argument)
 	}
     }
 
+  /* vlistPrint(vlistID2);*/
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 

@@ -1,6 +1,7 @@
 2008-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.9
+	* Seltime: bug fix for input with time constant fields [report: Claas Teichmann]
 	* diff: check number of time steps
 	* Version 1.1.0 released
 

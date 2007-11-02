@@ -104,14 +104,14 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 	for ( i = 0; i < ngp; i++ )
 	  p->data[i+k*ngp] = p1->u.con.value + p2->data[i+k*ngp];
       break;
-    case '-':  cdoAbort("const - var not implemented"); break;
+    case '-':  cdoAbort("const - var not implemented!"); break;
     case '*':
       for ( k = 0; k < nlev; k++ )
 	for ( i = 0; i < ngp; i++ )
 	  p->data[i+k*ngp] = p1->u.con.value * p2->data[i+k*ngp];
       break;
-    case '/':  cdoAbort("const / var not implemented"); break;
-    case '^':  cdoAbort("const ^ var not implemented"); break;
+    case '/':  cdoAbort("const / var not implemented!"); break;
+    case '^':  cdoAbort("const ^ var not implemented!"); break;
     default:
       cdoAbort("%s: operator %c unsupported!", func, oper);
     }
@@ -575,7 +575,7 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 
 	  if ( varID == nvars )
 	    {
-	      cdoAbort("variable >%s< not found!\n", p->u.var.nm);
+	      cdoAbort("variable >%s< not found!", p->u.var.nm);
 	    }
 	  else
 	    {
@@ -668,7 +668,7 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 
 	      if ( varID == nvars )
 		{
-		  cdoAbort("variable >%s< not found!\n", p->u.opr.op[0]->u.var.nm);
+		  cdoAbort("variable >%s< not found!", p->u.opr.op[0]->u.var.nm);
 		}
 	      else
 		{

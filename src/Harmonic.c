@@ -185,7 +185,7 @@ void *Harmonic(void *argument)
   if ( nts%n )
     {
       cdoAbort("The length of first harmonic (=%d)"
-	       " does not divide the number of timesteps (=%d)!\n", n, nts);
+	       " does not divide the number of timesteps (=%d)!", n, nts);
     }
 
   for ( j = 0; j < n_out && 2*(j+1) < n; j++ )

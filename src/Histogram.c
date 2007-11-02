@@ -105,7 +105,7 @@ void *Histogram(void *argument)
       zaxisID = vlistZaxis(vlistID1, index);
       nlevel = zaxisInqSize(zaxisID);
       if ( nlevel > 1 )
-	cdoAbort("Found 3D field with %d levels. Only 2D fields allowed!\n", nlevel);
+	cdoAbort("Found 3D field with %d levels. Only 2D fields allowed!", nlevel);
       vlistChangeZaxisIndex(vlistID2, index, zaxisID2);
     }
 

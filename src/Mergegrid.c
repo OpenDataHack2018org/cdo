@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -64,10 +64,10 @@ static void gen_index(int gridID1, int gridID2, int *index)
       nlat2 = gridInqYsize(gridID2);
 
       if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
-	cdoAbort("Grid 1 has no values");
+	cdoAbort("Grid 1 has no values!");
 
       if ( ! (gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)) )
-	cdoAbort("Grid 2 has no values");
+	cdoAbort("Grid 2 has no values!");
 
       xvals1 = (double *) malloc(nlon1*sizeof(double));
       yvals1 = (double *) malloc(nlat1*sizeof(double));
@@ -144,7 +144,7 @@ static void gen_index(int gridID1, int gridID2, int *index)
       free(yvals2);
     }
   else
-    cdoAbort("Data on %s grid unsupported!\n", gridNamePtr(gridtype1));
+    cdoAbort("Data on %s grid unsupported!", gridNamePtr(gridtype1));
 }
 
 
@@ -188,14 +188,14 @@ void *Mergegrid(void *argument)
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s", cdoStreamName(0));
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0));
 
   ndiffgrids = 0;
   for ( index = 1; index < vlistNgrids(vlistID2); index++ )
     if ( vlistGrid(vlistID2, 0) != vlistGrid(vlistID2, index))
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s", cdoStreamName(1));
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(1));
 
   gridID1 = vlistGrid(vlistID1, 0);
   gridID2 = vlistGrid(vlistID2, 0);

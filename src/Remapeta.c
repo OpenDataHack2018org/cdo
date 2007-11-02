@@ -172,10 +172,10 @@ void *Remapeta(void *argument)
 	      }
 
 	    if ( minval < -100000 || maxval > 100000 )
-	      cdoWarning("Orography out of range (min=%g max=%g)!\n", minval, maxval);
+	      cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 
 	    if ( minval < -1.e10 || maxval > 1.e10 )
-	      cdoAbort("Orography out of range!\n");
+	      cdoAbort("Orography out of range!");
 	  }
 
 	  streamClose(streamID1); 
@@ -389,7 +389,7 @@ void *Remapeta(void *argument)
 	cdoAbort("Surface pressure not found!");
     }
 
-  if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d\n", nvars3D, ltq);
+  if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, ltq);
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -458,10 +458,10 @@ void *Remapeta(void *argument)
 	      }
 
 	    if ( minval < 20000 || maxval > 150000 )
-	      cdoWarning("Surface pressure out of range (min=%g max=%g)!\n", minval, maxval);
+	      cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	    if ( minval < -1.e10 || maxval > 1.e10 )
-	      cdoAbort("Surface pressure out of range!\n");
+	      cdoAbort("Surface pressure out of range!");
 	  }
 	  /* check range of geop */
 	  {
@@ -474,10 +474,10 @@ void *Remapeta(void *argument)
 	      }
 
 	    if ( minval < -100000 || maxval > 100000 )
-	      cdoWarning("Orography out of range (min=%g max=%g)!\n", minval, maxval);
+	      cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 
 	    if ( minval < -1.e10 || maxval > 1.e10 )
-	      cdoAbort("Orography out of range!\n");
+	      cdoAbort("Orography out of range!");
 	  }
 	}
 

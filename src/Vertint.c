@@ -385,7 +385,7 @@ void *Vertint(void *argument)
 	      }
 
 	    if ( minval < 20000 || maxval > 150000 )
-	      cdoWarning("surface pressure out of range (min=%g max=%g)\n", minval, maxval);
+	      cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 	  }
 
 	  presh(full_press, half_press, vct, ps_prog, nhlev, ngp);

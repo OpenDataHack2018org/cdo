@@ -66,6 +66,7 @@ void *Seltime(void *argument)
   int gridsize;
   int status;
   int nmiss;
+  int lnts1;
   int ncts = 0, nts, it;
   int *selfound = NULL;
   int year, month, day, hour, minute;
@@ -77,6 +78,7 @@ void *Seltime(void *argument)
   LIST *flist = listNew(FLT_LIST);
   int gridID;
   int nvars, nlevel;
+  int nconst, lconstout = FALSE;
   int process_nts1 = FALSE, process_nts2 = FALSE;
   int *vdate_list = NULL, *vtime_list = NULL;
   double missval;
@@ -192,7 +194,6 @@ void *Seltime(void *argument)
 	      else
 		{
 		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d", &year, &month, &day, &hour, &minute);
-		  /* fprintf(stderr, "status = %d\n", status); */
 		  fval = encode_time(hour, minute);
 		  if ( fabs(fval) > 0 ) fval /= 10000;
 		  fval += encode_date(year, month, day);
@@ -241,7 +242,7 @@ void *Seltime(void *argument)
       if ( nsel > 3 ) cdoAbort("Too many parameters");
 
       if ( cdoVerbose )
-	cdoPrint("mon=%d  nts1=%d  nts2=%d\n", intarr[0], nts1, nts2);
+	cdoPrint("mon=%d  nts1=%d  nts2=%d", intarr[0], nts1, nts2);
 
       nsel = 1;
     }
@@ -284,11 +285,24 @@ void *Seltime(void *argument)
     }
 
   nvars = vlistNvars(vlistID1);
+  nconst = 0;
+  for ( varID = 0; varID < nvars; varID++ )
+    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) nconst++;
       
-  if ( operatorID == SELSMON && nts1 )
+  lnts1 = operatorID == SELSMON && nts1 > 0;
+
+  if ( lnts1 || nconst )
     {
-      vdate_list = (int *) malloc(nts1*sizeof(int));
-      vtime_list = (int *) malloc(nts1*sizeof(int));
+      if ( lnts1 )
+	{
+	  vdate_list = (int *) malloc(nts1*sizeof(int));
+	  vtime_list = (int *) malloc(nts1*sizeof(int));
+	}
+      else
+	{
+	  nts1 = 1;
+	}
+
       vars  = (FIELD ***) malloc(nts1*sizeof(FIELD **));
 
       for ( tsID = 0; tsID < nts1; tsID++ )
@@ -297,18 +311,21 @@ void *Seltime(void *argument)
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      gridID  = vlistInqVarGrid(vlistID1, varID);
-	      missval = vlistInqVarMissval(vlistID1, varID);
-	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      gridsize = gridInqSize(gridID);
-
-	      vars[tsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
-
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
+	      if ( lnts1 || (vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT) )
 		{
-		  vars[tsID][varID][levelID].grid    = gridID;
-		  vars[tsID][varID][levelID].missval = missval;
-		  vars[tsID][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  gridID  = vlistInqVarGrid(vlistID1, varID);
+		  missval = vlistInqVarMissval(vlistID1, varID);
+		  nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		  gridsize = gridInqSize(gridID);
+		  
+		  vars[tsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
+
+		  for ( levelID = 0; levelID < nlevel; levelID++ )
+		    {
+		      vars[tsID][varID][levelID].grid    = gridID;
+		      vars[tsID][varID][levelID].missval = missval;
+		      vars[tsID][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		    }
 		}
 	    }
 	}
@@ -386,41 +403,37 @@ void *Seltime(void *argument)
 
       if ( copytimestep || copy_nts2 )
 	{
-	  /*
-	  printf("%d %04d %d %d %d %d %d\n", vdate, vtime, its2, nts2, copytimestep, copy_nts2, ncts);
-	  */
-	  if ( operatorID == SELSMON )
-	    if ( ncts == 0 && nts1 > 0 )
-	      {
-		nts = nts1;
-		if ( its1 < nts1 )
-		  {
-		    nts = its1;
-		    cdoWarning("%d timesteps missing before month %d!", nts1-its1, intarr[0]);
-		  }
+	  if ( lnts1 && ncts == 0 )
+	    {
+	      nts = nts1;
+	      if ( its1 < nts1 )
+		{
+		  nts = its1;
+		  cdoWarning("%d timesteps missing before month %d!", nts1-its1, intarr[0]);
+		}
 
-		for ( it = 0; it < nts; it++ )
-		  {
-		    taxisDefVdate(taxisID2, vdate_list[it]);
-		    taxisDefVtime(taxisID2, vtime_list[it]);
-		    streamDefTimestep(streamID2, tsID2++);
+	      for ( it = 0; it < nts; it++ )
+		{
+		  taxisDefVdate(taxisID2, vdate_list[it]);
+		  taxisDefVtime(taxisID2, vtime_list[it]);
+		  streamDefTimestep(streamID2, tsID2++);
+		  
+		  for ( varID = 0; varID < nvars; varID++ )
+		    {
+		      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT && tsID2 > 1 ) continue;
+		      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      for ( levelID = 0; levelID < nlevel; levelID++ )
+			{
+			  streamDefRecord(streamID2, varID, levelID);
+			  single = vars[it][varID][levelID].ptr;
+			  nmiss  = vars[it][varID][levelID].nmiss;
+			  streamWriteRecord(streamID2, single, nmiss);
+			}
+		    }
+		}
 
-		    for ( varID = 0; varID < nvars; varID++ )
-		      {
-			nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-			for ( levelID = 0; levelID < nlevel; levelID++ )
-			  {
-			    streamDefRecord(streamID2, varID, levelID);
-			    single =  vars[it][varID][levelID].ptr;
-			    nmiss  =  vars[it][varID][levelID].nmiss;
-
-			    streamWriteRecord(streamID2, single, nmiss);
-			  }
-		      }
-		  }
-
-		its1 = 0;
-	      }
+	      its1 = 0;
+	    }
 
 	  ncts++;
 	  if ( process_nts2 == FALSE )
@@ -432,6 +445,26 @@ void *Seltime(void *argument)
 	  taxisCopyTimestep(taxisID2, taxisID1);
 
 	  streamDefTimestep(streamID2, tsID2++);
+
+	  if ( tsID > 0 && lconstout )
+	    {
+	      lconstout = FALSE;
+	      nts = nts1 - 1;
+	      for ( varID = 0; varID < nvars; varID++ )
+		{
+		  if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT )
+		    {
+		      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      for ( levelID = 0; levelID < nlevel; levelID++ )
+			{
+			  streamDefRecord(streamID2, varID, levelID);
+			  single = vars[nts][varID][levelID].ptr;
+			  nmiss  = vars[nts][varID][levelID].nmiss;
+			  streamWriteRecord(streamID2, single, nmiss);
+			}
+		    }
+		}
+	    }
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
@@ -452,43 +485,52 @@ void *Seltime(void *argument)
 	{
 	  ncts = 0;
 
-	  if ( operatorID == SELSMON && nts1 > 0 )
+	  if ( lnts1 || tsID == 0 )
 	    {
+	      if ( tsID == 0 && nconst && (!lnts1) ) lconstout = TRUE;
+
 	      nts = nts1-1;
-	      if ( its1 <= nts )
-		nts = its1;
-	      else
-		for ( it = 0; it < nts; it++ )
-		  {
-		    vdate_list[it] = vdate_list[it+1];
-		    vtime_list[it] = vtime_list[it+1];
-		    for ( varID = 0; varID < nvars; varID++ )
+	      if ( lnts1 )
+		{
+		  if ( its1 <= nts )
+		    nts = its1;
+		  else
+		    for ( it = 0; it < nts; it++ )
 		      {
-			gridID   = vlistInqVarGrid(vlistID1, varID);
-			gridsize = gridInqSize(gridID);
-			nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-			for ( levelID = 0; levelID < nlevel; levelID++ )
+			vdate_list[it] = vdate_list[it+1];
+			vtime_list[it] = vtime_list[it+1];
+			for ( varID = 0; varID < nvars; varID++ )
 			  {
-			    memcpy(vars[it][varID][levelID].ptr,
-				   vars[it+1][varID][levelID].ptr,
-				   gridsize*sizeof(double));
-			    vars[it][varID][levelID].nmiss = vars[it+1][varID][levelID].nmiss;
+			    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+			    gridID   = vlistInqVarGrid(vlistID1, varID);
+			    gridsize = gridInqSize(gridID);
+			    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+			    for ( levelID = 0; levelID < nlevel; levelID++ )
+			      {
+				memcpy(vars[it][varID][levelID].ptr,
+				       vars[it+1][varID][levelID].ptr,
+				       gridsize*sizeof(double));
+				vars[it][varID][levelID].nmiss = vars[it+1][varID][levelID].nmiss;
+			      }
 			  }
 		      }
-		  }
 
-	      vdate_list[nts] = taxisInqVdate(taxisID1);
-	      vtime_list[nts] = taxisInqVtime(taxisID1);
+		  vdate_list[nts] = taxisInqVdate(taxisID1);
+		  vtime_list[nts] = taxisInqVtime(taxisID1);
+
+		  its1++;
+		}
 
 	      for ( recID = 0; recID < nrecs; recID++ )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
-		  single =  vars[nts][varID][levelID].ptr;
-		  streamReadRecord(streamID1, single, &nmiss);
-		  vars[nts][varID][levelID].nmiss = nmiss;
+		  if ( lnts1 || (vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT) )
+		    {
+		      single = vars[nts][varID][levelID].ptr;
+		      streamReadRecord(streamID1, single, &nmiss);
+		      vars[nts][varID][levelID].nmiss = nmiss;
+		    }
 		}
-
-	      its1++;
 	    }
 	}
        
@@ -550,18 +592,21 @@ void *Seltime(void *argument)
 
   listDelete(ilist);
 
-  if ( operatorID == SELSMON && nts1 )
+  if ( lnts1 || nconst )
     {
       for ( tsID = 0; tsID < nts1; tsID++ )
 	{
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		if ( vars[tsID][varID][levelID].ptr )
-		  free(vars[tsID][varID][levelID].ptr);
+	      if ( lnts1 || (vlistInqVarTime(vlistID2, varID) == TIME_CONSTANT) )
+		{
+		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+		  for ( levelID = 0; levelID < nlevel; levelID++ )
+		    if ( vars[tsID][varID][levelID].ptr )
+		      free(vars[tsID][varID][levelID].ptr);
 
-	      free(vars[tsID][varID]);
+		  free(vars[tsID][varID]);
+		}
 	    }
 	  free(vars[tsID]);
 	}
@@ -570,6 +615,8 @@ void *Seltime(void *argument)
       if ( vdate_list ) free(vdate_list);
       if ( vtime_list ) free(vtime_list);
     }
+
+  vlistDestroy(vlistID2);
 
   cdoFinish();
 

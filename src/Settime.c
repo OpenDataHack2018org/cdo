@@ -214,7 +214,7 @@ void *Settime(void *argument)
   dpy = calendar_dpy(calendar);
 
   if ( cdoVerbose )
-    cdoPrint("calendar = %d;  dpy = %d\n", calendar, dpy);
+    cdoPrint("calendar = %d;  dpy = %d", calendar, dpy);
 
   if ( operatorID == SETREFTIME )
     {
@@ -336,7 +336,7 @@ void *Settime(void *argument)
 	      julval += ijulinc;
 	      decode_julval(dpy, julval, &vdate, &vtime);
 	      if ( cdoVerbose )
-		cdoPrint("julval, ijulinc, vdate, vtime: %g %d %d %d\n",
+		cdoPrint("julval, ijulinc, vdate, vtime: %g %d %d %d",
 			 julval, ijulinc, vdate, vtime);
 	    }
 	}

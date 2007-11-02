@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -122,7 +122,7 @@ void *Input(void *argument)
 	  if ( nrecs == 0 )
 	    array = (double *) malloc(gridsize*sizeof(double));
 	  
-	  cdoPrint("Enter all %d elements of record %d!\n", gridsize, nrecs+1);
+	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(gridsize, array);
 
@@ -138,7 +138,7 @@ void *Input(void *argument)
 	  output_filetype = FILETYPE_EXT;
 
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
-		   " of record %d (or EOF(=^D))!\n", nrecs+1);
+		   " of record %d (or EOF(=^D))!", nrecs+1);
 
 	  rval = input_iarray(4, ihead);
 	  if ( feof(stdin) && nrecs == 0 )
@@ -160,7 +160,7 @@ void *Input(void *argument)
 	      gridsize0 = gridsize;
 
 	      if ( gridsize < 0 )
-		cdoAbort("Gridsize must not be negative!\n", gridsize);
+		cdoAbort("Gridsize must not be negative!", gridsize);
 
 	      array = (double *) malloc(gridsize*sizeof(double));
 
@@ -172,7 +172,7 @@ void *Input(void *argument)
 		cdoAbort("Gridsize must not change!");
 	    }
 	  
-	  cdoPrint("Enter all %d elements of record %d!\n", gridsize, nrecs+1);
+	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(gridsize, array);
 	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
@@ -182,7 +182,7 @@ void *Input(void *argument)
 	  output_filetype = FILETYPE_SRV;
 	  
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
-		   " of record %d (or EOF(=^D))!\n", nrecs+1);
+		   " of record %d (or EOF(=^D))!", nrecs+1);
 
 	  rval = input_iarray(8, ihead);
 	  if ( feof(stdin) && nrecs == 0 )
@@ -206,7 +206,7 @@ void *Input(void *argument)
 	      gridsize0 = gridsize;
 	  
 	      if ( gridsize < 0 )
-		cdoAbort("Gridsize must not be negative!\n", gridsize);
+		cdoAbort("Gridsize must not be negative!", gridsize);
 
 	      array = (double *) malloc(gridsize*sizeof(double));
 
@@ -220,7 +220,7 @@ void *Input(void *argument)
 		cdoAbort("Gridsize must not change!");
 	    }
 	  
-	  cdoPrint("Enter all %d elements of record %d!\n", gridsize, nrecs+1);
+	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
 	  rval = input_darray(gridsize, array);
 	  if ( rval != gridsize ) cdoAbort("Invalid data input!");

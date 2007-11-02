@@ -245,8 +245,11 @@ void *Filedes(void *argument)
 	  tableID  = vlistInqVarTable(vlistID, varID);
 	  tabnum   = tableInqNum(tableID);
 	  vlistInqVarName(vlistID, varID, varname);
+	  /* printf("1>%s<\n", varname); */
 	  vlistInqVarStdname(vlistID, varID, varstdname);
+	  /* printf("2>%s<\n", varname); */
 	  vlistInqVarLongname(vlistID, varID, varlongname);
+	  /* printf("3>%s<\n", varname); */
 	  vlistInqVarUnits(vlistID, varID, varunits);
 
 	  prec = vlistInqVarDatatype(vlistID, varID);
