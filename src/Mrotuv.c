@@ -238,7 +238,7 @@ void *Mrotuv(void *argument)
       if ( nvars == 2 )
 	{
 	  uid = 0;
-	  uid = 1;
+	  vid = 1;
 	}
       else
 	cdoAbort("U and V not found in %s",  cdoStreamName(0));

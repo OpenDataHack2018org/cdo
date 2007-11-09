@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -44,6 +44,8 @@ void *Fldstat(void *argument)
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridID2, lastgrid = -1;
+  int wstatus = FALSE;
+  int code = 0, oldcode = 0;
   int index, ngrids;
   int recID, nrecs;
   int tsID, varID, levelID;
@@ -140,8 +142,12 @@ void *Fldstat(void *argument)
 	  if ( needWeights && field.grid != lastgrid )
 	    {
 	      lastgrid = field.grid;
-	      if ( needWeights ) gridWeights(field.grid, field.weight);
+	      wstatus = gridWeights(field.grid, field.weight);
 	    }
+	  code = vlistInqVarCode(vlistID1, varID);
+	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
+	    cdoWarning("Using constant area weights for code %d!", oldcode=code);
+
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
 	  /* RQ */

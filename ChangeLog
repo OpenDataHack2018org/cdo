@@ -3,6 +3,7 @@
 	* using CDI library version 1.0.9
 	* Seltime: bug fix for input with time constant fields [report: Claas Teichmann]
 	* diff: check number of time steps
+	* gridWeights: warning with code number when using constant area weights
 	* Version 1.1.0 released
 
 2007-10-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

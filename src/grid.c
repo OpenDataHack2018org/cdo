@@ -1866,9 +1866,10 @@ void defineGrid(const char *gridarg)
 }
 
 
-void gridWeights(int gridID, double *weights)
+int gridWeights(int gridID, double *weights)
 {
   static char func[] = "gridWeights";
+  int status = FALSE;
   int i, j, len;
 
   len = gridInqSize(gridID);
@@ -1966,9 +1967,11 @@ void gridWeights(int gridID, double *weights)
 	}
       else
 	{
-	  cdoWarning("Using constant area weights!");
+	  status = TRUE;
 
 	  for ( i = 0; i < len; i++ ) weights[i] = 1;
 	}
     }
+
+  return (status);
 }
