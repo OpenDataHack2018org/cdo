@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 #define  CDI_UNDEFID             -1
+#define  CDI_GLOBAL              -1   /* Global var ID for vlist  */
 
 /* Byte order */
 
@@ -16,6 +17,7 @@ extern "C" {
 
 /* Error identifier */
 
+#define	 CDI_NOERR        	  0   /* No Error                         */
 #define  CDI_ESYSTEM            -10   /* Operating system error           */
 #define  CDI_EINVAL             -20   /* Invalid argument                 */
 #define  CDI_EUFTYPE            -21   /* Unsupported file type            */
@@ -25,7 +27,7 @@ extern "C" {
 /* File types */
 
 #define  FILETYPE_GRB             1   /* File type GRIB                   */
-#define  FILETYPE_G2              2   /* File type GRIB version 2         */
+#define  FILETYPE_GB2             2   /* File type GRIB version 2         */
 #define  FILETYPE_NC              3   /* File type netCDF                 */
 #define  FILETYPE_NC2             4   /* File type netCDF version 2       */
 #define  FILETYPE_SRV             5   /* File type SERVICE                */
@@ -38,7 +40,7 @@ extern "C" {
 #define  COMPRESS_GZIP            2
 #define  COMPRESS_BZIP2           3
 
-/* Data types */
+/* external data types */
 
 #define  DATATYPE_PACK            0
 #define  DATATYPE_PACK1           1
@@ -79,6 +81,13 @@ extern "C" {
 #define  DATATYPE_INT16         216
 #define  DATATYPE_INT32         232
 
+/* internal data types */
+
+#define  DATATYPE_INT           251
+#define  DATATYPE_FLT           252
+#define  DATATYPE_TXT           253
+
+
 /* GRID types */
 
 #define  GRID_GENERIC             1
@@ -91,6 +100,7 @@ extern "C" {
 #define  GRID_TRAJECTORY          8
 #define  GRID_CELL                9
 #define  GRID_CURVILINEAR        10
+#define  GRID_LAMBERT            11
 
 /* ZAXIS types */
 
@@ -276,7 +286,6 @@ void    vlistDefInstitut(int vlistID, int instID);
 int     vlistInqInstitut(int vlistID);
 void    vlistDefModel(int vlistID, int modelID);
 int     vlistInqModel(int vlistID);
-void    vlistDefAttribute(int vlistID, const char *attname, const char *attstring);
 
 
 /* VLIST VAR routines */
@@ -359,6 +368,23 @@ int     vlistFlagVar(int vlistID, int varID);
 int     vlistFlagLevel(int vlistID, int varID, int levelID);
 int     vlistFindVar(int vlistID, int fvarID);
 int     vlistFindLevel(int vlistID, int fvarID, int flevelID);
+
+
+/* VLIST attributes */
+
+int     vlistInqNatts(int vlistID, int varID, int *nattsp);
+
+int     vlistInqAttr(int vlistID, int varID, int attrnum, char *name, int *typep, int *lenp);
+
+int     vlistDelAttr(int vlistID, int varID, const char *name);
+
+int     vlistDefAttrInt(int vlistID, int varID, const char *name, int len, const int *ip);
+int     vlistDefAttrFlt(int vlistID, int varID, const char *name, int len, const double *dp);
+int     vlistDefAttrTxt(int vlistID, int varID, const char *name, int len, const char *tp);
+
+int     vlistInqAttrInt(int vlistID, int varID, const char *name, int mlen, int *ip);
+int     vlistInqAttrFlt(int vlistID, int varID, const char *name, int mlen, double *dp);
+int     vlistInqAttrTxt(int vlistID, int varID, const char *name, int mlen, char *tp);
 
 
 /* GRID routines */
@@ -489,6 +515,12 @@ int     gridInqGMEni2(int gridID);
 void    gridDefGMEni2(int gridID, int ni2);
 int     gridInqGMEni3(int gridID);
 void    gridDefGMEni3(int gridID, int ni3);
+
+/* Lambert grid */
+void gridDefLambert(int gridID, double originLon, double originLat, double lonParY,
+		    double lat1, double lat2, double xinc, double yinc);
+void gridInqLambert(int gridID, double *originLon, double *originLat, double *lonParY,
+		    double *lat1, double *lat2, double *xinc, double *yinc);
 
 void    gridDefArea(int gridID, double *area);
 void    gridInqArea(int gridID, double *area);

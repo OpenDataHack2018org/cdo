@@ -851,7 +851,9 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 		}
 	    }
 	}
-      vlistDefAttribute(vlistID, "CDO", cdoComment());
+
+      vlistDefAttrTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
+
       if ( cdoTimer ) timer_start(timer_write);
       streamDefVlist(pstreamptr->fileID, vlistID);
       if ( cdoTimer ) timer_stop(timer_write);

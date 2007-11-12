@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,41 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+
+
+static
+void printAtts(int vlistID, int varID)
+{
+  int natts, ia;
+  char attrname[1024];
+  int attrtype, attrlen;
+  char attrtxt[8192];
+  int attrint;
+  double attrflt;
+
+  vlistInqNatts(vlistID, varID, &natts);
+
+  for ( ia = 0; ia < natts; ++ia )
+    {
+      vlistInqAttr(vlistID, varID, ia, attrname, &attrtype, &attrlen);
+      if ( attrtype == DATATYPE_INT )
+	{
+	  vlistInqAttrInt(vlistID, varID, attrname, 1, &attrint);
+	  fprintf(stdout, "  ATTR_INT=\"%s=%d\"\n", attrname, attrint);
+	}
+      else if ( attrtype == DATATYPE_FLT )
+	{
+	  vlistInqAttrFlt(vlistID, varID, attrname, 1, &attrflt);
+	  fprintf(stdout, "  ATTR_FLT=\"%s=%g\"\n", attrname, attrflt);
+
+	}
+      else if ( attrtype == DATATYPE_TXT )
+	{
+	  vlistInqAttrTxt(vlistID, varID, attrname, sizeof(attrtxt), attrtxt);
+	  fprintf(stdout, "  ATTR_TXT=\"%s=%s\"\n", attrname, attrtxt);
+	}
+    }
+}
 
 
 void *Filedes(void *argument)
@@ -233,7 +268,18 @@ void *Filedes(void *argument)
       int varID, code, tabnum, tableID, prec;
       char pstr[4];
       char varname[128], varlongname[128], varstdname[128], varunits[128];
+      /*
+      int natts;
 
+      vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+      if ( natts > 0 )
+	{
+	  fprintf(stdout, "&PARAMETER\n");
+	  fprintf(stdout, "  NAME=_GLOBAL_\n");
+	  printAtts(vlistID, CDI_GLOBAL);
+	  fprintf(stdout, "/\n");
+	}
+      */
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  fprintf(stdout, "&PARAMETER\n");
