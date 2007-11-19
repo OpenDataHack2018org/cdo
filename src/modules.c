@@ -78,6 +78,7 @@ void *Merge(void *argument);
 void *Mergegrid(void *argument);
 void *Mergetime(void *argument);
 void *Merstat(void *argument);
+void *Monarith(void *argument);
 void *Mrotuv(void *argument);
 void *Mrotuvb(void *argument);
 void *Ninfo(void *argument);
@@ -261,16 +262,19 @@ void *Wct(void *argument);
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
-#define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", "cos", "tan", "asin", "acos", "atan"}
+#define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", \
+                                 "cos", "tan", "asin", "acos", "atan"}
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}
 #define  MerstatOperators       {"mermin", "mermax", "mersum", "mermean", "meravg", "mervar", "merstd", "merpctl"}
+#define  MonarithOperators      {"monadd", "monsub", "monmul", "mondiv"}
 #define  MrotuvOperators        {"mrotuv"}
 #define  MrotuvbOperators       {"mrotuvb"}
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
-#define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", "outputfld", "outputarr"}
+#define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
+                                 "outputfld", "outputarr"}
 #define  OutputgmtOperators     {"outputcenter", "outputcentercpt", "outputbounds", "outputboundscpt", "outputvector"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RemapOperators         {"remap"}
@@ -293,7 +297,8 @@ void *Wct(void *argument);
                                  "selzaxis", "selzaxisname", "seltabnum", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}
-#define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", "seltime", "selsmon"}
+#define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
+                                 "seltime", "selsmon"}
 #define  SetOperators           {"setpartab", "setpartabv", "setcode", "setname", "setlevel", "setltype"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
@@ -476,6 +481,7 @@ static MODULES Modules[] =
   { Mergegrid,      NULL,              MergegridOperators,      2,  1 },
   { Mergetime,      MergeHelp,         MergetimeOperators,     -1,  1 },
   { Merstat,        MerstatHelp,       MerstatOperators,        1,  1 },
+  { Monarith,       MonarithHelp,      MonarithOperators,       2,  1 },
   { Mrotuv,         NULL,              MrotuvOperators,         1,  2 },
   { Mrotuvb,        NULL,              MrotuvbOperators,        2,  1 },
   { Ninfo,          NinfoHelp,         NinfoOperators,          1,  0 },

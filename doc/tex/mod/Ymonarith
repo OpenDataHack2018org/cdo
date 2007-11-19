@@ -19,37 +19,37 @@ by a call of the module @mod{YMONSTAT}.
 
 
 @BeginOperator_ymonadd
-@Title     = Add multi-year monthly time average
+@Title     = Add multi-year monthly time series
 
 @BeginDescription
-Adds a time series and a multi-year monthly time average.
+Adds a time series and a multi-year monthly time series.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_ymonsub
-@Title     = Subtract multi-year monthly time average
+@Title     = Subtract multi-year monthly time series
 
 @BeginDescription
-Subtracts a time series and a multi-year monthly time average.
+Subtracts a time series and a multi-year monthly time series.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_ymonmul
-@Title     = Multiply multi-year monthly time average
+@Title     = Multiply multi-year monthly time series
 
 @BeginDescription
-Multiplies a time series and a multi-year monthly time average.
+Multiplies a time series and a multi-year monthly time series.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_ymondiv
-@Title     = Divide multi-year monthly time average
+@Title     = Divide multi-year monthly time series
 
 @BeginDescription
-Divides a time series and a multi-year monthly time average.
+Divides a time series and a multi-year monthly time series.
 @EndDescription
 @EndOperator
 

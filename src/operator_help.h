@@ -1143,6 +1143,33 @@ static char *ArithHelp[] = {
     NULL
 };
 
+static char *MonarithHelp[] = {
+    "NAME",
+    "    monadd, monsub, monmul, mondiv - Monthly arithmetic",
+    "",
+    "SYNOPSIS",
+    "    <operator>  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    This module performs simple arithmetic of a time series and a",
+    "    time step with the same month and year. For each field in ifile1",
+    "    the corresponding field of the time step in ifile2 with the",
+    "    same month and year is used. The header information in ifile1",
+    "    must be the same as in ifile2. Usually ifile2 is generated",
+    "    by a call of the module MONSTAT.",
+    "",
+    "OPERATORS",
+    "    monadd  Add monthly time series",
+    "            Adds a time series and a monthly time series.",
+    "    monsub  Subtract monthly time series",
+    "            Subtracts a time series and a monthly time series.",
+    "    monmul  Multiply monthly time series",
+    "            Multiplies a time series and a monthly time series.",
+    "    mondiv  Divide monthly time series",
+    "            Divides a time series and a monthly time series.",
+    NULL
+};
+
 static char *YmonarithHelp[] = {
     "NAME",
     "    ymonadd, ymonsub, ymonmul, ymondiv - Multi-year monthly arithmetic",
@@ -1159,14 +1186,14 @@ static char *YmonarithHelp[] = {
     "    by a call of the module YMONSTAT.",
     "",
     "OPERATORS",
-    "    ymonadd  Add multi-year monthly time average",
-    "             Adds a time series and a multi-year monthly time average.",
-    "    ymonsub  Subtract multi-year monthly time average",
-    "             Subtracts a time series and a multi-year monthly time average.",
-    "    ymonmul  Multiply multi-year monthly time average",
-    "             Multiplies a time series and a multi-year monthly time average.",
-    "    ymondiv  Divide multi-year monthly time average",
-    "             Divides a time series and a multi-year monthly time average.",
+    "    ymonadd  Add multi-year monthly time series",
+    "             Adds a time series and a multi-year monthly time series.",
+    "    ymonsub  Subtract multi-year monthly time series",
+    "             Subtracts a time series and a multi-year monthly time series.",
+    "    ymonmul  Multiply multi-year monthly time series",
+    "             Multiplies a time series and a multi-year monthly time series.",
+    "    ymondiv  Divide multi-year monthly time series",
+    "             Divides a time series and a multi-year monthly time series.",
     NULL
 };
 
@@ -3099,7 +3126,8 @@ static char *FdnsHelp[] = {
     "    Let ifile1 be a time series of daily minimum temperatures TN",
     "    and ifile2 be a corresponding series of daily surface snow",
     "    amounts. Then counted is the number of days where TN < 0° Celsius",
-    "    and the surface snow amount is less than 1 cm.",
+    "    and the surface snow amount is less than 1 cm. The temperature TN",
+    "    must be given in units of Kelvin.",
     "    The date information for a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
     NULL

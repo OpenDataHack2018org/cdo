@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.1.0 (?? January 2008):
+
+   * New operators:
+      o Monthly arithmetic - monadd, monsub, monmul, mondiv
+
 Version 1.0.9 (22 October 2007):
 
    * New operators:

@@ -1,6 +1,7 @@
 2008-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.9
+	* New module: Monarith (monadd, monsub, monmul, mondiv) [request: Daniel Hernandez]
 	* Seltime: bug fix for input with time constant fields [report: Claas Teichmann]
 	* diff: check number of time steps
 	* gridWeights: warning with code number when using constant area weights

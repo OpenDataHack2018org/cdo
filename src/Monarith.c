@@ -18,10 +18,10 @@
 /*
    This module contains the following operators:
 
-      Ymonarith  ymonadd         Add multi-year monthly time series
-      Ymonarith  ymonsub         Subtract multi-year monthly time series
-      Ymonarith  ymonmul         Multiply multi-year monthly time series
-      Ymonarith  ymondiv         Divide multi-year monthly time series
+      Monarith  monadd         Add monthly time series
+      Monarith  monsub         Subtract monthly time series
+      Monarith  monmul         Multiply monthly time series
+      Monarith  mondiv         Divide monthly time series
 */
 
 
@@ -33,32 +33,31 @@
 #include "pstream.h"
 
 
-#define  MAX_MON    20
-
-void *Ymonarith(void *argument)
+void *Monarith(void *argument)
 {
-  static char func[] = "Ymonarith";
+  static char func[] = "Monarith";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
   int gridsize;
-  int nrecs, nvars, nlev, recID;
-  int tsID;
+  int nrecs, nrecs2, nvars, nlev, recID;
+  int tsID, tsID2;
   int varID, levelID;
   int offset;
   int vlistID1, vlistID2, vlistID3;
   int taxisID1, taxisID2, taxisID3;
-  int vdate, vtime, mon;
+  int vdate;
+  int yearmon1, yearmon2 = -1;
   FIELD field1, field2;
-  int **varnmiss2[MAX_MON];
-  double **vardata2[MAX_MON];
+  int **varnmiss2;
+  double **vardata2;
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ymonadd", func_add, 0, NULL);
-  cdoOperatorAdd("ymonsub", func_sub, 0, NULL);
-  cdoOperatorAdd("ymonmul", func_mul, 0, NULL);
-  cdoOperatorAdd("ymondiv", func_div, 0, NULL);
+  cdoOperatorAdd("monadd", func_add, 0, NULL);
+  cdoOperatorAdd("monsub", func_sub, 0, NULL);
+  cdoOperatorAdd("monmul", func_mul, 0, NULL);
+  cdoOperatorAdd("mondiv", func_div, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
@@ -94,55 +93,65 @@ void *Ymonarith(void *argument)
 
   nvars  = vlistNvars(vlistID2);
 
-  for ( mon = 0; mon < MAX_MON ; mon++ ) vardata2[mon] = NULL;
+  vardata2  = (double **) malloc(nvars*sizeof(double *));
+  varnmiss2 = (int **) malloc(nvars*sizeof(int *));
 
-  tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
+  for ( varID = 0; varID < nvars; varID++ )
     {
-      vdate = taxisInqVdate(taxisID2);
-
-      mon   = (vdate - (vdate/10000)*10000) / 100;
-      if ( mon < 0 || mon >= MAX_MON ) cdoAbort("Month %d out of range!", mon);
-
-      if ( vardata2[mon] != NULL ) cdoAbort("Month %d already allocatd!", mon);
-
-      vardata2[mon]  = (double **) malloc(nvars*sizeof(double *));
-      varnmiss2[mon] = (int **) malloc(nvars*sizeof(int *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  vardata2[mon][varID]  = (double *) malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[mon][varID] = (int *) malloc(nlev*sizeof(int));
-	}
-
-      for ( recID = 0; recID < nrecs; recID++ )
-	{
-	  streamInqRecord(streamID2, &varID, &levelID);
-
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	  offset   = gridsize*levelID;
-
-	  streamReadRecord(streamID2, vardata2[mon][varID]+offset, &field2.nmiss);
-	  varnmiss2[mon][varID][levelID] = field2.nmiss;
-	}
-
-      tsID++;
+      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+      nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+      vardata2[varID]  = (double *) malloc(nlev*gridsize*sizeof(double));
+      varnmiss2[varID] = (int *) malloc(nlev*sizeof(int));
     }
 
-
-  tsID = 0;
+  tsID  = 0;
+  tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
 
-      mon   = (vdate - (vdate/10000)*10000) / 100;
-      if ( mon < 0 || mon >= MAX_MON ) cdoAbort("Month %d out of range!", mon);
+      yearmon1 = vdate / 100;
 
-      taxisDefVdate(taxisID3, vdate);
-      taxisDefVtime(taxisID3, vtime);
+      if ( yearmon1 != yearmon2 )
+	{
+	  int year1, mon1;
+
+	  year1 = yearmon1/100;
+	  mon1  = yearmon1 - (yearmon1/100)*100;
+
+	  if ( cdoVerbose ) cdoPrint("Process: Year = %4d  Month = %2d", year1, mon1);
+
+	  nrecs2 = streamInqTimestep(streamID2, tsID2);
+	  if ( nrecs2 == 0 )
+	    cdoAbort("Missing year=%4d mon=%2d in %s!", year1, mon1, cdoStreamName(1));
+
+	  vdate = taxisInqVdate(taxisID2);
+
+	  yearmon2 = vdate / 100;
+
+	  if ( yearmon1 != yearmon2 )
+	    {
+	      int year2, mon2;
+
+	      year2 = yearmon2/100;
+	      mon2  = yearmon2 - (yearmon2/100)*100;
+
+	      cdoAbort("Timestep %d in %s has wrong date!\nCurrent year=%4d mon=%2d, expected year=%4d mon=%2d",
+		       tsID2+1, cdoStreamName(1), year2, mon2, year1, mon1);
+	    }
+
+	  for ( recID = 0; recID < nrecs2; recID++ )
+	    {
+	      streamInqRecord(streamID2, &varID, &levelID);
+
+	      streamReadRecord(streamID2, &vardata2[varID][levelID], &field2.nmiss);
+	      varnmiss2[varID][levelID] = field2.nmiss;
+	    }
+
+	  tsID2++;
+	}
+
+      taxisCopyTimestep(taxisID3, taxisID1);
 
       streamDefTimestep(streamID3, tsID);
 
@@ -153,8 +162,8 @@ void *Ymonarith(void *argument)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
-	  memcpy(field2.ptr, vardata2[mon][varID]+offset, gridsize*sizeof(double));
-	  field2.nmiss = varnmiss2[mon][varID][levelID];
+	  memcpy(field2.ptr, vardata2[varID]+offset, gridsize*sizeof(double));
+	  field2.nmiss = varnmiss2[varID][levelID];
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
@@ -174,18 +183,14 @@ void *Ymonarith(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  for ( mon = 0; mon < MAX_MON ; mon++ ) 
-    if ( vardata2[mon] )
-      {
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    free(vardata2[mon][varID]);
-	    free(varnmiss2[mon][varID]);
-	  }
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      free(vardata2[varID]);
+      free(varnmiss2[varID]);
+    }
 
-	free(vardata2[mon]);
-	free(varnmiss2[mon]);
-      }
+  free(vardata2);
+  free(varnmiss2);
 
   if ( field1.ptr ) free(field1.ptr);
   if ( field2.ptr ) free(field2.ptr);
