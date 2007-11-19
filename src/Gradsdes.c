@@ -451,7 +451,12 @@ void *Gradsdes(void *argument)
        filetype != FILETYPE_EXT &&
        filetype != FILETYPE_IEG &&
        filetype != FILETYPE_GRB )
-    cdoAbort("Unsupported file format!");
+    {
+      if ( filetype == FILETYPE_NC )
+	cdoAbort("Unsupported file format: netCDF");
+      else
+	cdoAbort("Unsupported file format!");
+    }
 
   /* find the first lonlat or Gaussian grid */
 

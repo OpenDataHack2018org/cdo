@@ -76,6 +76,7 @@ void *Remap(void *argument)
   char *envstr;
   char *remap_file = NULL;
   int lwrite_remap;
+  int remap_max_iter = -1;
 
   cdoInitialize(argument);
 
@@ -105,6 +106,20 @@ void *Remap(void *argument)
 	  max_remaps = ival;
 	  if ( cdoVerbose )
 	    cdoPrint("Set MAX_REMAPS to %d", max_remaps);
+	}
+    }
+
+  envstr = getenv("REMAP_MAX_ITER");
+  if ( envstr )
+    {
+      int ival;
+      ival = atoi(envstr);
+      if ( ival > 0 )
+	{
+	  remap_max_iter = ival;
+	  remap_set_max_iter(remap_max_iter);
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_MAX_ITER to %d", remap_max_iter);
 	}
     }
 

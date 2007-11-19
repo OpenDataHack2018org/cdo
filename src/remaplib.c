@@ -1420,9 +1420,16 @@ void remap_con1(double *dst_array, double missval, int dst_size, int num_links, 
   free(src_wts);
 }
 
+#define  DEFAULT_MAX_ITER  100
 
-static int     max_iter = 100;     /* max iteration count for i,j iteration */
+static int     Max_Iter = DEFAULT_MAX_ITER;  /* max iteration count for i,j iteration */
 static double  converge = 1.e-10;  /* convergence criterion */
+
+void remap_set_max_iter(int max_iter)
+{
+  if ( max_iter > 0 ) Max_Iter = max_iter;
+}
+
 
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 /*                                                                         */
@@ -1802,7 +1809,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
           jguess = HALF;
 
 	  /* Unvectorized loop: break */
-          for ( iter = 0; iter < max_iter; iter++ )
+          for ( iter = 0; iter < Max_Iter; iter++ )
 	    {
 	      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
 	      dphp = plon - src_lons[0];
@@ -1828,7 +1835,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	      jguess += delj;
 	    }
 
-          if ( iter < max_iter )
+          if ( iter < Max_Iter )
 	    {
 	      /* successfully found i,j - compute weights */
 
@@ -1846,7 +1853,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	      cdoPrint("Dest grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
 	      cdoPrint("Dest grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
 	      cdoPrint("Current i,j : %g %g", iguess, jguess);
-	      cdoAbort("Iteration for i,j exceed max iteration count of %d", max_iter);
+	      cdoAbort("Iteration for i,j exceed max iteration count of %d", Max_Iter);
 	    }
 
 	  /*
@@ -2026,7 +2033,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
           iguess = HALF;
           jguess = HALF;
 
-          for ( iter = 0; iter < max_iter; iter++ )
+          for ( iter = 0; iter < Max_Iter; iter++ )
 	    {
 	      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
 	      dphp = plon - src_lons[0];
@@ -2052,7 +2059,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	      jguess += delj;
 	    }
 
-          if ( iter < max_iter )
+          if ( iter < Max_Iter )
 	    {
 	      /* successfully found i,j - compute weights */
 
@@ -2093,7 +2100,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	    }
           else
 	    {
-	      cdoAbort("Iteration for i,j exceed max iteration count of %d", max_iter);
+	      cdoAbort("Iteration for i,j exceed max iteration count of %d", Max_Iter);
 	    }
 	  
 	  /*

@@ -110,6 +110,8 @@ typedef struct {
 }
 REMAP;
 
+void remap_set_max_iter(int max_iter);
+
 void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg);
 void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv);
 
