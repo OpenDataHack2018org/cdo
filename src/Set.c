@@ -274,7 +274,6 @@ void *Set(void *argument)
 	  zaxisInqLevels(zaxisID2, levels);
 	  levels[0] = newlevel;
 	  zaxisDefLevels(zaxisID2, levels);
-	  /* printf("lev %d %g\n", nlevs, levels[0]); */
 	  vlistChangeZaxis(vlistID2, index, zaxisID2);
 	  free(levels);
 	}

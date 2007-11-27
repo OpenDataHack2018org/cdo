@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -357,13 +357,59 @@ static char *getOperatorArg(const char *xoperator)
 }
 
 
-static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
+static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
+
+
+static int getGlobArgc(int argc, char *argv[], int globArgc)
 {
   int streamInCnt;
   int streamOutCnt;
   char *opername;
   char *comma_position;
+  /*
+  { int i;
+  for ( i = 0; i < argc; i++ )
+    printf("%d %d %s\n", globArgc, i, argv[i]);
+  }
+  */
+  opername = &argv[globArgc][1];
+  comma_position = strchr(opername, ',');
+  if ( comma_position ) *comma_position = 0;
 
+  streamInCnt  = operatorStreamInCnt(opername);
+  streamOutCnt = operatorStreamOutCnt(opername);
+
+  if ( streamInCnt == -1 )
+    {
+      /*
+      int i;
+
+      for ( i = globArgc+1; i < argc; i++ )
+	if ( argv[i][0] == '-' ) break;
+
+      printf("%d %d %d\n", i, argc, globArgc);
+      if ( i < argc )
+      */
+	Error(processInqPrompt(),
+	      "Unlimited input streams not allowed in CDO pipes (Operator %s)!", opername);
+    }
+
+  if ( streamOutCnt != 1 )
+    Error(processInqPrompt(), 
+	  "More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
+
+  globArgc++;
+
+  if ( streamInCnt > 0 )
+    globArgc = skipInputStreams(argc, argv, globArgc, streamInCnt);
+  if ( comma_position ) *comma_position = ',';
+
+  return (globArgc);
+}
+
+
+static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
+{
   while ( nstreams > 0 )
     {
       if ( globArgc >= argc )
@@ -373,19 +419,7 @@ static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 	}
       if ( argv[globArgc][0] == '-' )
 	{
-	  opername = &argv[globArgc][1];
-	  comma_position = strchr(opername, ',');
-	  if ( comma_position ) *comma_position = 0;
-	  streamInCnt  = operatorStreamInCnt(opername);
-	  streamOutCnt = operatorStreamOutCnt(opername);
-	  if ( streamInCnt == -1 )
-	    Error(processInqPrompt(), "Operator %s needs unlimited input streams.", opername);
-	  if ( streamOutCnt != 1 )
-	    Error(processInqPrompt(), "Operator %s must use only 1 output stream in pipes.", opername);
-	  globArgc++;
-	  if ( streamInCnt > 0 )
-	    globArgc = skipInputStreams(argc, argv, globArgc, streamInCnt);
-	  if ( comma_position ) *comma_position = ',';
+	  globArgc = getGlobArgc(argc, argv, globArgc);
 	}
       else
 	globArgc++;
@@ -399,29 +433,14 @@ static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 
 static int getStreamCnt(int argc, char *argv[])
 {
-  int streamInCnt, streamOutCnt;
   int streamCnt = 0;
   int globArgc = 1;
-  char *opername;
-  char *comma_position;
 
   while ( globArgc < argc )
     {
       if ( argv[globArgc][0] == '-' )
 	{
-	  opername = &argv[globArgc][1];
-	  comma_position = strchr(opername, ',');
-	  if ( comma_position ) *comma_position = 0;
-	  streamInCnt  = operatorStreamInCnt(opername);
-	  streamOutCnt = operatorStreamOutCnt(opername);
-	  if ( streamInCnt == -1 )
-	    Error(processInqPrompt(), "Operator %s needs unlimited input streams.", opername);
-	  if ( streamOutCnt != 1 )
-	    Error(processInqPrompt(), "Operator %s must use only 1 output stream in pipes.", opername);
-	  globArgc++;
-	  if ( streamInCnt > 0 )
-	    globArgc = skipInputStreams(argc, argv, globArgc, streamInCnt);
-	  if ( comma_position ) *comma_position = ',';
+	  globArgc = getGlobArgc(argc, argv, globArgc);
 	}
       else
 	globArgc++;
@@ -437,12 +456,9 @@ static void setStreamNames(int argc, char *argv[])
 {
   static char func[] = "setStreamNames";
   int processID = processSelf();
-  int streamInCnt, streamOutCnt;
   int i;
   int globArgc = 1;
   int globArgcStart;
-  char *opername;
-  char *comma_position;
   char *streamname;
   size_t len;
 
@@ -451,19 +467,9 @@ static void setStreamNames(int argc, char *argv[])
       if ( argv[globArgc][0] == '-' )
 	{
 	  globArgcStart = globArgc;
-	  opername = &argv[globArgc][1];
-	  comma_position = strchr(opername, ',');
-	  if ( comma_position ) *comma_position = 0;
-	  streamInCnt  = operatorStreamInCnt(opername);
-	  streamOutCnt = operatorStreamOutCnt(opername);
-	  if ( streamInCnt == -1 )
-	    Error(processInqPrompt(), "Operator %s needs unlimited input streams.", opername);
-	  if ( streamOutCnt != 1 )
-	    Error(processInqPrompt(), "Operator %s must use only 1 output stream in pipes.", opername);
-	  globArgc++;
-	  if ( streamInCnt > 0 )
-	    globArgc = skipInputStreams(argc, argv, globArgc, streamInCnt);
-	  if ( comma_position ) *comma_position = ',';
+
+	  globArgc = getGlobArgc(argc, argv, globArgc);
+
 	  len = 0;
 	  for ( i = globArgcStart; i < globArgc; i++ ) len += strlen(argv[i]) + 1;
 	  streamname = (char *) malloc(len);

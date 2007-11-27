@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,11 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+#if defined (__GNUC__)
+#if __GNUC__ > 2
+#define WITH_ETOPO 1
+#endif
+#endif
 
 void *Vargen(void *argument)
 {
@@ -43,7 +48,7 @@ void *Vargen(void *argument)
   int gridsize, i;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
-#if defined (__GNUC__)
+#if defined(WITH_ETOPO)
   double etopo_scale = 3;
   short etopo[] = {
 #include "etopo.h"
@@ -131,11 +136,11 @@ void *Vargen(void *argument)
 	}
       else if ( operatorID == TOPO )
 	{
-#if defined (__GNUC__)
+#if defined(WITH_ETOPO)
 	  for ( i = 0; i < gridsize; i++ )
 	    array[i] = (double)etopo[i]/etopo_scale;
 #else
-	  cdoAbort("Operator not available with non GNUC compiler!");
+	  cdoAbort("Operator support disabled!");
 #endif
 	}      
 

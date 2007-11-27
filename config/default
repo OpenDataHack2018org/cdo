@@ -93,7 +93,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
                     CC=cc CFLAGS="-g -mt -fast -xarch=v9"
 	;;
-# sparc-sun-solaris2.9 chnaged to
+# sparc-sun-solaris2.9 changed to
 # sparc-sun-solaris2.10
     executor | yang | yin)
         if [ "$SGE_MODE" = "off" ] ; then
