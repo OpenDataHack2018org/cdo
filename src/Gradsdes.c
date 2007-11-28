@@ -35,6 +35,49 @@
 #include "pstream.h"
 
 
+/*
+  Values output into the grib map file:
+
+  Header:
+
+  hipnt info:  0 - version number (1)
+               1 - number of times in file
+               2 - number of records per time
+               3 - Grid type
+                 255 - user defined grid.  descriptor
+                       describes grid exactly; one record
+                       per grid.
+                  29 - Predefined grid set 29 and 30.
+                       Two records per grid.
+
+  hfpnt info:  None
+
+  Info:
+
+  intpnt info (for each mapped grib record) :
+                 0 - position of start of data in file
+                 1 - position of start of bit map in file
+                 2 - number of bits per data element
+
+  fltpnt info :
+                 0 - decimal scale factor for this record
+                 1 - binary scale factor
+                 2 - reference value
+
+*/
+struct gaindx {
+  int    type;      /* Indexing file type             */
+  int    hinum;     /* Number of ints in header       */
+  int    hfnum;     /* Number of floats in header     */
+  int    intnum;    /* Number of index ints (long)    */
+  int    fltnum;    /* Number of index floats         */
+  int   *hipnt;     /* Pointer to header int values   */
+  float *hfpnt;     /* Pointer to header float values */
+  int   *intpnt;    /* Pointer to int index values    */
+  float *fltpnt;    /* Pointer to float index values  */
+};
+
+
 /* Byte swap requested number of 4 byte elements */
 
 static void gabswp (void *r, int cnt) {
@@ -176,6 +219,150 @@ static int flt2ibm(float x, unsigned char *ibm) {
 
 #define  PutInt(buf, cnt, ival)   (ival < 0 ? Put4Byte(buf, cnt, 0x7fffffff - ival + 1) : Put4Byte(buf, cnt, ival))
 
+static void dumpmap()
+{
+  static char func[] = "dumpmap";
+  unsigned char urec[4];
+  unsigned char vermap;
+  unsigned char mrec[512];
+  int swpflg = 0;
+  int i;
+  struct gaindx indx;
+  FILE *mapfp;
+
+  indx.hipnt = NULL;
+  indx.hfpnt = NULL;
+  indx.intpnt = NULL;
+  indx.fltpnt = NULL;
+
+  mapfp = fopen(cdoStreamName(0), "r");
+  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0));
+
+  /* check the version number */
+
+  fseek(mapfp, 1, 0);
+  fread(&vermap, sizeof(unsigned char), 1, mapfp);
+
+  if ( vermap == 2 )
+    {
+      printf("gribmap version = %d\n", vermap);
+      fseek(mapfp, 2, 0);
+
+      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      indx.hinum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
+      
+      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      indx.hfnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
+
+      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      indx.intnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
+
+      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      indx.fltnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
+
+      fread(mrec, sizeof(unsigned char), 7, mapfp);
+
+      if ( indx.hinum > 0 )
+	{
+	  indx.hipnt = (int *) malloc(sizeof(int)*indx.hinum);
+	  for ( i = 0; i < indx.hinum; i++ )
+	    {
+	      fread(mrec, sizeof(unsigned char), 4, mapfp);
+	      indx.hipnt[i] = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
+	    }
+	}
+      if ( indx.hfnum > 0 )
+	{
+	  indx.hfpnt = (float *) malloc(sizeof(float)*indx.hfnum);
+	  fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
+	}
+      if ( indx.intnum > 0 )
+	{
+	  indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
+	  for ( i = 0; i < indx.intnum; i++ )
+	    {
+	      fread(mrec, sizeof(unsigned char), 4, mapfp);
+	      indx.intpnt[i] = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
+	      if ( indx.intpnt[i] < 0 ) indx.intpnt[i] = 0x7fffffff - indx.intpnt[i] + 1;
+	    }
+	}
+      if ( indx.fltnum > 0 )
+	{
+	  indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
+	  for ( i = 0; i < indx.fltnum; i++ )
+	    {
+	      fread(urec, sizeof(unsigned char), 4, mapfp);
+	      indx.fltpnt[i] = ibm2flt(urec);
+	    }
+	}
+    }
+  else
+    {
+      fseek(mapfp, 0, 0);
+      fread (&indx, sizeof(struct gaindx), 1, mapfp);
+      if ( indx.type>>24 > 0 ) swpflg = 1;
+      if ( swpflg ) printf("swap endian!\n");
+      if ( swpflg ) gabswp((float *)&indx.type, 5);
+      
+      if ( indx.hinum > 0 )
+	{
+	  indx.hipnt = (int *) malloc(sizeof(int)*indx.hinum);
+	  fread (indx.hipnt, sizeof(int), indx.hinum, mapfp);
+	  if ( swpflg ) gabswp((float *)(indx.hipnt),indx.hinum);
+	}
+      if ( indx.hfnum > 0 )
+	{
+	  indx.hfpnt = (float *) malloc(sizeof(float)*indx.hfnum);
+	  fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
+	  if ( swpflg ) gabswp(indx.hfpnt,indx.hfnum);
+	}
+      if ( indx.intnum > 0 )
+	{
+	  indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
+	  fread (indx.intpnt,sizeof(int),indx.intnum,mapfp);
+	  if ( swpflg ) gabswp((float *)(indx.intpnt),indx.intnum);
+	}
+      if ( indx.fltnum > 0 )
+	{
+	  indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
+	  fread (indx.fltpnt,sizeof(float),indx.fltnum,mapfp);
+	  if ( swpflg ) gabswp(indx.fltpnt,indx.fltnum);
+	}
+    }
+
+  fclose(mapfp);
+
+  printf("hinum: %d\n", indx.hinum);
+  for ( i = 0; i < indx.hinum; i++ )
+    printf("%3d %5d\n", i+1, indx.hipnt[i]);
+  
+  printf("\n");
+  printf("hfnum: %d\n", indx.hfnum);
+  for ( i = 0; i < indx.hfnum; i++ )
+    printf("%3d %g\n", i+1, indx.hfpnt[i]);
+  
+  printf("\n");
+  if ( indx.intnum == indx.fltnum )
+    {
+      printf("num: %d\n", indx.intnum);
+      for ( i = 0; i < indx.intnum/3; i++ )
+	printf("%3d %8d %6d %4d %8g %10g %8g\n", i+1,
+	       indx.intpnt[i*3], indx.intpnt[i*3+1], indx.intpnt[i*3+2],
+	       indx.fltpnt[i*3], indx.fltpnt[i*3+1], indx.fltpnt[i*3+2]);
+    }
+  else
+    {
+      printf("intnum: %d\n", indx.intnum);
+      for ( i = 0; i < indx.intnum; i++ )
+	printf("%3d %d\n", i+1, indx.intpnt[i]);
+
+      printf("\n");
+      printf("fltnum: %d\n", indx.fltnum);
+      for ( i = 0; i < indx.fltnum; i++ )
+	printf("%3d %g\n", i+1, indx.fltpnt[i]);
+    }
+}
+
 
 void *Gradsdes(void *argument)
 {
@@ -234,49 +421,6 @@ void *Gradsdes(void *argument)
   double *xvals, *yvals;
   char *cmons[]={"jan","feb","mar","apr","may","jun",
 		 "jul","aug","sep","oct","nov","dec"};
-
-  /*
-    Values output into the grib map file:
-
-    Header:
-
-    hipnt info:  0 - version number (1)
-                 1 - number of times in file
-                 2 - number of records per time
-                 3 - Grid type
-                   255 - user defined grid.  descriptor
-                         describes grid exactly; one record
-                         per grid.
-                    29 - Predefined grid set 29 and 30.
-                         Two records per grid.
-
-    hfpnt info:  None
-
-    Info:
-
-    intpnt info (for each mapped grib record) :
-                 0 - position of start of data in file
-                 1 - position of start of bit map in file
-                 2 - number of bits per data element
-
-    fltpnt info :
-                 0 - decimal scale factor for this record
-                 1 - binary scale factor
-                 2 - reference value
-
-  */
-  struct gaindx {
-    int    type;      /* Indexing file type             */
-    int    hinum;     /* Number of ints in header       */
-    int    hfnum;     /* Number of floats in header     */
-    int    intnum;    /* Number of index ints (long)    */
-    int    fltnum;    /* Number of index floats         */
-    int   *hipnt;     /* Pointer to header int values   */
-    float *hfpnt;     /* Pointer to header float values */
-    int   *intpnt;    /* Pointer to int index values    */
-    float *fltpnt;    /* Pointer to float index values  */
-  };
-
       
   cdoInitialize(argument);
 
@@ -291,145 +435,7 @@ void *Gradsdes(void *argument)
 
   if ( operatorID == DUMPMAP )
     {
-      unsigned char urec[4];
-      unsigned char vermap;
-      unsigned char mrec[512];
-      int swpflg = 0;
-      struct gaindx indx;
-      FILE *mapfp;
-
-      indx.hipnt = NULL;
-      indx.hfpnt = NULL;
-      indx.intpnt = NULL;
-      indx.fltpnt = NULL;
-
-      mapfp = fopen(cdoStreamName(0), "r");
-      if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0));
-
-      /* check the version number */
-
-      fseek(mapfp, 1, 0);
-      fread(&vermap, sizeof(unsigned char), 1, mapfp);
-
-      if ( vermap == 2 )
-	{
-	  printf("gribmap version = %d\n", vermap);
-	  fseek(mapfp, 2, 0);
-
-	  fread(mrec, sizeof(unsigned char), 4, mapfp);
-	  indx.hinum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
-
-	  fread(mrec, sizeof(unsigned char), 4, mapfp);
-	  indx.hfnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
-
-	  fread(mrec, sizeof(unsigned char), 4, mapfp);
-	  indx.intnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
-
-	  fread(mrec, sizeof(unsigned char), 4, mapfp);
-	  indx.fltnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
-
-	  fread(mrec, sizeof(unsigned char), 7, mapfp);
-
-	  if ( indx.hinum > 0 )
-	    {
-	      indx.hipnt = (int *) malloc(sizeof(int)*indx.hinum);
-	      for ( i = 0; i < indx.hinum; i++ )
-		{
-		  fread(mrec, sizeof(unsigned char), 4, mapfp);
-		  indx.hipnt[i] = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
-		}
-	    }
-	  if ( indx.hfnum > 0 )
-	    {
-	      indx.hfpnt = (float *) malloc(sizeof(float)*indx.hfnum);
-	      fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
-	    }
-	  if ( indx.intnum > 0 )
-	    {
-	      indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
-	      for ( i = 0; i < indx.intnum; i++ )
-		{
-		  fread(mrec, sizeof(unsigned char), 4, mapfp);
-		  indx.intpnt[i] = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
-		  if ( indx.intpnt[i] < 0 ) indx.intpnt[i] = 0x7fffffff - indx.intpnt[i] + 1;
-		}
-	    }
-	  if ( indx.fltnum > 0 )
-	    {
-	      indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
-	      for ( i = 0; i < indx.fltnum; i++ )
-		{
-		  fread(urec, sizeof(unsigned char), 4, mapfp);
-		  indx.fltpnt[i] = ibm2flt(urec);
-		}
-	    }
-	}
-      else
-	{
-	  fseek(mapfp, 0, 0);
-	  fread (&indx, sizeof(struct gaindx), 1, mapfp);
-	  if ( indx.type>>24 > 0 ) swpflg = 1;
-	  if ( swpflg ) printf("swap endian!\n");
-	  if ( swpflg ) gabswp((float *)&indx.type, 5);
-
-	  if ( indx.hinum > 0 )
-	    {
-	      indx.hipnt = (int *) malloc(sizeof(int)*indx.hinum);
-	      fread (indx.hipnt, sizeof(int), indx.hinum, mapfp);
-	      if ( swpflg ) gabswp((float *)(indx.hipnt),indx.hinum);
-	    }
-	  if ( indx.hfnum > 0 )
-	    {
-	      indx.hfpnt = (float *) malloc(sizeof(float)*indx.hfnum);
-	      fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
-	      if ( swpflg ) gabswp(indx.hfpnt,indx.hfnum);
-	    }
-	  if ( indx.intnum > 0 )
-	    {
-	      indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
-	      fread (indx.intpnt,sizeof(int),indx.intnum,mapfp);
-	      if ( swpflg ) gabswp((float *)(indx.intpnt),indx.intnum);
-	    }
-	  if ( indx.fltnum > 0 )
-	    {
-	      indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
-	      fread (indx.fltpnt,sizeof(float),indx.fltnum,mapfp);
-	      if ( swpflg ) gabswp(indx.fltpnt,indx.fltnum);
-	    }
-	}
-
-      fclose(mapfp);
-
-      printf("hinum: %d\n", indx.hinum);
-      for ( i = 0; i < indx.hinum; i++ )
-	printf("%3d %5d\n", i+1, indx.hipnt[i]);
-
-      printf("\n");
-      printf("hfnum: %d\n", indx.hfnum);
-      for ( i = 0; i < indx.hfnum; i++ )
-	printf("%3d %g\n", i+1, indx.hfpnt[i]);
-
-      printf("\n");
-      if ( indx.intnum == indx.fltnum )
-	{
-	  printf("num: %d\n", indx.intnum);
-	  for ( i = 0; i < indx.intnum/3; i++ )
-	    printf("%3d %8d %6d %4d %8g %10g %8g\n", i+1,
-		   indx.intpnt[i*3], indx.intpnt[i*3+1], indx.intpnt[i*3+2],
-		   indx.fltpnt[i*3], indx.fltpnt[i*3+1], indx.fltpnt[i*3+2]);
-	}
-      else
-	{
-	  printf("intnum: %d\n", indx.intnum);
-	  for ( i = 0; i < indx.intnum; i++ )
-	    printf("%3d %d\n", i+1, indx.intpnt[i]);
-
-	  printf("\n");
-	  printf("fltnum: %d\n", indx.fltnum);
-	  for ( i = 0; i < indx.fltnum; i++ )
-	    printf("%3d %g\n", i+1, indx.fltpnt[i]);
-	}
-
+      dumpmap();
 
       goto END_LABEL;
     }
@@ -464,11 +470,14 @@ void *Gradsdes(void *argument)
     {
       gridID = vlistGrid(vlistID, index);
       gridtype = gridInqType(gridID);
-      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
+      if ( gridtype == GRID_LONLAT   ||
+	   gridtype == GRID_GAUSSIAN ||
+	   gridtype == GRID_LAMBERT  ) break;
     }
 
   if ( index == ngrids )
-    cdoAbort("No Lon/Lat or Gaussian grid found!");
+    cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!",
+	     gridNamePtr(gridtype));
 
   /* select all variables with used gridID */
 
@@ -724,95 +733,151 @@ void *Gradsdes(void *argument)
 
  LABEL_STOP:
 
+  xsize  = gridInqXsize(gridID);
+  ysize  = gridInqYsize(gridID);
+
   /* XDEF */
 
-  xsize  = gridInqXsize(gridID);
-  xfirst = gridInqXval(gridID, 0);
-  xinc   = gridInqXinc(gridID);
-  if ( DBL_IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL) )
+  if ( gridtype == GRID_LAMBERT )
     {
-      xvals = (double *) malloc(xsize*sizeof(double));
-      gridInqXvals(gridID, xvals);
-      fprintf(gdp ,"XDEF %d LEVELS ", xsize);
-      j = 0;
-      for ( i = 0; i < xsize; i++ )
-	{
-	  fprintf(gdp, "%7.3f ", xvals[i]); 
-	  j++;
-	  if ( j == 6 )
-	    {
-	      fprintf(gdp, "\n");
-	      j = 0;
-	      if ( i != xsize-1 ) fprintf(gdp, "               ");
-	    }
-	}
-      if ( j ) fprintf(gdp, "\n");
+      double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
+      double xmin = 1.e10, xmax = -1.e10, ymin = 1.e10, ymax = -1.e10;
+      double xrange, yrange;
+      int nx, ny, ni;
+      double inc[] = { 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001 };
 
+      gridInqLambert(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
+      fprintf(gdp, "PDEF %d %d lcc %g %g 1 1 %g %g %g %g %g\n", 
+	      xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
+
+      gridID = gridToCurvilinear(gridID);
+      xvals = (double *) malloc(xsize*ysize*sizeof(double));
+      yvals = (double *) malloc(xsize*ysize*sizeof(double));
+      gridInqXvals(gridID, xvals);
+      gridInqYvals(gridID, yvals);
+      for ( i = 0; i < xsize*ysize; ++i )
+	{
+	  if ( xvals[i] > 180 ) xvals[i] -= 360;
+	  if ( xvals[i] < xmin ) xmin = xvals[i];
+	  if ( xvals[i] > xmax ) xmax = xvals[i];
+	  if ( yvals[i] < ymin ) ymin = yvals[i];
+	  if ( yvals[i] > ymax ) ymax = yvals[i];
+	}
       free(xvals);
+      free(yvals);
+
+      xfirst = ((int)(xmin-1));
+      yfirst = ((int)(ymin-1));
+      xrange = ((int)(xmax+1.5)) - xfirst;
+      yrange = ((int)(ymax+1.5)) - yfirst;
+
+      ni = sizeof(inc)/sizeof(inc[0]);
+      for ( i = 0; i < ni; i++ )
+	{
+	  xinc = yinc = inc[i];
+	  nx = xrange / xinc;
+	  ny = yrange / yinc;
+
+	  if ( nx > 2*xsize && ny > 2*ysize ) break;
+	}
+
+      fprintf(gdp, "XDEF %d LINEAR %f %f\n", nx, xfirst, xinc);
+      fprintf(gdp, "YDEF %d LINEAR %f %f\n", ny, yfirst, yinc);
+
+      fprintf(gdp, "* XDEF 3600 LINEAR -179.95 0.1\n");
+      fprintf(gdp, "* YDEF 1800 LINEAR  -89.95 0.1\n");
     }
   else
     {
-      if ( DBL_IS_EQUAL(xinc, 0) ) xinc = 360.0/xsize;
-      fprintf(gdp, "XDEF %d LINEAR %f %f\n", xsize, xfirst, xinc);	  
+      xfirst = gridInqXval(gridID, 0);
+      xinc   = gridInqXinc(gridID);
+      if ( DBL_IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL) )
+	{
+	  xvals = (double *) malloc(xsize*sizeof(double));
+	  gridInqXvals(gridID, xvals);
+	  fprintf(gdp ,"XDEF %d LEVELS ", xsize);
+	  j = 0;
+	  for ( i = 0; i < xsize; i++ )
+	    {
+	      fprintf(gdp, "%7.3f ", xvals[i]); 
+	      j++;
+	      if ( j == 6 )
+		{
+		  fprintf(gdp, "\n");
+		  j = 0;
+		  if ( i != xsize-1 ) fprintf(gdp, "               ");
+		}
+	    }
+	  if ( j ) fprintf(gdp, "\n");
+	  
+	  free(xvals);
+	}
+      else
+	{
+	  if ( DBL_IS_EQUAL(xinc, 0) ) xinc = 360.0/xsize;
+	  fprintf(gdp, "XDEF %d LINEAR %f %f\n", xsize, xfirst, xinc);	  
+	}
     }
 
   /* YDEF */
 
-  ysize  = gridInqYsize(gridID);
-  yfirst = gridInqYval(gridID, 0);
-  yinc   = gridInqYinc(gridID);
-  if ( gridtype == GRID_GAUSSIAN ) yinc = 0;
-
-  if ( DBL_IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
+  if ( gridtype != GRID_LAMBERT )
     {
-      yvals = (double *) malloc(ysize*sizeof(double));
-      gridInqYvals(gridID, yvals);
-      fprintf(gdp ,"YDEF %d LEVELS ", ysize);
-      j = 0;
-      if ( yvals[0] > yvals[ysize-1] )
+      yfirst = gridInqYval(gridID, 0);
+      yinc   = gridInqYinc(gridID);
+      if ( gridtype == GRID_GAUSSIAN ) yinc = 0;
+
+      if ( DBL_IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
 	{
-	  yrev = TRUE;
-	  for ( i = ysize-1; i >= 0; i-- )
+	  yvals = (double *) malloc(ysize*sizeof(double));
+	  gridInqYvals(gridID, yvals);
+	  fprintf(gdp ,"YDEF %d LEVELS ", ysize);
+	  j = 0;
+	  if ( yvals[0] > yvals[ysize-1] )
 	    {
-	      fprintf(gdp, "%7.3f ", yvals[i]); 
-	      j++;
-	      if ( j == 6 )
+	      yrev = TRUE;
+	      for ( i = ysize-1; i >= 0; i-- )
 		{
-		  fprintf(gdp, "\n");
-		  j = 0;
-		  if ( i != 0 ) fprintf(gdp, "               ");
+		  fprintf(gdp, "%7.3f ", yvals[i]); 
+		  j++;
+		  if ( j == 6 )
+		    {
+		      fprintf(gdp, "\n");
+		      j = 0;
+		      if ( i != 0 ) fprintf(gdp, "               ");
+		    }
 		}
 	    }
+	  else
+	    {
+	      for ( i = 0; i < ysize; i++ )
+		{
+		  fprintf(gdp, "%7.3f ", yvals[i]); 
+		  j++;
+		  if ( j == 6 )
+		    {
+		      fprintf(gdp, "\n");
+		      j = 0;
+		      if ( i != ysize-1 ) fprintf(gdp, "               ");
+		    }
+		}
+	    }
+
+	  if ( j ) fprintf(gdp, "\n");
+
+	  free(yvals);
 	}
       else
 	{
-	  for ( i = 0; i < ysize; i++ )
+	  if ( DBL_IS_EQUAL(yinc, 0) ) yinc = 180.0/ysize;
+	  if ( yinc < 0)
 	    {
-	      fprintf(gdp, "%7.3f ", yvals[i]); 
-	      j++;
-	      if ( j == 6 )
-		{
-		  fprintf(gdp, "\n");
-		  j = 0;
-		  if ( i != ysize-1 ) fprintf(gdp, "               ");
-		}
+	      yrev = TRUE;
+	      fprintf(gdp, "YDEF %d LINEAR %f %f\n", ysize, yfirst + yinc * (ysize-1 ), -yinc);
 	    }
+	  else
+	    fprintf(gdp, "YDEF %d LINEAR %f %f\n", ysize, yfirst, yinc);
 	}
-
-      if ( j ) fprintf(gdp, "\n");
-
-      free(yvals);
-    }
-  else
-    {
-      if ( DBL_IS_EQUAL(yinc, 0) ) yinc = 180.0/ysize;
-      if ( yinc < 0)
-	{
-	  yrev = TRUE;
-	  fprintf(gdp, "YDEF %d LINEAR %f %f\n", ysize, yfirst + yinc * (ysize-1 ), -yinc);
-	}
-      else
-	fprintf(gdp, "YDEF %d LINEAR %f %f\n", ysize, yfirst, yinc);
     }
 
   /* ZDEF */
