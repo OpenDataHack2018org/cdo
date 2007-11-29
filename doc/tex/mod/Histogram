@@ -8,6 +8,11 @@
 
 @BeginDescription
 This module creates bins for a histogram of the input data.
+The bins must be adjacent and have non-overlapping intervals.
+The user has to define the bounds of the bins. The first value
+is the lower bound and the second value the upper bound of the
+first bin. The bounds of the second bin are defined by the
+second and third value, aso.
 Only 2-dimensional input fields are allowed. The ouput file 
 contains one vertical level for each of the bins requested.
 @EndDescription
@@ -16,7 +21,7 @@ contains one vertical level for each of the bins requested.
 
 @BeginOperator_histcount
 @Title     = Histogram count
-@Parameter = bins
+@Parameter = bounds
 
 @BeginDescription
 Number of elements in the bin range.
@@ -26,7 +31,7 @@ Number of elements in the bin range.
 
 @BeginOperator_histsum
 @Title     = Histogram sum
-@Parameter = bins
+@Parameter = bounds
 
 @BeginDescription
 Sum of elements in the bin range.
@@ -36,7 +41,7 @@ Sum of elements in the bin range.
 
 @BeginOperator_histmean
 @Title     = Histogram mean
-@Parameter = bins
+@Parameter = bounds
 
 @BeginDescription
 Mean of elements in the bin range.
@@ -46,7 +51,7 @@ Mean of elements in the bin range.
 
 @BeginOperator_histfreq
 @Title     = Histogram frequency
-@Parameter = bins
+@Parameter = bounds
 
 @BeginDescription
 Frequency of elements in the bin range.
@@ -54,7 +59,7 @@ Frequency of elements in the bin range.
 @EndOperator
 
 
-@BeginParameter bins
-@Item = bins
-FLOAT  Comma separated list of bin ranges (-inf and inf valid)
+@BeginParameter bounds
+@Item = bounds
+FLOAT  Comma separated list of the bin bounds (-inf and inf valid)
 @EndParameter

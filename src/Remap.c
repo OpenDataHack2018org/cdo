@@ -180,6 +180,7 @@ void *Remap(void *argument)
 
       if ( gridInqType(gridID1) != GRID_LONLAT      &&
 	   gridInqType(gridID1) != GRID_GAUSSIAN    &&
+	   gridInqType(gridID1) != GRID_LAMBERT     &&
 	   gridInqType(gridID1) != GRID_GME         &&
 	   gridInqType(gridID1) != GRID_CURVILINEAR &&
 	   gridInqType(gridID1) != GRID_CELL )

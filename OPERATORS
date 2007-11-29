@@ -175,10 +175,14 @@ Operator catalog:
       Arith      min             Minimum of two fields
       Arith      max             Maximum of two fields
       Arith      atan2           Arc tangent of two fields
-      Ymonarith  ymonadd         Add multi-year monthly time average
-      Ymonarith  ymonsub         Subtract multi-year monthly time average
-      Ymonarith  ymonmul         Multiply multi-year monthly time average
-      Ymonarith  ymondiv         Divide multi-year monthly time average
+      Monarith   monadd          Add monthly time series
+      Monarith   monsub          Subtract monthly time series
+      Monarith   monmul          Multiply monthly time series
+      Monarith   mondiv          Divide monthly time series
+      Ymonarith  ymonadd         Add multi-year monthly time series
+      Ymonarith  ymonsub         Subtract multi-year monthly time series
+      Ymonarith  ymonmul         Multiply multi-year monthly time series
+      Ymonarith  ymondiv         Divide multi-year monthly time series
       Arithdays  muldpm          Multiply with days per month
       Arithdays  divdpm          Divide by days per month
       Arithdays  muldpy          Multiply with days per year

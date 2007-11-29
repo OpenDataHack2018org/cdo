@@ -3075,10 +3075,15 @@ static char *HistogramHelp[] = {
     "    histcount, histsum, histmean, histfreq - Histogram",
     "",
     "SYNOPSIS",
-    "    <operator>,bins  ifile ofile",
+    "    <operator>,bounds  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module creates bins for a histogram of the input data.",
+    "    The bins must be adjacent and have non-overlapping intervals.",
+    "    The user has to define the bounds of the bins. The first value",
+    "    is the lower bound and the second value the upper bound of the",
+    "    first bin. The bounds of the second bin are defined by the",
+    "    second and third value, aso.",
     "    Only 2-dimensional input fields are allowed. The ouput file ",
     "    contains one vertical level for each of the bins requested.",
     "",
@@ -3093,7 +3098,7 @@ static char *HistogramHelp[] = {
     "               Frequency of elements in the bin range.",
     "",
     "PARAMETER",
-    "    bins  FLOAT  Comma separated list of bin ranges (-inf and inf valid)",
+    "    bounds  FLOAT  Comma separated list of the bin bounds (-inf and inf valid)",
     NULL
 };
 
