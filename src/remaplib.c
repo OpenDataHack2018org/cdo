@@ -633,7 +633,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else
     {
-      cdoWarning("unknown units supplied for grid1 center lat/lon: "
+      cdoWarning("Unknown units supplied for grid1 center lat/lon: "
 		 "proceeding assuming radians");
     }
 
@@ -695,7 +695,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else
     {
-      cdoWarning("unknown units supplied for grid2 center lat/lon: "
+      cdoWarning("Unknown units supplied for grid2 center lat/lon: "
 		 "proceeding assuming radians");
     }
 
@@ -1113,7 +1113,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
     }
   else
-    cdoAbort("unknown search restriction method");
+    cdoAbort("Unknown search restriction method!");
 
 }  /* remapGridInit */
 
@@ -1145,7 +1145,7 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
   else if ( map_type == MAP_TYPE_BICUBIC  ) rv->num_wts = 4;
   else if ( map_type == MAP_TYPE_DISTWGT  ) rv->num_wts = 1;
   else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->num_wts = 1;
-  else cdoAbort("unknown mapping method");
+  else cdoAbort("Unknown mapping method!");
 
   /*
     initialize num_links and set max_links to four times the largest 
@@ -2251,7 +2251,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
 	}
     }
   else
-    cdoAbort("unknown search restriction method");
+    cdoAbort("Unknown search restriction method!");
 
 
   /* initialize distance and address arrays */
@@ -2542,7 +2542,7 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
 	}
     }
   else
-    cdoAbort("unknown search restriction method");
+    cdoAbort("Unknown search restriction method!");
 
 
   /* initialize distance and address arrays */
@@ -5707,9 +5707,9 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
     {
       cdoPrint("convention = %s", convention);
       if ( strcmp(convention, "NCAR-CSM") == 0 )
-        cdoAbort("unsupported file convention");
+        cdoAbort("Unsupported file convention!");
       else
-        cdoAbort("unknown file convention");
+        cdoAbort("Unknown file convention!");
     }
 
   /* read some additional global attributes */
@@ -5855,7 +5855,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	}
     }
   else if ( strncmp(grid1_units, "radians", 7) != 0 )
-    cdoPrint("unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
+    cdoPrint("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
 
   if ( rg->grid1_corners )
     {
@@ -5875,7 +5875,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	    }
 	}
       else if ( strncmp(grid1_units, "radians", 7) != 0 )
-	cdoPrint("unknown units supplied for grid1 corner lat/lon: proceeding assuming radians");
+	cdoPrint("Unknown units supplied for grid1 corner lat/lon: proceeding assuming radians");
     }
 
   if ( rv->map_type == MAP_TYPE_CONSERV )
@@ -5903,7 +5903,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	}
     }
   else if ( strncmp(grid1_units, "radians", 7) != 0 )
-    cdoPrint("unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
+    cdoPrint("Unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
 
   if ( rg->grid2_corners )
     {
@@ -5923,7 +5923,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	    }
 	}
       else if ( strncmp(grid1_units, "radians", 7) != 0 )
-	cdoPrint("unknown units supplied for grid2 corner lat/lon: proceeding assuming radians");
+	cdoPrint("Unknown units supplied for grid2 corner lat/lon: proceeding assuming radians");
     }
 
   if ( rv->map_type == MAP_TYPE_CONSERV )
