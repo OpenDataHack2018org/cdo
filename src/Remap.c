@@ -66,6 +66,7 @@ void *Remap(void *argument)
   int max_remaps = 0;
   int remap_test = 0;
   int remap_non_global = 0;
+  int non_global;
   int lgridboxinfo = TRUE;
   int grid1sizemax;
   char varname[128];
@@ -230,10 +231,14 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
+      /* grid_is_circular = gridIsCyclic(gridID1); */
+
+      non_global = remap_non_global || !gridIsCyclic(gridID1);
       if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-	    (gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
-	    (gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
+	    (gridInqType(gridID1) == GRID_LONLAT && non_global) ||
+	    (gridInqType(gridID1) == GRID_LAMBERT) ||
+	    (gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
 	{
 	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
 	  remaps[0].grid.non_global = TRUE;
@@ -389,10 +394,12 @@ void *Remap(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 
+	  non_global = remap_non_global || !gridIsCyclic(gridID1);
 	  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-		(gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
-		(gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
+		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
+		(gridInqType(gridID1) == GRID_LAMBERT) ||
+		(gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
 	    {
 	      int gridsize_new;
 	      int nx, ny;
@@ -473,10 +480,12 @@ void *Remap(void *argument)
 	      if ( remaps[r].gridID != gridID1 )
 		{
 		  remaps[r].grid.non_global = FALSE;
+		  non_global = remap_non_global || !gridIsCyclic(gridID1);
 		  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
-			(gridInqType(gridID1) == GRID_LONLAT && remap_non_global) ||
-			(gridInqType(gridID1) == GRID_CURVILINEAR && remap_non_global)) )
+			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
+			(gridInqType(gridID1) == GRID_LAMBERT) ||
+			(gridInqType(gridID1) == GRID_CURVILINEAR &&non_global)) )
 		    {
 		      remaps[r].grid.non_global = TRUE;
 		    }
