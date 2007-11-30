@@ -231,6 +231,7 @@ static void printGridInfo(int vlistID)
 	  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
 
 	  gridInqLambert(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
+
 	  fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
 	  fprintf(stdout, "%*s", nbyte0, "");	  
 	  fprintf(stdout, "            originLon = %g  originLat = %g  lonParY = %g\n",

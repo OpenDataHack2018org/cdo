@@ -62,6 +62,16 @@ typedef struct {
   double  xlast, ylast;
   double  xinc, yinc;
   double  xpole, ypole, angle;    /* rotated north pole             */
+  double  originLon;          /* lambert                        */
+  double  originLat;
+  double  lonParY;
+  double  lat1;
+  double  lat2;
+  int     def_originLon;
+  int     def_originLat;
+  int     def_lonParY;
+  int     def_lat1;
+  int     def_lat2;
   int     prec;
   int     isRotated;              /* TRUE for rotated grids         */
   int     type;
@@ -104,6 +114,18 @@ void gridInit(GRID *grid)
   grid->isRotated     = FALSE;
   grid->ntr           = 0;
   grid->nvertex       = 0;
+
+  grid->originLon     = 0;
+  grid->originLat     = 0;
+  grid->lonParY       = 0;
+  grid->lat1          = 0;
+  grid->lat2          = 0;
+  grid->def_originLon = FALSE;
+  grid->def_originLat = FALSE;
+  grid->def_lonParY   = FALSE;
+  grid->def_lat1      = FALSE;
+  grid->def_lat2      = FALSE;
+
   grid->def_xfirst    = FALSE;
   grid->def_yfirst    = FALSE;
   grid->def_xlast     = FALSE;
@@ -325,6 +347,33 @@ int gridDefine(GRID grid)
 	    gridDefYbounds(gridID, grid.ybounds);
 	    free(grid.ybounds);
 	  }
+
+	break;
+      }
+    case GRID_LAMBERT:
+      {
+	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
+	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+
+	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
+
+	gridID = gridCreate(grid.type, grid.size);
+
+	gridDefPrec(gridID, grid.prec);
+
+	gridDefXsize(gridID, grid.xsize);
+	gridDefYsize(gridID, grid.ysize);
+
+	if ( grid.def_originLon == FALSE ) Error(func, "originLon undefined!");
+	if ( grid.def_originLat == FALSE ) Error(func, "originLat undefined!");
+	if ( grid.def_lonParY   == FALSE ) Error(func, "lonParY undefined!");
+	if ( grid.def_lat1      == FALSE ) Error(func, "lat1 undefined!");
+	if ( grid.def_lat2      == FALSE ) Error(func, "lat2 undefined!");
+	if ( grid.def_xinc      == FALSE ) Error(func, "xinc undefined!");
+	if ( grid.def_yinc      == FALSE ) Error(func, "yinc undefined!");
+
+	gridDefLambert(gridID, grid.originLon, grid.originLat, grid.lonParY,
+		       grid.lat1, grid.lat2, grid.xinc, grid.yinc);
 
 	break;
       }
@@ -559,6 +608,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_CELL;
 	  else if ( strncmp(pline, "gme", 3)  == 0 )
 	    grid.type = GRID_GME;
+	  else if ( strncmp(pline, "lambert", 7)  == 0 )
+	    grid.type = GRID_LAMBERT;
 	  else
 	    Warning(func, "Invalid grid name : %s", pline);
 	}
@@ -678,6 +729,31 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  grid.yinc = atof(skipSeparator(pline + 6));
 	  grid.def_yinc = TRUE;
+	}
+      else if ( strncmp(pline, "originLon", 9)  == 0 )
+	{
+	  grid.originLon = atof(skipSeparator(pline + 9));
+	  grid.def_originLon = TRUE;
+	}
+      else if ( strncmp(pline, "originLat", 9)  == 0 )
+	{
+	  grid.originLat = atof(skipSeparator(pline + 9));
+	  grid.def_originLat = TRUE;
+	}
+      else if ( strncmp(pline, "lonParY", 7)  == 0 )
+	{
+	  grid.lonParY = atof(skipSeparator(pline + 7));
+	  grid.def_lonParY = TRUE;
+	}
+      else if ( strncmp(pline, "lat1", 4)  == 0 )
+	{
+	  grid.lat1 = atof(skipSeparator(pline + 4));
+	  grid.def_lat1 = TRUE;
+	}
+      else if ( strncmp(pline, "lat2", 4)  == 0 )
+	{
+	  grid.lat2 = atof(skipSeparator(pline + 4));
+	  grid.def_lat2 = TRUE;
 	}
       else if ( strncmp(pline, "xnpole", 6)  == 0 )
 	{
