@@ -78,6 +78,8 @@ void *Remap(void *argument)
   char *remap_file = NULL;
   int lwrite_remap;
   int remap_max_iter = -1;
+  int remap_restrict_type = RESTRICT_LATITUDE;
+  int remap_num_srch_bins = 180;
 
   cdoInitialize(argument);
 
@@ -134,6 +136,34 @@ void *Remap(void *argument)
 	  remap_test = ival;
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_TEST to %d", remap_test);
+	}
+    }
+
+  envstr = getenv("REMAP_RESTRICT_TYPE");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "latitude") == 0 ) remap_restrict_type = RESTRICT_LATITUDE;
+      else if ( strcmp(envstr, "latlon")   == 0 ) remap_restrict_type = RESTRICT_LATLON;
+
+      if ( cdoVerbose )
+	{
+	  if      ( remap_restrict_type == RESTRICT_LATITUDE )
+	    cdoPrint("Set REMAP_RESTRICT_TYPE to latitude");
+	  else if ( remap_restrict_type == RESTRICT_LATLON )
+	    cdoPrint("Set REMAP_RESTRICT_TYPE to latlon");
+	}
+    }
+
+  envstr = getenv("REMAP_NUM_SRCH_BINS");
+  if ( envstr )
+    {
+      int ival;
+      ival = atoi(envstr);
+      if ( ival > 0 )
+	{
+	  remap_num_srch_bins = ival;
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_NUM_SRCH_BINS to %d", remap_num_srch_bins);
 	}
     }
 
@@ -231,9 +261,7 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
-      /* grid_is_circular = gridIsCyclic(gridID1); */
-
-      non_global = remap_non_global || !gridIsCyclic(gridID1);
+      non_global = remap_non_global || !gridIsCircular(gridID1);
       if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	    (gridInqType(gridID1) == GRID_LONLAT && non_global) ||
@@ -394,7 +422,7 @@ void *Remap(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 
-	  non_global = remap_non_global || !gridIsCyclic(gridID1);
+	  non_global = remap_non_global || !gridIsCircular(gridID1);
 	  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
@@ -480,7 +508,7 @@ void *Remap(void *argument)
 	      if ( remaps[r].gridID != gridID1 )
 		{
 		  remaps[r].grid.non_global = FALSE;
-		  non_global = remap_non_global || !gridIsCyclic(gridID1);
+		  non_global = remap_non_global || !gridIsCircular(gridID1);
 		  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
@@ -493,9 +521,8 @@ void *Remap(void *argument)
 		    remaps[r].grid.luse_grid1_area = FALSE;
 		    remaps[r].grid.luse_grid2_area = FALSE;
 		  */
-		  remaps[r].grid.restrict_type = RESTRICT_LATITUDE;
-		  /* remaps[r].grid.restrict_type = RESTRICT_LATLON; */
-		  remaps[r].grid.num_srch_bins = 180;
+		  remaps[r].grid.restrict_type = remap_restrict_type;
+		  remaps[r].grid.num_srch_bins = remap_num_srch_bins;
 		  remaps[r].grid.pinit = FALSE;
 
 		  remaps[r].vars.norm_opt = norm_opt;

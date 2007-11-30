@@ -143,7 +143,7 @@ static void printGridInfo(int vlistID)
 	      fprintf(stdout, "longitude : first = %.9g  last = %.9g", lonfirst, lonlast);
 	      if ( !DBL_IS_EQUAL(loninc, 0) )
 		fprintf(stdout, "  inc = %.9g", loninc);
-	      if ( gridIsCyclic(gridID) )
+	      if ( gridIsCircular(gridID) )
 		fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
 	    }
@@ -212,7 +212,7 @@ static void printGridInfo(int vlistID)
 
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "longitude : first = %.9g  last = %.9g", xfirst, xlast);
-	      if ( gridIsCyclic(gridID) )
+	      if ( gridIsCircular(gridID) )
 		fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
 	      fprintf(stdout, "%*s", nbyte0, "");
@@ -246,7 +246,7 @@ static void printGridInfo(int vlistID)
 	  else
 	    {
 	      fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
-	      if ( gridIsCyclic(gridID) )
+	      if ( gridIsCircular(gridID) )
 		{
 		  fprintf(stdout, "%*s", nbyte0, "");	  
 		  fprintf(stdout, "longitude :  circular\n");

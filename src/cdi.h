@@ -496,7 +496,7 @@ double  gridInqYval(int gridID, int index);
 double  gridInqXinc(int gridID);
 double  gridInqYinc(int gridID);
 
-int     gridIsCyclic(int gridID);
+int     gridIsCircular(int gridID);
 int     gridIsRotated(int gridID);
 double  gridInqXpole(int gridID);
 void    gridDefXpole(int gridID, double xpole);
@@ -517,10 +517,8 @@ int     gridInqGMEni3(int gridID);
 void    gridDefGMEni3(int gridID, int ni3);
 
 /* Lambert grid */
-void gridDefLambert(int gridID, double originLon, double originLat, double lonParY,
-		    double lat1, double lat2, double xinc, double yinc);
-void gridInqLambert(int gridID, double *originLon, double *originLat, double *lonParY,
-		    double *lat1, double *lat2, double *xinc, double *yinc);
+void gridDefLambert(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc);
+void gridInqLambert(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc);
 
 void    gridDefArea(int gridID, double *area);
 void    gridInqArea(int gridID, double *area);

@@ -121,7 +121,7 @@ void *Smooth9(void *argument)
 	      gridsize = gridInqSize(gridID);
 	      nlon = gridInqXsize(gridID);	 
 	      nlat = gridInqYsize(gridID);
-	      grid_is_cyclic = gridIsCyclic(gridID);
+	      grid_is_cyclic = gridIsCircular(gridID);
 	   
 	      for ( i = 0; i < gridsize; i++) 
 		{		
