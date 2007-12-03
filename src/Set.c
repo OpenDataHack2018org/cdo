@@ -274,7 +274,7 @@ void *Set(void *argument)
 	  zaxisInqLevels(zaxisID2, levels);
 	  levels[0] = newlevel;
 	  zaxisDefLevels(zaxisID2, levels);
-	  vlistChangeZaxis(vlistID2, index, zaxisID2);
+	  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 	  free(levels);
 	}
     }
@@ -290,7 +290,7 @@ void *Set(void *argument)
 
 	  zaxisChangeType(zaxisID2, zaxistype);
 	  if ( zaxistype == ZAXIS_GENERIC ) zaxisDefLtype(zaxisID2, newval);
-	  vlistChangeZaxis(vlistID2, index, zaxisID2);
+	  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 	}
     }
 

@@ -4,6 +4,7 @@
 	* New module: Monarith (monadd, monsub, monmul, mondiv) [request: Daniel Hernandez]
 	* Add support for Lambert grids
 	* Seltime: bug fix for input with time constant fields [report: Claas Teichmann]
+	* Setlevel: bug fix for usage in pipes [report: Claas Teichmann]
 	* Remap: check for non global grids
 	* diff: check number of time steps
 	* gridWeights: warning with code number when using constant area weights

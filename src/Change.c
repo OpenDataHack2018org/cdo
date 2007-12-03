@@ -174,7 +174,7 @@ void *Change(void *argument)
 		    levels[k] = chlevels[i+1];
 
 	      zaxisDefLevels(zaxisID2, levels);
-	      vlistChangeZaxis(vlistID2, index, zaxisID2);
+	      vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 	    }
 
 	  free(levels);
@@ -255,7 +255,7 @@ void *Change(void *argument)
 		{
 		  zaxisChangeType(zaxisID2, zaxistype2);
 		  if ( zaxistype == ZAXIS_GENERIC ) zaxisDefLtype(zaxisID2, ltype2);
-		  vlistChangeZaxis(vlistID2, index, zaxisID2);
+		  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 		}
 	    }
 	}
