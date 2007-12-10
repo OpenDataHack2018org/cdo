@@ -374,17 +374,17 @@ int     vlistFindLevel(int vlistID, int fvarID, int flevelID);
 
 int     vlistInqNatts(int vlistID, int varID, int *nattsp);
 
-int     vlistInqAttr(int vlistID, int varID, int attrnum, char *name, int *typep, int *lenp);
+int     vlistInqAtt(int vlistID, int varID, int attrnum, char *name, int *typep, int *lenp);
 
-int     vlistDelAttr(int vlistID, int varID, const char *name);
+int     vlistDelAtt(int vlistID, int varID, const char *name);
 
-int     vlistDefAttrInt(int vlistID, int varID, const char *name, int len, const int *ip);
-int     vlistDefAttrFlt(int vlistID, int varID, const char *name, int len, const double *dp);
-int     vlistDefAttrTxt(int vlistID, int varID, const char *name, int len, const char *tp);
+int     vlistDefAttInt(int vlistID, int varID, const char *name, int len, const int *ip);
+int     vlistDefAttFlt(int vlistID, int varID, const char *name, int len, const double *dp);
+int     vlistDefAttTxt(int vlistID, int varID, const char *name, int len, const char *tp);
 
-int     vlistInqAttrInt(int vlistID, int varID, const char *name, int mlen, int *ip);
-int     vlistInqAttrFlt(int vlistID, int varID, const char *name, int mlen, double *dp);
-int     vlistInqAttrTxt(int vlistID, int varID, const char *name, int mlen, char *tp);
+int     vlistInqAttInt(int vlistID, int varID, const char *name, int mlen, int *ip);
+int     vlistInqAttFlt(int vlistID, int varID, const char *name, int mlen, double *dp);
+int     vlistInqAttTxt(int vlistID, int varID, const char *name, int mlen, char *tp);
 
 
 /* GRID routines */

@@ -35,33 +35,48 @@
 static
 void printAtts(int vlistID, int varID)
 {
+#define MAXATT 8192
   int natts, ia;
-  char attrname[1024];
-  int attrtype, attrlen;
-  char attrtxt[8192];
-  int attrint;
-  double attrflt;
+  char attname[1024];
+  int atttype, attlen;
+  char atttxt[MAXATT];
+  int attint[MAXATT];
+  double attflt[MAXATT];
+  int i;
 
   vlistInqNatts(vlistID, varID, &natts);
 
   for ( ia = 0; ia < natts; ++ia )
     {
-      vlistInqAttr(vlistID, varID, ia, attrname, &attrtype, &attrlen);
-      if ( attrtype == DATATYPE_INT )
+      vlistInqAtt(vlistID, varID, ia, attname, &atttype, &attlen);
+      if ( atttype == DATATYPE_INT )
 	{
-	  vlistInqAttrInt(vlistID, varID, attrname, 1, &attrint);
-	  fprintf(stdout, "  ATTR_INT=\"%s=%d\"\n", attrname, attrint);
+	  if ( attlen > MAXATT ) attlen = MAXATT;
+	  vlistInqAttInt(vlistID, varID, attname, attlen, attint);
+	  fprintf(stdout, "  %s = ", attname);
+	  for ( i = 0; i < attlen; ++i)
+	    {
+	      if ( i > 0 ) fprintf(stdout, ", ");
+	      fprintf(stdout, "%d", attint[i]);
+	    }
+	  fprintf(stdout, "\n");
 	}
-      else if ( attrtype == DATATYPE_FLT )
+      else if ( atttype == DATATYPE_FLT )
 	{
-	  vlistInqAttrFlt(vlistID, varID, attrname, 1, &attrflt);
-	  fprintf(stdout, "  ATTR_FLT=\"%s=%g\"\n", attrname, attrflt);
-
+	  if ( attlen > MAXATT ) attlen = MAXATT;
+	  vlistInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
+	  fprintf(stdout, "  %s = ", attname);
+	  for ( i = 0; i < attlen; ++i)
+	    {
+	      if ( i > 0 ) fprintf(stdout, ", ");
+	      fprintf(stdout, "%g", attflt[i]);
+	    }
+	  fprintf(stdout, "\n");
 	}
-      else if ( attrtype == DATATYPE_TXT )
+      else if ( atttype == DATATYPE_TXT )
 	{
-	  vlistInqAttrTxt(vlistID, varID, attrname, sizeof(attrtxt), attrtxt);
-	  fprintf(stdout, "  ATTR_TXT=\"%s=%s\"\n", attrname, attrtxt);
+	  vlistInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
+	  fprintf(stdout, "  %s = %s\n", attname, atttxt);
 	}
     }
 }
@@ -268,9 +283,8 @@ void *Filedes(void *argument)
       int varID, code, tabnum, tableID, prec;
       char pstr[4];
       char varname[128], varlongname[128], varstdname[128], varunits[128];
-      /*
       int natts;
-
+      /*
       vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
       if ( natts > 0 )
 	{
@@ -319,6 +333,8 @@ void *Filedes(void *argument)
 	    fprintf(stdout, "  UNITS=\"%s\"\n", varunits);
 
 	  /* if ( pstr ) fprintf(stdout, "  DATATYPE=%s\n", pstr); */
+
+	  /* printAtts(vlistID, varID); */
 
 	  fprintf(stdout, "/\n");
 	}   

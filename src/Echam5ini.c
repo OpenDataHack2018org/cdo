@@ -1358,8 +1358,8 @@ void *Echam5ini(void *argument)
       for ( iatt = 0; iatt < atts.natxt; ++iatt )
 	{
 	  /* printf("%s: %s\n", atts.atxtname[iatt], atts.atxtentry[iatt]); */
-	  vlistDefAttrTxt(vlistID2, CDI_GLOBAL, atts.atxtname[iatt],
-			  (int)strlen(atts.atxtentry[iatt])+1, atts.atxtentry[iatt]);
+	  vlistDefAttTxt(vlistID2, CDI_GLOBAL, atts.atxtname[iatt],
+			 (int)strlen(atts.atxtentry[iatt])+1, atts.atxtentry[iatt]);
 	}
 
       taxisID = taxisCreate(TAXIS_ABSOLUTE);

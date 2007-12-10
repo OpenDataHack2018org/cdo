@@ -80,7 +80,7 @@ void *Setgatt(void *argument)
 
   if ( operatorID == SETGATT )
     {
-      vlistDefAttrTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring)+1, attstring);
+      vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring)+1, attstring);
     }
   else
     {
@@ -108,7 +108,7 @@ void *Setgatt(void *argument)
 	      while ( isspace((int) *attstring) ) attstring++;
 	    }
 
-	  vlistDefAttrTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring)+1, attstring);
+	  vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring)+1, attstring);
 	}
 
       fclose(fp);
