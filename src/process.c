@@ -601,6 +601,7 @@ void processDefArgument(const char *argument)
   int oargc = 0;
   char **oargv = Process[processID].oargv;
 
+  /*printf("argument %s\n", argument);*/
   Process[processID].xoperator    = getOperator(argument);
   Process[processID].operatorName = getOperatorName(Process[processID].xoperator);
   Process[processID].operatorArg  = getOperatorArg(Process[processID].xoperator);
@@ -609,6 +610,7 @@ void processDefArgument(const char *argument)
   if ( operatorArg )
     {
       oargv[oargc++] = operatorArg;
+      /*printf("%d %s\n", oargc, operatorArg);*/
 
       commapos = operatorArg;
       while ( (commapos = strchr(commapos, ',')) != NULL )
