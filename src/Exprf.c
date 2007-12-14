@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,8 @@
 
       Exprf      expr            Evaluate expressions
       Exprf      exprf           Evaluate expressions from script file
+      Exprf      aexpr           Append evaluated expressions
+      Exprf      aexprf          Append evaluated expressions from script file
 */
 /*
 Operatoren: +, -, *, \
@@ -44,7 +46,7 @@ Constansts: M_PI, M_E
 void *Expr(void *argument)
 {
   static char func[] = "Expr";
-  int EXPR, EXPRF;
+  int EXPR, EXPRF, AEXPR, AEXPRF;
   int operatorID;
   char *exprs = NULL;
   const char *exprf = NULL;
@@ -67,14 +69,16 @@ void *Expr(void *argument)
 
   cdoInitialize(argument);
 
-  EXPR  = cdoOperatorAdd("expr",  0, 0, "expressions");
-  EXPRF = cdoOperatorAdd("exprf", 0, 0, "expr script filename");
+  EXPR   = cdoOperatorAdd("expr",   0, 0, "expressions");
+  EXPRF  = cdoOperatorAdd("exprf",  0, 0, "expr script filename");
+  AEXPR  = cdoOperatorAdd("aexpr",  0, 0, "expressions");
+  AEXPRF = cdoOperatorAdd("aexprf", 0, 0, "expr script filename");
 
   operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == EXPR )
+  if ( operatorID == EXPR || operatorID == AEXPR )
     {
       exprs = operatorArgv()[0];
     }
@@ -114,7 +118,10 @@ void *Expr(void *argument)
 
   nvars = vlistNvars(vlistID1);
 
-  vlistID2 = vlistCreate();
+  if ( operatorID == EXPR || operatorID == EXPRF )
+    vlistID2 = vlistCreate();
+  else
+    vlistID2 = vlistDuplicate(vlistID1);
 
   prs_arg.init = 1;
   prs_arg.vlistID1 = vlistID1;
