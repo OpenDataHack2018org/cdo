@@ -109,11 +109,12 @@ void *Setgatt(void *argument)
 	      *attstring = '\0';
 	      attstring++;
 	      while ( isspace((int) *attstring) || (int) *attstring == '=' ||
-		      (int) *attstring == '"' ) attstring++;
+		      (int) *attstring == '"' || (int) *attstring == '\'' ) attstring++;
 	      attlen = strlen(attstring);
-	      if ( attstring[attlen-1] == '"' ) attstring[--attlen] = 0;
+	      if ( attstring[attlen-1] == '"' || attstring[attlen-1] == '\'' )
+		attstring[--attlen] = 0;
 	    }
-	  printf("%s = \"%s\"\n", attname, attstring);
+
 	  if ( attstring && attlen)
 	    vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
 	}
