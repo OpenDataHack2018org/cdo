@@ -80,35 +80,42 @@ void *Setgatt(void *argument)
 
   if ( operatorID == SETGATT )
     {
-      vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring)+1, attstring);
+      vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
     }
   else
     {
       char line[1024];
       FILE *fp;
+      int attlen = 0;
 
       fp = fopen(attfile, "r");
       if ( fp == 0 ) cdoAbort("Open failed on %s", attfile);
 
       while ( readline(fp, line, 1024) )
 	{
+	  attlen = 0;
 	  if ( line[0] == '#' ) continue;
 	  if ( line[0] == '\0' ) continue;
 	  attname = line;
 	  while ( isspace((int) *attname) ) attname++;
 	  if ( attname[0] == '\0' ) continue;
 	  attstring = attname;
-	  while ( *attstring != ' ' && *attstring != '\0' ) attstring++;
+	  while ( *attstring != ' ' && *attstring != '\0' &&
+		  *attstring != '=' && *attstring != '"' ) attstring++;
 	  if ( *attstring == '\0' )
 	    attstring = NULL;
 	  else
 	    {
 	      *attstring = '\0';
 	      attstring++;
-	      while ( isspace((int) *attstring) ) attstring++;
+	      while ( isspace((int) *attstring) || (int) *attstring == '=' ||
+		      (int) *attstring == '"' ) attstring++;
+	      attlen = strlen(attstring);
+	      if ( attstring[attlen-1] == '"' ) attstring[--attlen] = 0;
 	    }
-
-	  vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, (int)strlen(attstring)+1, attstring);
+	  printf("%s = \"%s\"\n", attname, attstring);
+	  if ( attstring && attlen)
+	    vlistDefAttTxt(vlistID2, CDI_GLOBAL, attname, attlen, attstring);
 	}
 
       fclose(fp);
