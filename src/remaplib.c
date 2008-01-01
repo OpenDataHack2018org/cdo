@@ -119,7 +119,7 @@ void remapGridFree(REMAPGRID *rg)
       free(rg->bin_lons);
     }
   else
-    fprintf(stderr, "remapGridFree Warning: grid not initialized!\n");
+    fprintf(stderr, "%s Warning: grid not initialized!\n", func);
 
 } /* remapGridFree */
 
@@ -159,7 +159,7 @@ void remapVarsFree(REMAPVARS *rv)
 	}
     }
   else
-    fprintf(stderr, "remapVarsFree Warning: vars not initialized!\n");
+    fprintf(stderr, "%s Warning: vars not initialized!\n", func);
 
 } /* remapVarsFree */
 
@@ -2839,13 +2839,13 @@ void pole_intersection(int *location,
   *intrsct_y = endy;
 
   /*
-     search for location of this segment in ocean grid using cross
+     Search for location of this segment in ocean grid using cross
      product method to determine whether a point is enclosed by a cell
   */
 
   while ( TRUE ) /* srch_loop */
     {
-      /* if last segment crossed threshold, use that location */
+      /* If last segment crossed threshold, use that location */
 
       if ( *lthresh )
 	{
@@ -2857,7 +2857,7 @@ void pole_intersection(int *location,
 	      }
 	}
 
-      /* otherwise normal search algorithm */
+      /* Otherwise normal search algorithm */
 
       for ( cell = 0; cell < num_srch_cells; cell++ ) /* cell_loop  */
 	{
@@ -2867,9 +2867,9 @@ void pole_intersection(int *location,
 	      next_n = (n+1)%srch_corners;
 
 	      /*
-		here we take the cross product of the vector making 
+		Here we take the cross product of the vector making 
 		up each cell side with the vector formed by the vertex
-		and search point.  if all the cross products are 
+		and search point.  If all the cross products are 
 		positive, the point is contained in the cell.
 	      */
 	      vec1_x = srch_corner_x[ioffset+next_n] - srch_corner_x[ioffset+n];
@@ -2877,7 +2877,7 @@ void pole_intersection(int *location,
 	      vec2_x = x1 - srch_corner_x[ioffset+n];
 	      vec2_y = y1 - srch_corner_y[ioffset+n];
 
-	      /* if endpoint coincident with vertex, offset the endpoint */
+	      /* If endpoint coincident with vertex, offset the endpoint */
 
 	      if ( DBL_IS_EQUAL(vec2_x, 0) && DBL_IS_EQUAL(vec2_y, 0) )
 		{
@@ -2890,12 +2890,12 @@ void pole_intersection(int *location,
 	      cross_product = vec1_x*vec2_y - vec2_x*vec1_y;
 
 	      /*
-		if the cross product for a side is ZERO, the point 
+		If the cross product for a side is ZERO, the point 
                   lies exactly on the side or the length of a side
-                  is ZERO.  if the length is ZERO set det > 0.
+                  is ZERO.  If the length is ZERO set det > 0.
                   otherwise, perform another cross 
                   product between the side and the segment itself. 
-	        if this cross product is also ZERO, the line is 
+	        If this cross product is also ZERO, the line is 
 	          coincident with the cell boundary - perform the 
                   dot product and only choose the cell if the dot 
                   product is positive (parallel vs anti-parallel).
@@ -2919,19 +2919,19 @@ void pole_intersection(int *location,
 		    }
 		}
 
-	      /* if cross product is less than ZERO, this cell doesn't work */
+	      /* If cross product is less than ZERO, this cell doesn't work */
 
 	      if ( cross_product < ZERO ) break; /* corner_loop */
 	     
 	    } /* corner_loop */
 
-	  /* if cross products all positive, we found the location */
+	  /* If cross products all positive, we found the location */
 
 	  if  ( n >= srch_corners )
 	    {
 	      *location = srch_add[cell];
 	      /*
-		if the beginning of this segment was outside the
+		If the beginning of this segment was outside the
 		grid, invert the segment so the intersection found
 		will be the first intersection with the grid
 	      */
@@ -2948,12 +2948,12 @@ void pole_intersection(int *location,
 	      goto after_srch_loop;
 	    }
 
-	  /* otherwise move on to next cell */
+	  /* Otherwise move on to next cell */
 
 	} /* cell_loop */
 
      /*
-       if no cell found, the point lies outside the grid.
+       If no cell found, the point lies outside the grid.
        take some baby steps along the segment to see if any
        part of the segment lies inside the grid.  
      */
@@ -2962,7 +2962,7 @@ void pole_intersection(int *location,
       x1 = begx + s1*(x2 - begx);
       y1 = begy + s1*(y2 - begy);
 
-      /* reached the end of the segment and still outside the grid return no intersection */
+      /* Reached the end of the segment and still outside the grid return no intersection */
 
       if ( s1 >= ONE )
 	{
@@ -2976,8 +2976,8 @@ void pole_intersection(int *location,
  after_srch_loop:
 
   /*
-    now that a cell is found, search for the next intersection.
-    loop over sides of the cell to find intersection with side
+    Now that a cell is found, search for the next intersection.
+    Loop over sides of the cell to find intersection with side
     must check all sides for coincidences or intersections
   */
 
@@ -3188,7 +3188,7 @@ void pole_intersection(int *location,
       *lthresh = TRUE;
     }
 
-  /* if reached end of segment, do not use x,y intersect on next entry */
+  /* If reached end of segment, do not use x,y intersect on next entry */
 
   if ( DBL_IS_EQUAL(*intrsct_lat, endlat) && DBL_IS_EQUAL(*intrsct_lon, endlon) ) *luse_last = FALSE;
 
@@ -3196,10 +3196,10 @@ void pole_intersection(int *location,
 
 
 /*
-   this routine finds the next intersection of a destination grid 
+   This routine finds the next intersection of a destination grid 
    line with the line segment given by beglon, endlon, etc.
-   a coincidence flag is returned if the segment is entirely 
-   coincident with an ocean grid line.  the cells in which to search
+   A coincidence flag is returned if the segment is entirely 
+   coincident with an ocean grid line.  The cells in which to search
    for an intersection must have already been restricted in the
    calling routine.
 */
@@ -3245,7 +3245,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
   double s1, s2, determ;     /* variables used for linear solve to */
   double mat1 = 0, mat2, mat3 = 0, mat4, rhs1, rhs2;  /* find intersection */
 
-  /* initialize defaults, flags, etc. */
+  /* Initialize defaults, flags, etc. */
 
   *location = -1;
   *lcoinc = FALSE;
@@ -3296,13 +3296,13 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
   s1 = ZERO;
 
   /*
-     search for location of this segment in ocean grid using cross
+     Search for location of this segment in ocean grid using cross
      product method to determine whether a point is enclosed by a cell
   */
 
-  while (TRUE) /* srch_loop */
+  while ( TRUE ) /* srch_loop */
     {
-      /* if last segment crossed threshold, use that location */
+      /* If last segment crossed threshold, use that location */
 
       if ( *lthresh )
        {
@@ -3315,7 +3315,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	     }
        }
 
-      /* otherwise normal search algorithm */
+      /* Otherwise normal search algorithm */
 
       for ( cell = 0; cell < num_srch_cells; cell++ ) /* cell_loop  */
 	{
@@ -3324,9 +3324,9 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	    {
 	      next_n = (n+1)%srch_corners;
 	      /*
-		here we take the cross product of the vector making 
+		Here we take the cross product of the vector making 
 		up each cell side with the vector formed by the vertex
-		and search point.  if all the cross products are 
+		and search point.  If all the cross products are 
 		positive, the point is contained in the cell.
 	      */
 	      vec1_lat = srch_corner_lat[ioffset+next_n] - srch_corner_lat[ioffset+n];
@@ -3334,7 +3334,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	      vec2_lat = lat1 - srch_corner_lat[ioffset+n];
 	      vec2_lon = lon1 - srch_corner_lon[ioffset+n];
 
-	      /* if endpoint coincident with vertex, offset the endpoint */
+	      /* If endpoint coincident with vertex, offset the endpoint */
 
 	      if ( DBL_IS_EQUAL(vec2_lat, 0) && DBL_IS_EQUAL(vec2_lon, 0) )
 		{
@@ -3344,7 +3344,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		  vec2_lon = lon1 - srch_corner_lon[ioffset+n];
 		}
 
-	      /* check for 0,2pi crossings */
+	      /* Check for 0,2pi crossings */
 
 	      if      ( vec1_lon >  PI ) vec1_lon -= PI2;
 	      else if ( vec1_lon < -PI ) vec1_lon += PI2;
@@ -3355,13 +3355,13 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	      cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
 
 	      /*
-	       if the cross product for a side is ZERO, the point 
+	       If the cross product for a side is ZERO, the point 
                  lies exactly on the side or the side is degenerate
-                 (ZERO length).  if degenerate, set the cross 
-                 product to a positive number.  otherwise perform 
+                 (ZERO length).  If degenerate, set the cross 
+                 product to a positive number.  Otherwise perform 
                  another cross product between the side and the 
                  segment itself. 
-	       if this cross product is also ZERO, the line is 
+	       If this cross product is also ZERO, the line is 
                  coincident with the cell boundary - perform the 
                  dot product and only choose the cell if the dot 
                  product is positive (parallel vs anti-parallel).
@@ -3389,19 +3389,19 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		    }
 		}
 
-	      /* if cross product is less than ZERO, this cell doesn't work */
+	      /* If cross product is less than ZERO, this cell doesn't work */
 
 	      if ( cross_product < ZERO ) break; /* corner_loop */
 
 	    } /* corner_loop */
 
-	  /* if cross products all positive, we found the location */
+	  /* If cross products all positive, we found the location */
 
 	  if ( n >= srch_corners )
 	    {
 	      *location = srch_add[cell];
 	      /*
-		if the beginning of this segment was outside the
+		If the beginning of this segment was outside the
 		grid, invert the segment so the intersection found
 		will be the first intersection with the grid
 	      */
@@ -3418,13 +3418,13 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	      goto after_srch_loop;
 	    }
 
-	  /* otherwise move on to next cell */
+	  /* Otherwise move on to next cell */
 
 	} /* cell_loop */
 
       /*
-	if still no cell found, the point lies outside the grid.
-	take some baby steps along the segment to see if any
+	If still no cell found, the point lies outside the grid.
+	Take some baby steps along the segment to see if any
 	part of the segment lies inside the grid.  
       */
       loutside = TRUE;
@@ -3432,7 +3432,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
       lat1 = beglat + s1*(endlat - beglat);
       lon1 = beglon + s1*(lon2   - beglon);
 
-      /* reached the end of the segment and still outside the grid return no intersection */
+      /* Reached the end of the segment and still outside the grid return no intersection */
 
       if ( s1 >= ONE ) return;
 
@@ -3441,8 +3441,8 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
  after_srch_loop:
 
   /*
-    now that a cell is found, search for the next intersection.
-    loop over sides of the cell to find intersection with side
+    Now that a cell is found, search for the next intersection.
+    Loop over sides of the cell to find intersection with side
     must check all sides for coincidences or intersections
   */
 
@@ -3595,8 +3595,8 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 
 
 /*
-   this routine computes the line integral of the flux function 
-   that results in the interpolation weights.  the line is defined
+   This routine computes the line integral of the flux function 
+   that results in the interpolation weights.  The line is defined
    by the input lat/lon of the endpoints.
 */
 static
@@ -3699,7 +3699,7 @@ void line_integral(double *weights, int num_wts,
 
 
 /*
-    this routine stores the address and weight for this link in
+    This routine stores the address and weight for this link in
     the appropriate address and weight arrays and resizes those
     arrays if necessary.
 */
@@ -3809,7 +3809,7 @@ void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
 /*
   -----------------------------------------------------------------------
 
-   this routine traces the perimeters of every grid cell on each
+   This routine traces the perimeters of every grid cell on each
    grid checking for intersections with the other grid and computing
    line integrals for each subsegment.
 
