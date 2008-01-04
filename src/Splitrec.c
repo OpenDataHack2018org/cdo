@@ -67,7 +67,7 @@ void *Splitrec(void *argument)
     {
       strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
       if ( cdoDefaultFileType == FILETYPE_GRB )
-	if ( vlistIsSzipped(vlistID1) || cdoCompress == COMPRESS_SZIP )
+	if ( vlistIsSzipped(vlistID1) || cdoZtype == COMPRESS_SZIP )
 	  strcat(filesuffix, ".sz");
     }
 

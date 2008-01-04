@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 #
-bin_PROGRAMS = cdo              \
-               cdotest
+bin_PROGRAMS = cdo
+#
+noinst_PROGRAMS = cdotest
 #
 cdo_SOURCES = Arith.c		\
 	      Arithc.c 		\
@@ -215,7 +216,7 @@ cdotest_SOURCES = cdi.h 	\
 		  cdo_int.h 	\
 		  cdotest.c
 #
-userlog.o: userlog.c
+userlog.o: userlog.c config.h
 	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c `test -f '$<' || echo '$(srcdir)/'`$<
 #
 CLEANFILES  = `ls *~`

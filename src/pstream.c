@@ -612,6 +612,12 @@ int pstreamOpenWrite(const char *argument, int filetype)
 
       if ( cdoDefaultByteorder != CDI_UNDEFID )
 	streamDefByteorder(fileID, cdoDefaultByteorder);
+
+      if ( cdoZtype != COMPRESS_NONE )
+	{
+	  streamDefZtype(fileID, cdoZtype);
+	  streamDefZlevel(fileID, cdoZlevel);
+	}
       /*
       if ( cdoDefaultInstID != CDI_UNDEFID )
 	streamDefInstID(fileID, cdoDefaultInstID);

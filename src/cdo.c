@@ -67,7 +67,8 @@ int cdoDefaultTableID   = CDI_UNDEFID;
 
 int cdoDisableFilesuffix = FALSE;
 int cdoDisableHistory = FALSE;
-int cdoCompress    = 0;
+int cdoZtype       = COMPRESS_NONE;
+int cdoZlevel      = 0;
 int cdoLogOff      = FALSE;
 int cdoSilentMode  = FALSE;
 int cdoRegulargrid = FALSE;
@@ -179,6 +180,7 @@ static void usage(void)
 
   fprintf(stderr, "    -V             Print the version number\n");
   fprintf(stderr, "    -v             Print extra details for some operators\n");
+  fprintf(stderr, "    -z szip        Compress GRIB records with szip\n");
   fprintf(stderr, "\n");
 
   fprintf(stderr, "  Operators:\n");
@@ -338,18 +340,6 @@ static void setDefaultDataType(char *datatypestr)
       if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
       datatypestr++;
     }
-
-  if ( *datatypestr == 'z' || *datatypestr == 'Z' )
-    {
-      int level = 6;
-      datatypestr++;
-      if ( isdigit((int) *datatypestr) )
-	{
-	  level = atoi(datatypestr);
-	  datatypestr++;	      
-	}
-      cdiDefCompress(COMPRESS_GZIP, level);
-    }
 }
 
 
@@ -386,18 +376,6 @@ static void setDefaultDataTypeByte(char *datatypestr)
     {
       if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
       datatypestr++;
-    }
-
-  if ( *datatypestr == 'z' || *datatypestr == 'Z' )
-    {
-      int level = 6;
-      datatypestr++;
-      if ( isdigit((int) *datatypestr) )
-	{
-	  level = atoi(datatypestr);
-	  datatypestr++;	      
-	}
-      cdiDefCompress(COMPRESS_GZIP, level);
     }
 }
 
@@ -468,13 +446,13 @@ void defineCompress(const char *arg)
 
   if      ( strncmp(arg, "szip", len) == 0 )
     {
-      cdoCompress = COMPRESS_SZIP;
-      cdiDefCompress(COMPRESS_SZIP, 0);
+      cdoZtype  = COMPRESS_SZIP;
+      cdoZlevel = 0;
     }
   else if ( strncmp(arg, "gzip", len) == 0 )
     {
-      cdoCompress = COMPRESS_GZIP;
-      cdiDefCompress(COMPRESS_GZIP, 6);
+      cdoZtype  = COMPRESS_GZIP;
+      cdoZlevel = 6;
     }
   else
     fprintf(stderr, "Compression %s unsupported!\n", arg);
@@ -591,9 +569,6 @@ int main(int argc, char *argv[])
 	case 'z':
 	  defineCompress(cdoOptarg);
           break;
-	case 'Z':
-	  cdiDefCompress(COMPRESS_GZIP, 6);
-	  break;
 	case ':':
 	  fprintf(stderr, "\nmissing parameter for one of the options\n\n");	  
 	  Help = 1;

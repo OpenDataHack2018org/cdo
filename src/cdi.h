@@ -36,6 +36,7 @@ extern "C" {
 
 /* Compress types */
 
+#define  COMPRESS_NONE            0
 #define  COMPRESS_SZIP            1
 #define  COMPRESS_GZIP            2
 #define  COMPRESS_BZIP2           3
@@ -158,7 +159,6 @@ void    cdiPrintVersion(void);
 void    cdiDefMissval(double missval);
 double  cdiInqMissval(void);
 int     cdiDefGlobal(const char *string, int val);
-void    cdiDefCompress(int type, int level);
 
 /* STREAM control routines */
 
@@ -187,6 +187,18 @@ void    streamDefByteorder(int streamID, int byteorder);
 
 /*      streamInqByteorder: Get the byteorder */
 int     streamInqByteorder(int streamID);
+
+/*      streamDefZtype: Define compression type */
+void    streamDefZtype(int streamID, int ztype);
+
+/*      streamDefZlevel: Define compression level */
+void    streamDefZlevel(int streamID, int zlevel);
+
+/*      streamInqZtype: Get compression type */
+int     streamInqZtype(int streamID);
+
+/*      streamInqZlevel: Get compression level */
+int     streamInqZlevel(int streamID);
 
 /*      streamDefTimestep: Define time step */
 int     streamDefTimestep(int streamID, int tsID);
