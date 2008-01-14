@@ -5,6 +5,7 @@
 	* Add support for Lambert grids
 	* Seltime: bug fix for input with time constant fields [report: Claas Teichmann]
 	* Setlevel: bug fix for usage in pipes [report: Claas Teichmann]
+	* Outputbounds: use -ZNaN for missing values [request: Karin Meier-Fleischer]
 	* Remap: check for non global grids
 	* Setgatts: improve attribute format
 	* diff: check number of time steps

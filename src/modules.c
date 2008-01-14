@@ -241,7 +241,7 @@ void *Wct(void *argument);
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
-#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab"}
+#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}

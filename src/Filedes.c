@@ -84,7 +84,7 @@ void printAtts(int vlistID, int varID)
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, GRIDDES2, ZAXISDES, VCT, PARDES, TAXISDES, FILEDES, VLIST, PARTAB;
+  int GRIDDES, GRIDDES2, ZAXISDES, VCT, PARDES, TAXISDES, FILEDES, VLIST, PARTAB, PARTAB2;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -103,6 +103,7 @@ void *Filedes(void *argument)
   FILEDES  = cdoOperatorAdd("filedes",  0, 0, NULL);
   VLIST    = cdoOperatorAdd("vlist",    0, 0, NULL);
   PARTAB   = cdoOperatorAdd("partab",   0, 0, NULL);
+  PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -278,22 +279,25 @@ void *Filedes(void *argument)
 	  fprintf(stdout, "\n");
 	}   
     }
-  else if ( operatorID == PARTAB )
+  else if ( operatorID == PARTAB || operatorID == PARTAB2 )
     {
       int varID, code, tabnum, tableID, prec;
       char pstr[4];
       char varname[128], varlongname[128], varstdname[128], varunits[128];
       int natts;
-      /*
-      vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
-      if ( natts > 0 )
+      
+      if (  operatorID == PARTAB2 )
 	{
-	  fprintf(stdout, "&PARAMETER\n");
-	  fprintf(stdout, "  NAME=_GLOBAL_\n");
-	  printAtts(vlistID, CDI_GLOBAL);
-	  fprintf(stdout, "/\n");
+	  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+	  if ( natts > 0 )
+	    {
+	      fprintf(stdout, "&PARAMETER\n");
+	      fprintf(stdout, "  NAME=_GLOBAL_\n");
+	      printAtts(vlistID, CDI_GLOBAL);
+	      fprintf(stdout, "/\n");
+	    }
 	}
-      */
+
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  fprintf(stdout, "&PARAMETER\n");
@@ -334,7 +338,7 @@ void *Filedes(void *argument)
 
 	  /* if ( pstr ) fprintf(stdout, "  DATATYPE=%s\n", pstr); */
 
-	  /* printAtts(vlistID, varID); */
+	  if ( operatorID == PARTAB2 ) printAtts(vlistID, varID);
 
 	  fprintf(stdout, "/\n");
 	}   
