@@ -37,6 +37,13 @@
 #endif
 #endif
 
+#if defined(WITH_ETOPO)
+double etopo_scale = 3;
+static const short etopo[] = {
+#include "etopo.h"
+};
+#endif
+
 void *Vargen(void *argument)
 {
   static char func[] = "Vargen";
@@ -48,12 +55,6 @@ void *Vargen(void *argument)
   int gridsize, i;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
-#if defined(WITH_ETOPO)
-  double etopo_scale = 3;
-  short etopo[] = {
-#include "etopo.h"
-  };
-#endif
   const char *gridfile;
   double rconst = 0.0;
   double *array;
