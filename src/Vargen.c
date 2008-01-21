@@ -37,12 +37,6 @@
 #endif
 #endif
 
-#if defined(WITH_ETOPO)
-double etopo_scale = 3;
-static const short etopo[] = {
-#include "etopo.h"
-};
-#endif
 
 void *Vargen(void *argument)
 {
@@ -58,6 +52,12 @@ void *Vargen(void *argument)
   const char *gridfile;
   double rconst = 0.0;
   double *array;
+#if defined(WITH_ETOPO)
+  double etopo_scale = 3;
+  static const short etopo[] = {
+#include "etopo.h"
+  };
+#endif
 
   cdoInitialize(argument);
 

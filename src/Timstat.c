@@ -209,6 +209,8 @@ void *Timstat(void *argument)
 	  if ( nsets == 0 ) indate2 = (INT64)vdate*10000 + vtime;
 	  indate1 = (INT64)vdate*10000 + vtime;
 
+	  /* printf("%d %lld %lld %lld %d %d\n", tsID, indate1, indate2, intvdat, vdate, vtime);*/
+
 	  if ( indate1/intvdat != indate2/intvdat ) break;
 
 	  for ( recID = 0; recID < nrecs; recID++ )
