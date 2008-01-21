@@ -68,8 +68,8 @@ void *Timstat(void *argument)
   static char func[] = "Timstat";
   int operatorID;
   int operfunc;
-  INT64 intvdat;
-  INT64 indate1, indate2 = 0;
+  int cmplen;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
@@ -90,13 +90,13 @@ void *Timstat(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timmin",   func_min,  17, NULL);
-  cdoOperatorAdd("timmax",   func_max,  17, NULL);
-  cdoOperatorAdd("timsum",   func_sum,  17, NULL);
-  cdoOperatorAdd("timmean",  func_mean, 17, NULL);
-  cdoOperatorAdd("timavg",   func_avg,  17, NULL);
-  cdoOperatorAdd("timvar",   func_var,  17, NULL);
-  cdoOperatorAdd("timstd",   func_std,  17, NULL);
+  cdoOperatorAdd("timmin",   func_min,  16, NULL);
+  cdoOperatorAdd("timmax",   func_max,  16, NULL);
+  cdoOperatorAdd("timsum",   func_sum,  16, NULL);
+  cdoOperatorAdd("timmean",  func_mean, 16, NULL);
+  cdoOperatorAdd("timavg",   func_avg,  16, NULL);
+  cdoOperatorAdd("timvar",   func_var,  16, NULL);
+  cdoOperatorAdd("timstd",   func_std,  16, NULL);
   cdoOperatorAdd("yearmin",  func_min,   8, NULL);
   cdoOperatorAdd("yearmax",  func_max,   8, NULL);
   cdoOperatorAdd("yearsum",  func_sum,   8, NULL);
@@ -129,7 +129,7 @@ void *Timstat(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
-  intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
+  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -137,7 +137,7 @@ void *Timstat(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(vlistID2, 1);
+  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(vlistID2, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
@@ -195,7 +195,6 @@ void *Timstat(void *argument)
 	}
     }
 
-  indate1 = 0;
   tsID    = 0;
   otsID   = 0;
   while ( TRUE )
@@ -206,12 +205,10 @@ void *Timstat(void *argument)
 	  vdate = taxisInqVdate(taxisID1);
 	  vtime = taxisInqVtime(taxisID1);
 
-	  if ( nsets == 0 ) indate2 = (INT64)vdate*10000 + vtime;
-	  indate1 = (INT64)vdate*10000 + vtime;
+	  if ( nsets == 0 ) SET_DATE(indate2, vdate, vtime);
+	  SET_DATE(indate1, vdate, vtime);
 
-	  /* printf("%d %lld %lld %lld %d %d\n", tsID, indate1, indate2, intvdat, vdate, vtime);*/
-
-	  if ( indate1/intvdat != indate2/intvdat ) break;
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {

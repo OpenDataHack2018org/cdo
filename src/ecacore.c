@@ -37,8 +37,8 @@ void eca1(const ECA_REQUEST_1 *request)
   static const char func[] = "eca1";
   const int operatorID = cdoOperatorID();
   
-  INT64 intvdat;
-  INT64 indate1 = 0, indate2;
+  int cmplen;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
@@ -56,7 +56,7 @@ void eca1(const ECA_REQUEST_1 *request)
   FIELD *var12 = NULL, *samp1 = NULL, *samp2 = NULL, *var13 = NULL, *var21 = NULL, *var23 = NULL, *var;
   FIELD field1, field2;
   
-  intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
+  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   istreamID = streamOpenRead(cdoStreamName(0));
   if ( istreamID < 0 ) cdiError(istreamID, "Open failed on %s", cdoStreamName(0));
@@ -87,7 +87,7 @@ void eca1(const ECA_REQUEST_1 *request)
         vlistDefVarUnits(ovlistID, varID, request->var2.units);
     }
     
-  if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID = vlistInqTaxis(ivlistID);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
@@ -168,7 +168,6 @@ void eca1(const ECA_REQUEST_1 *request)
         }
     }
 
-  indate2 = 0;
   itsID   = 0;
   otsID   = 0;
   while ( TRUE )
@@ -179,10 +178,10 @@ void eca1(const ECA_REQUEST_1 *request)
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
 
-          if ( nsets == 0 ) indate1 = (INT64)ivdate*10000 + ivtime;
-          indate2 = (INT64)ivdate*10000 + ivtime;
+	  if ( nsets == 0 ) SET_DATE(indate2, ivdate, ivtime);
+	  SET_DATE(indate1, ivdate, ivtime);
 
-          if ( indate2/intvdat != indate1/intvdat ) break;
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
           for ( recID = 0; recID < nrecs; recID++ )
             {
@@ -398,8 +397,8 @@ void eca2(const ECA_REQUEST_2 *request)
   static const char func[] = "eca2";
   const int operatorID = cdoOperatorID();
   
-  INT64 intvdat;
-  INT64 indate1 = 0, indate2;
+  int cmplen;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
@@ -417,7 +416,7 @@ void eca2(const ECA_REQUEST_2 *request)
   FIELD *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
   FIELD field1, field2;
   
-  intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
+  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
   if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
@@ -454,7 +453,7 @@ void eca2(const ECA_REQUEST_2 *request)
         vlistDefVarUnits(ovlistID, varID, request->var2.units);
     }
 
-  if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
@@ -540,7 +539,6 @@ void eca2(const ECA_REQUEST_2 *request)
         }
     }
 
-  indate2 = 0;
   itsID   = 0;
   otsID   = 0;
   while ( TRUE )
@@ -554,10 +552,10 @@ void eca2(const ECA_REQUEST_2 *request)
           ivdate = taxisInqVdate(itaxisID1);
           ivtime = taxisInqVtime(itaxisID1);
           
-          if ( nsets == 0 ) indate1 = (INT64)ivdate*10000 + ivtime;
-          indate2 = (INT64)ivdate*10000 + ivtime;
+	  if ( nsets == 0 ) SET_DATE(indate2, ivdate, ivtime);
+	  SET_DATE(indate1, ivdate, ivtime);
 
-          if ( indate2/intvdat != indate1/intvdat ) break;
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
           for ( recID = 0; recID < nrecs; recID++ )
             {
@@ -777,8 +775,8 @@ void eca3(const ECA_REQUEST_3 *request)
   static const char func[] = "eca3";
   const int operatorID = cdoOperatorID();
   
-  INT64 intvdat;
-  INT64 indate1 = 0, indate2;
+  int cmplen;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
   int ivdate1 = 0, ivtime1 = 0;
   int ivdate2 = 0, ivtime2 = 0;
@@ -797,7 +795,7 @@ void eca3(const ECA_REQUEST_3 *request)
   FIELD *var1 = NULL, *var2 = NULL;
   FIELD field1, field2;
   
-  intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
+  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
   if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
@@ -822,7 +820,7 @@ void eca3(const ECA_REQUEST_3 *request)
   if ( IS_SET(request->units) ) 
     vlistDefVarUnits(ovlistID, varID, request->units);
 
-  if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
@@ -866,7 +864,6 @@ void eca3(const ECA_REQUEST_3 *request)
       var2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
     }
 
-  indate2 = 0;
   itsID   = 0;
   otsID   = 0;
   while ( TRUE )
@@ -886,11 +883,11 @@ void eca3(const ECA_REQUEST_3 *request)
           ivtime2 = taxisInqVtime(itaxisID2);
           if ( ivtime1 != ivtime2 )
             cdoAbort("Input streams have different verification times for time step %d!", itsID+1);
+   
+	  if ( nsets == 0 ) SET_DATE(indate2, ivdate1, ivtime1);
+	  SET_DATE(indate1, ivdate1, ivtime1);
 
-          if ( nsets == 0 ) indate1 = (INT64)ivdate1*10000 + ivtime1;
-          indate2 = (INT64)ivdate1*10000 + ivtime1;
-
-          if ( indate2/intvdat != indate1/intvdat ) break;
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
           for ( recID = 0; recID < nrecs; recID++ )
             {
@@ -980,8 +977,8 @@ void eca4(const ECA_REQUEST_4 *request)
   static const char func[] = "eca4";
   const int operatorID = cdoOperatorID();
   
-  INT64 intvdat;
-  INT64 indate1 = 0, indate2;
+  int cmplen;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
@@ -1001,7 +998,7 @@ void eca4(const ECA_REQUEST_4 *request)
   FIELD field, mask;
   double firstDay, finalDay;
   
-  intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
+  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
   if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
@@ -1034,7 +1031,7 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( IS_SET(request->units2) ) 
     vlistDefVarUnits(ovlistID, ovarID2, request->units2);
 
-  if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID = vlistInqTaxis(ivlistID1);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
@@ -1089,7 +1086,6 @@ void eca4(const ECA_REQUEST_4 *request)
       var2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
     }
   
-  indate2 = 0;
   itsID   = 0;
   otsID   = 0;
 
@@ -1111,11 +1107,11 @@ void eca4(const ECA_REQUEST_4 *request)
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
+          
+	  if ( nsets == 0 ) SET_DATE(indate2, ivdate, ivtime);
+	  SET_DATE(indate1, ivdate, ivtime);
 
-          if ( nsets == 0 ) indate1 = (INT64)ivdate*10000 + ivtime;
-          indate2 = (INT64)ivdate*10000 + ivtime;
-
-          if ( indate2/intvdat != indate1/intvdat ) break;
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
           for ( recID = 0; recID < nrecs; recID++ )
             {

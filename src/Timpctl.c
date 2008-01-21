@@ -37,8 +37,8 @@
 static void timpctl(int operatorID)
 {
   static const char func[] = "timpctl";
-  INT64 intvdat;
-  INT64 indate1, indate2 = 0;
+  int cmplen;
+  char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;
   int vdate1 = 0, vtime1 = 0;
   int vdate2 = 0, vtime2 = 0;
@@ -66,7 +66,7 @@ static void timpctl(int operatorID)
   if ( pn < 1 || pn > 99 )
     cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
 
-  intvdat = (INT64) pow(10.0, (double) cdoOperatorIntval(operatorID));
+  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -83,7 +83,7 @@ static void timpctl(int operatorID)
   vlistCompare(vlistID1, vlistID2, func_hrd);
   vlistCompare(vlistID1, vlistID3, func_hrd);
   
-  if ( cdoOperatorIntval(operatorID) == 17 ) vlistDefNtsteps(vlistID4, 1);
+  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(vlistID4, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);
@@ -130,7 +130,6 @@ static void timpctl(int operatorID)
         } 
     }
 
-  indate1 = 0;
   tsID    = 0;
   otsID   = 0;
   while ( TRUE )
@@ -170,10 +169,11 @@ static void timpctl(int operatorID)
 	  vdate1 = taxisInqVdate(taxisID1);
 	  vtime1 = taxisInqVtime(taxisID1);
 
-	  if ( nsets == 0 ) indate2 = (INT64) vdate1 * 10000 + vtime1;
-	  indate1 = (INT64) vdate1 * 10000 + vtime1;
 
-	  if ( indate1 / intvdat != indate2 / intvdat ) break;
+	  if ( nsets == 0 ) SET_DATE(indate2, vdate1, vtime1);
+	  SET_DATE(indate1, vdate1, vtime1);
+
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
@@ -258,7 +258,7 @@ void *Timpctl(void *argument)
   
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timpctl",  func_pctl, 17, NULL);
+  cdoOperatorAdd("timpctl",  func_pctl, 16, NULL);
   cdoOperatorAdd("yearpctl", func_pctl,  8, NULL);
   cdoOperatorAdd("monpctl",  func_pctl,  6, NULL);
   cdoOperatorAdd("daypctl",  func_pctl,  4, NULL);

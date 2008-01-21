@@ -10,6 +10,7 @@
 	* Remap: check for non global grids
 	* Setgatts: improve attribute format
 	* diff: check number of time steps
+	* Timstat: change datetime type from INT64 to char[16]
 	* gridWeights: warning with code number when using constant area weights
 	* Version 1.1.0 released
 

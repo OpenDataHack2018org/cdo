@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <float.h>
 
@@ -44,6 +45,13 @@ char *strdup(const char *s);
 })
 */
 #endif
+
+
+/* sxxxYYYYMMDDhhmm0 */
+#define  DATE_LEN  16        /* allocate DTLEN+1 !!!! */
+#define  SET_DATE(dtstr, date, time)        (sprintf(dtstr, "%*d%*d", DATE_LEN-4, date, 4, time))
+#define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
+
 
 #ifndef  DBL_IS_EQUAL
 /*
