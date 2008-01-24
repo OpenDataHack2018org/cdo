@@ -1,4 +1,4 @@
-2008-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2008-01-24  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.1.0
 	* New module: Monarith (monadd, monsub, monmul, mondiv) [request: Daniel Hernandez]
