@@ -1,10 +1,20 @@
 CDO NEWS
 --------
 
-Version 1.1.0 (?? January 2008):
+Version 1.1.0 (25 January 2008):
+
+   * New features
+      o Support for Lambert conformal grids in GRIB format
+      o Improved support for netCDF attributes
 
    * New operators:
       o Monthly arithmetic - monadd, monsub, monmul, mondiv
+
+   * Fixed bugs:
+      o Operator setlevel and chlevel: bug fix for usage in pipes
+      o Operator cat: bug fix for large existing output files (>2GB) on 32-bit machines
+      o Operator gradsdes: bug fix for monthly mean data with start day > 28
+      o Operator expr: change exponent precedence from left to right
 
 Version 1.0.9 (22 October 2007):
 

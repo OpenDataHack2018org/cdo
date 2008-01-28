@@ -59,6 +59,23 @@ case "${HOSTNAME}" in
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/include"  LIBS=$HOME/local/lib/libsz.a \
                     CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
 	;;
+# etch-ia32
+    baba)
+        if [ "$SGE_MODE" = "off" ] ; then
+ 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
+	            --with-netcdf=/client \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/etch-ia32/include"  LIBS=$HOME/local/etch-ia32/lib/libsz.a \
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+        else
+ 	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
+                    --program-suffix=_${SGE_SUFFIX} \
+	            --with-netcdf=/client \
+                    CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/etch-ia32/include -DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
+                    LIBS="$HOME/local/etch-ia32/lib/libsz.a -L/opt/gridware/sge/lib/lx24-x86 -ldrmaa -ldl -L/usr/lib -lcurl" \
+                    CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+        fi
+        ;;
+# sarge-ia32
     gata)
 # opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
         if [ "$SGE_MODE" = "off" ] ; then
