@@ -128,31 +128,32 @@ The following keywords can be used to describe a grid:
 
 \vspace{3mm}
 \begin{tabular}[b]{lll}
-gridtype     & STRING       & type of the grid (gaussian, lonlat, curvilinear, cell) \\
-gridsize     & INTEGER      & size of the grid \\
-xsize        & INTEGER      & size in x direction (number of longitudes) \\
-ysize        & INTEGER      & size in y direction (number of latitudes) \\
-xvals        & FLOAT ARRAY  & x values of the grid \\
-yvals        & FLOAT ARRAY  & y values of the grid \\
-xnpole       & FLOAT        & x value of the north pole (rotated grid) \\
-ynpole       & FLOAT        & y value of the north pole (rotated grid) \\
-nvertex      & INTEGER      & number of the vertices for all grid cells \\
-xbounds      & FLOAT ARRAY  & x bounds of each gridbox \\
-ybounds      & FLOAT ARRAY  & y bounds of each gridbox \\
+Keyword           & Datatype     & Description \\ \hline
+\bf{gridtype}     & STRING       & type of the grid (gaussian, lonlat, curvilinear, cell) \\
+\bf{gridsize}     & INTEGER      & size of the grid \\
+\bf{xsize}        & INTEGER      & size in x direction (number of longitudes) \\
+\bf{ysize}        & INTEGER      & size in y direction (number of latitudes) \\
+\bf{xvals}        & FLOAT ARRAY  & x values of the grid \\
+\bf{yvals}        & FLOAT ARRAY  & y values of the grid \\
+\bf{xnpole}       & FLOAT        & x value of the north pole (rotated grid) \\
+\bf{ynpole}       & FLOAT        & y value of the north pole (rotated grid) \\
+\bf{nvertex}      & INTEGER      & number of the vertices for all grid cells \\
+\bf{xbounds}      & FLOAT ARRAY  & x bounds of each gridbox \\
+\bf{ybounds}      & FLOAT ARRAY  & y bounds of each gridbox \\
 %xname        & STRING       & name of the x axis \\
 %xlongname    & STRING       & longname of the x axis \\
 %xunits       & STRING       & units of the x axis \\
 %yname        & STRING       & name of the y axis \\
 %ylongname    & STRING       & longname of the y axis \\
 %yunits       & STRING       & units of the y axis \\
-xfirst, xinc & FLOAT, FLOAT & macros to define xvals with a constant increment \\
-yfirst, yinc & FLOAT, FLOAT & macros to define yvals with a constant increment \\
+\bf{xfirst, xinc} & FLOAT, FLOAT & macros to define xvals with a constant increment \\
+\bf{yfirst, yinc} & FLOAT, FLOAT & macros to define yvals with a constant increment \\
 \end{tabular}
 
 \vspace{4mm}
 
 Which keywords are necessary depends on the gridtype.
-The following table gives an overview of the default values or the array size for the different
+The following table gives an overview of the default values or the size for the different
 grid types.
 
 %\vspace{2mm}

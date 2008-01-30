@@ -331,7 +331,7 @@ void *Outputgmt(void *argument)
 			}
 		    }
 
-		  if ( operatorID == OUTPUTCENTER ) 
+		  if ( operatorID == OUTPUTCENTER )
 		    {
 		      if ( lzon )
 			fprintf(stdout, " %g  %g  %g\n", grid_center_lat[i], level, array[i]);
