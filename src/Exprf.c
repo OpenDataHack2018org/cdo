@@ -138,7 +138,7 @@ void *Expr(void *argument)
     parse_arg.var_needed[varID] = FALSE;
 
   yy_scan_string(exprs, scanner);
-  yyparse((void *) &parse_arg, scanner);
+  yyparse(&parse_arg, scanner);
 
   parse_arg.init = 0;
 
@@ -227,7 +227,7 @@ void *Expr(void *argument)
 	}
 
       yy_scan_string(exprs, scanner);
-      yyparse((void *) &parse_arg, scanner);
+      yyparse(&parse_arg, scanner);
 
       for ( varID = 0; varID < nvars2; varID++ )
 	{
