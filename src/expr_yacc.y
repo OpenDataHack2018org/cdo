@@ -5,6 +5,13 @@
 #include <stdarg.h>
 
 #include "expr.h"
+#include "expr_yacc.h" /* expr_yacc.h (y.tab.h) is produced from expr_yacc.y by parser generator */
+
+/* Bison manual p. 60 describes how to call yyparse() with arguments */
+/* #define YYPARSE_PARAM parse_arg */
+/* #define YYLEX_PARAM   ((parse_parm_t *) parse_arg, void *yyscanner) */
+
+  /* #define YYPURE 1 *//* ??? */
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
@@ -13,31 +20,16 @@ nodeType *con(double value);
 nodeType *fun(char *fname, nodeType *p);
 
 void freeNode(nodeType *p);
-int ex(nodeType *p, prs_sct *prs_arg);
-
-void yyerror(char *s);
-
-/* Get YYSTYPE prior to prototyping scanner */
-#include "expr_yacc.h" /* expr_yacc.h (y.tab.h) is produced from expr_yacc.y by parser generator */
-
-#define YY_DECL int yylex(YYSTYPE *yylval, prs_sct *prs_arg)
-
-YY_DECL;
-
-/* Bison manual p. 60 describes how to call yyparse() with arguments */
-#define YYPARSE_PARAM prs_arg
-#define YYLEX_PARAM   &yylval, (prs_sct *) prs_arg
-
-  /* #define YYPURE 1 *//* ??? */
+int ex(nodeType *p, parse_parm_t *parse_arg);
 
 %}
 
-%union {
-    double cvalue;              /* constant value */
-    char *varnm;                /* variable name */
-    char *fname;                /* function name */
-    nodeType *nPtr;             /* node pointer */
-};
+%pure_parser
+%parse-param {parse_parm_t *parse_arg}
+%parse-param {void *scanner}
+%lex-param {parse_parm_t *parse_arg}
+%lex-param {yyscan_t *scanner}
+
 
 %token <cvalue> CONSTANT
 %token <varnm>  VARIABLE
@@ -58,7 +50,7 @@ program:
         ;
 
 function:
-          function stmt           { ex($2, (prs_sct *) prs_arg); freeNode($2); }
+          function stmt           { ex($2, (parse_parm_t *) parse_arg); freeNode($2); }
         | /* NULL */
         ;
 
@@ -105,7 +97,7 @@ nodeType *con(double value)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(conNodeType);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeCon;
@@ -122,7 +114,7 @@ nodeType *var(char *nm)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(varNodeType);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeVar;
@@ -139,7 +131,7 @@ nodeType *fun(char *fname, nodeType *op)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeFun;
@@ -159,7 +151,7 @@ nodeType *opr(int oper, int nops, ...)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(oprNodeType) + (nops - 1)*sizeof(nodeType*);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeOpr;
@@ -188,7 +180,7 @@ void freeNode(nodeType *p)
   free (p);
 }
 
-void yyerror(char *s)
+void yyerror(void *parse_arg, void *scanner, char *s)
 {
   fprintf(stdout, "%s\n", s);
 }
@@ -199,29 +191,29 @@ int main(void)
   int i;
   static char fexpr[] = "nvar = q*(geosp+234.56); xx = geosp+999-log(aps);";
 
-  prs_sct prs_arg;
+  parse_parm_t parse_arg;
 
   printf("%s\n", fexpr);
 
   yy_scan_string(fexpr);
 
-  prs_arg.nvar = 0;
-  prs_arg.init = 1;
-  prs_arg.debug = 1;
+  parse_arg.nvar = 0;
+  parse_arg.init = 1;
+  parse_arg.debug = 1;
 
-  yyparse((void *)&prs_arg);
+  yyparse((void *)&parse_arg);
 
-  for ( i = 0; i < prs_arg.nvar; i++ )
-    printf("vars %d %s\n", i, prs_arg.var[i]);
+  for ( i = 0; i < parse_arg.nvar; i++ )
+    printf("vars %d %s\n", i, parse_arg.var[i]);
 
   yy_scan_string(fexpr);
 
-  prs_arg.init = 0;
+  parse_arg.init = 0;
 
-  yyparse((void *)&prs_arg);
+  yyparse((void *)&parse_arg);
 
-  for ( i = 0; i < prs_arg.nvar; i++ )
-    printf("vars %d %s\n", i, prs_arg.var[i]);
+  for ( i = 0; i < parse_arg.nvar; i++ )
+    printf("vars %d %s\n", i, parse_arg.var[i]);
 
   return 0;
 }

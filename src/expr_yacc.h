@@ -63,21 +63,11 @@
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 35 "expr_yacc.y"
-{
-    double cvalue;              /* constant value */
-    char *varnm;                /* variable name */
-    char *fname;                /* function name */
-    nodeType *nPtr;             /* node pointer */
-}
-/* Line 1529 of yacc.c.  */
-#line 76 "expr_yacc.h"
-	YYSTYPE;
+typedef int YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
 
-extern YYSTYPE yylval;
+
 

@@ -74,5 +74,30 @@ typedef struct{ /* prs_sct */
   char   *var[1024];
   int    init;
   int    debug;
+  int    gridID2;
+  int    zaxisID2;
+  int    timeID2;
   double **vardata1, **vardata2;
-} prs_sct;
+} parse_parm_t;
+
+
+typedef union{
+    double cvalue;              /* constant value */
+    char *varnm;                /* variable name */
+    char *fname;                /* function name */
+    nodeType *nPtr;             /* node pointer */
+} stype_t;
+
+
+#define YYSTYPE        stype_t
+#define YY_EXTRA_TYPE  parse_parm_t *
+
+#define YY_DECL int yylex(YYSTYPE *yylval_param, parse_parm_t *parse_arg, void *yyscanner)
+YY_DECL;
+
+int  yyparse(parse_parm_t *parse_arg, void*);
+void yyerror(void *parse_arg, void *scanner, char *errstr);
+
+int  yylex_init(void **);
+int  yylex_destroy(void *);
+void yyset_extra(YY_EXTRA_TYPE, void *);

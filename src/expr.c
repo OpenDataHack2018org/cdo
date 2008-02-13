@@ -44,9 +44,6 @@ static FUNC fun_sym_tbl[] =
 static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 
 
-int gridID2 = -1, zaxisID2 = -1, timeID2 = -1;
-
-
 nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
   static char func[] = "expr_con_con";
@@ -511,7 +508,7 @@ nodeType *ex_uminus(nodeType *p1)
 }
 
 
-int exNode(nodeType *p, prs_sct *prs_arg)
+int exNode(nodeType *p, parse_parm_t *parse_arg)
 {
   int k;              /* child number */
 
@@ -526,14 +523,14 @@ int exNode(nodeType *p, prs_sct *prs_arg)
   /* node has children */
   for ( k = 0; k < p->u.opr.nops; k++ )
     {
-      exNode(p->u.opr.op[k], prs_arg);
+      exNode(p->u.opr.op[k], parse_arg);
     }
 
   return (0);
 }
 
 
-nodeType *ex(nodeType *p, prs_sct *prs_arg)
+nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 {
   static char func[] = "ex";
   int gridID1 = -1, zaxisID1 = -1, timeID1 = -1;
@@ -544,14 +541,14 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 
   if ( ! p ) return (rnode);
 
-  /*  if ( ! prs_arg->init ) { exNode(p, prs_arg); return (0); } */
+  /*  if ( ! parse_arg->init ) { exNode(p, parse_arg); return (0); } */
 
   switch ( p->type )
     {
     case typeCon:       
-      if ( prs_arg->init )
+      if ( parse_arg->init )
 	{
-	  if ( prs_arg->debug )
+	  if ( parse_arg->debug )
 	    printf("\tpush\t%g\n", p->u.con.value);
 	}
       else
@@ -561,15 +558,15 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 
       break;
     case typeVar:
-      /*    if ( prs_arg->init ) */
+      /*    if ( parse_arg->init ) */
 	{
-	  if ( prs_arg->debug )
+	  if ( parse_arg->debug )
 	    printf("\tpush\t%s\n", p->u.var.nm);
 
-	  nvars = vlistNvars(prs_arg->vlistID1);
+	  nvars = vlistNvars(parse_arg->vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      vlistInqVarName(prs_arg->vlistID1, varID, varname);
+	      vlistInqVarName(parse_arg->vlistID1, varID, varname);
 	      if ( strcmp(varname, p->u.var.nm) == 0 ) break;
 	    }
 
@@ -579,90 +576,90 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 	    }
 	  else
 	    {
-	      if ( prs_arg->var_needed[varID] == 0 )
+	      if ( parse_arg->var_needed[varID] == 0 )
 		{
 
-		  prs_arg->var[varID] = strdupx(p->u.var.nm);
-		  prs_arg->varID[varID] = varID;
-		  prs_arg->var_needed[varID] = 1;
+		  parse_arg->var[varID] = strdupx(p->u.var.nm);
+		  parse_arg->varID[varID] = varID;
+		  parse_arg->var_needed[varID] = 1;
 		}
 
-	      gridID1  = vlistInqVarGrid(prs_arg->vlistID1, varID);
-	      zaxisID1 = vlistInqVarZaxis(prs_arg->vlistID1, varID);
-	      timeID1  = vlistInqVarTime(prs_arg->vlistID1, varID);
-	      missval  = vlistInqVarMissval(prs_arg->vlistID1, varID);
+	      gridID1  = vlistInqVarGrid(parse_arg->vlistID1, varID);
+	      zaxisID1 = vlistInqVarZaxis(parse_arg->vlistID1, varID);
+	      timeID1  = vlistInqVarTime(parse_arg->vlistID1, varID);
+	      missval  = vlistInqVarMissval(parse_arg->vlistID1, varID);
 
-	      if ( gridID2 == -1 )
-		gridID2 = gridID1;
+	      if ( parse_arg->gridID2 == -1 )
+		parse_arg->gridID2 = gridID1;
 
-	      if ( zaxisID2 == -1 )
-		zaxisID2 = zaxisID1;
+	      if ( parse_arg->zaxisID2 == -1 )
+		parse_arg->zaxisID2 = zaxisID1;
 
-	      if ( timeID2 == -1 || timeID2 == TIME_CONSTANT )
-		timeID2 = timeID1;
+	      if ( parse_arg->timeID2 == -1 || parse_arg->timeID2 == TIME_CONSTANT )
+		parse_arg->timeID2 = timeID1;
 	    }
 	}
 	/* else */
 	{ 
-	  if ( prs_arg->debug )
+	  if ( parse_arg->debug )
 	    printf("%s %d %d %d\n", p->u.var.nm, varID, gridID1, zaxisID1);
 	  p->gridID  = gridID1;
 	  p->zaxisID = zaxisID1;
 	  p->missval = missval;
           p->nmiss   = 0;
-	  if ( ! prs_arg->init )
-	    p->data    = prs_arg->vardata1[varID];
+	  if ( ! parse_arg->init )
+	    p->data    = parse_arg->vardata1[varID];
 	  p->tmpvar  = 0;
 	  rnode = p;
 	}
 
       break;
     case typeFun:
-      if ( prs_arg->init )
+      if ( parse_arg->init )
 	{
-	  ex(p->u.fun.op, prs_arg);
+	  ex(p->u.fun.op, parse_arg);
 
-	  if ( prs_arg->debug )
+	  if ( parse_arg->debug )
 	    printf("\tcall \t%s\n", p->u.fun.name);
 	}
       else
 	{
-	  rnode = ex_fun(p->u.fun.name, ex(p->u.fun.op, prs_arg));
+	  rnode = ex_fun(p->u.fun.name, ex(p->u.fun.op, parse_arg));
 	}
       break;
     case typeOpr:
       switch( p->u.opr.oper )
 	{
         case '=':
-	  gridID2  = -1;
-	  zaxisID2 = -1;
-          timeID2  = -1;
+	  parse_arg->gridID2  = -1;
+	  parse_arg->zaxisID2 = -1;
+          parse_arg->timeID2  = -1;
 
-	  rnode = ex(p->u.opr.op[1], prs_arg);
+	  rnode = ex(p->u.opr.op[1], parse_arg);
 
-	  if ( prs_arg->init )
+	  if ( parse_arg->init )
 	    {
-	      if ( prs_arg->debug )
+	      if ( parse_arg->debug )
 		printf("\tpop\t%s\n", p->u.opr.op[0]->u.var.nm);
 	      /*
 	      if ( p->u.opr.op[1]->type != typeVar )
 		cdoAbort("Operand not variable!");
 	      */
-	      if ( gridID2 == -1 || zaxisID2 == -1 || timeID2 == -1 )
+	      if ( parse_arg->gridID2 == -1 || parse_arg->zaxisID2 == -1 || parse_arg->timeID2 == -1 )
 		cdoAbort("Operand not variable!");
 
-	      varID = vlistDefVar(prs_arg->vlistID2, gridID2, zaxisID2, timeID2);
-	      vlistDefVarName(prs_arg->vlistID2, varID, p->u.opr.op[0]->u.var.nm);
+	      varID = vlistDefVar(parse_arg->vlistID2, parse_arg->gridID2, parse_arg->zaxisID2, parse_arg->timeID2);
+	      vlistDefVarName(parse_arg->vlistID2, varID, p->u.opr.op[0]->u.var.nm);
 	    }
 	  else
 	    {
-	      if ( prs_arg->debug )
+	      if ( parse_arg->debug )
 		printf("\tpop\t%s\t%s\n", p->u.opr.op[0]->u.var.nm, rnode->u.var.nm);
 
-	      nvars = vlistNvars(prs_arg->vlistID2);
+	      nvars = vlistNvars(parse_arg->vlistID2);
 	      for ( varID = 0; varID < nvars; varID++ )
 		{
-		  vlistInqVarName(prs_arg->vlistID2, varID, varname);
+		  vlistInqVarName(parse_arg->vlistID2, varID, varname);
 		  if ( strcmp(varname, p->u.opr.op[0]->u.var.nm) == 0 ) break;
 		}
 
@@ -672,15 +669,15 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 		}
 	      else
 		{
-		  gridID2  = vlistInqVarGrid(prs_arg->vlistID2, varID);
-		  zaxisID2 = vlistInqVarZaxis(prs_arg->vlistID2, varID);
-		  timeID2  = vlistInqVarTime(prs_arg->vlistID2, varID);
-		  missval  = vlistInqVarMissval(prs_arg->vlistID2, varID);
+		  parse_arg->gridID2  = vlistInqVarGrid(parse_arg->vlistID2, varID);
+		  parse_arg->zaxisID2 = vlistInqVarZaxis(parse_arg->vlistID2, varID);
+		  parse_arg->timeID2  = vlistInqVarTime(parse_arg->vlistID2, varID);
+		  missval  = vlistInqVarMissval(parse_arg->vlistID2, varID);
 	      
-		  p->gridID  = gridID2;
-		  p->zaxisID = zaxisID2;
+		  p->gridID  = parse_arg->gridID2;
+		  p->zaxisID = parse_arg->zaxisID2;
 		  p->missval = missval;
-		  p->data = prs_arg->vardata2[varID];
+		  p->data = parse_arg->vardata2[varID];
 		  p->tmpvar = 0;
 
 		  ex_copy(p, rnode);
@@ -691,25 +688,25 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 
 	  break;
         case UMINUS:    
-	  if ( prs_arg->init )
+	  if ( parse_arg->init )
 	    {
-	      ex(p->u.opr.op[0], prs_arg);
+	      ex(p->u.opr.op[0], parse_arg);
 
-	      if ( prs_arg->debug )
+	      if ( parse_arg->debug )
 		printf("\tneg\n");
 	    }
 	  else
 	    {
-	      rnode = ex_uminus(ex(p->u.opr.op[0], prs_arg));
+	      rnode = ex_uminus(ex(p->u.opr.op[0], parse_arg));
 	    }
 
 	  break;
         default:
-	  if ( prs_arg->init )
+	  if ( parse_arg->init )
 	    {
-	      ex(p->u.opr.op[0], prs_arg);
-	      ex(p->u.opr.op[1], prs_arg);
-	      if ( prs_arg->debug )
+	      ex(p->u.opr.op[0], parse_arg);
+	      ex(p->u.opr.op[1], parse_arg);
+	      if ( parse_arg->debug )
 		switch( p->u.opr.oper )
 		  {
 		  case '+':  printf("\tadd\n"); break;
@@ -726,7 +723,7 @@ nodeType *ex(nodeType *p, prs_sct *prs_arg)
 	    }
 	  else
 	    {
-	      rnode = expr(p->u.opr.oper, ex(p->u.opr.op[0], prs_arg), ex(p->u.opr.op[1], prs_arg));
+	      rnode = expr(p->u.opr.oper, ex(p->u.opr.op[0], parse_arg), ex(p->u.opr.op[1], parse_arg));
 	    }
         }
     }

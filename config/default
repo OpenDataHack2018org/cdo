@@ -60,7 +60,7 @@ case "${HOSTNAME}" in
                     CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
 	;;
 # etch-ia32
-    baba)
+    etch-ia32 | gata | baba)
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
 	            --with-netcdf=/client \
@@ -76,7 +76,7 @@ case "${HOSTNAME}" in
         fi
         ;;
 # sarge-ia32
-    gata)
+    sarge-ia32)
 # opt: -fno-PIC -O4 -march=i686 -mcpu=i686 -pipe -ffast-math -fomit-frame-pointer
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
@@ -98,7 +98,7 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
 	;;
 # i386-pc-solaris2.10
-    yun)
+    grim)
 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10-x86 \
                     --with-netcdf=/client \
                     CPPFLAGS="-DHAVE_LIBSZ -I$HOME/local/solaris10-x86/include"  LIBS=$HOME/local/solaris10-x86/lib/libsz.a \

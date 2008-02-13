@@ -14,13 +14,11 @@
 #include "expr.h"
 #include "expr_yacc.h"
 
-void yyerror(char *);
-
-#define YY_DECL int yylex(YYSTYPE *yylval, prs_sct *prs_arg)
-
-YY_DECL;
-
 %}
+
+%option reentrant bison-bridge
+%option noyywrap
+%option nounput
 
 /* Definitions:  LMB92 p. 153
    Definitions are named regular expressions, e.g., DGT [0-9]
@@ -81,8 +79,5 @@ M_E          {
 
 [ \t\n]+        ;       /* ignore whitespace */
 
-.               yyerror("Unknown character");
+.               yyerror(NULL, NULL, "Unknown character");
 %%
-int yywrap(void) {
-    return 1;
-}

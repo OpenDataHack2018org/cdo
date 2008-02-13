@@ -63,11 +63,14 @@ void *Expr(void *argument)
   double missval;
   double *array = NULL;
   double *single1, *single2;
-  prs_sct prs_arg;
-  extern int yyparse(void *);
-  extern int yy_scan_string(const char *);
+  parse_parm_t parse_arg;
+  void *scanner;
+  int yy_scan_string(const char *str, void *scanner);
 
   cdoInitialize(argument);
+
+  yylex_init(&scanner);
+  yyset_extra(&parse_arg, scanner);
 
   EXPR   = cdoOperatorAdd("expr",   0, 0, "expressions");
   EXPRF  = cdoOperatorAdd("exprf",  0, 0, "expr script filename");
@@ -123,18 +126,21 @@ void *Expr(void *argument)
   else
     vlistID2 = vlistDuplicate(vlistID1);
 
-  prs_arg.init = 1;
-  prs_arg.vlistID1 = vlistID1;
-  prs_arg.vlistID2 = vlistID2;
-  prs_arg.nvars1 = 0;
-  prs_arg.debug  = 0;
+  parse_arg.init = 1;
+  parse_arg.vlistID1 = vlistID1;
+  parse_arg.vlistID2 = vlistID2;
+  parse_arg.nvars1 = 0;
+  parse_arg.debug  = 0;
+  parse_arg.gridID2  = -1;
+  parse_arg.zaxisID2 = -1;
+  parse_arg.timeID2  = -1;
   for ( varID = 0; varID < nvars; varID++ )
-    prs_arg.var_needed[varID] = FALSE;
+    parse_arg.var_needed[varID] = FALSE;
 
-  yy_scan_string(exprs);
-  yyparse((void *) &prs_arg);
+  yy_scan_string(exprs, scanner);
+  yyparse((void *) &parse_arg, scanner);
 
-  prs_arg.init = 0;
+  parse_arg.init = 0;
 
   nvars2 = vlistNvars(vlistID2);
 
@@ -143,8 +149,8 @@ void *Expr(void *argument)
   if ( cdoVerbose ) vlistPrint(vlistID2);
 
   for ( varID = 0; varID < nvars; varID++ )
-    if ( prs_arg.var_needed[varID] && cdoVerbose )
-      printf("var_needed: %d %s\n", varID, prs_arg.var[varID]);
+    if ( parse_arg.var_needed[varID] && cdoVerbose )
+      printf("var_needed: %d %s\n", varID, parse_arg.var[varID]);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
@@ -155,21 +161,21 @@ void *Expr(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  prs_arg.vardata1 = (double **) malloc(nvars*sizeof(double*));
-  prs_arg.vardata2 = (double **) malloc(nvars2*sizeof(double*));
+  parse_arg.vardata1 = (double **) malloc(nvars*sizeof(double*));
+  parse_arg.vardata2 = (double **) malloc(nvars2*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID  = vlistInqVarGrid(vlistID1, varID);
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      /*     prs_arg.missval = vlistInqVarMissval(vlistID1, varID); */
+      /*     parse_arg.missval = vlistInqVarMissval(vlistID1, varID); */
 
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
-      if ( prs_arg.var_needed[varID] )
-	prs_arg.vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
+      if ( parse_arg.var_needed[varID] )
+	parse_arg.vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
       else
-	prs_arg.vardata1[varID] = NULL;
+	parse_arg.vardata1[varID] = NULL;
     }
 
   for ( varID = 0; varID < nvars2; varID++ )
@@ -179,7 +185,7 @@ void *Expr(void *argument)
 
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
-      prs_arg.vardata2[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
+      parse_arg.vardata2[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
     }
 
   gridsize = vlistGridsizeMax(vlistID1);
@@ -195,12 +201,12 @@ void *Expr(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  if ( prs_arg.var_needed[varID] )
+	  if ( parse_arg.var_needed[varID] )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      offset   = gridsize*levelID;
-	      single1  = prs_arg.vardata1[varID] + offset;
+	      single1  = parse_arg.vardata1[varID] + offset;
 	      streamReadRecord(streamID1, single1, &nmiss);
 	      if ( nmiss && lwarn )
 		{
@@ -217,11 +223,11 @@ void *Expr(void *argument)
 	  gridsize = gridInqSize(gridID);
 	  nlevel   = zaxisInqSize(zaxisID);
 
-	  memset(prs_arg.vardata2[varID], 0, gridsize*nlevel*sizeof(double));
+	  memset(parse_arg.vardata2[varID], 0, gridsize*nlevel*sizeof(double));
 	}
 
-      yy_scan_string(exprs);
-      yyparse((void *) &prs_arg);
+      yy_scan_string(exprs, scanner);
+      yyparse((void *) &parse_arg, scanner);
 
       for ( varID = 0; varID < nvars2; varID++ )
 	{
@@ -231,12 +237,12 @@ void *Expr(void *argument)
 
 	  gridsize = gridInqSize(gridID);
 	  nlevel   = zaxisInqSize(zaxisID);
-	  /* nmiss    = prs_arg.nmiss; */
+	  /* nmiss    = parse_arg.nmiss; */
 	  /* if ( nmiss ) fprintf(stdout, "out nmiss = %d\n", nmiss); */
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      offset   = gridsize*levelID;
-	      single2  = prs_arg.vardata2[varID] + offset;
+	      single2  = parse_arg.vardata2[varID] + offset;
 	      nmiss = 0;
 	      if ( missval < -1.e30 || missval > 1.e30 )
 		{
@@ -260,6 +266,8 @@ void *Expr(void *argument)
   streamClose(streamID1);
 
   vlistDestroy(vlistID2);
+
+  yylex_destroy(scanner);
 
   if ( array ) free(array);
 

@@ -53,7 +53,7 @@
 #define YYSKELETON_NAME "yacc.c"
 
 /* Pure parsers.  */
-#define YYPURE 0
+#define YYPURE 1
 
 /* Using locations.  */
 #define YYLSP_NEEDED 0
@@ -98,6 +98,13 @@
 #include <stdarg.h>
 
 #include "expr.h"
+#include "expr_yacc.h" /* expr_yacc.h (y.tab.h) is produced from expr_yacc.y by parser generator */
+
+/* Bison manual p. 60 describes how to call yyparse() with arguments */
+/* #define YYPARSE_PARAM parse_arg */
+/* #define YYLEX_PARAM   ((parse_parm_t *) parse_arg, void *yyscanner) */
+
+  /* #define YYPURE 1 *//* ??? */
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
@@ -106,22 +113,7 @@ nodeType *con(double value);
 nodeType *fun(char *fname, nodeType *p);
 
 void freeNode(nodeType *p);
-int ex(nodeType *p, prs_sct *prs_arg);
-
-void yyerror(char *s);
-
-/* Get YYSTYPE prior to prototyping scanner */
-#include "expr_yacc.h" /* expr_yacc.h (y.tab.h) is produced from expr_yacc.y by parser generator */
-
-#define YY_DECL int yylex(YYSTYPE *yylval, prs_sct *prs_arg)
-
-YY_DECL;
-
-/* Bison manual p. 60 describes how to call yyparse() with arguments */
-#define YYPARSE_PARAM prs_arg
-#define YYLEX_PARAM   &yylval, (prs_sct *) prs_arg
-
-  /* #define YYPURE 1 *//* ??? */
+int ex(nodeType *p, parse_parm_t *parse_arg);
 
 
 
@@ -144,17 +136,7 @@ YY_DECL;
 #endif
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 35 "expr_yacc.y"
-{
-    double cvalue;              /* constant value */
-    char *varnm;                /* variable name */
-    char *fname;                /* function name */
-    nodeType *nPtr;             /* node pointer */
-}
-/* Line 193 of yacc.c.  */
-#line 157 "expr_yacc.c"
-	YYSTYPE;
+typedef int YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -166,7 +148,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 170 "expr_yacc.c"
+#line 152 "expr_yacc.c"
 
 #ifdef short
 # undef short
@@ -458,9 +440,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    61,    62,    66,    67,    68,    69,    73,
-      74,    78,    79,    80,    81,    82,    83,    84,    85,    86,
-      87,    88,    89,    90,    91,    92,    93
+       0,    49,    49,    53,    54,    58,    59,    60,    61,    65,
+      66,    70,    71,    72,    73,    74,    75,    76,    77,    78,
+      79,    80,    81,    82,    83,    84,    85
 };
 #endif
 
@@ -619,7 +601,7 @@ do								\
     }								\
   else								\
     {								\
-      yyerror (YY_("syntax error: cannot back up")); \
+      yyerror (parse_arg, scanner, YY_("syntax error: cannot back up")); \
       YYERROR;							\
     }								\
 while (YYID (0))
@@ -674,9 +656,9 @@ while (YYID (0))
 /* YYLEX -- calling `yylex' with the right arguments.  */
 
 #ifdef YYLEX_PARAM
-# define YYLEX yylex (YYLEX_PARAM)
+# define YYLEX yylex (&yylval, YYLEX_PARAM)
 #else
-# define YYLEX yylex ()
+# define YYLEX yylex (&yylval, parse_arg, scanner)
 #endif
 
 /* Enable debugging if requested.  */
@@ -699,7 +681,7 @@ do {									  \
     {									  \
       YYFPRINTF (stderr, "%s ", Title);					  \
       yy_symbol_print (stderr,						  \
-		  Type, Value); \
+		  Type, Value, parse_arg, scanner); \
       YYFPRINTF (stderr, "\n");						  \
     }									  \
 } while (YYID (0))
@@ -713,17 +695,21 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, parse_parm_t *parse_arg, void *scanner)
 #else
 static void
-yy_symbol_value_print (yyoutput, yytype, yyvaluep)
+yy_symbol_value_print (yyoutput, yytype, yyvaluep, parse_arg, scanner)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    parse_parm_t *parse_arg;
+    void *scanner;
 #endif
 {
   if (!yyvaluep)
     return;
+  YYUSE (parse_arg);
+  YYUSE (scanner);
 # ifdef YYPRINT
   if (yytype < YYNTOKENS)
     YYPRINT (yyoutput, yytoknum[yytype], *yyvaluep);
@@ -745,13 +731,15 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, parse_parm_t *parse_arg, void *scanner)
 #else
 static void
-yy_symbol_print (yyoutput, yytype, yyvaluep)
+yy_symbol_print (yyoutput, yytype, yyvaluep, parse_arg, scanner)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
+    parse_parm_t *parse_arg;
+    void *scanner;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -759,7 +747,7 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
   else
     YYFPRINTF (yyoutput, "nterm %s (", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, parse_arg, scanner);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -799,12 +787,14 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, parse_parm_t *parse_arg, void *scanner)
 #else
 static void
-yy_reduce_print (yyvsp, yyrule)
+yy_reduce_print (yyvsp, yyrule, parse_arg, scanner)
     YYSTYPE *yyvsp;
     int yyrule;
+    parse_parm_t *parse_arg;
+    void *scanner;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -818,7 +808,7 @@ yy_reduce_print (yyvsp, yyrule)
       fprintf (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
-		       		       );
+		       		       , parse_arg, scanner);
       fprintf (stderr, "\n");
     }
 }
@@ -826,7 +816,7 @@ yy_reduce_print (yyvsp, yyrule)
 # define YY_REDUCE_PRINT(Rule)		\
 do {					\
   if (yydebug)				\
-    yy_reduce_print (yyvsp, Rule); \
+    yy_reduce_print (yyvsp, Rule, parse_arg, scanner); \
 } while (YYID (0))
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1077,16 +1067,20 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, parse_parm_t *parse_arg, void *scanner)
 #else
 static void
-yydestruct (yymsg, yytype, yyvaluep)
+yydestruct (yymsg, yytype, yyvaluep, parse_arg, scanner)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
+    parse_parm_t *parse_arg;
+    void *scanner;
 #endif
 {
   YYUSE (yyvaluep);
+  YYUSE (parse_arg);
+  YYUSE (scanner);
 
   if (!yymsg)
     yymsg = "Deleting";
@@ -1111,7 +1105,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (void);
+int yyparse (parse_parm_t *parse_arg, void *scanner);
 #else
 int yyparse ();
 #endif
@@ -1119,14 +1113,6 @@ int yyparse ();
 
 
 
-/* The look-ahead symbol.  */
-int yychar;
-
-/* The semantic value of the look-ahead symbol.  */
-YYSTYPE yylval;
-
-/* Number of syntax errors so far.  */
-int yynerrs;
 
 
 
@@ -1148,15 +1134,24 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (void)
+yyparse (parse_parm_t *parse_arg, void *scanner)
 #else
 int
-yyparse ()
-
+yyparse (parse_arg, scanner)
+    parse_parm_t *parse_arg;
+    void *scanner;
 #endif
 #endif
 {
-  
+  /* The look-ahead symbol.  */
+int yychar;
+
+/* The semantic value of the look-ahead symbol.  */
+YYSTYPE yylval;
+
+/* Number of syntax errors so far.  */
+int yynerrs;
+
   int yystate;
   int yyn;
   int yyresult;
@@ -1401,128 +1396,128 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 57 "expr_yacc.y"
+#line 49 "expr_yacc.y"
     { return(0); }
     break;
 
   case 3:
-#line 61 "expr_yacc.y"
-    { ex((yyvsp[(2) - (2)].nPtr), (prs_sct *) prs_arg); freeNode((yyvsp[(2) - (2)].nPtr)); }
+#line 53 "expr_yacc.y"
+    { ex((yyvsp[(2) - (2)].nPtr), (parse_parm_t *) parse_arg); freeNode((yyvsp[(2) - (2)].nPtr)); }
     break;
 
   case 5:
-#line 66 "expr_yacc.y"
+#line 58 "expr_yacc.y"
     { (yyval.nPtr) = opr(';', 2, NULL, NULL); }
     break;
 
   case 6:
-#line 67 "expr_yacc.y"
+#line 59 "expr_yacc.y"
     { (yyval.nPtr) = (yyvsp[(1) - (2)].nPtr); }
     break;
 
   case 7:
-#line 68 "expr_yacc.y"
+#line 60 "expr_yacc.y"
     { (yyval.nPtr) = opr('=', 2, var((yyvsp[(1) - (4)].varnm)), (yyvsp[(3) - (4)].nPtr)); }
     break;
 
   case 8:
-#line 69 "expr_yacc.y"
+#line 61 "expr_yacc.y"
     { (yyval.nPtr) = (yyvsp[(2) - (3)].nPtr); }
     break;
 
   case 9:
-#line 73 "expr_yacc.y"
+#line 65 "expr_yacc.y"
     { (yyval.nPtr) = (yyvsp[(1) - (1)].nPtr); }
     break;
 
   case 10:
-#line 74 "expr_yacc.y"
+#line 66 "expr_yacc.y"
     { (yyval.nPtr) = opr(';', 2, (yyvsp[(1) - (2)].nPtr), (yyvsp[(2) - (2)].nPtr)); }
     break;
 
   case 11:
-#line 78 "expr_yacc.y"
+#line 70 "expr_yacc.y"
     { (yyval.nPtr) = con((yyvsp[(1) - (1)].cvalue)); }
     break;
 
   case 12:
-#line 79 "expr_yacc.y"
+#line 71 "expr_yacc.y"
     { (yyval.nPtr) = var((yyvsp[(1) - (1)].varnm)); }
     break;
 
   case 13:
-#line 80 "expr_yacc.y"
+#line 72 "expr_yacc.y"
     { (yyval.nPtr) = opr(UMINUS, 1, (yyvsp[(2) - (2)].nPtr)); }
     break;
 
   case 14:
-#line 81 "expr_yacc.y"
+#line 73 "expr_yacc.y"
     { (yyval.nPtr) = opr('+', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 15:
-#line 82 "expr_yacc.y"
+#line 74 "expr_yacc.y"
     { (yyval.nPtr) = opr('-', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 16:
-#line 83 "expr_yacc.y"
+#line 75 "expr_yacc.y"
     { (yyval.nPtr) = opr('*', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 17:
-#line 84 "expr_yacc.y"
+#line 76 "expr_yacc.y"
     { (yyval.nPtr) = opr('/', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 18:
-#line 85 "expr_yacc.y"
+#line 77 "expr_yacc.y"
     { (yyval.nPtr) = opr('<', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 19:
-#line 86 "expr_yacc.y"
+#line 78 "expr_yacc.y"
     { (yyval.nPtr) = opr('>', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 20:
-#line 87 "expr_yacc.y"
+#line 79 "expr_yacc.y"
     { (yyval.nPtr) = opr('^', 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 21:
-#line 88 "expr_yacc.y"
+#line 80 "expr_yacc.y"
     { (yyval.nPtr) = opr(GE, 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 22:
-#line 89 "expr_yacc.y"
+#line 81 "expr_yacc.y"
     { (yyval.nPtr) = opr(LE, 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 23:
-#line 90 "expr_yacc.y"
+#line 82 "expr_yacc.y"
     { (yyval.nPtr) = opr(NE, 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 24:
-#line 91 "expr_yacc.y"
+#line 83 "expr_yacc.y"
     { (yyval.nPtr) = opr(EQ, 2, (yyvsp[(1) - (3)].nPtr), (yyvsp[(3) - (3)].nPtr)); }
     break;
 
   case 25:
-#line 92 "expr_yacc.y"
+#line 84 "expr_yacc.y"
     { (yyval.nPtr) = (yyvsp[(2) - (3)].nPtr); }
     break;
 
   case 26:
-#line 93 "expr_yacc.y"
+#line 85 "expr_yacc.y"
     { (yyval.nPtr) = fun((yyvsp[(1) - (4)].fname), (yyvsp[(3) - (4)].nPtr)); }
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1526 "expr_yacc.c"
+#line 1521 "expr_yacc.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1558,7 +1553,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (YY_("syntax error"));
+      yyerror (parse_arg, scanner, YY_("syntax error"));
 #else
       {
 	YYSIZE_T yysize = yysyntax_error (0, yystate, yychar);
@@ -1582,11 +1577,11 @@ yyerrlab:
 	if (0 < yysize && yysize <= yymsg_alloc)
 	  {
 	    (void) yysyntax_error (yymsg, yystate, yychar);
-	    yyerror (yymsg);
+	    yyerror (parse_arg, scanner, yymsg);
 	  }
 	else
 	  {
-	    yyerror (YY_("syntax error"));
+	    yyerror (parse_arg, scanner, YY_("syntax error"));
 	    if (yysize != 0)
 	      goto yyexhaustedlab;
 	  }
@@ -1610,7 +1605,7 @@ yyerrlab:
       else
 	{
 	  yydestruct ("Error: discarding",
-		      yytoken, &yylval);
+		      yytoken, &yylval, parse_arg, scanner);
 	  yychar = YYEMPTY;
 	}
     }
@@ -1666,7 +1661,7 @@ yyerrlab1:
 
 
       yydestruct ("Error: popping",
-		  yystos[yystate], yyvsp);
+		  yystos[yystate], yyvsp, parse_arg, scanner);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1704,7 +1699,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_("memory exhausted"));
+  yyerror (parse_arg, scanner, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1712,7 +1707,7 @@ yyexhaustedlab:
 yyreturn:
   if (yychar != YYEOF && yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
-		 yytoken, &yylval);
+		 yytoken, &yylval, parse_arg, scanner);
   /* Do not reclaim the symbols of the rule which action triggered
      this YYABORT or YYACCEPT.  */
   YYPOPSTACK (yylen);
@@ -1720,7 +1715,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-		  yystos[*yyssp], yyvsp);
+		  yystos[*yyssp], yyvsp, parse_arg, scanner);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1736,7 +1731,7 @@ yyreturn:
 }
 
 
-#line 96 "expr_yacc.y"
+#line 88 "expr_yacc.y"
 
 
 #define SIZEOF_NODETYPE ((char *)&p->u.con - (char *)p)
@@ -1749,7 +1744,7 @@ nodeType *con(double value)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(conNodeType);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeCon;
@@ -1766,7 +1761,7 @@ nodeType *var(char *nm)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(varNodeType);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeVar;
@@ -1783,7 +1778,7 @@ nodeType *fun(char *fname, nodeType *op)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(funNodeType);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeFun;
@@ -1803,7 +1798,7 @@ nodeType *opr(int oper, int nops, ...)
   /* allocate node */
   nodeSize = SIZEOF_NODETYPE + sizeof(oprNodeType) + (nops - 1)*sizeof(nodeType*);
   if ((p = (nodeType *) malloc(nodeSize)) == NULL)
-    yyerror("out of memory");
+    yyerror(NULL, NULL, "Out of memory");
 
   /* copy information */
   p->type = typeOpr;
@@ -1832,7 +1827,7 @@ void freeNode(nodeType *p)
   free (p);
 }
 
-void yyerror(char *s)
+void yyerror(void *parse_arg, void *scanner, char *s)
 {
   fprintf(stdout, "%s\n", s);
 }
@@ -1843,29 +1838,29 @@ int main(void)
   int i;
   static char fexpr[] = "nvar = q*(geosp+234.56); xx = geosp+999-log(aps);";
 
-  prs_sct prs_arg;
+  parse_parm_t parse_arg;
 
   printf("%s\n", fexpr);
 
   yy_scan_string(fexpr);
 
-  prs_arg.nvar = 0;
-  prs_arg.init = 1;
-  prs_arg.debug = 1;
+  parse_arg.nvar = 0;
+  parse_arg.init = 1;
+  parse_arg.debug = 1;
 
-  yyparse((void *)&prs_arg);
+  yyparse((void *)&parse_arg);
 
-  for ( i = 0; i < prs_arg.nvar; i++ )
-    printf("vars %d %s\n", i, prs_arg.var[i]);
+  for ( i = 0; i < parse_arg.nvar; i++ )
+    printf("vars %d %s\n", i, parse_arg.var[i]);
 
   yy_scan_string(fexpr);
 
-  prs_arg.init = 0;
+  parse_arg.init = 0;
 
-  yyparse((void *)&prs_arg);
+  yyparse((void *)&parse_arg);
 
-  for ( i = 0; i < prs_arg.nvar; i++ )
-    printf("vars %d %s\n", i, prs_arg.var[i]);
+  for ( i = 0; i < parse_arg.nvar; i++ )
+    printf("vars %d %s\n", i, parse_arg.var[i]);
 
   return 0;
 }
