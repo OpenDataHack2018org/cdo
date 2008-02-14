@@ -52,7 +52,7 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-char CDO_Version[] = "Climate Data Operators version "VERSION" available from http://www.mpimet.mpg.de/cdo";
+char CDO_Version[] = "Climate Data Operators version "VERSION" (http://www.mpimet.mpg.de/cdo)";
 
 
 char *Progname;
