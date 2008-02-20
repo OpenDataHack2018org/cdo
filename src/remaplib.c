@@ -356,9 +356,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   int k, nc;
   int i4, inc;
   int n2, n4, nele4;
-  int n;      /* loop counter                  */
-  int nele;   /* element loop counter          */
-  int i,j;    /* logical 2d addresses          */
+  int n;      /* Loop counter                  */
+  int nele;   /* Element loop counter          */
+  int i,j;    /* Logical 2d addresses          */
   int ip1,jp1;
   int n_add, e_add, ne_add;
   int nx, ny;
@@ -382,7 +382,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       rg->luse_grid2_corners = FALSE;
     }
 
-  /* initialize all pointer */
+  /* Initialize all pointer */
   if ( rg->pinit == FALSE ) remapGridInitPointer(rg);
 
   rg->gridID1 = gridID1;
@@ -604,13 +604,13 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
     }
 
-  /* initialize logical mask */
+  /* Initialize logical mask */
 
   for ( i = 0; i < rg->grid1_size; i++ ) rg->grid1_mask[i] = TRUE;
 
   if ( gridInqType(rg->gridID1) == GRID_GME ) gridInqMask(gridID1_gme, rg->grid1_vgpm);
 
-  /* convert lat/lon units if required */
+  /* Convert lat/lon units if required */
 
   gridInqYunits(gridID1, units);
 
@@ -622,7 +622,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	  rg->grid1_center_lon[i] *= DEG2RAD;
 	}
 
-      /* note: using units from latitude instead from bounds */
+      /* Note: using units from latitude instead from bounds */
       if ( rg->grid1_corners )
 	for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
 	  {
@@ -632,7 +632,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else if ( strncmp(units, "radians", 7) == 0 )
     {
-      /* no conversion necessary */
+      /* No conversion necessary */
     }
   else
     {
@@ -640,7 +640,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 		 "proceeding assuming radians");
     }
 
-  /* data for grid 2 */
+  /* Data for grid 2 */
 
   rg->grid2_dims[0] = gridInqXsize(gridID2);
   rg->grid2_dims[1] = gridInqYsize(gridID2);
@@ -666,13 +666,13 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
     }
 
-  /* initialize logical mask */
+  /* Initialize logical mask */
 
   for ( i = 0; i < rg->grid2_size; i++ ) rg->grid2_mask[i] = TRUE;
 
   if ( gridInqType(rg->gridID2) == GRID_GME ) gridInqMask(gridID2_gme, rg->grid2_vgpm);
 
-  /* convert lat/lon units if required */
+  /* Convert lat/lon units if required */
 
   gridInqYunits(gridID2, units);
 
@@ -684,7 +684,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	  rg->grid2_center_lon[i] *= DEG2RAD;
 	}
 
-      /* note: using units from latitude instead from bounds */
+      /* Note: using units from latitude instead from bounds */
       if ( rg->grid2_corners )
 	for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
 	  {
@@ -694,7 +694,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else if ( strncmp(units, "radians", 7) == 0 )
     {
-      /* no conversion necessary */
+      /* No conversion necessary */
     }
   else
     {
@@ -702,7 +702,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 		 "proceeding assuming radians");
     }
 
-  /*     convert longitudes to 0,2pi interval */
+  /* Convert longitudes to 0,2pi interval */
 
   for ( i = 0; i < rg->grid1_size; i++ )
     {
@@ -729,7 +729,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	if ( rg->grid2_corner_lon[i] < ZERO ) rg->grid2_corner_lon[i] += PI2;
       }
 
-  /*  make sure input latitude range is within the machine values for +/- pi/2 */
+  /*  Make sure input latitude range is within the machine values for +/- pi/2 */
 
   for ( i = 0; i < rg->grid1_size; i++ )
     {
@@ -757,7 +757,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	if ( rg->grid2_corner_lat[i] < -PIH ) rg->grid2_corner_lat[i] = -PIH;
       }
 
-  /*  compute bounding boxes for restricting future grid searches */
+  /*  Compute bounding boxes for restricting future grid searches */
 
   if ( rg->luse_grid1_corners )
     {
@@ -791,7 +791,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       for ( n = 0; n < rg->grid1_size; n++ )
 	{
 	  n4 = 4*n;
-          /* find N,S and NE points to this grid point */
+          /* Find N,S and NE points to this grid point */
 
           j = n/nx + 1;
           i = n - (j-1)*nx + 1;
@@ -800,9 +800,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
             ip1 = i + 1;
           else
 	    {
-	      /* assume cyclic */
+	      /* Assume cyclic */
 	      ip1 = 1;
-	      /* but if it is not, correct */
+	      /* But if it is not, correct */
 	      e_add = (j - 1)*nx + ip1 - 1;
 	      if ( fabs(rg->grid1_center_lat[e_add] - rg->grid1_center_lat[n]) > PIH ) ip1 = i;
 	    }
@@ -811,9 +811,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
             jp1 = j + 1;
           else
 	    {
-	      /* assume cyclic */
+	      /* Assume cyclic */
 	      jp1 = 1;
-	      /* but if it is not, correct */
+	      /* But if it is not, correct */
 	      n_add = (jp1 - 1)*nx + i - 1;
 	      if ( fabs(rg->grid1_center_lat[n_add] - rg->grid1_center_lat[n]) > PIH ) jp1 = j;
 	    }
@@ -822,7 +822,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
           e_add  = (j - 1)*nx + ip1 - 1;
           ne_add = (jp1 - 1)*nx + ip1 - 1;
 
-          /* find N,S and NE lat/lon coords and check bounding box */
+          /* Find N,S and NE lat/lon coords and check bounding box */
 
           tmp_lats[0] = rg->grid1_center_lat[n];
           tmp_lats[1] = rg->grid1_center_lat[e_add];
@@ -882,7 +882,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       for ( n = 0; n < rg->grid2_size; n++ )
 	{
 	  n4 = 4*n;
-	  /* find N,S and NE points to this grid point */
+	  /* Find N,S and NE points to this grid point */
 
           j = n/nx + 1;
           i = n - (j-1)*nx + 1;
@@ -891,9 +891,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
             ip1 = i + 1;
           else
 	    {
-	      /* assume cyclic */
+	      /* Assume cyclic */
 	      ip1 = 1;
-	      /* but if it is not, correct */
+	      /* But if it is not, correct */
 	      e_add = (j - 1)*nx + ip1 - 1;
 	      if ( fabs(rg->grid2_center_lat[e_add] - rg->grid2_center_lat[n]) > PIH ) ip1 = i;
 	    }
@@ -902,9 +902,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
             jp1 = j+1;
           else
 	    {
-	      /* assume cyclic */
+	      /* Assume cyclic */
 	      jp1 = 1;
-	      /* but if it is not, correct */
+	      /* But if it is not, correct */
 	      n_add = (jp1 - 1)*nx + i - 1;
 	      if ( fabs(rg->grid2_center_lat[n_add] - rg->grid2_center_lat[n]) > PIH ) jp1 = j;
 	    }
@@ -913,7 +913,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
           e_add = (j - 1)*nx + ip1 - 1;
           ne_add = (jp1 - 1)*nx + ip1 - 1;
 
-          /* find N,S and NE lat/lon coords and check bounding box */
+          /* Find N,S and NE lat/lon coords and check bounding box */
 
           tmp_lats[0] = rg->grid2_center_lat[n];
           tmp_lats[1] = rg->grid2_center_lat[e_add];
@@ -954,7 +954,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
         rg->grid2_bound_box[4*n+3] = PI2;
       }
 
-  /* try to check for cells that overlap poles */
+  /* Try to check for cells that overlap poles */
 
   for ( n = 0; n < rg->grid1_size; n++ )
     if ( rg->grid1_center_lat[n] > rg->grid1_bound_box[4*n+1] )
@@ -1000,7 +1000,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 #endif
 
   /*
-    set up and assign address ranges to search bins in order to 
+    Set up and assign address ranges to search bins in order to 
     further restrict later searches
   */
   if ( rg->restrict_type == RESTRICT_LATITUDE )
@@ -1123,7 +1123,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 /*****************************************************************************/
 
 /*
-    this routine initializes some variables and provides an initial
+    This routine initializes some variables and provides an initial
     allocation of arrays (fairly large so frequent resizing unnecessary).
 */
 void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
@@ -1131,7 +1131,7 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
   static char func[] = "remapVarsInit";
   int i;
 
-  /* initialize all pointer */
+  /* Initialize all pointer */
   if ( rv->pinit == FALSE )
     {
       rv->pinit = TRUE;
@@ -1141,7 +1141,7 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
       for ( i = 0; i < 4; i++ ) rv->wts[i] = NULL;
     }
 
-  /* determine the number of weights */
+  /* Determine the number of weights */
 
   if      ( map_type == MAP_TYPE_CONSERV  ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_BILINEAR ) rv->num_wts = 1;
@@ -1151,9 +1151,9 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
   else cdoAbort("Unknown mapping method!");
 
   /*
-    initialize num_links and set max_links to four times the largest 
+    Initialize num_links and set max_links to four times the largest 
     of the destination grid sizes initially (can be changed later).
-    set a default resize increment to increase the size of link
+    Set a default resize increment to increase the size of link
     arrays if the number of links exceeds the initial size
   */
   rv->num_links = 0;
@@ -1161,7 +1161,7 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
 
   rv->resize_increment = (int) (0.1 * MAX(rg->grid1_size, rg->grid2_size));
 
-  /*  allocate address and weight arrays for mapping 1 */
+  /*  Allocate address and weight arrays for mapping 1 */
 
   rv->grid1_add = (int *) realloc(rv->grid1_add, rv->max_links*sizeof(int));
   rv->grid2_add = (int *) realloc(rv->grid2_add, rv->max_links*sizeof(int));
@@ -1182,19 +1182,19 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
 /*****************************************************************************/
 
 /*
-   this routine resizes remapping arrays by increasing(decreasing)
+   This routine resizes remapping arrays by increasing(decreasing)
    the max_links by increment
 */
 void resize_remap_vars(REMAPVARS *rv, int increment)
 {
   static char func[] = "resize_remap_vars";
   /*
-    input variables:
+    Input variables:
     int  increment  ! the number of links to add(subtract) to arrays
   */
   int i;
 
-  /*  reallocate arrays at new size */
+  /*  Reallocate arrays at new size */
 
   rv->max_links += increment;
 
@@ -1213,7 +1213,7 @@ void resize_remap_vars(REMAPVARS *rv, int increment)
 /*
   -----------------------------------------------------------------------
 
-  performs the remapping based on weights computed elsewhere
+  Performs the remapping based on weights computed elsewhere
      
   -----------------------------------------------------------------------
 */
@@ -1223,7 +1223,7 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
 	   REMAPLINK links)
 {
   /*
-    input arrays:
+    Input arrays:
 
     int *dst_add         ! destination address for each link
     int *src_add         ! source      address for each link
@@ -1245,11 +1245,11 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
     double *dst_array    ! array for remapped field on destination grid
   */
 
-  /* local variables */
+  /* Local variables */
 
   int n, iorder;
 
-  /* check the order of the interpolation */
+  /* Check the order of the interpolation */
 
   if ( src_grad1 )
     iorder = 2;
@@ -1266,7 +1266,7 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
   for ( n = 0; n < num_links; n++ )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
-  if ( iorder == 1 )   /* first order remapping */
+  if ( iorder == 1 )   /* First order remapping */
     {
       if ( links.option == TRUE )
 	{
@@ -1294,7 +1294,7 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
 	    }
 	}
     }
-  else                 /* second order remapping */
+  else                 /* Second order remapping */
     {
       if ( num_wts == 3 )
 	{
@@ -1326,7 +1326,7 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
 /*
   -----------------------------------------------------------------------
 
-  performs the remapping based on weights computed elsewhere
+  Performs the remapping based on weights computed elsewhere
      
   -----------------------------------------------------------------------
 */
@@ -1335,7 +1335,7 @@ void remap_con1(double *dst_array, double missval, int dst_size, int num_links, 
 		int *dst_add, int *src_add, double *src_array)
 {
   /*
-    input arrays:
+    Input arrays:
 
     int *dst_add         ! destination address for each link
     int *src_add         ! source      address for each link
@@ -1349,7 +1349,7 @@ void remap_con1(double *dst_array, double missval, int dst_size, int num_links, 
     double *dst_array    ! array for remapped field on destination grid
   */
 
-  /* local variables */
+  /* Local variables */
   static char func[] = "remap_con1";
   int i, n, k, ncls, imax;
   int max_cls = 1000;
@@ -1425,8 +1425,8 @@ void remap_con1(double *dst_array, double missval, int dst_size, int num_links, 
 
 #define  DEFAULT_MAX_ITER  100
 
-static int     Max_Iter = DEFAULT_MAX_ITER;  /* max iteration count for i,j iteration */
-static double  converge = 1.e-10;  /* convergence criterion */
+static int     Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i,j iteration */
+static double  converge = 1.e-10;            /* Convergence criterion */
 
 void remap_set_max_iter(int max_iter)
 {
@@ -1441,7 +1441,7 @@ void remap_set_max_iter(int max_iter)
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 /*
-   this routine finds the location of the search point plat, plon
+   This routine finds the location of the search point plat, plon
    in the source grid and returns the corners needed for a bilinear
    interpolation.
 */
@@ -1452,15 +1452,13 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 		 double *src_grid_bound_box, int *src_bin_add)
 {
   /*
-    output variables:
+    Output variables:
 
     int    src_add[4]              ! address of each corner point enclosing P
     double src_lats[4]             ! latitudes  of the four corner points
     double src_lons[4]             ! longitudes of the four corner points
-  */
 
-  /*
-    input variables:
+    Input variables:
 
     double plat                    ! latitude  of the search point
     double plon                    ! longitude of the search point
@@ -1474,21 +1472,21 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
     int src_bin_add[][2]           ! latitude bins for restricting
   */
-  /*  local variables */
+  /*  Local variables */
 
   int n, next_n, srch_add;                   /* dummy indices */
   int nx, ny;                                /* dimensions of src grid */
   int min_add, max_add;                      /* addresses for restricting search */
   int i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses */
 
-  /* vectors for cross-product check */
+  /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
   double vec2_lat, vec2_lon, cross_product, cross_product_last = 0;
   double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
-  double dist_min, distance; /* for computing dist-weighted avg */
+  double dist_min, distance; /* For computing dist-weighted avg */
 
   /*
-    restrict search first using bins
+    Restrict search first using bins
   */
   for ( n = 0; n < 4; n++ ) src_add[n] = 0;
 
@@ -1504,7 +1502,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
       }
  
   /*
-    now perform a more detailed search 
+    Now perform a more detailed search 
   */
   nx = src_grid_dims[0];
   ny = src_grid_dims[1];
@@ -1518,7 +1516,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   for ( srch_add = min_add; srch_add <= max_add; srch_add++ )
     {
       /*
-	first check bounding box
+	First check bounding box
       */
       if ( plat >= src_grid_bound_box[4*srch_add+0] && 
            plat <= src_grid_bound_box[4*srch_add+1] &&
@@ -1526,10 +1524,10 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	   plon <= src_grid_bound_box[4*srch_add+3] )
 	{
 	  /*
-	    we are within bounding box so get really serious
+	    We are within bounding box so get really serious
 	  */
 
-          /* determine neighbor addresses */
+          /* Determine neighbor addresses */
 
           j = srch_add/nx + 1;
           i = srch_add - (j-1)*nx + 1;
@@ -1559,7 +1557,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
           src_lons[3] = src_center_lon[n_add];
 
 	  /*
-	     for consistency, we must make sure all lons are in same 2pi interval
+	     For consistency, we must make sure all lons are in same 2pi interval
 	  */
 
           vec1_lon = src_lons[0] - plon;
@@ -1579,9 +1577,9 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	      next_n = (n+1)%4;
 
 	      /*
-		here we take the cross product of the vector making 
+		Here we take the cross product of the vector making 
 		up each box side with the vector formed by the vertex
-		and search point.  if all the cross products are 
+		and search point.  If all the cross products are 
 		positive, the point is contained in the box.
 	      */
 	      vec1_lat = src_lats[next_n] - src_lats[n];
@@ -1589,7 +1587,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	      vec2_lat = plat - src_lats[n];
 	      vec2_lon = plon - src_lons[n];
 
-	      /* check for 0,2pi crossings */
+	      /* Check for 0,2pi crossings */
 
 	      if      ( vec1_lon >  THREE*PIH ) vec1_lon -= PI2;
 	      else if ( vec1_lon < -THREE*PIH ) vec1_lon += PI2;
@@ -1600,7 +1598,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	      cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
 
 	      /*
-		if cross product is less than ZERO, this cell doesn't work
+		If cross product is less than ZERO, this cell doesn't work
 	      */
 	      if ( n == 0 ) cross_product_last = cross_product;
 	      if ( cross_product*cross_product_last < ZERO ) break;
@@ -1610,7 +1608,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	    } /* corner_loop */
 
 	  /*
-	    if cross products all same sign, we found the location
+	    If cross products all same sign, we found the location
 	  */
           if ( n >= 4 )
 	    {
@@ -1622,9 +1620,9 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	      return;
 	    }
 
-	  /* otherwise move on to next cell */
+	  /* Otherwise move on to next cell */
 
-        } /* bounding box check */
+        } /* Bounding box check */
     } /* srch_loop */
 
   /*
@@ -1685,7 +1683,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
 
 /*
-  this routine stores the address and weight for four links 
+  This routine stores the address and weight for four links 
   associated with one destination point in the appropriate address 
   and weight arrays and resizes those arrays if necessary.
 */
@@ -1693,7 +1691,7 @@ static
 void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
 {
   /*
-    input variables:
+    Input variables:
     int dst_add       ! address on destination grid
     int src_add[4]    ! addresses on source grid
     double weights[4] ! array of remapping weights for these links
@@ -1702,8 +1700,8 @@ void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
   int num_links_old; /* placeholder for old link number */
 
   /*
-     increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  then store the link.
+     Increment number of links and check to see if remap arrays need
+     to be increased to accomodate the new link.  Then store the link.
   */
   num_links_old = rv->num_links;
   rv->num_links = num_links_old + 4;
@@ -1724,18 +1722,18 @@ void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
 /*
   -----------------------------------------------------------------------
 
-  this routine computes the weights for a bilinear interpolation.
+  This routine computes the weights for a bilinear interpolation.
 
   -----------------------------------------------------------------------
 */
 void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 {
-  /*   local variables */
+  /*   Local variables */
   int n,icount;
   int dst_add;        /*  destination addresss */
   int iter;           /*  iteration counters   */
 
-  int src_add[4];     /* address for the four source points */
+  int src_add[4];     /*  address for the four source points */
 
   double src_lats[4]; /*  latitudes  of four bilinear corners */
   double src_lons[4]; /*  longitudes of four bilinear corners */
@@ -1752,13 +1750,13 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
   double sum_wgts;               /*  sum of weights for normalization       */
 
   /*
-    compute mappings from grid1 to grid2
+    Compute mappings from grid1 to grid2
   */
   if ( rg->grid1_rank != 2 )
     cdoAbort("Can not do bilinear interpolation when grid1_rank != 2"); 
 
   /*
-    loop over destination grid 
+    Loop over destination grid 
   */
   /* grid_loop1 */
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
@@ -1768,20 +1766,20 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
       plat = rg->grid2_center_lat[dst_add];
       plon = rg->grid2_center_lon[dst_add];
 
-      /*  find nearest square of grid points on source grid  */
+      /*  Find nearest square of grid points on source grid  */
       grid_search(rg, src_add, src_lats, src_lons, 
 		  plat, plon, rg->grid1_dims,
 		  rg->grid1_center_lat, rg->grid1_center_lon,
 		  rg->grid1_bound_box, rg->bin_addr1);
 
-      /* check to see if points are land points */
+      /* Check to see if points are land points */
 
       if ( src_add[0] > 0 )
 	for ( n = 0; n < 4; n++ )
 	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
 	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
-      /*  if point found, find local i,j coordinates for weights  */
+      /*  If point found, find local i,j coordinates for weights  */
 #ifdef REMAPTEST
       printf("%d %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
 #endif
@@ -1789,7 +1787,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	{
           rg->grid2_frac[dst_add] = ONE;
 
-	  /*  iterate to find i,j for bilinear approximation  */
+	  /*  Iterate to find i,j for bilinear approximation  */
 
           dth1 = src_lats[1] - src_lats[0];
           dth2 = src_lats[3] - src_lats[0];
@@ -1840,7 +1838,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 
           if ( iter < Max_Iter )
 	    {
-	      /* successfully found i,j - compute weights */
+	      /* Successfully found i,j - compute weights */
 
 	      wgts[0] = (ONE-iguess)*(ONE-jguess);
 	      wgts[1] = iguess*(ONE-jguess);
@@ -1860,7 +1858,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	    }
 
 	  /*
-	    search for bilinear failed - use a distance-weighted
+	    Search for bilinear failed - use a distance-weighted
 	    average instead (this is typically near the pole)
 	  */
 	}
@@ -1887,7 +1885,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 
           if ( lstore && icount > 0 )
 	    {
-	      /* renormalize weights */
+	      /* Renormalize weights */
 	      sum_wgts = 0.0;
 	      for ( n = 0; n < 4; n++ ) sum_wgts += src_lats[n];
 	      wgts[0] = src_lats[0]/sum_wgts;
@@ -1912,7 +1910,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 /*
-  this routine stores the address and weight for four links 
+  This routine stores the address and weight for four links 
   associated with one destination point in the appropriate address 
   and weight arrays and resizes those arrays if necessary.
 */
@@ -1920,7 +1918,7 @@ static
 void store_link_bicub(REMAPVARS *rv, int dst_add, int *src_add, double weights[4][4])
 {
   /*
-    input variables:
+    Input variables:
     int dst_add          ! address on destination grid
     int src_add[4]       ! addresses on source grid
     double weights[4][4] ! array of remapping weights for these links
@@ -1929,7 +1927,7 @@ void store_link_bicub(REMAPVARS *rv, int dst_add, int *src_add, double weights[4
   int num_links_old; /* placeholder for old link number */
 
   /*
-     increment number of links and check to see if remap arrays need
+     Increment number of links and check to see if remap arrays need
      to be increased to accomodate the new link.  then store the link.
   */
   num_links_old = rv->num_links;
@@ -1952,13 +1950,13 @@ void store_link_bicub(REMAPVARS *rv, int dst_add, int *src_add, double weights[4
 /*
   -----------------------------------------------------------------------
 
-  this routine computes the weights for a bicubic interpolation.
+  This routine computes the weights for a bicubic interpolation.
 
   -----------------------------------------------------------------------
 */
 void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 {
-  /*   local variables */
+  /*   Local variables */
   int n,icount;
   int dst_add;        /*  destination addresss */
   int iter;           /*  iteration counters   */
@@ -1980,12 +1978,12 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
   double sum_wgts;               /*  sum of weights for normalization       */
 
   /*
-    compute mappings from grid1 to grid2
+    Compute mappings from grid1 to grid2
   */
   if ( rg->grid1_rank != 2 )
     cdoAbort("Can not do bicubic interpolation when grid1_rank != 2"); 
 
-  /* loop over destination grid */
+  /* Loop over destination grid */
 
   /* grid_loop1 */
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
@@ -1995,26 +1993,26 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
       plat = rg->grid2_center_lat[dst_add];
       plon = rg->grid2_center_lon[dst_add];
 
-      /*  find nearest square of grid points on source grid  */
+      /*  Find nearest square of grid points on source grid  */
       grid_search(rg, src_add, src_lats, src_lons, 
 		  plat, plon, rg->grid1_dims,
 		  rg->grid1_center_lat, rg->grid1_center_lon,
 		  rg->grid1_bound_box, rg->bin_addr1);
 
-      /* check to see if points are land points */
+      /* Check to see if points are land points */
 
       if ( src_add[0] > 0 )
 	for ( n = 0; n < 4; n++ )
 	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
 	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
-      /*  if point found, find local i,j coordinates for weights  */
+      /*  If point found, find local i,j coordinates for weights  */
 
       if ( src_add[0] > 0 )
 	{
           rg->grid2_frac[dst_add] = ONE;
 
-	  /*  iterate to find i,j for bilinear approximation  */
+	  /*  Iterate to find i,j for bilinear approximation  */
 
           dth1 = src_lats[1] - src_lats[0];
           dth2 = src_lats[3] - src_lats[0];
@@ -2064,7 +2062,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 
           if ( iter < Max_Iter )
 	    {
-	      /* successfully found i,j - compute weights */
+	      /* Successfully found i,j - compute weights */
 
 	      wgts[0][0] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
 		           (ONE - iguess*iguess*(THREE-TWO*iguess));
@@ -2107,7 +2105,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 	    }
 	  
 	  /*
-	    search for bilinear failed - use a distance-weighted
+	    Search for bilinear failed - use a distance-weighted
 	    average instead (this is typically near the pole)
 	  */
 	}
@@ -2134,7 +2132,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 
           if ( lstore && icount > 0 )
 	    {
-	      /* renormalize weights */
+	      /* Renormalize weights */
 	      sum_wgts = 0.0;
 	      for ( n = 0; n < 4; n++ ) sum_wgts += src_lats[n];
 	      for ( n = 0; n < 4; n++ ) wgts[0][n] = src_lats[n]/sum_wgts;
@@ -2161,7 +2159,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 #define  num_neighbors  4  /* num nearest neighbors to interpolate from */
 
 /*
-   this routine finds the closest num_neighbor points to a search 
+   This routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
 */
 static
@@ -2171,14 +2169,12 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
 		     double *sinlat, double *coslat, double *sinlon, double *coslon)
 {
   /*
-    output variables:
+    Output variables:
 
     int nbr_add[num_neighbors]     ! address of each of the closest points
     double nbr_dist[num_neighbors] ! distance to each of the closest points
-  */
 
-  /*
-    input variables:
+    Input variables:
 
     int src_bin_add[][2]  ! search bins for restricting search
 
@@ -2189,17 +2185,17 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
     double sinlat_dst,   ! sin(lat)  of the search point
     double sinlon_dst    ! sin(lon)  of the search point
   */
-  /*  local variables */
+  /*  Local variables */
 
   int n, nmax, nadd, nchk;
   int min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
 
   double distance;     /* angular distance */
 
-  /*  loop over source grid and find nearest neighbors */
+  /*  Loop over source grid and find nearest neighbors */
 
   /*
-    restrict the search using search bins expand the bins to catch neighbors
+    Restrict the search using search bins expand the bins to catch neighbors
   */
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
@@ -2257,7 +2253,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
     cdoAbort("Unknown search restriction method!");
 
 
-  /* initialize distance and address arrays */
+  /* Initialize distance and address arrays */
 
   for ( n = 0; n < num_neighbors; n++ )
     {
@@ -2268,7 +2264,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
   /* Unvectorized loop: break (num_neighbors is constant 4) */
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
-      /* find distance to this point */
+      /* Find distance to this point */
 
       distance = acos(sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
                      (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]));
@@ -2299,7 +2295,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
 
 
 /*
-  this routine stores the address and weight for this link in
+  This routine stores the address and weight for this link in
   the appropriate address and weight arrays and resizes those
   arrays if necessary.
 */
@@ -2307,15 +2303,15 @@ static
 void store_link_nbr(REMAPVARS *rv, int add1, int add2, double weights)
 {
   /*
-    input variables:
+    Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
     double weights[]  ! array of remapping weights for this link
   */
 
   /*
-     increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  then store the link.
+     Increment number of links and check to see if remap arrays need
+     to be increased to accomodate the new link.  Then store the link.
   */
   rv->num_links = rv->num_links + 1;
 
@@ -2333,7 +2329,7 @@ void store_link_nbr(REMAPVARS *rv, int add1, int add2, double weights)
 /*
   -----------------------------------------------------------------------
 
-   this routine computes the inverse-distance weights for a
+   This routine computes the inverse-distance weights for a
    nearest-neighbor interpolation.
 
   -----------------------------------------------------------------------
@@ -2342,7 +2338,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
 {
   static char func[] = "remap_distwgt";
 
-  /*   local variables */
+  /*  Local variables */
 
   int grid1_size;
   int grid2_size;
@@ -2361,13 +2357,13 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
   double wgtstmp;          /* hold the link weight                        */
 
   /*
-    compute mappings from grid1 to grid2
+    Compute mappings from grid1 to grid2
   */
 
   grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
-  /* compute cos, sin of lat/lon on source grid for distance calculations */
+  /* Compute cos, sin of lat/lon on source grid for distance calculations */
 
   coslat = (double *) malloc(grid1_size*sizeof(double));
   coslon = (double *) malloc(grid1_size*sizeof(double));
@@ -2382,7 +2378,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
       sinlon[n] = sin(rg->grid1_center_lon[n]);
     }
 
-  /* loop over destination grid  */
+  /* Loop over destination grid  */
 
   /* grid_loop1 */
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
@@ -2394,7 +2390,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
       sinlat_dst = sin(rg->grid2_center_lat[dst_add]);
       sinlon_dst = sin(rg->grid2_center_lon[dst_add]);
 	
-      /* find nearest grid points on source grid and  distances to each point */
+      /* Find nearest grid points on source grid and  distances to each point */
       grid_search_nbr(rg, nbr_add, nbr_dist, 
 		      rg->grid2_center_lat[dst_add],
 		      rg->grid2_center_lon[dst_add],
@@ -2404,7 +2400,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
 		      sinlat, coslat, sinlon, coslon);
 
       /*
-         compute weights based on inverse distance
+         Compute weights based on inverse distance
          if mask is false, eliminate those points
       */
       dist_tot = ZERO;
@@ -2422,7 +2418,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
 	      }
 	}
 
-      /* normalize weights and store the link */
+      /* Normalize weights and store the link */
 
       for ( n = 0; n < num_neighbors; n++ )
 	{
@@ -2451,7 +2447,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 /*
-   this routine finds the closest num_neighbor points to a search 
+   This routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
 */
 static
@@ -2461,14 +2457,12 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
                       double *sinlat, double *coslat, double *sinlon, double *coslon)
 {
   /*
-    output variables:
+    Output variables:
 
     int nbr_add[0]     ! address of each of the closest points
     double nbr_dist[0] ! distance to each of the closest points
-  */
 
-  /*
-    input variables:
+    Input variables:
 
     int src_bin_add[][2] ! search bins for restricting search
 
@@ -2479,17 +2473,17 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
     double sinlat_dst,   ! sin(lat)  of the search point
     double sinlon_dst    ! sin(lon)  of the search point
   */
-  /*  local variables */
+  /*  Local variables */
 
   int n, nmax, nadd;
   int min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
 
-  double distance;     /* angular distance */
+  double distance;     /* Angular distance */
 
-  /*  loop over source grid and find nearest neighbors */
+  /*  Loop over source grid and find nearest neighbors */
 
   /*
-    restrict the search using search bins
+    Restrict the search using search bins
     expand the bins to catch neighbors
   */
   if ( rg->restrict_type == RESTRICT_LATITUDE )
@@ -2548,19 +2542,19 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
     cdoAbort("Unknown search restriction method!");
 
 
-  /* initialize distance and address arrays */
+  /* Initialize distance and address arrays */
 
   nbr_add[0]  = 0;
   nbr_dist[0] = BIGNUM;
 
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
-      /* find distance to this point */
+      /* Find distance to this point */
 
       distance = acos(sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
                      (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]));
       /*
-         store the address and distance if this is the smallest so far
+         Store the address and distance if this is the smallest so far
       */
       if ( distance < nbr_dist[0] )
 	{
@@ -2573,7 +2567,7 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
 
 
 /*
-  this routine stores the address and weight for this link in
+  This routine stores the address and weight for this link in
   the appropriate address and weight arrays and resizes those
   arrays if necessary.
 */
@@ -2581,15 +2575,15 @@ static
 void store_link_nbr1(REMAPVARS *rv, int add1, int add2, double weights)
 {
   /*
-    input variables:
+    Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
     double weights[]  ! array of remapping weights for this link
   */
 
   /*
-     increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  then store the link.
+     Increment number of links and check to see if remap arrays need
+     to be increased to accomodate the new link.  Then store the link.
   */
   rv->num_links = rv->num_links + 1;
 
@@ -2607,7 +2601,7 @@ void store_link_nbr1(REMAPVARS *rv, int add1, int add2, double weights)
 /*
   -----------------------------------------------------------------------
 
-   this routine computes the inverse-distance weights for a
+   This routine computes the inverse-distance weights for a
    nearest-neighbor interpolation.
 
   -----------------------------------------------------------------------
@@ -2616,15 +2610,15 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
 {
   static char func[] = "remap_distwgt";
 
-  /*   local variables */
+  /*  Local variables */
 
   int grid1_size;
   int grid2_size;
-  int nbr_mask;    /* mask at nearest neighbors */
+  int nbr_mask;            /* mask at nearest neighbors */
   int n;
-  int dst_add;                    /* destination address */
-  int nbr_add;     /* source address at nearest neighbors     */
-  double nbr_dist; /* angular distance four nearest neighbors */
+  int dst_add;             /* destination address */
+  int nbr_add;             /* source address at nearest neighbors     */
+  double nbr_dist;         /* angular distance four nearest neighbors */
   double coslat_dst;       /* cos(lat) of destination grid point */
   double coslon_dst;       /* cos(lon) of destination grid point */
   double sinlat_dst;       /* sin(lat) of destination grid point */
@@ -2635,13 +2629,13 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
   double wgtstmp;          /* hold the link weight                        */
 
   /*
-    compute mappings from grid1 to grid2
+    Compute mappings from grid1 to grid2
   */
 
   grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
-  /* compute cos, sin of lat/lon on source grid for distance calculations */
+  /* Compute cos, sin of lat/lon on source grid for distance calculations */
 
   coslat = (double *) malloc(grid1_size*sizeof(double));
   coslon = (double *) malloc(grid1_size*sizeof(double));
@@ -2656,7 +2650,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
       sinlon[n] = sin(rg->grid1_center_lon[n]);
     }
 
-  /* loop over destination grid  */
+  /* Loop over destination grid  */
 
   /* grid_loop1 */
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
@@ -2668,7 +2662,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
       sinlat_dst = sin(rg->grid2_center_lat[dst_add]);
       sinlon_dst = sin(rg->grid2_center_lon[dst_add]);
 	
-      /* find nearest grid points on source grid and  distances to each point */
+      /* Find nearest grid points on source grid and  distances to each point */
 
       grid_search_nbr1(rg, &nbr_add, &nbr_dist,
 		       rg->grid2_center_lat[dst_add],
@@ -2679,7 +2673,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
 		       sinlat, coslat, sinlon, coslon);
 
       /*
-         compute weights based on inverse distance
+         Compute weights based on inverse distance
          if mask is false, eliminate those points
       */
       dist_tot = ZERO;
@@ -2695,7 +2689,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
 	    nbr_mask = TRUE;
 	  }
 
-      /* normalize weights and store the link */
+      /* Normalize weights and store the link */
 
       if ( nbr_mask )
 	{
@@ -2725,7 +2719,7 @@ static double north_thresh = 2.00;  /* threshold for coord transf. */
 static double south_thresh =-2.00;  /* threshold for coord transf. */
 
 /*
-    this routine is identical to the intersection routine except
+    This routine is identical to the intersection routine except
     that a coordinate transformation (using a Lambert azimuthal
     equivalent projection) is performed to treat polar cells more
     accurately.
@@ -2742,12 +2736,12 @@ void pole_intersection(int *location,
 {
   static char func[] = "pole_intersection";
   /*
-    intent(in): 
+    Intent(in): 
     double beglat, beglon,  ! beginning lat/lon endpoints for segment
     double endlat, endlon   ! ending    lat/lon endpoints for segment
     int    lrevers          ! flag true if segment integrated in reverse
 
-    intent(inout) :
+    Intent(inout) :
     double begseg[2] ! begin lat/lon of full segment
     int *location    ! address in destination array containing this
                      ! segment -- also may contain last location on entry
@@ -2757,7 +2751,7 @@ void pole_intersection(int *location,
     *int lcoinc      ! flag segment coincident with grid line
     double *intrsct_lat, *intrsct_lon ! lat/lon coords of next intersect.
   */
-  /* local variables */
+  /* Local variables */
   int n, next_n, cell;
   int ioffset;
   int loutside; /* flags points outside grid */
@@ -2780,7 +2774,7 @@ void pole_intersection(int *location,
   double *srch_corner_y;     /*  y of each corner of srch cells */
 
 
-  /* initialize defaults, flags, etc. */
+  /* Initialize defaults, flags, etc. */
 
   if ( ! *lthresh ) *location = -1;
   *lcoinc = FALSE;
@@ -2790,7 +2784,7 @@ void pole_intersection(int *location,
   loutside = FALSE;
   s1 = ZERO;
 
-  /* convert coordinates */
+  /* Convert coordinates */
 
   srch_corner_x = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
   srch_corner_y = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
@@ -2992,7 +2986,7 @@ void pole_intersection(int *location,
       grdx1 = srch_corner_x[ioffset+n];
       grdx2 = srch_corner_x[ioffset+next_n];
 
-      /* set up linear system to solve for intersection */
+      /* Set up linear system to solve for intersection */
 
       mat1 = x2 - x1;
       mat2 = grdx1 - grdx2;
@@ -3004,14 +2998,14 @@ void pole_intersection(int *location,
       determ = mat1*mat4 - mat2*mat3;
 
       /*
-         if the determinant is ZERO, the segments are either 
-           parallel or coincident.  coincidences were detected 
+         If the determinant is ZERO, the segments are either 
+           parallel or coincident.  Coincidences were detected 
            above so do nothing.
-         if the determinant is non-ZERO, solve for the linear 
+         If the determinant is non-ZERO, solve for the linear 
            parameters s for the intersection point on each line 
            segment.
-         if 0<s1,s2<1 then the segment intersects with this side.
-           return the point of intersection (adding a small
+         If 0<s1,s2<1 then the segment intersects with this side.
+           Return the point of intersection (adding a small
            number so the intersection is off the grid line).
       */
       if ( fabs(determ) > 1.e-30 )
@@ -3022,7 +3016,7 @@ void pole_intersection(int *location,
           if ( s2 >= ZERO && s2 <= ONE && s1 >= ZERO && s1 <= ONE )
 	    {
 	      /*
-		recompute intersection based on full segment
+		Recompute intersection based on full segment
 		so intersections are consistent for both sweeps
 	      */
 	      if ( ! loutside )
@@ -3043,9 +3037,9 @@ void pole_intersection(int *location,
 	      determ = mat1*mat4 - mat2*mat3;
 
 	      /*
-		sometimes due to roundoff, the previous 
+		Sometimes due to roundoff, the previous 
 		determinant is non-ZERO, but the lines
-		are actually coincident.  if this is the
+		are actually coincident.  If this is the
 		case, skip the rest.
 	      */
 	      if ( !DBL_IS_EQUAL(determ, 0) )
@@ -3064,7 +3058,7 @@ void pole_intersection(int *location,
 		     *intrsct_y = endy + s1*mat3;
 		   }
 
-		 /* convert back to lat/lon coordinates */
+		 /* Convert back to lat/lon coordinates */
 
 		 *intrsct_lon = rns*atan2(*intrsct_y, *intrsct_x);
 		 if ( *intrsct_lon < ZERO ) 
@@ -3077,7 +3071,7 @@ void pole_intersection(int *location,
 		 else
 		   *intrsct_lat = TWO*pi4;
 
-		 /* add offset in transformed space for next pass. */
+		 /* Add offset in transformed space for next pass. */
 
 		 if ( s1 - eps/determ < ONE )
 		   {
@@ -3107,7 +3101,7 @@ void pole_intersection(int *location,
 	    }
 	}
  
-      /* no intersection this side, move on to next side */
+      /* No intersection this side, move on to next side */
 
     } /* intrsct_loop */
 
@@ -3115,7 +3109,7 @@ void pole_intersection(int *location,
   free(srch_corner_x);
 
   /*
-     if segment manages to cross over pole, shift the beginning 
+     If segment manages to cross over pole, shift the beginning 
      endpoint in order to avoid hitting pole directly
      (it is ok for endpoint to be pole point)
   */
@@ -3152,9 +3146,9 @@ void pole_intersection(int *location,
     }
 
   /*
-     if the segment crosses a pole threshold, reset the intersection
+     If the segment crosses a pole threshold, reset the intersection
      to be the threshold latitude and do not reuse x,y intersect
-     on next entry.  only check if did not cross threshold last
+     on next entry.  Only check if did not cross threshold last
      time - sometimes the coordinate transformation can place a
      segment on the other side of the threshold again
   */
@@ -3214,13 +3208,13 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 		  int *avoid_pole_count, double *avoid_pole_offset)
 {
   /*
-    intent(in): 
+    Intent(in): 
     int lbegin, ! flag for first integration along this segment
     int lrevers ! flag whether segment integrated in reverse
     double beglat, beglon,  ! beginning lat/lon endpoints for segment
     double endlat, endlon   ! ending    lat/lon endpoints for segment
 
-    intent(inout) :: 
+    Intent(inout) :: 
     double *begseg ! begin lat/lon of full segment
 
     intent(out): 
@@ -3228,7 +3222,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
     int *lcoinc    ! flag segments which are entirely coincident with a grid line
     double *intrsct_lat, *intrsct_lon ! lat/lon coords of next intersect.
   */
-  /* local variables */
+  /* Local variables */
   int n, next_n, cell;
   int ioffset;
 
@@ -3457,7 +3451,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
       grdlat1 = srch_corner_lat[ioffset+n];
       grdlat2 = srch_corner_lat[ioffset+next_n];
 
-      /* set up linear system to solve for intersection */
+      /* Set up linear system to solve for intersection */
 
       mat1 = lat2 - lat1;
       mat2 = grdlat1 - grdlat2;
@@ -3478,14 +3472,14 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
       determ = mat1*mat4 - mat2*mat3;
 
       /*
-         if the determinant is ZERO, the segments are either 
-           parallel or coincident.  coincidences were detected 
+         If the determinant is ZERO, the segments are either 
+           parallel or coincident.  Coincidences were detected 
            above so do nothing.
-         if the determinant is non-ZERO, solve for the linear 
+         If the determinant is non-ZERO, solve for the linear 
            parameters s for the intersection point on each line 
            segment.
-         if 0<s1,s2<1 then the segment intersects with this side.
-           return the point of intersection (adding a small
+         If 0<s1,s2<1 then the segment intersects with this side.
+           Return the point of intersection (adding a small
            number so the intersection is off the grid line).
       */
       if ( fabs(determ) > 1.e-30 )
@@ -3496,7 +3490,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	  if ( s2 >= ZERO && s2 <= ONE && s1 >= ZERO && s1 <= ONE )
 	    {
 	      /*
-		recompute intersection based on full segment
+		Recompute intersection based on full segment
 		so intersections are consistent for both sweeps
 	      */
 	      if ( ! loutside )
@@ -3523,9 +3517,9 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	      determ = mat1*mat4 - mat2*mat3;
 
 	      /*
-		sometimes due to roundoff, the previous 
+		Sometimes due to roundoff, the previous 
 		determinant is non-ZERO, but the lines
-		are actually coincident.  if this is the
+		are actually coincident.  If this is the
 		case, skip the rest.
 	      */
 	      if ( !DBL_IS_EQUAL(determ, 0) )
@@ -3555,13 +3549,13 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 	    }
 	}
 
-      /* no intersection this side, move on to next side */
+      /* No intersection this side, move on to next side */
 
     } /* intrsct_loop */
 
   /*
-     if the segment crosses a pole threshold, reset the intersection
-     to be the threshold latitude.  only check if this was not a
+     If the segment crosses a pole threshold, reset the intersection
+     to be the threshold latitude.  Only check if this was not a
      threshold segment since sometimes coordinate transform can end
      up on other side of threshold again.
   */
@@ -3605,24 +3599,24 @@ void line_integral(double *weights, int num_wts,
 		   double grid1_lon, double grid2_lon)
 {
   /*
-    intent(in): 
-    int    num_wts               ! number of weights to compute
-    double in_phi1, in_phi2,     ! longitude endpoints for the segment
-    double theta1, theta2,       ! latitude  endpoints for the segment
-    double grid1_lon,            ! reference coordinates for each
-    double grid2_lon             ! grid (to ensure correct 0,2pi interv.
+    Intent(in): 
+    int    num_wts               ! Number of weights to compute
+    double in_phi1, in_phi2,     ! Longitude endpoints for the segment
+    double theta1, theta2,       ! Latitude  endpoints for the segment
+    double grid1_lon,            ! Reference coordinates for each
+    double grid2_lon             ! Grid (to ensure correct 0,2pi interv.
 
-    intent(out):
-    double weights[2*num_wts]    ! line integral contribution to weights
+    Intent(out):
+    double weights[2*num_wts]    ! Line integral contribution to weights
   */
 
-  /*  local variables  */
+  /*  Local variables  */
 
   double dphi, sinth1, sinth2, costh1, costh2, fac;
   double phi1, phi2;
   double f1, f2, fint;
 
-  /*  weights for the general case based on a trapezoidal approx to the integrals. */
+  /*  Weights for the general case based on a trapezoidal approx to the integrals. */
 
   sinth1 = sin(theta1);
   sinth2 = sin(theta2);
@@ -3636,7 +3630,7 @@ void line_integral(double *weights, int num_wts,
   dphi = HALF*dphi;
 
   /*
-     the first weight is the area overlap integral. the second and
+     The first weight is the area overlap integral. The second and
      fourth are second-order latitude gradient weights.
   */
   weights[        0] = dphi*(sinth1 + sinth2);
@@ -3645,8 +3639,8 @@ void line_integral(double *weights, int num_wts,
   weights[num_wts+1] = dphi*(costh1 + costh2 + (theta1*sinth1 + theta2*sinth2));
 
   /*
-     the third and fifth weights are for the second-order phi gradient
-     component.  must be careful of longitude range.
+     The third and fifth weights are for the second-order phi gradient
+     component.  Must be careful of longitude range.
   */
   f1 = HALF*(costh1*sinth1 + theta1);
   f2 = HALF*(costh2*sinth2 + theta2);
@@ -3708,20 +3702,20 @@ void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
 		      int *link_add1[2], int *link_add2[2])
 {
   /*
-    input variables:
+    Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
     double weights[]  ! array of remapping weights for this link
   */
-  /* local variables */
+  /* Local variables */
   int nlink, min_link, max_link; /* link index */
 
-  /*   if all weights are ZERO, do not bother storing the link */
+  /*  If all weights are ZERO, do not bother storing the link */
 
   if ( DBL_IS_EQUAL(weights[0], 0) && DBL_IS_EQUAL(weights[1], 0) && DBL_IS_EQUAL(weights[2], 0) &&
        DBL_IS_EQUAL(weights[3], 0) && DBL_IS_EQUAL(weights[4], 0) && DBL_IS_EQUAL(weights[5], 0) ) return;
 
-  /*  restrict the range of links to search for existing links */
+  /*  Restrict the range of links to search for existing links */
 
   min_link = MIN(link_add1[0][add1], link_add2[0][add2]);
   max_link = MAX(link_add1[1][add1], link_add2[1][add2]);
@@ -3844,7 +3838,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int lrevers;     /* flag for reversing direction of segment */
   int lbegin;      /* flag for first integration of a segment */
 
-  int *srch_mask; /* mask for restricting searches */
+  int *srch_mask;  /* mask for restricting searches */
 
   double intrsct_lat, intrsct_lon;         /* lat/lon of next intersect  */
   double beglat, endlat, beglon, endlon;   /* endpoints of current seg.  */
@@ -3867,16 +3861,16 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int *link_add1[2];  /* min,max link add to restrict search */
   int *link_add2[2];  /* min,max link add to restrict search */
 
-  /* intersection */
+  /* Intersection */
   int last_loc = FALSE; /* save location when crossing threshold */
   int lthresh = FALSE;  /* flags segments crossing threshold bndy */
   double intrsct_lat_off = 0, intrsct_lon_off = 0; /* lat/lon coords offset for next search */
 
-  /* pole_intersection */
-  /* save last intersection to avoid roundoff during coord transformation */
+  /* Pole_intersection */
+  /* Save last intersection to avoid roundoff during coord transformation */
   int luse_last = FALSE;
   double intrsct_x, intrsct_y;  /* x,y for intersection */
-  /* variables necessary if segment manages to hit pole */
+  /* Variables necessary if segment manages to hit pole */
   int avoid_pole_count = 0;  /* count attempts to avoid pole */
   double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
 
@@ -3912,7 +3906,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
       link_add2[1][n] = -1;
     }
 
-  /* initialize centroid arrays */
+  /* Initialize centroid arrays */
 
   grid1_centroid_lat = (double *) malloc(grid1_size*sizeof(double));
   grid1_centroid_lon = (double *) malloc(grid1_size*sizeof(double));
@@ -3931,7 +3925,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
       grid2_centroid_lon[n] = ZERO;
     }
 
-  /*   integrate around each cell on grid1 */
+  /*  Integrate around each cell on grid1 */
 
   srch_mask = (int *) malloc(grid2_size*sizeof(int));
 
@@ -3950,7 +3944,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   for ( grid1_add = 0; grid1_add < grid1_size; grid1_add++ )
     {
-      /* restrict searches first using search bins */
+      /* Restrict searches first using search bins */
 
       min_add = grid2_size - 1;
       max_add = 0;
@@ -3961,7 +3955,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
             if ( rg->bin_addr2[2*n+1] > max_add ) max_add = rg->bin_addr2[2*n+1];
           }
 
-      /* further restrict searches using bounding boxes */
+      /* Further restrict searches using bounding boxes */
 
       num_srch_cells = 0;
       grid1_addm4 = grid1_add*4;
@@ -3982,7 +3976,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
       if ( num_srch_cells == 0 ) continue;
 
-      /* create search arrays */
+      /* Create search arrays */
 
       if ( num_srch_cells > max_srch_cells )
 	{
@@ -4009,7 +4003,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
             n++;
           }
 
-      /* integrate around this cell */
+      /* Integrate around this cell */
 
       ioffset = grid1_add*grid1_corners;
 
@@ -4017,7 +4011,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	{
           next_corn = (corner+1)%grid1_corners;
 
-          /* define endpoints of the current segment */
+          /* Define endpoints of the current segment */
 
           beglat = rg->grid1_corner_lat[ioffset+corner];
           beglon = rg->grid1_corner_lon[ioffset+corner];
@@ -4026,7 +4020,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
           lrevers = FALSE;
 
           /* 
-	     to ensure exact path taken during both
+	     To ensure exact path taken during both
 	     sweeps, always integrate segments in the same direction (SW to NE).
           */
           if ( (endlat < beglat) || (DBL_IS_EQUAL(endlat, beglat) && endlon < beglon) )
@@ -4043,20 +4037,20 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
           lbegin = TRUE;
 
           /*
-	    if this is a constant-longitude segment, skip the rest 
+	    If this is a constant-longitude segment, skip the rest 
 	    since the line integral contribution will be ZERO.
           */
           if ( !DBL_IS_EQUAL(endlon, beglon) )
 	    {
 	      num_subseg = 0;
 	      /*
-		integrate along this segment, detecting intersections 
+		Integrate along this segment, detecting intersections 
 		and computing the line integral for each sub-segment
 	      */
 	      while ( !DBL_IS_EQUAL(beglat, endlat) || !DBL_IS_EQUAL(beglon, endlon) )
 		{
  		  /*
-		    prevent infinite loops if integration gets stuck
+		    Prevent infinite loops if integration gets stuck
 		    near cell or threshold boundary
 		  */
 		  num_subseg++;
@@ -4064,7 +4058,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( num_subseg >= max_subseg )
 		    cdoAbort("integration stalled: num_subseg exceeded limit");
 
-		  /* find next intersection of this segment with a gridline on grid 2. */
+		  /* Find next intersection of this segment with a gridline on grid 2. */
 
 		  intersection(&grid2_add, &intrsct_lat, &intrsct_lon, &lcoinc,
 			       beglat, beglon, endlat, endlon, begseg, 
@@ -4077,7 +4071,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 		  lbegin = FALSE;
 
-		  /* compute line integral for this subsegment. */
+		  /* Compute line integral for this subsegment. */
 
 		  if ( grid2_add != -1 )
 		    line_integral(weights, rv->num_wts,
@@ -4090,13 +4084,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 				  rg->grid1_center_lon[grid1_add],
 				  rg->grid1_center_lon[grid1_add]);
 
-		  /* if integrating in reverse order, change sign of weights */
+		  /* If integrating in reverse order, change sign of weights */
 
 		  if ( lrevers ) for ( k = 0; k < 6; k++ ) weights[k] = -weights[k];
 
 		  /*
-		    store the appropriate addresses and weights. 
-		    also add contributions to cell areas and centroids.
+		    Store the appropriate addresses and weights. 
+		    Also add contributions to cell areas and centroids.
 		  */
 		  if ( grid2_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
@@ -4111,13 +4105,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  grid1_centroid_lat[grid1_add] += weights[1];
 		  grid1_centroid_lon[grid1_add] += weights[2];
 
-		  /* reset beglat and beglon for next subsegment. */
+		  /* Reset beglat and beglon for next subsegment. */
 
 		  beglat = intrsct_lat;
 		  beglon = intrsct_lon;
 		}
 	    }
-          /* end of segment */
+          /* End of segment */
         }
     }
 
@@ -4131,7 +4125,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   free(srch_mask);
 
-  /* integrate around each cell on grid2 */
+  /* Integrate around each cell on grid2 */
 
   srch_mask = (int *) malloc(grid1_size*sizeof(int));
 
@@ -4150,7 +4144,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   for ( grid2_add = 0; grid2_add < grid2_size; grid2_add++ )
     {
-      /* restrict searches first using search bins */
+      /* Restrict searches first using search bins */
 
       min_add = grid1_size - 1;
       max_add = 0;
@@ -4161,7 +4155,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
             if ( rg->bin_addr1[2*n+1] > max_add ) max_add = rg->bin_addr1[2*n+1];
 	  }
 
-      /* further restrict searches using bounding boxes */
+      /* Further restrict searches using bounding boxes */
 
       num_srch_cells = 0;
       grid2_addm4 = grid2_add*4;
@@ -4182,7 +4176,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
       if ( num_srch_cells == 0 ) continue;
 
-      /* create search arrays */
+      /* Create search arrays */
       
       if ( num_srch_cells > max_srch_cells )
 	{
@@ -4209,7 +4203,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
             n++;
 	  }
 
-      /* integrate around this cell */
+      /* Integrate around this cell */
 
       ioffset = grid2_add*grid2_corners;
 
@@ -4224,7 +4218,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
           lrevers = FALSE;
 
 	  /*
-             to ensure exact path taken during both
+             To ensure exact path taken during both
              sweeps, always integrate in the same direction
           */
 
@@ -4242,20 +4236,20 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
           lbegin = TRUE;
 
           /*
-	    if this is a constant-longitude segment, skip the rest 
+	    If this is a constant-longitude segment, skip the rest 
 	    since the line integral contribution will be ZERO.
           */
           if ( !DBL_IS_EQUAL(endlon, beglon) )
 	    {
 	      num_subseg = 0;
 	      /*
-		integrate along this segment, detecting intersections 
+		Integrate along this segment, detecting intersections 
 		and computing the line integral for each sub-segment
 	      */
 	      while ( !DBL_IS_EQUAL(beglat, endlat) || !DBL_IS_EQUAL(beglon, endlon) )
 		{
 		  /*
-		    prevent infinite loops if integration gets stuck
+		    Prevent infinite loops if integration gets stuck
 		    near cell or threshold boundary
 		  */
 		  num_subseg++;
@@ -4263,7 +4257,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( num_subseg >= max_subseg )
  		    cdoAbort("integration stalled: num_subseg exceeded limit");
 
-		  /* find next intersection of this segment with a gridline on grid 2. */
+		  /* Find next intersection of this segment with a gridline on grid 2. */
 
 		  intersection(&grid1_add, &intrsct_lat, &intrsct_lon, &lcoinc,
 			       beglat, beglon, endlat, endlon, begseg,
@@ -4276,7 +4270,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 		  lbegin = FALSE;
 
-		  /* compute line integral for this subsegment. */
+		  /* Compute line integral for this subsegment. */
 
 		  if ( grid1_add != -1 )
 		    line_integral(weights, rv->num_wts,
@@ -4289,16 +4283,16 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 				  rg->grid2_center_lon[grid2_add],
 				  rg->grid2_center_lon[grid2_add]);
 
-		  /* if integrating in reverse order, change sign of weights */
+		  /* If integrating in reverse order, change sign of weights */
 
 		  if ( lrevers ) for ( k = 0; k < 6; k++ ) weights[k] = -weights[k];
 
 		  /*
-		    store the appropriate addresses and weights. 
-		    also add contributions to cell areas and centroids.
-		    if there is a coincidence, do not store weights
+		    Store the appropriate addresses and weights. 
+		    Also add contributions to cell areas and centroids.
+		    If there is a coincidence, do not store weights
 		    because they have been captured in the previous loop.
-		    the grid1 mask is the master mask
+		    The grid1 mask is the master mask
 		  */
 		  if ( ! lcoinc && grid1_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
@@ -4313,19 +4307,19 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  grid2_centroid_lat[grid2_add] += weights[rv->num_wts+1];
 		  grid2_centroid_lon[grid2_add] += weights[rv->num_wts+2];
 
-		  /* reset beglat and beglon for next subsegment. */
+		  /* Reset beglat and beglon for next subsegment. */
 
 		  beglat = intrsct_lat;
 		  beglon = intrsct_lon;
 		}
 	    }
-          /* end of segment */
+          /* End of segment */
 	}
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_con3);
 
-  /* finished with all cells: deallocate search arrays */
+  /* Finished with all cells: deallocate search arrays */
 
   if ( srch_corner_lon ) free(srch_corner_lon);
   if ( srch_corner_lat ) free(srch_corner_lat);
@@ -4334,10 +4328,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   free(srch_mask);
 
   /*
-     correct for situations where N/S pole not explicitly included in
-     grid (i.e. as a grid corner point). if pole is missing from only
+     Correct for situations where N/S pole not explicitly included in
+     grid (i.e. as a grid corner point). If pole is missing from only
      one grid, need to correct only the area and centroid of that 
-     grid.  if missing from both, do complete weight calculation.
+     grid.  If missing from both, do complete weight calculation.
   */
 
   /* North Pole */
@@ -4444,7 +4438,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
       rg->grid2_frac[grid2_add] += weights[rv->num_wts];
     }
 
-  /* finish centroid computation */
+  /* Finish centroid computation */
 
   for ( n = 0; n < grid1_size; n++ )
     if ( !DBL_IS_EQUAL(rg->grid1_area[n], 0) )
@@ -4460,7 +4454,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
         grid2_centroid_lon[n] = grid2_centroid_lon[n]/rg->grid2_area[n];
       }
 
-  /* include centroids in weights and normalize using destination area if requested */
+  /* Include centroids in weights and normalize using destination area if requested */
 
   if ( rv->norm_opt == NORM_OPT_DESTAREA )
     {
@@ -4529,7 +4523,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   for ( n = 0; n < grid2_size; n++ )
     if ( !DBL_IS_EQUAL(rg->grid2_area[n], 0) ) rg->grid2_frac[n] = rg->grid2_frac[n]/rg->grid2_area[n];
 
-  /*  perform some error checking on final weights  */
+  /* Perform some error checking on final weights  */
 
   for ( n = 0; n < grid2_size; n++ )
     {
@@ -4810,7 +4804,7 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 	  ise = (jm1-1)*nx + ip1 - 1;
 	  isw = (jm1-1)*nx + im1 - 1;
 
-	  /* compute i-gradient */
+	  /* Compute i-gradient */
 
 	  if ( ! rg.grid1_mask[ie] )
 	    {
@@ -4825,7 +4819,7 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
  
 	  grad1_lat[n] = delew*(array[ie] - array[iw]);
 
-	  /* compute j-gradient */
+	  /* Compute j-gradient */
 
 	  if ( ! rg.grid1_mask[in] )
 	    {
@@ -4840,7 +4834,7 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
  
 	  grad1_lon[n] = delns*(array[in] - array[is]);
 
-	  /* compute ij-gradient */
+	  /* Compute ij-gradient */
 
 	  delew = HALF;
 	  if ( jp1 == j || jm1 == j )
@@ -4972,7 +4966,7 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
        weights         ! remapping weights [num_links][num_wts]
   */
 
-  /* local variables */
+  /* Local variables */
 
   int add1_tmp, add2_tmp;  /* temp for addresses during swap     */
   int lvl, final_lvl;      /* level indexes for heap sort levels */
@@ -4998,11 +4992,11 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
       for ( n = 0; n < num_wts; n++ )
 	wgttmp[n] = weights[n][lvl];
 
-      /* loop until proper level is found for this link, or reach bottom */
+      /* Loop until proper level is found for this link, or reach bottom */
 
       for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
 	{
-	  /* find the largest of the two daughters */
+	  /* Find the largest of the two daughters */
 
           chk_lvl1 = 2*final_lvl+1;
           chk_lvl2 = 2*final_lvl+2;
@@ -5016,7 +5010,7 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
             max_lvl = chk_lvl2;
 
           /*
-	    if the parent is greater than both daughters,
+	    If the parent is greater than both daughters,
 	    the correct level has been found
 	  */
           if ((add1_tmp >  add1[max_lvl]) ||
@@ -5033,9 +5027,9 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
 	  else
 	    {
 	      /*
-		otherwise, promote the largest daughter and push
-		down one level in the tree.  if haven"t reached
-		the end of the tree, repeat the process.  otherwise
+		Otherwise, promote the largest daughter and push
+		down one level in the tree.  If haven"t reached
+		the end of the tree, repeat the process.  Otherwise
 		store last values and exit the loop
 	      */
 	      add1[final_lvl] = add1[max_lvl];
@@ -5061,13 +5055,13 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
     }
 
   /*
-    now that the heap has been sorted, strip off the top (largest)
+    Now that the heap has been sorted, strip off the top (largest)
     value and promote the values below
   */
 
   for ( lvl = num_links-1; lvl >= 2; lvl-- )
     {
-      /* move the top value and insert it into the correct place */
+      /* Move the top value and insert it into the correct place */
 
       add1_tmp = add1[lvl];
       add1[lvl] = add1[0];
@@ -5081,13 +5075,13 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
       for ( n = 0; n < num_wts; n++ )
         weights[n][lvl] = weights[n][0];
 
-      /* as above this loop sifts the tmp values down until proper level is reached */
+      /* As above this loop sifts the tmp values down until proper level is reached */
 
       final_lvl = 0;
 
       for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
 	{
-	  /* find the largest of the two daughters */
+	  /* Find the largest of the two daughters */
 
           chk_lvl1 = 2*final_lvl+1;
           chk_lvl2 = 2*final_lvl+2;
@@ -5101,7 +5095,7 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
             max_lvl = chk_lvl2;
 
           /*
-	    if the parent is greater than both daughters,
+	    If the parent is greater than both daughters,
 	    the correct level has been found
 	  */
           if ((add1_tmp >  add1[max_lvl]) ||
@@ -5117,9 +5111,9 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
 	  else
 	    {
 	      /*
-		otherwise, promote the largest daughter and push
-		down one level in the tree.  if haven't reached
-		the end of the tree, repeat the process.  otherwise
+		Otherwise, promote the largest daughter and push
+		down one level in the tree.  If haven't reached
+		the end of the tree, repeat the process.  Otherwise
 		store last values and exit the loop
 	      */
 	      add1[final_lvl] = add1[max_lvl];
@@ -5144,7 +5138,7 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
 	cdoAbort("Internal problem; link 2 not found!");
     }
 
-  /* swap the last two entries */
+  /* Swap the last two entries */
 
   add1_tmp = add1[1];
   add1[1]  = add1[0];
@@ -5269,17 +5263,17 @@ static void nce(int istat)
 void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMAPVARS rv)
 {
   /*
-    writes remap data to a netCDF file using SCRIP conventions
+    Writes remap data to a netCDF file using SCRIP conventions
   */
   /*
-    input variables:
+    Input variables:
 
     interp_file  ! filename for remap data
   */
 
 #if  defined  (HAVE_LIBNETCDF)
 
-  /* local variables */
+  /* Local variables */
 
   int nc_file_id;           /* id for netCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
@@ -5357,19 +5351,19 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
       break;
     }
 
-  /* create netCDF file for mapping and define some global attributes */
+  /* Create netCDF file for mapping and define some global attributes */
   nce(nc_create(interp_file, NC_CLOBBER, &nc_file_id));
 
-  /*  map name */
+  /* Map name */
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "title", strlen(map_name), map_name));
 
-  /* normalization option */
+  /* Normalization option */
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "normalization", strlen(normalize_opt), normalize_opt));
 
-  /* map method */
+  /* Map method */
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "map_method", strlen(map_method), map_method));
 
-  /* history */
+  /* History */
   date_and_time_in_sec = time(NULL);
 
   if ( date_and_time_in_sec != -1 )
@@ -5381,52 +5375,52 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
 
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "history", strlen(history), history));
 
-  /* file convention */
+  /* File convention */
   strcpy(tmp_string, "SCRIP");
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "conventions", strlen(tmp_string), tmp_string));
 
-  /* source and destination grid names */
+  /* Source and destination grid names */
   gridName(gridInqType(rg.gridID1), grid1_name);
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "source_grid", strlen(grid1_name), grid1_name));
 
   gridName(gridInqType(rg.gridID2), grid2_name);
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "dest_grid", strlen(grid2_name), grid2_name));
 
-  /* prepare netCDF dimension info */
+  /* Prepare netCDF dimension info */
 
-  /* define grid size dimensions */
+  /* Define grid size dimensions */
   nce(nc_def_dim(nc_file_id, "src_grid_size", rg.grid1_size, &nc_srcgrdsize_id));
   nce(nc_def_dim(nc_file_id, "dst_grid_size", rg.grid2_size, &nc_dstgrdsize_id));
 
-  /* define grid corner dimension */
+  /* Define grid corner dimension */
   if ( rg.grid1_corners )
     nce(nc_def_dim(nc_file_id, "src_grid_corners", rg.grid1_corners, &nc_srcgrdcorn_id));
   if ( rg.grid2_corners )
     nce(nc_def_dim(nc_file_id, "dst_grid_corners", rg.grid2_corners, &nc_dstgrdcorn_id));
 
-  /* define grid rank dimension */
+  /* Define grid rank dimension */
   nce(nc_def_dim(nc_file_id, "src_grid_rank", rg.grid1_rank, &nc_srcgrdrank_id));
   nce(nc_def_dim(nc_file_id, "dst_grid_rank", rg.grid2_rank, &nc_dstgrdrank_id));
 
-  /* define map size dimensions */
+  /* Define map size dimensions */
   nce(nc_def_dim(nc_file_id, "num_links", rv.num_links, &nc_numlinks_id));
   nce(nc_def_dim(nc_file_id, "num_wgts", rv.num_wts, &nc_numwgts_id));
        
-  /* define grid dimensions */
+  /* Define grid dimensions */
   nce(nc_def_var(nc_file_id, "src_grid_dims", NC_INT, 1, &nc_srcgrdrank_id, &nc_srcgrddims_id));
   nce(nc_def_var(nc_file_id, "dst_grid_dims", NC_INT, 1, &nc_dstgrdrank_id, &nc_dstgrddims_id));
 
-  /* define all arrays for netCDF descriptors */
+  /* Define all arrays for netCDF descriptors */
 
-  /* define grid center latitude array */
+  /* Define grid center latitude array */
   nce(nc_def_var(nc_file_id, "src_grid_center_lat", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdcntrlat_id));
   nce(nc_def_var(nc_file_id, "dst_grid_center_lat", NC_DOUBLE, 1, &nc_dstgrdsize_id, &nc_dstgrdcntrlat_id));
 
-  /* define grid center longitude array */
+  /* Define grid center longitude array */
   nce(nc_def_var(nc_file_id, "src_grid_center_lon", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdcntrlon_id));
   nce(nc_def_var(nc_file_id, "dst_grid_center_lon", NC_DOUBLE, 1, &nc_dstgrdsize_id, &nc_dstgrdcntrlon_id));
 
-  /* define grid corner lat/lon arrays */
+  /* Define grid corner lat/lon arrays */
 
   nc_dims2_id[0] = nc_srcgrdsize_id;
   nc_dims2_id[1] = nc_srcgrdcorn_id;
@@ -5446,7 +5440,7 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
       nce(nc_def_var(nc_file_id, "dst_grid_corner_lon", NC_DOUBLE, 2, nc_dims2_id, &nc_dstgrdcrnrlon_id));
     }
 
-  /* define units for all coordinate arrays */
+  /* Define units for all coordinate arrays */
   nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlat_id, "units", 7, grid1_units));
   nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlat_id, "units", 7, grid2_units));
   nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlon_id, "units", 7, grid1_units));
@@ -5462,7 +5456,7 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
       nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlon_id, "units", 7, grid2_units));
     }
 
-  /* define grid mask */
+  /* Define grid mask */
 
   nce(nc_def_var(nc_file_id, "src_grid_imask", NC_INT, 1, &nc_srcgrdsize_id, &nc_srcgrdimask_id));
   nce(nc_put_att_text(nc_file_id, nc_srcgrdimask_id, "units", 8, "unitless"));
@@ -5470,7 +5464,7 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
   nce(nc_def_var(nc_file_id, "dst_grid_imask", NC_INT, 1, &nc_dstgrdsize_id, &nc_dstgrdimask_id));
   nce(nc_put_att_text(nc_file_id, nc_dstgrdimask_id, "units", 8, "unitless"));
 
-  /* define grid area arrays */
+  /* Define grid area arrays */
 
   nce(nc_def_var(nc_file_id, "src_grid_area", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdarea_id));
   nce(nc_put_att_text(nc_file_id, nc_srcgrdarea_id, "units", 14, "square radians"));
@@ -5478,7 +5472,7 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
   nce(nc_def_var(nc_file_id, "dst_grid_area", NC_DOUBLE, 1, &nc_dstgrdsize_id, &nc_dstgrdarea_id));   
   nce(nc_put_att_text(nc_file_id, nc_dstgrdarea_id, "units", 14, "square radians"));
 
-  /* define grid fraction arrays */
+  /* Define grid fraction arrays */
 
   nce(nc_def_var(nc_file_id, "src_grid_frac", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdfrac_id));
   nce(nc_put_att_text(nc_file_id, nc_srcgrdfrac_id, "units", 8, "unitless"));
@@ -5486,7 +5480,7 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
   nce(nc_def_var(nc_file_id, "dst_grid_frac", NC_DOUBLE, 1, &nc_dstgrdsize_id, &nc_dstgrdfrac_id));
   nce(nc_put_att_text(nc_file_id, nc_dstgrdfrac_id, "units", 8, "unitless"));
 
-  /* define mapping arrays */
+  /* Define mapping arrays */
 
   nce(nc_def_var(nc_file_id, "src_address", NC_INT, 1, &nc_numlinks_id, &nc_srcadd_id));      
   nce(nc_def_var(nc_file_id, "dst_address", NC_INT, 1, &nc_numlinks_id, &nc_dstadd_id));
@@ -5496,12 +5490,12 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
 
   nce(nc_def_var(nc_file_id, "remap_matrix", NC_DOUBLE, 2, nc_dims2_id, &nc_rmpmatrix_id));
 
-  /* end definition stage */
+  /* End definition stage */
   
   nce(nc_enddef(nc_file_id));
 
 
-  /* write mapping data */
+  /* Write mapping data */
 
   nce(nc_put_var_int(nc_file_id, nc_srcgrddims_id, rg.grid1_dims));
   nce(nc_put_var_int(nc_file_id, nc_dstgrddims_id, rg.grid2_dims));
@@ -5581,17 +5575,17 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, REMAPGRID *rg, REMAPVARS *rv)
 {
   /*
-    the routine reads a netCDF file to extract remapping info
+    The routine reads a netCDF file to extract remapping info
     in SCRIP format
   */
   /*
-    input variables
+    Input variables
 
     interp_file        ! filename for remap data
   */
 #if  defined  (HAVE_LIBNETCDF)
 
-  /* local variables */
+  /* Local variables */
 
   static char func[] = "read_remap_scrip";
   int status;
@@ -5642,11 +5636,11 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   int gridID1_gme_c = -1;
 
 
-  /* open file and read some global information */
+  /* Open file and read some global information */
 
   nce(nc_open(interp_file, NC_NOWRITE, &nc_file_id));
 
-  /* map name */
+  /* Map name */
 
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "title", map_name));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "title", &attlen));
@@ -5658,7 +5652,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       cdoPrint("From file: %s", interp_file);
     }
 
-  /* normalization option */
+  /* Normalization option */
 
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "normalization", normalize_opt));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "normalization", &attlen));
@@ -5679,7 +5673,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( cdoVerbose )
     cdoPrint("normalize_opt = %s", normalize_opt);
 
-  /* map method */
+  /* Map method */
 
   nce(nc_get_att_text (nc_file_id, NC_GLOBAL, "map_method", map_method));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "map_method", &attlen));
@@ -5700,7 +5694,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   *map_type = rv->map_type;
 
-  /* file convention */
+  /* File convention */
 
   nce(nc_get_att_text (nc_file_id, NC_GLOBAL, "conventions", convention));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "conventions", &attlen));
@@ -5715,9 +5709,9 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
         cdoAbort("Unknown file convention!");
     }
 
-  /* read some additional global attributes */
+  /* Read some additional global attributes */
 
-  /* source and destination grid names */
+  /* Source and destination grid names */
 
   nce(nc_get_att_text (nc_file_id, NC_GLOBAL, "source_grid", grid1_name));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "source_grid", &attlen));
@@ -5730,7 +5724,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( cdoVerbose )
     cdoPrint("Remapping between: %s and %s", grid1_name, grid2_name);
 
-  /* read dimension information */
+  /* Read dimension information */
 
   nce(nc_inq_dimid(nc_file_id, "src_grid_size", &nc_srcgrdsize_id));
   nce(nc_inq_dimlen(nc_file_id, nc_srcgrdsize_id, &dimlen));
@@ -5779,7 +5773,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   rg->gridID1 = gridID1;
   rg->gridID2 = gridID2;
 
-  /* initialize all pointer */
+  /* Initialize all pointer */
   rg->pinit = FALSE;
   remapGridInitPointer(rg);
 
@@ -5800,7 +5794,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   rv->resize_increment = (int) (0.1 * MAX(rg->grid1_size, rg->grid2_size));
 
-  /*  allocate address and weight arrays for mapping 1 */
+  /* Allocate address and weight arrays for mapping 1 */
 
   rv->grid1_add = (int *) malloc(rv->num_links*sizeof(int));
   rv->grid2_add = (int *) malloc(rv->num_links*sizeof(int));
@@ -5808,7 +5802,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   for ( i = 0; i < rv->num_wts; i++ )
     rv->wts[i] = (double *) malloc(rv->num_links*sizeof(double));
 
-  /* get variable ids */
+  /* Get variable ids */
 
   nce(nc_inq_varid(nc_file_id, "src_grid_dims", &nc_srcgrddims_id));
   nce(nc_inq_varid(nc_file_id, "src_grid_imask", &nc_srcgrdimask_id));
@@ -5836,7 +5830,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_varid(nc_file_id, "dst_address", &nc_dstadd_id));
   nce(nc_inq_varid(nc_file_id, "remap_matrix", &nc_rmpmatrix_id));
 
-  /* read all variables */
+  /* Read all variables */
 
   nce(nc_get_var_int(nc_file_id, nc_srcgrddims_id, rg->grid1_dims));
 
@@ -5956,7 +5950,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	rv->wts[n][i] = weights[n];
     }
 
-  /*close input file */
+  /* Close input file */
 
   nce(nc_close(nc_file_id));
 
