@@ -48,6 +48,7 @@ void *Cond(void *argument);
 void *Cond2(void *argument);
 void *Condc(void *argument);
 void *Copy(void *argument);
+void *Del29feb(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
 void *Echam5ini(void *argument);
@@ -233,6 +234,7 @@ void *Wct(void *argument);
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
 #define  CopyOperators          {"copy", "selall"}
+#define  Del29febOperators      {"del29feb"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffv"}
 #define  Echam5iniOperators     {"read_e5ml",  "read_e5res", \
@@ -275,7 +277,7 @@ void *Wct(void *argument);
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr"}
-#define  OutputgmtOperators     {"outputcenter", "outputcentercpt", "outputbounds", "outputboundscpt", "outputvector"}
+#define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", "outputboundscpt", "outputvector", "outputtri"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
@@ -450,6 +452,7 @@ static MODULES Modules[] =
   { Cond2,          Cond2Help,         Cond2Operators,          3,  1 },
   { Condc,          CondcHelp,         CondcOperators,          1,  1 },
   { Copy,           CopyHelp,          CopyOperators,          -1,  1 },
+  { Del29feb,       NULL,              Del29febOperators,       1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,        1,  1 },
   { Diff,           DiffHelp,          DiffOperators,           2,  0 },
   { Echam5ini,      NULL,              Echam5iniOperators,      1,  1 },

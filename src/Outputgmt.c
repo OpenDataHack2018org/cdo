@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -43,14 +43,103 @@
 #include "color.h"
 
 
+
+int pnpoly(int npol, double *xp, double *yp, double x, double y)
+{
+  int i, j, c = 0;
+  for (i = 0, j = npol-1; i < npol; j = i++) {
+    if ((((yp[i]<=y) && (y<yp[j])) ||
+	 ((yp[j]<=y) && (y<yp[i]))) &&
+	(x < (xp[j] - xp[i]) * (y - yp[i]) / (yp[j] - yp[i]) + xp[i]))
+      
+      c = !c;
+  }
+  return c;
+}
+
+
+
+void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
+		double *grid_center_lon, double *grid_center_lat,
+		double *grid_corner_lon, double *grid_corner_lat)
+{
+  int i, k;
+  int nout = 0;
+  int isinside;
+  double lon, lat;
+  double lon_bounds[9], lat_bounds[9];
+
+  /* check that all centers are inside the bounds */
+
+  for ( i = 0; i < gridsize; ++i )
+    {
+      lon = grid_center_lon[i];
+      lat = grid_center_lat[i];
+
+      for ( k = 0; k < ncorner; ++k )
+	{
+	  lon_bounds[k] = grid_corner_lon[i*ncorner+k];
+	  lat_bounds[k] = grid_corner_lat[i*ncorner+k];
+	}
+
+      for ( k = 0; k < ncorner; ++k )
+	{
+	  if ( (grid_center_lon[i] - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
+	  if ( (lon_bounds[k] - grid_center_lon[i]) > 270 ) lon_bounds[k] -= 360;
+	}
+
+      lon_bounds[ncorner] = lon_bounds[0];
+      lat_bounds[ncorner] = lat_bounds[0];
+
+      isinside = pnpoly(ncorner+1, lon_bounds, lat_bounds, lon, lat);
+
+      if ( !isinside ) nout++;
+
+      if ( !isinside && cdoVerbose )
+	printf("%d %d %g %g %g %g %g %g %g %g %g %g\n", nout, i, lon, lat, lon_bounds[0], lat_bounds[0],
+	       lon_bounds[1], lat_bounds[1], lon_bounds[2], lat_bounds[2], lon_bounds[3], lat_bounds[3]);
+    }
+
+  if ( nout > 0 )
+    cdoWarning("%d of %d points out of bounds!\n", nout, gridsize);
+}
+
+
+void make_cyclic(double *array1, double *array2, int nlon, int nlat)
+{
+  int i, j;
+  int ij1, ij2;
+
+  for ( j = 0; j < nlat; ++j )
+    {
+      for ( i = 0; i < nlon; ++i )
+	{
+	  ij1 = j*nlon+i;
+	  ij2 = j*(nlon+1)+i;
+	  array2[ij2] = array1[ij1];
+	}
+    }
+
+  for ( j = 0; j < nlat; ++j )
+    {
+      ij2 = j*(nlon+1);
+      array2[ij2+nlon] = array2[ij2];
+    }
+}
+
+
 void *Outputgmt(void *argument)
 {
   static char func[] = "Outputgmt";
-  int OUTPUTCENTER,  OUTPUTCENTERCPT, OUTPUTBOUNDS, OUTPUTBOUNDSCPT, OUTPUTVECTOR;
+  int GRIDVERIFY, OUTPUTCENTER, OUTPUTCENTER2, OUTPUTCENTERCPT, OUTPUTBOUNDS;
+  int OUTPUTBOUNDSCPT, OUTPUTVECTOR, OUTPUTTRI;
   int operatorID;
+  int process_data = TRUE;
   int i, j;
   int varID0, varID, recID;
+  int nvals;
   int gridsize = 0;
+  int gridsize2 = 0;
   int gridID, code;
   int nrecs;
   int levelID;
@@ -71,20 +160,28 @@ void *Outputgmt(void *argument)
   double level;
   double missval;
   double *array = NULL;
+  double *array2 = NULL;
+  double *parray;
   double *uf = NULL, *vf = NULL, *alpha = NULL, *auv = NULL;
   double *grid_center_lat = NULL, *grid_center_lon = NULL;
+  double *grid_center_lat2 = NULL, *grid_center_lon2 = NULL;
   double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
+  double *plat, *plon;
   double *zaxis_center_lev, *zaxis_lower_lev, *zaxis_upper_lev;
   FILE *cpt_fp;
   CPT cpt;
+  int grid_is_circular;
 
   cdoInitialize(argument);
 
+  GRIDVERIFY      = cdoOperatorAdd("gridverify",      0, 0, NULL);
   OUTPUTCENTER    = cdoOperatorAdd("outputcenter",    0, 0, NULL);
+  OUTPUTCENTER2   = cdoOperatorAdd("outputcenter2",   0, 0, NULL);
   OUTPUTCENTERCPT = cdoOperatorAdd("outputcentercpt", 0, 0, NULL);
   OUTPUTBOUNDS    = cdoOperatorAdd("outputbounds",    0, 0, NULL);
   OUTPUTBOUNDSCPT = cdoOperatorAdd("outputboundscpt", 0, 0, NULL);
   OUTPUTVECTOR    = cdoOperatorAdd("outputvector",    0, 0, NULL);
+  OUTPUTTRI       = cdoOperatorAdd("outputtri",       0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -94,6 +191,12 @@ void *Outputgmt(void *argument)
       operatorCheckArgc(1);
       ninc  = atoi(operatorArgv()[0]);
       if ( ninc < 1 ) cdoAbort("Increment must be greater than 0!");
+    }
+
+  if ( operatorID == GRIDVERIFY  )
+    {
+      process_data = FALSE;
+      luse_grid_corner = TRUE;
     }
 
   if ( operatorID == OUTPUTBOUNDS || operatorID == OUTPUTBOUNDSCPT )
@@ -185,11 +288,40 @@ void *Outputgmt(void *argument)
   else
     gridcorners = 4;
 
-  grid_center_lat = (double *) realloc(grid_center_lat, gridsize*sizeof(double));
-  grid_center_lon = (double *) realloc(grid_center_lon, gridsize*sizeof(double));
+  grid_is_circular = gridIsCircular(gridID);
+
+  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
+  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
+
+  nvals = gridsize;
+  plon = grid_center_lon;
+  plat = grid_center_lat;
+
+  if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
+    {
+      int ij2;
+
+      gridsize2 = nlat*(nlon+1);
+
+      grid_center_lat2 = (double *) malloc(gridsize2*sizeof(double));
+      grid_center_lon2 = (double *) malloc(gridsize2*sizeof(double));
+
+      make_cyclic(grid_center_lat, grid_center_lat2, nlon, nlat);
+      make_cyclic(grid_center_lon, grid_center_lon2, nlon, nlat);
+
+      for ( j = 0; j < nlat; ++j )
+	{
+	  ij2 = j*(nlon+1);
+	  grid_center_lon2[ij2+nlon] += 360;
+	}
+
+      nvals = gridsize2;
+      plon = grid_center_lon2;
+      plat = grid_center_lat2;
+    }
 
   zaxis_center_lev = (double *) malloc(nlev*sizeof(double));
   zaxis_lower_lev  = (double *) malloc(nlev*sizeof(double));
@@ -244,6 +376,14 @@ void *Outputgmt(void *argument)
     }
 
   array = (double *) malloc(gridsize*sizeof(double));
+  parray = array;
+						
+  if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
+    {
+      array2 = (double *) malloc(nlat*(nlon+1)*sizeof(double));
+      parray = array2;
+    }
+
   if ( operatorID == OUTPUTVECTOR )
     {
       uf    = (double *) malloc(gridsize*sizeof(double));
@@ -252,7 +392,13 @@ void *Outputgmt(void *argument)
       auv   = (double *) malloc(gridsize*sizeof(double));
     }
 
+  if ( operatorID == GRIDVERIFY )
+    verify_grid(gridInqType(gridID), gridsize, nlon, nlat, gridcorners,
+		grid_center_lon, grid_center_lat,
+		grid_corner_lon, grid_corner_lat);
+
   tsID = 0;
+  if ( process_data )
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
       vdate = taxisInqVdate(taxisID);
@@ -261,7 +407,7 @@ void *Outputgmt(void *argument)
       decode_date(vdate, &year, &month, &day);
       decode_time(vtime, &hour, &minute);
 
-      if ( tsID == 0 )
+      if ( tsID == 0 && operatorID != OUTPUTTRI )
 	{
 #if defined (VERSION)
 	  fprintf(stdout, "# Generated by CDO version %s\n", VERSION);
@@ -294,18 +440,21 @@ void *Outputgmt(void *argument)
 
 	  streamReadRecord(streamID, array, &nmiss);
 
+	  if ( operatorID == OUTPUTCENTER2 && grid_is_circular )
+	    make_cyclic(array, array2, nlon, nlat);
+
 	  level = zaxis_center_lev[levelID];
 
-	  if ( tsID == 0 || lzon || lmer )
+	  if ( (tsID == 0 || lzon || lmer) && operatorID != OUTPUTTRI )
 	    fprintf(stdout, "# Level = %g\n", level);
 	  if ( lhov )
 	    fprintf(stdout, "# Timestep = %d\n", tsID+1);
 
-	  fprintf(stdout, "#\n");
+	  if ( operatorID != OUTPUTTRI ) fprintf(stdout, "#\n");
 
-	  if ( operatorID == OUTPUTCENTER || operatorID == OUTPUTCENTERCPT )
+	  if ( operatorID == OUTPUTCENTER || operatorID == OUTPUTCENTER2 || operatorID == OUTPUTCENTERCPT )
 	    {
-	      for ( i = 0; i < gridsize; i++ )
+	      for ( i = 0; i < nvals; i++ )
 		{
 		  if ( operatorID == OUTPUTCENTERCPT )
 		    {
@@ -342,6 +491,10 @@ void *Outputgmt(void *argument)
 		      else
 			fprintf(stdout, " %g  %g  %g\n", grid_center_lon[i], grid_center_lat[i], array[i]);
 		    }
+		  else if ( operatorID == OUTPUTCENTER2 )
+		    {
+		      fprintf(stdout, " %g  %g  %g\n", plon[i], plat[i], parray[i]);
+		    }
 		  else
 		    {
 		      if ( lzon )
@@ -353,6 +506,32 @@ void *Outputgmt(void *argument)
 		    }
 		}
 	      fprintf(stdout, "#\n");
+	    }
+	  else if ( operatorID == OUTPUTTRI )
+	    {
+	      int ij, c1, c2, c3;
+	      int mlon, ip1;
+	      if ( gridInqType(gridID) != GRID_CURVILINEAR ) cdoAbort("Unsupported grid!");
+
+	      mlon = nlon-1;
+	      /* if ( gridIsCircular(gridID) ) mlon = nlon; */
+	      for ( j = 0; j < nlat-1; ++j )
+		{
+		  for ( i = 0; i < mlon; ++i )
+		    {
+		      ip1 = i+1;
+		      if ( i == nlon-1 ) ip1 = 0;
+		      ij = j*nlon+i;
+		      c1 = (j)*nlon+ip1;
+		      c2 = (j)*nlon+i;
+		      c3 = (j+1)*nlon+i;
+		      fprintf(stdout, "%d   %d   %d\n", c1, c2, c3);
+		      c1 = (j)*nlon+i+1;
+		      c2 = (j+1)*nlon+i;
+		      c3 = (j+1)*nlon+ip1;
+		      fprintf(stdout, "%d   %d   %d\n", c1, c2, c3);
+		    }
+		}
 	    }
 	  else if ( operatorID == OUTPUTVECTOR )
 	    {
@@ -462,9 +641,12 @@ void *Outputgmt(void *argument)
 
   streamClose(streamID);
 
-  if ( array ) free(array);
+  if ( array  ) free(array);
+  if ( array2 ) free(array2);
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
+  if ( grid_center_lon2 ) free(grid_center_lon2);
+  if ( grid_center_lat2 ) free(grid_center_lat2);
   if ( grid_corner_lon ) free(grid_corner_lon);
   if ( grid_corner_lat ) free(grid_corner_lat);
 

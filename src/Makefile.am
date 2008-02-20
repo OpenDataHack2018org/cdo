@@ -16,6 +16,7 @@ cdo_SOURCES = Arith.c		\
 	      Cond2.c 		\
 	      Condc.c 		\
 	      Copy.c		\
+              Del29feb.c	\
               Detrend.c		\
               Diff.c		\
               Echam5ini.c     	\

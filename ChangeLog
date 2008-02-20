@@ -1,7 +1,9 @@
 2008-04-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.1.1
+	* New operator: del29feb to delete the 29. February [request: Etienne Tourigny]
 	* Exprf: using MT safe version of bison and flex (bug fix) [report: Claas Teichmann]
+	* Seltime: changed value of NOPERATORS (bug fix)
 	* Version 1.1.1 released
 	
 2008-01-24  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
