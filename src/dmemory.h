@@ -3,6 +3,11 @@
 
 #include <stdlib.h>
 
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 /*
  * if DEBUG_MEMORY is defined setenv MEMORY_DEBUG to debug memory
  */
@@ -39,5 +44,9 @@ extern void    Free   (const char *caller, const char *file, int line, void *ptr
 #endif
 
 #endif /* DEBUG_MEMORY */
+
+#if defined (__cplusplus)
+}
+#endif
 
 #endif /* _DMEMORY_H */
