@@ -638,6 +638,14 @@ int main(int argc, char *argv[])
       if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
       fprintf(stderr, "\n");
 
+#if defined (HAVE_MMAP)
+      fprintf(stderr, "HAVE_MMAP\n");
+#endif
+#if defined (HAVE_MEMORY_H)
+      fprintf(stderr, "HAVE_MEMORY_H\n");
+#endif
+      fprintf(stderr, "\n");
+
 #if defined (__STDC__)
       fprintf(stderr, "STD ANSI C          = %d\n", __STDC__);
 #endif
