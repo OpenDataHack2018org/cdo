@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -59,6 +59,7 @@ void *Vertint(void *argument)
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
   char varname[128];
+  int *vars = NULL;
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;
   double *ret_vct = NULL; /* reduced VCT for LM */
@@ -241,6 +242,7 @@ void *Vertint(void *argument)
 
   nvars = vlistNvars(vlistID1);
 
+  vars      = (int *) malloc(nvars*sizeof(int));
   vardata1  = (double **) malloc(nvars*sizeof(double*));
   vardata2  = (double **) malloc(nvars*sizeof(double*));
   varnmiss  = (int **) malloc(nvars*sizeof(int*));
@@ -271,8 +273,8 @@ void *Vertint(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      gridID  = vlistInqVarGrid(vlistID1, varID);
-      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      gridID   = vlistInqVarGrid(vlistID1, varID);
+      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
 
@@ -283,10 +285,10 @@ void *Vertint(void *argument)
 
 	  strtolower(varname);
 
-	  if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
-	  else if ( strcmp(varname, "st")      == 0 ) code = 130;
-	  else if ( strcmp(varname, "aps")     == 0 ) code = 134;
-	  else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
+	  if      ( strcmp(varname, "geosp") == 0 ) code = 129;
+	  else if ( strcmp(varname, "st")    == 0 ) code = 130;
+	  else if ( strcmp(varname, "aps")   == 0 ) code = 134;
+	  else if ( strcmp(varname, "lsp")   == 0 ) code = 152;
 	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
 
@@ -349,6 +351,7 @@ void *Vertint(void *argument)
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
+      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
@@ -362,6 +365,7 @@ void *Vertint(void *argument)
 	  single1  = vardata1[varID] + offset;
 	  
 	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
+	  vars[varID] = TRUE;
 	}
 
       if ( zaxisIDh != -1 )
@@ -398,48 +402,54 @@ void *Vertint(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
-	  nlevel   = zaxisInqSize(zaxisID);
-	  if ( varinterp[varID] )
+	  if ( vars[varID] )
 	    {
-	      if ( varID == tempID )
+	      gridID   = vlistInqVarGrid(vlistID1, varID);
+	      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	      missval  = vlistInqVarMissval(vlistID1, varID);
+	      gridsize = gridInqSize(gridID);
+	      nlevel   = zaxisInqSize(zaxisID);
+	      if ( varinterp[varID] )
 		{
-		  interp_T(geop, vardata1[varID], vardata2[varID],
-			   full_press, half_press, vert_index,
-			   plev, nplev, ngp, nlevel, missval);
+		  if ( varID == tempID )
+		    {
+		      interp_T(geop, vardata1[varID], vardata2[varID],
+			       full_press, half_press, vert_index,
+			       plev, nplev, ngp, nlevel, missval);
+		    }
+		  /*
+		    else if ( varID == gheightID )
+		    {
+		    interp_Z(geop, vardata1[varID], vardata2[varID],
+		    full_press, half_press, vert_index, vardata1[tempID],
+		    plev, nplev, ngp, nlevel, missval);
+		    }
+		  */
+		  else
+		    {
+		      interp_X(vardata1[varID], vardata2[varID], full_press,
+			       vert_index, plev, nplev, ngp, nlevel, missval);
+		    }
+		  
+		  if ( Extrapolate == 0 )
+		    memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
 		}
-	      /*
-	      else if ( varID == gheightID )
-		{
-		  interp_Z(geop, vardata1[varID], vardata2[varID],
-			   full_press, half_press, vert_index, vardata1[tempID],
-			   plev, nplev, ngp, nlevel, missval);
-		}
-	      */
-	      else
-		{
-		  interp_X(vardata1[varID], vardata2[varID], full_press,
-			   vert_index, plev, nplev, ngp, nlevel, missval);
-		}
-
-	      if ( Extrapolate == 0 )
-		memcpy(varnmiss[varID], pnmiss, nplev*sizeof(int));
 	    }
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
+	  if ( vars[varID] )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	      offset   = gridsize*levelID;
-	      single2  = vardata2[varID] + offset;
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		{
+		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		  offset   = gridsize*levelID;
+		  single2  = vardata2[varID] + offset;
+		  streamDefRecord(streamID2, varID, levelID);
+		  streamWriteRecord(streamID2, single2, varnmiss[varID][levelID]);
+		}
 	    }
 	}
 
@@ -460,6 +470,7 @@ void *Vertint(void *argument)
   free(varnmiss);
   free(vardata2);
   free(vardata1);
+  free(vars);
 
   if ( pnmiss     ) free(pnmiss);
 
