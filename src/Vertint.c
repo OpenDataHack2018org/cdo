@@ -41,6 +41,9 @@ void *Vertint(void *argument)
   static char func[] = "Vertint";
   int ML2PL, ML2HL;
   int operatorID;
+  int mode;
+  enum {ECHAM_MODE, WMO_MODE};
+  int geop_code = 0, temp_code = 0, ps_code = 0, lsp_code = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridsize, ngp = 0;
@@ -71,6 +74,7 @@ void *Vertint(void *argument)
   int taxisID1, taxisID2;
   int lhavevct;
   int mono_level;
+  int instNum, tableNum;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
@@ -277,8 +281,32 @@ void *Vertint(void *argument)
       zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
+      instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
+      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
       code = vlistInqVarCode(vlistID1, varID);
+
+      if ( tableNum == 2 )
+	{
+	  mode = WMO_MODE;
+	  geop_code  =   6;
+	  temp_code  =  11;
+	  ps_code    =   1;
+	}
+      else if ( tableNum == 128 )
+	{
+	  mode = ECHAM_MODE;
+	  geop_code  = 129;
+	  temp_code  = 130;
+	  ps_code    = 134;
+	  lsp_code   = 152;
+	}
+      else
+	mode = -1;
+
+      if ( cdoVerbose )
+	cdoPrint("Mode = %d  Center = %d  Table = %d  Code = %d", mode, instNum, tableNum, code);
+
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
@@ -292,11 +320,20 @@ void *Vertint(void *argument)
 	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
 
-      if      ( code == 129 && nlevel == 1     ) geopID    = varID;
-      else if ( code == 130 && nlevel == nhlev ) tempID    = varID;
-      else if ( code == 134 && nlevel == 1     ) psID      = varID;
-      else if ( code == 152 && nlevel == 1     ) lnpsID    = varID;
-      /* else if ( code == 156 ) gheightID = varID; */
+      if ( mode == ECHAM_MODE )
+	{
+	  if      ( code == geop_code  && nlevel == 1     ) geopID  = varID;
+	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
+	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
+	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID  = varID;
+	  /* else if ( code == 156 ) gheightID = varID; */
+	}
+      else if ( mode == WMO_MODE )
+	{
+	  if      ( code == geop_code  && nlevel == 1     ) geopID  = varID;
+	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
+	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
+	}
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("Spectral data on model level unsupported!");
@@ -343,7 +380,10 @@ void *Vertint(void *argument)
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
       if ( psID != -1 )
-	cdoWarning("LOG surface pressure (code 152) not found - using surface pressure (code 134)!");
+	{
+	  code = vlistInqVarCode(vlistID1, psID);
+	  cdoWarning("LOG surface pressure not found - using surface pressure (code %d)!", code);
+	}
       else
 	cdoAbort("Surface pressure not found!");
     }
@@ -371,7 +411,25 @@ void *Vertint(void *argument)
       if ( zaxisIDh != -1 )
 	{
 	  if ( geop_needed && geopID != -1 )
-	    memcpy(geop, vardata1[geopID], ngp*sizeof(double));
+	    {
+	      memcpy(geop, vardata1[geopID], ngp*sizeof(double));
+
+	      /* check range of geop */
+	      {
+		double minval = geop[0];
+		double maxval = geop[0];
+		for ( i = 1; i < ngp; i++ )
+		  {
+		    if      ( geop[i] > maxval ) maxval = geop[i];
+		    else if ( geop[i] < minval ) minval = geop[i];
+		  }
+
+		if ( minval < -9000 || maxval > 90000 )
+		  cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
+		if ( minval >= 0 && maxval <= 1000 )
+		  cdoWarning("Surface geopotential has unexpected range (min=%g max=%g)!", minval, maxval);
+	      }
+	    }
 
 	  if ( lnpsID != -1 )
 	    for ( i = 0; i < ngp; i++ ) ps_prog[i] = exp(vardata1[lnpsID][i]);
