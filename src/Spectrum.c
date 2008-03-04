@@ -70,7 +70,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 	
   for (seg_i = 0; seg_i < seg_n; seg_i += 2)
     {
-      offset = seg_n == 1 ? 0 : (float) (nrec - seg_l) / (seg_n - 1) * seg_i;
+      offset = seg_n == 1 ? 0 : (int) ((double) (nrec - seg_l) / (seg_n - 1) * seg_i);
       
       for ( k = 0; k < seg_l; k++ ) real[k] = data[offset + k];
 
@@ -96,8 +96,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
       
       if (seg_i + 1 < seg_n)
 	{
-	  offset = seg_n == 1 ? 0 :
-	    (float) (nrec - seg_l) / (seg_n - 1) * (seg_i + 1);
+	  offset = seg_n == 1 ? 0 : (int) ((double) (nrec - seg_l) / (seg_n - 1) * (seg_i + 1));
 	  for (k = 0; k < seg_l; k++)
 	    imag[k] = data[offset + k];
 	  if ( detrend == 3 )

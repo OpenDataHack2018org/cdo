@@ -775,8 +775,8 @@ void *Gradsdes(void *argument)
       for ( i = 0; i < ni; i++ )
 	{
 	  xinc = yinc = inc[i];
-	  nx = xrange / xinc;
-	  ny = yrange / yinc;
+	  nx = (int) (xrange / xinc);
+	  ny = (int) (yrange / yinc);
 
 	  if ( nx > 2*xsize && ny > 2*ysize ) break;
 	}
