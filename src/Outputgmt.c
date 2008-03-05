@@ -168,6 +168,7 @@ void *Outputgmt(void *argument)
   double *grid_corner_lat = NULL, *grid_corner_lon = NULL;
   double *plat, *plon;
   double *zaxis_center_lev, *zaxis_lower_lev, *zaxis_upper_lev;
+  int *grid_mask = NULL;
   FILE *cpt_fp;
   CPT cpt;
   int grid_is_circular;
@@ -238,11 +239,15 @@ void *Outputgmt(void *argument)
        gridInqType(gridID) != GRID_CELL )
     cdoAbort("Output of %s data failed!", gridNamePtr(gridInqType(gridID)));
   
+  gridsize = gridInqSize(gridID);
+
   if ( gridInqType(gridID) != GRID_CELL && gridInqType(gridID) != GRID_CURVILINEAR )
     {
       if ( gridInqType(gridID) == GRID_GME )
 	{
 	  gridID = gridToCell(gridID);
+	  grid_mask = (int *) malloc(gridsize*sizeof(int));
+	  gridInqMask(gridID, grid_mask);
 	}
       else
 	{
@@ -456,6 +461,9 @@ void *Outputgmt(void *argument)
 	    {
 	      for ( i = 0; i < nvals; i++ )
 		{
+		  if ( grid_mask )
+		    if ( grid_mask[i] == 0 ) continue;
+
 		  if ( operatorID == OUTPUTCENTERCPT )
 		    {
 		      int r = 0, g = 0, b = 0, n;
@@ -567,6 +575,9 @@ void *Outputgmt(void *argument)
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		{
+		  if ( grid_mask )
+		    if ( grid_mask[i] == 0 ) continue;
+
 		  if ( !DBL_IS_EQUAL(array[i], missval) )
 		    fprintf(stdout, "> -Z%g", array[i]);
 		  else
@@ -643,6 +654,7 @@ void *Outputgmt(void *argument)
 
   if ( array  ) free(array);
   if ( array2 ) free(array2);
+  if ( grid_mask ) free(grid_mask);
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
   if ( grid_center_lon2 ) free(grid_center_lon2);
