@@ -29,6 +29,7 @@ cdo_SOURCES = Arith.c		\
               Fldrms.c 		\
               Fldstat.c 	\
               Gradsdes.c 	\
+              Gridcell.c 	\
               Harmonic.c 	\
               Histogram.c 	\
               Info.c		\

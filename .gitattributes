@@ -228,6 +228,7 @@ src/Fillmiss.c -text
 src/Fldrms.c -text
 src/Fldstat.c -text
 src/Gradsdes.c -text
+src/Gridcell.c -text
 src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -1958,31 +1958,7 @@ int gridWeights(int gridID, double *weights)
     {
       int gridtype = gridInqType(gridID);
 
-      /* only for global grids
-      if ( gridtype == GRID_GAUSSIAN )
-	{
-	  int     nx, ny;
-	  double *lats, *gw;
-	  double sumw;
-
-	  nx = gridInqXsize(gridID);
-	  ny = gridInqYsize(gridID);
-
-	  lats = (double *) malloc(ny*sizeof(double));
-	  gw   = (double *) malloc(ny*sizeof(double));
-
-	  gaussaw(lats, gw, ny);
-	  sumw = 0;
-	  for ( j = 0; j < ny; j++ ) sumw += gw[j];
-
-	  for ( j = 0; j < ny; j++ )
-	    for ( i = 0; i < nx; i++ )
-	      weights[j*nx+i] = gw[j]*0.5;
-
-	  if ( lats ) free(lats);
-	  if ( gw )   free(gw);
-	}
-      else */ if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
+      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
 	{
 	  int     nlat, nlon;
 	  int     datapoint;
@@ -2045,9 +2021,179 @@ int gridWeights(int gridID, double *weights)
 	{
 	  status = TRUE;
 
-	  for ( i = 0; i < len; i++ ) weights[i] = 1;
+	  for ( i = 0; i < len; i++ ) weights[i] = 1./len;
 	}
     }
 
   return (status);
+}
+
+
+struct cart {
+  double x[3];
+};
+
+struct geo {
+  double lon;
+  double lat;
+};
+
+struct cart gc2cc(struct geo *position);
+double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3);
+
+int gridArea(int gridID, double *area)
+{
+  static char func[] = "gridArea";
+  int status = FALSE;
+  int i, j, k, len;
+
+  len = gridInqSize(gridID);
+
+  if ( gridHasArea(gridID) )
+    {
+      gridInqArea(gridID, area);
+    }
+  else
+    {
+      int gridtype = gridInqType(gridID);
+      int gridID0 = gridID;
+      int nv, gridsize;
+      int lgrid_gen_bounds = FALSE;
+      double total_area;
+      double *grid_center_lon = NULL;
+      double *grid_center_lat = NULL;
+      double *grid_corner_lon = NULL;
+      double *grid_corner_lat = NULL;
+      int *grid_mask = NULL;
+      struct geo p1, p2, p3;
+      struct cart c1, c2, c3;
+
+      gridsize = gridInqSize(gridID);
+
+      if ( gridtype != GRID_CELL && gridtype != GRID_CURVILINEAR )
+	{
+	  if ( gridtype == GRID_GME )
+	    {
+	      gridID = gridToCell(gridID);
+	      grid_mask = (int *) malloc(gridsize*sizeof(int));
+	      gridInqMask(gridID, grid_mask);
+	    }
+	  else
+	    {
+	      gridID = gridToCurvilinear(gridID);
+	      lgrid_gen_bounds = TRUE;
+	    }
+	}
+
+      gridtype = gridInqType(gridID);
+
+      if ( gridtype == GRID_CELL )
+	nv = gridInqNvertex(gridID);
+      else
+	nv = 4;
+
+      grid_center_lon = (double *) malloc(gridsize*sizeof(double));
+      grid_center_lat = (double *) malloc(gridsize*sizeof(double));
+
+      gridInqXvals(gridID, grid_center_lon);
+      gridInqYvals(gridID, grid_center_lat);
+
+      grid_corner_lon = (double *) malloc(nv*gridsize*sizeof(double));
+      grid_corner_lat = (double *) malloc(nv*gridsize*sizeof(double));
+
+      if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
+	{
+	  gridInqXbounds(gridID, grid_corner_lon);
+	  gridInqYbounds(gridID, grid_corner_lat);
+	}
+      else
+	{
+	  if ( lgrid_gen_bounds )
+	    {
+	      int nlon = gridInqXsize(gridID);
+	      int nlat = gridInqYsize(gridID);
+	      genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon);
+	      genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
+	    }
+	  else
+	    {
+	      cdoAbort("Grid corner missing!");
+	    }
+	}
+
+      total_area = 0;
+      for ( i = 0; i < gridsize; ++i )
+	{
+	  area[i] = 0;
+
+	  p3.lon = grid_center_lon[i]*deg2rad; 
+	  p3.lat = grid_center_lat[i]*deg2rad;
+	  c3 = gc2cc(&p3);
+
+	  for ( k = 1; k < nv; ++k )
+	    {
+	      p1.lon = grid_corner_lon[i*nv+k-1]*deg2rad; 
+	      p1.lat = grid_corner_lat[i*nv+k-1]*deg2rad;
+	      c1 = gc2cc(&p1);
+	      p2.lon = grid_corner_lon[i*nv+k]*deg2rad; 
+	      p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
+	      c2 = gc2cc(&p2);
+
+	      area[i] += areas(&c1, &c2, &c3);
+	    }
+	  total_area += area[i];
+	}
+
+      if ( cdoVerbose ) cdoPrint("Total area = %g\n", total_area);
+
+      free(grid_center_lon);
+      free(grid_center_lat);
+      free(grid_corner_lon);
+      free(grid_corner_lat);
+      if ( grid_mask ) free(grid_mask);
+    }
+
+  return (status);
+}
+
+
+int gridWeightsNew(int gridID, double *grid_area, double *grid_wgts)
+{
+  static char func[] = "gridWeightsNew";
+  int i, nvals, gridsize = gridInqSize(gridID);
+  int *grid_mask = NULL;
+  double total_area;
+
+  if ( gridInqType(gridID) == GRID_GME )
+    {
+      gridID = gridToCell(gridID);	  
+      grid_mask = (int *) malloc(gridsize*sizeof(int));
+      gridInqMask(gridID, grid_mask);
+    }
+
+  total_area = 0;
+  nvals = 0;
+  for ( i = 0; i < gridsize; i++ )
+    {
+      if ( grid_mask )
+	if ( grid_mask[i] == 0 ) continue;
+      total_area += grid_area[i];
+      nvals++;
+    }
+
+  if ( cdoVerbose ) cdoPrint("Total area = %g\n", total_area);
+
+  for ( i = 0; i < gridsize; i++ )
+    {
+      if ( grid_mask )
+	if ( grid_mask[i] == 0 )
+	  {
+	    grid_wgts[i] = 0;
+	    continue;
+	  }
+      
+      grid_wgts[i] = grid_area[i] / total_area;
+    }
+  
+  if ( grid_mask ) free(grid_mask);
 }

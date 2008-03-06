@@ -355,7 +355,7 @@ void *Outputgmt(void *argument)
 	      genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
 	    }
 	  else
-	    cdoAbort("grid corner missing!");
+	    cdoAbort("Grid corner missing!");
 	}
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )

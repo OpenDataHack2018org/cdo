@@ -60,55 +60,55 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Enlarge.$(OBJEXT) Enlargegrid.$(OBJEXT) Ensstat.$(OBJEXT) \
 	Exprf.$(OBJEXT) Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) \
 	Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) Gradsdes.$(OBJEXT) \
-	Harmonic.$(OBJEXT) Histogram.$(OBJEXT) Info.$(OBJEXT) \
-	Input.$(OBJEXT) Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) \
-	Inttime.$(OBJEXT) Intntime.$(OBJEXT) Intyear.$(OBJEXT) \
-	Invert.$(OBJEXT) Log.$(OBJEXT) Maskbox.$(OBJEXT) \
-	Mastrfu.$(OBJEXT) Math.$(OBJEXT) Merge.$(OBJEXT) \
-	Mergegrid.$(OBJEXT) Mergetime.$(OBJEXT) Merstat.$(OBJEXT) \
-	Monarith.$(OBJEXT) Mrotuv.$(OBJEXT) Mrotuvb.$(OBJEXT) \
-	Ninfo.$(OBJEXT) Nmltest.$(OBJEXT) Output.$(OBJEXT) \
-	Outputgmt.$(OBJEXT) Pinfo.$(OBJEXT) Remap.$(OBJEXT) \
-	Remapeta.$(OBJEXT) Replace.$(OBJEXT) Rotuv.$(OBJEXT) \
-	Runpctl.$(OBJEXT) Runstat.$(OBJEXT) Seascount.$(OBJEXT) \
-	Seaspctl.$(OBJEXT) Seasstat.$(OBJEXT) Selbox.$(OBJEXT) \
-	Select.$(OBJEXT) Seloperator.$(OBJEXT) Selrec.$(OBJEXT) \
-	Seltime.$(OBJEXT) Set.$(OBJEXT) Setbox.$(OBJEXT) \
-	Setgatt.$(OBJEXT) Setgrid.$(OBJEXT) Sethalo.$(OBJEXT) \
-	Setmiss.$(OBJEXT) Setrange.$(OBJEXT) Setrcaname.$(OBJEXT) \
-	Settime.$(OBJEXT) Setzaxis.$(OBJEXT) Showinfo.$(OBJEXT) \
-	Sinfo.$(OBJEXT) Smooth9.$(OBJEXT) Sort.$(OBJEXT) \
-	Specinfo.$(OBJEXT) Spectral.$(OBJEXT) Spectrum.$(OBJEXT) \
-	Split.$(OBJEXT) Splitrec.$(OBJEXT) Splitsel.$(OBJEXT) \
-	Splittime.$(OBJEXT) Splityear.$(OBJEXT) Subtrend.$(OBJEXT) \
-	Templates.$(OBJEXT) Test.$(OBJEXT) Tests.$(OBJEXT) \
-	Timcount.$(OBJEXT) Timpctl.$(OBJEXT) Timsort.$(OBJEXT) \
-	Timselpctl.$(OBJEXT) Timselstat.$(OBJEXT) Timstat.$(OBJEXT) \
-	Timstat2.$(OBJEXT) Timstat3.$(OBJEXT) Tinfo.$(OBJEXT) \
-	Trend.$(OBJEXT) Trms.$(OBJEXT) Vardup.$(OBJEXT) \
-	Vargen.$(OBJEXT) Varrms.$(OBJEXT) Vertint.$(OBJEXT) \
-	Vertstat.$(OBJEXT) Wind.$(OBJEXT) Writegrid.$(OBJEXT) \
-	Writerandom.$(OBJEXT) Yhourstat.$(OBJEXT) Ydaypctl.$(OBJEXT) \
-	Ydaystat.$(OBJEXT) Ydrunpctl.$(OBJEXT) Ydrunstat.$(OBJEXT) \
-	Ymonarith.$(OBJEXT) Ymonpctl.$(OBJEXT) Ymonstat.$(OBJEXT) \
-	Yseaspctl.$(OBJEXT) Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) \
-	cdilib.$(OBJEXT) commandline.$(OBJEXT) exception.$(OBJEXT) \
-	expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) expr.$(OBJEXT) \
-	cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) \
-	field.$(OBJEXT) fieldc.$(OBJEXT) field2.$(OBJEXT) \
-	fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) grid.$(OBJEXT) \
-	hetaeta.$(OBJEXT) history.$(OBJEXT) institution.$(OBJEXT) \
-	interpol.$(OBJEXT) job.$(OBJEXT) modules.$(OBJEXT) \
-	namelist.$(OBJEXT) normal.$(OBJEXT) pipe.$(OBJEXT) \
-	process.$(OBJEXT) remaplib.$(OBJEXT) timer.$(OBJEXT) \
-	realtime.$(OBJEXT) pstream.$(OBJEXT) table.$(OBJEXT) \
-	userlog.$(OBJEXT) util.$(OBJEXT) legendre.$(OBJEXT) \
-	fourier.$(OBJEXT) specspace.$(OBJEXT) readline.$(OBJEXT) \
-	julian.$(OBJEXT) vinterp.$(OBJEXT) zaxis.$(OBJEXT) \
-	pthread_debug.$(OBJEXT) color.$(OBJEXT) list.$(OBJEXT) \
-	percentiles.$(OBJEXT) nth_element.$(OBJEXT) ecacore.$(OBJEXT) \
-	ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) Hi.$(OBJEXT) \
-	Wct.$(OBJEXT) statistic.$(OBJEXT)
+	Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) Histogram.$(OBJEXT) \
+	Info.$(OBJEXT) Input.$(OBJEXT) Intgrid.$(OBJEXT) \
+	Intgridtraj.$(OBJEXT) Inttime.$(OBJEXT) Intntime.$(OBJEXT) \
+	Intyear.$(OBJEXT) Invert.$(OBJEXT) Log.$(OBJEXT) \
+	Maskbox.$(OBJEXT) Mastrfu.$(OBJEXT) Math.$(OBJEXT) \
+	Merge.$(OBJEXT) Mergegrid.$(OBJEXT) Mergetime.$(OBJEXT) \
+	Merstat.$(OBJEXT) Monarith.$(OBJEXT) Mrotuv.$(OBJEXT) \
+	Mrotuvb.$(OBJEXT) Ninfo.$(OBJEXT) Nmltest.$(OBJEXT) \
+	Output.$(OBJEXT) Outputgmt.$(OBJEXT) Pinfo.$(OBJEXT) \
+	Remap.$(OBJEXT) Remapeta.$(OBJEXT) Replace.$(OBJEXT) \
+	Rotuv.$(OBJEXT) Runpctl.$(OBJEXT) Runstat.$(OBJEXT) \
+	Seascount.$(OBJEXT) Seaspctl.$(OBJEXT) Seasstat.$(OBJEXT) \
+	Selbox.$(OBJEXT) Select.$(OBJEXT) Seloperator.$(OBJEXT) \
+	Selrec.$(OBJEXT) Seltime.$(OBJEXT) Set.$(OBJEXT) \
+	Setbox.$(OBJEXT) Setgatt.$(OBJEXT) Setgrid.$(OBJEXT) \
+	Sethalo.$(OBJEXT) Setmiss.$(OBJEXT) Setrange.$(OBJEXT) \
+	Setrcaname.$(OBJEXT) Settime.$(OBJEXT) Setzaxis.$(OBJEXT) \
+	Showinfo.$(OBJEXT) Sinfo.$(OBJEXT) Smooth9.$(OBJEXT) \
+	Sort.$(OBJEXT) Specinfo.$(OBJEXT) Spectral.$(OBJEXT) \
+	Spectrum.$(OBJEXT) Split.$(OBJEXT) Splitrec.$(OBJEXT) \
+	Splitsel.$(OBJEXT) Splittime.$(OBJEXT) Splityear.$(OBJEXT) \
+	Subtrend.$(OBJEXT) Templates.$(OBJEXT) Test.$(OBJEXT) \
+	Tests.$(OBJEXT) Timcount.$(OBJEXT) Timpctl.$(OBJEXT) \
+	Timsort.$(OBJEXT) Timselpctl.$(OBJEXT) Timselstat.$(OBJEXT) \
+	Timstat.$(OBJEXT) Timstat2.$(OBJEXT) Timstat3.$(OBJEXT) \
+	Tinfo.$(OBJEXT) Trend.$(OBJEXT) Trms.$(OBJEXT) \
+	Vardup.$(OBJEXT) Vargen.$(OBJEXT) Varrms.$(OBJEXT) \
+	Vertint.$(OBJEXT) Vertstat.$(OBJEXT) Wind.$(OBJEXT) \
+	Writegrid.$(OBJEXT) Writerandom.$(OBJEXT) Yhourstat.$(OBJEXT) \
+	Ydaypctl.$(OBJEXT) Ydaystat.$(OBJEXT) Ydrunpctl.$(OBJEXT) \
+	Ydrunstat.$(OBJEXT) Ymonarith.$(OBJEXT) Ymonpctl.$(OBJEXT) \
+	Ymonstat.$(OBJEXT) Yseaspctl.$(OBJEXT) Yseasstat.$(OBJEXT) \
+	Zonstat.$(OBJEXT) cdilib.$(OBJEXT) commandline.$(OBJEXT) \
+	exception.$(OBJEXT) expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) \
+	expr.$(OBJEXT) cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) \
+	cdo_vlist.$(OBJEXT) field.$(OBJEXT) fieldc.$(OBJEXT) \
+	field2.$(OBJEXT) fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) \
+	grid.$(OBJEXT) hetaeta.$(OBJEXT) history.$(OBJEXT) \
+	institution.$(OBJEXT) interpol.$(OBJEXT) job.$(OBJEXT) \
+	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
+	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
+	timer.$(OBJEXT) realtime.$(OBJEXT) pstream.$(OBJEXT) \
+	table.$(OBJEXT) userlog.$(OBJEXT) util.$(OBJEXT) \
+	legendre.$(OBJEXT) fourier.$(OBJEXT) specspace.$(OBJEXT) \
+	readline.$(OBJEXT) julian.$(OBJEXT) vinterp.$(OBJEXT) \
+	zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
+	list.$(OBJEXT) percentiles.$(OBJEXT) nth_element.$(OBJEXT) \
+	ecacore.$(OBJEXT) ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) \
+	Hi.$(OBJEXT) Wct.$(OBJEXT) statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 am__DEPENDENCIES_1 =
 cdo_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -131,41 +131,42 @@ am__depfiles_maybe = depfiles
 @AMDEP_TRUE@	./$(DEPDIR)/Exprf.Po ./$(DEPDIR)/Filedes.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Fillmiss.Po ./$(DEPDIR)/Fldrms.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Fldstat.Po ./$(DEPDIR)/Gradsdes.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Harmonic.Po ./$(DEPDIR)/Hi.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Histogram.Po ./$(DEPDIR)/Info.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Input.Po ./$(DEPDIR)/Intgrid.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Intgridtraj.Po ./$(DEPDIR)/Intntime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Inttime.Po ./$(DEPDIR)/Intyear.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Invert.Po ./$(DEPDIR)/Log.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Maskbox.Po ./$(DEPDIR)/Mastrfu.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Math.Po ./$(DEPDIR)/Merge.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Mergegrid.Po ./$(DEPDIR)/Mergetime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Merstat.Po ./$(DEPDIR)/Monarith.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Mrotuv.Po ./$(DEPDIR)/Mrotuvb.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Ninfo.Po ./$(DEPDIR)/Nmltest.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Output.Po ./$(DEPDIR)/Outputgmt.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Pinfo.Po ./$(DEPDIR)/Remap.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Remapeta.Po ./$(DEPDIR)/Replace.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Rotuv.Po ./$(DEPDIR)/Runpctl.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Runstat.Po ./$(DEPDIR)/Seascount.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Seaspctl.Po ./$(DEPDIR)/Seasstat.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Selbox.Po ./$(DEPDIR)/Select.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Seloperator.Po ./$(DEPDIR)/Selrec.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Seltime.Po ./$(DEPDIR)/Set.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setbox.Po ./$(DEPDIR)/Setgatt.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setgrid.Po ./$(DEPDIR)/Sethalo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setmiss.Po ./$(DEPDIR)/Setrange.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setrcaname.Po ./$(DEPDIR)/Settime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Setzaxis.Po ./$(DEPDIR)/Showinfo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Sinfo.Po ./$(DEPDIR)/Smooth9.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Sort.Po ./$(DEPDIR)/Specinfo.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Spectral.Po ./$(DEPDIR)/Spectrum.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Split.Po ./$(DEPDIR)/Splitrec.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Splitsel.Po ./$(DEPDIR)/Splittime.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Splityear.Po ./$(DEPDIR)/Subtrend.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Templates.Po ./$(DEPDIR)/Test.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Tests.Po ./$(DEPDIR)/Timcount.Po \
-@AMDEP_TRUE@	./$(DEPDIR)/Timpctl.Po ./$(DEPDIR)/Timselpctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Gridcell.Po ./$(DEPDIR)/Harmonic.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Hi.Po ./$(DEPDIR)/Histogram.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Info.Po ./$(DEPDIR)/Input.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Intgrid.Po ./$(DEPDIR)/Intgridtraj.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Intntime.Po ./$(DEPDIR)/Inttime.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Intyear.Po ./$(DEPDIR)/Invert.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Log.Po ./$(DEPDIR)/Maskbox.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Mastrfu.Po ./$(DEPDIR)/Math.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Merge.Po ./$(DEPDIR)/Mergegrid.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Mergetime.Po ./$(DEPDIR)/Merstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Monarith.Po ./$(DEPDIR)/Mrotuv.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Mrotuvb.Po ./$(DEPDIR)/Ninfo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Nmltest.Po ./$(DEPDIR)/Output.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Outputgmt.Po ./$(DEPDIR)/Pinfo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Remap.Po ./$(DEPDIR)/Remapeta.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Replace.Po ./$(DEPDIR)/Rotuv.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Runpctl.Po ./$(DEPDIR)/Runstat.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Seascount.Po ./$(DEPDIR)/Seaspctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Seasstat.Po ./$(DEPDIR)/Selbox.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Select.Po ./$(DEPDIR)/Seloperator.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Selrec.Po ./$(DEPDIR)/Seltime.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Set.Po ./$(DEPDIR)/Setbox.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Setgatt.Po ./$(DEPDIR)/Setgrid.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Sethalo.Po ./$(DEPDIR)/Setmiss.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Setrange.Po ./$(DEPDIR)/Setrcaname.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Settime.Po ./$(DEPDIR)/Setzaxis.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Showinfo.Po ./$(DEPDIR)/Sinfo.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Smooth9.Po ./$(DEPDIR)/Sort.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Specinfo.Po ./$(DEPDIR)/Spectral.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Spectrum.Po ./$(DEPDIR)/Split.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Splitrec.Po ./$(DEPDIR)/Splitsel.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Splittime.Po ./$(DEPDIR)/Splityear.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Subtrend.Po ./$(DEPDIR)/Templates.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Test.Po ./$(DEPDIR)/Tests.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timcount.Po ./$(DEPDIR)/Timpctl.Po \
+@AMDEP_TRUE@	./$(DEPDIR)/Timselpctl.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Timselstat.Po ./$(DEPDIR)/Timsort.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Timstat.Po ./$(DEPDIR)/Timstat2.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/Timstat3.Po ./$(DEPDIR)/Tinfo.Po \
@@ -332,6 +333,7 @@ cdo_SOURCES = Arith.c		\
               Fldrms.c 		\
               Fldstat.c 	\
               Gradsdes.c 	\
+              Gridcell.c 	\
               Harmonic.c 	\
               Histogram.c 	\
               Info.c		\
@@ -639,6 +641,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Fldrms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Fldstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Gradsdes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Gridcell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Histogram.Po@am__quote@
