@@ -1942,9 +1942,9 @@ void defineGrid(const char *gridarg)
 }
 
 
-int gridWeights(int gridID, double *weights)
+int gridWeightsOld(int gridID, double *weights)
 {
-  static char func[] = "gridWeights";
+  static char func[] = "gridWeightsOld";
   int status = FALSE;
   int i, j, len;
 
@@ -2041,130 +2041,145 @@ struct geo {
 struct cart gc2cc(struct geo *position);
 double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3);
 
-int gridArea(int gridID, double *area)
+int gridGenArea(int gridID, double *area)
 {
   static char func[] = "gridArea";
   int status = FALSE;
-  int i, j, k, len;
+  int i, k;
+  int gridtype;
+  int nv, gridsize;
+  int lgrid_gen_bounds = FALSE;
+  double total_area;
+  double *grid_center_lon = NULL;
+  double *grid_center_lat = NULL;
+  double *grid_corner_lon = NULL;
+  double *grid_corner_lat = NULL;
+  int *grid_mask = NULL;
+  struct geo p1, p2, p3;
+  struct cart c1, c2, c3;
 
-  len = gridInqSize(gridID);
+  gridsize = gridInqSize(gridID);
+  gridtype = gridInqType(gridID);
 
-  if ( gridHasArea(gridID) )
+  if ( gridtype != GRID_LONLAT      &&
+       gridtype != GRID_GAUSSIAN    &&
+       gridtype != GRID_LAMBERT     &&
+       gridtype != GRID_GME         &&
+       gridtype != GRID_CURVILINEAR &&
+       gridtype != GRID_CELL )
     {
-      gridInqArea(gridID, area);
+      cdoAbort("Internal error! Unsupported gridtype: %s", gridNamePtr(gridtype)); 
+    }
+
+  if ( gridtype != GRID_CELL && gridtype != GRID_CURVILINEAR )
+    {
+      if ( gridtype == GRID_GME )
+	{
+	  gridID = gridToCell(gridID);
+	  grid_mask = (int *) malloc(gridsize*sizeof(int));
+	  gridInqMask(gridID, grid_mask);
+	}
+      else
+	{
+	  gridID = gridToCurvilinear(gridID);
+	  lgrid_gen_bounds = TRUE;
+	}
+    }
+
+  gridtype = gridInqType(gridID);
+
+  if ( gridtype == GRID_CELL )
+    nv = gridInqNvertex(gridID);
+  else
+    nv = 4;
+  
+  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
+  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
+
+  gridInqXvals(gridID, grid_center_lon);
+  gridInqYvals(gridID, grid_center_lat);
+
+  grid_corner_lon = (double *) malloc(nv*gridsize*sizeof(double));
+  grid_corner_lat = (double *) malloc(nv*gridsize*sizeof(double));
+
+  if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
+    {
+      gridInqXbounds(gridID, grid_corner_lon);
+      gridInqYbounds(gridID, grid_corner_lat);
     }
   else
     {
-      int gridtype = gridInqType(gridID);
-      int gridID0 = gridID;
-      int nv, gridsize;
-      int lgrid_gen_bounds = FALSE;
-      double total_area;
-      double *grid_center_lon = NULL;
-      double *grid_center_lat = NULL;
-      double *grid_corner_lon = NULL;
-      double *grid_corner_lat = NULL;
-      int *grid_mask = NULL;
-      struct geo p1, p2, p3;
-      struct cart c1, c2, c3;
-
-      gridsize = gridInqSize(gridID);
-
-      if ( gridtype != GRID_CELL && gridtype != GRID_CURVILINEAR )
+      if ( lgrid_gen_bounds )
 	{
-	  if ( gridtype == GRID_GME )
-	    {
-	      gridID = gridToCell(gridID);
-	      grid_mask = (int *) malloc(gridsize*sizeof(int));
-	      gridInqMask(gridID, grid_mask);
-	    }
-	  else
-	    {
-	      gridID = gridToCurvilinear(gridID);
-	      lgrid_gen_bounds = TRUE;
-	    }
-	}
-
-      gridtype = gridInqType(gridID);
-
-      if ( gridtype == GRID_CELL )
-	nv = gridInqNvertex(gridID);
-      else
-	nv = 4;
-
-      grid_center_lon = (double *) malloc(gridsize*sizeof(double));
-      grid_center_lat = (double *) malloc(gridsize*sizeof(double));
-
-      gridInqXvals(gridID, grid_center_lon);
-      gridInqYvals(gridID, grid_center_lat);
-
-      grid_corner_lon = (double *) malloc(nv*gridsize*sizeof(double));
-      grid_corner_lat = (double *) malloc(nv*gridsize*sizeof(double));
-
-      if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
-	{
-	  gridInqXbounds(gridID, grid_corner_lon);
-	  gridInqYbounds(gridID, grid_corner_lat);
+	  int nlon = gridInqXsize(gridID);
+	  int nlat = gridInqYsize(gridID);
+	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon);
+	  genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
 	}
       else
 	{
-	  if ( lgrid_gen_bounds )
-	    {
-	      int nlon = gridInqXsize(gridID);
-	      int nlat = gridInqYsize(gridID);
-	      genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon);
-	      genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
-	    }
-	  else
-	    {
-	      cdoAbort("Grid corner missing!");
-	    }
+	  status = TRUE;
+	  return (status);
 	}
-
-      total_area = 0;
-      for ( i = 0; i < gridsize; ++i )
-	{
-	  area[i] = 0;
-
-	  p3.lon = grid_center_lon[i]*deg2rad; 
-	  p3.lat = grid_center_lat[i]*deg2rad;
-	  c3 = gc2cc(&p3);
-
-	  for ( k = 1; k < nv; ++k )
-	    {
-	      p1.lon = grid_corner_lon[i*nv+k-1]*deg2rad; 
-	      p1.lat = grid_corner_lat[i*nv+k-1]*deg2rad;
-	      c1 = gc2cc(&p1);
-	      p2.lon = grid_corner_lon[i*nv+k]*deg2rad; 
-	      p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
-	      c2 = gc2cc(&p2);
-
-	      area[i] += areas(&c1, &c2, &c3);
-	    }
-	  total_area += area[i];
-	}
-
-      if ( cdoVerbose ) cdoPrint("Total area = %g\n", total_area);
-
-      free(grid_center_lon);
-      free(grid_center_lat);
-      free(grid_corner_lon);
-      free(grid_corner_lat);
-      if ( grid_mask ) free(grid_mask);
     }
+  
+  total_area = 0;
+  for ( i = 0; i < gridsize; ++i )
+    {
+      area[i] = 0;
+      
+      p3.lon = grid_center_lon[i]*deg2rad; 
+      p3.lat = grid_center_lat[i]*deg2rad;
+      c3 = gc2cc(&p3);
+      
+      for ( k = 1; k < nv; ++k )
+	{
+	  p1.lon = grid_corner_lon[i*nv+k-1]*deg2rad; 
+	  p1.lat = grid_corner_lat[i*nv+k-1]*deg2rad;
+	  c1 = gc2cc(&p1);
+	  p2.lon = grid_corner_lon[i*nv+k]*deg2rad; 
+	  p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
+	  c2 = gc2cc(&p2);
+
+	  area[i] += areas(&c1, &c2, &c3);
+	}
+
+      p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
+      p1.lat = grid_corner_lat[i*nv+0]*deg2rad;
+      c1 = gc2cc(&p1);
+      p2.lon = grid_corner_lon[i*nv+nv-1]*deg2rad; 
+      p2.lat = grid_corner_lat[i*nv+nv-1]*deg2rad;
+      c2 = gc2cc(&p2);
+
+      area[i] += areas(&c1, &c2, &c3);
+
+      total_area += area[i];
+    }
+
+  if ( cdoVerbose ) cdoPrint("Total area = %g\n", total_area);
+
+  free(grid_center_lon);
+  free(grid_center_lat);
+  free(grid_corner_lon);
+  free(grid_corner_lat);
+  if ( grid_mask ) free(grid_mask);
 
   return (status);
 }
 
 
-int gridWeightsNew(int gridID, double *grid_area, double *grid_wgts)
+int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 {
-  static char func[] = "gridWeightsNew";
-  int i, nvals, gridsize = gridInqSize(gridID);
+  static char func[] = "gridGenWeights";
+  int i, nvals, gridsize, gridtype;
+  int status = FALSE;
   int *grid_mask = NULL;
   double total_area;
 
-  if ( gridInqType(gridID) == GRID_GME )
+  gridtype = gridInqType(gridID);
+  gridsize = gridInqSize(gridID);
+  
+  if ( gridtype == GRID_GME )
     {
       gridID = gridToCell(gridID);	  
       grid_mask = (int *) malloc(gridsize*sizeof(int));
@@ -2196,4 +2211,60 @@ int gridWeightsNew(int gridID, double *grid_area, double *grid_wgts)
     }
   
   if ( grid_mask ) free(grid_mask);
+
+  return (status);
+}
+
+
+int gridWeights(int gridID, double *grid_wgts)
+{
+  static char func[] = "gridWeights";
+  int i, gridsize, gridtype;
+  int a_status, w_status;
+  double *grid_area;
+
+  gridtype = gridInqType(gridID);
+  gridsize = gridInqSize(gridID);
+  
+  grid_area = (double *) malloc(gridsize*sizeof(double));
+
+  a_status = FALSE;
+
+  if ( gridHasArea(gridID) )
+    {
+      if ( cdoVerbose ) cdoPrint("Using existing grid cell area!");
+      gridInqArea(gridID, grid_area);
+    }
+  else
+    {
+      if ( gridtype != GRID_LONLAT      &&
+	   gridtype != GRID_GAUSSIAN    &&
+	   gridtype != GRID_LAMBERT     &&
+	   gridtype != GRID_GME         &&
+	   gridtype != GRID_CURVILINEAR &&
+	   gridtype != GRID_CELL )
+	{
+	  a_status = TRUE;
+	}
+      else
+	{
+	  a_status = gridGenArea(gridID, grid_area);
+	}
+    }
+
+  if ( a_status == FALSE )
+    {
+      w_status = gridGenWeights(gridID, grid_area, grid_wgts);
+    }
+  else
+    {
+      for ( i = 0; i < gridsize; ++i )
+	grid_wgts[i] = 1./gridsize;
+
+      w_status = TRUE;
+    }
+
+  free(grid_area);
+
+  return (w_status);
 }

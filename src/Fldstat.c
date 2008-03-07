@@ -146,7 +146,7 @@ void *Fldstat(void *argument)
 	    }
 	  code = vlistInqVarCode(vlistID1, varID);
 	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
-	    cdoWarning("Using constant area weights for code %d!", oldcode=code);
+	    cdoWarning("Using constant grid cell area weights for code %d!", oldcode=code);
 
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 

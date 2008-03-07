@@ -28,6 +28,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+double  EarthRadius = 6371000; /* default radius of the earth in m */
 
 void *Gridcell(void *argument)
 {
@@ -37,15 +38,29 @@ void *Gridcell(void *argument)
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridID, zaxisID;
-  int gridsize;
-  int a_status, w_status;
+  int gridsize, gridtype;
+  int status;
   int ngrids;
   int tsID, varID, levelID, taxisID;
   double *grid_area = NULL;
   double *grid_wgts = NULL;
   double *pdata;
+  char *envstr;
 
   cdoInitialize(argument);
+
+  envstr = getenv("EARTH_RADIUS");
+  if ( envstr )
+    {
+      double fval;
+      fval = atof(envstr);
+      if ( fval > 0 )
+	{
+	  EarthRadius = fval;
+	  if ( cdoVerbose )
+	    cdoPrint("Set EarthRadius to %g", EarthRadius);
+	}
+    }
 
   GRIDAREA = cdoOperatorAdd("gridarea",     0,  0, NULL);
   GRIDWGTS = cdoOperatorAdd("gridweights",  0,  0, NULL);
@@ -62,7 +77,7 @@ void *Gridcell(void *argument)
   if ( ngrids > 1 )
     cdoWarning("Found more than 1 grid, using the first one!");
 
-  gridID = 0;
+  gridID  = vlistGrid(vlistID1, 0);
 
   zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
@@ -98,23 +113,52 @@ void *Gridcell(void *argument)
   levelID = 0;
   streamDefRecord(streamID2, varID, levelID);
 
-  a_status = gridArea(gridID, grid_area);
-
-  w_status = gridWeightsNew(gridID, grid_area, grid_wgts);
 
   if ( operatorID == GRIDAREA )
     {
-      if ( a_status != 0 )
-	cdoAbort("Calculation of grid cell area failed!");
+      gridtype = gridInqType(gridID);
+      if ( gridtype != GRID_LONLAT      &&
+	   gridtype != GRID_GAUSSIAN    &&
+	   gridtype != GRID_LAMBERT     &&
+	   gridtype != GRID_GME         &&
+	   gridtype != GRID_CURVILINEAR &&
+	   gridtype != GRID_CELL )
+	{
+	  if ( gridInqType(gridID) == GRID_GAUSSIAN_REDUCED )
+	    cdoAbort("Gridarea for %s data failed! Use CDO option -R to convert reduced to regular grid!",
+		     gridNamePtr(gridtype));
+	  else
+	    cdoAbort("Gridarea for %s data failed!", gridNamePtr(gridtype));
+	}
+      else
+	{
+	  if ( gridHasArea(gridID) )
+	    {
+	      if ( cdoVerbose ) cdoPrint("Using existing grid cell area!");
+	      gridInqArea(gridID, grid_area);
+	    }
+	  else
+	    {
+	      int i;
+
+	      status = gridGenArea(gridID, grid_area);
+	      if ( status )
+		cdoAbort("Grid corner missing!");
+	      /*
+	      for ( i = 0; i < gridsize; ++i )
+		grid_area[i] *= EarthRadius;
+	      */
+	    }
+	}
 
       pdata = grid_area;
     }
   else
     {
-      /*
-      if ( w_status != 0 )
-        cdoWarning("Using constant grid cell area weights!");
-      */
+      status = gridWeights(gridID, grid_wgts);
+      if ( status != 0 )
+	  cdoWarning("Using constant grid cell area weights!");
+
       pdata = grid_wgts;
     }
 

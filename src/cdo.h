@@ -112,7 +112,7 @@ int     vlistIsSzipped(int vlistID);
 void    vlistCompare(int vlistID1, int vlistID2, int function);
 
 int  gridWeights(int gridID, double *weights);
-int  gridArea(int gridID, double *area);
+int  gridGenArea(int gridID, double *area);
 void gaussaw(double pa[], double pw[], int nlat);
 void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corner_lon);
 void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corner_lat);
