@@ -103,7 +103,8 @@ void *Vargen(void *argument)
   zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
   vlistID = vlistCreate();
-  varID   = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+  /* varID   = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE); */
+  varID   = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID, taxisID);

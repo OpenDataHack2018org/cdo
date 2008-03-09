@@ -86,11 +86,13 @@ void *Gridcell(void *argument)
 
   if ( operatorID == GRIDAREA )
     {
-      vlistDefVarName(vlistID2, varID, "grid_area");
-      vlistDefVarUnits(vlistID2, varID, "m^2");
+      vlistDefVarName(vlistID2, varID, "cell_area");
+      vlistDefVarStdname(vlistID2, varID, "area");
+      vlistDefVarLongname(vlistID2, varID, "area of grid cell");
+      vlistDefVarUnits(vlistID2, varID, "m2");
     }
   else if ( operatorID == GRIDWGTS )
-    vlistDefVarName(vlistID2, varID, "grid_weights");
+    vlistDefVarName(vlistID2, varID, "cell_weights");
 
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID);
