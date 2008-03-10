@@ -146,10 +146,9 @@ void *Gridcell(void *argument)
 	      status = gridGenArea(gridID, grid_area);
 	      if ( status )
 		cdoAbort("Grid corner missing!");
-	      /*
+
 	      for ( i = 0; i < gridsize; ++i )
-		grid_area[i] *= EarthRadius;
-	      */
+		grid_area[i] *= EarthRadius*EarthRadius;
 	    }
 	}
 

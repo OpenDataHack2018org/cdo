@@ -521,6 +521,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       rg->no_fall_back = TRUE;
     }
 
+  if ( gridInqType(rg->gridID1) == GRID_CELL ) rg->luse_grid1_corners = TRUE;
+  if ( gridInqType(rg->gridID2) == GRID_CELL ) rg->luse_grid2_corners = TRUE;
+
   if ( gridInqType(rg->gridID1) != GRID_CELL && gridInqType(rg->gridID1) != GRID_CURVILINEAR )
     {
       if ( gridInqType(rg->gridID1) == GRID_GME )
@@ -785,6 +788,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else
     {
+      if ( rg->grid1_rank != 2 ) cdoAbort("Internal problem! Grid1 rank = %d\n", rg->grid1_rank);
+
       nx = rg->grid1_dims[0];
       ny = rg->grid1_dims[1];
 
@@ -876,6 +881,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
   else
     {
+      if ( rg->grid2_rank != 2 ) cdoAbort("Internal problem! Grid2 rank = %d\n", rg->grid2_rank);
+
       nx = rg->grid2_dims[0];
       ny = rg->grid2_dims[1];
 
