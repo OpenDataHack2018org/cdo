@@ -7,6 +7,7 @@
 	* Vertint: support for GME data [request: Luis Kornblueh]
 	* Vertint: bug fix for input with time constant fields
 	* Outputgmt: use grid_mask if present
+	* splitsel: bug fix for multilevel/multivar datasets [report: Heiner Widmann]
 	* remaplib: set luse_grid_corners = TRUE for GRID_CELL (bug fix)
 	* Seltime: changed value of NOPERATORS (bug fix)
 	* Version 1.1.1 released
