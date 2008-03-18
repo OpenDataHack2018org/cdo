@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -93,8 +93,6 @@ void printFiletype(int streamID, int vlistID)
 }
 
 
-
-
 static void printGridInfo(int vlistID)
 {
   static char func[] = "printGridInfo";
@@ -183,13 +181,18 @@ static void printGridInfo(int vlistID)
 	  nd = gridInqGMEnd(gridID);
 	  fprintf(stdout, "size      : dim = %d  nd = %d  ni = %d\n", gridsize, nd, ni);
 	}
-      else if ( gridtype == GRID_CURVILINEAR )
+      else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_CELL )
 	{
-	  fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
-	  
+	  if ( gridtype == GRID_CURVILINEAR )
+	    fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
+	  else
+	    fprintf(stdout, "size      : dim = %d  nvertex = %d\n", gridsize, gridInqNvertex(gridID));
+
 	  if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
 	    {
 	      int i;
+	      char xunits[256];
+	      char yunits[256];
 	      double *xvals, *yvals;
 	      double xfirst, xlast, yfirst, ylast;
 	      xvals = (double *) malloc(gridsize*sizeof(double));
@@ -197,6 +200,8 @@ static void printGridInfo(int vlistID)
 
 	      gridInqXvals(gridID, xvals);
 	      gridInqYvals(gridID, yvals);
+	      gridInqXunits(gridID, xunits);
+	      gridInqYunits(gridID, yunits);
 
 	      xfirst = xvals[0];
 	      xlast  = xvals[0];
@@ -211,20 +216,16 @@ static void printGridInfo(int vlistID)
 		}
 
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "longitude : first = %.9g  last = %.9g", xfirst, xlast);
+	      fprintf(stdout, "longitude : min = %.9g  max = %.9g  %s", xfirst, xlast, xunits);
 	      if ( gridIsCircular(gridID) )
 		fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "latitude  : first = %.9g  last = %.9g\n", yfirst, ylast);
+	      fprintf(stdout, "latitude  : min = %.9g  max = %.9g  %s\n", yfirst, ylast, yunits);
 	      
 	      free(xvals);
 	      free(yvals);
 	    }
-	}
-      else if ( gridtype == GRID_CELL )
-	{
-	  fprintf(stdout, "size      : dim = %d  nvertex = %d\n", gridsize, gridInqNvertex(gridID));
 	}
       else if ( gridtype == GRID_LAMBERT )
 	{

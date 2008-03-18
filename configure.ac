@@ -155,8 +155,9 @@ fi
 #  If the library path is specified then it must be preceded by a comma.
 #
 AC_ARG_WITH([netcdf],
-            [AC_HELP_STRING([--with-netcdf=DIR],
-                            [Use the netCDF library [default=no]])],,withval=no)
+            [AC_HELP_STRING([--with-netcdf=<directory>],
+                            [Specify location of netCDF library. Configure will expect to find subdirs include and lib.])],,
+            withval=no)
 
 case $withval in
   yes)
@@ -235,6 +236,20 @@ fi
     fi
     ;;
 esac
+
+#  ----------------------------------------------------------------------
+#  Compile interface with SZLIB library
+#
+AC_MSG_CHECKING([whether a location for the SZLIB library was specified])
+AC_ARG_WITH([szlib],
+            [AS_HELP_STRING([--with-szlib=<directory>],
+                            [Specify location of SZLIB library. Configure will expect to find subdirs include and lib.])],
+            [SZLIBDIR=$with_szlib])
+AC_MSG_RESULT([$SZLIBDIR])
+LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
+CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
+AC_CHECK_LIB(sz, SZ_BufftoBuffCompress,, LDFLAGS="$LDFLAGS")
+AC_SUBST([SZLIBDIR], [$SZLIBDIR])
 
 AC_SUBST([CPPFLAGS])
 AC_SUBST([FC],$F77)

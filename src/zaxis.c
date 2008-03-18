@@ -128,7 +128,7 @@ int zaxisDefine(ZAXIS zaxis)
   if ( zaxis.longname[0] ) zaxisDefLongname(zaxisID, zaxis.longname);
   if ( zaxis.units[0] )    zaxisDefUnits(zaxisID, zaxis.units);
 
-  if ( zaxis.type == ZAXIS_HYBRID )
+  if ( zaxis.type == ZAXIS_HYBRID || zaxis.type == ZAXIS_HYBRID_HALF )
     {
       if ( zaxis.vctsize && zaxis.vct )
 	zaxisDefVct(zaxisID, zaxis.vctsize, zaxis.vct);
@@ -176,6 +176,8 @@ int zaxisFromFile(FILE *gfp)
 
 	  if ( strncmp(pline, "pressure", 6) == 0 )
 	    zaxis.type = ZAXIS_PRESSURE;
+	  else if ( strncmp(pline, "hybrid_half", 11)  == 0 )
+	    zaxis.type = ZAXIS_HYBRID_HALF;
 	  else if ( strncmp(pline, "hybrid", 6)  == 0 )
 	    zaxis.type = ZAXIS_HYBRID;
 	  else if ( strncmp(pline, "height", 6) == 0 )
@@ -425,6 +427,7 @@ int ztype2ltype(int zaxistype)
   else if ( zaxistype == ZAXIS_HEIGHT            )  ltype = 105;
   else if ( zaxistype == ZAXIS_SIGMA             )  ltype = 107;
   else if ( zaxistype == ZAXIS_HYBRID            )  ltype = 109;
+  else if ( zaxistype == ZAXIS_HYBRID_HALF       )  ltype = 109;
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_LAND  )  ltype = 111;
   else if ( zaxistype == ZAXIS_ISENTROPIC        )  ltype = 113;
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_SEA   )  ltype = 160;

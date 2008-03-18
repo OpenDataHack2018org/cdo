@@ -1,6 +1,7 @@
 2008-04-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.1.1
+	* configure: --with-szlib=<directory>
 	* New module: Gridcell (gridarea, gridweights)
 	* New operator: del29feb to delete the 29. February [request: Etienne Tourigny]
 	* Exprf: using MT safe version of bison and flex (bug fix) [report: Claas Teichmann]
@@ -9,6 +10,7 @@
 	* Outputgmt: use grid_mask if present
 	* splitsel: bug fix for multilevel/multivar datasets [report: Heiner Widmann]
 	* remaplib: set luse_grid_corners = TRUE for GRID_CELL (bug fix)
+	* remap_conserv: skip very small regions if num_subseg exceeded limit
 	* Seltime: changed value of NOPERATORS (bug fix)
 	* Version 1.1.1 released
 	

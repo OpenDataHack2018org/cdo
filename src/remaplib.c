@@ -633,7 +633,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	    rg->grid1_corner_lon[i] *= DEG2RAD;
 	}
     }
-  else if ( strncmp(units, "radians", 7) == 0 )
+  else if ( strncmp(units, "radian", 6) == 0 )
     {
       /* No conversion necessary */
     }
@@ -695,7 +695,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	    rg->grid2_corner_lon[i] *= DEG2RAD;
 	  }
     }
-  else if ( strncmp(units, "radians", 7) == 0 )
+  else if ( strncmp(units, "radian", 6) == 0 )
     {
       /* No conversion necessary */
     }
@@ -4061,9 +4061,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		    near cell or threshold boundary
 		  */
 		  num_subseg++;
-		  
 		  if ( num_subseg >= max_subseg )
-		    cdoAbort("integration stalled: num_subseg exceeded limit");
+		    {
+		      /* Uwe Schulzweida: skip very small regions */
+		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 ) break;
+
+		      cdoAbort("Integration stalled 1: num_subseg exceeded limit");
+		    }
 
 		  /* Find next intersection of this segment with a gridline on grid 2. */
 
@@ -4255,14 +4259,18 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	      */
 	      while ( !DBL_IS_EQUAL(beglat, endlat) || !DBL_IS_EQUAL(beglon, endlon) )
 		{
-		  /*
+ 		  /*
 		    Prevent infinite loops if integration gets stuck
 		    near cell or threshold boundary
 		  */
 		  num_subseg++;
-
 		  if ( num_subseg >= max_subseg )
- 		    cdoAbort("integration stalled: num_subseg exceeded limit");
+		    {
+		      /* Uwe Schulzweida: skip very small regions */
+		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 ) break;
+
+		      cdoAbort("Integration stalled 2: num_subseg exceeded limit");
+		    }
 
 		  /* Find next intersection of this segment with a gridline on grid 2. */
 
@@ -5858,7 +5866,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	  rg->grid1_center_lon[i] *= DEG2RAD;
 	}
     }
-  else if ( strncmp(grid1_units, "radians", 7) != 0 )
+  else if ( strncmp(grid1_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
 
   if ( rg->grid1_corners )
@@ -5878,7 +5886,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	      rg->grid1_corner_lon[i] *= DEG2RAD;
 	    }
 	}
-      else if ( strncmp(grid1_units, "radians", 7) != 0 )
+      else if ( strncmp(grid1_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid1 corner lat/lon: proceeding assuming radians");
     }
 
@@ -5906,7 +5914,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	  rg->grid2_center_lon[i] *= DEG2RAD;
 	}
     }
-  else if ( strncmp(grid1_units, "radians", 7) != 0 )
+  else if ( strncmp(grid2_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
 
   if ( rg->grid2_corners )
@@ -5926,7 +5934,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	      rg->grid2_corner_lon[i] *= DEG2RAD;
 	    }
 	}
-      else if ( strncmp(grid1_units, "radians", 7) != 0 )
+      else if ( strncmp(grid2_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid2 corner lat/lon: proceeding assuming radians");
     }
 

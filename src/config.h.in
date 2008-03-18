@@ -39,6 +39,9 @@
 /* Define to 1 for SERVICE interface */
 #undef HAVE_LIBSERVICE
 
+/* Define to 1 if you have the `sz' library (-lsz). */
+#undef HAVE_LIBSZ
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 

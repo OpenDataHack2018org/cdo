@@ -172,6 +172,7 @@ void *Outputgmt(void *argument)
   FILE *cpt_fp;
   CPT cpt;
   int grid_is_circular;
+  char units[128];
 
   cdoInitialize(argument);
 
@@ -301,6 +302,28 @@ void *Outputgmt(void *argument)
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);
 
+  /* Convert lat/lon units if required */
+
+  gridInqYunits(gridID, units);
+
+  if ( strncmp(units, "radian", 6) == 0 )
+    {
+      for ( i = 0; i < gridsize; i++ )
+	{
+	  grid_center_lat[i] *= RAD2DEG;
+	  grid_center_lon[i] *= RAD2DEG;
+	}
+    }
+  else if ( strncmp(units, "degrees", 7) == 0 )
+    {
+      /* No conversion necessary */
+    }
+  else
+    {
+      cdoWarning("Unknown units supplied for grid1 center lat/lon: "
+		 "proceeding assuming degrees");
+    }
+
   nvals = gridsize;
   plon = grid_center_lon;
   plat = grid_center_lat;
@@ -356,6 +379,25 @@ void *Outputgmt(void *argument)
 	    }
 	  else
 	    cdoAbort("Grid corner missing!");
+	}
+
+      if ( strncmp(units, "radian", 6) == 0 )
+	{
+	  /* Note: using units from latitude instead from bounds */
+	  for ( i = 0; i < gridcorners*gridsize; i++ )
+	    {
+	      grid_corner_lat[i] *= RAD2DEG;
+	      grid_corner_lon[i] *= RAD2DEG;
+	    }
+	}
+      else if ( strncmp(units, "degrees", 7) == 0 )
+	{
+	  /* No conversion necessary */
+	}
+      else
+	{
+	  cdoWarning("Unknown units supplied for grid1 center lat/lon: "
+		     "proceeding assuming degrees");
 	}
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )

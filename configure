@@ -703,6 +703,7 @@ RANLIB
 CPP
 GREP
 EGREP
+SZLIBDIR
 FC
 LIBOBJS
 LTLIBOBJS'
@@ -1311,7 +1312,12 @@ Optional Packages:
   --with-service          Use the internal SERVICE library [default=yes]
   --with-extra            Use the internal EXTRA library [default=yes]
   --with-ieg              Use the internal IEG library [default=yes]
-  --with-netcdf=DIR       Use the netCDF library [default=no]
+  --with-netcdf=<directory>
+                          Specify location of netCDF library. Configure will
+                          expect to find subdirs include and lib.
+  --with-szlib=<directory>
+                          Specify location of SZLIB library. Configure will
+                          expect to find subdirs include and lib.
 
 Some influential environment variables:
   AR          AR archive command
@@ -6243,6 +6249,97 @@ echo "$as_me: error: couldn't find netcdf library" >&2;}
     ;;
 esac
 
+#  ----------------------------------------------------------------------
+#  Compile interface with SZLIB library
+#
+{ echo "$as_me:$LINENO: checking whether a location for the SZLIB library was specified" >&5
+echo $ECHO_N "checking whether a location for the SZLIB library was specified... $ECHO_C" >&6; }
+
+# Check whether --with-szlib was given.
+if test "${with_szlib+set}" = set; then
+  withval=$with_szlib; SZLIBDIR=$with_szlib
+fi
+
+{ echo "$as_me:$LINENO: result: $SZLIBDIR" >&5
+echo "${ECHO_T}$SZLIBDIR" >&6; }
+LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
+CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
+
+{ echo "$as_me:$LINENO: checking for SZ_BufftoBuffCompress in -lsz" >&5
+echo $ECHO_N "checking for SZ_BufftoBuffCompress in -lsz... $ECHO_C" >&6; }
+if test "${ac_cv_lib_sz_SZ_BufftoBuffCompress+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsz  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char SZ_BufftoBuffCompress ();
+int
+main ()
+{
+return SZ_BufftoBuffCompress ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_sz_SZ_BufftoBuffCompress=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_sz_SZ_BufftoBuffCompress=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_sz_SZ_BufftoBuffCompress" >&5
+echo "${ECHO_T}$ac_cv_lib_sz_SZ_BufftoBuffCompress" >&6; }
+if test $ac_cv_lib_sz_SZ_BufftoBuffCompress = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSZ 1
+_ACEOF
+
+  LIBS="-lsz $LIBS"
+
+else
+  LDFLAGS="$LDFLAGS"
+fi
+
+SZLIBDIR=$SZLIBDIR
+
+
 
 FC=$F77
 
@@ -6981,12 +7078,13 @@ RANLIB!$RANLIB$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
+SZLIBDIR!$SZLIBDIR$ac_delim
 FC!$FC$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 92; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 93; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
