@@ -82,6 +82,7 @@ Spectral      Transformation
 Wind          Transformation
 Input         Formatted I/O
 Output        Formatted I/O
+Gridcell      Miscellaneous
 Gradsdes      Miscellaneous
 Smooth9       Miscellaneous
 Setrange      Miscellaneous

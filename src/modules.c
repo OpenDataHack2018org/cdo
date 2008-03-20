@@ -467,7 +467,7 @@ static MODULES Modules[] =
   { Fldrms,         NULL,              FldrmsOperators,         2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
-  { Gridcell,       NULL,              GridcellOperators,       1,  1 },
+  { Gridcell,       GridcellHelp,      GridcellOperators,       1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },

@@ -28,7 +28,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-double  EarthRadius = 6371000; /* default radius of the earth in m */
 
 void *Gridcell(void *argument)
 {
@@ -46,19 +45,21 @@ void *Gridcell(void *argument)
   double *grid_wgts = NULL;
   double *pdata;
   char *envstr;
+  double  EarthRadius = 6371000; /* default radius of the earth in m */
+  double PlanetRadius = EarthRadius;
 
   cdoInitialize(argument);
 
-  envstr = getenv("EARTH_RADIUS");
+  envstr = getenv("PLANET_RADIUS");
   if ( envstr )
     {
       double fval;
       fval = atof(envstr);
       if ( fval > 0 )
 	{
-	  EarthRadius = fval;
+	  PlanetRadius = fval;
 	  if ( cdoVerbose )
-	    cdoPrint("Set EarthRadius to %g", EarthRadius);
+	    cdoPrint("Set PlanetRadius to %g", PlanetRadius);
 	}
     }
 
@@ -148,7 +149,7 @@ void *Gridcell(void *argument)
 		cdoAbort("Grid corner missing!");
 
 	      for ( i = 0; i < gridsize; ++i )
-		grid_area[i] *= EarthRadius*EarthRadius;
+		grid_area[i] *= PlanetRadius*PlanetRadius;
 	    }
 	}
 

@@ -151,24 +151,26 @@ static char *ShowinfoHelp[] = {
 
 static char *FiledesHelp[] = {
     "NAME",
-    "    pardes, griddes, vct - Dataset description",
+    "    pardes, griddes, zaxisdes, vct - Dataset description",
     "",
     "SYNOPSIS",
     "    <operator>  ifile",
     "",
     "DESCRIPTION",
     "    This module prints, according to the actual operator, the description",
-    "    of the parameters, the grids or the vertical coordinate table.",
+    "    of the parameters, the grids, the z-axis or the vertical coordinate table.",
     "",
     "OPERATORS",
-    "    pardes   Parameter description",
-    "             Prints a table with a description of all variables.",
-    "             For each variable the operator prints one line listing the",
-    "             code, name, description and units.",
-    "    griddes  Grid description",
-    "             Prints the description of all grids in a file.",
-    "    vct      Vertical coordinate table",
-    "             Prints the vertical coordinate table.",
+    "    pardes    Parameter description",
+    "              Prints a table with a description of all variables.",
+    "              For each variable the operator prints one line listing the",
+    "              code, name, description and units.",
+    "    griddes   Grid description",
+    "              Prints the description of all grids.",
+    "    zaxisdes  Zaxis description",
+    "              Prints the description of all z-axis.",
+    "    vct       Vertical coordinate table",
+    "              Prints the vertical coordinate table.",
     NULL
 };
 
@@ -2916,6 +2918,32 @@ static char *OutputHelp[] = {
     "PARAMETER",
     "    format  STRING  C-style format for one element (e.g. \%13.6g)",
     "    nelem   INTEGER Number of elements for each row",
+    NULL
+};
+
+static char *GridcellHelp[] = {
+    "NAME",
+    "    gridarea, gridweights - Grid cell quantities",
+    "",
+    "SYNOPSIS",
+    "    <operator>  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This module reads the grid cell area of the first grid from the input stream.",
+    "    If the grid cell area is missing it will be computed from the ",
+    "    grid description. Depending on the actual operator the grid cell area or weights",
+    "    are written to the output stream.",
+    "",
+    "OPERATORS",
+    "    gridarea     Grid cell area",
+    "                 Writes the grid cell area to the output stream.",
+    "    gridweights  Grid cell weights",
+    "                 Writes the grid cell area weights to the output stream.",
+    "",
+    "ENVIRONMENT",
+    "    PLANET_RADIUS",
+    "        This variable is used to scale the computed grid cell areas to square meter. ",
+    "        By default, PLANET_RADIUS is set to an earth radius of 6371000 meter.",
     NULL
 };
 

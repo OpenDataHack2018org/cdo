@@ -1,6 +1,20 @@
 CDO NEWS
 --------
 
+Version 1.1.1 (?? April 2008):
+
+   * New features
+      o Module Vertint support for GME data
+
+   * New operators:
+      o Grid cell - gridarea, gridweights
+      o Z-axis description - zaxisdes
+
+   * Fixed bugs:
+      o Module Exprf: using MT safe version of bison and flex
+      o Module Vertint: bug fix for input with time constant fields
+      o Operator splitsel: bug fix for multilevel/multivar datasets
+
 Version 1.1.0 (25 January 2008):
 
    * New features

@@ -5,11 +5,11 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = pardes griddes vct
+@Operators = pardes griddes zaxisdes vct
 
 @BeginDescription
 This module prints, according to the actual operator, the description
-of the parameters, the grids or the vertical coordinate table.
+of the parameters, the grids, the z-axis or the vertical coordinate table.
 @EndDescription
 @EndModule
 
@@ -29,7 +29,16 @@ code, name, description and units.
 @Title     = Grid description
 
 @BeginDescription
-Prints the description of all grids in a file.
+Prints the description of all grids.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_zaxisdes
+@Title     = Zaxis description
+
+@BeginDescription
+Prints the description of all z-axis.
 @EndDescription
 @EndOperator
 
@@ -44,17 +53,17 @@ Prints the vertical coordinate table.
 
 
 @BeginExample
-Assume an input dataset having three parameters with the names geosp, t and tslm1.
-To print the description of these parameters use:
-@BeginVerbatim
-   cdo pardes ifile
-@EndVerbatim
-Result:
-@BeginVerbatim
-   129  geosp         surface geopotential (orography) [m^2/s^2]
-   130  t             temperature [K]
-   139  tslm1         surface temperature of land [K]
-@EndVerbatim
+@C Assume an input dataset having three parameters with the names geosp, t and tslm1.
+@C To print the description of these parameters use:
+@C @BeginVerbatim
+@C    cdo pardes ifile
+@C @EndVerbatim
+@C Result:
+@C @BeginVerbatim
+@C    129  geosp         surface geopotential (orography) [m^2/s^2]
+@C    130  t             temperature [K]
+@C    139  tslm1         surface temperature of land [K]
+@C @EndVerbatim
 Assume all variables of the dataset are on a T21 gausssian grid.
 To print the grid description of this dataset use:
 @BeginVerbatim

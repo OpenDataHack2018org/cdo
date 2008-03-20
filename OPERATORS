@@ -32,6 +32,7 @@ Operator catalog:
       Showinfo   showtime        Show time steps
       Filedes    pardes          Parameter description
       Filedes    griddes         Grid description
+      Filedes    zaxisdes        Zaxis description
       Filedes    vct             Vertical coordinate table
 -------------------------------------------------------------
    File operations
@@ -385,6 +386,8 @@ Operator catalog:
 -------------------------------------------------------------
    Miscellaneous
 -------------------------------------------------------------
+      Gridcell   gridarea        Grid cell area
+      Gridcell   gridweights     Grid cell weights
       Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
       Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
       Smooth9    smooth9         9 point smoothing
