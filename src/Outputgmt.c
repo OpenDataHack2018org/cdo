@@ -44,9 +44,10 @@
 
 
 
-int pnpoly(int npol, double *xp, double *yp, double x, double y)
+static int pnpoly(int npol, double *xp, double *yp, double x, double y)
 {
   int i, j, c = 0;
+
   for (i = 0, j = npol-1; i < npol; j = i++) {
     if ((((yp[i]<=y) && (y<yp[j])) ||
 	 ((yp[j]<=y) && (y<yp[i]))) &&
@@ -58,19 +59,39 @@ int pnpoly(int npol, double *xp, double *yp, double x, double y)
 }
 
 
+static double PolygonArea(int np, double *xp, double *yp)
+{
+   int i, j;
+   double area = 0;
+
+   for ( i = 0; i < np; i++ )
+     {
+       j = (i + 1) % np;
+       area += xp[i] * yp[j];
+       area -= yp[i] * xp[j];
+     }
+
+   area /= 2;
+   /* return(area < 0 ? -area : area); */
+   return (area);
+}
+
 
 void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
   int i, k;
-  int nout = 0;
+  int nout;
   int isinside;
+  int isnegative;
+  double area;
   double lon, lat;
   double lon_bounds[9], lat_bounds[9];
 
   /* check that all centers are inside the bounds */
 
+  nout = 0;
   for ( i = 0; i < gridsize; ++i )
     {
       lon = grid_center_lon[i];
@@ -96,12 +117,51 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
       if ( !isinside ) nout++;
 
       if ( !isinside && cdoVerbose )
-	printf("%d %d %g %g %g %g %g %g %g %g %g %g\n", nout, i, lon, lat, lon_bounds[0], lat_bounds[0],
+	printf("center: %d %d %g %g %g %g %g %g %g %g %g %g\n", nout, i, lon, lat, lon_bounds[0], lat_bounds[0],
 	       lon_bounds[1], lat_bounds[1], lon_bounds[2], lat_bounds[2], lon_bounds[3], lat_bounds[3]);
     }
 
   if ( nout > 0 )
     cdoWarning("%d of %d points out of bounds!\n", nout, gridsize);
+
+
+  /* check that all cell bounds have the same orientation */
+
+  nout = 0;
+  for ( i = 0; i < gridsize; ++i )
+    {
+      lon = grid_center_lon[i];
+      lat = grid_center_lat[i];
+
+      for ( k = 0; k < ncorner; ++k )
+	{
+	  lon_bounds[k] = grid_corner_lon[i*ncorner+k];
+	  lat_bounds[k] = grid_corner_lat[i*ncorner+k];
+	}
+
+      for ( k = 0; k < ncorner; ++k )
+	{
+	  if ( (grid_center_lon[i] - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
+	  if ( (lon_bounds[k] - grid_center_lon[i]) > 270 ) lon_bounds[k] -= 360;
+	}
+
+      lon_bounds[ncorner] = lon_bounds[0];
+      lat_bounds[ncorner] = lat_bounds[0];
+
+      area = PolygonArea(ncorner+1, lon_bounds, lat_bounds);
+
+      if ( area < 0 ) isnegative = 1;
+      else            isnegative = 0;
+
+      if ( isnegative ) nout++;
+
+      if ( isnegative && cdoVerbose )
+	printf("bounds: %d %d %g %g %g %g %g %g %g %g %g %g\n", nout, i, lon, lat, lon_bounds[0], lat_bounds[0],
+	       lon_bounds[1], lat_bounds[1], lon_bounds[2], lat_bounds[2], lon_bounds[3], lat_bounds[3]);
+    }
+
+  if ( nout > 0 )
+    cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
 }
 
 

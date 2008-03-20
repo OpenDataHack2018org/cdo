@@ -784,6 +784,14 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      if ( rg->grid1_corner_lon[inc+j] > rg->grid1_bound_box[i4+3] )
 		rg->grid1_bound_box[i4+3] = rg->grid1_corner_lon[inc+j];
 	    }
+	  if ( cdoVerbose )
+	  if ( i == 0 || i == 4 || i == 8 )
+	    {
+	      printf("cell = %d  lon0 %g lat0 %g\n", i, RAD2DEG*rg->grid1_center_lon[i], RAD2DEG*rg->grid1_center_lat[i]);
+	      for ( j = 0; j < nc; j++ )
+		printf("bounds %d %g %g\n", j+1, RAD2DEG*rg->grid1_corner_lon[inc+j], RAD2DEG*rg->grid1_corner_lat[inc+j]);
+	      printf("bound_box: lat %g %g  lon %g %g\n", RAD2DEG*rg->grid1_bound_box[i4+0], RAD2DEG*rg->grid1_bound_box[i4+1], RAD2DEG*rg->grid1_bound_box[i4+2], RAD2DEG*rg->grid1_bound_box[i4+3]);
+	    }
 	}
     }
   else
@@ -2780,7 +2788,6 @@ void pole_intersection(int *location,
   double *srch_corner_x;     /*  x of each corner of srch cells */
   double *srch_corner_y;     /*  y of each corner of srch cells */
 
-
   /* Initialize defaults, flags, etc. */
 
   if ( ! *lthresh ) *location = -1;
@@ -4064,7 +4071,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( num_subseg >= max_subseg )
 		    {
 		      /* Uwe Schulzweida: skip very small regions */
-		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 ) break;
+		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
+			{
+			  if ( cdoVerbose )
+			    cdoPrint("Skip very small region (grid1): lon = %g dlon = %g lat = %g dlat = %g",
+				     beglon, endlon-beglon, beglat, endlat-beglat);
+			  break;
+			}
 
 		      cdoAbort("Integration stalled 1: num_subseg exceeded limit");
 		    }
@@ -4267,7 +4280,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( num_subseg >= max_subseg )
 		    {
 		      /* Uwe Schulzweida: skip very small regions */
-		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 ) break;
+		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
+			{
+			  if ( cdoVerbose )
+			    cdoPrint("Skip very small region (grid2): lon = %g dlon = %g lat = %g dlat = %g",
+				     beglon, endlon-beglon, beglat, endlat-beglat);
+			  break;
+			}
 
 		      cdoAbort("Integration stalled 2: num_subseg exceeded limit");
 		    }
