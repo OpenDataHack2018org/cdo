@@ -25,11 +25,13 @@
 #include <stdlib.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
-#if ! defined (SX)
+#if  defined (HAVE_GETRLIMIT)
+#if  defined (HAVE_SYS_RESOURCE_H)
 #include <sys/time.h>       /* getrlimit */
 #include <sys/resource.h>   /* getrlimit */
 #endif
-#include <unistd.h>         /* getrlimit sysconf */
+#endif
+#include <unistd.h>         /* sysconf */
 
 #include "cdi.h"
 #include "cdo.h"
@@ -687,6 +689,7 @@ int main(int argc, char *argv[])
 
       fprintf(stderr, "\n");
 
+#if defined (HAVE_GETRLIMIT)
 #if defined (RLIMIT_FSIZE)
       PRINT_RLIMIT(RLIMIT_FSIZE);
 #endif
@@ -696,9 +699,11 @@ int main(int argc, char *argv[])
 #if defined (RLIMIT_STACK)
       PRINT_RLIMIT(RLIMIT_STACK);
 #endif
+#endif
       fprintf(stderr, "\n");
     }
 
+#if defined (HAVE_GETRLIMIT)
 #if defined (RLIMIT_STACK)
   {
 #define  MIN_STACK_SIZE  67108864L  /* 64MB */
@@ -729,6 +734,7 @@ int main(int argc, char *argv[])
 	  }
       }
   }
+#endif
 #endif
 
   if ( Debug )

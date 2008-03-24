@@ -5,8 +5,10 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#if defined (HAVE_SYS_TIMES_H)
 #include <sys/times.h>
-#include <sys/param.h>
+#endif
+/* #include <sys/param.h> */
 #ifdef __XT3__
 #include <catamount/dclock.h>
 #endif
@@ -15,7 +17,7 @@
 static double clock0=-1.0;
 #endif
 
-extern clock_t times (struct tms *buffer);
+/* extern clock_t times (struct tms *buffer); */
 #define clock_ticks ( (double) sysconf(_SC_CLK_TCK) )
 
 int util_cputime(double *user_time, double *system_time)
@@ -24,11 +26,16 @@ int util_cputime(double *user_time, double *system_time)
   *user_time   = dclock()-clock0;
   *system_time = (double) 0;
 #else
+#if defined (HAVE_SYS_TIMES_H)
   struct tms tbuf;
   if (times(&tbuf) == -1) return ((int) (-1)); 
 
   *user_time   = ((double) tbuf.tms_utime) / clock_ticks; 
   *system_time = ((double) tbuf.tms_stime) / clock_ticks;
+#else
+  *user_time   = 0; 
+  *system_time = 0;
+#endif
 #endif
 
   return (0);
@@ -36,8 +43,10 @@ int util_cputime(double *user_time, double *system_time)
 
 double util_walltime(void)
 {
+  double time_in_secs = 0;
+#if defined (HAVE_SYS_TIMES_H)
   static double time_init = 0.;
-  double time_in_secs;
+
   struct timeval tbuf;
   if (gettimeofday(&tbuf,NULL) == -1) perror("UTIL_WALLTIME");
 
@@ -46,6 +55,7 @@ double util_walltime(void)
 
   time_in_secs =
   (double) tbuf.tv_sec + (tbuf.tv_usec / 1000000.0) - time_init;
+#endif
 
   return (time_in_secs);
 }

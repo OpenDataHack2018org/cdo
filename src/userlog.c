@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <pwd.h>
+/* #include <pwd.h> */
 #include <unistd.h>  /* write, close */
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -26,7 +26,12 @@
 #define  LOGSSIZE  32
 #define  LOGOSIZE  40
 
+#undef HAVE_LOCK
+#if defined (F_UNLCK) && defined (F_RDLCK) && defined (F_WRLCK)
+#define HAVE_LOCK
+#endif
 
+#if defined (HAVE_LOCK)
 static void filestatus(struct flock *lock)
 {
   switch(lock->l_type) {
@@ -41,10 +46,12 @@ static void filestatus(struct flock *lock)
       break;
   }
 }
+#endif
 
 
 void cdolog(const char *prompt, double cputime)
 {
+#if defined (HAVE_LOCK)
 #if defined (LOGPATH)
 #define  XSTRING(x)	#x
 #define  STRING(x)	XSTRING(x)
@@ -145,6 +152,7 @@ void cdolog(const char *prompt, double cputime)
 
   return;
 
+#endif
 #endif
 }
 
@@ -288,6 +296,7 @@ static int flt2ibm(float x, unsigned char *ibm) {
 
 void cdologs(int noper)
 {
+#if defined (HAVE_LOCK)
 #if defined (LOGPATH)
 #define  XSTRING(x)	#x
 #define  STRING(x)	XSTRING(x)
@@ -424,11 +433,13 @@ void cdologs(int noper)
   return;
 
 #endif
+#endif
 }
 
 
 void dumplogs(const char *logfilename)
 {
+#if defined (HAVE_LOCK)
   static const char func[] = "dumplogs";
   int  logfileno;
   int status;
@@ -502,6 +513,7 @@ void dumplogs(const char *logfilename)
   errno = 0;
 
   return;
+#endif
 }
 
 
@@ -668,6 +680,7 @@ void monlogs(const char *logfilename)
 
 void cdologo(int noper)
 {
+#if defined (HAVE_LOCK)
   static char func[] = "cdologo";
 #if defined (LOGPATH)
 #define  XSTRING(x)	#x
@@ -801,6 +814,7 @@ void cdologo(int noper)
   return;
 
 #endif
+#endif
 }
 
 
@@ -878,6 +892,7 @@ int cmplogname(const void *s1, const void *s2)
 
 void dumplogo(const char *logfilename, int dumptype)
 {
+#if defined (HAVE_LOCK)
   static const char func[] = "dumplogo";
   int  logfileno;
   int status;
@@ -980,4 +995,5 @@ void dumplogo(const char *logfilename, int dumptype)
   errno = 0;
 
   return;
+#endif
 }

@@ -30,8 +30,14 @@ AC_CHECK_LIB(malloc, mallinfo)
 # Checks for structures.
 AC_CHECK_MEMBERS([struct stat.st_blksize])
 
+# Checks for header files
+AC_CHECK_HEADERS(sys/resource.h)
+AC_CHECK_HEADERS(sys/times.h)
+
 # Checks for the availability of ANSI-C99 functions
 AC_CHECK_FUNCS(isnan)
+
+AC_CHECK_FUNCS(getrlimit)
 
 # Checks for compiler
 COMPILER="$CC $CFLAGS"
