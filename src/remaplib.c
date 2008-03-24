@@ -79,6 +79,10 @@
 #define  PIH      HALF*PI
 
 
+/* static double north_thresh = 1.45;  */ /* threshold for coord transf. */
+static double north_thresh = 2.00;  /* threshold for coord transf. */
+static double south_thresh =-2.00;  /* threshold for coord transf. */
+
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
@@ -784,15 +788,37 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      if ( rg->grid1_corner_lon[inc+j] > rg->grid1_bound_box[i4+3] )
 		rg->grid1_bound_box[i4+3] = rg->grid1_corner_lon[inc+j];
 	    }
-	  if ( cdoVerbose )
-	  if ( i == 0 || i == 4 || i == 8 )
-	    {
-	      printf("cell = %d  lon0 %g lat0 %g\n", i, RAD2DEG*rg->grid1_center_lon[i], RAD2DEG*rg->grid1_center_lat[i]);
-	      for ( j = 0; j < nc; j++ )
-		printf("bounds %d %g %g\n", j+1, RAD2DEG*rg->grid1_corner_lon[inc+j], RAD2DEG*rg->grid1_corner_lat[inc+j]);
-	      printf("bound_box: lat %g %g  lon %g %g\n", RAD2DEG*rg->grid1_bound_box[i4+0], RAD2DEG*rg->grid1_bound_box[i4+1], RAD2DEG*rg->grid1_bound_box[i4+2], RAD2DEG*rg->grid1_bound_box[i4+3]);
-	    }
 	}
+      /*
+      {
+      double latmin, latmax;
+      for ( i = 0; i < rg->grid1_size; i++ )
+	{
+	  inc = i*nc;
+	  latmin = rg->grid1_corner_lat[inc];
+	  latmax = rg->grid1_corner_lat[inc];
+	  for ( j = 1; j < nc; j++ )
+	    {
+	      if ( rg->grid1_corner_lat[inc+j] > latmax ) latmax = rg->grid1_corner_lat[inc+j];
+	      if ( rg->grid1_corner_lat[inc+j] < latmin ) latmin = rg->grid1_corner_lat[inc+j];
+	    }
+	  if ( DBL_IS_EQUAL(latmax, PIH) && latmin < north_thresh )
+	    {
+	      north_thresh = latmin;
+	      north_thresh = 1.15;
+	      printf("north_thresh %g\n", north_thresh);
+	    }
+	  if ( DBL_IS_EQUAL(latmin, -PIH) && latmax > south_thresh )
+	    {
+	      south_thresh = latmax;
+	      south_thresh = -1.15;
+	      printf("south_thresh %g\n", south_thresh);
+	    }
+	  printf("latmin, latmax %g %g %g %d %d\n", latmin, latmax, PIH, DBL_IS_EQUAL(latmax, PIH), DBL_IS_EQUAL(latmin, -PIH));
+	}
+      printf("latmin, latmax %g %g %g\n", latmin, latmax , PIH);
+      }
+      */
     }
   else
     {
@@ -2728,10 +2754,6 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
 /*      CONSERVATIVE INTERPOLATION                                         */
 /*                                                                         */
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-
-/* static double north_thresh = 1.45;  */ /* threshold for coord transf. */
-static double north_thresh = 2.00;  /* threshold for coord transf. */
-static double south_thresh =-2.00;  /* threshold for coord transf. */
 
 /*
     This routine is identical to the intersection routine except
