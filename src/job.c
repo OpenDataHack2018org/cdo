@@ -42,7 +42,12 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
 
   /* determine hostname */
 
+#if defined (HAVE_GETHOSTNAME)
   gethostname(host, sizeof(host));  
+#else
+  fprintf(stderr, "Function gethostname not available!\n");
+  exit(EXIT_FAILURE);
+#endif
 
   /* determine current path */
 
@@ -592,7 +597,12 @@ void exp_run(int argc, char *argv[], char *cdoExpName)
   size_t len;
   char host[1024];
 
+#if defined (HAVE_GETHOSTNAME)
   gethostname(host, sizeof(host));
+#else
+  fprintf(stderr, "Function gethostname not available!\n");
+  exit(EXIT_FAILURE);
+#endif
 
   sprintf(tmpdir, "cdo_%s_%d", host, (int) getpid());
   /*

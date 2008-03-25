@@ -515,6 +515,7 @@ int main(int argc, char *argv[])
 	  break;
 	case 'e':
 	  {
+#if defined (HAVE_GETHOSTNAME)
 	  char host[1024];
 	  gethostname(host, sizeof(host));
 	  cdoExpName = cdoOptarg;
@@ -523,6 +524,10 @@ int main(int argc, char *argv[])
 	    cdoExpMode = CDO_EXP_REMOTE;
 	  else
             cdoExpMode = CDO_EXP_LOCAL;
+#else
+          fprintf(stderr, "Function gethostname not available!\n");
+	  exit(EXIT_FAILURE);
+#endif
           break;
 	  }
 	case 'f':

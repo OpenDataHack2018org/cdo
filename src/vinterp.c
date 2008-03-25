@@ -278,7 +278,7 @@ static double extra_Z(double pres, double halfp, double fullp, double geop, doub
 }  /* extra_Z */
 
 
-void interp_X(double *gt, double *pt, double *fullp, int *nx, double *plev, int nplev,
+void interp_X(double *gt, double *pt, double *hyb_press, int *nx, double *plev, int nplev,
 	     int ngp, int nhlev, double missval)
 {
   int lp, i;
@@ -306,8 +306,8 @@ void interp_X(double *gt, double *pt, double *fullp, int *nx, double *plev, int 
 	      if ( nh >= ngp*nhlev )
 		ptl[i] = gt[nl];
 	      else
-		ptl[i] =  gt[nl] + (pres-fullp[nl])
-		       * (gt[nh] - gt[nl]) / (fullp[nh] - fullp[nl]);
+		ptl[i] =  gt[nl] + (pres-hyb_press[nl])
+		       * (gt[nh] - gt[nl]) / (hyb_press[nh] - hyb_press[nl]);
 	    }
 	}
     }

@@ -18,7 +18,7 @@ void interp_T(double *geop, double *gt, double *pt, double *fullp, double *halfp
               int *nx, double *plev, int nplev, int ngp, int nhlev, double missval);
 void interp_Z(double *geop, double *gz, double *pz, double *fullp, double *halfp,
 	      int *nx, double *gt, double *plev, int nplev, int ngp, int nhlev, double missval);
-void interp_X(double *gt, double *pt, double *fullp,
+void interp_X(double *gt, double *pt, double *hyb_press,
 	      int *nx, double *plev, int nplev, int ngp, int nhlev, double missval);
 
 #if defined(__cplusplus)

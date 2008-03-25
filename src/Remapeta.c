@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2007-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -153,7 +153,6 @@ void *Remapeta(void *argument)
 	  vlistID1 = streamInqVlist(streamID1);
 
 	  streamInqRecord(streamID1, &varID, &levelID);
-
 	  gridID = vlistInqVarGrid(vlistID1, varID);
 	  nfis2gp = gridInqSize(gridID);
 
@@ -495,7 +494,6 @@ void *Remapeta(void *argument)
 		nvars3D, vars1, vars2,
 		tscor, pscor, secor);
 
-
       if ( geopID != -1 )
 	{
 	  varID   = geopID;
@@ -508,11 +506,14 @@ void *Remapeta(void *argument)
       if ( lnpsID != -1 )
 	for ( i = 0; i < ngp; ++i ) ps2[i] = log(ps2[i]);
 
-      varID   = presID;
-      levelID = 0;
-      nmiss   = 0;
-      streamDefRecord(streamID2, varID, levelID);
-      streamWriteRecord(streamID2, ps2, nmiss);
+      if ( presID != -1 )
+	{
+	  varID   = presID;
+	  levelID = 0;
+	  nmiss   = 0;
+	  streamDefRecord(streamID2, varID, levelID);
+	  streamWriteRecord(streamID2, ps2, nmiss);
+	}
 
       if ( ltq )
 	{

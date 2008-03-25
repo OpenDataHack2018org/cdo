@@ -53,7 +53,7 @@ void *Vertint(void *argument)
   int nvars;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
   int ngrids, gridID, zaxisID;
-  int nplev, nhlev = 0, nhlevp1 = 0, nlevel, maxlev;
+  int nplev, nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel, maxlev;
   int *vert_index = NULL;
   int nvct;
   int geop_needed = FALSE;
@@ -69,6 +69,7 @@ void *Vertint(void *argument)
   double *single1, *single2;
   double **vardata1 = NULL, **vardata2 = NULL;
   double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
+  double *hyb_press = NULL;
   char *envstr;
   int Extrapolate = 0;
   int taxisID1, taxisID2;
@@ -148,7 +149,8 @@ void *Vertint(void *argument)
       zaxisID = vlistZaxis(vlistID1, i);
       nlevel  = zaxisInqSize(zaxisID);
 
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
+      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
+	   nlevel > 1 )
 	{
 	  double *level;
 	  int l;
@@ -162,7 +164,8 @@ void *Vertint(void *argument)
 	  free(level);
 	}
 
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 && mono_level )
+      if ( (zaxisInqType(zaxisID) == ZAXIS_HYBRID || zaxisInqType(zaxisID) == ZAXIS_HYBRID_HALF) &&
+	   nlevel > 1 && mono_level )
 	{
 	  nvct = zaxisInqVctSize(zaxisID);
 	  if ( nlevel == (nvct/2 - 1) )
@@ -172,7 +175,29 @@ void *Vertint(void *argument)
 		  lhavevct = TRUE;
 		  zaxisIDh = zaxisID;
 		  nhlev    = nlevel;
-		  nhlevp1  = nhlev + 1;
+		  nhlevf   = nhlev;
+		  nhlevh   = nhlevf + 1;
+	      
+		  vct = (double *) malloc(nvct*sizeof(double));
+		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+
+		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+		}
+	      else
+		{
+		  if ( memcmp(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
+		}
+	    }
+	  else if ( nlevel == (nvct/2) )
+	    {
+	      if ( lhavevct == FALSE )
+		{
+		  lhavevct = TRUE;
+		  zaxisIDh = zaxisID;
+		  nhlev    = nlevel;
+		  nhlevf   = nhlev - 1;
+		  nhlevh   = nhlev;
 	      
 		  vct = (double *) malloc(nvct*sizeof(double));
 		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
@@ -198,9 +223,10 @@ void *Vertint(void *argument)
 		      lhavevct = TRUE;
 		      zaxisIDh = zaxisID;
 		      nhlev    = nlevel;
-		      nhlevp1  = nhlev + 1;
+		      nhlevf   = nhlev;
+		      nhlevh   = nhlev + 1;
 
-		      vctsize = 2*nhlevp1;
+		      vctsize = 2*nhlevh;
 		      vct = (double *) malloc(vctsize*sizeof(double));
 		      ret_vct = (double *) malloc(nvct*sizeof(double));
 		      memcpy(ret_vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
@@ -261,8 +287,8 @@ void *Vertint(void *argument)
     {
       vert_index = (int *) malloc(ngp*nplev*sizeof(int));
       ps_prog    = (double *) malloc(ngp*sizeof(double));
-      full_press = (double *) malloc(ngp*nhlev*sizeof(double));
-      half_press = (double *) malloc(ngp*nhlevp1*sizeof(double));
+      full_press = (double *) malloc(ngp*nhlevf*sizeof(double));
+      half_press = (double *) malloc(ngp*nhlevh*sizeof(double));
     }
   else
     cdoWarning("No data on hybrid model level found!");
@@ -450,9 +476,9 @@ void *Vertint(void *argument)
 	      cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 	  }
 
-	  presh(full_press, half_press, vct, ps_prog, nhlev, ngp);
+	  presh(full_press, half_press, vct, ps_prog, nhlevf, ngp);
 
-	  genind(vert_index, plev, full_press, ngp, nplev, nhlev);
+	  genind(vert_index, plev, full_press, ngp, nplev, nhlevf);
 
 	  if ( Extrapolate == 0 )
 	    genindmiss(vert_index, plev, ngp, nplev, ps_prog, pnmiss);
@@ -469,8 +495,40 @@ void *Vertint(void *argument)
 	      nlevel   = zaxisInqSize(zaxisID);
 	      if ( varinterp[varID] )
 		{
+		  /*
+		  if ( nlevel == nhlevh )
+		    {
+		      int i, k;
+		      double *vl1, *vl2;
+
+		      for ( k = 1; k < nlevel; k++ )
+			{
+			  vl1  = vardata1[varID] + gridsize*(k-1);
+			  vl2  = vardata1[varID] + gridsize*(k);
+			  for ( i = 0; i < gridsize; i++ )
+			    vl1[i] = 0.5*(vl1[i] + vl2[i]);
+			}
+		      
+		      nlevel = nhlevf;
+		    }
+		  */
+		  if ( nlevel == nhlevh )
+		    {
+		      hyb_press = half_press;
+		    }
+		  else if ( nlevel == nhlevf )
+		    {
+		      hyb_press = full_press;
+		    }
+		  else
+		    cdoAbort("Number of hybrid level differ from full/half level (code %d)!",
+			     vlistInqVarCode(vlistID1, varID));
+
 		  if ( varID == tempID )
 		    {
+		      if ( nlevel == nhlevh )
+			cdoAbort("Temperature on half level unsupported!");
+
 		      interp_T(geop, vardata1[varID], vardata2[varID],
 			       full_press, half_press, vert_index,
 			       plev, nplev, ngp, nlevel, missval);
@@ -485,7 +543,7 @@ void *Vertint(void *argument)
 		  */
 		  else
 		    {
-		      interp_X(vardata1[varID], vardata2[varID], full_press,
+		      interp_X(vardata1[varID], vardata2[varID], hyb_press,
 			       vert_index, plev, nplev, ngp, nlevel, missval);
 		    }
 		  

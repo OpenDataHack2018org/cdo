@@ -39,6 +39,8 @@ AC_CHECK_FUNCS(isnan)
 
 AC_CHECK_FUNCS(getrlimit)
 
+AC_CHECK_FUNCS(gethostname)
+
 # Checks for compiler
 COMPILER="$CC $CFLAGS"
 AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
