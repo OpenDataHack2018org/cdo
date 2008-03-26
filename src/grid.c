@@ -1723,6 +1723,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   int gridtype;
   int gridsize;
   double *vals;
+  char units[128];
 
 
   gridtype = gridInqType(gridID);
@@ -1745,6 +1746,14 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   else
     {
     }
+
+  gridInqYunits(gridID, units);
+  if ( strncmp(units, "degrees", 7) == 0 )
+    units[7] = 0;
+  else if ( strncmp(units, "radian", 6) == 0 )
+    units[6] = 0;
+  else
+    cdoWarning("Unknown units supplied for grid!");
 
   /* create netCDF dataset for this grid */
   
@@ -1791,14 +1800,14 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 
   nce(nc_def_var(nc_file_id, "grid_center_lat", xtype, ndims, nc_dims_id, &nc_gridlat_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "units", 7, "degrees"));
+  nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "units", strlen(units), units));
   nce(nc_put_att_text(nc_file_id, nc_gridlat_id, "bounds", 15, "grid_corner_lat"));
 
   /* define grid center longitude array */
 
   nce(nc_def_var(nc_file_id, "grid_center_lon", xtype, ndims, nc_dims_id, &nc_gridlon_id));
  
-  nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "units", 7, "degrees"));
+  nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "units", strlen(units), units));
   nce(nc_put_att_text(nc_file_id, nc_gridlon_id, "bounds", 15, "grid_corner_lon"));
 
   /* define grid mask */
@@ -1826,13 +1835,13 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 
   nce(nc_def_var(nc_file_id, "grid_corner_lat", xtype, ndims, nc_dims_id, &nc_gridclat_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridclat_id, "units", 7, "degrees"));
+  nce(nc_put_att_text(nc_file_id, nc_gridclat_id, "units", strlen(units), units));
 
   /* define grid corner longitude array */
 
   nce(nc_def_var(nc_file_id, "grid_corner_lon", xtype, ndims, nc_dims_id, &nc_gridclon_id));
 
-  nce(nc_put_att_text(nc_file_id, nc_gridclon_id, "units", 7, "degrees"));
+  nce(nc_put_att_text(nc_file_id, nc_gridclon_id, "units", strlen(units), units));
 
   /* end definition stage */
 
