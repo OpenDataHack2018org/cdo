@@ -361,7 +361,7 @@ void *Wct(void *argument);
 #define  VardupOperators        {"pardup", "parmul"}
 #define  VargenOperators        {"random", "const", "topo"}
 #define  VarrmsOperators        {"varrms"}
-#define  VertintOperators       {"ml2pl", "ml2hl"}
+#define  VertintOperators       {"ml2pl", "ml2hl", "ml2plx", "ml2hlx"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertvar", "vertstd"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}

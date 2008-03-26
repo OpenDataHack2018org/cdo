@@ -9,9 +9,12 @@
 
 @BeginDescription
 Interpolate 3D variables on hybrid model level to pressure or height level.
-The input file must contain the log. surface pressure (LSP/code152) or the 
-surface pressure (APS/code134). To interpolate the temperature,
-the orography (GEOSP/code129) is also needed.
+The input file must contain the log. surface pressure or the surface pressure.
+To interpolate the temperature, the orography is also needed.
+The pressure, temperature, and orography are identified by there code numbers.
+Supported code tables are: WMO standard table number 2 and ECMWF local table number 128.
+Use the alias  ml2plx/ml2hlx or the environment variable EXTRAPOLATE
+to extrapolate missing values.
 @EndDescription
 @EndModule
 

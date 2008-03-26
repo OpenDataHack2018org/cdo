@@ -39,7 +39,7 @@
 void *Vertint(void *argument)
 {
   static char func[] = "Vertint";
-  int ML2PL, ML2HL;
+  int ML2PL, ML2HL, ML2PLX, ML2HLX;
   int operatorID;
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
@@ -70,31 +70,41 @@ void *Vertint(void *argument)
   double **vardata1 = NULL, **vardata2 = NULL;
   double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
   double *hyb_press = NULL;
-  char *envstr;
   int Extrapolate = 0;
   int taxisID1, taxisID2;
   int lhavevct;
   int mono_level;
   int instNum, tableNum;
+  int useTable;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
-  ML2PL = cdoOperatorAdd("ml2pl", 0, 0, "pressure levels in pascal");
-  ML2HL = cdoOperatorAdd("ml2hl", 0, 0, "height levels in meter");
+  ML2PL  = cdoOperatorAdd("ml2pl",  0, 0, "pressure levels in pascal");
+  ML2PLX = cdoOperatorAdd("ml2plx", 0, 0, "pressure levels in pascal");
+  ML2HL  = cdoOperatorAdd("ml2hl",  0, 0, "height levels in meter");
+  ML2HLX = cdoOperatorAdd("ml2hlx", 0, 0, "height levels in meter");
 
   operatorID = cdoOperatorID();
 
-  envstr = getenv("EXTRAPOLATE");
-
-  if ( envstr )
+  if ( operatorID == ML2PL || operatorID == ML2HL )
     {
-      if ( isdigit((int) envstr[0]) )
+      char *envstr;
+      envstr = getenv("EXTRAPOLATE");
+
+      if ( envstr )
 	{
-	  Extrapolate = atoi(envstr);
-	  if ( Extrapolate == 1 )
-	    cdoPrint("Extrapolation of missing values enabled!");
+	  if ( isdigit((int) envstr[0]) )
+	    {
+	      Extrapolate = atoi(envstr);
+	      if ( Extrapolate == 1 )
+		cdoPrint("Extrapolation of missing values enabled!");
+	    }
 	}
+    }
+  else
+    {
+      Extrapolate = 1;
     }
 
   operatorInputArg(cdoOperatorEnter(operatorID));
@@ -134,7 +144,7 @@ void *Vertint(void *argument)
 	}
     }
 
-  if ( operatorID == ML2HL )
+  if ( operatorID == ML2HL || operatorID == ML2HLX )
     zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
   else
     zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
@@ -293,13 +303,26 @@ void *Vertint(void *argument)
   else
     cdoWarning("No data on hybrid model level found!");
 
-  if ( operatorID == ML2HL )
+  if ( operatorID == ML2HL || operatorID == ML2HLX )
     {
       phlev = (double *) malloc(nplev*sizeof(double));
       h2p(phlev, plev, nplev);
       memcpy(plev, phlev, nplev*sizeof(double));
       free(phlev);
     }
+
+  useTable = FALSE;
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
+
+      if ( tableNum > 0 )
+	{
+	  useTable = TRUE;
+	}
+    }
+
+  if ( cdoVerbose && useTable ) cdoPrint("Use code tables!");
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -312,14 +335,27 @@ void *Vertint(void *argument)
 
       code = vlistInqVarCode(vlistID1, varID);
 
-      if ( tableNum == 2 )
+      if ( useTable )
 	{
-	  mode = WMO_MODE;
-	  geop_code  =   6;
-	  temp_code  =  11;
-	  ps_code    =   1;
+	  if ( tableNum == 2 )
+	    {
+	      mode = WMO_MODE;
+	      geop_code  =   6;
+	      temp_code  =  11;
+	      ps_code    =   1;
+	    }
+	  else if ( tableNum == 128 )
+	    {
+	      mode = ECHAM_MODE;
+	      geop_code  = 129;
+	      temp_code  = 130;
+	      ps_code    = 134;
+	      lsp_code   = 152;
+	    }
+	  else
+	    mode = -1;
 	}
-      else if ( tableNum == 128 )
+      else
 	{
 	  mode = ECHAM_MODE;
 	  geop_code  = 129;
@@ -327,8 +363,6 @@ void *Vertint(void *argument)
 	  ps_code    = 134;
 	  lsp_code   = 152;
 	}
-      else
-	mode = -1;
 
       if ( cdoVerbose )
 	cdoPrint("Mode = %d  Center = %d  Table = %d  Code = %d", mode, instNum, tableNum, code);
@@ -339,10 +373,11 @@ void *Vertint(void *argument)
 
 	  strtolower(varname);
 
-	  if      ( strcmp(varname, "geosp") == 0 ) code = 129;
-	  else if ( strcmp(varname, "st")    == 0 ) code = 130;
-	  else if ( strcmp(varname, "aps")   == 0 ) code = 134;
-	  else if ( strcmp(varname, "lsp")   == 0 ) code = 152;
+	  /*                        ECHAM                            ECMWF       */
+	  if      ( strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0 ) code = 129;
+	  else if ( strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0 ) code = 130;
+	  else if ( strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0 ) code = 134;
+	  else if ( strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0 ) code = 152;
 	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
 
@@ -408,7 +443,7 @@ void *Vertint(void *argument)
       if ( psID != -1 )
 	{
 	  code = vlistInqVarCode(vlistID1, psID);
-	  cdoWarning("LOG surface pressure not found - using surface pressure (code %d)!", code);
+	  cdoPrint("LOG surface pressure not found - using surface pressure (code %d)!", code);
 	}
       else
 	cdoAbort("Surface pressure not found!");
