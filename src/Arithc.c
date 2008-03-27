@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ void *Arithc(void *argument)
   int operatorID;
   int operfunc;
   int streamID1, streamID2;
-  int gridsize;
+  int gridsize, i;
   int nrecs, recID;
   int tsID;
   int varID, levelID;
@@ -98,6 +98,12 @@ void *Arithc(void *argument)
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
 	  farcfun(&field, rconst, operfunc);
+
+	  /* recalculate number of missing values */
+	  gridsize = gridInqSize(field.grid);
+	  field.nmiss = 0;
+	  for ( i = 0; i < gridsize; ++i )
+	    if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
 
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, field.ptr, field.nmiss);

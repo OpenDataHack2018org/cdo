@@ -2810,6 +2810,8 @@ void pole_intersection(int *location,
   double *srch_corner_x;     /*  x of each corner of srch cells */
   double *srch_corner_y;     /*  y of each corner of srch cells */
 
+  /*printf("pole_intersection: %g %g %g %g\n", beglat, beglon, endlat, endlon);*/
+
   /* Initialize defaults, flags, etc. */
 
   if ( ! *lthresh ) *location = -1;
@@ -3910,6 +3912,12 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int avoid_pole_count = 0;  /* count attempts to avoid pole */
   double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
 
+
+  if ( cdoVerbose )
+    {
+      cdoPrint("north_thresh: %g", north_thresh);
+      cdoPrint("south_thresh: %g", south_thresh);
+    }
 
   if ( cdoTimer ) timer_start(timer_remap_con);
 
