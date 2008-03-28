@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ void *Remap(void *argument)
 {
   static char func[] = "Remap";
   enum {REMAPCON, REMAPBIL, REMAPBIC, REMAPDIS, REMAPDIS1, REMAPCON1, 
-        REMAPCONF, REMAPBILF, REMAPBICF, REMAPDISF, REMAPXXX};
+        GENCON, GENBIL, GENBIC, GENDIS, REMAPXXX};
   int operatorID;
   int operfunc;
   int streamID1, streamID2 = -1;
@@ -89,14 +89,14 @@ void *Remap(void *argument)
   cdoOperatorAdd("remapdis",    REMAPDIS,    0, NULL);
   cdoOperatorAdd("remapdis1",   REMAPDIS1,   0, NULL);
   cdoOperatorAdd("remapcon1",   REMAPCON1,   0, NULL);
-  cdoOperatorAdd("gencon",      REMAPCONF,   1, NULL);
-  cdoOperatorAdd("genbil",      REMAPBILF,   1, NULL);
-  cdoOperatorAdd("genbic",      REMAPBICF,   1, NULL);
-  cdoOperatorAdd("gendis",      REMAPDISF,   1, NULL);
+  cdoOperatorAdd("gencon",      GENCON,      1, NULL);
+  cdoOperatorAdd("genbil",      GENBIL,      1, NULL);
+  cdoOperatorAdd("genbic",      GENBIC,      1, NULL);
+  cdoOperatorAdd("gendis",      GENDIS,      1, NULL);
   cdoOperatorAdd("remap",       REMAPXXX,    0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc   = cdoOperatorFunc(operatorID);
   lwrite_remap = cdoOperatorIntval(operatorID);
 
   envstr = getenv("MAX_REMAPS");
@@ -319,7 +319,7 @@ void *Remap(void *argument)
       if ( remap_test ) reorder_links(&remaps[0].vars);
     }
 
-  if ( operfunc == REMAPCON || operfunc == REMAPCON1 || operfunc == REMAPCONF )
+  if ( operfunc == REMAPCON || operfunc == REMAPCON1 || operfunc == GENCON )
     {
       norm_opt = NORM_OPT_FRACAREA;
 
@@ -352,19 +352,19 @@ void *Remap(void *argument)
     {
     case REMAPCON:
     case REMAPCON1:
-    case REMAPCONF:
+    case GENCON:
       map_type = MAP_TYPE_CONSERV;
       break;
     case REMAPBIL:
-    case REMAPBILF:
+    case GENBIL:
       map_type = MAP_TYPE_BILINEAR;
       break;
     case REMAPBIC:
-    case REMAPBICF:
+    case GENBIC:
       map_type = MAP_TYPE_BICUBIC;
       break;
     case REMAPDIS:
-    case REMAPDISF:
+    case GENDIS:
       map_type = MAP_TYPE_DISTWGT;
       break;
     case REMAPDIS1:

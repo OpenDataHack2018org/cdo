@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -47,7 +47,8 @@ static int input_iarray(int nval, int *array)
   return (ival);
 }
 
-
+static int input_darray(FILE *gfp, int nval, double *array);
+/*
 static int input_darray(int nval, double *array)
 {
   int i, n;
@@ -63,7 +64,7 @@ static int input_darray(int nval, double *array)
 
   return (ival);
 }
-
+*/
 
 void *Input(void *argument)
 {
@@ -124,7 +125,7 @@ void *Input(void *argument)
 	  
 	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
-	  rval = input_darray(gridsize, array);
+	  rval = input_darray(stdin, gridsize, array);
 
 	  if ( nrecs > 0 && rval == 0 ) break;
 
@@ -174,7 +175,7 @@ void *Input(void *argument)
 	  
 	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
-	  rval = input_darray(gridsize, array);
+	  rval = input_darray(stdin, gridsize, array);
 	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
 	}
       else if ( operatorID == INPUTSRV )
@@ -222,7 +223,7 @@ void *Input(void *argument)
 	  
 	  cdoPrint("Enter all %d elements of record %d!", gridsize, nrecs+1);
 	  
-	  rval = input_darray(gridsize, array);
+	  rval = input_darray(stdin, gridsize, array);
 	  if ( rval != gridsize ) cdoAbort("Invalid data input!");
 	}
 

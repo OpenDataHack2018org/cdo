@@ -1184,7 +1184,7 @@ void skip_nondigit_lines(FILE *gfp)
     {
       do
 	c = fgetc(gfp);
-      while ( isspace(c) && c != EOF );
+      while ( (isspace(c) || c == ',') && c != EOF );
 
       if ( c == EOF || isdigit (c) || c == '.' || c == '+' || c == '-' ) break;
       else
@@ -1194,6 +1194,7 @@ void skip_nondigit_lines(FILE *gfp)
 
   ungetc(c, gfp);
 }
+
 
 int input_ival(FILE *gfp, int *ival)
 {
@@ -1207,6 +1208,7 @@ int input_ival(FILE *gfp, int *ival)
 
   return (read_items);
 }
+
 
 int input_darray(FILE *gfp, int n_values, double *array)
 {
