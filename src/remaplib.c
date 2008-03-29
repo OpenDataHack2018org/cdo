@@ -80,6 +80,7 @@
 
 
 /* static double north_thresh = 1.45;  */ /* threshold for coord transf. */
+/* static double south_thresh =-2.00;  */ /* threshold for coord transf. */
 static double north_thresh = 2.00;  /* threshold for coord transf. */
 static double south_thresh =-2.00;  /* threshold for coord transf. */
 

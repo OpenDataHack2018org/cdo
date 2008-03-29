@@ -327,11 +327,11 @@ void *Remap(void *argument)
 
       if ( envstr )
         {
-	  if ( strcmp(envstr, "fracarea") == 0 )
+	  if ( strncmp(envstr, "frac", 4) == 0 )
 	    norm_opt = NORM_OPT_FRACAREA;
-	  else if ( strcmp(envstr, "destarea") == 0 )
+	  else if ( strncmp(envstr, "dest", 4) == 0 )
 	    norm_opt = NORM_OPT_DESTAREA;
-	  else if ( strcmp(envstr, "none") == 0 )
+	  else if ( strncmp(envstr, "none", 4) == 0 )
 	    norm_opt = NORM_OPT_NONE;
 	  else
 	    cdoWarning("NORMALIZE_OPT=%s unsupported!", envstr);
@@ -340,9 +340,9 @@ void *Remap(void *argument)
       if ( cdoVerbose )
         {
 	  if ( norm_opt == NORM_OPT_FRACAREA )
-	    cdoPrint("Normalization option: fracarea");
+	    cdoPrint("Normalization option: frac");
 	  else if ( norm_opt == NORM_OPT_DESTAREA )
-	    cdoPrint("Normalization option: destarea");
+	    cdoPrint("Normalization option: dest");
 	  else
 	    cdoPrint("Normalization option: none");
 	}
@@ -596,7 +596,6 @@ void *Remap(void *argument)
 
 	  gridsize2 = gridInqSize(gridID2);
 
-	  /*
 	  if ( operfunc == REMAPCON )
 	    {
 	      double grid2_err;
@@ -606,7 +605,7 @@ void *Remap(void *argument)
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
 		      grid2_err = remaps[r].grid.grid2_frac[i]*remaps[r].grid.grid2_area[i];
-		      if ( grid2_err != 0 )
+		      if ( fabs(grid2_err) > 0 )
 			array2[i] = array2[i]/grid2_err;
 		      else
 			array2[i] = missval;
@@ -616,14 +615,13 @@ void *Remap(void *argument)
 		{
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
-		      if ( remaps[r].grid.grid2_frac[i] != 0 )
+		      if ( fabs(remaps[r].grid.grid2_frac[i]) > 0 )
 			array2[i] = array2[i]/remaps[r].grid.grid2_frac[i];
 		      else
 			array2[i] = missval;
 		    }
 		}
 	    }
-	  */
 
 	  vlistInqVarName(vlistID1, varID, varname);
 	  if ( operfunc == REMAPCON )

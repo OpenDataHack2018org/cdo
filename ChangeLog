@@ -16,6 +16,7 @@
 	* splitsel: bug fix for multilevel/multivar datasets [report: Heiner Widmann]
 	* remaplib: set luse_grid_corners = TRUE for GRID_CELL (bug fix)
 	* remap_conserv: skip very small regions if num_subseg exceeded limit
+	* remapcon: bug fix for NORMALIZE_OPT 'dest' and 'none'
 	* Seltime: changed value of NOPERATORS (bug fix)
 	* Version 1.1.1 released
 	

@@ -15,6 +15,10 @@
   GNU General Public License for more details.
 */
 
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
