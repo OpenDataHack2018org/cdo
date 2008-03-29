@@ -27,7 +27,11 @@ char *getProgname(char *string)
 {
   char *progname;
 
+#if defined (_WIN32)
+  progname = strrchr(string, '\\');
+#else
   progname = strrchr(string, '/');
+#endif
 
   if ( progname == NULL ) progname = string;
   else                    progname++;

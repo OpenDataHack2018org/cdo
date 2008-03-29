@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -1134,7 +1134,11 @@ void cdoFinish(void)
       if ( nvals > 0 )
 	{
 	  if ( sizeof(INT64) > sizeof(long) )
+#if defined (_WIN32)
+	    fprintf(stderr, "%s: Processed %l64d value%s from %d variable%s over %d timestep%s.",
+#else
 	    fprintf(stderr, "%s: Processed %lld value%s from %d variable%s over %d timestep%s.",
+#endif
 		    processInqPrompt(),
 		    nvals, nvals > 1 ? "s" : "",
 		    nvars, nvars > 1 ? "s" : "",
