@@ -47,7 +47,7 @@ static int input_iarray(int nval, int *array)
   return (ival);
 }
 
-static int input_darray(FILE *gfp, int nval, double *array);
+int input_darray(FILE *gfp, int nval, double *array);
 /*
 static int input_darray(int nval, double *array)
 {
