@@ -1135,7 +1135,7 @@ void cdoFinish(void)
 	{
 	  if ( sizeof(INT64) > sizeof(long) )
 #if defined (_WIN32)
-	    fprintf(stderr, "%s: Processed %l64d value%s from %d variable%s over %d timestep%s.",
+	    fprintf(stderr, "%s: Processed %I64d value%s from %d variable%s over %d timestep%s.",
 #else
 	    fprintf(stderr, "%s: Processed %lld value%s from %d variable%s over %d timestep%s.",
 #endif
