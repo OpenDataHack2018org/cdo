@@ -105,8 +105,8 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 
       for ( k = 0; k < ncorner; ++k )
 	{
-	  if ( (grid_center_lon[i] - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
-	  if ( (lon_bounds[k] - grid_center_lon[i]) > 270 ) lon_bounds[k] -= 360;
+	  if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
+	  if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
 	}
 
       lon_bounds[ncorner] = lon_bounds[0];

@@ -230,6 +230,8 @@ void *Seltime(void *argument)
   else
     nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
 
+  if ( nsel < 1 ) cdoAbort("No timestep selected!");
+
   intarr = (int *) listArrayPtr(ilist);
   fltarr = (double *) listArrayPtr(flist);
 

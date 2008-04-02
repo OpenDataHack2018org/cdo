@@ -165,6 +165,12 @@ void *Arith(void *argument)
     }
 
   vlistID3 = vlistDuplicate(vlistIDx1);
+  if ( filltype == FILL_TS && vlistIDx1 != vlistID1 )
+    {
+      nvars  = vlistNvars(vlistID1);
+      for ( varID = 0; varID < nvars; varID++ )
+	vlistDefVarMissval(vlistID3, varID, vlistInqVarMissval(vlistID1, varID));
+    }
 
   taxisID3 = taxisDuplicate(taxisIDx1);
   vlistDefTaxis(vlistID3, taxisID3);

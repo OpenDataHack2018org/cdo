@@ -7,6 +7,7 @@
 	* New operator: del29feb to delete the 29. February [request: Etienne Tourigny]
 	* New operator: zaxisdes
 	* Exprf: using MT safe version of bison and flex (bug fix) [report: Claas Teichmann]
+	* Arith: using missval from vlistID1 if ( filltype == FILL_TS && vlistIDx1 != vlistID1 )
 	* Arithc: recalculate number of missing values (bug fix) [report: Holger Goettel]
 	* Vertint: support for data on hybrid half-level
 	* Vertint: support for GME data [request: Luis Kornblueh]
