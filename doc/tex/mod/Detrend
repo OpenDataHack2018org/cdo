@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Detrend
 @Title     = Detrend time series
 @Section   = Regression
@@ -36,10 +35,14 @@ it is
 o(t,x) = i(t,x) - (a(x) + b(x)t)
 @EndDisplayMath
 @EndifDoc
-This operator has to keep the fields of all time steps concurrently in the memory.
-If not enough memory is available, use the operators @mod{trend} and @mod{subtrend}.
 @EndDescription
 @EndOperator
+
+
+@BeginNote
+This operator has to keep the fields of all time steps concurrently in the memory.
+If not enough memory is available, use the operators @mod{trend} and @mod{subtrend}.
+@EndNote
 
 
 @BeginExample

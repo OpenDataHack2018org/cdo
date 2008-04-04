@@ -88,6 +88,7 @@ void *Nmltest(void *argument);
 void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pinfo(void *argument);
+void *Regres(void *argument);
 void *Remap(void *argument);
 void *Remapeta(void *argument);
 void *Replace(void *argument);
@@ -281,6 +282,7 @@ void *Wct(void *argument);
                                  "outputfld", "outputarr"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", "outputboundscpt", "outputvector", "outputtri"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
+#define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
@@ -495,6 +497,7 @@ static MODULES Modules[] =
   { Output,         OutputHelp,        OutputOperators,        -1,  0 },
   { Outputgmt,      NULL,              OutputgmtOperators,      1,  0 },
   { Pinfo,          NULL,              PinfoOperators,          1,  1 },
+  { Regres,         RegresHelp,        RegresOperators,         1,  1 },
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
   { Remap,          RemapgridHelp,     RemapgridOperators,      1,  1 },
   { Remap,          GenweightsHelp,    GenweightsOperators,     1,  1 },

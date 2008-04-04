@@ -7,6 +7,7 @@ Version 1.1.1 (?? April 2008):
       o Module Vertint support for GME data
 
    * New operators:
+      o Regression - regres
       o Grid cell area/weights - gridarea, gridweights
       o Z-axis description - zaxisdes
 

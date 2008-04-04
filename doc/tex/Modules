@@ -67,6 +67,7 @@ Yseasstat     Statistical values
 Yseaspctl     Statistical values
 Ydrunstat     Statistical values
 Ydrunpctl     Statistical values
+Regres        Regression
 Detrend       Regression
 Trend         Regression
 Subtrend      Regression

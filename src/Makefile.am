@@ -56,6 +56,7 @@ cdo_SOURCES = Arith.c		\
               Output.c  	\
               Outputgmt.c  	\
               Pinfo.c  	        \
+              Regres.c  	\
               Remap.c  	        \
               Remapeta.c    	\
               Replace.c  	\

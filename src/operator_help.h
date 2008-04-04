@@ -2448,6 +2448,21 @@ static char *YdrunpctlHelp[] = {
     NULL
 };
 
+static char *RegresHelp[] = {
+    "NAME",
+    "    regres - Regression",
+    "",
+    "SYNOPSIS",
+    "    regres  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    The values of the input file ifile are assumed to be distributed as",
+    "    N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the",
+    "    parameter b. For every field element x only those time steps ",
+    "    t belong to the sample S(x), which have i(t,x) NE miss.",
+    NULL
+};
+
 static char *DetrendHelp[] = {
     "NAME",
     "    detrend - Detrend time series",
@@ -2458,8 +2473,6 @@ static char *DetrendHelp[] = {
     "DESCRIPTION",
     "    Every time series in ifile is linearly detrended. For every field element x ",
     "    only those time steps t belong to the sample S(x), which have i(t,x) NE miss.",
-    "    This operator has to keep the fields of all time steps concurrently in the memory.",
-    "    If not enough memory is available, use the operators trend and subtrend.",
     NULL
 };
 
