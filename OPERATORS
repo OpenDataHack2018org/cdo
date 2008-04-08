@@ -336,6 +336,7 @@ Operator catalog:
 -------------------------------------------------------------
    Regression
 -------------------------------------------------------------
+      Regres     regres          Regression
       Detrend    detrend         Detrend
       Trend      trend           Trend
       Subtrend   subtrend        Subtract trend
