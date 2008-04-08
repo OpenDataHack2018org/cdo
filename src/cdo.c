@@ -33,6 +33,13 @@
 #endif
 #include <unistd.h>         /* sysconf */
 
+#if defined (SX)
+#define RLIM_T  long long
+#else
+#define RLIM_T  rlim_t
+#endif
+
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -95,7 +102,7 @@ int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
 	status = getrlimit(resource, &rlim); \
 	if ( status == 0 ) \
 	  { \
-	    if ( sizeof(rlim_t) > sizeof(long) ) \
+	    if ( sizeof(RLIM_T) > sizeof(long) ) \
 	      { \
 		fprintf(stderr, "CUR %-15s = %llu\n", #resource, (long long) rlim.rlim_cur); \
 		fprintf(stderr, "MAX %-15s = %llu\n", #resource, (long long) rlim.rlim_max); \
@@ -714,7 +721,7 @@ int main(int argc, char *argv[])
 #define  MIN_STACK_SIZE  67108864L  /* 64MB */
     int status;
     struct rlimit rlim;
-    rlim_t min_stack_size = MIN_STACK_SIZE;
+    RLIM_T min_stack_size = MIN_STACK_SIZE;
 
     status = getrlimit(RLIMIT_STACK, &rlim);
 

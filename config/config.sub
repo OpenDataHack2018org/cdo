@@ -994,6 +994,18 @@ case $basic_machine in
 		basic_machine=i386-sequent
 		os=-dynix
 		;;
+	sx4 | sx4-nec)
+		basic_machine=sx4-nec
+		os=-superux
+		;;
+	sx5 | sx5-nec)
+		basic_machine=sx5-nec
+		os=-superux
+		;;
+	sx6 | sx6-nec)
+		basic_machine=sx6-nec
+		os=-superux
+		;;
 	t3e)
 		basic_machine=alphaev5-cray
 		os=-unicos
