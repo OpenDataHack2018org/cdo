@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -126,13 +126,14 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 int vlistIsSzipped(int vlistID)
 {
   int lszip = FALSE;
-  int nvars, varID;
+  int nvars, varID, ztype;
 
   nvars = vlistNvars(vlistID);
 
   for ( varID = 0; varID < nvars; varID++ )
-    {
-      if ( vlistInqVarSzip(vlistID, varID) )
+    {						
+      ztype = vlistInqVarZtype(vlistID, varID);
+      if ( ztype == COMPRESS_SZIP )
 	{
 	  lszip = TRUE;
 	  break;

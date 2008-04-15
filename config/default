@@ -53,6 +53,13 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local/sles9-x64 \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
 	;;        
+# x86_64-etch-x64-linux
+    squall1)
+ 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
+	            --with-netcdf=/sw/etch-x64/netcdf-3.6.1 \
+                    --with-szlib=/sw/etch-x64/szip-2.1 \
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	;;        
 # i686-suse-linux
     linux | laptop)
 	${CONFPATH}configure --prefix=$HOME/local \

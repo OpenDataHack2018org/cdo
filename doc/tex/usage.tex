@@ -24,8 +24,8 @@ The following options are available for all operators:
               \hline
               \rowcolor[gray]{.9}
                 \sl $<$format$>$ & \sl $<$nbits$>$ \\
-                {\tt grb}                    & {\tt 1 - 32} \\
-                {\tt nc, nc2, srv, ext, ieg} & {\tt 32/64}   \\
+                {\tt grb}                         & {\tt 1 - 32} \\
+                {\tt nc, nc2, nc4, srv, ext, ieg} & {\tt 32/64}   \\
               \hline
               \end{tabular}
               \vspace*{1mm}
@@ -39,13 +39,14 @@ The following options are available for all operators:
               \hspace*{0cm}\begin{tabular}{|l|l|}
               \hline
               \rowcolor[gray]{.9}
-              {\bf File format} & \sl $<$format$>$ \\
-               GRIB version 1   & {\tt grb} \\
-               netCDF           & {\tt nc}  \\
-               netCDF version 2 & {\tt nc2} \\
-               SERVICE          & {\tt srv} \\
-               EXTRA            & {\tt ext} \\
-               IEG              & {\tt ieg} \\
+              {\bf File format}          & \sl $<$format$>$ \\
+               GRIB version 1            & {\tt grb} \\
+               netCDF                    & {\tt nc}  \\
+               netCDF version 2 (64-bit) & {\tt nc2} \\
+               netCDF-4 classic (HDF5)   & {\tt nc4} \\
+               SERVICE                   & {\tt srv} \\
+               EXTRA                     & {\tt ext} \\
+               IEG                       & {\tt ieg} \\
               \hline
               \end{tabular}
               \vspace*{1mm}
@@ -72,6 +73,8 @@ The following options are available for all operators:
          \> Print extra details for some operators. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -z szip}
          \> Compress GRIB records with szip. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl \ \ zip}
+         \> Deflate compression of netCDF4 variables. \\
 \end{tabbing}
 %\footnotemark
 %\footnotetext{Needs szip support compiled in}

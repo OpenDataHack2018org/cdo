@@ -613,10 +613,30 @@ int pstreamOpenWrite(const char *argument, int filetype)
       if ( cdoDefaultByteorder != CDI_UNDEFID )
 	streamDefByteorder(fileID, cdoDefaultByteorder);
 
+      if ( cdoCompress )
+	{
+	  if      ( filetype == FILETYPE_GRB )
+	    {
+	      cdoZtype  = COMPRESS_SZIP;
+	      cdoZlevel = 0;
+	    }
+	  else if ( filetype == FILETYPE_NC4 )
+	    {
+	      cdoZtype  = COMPRESS_ZIP;
+	      cdoZlevel = 1;
+	    }
+	}
+
       if ( cdoZtype != COMPRESS_NONE )
 	{
 	  streamDefZtype(fileID, cdoZtype);
 	  streamDefZlevel(fileID, cdoZlevel);
+
+	  if ( cdoZtype == COMPRESS_SZIP && filetype != FILETYPE_GRB )
+	    cdoWarning("SZIP compression not available for non GRIB data!");
+
+	  if ( cdoZtype == COMPRESS_ZIP && filetype != FILETYPE_NC4 )
+	    cdoWarning("Deflate compression not available for non netCDF4 data!");
 	}
       /*
       if ( cdoDefaultInstID != CDI_UNDEFID )

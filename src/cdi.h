@@ -17,22 +17,23 @@ extern "C" {
 
 /* Error identifier */
 
-#define	 CDI_NOERR        	  0   /* No Error                         */
-#define  CDI_ESYSTEM            -10   /* Operating system error           */
-#define  CDI_EINVAL             -20   /* Invalid argument                 */
-#define  CDI_EUFTYPE            -21   /* Unsupported file type            */
-#define  CDI_ELIBNAVAIL         -22   /* xxx library not available        */
-#define  CDI_EUFSTRUCT          -23   /* Unsupported file structure       */
+#define	 CDI_NOERR        	  0   /* No Error                             */
+#define  CDI_ESYSTEM            -10   /* Operating system error               */
+#define  CDI_EINVAL             -20   /* Invalid argument                     */
+#define  CDI_EUFTYPE            -21   /* Unsupported file type                */
+#define  CDI_ELIBNAVAIL         -22   /* xxx library not available            */
+#define  CDI_EUFSTRUCT          -23   /* Unsupported file structure           */
 
 /* File types */
 
-#define  FILETYPE_GRB             1   /* File type GRIB                   */
-#define  FILETYPE_GB2             2   /* File type GRIB version 2         */
-#define  FILETYPE_NC              3   /* File type netCDF                 */
-#define  FILETYPE_NC2             4   /* File type netCDF version 2       */
-#define  FILETYPE_SRV             5   /* File type SERVICE                */
-#define  FILETYPE_EXT             6   /* File type EXTRA                  */
-#define  FILETYPE_IEG             8   /* File type IEG                    */
+#define  FILETYPE_GRB             1   /* File type GRIB                       */
+#define  FILETYPE_GB2             2   /* File type GRIB version 2             */
+#define  FILETYPE_NC              3   /* File type netCDF                     */
+#define  FILETYPE_NC2             4   /* File type netCDF version 2           */
+#define  FILETYPE_NC4             5   /* File type netCDF version 4 (classic) */
+#define  FILETYPE_SRV             6   /* File type SERVICE                    */
+#define  FILETYPE_EXT             7   /* File type EXTRA                      */
+#define  FILETYPE_IEG             8   /* File type IEG                        */
 
 /* Compress types */
 
@@ -40,6 +41,7 @@ extern "C" {
 #define  COMPRESS_SZIP            1
 #define  COMPRESS_GZIP            2
 #define  COMPRESS_BZIP2           3
+#define  COMPRESS_ZIP             4
 
 /* external data types */
 
@@ -313,8 +315,10 @@ int     vlistInqVarGrid(int vlistID, int varID);
 int     vlistInqVarZaxis(int vlistID, int varID);
 int     vlistInqVarTime(int vlistID, int varID);
 
-void    vlistDefVarSzip(int vlistID, int varID, int szip);
-int     vlistInqVarSzip(int vlistID, int varID);
+void    vlistDefVarZtype(int vlistID, int varID, int ztype);
+int     vlistInqVarZtype(int vlistID, int varID);
+void    vlistDefVarZlevel(int vlistID, int varID, int zlevel);
+int     vlistInqVarZlevel(int vlistID, int varID);
 
 /*      vlistDefVarCode: Define the code number of a Variable */
 void    vlistDefVarCode(int vlistID, int varID, int code);

@@ -1,3 +1,9 @@
+2008-08-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.2.0
+	* add support for netCDF4 classic with deflate option
+	* Version 1.2.0 released
+	
 2008-04-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.1.1

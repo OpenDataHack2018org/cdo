@@ -73,20 +73,25 @@ void printFiletype(int streamID, int vlistID)
 	}
     }
 
-  if ( filetype == FILETYPE_GRB )
+  if ( filetype == FILETYPE_GRB || filetype == FILETYPE_NC4 )
     {
       int nvars, varID;
+      int ztype;
 
       nvars = vlistNvars(vlistID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  if ( vlistInqVarSzip(vlistID, varID) )
+	  if ( ztype = vlistInqVarZtype(vlistID, varID) )
 	    {
-	      printf(" SZIP");
+	      if ( ztype == COMPRESS_SZIP )
+		printf(" SZIP");
+	      else if ( ztype == COMPRESS_ZIP )
+		printf(" ZIP");
+
 	      break;
 	    }
-	}      
+	}
     }
 
   printf("\n");
@@ -382,7 +387,7 @@ void *Sinfo(void *argument)
 
 	  fprintf(stdout, " %-3s", pstr);
 
-	  if ( vlistInqVarSzip(vlistID, varID) )
+	  if ( vlistInqVarZtype(vlistID, varID) )
 	    fprintf(stdout, "z");
 	  else
 	    fprintf(stdout, " ");

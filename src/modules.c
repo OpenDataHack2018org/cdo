@@ -134,6 +134,7 @@ void *Template1(void *argument);
 void *Template2(void *argument);
 void *Test(void *argument);
 void *Test2(void *argument);
+void *Testdata(void *argument);
 void *Tests(void *argument);
 void *Timsort(void *argument);
 /* RQ */
@@ -334,6 +335,7 @@ void *Wct(void *argument);
 #define  Template2Operators     {"template2"}
 #define  TestOperators          {"test"}
 #define  Test2Operators         {"test2"}
+#define  TestdataOperators      {"testdata"}
 #define  TestsOperators         {"normal", "studentt", "chisquare", "beta", "fisher"}
 #define  TimsortOperators       {"timsort"}
 /* RQ */
@@ -545,6 +547,7 @@ static MODULES Modules[] =
   { Template2,      NULL,              Template2Operators,      1,  1 },
   { Test,           NULL,              TestOperators,           1,  1 },
   { Test2,          NULL,              Test2Operators,          2,  1 },
+  { Testdata,       NULL,              TestdataOperators,       1,  1 },
   { Tests,          NULL,              TestsOperators,          1,  1 },
   /* RQ */
   { Timcount,       NULL,              TimcountOperators,       1,  1 },

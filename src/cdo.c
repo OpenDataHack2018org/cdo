@@ -85,6 +85,7 @@ int cdoBenchmark   = FALSE;
 int cdoTimer       = FALSE;
 int cdoVerbose     = FALSE;
 int cdoDebug       = 0;
+int cdoCompress    = FALSE;
 
 int cdoExpMode     = -1;
 char *cdoExpName   = NULL;
@@ -158,8 +159,8 @@ static void usage(void)
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (32/64 for nc, nc2, srv, ext, ieg; 1 - 32 for grb)\n");
-  fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, srv, ext or ieg)\n");
+  fprintf(stderr, "                   (32/64 for nc, nc2, nc4, srv, ext, ieg; 1 - 32 for grb)\n");
+  fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, nc4, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Grid name or file. Available grids: \n");
   fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
@@ -175,7 +176,7 @@ static void usage(void)
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
   /*
   fprintf(stderr, "    -p <prec>      Set the precision of the output data in bytes\n");
-  fprintf(stderr, "                   (4/8 for nc, nc2, srv, ext, ieg; 1/2/3 for grb)\n");
+  fprintf(stderr, "                   (4/8 for nc, nc2, nc4, srv, ext, ieg; 1/2/3 for grb)\n");
   */
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
   fprintf(stderr, "    -r             Convert from an absolute to a relative time axis\n");
@@ -190,6 +191,7 @@ static void usage(void)
   fprintf(stderr, "    -V             Print the version number\n");
   fprintf(stderr, "    -v             Print extra details for some operators\n");
   fprintf(stderr, "    -z szip        Compress GRIB records with szip\n");
+  fprintf(stderr, "        zip        Deflate compression of netCDF4 variables\n");
   fprintf(stderr, "\n");
 
   fprintf(stderr, "  Operators:\n");
@@ -397,6 +399,7 @@ void setDefaultFileType(char *filetypestr, int labort)
 
       if      ( strncmp(filetypestr, "grb", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
       else if ( strncmp(filetypestr, "nc2", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
+      else if ( strncmp(filetypestr, "nc4", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
       else if ( strncmp(filetypestr, "nc",  2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
       else if ( strncmp(filetypestr, "srv", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
       else if ( strncmp(filetypestr, "ext", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_EXT; }
@@ -406,7 +409,7 @@ void setDefaultFileType(char *filetypestr, int labort)
 	  if ( labort )
 	    {
 	      fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-	      fprintf(stderr, "Available filetypes: grb, nc, nc2, srv, ext and ieg\n");
+	      fprintf(stderr, "Available filetypes: grb, nc, nc2, nc4, srv, ext and ieg\n");
 	      exit(EXIT_FAILURE);
 	    }
 	  else
@@ -427,8 +430,8 @@ void setDefaultFileType(char *filetypestr, int labort)
 	    {
 	      fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
 	      fprintf(stderr, "Use format[_nbits] with:\n");
-	      fprintf(stderr, "    format = grb, nc, nc2, srv, ext or ieg\n");
-	      fprintf(stderr, "    nbits  = 32/64 for nc, nc2, srv, ext, ieg; 1 - 32 for grb\n");
+	      fprintf(stderr, "    format = grb, nc, nc2, nc4, srv, ext or ieg\n");
+	      fprintf(stderr, "    nbits  = 32/64 for nc, nc2, nc4, srv, ext, ieg; 1 - 32 for grb\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
@@ -462,6 +465,11 @@ void defineCompress(const char *arg)
     {
       cdoZtype  = COMPRESS_GZIP;
       cdoZlevel = 6;
+    }
+  else if ( strncmp(arg, "zip", len) == 0 )
+    {
+      cdoZtype  = COMPRESS_ZIP;
+      cdoZlevel = 1;
     }
   else
     fprintf(stderr, "Compression %s unsupported!\n", arg);
@@ -580,6 +588,9 @@ int main(int argc, char *argv[])
 	case 'v':
 	  cdoVerbose = TRUE;
 	  break;
+	case 'Z':
+	  cdoCompress = TRUE;
+          break;
 	case 'z':
 	  defineCompress(cdoOptarg);
           break;
