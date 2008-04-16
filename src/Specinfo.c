@@ -157,8 +157,8 @@ void *Specinfo(void *argument)
       ni2    = ni1;
       ngp_gme1 = NGP_GME(ni1);
       ngp_gme2 = NGP_GME(ni2);
-      nsp1   = ngp_gme1 / 2;
-      nsp2   = ngp_gme2 / 2;
+      nsp1   = ngp_gme1;
+      nsp2   = ngp_gme2;
       ntr1   = NSP2NTR(nsp1);
       ntr2   = NSP2NTR(nsp2);
       nlat1  = ntr1 + ntr1%2;
@@ -241,8 +241,8 @@ void *Specinfo(void *argument)
       ni2 = ni1;
       ngp_gme1 = NGP_GME(ni1);
       ngp_gme2 = NGP_GME(ni2);
-      nsp1   = ngp_gme1 / 2;
-      nsp2   = ngp_gme2 / 2;
+      nsp1   = ngp_gme1;
+      nsp2   = ngp_gme2;
       ntr1   = NSP2NTR(nsp1);
       ntr2   = NSP2NTR(nsp2);
       nlat1  = ntr1 + ntr1%2;
