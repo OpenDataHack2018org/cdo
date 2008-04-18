@@ -34,7 +34,7 @@
 
 #define NSP2NTR(nsp)          ((int) ((((sqrt((double)(4*nsp+1)))-3)/2)))
 #define NGP2ICONL(ngp)        ((int) (log10(((double)ngp)/80.)/log10(4.)))
-#define NGP_ICON(iconr,iconl) (20*iconr*iconr*pow(4., iconl))
+#define NGP_ICON(iconr,iconl) ((int) (20*iconr*iconr*pow(4., iconl)))
 #define NGP_GME(ni)           ((ni+1)*(ni+1)*10)
 #define NGP2NI(ngp)           ((int) sqrt((double)ngp/10.) - 1)
 

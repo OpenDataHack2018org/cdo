@@ -124,26 +124,28 @@ void *Setrange(void *argument)
 	  if ( operatorID == SETRTOC )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
-		if ( array[i] != missval ) {
-		  if ( array[i] >= rmin && array[i] <= rmax)
-		    {
-		      array[i] = newval;
-		    }
-		}
+		if ( !DBL_IS_EQUAL(array[i], missval) )
+		  {
+		    if ( array[i] >= rmin && array[i] <= rmax)
+		      {
+			array[i] = newval;
+		      }
+		  }
 	    }
 	  else if ( operatorID == SETRTOC2 )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
-		if ( array[i] != missval ) {
-		  if ( array[i] >= rmin && array[i] <= rmax )
-		    {
-		      array[i] = newval;
-		    }
-		  else
-		    {
-		      array[i] = newval2;
-		    }
-		}
+		if ( !DBL_IS_EQUAL(array[i], missval) )
+		  {
+		    if ( array[i] >= rmin && array[i] <= rmax )
+		      {
+			array[i] = newval;
+		      }
+		    else
+		      {
+			array[i] = newval2;
+		      }
+		  }
 	    }
 
 	  streamDefRecord(streamID2, varID, levelID);
