@@ -387,10 +387,10 @@ void *Sinfo(void *argument)
 
 	  fprintf(stdout, " %-3s", pstr);
 
-	  if ( vlistInqVarZtype(vlistID, varID) )
-	    fprintf(stdout, "z");
-	  else
+	  if ( vlistInqVarZtype(vlistID, varID) == COMPRESS_NONE )
 	    fprintf(stdout, " ");
+	  else
+	    fprintf(stdout, "z");
 
 	  fprintf(stdout, "%9d", gridsize);
 

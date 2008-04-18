@@ -10,20 +10,20 @@
 #include "statistic.h"
 
 void make_symmetric_matrix_triangular (double **a, int n,
-				       double *d, double *e, char *prompt);
+				       double *d, double *e, const char *prompt);
 double pythagoras (double a, double b);
 void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
-					  double **a, char *prompt);
+					  double **a, const char *prompt);
 int lu_decomposition (double **a, int n, int *index, int *sign);
 void lu_backsubstitution (double **a, int n, int *index, double *b);
 void heap_sort (double *eig_val, double **a, int n);
-static double gamma_help_1 (double a, double x, char *prompt);
-static double gamma_help_2 (double a, double x, char *prompt);
-static double beta_help (double a, double b, double x, char *prompt);
+static double gamma_help_1 (double a, double x, const char *prompt);
+static double gamma_help_2 (double a, double x, const char *prompt);
+static double beta_help (double a, double b, double x, const char *prompt);
 
 void
 eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
-				    int n, char *prompt)
+				    int n, const char *prompt)
 /* After return the rows (!!!) of a are the eigenvectors */
 {
   static char func[] = "eigen_solution_of_symmetric_matrix";
@@ -110,7 +110,7 @@ heap_sort (double *eig_val, double **a, int n)
 
 void
 make_symmetric_matrix_triangular (double **a, int n,
-				  double *d, double *e, char *prompt)
+				  double *d, double *e, const char *prompt)
 {
   int i, j, k;
   double f, g, h, hh, scale;
@@ -233,7 +233,7 @@ pythagoras (double a, double b)
 
 void
 eigen_solution_of_triangular_matrix (double *d, double *e, int n,
-				     double **a, char *prompt)
+				     double **a, const char *prompt)
 {
   int i, k, l, m, iter;
   double b, c, f, g, p, r, s;
@@ -524,7 +524,7 @@ fft (double *real, double *imag, int n, int sign)
 }
 
 void
-ft (double *real, double *imag, int n, int sign, char *prompt)
+ft (double *real, double *imag, int n, int sign, const char *prompt)
 {				/* sign should be 1 (FT) or -1 (reverse FT) */
   static char func[] = "ft";
   int j, k;
@@ -590,7 +590,7 @@ lngamma (double x)
 }
 
 double
-incomplete_gamma (double a, double x, char *prompt)
+incomplete_gamma (double a, double x, const char *prompt)
 {
   if (x < 0 || a <= 0)
     {
@@ -606,7 +606,7 @@ incomplete_gamma (double a, double x, char *prompt)
 }
 
 static double
-gamma_help_1 (double a, double x, char *prompt)
+gamma_help_1 (double a, double x, const char *prompt)
 {
   int i;
   double ap, del, gln, sum;
@@ -631,7 +631,7 @@ gamma_help_1 (double a, double x, char *prompt)
 }
 
 static double
-gamma_help_2 (double a, double x, char *prompt)
+gamma_help_2 (double a, double x, const char *prompt)
 {
   int i;
   double an, b, c, d, del, gln, h;
@@ -667,7 +667,7 @@ gamma_help_2 (double a, double x, char *prompt)
 }
 
 double
-beta (double a, double b, char *prompt)
+beta (double a, double b, const char *prompt)
 {
   if (a <= 0 || b <= 0)
     {
@@ -680,15 +680,21 @@ beta (double a, double b, char *prompt)
 }
 
 double
-incomplete_beta (double a, double b, double x, char *prompt)
+incomplete_beta (double a, double b, double x, const char *prompt)
 {
   double c;
 
-  if (a <= 0 || b <= 0 || x < 0 || x > 1)
+  if (a <= 0 || b <= 0)
     {
       fprintf (stderr,
 	       "%s: IMPLEMENTATION ERROR! (Invalid argument in function "
 	       "\"incomplete_beta\")\n", prompt);
+      exit (4);
+    }
+
+  if (x < 0 || x > 1)
+    {
+      fprintf (stderr, "%s: Value out of range (0-1)!\n", prompt);
       exit (4);
     }
 
@@ -702,7 +708,7 @@ incomplete_beta (double a, double b, double x, char *prompt)
 }
 
 static double
-beta_help (double a, double b, double x, char *prompt)
+beta_help (double a, double b, double x, const char *prompt)
 {
   int m, m2;
   double aa, c, d, del, h, qab, qam, qap;
@@ -757,14 +763,14 @@ normal_density (double x)
 }
 
 double
-normal (double x, char *prompt)
+normal (double x, const char *prompt)
 {
   return x > 0 ? 0.5 * (1 + incomplete_gamma (0.5, x * x / 2, prompt)) :
     x < 0 ? 0.5 * (1 - incomplete_gamma (0.5, x * x / 2, prompt)) : 0.5;
 }
 
 double
-normal_inv (double p, char *prompt)
+normal_inv (double p, const char *prompt)
 {
   static double last_p = 0.5, last_x = 0;
   double x, xx;
@@ -801,7 +807,7 @@ normal_inv (double p, char *prompt)
 }
 
 double
-student_t_density (double n, double x, char *prompt)
+student_t_density (double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
@@ -815,7 +821,7 @@ student_t_density (double n, double x, char *prompt)
 }
 
 double
-student_t (double n, double x, char *prompt)
+student_t (double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
@@ -833,7 +839,7 @@ student_t (double n, double x, char *prompt)
 }
 
 double
-student_t_inv (double n, double p, char *prompt)
+student_t_inv (double n, double p, const char *prompt)
 {
   static double last_n = 1, last_p = 0.5, last_x = 0;
   double x, xx;
@@ -872,7 +878,7 @@ student_t_inv (double n, double p, char *prompt)
 }
 
 double
-chi_square_density (double n, double x, char *prompt)
+chi_square_density (double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
@@ -886,7 +892,7 @@ chi_square_density (double n, double x, char *prompt)
 }
 
 double
-chi_square (double n, double x, char *prompt)
+chi_square (double n, double x, const char *prompt)
 {
   if (n <= 0)
     {
@@ -899,7 +905,7 @@ chi_square (double n, double x, char *prompt)
 }
 
 double
-chi_square_inv (double n, double p, char *prompt)
+chi_square_inv (double n, double p, const char *prompt)
 {
   static double last_n = -1, last_p = -1, last_x = -1;
   static double last_last_n = -1, last_last_p = -1, last_last_x = -1;
@@ -943,7 +949,7 @@ chi_square_inv (double n, double p, char *prompt)
 }
 
 void
-chi_square_constants (double n, double p, double *c1, double *c2, char *prompt)
+chi_square_constants (double n, double p, double *c1, double *c2, const char *prompt)
 {
   double delta_c1, delta_c2;
   static double last_n, last_p, last_c1, last_c2;
@@ -1004,7 +1010,7 @@ chi_square_constants (double n, double p, double *c1, double *c2, char *prompt)
 }
 
 double
-beta_distr_density (double a, double b, double x, char *prompt)
+beta_distr_density (double a, double b, double x, const char *prompt)
 {
   if (a <= 0 || b <= 0)
     {
@@ -1018,13 +1024,13 @@ beta_distr_density (double a, double b, double x, char *prompt)
 }
 
 double
-beta_distr (double a, double b, double x, char *prompt)
+beta_distr (double a, double b, double x, const char *prompt)
 {
   return incomplete_beta (a, b, x, prompt);
 }
 
 double
-beta_distr_inv (double a, double b, double p, char *prompt)
+beta_distr_inv (double a, double b, double p, const char *prompt)
 {
   static double last_a = -1, last_b, last_p = -1, last_x = -1;
   static double last_last_a = -1, last_last_b = -1, last_last_p = -1,
@@ -1078,7 +1084,7 @@ beta_distr_inv (double a, double b, double p, char *prompt)
 
 
 void beta_distr_constants(double a, double b, double p, double *c1, double *c2,
-		      char *prompt)
+		      const char *prompt)
 {
   double delta_c1, delta_c2;
   static double last_a, last_b, last_p, last_c1, last_c2;
@@ -1148,7 +1154,7 @@ void beta_distr_constants(double a, double b, double p, double *c1, double *c2,
 }
 
 
-double fisher(double m, double n, double x, char *prompt)
+double fisher(double m, double n, double x, const char *prompt)
 {
   if (m <= 0 || n <= 0)
     {

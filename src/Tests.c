@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -58,6 +58,9 @@ void *Tests(void *argument)
       operatorCheckArgc(1);
 
       degree_of_freedom = atof(operatorArgv()[0]);
+
+      if ( degree_of_freedom <= 0 )
+	cdoAbort("degree of freedom must be positive!");
     }
   else if ( operatorID == BETA )
     {
@@ -67,6 +70,9 @@ void *Tests(void *argument)
 
       p = atof(operatorArgv()[0]);
       q = atof(operatorArgv()[1]);
+
+      if ( p <= 0 || q <= 0 )
+	cdoAbort("p and q must be positive!");
     }
   else if ( operatorID == FISHER )
     {
@@ -76,6 +82,9 @@ void *Tests(void *argument)
 
       n = atof(operatorArgv()[0]);
       d = atof(operatorArgv()[1]);
+
+      if ( n <= 0 || d <= 0 )
+	cdoAbort("both degrees must be positive!");
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -116,31 +125,36 @@ void *Tests(void *argument)
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  normal(array1[i], "tests");
+		  normal(array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == STUDENTT )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  student_t(degree_of_freedom, array1[i], "tests");
+		  student_t(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == CHISQUARE )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  chi_square(degree_of_freedom, array1[i], "tests");
+		  chi_square(degree_of_freedom, array1[i], processInqPrompt());
 	    }
 	  else if ( operatorID == BETA )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  beta_distr(p, q, array1[i], "tests");
+		{
+		  if ( array1[i] < 0 || array1[i] > 1 )
+		    cdoAbort("Value out of range (0-1)!");
+
+		  array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
+		    beta_distr(p, q, array1[i], processInqPrompt());
+		}
 	    }
 	  else if ( operatorID == FISHER )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval) ? missval :
-		  fisher(n, d, array1[i], "tests");
+		  fisher(n, d, array1[i], processInqPrompt());
 	    }
 	  else
 	    {

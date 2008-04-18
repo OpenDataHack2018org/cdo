@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.2.0
 	* add support for netCDF4 classic with deflate option (option -z zip)
+	* New module: Tests (normal, studentt, chisquare, beta, fisher)
 	* Version 1.2.0 released
 	
 2008-04-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
