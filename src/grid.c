@@ -1378,8 +1378,10 @@ int ntr2nlat(int ntr)
     {
       nlat  = nlat + 1;
       nlat2 = NINT(((ntr+1)*3.+1.)/2.);
+      /*
       if ( nlat == nlat2 )
 	Error(func, "Computation of latitudes failed for truncation %d", ntr);
+      */
     }
 
   return (nlat);
@@ -1396,8 +1398,10 @@ int ntr2nlat_linear(int ntr)
     {
       nlat  = nlat + 1;
       nlat2 = NINT(((ntr+1)*2.+1.)/2.);
+      /*
       if ( nlat == nlat2 )
 	Error(func, "Computation of latitudes failed for truncation %d", ntr);
+      */
     }
 
   return (nlat);

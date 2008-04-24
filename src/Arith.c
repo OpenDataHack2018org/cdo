@@ -41,12 +41,12 @@ void *Arith(void *argument)
   static char func[] = "Arith";
   int operatorID;
   int operfunc;
-  enum {FILL_NONE, FILL_TS, FILL_REC};
+  enum {FILL_NONE, FILL_TS, FILL_REC, FILL_FILE};
   int filltype = FILL_NONE;
   int streamIDx1, streamIDx2, streamID1, streamID2, streamID3;
   int gridsize;
   int nrecs, nrecs2, nvars = 0, nlev, recID;
-  int tsID;
+  int tsID, tsID2;
   int varID, levelID;
   int offset;
   int vlistIDx1, vlistIDx2, vlistID1, vlistID2, vlistID3;
@@ -181,13 +181,40 @@ void *Arith(void *argument)
   streamDefVlist(streamID3, vlistID3);
 
   tsID = 0;
+  tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamIDx1, tsID)) )
     {
-      if ( tsID == 0 || filltype == FILL_NONE )
+      if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE )
 	{
-	  nrecs2 = streamInqTimestep(streamIDx2, tsID);
+	  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
 	  if ( nrecs2 == 0 )
-	    cdoAbort("Input streams have different number of timesteps!");
+	    {
+	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
+		{
+		  filltype = FILL_FILE;
+		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", cdoStreamName(1));
+		}
+
+	      if ( filltype == FILL_FILE )
+		{
+		  tsID2 = 0;
+		  streamClose(streamID2);
+		  streamID2 = streamOpenRead(cdoStreamName(1));
+		  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+		  streamIDx2 = streamID2;
+
+		  vlistID2 = streamInqVlist(streamID2);
+		  vlistIDx2 = vlistID2;
+
+		  vlistCompare(vlistID1, vlistID2, func_sft);
+
+		  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
+		  if ( nrecs2 == 0 )
+		    cdoAbort("Empty input stream %s!", cdoStreamName(1));
+		}
+	      else
+		cdoAbort("Input streams have different number of timesteps!");
+	    }
 	}
 
       taxisCopyTimestep(taxisID3, taxisIDx1);
@@ -199,7 +226,7 @@ void *Arith(void *argument)
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, fieldx1->ptr, &fieldx1->nmiss);
 
-	  if ( tsID == 0 || filltype == FILL_NONE )
+	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE )
 	    {
 	      if ( recID == 0 || filltype != FILL_REC )
 		{
@@ -253,6 +280,7 @@ void *Arith(void *argument)
 	}
 
       tsID++;
+      tsID2++;
     }
 
   streamClose(streamID3);

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 #endif
 
 #include <string.h>
+#include <time.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -276,7 +277,7 @@ static int read_e5ml(const char *filename, VAR **vars)
 }
 
 
-static void write_e5ml(const char *filename, VAR *vars, int nvars)
+static void write_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
 {
   static char func[] = "write_e5ml";
 #if  defined  (HAVE_LIBNETCDF)
@@ -295,9 +296,91 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
   int nc_stpid, lspid;
   double *xvals, *yvals;
   const double *vct;
+  char atttext[1024];
+  size_t attlen;
+  int attint;
+  char *username;
+  char timestr[30];
+  time_t date_and_time_in_sec;
+  struct tm *date_and_time;
+  
+  date_and_time_in_sec = time(NULL);
+  timestr[0] = 0;
+
+  if ( date_and_time_in_sec != -1 )
+    {
+      date_and_time = localtime(&date_and_time_in_sec);
+      (void) strftime(timestr, sizeof(timestr), "%d/%m/%Y %H:%M", date_and_time);
+    }
+
+  username = getenv("LOGNAME");
+  if ( username == NULL )
+    {
+      username = getenv("USER");
+      if ( username == NULL ) username = "unknown";
+    }
 
   /* create file */
   nce(nc_create(filename, NC_CLOBBER, &nc_file_id));
+
+  strcpy(atttext, "IEEE");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "source_type", attlen, atttext));
+
+  strcpy(atttext, commandLine());
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "history", attlen, atttext));
+
+  strcpy(atttext, username);
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "user", attlen, atttext));
+
+  strcpy(atttext, timestr);
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "created", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_1", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_2", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_3", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_4", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_5", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_6", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_7", attlen, atttext));
+
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "label_8", attlen, atttext));
+
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "fdate", NC_INT, 1, &vdate));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "ftime", NC_INT, 1, &vtime));
+
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vdate", NC_INT, 1, &vdate));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "vtime", NC_INT, 1, &vtime));
+
+  attint = 31;
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_n", NC_INT, 1, &ntr));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_m", NC_INT, 1, &ntr));
+  nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "spherical_truncation_k", NC_INT, 1, &ntr));
 
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type", strlen(strfiletype_ml), strfiletype_ml));
 
@@ -331,8 +414,8 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 	}
     }
 
-  if ( lat == 0 ) cdoAbort("Gaussian grid not found!");
-  if ( nsp == 0 ) cdoAbort("Spectral data not found!");
+  if ( lat  == 0 ) cdoAbort("Gaussian grid not found!");
+  if ( nsp  == 0 ) cdoAbort("Spectral data not found!");
   if ( nlev == 0 ) cdoAbort("Hybrid level not found!");
 
   nlon = lon;
@@ -363,11 +446,23 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 
   nce(nc_redef(nc_file_id));
   nce(nc_def_var(nc_file_id, "lat", NC_DOUBLE, 1, &lat_dimid, &nc_var_id));
+  strcpy(atttext, "Gaussian latitude");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", attlen, atttext));
+  strcpy(atttext, "degrees_N");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "units", attlen, atttext));
   nce(nc_enddef(nc_file_id));
   nce(nc_put_var_double(nc_file_id, nc_var_id, yvals));
    
   nce(nc_redef(nc_file_id));
   nce(nc_def_var(nc_file_id, "lon", NC_DOUBLE, 1, &lon_dimid, &nc_var_id));
+  strcpy(atttext, "longitude");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", attlen, atttext));
+  strcpy(atttext, "degrees_E");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "units", attlen, atttext));
   nce(nc_enddef(nc_file_id));
   nce(nc_put_var_double(nc_file_id, nc_var_id, xvals));
 
@@ -384,11 +479,23 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 
   nce(nc_redef(nc_file_id));
   nce(nc_def_var(nc_file_id, "vct_a", NC_DOUBLE, 1, &nvclev_dimid, &nc_var_id));
+  strcpy(atttext, "vertical-coordinate parameter set A");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", attlen, atttext));
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "units", attlen, atttext));
   nce(nc_enddef(nc_file_id));
   nce(nc_put_var_double(nc_file_id, nc_var_id, vct));
 
   nce(nc_redef(nc_file_id));
   nce(nc_def_var(nc_file_id, "vct_b", NC_DOUBLE, 1, &nvclev_dimid, &nc_var_id));
+  strcpy(atttext, "vertical-coordinate parameter set B");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", attlen, atttext));
+  strcpy(atttext, "");
+  attlen = strlen(atttext);
+  nce(nc_put_att_text(nc_file_id, nc_var_id, "units", attlen, atttext));
   nce(nc_enddef(nc_file_id));
   nce(nc_put_var_double(nc_file_id, nc_var_id, vct+nlevp1));
 
@@ -442,8 +549,10 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars)
 
       nce(nc_redef(nc_file_id));
       nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
-      /*
-	nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", strlen(vars[varid].longname), vars[varid].longname));*/
+      if ( vars[varid].longname )
+	nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", strlen(vars[varid].longname), vars[varid].longname));
+      if ( vars[varid].units )
+	nce(nc_put_att_text(nc_file_id, nc_var_id, "units", strlen(vars[varid].units), vars[varid].units));
       nce(nc_enddef(nc_file_id));
 
       if (  dimidsp[2] == nlevp1_dimid ) nc_stpid = nc_var_id;
@@ -1396,12 +1505,15 @@ void *Echam5ini(void *argument)
     {
       VAR *vars = NULL;
       int gridID, zaxisID, gridtype, zaxistype, gridsize, nlev;
-      char name[256];
+      char name[256], longname[256], units[256];
+      int taxisID, vdate, vtime;
+      int ntr = 0;
 
       streamID1 = streamOpenRead(cdoStreamName(0));
       if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
 
       vlistID1 = streamInqVlist(streamID1);
+      taxisID = vlistInqTaxis(vlistID1);
 
       nvars = vlistNvars(vlistID1);
 
@@ -1410,6 +1522,8 @@ void *Echam5ini(void *argument)
       for ( varID = 0; varID < nvars; ++varID )
 	{
 	  vlistInqVarName(vlistID1, varID, name);
+	  vlistInqVarLongname(vlistID1, varID, longname);
+	  vlistInqVarUnits(vlistID1, varID, units);
 
 	  gridID = vlistInqVarGrid(vlistID1, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID1, varID);
@@ -1417,12 +1531,17 @@ void *Echam5ini(void *argument)
 	  gridtype = gridInqType(gridID);
 	  zaxistype = zaxisInqType(zaxisID);
 
+	  if ( gridtype == GRID_SPECTRAL && ntr == 0 )
+	    {
+	      ntr = gridInqTrunc(gridID);
+	    }
+
 	  gridsize = gridInqSize(gridID);
 	  nlev     = zaxisInqSize(zaxisID);
 
-	  inivar(&vars[varID], gridtype, zaxistype,  0, name, NULL, NULL);
+	  inivar(&vars[varID], gridtype, zaxistype,  0, name, longname, units);
 	  
-	  vars[varID].gridID = gridID;
+	  vars[varID].gridID    = gridID;
 	  vars[varID].zaxisID   = zaxisID;
 	  vars[varID].gridsize  = gridsize;
 	  vars[varID].nlev      = nlev;
@@ -1431,6 +1550,15 @@ void *Echam5ini(void *argument)
 	}
 
       nrecs = streamInqTimestep(streamID1, 0);
+      vdate = taxisInqVdate(taxisID);
+      vtime = taxisInqVtime(taxisID);
+
+      if ( vdate == 0 )
+	{
+	  vdate = 19890101;
+	  vtime = 1200;
+	}
+      vtime *= 100;
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -1445,7 +1573,7 @@ void *Echam5ini(void *argument)
       streamClose(streamID1);
 
       if ( operatorID == WRITE_E5ML )
-	write_e5ml(cdoStreamName(1), vars, nvars);
+	write_e5ml(cdoStreamName(1), vars, nvars, vdate, vtime, ntr);
       else if ( operatorID == WRITE_E5RES )
 	write_e5res(cdoStreamName(1), vars, nvars);
       else

@@ -73,6 +73,7 @@ void cdolog(const char *prompt, double cputime)
   memset(logstring, 0, MAX_LEN);
 
   date_and_time_in_sec = time(NULL);
+  timestr[0] = 0;
 
   if ( date_and_time_in_sec != -1 )
     {
