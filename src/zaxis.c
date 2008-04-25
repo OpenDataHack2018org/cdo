@@ -120,7 +120,7 @@ int zaxisDefine(ZAXIS zaxis)
     }
   if ( zaxis.ubounds )
     {
-      zaxisDefLbounds(zaxisID, zaxis.ubounds);
+      zaxisDefUbounds(zaxisID, zaxis.ubounds);
       free(zaxis.ubounds);
     }
 

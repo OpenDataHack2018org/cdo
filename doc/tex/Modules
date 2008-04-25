@@ -25,6 +25,7 @@ Setgrid       Modification
 Setzaxis      Modification
 Setgatt       Modification
 Invert        Modification
+Invertlev     Modification
 Maskregion    Modification
 Maskbox       Modification
 Setbox        Modification

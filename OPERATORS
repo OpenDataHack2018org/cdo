@@ -131,11 +131,7 @@ Operator catalog:
       Setgatt    setgatt         Set global attribute
       Setgatt    setgatts        Set global attributes
       Invert     invertlat       Invert latitude
-      Invert     invertlon       Invert longitude
-      Invert     invertlatdes    Invert latitude description
-      Invert     invertlondes    Invert longitude description
-      Invert     invertlatdata   Invert latitude data
-      Invert     invertlondata   Invert longitude data
+      Invertlev  invertlev       Invert level
       Maskregion maskregion      Mask regions
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
@@ -340,6 +336,13 @@ Operator catalog:
       Detrend    detrend         Detrend
       Trend      trend           Trend
       Subtrend   subtrend        Subtract trend
+-------------------------------------------------------------
+   Tests
+-------------------------------------------------------------
+      Tests      normal          Normal distribution
+      Tests      studentt        Student-t distribution
+      Tests      chisquare       Chi-Square distribution
+      Tests      fisher          Fisher distribution
 -------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------

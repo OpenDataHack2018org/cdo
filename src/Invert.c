@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@
 #include "error.h"
 
 
-void invertLonDes(int vlistID)
+static void invertLonDes(int vlistID)
 {
   static char func[] = "invertLonDes";
   int index, ngrids;
@@ -137,7 +137,7 @@ void invertLonDes(int vlistID)
     }
 }
 
-void invertLatDes(int vlistID)
+static void invertLatDes(int vlistID)
 {
   static char func[] = "invertLatDes";
   int index, ngrids;
@@ -237,7 +237,7 @@ void invertLatDes(int vlistID)
 }
 
 
-void invertLonData(double *array1, double *array2, int gridID1)
+static void invertLonData(double *array1, double *array2, int gridID1)
 {
   static char func[] = "invertLonData";
   int nlat, nlon;
@@ -265,7 +265,7 @@ void invertLonData(double *array1, double *array2, int gridID1)
 }
 
 
-void invertLatData(double *array1, double *array2, int gridID1)
+static void invertLatData(double *array1, double *array2, int gridID1)
 {
   static char func[] = "invertLatData";
   int nlat, nlon;

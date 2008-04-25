@@ -827,29 +827,27 @@ static char *SetgattHelp[] = {
 
 static char *InvertHelp[] = {
     "NAME",
-    "    invertlat, invertlon, invertlatdes, invertlondes, invertlatdata, ",
-    "    invertlondata - Invert fields",
+    "    invertlat - Invert latitude",
     "",
     "SYNOPSIS",
-    "    <operator>  ifile ofile",
+    "    invertlat  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This module inverts 2D fields on a rectangular grid. Depending on the actual ",
-    "    operator the field, only the data or only the grid description is inverted.",
+    "    This operator inverts the latitudes of all fields with a regular",
+    "    rectangular grid. ",
+    NULL
+};
+
+static char *InvertlevHelp[] = {
+    "NAME",
+    "    invertlev - Invert level",
     "",
-    "OPERATORS",
-    "    invertlat      Invert latitude",
-    "                   Inverts the latitude of a field.",
-    "    invertlon      Invert longitude",
-    "                   Inverts the longitude of a field.",
-    "    invertlatdes   Invert latitude description",
-    "                   Inverts only the latitude description of a field.",
-    "    invertlondes   Invert longitude description",
-    "                   Inverts only the longitude description of a field.",
-    "    invertlatdata  Invert latitude data",
-    "                   Inverts only the latitude data of a field.",
-    "    invertlondata  Invert longitude data",
-    "                   Inverts only the longitude data of a field.",
+    "SYNOPSIS",
+    "    invertlev  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator inverts the levels of all 3D variables with a non",
+    "    hybrid zaxis.",
     NULL
 };
 
@@ -2506,6 +2504,35 @@ static char *SubtrendHelp[] = {
     "    ",
     "    o(t,x) = i_1(t,x) - (i_2(1,x) + i_3(1,x)*t)",
     "    where t is the time steps.",
+    NULL
+};
+
+static char *TestsHelp[] = {
+    "NAME",
+    "    normal, studentt, chisquare, fisher - Tests",
+    "",
+    "SYNOPSIS",
+    "    normal  ifile ofile",
+    "    studentt,df  ifile ofile",
+    "    chisquare,df  ifile ofile",
+    "    fisher,dfn,dfd  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "",
+    "OPERATORS",
+    "    normal     Normal distribution",
+    "               Computes the distribution function of the normal (Gaussian) distribution.",
+    "    studentt   Student-t distribution",
+    "               Computes the distribution function of the Student-t distribution.",
+    "    chisquare  Chi-Square distribution",
+    "               Computes the distribution function of the Chi-Square distribution.",
+    "    fisher     Fisher distribution",
+    "               Computes the distribution function of the Fischer distribution.",
+    "",
+    "PARAMETER",
+    "    df   FLOAT  degree of freedom",
+    "    dfn  FLOAT  degree of freedom of numerator",
+    "    dfd  FLOAT  degree of freedom of denominator",
     NULL
 };
 
