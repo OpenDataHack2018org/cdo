@@ -240,6 +240,7 @@ src/Intntime.c -text
 src/Inttime.c -text
 src/Intyear.c -text
 src/Invert.c -text
+src/Invertlev.c -text
 src/Log.c -text
 src/Makefile.am -text
 src/Makefile.in -text
