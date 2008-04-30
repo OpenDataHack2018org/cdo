@@ -41,7 +41,7 @@ static void invertLevDes(int vlistID)
   int zaxisID1, zaxisID2;
   int nlev;
   int ilev;
-  int zaxistype, nv, iv;
+  int zaxistype;
   double *yv1, *yv2;
   double *ylb1, *ylb2;;
   double *yub1, *yub2;;
