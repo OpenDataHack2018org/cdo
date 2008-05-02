@@ -23,6 +23,7 @@ extern "C" {
 #define  CDI_EUFTYPE            -21   /* Unsupported file type                */
 #define  CDI_ELIBNAVAIL         -22   /* xxx library not available            */
 #define  CDI_EUFSTRUCT          -23   /* Unsupported file structure           */
+#define  CDI_EUNC4              -24   /* Unsupported netCDF4 structure        */
 
 /* File types */
 

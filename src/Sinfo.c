@@ -47,6 +47,9 @@ void printFiletype(int streamID, int vlistID)
     case FILETYPE_NC2:
       printf("netCDF2");
       break;
+    case FILETYPE_NC4:
+      printf("netCDF4");
+      break;
     case FILETYPE_SRV:
       printf("SERVICE");
       break;
