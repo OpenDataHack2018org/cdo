@@ -2717,7 +2717,7 @@ static char *IntvertHelp[] = {
     "    The input file must contain the log. surface pressure or the surface pressure.",
     "    To interpolate the temperature, the orography is also needed.",
     "    The pressure, temperature, and orography are identified by there code numbers.",
-    "    Supported code tables are: WMO standard table number 2 and ECMWF local table number 128.",
+    "    Supported parameter tables are: WMO standard table number 2 and ECMWF local table number 128.",
     "    Use the alias  ml2plx/ml2hlx or the environment variable EXTRAPOLATE",
     "    to extrapolate missing values.",
     "",
@@ -2737,6 +2737,22 @@ static char *IntvertHelp[] = {
     "ENVIRONMENT",
     "    EXTRAPOLATE",
     "        If set to 1 extrapolate missing values.",
+    NULL
+};
+
+static char *IntlevelHelp[] = {
+    "NAME",
+    "    intlevel - Linear level interpolation",
+    "",
+    "SYNOPSIS",
+    "    intlevel,levels  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator performs a linear vertical interpolation of non hybrid ",
+    "    3D variables.",
+    "",
+    "PARAMETER",
+    "    levels  FLOAT  Target levels",
     NULL
 };
 

@@ -68,6 +68,7 @@ void *Info(void *argument);
 void *Input(void *argument);
 void *Intgrid(void *argument);
 void *Intgridtraj(void *argument);
+void *Intlevel(void *argument);
 void *Inttime(void *argument);
 void *Intntime(void *argument);
 void *Intyear(void *argument);
@@ -259,6 +260,7 @@ void *Wct(void *argument);
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
+#define  IntlevelOperators      {"intlevel", "intlevelx"}
 #define  InttimeOperators       {"inttime"}
 #define  IntntimeOperators      {"intntime"}
 #define  IntyearOperators       {"intyear"}
@@ -480,6 +482,7 @@ static MODULES Modules[] =
   { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,    1,  1 },
+  { Intlevel,       IntlevelHelp,      IntlevelOperators,       1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,        1,  1 },
   { Intntime,       InttimeHelp,       IntntimeOperators,       1,  1 },
   { Intyear,        IntyearHelp,       IntyearOperators,        2,  1 },

@@ -31,7 +31,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 #include "vinterp.h"
 #include "list.h"
 
@@ -453,6 +452,7 @@ void *Vertint(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       for ( varID = 0; varID < nvars; ++varID ) vars[varID] = FALSE;
+
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);

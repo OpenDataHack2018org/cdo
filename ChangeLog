@@ -3,7 +3,8 @@
 	* using CDI library version 1.2.0
 	* add support for netCDF4 classic with deflate option (option -z zip)
 	* Arith: add filltype FILL_FILE [request: Rita Seiffert]
-	* New operator: invertlev
+	* New operator: intlevel - Linear level interpolation
+	* New operator: invertlev - Invert level [request: Marco Giorgetta]
 	* New module: Tests (normal, studentt, chisquare, beta, fisher)
 	* New module: Echam5ini (read_e5ml, write_e5ml)
 	* Version 1.2.0 released
@@ -324,7 +325,7 @@
 2006-02-01  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* using CDI library version 0.9.5
-	* use marco DBL_IS_EQUAL to check floating-point equality
+	* use macro DBL_IS_EQUAL to check floating-point equality
 	* use taxisCopyTimestep if posible
 	* New operator: sp2gp2 (Spectral) for ERA40 data
 	* New operator: gp2sp2 (Spectral) for ERA40 data
