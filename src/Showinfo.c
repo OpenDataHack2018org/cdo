@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@ void *Showinfo(void *argument)
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
-  int nrecs, nvars, nout;
+  int nrecs, nvars, nout, ntsteps;
   int nlevs, levelID;
   int ltype;
   int index, nzaxis;
@@ -79,90 +79,95 @@ void *Showinfo(void *argument)
 
   nvars   = vlistNvars(vlistID);
   taxisID = vlistInqTaxis(vlistID);
+  ntsteps = vlistNtsteps(vlistID);
 
   if ( operatorID == SHOWYEAR )
     {
       nyear = 0;
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  vdate = taxisInqVdate(taxisID);
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    vdate = taxisInqVdate(taxisID);
 
-	  decode_date(vdate, &year, &month, &day);
+	    decode_date(vdate, &year, &month, &day);
 	 
-	  if ( tsID == 0 || year0 != year )
-	    {
-	      /* if ( nyear == 10 ) { nyear = 0; fprintf(stdout, "\n"); } */
-	      year0 = year;
-	      fprintf(stdout, " %4d", year0);
-	      nyear++;
-	    }
+	    if ( tsID == 0 || year0 != year )
+	      {
+		/* if ( nyear == 10 ) { nyear = 0; fprintf(stdout, "\n"); } */
+		year0 = year;
+		fprintf(stdout, " %4d", year0);
+		nyear++;
+	      }
 
-	  tsID++;
-	}
+	    tsID++;
+	  }
       fprintf(stdout, "\n");
     }
   else if ( operatorID == SHOWMON )
     {
       nmonth = 0;
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  vdate = taxisInqVdate(taxisID);
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    vdate = taxisInqVdate(taxisID);
 
-	  decode_date(vdate, &year, &month, &day);
+	    decode_date(vdate, &year, &month, &day);
 	 
-	  if ( tsID == 0 || month0 != month )
-	    {
-	      /* if ( nmonth == 12 ) { nmonth = 0; fprintf(stdout, "\n"); } */
-	      month0 = month;
-	      fprintf(stdout, " %2d", month0);
-	      nmonth++;
-	    }
+	    if ( tsID == 0 || month0 != month )
+	      {
+		/* if ( nmonth == 12 ) { nmonth = 0; fprintf(stdout, "\n"); } */
+		month0 = month;
+		fprintf(stdout, " %2d", month0);
+		nmonth++;
+	      }
 
-	  tsID++;
-	}
+	    tsID++;
+	  }
       fprintf(stdout, "\n");
     }
   else if ( operatorID == SHOWDATE )
     {
       ndate = 0;
       tsID  = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  vdate = taxisInqVdate(taxisID);
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    vdate = taxisInqVdate(taxisID);
 	 
-	  decode_date(vdate, &year, &month, &day);
+	    decode_date(vdate, &year, &month, &day);
 
-	  if ( tsID == 0 || date0 != vdate )
-	    {
-	      /* if ( ndate == 10 ) { ndate = 0; fprintf(stdout, "\n"); } */
-	      date0 = vdate;
-	      fprintf(stdout, " %4.4d-%2.2d-%2.2d", year, month, day);
-	      ndate++;
-	    }
+	    if ( tsID == 0 || date0 != vdate )
+	      {
+		/* if ( ndate == 10 ) { ndate = 0; fprintf(stdout, "\n"); } */
+		date0 = vdate;
+		fprintf(stdout, " %4.4d-%2.2d-%2.2d", year, month, day);
+		ndate++;
+	      }
 
-	  tsID++;
-	}
+	    tsID++;
+	  }
       fprintf(stdout, "\n");
     }
   else if ( operatorID == SHOWTIME )
     {
       nout = 0;
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  /* if ( nout == 4 ) { nout = 0; fprintf(stdout, "\n"); } */
-	  vdate = taxisInqVdate(taxisID);
-	  vtime = taxisInqVtime(taxisID);
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    /* if ( nout == 4 ) { nout = 0; fprintf(stdout, "\n"); } */
+	    vdate = taxisInqVdate(taxisID);
+	    vtime = taxisInqVtime(taxisID);
 
-	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute);
+	    decode_date(vdate, &year, &month, &day);
+	    decode_time(vtime, &hour, &minute);
 
-	  fprintf(stdout, " %4.4d-%2.2d-%2.2d,%2.2d:%2.2d", year, month, day, hour, minute);
-	  tsID++;
-	  nout++;
-	}
+	    fprintf(stdout, " %4.4d-%2.2d-%2.2d,%2.2d:%2.2d", year, month, day, hour, minute);
+	    tsID++;
+	    nout++;
+	  }
       fprintf(stdout, "\n");
     }
   else if ( operatorID == SHOWCODE )

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -40,7 +40,7 @@ void *Ninfo(void *argument)
   int operfunc;
   int varID, zaxisID;
   int vdate;
-  int nrecs, nvars;
+  int nrecs, nvars, ntsteps;
   int levelsize;
   int tsID, ndate, date0 = 0;
   int day, mon0 = 0, mon, nmon, year0 = 0, year, nyear;
@@ -54,7 +54,7 @@ void *Ninfo(void *argument)
   cdoOperatorAdd("nmon",   NMON,   0, NULL);
   cdoOperatorAdd("ndate",  NDATE,  0, NULL);
   cdoOperatorAdd("ntime",  NTIME,  0, NULL);
-  cdoOperatorAdd("npar",   NPAR,  0, NULL);
+  cdoOperatorAdd("npar",   NPAR,   0, NULL);
   cdoOperatorAdd("nlevel", NLEVEL, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -67,67 +67,72 @@ void *Ninfo(void *argument)
 
   nvars   = vlistNvars(vlistID);
   taxisID = vlistInqTaxis(vlistID);
+  ntsteps = vlistNtsteps(vlistID);
 
   switch ( operfunc )
     {
     case NYEAR:
       nyear = 0;
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  vdate = taxisInqVdate(taxisID);
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    vdate = taxisInqVdate(taxisID);
 
-	  decode_date(vdate, &year, &mon, &day);
+	    decode_date(vdate, &year, &mon, &day);
 	 
-	  if ( tsID == 0 || year0 != year )
-	    {
-	      year0 = year;
-	      nyear++;
-	    }
+	    if ( tsID == 0 || year0 != year )
+	      {
+		year0 = year;
+		nyear++;
+	      }
 
-	  tsID++;
-	}
+	    tsID++;
+	  }
       fprintf(stdout, "%d\n", nyear);
       break;
     case NMON:
       nmon = 0;
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  vdate = taxisInqVdate(taxisID);
-
-	  decode_date(vdate, &year, &mon, &day);
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    vdate = taxisInqVdate(taxisID);
+	    
+	    decode_date(vdate, &year, &mon, &day);
 	 
-	  if ( tsID == 0 || mon0 != mon )
-	    {
-	      mon0 = mon;
-	      nmon++;
-	    }
+	    if ( tsID == 0 || mon0 != mon )
+	      {
+		mon0 = mon;
+		nmon++;
+	      }
 
-	  tsID++;
-	}
+	    tsID++;
+	  }
       fprintf(stdout, "%d\n", nmon);
       break;
     case NDATE:
       ndate = 0;
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	{
-	  vdate = taxisInqVdate(taxisID);
-	 
-	  if ( tsID == 0 || date0 != vdate )
-	    {
-	      date0 = vdate;
-	      ndate++;
-	    }
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    vdate = taxisInqVdate(taxisID);
+	    
+	    if ( tsID == 0 || date0 != vdate )
+	      {
+		date0 = vdate;
+		ndate++;
+	      }
 
-	  tsID++;
-	}
+	    tsID++;
+	  }
       fprintf(stdout, "%d\n", ndate);
       break;
     case NTIME:
       tsID = 0;
-      while ( (nrecs = streamInqTimestep(streamID, tsID)) ) tsID++;
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) ) tsID++;
       fprintf(stdout, "%d\n", tsID);
       break;
     case NPAR:

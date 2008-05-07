@@ -7,6 +7,9 @@
 	* New operator: invertlev - Invert level [request: Marco Giorgetta]
 	* New module: Tests (normal, studentt, chisquare, beta, fisher)
 	* New module: Echam5ini (read_e5ml, write_e5ml)
+	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
+	* ntime: bug fix for datasets with time constant parameters only [report: David Wang]
+	  (also affected: ndate, nmon, nyear, showdate, showtime, showmon, showyear)
 	* Version 1.2.0 released
 	
 2008-04-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

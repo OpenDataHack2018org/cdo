@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -39,6 +39,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Settime(void *argument)
 {
@@ -47,7 +48,7 @@ void *Settime(void *argument)
   int SETTAXIS, SETREFTIME, SETCALENDAR, SHIFTTIME;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs, newval = 0;
+  int nrecs, newval = 0, ntsteps;
   int tsID1, recID, varID, levelID;
   int vlistID1, vlistID2;
   int vdate, vtime;
@@ -208,6 +209,15 @@ void *Settime(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
+  ntsteps = vlistNtsteps(vlistID1);
+
+  if ( ntsteps == 0 )
+    {
+      int nvars = vlistNvars(vlistID1);
+
+      for ( varID = 0; varID < nvars; ++varID )
+	vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
+    }
 
   calendar = taxisInqCalendar(taxisID1);
 
