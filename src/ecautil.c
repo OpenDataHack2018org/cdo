@@ -167,21 +167,21 @@ static void count(FIELD *field1, const FIELD *field2, double mode)
         {
           if ( DBL_IS_EQUAL(array2[i], missval2) )
             {
-              if ( mode == 1.0 || DBL_IS_EQUAL(array1[i], missval1) )
+              if (  DBL_IS_EQUAL(mode, 1.0) || DBL_IS_EQUAL(array1[i], missval1) )
                 array1[i] = 0.0; 
               continue;
             }
 
           if ( !DBL_IS_EQUAL(array1[i], missval1) )
             {
-              if ( mode == 0.0 || mode == 1.0 || array2[i] > mode )
+              if (  DBL_IS_EQUAL(mode, 0.0) ||  DBL_IS_EQUAL(mode, 1.0) || array2[i] > mode )
                 array1[i] += 1.0;
-              else if ( array2[i] == mode )
+              else if (  DBL_IS_EQUAL(array2[i], mode) )
                 array1[i] += mode;
             } 
           else
             {
-              if ( mode == 0.0 || mode == 1.0 )
+              if (  DBL_IS_EQUAL(mode, 0.0) ||  DBL_IS_EQUAL(mode, 1.0) )
                 array1[i] = 1.0;
               else if ( array2[i] < mode )
                 array1[i] = 0.0;
@@ -200,14 +200,14 @@ static void count(FIELD *field1, const FIELD *field2, double mode)
         {
           if ( DBL_IS_EQUAL(array2[i], missval2) )
             {
-              if ( mode == 1.0 )
+              if ( DBL_IS_EQUAL(mode, 1.0) )
                 array1[i] = 0.0; 
               continue;
             }
 
-          if ( mode == 0.0 || mode == 1.0 || array2[i] > mode )
+          if (  DBL_IS_EQUAL(mode, 0.0) ||  DBL_IS_EQUAL(mode, 1.0) || array2[i] > mode )
             array1[i] += 1.0;
-          else if ( array2[i] == mode )
+          else if ( DBL_IS_EQUAL(array2[i], mode) )
             array1[i] += mode;
         }
     }
@@ -389,13 +389,13 @@ void farsel(FIELD *field1, FIELD field2)
   if ( nmiss2 > 0 )
     {
       for ( i = 0; i < len; i++ )
-        if ( DBL_IS_EQUAL(array2[i], missval2) || array2[i] == 0.0 ) 
+        if ( DBL_IS_EQUAL(array2[i], missval2) ||  DBL_IS_EQUAL(array2[i], 0.0) ) 
           array1[i] = missval1;
     }
   else
     {
       for ( i = 0; i < len; i++ )
-        if ( array2[i] == 0.0 ) array1[i] = missval1;
+        if ( DBL_IS_EQUAL(array2[i], 0.0) ) array1[i] = missval1;
     }
       
   field1->nmiss = 0;

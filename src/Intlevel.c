@@ -92,7 +92,7 @@ static void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *l
 			int *lev_idx1, int *lev_idx2, double *lev_wgt1, double *lev_wgt2)
 {
   int i1, i2;
-  double val1, val2;
+  double val1, val2 = 0;
   int    idx1 = 0, idx2 = 0;
 
   for ( i2 = 0; i2 < nlev2; ++i2 )

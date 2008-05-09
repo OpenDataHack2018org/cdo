@@ -7,7 +7,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
 int solution_of_linear_equation (double **a, double *b, int n);
 int inverse_of_matrix (double **a, double **b, int n);
 void fft (double *real, double *imag, int n, int sign);
-void ft (double *real, double *imag, int n, int sign, const char *prompt);
+void ft (double *real, double *imag, int n, int sign);
 double lngamma (double x);
 double beta (double a, double b, const char *prompt);
 double incomplete_gamma (double a, double x, const char *prompt);

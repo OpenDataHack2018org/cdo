@@ -524,7 +524,7 @@ fft (double *real, double *imag, int n, int sign)
 }
 
 void
-ft (double *real, double *imag, int n, int sign, const char *prompt)
+ft (double *real, double *imag, int n, int sign)
 {				/* sign should be 1 (FT) or -1 (reverse FT) */
   static char func[] = "ft";
   int j, k;

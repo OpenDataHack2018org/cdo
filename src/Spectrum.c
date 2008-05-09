@@ -125,7 +125,7 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
       if (bit == 1)	/* seg_l is a power of 2 */
 	fft (real, imag, seg_l, 1);
       else
-	ft (real, imag, seg_l, 1, "spectrum");
+	ft (real, imag, seg_l, 1);
 	
       spectrum[0] += real[0] * real[0] + imag[0] * imag[0];
       

@@ -28,7 +28,7 @@
 #define NBINS_DEFAULT 100
 #define NBINS_MINIMUM 10
 
-#define DBL_CAPACITY(n) (((n) * sizeof(int)) / sizeof(double))
+#define DBL_CAPACITY(n) ((int)(((n) * sizeof(int)) / sizeof(double)))
 #define DBL_PTR(p) ((double *) (p))
 #define INT_PTR(p) ((int *) (p))
 
