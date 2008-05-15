@@ -4,7 +4,8 @@
 	* add support for netCDF4 classic with deflate option (option -z zip)
 	* Arith: add filltype FILL_FILE [request: Rita Seiffert]
 	* New operator: intlevel - Linear level interpolation
-	* New operator: invertlev - Invert level [request: Marco Giorgetta]
+	* New operator: invertlev - Invert levels [request: Marco Giorgetta]
+	* New operator: sellevidx - Select levels by index [request: David Wang]
 	* New module: Tests (normal, studentt, chisquare, beta, fisher)
 	* New module: Echam5ini (read_e5ml, write_e5ml)
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0

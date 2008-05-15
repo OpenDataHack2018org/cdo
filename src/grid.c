@@ -984,7 +984,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    {
 	      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 		{
-		  Warning(func, "Incomplete commmand: >gridlatlon<");
+		  Warning(func, "Incomplete command: >gridlatlon<");
 		  break;
 		}
 	      sscanf(line, "%g %g", &flat, &flon);
@@ -1016,7 +1016,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >xvals<");
+			  Warning(func, "Incomplete command: >xvals<");
 			  break;
 			}
 		      pline = line;
@@ -1053,7 +1053,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >yvals<");
+			  Warning(func, "Incomplete command: >yvals<");
 			  break;
 			}
 		      pline = line;
@@ -1095,7 +1095,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >xbounds<");
+			  Warning(func, "Incomplete command: >xbounds<");
 			  break;
 			}
 		      pline = line;
@@ -1140,7 +1140,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >ybounds<");
+			  Warning(func, "Incomplete command: >ybounds<");
 			  break;
 			}
 		      pline = line;

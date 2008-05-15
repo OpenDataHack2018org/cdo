@@ -62,6 +62,7 @@ Operator catalog:
       Select     delname         Delete variables by name
       Select     selstdname      Select variables by standard name
       Select     sellevel        Select levels
+      Select     sellevidx       Select levels by index
       Select     selgrid         Select grids
       Select     selgridname     Select grids by name
       Select     selzaxis        Select zaxes
@@ -360,6 +361,7 @@ Operator catalog:
       Remapeta   remapeta        Remap vertical hybrid level
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation
+      Intlevel   intlevel        Linear level interpolation
       Inttime    inttime         Time interpolation
       Inttime    intntime        Time interpolation
       Intyear    intyear         Year interpolation

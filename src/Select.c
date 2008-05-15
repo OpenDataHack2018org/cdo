@@ -24,6 +24,7 @@
       Select     delname         Delete variables
       Select     selstdname      Select variables by CF standard name
       Select     sellevel        Select levels
+      Select     sellevidx       Select levels by index
       Select     selgrid         Select grids
       Select     selgridname     Select grid by name
       Select     selzaxis        Select zaxis
@@ -49,7 +50,7 @@
 void *Select(void *argument)
 {
   const char func[] = "Select";
-  int SELCODE, SELNAME, SELLEVEL, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME, SELLTYPE; 
+  int SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME, SELLTYPE; 
   int SELTABNUM, DELCODE, DELNAME, SELSTDNAME;
   int operatorID;
   int streamID1, streamID2;
@@ -85,6 +86,7 @@ void *Select(void *argument)
   SELNAME      = cdoOperatorAdd("selname",      0, 0, "vars");
   SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 0, "standard names");
   SELLEVEL     = cdoOperatorAdd("sellevel",     0, 0, "levels");
+  SELLEVIDX    = cdoOperatorAdd("sellevidx",    0, 0, "index of levels");
   SELGRID      = cdoOperatorAdd("selgrid",      0, 0, "gridIDs");
   SELGRIDNAME  = cdoOperatorAdd("selgridname",  0, 0, "grid names");
   SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 0, "zaxisIDs");
@@ -199,6 +201,14 @@ void *Select(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
+	      else if ( operatorID == SELLEVIDX )
+		{
+		  if ( intarr[isel] == (levID+1) )
+		    {
+		      vlistDefFlag(vlistID1, varID, levID, TRUE);
+		      selfound[isel] = TRUE;
+		    }
+		}
 	      else if ( operatorID == SELGRID )
 		{
 		  if ( intarr[isel] == (gridID+1) )
@@ -288,6 +298,10 @@ void *Select(void *argument)
 	  else if ( operatorID == SELLEVEL )
 	    {
 	      cdoWarning("Level %g not found!", fltarr[isel]);
+	    }
+	  else if ( operatorID == SELLEVIDX )
+	    {
+	      cdoWarning("Level index %d not found!", intarr[isel]);
 	    }
 	  else if ( operatorID == SELGRID )
 	    {

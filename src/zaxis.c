@@ -232,7 +232,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >levels<");
+			  Warning(func, "Incomplete command: >levels<");
 			  break;
 			}
 		      pline = line;
@@ -267,7 +267,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >vct<");
+			  Warning(func, "Incomplete command: >vct<");
 			  break;
 			}
 		      pline = line;
@@ -302,7 +302,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >lbounds<");
+			  Warning(func, "Incomplete command: >lbounds<");
 			  break;
 			}
 		      pline = line;
@@ -337,7 +337,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete commmand: >ubounds<");
+			  Warning(func, "Incomplete command: >ubounds<");
 			  break;
 			}
 		      pline = line;

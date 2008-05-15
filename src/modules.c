@@ -285,7 +285,8 @@ void *Wct(void *argument);
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
                                  "outputfld", "outputarr"}
-#define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", "outputboundscpt", "outputvector", "outputtri"}
+#define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
+                                 "outputboundscpt", "outputvector", "outputtri"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
@@ -304,7 +305,7 @@ void *Wct(void *argument);
 /* QR */
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelectOperators        {"selcode", "selname", "selstdname", "sellevel", "selgrid", "selgridname", \
+#define  SelectOperators        {"selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", "selgridname", \
                                  "selzaxis", "selzaxisname", "seltabnum", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}

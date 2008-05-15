@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selname delname selstdname sellevel selgrid selgridname selzaxis selzaxisname selltype seltabnum
+@Operators = selcode delcode selname delname selstdname sellevel sellevidx selgrid selgridname selzaxis selzaxisname selltype seltabnum
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -70,6 +70,16 @@ Selects all fields with standard names in a user given list.
 
 @BeginDescription
 Selects all fields with levels in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_sellevidx
+@Title     = Select levels by index
+@Parameter = levidx
+
+@BeginDescription
+Selects all fields with index of levels in a user given list.
 @EndDescription
 @EndOperator
 
@@ -154,6 +164,8 @@ STRING   Comma separated list of variable names
 STRING   Comma separated list of standard names
 @Item = levels
 FLOAT    Comma separated list of levels
+@Item = levidx
+INTEGER  Comma separated list of index of levels
 @Item = ltypes
 INTEGER  Comma separated list of GRIB level types
 @Item = grids
@@ -171,14 +183,14 @@ INTEGER  Comma separated list of parameter table numbers
 @EndParameter
 
 
-@BeginExample
-Assume an input dataset has three variables with the code numbers 129, 130 and 139.
-To select the variables with the code number 129 and 139 use:
-@BeginVerbatim
-   cdo selcode,129,139 ifile ofile
-@EndVerbatim
-You can also select the code number 129 and 139 by deleting the code number 130 with:
-@BeginVerbatim
-   cdo delcode,130 ifile ofile
-@EndVerbatim
-@EndExample
+@C @BeginExample
+@CAssume an input dataset has three variables with the code numbers 129, 130 and 139.
+@CTo select the variables with the code number 129 and 139 use:
+@C@BeginVerbatim
+@C   cdo selcode,129,139 ifile ofile
+@C@EndVerbatim
+@CYou can also select the code number 129 and 139 by deleting the code number 130 with:
+@C@BeginVerbatim
+@C   cdo delcode,130 ifile ofile
+@C@EndVerbatim
+@C@EndExample

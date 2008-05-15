@@ -327,7 +327,7 @@ static char *SplitselHelp[] = {
 
 static char *SelectHelp[] = {
     "NAME",
-    "    selcode, delcode, selname, delname, selstdname, sellevel, selgrid, ",
+    "    selcode, delcode, selname, delname, selstdname, sellevel, sellevidx, selgrid, ",
     "    selgridname, selzaxis, selzaxisname, selltype, seltabnum - Select fields",
     "",
     "SYNOPSIS",
@@ -337,6 +337,7 @@ static char *SelectHelp[] = {
     "    delname,varnames  ifile ofile",
     "    selstdname,stdnames  ifile ofile",
     "    sellevel,levels  ifile ofile",
+    "    sellevidx,levidx  ifile ofile",
     "    selgrid,grids  ifile ofile",
     "    selgridname,gridnames  ifile ofile",
     "    selzaxis,zaxes  ifile ofile",
@@ -361,6 +362,8 @@ static char *SelectHelp[] = {
     "                  Selects all fields with standard names in a user given list.",
     "    sellevel      Select levels",
     "                  Selects all fields with levels in a user given list.",
+    "    sellevidx     Select levels by index",
+    "                  Selects all fields with index of levels in a user given list.",
     "    selgrid       Select grids",
     "                  Selects all fields with grids in a user given list.",
     "    selgridname   Select grids by name",
@@ -379,6 +382,7 @@ static char *SelectHelp[] = {
     "    varnames    STRING   Comma separated list of variable names",
     "    stdnames    STRING   Comma separated list of standard names",
     "    levels      FLOAT    Comma separated list of levels",
+    "    levidx      INTEGER  Comma separated list of index of levels",
     "    ltypes      INTEGER  Comma separated list of GRIB level types",
     "    grids       INTEGER  Comma separated list of grid numbers",
     "    gridnames   STRING   Comma separated list of grid names",
