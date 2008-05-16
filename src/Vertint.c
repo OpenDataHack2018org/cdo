@@ -64,7 +64,7 @@ void *Vertint(void *argument)
   int *vars = NULL;
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;
-  double *ret_vct = NULL; /* reduced VCT for LM */
+  double *rvct = NULL; /* reduced VCT for LM */
   double *single1, *single2;
   double **vardata1 = NULL, **vardata2 = NULL;
   double *geop = NULL, *ps_prog = NULL, *full_press = NULL, *half_press = NULL;
@@ -237,8 +237,8 @@ void *Vertint(void *argument)
 
 		      vctsize = 2*nhlevh;
 		      vct = (double *) malloc(vctsize*sizeof(double));
-		      ret_vct = (double *) malloc(nvct*sizeof(double));
-		      memcpy(ret_vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		      rvct = (double *) malloc(nvct*sizeof(double));
+		      memcpy(rvct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
 
 		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 
@@ -246,15 +246,15 @@ void *Vertint(void *argument)
 
 		      for ( i = 0; i < vctsize/2; i++ )
 			{
-			  if ( ret_vct[voff+i] >= ret_vct[voff] && ret_vct[voff+i] <= ret_vct[3] )
+			  if ( rvct[voff+i] >= rvct[voff] && rvct[voff+i] <= rvct[3] )
 			    {
-			      vct[i] = ret_vct[0]*ret_vct[voff+i];
+			      vct[i] = rvct[0]*rvct[voff+i];
 			      vct[vctsize/2+i] = 0;
 			    }
 			  else
 			    {
-			      vct[i] = (ret_vct[0]*ret_vct[3]*(1-ret_vct[voff+i]))/(1-ret_vct[3]);;
-			      vct[vctsize/2+i] = (ret_vct[voff+i]-ret_vct[3])/(1-ret_vct[3]);
+			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);;
+			      vct[vctsize/2+i] = (rvct[voff+i]-rvct[3])/(1-rvct[3]);
 			    }
 			}
 		      
@@ -267,7 +267,7 @@ void *Vertint(void *argument)
 		}
 	      else
 		{
-		  if ( memcmp(ret_vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
+		  if ( memcmp(rvct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double)) == 0 )
 		    vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 		}
 	    }
@@ -631,7 +631,7 @@ void *Vertint(void *argument)
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
   if ( vct        ) free(vct);
-  if ( ret_vct    ) free(ret_vct);
+  if ( rvct       ) free(rvct);
 
   listDelete(flist);
 

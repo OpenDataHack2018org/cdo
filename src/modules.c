@@ -89,6 +89,7 @@ void *Ninfo(void *argument);
 void *Nmltest(void *argument);
 void *Output(void *argument);
 void *Outputgmt(void *argument);
+void *Pressure(void *argument);
 void *Pinfo(void *argument);
 void *Regres(void *argument);
 void *Remap(void *argument);
@@ -287,6 +288,7 @@ void *Wct(void *argument);
                                  "outputfld", "outputarr"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri"}
+#define  PressureOperators      {"fpressure", "hpressure"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
@@ -505,6 +507,7 @@ static MODULES Modules[] =
   { Nmltest,        NULL,              NmltestOperators,        0,  0 },
   { Output,         OutputHelp,        OutputOperators,        -1,  0 },
   { Outputgmt,      NULL,              OutputgmtOperators,      1,  0 },
+  { Pressure,       NULL,              PressureOperators,       1,  1 },
   { Pinfo,          NULL,              PinfoOperators,          1,  1 },
   { Regres,         RegresHelp,        RegresOperators,         1,  1 },
   { Remap,          RemapHelp,         RemapOperators,          1,  1 },
