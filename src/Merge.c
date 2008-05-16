@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ void *Merge(void *argument)
   int vlistID1 = -1, vlistID2;
   int recID2;
   int nmerge;
+  int idum = -4711;
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
@@ -100,7 +101,7 @@ void *Merge(void *argument)
 	  streamID1 = streamIDs[index];
 	  vlistID1  = vlistIDs[index];
 
-	  if ( vlistID1 == -4711 ) continue;
+	  if ( vlistID1 == idum ) continue;
 
 	  nrecs = streamInqTimestep(streamID1, tsID);
 
@@ -108,12 +109,12 @@ void *Merge(void *argument)
 	    {
 	      if ( tsID == 1 )
 		{
-		  vlistIDs[index] = -4711;
+		  vlistIDs[index] = idum;
 		  continue;
 		}
 	      else
 		{
-		  tsID = -4711;
+		  tsID = idum;
 		  break;
 		}
 	    }
@@ -151,9 +152,9 @@ void *Merge(void *argument)
       tsID++;
 
       for ( index = 0; index < nmerge; index++ )
-	if ( vlistIDs[index] != -4711 ) break;
+	if ( vlistIDs[index] != idum ) break;
 
-      if ( index == nmerge ) tsID = -4711;
+      if ( index == nmerge ) tsID = idum;
     }
 
   for ( index = 0; index < nmerge; index++ )
