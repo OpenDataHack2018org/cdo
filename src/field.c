@@ -26,13 +26,13 @@ double fldfun(FIELD field, int function)
 {
   double rval = 0;
 
-  if      ( function == func_min )  rval = fldmin(field);
-  else if ( function == func_max )  rval = fldmax(field);  
-  else if ( function == func_sum )  rval = fldsum(field);  
-  else if ( function == func_mean ) rval = fldmean(field);  
-  else if ( function == func_avg )  rval = fldavg(field);  
-  else if ( function == func_std )  rval = fldstd(field);  
-  else if ( function == func_var )  rval = fldvar(field);
+  if      ( function == func_min  )  rval = fldmin(field);
+  else if ( function == func_max  )  rval = fldmax(field);  
+  else if ( function == func_sum  )  rval = fldsum(field);  
+  else if ( function == func_mean )  rval = fldmean(field);  
+  else if ( function == func_avg  )  rval = fldavg(field);  
+  else if ( function == func_std  )  rval = fldstd(field);  
+  else if ( function == func_var  )  rval = fldvar(field);
   else cdoAbort("function %d not implemented!", function);
 
   return rval;
@@ -81,10 +81,8 @@ double fldmax(FIELD field)
     {
       rmax = -DBL_MAX;
       for ( i = 0; i < len; i++ )
-	{
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] > rmax ) rmax = array[i];
-	}
 
       if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
 	rmax = missval;

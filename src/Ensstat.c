@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -108,8 +108,8 @@ void *Ensstat(void *argument)
   field = (FIELD *) malloc(ompNumThreads*sizeof(FIELD));
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      field[i].size = nfiles;
-      field[i].ptr = (double *) malloc(nfiles*sizeof(double));
+      field[i].size   = nfiles;
+      field[i].ptr    = (double *) malloc(nfiles*sizeof(double));
       field[i].weight = (double *) malloc(nfiles*sizeof(double));
       for ( fileID = 0; fileID < nfiles; fileID++ )
 	field[i].weight[fileID] = 1;
@@ -173,9 +173,9 @@ void *Ensstat(void *argument)
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
 	    }
 
-	  gridID = vlistInqVarGrid(vlistID1, varID);
+	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  missval = vlistInqVarMissval(vlistID1, varID);
+	  missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  nmiss = 0;
 #if defined (_OPENMP)
@@ -231,7 +231,7 @@ void *Ensstat(void *argument)
 
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      if ( field[i].ptr ) free(field[i].ptr);
+      if ( field[i].ptr    ) free(field[i].ptr);
       if ( field[i].weight ) free(field[i].weight);
     }
 
