@@ -9,6 +9,7 @@
 	* New module: Pressure (fpressure, hpressure) [request: Jan Kazir]
 	* New module: Tests (normal, studentt, chisquare, beta, fisher)
 	* New module: Echam5ini (read_e5ml, write_e5ml)
+	* setpartab: add parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
 	* ntime: bug fix for datasets with time constant parameters only [report: David Wang]
 	  (also affected: ndate, nmon, nyear, showdate, showtime, showmon, showyear)

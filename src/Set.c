@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -146,11 +146,11 @@ void *Set(void *argument)
 	  FILE *fp;
 	  NAMELIST *nml;
 	  int nml_code, nml_new_code, nml_table, nml_datatype, nml_name, nml_new_name, nml_stdname;
-	  int nml_longname, nml_units;
+	  int nml_longname, nml_units, nml_ltype;
 	  int locc, i;
-	  int code, new_code, table;
+	  int code, new_code, table, ltype;
 	  int nml_index = 0;
-	  int tabnum;
+	  int codenum, tabnum, levtype;
 	  char *datatype = NULL;
 	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
 	  char varname[256];
@@ -165,6 +165,7 @@ void *Set(void *argument)
 	  nml_code     = namelistAdd(nml, "code",          NML_INT,  0, &code, 1);
 	  nml_new_code = namelistAdd(nml, "new_code",      NML_INT,  0, &new_code, 1);
 	  nml_table    = namelistAdd(nml, "table",         NML_INT,  0, &table, 1);
+	  nml_ltype    = namelistAdd(nml, "ltype",         NML_INT,  0, &ltype, 1);
 	  nml_datatype = namelistAdd(nml, "datatype",      NML_WORD, 0, &datatype, 1);
 	  nml_name     = namelistAdd(nml, "name",          NML_WORD, 0, &name, 1);
 	  nml_new_name = namelistAdd(nml, "new_name",      NML_WORD, 0, &new_name, 1);
@@ -197,20 +198,6 @@ void *Set(void *argument)
 			  cdoPrint("Parameter %d skipped, code number not found!", nml_index);
 			  continue;
 			}
-
-		      if ( nml->entry[nml_table]->occ == 0 )
-			for ( varID = 0; varID < nvars; varID++ )
-			  {
-			    if ( vlistInqVarCode(vlistID2, varID) == code ) break;
-			  }
-		      else
-			for ( varID = 0; varID < nvars; varID++ )
-			  {
-			    tableID = vlistInqVarTable(vlistID2, varID);
-			    tabnum  = tableInqNum(tableID);
-			    if ( vlistInqVarCode(vlistID2, varID) == code &&
-				 tabnum == table ) break;
-			  }
 		    }
 		  else
 		    {
@@ -219,8 +206,25 @@ void *Set(void *argument)
 			  cdoWarning("Parameter %d skipped, variable name not found!", nml_index);
 			  continue;
 			}
+		    }
 
-		      for ( varID = 0; varID < nvars; varID++ )
+		  for ( varID = 0; varID < nvars; varID++ )
+		    {
+		      if ( operatorID == SETPARTAB )
+			{
+			  codenum = vlistInqVarCode(vlistID2, varID);
+			  tableID = vlistInqVarTable(vlistID2, varID);
+			  tabnum  = tableInqNum(tableID);
+			  levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
+			  /*
+			  printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
+			  */
+			  if ( nml->entry[nml_table]->occ == 0 ) table = tabnum;
+			  if ( nml->entry[nml_ltype]->occ == 0 ) ltype = levtype;
+
+			  if ( codenum == code && tabnum == table && levtype == ltype ) break;
+			}
+		      else
 			{
 			  vlistInqVarName(vlistID2, varID, varname);
 			  if ( strcmp(varname, name) == 0 ) break;
@@ -229,13 +233,13 @@ void *Set(void *argument)
 
 		  if ( varID < nvars )
 		    {
-		      if ( nml->entry[nml_code]->occ )     vlistDefVarCode(vlistID2, varID, code);
+		      if ( nml->entry[nml_code]->occ     ) vlistDefVarCode(vlistID2, varID, code);
 		      if ( nml->entry[nml_new_code]->occ ) vlistDefVarCode(vlistID2, varID, new_code);
-		      if ( nml->entry[nml_name]->occ )     vlistDefVarName(vlistID2, varID, name);
+		      if ( nml->entry[nml_name]->occ     ) vlistDefVarName(vlistID2, varID, name);
 		      if ( nml->entry[nml_new_name]->occ ) vlistDefVarName(vlistID2, varID, new_name);
-		      if ( nml->entry[nml_stdname]->occ )  vlistDefVarStdname(vlistID2, varID, stdname);
+		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
 		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
-		      if ( nml->entry[nml_units]->occ )    vlistDefVarUnits(vlistID2, varID, units);
+		      if ( nml->entry[nml_units]->occ    ) vlistDefVarUnits(vlistID2, varID, units);
 		    }
 		  else
 		    {

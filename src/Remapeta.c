@@ -280,8 +280,8 @@ void *Remapeta(void *argument)
       zaxisID = vlistInqVarZaxis(vlistID1, varID);
       nlevel  = zaxisInqSize(zaxisID);
 
-      /* code = vlistInqVarCode(vlistID1, varID); */
-      code = -1;
+      code = vlistInqVarCode(vlistID1, varID);
+      /* code = -1; */
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);

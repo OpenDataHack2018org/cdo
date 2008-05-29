@@ -176,10 +176,10 @@ void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corn
   double dlon, minlon, maxlon;
 
   dlon = 360./xsize;
-
+  /*
   if ( xsize == 1 || (grid_center_lon[xsize-1]-grid_center_lon[0]+dlon) < 359 )
     cdoAbort("Cannot calculate Xbounds for %d vals with dlon = %g", xsize, dlon);
-
+  */
   for ( i = 0; i < xsize; i++ )
     {
       minlon = grid_center_lon[i] - HALF*dlon;

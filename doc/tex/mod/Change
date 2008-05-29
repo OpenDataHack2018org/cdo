@@ -27,7 +27,7 @@ Changes some user given code numbers to new user given values.
 
 @BeginOperator_chname
 @Title     = Change variable name
-@Parameter = ovar nvar ...
+@Parameter = oldname newname ...
 
 @BeginDescription
 Changes some user given variable names to new user given names.
@@ -57,7 +57,7 @@ Changes one level of a user given code number.
 
 @BeginOperator_chlevelv
 @Title     = Change level of one variable
-@Parameter = var oldlev newlev
+@Parameter = name oldlev newlev
 
 @BeginDescription
 Changes one level of a user given variable.
@@ -70,9 +70,9 @@ Changes one level of a user given variable.
 INTEGER  Code number
 @Item = oldcode,newcode,...
 INTEGER  Pairs of old and new code numbers
-@Item = var
+@Item = name
 STRING   Variable name
-@Item = ovar,nvar,...
+@Item = oldname,newname,...
 STRING   Pairs of old and new variable names
 @Item = oldlev
 FLOAT    Old level
