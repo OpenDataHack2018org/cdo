@@ -3,7 +3,7 @@
 This section descibes how to use {\CDO}.
 The syntax is:
 \begin{verbatim}
-   cdo  [Options]  [Operators]
+   cdo  [ Options ] Operator1 [ --Operator2 [ --OperatorN ] ]
 \end{verbatim}
 
 
@@ -91,7 +91,7 @@ A detailed description of all operators can be found in the
 
 All operators with a fixed number of input streams and one output stream
 can pipe the result directly to an other operator.
-The operator must begin with "-", in order to combine it with others.
+The operator must begin with "--", in order to combine it with others.
 This can improve the performance by:
 \begin{itemize}
 \item reducing unnecessary disk I/O
@@ -109,6 +109,18 @@ instead of
    rm tmp1 tmp2
 \end{verbatim}
 
+All operators with an unlimited number of input streams ({\tt ifiles})
+can't be combined with other operators. Here is an incomplete list
+of those operators:
+{\bf \htmlref{copy}{copy}},
+{\bf \htmlref{cat}{cat}},
+{\bf \htmlref{merge}{merge}},
+{\bf \htmlref{mergetime}{mergetime}},
+{\bf \htmlref{ens$<\!STAT\!>$}{ENSSTAT}}
+
+Combining of operators is implemented over POSIX Threads (pthread).
+Therefore this {\CDO} feature is not available on operating systems 
+without POSIX Threads.
 
 \subsection{Operator parameter}
 
