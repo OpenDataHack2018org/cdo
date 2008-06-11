@@ -383,6 +383,7 @@ void *Sinfo(void *argument)
 	  else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
 	  else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
 	  else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
+	  else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
 	  else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
 	  else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
 	  else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");

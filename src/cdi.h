@@ -84,6 +84,7 @@ extern "C" {
 #define  DATATYPE_INT8          208
 #define  DATATYPE_INT16         216
 #define  DATATYPE_INT32         232
+#define  DATATYPE_UINT8         308
 
 /* internal data types */
 
