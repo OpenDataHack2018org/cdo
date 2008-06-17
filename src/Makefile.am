@@ -147,6 +147,9 @@ cdo_SOURCES = Arith.c		\
               fieldmer.c  	\
               fieldzon.c  	\
               grid.c		\
+              grid.h		\
+              gridnc.c		\
+              gridh5.c		\
               hetaeta.c		\
               history.c		\
               institution.c 	\

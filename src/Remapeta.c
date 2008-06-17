@@ -38,7 +38,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void hetaeta(int ltq, int ngp,
+
+void hetaeta(int ltq, int ngp, int *imiss,
 	     int nlev1, double *ah1, double *bh1,
              double *fis1, double *ps1, 
              double *t1, double *q1,
@@ -47,6 +48,52 @@ void hetaeta(int ltq, int ngp,
              double *t2, double *q2,
 	     int nvars, double **vars1, double **vars2,
 	     double *tscor, double *pscor, double *secor);
+
+
+static void setmissval(int nvals, int *imiss, double missval, double *array)
+{
+  int i;
+
+  if ( imiss )
+    {
+      for ( i = 0; i < nvals; i++ )
+	{
+	  if ( imiss[i] ) array[i] = missval;
+	}
+    }
+}
+
+ 
+static void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval)
+{
+  int i;
+  double xmin =  DBL_MAX;
+  double xmax = -DBL_MAX;
+
+  if ( imiss )
+    {
+      for ( i = 0; i < nvals; i++ )
+	{
+	  if ( ! imiss[i] )
+	    {
+	      if      ( array[i] > xmax ) xmax = array[i];
+	      else if ( array[i] < xmin ) xmin = array[i];
+	    }
+	}
+    }
+  else
+    {
+      for ( i = 0; i < nvals; i++ )
+	{
+	  if      ( array[i] > xmax ) xmax = array[i];
+	  else if ( array[i] < xmin ) xmin = array[i];
+	}
+    }
+
+  *minval = xmin;
+  *maxval = xmax;
+}
+
 
 #define  MAX_VARS3D  1024
 
@@ -79,12 +126,15 @@ void *Remapeta(void *argument)
   double *fis1 = NULL, *ps1 = NULL, *t1 = NULL, *q1 = NULL;
   double *fis2 = NULL, *ps2 = NULL, *t2 = NULL, *q2 = NULL;
   double *tscor = NULL, *pscor = NULL, *secor = NULL;
-  int nmiss;
+  int nmiss, nmissout = 0;
   int ltq = FALSE;
   int lfis2 = FALSE;
   int varids[MAX_VARS3D];
+  int *imiss = NULL;
   double *array = NULL;
   double **vars1 = NULL, **vars2 = NULL;
+  double minval, maxval;
+  double missval = 0;
 
   cdoInitialize(argument);
 
@@ -153,29 +203,37 @@ void *Remapeta(void *argument)
 	  vlistID1 = streamInqVlist(streamID1);
 
 	  streamInqRecord(streamID1, &varID, &levelID);
-	  gridID = vlistInqVarGrid(vlistID1, varID);
+	  gridID  = vlistInqVarGrid(vlistID1, varID);
 	  nfis2gp = gridInqSize(gridID);
 
 	  fis2  = (double *) malloc(nfis2gp*sizeof(double));
 
 	  streamReadRecord(streamID1, fis2, &nmiss);
 
+	  if ( nmiss )
+	    {
+	      missval = vlistInqVarMissval(vlistID1, varID);
+	      imiss = (int *) malloc (nfis2gp*sizeof(int));
+	      for ( i = 0; i < nfis2gp; ++i )
+		{
+		  if ( DBL_IS_EQUAL(fis2[i], missval) )
+		    imiss[i] = 1;
+		  else 
+		    imiss[i] = 0;
+		}
+
+	      nmissout = nmiss;
+	    }
+
 	  /* check range of geop */
-	  {
-	    double minval =  DBL_MAX;
-	    double maxval = -DBL_MAX;
-	    for ( i = 0; i < nfis2gp; i++ )
-	      {
-		if      ( fis2[i] > maxval ) maxval = fis2[i];
-		else if ( fis2[i] < minval ) minval = fis2[i];
-	      }
 
-	    if ( minval < -100000 || maxval > 100000 )
-	      cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+	  minmax(nfis2gp, fis2, imiss, &minval, &maxval);
 
-	    if ( minval < -1.e10 || maxval > 1.e10 )
-	      cdoAbort("Orography out of range!");
-	  }
+	  if ( minval < -100000 || maxval > 100000 )
+	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+
+	  if ( minval < -1.e10 || maxval > 1.e10 )
+	    cdoAbort("Orography out of range!");
 
 	  streamClose(streamID1); 
 	}
@@ -447,44 +505,31 @@ void *Remapeta(void *argument)
       if ( zaxisIDh != -1 )
 	{
 	  /* check range of ps_prog */
-	  {
-	    double minval =  DBL_MAX;
-	    double maxval = -DBL_MAX;
-	    for ( i = 0; i < ngp; i++ )
-	      {
-		if      ( ps1[i] > maxval ) maxval = ps1[i];
-		else if ( ps1[i] < minval ) minval = ps1[i];
-	      }
 
-	    if ( minval < 20000 || maxval > 150000 )
-	      cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+	  minmax(ngp, ps1, imiss, &minval, &maxval);
 
-	    if ( minval < -1.e10 || maxval > 1.e10 )
-	      cdoAbort("Surface pressure out of range!");
-	  }
+	  if ( minval < 20000 || maxval > 150000 )
+	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+
+	  if ( minval < -1.e10 || maxval > 1.e10 )
+	    cdoAbort("Surface pressure out of range!");
+
 	  /* check range of geop */
-	  {
-	    double minval =  DBL_MAX;
-	    double maxval = -DBL_MAX;
-	    for ( i = 0; i < ngp; i++ )
-	      {
-		if      ( fis1[i] > maxval ) maxval = fis1[i];
-		else if ( fis1[i] < minval ) minval = fis1[i];
-	      }
 
-	    if ( minval < -100000 || maxval > 100000 )
-	      cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+	  minmax(ngp, fis1, imiss, &minval, &maxval);
 
-	    if ( minval < -1.e10 || maxval > 1.e10 )
-	      cdoAbort("Orography out of range!");
-	  }
+	  if ( minval < -100000 || maxval > 100000 )
+	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+
+	  if ( minval < -1.e10 || maxval > 1.e10 )
+	    cdoAbort("Orography out of range!");
 	}
 
       if ( lfis2 == FALSE )
 	for ( i = 0; i < ngp; i++ ) fis2[i] = fis1[i];
 
       if ( nvars3D || ltq )
-	hetaeta(ltq, ngp,
+	hetaeta(ltq, ngp, imiss,
 		nlevh1, a1, b1,
 		fis1, ps1,
 		t1, q1,
@@ -498,9 +543,9 @@ void *Remapeta(void *argument)
 	{
 	  varID   = geopID;
 	  levelID = 0;
-	  nmiss   = 0;
+	  setmissval(ngp, imiss, missval, fis2);
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, fis2, nmiss);
+	  streamWriteRecord(streamID2, fis2, nmissout);
 	}
 
       if ( lnpsID != -1 )
@@ -510,9 +555,9 @@ void *Remapeta(void *argument)
 	{
 	  varID   = presID;
 	  levelID = 0;
-	  nmiss   = 0;
+	  setmissval(ngp, imiss, missval, ps2);
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, ps2, nmiss);
+	  streamWriteRecord(streamID2, ps2, nmissout);
 	}
 
       if ( ltq )
@@ -524,10 +569,10 @@ void *Remapeta(void *argument)
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 	      single2  = t2 + offset;
-	      nmiss    = 0;
 
+	      if ( gridsize == ngp ) setmissval(ngp, imiss, missval, single2);
 	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, nmiss);
+	      streamWriteRecord(streamID2, single2, nmissout);
 	    }
 
 	  varID = sqID;
@@ -537,10 +582,10 @@ void *Remapeta(void *argument)
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 	      single2  = q2 + offset;
-	      nmiss    = 0;
 
+	      if ( gridsize == ngp ) setmissval(ngp, imiss, missval, single2);
 	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, nmiss);
+	      streamWriteRecord(streamID2, single2, nmissout);
 	    }
 	}
 
@@ -553,10 +598,10 @@ void *Remapeta(void *argument)
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 	      single2  = vars2[iv] + offset;
-	      nmiss    = 0;
 
+	      if ( gridsize == ngp ) setmissval(ngp, imiss, missval, single2);
 	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, single2, nmiss);
+	      streamWriteRecord(streamID2, single2, nmissout);
 	    }
 	}
 
@@ -587,6 +632,8 @@ void *Remapeta(void *argument)
       free(pscor);
       free(tscor);
     }
+
+  if ( imiss ) free(imiss);
 
   free(ps2);
   free(fis2);

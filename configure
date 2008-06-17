@@ -707,6 +707,7 @@ CPP
 GREP
 EGREP
 SZLIBDIR
+HDF5DIR
 FC
 LIBOBJS
 LTLIBOBJS'
@@ -1320,6 +1321,8 @@ Optional Packages:
                           expect to find subdirs include and lib.
   --with-szlib=<directory>
                           Specify location of SZLIB library. Configure will
+                          expect to find subdirs include and lib.
+  --with-hdf5=<directory> Specify location of HDF5 library. Configure will
                           expect to find subdirs include and lib.
 
 Some influential environment variables:
@@ -6962,6 +6965,99 @@ fi
 SZLIBDIR=$SZLIBDIR
 
 
+#  ----------------------------------------------------------------------
+#  Compile interface with HDF5 library
+#
+{ echo "$as_me:$LINENO: checking whether a location for the HDF5 library was specified" >&5
+echo $ECHO_N "checking whether a location for the HDF5 library was specified... $ECHO_C" >&6; }
+
+# Check whether --with-hdf5 was given.
+if test "${with_hdf5+set}" = set; then
+  withval=$with_hdf5; HDF5DIR=$with_hdf5
+fi
+
+{ echo "$as_me:$LINENO: result: $HDF5DIR" >&5
+echo "${ECHO_T}$HDF5DIR" >&6; }
+LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
+CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
+
+{ echo "$as_me:$LINENO: checking for H5Fopen in -lhdf5" >&5
+echo $ECHO_N "checking for H5Fopen in -lhdf5... $ECHO_C" >&6; }
+if test "${ac_cv_lib_hdf5_H5Fopen+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lhdf5 -lm -lz $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char H5Fopen ();
+int
+main ()
+{
+return H5Fopen ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_hdf5_H5Fopen=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_hdf5_H5Fopen=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_hdf5_H5Fopen" >&5
+echo "${ECHO_T}$ac_cv_lib_hdf5_H5Fopen" >&6; }
+if test $ac_cv_lib_hdf5_H5Fopen = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBHDF5 1
+_ACEOF
+
+  LIBS="-lhdf5 $LIBS"
+
+else
+  LDFLAGS="$LDFLAGS"
+fi
+
+HDF5DIR=$HDF5DIR
+
+
+#  ----------------------------------------------------------------------
+
 
 FC=$F77
 
@@ -7705,12 +7801,13 @@ CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
 SZLIBDIR!$SZLIBDIR$ac_delim
+HDF5DIR!$HDF5DIR$ac_delim
 FC!$FC$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 96; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

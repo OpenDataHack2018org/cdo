@@ -73,7 +73,7 @@ static double esat(double temperature)
 }
 
 /* Source from INTERA */
-void hetaeta(int ltq, int ngp,
+void hetaeta(int ltq, int ngp, int *imiss,
 	     int nlev1, double *ah1, double *bh1,
              double *fis1, double *ps1, 
              double *t1, double *q1,
@@ -243,6 +243,9 @@ void hetaeta(int ltq, int ngp,
 
   for ( ij = 0; ij < ngp; ++ij )
     {
+      if ( imiss )
+	if ( imiss[ij] ) continue;
+
       /******* initialise atmospheric fields in old system */
       
       /* pressure */

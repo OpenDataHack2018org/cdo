@@ -72,8 +72,9 @@ case "${HOSTNAME}" in
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
 	            --with-netcdf=/client \
+	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal" LIBS="-lz"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --program-suffix=_${SGE_SUFFIX} \

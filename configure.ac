@@ -262,6 +262,22 @@ CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
 AC_CHECK_LIB(sz, SZ_BufftoBuffCompress,, LDFLAGS="$LDFLAGS")
 AC_SUBST([SZLIBDIR], [$SZLIBDIR])
 
+#  ----------------------------------------------------------------------
+#  Compile interface with HDF5 library
+#
+AC_MSG_CHECKING([whether a location for the HDF5 library was specified])
+AC_ARG_WITH([hdf5],
+            [AS_HELP_STRING([--with-hdf5=<directory>],
+                            [Specify location of HDF5 library. Configure will expect to find subdirs include and lib.])],
+            [HDF5DIR=$with_hdf5])
+AC_MSG_RESULT([$HDF5DIR])
+LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
+CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
+AC_CHECK_LIB(hdf5, H5Fopen,, LDFLAGS="$LDFLAGS", -lm -lz)
+AC_SUBST([HDF5DIR], [$HDF5DIR])
+
+#  ----------------------------------------------------------------------
+
 AC_SUBST([CPPFLAGS])
 AC_SUBST([FC],$F77)
 AC_SUBST([AR])

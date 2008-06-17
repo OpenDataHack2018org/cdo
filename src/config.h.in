@@ -27,6 +27,9 @@
 /* Define to 1 for GRIB interface */
 #undef HAVE_LIBGRIB
 
+/* Define to 1 if you have the `hdf5' library (-lhdf5). */
+#undef HAVE_LIBHDF5
+
 /* Define to 1 for IEG interface */
 #undef HAVE_LIBIEG
 

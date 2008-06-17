@@ -370,6 +370,9 @@ src/fieldzon.c -text
 src/fourier.c -text
 src/functs.h -text
 src/grid.c -text
+src/grid.h -text
+src/gridh5.c -text
+src/gridnc.c -text
 src/hetaeta.c -text
 src/history.c -text
 src/institution.c -text
