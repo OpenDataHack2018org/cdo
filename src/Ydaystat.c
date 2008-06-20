@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -47,6 +47,7 @@ void *Ydaystat(void *argument)
   int operatorID;
   int operfunc;
   int gridsize;
+  int i;
   int varID;
   int recID;
   int gridID;
@@ -64,7 +65,7 @@ void *Ydaystat(void *argument)
   int *recVarID, *recLevelID;
   int vdates[NDAY], vtimes[NDAY];
   double missval;
-  FIELD **vars1[NDAY], **vars2[NDAY];
+  FIELD **vars1[NDAY], **vars2[NDAY], **samp1[NDAY];
   FIELD field;
 
   cdoInitialize(argument);
@@ -84,6 +85,7 @@ void *Ydaystat(void *argument)
     {
       vars1[dayoy] = NULL;
       vars2[dayoy] = NULL;
+      samp1[dayoy] = NULL;
       nsets[dayoy] = 0;
     }
 
@@ -136,6 +138,7 @@ void *Ydaystat(void *argument)
       if ( vars1[dayoy] == NULL )
 	{
 	  vars1[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  samp1[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
@@ -147,6 +150,7 @@ void *Ydaystat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      samp1[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[dayoy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
@@ -156,6 +160,10 @@ void *Ydaystat(void *argument)
 		  vars1[dayoy][varID][levelID].nmiss   = 0;
 		  vars1[dayoy][varID][levelID].missval = missval;
 		  vars1[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  samp1[dayoy][varID][levelID].grid    = gridID;
+		  samp1[dayoy][varID][levelID].nmiss   = 0;
+		  samp1[dayoy][varID][levelID].missval = missval;
+		  samp1[dayoy][varID][levelID].ptr     = NULL;
 		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[dayoy][varID][levelID].grid    = gridID;
@@ -180,12 +188,39 @@ void *Ydaystat(void *argument)
 	    {
 	      streamReadRecord(streamID1, vars1[dayoy][varID][levelID].ptr, &nmiss);
 	      vars1[dayoy][varID][levelID].nmiss = nmiss;
+
+	      if ( nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
+		{
+		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
+		    samp1[dayoy][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( DBL_IS_EQUAL(vars1[dayoy][varID][levelID].ptr[i],
+				      vars1[dayoy][varID][levelID].missval) )
+		      samp1[dayoy][varID][levelID].ptr[i] = 0;
+		    else
+		      samp1[dayoy][varID][levelID].ptr[i] = 1;
+		}
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
 	      field.grid    = vars1[dayoy][varID][levelID].grid;
 	      field.missval = vars1[dayoy][varID][levelID].missval;
+
+	      if ( field.nmiss > 0 || samp1[dayoy][varID][levelID].ptr )
+		{
+		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
+		    {
+		      samp1[dayoy][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+		      for ( i = 0; i < gridsize; i++ )
+			samp1[dayoy][varID][levelID].ptr[i] = nsets[dayoy];
+		    }
+		  
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[dayoy][varID][levelID].missval) )
+		      samp1[dayoy][varID][levelID].ptr[i]++;
+		}
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
@@ -222,7 +257,12 @@ void *Ydaystat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcmul(&vars1[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		{
+		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
+		    farcmul(&vars1[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		  else
+		    fardiv(&vars1[dayoy][varID][levelID], samp1[dayoy][varID][levelID]);
+		}
 	    }
 	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -230,10 +270,23 @@ void *Ydaystat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		if ( operfunc == func_std )
-		  farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
-		else
-		  farcvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		{
+		  if ( samp1[dayoy][varID][levelID].ptr == NULL )
+		    {
+		      if ( operfunc == func_std )
+			farcstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		      else
+			farcvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], 1.0/nsets[dayoy]);
+		    }
+		  else
+		    {
+		      farinv(&samp1[dayoy][varID][levelID]);
+		      if ( operfunc == func_std )
+			farstd(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID]);
+		      else
+			farvar(&vars1[dayoy][varID][levelID], vars2[dayoy][varID][levelID], samp1[dayoy][varID][levelID]);
+		    }
+		}
 	    }
 
 	taxisDefVdate(taxisID2, vdates[dayoy]);
@@ -264,14 +317,17 @@ void *Ydaystat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[dayoy][varID][levelID].ptr);
+		  if ( samp1[dayoy][varID][levelID].ptr ) free(samp1[dayoy][varID][levelID].ptr);
 		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[dayoy][varID]);
+	      free(samp1[dayoy][varID]);
 	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy][varID]);
 	    }
 
 	  free(vars1[dayoy]);
+	  free(samp1[dayoy]);
 	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[dayoy]);
 	}
     }
