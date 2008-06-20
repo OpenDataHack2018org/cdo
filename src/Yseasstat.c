@@ -193,7 +193,8 @@ void *Yseasstat(void *argument)
 		    samp1[seas][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
 
 		  for ( i = 0; i < gridsize; i++ )
-		    if ( DBL_IS_EQUAL(vars1[seas][varID][levelID].ptr[i], vars1[seas][varID][levelID].missval) )
+		    if ( DBL_IS_EQUAL(vars1[seas][varID][levelID].ptr[i],
+				      vars1[seas][varID][levelID].missval) )
 		      samp1[seas][varID][levelID].ptr[i] = 0;
 		    else
 		      samp1[seas][varID][levelID].ptr[i] = 1;

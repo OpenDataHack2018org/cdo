@@ -195,7 +195,8 @@ void *Seasstat(void *argument)
 			samp1[varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
 
 		      for ( i = 0; i < gridsize; i++ )
-			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
+			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i],
+					  vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
 			else
 			  samp1[varID][levelID].ptr[i] = 1;
