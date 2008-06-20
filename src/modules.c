@@ -91,6 +91,7 @@ void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pressure(void *argument);
 void *Pinfo(void *argument);
+void *Readamsr(void *argument);
 void *Regres(void *argument);
 void *Remap(void *argument);
 void *Remapeta(void *argument);
@@ -290,6 +291,7 @@ void *Wct(void *argument);
                                  "outputboundscpt", "outputvector", "outputtri"}
 #define  PressureOperators      {"fpressure", "hpressure"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
+#define  ReadamsrOperators      {"read_amsr"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}

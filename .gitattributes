@@ -261,6 +261,7 @@ src/Output.c -text
 src/Outputgmt.c -text
 src/Pinfo.c -text
 src/Pressure.c -text
+src/Readamsr.c -text
 src/Regres.c -text
 src/Remap.c -text
 src/Remapeta.c -text
