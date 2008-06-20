@@ -79,7 +79,7 @@ For every gridpoint the standard deviation over all levels is computed.
 
 
 @BeginExample
-To compute the vertical sum of all input variables, use:
+To compute the vertical sum of all input variables use:
 @BeginVerbatim
    cdo vertsum ifile ofile
 @EndVerbatim

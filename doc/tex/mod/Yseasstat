@@ -185,7 +185,7 @@ o(\mbox{4},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{09, 10, 11}\}
 
 
 @BeginExample
-To compute the seasonal mean over all input years, use:
+To compute the seasonal mean over all input years use:
 @BeginVerbatim
    cdo yseasmean ifile ofile
 @EndVerbatim

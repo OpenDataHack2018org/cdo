@@ -150,7 +150,7 @@ time step in ifile.
 
 
 @BeginExample
-To compute the running mean over 9 time steps, use:
+To compute the running mean over 9 time steps use:
 @BeginVerbatim
    cdo runmean,9 ifile ofile
 @EndVerbatim

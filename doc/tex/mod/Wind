@@ -107,7 +107,7 @@ is calculated from the number of latitudes by:
 @BeginExample
 Assume a dataset has at least spherical harmonic coefficients
 of divergence and vorticity.
-To transform the spectral divergence and vorticity to U and V wind, use:
+To transform the spectral divergence and vorticity to U and V wind use:
 @BeginVerbatim
    cdo dv2uv ifile ofile
 @EndVerbatim

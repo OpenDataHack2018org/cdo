@@ -11,8 +11,8 @@
 Let @file{ifile1} and @file{ifile2} be time series of maximum and minimum
 temperatures TX and TN, respectively. Then the extreme temperature
 range is the difference of the maximum of TX and the minimum of TN.
-Note that TX and TN must be given in the same units.
-The date information for a time step in @file{ofile} is the date of
+Note that TX and TN have to be given in the same units.
+The date information of a time step in @file{ofile} is the date of
 the last contributing time steps in @file{ifile1} and @file{ifile2}.
 @EndDescription
 @EndModule
@@ -25,7 +25,7 @@ the last contributing time steps in @file{ifile1} and @file{ifile2}.
 
 @BeginExample
 To get the intra-period extreme temperature range for two time
-series of maximum and minimum temperatures, use:
+series of maximum and minimum temperatures use:
 @BeginVerbatim
    cdo eca_etr txfile tnfile ofile
 @EndVerbatim

@@ -9,7 +9,7 @@
 @BeginDescription
 Let @file{ifile} be a time series of daily precipitation amounts RR,
 then counted is the number of days where RR is at least 20 mm. 
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -22,7 +22,7 @@ the last contributing time step in @file{ifile}.
 
 @BeginExample
 To get the number of days with precipitation greater than 20 mm for
-a time series of daily precipitation amounts, use:
+a time series of daily precipitation amounts use:
 @BeginVerbatim
    cdo eca_r20mm rrfile ofile
 @EndVerbatim

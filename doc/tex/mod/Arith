@@ -9,7 +9,9 @@
 
 @BeginDescription
 This module performs simple arithmetic of two datasets.
-The header and date information in @file{ofile} is the same as in @file{ifile1}.
+The number of fields in @file{ifile1} should be the same as in @file{ifile2}.
+One of the input files can contain only one time step or one field.
+The fields in @file{ofile} inherit the meta data from @file{ifile1} or @file{ifile2}.
 @EndDescription
 @EndModule
 

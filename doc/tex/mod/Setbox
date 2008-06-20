@@ -34,7 +34,7 @@ user has to give the longitudes and latitudes of the edges of the box.
 @BeginDescription
 Sets the values of an index box to a constant value. The user has to 
 give the indexes of the edges of the box. The index of the left edge 
-may be greater then that of the right edge.
+can be greater than the one of the right edge.
 @EndDescription
 @EndOperator
 
@@ -63,7 +63,7 @@ INTEGER  Index of last latitude
 
 @BeginExample
 To set all values in the region with the longitudes from 120E to 90W and
-latitudes from 20N to 20S to the constant value -1.23, use:
+latitudes from 20N to 20S to the constant value -1.23 use:
 @BeginVerbatim
    cdo setclonlatbox,-1.23,120,-90,20,-20 ifile ofile
 @EndVerbatim

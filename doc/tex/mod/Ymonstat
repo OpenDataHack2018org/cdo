@@ -171,7 +171,7 @@ o(\mbox{12},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 
 
 @BeginExample
-To compute the monthly mean over all input years, use:
+To compute the monthly mean over all input years use:
 @BeginVerbatim
    cdo ymonmean ifile ofile
 @EndVerbatim

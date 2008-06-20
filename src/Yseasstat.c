@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -46,6 +46,7 @@ void *Yseasstat(void *argument)
   int operatorID;
   int operfunc;
   int gridsize;
+  int i;
   int varID;
   int recID;
   int gridID;
@@ -63,7 +64,7 @@ void *Yseasstat(void *argument)
   int *recVarID, *recLevelID;
   int vdates[NSEAS], vtimes[NSEAS];
   double missval;
-  FIELD **vars1[NSEAS], **vars2[NSEAS];
+  FIELD **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
   FIELD field;
 
   cdoInitialize(argument);
@@ -83,6 +84,7 @@ void *Yseasstat(void *argument)
     {
       vars1[seas] = NULL;
       vars2[seas] = NULL;
+      samp1[seas] = NULL;
       nsets[seas] = 0;
     }
 
@@ -134,6 +136,7 @@ void *Yseasstat(void *argument)
       if ( vars1[seas] == NULL )
 	{
 	  vars1[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  samp1[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
@@ -145,6 +148,7 @@ void *Yseasstat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      samp1[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[seas][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
@@ -154,6 +158,10 @@ void *Yseasstat(void *argument)
 		  vars1[seas][varID][levelID].nmiss   = 0;
 		  vars1[seas][varID][levelID].missval = missval;
 		  vars1[seas][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  samp1[seas][varID][levelID].grid    = gridID;
+		  samp1[seas][varID][levelID].nmiss   = 0;
+		  samp1[seas][varID][levelID].missval = missval;
+		  samp1[seas][varID][levelID].ptr     = NULL;
 		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[seas][varID][levelID].grid    = gridID;
@@ -178,12 +186,38 @@ void *Yseasstat(void *argument)
 	    {
 	      streamReadRecord(streamID1, vars1[seas][varID][levelID].ptr, &nmiss);
 	      vars1[seas][varID][levelID].nmiss = nmiss;
+
+	      if ( nmiss > 0 || samp1[seas][varID][levelID].ptr )
+		{
+		  if ( samp1[seas][varID][levelID].ptr == NULL )
+		    samp1[seas][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( DBL_IS_EQUAL(vars1[seas][varID][levelID].ptr[i], vars1[seas][varID][levelID].missval) )
+		      samp1[seas][varID][levelID].ptr[i] = 0;
+		    else
+		      samp1[seas][varID][levelID].ptr[i] = 1;
+		}
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
 	      field.grid    = vars1[seas][varID][levelID].grid;
 	      field.missval = vars1[seas][varID][levelID].missval;
+
+	      if ( field.nmiss > 0 || samp1[seas][varID][levelID].ptr )
+		{
+		  if ( samp1[seas][varID][levelID].ptr == NULL )
+		    {
+		      samp1[seas][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+		      for ( i = 0; i < gridsize; i++ )
+			samp1[seas][varID][levelID].ptr[i] = nsets[seas];
+		    }
+		  
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[seas][varID][levelID].missval) )
+		      samp1[seas][varID][levelID].ptr[i]++;
+		}
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
@@ -220,7 +254,12 @@ void *Yseasstat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcmul(&vars1[seas][varID][levelID], 1.0/nsets[seas]);
+		{
+		  if ( samp1[seas][varID][levelID].ptr == NULL )
+		    farcmul(&vars1[seas][varID][levelID], 1.0/nsets[seas]);
+		  else
+		    fardiv(&vars1[seas][varID][levelID], samp1[seas][varID][levelID]);
+		}
 	    }
 	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -228,10 +267,23 @@ void *Yseasstat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		if ( operfunc == func_std )
-		  farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
-		else
-		  farcvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+		{
+		  if ( samp1[month][varID][levelID].ptr == NULL )
+		    {
+		      if ( operfunc == func_std )
+			farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+		      else
+			farcvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
+		    }
+		  else
+		    {
+		      farinv(&samp1[seas][varID][levelID]);
+		      if ( operfunc == func_std )
+			farstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID]);
+		      else
+			farvar(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], samp1[seas][varID][levelID]);
+		    }
+		}
 	    }
 
 	taxisDefVdate(taxisID2, vdates[seas]);
@@ -262,14 +314,17 @@ void *Yseasstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[seas][varID][levelID].ptr);
+		  if ( samp1[seas][varID][levelID].ptr ) free(samp1[seas][varID][levelID].ptr);
 		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[seas][varID]);
+	      free(samp1[seas][varID]);
 	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas][varID]);
 	    }
 
 	  free(vars1[seas]);
+	  free(samp1[seas]);
 	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[seas]);
 	}
     }

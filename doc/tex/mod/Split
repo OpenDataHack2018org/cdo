@@ -59,11 +59,11 @@ form the output file names.
 
 
 @BeginOperator_splitzaxis
-@Title     = Split zaxis
+@Title     = Split z-axes
 
 @BeginDescription
-Splits a dataset into pieces, one for each different zaxis.
-Appends two digits with the zaxis number to @file{oprefix} to 
+Splits a dataset into pieces, one for each different z-axis.
+Appends two digits with the z-axis number to @file{oprefix} to 
 form the output file names.
 @EndDescription
 @EndOperator

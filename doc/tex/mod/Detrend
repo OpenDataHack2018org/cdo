@@ -41,12 +41,12 @@ o(t,x) = i(t,x) - (a(x) + b(x)t)
 
 @BeginNote
 This operator has to keep the fields of all time steps concurrently in the memory.
-If not enough memory is available, use the operators @mod{trend} and @mod{subtrend}.
+If not enough memory is available use the operators @mod{trend} and @mod{subtrend}.
 @EndNote
 
 
 @BeginExample
-To detrend the data in @file{ifile} and to store the detrended data in @file{ofile}, use:
+To detrend the data in @file{ifile} and to store the detrended data in @file{ofile} use:
 @BeginVerbatim
   cdo detrend ifile ofile
 @EndVerbatim

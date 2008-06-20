@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = Setzaxis
-@Title     = Set zaxis type
+@Title     = Set z-axis type
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
@@ -9,17 +9,17 @@
 
 
 @BeginOperator_setzaxis
-@Title     = Set zaxis
+@Title     = Set z-axis
 @Parameter = zaxis
 
 @BeginDescription
-This operator sets the zaxis description of all variables with the
-same number of level as the new zaxis.
+This operator sets the z-axis description of all variables with the
+same number of level as the new z-axis.
 @EndDescription
 @EndOperator
 
 
 @BeginParameter
 @Item = zaxis
-STRING  Zaxis description file or name of the target zaxis
+STRING  Z-axis description file or name of the target z-axis
 @EndParameter

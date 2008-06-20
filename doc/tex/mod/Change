@@ -60,7 +60,7 @@ Changes one level of a user given code number.
 @Parameter = name oldlev newlev
 
 @BeginDescription
-Changes one level of a user given variable.
+Changes one level of a user given variable name.
 @EndDescription
 @EndOperator
 

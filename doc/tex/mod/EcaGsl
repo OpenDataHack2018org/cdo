@@ -16,11 +16,11 @@ after 1 July of at least nday consecutive days with TG < T. The
 numbers nday and T are optional parameter with default nday = 6
 and T = 5° Celsius. The number fland is an optional parameter with
 default value fland = 0.5 and denotes the fraction of a grid point that
-must be covered by land in order to be included in the calculation. A
+have to be covered by land in order to be included in the calculation. A
 further output variable is the start day of year of the growing season.
-Note that TG must be given in units of Kelvin, whereas T must be given
+Note that TG have to be given in units of Kelvin, whereas T have to be given
 in degrees Celsius.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -43,8 +43,8 @@ DOUBLE   Land fraction threshold (default: fland = 0.5)
 
 
 @BeginExample
-To get the growing season length for a time series of daily
-mean temperatures, use:
+To get the growing season length of a time series of daily
+mean temperatures use:
 @BeginVerbatim
    cdo eca_gsl tgfile maskfile ofile
 @EndVerbatim

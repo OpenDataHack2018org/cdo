@@ -8,8 +8,9 @@
 @Operators = npar nlevel nyear nmon ndate ntime
 
 @BeginDescription
-This module prints, according to the actual operator,
-the number of variables, levels or times of the input dataset.
+This module prints the number of variables, levels or times of the 
+input dataset.
+@C  according to the actual operator.
 @EndDescription
 @EndModule
 
@@ -73,7 +74,7 @@ To print the number of parameters (variables) in a dataset use:
 @BeginVerbatim
    cdo npar ifile
 @EndVerbatim
-To print the number of month in a dataset use:
+To print the number of months in a dataset use:
 @BeginVerbatim
    cdo nmon ifile
 @EndVerbatim

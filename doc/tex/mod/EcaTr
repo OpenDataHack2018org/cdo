@@ -11,8 +11,8 @@
 Let @file{ifile} be a time series of daily minimum temperatures TN,
 then counted is the number of days where TN > T. The number T is
 an optional parameter with default T = 20° Celsius. Note that TN
-must be given in units of Kelvin, whereas T must be given in degrees Celsius.
-The date information for a time step in @file{ofile} is the date of
+have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -31,8 +31,8 @@ FLOAT   Temperature threshold (° Celsius, default: T = 20° Celsius)
 
 
 @BeginExample
-To get the number of tropical nights for a time series of daily
-minimum temperatures, use:
+To get the number of tropical nights of a time series of daily
+minimum temperatures use:
 @BeginVerbatim
    cdo eca_tr tnfile ofile
 @EndVerbatim

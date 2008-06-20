@@ -8,9 +8,9 @@
 @Operators = eqc nec lec ltc gec gtc
 
 @BeginDescription
-This module compares all fields of dataset with a constant. The resulting
-field is a mask with 1 if the comparison is true and 0 if the comparison 
-is false. The type of the comparison depends on the actual operator.
+This module compares all fields of a dataset with a constant. The resulting
+field is a mask containing 1 if the comparison is true and 0 if not.
+The type of comparison depends on the actual operator.
 @EndDescription
 @EndModule
 
@@ -88,7 +88,7 @@ o(t,x) = \left\{
 
 
 @BeginOperator_ltc
-@Title     = Less then constant
+@Title     = Less than constant
 @Parameter = c
 
 @BeginDescription
@@ -136,7 +136,7 @@ o(t,x) = \left\{
 
 
 @BeginOperator_gtc
-@Title     = Greater then constant
+@Title     = Greater than constant
 @Parameter = c
 
 @BeginDescription
@@ -166,7 +166,7 @@ FLOAT  Constant
 
 
 @BeginExample
-To create a mask with 1 if the field element is greater than 273.15 and 0 if not, use:
+To create a mask containing 1 if the field element is greater than 273.15 and 0 if not use:
 @BeginVerbatim
    cdo gtc,273.15 ifile ofile
 @EndVerbatim

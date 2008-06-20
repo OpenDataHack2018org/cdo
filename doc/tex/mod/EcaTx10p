@@ -10,9 +10,9 @@
 Let @file{ifile1} be a time series of daily maximum temperatures TX, and
 @file{ifile2} be the 10th percentile TNx10 of daily maximum temperatures
 for any period used as reference. Then calculated is the percentage
-of time where TX < TXn10. Note that both TX and TXn10 must be given
+of time where TX < TXn10. Note that both TX and TXn10 have to be given
 in the same units.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription
 @EndModule
@@ -26,7 +26,7 @@ the last contributing time step in @file{ifile1}.
 @BeginExample
 To compute the percentage of time where the daily maximum temperature
 is less than the 10th percentile of the daily maximum temperature for
-a given reference period, use:
+a given reference period use:
 @BeginVerbatim
    cdo eca_tx10p txfile txn10file ofile
 @EndVerbatim

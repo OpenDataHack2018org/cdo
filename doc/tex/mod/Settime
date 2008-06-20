@@ -25,7 +25,7 @@ Sets the date in every time step to the same given value.
 
 
 @BeginOperator_settime
-@Title     = Set time
+@Title     = Set time of the day
 @Parameter = time
 
 @BeginDescription

@@ -21,13 +21,13 @@ The following pre-defined grid names are available:
     {\tt r<NX>x<NY>} defines a global regular grid.
     The number of the longitudes {\tt <NX>} and the latitudes {\tt <NY>}
     can be selected at will.
-    The longitudes starts at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
+    The longitudes start at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
     The latitudes go from south to north with an increment of (180/{\tt <NY>})$^\circ$.
 
 \subsection*{Global gaussian grid: {\tt t<RES>grid}}
     {\tt t<RES>grid} defines a global gaussian grid.
     Each valid triangular resolution can be used for {\tt <RES>}.
-    The longitudes starts at 0$^\circ$ with an increment of (360/nlon)$^\circ$.
+    The longitudes start at 0$^\circ$ with an increment of (360/nlon)$^\circ$.
     The gaussian latitudes go from north to south.
 
 %\subsection*{Spherical harmonics: t$<$RES$>$spec}
@@ -51,10 +51,10 @@ the first variable will be used.
 \subsection{SCRIP grids}
 
 SCRIP is a Spherical Coordinate Remapping and Interpolation Package.
-It is using a common grid description in netCDF.
+It uses a common grid description in netCDF.
 You can use it to describe curvilinear grids or unstructured grid cells.
 For more information about this format see \cite{SCRIP}.
-This grid description format is only available if the program was compiled
+That grid description format is only available if the program was compiled
 with netCDF support.
 
 \vspace{2mm}
@@ -121,7 +121,7 @@ PINGO grid description example of a T21 gaussian grid:
 
 \subsection{CDO grids}
 
-All supported grids can be also described with the {\CDO} description ASCII formatted file.
+All supported grids can also be described with the {\CDO} grid description.
 %The {\CDO} grid description is an ASCII formatted file.
 %It is a common grid description for all available grids.
 The following keywords can be used to describe a grid:
@@ -153,8 +153,8 @@ Keyword           & Datatype     & Description \\ \hline
 \vspace{4mm}
 
 Which keywords are necessary depends on the gridtype.
-The following table gives an overview of the default values or the size for the different
-grid types.
+The following table gives an overview of the default values or the size
+with respect to the different grid types.
 
 %\vspace{2mm}
 %\begin{tabular}[b]{|c|c|c|c|c|c|c|c|c|}
@@ -216,7 +216,7 @@ ybounds    & 2*ysize & 2*ysize & 4*gridsize & nv*gridsize \\
 
 \vspace{3mm}
 
-The keywords nvertex, xbounds and ybounds are optional if the area weights are not needed.
+The keywords nvertex, xbounds and ybounds are optional if area weights are not needed.
 
 \vspace{2mm}
 

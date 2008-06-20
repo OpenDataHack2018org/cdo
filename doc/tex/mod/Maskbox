@@ -11,6 +11,8 @@
 Masks a box of the rectangular understood field. The elements inside 
 the box are untouched, the elements outside are set to missing value.
 All input fields must have the same horizontal grid.
+Use @mod{sellonlatbox} or @mod{selindexbox} if only the data inside the
+box are needed.
 @EndDescription
 @EndModule
 
@@ -32,8 +34,8 @@ longitudes and latitudes of the edges of the box.
 
 @BeginDescription
 Masks an index box. The user has to give the indexes of the 
-edges of the box. The index of the left edge may be greater 
-then that of the right edge.
+edges of the box. The index of the left edge can be greater 
+then the one of the right edge.
 @EndDescription
 @EndOperator
 
@@ -60,7 +62,7 @@ INTEGER  Index of last latitude
 
 @BeginExample
 To mask the region with the longitudes from 120E to 90W and
-latitudes from 20N to 20S on all input fields, use:
+latitudes from 20N to 20S on all input fields use:
 @BeginVerbatim
    cdo masklonlatbox,120,-90,20,-20 ifile ofile
 @EndVerbatim

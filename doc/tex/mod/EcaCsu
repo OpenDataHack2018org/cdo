@@ -11,9 +11,9 @@
 Let @file{ifile} be a time series of daily maximum temperatures TX,
 then counted is the largest number of consecutive days where TX > T.
 The number T is an optional parameter with default T = 25° Celsius.
-Note that TN must be given in units of Kelvin, whereas T must be given
+Note that TN have to be given in units of Kelvin, whereas T have to be given
 in degrees Celsius.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -32,8 +32,8 @@ DOUBLE   Temperature threshold (° Celsius, default: T = 25° Celsius)
 
 
 @BeginExample
-To get the largest number of consecutive summer days for a time
-series of daily minimum temperatures, use:
+To get the largest number of consecutive summer days of a time
+series of daily minimum temperatures use:
 @BeginVerbatim
    cdo eca_csu txfile ofile
 @EndVerbatim

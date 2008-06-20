@@ -19,7 +19,7 @@ field element is used for the enlargement. If however the input and output
 grid are rectangular, a zonal or meridional enlargement is possible.
 Zonal enlargement takes place, if the xsize of the input field is 1 and 
 the ysize of both grids are the same. For meridional enlargement the ysize
-must be 1 and the xsize of both grids must have the same size.
+have to be 1 and the xsize of both grids must have the same size.
 @EndDescription
 @EndOperator
 
@@ -34,7 +34,7 @@ STRING  Target grid description file or name
 Assumed you want to add two datasets. The first dataset is on a
 T21 grid (2048 field elements) and the second dataset is only a
 global mean (1 field element).
-Before you can add these two datasets the second dataset must be
+Before you can add these two datasets the second dataset have to be
 enlarged to the grid size of the first dataset:
 @BeginVerbatim
    cdo enlarge,t21grid ifile2 tmpfile

@@ -12,7 +12,7 @@ Let @file{ifile} be a time series of daily precipitation amounts RR,
 then counted is the largest number of consecutive days where
 RR is less than 1 mm. A further output variable is the number of dry
 periods of more than 5 days.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -24,8 +24,8 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginExample
-To get the largest number of consecutive dry days for a time series
-of daily precipitation amounts, use:
+To get the largest number of consecutive dry days of a time series
+of daily precipitation amounts use:
 @BeginVerbatim
    cdo eca_cdd rrfile ofile
 @EndVerbatim

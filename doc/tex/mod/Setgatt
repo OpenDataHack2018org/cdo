@@ -44,7 +44,7 @@ STRING  File name which contains global text attributes
 
 
 @BeginNote
-From the supported data formats only netCDF can work with global attributes.
+Besides netCDF none of the supported data formats supports global attributes.
 @EndNote
 
 

@@ -6,9 +6,13 @@
 @Operators = ifthenelse
 
 @BeginDescription
-This operator conditional selects field elements from @file{ifile2} or @file{ifile3} and 
-writes them to @file{ofile}. The fields in @file{ifile1} are handled as a mask.
+This operator selects field elements from @file{ifile2} or @file{ifile3} with respect to
+@file{ifile1} and writes them to @file{ofile}. The fields in @file{ifile1} are handled as a mask.
 A value not equal to zero is treated as "true", zero is treated as "false".
+The number of fields in @file{ifile1} has either to be the same as in @file{ifile2} or the 
+same as in one time step of @file{ifile2} or only one.
+@file{ifile2} and @file{ifile3} need to have the same number of fields.
+The fields in @file{ofile} inherit the meta data from @file{ifile2}.
 @EndDescription
 @EndModule
 
@@ -18,17 +22,19 @@ A value not equal to zero is treated as "true", zero is treated as "false".
 
 @BeginDescription
 @IfMan
-          / i_2(t,x) if i_1(t,x) NE 0  AND  i_1(t,x) NE miss
-o(t,x) = <  i_3(t,x) if i_1(t,x) EQ 0  AND  i_1(t,x) NE miss
-          \ miss     if i_1(t,x) EQ miss
+
+          / i_2(t,x) if i_1([t,]x) NE 0  AND  i_1([t,]x) NE miss
+o(t,x) = <  i_3(t,x) if i_1([t,]x) EQ 0  AND  i_1([t,]x) NE miss
+          \ miss     if i_1([t,]x) EQ miss
 @EndifMan
 @IfDoc
+\vspace*{4mm}
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
-   i_2(t,x) & \mbox{if} \;\;  i_1(t,x) \neq 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
-   i_3(t,x) & \mbox{if} \;\;  i_1(t,x)    = 0 & \wedge \;\; i_1(t,x) \neq \mbox{miss} \\
-\mbox{miss} & \mbox{if} \;\;  i_1(t,x)    = \mbox{miss} \\
+   i_2(t,x) & \mbox{if} \;\;  i_1([t,]x) \neq 0 & \wedge \;\; i_1([t,]x) \neq \mbox{miss} \\
+   i_3(t,x) & \mbox{if} \;\;  i_1([t,]x)    = 0 & \wedge \;\; i_1([t,]x) \neq \mbox{miss} \\
+\mbox{miss} & \mbox{if} \;\;  i_1([t,]x)    = \mbox{miss} \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -38,7 +44,7 @@ o(t,x) = \left\{
 
 @BeginExample
 To select all field elements of @file{ifile2} if the corresponding field
-element of @file{ifile1} is greater than 0 and from @file{ifile3} otherwise, use:
+element of @file{ifile1} is greater than 0 and from @file{ifile3} otherwise use:
 @BeginVerbatim
    cdo ifthenelse ifile1 ifile2 ifile3 ofile
 @EndVerbatim

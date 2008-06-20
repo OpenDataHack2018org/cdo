@@ -16,20 +16,20 @@ actual operator.
 
 @BeginOperator_setmissval
 @Title     = Set a new missing value
-@Parameter = miss
+@Parameter = newmiss
 
 @BeginDescription
 @IfMan
-         / miss   if i(t,x) EQ miss
+         / newmiss   if i(t,x) EQ miss
 o(t,x) = 
-         \ i(t,x) if i(t,x) NE miss
+         \ i(t,x)    if i(t,x) NE miss
 @EndifMan
 @IfDoc
 @BeginMath
 o(t,x) = \left\{
 \begin{array}{cll}
- \mbox{miss} & \mbox{if} \;\; i(t,x) = \mbox{\sl miss}      \\
- i(t,x)      & \mbox{if} \;\; i(t,x) \neq \mbox{\sl miss}   \\
+ \mbox{newmiss} & \mbox{if} \;\; i(t,x) = \mbox{\sl miss}      \\
+ i(t,x)         & \mbox{if} \;\; i(t,x) \neq \mbox{\sl miss}   \\
 \end{array}   \right.
 @EndMath
 @EndifDoc
@@ -119,7 +119,7 @@ FLOAT  Upper bound
 
 
 @BeginExample
-Assume an input dataset has one field with the temperature
+Assume an input dataset has one field with temperatures
 in the range from 246 to 304 Kelvin. To set all values
 below 273.15 Kelvin to missing value use:
 @BeginVerbatim

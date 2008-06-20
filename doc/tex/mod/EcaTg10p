@@ -11,9 +11,9 @@
 Let @file{ifile1} be a time series of daily mean temperatures TG, and
 @file{ifile2} be the 10th percentile TGn10 of daily mean temperatures
 for any period used as reference. Then calculated is the percentage
-of time where TG < TGn10. Note that both TG and TGn10 must be given
+of time where TG < TGn10. Note that both TG and TGn10 have to be given
 in the same units.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription
 @EndModule
@@ -27,7 +27,7 @@ the last contributing time step in @file{ifile1}.
 @BeginExample
 To compute the percentage of time where the daily mean temperature
 is less than the 10th percentile of the daily mean temperature for
-a given reference period, use:
+a given reference period use:
 @BeginVerbatim
    cdo eca_tg10p tgfile tgn10file ofile
 @EndVerbatim

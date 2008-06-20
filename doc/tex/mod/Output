@@ -30,7 +30,7 @@ Each row has 6 elements with the C-style format "%13.6g".
 
 @BeginDescription
 Prints all values to standard output.
-The format and number of elements for each row must be specified by the parameters
+The format and number of elements for each row have to be specified by the parameters
 @var{format} and @var{nelem}.
 @EndDescription
 @EndOperator

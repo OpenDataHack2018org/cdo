@@ -9,8 +9,8 @@
 @BeginDescription
 Let @file{ifile} be a time series of daily minimum temperatures TN,
 then counted is the number of days where TN < 0° Celsius. Note
-that TN must be given in units of Kelvin.
-The date information for a time step in @file{ofile} is the date of
+that TN have to be given in units of Kelvin.
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -22,8 +22,8 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginExample
-To get the number of frost days for a time series of daily
-minimum temperatures, use:
+To get the number of frost days of a time series of daily
+minimum temperatures use:
 @BeginVerbatim
    cdo eca_fd tnfile ofile
 @EndVerbatim

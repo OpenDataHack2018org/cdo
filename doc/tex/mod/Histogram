@@ -8,7 +8,7 @@
 
 @BeginDescription
 This module creates bins for a histogram of the input data.
-The bins must be adjacent and have non-overlapping intervals.
+The bins have to be adjacent and have non-overlapping intervals.
 The user has to define the bounds of the bins. The first value
 is the lower bound and the second value the upper bound of the
 first bin. The bounds of the second bin are defined by the

@@ -11,7 +11,7 @@
 This module computes statistical values over an ensemble of input files.
 Depending on the actual operator the minimum, maximum, sum, average, variance,
 standard deviation, or a certain percentile over all input files is written
-to @file{ofile}. The date information for a time step in @file{ofile} is
+to @file{ofile}. The date information of a time step in @file{ofile} is
 the date of the first input file.
 @EndDescription
 @EndModule
@@ -152,7 +152,7 @@ INTEGER  Percentile number in {1, ..., 99}
 
 
 @BeginExample
-To compute the ensemble mean over 6 input files, use:
+To compute the ensemble mean over 6 input files use:
 @BeginVerbatim
    cdo ensmean ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
 @EndVerbatim
@@ -161,7 +161,7 @@ Or shorter with filename substitution:
    cdo ensmean ifile[1-6] ofile
 @EndVerbatim
 
-To compute the 50th percentile (median) over 6 input files, use:
+To compute the 50th percentile (median) over 6 input files use:
 @BeginVerbatim
    cdo enspctl,50 ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
 @EndVerbatim

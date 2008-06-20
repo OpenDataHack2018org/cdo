@@ -10,7 +10,7 @@
 Let @file{ifile} be a time series of daily precipitation amounts RR,
 then the mean precipitation amount at wet days (RR > 1 mm) is written
 to @file{ofile}. 
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -22,8 +22,8 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginExample
-To get the daily intensity index for a time series of daily precipitation
-amounts, use:
+To get the daily intensity index of a time series of daily precipitation
+amounts use:
 @BeginVerbatim
    cdo eca_sdii rrfile ofile
 @EndVerbatim

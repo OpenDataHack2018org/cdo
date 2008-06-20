@@ -56,7 +56,7 @@ STRING  Target grid type (curvilinear or cell)
 
 
 @BeginExample
-Assumed a dataset has fields with 2048 gridpoints without or with wrong
+Assuming a dataset has fields with 2048 gridpoints without or with wrong
 grid description.
 To set the grid description of all input fields to a T21 gaussian grid (2048 gridpoints) use:
 @BeginVerbatim

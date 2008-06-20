@@ -9,9 +9,11 @@
 
 @BeginDescription
 This module compares two datasets field by field. The resulting
-field is a mask with 1 if the comparison is true and 0 if the
-comparison is false. The type of the comparison depends on the
-actual operator.
+field is a mask containing 1 if the comparison is true and 0 if not. 
+The number of fields in @file{ifile1} should be the same as in @file{ifile2}.
+One of the input files can contain only one time step or one field.
+The fields in @file{ofile} inherit the meta data from @file{ifile1} or @file{ifile2}.
+The type of comparison depends on the actual operator.
 @EndDescription
 @EndModule
 
@@ -155,8 +157,8 @@ o(t,x) = \left\{
 
 
 @BeginExample
-To create a mask with 1 if the elements of two fields are the same and 
-0 if the elements are different, use:
+To create a mask containing 1 if the elements of two fields are the same and 
+0 if the elements are different use:
 @BeginVerbatim
    cdo eq ifile1 ifile2 ofile
 @EndVerbatim

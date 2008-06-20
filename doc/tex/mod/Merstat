@@ -12,7 +12,7 @@
 This module computes meridional statistical values of the input fields.
 According to the actual operator the meridional minimum, maximum,
 sum, average, variance, standard deviation or a certain percentile is
-written to @file{ofile}. All input fields must have the same rectangular
+written to @file{ofile}. All input fields need to have the same rectangular
 grid. 
 @EndDescription
 @EndModule
@@ -98,12 +98,12 @@ INTEGER  Percentile number in {1, ..., 99}
 
 
 @BeginExample
-To compute the meridional mean of all input fields, use:
+To compute the meridional mean of all input fields use:
 @BeginVerbatim
    cdo mermean ifile ofile
 @EndVerbatim
 
-To compute the 50th meridional percentile (median) of all input fields, use:
+To compute the 50th meridional percentile (median) of all input fields use:
 @BeginVerbatim
    cdo merpctl,50 ifile ofile
 @EndVerbatim

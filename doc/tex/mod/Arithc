@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module performs simple arithmetic with all field elements of a dataset and 
-a constant. The header and date information in @file{ofile} is the same as in @file{ifile}.
+a constant. The fields in @file{ofile} inherit the meta data from @file{ifile}.
 @EndDescription
 @EndModule
 

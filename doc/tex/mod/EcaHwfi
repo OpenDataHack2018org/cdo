@@ -14,9 +14,9 @@ for any period used as reference. Then counted is the number of days
 where, in intervals of at least nday consecutive days, TG > TGn90. The
 number nday is an optional parameter with default nday = 6. A further
 output variable is the number of warm-spell periods longer than or
-equal to nday days. Note that both TG and TGn90 must be given in the
+equal to nday days. Note that both TG and TGn90 have to be given in the
 same units.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription
 @EndModule
@@ -35,8 +35,8 @@ INTEGER  Number of consecutive days (default: nday = 6)
 
 
 @BeginExample
-To compute the number of warm-spell days for a time series of
-daily mean temperatures, use:
+To compute the number of warm-spell days of a time series of
+daily mean temperatures use:
 @BeginVerbatim
    cdo eca_hwfi tgfile tgn90file ofile
 @EndVerbatim

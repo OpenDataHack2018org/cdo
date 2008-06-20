@@ -14,8 +14,8 @@ where, in intervals of at least nday consecutive days, TX > TXnorm + T.
 The numbers nday and T are optional parameters with default nday = 6
 and T = 5° Celsius. A further output variable is the number of heat
 waves longer than or equal to nday days. Note that both TX and TXnorm
-must be given in the same units.
-The date information for a time step in @file{ofile} is the date of
+have to be given in the same units.
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription
 @EndModule
@@ -36,8 +36,8 @@ FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)
 
 
 @BeginExample
-To compute the heat wave duration index for a time series of daily
-maximum temperatures, use:
+To compute the heat wave duration index of a time series of daily
+maximum temperatures use:
 @BeginVerbatim
    cdo eca_hwdi txfile txnormfile ofile
 @EndVerbatim

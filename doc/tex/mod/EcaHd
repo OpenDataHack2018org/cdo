@@ -12,9 +12,9 @@ Let @file{ifile} be a time series of daily mean temperatures TG, then
 the heating degree days are defined as the sum of T1 - TG, where only
 values TG < T2 are considered. If T1 and T2 are omitted, a temperature
 of 17° Celsius is used for both parameters. If only T1 is given, T2 is
-set to T1. Note that TG must be given in units of kelvin, whereas T1
-and T2 must be given in degrees Celsius.
-The date information for a time step in @file{ofile} is the date of
+set to T1. Note that TG have to be given in units of kelvin, whereas T1
+and T2 have to be given in degrees Celsius.
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -35,8 +35,8 @@ DOUBLE   Temperature limit (° Celsius, default: T2 = T1)
 
 
 @BeginExample
-To compute the heating degree days for a time series of daily
-mean temperatures, use:
+To compute the heating degree days of a time series of daily
+mean temperatures use:
 @BeginVerbatim
    cdo eca_hd tgfile ofile
 @EndVerbatim

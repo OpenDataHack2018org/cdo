@@ -8,8 +8,8 @@
 @Operators = copy cat
 
 @BeginDescription
-This module contains operators to copy or concatenate datasets. Each
-input dataset must have the same variables with complete time steps.
+This module contains operators to copy or concatenate datasets. Each input
+dataset is required to have the same variables with complete time steps.
 @EndDescription
 @EndModule
 
@@ -26,7 +26,7 @@ Copies all input datasets to @file{ofile}.
 @Title     = Concatenate datasets
 
 @BeginDescription
-Concatenates all input datasets and append the result to the end 
+Concatenates all input datasets and appends the result to the end 
 of @file{ofile}. If @file{ofile} does not exist it will be created.
 @EndDescription
 @EndOperator
@@ -46,7 +46,7 @@ To concatenate 3 datasets with different time steps of the same variables use:
 @BeginVerbatim
    cdo copy ifile1 ifile2 ifile3 ofile
 @EndVerbatim
-If the output dataset already exist and you wish to extend it 
+If the output dataset already exists and you wish to extend it 
 with more time steps use:
 @BeginVerbatim
    cdo cat ifile1 ifile2 ifile3 ofile

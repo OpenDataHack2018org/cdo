@@ -119,7 +119,7 @@ Selects all fields with zaxes in a user given list.
 @Parameter = zaxisnames
 
 @BeginDescription
-Selects all fields with zaxis names in a user given list.
+Selects all fields with z-axis names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -173,9 +173,9 @@ INTEGER  Comma separated list of grid numbers
 @Item = gridnames
 STRING   Comma separated list of grid names
 @Item = zaxes
-INTEGER  Comma separated list of zaxis numbers
+INTEGER  Comma separated list of z-axis numbers
 @Item = zaxisnames
-STRING   Comma separated list of zaxis names
+STRING   Comma separated list of z-axis names
 @Item = tabnums
 INTEGER  Comma separated list of parameter table numbers
 @C @Item = records

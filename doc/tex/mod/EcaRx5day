@@ -13,7 +13,7 @@ then the maximum of RR is written to @file{ofile}. A further output
 variable is the number of 5 day period with precipitation totals
 greater than x mm, where x is an optional parameter with default
 x = 50 mm.
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -32,7 +32,7 @@ FLOAT   Precipitation threshold (mm, default: x = 50 mm)
 
 
 @BeginExample
-To get the maximum of a time series of 5-day precipitation totals, use:
+To get the maximum of a time series of 5-day precipitation totals use:
 @BeginVerbatim
    cdo eca_rx5day rrfile ofile
 @EndVerbatim

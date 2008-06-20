@@ -9,7 +9,7 @@
 @BeginDescription
 Creates a \htmlref{GrADS}{GrADS} data descriptor file. Supported file formats are GRIB,
 SERVICE, EXTRA and IEG. For GRIB files the GrADS map file is also 
-generated. For SERVICE and EXTRA files the grid must be specified with
+generated. For SERVICE and EXTRA files the grid have to be specified with
 the CDO option '-g <grid>'. This module takes @file{ifile} in order to create 
 filenames for the descriptor (@file{ifile.ctl}) and the map (@file{ifile.gmp}) file.
 "gradsdes" is an alias for @oper{gradsdes2}.

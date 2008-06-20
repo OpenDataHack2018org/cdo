@@ -13,9 +13,9 @@ The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
 histogram bins is 100. The default can be overridden by setting the
 environment variable CDO_PCTL_NBINS to a different value. The files
-@file{ifile2} and @file{ifile3} must be the result of corresponding
-timselmin and timselmax operations, respectively.
-The date information for a time step in @file{ofile} is the date of the last 
+@file{ifile2} and @file{ifile3} should be the result of corresponding
+@mod{timselmin} and @mod{timselmax} operations, respectively.
+The date information of a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -28,13 +28,14 @@ contributing time step in @file{ifile}.
 @BeginDescription
 @IfMan
 For every adjacent sequence t1, ...., tn of time steps of the same 
-selected time range, it is
+selected time range it is
 
 o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
+\vspace*{1mm}
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
-selected time range, it is: \\
+selected time range it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf pth percentile} \{i(t',x), t_1 < t' \le t_n\}
 @EndMath

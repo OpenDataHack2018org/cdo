@@ -21,12 +21,12 @@ is written to @file{ofile}.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = min{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf min}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -40,12 +40,12 @@ o(t,1) = \mbox{\bf min}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = max{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf max}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -59,12 +59,12 @@ o(t,1) = \mbox{\bf max}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = sum{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf sum}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -78,12 +78,12 @@ o(t,1) = \mbox{\bf sum}\{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = mean{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf mean}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -98,12 +98,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = avg{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf avg}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -118,12 +118,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = var{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf var}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -138,12 +138,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = std{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf std}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -159,12 +159,12 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field, it is:
+For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field, it is: \\
+For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf pth percentile} \{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
@@ -180,12 +180,12 @@ INTEGER  Percentile number in {1, ..., 99}
 
 
 @BeginExample
-To compute the field mean of all input fields, use:
+To compute the field mean of all input fields use:
 @BeginVerbatim
    cdo fldmean ifile ofile
 @EndVerbatim
 
-To compute the 90th percentile of all input fields, use:
+To compute the 90th percentile of all input fields use:
 @BeginVerbatim
    cdo fldpctl,90 ifile ofile
 @EndVerbatim

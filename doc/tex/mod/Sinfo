@@ -24,7 +24,7 @@ Prints short information of a dataset. The information is divided into
 @Item = institute and source
 @Item = parameter table and code number
 @Item = horizontal grid size and number
-@Item = number of vertical levels and zaxis number
+@Item = number of vertical levels and z-axis number
 @EndItemize
 Section 2 and 3 gives a short overview of all horizontal and vertical grids.
 And the last section contains short information of the time axis.

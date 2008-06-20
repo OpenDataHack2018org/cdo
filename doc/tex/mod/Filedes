@@ -8,8 +8,8 @@
 @Operators = pardes griddes zaxisdes vct
 
 @BeginDescription
-This module prints, according to the actual operator, the description
-of the parameters, the grids, the z-axis or the vertical coordinate table.
+This module prints the description of the parameters, the grids,
+the z-axis or the vertical coordinate table.
 @EndDescription
 @EndModule
 
@@ -35,10 +35,10 @@ Prints the description of all grids.
 
 
 @BeginOperator_zaxisdes
-@Title     = Zaxis description
+@Title     = Z-axis description
 
 @BeginDescription
-Prints the description of all z-axis.
+Prints the description of all z-axes.
 @EndDescription
 @EndOperator
 

@@ -8,8 +8,7 @@
 @Operators = showformat showcode showname showstdname showlevel showltype showyear showmon showdate showtime
 
 @BeginDescription
-This module prints, according to the actual operator,
-the format, variables, levels or times of the input dataset.
+This module prints the format, variables, levels or times of the input dataset.
 @EndDescription
 @EndModule
 
@@ -27,7 +26,7 @@ Prints the file format of the input dataset.
 
 @Title     = Show code numbers
 @BeginDescription
-Prints the code number of all different variables.
+Prints the code number of all variables.
 @EndDescription
 @EndOperator
 
@@ -36,7 +35,7 @@ Prints the code number of all different variables.
 
 @Title     = Show variable names
 @BeginDescription
-Prints the name of all different variables.
+Prints the name of all variables.
 @EndDescription
 @EndOperator
 
@@ -45,7 +44,7 @@ Prints the name of all different variables.
 
 @Title     = Show standard names
 @BeginDescription
-Prints the standard name of all different variables.
+Prints the standard name of all variables.
 @EndDescription
 @EndOperator
 
@@ -63,7 +62,7 @@ Prints all levels for each variable.
 
 @Title     = Show GRIB level types
 @BeginDescription
-Prints the GRIB level type for all different z-axis.
+Prints the GRIB level type for all z-axes.
 @EndDescription
 @EndOperator
 
@@ -72,7 +71,7 @@ Prints the GRIB level type for all different z-axis.
 @Title     = Show years
 
 @BeginDescription
-Prints all different years.
+Prints all years.
 @EndDescription
 @EndOperator
 
@@ -81,7 +80,7 @@ Prints all different years.
 @Title     = Show months
 
 @BeginDescription
-Prints all different months.
+Prints all months.
 @EndDescription
 @EndOperator
 
@@ -90,7 +89,7 @@ Prints all different months.
 @Title     = Show dates
 
 @BeginDescription
-Prints all different dates.
+Prints all dates.
 @EndDescription
 @EndOperator
 

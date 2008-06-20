@@ -8,11 +8,11 @@
 @Operators = ymonadd ymonsub ymonmul ymondiv
 
 @BeginDescription
-This module performs simple arithmetic of a time series and a
+This module performs simple arithmetic of a time series and one
 time step with the same month of year. For each field in @file{ifile1}
 the corresponding field of the time step in @file{ifile2} with the
 same month of year is used. The header information in @file{ifile1}
-must be the same as in @file{ifile2}. Usually @file{ifile2} is generated
+have to be the same as in @file{ifile2}. Usually @file{ifile2} is generated
 by a call of the module @mod{YMONSTAT}.
 @EndDescription
 @EndModule
@@ -55,7 +55,7 @@ Divides a time series and a multi-year monthly time series.
 
 
 @BeginExample
-To subtract a multi-year monthly time average from a time series, use:
+To subtract a multi-year monthly time average from a time series use:
 @BeginVerbatim
    cdo ymonsub ifile -ymonavg ifile ofile
 @EndVerbatim

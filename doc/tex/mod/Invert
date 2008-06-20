@@ -1,7 +1,7 @@
 @BeginModule
 @NewPage
 @Name      = Invert
-@Title     = Invert latitude
+@Title     = Invert latitudes
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
@@ -17,18 +17,18 @@ rectangular grid.
 
 
 @BeginOperator_invertlat
-@Title     = Invert latitude
+@Title     = Invert latitudes
 @C @BeginDescription
-@C Inverts the latitude of a field.
+@C Inverts the latitudes of a field.
 @C @EndDescription
 @EndOperator
 
 
 @BeginOperator_invertlon
-@Title     = Invert longitude
+@Title     = Invert longitudes
 
 @BeginDescription
-Inverts the longitude of a field.
+Inverts the longitudes of a field.
 @EndDescription
 @EndOperator
 
@@ -70,7 +70,7 @@ Inverts only the longitude data of a field.
 
 
 @BeginExample
-To invert the latitudes of a 2D field from N->S to S->N, use:
+To invert the latitudes of a 2D field from N->S to S->N use:
 @BeginVerbatim
    cdo invertlat ifile ofile
 @EndVerbatim

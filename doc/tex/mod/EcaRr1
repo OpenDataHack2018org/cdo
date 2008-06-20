@@ -10,7 +10,7 @@
 @BeginDescription
 Let @file{ifile} be a time series of daily precipitation amounts RR,
 then counted is the number of days where RR is at least 1 mm. 
-The date information for a time step in @file{ofile} is the date of
+The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
 @EndModule
@@ -22,8 +22,8 @@ the last contributing time step in @file{ifile}.
 
 
 @BeginExample
-To get the number of wet days for a time series of daily precipitation
-amounts, use:
+To get the number of wet days of a time series of daily precipitation
+amounts use:
 @BeginVerbatim
    cdo eca_rr1 rrfile ofile
 @EndVerbatim
