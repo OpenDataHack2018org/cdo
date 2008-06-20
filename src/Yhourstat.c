@@ -47,6 +47,7 @@ void *Yhourstat(void *argument)
   int operatorID;
   int operfunc;
   int gridsize;
+  int i;
   int varID;
   int recID;
   int gridID;
@@ -65,7 +66,7 @@ void *Yhourstat(void *argument)
   int *recVarID, *recLevelID;
   int vdates[NHOUR], vtimes[NHOUR];
   double missval;
-  FIELD **vars1[NHOUR], **vars2[NHOUR];
+  FIELD **vars1[NHOUR], **vars2[NHOUR], **samp1[NHOUR];
   FIELD field;
 
   cdoInitialize(argument);
@@ -85,6 +86,7 @@ void *Yhourstat(void *argument)
     {
       vars1[houroy] = NULL;
       vars2[houroy] = NULL;
+      samp1[houroy] = NULL;
       nsets[houroy] = 0;
     }
 
@@ -138,6 +140,7 @@ void *Yhourstat(void *argument)
       if ( vars1[houroy] == NULL )
 	{
 	  vars1[houroy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  samp1[houroy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[houroy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
@@ -149,6 +152,7 @@ void *Yhourstat(void *argument)
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
 	      vars1[houroy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	      samp1[houroy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      if ( operfunc == func_std || operfunc == func_var )
 		vars2[houroy][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	      
@@ -158,6 +162,10 @@ void *Yhourstat(void *argument)
 		  vars1[houroy][varID][levelID].nmiss   = 0;
 		  vars1[houroy][varID][levelID].missval = missval;
 		  vars1[houroy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		  samp1[houroy][varID][levelID].grid    = gridID;
+		  samp1[houroy][varID][levelID].nmiss   = 0;
+		  samp1[houroy][varID][levelID].missval = missval;
+		  samp1[houroy][varID][levelID].ptr     = NULL;
 		  if ( operfunc == func_std || operfunc == func_var )
 		    {
 		      vars2[houroy][varID][levelID].grid    = gridID;
@@ -182,12 +190,39 @@ void *Yhourstat(void *argument)
 	    {
 	      streamReadRecord(streamID1, vars1[houroy][varID][levelID].ptr, &nmiss);
 	      vars1[houroy][varID][levelID].nmiss = nmiss;
+
+	      if ( nmiss > 0 || samp1[houroy][varID][levelID].ptr )
+		{
+		  if ( samp1[houroy][varID][levelID].ptr == NULL )
+		    samp1[houroy][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( DBL_IS_EQUAL(vars1[houroy][varID][levelID].ptr[i],
+				      vars1[houroy][varID][levelID].missval) )
+		      samp1[houroy][varID][levelID].ptr[i] = 0;
+		    else
+		      samp1[houroy][varID][levelID].ptr[i] = 1;
+		}
 	    }
 	  else
 	    {
 	      streamReadRecord(streamID1, field.ptr, &field.nmiss);
 	      field.grid    = vars1[houroy][varID][levelID].grid;
 	      field.missval = vars1[houroy][varID][levelID].missval;
+
+	      if ( field.nmiss > 0 || samp1[houroy][varID][levelID].ptr )
+		{
+		  if ( samp1[houroy][varID][levelID].ptr == NULL )
+		    {
+		      samp1[houroy][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+		      for ( i = 0; i < gridsize; i++ )
+			samp1[houroy][varID][levelID].ptr[i] = nsets[houroy];
+		    }
+		  
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( !DBL_IS_EQUAL(field.ptr[i], vars1[houroy][varID][levelID].missval) )
+		      samp1[houroy][varID][levelID].ptr[i]++;
+		}
 
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
@@ -224,7 +259,12 @@ void *Yhourstat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		farcmul(&vars1[houroy][varID][levelID], 1.0/nsets[houroy]);
+		{
+		  if ( samp1[houroy][varID][levelID].ptr == NULL )
+		    farcmul(&vars1[houroy][varID][levelID], 1.0/nsets[houroy]);
+		  else
+		    fardiv(&vars1[houroy][varID][levelID], samp1[houroy][varID][levelID]);
+		}
 	    }
 	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -232,10 +272,23 @@ void *Yhourstat(void *argument)
 	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
-		if ( operfunc == func_std )
-		  farcstd(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], 1.0/nsets[houroy]);
-		else
-		  farcvar(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], 1.0/nsets[houroy]);
+		{
+		  if ( samp1[houroy][varID][levelID].ptr == NULL )
+		    {
+		      if ( operfunc == func_std )
+			farcstd(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], 1.0/nsets[houroy]);
+		      else
+			farcvar(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], 1.0/nsets[houroy]);
+		    }
+		  else
+		    {
+		      farinv(&samp1[houroy][varID][levelID]);
+		      if ( operfunc == func_std )
+			farstd(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], samp1[houroy][varID][levelID]);
+		      else
+			farvar(&vars1[houroy][varID][levelID], vars2[houroy][varID][levelID], samp1[houroy][varID][levelID]);
+		    }
+		}
 	    }
 
 	taxisDefVdate(taxisID2, vdates[houroy]);
@@ -266,13 +319,16 @@ void *Yhourstat(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  free(vars1[houroy][varID][levelID].ptr);
+		  if ( samp1[houroy][varID][levelID].ptr ) free(samp1[houroy][varID][levelID].ptr);
 		  if ( operfunc == func_std || operfunc == func_var ) free(vars2[houroy][varID][levelID].ptr);
 		}
 	      
 	      free(vars1[houroy][varID]);
+	      free(samp1[houroy][varID]);
 	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[houroy][varID]);
 	    }
 
+	  free(samp1[houroy]);
 	  free(vars1[houroy]);
 	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[houroy]);
 	}

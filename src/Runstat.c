@@ -84,6 +84,7 @@ void *Runstat(void *argument)
   int operatorID;
   int operfunc;
   int gridsize;
+  int i;
   int varID;
   int recID;
   int gridID;
@@ -98,7 +99,7 @@ void *Runstat(void *argument)
   int nvars, nlevel;
   int *recVarID, *recLevelID;
   double missval;
-  FIELD ***vars1 = NULL, ***vars2 = NULL;
+  FIELD ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
   DATETIME *datetime;
   int taxisID1, taxisID2;
   int calendar, dpy;
@@ -172,12 +173,14 @@ void *Runstat(void *argument)
 
   datetime = (DATETIME *) malloc((ndates+1)*sizeof(DATETIME));
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
+  samp1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
   if ( operfunc == func_std || operfunc == func_var )
     vars2 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
 
   for ( its = 0; its < ndates; its++ )
     {
       vars1[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+      samp1[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
       if ( operfunc == func_std || operfunc == func_var )
 	vars2[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
 
@@ -189,6 +192,7 @@ void *Runstat(void *argument)
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  vars1[its][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	  samp1[its][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[its][varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
 
@@ -198,6 +202,10 @@ void *Runstat(void *argument)
 	      vars1[its][varID][levelID].nmiss   = 0;
 	      vars1[its][varID][levelID].missval = missval;
 	      vars1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+	      samp1[its][varID][levelID].grid    = gridID;
+	      samp1[its][varID][levelID].nmiss   = 0;
+	      samp1[its][varID][levelID].missval = missval;
+	      samp1[its][varID][levelID].ptr     = NULL;
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  vars2[its][varID][levelID].grid    = gridID;
@@ -359,19 +367,23 @@ void *Runstat(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      free(vars1[its][varID][levelID].ptr);
+	      if ( samp1[its][varID][levelID].ptr ) free(samp1[its][varID][levelID].ptr);
 	      if ( operfunc == func_std || operfunc == func_var ) free(vars2[its][varID][levelID].ptr);
 	    }
 
 	  free(vars1[its][varID]);
+	  free(samp1[its][varID]);
 	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[its][varID]);
 	}
 
       free(vars1[its]);
+      free(samp1[its]);
       if ( operfunc == func_std || operfunc == func_var ) free(vars2[its]);
     }
 
   free(datetime);
   free(vars1);
+  free(samp1);
   if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
   if ( recVarID   ) free(recVarID);

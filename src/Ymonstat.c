@@ -188,7 +188,8 @@ void *Ymonstat(void *argument)
 		    samp1[month][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
 
 		  for ( i = 0; i < gridsize; i++ )
-		    if ( DBL_IS_EQUAL(vars1[month][varID][levelID].ptr[i], vars1[month][varID][levelID].missval) )
+		    if ( DBL_IS_EQUAL(vars1[month][varID][levelID].ptr[i],
+				      vars1[month][varID][levelID].missval) )
 		      samp1[month][varID][levelID].ptr[i] = 0;
 		    else
 		      samp1[month][varID][levelID].ptr[i] = 1;
