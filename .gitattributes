@@ -232,6 +232,7 @@ src/Gridcell.c -text
 src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text
+src/Importamsr.c -text
 src/Info.c -text
 src/Input.c -text
 src/Intgrid.c -text
@@ -261,7 +262,6 @@ src/Output.c -text
 src/Outputgmt.c -text
 src/Pinfo.c -text
 src/Pressure.c -text
-src/Readamsr.c -text
 src/Regres.c -text
 src/Remap.c -text
 src/Remapeta.c -text

@@ -32,6 +32,7 @@ cdo_SOURCES = Arith.c		\
               Gridcell.c 	\
               Harmonic.c 	\
               Histogram.c 	\
+              Importamsr.c  	\
               Info.c		\
               Input.c		\
               Intgrid.c 	\
@@ -59,7 +60,6 @@ cdo_SOURCES = Arith.c		\
               Outputgmt.c  	\
               Pinfo.c  	        \
               Pressure.c  	\
-              Readamsr.c  	\
               Regres.c  	\
               Remap.c  	        \
               Remapeta.c    	\

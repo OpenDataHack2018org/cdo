@@ -57,16 +57,16 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Exprf.$(OBJEXT) Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) \
 	Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) Gradsdes.$(OBJEXT) \
 	Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) Histogram.$(OBJEXT) \
-	Info.$(OBJEXT) Input.$(OBJEXT) Intgrid.$(OBJEXT) \
-	Intgridtraj.$(OBJEXT) Intlevel.$(OBJEXT) Inttime.$(OBJEXT) \
-	Intntime.$(OBJEXT) Intyear.$(OBJEXT) Invert.$(OBJEXT) \
-	Invertlev.$(OBJEXT) Log.$(OBJEXT) Maskbox.$(OBJEXT) \
-	Mastrfu.$(OBJEXT) Math.$(OBJEXT) Merge.$(OBJEXT) \
-	Mergegrid.$(OBJEXT) Mergetime.$(OBJEXT) Merstat.$(OBJEXT) \
-	Monarith.$(OBJEXT) Mrotuv.$(OBJEXT) Mrotuvb.$(OBJEXT) \
-	Ninfo.$(OBJEXT) Nmltest.$(OBJEXT) Output.$(OBJEXT) \
-	Outputgmt.$(OBJEXT) Pinfo.$(OBJEXT) Pressure.$(OBJEXT) \
-	Readamsr.$(OBJEXT) Regres.$(OBJEXT) Remap.$(OBJEXT) \
+	Importamsr.$(OBJEXT) Info.$(OBJEXT) Input.$(OBJEXT) \
+	Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) Intlevel.$(OBJEXT) \
+	Inttime.$(OBJEXT) Intntime.$(OBJEXT) Intyear.$(OBJEXT) \
+	Invert.$(OBJEXT) Invertlev.$(OBJEXT) Log.$(OBJEXT) \
+	Maskbox.$(OBJEXT) Mastrfu.$(OBJEXT) Math.$(OBJEXT) \
+	Merge.$(OBJEXT) Mergegrid.$(OBJEXT) Mergetime.$(OBJEXT) \
+	Merstat.$(OBJEXT) Monarith.$(OBJEXT) Mrotuv.$(OBJEXT) \
+	Mrotuvb.$(OBJEXT) Ninfo.$(OBJEXT) Nmltest.$(OBJEXT) \
+	Output.$(OBJEXT) Outputgmt.$(OBJEXT) Pinfo.$(OBJEXT) \
+	Pressure.$(OBJEXT) Regres.$(OBJEXT) Remap.$(OBJEXT) \
 	Remapeta.$(OBJEXT) Replace.$(OBJEXT) Rotuv.$(OBJEXT) \
 	Runpctl.$(OBJEXT) Runstat.$(OBJEXT) Seascount.$(OBJEXT) \
 	Seaspctl.$(OBJEXT) Seasstat.$(OBJEXT) Selbox.$(OBJEXT) \
@@ -256,6 +256,7 @@ cdo_SOURCES = Arith.c		\
               Gridcell.c 	\
               Harmonic.c 	\
               Histogram.c 	\
+              Importamsr.c  	\
               Info.c		\
               Input.c		\
               Intgrid.c 	\
@@ -283,7 +284,6 @@ cdo_SOURCES = Arith.c		\
               Outputgmt.c  	\
               Pinfo.c  	        \
               Pressure.c  	\
-              Readamsr.c  	\
               Regres.c  	\
               Remap.c  	        \
               Remapeta.c    	\
@@ -573,6 +573,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Histogram.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importamsr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Intgrid.Po@am__quote@
@@ -600,7 +601,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Outputgmt.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Pressure.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Readamsr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Regres.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Remap.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Remapeta.Po@am__quote@

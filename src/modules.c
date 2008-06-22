@@ -64,6 +64,7 @@ void *Gradsdes(void *argument);
 void *Gridcell(void *argument);
 void *Harmonic(void *argument);
 void *Histogram(void *argument);
+void *Importamsr(void *argument);
 void *Info(void *argument);
 void *Input(void *argument);
 void *Intgrid(void *argument);
@@ -91,7 +92,6 @@ void *Output(void *argument);
 void *Outputgmt(void *argument);
 void *Pressure(void *argument);
 void *Pinfo(void *argument);
-void *Readamsr(void *argument);
 void *Regres(void *argument);
 void *Remap(void *argument);
 void *Remapeta(void *argument);
@@ -258,6 +258,7 @@ void *Wct(void *argument);
 #define  GridcellOperators      {"gridarea", "gridweights"}
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
+#define  ImportamsrOperators    {"import_amsr"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
@@ -291,7 +292,6 @@ void *Wct(void *argument);
                                  "outputboundscpt", "outputvector", "outputtri"}
 #define  PressureOperators      {"fpressure", "hpressure"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
-#define  ReadamsrOperators      {"read_amsr"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
@@ -483,6 +483,7 @@ static MODULES Modules[] =
   { Gridcell,       GridcellHelp,      GridcellOperators,       1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
+  { Importamsr,     NULL,              ImportamsrOperators,     1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },
