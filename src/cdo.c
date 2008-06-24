@@ -396,16 +396,23 @@ static void setDefaultDataType(char *datatypestr)
 	}
     }
 
-  if ( *datatypestr == 'l' || *datatypestr == 'L' )
+  if ( *datatypestr != 0 )
     {
-      if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-      datatypestr++;
-    }
-
-  if ( *datatypestr == 'b' || *datatypestr == 'B' )
-    {
-      if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
-      datatypestr++;
+      if ( *datatypestr == 'l' || *datatypestr == 'L' )
+	{
+	  if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
+	  datatypestr++;
+	}
+      else if ( *datatypestr == 'b' || *datatypestr == 'B' )
+	{
+	  if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
+	  datatypestr++;
+	}
+      else
+	{
+	  fprintf(stderr, "Unsupported character in number of bytes: >%s< !\n", datatypestr);
+	  exit(EXIT_FAILURE);
+	}
     }
 }
 
@@ -433,16 +440,23 @@ static void setDefaultDataTypeByte(char *datatypestr)
 	}
     }
 
-  if ( *datatypestr == 'l' || *datatypestr == 'L' )
+  if ( *datatypestr != 0 )
     {
-      if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
-      datatypestr++;
-    }
-
-  if ( *datatypestr == 'b' || *datatypestr == 'B' )
-    {
-      if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
-      datatypestr++;
+      if ( *datatypestr == 'l' || *datatypestr == 'L' )
+	{
+	  if ( IsBigendian() ) cdoDefaultByteorder = CDI_LITTLEENDIAN;
+	  datatypestr++;
+	}
+      else if ( *datatypestr == 'b' || *datatypestr == 'B' )
+	{
+	  if ( ! IsBigendian() ) cdoDefaultByteorder = CDI_BIGENDIAN;
+	  datatypestr++;
+	}
+      else
+	{
+	  fprintf(stderr, "Unsupported character in number of bytes: %s!\n", datatypestr);
+	  exit(EXIT_FAILURE);
+	}
     }
 }
 
