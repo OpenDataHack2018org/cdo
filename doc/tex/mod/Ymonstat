@@ -8,10 +8,10 @@
 @Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonvar ymonstd
 
 @BeginDescription
-This module writes to @file{ofile}, according to the actual operator,
-the minimum, maximum, sum, average, variance or standard deviation  of each 
-month of year in @file{ifile}. The date information in an output field is 
-the date of the last contributing input field.
+This module computes statistical values of each month of year.
+Depending on the actual operator the minimum, maximum, sum, average, variance
+or standard deviation of each month of year in @file{ifile} is written to @file{ofile}.
+The date information in an output field is the date of the last contributing input field.
 @EndDescription
 @EndModule
 

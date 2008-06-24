@@ -8,14 +8,13 @@
 @Operators = ydaypctl
 
 @BeginDescription
-This module writes to @file{ofile} a certain percentile of each day of
-year in @file{ifile1}.
+This operator writes a certain percentile of each day of year in @file{ifile1} to @file{ofile}.
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
 histogram bins is 100. The default can be overridden by setting the
 environment variable CDO_PCTL_NBINS to a different value. The files
 @file{ifile2} and @file{ifile3} should be the result of corresponding
-ydaymin and ydaymax operations, respectively.
+@mod{ydaymin} and @mod{ydaymax} operations, respectively.
 The date information in an output field is the date of the last
 contributing input field.
 @EndModule
@@ -27,11 +26,14 @@ contributing input field.
 
 @BeginDescription
 @IfMan
+
 o(001,x) = pth percentile {i(t,x), day(i(t)) = 001}
                  ...
 o(366,x) = pth percentile {i(t,x), day(i(t)) = 366}
 @EndifMan
 @IfDoc
+\vspace*{3mm}
+
 @BeginMath
 \begin{array}{c}
 o(\mbox{001},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\

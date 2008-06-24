@@ -8,12 +8,12 @@
 @Operators = genbil genbic gencon gendis
 
 @BeginDescription
-Grid interpolation can be a very time consuming process. Especially if the
-data is on an unstructured or on a large grid. In this case the \htmlref{SCRIP}{SCRIP}
-interpolation process can be split into two parts. First generation of the
-interpolation weights, this is the most time consuming part. These interpolation 
-weights can be reused for every remapping process. 
-This method works only if all input fields are on the same grid and a possibly
+Grid interpolation can be a very time-consuming process. Especially if the
+data are on an unstructured or a large grid. In this case the \htmlref{SCRIP}{SCRIP}
+interpolation process can be split into two parts. Firstly the generation of the
+interpolation weights, which is the most time-consuming part. These interpolation 
+weights can be reused for every remapping process with the operator @mod{remap}. 
+This method should be used only if all input fields are on the same grid and a possibly
 mask (missing values) does not change. This module contains operators to 
 generate SCRIP interpolation weights of the first input field.
 Each operator is using a different interpolation method.
@@ -27,8 +27,8 @@ Each operator is using a different interpolation method.
 @Parameter = grid
 
 @BeginDescription
-Generates bilinear interpolation weights and write the result to a file. 
-This interpolation method works only on rectangular grids.
+Generates bilinear interpolation weights and writes the result to a file. 
+This interpolation method only works on rectangular grids.
 @EndDescription
 @EndOperator
 
@@ -39,8 +39,8 @@ This interpolation method works only on rectangular grids.
 @Parameter = grid
 
 @BeginDescription
-Generates bicubic interpolation weights and write the result to a file.
-This interpolation method works only on rectangular grids.
+Generates bicubic interpolation weights and writes the result to a file.
+This interpolation method only works on rectangular grids.
 @EndDescription
 @EndOperator
 
@@ -51,19 +51,19 @@ This interpolation method works only on rectangular grids.
 
 @BeginDescription
 Generates first order conservative interpolation weights and
-write the result to a file.
+writes the result to a file.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_gendis
 @Name      = gendis
-@Title     = Generate distance-weighted averaging weights
+@Title     = Generate distance-weighted average remap weights
 @Parameter = grid
 
 @BeginDescription
-Generates distance-weighted average weights of the four
-nearest neighbor values and write the result to a file.
+Generates distance-weighted average remapping weights of the four
+nearest neighbor values and writes the result to a file.
 @EndDescription
 @EndOperator
 
@@ -77,7 +77,7 @@ STRING  Target grid description file or name
 @BeginEnvironment
 @Item = NORMALIZE_OPT
 This variable is used to choose the normalization of the conservative 
-interpolation. By default, NORMALIZE_OPT is set to be 'fracarea' and will
+interpolation. By default NORMALIZE_OPT is set to 'fracarea' and will
 include the destination area fraction in the output weights; other 
 options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
 @EndEnvironment
@@ -85,14 +85,14 @@ options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
 
 @BeginNote
 For this program the author has converted the original Fortran 90 SCRIP 
-software to ANSI C. In case of any problems send a bug report to CDO and
+software to ANSI C. If there are any problems send a bug report to CDO and
 not to SCRIP!
 @EndNote
 
 
 @BeginExample
 Say @file{ifile} contains fields on a rectangular grid.
-Remap all fields bilinear to a T42 gaussian grid:
+To remap all fields bilinear to a T42 gaussian grid use:
 @BeginVerbatim
    cdo genbil,t42grid ifile remapweights.nc
    cdo remap,t42grid,remapweights ifile ofile

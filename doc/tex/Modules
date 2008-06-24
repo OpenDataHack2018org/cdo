@@ -72,7 +72,6 @@ Regres        Regression
 Detrend       Regression
 Trend         Regression
 Subtrend      Regression
-Tests         Tests
 Remapgrid     Interpolation
 Genweights    Interpolation
 Remap         Interpolation

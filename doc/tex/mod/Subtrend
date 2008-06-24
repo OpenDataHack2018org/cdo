@@ -30,12 +30,12 @@ where t is the time steps.
 
 
 @BeginExample
-The typical call for detrend the data in @file{ifile} and to store the detrended data in @file{ofile} is:
+The typical call for detrending the data in @file{ifile} and storing the detrended data in @file{ofile} is:
 @BeginVerbatim
   cdo trend ifile afile bfile
   cdo subtrend ifile afile bfile ofile
 @EndVerbatim
-The result is identical to operator @mod{detrend}:
+The result is identical to a call of the operator @mod{detrend}:
 @BeginVerbatim
   cdo detrend ifile ofile
 @EndVerbatim

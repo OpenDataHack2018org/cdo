@@ -7,7 +7,7 @@
 @Operators = timselpctl
 
 @BeginDescription
-This module computes percentile values over a selected number of time
+This operator computes percentile values over a selected number of time
 steps in @file{ifile1}.
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
@@ -36,6 +36,8 @@ o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
 \vspace*{1mm}
 For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
 selected time range it is: \\
+\vspace*{1mm}
+
 @BeginMath
 o(t,x) = \mbox{\bf pth percentile} \{i(t',x), t_1 < t' \le t_n\}
 @EndMath

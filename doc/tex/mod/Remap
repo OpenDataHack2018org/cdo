@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Remap
 @Title     = SCRIP grid remapping
 @Section   = Interpolation
@@ -15,9 +14,9 @@
 
 @BeginDescription
 This operator remaps all input fields to a new grid. The remap type and the 
-interpolation weights of one grid are read from a netCDF file. The netCDF 
-file with the weights must follow the \htmlref{SCRIP}{SCRIP} convention. Normaly these weights 
-come from a previous call to module @mod{GENWEIGHTS} or was created by the original
+interpolation weights of one input grid are read from a netCDF file. The netCDF 
+file with the weights should follow the \htmlref{SCRIP}{SCRIP} convention. Normally these weights 
+come from a previous call to module @mod{GENWEIGHTS} or were created by the original
 SCRIP package.
 @EndDescription
 @EndOperator
@@ -33,14 +32,14 @@ STRING  Interpolation weights (SCRIP netCDF file)
 
 @BeginNote
 For this program the author has converted the original Fortran 90 SCRIP 
-software to ANSI C. In case of any problems send a bug report to CDO and
+software to ANSI C. If there are any problems send a bug report to CDO and
 not to SCRIP!
 @EndNote
 
 
 @BeginExample
 Say @file{ifile} contains fields on a regular grid.
-Remap all fields bilinear to a T42 gaussian grid:
+To remap all fields bilinear to a T42 gaussian grid use:
 @BeginVerbatim
    cdo genbil,t42grid ifile remapweights.nc
    cdo remap,t42grid,remapweights ifile ofile

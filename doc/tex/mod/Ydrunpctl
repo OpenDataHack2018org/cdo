@@ -8,8 +8,8 @@
 @Operators = ydrunpctl
 
 @BeginDescription
-This module writes to @file{ofile} running percentile values for each
-day of year in @file{ifile1}. A certain percentile is computed for all
+This operator writes running percentile values for each day of year 
+in @file{ifile1} to @file{ofile}. A certain percentile is computed for all
 time steps in running windows of which the medium time step corresponds
 to a certain day of year. 
 The algorithm uses histograms with minimum and maximum bounds given in
@@ -26,7 +26,7 @@ the output time series begins (nts-1)/2 time steps after the first time step
 of the input time series and ends (nts-1)/2 time steps before the last.
 For input data which are complete but not continuous, such as time series of
 daily measurements for the same month or season within different years, the
-operator yields physically meaningful results only if the input time series
+operator only yields physically meaningful results if the input time series
 does include the (nts-1)/2 days before and after each period of interest.
 @EndModule
 
@@ -38,11 +38,14 @@ does include the (nts-1)/2 days before and after each period of interest.
 
 @BeginDescription
 @IfMan
+
 o(001,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
 o(366,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
 @EndifMan
 @IfDoc
+\vspace*{3mm}
+
 @BeginMath
 \begin{array}{c}
 o(\mbox{001},x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\

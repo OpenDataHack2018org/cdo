@@ -8,7 +8,7 @@
 @Operators = monpctl
 
 @BeginDescription
-This module computes percentiles over all time steps of the same month in @file{ifile1}.
+This operator computes percentiles over all time steps of the same month in @file{ifile1}.
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
 histogram bins is 100. The default can be overridden by setting the

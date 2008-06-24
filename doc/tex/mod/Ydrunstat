@@ -8,8 +8,8 @@
 @Operators = ydrunmin ydrunmax ydrunsum ydrunmean ydrunavg ydrunvar ydrunstd
 
 @BeginDescription
-This module writes to @file{ofile} running statistical values for each
-day of year in @file{ifile}. Depending on the actual operator, the minimum,
+This module writes running statistical values for each day of year
+in @file{ifile} to @file{ofile}. Depending on the actual operator, the minimum,
 maximum, sum, average, variance or standard deviation of all time steps in
 running windows of wich the medium time step corresponds to a certain day of
 year is computed. The date information in an output field is the date of the
@@ -17,7 +17,7 @@ medium time step in the last contributing running window.
 Note that the operator have to be applied to a continuous time series of daily
 measurements in order to yield physically meaningful results. Also note that
 the output time series begins (nts-1)/2 time steps after the first time step
-of the input time series and ends (nts-1)/2 time steps before the last.
+of the input time series and ends (nts-1)/2 time steps before the last one.
 For input data which are complete but not continuous, such as time series of
 daily measurements for the same month or season within different years, the
 operator yields physically meaningful results only if the input time series

@@ -80,7 +80,8 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
 
   for ( i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+      /* varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT); */
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
       vlistDefVarDatatype(vlistID, varID, DATATYPE_INT16);
@@ -183,6 +184,7 @@ void *Importamsr(void *argument)
   fseek(fp, 0L, SEEK_SET);
 
   vdate = getDate(cdoStreamName(0));
+  if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(1));
@@ -216,12 +218,14 @@ void *Importamsr(void *argument)
 
       streamDefVlist(streamID, vlistID);
 
+      vtime = 130; /* 1:30 */
       for ( tsID = 0; tsID < 2; ++tsID )
 	{
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
-	  vtime += 1200;
+	  vtime += 1200;  /* 13:30 */
 	  streamDefTimestep(streamID, tsID);
+	  processDefTimesteps(streamID);
 
 	  read_amsr(fp, vlistID, nvars, data, nmiss);
 
@@ -237,8 +241,15 @@ void *Importamsr(void *argument)
 
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 
+      /* vlistDefNtsteps(vlistID, 0);*/
       streamDefVlist(streamID, vlistID);
-
+      
+      taxisDefVdate(taxisID, vdate);
+      taxisDefVtime(taxisID, vtime);
+      tsID = 0;
+      streamDefTimestep(streamID, tsID);
+      processDefTimesteps(streamID);
+      
       read_amsr(fp, vlistID, nvars, data, nmiss);
 
       write_data(streamID, nvars, data, nmiss);
@@ -247,6 +258,8 @@ void *Importamsr(void *argument)
     }
   else
     cdoAbort("Unexpected file size for AMSR data!");
+
+  processDefVarNum(vlistNvars(vlistID), streamID);
 
   streamClose(streamID);
 
