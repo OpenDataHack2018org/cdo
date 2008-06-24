@@ -16,6 +16,7 @@
 	* yseasmean: bug fix for datasets with missing values [report: Hans-Jürgen Panitz]
 	* yhourmean: bug fix for datasets with missing values
 	* ydaymean: bug fix for datasets with missing values
+	* namelist: bug fix for wrong input
 	* ntime: bug fix for datasets with time constant parameters only [report: David Wang]
 	  (also affected: ndate, nmon, nyear, showdate, showtime, showmon, showyear)
 	* Version 1.2.0 released
