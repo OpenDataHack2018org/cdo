@@ -1570,6 +1570,8 @@ int cdoDefineGrid(const char *gridfile)
   if ( gfp == NULL )
     {
       gridID = gridFromName(gridfile);
+
+      if ( gridID == -1 ) cdoAbort("Open failed on %s!", gridfile);
     }
   else
     {
@@ -1622,9 +1624,9 @@ int cdoDefineGrid(const char *gridfile)
 	  gridID = gridFromPingo(gfp, gridfile);
 	  fclose(gfp);
 	}
-    }
 
-  if ( gridID == -1 ) cdoAbort("Invalid grid description file %s!", gridfile);
+      if ( gridID == -1 ) cdoAbort("Invalid grid description file %s!", gridfile);
+    }
 
   return (gridID);
 }
