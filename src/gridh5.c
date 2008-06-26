@@ -83,20 +83,27 @@ int gridFromH5file(const char *gridfile)
   /* Open an existing dataset. */
   dataset_id = H5Dopen(file_id, "/lon", 0);
 
-  dataspace = H5Dget_space(dataset_id);    /* dataspace handle */
-  rank      = H5Sget_simple_extent_ndims(dataspace);
-  status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
-  printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
-	 (unsigned long)(dims_out[0]), (unsigned long)(dims_out[1]));
+  if ( dataset_id < 0 )
+    {
+    }
 
-  dset_data = (int *) malloc(dset_len*sizeof(int));
-  status = H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data);
-  free(dset_data);
+  if ( dataset_id >= 0 )
+    {
+      dataspace = H5Dget_space(dataset_id);    /* dataspace handle */
+      rank      = H5Sget_simple_extent_ndims(dataspace);
+      status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
+      printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
+	     (unsigned long)(dims_out[0]), (unsigned long)(dims_out[1]));
 
-  status = H5Sclose(dataspace);
+      dset_data = (int *) malloc(dset_len*sizeof(int));
+      status = H5Dread(dataset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data);
+      free(dset_data);
 
-  /* Close the dataset. */
-  status = H5Dclose(dataset_id);
+      status = H5Sclose(dataspace);
+
+      /* Close the dataset. */
+      status = H5Dclose(dataset_id);
+    }
 
   /* Close file */
   status = H5Fclose(file_id);

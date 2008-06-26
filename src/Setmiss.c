@@ -80,7 +80,7 @@ void *Setmiss(void *argument)
       if ( operatorArgv()[0][0] == 'n' || operatorArgv()[0][0] == 'N' )
 	{
 #if ! defined  (HAVE_ISNAN)
-	  cdoWarning("function >isnan< not available!");
+	  cdoWarning("Function >isnan< not available!");
 #endif
 	  rconst = 0.0/0.0;
 	}

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -17,6 +17,10 @@
 
 #ifndef _CDO_INT_H
 #define _CDO_INT_H
+
+#if defined (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
 
 #include <assert.h>
 #include <stdio.h>
@@ -53,12 +57,17 @@ char *strdup(const char *s);
 #define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
 
-#ifndef  DBL_IS_EQUAL
+#ifndef DBL_IS_EQUAL
+#if  defined  (HAVE_ISNAN)
+#  define DBL_IS_EQUAL(x,y) (isnan(x)||isnan(y)?(isnan(x)&&isnan(y)?1:0):!(fabs(x - y) > 0))
+#else
 /*
-#define  DBL_IS_EQUAL(x,y) (fabs(x - y) <= 2.0*(y*DBL_EPSILON + DBL_MIN))
+#  define DBL_IS_EQUAL(x,y) (fabs(x - y) <= 2.0*(y*DBL_EPSILON + DBL_MIN))
 */
-#define  DBL_IS_EQUAL(x,y) (!(fabs(x - y) > 0))
+#  define DBL_IS_EQUAL(x,y) (!(fabs(x - y) > 0))
 #endif
+#endif
+
 
 #ifndef  M_PI
 #define  M_PI		3.14159265358979323846	/* pi */
