@@ -158,6 +158,7 @@ void *Vargen(void *argument);
 void *Varrms(void *argument);
 void *Vertint(void *argument);
 void *Vertstat(void *argument);
+void *Vertwind(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
@@ -376,6 +377,7 @@ void *Wct(void *argument);
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl", "ml2plx", "ml2hlx"}
 #define  VertstatOperators      {"vertmin", "vertmax", "vertsum", "vertmean", "vertavg", "vertvar", "vertstd"}
+#define  VertwindOperators      {"vertwind"}
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
@@ -592,6 +594,7 @@ static MODULES Modules[] =
   { Varrms,         NULL,              VarrmsOperators,         2,  1 },
   { Vertint,        IntvertHelp,       VertintOperators,        1,  1 },
   { Vertstat,       VertstatHelp,      VertstatOperators,       1,  1 },
+  { Vertwind,       NULL,              VertwindOperators,       1,  1 },
   { Wind,           WindHelp,          WindOperators,           1,  1 },
   { Writegrid,      NULL,              WritegridOperators,      1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,    1,  1 },

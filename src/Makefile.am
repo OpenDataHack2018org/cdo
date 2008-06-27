@@ -117,6 +117,7 @@ cdo_SOURCES = Arith.c		\
               Varrms.c  	\
               Vertint.c 	\
               Vertstat.c 	\
+              Vertwind.c 	\
               Wind.c         	\
               Writegrid.c 	\
               Writerandom.c 	\

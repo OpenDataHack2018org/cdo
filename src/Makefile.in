@@ -85,29 +85,29 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Timstat2.$(OBJEXT) Timstat3.$(OBJEXT) Tinfo.$(OBJEXT) \
 	Trend.$(OBJEXT) Trms.$(OBJEXT) Vardup.$(OBJEXT) \
 	Vargen.$(OBJEXT) Varrms.$(OBJEXT) Vertint.$(OBJEXT) \
-	Vertstat.$(OBJEXT) Wind.$(OBJEXT) Writegrid.$(OBJEXT) \
-	Writerandom.$(OBJEXT) Yhourstat.$(OBJEXT) Ydaypctl.$(OBJEXT) \
-	Ydaystat.$(OBJEXT) Ydrunpctl.$(OBJEXT) Ydrunstat.$(OBJEXT) \
-	Ymonarith.$(OBJEXT) Ymonpctl.$(OBJEXT) Ymonstat.$(OBJEXT) \
-	Yseaspctl.$(OBJEXT) Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) \
-	cdilib.$(OBJEXT) commandline.$(OBJEXT) exception.$(OBJEXT) \
-	expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) expr.$(OBJEXT) \
-	cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) \
-	field.$(OBJEXT) fieldc.$(OBJEXT) field2.$(OBJEXT) \
-	fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) grid.$(OBJEXT) \
-	gridnc.$(OBJEXT) gridh5.$(OBJEXT) hetaeta.$(OBJEXT) \
-	history.$(OBJEXT) institution.$(OBJEXT) interpol.$(OBJEXT) \
-	job.$(OBJEXT) modules.$(OBJEXT) namelist.$(OBJEXT) \
-	normal.$(OBJEXT) pipe.$(OBJEXT) process.$(OBJEXT) \
-	remaplib.$(OBJEXT) timer.$(OBJEXT) realtime.$(OBJEXT) \
-	pstream.$(OBJEXT) table.$(OBJEXT) userlog.$(OBJEXT) \
-	util.$(OBJEXT) legendre.$(OBJEXT) fourier.$(OBJEXT) \
-	specspace.$(OBJEXT) readline.$(OBJEXT) julian.$(OBJEXT) \
-	vinterp.$(OBJEXT) zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) \
-	color.$(OBJEXT) list.$(OBJEXT) percentiles.$(OBJEXT) \
-	nth_element.$(OBJEXT) ecacore.$(OBJEXT) ecautil.$(OBJEXT) \
-	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Wct.$(OBJEXT) \
-	statistic.$(OBJEXT)
+	Vertstat.$(OBJEXT) Vertwind.$(OBJEXT) Wind.$(OBJEXT) \
+	Writegrid.$(OBJEXT) Writerandom.$(OBJEXT) Yhourstat.$(OBJEXT) \
+	Ydaypctl.$(OBJEXT) Ydaystat.$(OBJEXT) Ydrunpctl.$(OBJEXT) \
+	Ydrunstat.$(OBJEXT) Ymonarith.$(OBJEXT) Ymonpctl.$(OBJEXT) \
+	Ymonstat.$(OBJEXT) Yseaspctl.$(OBJEXT) Yseasstat.$(OBJEXT) \
+	Zonstat.$(OBJEXT) cdilib.$(OBJEXT) commandline.$(OBJEXT) \
+	exception.$(OBJEXT) expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) \
+	expr.$(OBJEXT) cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) \
+	cdo_vlist.$(OBJEXT) field.$(OBJEXT) fieldc.$(OBJEXT) \
+	field2.$(OBJEXT) fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) \
+	grid.$(OBJEXT) gridnc.$(OBJEXT) gridh5.$(OBJEXT) \
+	hetaeta.$(OBJEXT) history.$(OBJEXT) institution.$(OBJEXT) \
+	interpol.$(OBJEXT) job.$(OBJEXT) modules.$(OBJEXT) \
+	namelist.$(OBJEXT) normal.$(OBJEXT) pipe.$(OBJEXT) \
+	process.$(OBJEXT) remaplib.$(OBJEXT) timer.$(OBJEXT) \
+	realtime.$(OBJEXT) pstream.$(OBJEXT) table.$(OBJEXT) \
+	userlog.$(OBJEXT) util.$(OBJEXT) legendre.$(OBJEXT) \
+	fourier.$(OBJEXT) specspace.$(OBJEXT) readline.$(OBJEXT) \
+	julian.$(OBJEXT) vinterp.$(OBJEXT) zaxis.$(OBJEXT) \
+	pthread_debug.$(OBJEXT) color.$(OBJEXT) list.$(OBJEXT) \
+	percentiles.$(OBJEXT) nth_element.$(OBJEXT) ecacore.$(OBJEXT) \
+	ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) Hi.$(OBJEXT) \
+	Wct.$(OBJEXT) statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 am__DEPENDENCIES_1 =
 cdo_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -341,6 +341,7 @@ cdo_SOURCES = Arith.c		\
               Varrms.c  	\
               Vertint.c 	\
               Vertstat.c 	\
+              Vertwind.c 	\
               Wind.c         	\
               Writegrid.c 	\
               Writerandom.c 	\
@@ -658,6 +659,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Varrms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Vertwind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writegrid.Po@am__quote@
