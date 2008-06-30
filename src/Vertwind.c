@@ -31,7 +31,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "vinterp.h"
-#include "list.h"
 
 
 #define R  287.07  /* spezielle Gaskonstante fuer Luft */
@@ -46,16 +45,19 @@ void *Vertwind(void *argument)
   int gridID, zaxisID, tsID;
   int nlevel, nrecs, recID, code;
   int varID, levelID;
-  int nvars;
+  int nvars, nvct = 0;
   int gridsize, i;
   int offset;
   int nmiss;
+  int ngp = 0, ngrids;
   int temp_code, sq_code, ps_code, omega_code, lsp_code;
   int tempID = -1, sqID = -1, psID = -1, omegaID = -1, lnpsID = -1;
   char varname[128];
+  double *vct = NULL;
   double tv, rho;
   double *level = NULL;
   double *temp = NULL, *sq = NULL, *omega = NULL, *wms = NULL;
+  double *fpress = NULL, *hpress = NULL, *ps_prog = NULL;
 
   cdoInitialize(argument);
 
@@ -63,6 +65,28 @@ void *Vertwind(void *argument)
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
+
+  ngrids  = vlistNgrids(vlistID1);
+  for ( i = 0; i < ngrids; i++ )
+    {
+      gridID = vlistGrid(vlistID1, i);
+      if ( gridInqType(gridID) != GRID_SPECTRAL )
+	{
+	  ngp = gridInqSize(gridID);
+	  break;
+	}
+    }
+
+  /* check gridsize */
+  for ( i = 0; i < ngrids; i++ )
+    {
+      gridID = vlistGrid(vlistID1, i);
+      if ( gridInqType(gridID) != GRID_SPECTRAL )
+	{
+	  if ( ngp != gridInqSize(gridID) )
+	    cdoAbort("Grids have different size!");
+	}
+    }
 
   temp_code  = 130;
   sq_code    = 133;
@@ -108,6 +132,9 @@ void *Vertwind(void *argument)
       cdoAbort("Parameter not found!");
     }
 
+  if ( psID == -1 && zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
+    cdoAbort("Surface pressure (code 134) not found!");
+
   gridID  = vlistInqVarGrid(vlistID1, omegaID);
   zaxisID = vlistInqVarZaxis(vlistID1, omegaID);
 
@@ -116,10 +143,39 @@ void *Vertwind(void *argument)
   level  = (double *) malloc(nlevel*sizeof(double));
   zaxisInqLevels(zaxisID, level);
 
-  temp  = (double *) malloc(gridsize*nlevel*sizeof(double));
-  sq    = (double *) malloc(gridsize*nlevel*sizeof(double));
-  omega = (double *) malloc(gridsize*nlevel*sizeof(double));
-  wms   = (double *) malloc(gridsize*nlevel*sizeof(double));
+  temp    = (double *) malloc(gridsize*nlevel*sizeof(double));
+  sq      = (double *) malloc(gridsize*nlevel*sizeof(double));
+  omega   = (double *) malloc(gridsize*nlevel*sizeof(double));
+  wms     = (double *) malloc(gridsize*nlevel*sizeof(double));
+  fpress  = (double *) malloc(gridsize*nlevel*sizeof(double));
+
+
+  if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
+    {
+      for ( levelID = 0; levelID < nlevel; ++levelID )
+	{
+	  offset = levelID*gridsize;
+	  for ( i = 0; i < gridsize; ++i )
+	    fpress[offset+i] = level[levelID];
+	}
+    }
+  else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+    {
+      ps_prog = (double *) malloc(gridsize*sizeof(double));
+      hpress  = (double *) malloc(gridsize*(nlevel+1)*sizeof(double));
+  
+      nvct = zaxisInqVctSize(zaxisID);
+      if ( nlevel == (nvct/2 - 1) )
+	{
+	  vct = (double *) malloc(nvct*sizeof(double));
+	  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+	}
+      else
+	cdoAbort("Unsupported vertical coordinate table format!");
+    }
+  else
+    cdoAbort("Unsupported Z-Axis type!");
+
 
   vlistClearFlag(vlistID1);
   for ( levelID = 0; levelID < nlevel; ++levelID )
@@ -127,6 +183,10 @@ void *Vertwind(void *argument)
 
   vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);
+  vlistDefVarCode(vlistID2, 0, 40);
+  vlistDefVarName(vlistID2, 0, "W");
+  vlistDefVarLongname(vlistID2, 0, "Vertical velocity");
+  vlistDefVarUnits(vlistID2, 0, "m/s");
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
@@ -156,14 +216,19 @@ void *Vertwind(void *argument)
 	    streamReadRecord(streamID1, sq+offset, &nmiss);
 	  else if ( varID == omegaID )
 	    streamReadRecord(streamID1, omega+offset, &nmiss);
+	  else if ( varID == psID && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+	    streamReadRecord(streamID1, ps_prog, &nmiss);
 	}
+
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+	presh(fpress, hpress, vct, ps_prog, nlevel, gridsize);
 
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
+	  offset = levelID*gridsize;
+
 	  for ( i = 0; i < gridsize; ++i )
 	    {
-	      offset = levelID*gridsize;
-
 	      /* Virtuelle Temperatur bringt die Feuchteabhaengigkeit hinein */
 	      tv = temp[offset+i] * (1. + 0.608*sq[offset+i]);
 
@@ -171,7 +236,7 @@ void *Vertwind(void *argument)
 		Die Dichte erhaelt man nun mit der Gasgleichung rho=p/(R*tv)
 		Level in Pa!
 	      */
-	      rho = level[levelID] / (R*tv);
+	      rho = fpress[offset+i] / (R*tv);
 
 	      /*
 		Nun daraus die Vertikalgeschwindigkeit im m/s, indem man die
@@ -203,6 +268,11 @@ void *Vertwind(void *argument)
   free(sq);
   free(omega);
   free(wms);
+  free(fpress);
+
+  if ( ps_prog ) free(ps_prog);
+  if ( hpress )  free(hpress);
+  if ( vct ) free(vct);
 
   free(level);
 
