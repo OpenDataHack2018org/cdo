@@ -16,7 +16,7 @@ Constansts: M_PI, M_E
 
 @BeginDescription
 This module arithmetically processes every time step of the input dataset.
-Each individual assignment statement must end with a semi-colon.
+Each individual assignment statement have to end with a semi-colon.
 @IfMan
 The basic arithmetic operations addition +, subtraction -, multiplication *,
 division / and exponentiation ^ can be used.

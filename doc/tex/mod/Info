@@ -10,7 +10,7 @@
 @BeginDescription
 This module writes information about the structure and contents 
 of all input datasets to standard output. The information displayed 
-depends on the actual operator.
+depends on the chosen operator.
 @EndDescription
 @EndModule
 

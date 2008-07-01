@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
-The fields selected depend on the actual operator and the parameters.
+The fields selected depend on the chosen operator and the parameters.
 @EndDescription
 @EndModule
 

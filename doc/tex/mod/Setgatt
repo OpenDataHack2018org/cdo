@@ -8,7 +8,7 @@
 @Operators = setgatt setgatts
 
 @BeginDescription
-This module sets global text attributes of a dataset. Depending on the actual 
+This module sets global text attributes of a dataset. Depending on the chosen 
 operator the attributes are read from a file or can be specified by a parameter.
 @EndDescription
 @EndModule

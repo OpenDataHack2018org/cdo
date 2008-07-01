@@ -17,8 +17,8 @@ This module converts divergence and vorticity to U and V wind and vice versa.
 
 @BeginDescription
 Calculate U and V wind on a gaussian grid from spherical harmonic 
-coefficients of divergence and vorticity. The U and V wind must have
-the names u and v or the code numbers 131 and 132.
+coefficients of divergence and vorticity. The divergence and vorticity 
+need to have the names sd and svo or code numbers 155 and 138.
 The number of latitudes of the resulting gaussian grid is calculated 
 from the triangular truncation by:
 @IfMan
@@ -40,8 +40,8 @@ from the triangular truncation by:
 
 @BeginDescription
 Calculate U and V wind on a gaussian grid from spherical harmonic 
-coefficients of divergence and vorticity. The U and V wind must have
-the names u and v or the code numbers 131 and 132.
+coefficients of divergence and vorticity. The divergence and vorticity 
+need tohave the names sd and svo or code numbers 155 and 138.
 The number of latitudes of the resulting gaussian grid is calculated 
 from the triangular truncation by:
 @IfMan
@@ -63,8 +63,8 @@ from the triangular truncation by:
 
 @BeginDescription
 Calculate spherical harmonic coefficients of divergence and vorticity
-from U and V wind. The divergence and vorticity must have the names sd
-and svo or code numbers 155 and 138.
+from U and V wind. The U and V wind need to have the names u and v or
+the code numbers 131 and 132.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
 @IfMan
@@ -86,8 +86,8 @@ is calculated from the number of latitudes by:
 
 @BeginDescription
 Calculate spherical harmonic coefficients of divergence and vorticity
-from U and V wind. The divergence and vorticity must have the names sd
-and svo or code numbers 155 and 138.
+from U and V wind. The U and V wind need to have the names u and v or
+the code numbers 131 and 132.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
 @IfMan

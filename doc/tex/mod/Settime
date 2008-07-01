@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module sets the time axis or part of the time axis. Which part of the
-time axis is overwritten depends on the actual operator.
+time axis is overwritten depends on the chosen operator.
 @EndDescription
 @EndModule
 

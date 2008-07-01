@@ -8,8 +8,8 @@
 
 @BeginDescription
 This module prints all values of all input datasets to standard output.
-All input fields must have the same horizontal grid. The format of the 
-output depends on the actual operator.
+All input fields need to have the same horizontal grid. The format of the 
+output depends on the chosen operator.
 @EndDescription
 @EndModule
 
@@ -40,7 +40,7 @@ The format and number of elements for each row have to be specified by the param
 @Title     = Integer output
 
 @BeginDescription
-Prints all values rounded to the nearest interger to standard output.
+Prints all values rounded to the nearest integer to standard output.
 @EndDescription
 @EndOperator
 

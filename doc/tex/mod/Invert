@@ -10,7 +10,7 @@
 @BeginDescription
 This operator inverts the latitudes of all fields with a regular
 rectangular grid. 
-@C This module inverts 2D fields on a rectangular grid. Depending on the actual 
+@C This module inverts 2D fields on a rectangular grid. Depending on the chosen 
 @C operator the field, only the data or only the grid description is inverted.
 @EndDescription
 @EndModule

@@ -12,7 +12,7 @@ This operator writes a certain percentile of each month of year in @file{ifile1}
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
 histogram bins is 100. The default can be overridden by setting the
-environment variable CDO_PCTL_NBINS to a different value. The files
+environment variable @env{CDO_PCTL_NBINS} to a different value. The files
 @file{ifile2} and @file{ifile3} should be the result of corresponding
 @mod{ymonmin} and @mod{ymonmax} operations, respectively.
 The date information in an output field is the date of the last

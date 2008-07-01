@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module computes statistical values of the input fields.
-According to the actual operator the field minimum, maximum,
+According to the chosen operator the field minimum, maximum,
 sum, average, variance, standard deviation or a certain percentile
 is written to @file{ofile}.
 @EndDescription

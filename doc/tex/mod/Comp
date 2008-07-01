@@ -13,7 +13,7 @@ field is a mask containing 1 if the comparison is true and 0 if not.
 The number of fields in @file{ifile1} should be the same as in @file{ifile2}.
 One of the input files can contain only one time step or one field.
 The fields in @file{ofile} inherit the meta data from @file{ifile1} or @file{ifile2}.
-The type of comparison depends on the actual operator.
+The type of comparison depends on the chosen operator.
 @EndDescription
 @EndModule
 

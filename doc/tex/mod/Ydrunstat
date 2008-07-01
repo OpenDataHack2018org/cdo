@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module writes running statistical values for each day of year
-in @file{ifile} to @file{ofile}. Depending on the actual operator, the minimum,
+in @file{ifile} to @file{ofile}. Depending on the chosen operator, the minimum,
 maximum, sum, average, variance or standard deviation of all time steps in
 running windows of wich the medium time step corresponds to a certain day of
 year is computed. The date information in an output field is the date of the

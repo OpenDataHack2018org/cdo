@@ -12,7 +12,7 @@ and let @file{ifile2} be the mean TXnorm of daily maximum temperatures
 for any period used as reference. Then counted is the number of days
 where, in intervals of at least nday consecutive days, TX > TXnorm + T.
 The numbers nday and T are optional parameters with default nday = 6
-and T = 5° Celsius. A further output variable is the number of heat
+and T = 5 @celsius. A further output variable is the number of heat
 waves longer than or equal to nday days. Note that both TX and TXnorm
 have to be given in the same units.
 The date information of a time step in @file{ofile} is the date of

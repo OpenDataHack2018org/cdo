@@ -32,7 +32,7 @@ Operator catalog:
       Showinfo   showtime        Show time steps
       Filedes    pardes          Parameter description
       Filedes    griddes         Grid description
-      Filedes    zaxisdes        Zaxis description
+      Filedes    zaxisdes        Z-axis description
       Filedes    vct             Vertical coordinate table
 -------------------------------------------------------------
    File operations
@@ -46,7 +46,7 @@ Operator catalog:
       Split      splitname       Split variable names
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
-      Split      splitzaxis      Split zaxis
+      Split      splitzaxis      Split z-axes
       Splittime  splithour       Split hours
       Splittime  splitday        Split days
       Splittime  splitmon        Split months
@@ -100,9 +100,9 @@ Operator catalog:
       Compc      eqc             Equal constant
       Compc      nec             Not equal constant
       Compc      lec             Less equal constant
-      Compc      ltc             Less then constant
+      Compc      ltc             Less than constant
       Compc      gec             Greater equal constant
-      Compc      gtc             Greater then constant
+      Compc      gtc             Greater than constant
 -------------------------------------------------------------
    Modification
 -------------------------------------------------------------
@@ -112,7 +112,7 @@ Operator catalog:
       Set        setlevel        Set level
       Set        setltype        Set GRIB level type
       Settime    setdate         Set date
-      Settime    settime         Set time
+      Settime    settime         Set time of the day
       Settime    setday          Set day
       Settime    setmon          Set month
       Settime    setyear         Set year
@@ -128,11 +128,11 @@ Operator catalog:
       Change     chlevelv        Change level of one variable
       Setgrid    setgrid         Set grid
       Setgrid    setgridtype     Set grid type
-      Setzaxis   setzaxis        Set zaxis
+      Setzaxis   setzaxis        Set z-axis
       Setgatt    setgatt         Set global attribute
       Setgatt    setgatts        Set global attributes
-      Invert     invertlat       Invert latitude
-      Invertlev  invertlev       Invert level
+      Invert     invertlat       Invert latitudes
+      Invertlev  invertlev       Invert levels
       Maskregion maskregion      Mask regions
       Maskbox    masklonlatbox   Mask a longitude/latitude box
       Maskbox    maskindexbox    Mask an index box
@@ -338,23 +338,16 @@ Operator catalog:
       Trend      trend           Trend
       Subtrend   subtrend        Subtract trend
 -------------------------------------------------------------
-   Tests
--------------------------------------------------------------
-      Tests      normal          Normal distribution
-      Tests      studentt        Student-t distribution
-      Tests      chisquare       Chi-Square distribution
-      Tests      fisher          Fisher distribution
--------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------
       Remapgrid  remapbil        Bilinear interpolation
       Remapgrid  remapbic        Bicubic interpolation
       Remapgrid  remapcon        Conservative remapping
-      Remapgrid  remapdis        Distance-weighted averaging
+      Remapgrid  remapdis        Distance-weighted average remapping
       Genweights genbil          Generate bilinear interpolation weights
       Genweights genbic          Generate bicubic interpolation weights
       Genweights gencon          Generate conservative interpolation weights
-      Genweights gendis          Generate distance-weighted averaging weights
+      Genweights gendis          Generate distance-weighted average remap weights
       Remap      remap           SCRIP grid remapping
       Intgrid    interpolate     PINGO grid interpolation
       Intgrid    intgridbil      Bilinear grid interpolation
@@ -408,7 +401,7 @@ Operator catalog:
       Histogram  histsum         Histogram sum
       Histogram  histmean        Histogram mean
       Histogram  histfreq        Histogram frequency
-      Wct        wct             Windchill temperature (°C)
+      Wct        wct             Windchill temperature
       Fdns       fdns            Frost days where no snow index per time period
       Strwin     strwin          Strong wind days index per time period
       Strbre     strbre          Strong breeze days index per time period

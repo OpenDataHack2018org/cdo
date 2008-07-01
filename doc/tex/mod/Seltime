@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module selects user specified time steps from @file{ifile} and writes them to @file{ofile}.
-The time steps selected depends on the actual operator and the parameters.
+The time steps selected depends on the chosen operator and the parameters.
 @EndDescription
 @EndModule
 

@@ -10,7 +10,7 @@
 @BeginDescription
 Sets a box of the rectangular understood field to a constant value. 
 The elements outside the box are untouched, the elements inside are 
-set to the given constant. All input fields must have the same 
+set to the given constant. All input fields need to have the same 
 horizontal grid.
 @EndDescription
 @EndModule

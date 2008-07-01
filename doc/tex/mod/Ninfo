@@ -10,7 +10,7 @@
 @BeginDescription
 This module prints the number of variables, levels or times of the 
 input dataset.
-@C  according to the actual operator.
+@C  according to the chosen operator.
 @EndDescription
 @EndModule
 

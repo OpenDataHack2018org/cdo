@@ -8,8 +8,8 @@
 
 @BeginDescription
 This module reads time series of one 2D variable from standard input.
-All input fields must have the same horizontal grid. The format of the 
-input depends on the actual operator.
+All input fields need to have the same horizontal grid. The format of the 
+input depends on the chosen operator.
 @EndDescription
 @EndModule
 
@@ -19,9 +19,9 @@ input depends on the actual operator.
 @Parameter = grid
 
 @BeginDescription
-Read fields with ASCII numbers from standard input and stores them
-in @file{ofile}. The numbers that are read are exactly that ones which 
-are written out by @mod{output}.
+Reads fields with ASCII numbers from standard input and stores them
+in @file{ofile}. The numbers read are exactly that ones which are 
+written out by @mod{output}.
 @EndDescription
 @EndOperator
 
@@ -30,10 +30,9 @@ are written out by @mod{output}.
 @Title     = SERVICE input
 
 @BeginDescription
-Read fields with ASCII numbers from standard input and stores them 
-in @file{ofile}. Each field must have a header of 8 integers (SERVICE likely).
-The numbers that are read are exactly that ones which are written 
-out by @mod{outputsrv}.
+Reads fields with ASCII numbers from standard input and stores them 
+in @file{ofile}. Each field should have a header of 8 integers (SERVICE likely).
+The numbers that are read are exactly that ones which are written out by @mod{outputsrv}.
 @EndDescription
 @EndOperator
 
@@ -43,9 +42,8 @@ out by @mod{outputsrv}.
 
 @BeginDescription
 Read fields with ASCII numbers from standard input and stores them 
-in @file{ofile}. Each field with a header of 4 integers (EXTRA likely).
-The numbers that are read are exactly that ones which are written 
-out by @mod{outputext}.
+in @file{ofile}. Each field should have header of 4 integers (EXTRA likely).
+The numbers read are exactly that ones which are written out by @mod{outputext}.
 @EndDescription
 @EndOperator
 
@@ -58,7 +56,7 @@ STRING  Grid description file or name
 
 @BeginExample
 Assume an ASCII dataset contains a field on a global regular 
-grid with 32 longitude and 16 latitudes (512 elements).
+grid with 32 longitudes and 16 latitudes (512 elements).
 To create a GRIB dataset from the ASCII dataset use:
 @BeginVerbatim
    cdo -f grb input,r32x16 ofile.grb < my_ascii_data

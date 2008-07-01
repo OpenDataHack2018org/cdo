@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module computes statistical values over all levels of the input variables.
-According to actual operator the vertical minimum, maximum, sum, average, variance
+According to chosen operator the vertical minimum, maximum, sum, average, variance
 or standard deviation is written to @file{ofile}.
 @EndDescription
 @EndModule

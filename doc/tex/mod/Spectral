@@ -18,7 +18,7 @@ and vice versa.
 @Title     = Spectral to gridpoint
 
 @BeginDescription
-Convert all fields with spectral coefficients to regular gaussian
+Convert all fields with spectral coefficients to a regular gaussian
 grid. The number of latitudes of the resulting gaussian grid is 
 calculated from the triangular truncation by:
 @IfMan
@@ -39,7 +39,7 @@ calculated from the triangular truncation by:
 @Title     = Spectral to gridpoint (linear)
 
 @BeginDescription
-Convert all fields with spectral coefficients to regular gaussian
+Convert all fields with spectral coefficients to a regular gaussian
 grid. The number of latitudes of the resulting Gaussian grid
 is calculated from the triangular truncation by:
 @IfMan

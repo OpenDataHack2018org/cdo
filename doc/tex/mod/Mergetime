@@ -15,7 +15,7 @@
 @BeginDescription
 Merges all time steps of all input files sorted by date and time. After this 
 operation every input time step is in @file{ofile} and all time steps are sorted by 
-date and time. Each input file must have the same variables.
+date and time. Each input file should have the same variables.
 @EndDescription
 @EndOperator
 

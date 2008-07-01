@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module computes statistical values for a selected number of time steps.
-According to the actual operator the minimum, maximum, sum, average,
+According to the chosen operator the minimum, maximum, sum, average,
 variance or standard deviation of the selected time steps is written to @file{ofile}.
 The date information of a time step in @file{ofile} is the date of the last 
 contributing time step in @file{ifile}.

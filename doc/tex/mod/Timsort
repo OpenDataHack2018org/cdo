@@ -12,15 +12,16 @@
 @Title     = Sort over the time
 
 @BeginDescription
-Sorts for every field position the elements in ascending order over all time steps.
+Sorts the elements in ascending order over all time steps for every field position.
 After sorting it is:
 
 @IfMan
-o(t_1,x) < o(t_2,x)      forall (t_1<t_2),x
+o(t_1,x) <= o(t_2,x)      forall (t_1<t_2),x
 @EndifMan
 @IfDoc
+\vspace*{2mm}
 @BeginMath
-o(t_1,x) < o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
+o(t_1,x) <= o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
 @EndMath
 @EndifDoc
 @EndDescription

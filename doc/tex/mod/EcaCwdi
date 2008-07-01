@@ -13,7 +13,7 @@ and let @file{ifile2} be the mean TNnorm of daily minimum temperatures
 for any period used as reference. Then counted is the number of days
 where, in intervals of at least nday consecutive days, TN < TNnorm - T.
 The numbers nday and T are optional parameters with default nday = 6
-and T = 5° Celsius. A further output variable is the number of cold
+and T = 5 @celsius. A further output variable is the number of cold
 waves longer than or equal to nday days. Note that both TN and TNnorm
 have to be given in the same units.
 The date information of a time step in @file{ofile} is the date of

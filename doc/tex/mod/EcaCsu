@@ -10,7 +10,7 @@
 @BeginDescription
 Let @file{ifile} be a time series of daily maximum temperatures TX,
 then counted is the largest number of consecutive days where TX > T.
-The number T is an optional parameter with default T = 25° Celsius.
+The number T is an optional parameter with default T = 25 @celsius.
 Note that TN have to be given in units of Kelvin, whereas T have to be given
 in degrees Celsius.
 The date information of a time step in @file{ofile} is the date of

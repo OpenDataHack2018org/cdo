@@ -1081,6 +1081,8 @@ sub print_description {
 	  $line =~ s/\@mod\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;
 	  $line =~ s/\@cite\{([^}]*)\}/\\cite{\1}/og;
+	  $line =~ s/\@bold\{([^}]*)\}/{\\bf \1}/og;
+	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  $line =~ s/</\$<\$/og;
 	  $line =~ s/>/\$>\$/og;
 	  $line =~ s/%/\\%/og;
@@ -1096,6 +1098,8 @@ sub print_description {
 	$docline =~ s/\@mod\{([^}]*)\}/\1/og;
 	$docline =~ s/\@env\{([^}]*)\}/\1/og;
 	$docline =~ s/\@cite\{([^}]*)\}/\1/og;
+	$docline =~ s/\@bold\{([^}]*)\}/\1/og;
+	$docline =~ s/\@celsius/°C/og;
 	$docline =~ s/\\/\\\\/og;
 	$docline =~ s/\\cite//og;
 #	$docline =~ s/%/\\%/og;

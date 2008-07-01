@@ -10,7 +10,7 @@
 @BeginDescription
 Masks a box of the rectangular understood field. The elements inside 
 the box are untouched, the elements outside are set to missing value.
-All input fields must have the same horizontal grid.
+All input fields need to have the same horizontal grid.
 Use @mod{sellonlatbox} or @mod{selindexbox} if only the data inside the
 box are needed.
 @EndDescription

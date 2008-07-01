@@ -8,7 +8,7 @@
 @Operators = setpartab setcode setname setlevel setltype
 
 @BeginDescription
-This module sets some field information. Depending on the actual
+This module sets some field information. Depending on the chosen
 operator the parameter table, code number, variable name or
 level is set.
 @EndDescription

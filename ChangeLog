@@ -10,7 +10,7 @@
 	* New module: Tests (normal, studentt, chisquare, beta, fisher)
 	* New module: Echam5ini (read_e5ml, write_e5ml)
 	* New operator: import_amsr to read AMSR binary files
-	* New operator: vertwind (testversion)
+	* New operator: vertwind (testversion) [request: Michael Boettinger]
 	* remapeta: add missing value support
 	* setpartab: add parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0

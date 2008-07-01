@@ -12,7 +12,7 @@ This operator computes percentiles over all time steps of the same day in @file{
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
 histogram bins is 100. The default can be overridden by defining the
-environment variable CDO_PCTL_NBINS. The files @file{ifile2} and
+environment variable @env{CDO_PCTL_NBINS}. The files @file{ifile2} and
 @file{ifile3} should be the result of corresponding @mod{daymin} and @mod{daymax}
 operations, respectively.
 The date information of a time step in @file{ofile} is the date of the

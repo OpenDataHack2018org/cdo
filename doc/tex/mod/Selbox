@@ -9,7 +9,7 @@
 
 @BeginDescription
 Selects a box of the rectangular understood field.
-All input fields must have the same horizontal grid.
+All input fields need to have the same horizontal grid.
 @EndDescription
 @EndModule
 
