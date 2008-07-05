@@ -265,6 +265,7 @@ void *Timstat3(void *argument)
 	  double fractil;
 	  double mean_factor[NIN], var_factor[NIN];
 	  double stddev_estimator, mean_estimator, norm, deg_of_freedom;
+	  double tmp;
 	  
 	  mean_factor[0] = 1;
 	  mean_factor[1] = -1;
@@ -277,10 +278,8 @@ void *Timstat3(void *argument)
 	      for ( j = 0; j < n_in; j++ )
 		{
 		  fnvals = iwork[j][varID][levelID][i];
-		  temp0 = ADD(temp0, DIV(SUB(fwork[2*j+1][varID][levelID].ptr[i],
-					     DIV(MUL(fwork[2*j][varID][levelID].ptr[i],
-						     fwork[2*j][varID][levelID].ptr[i]),
-						     fnvals)), var_factor[j]));
+		  tmp   = DIV(MUL(fwork[2*j][varID][levelID].ptr[i], fwork[2*j][varID][levelID].ptr[i]), fnvals);
+		  temp0 = ADD(temp0, DIV(SUB(fwork[2*j+1][varID][levelID].ptr[i], tmp), var_factor[j]));
 		  deg_of_freedom = ADD(deg_of_freedom, fnvals);
 		}
 

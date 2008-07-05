@@ -59,12 +59,13 @@ char *strdup(const char *s);
 
 #ifndef DBL_IS_EQUAL
 #if  defined  (HAVE_ISNAN)
-#  define DBL_IS_EQUAL(x,y) (isnan(x)||isnan(y)?(isnan(x)&&isnan(y)?1:0):!(fabs(x - y) > 0))
+#  define DBL_IS_NAN(x)  (isnan(x))
+#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
+#elif  defined  (FP_NAN)
+#  define DBL_IS_NAN(x)  (fpclassify(x) == FP_NAN)
+#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
 #else
-/*
-#  define DBL_IS_EQUAL(x,y) (fabs(x - y) <= 2.0*(y*DBL_EPSILON + DBL_MIN))
-*/
-#  define DBL_IS_EQUAL(x,y) (!(fabs(x - y) > 0))
+#  define DBL_IS_EQUAL(x,y) (!(x < y || y < x))
 #endif
 #endif
 
