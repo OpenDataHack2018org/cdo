@@ -1582,7 +1582,7 @@ int cdoDefineGrid(const char *gridfile)
 
       if ( strncmp(buffer, "CDF", 3) == 0 )
 	{
-	  if ( cdoDebug ) cdoPrint("grid from netCDF file");
+	  if ( cdoDebug ) cdoPrint("Grid from netCDF file");
 	  gridID = gridFromNCfile(gridfile);
 	}
 
@@ -1590,7 +1590,7 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( strncmp(buffer+1, "HDF", 3) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("grid from HDF5 file");
+	      if ( cdoDebug ) cdoPrint("Grid from HDF5 file");
 	      gridID = gridFromH5file(gridfile);
 	    }
 	}
@@ -1598,7 +1598,7 @@ int cdoDefineGrid(const char *gridfile)
       if ( gridID == -1 )
 	{
 	  int streamID;
-	  if ( cdoDebug ) cdoPrint("grid from CDI file");
+	  if ( cdoDebug ) cdoPrint("Grid from CDI file");
 	  streamID = streamOpenRead(gridfile);
 	  if ( streamID >= 0 )
 	    {
