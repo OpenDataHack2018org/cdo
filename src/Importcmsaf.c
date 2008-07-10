@@ -1,3 +1,11 @@
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
+#if  defined  (HAVE_LIBHDF5)
+#  include "hdf5.h"
+#endif
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -9,7 +17,6 @@
 #define  MAX_VARS   6
 
 
-static
 void init_amsr_day(int vlistID, int gridID, int zaxisID, int nvars)
 {
   /*
@@ -47,7 +54,6 @@ void init_amsr_day(int vlistID, int gridID, int zaxisID, int nvars)
 }
 
 
-static
 void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
 {
   /*
@@ -94,7 +100,6 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
 }
 
 
-static
 void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 {
   static char func[] = "read_amsr_averaged";
@@ -133,7 +138,6 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 }
 
 
-static
 void write_data(int streamID, int nvars, double *data[], int *nmiss)
 {
   int varID;
@@ -146,7 +150,6 @@ void write_data(int streamID, int nvars, double *data[], int *nmiss)
 }
 
 
-static
 int getDate(const char *name)
 {
   int date = 0;
@@ -163,9 +166,40 @@ int getDate(const char *name)
 }
 
 
-void *Importamsr(void *argument)
+#if  defined  (HAVE_LIBHDF5)
+static
+herr_t file_info(hid_t loc_id, const char *name, void *opdata)
 {
-  static char func[] = "Importamsr";
+    H5G_stat_t statbuf;
+
+    /*
+     * Get type of the object and display its name and type.
+     * The name of the object is passed to this function by 
+     * the Library. Some magic :-)
+     */
+    H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
+    switch (statbuf.type) {
+    case H5G_GROUP: 
+         printf(" Object with name %s is a group \n", name);
+         break;
+    case H5G_DATASET: 
+         printf(" Object with name %s is a dataset \n", name);
+         break;
+    case H5G_TYPE: 
+         printf(" Object with name %s is a named datatype \n", name);
+         break;
+    default:
+         printf(" Unable to identify an object ");
+    }
+    return 0;
+}
+#endif
+
+
+void *Importcmsaf(void *argument)
+{
+#if  defined  (HAVE_LIBHDF5)
+  static char func[] = "Importcmsaf";
   int streamID;
   int tsID;
   int gridID, zaxisID, taxisID, vlistID;
@@ -178,18 +212,15 @@ void *Importamsr(void *argument)
   int nmiss[MAX_VARS];
   FILE *fp;
   size_t fsize;
+  hid_t	  file_id;	/* HDF5 File ID	        	*/
+  herr_t  status;	/* Generic return value		*/
 
   cdoInitialize(argument);
 
-  fp = fopen(cdoStreamName(0), "r");
-  if ( fp == NULL ) { perror(cdoStreamName(0)); exit(EXIT_FAILURE); }
+  /* Open an existing file. */
+  file_id = H5Fopen(cdoStreamName(0), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  fseek(fp, 0L, SEEK_END);
-  fsize = (size_t) ftell(fp);
-  fseek(fp, 0L, SEEK_SET);
-
-  vdate = getDate(cdoStreamName(0));
-  if ( vdate <= 999999 ) vdate = vdate*100 + 1;
+  H5Giterate(file_id, "/", NULL, file_info, NULL);
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(1));
@@ -198,6 +229,7 @@ void *Importamsr(void *argument)
     Longitude  is 0.25*xdim-0.125    degrees east
     Latitude   is 0.25*ydim-90.125
   */
+  /*
   gridsize = NLON*NLAT;
   gridID = gridCreate(GRID_LONLAT, gridsize);
   gridDefXsize(gridID, NLON);
@@ -223,12 +255,12 @@ void *Importamsr(void *argument)
 
       streamDefVlist(streamID, vlistID);
 
-      vtime = 130; /* 1:30 */
+      vtime = 130;
       for ( tsID = 0; tsID < 2; ++tsID )
 	{
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
-	  vtime += 1200;  /* 13:30 */
+	  vtime += 1200;
 	  streamDefTimestep(streamID, tsID);
 	  processDefTimesteps(streamID);
 
@@ -246,7 +278,6 @@ void *Importamsr(void *argument)
 
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 
-      /* vlistDefNtsteps(vlistID, 0);*/
       streamDefVlist(streamID, vlistID);
       
       taxisDefVdate(taxisID, vdate);
@@ -265,17 +296,22 @@ void *Importamsr(void *argument)
     cdoAbort("Unexpected file size for AMSR data!");
 
   processDefVarNum(vlistNvars(vlistID), streamID);
-
+  */
   streamClose(streamID);
 
-  fclose(fp);
+  /* Close file */
+  status = H5Fclose(file_id);
 
+  /*
   vlistDestroy(vlistID);
   gridDestroy(gridID);
   zaxisDestroy(zaxisID);
   taxisDestroy(taxisID);
-
+  */
   cdoFinish();
+#else
+  cdoWarning("HDF5 support not compiled in!");
+#endif
 
   return (0);
 }

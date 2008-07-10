@@ -33,6 +33,7 @@ cdo_SOURCES = Arith.c		\
               Harmonic.c 	\
               Histogram.c 	\
               Importamsr.c  	\
+              Importcmsaf.c  	\
               Info.c		\
               Input.c		\
               Intgrid.c 	\

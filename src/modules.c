@@ -65,6 +65,7 @@ void *Gridcell(void *argument);
 void *Harmonic(void *argument);
 void *Histogram(void *argument);
 void *Importamsr(void *argument);
+void *Importcmsaf(void *argument);
 void *Info(void *argument);
 void *Input(void *argument);
 void *Intgrid(void *argument);
@@ -260,6 +261,7 @@ void *Wct(void *argument);
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  ImportamsrOperators    {"import_amsr"}
+#define  ImportcmsafOperators   {"import_cmsaf"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
@@ -486,6 +488,7 @@ static MODULES Modules[] =
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
   { Importamsr,     NULL,              ImportamsrOperators,     1,  1 },
+  { Importcmsaf,    NULL,              ImportcmsafOperators,    1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },

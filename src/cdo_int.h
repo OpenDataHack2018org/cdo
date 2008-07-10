@@ -58,10 +58,10 @@ char *strdup(const char *s);
 
 
 #ifndef DBL_IS_EQUAL
-#if  defined  (HAVE_ISNAN)
+#if  defined  (XXX_HAVE_ISNAN)
 #  define DBL_IS_NAN(x)  (isnan(x))
 #  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
-#elif  defined  (FP_NAN)
+#elif  defined  (XXX_FP_NAN)
 #  define DBL_IS_NAN(x)  (fpclassify(x) == FP_NAN)
 #  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
 #else

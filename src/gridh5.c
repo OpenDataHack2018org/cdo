@@ -6,8 +6,6 @@
 #  include "hdf5.h"
 #endif
 
-#include <stdio.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -78,7 +76,7 @@ int gridFromH5file(const char *gridfile)
   gridInit(&grid);
 
   /* Open an existing file. */
-  file_id = H5Fopen(gridfile, H5F_ACC_RDWR, H5P_DEFAULT);
+  file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, H5P_DEFAULT);
 
   /* H5Giterate(file_id, "/", NULL, file_info, NULL); */
 

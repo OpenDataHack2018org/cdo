@@ -15,7 +15,7 @@
 	* setpartab: add parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
 	* add support of CM-SAF HDF grids (test version)
-        * DBL_IS_EQUAL: check NaN with isnan
+        * DBL_IS_EQUAL: check NaN with isnan (removed! compilation problems)
 	* yseasmean: bug fix for datasets with missing values [report: Hans-Jürgen Panitz]
 	* yhourmean: bug fix for datasets with missing values
 	* ydaymean: bug fix for datasets with missing values

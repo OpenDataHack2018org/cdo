@@ -233,6 +233,7 @@ src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text
 src/Importamsr.c -text
+src/Importcmsaf.c -text
 src/Info.c -text
 src/Input.c -text
 src/Intgrid.c -text
