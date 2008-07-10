@@ -11,13 +11,17 @@ First go to the \href{http://www.mpimet.mpg.de/cdo}{\tt download} page
 if you do not have it yet.
 
 To take full advantage of {\CDO} features the following additional
-library should be installed.
+libraries should be installed.
 
 \begin{itemize}
 \item Unidata \href{http://www.unidata.ucar.edu/packages/netcdf}{netCDF} library
       ({\tt http://www.unidata.ucar.edu/packages/netcdf})
-      version 3 or higher.
-      This is needed to read/write netCDF files with {\CDO}. 
+      version 3 or higher. \\
+      This is needed to process \htmlref{netCDF}{netCDF} files with {\CDO}. 
+\item HDF5 \href{http://hdf.ncsa.uiuc.edu/doc_resource/SZIP}{szip} library
+      ({\tt http://hdf.ncsa.uiuc.edu/doc\_resource/SZIP})
+      version 2.1 or higher. \\
+      This is needed to process szip compressed \htmlref{GRIB}{GRIB} files with {\CDO}. 
 \end{itemize}
 
 %This section is divided into the following sections:
@@ -47,10 +51,16 @@ Compilation is done by performing the following steps:
     ./configure
 \end{verbatim}
 
-Or with netCDF support:
+Or with \htmlref{netCDF}{netCDF} support:
  
 \begin{verbatim}
     ./configure --with-netcdf=<netCDF root directory>
+\end{verbatim}
+
+To enable \htmlref{szip}{szip} support add:
+ 
+\begin{verbatim}
+    --with-szlib=<SZLIB root directory>
 \end{verbatim}
 
 For an overview of other configuration options use

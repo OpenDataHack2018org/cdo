@@ -29,7 +29,10 @@ Building and installing it:
         script has some more options; type 'configure -h' to see them.
         The most interesting ones are the usual
         --prefix=<installation directory> and
-        --with-netcdf=<netCDF root directory> to enable netCDF support.
+        --with-netcdf=<directory> to enable netCDF support.
+        To process szip compressed GRIB files you have to enable
+        SZLIB support with:
+        --with-szlib=<directory>
 
      2. Do "make" to compile the program.
 
