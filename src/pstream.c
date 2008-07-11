@@ -933,7 +933,7 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 {
   PSTREAM *pstreamptr;
 
-  if ( data == NULL ) cdoAbort("Data pointer not allocaced (pstreamReadRecord)!");
+  if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -954,7 +954,7 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 {
   PSTREAM *pstreamptr;
 
-  if ( data == NULL ) cdoAbort("Data pointer not allocaced (pstreamWriteRecord)!");
+  if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamWriteRecord)!");
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -1155,26 +1155,28 @@ void cdoFinish(void)
 	{
 	  if ( sizeof(INT64) > sizeof(long) )
 #if defined (_WIN32)
-	    fprintf(stderr, "%s: Processed %I64d value%s from %d variable%s over %d timestep%s.",
+	    fprintf(stderr, "%s: Processed %I64d value%s from %d variable%s",
 #else
-	    fprintf(stderr, "%s: Processed %lld value%s from %d variable%s over %d timestep%s.",
+	    fprintf(stderr, "%s: Processed %lld value%s from %d variable%s",
 #endif
 		    processInqPrompt(),
 		    nvals, nvals > 1 ? "s" : "",
-		    nvars, nvars > 1 ? "s" : "",
-		    ntimesteps, ntimesteps > 1 ? "s" : "");
+		    nvars, nvars > 1 ? "s" : "");
 	  else
-	    fprintf(stderr, "%s: Processed %ld value%s from %d variable%s over %d timestep%s.",
+	    fprintf(stderr, "%s: Processed %ld value%s from %d variable%s",
 		    processInqPrompt(),
 		    (long) nvals, nvals > 1 ? "s" : "",
-		    nvars, nvars > 1 ? "s" : "",
-		    ntimesteps, ntimesteps > 1 ? "s" : "");
+		    nvars, nvars > 1 ? "s" : "");
 	}
       else
-	fprintf(stderr, "%s: Processed %d variable%s over %d timestep%s.",
+	fprintf(stderr, "%s: Processed %d variable%s",
 		processInqPrompt(),
-		nvars, nvars > 1 ? "s" : "",
-		ntimesteps, ntimesteps > 1 ? "s" : "");
+		nvars, nvars > 1 ? "s" : "");
+
+      if ( ntimesteps > 0 )
+	fprintf(stderr, " over %d timestep%s", ntimesteps, ntimesteps > 1 ? "s" : "");
+
+      fprintf(stderr, ".");
     }
   /*
     fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",

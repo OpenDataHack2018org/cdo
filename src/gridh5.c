@@ -14,7 +14,8 @@
 
 
 #if  defined  (HAVE_LIBHDF5)
-static void nce(int istat)
+static
+void nce(int istat)
 {
   /*
     This routine provides a simple interface to netCDF error message routine.
@@ -30,6 +31,7 @@ static void nce(int istat)
  * Operator function.
  */
 #if  defined  (HAVE_LIBHDF5)
+static
 herr_t file_info(hid_t loc_id, const char *name, void *opdata)
 {
     H5G_stat_t statbuf;

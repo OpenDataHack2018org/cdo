@@ -177,6 +177,13 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local \
 	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
+# powerpc-ibm-aix5.3.0.0
+    vip001)
+	${CONFPATH}configure --prefix=$HOME/local \
+                    --with-netcdf=$HOME/local \
+                    --with-szlib=$HOME/local \
+	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	;;
 # powerpc-ibm-aix6.0.0.0
     hpc*)
 	${CONFPATH}configure --prefix=$HOME/local \
