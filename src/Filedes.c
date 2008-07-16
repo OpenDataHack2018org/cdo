@@ -53,7 +53,7 @@ void printAtts(int vlistID, int varID)
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  vlistInqAttInt(vlistID, varID, attname, attlen, attint);
-	  fprintf(stdout, "  %s = ", attname);
+	  fprintf(stdout, "  %s=", attname);
 	  for ( i = 0; i < attlen; ++i)
 	    {
 	      if ( i > 0 ) fprintf(stdout, ", ");
@@ -65,7 +65,7 @@ void printAtts(int vlistID, int varID)
 	{
 	  if ( attlen > MAXATT ) attlen = MAXATT;
 	  vlistInqAttFlt(vlistID, varID, attname, MAXATT, attflt);
-	  fprintf(stdout, "  %s = ", attname);
+	  fprintf(stdout, "  %s=", attname);
 	  for ( i = 0; i < attlen; ++i)
 	    {
 	      if ( i > 0 ) fprintf(stdout, ", ");
@@ -76,7 +76,8 @@ void printAtts(int vlistID, int varID)
       else if ( atttype == DATATYPE_TXT )
 	{
 	  vlistInqAttTxt(vlistID, varID, attname, sizeof(atttxt), atttxt);
-	  fprintf(stdout, "  %s = %s\n", attname, atttxt);
+	  atttxt[attlen] = 0;
+	  fprintf(stdout, "  %s=\"%s\"\n", attname, atttxt);
 	}
     }
 }
@@ -321,10 +322,12 @@ void *Filedes(void *argument)
 	  else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
 	  else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
 	  else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
-	  else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
 	  else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
 	  else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
 	  else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");
+	  else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
+	  else if ( prec == DATATYPE_UINT16 ) strcpy(pstr, "U16");
+	  else if ( prec == DATATYPE_UINT32 ) strcpy(pstr, "U32");
 	  else                                strcpy(pstr, "-1");
 
 	  if ( code   > 0 ) fprintf(stdout, "  CODE=%d\n", code);

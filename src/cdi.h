@@ -85,6 +85,8 @@ extern "C" {
 #define  DATATYPE_INT16         216
 #define  DATATYPE_INT32         232
 #define  DATATYPE_UINT8         308
+#define  DATATYPE_UINT16        316
+#define  DATATYPE_UINT32        332
 
 /* internal data types */
 
@@ -570,7 +572,7 @@ int     gridToCurvilinear(int gridID);
 
 /* ZAXIS routines */
 
-void    zaxisName(int zaxistype, char *gridname);
+void    zaxisName(int zaxistype, char *zaxisname);
 
 /*      zaxisCreate: Create a vertical Z-axis */
 int     zaxisCreate(int zaxistype, int size);
