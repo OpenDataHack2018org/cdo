@@ -122,7 +122,7 @@ void *Gridcell(void *argument)
       gridtype = gridInqType(gridID);
       if ( gridtype != GRID_LONLAT      &&
 	   gridtype != GRID_GAUSSIAN    &&
-	   gridtype != GRID_LAMBERT     &&
+	   gridtype != GRID_LCC     &&
 	   gridtype != GRID_GME         &&
 	   gridtype != GRID_CURVILINEAR &&
 	   gridtype != GRID_CELL )

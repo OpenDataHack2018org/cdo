@@ -235,11 +235,11 @@ static void printGridInfo(int vlistID)
 	      free(yvals);
 	    }
 	}
-      else if ( gridtype == GRID_LAMBERT )
+      else if ( gridtype == GRID_LCC )
 	{
 	  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
 
-	  gridInqLambert(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
+	  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
 
 	  fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
 	  fprintf(stdout, "%*s", nbyte0, "");	  
@@ -265,7 +265,7 @@ static void printGridInfo(int vlistID)
 	}
 
       if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_CELL ||
-	   gridtype == GRID_GENERIC || gridtype == GRID_LAMBERT )
+	   gridtype == GRID_GENERIC || gridtype == GRID_LCC )
 	{
 	  if ( gridInqXvals(gridID, NULL) || gridInqYvals(gridID, NULL) || gridHasArea(gridID) ||
 	       gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )

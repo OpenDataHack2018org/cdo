@@ -107,7 +107,8 @@ extern "C" {
 #define  GRID_TRAJECTORY          8
 #define  GRID_CELL                9
 #define  GRID_CURVILINEAR        10
-#define  GRID_LAMBERT            11
+#define  GRID_LCC                11  /* Lambert Conformal Conic        */
+#define  GRID_LAEA               12  /* Lambert Azimuthal Equal Area   */
 
 /* ZAXIS types */
 
@@ -375,8 +376,10 @@ void    vlistDefVarScalefactor(int vlistID, int varID, double scalefactor);
 double  vlistInqVarScalefactor(int vlistID, int varID);
 void    vlistDefVarAddoffset(int vlistID, int varID, double addoffset);
 double  vlistInqVarAddoffset(int vlistID, int varID);
-void    vlistDefVarAverage(int vlistID, int varID, int average);
-int     vlistInqVarAverage(int vlistID, int varID);
+void    vlistDefVarTimave(int vlistID, int varID, int timave);
+int     vlistInqVarTimave(int vlistID, int varID);
+void    vlistDefVarTimaccu(int vlistID, int varID, int timaccu);
+int     vlistInqVarTimaccu(int vlistID, int varID);
 int     vlistInqVarSize(int vlistID, int varID);
 int     vlistInqVarID(int vlistID, int code);
 
@@ -537,8 +540,8 @@ int     gridInqGMEni3(int gridID);
 void    gridDefGMEni3(int gridID, int ni3);
 
 /* Lambert grid */
-void gridDefLambert(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc);
-void gridInqLambert(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc);
+void gridDefLCC(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc);
+void gridInqLCC(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc);
 
 void    gridDefArea(int gridID, double *area);
 void    gridInqArea(int gridID, double *area);

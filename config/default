@@ -175,27 +175,27 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/home/ms/spdekplb/hmk/local/AIX \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix5.3.0.0
-    vip001)
+    vip*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix6.0.0.0
     hpc*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/lib/netcdf-3.5.0/LP64 \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix6.0.0.0
     dwd | p???et01)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/uhome/mpischul/local \
-	            CC=xlc_r CFLAGS="-O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # hppa2.0w-hp-hpux11.11
     moon)

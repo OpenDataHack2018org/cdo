@@ -472,7 +472,7 @@ void *Gradsdes(void *argument)
       gridtype = gridInqType(gridID);
       if ( gridtype == GRID_LONLAT   ||
 	   gridtype == GRID_GAUSSIAN ||
-	   gridtype == GRID_LAMBERT  ) break;
+	   gridtype == GRID_LCC  ) break;
     }
 
   if ( index == ngrids )
@@ -738,7 +738,7 @@ void *Gradsdes(void *argument)
 
   /* XDEF */
 
-  if ( gridtype == GRID_LAMBERT )
+  if ( gridtype == GRID_LCC )
     {
       double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
       double xmin = 1.e10, xmax = -1.e10, ymin = 1.e10, ymax = -1.e10;
@@ -746,7 +746,7 @@ void *Gradsdes(void *argument)
       int nx, ny, ni;
       double inc[] = { 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001 };
 
-      gridInqLambert(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
+      gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
       fprintf(gdp, "PDEF %d %d lcc %g %g 1 1 %g %g %g %g %g\n", 
 	      xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
 
@@ -821,7 +821,7 @@ void *Gradsdes(void *argument)
 
   /* YDEF */
 
-  if ( gridtype != GRID_LAMBERT )
+  if ( gridtype != GRID_LCC )
     {
       yfirst = gridInqYval(gridID, 0);
       yinc   = gridInqYinc(gridID);

@@ -307,7 +307,7 @@ int gridDefine(GRID grid)
 
 	break;
       }
-    case GRID_LAMBERT:
+    case GRID_LCC:
       {
 	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
 	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
@@ -329,8 +329,8 @@ int gridDefine(GRID grid)
 	if ( grid.def_xinc      == FALSE ) Error(func, "xinc undefined!");
 	if ( grid.def_yinc      == FALSE ) Error(func, "yinc undefined!");
 
-	gridDefLambert(gridID, grid.originLon, grid.originLat, grid.lonParY,
-		       grid.lat1, grid.lat2, grid.xinc, grid.yinc);
+	gridDefLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
+		   grid.lat1, grid.lat2, grid.xinc, grid.yinc);
 
 	break;
       }
@@ -566,7 +566,11 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else if ( strncmp(pline, "gme", 3)  == 0 )
 	    grid.type = GRID_GME;
 	  else if ( strncmp(pline, "lambert", 7)  == 0 )
-	    grid.type = GRID_LAMBERT;
+	    grid.type = GRID_LCC;
+	  else if ( strncmp(pline, "lcc", 3)  == 0 )
+	    grid.type = GRID_LCC;
+	  else if ( strncmp(pline, "laea", 4)  == 0 )
+	    grid.type = GRID_LAEA;
 	  else
 	    Warning(func, "Invalid grid name : %s", pline);
 	}
@@ -1765,7 +1769,7 @@ int gridGenArea(int gridID, double *area)
 
   if ( gridtype != GRID_LONLAT      &&
        gridtype != GRID_GAUSSIAN    &&
-       gridtype != GRID_LAMBERT     &&
+       gridtype != GRID_LCC     &&
        gridtype != GRID_GME         &&
        gridtype != GRID_CURVILINEAR &&
        gridtype != GRID_CELL )
@@ -1941,7 +1945,7 @@ int gridWeights(int gridID, double *grid_wgts)
     {
       if ( gridtype != GRID_LONLAT      &&
 	   gridtype != GRID_GAUSSIAN    &&
-	   gridtype != GRID_LAMBERT     &&
+	   gridtype != GRID_LCC     &&
 	   gridtype != GRID_GME         &&
 	   gridtype != GRID_CURVILINEAR &&
 	   gridtype != GRID_CELL )
