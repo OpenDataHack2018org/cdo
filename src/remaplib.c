@@ -4589,7 +4589,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
     if ( !DBL_IS_EQUAL(rg->grid2_area[n], 0) ) rg->grid2_frac[n] = rg->grid2_frac[n]/rg->grid2_area[n];
 
   /* Perform some error checking on final weights  */
-
+  /*
+  for ( n = 0; n < grid2_size; n++ )
+    {
+      grid2_centroid_lat[n] = 0;
+      grid2_centroid_lon[n] = 0;
+    }
+  */
   if ( lcheck )
     {
       for ( n = 0; n < grid1_size; n++ )
@@ -4601,17 +4607,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	    cdoPrint("Grid 1 centroid lat error: %d %g", n, grid1_centroid_lat[n]);
 	}
     }
-  /*
+
   for ( n = 0; n < grid1_size; n++ )
     {
       grid1_centroid_lat[n] = 0;
       grid1_centroid_lon[n] = 0;
-    }
-  */
-  for ( n = 0; n < grid2_size; n++ )
-    {
-      grid2_centroid_lat[n] = 0;
-      grid2_centroid_lon[n] = 0;
     }
 
   if ( lcheck )
@@ -4627,8 +4627,8 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   for ( n = 0; n < grid2_size; n++ )
     {
-      grid2_centroid_lat[n] = ZERO;
-      grid2_centroid_lon[n] = ZERO;
+      grid2_centroid_lat[n] = 0;
+      grid2_centroid_lon[n] = 0;
     }
 
   if ( lcheck )
