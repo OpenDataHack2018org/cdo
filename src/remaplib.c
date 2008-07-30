@@ -2308,8 +2308,13 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
     {
       /* Find distance to this point */
 
-      distance = acos(sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-                     (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]));
+      distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
+	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
+      /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
+                                     otherwise the result of acos(distance) is NaN */
+      if ( distance >  1 ) distance =  1;
+      if ( distance < -1 ) distance = -1;
+      distance = acos(distance);
 
       /* Uwe Schulzweida: if distance is zero, set to small number */
       if ( DBL_IS_EQUAL(distance, 0) ) distance = TINY;
@@ -3052,6 +3057,7 @@ void pole_intersection(int *location,
           s1 = (rhs1*mat4 - mat2*rhs2)/determ;
           s2 = (mat1*rhs2 - rhs1*mat3)/determ;
 
+	  /* Uwe Schulzweida: s1 >= ZERO! (bug fix) */
           if ( s2 >= ZERO && s2 <= ONE && s1 >= ZERO && s1 <= ONE )
 	    {
 	      /*

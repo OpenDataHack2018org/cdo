@@ -11,6 +11,7 @@
 	* New module: Echam5ini (read_e5ml, write_e5ml)
 	* New operator: import_amsr to read AMSR binary files
 	* New operator: vertwind (testversion) [request: Michael Boettinger]
+	* remapdis: check that distance is inside the range of -1 to 1 [report: Hui Wan]
 	* remapeta: add missing value support
 	* setpartab: add parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
