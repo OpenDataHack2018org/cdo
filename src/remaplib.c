@@ -2598,8 +2598,12 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
     {
       /* Find distance to this point */
 
-      distance = acos(sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-                     (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]));
+      distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
+	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
+      if ( distance >  1 ) distance =  1;
+      if ( distance < -1 ) distance = -1;
+      distance = acos(distance);
+
       /*
          Store the address and distance if this is the smallest so far
       */
