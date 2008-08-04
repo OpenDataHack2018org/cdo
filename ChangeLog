@@ -11,6 +11,7 @@
 	* New module: Echam5ini (read_e5ml, write_e5ml)
 	* New operator: import_amsr to read AMSR binary files
 	* New operator: vertwind (testversion) [request: Michael Boettinger]
+	* New operator: ml2pl_lp (testversion) [request: Hui Wan]
 	* remapdis: check that distance is inside the range of -1 to 1 [report: Hui Wan]
 	* remapeta: add missing value support
 	* setpartab: add parameter LTYPE [request: Stefan Petri]

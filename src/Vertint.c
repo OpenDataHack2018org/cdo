@@ -39,15 +39,18 @@ void *Vertint(void *argument)
 {
   static char func[] = "Vertint";
   int ML2PL, ML2HL, ML2PLX, ML2HLX;
+  int ML2PL_LP, ML2HL_LP, ML2PLX_LP, ML2HLX_LP;
   int operatorID;
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
+  enum {func_pl, func_hl};
+  enum {type_lin, type_log};
   int geop_code = 0, temp_code = 0, ps_code = 0, lsp_code = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridsize, ngp = 0;
   int recID, nrecs;
-  int i, offset;
+  int i, k, offset;
   int tsID, varID, levelID;
   int nvars;
   int zaxisIDp, zaxisIDh = -1, nzaxis;
@@ -75,18 +78,25 @@ void *Vertint(void *argument)
   int mono_level;
   int instNum, tableNum;
   int useTable;
+  int operfunc, opertype;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
-  ML2PL  = cdoOperatorAdd("ml2pl",  0, 0, "pressure levels in pascal");
-  ML2PLX = cdoOperatorAdd("ml2plx", 0, 0, "pressure levels in pascal");
-  ML2HL  = cdoOperatorAdd("ml2hl",  0, 0, "height levels in meter");
-  ML2HLX = cdoOperatorAdd("ml2hlx", 0, 0, "height levels in meter");
+  ML2PL  = cdoOperatorAdd("ml2pl",  func_pl, type_lin, "pressure levels in pascal");
+  ML2PLX = cdoOperatorAdd("ml2plx", func_pl, type_lin, "pressure levels in pascal");
+  ML2HL  = cdoOperatorAdd("ml2hl",  func_hl, type_lin, "height levels in meter");
+  ML2HLX = cdoOperatorAdd("ml2hlx", func_hl, type_lin, "height levels in meter");
+  ML2PL_LP  = cdoOperatorAdd("ml2pl_lp",  func_pl, type_log, "pressure levels in pascal");
+  ML2PLX_LP = cdoOperatorAdd("ml2plx_lp", func_pl, type_log, "pressure levels in pascal");
+  ML2HL_LP  = cdoOperatorAdd("ml2hl_lp",  func_hl, type_log, "height levels in meter");
+  ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
 
   operatorID = cdoOperatorID();
+  operfunc = cdoOperatorFunc(operatorID);
+  opertype = cdoOperatorIntval(operatorID);
 
-  if ( operatorID == ML2PL || operatorID == ML2HL )
+  if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {
       char *envstr;
       envstr = getenv("EXTRAPOLATE");
@@ -143,7 +153,7 @@ void *Vertint(void *argument)
 	}
     }
 
-  if ( operatorID == ML2HL || operatorID == ML2HLX )
+  if ( operfunc == func_hl )
     zaxisIDp = zaxisCreate(ZAXIS_HEIGHT, nplev);
   else
     zaxisIDp = zaxisCreate(ZAXIS_PRESSURE, nplev);
@@ -302,13 +312,16 @@ void *Vertint(void *argument)
   else
     cdoWarning("No data on hybrid model level found!");
 
-  if ( operatorID == ML2HL || operatorID == ML2HLX )
+  if ( operfunc == func_hl )
     {
       phlev = (double *) malloc(nplev*sizeof(double));
       h2p(phlev, plev, nplev);
       memcpy(plev, phlev, nplev*sizeof(double));
       free(phlev);
     }
+
+  if ( opertype == type_log )
+    for ( k = 0; k < nplev; k++ ) plev[k] = log(plev[k]);
 
   useTable = FALSE;
   for ( varID = 0; varID < nvars; varID++ )
@@ -513,6 +526,19 @@ void *Vertint(void *argument)
 
 	  presh(full_press, half_press, vct, ps_prog, nhlevf, ngp);
 
+	  if ( opertype == type_log )
+	    {
+	      for ( i = 0; i < ngp; i++ ) ps_prog[i] = log(ps_prog[i]);
+
+	      for ( k = 0; k < nhlevh; k++ )
+		for ( i = 0; i < ngp; i++ )
+		  half_press[k*ngp+i] = log(half_press[k*ngp+i]);
+
+	      for ( k = 0; k < nhlevf; k++ )
+		for ( i = 0; i < ngp; i++ )
+		  full_press[k*ngp+i] = log(full_press[k*ngp+i]);
+	    }
+
 	  genind(vert_index, plev, full_press, ngp, nplev, nhlevf);
 
 	  if ( Extrapolate == 0 )
@@ -563,6 +589,9 @@ void *Vertint(void *argument)
 		    {
 		      if ( nlevel == nhlevh )
 			cdoAbort("Temperature on half level unsupported!");
+
+		      if ( opertype == type_log && Extrapolate )
+			cdoAbort("Log. extrapolation of temperature unsupported!");
 
 		      interp_T(geop, vardata1[varID], vardata2[varID],
 			       full_press, half_press, vert_index,

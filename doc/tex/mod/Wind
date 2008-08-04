@@ -7,7 +7,7 @@
 @Operators = dv2uv dv2uvl uv2dv uv2dvl 
 
 @BeginDescription
-This module converts divergence and vorticity to U and V wind and vice versa.
+This module converts relative divergence and vorticity to U and V wind and vice versa.
 @EndDescription
 @EndModule
 
@@ -17,7 +17,7 @@ This module converts divergence and vorticity to U and V wind and vice versa.
 
 @BeginDescription
 Calculate U and V wind on a gaussian grid from spherical harmonic 
-coefficients of divergence and vorticity. The divergence and vorticity 
+coefficients of relative divergence and vorticity. The divergence and vorticity 
 need to have the names sd and svo or code numbers 155 and 138.
 The number of latitudes of the resulting gaussian grid is calculated 
 from the triangular truncation by:
@@ -40,7 +40,7 @@ from the triangular truncation by:
 
 @BeginDescription
 Calculate U and V wind on a gaussian grid from spherical harmonic 
-coefficients of divergence and vorticity. The divergence and vorticity 
+coefficients of relative divergence and vorticity. The divergence and vorticity 
 need tohave the names sd and svo or code numbers 155 and 138.
 The number of latitudes of the resulting gaussian grid is calculated 
 from the triangular truncation by:
@@ -62,7 +62,7 @@ from the triangular truncation by:
 @Title     = U and V wind to divergence and vorticity
 
 @BeginDescription
-Calculate spherical harmonic coefficients of divergence and vorticity
+Calculate spherical harmonic coefficients of relative divergence and vorticity
 from U and V wind. The U and V wind need to have the names u and v or
 the code numbers 131 and 132.
 The triangular truncation of the resulting spherical harmonics
@@ -85,7 +85,7 @@ is calculated from the number of latitudes by:
 @Title     = U and V wind to divergence and vorticity (linear)
 
 @BeginDescription
-Calculate spherical harmonic coefficients of divergence and vorticity
+Calculate spherical harmonic coefficients of relative divergence and vorticity
 from U and V wind. The U and V wind need to have the names u and v or
 the code numbers 131 and 132.
 The triangular truncation of the resulting spherical harmonics
