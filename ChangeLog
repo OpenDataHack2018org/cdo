@@ -14,6 +14,7 @@
 	* New operator: ml2pl_lp (testversion) [request: Hui Wan]
 	* remapdis: check that distance is inside the range of -1 to 1 [report: Hui Wan]
 	* remapeta: add missing value support
+	* vlistCompare: compare all lon/lat values
 	* setpartab: add parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
 	* add support of CM-SAF HDF grids (test version)

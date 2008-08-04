@@ -71,6 +71,7 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
       {
 	int gridID1, gridID2;
 	int xsize, ysize;
+	int i;
 
 	gridID1 = vlistInqVarGrid(vlistID1, 0);
 	gridID2 = vlistInqVarGrid(vlistID2, 0);
@@ -102,9 +103,44 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 			    else
 			      cdoWarning("Grid orientation differ! First grid: S->N; second grid: N->S");
 			  }
+			else
+			  {
+			    for ( i = 0; i < ysize; ++i )
+			      if ( fabs(yvals1[i] - yvals2[i]) > 1.e-10 )
+				{
+				  cdoWarning("Grid latitudes differ!");
+				  break;
+				}
+			  }
 
 			free(yvals1);
 			free(yvals2);
+		      }
+		  }
+		else
+		  cdoWarning("ysize of input grids differ!");
+		
+		if ( xsize == gridInqXsize(gridID2) )
+		  {
+		    if ( xsize > 1 )
+		      {
+			double *xvals1, *xvals2;
+
+			xvals1 = (double *) malloc(xsize*sizeof(double));
+			xvals2 = (double *) malloc(xsize*sizeof(double));
+
+			gridInqXvals(gridID1, xvals1);
+			gridInqXvals(gridID2, xvals2);
+		
+			for ( i = 0; i < xsize; ++i )
+			  if ( fabs(xvals1[i] - xvals2[i]) > 1.e-10 )
+			    {
+			      cdoWarning("Grid longitudes differ!");
+			      break;
+			    }
+
+			free(xvals1);
+			free(xvals2);
 		      }
 		  }
 		else
