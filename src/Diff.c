@@ -79,10 +79,10 @@ void *Diff(void *argument)
 
   if ( operatorID == DIFFV )
     fprintf(stdout, "               Date  Time Varname     Level    Size    Miss :"
-	    " S Z      Absdiff     Reldiff\n");
+	    " S Z  Max_Absdiff Max_Reldiff\n");
   else if ( operatorID == DIFF )
     fprintf(stdout, "               Date  Time Code  Level    Size    Miss :"
-	    " S Z      Absdiff     Reldiff\n");
+	    " S Z  Max_Absdiff Max_Reldiff\n");
 
   indg = 0;
   tsID = 0;

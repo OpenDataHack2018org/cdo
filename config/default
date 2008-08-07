@@ -119,7 +119,7 @@ case "${HOSTNAME}" in
     xxf)
 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
                     --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
-                    CC=cc CFLAGS="-g -mt -fast -m64"
+                    CC=cc CFLAGS="-g -mt -xO3 -m64"
 	;;
 # sparc-sun-solaris2.9 changed to
 # sparc-sun-solaris2.10
@@ -128,7 +128,7 @@ case "${HOSTNAME}" in
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
                     --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
                     --with-szlib=$HOME/local/solaris10 \
-                    CC=cc CFLAGS="-g -mt -fast -m64"
+                    CC=cc CFLAGS="-g -mt -xO3 -m64"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
                     --program-suffix=_${SGE_SUFFIX} \
@@ -136,7 +136,7 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local/solaris10 \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/local/include" \
                     LIBS="-L/opt/gridware/sge/lib/sol-sparc64 -ldrmaa -ldl -L/sw/solaris10/curl-7.16.4-cc/lib -lcurl" \
-                    CC=cc CFLAGS="-g -mt -fast -m64"
+                    CC=cc CFLAGS="-g -mt -xO3 -m64"
         fi
 	;;
 # sx6-nec-superux12.2

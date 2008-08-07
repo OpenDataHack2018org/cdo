@@ -77,7 +77,7 @@ STRING  Target grid description file or name
 
 @BeginExample
 Say @file{ifile} contains fields on a rectangular grid.
-To interpolate all fields bilinear to a T42 gaussian grid use:
+To interpolate all fields bilinear to a T42 Gaussian grid use:
 @BeginVerbatim
    cdo intgridbil,t42grid ifile ofile
 @EndVerbatim

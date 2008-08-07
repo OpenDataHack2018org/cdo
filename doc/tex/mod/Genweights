@@ -92,7 +92,7 @@ not to SCRIP!
 
 @BeginExample
 Say @file{ifile} contains fields on a rectangular grid.
-To remap all fields bilinear to a T42 gaussian grid use:
+To remap all fields bilinear to a T42 Gaussian grid use:
 @BeginVerbatim
    cdo genbil,t42grid ifile remapweights.nc
    cdo remap,t42grid,remapweights ifile ofile

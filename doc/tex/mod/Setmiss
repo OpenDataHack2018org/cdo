@@ -107,7 +107,7 @@ o(t,x) = \left\{
 
 
 @BeginParameter rmax
-@Item = miss
+@Item = newmiss
 FLOAT  New missing value
 @Item = c
 FLOAT  Constant

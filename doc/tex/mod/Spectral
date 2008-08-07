@@ -8,7 +8,7 @@
 @Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp spcut
 
 @BeginDescription
-This module transforms fields on gaussian grids to spectral coefficients 
+This module transforms fields on Gaussian grids to spectral coefficients 
 and vice versa.
 @EndDescription
 @EndModule
@@ -18,8 +18,8 @@ and vice versa.
 @Title     = Spectral to gridpoint
 
 @BeginDescription
-Convert all fields with spectral coefficients to a regular gaussian
-grid. The number of latitudes of the resulting gaussian grid is 
+Convert all fields with spectral coefficients to a regular Gaussian
+grid. The number of latitudes of the resulting Gaussian grid is 
 calculated from the triangular truncation by:
 @IfMan
 
@@ -39,7 +39,7 @@ calculated from the triangular truncation by:
 @Title     = Spectral to gridpoint (linear)
 
 @BeginDescription
-Convert all fields with spectral coefficients to a regular gaussian
+Convert all fields with spectral coefficients to a regular Gaussian
 grid. The number of latitudes of the resulting Gaussian grid
 is calculated from the triangular truncation by:
 @IfMan
@@ -62,7 +62,7 @@ Use this operator to convert ERA40 data e.g. from TL159 to N80.
 @Title     = Gridpoint to spectral
 
 @BeginDescription
-Convert all gaussian gridpoint fields to spectral coefficients.
+Convert all Gaussian gridpoint fields to spectral coefficients.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
 @IfMan
@@ -83,7 +83,7 @@ is calculated from the number of latitudes by:
 @Title     = Gridpoint to spectral (linear)
 
 @BeginDescription
-Convert all gaussian gridpoint fields to spectral coefficients.
+Convert all Gaussian gridpoint fields to spectral coefficients.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
 @IfMan
@@ -134,11 +134,11 @@ INTEGER  Comma separated list of wave numbers
 
 
 @BeginExample
-To transform spectral coefficients from T106 to N80 gaussian grid use:
+To transform spectral coefficients from T106 to N80 Gaussian grid use:
 @BeginVerbatim
    cdo sp2gp ifile ofile
 @EndVerbatim
-To transform spectral coefficients from TL159 to N80 gaussian grid use:
+To transform spectral coefficients from TL159 to N80 Gaussian grid use:
 @BeginVerbatim
    cdo sp2gpl ifile ofile
 @EndVerbatim

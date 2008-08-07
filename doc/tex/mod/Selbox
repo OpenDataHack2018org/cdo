@@ -63,7 +63,7 @@ latitudes from 20N to 20S from all input fields use:
 @BeginVerbatim
    cdo sellonlatbox,120,-90,20,-20 ifile ofile
 @EndVerbatim
-If the input dataset has fields on a T21 gaussian grid, the same box can
+If the input dataset has fields on a T21 Gaussian grid, the same box can
 be selected with @oper{selindexbox} by:
 @BeginVerbatim
    cdo selindexbox,23,48,13,20 ifile ofile

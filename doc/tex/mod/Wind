@@ -16,10 +16,10 @@ This module converts relative divergence and vorticity to U and V wind and vice 
 @Title     = Divergence and vorticity to U and V wind
 
 @BeginDescription
-Calculate U and V wind on a gaussian grid from spherical harmonic 
+Calculate U and V wind on a Gaussian grid from spherical harmonic 
 coefficients of relative divergence and vorticity. The divergence and vorticity 
 need to have the names sd and svo or code numbers 155 and 138.
-The number of latitudes of the resulting gaussian grid is calculated 
+The number of latitudes of the resulting Gaussian grid is calculated 
 from the triangular truncation by:
 @IfMan
 
@@ -39,10 +39,10 @@ from the triangular truncation by:
 @Title     = Divergence and vorticity to U and V wind (linear)
 
 @BeginDescription
-Calculate U and V wind on a gaussian grid from spherical harmonic 
+Calculate U and V wind on a Gaussian grid from spherical harmonic 
 coefficients of relative divergence and vorticity. The divergence and vorticity 
 need tohave the names sd and svo or code numbers 155 and 138.
-The number of latitudes of the resulting gaussian grid is calculated 
+The number of latitudes of the resulting Gaussian grid is calculated 
 from the triangular truncation by:
 @IfMan
 

@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module splits a dataset to several files with names
-formed from the field header information and @file{oprefix}.
+formed from the field header information and the string @file{oprefix}.
 @EndDescription
 @EndModule
 

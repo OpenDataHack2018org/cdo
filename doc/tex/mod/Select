@@ -105,17 +105,17 @@ Selects all fields with grid names in a user given list.
 
 
 @BeginOperator_selzaxis
-@Title     = Select zaxes
+@Title     = Select z-axes
 @Parameter = zaxes
 
 @BeginDescription
-Selects all fields with zaxes in a user given list.
+Selects all fields with z-axes in a user given list.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_selzaxisname
-@Title     = Select zaxes by name
+@Title     = Select z-axes by name
 @Parameter = zaxisnames
 
 @BeginDescription

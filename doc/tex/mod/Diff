@@ -30,6 +30,14 @@ For each pair of fields the operator prints one line with the following informat
 @Item = Maxima of absolute difference of coefficient pairs
 @Item = Maxima of relative difference of non-zero coefficient pairs with equal signs
 @EndItemize
+@IfDoc
+\begin{displaymath}
+        Absdiff(t,x) = \left| i_1(t,x) - i_2(t,x) \right|
+\end{displaymath}
+\begin{displaymath}
+        Reldiff(t,x) = \frac{\left| i_1(t,x) - i_2(t,x) \right|}{\mbox{max}(\left| i_1(t,x) \right| , \left| i_2(t,x) \right| )}
+\end{displaymath}
+@EndifDoc
 @EndDescription
 @EndOperator
 
@@ -49,10 +57,9 @@ To print the difference for each field of two datasets use:
 @BeginVerbatim
    cdo diff ifile1 ifile2
 @EndVerbatim
-This is an example result of the difference of two datasets 
-with one 2D variable over 12 time steps:
+This is an example result of two datasets with one 2D variable over 12 time steps:
 @BeginVerbatim
-              Date  Time Code Level  Size  Miss : S Z      Absdiff     Reldiff
+              Date  Time Code Level  Size  Miss : S Z  Max_Absdiff Max_Reldiff
     1 : 1987-01-31 12:00 139      0  2048  1361 : F F   0.00010681  4.1660e-07
     2 : 1987-02-28 12:00 139      0  2048  1361 : F F   6.1035e-05  2.3742e-07
     3 : 1987-03-31 12:00 139      0  2048  1361 : F F   7.6294e-05  3.3784e-07

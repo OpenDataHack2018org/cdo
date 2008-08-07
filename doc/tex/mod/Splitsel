@@ -42,18 +42,3 @@ INTEGER  Number of input time steps skipped before the first time step range (op
 @Item = nskip
 INTEGER  Number of input time steps skipped between time step ranges (optional)
 @EndParameter
-
-
-@C @BeginExample
-@C Assume the input GRIB dataset has time steps from
-@C January to December. To split each month with all
-@C variables into one separate file use:
-@C @BeginVerbatim
-@C    cdo splitmon ifile mon
-@C @EndVerbatim
-@C Result of '{\tt dir mon*}':
-@C @BeginVerbatim
-@C    mon01.grb  mon02.grb  mon03.grb  mon04.grb  mon05.grb  mon06.grb
-@C    mon07.grb  mon08.grb  mon09.grb  mon10.grb  mon11.grb  mon12.grb
-@C @EndVerbatim
-@C @EndExample

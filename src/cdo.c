@@ -161,7 +161,7 @@ static void usage(void)
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (32/64 for nc, nc2, nc4, srv, ext, ieg; 1 - 32 for grb)\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, nc4, srv, ext or ieg)\n");
-  fprintf(stderr, "    -g <grid>      Grid name or file. Available grids: \n");
+  fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
   /*
@@ -181,7 +181,7 @@ static void usage(void)
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
   fprintf(stderr, "    -r             Convert from an absolute to a relative time axis\n");
   fprintf(stderr, "    -s             Silent mode\n");
-  fprintf(stderr, "    -t <partab>    Parameter table name or file\n");
+  fprintf(stderr, "    -t <partab>    Set default parameter table name or file\n");
   fprintf(stderr, "                   Predefined tables: ");
   for ( id = 0; id < tableInqNumber(); id++ )
     if ( (name = tableInqNamePtr(id)) )
