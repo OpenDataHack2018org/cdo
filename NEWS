@@ -1,9 +1,25 @@
 CDO NEWS
 --------
 
+Version 1.2.0 (? August 2008):
+
+   * New features:
+      o add support for netCDF4 classic with deflate (option -z zip)
+   * New operators:
+      o Linear level interpolation - intlevel
+      o Invert levels - invertlev
+      o Select levels by index - sellevidx
+      o Import AMSR binary files - import_amsr
+   * Changed operators:
+      o remapeta: add missing value support
+   * Fixed bugs:
+      o Operator yseasmean, yhourmean and ydaymean: bug fix for datasets with missing values
+      o Module Ninfo and Showinfo: bug fix for datasets with time constant parameter only
+        Affected operators: ndate, nmon, nyear, showdate, showtime, showmon, showyear
+
 Version 1.1.1 (8 April 2008):
 
-   * New features
+   * New features:
       o Module Vertint: add support for GME data
 
    * New operators:
@@ -19,7 +35,7 @@ Version 1.1.1 (8 April 2008):
 
 Version 1.1.0 (25 January 2008):
 
-   * New features
+   * New features:
       o Support for Lambert conformal grids in GRIB format
       o Improved support for netCDF attributes
 

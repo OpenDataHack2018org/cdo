@@ -17,13 +17,13 @@
 	* vlistCompare: compare all lon/lat values
 	* setpartab: add parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
-	* add support of CM-SAF HDF grids (test version)
+	* add support of CM-SAF HDF5 grids (test version)
         * DBL_IS_EQUAL: check NaN with isnan (removed! compilation problems)
 	* yseasmean: bug fix for datasets with missing values [report: Hans-Jürgen Panitz]
 	* yhourmean: bug fix for datasets with missing values
 	* ydaymean: bug fix for datasets with missing values
 	* namelist: bug fix for wrong input
-	* ntime: bug fix for datasets with time constant parameters only [report: David Wang]
+	* ntime: bug fix for datasets with time constant parameter only [report: David Wang]
 	  (also affected: ndate, nmon, nyear, showdate, showtime, showmon, showyear)
 	* Version 1.2.0 released
 	

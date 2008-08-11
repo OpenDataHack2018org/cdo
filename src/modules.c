@@ -488,7 +488,7 @@ static MODULES Modules[] =
   { Gridcell,       GridcellHelp,      GridcellOperators,       1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
-  { Importamsr,     NULL,              ImportamsrOperators,     1,  1 },
+  { Importamsr,     ImportamsrHelp,    ImportamsrOperators,     1,  1 },
   { Importcmsaf,    NULL,              ImportcmsafOperators,    1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },

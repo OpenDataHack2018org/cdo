@@ -263,7 +263,7 @@ void *Vertint(void *argument)
 			    }
 			  else
 			    {
-			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);;
+			      vct[i] = (rvct[0]*rvct[3]*(1-rvct[voff+i]))/(1-rvct[3]);
 			      vct[vctsize/2+i] = (rvct[voff+i]-rvct[3])/(1-rvct[3]);
 			    }
 			}

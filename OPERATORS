@@ -65,8 +65,8 @@ Operator catalog:
       Select     sellevidx       Select levels by index
       Select     selgrid         Select grids
       Select     selgridname     Select grids by name
-      Select     selzaxis        Select zaxes
-      Select     selzaxisname    Select zaxes by name
+      Select     selzaxis        Select z-axes
+      Select     selzaxisname    Select z-axes by name
       Select     selltype        Select GRIB level types
       Select     seltabnum       Select parameter table numbers
       Seltime    seltimestep     Select time steps
@@ -407,6 +407,7 @@ Operator catalog:
       Strbre     strbre          Strong breeze days index per time period
       Strgal     strgal          Strong gale days index per time period
       Hurr       hurr            Hurricane days index per time period
+      Importamsr import_amsr     Import AMSR binary files
 -------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
