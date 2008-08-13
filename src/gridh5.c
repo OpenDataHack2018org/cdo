@@ -83,9 +83,9 @@ int gridFromH5file(const char *gridfile)
   /* H5Giterate(file_id, "/", NULL, file_info, NULL); */
 
   /* Open an existing dataset. */
-  lon_id = H5Dopen(file_id, "/lon", 0);
+  lon_id = H5Dopen(file_id, "/lon", H5P_DEFAULT);
   if ( lon_id >= 0 )
-    lat_id = H5Dopen(file_id, "/lat", 0);
+    lat_id = H5Dopen(file_id, "/lat", H5P_DEFAULT);
   
   if ( lon_id >= 0 && lat_id >= 0 )
     {
@@ -100,11 +100,11 @@ int gridFromH5file(const char *gridfile)
 	}
       /*
       printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
-	     (unsigned long)(dims_out[0]), (unsigned long)(dims_out[1]));
+	     (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
       */
 
-      grid.xsize = (int)dims_out[0];
-      grid.ysize = (int)dims_out[1];
+      grid.xsize = (int)dims_out[1];
+      grid.ysize = (int)dims_out[0];
       grid.size  = grid.xsize*grid.ysize;
 
       grid.xvals = (double *) malloc(grid.size*sizeof(double));
@@ -190,11 +190,11 @@ int gridFromH5file(const char *gridfile)
 	    }
 	  /*
 	  printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
-		 (unsigned long)(dims_out[0]), (unsigned long)(dims_out[1]));
+		 (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
 	  */
 
-	  grid.xsize = (int)dims_out[0];
-	  grid.ysize = (int)dims_out[1];
+	  grid.xsize = (int)dims_out[1];
+	  grid.ysize = (int)dims_out[0];
 	  grid.size  = grid.xsize*grid.ysize;
 
 	  grid.xvals = (double *) malloc(grid.size*sizeof(double));

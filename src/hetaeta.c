@@ -134,16 +134,16 @@ void hetaeta(int ltq, int ngp, int *imiss,
   rh1    = (double *) malloc(nlev1*sizeof(double));
   zvar   = (double *) malloc(nlev1*sizeof(double));
 
-  etah2     = (double *) malloc(nlev2p1*sizeof(double));
-  ph2       = (double *) malloc(nlev2p1*sizeof(double));
-  lnph2     = (double *) malloc(nlev2p1*sizeof(double));
-  fi2       = (double *) malloc(nlev2p1*sizeof(double));
+  etah2  = (double *) malloc(nlev2p1*sizeof(double));
+  ph2    = (double *) malloc(nlev2p1*sizeof(double));
+  lnph2  = (double *) malloc(nlev2p1*sizeof(double));
+  fi2    = (double *) malloc(nlev2p1*sizeof(double));
 
-  af2       = (double *) malloc(nlev2*sizeof(double));
-  bf2       = (double *) malloc(nlev2*sizeof(double));
-  etaf2     = (double *) malloc(nlev2*sizeof(double));
-  pf2       = (double *) malloc(nlev2*sizeof(double));
-  /* lnpf2     = (double *) malloc(nlev2*sizeof(double)); */
+  af2    = (double *) malloc(nlev2*sizeof(double));
+  bf2    = (double *) malloc(nlev2*sizeof(double));
+  etaf2  = (double *) malloc(nlev2*sizeof(double));
+  pf2    = (double *) malloc(nlev2*sizeof(double));
+  /* lnpf2  = (double *) malloc(nlev2*sizeof(double)); */
 
   if ( ltq )
     {
@@ -151,8 +151,8 @@ void hetaeta(int ltq, int ngp, int *imiss,
       theta_pbl = (double *) malloc(nlev2*sizeof(double));
     }
 
-  wgt       = (double *) malloc(nlev2*sizeof(double));
-  idx       = (int *) malloc(nlev2*sizeof(int));
+  wgt    = (double *) malloc(nlev2*sizeof(double));
+  idx    = (int *) malloc(nlev2*sizeof(int));
 
   if ( nvars > 0 )
     {
@@ -161,11 +161,11 @@ void hetaeta(int ltq, int ngp, int *imiss,
 	vars_pbl[iv] = (double *) malloc(nlev2*sizeof(double));
     }
 
-  rh2      = (double *) malloc(nlev2*sizeof(double));
-  w1       = (double *) malloc(nlev2*sizeof(double));
-  w2       = (double *) malloc(nlev2*sizeof(double));
-  jl1      = (int *)    malloc(nlev2*sizeof(int));
-  jl2      = (int *)    malloc(nlev2*sizeof(int));
+  rh2   = (double *) malloc(nlev2*sizeof(double));
+  w1    = (double *) malloc(nlev2*sizeof(double));
+  w2    = (double *) malloc(nlev2*sizeof(double));
+  jl1   = (int *)    malloc(nlev2*sizeof(int));
+  jl2   = (int *)    malloc(nlev2*sizeof(int));
   
 
   /******* set coordinate system ETA's, A's, B's
