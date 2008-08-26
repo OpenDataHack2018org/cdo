@@ -35,6 +35,83 @@
 #define MAX_NTSM 128
 
 
+static
+void printTunit(int unit)
+{
+  if ( unit == TUNIT_YEAR )
+    fprintf(stdout, "  Units = years");
+  else if ( unit == TUNIT_MONTH )
+    fprintf(stdout, "  Units = months");
+  else if ( unit == TUNIT_DAY )
+    fprintf(stdout, "  Units = days");
+  else if ( unit == TUNIT_HOUR )
+    fprintf(stdout, "  Units = hours");
+  else if ( unit == TUNIT_MINUTE )
+    fprintf(stdout, "  Units = minutes");
+  else if ( unit == TUNIT_SECOND )
+    fprintf(stdout, "  Units = seconds");
+  else
+    fprintf(stdout, "  Units = unknown");
+}
+
+
+static
+void printCalendar(int calendar)
+{
+  if ( calendar == CALENDAR_STANDARD )
+    fprintf(stdout, "  Calendar = STANDARD");
+  else if ( calendar == CALENDAR_NONE )
+    fprintf(stdout, "  Calendar = NONE");
+  else if ( calendar == CALENDAR_360DAYS )
+    fprintf(stdout, "  Calendar = 360DAYS");
+  else if ( calendar == CALENDAR_365DAYS )
+    fprintf(stdout, "  Calendar = 365DAYS");
+  else if ( calendar == CALENDAR_366DAYS )
+    fprintf(stdout, "  Calendar = 366DAYS");
+  else
+    fprintf(stdout, "  Calendar = unknown");
+}
+
+
+static
+void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incunit)
+{
+  *incperiod = 0;
+  *incunit   = 0;
+
+  if ( lperiod/60 > 0 && lperiod/60 < 60 )
+    {
+      *incperiod = lperiod/60;
+      *incunit = 1;
+    }
+  else if ( lperiod/3600 > 0 && lperiod/3600 < 24 )
+    {
+      *incperiod = lperiod/3600;
+      *incunit = 2;
+    }
+  else if ( lperiod/(3600*24) > 0 && lperiod/(3600*24) < 32 )
+    {
+      *incperiod = lperiod/(3600*24);
+      *incunit = 3;
+      if ( *incperiod > 27 && deltam == 1 )
+	{
+	  *incperiod = 1;
+	  *incunit = 4;
+	}
+    }
+  else if ( lperiod/(3600*24*30) > 0 && lperiod/(3600*24*30) < 12 )
+    {
+      *incperiod = deltam;
+      *incunit = 4;
+    }
+  else if ( lperiod/(3600*24*30*12) > 0 )
+    {
+      *incperiod = deltay;
+      *incunit = 5;
+    }
+}
+
+
 void *Tinfo(void *argument)
 {
   int vdate0 = 0, vtime0 = 0;
@@ -93,40 +170,10 @@ void *Tinfo(void *argument)
 		      year, month, day, hour, minute);
 		      
 	      unit = taxisInqTunit(taxisID);
-	      if ( unit != CDI_UNDEFID )
-		{
-		  if ( unit == TUNIT_YEAR )
-		    fprintf(stdout, "  Units = years");
-		  else if ( unit == TUNIT_MONTH )
-		    fprintf(stdout, "  Units = months");
-		  else if ( unit == TUNIT_DAY )
-		    fprintf(stdout, "  Units = days");
-		  else if ( unit == TUNIT_HOUR )
-		    fprintf(stdout, "  Units = hours");
-		  else if ( unit == TUNIT_MINUTE )
-		    fprintf(stdout, "  Units = minutes");
-		  else if ( unit == TUNIT_SECOND )
-		    fprintf(stdout, "  Units = seconds");
-		  else
-		    fprintf(stdout, "  Units = unknown");
-		}
+	      if ( unit != CDI_UNDEFID ) printTunit(unit);
 	      
 	      calendar = taxisInqCalendar(taxisID);
-	      if ( calendar != CDI_UNDEFID )
-		{
-		  if ( calendar == CALENDAR_STANDARD )
-		    fprintf(stdout, "  Calendar = STANDARD");
-		  else if ( calendar == CALENDAR_NONE )
-		    fprintf(stdout, "  Calendar = NONE");
-		  else if ( calendar == CALENDAR_360DAYS )
-		    fprintf(stdout, "  Calendar = 360DAYS");
-		  else if ( calendar == CALENDAR_365DAYS )
-		    fprintf(stdout, "  Calendar = 365DAYS");
-		  else if ( calendar == CALENDAR_366DAYS )
-		    fprintf(stdout, "  Calendar = 366DAYS");
-		  else
-		    fprintf(stdout, "  Calendar = unknown");
-		}
+	      if ( calendar != CDI_UNDEFID ) printCalendar(calendar);
 
 	      fprintf(stdout, "\n");
 	    }
@@ -152,51 +199,22 @@ void *Tinfo(void *argument)
 	    {
 	      char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
               int   iunits[] = {1, 60, 3600, 86400, 1, 12};
-	      int deltam;
+	      int deltam, deltay;
 
 	      decode_date(vdate0, &year0, &month0, &day0);
 	      decode_time(vtime0, &hour0, &minute0);
 
 	      julval0 = encode_julval(dpy, vdate0, vtime0);
-	      julval = encode_julval(dpy, vdate, vtime);
-	      jdelta = julval-julval0;
+	      julval  = encode_julval(dpy, vdate, vtime);
+	      jdelta  = julval - julval0;
 	      lperiod = (INT64)(jdelta+0.5);
 	      incperiod = (int) lperiod;
 
-	      if ( lperiod/60 > 0 && lperiod/60 < 60 )
-		{
-		  incperiod = lperiod/60;
-		  incunit = 1;
-		}
-	      else if ( lperiod/3600 > 0 && lperiod/3600 < 24 )
-		{
-		  incperiod = lperiod/3600;
-		  incunit = 2;
-		}
-	      else if ( lperiod/(3600*24) > 0 && lperiod/(3600*24) < 32 )
-		{
-		  incperiod = lperiod/(3600*24);
-		  incunit = 3;
-		  deltam = (year-year0)*12 + (month-month0);
-		  if ( incperiod > 27 && deltam == 1 )
-		    {
-		      incperiod = 1;
-		      incunit = 4;
-		    }
-		}
-	      else if ( lperiod/(3600*24*30) > 0 && lperiod/(3600*24*30) < 12 )
-		{
-		  /* incperiod = lperiod/(3600*24*30); */
-		  deltam = (year-year0)*12 + (month-month0);
-		  incperiod = deltam;
-		  incunit = 4;
-		}
-	      else if ( lperiod/(3600*24*30*12) > 0 )
-		{
-		  /* incperiod = lperiod/(3600*24*30*12); */
-		  incperiod = year-year0;
-		  incunit = 5;
-		}
+	      deltay = year-year0;
+	      deltam = deltay*12 + (month-month0);
+
+	      getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);
+
 	      /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
 	      fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], incperiod>1?"s":"");
 

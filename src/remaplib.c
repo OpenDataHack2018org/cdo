@@ -415,6 +415,11 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       gridDefXsize(gridIDnew, nxp4);
       gridDefYsize(gridIDnew, nyp4);
 	      
+      gridInqXunits(gridID1,   units);
+      gridDefXunits(gridIDnew, units);
+      gridInqYunits(gridID1,   units);
+      gridDefYunits(gridIDnew, units);
+
       xvals[0] = xvals[2] - 2*gridInqXinc(gridID1);
       xvals[1] = xvals[2] - gridInqXinc(gridID1);
       xvals[nxp4-2] = xvals[nx+1] + gridInqXinc(gridID1);
@@ -469,6 +474,11 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       gridIDnew = gridCreate(GRID_CURVILINEAR, nxp4*nyp4);
       gridDefXsize(gridIDnew, nxp4);
       gridDefYsize(gridIDnew, nyp4);
+
+      gridInqXunits(gridID1,   units);
+      gridDefXunits(gridIDnew, units);
+      gridInqYunits(gridID1,   units);
+      gridDefYunits(gridIDnew, units);
 
       for ( j = ny-1; j >= 0; j-- )
 	for ( i = nx-1; i >= 0; i-- )

@@ -205,7 +205,7 @@ void *Runstat(void *argument)
 	      samp1[its][varID][levelID].grid    = gridID;
 	      samp1[its][varID][levelID].nmiss   = 0;
 	      samp1[its][varID][levelID].missval = missval;
-	      samp1[its][varID][levelID].ptr     = NULL;
+	      samp1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 	      if ( operfunc == func_std || operfunc == func_var )
 		{
 		  vars2[its][varID][levelID].grid    = gridID;
@@ -239,6 +239,19 @@ void *Runstat(void *argument)
 	  streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
 	  vars1[tsID][varID][levelID].nmiss = nmiss;
 
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  missval = vars1[ndates-1][varID][levelID].missval;
+
+	  for ( i = 0; i < gridsize; i++ )
+	    if ( DBL_IS_EQUAL(vars1[tsID][varID][levelID].ptr[i], missval) )
+	      samp1[tsID][varID][levelID].ptr[i] = 0;
+	    else
+	      {
+		samp1[tsID][varID][levelID].ptr[i] = 1;
+		for ( inp = 0; inp < tsID; inp++ )
+		  samp1[inp][varID][levelID].ptr[i]++;
+	      }
+
 	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
@@ -267,7 +280,12 @@ void *Runstat(void *argument)
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      farcmul(&vars1[0][varID][levelID], 1.0/ndates);
+	      {
+		if ( samp1[0][varID][levelID].ptr == NULL )
+		  farcmul(&vars1[0][varID][levelID], 1.0/ndates);
+		else
+		  fardiv(&vars1[0][varID][levelID], samp1[0][varID][levelID]);
+	      }
 	  }
       else if ( operfunc == func_std || operfunc == func_var )
 	for ( varID = 0; varID < nvars; varID++ )
@@ -275,10 +293,23 @@ void *Runstat(void *argument)
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
-	      if ( operfunc == func_std )
-		farcstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
-	      else
-		farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
+	      {
+		if ( samp1[0][varID][levelID].ptr == NULL )
+		  {
+		    if ( operfunc == func_std )
+		      farcstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
+		    else
+		      farcvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], 1.0/ndates);
+		  }
+		else
+		  {
+		    farinv(&samp1[0][varID][levelID]);
+		    if ( operfunc == func_std )
+		      farstd(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID]);
+		    else
+		      farvar(&vars1[0][varID][levelID], vars2[0][varID][levelID], samp1[0][varID][levelID]);
+		  }
+	      }
 	  }
 
       if ( runstat_date == DATE_MIDDLE )
@@ -314,6 +345,7 @@ void *Runstat(void *argument)
 
       datetime[ndates] = datetime[0];
       vars1[ndates] = vars1[0];
+      samp1[ndates] = samp1[0];
       if ( operfunc == func_std || operfunc == func_var )
         vars2[ndates] = vars2[0];
 
@@ -321,6 +353,7 @@ void *Runstat(void *argument)
 	{
 	  datetime[inp] = datetime[inp+1];
 	  vars1[inp] = vars1[inp+1];
+	  samp1[inp] = samp1[inp+1];
 	  if ( operfunc == func_std || operfunc == func_var )
 	    vars2[inp] = vars2[inp+1];
 	}
@@ -337,6 +370,19 @@ void *Runstat(void *argument)
 	  
 	  streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
 	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
+
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	  missval = vars1[ndates-1][varID][levelID].missval;
+
+	  for ( i = 0; i < gridsize; i++ )
+	    if ( DBL_IS_EQUAL(vars1[ndates-1][varID][levelID].ptr[i], missval) )
+	      samp1[ndates-1][varID][levelID].ptr[i] = 0;
+	    else
+	      {
+		samp1[ndates-1][varID][levelID].ptr[i] = 1;
+		for ( inp = 0; inp < ndates-1; inp++ )
+		  samp1[inp][varID][levelID].ptr[i]++;
+	      }
 
 	  if ( operfunc == func_std || operfunc == func_var )
 	    {

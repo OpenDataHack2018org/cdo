@@ -43,8 +43,8 @@ static void invertLevDes(int vlistID)
   int ilev;
   int zaxistype;
   double *yv1, *yv2;
-  double *ylb1, *ylb2;;
-  double *yub1, *yub2;;
+  double *ylb1, *ylb2;
+  double *yub1, *yub2;
 
   nzaxis = vlistNzaxis(vlistID);
   for ( index = 0; index < nzaxis; index++ )

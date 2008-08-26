@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(cdo, 1.2.0, Uwe.Schulzweida@zmaw.de)
+AC_INIT(cdo, 1.2.1, Uwe.Schulzweida@zmaw.de)
 
 CONFIG_ABORT=yes
 
@@ -256,11 +256,15 @@ AC_ARG_WITH([szlib],
             [AS_HELP_STRING([--with-szlib=<directory>],
                             [Specify location of SZLIB library. Configure will expect to find subdirs include and lib.])],
             [SZLIBDIR=$with_szlib])
-AC_MSG_RESULT([$SZLIBDIR])
-LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
-CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
-AC_CHECK_LIB(sz, SZ_BufftoBuffCompress,, LDFLAGS="$LDFLAGS")
-AC_SUBST([SZLIBDIR], [$SZLIBDIR])
+if test -z "$SZLIBDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$SZLIBDIR])
+  LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
+  AC_CHECK_LIB(sz, SZ_BufftoBuffCompress, , LDFLAGS="$LDFLAGS")
+# AC_SUBST([SZLIBDIR], [$SZLIBDIR])
+fi
 
 #  ----------------------------------------------------------------------
 #  Compile interface with HDF5 library
@@ -270,11 +274,15 @@ AC_ARG_WITH([hdf5],
             [AS_HELP_STRING([--with-hdf5=<directory>],
                             [Specify location of HDF5 library. Configure will expect to find subdirs include and lib.])],
             [HDF5DIR=$with_hdf5])
-AC_MSG_RESULT([$HDF5DIR])
-LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
-CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
-AC_CHECK_LIB(hdf5, H5Fopen,, LDFLAGS="$LDFLAGS", -lm -lz)
-AC_SUBST([HDF5DIR], [$HDF5DIR])
+if test -z "$HDF5DIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$HDF5DIR])
+  LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
+  AC_CHECK_LIB(hdf5, H5Fopen,, LDFLAGS="$LDFLAGS", -lm -lz)
+# AC_SUBST([HDF5DIR], [$HDF5DIR])
+fi
 
 #  ----------------------------------------------------------------------
 
