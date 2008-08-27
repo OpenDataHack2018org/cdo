@@ -673,6 +673,12 @@ void    taxisDefRdate(int taxisID, int date);
 /*      taxisDefRtime: Define the reference date */
 void    taxisDefRtime(int taxisID, int time);
 
+int     taxisHasBounds(int taxisID);
+
+void    taxisInqVdateBounds(int taxisID, int *vdate_lb, int *vdate_ub);
+
+void    taxisInqVtimeBounds(int taxisID, int *vtime_lb, int *vtime_ub);
+
 /*      taxisDefCalendar: Define the calendar */
 void    taxisDefCalendar(int taxisID, int calendar);
 

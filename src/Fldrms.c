@@ -84,7 +84,7 @@ void *Fldrms(void *argument)
   gridID2 = vlistGrid(vlistID2, index);
 
   if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
-    cdoAbort("Fields have different grid size");
+    cdoAbort("Fields have different grid size!");
   
   if ( needWeights &&
        gridInqType(gridID1) != GRID_LONLAT &&

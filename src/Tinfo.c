@@ -34,6 +34,8 @@
 #define MAX_GAPS  64
 #define MAX_NTSM 128
 
+char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
+int   iunits[] = {1, 60, 3600, 86400, 1, 12};
 
 static
 void printTunit(int unit)
@@ -111,6 +113,47 @@ void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incuni
     }
 }
 
+static
+void printBounds(int taxisID, int dpy)
+{
+  int vdate0, vdate1;
+  int vtime0, vtime1;
+  int year0, month0, day0, hour0, minute0;
+  int year1, month1, day1, hour1, minute1;
+  INT64 lperiod;
+  int incperiod = 0, incunit = 0;
+  double julval1 = 0, julval0 = 0, jdelta;
+  int deltam, deltay;
+  int i, len;
+
+  taxisInqVdateBounds(taxisID, &vdate0, &vdate1);
+  taxisInqVtimeBounds(taxisID, &vtime0, &vtime1);
+
+  decode_date(vdate0, &year0, &month0, &day0);
+  decode_time(vtime0, &hour0, &minute0);
+
+  decode_date(vdate1, &year1, &month1, &day1);
+  decode_time(vtime1, &hour1, &minute1);
+
+  fprintf(stdout, "%6.4d-%2.2d-%2.2d %2.2d:%2.2d", year0, month0, day0, hour0, minute0);
+  fprintf(stdout, "%6.4d-%2.2d-%2.2d %2.2d:%2.2d", year1, month1, day1, hour1, minute1);
+
+  julval0 = encode_julval(dpy, vdate0, vtime0);
+  julval1 = encode_julval(dpy, vdate1, vtime1);
+  jdelta  = julval1 - julval0;
+  lperiod = (INT64)(jdelta+0.5);
+  incperiod = (int) lperiod;
+
+  deltay = year1-year0;
+  deltam = deltay*12 + (month1-month0);
+
+  getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);
+  
+  /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
+  len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], incperiod>1?"s":"");
+  for ( i = 0; i < 11-len; ++i ) fprintf(stdout, " ");
+}
+
 
 void *Tinfo(void *argument)
 {
@@ -134,7 +177,8 @@ void *Tinfo(void *argument)
   int rangetsm[MAX_GAPS][2];
   int vdatem[MAX_GAPS][MAX_NTSM];
   int vtimem[MAX_GAPS][MAX_NTSM];
-  double julval, julval0, jdelta;
+  double julval = 0, julval0 = 0, jdelta;
+  int i, len;
 	  
 
   cdoInitialize(argument);
@@ -183,7 +227,10 @@ void *Tinfo(void *argument)
 
       dpy = calendar_dpy(calendar);
 
-      fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement   YYYY-MM-DD hh:mm  YYYY-MM-DD hh:mm  Difference\n");
+      if ( taxisHasBounds(taxisID) ) 
+	fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement  YYYY-MM-DD hh:mm  YYYY-MM-DD hh:mm  Difference\n");
+      else
+	fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement\n");
 
       tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -197,8 +244,6 @@ void *Tinfo(void *argument)
 	  fprintf(stdout, "%6d  %6.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID+1, year, month, day, hour, minute);
 	  if ( tsID )
 	    {
-	      char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
-              int   iunits[] = {1, 60, 3600, 86400, 1, 12};
 	      int deltam, deltay;
 
 	      decode_date(vdate0, &year0, &month0, &day0);
@@ -216,73 +261,83 @@ void *Tinfo(void *argument)
 	      getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);
 
 	      /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
-	      fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], incperiod>1?"s":"");
+	      len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], incperiod>1?"s":"");
+	      for ( i = 0; i < 11-len; ++i ) fprintf(stdout, " ");
+	    }
+	  else
+	    {
+	      fprintf(stdout, "   --------");
+	    }
 
-	      if ( tsID > 1 )
+	  if ( taxisHasBounds(taxisID) ) printBounds(taxisID, dpy);
+
+	  if ( tsID > 1 )
+	    {
+	      if ( incperiod != incperiod0 || incunit != incunit0 )
 		{
-		  if ( incperiod != incperiod0 || incunit != incunit0 )
+		  int ndate, ntime;
+		  int ijulinc = incperiod0 * iunits[incunit0];
+		  if ( ngaps < MAX_GAPS )
 		    {
-		      int ndate, ntime;
-		      int ijulinc = incperiod0 * iunits[incunit0];
-		      if ( ngaps < MAX_GAPS )
+		      rangetsm[ngaps][0] = tsID;
+		      rangetsm[ngaps][1] = tsID+1;
+
+		      if ( incunit0 == 4 || incunit0 == 5 )
 			{
-			  rangetsm[ngaps][0] = tsID;
-			  rangetsm[ngaps][1] = tsID+1;
-
-			  if ( incunit0 == 4 || incunit0 == 5 )
+			  its = 0;
+			  ndate = vdate0;
+			  while ( TRUE )
 			    {
-			      its = 0;
-			      ndate = vdate0;
-			      while ( TRUE )
-				{
-				  decode_date(ndate, &year, &month, &day);
+			      decode_date(ndate, &year, &month, &day);
 				  
-				  month += ijulinc;
+			      month += ijulinc;
 				  
-				  while ( month > 12 ) { month -= 12; year++; }
-				  while ( month <  1 ) { month += 12; year--; }
-				  
-				  if ( day0 == 31 )
-				    day = days_per_month(dpy, year, month);
+			      while ( month > 12 ) { month -= 12; year++; }
+			      while ( month <  1 ) { month += 12; year--; }
+			      
+			      if ( day0 == 31 )
+				day = days_per_month(dpy, year, month);
 
-				  ndate = encode_date(year, month, day);
-				  ntime = vtime0;
-				  if ( ndate >= vdate ) break;
-				  /* printf("\n1 %d %d\n", ndate, ntime); */
-				  if ( its < MAX_NTSM )
-				    {
-				      vdatem[ngaps][its] = ndate;
-				      vtimem[ngaps][its] = ntime;
-				    }
-				  its++;
+			      ndate = encode_date(year, month, day);
+			      ntime = vtime0;
+			      if ( ndate >= vdate ) break;
+			      /* printf("\n1 %d %d\n", ndate, ntime); */
+			      if ( its < MAX_NTSM )
+				{
+				  vdatem[ngaps][its] = ndate;
+				  vtimem[ngaps][its] = ntime;
 				}
+			      its++;
 			    }
-			  else
-			    {
-			      its = 0;
-			      julval0 += ijulinc;
-			      while ( julval0 < julval )
-				{
-				  decode_julval(dpy, julval0, &ndate, &ntime);
-				  julval0 += ijulinc;
-				  /* printf("\n2 %d %d %g %d\n", ndate, ntime, julval0, ijulinc); */
-				  if ( its < MAX_NTSM )
-				    {
-				      vdatem[ngaps][its] = ndate;
-				      vtimem[ngaps][its] = ntime;
-				    }
-				  its++;
-				}
-			    }			
-			  ntsm[ngaps] = its;
 			}
-		      ngaps++;
-		      if ( cdoVerbose )
-			fprintf(stdout, "  <--- Gap %d, missing %d timestep%s",
-				ngaps, its, its>1?"s":"");
+		      else
+			{
+			  its = 0;
+			  julval0 += ijulinc;
+			  while ( julval0 < julval )
+			    {
+			      decode_julval(dpy, julval0, &ndate, &ntime);
+			      julval0 += ijulinc;
+			      /* printf("\n2 %d %d %g %d\n", ndate, ntime, julval0, ijulinc); */
+			      if ( its < MAX_NTSM )
+				{
+				  vdatem[ngaps][its] = ndate;
+				  vtimem[ngaps][its] = ntime;
+				}
+			      its++;
+			    }
+			}			
+		      ntsm[ngaps] = its;
 		    }
+		  ngaps++;
+		  if ( cdoVerbose )
+		    fprintf(stdout, "  <--- Gap %d, missing %d timestep%s",
+			    ngaps, its, its>1?"s":"");
 		}
+	    }
 
+	  if ( tsID )
+	    {
 	      if ( tsID == 1 )
 		{
 		  incperiod0 = incperiod;

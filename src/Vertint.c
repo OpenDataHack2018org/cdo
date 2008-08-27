@@ -455,7 +455,8 @@ void *Vertint(void *argument)
       if ( psID != -1 )
 	{
 	  code = vlistInqVarCode(vlistID1, psID);
-	  cdoPrint("LOG surface pressure not found - using surface pressure (code %d)!", code);
+	  if ( cdoVerbose )
+	    cdoPrint("LOG surface pressure not found - using surface pressure (code %d)!", code);
 	}
       else
 	cdoAbort("Surface pressure not found!");
