@@ -1,6 +1,7 @@
 2008-12-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.2.1
+	* New operator: gengrid - generate grid [request: Michael Boettinger]
 	* runmean: bug fix for datasets with missing values [report: Carmen Ulmen]
 	* Version 1.2.1 released
 

@@ -60,7 +60,7 @@ void *Filedes(void *argument);
 void *Fillmiss(void *argument);
 void *Fldrms(void *argument);
 void *Fldstat(void *argument);
-void *Gengriddes(void *argument);
+void *Gengrid(void *argument);
 void *Gradsdes(void *argument);
 void *Gridcell(void *argument);
 void *Harmonic(void *argument);
@@ -257,7 +257,7 @@ void *Wct(void *argument);
 #define  FillmissOperators      {"fillmiss"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
-#define  GengriddesOperators    {"gengriddes"}
+#define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
 #define  GridcellOperators      {"gridarea", "gridweights"}
 #define  HarmonicOperators      {"harmonic"}
@@ -486,7 +486,7 @@ static MODULES Modules[] =
   { Fillmiss,       NULL,              FillmissOperators,       1,  1 },
   { Fldrms,         NULL,              FldrmsOperators,         2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
-  { Gengriddes,     NULL,              GengriddesOperators,     2,  0 },
+  { Gengrid,        NULL,              GengridOperators,        2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
   { Gridcell,       GridcellHelp,      GridcellOperators,       1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },

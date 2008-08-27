@@ -55,7 +55,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Detrend.$(OBJEXT) Diff.$(OBJEXT) Echam5ini.$(OBJEXT) \
 	Enlarge.$(OBJEXT) Enlargegrid.$(OBJEXT) Ensstat.$(OBJEXT) \
 	Exprf.$(OBJEXT) Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) \
-	Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) Gengriddes.$(OBJEXT) \
+	Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) Gengrid.$(OBJEXT) \
 	Gradsdes.$(OBJEXT) Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) \
 	Histogram.$(OBJEXT) Importamsr.$(OBJEXT) Importcmsaf.$(OBJEXT) \
 	Info.$(OBJEXT) Input.$(OBJEXT) Intgrid.$(OBJEXT) \
@@ -251,7 +251,7 @@ cdo_SOURCES = Arith.c		\
               Fillmiss.c 	\
               Fldrms.c 		\
               Fldstat.c 	\
-              Gengriddes.c 	\
+              Gengrid.c 	\
               Gradsdes.c 	\
               Gridcell.c 	\
               Harmonic.c 	\
@@ -570,7 +570,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Fillmiss.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Fldrms.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Fldstat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Gengriddes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Gengrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Gradsdes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Gridcell.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Harmonic.Po@am__quote@

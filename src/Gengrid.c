@@ -28,26 +28,25 @@
 #include "functs.h"
 
 
-void *Gengriddes(void *argument)
+void *Gengrid(void *argument)
 {
-  static char func[] = "Gengriddes";
+  static char func[] = "Gengrid";
   int streamID1, streamID2, streamID3;
   int vlistID1, vlistID2, vlistID3;
-  int gridID1, gridID2, gridID3, lastgrid = -1;
-  int wstatus = FALSE;
-  int code = 0, oldcode = 0;
-  int index, ngrids;
-  int recID, nrecs;
+  int gridID1, gridID2, gridID3;
+  int zaxisID3;
+  int datatype;
+  int nrecs;
   int tsID, varID, levelID;
-  int lim;
-  int ndiffgrids;
-  int gridsize;
+  int gridsize, i;
+  int xsize, ysize;
+  int nmiss1, nmiss2;
+  int taxisID3;
   double *array1, *array2, *array3;
-  int taxisID1;
+  double missval = 0;
+  double xminval, xmaxval, yminval, ymaxval;
 
   cdoInitialize(argument);
-
-  needWeights = TRUE;
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -58,11 +57,8 @@ void *Gengriddes(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = streamInqVlist(streamID2);
 
-  taxisID1 = vlistInqTaxis(vlistID1);
-
-  index = 0;
-  gridID1 = vlistGrid(vlistID1, index);
-  gridID2 = vlistGrid(vlistID2, index);
+  gridID1 = vlistGrid(vlistID1, 0);
+  gridID2 = vlistGrid(vlistID2, 0);
 
   if ( gridInqSize(gridID1) != gridInqSize(gridID2) )
     cdoAbort("Arrays have different grid size!");
@@ -84,7 +80,7 @@ void *Gengriddes(void *argument)
   streamInqRecord(streamID2, &varID, &levelID);
   streamReadRecord(streamID2, array2, &nmiss2);
 
-  missval = vlistInqVarMissval(vlistID1, varID);
+  datatype = vlistInqVarDatatype(vlistID1, 0);
 
   streamClose(streamID2);
   streamClose(streamID1);
@@ -92,11 +88,63 @@ void *Gengriddes(void *argument)
   if ( nmiss1 || nmiss2 ) cdoAbort("Missing values unsupported!");
 
   gridID3 = gridCreate(GRID_CURVILINEAR, gridsize);
+
+  if ( cdoVerbose ) cdoPrint("xsize %d  ysize %d", xsize, ysize);
+  if ( xsize*ysize != gridsize )
+    cdoAbort("xsize*ysize != gridsize");
+
   gridDefXsize(gridID3, xsize);
   gridDefYsize(gridID3, ysize);
   gridDefXvals(gridID3, array1);
   gridDefYvals(gridID3, array2);
 
+  if ( datatype == DATATYPE_FLT64 )
+    gridDefPrec(gridID3, DATATYPE_FLT64);
+  else
+    gridDefPrec(gridID3, DATATYPE_FLT32);
+
+  xminval = array1[0];
+  xmaxval = array1[0];
+  yminval = array2[0];
+  ymaxval = array2[0];
+  for ( i = 1; i < gridsize; ++i )
+    {
+      if ( array1[i] < xminval ) xminval = array1[i];
+      if ( array1[i] > xmaxval ) xmaxval = array1[i];
+      if ( array2[i] < yminval ) yminval = array2[i];
+      if ( array2[i] > ymaxval ) ymaxval = array2[i];
+    }
+
+  if ( cdoVerbose )
+    cdoPrint("xminval = %g, xmaxval = %g, yminval = %g, ymaxval = %g",
+	     xminval, xmaxval, yminval, ymaxval);
+
+  /* check units */
+  if ( xminval > -4 && xmaxval < 8 && yminval > -2 && ymaxval < 2 )
+    {
+      gridDefXunits(gridID3, "radians");
+      gridDefYunits(gridID3, "radians");
+    }
+  else if ( xminval > -181 && xmaxval < 361 && yminval > -91 && ymaxval < 91 )
+    {
+      /* default is degrees */
+    }
+  else
+    {
+      cdoAbort("Units undefined!");
+    }
+
+  zaxisID3 = zaxisCreate(ZAXIS_SURFACE, 1);
+
+  vlistID3 = vlistCreate();
+  vlistDefVar(vlistID3, gridID3, zaxisID3, TIME_CONSTANT);
+  vlistDefVarMissval(vlistID3, 0, missval);
+  vlistDefVarName(vlistID3, 0, "dummy");
+  vlistDefVarDatatype(vlistID3, 0, DATATYPE_INT8);
+
+  taxisID3 = taxisCreate(TAXIS_ABSOLUTE);;
+
+  vlistDefTaxis(vlistID3, taxisID3);
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
@@ -105,6 +153,8 @@ void *Gengriddes(void *argument)
 
   tsID = 0;
   streamDefTimestep(streamID3, tsID);
+
+  for ( i = 0; i < gridsize; ++i ) array3[i] = missval;
 
   streamDefRecord(streamID3, 0, 0);
   streamWriteRecord(streamID3, array3, gridsize);
