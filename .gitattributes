@@ -228,7 +228,7 @@ src/Filedes.c -text
 src/Fillmiss.c -text
 src/Fldrms.c -text
 src/Fldstat.c -text
-src/Gengriddes.c -text
+src/Gengrid.c -text
 src/Gradsdes.c -text
 src/Gridcell.c -text
 src/Harmonic.c -text
