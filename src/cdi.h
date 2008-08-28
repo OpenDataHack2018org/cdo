@@ -180,6 +180,9 @@ int     streamOpenAppend(const char *path);
 /*      streamClose: Close an open dataset */
 void    streamClose(int streamID);
 
+/*      streamSync: Synchronize an Open Dataset to Disk */
+void    streamSync(int streamID);
+
 /*      streamDefVlist: Define the Vlist for a stream */
 void    streamDefVlist(int streamID, int vlistID);
 
@@ -674,6 +677,10 @@ void    taxisDefRdate(int taxisID, int date);
 void    taxisDefRtime(int taxisID, int time);
 
 int     taxisHasBounds(int taxisID);
+
+void    taxisDefVdateBounds(int taxisID, int vdate_lb, int vdate_ub);
+
+void    taxisDefVtimeBounds(int taxisID, int vtime_lb, int vtime_ub);
 
 void    taxisInqVdateBounds(int taxisID, int *vdate_lb, int *vdate_ub);
 
