@@ -47,6 +47,7 @@ void *Cond2(void *argument)
   int nmiss1, nmiss2, nmiss3, nmiss4;
   int i;
   double missval1 = -9.E33;
+  double missval2 = -9.E33;
   double *array1, *array2, *array3, *array4;
   int **varnmiss1 = NULL;
   double **vardata1 = NULL;
@@ -179,6 +180,7 @@ void *Cond2(void *argument)
 	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	  missval2 = vlistInqVarMissval(vlistID2, varID);
 
 	  if ( recID == 0 || filltype != FILL_REC )
 	    {
@@ -189,7 +191,7 @@ void *Cond2(void *argument)
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		array4[i] = DBL_IS_EQUAL(array1[i], missval1) ?
-		  missval1 : !DBL_IS_EQUAL(array1[i], 0) ? array2[i] : array3[i];
+		  missval2 : !DBL_IS_EQUAL(array1[i], 0) ? array2[i] : array3[i];
 	    }
 	  else
 	    {
@@ -198,7 +200,7 @@ void *Cond2(void *argument)
 
 	  nmiss4 = 0;
 	  for ( i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array4[i], missval1) ) nmiss4++;
+	    if ( DBL_IS_EQUAL(array4[i], missval2) ) nmiss4++;
 
 	  streamDefRecord(streamID4, varID, levelID);
 	  streamWriteRecord(streamID4, array4, nmiss4);

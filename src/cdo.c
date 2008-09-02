@@ -86,6 +86,7 @@ int cdoTimer       = FALSE;
 int cdoVerbose     = FALSE;
 int cdoDebug       = 0;
 int cdoCompress    = FALSE;
+int cdoInteractive = FALSE;
 
 int cdoExpMode     = -1;
 char *cdoExpName   = NULL;
@@ -578,7 +579,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:p:g:i:l:m:t:D:z:aBdhRrsTVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:p:g:i:l:m:t:D:z:aBdhRrsTuVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -651,6 +652,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 't':
 	  cdoDefaultTableID = defineTable(cdoOptarg);
+	  break;
+	case 'u':
+	  cdoInteractive = TRUE;
 	  break;
 	case 'V':
 	  Version = 1;

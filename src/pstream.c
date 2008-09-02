@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <sys/stat.h> /* stat */
 
 FILE *popen(const char *command, const char *type);
 int pclose(FILE *stream);
@@ -596,6 +597,19 @@ int pstreamOpenWrite(const char *argument, int filetype)
       if ( PSTREAM_Debug ) Message(func, "file %s", argument);
 
       if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
+
+      if ( cdoInteractive )
+	{
+	  int rstatus;
+	  struct stat stbuf;
+
+	  rstatus = stat(argument, &stbuf);
+	  /* If permanent file already exists, query user whether to overwrite or exit */
+	  if ( rstatus != -1 )
+	    {
+	      fprintf(stderr, "%s exists ---`e'xit, `o'verwrite (delete existing file) (e/o)?", argument);
+	    }
+	}
 
 #if  defined  (HAVE_LIBPTHREAD)
       pthread_mutex_lock(&streamOpenWriteMutex);

@@ -58,6 +58,7 @@ extern int cdoTimer;
 extern int cdoVerbose;
 extern int cdoDebug;
 extern int cdoCompress;
+extern int cdoInteractive;
 
 extern int cdoZtype;
 extern int cdoZlevel;
