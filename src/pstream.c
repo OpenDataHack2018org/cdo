@@ -557,6 +557,65 @@ int pstreamOpenRead(const char *argument)
 }
 
 
+static
+void query_user_exit(const char *argument)
+{
+  /* modified code from NCO */
+#define USR_RPL_MAX_LNG 10 /* Maximum length for user reply */
+#define USR_RPL_MAX_NBR 10 /* Maximum number of chances for user to reply */
+  char usr_rpl[USR_RPL_MAX_LNG];
+  int usr_rpl_int;
+  short nbr_itr=0;
+  size_t usr_rpl_lng = 0;
+
+  /* Initialize user reply string */
+  usr_rpl[0]='z';
+  usr_rpl[1]='\0';
+
+  while ( !(usr_rpl_lng == 1 && 
+	    (*usr_rpl == 'o' || *usr_rpl == 'O' || *usr_rpl == 'e' || *usr_rpl == 'E')) )
+    {
+      if ( nbr_itr++ > USR_RPL_MAX_NBR )
+	{
+	  (void)fprintf(stdout,"\n%s: ERROR %d failed attempts to obtain valid interactive input.\n",
+			processInqPrompt(), nbr_itr-1);
+	  exit(EXIT_FAILURE);
+	}
+
+      if ( nbr_itr > 1 ) (void)fprintf(stdout,"%s: ERROR Invalid response.\n", processInqPrompt());
+      (void)fprintf(stdout,"%s: %s exists ---`e'xit, or `o'verwrite (delete existing file) (e/o)? ",
+		    processInqPrompt(), argument);
+      (void)fflush(stdout);
+      if ( fgets(usr_rpl, USR_RPL_MAX_LNG, stdin) == NULL ) continue;
+
+      /* Ensure last character in input string is \n and replace that with \0 */
+      usr_rpl_lng = strlen(usr_rpl);
+      if ( usr_rpl_lng >= 1 )
+	if ( usr_rpl[usr_rpl_lng-1] == '\n' )
+	  {
+	    usr_rpl[usr_rpl_lng-1] = '\0';
+	    usr_rpl_lng--;
+	  }
+    }
+
+  /* Ensure one case statement for each exit condition in preceding while loop */
+  usr_rpl_int=(int)usr_rpl[0];
+  switch(usr_rpl_int)
+    {
+    case 'E':
+    case 'e':
+      exit(EXIT_SUCCESS);
+      break;
+    case 'O':
+    case 'o':
+      break;
+    default:
+      exit(EXIT_FAILURE);
+      break;
+    } /* end switch */
+}
+
+
 int pstreamOpenWrite(const char *argument, int filetype)
 {
   static char func[] = "pstreamOpenWrite";
@@ -605,10 +664,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 
 	  rstatus = stat(argument, &stbuf);
 	  /* If permanent file already exists, query user whether to overwrite or exit */
-	  if ( rstatus != -1 )
-	    {
-	      fprintf(stderr, "%s exists ---`e'xit, `o'verwrite (delete existing file) (e/o)?", argument);
-	    }
+	  if ( rstatus != -1 ) query_user_exit(argument);
 	}
 
 #if  defined  (HAVE_LIBPTHREAD)
