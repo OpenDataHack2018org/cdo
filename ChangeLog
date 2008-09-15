@@ -3,6 +3,7 @@
 	* using CDI library version 1.2.1
 	* New operator: gengrid - generate grid [request: Michael Boettinger]
 	* Module Timstat: use taxis with bounds from input [request: Beate Geyer]
+	* sellonlatbox: add support for GRID_CELL [request: Jeff Daily]
 	* Add option '-u' to determinate whether to overwrite existing files [request: David Wang]
 	* ifthen:  bug fix for datasets with different missing values [report: Beate Geyer]
 	* runmean: bug fix for datasets with missing values [report: Carmen Ulmen]

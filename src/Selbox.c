@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,8 @@
 #include "pstream.h"
 
 
-static int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+static
+int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   static char func[] = "gengrid";  
   int gridtype, gridID2;
@@ -224,7 +225,112 @@ static int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lo
 }
 
 
-static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+static
+int gengridcell(int gridID1, int gridsize2, int *cellindx)
+{
+  static char func[] = "gengridcell";  
+  int gridtype, gridID2;
+  int gridsize1;
+  int i, k, nv;
+  int prec;
+  char xname[128], xlongname[128], xunits[128];
+  char yname[128], ylongname[128], yunits[128];
+  double *xvals1 = NULL, *yvals1 = NULL;
+  double *xvals2 = NULL, *yvals2 = NULL;
+  double *xbounds1 = NULL, *ybounds1 = NULL;
+  double *xbounds2 = NULL, *ybounds2 = NULL;
+
+  gridsize1 = gridInqSize(gridID1);
+
+  /* printf("gridsize1 = %d, gridsize2 = %d\n", gridsize1, gridsize2); */
+
+  gridtype = gridInqType(gridID1);
+  prec     = gridInqPrec(gridID1);
+
+  gridID2 = gridCreate(gridtype, gridsize2);
+
+  gridDefPrec(gridID2, prec);
+
+  gridInqXname(gridID1, xname);
+  gridInqXlongname(gridID1, xlongname);
+  gridInqXunits(gridID1, xunits);
+  gridInqYname(gridID1, yname);
+  gridInqYlongname(gridID1, ylongname);
+  gridInqYunits(gridID1, yunits);
+
+  gridDefXname(gridID2, xname);
+  gridDefXlongname(gridID2, xlongname);
+  gridDefXunits(gridID2, xunits);
+  gridDefYname(gridID2, yname);
+  gridDefYlongname(gridID2, ylongname);
+  gridDefYunits(gridID2, yunits);
+
+  if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
+    {
+      xvals1 = (double *) malloc(gridsize1*sizeof(double));
+      yvals1 = (double *) malloc(gridsize1*sizeof(double));
+      xvals2 = (double *) malloc(gridsize2*sizeof(double));
+      yvals2 = (double *) malloc(gridsize2*sizeof(double));
+
+      gridInqXvals(gridID1, xvals1);
+      gridInqYvals(gridID1, yvals1);
+
+      for ( i = 0; i < gridsize2; ++i )
+	{
+	  xvals2[i] = xvals1[cellindx[i]];
+	  yvals2[i] = yvals1[cellindx[i]];
+	}
+
+      if ( cdoVerbose )
+	for ( i = 0; i < gridsize2; i++ ) printf("lat/lon : %d %g %g\n", i+1, yvals2[i], xvals2[i]);
+
+      gridDefXvals(gridID2, xvals2);
+      gridDefYvals(gridID2, yvals2);
+
+      free(xvals1);
+      free(yvals1);
+      free(xvals2);
+      free(yvals2);
+    }
+
+  if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
+    {
+      nv = gridInqNvertex(gridID1);
+
+      xbounds1 = (double *) malloc(nv*gridsize1*sizeof(double));
+      ybounds1 = (double *) malloc(nv*gridsize1*sizeof(double));
+      xbounds2 = (double *) malloc(nv*gridsize2*sizeof(double));
+      ybounds2 = (double *) malloc(nv*gridsize2*sizeof(double));
+
+      gridInqXbounds(gridID1, xbounds1);
+      gridInqYbounds(gridID1, ybounds1);
+
+      gridDefNvertex(gridID2, nv);
+
+      for ( i = 0; i < gridsize2; ++i )
+	{
+	  for ( k = 0; k < nv; ++k )
+	    {
+	      xbounds2[i*nv+k] = xbounds1[cellindx[i]*nv+k];
+	      ybounds2[i*nv+k] = ybounds1[cellindx[i]*nv+k];
+	    }
+	}
+
+      gridDefXbounds(gridID2, xbounds2);
+      gridDefYbounds(gridID2, ybounds2);
+
+      free(xbounds1);
+      free(ybounds1);
+      free(xbounds2);
+      free(ybounds2);
+    }
+
+  return (gridID2);
+}
+
+
+static
+int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   static char func[] = "genlonlatgrid";  
   int nlon1, nlat1;
@@ -386,7 +492,75 @@ static int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
 }
 
 
-static int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+static
+int gencellgrid(int gridID1, int *gridsize2, int **cellindx)
+{
+  static char func[] = "gencellgrid";  
+  int gridtype, gridID2;
+  double *xvals1, *yvals1;
+  double xlon1, xlon2, xlat1, xlat2, x, xval, yval;
+  int i, gridsize1;
+  int nvals = 0;
+  int maxcell = 0;
+  int cellinc = 4096;
+
+  operatorCheckArgc(4);
+
+  xlon1 = atof(operatorArgv()[0]);
+  xlon2 = atof(operatorArgv()[1]);
+  xlat1 = atof(operatorArgv()[2]);
+  xlat2 = atof(operatorArgv()[3]);
+
+  if ( xlon1 >= xlon2 ) { x = xlon1; xlon1 = xlon2; xlon2 = x; }
+  if ( xlat1 >= xlat2 ) { x = xlat1; xlat1 = xlat2; xlat2 = x; }
+
+  gridtype = gridInqType(gridID1);
+
+  gridsize1 = gridInqSize(gridID1);
+
+  if ( gridtype != GRID_CELL ) cdoAbort("Internal problem, wrong grid type!");
+
+  xvals1 = (double *) malloc(gridsize1*sizeof(double));
+  yvals1 = (double *) malloc(gridsize1*sizeof(double));
+
+  gridInqXvals(gridID1, xvals1);
+  gridInqYvals(gridID1, yvals1);
+
+  /* find gridsize2 */
+  for ( i = 0; i < gridsize1; ++i )
+    {
+      xval = xvals1[i];
+      yval = yvals1[i];
+      if ( yval >= xlat1 && yval <= xlat2 )
+	if ( (xval >= xlon1 && xval <= xlon2) ||
+	     (xval+360 >= xlon1 && xval+360 <= xlon2) ||
+	     (xval-360 >= xlon1 && xval-360 <= xlon2)  )
+	  {
+	    nvals++;
+	    if ( nvals > maxcell )
+	      {
+		maxcell += cellinc;
+		*cellindx = (int *) realloc(*cellindx, maxcell*sizeof(int));
+	      }
+	    (*cellindx)[nvals-1] = i;
+	  }
+    }
+
+  if ( nvals == 0 ) cdoAbort("No grid points found!");
+
+  *gridsize2 = nvals;
+
+  free(xvals1);
+  free(yvals1);
+
+  gridID2 = gengridcell(gridID1, *gridsize2, *cellindx);
+
+  return (gridID2);
+}
+
+
+static
+int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   int gridID2;
   int nlon1, nlat1;
@@ -463,8 +637,9 @@ static int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon1
 }
 
 
-static void window(double *array1, int gridID1, double *array2,
-		   int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+static
+void window(double *array1, int gridID1, double *array2,
+	    int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int nlon1;
   int ilat, ilon;
@@ -480,6 +655,15 @@ static void window(double *array1, int gridID1, double *array2,
     }
 }
 
+static
+void window_cell(double *array1, int gridID1, double *array2, int gridsize2, int *cellidx)
+{
+  int i;
+
+  for ( i = 0; i < gridsize2; ++i )
+    array2[i] = array1[cellidx[i]];
+}
+
 
 void *Selbox(void *argument)
 {
@@ -492,7 +676,7 @@ void *Selbox(void *argument)
   int gridsize, gridsize2;
   int vlistID1, vlistID2;
   int gridID1 = -1, gridID2;
-  int index, ngrids, gridtype;
+  int index, ngrids, gridtype = -1;
   int nmiss;
   int *vars;
   int i;
@@ -501,6 +685,7 @@ void *Selbox(void *argument)
   double missval;
   double *array1 = NULL, *array2 = NULL;
   int taxisID1, taxisID2;
+  int *cellidx = NULL, nvals;
 
   cdoInitialize(argument);
 
@@ -529,6 +714,7 @@ void *Selbox(void *argument)
       if ( gridtype == GRID_CURVILINEAR ) break;
       if ( operatorID == SELINDEXBOX && gridtype == GRID_GENERIC &&
 	   gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0 ) break;
+      if ( operatorID == SELLONLATBOX && gridtype == GRID_CELL ) break;
     }
 
   if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
@@ -539,7 +725,12 @@ void *Selbox(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
   if ( operatorID == SELLONLATBOX )
-    gridID2 = genlonlatgrid(gridID1, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+    {
+      if ( gridtype == GRID_CELL )
+	gridID2 = gencellgrid(gridID1, &nvals, &cellidx);
+      else
+	gridID2 = genlonlatgrid(gridID1, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+    }
   else
     gridID2 = genindexgrid(gridID1, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
 
@@ -595,7 +786,10 @@ void *Selbox(void *argument)
 	    {
 	      streamReadRecord(streamID1, array1, &nmiss);
 
-	      window(array1, gridID1, array2, lat1, lat2, lon11, lon12, lon21, lon22);
+	      if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL )
+		window_cell(array1, gridID1, array2, gridsize2, cellidx);
+	      else
+		window(array1, gridID1, array2, lat1, lat2, lon11, lon12, lon21, lon22);
 
 	      if ( nmiss )
 		{
