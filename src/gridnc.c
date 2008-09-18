@@ -63,6 +63,13 @@ int gridFromNCfile(const char *gridfile)
       nce(nc_inq_dimlen(nc_file_id, nc_gridrank_id, &grid_rank));
       nce(nc_inq_dimlen(nc_file_id, nc_gridcorn_id, &grid_nvertex)); grid.nvertex = (int) grid_nvertex;
   
+      /* check variables */
+      if ( nc_inq_varid(nc_file_id, "grid_dims", &nc_griddims_id)       != NC_NOERR || 
+	   nc_inq_varid(nc_file_id, "grid_center_lat", &nc_gridlat_id)  != NC_NOERR || 
+	   nc_inq_varid(nc_file_id, "grid_center_lon", &nc_gridlon_id)  != NC_NOERR || 
+	   nc_inq_varid(nc_file_id, "grid_corner_lat", &nc_gridclat_id) != NC_NOERR || 
+	   nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id) != NC_NOERR ) return (gridID);
+
       nce(nc_inq_varid(nc_file_id, "grid_dims", &nc_griddims_id));
       nce(nc_get_var_int(nc_file_id, nc_griddims_id, grid_dims));
 

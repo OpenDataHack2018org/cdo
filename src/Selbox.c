@@ -333,10 +333,14 @@ static
 int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   static char func[] = "genlonlatgrid";  
+  int ilon, ilat;
   int nlon1, nlat1;
   int gridtype, gridID2;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
+  char xunits[128];
+  char yunits[128];
+  double xfact, yfact;
 
   operatorCheckArgc(4);
 
@@ -364,9 +368,21 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
 
+  gridInqXunits(gridID1, xunits);
+  gridInqYunits(gridID1, yunits);
+
+  if ( strncmp(xunits, "radian", 6) == 0 )
+    xfact = RAD2DEG;
+  else
+    xfact = 1;
+
+  if ( strncmp(yunits, "radian", 6) == 0 )
+    yfact = RAD2DEG;
+  else
+    yfact = 1;
+
   if ( gridtype == GRID_CURVILINEAR )
     {
-      int ilon, ilat;
       double xval, yval;
       double x1 = 720, x2 = -720, x3 = -720, x4 = 720, y1 = 180, y2 = 180, y3 = -180, y4 = -180;
       int    ix1 = 0, ix2 = 0, ix3 = 0, ix4 = 0, iy1 = 0, iy2 = 0, iy3 = 0, iy4 = 0;
@@ -385,6 +401,9 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	    {
 	      xval = xvals1[ilat*nlon1 + ilon];
 	      yval = yvals1[ilat*nlon1 + ilon];
+
+	      xval *= xfact;
+	      yval *= yfact;
 
 	      if ( xval >= xlon1 && xval <= xlon2 && yval >= xlat1 && yval <= xlat2 )
 		{
@@ -427,6 +446,9 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
     }
   else
     {
+      for ( ilat = 0; ilat < nlat1; ilat++ ) yvals1[ilat] *= yfact;
+      for ( ilon = 0; ilon < nlon1; ilon++ ) xvals1[ilon] *= xfact;
+
       xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
       if ( DBL_IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
       xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
@@ -503,6 +525,9 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellindx)
   int nvals = 0;
   int maxcell = 0;
   int cellinc = 4096;
+  char xunits[128];
+  char yunits[128];
+  double xfact, yfact;
 
   operatorCheckArgc(4);
 
@@ -526,11 +551,24 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellindx)
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
 
+  gridInqXunits(gridID1, xunits);
+  gridInqYunits(gridID1, yunits);
+
+  if ( strncmp(xunits, "radian", 6) == 0 )
+    xfact = RAD2DEG;
+  else
+    xfact = 1;
+
+  if ( strncmp(yunits, "radian", 6) == 0 )
+    yfact = RAD2DEG;
+  else
+    yfact = 1;
+
   /* find gridsize2 */
   for ( i = 0; i < gridsize1; ++i )
     {
-      xval = xvals1[i];
-      yval = yvals1[i];
+      xval = xvals1[i]*xfact;
+      yval = yvals1[i]*yfact;
       if ( yval >= xlat1 && yval <= xlat2 )
 	if ( (xval >= xlon1 && xval <= xlon2) ||
 	     (xval+360 >= xlon1 && xval+360 <= xlon2) ||

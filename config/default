@@ -55,10 +55,19 @@ case "${HOSTNAME}" in
 	;;        
 # x86_64-etch-x64-linux
     squall1)
- 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
+        if [ "$SGE_MODE" = "off" ] ; then
+   	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
 	            --with-netcdf=/sw/etch-x64/netcdf-3.6.1 \
                     --with-szlib=/sw/etch-x64/szip-2.1 \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+        else
+   	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
+	            --with-netcdf=/sw/etch-x64/netcdf-3.6.1 \
+                    --with-szlib=/sw/etch-x64/szip-2.1 \
+                    CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
+                    LIBS="-L/opt/gridware/sge/lib/lx24-amd64 -ldrmaa -ldl -L/usr/lib -lcurl" \
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+        fi
 	;;        
 # i686-suse-linux
     linux | laptop)

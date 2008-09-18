@@ -479,6 +479,8 @@ void *Mrotuvb(void *argument)
 	      }
           }
 	  */
+	  nmiss1 = 0;
+	  nmiss2 = 0;
 	  streamDefRecord(streamID3, 0, levelID);
 	  streamWriteRecord(streamID3, urfield, nmiss1);     
 	  streamDefRecord(streamID3, 1, levelID);
