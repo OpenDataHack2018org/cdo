@@ -70,7 +70,7 @@ o(t,x) = \mbox{nint}(i(t,x))
 
 @BeginDescription
 @IfMan
-o(t,x) = i(t,x)**2
+o(t,x) = i(t,x)^2
 @EndifMan
 @IfDoc
 @BeginMath
@@ -104,7 +104,7 @@ o(t,x) = \sqrt{i(t,x)}
 
 @BeginDescription
 @IfMan
-o(t,x) = e**i(t,x)
+o(t,x) = e^i(t,x)
 @EndifMan
 @IfDoc
 @BeginMath
