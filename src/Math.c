@@ -42,7 +42,7 @@
 void *Math(void *argument)
 {
   static char func[] = "Math";
-  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN};
+  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW};
   int operatorID;
   int operfunc;
   int streamID1, streamID2;
@@ -55,6 +55,7 @@ void *Math(void *argument)
   int i;
   double missval1, missval2;
   double *array1, *array2;
+  double rc = 0;
   int taxisID1, taxisID2;
 
   cdoInitialize(argument);
@@ -73,9 +74,16 @@ void *Math(void *argument)
   cdoOperatorAdd("asin",  ASIN,  0, NULL);
   cdoOperatorAdd("acos",  ACOS,  0, NULL);
   cdoOperatorAdd("atan",  ATAN,  0, NULL);
+  cdoOperatorAdd("pow",   POW,   0, NULL);
  
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  if ( operfunc == POW )
+    {
+      operatorInputArg("value");
+      rc = atof(operatorArgv()[0]);
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -174,6 +182,10 @@ void *Math(void *argument)
 	    case ATAN:
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : atan(array1[i]);
+	      break;
+	    case POW:
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : pow(array1[i], rc);
 	      break;
 	    default:
 	      cdoAbort("operator not implemented!");

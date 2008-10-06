@@ -281,7 +281,7 @@ void *Wct(void *argument);
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
 #define  MathOperators          {"abs", "int", "nint", "sqr", "sqrt", "exp", "ln", "log10", "sin", \
-                                 "cos", "tan", "asin", "acos", "atan"}
+                                 "cos", "tan", "asin", "acos", "atan", "pow"}
 #define  MergeOperators         {"merge"}
 #define  MergegridOperators     {"mergegrid"}
 #define  MergetimeOperators     {"mergetime"}

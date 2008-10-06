@@ -5,7 +5,7 @@
 @Section   = Arithmetic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = abs int nint sqr sqrt exp ln log10 sin cos tan asin acos atan
+@Operators = abs int nint sqr sqrt exp ln log10 sin cos tan asin acos atan pow
 
 @BeginDescription
 This module contains some standard mathematical functions.
@@ -61,6 +61,23 @@ o(t,x) = \mbox{nint}(i(t,x))
 @EndMath
 @EndifDoc
 @C Evaluate the nearest integer value of i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_pow
+@Title     = Power
+
+@BeginDescription
+@IfMan
+o(t,x) = i(t,x)^y
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = {i(t,x)}^y
+@EndMath
+@EndifDoc
+@C Calculates the value of i(t,x) raised to the power of y.
 @EndDescription
 @EndOperator
 

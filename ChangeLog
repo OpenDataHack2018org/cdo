@@ -2,6 +2,7 @@
 	
 	* using CDI library version 1.2.1
 	* New operator: gengrid - generate grid [request: Michael Boettinger]
+	* New operator: pow - Power [request: Gil Lizcano]
 	* Module Timstat: use taxis with bounds from input [request: Beate Geyer]
 	* sellonlatbox: add support for grid units 'radians' [request: Jeff Daily]
 	* sellonlatbox: add support for GRID_CELL [request: Jeff Daily]

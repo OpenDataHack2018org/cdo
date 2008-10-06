@@ -1057,8 +1057,8 @@ static char *ExprHelp[] = {
 
 static char *MathHelp[] = {
     "NAME",
-    "    abs, int, nint, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, atan - ",
-    "    Mathematical functions",
+    "    abs, int, nint, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, atan, ",
+    "    pow - Mathematical functions",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -1075,11 +1075,11 @@ static char *MathHelp[] = {
     "    nint   Nearest integer value",
     "           o(t,x) = nint(i(t,x))",
     "    sqr    Square",
-    "           o(t,x) = i(t,x)**2",
+    "           o(t,x) = i(t,x)^2",
     "    sqrt   Square root",
     "           o(t,x) = sqrt(i(t,x))",
     "    exp    Exponential",
-    "           o(t,x) = e**i(t,x)",
+    "           o(t,x) = e^i(t,x)",
     "    ln     Natural logarithm",
     "           o(t,x) = ln(i(t,x))",
     "    log10  Base 10 logarithm",
@@ -1096,6 +1096,8 @@ static char *MathHelp[] = {
     "           o(t,x) = acos(i(t,x))",
     "    atan   Arc tangent",
     "           o(t,x) = atan(i(t,x))",
+    "    pow    Power",
+    "           o(t,x) = i(t,x)^y",
     NULL
 };
 
