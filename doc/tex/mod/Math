@@ -5,7 +5,7 @@
 @Section   = Arithmetic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = abs int nint sqr sqrt exp ln log10 sin cos tan asin acos atan pow
+@Operators = abs int nint pow sqr sqrt exp ln log10 sin cos tan asin acos atan
 
 @BeginDescription
 This module contains some standard mathematical functions.

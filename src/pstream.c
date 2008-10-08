@@ -1219,7 +1219,7 @@ void cdoFinish(void)
   nvars = processInqVarNum();
   ntimesteps = processInqTimesteps();
 
-  if ( ! cdoSilentMode )
+  if ( !cdoSilentMode )
     {
       if ( nvals > 0 )
 	{

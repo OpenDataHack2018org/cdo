@@ -83,12 +83,11 @@ void *Copy(void *argument)
 	  gridsize = vlistGridsizeMax(vlistID1);
 	  array = (double *) malloc(gridsize*sizeof(double));
 	}
-      /*
       else
 	{
-	  vlistCompare(vlistID1, vlistID2, func_hrd);
+	  vlistCompare(vlistID1, vlistID2, func_sft);
+	  /* vlistCompare(vlistID1, vlistID2, func_hrd); */
 	}
-      */
 
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )

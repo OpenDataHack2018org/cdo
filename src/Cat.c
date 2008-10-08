@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -86,6 +86,8 @@ void *Cat(void *argument)
 	      vlistID2 = streamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
 
+	      vlistCompare(vlistID1, vlistID2, func_sft);
+
 	      tsID2 = vlistNtsteps(vlistID2);
 	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for constant data only */
 	    }
@@ -142,8 +144,7 @@ void *Cat(void *argument)
 
   streamClose(streamID2);
  
-  if ( ! lcopy )
-    if ( array ) free(array);
+  if ( array ) free(array);
 
   cdoFinish();
 
