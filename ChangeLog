@@ -10,6 +10,7 @@
 	* cat, copy: compare input files
 	* ifthen:  bug fix for datasets with different missing values [report: Beate Geyer]
 	* runmean: bug fix for datasets with missing values [report: Carmen Ulmen]
+	* namelist: bug fix for wrong input
 	* Version 1.2.1 released
 
 2008-08-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

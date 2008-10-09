@@ -235,14 +235,12 @@ int gridDefine(GRID grid)
 
 	if ( grid.xbounds )
 	  {
-	    printf("gridDefXbounds\n");
 	    gridDefXbounds(gridID, grid.xbounds);
 	    free(grid.xbounds);
 	  }
 
 	if ( grid.ybounds )
 	  {
-	    printf("gridDefYbounds\n");
 	    gridDefYbounds(gridID, grid.ybounds);
 	    free(grid.ybounds);
 	  }

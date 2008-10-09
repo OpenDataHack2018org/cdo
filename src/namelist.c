@@ -481,12 +481,11 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
           if ( nml->line.namitf < nml->line.namitl)
 	    pnamecx = &nml->line.linelc[nml->line.namitf+1];
 
-          if ( strncmp(pnamecx, "select", 6) == 0 || 
-	       strncmp(pnamecx, "params", 6) == 0 || 
-	       strncmp(pnamecx, nml->name, strlen(nml->name)) == 0 )
-	    {
+	  if ( pnamecx )
+	    if ( strncmp(pnamecx, "select", 6) == 0 || 
+		 strncmp(pnamecx, "params", 6) == 0 || 
+		 strncmp(pnamecx, nml->name, strlen(nml->name)) == 0 )
 	      goto L2000;
-	    }
 
 	  goto L3000;
         }
