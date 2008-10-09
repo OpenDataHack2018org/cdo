@@ -404,7 +404,7 @@ void *Wct(void *argument);
 #define  YseaspctlOperators     {"yseaspctl"}
 /* QR */
 #define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasvar", "yseasstd"}
-#define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonstd", "zonpctl"}
+#define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonvar", "zonstd", "zonpctl"}
 
 /* RQ */
 #define  EcaCfdOperators        {"eca_cfd"}
