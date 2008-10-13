@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -174,20 +174,20 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
 	    {
 	      for ( ilon = 4*(nlon1-lhalo); ilon < 4*nlon1; ilon++ )
 		{
-		  *pxbounds2++ = xbounds1[ilat*nlon1 + ilon];
-		  *pybounds2++ = ybounds1[ilat*nlon1 + ilon];
+		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
+		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
 		}
 
 	      for ( ilon = 0; ilon < 4*nlon1; ilon++ )
 		{
-		  *pxbounds2++ = xbounds1[ilat*nlon1 + ilon];
-		  *pybounds2++ = ybounds1[ilat*nlon1 + ilon];
+		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
+		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
 		}
 
 	      for ( ilon = 0; ilon < 4*rhalo; ilon++ )
 		{
-		  *pxbounds2++ = xbounds1[ilat*nlon1 + ilon];
-		  *pybounds2++ = ybounds1[ilat*nlon1 + ilon];
+		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
+		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
 		}
 	    }
 	}
