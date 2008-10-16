@@ -1536,6 +1536,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   double vec2_lat, vec2_lon, cross_product, cross_product_last = 0;
   double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
   double dist_min, distance; /* For computing dist-weighted avg */
+  int scross;
 
   /*
     Restrict search first using bins
@@ -1624,6 +1625,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	    }
 
           /* corner_loop */
+	  scross = 1;
           for ( n = 0; n < 4; n++ )
 	    {
 	      next_n = (n+1)%4;
@@ -1653,7 +1655,11 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 		If cross product is less than ZERO, this cell doesn't work
 	      */
 	      if ( n == 0 ) cross_product_last = cross_product;
+
+	      if ( cross_product < 0 ) scross *= -1;
+	      printf("  cross %d %g %g %g\n", n, cross_product*cross_product_last, cross_product, cross_product_last);
 	      if ( cross_product*cross_product_last < ZERO ) break;
+	      /* if ( n > 0 && scross < 0 ) break; */
 
 	      cross_product_last = cross_product;
 
@@ -1825,11 +1831,9 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 		  rg->grid1_bound_box, rg->bin_addr1);
 
       /* Check to see if points are land points */
-
-      if ( src_add[0] > 0 )
-	for ( n = 0; n < 4; n++ )
-	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
-	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
+      for ( n = 0; n < 4; n++ )
+	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  If point found, find local i,j coordinates for weights  */
 #ifdef REMAPTEST
@@ -2052,11 +2056,9 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
 		  rg->grid1_bound_box, rg->bin_addr1);
 
       /* Check to see if points are land points */
-
-      if ( src_add[0] > 0 )
-	for ( n = 0; n < 4; n++ )
-	  if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
-	    if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
+      for ( n = 0; n < 4; n++ )
+	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  If point found, find local i,j coordinates for weights  */
 
