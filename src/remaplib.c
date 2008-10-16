@@ -1533,10 +1533,10 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
   /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
-  double vec2_lat, vec2_lon, cross_product, cross_product_last = 0;
+  double vec2_lat, vec2_lon, cross_product/*, cross_product_last = 0*/;
   double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
   double dist_min, distance; /* For computing dist-weighted avg */
-  int scross;
+  int scross, scross_last = 0;
 
   /*
     Restrict search first using bins
@@ -1625,7 +1625,6 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	    }
 
           /* corner_loop */
-	  scross = 1;
           for ( n = 0; n < 4; n++ )
 	    {
 	      next_n = (n+1)%4;
@@ -1654,15 +1653,21 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	      /*
 		If cross product is less than ZERO, this cell doesn't work
 	      */
+	      /* 2008-10-16 Uwe Schulzweida: bug fix for cross_product eq zero */
+	      /*
 	      if ( n == 0 ) cross_product_last = cross_product;
 
-	      if ( cross_product < 0 ) scross *= -1;
-	      printf("  cross %d %g %g %g\n", n, cross_product*cross_product_last, cross_product, cross_product_last);
 	      if ( cross_product*cross_product_last < ZERO ) break;
-	      /* if ( n > 0 && scross < 0 ) break; */
 
 	      cross_product_last = cross_product;
+	      */
+	      scross = cross_product < 0 ? -1 : 1;
 
+	      if ( n == 0 ) scross_last = scross;
+
+	      if ( scross*scross_last < 0 ) break;
+
+	      scross_last = scross;
 	    } /* corner_loop */
 
 	  /*
