@@ -41,6 +41,7 @@ void *Arithc(void *argument);
 void *Arithdays(void *argument);
 void *Arithlat(void *argument);
 void *Cat(void *argument);
+void *CDItest(void *argument);
 void *Change(void *argument);
 void *Comp(void *argument);
 void *Compc(void *argument);
@@ -237,6 +238,7 @@ void *Wct(void *argument);
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy"}
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
+#define  CDItestOperators       {"ncopy"}
 #define  ChangeOperators        {"chcode", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
@@ -467,6 +469,7 @@ static MODULES Modules[] =
   { Arithdays,      ArithdaysHelp,     ArithdaysOperators,      1,  1 },
   { Arithlat,       NULL,              ArithlatOperators,       1,  1 },
   { Cat,            CopyHelp,          CatOperators,           -1,  1 },
+  { CDItest,        NULL,              CDItestOperators,        1,  1 },
   { Change,         ChangeHelp,        ChangeOperators,         1,  1 },
   { Comp,           CompHelp,          CompOperators,           2,  1 },
   { Compc,          CompcHelp,         CompcOperators,          1,  1 },

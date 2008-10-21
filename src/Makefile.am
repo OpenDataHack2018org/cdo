@@ -9,6 +9,7 @@ cdo_SOURCES = Arith.c		\
 	      Arithdays.c 	\
 	      Arithlat.c        \
 	      Cat.c		\
+	      CDItest.c		\
 	      Change.c		\
 	      Comp.c 		\
 	      Compc.c 		\

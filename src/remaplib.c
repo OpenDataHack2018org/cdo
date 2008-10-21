@@ -44,6 +44,7 @@
 */
 
 /* #define REMAPTEST 1 */
+/* #define REMAPDEBUG 1 */
 
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
@@ -739,6 +740,39 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	if ( rg->grid1_corner_lon[i] > PI2 )  rg->grid1_corner_lon[i] -= PI2;
 	if ( rg->grid1_corner_lon[i] < ZERO ) rg->grid1_corner_lon[i] += PI2;
       }
+#ifdef REMAPDEBUG
+  for ( i = 0; i < rg->grid2_size; ++i )
+    {
+      if ( i == 269 )
+	{
+	  printf("grid2 %d ", i);
+	  for ( j = 0; j < 4; ++j )
+	    printf("%g ", RAD2DEG*rg->grid2_corner_lon[i*4+j]);
+	  for ( j = 0; j < 4; ++j )
+	    printf("%g ", RAD2DEG*rg->grid2_corner_lat[i*4+j]);
+	  printf("%g ", RAD2DEG*rg->grid2_center_lon[i]);
+	  printf("%g ", RAD2DEG*rg->grid2_center_lat[i]);
+	  printf("\n");
+	}
+    }
+  for ( i = 0; i < rg->grid1_size; ++i )
+    {
+      if ( i == 25498 || i == 28378 )
+	{
+	  printf("grid1 %d ", i);
+	  for ( j = 0; j < 4; ++j )
+	    printf("%g ", RAD2DEG*rg->grid1_corner_lon[i*4+j]);
+	  for ( j = 0; j < 4; ++j )
+	    printf("%g ", RAD2DEG*rg->grid1_corner_lat[i*4+j]);
+	  for ( j = 0; j < 4; ++j )
+	    if ( rg->grid1_corner_lat[i*4+j] >= PIH )
+	      rg->grid1_corner_lat[i*4+j] = /*89.998*/ 90*DEG2RAD;
+	  printf("%g ", RAD2DEG*rg->grid1_center_lon[i]);
+	  printf("%g ", RAD2DEG*rg->grid1_center_lat[i]);
+	  printf("\n");
+	}
+    }
+#endif
 
   if ( rg->grid2_corners )
     for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
@@ -3662,7 +3696,7 @@ void intersection(int *location, double *intrsct_lat, double *intrsct_lon, int *
 static
 void line_integral(double *weights, int num_wts, 
 		   double in_phi1, double in_phi2, double theta1, double theta2,
-		   double grid1_lon, double grid2_lon)
+		   double grid1_lon, double grid2_lon, int grid1_add, int grid2_add)
 {
   /*
     Intent(in): 
@@ -3670,7 +3704,7 @@ void line_integral(double *weights, int num_wts,
     double in_phi1, in_phi2,     ! Longitude endpoints for the segment
     double theta1, theta2,       ! Latitude  endpoints for the segment
     double grid1_lon,            ! Reference coordinates for each
-    double grid2_lon             ! Grid (to ensure correct 0,2pi interv.
+    double grid2_lon             ! Grid (to ensure correct 0,2pi interv.)
 
     Intent(out):
     double weights[2*num_wts]    ! Line integral contribution to weights
@@ -3699,11 +3733,15 @@ void line_integral(double *weights, int num_wts,
      The first weight is the area overlap integral. The second and
      fourth are second-order latitude gradient weights.
   */
-  weights[        0] = dphi*(sinth1 + sinth2);
-  weights[num_wts+0] = dphi*(sinth1 + sinth2);
-  weights[        1] = dphi*(costh1 + costh2 + (theta1*sinth1 + theta2*sinth2));
-  weights[num_wts+1] = dphi*(costh1 + costh2 + (theta1*sinth1 + theta2*sinth2));
-
+  weights[0] = dphi*(sinth1 + sinth2);
+  weights[1] = dphi*(costh1 + costh2 + (theta1*sinth1 + theta2*sinth2));
+  weights[num_wts+0] = weights[0];
+  weights[num_wts+1] = weights[1];
+#ifdef REMAPDEBUG
+  if ( (grid1_add == 25498 || grid1_add == 28378 || grid1_add == 25499 ) && grid2_add == 269 )
+    printf("in li: %g %g %g %g %g %g %g %g %g %g\n", 
+	   RAD2DEG*in_phi1, RAD2DEG*in_phi2, RAD2DEG*theta1, RAD2DEG*theta2, RAD2DEG*grid1_lon, RAD2DEG*grid2_lon, RAD2DEG*dphi, sinth1, sinth2, weights[0]);
+#endif
   /*
      The third and fifth weights are for the second-order phi gradient
      component.  Must be careful of longitude range.
@@ -4159,12 +4197,12 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		    line_integral(weights, rv->num_wts,
 				  beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid1_center_lon[grid1_add],
-				  rg->grid2_center_lon[grid2_add]);
+				  rg->grid2_center_lon[grid2_add], grid1_add, grid2_add);
 		  else
 		    line_integral(weights, rv->num_wts,
 				  beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid1_center_lon[grid1_add],
-				  rg->grid1_center_lon[grid1_add]);
+				  rg->grid1_center_lon[grid1_add], grid1_add, grid2_add);
 
 		  /* If integrating in reverse order, change sign of weights */
 
@@ -4177,6 +4215,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( grid2_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
+#ifdef REMAPDEBUG
+			if ( (grid1_add == 25498 || grid1_add == 28378) && grid2_add == 269 )
+			  printf("grid1: %d %d\n", grid1_add, grid2_add);
+#endif
 			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
 			rg->grid1_frac[grid1_add] += weights[0];
@@ -4364,16 +4406,22 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 		  /* Compute line integral for this subsegment. */
 
+#ifdef REMAPDEBUG
+		  if ( (grid1_add == 25498 || grid1_add == 28378 || grid1_add == 25499 ) && grid2_add == 269 )
+		    printf("li: %d %d %g %g %g %g %g %g\n", grid1_add, grid2_add,  RAD2DEG*beglon, RAD2DEG*intrsct_lon, RAD2DEG*beglat, RAD2DEG*intrsct_lat,
+				  RAD2DEG*rg->grid1_center_lon[grid1_add],
+				  RAD2DEG*rg->grid2_center_lon[grid2_add]);
+#endif
 		  if ( grid1_add != -1 )
 		    line_integral(weights, rv->num_wts,
 				  beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid1_center_lon[grid1_add],
-				  rg->grid2_center_lon[grid2_add]);
+				  rg->grid2_center_lon[grid2_add], grid1_add, grid2_add);
 		  else
 		    line_integral(weights, rv->num_wts,
 				  beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid2_center_lon[grid2_add],
-				  rg->grid2_center_lon[grid2_add]);
+				  rg->grid2_center_lon[grid2_add], grid1_add, grid2_add);
 
 		  /* If integrating in reverse order, change sign of weights */
 
@@ -4389,10 +4437,26 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( ! lcoinc && grid1_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
+#ifdef REMAPDEBUG
+			if ( (grid1_add == 25498 || grid1_add == 28378 || grid1_add == 25499 ) && grid2_add == 269 )
+			  {
+			    printf("grid2: %d %d\n", grid1_add, grid2_add);
+			    printf("grid2: %g %g %g %g %g %g %g %g\n", weights[0], weights[1], weights[2], weights[3], weights[4], weights[5], rg->grid1_frac[grid1_add], rg->grid2_frac[grid2_add]);
+			  }
+#endif
 			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
-
+#ifdef REMAPDEBUG
+			if ( grid2_add == 269 )
+			  printf("link: %d %g %g %g\n",
+				 rv->num_links-1, rv->wts[0][rv->num_links-1], weights[rv->num_wts], 
+				 rv->wts[0][rv->num_links-1]/weights[rv->num_wts]);
+#endif
 			rg->grid1_frac[grid1_add] += weights[0];
 			rg->grid2_frac[grid2_add] += weights[rv->num_wts];
+#ifdef REMAPDEBUG
+			if ( grid2_add == 269 )
+			  printf(">>> %d %g %g %g %g\n", grid1_add, weights[0], weights[rv->num_wts], rg->grid1_frac[grid1_add], rg->grid2_frac[grid2_add]);
+#endif
 		      }
 
 		  rg->grid2_area[grid2_add]     += weights[rv->num_wts+0];
@@ -4583,6 +4647,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
           else
             norm_factor = ZERO;
 
+#ifdef REMAPDEBUG
+	  if ( (grid1_add == 25498 || grid1_add == 28378 || grid1_add == 25499 ) && grid2_add == 269 )
+	    printf("wts: %d %d %g %g %g\n", grid1_add, grid2_add, weights[0],norm_factor, weights[0]*norm_factor);
+#endif
 	  rv->wts[0][n] =  weights[0]*norm_factor;
 	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
 	  rv->wts[2][n] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;

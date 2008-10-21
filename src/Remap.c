@@ -52,6 +52,7 @@ void *Remap(void *argument)
   int streamID1, streamID2 = -1;
   int nrecs, ngrids;
   int nzaxis, zaxisID, zaxissize;
+  int nvars;
   int index;
   int tsID, recID, varID, levelID;
   int gridsize, gridsize2;
@@ -237,6 +238,9 @@ void *Remap(void *argument)
 	  zaxissize = zaxisInqSize(zaxisID);
           if ( zaxissize > max_remaps ) max_remaps = zaxissize;
 	}
+
+      nvars = vlistNvars(vlistID1);
+      if ( nvars > max_remaps ) max_remaps = nvars;
 
       max_remaps++;
 
