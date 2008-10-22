@@ -9,6 +9,7 @@
 	* Add option '-u' to determinate whether to overwrite existing files [request: David Wang]
 	* cat, copy: compare input files
 	* zonvar: activation missing (bug fix) [report: Irene Fischer-Bruns]
+	* detrend: change taxisCreate to taxisDuplicate
 	* remapbil: bug fix for cross_product eq zero
 	* sethalo: bug fix for x/y bounds [report: Helmut Haak]
 	* ifthen:  bug fix for datasets with different missing values [report: Beate Geyer]
