@@ -69,6 +69,10 @@ char *strdup(const char *s);
 #endif
 #endif
 
+#ifndef IS_EQUAL
+#  define IS_NOT_EQUAL(x,y) (x < y || y < x)
+#  define IS_EQUAL(x,y)     (!IS_NOT_EQUAL(x,y))
+#endif
 
 #ifndef  M_PI
 #define  M_PI		3.14159265358979323846	/* pi */

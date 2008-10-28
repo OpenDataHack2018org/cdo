@@ -743,10 +743,12 @@ void *Gradsdes(void *argument)
       double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
       double xmin = 1.e10, xmax = -1.e10, ymin = 1.e10, ymax = -1.e10;
       double xrange, yrange;
+      int projflag, scanflag;
       int nx, ny, ni;
       double inc[] = { 1, 0.5, 0.2, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001 };
 
-      gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
+      gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
+		 &projflag, &scanflag);
       fprintf(gdp, "PDEF %d %d lcc %g %g 1 1 %g %g %g %g %g\n", 
 	      xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
 

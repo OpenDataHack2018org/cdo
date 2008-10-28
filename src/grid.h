@@ -16,6 +16,8 @@ typedef struct {
   double  lonParY;
   double  lat1;
   double  lat2;
+  int     projflag;
+  int     scanflag;
   int     def_originLon;
   int     def_originLat;
   int     def_lonParY;

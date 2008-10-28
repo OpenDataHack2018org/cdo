@@ -543,8 +543,8 @@ int     gridInqGMEni3(int gridID);
 void    gridDefGMEni3(int gridID, int ni3);
 
 /* Lambert grid */
-void gridDefLCC(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc);
-void gridInqLCC(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc);
+void gridDefLCC(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc, int projflag, int scanflag);
+void gridInqLCC(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc, int *projflag, int *scanflag);
 
 void    gridDefArea(int gridID, double *area);
 void    gridInqArea(int gridID, double *area);

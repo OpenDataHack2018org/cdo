@@ -238,10 +238,16 @@ static void printGridInfo(int vlistID)
       else if ( gridtype == GRID_LCC )
 	{
 	  double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
+	  int projflag, scanflag;
 
-	  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm);
+	  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
+		     &projflag, &scanflag);
 
-	  fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
+	  fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d  ", gridsize, xsize, ysize);
+	  if ( (projflag&128) == 0 )
+	    fprintf(stdout, "North Pole\n");
+	  else
+	    fprintf(stdout, "South Pole\n");
 	  fprintf(stdout, "%*s", nbyte0, "");	  
 	  fprintf(stdout, "            originLon = %g  originLat = %g  lonParY = %g\n",
 		  originLon, originLat, lonParY);

@@ -76,6 +76,8 @@ void gridInit(GRID *grid)
   grid->lonParY       = 0;
   grid->lat1          = 0;
   grid->lat2          = 0;
+  grid->projflag      = 0;
+  grid->scanflag      = 64;
   grid->def_originLon = FALSE;
   grid->def_originLat = FALSE;
   grid->def_lonParY   = FALSE;
@@ -328,7 +330,7 @@ int gridDefine(GRID grid)
 	if ( grid.def_yinc      == FALSE ) Error(func, "yinc undefined!");
 
 	gridDefLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
-		   grid.lat1, grid.lat2, grid.xinc, grid.yinc);
+		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
 
 	break;
       }
@@ -713,6 +715,22 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  grid.lat2 = atof(skipSeparator(pline + 4));
 	  grid.def_lat2 = TRUE;
+	}
+      else if ( strncmp(pline, "projection", 10)  == 0 )
+	{
+	  pline = skipSeparator(pline + 10);
+	  if      ( strncmp(pline, "north", 5) == 0 )
+	    {
+	      grid.projflag = 0;
+	      grid.scanflag = 64;
+	    }
+	  else if ( strncmp(pline, "south", 5) == 0 )
+	    {
+	      grid.projflag = 128;
+	      grid.scanflag = 64;
+	    }
+	  else
+	    Warning(func, "Invalid projection : %s", pline);
 	}
       else if ( strncmp(pline, "xnpole", 6)  == 0 )
 	{
