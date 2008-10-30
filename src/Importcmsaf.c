@@ -6,6 +6,8 @@
 #  include "hdf5.h"
 #endif
 
+#include <ctype.h>
+
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -41,6 +43,37 @@ DSETS;
 
 #if  defined  (HAVE_LIBHDF5)
 static
+void print_filter(hid_t dset_id, char *varname)
+{
+  hid_t plist;
+  H5Z_filter_t filter;
+  unsigned int flags;
+  int idx;
+  unsigned int cd_values;
+  unsigned int filter_config;
+  int nfilter;
+  size_t cd_nelmts = 1;
+  size_t pnamelen = 64;
+  char pname[64];
+
+  /* get filter */
+  plist = H5Dget_create_plist(dset_id);
+  nfilter = H5Pget_nfilters(plist);
+
+  for ( idx = 0; idx < nfilter; idx++ )
+    {
+      filter = H5Pget_filter(plist, idx, &flags, &cd_nelmts, &cd_values, 
+			     pnamelen, pname, &filter_config);
+      cdoPrint("Dataset %s: filter %d =  %s", varname, idx+1, pname);
+    }
+
+  H5Pclose(plist);
+}
+#endif
+
+
+#if  defined  (HAVE_LIBHDF5)
+static
 void read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
   static char func[] = "read_dataset";
@@ -56,8 +89,6 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   int     rank;
   int nx, ny, nz;
   int gridsize, offset;
-  int attint;
-  double attflt;
   double *array;
   double addoffset = 0, scalefactor = 1, missval = cdiInqMissval();
   int lmissval = 0;
@@ -68,6 +99,9 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   int dtype = DATATYPE_FLT32;
   char attstring[4096];     /* Buffer to read string attribute back */
   char varname[256];
+  short *mask = NULL;
+  double minval, maxval;
+  int nmiss;
 
   attstring[0] = 0;
   strcpy(varname, name);
@@ -108,7 +142,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) dtype = DATATYPE_FLT64;
   else
     {
-      cdoWarning("%s skipped, unsupported native datatype!", varname);
+      cdoWarning("Dataset %s skipped, unsupported native datatype!", varname);
       goto RETURN;
     }
   H5Tclose(native_type);
@@ -118,7 +152,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
   if ( rank != 2 )
     {
-      cdoWarning("%s skipped, unsupported rank (=%d)!", rank);
+      cdoWarning("Dataset %s skipped, unsupported rank (=%d)!", rank);
       goto RETURN;
     }
 
@@ -150,6 +184,8 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
   if ( nset < MAX_DSETS )
     {
+      if ( cdoVerbose ) print_filter(dset_id, varname);
+
       H5Oget_info(dset_id, &oinfo);
       for( i = 0; i < (int)oinfo.num_attrs; i++ )
 	{
@@ -210,10 +246,13 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	}
       
       offset = gridsize*(nz-1);
-      array = ((DSETS *) opdata)->obj[nset].array;
-      array = (double *) realloc(array, gridsize*nz*sizeof(double));
+      array  = ((DSETS *) opdata)->obj[nset].array;
+      array  = (double *) realloc(array, gridsize*nz*sizeof(double));
       ((DSETS *) opdata)->obj[nset].array    = array;
-      array = array+offset;
+      array  = array+offset;
+
+      mask = (short *) malloc(gridsize*sizeof(short));
+      memset(mask, 0, gridsize*sizeof(short));
 
       status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
 
@@ -232,8 +271,39 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((DSETS *) opdata)->obj[nset].scale    = scalefactor;
       ((DSETS *) opdata)->obj[nset].missval  = missval;
 
-      if ( nz == 1 )
-	((DSETS *) opdata)->nsets++;
+      if ( nz == 1 ) ((DSETS *) opdata)->nsets++;
+
+      nmiss  = 0;
+ 
+      minval =  1e35;
+      maxval = -1e35;
+
+      for ( i = 0; i < gridsize; i++ )
+	{
+	  if ( array[i] < minval ) minval = array[i];
+	  if ( array[i] > maxval ) maxval = array[i];
+	}
+
+      if ( cdoVerbose )
+	cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g",
+		 varname, dtype,  minval, maxval);
+
+      if ( dtype == DATATYPE_UINT8 )
+	{
+	  if ( minval >= 0 && maxval <= 127 )
+	    {
+	      dtype = DATATYPE_INT8;
+	      ((DSETS *) opdata)->obj[nset].dtype    = dtype;	      
+	    }
+	}
+      else if ( dtype == DATATYPE_UINT16 )
+	{
+	  if ( minval >= 0 && maxval <= 32767 )
+	    {
+	      dtype = DATATYPE_INT16;
+	      ((DSETS *) opdata)->obj[nset].dtype    = dtype;	      
+	    }
+	}
 
       laddoffset   = !DBL_IS_EQUAL(addoffset, 0);
       lscalefactor = !DBL_IS_EQUAL(scalefactor,  1);
@@ -243,10 +313,53 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( !DBL_IS_EQUAL(array[i], missval) )
 	      {
+		mask[i] = 0;
+
 		if ( lscalefactor ) array[i] *= scalefactor;
-		if ( laddoffset )   array[i] += addoffset;
+		if ( laddoffset   ) array[i] += addoffset;
+	      }
+	    else
+	      {
+		nmiss++;
+		mask[i] = 1;
 	      }
 	}
+	    
+      minval =  1e35;
+      maxval = -1e35;
+
+      for ( i = 0; i < gridsize; i++ )
+	if ( mask[i] == 0 )
+	  {
+	    if ( array[i] < minval ) minval = array[i];
+	    if ( array[i] > maxval ) maxval = array[i];
+	  }
+
+      if ( cdoVerbose )
+	cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g",
+		 varname, dtype,  minval, maxval);
+
+      if ( nmiss > 0 )
+	{
+	  if ( ! (missval < minval || missval > maxval) )
+	    {
+	      if ( DBL_IS_EQUAL(missval, 255) && dtype == DATATYPE_UINT8 )
+		{
+		  missval = -255;
+		  dtype   = DATATYPE_INT16;
+		  ((DSETS *) opdata)->obj[nset].dtype    = dtype;
+		  ((DSETS *) opdata)->obj[nset].missval  = missval;
+		  cdoPrint("Dataset %s: change missval to %g and datatype to INT16!",
+			   varname, missval);
+
+		  for ( i = 0; i < gridsize; i++ )
+		    if ( mask[i] ) array[i] = missval;
+		}
+	    }
+	}
+
+      free(mask); 
+      mask = NULL;
     }
   else
     {
@@ -295,11 +408,11 @@ file_info(hid_t loc_id, const char *name, const H5L_info_t *linfo, void *opdata)
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a dataset", name);
     if ( strstr(name, "PALETTE") )
       {
-	cdoPrint("   Skip dataset: %s", name);
+	if ( cdoVerbose ) cdoPrint("   Skip dataset: %s", name);
       }
     else if ( strstr(name, "egion") )
       {
-	cdoPrint("   Skip dataset: %s", name);
+	if ( cdoVerbose ) cdoPrint("   Skip dataset: %s", name);
       }
     else
       {
@@ -322,9 +435,7 @@ file_info(hid_t loc_id, const char *name, const H5L_info_t *linfo, void *opdata)
 #if  defined  (HAVE_LIBHDF5)
 void get_global_att(hid_t file_id, int vlistID)
 {
-  static char func[] = "get_global_att";
   H5O_info_t oinfo;           /* Object info */
-  herr_t  status;	/* Generic return value		*/
   hid_t   attr, atype, atype_mem, obj_id, grp_id = -1;
   char attname[256];
   H5T_class_t  type_class;
@@ -356,7 +467,7 @@ void get_global_att(hid_t file_id, int vlistID)
       H5Aget_name(attr, sizeof(attname), attname);
 
       /* remove illegal characters */
-      for ( pos = 0; pos < strlen(attname); ++pos )
+      for ( pos = 0; pos < (int)strlen(attname); ++pos )
 	if ( attname[pos] == '&' ) attname[pos] = '_';
 
       type_class = H5Tget_class(atype);
@@ -422,7 +533,6 @@ void *Importcmsaf(void *argument)
   int streamID;
   int gridID, zaxisID, taxisID, vlistID;
   int i, offset;
-  int nvars;
   int nmiss;
   int ivar;
   int varID, levelID;
@@ -547,7 +657,8 @@ void *Importcmsaf(void *argument)
 		 varID, levelID, nmiss, missval, minval, maxval);
 
 	  if ( ! (missval < minval || missval > maxval) )
-	    cdoWarning(" Missval is inside of valid values\n");
+	    cdoWarning(" Missval is inside of valid values! Name: %s  Range: %g - %g  Missval: %g\n",
+		       dsets.obj[ivar].name, minval, maxval, missval);
 
 	  streamDefRecord(streamID,  varID,  levelID);
 	  streamWriteRecord(streamID, array, nmiss);
