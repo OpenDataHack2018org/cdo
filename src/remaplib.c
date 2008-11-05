@@ -889,6 +889,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
       else /* full grid search */
 	{
+	  if ( cdoVerbose ) cdoPrint("Grid1: bounds missing -> full grid search!");
+
 	  for ( i = 0; i < rg->grid1_size; i++ )
 	    {
 	      i4 = i*4;
@@ -920,6 +922,8 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
       else /* full grid search */
 	{
+	  if ( cdoVerbose ) cdoPrint("Grid2: bounds missing -> full grid search!");
+
 	  for ( i = 0; i < rg->grid1_size; i++ )
 	    {
 	      i4 = i*4;
@@ -4255,7 +4259,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 			{
 			  if ( cdoVerbose )
 			    cdoPrint("Skip very small region (grid2[%d]): lon = %g dlon = %g lat = %g dlat = %g",
-				     grid2_add,  beglon, endlon-beglon, beglat, endlat-beglat);
+				     grid2_add, beglon, endlon-beglon, beglat, endlat-beglat);
 			  break;
 			}
 
