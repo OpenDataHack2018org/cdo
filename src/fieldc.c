@@ -48,6 +48,11 @@ void farcmul(FIELD *field, double rconst)
     }
   else
     {
+      /*
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(i)
+#endif
+      */
       for ( i = 0; i < len; i++ ) 
 	array[i] *= rconst;
     }

@@ -66,6 +66,11 @@ void faradd(FIELD *field1, FIELD field2)
     }
   else
     {
+      /*
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(i)
+#endif
+      */
       for ( i = 0; i < len; i++ ) 
 	array1[i] += array2[i];
     }
