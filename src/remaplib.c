@@ -4094,14 +4094,10 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( grid2_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
-			if ( grid2_add ==  90 )
-			  printf("%d %d %g %g\n", grid1_add, grid2_add, weights[0], weights[rv->num_wts]);
 			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
 			rg->grid1_frac[grid1_add] += weights[0];
 			rg->grid2_frac[grid2_add] += weights[rv->num_wts];
-			if ( grid2_add ==  90 )
-			  printf("grid1: %d grid2frac %g %d %g\n", grid2_add, rg->grid2_frac[grid2_add], grid1_add, rg->grid1_frac[grid1_add]);
 		      }
 
 		  rg->grid1_area[grid1_add]     += weights[0];
@@ -4116,10 +4112,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	    }
           /* End of segment */
         }
-      /* printf("grid1: %d grid1frac %g\n", grid1_add, rg->grid1_frac[grid1_add]); */
     }
-  for ( grid2_add = 0; grid2_add < grid2_size; grid2_add++ )
-      printf("grid1: %d grid2frac %g\n", grid2_add, rg->grid2_frac[grid2_add]);
 
   if ( cdoTimer ) timer_stop(timer_remap_con2);
 
@@ -4313,8 +4306,6 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 			rg->grid1_frac[grid1_add] += weights[0];
 			rg->grid2_frac[grid2_add] += weights[rv->num_wts];
-			if ( grid2_add ==  9000 )
-			  printf("grid2: %d grid2frac %g\n", grid2_add, rg->grid2_frac[grid2_add]);
 		      }
 
 		  rg->grid2_area[grid2_add]     += weights[rv->num_wts+0];
@@ -4329,7 +4320,6 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	    }
           /* End of segment */
 	}
-      printf("grid2: %d grid2frac %g\n", grid2_add, rg->grid2_frac[grid2_add]);
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_con3);
