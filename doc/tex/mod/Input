@@ -27,7 +27,7 @@ written out by @mod{output}.
 
 
 @BeginOperator_inputsrv
-@Title     = SERVICE input
+@Title     = SERVICE ASCII input
 
 @BeginDescription
 Reads fields with ASCII numbers from standard input and stores them 
@@ -38,7 +38,7 @@ The numbers that are read are exactly that ones which are written out by @mod{ou
 
 
 @BeginOperator_inputext
-@Title     = EXTRA input
+@Title     = EXTRA ASCII input
 
 @BeginDescription
 Read fields with ASCII numbers from standard input and stores them 

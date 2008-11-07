@@ -30,6 +30,155 @@
 #include "pstream.h"
 
 
+static int gentpngrid(int gridID1)
+{
+  static char func[] = "gentpngrid";  
+  int gridtype, gridID2;
+  int nlon1, nlat1;
+  int nlon2, nlat2;
+  int prec;
+  int ilat, ilon, ilonr, k, kr;
+  char xname[128], xlongname[128], xunits[128];
+  char yname[128], ylongname[128], yunits[128];
+  double *xvals1 = NULL, *yvals1 = NULL;
+  double *xvals2 = NULL, *yvals2 = NULL;
+  double *xbounds1 = NULL, *ybounds1 = NULL;
+  double *xbounds2 = NULL, *ybounds2 = NULL;
+
+  nlon1 = gridInqXsize(gridID1);
+  nlat1 = gridInqYsize(gridID1);
+
+  nlon2 = nlon1;
+  nlat2 = nlat1+2;
+
+  gridtype = gridInqType(gridID1);
+  prec     = gridInqPrec(gridID1);
+
+  gridID2 = gridCreate(gridtype, nlon2*nlat2);
+  gridDefXsize(gridID2, nlon2);
+  gridDefYsize(gridID2, nlat2);
+
+  gridDefPrec(gridID2, prec);
+
+  gridInqXname(gridID1, xname);
+  gridInqXlongname(gridID1, xlongname);
+  gridInqXunits(gridID1, xunits);
+  gridInqYname(gridID1, yname);
+  gridInqYlongname(gridID1, ylongname);
+  gridInqYunits(gridID1, yunits);
+
+  gridDefXname(gridID2, xname);
+  gridDefXlongname(gridID2, xlongname);
+  gridDefXunits(gridID2, xunits);
+  gridDefYname(gridID2, yname);
+  gridDefYlongname(gridID2, ylongname);
+  gridDefYunits(gridID2, yunits);
+	
+  if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
+    {
+      if ( gridtype == GRID_CURVILINEAR )
+	{
+	  xvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
+	  yvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
+	  xvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
+	  yvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
+
+	  gridInqXvals(gridID1, xvals1);
+	  gridInqYvals(gridID1, yvals1);
+
+	  for ( ilat = 0; ilat < nlat1; ilat++ )
+	    {
+	      for ( ilon = 0; ilon < nlon1; ilon++ )
+		{
+		  xvals2[(ilat+2)*nlon1 + ilon] = xvals1[ilat*nlon1 + ilon];
+		  yvals2[(ilat+2)*nlon1 + ilon] = yvals1[ilat*nlon1 + ilon];
+		}
+	    }
+
+	  for ( ilon = 0; ilon < nlon1; ilon++ )
+	    {
+	      ilonr = nlon1 - ilon - 1;
+	      xvals2[1*nlon1 + ilon] = xvals2[2*nlon1 + ilonr]; /* syncronise line 2 with line 3 */
+	      xvals2[0*nlon1 + ilon] = xvals2[3*nlon1 + ilonr]; /* syncronise line 1 with line 4 */
+	      yvals2[1*nlon1 + ilon] = yvals2[2*nlon1 + ilonr]; /* syncronise line 2 with line 3 */
+	      yvals2[0*nlon1 + ilon] = yvals2[3*nlon1 + ilonr]; /* syncronise line 1 with line 4 */
+	    }	
+	  
+	  gridDefXvals(gridID2, xvals2);
+	  gridDefYvals(gridID2, yvals2);
+	  
+	  free(xvals1);
+	  free(yvals1);
+	  free(xvals2);
+	  free(yvals2);
+	}
+    }
+
+  if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
+    {
+      if ( gridtype == GRID_CURVILINEAR )
+	{
+	  xbounds1 = (double *) malloc(4*nlon1*nlat1*sizeof(double));
+	  ybounds1 = (double *) malloc(4*nlon1*nlat1*sizeof(double));
+	  xbounds2 = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+	  ybounds2 = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+
+	  gridInqXbounds(gridID1, xbounds1);
+	  gridInqYbounds(gridID1, ybounds1);
+
+	  if ( gridtype == GRID_CURVILINEAR )
+	    {
+	      gridDefNvertex(gridID2, 4);
+
+	      for ( ilat = 0; ilat < nlat1; ilat++ )
+		{
+		  for ( ilon = 0; ilon < 4*nlon1; ilon++ )
+		    {
+		      xbounds2[4*(ilat+2)*nlon1 + ilon] = xbounds1[4*ilat*nlon1 + ilon];
+		      ybounds2[4*(ilat+2)*nlon1 + ilon] = ybounds1[4*ilat*nlon1 + ilon];
+		    }
+		}
+
+	      for ( ilon = 0; ilon < nlon1; ilon++ )
+		{
+		  ilonr = nlon1 - ilon - 1;
+		  for ( k = 0; k < 4; ++k )
+		    {
+		      kr = 3 - k;
+		      xbounds2[4*1*nlon1 + 4*ilon + k] = xbounds2[4*2*nlon1 + 4*ilonr + kr];
+		      xbounds2[4*0*nlon1 + 4*ilon + k] = xbounds2[4*3*nlon1 + 4*ilonr + kr];
+		      ybounds2[4*1*nlon1 + 4*ilon + k] = ybounds2[4*2*nlon1 + 4*ilonr + kr];
+		      ybounds2[4*0*nlon1 + 4*ilon + k] = ybounds2[4*3*nlon1 + 4*ilonr + kr];
+		    }
+		}	
+	      /*
+	      for ( ilon = 0; ilon < 4*nlon1; ilon++ )
+		{
+		  ilonr = 4*nlon1 - ilon - 1;
+		    {
+		      xbounds2[4*1*nlon1 + ilon ] = xbounds2[4*2*nlon1 + ilonr ];
+		      xbounds2[4*0*nlon1 + ilon ] = xbounds2[4*3*nlon1 + ilonr ];
+		      ybounds2[4*1*nlon1 + ilon ] = ybounds2[4*2*nlon1 + ilonr ];
+		      ybounds2[4*0*nlon1 + ilon ] = ybounds2[4*3*nlon1 + ilonr ]; 
+		    }
+		}
+	      */	
+	    }
+
+	  gridDefXbounds(gridID2, xbounds2);
+	  gridDefYbounds(gridID2, ybounds2);
+
+	  free(xbounds1);
+	  free(ybounds1);
+	  free(xbounds2);
+	  free(ybounds2);
+	}
+    }
+
+  return (gridID2);
+}
+
+
 static int gengrid(int gridID1, int lhalo, int rhalo)
 {
   static char func[] = "gengrid";  
@@ -266,9 +415,34 @@ static void halo(double *array1, int gridID1, double *array2, int lhalo, int rha
 }
 
 
+static void tpnhalo(double *array1, int gridID1, double *array2)
+{
+  int nlon, nlat;
+  int ilat, ilon, ilonr;
+
+  nlon = gridInqXsize(gridID1);
+  nlat = gridInqYsize(gridID1);
+
+  for ( ilat = 0; ilat < nlat; ilat++ )
+    {
+      for ( ilon = 0; ilon < nlon; ilon++ )
+	array2[(ilat+2)*nlon + ilon] = array1[ilat*nlon + ilon];
+    }
+
+  for ( ilon = 0; ilon < nlon; ilon++ )
+    {
+      ilonr = nlon - ilon - 1;
+      array2[1*nlon + ilon] = array2[2*nlon + ilonr]; /* syncronise line 2 with line 3 */
+      array2[0*nlon + ilon] = array2[3*nlon + ilonr]; /* syncronise line 1 with line 4 */
+    }
+}
+
+
 void *Sethalo(void *argument)
 {
   static char func[] = "Sethalo";
+  int SETHALO, TPNHALO;
+  int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
   int tsID, recID, varID, levelID;
@@ -279,13 +453,18 @@ void *Sethalo(void *argument)
   int nmiss;
   int *vars;
   int i;
-  int lhalo, rhalo;
+  int lhalo = 0, rhalo = 0;
   int ndiffgrids;
   double missval;
   double *array1 = NULL, *array2 = NULL;
   int taxisID1, taxisID2;
 
   cdoInitialize(argument);
+
+  SETHALO = cdoOperatorAdd("sethalo", 0, 0, NULL);
+  TPNHALO = cdoOperatorAdd("tpnhalo", 0, 0, NULL);
+
+  operatorID = cdoOperatorID();
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -314,8 +493,15 @@ void *Sethalo(void *argument)
   if ( index == ngrids ) cdoAbort("No regular grid found!");
   if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
 
-  operatorInputArg("left and right halo");
-  gridID2 = genindexgrid(gridID1, &lhalo, &rhalo);
+  if ( operatorID == SETHALO )
+    {
+      operatorInputArg("left and right halo");
+      gridID2 = genindexgrid(gridID1, &lhalo, &rhalo);
+    }
+  else
+    {
+      gridID2 = gentpngrid(gridID1);
+    }
 
   vlistID2 = vlistDuplicate(vlistID1);
 
@@ -369,7 +555,10 @@ void *Sethalo(void *argument)
 	    {
 	      streamReadRecord(streamID1, array1, &nmiss);
 
-	      halo(array1, gridID1, array2, lhalo, rhalo);
+	      if ( operatorID == SETHALO )
+		halo(array1, gridID1, array2, lhalo, rhalo);
+	      else
+		tpnhalo(array1, gridID1, array2);
 
 	      if ( nmiss )
 		{

@@ -46,7 +46,7 @@ Prints all values rounded to the nearest integer to standard output.
 
 
 @BeginOperator_outputsrv
-@Title     = SERVICE output
+@Title     = SERVICE ASCII output
 
 @BeginDescription
 Prints all values to standard output.
@@ -56,7 +56,7 @@ Each field with a header of 8 integers (SERVICE likely).
 
 
 @BeginOperator_outputext
-@Title     = EXTRA output
+@Title     = EXTRA ASCII output
 
 @BeginDescription
 Prints all values to standard output.
