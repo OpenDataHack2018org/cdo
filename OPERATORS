@@ -151,6 +151,7 @@ Operator catalog:
       Math       abs             Absolute value
       Math       int             Integer value
       Math       nint            Nearest integer value
+      Math       pow             Power
       Math       sqr             Square
       Math       sqrt            Square root
       Math       exp             Exponential
@@ -375,13 +376,13 @@ Operator catalog:
    Formatted I/O
 -------------------------------------------------------------
       Input      input           ASCII input
-      Input      inputsrv        SERVICE input
-      Input      inputext        EXTRA input
+      Input      inputsrv        SERVICE ASCII input
+      Input      inputext        EXTRA ASCII input
       Output     output          ASCII output
       Output     outputf         Formatted output
       Output     outputint       Integer output
-      Output     outputsrv       SERVICE output
-      Output     outputext       EXTRA output
+      Output     outputsrv       SERVICE ASCII output
+      Output     outputext       EXTRA ASCII output
 -------------------------------------------------------------
    Miscellaneous
 -------------------------------------------------------------
