@@ -1,7 +1,24 @@
 CDO NEWS
 --------
 
-Version 1.2.0 (? August 2008):
+Version 1.2.1 (10 November 2008):
+
+   * New features:
+      o Option '-u' to determinate whether to overwrite existing files
+   * New operators:
+      o Import CM-SAF files - import_cmsaf
+      o Mathematical function 'power' - pow
+   * Changed operators:
+      o sellonlatbox: add support for grid type 'CELL' and units 'radians'
+      o remapdis: add support for grid type 'CELL' without bounds (full grid search)
+      o Timstat: use time axis with bounds from input
+      o copy, cat: concatenate time constant fields
+   * Fixed bugs:
+      o zonvar: activation was missing
+      o ifthen:  bug fix for datasets with different missing values
+      o runmean: bug fix for datasets with missing values
+
+Version 1.2.0 (13 August 2008):
 
    * New features:
       o add support for netCDF4 classic with deflate (option -z zip)

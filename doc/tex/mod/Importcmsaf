@@ -1,0 +1,33 @@
+@BeginModule
+@Name      = Importcmsaf
+@Title     = Import CM-SAF files
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = import_cmsaf
+
+@BeginDescription
+This operator imports gridded CM-SAF (Satellite Application Facility on Climate Monitoring)
+HDF5 files. 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_import_cmsaf
+@Title     = Import CM-SAF files
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginNote
+This operator is only available if the program was compiled with HDF5 support!
+@EndNote
+
+
+@BeginExample
+To convert a CM-SAF HDF5 file to netCDF use:
+@BeginVerbatim
+   cdo -f nc ifile.h5 ofile.nc
+@EndVerbatim
+@EndExample

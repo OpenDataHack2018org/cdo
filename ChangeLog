@@ -1,6 +1,7 @@
-2008-11-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2008-11-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.2.1
+	* New operator: import_cmsaf - import CM-SAF files
 	* New operator: gengrid - generate grid [request: Michael Boettinger]
 	* New operator: pow - Power [request: Gil Lizcano]
 	* New operator: tpnhalo (testversion)
@@ -8,7 +9,8 @@
 	* sellonlatbox: add support for grid units 'radians' [request: Jeff Daily]
 	* sellonlatbox: add support for GRID_CELL [request: Jeff Daily]
 	* Add option '-u' to determinate whether to overwrite existing files [request: David Wang]
-	* cat, copy: compare input files
+        * copy, cat: concatenate time constant fields
+	* copy, cat: compare input files
 	* zonvar: activation missing (bug fix) [report: Irene Fischer-Bruns]
 	* detrend: change taxisCreate to taxisDuplicate [report: Ute Merkel]
 	* remapdis: add support for GRID_CELL without bounds (full grid search)

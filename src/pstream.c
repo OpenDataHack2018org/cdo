@@ -758,6 +758,8 @@ int pstreamOpenAppend(const char *argument)
       cdoDefHistory(fileID, commandLine());
       */
       strcpy(filename, argument);
+
+      pstreamptr->mode   = 'a';
       pstreamptr->name   = filename;
       pstreamptr->fileID = fileID;
     }

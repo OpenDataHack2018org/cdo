@@ -29,6 +29,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Copy(void *argument)
 {
@@ -44,6 +45,7 @@ void *Copy(void *argument)
   int nmiss;
   int streamCnt, nfiles, indf;
   int taxisID1, taxisID2 = CDI_UNDEFID;
+  int ntsteps;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -77,6 +79,15 @@ void *Copy(void *argument)
 	  vlistID2 = vlistDuplicate(vlistID1);
 	  taxisID2 = taxisDuplicate(taxisID1);
 	  vlistDefTaxis(vlistID2, taxisID2);
+
+	  ntsteps = vlistNtsteps(vlistID1);
+	  if ( ntsteps == 0 && nfiles > 1 )
+	    {
+	      int nvars = vlistNvars(vlistID1);
+	      
+	      for ( varID = 0; varID < nvars; ++varID )
+		vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
+	    }
 
 	  streamDefVlist(streamID2, vlistID2);
 

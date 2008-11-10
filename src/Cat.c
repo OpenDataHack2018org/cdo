@@ -33,6 +33,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Cat(void *argument)
 {
@@ -46,6 +47,7 @@ void *Cat(void *argument)
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
+  int ntsteps;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -104,6 +106,15 @@ void *Cat(void *argument)
 	      taxisID2 = taxisDuplicate(taxisID1);
 	      vlistDefTaxis(vlistID2, taxisID2);
 	  
+	      ntsteps = vlistNtsteps(vlistID1);
+	      if ( ntsteps == 0 && nfiles > 1 )
+		{
+		  int nvars = vlistNvars(vlistID1);
+		  
+		  for ( varID = 0; varID < nvars; ++varID )
+		    vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
+		}
+
 	      streamDefVlist(streamID2, vlistID2);
 	    }
 
