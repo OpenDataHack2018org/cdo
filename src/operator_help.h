@@ -3311,6 +3311,19 @@ static char *ImportamsrHelp[] = {
     NULL
 };
 
+static char *ImportcmsafHelp[] = {
+    "NAME",
+    "    import_cmsaf - Import CM-SAF files",
+    "",
+    "SYNOPSIS",
+    "    import_cmsaf  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator imports gridded CM-SAF (Satellite Application Facility on Climate Monitoring)",
+    "    HDF5 files. ",
+    NULL
+};
+
 static char *EcaCddHelp[] = {
     "NAME",
     "    eca_cdd - Consecutive dry days index per time period",

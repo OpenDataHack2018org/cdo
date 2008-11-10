@@ -409,6 +409,7 @@ Operator catalog:
       Strgal     strgal          Strong gale days index per time period
       Hurr       hurr            Hurricane days index per time period
       Importamsr import_amsr     Import AMSR binary files
+      Importcmsaf import_cmsaf    Import CM-SAF files
 -------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
