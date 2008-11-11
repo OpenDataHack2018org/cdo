@@ -5734,11 +5734,17 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_dimid(nc_file_id, "src_grid_size", &nc_srcgrdsize_id));
   nce(nc_inq_dimlen(nc_file_id, nc_srcgrdsize_id, &dimlen));
   rg->grid1_size = dimlen;
-
+  /*
+  if (  rg->grid1_size != gridInqSize(gridID1) )
+    cdoAbort("Source grids have different size!");
+  */
   nce(nc_inq_dimid(nc_file_id, "dst_grid_size", &nc_dstgrdsize_id));
   nce(nc_inq_dimlen(nc_file_id, nc_dstgrdsize_id, &dimlen));
   rg->grid2_size = dimlen;
-
+  /*
+  if ( rg->grid2_size != gridInqSize(gridID2) )
+    cdoAbort("Target grids have different size!");
+  */
   rg->grid1_corners = 0;
   rg->luse_grid1_corners = FALSE;
   status = nc_inq_dimid(nc_file_id, "src_grid_corners", &nc_srcgrdcorn_id);

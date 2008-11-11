@@ -198,6 +198,7 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/lib/netcdf-3.5.0/LP64 \
                     --with-szlib=$HOME/local \
+                    --with-hdf5=/usr/local/lib/hdf5/1.6.5/LP64_underscore LIBS="-lz" \
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix6.0.0.0

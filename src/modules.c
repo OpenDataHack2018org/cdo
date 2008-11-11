@@ -495,7 +495,7 @@ static MODULES Modules[] =
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
   { Importamsr,     ImportamsrHelp,    ImportamsrOperators,     1,  1 },
-  { Importcmsaf,    NULL,              ImportcmsafOperators,    1,  1 },
+  { Importcmsaf,    ImportcmsafHelp,   ImportcmsafOperators,    1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },

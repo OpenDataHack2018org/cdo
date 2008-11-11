@@ -2,6 +2,8 @@
 #  include "config.h"
 #endif
 
+#define H5_USE_16_API
+
 #if  defined  (HAVE_LIBHDF5)
 #  include "hdf5.h"
 #endif
@@ -83,9 +85,15 @@ int gridFromH5file(const char *gridfile)
   /* H5Giterate(file_id, "/", NULL, file_info, NULL); */
 
   /* Open an existing dataset. */
-  lon_id = H5Dopen(file_id, "/lon", H5P_DEFAULT);
+  lon_id = H5Dopen(file_id, "/lon");
   if ( lon_id >= 0 )
-    lat_id = H5Dopen(file_id, "/lat", H5P_DEFAULT);
+    lat_id = H5Dopen(file_id, "/lat");
+  else
+    {
+      lon_id = H5Dopen(file_id, "/Longitude");
+      if ( lon_id >= 0 )
+	lat_id = H5Dopen(file_id, "/Latitude");
+    }
   
   if ( lon_id >= 0 && lat_id >= 0 )
     {
@@ -132,17 +140,17 @@ int gridFromH5file(const char *gridfile)
       hid_t att_id;
       int i;
 
-      grp_id = H5Gopen(file_id, "/where/lon/what", H5P_DEFAULT);
+      grp_id = H5Gopen(file_id, "/where/lon/what");
       if ( grp_id >= 0 )
 	{
-	  att_id = H5Aopen(grp_id, "gain", H5P_DEFAULT);
+	  att_id = H5Aopen_name(grp_id, "gain");
 	  if ( att_id >= 0 )
 	    {
 	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &xscale);
 	      H5Aclose(att_id);
 	    }
 
-	  att_id = H5Aopen(grp_id, "offset", H5P_DEFAULT);
+	  att_id = H5Aopen_name(grp_id, "offset");
 	  if ( att_id >= 0 )
 	    {
 	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &xoffset);
@@ -152,17 +160,17 @@ int gridFromH5file(const char *gridfile)
 	  H5Gclose(grp_id);
 	}
 
-      grp_id = H5Gopen(file_id, "/where/lat/what", H5P_DEFAULT);
+      grp_id = H5Gopen(file_id, "/where/lat/what");
       if ( grp_id >= 0 )
 	{
-	  att_id = H5Aopen(grp_id, "gain", H5P_DEFAULT);
+	  att_id = H5Aopen_name(grp_id, "gain");
 	  if ( att_id >= 0 )
 	    {
 	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &yscale);
 	      H5Aclose(att_id);
 	    }
 
-	  att_id = H5Aopen(grp_id, "offset", H5P_DEFAULT);
+	  att_id = H5Aopen_name(grp_id, "offset");
 	  if ( att_id >= 0 )
 	    {
 	      status = H5Aread(att_id, H5T_NATIVE_DOUBLE, &yoffset);
@@ -173,9 +181,9 @@ int gridFromH5file(const char *gridfile)
 	}
 
       /* Open an existing dataset. */
-      lon_id = H5Dopen(file_id, "/where/lon/data", H5P_DEFAULT);
+      lon_id = H5Dopen(file_id, "/where/lon/data");
       if ( lon_id >= 0 )
-	lat_id = H5Dopen(file_id, "/where/lat/data", H5P_DEFAULT);
+	lat_id = H5Dopen(file_id, "/where/lat/data");
 
       if ( lon_id >= 0 && lat_id >= 0 )
 	{

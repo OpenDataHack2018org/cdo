@@ -2,6 +2,8 @@
 #  include "config.h"
 #endif
 
+#define H5_USE_16_API
+
 #if  defined  (HAVE_LIBHDF5)
 #  include "hdf5.h"
 #endif
@@ -12,6 +14,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+
 
 #define  MAX_DSETS  1024
 
@@ -50,7 +53,6 @@ void print_filter(hid_t dset_id, char *varname)
   unsigned int flags;
   int idx;
   unsigned int cd_values;
-  unsigned int filter_config;
   int nfilter;
   size_t cd_nelmts = 1;
   size_t pnamelen = 64;
@@ -63,7 +65,7 @@ void print_filter(hid_t dset_id, char *varname)
   for ( idx = 0; idx < nfilter; idx++ )
     {
       filter = H5Pget_filter(plist, idx, &flags, &cd_nelmts, &cd_values, 
-			     pnamelen, pname, &filter_config);
+			     pnamelen, pname);
       cdoPrint("Dataset %s: filter %d =  %s", varname, idx+1, pname);
     }
 
@@ -78,14 +80,15 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
   static char func[] = "read_dataset";
   hid_t dset_id, type_id;
-  H5O_info_t oinfo;           /* Object info */
   hid_t   dataspace;   
   hsize_t dims_out[9];  /* dataset dimensions           */
   herr_t  status;	/* Generic return value		*/
   hid_t   attr, atype, atype_mem;
   hid_t   native_type;
+  int iattr;
   char attname[256];
   H5T_class_t  type_class;
+  H5T_class_t atype_class;
   int     rank;
   int nx, ny, nz;
   int gridsize, offset;
@@ -94,6 +97,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   int lmissval = 0;
   int nset;
   int i;
+  int ftype = 0;
   int len;
   int laddoffset, lscalefactor;
   int dtype = DATATYPE_FLT32;
@@ -102,11 +106,12 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   short *mask = NULL;
   double minval, maxval;
   int nmiss;
+  int num_attrs;
 
   attstring[0] = 0;
   strcpy(varname, name);
 
-  dset_id = H5Dopen2(loc_id, varname, H5P_DEFAULT);
+  dset_id = H5Dopen(loc_id, varname);
   
   type_id = H5Dget_type(dset_id);  /* get datatype*/
 
@@ -132,14 +137,14 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   }
   */
   native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
-  if      ( H5Tequal(native_type, H5T_NATIVE_CHAR)   > 0 ) dtype = DATATYPE_INT8;
-  else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) dtype = DATATYPE_UINT8;
-  else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) dtype = DATATYPE_INT16;
-  else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) dtype = DATATYPE_UINT16;
-  else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) dtype = DATATYPE_INT32;
-  else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) dtype = DATATYPE_UINT32;
-  else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) dtype = DATATYPE_FLT32;
-  else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) dtype = DATATYPE_FLT64;
+  if      ( H5Tequal(native_type, H5T_NATIVE_CHAR)   > 0 ) {ftype=0; dtype = DATATYPE_INT8;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0; dtype = DATATYPE_UINT8;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0; dtype = DATATYPE_INT16;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0; dtype = DATATYPE_UINT16;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) {ftype=0; dtype = DATATYPE_INT32;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) {ftype=0; dtype = DATATYPE_UINT32;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) {ftype=1; dtype = DATATYPE_FLT32;}
+  else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1; dtype = DATATYPE_FLT64;}
   else
     {
       cdoWarning("Dataset %s skipped, unsupported native datatype!", varname);
@@ -186,11 +191,10 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
     {
       if ( cdoVerbose ) print_filter(dset_id, varname);
 
-      H5Oget_info(dset_id, &oinfo);
-      for( i = 0; i < (int)oinfo.num_attrs; i++ )
+      num_attrs = H5Aget_num_attrs(dset_id);
+      for( i = 0; i < num_attrs; i++ )
 	{
-	  attr = H5Aopen_by_idx(dset_id, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
-				(hsize_t)i, H5P_DEFAULT, H5P_DEFAULT);
+	  attr = H5Aopen_idx(dset_id, i);
 	  atype = H5Aget_type(attr);
 	  H5Aget_name(attr, sizeof(attname), attname);
 
@@ -198,26 +202,58 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	       strcmp(attname, "IMAGE_VERSION") == 0 ||
 	       strcmp(attname, "PALETTE") == 0 ) continue;
 
-	  type_class = H5Tget_class(atype);
-
 	  atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
+	  atype_class = H5Tget_class(atype);
 
 	  if ( strcmp(attname, "intercept") == 0 )
 	    {
-	      H5Aread(attr, H5T_NATIVE_DOUBLE, &addoffset);
-	      laddoffset = 1;
+	      if ( atype_class == H5T_FLOAT )
+		{
+		  H5Aread(attr, H5T_NATIVE_DOUBLE, &addoffset);
+		  laddoffset = 1;
+		}
+	      else if ( atype_class == H5T_INTEGER )
+		{
+		  H5Aread(attr, H5T_NATIVE_INT, &iattr);
+		  addoffset = iattr;
+		  laddoffset = 1;
+		}
+	      else
+		cdoWarning("Attribute %s has unsupported data type!", attname);
 	    }
 	  else if ( strcmp(attname, "gain") == 0 )
 	    {
-	      H5Aread(attr, H5T_NATIVE_DOUBLE, &scalefactor);
-	      lscalefactor = 1;
+	      if ( atype_class == H5T_FLOAT )
+		{
+		  H5Aread(attr, H5T_NATIVE_DOUBLE, &scalefactor);
+		  lscalefactor = 1;
+		}
+	      else if ( atype_class == H5T_INTEGER )
+		{
+		  H5Aread(attr, H5T_NATIVE_INT, &iattr);
+		  scalefactor = iattr;
+		  lscalefactor = 1;
+		}
+	      else
+		cdoWarning("Attribute %s has unsupported data type!", attname);
 	    }
 	  else if ( strcmp(attname, "no_data_value") == 0 ||
 		    strcmp(attname, "nodata value") == 0  ||
 		    strcmp(attname, "nodata") == 0 )
 	    {
-	      H5Aread(attr, H5T_NATIVE_DOUBLE, &missval);
-	      lmissval = 1;
+	      if ( atype_class == H5T_FLOAT )
+		{
+		  H5Aread(attr, H5T_NATIVE_DOUBLE, &missval);
+		  lmissval = 1;
+		}
+	      else if ( atype_class == H5T_INTEGER )
+		{
+		  H5Aread(attr, H5T_NATIVE_INT, &iattr);
+		  missval = iattr;
+		  lmissval = 1;
+		}
+	      else
+		cdoWarning("Attribute %s has unsupported data type!", attname);
 	    }
 	  else if ( strcmp(attname, "description") == 0 )
 	    {
@@ -254,7 +290,18 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       mask = (short *) malloc(gridsize*sizeof(short));
       memset(mask, 0, gridsize*sizeof(short));
 
-      status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
+      if ( ftype )
+	{
+	  status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
+	}
+      else
+	{
+	  int *iarray, i;
+	  iarray = (int *) malloc(gridsize*sizeof(int));
+	  status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+	  for ( i = 0; i < gridsize; ++i ) array[i] = iarray[i];
+	  free(iarray);
+	}
 
       ((DSETS *) opdata)->obj[nset].name     = strdup(varname);
       ((DSETS *) opdata)->obj[nset].nx       = nx;
@@ -355,6 +402,10 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( mask[i] ) array[i] = missval;
 		}
+	      else
+		cdoWarning(" Missval is inside of valid values!\n"
+                           " Name: %s  Range: %g - %g  Missval: %g\n",
+			   varname, minval, maxval, missval);
 	    }
 	}
 
@@ -376,32 +427,29 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 }
 #endif
 
+
 #if  defined  (HAVE_LIBHDF5)
 static herr_t
-file_info(hid_t loc_id, const char *name, const H5L_info_t *linfo, void *opdata)
+obj_info(hid_t loc_id, const char *name, void *opdata)
 {
-  H5O_info_t obj_info;
+  H5G_obj_t obj_type;
+  hbool_t follow_link = 0;
+  H5G_stat_t statbuf;
 
   /* avoid compiler warnings */
   loc_id = loc_id;
   opdata = opdata;
-  linfo = linfo;
 
-  /*
-   * Display group name. The name is passed to the function by
-   * the Library. Some magic :-)
-   */
-  H5Oget_info_by_name(loc_id, name, &obj_info, H5P_DEFAULT);
+  H5Gget_objinfo(loc_id, name, follow_link, &statbuf);
 
-  switch (obj_info.type) {
+  obj_type = statbuf.type;
+
+  switch (obj_type) {
   case H5G_GROUP:
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a group", name);
     if ( strcmp(name, "Data") == 0 )
       {
-	hid_t grp_id;
-	grp_id = H5Gopen2(loc_id, name, H5P_DEFAULT);
-	H5Literate(grp_id, H5_INDEX_NAME, H5_ITER_INC, NULL, file_info, opdata);
-	H5Gclose(grp_id);	
+	H5Giterate(loc_id, name, NULL, obj_info, opdata);
       }
     break;
   case H5G_DATASET: 
@@ -435,34 +483,34 @@ file_info(hid_t loc_id, const char *name, const H5L_info_t *linfo, void *opdata)
 #if  defined  (HAVE_LIBHDF5)
 void get_global_att(hid_t file_id, int vlistID)
 {
-  H5O_info_t oinfo;           /* Object info */
   hid_t   attr, atype, atype_mem, obj_id, grp_id = -1;
   char attname[256];
   H5T_class_t  type_class;
   int attint;
   double attflt;
   int i, pos;
+  int num_attrs;
   char attstring[4096];     /* Buffer to read string attribute back */
 
   attstring[0] = 0;
-  obj_id = file_id;
 
-  H5Oget_info(obj_id, &oinfo);
-  if ( oinfo.num_attrs == 0 )
+  obj_id = H5Gopen(file_id, "/");
+
+  num_attrs = H5Aget_num_attrs(obj_id);
+  if ( num_attrs == 0 )
     {
-      grp_id = H5Gopen2(obj_id, "Metadata", H5P_DEFAULT);
+      grp_id = H5Gopen(obj_id, "Metadata");
 
       if ( grp_id < 0 ) return;
 
       obj_id = grp_id;
 
-      H5Oget_info(obj_id, &oinfo);
+      num_attrs = H5Aget_num_attrs(obj_id);
     }
 
-  for( i = 0; i < (int)oinfo.num_attrs; i++ )
+  for( i = 0; i < num_attrs; i++ )
     {
-      attr = H5Aopen_by_idx(obj_id, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
-			    (hsize_t)i, H5P_DEFAULT, H5P_DEFAULT);
+      attr = H5Aopen_idx(obj_id, i);
       atype = H5Aget_type(attr);
       H5Aget_name(attr, sizeof(attname), attname);
 
@@ -470,28 +518,24 @@ void get_global_att(hid_t file_id, int vlistID)
       for ( pos = 0; pos < (int)strlen(attname); ++pos )
 	if ( attname[pos] == '&' ) attname[pos] = '_';
 
+      atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
       type_class = H5Tget_class(atype);
       if ( type_class == H5T_STRING )
 	{
-	  atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
 	  H5Aread(attr, atype_mem, attstring);
-	  H5Tclose(atype_mem);
 	  vlistDefAttTxt(vlistID, CDI_GLOBAL, attname, (int)strlen(attstring), attstring);
 	} 
       else if ( type_class == H5T_INTEGER )
 	{
-	  atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
 	  H5Aread(attr, H5T_NATIVE_INT, &attint);
-	  H5Tclose(atype_mem);
 	  vlistDefAttInt(vlistID, CDI_GLOBAL, attname, 1, &attint);
 	} 
       else if ( type_class == H5T_FLOAT )
 	{
-	  atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
 	  H5Aread(attr, H5T_NATIVE_DOUBLE, &attflt);
-	  H5Tclose(atype_mem);
 	  vlistDefAttFlt(vlistID, CDI_GLOBAL, attname, 1, &attflt);
 	} 
+      H5Tclose(atype_mem);
       H5Aclose(attr);
       H5Tclose(atype);
     }
@@ -552,7 +596,7 @@ void *Importcmsaf(void *argument)
 
   /* cmsaf_type = get_cmsaf_type(file_id); */
 
-  H5Literate(file_id, H5_INDEX_NAME, H5_ITER_INC, NULL, file_info, (void *) &dsets);
+  H5Giterate(file_id, "/", NULL, obj_info, (void *) &dsets);
 
   if ( dsets.nsets == 0 ) cdoAbort("No dataset found!");
 
@@ -655,11 +699,11 @@ void *Importcmsaf(void *argument)
 	  if ( cdoVerbose )
 	    cdoPrint(" Write var %d,  level %d, nmiss %d, missval %g, minval %g, maxval %g",
 		 varID, levelID, nmiss, missval, minval, maxval);
-
+	  /*
 	  if ( ! (missval < minval || missval > maxval) )
 	    cdoWarning(" Missval is inside of valid values! Name: %s  Range: %g - %g  Missval: %g\n",
 		       dsets.obj[ivar].name, minval, maxval, missval);
-
+	  */
 	  streamDefRecord(streamID,  varID,  levelID);
 	  streamWriteRecord(streamID, array, nmiss);
 	}
