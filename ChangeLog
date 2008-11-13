@@ -1,4 +1,4 @@
-2008-11-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2008-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.2.1
 	* New operator: import_cmsaf - import CM-SAF files

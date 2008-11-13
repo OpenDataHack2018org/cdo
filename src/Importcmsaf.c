@@ -137,7 +137,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   }
   */
   native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
-  if      ( H5Tequal(native_type, H5T_NATIVE_CHAR)   > 0 ) {ftype=0; dtype = DATATYPE_INT8;}
+  if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0; dtype = DATATYPE_INT8;}
   else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0; dtype = DATATYPE_UINT8;}
   else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0; dtype = DATATYPE_INT16;}
   else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0; dtype = DATATYPE_UINT16;}
