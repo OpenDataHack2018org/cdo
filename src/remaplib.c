@@ -1587,11 +1587,14 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
 	      cross_product_last = cross_product;
 	      */
-	      scross = cross_product < 0 ? -1 : 1;
+	      /* scross = cross_product < 0 ? -1 : 1; */
+	      scross = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
 
 	      if ( n == 0 ) scross_last = scross;
 
-	      if ( scross*scross_last < 0 ) break;
+	      if ( (scross < 0 && scross_last >= 0) || (scross > 0 && scross_last < 0) )
+		break;
+	      /* if ( scross*scross_last < 0 ) break; */
 
 	      scross_last = scross;
 	    } /* corner_loop */
@@ -2827,7 +2830,6 @@ void pole_intersection(int *location,
      Search for location of this segment in ocean grid using cross
      product method to determine whether a point is enclosed by a cell
   */
-
   while ( TRUE ) /* srch_loop */
     {
       /* If last segment crossed threshold, use that location */

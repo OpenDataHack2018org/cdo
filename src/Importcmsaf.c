@@ -433,14 +433,13 @@ static herr_t
 obj_info(hid_t loc_id, const char *name, void *opdata)
 {
   H5G_obj_t obj_type;
-  hbool_t follow_link = 0;
   H5G_stat_t statbuf;
 
   /* avoid compiler warnings */
   loc_id = loc_id;
   opdata = opdata;
 
-  H5Gget_objinfo(loc_id, name, follow_link, &statbuf);
+  H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
 
   obj_type = statbuf.type;
 

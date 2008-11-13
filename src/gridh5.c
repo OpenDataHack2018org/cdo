@@ -29,35 +29,52 @@ void nce(int istat)
 #endif
 
 
-/*
- * Operator function.
- */
+#if  defined  (HAVE_LIBHDF5)
+static herr_t
+obj_info(hid_t loc_id, const char *name, void *objname)
+{
+  H5G_obj_t obj_type;
+  H5G_stat_t statbuf;
+  herr_t lexist = 0;
+
+  H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
+
+  if ( strcmp(name, (char *) objname) == 0 )
+    {
+      lexist = 1;
+
+      obj_type = statbuf.type;
+
+      switch (obj_type) {
+      case H5G_GROUP:
+	if ( cdoVerbose ) cdoPrint(" Object with name %s is a group", name);
+	break;
+      case H5G_DATASET: 
+	if ( cdoVerbose ) cdoPrint(" Object with name %s is a dataset", name);
+	break;
+      case H5G_TYPE: 
+	if ( cdoVerbose ) cdoPrint(" Object with name %s is a named datatype", name);
+	break;
+      default:
+	/*cdoAbort(" Unable to identify an object %s", name);*/
+	break;
+      }
+  }
+
+  return lexist;
+}
+#endif
+
+
 #if  defined  (HAVE_LIBHDF5)
 static
-herr_t file_info(hid_t loc_id, const char *name, void *opdata)
+int h5find_object(hid_t file_id, char *name)
 {
-    H5G_stat_t statbuf;
+  int lexist = 0;
 
-    /*
-     * Get type of the object and display its name and type.
-     * The name of the object is passed to this function by 
-     * the Library. Some magic :-)
-     */
-    H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
-    switch (statbuf.type) {
-    case H5G_GROUP: 
-         printf(" Object with name %s is a group \n", name);
-         break;
-    case H5G_DATASET: 
-         printf(" Object with name %s is a dataset \n", name);
-         break;
-    case H5G_TYPE: 
-         printf(" Object with name %s is a named datatype \n", name);
-         break;
-    default:
-         printf(" Unable to identify an object ");
-    }
-    return 0;
+  lexist = (int) H5Giterate(file_id, "/", NULL, obj_info, (void *) name);
+
+  return lexist;
 }
 #endif
 
@@ -68,8 +85,8 @@ int gridFromH5file(const char *gridfile)
   int gridID = -1;
 #if  defined  (HAVE_LIBHDF5)
   hid_t	  file_id;	/* HDF5 File ID	        	*/
-  hid_t	  lon_id;	/* Dataset ID	        	*/
-  hid_t	  lat_id;	/* Dataset ID	        	*/
+  hid_t	  lon_id = -1;	/* Dataset ID	        	*/
+  hid_t	  lat_id = -1;	/* Dataset ID	        	*/
   hid_t   dataspace;   
   hsize_t dims_out[9];  /* dataset dimensions           */
   herr_t  status;	/* Generic return value		*/
@@ -82,17 +99,17 @@ int gridFromH5file(const char *gridfile)
   /* Open an existing file. */
   file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  /* H5Giterate(file_id, "/", NULL, file_info, NULL); */
-
-  /* Open an existing dataset. */
-  lon_id = H5Dopen(file_id, "/lon");
-  if ( lon_id >= 0 )
-    lat_id = H5Dopen(file_id, "/lat");
-  else
+  if ( h5find_object(file_id, "lon") > 0 && 
+       h5find_object(file_id, "lat") > 0 )
+    {
+      lon_id = H5Dopen(file_id, "/lon");
+      lat_id = H5Dopen(file_id, "/lat");
+    }
+  else if ( h5find_object(file_id, "Longitude") > 0 && 
+	    h5find_object(file_id, "Latitude") > 0 )
     {
       lon_id = H5Dopen(file_id, "/Longitude");
-      if ( lon_id >= 0 )
-	lat_id = H5Dopen(file_id, "/Latitude");
+      lat_id = H5Dopen(file_id, "/Latitude");
     }
   
   if ( lon_id >= 0 && lat_id >= 0 )
@@ -132,7 +149,7 @@ int gridFromH5file(const char *gridfile)
 
       gridID = gridDefine(grid);
     }
-  else
+  else  if ( h5find_object(file_id, "where") > 0 )
     {
       double xscale = 1, yscale = 1;
       double xoffset = 0, yoffset = 0;
