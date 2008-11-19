@@ -26,6 +26,7 @@ typedef struct {
   int nx;
   int ny;
   int nz;
+  int nt;
   int gridsize;
   int lscale;
   int loffset;
@@ -39,6 +40,7 @@ DSET_OBJ;
 
 typedef struct {
   int nsets;
+  int lgeoloc;
   DSET_OBJ obj[MAX_DSETS];
 }
 DSETS;
@@ -76,6 +78,111 @@ void print_filter(hid_t dset_id, char *varname)
 
 #if  defined  (HAVE_LIBHDF5)
 static
+int read_geolocation(hid_t loc_id, int nx, int ny)
+{
+  static char func[] = "read_geolocation";
+  int gridID = -1;
+  hid_t grp_id;
+  hid_t proj_id, region_id;
+  hid_t proj_tid, region_tid;
+  hid_t str_tid, fltarr_tid;
+  herr_t     status;
+  hsize_t dims;
+  int xsize, ysize;
+  typedef struct proj_t {
+    char name[64];
+    char ellipsoid[64];
+    float  parameter[10];
+  } proj_t;
+  typedef struct region_t {
+    float  xmin;
+    float  xmax;
+    float  ymin;
+    float  ymax;
+    float  dx;
+    float  dy;
+  } region_t;
+
+  proj_t proj;
+  region_t region;
+
+  if ( cdoVerbose ) cdoPrint("Read geolocation:");
+
+  str_tid = H5Tcopy(H5T_C_S1);
+  H5Tset_size(str_tid, 64);
+  dims = 10;
+  fltarr_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, &dims, NULL);
+
+  proj_tid = H5Tcreate(H5T_COMPOUND, sizeof(proj_t));
+  H5Tinsert(proj_tid, "Projetion name", HOFFSET(proj_t, name), str_tid);
+  H5Tinsert(proj_tid, "Reference ellipsoid", HOFFSET(proj_t, ellipsoid), str_tid);
+  H5Tinsert(proj_tid, "Projection parameter", HOFFSET(proj_t, parameter), fltarr_tid);
+
+  grp_id = H5Gopen(loc_id, "Geolocation");
+
+  proj_id = H5Dopen(grp_id, "Projection");
+
+  status = H5Dread(proj_id, proj_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &proj);
+
+  H5Dclose(proj_id);
+  H5Tclose(proj_tid);
+  H5Tclose(str_tid);
+  H5Tclose(fltarr_tid);
+
+  if ( cdoVerbose )
+    cdoPrint("  Projection: name=%s ellipsoid=%s parameter=%g %g %g %g",  
+	     proj.name, proj.ellipsoid, 
+	     proj.parameter[0], proj.parameter[1], proj.parameter[2], proj.parameter[3]);
+
+  region_tid = H5Tcreate(H5T_COMPOUND, sizeof(region_t));
+  H5Tinsert(region_tid, "xmin", HOFFSET(region_t, xmin), H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "xmax", HOFFSET(region_t, xmax), H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "ymin", HOFFSET(region_t, ymin), H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "ymax", HOFFSET(region_t, ymax), H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "dx",   HOFFSET(region_t, dx),   H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "dy",   HOFFSET(region_t, dy),   H5T_NATIVE_FLOAT);
+
+  region_id = H5Dopen(grp_id, "Region");
+
+  status = H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
+
+  H5Dclose(region_id);
+  H5Tclose(region_tid);
+
+  if ( cdoVerbose ) 
+    cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
+	     region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy);
+
+  H5Gclose(grp_id);
+
+  /* check region */
+  xsize = NINT((region.xmax-region.xmin)/region.dx);
+  ysize = NINT((region.ymax-region.ymin)/region.dy);
+
+  if ( cdoVerbose ) cdoPrint("  Size: xsize=%d  ysize=%d", xsize, ysize);
+
+  if ( nx == xsize && ny == ysize && 
+       strcmp(proj.name, "sinusoidal") == 0 && 
+       strcmp(proj.ellipsoid, "WGS-84") == 0 )
+    {
+      gridID = gridCreate(GRID_GENERIC, nx*ny);
+      gridDefXsize(gridID, nx);
+      gridDefYsize(gridID, ny);
+    }
+  else
+    {
+      gridID = gridCreate(GRID_GENERIC, nx*ny);
+      gridDefXsize(gridID, nx);
+      gridDefYsize(gridID, ny);
+    }
+
+  return (gridID);
+}
+#endif
+
+
+#if  defined  (HAVE_LIBHDF5)
+static
 void read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
   static char func[] = "read_dataset";
@@ -90,7 +197,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   H5T_class_t  type_class;
   H5T_class_t atype_class;
   int     rank;
-  int nx, ny, nz;
+  int nx = 0, ny = 0, nz = 0, nt = 0;
   int gridsize, offset;
   double *array;
   double addoffset = 0, scalefactor = 1, missval = cdiInqMissval();
@@ -155,15 +262,27 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   dataspace = H5Dget_space(dset_id);    /* dataspace handle */
   rank      = H5Sget_simple_extent_ndims(dataspace);
   status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
-  if ( rank != 2 )
+
+  if ( rank == 2 )
     {
-      cdoWarning("Dataset %s skipped, unsupported rank (=%d)!", rank);
+      nx = dims_out[1];
+      ny = dims_out[0];
+      nz = 1;
+      nt = 1;
+    }
+  else if ( rank == 3 )
+    {
+      nx = dims_out[2];
+      ny = dims_out[1];
+      nz = 1;
+      nt = dims_out[0];
+    }
+  else
+    {
+      cdoWarning("Dataset %s skipped, unsupported rank (=%d)!", varname, rank);
       goto RETURN;
     }
 
-  nx = dims_out[1];
-  ny = dims_out[0];
-  nz = 1;
 
   len = (int) strlen(varname);
   if ( isdigit(varname[len-1]) )
@@ -283,12 +402,12 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       
       offset = gridsize*(nz-1);
       array  = ((DSETS *) opdata)->obj[nset].array;
-      array  = (double *) realloc(array, gridsize*nz*sizeof(double));
+      array  = (double *) realloc(array, gridsize*nz*nt*sizeof(double));
       ((DSETS *) opdata)->obj[nset].array    = array;
       array  = array+offset;
 
-      mask = (short *) malloc(gridsize*sizeof(short));
-      memset(mask, 0, gridsize*sizeof(short));
+      mask = (short *) malloc(gridsize*nt*sizeof(short));
+      memset(mask, 0, gridsize*nt*sizeof(short));
 
       if ( ftype )
 	{
@@ -297,9 +416,9 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       else
 	{
 	  int *iarray, i;
-	  iarray = (int *) malloc(gridsize*sizeof(int));
+	  iarray = (int *) malloc(gridsize*nt*sizeof(int));
 	  status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
-	  for ( i = 0; i < gridsize; ++i ) array[i] = iarray[i];
+	  for ( i = 0; i < gridsize*nt; ++i ) array[i] = iarray[i];
 	  free(iarray);
 	}
 
@@ -307,6 +426,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((DSETS *) opdata)->obj[nset].nx       = nx;
       ((DSETS *) opdata)->obj[nset].ny       = ny;
       ((DSETS *) opdata)->obj[nset].nz       = nz;
+      ((DSETS *) opdata)->obj[nset].nt       = nt;
       ((DSETS *) opdata)->obj[nset].gridsize = gridsize;
 
       ((DSETS *) opdata)->obj[nset].dtype    = dtype;
@@ -450,6 +570,10 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
       {
 	H5Giterate(loc_id, name, NULL, obj_info, opdata);
       }
+    else if ( strcmp(name, "Geolocation") == 0 )
+      {
+	((DSETS *) opdata)->lgeoloc = TRUE;
+      }
     break;
   case H5G_DATASET: 
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a dataset", name);
@@ -550,6 +674,7 @@ void dsets_init(DSETS *dsets)
   int i;
 
   dsets->nsets = 0;
+  dsets->lgeoloc = 0;
 
   for ( i = 0; i < MAX_DSETS; ++i )
     {
@@ -578,8 +703,8 @@ void *Importcmsaf(void *argument)
   int i, offset;
   int nmiss;
   int ivar;
-  int varID, levelID;
-  int nx, ny, nz, gridsize;
+  int varID, levelID, tsID;
+  int nx, ny, nz, nt, gridsize;
   double *array;
   double missval, minval, maxval;
   hid_t	  file_id;	/* HDF5 File ID	        	*/
@@ -603,6 +728,7 @@ void *Importcmsaf(void *argument)
   nx = dsets.obj[0].nx;
   ny = dsets.obj[0].ny;
   nz = dsets.obj[0].nz;
+  nt = dsets.obj[0].nt;
 
   if ( cdoVerbose )
     for ( ivar = 0; ivar < dsets.nsets; ++ivar )
@@ -616,9 +742,16 @@ void *Importcmsaf(void *argument)
 	cdoAbort("Number of levels must not change!");
     }
 
-  gridID = gridCreate(GRID_GENERIC, gridsize);
-  gridDefXsize(gridID, nx);
-  gridDefYsize(gridID, ny);
+  if ( dsets.lgeoloc )
+    {
+      gridID = read_geolocation(file_id, nx, ny);
+    }
+  else
+    {
+      gridID = gridCreate(GRID_GENERIC, gridsize);
+      gridDefXsize(gridID, nx);
+      gridDefYsize(gridID, ny);
+    }
 
   if ( nz == 1 )
     zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
@@ -639,7 +772,11 @@ void *Importcmsaf(void *argument)
 
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+      if ( dsets.obj[ivar].nt > 1 ) 
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+      else
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+
       vlistDefVarName(vlistID, varID,  dsets.obj[ivar].name);
       if ( dsets.obj[ivar].description )
 	vlistDefVarLongname(vlistID, varID,  dsets.obj[ivar].description);
@@ -665,46 +802,52 @@ void *Importcmsaf(void *argument)
 
   streamDefVlist(streamID, vlistID);
 
-  streamDefTimestep(streamID, 0);
-
-  for ( ivar = 0; ivar < dsets.nsets; ++ivar )
+  for ( tsID = 0; tsID < nt; ++tsID )
     {
-      varID   = ivar;
+      taxisDefVdate(taxisID, 0);
+      taxisDefVtime(taxisID, tsID*100);
+      streamDefTimestep(streamID, tsID);
 
-      gridsize = dsets.obj[ivar].gridsize;
-      missval  = dsets.obj[ivar].missval;
-
-      for ( levelID = 0; levelID < nz; ++levelID )
+      for ( ivar = 0; ivar < dsets.nsets; ++ivar )
 	{
-	  offset = gridsize*levelID;
-	  array  = dsets.obj[ivar].array+offset;
+	  varID   = ivar;
+	  
+	  gridsize = dsets.obj[ivar].gridsize;
+	  missval  = dsets.obj[ivar].missval;
 
-	  nmiss  = 0;
-	  minval =  1e35;
-	  maxval = -1e35;
-
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( levelID = 0; levelID < nz; ++levelID )
 	    {
-	      if ( !DBL_IS_EQUAL(array[i], missval) )
+	      offset = gridsize*levelID;
+	      if ( nz == 1 ) offset = gridsize*tsID;
+	      array  = dsets.obj[ivar].array+offset;
+	      
+	      nmiss  = 0;
+	      minval =  1e35;
+	      maxval = -1e35;
+
+	      for ( i = 0; i < gridsize; i++ )
 		{
-		  if ( array[i] < minval ) minval = array[i];
-		  if ( array[i] > maxval ) maxval = array[i];
+		  if ( !DBL_IS_EQUAL(array[i], missval) )
+		    {
+		      if ( array[i] < minval ) minval = array[i];
+		      if ( array[i] > maxval ) maxval = array[i];
+		    }
 		}
+
+	      for ( i = 0; i < gridsize; i++ )
+		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
+
+	      if ( cdoVerbose )
+		cdoPrint(" Write var %d,  level %d, nmiss %d, missval %g, minval %g, maxval %g",
+			 varID, levelID, nmiss, missval, minval, maxval);
+	      /*
+		if ( ! (missval < minval || missval > maxval) )
+		cdoWarning(" Missval is inside of valid values! Name: %s  Range: %g - %g  Missval: %g\n",
+		dsets.obj[ivar].name, minval, maxval, missval);
+	      */
+	      streamDefRecord(streamID,  varID,  levelID);
+	      streamWriteRecord(streamID, array, nmiss);
 	    }
-
-	  for ( i = 0; i < gridsize; i++ )
-	    if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
-
-	  if ( cdoVerbose )
-	    cdoPrint(" Write var %d,  level %d, nmiss %d, missval %g, minval %g, maxval %g",
-		 varID, levelID, nmiss, missval, minval, maxval);
-	  /*
-	  if ( ! (missval < minval || missval > maxval) )
-	    cdoWarning(" Missval is inside of valid values! Name: %s  Range: %g - %g  Missval: %g\n",
-		       dsets.obj[ivar].name, minval, maxval, missval);
-	  */
-	  streamDefRecord(streamID,  varID,  levelID);
-	  streamWriteRecord(streamID, array, nmiss);
 	}
     }
 

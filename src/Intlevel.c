@@ -170,6 +170,7 @@ void *Intlevel(void *argument)
   int tsID, varID, levelID;
   int nvars;
   int nzaxis;
+  int nmiss;
   int zaxisID1 = -1, zaxisID2;
   int gridID, zaxisID;
   int nlev1, nlev2, nlevel = 0, maxlev;
@@ -360,6 +361,17 @@ void *Intlevel(void *argument)
 
 	      interp_lev(gridsize, missval, vardata1[varID], vardata2[varID],
 			 nlev2, lev_idx1, lev_idx2, lev_wgt1, lev_wgt2);
+
+	      for ( levelID = 0; levelID < nlev2; levelID++ )
+		{
+		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		  offset   = gridsize*levelID;
+		  single2  = vardata2[varID] + offset;
+		  nmiss    = 0;
+		  for ( i = 0; i < gridsize; ++i )
+		    if ( DBL_IS_EQUAL(single2[i], missval) ) nmiss++;
+		  varnmiss[varID][levelID] = nmiss;
+		}
 	    }
 	}
 

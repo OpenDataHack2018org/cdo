@@ -1,3 +1,10 @@
+2008-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>\
+	
+	* using CDI library version 1.2.2
+	* import_cmsaf: add support for monthly mean diurnal variation
+	* intlevel: bug fix for datasets with missing values
+	* Version 1.2.2 released
+
 2008-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.2.1
