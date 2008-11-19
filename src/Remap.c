@@ -66,6 +66,8 @@ void *Remap(void *argument)
   int map_type = -1;
   int max_remaps = 0;
   int remap_test = 0;
+  int remap_order = 1;
+  int need_gradiants = FALSE;
   int remap_non_global = 0;
   int non_global;
   int lgridboxinfo = TRUE;
@@ -124,6 +126,22 @@ void *Remap(void *argument)
 	  remap_set_max_iter(remap_max_iter);
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_MAX_ITER to %d", remap_max_iter);
+	}
+    }
+
+  envstr = getenv("REMAP_ORDER");
+  if ( envstr )
+    {
+      int ival;
+      ival = atoi(envstr);
+      if ( ival > 0 )
+	{
+	  remap_order = ival;
+	  if ( remap_order == 0 ) remap_order = 1;
+	  if ( remap_order != 1 && remap_order != 2 )
+	    cdoAbort("REMAP_ORDER must be 1 or 2");
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_ORDER to %d", remap_order);
 	}
     }
 
@@ -380,7 +398,16 @@ void *Remap(void *argument)
 
   grid1sizemax = vlistGridsizeMax(vlistID1);
 
-  if ( map_type == MAP_TYPE_BICUBIC )
+  if ( map_type == MAP_TYPE_BICUBIC ) need_gradiants = TRUE;
+  if ( map_type == MAP_TYPE_CONSERV && remap_order == 2 )
+    {
+      cdoPrint("Second order remapping");
+      need_gradiants = TRUE;
+    }
+  else
+    remap_order = 1;
+
+  if ( need_gradiants )
     {
       grad1_lat    = (double *) malloc(grid1sizemax*sizeof(double));
       grad1_lon    = (double *) malloc(grid1sizemax*sizeof(double));
@@ -449,7 +476,7 @@ void *Remap(void *argument)
 		  array1 = (double *) realloc(array1, grid1sizemax*sizeof(double));
 		  imask  = (int *) realloc(imask, grid1sizemax*sizeof(int));
 
-		  if ( map_type == MAP_TYPE_BICUBIC )
+		  if ( need_gradiants )
 		    {
 		      grad1_lat    = (double *) realloc(grad1_lat, grid1sizemax*sizeof(double));
 		      grad1_lon    = (double *) realloc(grad1_lon, grid1sizemax*sizeof(double));
@@ -587,8 +614,13 @@ void *Remap(void *argument)
 		if ( remaps[r].grid.grid1_vgpm[i] ) array1[j++] = array1[i];
 	    }
 	  
-	  if ( map_type == MAP_TYPE_BICUBIC )
-	    remap_gradients(remaps[r].grid, array1, grad1_lat, grad1_lon, grad1_latlon);
+	  if ( need_gradiants )
+	    {
+	      if ( remaps[r].grid.grid1_rank != 2 && remap_order == 2 )
+		cdoAbort("Second order remapping is only available for 2D grids!");
+
+	      remap_gradients(remaps[r].grid, array1, grad1_lat, grad1_lon, grad1_latlon);
+	    }
 
 	  if ( operfunc == REMAPCON1 )
 	    remap_con1(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
@@ -651,7 +683,8 @@ void *Remap(void *argument)
 	      }
 
 	  /* calculate some statistics */
-	  if ( cdoVerbose ) remap_stat(remaps[r].grid, remaps[r].vars, array1, array2, missval);
+	  if ( cdoVerbose )
+	    remap_stat(remap_order, remaps[r].grid, remaps[r].vars, array1, array2, missval);
 
 	  if ( gridInqType(gridID2) == GRID_GME )
 	    {

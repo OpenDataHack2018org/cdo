@@ -4633,7 +4633,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 /*****************************************************************************/
 
-void remap_stat(REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval)
+void remap_stat(int remap_order, REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval)
 {
   static char func[] = "remap_stat";
   int n, ns, i;
@@ -4641,7 +4641,10 @@ void remap_stat(REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, doub
   int *grid2_count;
   double minval, maxval, sum;
 	  
-  cdoPrint("First order mapping from grid1 to grid2:");
+  if ( remap_order == 2 )
+    cdoPrint("Second order mapping from grid1 to grid2:");
+  else
+    cdoPrint("First order mapping from grid1 to grid2:");
   cdoPrint("----------------------------------------");
 
   ns = 0;
@@ -4760,14 +4763,14 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
   int n, nx, ny, grid1_size;
   int i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
   double delew, delns;
-  double *grad1_lat_zero, *grad1_lon_zero;
+  double grad1_lat_zero, grad1_lon_zero;
+
+  if ( rg.grid1_rank != 2 )
+    cdoAbort("Internal problem (remap_gradients)! Grid1 rank = %d\n", rg.grid1_rank);
 
   grid1_size = rg.grid1_size;
   nx = rg.grid1_dims[0];
   ny = rg.grid1_dims[1];
-
-  grad1_lat_zero = (double *) malloc(grid1_size*sizeof(double));
-  grad1_lon_zero = (double *) malloc(grid1_size*sizeof(double));
 
   for ( n = 0; n < grid1_size; n++ )
     {
@@ -4895,7 +4898,7 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 		}
 	    }
 
-	  grad1_lat_zero[n] = delew*(array[ine] - array[inw]);
+	  grad1_lat_zero = delew*(array[ine] - array[inw]);
 
 	  if ( ! rg.grid1_mask[ise] )
 	    {
@@ -4943,15 +4946,11 @@ void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 		}
 	    }
 
-	  grad1_lon_zero[n] = delew*(array[ise] - array[isw]);
+	  grad1_lon_zero = delew*(array[ise] - array[isw]);
 
-	  grad1_latlon[n] = delns*(grad1_lat_zero[n] - grad1_lon_zero[n]);
+	  grad1_latlon[n] = delns*(grad1_lat_zero - grad1_lon_zero);
 	}
     }
-
-  free(grad1_lat_zero);
-  free(grad1_lon_zero);
-
 } /* remap_gradients */
 
 /*****************************************************************************/

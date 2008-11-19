@@ -135,7 +135,7 @@ void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv);
 
 void resize_remap_vars(REMAPVARS *rv, int increment);
 
-void remap_stat(REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval);
+void remap_stat(int remap_order, REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval);
 void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
 		     double *grad1_lon, double *grad1_latlon);
 
