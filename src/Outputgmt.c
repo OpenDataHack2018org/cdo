@@ -35,6 +35,7 @@
 #endif
 
 #include <string.h>
+#include <math.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -42,6 +43,10 @@
 #include "pstream.h"
 #include "color.h"
 
+
+#ifndef PI
+#define PI M_PI
+#endif
 
 
 static int pnpoly(int npol, double *xp, double *yp, double x, double y)
@@ -59,7 +64,7 @@ static int pnpoly(int npol, double *xp, double *yp, double x, double y)
 }
 
 
-static double PolygonArea(int np, double *xp, double *yp)
+static double PolygonArea_old(int np, double *xp, double *yp)
 {
    int i, j;
    double area = 0;
@@ -77,7 +82,343 @@ static double PolygonArea(int np, double *xp, double *yp)
 }
 
 
+static double PolygonArea(int np, double *xp, double *yp, double yc)
+{
+   int i, j;
+   double area = 0.;
+
+   /*Process area in Radians*/
+   for ( i = 0; i < np; i++ )
+       { xp[i] *= PI/180.; yp[i] *= PI/180.; }
+   yc *= PI/180.;
+   
+   for ( i = 0; i < np; i++ )
+     {
+       j = (i + 1) % np;
+       area += xp[i] * yp[j];
+       area -= yp[i] * xp[j];
+     }
+   area *= 0.5 * cos(yc);
+   return (area);
+}
+
+int ccw(double p0x, double p0y, double p1x, double p1y, double p2x, double p2y)
+{
+    /*
+     This function says wether the point are orientated clockwise
+     +1 psitive orientation
+     -1 negative orientation
+     0 points are on a line --> no orientation
+     
+     This is done by a comparision of the gradient of
+     dy1/dx1 = p1 - p0 vs.
+     dy2/dx2 = p2 - p0
+     To avoid singularities at dx1=0 OR dx2 = 0 we multiply with
+     dx1*dx2
+     */
+    double dx1, dx2, dy1, dy2;
+    dx1 = p1x - p0x; dy1 = p1y - p0y;
+    dx2 = p2x - p0x; dy2 = p2y - p0y;
+    if ( dx1*dy2 > dy1*dx2 ) return +1;
+    if ( dx1*dy2 < dy1*dx2 ) return -1;
+    if ( (dx1*dx2 < 0 ) || (dy1*dy2 < 0)) return -1;
+    if ( (dx1*dx1 + dy1*dy1) < (dx2*dx2 + dy2*dy2)) return +1;
+    return 0;
+}
+
+int intersect(double pix, double piy, double pjx, double pjy,
+              double pkx, double pky, double plx, double ply)
+{
+    /*This function returns if there is an intersection between the lines 
+        line1 between pi and pj and
+        line2 between pk and pl,
+      whereas pi = (pix, piy).
+      
+      This can done by means of ccw since the product of ccw(pi,pj,pk)*ccw(pi,pj,pl)
+      shows if pk and pl are on different or the same side(s) of the line1 (They must
+		  have different signums to be on different sides).
+      
+      Consequently if and ONLY IF pk as well as pl are on different sides of line1
+      AND pi as well as pj are on different sides of line2 there HAS TO be an intersection.
+    */
+    
+    return ( ( ccw(pix, piy, pjx, pjy, pkx, pky) *
+               ccw(pix, piy, pjx, pjy, plx, ply) <= 0 ) &&
+             ( ccw(pkx, pky, plx, ply, pix, piy) *
+               ccw(pkx, pky, plx, ply, pjx, pjy) <= 0 ) );
+}
+
+#ifndef MAX_CORNERS 
+#define MAX_CORNERS 8+1
+#endif
 void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
+		double *grid_center_lon, double *grid_center_lat,
+		double *grid_corner_lon, double *grid_corner_lat)
+{
+  int i0, i, j, k, l;
+  int l0;
+  int nout;
+  int isinside, convex, alone, isnegative;
+  int cuts[MAX_CORNERS][MAX_CORNERS];  
+  int alone_cell[gridsize*ncorner];          
+  int check_corners;
+  double lon, lat = 0;
+  double lon_bounds[MAX_CORNERS], lat_bounds[MAX_CORNERS];
+  double area, sumarea;
+	
+  check_corners = 0; // don't execute corner checking (last loop)
+  nout = 0;
+  sumarea = 0;
+  
+  /* Check if center is inside bounds of cell */
+#if defined (SX)  
+#pragma vdir nodep
+#endif  
+  for ( i = 0; i < gridsize; ++i )
+    {
+      lon = grid_center_lon[i];
+      lat = grid_center_lat[i];
+#if defined (SX)  
+#pragma vdir nodep
+#endif  
+      for ( k = 0; k < ncorner; ++k )
+        {
+          lon_bounds[k] = grid_corner_lon[i*ncorner+k];
+          lat_bounds[k] = grid_corner_lat[i*ncorner+k];
+          if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
+          if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
+        }      
+      lon_bounds[ncorner] = lon_bounds[0];
+      lat_bounds[ncorner] = lat_bounds[0];
+      
+      isinside = pnpoly(ncorner+1, lon_bounds, lat_bounds, lon, lat);
+
+      if ( !isinside ) nout++;
+      if ( !isinside && cdoVerbose )
+        {
+          if ( nout == 1 )
+            {
+              fprintf(stdout,"\n CENTER IS OUT OF BOUNDS");
+              fprintf(stdout,"\n                                                  :");
+              for ( k = 0; k < ncorner; k++ )
+                fprintf(stdout, "            Corner %2i : ", k);
+              fprintf(stdout,"\n Number  Index  center_lon  center_lat  area*10^6 :");
+              for ( k = 0; k < ncorner; k++ )
+                fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
+              fprintf(stdout, "\n");
+            }
+          area = PolygonArea(ncorner+1,lon_bounds,lat_bounds,lat);
+          fprintf(stdout, " %6i %6i   %9.4f   %9.4f %10.5f :", 
+		  nout, i, lon, lat, area*pow(10,6));
+          for ( k = 0; k < ncorner; k++ )
+            fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
+          fprintf(stdout, "\n");
+          
+        }
+    }
+  if ( nout )
+    cdoWarning("%d of %d points out of bounds!", nout, gridsize);
+  
+  
+  /* check that all cell bounds have the same orientation */
+  
+  nout = 0;
+  for ( i = 0; i < gridsize; ++i )
+    {
+      lon = grid_center_lon[i];
+      lat = grid_center_lat[i];
+      
+      for ( k = 0; k < ncorner; ++k )
+	{
+          lon_bounds[k] = grid_corner_lon[i*ncorner+k];
+          lat_bounds[k] = grid_corner_lat[i*ncorner+k];
+          if ( (grid_center_lon[i] - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
+          if ( (lon_bounds[k] - grid_center_lon[i]) > 270 ) lon_bounds[k] -= 360;
+	}
+      lon_bounds[ncorner] = lon_bounds[0];
+      lat_bounds[ncorner] = lat_bounds[0];
+      
+      area = PolygonArea(ncorner+1, lon_bounds, lat_bounds, lat);
+      
+      isnegative = area < 0 ? 1 : 0;
+      sumarea += area < 0 ? -area : area;
+      
+      if ( isnegative ) nout++;
+      
+      if ( isnegative && cdoVerbose )
+        {
+          if ( nout == 1 )
+            {
+              fprintf(stdout,"\n                                       :");
+              for ( k = 0; k < ncorner; k++ )
+                fprintf(stdout, "            Corner %2i : ", k);
+              fprintf(stdout,"\n Number  Index  center_lon  center_lat :");
+              for ( k = 0; k < ncorner; k++ )
+                fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
+              fprintf(stdout, "\n");
+            }
+          fprintf(stdout, "%6i %6i   %9.4f   %9.4f :", nout, i, lon, lat);
+          for ( k = 0; k < ncorner; k++ )
+            fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
+          fprintf(stdout, "\n");
+        }
+    }
+  if ( nout )
+		cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
+  if ( cdoVerbose ) 
+    fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
+  if ( abs( 100.*(sumarea - 4.*PI)/4.*PI) > 0.1)
+    cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
+  
+  
+  
+  /* check that all cells are convex */
+  
+  
+  nout = 0;
+  for ( i0 = 0; i0 < gridsize; i0++ )
+    {
+      lon = grid_center_lon[i0];
+      for ( k = 0; k < ncorner; k++ )
+			  {
+			    lon_bounds[k] = grid_corner_lon[i0*ncorner+k];
+			    lat_bounds[k] = grid_corner_lat[i0*ncorner+k];
+			    /* Find cells that cover left and right border of the grid and adjust
+			       coordinates --> they become closed polygons on theta-phi plane! */
+			    if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360; 
+			    if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
+			  }
+      
+			/* Reset found cuts for the current cell before starting the search */
+      for ( i = 0; i < ncorner; i ++ )
+	for ( j = 0; j < ncorner; j++ )
+	  cuts[i][j] = 0;
+      
+      /* Loops cover all combinations between inner lines of the Polygon
+	 Check whether each inner line is cut by an other (inner) one at least once. 
+	 - Only if there is a cut every inner line the Polygon is convex
+	 - We assume: Points are in either cyclic or anticyclic order
+      */
+      for ( i = 0; i < ncorner-1; i++ )
+	{
+          /* j = i+2 excludes lines from one corner to an other (j=i+1) and
+	     from one point to itself (j=i)*/
+          for ( j = i+2 ; j < ncorner; j++ )
+	    {
+              /* Exclude the line between the last and first corner*/
+              if ( i == 0 && j == ncorner-1 ) continue;               
+	      /* k = i+1: if starting point is in common lines to different corners
+		 do not intersect */
+              for ( k = i+1; k < ncorner - 1; k++ )
+		{                  
+                  if ( i == k ) l0 = j+1;
+                  else l0 = k+2;
+                  for ( l = l0; l < ncorner; l++ )
+		    {
+                      if ( cuts[k][l] && cuts[i][j] ) continue;
+		      /* Exlude the line between the last and first corner 
+			 Exlude the line itself (l!=i, k!=j)
+			 Check if line ij and kl intersect each other.
+			 If so increment respective counters for intersections. 
+			 It is not relevant by which line a line is intersected - 
+			 it is only relevant if they is itersected! */
+                      if ( ! ( k==0 && l == ncorner-1 ) &&
+			   ( l != j ) && ( k != j )  )
+			{
+                          if ( intersect(lon_bounds[i], lat_bounds[i], lon_bounds[j], lat_bounds[j],
+                                         lon_bounds[k], lat_bounds[k], lon_bounds[l], lat_bounds[l] ) )
+			    {cuts[i][j]++; cuts[k][l]++; cuts[j][i]++; cuts[l][k]++;}                                                        
+			}
+		    }
+		}                  
+	    }
+	}
+      convex = 1;
+      /* The following loop covers all inner lines of the Polygon 
+	 (The assumption applies that the points are in cyclic order) */
+      for ( i = 0; i < ncorner-1; i++ )
+	for ( j = i+2; j < ncorner; j++)
+	  {
+	    if ( i == 0 && j == ncorner-1 ) continue;
+	    if ( ! cuts[i][j] ) convex = 0;
+	  }
+      if ( !convex ) nout++;        
+      if ( cdoVerbose && ( !convex ) )
+	{
+          if ( nout == 1 )
+	    {
+              fprintf(stdout,"\n NO CONVEX POLYGON");
+              fprintf(stdout,"\n                                       :");
+              for ( k = 0; k < ncorner; k++ )
+		fprintf(stdout, "            Corner %2i : ", k);
+              fprintf(stdout,"\n Number  Index  center_lon  center_lat :");
+              for ( k = 0; k < ncorner; k++ )
+		fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
+              fprintf(stdout, "\n");
+	    }
+          
+          fprintf(stdout, " %6i %6i   %9.4f   %9.4f :", nout, i0, lon, lat);
+          for ( k = 0; k < ncorner; k++ )
+	    fprintf(stdout, "  %9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
+          fprintf(stdout, "\n");         
+	}     
+		}
+  if ( nout )
+    cdoWarning("%d of %d cells are not Convex\n", nout, gridsize);
+  
+  if ( check_corners )
+    {
+      /* 
+	 Check if there is a corner at the same point of 
+	 an other cell foreach corner of each cell 
+      */
+      nout = 0;
+      for ( i = 0; i < gridsize*ncorner; i++ )
+	alone_cell[i] = 1;
+      
+      for ( i = 0; i < gridsize*ncorner; i++ )
+	{
+	  if ( ! alone_cell[i] ) continue;
+	  alone = 1;
+	  lon = grid_corner_lon[i];
+	  lat = grid_corner_lat[i];			
+	  for ( j = 0; j < gridsize*ncorner; j++ )
+	    if ( j != i && 
+		 DBL_IS_EQUAL(grid_corner_lat[j], lat) && 
+		 DBL_IS_EQUAL(grid_corner_lon[j], lon) )
+	      { alone = 0; alone_cell[i] = alone_cell[j] = 1; break; }
+	  if ( alone )
+	    {
+	      if      ( lon >= 180. ) lon -= 360.;
+	      else if ( lon  < 180. ) lon += 360.;
+	      for ( j = i+1; j < gridsize*ncorner; j++ )
+		if (j != i  && 
+		    DBL_IS_EQUAL(grid_corner_lat[j], lat) && 
+		    DBL_IS_EQUAL(grid_corner_lon[j], lon) )
+		  { alone = 0; alone_cell[i] = alone_cell[j] = 0; break; }
+	    }
+	  if ( alone )
+	    { 
+	      nout++;
+	      if ( cdoVerbose )
+		{
+	      if ( nout == 1 )
+		{
+		  fprintf(stdout,"\n VERTEX ALONE ON GRID\n");
+		  fprintf(stdout," number cell-Index  Vert-Index :        lon        lat\n");
+		}							
+	      fprintf(stdout, " %6i     %6i      %6i : %10.4f %10.4f\n", 
+		      nout, i/ncorner, i, grid_corner_lon[i], grid_corner_lat[i]);
+		}					
+	    }
+	}
+      if ( nout )
+	cdoWarning("%d of %d corners are lonely on the grid", nout, gridsize*ncorner);
+    }
+}
+
+
+void verify_grid_old(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
@@ -148,7 +489,7 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
       lon_bounds[ncorner] = lon_bounds[0];
       lat_bounds[ncorner] = lat_bounds[0];
 
-      area = PolygonArea(ncorner+1, lon_bounds, lat_bounds);
+      area = PolygonArea_old(ncorner+1, lon_bounds, lat_bounds);
 
       if ( area < 0 ) isnegative = 1;
       else            isnegative = 0;
