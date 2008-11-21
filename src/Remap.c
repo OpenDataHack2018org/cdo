@@ -276,6 +276,8 @@ void *Remap(void *argument)
 
   if ( operfunc == REMAPXXX )
     {
+      int gridsize2;
+
       read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &remaps[0].grid, &remaps[0].vars);
       nremaps = 1;
       gridsize = remaps[0].grid.grid1_size;
@@ -297,7 +299,7 @@ void *Remap(void *argument)
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_nvgp;
 
       if ( gridsize != remaps[0].gridsize )
-	cdoAbort("Size of data grid and weights from %s differ!", remap_file);
+	cdoAbort("Size of source grid and weights from %s differ!", remap_file);
 
       if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_size;
 
@@ -305,15 +307,25 @@ void *Remap(void *argument)
         if ( remaps[0].grid.grid1_mask[i] == FALSE )
           remaps[0].nmiss++;
 
+      gridsize2 = gridInqSize(gridID2);
       if ( gridInqType(gridID2) == GRID_GME )
 	{
 	  int gridID2_gme;
+	  int isize = 0;
 	  remaps[0].grid.grid2_nvgp = gridInqSize(gridID2);
 	  remaps[0].grid.grid2_vgpm = (int *) realloc(remaps[0].grid.grid2_vgpm,
 						      gridInqSize(gridID2)*sizeof(int));
 	  gridID2_gme = gridToCell(gridID2);
 	  gridInqMask(gridID2_gme, remaps[0].grid.grid2_vgpm);
+	  for ( i = 0; i < gridsize2; ++i )
+	    if ( remaps[0].grid.grid2_vgpm[i] ) isize++;
+	  gridsize2 = isize;
 	}
+      /*
+      printf("grid2 %d %d %d\n", gridsize2, remaps[0].grid.grid2_nvgp, remaps[0].grid.grid2_size);
+      */
+      if ( remaps[0].grid.grid2_size != gridsize2 )
+	cdoAbort("Size of target grid and weights from %s differ!", remap_file);
 
       if ( map_type == MAP_TYPE_CONSERV )
         {

@@ -269,7 +269,7 @@ void *Yseasstat(void *argument)
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
-		  if ( samp1[month][varID][levelID].ptr == NULL )
+		  if ( samp1[seas][varID][levelID].ptr == NULL )
 		    {
 		      if ( operfunc == func_std )
 			farcstd(&vars1[seas][varID][levelID], vars2[seas][varID][levelID], 1.0/nsets[seas]);
