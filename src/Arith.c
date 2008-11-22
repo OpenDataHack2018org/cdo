@@ -41,7 +41,7 @@ void *Arith(void *argument)
   static char func[] = "Arith";
   int operatorID;
   int operfunc;
-  enum {FILL_NONE, FILL_TS, FILL_REC, FILL_FILE};
+  enum {FILL_NONE, FILL_TS, FILL_REC, FILL_RECTS, FILL_FILE};
   int filltype = FILL_NONE;
   int streamIDx1, streamIDx2, streamID1, streamID2, streamID3;
   int gridsize;
@@ -49,6 +49,7 @@ void *Arith(void *argument)
   int tsID, tsID2;
   int varID, levelID;
   int offset;
+  int ntsteps1, ntsteps2;
   int vlistIDx1, vlistIDx2, vlistID1, vlistID2, vlistID3;
   int taxisIDx1, taxisID1, taxisID2, taxisID3;
   FIELD *fieldx1, *fieldx2, fieldrec, field1, field2;
@@ -87,15 +88,34 @@ void *Arith(void *argument)
   taxisID2 = vlistInqTaxis(vlistID2);
   taxisIDx1 = taxisID1;
 
+  ntsteps1 = vlistNtsteps(vlistID1);
+  ntsteps2 = vlistNtsteps(vlistID2);
+
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
-      filltype = FILL_REC;
-      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1));
+      if ( ntsteps1 != 1 && ntsteps1 != 0 && (ntsteps2 == 1 || ntsteps2 == 0) )
+	{
+	  filltype = FILL_REC;
+	  cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1));
+	}
+      else
+	{
+	  filltype = FILL_RECTS;
+	  cdoPrint("Filling up stream2 >%s< by copying the first record of each timestep.", cdoStreamName(1));
+	}
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
-      filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
+      if ( (ntsteps1 == 1 || ntsteps1 == 0) && ntsteps2 != 1 && ntsteps2 != 0 )
+	{
+	  filltype = FILL_REC;
+	  cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
+	}
+      else
+	{
+	  filltype = FILL_RECTS;
+	  cdoPrint("Filling up stream1 >%s< by copying the first record of each timestep.", cdoStreamName(0));
+	}
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
       vlistIDx1 = vlistID2;
@@ -120,23 +140,20 @@ void *Arith(void *argument)
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
   fieldrec.ptr = NULL;
   fieldrec.nmiss = 0;
-  if ( filltype == FILL_REC )
+  if ( filltype == FILL_REC || filltype == FILL_RECTS )
     fieldrec.ptr = (double *) malloc(gridsize*sizeof(double));
 
   if ( cdoVerbose )
-    cdoPrint("Number of timesteps: file1 %d, file2 %d",
-	     vlistNtsteps(vlistID1), vlistNtsteps(vlistID2));
+    cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
 
   if ( filltype == FILL_NONE )
     {
-      if ( vlistNtsteps(vlistID1) != 1 && vlistNtsteps(vlistID1) != 0 &&
-	  (vlistNtsteps(vlistID2) == 1 || vlistNtsteps(vlistID2) == 0) )
+      if ( ntsteps1 != 1 && ntsteps1 != 0 && (ntsteps2 == 1 || ntsteps2 == 0) )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
 	}
-      else if ( (vlistNtsteps(vlistID1) == 1 || vlistNtsteps(vlistID1) == 0) &&
-		 vlistNtsteps(vlistID2) != 1 && vlistNtsteps(vlistID2) != 0 )
+      else if ( (ntsteps1 == 1 || ntsteps1 == 0) && ntsteps2 != 1 && ntsteps2 != 0 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
@@ -184,7 +201,7 @@ void *Arith(void *argument)
   tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamIDx1, tsID)) )
     {
-      if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE )
+      if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_RECTS )
 	{
 	  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
 	  if ( nrecs2 == 0 )
@@ -226,9 +243,9 @@ void *Arith(void *argument)
 	  streamInqRecord(streamIDx1, &varID, &levelID);
 	  streamReadRecord(streamIDx1, fieldx1->ptr, &fieldx1->nmiss);
 
-	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE )
+	  if ( tsID == 0 || filltype == FILL_NONE || filltype == FILL_FILE || filltype == FILL_RECTS )
 	    {
-	      if ( recID == 0 || filltype != FILL_REC )
+	      if ( recID == 0 || (filltype != FILL_REC && filltype != FILL_RECTS) )
 		{
 		  streamInqRecord(streamIDx2, &varID, &levelID);
 		  streamReadRecord(streamIDx2, fieldx2->ptr, &fieldx2->nmiss);
@@ -241,7 +258,7 @@ void *Arith(void *argument)
 		  memcpy(vardata[varID]+offset, fieldx2->ptr, gridsize*sizeof(double));
 		  varnmiss[varID][levelID] = fieldx2->nmiss;
 		}
-	      else if ( recID == 0 && filltype == FILL_REC )
+	      else if ( recID == 0 && (filltype == FILL_REC || filltype == FILL_RECTS) )
 		{
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
 		  memcpy(fieldrec.ptr, fieldx2->ptr, gridsize*sizeof(double));
@@ -259,7 +276,7 @@ void *Arith(void *argument)
 	  fieldx1->grid    = vlistInqVarGrid(vlistIDx1, varID);
 	  fieldx1->missval = vlistInqVarMissval(vlistIDx1, varID);
 
-	  if ( filltype == FILL_REC )
+	  if ( filltype == FILL_REC || filltype == FILL_RECTS )
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistIDx2, 0));
 	      memcpy(fieldx2->ptr, fieldrec.ptr, gridsize*sizeof(double));
@@ -301,7 +318,7 @@ void *Arith(void *argument)
 
   if ( field1.ptr ) free(field1.ptr);
   if ( field2.ptr ) free(field2.ptr);
-  if ( filltype == FILL_REC )
+  if ( filltype == FILL_REC || filltype == FILL_RECTS )
     if ( fieldrec.ptr ) free(fieldrec.ptr);
 
   cdoFinish();

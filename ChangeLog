@@ -3,6 +3,7 @@
 	* using CDI library version 1.2.2
 	* import_cmsaf: add support for monthly mean diurnal variation
 	* remapcon: add support for second order remapping (use env REMAP_ORDER=2)
+	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
 	* gridverify: replaced [Cedrick Ansorge]
 	* intlevel: bug fix for datasets with missing values
 	* yseasstd,yseasvar: wrong array index (bug fix) [report: Robert Nicholas]
