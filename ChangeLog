@@ -1,9 +1,10 @@
-2008-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>\
+2008-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.2.2
 	* import_cmsaf: add support for monthly mean diurnal variation
 	* remapcon: add support for second order remapping (use env REMAP_ORDER=2)
 	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
+	* remapcon: change max_subseg from 100000 to 1000
 	* gridverify: replaced [Cedrick Ansorge]
 	* intlevel: bug fix for datasets with missing values
 	* yseasstd,yseasvar: wrong array index (bug fix) [report: Robert Nicholas]

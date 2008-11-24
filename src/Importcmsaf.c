@@ -76,6 +76,134 @@ void print_filter(hid_t dset_id, char *varname)
 #endif
 
 
+#define  NINT(x)   ((x) < 0 ? (int)((x)-0.5) : (int)((x)+0.5))
+
+
+void get_grid_info(double c0, double re, int *nrxp, int *nryp,
+		   double *r0p, double *s0p, double *cp)
+{
+  const double pi = M_PI;
+  double git, phi, s90;
+  double r0, s0, c;
+  int nrx, nry;
+
+  git=2.*pi*re*cos(pi/6.)/c0;
+  /* number of longitude pixels */
+  nrx=2*NINT(0.5*git);
+
+  /* central index in longitude */
+  r0=nrx/2+0.5;
+
+  /* resolution in km */
+  c=2.*pi*re*cos(30.*pi/180.)/nrx;
+
+  phi=pi/2.;
+  s90= re/c *sin(phi) / cos(30.*pi/180.);
+
+  nry=floor(s90);
+  /* central index in latitude */
+  s0=nry+0.5;
+  /* number of latitude pixels */
+  nry=2*nry;
+
+  *nrxp = nrx;
+  *nryp = nry;
+  *r0p  = r0;
+  *s0p  = s0;
+  *cp   = c;
+}
+
+
+double det_lon_atovs(double r, double r0, double lts, double c, double re)
+{
+  const double pi = M_PI;
+  double xla;
+
+  xla=(r-r0)*c/re/cos(lts*pi/180.); /* longitude */
+  xla=180.*xla/pi;
+
+  return (xla);
+}
+
+
+double det_lat_atovs(double s, double s0, double lts, double c, double re)
+{
+  const double pi = M_PI;
+  double siphi;
+  double phi;
+
+  siphi=(s-s0)*c*cos(lts*pi/180.)/re;
+  phi=180.*asin(siphi)/pi; /* latitude */
+
+  return (phi);
+}
+
+
+int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
+{
+  static char func[] = "defLonLatGrid";
+  int gridID;
+  int nrx, nry, i;
+  double c;
+  double r0, s0;
+  double r, s;
+  double xla, phi;
+  double *xvals, *yvals, *xbounds, *ybounds;
+
+  get_grid_info(c0, re, &nrx, &nry, &r0, &s0, &c);
+
+  if ( nx != nrx || ny != nry )
+    {
+      printf("nrx=%d nry=%d\n", nrx, nry);
+      return(-1);
+    }
+
+  xvals = (double *) malloc(nx*sizeof(double));
+  yvals = (double *) malloc(ny*sizeof(double));
+  xbounds = (double *) malloc(nx*2*sizeof(double));
+  ybounds = (double *) malloc(nx*2*sizeof(double));
+
+  for ( i = 0; i < nrx; ++i )
+    {
+      r = i+1;
+      xla = det_lon_atovs(r, r0, lts, c, re);
+      xvals[i] = xla;
+      xla = det_lon_atovs(r-0.5, r0, lts, c, re);
+      xbounds[2*i] = xla;
+      xla = det_lon_atovs(r+0.5, r0, lts, c, re);
+      xbounds[2*i+1] = xla;
+      /* printf("xla[%d]=%g\n", i, xla); */
+    }
+
+  for ( i = 0; i < nry; ++i )
+    {
+      s = (nry-i-1)+1;
+      phi = det_lat_atovs(s, s0, lts, c, re);
+      yvals[i] = phi;
+      phi = det_lat_atovs(s-0.5, s0, lts, c, re);
+      ybounds[2*i] = phi;
+      phi = det_lat_atovs(s+0.5, s0, lts, c, re);
+      ybounds[2*i+1] = phi;
+      /* printf("phi[%d]=%g\n", i, phi); */
+    }
+
+  gridID = gridCreate(GRID_LONLAT, nx*ny);
+  gridDefXsize(gridID, nx);
+  gridDefYsize(gridID, ny);
+  gridDefXvals(gridID, xvals);
+  gridDefYvals(gridID, yvals);
+  gridDefXbounds(gridID, xbounds);
+  gridDefYbounds(gridID, ybounds);
+
+  free(xvals);
+  free(yvals);
+  free(xbounds);
+  free(ybounds);
+
+  return (gridID);
+}
+
+
 #if  defined  (HAVE_LIBHDF5)
 static
 int read_geolocation(hid_t loc_id, int nx, int ny)
@@ -121,7 +249,20 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   grp_id = H5Gopen(loc_id, "Geolocation");
 
   proj_id = H5Dopen(grp_id, "Projection");
+  /*
+  {
+    hid_t tid;
+    int nmem;
+    int im;
 
+    tid = H5Dget_type(proj_id);
+    nmem = H5Tget_nmembers(tid);
+    for ( im = 0; im < nmem; ++im )
+      {
+	printf("%d %s\n", im, H5Tget_member_name(tid, im));
+      }
+  }
+  */
   status = H5Dread(proj_id, proj_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &proj);
 
   H5Dclose(proj_id);
@@ -170,6 +311,17 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
       gridDefYsize(gridID, ny);
     }
   else
+    {
+      if ( nx == 386 && ny == 162 )
+	{
+	  double c0 = 90;       /* nominal spatial resolution */
+	  double lts = 30;      
+	  double re = 6371.22;  /* Earth radius */
+	  gridID = defLonLatGrid(nx, ny, c0, lts, re);
+	}
+    }
+
+  if ( gridID == -1 )
     {
       gridID = gridCreate(GRID_GENERIC, nx*ny);
       gridDefXsize(gridID, nx);
