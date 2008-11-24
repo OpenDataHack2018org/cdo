@@ -233,6 +233,7 @@ src/Fldstat.c -text
 src/Gengrid.c -text
 src/Gradsdes.c -text
 src/Gridcell.c -text
+src/Gridstat.c -text
 src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text

@@ -63,6 +63,7 @@ void *Fldrms(void *argument);
 void *Fldstat(void *argument);
 void *Gengrid(void *argument);
 void *Gradsdes(void *argument);
+void *Gridboxstat(void *argument);
 void *Gridcell(void *argument);
 void *Harmonic(void *argument);
 void *Histogram(void *argument);
@@ -261,6 +262,8 @@ void *Wct(void *argument);
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
+#define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", \
+                                 "gridboxvar", "gridboxstd"}
 #define  GridcellOperators      {"gridarea", "gridweights"}
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
@@ -491,6 +494,7 @@ static MODULES Modules[] =
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
   { Gengrid,        NULL,              GengridOperators,        2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
+  { Gridboxstat,    NULL,              GridboxstatOperators,       1,  1 },
   { Gridcell,       GridcellHelp,      GridcellOperators,       1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
