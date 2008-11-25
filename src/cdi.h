@@ -109,6 +109,7 @@ extern "C" {
 #define  GRID_CURVILINEAR        10
 #define  GRID_LCC                11  /* Lambert Conformal Conic        */
 #define  GRID_LAEA               12  /* Lambert Azimuthal Equal Area   */
+#define  GRID_SINUSOIDAL         13  /* Sinusoidal                     */
 
 /* ZAXIS types */
 

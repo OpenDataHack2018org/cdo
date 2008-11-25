@@ -163,7 +163,7 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   xbounds = (double *) malloc(nx*2*sizeof(double));
   ybounds = (double *) malloc(nx*2*sizeof(double));
 
-  for ( i = 0; i < nrx; ++i )
+  for ( i = 0; i < nx; ++i )
     {
       r = i+1;
       xla = det_lon_atovs(r, r0, lts, c, re);
@@ -175,7 +175,7 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
       /* printf("xla[%d]=%g\n", i, xla); */
     }
 
-  for ( i = 0; i < nry; ++i )
+  for ( i = 0; i < ny; ++i )
     {
       s = (nry-i-1)+1;
       phi = det_lat_atovs(s, s0, lts, c, re);
@@ -199,6 +199,42 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   free(yvals);
   free(xbounds);
   free(ybounds);
+
+  return (gridID);
+}
+
+
+int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
+		      double dx, double dy, double p1, double p2, double p3, double p4)
+{
+  static char func[] = "defSinusoidalGrid";
+  int gridID;
+  int i;
+  double *xvals, *yvals;
+
+  xvals = (double *) malloc(nx*sizeof(double));
+  yvals = (double *) malloc(ny*sizeof(double));
+
+  for ( i = 0; i < nx; ++i )
+    {
+      xvals[i] = xmin + i*dx + dx/2;
+      /* printf("x[%d]=%g\n", i, xvals[i]); */
+    }
+
+  for ( i = 0; i < ny; ++i )
+    {
+      yvals[i] = ymax - i*dx - dx/2;;
+      /* printf("y[%d]=%g\n", i, yvals[i]); */
+    }
+
+  gridID = gridCreate(GRID_SINUSOIDAL, nx*ny);
+  gridDefXsize(gridID, nx);
+  gridDefYsize(gridID, ny);
+  gridDefXvals(gridID, xvals);
+  gridDefYvals(gridID, yvals);
+
+  free(xvals);
+  free(yvals);
 
   return (gridID);
 }
@@ -306,9 +342,10 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
        strcmp(proj.name, "sinusoidal") == 0 && 
        strcmp(proj.ellipsoid, "WGS-84") == 0 )
     {
-      gridID = gridCreate(GRID_GENERIC, nx*ny);
-      gridDefXsize(gridID, nx);
-      gridDefYsize(gridID, ny);
+      gridID = defSinusoidalGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax, 
+				 region.dx, region.dy,
+				 proj.parameter[0], proj.parameter[1], 
+				 proj.parameter[2], proj.parameter[3]);
     }
   else
     {

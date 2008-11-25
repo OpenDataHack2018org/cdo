@@ -107,6 +107,7 @@ static void printGridInfo(int vlistID)
   int ngrids, index;
   int gridID, gridtype, trunc, gridsize, xsize, ysize;
   int nbyte0;
+  char xname[128], yname[128], xunits[128], yunits[128];
 
   ngrids = vlistNgrids(vlistID);
   for ( index = 0; index < ngrids; index++ )
@@ -117,22 +118,27 @@ static void printGridInfo(int vlistID)
       gridsize = gridInqSize(gridID);
       xsize    = gridInqXsize(gridID);
       ysize    = gridInqYsize(gridID);
+      gridInqXname(gridID, xname);
+      gridInqYname(gridID, yname);
+      gridInqXunits(gridID, xunits);
+      gridInqYunits(gridID, yunits);
 
       /*	  nbyte0   = fprintf(stdout, "  %4d : %-23s : ",*/
       nbyte0   = fprintf(stdout, "  %4d : %-12s > ",
 			 gridID+1, gridNamePtr(gridtype));
 
       if ( gridtype == GRID_LONLAT   ||
+	   gridtype == GRID_SINUSOIDAL ||
 	   gridtype == GRID_GAUSSIAN ||
 	   gridtype == GRID_GAUSSIAN_REDUCED )
 	{
-	  double lonfirst = 0.0, lonlast = 0.0;
-	  double latfirst = 0.0, latlast = 0.0;
-	  double loninc = 0.0, latinc = 0.0;
+	  double xfirst = 0.0, xlast = 0.0;
+	  double yfirst = 0.0, ylast = 0.0;
+	  double xinc = 0.0, yinc = 0.0;
 	  
-	  latfirst = gridInqYval(gridID, 0);
-	  latlast  = gridInqYval(gridID, ysize-1);
-	  latinc   = gridInqYinc(gridID);
+	  yfirst = gridInqYval(gridID, 0);
+	  ylast  = gridInqYval(gridID, ysize-1);
+	  yinc   = gridInqYinc(gridID);
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
 	    {
 	      fprintf(stdout, "size : dim = %d  nlat = %d\n", gridsize, ysize);
@@ -141,22 +147,24 @@ static void printGridInfo(int vlistID)
 	    }
 	  else
 	    {
-	      lonfirst = gridInqXval(gridID, 0);
-	      lonlast  = gridInqXval(gridID, xsize-1);
-	      loninc   = gridInqXinc(gridID);
+	      xfirst = gridInqXval(gridID, 0);
+	      xlast  = gridInqXval(gridID, xsize-1);
+	      xinc   = gridInqXinc(gridID);
 	      fprintf(stdout, "size      : dim = %d  nlon = %d  nlat = %d\n", gridsize, xsize, ysize);
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "longitude : first = %.9g  last = %.9g", lonfirst, lonlast);
-	      if ( !DBL_IS_EQUAL(loninc, 0) )
-		fprintf(stdout, "  inc = %.9g", loninc);
+	      fprintf(stdout, "%-9s : first = %.9g  last = %.9g", xname, xfirst, xlast);
+	      if ( !DBL_IS_EQUAL(xinc, 0) )
+		fprintf(stdout, "  inc = %.9g", xinc);
+	      fprintf(stdout, "  %s", xunits);
 	      if ( gridIsCircular(gridID) )
 		fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
 	    }
 	  fprintf(stdout, "%*s", nbyte0, "");
-	  fprintf(stdout, "latitude  : first = %.9g  last = %.9g", latfirst, latlast);
-	  if ( !DBL_IS_EQUAL(latinc, 0) && gridtype == GRID_LONLAT )
-	    fprintf(stdout, "  inc = %.9g", latinc);
+	  fprintf(stdout, "%-9s : first = %.9g  last = %.9g", yname, yfirst, ylast);
+	  if ( !DBL_IS_EQUAL(yinc, 0) && (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL) )
+	    fprintf(stdout, "  inc = %.9g", yinc);
+	  fprintf(stdout, "  %s", yunits);
 	  fprintf(stdout, "\n");
 	  
 	  if ( gridIsRotated(gridID) )
@@ -199,8 +207,6 @@ static void printGridInfo(int vlistID)
 	  if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
 	    {
 	      int i;
-	      char xunits[256];
-	      char yunits[256];
 	      double *xvals, *yvals;
 	      double xfirst, xlast, yfirst, ylast;
 	      xvals = (double *) malloc(gridsize*sizeof(double));
@@ -208,8 +214,6 @@ static void printGridInfo(int vlistID)
 
 	      gridInqXvals(gridID, xvals);
 	      gridInqYvals(gridID, yvals);
-	      gridInqXunits(gridID, xunits);
-	      gridInqYunits(gridID, yunits);
 
 	      xfirst = xvals[0];
 	      xlast  = xvals[0];
@@ -224,12 +228,12 @@ static void printGridInfo(int vlistID)
 		}
 
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "longitude : min = %.9g  max = %.9g  %s", xfirst, xlast, xunits);
+	      fprintf(stdout, "%-9s : min = %.9g  max = %.9g  %s", xname, xfirst, xlast, xunits);
 	      if ( gridIsCircular(gridID) )
 		fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "latitude  : min = %.9g  max = %.9g  %s\n", yfirst, ylast, yunits);
+	      fprintf(stdout, "%-9s : min = %.9g  max = %.9g  %s\n", yname, yfirst, ylast, yunits);
 	      
 	      free(xvals);
 	      free(yvals);
