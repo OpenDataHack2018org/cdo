@@ -81,17 +81,17 @@ double fldmax(FIELD field)
     {
       rmax = -DBL_MAX;
       for ( i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array[i], missval) )
-	  if ( array[i] > rmax ) rmax = array[i];
-
+        if ( !DBL_IS_EQUAL(array[i], missval) )
+          if ( array[i] > rmax ) rmax = array[i];
+      
       if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
-	rmax = missval;
+        rmax = missval;
     }
   else
     {
       rmax = array[0];
       for ( i = 1; i < len; i++ ) 
-	if ( array[i] > rmax )  rmax = array[i];
+        if ( array[i] > rmax )  rmax = array[i];
     }
 
   return (rmax);
@@ -207,23 +207,23 @@ double fldvar(FIELD field)
   if ( nmiss > 0 )
     {
       for ( i = 0; i < len; i++ ) 
-	if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
-	  {
-	    rsum   += w[i] * array[i];
-	    rsumq  += w[i] * array[i] * array[i];
-	    rsumw  += w[i];
-	    rsumwq += w[i] * w[i];
-	  }
+        if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
+          {
+            rsum   += w[i] * array[i];
+            rsumq  += w[i] * array[i] * array[i];
+            rsumw  += w[i];
+            rsumwq += w[i] * w[i];
+          }
     }
   else
     {
       for ( i = 0; i < len; i++ ) 
-	{
-	  rsum   += w[i] * array[i];
-	  rsumq  += w[i] * array[i] * array[i];
-	  rsumw  += w[i];
-	  rsumwq += w[i] * w[i];
-	}
+        {
+          rsum   += w[i] * array[i];
+          rsumq  += w[i] * array[i] * array[i];
+          rsumw  += w[i];
+          rsumwq += w[i] * w[i];
+        }
     }
 
   rvar = !DBL_IS_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;

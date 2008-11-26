@@ -55,7 +55,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 
   gridtype  = gridInqType(gridID1);
   gridsize1 = gridInqSize(gridID1);
-
+ 
+  if ( xinc < 1 || yinc < 1 )
+    cdoAbort("xinc and yinc must not be smaller than 1.");
+  
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR )
     {
       nlon1 = gridInqXsize(gridID1);
@@ -72,6 +75,11 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       gridDefYsize(gridID2, nlat2);
     }
 
+  if ( xinc > nlon1 || yinc > nlat1 )
+    cdoAbort("xinc and/or yinc exceeds gridsize");
+
+
+  
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
       xvals1 = (double *) malloc(nlon1*sizeof(double));
@@ -163,7 +171,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                   else use_y1 = y1;
                   for ( x1 = x2*xinc; x1 < xinc*(x2+1) ; x1++ )
                     {
-                      if ( x1 >= nlat1 ) use_y1 -= 1;
+                      if ( x1 >= nlon1 && use_y1 == y1 ) use_y1 -= 1;
                       use_x1 = x1;
                       g1_add= (use_y1*nlon1)+use_x1;
                       xvals2[g2_add] += xvals1[g1_add]/area_norm;
@@ -188,6 +196,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
               grid2_corner_lat[4*g2_add+2] = grid2_corner_lat[4*g2_add+3] = ax;
             }
         }
+      gridDefNvertex(gridID2, 4);
       gridDefXbounds(gridID2, grid2_corner_lon);
       gridDefYbounds(gridID2, grid2_corner_lat);
       gridDefXvals(gridID2, xvals2);
