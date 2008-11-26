@@ -96,8 +96,8 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	expr_lex.$(OBJEXT) expr.$(OBJEXT) cdo.$(OBJEXT) \
 	cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) field.$(OBJEXT) \
 	fieldc.$(OBJEXT) field2.$(OBJEXT) fieldmer.$(OBJEXT) \
-	fieldzon.$(OBJEXT) grid.$(OBJEXT) gridnc.$(OBJEXT) \
-	gridh5.$(OBJEXT) hetaeta.$(OBJEXT) history.$(OBJEXT) \
+	fieldzon.$(OBJEXT) griddes.$(OBJEXT) griddes_nc.$(OBJEXT) \
+	griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) history.$(OBJEXT) \
 	institution.$(OBJEXT) interpol.$(OBJEXT) job.$(OBJEXT) \
 	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
 	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
@@ -375,10 +375,10 @@ cdo_SOURCES = Arith.c		\
               field2.c		\
               fieldmer.c  	\
               fieldzon.c  	\
-              grid.c		\
-              grid.h		\
-              gridnc.c		\
-              gridh5.c		\
+              griddes.c		\
+              griddes.h		\
+              griddes_nc.c	\
+              griddes_h5.c	\
               hetaeta.c		\
               history.c		\
               institution.c 	\
@@ -701,9 +701,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldmer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldzon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fourier.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gridh5.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gridnc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/griddes.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/griddes_h5.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/griddes_nc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hetaeta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/history.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/institution.Po@am__quote@

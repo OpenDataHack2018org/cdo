@@ -32,7 +32,7 @@
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
-#include "grid.h"
+#include "griddes.h"
 #include "error.h"
 
 #define  deg2rad  (M_PI/180.)   /* conversion for deg to rad */

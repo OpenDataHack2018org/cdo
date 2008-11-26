@@ -154,8 +154,8 @@ cdo_SOURCES = Arith.c		\
               fieldzon.c  	\
               griddes.c		\
               griddes.h		\
-              gridnc.c		\
-              gridh5.c		\
+              griddes_nc.c	\
+              griddes_h5.c	\
               hetaeta.c		\
               history.c		\
               institution.c 	\

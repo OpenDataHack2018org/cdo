@@ -377,10 +377,11 @@ src/fieldmer.c -text
 src/fieldzon.c -text
 src/fourier.c -text
 src/functs.h -text
-src/grid.h -text
 src/grid_lcc.c -text
-src/gridh5.c -text
-src/gridnc.c -text
+src/griddes.c -text
+src/griddes.h -text
+src/griddes_h5.c -text
+src/griddes_nc.c -text
 src/hetaeta.c -text
 src/history.c -text
 src/institution.c -text
@@ -410,7 +411,6 @@ src/pstream.h -text
 src/pstream_int.h -text
 src/pthread_debug.c -text
 src/pthread_debug.h -text
-src/read_griddes.c -text
 src/readline.c -text
 src/realtime.c -text
 src/remap.h -text
