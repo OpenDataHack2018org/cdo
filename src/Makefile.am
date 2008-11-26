@@ -152,6 +152,11 @@ cdo_SOURCES = Arith.c		\
               field2.c		\
               fieldmer.c  	\
               fieldzon.c  	\
+              grid.c		\
+              grid.h		\
+              grid_gme.c	\
+              grid_lcc.c	\
+              grid_rot.c	\
               griddes.c		\
               griddes.h		\
               griddes_nc.c	\

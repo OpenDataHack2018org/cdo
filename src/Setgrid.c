@@ -29,6 +29,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 void *Setgrid(void *argument)

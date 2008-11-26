@@ -1,6 +1,7 @@
 2008-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
-	* using CDI library version 1.2.2
+	* using CDI library version 1.3.0
+	* add support for GRID type SINUSOIDAL
 	* import_cmsaf: add support for monthly mean diurnal variation
 	* remapcon: add support for second order remapping (use env REMAP_ORDER=2)
 	* remap: check grid and weights
@@ -10,7 +11,7 @@
 	* gridverify: replaced [Cedrick Ansorge]
 	* intlevel: bug fix for datasets with missing values
 	* yseasstd,yseasvar: wrong array index (bug fix) [report: Robert Nicholas]
-	* Version 1.2.2 released
+	* Version 1.3.0 released
 
 2008-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	

@@ -38,9 +38,8 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "remap.h"
+#include "grid.h"
 
-
-void gme_grid_restore(double *p, int ni, int nd);
 
 void *Remap(void *argument)
 {

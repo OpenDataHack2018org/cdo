@@ -1,5 +1,5 @@
-#ifndef _GRID_H
-#define _GRID_H
+#ifndef _GRIDDES_H
+#define _GRIDDES_H
 
 typedef struct {
   double *xvals;
@@ -54,4 +54,4 @@ int gridDefine(GRID grid);
 int gridFromNCfile(const char *gridfile);
 int gridFromH5file(const char *gridfile);
 
-#endif  /* _GRID_H */
+#endif  /* _GRIDDES_H */

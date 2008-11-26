@@ -96,19 +96,21 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	expr_lex.$(OBJEXT) expr.$(OBJEXT) cdo.$(OBJEXT) \
 	cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) field.$(OBJEXT) \
 	fieldc.$(OBJEXT) field2.$(OBJEXT) fieldmer.$(OBJEXT) \
-	fieldzon.$(OBJEXT) griddes.$(OBJEXT) griddes_nc.$(OBJEXT) \
-	griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) history.$(OBJEXT) \
-	institution.$(OBJEXT) interpol.$(OBJEXT) job.$(OBJEXT) \
-	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
-	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
-	timer.$(OBJEXT) realtime.$(OBJEXT) pstream.$(OBJEXT) \
-	table.$(OBJEXT) userlog.$(OBJEXT) util.$(OBJEXT) \
-	legendre.$(OBJEXT) fourier.$(OBJEXT) specspace.$(OBJEXT) \
-	readline.$(OBJEXT) julian.$(OBJEXT) vinterp.$(OBJEXT) \
-	zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
-	list.$(OBJEXT) percentiles.$(OBJEXT) nth_element.$(OBJEXT) \
-	ecacore.$(OBJEXT) ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) \
-	Hi.$(OBJEXT) Wct.$(OBJEXT) statistic.$(OBJEXT)
+	fieldzon.$(OBJEXT) grid.$(OBJEXT) grid_gme.$(OBJEXT) \
+	grid_lcc.$(OBJEXT) grid_rot.$(OBJEXT) griddes.$(OBJEXT) \
+	griddes_nc.$(OBJEXT) griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) \
+	history.$(OBJEXT) institution.$(OBJEXT) interpol.$(OBJEXT) \
+	job.$(OBJEXT) modules.$(OBJEXT) namelist.$(OBJEXT) \
+	normal.$(OBJEXT) pipe.$(OBJEXT) process.$(OBJEXT) \
+	remaplib.$(OBJEXT) timer.$(OBJEXT) realtime.$(OBJEXT) \
+	pstream.$(OBJEXT) table.$(OBJEXT) userlog.$(OBJEXT) \
+	util.$(OBJEXT) legendre.$(OBJEXT) fourier.$(OBJEXT) \
+	specspace.$(OBJEXT) readline.$(OBJEXT) julian.$(OBJEXT) \
+	vinterp.$(OBJEXT) zaxis.$(OBJEXT) pthread_debug.$(OBJEXT) \
+	color.$(OBJEXT) list.$(OBJEXT) percentiles.$(OBJEXT) \
+	nth_element.$(OBJEXT) ecacore.$(OBJEXT) ecautil.$(OBJEXT) \
+	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Wct.$(OBJEXT) \
+	statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 am__DEPENDENCIES_1 =
 cdo_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -375,6 +377,11 @@ cdo_SOURCES = Arith.c		\
               field2.c		\
               fieldmer.c  	\
               fieldzon.c  	\
+              grid.c		\
+              grid.h		\
+              grid_gme.c	\
+              grid_lcc.c	\
+              grid_rot.c	\
               griddes.c		\
               griddes.h		\
               griddes_nc.c	\
@@ -701,6 +708,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldmer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldzon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fourier.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_gme.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_lcc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/grid_rot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/griddes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/griddes_h5.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/griddes_nc.Po@am__quote@

@@ -573,10 +573,6 @@ int     gridInqYbounds(int gridID, double *ybounds);
 void    gridDefRowlon(int gridID, int nrowlon, int *rowlon);
 void    gridInqRowlon(int gridID, int *rowlon);
 void    gridChangeType(int gridID, int gridtype);
-int     gridToZonal(int gridID);
-int     gridToMeridional(int gridID);
-int     gridToCell(int gridID);
-int     gridToCurvilinear(int gridID);
 
 /* ZAXIS routines */
 

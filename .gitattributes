@@ -377,7 +377,11 @@ src/fieldmer.c -text
 src/fieldzon.c -text
 src/fourier.c -text
 src/functs.h -text
+src/grid.c -text
+src/grid.h -text
+src/grid_gme.c -text
 src/grid_lcc.c -text
+src/grid_rot.c -text
 src/griddes.c -text
 src/griddes.h -text
 src/griddes_h5.c -text

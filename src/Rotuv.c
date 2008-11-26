@@ -29,12 +29,8 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
-
-double rls_to_rl(double phis, double rlas, double polphi, double pollam);
-double phs_to_ph(double phis, double rlas, double polphi);
-void usvs_to_uv(double us, double vs, double phi, double rla,
-		double polphi, double pollam, double *u, double *v);
 
 static void rot_uv_back(int gridID, double *us, double *vs)
 {
