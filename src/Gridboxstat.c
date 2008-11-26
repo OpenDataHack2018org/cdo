@@ -47,6 +47,11 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   double *xvals1, *yvals1, *xvals2, *yvals2;
   double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
+  int x1, y1, x2, y2, use_x1, use_y1;
+  int corner, add, g2_add;
+  int g1_add;
+  double on, ox, an, ax;
+  double area_norm;
 
   gridtype  = gridInqType(gridID1);
   gridsize1 = gridInqSize(gridID1);
@@ -77,64 +82,122 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       gridInqYvals(gridID1, yvals1);
 
       if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
-	{
-	  grid1_corner_lon = (double *) malloc(2*nlon1*sizeof(double));
-	  grid1_corner_lat = (double *) malloc(2*nlat1*sizeof(double));
-	  grid2_corner_lon = (double *) malloc(2*nlon2*sizeof(double));
-	  grid2_corner_lat = (double *) malloc(2*nlat2*sizeof(double));
-	  gridInqXbounds(gridID1, grid1_corner_lon);
-	  gridInqYbounds(gridID1, grid1_corner_lat);
-	}
+        {
+          grid1_corner_lon = (double *) malloc(2*nlon1*sizeof(double));
+          grid1_corner_lat = (double *) malloc(2*nlat1*sizeof(double));
+          grid2_corner_lon = (double *) malloc(2*nlon2*sizeof(double));
+          grid2_corner_lat = (double *) malloc(2*nlat2*sizeof(double));
+          gridInqXbounds(gridID1, grid1_corner_lon);
+          gridInqYbounds(gridID1, grid1_corner_lat);
+        }
 
       j = 0;
       for ( i = 0; i < nlon1; i += xinc )
-	{
-	  i1 = i+(xinc-1);
-	  if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
-	  xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2;
-	  if ( grid2_corner_lon )
-	    {
-	      grid2_corner_lon[2*j] = grid1_corner_lon[2*i];
-	      grid2_corner_lon[2*j+1] = grid1_corner_lon[2*i1+1];
-	    }
-	  j++;
-	}
+        {
+          i1 = i+(xinc-1);
+          if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
+          xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2.;
+          if ( grid2_corner_lon )
+            {
+              grid2_corner_lon[2*j] = grid1_corner_lon[2*i];
+              grid2_corner_lon[2*j+1] = grid1_corner_lon[2*i1+1];
+            }
+          j++;
+        }
       j = 0;
       for ( i = 0; i < nlat1; i += yinc )
-	{
-	  i1 = i+(yinc-1);
-	  if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
-	  yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
-	  if ( grid2_corner_lat )
-	    {
-	      grid2_corner_lat[2*j] = grid1_corner_lat[2*i];
-	      grid2_corner_lat[2*j+1] = grid1_corner_lat[2*i1+1];
-	    }
-	  j++;
-	}
-
+        {
+          i1 = i+(yinc-1);
+          if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
+          yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
+          if ( grid2_corner_lat )
+            {
+              grid2_corner_lat[2*j] = grid1_corner_lat[2*i];
+              grid2_corner_lat[2*j+1] = grid1_corner_lat[2*i1+1];
+            }
+          j++;
+        }
+      
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
-
+      
       if ( grid2_corner_lon && grid2_corner_lat )
-	{
-	  gridDefNvertex(gridID2, 2);
-	  gridDefXbounds(gridID2, grid2_corner_lon);
-	  gridDefYbounds(gridID2, grid2_corner_lat);
-
-	  free(grid2_corner_lon);
-	  free(grid2_corner_lat);
-	}
+        {
+          gridDefNvertex(gridID2, 2);
+          gridDefXbounds(gridID2, grid2_corner_lon);
+          gridDefYbounds(gridID2, grid2_corner_lat);
+          
+          free(grid2_corner_lon);
+          free(grid2_corner_lat);
+        }
     }
   else if ( gridtype == GRID_CURVILINEAR )
     {
-      cdoAbort("Code missing");
+      grid1_corner_lon = (double *) malloc(4*nlon1*nlat1*sizeof(double));
+      grid1_corner_lat = (double *) malloc(4*nlon1*nlat1*sizeof(double));
+      grid2_corner_lon = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+      grid2_corner_lat = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+      xvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
+      yvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
+      xvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
+      yvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
+      
+      gridInqXbounds(gridID1, grid1_corner_lon);
+      gridInqYbounds(gridID1, grid1_corner_lat);
+      gridInqXvals(gridID1, xvals1);
+      gridInqYvals(gridID1, yvals1);
+      
+      // Process grid2 bounds
+      area_norm = xinc*yinc;
+      for ( y2 = 0; y2 < nlat2; y2++ )
+        {
+          for ( x2 = 0; x2 < nlon2; x2++ )
+            {
+              g2_add = (y2*nlon2+x2); 
+              on = 360.; ox = -360;
+              an =  90.; ax = -90.; 
+              
+              for ( y1 = y2*yinc; y1 < yinc*(y2+1); y1++ )
+                {
+                  if ( y1 >= nlat1 ) use_y1 -= 1;
+                  else use_y1 = y1;
+                  for ( x1 = x2*xinc; x1 < xinc*(x2+1) ; x1++ )
+                    {
+                      if ( x1 >= nlat1 ) use_y1 -= 1;
+                      use_x1 = x1;
+                      g1_add= (use_y1*nlon1)+use_x1;
+                      xvals2[g2_add] += xvals1[g1_add]/area_norm;
+                      yvals2[g2_add] += yvals1[g1_add]/area_norm; 
+                      for ( corner = 0; corner < 4; corner++ )
+                        {
+                          add = 4*g1_add + corner;
+                          if ( grid1_corner_lon[add] < on )
+                            on = grid1_corner_lon[add];
+                          if ( grid1_corner_lon[add] > ox )
+                            ox = grid1_corner_lon[add];
+                          if ( grid1_corner_lat[add] < an )
+                            an = grid1_corner_lat[add];
+                          if (grid1_corner_lat[add] > ax )
+                            ax = grid1_corner_lat[add];
+                        }
+                    }                  
+                }
+              grid2_corner_lon[4*g2_add+0] = grid2_corner_lon[4*g2_add+3] = on;
+              grid2_corner_lon[4*g2_add+1] = grid2_corner_lon[4*g2_add+2] = ox;
+              grid2_corner_lat[4*g2_add+0] = grid2_corner_lat[4*g2_add+1] = an;
+              grid2_corner_lat[4*g2_add+2] = grid2_corner_lat[4*g2_add+3] = ax;
+            }
+        }
+      gridDefXbounds(gridID2, grid2_corner_lon);
+      gridDefYbounds(gridID2, grid2_corner_lat);
+      gridDefXvals(gridID2, xvals2);
+      gridDefYvals(gridID2, yvals2);
     }
   else
     {
       cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
     }
-
+  
   return gridID2;
 }
 
