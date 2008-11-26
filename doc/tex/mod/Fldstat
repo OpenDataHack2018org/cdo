@@ -179,6 +179,12 @@ INTEGER  Percentile number in {1, ..., 99}
 @EndParameter
 
 
+@c @BeginNote
+@c Use CDO option '-v' in order to get the geographic position of the
+@c minimum and maximum to stdout.
+@c @EndNote
+
+
 @BeginExample
 To compute the field mean of all input fields use:
 @BeginVerbatim

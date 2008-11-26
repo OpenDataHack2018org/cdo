@@ -42,6 +42,9 @@
 /* Define to 1 if you have the `netcdf' library (-lnetcdf). */
 #undef HAVE_LIBNETCDF
 
+/* Define to 1 if you have the `proj' library (-lproj). */
+#undef HAVE_LIBPROJ
+
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #undef HAVE_LIBPTHREAD
 

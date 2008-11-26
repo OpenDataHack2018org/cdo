@@ -249,7 +249,7 @@ fi
 esac
 
 #  ----------------------------------------------------------------------
-#  Compile interface with SZLIB library
+#  Compile application with SZLIB library
 #
 AC_MSG_CHECKING([whether a location for the SZLIB library was specified])
 AC_ARG_WITH([szlib],
@@ -267,7 +267,7 @@ else
 fi
 
 #  ----------------------------------------------------------------------
-#  Compile interface with HDF5 library
+#  Compile application with HDF5 library
 #
 AC_MSG_CHECKING([whether a location for the HDF5 library was specified])
 AC_ARG_WITH([hdf5],
@@ -282,6 +282,24 @@ else
   CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
   AC_CHECK_LIB(hdf5, H5Fopen,, LDFLAGS="$LDFLAGS", -lm -lz)
 # AC_SUBST([HDF5DIR], [$HDF5DIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with PROJ library
+#
+AC_MSG_CHECKING([whether a location for the PROJ library was specified])
+AC_ARG_WITH([proj],
+            [AS_HELP_STRING([--with-proj=<directory>],
+                            [Specify location of PROJ library. Configure will expect to find subdirs include and lib.])],
+            [PROJDIR=$with_proj])
+if test -z "$PROJDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$PROJDIR])
+  LDFLAGS="$LDFLAGS -L$PROJDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$PROJDIR/include"
+  AC_CHECK_LIB(proj, pj_init,, LDFLAGS="$LDFLAGS", -lm)
+# AC_SUBST([PROJDIR], [$PROJDIR])
 fi
 
 #  ----------------------------------------------------------------------

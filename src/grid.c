@@ -15,7 +15,15 @@
   GNU General Public License for more details.
 */
 
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
 #include <stdio.h>
+
+#if defined (HAVE_LIBPROJ)
+#  include "projects.h"
+#endif
 
 #include "cdi.h"
 #include "cdo.h"
@@ -154,6 +162,21 @@ void gridGenYbounds(int ny, double *yvals, double *ybounds)
 }
 
 
+void gridGenYboundsM(int ny, double *yvals, double *ybounds)
+{
+  int i;
+
+  for ( i = 0; i < ny-1; i++ )
+    {
+      ybounds[2*i+1]   = 0.5*(yvals[i] + yvals[i+1]);
+      ybounds[2*(i+1)] = 0.5*(yvals[i] + yvals[i+1]);
+    }
+
+  ybounds[0]      = 2*yvals[0] - ybounds[1];
+  ybounds[2*ny-1] = 2*yvals[ny-1] - ybounds[2*(ny-1)];
+}
+
+
 void gridGenRotBounds(int gridID, int nx, int ny,
 		      double *xbounds, double *ybounds, double *xbounds2D, double *ybounds2D)
 {
@@ -265,6 +288,7 @@ int gridToCurvilinear(int gridID1)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_LCC:
+    case GRID_SINUSOIDAL:
       {
 	int i, j, nx, ny;
 	double *xvals = NULL, *yvals = NULL;
@@ -340,12 +364,51 @@ int gridToCurvilinear(int gridID1)
 	      }
 	    else
 	      {
-		for ( j = 0; j < ny; j++ )
-		  for ( i = 0; i < nx; i++ )
-		    {
-		      xvals2D[j*nx+i] = xvals[i];
-		      yvals2D[j*nx+i] = yvals[j];
-		    }
+		if ( gridtype == GRID_SINUSOIDAL )
+		  {
+#if defined (HAVE_LIBPROJ)
+		    int i;
+		    PJ   *libProj;
+		    char *params[20];
+		    int nbpar=0;
+		    projUV data, res;
+
+		    nbpar = 0;
+		    params[nbpar++] = (char*) "proj=sinu";
+		    params[nbpar++] = (char*) "ellps=WGS84";
+
+		    if ( cdoVerbose )
+		      for ( i = 0; i < nbpar; ++i )
+			cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+		    libProj = pj_init(nbpar, params);
+		    if ( !libProj )
+		      cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+		    /* libProj->over = 1; */		// allow longitude > 180°
+
+		    for ( j = 0; j < ny; j++ )
+		      for ( i = 0; i < nx; i++ )
+			{
+			  data.u = xvals[i];
+			  data.v = yvals[j];
+			  res = pj_inv(data, libProj);
+			  xvals2D[j*nx+i] = res.u*rad2deg;
+			  yvals2D[j*nx+i] = res.v*rad2deg;
+			}
+#else
+		    cdoAbort("proj4 support not compiled in!");
+#endif
+		  }
+		else
+		  {
+		    for ( j = 0; j < ny; j++ )
+		      for ( i = 0; i < nx; i++ )
+			{
+			  xvals2D[j*nx+i] = xvals[i];
+			  yvals2D[j*nx+i] = yvals[j];
+			}
+		  }
 	      }
 	  }
 
@@ -427,7 +490,10 @@ int gridToCurvilinear(int gridID1)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double *) malloc(2*ny*sizeof(double));
-		gridGenYbounds(ny, yvals, ybounds);
+		if ( gridtype == GRID_SINUSOIDAL )
+		  gridGenYboundsM(ny, yvals, ybounds);
+		else
+		  gridGenYbounds(ny, yvals, ybounds);
 	      }
 
 	    free(xvals);
@@ -444,8 +510,71 @@ int gridToCurvilinear(int gridID1)
 		  }
 		else
 		  {
-		    gridGenXbounds2D(nx, ny, xbounds, xbounds2D);
-		    gridGenYbounds2D(nx, ny, ybounds, ybounds2D);
+		    if ( gridtype == GRID_SINUSOIDAL )
+		      {
+#if defined (HAVE_LIBPROJ)
+			int index;
+			int i;
+			PJ   *libProj;
+			char *params[20];
+			int nbpar=0;
+			projUV data, res;
+
+			nbpar = 0;
+			params[nbpar++] = (char*) "proj=sinu";
+			params[nbpar++] = (char*) "ellps=WGS84";
+
+			if ( cdoVerbose )
+			  for ( i = 0; i < nbpar; ++i )
+			    cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+			libProj = pj_init(nbpar, params);
+			if ( !libProj )
+			  cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+			/* libProj->over = 1; */		// allow longitude > 180°
+			/*
+			for ( j = 0; j < 2*ny; j++ ) printf("ybounds %d %g\n", j, ybounds[j]);
+			for ( i = 0; i < 2*nx; i++ ) printf("xbounds %d %g\n", i, xbounds[i]);
+			*/
+			for ( j = 0; j < ny; j++ )
+			  for ( i = 0; i < nx; i++ )
+			    {
+			      index = j*4*nx + 4*i;
+
+			      data.u = xbounds[2*i];
+			      data.v = ybounds[2*j];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+0] = res.u*rad2deg;
+			      ybounds2D[index+0] = res.v*rad2deg;
+
+			      data.u = xbounds[2*i];
+			      data.v = ybounds[2*j+1];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+1] = res.u*rad2deg;
+			      ybounds2D[index+1] = res.v*rad2deg;
+
+			      data.u = xbounds[2*i+1];
+			      data.v = ybounds[2*j+1];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+2] = res.u*rad2deg;
+			      ybounds2D[index+2] = res.v*rad2deg;
+
+			      data.u = xbounds[2*i+1];
+			      data.v = ybounds[2*j];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+3] = res.u*rad2deg;
+			      ybounds2D[index+3] = res.v*rad2deg;
+			    }
+#else
+			cdoAbort("proj4 support not compiled in!");
+#endif
+		      }
+		    else
+		      {
+			gridGenXbounds2D(nx, ny, xbounds, xbounds2D);
+			gridGenYbounds2D(nx, ny, ybounds, ybounds2D);
+		      }
 		  }
 		
 		gridDefXbounds(gridID2, xbounds2D);

@@ -127,10 +127,13 @@ static void version(void)
 #if defined (COMP_VERSION)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
 #endif
-#if defined (HAVE_LIBSZ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL)
+#if defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL)
   fprintf(stderr, "    with:");
 #if defined (HAVE_LIBSZ)
   fprintf(stderr, " libsz");
+#endif
+#if defined (HAVE_LIBPROJ)
+  fprintf(stderr, " libproj");
 #endif
 #if defined (HAVE_LIBDRMAA)
   fprintf(stderr, " libdrmaa");
