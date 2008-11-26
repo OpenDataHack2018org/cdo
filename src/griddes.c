@@ -158,6 +158,7 @@ int gridDefine(GRID grid)
     case GRID_GENERIC:
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
+    case GRID_SINUSOIDAL:
       {
 	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
 	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
@@ -570,6 +571,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_LCC;
 	  else if ( strncmp(pline, "lcc", 3)  == 0 )
 	    grid.type = GRID_LCC;
+	  else if ( strncmp(pline, "sinusoidal", 10)  == 0 )
+	    grid.type = GRID_SINUSOIDAL;
 	  else if ( strncmp(pline, "laea", 4)  == 0 )
 	    grid.type = GRID_LAEA;
 	  else
