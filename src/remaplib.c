@@ -1489,7 +1489,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   ny = src_grid_dims[1];
 
 #ifdef REMAPTEST
-  printf("min_add, max_add, nx, ny %d %d %d %d\n", min_add, max_add, nx, ny);
+  printf("min_add, max_add, diff_add, nx, ny %d %d %d %d %d\n", min_add, max_add, max_add-min_add, nx, ny);
 #endif
 
   /* srch_loop */
