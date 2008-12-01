@@ -305,6 +305,7 @@ int gridToCurvilinear(int gridID1)
   gridtype = gridInqType(gridID1);
   gridsize = gridInqSize(gridID1);
   gridID2  = gridCreate(GRID_CURVILINEAR, gridsize);
+  gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
   switch (gridtype)
     {
@@ -744,6 +745,7 @@ int gridToCell(int gridID1)
   gridtype = gridInqType(gridID1);
   gridsize = gridInqSize(gridID1);
   gridID2  = gridCreate(GRID_CELL, gridsize);
+  gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
   switch (gridtype)
     {

@@ -5,7 +5,7 @@
 	* import_cmsaf: add support for monthly mean diurnal variation
 	* remapcon: add support for second order remapping (use env REMAP_ORDER=2)
 	* remap: check grid and weights
-	* sinfo: extent grid description 
+	* sinfo: extent grid description
 	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
 	* remapcon: change max_subseg from 100000 to 1000
 	* gridverify: replaced [Cedrick Ansorge]
