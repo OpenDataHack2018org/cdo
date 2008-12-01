@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = Importcmsaf
-@Title     = Import CM-SAF files
+@Title     = Import CM-SAF HDF5 files
 @Section   = Miscellaneous
 @Arguments = ifile ofile
 @Operators = import_cmsaf
@@ -28,6 +28,6 @@ This operator is only available if the program was compiled with HDF5 support!
 @BeginExample
 To convert a CM-SAF HDF5 file to netCDF use:
 @BeginVerbatim
-   cdo -f nc ifile.h5 ofile.nc
+   cdo -f nc import_cmsaf ifile.h5 ofile.nc
 @EndVerbatim
 @EndExample

@@ -27,9 +27,17 @@ Building and installing it:
      1. Run ./configure, with some options if you wish. The standard
         options are documented in the INSTALL file. The configuration
         script has some more options; type 'configure -h' to see them.
+
         The most interesting ones are the usual
         --prefix=<installation directory> and
         --with-netcdf=<directory> to enable netCDF support.
+
+        The netCDF-4 configuration depends on the netCDF-4 installation!
+        You have to set all additional libraries with the environment 
+        variable LIBS, e.g.:
+ 
+        --with-netcdf=<netCDF-4 root directory>  LIBS='-lhdf5 -lz'
+
         To process szip compressed GRIB files you have to enable
         SZLIB support with:
         --with-szlib=<directory>

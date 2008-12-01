@@ -544,9 +544,14 @@ void    gridDefGMEni2(int gridID, int ni2);
 int     gridInqGMEni3(int gridID);
 void    gridDefGMEni3(int gridID, int ni3);
 
-/* Lambert grid */
+/* Lambert Conformal Conic grid */
 void gridDefLCC(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc, int projflag, int scanflag);
 void gridInqLCC(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc, int *projflag, int *scanflag);
+
+/* Lambert Azimuthal Equal Area grid */
+void gridDefLaea(int gridID, double earth_radius, double lon_0, double lat_0);
+void gridInqLaea(int gridID, double *earth_radius, double *lon_0, double *lat_0);
+
 
 void    gridDefArea(int gridID, double *area);
 void    gridInqArea(int gridID, double *area);

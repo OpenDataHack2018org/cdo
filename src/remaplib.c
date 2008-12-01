@@ -542,7 +542,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     }
 
   if ( gridInqSize(rg->gridID1) > 1 && 
-       (gridInqType(rg->gridID1) == GRID_LCC || gridInqType(rg->gridID1) == GRID_SINUSOIDAL) )
+       (gridInqType(rg->gridID1) == GRID_LCC || 
+	gridInqType(rg->gridID1) == GRID_LAEA || 
+	gridInqType(rg->gridID1) == GRID_SINUSOIDAL) )
     rg->gridID1 = gridID1 = gridToCurvilinear(rg->gridID1);
 
   if ( map_type != MAP_TYPE_CONSERV && gridInqSize(rg->gridID1) > 1 &&

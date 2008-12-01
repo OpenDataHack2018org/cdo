@@ -41,6 +41,7 @@ DSET_OBJ;
 typedef struct {
   int nsets;
   int lgeoloc;
+  int lregion;
   DSET_OBJ obj[MAX_DSETS];
 }
 DSETS;
@@ -204,6 +205,7 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
 }
 
 
+static
 int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 		      double dx, double dy, double p1, double p2, double p3, double p4)
 {
@@ -237,6 +239,100 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   free(yvals);
 
   return (gridID);
+}
+
+
+static
+int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
+		double dx, double dy, double a, double lon0, double lat0)
+{
+  static char func[] = "defLaeaGrid";
+  int gridID;
+  int i;
+  double *xvals, *yvals;
+
+  xvals = (double *) malloc(nx*sizeof(double));
+  yvals = (double *) malloc(ny*sizeof(double));
+
+  for ( i = 0; i < nx; ++i )
+    {
+      xvals[i] = xmin + i*dx + dx/2;
+      /* printf("x[%d]=%g\n", i, xvals[i]); */
+    }
+
+  for ( i = 0; i < ny; ++i )
+    {
+      yvals[i] = ymax - i*dx - dx/2;;
+      /* printf("y[%d]=%g\n", i, yvals[i]); */
+    }
+
+  gridID = gridCreate(GRID_LAEA, nx*ny);
+  gridDefXsize(gridID, nx);
+  gridDefYsize(gridID, ny);
+  gridDefXvals(gridID, xvals);
+  gridDefYvals(gridID, yvals);
+
+  gridDefLaea(gridID, a, lon0, lat0);
+
+  free(xvals);
+  free(yvals);
+
+  return (gridID);
+}
+
+
+static
+int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double *lat0)
+{
+  char *pcs[64];
+  int npcs = 0;
+  int i;
+  size_t len;
+  int nfound = 0;
+
+  strcpy(proj, "unknown");
+  *a = 1;
+  *lon0 = 0;
+  *lat0 = 0;
+
+  pcs[npcs++] = &pcs_def[0];
+  len = strlen(pcs_def);
+  for ( i = 0; i < len; ++i )
+    if ( pcs_def[i] == ',' && npcs < 64 )
+      {
+	pcs_def[i] = 0;
+	pcs[npcs++] = &pcs_def[i+1];
+      }
+
+  for ( i = 0; i < npcs; ++i )
+    {
+      if ( strncmp(pcs[i], "proj=", 5) == 0 )
+	{
+	  pcs[i] += 5;
+	  strcpy(proj, pcs[i]);
+	  nfound++;
+	}
+      else if ( strncmp(pcs[i], "a=", 2) == 0 )
+	{
+	  pcs[i] += 2;
+	  *a = atof(pcs[i]);
+	  nfound++;
+	}
+      else if ( strncmp(pcs[i], "lon_0=", 6) == 0 )
+	{
+	  pcs[i] += 6;
+	  *lon0 = atof(pcs[i]);
+	  nfound++;
+	}
+      else if ( strncmp(pcs[i], "lat_0=", 6) == 0 )
+	{
+	  pcs[i] += 6;
+	  *lat0 = atof(pcs[i]);
+	  nfound++;
+	}
+    }
+
+  return (nfound);
 }
 
 
@@ -358,11 +454,151 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
 	}
     }
 
-  if ( gridID == -1 )
+  return (gridID);
+}
+#endif
+
+
+#if  defined  (HAVE_LIBHDF5)
+static
+int read_region(hid_t loc_id, int nx, int ny)
+{
+  static char func[] = "read_region";
+  int gridID = -1;
+  hsize_t		memb_size[1] = {4};
+  hid_t grp_id;
+  hid_t proj_id, region_id;
+  hid_t proj_tid, region_tid;
+  hid_t str64_tid, str128_tid, fltarr_tid;
+  herr_t     status;
+  hsize_t dims;
+  int xsize, ysize;
+  hid_t      file, dataset, datatype; /* Handles */
+  typedef struct region_t {
+    double area_extent[4];
+    int xsize;
+    int ysize;
+    float xscale;
+    float yscale;
+    float lat_0;
+    float lon_0;
+    float lat_ts;
+    char id[128];
+    char name[128];
+    char pcs_id[128];
+    char pcs_def[128];
+  } region_t;
+  region_t region;
+  int nfound;
+  char proj[128];
+  double a, lon0, lat0;
+  double xmin, ymin, xmax, ymax;
+  double dx, dy;
+
+  if ( cdoVerbose ) cdoPrint("Read region:");
+
+  /*
+   * Create a data type for region
+   */
+  region_tid = H5Tcreate(H5T_COMPOUND, sizeof(region_t));
+  dims = 4;
+  fltarr_tid = H5Tarray_create(H5T_NATIVE_DOUBLE, 1, &dims, NULL);
+  str64_tid = H5Tcopy(H5T_C_S1);
+  H5Tset_size(str64_tid, 128);
+  str128_tid = H5Tcopy(H5T_C_S1);
+  H5Tset_size(str128_tid, 128);
+
+  H5Tinsert(region_tid, "area_extent", HOFFSET(region_t, area_extent), fltarr_tid);
+  H5Tinsert(region_tid, "xsize",   HOFFSET(region_t, xsize),   H5T_NATIVE_INT);
+  H5Tinsert(region_tid, "ysize",   HOFFSET(region_t, ysize),   H5T_NATIVE_INT);
+  H5Tinsert(region_tid, "xscale",  HOFFSET(region_t, xscale),  H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "yscale",  HOFFSET(region_t, yscale),  H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "lat_0",   HOFFSET(region_t, lat_0),   H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "lon_0",   HOFFSET(region_t, lon_0),   H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "lat_ts",  HOFFSET(region_t, lat_ts),  H5T_NATIVE_FLOAT);
+  H5Tinsert(region_tid, "id",      HOFFSET(region_t, id),      str64_tid);
+  H5Tinsert(region_tid, "name",    HOFFSET(region_t, name),    str64_tid);
+  H5Tinsert(region_tid, "pcs_id",  HOFFSET(region_t, pcs_id),  str64_tid);
+  H5Tinsert(region_tid, "pcs_def", HOFFSET(region_t, pcs_def), str128_tid);
+
+  grp_id = H5Gopen(loc_id, "/");
+
+  region_id = H5Dopen(grp_id, "region");
+  /*
+  {
+    hid_t tid;
+    int nmem;
+    int im;
+
+    tid = H5Dget_type(proj_id);
+    nmem = H5Tget_nmembers(tid);
+    for ( im = 0; im < nmem; ++im )
+      {
+	printf("%d %s\n", im, H5Tget_member_name(tid, im));
+      }
+  }
+  */
+  status = H5Dread(region_id, region_tid, H5S_ALL, H5S_ALL, H5P_DEFAULT, &region);
+
+  if ( cdoVerbose )
     {
-      gridID = gridCreate(GRID_GENERIC, nx*ny);
-      gridDefXsize(gridID, nx);
-      gridDefYsize(gridID, ny);
+      printf("area_extent[0] = %g\n", region.area_extent[0]);
+      printf("area_extent[1] = %g\n", region.area_extent[1]);
+      printf("area_extent[2] = %g\n", region.area_extent[2]);
+      printf("area_extent[3] = %g\n", region.area_extent[3]);
+      printf("xsize = %d\n", region.xsize);
+      printf("ysize = %d\n", region.ysize);
+      printf("xscale = %g\n", region.xscale);
+      printf("yscale = %g\n", region.yscale);
+      printf("lat_0 = %g\n", region.lat_0);
+      printf("lon_0 = %g\n", region.lon_0);
+      printf("lat_ts = %g\n", region.lat_ts);
+      printf("id = %s\n", region.id);
+      printf("name = %s\n", region.name);
+      printf("pcs_id = %s\n", region.pcs_id);
+      printf("pcs_def = %s\n", region.pcs_def);
+    }
+
+  H5Dclose(region_id);
+  H5Tclose(region_tid);
+  H5Tclose(str64_tid);
+  H5Tclose(str128_tid);
+  H5Tclose(fltarr_tid);
+
+  H5Gclose(grp_id);
+
+  /* check region */
+
+  nfound = scan_pcs_def(region.pcs_def, proj, &a, &lon0, &lat0);
+
+  if ( cdoVerbose )
+    {
+      printf("proj = %s\n", proj);
+      printf("a    = %g\n", a);
+      printf("lon0 = %g\n", lon0);
+      printf("lat0 = %g\n", lat0);
+    }
+
+  xmin =  region.area_extent[0];
+  ymin =  region.area_extent[1];
+  xmax =  region.area_extent[2];
+  ymax =  region.area_extent[3];
+
+  dx = (xmax-xmin) / nx;
+  dy = (ymax-ymin) / ny;
+  /*
+  xsize = NINT((region.xmax-region.xmin)/region.dx);
+  ysize = NINT((region.ymax-region.ymin)/region.dy);
+
+  if ( cdoVerbose ) cdoPrint("  Size: xsize=%d  ysize=%d", xsize, ysize);
+  */
+
+  if ( nfound == 4 &&
+       nx == region.xsize && ny == region.ysize && 
+       strcmp(proj, "laea") == 0 )
+    {
+      gridID = defLaeaGrid(nx, ny, xmin, xmax, ymin, ymax, 
+			   dx, dy, a, lon0, lat0);
     }
 
   return (gridID);
@@ -770,9 +1006,10 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
       {
 	if ( cdoVerbose ) cdoPrint("   Skip dataset: %s", name);
       }
-    else if ( strstr(name, "egion") )
+    /*else if ( strstr(name, "egion") ) */
+    else if ( strcmp(name, "region") == 0 )
       {
-	if ( cdoVerbose ) cdoPrint("   Skip dataset: %s", name);
+	((DSETS *) opdata)->lregion = TRUE;
       }
     else
       {
@@ -864,6 +1101,7 @@ void dsets_init(DSETS *dsets)
 
   dsets->nsets = 0;
   dsets->lgeoloc = 0;
+  dsets->lregion = 0;
 
   for ( i = 0; i < MAX_DSETS; ++i )
     {
@@ -888,7 +1126,7 @@ void *Importcmsaf(void *argument)
 #if  defined  (HAVE_LIBHDF5)
   static char func[] = "Importcmsaf";
   int streamID;
-  int gridID, zaxisID, taxisID, vlistID;
+  int gridID = -1, zaxisID, taxisID, vlistID;
   int i, offset;
   int nmiss;
   int ivar;
@@ -935,7 +1173,12 @@ void *Importcmsaf(void *argument)
     {
       gridID = read_geolocation(file_id, nx, ny);
     }
-  else
+  else if ( dsets.lregion )
+    {
+      gridID = read_region(file_id, nx, ny);
+    }
+  
+  if ( gridID == -1 )
     {
       gridID = gridCreate(GRID_GENERIC, gridsize);
       gridDefXsize(gridID, nx);

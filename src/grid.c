@@ -20,6 +20,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdarg.h> /* va_list */
 
 #if defined (HAVE_LIBPROJ)
 #  include "projects.h"
@@ -273,6 +274,28 @@ void gridGenYbounds2D(int nx, int ny, double *ybounds, double *ybounds2D)
 }
 
 
+char *gen_param(const char *fmt, ...)
+{
+  static char func[] = "get_param";
+  va_list args;
+  char str[256];
+  char *rstr;
+  int len;
+
+  va_start(args, fmt);
+
+  len = vsprintf(str, fmt, args);
+
+  va_end(args);
+
+  len++;
+  rstr = (char *) malloc(len*sizeof(char));
+  memcpy(rstr, str, len*sizeof(char));
+
+  return (rstr);
+}
+
+
 int gridToCurvilinear(int gridID1)
 {
   static char func[] = "gridToCurvilinear";
@@ -288,6 +311,7 @@ int gridToCurvilinear(int gridID1)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_LCC:
+    case GRID_LAEA:
     case GRID_SINUSOIDAL:
       {
 	int i, j, nx, ny;
@@ -400,6 +424,49 @@ int gridToCurvilinear(int gridID1)
 		    cdoAbort("proj4 support not compiled in!");
 #endif
 		  }
+		else if ( gridtype == GRID_LAEA )
+		  {
+#if defined (HAVE_LIBPROJ)
+		    int i;
+		    PJ   *libProj;
+		    char *params[20];
+		    int nbpar=0;
+		    projUV data, res;
+		    double a, lon_0, lat_0;
+
+		    gridInqLaea(gridID1, &a , &lon_0, &lat_0);
+
+		    nbpar = 0;
+		    params[nbpar++] = gen_param("proj=laea");
+		    params[nbpar++] = gen_param("a=%g", a);
+		    params[nbpar++] = gen_param("lon_0=%g", lon_0);
+		    params[nbpar++] = gen_param("lat_0=%g", lat_0);
+
+		    if ( cdoVerbose )
+		      for ( i = 0; i < nbpar; ++i )
+			cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+		    libProj = pj_init(nbpar, &params[0]);
+		    if ( !libProj )
+		      cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+		    for ( i = 0; i < nbpar; ++i ) free(params[i]);
+
+		    /* libProj->over = 1; */		// allow longitude > 180°
+
+		    for ( j = 0; j < ny; j++ )
+		      for ( i = 0; i < nx; i++ )
+			{
+			  data.u = xvals[i];
+			  data.v = yvals[j];
+			  res = pj_inv(data, libProj);
+			  xvals2D[j*nx+i] = res.u*rad2deg;
+			  yvals2D[j*nx+i] = res.v*rad2deg;
+			}
+#else
+		    cdoAbort("proj4 support not compiled in!");
+#endif
+		  }
 		else
 		  {
 		    for ( j = 0; j < ny; j++ )
@@ -490,7 +557,7 @@ int gridToCurvilinear(int gridID1)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double *) malloc(2*ny*sizeof(double));
-		if ( gridtype == GRID_SINUSOIDAL )
+		if ( gridtype == GRID_SINUSOIDAL || gridtype == GRID_LAEA )
 		  gridGenYboundsM(ny, yvals, ybounds);
 		else
 		  gridGenYbounds(ny, yvals, ybounds);
@@ -531,6 +598,73 @@ int gridToCurvilinear(int gridID1)
 			libProj = pj_init(nbpar, params);
 			if ( !libProj )
 			  cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+			/* libProj->over = 1; */		// allow longitude > 180°
+			/*
+			for ( j = 0; j < 2*ny; j++ ) printf("ybounds %d %g\n", j, ybounds[j]);
+			for ( i = 0; i < 2*nx; i++ ) printf("xbounds %d %g\n", i, xbounds[i]);
+			*/
+			for ( j = 0; j < ny; j++ )
+			  for ( i = 0; i < nx; i++ )
+			    {
+			      index = j*4*nx + 4*i;
+
+			      data.u = xbounds[2*i];
+			      data.v = ybounds[2*j];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+0] = res.u*rad2deg;
+			      ybounds2D[index+0] = res.v*rad2deg;
+
+			      data.u = xbounds[2*i];
+			      data.v = ybounds[2*j+1];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+1] = res.u*rad2deg;
+			      ybounds2D[index+1] = res.v*rad2deg;
+
+			      data.u = xbounds[2*i+1];
+			      data.v = ybounds[2*j+1];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+2] = res.u*rad2deg;
+			      ybounds2D[index+2] = res.v*rad2deg;
+
+			      data.u = xbounds[2*i+1];
+			      data.v = ybounds[2*j];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+3] = res.u*rad2deg;
+			      ybounds2D[index+3] = res.v*rad2deg;
+			    }
+#else
+			cdoAbort("proj4 support not compiled in!");
+#endif
+		      }
+		    else if ( gridtype == GRID_LAEA )
+		      {
+#if defined (HAVE_LIBPROJ)
+			int index;
+			int i;
+			PJ   *libProj;
+			char *params[20];
+			int nbpar=0;
+			projUV data, res;
+			double a, lon_0, lat_0;
+
+			gridInqLaea(gridID1, &a , &lon_0, &lat_0);
+
+			nbpar = 0;
+			params[nbpar++] = gen_param("proj=laea");
+			params[nbpar++] = gen_param("a=%g", a);
+			params[nbpar++] = gen_param("lon_0=%g", lon_0);
+			params[nbpar++] = gen_param("lat_0=%g", lat_0);
+
+			if ( cdoVerbose )
+			  for ( i = 0; i < nbpar; ++i )
+			    cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+			libProj = pj_init(nbpar, params);
+			if ( !libProj )
+			  cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+			for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
 			/* libProj->over = 1; */		// allow longitude > 180°
 			/*

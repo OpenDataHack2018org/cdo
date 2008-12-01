@@ -22,6 +22,16 @@ libraries should be installed.
       ({\tt http://hdf.ncsa.uiuc.edu/doc\_resource/SZIP})
       version 2.1 or higher. \\
       This is needed to process szip compressed \htmlref{GRIB}{GRIB} files with {\CDO}. 
+\item \href{http://www.hdfgroup.org/HDF5}{HDF5} library
+      ({\tt http://www.hdfgroup.org/HDF5})
+      version 1.6 or higher. \\
+      This is needed to import \htmlref{CM-SAF}{CM-SAF} HDF5 files with the {\CDO}
+      operator {\bf import\_cmsaf}. 
+\item \href{http://trac.osgeo.org/proj}{PROJ.4} library
+      ({\tt http://trac.osgeo.org/proj})
+      version 4.6 or higher. \\
+      This is needed to convert Sinusoidal and Lambert Azimuthal Equal Area coordinates
+      to geographic coordinates, for e.g. remapping. 
 \end{itemize}
 
 %This section is divided into the following sections:
@@ -56,6 +66,14 @@ Or with \htmlref{netCDF}{netCDF} support:
 \begin{verbatim}
     ./configure --with-netcdf=<netCDF root directory>
 \end{verbatim}
+
+The netCDF-4 configuration depends on the netCDF-4 installation!
+You have to set all additional libraries with the environment variable LIBS, e.g.:
+ 
+\begin{verbatim}
+    ./configure --with-netcdf=<netCDF-4 root directory>  LIBS='-lhdf5 -lz'
+\end{verbatim}
+
 
 To enable \htmlref{szip}{szip} support add:
  
