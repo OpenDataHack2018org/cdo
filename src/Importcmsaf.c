@@ -193,9 +193,10 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   gridDefYsize(gridID, ny);
   gridDefXvals(gridID, xvals);
   gridDefYvals(gridID, yvals);
+  /*
   gridDefXbounds(gridID, xbounds);
   gridDefYbounds(gridID, ybounds);
-
+  */
   free(xvals);
   free(yvals);
   free(xbounds);
@@ -287,7 +288,7 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
   char *pcs[64];
   int npcs = 0;
   int i;
-  size_t len;
+  int len;
   int nfound = 0;
 
   strcpy(proj, "unknown");
@@ -296,7 +297,7 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
   *lat0 = 0;
 
   pcs[npcs++] = &pcs_def[0];
-  len = strlen(pcs_def);
+  len = (int)strlen(pcs_def);
   for ( i = 0; i < len; ++i )
     if ( pcs_def[i] == ',' && npcs < 64 )
       {
