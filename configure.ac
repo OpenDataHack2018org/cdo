@@ -69,7 +69,12 @@ if test -z "$HOST" ; then HOST="unknown"; fi;
 AC_DEFINE_UNQUOTED(HOST_NAME, ["$HOST"], [Host name])
 
 #  ----------------------------------------------------------------------
-#  Checks pthread library
+#  Check for math library
+#
+AC_CHECK_LIB(m, floor)
+
+#  ----------------------------------------------------------------------
+#  Checks for pthread library
 #
 AC_ARG_WITH([threads],
             [AC_HELP_STRING([--with-threads],
@@ -81,6 +86,93 @@ if test "$with_threads" = "no" ; then
 else
   AC_CHECK_HEADERS(pthread.h)
   AC_CHECK_LIB(pthread, pthread_create)
+fi
+
+#  ----------------------------------------------------------------------
+#  Checks for PROJ.4 library
+#
+AC_MSG_CHECKING([whether a location for the PROJ library was specified])
+AC_ARG_WITH([proj],
+            [AS_HELP_STRING([--with-proj=<directory>],
+                            [Specify location of PROJ library. Configure will expect to find subdirs include and lib.])],
+            [PROJDIR=$with_proj])
+if test -z "$PROJDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$PROJDIR])
+  LDFLAGS="$LDFLAGS -L$PROJDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$PROJDIR/include"
+  AC_CHECK_LIB(proj, pj_init,, LDFLAGS="$LDFLAGS")
+# AC_SUBST([PROJDIR], [$PROJDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with ZLIB library
+#
+AC_MSG_CHECKING([whether a location for the ZLIB library was specified])
+AC_ARG_WITH([zlib],
+            [AS_HELP_STRING([--with-zlib=<directory>],
+                            [Specify location of ZLIB library. ZLIB is required for HDF5. Configure will expect to find subdirs include and lib.])],
+            [ZLIBDIR=$with_zlib])
+if test -z "$ZLIBDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$ZLIBDIR])
+  LDFLAGS="$LDFLAGS -L$ZLIBDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$ZLIBDIR/include"
+#  AC_CHECK_LIB(z, xxx, , LDFLAGS="$LDFLAGS")
+# AC_SUBST([ZLIBDIR], [$ZLIBDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with SZLIB library
+#
+AC_MSG_CHECKING([whether a location for the SZLIB library was specified])
+AC_ARG_WITH([szlib],
+            [AS_HELP_STRING([--with-szlib=<directory>],
+                            [Specify location of SZLIB library. You must specify its location if HDF5 was built with SZLIB. Configure will expect to find subdirs include and lib.])],
+            [SZLIBDIR=$with_szlib])
+if test -z "$SZLIBDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$SZLIBDIR])
+  LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
+  AC_CHECK_LIB(sz, SZ_BufftoBuffCompress, , LDFLAGS="$LDFLAGS")
+# AC_SUBST([SZLIBDIR], [$SZLIBDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with HDF5 library
+#
+AC_MSG_CHECKING([whether a location for the HDF5 library was specified])
+AC_ARG_WITH([hdf5],
+            [AS_HELP_STRING([--with-hdf5=<directory>],
+                            [Specify location of HDF5 library. Configure will expect to find subdirs include and lib.])],
+            [HDF5DIR=$with_hdf5])
+if test -z "$HDF5DIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$HDF5DIR])
+
+  LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
+  AC_CHECK_LIB([hdf5], [H5Fopen], [], [nc_hdf5_lib_missing=yes], [-lz])
+# AC_SUBST([HDF5DIR], [$HDF5DIR])
+  if test "x$nc_hdf5_lib_missing" = xyes; then
+    AC_MSG_ERROR([Can't find the hdf5 header and/or library, or can't link a program \
+    to it. HDF5 must be built with zlib; the location of zlib must be specified for HDF5 with the \
+    --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
+    specified with the --with-szlib option.])
+  else
+    LIBS="${LIBS} -lz"
+# Check for the HDF5 High Level library.
+    AC_CHECK_LIB([hdf5_hl], [H5DSis_scale], [], [nc_hdf5_hl_lib_missing=yes])
+#    if test "x$nc_hdf5_hl_lib_missing" = xyes; then
+#      AC_MSG_ERROR([Can't find the hdf5 high-level library. The high-level library is required for netCDF-4.])
+#    fi
+  fi
+
 fi
 
 #  ----------------------------------------------------------------------
@@ -177,7 +269,7 @@ case $withval in
     AC_CHECK_LIB(netcdf, nc_open,, unset HAVE_NETCDF)
 
     if test -z "$HAVE_NETCDF" -a -n "$CONFIG_ABORT"; then
-      AC_MSG_ERROR([couldn't find netcdf library])
+      AC_MSG_ERROR([Can't find netcdf library, or can't link a program to it.])
     fi
     ;;
   no)
@@ -243,64 +335,10 @@ fi
     fi
 
     if test -z "$HAVE_NETCDF" -a -n "$CONFIG_ABORT"; then
-      AC_MSG_ERROR(couldn't find netcdf library)
+      AC_MSG_ERROR([Can't find netcdf library, or can't link a program to it.])
     fi
     ;;
 esac
-
-#  ----------------------------------------------------------------------
-#  Compile application with SZLIB library
-#
-AC_MSG_CHECKING([whether a location for the SZLIB library was specified])
-AC_ARG_WITH([szlib],
-            [AS_HELP_STRING([--with-szlib=<directory>],
-                            [Specify location of SZLIB library. Configure will expect to find subdirs include and lib.])],
-            [SZLIBDIR=$with_szlib])
-if test -z "$SZLIBDIR" ; then
-  AC_MSG_RESULT([no])
-else
-  AC_MSG_RESULT([$SZLIBDIR])
-  LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
-  CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
-  AC_CHECK_LIB(sz, SZ_BufftoBuffCompress, , LDFLAGS="$LDFLAGS")
-# AC_SUBST([SZLIBDIR], [$SZLIBDIR])
-fi
-
-#  ----------------------------------------------------------------------
-#  Compile application with HDF5 library
-#
-AC_MSG_CHECKING([whether a location for the HDF5 library was specified])
-AC_ARG_WITH([hdf5],
-            [AS_HELP_STRING([--with-hdf5=<directory>],
-                            [Specify location of HDF5 library. Configure will expect to find subdirs include and lib.])],
-            [HDF5DIR=$with_hdf5])
-if test -z "$HDF5DIR" ; then
-  AC_MSG_RESULT([no])
-else
-  AC_MSG_RESULT([$HDF5DIR])
-  LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
-  CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
-  AC_CHECK_LIB(hdf5, H5Fopen,, LDFLAGS="$LDFLAGS", -lm -lz)
-# AC_SUBST([HDF5DIR], [$HDF5DIR])
-fi
-
-#  ----------------------------------------------------------------------
-#  Compile application with PROJ library
-#
-AC_MSG_CHECKING([whether a location for the PROJ library was specified])
-AC_ARG_WITH([proj],
-            [AS_HELP_STRING([--with-proj=<directory>],
-                            [Specify location of PROJ library. Configure will expect to find subdirs include and lib.])],
-            [PROJDIR=$with_proj])
-if test -z "$PROJDIR" ; then
-  AC_MSG_RESULT([no])
-else
-  AC_MSG_RESULT([$PROJDIR])
-  LDFLAGS="$LDFLAGS -L$PROJDIR/lib"
-  CPPFLAGS="$CPPFLAGS -I$PROJDIR/include"
-  AC_CHECK_LIB(proj, pj_init,, LDFLAGS="$LDFLAGS", -lm)
-# AC_SUBST([PROJDIR], [$PROJDIR])
-fi
 
 #  ----------------------------------------------------------------------
 

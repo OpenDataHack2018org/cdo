@@ -227,9 +227,9 @@ cdo_SOURCES = Arith.c		\
 	      statistic.h       \
 	      cdi.h
 #
-cdo_LDADD = $(LDFLAGS) -lm
+#cdo_LDADD = $(LDFLAGS) -lm
 #
-cdotest_LDADD = $(LDFLAGS) -lm
+#cdotest_LDADD = $(LDFLAGS) -lm
 #
 cdotest_SOURCES = cdi.h 	\
 		  cdilib.c 	\

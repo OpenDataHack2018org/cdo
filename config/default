@@ -86,7 +86,7 @@ case "${HOSTNAME}" in
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal" LIBS="-lz"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --program-suffix=_${SGE_SUFFIX} \
@@ -200,8 +200,9 @@ case "${HOSTNAME}" in
     hpc*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/lib/netcdf/3.6.2/LP64_underscore \
+                    --with-hdf5=/usr/local/lib/hdf5/1.6.5/LP64_underscore \
                     --with-szlib=$HOME/local \
-                    --with-hdf5=/usr/local/lib/hdf5/1.6.5/LP64_underscore LIBS="-lz" \
+                    --with-proj=$HOME/local \
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
 	;;
 # powerpc-ibm-aix6.0.0.0

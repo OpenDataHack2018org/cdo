@@ -112,11 +112,10 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Wct.$(OBJEXT) \
 	statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
-am__DEPENDENCIES_1 =
-cdo_DEPENDENCIES = $(am__DEPENDENCIES_1)
+cdo_LDADD = $(LDADD)
 am_cdotest_OBJECTS = cdilib.$(OBJEXT) cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
-cdotest_DEPENDENCIES = $(am__DEPENDENCIES_1)
+cdotest_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -453,9 +452,9 @@ cdo_SOURCES = Arith.c		\
 	      cdi.h
 
 #
-cdo_LDADD = $(LDFLAGS) -lm
+#cdo_LDADD = $(LDFLAGS) -lm
 #
-cdotest_LDADD = $(LDFLAGS) -lm
+#cdotest_LDADD = $(LDFLAGS) -lm
 #
 cdotest_SOURCES = cdi.h 	\
 		  cdilib.c 	\

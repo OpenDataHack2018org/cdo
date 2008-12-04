@@ -1310,19 +1310,23 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-threads          Use the pthread library [default=yes]
+  --with-proj=<directory> Specify location of PROJ library. Configure will
+                          expect to find subdirs include and lib.
+  --with-zlib=<directory> Specify location of ZLIB library. ZLIB is required
+                          for HDF5. Configure will expect to find subdirs
+                          include and lib.
+  --with-szlib=<directory>
+                          Specify location of SZLIB library. You must specify
+                          its location if HDF5 was built with SZLIB. Configure
+                          will expect to find subdirs include and lib.
+  --with-hdf5=<directory> Specify location of HDF5 library. Configure will
+                          expect to find subdirs include and lib.
   --with-grib             Use the internal GRIB library [default=yes]
   --with-service          Use the internal SERVICE library [default=yes]
   --with-extra            Use the internal EXTRA library [default=yes]
   --with-ieg              Use the internal IEG library [default=yes]
   --with-netcdf=<directory>
                           Specify location of netCDF library. Configure will
-                          expect to find subdirs include and lib.
-  --with-szlib=<directory>
-                          Specify location of SZLIB library. Configure will
-                          expect to find subdirs include and lib.
-  --with-hdf5=<directory> Specify location of HDF5 library. Configure will
-                          expect to find subdirs include and lib.
-  --with-proj=<directory> Specify location of PROJ library. Configure will
                           expect to find subdirs include and lib.
 
 Some influential environment variables:
@@ -5911,7 +5915,82 @@ _ACEOF
 
 
 #  ----------------------------------------------------------------------
-#  Checks pthread library
+#  Check for math library
+#
+
+{ echo "$as_me:$LINENO: checking for floor in -lm" >&5
+echo $ECHO_N "checking for floor in -lm... $ECHO_C" >&6; }
+if test "${ac_cv_lib_m_floor+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lm  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char floor ();
+int
+main ()
+{
+return floor ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_m_floor=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_m_floor=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_m_floor" >&5
+echo "${ECHO_T}$ac_cv_lib_m_floor" >&6; }
+if test $ac_cv_lib_m_floor = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBM 1
+_ACEOF
+
+  LIBS="-lm $LIBS"
+
+fi
+
+
+#  ----------------------------------------------------------------------
+#  Checks for pthread library
 #
 
 # Check whether --with-threads was given.
@@ -6141,6 +6220,406 @@ _ACEOF
   LIBS="-lpthread $LIBS"
 
 fi
+
+fi
+
+#  ----------------------------------------------------------------------
+#  Checks for PROJ.4 library
+#
+{ echo "$as_me:$LINENO: checking whether a location for the PROJ library was specified" >&5
+echo $ECHO_N "checking whether a location for the PROJ library was specified... $ECHO_C" >&6; }
+
+# Check whether --with-proj was given.
+if test "${with_proj+set}" = set; then
+  withval=$with_proj; PROJDIR=$with_proj
+fi
+
+if test -z "$PROJDIR" ; then
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $PROJDIR" >&5
+echo "${ECHO_T}$PROJDIR" >&6; }
+  LDFLAGS="$LDFLAGS -L$PROJDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$PROJDIR/include"
+
+{ echo "$as_me:$LINENO: checking for pj_init in -lproj" >&5
+echo $ECHO_N "checking for pj_init in -lproj... $ECHO_C" >&6; }
+if test "${ac_cv_lib_proj_pj_init+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lproj  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char pj_init ();
+int
+main ()
+{
+return pj_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_proj_pj_init=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_proj_pj_init=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_proj_pj_init" >&5
+echo "${ECHO_T}$ac_cv_lib_proj_pj_init" >&6; }
+if test $ac_cv_lib_proj_pj_init = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPROJ 1
+_ACEOF
+
+  LIBS="-lproj $LIBS"
+
+else
+  LDFLAGS="$LDFLAGS"
+fi
+
+# AC_SUBST([PROJDIR], [$PROJDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with ZLIB library
+#
+{ echo "$as_me:$LINENO: checking whether a location for the ZLIB library was specified" >&5
+echo $ECHO_N "checking whether a location for the ZLIB library was specified... $ECHO_C" >&6; }
+
+# Check whether --with-zlib was given.
+if test "${with_zlib+set}" = set; then
+  withval=$with_zlib; ZLIBDIR=$with_zlib
+fi
+
+if test -z "$ZLIBDIR" ; then
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $ZLIBDIR" >&5
+echo "${ECHO_T}$ZLIBDIR" >&6; }
+  LDFLAGS="$LDFLAGS -L$ZLIBDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$ZLIBDIR/include"
+#  AC_CHECK_LIB(z, xxx, , LDFLAGS="$LDFLAGS")
+# AC_SUBST([ZLIBDIR], [$ZLIBDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with SZLIB library
+#
+{ echo "$as_me:$LINENO: checking whether a location for the SZLIB library was specified" >&5
+echo $ECHO_N "checking whether a location for the SZLIB library was specified... $ECHO_C" >&6; }
+
+# Check whether --with-szlib was given.
+if test "${with_szlib+set}" = set; then
+  withval=$with_szlib; SZLIBDIR=$with_szlib
+fi
+
+if test -z "$SZLIBDIR" ; then
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $SZLIBDIR" >&5
+echo "${ECHO_T}$SZLIBDIR" >&6; }
+  LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
+
+{ echo "$as_me:$LINENO: checking for SZ_BufftoBuffCompress in -lsz" >&5
+echo $ECHO_N "checking for SZ_BufftoBuffCompress in -lsz... $ECHO_C" >&6; }
+if test "${ac_cv_lib_sz_SZ_BufftoBuffCompress+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsz  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char SZ_BufftoBuffCompress ();
+int
+main ()
+{
+return SZ_BufftoBuffCompress ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_sz_SZ_BufftoBuffCompress=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_sz_SZ_BufftoBuffCompress=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_sz_SZ_BufftoBuffCompress" >&5
+echo "${ECHO_T}$ac_cv_lib_sz_SZ_BufftoBuffCompress" >&6; }
+if test $ac_cv_lib_sz_SZ_BufftoBuffCompress = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSZ 1
+_ACEOF
+
+  LIBS="-lsz $LIBS"
+
+else
+  LDFLAGS="$LDFLAGS"
+fi
+
+# AC_SUBST([SZLIBDIR], [$SZLIBDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with HDF5 library
+#
+{ echo "$as_me:$LINENO: checking whether a location for the HDF5 library was specified" >&5
+echo $ECHO_N "checking whether a location for the HDF5 library was specified... $ECHO_C" >&6; }
+
+# Check whether --with-hdf5 was given.
+if test "${with_hdf5+set}" = set; then
+  withval=$with_hdf5; HDF5DIR=$with_hdf5
+fi
+
+if test -z "$HDF5DIR" ; then
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+else
+  { echo "$as_me:$LINENO: result: $HDF5DIR" >&5
+echo "${ECHO_T}$HDF5DIR" >&6; }
+
+  LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
+
+{ echo "$as_me:$LINENO: checking for H5Fopen in -lhdf5" >&5
+echo $ECHO_N "checking for H5Fopen in -lhdf5... $ECHO_C" >&6; }
+if test "${ac_cv_lib_hdf5_H5Fopen+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lhdf5 -lz $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char H5Fopen ();
+int
+main ()
+{
+return H5Fopen ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_hdf5_H5Fopen=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_hdf5_H5Fopen=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_hdf5_H5Fopen" >&5
+echo "${ECHO_T}$ac_cv_lib_hdf5_H5Fopen" >&6; }
+if test $ac_cv_lib_hdf5_H5Fopen = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBHDF5 1
+_ACEOF
+
+  LIBS="-lhdf5 $LIBS"
+
+else
+  nc_hdf5_lib_missing=yes
+fi
+
+# AC_SUBST([HDF5DIR], [$HDF5DIR])
+  if test "x$nc_hdf5_lib_missing" = xyes; then
+    { { echo "$as_me:$LINENO: error: Can't find the hdf5 header and/or library, or can't link a program \
+    to it. HDF5 must be built with zlib; the location of zlib must be specified for HDF5 with the \
+    --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
+    specified with the --with-szlib option." >&5
+echo "$as_me: error: Can't find the hdf5 header and/or library, or can't link a program \
+    to it. HDF5 must be built with zlib; the location of zlib must be specified for HDF5 with the \
+    --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
+    specified with the --with-szlib option." >&2;}
+   { (exit 1); exit 1; }; }
+  else
+    LIBS="${LIBS} -lz"
+# Check for the HDF5 High Level library.
+
+{ echo "$as_me:$LINENO: checking for H5DSis_scale in -lhdf5_hl" >&5
+echo $ECHO_N "checking for H5DSis_scale in -lhdf5_hl... $ECHO_C" >&6; }
+if test "${ac_cv_lib_hdf5_hl_H5DSis_scale+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lhdf5_hl  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char H5DSis_scale ();
+int
+main ()
+{
+return H5DSis_scale ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext &&
+       $as_test_x conftest$ac_exeext; then
+  ac_cv_lib_hdf5_hl_H5DSis_scale=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_hdf5_hl_H5DSis_scale=no
+fi
+
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ echo "$as_me:$LINENO: result: $ac_cv_lib_hdf5_hl_H5DSis_scale" >&5
+echo "${ECHO_T}$ac_cv_lib_hdf5_hl_H5DSis_scale" >&6; }
+if test $ac_cv_lib_hdf5_hl_H5DSis_scale = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBHDF5_HL 1
+_ACEOF
+
+  LIBS="-lhdf5_hl $LIBS"
+
+else
+  nc_hdf5_hl_lib_missing=yes
+fi
+
+#    if test "x$nc_hdf5_hl_lib_missing" = xyes; then
+#      AC_MSG_ERROR([Can't find the hdf5 high-level library. The high-level library is required for netCDF-4.])
+#    fi
+  fi
 
 fi
 
@@ -6507,8 +6986,8 @@ fi
 
 
     if test -z "$HAVE_NETCDF" -a -n "$CONFIG_ABORT"; then
-      { { echo "$as_me:$LINENO: error: couldn't find netcdf library" >&5
-echo "$as_me: error: couldn't find netcdf library" >&2;}
+      { { echo "$as_me:$LINENO: error: Can't find netcdf library, or can't link a program to it." >&5
+echo "$as_me: error: Can't find netcdf library, or can't link a program to it." >&2;}
    { (exit 1); exit 1; }; }
     fi
     ;;
@@ -6867,297 +7346,12 @@ fi
     fi
 
     if test -z "$HAVE_NETCDF" -a -n "$CONFIG_ABORT"; then
-      { { echo "$as_me:$LINENO: error: couldn't find netcdf library" >&5
-echo "$as_me: error: couldn't find netcdf library" >&2;}
+      { { echo "$as_me:$LINENO: error: Can't find netcdf library, or can't link a program to it." >&5
+echo "$as_me: error: Can't find netcdf library, or can't link a program to it." >&2;}
    { (exit 1); exit 1; }; }
     fi
     ;;
 esac
-
-#  ----------------------------------------------------------------------
-#  Compile application with SZLIB library
-#
-{ echo "$as_me:$LINENO: checking whether a location for the SZLIB library was specified" >&5
-echo $ECHO_N "checking whether a location for the SZLIB library was specified... $ECHO_C" >&6; }
-
-# Check whether --with-szlib was given.
-if test "${with_szlib+set}" = set; then
-  withval=$with_szlib; SZLIBDIR=$with_szlib
-fi
-
-if test -z "$SZLIBDIR" ; then
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-else
-  { echo "$as_me:$LINENO: result: $SZLIBDIR" >&5
-echo "${ECHO_T}$SZLIBDIR" >&6; }
-  LDFLAGS="$LDFLAGS -L$SZLIBDIR/lib"
-  CPPFLAGS="$CPPFLAGS -I$SZLIBDIR/include"
-
-{ echo "$as_me:$LINENO: checking for SZ_BufftoBuffCompress in -lsz" >&5
-echo $ECHO_N "checking for SZ_BufftoBuffCompress in -lsz... $ECHO_C" >&6; }
-if test "${ac_cv_lib_sz_SZ_BufftoBuffCompress+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsz  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char SZ_BufftoBuffCompress ();
-int
-main ()
-{
-return SZ_BufftoBuffCompress ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext &&
-       $as_test_x conftest$ac_exeext; then
-  ac_cv_lib_sz_SZ_BufftoBuffCompress=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_sz_SZ_BufftoBuffCompress=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_sz_SZ_BufftoBuffCompress" >&5
-echo "${ECHO_T}$ac_cv_lib_sz_SZ_BufftoBuffCompress" >&6; }
-if test $ac_cv_lib_sz_SZ_BufftoBuffCompress = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBSZ 1
-_ACEOF
-
-  LIBS="-lsz $LIBS"
-
-else
-  LDFLAGS="$LDFLAGS"
-fi
-
-# AC_SUBST([SZLIBDIR], [$SZLIBDIR])
-fi
-
-#  ----------------------------------------------------------------------
-#  Compile application with HDF5 library
-#
-{ echo "$as_me:$LINENO: checking whether a location for the HDF5 library was specified" >&5
-echo $ECHO_N "checking whether a location for the HDF5 library was specified... $ECHO_C" >&6; }
-
-# Check whether --with-hdf5 was given.
-if test "${with_hdf5+set}" = set; then
-  withval=$with_hdf5; HDF5DIR=$with_hdf5
-fi
-
-if test -z "$HDF5DIR" ; then
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-else
-  { echo "$as_me:$LINENO: result: $HDF5DIR" >&5
-echo "${ECHO_T}$HDF5DIR" >&6; }
-  LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
-  CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
-
-{ echo "$as_me:$LINENO: checking for H5Fopen in -lhdf5" >&5
-echo $ECHO_N "checking for H5Fopen in -lhdf5... $ECHO_C" >&6; }
-if test "${ac_cv_lib_hdf5_H5Fopen+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lhdf5 -lm -lz $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char H5Fopen ();
-int
-main ()
-{
-return H5Fopen ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext &&
-       $as_test_x conftest$ac_exeext; then
-  ac_cv_lib_hdf5_H5Fopen=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_hdf5_H5Fopen=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_hdf5_H5Fopen" >&5
-echo "${ECHO_T}$ac_cv_lib_hdf5_H5Fopen" >&6; }
-if test $ac_cv_lib_hdf5_H5Fopen = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBHDF5 1
-_ACEOF
-
-  LIBS="-lhdf5 $LIBS"
-
-else
-  LDFLAGS="$LDFLAGS"
-fi
-
-# AC_SUBST([HDF5DIR], [$HDF5DIR])
-fi
-
-#  ----------------------------------------------------------------------
-#  Compile application with PROJ library
-#
-{ echo "$as_me:$LINENO: checking whether a location for the PROJ library was specified" >&5
-echo $ECHO_N "checking whether a location for the PROJ library was specified... $ECHO_C" >&6; }
-
-# Check whether --with-proj was given.
-if test "${with_proj+set}" = set; then
-  withval=$with_proj; PROJDIR=$with_proj
-fi
-
-if test -z "$PROJDIR" ; then
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-else
-  { echo "$as_me:$LINENO: result: $PROJDIR" >&5
-echo "${ECHO_T}$PROJDIR" >&6; }
-  LDFLAGS="$LDFLAGS -L$PROJDIR/lib"
-  CPPFLAGS="$CPPFLAGS -I$PROJDIR/include"
-
-{ echo "$as_me:$LINENO: checking for pj_init in -lproj" >&5
-echo $ECHO_N "checking for pj_init in -lproj... $ECHO_C" >&6; }
-if test "${ac_cv_lib_proj_pj_init+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lproj -lm $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char pj_init ();
-int
-main ()
-{
-return pj_init ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval "echo \"\$as_me:$LINENO: $ac_try_echo\"") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext &&
-       $as_test_x conftest$ac_exeext; then
-  ac_cv_lib_proj_pj_init=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_proj_pj_init=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ echo "$as_me:$LINENO: result: $ac_cv_lib_proj_pj_init" >&5
-echo "${ECHO_T}$ac_cv_lib_proj_pj_init" >&6; }
-if test $ac_cv_lib_proj_pj_init = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPROJ 1
-_ACEOF
-
-  LIBS="-lproj $LIBS"
-
-else
-  LDFLAGS="$LDFLAGS"
-fi
-
-# AC_SUBST([PROJDIR], [$PROJDIR])
-fi
 
 #  ----------------------------------------------------------------------
 
