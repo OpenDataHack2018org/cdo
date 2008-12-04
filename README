@@ -29,18 +29,20 @@ Building and installing it:
         script has some more options; type 'configure -h' to see them.
 
         The most interesting ones are the usual
-        --prefix=<installation directory> and
-        --with-netcdf=<directory> to enable netCDF support.
+          --prefix=<installation directory> and
+          --with-netcdf=<directory> to enable netCDF support.
 
-        The netCDF-4 configuration depends on the netCDF-4 installation!
-        You have to set all additional libraries with the environment 
-        variable LIBS, e.g.:
+        The netCDF-4 configuration depends on the netCDF-4 and HDF5 installation!
+	You have to define the location of the HDF5 installation if netCDF-4 was 
+        build with HDF5 support:
  
-        --with-netcdf=<netCDF-4 root directory>  LIBS='-lhdf5 -lz'
+          --with-netcdf=<netCDF-4 root directory> --with-hdf5=<HDF5 root directory> 
 
-        To process szip compressed GRIB files you have to enable
-        SZLIB support with:
-        --with-szlib=<directory>
+        You have to specify also the location of the SZLIB if HDF5 was build with 
+        SZLIB support.
+
+        To process szip compressed GRIB files you have to enable SZLIB support with:
+          --with-szlib=<directory>
 
      2. Do "make" to compile the program.
 

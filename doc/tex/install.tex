@@ -67,13 +67,16 @@ Or with \htmlref{netCDF}{netCDF} support:
     ./configure --with-netcdf=<netCDF root directory>
 \end{verbatim}
 
-The netCDF-4 configuration depends on the netCDF-4 installation!
-You have to set all additional libraries with the environment variable LIBS, e.g.:
+The netCDF-4 configuration depends on the netCDF-4 and HDF5 installation!
+You have to define the location of the HDF5 installation if netCDF-4 was 
+build with HDF5 support:
  
 \begin{verbatim}
-    ./configure --with-netcdf=<netCDF-4 root directory>  LIBS='-lhdf5 -lz'
+    ./configure --with-netcdf=<netCDF-4 root directory> \
+                --with-hdf5=<HDF5 root directory>
 \end{verbatim}
 
+You have to specify also the location of the SZLIB if HDF5 was build with SZLIB support.\\
 
 To enable \htmlref{szip}{szip} support add:
  
