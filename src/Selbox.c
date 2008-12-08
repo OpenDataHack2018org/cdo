@@ -384,8 +384,6 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   if ( gridtype == GRID_CURVILINEAR )
     {
       double xval, yval;
-      double x1 = 720, x2 = -720, x3 = -720, x4 = 720, y1 = 180, y2 = 180, y3 = -180, y4 = -180;
-      int    ix1 = 0, ix2 = 0, ix3 = 0, ix4 = 0, iy1 = 0, iy2 = 0, iy3 = 0, iy4 = 0;
       int ixmin, ixmax, iymin, iymax;
 
       *lat1 = nlat1-1;
@@ -394,6 +392,11 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       *lon12 = -1;
       *lon21 = nlon1-1;
       *lon22 = 0;
+
+      ixmin = nlon1-1;
+      ixmax = 0;
+      iymin = nlat1-1;
+      iymax = 0;
 
       for ( ilat = 0; ilat < nlat1; ilat++ )
 	{
@@ -405,43 +408,25 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	      xval *= xfact;
 	      yval *= yfact;
 
-	      if ( xval >= xlon1 && xval <= xlon2 && yval >= xlat1 && yval <= xlat2 )
+	      if ( ((xval >= xlon1 && xval <= xlon2) ||
+		    (xval-360 >= xlon1 && xval-360 <= xlon2) ||
+		    (xval+360 >= xlon1 && xval+360 <= xlon2)) &&
+		   yval >= xlat1 && yval <= xlat2 )
 		{
-		  if ( xval < x1 && yval < y1 ) { x1 = xval; y1 = yval; ix1 = ilon; iy1 = ilat; }
-		  if ( xval > x2 && yval < y2 ) { x2 = xval; y2 = yval; ix2 = ilon; iy2 = ilat; }
-		  if ( xval > x3 && yval > y3 ) { x3 = xval; y3 = yval; ix3 = ilon; iy3 = ilat; }
-		  if ( xval < x4 && yval > y4 ) { x4 = xval; y4 = yval; ix4 = ilon; iy4 = ilat; }
+		  if ( ilon < ixmin ) ixmin = ilon;
+		  if ( ilon > ixmax ) ixmax = ilon;
+		  if ( ilat < iymin ) iymin = ilat;
+		  if ( ilat > iymax ) iymax = ilat;
 		}
 	    }
 	}
-      /*
-      printf("%g %g %g %g %g %g %g %g\n",  x1, x2, x3, x4, y1, y2, y3, y4);
-      printf("%d %d %d %d %d %d %d %d\n",     ix1, ix2, ix3, ix4, iy1, iy2, iy3, iy4);
-      */
-      ixmin = ix1;
-      ixmax = ix1;
-      if ( ix2 < ixmin ) ixmin = ix2;
-      if ( ix3 < ixmin ) ixmin = ix3;
-      if ( ix4 < ixmin ) ixmin = ix4;
-      if ( ix2 > ixmax ) ixmax = ix2;
-      if ( ix3 > ixmax ) ixmax = ix3;
-      if ( ix4 > ixmax ) ixmax = ix4;
-      iymin = iy1;
-      iymax = iy1;
-      if ( iy2 < iymin ) iymin = iy2;
-      if ( iy3 < iymin ) iymin = iy3;
-      if ( iy4 < iymin ) iymin = iy4;
-      if ( iy2 > iymax ) iymax = iy2;
-      if ( iy3 > iymax ) iymax = iy3;
-      if ( iy4 > iymax ) iymax = iy4;
 
       *lat1 = iymin;
       *lat2 = iymax;
       *lon21 = ixmin;
       *lon22 = ixmax;
       /*
-      printf(" xmin=%g, xmax=%g, ymin=%g, ymax=%g\n", xmin, xmax, ymin, ymax);
-      printf("%d %d %d %d %d %d\n", *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
+      printf(" ixmin=%d, ixmax=%d, iymin=%d, iymax=%d\n", ixmin, ixmax, iymin, iymax);
       */
     }
   else
