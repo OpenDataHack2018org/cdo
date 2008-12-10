@@ -25,7 +25,6 @@
       Gridboxstat    gridboxavg          Gridbox average
       Gridboxstat    gridboxstd          Gridbox standard deviation
       Gridboxstat    gridboxvar          Gridbox variance
-      Gridboxstat    gridboxpctl         Gridbox percentiles
 */
 
 
@@ -53,7 +52,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
   double on_up, on_lo, ox_up, ox_lo, an_le, an_ri, ax_le, ax_ri;
-  double xvals2_0;
+  double xvals2_0 = 0;
   double area_norm;  
 
  
@@ -136,6 +135,12 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
+
+      free(xvals2);
+      free(yvals2);
+
+      free(xvals1);
+      free(yvals1);
       
       if ( grid2_corner_lon && grid2_corner_lat )
         {
@@ -145,23 +150,36 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           
           free(grid2_corner_lon);
           free(grid2_corner_lat);
+
+          free(grid1_corner_lon);
+          free(grid1_corner_lat);
         }
     }
   else if ( gridtype == GRID_CURVILINEAR )
     {
-      grid1_corner_lon = (double *) malloc(4*nlon1*nlat1*sizeof(double));
-      grid1_corner_lat = (double *) malloc(4*nlon1*nlat1*sizeof(double));
-      grid2_corner_lon = (double *) malloc(4*nlon2*nlat2*sizeof(double));
-      grid2_corner_lat = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+      int gridHasBounds = FALSE;
+
+      if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
+	gridHasBounds = TRUE;
+
       xvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
       yvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
       xvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
       yvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
-      
-      gridInqXbounds(gridID1, grid1_corner_lon);
-      gridInqYbounds(gridID1, grid1_corner_lat);
+
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
+
+      if ( gridHasBounds )
+	{
+	  grid1_corner_lon = (double *) malloc(4*nlon1*nlat1*sizeof(double));
+	  grid1_corner_lat = (double *) malloc(4*nlon1*nlat1*sizeof(double));
+	  grid2_corner_lon = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+	  grid2_corner_lat = (double *) malloc(4*nlon2*nlat2*sizeof(double));
+      
+	  gridInqXbounds(gridID1, grid1_corner_lon);
+	  gridInqYbounds(gridID1, grid1_corner_lat);
+	}
       
       // Process grid2 bounds
       area_norm = xinc*yinc;
@@ -205,76 +223,79 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                       else                      
                         xvals2[g2_add] += xvals1[g1_add]/area_norm;                                                                    
                       yvals2[g2_add] += yvals1[g1_add]/area_norm;  
-                      add = 4*g1_add + corner;
-                      //fprintf(stderr, "%i\n", add);
-                      // upper left cell
-                      if ( y1 == y2*yinc && x1 == x2*xinc)
-                        {
-                          for ( corner = 0; corner < 4; corner++ )
-                            {
-                              add = 4*g1_add + corner;
-                              if ( grid1_corner_lon[add] < on_up )
-                                on_up = grid1_corner_lon[add];
-                              if (grid1_corner_lat[add] > ax_le )
-                                ax_le = grid1_corner_lat[add];
-                            }
-                          
-                        }
+
+		      if ( gridHasBounds )
+			{
+			  // upper left cell
+			  if ( y1 == y2*yinc && x1 == x2*xinc)
+			    {
+			      for ( corner = 0; corner < 4; corner++ )
+				{
+				  add = 4*g1_add + corner;
+				  if ( grid1_corner_lon[add] < on_up )
+				    on_up = grid1_corner_lon[add];
+				  if (grid1_corner_lat[add] > ax_le )
+				    ax_le = grid1_corner_lat[add];
+				}
+			    }
                       
-                      // upper right cell
-                      if ( ( y1 == y2*yinc ) && ( x1 == (x2+1)*xinc - 1 ) )
-                        {    
-                          for ( corner = 0; corner < 4; corner++ )
-                            {
-                              add = 4*g1_add + corner;
-                              if ( grid1_corner_lon[add] > ox_up )
-                                ox_up = grid1_corner_lon[add];
-                              if (grid1_corner_lat[add] > ax_ri )
-                                ax_ri = grid1_corner_lat[add];
-                            }
-                       
-                        }
+			  // upper right cell
+			  if ( ( y1 == y2*yinc ) && ( x1 == (x2+1)*xinc - 1 ) )
+			    {    
+			      for ( corner = 0; corner < 4; corner++ )
+				{
+				  add = 4*g1_add + corner;
+				  if ( grid1_corner_lon[add] > ox_up )
+				    ox_up = grid1_corner_lon[add];
+				  if (grid1_corner_lat[add] > ax_ri )
+				    ax_ri = grid1_corner_lat[add];
+				}
+			    }
                       
-                      // lower right cell
-                      if ( ( y1 == (y2+1)*yinc -1 ) && (x1 == (x2+1)*xinc -1) )
-                        {
-                          for ( corner = 0; corner < 4; corner ++ )
-                            {                             
-                              add = 4*g1_add + corner;
-                              if ( grid1_corner_lon[add] > ox_lo )
-                                ox_lo = grid1_corner_lon[add];
-                              if ( grid1_corner_lat[add] < an_ri )
-                                an_ri = grid1_corner_lat[add];
-                            }
-                        }
+			  // lower right cell
+			  if ( ( y1 == (y2+1)*yinc -1 ) && (x1 == (x2+1)*xinc -1) )
+			    {
+			      for ( corner = 0; corner < 4; corner ++ )
+				{                             
+				  add = 4*g1_add + corner;
+				  if ( grid1_corner_lon[add] > ox_lo )
+				    ox_lo = grid1_corner_lon[add];
+				  if ( grid1_corner_lat[add] < an_ri )
+				    an_ri = grid1_corner_lat[add];
+				}
+			    }
                       
-                      // lower left cell
-                      if ( ( y1 == (y2+1)*yinc -1 ) && ( x1 == x2*xinc ) )
-                        {    
-                          for ( corner = 0; corner < 4; corner ++ )
-                            {
-                              add = 4*g1_add + corner;
-                              if ( grid1_corner_lon[add] < on_lo )
-                                on_lo = grid1_corner_lon[add];
-                              if ( grid1_corner_lat[add] < an_le )
-                                an_le = grid1_corner_lat[add];                              
-                            }                       
-                        }                                                                                          
-                    }                  
-                }
+			  // lower left cell
+			  if ( ( y1 == (y2+1)*yinc -1 ) && ( x1 == x2*xinc ) )
+			    {    
+			      for ( corner = 0; corner < 4; corner ++ )
+				{
+				  add = 4*g1_add + corner;
+				  if ( grid1_corner_lon[add] < on_lo )
+				    on_lo = grid1_corner_lon[add];
+				  if ( grid1_corner_lat[add] < an_le )
+				    an_le = grid1_corner_lat[add];
+				}
+			    }
+			}                  
+		    }
+		}
               
-              // upper left corner
-              grid2_corner_lon[4*g2_add+3] = on_up;
-              grid2_corner_lat[4*g2_add+3] = ax_le;
-              // upper right corner
-              grid2_corner_lon[4*g2_add+2] = ox_up;
-              grid2_corner_lat[4*g2_add+2] = ax_ri;
-              // lower right corner
-              grid2_corner_lon[4*g2_add+1] = ox_lo;
-              grid2_corner_lat[4*g2_add+1] = an_ri;
-              // lower left corner
-              grid2_corner_lon[4*g2_add+0] = on_lo;
-              grid2_corner_lat[4*g2_add+0] = an_le;
+	      if ( gridHasBounds )
+		{
+		  // upper left corner
+		  grid2_corner_lon[4*g2_add+3] = on_up;
+		  grid2_corner_lat[4*g2_add+3] = ax_le;
+		  // upper right corner
+		  grid2_corner_lon[4*g2_add+2] = ox_up;
+		  grid2_corner_lat[4*g2_add+2] = ax_ri;
+		  // lower right corner
+		  grid2_corner_lon[4*g2_add+1] = ox_lo;
+		  grid2_corner_lat[4*g2_add+1] = an_ri;
+		  // lower left corner
+		  grid2_corner_lon[4*g2_add+0] = on_lo;
+		  grid2_corner_lat[4*g2_add+0] = an_le;
+		}
                       
               if ( xvals2[g2_add] >  360. ) xvals2[g2_add] -= 360.;
               if ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
@@ -282,11 +303,27 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
         }
       
       //write grid
-      gridDefNvertex(gridID2, 4);
-      gridDefXbounds(gridID2, grid2_corner_lon);
-      gridDefYbounds(gridID2, grid2_corner_lat);
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
+
+      free(xvals2);
+      free(yvals2);
+
+      free(xvals1);
+      free(yvals1);
+
+      if ( gridHasBounds )
+	{
+	  gridDefNvertex(gridID2, 4);
+	  gridDefXbounds(gridID2, grid2_corner_lon);
+	  gridDefYbounds(gridID2, grid2_corner_lat);
+
+          free(grid2_corner_lon);
+          free(grid2_corner_lat);
+
+          free(grid1_corner_lon);
+          free(grid1_corner_lat);
+	}
     }
   else
     {
