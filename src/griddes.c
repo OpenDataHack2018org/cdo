@@ -956,7 +956,7 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( strncmp(pline, "gridlatlon", 10)  == 0 )
 	{
 	  int i;
-	  float flat, flon;
+	  double flat, flon;
 	  if ( grid.size == 0 ) grid.size = grid.xsize * grid.ysize;
 	  
 	  grid.xvals = (double *) malloc(grid.size*sizeof(double));
@@ -968,7 +968,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  Warning(func, "Incomplete command: >gridlatlon<");
 		  break;
 		}
-	      sscanf(line, "%g %g", &flat, &flon);
+	      sscanf(line, "%lg %lg", &flat, &flon);
 	      grid.yvals[i] = flat;
 	      grid.xvals[i] = flon;
 	    }

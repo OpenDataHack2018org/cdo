@@ -784,6 +784,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    }
 	  else if ( strcmp(attname, "no_data_value") == 0 ||
 		    strcmp(attname, "nodata value") == 0  ||
+		    strcmp(attname, "nodata_value") == 0  ||
 		    strcmp(attname, "nodata") == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )

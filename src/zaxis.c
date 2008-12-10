@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -218,7 +218,7 @@ int zaxisFromFile(FILE *gfp)
       else if ( strncmp(pline, "levels", 6)  == 0 )
 	{
 	  int i;
-	  float flev;
+	  double flev;
 
 	  if ( zaxis.size > 0 )
 	    {
@@ -238,7 +238,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  sscanf(pline, "%g", &flev);
+		  sscanf(pline, "%lg", &flev);
 		  zaxis.vals[i] = flev;
 		  while ( isalnum((int) *pline) ||
 			  isdigit((int) *pline) ||
@@ -253,7 +253,7 @@ int zaxisFromFile(FILE *gfp)
       else if ( strncmp(pline, "vct", 3)  == 0 )
 	{
 	  int i;
-	  float flev;
+	  double flev;
 
 	  if ( zaxis.vctsize > 0 )
 	    {
@@ -273,7 +273,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  sscanf(pline, "%g", &flev);
+		  sscanf(pline, "%lg", &flev);
 		  zaxis.vct[i] = flev;
 		  while ( isalnum((int) *pline) ||
 			  isdigit((int) *pline) ||
@@ -288,7 +288,7 @@ int zaxisFromFile(FILE *gfp)
       else if ( strncmp(pline, "lbounds", 7)  == 0 )
 	{
 	  int i;
-	  float flev;
+	  double flev;
 
 	  if ( zaxis.size > 0 )
 	    {
@@ -308,7 +308,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  sscanf(pline, "%g", &flev);
+		  sscanf(pline, "%lg", &flev);
 		  zaxis.lbounds[i] = flev;
 		  while ( isalnum((int) *pline) ||
 			  isdigit((int) *pline) ||
@@ -323,7 +323,7 @@ int zaxisFromFile(FILE *gfp)
       else if ( strncmp(pline, "ubounds", 7)  == 0 )
 	{
 	  int i;
-	  float flev;
+	  double flev;
 
 	  if ( zaxis.size > 0 )
 	    {
@@ -343,7 +343,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
-		  sscanf(pline, "%g", &flev);
+		  sscanf(pline, "%lg", &flev);
 		  zaxis.ubounds[i] = flev;
 		  while ( isalnum((int) *pline) ||
 			  isdigit((int) *pline) ||
