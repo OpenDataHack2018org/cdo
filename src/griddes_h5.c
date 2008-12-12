@@ -78,6 +78,179 @@ int h5find_object(hid_t file_id, char *name)
 }
 #endif
 
+static
+void fill_gridvals(int xsize, int ysize, double *xvals, double *yvals)
+{
+  int i, j, ii, jj;
+  int index, index2;
+  double xmin, xmax, ymin, ymax;
+
+  xmin = -180;
+  xmax =  180;
+  ymin = -90;
+  ymax =  90;
+  /*
+  for ( ii = 0; ii < xsize/2; ++ii )
+    {
+      index2 = ysize/2*xsize + ii;
+      if ( xvals[index2] > -180 && xvals[index2] < 360 )
+	{
+	  xmin = xvals[index2];
+	  break;
+	}
+    }
+  */
+  for ( ii = xsize-1; ii > xsize/2; --ii )
+    {
+      index2 = ysize/2*xsize + ii;
+      if ( xvals[index2] > -180 && xvals[index2] < 360 )
+	{
+	  xmax = xvals[index2];
+	  break;
+	}
+    }
+
+  for ( jj = 0; jj < ysize; ++jj )
+    {
+      index2 = jj*xsize + xsize/2;
+      if ( xvals[index2] < -180 || xvals[index2] > 360 ) xvals[index2] = 0;
+      index2 = jj*xsize + xsize/2-1;
+      if ( xvals[index2] < -180 || xvals[index2] > 360 ) xvals[index2] = 0;
+    }
+
+  printf("x %g %g\n", xmin, xmax);
+  
+  for ( jj = 0; jj < ysize/2; ++jj )
+    {
+      index2 = jj*xsize + xsize/2;
+      if ( yvals[index2] > -90 && yvals[index2] < 90 )
+	{
+	  ymax = yvals[index2];
+	  break;
+	}
+    }
+
+  for ( jj = ysize-1; jj > ysize/2; --jj )
+    {
+      index2 = jj*xsize + xsize/2;
+      if ( yvals[index2] > -90 && yvals[index2] < 90 )
+	{
+	  ymin = yvals[index2];
+	  break;
+	}
+    }
+  
+  printf("y %g %g\n", ymin, ymax);
+
+  for ( i = 0; i < xsize*ysize; ++i )
+    {
+      if ( xvals[i] > -180 && xvals[i] < 360 )
+	{
+	  if ( xvals[i] < xmin ) xmin = xvals[i];
+	  if ( xvals[i] > xmax ) xmax = xvals[i];
+	}
+
+      if ( yvals[i] > -90 && yvals[i] < 90 )
+	{
+	  if ( yvals[i] < ymin ) ymin = yvals[i];
+	  if ( yvals[i] > ymax ) ymax = yvals[i];
+	}
+    }
+
+  printf("x %g %g\n", xmin, xmax);
+  printf("y %g %g\n", ymin, ymax);
+
+  for ( j = 0; j < ysize; ++j )
+    for ( i = 0; i < xsize; ++i )
+      {
+	index = j*xsize + i;
+
+	if ( xvals[index] < -180 || xvals[index] > 360 )
+	  {
+	    if ( i < xsize/2 )
+	      xvals[index] = xmin;
+	    else
+	      xvals[index] = xmax;
+	    /*
+	    if ( j < ysize/2 )
+	      for ( jj = j+1; jj < ysize/2; ++jj )
+		{
+		  index2 = jj*xsize + i;
+		  if ( xvals[index2] > -180 && xvals[index2] < 360 )
+		    {
+		      xvals[index] = xvals[index2];
+		      break;
+		    }
+		}
+	    else
+	      for ( jj = j-1; jj > ysize/2; --jj )
+		{
+		  index2 = jj*xsize + i;
+		  if ( xvals[index2] > -180 && xvals[index2] < 360 )
+		    {
+		      xvals[index] = xvals[index2];
+		      break;
+		    }
+		}
+	    */
+	    if ( i < xsize/2 )
+	      for ( ii = i+1; ii < xsize/2; ++ii )
+		{
+		  index2 = j*xsize + ii;
+		  if ( xvals[index2] > -180 && xvals[index2] < 360 )
+		    {
+		      xvals[index] = (xmin*(ii-i) + xvals[index2]*(i))/ii;
+		      /*
+		      if ( i%10 )
+			printf("%d %d %d %g %g %g\n", i, ii, ii-i,  xvals[index], xmin, xvals[index2]);
+		      */
+		      break;
+		    }
+		}
+	    else
+	      for ( ii = i-1; ii >= xsize/2; --ii )
+		{
+		  index2 = j*xsize + ii;
+		  if ( xvals[index2] > -180 && xvals[index2] < 360 )
+		    {
+		      xvals[index] = xvals[index2];
+		      xvals[index] = (xmax*(i-ii) + xvals[index2]*((xsize-1)-i))/(xsize-1-ii);
+		      break;
+		    }
+		}
+	  }
+
+	if ( yvals[index] < -90 || yvals[index] > 90 )
+	  {
+	    if ( j < ysize/2 )
+	      yvals[index] = ymax;
+	    else
+	      yvals[index] = ymin;
+
+	    if ( i < xsize/2 )
+	      for ( ii = i+1; ii < xsize/2; ++ii )
+		{
+		  index2 = j*xsize + ii;
+		  if ( yvals[index2] > -90 && yvals[index2] < 90 )
+		    {
+		      yvals[index] = yvals[index2];
+		      break;
+		    }
+		}
+	    else
+	      for ( ii = i-1; ii > xsize/2; --ii )
+		{
+		  index2 = j*xsize + ii;
+		  if ( yvals[index2] > -90 && yvals[index2] < 90 )
+		    {
+		      yvals[index] = yvals[index2];
+		      break;
+		    }
+		}
+	  }
+      }
+}
+
 
 int gridFromH5file(const char *gridfile)
 {
@@ -143,6 +316,8 @@ int gridFromH5file(const char *gridfile)
       /* Close the dataset. */
       status = H5Dclose(lon_id);
       status = H5Dclose(lat_id);
+
+      fill_gridvals(grid.xsize, grid.ysize, grid.xvals, grid.yvals);
 
       grid.type = GRID_CURVILINEAR;
       grid.prec = DATATYPE_FLT32;

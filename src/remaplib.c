@@ -441,6 +441,11 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	  if ( tmp_lons[k] < bound_box[n4+2] ) bound_box[n4+2] = tmp_lons[k];
 	  if ( tmp_lons[k] > bound_box[n4+3] ) bound_box[n4+3] = tmp_lons[k];
 	}
+      /*
+      printf("%d %d %d lat: %g %g %g  lon: %g %g %g\n", n, j, i, 
+	     center_lat[n], bound_box[n4+0], bound_box[n4+1],
+	     center_lon[n], bound_box[n4+2], bound_box[n4+3]);
+      */
     }
 }
 

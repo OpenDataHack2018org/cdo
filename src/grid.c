@@ -37,10 +37,6 @@
 #define  rad2deg  (180./M_PI)   /* conversion for rad to deg */
 
 
-double *gridInqXboundsPtr(int gridID);
-double *gridInqYboundsPtr(int gridID);
-
-
 int gridToZonal(int gridID1)
 {
   static char func[] = "gridToZonal";
@@ -539,7 +535,7 @@ int gridToCurvilinear(int gridID1)
 	  }
 	else
 	  {
-	    if ( gridInqXboundsPtr(gridID1) )
+	    if ( gridInqXbounds(gridID1, NULL) )
 	      {
 		xbounds = (double *) malloc(2*nx*sizeof(double));
 		gridInqXbounds(gridID1, xbounds);
@@ -550,7 +546,7 @@ int gridToCurvilinear(int gridID1)
 		gridGenXbounds(nx, xvals, xbounds);
 	      }
 
-	    if ( gridInqYboundsPtr(gridID1) )
+	    if ( gridInqYbounds(gridID1, NULL) )
 	      {
 		ybounds = (double *) malloc(2*ny*sizeof(double));
 		gridInqYbounds(gridID1, ybounds);
@@ -805,7 +801,7 @@ int gridToCell(int gridID1)
 	free(xvals2D);
 	free(yvals2D);
 
-	if ( gridInqXboundsPtr(gridID1) )
+	if ( gridInqXbounds(gridID1, NULL) )
 	  {
 	    xbounds = (double *) malloc(2*nx*sizeof(double));
 	    gridInqXbounds(gridID1, xbounds);
@@ -816,7 +812,7 @@ int gridToCell(int gridID1)
 	    gridGenXbounds(nx, xvals, xbounds);
 	  }
 
-	if ( gridInqYboundsPtr(gridID1) )
+	if ( gridInqYbounds(gridID1, NULL) )
 	  {
 	    ybounds = (double *) malloc(2*ny*sizeof(double));
 	    gridInqYbounds(gridID1, ybounds);
@@ -943,7 +939,7 @@ int gridGenArea(int gridID, double *area)
 
   if ( gridtype != GRID_LONLAT      &&
        gridtype != GRID_GAUSSIAN    &&
-       gridtype != GRID_LCC     &&
+       gridtype != GRID_LCC         &&
        gridtype != GRID_GME         &&
        gridtype != GRID_CURVILINEAR &&
        gridtype != GRID_CELL )
@@ -994,6 +990,7 @@ int gridGenArea(int gridID, double *area)
 	  int nlon = gridInqXsize(gridID);
 	  int nlat = gridInqYsize(gridID);
 	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon);
+	  printf("nlon, nlat %d %d\n", nlon, nlat);
 	  genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
 	}
       else
@@ -1022,6 +1019,11 @@ int gridGenArea(int gridID, double *area)
 	  c2 = gc2cc(&p2);
 
 	  area[i] += areas(&c1, &c2, &c3);
+
+	  printf("%d %d %g %g %g %g %g %g %g\n", i, k, area[i],
+		 p3.lon*rad2deg, p3.lat*rad2deg, 
+		 p1.lon*rad2deg, p1.lat*rad2deg, 
+		 p2.lon*rad2deg, p2.lat*rad2deg);
 	}
 
       p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
@@ -1032,6 +1034,10 @@ int gridGenArea(int gridID, double *area)
       c2 = gc2cc(&p2);
 
       area[i] += areas(&c1, &c2, &c3);
+	  printf("%d %d %g %g %g %g %g %g %g\n", i, k, area[i],
+		 p3.lon*rad2deg, p3.lat*rad2deg, 
+		 p1.lon*rad2deg, p1.lat*rad2deg, 
+		 p2.lon*rad2deg, p2.lat*rad2deg);
 
       total_area += area[i];
     }
@@ -1207,7 +1213,7 @@ int gridWeights(int gridID, double *grid_wgts)
     {
       if ( gridtype != GRID_LONLAT      &&
 	   gridtype != GRID_GAUSSIAN    &&
-	   gridtype != GRID_LCC     &&
+	   gridtype != GRID_LCC         &&
 	   gridtype != GRID_GME         &&
 	   gridtype != GRID_CURVILINEAR &&
 	   gridtype != GRID_CELL )

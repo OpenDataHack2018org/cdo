@@ -22,6 +22,8 @@ typedef struct {
   char *name;
   char *description;
   char *units;
+  char *title;
+  char *time;
   int dtype;
   int nx;
   int ny;
@@ -40,6 +42,7 @@ DSET_OBJ;
 
 typedef struct {
   int nsets;
+  int mergelevel;
   int lgeoloc;
   int lregion;
   DSET_OBJ obj[MAX_DSETS];
@@ -711,11 +714,12 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
 
   len = (int) strlen(varname);
-  if ( isdigit(varname[len-1]) )
-    {
-      nz = atoi(&varname[len-1]);
-      varname[len-1] = 0;
-    }
+  if ( ((DSETS *) opdata)->mergelevel )
+    if ( isdigit(varname[len-1]) )
+      {
+	nz = atoi(&varname[len-1]);
+	varname[len-1] = 0;
+      }
 
   gridsize = nx*ny;
 
@@ -808,14 +812,20 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		free(((DSETS *) opdata)->obj[nset].description);
 	      ((DSETS *) opdata)->obj[nset].description = strdup(attstring);
 	    }
-	  /*
 	  else if ( strcmp(attname, "title") == 0 )
 	    {
 	      H5Aread(attr, atype_mem, attstring);
-	      if ( ((DSETS *) opdata)->obj[nset].description == NULL )
-		((DSETS *) opdata)->obj[nset].description = strdup(attstring);
+	      if ( ((DSETS *) opdata)->obj[nset].title )
+		free(((DSETS *) opdata)->obj[nset].title);
+	      ((DSETS *) opdata)->obj[nset].title = strdup(attstring);
 	    }
-	  */
+	  else if ( strcmp(attname, "time") == 0 )
+	    {
+	      H5Aread(attr, atype_mem, attstring);
+	      if ( ((DSETS *) opdata)->obj[nset].time )
+		free(((DSETS *) opdata)->obj[nset].time);
+	      ((DSETS *) opdata)->obj[nset].time = strdup(attstring);
+	    }
 	  else if ( strcmp(attname, "unit") == 0 )
 	    {
 	      H5Aread(attr, atype_mem, attstring);
@@ -995,6 +1005,7 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a group", name);
     if ( strcmp(name, "Data") == 0 )
       {
+	((DSETS *) opdata)->mergelevel = TRUE;	
 	H5Giterate(loc_id, name, NULL, obj_info, opdata);
       }
     else if ( strcmp(name, "Geolocation") == 0 )
@@ -1102,6 +1113,7 @@ void dsets_init(DSETS *dsets)
   int i;
 
   dsets->nsets = 0;
+  dsets->mergelevel = 0;
   dsets->lgeoloc = 0;
   dsets->lregion = 0;
 
@@ -1113,6 +1125,8 @@ void dsets_init(DSETS *dsets)
       dsets->obj[i].name        = NULL;
       dsets->obj[i].description = NULL;
       dsets->obj[i].units       = NULL;
+      dsets->obj[i].title       = NULL;
+      dsets->obj[i].time        = NULL;
       dsets->obj[i].dtype       = cdoDefaultDataType;
       dsets->obj[i].lscale      = 0;
       dsets->obj[i].loffset     = 0;
@@ -1139,6 +1153,7 @@ void *Importcmsaf(void *argument)
   hid_t	  file_id;	/* HDF5 File ID	        	*/
   herr_t  status;	/* Generic return value		*/
   DSETS dsets;
+  int *vtimes = NULL;
 
   cdoInitialize(argument);
 
@@ -1158,6 +1173,30 @@ void *Importcmsaf(void *argument)
   ny = dsets.obj[0].ny;
   nz = dsets.obj[0].nz;
   nt = dsets.obj[0].nt;
+
+  if ( nt > 1 )
+    {
+      vtimes = (int *) malloc(dsets.obj[0].nt*sizeof(int));
+      
+      for ( i = 0; i < nt; ++i ) vtimes[i] = i*100;
+
+      if ( dsets.obj[0].time )
+	{
+	  long itime;
+	  char *pline = dsets.obj[0].time;
+
+	  for ( i = 0; i < nt; ++i )
+	    {
+	      itime = (int)strtol(pline, &pline, 10);
+	      if ( itime < 0 || itime > 2400 )
+		{
+		  cdoWarning("Wrong time string!");
+		  break;
+		}
+	      vtimes[i] = (int) itime;
+	    }
+	}
+    }
 
   if ( cdoVerbose )
     for ( ivar = 0; ivar < dsets.nsets; ++ivar )
@@ -1206,7 +1245,7 @@ void *Importcmsaf(void *argument)
 
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
     {
-      if ( dsets.obj[ivar].nt > 1 ) 
+      if ( dsets.obj[ivar].nt > 1 )
 	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
       else
 	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
@@ -1216,6 +1255,9 @@ void *Importcmsaf(void *argument)
 	vlistDefVarLongname(vlistID, varID,  dsets.obj[ivar].description);
       if ( dsets.obj[ivar].units )
 	vlistDefVarUnits(vlistID, varID,  dsets.obj[ivar].units);
+      if ( dsets.obj[ivar].title )
+	vlistDefAttTxt(vlistID, varID, "title", (int)strlen(dsets.obj[ivar].title), 
+		       dsets.obj[ivar].title);
 	
       /*
       vlistDefVarUnits(vlistID, varID, units[i]);
@@ -1239,7 +1281,7 @@ void *Importcmsaf(void *argument)
   for ( tsID = 0; tsID < nt; ++tsID )
     {
       taxisDefVdate(taxisID, 0);
-      taxisDefVtime(taxisID, tsID*100);
+      taxisDefVtime(taxisID, vtimes[tsID]);
       streamDefTimestep(streamID, tsID);
 
       for ( ivar = 0; ivar < dsets.nsets; ++ivar )
@@ -1299,6 +1341,8 @@ void *Importcmsaf(void *argument)
 
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
     free(dsets.obj[ivar].array);
+
+  if ( vtimes ) free(vtimes);
 
   cdoFinish();
 #else

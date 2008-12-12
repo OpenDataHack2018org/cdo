@@ -1,8 +1,9 @@
 2009-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.3.0
-	* add support for GRID type SINUSOIDAL
-	* import_cmsaf: add support for monthly mean diurnal variation
+	* add support for GRID type Sinusoidal
+	* add support for GRID type Lambert Azimuthal Equal Area
+	* import_cmsaf: add support for monthly mean diurnal cycle
 	* remapcon: add support for second order remapping (use env REMAP_ORDER=2)
 	* remap: check grid and weights
 	* sinfo: extent grid description
