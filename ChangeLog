@@ -11,6 +11,7 @@
 	* setzaxis: change float to double (bug fix) [report: Pier Giuseppe Fogli]
 	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
 	* remapcon: change max_subseg from 100000 to 1000
+	* gridWeights: bug fix for areas greater than hemisphere [report: Malte Heinemann]
 	* gridverify: replaced [Cedrick Ansorge]
 	* intlevel: bug fix for datasets with missing values
 	* yseasstd,yseasvar: wrong array index (bug fix) [report: Robert Nicholas]

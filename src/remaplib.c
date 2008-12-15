@@ -1601,7 +1601,8 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
 	      if ( n == 0 ) scross_last = scross;
 
-	      if ( (scross < 0 && scross_last >= 0) || (scross > 0 && scross_last < 0) )
+	      /* if ( (scross < 0 && scross_last >= 0) || (scross > 0 && scross_last < 0) ) */
+	      if ( (scross < 0 && scross_last > 0) || (scross > 0 && scross_last < 0) )
 		break;
 	      /* if ( scross*scross_last < 0 ) break; */
 

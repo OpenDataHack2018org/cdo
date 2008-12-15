@@ -145,8 +145,10 @@ void *Gridcell(void *argument)
 	      int i;
 
 	      status = gridGenArea(gridID, grid_area);
-	      if ( status )
+	      if ( status == 1 )
 		cdoAbort("Grid corner missing!");
+	      else if ( status == 2 )
+		cdoAbort("Can't compute grid cell areas for this grid!");
 
 	      for ( i = 0; i < gridsize; ++i )
 		grid_area[i] *= PlanetRadius*PlanetRadius;

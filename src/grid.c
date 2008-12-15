@@ -919,8 +919,8 @@ int gridToCell(int gridID1)
 
 int gridGenArea(int gridID, double *area)
 {
-  static char func[] = "gridArea";
-  int status = FALSE;
+  static char func[] = "gridGenArea";
+  int status = 0;
   int i, k;
   int gridtype;
   int nv, gridsize;
@@ -990,12 +990,11 @@ int gridGenArea(int gridID, double *area)
 	  int nlon = gridInqXsize(gridID);
 	  int nlat = gridInqYsize(gridID);
 	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon);
-	  printf("nlon, nlat %d %d\n", nlon, nlat);
 	  genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
 	}
       else
 	{
-	  status = TRUE;
+	  status = 1;
 	  return (status);
 	}
     }
@@ -1018,12 +1017,11 @@ int gridGenArea(int gridID, double *area)
 	  p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
 	  c2 = gc2cc(&p2);
 
-	  area[i] += areas(&c1, &c2, &c3);
+	  if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+	       (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+	       (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
 
-	  printf("%d %d %g %g %g %g %g %g %g\n", i, k, area[i],
-		 p3.lon*rad2deg, p3.lat*rad2deg, 
-		 p1.lon*rad2deg, p1.lat*rad2deg, 
-		 p2.lon*rad2deg, p2.lat*rad2deg);
+	  area[i] += areas(&c1, &c2, &c3);
 	}
 
       p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
@@ -1033,11 +1031,11 @@ int gridGenArea(int gridID, double *area)
       p2.lat = grid_corner_lat[i*nv+nv-1]*deg2rad;
       c2 = gc2cc(&p2);
 
+      if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+	   (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+	   (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+
       area[i] += areas(&c1, &c2, &c3);
-	  printf("%d %d %g %g %g %g %g %g %g\n", i, k, area[i],
-		 p3.lon*rad2deg, p3.lat*rad2deg, 
-		 p1.lon*rad2deg, p1.lat*rad2deg, 
-		 p2.lon*rad2deg, p2.lat*rad2deg);
 
       total_area += area[i];
     }
@@ -1058,7 +1056,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 {
   static char func[] = "gridGenWeights";
   int i, nvals, gridsize, gridtype;
-  int status = FALSE;
+  int status = 0;
   int *grid_mask = NULL;
   double total_area;
 
@@ -1202,7 +1200,7 @@ int gridWeights(int gridID, double *grid_wgts)
   
   grid_area = (double *) malloc(gridsize*sizeof(double));
 
-  a_status = FALSE;
+  a_status = 0;
 
   if ( gridHasArea(gridID) )
     {
@@ -1218,7 +1216,7 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype != GRID_CURVILINEAR &&
 	   gridtype != GRID_CELL )
 	{
-	  a_status = TRUE;
+	  a_status = 1;
 	}
       else
 	{
@@ -1226,7 +1224,7 @@ int gridWeights(int gridID, double *grid_wgts)
 	}
     }
 
-  if ( a_status == FALSE )
+  if ( a_status == 0 )
     {
       w_status = gridGenWeights(gridID, grid_area, grid_wgts);
     }
@@ -1235,7 +1233,7 @@ int gridWeights(int gridID, double *grid_wgts)
       for ( i = 0; i < gridsize; ++i )
 	grid_wgts[i] = 1./gridsize;
 
-      w_status = TRUE;
+      w_status = 1;
     }
 
   free(grid_area);
