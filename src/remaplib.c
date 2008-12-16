@@ -399,7 +399,7 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	  ip1 = 1;
 	  /* But if it is not, correct */
 	  e_add = (j - 1)*nx + ip1 - 1;
-	  if ( fabs(center_lat[e_add] - center_lat[n]) > PIH ) ip1 = i;
+	  if ( fabs(center_lon[e_add] - center_lon[n]) > PIH ) ip1 = i;
 	}
 
       if ( j < ny )
@@ -413,8 +413,8 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	  if ( fabs(center_lat[n_add] - center_lat[n]) > PIH ) jp1 = j;
 	}
 
-      n_add  = (jp1 - 1)*nx + i - 1;
-      e_add  = (j - 1)*nx + ip1 - 1;
+      n_add  = (jp1 - 1)*nx + i   - 1;
+      e_add  = (j   - 1)*nx + ip1 - 1;
       ne_add = (jp1 - 1)*nx + ip1 - 1;
 
       /* Find N,S and NE lat/lon coords and check bounding box */
@@ -1523,15 +1523,27 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
           if ( i < nx )
             ip1 = i + 1;
           else
-            ip1 = 1;
+	    {
+	      /* Assume cyclic */
+	      ip1 = 1;
+	      /* But if it is not, correct */
+	      e_add = (j - 1)*nx + ip1 - 1;
+	      if ( fabs(src_center_lon[e_add] - src_center_lon[srch_add]) > PIH ) ip1 = i;
+	    }
 
           if ( j < ny )
             jp1 = j + 1;
           else
-            jp1 = 1;
+	    {
+	      /* Assume cyclic */
+	      jp1 = 1;
+	      /* But if it is not, correct */
+	      n_add = (jp1 - 1)*nx + i - 1;
+	      if ( fabs(src_center_lat[n_add] - src_center_lat[srch_add]) > PIH ) jp1 = j;
+	    }
 
-          n_add = (jp1 - 1)*nx + i - 1;
-          e_add = (j - 1)*nx + ip1 - 1;
+          n_add  = (jp1 - 1)*nx + i   - 1;
+          e_add  = (j   - 1)*nx + ip1 - 1;
           ne_add = (jp1 - 1)*nx + ip1 - 1;
 
           src_lats[0] = src_center_lat[srch_add];
@@ -1547,7 +1559,6 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 	  /*
 	     For consistency, we must make sure all lons are in same 2pi interval
 	  */
-
           vec1_lon = src_lons[0] - plon;
           if      ( vec1_lon >  PI ) src_lons[0] -= PI2;
           else if ( vec1_lon < -PI ) src_lons[0] += PI2;
