@@ -10,7 +10,7 @@
 
 @BeginDescription
 This module contains operators to interpolate all input fields to a new grid.
-All interpolation methods in this module only work on rectangular grids.
+All interpolation methods in this module only work on regular lon/lat grids.
 @EndDescription
 @EndModule
 
@@ -76,7 +76,7 @@ STRING  Target grid description file or name
 
 
 @BeginExample
-Say @file{ifile} contains fields on a rectangular grid.
+Say @file{ifile} contains fields on a regular lon/lat grid.
 To interpolate all fields bilinear to a T42 Gaussian grid use:
 @BeginVerbatim
    cdo intgridbil,t42grid ifile ofile

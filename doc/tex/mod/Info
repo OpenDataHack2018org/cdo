@@ -47,7 +47,7 @@ number to identify the variables.
 
 @BeginDescription
 Prints information, simple statistics and a map for each field of all input
-datasets. The map will be printed only for fields on a rectangular grid.
+datasets. The map will be printed only for fields on a regular lon/lat grid.
 @EndDescription
 @EndOperator
 

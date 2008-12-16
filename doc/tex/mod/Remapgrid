@@ -23,7 +23,7 @@ methods see @cite{SCRIP}.
 
 @BeginDescription
 Performs a bilinear interpolation on all input fields.
-This interpolation method only works on rectangular grids.
+This interpolation method only works on regular quadrilateral grids.
 @EndDescription
 @EndOperator
 
@@ -35,7 +35,7 @@ This interpolation method only works on rectangular grids.
 
 @BeginDescription
 Performs a bicubic interpolation on all input fields.
-This interpolation method only works on rectangular grids.
+This interpolation method only works on regular quadrilateral grids.
 @EndDescription
 @EndOperator
 
@@ -86,7 +86,7 @@ not to SCRIP!
 
 
 @BeginExample
-Say @file{ifile} contains fields on a rectangular grid.
+Say @file{ifile} contains fields on a regular quadrilateral grid.
 To remap all fields bilinear to a T42 Gaussian grid type:
 @BeginVerbatim
    cdo remapbil,t42grid ifile ofile

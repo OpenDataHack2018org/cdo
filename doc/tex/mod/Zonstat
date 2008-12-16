@@ -12,7 +12,7 @@ This module computes zonal statistical values of the input fields.
 According to the chosen operator the zonal minimum, maximum, 
 sum, average, variance, standard deviation or a certain percentile
 is written to @file{ofile}. All input fields need to have the same
-rectangular grid. 
+regular quadrilateral grid. 
 @EndDescription
 @EndModule
 
