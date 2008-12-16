@@ -165,8 +165,4 @@ To compute the 50th percentile (median) over 6 input files use:
 @BeginVerbatim
    cdo enspctl,50 ifile1 ifile2 ifile3 ifile4 ifile5 ifile6 ofile
 @EndVerbatim
-Or shorter with filename substitution:
-@BeginVerbatim
-   cdo enspctl,50 ifile[1-6] ofile
-@EndVerbatim
 @EndExample
