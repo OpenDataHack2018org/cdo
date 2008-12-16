@@ -527,12 +527,15 @@ int cdoFiletype(void)
 }
 
 
+#if  defined  (HAVE_LIBNETCDF)
+#include "netcdf.h"
+#endif
+
 int have_netCDF4(void)
 {
   int haveNC4 = FALSE;
 
 #if  defined  (HAVE_LIBNETCDF)
-#include "netcdf.h"
 #if  defined  (NC_NETCDF4)
   haveNC4 = TRUE;
 #endif
