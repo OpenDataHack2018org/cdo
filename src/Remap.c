@@ -82,6 +82,7 @@ void *Remap(void *argument)
   int remap_max_iter = -1;
   int remap_restrict_type = RESTRICT_LATITUDE;
   int remap_num_srch_bins = 180;
+  int lremap_num_srch_bins = FALSE;
 
   cdoInitialize(argument);
 
@@ -180,6 +181,7 @@ void *Remap(void *argument)
       if ( ival > 0 )
 	{
 	  remap_num_srch_bins = ival;
+	  lremap_num_srch_bins = TRUE;
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_NUM_SRCH_BINS to %d", remap_num_srch_bins);
 	}
@@ -571,6 +573,15 @@ void *Remap(void *argument)
 		    remaps[r].grid.luse_grid1_area = FALSE;
 		    remaps[r].grid.luse_grid2_area = FALSE;
 		  */
+		  if ( gridInqType(gridID1) != GRID_CELL && lremap_num_srch_bins == FALSE )
+		    {
+		      int maxbins = 720;
+		      int ysize1 = gridInqYsize(gridID1);
+		      remap_num_srch_bins = 0.5*ysize1;
+		      if ( remap_num_srch_bins > maxbins ) remap_num_srch_bins = maxbins;
+		      if ( remap_num_srch_bins < 1 )       remap_num_srch_bins = 1;
+		    }
+
 		  remaps[r].grid.restrict_type = remap_restrict_type;
 		  remaps[r].grid.num_srch_bins = remap_num_srch_bins;
 		  remaps[r].grid.pinit = FALSE;

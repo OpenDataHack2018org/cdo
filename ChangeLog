@@ -6,6 +6,7 @@
 	* import_cmsaf: add support for monthly mean diurnal cycle
 	* remapcon: add support for second order remapping (use env REMAP_ORDER=2)
 	* remap: check grid and weights
+	* remap: set num_srch_bins to nlat/2 (speed up)
 	* sinfo: extent grid description
 	* sellonlatbox: bug fix for curvilinear grids
 	* setzaxis: change float to double (bug fix) [report: Pier Giuseppe Fogli]
