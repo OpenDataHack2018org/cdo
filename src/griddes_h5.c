@@ -316,9 +316,9 @@ int gridFromH5file(const char *gridfile)
       /* Close the dataset. */
       status = H5Dclose(lon_id);
       status = H5Dclose(lat_id);
-
+      /*
       fill_gridvals(grid.xsize, grid.ysize, grid.xvals, grid.yvals);
-
+      */
       grid.type = GRID_CURVILINEAR;
       grid.prec = DATATYPE_FLT32;
 

@@ -1153,6 +1153,7 @@ void *Importcmsaf(void *argument)
   hid_t	  file_id;	/* HDF5 File ID	        	*/
   herr_t  status;	/* Generic return value		*/
   DSETS dsets;
+  int vtime;
   int *vtimes = NULL;
 
   cdoInitialize(argument);
@@ -1281,7 +1282,9 @@ void *Importcmsaf(void *argument)
   for ( tsID = 0; tsID < nt; ++tsID )
     {
       taxisDefVdate(taxisID, 0);
-      taxisDefVtime(taxisID, vtimes[tsID]);
+      vtime = 0;
+      if ( vtimes ) vtime = vtimes[tsID];
+      taxisDefVtime(taxisID, vtime);
       streamDefTimestep(streamID, tsID);
 
       for ( ivar = 0; ivar < dsets.nsets; ++ivar )
