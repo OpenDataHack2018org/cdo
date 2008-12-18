@@ -116,11 +116,6 @@ int gridFromNCfile(const char *gridfile)
       grid.yunits[attlen] = 0;
 
       gridID = gridDefine(grid);
-
-      free(grid.xvals);
-      free(grid.yvals);
-      free(grid.xbounds);
-      free(grid.ybounds);
     }
 
   nce(nc_close(nc_file_id));
