@@ -318,6 +318,9 @@ int gridFromH5file(const char *gridfile)
       grid.prec = DATATYPE_FLT32;
 
       gridID = gridDefine(grid);
+
+      free(grid.xvals);
+      free(grid.yvals);
     }
   else  if ( h5find_object(file_id, "where") > 0 )
     {
@@ -411,6 +414,9 @@ int gridFromH5file(const char *gridfile)
 	  grid.prec = DATATYPE_FLT32;
 
 	  gridID = gridDefine(grid);
+
+	  free(grid.xvals);
+	  free(grid.yvals);
 	}
     }
 

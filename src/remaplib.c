@@ -399,6 +399,7 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	  ip1 = 1;
 	  /* But if it is not, correct */
 	  e_add = (j - 1)*nx + ip1 - 1;
+	  /* 2008-12-16 Uwe Schulzweida: change center_lat to center_lon (bug fix) */
 	  if ( fabs(center_lon[e_add] - center_lon[n]) > PIH ) ip1 = i;
 	}
 
@@ -406,11 +407,15 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	jp1 = j + 1;
       else
 	{
+	  /* 2008-12-17 Uwe Schulzweida: latitute cyclic ??? (bug fix) */
 	  /* Assume cyclic */
-	  jp1 = 1;
+	  /* jp1 = 1; */
 	  /* But if it is not, correct */
+	  /*
 	  n_add = (jp1 - 1)*nx + i - 1;
 	  if ( fabs(center_lat[n_add] - center_lat[n]) > PIH ) jp1 = j;
+	  */
+	  jp1 = j;
 	}
 
       n_add  = (jp1 - 1)*nx + i   - 1;
@@ -443,8 +448,8 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	}
       /*
       printf("%d %d %d lat: %g %g %g  lon: %g %g %g\n", n, j, i, 
-	     center_lat[n], bound_box[n4+0], bound_box[n4+1],
-	     center_lon[n], bound_box[n4+2], bound_box[n4+3]);
+	     RAD2DEG*center_lat[n], RAD2DEG*bound_box[n4+0], RAD2DEG*bound_box[n4+1],
+	     RAD2DEG*center_lon[n], RAD2DEG*bound_box[n4+2], RAD2DEG*bound_box[n4+3]);
       */
     }
 }
@@ -1460,18 +1465,17 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
     int src_bin_add[][2]           ! latitude bins for restricting
   */
   /*  Local variables */
-
-  int n, next_n, srch_add;                   /* dummy indices */
-  int nx, ny;                                /* dimensions of src grid */
+  int n, next_n, srch_add;                   /* dummy indices                    */
+  int nx, ny;                                /* dimensions of src grid           */
   int min_add, max_add;                      /* addresses for restricting search */
-  int i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses */
+  int i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses                        */
 
   /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
   double vec2_lat, vec2_lon, cross_product/*, cross_product_last = 0*/;
   double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
   double dist_min, distance; /* For computing dist-weighted avg */
-  int scross, scross_last = 0;
+  int scross[4], scross_last = 0;
 
   /*
     Restrict search first using bins
@@ -1496,7 +1500,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   ny = src_grid_dims[1];
 
 #ifdef REMAPTEST
-  printf("min_add, max_add, diff_add, nx, ny %d %d %d %d %d\n", min_add, max_add, max_add-min_add, nx, ny);
+  printf("  min_add, max_add, diff_add, nx, ny %d %d %d %d %d\n", min_add, max_add, max_add-min_add, nx, ny);
 #endif
 
   /* srch_loop */
@@ -1535,16 +1539,19 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
             jp1 = j + 1;
           else
 	    {
-	      /* Assume cyclic */
-	      jp1 = 1;
-	      /* But if it is not, correct */
-	      n_add = (jp1 - 1)*nx + i - 1;
-	      if ( fabs(src_center_lat[n_add] - src_center_lat[srch_add]) > PIH ) jp1 = j;
+	      /* 2008-12-17 Uwe Schulzweida: latitute cyclic ??? (bug fix) */
+	      /* jp1 = 1; */
+	      jp1 = j;
 	    }
 
           n_add  = (jp1 - 1)*nx + i   - 1;
           e_add  = (j   - 1)*nx + ip1 - 1;
-          ne_add = (jp1 - 1)*nx + ip1 - 1;
+	  ne_add = (jp1 - 1)*nx + ip1 - 1;
+
+#ifdef REMAPTEST
+	  printf("  %d %g %g %d %d %d %d %d %d %d\n", 
+		 srch_add, RAD2DEG*plon, RAD2DEG*plat, i, j, ip1, jp1, n_add, e_add, ne_add);
+#endif
 
           src_lats[0] = src_center_lat[srch_add];
           src_lats[1] = src_center_lat[e_add];
@@ -1607,18 +1614,22 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
 	      cross_product_last = cross_product;
 	      */
-	      /* scross = cross_product < 0 ? -1 : 1; */
-	      scross = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
+	      scross[n] = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
 
-	      if ( n == 0 ) scross_last = scross;
+	      if ( n == 0 ) scross_last = scross[n];
 
-	      /* if ( (scross < 0 && scross_last >= 0) || (scross > 0 && scross_last < 0) ) */
-	      if ( (scross < 0 && scross_last > 0) || (scross > 0 && scross_last < 0) )
+	      if ( (scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0) )
 		break;
-	      /* if ( scross*scross_last < 0 ) break; */
 
-	      scross_last = scross;
+	      scross_last = scross[n];
 	    } /* corner_loop */
+
+	  if ( n >= 4 )
+	    {
+	      n = 0;
+	      if      ( scross[0]>=0&&scross[1]>=0&&scross[2]>=0&&scross[3]>=0 ) n = 4;
+	      else if ( scross[0]<=0&&scross[1]<=0&&scross[2]<=0&&scross[3]<=0 ) n = 4;
+	    }
 
 	  /*
 	    If cross products all same sign, we found the location
@@ -1779,12 +1790,20 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
       plat = rg->grid2_center_lat[dst_add];
       plon = rg->grid2_center_lon[dst_add];
 
+#ifdef REMAPTEST
+      printf("dst: %d %g %g %d %d %d\n", dst_add, RAD2DEG*plon, RAD2DEG*plat, 
+	     rg->grid1_size, rg->grid1_dims[0], rg->grid1_dims[1]);
+#endif
+
       /*  Find nearest square of grid points on source grid  */
       grid_search(rg, src_add, src_lats, src_lons, 
 		  plat, plon, rg->grid1_dims,
 		  rg->grid1_center_lat, rg->grid1_center_lon,
 		  rg->grid1_bound_box, rg->bin_addr1);
 
+#ifdef REMAPTEST
+      printf("  %d src_add0 %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
+#endif
       /* Check to see if points are land points */
       for ( n = 0; n < 4; n++ )
 	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
@@ -1792,7 +1811,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 
       /*  If point found, find local i,j coordinates for weights  */
 #ifdef REMAPTEST
-      printf("%d %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
+      printf("  %d src_add0 %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
 #endif
       if ( src_add[0] > 0 )
 	{

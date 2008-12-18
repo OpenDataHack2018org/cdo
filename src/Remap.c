@@ -471,6 +471,7 @@ void *Remap(void *argument)
 	  gridsize = gridInqSize(gridID1);
 
 	  non_global = remap_non_global || !gridIsCircular(gridID1);
+	  /* non_global = FALSE; */
 	  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
@@ -559,6 +560,7 @@ void *Remap(void *argument)
 		{
 		  remaps[r].grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
+		  /* non_global = FALSE; */
 		  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
