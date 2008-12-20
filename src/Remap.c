@@ -579,7 +579,7 @@ void *Remap(void *argument)
 		    {
 		      int maxbins = 720;
 		      int ysize1 = gridInqYsize(gridID1);
-		      remap_num_srch_bins = 0.5*ysize1;
+		      remap_num_srch_bins = (int) (0.5*ysize1);
 		      if ( remap_num_srch_bins > maxbins ) remap_num_srch_bins = maxbins;
 		      if ( remap_num_srch_bins < 1 )       remap_num_srch_bins = 1;
 		    }
