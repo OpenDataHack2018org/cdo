@@ -11,6 +11,7 @@
 	* sellonlatbox: bug fix for curvilinear grids
 	* setzaxis: change float to double (bug fix) [report: Pier Giuseppe Fogli]
 	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
+	* Seasstat: warning message for seasons with less than 3 input time steps
 	* remapcon: change max_subseg from 100000 to 1000
 	* remapbil: 2. bug fix for cross_product eq zero
 	* gridWeights: bug fix for areas greater than hemisphere [report: Malte Heinemann]

@@ -289,9 +289,20 @@ void *Seasstat(void *argument)
 	      }
 	  }
 
+      if ( cdoVerbose )
+	cdoPrint("%d %d nsets %d", vdate0, vtime0, nsets);
+
       taxisDefVdate(taxisID2, vdate0);
       taxisDefVtime(taxisID2, vtime0);
       streamDefTimestep(streamID2, otsID++);
+
+      if ( nsets < 3 )
+	{
+	  int year, month, day;
+	  decode_date(vdate0, &year, &month, &day);
+	  cdoWarning("Season %3d (%4.4d-%2.2d-%2.2d) has only %d input time step%s!", 
+		     otsID, year, month, day, nsets, nsets == 1 ? "" : "s");
+	}
 
       for ( recID = 0; recID < nrecords; recID++ )
 	{
