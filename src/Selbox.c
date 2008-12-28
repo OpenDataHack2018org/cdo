@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -226,7 +226,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 
 
 static
-int gengridcell(int gridID1, int gridsize2, int *cellindx)
+int gengridcell(int gridID1, int gridsize2, int *cellidx)
 {
   static char func[] = "gengridcell";  
   int gridtype, gridID2;
@@ -277,8 +277,8 @@ int gengridcell(int gridID1, int gridsize2, int *cellindx)
 
       for ( i = 0; i < gridsize2; ++i )
 	{
-	  xvals2[i] = xvals1[cellindx[i]];
-	  yvals2[i] = yvals1[cellindx[i]];
+	  xvals2[i] = xvals1[cellidx[i]];
+	  yvals2[i] = yvals1[cellidx[i]];
 	}
 
       if ( cdoVerbose )
@@ -311,8 +311,8 @@ int gengridcell(int gridID1, int gridsize2, int *cellindx)
 	{
 	  for ( k = 0; k < nv; ++k )
 	    {
-	      xbounds2[i*nv+k] = xbounds1[cellindx[i]*nv+k];
-	      ybounds2[i*nv+k] = ybounds1[cellindx[i]*nv+k];
+	      xbounds2[i*nv+k] = xbounds1[cellidx[i]*nv+k];
+	      ybounds2[i*nv+k] = ybounds1[cellidx[i]*nv+k];
 	    }
 	}
 
@@ -500,7 +500,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
 
 static
-int gencellgrid(int gridID1, int *gridsize2, int **cellindx)
+int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 {
   static char func[] = "gencellgrid";  
   int gridtype, gridID2;
@@ -563,9 +563,9 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellindx)
 	    if ( nvals > maxcell )
 	      {
 		maxcell += cellinc;
-		*cellindx = (int *) realloc(*cellindx, maxcell*sizeof(int));
+		*cellidx = (int *) realloc(*cellidx, maxcell*sizeof(int));
 	      }
-	    (*cellindx)[nvals-1] = i;
+	    (*cellidx)[nvals-1] = i;
 	  }
     }
 
@@ -576,7 +576,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellindx)
   free(xvals1);
   free(yvals1);
 
-  gridID2 = gengridcell(gridID1, *gridsize2, *cellindx);
+  gridID2 = gengridcell(gridID1, *gridsize2, *cellidx);
 
   return (gridID2);
 }
@@ -703,12 +703,15 @@ void *Selbox(void *argument)
   int nmiss;
   int *vars;
   int i;
-  int ndiffgrids;
-  int lat1, lat2, lon11, lon12, lon21, lon22;
   double missval;
   double *array1 = NULL, *array2 = NULL;
   int taxisID1, taxisID2;
-  int *cellidx = NULL, nvals;
+  typedef struct {
+    int gridID1, gridID2;
+    int *cellidx, nvals;
+    int lat1, lat2, lon11, lon12, lon21, lon22; 
+  } SBOX;
+  SBOX *sbox = NULL;
 
   cdoInitialize(argument);
 
@@ -717,70 +720,62 @@ void *Selbox(void *argument)
 
   operatorID = cdoOperatorID();
 
+  operatorInputArg(cdoOperatorEnter(operatorID));
+
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
-
-  ngrids = vlistNgrids(vlistID1);
-  ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
-
-  for ( index = 0; index < ngrids; index++ )
-    {
-      gridID1  = vlistGrid(vlistID1, index);
-      gridtype = gridInqType(gridID1);
-      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) break;
-      /* if ( operatorID == SELINDEXBOX && gridtype == GRID_CURVILINEAR ) break; */
-      if ( gridtype == GRID_CURVILINEAR ) break;
-      if ( operatorID == SELINDEXBOX && gridtype == GRID_GENERIC &&
-	   gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0 ) break;
-      if ( operatorID == SELLONLATBOX && gridtype == GRID_CELL ) break;
-    }
-
-  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
-    cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
-
-  if ( index == ngrids ) cdoAbort("No regular grid found!");
-  if ( ndiffgrids > 0 )  cdoAbort("Too many different grids!");
-
-  operatorInputArg(cdoOperatorEnter(operatorID));
-  if ( operatorID == SELLONLATBOX )
-    {
-      if ( gridtype == GRID_CELL )
-	gridID2 = gencellgrid(gridID1, &nvals, &cellidx);
-      else
-	gridID2 = genlonlatgrid(gridID1, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
-    }
-  else
-    gridID2 = genindexgrid(gridID1, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
-
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  ngrids = vlistNgrids(vlistID1);
-  for ( index = 0; index < ngrids; index++ )
-    {
-      if ( gridID1 == vlistGrid(vlistID1, index) )
-	{
-	  vlistChangeGridIndex(vlistID2, index, gridID2);
-	  break;
-	}
-    }
-
   nvars = vlistNvars(vlistID1);
   vars  = (int *) malloc(nvars*sizeof(int));
-  for ( varID = 0; varID < nvars; varID++ )
+  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+
+  ngrids = vlistNgrids(vlistID1);
+  sbox = (SBOX *) malloc(ngrids*sizeof(SBOX));
+
+  for ( index = 0; index < ngrids; index++ )
     {
-      if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
-	vars[varID] = TRUE;
+      gridID1  = vlistGrid(vlistID1, index);
+      gridtype = gridInqType(gridID1);
+
+      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
+	   (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC && 
+	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0 ) ||
+	   (operatorID == SELLONLATBOX && gridtype == GRID_CELL) )
+	{
+	  if ( operatorID == SELLONLATBOX )
+	    {
+	      if ( gridtype == GRID_CELL )
+		gridID2 = gencellgrid(gridID1, &sbox[index].nvals, &sbox[index].cellidx);
+	      else
+		gridID2 = genlonlatgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2, &sbox[index].lon11, 
+					&sbox[index].lon12, &sbox[index].lon21, &sbox[index].lon22);
+	    }
+	  else
+	    gridID2 = genindexgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2, &sbox[index].lon11, 
+				   &sbox[index].lon12, &sbox[index].lon21, &sbox[index].lon22);
+	  
+	  sbox[index].gridID1 = gridID1;
+	  sbox[index].gridID2 = gridID2;
+
+	  vlistChangeGridIndex(vlistID2, index, gridID2);
+
+	  for ( varID = 0; varID < nvars; varID++ )
+	    if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
+	      vars[varID] = TRUE;
+	}
       else
-	vars[varID] = FALSE;
+	{
+	  cdoPrint("%s grid unsupported!", gridNamePtr(gridtype));
+	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
+	    cdoPrint("Use option -R to convert Gaussian reduced grid to a regular grid!");
+	}
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -788,10 +783,10 @@ void *Selbox(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  gridsize = gridInqSize(gridID1);
+  gridsize = vlistGridsizeMax(vlistID1);
   array1 = (double *) malloc(gridsize*sizeof(double));
 
-  gridsize2 = gridInqSize(gridID2);
+  gridsize2 = vlistGridsizeMax(vlistID2);
   array2 = (double *) malloc(gridsize2*sizeof(double));
 
   tsID = 0;
@@ -809,15 +804,24 @@ void *Selbox(void *argument)
 	    {
 	      streamReadRecord(streamID1, array1, &nmiss);
 
+	      gridID1 = vlistInqVarGrid(vlistID1, varID);
+	      for ( index = 0; index < ngrids; index++ )
+		if ( gridID1 == sbox[index].gridID1 ) break;
+
+	      if ( index == ngrids ) cdoAbort("Internal problem, grid not found!");
+
+	      gridsize2 = gridInqSize(sbox[index].gridID2);
+
 	      if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL )
-		window_cell(array1, gridID1, array2, gridsize2, cellidx);
+		window_cell(array1, gridID1, array2, gridsize2, sbox[index].cellidx);
 	      else
-		window(array1, gridID1, array2, lat1, lat2, lon11, lon12, lon21, lon22);
+		window(array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, 
+		       sbox[index].lon12, sbox[index].lon21, sbox[index].lon22);
 
 	      if ( nmiss )
 		{
 		  nmiss = 0;
-		  missval = vlistInqVarMissval(vlistID1, varID);
+		  missval = vlistInqVarMissval(vlistID2, varID);
 		  for ( i = 0; i < gridsize2; i++ )
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 		}
@@ -835,6 +839,8 @@ void *Selbox(void *argument)
   if ( vars   ) free(vars);
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
+  free(sbox);
+  if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL ) free(sbox[index].cellidx);
 
   cdoFinish();
 

@@ -67,6 +67,7 @@ void *Merge(void *argument)
 
       vlistID1 = streamInqVlist(streamID1);
       vlistIDs[index] = vlistID1;
+      if ( cdoVerbose ) vlistPrint(vlistID1);
     }
 
   vlistID1 = vlistIDs[0];
