@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -136,7 +136,8 @@ void *Input(void *argument)
 	}
       else if ( operatorID == INPUTEXT )
 	{
-	  output_filetype = FILETYPE_EXT;
+	  output_filetype = cdoDefaultFileType;
+	  if ( output_filetype == CDI_UNDEFID ) output_filetype = FILETYPE_EXT;
 
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
 		   " of record %d (or EOF(=^D))!", nrecs+1);
@@ -180,7 +181,8 @@ void *Input(void *argument)
 	}
       else if ( operatorID == INPUTSRV )
 	{
-	  output_filetype = FILETYPE_SRV;
+	  output_filetype = cdoDefaultFileType;
+	  if ( output_filetype == CDI_UNDEFID ) output_filetype = FILETYPE_SRV;
 	  
 	  cdoPrint("Enter header (code,level,date,time,nlon,nlat,dispo1,dispo2)"
 		   " of record %d (or EOF(=^D))!", nrecs+1);
