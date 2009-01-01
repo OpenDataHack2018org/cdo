@@ -13,6 +13,7 @@
 	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
 	* inputsrv: use -f format if set (bug fix)
 	* Seasstat: warning message for seasons with less than 3 input time steps
+	* merge: bug fix for usage in pipes [report: Álvaro M. Valdebenito]
 	* remapcon: change max_subseg from 100000 to 1000
 	* remapbil: 2. bug fix for cross_product eq zero
 	* gridWeights: bug fix for areas greater than hemisphere [report: Malte Heinemann]

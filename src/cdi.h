@@ -392,10 +392,10 @@ void    vlistDefIndex(int vlistID, int varID, int levID, int index);
 int     vlistInqIndex(int vlistID, int varID, int levID);
 void    vlistDefFlag(int vlistID, int varID, int levID, int flag);
 int     vlistInqFlag(int vlistID, int varID, int levID);
-int     vlistFlagVar(int vlistID, int varID);
-int     vlistFlagLevel(int vlistID, int varID, int levelID);
 int     vlistFindVar(int vlistID, int fvarID);
 int     vlistFindLevel(int vlistID, int fvarID, int flevelID);
+int     vlistMergedVar(int vlistID, int varID);
+int     vlistMergedLevel(int vlistID, int varID, int levelID);
 
 
 /* VLIST attributes */

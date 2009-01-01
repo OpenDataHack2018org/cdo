@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -67,7 +67,6 @@ void *Merge(void *argument)
 
       vlistID1 = streamInqVlist(streamID1);
       vlistIDs[index] = vlistID1;
-      if ( cdoVerbose ) vlistPrint(vlistID1);
     }
 
   vlistID1 = vlistIDs[0];
@@ -79,7 +78,11 @@ void *Merge(void *argument)
   /*  for ( index = 1; index < nmerge; index++ ) vlistCat(vlistID2, vlistIDs[index]); */
   for ( index = 1; index < nmerge; index++ ) vlistMerge(vlistID2, vlistIDs[index]);
 
-  if ( cdoVerbose ) vlistPrint(vlistID2);
+  if ( cdoVerbose ) 
+    {
+      for ( index = 0; index < nmerge; index++ ) vlistPrint(vlistIDs[index]);
+      vlistPrint(vlistID2);
+    }
 
   streamID2 = streamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(streamCnt-1));
@@ -131,8 +134,8 @@ void *Merge(void *argument)
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
-	      varID2   = vlistFlagVar(vlistID1, varID);
-	      levelID2 = vlistFlagLevel(vlistID1, varID, levelID);
+	      varID2   = vlistMergedVar(vlistID1, varID);
+	      levelID2 = vlistMergedLevel(vlistID1, varID, levelID);
 
 	      if ( cdoVerbose )	cdoPrint("var %d %d %d %d", varID, levelID, varID2, levelID2);
 

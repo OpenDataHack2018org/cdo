@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@ void *Diff(void *argument)
   int operatorID;
   int i;
   int indg;
-  int varID, recID;
+  int varID1, varID2, recID;
   int gridsize;
   int gridID, zaxisID, code, vdate, vtime;
   int nrecs, nrecs2;
@@ -105,21 +105,21 @@ void *Diff(void *argument)
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamInqRecord(streamID2, &varID, &levelID);
+	  streamInqRecord(streamID1, &varID1, &levelID);
+	  streamInqRecord(streamID2, &varID2, &levelID);
 
 	  indg += 1;
 
-	  code     = vlistInqVarCode(vlistID1, varID);
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	  code     = vlistInqVarCode(vlistID1, varID1);
+	  gridID   = vlistInqVarGrid(vlistID1, varID1);
+	  zaxisID  = vlistInqVarZaxis(vlistID1, varID1);
 	  gridsize = gridInqSize(gridID);
-	  missval1 = vlistInqVarMissval(vlistID1, varID);
-	  missval2 = vlistInqVarMissval(vlistID2, varID);
+	  missval1 = vlistInqVarMissval(vlistID1, varID1);
+	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
 	  if ( operatorID == DIFFV || operatorID == DIFF )
 	    {
-	      if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID, varname);
+	      if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID1, varname);
 
 	      if ( operatorID == DIFFV )
 		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %-8s ",
