@@ -59,10 +59,14 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   gridtype  = gridInqType(gridID1);
   gridsize1 = gridInqSize(gridID1);
  
-  if ( ! circular )
-    fprintf(stderr, "grid is not circular\n");
-  else
-    fprintf(stderr, "grid is circular\n");
+  if ( cdoVerbose )
+    {
+      if ( ! circular )
+	fprintf(stderr, "grid is not circular\n");
+      else
+	fprintf(stderr, "grid is circular\n");
+    }
+
   if ( xinc < 1 || yinc < 1 )
     cdoAbort("xinc and yinc must not be smaller than 1");
   
