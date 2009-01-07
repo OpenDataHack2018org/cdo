@@ -27,6 +27,7 @@ cdo_SOURCES = Arith.c		\
               Exprf.c     	\
               Filedes.c 	\
               Fillmiss.c 	\
+              Filter.c 		\
               Fldrms.c 		\
               Fldstat.c 	\
               Gengrid.c 	\

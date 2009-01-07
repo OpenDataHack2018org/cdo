@@ -18,7 +18,6 @@
 /*
    This module contains the following operators:
 
-      Detrend    detrend         Detrend
 */
 
 
@@ -29,7 +28,6 @@
 
 
 #define  NALLOC_INC  1000
-
 
 static
 void detrend(int nts, double missval1, double *array1, double *array2)
@@ -63,9 +61,9 @@ void detrend(int nts, double missval1, double *array1, double *array2)
 }
 
 
-void *Detrend(void *argument)
+void *Filter(void *argument)
 {
-  static char func[] = "Detrend";
+  static char func[] = "Filter";
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;

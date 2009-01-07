@@ -228,6 +228,7 @@ src/Ensstat.c -text
 src/Exprf.c -text
 src/Filedes.c -text
 src/Fillmiss.c -text
+src/Filter.c -text
 src/Fldrms.c -text
 src/Fldstat.c -text
 src/Gengrid.c -text

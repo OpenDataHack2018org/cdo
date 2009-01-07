@@ -59,6 +59,7 @@ void *Ensstat(void *argument);
 void *Expr(void *argument);
 void *Filedes(void *argument);
 void *Fillmiss(void *argument);
+void *Filter(void *argument);
 void *Fldrms(void *argument);
 void *Fldstat(void *argument);
 void *Gengrid(void *argument);
@@ -258,6 +259,7 @@ void *Wct(void *argument);
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
+#define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
 #define  GengridOperators       {"gengrid"}
@@ -490,11 +492,12 @@ static MODULES Modules[] =
   { Expr,           ExprHelp,          ExprOperators,           1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,        1,  0 },
   { Fillmiss,       NULL,              FillmissOperators,       1,  1 },
+  { Filter,         NULL,              FilterOperators,         1,  1 },
   { Fldrms,         NULL,              FldrmsOperators,         2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
   { Gengrid,        NULL,              GengridOperators,        2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,       1,  0 },
-  { Gridboxstat,    NULL,              GridboxstatOperators,       1,  1 },
+  { Gridboxstat,    NULL,              GridboxstatOperators,    1,  1 },
   { Gridcell,       GridcellHelp,      GridcellOperators,       1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,       1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },

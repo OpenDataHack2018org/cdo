@@ -49,7 +49,7 @@ case "${HOSTNAME}" in
 # x86_64-suse-linux
     tornado1)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/sles9-x64 \
-	            --with-netcdf=/sw/sles9-x64/netcdf-3.6.1 \
+	            --with-netcdf=/sw/sles9-x64/netcdf-3.6.2 \
                     --with-szlib=$HOME/local/sles9-x64 \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
 	;;        
@@ -57,13 +57,13 @@ case "${HOSTNAME}" in
     squall1)
         if [ "$SGE_MODE" = "off" ] ; then
    	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
-	            --with-netcdf=/sw/etch-x64/netcdf-3.6.1 \
+	            --with-netcdf=/sw/etch-x64/netcdf-3.6.2 \
                     --with-szlib=/sw/etch-x64/szip-2.1 \
                     --with-proj=$HOME/local/etch-x64/proj-4.6.1 \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
         else
    	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
-	            --with-netcdf=/sw/etch-x64/netcdf-3.6.1 \
+	            --with-netcdf=/sw/etch-x64/netcdf-3.6.2 \
                     --with-szlib=/sw/etch-x64/szip-2.1 \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
                     LIBS="-L/opt/gridware/sge/lib/lx24-amd64 -ldrmaa -ldl -L/usr/lib -lcurl" \
@@ -81,7 +81,7 @@ case "${HOSTNAME}" in
     etch-ia32 | gata | baba)
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
-	            --with-netcdf=/sw/etch-ia32/netcdf-3.6.1 \
+	            --with-netcdf=/sw/etch-ia32/netcdf-3.6.2 \
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
@@ -89,7 +89,7 @@ case "${HOSTNAME}" in
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --program-suffix=_${SGE_SUFFIX} \
-	            --with-netcdf=/sw/etch-ia32/netcdf-3.6.1 \
+	            --with-netcdf=/sw/etch-ia32/netcdf-3.6.2 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
                     LIBS="-L/opt/gridware/sge/lib/lx24-x86 -ldrmaa -ldl -L/usr/lib -lcurl" \
@@ -129,7 +129,7 @@ case "${HOSTNAME}" in
 # sparc-sun-solaris2.10
     xxf)
 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
-                    --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
+                    --with-netcdf=/sw/solaris10/netcdf-3.6.2 \
                     CC=cc CFLAGS="-g -mt -xO3 -m64"
 	;;
 # sparc-sun-solaris2.9 changed to
@@ -137,13 +137,13 @@ case "${HOSTNAME}" in
     executor | yang | yin)
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
-                    --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
+                    --with-netcdf=/sw/solaris10/netcdf-3.6.2 \
                     --with-szlib=$HOME/local/solaris10 \
                     CC=cc CFLAGS="-g -mt -xO3 -m64"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
                     --program-suffix=_${SGE_SUFFIX} \
-                    --with-netcdf=/sw/solaris10/netcdf-3.6.1 \
+                    --with-netcdf=/sw/solaris10/netcdf-3.6.2 \
                     --with-szlib=$HOME/local/solaris10 \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/local/include" \
                     LIBS="-L/opt/gridware/sge/lib/sol-sparc64 -ldrmaa -ldl -L/sw/solaris10/curl-7.16.4-cc/lib -lcurl" \
