@@ -10,7 +10,7 @@
 
 
 @BeginOperator_intyear
-@Title     = Year interpolation
+@Title     = Interpolation between two years
 @Parameter = years
 
 @BeginDescription

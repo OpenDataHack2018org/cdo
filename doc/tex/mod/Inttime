@@ -14,7 +14,7 @@ This module performs linear interpolation between time steps.
 
 
 @BeginOperator_inttime
-@Title     = Time interpolation
+@Title     = Interpolation between time steps
 @Parameter = date time [inc]
 
 @BeginDescription
@@ -25,7 +25,7 @@ The user has to define the start date/time with an optional increment.
 
 
 @BeginOperator_intntime
-@Title     = Time interpolation
+@Title     = Interpolation between time steps
 @Parameter = n
 
 @BeginDescription
