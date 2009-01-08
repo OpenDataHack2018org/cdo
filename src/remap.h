@@ -10,6 +10,9 @@
 #define  MAP_TYPE_DISTWGT   4
 #define  MAP_TYPE_DISTWGT1  5
 
+#define  SUBMAP_TYPE_NONE   0
+#define  SUBMAP_TYPE_LAF    1
+
 #define  RESTRICT_LATITUDE  1
 #define  RESTRICT_LATLON    2
 
@@ -124,8 +127,8 @@ void remap(double *dst_array, double missval, int dst_size, int dst_array_dim,
 	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
 	   REMAPLINK links);
 
-void remap_con1(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
-		int *dst_add, int *src_add, double *src_array);
+void remap_laf(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
+	       int *dst_add, int *src_add, double *src_array);
 
 void remap_bilin(REMAPGRID *rg, REMAPVARS *rv);
 void remap_bicub(REMAPGRID *rg, REMAPVARS *rv);
@@ -143,5 +146,7 @@ void reorder_links(REMAPVARS *rv);
 
 void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights);
 
-void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMAPVARS rv);
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, REMAPGRID *rg, REMAPVARS *rv);
+void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
+		       int remap_order, REMAPGRID rg, REMAPVARS rv);
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
+		      int *remap_order, REMAPGRID *rg, REMAPVARS *rv);

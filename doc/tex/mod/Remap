@@ -13,8 +13,8 @@
 @Parameter = grid weights
 
 @BeginDescription
-This operator remaps all input fields to a new grid. The remap type and the 
-interpolation weights of one input grid are read from a netCDF file. The netCDF 
+This operator remaps all input fields to a new horizontal grid. The remap type and 
+the interpolation weights of one input grid are read from a netCDF file. The netCDF 
 file with the weights should follow the \htmlref{SCRIP}{SCRIP} convention. Normally these weights 
 come from a previous call to module @mod{GENWEIGHTS} or were created by the original
 SCRIP package.
@@ -38,7 +38,7 @@ not to SCRIP!
 
 
 @BeginExample
-Say @file{ifile} contains fields on a regular grid.
+Say @file{ifile} contains fields on a regular quadrilateral grid.
 To remap all fields bilinear to a T42 Gaussian grid use:
 @BeginVerbatim
    cdo genbil,t42grid ifile remapweights.nc

@@ -306,8 +306,8 @@ void *Wct(void *argument);
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
-#define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapdis1", "remapcon1"}
-#define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis"}
+#define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2"}
+#define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
 #define  RemapetaOperators      {"remapeta"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
@@ -707,6 +707,8 @@ static char *opalias[][2] =
   {"delvar",              "delname"    },
   {"vardup",              "pardup"     },
   {"varmul",              "parmul"     },
+  {"remapcon1",           "remaplaf"   },
+  {"remapdis1",           "remapnn"    },
   {"showvar",             "showname"   },
   {"selvar",              "selname"    },
   {"setvar",              "setname"    },

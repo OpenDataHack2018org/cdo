@@ -137,6 +137,8 @@ void fill_gridvals(int xsize, int ysize, double *xvals, double *yvals)
 	  break;
 	}
     }
+
+  /* printf("xmin %g, xmax %g, ymin %g, ymax %g\n", xmin, xmax, ymin, ymax); */
   
   for ( i = 0; i < xsize*ysize; ++i )
     {
@@ -282,6 +284,10 @@ int gridFromH5file(const char *gridfile)
   
   if ( lon_id >= 0 && lat_id >= 0 )
     {
+      hid_t type_id;
+      hid_t native_type;
+      int ftype = 0;
+
       dataspace = H5Dget_space(lon_id);    /* dataspace handle */
       rank      = H5Sget_simple_extent_ndims(dataspace);
       status    = H5Sget_simple_extent_dims(dataspace, dims_out, NULL);
@@ -296,6 +302,24 @@ int gridFromH5file(const char *gridfile)
 	     (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
       */
 
+      type_id = H5Dget_type(lon_id);  /* get datatype*/
+
+      native_type = H5Tget_native_type(type_id, H5T_DIR_ASCEND);
+      if      ( H5Tequal(native_type, H5T_NATIVE_SCHAR)  > 0 ) {ftype=0;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_UCHAR)  > 0 ) {ftype=0;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_SHORT)  > 0 ) {ftype=0;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_USHORT) > 0 ) {ftype=0;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_INT)    > 0 ) {ftype=0;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_UINT)   > 0 ) {ftype=0;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_FLOAT)  > 0 ) {ftype=1;}
+      else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1;}
+      else
+	{
+	  cdoWarning("Grid has unsupported native datatype!");
+	  goto RETURN;
+	}
+      H5Tclose(native_type);
+
       grid.xsize = (int)dims_out[1];
       grid.ysize = (int)dims_out[0];
       grid.size  = grid.xsize*grid.ysize;
@@ -303,8 +327,21 @@ int gridFromH5file(const char *gridfile)
       grid.xvals = (double *) malloc(grid.size*sizeof(double));
       grid.yvals = (double *) malloc(grid.size*sizeof(double));
 
-      status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
-      status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
+      if ( ftype )
+	{
+	  status = H5Dread(lon_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.xvals);
+	  status = H5Dread(lat_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, grid.yvals);
+	}
+      else
+	{
+	  int *iarray, i;
+	  iarray = (int *) malloc(grid.size*sizeof(int));
+	  status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+	  for ( i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
+	  status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+	  for ( i = 0; i < grid.size; ++i ) grid.yvals[i] = iarray[i];
+	  free(iarray);
+	}
 
       status = H5Sclose(dataspace);
 

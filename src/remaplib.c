@@ -1323,8 +1323,8 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
   -----------------------------------------------------------------------
 */
 
-void remap_con1(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
-		int *dst_add, int *src_add, double *src_array)
+void remap_laf(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
+	       int *dst_add, int *src_add, double *src_array)
 {
   /*
     Input arrays:
@@ -5307,7 +5307,8 @@ static void nce(int istat)
 #endif
 
 
-void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMAPVARS rv)
+void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
+		       int remap_order, REMAPGRID rg, REMAPVARS rv)
 {
   /*
     Writes remap data to a netCDF file using SCRIP conventions
@@ -5385,13 +5386,24 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
   switch ( map_type )
     {
     case MAP_TYPE_CONSERV:
-      strcpy(map_method, "Conservative remapping");
-      break;
+      if ( submap_type == SUBMAP_TYPE_LAF )
+	{
+	  strcpy(map_method, "Largest area fraction");
+	  break;
+	}
+      else
+	{
+	  strcpy(map_method, "Conservative remapping");
+	  break;
+	}
     case MAP_TYPE_BILINEAR:
       strcpy(map_method, "Bilinear remapping");
       break;
     case MAP_TYPE_DISTWGT:
       strcpy(map_method, "Distance weighted avg of nearest neighbors");
+      break;
+    case MAP_TYPE_DISTWGT1:
+      strcpy(map_method, "Nearest neighbor");
       break;
     case MAP_TYPE_BICUBIC:
       strcpy(map_method, "Bicubic remapping");
@@ -5409,6 +5421,10 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
 
   /* Map method */
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "map_method", strlen(map_method), map_method));
+
+  /* Remap order */
+  if ( map_type == MAP_TYPE_CONSERV && submap_type == SUBMAP_TYPE_NONE )
+    nce(nc_put_att_int(nc_file_id, NC_GLOBAL, "remap_order", NC_INT, 1L, &remap_order));
 
   /* History */
   date_and_time_in_sec = time(NULL);
@@ -5619,7 +5635,8 @@ void write_remap_scrip(const char *interp_file, int map_type, REMAPGRID rg, REMA
 
 /*****************************************************************************/
 
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, REMAPGRID *rg, REMAPVARS *rv)
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
+		      int *remap_order, REMAPGRID *rg, REMAPVARS *rv)
 {
   /*
     The routine reads a netCDF file to extract remapping info
@@ -5726,10 +5743,25 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "map_method", &attlen));
   map_method[attlen] = 0;
 
-  if ( strncmp(map_method, "Conservative", 12) == 0 ) rv->map_type = MAP_TYPE_CONSERV;
+  *submap_type = SUBMAP_TYPE_NONE;
+  *remap_order = 1;
+
+  if ( strncmp(map_method, "Conservative", 12) == 0 )
+    {
+      int iatt;
+      rv->map_type = MAP_TYPE_CONSERV;
+      status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
+      if ( status == NC_NOERR ) *remap_order = iatt;
+    }
   else if ( strncmp(map_method, "Bilinear", 8) == 0 ) rv->map_type = MAP_TYPE_BILINEAR;
   else if ( strncmp(map_method, "Distance", 8) == 0 ) rv->map_type = MAP_TYPE_DISTWGT;
+  else if ( strncmp(map_method, "Nearest", 7) == 0 )  rv->map_type = MAP_TYPE_DISTWGT1;
   else if ( strncmp(map_method, "Bicubic", 7) == 0 )  rv->map_type = MAP_TYPE_BICUBIC;
+  else if ( strncmp(map_method, "Largest", 7) == 0 )
+    {
+      rv->map_type = MAP_TYPE_CONSERV;
+      *submap_type = SUBMAP_TYPE_LAF;
+    }
   else
     {
       cdoPrint("map_type = %s", map_method);

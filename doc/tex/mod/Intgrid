@@ -5,7 +5,7 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = interpolate intgridbil
+@Operators = interpolate
 
 
 @BeginDescription

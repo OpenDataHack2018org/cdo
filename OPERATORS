@@ -343,15 +343,20 @@ Operator catalog:
 -------------------------------------------------------------
       Remapgrid  remapbil        Bilinear interpolation
       Remapgrid  remapbic        Bicubic interpolation
-      Remapgrid  remapcon        Conservative remapping
       Remapgrid  remapdis        Distance-weighted average remapping
+      Remapgrid  remapnn         Nearest neighbor remapping
+      Remapgrid  remapcon        First order conservative remapping
+      Remapgrid  remapcon2       Second order conservative remapping
+      Remapgrid  remaplaf        Largest area fraction remapping
       Genweights genbil          Generate bilinear interpolation weights
       Genweights genbic          Generate bicubic interpolation weights
-      Genweights gencon          Generate conservative interpolation weights
       Genweights gendis          Generate distance-weighted average remap weights
+      Genweights gennn           Generate nearest neighbor remap weights
+      Genweights gencon          Generate 1st order conservative remap weights
+      Genweights gencon2         Generate 2nd order conservative remap weights
+      Genweights genlaf          Generate largest area fraction remap weights
       Remap      remap           SCRIP grid remapping
       Intgrid    interpolate     PINGO grid interpolation
-      Intgrid    intgridbil      Bilinear grid interpolation
       Remapeta   remapeta        Remap vertical hybrid level
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation

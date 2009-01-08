@@ -5,12 +5,12 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = remapbil remapbic remapcon remapdis
+@Operators = remapbil remapbic remapdis remapnn remapcon remapcon2 remaplaf
 
 @BeginDescription
-This module contains operators to interpolate all input fields to a new grid.
+This module contains operators to remap all input fields to a new horizontal grid.
 Each operator uses a different remapping method. The interpolation is based
-on a special SCRIP library version. For a detailed description of the remapping 
+on an adapted SCRIP library version. For a detailed description of the remapping 
 methods see @cite{SCRIP}.
 @EndDescription
 @EndModule
@@ -40,17 +40,6 @@ This interpolation method only works on regular quadrilateral grids.
 @EndOperator
 
 
-@BeginOperator_remapcon
-@Name      = remapcon
-@Title     = Conservative remapping
-@Parameter = grid
-
-@BeginDescription
-Performs a first order conservative remapping on all input fields.
-@EndDescription
-@EndOperator
-
-
 @BeginOperator_remapdis
 @Name      = remapdis
 @Title     = Distance-weighted average remapping
@@ -59,6 +48,50 @@ Performs a first order conservative remapping on all input fields.
 @BeginDescription
 Performs a distance-weighted average remapping of the four nearest neighbor 
 values on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remapnn
+@Name      = remapnn
+@Title     = Nearest neighbor remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a nearest neighbor remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remapcon
+@Name      = remapcon
+@Title     = First order conservative remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a first order conservative remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remapcon2
+@Name      = remapcon2
+@Title     = Second order conservative remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a second order conservative remapping on all input fields.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_remaplaf
+@Name      = remaplaf
+@Title     = Largest area fraction remapping
+@Parameter = grid
+
+@BeginDescription
+Performs a largest area fraction remapping on all input fields.
 @EndDescription
 @EndOperator
 

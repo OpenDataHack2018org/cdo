@@ -18,14 +18,22 @@
 /*
    This module contains the following operators:
 
-      Interpolate remapcon        Conservative remapping
+      Interpolate remapcon        First order conservative remapping
+      Interpolate remapcon2       Second order onservative remapping
+      Interpolate remaplaf        Largest area fraction
       Interpolate remapbil        Bilinear interpolation
       Interpolate remapbic        Bicubic interpolation
       Interpolate remapdis        Distance-weighted averaging
-      Genweights  gencon          Generate conservative interpolation weights
+      Interpolate remapnn         Nearest neighbor remapping
+      Interpolate remaplaf        Largest area fraction remapping
+      Genweights  gencon          Generate first order conservative remap weights
+      Genweights  gencon2         Generate second order conservative remap weights
+      Genweights  genlaf          Generate largest area fraction weights
       Genweights  genbil          Generate bilinear interpolation weights
       Genweights  genbic          Generate bicubic interpolation weights
       Genweights  gendis          Generate distance-weighted averaging weights
+      Genweights  gennn           Generate nearest neighbor weights
+      Genweights  genlaf          Generate largest ares fraction weights
       Remap       remap           SCRIP grid remapping
 */
 
@@ -44,8 +52,8 @@
 void *Remap(void *argument)
 {
   static char func[] = "Remap";
-  enum {REMAPCON, REMAPBIL, REMAPBIC, REMAPDIS, REMAPDIS1, REMAPCON1, 
-        GENCON, GENBIL, GENBIC, GENDIS, REMAPXXX};
+  enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, 
+        GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX};
   int operatorID;
   int operfunc;
   int streamID1, streamID2 = -1;
@@ -63,6 +71,7 @@ void *Remap(void *argument)
   int nremaps = 0;
   int norm_opt = NORM_OPT_NONE;
   int map_type = -1;
+  int submap_type = SUBMAP_TYPE_NONE;
   int max_remaps = 0;
   int remap_test = 0;
   int remap_order = 1;
@@ -87,15 +96,19 @@ void *Remap(void *argument)
   cdoInitialize(argument);
 
   cdoOperatorAdd("remapcon",    REMAPCON,    0, NULL);
+  cdoOperatorAdd("remapcon2",   REMAPCON2,   0, NULL);
   cdoOperatorAdd("remapbil",    REMAPBIL,    0, NULL);
   cdoOperatorAdd("remapbic",    REMAPBIC,    0, NULL);
   cdoOperatorAdd("remapdis",    REMAPDIS,    0, NULL);
-  cdoOperatorAdd("remapdis1",   REMAPDIS1,   0, NULL);
-  cdoOperatorAdd("remapcon1",   REMAPCON1,   0, NULL);
+  cdoOperatorAdd("remapnn",     REMAPNN,     0, NULL);
+  cdoOperatorAdd("remaplaf",    REMAPLAF,    0, NULL);
   cdoOperatorAdd("gencon",      GENCON,      1, NULL);
+  cdoOperatorAdd("gencon2",     GENCON2,     1, NULL);
   cdoOperatorAdd("genbil",      GENBIL,      1, NULL);
   cdoOperatorAdd("genbic",      GENBIC,      1, NULL);
   cdoOperatorAdd("gendis",      GENDIS,      1, NULL);
+  cdoOperatorAdd("gennn",       GENNN,       1, NULL);
+  cdoOperatorAdd("genlaf",      GENLAF,      1, NULL);
   cdoOperatorAdd("remap",       REMAPXXX,    0, NULL);
 
   operatorID = cdoOperatorID();
@@ -128,7 +141,7 @@ void *Remap(void *argument)
 	    cdoPrint("Set REMAP_MAX_ITER to %d", remap_max_iter);
 	}
     }
-
+  /*
   envstr = getenv("REMAP_ORDER");
   if ( envstr )
     {
@@ -144,7 +157,7 @@ void *Remap(void *argument)
 	    cdoPrint("Set REMAP_ORDER to %d", remap_order);
 	}
     }
-
+  */
   envstr = getenv("REMAP_TEST");
   if ( envstr )
     {
@@ -281,7 +294,8 @@ void *Remap(void *argument)
     {
       int gridsize2;
 
-      read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &remaps[0].grid, &remaps[0].vars);
+      read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &submap_type, 
+		       &remap_order, &remaps[0].grid, &remaps[0].vars);
       nremaps = 1;
       gridsize = remaps[0].grid.grid1_size;
       remaps[0].gridID = gridID1;
@@ -334,8 +348,24 @@ void *Remap(void *argument)
 
       if ( map_type == MAP_TYPE_CONSERV )
         {
-	  operfunc = REMAPCON;
-	  cdoPrint("Using remapcon");
+	  if ( submap_type == SUBMAP_TYPE_LAF )
+	    {
+	      operfunc = REMAPLAF;
+	      cdoPrint("Using remaplaf");
+	    }
+	  else
+	    {
+	      if ( remap_order == 2 )
+		{
+		  operfunc = REMAPCON2;
+		  cdoPrint("Using remapcon2");
+		}
+	      else
+		{
+		  operfunc = REMAPCON;
+		  cdoPrint("Using remapcon");
+		}
+	    }
 	}
       else if ( map_type == MAP_TYPE_BILINEAR )
         {
@@ -352,13 +382,55 @@ void *Remap(void *argument)
 	  operfunc = REMAPDIS;
 	  cdoPrint("Using remapdis");
 	}
+      else if ( map_type == MAP_TYPE_DISTWGT1 )
+        {
+	  operfunc = REMAPNN;
+	  cdoPrint("Using remapnn");
+	}
       else
-	cdoAbort("unsupported mapping method (map_type = %d)", map_type);
+	cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
 
       if ( remap_test ) reorder_links(&remaps[0].vars);
     }
 
-  if ( operfunc == REMAPCON || operfunc == REMAPCON1 || operfunc == GENCON )
+  switch ( operfunc )
+    {
+    case REMAPCON:
+    case GENCON:
+      map_type = MAP_TYPE_CONSERV;
+      remap_order = 1;
+      break;
+    case REMAPCON2:
+    case GENCON2:
+      map_type = MAP_TYPE_CONSERV;
+      remap_order = 2;
+      break;
+    case REMAPLAF:
+    case GENLAF:
+      map_type = MAP_TYPE_CONSERV;
+      submap_type = SUBMAP_TYPE_LAF;
+      break;
+    case REMAPBIL:
+    case GENBIL:
+      map_type = MAP_TYPE_BILINEAR;
+      break;
+    case REMAPBIC:
+    case GENBIC:
+      map_type = MAP_TYPE_BICUBIC;
+      break;
+    case REMAPDIS:
+    case GENDIS:
+      map_type = MAP_TYPE_DISTWGT;
+      break;
+    case REMAPNN:
+    case GENNN:
+      map_type = MAP_TYPE_DISTWGT1;
+      break;
+    default:
+      cdoAbort("Unknown mapping method");
+    }
+
+  if ( map_type == MAP_TYPE_CONSERV )
     {
       norm_opt = NORM_OPT_FRACAREA;
 
@@ -387,38 +459,12 @@ void *Remap(void *argument)
 	}
     }
 
-  switch ( operfunc )
-    {
-    case REMAPCON:
-    case REMAPCON1:
-    case GENCON:
-      map_type = MAP_TYPE_CONSERV;
-      break;
-    case REMAPBIL:
-    case GENBIL:
-      map_type = MAP_TYPE_BILINEAR;
-      break;
-    case REMAPBIC:
-    case GENBIC:
-      map_type = MAP_TYPE_BICUBIC;
-      break;
-    case REMAPDIS:
-    case GENDIS:
-      map_type = MAP_TYPE_DISTWGT;
-      break;
-    case REMAPDIS1:
-      map_type = MAP_TYPE_DISTWGT1;
-      break;
-    default:
-      cdoAbort("unknown mapping method");
-    }
-
   grid1sizemax = vlistGridsizeMax(vlistID1);
 
   if ( map_type == MAP_TYPE_BICUBIC ) need_gradiants = TRUE;
   if ( map_type == MAP_TYPE_CONSERV && remap_order == 2 )
     {
-      cdoPrint("Second order remapping");
+      if ( cdoVerbose ) cdoPrint("Second order remapping");
       need_gradiants = TRUE;
     }
   else
@@ -654,8 +700,8 @@ void *Remap(void *argument)
 	      remap_gradients(remaps[r].grid, array1, grad1_lat, grad1_lon, grad1_latlon);
 	    }
 
-	  if ( operfunc == REMAPCON1 )
-	    remap_con1(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
+	  if ( operfunc == REMAPLAF )
+	    remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 		  remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
 	  else
 	    remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
@@ -664,7 +710,7 @@ void *Remap(void *argument)
 
 	  gridsize2 = gridInqSize(gridID2);
 
-	  if ( operfunc == REMAPCON )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
 	    {
 	      double grid2_err;
 
@@ -692,7 +738,7 @@ void *Remap(void *argument)
 	    }
 
 	  vlistInqVarName(vlistID1, varID, varname);
-	  if ( operfunc == REMAPCON )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
 	      {
 		double array1sum = 0;
@@ -746,7 +792,7 @@ void *Remap(void *argument)
   WRITE_REMAP:
  
   if ( lwrite_remap ) 
-    write_remap_scrip(cdoStreamName(1), map_type, remaps[r].grid, remaps[r].vars);
+    write_remap_scrip(cdoStreamName(1), map_type, submap_type, remap_order, remaps[r].grid, remaps[r].vars);
 
   streamClose(streamID1);
 
