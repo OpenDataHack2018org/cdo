@@ -386,46 +386,34 @@ void boundbox_from_center(int lonIsCyclic, int size, int nx, int ny, double *cen
   for ( n = 0; n < size; n++ )
     {
       n4 = 4*n;
+
       /* Find N,S and NE points to this grid point */
       
-      j = n/nx + 1;
-      i = n - (j-1)*nx + 1;
+      j = n/nx;
+      i = n - j*nx;
 
-      if ( i < nx )
+      if ( i < (nx-1) )
 	ip1 = i + 1;
       else
 	{
+	  /* 2009-01-09 Uwe Schulzweida: bug fix */
 	  if ( lonIsCyclic )
-	    ip1 = 1;
+	    ip1 = 0;
 	  else
 	    ip1 = i;
-
-	  /* Assume cyclic */
-	  /* ip1 = 1; */
-	  /* But if it is not, correct */
-	  /* e_add = (j - 1)*nx + ip1 - 1; */
-	  /* 2008-12-16 Uwe Schulzweida: change center_lat to center_lon (bug fix) */
-	  /* if ( fabs(center_lon[e_add] - center_lon[n]) > PIH ) ip1 = i; */
 	}
 
-      if ( j < ny )
+      if ( j < (ny-1) )
 	jp1 = j + 1;
       else
 	{
 	  /* 2008-12-17 Uwe Schulzweida: latitute cyclic ??? (bug fix) */
-	  /* Assume cyclic */
-	  /* jp1 = 1; */
-	  /* But if it is not, correct */
-	  /*
-	  n_add = (jp1 - 1)*nx + i - 1;
-	  if ( fabs(center_lat[n_add] - center_lat[n]) > PIH ) jp1 = j;
-	  */
 	  jp1 = j;
 	}
 
-      n_add  = (jp1 - 1)*nx + i   - 1;
-      e_add  = (j   - 1)*nx + ip1 - 1;
-      ne_add = (jp1 - 1)*nx + ip1 - 1;
+      n_add  = jp1*nx + i;
+      e_add  = j  *nx + ip1;
+      ne_add = jp1*nx + ip1;
 
       /* Find N,S and NE lat/lon coords and check bounding box */
 
@@ -1529,44 +1517,31 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
 
           /* Determine neighbor addresses */
 
-          j = srch_add/nx + 1;
-          i = srch_add - (j-1)*nx + 1;
+          j = srch_add/nx;
+          i = srch_add - j*nx;
 
-          if ( i < nx )
+          if ( i < (nx-1) )
             ip1 = i + 1;
           else
 	    {
+	      /* 2009-01-09 Uwe Schulzweida: bug fix */
 	      if ( rg->grid1_is_cyclic )
-		ip1 = 1;
+		ip1 = 0;
 	      else
 		ip1 = i;
-
-	      /* Assume cyclic */
-	      /* ip1 = 1; */
-	      /* But if it is not, correct */
-	      /*
-	      e_add = (j - 1)*nx + ip1 - 1;
-	      if ( fabs(src_center_lon[e_add] - src_center_lon[srch_add]) > PIH ) ip1 = i;
-	      */
 	    }
 
-          if ( j < ny )
+          if ( j < (ny-1) )
             jp1 = j + 1;
           else
 	    {
 	      /* 2008-12-17 Uwe Schulzweida: latitute cyclic ??? (bug fix) */
-	      /* jp1 = 1; */
 	      jp1 = j;
 	    }
 
-          n_add  = (jp1 - 1)*nx + i   - 1;
-          e_add  = (j   - 1)*nx + ip1 - 1;
-	  ne_add = (jp1 - 1)*nx + ip1 - 1;
-
-#ifdef REMAPTEST
-	  printf("  %d %g %g %d %d %d %d %d %d %d\n", 
-		 srch_add, RAD2DEG*plon, RAD2DEG*plat, i, j, ip1, jp1, n_add, e_add, ne_add);
-#endif
+          n_add  = jp1*nx + i;
+          e_add  = j  *nx + ip1;
+	  ne_add = jp1*nx + ip1;
 
           src_lats[0] = src_center_lat[srch_add];
           src_lats[1] = src_center_lat[e_add];
