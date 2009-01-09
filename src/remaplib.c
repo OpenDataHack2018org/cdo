@@ -377,7 +377,7 @@ void boundbox_from_corners(int size, int nc, double *corner_lon, double *corner_
 }
 
 static
-void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *center_lat, double *bound_box)
+void boundbox_from_center(int lonIsCyclic, int size, int nx, int ny, double *center_lon, double *center_lat, double *bound_box)
 {
   int n4, i, j, k, n, ip1, jp1;
   int n_add, e_add, ne_add;
@@ -395,12 +395,17 @@ void boundbox_from_center(int size, int nx, int ny, double *center_lon, double *
 	ip1 = i + 1;
       else
 	{
+	  if ( lonIsCyclic )
+	    ip1 = 1;
+	  else
+	    ip1 = i;
+
 	  /* Assume cyclic */
-	  ip1 = 1;
+	  /* ip1 = 1; */
 	  /* But if it is not, correct */
-	  e_add = (j - 1)*nx + ip1 - 1;
+	  /* e_add = (j - 1)*nx + ip1 - 1; */
 	  /* 2008-12-16 Uwe Schulzweida: change center_lat to center_lon (bug fix) */
-	  if ( fabs(center_lon[e_add] - center_lon[n]) > PIH ) ip1 = i;
+	  /* if ( fabs(center_lon[e_add] - center_lon[n]) > PIH ) ip1 = i; */
 	}
 
       if ( j < ny )
@@ -693,6 +698,9 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   rg->grid1_size = gridInqSize(gridID1);
   rg->grid2_size = gridInqSize(gridID2);
 
+  rg->grid1_is_cyclic = gridIsCircular(gridID1);
+  rg->grid2_is_cyclic = gridIsCircular(gridID2);
+
   if ( gridInqType(gridID1) == GRID_CELL )
     rg->grid1_rank = 1;
   else
@@ -922,7 +930,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       nx = rg->grid1_dims[0];
       ny = rg->grid1_dims[1];
 
-      boundbox_from_center(rg->grid1_size, nx, ny, 
+      boundbox_from_center(rg->grid1_is_cyclic, rg->grid1_size, nx, ny, 
 			   rg->grid1_center_lon, rg->grid1_center_lat, rg->grid1_bound_box);
     }
 
@@ -955,7 +963,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       nx = rg->grid2_dims[0];
       ny = rg->grid2_dims[1];
 
-      boundbox_from_center(rg->grid2_size, nx, ny, 
+      boundbox_from_center(rg->grid2_is_cyclic, rg->grid2_size, nx, ny, 
 			   rg->grid2_center_lon, rg->grid2_center_lat, rg->grid2_bound_box);
     }
 
@@ -1528,11 +1536,18 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
             ip1 = i + 1;
           else
 	    {
+	      if ( rg->grid1_is_cyclic )
+		ip1 = 1;
+	      else
+		ip1 = i;
+
 	      /* Assume cyclic */
-	      ip1 = 1;
+	      /* ip1 = 1; */
 	      /* But if it is not, correct */
+	      /*
 	      e_add = (j - 1)*nx + ip1 - 1;
 	      if ( fabs(src_center_lon[e_add] - src_center_lon[srch_add]) > PIH ) ip1 = i;
+	      */
 	    }
 
           if ( j < ny )

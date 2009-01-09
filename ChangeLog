@@ -7,6 +7,7 @@
 	* add support for GRID type Sinusoidal
 	* add support for GRID type Lambert Azimuthal Equal Area
 	* import_cmsaf: add support for monthly mean diurnal cycle
+	* reamp: use gridIsCyclic to check whether lon is cyclic
 	* remap: check grid and weights
 	* remap: set num_srch_bins to nlat/2 (speedup)
 	* sinfo: extent grid description

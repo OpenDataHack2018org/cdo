@@ -23,6 +23,7 @@ typedef struct {
   int      gridID2;
   int      no_fall_back;
   int      non_global;
+  int      grid1_is_cyclic, grid2_is_cyclic;
   int      grid1_size, grid2_size; /* total points on each grid */
   int      grid1_rank, grid2_rank; /* rank of each grid */
   int      grid1_corners, grid2_corners; /* number of corners for each grid cell */
