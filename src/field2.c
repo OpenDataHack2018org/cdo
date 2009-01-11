@@ -68,7 +68,7 @@ void faradd(FIELD *field1, FIELD field2)
     {
       /*
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) private(i)
+#pragma omp parallel for default(shared)
 #endif
       */
       for ( i = 0; i < len; i++ ) 

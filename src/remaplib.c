@@ -49,6 +49,10 @@
 #  include "config.h"
 #endif
 
+#if defined (_OPENMP)
+#  include <omp.h>
+#endif
+
 #include <string.h>
 #include <limits.h>
 #include <float.h>
@@ -358,6 +362,11 @@ void boundbox_from_corners(int size, int nc, double *corner_lon, double *corner_
 {
   int i4, inc, i, j;
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none)        \
+  shared(bound_box, corner_lat, corner_lon, nc, size)	\
+  private(i4, inc, i, j)
+#endif
   for ( i = 0; i < size; i++ )
     {
       i4 = i*4;
@@ -1017,6 +1026,11 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	  rg->bin_addr2[2*n+1] = 0;
 	}
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(rg)	                       \
+  private(nele, nele4, n)
+#endif
       for ( nele = 0; nele < rg->grid1_size; nele++ )
 	{
 	  nele4 = nele*4;
@@ -1029,6 +1043,11 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	      }
 	}
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(rg)	                       \
+  private(nele, nele4, n)
+#endif
       for ( nele = 0; nele < rg->grid2_size; nele++ )
 	{
 	  nele4 = nele*4;
@@ -3828,12 +3847,14 @@ void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
 
   -----------------------------------------------------------------------
 */
+#define MASK_TYPE  int
 void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 {
   static char func[] = "remap_conserv";
 
   /* local variables */
 
+  int ompthID, i;
   int lcheck = TRUE;
 
   int ioffset;
@@ -3858,7 +3879,8 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int lrevers;          /* flag for reversing direction of segment */
   int lbegin;           /* flag for first integration of a segment */
 
-  int *srch_mask;       /* mask for restricting searches */
+  MASK_TYPE *srch_mask;      /* mask for restricting searches */
+  MASK_TYPE **srch_mask2;
 
   double intrsct_lat, intrsct_lon;         /* lat/lon of next intersect  */
   double beglat, endlat, beglon, endlon;   /* endpoints of current seg.  */
@@ -3953,7 +3975,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   /*  Integrate around each cell on grid1 */
 
-  srch_mask = (int *) malloc(grid2_size*sizeof(int));
+#if defined (_OPENMP)
+  srch_mask2 = (MASK_TYPE **) malloc(ompNumThreads*sizeof(MASK_TYPE *));
+  for ( i = 0; i < ompNumThreads; i++ )
+    srch_mask2[i] = (MASK_TYPE *) malloc(grid2_size*sizeof(MASK_TYPE));
+#else
+  srch_mask = (MASK_TYPE *) malloc(grid2_size*sizeof(MASK_TYPE));
+#endif
 
   lthresh   = FALSE;
   luse_last = FALSE;
@@ -3968,8 +3996,22 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   if ( cdoTimer ) timer_start(timer_remap_con2);
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(grid1_centroid_lon, grid1_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, grid1_corners, \
+	 srch_corners, rg, grid2_size, grid1_size, func, srch_mask2)	\
+  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, grid1_add, grid2_add, grid2_addm4, \
+	  ioffset, nsrch_corners, corner, next_corn, beglat, beglon, endlat, endlon, lrevers, begseg, lbegin, num_subseg, \
+	  srch_add, srch_corner_lat, srch_corner_lon, weights, intrsct_lat, intrsct_lon, intrsct_lat_off, \
+	  intrsct_lon_off, intrsct_x, intrsct_y, luse_last, last_loc, lthresh, avoid_pole_count, avoid_pole_offset, lcoinc)
+#endif
   for ( grid1_add = 0; grid1_add < grid1_size; grid1_add++ )
     {
+#if defined (_OPENMP)
+      ompthID = omp_get_thread_num();
+      srch_mask = srch_mask2[ompthID];
+#endif
+
       /* Restrict searches first using search bins */
 
       min_add = grid2_size - 1;
@@ -4004,6 +4046,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
       /* Create search arrays */
 
+#if defined (_OPENMP)
+	  srch_add = (int *) malloc(num_srch_cells*sizeof(int));
+	  srch_corner_lat = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
+#else
       if ( num_srch_cells > max_srch_cells )
 	{
 	  max_srch_cells = num_srch_cells;
@@ -4011,6 +4058,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  srch_corner_lat = (double *) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
 	  srch_corner_lon = (double *) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
 	}
+#endif
 
       n = 0;
       /* gather1 */
@@ -4127,6 +4175,9 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( grid2_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
 			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
 			rg->grid1_frac[grid1_add] += weights[0];
@@ -4145,28 +4196,48 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	    }
           /* End of segment */
         }
+#if defined (_OPENMP)
+      free(srch_add);
+      free(srch_corner_lat);
+      free(srch_corner_lon);
+#endif
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_con2);
 
-  /* finished with all cells: deallocate search arrays */
+  /* Finished with all cells: deallocate search arrays */
 
+#if ! defined (_OPENMP)
   if ( srch_corner_lon ) free(srch_corner_lon);
   if ( srch_corner_lat ) free(srch_corner_lat);
   if ( srch_add ) free(srch_add);
+#endif
 
+#if defined (_OPENMP)
+  for ( i = 0; i < ompNumThreads; i++ )
+    free(srch_mask2[i]);
+
+  free(srch_mask2);
+#else
   free(srch_mask);
+#endif
 
   /* Integrate around each cell on grid2 */
 
-  srch_mask = (int *) malloc(grid1_size*sizeof(int));
+#if defined (_OPENMP)
+  srch_mask2 = (MASK_TYPE **) malloc(ompNumThreads*sizeof(MASK_TYPE *));
+  for ( i = 0; i < ompNumThreads; i++ )
+    srch_mask2[i] = (MASK_TYPE *) malloc(grid1_size*sizeof(MASK_TYPE));
+#else
+  srch_mask = (MASK_TYPE *) malloc(grid1_size*sizeof(MASK_TYPE));
+#endif
 
   lthresh   = FALSE;
   luse_last = FALSE;
   avoid_pole_count  = 0;
   avoid_pole_offset = TINY;
 
-  srch_corners = grid1_corners;
+  srch_corners    = grid1_corners;
   max_srch_cells  = 0;
   srch_add        = NULL;
   srch_corner_lat = NULL;
@@ -4174,8 +4245,22 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   if ( cdoTimer ) timer_start(timer_remap_con3);
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(grid2_centroid_lon, grid2_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, grid2_corners, \
+	 srch_corners, rg, grid2_size, grid1_size, func, srch_mask2)	\
+  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, grid1_add, grid2_add, grid2_addm4, \
+	  ioffset, nsrch_corners, corner, next_corn, beglat, beglon, endlat, endlon, lrevers, begseg, lbegin, num_subseg, \
+	  srch_add, srch_corner_lat, srch_corner_lon, weights, intrsct_lat, intrsct_lon, intrsct_lat_off, \
+	  intrsct_lon_off, intrsct_x, intrsct_y, luse_last, last_loc, lthresh, avoid_pole_count, avoid_pole_offset, lcoinc)
+#endif
   for ( grid2_add = 0; grid2_add < grid2_size; grid2_add++ )
     {
+#if defined (_OPENMP)
+      ompthID = omp_get_thread_num();
+      srch_mask = srch_mask2[ompthID];
+#endif
+
       /* Restrict searches first using search bins */
 
       min_add = grid1_size - 1;
@@ -4210,6 +4295,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
       /* Create search arrays */
       
+#if defined (_OPENMP)
+	  srch_add = (int *) malloc(num_srch_cells*sizeof(int));
+	  srch_corner_lat = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
+#else
       if ( num_srch_cells > max_srch_cells )
 	{
 	  max_srch_cells = num_srch_cells;
@@ -4217,6 +4307,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	  srch_corner_lat = (double *) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
 	  srch_corner_lon = (double *) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
 	}
+#endif
 
       n = 0;
       /* gather2 */
@@ -4335,6 +4426,9 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 		  if ( ! lcoinc && grid1_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
 			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
 			rg->grid1_frac[grid1_add] += weights[0];
@@ -4353,17 +4447,31 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 	    }
           /* End of segment */
 	}
+#if defined (_OPENMP)
+      free(srch_add);
+      free(srch_corner_lat);
+      free(srch_corner_lon);
+#endif
     }
 
   if ( cdoTimer ) timer_stop(timer_remap_con3);
 
   /* Finished with all cells: deallocate search arrays */
 
+#if ! defined (_OPENMP)
   if ( srch_corner_lon ) free(srch_corner_lon);
   if ( srch_corner_lat ) free(srch_corner_lat);
   if ( srch_add ) free(srch_add);
+#endif
 
+#if defined (_OPENMP)
+  for ( i = 0; i < ompNumThreads; i++ )
+    free(srch_mask2[i]);
+
+  free(srch_mask2);
+#else
   free(srch_mask);
+#endif
 
   /*
      Correct for situations where N/S pole not explicitly included in
