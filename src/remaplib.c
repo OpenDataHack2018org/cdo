@@ -42,6 +42,9 @@
   http://climate.lanl.gov/Software/SCRIP/SCRIPusers.pdf
 
 */
+/*
+  2009-01-11 Uwe Schulzweida: remap_conserv with OpenMP
+ */
 
 /* #define REMAPTEST 1 */
 

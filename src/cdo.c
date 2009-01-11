@@ -179,6 +179,9 @@ static void usage(void)
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
+#if defined (_OPENMP)
+  fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
+#endif
   /*
   fprintf(stderr, "    -p <prec>      Set the precision of the output data in bytes\n");
   fprintf(stderr, "                   (4/8 for nc, nc2, nc4, srv, ext, ieg; 1/2/3 for grb)\n");
@@ -874,6 +877,8 @@ int main(int argc, char *argv[])
 #if defined (_OPENMP)
   if ( numThreads > 0 ) omp_set_num_threads(numThreads);
   ompNumThreads = omp_get_max_threads();
+  if ( omp_get_max_threads() > omp_get_num_procs() )
+    fprintf(stderr, " Number of threads greater than number of CPUs=%d!\n", omp_get_num_procs());
   if ( cdoVerbose )
     fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d\n",
 	    omp_get_num_procs(), omp_get_max_threads());
