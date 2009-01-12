@@ -44,9 +44,8 @@
 */
 /*
   2009-01-11 Uwe Schulzweida: remap_conserv with OpenMP
+  2009-01-12 Uwe Schulzweida: remap_bilin with OpenMP
  */
-
-/* #define REMAPTEST 1 */
 
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
@@ -395,6 +394,11 @@ void boundbox_from_center(int lonIsCyclic, int size, int nx, int ny, double *cen
   int n_add, e_add, ne_add;
   double tmp_lats[4], tmp_lons[4];  /* temps for computing bounding boxes */
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none)        \
+  shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box)	\
+  private(n4, i, j, k, n, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
+#endif
   for ( n = 0; n < size; n++ )
     {
       n4 = 4*n;
@@ -1517,10 +1521,6 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   nx = src_grid_dims[0];
   ny = src_grid_dims[1];
 
-#ifdef REMAPTEST
-  printf("  min_add, max_add, diff_add, nx, ny %d %d %d %d %d\n", min_add, max_add, max_add-min_add, nx, ny);
-#endif
-
   /* srch_loop */
   /* Unvectorized loop: break and return */
   for ( srch_add = min_add; srch_add <= max_add; srch_add++ )
@@ -1765,8 +1765,8 @@ void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
 void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 {
   /*   Local variables */
-  int n,icount;
   int dst_add;        /*  destination addresss */
+  int n, icount;
   int iter;           /*  iteration counters   */
 
   int src_add[4];     /*  address for the four source points */
@@ -1794,7 +1794,15 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
   /*
     Loop over destination grid 
   */
-  /* grid_loop1 */
+ /* grid_loop1 */
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(rg, rv, Max_Iter, converge)   \
+  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
+          deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
+	  determinant, sum_wgts)	\
+  schedule(dynamic,1)
+#endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
       if ( ! rg->grid2_mask[dst_add] ) continue;
@@ -1802,29 +1810,18 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
       plat = rg->grid2_center_lat[dst_add];
       plon = rg->grid2_center_lon[dst_add];
 
-#ifdef REMAPTEST
-      printf("dst: %d %g %g %d %d %d\n", dst_add, RAD2DEG*plon, RAD2DEG*plat, 
-	     rg->grid1_size, rg->grid1_dims[0], rg->grid1_dims[1]);
-#endif
-
       /*  Find nearest square of grid points on source grid  */
       grid_search(rg, src_add, src_lats, src_lons, 
 		  plat, plon, rg->grid1_dims,
 		  rg->grid1_center_lat, rg->grid1_center_lon,
 		  rg->grid1_bound_box, rg->bin_addr1);
 
-#ifdef REMAPTEST
-      printf("  %d src_add0 %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
-#endif
       /* Check to see if points are land points */
       for ( n = 0; n < 4; n++ )
 	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
 	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  If point found, find local i,j coordinates for weights  */
-#ifdef REMAPTEST
-      printf("  %d src_add0 %d %g %g\n", dst_add, src_add[0], plat*RAD2DEG, plon*RAD2DEG);
-#endif
       if ( src_add[0] > 0 )
 	{
           rg->grid2_frac[dst_add] = ONE;
@@ -1887,6 +1884,9 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 	      wgts[2] = iguess*jguess;
 	      wgts[3] = (ONE-iguess)*jguess;
 
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
 	      store_link_bilin(rv, dst_add, src_add, wgts);
 	    }
           else
@@ -1937,6 +1937,9 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
 
 	      rg->grid2_frac[dst_add] = ONE;
 
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
 	      store_link_bilin(rv, dst_add, src_add, wgts);
 	    }
         }
@@ -3859,6 +3862,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   int ompthID, i;
   int lcheck = TRUE;
+  int lwarn  = TRUE;
 
   int ioffset;
   int grid1_addm4, grid2_addm4;
@@ -3907,7 +3911,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int *link_add2[2];        /* min,max link add to restrict search */
 
   /* Intersection */
-  int last_loc = FALSE;     /* save location when crossing threshold  */
+  int last_loc = -1;        /* save location when crossing threshold  */
   int lthresh = FALSE;      /* flags segments crossing threshold bndy */
   double intrsct_lat_off = 0, intrsct_lon_off = 0; /* lat/lon coords offset for next search */
 
@@ -4001,12 +4005,15 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(grid1_centroid_lon, grid1_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, grid1_corners, \
-	 srch_corners, rg, grid2_size, grid1_size, func, srch_mask2)	\
-  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, grid1_add, grid2_add, grid2_addm4, \
-	  ioffset, nsrch_corners, corner, next_corn, beglat, beglon, endlat, endlon, lrevers, begseg, lbegin, num_subseg, \
-	  srch_add, srch_corner_lat, srch_corner_lon, weights, intrsct_lat, intrsct_lon, intrsct_lat_off, \
-	  intrsct_lon_off, intrsct_x, intrsct_y, luse_last, last_loc, lthresh, avoid_pole_count, avoid_pole_offset, lcoinc)
+  shared(grid1_centroid_lon, grid1_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, \
+	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, func, srch_mask2, lwarn) \
+  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, \
+	  grid1_add, grid2_add, grid2_addm4, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
+	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_add, srch_corner_lat, srch_corner_lon, \
+	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
+	  last_loc, lcoinc) \
+  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)	\
+  schedule(dynamic,1)
 #endif
   for ( grid1_add = 0; grid1_add < grid1_size; grid1_add++ )
     {
@@ -4156,6 +4163,17 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 			       &luse_last, &intrsct_x, &intrsct_y,
 			       &avoid_pole_count, &avoid_pole_offset);
 
+#if defined (_OPENMP)
+		  if ( lthresh )
+		    {
+		      lthresh = FALSE;
+		      if ( lwarn )
+			{
+			  lwarn = FALSE;
+			  printf("Warning: lthresh is enabled, may give wrong result with OpenMP!\n");
+			}
+		    }
+#endif
 		  lbegin = FALSE;
 
 		  /* Compute line integral for this subsegment. */
@@ -4181,10 +4199,12 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 #if defined (_OPENMP)
 #pragma omp critical
 #endif
-			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
+			{
+			  store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
+			  rg->grid2_frac[grid2_add] += weights[rv->num_wts];
+			}
 			rg->grid1_frac[grid1_add] += weights[0];
-			rg->grid2_frac[grid2_add] += weights[rv->num_wts];
 		      }
 
 		  rg->grid1_area[grid1_add]     += weights[0];
@@ -4250,12 +4270,15 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(grid2_centroid_lon, grid2_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, grid2_corners, \
-	 srch_corners, rg, grid2_size, grid1_size, func, srch_mask2)	\
-  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, grid1_add, grid2_add, grid2_addm4, \
-	  ioffset, nsrch_corners, corner, next_corn, beglat, beglon, endlat, endlon, lrevers, begseg, lbegin, num_subseg, \
-	  srch_add, srch_corner_lat, srch_corner_lon, weights, intrsct_lat, intrsct_lon, intrsct_lat_off, \
-	  intrsct_lon_off, intrsct_x, intrsct_y, luse_last, last_loc, lthresh, avoid_pole_count, avoid_pole_offset, lcoinc)
+  shared(grid2_centroid_lon, grid2_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, \
+	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, func, srch_mask2, lwarn) \
+  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, \
+	  grid1_add, grid2_add, grid2_addm4, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
+	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_add, srch_corner_lat, srch_corner_lon, \
+	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
+	  last_loc, lcoinc) \
+  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)	\
+  schedule(dynamic,1)
 #endif
   for ( grid2_add = 0; grid2_add < grid2_size; grid2_add++ )
     {
@@ -4404,6 +4427,17 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 			       &luse_last, &intrsct_x, &intrsct_y,
 			       &avoid_pole_count, &avoid_pole_offset);
 
+#if defined (_OPENMP)
+		  if ( lthresh )
+		    {
+		      lthresh = FALSE;
+		      if ( lwarn )
+			{
+			  lwarn = FALSE;
+			  printf("Warning: lthresh is enabled, may give wrong result with OpenMP!\n");
+			}
+		    }
+#endif
 		  lbegin = FALSE;
 
 		  /* Compute line integral for this subsegment. */
@@ -4432,9 +4466,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 #if defined (_OPENMP)
 #pragma omp critical
 #endif
-			store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
+			{
+			  store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
-			rg->grid1_frac[grid1_add] += weights[0];
+			  rg->grid1_frac[grid1_add] += weights[0];
+			}
 			rg->grid2_frac[grid2_add] += weights[rv->num_wts];
 		      }
 
