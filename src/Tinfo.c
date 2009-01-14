@@ -75,7 +75,6 @@ void printCalendar(int calendar)
 }
 
 
-static
 void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incunit)
 {
   *incperiod = 0;

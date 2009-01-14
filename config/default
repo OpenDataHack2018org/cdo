@@ -186,14 +186,14 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/home/ms/spdekplb/hmk/local/AIX \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix5.3.0.0
     vip*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix6.0.0.0
     hpc*)
@@ -202,13 +202,13 @@ case "${HOSTNAME}" in
                     --with-hdf5=/usr/local/lib/hdf5/1.6.5/LP64_underscore \
                     --with-szlib=$HOME/local \
                     --with-proj=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qstrict -qarch=auto -qtune=auto -qreport -qsmp=omp -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix6.0.0.0
     dwd | p???et01)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/uhome/mpischul/local \
-	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP -D_LARGE_FILES=1"
+	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP"
 	;;
 # hppa2.0w-hp-hpux11.11
     moon)
