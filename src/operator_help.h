@@ -1057,7 +1057,7 @@ static char *ExprHelp[] = {
 static char *MathHelp[] = {
     "NAME",
     "    abs, int, nint, pow, sqr, sqrt, exp, ln, log10, sin, cos, tan, asin, acos, ",
-    "    atan - Mathematical functions",
+    "    reci - Mathematical functions",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -1095,8 +1095,8 @@ static char *MathHelp[] = {
     "           o(t,x) = asin(i(t,x))",
     "    acos   Arc cosine",
     "           o(t,x) = acos(i(t,x))",
-    "    atan   Arc tangent",
-    "           o(t,x) = atan(i(t,x))",
+    "    reci   Reciprocal value",
+    "           o(t,x) = 1 / i(t,x)",
     NULL
 };
 
@@ -2764,10 +2764,10 @@ static char *InttimeHelp[] = {
     "    This module performs linear interpolation between time steps.",
     "",
     "OPERATORS",
-    "    inttime   Time interpolation",
+    "    inttime   Interpolation between time steps",
     "              This operator creates a new dataset by linear interpolation between time steps.",
     "              The user has to define the start date/time with an optional increment.",
-    "    intntime  Time interpolation",
+    "    intntime  Interpolation between time steps",
     "              This operator performs linear interpolation between time steps.",
     "              The user has to define the number of time steps from one time step",
     "              to the next.",

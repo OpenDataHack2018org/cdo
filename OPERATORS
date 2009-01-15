@@ -162,7 +162,7 @@ Operator catalog:
       Math       tan             Tangent
       Math       asin            Arc sine
       Math       acos            Arc cosine
-      Math       atan            Arc tangent
+      Math       reci            Reciprocal value
       Arithc     addc            Add a constant
       Arithc     subc            Subtract a constant
       Arithc     mulc            Multiply with a constant
@@ -361,9 +361,9 @@ Operator catalog:
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation
       Intlevel   intlevel        Linear level interpolation
-      Inttime    inttime         Time interpolation
-      Inttime    intntime        Time interpolation
-      Intyear    intyear         Year interpolation
+      Inttime    inttime         Interpolation between time steps
+      Inttime    intntime        Interpolation between time steps
+      Intyear    intyear         Interpolation between two years
 -------------------------------------------------------------
    Transformation
 -------------------------------------------------------------
@@ -414,7 +414,7 @@ Operator catalog:
       Strgal     strgal          Strong gale days index per time period
       Hurr       hurr            Hurricane days index per time period
       Importamsr import_amsr     Import AMSR binary files
-      Importcmsaf import_cmsaf    Import CM-SAF files
+      Importcmsaf import_cmsaf    Import CM-SAF HDF5 files
 -------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------

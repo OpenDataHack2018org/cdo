@@ -13,7 +13,7 @@ HDF5 files.
 
 
 @BeginOperator_import_cmsaf
-@Title     = Import CM-SAF files
+@Title     = Import CM-SAF HDF5 files
 
 @BeginDescription
 @EndDescription
