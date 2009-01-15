@@ -5,7 +5,7 @@
 @Section   = Arithmetic
 @Class     = Arithmetic
 @Arguments = ifile ofile
-@Operators = abs int nint pow sqr sqrt exp ln log10 sin cos tan asin acos atan
+@Operators = abs int nint pow sqr sqrt exp ln log10 sin cos tan asin acos reci
 
 @BeginDescription
 This module contains some standard mathematical functions.
@@ -265,6 +265,23 @@ o(t,x) = \arctan(i(t,x))
 @EndMath
 @EndifDoc
 @C Calculates the arcus tangent of i(t,x); that is the value whose tangent is i(t,x).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_reci
+@Title     = Reciprocal value
+
+@BeginDescription
+@IfMan
+o(t,x) = 1 / i(t,x)
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = 1 / i(t,x)
+@EndMath
+@EndifDoc
+@C Calculates the reciprocal value of i(t,x).
 @EndDescription
 @EndOperator
 

@@ -54,10 +54,31 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 	     zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )
 	  cdoAbort("Number of levels of the input fields do not match!");
       }
-  else if ( function == func_sft )
+  else if ( function == func_sft || function == func_sftn /* || function == func_sftc */ )
     {
       for ( varID = 0; varID < nvars; varID++ )
 	{
+	  if ( function == func_sftn )
+	    {
+	      char name1[256], name2[256];
+	      vlistInqVarName(vlistID1, varID, name1);
+	      vlistInqVarName(vlistID2, varID, name2);
+	      if ( strcmp(name1, name2) != 0 )
+		{
+		  cdoWarning("Input streams have different variable names!");
+		  break;
+		}
+	    }
+	  /*
+	  if ( function == func_sftc )
+	    {
+	      if ( vlistInqVarCode(vlistID1, varID) != vlistInqVarCode(vlistID2, varID) )
+		{
+		  cdoWarning("Input streams have different code numbers!");
+		  break;
+		}
+	    }
+	  */
 	  if ( gridInqSize(vlistInqVarGrid(vlistID1, varID)) !=
 	       gridInqSize(vlistInqVarGrid(vlistID2, varID)) )
 	    cdoAbort("Grid size of the input fields do not match!");

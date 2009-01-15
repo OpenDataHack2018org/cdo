@@ -18,7 +18,9 @@
 
 #define  func_hrd   31
 #define  func_sft   32
-#define  func_code  33
+#define  func_sftn  33
+#define  func_sftc  34
+#define  func_code  35
 
 #define  func_add   41
 #define  func_sub   42

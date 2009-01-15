@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -30,6 +30,8 @@
       Math       asin            Arc sine
       Math       acos            Arc cosine
       Math       atan            Arc tangent
+      Math       pow             Power
+      Math       reci            Reciprocal
 */
 
 
@@ -42,7 +44,7 @@
 void *Math(void *argument)
 {
   static char func[] = "Math";
-  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW};
+  enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI};
   int operatorID;
   int operfunc;
   int streamID1, streamID2;
@@ -75,6 +77,7 @@ void *Math(void *argument)
   cdoOperatorAdd("acos",  ACOS,  0, NULL);
   cdoOperatorAdd("atan",  ATAN,  0, NULL);
   cdoOperatorAdd("pow",   POW,   0, NULL);
+  cdoOperatorAdd("reci",  RECI,  0, NULL);
  
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
@@ -186,6 +189,10 @@ void *Math(void *argument)
 	    case POW:
 	      for ( i = 0; i < gridsize; i++ )
 		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : pow(array1[i], rc);
+	      break;
+	    case RECI:
+	      for ( i = 0; i < gridsize; i++ )
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array1[i], 0) ? missval1 : 1/array1[i];
 	      break;
 	    default:
 	      cdoAbort("operator not implemented!");

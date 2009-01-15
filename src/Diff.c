@@ -49,6 +49,7 @@ void *Diff(void *argument)
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[128];
   int year, month, day, hour, minute;
+  int lfunc;
   double *array1, *array2;
   double absm, relm;
   double missval1, missval2;
@@ -70,7 +71,14 @@ void *Diff(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = streamInqVlist(streamID2);
 
-  vlistCompare(vlistID1, vlistID2, func_sft);
+  lfunc = func_sftn;
+  /*
+  if ( operatorID == DIFFV )
+    lfunc = func_sftn;
+  else
+    lfunc = func_sftc;
+  */
+  vlistCompare(vlistID1, vlistID2, lfunc);
 
   gridsize = vlistGridsizeMax(vlistID1);
 
