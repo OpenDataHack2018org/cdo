@@ -77,6 +77,7 @@ cdo_SOURCES = Arith.c		\
               Seasstat.c 	\
               Selbox.c  	\
               Select.c  	\
+              Select2.c  	\
               Seloperator.c  	\
               Selrec.c  	\
               Seltime.c 	\

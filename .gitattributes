@@ -281,6 +281,7 @@ src/Seaspctl.c -text
 src/Seasstat.c -text
 src/Selbox.c -text
 src/Select.c -text
+src/Select2.c -text
 src/Seloperator.c -text
 src/Selrec.c -text
 src/Seltime.c -text
