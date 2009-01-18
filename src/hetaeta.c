@@ -4,6 +4,10 @@
 #define  OPOINT 34179
 */
 
+#if defined (_OPENMP)
+#  include <omp.h>
+#endif
+
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -72,6 +76,9 @@ static double esat(double temperature)
   return es;
 }
 
+
+#define MAX_VARS  512
+
 /* Source from INTERA */
 void hetaeta(int ltq, int ngp, int *imiss,
 	     int nlev1, double *ah1, double *bh1,
@@ -86,7 +93,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
   static char func[] = "hetaeta";
   double epsm1i, zdff, zdffl, ztv, zb, zbb, zc, zps;
   double zsump, zsumpp, zsumt, zsumtp;
-  double dfi, fiadj= 0, dteta = 0;
+  double dfi, fiadj = 0, dteta = 0;
   double pbl_lim, pbl_lim_need;
   int jblt, jjblt;
   int k, iv, ij, ijk, ijk1, ijk2;
@@ -99,7 +106,6 @@ void hetaeta(int ltq, int ngp, int *imiss,
   double *zvar;
   double *rh_pbl = NULL;
   double *theta_pbl = NULL;
-  double **vars_pbl = NULL;
   double *rh2;
   double *w1, *w2;
   double *wgt;
@@ -109,6 +115,19 @@ void hetaeta(int ltq, int ngp, int *imiss,
   int nlev2p1;
   int lpsmod = 1;
   int klo;
+#if defined (_OPENMP)
+  double **ph1_2, **lnph1_2, **fi1_2, **pf1_2, **lnpf1_2, **tv1_2, **theta1_2, **rh1_2, **zvar_2;
+  double **ph2_2, **lnph2_2, **fi2_2, **pf2_2;
+  double **rh_pbl_2, **theta_pbl_2, **rh2_2;
+  double **wgt_2;
+  double ***vars_pbl_2;
+  int **idx_2;
+  int ompthID, i;
+  extern int ompNumThreads;
+  double *vars_pbl[MAX_VARS];
+#else
+  double **vars_pbl = NULL;
+#endif
 #if defined (OUTPUT)
   double t, q, fi;
 
@@ -119,14 +138,84 @@ void hetaeta(int ltq, int ngp, int *imiss,
   nlev1p1 = nlev1+1;
   nlev2p1 = nlev2+1;
 
+#if defined (_OPENMP)
+  ph1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  lnph1_2  = (double **) malloc(ompNumThreads*sizeof(double *));
+  fi1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+
+  pf1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  lnpf1_2  = (double **) malloc(ompNumThreads*sizeof(double *));
+  tv1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  theta1_2 = (double **) malloc(ompNumThreads*sizeof(double *));
+  rh1_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  zvar_2   = (double **) malloc(ompNumThreads*sizeof(double *));
+
+  ph2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  lnph2_2  = (double **) malloc(ompNumThreads*sizeof(double *));
+  fi2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+
+  pf2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  rh2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  wgt_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+  idx_2    = (int **)    malloc(ompNumThreads*sizeof(int *));
+
+  if ( ltq )
+    {
+      rh_pbl_2    = (double **) malloc(ompNumThreads*sizeof(double *));
+      theta_pbl_2 = (double **) malloc(ompNumThreads*sizeof(double *));
+    }
+
+  if ( nvars > 0 )
+    {
+      vars_pbl_2  = (double ***) malloc(ompNumThreads*sizeof(double **));
+    }
+
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      ph1_2[i]    = (double *) malloc(nlev1p1*sizeof(double));
+      lnph1_2[i]  = (double *) malloc(nlev1p1*sizeof(double));
+      fi1_2[i]    = (double *) malloc(nlev1p1*sizeof(double));
+
+      pf1_2[i]    = (double *) malloc(nlev1*sizeof(double));
+      lnpf1_2[i]  = (double *) malloc(nlev1*sizeof(double));
+      tv1_2[i]    = (double *) malloc(nlev1*sizeof(double));
+      theta1_2[i] = (double *) malloc(nlev1*sizeof(double));
+      rh1_2[i]    = (double *) malloc(nlev1*sizeof(double));
+      zvar_2[i]   = (double *) malloc(nlev1*sizeof(double));
+
+      ph2_2[i]    = (double *) malloc(nlev2p1*sizeof(double));
+      lnph2_2[i]  = (double *) malloc(nlev2p1*sizeof(double));
+      fi2_2[i]    = (double *) malloc(nlev2p1*sizeof(double));
+
+      pf2_2[i]    = (double *) malloc(nlev2*sizeof(double));
+      rh2_2[i]    = (double *) malloc(nlev2*sizeof(double));
+      wgt_2[i]    = (double *) malloc(nlev2*sizeof(double));
+      idx_2[i]    = (int *)    malloc(nlev2*sizeof(int));
+
+      if ( ltq )
+	{
+	  rh_pbl_2[i]    = (double *) malloc(nlev2*sizeof(double));
+	  theta_pbl_2[i] = (double *) malloc(nlev2*sizeof(double));
+	}
+
+      if ( nvars > 0 )
+	{
+	  if ( nvars > MAX_VARS )
+	    {
+	      fprintf(stderr, "To many vars (max = %d)!\n", MAX_VARS);
+	      exit(-1);
+	    }
+	  vars_pbl_2[i]  = (double **) malloc(nvars*sizeof(double *));
+	  for ( iv = 0; iv < nvars; ++iv )
+	    vars_pbl_2[i][iv] = (double *) malloc(nlev2*sizeof(double));
+	}
+    }
+#else
   /* etah1  = (double *) malloc(nlev1p1*sizeof(double)); */
   ph1    = (double *) malloc(nlev1p1*sizeof(double));
   lnph1  = (double *) malloc(nlev1p1*sizeof(double));
   fi1    = (double *) malloc(nlev1p1*sizeof(double));
 
-  af1    = (double *) malloc(nlev1*sizeof(double));
-  bf1    = (double *) malloc(nlev1*sizeof(double));
-  etaf1  = (double *) malloc(nlev1*sizeof(double));
   pf1    = (double *) malloc(nlev1*sizeof(double));
   lnpf1  = (double *) malloc(nlev1*sizeof(double));
   tv1    = (double *) malloc(nlev1*sizeof(double));
@@ -134,16 +223,15 @@ void hetaeta(int ltq, int ngp, int *imiss,
   rh1    = (double *) malloc(nlev1*sizeof(double));
   zvar   = (double *) malloc(nlev1*sizeof(double));
 
-  etah2  = (double *) malloc(nlev2p1*sizeof(double));
   ph2    = (double *) malloc(nlev2p1*sizeof(double));
   lnph2  = (double *) malloc(nlev2p1*sizeof(double));
   fi2    = (double *) malloc(nlev2p1*sizeof(double));
 
-  af2    = (double *) malloc(nlev2*sizeof(double));
-  bf2    = (double *) malloc(nlev2*sizeof(double));
-  etaf2  = (double *) malloc(nlev2*sizeof(double));
   pf2    = (double *) malloc(nlev2*sizeof(double));
   /* lnpf2  = (double *) malloc(nlev2*sizeof(double)); */
+  rh2    = (double *) malloc(nlev2*sizeof(double));
+  wgt    = (double *) malloc(nlev2*sizeof(double));
+  idx    = (int *)   malloc(nlev2*sizeof(int));
 
   if ( ltq )
     {
@@ -151,22 +239,29 @@ void hetaeta(int ltq, int ngp, int *imiss,
       theta_pbl = (double *) malloc(nlev2*sizeof(double));
     }
 
-  wgt    = (double *) malloc(nlev2*sizeof(double));
-  idx    = (int *) malloc(nlev2*sizeof(int));
-
   if ( nvars > 0 )
     {
       vars_pbl  = (double **) malloc(nvars*sizeof(double *));
       for ( iv = 0; iv < nvars; ++iv )
 	vars_pbl[iv] = (double *) malloc(nlev2*sizeof(double));
     }
-
-  rh2   = (double *) malloc(nlev2*sizeof(double));
-  w1    = (double *) malloc(nlev2*sizeof(double));
-  w2    = (double *) malloc(nlev2*sizeof(double));
-  jl1   = (int *)    malloc(nlev2*sizeof(int));
-  jl2   = (int *)    malloc(nlev2*sizeof(int));
+#endif
   
+  af1    = (double *) malloc(nlev1*sizeof(double));
+  bf1    = (double *) malloc(nlev1*sizeof(double));
+  etaf1  = (double *) malloc(nlev1*sizeof(double));
+
+  etah2  = (double *) malloc(nlev2p1*sizeof(double));
+
+  af2    = (double *) malloc(nlev2*sizeof(double));
+  bf2    = (double *) malloc(nlev2*sizeof(double));
+  etaf2  = (double *) malloc(nlev2*sizeof(double));
+
+  w1     = (double *) malloc(nlev2*sizeof(double));
+  w2     = (double *) malloc(nlev2*sizeof(double));
+  jl1    = (int *)    malloc(nlev2*sizeof(int));
+  jl2    = (int *)    malloc(nlev2*sizeof(int));
+
 
   /******* set coordinate system ETA's, A's, B's
 	   calculate half and full level ETA
@@ -232,8 +327,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
 	      if (etaf2[k] > etaf1[jlev]) break;
 	    }
 	  jl2[k] = jl1[k]+1;
-	  w2[k]  = log(etaf2[k]/etaf1[jl1[k]])
-	         /log(etaf1[jl2[k]]/etaf1[jl1[k]]);
+	  w2[k]  = log(etaf2[k]/etaf1[jl1[k]]) / log(etaf1[jl2[k]]/etaf1[jl1[k]]);
 	}
       w1[k] = 1.0-w2[k];
     }
@@ -241,8 +335,56 @@ void hetaeta(int ltq, int ngp, int *imiss,
   epsm1i = 1.0/epsilon-1.0;
 
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(ngp, ph1_2, lnph1_2, fi1_2, pf1_2, lnpf1_2, tv1_2, theta1_2, rh1_2, zvar_2, ph2_2, lnph2_2, fi2_2, pf2_2, rh_pbl_2, \
+	 theta_pbl_2, rh2_2, wgt_2, vars_pbl_2, idx_2, af1, bf1, etaf1, etah2, af2, bf2, etaf2, w1, w2, jl1, jl2, \
+	 ltq, nvars, imiss, nlev1p1, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, ps2, nlev2p1, ah2, bh2, \
+	 nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt, stderr)	\
+  firstprivate(lpsmod) \
+  private(ij, iv, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, theta_pbl, rh2, wgt, vars_pbl, \
+	  k, ijk, jlev, idx, ompthID, zdff, jlevr, zdffl, jnop, zsumt, zsump, zsumpp, zsumtp, zb, zc, zps, zbb, \
+	  fiadj, pbl_lim, jjblt, pbl_lim_need, ijk1, ijk2, klo, dteta, dfi, ztv) \
+  schedule(dynamic,1)
+#endif
   for ( ij = 0; ij < ngp; ++ij )
     {
+#if defined (_OPENMP)
+      ompthID = omp_get_thread_num();
+
+      ph1    = ph1_2[ompthID];
+      lnph1  = lnph1_2[ompthID];
+      fi1    = fi1_2[ompthID];
+
+      pf1    = pf1_2[ompthID];
+      lnpf1  = lnpf1_2[ompthID];
+      tv1    = tv1_2[ompthID];
+      theta1 = theta1_2[ompthID];
+      rh1    = rh1_2[ompthID];
+      zvar   = zvar_2[ompthID];
+
+      ph2    = ph2_2[ompthID];
+      lnph2  = lnph2_2[ompthID];
+      fi2    = fi2_2[ompthID];
+
+      pf2    = pf2_2[ompthID];
+      rh2    = rh2_2[ompthID];
+      wgt    = wgt_2[ompthID];
+      idx    = idx_2[ompthID];
+
+      if ( ltq )
+	{
+	  rh_pbl    = rh_pbl_2[ompthID];
+	  theta_pbl = theta_pbl_2[ompthID];
+	}
+
+      if ( nvars > 0 )
+	{
+	  for ( iv = 0; iv < nvars; ++iv )
+	    vars_pbl[iv] = vars_pbl_2[ompthID][iv];
+	}
+#endif
+
       if ( imiss )
 	if ( imiss[ij] ) continue;
 
@@ -587,13 +729,104 @@ void hetaeta(int ltq, int ngp, int *imiss,
   fclose(new);
 #endif
 
-  free(jl2);      
-  free(jl1);      
 
-  free(w2);       
-  free(w1);       
+#if defined (_OPENMP)
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      free(ph1_2[i]);    
+      free(lnph1_2[i]);  
+      free(fi1_2[i]);    
 
+      free(pf1_2[i]);    
+      free(lnpf1_2[i]);  
+      free(tv1_2[i]);    
+      free(theta1_2[i]); 
+      free(rh1_2[i]);    
+      free(zvar_2[i]);    
+
+      free(ph2_2[i]);       
+      free(lnph2_2[i]);     
+      free(fi2_2[i]);
+
+      free(pf2_2[i]);       
+      /* free(lnpf2_2[i]); */
+      free(rh2_2[i]);      
+      free(wgt_2[i]); 
+      free(idx_2[i]); 
+
+      if ( ltq )
+	{
+	  free(rh_pbl_2[i]); 
+	  free(theta_pbl_2[i]); 
+	}   
+
+      if ( nvars > 0 )
+	{
+	  for ( iv = 0; iv < nvars; ++iv )
+	    free(vars_pbl_2[i][iv]);
+	  
+	  free(vars_pbl_2[i]);
+	}
+    }
+
+  free(ph1_2);
+  free(lnph1_2);
+  free(fi1_2);
+
+  free(pf1_2);
+  free(lnpf1_2);
+  free(tv1_2);
+  free(theta1_2);
+  free(rh1_2);
+  free(zvar_2);
+
+  free(ph2_2);
+  free(lnph2_2);
+  free(fi2_2);
+
+  free(pf2_2);
+  free(rh2_2);
+  free(wgt_2);
+  free(idx_2);
+
+  if ( ltq )
+    {
+      free(rh_pbl_2);
+      free(theta_pbl_2);
+    }
+
+  if ( nvars > 0 )
+    {
+      free(vars_pbl_2);
+    }
+#else
+  /* free(etah1); */     
+  free(ph1);    
+  free(lnph1);  
+  free(fi1);    
+
+  free(pf1);    
+  free(lnpf1);  
+  free(tv1);    
+  free(theta1); 
+  free(rh1);    
+  free(zvar);    
+
+  free(ph2);       
+  free(lnph2);     
+  free(fi2);
+
+  free(pf2);       
+  /* free(lnpf2); */
   free(rh2);      
+  free(wgt); 
+  free(idx); 
+
+  if ( ltq )
+    {
+      free(rh_pbl); 
+      free(theta_pbl); 
+    }   
 
   if ( nvars > 0 )
     {
@@ -602,44 +835,22 @@ void hetaeta(int ltq, int ngp, int *imiss,
 
       free(vars_pbl);
     }
+#endif
 
-  free(idx); 
-  free(wgt); 
-
-  if ( ltq )
-    {
-      free(theta_pbl); 
-      free(rh_pbl); 
-    }   
-
-  /* free(lnpf2); */
-  free(pf2);       
-  free(etaf2);     
-
-  free(bf2);       
-  free(af2);       
-
-  free(fi2);       
-  free(lnph2);     
-  free(ph2);       
-  free(etah2);    
-
-  free(zvar);    
-  free(rh1);    
-  free(theta1); 
-  free(tv1);    
-
-  free(lnpf1);  
-  free(pf1);    
+  free(af1);    
+  free(bf1);    
   free(etaf1);  
 
-  free(bf1);    
-  free(af1);    
+  free(etah2);
 
-  free(fi1);    
-  free(lnph1);  
-  free(ph1);    
-  /* free(etah1); */     
+  free(af2);       
+  free(bf2);       
+  free(etaf2);     
+
+  free(w1);       
+  free(w2);       
+  free(jl1);      
+  free(jl2);      
 
   return;
 }
