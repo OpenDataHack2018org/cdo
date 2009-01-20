@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
+#include "par_io.h"
 #include "pstream.h"
 
 void    vlistDefVarTime(int vlistID, int varID, int timeID);
@@ -47,6 +48,7 @@ void *Copy(void *argument)
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int ntsteps;
   double *array = NULL;
+  par_io_t parIO;
 
   cdoInitialize(argument);
 
@@ -93,6 +95,11 @@ void *Copy(void *argument)
 
 	  gridsize = vlistGridsizeMax(vlistID1);
 	  array = (double *) malloc(gridsize*sizeof(double));
+	  if ( cdoParIO )
+	    {
+	      parIO.array = (double *) malloc(gridsize*sizeof(double));
+	      parIO.array_size = gridsize;
+	    }
 	}
       else
 	{
@@ -108,17 +115,28 @@ void *Copy(void *argument)
 	  streamDefTimestep(streamID2, tsID2);
 	       
 	  for ( recID = 0; recID < nrecs; recID++ )
-	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
-	      streamDefRecord(streamID2,  varID,  levelID);
-	  
+	    { 
 	      if ( lcopy && operatorID == SELALL )
 		{
+		  streamInqRecord(streamID1, &varID, &levelID);
+		  streamDefRecord(streamID2,  varID,  levelID);
 		  streamCopyRecord(streamID2, streamID1);
 		}
 	      else
 		{
-		  streamReadRecord(streamID1, array, &nmiss);
+		  if ( cdoParIO )
+		    {
+		      parIO.recID = recID; parIO.nrecs = nrecs;
+		      parReadRecord(streamID1, &varID, &levelID, array, &nmiss, &parIO);
+		      fprintf(stderr, "2 streamID %d varID %d levelID %d\n", streamID1, varID, levelID);
+		    }
+		  else
+		    {
+		      streamInqRecord(streamID1, &varID, &levelID);
+		      streamReadRecord(streamID1, array, &nmiss);
+		    }
+
+		  streamDefRecord(streamID2,  varID,  levelID);
 		  streamWriteRecord(streamID2, array, nmiss);
 		}
 	    }

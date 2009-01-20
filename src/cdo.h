@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -59,6 +59,7 @@ extern int cdoVerbose;
 extern int cdoDebug;
 extern int cdoCompress;
 extern int cdoInteractive;
+extern int cdoParIO;
 
 extern int cdoZtype;
 extern int cdoZlevel;

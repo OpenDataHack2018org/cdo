@@ -406,6 +406,8 @@ src/normal.c -text
 src/nth_element.c -text
 src/nth_element.h -text
 src/operator_help.h -text
+src/par_io.c -text
+src/par_io.h -text
 src/percentiles.c -text
 src/percentiles.h -text
 src/pipe.c -text

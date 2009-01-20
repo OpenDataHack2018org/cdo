@@ -88,6 +88,7 @@ int cdoVerbose     = FALSE;
 int cdoDebug       = 0;
 int cdoCompress    = FALSE;
 int cdoInteractive = FALSE;
+int cdoParIO       = FALSE;
 
 int cdoExpMode     = -1;
 char *cdoExpName   = NULL;
@@ -607,7 +608,7 @@ int main(int argc, char *argv[])
 
   cdoHaveNC4 = have_netCDF4();
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhRrsTuVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhMRrsTuVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -661,6 +662,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'm':
 	  cdiDefMissval(atof(cdoOptarg));
+	  break;
+	case 'M': /* multi threaded I/O */
+	  cdoParIO = TRUE;
 	  break;
 	case 'P':
 	  numThreads = atoi(cdoOptarg);

@@ -187,6 +187,8 @@ cdo_SOURCES = Arith.c		\
               julian.c  	\
               vinterp.c		\
               zaxis.c  		\
+	      par_io.c 	        \
+	      par_io.h 	        \
 	      pthread_debug.c 	\
 	      pthread_debug.h 	\
 	      color.c 	        \
