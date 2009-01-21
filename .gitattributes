@@ -220,7 +220,6 @@ src/Copy.c -text
 src/Del29feb.c -text
 src/Detrend.c -text
 src/Diff.c -text
-src/EOF.c -text
 src/EcaIndices.c -text
 src/Echam5ini.c -text
 src/Enlarge.c -text
@@ -313,6 +312,7 @@ src/Templates.c -text
 src/Test.c -text
 src/Tests.c -text
 src/Timcount.c -text
+src/Timeof.c -text
 src/Timpctl.c -text
 src/Timselpctl.c -text
 src/Timselstat.c -text
