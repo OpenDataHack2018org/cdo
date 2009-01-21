@@ -56,6 +56,7 @@ void *Echam5ini(void *argument);
 void *Enlarge(void *argument);
 void *Enlargegrid(void *argument);
 void *Ensstat(void *argument);
+void *Timeof(void *argument);
 void *Expr(void *argument);
 void *Filedes(void *argument);
 void *Fillmiss(void *argument);
@@ -257,6 +258,7 @@ void *Wct(void *argument);
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
+#define  TimeofOperators        {"timeof"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
@@ -491,6 +493,7 @@ static MODULES Modules[] =
   { Enlarge,        EnlargeHelp,       EnlargeOperators,        1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,    1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       -1,  1 },
+  { Timeof,         NULL,              TimeofOperators,         1,  1 },
   { Expr,           ExprHelp,          ExprOperators,           1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,        1,  0 },
   { Fillmiss,       NULL,              FillmissOperators,       1,  1 },

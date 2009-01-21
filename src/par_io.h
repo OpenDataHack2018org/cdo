@@ -9,11 +9,21 @@
 #  include <pthread.h>
 #endif
 
+
+typedef struct {
+  int streamID;
+  int *varID, *levelID, *nmiss;
+  double *array;
+}
+read_arg_t;
+
+
 typedef struct {
   int varID, levelID, nmiss;
   double *array;
   int array_size;
   int recID, nrecs;
+  read_arg_t read_arg;
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_t thrID;
   pthread_attr_t attr;

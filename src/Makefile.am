@@ -108,6 +108,7 @@ cdo_SOURCES = Arith.c		\
               Test.c    	\
               Tests.c    	\
               Timcount.c 	\
+              Timeof.c 		\
               Timpctl.c 	\
               Timsort.c 	\
               Timselpctl.c 	\

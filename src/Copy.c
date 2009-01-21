@@ -127,17 +127,25 @@ void *Copy(void *argument)
 		  if ( cdoParIO )
 		    {
 		      parIO.recID = recID; parIO.nrecs = nrecs;
+		      /* fprintf(stderr, "in1 streamID %d varID %d levelID %d\n", streamID1, varID, levelID);*/
 		      parReadRecord(streamID1, &varID, &levelID, array, &nmiss, &parIO);
-		      fprintf(stderr, "2 streamID %d varID %d levelID %d\n", streamID1, varID, levelID);
+		      /* fprintf(stderr, "in2 streamID %d varID %d levelID %d\n", streamID1, varID, levelID);*/
 		    }
 		  else
 		    {
 		      streamInqRecord(streamID1, &varID, &levelID);
 		      streamReadRecord(streamID1, array, &nmiss);
 		    }
-
+		  /*
+		  if ( cdoParIO )
+		    fprintf(stderr, "out1 %d %d %d\n", streamID2,  varID,  levelID);
+		  */
 		  streamDefRecord(streamID2,  varID,  levelID);
 		  streamWriteRecord(streamID2, array, nmiss);
+		  /*
+		  if ( cdoParIO )
+		    fprintf(stderr, "out2 %d %d %d\n", streamID2,  varID,  levelID);
+		  */
 		}
 	    }
 	  tsID1++;

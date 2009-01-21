@@ -12,20 +12,13 @@
 #include "par_io.h"
 #include "pstream.h"
 
-typedef struct {
-  int streamID;
-  int *varID, *levelID, *nmiss;
-  double *array;
-}
-READ_ARG;
-
 
 void *readRecord(void *arg)
 {
   int streamID;
   int *varID, *levelID, *nmiss;
   double *array;
-  READ_ARG *read_arg = (READ_ARG *) arg;
+  read_arg_t *read_arg = (read_arg_t *) arg;
 
   streamID = read_arg->streamID;
   varID    = read_arg->varID;
@@ -33,9 +26,10 @@ void *readRecord(void *arg)
   nmiss    = read_arg->nmiss;
   array    = read_arg->array;
 
+  /* fprintf(stderr, "streamInqRecord: streamID = %d\n", streamID); */
   streamInqRecord(streamID, varID, levelID);
   streamReadRecord(streamID, array, nmiss);
-  fprintf(stderr, "1 varID %d levelID %d\n", *varID, *levelID);
+  /* fprintf(stderr, "readRecord: varID %d levelID %d\n", *varID, *levelID); */
 
   return (NULL);
 }
@@ -44,20 +38,12 @@ void *readRecord(void *arg)
 void parReadRecord(int streamID, int *varID, int *levelID, double *array, int *nmiss, par_io_t *parIO)
 {
   int lpario = FALSE;
-  READ_ARG read_arg;
-  void *statusp;
   int recID = 0, nrecs = 0;
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_t thrID;
   /* pthread_attr_t attr; */
   int rval;
 #endif
-
-  read_arg.streamID = streamID;
-  read_arg.varID    = varID;
-  read_arg.levelID  = levelID;
-  read_arg.nmiss    = nmiss;
-  read_arg.array    = array;
 
 #if  defined  (HAVE_LIBPTHREAD)
   if ( parIO )
@@ -71,27 +57,32 @@ void parReadRecord(int streamID, int *varID, int *levelID, double *array, int *n
 
   if ( recID == 0 || lpario == FALSE )
     {
-      statusp = readRecord(&read_arg);
+      read_arg_t read_arg;
+      read_arg.streamID = streamID;
+      read_arg.varID    = varID;
+      read_arg.levelID  = levelID;
+      read_arg.nmiss    = nmiss;
+      read_arg.array    = array;
+
+      readRecord(&read_arg);
     }
 #if  defined  (HAVE_LIBPTHREAD)
   else
     {
-      fprintf(stderr, "parIO: %ld streamID %d %d %d\n", (long)thrID, streamID, recID, nrecs);
-      rval = pthread_join(thrID, &statusp);
+      /* fprintf(stderr, "parIO1: %ld streamID %d %d %d\n", (long)thrID, streamID, recID, nrecs); */
+      rval = pthread_join(thrID, NULL);
       if ( rval != 0 ) cdoAbort("pthread_join failed!");
-      /*
-      if ( *(int *)statusp < 0 )
-	cdoAbort("pthread_join failed! (status = %d)", *(int *)statusp);
-      */
 
       *varID    = parIO->varID;
       *levelID  = parIO->levelID;
       *nmiss    = parIO->nmiss;
+      /* fprintf(stderr, "parIO2: %ld streamID %d %d %d\n", (long)thrID, streamID, *varID, *levelID); */
       memcpy(array, parIO->array, parIO->array_size*sizeof(double));
     }
 
   if ( lpario && nrecs > 1 )
     {
+      read_arg_t *read_arg = &(parIO->read_arg);
       if ( (recID+1) < nrecs )
 	{
 	  if ( recID == 0 )
@@ -100,16 +91,17 @@ void parReadRecord(int streamID, int *varID, int *levelID, double *array, int *n
 	      pthread_attr_setdetachstate(&parIO->attr, PTHREAD_CREATE_JOINABLE);
 	    }
 
-	  read_arg.streamID = streamID;
-	  read_arg.varID    = &parIO->varID;
-	  read_arg.levelID  = &parIO->levelID;
-	  read_arg.nmiss    = &parIO->nmiss;
-	  read_arg.array    = parIO->array;
+	  read_arg->streamID = streamID;
+	  read_arg->varID    = &parIO->varID;
+	  read_arg->levelID  = &parIO->levelID;
+	  read_arg->nmiss    = &parIO->nmiss;
+	  read_arg->array    = parIO->array;
 
-	  rval = pthread_create(&thrID, &parIO->attr, readRecord, &read_arg);
+	  /* fprintf(stderr, "pthread_create: streamID %d %d\n", read_arg->streamID,streamID); */
+	  rval = pthread_create(&thrID, &parIO->attr, readRecord, read_arg);
 	  if ( rval != 0 ) cdoAbort("pthread_create failed!");
 
-	  fprintf(stderr, "thrID = %ld\n", (long) thrID);
+	  /* fprintf(stderr, "thrID = %ld\n", (long) thrID); */
 	  parIO->thrID = thrID;
 	}
       else
