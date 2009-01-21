@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Importcmsaf
 @Title     = Import CM-SAF HDF5 files
 @Section   = Miscellaneous
@@ -7,7 +8,74 @@
 
 @BeginDescription
 This operator imports gridded CM-SAF (Satellite Application Facility on Climate Monitoring)
-HDF5 files. 
+HDF5 files. CM-SAF exploits data from polar-orbiting and geostationary satellites in order 
+to provide climate monitoring products of the following parameters: 
+
+@IfMan
+
+Cloud parameters: cloud fraction (CFC), cloud type (CTY), cloud phase (CPH), 
+                  cloud top height, pressure and temperature (CTH,CTP,CTT), 
+                  cloud optical thickness (COT), cloud water path (CWP).
+
+Surface radiation components: Surface albedo (SAL); surface incoming (SIS) 
+                  and net (SNS) shortwave radiation; surface downward (SDL) 
+                  and outgoing (SOL) longwave radiation, surface net longwave 
+                  radiation (SNL) and surface radiation budget (SRB).
+
+Top-of-atmosphere radiation components: Incoming (TIS) and reflected (TRS) 
+                  solar radiative flux at top-of-atmosphere. Emitted thermal 
+                  radiative flux at top-of-atmosphere (TET).
+
+Water vapour: Vertically integrated water vapour (HTW), layered vertically 
+                  integrated water vapour and layer mean temperature and relative 
+                  humidity for 5 layers (HLW), temperature and mixing ratio at 
+                  6 pressure levels. 
+
+@EndifMan
+@IfDoc
+\vspace*{2mm}
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-0mm}
+\hspace*{0mm}\begin{minipage}{\miniwidth}
+\begin{defalist}{\bf Cloud para\ }
+\item[{\bf Cloud parameters:}]
+                  cloud fraction (CFC), cloud type (CTY), cloud phase (CPH), 
+                  cloud top height, pressure and temperature (CTH,CTP,CTT), 
+                  cloud optical thickness (COT), cloud water path (CWP).
+
+\item[{\bf Surface radiation components:}]
+                  Surface albedo (SAL); surface incoming (SIS) 
+                  and net (SNS) shortwave radiation; surface downward (SDL) 
+                  and outgoing (SOL) longwave radiation, surface net longwave 
+                  radiation (SNL) and surface radiation budget (SRB).
+
+\item[{\bf Top-of-atmosphere radiation components:}]
+                  Incoming (TIS) and reflected (TRS) 
+                  solar radiative flux at top-of-atmosphere. Emitted thermal 
+                  radiative flux at top-of-atmosphere (TET).
+
+\item[{\bf Water vapour:}]
+                  Vertically integrated water vapour (HTW), layered vertically 
+                  integrated water vapour and layer mean temperature and relative 
+                  humidity for 5 layers (HLW), temperature and mixing ratio at 
+                  6 pressure levels.
+\end{defalist}
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+\vspace*{2mm}
+@EndifDoc
+
+Daily and monthly mean products can be ordered via the CM-SAF web page (www.cmsaf.eu). 
+Products with higher spatial and temporal resolution, i.e. instantaneous swath-based products,
+are available on request (contact.cmsaf@dwd.de). All products are distributed free-of-charge.
+More information on the data is available on the CM-SAF homepage (www.cmsaf.eu).
+
+Daily and monthly mean products are provided in equal-area projections. CDO reads the 
+projection parameters from the metadata in the HDF5-headers in order to allow spatial 
+operations like remapping. For spatial operations with instantaneous products on original 
+satellite projection, additional files with arrays of latitudes and longitudes are needed.
+These can be obtained from CM-SAF together with the data.
+
 @EndDescription
 @EndModule
 
@@ -21,7 +89,9 @@ HDF5 files.
 
 
 @BeginNote
-This operator is only available if the program was compiled with HDF5 support!
+To use this operator, it is necessary to build CDO with HDF5 support (version 1.6 or higher).
+The PROJ.4 library (version 4.6 or higher) is needed for full support of the remapping
+functionality. 
 @EndNote
 
 

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -316,9 +316,17 @@ int gridToCurvilinear(int gridID1)
 	double *xvals2D, *yvals2D;
 	double *xbounds = NULL, *ybounds = NULL;
 	double *xbounds2D, *ybounds2D;
+	char xunits[128], yunits[128];
+	double xscale = 1, yscale = 1;
 
 	nx = gridInqXsize(gridID1);
 	ny = gridInqYsize(gridID1);
+
+	gridInqXunits(gridID1, xunits);
+	gridInqYunits(gridID1, yunits);
+
+	if ( strncmp(xunits, "km", 2) == 0 ) xscale = 1000;
+	if ( strncmp(yunits, "km", 2) == 0 ) yscale = 1000;
 
 	gridDefXsize(gridID2, nx);
 	gridDefYsize(gridID2, ny);
@@ -411,8 +419,8 @@ int gridToCurvilinear(int gridID1)
 		    for ( j = 0; j < ny; j++ )
 		      for ( i = 0; i < nx; i++ )
 			{
-			  data.u = xvals[i];
-			  data.v = yvals[j];
+			  data.u = xscale*xvals[i];
+			  data.v = yscale*yvals[j];
 			  res = pj_inv(data, libProj);
 			  xvals2D[j*nx+i] = res.u*rad2deg;
 			  yvals2D[j*nx+i] = res.v*rad2deg;
@@ -454,8 +462,8 @@ int gridToCurvilinear(int gridID1)
 		    for ( j = 0; j < ny; j++ )
 		      for ( i = 0; i < nx; i++ )
 			{
-			  data.u = xvals[i];
-			  data.v = yvals[j];
+			  data.u = xscale*xvals[i];
+			  data.v = yscale*yvals[j];
 			  res = pj_inv(data, libProj);
 			  xvals2D[j*nx+i] = res.u*rad2deg;
 			  yvals2D[j*nx+i] = res.v*rad2deg;
@@ -606,26 +614,26 @@ int gridToCurvilinear(int gridID1)
 			    {
 			      index = j*4*nx + 4*i;
 
-			      data.u = xbounds[2*i];
-			      data.v = ybounds[2*j];
+			      data.u = xscale*xbounds[2*i];
+			      data.v = yscale*ybounds[2*j];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+0] = res.u*rad2deg;
 			      ybounds2D[index+0] = res.v*rad2deg;
 
-			      data.u = xbounds[2*i];
-			      data.v = ybounds[2*j+1];
+			      data.u = xscale*xbounds[2*i];
+			      data.v = yscale*ybounds[2*j+1];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+1] = res.u*rad2deg;
 			      ybounds2D[index+1] = res.v*rad2deg;
 
-			      data.u = xbounds[2*i+1];
-			      data.v = ybounds[2*j+1];
+			      data.u = xscale*xbounds[2*i+1];
+			      data.v = yscale*ybounds[2*j+1];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+2] = res.u*rad2deg;
 			      ybounds2D[index+2] = res.v*rad2deg;
 
-			      data.u = xbounds[2*i+1];
-			      data.v = ybounds[2*j];
+			      data.u = xscale*xbounds[2*i+1];
+			      data.v = yscale*ybounds[2*j];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+3] = res.u*rad2deg;
 			      ybounds2D[index+3] = res.v*rad2deg;
@@ -673,26 +681,26 @@ int gridToCurvilinear(int gridID1)
 			    {
 			      index = j*4*nx + 4*i;
 
-			      data.u = xbounds[2*i];
-			      data.v = ybounds[2*j];
+			      data.u = xscale*xbounds[2*i];
+			      data.v = yscale*ybounds[2*j];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+0] = res.u*rad2deg;
 			      ybounds2D[index+0] = res.v*rad2deg;
 
-			      data.u = xbounds[2*i];
-			      data.v = ybounds[2*j+1];
+			      data.u = xscale*xbounds[2*i];
+			      data.v = yscale*ybounds[2*j+1];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+1] = res.u*rad2deg;
 			      ybounds2D[index+1] = res.v*rad2deg;
 
-			      data.u = xbounds[2*i+1];
-			      data.v = ybounds[2*j+1];
+			      data.u = xscale*xbounds[2*i+1];
+			      data.v = yscale*ybounds[2*j+1];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+2] = res.u*rad2deg;
 			      ybounds2D[index+2] = res.v*rad2deg;
 
-			      data.u = xbounds[2*i+1];
-			      data.v = ybounds[2*j];
+			      data.u = xscale*xbounds[2*i+1];
+			      data.v = yscale*ybounds[2*j];
 			      res = pj_inv(data, libProj);
 			      xbounds2D[index+3] = res.u*rad2deg;
 			      ybounds2D[index+3] = res.v*rad2deg;
