@@ -203,11 +203,42 @@ void *Filter(void *argument)
   
   nvars = vlistNvars(vlistID1);
   
+  nalloc += NALLOC_INC;
+  vdate = (int *) realloc(vdate, nalloc*sizeof(int));
+  vtime = (int *) realloc(vtime, nalloc*sizeof(int));
+  vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
+  
+  
+  if ( taxisID1 != CDI_UNDEFID )
+    {      
+      // require reference date for relative time axis to determine the time step
+      if ( taxisInqType(taxisID1) == TAXIS_RELATIVE )
+        {
+          vdate[0] = taxisInqRdate(taxisID1);
+          vtime[0] = taxisInqRtime(taxisID1);
+          
+          decode_date(vdate[0], &year0, &month0, &day0);
+          decode_time(vtime[0], &hour0, &minute0);
+          
+          calendar = taxisInqCalendar(taxisID1);
+          dpy = calendar_dpy(calendar);
+
+          //fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d  cal %i dpy %3i",
+          //        year0, month0, day0, hour0, minute0, calendar, dpy);
+          
+          tunit = taxisInqTunit(taxisID1);
+          calendar = taxisInqCalendar(taxisID1);
+          dpy = calendar_dpy(calendar);
+          fprintf(stdout, "\n");
+        }
+    }
+  
+  
   tsID = 0;    
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       int deltay, deltam;
-      int julval0, julval, jdelta;
+      double julval0, julval, jdelta;
       int lperiod, incperiod;
       int year, month, day, hour, minute;
       if ( tsID >= nalloc )
@@ -217,13 +248,20 @@ void *Filter(void *argument)
           vtime = (int *) realloc(vtime, nalloc*sizeof(int));
           vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
         }
-            
-      vdate[tsID] = taxisInqVdate(taxisID1);
-      vtime[tsID] = taxisInqVtime(taxisID1);
-      decode_date(vdate[tsID], &year, &month, &day);
-      decode_time(vtime[tsID], &hour, &minute);
-      if ( tsID )        
-        decode_date(vdate[tsID-1], &year0, &month0, &day0);               
+                       
+      if ( tsID > 0)        
+        {
+          vdate[tsID] = taxisInqVdate(taxisID1);
+          vtime[tsID] = taxisInqVtime(taxisID1);
+          decode_date(vdate[tsID], &year, &month, &day);
+          decode_time(vtime[tsID], &hour, &minute);
+          
+          if ( tsID > 1 ) 
+            {
+              decode_date(vdate[tsID-1], &year0, &month0, &day0);               
+              decode_time(vtime[tsID-1], &hour0, &minute0);
+            }
+        }
       if ( month == 2 && day == 29 && 
           ( day0 != day || month0 != month || year0 != year ) )
         {
@@ -263,7 +301,8 @@ void *Filter(void *argument)
 
       /* get and check time increment */                   
       if ( tsID > 0)
-        {
+        {    
+          //dpy = 365;
           julval0 = encode_julval(dpy, vdate[tsID-1], vtime[tsID-1]);        
           julval  = encode_julval(dpy, vdate[tsID], vtime[tsID]);         
           jdelta  = julval - julval0;
@@ -276,12 +315,14 @@ void *Filter(void *argument)
           
           
           if ( tsID == 1 ) 
-            {
+            {           
+              /*printf("%4i %4.4i-%2.2i-%2.2i %2.2i:%2.2i\n", tsID, year, month, day, hour, minute);
+              printf("    %4.4i-%2.2i-%2.2i %2.2i:%2.2i\n",     year0,month0,day0,hour0,minute0);*/
               getTimeInc(lperiod, deltam, deltay, &incperiod0, &incunit0);
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero\n");
               incunit = incunit0;
-              //fprintf(stderr, "step %i%s\n", incperiod, tunits[incunit]);
+              if ( cdoVerbose ) fprintf(stdout, "time step %i %s\n", incperiod, tunits[incunit]);
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
