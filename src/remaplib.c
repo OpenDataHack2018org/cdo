@@ -327,32 +327,38 @@ void remapGridRealloc(int map_type, REMAPGRID *rg)
   memset(rg->grid1_frac, 0, rg->grid1_size*sizeof(double));
   memset(rg->grid2_frac, 0, rg->grid2_size*sizeof(double));
 
-  if ( rg->grid1_corners == 0 )
+  if ( rg->lneed_grid1_corners )
     {
-      if ( rg->lneed_grid1_corners ) cdoAbort("grid1 corner missing!");
-    }
-  else
-    {
-      nalloc = rg->grid1_corners*rg->grid1_size;
-      rg->grid1_corner_lat = (double *) realloc(rg->grid1_corner_lat, nalloc*sizeof(double));
-      rg->grid1_corner_lon = (double *) realloc(rg->grid1_corner_lon, nalloc*sizeof(double));
-  
-      memset(rg->grid1_corner_lat, 0, nalloc*sizeof(double));
-      memset(rg->grid1_corner_lon, 0, nalloc*sizeof(double));
+      if ( rg->grid1_corners == 0 )
+	{
+	  cdoAbort("grid1 corner missing!");
+	}
+      else
+	{
+	  nalloc = rg->grid1_corners*rg->grid1_size;
+	  rg->grid1_corner_lat = (double *) realloc(rg->grid1_corner_lat, nalloc*sizeof(double));
+	  rg->grid1_corner_lon = (double *) realloc(rg->grid1_corner_lon, nalloc*sizeof(double));
+	  
+	  memset(rg->grid1_corner_lat, 0, nalloc*sizeof(double));
+	  memset(rg->grid1_corner_lon, 0, nalloc*sizeof(double));
+	}
     }
 
-  if ( rg->grid2_corners == 0 )
+  if ( rg->lneed_grid2_corners )
     {
-      if ( rg->lneed_grid2_corners ) cdoAbort("grid2 corner missing!");
-    }
-  else
-    {
-      nalloc = rg->grid2_corners*rg->grid2_size;
-      rg->grid2_corner_lat = (double *) realloc(rg->grid2_corner_lat, nalloc*sizeof(double));
-      rg->grid2_corner_lon = (double *) realloc(rg->grid2_corner_lon, nalloc*sizeof(double));
+      if ( rg->grid2_corners == 0 )
+	{
+	  cdoAbort("grid2 corner missing!");
+	}
+      else
+	{
+	  nalloc = rg->grid2_corners*rg->grid2_size;
+	  rg->grid2_corner_lat = (double *) realloc(rg->grid2_corner_lat, nalloc*sizeof(double));
+	  rg->grid2_corner_lon = (double *) realloc(rg->grid2_corner_lon, nalloc*sizeof(double));
   
-      memset(rg->grid2_corner_lat, 0, nalloc*sizeof(double));
-      memset(rg->grid2_corner_lon, 0, nalloc*sizeof(double));
+	  memset(rg->grid2_corner_lat, 0, nalloc*sizeof(double));
+	  memset(rg->grid2_corner_lon, 0, nalloc*sizeof(double));
+	}
     }
 
   rg->grid1_bound_box = (double *) realloc(rg->grid1_bound_box, 4*rg->grid1_size*sizeof(double));
@@ -487,15 +493,15 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 
   if ( map_type == MAP_TYPE_CONSERV )
     {
-      rg->luse_grid1_corners = TRUE;
-      rg->luse_grid2_corners = TRUE;
+      rg->luse_grid1_corners  = TRUE;
+      rg->luse_grid2_corners  = TRUE;
       rg->lneed_grid1_corners = TRUE;
       rg->lneed_grid2_corners = TRUE;
     }
   else
     {
-      rg->luse_grid1_corners = FALSE;
-      rg->luse_grid2_corners = FALSE;
+      rg->luse_grid1_corners  = FALSE;
+      rg->luse_grid2_corners  = FALSE;
       rg->lneed_grid1_corners = FALSE;
       rg->lneed_grid2_corners = FALSE;
     }
@@ -656,12 +662,12 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
     {
       if ( gridInqType(rg->gridID1) == GRID_CELL )
 	{
-	  rg->luse_grid1_corners = TRUE;
+	  rg->luse_grid1_corners  = TRUE;
 	  rg->lneed_grid1_corners = FALSE; /* full grid search */
 	}
       if ( gridInqType(rg->gridID2) == GRID_CELL )
 	{
-	  rg->luse_grid2_corners = TRUE;
+	  rg->luse_grid2_corners  = TRUE;
 	  rg->lneed_grid2_corners = FALSE; /* full grid search */
 	}
     }
@@ -734,21 +740,24 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   gridInqXvals(gridID1, rg->grid1_center_lon);
   gridInqYvals(gridID1, rg->grid1_center_lat);
 
-  if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
+  if ( rg->lneed_grid1_corners )
     {
-      gridInqXbounds(gridID1, rg->grid1_corner_lon);
-      gridInqYbounds(gridID1, rg->grid1_corner_lat);
-    }
-  else
-    {
-      if ( lgrid1_gen_bounds )
+      if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
 	{
-	  genXbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lon, rg->grid1_corner_lon);
-	  genYbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lat, rg->grid1_corner_lat);
+	  gridInqXbounds(gridID1, rg->grid1_corner_lon);
+	  gridInqYbounds(gridID1, rg->grid1_corner_lat);
 	}
       else
 	{
-	  if ( rg->lneed_grid1_corners ) cdoAbort("grid1 corner missing!");
+	  if ( lgrid1_gen_bounds )
+	    {
+	      genXbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lon, rg->grid1_corner_lon);
+	      genYbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lat, rg->grid1_corner_lat);
+	    }
+	  else
+	    {
+	      cdoAbort("grid1 corner missing!");
+	    }
 	}
     }
 
@@ -777,7 +786,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
 
       /* Note: using units from latitude instead from bounds */
-      if ( rg->grid1_corners )
+      if ( rg->grid1_corners && rg->lneed_grid1_corners )
 	{
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -807,21 +816,24 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   gridInqXvals(gridID2, rg->grid2_center_lon);
   gridInqYvals(gridID2, rg->grid2_center_lat);
 
-  if ( gridInqYbounds(gridID2, NULL) && gridInqXbounds(gridID2, NULL) )
+  if ( rg->lneed_grid2_corners )
     {
-      gridInqXbounds(gridID2, rg->grid2_corner_lon);
-      gridInqYbounds(gridID2, rg->grid2_corner_lat);
-    }
-  else
-    {
-      if ( lgrid2_gen_bounds )
+      if ( gridInqYbounds(gridID2, NULL) && gridInqXbounds(gridID2, NULL) )
 	{
-	  genXbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lon, rg->grid2_corner_lon);
-	  genYbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lat, rg->grid2_corner_lat);
+	  gridInqXbounds(gridID2, rg->grid2_corner_lon);
+	  gridInqYbounds(gridID2, rg->grid2_corner_lat);
 	}
       else
 	{
-	  if ( rg->lneed_grid2_corners ) cdoAbort("grid2 corner missing!");
+	  if ( lgrid2_gen_bounds )
+	    {
+	      genXbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lon, rg->grid2_corner_lon);
+	      genYbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lat, rg->grid2_corner_lat);
+	    }
+	  else
+	    {
+	      cdoAbort("grid2 corner missing!");
+	    }
 	}
     }
 
@@ -850,7 +862,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
 
       /* Note: using units from latitude instead from bounds */
-      if ( rg->grid2_corners )
+      if ( rg->grid2_corners && rg->lneed_grid1_corners )
 	{
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -892,7 +904,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       if ( rg->grid2_center_lon[i] < ZERO ) rg->grid2_center_lon[i] += PI2;
     }
 
-  if ( rg->grid1_corners )
+  if ( rg->grid1_corners && rg->lneed_grid1_corners )
     {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -904,7 +916,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	}
     }
 
-  if ( rg->grid2_corners )
+  if ( rg->grid2_corners && rg->lneed_grid2_corners )
     {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -927,7 +939,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       if ( rg->grid1_center_lat[i] < -PIH ) rg->grid1_center_lat[i] = -PIH;
     }
 
-  if ( rg->grid1_corners )
+  if ( rg->grid1_corners && rg->lneed_grid1_corners )
     {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -948,7 +960,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       if ( rg->grid2_center_lat[i] < -PIH ) rg->grid2_center_lat[i] = -PIH;
     }
 
-  if ( rg->grid2_corners )
+  if ( rg->grid2_corners && rg->lneed_grid2_corners )
     {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
