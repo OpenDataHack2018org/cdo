@@ -209,30 +209,27 @@ void *Filter(void *argument)
   vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
   
   
-  if ( taxisID1 != CDI_UNDEFID )
-    {      
-      // require reference date for relative time axis to determine the time step
-      if ( taxisInqType(taxisID1) == TAXIS_RELATIVE )
-        {
-          vdate[0] = taxisInqRdate(taxisID1);
-          vtime[0] = taxisInqRtime(taxisID1);
-          
-          decode_date(vdate[0], &year0, &month0, &day0);
-          decode_time(vtime[0], &hour0, &minute0);
-          
-          calendar = taxisInqCalendar(taxisID1);
-          dpy = calendar_dpy(calendar);
-
-          //fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d  cal %i dpy %3i",
-          //        year0, month0, day0, hour0, minute0, calendar, dpy);
-          
-          tunit = taxisInqTunit(taxisID1);
-          calendar = taxisInqCalendar(taxisID1);
-          dpy = calendar_dpy(calendar);
-          fprintf(stdout, "\n");
-        }
+  if ( taxisID1 != CDI_UNDEFID && taxisInqType(taxisID1) == TAXIS_RELATIVE )
+    {
+      vdate[0] = taxisInqRdate(taxisID1);
+      vtime[0] = taxisInqRtime(taxisID1);      
+    }
+  else
+    {
+      vdate[0] = taxisInqVdate(taxisID1);
+      vtime[0] = taxisInqVtime(taxisID1);                     
     }
   
+  decode_date(vdate[0], &year0, &month0, &day0);
+  decode_time(vtime[0], &hour0, &minute0);
+  
+  calendar = taxisInqCalendar(taxisID1);
+  dpy = calendar_dpy(calendar);          
+  tunit = taxisInqTunit(taxisID1);   
+  
+  /*fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d  cal %i dpy %3i",
+          year0, month0, day0, hour0, minute0, calendar, dpy);
+  fprintf(stdout, "\n");*/
   
   tsID = 0;    
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
