@@ -42,6 +42,6 @@ Say @file{ifile} contains fields on a regular quadrilateral grid.
 To remap all fields bilinear to a T42 Gaussian grid use:
 @BeginVerbatim
    cdo genbil,t42grid ifile remapweights.nc
-   cdo remap,t42grid,remapweights ifile ofile
+   cdo remap,t42grid,remapweights.nc ifile ofile
 @EndVerbatim
 @EndExample

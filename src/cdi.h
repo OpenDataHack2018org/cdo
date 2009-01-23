@@ -107,9 +107,10 @@ extern "C" {
 #define  GRID_TRAJECTORY          8
 #define  GRID_CELL                9
 #define  GRID_CURVILINEAR        10
-#define  GRID_LCC                11  /* Lambert Conformal Conic        */
-#define  GRID_LAEA               12  /* Lambert Azimuthal Equal Area   */
-#define  GRID_SINUSOIDAL         13  /* Sinusoidal                     */
+#define  GRID_LCC                11  /* Lambert Conformal Conic (GRIB) */
+#define  GRID_LCC2               12  /* Lambert Conformal Conic (PROJ) */
+#define  GRID_LAEA               13  /* Lambert Azimuthal Equal Area   */
+#define  GRID_SINUSOIDAL         14  /* Sinusoidal                     */
 
 /* ZAXIS types */
 
@@ -544,9 +545,13 @@ void    gridDefGMEni2(int gridID, int ni2);
 int     gridInqGMEni3(int gridID);
 void    gridDefGMEni3(int gridID, int ni3);
 
-/* Lambert Conformal Conic grid */
+/* Lambert Conformal Conic grid (GRIB version) */
 void gridDefLCC(int gridID, double originLon, double originLat, double lonParY, double lat1, double lat2, double xinc, double yinc, int projflag, int scanflag);
 void gridInqLCC(int gridID, double *originLon, double *originLat, double *lonParY, double *lat1, double *lat2, double *xinc, double *yinc, int *projflag, int *scanflag);
+
+/* Lambert Conformal Conic 2 grid (PROJ version) */
+void gridDefLcc2(int gridID, double earth_radius, double lon_0, double lat_0, double lat_1, double lat_2);
+void gridInqLcc2(int gridID, double *earth_radius, double *lon_0, double *lat_0, double *lat_1, double *lat_2);
 
 /* Lambert Azimuthal Equal Area grid */
 void gridDefLaea(int gridID, double earth_radius, double lon_0, double lat_0);

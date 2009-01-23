@@ -11,7 +11,7 @@ typedef struct {
   double  xlast, ylast;
   double  xinc, yinc;
   double  xpole, ypole, angle;    /* rotated north pole             */
-  double  originLon;          /* lambert                        */
+  double  originLon;              /* lambert                        */
   double  originLat;
   double  lonParY;
   double  lat1;
@@ -23,6 +23,15 @@ typedef struct {
   int     def_lonParY;
   int     def_lat1;
   int     def_lat2;
+  double  a;
+  double  lon_0;
+  double  lat_0;
+  double  lat_1;
+  double  lat_2;
+  int     def_lon_0;
+  int     def_lat_0;
+  int     def_lat_1;
+  int     def_lat_2;
   int     prec;
   int     isRotated;              /* TRUE for rotated grids         */
   int     type;

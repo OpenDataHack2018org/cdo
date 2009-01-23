@@ -129,6 +129,7 @@ static void printGridInfo(int vlistID)
 			 gridID+1, gridNamePtr(gridtype));
 
       if ( gridtype == GRID_LONLAT   ||
+	   gridtype == GRID_LCC2 ||
 	   gridtype == GRID_LAEA ||
 	   gridtype == GRID_SINUSOIDAL ||
 	   gridtype == GRID_GAUSSIAN ||
@@ -165,7 +166,8 @@ static void printGridInfo(int vlistID)
 	  fprintf(stdout, "%*s", nbyte0, "");
 	  fprintf(stdout, "%-9s : first = %.9g  last = %.9g", yname, yfirst, ylast);
 	  if ( !DBL_IS_EQUAL(yinc, 0) && 
-	       (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL || gridtype == GRID_LAEA) )
+	       (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL || 
+		gridtype == GRID_LCC2 || gridtype == GRID_LAEA) )
 	    fprintf(stdout, "  inc = %.9g", yinc);
 	  fprintf(stdout, "  %s", yunits);
 	  fprintf(stdout, "\n");
@@ -194,6 +196,15 @@ static void printGridInfo(int vlistID)
 	      gridInqLaea(gridID, &a, &lon_0, &lat_0);
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "projpar   : a = %g  lon_0 = %g  lat_0 = %g\n", a, lon_0, lat_0);
+	    }
+	  
+	  if ( gridtype == GRID_LCC2 )
+	    {
+	      double a, lon_0, lat_0, lat_1, lat_2;
+	      gridInqLcc2(gridID, &a, &lon_0, &lat_0, &lat_1, &lat_2);
+	      fprintf(stdout, "%*s", nbyte0, "");
+	      fprintf(stdout, "projpar   : a = %7.0f  lon_0 = %g  lat_0 = %g  lat_1 = %g  lat_2 = %g\n",
+		      a, lon_0, lat_0, lat_1, lat_2);
 	    }
 	}
       else if ( gridtype == GRID_SPECTRAL )

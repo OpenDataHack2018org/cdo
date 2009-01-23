@@ -308,6 +308,7 @@ int gridToCurvilinear(int gridID1)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_LCC:
+    case GRID_LCC2:
     case GRID_LAEA:
     case GRID_SINUSOIDAL:
       {
@@ -472,6 +473,51 @@ int gridToCurvilinear(int gridID1)
 		    cdoAbort("proj4 support not compiled in!");
 #endif
 		  }
+		else if ( gridtype == GRID_LCC2 )
+		  {
+#if defined (HAVE_LIBPROJ)
+		    int i;
+		    PJ   *libProj;
+		    char *params[20];
+		    int nbpar=0;
+		    projUV data, res;
+		    double a, lon_0, lat_0, lat_1, lat_2;
+
+		    gridInqLcc2(gridID1, &a , &lon_0, &lat_0, &lat_1, &lat_2);
+
+		    nbpar = 0;
+		    params[nbpar++] = gen_param("proj=lcc");
+		    if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+		    params[nbpar++] = gen_param("lon_0=%g", lon_0);
+		    params[nbpar++] = gen_param("lat_0=%g", lat_0);
+		    params[nbpar++] = gen_param("lat_1=%g", lat_1);
+		    params[nbpar++] = gen_param("lat_2=%g", lat_2);
+
+		    if ( cdoVerbose )
+		      for ( i = 0; i < nbpar; ++i )
+			cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+		    libProj = pj_init(nbpar, &params[0]);
+		    if ( !libProj )
+		      cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+		    for ( i = 0; i < nbpar; ++i ) free(params[i]);
+
+		    /* libProj->over = 1; */		// allow longitude > 180°
+
+		    for ( j = 0; j < ny; j++ )
+		      for ( i = 0; i < nx; i++ )
+			{
+			  data.u = xscale*xvals[i];
+			  data.v = yscale*yvals[j];
+			  res = pj_inv(data, libProj);
+			  xvals2D[j*nx+i] = res.u*rad2deg;
+			  yvals2D[j*nx+i] = res.v*rad2deg;
+			}
+#else
+		    cdoAbort("proj4 support not compiled in!");
+#endif
+		  }
 		else
 		  {
 		    for ( j = 0; j < ny; j++ )
@@ -562,7 +608,7 @@ int gridToCurvilinear(int gridID1)
 	    else if ( ny > 1 )
 	      {
 		ybounds = (double *) malloc(2*ny*sizeof(double));
-		if ( gridtype == GRID_SINUSOIDAL || gridtype == GRID_LAEA )
+		if ( gridtype == GRID_SINUSOIDAL || gridtype == GRID_LAEA || gridtype == GRID_LCC2 )
 		  gridGenYboundsM(ny, yvals, ybounds);
 		else
 		  gridGenYbounds(ny, yvals, ybounds);
@@ -660,6 +706,75 @@ int gridToCurvilinear(int gridID1)
 			params[nbpar++] = gen_param("a=%g", a);
 			params[nbpar++] = gen_param("lon_0=%g", lon_0);
 			params[nbpar++] = gen_param("lat_0=%g", lat_0);
+
+			if ( cdoVerbose )
+			  for ( i = 0; i < nbpar; ++i )
+			    cdoPrint("Proj.param[%d] = %s", i+1, params[i]);
+
+			libProj = pj_init(nbpar, params);
+			if ( !libProj )
+			  cdoAbort("proj error: %s", pj_strerrno(pj_errno));
+
+			for ( i = 0; i < nbpar; ++i ) free(params[i]);
+
+			/* libProj->over = 1; */		// allow longitude > 180°
+			/*
+			for ( j = 0; j < 2*ny; j++ ) printf("ybounds %d %g\n", j, ybounds[j]);
+			for ( i = 0; i < 2*nx; i++ ) printf("xbounds %d %g\n", i, xbounds[i]);
+			*/
+			for ( j = 0; j < ny; j++ )
+			  for ( i = 0; i < nx; i++ )
+			    {
+			      index = j*4*nx + 4*i;
+
+			      data.u = xscale*xbounds[2*i];
+			      data.v = yscale*ybounds[2*j];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+0] = res.u*rad2deg;
+			      ybounds2D[index+0] = res.v*rad2deg;
+
+			      data.u = xscale*xbounds[2*i];
+			      data.v = yscale*ybounds[2*j+1];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+1] = res.u*rad2deg;
+			      ybounds2D[index+1] = res.v*rad2deg;
+
+			      data.u = xscale*xbounds[2*i+1];
+			      data.v = yscale*ybounds[2*j+1];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+2] = res.u*rad2deg;
+			      ybounds2D[index+2] = res.v*rad2deg;
+
+			      data.u = xscale*xbounds[2*i+1];
+			      data.v = yscale*ybounds[2*j];
+			      res = pj_inv(data, libProj);
+			      xbounds2D[index+3] = res.u*rad2deg;
+			      ybounds2D[index+3] = res.v*rad2deg;
+			    }
+#else
+			cdoAbort("proj4 support not compiled in!");
+#endif
+		      }
+		    else if ( gridtype == GRID_LCC2 )
+		      {
+#if defined (HAVE_LIBPROJ)
+			int index;
+			int i;
+			PJ   *libProj;
+			char *params[20];
+			int nbpar=0;
+			projUV data, res;
+			double a, lon_0, lat_0, lat_1, lat_2;
+
+			gridInqLcc2(gridID1, &a , &lon_0, &lat_0, &lat_1, &lat_2);
+
+			nbpar = 0;
+			params[nbpar++] = gen_param("proj=lcc");
+			if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
+			params[nbpar++] = gen_param("lon_0=%g", lon_0);
+			params[nbpar++] = gen_param("lat_0=%g", lat_0);
+			params[nbpar++] = gen_param("lat_1=%g", lat_1);
+			params[nbpar++] = gen_param("lat_2=%g", lat_2);
 
 			if ( cdoVerbose )
 			  for ( i = 0; i < nbpar; ++i )

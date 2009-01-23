@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -84,6 +84,16 @@ void gridInit(GRID *grid)
   grid->def_lonParY   = FALSE;
   grid->def_lat1      = FALSE;
   grid->def_lat2      = FALSE;
+
+  grid->a             = 0;
+  grid->lon_0         = 0;
+  grid->lat_0         = 0;
+  grid->lat_1         = 0;
+  grid->lat_2         = 0;
+  grid->def_lon_0     = FALSE;
+  grid->def_lat_0     = FALSE;
+  grid->def_lat_1     = FALSE;
+  grid->def_lat_2     = FALSE;
 
   grid->def_xfirst    = FALSE;
   grid->def_yfirst    = FALSE;
@@ -336,6 +346,55 @@ int gridDefine(GRID grid)
 
 	break;
       }
+    case GRID_LCC2:
+      {
+	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
+	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+
+	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
+
+	gridID = gridCreate(grid.type, grid.size);
+
+	gridDefPrec(gridID, grid.prec);
+
+	gridDefXsize(gridID, grid.xsize);
+	gridDefYsize(gridID, grid.ysize);
+
+	if ( grid.def_xfirst && grid.def_xinc && grid.xvals == NULL )
+	  {
+	    grid.xvals = (double *) malloc(grid.xsize*sizeof(double));
+	    for ( i = 0; i < grid.xsize; ++i )
+	      grid.xvals[i] = grid.xfirst + i*grid.xinc;
+	  }
+
+	if ( grid.def_yfirst && grid.def_yinc && grid.yvals == NULL )
+	  {
+	    grid.yvals = (double *) malloc(grid.ysize*sizeof(double));
+	    for ( i = 0; i < grid.ysize; ++i )
+	      grid.yvals[i] = grid.yfirst + i*grid.yinc;
+	  }
+
+	if ( grid.xvals )
+	  {
+	    gridDefXvals(gridID, grid.xvals);
+	    free(grid.xvals);
+	  }
+
+	if ( grid.yvals )
+	  {
+	    gridDefYvals(gridID, grid.yvals);
+	    free(grid.yvals);
+	  }	
+
+	if ( grid.def_lon_0     == FALSE ) Error(func, "lon_0 undefined!");
+	if ( grid.def_lat_0     == FALSE ) Error(func, "lat_0 undefined!");
+	if ( grid.def_lat_1     == FALSE ) Error(func, "lat_1 undefined!");
+	if ( grid.def_lat_2     == FALSE ) grid.def_lat_2 = grid.def_lat_1;
+
+	gridDefLcc2(gridID, grid.a, grid.lon_0, grid.lat_0, grid.lat_1, grid.lat_2);
+
+	break;
+      }
     case GRID_SPECTRAL:
       {
 	if ( grid.ntr == 0 )
@@ -567,9 +626,11 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_CELL;
 	  else if ( strncmp(pline, "gme", 3)  == 0 )
 	    grid.type = GRID_GME;
-	  else if ( strncmp(pline, "lambert", 7)  == 0 )
-	    grid.type = GRID_LCC;
+	  else if ( strncmp(pline, "lcc2", 4)  == 0 )
+	    grid.type = GRID_LCC2;
 	  else if ( strncmp(pline, "lcc", 3)  == 0 )
+	    grid.type = GRID_LCC;
+	  else if ( strncmp(pline, "lambert", 7)  == 0 )
 	    grid.type = GRID_LCC;
 	  else if ( strncmp(pline, "sinusoidal", 10)  == 0 )
 	    grid.type = GRID_SINUSOIDAL;
@@ -735,6 +796,30 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    }
 	  else
 	    Warning(func, "Invalid projection : %s", pline);
+	}
+      else if ( strncmp(pline, "a", 1)  == 0 )
+	{
+	  grid.a = atof(skipSeparator(pline + 1));
+	}
+      else if ( strncmp(pline, "lon_0", 5)  == 0 )
+	{
+	  grid.lon_0 = atof(skipSeparator(pline + 5));
+	  grid.def_lon_0 = TRUE;
+	}
+      else if ( strncmp(pline, "lat_0", 5)  == 0 )
+	{
+	  grid.lat_0 = atof(skipSeparator(pline + 5));
+	  grid.def_lat_0 = TRUE;
+	}
+      else if ( strncmp(pline, "lat_1", 5)  == 0 )
+	{
+	  grid.lat_1 = atof(skipSeparator(pline + 5));
+	  grid.def_lat_1 = TRUE;
+	}
+      else if ( strncmp(pline, "lat_2", 5)  == 0 )
+	{
+	  grid.lat_2 = atof(skipSeparator(pline + 5));
+	  grid.def_lat_2 = TRUE;
 	}
       else if ( strncmp(pline, "xnpole", 6)  == 0 )
 	{

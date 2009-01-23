@@ -157,7 +157,7 @@ void *Ensstat(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records change from %d to %d", nrecs0, nrecs);
+	    cdoAbort("Number of records changed from %d to %d", nrecs0, nrecs);
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);
