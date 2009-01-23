@@ -1509,6 +1509,7 @@ int compNlon(int nlat)
 
 int gridFromName(const char *gridname)
 {
+  static char func[] = "gridFromName";
   const char *pline;
   int gridID = UNDEFID;
   GRID grid;
@@ -1569,6 +1570,28 @@ int gridFromName(const char *gridname)
 
 	  grid.def_xfirst = TRUE;
 	  grid.def_yfirst = TRUE;
+	}
+    }
+  else if ( gridname[0] == 'l' &&  gridname[1] == 'o' && gridname[2] == 'n' ) /* lon=<LON>_lat=<LAT> */
+    {
+      /* only one gridpoint */
+      pline = &gridname[3];
+      if ( *pline == '=' ) pline++;
+      if ( isdigit((int) *pline) )
+	{
+	  grid.type = GRID_LONLAT;
+	  grid.xsize = 1;
+	  grid.ysize = 1;
+	  grid.xvals = (double *) malloc(sizeof(double));
+	  grid.yvals = (double *) malloc(sizeof(double));
+	  grid.xvals[0] = atof(pline);
+	  while ( isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-' ) pline++;
+	  if ( *pline == '_' ) pline++;
+	  if ( ! (pline[0] == 'l' &&  pline[1] == 'a' && pline[2] == 't') ) return(gridID);
+	  pline += 3;
+	  if ( *pline == '=' ) pline++;
+	  if ( ! isdigit((int) *pline) ) return(gridID);
+	  grid.yvals[0] = atof(pline);
 	}
     }
   else if ( gridname[0] == 'g' && gridname[1] == 'm' && gridname[2] == 'e' ) /* gme<NI> */
