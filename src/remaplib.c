@@ -472,7 +472,7 @@ void boundbox_from_center(int lonIsCyclic, int size, int nx, int ny, double *cen
 
 /*****************************************************************************/
 
-void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
+void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REMAPGRID *rg)
 {
   static char func[] = "remapGridInit";
   char units[128];
@@ -489,7 +489,10 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
   double dlat, dlon;                /* lat/lon intervals for search bins  */
 
 
-  rg->no_fall_back = FALSE;
+  if ( lextrapolate > 0 )
+    rg->lextrapolate = TRUE;
+  else
+    rg->lextrapolate = FALSE;
 
   if ( map_type == MAP_TYPE_CONSERV )
     {
@@ -564,7 +567,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       gridID1 = gridIDnew;
       rg->gridID1 = gridIDnew;
       
-      rg->no_fall_back = TRUE;
+      rg->lextrapolate = FALSE;
     }
 
   if ( gridInqSize(rg->gridID1) > 1 && 
@@ -655,7 +658,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
       gridID1 = gridIDnew;
       rg->gridID1 = gridIDnew;
       
-      rg->no_fall_back = TRUE;
+      rg->lextrapolate = FALSE;
     }
 
   if ( map_type == MAP_TYPE_DISTWGT )
@@ -1836,7 +1839,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
     bilinear weights.
   */
 
-  if ( rg->no_fall_back ) return;
+  if ( ! rg->lextrapolate ) return;
 
   /*
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);

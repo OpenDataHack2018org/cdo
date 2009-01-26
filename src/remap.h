@@ -21,7 +21,7 @@ typedef struct {
   int      pinit;            /* TRUE if the pointers are initialized     */
   int      gridID1;
   int      gridID2;
-  int      no_fall_back;
+  int      lextrapolate;
   int      non_global;
   int      grid1_is_cyclic, grid2_is_cyclic;
   int      grid1_size, grid2_size; /* total points on each grid */
@@ -116,7 +116,7 @@ REMAP;
 
 void remap_set_max_iter(int max_iter);
 
-void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg);
+void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REMAPGRID *rg);
 void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv);
 
 void remapVarsFree(REMAPVARS *rv);

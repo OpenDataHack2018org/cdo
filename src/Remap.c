@@ -77,6 +77,7 @@ void *Remap(void *argument)
   int remap_order = 1;
   int need_gradiants = FALSE;
   int remap_non_global = 0;
+  int remap_extrapolate = 0;
   int non_global;
   int lgridboxinfo = TRUE;
   int grid1sizemax;
@@ -210,6 +211,19 @@ void *Remap(void *argument)
 	  remap_non_global = ival;
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_NON_GLOBAL to %d", remap_non_global);
+	}
+    }
+
+  envstr = getenv("REMAP_EXTRAPOLATE");
+  if ( envstr )
+    {
+      int ival;
+      ival = atoi(envstr);
+      if ( ival > 0 )
+	{
+	  remap_extrapolate = ival;
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_EXTRAPOLATE to %d", remap_extrapolate);
 	}
     }
 
@@ -638,7 +652,7 @@ void *Remap(void *argument)
 		  remaps[r].vars.pinit = FALSE;
 		  
 		  /* initialize grid information for both grids */
-		  remapGridInit(map_type, gridID1, gridID2, &remaps[r].grid);
+		  remapGridInit(map_type, remap_extrapolate, gridID1, gridID2, &remaps[r].grid);
 		}
 
 	      remaps[r].gridID = gridID1;
