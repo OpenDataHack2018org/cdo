@@ -178,12 +178,12 @@ void remapVarsFree(REMAPVARS *rv)
 
 /*****************************************************************************/
 
-void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corner_lon)
+void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corner_lon, double dlon)
 {
   int i, j, index;
-  double dlon, minlon, maxlon;
+  double minlon, maxlon;
 
-  dlon = 360./xsize;
+  if ( ! (dlon > 0) ) dlon = 360./xsize;
   /*
   if ( xsize == 1 || (grid_center_lon[xsize-1]-grid_center_lon[0]+dlon) < 359 )
     cdoAbort("Cannot calculate Xbounds for %d vals with dlon = %g", xsize, dlon);
@@ -751,7 +751,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	{
 	  if ( lgrid1_gen_bounds )
 	    {
-	      genXbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lon, rg->grid1_corner_lon);
+	      genXbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lon, rg->grid1_corner_lon, 0);
 	      genYbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lat, rg->grid1_corner_lat);
 	    }
 	  else
@@ -827,7 +827,7 @@ void remapGridInit(int map_type, int gridID1, int gridID2, REMAPGRID *rg)
 	{
 	  if ( lgrid2_gen_bounds )
 	    {
-	      genXbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lon, rg->grid2_corner_lon);
+	      genXbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lon, rg->grid2_corner_lon, 0);
 	      genYbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lat, rg->grid2_corner_lat);
 	    }
 	  else

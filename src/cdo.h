@@ -117,7 +117,7 @@ void    vlistCompare(int vlistID1, int vlistID2, int function);
 int  gridWeights(int gridID, double *weights);
 int  gridGenArea(int gridID, double *area);
 void gaussaw(double pa[], double pw[], int nlat);
-void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corner_lon);
+void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corner_lon, double dlon);
 void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corner_lat);
 void writeNCgrid(const char *gridfile, int gridID, int *imask);
 void defineZaxis(const char *zaxisarg);

@@ -1112,7 +1112,12 @@ int gridGenArea(int gridID, double *area)
 	{
 	  int nlon = gridInqXsize(gridID);
 	  int nlat = gridInqYsize(gridID);
-	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon);
+	  double dlon = 0;
+	  if ( nlon == 1 )
+	    {
+	      dlon = 1;
+	    }
+	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
 	  genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
 	}
       else
