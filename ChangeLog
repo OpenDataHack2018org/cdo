@@ -8,6 +8,10 @@
 	* remap: read grid corners only if needed
 	* Version 1.3.1 released
 
+2009-01-16  Álvaro M. Valdebenito <alvaro.valdebenito@met.no>
+
+	* Settime: added "seconds" support to "settunits", "settaxis" and "shifttime"
+
 2009-01-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.3.0

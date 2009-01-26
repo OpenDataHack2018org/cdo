@@ -86,7 +86,7 @@ Sets the time axis.
 
 @BeginOperator_setreftime
 @Title     = Set reference time
-@Parameter = date time
+@Parameter = date time [units]
 
 @BeginDescription
 Sets the reference time of a relative time axis.
@@ -122,13 +122,13 @@ INTEGER  Value of the new month
 @Item = year
 INTEGER  Value of the new year
 @Item = units
-STRING   Base units of the time axis (minutes, hours, days, months, years)
+STRING   Base units of the time axis (seconds, minutes, hours, days, months, years)
 @Item = date
 STRING   Date (format YYYY-MM-DD)
 @Item = time
 STRING   Time (format HH:MM)
 @Item = inc
-STRING   Optional increment (minutes, hours, days, months, years) [default: 0hour]
+STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]
 @Item = calendar
 STRING   Calendar (standard, 360days, 365days, 366days)
 @Item = sval

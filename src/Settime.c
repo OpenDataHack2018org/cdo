@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -41,6 +41,25 @@
 
 void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
+
+int get_tunits(const char *unit, int *incunit, int *tunit)
+{
+  size_t len;
+	
+  len = strlen(unit);
+  
+  if      ( strncmp(unit, "seconds", len) == 0 ) { *incunit =     1; *tunit = TUNIT_SECOND;}
+  else if ( strncmp(unit, "minutes", len) == 0 ) { *incunit =    60; *tunit = TUNIT_MINUTE;}
+  else if ( strncmp(unit, "hours", len)   == 0 ) { *incunit =  3600; *tunit = TUNIT_HOUR;}
+  else if ( strncmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;}
+  else if ( strncmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH;}
+  else if ( strncmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;}
+  else cdoAbort("time unit >%s< unsupported", unit);
+
+  return (0);
+}
+
+
 void *Settime(void *argument)
 {
   static char func[] = "Settime";
@@ -73,9 +92,9 @@ void *Settime(void *argument)
   SETDAY      = cdoOperatorAdd("setday",      0, 0, "day");
   SETDATE     = cdoOperatorAdd("setdate",     0, 0, "date (format YYYY-MM-DD)");
   SETTIME     = cdoOperatorAdd("settime",     0, 0, "time (format hh:mm)");
-  SETTUNITS   = cdoOperatorAdd("settunits",   0, 0, "time units (minutes, hours, days, months, years)");
+  SETTUNITS   = cdoOperatorAdd("settunits",   0, 0, "time units (seconds, minutes, hours, days, months, years)");
   SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,hh:mm)");
-  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time (format YYYY-MM-DD,hh:mm)");
+  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time<,units> (format YYYY-MM-DD,hh:mm)");
   SETCALENDAR = cdoOperatorAdd("setcalendar", 0, 0, "calendar (standard, 360days, 365days, 366days)");
   SHIFTTIME   = cdoOperatorAdd("shifttime",   0, 0, "shift value");
 
@@ -112,17 +131,11 @@ void *Settime(void *argument)
 
       if ( operatorArgc() == 3 )
 	{
-	  size_t len;
 	  char *unit = operatorArgv()[2];
 	  incperiod = atoi(unit);
 	  while ( isdigit((int) *unit) ) unit++;
-	  len = strlen(unit);      
-	  if      ( strncmp(unit, "minutes", len) == 0 ) { incunit =    60; tunit = TUNIT_MINUTE;}
-	  else if ( strncmp(unit, "hours", len)   == 0 ) { incunit =  3600; tunit = TUNIT_HOUR;}
-	  else if ( strncmp(unit, "days", len)    == 0 ) { incunit = 86400; tunit = TUNIT_DAY;}
-	  else if ( strncmp(unit, "months", len)  == 0 ) { incunit =     1; tunit = TUNIT_MONTH;}
-	  else if ( strncmp(unit, "years", len)   == 0 ) { incunit =    12; tunit = TUNIT_YEAR;}
-	  else cdoAbort("time unit >%s< unsupported", unit);
+
+	  get_tunits(unit, &incunit, &tunit);
 	}
       /* increment in seconds */
       ijulinc = incperiod * incunit;
@@ -158,33 +171,22 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SHIFTTIME )
     {
-	  size_t len;
-	  char *unit = operatorArgv()[0];
-	  incperiod = atoi(unit);
-	  if ( unit[0] == '-' || unit[0] == '+' ) unit++;
-	  while ( isdigit((int) *unit) ) unit++;
-	  len = strlen(unit);      
-	  if      ( strncmp(unit, "minutes", len) == 0 ) { incunit =    60; tunit = TUNIT_MINUTE;}
-	  else if ( strncmp(unit, "hours", len)   == 0 ) { incunit =  3600; tunit = TUNIT_HOUR;}
-	  else if ( strncmp(unit, "days", len)    == 0 ) { incunit = 86400; tunit = TUNIT_DAY;}
-	  else if ( strncmp(unit, "months", len)  == 0 ) { incunit =     1; tunit = TUNIT_MONTH;}
-	  else if ( strncmp(unit, "years", len)   == 0 ) { incunit =    12; tunit = TUNIT_YEAR;}
-	  else cdoAbort("time unit >%s< unsupported", unit);
+      char *unit = operatorArgv()[0];
+      incperiod = atoi(unit);
+      if ( unit[0] == '-' || unit[0] == '+' ) unit++;
+      while ( isdigit((int) *unit) ) unit++;
+
+      get_tunits(unit, &incunit, &tunit);
 
       /* increment in seconds */
       ijulinc = incperiod * incunit;
     }
   else if ( operatorID == SETTUNITS )
     {
-      size_t len;
+      int idum;
       char *unit = operatorArgv()[0];
-      len = strlen(unit);      
-      if      ( strncmp(unit, "minutes", len) == 0 ) { tunit = TUNIT_MINUTE;}
-      else if ( strncmp(unit, "hours", len)   == 0 ) { tunit = TUNIT_HOUR;}
-      else if ( strncmp(unit, "days", len)    == 0 ) { tunit = TUNIT_DAY;}
-      else if ( strncmp(unit, "months", len)  == 0 ) { tunit = TUNIT_MONTH;}
-      else if ( strncmp(unit, "years", len)   == 0 ) { tunit = TUNIT_YEAR;}
-      else cdoAbort("time unit >%s< unsupported", unit);
+
+      get_tunits(unit, &idum, &tunit);
     }
   else if ( operatorID == SETCALENDAR )
     {
@@ -233,7 +235,20 @@ void *Settime(void *argument)
 	  cdoPrint("Changing absolute to relative time axis!");
 
 	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
-	  if ( operatorArgc() != 3 ) tunit = taxisInqTunit(taxisID1);
+	}
+      else
+	taxisID2 = taxisDuplicate(taxisID1);
+
+      if ( operatorArgc() != 3 ) tunit = taxisInqTunit(taxisID1);
+      taxisDefTunit(taxisID2, tunit);
+    }
+  else if ( operatorID == SETTUNITS )
+    {
+      if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
+	{
+	  cdoPrint("Changing absolute to relative time axis!");
+
+	  taxisID2 = taxisCreate(TAXIS_RELATIVE);
 	  taxisDefTunit(taxisID2, tunit);
 	}
       else
@@ -295,7 +310,7 @@ void *Settime(void *argument)
     {
       if ( operatorID == SETTAXIS )
 	{
-	  if ( incunit == 1 || incunit == 12 )
+	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
 	    {
 	      vtime = stime;
 	      if ( tsID1 == 0 )
