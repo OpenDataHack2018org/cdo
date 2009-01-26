@@ -4,7 +4,8 @@
 	* add support for GRID type Lambert Conformal Conic
 	* Sinusoidal and Lambert Azimuthal Equal Area grids with units [km]
 	* gridFromName: define GRID with one point lon=<LON>_lat=<LAT>
-	* remapbil: extrapolate only if REMAP_EXTRAPOLATE is set
+	* remapbil, remapbic: enable extrapolation with REMAP_EXTRAPOLATE=ON
+	* remapdis, remapnn: disable extrapolation with REMAP_EXTRAPOLATE=OFF
 	* mermean: bug fix for weights from 'zonmean' (report: Michael Sigmond)
 	* remap: read grid corners only if needed
 	* Version 1.3.1 released

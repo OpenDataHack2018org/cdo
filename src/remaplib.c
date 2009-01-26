@@ -515,7 +515,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REM
   rg->gridID1 = gridID1;
   rg->gridID2 = gridID2;
 
-  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(rg->gridID1) > 1 &&
+  if ( !rg->lextrapolate && gridInqSize(rg->gridID1) > 1 &&
+       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
        ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	(gridInqType(gridID1) == GRID_LONLAT && rg->non_global)) )
     {
@@ -567,7 +568,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REM
       gridID1 = gridIDnew;
       rg->gridID1 = gridIDnew;
       
-      rg->lextrapolate = FALSE;
+      /* rg->no_fall_back = TRUE; */
     }
 
   if ( gridInqSize(rg->gridID1) > 1 && 
@@ -576,7 +577,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REM
 	gridInqType(rg->gridID1) == GRID_SINUSOIDAL) )
     rg->gridID1 = gridID1 = gridToCurvilinear(rg->gridID1);
 
-  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(rg->gridID1) > 1 &&
+  if ( !rg->lextrapolate && gridInqSize(rg->gridID1) > 1 &&
+       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
        (gridInqType(gridID1) == GRID_CURVILINEAR && rg->non_global) )
     {
       int gridIDnew;
@@ -657,8 +659,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REM
 
       gridID1 = gridIDnew;
       rg->gridID1 = gridIDnew;
-      
-      rg->lextrapolate = FALSE;
+       
+      /* rg->no_fall_back = TRUE; */
     }
 
   if ( map_type == MAP_TYPE_DISTWGT )
@@ -1961,10 +1963,8 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
   if ( rg->grid1_rank != 2 )
     cdoAbort("Can not do bilinear interpolation when grid1_rank != 2"); 
 
-  /*
-    Loop over destination grid 
-  */
- /* grid_loop1 */
+  /* Loop over destination grid */
+  /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(rg, rv, Max_Iter, converge)   \
@@ -2198,7 +2198,6 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
     cdoAbort("Can not do bicubic interpolation when grid1_rank != 2"); 
 
   /* Loop over destination grid */
-
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \

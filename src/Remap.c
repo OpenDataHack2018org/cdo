@@ -76,8 +76,8 @@ void *Remap(void *argument)
   int remap_test = 0;
   int remap_order = 1;
   int need_gradiants = FALSE;
-  int remap_non_global = 0;
-  int remap_extrapolate = 0;
+  int remap_non_global = FALSE;
+  int remap_extrapolate = FALSE;
   int non_global;
   int lgridboxinfo = TRUE;
   int grid1sizemax;
@@ -115,6 +115,10 @@ void *Remap(void *argument)
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorFunc(operatorID);
   lwrite_remap = cdoOperatorIntval(operatorID);
+
+  if ( operfunc == REMAPDIS || operfunc == GENDIS ||
+       operfunc == REMAPNN  || operfunc == GENNN )
+    remap_extrapolate = TRUE;
 
   envstr = getenv("MAX_REMAPS");
   if ( envstr )
@@ -219,12 +223,33 @@ void *Remap(void *argument)
     {
       int ival;
       ival = atoi(envstr);
-      if ( ival > 0 )
+      if ( *envstr )
 	{
-	  remap_extrapolate = ival;
+	  if ( (envstr[0] == 'O' && envstr[1] == 'N') ||
+	       (envstr[0] == 'o' && envstr[1] == 'n') )
+	    remap_extrapolate = TRUE;
+	  else if ( (envstr[0] == 'O' && envstr[1] == 'F' && envstr[2] == 'F') ||
+		    (envstr[0] == 'o' && envstr[1] == 'f' && envstr[1] == 'f') )
+	    remap_extrapolate = FALSE;
+	  else
+	    cdoWarning("Environment variable REMAP_EXTRAPOLATE has wrong value!");
+
 	  if ( cdoVerbose )
-	    cdoPrint("Set REMAP_EXTRAPOLATE to %d", remap_extrapolate);
+	    {
+	      if ( remap_extrapolate == TRUE )
+		cdoPrint("Extrapolation enabled!");
+	      else if ( remap_extrapolate == FALSE )
+		cdoPrint("Extrapolation disabled!");
+	    }
 	}
+    }
+
+  if ( cdoVerbose )
+    {
+      if ( remap_extrapolate == TRUE )
+	cdoPrint("Extrapolation enabled!");
+      else if ( remap_extrapolate == FALSE )
+	cdoPrint("Extrapolation disabled!");
     }
 
   if ( operfunc == REMAPXXX )
@@ -317,7 +342,8 @@ void *Remap(void *argument)
       remaps[0].nmiss = 0;
 
       non_global = remap_non_global || !gridIsCircular(gridID1);
-      if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
+      if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
+	   (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
 	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	    (gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 	    (gridInqType(gridID1) == GRID_LCC) ||
@@ -531,8 +557,8 @@ void *Remap(void *argument)
 	  gridsize = gridInqSize(gridID1);
 
 	  non_global = remap_non_global || !gridIsCircular(gridID1);
-	  /* non_global = FALSE; */
-	  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
+	  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
+	       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 		(gridInqType(gridID1) == GRID_LCC) ||
@@ -567,13 +593,7 @@ void *Remap(void *argument)
 	      for ( j = ny-1; j >= 0; j-- )
 		for ( i = nx-1; i >= 0; i-- )
 		  array1[(j+2)*(nx+4)+i+2] = array1[j*nx+i];
-	      /*		  array1[(j+1)*(nx+2)+i+1] = array1[j*nx+i];*/
-	      /*
-	      for ( j = 0; j < ny+2; j++ ) array1[j*(nx+2)+0]      = missval;
-	      for ( j = 0; j < ny+2; j++ ) array1[j*(nx+2)+nx+1]   = missval;
-	      for ( i = 0; i < nx+2; i++ ) array1[     0*(nx+2)+i] = missval;
-	      for ( i = 0; i < nx+2; i++ ) array1[(ny+1)*(nx+2)+i] = missval;
-	      */
+
 	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+0]      = missval;
 	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+1]      = missval;
 	      for ( j = 0; j < ny+4; j++ ) array1[j*(nx+4)+nx+2]   = missval;
@@ -620,14 +640,14 @@ void *Remap(void *argument)
 		{
 		  remaps[r].grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
-		  /* non_global = FALSE; */
-		  if ( map_type != MAP_TYPE_CONSERV && gridInqSize(gridID1) > 1 &&
+		  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
+		       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 			(gridInqType(gridID1) == GRID_LCC) ||
 			(gridInqType(gridID1) == GRID_LAEA) ||
 			(gridInqType(gridID1) == GRID_SINUSOIDAL) ||
-			(gridInqType(gridID1) == GRID_CURVILINEAR &&non_global)) )
+			(gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
 		    {
 		      remaps[r].grid.non_global = TRUE;
 		    }
@@ -639,7 +659,7 @@ void *Remap(void *argument)
 		    {
 		      int maxbins = 720;
 		      int ysize1 = gridInqYsize(gridID1);
-		      remap_num_srch_bins = (int) (0.5*ysize1);
+		      remap_num_srch_bins = ysize1/2 + ysize1%2;
 		      if ( remap_num_srch_bins > maxbins ) remap_num_srch_bins = maxbins;
 		      if ( remap_num_srch_bins < 1 )       remap_num_srch_bins = 1;
 		    }
