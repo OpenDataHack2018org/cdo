@@ -338,6 +338,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   int gridtype, gridID2;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
+  int grid_is_circular;
   char xunits[128];
   char yunits[128];
   double xfact, yfact;
@@ -353,6 +354,8 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
+
+  grid_is_circular = gridIsCircular(gridID1);
 
   if ( gridtype == GRID_CURVILINEAR )
     {
@@ -383,8 +386,14 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
   if ( gridtype == GRID_CURVILINEAR )
     {
-      double xval, yval;
+      double xval, yval, xlast, ylast;
       int ixmin, ixmax, iymin, iymax;
+      int lp2 = FALSE;
+
+      if ( xlon1 > xlon2 ) 
+	cdoAbort("The second longitude have to be greater than the first one!");
+      if ( xlat1 > xlat2 )
+	cdoAbort("The second latitude have to be greater than the first one!");
 
       *lat1 = nlat1-1;
       *lat2 = 0;
@@ -400,6 +409,21 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
       for ( ilat = 0; ilat < nlat1; ilat++ )
 	{
+	  xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
+	  ylast = yfact * yvals1[ilat*nlon1 + nlon1-1];
+	  if ( ylast >= xlat1 && ylast <= xlat2 )
+	    if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360)
+	      {
+		*lon11 = nlon1-1;
+		*lon12 = 0;
+		lp2 = TRUE;
+	      }
+	}
+
+      for ( ilat = 0; ilat < nlat1; ilat++ )
+	{
+	  xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
+
 	  for ( ilon = 0; ilon < nlon1; ilon++ )
 	    {
 	      xval = xvals1[ilat*nlon1 + ilon];
@@ -408,26 +432,53 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	      xval *= xfact;
 	      yval *= yfact;
 
-	      if ( ((xval >= xlon1 && xval <= xlon2) ||
-		    (xval-360 >= xlon1 && xval-360 <= xlon2) ||
-		    (xval+360 >= xlon1 && xval+360 <= xlon2)) &&
-		   yval >= xlat1 && yval <= xlat2 )
+
+	      if ( yval >= xlat1 && yval <= xlat2 )
 		{
-		  if ( ilon < ixmin ) ixmin = ilon;
-		  if ( ilon > ixmax ) ixmax = ilon;
-		  if ( ilat < iymin ) iymin = ilat;
-		  if ( ilat > iymax ) iymax = ilat;
+		  if ( lp2 )
+		    {
+		      if ( xval >= xlon1 && xval <= xlast )
+			{
+			  if ( ilon < *lon21 ) *lon21 = ilon;
+			  if ( ilon > *lon22 ) *lon22 = ilon;
+			  if ( ilat < *lat1 ) *lat1 = ilat;
+			  if ( ilat > *lat2 ) *lat2 = ilat;
+			}
+		      else if ( xval > xlast && xval <= xlon2 )
+			{
+			  if ( ilon < *lon11 ) *lon11 = ilon;
+			  if ( ilon > *lon12 ) *lon12 = ilon;
+			  if ( ilat < *lat1 ) *lat1 = ilat;
+			  if ( ilat > *lat2 ) *lat2 = ilat;
+			}
+		    }
+		  else
+		    {
+		      if ( ((xval >= xlon1 && xval <= xlon2) ||
+			    (xval-360 >= xlon1 && xval-360 <= xlon2) ||
+			    (xval+360 >= xlon1 && xval+360 <= xlon2)) )
+			{
+			  if ( ilon < ixmin ) ixmin = ilon;
+			  if ( ilon > ixmax ) ixmax = ilon;
+			  if ( ilat < iymin ) iymin = ilat;
+			  if ( ilat > iymax ) iymax = ilat;
+			}
+		    }
 		}
 	    }
 	}
 
-      *lat1 = iymin;
-      *lat2 = iymax;
-      *lon21 = ixmin;
-      *lon22 = ixmax;
-      /*
-      printf(" ixmin=%d, ixmax=%d, iymin=%d, iymax=%d\n", ixmin, ixmax, iymin, iymax);
-      */
+      if ( ! lp2 )
+	{
+	  *lat1 = iymin;
+	  *lat2 = iymax;
+	  *lon21 = ixmin;
+	  *lon22 = ixmax;
+	}
+      
+      if ( cdoVerbose )
+	fprintf(stderr, " ixmin=%d, ixmax=%d, iymin=%d, iymax=%d\n", *lon21, *lon22, *lat1, *lat2);
+      
     }
   else
     {
