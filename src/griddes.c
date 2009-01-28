@@ -1507,6 +1507,34 @@ int compNlon(int nlat)
 }
 
 
+void gen_grid_lonlat(GRID *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
+{
+  static char func[] = "gen_grid_lonlat";
+  int nlon, nlat, i;
+
+  grid->type = GRID_LONLAT;
+  
+  if ( *pline == '_' ) pline++;
+
+  if ( isdigit((int) *pline) || ispunct((int) *pline) )
+    {
+      inc = atof(pline);
+      if ( inc < 1e-9 ) inc = 1;
+    }
+
+  nlon = (lon2 - lon1)/inc + 0.5;
+  nlat = (lat2 - lat1)/inc + 0.5;
+  grid->xsize = nlon;
+  grid->ysize = nlat;
+
+  grid->xvals = (double *) malloc(grid->xsize*sizeof(double));
+  grid->yvals = (double *) malloc(grid->ysize*sizeof(double));
+
+  for ( i = 0; i < nlon; ++i ) grid->xvals[i] = lon1 + inc/2 + i*inc;
+  for ( i = 0; i < nlat; ++i ) grid->yvals[i] = lat1 + inc/2 + i*inc;
+}
+
+
 int gridFromName(const char *gridname)
 {
   static char func[] = "gridFromName";
@@ -1618,7 +1646,7 @@ int gridFromName(const char *gridname)
 	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
 	}
     }
-  else if ( gridname[0] == 'g' ) /* g<LON>x<LAT> */
+  else if ( gridname[0] == 'g' && isdigit(gridname[1])) /* g<LON>x<LAT> */
     {
       pline = &gridname[1];
       if ( isdigit((int) *pline) )
@@ -1630,6 +1658,39 @@ int gridFromName(const char *gridname)
 	  grid.ysize = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 	}
+    }
+  else if ( gridname[0] == 'g' && gridname[1] == 'e' && gridname[2] == 'r' && gridname[3] == 'm' && 
+	    gridname[4] == 'a' && gridname[5] == 'n' && gridname[6] == 'y' ) /* germany_Xdeg */
+    {
+      double lon1 =   5.6, lon2 = 15.2;
+      double lat1 =  47.1, lat2 = 55.1;
+      double dll = 0.1;
+
+      pline = &gridname[7];
+
+      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+    }
+  else if ( gridname[0] == 'e' && gridname[1] == 'u' && gridname[2] == 'r' && 
+	    gridname[3] == 'o' && gridname[4] == 'p' && gridname[5] == 'e' ) /* europe_Xdeg */
+    {
+      double lon1 = -30, lon2 = 60;
+      double lat1 =  30, lat2 = 80;
+      double dll = 1;
+
+      pline = &gridname[6];
+
+      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+    }
+  else if ( gridname[0] == 'a' && gridname[1] == 'f' && gridname[2] == 'r' && 
+	    gridname[3] == 'i' && gridname[4] == 'c' && gridname[5] == 'a' ) /* africa_Xdeg */
+    {
+      double lon1 = -20, lon2 = 60;
+      double lat1 = -40, lat2 = 40;
+      double dll = 1;
+
+      pline = &gridname[6];
+
+      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
 
   if ( grid.type != -1 )
