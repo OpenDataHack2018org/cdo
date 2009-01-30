@@ -497,7 +497,7 @@ static MODULES Modules[] =
   { Expr,           ExprHelp,          ExprOperators,           1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,        1,  0 },
   { Fillmiss,       NULL,              FillmissOperators,       1,  1 },
-  { Filter,         NULL,              FilterOperators,         1,  1 },
+  { Filter,         NULL,              FilterOperators,         1,  2 },
   { Fldrms,         NULL,              FldrmsOperators,         2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,        1,  1 },
   { Gengrid,        NULL,              GengridOperators,        2,  1 },
