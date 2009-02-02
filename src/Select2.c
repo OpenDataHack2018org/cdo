@@ -36,6 +36,12 @@
 #include "namelist.h"
 
 
+#define  PAR_INT         1
+#define  PAR_FLT         2
+#define  PAR_WORD        3
+#define  PAR_DATE        4
+#define  PAR_TIME        4
+
 typedef struct {
   char *name;
   int maxpar;

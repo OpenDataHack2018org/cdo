@@ -1,11 +1,12 @@
 2009-02-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.3.1
-	* add support for GRID type Lambert Conformal Conic
+	* added support for GRID type Lambert Conformal Conic
 	* Sinusoidal and Lambert Azimuthal Equal Area grids with units [km]
-	* add predefined lonlat grid for germany, europe and africa
+	* added predefined lonlat grid for germany, europe and africa
 	* gridFromName: define GRID with one point lon=<LON>_lat=<LAT>
 	* sellonlatbox: select box from circular curvilinear grids
+	* ml2pl: added support for Geopotential Height [request: Katharina Klehmet]
 	* remapbil, remapbic: enable extrapolation with REMAP_EXTRAPOLATE=ON
 	* remapdis, remapnn: disable extrapolation with REMAP_EXTRAPOLATE=OFF
 	* mermean: bug fix for weights from 'zonmean' (report: Michael Sigmond)
@@ -23,9 +24,9 @@
 	* New operator: remaplaf - Largest area fraction remapping
 	* New operator: remapnn - Nearest neighbor remapping
 	* New operator: reci - Reciprocal value
-	* add support for GRID type Sinusoidal
-	* add support for GRID type Lambert Azimuthal Equal Area
-	* import_cmsaf: add support for monthly mean diurnal cycle
+	* added support for GRID type Sinusoidal
+	* added support for GRID type Lambert Azimuthal Equal Area
+	* import_cmsaf: added support for monthly mean diurnal cycle
 	* remap: use gridIsCyclic to check whether lon is cyclic (bug fix)
 	* remap: check grid and weights
 	* remap: set num_srch_bins to nlat/2 (speedup)
@@ -33,7 +34,7 @@
 	* diff: check variable names
 	* sellonlatbox: bug fix for curvilinear grids
 	* setzaxis: change float to double (bug fix) [report: Pier Giuseppe Fogli]
-	* Arith: add filltype FILL_RECTS [request: Wolfgang Mueller]
+	* Arith: added filltype FILL_RECTS [request: Wolfgang Mueller]
 	* inputsrv: use -f format if set (bug fix)
 	* Seasstat: warning message for seasons with less than 3 input time steps
 	* merge: bug fix for usage in pipes [report: Álvaro M. Valdebenito]
@@ -53,14 +54,14 @@
 	* New operator: pow - Power [request: Gil Lizcano]
 	* New operator: tpnhalo (testversion)
 	* Module Timstat: use taxis with bounds from input [request: Beate Geyer]
-	* sellonlatbox: add support for grid units 'radians' [request: Jeff Daily]
-	* sellonlatbox: add support for GRID_CELL [request: Jeff Daily]
-	* Add option '-u' to determinate whether to overwrite existing files [request: David Wang]
+	* sellonlatbox: added support for grid units 'radians' [request: Jeff Daily]
+	* sellonlatbox: added support for GRID_CELL [request: Jeff Daily]
+	* Added option '-u' to determinate whether to overwrite existing files [request: David Wang]
         * copy, cat: concatenate time constant fields
 	* copy, cat: compare input files
 	* zonvar: activation missing (bug fix) [report: Irene Fischer-Bruns]
 	* detrend: change taxisCreate to taxisDuplicate [report: Ute Merkel]
-	* remapdis: add support for GRID_CELL without bounds (full grid search)
+	* remapdis: added support for GRID_CELL without bounds (full grid search)
 	* remapbil: bug fix for cross_product eq zero
 	* sethalo: bug fix for x/y bounds [report: Helmut Haak]
 	* ifthen:  bug fix for datasets with different missing values [report: Beate Geyer]
@@ -71,8 +72,8 @@
 2008-08-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.2.0
-	* add support for netCDF4 classic with deflate option (option -z zip)
-	* Arith: add filltype FILL_FILE [request: Rita Seiffert]
+	* added support for netCDF4 classic with deflate option (option -z zip)
+	* Arith: added filltype FILL_FILE [request: Rita Seiffert]
 	* New operator: intlevel - Linear level interpolation
 	* New operator: invertlev - Invert levels [request: Marco Giorgetta]
 	* New operator: sellevidx - Select levels by index [request: David Wang]
@@ -83,11 +84,11 @@
 	* New operator: vertwind (testversion) [request: Michael Boettinger]
 	* New operator: ml2pl_lp (testversion) [request: Hui Wan]
 	* remapdis: check that distance is inside the range of -1 to 1 [report: Hui Wan]
-	* remapeta: add missing value support
+	* remapeta: added missing value support
 	* vlistCompare: compare all lon/lat values
-	* setpartab: add parameter LTYPE [request: Stefan Petri]
+	* setpartab: added parameter LTYPE [request: Stefan Petri]
 	* Settime: change TIME_CONSTANT to TIME_VARIABLE if ntstep = 0
-	* add support of CM-SAF HDF5 grids (test version)
+	* added support of CM-SAF HDF5 grids (test version)
         * DBL_IS_EQUAL: check NaN with isnan (removed! compilation problems)
 	* yseasmean: bug fix for datasets with missing values [report: Hans-Jürgen Panitz]
 	* yhourmean: bug fix for datasets with missing values

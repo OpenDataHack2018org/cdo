@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@
 #include "vinterp.h"
 #include "list.h"
 
+#define  C_EARTH_GRAV    (9.80665)
 
 void *Vertint(void *argument)
 {
@@ -59,7 +60,7 @@ void *Vertint(void *argument)
   int *vert_index = NULL;
   int nvct;
   int geop_needed = FALSE;
-  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1/*, gheightID = -1*/;
+  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
   int code;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
@@ -399,7 +400,7 @@ void *Vertint(void *argument)
 	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
 	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
 	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID  = varID;
-	  /* else if ( code == 156 ) gheightID = varID; */
+	  else if ( code == 156        && nlevel == nhlev ) gheightID = varID;
 	}
       else if ( mode == WMO_MODE )
 	{
@@ -414,7 +415,10 @@ void *Vertint(void *argument)
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	cdoAbort("Spectral data unsupported!");
 
-      vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
+      if ( varID == gheightID )
+	vardata1[varID] = (double *) malloc(gridsize*(nlevel+1)*sizeof(double));
+      else
+	vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
 
       /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
       if ( zaxisID == zaxisIDh )
@@ -435,7 +439,7 @@ void *Vertint(void *argument)
 	}
     }
 
-  if ( tempID != -1 /*|| gheightID != -1*/ ) geop_needed = TRUE;
+  if ( tempID != -1 || gheightID != -1 ) geop_needed = TRUE;
 
   if ( zaxisIDh != -1 && geop_needed )
     {
@@ -446,10 +450,10 @@ void *Vertint(void *argument)
 	  memset(geop, 0, ngp*sizeof(double));
 	}
     }
-  /*
+
   if ( zaxisIDh != -1 && gheightID != -1 && tempID == -1 )
     cdoAbort("Temperature not found, needed to compute geopotheight!");
-  */
+
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
       if ( psID != -1 )
@@ -598,14 +602,15 @@ void *Vertint(void *argument)
 			       full_press, half_press, vert_index,
 			       plev, nplev, ngp, nlevel, missval);
 		    }
-		  /*
-		    else if ( varID == gheightID )
+		  else if ( varID == gheightID )
 		    {
-		    interp_Z(geop, vardata1[varID], vardata2[varID],
-		    full_press, half_press, vert_index, vardata1[tempID],
-		    plev, nplev, ngp, nlevel, missval);
+		      for ( i = 0; i < ngp; ++i )
+			vardata1[varID][ngp*nlevel+i] = geop[i]/C_EARTH_GRAV;
+
+		      interp_Z(geop, vardata1[varID], vardata2[varID],
+			       full_press, half_press, vert_index, vardata1[tempID],
+			       plev, nplev, ngp, nlevel, missval);
 		    }
-		  */
 		  else
 		    {
 		      interp_X(vardata1[varID], vardata2[varID], hyb_press,
