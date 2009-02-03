@@ -231,6 +231,8 @@ pythagoras (double a, double b)
     return M_SQRT2 * abs_a;
 }
 
+#define MAX_ITER 100
+
 void
 eigen_solution_of_triangular_matrix (double *d, double *e, int n,
 				     double **a, const char *prompt)
@@ -247,71 +249,74 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
     {
       iter = 0;
       while (1)
-	{
-	  for (m = l; m < n - 1; m++)
-	    if (fabs (e[m]) <= eps * (fabs (d[m]) + fabs (d[m + 1])))
-	      break;
-	  if (m == l)
-	    break;
-	  iter++;
-	  if (iter == 30)
-	    {
-	      fprintf (stderr, "%s: ERROR! Too many iterations while"
-		       " determining the eigensolution!\n", prompt);
-	      exit (1);
-	    }
-	  g = (d[l + 1] - d[l]) / (2 * e[l]);
-	  r = pythagoras (g, 1);
-	  g = d[m] - d[l] + e[l] 
-            / (g + (fabs(g) > 0 ? (g >= 0 ? fabs (r) : -fabs (r)) : r));
-	  s = c = 1;
-	  p = 0;
-	  for (i = m - 1; i >= l; i--)
-	    {
-	      f = s * e[i];
-	      b = c * e[i];
-	      e[i + 1] = r = pythagoras (f, g);
-
-	      if ( DBL_IS_EQUAL(r, 0) )
-		{
-		  d[i + 1] -= p;
-		  e[m] = 0;
-		  break;
-		}
-
-	      s = f / r;
-	      c = g / r;
-	      g = d[i + 1] - p;
-	      r = (d[i] - g) * s + 2 * c * b;
-	      p = s * r;
-	      d[i + 1] = g + p;
-	      g = c * r - b;
-	      for (k = 0; k < n; k++)
-		{
-		  f = a[k][i + 1];
-		  a[k][i + 1] = s * a[k][i] + c * f;
-		  a[k][i] = c * a[k][i] - s * f;
-		}
-	    }
-
-	  if ( DBL_IS_EQUAL(r, 0) && i >= l ) continue;
-
-	  d[l] -= p;
-	  e[l] = g;
-	  e[m] = 0;
-	}
+        {
+          for (m = l; m < n - 1; m++)
+            if (fabs (e[m]) <= eps * (fabs (d[m]) + fabs (d[m + 1])))
+              break;
+          if (m == l)
+            {
+              printf("found solution after %i Iteration\n", iter++);
+              break;
+            }
+          iter++;
+          if (iter == MAX_ITER)
+            {
+              fprintf (stderr, "%s: ERROR! Too many iterations while"
+                       " determining the eigensolution!\n", prompt);
+              exit (1);
+            }
+          g = (d[l + 1] - d[l]) / (2 * e[l]);
+          r = pythagoras (g, 1);
+          g = d[m] - d[l] + e[l] 
+          / (g + (fabs(g) > 0 ? (g >= 0 ? fabs (r) : -fabs (r)) : r));
+          s = c = 1;
+          p = 0;
+          for (i = m - 1; i >= l; i--)
+            {
+              f = s * e[i];
+              b = c * e[i];
+              e[i + 1] = r = pythagoras (f, g);
+              
+              if ( DBL_IS_EQUAL(r, 0) )
+                {
+                  d[i + 1] -= p;
+                  e[m] = 0;
+                  break;
+                }
+              
+              s = f / r;
+              c = g / r;
+              g = d[i + 1] - p;
+              r = (d[i] - g) * s + 2 * c * b;
+              p = s * r;
+              d[i + 1] = g + p;
+              g = c * r - b;
+              for (k = 0; k < n; k++)
+                {
+                  f = a[k][i + 1];
+                  a[k][i + 1] = s * a[k][i] + c * f;
+                  a[k][i] = c * a[k][i] - s * f;
+                }
+            }
+          
+          if ( DBL_IS_EQUAL(r, 0) && i >= l ) continue;
+          
+          d[l] -= p;
+          e[l] = g;
+          e[m] = 0;
+        }
       /*
-      if (user_asked)
-	{
-	  lock ();
-	  fprintf (stderr,
+       if (user_asked)
+       {
+       lock ();
+       fprintf (stderr,
 		   "%s: Status: Computing eigen solution pass 3 of 3"
 		   " cycle %ld of %ld.\n", prompt, (long) (l + 1), (long) n);
-	  fflush (stderr);
-	  unlock ();
-	  user_asked = FALSE;
-	}
-      */
+       fflush (stderr);
+       unlock ();
+       user_asked = FALSE;
+       }
+       */
     }
 }
 

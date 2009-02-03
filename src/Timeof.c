@@ -29,334 +29,314 @@
 #include "pstream.h"
 #include "statistic.h"
 
-#define  NIN     2
-#define  NOUT    1
-#define  NFWORK  4
-#define  NIWORK  2
-
 void *Timeof(void *argument)
 {
   static char func[] = "Timeof";
-  int VARQUOT2TEST, MEANDIFF2TEST;
   int operatorID;
-  int *streamID, streamID3;
+  int streamID1, streamID2, streamID3;
   int gridsize;
   int vdate = 0, vtime = 0;
-  int nrecs, nrecs3, nvars, nlevs ;
-  int i, iw, is;
+  int nrecs, nvars, nlevs ;
+  int i, j, i1, i2;
+  int nmiss;
   int tsID;
   int varID, recID, levelID, gridID;
-  int nmiss3;
-  int *recVarID, *recLevelID;
-  int *vlistID, vlistID2 = -1, vlistID3 = -1;
-  int taxisID1, taxisID3;
-  double rconst, risk;
-  double fnvals0, fnvals1;
-  double missval, missval1, missval2;
-  double fractil_1, fractil_2, statistic;
-  FIELD **fwork[NFWORK];
-  double temp0, temp1, temp2, temp3;
-  int ***iwork[NIWORK];
-  FIELD *in, *out;
-  int *reached_eof;
-  int n_in = NIN;
-
+  int vlistID1, vlistID2 = -1, vlistID3 = -1;
+  int taxisID1, taxisID2, taxisID3;
+  int gridID1, gridID2, gridID3;
+  int ngrids;
+  int reached_eof;
+  int npack;
+  int *pack;
+  int ***iwork;
+  double *w;
+  double sum_w;
+  double missval;
+  double *xvals, *yvals;
+  FIELD **fwork;
+  FIELD ***o, ***o2; 
+  FIELD in;     
 
   cdoInitialize(argument);
-
-  VARQUOT2TEST  = cdoOperatorAdd("varquot2test",  0, 0, NULL);
-  MEANDIFF2TEST = cdoOperatorAdd("meandiff2test", 0, 0, NULL);
-
+  cdoOperatorAdd("timeof", 0, 0, NULL);  
   operatorID = cdoOperatorID();
-
-  operatorInputArg("constant and risk (e.g. 0.05)");
-  operatorCheckArgc(2);
-  rconst = atof(operatorArgv()[0]);
-  risk   = atof(operatorArgv()[1]);
-
-  if ( operatorID == VARQUOT2TEST )
-    {
-      if ( rconst <= 0 )
-	cdoAbort("Constant must be positive!");
-      
-      if ( risk <= 0 || risk >= 1 )
-	cdoAbort("Risk must be greater than 0 and lower than 1!");
-    }
-
-  streamID = (int *) malloc(NIN*sizeof(int));
-  vlistID  = (int *) malloc(NIN*sizeof(int));
-
-  for ( is = 0; is < NIN; ++is )
-    {
-      streamID[is] = streamOpenRead(cdoStreamName(is));
-      if ( streamID[is] < 0 ) cdiError(streamID[is], "Open failed on %s", cdoStreamName(is));
-
-      vlistID[is] = streamInqVlist(streamID[is]);
-      if ( is > 0 )
-	{
-	  vlistID2 = streamInqVlist(streamID[is]);
-	  vlistCompare(vlistID[0], vlistID2, func_sft);
-	}
-    }
-
-  vlistID3 = vlistDuplicate(vlistID[0]);
-
-  gridsize = vlistGridsizeMax(vlistID[0]);
-  nvars = vlistNvars(vlistID[0]);
-  nrecs = vlistNrecs(vlistID[0]);
-  nrecs3 = nrecs;
-  recVarID   = (int *) malloc(nrecs*sizeof(int));
-  recLevelID = (int *) malloc(nrecs*sizeof(int));
-  taxisID1 = vlistInqTaxis(vlistID[0]);
-  taxisID3 = taxisDuplicate(taxisID1);
- 
-  vlistDefTaxis(vlistID3, taxisID3);
+  printf("initialized operator %i\n", operatorID);
+  
+  streamID1 = streamOpenRead(cdoStreamName(0));
+  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
+  vlistID1 = streamInqVlist(streamID1); 
+  taxisID1 = vlistInqTaxis(vlistID1);
+  printf("opened stream1 (%i) for reading\n", streamID1);
+  
+  gridsize = vlistGridsizeMax(vlistID1);
+  nvars = vlistNvars(vlistID1);
+  nrecs = vlistNrecs(vlistID1); 
+  taxisID1 = vlistInqTaxis(vlistID1);
+  w = (double*)malloc(gridsize*sizeof(double));
+  gridWeights(gridID1, &w[0]);
+  
+  printf("got stream1 properties\n");
+  
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+  vlistID2 = vlistDuplicate(vlistID1);
+  taxisID2 = taxisDuplicate(taxisID1); 
+  vlistDefTaxis(vlistID2, taxisID2);  
+  
+  printf("set stream to properties\n");
+  
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
+  vlistID3 = vlistDuplicate(vlistID1); 
+  taxisID3 = taxisDuplicate(taxisID1);  
+  vlistDefTaxis(vlistID3, taxisID3);  
+  
+  gridID3 = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID3, 1);
+  gridDefYsize(gridID3, 1);
+  xvals=(double*)malloc(1*sizeof(double));
+  yvals=(double*)malloc(1*sizeof(double));
+  xvals[0]=0;
+  yvals[0]=0;
+  gridDefXvals(gridID3, xvals);
+  gridDefYvals(gridID3, yvals);
+  
+  ngrids = vlistNgrids(vlistID3);
+  
+  for ( i = 0; i < ngrids; i++ )
+    vlistChangeGridIndex(vlistID3, i, gridID3);
+  
+  reached_eof=0;
+  
+  in.ptr = (double *) malloc(gridsize*sizeof(double));
 
-  streamDefVlist(streamID3, vlistID3);
-
-  reached_eof = (int *) malloc(NIN*sizeof(int));
-  memset(reached_eof, 0, NIN*sizeof(int));
-
-  in = (FIELD *) malloc(NIN*sizeof(FIELD));
-  for ( i = 0; i < NIN; ++i )
-    in[i].ptr = (double *) malloc(gridsize*sizeof(double));
-  				 
-  out = (FIELD *) malloc(NOUT*sizeof(FIELD));
-  for ( i = 0; i < NOUT; ++i )
-    out[i].ptr = (double *) malloc(gridsize*sizeof(double));
-  				 
-  for ( iw = 0; iw < NFWORK; ++iw )
-    fwork[iw] = (FIELD **) malloc(nvars*sizeof(FIELD *));
-  for ( iw = 0; iw < NIWORK; ++iw )
-    iwork[iw] = (int ***)   malloc(nvars*sizeof(int **));
+  fwork = (FIELD **) malloc(nvars*sizeof(FIELD*));
+  o     = (FIELD ***)malloc(nvars*sizeof(FIELD**));
+  o2    = (FIELD ***)malloc(nvars*sizeof(FIELD**));
+  iwork = (int ***) malloc(nvars*sizeof(int **));
+  
 
   for ( varID = 0; varID < nvars; ++varID )
     {
-      gridID   = vlistInqVarGrid(vlistID[0], varID);      
-      gridsize = vlistGridsizeMax(vlistID[0]);
-      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID[0], varID));
-      missval  = missval1 = vlistInqVarMissval(vlistID[0], varID);
-      missval2 = vlistInqVarMissval(vlistID[1], varID); 
-
-      for ( iw = 0; iw < NFWORK; ++iw )
-	fwork[iw][varID] = (FIELD *)  malloc(nlevs*sizeof(FIELD));
-      for ( iw = 0; iw < NIWORK; ++iw )
-	iwork[iw][varID] = (int **)  malloc(nlevs*sizeof(int *));  
+      gridID1  = vlistInqVarGrid(vlistID1, varID);      
+      gridsize = vlistGridsizeMax(vlistID1);
+      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      missval  = vlistInqVarMissval(vlistID1, varID);      
+      
+      fwork[varID] = (FIELD *)  malloc(nlevs*sizeof(FIELD));
+      o[varID]     = (FIELD **) malloc(nlevs*sizeof(FIELD*));     
+      o2[varID]    = (FIELD **) malloc(nlevs*sizeof(FIELD*));
+      iwork[varID] = (int ** )  malloc(nlevs*sizeof(int* ));
 
       for ( levelID = 0; levelID < nlevs; ++levelID )
-	{
-	  for ( iw = 0; iw < NFWORK; ++iw )
-	    {
-	      fwork[iw][varID][levelID].grid    = gridID;
-	      fwork[iw][varID][levelID].nmiss   = 0;
-	      fwork[iw][varID][levelID].missval = missval;
-	      fwork[iw][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	      memset(fwork[iw][varID][levelID].ptr, 0, gridsize*sizeof(double));
-	    }
-
-	  for ( iw = 0; iw < NIWORK; ++iw )
-	    {
-	      iwork[iw][varID][levelID] = (int *) malloc(gridsize*sizeof(int));
-	      memset(iwork[iw][varID][levelID], 0, gridsize*sizeof(int));
-	    }
-	}
-    }
- 
-  tsID=0;
+        {  
+          fwork[varID][levelID].grid    = gridID1;
+          fwork[varID][levelID].nmiss   = 0;
+          fwork[varID][levelID].missval = missval;
+          fwork[varID][levelID].ptr     = (double *) malloc(gridsize*gridsize*sizeof(double));
+          iwork[varID][levelID] = (int *) malloc(gridsize*gridsize*sizeof(int));
+          memset(fwork[varID][levelID].ptr, missval, gridsize*gridsize*sizeof(double));
+          memset(iwork[varID][levelID], 0, gridsize*gridsize*sizeof(int)); 
+          
+          o[varID][levelID] = (FIELD *) malloc(gridsize*sizeof(FIELD));
+          o2[varID][levelID]= (FIELD *) malloc(gridsize*sizeof(FIELD));
+          for ( i = 0; i < gridsize; i++ )
+            {
+              o[varID][levelID][i].grid   = gridID2;
+              o[varID][levelID][i].nmiss  = 0;
+              o[varID][levelID][i].missval= missval;
+              o[varID][levelID][i].ptr    = (double *)malloc(gridsize*sizeof(double));
+              memset(o[varID][levelID][i].ptr, missval, gridsize*sizeof(double));
+              
+              o2[varID][levelID][i].grid    = gridID3;
+              o2[varID][levelID][i].nmiss   = 0;
+              o2[varID][levelID][i].missval = missval;
+              o2[varID][levelID][i].ptr     = (double *)malloc(1*sizeof(double));
+              o2[varID][levelID][i].ptr[0]  = missval;              
+            }
+        }      
+    }  
+  
+  tsID=0; 
+  /* Read the data and reate covariance matrices for each var & level */
   while ( TRUE )
-    {
-      for ( is = 0; is < NIN; ++is )
-	{
-	  if ( reached_eof[is] ) continue;
-
-	  nrecs = streamInqTimestep(streamID[is], tsID);
-	  if ( nrecs == 0 )
-	    {
-	      reached_eof[is] = 1;
-	      continue;
-	    }
-
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
-
-	  for ( recID = 0; recID < nrecs; recID++ )
-	    {
-	      streamInqRecord(streamID[is], &varID, &levelID);
-
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID[is], varID));
-
-	      in[is].missval = vlistInqVarMissval(vlistID[is], varID);
-
-	      if ( tsID == 0 && is == 0 )
-		{
-		  recVarID[recID] = varID;
-		  recLevelID[recID] = levelID;	     	     
-		}	 
-
-	      streamReadRecord(streamID[is], in[is].ptr, &in[is].nmiss);
-	      
-	      for ( i = 0; i < gridsize; ++i )
-		{
-		  /*
-		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
-		  ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
-		  */
-		    {
-		      fwork[NIN*is + 0][varID][levelID].ptr[i] += in[is].ptr[i];
-		      fwork[NIN*is + 1][varID][levelID].ptr[i] += in[is].ptr[i] * in[is].ptr[i];
-		      iwork[is][varID][levelID][i]++;
-		    }
-		}	 
-	    }
-	}
-
-      for ( is = 0; is < NIN; ++is )
-	if ( ! reached_eof[is] ) break;
-
-      if ( is == NIN ) break;
-
+    {      
+      if ( reached_eof ) continue;
+      
+      nrecs = streamInqTimestep(streamID1, tsID);
+      //printf("nrecs %i\n",nrecs);
+      if ( nrecs == 0 )
+        {
+          reached_eof = 1;
+          break;
+        }
+          
+      vdate = taxisInqVdate(taxisID1);
+      vtime = taxisInqVtime(taxisID1);    
+      
+      for ( recID = 0; recID < nrecs; recID++ )
+        {
+          int i2;
+          streamInqRecord(streamID1, &varID, &levelID); 
+          gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));          
+          missval = in.missval = vlistInqVarMissval(vlistID1, varID);           
+          
+          streamReadRecord(streamID1, in.ptr, &in.nmiss);   
+          for ( i = 0; i < gridsize; ++i )
+            {
+              double tmp;
+              for ( i2 = 0; i2 <= i; i2++ )
+                {                
+                  if ( ( ! DBL_IS_EQUAL(in.ptr[i], missval) ) && 
+                      ( ! DBL_IS_EQUAL(in.ptr[i2], missval) ) )                            
+                    {
+                      tmp = in.ptr[i]*in.ptr[i2];                    
+                      fwork[varID][levelID].ptr[i*gridsize+i2] += tmp;                      
+                      iwork[varID][levelID][i*gridsize+i2]++;                                        
+                    }
+                }              
+            }	   
+          // creater lower triangular of covariance matrix;
+          for (i=0;i<gridsize;i++)
+            for(i2=0;i2<i;i2++)
+              {
+                fwork[varID][levelID].ptr[i2*gridsize+i]=fwork[varID][levelID].ptr[i*gridsize+i2];
+                iwork[varID][levelID][i2*gridsize+i]    =iwork[varID][levelID][i*gridsize+i2];
+              }
+              
+        }                                  
       tsID++;
     }
-
-  tsID = 0;
-  taxisDefVdate(taxisID3, vdate);
-  taxisDefVtime(taxisID3, vtime);
-  streamDefTimestep(streamID3, tsID);
-
-  for ( recID = 0; recID < nrecs3; recID++ )
-    {
-      varID    = recVarID[recID];
-      levelID  = recLevelID[recID];
+  printf("read data\n");
   
-      missval1 = fwork[0][varID][levelID].missval;
-      missval2 = missval1;
-
-      if ( operatorID == VARQUOT2TEST )
-	{
-	  for ( i = 0; i < gridsize; ++i )
-	    {
-	      fnvals0 = iwork[0][varID][levelID][i];
-	      fnvals1 = iwork[1][varID][levelID][i];
-
-	      temp0 = DIV(MUL(fwork[0][varID][levelID].ptr[i], fwork[0][varID][levelID].ptr[i]), fnvals0);
-	      temp1 = DIV(MUL(fwork[2][varID][levelID].ptr[i], fwork[2][varID][levelID].ptr[i]), fnvals1);
-	      temp2 = SUB(fwork[1][varID][levelID].ptr[i], temp0);
-	      temp3 = SUB(fwork[3][varID][levelID].ptr[i], temp1);
-	      statistic = DIV(temp2, ADD(temp2, MUL(rconst, temp3)));
-	      
-	      if ( fnvals0 <= 1 || fnvals1 <= 1 )
-		fractil_1 = fractil_2 = missval1;
-	      else
-		beta_distr_constants((fnvals0 - 1) / 2,
-				     (fnvals1 - 1) / 2, 1 - risk,
-				     &fractil_1, &fractil_2, func);
-	      out[0].ptr[i] = DBL_IS_EQUAL(statistic, missval1) ? missval1 : 
-	       	              statistic <= fractil_1 || statistic >= fractil_2 ? 1 : 0;
-	    }
-	}									       
-      else if ( operatorID == MEANDIFF2TEST )
-	{
-	  int j;
-	  double fnvals;
-	  double fractil;
-	  double mean_factor[NIN], var_factor[NIN];
-	  double stddev_estimator, mean_estimator, norm, deg_of_freedom;
-	  double tmp;
-	  
-	  mean_factor[0] = 1;
-	  mean_factor[1] = -1;
-	  var_factor[0] = var_factor[1] = 1;
-
-	  for ( i = 0; i < gridsize; ++i )
-	    {
-	      temp0 = 0;
-	      deg_of_freedom = -n_in;
-	      for ( j = 0; j < n_in; j++ )
-		{
-		  fnvals = iwork[j][varID][levelID][i];
-		  tmp   = DIV(MUL(fwork[2*j][varID][levelID].ptr[i], fwork[2*j][varID][levelID].ptr[i]), fnvals);
-		  temp0 = ADD(temp0, DIV(SUB(fwork[2*j+1][varID][levelID].ptr[i], tmp), var_factor[j]));
-		  deg_of_freedom = ADD(deg_of_freedom, fnvals);
-		}
-
-	      if ( !DBL_IS_EQUAL(temp0, missval1) && temp0 < 0 ) /* This is possible because */
-		temp0 = 0;	                                 /* of rounding errors       */
-
-	      stddev_estimator = ROOT(DIV(temp0, deg_of_freedom));
-	      mean_estimator = -rconst;
-	      for ( j = 0; j < n_in; j++ )
-		{
-		  fnvals = iwork[j][varID][levelID][i];
-		  mean_estimator = ADD(mean_estimator,
-				       MUL(mean_factor[j],
-					   DIV(fwork[2*j][varID][levelID].ptr[i], fnvals)));
-		}
-
-	      temp1 = 0;
-	      for ( j = 0; j < n_in; j++ )
-		{
-		  fnvals = iwork[j][varID][levelID][i];
-		  temp1 = ADD(temp1, DIV(MUL(MUL(mean_factor[j], mean_factor[j]),
-					     var_factor[j]), fnvals));
-		}
-
-	      norm = ROOT(temp1);
-	      
-	      temp2 = DIV(DIV(mean_estimator, norm), stddev_estimator);
-	      fractil = deg_of_freedom < 1 ? missval1 :
-		student_t_inv (deg_of_freedom, 1 - risk/2, func);
-
-	      out[0].ptr[i] = DBL_IS_EQUAL(temp2, missval1)|| DBL_IS_EQUAL(fractil, missval1) ? 
-		              missval1 : fabs(temp2) >= fractil;
-	    }
-	}
-
-      nmiss3 = 0;
-      for ( i = 0; i < gridsize; i++ )
-	if ( DBL_IS_EQUAL(out[0].ptr[i], missval1) ) nmiss3++;
-
-      streamDefRecord(streamID3, varID, levelID);
-      streamWriteRecord(streamID3, out[0].ptr, nmiss3);
-    }
-
+  pack = (int *)malloc(gridsize*sizeof(int));   
+  
   for ( varID = 0; varID < nvars; varID++ )
     {
-      nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID[0], varID));
       for ( levelID = 0; levelID < nlevs; levelID++ )
-	{
-	  for ( iw = 0; iw < NFWORK; ++iw )
-	    free(fwork[iw][varID][levelID].ptr);
-	  for ( iw = 0; iw < NIWORK; ++iw )
-	    free(iwork[iw][varID][levelID]);
-	}
-    
-      for ( iw = 0; iw < NFWORK; ++iw ) free(fwork[iw][varID]);
-      for ( iw = 0; iw < NIWORK; ++iw ) free(iwork[iw][varID]);
+        {
+          double **cov;
+          double *eigv;
+          npack = 0;
+          int i2;
+          sum_w = 0;
+          memset(pack, 0, gridsize*sizeof(int));
+          for ( i = 0; i < gridsize; i++ )
+            {        
+              for ( i2 = 0; i2 < gridsize; i2++ )              
+                  if (!iwork[varID][levelID][i2*gridsize+i])
+                    break;
+              
+              if ( i2 == gridsize )
+                {
+                  pack[npack] = i;                  
+                  npack++;        
+                  sum_w += w[i];
+                }            
+            }          
+          cov = (double **)malloc(npack*sizeof(double *));
+          eigv = (double *)malloc(npack*sizeof(double));
+          
+          for (i1=0;i1<npack;i1++) 
+            { 
+              cov[i1]=(double*)malloc(npack*sizeof(double));
+              for (i2 = 0; i2 < npack; i2++ )                               
+                if ( iwork[varID][levelID][i1*gridsize+i2] )
+                  {                    
+                    cov[i1][i2] = fwork[varID][levelID].ptr[pack[i2]*gridsize+pack[i1]];                                   
+                    // weight and normalize the covariances 
+                    cov[i1][i2] *= sqrt (w[pack[i1]]) * sqrt (w[pack[i2]]) / sum_w / (iwork[varID][levelID][i1*gridsize+i2] - 1);
+                  }
+            }   
+          printf("sumw %7.5f, weight[0] %7.5f weights[npack-1] %7.5f\n", sum_w, w[0], w[npack-1]);
+          
+           for(i1=0;i1<npack;i1++)
+            {
+              printf("\n");
+              for(i2=0;i2<npack;i2++)
+                printf("%7.5f ", cov[i1][i2]);
+              printf("\n");
+            }
+          
+          
+          eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], npack, func);
+          // cov contains the eigenvectors, eigv the eigenvalues
+          for (i=0;i<npack;i++)
+            {             
+              for (j=0;j<npack;j++)
+                o[varID][levelID][i].ptr[pack[j]] = cov[j][i]/sqrt(w[pack[j]]/sum_w);                                
+              o2[varID][levelID][i].ptr[0] = eigv[i];
+            }
+        }
     }
-
-  for ( iw = 0; iw < NFWORK; iw++ ) free(fwork[iw]);
-  for ( iw = 0; iw < NIWORK; iw++ ) free(iwork[iw]);
-
-
-  streamClose(streamID3);
-  for ( is = 0; is < NIN; ++is )
-    streamClose(streamID[is]);
-
-  free(streamID);
-  free(vlistID);
-  free(reached_eof);
-
-  for ( i = 0; i < NIN; ++i ) free(in[i].ptr);
-  free(in);
-  for ( i = 0; i < NOUT; ++i ) free(out[i].ptr);
-  free(out);
-
-  free(recVarID);
-  free(recLevelID);
     
+  streamDefVlist(streamID3, vlistID3);
+  streamDefVlist(streamID2, vlistID2);
+  
+  for ( tsID=0; tsID<npack; tsID++ )
+    {
+      taxisDefVdate(taxisID3, 0.0); 
+      taxisDefVtime(taxisID3, 0.0);
+      streamDefTimestep(streamID3, tsID); 
+     
+      taxisDefVdate(taxisID2, 0.0);
+      taxisDefVtime(taxisID2, 0.0);  
+      streamDefTimestep(streamID2, tsID); 
+       
+      for ( varID = 0; varID < nvars; varID++ )
+        {
+          nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+          for ( levelID=0; levelID < nlevs;levelID++ )
+            {           
+              nmiss = 0;              
+              for ( i = 0; i < gridsize; i++ )
+                if ( DBL_IS_EQUAL(o[varID][levelID][tsID].ptr[i], missval) ) nmiss++;              
+              streamDefRecord(streamID2, varID, levelID);              
+              streamWriteRecord(streamID2, o[varID][levelID][tsID].ptr, nmiss);
+              
+              if ( DBL_IS_EQUAL(o2[varID][levelID][tsID].ptr[i], missval) ) nmiss = 1;
+              else nmiss = 0;
+              streamDefRecord(streamID3, varID, levelID);
+              streamWriteRecord(streamID3, o2[varID][levelID][tsID].ptr,nmiss);
+              
+            }     
+        }
+    }
+          
+  for ( varID=0;varID<nvars;varID++)
+    {
+      for(levelID=0;levelID<nlevs;levelID++)
+        {
+          for(i=0;i<gridsize;i++)
+            {
+              free(o[varID][levelID][i].ptr);
+              free(o2[varID][levelID][i].ptr);
+            }
+          free(o[varID][levelID]);
+          free(o2[varID][levelID]);
+          free(iwork[varID][levelID]);
+        }
+      free(o[varID]);
+      free(o2[varID]);
+      free(fwork[varID]);
+      free(iwork[varID]);
+
+    }
+  
+  free(o);
+  free(o2);
+  free(fwork);
+  free(iwork);
+  free(in.ptr);
+  
+  
+  
+  
+  streamClose(streamID3);
+  streamClose(streamID2);
+  streamClose(streamID1);
+  
   cdoFinish();   
- 
-  return (0);
+  
+  return (0);  
 }
