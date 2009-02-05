@@ -867,7 +867,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REM
 	}
 
       /* Note: using units from latitude instead from bounds */
-      if ( rg->grid2_corners && rg->lneed_grid1_corners )
+      if ( rg->grid2_corners && rg->lneed_grid2_corners )
 	{
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -5809,9 +5809,9 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nce(nc_def_dim(nc_file_id, "dst_grid_size", rg.grid2_size, &nc_dstgrdsize_id));
 
   /* Define grid corner dimension */
-  if ( rg.grid1_corners )
+  if ( rg.lneed_grid1_corners )
     nce(nc_def_dim(nc_file_id, "src_grid_corners", rg.grid1_corners, &nc_srcgrdcorn_id));
-  if ( rg.grid2_corners )
+  if ( rg.lneed_grid2_corners )
     nce(nc_def_dim(nc_file_id, "dst_grid_corners", rg.grid2_corners, &nc_dstgrdcorn_id));
 
   /* Define grid rank dimension */
@@ -5841,7 +5841,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nc_dims2_id[0] = nc_srcgrdsize_id;
   nc_dims2_id[1] = nc_srcgrdcorn_id;
 
-  if ( rg.grid1_corners )
+  if ( rg.lneed_grid1_corners )
     {
       nce(nc_def_var(nc_file_id, "src_grid_corner_lat", NC_DOUBLE, 2, nc_dims2_id, &nc_srcgrdcrnrlat_id));
       nce(nc_def_var(nc_file_id, "src_grid_corner_lon", NC_DOUBLE, 2, nc_dims2_id, &nc_srcgrdcrnrlon_id));
@@ -5850,7 +5850,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nc_dims2_id[0] = nc_dstgrdsize_id;
   nc_dims2_id[1] = nc_dstgrdcorn_id;
 
-  if ( rg.grid2_corners )
+  if ( rg.lneed_grid2_corners )
     {
       nce(nc_def_var(nc_file_id, "dst_grid_corner_lat", NC_DOUBLE, 2, nc_dims2_id, &nc_dstgrdcrnrlat_id));
       nce(nc_def_var(nc_file_id, "dst_grid_corner_lon", NC_DOUBLE, 2, nc_dims2_id, &nc_dstgrdcrnrlon_id));
@@ -5861,12 +5861,12 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlat_id, "units", 7, grid2_units));
   nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlon_id, "units", 7, grid1_units));
   nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlon_id, "units", 7, grid2_units));
-  if ( rg.grid1_corners )
+  if ( rg.lneed_grid1_corners )
     {
       nce(nc_put_att_text(nc_file_id, nc_srcgrdcrnrlat_id, "units", 7, grid1_units));
       nce(nc_put_att_text(nc_file_id, nc_srcgrdcrnrlon_id, "units", 7, grid1_units));
     }
-  if ( rg.grid2_corners )
+  if ( rg.lneed_grid2_corners )
     {
       nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlat_id, "units", 7, grid2_units));
       nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlon_id, "units", 7, grid2_units));
@@ -5922,7 +5922,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlat_id, rg.grid1_center_lat)); 
   nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlon_id, rg.grid1_center_lon));
 
-  if ( rg.grid1_corners )
+  if ( rg.lneed_grid1_corners )
     {
       nce(nc_put_var_double(nc_file_id, nc_srcgrdcrnrlat_id, rg.grid1_corner_lat));
       nce(nc_put_var_double(nc_file_id, nc_srcgrdcrnrlon_id, rg.grid1_corner_lon));
@@ -5931,12 +5931,11 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nce(nc_put_var_double(nc_file_id, nc_dstgrdcntrlat_id, rg.grid2_center_lat));
   nce(nc_put_var_double(nc_file_id, nc_dstgrdcntrlon_id, rg.grid2_center_lon));
 
-  if ( rg.grid2_corners )
+  if ( rg.lneed_grid2_corners )
     {
       nce(nc_put_var_double(nc_file_id, nc_dstgrdcrnrlat_id, rg.grid2_corner_lat));
       nce(nc_put_var_double(nc_file_id, nc_dstgrdcrnrlon_id, rg.grid2_corner_lon));
     }
-
   /*
   if ( luse_grid1_area )
     nce(nc_put_var_double(nc_file_id, nc_srcgrdarea_id, rg.grid1_area_in));
@@ -6174,22 +6173,26 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   */
   rg->grid1_corners = 0;
   rg->luse_grid1_corners = FALSE;
+  rg->lneed_grid1_corners = FALSE;
   status = nc_inq_dimid(nc_file_id, "src_grid_corners", &nc_srcgrdcorn_id);
   if ( status == NC_NOERR )
     {
       nce(nc_inq_dimlen(nc_file_id, nc_srcgrdcorn_id, &dimlen));
       rg->grid1_corners = dimlen;
       rg->luse_grid1_corners = TRUE;
+      rg->lneed_grid1_corners = TRUE;
     }
 
   rg->grid2_corners = 0;
   rg->luse_grid2_corners = FALSE;
+  rg->lneed_grid2_corners = FALSE;
   status = nc_inq_dimid(nc_file_id, "dst_grid_corners", &nc_dstgrdcorn_id);
   if ( status == NC_NOERR )
     {
       nce(nc_inq_dimlen(nc_file_id, nc_dstgrdcorn_id, &dimlen));
       rg->grid2_corners = dimlen;
-      rg->luse_grid2_corners = FALSE;
+      rg->luse_grid2_corners = TRUE;
+      rg->lneed_grid2_corners = TRUE;
     }
 
   nce(nc_inq_dimid(nc_file_id, "src_grid_rank", &nc_srcgrdrank_id));

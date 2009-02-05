@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(cdo, 1.3.1beta1, Uwe.Schulzweida@zmaw.de)
+AC_INIT(cdo, 1.3.1beta2, Uwe.Schulzweida@zmaw.de)
 
 CONFIG_ABORT=yes
 
@@ -67,6 +67,8 @@ AC_DEFINE_UNQUOTED(USER_NAME, ["$USERNAME"], [User name])
 if test -z "$HOST" ; then HOST="unknown"; fi;
 
 AC_DEFINE_UNQUOTED(HOST_NAME, ["$HOST"], [Host name])
+
+AC_DEFINE_UNQUOTED(SYSTEM_TYPE, ["$ac_cv_target"], [System type])
 
 #  ----------------------------------------------------------------------
 #  Check for math library

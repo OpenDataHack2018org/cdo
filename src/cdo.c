@@ -145,8 +145,9 @@ static void version(void)
 #endif
   fprintf(stderr, "\n");
 #endif
-#if defined (USER_NAME) && defined(HOST_NAME)
-  fprintf(stderr, "Compiled: by %s on %s %s %s\n", USER_NAME, HOST_NAME, __DATE__, __TIME__);
+#if defined (USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
+  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
+	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
   cdiPrintVersion();
   fprintf(stderr, "\n");
@@ -168,7 +169,7 @@ static void usage(void)
   fprintf(stderr, "                   (32/64 for nc, nc2, nc4, srv, ext, ieg; 1 - 32 for grb)\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, nc4, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
-  fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>\n");
+  fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>_lat=<LAT>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");

@@ -16,14 +16,17 @@ Predefined grids are available for global regular, gaussian or icosahedral-hexag
 \subsection{Predefined grids}
 
 The following pre-defined grid names are available: 
-{\tt r<NX>x<NY>}, {\tt t<RES>grid} and {\tt gme<NI>}
+{\tt r<NX>x<NY>}, {\tt lon=<LON>\_lat<LAT>}, {\tt t<RES>grid} and {\tt gme<NI>}
 
 \subsection*{Global regular grid: {\tt r<NX>x<NY>}}
-    {\tt r<NX>x<NY>} defines a global regular grid.
+    {\tt r<NX>x<NY>} defines a global regular lon/lat grid.
     The number of the longitudes {\tt <NX>} and the latitudes {\tt <NY>}
     can be selected at will.
     The longitudes start at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
     The latitudes go from south to north with an increment of (180/{\tt <NY>})$^\circ$.
+
+\subsection*{One grid point: {\tt lon=<LON>\_lat<LAT>}}
+    {\tt lon=<LON>\_lat<LAT>} defines one grid point of a lon/lat grid.
 
 \subsection*{Global gaussian grid: {\tt t<RES>grid}}
     {\tt t<RES>grid} defines a global gaussian grid.

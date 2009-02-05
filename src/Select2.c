@@ -36,11 +36,11 @@
 #include "namelist.h"
 
 
-#define  PAR_INT         1
-#define  PAR_FLT         2
-#define  PAR_WORD        3
-#define  PAR_DATE        4
-#define  PAR_TIME        4
+#define  PML_INT         1
+#define  PML_FLT         2
+#define  PML_WORD        3
+#define  PML_DATE        4
+#define  PML_TIME        4
 
 typedef struct {
   char *name;
@@ -50,8 +50,12 @@ typedef struct {
 }
 PARAMETER;
 
-#define PAR_DEF_INT(name, size, val)  int sel##name[size]; int nsel##name = 0; int name = 0
-#define PAR_DEF_FLT(name, size, val)  double sel##name[size]; int nsel##name = 0; double name = 0
+#define PML_DEF_INT(name, size, val)  int par##name[size]; int flag##name[size]; int npar##name = 0; int name = 0
+#define PML_DEF_FLT(name, size, val)  double par##name[size]; int npar##name = 0; double name = 0
+#define PML_ADD_INT(nml, name) pmlAdd(nml, #name, PML_INT, 0, par##name, sizeof(par##name)/sizeof(int))
+#define PML_ADD_FLT(nml, name) pmlAdd(nml, #name, PML_FLT, 0, par##name, sizeof(par##name)/sizeof(double))
+#define PML_NUM(nml, name)   npar##name = pmlNum(nml, #name)
+#define PML_PAR(name)        npar##name, par##name, name
 
 static PARAMETER Parameter[] =
 {
@@ -59,6 +63,290 @@ static PARAMETER Parameter[] =
 };
 
 static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
+
+#define MAX_PML_ENTRY  256
+
+typedef struct
+{
+  char *name;
+  size_t len;
+  void *ptr;
+  int type;
+  int occ;
+  int dis;
+  size_t size;
+} pml_entry_t;
+
+
+typedef struct
+{
+  int size;
+  int dis;
+  char *name;
+  /* PML_LINE line; */
+  pml_entry_t *entry[MAX_PML_ENTRY];
+} pml_t;
+
+
+static void pml_init(pml_t *pml, const char *name)
+{
+  static char func[] = "pml_init";
+  pml->size = 0;
+  pml->dis  = 1;
+  pml->name = strdup(name);
+}
+
+
+pml_t *pmlNew(const char *name)
+{
+  static char func[] = "pmlNew";
+  pml_t *pml;
+
+  pml = (pml_t *) malloc(sizeof(pml_t));
+
+  pml_init(pml, name);
+
+  return (pml);
+}
+
+
+void pmlPrint(pml_t *pml)
+{
+  pml_entry_t *entry;
+  int i, j, nout;
+
+  if ( pml == NULL ) return;
+
+  fprintf(stdout, "Parameter list: %s\n", pml->name);
+  fprintf(stdout, " Num  Name             Type  Size   Dis   Occ  Entries\n");
+
+  for ( i = 0; i < pml->size; ++i )
+    {
+      entry = pml->entry[i];
+      fprintf(stdout, "%4d  %-16s %4d  %4d  %4d  %4d ",
+	      i+1, pml->entry[i]->name, pml->entry[i]->type, (int)pml->entry[i]->size,
+	      pml->entry[i]->dis, pml->entry[i]->occ);
+      nout = pml->entry[i]->occ;
+      if ( nout > 8 ) nout = 8;
+
+      if      ( entry->type == PML_WORD )
+	for ( j = 0; j < nout; j++ )
+	  fprintf(stdout, " %s", ((char **)entry->ptr)[j]);
+      else if ( entry->type == PML_INT )
+	for ( j = 0; j < nout; j++ )
+	  fprintf(stdout, " %d", ((int *)entry->ptr)[j]);
+      else if ( entry->type == PML_FLT )
+	for ( j = 0; j < nout; j++ )
+	  fprintf(stdout, " %g", ((double *)entry->ptr)[j]);
+      
+      fprintf(stdout, "\n");
+    }
+}
+
+
+int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t size)
+{
+  static char func[] = "pmlAdd";
+  pml_entry_t *pml_entry;
+  int entry = 0;
+
+  if ( pml->size >= MAX_PML_ENTRY )
+    {
+      fprintf(stderr, "Too many entries in parameter list %s! (Max = %d)\n", pml->name, MAX_PML_ENTRY);
+      return (-1);
+    }
+
+  pml_entry = (pml_entry_t *) malloc(sizeof(pml_entry_t));
+
+  pml_entry->name = strdup(name);
+  pml_entry->len  = strlen(name);
+  pml_entry->type = type;
+  pml_entry->ptr  = ptr;
+  pml_entry->size = size;
+  pml_entry->dis  = dis;
+  pml_entry->occ  = 0;
+
+  entry = pml->size;
+  pml->entry[pml->size++] = pml_entry;
+
+  return (entry);
+}
+
+
+int pmlNum(pml_t *pml, const char *name)
+{
+  pml_entry_t *entry;
+  int i, nocc = 0;
+
+  if ( pml == NULL ) return (nocc);
+
+  for ( i = 0; i < pml->size; i++ )
+    {
+      entry = pml->entry[i];
+      if ( strcmp(name, entry->name) == 0 )
+	{
+	  nocc = entry->occ;
+	  break;
+	}
+    }
+
+  if ( i == pml->size )
+    fprintf(stderr, "Parameter list entry %s not found in %s\n", name, pml->name);
+
+  return (nocc);
+}
+
+
+int pml_add_entry(pml_entry_t *entry, char *arg)
+{
+  if ( entry->type == PML_INT )
+    {
+      if ( entry->occ < (int) entry->size )
+	((int *) entry->ptr)[entry->occ++] = atoi(arg);
+    }
+  else if ( entry->type == PML_FLT )
+    {
+      if ( entry->occ < (int) entry->size )
+	((double *) entry->ptr)[entry->occ++] = atof(arg);
+    }
+  else
+    {
+      fprintf(stderr, "unsupported type!\n");
+      return;
+    }
+}
+
+
+int pmlProcess(pml_entry_t *entry, int argc, char **argv)
+{
+  int i;
+  int len;
+  char *parg;
+  char *epos;
+
+  for ( i = 0; i < argc; ++i )
+    {
+      parg = argv[i];
+      if ( i == 0 )
+	{
+	  epos = strchr(parg, '=');
+	  if ( epos == NULL )
+	    {
+	      fprintf(stderr, "internal problem, keyword not found!\n");
+	    }
+	  parg += epos-parg+1;
+	}
+
+      printf("process: %s %d %s\n", entry->name, i, parg);
+      pml_add_entry(entry, parg);
+    }
+}
+
+
+int pmlRead(pml_t *pml, int argc, char **argv)
+{
+  static char func[] = "pmlRead";
+  pml_entry_t *entry;
+  pml_entry_t *pentry[MAX_PML_ENTRY];
+  int params[MAX_PML_ENTRY];
+  int num_par[MAX_PML_ENTRY];
+  int len_par[MAX_PML_ENTRY];
+  int nparams = 0;
+  int i, istart;
+  char *epos;
+  size_t len;
+  char *parbuf;
+  int bufsize = 0;
+  int status = 0;
+
+  for ( i = 0; i < argc; ++i ) printf("pmlRead: %d %s\n", i, argv[i]);
+
+  for ( i = 0; i < argc; ++i )
+    {
+      len = strlen(argv[i]);
+      len_par[i] = (int)len;
+      bufsize += len+1;
+    }
+
+  printf("bufsize %d\n", bufsize);
+  parbuf = (char *) malloc(bufsize*sizeof(char));
+  memset(parbuf, 0, bufsize*sizeof(char));
+
+  istart = 0;
+  while ( istart < argc )
+    {
+
+      epos = strchr(argv[istart], '=');
+      if ( epos == NULL )
+	{
+	  fprintf(stderr, "Parameter >%s< has no keyword!\n", argv[istart]);
+	  status = 1;
+	  goto END_LABEL;
+	}
+
+      len = epos - argv[istart];
+      printf ("len = %d\n", len);
+      for ( i = 0; i < pml->size; ++i )
+	{
+	  entry = pml->entry[i];
+	  if ( entry->len == len )
+	    if ( strncmp(entry->name, argv[istart], len) == 0 ) break;
+	}
+
+      if ( i == pml->size )
+	{
+	  fprintf(stderr, "Parameter >%s< not available!\n", argv[istart]);
+	  status = 2;
+	  goto END_LABEL;
+	}
+
+      num_par[nparams] = 0;
+      pentry[nparams] = entry;
+      params[nparams] = istart;
+      num_par[nparams] = 1;
+      
+      istart++;
+      for ( i = istart; i < argc; ++i )
+	{
+	  epos = strchr(argv[i], '=');
+	  if ( epos != NULL ) break;
+
+	  num_par[nparams]++;
+	}
+
+      istart = i;
+
+      nparams++;
+    }
+
+  for ( i = 0; i < nparams; ++i )
+    {
+      printf("param %d %s %d %s\n", i, pentry[i]->name, num_par[i],  argv[params[i]]);
+      pmlProcess(pentry[i], num_par[i], &argv[params[i]]);
+    }
+
+
+ END_LABEL:
+
+  free(parbuf);
+
+  return (status);
+}
+
+
+int par_check_int(int npar, int *parlist, int *flaglist, int par)
+{
+  int i, found;
+
+  if ( npar == 0 ) found = 1;
+  else             found = 0;
+
+  for ( i = 0; i < npar; i++ )
+    if ( par == parlist[i] ) { found = 1; break; }
+
+  return (found);
+}
+
 
 void *Select2(void *argument)
 {
@@ -94,12 +382,13 @@ void *Select2(void *argument)
   char **sargv;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
-  NML_DEF_INT(xcode,   1024, 0);
-  NML_DEF_FLT(xlevel,  1024, 0);
+  pml_t *pml;
+  PML_DEF_INT(xcode,   1024, 0);
+  PML_DEF_FLT(xlevel,  1024, 0);
 
   cdoInitialize(argument);
 
-  SELECT       = cdoOperatorAdd("select",       0, 0, "list of parameters");
+  SELECT  = cdoOperatorAdd("select", 0, 0, "parameter list");
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -116,12 +405,14 @@ void *Select2(void *argument)
 
   sargc = nsel;
   sargv = (char **) malloc(sargc*sizeof(char *));
+
   for ( i = 0; i < nsel; i++ )
     {
       argnames = operatorArgv();
+      /*
       if ( i == 0 )
 	{
-	  if ( strncmp(argnames[i], "code=", 5) == 0 )
+	  if ( strncmp(argnames[i], "xcode=", 6) == 0 )
 	    {
 	      sargv[i] = strdup(argnames[i]+5);
 	    }
@@ -131,6 +422,7 @@ void *Select2(void *argument)
 	    }
 	}
       else
+      */
 	{
 	  sargv[i] = strdup(argnames[i]);
 	}
@@ -147,7 +439,23 @@ void *Select2(void *argument)
     for ( i = 0; i < nsel; i++ )
       printf("int %d = %d\n", i+1, intarr[i]);
 
-  
+  pml = pmlNew("SELECT");
+
+  PML_ADD_INT(pml, xcode);
+  PML_ADD_FLT(pml, xlevel);
+  /*
+  pmlAdd(pml, "i2",  PML_INT,    1, &i2,  sizeof(i2)/sizeof(int));
+  pmlAdd(pml, "dm",  PML_FLT,    1, &dm,  sizeof(dm)/sizeof(double));
+  pmlAdd(pml, "var", PML_WORD,   0, var,  sizeof(var)/sizeof(char *));
+  */
+  pmlRead(pml, nsel, argnames);
+
+  pmlPrint(pml);
+
+  printf("nparxcode: %d\n", PML_NUM(pml, xcode));
+  /*
+  pmlDelete(pml);
+  */
 
   if ( operatorID == SELNAME || operatorID == DELNAME || operatorID == SELSTDNAME ||
        operatorID == SELGRIDNAME || operatorID == SELZAXISNAME )
@@ -218,6 +526,8 @@ void *Select2(void *argument)
 
 	  if ( operatorID == DELCODE || operatorID == DELNAME )
 	    vlistDefFlag(vlistID1, varID, levID, TRUE);
+
+	  printf("xcode: %d %d\n", code, par_check_int(nparxcode, parxcode, flagxcode, code));
 
 	  for ( isel = 0; isel < nsel; isel++ )
 	    {
