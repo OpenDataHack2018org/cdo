@@ -164,7 +164,7 @@ void *Vertint(void *argument)
   lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
-      mono_level = FALSE;
+      /* mono_level = FALSE; */
       mono_level = TRUE;
       zaxisID = vlistZaxis(vlistID1, i);
       nlevel  = zaxisInqSize(zaxisID);
@@ -421,7 +421,8 @@ void *Vertint(void *argument)
 	vardata1[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
 
       /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
-      if ( zaxisID == zaxisIDh )
+      if ( zaxisID == zaxisIDh ||
+	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev) )
 	{
 	  varinterp[varID] = TRUE;
 	  vardata2[varID]  = (double *) malloc(gridsize*nplev*sizeof(double));
