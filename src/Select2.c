@@ -199,6 +199,8 @@ int pmlNum(pml_t *pml, const char *name)
 
 int pml_add_entry(pml_entry_t *entry, char *arg)
 {
+  int status = 0;
+
   if ( entry->type == PML_INT )
     {
       if ( entry->occ < (int) entry->size )
@@ -212,7 +214,7 @@ int pml_add_entry(pml_entry_t *entry, char *arg)
   else
     {
       fprintf(stderr, "unsupported type!\n");
-      return;
+      return (status);
     }
 }
 
