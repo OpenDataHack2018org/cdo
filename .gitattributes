@@ -321,6 +321,7 @@ src/Timstat.c -text
 src/Timstat2.c -text
 src/Timstat3.c -text
 src/Tinfo.c -text
+src/Transpose.c -text
 src/Trend.c -text
 src/Trms.c -text
 src/Vardup.c -text

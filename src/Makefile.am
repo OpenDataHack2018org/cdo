@@ -117,6 +117,7 @@ cdo_SOURCES = Arith.c		\
               Timstat2.c 	\
               Timstat3.c 	\
               Tinfo.c 		\
+              Transpose.c  	\
               Trend.c  		\
               Trms.c  		\
               Vardup.c  	\
