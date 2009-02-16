@@ -4,6 +4,8 @@ AC_INIT(cdo, 1.3.1beta2, Uwe.Schulzweida@zmaw.de)
 
 CONFIG_ABORT=yes
 
+echo "configuring ${PACKAGE_NAME} ${PACKAGE_VERSION}"
+
 AC_ARG_VAR(AR,     [AR archive command]) 
 
 AC_CONFIG_AUX_DIR(config)
@@ -349,3 +351,10 @@ AC_SUBST([FC],$F77)
 AC_SUBST([AR])
 
 AC_OUTPUT(Makefile src/Makefile)
+
+AC_MSG_NOTICE([
+
+  Configuration completed.
+
+    You can now say 'make' to compile the CDO package and 'make install' to install it afterwards.
+])
