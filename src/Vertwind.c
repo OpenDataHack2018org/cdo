@@ -132,11 +132,11 @@ void *Vertwind(void *argument)
       cdoAbort("Parameter not found!");
     }
 
-  if ( psID == -1 && zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
-    cdoAbort("Surface pressure (code 134) not found!");
-
   gridID  = vlistInqVarGrid(vlistID1, omegaID);
   zaxisID = vlistInqVarZaxis(vlistID1, omegaID);
+
+  if ( psID == -1 && zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
+    cdoAbort("Surface pressure (code 134) not found!");
 
   gridsize = gridInqSize(gridID);
   nlevel = zaxisInqSize(zaxisID);

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2007-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -357,7 +357,7 @@ void *Tinfo(void *argument)
 
   if ( cdoVerbose && ngaps )
     {
-      fprintf(stdout, "\nFound potentially %d gaps in the time series", ngaps);
+      fprintf(stdout, "\nFound potentially %d gap%s in the time series", ngaps, ngaps>1?"s":"");
       if ( ngaps >= MAX_GAPS )
 	{
 	  ngaps = MAX_GAPS;

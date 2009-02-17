@@ -57,20 +57,19 @@ char *strdup(const char *s);
 #define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
 
-#ifndef DBL_IS_EQUAL
-#if  defined  (XXX_HAVE_ISNAN)
+#ifndef DBL_IS_NAN
+#if  defined  (HAVE_ISNAN)
 #  define DBL_IS_NAN(x)     (isnan(x))
-#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
-#elif  defined  (XXX_FP_NAN)
+#elif  defined  (FP_NAN)
 #  define DBL_IS_NAN(x)     (fpclassify(x) == FP_NAN)
-#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
 #else
 #  define DBL_IS_NAN(x)     ((x) != (x))
-/*
-#  define DBL_IS_EQUAL(x,y) (!(x < y || y < x))
-*/
-#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
 #endif
+#endif
+
+#ifndef DBL_IS_EQUAL
+/*#define DBL_IS_EQUAL(x,y) (!(x < y || y < x)) */
+#  define DBL_IS_EQUAL(x,y) (DBL_IS_NAN(x)||DBL_IS_NAN(y)?(DBL_IS_NAN(x)&&DBL_IS_NAN(y)?1:0):!(x < y || y < x))
 #endif
 
 #ifndef IS_EQUAL
