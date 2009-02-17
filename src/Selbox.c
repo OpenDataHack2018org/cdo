@@ -134,7 +134,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	  for ( i = lon11; i <= lon12; i++ ) *pxvals2++ = xvals1[i];
 	  for ( i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
 
-	  if ( DBL_IS_EQUAL(xvals2[0], xvals2[nlon2-1]) ) xvals2[nlon2-1] += 360;
+	  if ( IS_EQUAL(xvals2[0], xvals2[nlon2-1]) ) xvals2[nlon2-1] += 360;
 
 	  if ( xvals2[0] > xvals2[nlon2-1] )
 	    for ( i = 0; i < nlon2; i++ )
@@ -486,7 +486,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       for ( ilon = 0; ilon < nlon1; ilon++ ) xvals1[ilon] *= xfact;
 
       xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
-      if ( DBL_IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
+      if ( IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
       xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
       xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
 

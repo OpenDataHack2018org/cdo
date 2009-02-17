@@ -1328,7 +1328,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	  grid.xvals[1] -= 360 * floor((grid.xvals[1] - grid.xvals[0]) / 360);
 
 	  if ( grid.xsize > 1 )
-	    if ( DBL_IS_EQUAL(grid.xvals[0], grid.xvals[1]) )
+	    if ( IS_EQUAL(grid.xvals[0], grid.xvals[1]) )
 	      grid.xvals[1] += 360;
 
 	  for ( i = 0; i < (int)grid.xsize; i++ )
@@ -1377,7 +1377,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	}
 
       for ( i = 0; i < nlat - 1; i++ )
-	if ( DBL_IS_EQUAL(grid.yvals[i+1], grid.yvals[i]) || (i < nlat - 2 &&
+	if ( IS_EQUAL(grid.yvals[i+1], grid.yvals[i]) || (i < nlat - 2 &&
 	    ((grid.yvals[i+1] > grid.yvals[i]) != (grid.yvals[i+2] > grid.yvals[i+1]))) )
 	  {
 	    Message(func, "Latitudes must be in descending or ascending order!");

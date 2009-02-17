@@ -584,7 +584,7 @@ void interpolate(FIELD *field1, FIELD *field2)
     }
 
   for ( i = 0; i < out_nlat - 1; i++ )
-    if ( DBL_IS_EQUAL(lato[i + 1], lato[i]) || (i < out_nlat - 2 &&
+    if ( IS_EQUAL(lato[i + 1], lato[i]) || (i < out_nlat - 2 &&
 	((lato[i + 1] > lato[i]) != (lato[i + 2] > lato[i + 1]))) )
       {
 	cdoAbort("Latitudes of output grid must be in descending or ascending order!");
@@ -660,7 +660,7 @@ void interpolate(FIELD *field1, FIELD *field2)
     {
       volon1 = (lono[olon - 1] + lono[olon]) / 2;
       volon2 = (lono[olon] + lono[olon + 1]) / 2;
-      if ( DBL_IS_EQUAL(volon1, volon2) ) volon2 += 360;
+      if ( IS_EQUAL(volon1, volon2) ) volon2 += 360;
       volon2 -= 360 * floor((volon1 - xlon[0]) / 360);
       volon1 -= 360 * floor((volon1 - xlon[0]) / 360);
       volon21[olon] = volon1;
@@ -938,7 +938,7 @@ void interpolate(FIELD *field1, FIELD *field2)
 		    }
 		}
 	    }
-	  xout[olat][olon] = !DBL_IS_EQUAL(wsum, 0) ? sum / wsum : missval;
+	  xout[olat][olon] = IS_NOT_EQUAL(wsum, 0) ? sum / wsum : missval;
 	}
     }
 
@@ -1409,7 +1409,7 @@ void contrast(void)
 	for (ilon = 0; ilon < nlon; ilon++)
 	  denom += p_bar[ilat][ilon] * r_new[ilat][ilon];
 
-      if ( DBL_IS_EQUAL(denom, 0) ) break;
+      if ( IS_EQUAL(denom, 0) ) break;
 
       a = nom / denom;
 
@@ -1476,7 +1476,7 @@ void contrast(void)
       for (ilat = 0; ilat < nlat; ilat++)
 	for (ilon = 0; ilon < nlon; ilon++)
 	  nom += r_bar_new[ilat][ilon] * r_new[ilat][ilon];
-      if ( DBL_IS_EQUAL(denom, 0) )
+      if ( IS_EQUAL(denom, 0) )
 	break;
       b = nom / denom;
       for (ilat = 0; ilat < nlat; ilat++)

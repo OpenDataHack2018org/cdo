@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -116,8 +116,8 @@ void vlistCompare(int vlistID1, int vlistID2, int function)
 			gridInqYvals(gridID1, yvals1);
 			gridInqYvals(gridID2, yvals2);
 		
-			if ( DBL_IS_EQUAL(yvals1[0], yvals2[ysize-1]) &&
-			     DBL_IS_EQUAL(yvals1[ysize-1], yvals2[0]) )
+			if ( IS_EQUAL(yvals1[0], yvals2[ysize-1]) &&
+			     IS_EQUAL(yvals1[ysize-1], yvals2[0]) )
 			  {
 			    if ( yvals1[0] > yvals2[0] )
 			      cdoWarning("Grid orientation differ! First grid: N->S; second grid: S->N");

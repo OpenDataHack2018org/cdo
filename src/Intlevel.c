@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -61,18 +61,18 @@ static void interp_lev(int gridsize, double missval, double *vardata1, double *v
 	  if ( DBL_IS_EQUAL(var1L1[i], missval) ) w1 = 0;
 	  if ( DBL_IS_EQUAL(var1L2[i], missval) ) w2 = 0;
 
-	  if ( DBL_IS_EQUAL(w1, 0) && DBL_IS_EQUAL(w2, 0) )
+	  if ( IS_EQUAL(w1, 0) && IS_EQUAL(w2, 0) )
 	    {
 	      var2[i] = missval;
 	    }
-	  else if ( DBL_IS_EQUAL(w1, 0) )
+	  else if ( IS_EQUAL(w1, 0) )
 	    {
 	      if ( w2 >= 0.5 )
 		var2[i] = var1L2[i];
 	      else
 		var2[i] = missval;	      
 	    }
-	  else if ( DBL_IS_EQUAL(w2, 0) )
+	  else if ( IS_EQUAL(w2, 0) )
 	    {
 	      if ( w1 >= 0.5 )
 		var2[i] = var1L1[i];
@@ -123,7 +123,7 @@ static void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *l
 	      lev_idx1[i2] = 1;
 	      lev_idx2[i2] = 1;
 	      lev_wgt1[i2] = 0;
-	      if ( expol || DBL_IS_EQUAL(lev2[i2], val2) )
+	      if ( expol || IS_EQUAL(lev2[i2], val2) )
 		lev_wgt2[i2] = 1;
 	      else
 		lev_wgt2[i2] = 0;
@@ -132,7 +132,7 @@ static void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *l
 	    {
 	      lev_idx1[i2] = nlev1-2;
 	      lev_idx2[i2] = nlev1-2;
-	      if ( expol || DBL_IS_EQUAL(lev2[i2], val2) )
+	      if ( expol || IS_EQUAL(lev2[i2], val2) )
 		lev_wgt1[i2] = 1;
 	      else
 		lev_wgt1[i2] = 0;

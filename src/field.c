@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,32 @@
 /* RQ */
 #include "nth_element.h"
 /* QR */
+
+double _FADD_(double x, double y, double missval1, double missval2)
+{
+  return FADD(x,y);
+}
+
+double _FSUB_(double x, double y, double missval1, double missval2)
+{
+  return FSUB(x, y);
+}
+
+double _FMUL_(double x, double y, double missval1, double missval2)
+{
+  return FMUL(x, y);
+}
+
+double _FDIV_(double x, double y, double missval1, double missval2)
+{
+  return FDIV(x, y);
+}
+
+double _FROOT_(double x, double missval1)
+{
+  return FROOT(x);
+}
+
 
 double fldfun(FIELD field, int function)
 {
@@ -54,7 +80,7 @@ double fldmin(FIELD field)
 	if ( !DBL_IS_EQUAL(array[i], missval) )
 	  if ( array[i] < rmin ) rmin = array[i];
 
-      if ( DBL_IS_EQUAL(rmin, DBL_MAX) )
+      if ( IS_EQUAL(rmin, DBL_MAX) )
 	rmin = missval;
     }
   else
@@ -84,7 +110,7 @@ double fldmax(FIELD field)
         if ( !DBL_IS_EQUAL(array[i], missval) )
           if ( array[i] > rmax ) rmax = array[i];
       
-      if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
+      if ( IS_EQUAL(rmax, -DBL_MAX) )
         rmax = missval;
     }
   else
@@ -226,7 +252,7 @@ double fldvar(FIELD field)
         }
     }
 
-  rvar = !DBL_IS_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
+  rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
 
   return (rvar);
 }
@@ -239,7 +265,7 @@ double fldstd(FIELD field)
 
   rvar = fldvar(field);
 
-  rstd = (!DBL_IS_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
+  rstd = (IS_NOT_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
 
   return (rstd);
 }

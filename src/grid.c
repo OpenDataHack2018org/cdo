@@ -350,10 +350,10 @@ int gridToCurvilinear(int gridID1)
 	    while ( originLon < 0 ) originLon += 360;
 	    while ( lonParY   < 0 ) lonParY   += 360;
 	    */
-	    if ( ! DBL_IS_EQUAL(xincm, yincm) )
+	    if ( IS_NOT_EQUAL(xincm, yincm) )
 	      Warning(func, "X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
 		      xincm, yincm);
-	    if ( ! DBL_IS_EQUAL(lat1, lat2) )
+	    if ( IS_NOT_EQUAL(lat1, lat2) )
 	      Warning(func, "Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
 		      lat1, lat2);
 		
@@ -1298,7 +1298,7 @@ int gridWeightsOld(int gridID, double *weights)
 	    }
 
 	  /* Normalise weights.  */
-	  if( !DBL_IS_EQUAL(sumw, 0) )
+	  if( IS_NOT_EQUAL(sumw, 0) )
 	    for( i = 0; i < datapoint; i++ ) weights[i] /= sumw;
 
 	  if ( lons-1 ) free(lons-1);

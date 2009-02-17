@@ -41,7 +41,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
   step = (max - min) / 10;
 
-  if ( !DBL_IS_EQUAL(step, 0) )
+  if ( IS_NOT_EQUAL(step, 0) )
     {
       a = pow(10, floor(log(step) / M_LN10));
       b = step / a;

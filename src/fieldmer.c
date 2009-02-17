@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,7 @@ void mermin(FIELD field1, FIELD *field2)
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] < rmin ) rmin = array[j*nx+i];
 
-	  if ( DBL_IS_EQUAL(rmin, DBL_MAX) )
+	  if ( IS_EQUAL(rmin, DBL_MAX) )
 	    {
 	      rnmiss++;
 	      rmin = missval;
@@ -97,7 +97,7 @@ void mermax(FIELD field1, FIELD *field2)
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] > rmax ) rmax = array[j*nx+i];
 
-	  if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
+	  if ( IS_EQUAL(rmax, -DBL_MAX) )
 	    {
 	      rnmiss++;
 	      rmax = missval;
@@ -290,7 +290,7 @@ void mervar(FIELD field1, FIELD *field2)
 	    }
 	}
 
-      rvar = !DBL_IS_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
+      rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
 
       if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
 
@@ -315,7 +315,7 @@ void merstd(FIELD field1, FIELD *field2)
   for ( i = 0; i < nx; i++ )
     {
       rvar = field2->ptr[i];
-      rstd = (!DBL_IS_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
+      rstd = (IS_NOT_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
 
       if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
 

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
     }
 
  
-  if ( ( number != 0 )&& ( ! ( DBL_IS_EQUAL ( xvals[0], xvals[number-1] ) && DBL_IS_EQUAL ( yvals[0], yvals[number-1] ) ) ) )
+  if ( ( number != 0 )&& ( ! (IS_EQUAL(xvals[0], xvals[number-1]) && IS_EQUAL(yvals[0], yvals[number-1])) ) )
     {
       xvals[number] = xvals[0];
       yvals[number] = yvals[0];
@@ -134,7 +134,7 @@ static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
   gridInqYvals(gridID1, yvals1);
 
   xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
-  if ( DBL_IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
+  if ( IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
   xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
   xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
 

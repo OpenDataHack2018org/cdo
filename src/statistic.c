@@ -122,7 +122,7 @@ make_symmetric_matrix_triangular (double **a, int n,
 	{
 	  for (k = 0; k < i; k++)
 	    scale += fabs (a[i][k]);
-	  if ( DBL_IS_EQUAL(scale, 0) )
+	  if ( IS_EQUAL(scale, 0) )
 	    e[i] = a[i][i - 1];
 	  else
 	    {
@@ -277,7 +277,7 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
               b = c * e[i];
               e[i + 1] = r = pythagoras (f, g);
               
-              if ( DBL_IS_EQUAL(r, 0) )
+              if ( IS_EQUAL(r, 0) )
                 {
                   d[i + 1] -= p;
                   e[m] = 0;
@@ -299,7 +299,7 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
                 }
             }
           
-          if ( DBL_IS_EQUAL(r, 0) && i >= l ) continue;
+          if ( IS_EQUAL(r, 0) && i >= l ) continue;
           
           d[l] -= p;
           e[l] = g;
@@ -390,7 +390,7 @@ lu_decomposition (double **a, int n, int *index, int *sign)
 	if ((temp = fabs (a[i][j])) > big)
 	  big = temp;
 
-      if ( DBL_IS_EQUAL(big, 0) ) return 0;
+      if ( IS_EQUAL(big, 0) ) return 0;
 
       v[i] = 1 / big;
     }
@@ -429,7 +429,7 @@ lu_decomposition (double **a, int n, int *index, int *sign)
 	}
       index[j] = imax;
 
-      if ( DBL_IS_EQUAL(a[j][j], 0) ) return 0;
+      if ( IS_EQUAL(a[j][j], 0) ) return 0;
 
       if (j != n)
 	{
@@ -703,7 +703,7 @@ incomplete_beta (double a, double b, double x, const char *prompt)
       exit (4);
     }
 
-  c = (DBL_IS_EQUAL(x, 0) || DBL_IS_EQUAL(x, 1)) ? 0 :
+  c = (IS_EQUAL(x, 0) || IS_EQUAL(x, 1)) ? 0 :
     exp (lngamma (a + b) - lngamma (a) - lngamma (b) + a * log (x) + b * log (1 - x));
 
   if (x < (a + 1) / (a + b + 2))
@@ -789,9 +789,9 @@ normal_inv (double p, const char *prompt)
       exit (4);
     }
 
-  if ( DBL_IS_EQUAL(p, last_p) )
+  if ( IS_EQUAL(p, last_p) )
     return last_x;
-  if ( DBL_IS_EQUAL(p, 0.5) )
+  if ( IS_EQUAL(p, 0.5) )
     return 0;
   else if (p < 0.5)
     return -normal_inv (1 - p, prompt);
@@ -858,9 +858,9 @@ student_t_inv (double n, double p, const char *prompt)
       exit (4);
     }
 
-  if ( DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p) )
+  if ( IS_EQUAL(n, last_n) && IS_EQUAL(p, last_p) )
     return last_x;
-  if ( DBL_IS_EQUAL(p, 0.5) )
+  if ( IS_EQUAL(p, 0.5) )
     return 0;
   else if (p < 0.5)
     return -student_t_inv (n, 1 - p, prompt);
@@ -925,10 +925,10 @@ chi_square_inv (double n, double p, const char *prompt)
       exit (4);
     }
 
-  if ( DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p) )
+  if ( IS_EQUAL(n, last_n) && IS_EQUAL(p, last_p) )
     return last_x;
 
-  if (DBL_IS_EQUAL(n, last_last_n) && DBL_IS_EQUAL(p, last_last_p) )
+  if (IS_EQUAL(n, last_last_n) && IS_EQUAL(p, last_last_p) )
     return last_last_x;
 
   x = n;
@@ -970,7 +970,7 @@ chi_square_constants (double n, double p, double *c1, double *c2, const char *pr
       exit (4);
     }
 
-  if ( DBL_IS_EQUAL(n, last_n) && DBL_IS_EQUAL(p, last_p) )
+  if ( IS_EQUAL(n, last_n) && IS_EQUAL(p, last_p) )
     {
       *c1 = last_c1;
       *c2 = last_c2;
@@ -1051,10 +1051,10 @@ beta_distr_inv (double a, double b, double p, const char *prompt)
       exit (4);
     }
 
-  if ( DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b) && DBL_IS_EQUAL(p, last_p) )
+  if ( IS_EQUAL(a, last_a) && IS_EQUAL(b, last_b) && IS_EQUAL(p, last_p) )
     return last_x;
 
-  if ( DBL_IS_EQUAL(a, last_last_a) && DBL_IS_EQUAL(b, last_last_b) && DBL_IS_EQUAL(p, last_last_p) )
+  if ( IS_EQUAL(a, last_last_a) && IS_EQUAL(b, last_last_b) && IS_EQUAL(p, last_last_p) )
     return last_last_x;
 
   x = a / (a + b);
@@ -1105,7 +1105,7 @@ void beta_distr_constants(double a, double b, double p, double *c1, double *c2,
       exit (4);
     }
 
-  if ( DBL_IS_EQUAL(a, last_a) && DBL_IS_EQUAL(b, last_b) && DBL_IS_EQUAL(p, last_p) )
+  if ( IS_EQUAL(a, last_a) && IS_EQUAL(b, last_b) && IS_EQUAL(p, last_p) )
     {
       *c1 = last_c1;
       *c2 = last_c2;

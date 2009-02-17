@@ -154,7 +154,7 @@ void *Diff(void *argument)
 		  absm = MAX(absm, fabs(array1[i]-array2[i]));
 		  if ( array1[i]*array2[i] < 0 )
 		    dsgn = TRUE;
-		  else if ( DBL_IS_EQUAL(array1[i]*array2[i], 0) )
+		  else if ( IS_EQUAL(array1[i]*array2[i], 0) )
 		    zero = TRUE;
 		  else
 		    relm = MAX(relm, fabs(array1[i]-array2[i]) /

@@ -1,6 +1,7 @@
 2009-02-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.3.1
+	* added support for missval = NaN
 	* added support for GRID type Lambert Conformal Conic
 	* Sinusoidal and Lambert Azimuthal Equal Area grids with units [km]
 	* added predefined lonlat grid for germany, europe and africa

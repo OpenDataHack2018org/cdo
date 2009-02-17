@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -57,7 +57,7 @@ void zonmin(FIELD field1, FIELD *field2)
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] < rmin ) rmin = array[j*nx+i];
 
-	  if ( DBL_IS_EQUAL(rmin, DBL_MAX) )
+	  if ( IS_EQUAL(rmin, DBL_MAX) )
 	    {
 	      rnmiss++;
 	      rmin = missval;
@@ -98,7 +98,7 @@ void zonmax(FIELD field1, FIELD *field2)
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
 	      if ( array[j*nx+i] > rmax ) rmax = array[j*nx+i];
 
-	  if ( DBL_IS_EQUAL(rmax, -DBL_MAX) )
+	  if ( IS_EQUAL(rmax, -DBL_MAX) )
 	    {
 	      rnmiss++;
 	      rmax = missval;
@@ -285,7 +285,7 @@ void zonvar(FIELD field1, FIELD *field2)
 	    }
 	}
 
-      rvar = !DBL_IS_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval1;
+      rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval1;
 
       if ( DBL_IS_EQUAL(rvar, missval1) ) rnmiss++;
 
@@ -310,7 +310,7 @@ void zonstd(FIELD field1, FIELD *field2)
   for ( j = 0; j < ny; j++ )
     {
       rvar = field2->ptr[j];
-      rstd = (!DBL_IS_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
+      rstd = (IS_NOT_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
 
       if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
 

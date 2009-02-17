@@ -385,8 +385,8 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 	  lat = grid_corner_lat[i];			
 	  for ( j = 0; j < gridsize*ncorner; j++ )
 	    if ( j != i && 
-		 DBL_IS_EQUAL(grid_corner_lat[j], lat) && 
-		 DBL_IS_EQUAL(grid_corner_lon[j], lon) )
+		 IS_EQUAL(grid_corner_lat[j], lat) && 
+		 IS_EQUAL(grid_corner_lon[j], lon) )
 	      { alone = 0; alone_cell[i] = alone_cell[j] = 1; break; }
 	  if ( alone )
 	    {
@@ -394,8 +394,8 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 	      else if ( lon  < 180. ) lon += 360.;
 	      for ( j = i+1; j < gridsize*ncorner; j++ )
 		if (j != i  && 
-		    DBL_IS_EQUAL(grid_corner_lat[j], lat) && 
-		    DBL_IS_EQUAL(grid_corner_lon[j], lon) )
+		    IS_EQUAL(grid_corner_lat[j], lat) && 
+		    IS_EQUAL(grid_corner_lon[j], lon) )
 		  { alone = 0; alone_cell[i] = alone_cell[j] = 0; break; }
 	    }
 	  if ( alone )

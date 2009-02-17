@@ -252,9 +252,9 @@ void eca1(const ECA_REQUEST_1 *request)
                     }
                 }
               
-              if ( !DBL_IS_EQUAL(request->var1.mulc, 0.0) )
+              if ( IS_NOT_EQUAL(request->var1.mulc, 0.0) )
                 farcmul(&field1, request->var1.mulc);
-              if ( !DBL_IS_EQUAL(request->var1.addc, 0.0) )
+              if ( IS_NOT_EQUAL(request->var1.addc, 0.0) )
                 farcadd(&field1, request->var1.addc);
                 
               request->var1.f2(&var12[levelID], field1);

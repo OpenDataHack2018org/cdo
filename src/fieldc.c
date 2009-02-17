@@ -70,12 +70,12 @@ void farcdiv(FIELD *field, double rconst)
 
   len    = gridInqSize(grid);
 
-  if ( nmiss > 0 || DBL_IS_EQUAL(rconst, 0) )
+  if ( nmiss > 0 || IS_EQUAL(rconst, 0) )
     {
       for ( i = 0; i < len; i++ )
 	array[i] = DIV(array[i], rconst);
 
-      if ( DBL_IS_EQUAL(rconst, 0) ) field->nmiss = len;
+      if ( IS_EQUAL(rconst, 0) ) field->nmiss = len;
     }
   else
     {

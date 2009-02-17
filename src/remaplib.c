@@ -1534,7 +1534,7 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
 	  if ( i == dst_add[n] )
 	    {
 	      for ( k = 0; k < ncls; k++ )
-		if ( DBL_IS_EQUAL(src_array[src_add[n]], src_cls[k]) ) break;
+		if ( IS_EQUAL(src_array[src_add[n]], src_cls[k]) ) break;
 	      
 	      if ( k == ncls )
 		{
@@ -1564,7 +1564,7 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
       for ( n = min_add; n < max_add; n++ )
 	{
 	  for ( k = 0; k < ncls; k++ )
-	    if ( DBL_IS_EQUAL(src_array[src_add[n]], src_cls[k]) ) break;
+	    if ( IS_EQUAL(src_array[src_add[n]], src_cls[k]) ) break;
 	      
 	  if ( k == ncls )
 	    {

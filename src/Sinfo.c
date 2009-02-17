@@ -156,7 +156,7 @@ static void printGridInfo(int vlistID)
 	      fprintf(stdout, "size      : dim = %d  nlon = %d  nlat = %d\n", gridsize, xsize, ysize);
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "%-9s : first = %.9g  last = %.9g", xname, xfirst, xlast);
-	      if ( !DBL_IS_EQUAL(xinc, 0) )
+	      if ( IS_NOT_EQUAL(xinc, 0) )
 		fprintf(stdout, "  inc = %.9g", xinc);
 	      fprintf(stdout, "  %s", xunits);
 	      if ( gridIsCircular(gridID) )
@@ -165,7 +165,7 @@ static void printGridInfo(int vlistID)
 	    }
 	  fprintf(stdout, "%*s", nbyte0, "");
 	  fprintf(stdout, "%-9s : first = %.9g  last = %.9g", yname, yfirst, ylast);
-	  if ( !DBL_IS_EQUAL(yinc, 0) && 
+	  if ( IS_NOT_EQUAL(yinc, 0) && 
 	       (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL || 
 		gridtype == GRID_LCC2 || gridtype == GRID_LAEA) )
 	    fprintf(stdout, "  inc = %.9g", yinc);

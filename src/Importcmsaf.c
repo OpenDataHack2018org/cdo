@@ -909,8 +909,8 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    }
 	}
 
-      laddoffset   = !DBL_IS_EQUAL(addoffset, 0);
-      lscalefactor = !DBL_IS_EQUAL(scalefactor,  1);
+      laddoffset   = IS_NOT_EQUAL(addoffset, 0);
+      lscalefactor = IS_NOT_EQUAL(scalefactor,  1);
 
       if ( laddoffset || lscalefactor )
 	{	  

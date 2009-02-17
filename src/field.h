@@ -1,8 +1,8 @@
-#/*
+/*
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -19,11 +19,25 @@
 #define _FIELD_H
 
 
-#define  ADD(x,y)  ( DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y) )
-#define  SUB(x,y)  ( DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y) )
-#define  MUL(x,y)  ( DBL_IS_EQUAL((x),0)||DBL_IS_EQUAL((y),0) ? 0 : DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y) )
-#define  DIV(x,y)  ( DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) || DBL_IS_EQUAL((y),0) ? missval1 : (x)/(y) )
-#define  ROOT(x)   ( DBL_IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x) )
+#define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
+#define  FSUB(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
+#define  FMUL(x,y)  (DBL_IS_EQUAL((x),0)||IS_EQUAL((y),0) ? 0 : DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
+#define  FDIV(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) || DBL_IS_EQUAL((y),0) ? missval1 : (x)/(y))
+#define  FROOT(x)   (DBL_IS_EQUAL((x),missval1) || (x)<0 ? missval1 : sqrt(x))
+
+
+double _FADD_(double x, double y, double missval1, double missval2);
+double _FSUB_(double x, double y, double missval1, double missval2);
+double _FMUL_(double x, double y, double missval1, double missval2);
+double _FDIV_(double x, double y, double missval1, double missval2);
+double _FROOT_(double x, double missval1);
+
+
+#define ADD(x,y)  _FADD_(x, y, missval1, missval2)
+#define SUB(x,y)  _FSUB_(x, y, missval1, missval2)
+#define MUL(x,y)  _FMUL_(x, y, missval1, missval2)
+#define DIV(x,y)  _FDIV_(x, y, missval1, missval2)
+#define ROOT(x)   _FROOT_(x, missval1)
 
 
 typedef struct {

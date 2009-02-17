@@ -95,7 +95,7 @@ static int histAddValue(HISTOGRAM *hist, double value)
   assert( hist != NULL );
   assert( hist->nbins > 0 );
 
-  if ( DBL_IS_EQUAL(hist->min, hist->max) )
+  if ( IS_EQUAL(hist->min, hist->max) )
     return 0;
   if ( value < hist->min || value > hist->max )
     return 1;

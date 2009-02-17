@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -794,7 +794,7 @@ void *Gradsdes(void *argument)
     {
       xfirst = gridInqXval(gridID, 0);
       xinc   = gridInqXinc(gridID);
-      if ( DBL_IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL) )
+      if ( IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL) )
 	{
 	  xvals = (double *) malloc(xsize*sizeof(double));
 	  gridInqXvals(gridID, xvals);
@@ -817,7 +817,7 @@ void *Gradsdes(void *argument)
 	}
       else
 	{
-	  if ( DBL_IS_EQUAL(xinc, 0) ) xinc = 360.0/xsize;
+	  if ( IS_EQUAL(xinc, 0) ) xinc = 360.0/xsize;
 	  fprintf(gdp, "XDEF %d LINEAR %f %f\n", xsize, xfirst, xinc);	  
 	}
     }
@@ -830,7 +830,7 @@ void *Gradsdes(void *argument)
       yinc   = gridInqYinc(gridID);
       if ( gridtype == GRID_GAUSSIAN ) yinc = 0;
 
-      if ( DBL_IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
+      if ( IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
 	{
 	  yvals = (double *) malloc(ysize*sizeof(double));
 	  gridInqYvals(gridID, yvals);
@@ -872,7 +872,7 @@ void *Gradsdes(void *argument)
 	}
       else
 	{
-	  if ( DBL_IS_EQUAL(yinc, 0) ) yinc = 180.0/ysize;
+	  if ( IS_EQUAL(yinc, 0) ) yinc = 180.0/ysize;
 	  if ( yinc < 0)
 	    {
 	      yrev = TRUE;
@@ -908,11 +908,11 @@ void *Gradsdes(void *argument)
 
       levinc = levels[1] - levels[0];
 
-      if ( DBL_IS_EQUAL(levinc, 1) ) zrev = FALSE;
+      if ( IS_EQUAL(levinc, 1) ) zrev = FALSE;
 
       for ( i = 1; i < nlevmax; i++ )
 	{
-	  if ( !DBL_IS_EQUAL(levinc, (levels[i] - levels[i-1])) )
+	  if ( IS_NOT_EQUAL(levinc, (levels[i] - levels[i-1])) )
 	    {
 	      levinc = 0;
 	      break;
@@ -920,7 +920,7 @@ void *Gradsdes(void *argument)
 	}
     }
 
-  if ( !DBL_IS_EQUAL(levinc, 0) )
+  if ( IS_NOT_EQUAL(levinc, 0) )
     fprintf(gdp,"ZDEF %d LINEAR %g %g\n", nlevmax, level0, levinc);
   else
     {
