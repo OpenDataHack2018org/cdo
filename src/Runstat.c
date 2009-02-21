@@ -39,10 +39,11 @@
 #include "field.h"
 
 
-void datetime_avg(int dpy, int ndates, DATETIME *datetime)
+void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 {
   int vdate, vtime;
-  double julval1, julval2;
+  juldate_t juldate1, juldate2, juldatem;
+  double seconds;
   /*
   for ( i = 0; i < ndates; i++ )
     fprintf(stdout, "%4d %d %d\n", i+1, datetime[i].date, datetime[i].time);
@@ -53,16 +54,17 @@ void datetime_avg(int dpy, int ndates, DATETIME *datetime)
       vdate = datetime[ndates-1].date;
       vtime = datetime[ndates-1].time;
       */
-
       vdate = datetime[ndates/2-1].date;
       vtime = datetime[ndates/2-1].time;
-      julval1 = encode_julval(dpy, vdate, vtime);
+      juldate1 = juldate_encode(calendar, vdate, vtime);
 
       vdate = datetime[ndates/2].date;
       vtime = datetime[ndates/2].time;
-      julval2 = encode_julval(dpy, vdate, vtime);
+      juldate2 = juldate_encode(calendar, vdate, vtime);
 
-      decode_julval(dpy, (julval1+julval2)/2, &vdate, &vtime);
+      seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+      juldatem = juldate_add_seconds(NINT(seconds), juldate1);
+      juldate_decode(calendar, juldatem, &vdate, &vtime);
     }
   else
     {
@@ -100,9 +102,9 @@ void *Runstat(void *argument)
   int *recVarID, *recLevelID;
   double missval;
   FIELD ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
-  DATETIME *datetime;
+  datetime_t *datetime;
   int taxisID1, taxisID2;
-  int calendar, dpy;
+  int calendar;
   int runstat_date = DATE_MIDDLE;
   char *envstr;
 
@@ -158,8 +160,6 @@ void *Runstat(void *argument)
 
   calendar = taxisInqCalendar(taxisID1);
 
-  dpy = calendar_dpy(calendar);
-
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
@@ -171,7 +171,7 @@ void *Runstat(void *argument)
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
-  datetime = (DATETIME *) malloc((ndates+1)*sizeof(DATETIME));
+  datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
   samp1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
   if ( operfunc == func_std || operfunc == func_var )
@@ -314,7 +314,7 @@ void *Runstat(void *argument)
 
       if ( runstat_date == DATE_MIDDLE )
 	{
-	  datetime_avg(dpy, ndates, datetime);
+	  datetime_avg(calendar, ndates, datetime);
 	}
       else if ( runstat_date == DATE_FIRST )
 	{

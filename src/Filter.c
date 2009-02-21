@@ -163,7 +163,6 @@ void *Filter(void *argument)
   int *vdate = NULL, *vtime = NULL;
   int tunit;
   int incperiod0, incunit0, incunit, dpy, calendar;
-  
   int vdate0=0, vtime0=0, year0, month0, day0, hour0, minute0, vdateold;
   double missval;
   double *array1, *array2;
@@ -193,8 +192,7 @@ void *Filter(void *argument)
 
   tunit = taxisInqTunit(taxisID1); 
   calendar = taxisInqCalendar(taxisID1);  
-  dpy = calendar_dpy(calendar);
- 
+  dpy = calendar_dpy(calendar); /* should be 365 !!! */
   
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
@@ -223,10 +221,6 @@ void *Filter(void *argument)
   decode_date(vdate[0], &year0, &month0, &day0);
   decode_time(vtime[0], &hour0, &minute0);
   
-  calendar = taxisInqCalendar(taxisID1);
-  dpy = calendar_dpy(calendar);          
-  tunit = taxisInqTunit(taxisID1);   
-  
   /*fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d  cal %i dpy %3i",
           year0, month0, day0, hour0, minute0, calendar, dpy);
   fprintf(stdout, "\n");*/
@@ -235,7 +229,8 @@ void *Filter(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       int deltay, deltam;
-      double julval0, julval, jdelta;
+      juldate_t juldate0, juldate;
+      double jdelta;
       int lperiod, incperiod;
       int year, month, day, hour, minute;
       if ( tsID >= nalloc )
@@ -299,10 +294,9 @@ void *Filter(void *argument)
       /* get and check time increment */                   
       if ( tsID > 0)
         {    
-          //dpy = 365;
-          julval0 = encode_julval(dpy, vdate[tsID-1], vtime[tsID-1]);        
-          julval  = encode_julval(dpy, vdate[tsID], vtime[tsID]);         
-          jdelta  = julval - julval0;
+          juldate0 = juldate_encode(calendar, vdate[tsID-1], vtime[tsID-1]);        
+          juldate  = juldate_encode(calendar, vdate[tsID], vtime[tsID]);         
+          jdelta  = juldate_to_seconds(juldate_sub(juldate, juldate0));
          
           lperiod = (long)(jdelta+0.5);
           incperiod = (int) lperiod;

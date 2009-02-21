@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -43,13 +43,13 @@ void *Intntime(void *argument)
   int vdate1, vtime1;
   int vdate2, vtime2;
   int offset;
-  int dpy, calendar;
+  int calendar;
   int numts, it;
   int year, month, day, hour, minute;
   int *recVarID, *recLevelID;
   int **nmiss1, **nmiss2, nmiss3;
   double missval1, missval2;
-  double julval1, julval2, julval;
+  juldate_t juldate1, juldate2, juldate;
   double fac1, fac2;
   double *array, *single1, *single2;
   double **vardata1, **vardata2, *vardatap;
@@ -102,14 +102,13 @@ void *Intntime(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   calendar = taxisInqCalendar(taxisID1);
-  dpy = calendar_dpy(calendar);
 
   tsID = 0;
   tsIDo = 0;
   nrecs = streamInqTimestep(streamID1, tsID++);
   vdate1 = taxisInqVdate(taxisID1);
   vtime1 = taxisInqVtime(taxisID1);
-  julval1 = encode_julval(dpy, vdate1, vtime1);
+  juldate1 = juldate_encode(calendar, vdate1, vtime1);
 
   taxisCopyTimestep(taxisID2, taxisID1);
   streamDefTimestep(streamID2, tsIDo++);
@@ -129,7 +128,7 @@ void *Intntime(void *argument)
     {
       vdate2 = taxisInqVdate(taxisID1);
       vtime2 = taxisInqVtime(taxisID1);
-      julval2 = encode_julval(dpy, vdate2, vtime2);
+      juldate2 = juldate_encode(calendar, vdate2, vtime2);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -146,15 +145,18 @@ void *Intntime(void *argument)
 
       for ( it = 1; it < numts; it++ )
 	{
-	  julval = julval1 + it*(julval2 - julval1)/numts;
-	  decode_julval(dpy, julval, &vdate, &vtime);
+	  double seconds;
+	  seconds = it * juldate_to_seconds(juldate_sub(juldate2, juldate1)) / numts;
+	  juldate = juldate_add_seconds(NINT(seconds), juldate1);
+
+	  juldate_decode(calendar, juldate, &vdate, &vtime);
 
 	  if ( cdoVerbose )
 	    {
 	      /*
-		cdoPrint("julval1 %f", julval1);
-		cdoPrint("julval  %f", julval);
-		cdoPrint("julval2 %f", julval2);
+		cdoPrint("juldate1 %f", juldate_to_seconds(juldate1));
+		cdoPrint("juldate  %f", juldate_to_seconds(juldate));
+		cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
 	      */
 	      decode_date(vdate, &year, &month, &day);
 	      decode_time(vtime, &hour, &minute);
@@ -166,8 +168,11 @@ void *Intntime(void *argument)
 	  taxisDefVtime(taxisID2, vtime);
 	  streamDefTimestep(streamID2, tsIDo++);
 
-	  fac1 = (julval2-julval) / (julval2-julval1);
-	  fac2 = (julval-julval1) / (julval2-julval1);
+	  fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
+	         juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	  fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
+	         juldate_to_seconds(juldate_sub(juldate2, juldate1));
+
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
 	      varID    = recVarID[recID];
@@ -238,7 +243,7 @@ void *Intntime(void *argument)
 
       vdate1 = vdate2;
       vtime1 = vtime2;
-      julval1 = julval2;
+      juldate1 = juldate2;
     }
 
   for ( varID = 0; varID < nvars; varID++ )

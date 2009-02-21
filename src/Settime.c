@@ -79,10 +79,10 @@ void *Settime(void *argument)
   int ijulinc = 0, incperiod = 0, incunit = 0;
   int year, month, day, hour, minute;
   int day0;
-  int dpy, calendar;
+  int calendar;
   int newcalendar = CALENDAR_STANDARD;
   const char *datestr, *timestr;
-  double julval = 0;
+  juldate_t juldate;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -223,10 +223,7 @@ void *Settime(void *argument)
 
   calendar = taxisInqCalendar(taxisID1);
 
-  dpy = calendar_dpy(calendar);
-
-  if ( cdoVerbose )
-    cdoPrint("calendar = %d;  dpy = %d", calendar, dpy);
+  if ( cdoVerbose ) cdoPrint("calendar = %d", calendar);
 
   if ( operatorID == SETREFTIME )
     {
@@ -279,7 +276,7 @@ void *Settime(void *argument)
       taxisDefTunit(taxisID2, tunit);
       taxisDefRdate(taxisID2, sdate);
       taxisDefRtime(taxisID2, stime);
-      julval = encode_julval(dpy, sdate, stime);
+      juldate = juldate_encode(calendar, sdate, stime);
     }
   else if ( operatorID == SETTUNITS )
     {
@@ -328,15 +325,15 @@ void *Settime(void *argument)
 		  while ( month <  1 ) { month += 12; year--; }
 
 		  if ( day0 == 31 )
-		    day = days_per_month(dpy, year, month);
+		    day = days_per_month(calendar, year, month);
 
 		  vdate = encode_date(year, month, day);
 		}
 	    }
 	  else
 	    {
-	      decode_julval(dpy, julval, &vdate, &vtime);
-	      julval += ijulinc;
+	      juldate_decode(calendar, juldate, &vdate, &vtime);
+	      juldate = juldate_add_seconds(ijulinc, juldate);
 	    }
 	}
       else if ( operatorID == SHIFTTIME )
@@ -357,12 +354,12 @@ void *Settime(void *argument)
 	    }
 	  else
 	    {
-	      julval = encode_julval(dpy, vdate, vtime);
-	      julval += ijulinc;
-	      decode_julval(dpy, julval, &vdate, &vtime);
+	      juldate = juldate_encode(calendar, vdate, vtime);
+	      juldate = juldate_add_seconds(ijulinc, juldate);
+	      juldate_decode(calendar, juldate, &vdate, &vtime);
 	      if ( cdoVerbose )
-		cdoPrint("julval, ijulinc, vdate, vtime: %g %d %d %d",
-			 julval, ijulinc, vdate, vtime);
+		cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d",
+			 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
 	    }
 	}
       else if ( operatorID == SETREFTIME )

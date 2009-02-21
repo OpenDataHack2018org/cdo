@@ -57,7 +57,7 @@ void *Ydrunpctl(void *argument)
   int *recVarID, *recLevelID;
   double missval;
   FIELD ***vars1 = NULL, **vars2[NDAY];
-  DATETIME *datetime;
+  datetime_t *datetime;
   int taxisID1, taxisID2, taxisID3, taxisID4;
   int calendar, dpy;
   int vdate, vtime;
@@ -127,7 +127,7 @@ void *Ydrunpctl(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
-  datetime = (DATETIME *) malloc((ndates+1)*sizeof(DATETIME));
+  datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
   
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
   

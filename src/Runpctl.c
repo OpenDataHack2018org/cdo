@@ -53,7 +53,7 @@ void *Runpctl(void *argument)
   int *recVarID, *recLevelID;
   double missval, val;
   FIELD ***vars1 = NULL;
-  DATETIME *datetime;
+  datetime_t *datetime;
   int taxisID1, taxisID2;
   int calendar, dpy;
   int pn;
@@ -95,7 +95,7 @@ void *Runpctl(void *argument)
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
-  datetime = (DATETIME *) malloc((ndates+1)*sizeof(DATETIME));
+  datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
   array = (double *) malloc(ndates*sizeof(double));
   

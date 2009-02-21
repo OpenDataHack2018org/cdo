@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@
 #include "interpol.h"
 
 
-int readnextpos(FILE *fp, double *julval, double *xpos, double *ypos)
+int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double *ypos)
 {
   int year, month, day, hour, minute;
   int date, time;
@@ -44,7 +44,7 @@ int readnextpos(FILE *fp, double *julval, double *xpos, double *ypos)
     {
       date = encode_date(year, month, day);
       time = encode_time(hour, minute);
-      *julval = encode_julval(0, date, time);
+      *juldate = juldate_encode(calendar, date, time);
     }
 
   return (stat);
@@ -67,7 +67,7 @@ void *Intgridtraj(void *argument)
   int offset;
   int nmiss;
   int *recVarID, *recLevelID;
-  double julval1, julval2, julval;
+  juldate_t juldate1, juldate2, juldate;
   double fac1, fac2;
   double point;
   double *array, *single1, *single2;
@@ -75,6 +75,7 @@ void *Intgridtraj(void *argument)
   double xpos, ypos;
   char *posfile;
   double missval;
+  int calendar = CALENDAR_STANDARD;
   FIELD field1, field2;
   FILE *fp;
 
@@ -87,7 +88,7 @@ void *Intgridtraj(void *argument)
   fp = fopen(posfile, "r");
   if ( fp == NULL ) cdoAbort("Open failed on %s!", posfile);
 
-  readnextpos(fp, &julval, &xpos, &ypos);
+  readnextpos(fp, calendar, &juldate, &xpos, &ypos);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -145,7 +146,7 @@ void *Intgridtraj(void *argument)
 
   tsID = 0;
   nrecs = streamInqTimestep(streamID1, tsID++);
-  julval1 = encode_julval(0, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+  juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for ( recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(streamID1, &varID, &levelID);
@@ -157,11 +158,11 @@ void *Intgridtraj(void *argument)
     }
 
   tsIDo = 0;
-  while ( julval1 <= julval )
+  while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
       nrecs = streamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
-      julval2 = encode_julval(0, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -177,19 +178,24 @@ void *Intgridtraj(void *argument)
 	  if ( nmiss ) cdoAbort("missing values unsupported for this operator!");
 	}
 
-      while ( julval < julval2 )
+      while ( juldate_to_seconds(juldate) < juldate_to_seconds(juldate2) )
 	{
-	  if ( julval >= julval1 && julval < julval2 )
+	  if ( juldate_to_seconds(juldate) >= juldate_to_seconds(juldate1) && 
+	       juldate_to_seconds(juldate) <  juldate_to_seconds(juldate2) )
 	    {
-	      decode_julval(0, julval, &vdate, &vtime);
+	      juldate_decode(calendar, juldate, &vdate, &vtime);
 	      taxisDefVdate(taxisID2, vdate);
 	      taxisDefVtime(taxisID2, vtime);
 	      streamDefTimestep(streamID2, tsIDo++);
 
-	      fac1 = (julval2-julval) / (julval2-julval1);
-	      fac2 = (julval-julval1) / (julval2-julval1);
+	      fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
+		     juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	      fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
+	   	     juldate_to_seconds(juldate_sub(juldate2, juldate1));
 	      /*
-	      printf("      %f %f %f %f %f\n", julval, julval1, julval2, fac1, fac2);
+	      printf("      %f %f %f %f %f\n", juldate_to_seconds(juldate),
+	                                       juldate_to_seconds(juldate1), 
+					       juldate_to_seconds(juldate2), fac1, fac2);
 	      */
 	      for ( recID = 0; recID < nrecs; recID++ )
 		{
@@ -219,12 +225,12 @@ void *Intgridtraj(void *argument)
 		  streamWriteRecord(streamID2, &point, nmiss);
 		}
 	    }
-	  if ( readnextpos(fp, &julval, &xpos, &ypos) == EOF ) break;
+	  if ( readnextpos(fp, calendar, &juldate, &xpos, &ypos) == EOF ) break;
 	  gridDefXvals(gridID2, &xpos);
 	  gridDefYvals(gridID2, &ypos);
 	}
 
-      julval1 = julval2;
+      juldate1 = juldate2;
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  vardatap        = vardata1[varID];

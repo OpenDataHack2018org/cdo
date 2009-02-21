@@ -149,12 +149,12 @@ extern "C" {
 
 /* CALENDAR types */
 
-#define  CALENDAR_STANDARD        0
-#define  CALENDAR_NONE            1
+#define  CALENDAR_STANDARD        0  /* don't change this value (used also in griblib)! */
+#define  CALENDAR_PROLEPTIC       1
 #define  CALENDAR_360DAYS         2
 #define  CALENDAR_365DAYS         3
 #define  CALENDAR_366DAYS         4
-#define  CALENDAR_PROLEPTIC       5
+#define  CALENDAR_NONE            5
 
 
 /* CDI control routines */

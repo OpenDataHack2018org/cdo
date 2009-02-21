@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -45,13 +45,13 @@ void *Inttime(void *argument)
   int vdate, vtime;
   int offset;
   int ijulinc, incperiod = 0, incunit = 3600;
-  int dpy, calendar;
+  int calendar;
   int year, month, day, hour, minute;
   int *recVarID, *recLevelID;
   int **nmiss1, **nmiss2, nmiss3;
   const char *datestr, *timestr;
   double missval1, missval2;
-  double julval1, julval2, julval;
+  juldate_t juldate1, juldate2, juldate;
   double fac1, fac2;
   double *array, *single1, *single2;
   double **vardata1, **vardata2, *vardatap;
@@ -147,20 +147,18 @@ void *Inttime(void *argument)
 
   calendar = taxisInqCalendar(taxisID1);
 
-  dpy = calendar_dpy(calendar);
-
-  julval = encode_julval(dpy, vdate, vtime);
+  juldate = juldate_encode(calendar, vdate, vtime);
 
   if ( cdoVerbose )
     {
       cdoPrint("date %d  time %d", vdate, vtime);
-      cdoPrint("julval  = %f", julval);
+      cdoPrint("juldate  = %f", juldate_to_seconds(juldate));
       cdoPrint("ijulinc = %d", ijulinc);
     }
 
   tsID = 0;
   nrecs = streamInqTimestep(streamID1, tsID++);
-  julval1 = encode_julval(dpy, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+  juldate1 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
   for ( recID = 0; recID < nrecs; recID++ )
     {
       streamInqRecord(streamID1, &varID, &levelID);
@@ -173,23 +171,23 @@ void *Inttime(void *argument)
   if ( cdoVerbose )
     {
       cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-      cdoPrint("julval1  = %f", julval1);
+      cdoPrint("juldate1  = %f", juldate_to_seconds(juldate1));
     }
 
-  if ( julval1 > julval )
+  if ( juldate_to_seconds(juldate1) > juldate_to_seconds(juldate) )
     cdoWarning("start time %d %d out of range!", vdate, vtime);
 
   tsIDo = 0;
-  while ( julval1 <= julval )
+  while ( juldate_to_seconds(juldate1) <= juldate_to_seconds(juldate) )
     {
       nrecs = streamInqTimestep(streamID1, tsID++);
       if ( nrecs == 0 ) break;
 
-      julval2 = encode_julval(dpy, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
+      juldate2 = juldate_encode(calendar, taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
       if ( cdoVerbose )
 	{
 	  cdoPrint("date %d  time %d", taxisInqVdate(taxisID1), taxisInqVtime(taxisID1));
-	  cdoPrint("julval2  = %f", julval2);
+	  cdoPrint("juldate2  = %f", juldate_to_seconds(juldate2));
 	}
 
       for ( recID = 0; recID < nrecs; recID++ )
@@ -205,31 +203,35 @@ void *Inttime(void *argument)
 	  streamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
 	}
 
-      while ( julval < julval2 )
+      while ( juldate_to_seconds(juldate) < juldate_to_seconds(juldate2) )
 	{
-	  if ( julval >= julval1 && julval < julval2 )
+	  if ( juldate_to_seconds(juldate) >= juldate_to_seconds(juldate1) &&
+	       juldate_to_seconds(juldate) <  juldate_to_seconds(juldate2) )
 	    {
-	      decode_julval(dpy, julval, &vdate, &vtime);
+	      juldate_decode(calendar, juldate, &vdate, &vtime);
 
 	      if ( cdoVerbose )
 		{
 		  /*
-		  cdoPrint("julval1 %f", julval1);
-		  cdoPrint("julval  %f", julval);
-		  cdoPrint("julval2 %f", julval2);
+		  cdoPrint("juldate1 %f", juldate_to_seconds(juldate1));
+		  cdoPrint("juldate  %f", juldate_to_seconds(juldate));
+		  cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
 		  */
 		  decode_date(vdate, &year, &month, &day);
 		  decode_time(vtime, &hour, &minute);
 		  cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d  %f  %d",
-			   year, month, day, hour, minute, julval, dpy);
+			   year, month, day, hour, minute, juldate_to_seconds(juldate), calendar);
 		}
 
 	      taxisDefVdate(taxisID2, vdate);
 	      taxisDefVtime(taxisID2, vtime);
 	      streamDefTimestep(streamID2, tsIDo++);
 
-	      fac1 = (julval2-julval) / (julval2-julval1);
-	      fac2 = (julval-julval1) / (julval2-julval1);
+	      fac1 = juldate_to_seconds(juldate_sub(juldate2, juldate)) / 
+		     juldate_to_seconds(juldate_sub(juldate2, juldate1));
+	      fac2 = juldate_to_seconds(juldate_sub(juldate, juldate1)) / 
+	   	     juldate_to_seconds(juldate_sub(juldate2, juldate1));
+
 	      for ( recID = 0; recID < nrecs; recID++ )
 		{
 		  varID    = recVarID[recID];
@@ -279,7 +281,7 @@ void *Inttime(void *argument)
 
 	  if ( incunit == 1 || incunit == 12 )
 	    {
-	      decode_julval(dpy, julval, &vdate, &vtime);
+	      juldate_decode(calendar, juldate, &vdate, &vtime);
 
 	      decode_date(vdate, &year, &month, &day);
 	      
@@ -290,15 +292,15 @@ void *Inttime(void *argument)
 
 	      vdate = encode_date(year, month, day);
 		
-	      julval = encode_julval(dpy, vdate, vtime);
+	      juldate = juldate_encode(calendar, vdate, vtime);
 	    }
 	  else
 	    {
-	      julval += ijulinc;
+	      juldate = juldate_add_seconds(ijulinc, juldate);
 	    }
 	}
 
-      julval1 = julval2;
+      juldate1 = juldate2;
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  vardatap        = vardata1[varID];

@@ -186,7 +186,7 @@ cdo_SOURCES = Arith.c		\
               fourier.c  	\
 	      specspace.c 	\
               readline.c  	\
-              julian.c  	\
+              juldate.c  	\
               vinterp.c		\
               zaxis.c  		\
 	      par_io.c 	        \

@@ -84,7 +84,7 @@ void *Ydrunstat(void *argument)
   int *recVarID, *recLevelID;
   double missval;
   FIELD ***vars1 = NULL, ***vars2 = NULL;
-  DATETIME *datetime;
+  datetime_t *datetime;
   int taxisID1, taxisID2;
   int calendar, dpy;
   int vdate, vtime;
@@ -131,7 +131,7 @@ void *Ydrunstat(void *argument)
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
-  datetime = (DATETIME *) malloc((ndates+1)*sizeof(DATETIME));
+  datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
   
   stats = ydstatCreate(vlistID1);
   vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));

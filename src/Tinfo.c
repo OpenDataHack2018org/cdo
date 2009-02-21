@@ -34,6 +34,7 @@
 #define MAX_GAPS  64
 #define MAX_NTSM 128
 
+enum {TU_SECONDS=0, TU_MINUTES, TU_HOURS, TU_DAYS, TU_MONTHS, TU_YEARS};
 char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
 int   iunits[] = {1, 60, 3600, 86400, 1, 12};
 
@@ -60,10 +61,10 @@ void printTunit(int unit)
 static
 void printCalendar(int calendar)
 {
-  if ( calendar == CALENDAR_STANDARD )
+  if      ( calendar == CALENDAR_STANDARD )
     fprintf(stdout, "  Calendar = STANDARD");
-  else if ( calendar == CALENDAR_NONE )
-    fprintf(stdout, "  Calendar = NONE");
+  else if ( calendar == CALENDAR_PROLEPTIC )
+    fprintf(stdout, "  Calendar = PROLEPTIC");
   else if ( calendar == CALENDAR_360DAYS )
     fprintf(stdout, "  Calendar = 360DAYS");
   else if ( calendar == CALENDAR_365DAYS )
@@ -83,37 +84,37 @@ void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incuni
   if ( lperiod/60 > 0 && lperiod/60 < 60 )
     {
       *incperiod = lperiod/60;
-      *incunit = 1;
+      *incunit = TU_MINUTES;
     }
   else if ( lperiod/3600 > 0 && lperiod/3600 < 24 )
     {
       *incperiod = lperiod/3600;
-      *incunit = 2;
+      *incunit = TU_HOURS;
     }
   else if ( lperiod/(3600*24) > 0 && lperiod/(3600*24) < 32 )
     {
       *incperiod = lperiod/(3600*24);
-      *incunit = 3;
+      *incunit = TU_DAYS;
       if ( *incperiod > 27 && deltam == 1 )
 	{
 	  *incperiod = 1;
-	  *incunit = 4;
+	  *incunit = TU_MONTHS;
 	}
     }
   else if ( lperiod/(3600*24*30) > 0 && lperiod/(3600*24*30) < 12 )
     {
       *incperiod = deltam;
-      *incunit = 4;
+      *incunit = TU_MONTHS;
     }
   else if ( lperiod/(3600*24*30*12) > 0 )
     {
       *incperiod = deltay;
-      *incunit = 5;
+      *incunit = TU_YEARS;
     }
 }
 
 static
-void printBounds(int taxisID, int dpy)
+void printBounds(int taxisID, int calendar)
 {
   int vdate0, vdate1;
   int vtime0, vtime1;
@@ -121,7 +122,8 @@ void printBounds(int taxisID, int dpy)
   int year1, month1, day1, hour1, minute1;
   INT64 lperiod;
   int incperiod = 0, incunit = 0;
-  double julval1 = 0, julval0 = 0, jdelta;
+  juldate_t juldate1, juldate0;
+  double jdelta;
   int deltam, deltay;
   int i, len;
 
@@ -137,10 +139,10 @@ void printBounds(int taxisID, int dpy)
   fprintf(stdout, "%6.4d-%2.2d-%2.2d %2.2d:%2.2d", year0, month0, day0, hour0, minute0);
   fprintf(stdout, "%6.4d-%2.2d-%2.2d %2.2d:%2.2d", year1, month1, day1, hour1, minute1);
 
-  julval0 = encode_julval(dpy, vdate0, vtime0);
-  julval1 = encode_julval(dpy, vdate1, vtime1);
-  jdelta  = julval1 - julval0;
-  lperiod = (INT64)(jdelta+0.5);
+  juldate0  = juldate_encode(calendar, vdate0, vtime0);
+  juldate1  = juldate_encode(calendar, vdate1, vtime1);
+  jdelta    = juldate_to_seconds(juldate_sub(juldate1, juldate0));
+  lperiod   = (INT64)(jdelta+0.5);
   incperiod = (int) lperiod;
 
   deltay = year1-year0;
@@ -165,7 +167,7 @@ void *Tinfo(void *argument)
   int vlistID;
   int year0, month0, day0, hour0, minute0;
   int year, month, day, hour, minute;
-  int calendar, unit, dpy;
+  int calendar, unit;
   int incperiod0 = 0, incunit0 = 0;
   int incperiod1 = 0, incunit1 = 0;
   INT64 lperiod;
@@ -176,7 +178,8 @@ void *Tinfo(void *argument)
   int rangetsm[MAX_GAPS][2];
   int vdatem[MAX_GAPS][MAX_NTSM];
   int vtimem[MAX_GAPS][MAX_NTSM];
-  double julval = 0, julval0 = 0, jdelta;
+  juldate_t juldate, juldate0;
+  double jdelta;
   int i, len;
 	  
 
@@ -224,8 +227,6 @@ void *Tinfo(void *argument)
 
       calendar = taxisInqCalendar(taxisID);
 
-      dpy = calendar_dpy(calendar);
-
       if ( taxisHasBounds(taxisID) ) 
 	fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement  YYYY-MM-DD hh:mm  YYYY-MM-DD hh:mm  Difference\n");
       else
@@ -248,10 +249,10 @@ void *Tinfo(void *argument)
 	      decode_date(vdate0, &year0, &month0, &day0);
 	      decode_time(vtime0, &hour0, &minute0);
 
-	      julval0 = encode_julval(dpy, vdate0, vtime0);
-	      julval  = encode_julval(dpy, vdate, vtime);
-	      jdelta  = julval - julval0;
-	      lperiod = (INT64)(jdelta+0.5);
+	      juldate0  = juldate_encode(calendar, vdate0, vtime0);
+	      juldate   = juldate_encode(calendar, vdate, vtime);
+	      jdelta    = juldate_to_seconds(juldate_sub(juldate, juldate0));
+	      lperiod   = (INT64)(jdelta+0.5);
 	      incperiod = (int) lperiod;
 
 	      deltay = year-year0;
@@ -268,7 +269,7 @@ void *Tinfo(void *argument)
 	      fprintf(stdout, "   --------");
 	    }
 
-	  if ( taxisHasBounds(taxisID) ) printBounds(taxisID, dpy);
+	  if ( taxisHasBounds(taxisID) ) printBounds(taxisID, calendar);
 
 	  if ( tsID > 1 )
 	    {
@@ -276,12 +277,16 @@ void *Tinfo(void *argument)
 		{
 		  int ndate, ntime;
 		  int ijulinc = incperiod0 * iunits[incunit0];
+		  /*
+		  printf("%d %s changed to %d %s\n", 
+			 incperiod0, tunits[incunit0], incperiod, tunits[incunit]);
+		  */
 		  if ( ngaps < MAX_GAPS )
 		    {
 		      rangetsm[ngaps][0] = tsID;
 		      rangetsm[ngaps][1] = tsID+1;
 
-		      if ( incunit0 == 4 || incunit0 == 5 )
+		      if ( incunit0 == TU_MONTHS || incunit0 == TU_YEARS )
 			{
 			  its = 0;
 			  ndate = vdate0;
@@ -295,7 +300,7 @@ void *Tinfo(void *argument)
 			      while ( month <  1 ) { month += 12; year--; }
 			      
 			      if ( day0 == 31 )
-				day = days_per_month(dpy, year, month);
+				day = days_per_month(calendar, year, month);
 
 			      ndate = encode_date(year, month, day);
 			      ntime = vtime0;
@@ -312,12 +317,11 @@ void *Tinfo(void *argument)
 		      else
 			{
 			  its = 0;
-			  julval0 += ijulinc;
-			  while ( julval0 < julval )
+			  juldate0 = juldate_add_seconds(ijulinc, juldate0);
+			  while ( juldate_to_seconds(juldate0) < juldate_to_seconds(juldate) )
 			    {
-			      decode_julval(dpy, julval0, &ndate, &ntime);
-			      julval0 += ijulinc;
-			      /* printf("\n2 %d %d %g %d\n", ndate, ntime, julval0, ijulinc); */
+			      juldate_decode(calendar, juldate0, &ndate, &ntime);
+			      juldate0 = juldate_add_seconds(ijulinc, juldate0);
 			      if ( its < MAX_NTSM )
 				{
 				  vdatem[ngaps][its] = ndate;

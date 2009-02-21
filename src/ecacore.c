@@ -92,7 +92,7 @@ void eca1(const ECA_REQUEST_1 *request)
   itaxisID = vlistInqTaxis(ivlistID);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -459,7 +459,7 @@ void eca2(const ECA_REQUEST_2 *request)
   itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -826,7 +826,7 @@ void eca3(const ECA_REQUEST_3 *request)
   itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -1036,7 +1036,7 @@ void eca4(const ECA_REQUEST_4 *request)
   itaxisID = vlistInqTaxis(ivlistID1);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_STANDARD);
+  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);

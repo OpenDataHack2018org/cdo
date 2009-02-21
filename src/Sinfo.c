@@ -542,10 +542,10 @@ void *Sinfo(void *argument)
 		  calendar = taxisInqCalendar(taxisID);
 		  if ( calendar != CDI_UNDEFID )
 		    {
-		      if ( calendar == CALENDAR_STANDARD )
+		      if      ( calendar == CALENDAR_STANDARD )
 			fprintf(stdout, "  Calendar = STANDARD");
-		      else if ( calendar == CALENDAR_NONE )
-			fprintf(stdout, "  Calendar = NONE");
+		      else if ( calendar == CALENDAR_PROLEPTIC )
+			fprintf(stdout, "  Calendar = PROLEPTIC");
 		      else if ( calendar == CALENDAR_360DAYS )
 			fprintf(stdout, "  Calendar = 360DAYS");
 		      else if ( calendar == CALENDAR_365DAYS )

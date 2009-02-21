@@ -123,17 +123,26 @@ int ntr2nlat(int ntr);
 int ntr2nlat_linear(int ntr);
 int compNlon(int nlat);
 
+
 typedef struct {
-  int      date;
-  int      time;
-  int      julval;
-}
-DATETIME;
+  int   date;
+  int   time;
+} datetime_t;
 
-void    datetime_avg(int dpy, int ndates, DATETIME *datetime);
 
-double encode_julval(int dpy, int date, int time);
-void decode_julval(int dpy, double value, int *date, int *time);
+typedef struct {
+  int   julday;
+  int   secofday;
+} juldate_t;
+
+
+juldate_t juldate_encode(int calendar, int date, int time);
+void      juldate_decode(int calendar, juldate_t juldate, int *date, int *time);
+juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
+juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
+double    juldate_to_seconds(juldate_t juldate);
+
+void    datetime_avg(int dpy, int ndates, datetime_t *datetime);
 
 int     days_per_month(int calendar, int year, int month);
 int     days_per_year(int calendar, int year);
