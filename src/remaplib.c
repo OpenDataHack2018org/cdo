@@ -97,7 +97,7 @@ double intlin(double x, double y1, double x1, double y2, double x2);
 extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
 
-void remapGridFree(REMAPGRID *rg)
+void remapGridFree(remapgrid_t *rg)
 {
   static char func[] = "remapGridFree";
 
@@ -138,7 +138,7 @@ void remapGridFree(REMAPGRID *rg)
 
 /*****************************************************************************/
 
-void remapVarsFree(REMAPVARS *rv)
+void remapVarsFree(remapvars_t *rv)
 {
   static char func[] = "remapVarsFree";
   int i;
@@ -257,7 +257,7 @@ void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corn
 
 /*****************************************************************************/
 
-void remapGridInitPointer(REMAPGRID *rg)
+void remapGridInitPointer(remapgrid_t *rg)
 {
   rg->pinit = TRUE;
 
@@ -294,7 +294,7 @@ void remapGridInitPointer(REMAPGRID *rg)
 
 /*****************************************************************************/
 
-void remapGridRealloc(int map_type, REMAPGRID *rg)
+void remapGridRealloc(int map_type, remapgrid_t *rg)
 {
   static char func[] = "remapGridRealloc";
   int nalloc;
@@ -472,7 +472,7 @@ void boundbox_from_center(int lonIsCyclic, int size, int nx, int ny, double *cen
 
 /*****************************************************************************/
 
-void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REMAPGRID *rg)
+void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg)
 {
   static char func[] = "remapGridInit";
   char units[128];
@@ -1237,7 +1237,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REM
     This routine initializes some variables and provides an initial
     allocation of arrays (fairly large so frequent resizing unnecessary).
 */
-void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
+void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 {
   static char func[] = "remapVarsInit";
   int i;
@@ -1296,7 +1296,7 @@ void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv)
    This routine resizes remapping arrays by increasing(decreasing)
    the max_links by increment
 */
-void resize_remap_vars(REMAPVARS *rv, int increment)
+void resize_remap_vars(remapvars_t *rv, int increment)
 {
   static char func[] = "resize_remap_vars";
   /*
@@ -1331,7 +1331,7 @@ void resize_remap_vars(REMAPVARS *rv, int increment)
 void remap(double *dst_array, double missval, int dst_size, int num_links, double **map_wts, int num_wts,
 	   int *dst_add, int *src_add, 
 	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
-	   REMAPLINK links)
+	   remaplink_t links)
 {
   /*
     Input arrays:
@@ -1632,7 +1632,7 @@ void remap_set_max_iter(int max_iter)
    interpolation.
 */
 static
-void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons, 
+void grid_search(remapgrid_t *rg, int *src_add, double *src_lats, double *src_lons, 
 		 double plat, double plon, int *src_grid_dims,
 		 double *src_center_lat, double *src_center_lon,
 		 double *src_grid_bound_box, int *src_bin_add)
@@ -1896,7 +1896,7 @@ void grid_search(REMAPGRID *rg, int *src_add, double *src_lats, double *src_lons
   and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
+void store_link_bilin(remapvars_t *rv, int dst_add, int *src_add, double *weights)
 {
   /*
     Input variables:
@@ -1934,7 +1934,7 @@ void store_link_bilin(REMAPVARS *rv, int dst_add, int *src_add, double *weights)
 
   -----------------------------------------------------------------------
 */
-void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
+void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
   int dst_add;        /*  destination addresss */
@@ -2129,7 +2129,7 @@ void remap_bilin(REMAPGRID *rg, REMAPVARS *rv)
   and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bicub(REMAPVARS *rv, int dst_add, int *src_add, double weights[4][4])
+void store_link_bicub(remapvars_t *rv, int dst_add, int *src_add, double weights[4][4])
 {
   /*
     Input variables:
@@ -2168,7 +2168,7 @@ void store_link_bicub(REMAPVARS *rv, int dst_add, int *src_add, double weights[4
 
   -----------------------------------------------------------------------
 */
-void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
+void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
   int n,icount;
@@ -2387,7 +2387,7 @@ void remap_bicub(REMAPGRID *rg, REMAPVARS *rv)
    point and computes a distance to each of the neighbors.
 */
 static
-void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
+void grid_search_nbr(remapgrid_t *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
 		     double coslat_dst, double coslon_dst, double sinlat_dst, double sinlon_dst,
 		     int *src_bin_add,
 		     double *sinlat, double *coslat, double *sinlon, double *coslon)
@@ -2529,7 +2529,7 @@ void grid_search_nbr(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat,
   arrays if necessary.
 */
 static
-void store_link_nbr(REMAPVARS *rv, int add1, int add2, double weights)
+void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 {
   /*
     Input variables:
@@ -2563,7 +2563,7 @@ void store_link_nbr(REMAPVARS *rv, int add1, int add2, double weights)
 
   -----------------------------------------------------------------------
 */
-void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
+void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 {
   static char func[] = "remap_distwgt";
 
@@ -2697,7 +2697,7 @@ void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv)
    point and computes a distance to each of the neighbors.
 */
 static
-void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
+void grid_search_nbr1(remapgrid_t *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
 		      double coslat_dst, double coslon_dst, double sinlat_dst, double sinlon_dst,
 		      int *src_bin_add, 
                       double *sinlat, double *coslat, double *sinlon, double *coslon)
@@ -2822,7 +2822,7 @@ void grid_search_nbr1(REMAPGRID *rg, int *nbr_add, double *nbr_dist, double plat
   arrays if necessary.
 */
 static
-void store_link_nbr1(REMAPVARS *rv, int add1, int add2, double weights)
+void store_link_nbr1(remapvars_t *rv, int add1, int add2, double weights)
 {
   /*
     Input variables:
@@ -2856,7 +2856,7 @@ void store_link_nbr1(REMAPVARS *rv, int add1, int add2, double weights)
 
   -----------------------------------------------------------------------
 */
-void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv)
+void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 {
   static char func[] = "remap_distwgt";
 
@@ -3956,7 +3956,7 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
     arrays if necessary.
 */
 static
-void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
+void store_link_cnsrv(remapvars_t *rv, int add1, int add2, double *weights,
 		      int *link_add1[2], int *link_add2[2])
 {
   /*
@@ -4068,7 +4068,7 @@ void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
   -----------------------------------------------------------------------
 */
 #define MASK_TYPE  char
-void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
+void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 {
   static char func[] = "remap_conserv";
 
@@ -5082,7 +5082,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
 /*****************************************************************************/
 
-void remap_stat(int remap_order, REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval)
+void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, double *array1, double *array2, double missval)
 {
   static char func[] = "remap_stat";
   int n, ns, i;
@@ -5205,7 +5205,7 @@ void remap_stat(int remap_order, REMAPGRID rg, REMAPVARS rv, double *array1, dou
 
 /*****************************************************************************/
 
-void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
+void remap_gradients(remapgrid_t rg, double *array, double *grad1_lat,
 		     double *grad1_lon, double *grad1_latlon)
 {
   static char func[] = "remap_gradients";
@@ -5620,7 +5620,7 @@ void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights
 
 /*****************************************************************************/
 
-void reorder_links(REMAPVARS *rv)
+void reorder_links(remapvars_t *rv)
 {
   static char func[] = "reorder_links";
   int j, nval = 0, num_blks = 0;
@@ -5716,7 +5716,7 @@ static void nce(int istat)
 
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
-		       int remap_order, REMAPGRID rg, REMAPVARS rv)
+		       int remap_order, remapgrid_t rg, remapvars_t rv)
 {
   /*
     Writes remap data to a netCDF file using SCRIP conventions
@@ -6043,7 +6043,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
 /*****************************************************************************/
 
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
-		      int *remap_order, REMAPGRID *rg, REMAPVARS *rv)
+		      int *remap_order, remapgrid_t *rg, remapvars_t *rv)
 {
   /*
     The routine reads a netCDF file to extract remapping info

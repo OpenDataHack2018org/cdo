@@ -74,7 +74,7 @@ typedef struct {
   double  *bin_lats;        /* min,max latitude for each search bin   */
   double  *bin_lons;        /* min,max longitude for each search bin  */
 }
-REMAPGRID;
+remapgrid_t;
 
 typedef struct {
   int   option;
@@ -85,7 +85,7 @@ typedef struct {
   int **dst_add;
   int **w_index;
 }
-REMAPLINK;
+remaplink_t;
 
 typedef struct {
   int   pinit;            /* TRUE if the pointers are initialized     */
@@ -101,53 +101,53 @@ typedef struct {
 
   double *wts[4];         /* map weights for each link [max_links][num_wts] */
 
-  REMAPLINK  links;
+  remaplink_t  links;
 }
-REMAPVARS;
+remapvars_t;
 
 typedef struct {
   int gridID;
   int gridsize;
   int nmiss;
-  REMAPGRID grid;
-  REMAPVARS vars;
+  remapgrid_t grid;
+  remapvars_t vars;
 }
 REMAP;
 
 void remap_set_max_iter(int max_iter);
 
-void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, REMAPGRID *rg);
-void remapVarsInit(int map_type, REMAPGRID *rg, REMAPVARS *rv);
+void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg);
+void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv);
 
-void remapVarsFree(REMAPVARS *rv);
-void remapGridFree(REMAPGRID *rg);
+void remapVarsFree(remapvars_t *rv);
+void remapGridFree(remapgrid_t *rg);
 
 void remap(double *dst_array, double missval, int dst_size, int dst_array_dim,
 	   double **map_wts, int map_wts_dim,
 	   int *dst_add, int *src_add, 
 	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
-	   REMAPLINK links);
+	   remaplink_t links);
 
 void remap_laf(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
 	       int *dst_add, int *src_add, double *src_array);
 
-void remap_bilin(REMAPGRID *rg, REMAPVARS *rv);
-void remap_bicub(REMAPGRID *rg, REMAPVARS *rv);
-void remap_conserv(REMAPGRID *rg, REMAPVARS *rv);
-void remap_distwgt(REMAPGRID *rg, REMAPVARS *rv);
-void remap_distwgt1(REMAPGRID *rg, REMAPVARS *rv);
+void remap_bilin(remapgrid_t *rg, remapvars_t *rv);
+void remap_bicub(remapgrid_t *rg, remapvars_t *rv);
+void remap_conserv(remapgrid_t *rg, remapvars_t *rv);
+void remap_distwgt(remapgrid_t *rg, remapvars_t *rv);
+void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv);
 
-void resize_remap_vars(REMAPVARS *rv, int increment);
+void resize_remap_vars(remapvars_t *rv, int increment);
 
-void remap_stat(int remap_order, REMAPGRID rg, REMAPVARS rv, double *array1, double *array2, double missval);
-void remap_gradients(REMAPGRID rg, double *array, double *grad1_lat,
+void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, double *array1, double *array2, double missval);
+void remap_gradients(remapgrid_t rg, double *array, double *grad1_lat,
 		     double *grad1_lon, double *grad1_latlon);
 
-void reorder_links(REMAPVARS *rv);
+void reorder_links(remapvars_t *rv);
 
 void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights);
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
-		       int remap_order, REMAPGRID rg, REMAPVARS rv);
+		       int remap_order, remapgrid_t rg, remapvars_t rv);
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
-		      int *remap_order, REMAPGRID *rg, REMAPVARS *rv);
+		      int *remap_order, remapgrid_t *rg, remapvars_t *rv);
