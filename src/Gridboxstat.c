@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -185,7 +185,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 	  gridInqYbounds(gridID1, grid1_corner_lat);
 	}
       
-      // Process grid2 bounds
+      /* Process grid2 bounds */
       area_norm = xinc*yinc;
       for ( y2 = 0; y2 < nlat2; y2++ )
         {
@@ -217,7 +217,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                           xvals2_0 = xvals1[g1_add];
                           xvals2[g2_add] += xvals1[g1_add]/area_norm;                        
                         }
-                      else if (abs(xvals1[g1_add] - xvals2_0) > 270. )
+                      else if ( fabs(xvals1[g1_add] - xvals2_0) > 270. )
                         {
                           if ( (xvals1[g1_add] - xvals2_0) > 270. )
                             xvals2[g2_add] += (xvals1[g1_add]-360.)/area_norm;
@@ -230,7 +230,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 
 		      if ( gridHasBounds )
 			{
-			  // upper left cell
+			  /* upper left cell */
 			  if ( y1 == y2*yinc && x1 == x2*xinc)
 			    {
 			      for ( corner = 0; corner < 4; corner++ )
@@ -243,7 +243,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 				}
 			    }
                       
-			  // upper right cell
+			  /* upper right cell */
 			  if ( ( y1 == y2*yinc ) && ( x1 == (x2+1)*xinc - 1 ) )
 			    {    
 			      for ( corner = 0; corner < 4; corner++ )
@@ -256,7 +256,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 				}
 			    }
                       
-			  // lower right cell
+			  /* lower right cell */
 			  if ( ( y1 == (y2+1)*yinc -1 ) && (x1 == (x2+1)*xinc -1) )
 			    {
 			      for ( corner = 0; corner < 4; corner ++ )
@@ -269,7 +269,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 				}
 			    }
                       
-			  // lower left cell
+			  /* lower left cell */
 			  if ( ( y1 == (y2+1)*yinc -1 ) && ( x1 == x2*xinc ) )
 			    {    
 			      for ( corner = 0; corner < 4; corner ++ )
@@ -287,16 +287,16 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
               
 	      if ( gridHasBounds )
 		{
-		  // upper left corner
+		  /* upper left corner */
 		  grid2_corner_lon[4*g2_add+3] = on_up;
 		  grid2_corner_lat[4*g2_add+3] = ax_le;
-		  // upper right corner
+		  /* upper right corner */
 		  grid2_corner_lon[4*g2_add+2] = ox_up;
 		  grid2_corner_lat[4*g2_add+2] = ax_ri;
-		  // lower right corner
+		  /* lower right corner */
 		  grid2_corner_lon[4*g2_add+1] = ox_lo;
 		  grid2_corner_lat[4*g2_add+1] = an_ri;
-		  // lower left corner
+		  /* lower left corner */
 		  grid2_corner_lon[4*g2_add+0] = on_lo;
 		  grid2_corner_lat[4*g2_add+0] = an_le;
 		}
@@ -306,7 +306,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
             }
         }
       
-      //write grid
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
 

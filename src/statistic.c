@@ -9,6 +9,15 @@
 #include "cdo_int.h"
 #include "statistic.h"
 
+#ifndef  M_2_SQRTPI
+#define  M_2_SQRTPI	1.12837916709551257390	/* 2/sqrt(pi) */
+#endif
+
+#ifndef  M_SQRT2
+#define  M_SQRT2	1.41421356237309504880	/* sqrt(2) */
+#endif
+
+
 void make_symmetric_matrix_triangular (double **a, int n,
 				       double *d, double *e, const char *prompt);
 double pythagoras (double a, double b);

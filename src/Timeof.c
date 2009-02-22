@@ -37,7 +37,7 @@ void *Timeof(void *argument)
   int gridsize;
   int vdate = 0, vtime = 0;
   int nrecs, nvars, nlevs ;
-  int i, j, i1, i2;
+  int i, ii, j, i1, i2;
   int nmiss;
   int tsID;
   int varID, recID, levelID, gridID;
@@ -134,8 +134,10 @@ void *Timeof(void *argument)
           fwork[varID][levelID].nmiss   = 0;
           fwork[varID][levelID].missval = missval;
           fwork[varID][levelID].ptr     = (double *) malloc(gridsize*gridsize*sizeof(double));
+	  for ( i = 0; i < gridsize*gridsize; ++i )
+	    fwork[varID][levelID].ptr[i] = missval;
+
           iwork[varID][levelID] = (int *) malloc(gridsize*gridsize*sizeof(int));
-          memset(fwork[varID][levelID].ptr, missval, gridsize*gridsize*sizeof(double));
           memset(iwork[varID][levelID], 0, gridsize*gridsize*sizeof(int)); 
           
           o[varID][levelID] = (FIELD *) malloc(gridsize*sizeof(FIELD));
@@ -146,7 +148,8 @@ void *Timeof(void *argument)
               o[varID][levelID][i].nmiss  = 0;
               o[varID][levelID][i].missval= missval;
               o[varID][levelID][i].ptr    = (double *)malloc(gridsize*sizeof(double));
-              memset(o[varID][levelID][i].ptr, missval, gridsize*sizeof(double));
+	      for ( ii = 0; ii < gridsize; ++ii )
+		o[varID][levelID][i].ptr[ii] = missval;
               
               o2[varID][levelID][i].grid    = gridID3;
               o2[varID][levelID][i].nmiss   = 0;
@@ -164,7 +167,6 @@ void *Timeof(void *argument)
       if ( reached_eof ) continue;
       
       nrecs = streamInqTimestep(streamID1, tsID);
-      //printf("nrecs %i\n",nrecs);
       if ( nrecs == 0 )
         {
           reached_eof = 1;
@@ -196,7 +198,7 @@ void *Timeof(void *argument)
                     }
                 }              
             }	   
-          // creater lower triangular of covariance matrix;
+          /* creater lower triangular of covariance matrix; */
           for (i=0;i<gridsize;i++)
             for(i2=0;i2<i;i2++)
               {
@@ -217,8 +219,9 @@ void *Timeof(void *argument)
         {
           double **cov;
           double *eigv;
-          npack = 0;
           int i2;
+
+          npack = 0;
           sum_w = 0;
           memset(pack, 0, gridsize*sizeof(int));
           for ( i = 0; i < gridsize; i++ )
@@ -244,7 +247,7 @@ void *Timeof(void *argument)
                 if ( iwork[varID][levelID][i1*gridsize+i2] )
                   {                    
                     cov[i1][i2] = fwork[varID][levelID].ptr[pack[i2]*gridsize+pack[i1]];                                   
-                    // weight and normalize the covariances 
+                    /* weight and normalize the covariances */
                     cov[i1][i2] *= sqrt (w[pack[i1]]) * sqrt (w[pack[i2]]) / sum_w / (iwork[varID][levelID][i1*gridsize+i2] - 1);
                   }
             }   
@@ -260,7 +263,7 @@ void *Timeof(void *argument)
           
           
           eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], npack, func);
-          // cov contains the eigenvectors, eigv the eigenvalues
+          /* cov contains the eigenvectors, eigv the eigenvalues */
           for (i=0;i<npack;i++)
             {             
               for (j=0;j<npack;j++)
@@ -275,12 +278,12 @@ void *Timeof(void *argument)
   
   for ( tsID=0; tsID<npack; tsID++ )
     {
-      taxisDefVdate(taxisID3, 0.0); 
-      taxisDefVtime(taxisID3, 0.0);
+      taxisDefVdate(taxisID3, 0); 
+      taxisDefVtime(taxisID3, 0);
       streamDefTimestep(streamID3, tsID); 
      
-      taxisDefVdate(taxisID2, 0.0);
-      taxisDefVtime(taxisID2, 0.0);  
+      taxisDefVdate(taxisID2, 0);
+      taxisDefVtime(taxisID2, 0);  
       streamDefTimestep(streamID2, tsID); 
        
       for ( varID = 0; varID < nvars; varID++ )

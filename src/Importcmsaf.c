@@ -104,7 +104,7 @@ void get_grid_info(double c0, double re, int *nrxp, int *nryp,
   phi=pi/2.;
   s90= re/c *sin(phi) / cos(30.*pi/180.);
 
-  nry=floor(s90);
+  nry=(int)floor(s90);
   /* central index in latitude */
   s0=nry+0.5;
   /* number of latitude pixels */

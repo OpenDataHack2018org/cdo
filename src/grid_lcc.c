@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifndef  M_PI
+#define  M_PI		3.14159265358979323846	/* pi */
+#endif
+
 int W3FB12(double xi, double xj, double alat1, double elon1, double dx,
 	   double elonv, double alatan, double *alat, double *elon)
 {

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,7 @@
 #define PI2 6.2832
 #define HALF 0.5
 
-// FAST FOURIER TRANSFORMATION (bare)
+/* FAST FOURIER TRANSFORMATION (bare) */
 void fft2(double *real, double *imag, const int n, const int isign)
 {
   int nn, mmax, m, j, istep, i;
@@ -46,17 +46,17 @@ void fft2(double *real, double *imag, const int n, const int isign)
   nn = n << 1;
   j = 1;
   
-  //BIT Reversion of data
+  /* BIT Reversion of data */
   for ( i=1; i<nn; i+=2 )
     {
       if ( j > i ) 
         {        
-          //swap real part
+          /* swap real part */
           tmp = real[j/2]; 
           real[j/2] = real[i/2];          
           real[i/2] = tmp;                    
           
-          //swap imaginary part
+          /* swap imaginary part */
           tmp = imag[j/2]; 
           imag[j/2] = imag[i/2];
           imag[i/2] = tmp;         
@@ -70,7 +70,7 @@ void fft2(double *real, double *imag, const int n, const int isign)
       j += m;
     }
   
-  //Danielson-Lanzcos algorithm
+  /* Danielson-Lanzcos algorithm */
   mmax = 2;
   while ( nn > mmax )
     {
@@ -107,7 +107,7 @@ void fft2(double *real, double *imag, const int n, const int isign)
 }
 
 
-/*include from Tinfo.c*/
+/* include from Tinfo.c */
 void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incunit);
 
 void create_fmasc(const int nts, const double fdata, const double fmin, const double fmax, int *fmasc)
@@ -118,9 +118,8 @@ void create_fmasc(const int nts, const double fdata, const double fmin, const do
   dimin = nts*fmin / fdata;
   dimax = nts*fmax / fdata;
  
-  imin = dimin<0? 0 : floor(dimin);  
-  imax = ceil(dimax)>nts/2? nts/2 : ceil(dimax);  
-  //fprintf(stderr, "%7.5f %7.5f %5i %5i %7.5f\n", fmin, fmax, imin, imax, fdata);
+  imin = dimin<0 ? 0 : (int)floor(dimin);  
+  imax = ceil(dimax)>nts/2 ? nts/2 : (int) ceil(dimax);  
   
   fmasc[imin] = 1;
   for ( i = imin+1; i <= imax; i++ )  
@@ -131,7 +130,6 @@ void create_fmasc(const int nts, const double fdata, const double fmin, const do
 void filter(const int nts, const int *fmasc, double *array1, double *array2)
 {  
   int i;
-  double sum=0;
 
   fft2(&array1[0], &array2[0], nts, 1);
   for ( i = 0; i < nts; i++ )
@@ -166,7 +164,7 @@ void *Filter(void *argument)
   int vdate0=0, vtime0=0, year0, month0, day0, hour0, minute0, vdateold;
   double missval;
   double *array1, *array2;
-  double fdata;
+  double fdata = 0;
   FIELD ***vars = NULL;
   double fmin, fmax;
   int *fmasc;
@@ -328,11 +326,11 @@ void *Filter(void *argument)
   /*  round up nts to next power of two for (better) performance 
    ** of fast fourier transformation */
   nts2 = nts-1;
-  nts2 |= nts2 >> 1;  // handle  2 bit numbers
-  nts2 |= nts2 >> 2;  // handle  4 bit numbers
-  nts2 |= nts2 >> 4;  // handle  8 bit numbers
-  nts2 |= nts2 >> 8;  // handle 16 bit numbers
-  nts2 |= nts2 >> 16; // handle 32 bit numbers
+  nts2 |= nts2 >> 1;  /* handle  2 bit numbers */
+  nts2 |= nts2 >> 2;  /* handle  4 bit numbers */
+  nts2 |= nts2 >> 4;  /* handle  8 bit numbers */
+  nts2 |= nts2 >> 8;  /* handle 16 bit numbers */
+  nts2 |= nts2 >> 16; /* handle 32 bit numbers */
   nts2++;
   
   array1 = (double *) malloc(nts2*sizeof(double));
@@ -385,7 +383,7 @@ void *Filter(void *argument)
                   if ( i < gridsize - 1 )                 
                     array2[tsID] = vars[tsID][varID][levelID].ptr[i+1];
                 }
-              // zero padding up to next power of to
+              /* zero padding up to next power of to */
               for ( tsID = nts; tsID < nts2; tsID++ )                
                 {
                   array1[tsID]=0;       

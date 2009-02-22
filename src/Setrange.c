@@ -55,7 +55,6 @@ void *Setrange(void *argument)
   int vlistID1, vlistID2;
   int nmiss;
   int i;
-  //  double missval, missval2 = 0;
   double missval;
   double rmin = 0, rmax = 0;
   double *array;

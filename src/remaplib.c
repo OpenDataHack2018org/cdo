@@ -4067,7 +4067,7 @@ void store_link_cnsrv(REMAPVARS *rv, int add1, int add2, double *weights,
 
   -----------------------------------------------------------------------
 */
-#define MASK_TYPE  int
+#define MASK_TYPE  char
 void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 {
   static char func[] = "remap_conserv";
@@ -4098,6 +4098,7 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int lrevers;          /* flag for reversing direction of segment */
   int lbegin;           /* flag for first integration of a segment */
 
+  int lmask;
   MASK_TYPE *srch_mask;      /* mask for restricting searches */
 #if defined (_OPENMP)
   MASK_TYPE **srch_mask2;
@@ -4139,6 +4140,14 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   int avoid_pole_count = 0;         /* count attempts to avoid pole  */
   double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
 
+#define REMAP_CON_FAST 1
+#ifdef REMAP_CON_FAST
+  int *grid1_bound_box;
+  int *grid2_bound_box;
+  int    bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
+#else
+  double bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
+#endif
 
   if ( cdoVerbose )
     {
@@ -4153,6 +4162,17 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
   grid1_corners = rg->grid1_corners;
   grid2_corners = rg->grid2_corners;
+
+#ifdef REMAP_CON_FAST
+  grid1_bound_box = (int *) malloc(4*grid1_size*sizeof(int));
+  grid2_bound_box = (int *) malloc(4*grid2_size*sizeof(int));
+
+  for ( n = 0; n < 4*grid1_size; ++n )
+    grid1_bound_box[n] = (int) (0.5+100000000*rg->grid1_bound_box[n]);
+
+  for ( n = 0; n < 4*grid2_size; ++n )
+    grid2_bound_box[n] = (int) (0.5+100000000*rg->grid2_bound_box[n]);
+#endif
 
   link_add1[0] = (int *) malloc(grid1_size*sizeof(int));
   link_add1[1] = (int *) malloc(grid1_size*sizeof(int));
@@ -4222,12 +4242,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(grid1_centroid_lon, grid1_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, \
+         grid1_bound_box, grid2_bound_box, \
 	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, func, srch_mask2, lwarn) \
-  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, \
+  private(ompthID, lmask, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, \
 	  grid1_add, grid2_add, grid2_addm4, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_add, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
-	  last_loc, lcoinc) \
+	  last_loc, lcoinc, bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2) 	\
   firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)	\
   schedule(dynamic,1)
 #endif
@@ -4251,21 +4272,35 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
       /* Further restrict searches using bounding boxes */
 
+#ifdef REMAP_CON_FAST
+      bound_box_lat1 = grid1_bound_box[grid1_add*4+0];
+      bound_box_lat2 = grid1_bound_box[grid1_add*4+1];
+      bound_box_lon1 = grid1_bound_box[grid1_add*4+2];
+      bound_box_lon2 = grid1_bound_box[grid1_add*4+3];
+#else
+      bound_box_lat1 = rg->grid1_bound_box[grid1_add*4+0];
+      bound_box_lat2 = rg->grid1_bound_box[grid1_add*4+1];
+      bound_box_lon1 = rg->grid1_bound_box[grid1_add*4+2];
+      bound_box_lon2 = rg->grid1_bound_box[grid1_add*4+3];
+#endif
+
       num_srch_cells = 0;
-      grid1_addm4 = grid1_add*4;
       for ( grid2_add = min_add; grid2_add <= max_add; grid2_add++ )
 	{
 	  grid2_addm4 = grid2_add*4;
-          srch_mask[grid2_add] = (rg->grid2_bound_box[grid2_addm4+0] <= 
-				  rg->grid1_bound_box[grid1_addm4+1])  &&
-	                         (rg->grid2_bound_box[grid2_addm4+1] >= 
-                                  rg->grid1_bound_box[grid1_addm4+0])  &&
-                                 (rg->grid2_bound_box[grid2_addm4+2] <= 
-                                  rg->grid1_bound_box[grid1_addm4+3])  &&
-                                 (rg->grid2_bound_box[grid2_addm4+3] >= 
-                                  rg->grid1_bound_box[grid1_addm4+2]);
-
-          if ( srch_mask[grid2_add] ) num_srch_cells++;
+#ifdef REMAP_CON_FAST
+          lmask = (grid2_bound_box[grid2_addm4+0] <= bound_box_lat2)  &&
+	          (grid2_bound_box[grid2_addm4+1] >= bound_box_lat1)  &&
+	          (grid2_bound_box[grid2_addm4+2] <= bound_box_lon2)  &&
+	          (grid2_bound_box[grid2_addm4+3] >= bound_box_lon1);
+#else
+          lmask = (rg->grid2_bound_box[grid2_addm4+0] <= bound_box_lat2)  &&
+	          (rg->grid2_bound_box[grid2_addm4+1] >= bound_box_lat1)  &&
+	          (rg->grid2_bound_box[grid2_addm4+2] <= bound_box_lon2)  &&
+	          (rg->grid2_bound_box[grid2_addm4+3] >= bound_box_lon1);
+#endif
+          if ( lmask ) num_srch_cells++;
+	  srch_mask[grid2_add] = lmask;
         }
 
       if ( num_srch_cells == 0 ) continue;
@@ -4487,12 +4522,13 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(grid2_centroid_lon, grid2_centroid_lat, link_add2, link_add1, rv, cdoVerbose, max_subseg, \
+         grid1_bound_box, grid2_bound_box, \
 	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, func, srch_mask2, lwarn) \
-  private(ompthID, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, \
-	  grid1_add, grid2_add, grid2_addm4, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
+  private(ompthID, lmask, srch_mask, min_add, max_add, n, k, num_srch_cells, max_srch_cells, grid1_addm4, \
+	  grid1_add, grid2_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_add, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
-	  last_loc, lcoinc) \
+	  last_loc, lcoinc, bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2) \
   firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)	\
   schedule(dynamic,1)
 #endif
@@ -4516,21 +4552,35 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
 
       /* Further restrict searches using bounding boxes */
 
+#ifdef REMAP_CON_FAST
+      bound_box_lat1 = grid2_bound_box[grid2_add*4+0];
+      bound_box_lat2 = grid2_bound_box[grid2_add*4+1];
+      bound_box_lon1 = grid2_bound_box[grid2_add*4+2];
+      bound_box_lon2 = grid2_bound_box[grid2_add*4+3];
+#else
+      bound_box_lat1 = rg->grid2_bound_box[grid2_add*4+0];
+      bound_box_lat2 = rg->grid2_bound_box[grid2_add*4+1];
+      bound_box_lon1 = rg->grid2_bound_box[grid2_add*4+2];
+      bound_box_lon2 = rg->grid2_bound_box[grid2_add*4+3];
+#endif
+
       num_srch_cells = 0;
-      grid2_addm4 = grid2_add*4;
       for ( grid1_add = min_add; grid1_add <= max_add; grid1_add++ )
 	{
 	  grid1_addm4 = grid1_add*4;
-          srch_mask[grid1_add] = (rg->grid1_bound_box[grid1_addm4+0] <= 
-                                  rg->grid2_bound_box[grid2_addm4+1])  &&
-                                 (rg->grid1_bound_box[grid1_addm4+1] >= 
-                                  rg->grid2_bound_box[grid2_addm4+0])  &&
-                                 (rg->grid1_bound_box[grid1_addm4+2] <= 
-                                  rg->grid2_bound_box[grid2_addm4+3])  &&
-                                 (rg->grid1_bound_box[grid1_addm4+3] >= 
-                                  rg->grid2_bound_box[grid2_addm4+2]);
-
-          if ( srch_mask[grid1_add] ) num_srch_cells++;
+#ifdef REMAP_CON_FAST
+          lmask = (grid1_bound_box[grid1_addm4+0] <= bound_box_lat2)  &&
+	          (grid1_bound_box[grid1_addm4+1] >= bound_box_lat1)  &&
+	          (grid1_bound_box[grid1_addm4+2] <= bound_box_lon2)  &&
+	          (grid1_bound_box[grid1_addm4+3] >= bound_box_lon1);
+#else
+          lmask = (rg->grid1_bound_box[grid1_addm4+0] <= bound_box_lat2)  &&
+	          (rg->grid1_bound_box[grid1_addm4+1] >= bound_box_lat1)  &&
+	          (rg->grid1_bound_box[grid1_addm4+2] <= bound_box_lon2)  &&
+	          (rg->grid1_bound_box[grid1_addm4+3] >= bound_box_lon1);
+#endif
+          if ( lmask ) num_srch_cells++;
+	  srch_mask[grid1_add] = lmask;
         }
 
       if ( num_srch_cells == 0 ) continue;
@@ -4726,6 +4776,11 @@ void remap_conserv(REMAPGRID *rg, REMAPVARS *rv)
   free(srch_mask2);
 #else
   free(srch_mask);
+#endif
+
+#ifdef REMAP_CON_FAST
+  free(grid1_bound_box);
+  free(grid2_bound_box);
 #endif
 
   /*

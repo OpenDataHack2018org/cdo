@@ -156,18 +156,21 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
+  static char func[] = "verify_grid";
   int i0, i, j, k, l;
   int l0;
   int nout;
   int isinside, convex, alone, isnegative;
   int cuts[MAX_CORNERS][MAX_CORNERS];  
-  int alone_cell[gridsize*ncorner];          
+  int *alone_cell;          
   int check_corners;
   double lon, lat = 0;
   double lon_bounds[MAX_CORNERS], lat_bounds[MAX_CORNERS];
   double area, sumarea;
-	
-  check_corners = 0; // don't execute corner checking (last loop)
+
+  alone_cell = (int *) malloc(gridsize*ncorner*sizeof(int));
+
+  check_corners = 0; /* don't execute corner checking (last loop) */
   nout = 0;
   sumarea = 0;
   
@@ -268,7 +271,7 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
   if ( cdoVerbose ) 
     fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
-  if ( abs( 100.*(sumarea - 4.*PI)/4.*PI) > 0.1)
+  if ( fabs( 100.*(sumarea - 4.*PI)/4.*PI) > 0.1)
     cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
   
   
@@ -416,6 +419,8 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
       if ( nout )
 	cdoWarning("%d of %d corners are lonely on the grid", nout, gridsize*ncorner);
     }
+
+  free(alone_cell);
 }
 
 

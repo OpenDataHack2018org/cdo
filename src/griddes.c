@@ -1522,8 +1522,8 @@ void gen_grid_lonlat(GRID *grid, const char *pline, double inc, double lon1, dou
       if ( inc < 1e-9 ) inc = 1;
     }
 
-  nlon = (lon2 - lon1)/inc + 0.5;
-  nlat = (lat2 - lat1)/inc + 0.5;
+  nlon = (int) ((lon2 - lon1)/inc + 0.5);
+  nlat = (int) ((lat2 - lat1)/inc + 0.5);
   grid->xsize = nlon;
   grid->ysize = nlat;
 
