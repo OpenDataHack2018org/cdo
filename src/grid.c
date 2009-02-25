@@ -415,7 +415,7 @@ int gridToCurvilinear(int gridID1)
 		    if ( !libProj )
 		      cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
-		    /* libProj->over = 1; */		// allow longitude > 180°
+		    /* libProj->over = 1; */		/* allow longitude > 180° */
 
 		    for ( j = 0; j < ny; j++ )
 		      for ( i = 0; i < nx; i++ )
@@ -458,7 +458,7 @@ int gridToCurvilinear(int gridID1)
 
 		    for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
-		    /* libProj->over = 1; */		// allow longitude > 180°
+		    /* libProj->over = 1; */		/* allow longitude > 180° */
 
 		    for ( j = 0; j < ny; j++ )
 		      for ( i = 0; i < nx; i++ )
@@ -503,7 +503,7 @@ int gridToCurvilinear(int gridID1)
 
 		    for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
-		    /* libProj->over = 1; */		// allow longitude > 180°
+		    /* libProj->over = 1; */		/* allow longitude > 180° */
 
 		    for ( j = 0; j < ny; j++ )
 		      for ( i = 0; i < nx; i++ )
@@ -650,7 +650,7 @@ int gridToCurvilinear(int gridID1)
 			if ( !libProj )
 			  cdoAbort("proj error: %s", pj_strerrno(pj_errno));
 
-			/* libProj->over = 1; */		// allow longitude > 180°
+			/* libProj->over = 1; */		/* allow longitude > 180° */
 			/*
 			for ( j = 0; j < 2*ny; j++ ) printf("ybounds %d %g\n", j, ybounds[j]);
 			for ( i = 0; i < 2*nx; i++ ) printf("xbounds %d %g\n", i, xbounds[i]);
@@ -717,7 +717,7 @@ int gridToCurvilinear(int gridID1)
 
 			for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
-			/* libProj->over = 1; */		// allow longitude > 180°
+			/* libProj->over = 1; */		/* allow longitude > 180° */
 			/*
 			for ( j = 0; j < 2*ny; j++ ) printf("ybounds %d %g\n", j, ybounds[j]);
 			for ( i = 0; i < 2*nx; i++ ) printf("xbounds %d %g\n", i, xbounds[i]);
@@ -786,7 +786,7 @@ int gridToCurvilinear(int gridID1)
 
 			for ( i = 0; i < nbpar; ++i ) free(params[i]);
 
-			/* libProj->over = 1; */		// allow longitude > 180°
+			/* libProj->over = 1; */		/* allow longitude > 180° */
 			/*
 			for ( j = 0; j < 2*ny; j++ ) printf("ybounds %d %g\n", j, ybounds[j]);
 			for ( i = 0; i < 2*nx; i++ ) printf("xbounds %d %g\n", i, xbounds[i]);

@@ -112,7 +112,7 @@ typedef struct {
   remapgrid_t grid;
   remapvars_t vars;
 }
-REMAP;
+remap_t;
 
 void remap_set_max_iter(int max_iter);
 

@@ -4,12 +4,15 @@
 	* added support for missval = NaN
 	* added support for GRID type Lambert Conformal Conic
 	* Sinusoidal and Lambert Azimuthal Equal Area grids with units [km]
+	* cdoInitialize: omp_set_num_threads have to be called for every module
+	* expr: add ';' at the end of input expression if missing
 	* added predefined lonlat grid for germany, europe and africa
 	* gridFromName: define GRID with one point lon=<LON>_lat=<LAT>
 	* sellonlatbox: select box from circular curvilinear grids
 	* ml2pl: added support for Geopotential Height [request: Katharina Klehmet]
 	* remapbil, remapbic: enable extrapolation with REMAP_EXTRAPOLATE=ON
 	* remapdis, remapnn: disable extrapolation with REMAP_EXTRAPOLATE=OFF
+	* remapcon: eliminate srch_mask (~40% speed up)
 	* remapcon: change bound_box to int type (~25% speed up)
 	* remapcon: optimization of inner loop (~7% speed up)
 	* mermean: bug fix for weights from 'zonmean' (report: Michael Sigmond)

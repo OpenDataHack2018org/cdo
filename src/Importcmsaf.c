@@ -622,6 +622,8 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   hid_t   attr, atype, atype_mem;
   hid_t   native_type;
   int iattr;
+  float fattr;
+  double dattr;
   char attname[256];
   H5T_class_t  type_class;
   H5T_class_t atype_class;
@@ -754,18 +756,39 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	  atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
 	  atype_class = H5Tget_class(atype);
 
-	  if ( strcmp(attname, "intercept") == 0 )
+	  if ( strcmp(attname, "intercept") == 0 ||
+	       strcmp(attname, "offset")    == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
-		  H5Aread(attr, H5T_NATIVE_DOUBLE, &addoffset);
-		  laddoffset = 1;
+		  status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
+		  if ( status >= 0 )
+		    {
+		      addoffset  = dattr;
+		      laddoffset = 1;
+		    }
+		  else
+		    {
+		      status = H5Aread(attr, H5T_NATIVE_FLOAT, &fattr);
+		      if ( status >= 0 )
+			{
+			  addoffset  = fattr;
+			  laddoffset = 1;
+			}
+		      else
+			cdoWarning("Reading of float attribute %s failed!", attname);
+		    }
 		}
 	      else if ( atype_class == H5T_INTEGER )
 		{
-		  H5Aread(attr, H5T_NATIVE_INT, &iattr);
-		  addoffset = iattr;
-		  laddoffset = 1;
+		  status = H5Aread(attr, H5T_NATIVE_INT, &iattr);
+		  if ( status >= 0 )
+		    {
+		      addoffset  = iattr;
+		      laddoffset = 1;
+		    }
+		  else
+		    cdoWarning("Reading of integer attribute %s failed!", attname);
 		}
 	      else
 		cdoWarning("Attribute %s has unsupported data type!", attname);
@@ -774,14 +797,34 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
-		  H5Aread(attr, H5T_NATIVE_DOUBLE, &scalefactor);
-		  lscalefactor = 1;
+		  status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
+		  if ( status >= 0 )
+		    {
+		      scalefactor  = dattr;
+		      lscalefactor = 1;
+		    }
+		  else
+		    {
+		      status = H5Aread(attr, H5T_NATIVE_FLOAT, &fattr);
+		      if ( status >= 0 )
+			{
+			  scalefactor  = fattr;
+			  lscalefactor = 1;
+			}
+		      else
+			cdoWarning("Reading of integer attribute %s failed!", attname);
+		    }
 		}
 	      else if ( atype_class == H5T_INTEGER )
 		{
-		  H5Aread(attr, H5T_NATIVE_INT, &iattr);
-		  scalefactor = iattr;
-		  lscalefactor = 1;
+		  status = H5Aread(attr, H5T_NATIVE_INT, &iattr);
+		  if ( status >= 0 )
+		    {
+		      scalefactor  = iattr;
+		      lscalefactor = 1;
+		    }
+		  else
+		    cdoWarning("Reading of integer attribute %s failed!", attname);
 		}
 	      else
 		cdoWarning("Attribute %s has unsupported data type!", attname);
@@ -793,14 +836,34 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
-		  H5Aread(attr, H5T_NATIVE_DOUBLE, &missval);
-		  lmissval = 1;
+		  status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
+		  if ( status >= 0 )
+		    {
+		      missval  = dattr;
+		      lmissval = 1;
+		    }
+		  else
+		    {
+		      status = H5Aread(attr, H5T_NATIVE_FLOAT, &fattr);
+		      if ( status >= 0 )
+			{
+			  missval  = fattr;
+			  lmissval = 1;
+			}
+		      else
+			cdoWarning("Reading of integer attribute %s failed!", attname);
+		    }
 		}
 	      else if ( atype_class == H5T_INTEGER )
 		{
-		  H5Aread(attr, H5T_NATIVE_INT, &iattr);
-		  missval = iattr;
-		  lmissval = 1;
+		  status = H5Aread(attr, H5T_NATIVE_INT, &iattr);
+		  if ( status >= 0 )
+		    {
+		      missval  = iattr;
+		      lmissval = 1;
+		    }
+		  else
+		    cdoWarning("Reading of integer attribute %s failed!", attname);
 		}
 	      else
 		cdoWarning("Attribute %s has unsupported data type!", attname);
@@ -849,12 +912,16 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       if ( ftype )
 	{
 	  status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
+	  if ( status < 0 )
+	    cdoAbort("Reading of NATIVE_DOUBLE variable %s failed!", varname);
 	}
       else
 	{
 	  int *iarray, i;
 	  iarray = (int *) malloc(gridsize*nt*sizeof(int));
 	  status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
+	  if ( status < 0 )
+	    cdoAbort("Reading of NATIVE_INT variable %s failed!", varname);
 	  for ( i = 0; i < gridsize*nt; ++i ) array[i] = iarray[i];
 	  free(iarray);
 	}
@@ -889,6 +956,10 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	}
 
       if ( cdoVerbose )
+	cdoPrint("Dataset %s: missval = %g  addoffset = %g  scalefactor = %g",
+		 varname, missval, addoffset, scalefactor);
+
+      if ( cdoVerbose )
 	cdoPrint("Dataset %s: dtype = %d  minval = %g  maxval = %g",
 		 varname, dtype,  minval, maxval);
 
@@ -909,8 +980,8 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    }
 	}
 
-      laddoffset   = IS_NOT_EQUAL(addoffset, 0);
-      lscalefactor = IS_NOT_EQUAL(scalefactor,  1);
+      laddoffset   = IS_NOT_EQUAL(addoffset,   0);
+      lscalefactor = IS_NOT_EQUAL(scalefactor, 1);
 
       if ( laddoffset || lscalefactor )
 	{	  

@@ -19,6 +19,10 @@
 #  include "config.h"
 #endif
 
+#if defined (_OPENMP)
+#  include <omp.h>
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
@@ -1185,6 +1189,10 @@ void cdoInitialize(void *argument)
 {
   static char func[] = "cdoInitialize";
   int processID;
+
+#if defined (_OPENMP)
+  omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
+#endif
 
   processID = processCreate();
 

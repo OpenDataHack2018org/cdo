@@ -182,7 +182,8 @@ void extra_P(double *slp, double *halfp, double *fullp, double *geop, double *te
 }  /* extrap */
 
 
-static double extra_T(double pres, double halfp, double fullp, double geop, double temp)
+static 
+double extra_T(double pres, double halfp, double fullp, double geop, double temp)
 {
   double tstar, ztsz, z1, ztmsl, zalph, peval, zhts, zalp;
   double zrg;
@@ -243,7 +244,8 @@ static double extra_T(double pres, double halfp, double fullp, double geop, doub
 }  /* extra_T */
 
 
-static double extra_Z(double pres, double halfp, double fullp, double geop, double temp)
+static 
+double extra_Z(double pres, double halfp, double fullp, double geop, double temp)
 {
   double alpha, tstar, tmsl, zalp, zalpal;
   double zrg;
@@ -311,7 +313,6 @@ void interp_X(double *gt, double *pt, double *hyb_press, int *nx, double *plev, 
 	    }
 	}
     }
-
 }  /* interp_X */
 
 
@@ -364,7 +365,6 @@ void interp_T(double *geop, double *gt, double *pt, double *fullp, double *halfp
 	    }
 	}
     }
-
 }  /* interp_T */
 
 
@@ -419,5 +419,4 @@ void interp_Z(double *geop, double *gz, double *pz, double *fullp, double *halfp
 	    }
 	}
     }
-
 }  /* interp_Z */

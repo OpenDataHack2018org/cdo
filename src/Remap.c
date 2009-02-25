@@ -85,7 +85,7 @@ void *Remap(void *argument)
   double missval;
   double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
-  REMAP *remaps;
+  remap_t *remaps;
   char *envstr;
   char *remap_file = NULL;
   int lwrite_remap;
@@ -321,7 +321,7 @@ void *Remap(void *argument)
         cdoPrint("Set max_remaps to %d", max_remaps);
     }
 
-  remaps = (REMAP *) malloc(max_remaps*sizeof(REMAP));
+  remaps = (remap_t *) malloc(max_remaps*sizeof(remap_t));
   for ( r = 0; r < max_remaps; r++ )
     {
       remaps[r].gridID   = -1;

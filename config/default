@@ -85,7 +85,7 @@ case "${HOSTNAME}" in
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -ansi -pedantic"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -ansi -pedantic -std=c99"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --program-suffix=_${SGE_SUFFIX} \
