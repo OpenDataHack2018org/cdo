@@ -2559,11 +2559,14 @@ static char *RemapgridHelp[] = {
     "    grid  STRING  Target grid description file or name",
     "",
     "ENVIRONMENT",
-    "    NORMALIZE_OPT",
+    "    NORMALIZE_OPT    ",
     "        This variable is used to choose the normalization of the conservative ",
     "        remapping. By default NORMALIZE_OPT is set to 'fracarea' and will",
     "        include the destination area fraction in the output weights; other ",
     "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
+    "    REMAP_EXTRAPOLATE",
+    "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
+    "        By default the extrapolation is enabled for remapdis and remapnn.",
     NULL
 };
 
@@ -2613,11 +2616,14 @@ static char *GenweightsHelp[] = {
     "    grid  STRING  Target grid description file or name",
     "",
     "ENVIRONMENT",
-    "    NORMALIZE_OPT",
+    "    NORMALIZE_OPT    ",
     "        This variable is used to choose the normalization of the conservative ",
     "        interpolation. By default NORMALIZE_OPT is set to 'fracarea' and will",
     "        include the destination area fraction in the output weights; other ",
     "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
+    "    REMAP_EXTRAPOLATE",
+    "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
+    "        By default the extrapolation is enabled for remapdis and remapnn.",
     NULL
 };
 
@@ -2638,6 +2644,16 @@ static char *RemapHelp[] = {
     "PARAMETER",
     "    grid     STRING  Target grid description file or name",
     "    weights  STRING  Interpolation weights (SCRIP netCDF file)",
+    "",
+    "ENVIRONMENT",
+    "    NORMALIZE_OPT    ",
+    "        This variable is used to choose the normalization of the conservative ",
+    "        interpolation. By default NORMALIZE_OPT is set to 'fracarea' and will",
+    "        include the destination area fraction in the output weights; other ",
+    "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
+    "    REMAP_EXTRAPOLATE",
+    "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
+    "        By default the extrapolation is enabled for remapdis and remapnn.",
     NULL
 };
 

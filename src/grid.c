@@ -1150,6 +1150,10 @@ int gridGenArea(int gridID, double *area)
 	       (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
 
 	  area[i] += areas(&c1, &c2, &c3);
+	  /*
+      printf("area: %d %g %g %g %g %g %g %g\n", i, area[i],
+	     p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+	  */
 	}
 
       p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
@@ -1164,11 +1168,14 @@ int gridGenArea(int gridID, double *area)
 	   (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
 
       area[i] += areas(&c1, &c2, &c3);
-
+      /*
+      printf("area: %d %g %g %g %g %g %g %g\n", i, area[i],
+	     p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+      */
       total_area += area[i];
     }
 
-  if ( cdoVerbose ) cdoPrint("Total area = %g\n", total_area);
+  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
 
   free(grid_center_lon);
   free(grid_center_lat);
@@ -1208,7 +1215,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
       nvals++;
     }
 
-  if ( cdoVerbose ) cdoPrint("Total area = %g\n", total_area);
+  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
 
   for ( i = 0; i < gridsize; i++ )
     {
@@ -1363,7 +1370,10 @@ int gridWeights(int gridID, double *grid_wgts)
 
       w_status = 1;
     }
-
+  /*
+  for ( i = 0; i < gridsize; ++i ) 
+    printf("weights: %d %d %d %g %g\n", a_status, w_status, i, grid_area[i], grid_wgts[i]);
+  */
   free(grid_area);
 
   return (w_status);

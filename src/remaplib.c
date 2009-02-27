@@ -203,6 +203,40 @@ void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corn
     }
 }
 
+
+double genYmin(double y1, double y2)
+{
+  double ymin, dy;
+
+  dy = y2 - y1;
+  ymin = y1 - dy/2;
+
+  if ( y1 < -85 && ymin < -87.5 ) ymin = -90;
+
+  if ( cdoVerbose )
+    cdoPrint("genYmin: y1 = %g  y2 = %g  dy = %g  ymin = %g", y1, y2, dy, ymin);
+
+  return (ymin);
+}
+
+
+double genYmax(double y1, double y2)
+{
+  double ymax, dy;
+
+  dy = y1 - y2;
+  ymax = y1 + dy/2;
+
+  if ( y1 > 85 && ymax > 87.5 ) ymax = 90;
+
+  if ( cdoVerbose )
+    cdoPrint("genYmax: y1 = %g  y2 = %g  dy = %g  ymax = %g", y1, y2, dy, ymax);
+
+  return (ymax);
+}
+
+
+
 /*****************************************************************************/
 
 void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corner_lat)
@@ -214,7 +248,7 @@ void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corn
   firstlat = grid_center_lat[0];
   lastlat  = grid_center_lat[xsize*ysize-1];
 
-  if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value");
+  if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value!");
 
   for ( j = 0; j < ysize; j++ )
     {
@@ -222,24 +256,24 @@ void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corn
       if ( firstlat > lastlat )
 	{
 	  if ( j == 0 )
-	    maxlat = 90;
+	    maxlat = genYmax(grid_center_lat[index], grid_center_lat[index+xsize]);
 	  else
 	    maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
 
 	  if ( j == (ysize-1) )
-	    minlat = -90;
+	    minlat = genYmin(grid_center_lat[index], grid_center_lat[index-xsize]);
 	  else
 	    minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
 	}
       else
 	{
 	  if ( j == 0 )
-	    minlat = -90;
+	    minlat = genYmin(grid_center_lat[index], grid_center_lat[index+xsize]);
 	  else
 	    minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
 
 	  if ( j == (ysize-1) )
-	    maxlat = 90;
+	    maxlat = genYmax(grid_center_lat[index], grid_center_lat[index-xsize]);
 	  else
 	    maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
 	}

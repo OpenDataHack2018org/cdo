@@ -225,11 +225,9 @@ void *Remap(void *argument)
       ival = atoi(envstr);
       if ( *envstr )
 	{
-	  if ( (envstr[0] == 'O' && envstr[1] == 'N') ||
-	       (envstr[0] == 'o' && envstr[1] == 'n') )
+	  if ( strncmp(envstr, "ON", 2) == 0 || strncmp(envstr, "on", 2) == 0 )
 	    remap_extrapolate = TRUE;
-	  else if ( (envstr[0] == 'O' && envstr[1] == 'F' && envstr[2] == 'F') ||
-		    (envstr[0] == 'o' && envstr[1] == 'f' && envstr[1] == 'f') )
+	  else if ( strncmp(envstr, "OFF", 3) == 0 || strncmp(envstr, "off", 3) == 0 )
 	    remap_extrapolate = FALSE;
 	  else
 	    cdoWarning("Environment variable REMAP_EXTRAPOLATE has wrong value!");

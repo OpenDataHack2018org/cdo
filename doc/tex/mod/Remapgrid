@@ -108,11 +108,14 @@ This variable is used to choose the normalization of the conservative
 remapping. By default NORMALIZE_OPT is set to 'fracarea' and will
 include the destination area fraction in the output weights; other 
 options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
+@Item = REMAP_EXTRAPOLATE
+This variable is used to switch the extrapolation feature 'on' or 'off'.
+By default the extrapolation is enabled for remapdis and remapnn.
 @EndEnvironment
 
 
 @BeginNote
-For this program the author has converted the original Fortran 90 SCRIP 
+For this module the author has converted the original Fortran 90 SCRIP 
 software to ANSI C. If there are any problems send a bug report to CDO and
 not to SCRIP!
 @EndNote
