@@ -95,7 +95,7 @@ void *Settime(void *argument)
   SETTUNITS   = cdoOperatorAdd("settunits",   0, 0, "time units (seconds, minutes, hours, days, months, years)");
   SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,hh:mm)");
   SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time<,units> (format YYYY-MM-DD,hh:mm)");
-  SETCALENDAR = cdoOperatorAdd("setcalendar", 0, 0, "calendar (standard, 360days, 365days, 366days)");
+  SETCALENDAR = cdoOperatorAdd("setcalendar", 0, 0, "calendar (standard, proleptic, 360days, 365days, 366days)");
   SHIFTTIME   = cdoOperatorAdd("shifttime",   0, 0, "shift value");
 
   operatorID = cdoOperatorID();
@@ -193,10 +193,11 @@ void *Settime(void *argument)
       size_t len;
       char *cname = operatorArgv()[0];
       len = strlen(cname);      
-      if      ( strncmp(cname, "standard", len) == 0 ) { newcalendar = CALENDAR_STANDARD;}
-      else if ( strncmp(cname, "360days", len)  == 0 ) { newcalendar = CALENDAR_360DAYS;}
-      else if ( strncmp(cname, "365days", len)  == 0 ) { newcalendar = CALENDAR_365DAYS;}
-      else if ( strncmp(cname, "366days", len)  == 0 ) { newcalendar = CALENDAR_366DAYS;}
+      if      ( strncmp(cname, "standard" , len) == 0 ) { newcalendar = CALENDAR_STANDARD;}
+      else if ( strncmp(cname, "proleptic", len) == 0 ) { newcalendar = CALENDAR_PROLEPTIC;}
+      else if ( strncmp(cname, "360days",   len) == 0 ) { newcalendar = CALENDAR_360DAYS;}
+      else if ( strncmp(cname, "365days",   len) == 0 ) { newcalendar = CALENDAR_365DAYS;}
+      else if ( strncmp(cname, "366days",   len) == 0 ) { newcalendar = CALENDAR_366DAYS;}
       else cdoAbort("calendar >%s< unsupported", cname);
     }
   else
@@ -305,6 +306,9 @@ void *Settime(void *argument)
   tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
     {
+      vdate = taxisInqVdate(taxisID1);
+      vtime = taxisInqVtime(taxisID1);
+
       if ( operatorID == SETTAXIS )
 	{
 	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
@@ -338,9 +342,6 @@ void *Settime(void *argument)
 	}
       else if ( operatorID == SHIFTTIME )
 	{
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
-
 	  if ( incunit == 1 || incunit == 12 )
 	    {
 	      decode_date(vdate, &year, &month, &day);
@@ -362,21 +363,12 @@ void *Settime(void *argument)
 			 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
 	    }
 	}
-      else if ( operatorID == SETREFTIME )
+      else if ( operatorID == SETREFTIME || operatorID == SETCALENDAR )
 	{
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
-	}
-      else if ( operatorID == SETCALENDAR )
-	{
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
+	  ;
 	}
       else
 	{
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
-
 	  decode_date(vdate, &year, &month, &day);
 
 	  if ( operatorID == SETYEAR ) year  = newval;
