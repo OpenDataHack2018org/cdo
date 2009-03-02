@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(cdo, 1.3.1beta4, Uwe.Schulzweida@zmaw.de)
+AC_INIT(cdo, 1.3.1beta5, Uwe.Schulzweida@zmaw.de)
 
 CONFIG_ABORT=yes
 
@@ -347,7 +347,6 @@ esac
 #  ----------------------------------------------------------------------
 
 AC_SUBST([CPPFLAGS])
-AC_SUBST([FC],$F77)
 AC_SUBST([AR])
 
 AC_OUTPUT(Makefile src/Makefile)

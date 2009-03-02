@@ -378,7 +378,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   fltarr_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, &dims, NULL);
 
   proj_tid = H5Tcreate(H5T_COMPOUND, sizeof(proj_t));
-  H5Tinsert(proj_tid, "Projetion name", HOFFSET(proj_t, name), str_tid);
+  H5Tinsert(proj_tid, "Projection name", HOFFSET(proj_t, name), str_tid);
   H5Tinsert(proj_tid, "Reference ellipsoid", HOFFSET(proj_t, ellipsoid), str_tid);
   H5Tinsert(proj_tid, "Projection parameter", HOFFSET(proj_t, parameter), fltarr_tid);
 
@@ -407,9 +407,10 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   H5Tclose(fltarr_tid);
 
   if ( cdoVerbose )
-    cdoPrint("  Projection: name=%s ellipsoid=%s parameter=%g %g %g %g",  
+    cdoPrint("  Projection: name=%s\n\t\t\tellipsoid=%s\n\t\t\tparameter=%g %g %g %g %g %g",  
 	     proj.name, proj.ellipsoid, 
-	     proj.parameter[0], proj.parameter[1], proj.parameter[2], proj.parameter[3]);
+	     proj.parameter[0], proj.parameter[1], proj.parameter[2], 
+	     proj.parameter[3], proj.parameter[4], proj.parameter[5]);
 
   region_tid = H5Tcreate(H5T_COMPOUND, sizeof(region_t));
   H5Tinsert(region_tid, "xmin", HOFFSET(region_t, xmin), H5T_NATIVE_FLOAT);
@@ -447,15 +448,42 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
 				 proj.parameter[0], proj.parameter[1], 
 				 proj.parameter[2], proj.parameter[3]);
     }
-  else
+  /* modification by Frank Kaspar */
+  else if ( nx == xsize && ny == ysize &&
+            strcmp(proj.name, "Lambert Azimuthal Equal Area") == 0 &&
+            strncmp(proj.ellipsoid, "Sphere", 6) == 0 )
     {
-      if ( nx == 386 && ny == 162 )
-	{
-	  double c0 = 90;       /* nominal spatial resolution */
-	  double lts = 30;      
-	  double re = 6371.22;  /* Earth radius */
-	  gridID = defLonLatGrid(nx, ny, c0, lts, re);
-	}
+      double a;
+      if ( proj.parameter[4] < 0 )
+        {
+          a=6370997.0;
+        }
+      else
+        {
+          a=proj.parameter[4];
+        }
+      gridID = defLaeaGrid(nx, ny,
+                           region.xmin, region.xmax,
+                           region.ymin, region.ymax,
+                           region.dx, region.dy,
+                           a, proj.parameter[2], proj.parameter[3]);
+    }
+  else if ( strncmp(proj.name, "Cylindrical Equal Area", 22) == 0 &&
+            strncmp(proj.ellipsoid, "Sphere", 6) == 0 )
+    {
+      double c0  = 0.001*sqrt(proj.parameter[5]);       /* nominal spatial resolution */
+      double lts = proj.parameter[3];      
+      double re  = proj.parameter[4]/1000;  /* Earth radius [km]*/
+      if ( cdoVerbose ) cdoPrint("  c0 = %g, lts = %g, re = %g", c0, lts, re); 
+      gridID = defLonLatGrid(nx, ny, c0, lts, re);
+    }
+  else if ( nx == 386 && ny == 162 )
+    {
+      double c0  = 90;       /* nominal spatial resolution */
+      double lts = 30;      
+      double re  = 6371.228;  /* Earth radius [km]*/
+      if ( cdoVerbose ) cdoPrint("  c0 = %g, lts = %g, re = %g", c0, lts, re); 
+      gridID = defLonLatGrid(nx, ny, c0, lts, re);
     }
 
   return (gridID);
