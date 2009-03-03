@@ -5,6 +5,7 @@
 	* added support for proleptic gregorian calendar
 	* added support for missval = NaN
 	* added support for GRID type Lambert Conformal Conic
+	* import_cmsaf: read parameter for Lambert Azimuthal Equal Area projection
 	* import_cmsaf: read parameter for Cylindrical Equal Area projection
 	* Sinusoidal and Lambert Azimuthal Equal Area grids with units [km]
 	* cdoInitialize: omp_set_num_threads have to be called for every module

@@ -350,6 +350,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   hid_t proj_id, region_id;
   hid_t proj_tid, region_tid;
   hid_t str_tid, fltarr_tid;
+  hid_t ptype_id;
   herr_t     status;
   hsize_t dims;
   int xsize, ysize;
@@ -369,8 +370,16 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
 
   proj_t proj;
   region_t region;
+  char *projection_name = NULL;
 
   if ( cdoVerbose ) cdoPrint("Read geolocation:");
+
+  ptype_id = H5Topen(loc_id, "ProjType");
+  if ( ptype_id >= 0 )
+    {
+      projection_name = H5Tget_member_name(ptype_id, 0);
+      H5Tclose(ptype_id);
+    }
 
   str_tid = H5Tcopy(H5T_C_S1);
   H5Tset_size(str_tid, 64);
@@ -378,9 +387,14 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   fltarr_tid = H5Tarray_create(H5T_NATIVE_FLOAT, 1, &dims, NULL);
 
   proj_tid = H5Tcreate(H5T_COMPOUND, sizeof(proj_t));
-  H5Tinsert(proj_tid, "Projection name", HOFFSET(proj_t, name), str_tid);
+  if ( projection_name )
+    H5Tinsert(proj_tid, projection_name, HOFFSET(proj_t, name), str_tid);
+  else
+    H5Tinsert(proj_tid, "Projection name", HOFFSET(proj_t, name), str_tid);
   H5Tinsert(proj_tid, "Reference ellipsoid", HOFFSET(proj_t, ellipsoid), str_tid);
   H5Tinsert(proj_tid, "Projection parameter", HOFFSET(proj_t, parameter), fltarr_tid);
+
+  if ( projection_name ) free(projection_name);
 
   grp_id = H5Gopen(loc_id, "Geolocation");
 
