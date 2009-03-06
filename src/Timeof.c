@@ -19,7 +19,7 @@
    This module contains the following operators:
 
 */
-#define WEIGHTS 0
+#define WEIGHTS 1
 
 #include <string.h>
 
@@ -137,9 +137,9 @@ void *Timeof(void *argument)
           fwork[varID][levelID].grid    = gridID1;
           fwork[varID][levelID].nmiss   = 0;
           fwork[varID][levelID].missval = missval;
-          fwork[varID][levelID].ptr     = (double *) malloc(gridsize*gridsize*sizeof(double));
+          fwork[varID][levelID].ptr     = (double *)malloc(gridsize*gridsize*sizeof(double));
           for ( i = 0; i < gridsize*gridsize; ++i )
-            fwork[varID][levelID].ptr[i] = missval;
+            fwork[varID][levelID].ptr[i] = 0;
 
           iwork[varID][levelID] = (int *) malloc(gridsize*gridsize*sizeof(int));
           memset(iwork[varID][levelID], 0, gridsize*gridsize*sizeof(int)); 
@@ -153,7 +153,7 @@ void *Timeof(void *argument)
               o[varID][levelID][i].missval= missval;
               o[varID][levelID][i].ptr    = (double *)malloc(gridsize*sizeof(double));
               for ( ii = 0; ii < gridsize; ++ii )
-                o[varID][levelID][i].ptr[ii] = missval;
+                o[varID][levelID][i].ptr[ii] = 0;
               
               o2[varID][levelID][i].grid    = gridID3;
               o2[varID][levelID][i].nmiss   = 0;
@@ -183,14 +183,14 @@ void *Timeof(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
         {
           int i2;
+          double tmp;
           streamInqRecord(streamID1, &varID, &levelID); 
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));          
           missval = in.missval = vlistInqVarMissval(vlistID1, varID);           
           
           streamReadRecord(streamID1, in.ptr, &in.nmiss);   
           for ( i = 0; i < gridsize; ++i )
-            {
-              double tmp;
+            {     
               for ( i2 = 0; i2 <= i; i2++ )
                 {                
                   if ( ( ! DBL_IS_EQUAL(in.ptr[i], missval) ) && 
@@ -199,8 +199,8 @@ void *Timeof(void *argument)
                       tmp = in.ptr[i]*in.ptr[i2];                    
                       fwork[varID][levelID].ptr[i*gridsize+i2] += tmp;                      
                       iwork[varID][levelID][i*gridsize+i2]++;                                        
-                    }
-                }              
+                    }                 
+                }           
             }	   
           /* creater lower triangular of covariance matrix; */
           for (i=0;i<gridsize;i++)
@@ -253,13 +253,12 @@ void *Timeof(void *argument)
                     cov[i1][i2] = fwork[varID][levelID].ptr[pack[i2]*gridsize+pack[i1]];                                   
                     /* weight and normalize the covariances */
                     if ( ! WEIGHTS )
-                      cov[i1][i2] *= 1. / (iwork[varID][levelID][i1*gridsize+i2] - 1.);
+                      cov[i1][i2] /= (iwork[varID][levelID][i1*gridsize+i2] - 1.);
                     else if ( WEIGHTS )
-                      cov[i1][i2] *= sqrt(w[pack[i1]])*sqrt (w[pack[i2]]) / sum_w / (iwork[varID][levelID][i1*gridsize+i2] - 1);
+                      cov[i1][i2] *= sqrt(w[pack[i1]])*sqrt (w[pack[i2]]) / sum_w / (iwork[varID][levelID][i1*gridsize+i2] - 1.);
                   }
             }   
-          //printf("sumw %7.5f, weight[0] %7.5f weights[npack-1] %7.5f\n", sum_w, w[0], w[npack-1]);
-                           
+        
           eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], npack, n_eig, func);
           /* cov contains the eigenvectors, eigv the eigenvalues */
           for (i=0;i<n_eig;i++)
@@ -285,13 +284,13 @@ void *Timeof(void *argument)
                 }
               o2[varID][levelID][i].ptr[0] = eigv[i];
               
-              /*
+              
                sum2=0;
              
                for(j=0;j<npack;j++)
-               sum2+=o[varID][levelID][i].ptr[pack[j]]*o[varID][levelID][i].ptr[pack[j]];
+                  sum2+=o[varID][levelID][i].ptr[pack[j]]*o[varID][levelID][i].ptr[pack[j]];
                printf("sum2 %7.5f\n", sum2);
-               */
+               
             }
         }
     }
