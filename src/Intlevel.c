@@ -281,6 +281,20 @@ void *Intlevel(void *argument)
 
   zaxisID2 = zaxisCreate(zaxisInqType(zaxisID1), nlev2);
   zaxisDefLevels(zaxisID2, lev2);
+  {
+    char str[256];
+    str[0] = 0;
+    zaxisInqName(zaxisID1, str);
+    zaxisDefName(zaxisID2, str);
+    str[0] = 0;
+    zaxisInqLongname(zaxisID1, str);
+    if ( str[0] ) zaxisDefLongname(zaxisID2, str);
+    str[0] = 0;
+    zaxisInqUnits(zaxisID1, str);
+    if ( str[0] ) zaxisDefUnits(zaxisID2, str);
+
+    zaxisDefPrec(zaxisID2, zaxisInqPrec(zaxisID1));
+  }
 
   for ( i = 0; i < nzaxis; i++ )
     {
