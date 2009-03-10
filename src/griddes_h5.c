@@ -268,6 +268,7 @@ int gridFromH5file(const char *gridfile)
 
   /* Open an existing file. */
   file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, H5P_DEFAULT);
+  if ( file_id < 0 ) return(gridID);
 
   if ( h5find_object(file_id, "lon") > 0 && 
        h5find_object(file_id, "lat") > 0 )

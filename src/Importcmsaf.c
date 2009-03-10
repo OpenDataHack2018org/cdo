@@ -948,9 +948,6 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((DSETS *) opdata)->obj[nset].array    = array;
       array  = array+offset;
 
-      mask = (short *) malloc(gridsize*nt*sizeof(short));
-      memset(mask, 0, gridsize*nt*sizeof(short));
-
       if ( ftype )
 	{
 	  status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
@@ -986,12 +983,15 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( nz == 1 ) ((DSETS *) opdata)->nsets++;
 
+      mask = (short *) malloc(gridsize*nt*sizeof(short));
+      memset(mask, 0, gridsize*nt*sizeof(short));
+
       nmiss  = 0;
  
       minval =  1e35;
       maxval = -1e35;
 
-      for ( i = 0; i < gridsize; i++ )
+      for ( i = 0; i < gridsize*nt; i++ )
 	{
 	  if ( array[i] < minval ) minval = array[i];
 	  if ( array[i] > maxval ) maxval = array[i];
@@ -1027,7 +1027,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( laddoffset || lscalefactor )
 	{	  
-	  for ( i = 0; i < gridsize; i++ )
+	  for ( i = 0; i < gridsize*nt; i++ )
 	    if ( !DBL_IS_EQUAL(array[i], missval) )
 	      {
 		mask[i] = 0;
@@ -1045,7 +1045,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       minval =  1e35;
       maxval = -1e35;
 
-      for ( i = 0; i < gridsize; i++ )
+      for ( i = 0; i < gridsize*nt; i++ )
 	if ( mask[i] == 0 )
 	  {
 	    if ( array[i] < minval ) minval = array[i];
@@ -1074,7 +1074,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		}
 	      else
 		cdoWarning(" Missval is inside of valid values!\n"
-                           " Name: %s  Range: %g - %g  Missval: %g\n",
+                           " Name: %s  Range: %g - %g  Missval: %g",
 			   varname, minval, maxval, missval);
 	    }
 	}
@@ -1275,6 +1275,7 @@ void *Importcmsaf(void *argument)
 
   /* Open an existing file. */
   file_id = H5Fopen(cdoStreamName(0), H5F_ACC_RDONLY, H5P_DEFAULT);
+  if ( file_id < 0 ) cdoAbort("H5Fopen failed on %s", cdoStreamName(0));
 
   /* cmsaf_type = get_cmsaf_type(file_id); */
 
