@@ -1066,16 +1066,16 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		  dtype   = DATATYPE_INT16;
 		  ((DSETS *) opdata)->obj[nset].dtype    = dtype;
 		  ((DSETS *) opdata)->obj[nset].missval  = missval;
-		  cdoPrint("Dataset %s: change missval to %g and datatype to INT16!",
+		  cdoPrint("Dataset %s: changed missval to %g and datatype to INT16!",
 			   varname, missval);
 
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( mask[i] ) array[i] = missval;
 		}
 	      else
-		cdoWarning(" Missval is inside of valid values!\n"
-                           " Name: %s  Range: %g - %g  Missval: %g",
-			   varname, minval, maxval, missval);
+		cdoWarning(" Missing value is inside of valid values!\n"
+                           " Dataset %s,  Missval: %g,  Range: %g - %g",
+			   varname, missval, minval, maxval);
 	    }
 	}
 
