@@ -219,7 +219,7 @@ void *Select(void *argument)
 		}
 	      else if ( operatorID == SELGRIDNAME )
 		{
-		  if ( strncmp(argnames[isel], gridname, strlen(argnames[isel])) == 0 )
+		  if ( memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
@@ -235,7 +235,7 @@ void *Select(void *argument)
 		}
 	      else if ( operatorID == SELZAXISNAME )
 		{
-		  if ( strncmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0 )
+		  if ( memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;

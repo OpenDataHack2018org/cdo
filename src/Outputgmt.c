@@ -713,7 +713,7 @@ void *Outputgmt(void *argument)
 
   gridInqYunits(gridID, units);
 
-  if ( strncmp(units, "radian", 6) == 0 )
+  if ( memcmp(units, "radian", 6) == 0 )
     {
       for ( i = 0; i < gridsize; i++ )
 	{
@@ -721,7 +721,7 @@ void *Outputgmt(void *argument)
 	  grid_center_lon[i] *= RAD2DEG;
 	}
     }
-  else if ( strncmp(units, "degrees", 7) == 0 )
+  else if ( memcmp(units, "degrees", 7) == 0 )
     {
       /* No conversion necessary */
     }
@@ -788,7 +788,7 @@ void *Outputgmt(void *argument)
 	    cdoAbort("Grid corner missing!");
 	}
 
-      if ( strncmp(units, "radian", 6) == 0 )
+      if ( memcmp(units, "radian", 6) == 0 )
 	{
 	  /* Note: using units from latitude instead from bounds */
 	  for ( i = 0; i < gridcorners*gridsize; i++ )
@@ -797,7 +797,7 @@ void *Outputgmt(void *argument)
 	      grid_corner_lon[i] *= RAD2DEG;
 	    }
 	}
-      else if ( strncmp(units, "degrees", 7) == 0 )
+      else if ( memcmp(units, "degrees", 7) == 0 )
 	{
 	  /* No conversion necessary */
 	}

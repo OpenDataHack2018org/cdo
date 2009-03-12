@@ -482,9 +482,9 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
 	    pnamecx = &nml->line.linelc[nml->line.namitf+1];
 
 	  if ( pnamecx )
-	    if ( strncmp(pnamecx, "select", 6) == 0 || 
-		 strncmp(pnamecx, "params", 6) == 0 || 
-		 strncmp(pnamecx, nml->name, strlen(nml->name)) == 0 )
+	    if ( memcmp(pnamecx, "select", 6) == 0 || 
+		 memcmp(pnamecx, "params", 6) == 0 || 
+		 memcmp(pnamecx, nml->name, strlen(nml->name)) == 0 )
 	      goto L2000;
 
 	  goto L3000;
@@ -493,10 +493,10 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
       if ( nml->line.namitl-nml->line.namitf >= MAX_WORD_LEN ) goto L3000;
 
       pnamecx = &nml->line.linelc[nml->line.namitf];
-      strncpy(namecx, pnamecx, len);
+      memcpy(namecx, pnamecx, len);
 
       if ( len == 5 )
-	if ( strncmp(pnamecx, "clear", len) == 0 )
+	if ( memcmp(pnamecx, "clear", len) == 0 )
 	  {
 	    clear = TRUE;
 	    goto L2000;
@@ -506,7 +506,7 @@ void namelistRead(FILE *nmlfp, NAMELIST *nml)
       for ( j = 0; j < nparam; j++ )
 	{
 	  if ( strlen(nml->entry[j]->name) == len )
-	    if ( strncmp(pnamecx, nml->entry[j]->name, len) == 0 )
+	    if ( memcmp(pnamecx, nml->entry[j]->name, len) == 0 )
 	      {
 		jj = j;
 		while ( nml->entry[jj]->type == NML_NPR ) jj--;

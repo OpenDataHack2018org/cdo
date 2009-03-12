@@ -374,12 +374,12 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   gridInqXunits(gridID1, xunits);
   gridInqYunits(gridID1, yunits);
 
-  if ( strncmp(xunits, "radian", 6) == 0 )
+  if ( memcmp(xunits, "radian", 6) == 0 )
     xfact = RAD2DEG;
   else
     xfact = 1;
 
-  if ( strncmp(yunits, "radian", 6) == 0 )
+  if ( memcmp(yunits, "radian", 6) == 0 )
     yfact = RAD2DEG;
   else
     yfact = 1;
@@ -590,12 +590,12 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   gridInqXunits(gridID1, xunits);
   gridInqYunits(gridID1, yunits);
 
-  if ( strncmp(xunits, "radian", 6) == 0 )
+  if ( memcmp(xunits, "radian", 6) == 0 )
     xfact = RAD2DEG;
   else
     xfact = 1;
 
-  if ( strncmp(yunits, "radian", 6) == 0 )
+  if ( memcmp(yunits, "radian", 6) == 0 )
     yfact = RAD2DEG;
   else
     yfact = 1;

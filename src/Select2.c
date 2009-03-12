@@ -292,7 +292,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 	{
 	  entry = pml->entry[i];
 	  if ( entry->len == len )
-	    if ( strncmp(entry->name, argv[istart], len) == 0 ) break;
+	    if ( memcmp(entry->name, argv[istart], len) == 0 ) break;
 	}
 
       if ( i == pml->size )
@@ -414,7 +414,7 @@ void *Select2(void *argument)
       /*
       if ( i == 0 )
 	{
-	  if ( strncmp(argnames[i], "xcode=", 6) == 0 )
+	  if ( memcmp(argnames[i], "xcode=", 6) == 0 )
 	    {
 	      sargv[i] = strdup(argnames[i]+5);
 	    }
@@ -583,7 +583,7 @@ void *Select2(void *argument)
 		}
 	      else if ( operatorID == SELGRIDNAME )
 		{
-		  if ( strncmp(argnames[isel], gridname, strlen(argnames[isel])) == 0 )
+		  if ( memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
@@ -599,7 +599,7 @@ void *Select2(void *argument)
 		}
 	      else if ( operatorID == SELZAXISNAME )
 		{
-		  if ( strncmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0 )
+		  if ( memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -405,8 +405,8 @@ int pstreamOpenRead(const char *argument)
 	{
 	  pch = &argument[i+1];
 	  len -= (i+1);
-	  if ( len && ( strncmp(argument, "filelist:", i) == 0 || 
-			strncmp(argument, "flist:", i) == 0 ) )
+	  if ( len && ( memcmp(argument, "filelist:", 9) == 0 || 
+			memcmp(argument, "flist:", 6) == 0 ) )
 	    {
 	      for ( i = 0; i < len; i++ ) if ( pch[i] == ',' ) nfiles++;
 
@@ -472,7 +472,7 @@ int pstreamOpenRead(const char *argument)
 		    }
 		}
 	    }
-	  else if ( len && strncmp(argument, "ls:", i) == 0 )
+	  else if ( len && memcmp(argument, "ls:", 3) == 0 )
 	    {
 	      char line[4096];
 	      char command[4096];
@@ -630,7 +630,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 
   PSTREAM_INIT
 
-  ispipe = strncmp(argument, "(pipe", 5) == 0;
+  ispipe = memcmp(argument, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
@@ -735,7 +735,7 @@ int pstreamOpenAppend(const char *argument)
   int ispipe;
   PSTREAM *pstreamptr;
 
-  ispipe = strncmp(argument, "(pipe", 5) == 0;
+  ispipe = memcmp(argument, "(pipe", 5) == 0;
 
   if ( ispipe )
     {

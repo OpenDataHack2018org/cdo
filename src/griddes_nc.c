@@ -174,9 +174,9 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
     }
 
   gridInqYunits(gridID, units);
-  if ( strncmp(units, "degrees", 7) == 0 )
+  if      ( memcmp(units, "degrees", 7) == 0 )
     units[7] = 0;
-  else if ( strncmp(units, "radian", 6) == 0 )
+  else if ( memcmp(units, "radian", 6) == 0 )
     units[6] = 0;
   else
     cdoWarning("Unknown units supplied for grid!");

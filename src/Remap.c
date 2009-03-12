@@ -225,9 +225,9 @@ void *Remap(void *argument)
       ival = atoi(envstr);
       if ( *envstr )
 	{
-	  if ( strncmp(envstr, "ON", 2) == 0 || strncmp(envstr, "on", 2) == 0 )
+	  if ( memcmp(envstr, "ON", 2) == 0 || memcmp(envstr, "on", 2) == 0 )
 	    remap_extrapolate = TRUE;
-	  else if ( strncmp(envstr, "OFF", 3) == 0 || strncmp(envstr, "off", 3) == 0 )
+	  else if ( memcmp(envstr, "OFF", 3) == 0 || memcmp(envstr, "off", 3) == 0 )
 	    remap_extrapolate = FALSE;
 	  else
 	    cdoWarning("Environment variable REMAP_EXTRAPOLATE has wrong value!");
@@ -476,11 +476,11 @@ void *Remap(void *argument)
 
       if ( envstr )
         {
-	  if ( strncmp(envstr, "frac", 4) == 0 )
+	  if      ( memcmp(envstr, "frac", 4) == 0 )
 	    norm_opt = NORM_OPT_FRACAREA;
-	  else if ( strncmp(envstr, "dest", 4) == 0 )
+	  else if ( memcmp(envstr, "dest", 4) == 0 )
 	    norm_opt = NORM_OPT_DESTAREA;
-	  else if ( strncmp(envstr, "none", 4) == 0 )
+	  else if ( memcmp(envstr, "none", 4) == 0 )
 	    norm_opt = NORM_OPT_NONE;
 	  else
 	    cdoWarning("NORMALIZE_OPT=%s unsupported!", envstr);

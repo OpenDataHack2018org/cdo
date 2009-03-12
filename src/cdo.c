@@ -477,13 +477,13 @@ void setDefaultFileType(char *filetypestr, int labort)
     {
       char *ftstr = filetypestr;
 
-      if      ( strncmp(filetypestr, "grb", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
-      else if ( strncmp(filetypestr, "nc2", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
-      else if ( strncmp(filetypestr, "nc4", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
-      else if ( strncmp(filetypestr, "nc",  2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
-      else if ( strncmp(filetypestr, "srv", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
-      else if ( strncmp(filetypestr, "ext", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_EXT; }
-      else if ( strncmp(filetypestr, "ieg", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_IEG; }
+      if      ( memcmp(filetypestr, "grb", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
+      else if ( memcmp(filetypestr, "nc2", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
+      else if ( memcmp(filetypestr, "nc4", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
+      else if ( memcmp(filetypestr, "nc",  2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
+      else if ( memcmp(filetypestr, "srv", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
+      else if ( memcmp(filetypestr, "ext", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_EXT; }
+      else if ( memcmp(filetypestr, "ieg", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_IEG; }
       else
 	{
 	  if ( labort )
@@ -554,17 +554,17 @@ void defineCompress(const char *arg)
 {
   size_t len = strlen(arg);
 
-  if      ( strncmp(arg, "szip", len) == 0 )
+  if      ( memcmp(arg, "szip", len) == 0 )
     {
       cdoZtype  = COMPRESS_SZIP;
       cdoZlevel = 0;
     }
-  else if ( strncmp(arg, "gzip", len) == 0 )
+  else if ( memcmp(arg, "gzip", len) == 0 )
     {
       cdoZtype  = COMPRESS_GZIP;
       cdoZlevel = 6;
     }
-  else if ( strncmp(arg, "zip", len) == 0 )
+  else if ( memcmp(arg, "zip", len) == 0 )
     {
       cdoZtype  = COMPRESS_ZIP;
       cdoZlevel = 1;
@@ -599,11 +599,11 @@ int main(int argc, char *argv[])
 
   Progname = getProgname(argv[0]);
 
-  if ( strncmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
+  if ( memcmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
 
   /* old versions !!!! */
-  if ( strncmp(Progname, "gdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
-  if ( strncmp(Progname, "gm",  2) == 0 && strlen(Progname) > 2 ) noff = 2;
+  if ( memcmp(Progname, "gdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
+  if ( memcmp(Progname, "gm",  2) == 0 && strlen(Progname) > 2 ) noff = 2;
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 

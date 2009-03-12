@@ -813,7 +813,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   gridInqYunits(gridID1, units);
 
-  if ( strncmp(units, "degrees", 7) == 0 )
+  if ( memcmp(units, "degrees", 7) == 0 )
     {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -837,7 +837,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	    }
 	}
     }
-  else if ( strncmp(units, "radian", 6) == 0 )
+  else if ( memcmp(units, "radian", 6) == 0 )
     {
       /* No conversion necessary */
     }
@@ -889,7 +889,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   gridInqYunits(gridID2, units);
 
-  if ( strncmp(units, "degrees", 7) == 0 )
+  if ( memcmp(units, "degrees", 7) == 0 )
     {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(rg) private(i)
@@ -913,7 +913,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	    }
 	}
     }
-  else if ( strncmp(units, "radian", 6) == 0 )
+  else if ( memcmp(units, "radian", 6) == 0 )
     {
       /* No conversion necessary */
     }
@@ -6175,18 +6175,18 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   *submap_type = SUBMAP_TYPE_NONE;
   *remap_order = 1;
 
-  if ( strncmp(map_method, "Conservative", 12) == 0 )
+  if ( memcmp(map_method, "Conservative", 12) == 0 )
     {
       int iatt;
       rv->map_type = MAP_TYPE_CONSERV;
       status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
       if ( status == NC_NOERR ) *remap_order = iatt;
     }
-  else if ( strncmp(map_method, "Bilinear", 8) == 0 ) rv->map_type = MAP_TYPE_BILINEAR;
-  else if ( strncmp(map_method, "Distance", 8) == 0 ) rv->map_type = MAP_TYPE_DISTWGT;
-  else if ( strncmp(map_method, "Nearest", 7) == 0 )  rv->map_type = MAP_TYPE_DISTWGT1;
-  else if ( strncmp(map_method, "Bicubic", 7) == 0 )  rv->map_type = MAP_TYPE_BICUBIC;
-  else if ( strncmp(map_method, "Largest", 7) == 0 )
+  else if ( memcmp(map_method, "Bilinear", 8) == 0 ) rv->map_type = MAP_TYPE_BILINEAR;
+  else if ( memcmp(map_method, "Distance", 8) == 0 ) rv->map_type = MAP_TYPE_DISTWGT;
+  else if ( memcmp(map_method, "Nearest", 7) == 0 )  rv->map_type = MAP_TYPE_DISTWGT1;
+  else if ( memcmp(map_method, "Bicubic", 7) == 0 )  rv->map_type = MAP_TYPE_BICUBIC;
+  else if ( memcmp(map_method, "Largest", 7) == 0 )
     {
       rv->map_type = MAP_TYPE_CONSERV;
       *submap_type = SUBMAP_TYPE_LAF;
@@ -6361,7 +6361,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, nc_srcgrdcntrlat_id, "units", &attlen));
   grid1_units[attlen] = 0;
 
-  if ( strncmp(grid1_units, "degrees", 7) == 0 )
+  if ( memcmp(grid1_units, "degrees", 7) == 0 )
     {
       for ( i = 0; i < rg->grid1_size; i++ )
 	{
@@ -6369,7 +6369,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	  rg->grid1_center_lon[i] *= DEG2RAD;
 	}
     }
-  else if ( strncmp(grid1_units, "radian", 6) != 0 )
+  else if ( memcmp(grid1_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
 
   if ( rg->grid1_corners )
@@ -6381,7 +6381,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_attlen(nc_file_id, nc_srcgrdcrnrlat_id, "units", &attlen));
       grid1_units[attlen] = 0;
 
-      if ( strncmp(grid1_units, "degrees", 7) == 0 )
+      if ( memcmp(grid1_units, "degrees", 7) == 0 )
 	{
 	  for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
 	    {
@@ -6389,7 +6389,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	      rg->grid1_corner_lon[i] *= DEG2RAD;
 	    }
 	}
-      else if ( strncmp(grid1_units, "radian", 6) != 0 )
+      else if ( memcmp(grid1_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid1 corner lat/lon: proceeding assuming radians");
     }
 
@@ -6409,7 +6409,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, nc_dstgrdcntrlat_id, "units", &attlen));
   grid2_units[attlen] = 0;
 
-  if ( strncmp(grid2_units, "degrees", 7) == 0 )
+  if ( memcmp(grid2_units, "degrees", 7) == 0 )
     {
       for ( i = 0; i < rg->grid2_size; i++ )
 	{
@@ -6417,7 +6417,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	  rg->grid2_center_lon[i] *= DEG2RAD;
 	}
     }
-  else if ( strncmp(grid2_units, "radian", 6) != 0 )
+  else if ( memcmp(grid2_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
 
   if ( rg->grid2_corners )
@@ -6429,7 +6429,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_attlen(nc_file_id, nc_dstgrdcrnrlat_id, "units", &attlen));
       grid2_units[attlen] = 0;
       
-      if ( strncmp(grid2_units, "degrees", 7) == 0 )
+      if ( memcmp(grid2_units, "degrees", 7) == 0 )
 	{
 	  for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
 	    {
@@ -6437,7 +6437,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 	      rg->grid2_corner_lon[i] *= DEG2RAD;
 	    }
 	}
-      else if ( strncmp(grid2_units, "radian", 6) != 0 )
+      else if ( memcmp(grid2_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid2 corner lat/lon: proceeding assuming radians");
     }
 

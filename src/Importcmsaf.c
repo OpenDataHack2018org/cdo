@@ -310,25 +310,25 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
 
   for ( i = 0; i < npcs; ++i )
     {
-      if ( strncmp(pcs[i], "proj=", 5) == 0 )
+      if ( memcmp(pcs[i], "proj=", 5) == 0 )
 	{
 	  pcs[i] += 5;
 	  strcpy(proj, pcs[i]);
 	  nfound++;
 	}
-      else if ( strncmp(pcs[i], "a=", 2) == 0 )
+      else if ( memcmp(pcs[i], "a=", 2) == 0 )
 	{
 	  pcs[i] += 2;
 	  *a = atof(pcs[i]);
 	  nfound++;
 	}
-      else if ( strncmp(pcs[i], "lon_0=", 6) == 0 )
+      else if ( memcmp(pcs[i], "lon_0=", 6) == 0 )
 	{
 	  pcs[i] += 6;
 	  *lon0 = atof(pcs[i]);
 	  nfound++;
 	}
-      else if ( strncmp(pcs[i], "lat_0=", 6) == 0 )
+      else if ( memcmp(pcs[i], "lat_0=", 6) == 0 )
 	{
 	  pcs[i] += 6;
 	  *lat0 = atof(pcs[i]);
@@ -465,7 +465,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   /* modification by Frank Kaspar */
   else if ( nx == xsize && ny == ysize &&
             strcmp(proj.name, "Lambert Azimuthal Equal Area") == 0 &&
-            strncmp(proj.ellipsoid, "Sphere", 6) == 0 )
+            memcmp(proj.ellipsoid, "Sphere", 6) == 0 )
     {
       double a;
       if ( proj.parameter[4] < 0 )
@@ -482,8 +482,8 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
                            region.dx, region.dy,
                            a, proj.parameter[2], proj.parameter[3]);
     }
-  else if ( strncmp(proj.name, "Cylindrical Equal Area", 22) == 0 &&
-            strncmp(proj.ellipsoid, "Sphere", 6) == 0 )
+  else if ( memcmp(proj.name, "Cylindrical Equal Area", 22) == 0 &&
+            memcmp(proj.ellipsoid, "Sphere", 6) == 0 )
     {
       double c0  = 0.001*sqrt(proj.parameter[5]);       /* nominal spatial resolution */
       double lts = proj.parameter[3];      

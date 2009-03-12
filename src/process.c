@@ -746,7 +746,7 @@ void operatorInputArg(const char *enter)
 			  pline[len] != '\\' && len < linelen ) len++;
 
 		  Process[processID].oargv[oargc] = (char *) malloc(len+1);
-		  strncpy(Process[processID].oargv[oargc], pline, len);
+		  memcpy(Process[processID].oargv[oargc], pline, len);
 		  Process[processID].oargv[oargc][len] = '\0';
 		  oargc++;
 

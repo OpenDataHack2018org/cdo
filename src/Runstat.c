@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -115,15 +115,15 @@ void *Runstat(void *argument)
     {
       int env_date = -1;
 
-      if      ( strncmp(envstr, "first", 5) == 0 ||
-		strncmp(envstr, "FIRST", 5) == 0 ||
-		strncmp(envstr, "First", 5) == 0 )  env_date = DATE_FIRST;
-      else if ( strncmp(envstr, "last", 4) == 0 ||
-		strncmp(envstr, "LAST", 4) == 0 ||
-		strncmp(envstr, "Last", 4) == 0 )   env_date = DATE_LAST;
-      else if ( strncmp(envstr, "middle", 6) == 0 ||
-		strncmp(envstr, "MIDDLE", 6) == 0 ||
-		strncmp(envstr, "Middle", 6) == 0 ) env_date = DATE_MIDDLE;
+      if      ( memcmp(envstr, "first", 5) == 0 ||
+		memcmp(envstr, "FIRST", 5) == 0 ||
+		memcmp(envstr, "First", 5) == 0 )  env_date = DATE_FIRST;
+      else if ( memcmp(envstr, "last", 4) == 0 ||
+		memcmp(envstr, "LAST", 4) == 0 ||
+		memcmp(envstr, "Last", 4) == 0 )   env_date = DATE_LAST;
+      else if ( memcmp(envstr, "middle", 6) == 0 ||
+		memcmp(envstr, "MIDDLE", 6) == 0 ||
+		memcmp(envstr, "Middle", 6) == 0 ) env_date = DATE_MIDDLE;
 
       if ( env_date >= 0 )
 	{

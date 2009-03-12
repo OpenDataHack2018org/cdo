@@ -48,12 +48,12 @@ int get_tunits(const char *unit, int *incunit, int *tunit)
 	
   len = strlen(unit);
   
-  if      ( strncmp(unit, "seconds", len) == 0 ) { *incunit =     1; *tunit = TUNIT_SECOND;}
-  else if ( strncmp(unit, "minutes", len) == 0 ) { *incunit =    60; *tunit = TUNIT_MINUTE;}
-  else if ( strncmp(unit, "hours", len)   == 0 ) { *incunit =  3600; *tunit = TUNIT_HOUR;}
-  else if ( strncmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;}
-  else if ( strncmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH;}
-  else if ( strncmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;}
+  if      ( memcmp(unit, "seconds", len) == 0 ) { *incunit =     1; *tunit = TUNIT_SECOND;}
+  else if ( memcmp(unit, "minutes", len) == 0 ) { *incunit =    60; *tunit = TUNIT_MINUTE;}
+  else if ( memcmp(unit, "hours", len)   == 0 ) { *incunit =  3600; *tunit = TUNIT_HOUR;}
+  else if ( memcmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;}
+  else if ( memcmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH;}
+  else if ( memcmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;}
   else cdoAbort("time unit >%s< unsupported", unit);
 
   return (0);
@@ -193,11 +193,11 @@ void *Settime(void *argument)
       size_t len;
       char *cname = operatorArgv()[0];
       len = strlen(cname);      
-      if      ( strncmp(cname, "standard" , len) == 0 ) { newcalendar = CALENDAR_STANDARD;}
-      else if ( strncmp(cname, "proleptic", len) == 0 ) { newcalendar = CALENDAR_PROLEPTIC;}
-      else if ( strncmp(cname, "360days",   len) == 0 ) { newcalendar = CALENDAR_360DAYS;}
-      else if ( strncmp(cname, "365days",   len) == 0 ) { newcalendar = CALENDAR_365DAYS;}
-      else if ( strncmp(cname, "366days",   len) == 0 ) { newcalendar = CALENDAR_366DAYS;}
+      if      ( memcmp(cname, "standard" , len) == 0 ) { newcalendar = CALENDAR_STANDARD;}
+      else if ( memcmp(cname, "proleptic", len) == 0 ) { newcalendar = CALENDAR_PROLEPTIC;}
+      else if ( memcmp(cname, "360days",   len) == 0 ) { newcalendar = CALENDAR_360DAYS;}
+      else if ( memcmp(cname, "365days",   len) == 0 ) { newcalendar = CALENDAR_365DAYS;}
+      else if ( memcmp(cname, "366days",   len) == 0 ) { newcalendar = CALENDAR_366DAYS;}
       else cdoAbort("calendar >%s< unsupported", cname);
     }
   else

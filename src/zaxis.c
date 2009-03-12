@@ -87,7 +87,7 @@ static int getoptname(char *optname, const char *optstring, int nopt)
       else
 	namelen = pend - pname;
 
-      strncpy(optname, pname, namelen);
+      memcpy(optname, pname, namelen);
       optname[namelen] = '\0';
     }
   else
@@ -166,56 +166,56 @@ int zaxisFromFile(FILE *gfp)
       pline = line;
       while ( isspace((int) *pline) ) pline++;
       if ( pline[0] == '\0' ) continue;
-      if ( strncmp(pline, "zaxistype", 9) == 0 || 
-	   strncmp(pline, "type", 4) == 0 )
+      if ( memcmp(pline, "zaxistype", 9) == 0 || 
+	   memcmp(pline, "type", 4) == 0 )
 	{
 	  if ( *pline == 'z' )
 	    pline = skipSeparator(pline + 9);
 	  else
 	    pline = skipSeparator(pline + 4);
 
-	  if ( strncmp(pline, "pressure", 6) == 0 )
+	  if ( memcmp(pline, "pressure", 6) == 0 )
 	    zaxis.type = ZAXIS_PRESSURE;
-	  else if ( strncmp(pline, "hybrid_half", 11)  == 0 )
+	  else if ( memcmp(pline, "hybrid_half", 11)  == 0 )
 	    zaxis.type = ZAXIS_HYBRID_HALF;
-	  else if ( strncmp(pline, "hybrid", 6)  == 0 )
+	  else if ( memcmp(pline, "hybrid", 6)  == 0 )
 	    zaxis.type = ZAXIS_HYBRID;
-	  else if ( strncmp(pline, "height", 6) == 0 )
+	  else if ( memcmp(pline, "height", 6) == 0 )
 	    zaxis.type = ZAXIS_HEIGHT;
-	  else if ( strncmp(pline, "depth below sea", 15) == 0 ||
-		    strncmp(pline, "depth_below_sea", 15) == 0 )
+	  else if ( memcmp(pline, "depth below sea", 15) == 0 ||
+		    memcmp(pline, "depth_below_sea", 15) == 0 )
 	    zaxis.type = ZAXIS_DEPTH_BELOW_SEA;
-	  else if ( strncmp(pline, "depth below land", 16) == 0 ||
-		    strncmp(pline, "depth_below_land", 16) == 0 )
+	  else if ( memcmp(pline, "depth below land", 16) == 0 ||
+		    memcmp(pline, "depth_below_land", 16) == 0 )
 	    zaxis.type = ZAXIS_DEPTH_BELOW_LAND;
-	  else if ( strncmp(pline, "isentropic", 10)  == 0 )
+	  else if ( memcmp(pline, "isentropic", 10)  == 0 )
 	    zaxis.type = ZAXIS_ISENTROPIC;
-	  else if ( strncmp(pline, "surface", 7)  == 0 )
+	  else if ( memcmp(pline, "surface", 7)  == 0 )
 	    zaxis.type = ZAXIS_SURFACE;
 	  else
 	    Warning(func, "Invalid zaxisname : %s", pline);
 	}
-      else if ( strncmp(pline, "size", 4)  == 0 )
+      else if ( memcmp(pline, "size", 4)  == 0 )
 	{
 	  zaxis.size = atol(skipSeparator(pline + 4));
 	}
-      else if ( strncmp(pline, "vctsize", 7)  == 0 )
+      else if ( memcmp(pline, "vctsize", 7)  == 0 )
 	{
 	  zaxis.vctsize = atol(skipSeparator(pline + 7));
 	}
-      else if ( strncmp(pline, "name", 4)  == 0 )
+      else if ( memcmp(pline, "name", 4)  == 0 )
 	{
 	  strcpy(zaxis.name, skipSeparator(pline + 4));
 	}
-      else if ( strncmp(pline, "longname", 8)  == 0 )
+      else if ( memcmp(pline, "longname", 8)  == 0 )
 	{
 	  strcpy(zaxis.longname, skipSeparator(pline + 8));
 	}
-      else if ( strncmp(pline, "units", 5)  == 0 )
+      else if ( memcmp(pline, "units", 5)  == 0 )
 	{
 	  strcpy(zaxis.units, skipSeparator(pline + 5));
 	}
-      else if ( strncmp(pline, "levels", 6)  == 0 )
+      else if ( memcmp(pline, "levels", 6)  == 0 )
 	{
 	  int i;
 	  double flev;
@@ -250,7 +250,7 @@ int zaxisFromFile(FILE *gfp)
 	      Warning(func, "size undefined!");
 	    }
 	}
-      else if ( strncmp(pline, "vct", 3)  == 0 )
+      else if ( memcmp(pline, "vct", 3)  == 0 )
 	{
 	  int i;
 	  double flev;
@@ -285,7 +285,7 @@ int zaxisFromFile(FILE *gfp)
 	      Warning(func, "vctsize undefined!");
 	    }
 	}
-      else if ( strncmp(pline, "lbounds", 7)  == 0 )
+      else if ( memcmp(pline, "lbounds", 7)  == 0 )
 	{
 	  int i;
 	  double flev;
@@ -320,7 +320,7 @@ int zaxisFromFile(FILE *gfp)
 	      Warning(func, "size undefined!");
 	    }
 	}
-      else if ( strncmp(pline, "ubounds", 7)  == 0 )
+      else if ( memcmp(pline, "ubounds", 7)  == 0 )
 	{
 	  int i;
 	  double flev;

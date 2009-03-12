@@ -654,14 +654,14 @@ void exp_run(int argc, char *argv[], char *cdoExpName)
 
   len = strlen("scratch");
   if ( strlen(tmppath) > len+1 )
-    if ( strncmp(tmppath+1, "scratch", len) == 0 )
+    if ( memcmp(tmppath+1, "scratch", len) == 0 )
       {
 	strcpy(ftppath, tmppath+len+1);
       }
 
   len = strlen(cdoExpName);
   if ( strlen(tmppath) > len+1 )
-    if ( strncmp(tmppath+1, cdoExpName, len) == 0 )
+    if ( memcmp(tmppath+1, cdoExpName, len) == 0 )
       {
 	strcpy(ftppath, tmppath+len+1);
       }

@@ -725,7 +725,7 @@ static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));
   filetype[attlen] = 0;
 
-  if ( strncmp(filetype, strfiletype_res, strlen(strfiletype_res)) != 0 ) return (0);
+  if ( memcmp(filetype, strfiletype_res, strlen(strfiletype_res)) != 0 ) return (0);
 
   /* printf("%s\n", filetype); */
 

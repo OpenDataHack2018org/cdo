@@ -93,11 +93,11 @@ void *Inttime(void *argument)
       len = strlen(unit);
       if ( len )
 	{
-	  if      ( strncmp(unit, "minutes", len) == 0 ) incunit =    60;
-	  else if ( strncmp(unit, "hours", len)   == 0 ) incunit =  3600;
-	  else if ( strncmp(unit, "days", len)    == 0 ) incunit = 86400;
-	  else if ( strncmp(unit, "months", len)  == 0 ) incunit =     1;
-	  else if ( strncmp(unit, "years", len)   == 0 ) incunit =    12;
+	  if      ( memcmp(unit, "minutes", len) == 0 ) incunit =    60;
+	  else if ( memcmp(unit, "hours", len)   == 0 ) incunit =  3600;
+	  else if ( memcmp(unit, "days", len)    == 0 ) incunit = 86400;
+	  else if ( memcmp(unit, "months", len)  == 0 ) incunit =     1;
+	  else if ( memcmp(unit, "years", len)   == 0 ) incunit =    12;
 	  else cdoAbort("unsupported time unit >%s<", unit);
 	}
     }

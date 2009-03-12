@@ -326,8 +326,8 @@ int gridToCurvilinear(int gridID1)
 	gridInqXunits(gridID1, xunits);
 	gridInqYunits(gridID1, yunits);
 
-	if ( strncmp(xunits, "km", 2) == 0 ) xscale = 1000;
-	if ( strncmp(yunits, "km", 2) == 0 ) yscale = 1000;
+	if ( memcmp(xunits, "km", 2) == 0 ) xscale = 1000;
+	if ( memcmp(yunits, "km", 2) == 0 ) yscale = 1000;
 
 	gridDefXsize(gridID2, nx);
 	gridDefYsize(gridID2, ny);
