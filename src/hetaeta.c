@@ -115,6 +115,8 @@ void hetaeta(int ltq, int ngp, int *imiss,
   int nlev2p1;
   int lpsmod = 1;
   int klo;
+  double zq1, zt1;
+  double rair_d_cpair;
 #if defined (_OPENMP)
   double **ph1_2, **lnph1_2, **fi1_2, **pf1_2, **lnpf1_2, **tv1_2, **theta1_2, **rh1_2, **zvar_2;
   double **ph2_2, **lnph2_2, **fi2_2, **pf2_2;
@@ -134,6 +136,8 @@ void hetaeta(int ltq, int ngp, int *imiss,
   old = fopen("old.dat","w");
   new = fopen("new.dat","w");
 #endif
+
+  rair_d_cpair = rair/cpair;
 
   nlev1p1 = nlev1+1;
   nlev2p1 = nlev2+1;
@@ -410,9 +414,11 @@ void hetaeta(int ltq, int ngp, int *imiss,
 	for ( k = 0; k < nlev1; ++k )
 	  {
 	    ijk = k*ngp+ij;
-	    tv1[k]    = (1.0+epsm1i*q1[ijk])*t1[ijk];
-	    rh1[k]    = q1[ijk]*pf1[k]/(epsilon*esat(t1[ijk]));
-	    theta1[k] = t1[ijk]*pow(apr/pf1[k],rair/cpair);
+	    zq1 = q1[ijk];
+	    zt1 = t1[ijk];
+	    tv1[k]    = (1.0+epsm1i*zq1)*zt1;
+	    rh1[k]    = zq1*pf1[k]/(epsilon*esat(zt1));
+	    theta1[k] = zt1*pow(apr/pf1[k], rair_d_cpair);
 	  }
 
       /* ****** integrate hydrostatic equation, using interpolated orography */
@@ -620,7 +626,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
       if ( ltq )
 	{
 	  /* correction of potential temperature at top of PBL */
-	  dteta = t2[jjblt*ngp+ij]*pow(apr/pf2[jjblt],rair/cpair)-theta_pbl[jjblt];
+	  dteta = t2[jjblt*ngp+ij]*pow(apr/pf2[jjblt], rair_d_cpair)-theta_pbl[jjblt];
 	  
 	  /* merge top layer values */
 	  rh2[jjblt] = 0.5*(rh2[jjblt]+rh_pbl[jjblt]);
@@ -637,7 +643,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
 	for ( k = jjblt+1; k < nlev2; ++k ) 
 	  {
 	    ijk = k*ngp+ij;
-	    t2[ijk]  = (theta_pbl[k]+dteta)*pow(pf2[k]/apr,rair/cpair);
+	    t2[ijk]  = (theta_pbl[k]+dteta)*pow(pf2[k]/apr, rair_d_cpair);
 	    rh2[k] = rh_pbl[k];
 	  }
 
@@ -714,8 +720,8 @@ void hetaeta(int ltq, int ngp, int *imiss,
       if ( ltq )
 	{
 	  /* calculate surface temperature correction (old version) */
-	  tscor[ij] = dteta*pow(ps2[ij]/apr,rair/cpair);
-	  pscor[ij] = pow(ps2[ij]/ps1[ij],rair/cpair);
+	  tscor[ij] = dteta*pow(ps2[ij]/apr, rair_d_cpair);
+	  pscor[ij] = pow(ps2[ij]/ps1[ij], rair_d_cpair);
 
 	  /* correction term of static energy of lowest layer */
 	  secor[ij] = tv1[nlev1-1]*(cpair+rair*(1.0-ph1[nlev1-1]

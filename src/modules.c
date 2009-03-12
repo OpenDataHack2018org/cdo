@@ -254,8 +254,8 @@ void *Wct(void *argument);
 #define  Del29febOperators      {"del29feb"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffv", "sdiff"}
-#define  Echam5iniOperators     {"read_e5ml",  "read_e5res", \
-                                 "write_e5ml", "write_e5res"}
+#define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
+                                 "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
@@ -716,6 +716,7 @@ static char *opalias[][2] =
   {"delvar",              "delname"    },
   {"vardup",              "pardup"     },
   {"varmul",              "parmul"     },
+  {"read_e5ml",           "import_e5ml"},
   {"remapcon1",           "remaplaf"   },
   {"remapdis1",           "remapnn"    },
   {"showvar",             "showname"   },
@@ -725,6 +726,7 @@ static char *opalias[][2] =
   {"splitvar",            "splitname"  },
   {"sort",                "timsort"    },
   {"vinfos",              "sinfov"     },
+  {"write_e5ml",          "export_e5ml"},
   /* RQ */
   {"eca_r1mm",            "eca_rr1"    },
   /* QR */  

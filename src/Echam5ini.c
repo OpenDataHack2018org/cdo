@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -117,9 +117,9 @@ static void nce(int istat)
 #endif
 
 
-static int read_e5ml(const char *filename, VAR **vars)
+static int import_e5ml(const char *filename, VAR **vars)
 {
-  static char func[] = "read_e5ml";
+  static char func[] = "import_e5ml";
   int nvars = 0;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_dim_id, nc_var_id;
@@ -277,9 +277,9 @@ static int read_e5ml(const char *filename, VAR **vars)
 }
 
 
-static void write_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
+static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
 {
-  static char func[] = "write_e5ml";
+  static char func[] = "export_e5ml";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
   size_t nvals;
@@ -303,6 +303,8 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars, int vdate, in
   char timestr[30];
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
+  int writemode = NC_CLOBBER;
+  unsigned long  data_size;
   
   date_and_time_in_sec = time(NULL);
   timestr[0] = 0;
@@ -320,8 +322,58 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars, int vdate, in
       if ( username == NULL ) username = "unknown";
     }
 
+
+  n2 = 2;
+
+  lon = 0; lat = 0; nsp = 0; nlev = 0; nlevp1 = 0; nvclev = 0;
+  for ( varid = 0; varid < nvars; ++varid )
+    {
+      gridtype  = vars[varid].gridtype;
+      zaxistype = vars[varid].zaxistype;
+
+      if ( gridtype == GRID_GAUSSIAN && lat == 0 )
+	{
+	  gridIDgp = vars[varid].gridID;
+	  lon = gridInqXsize(vars[varid].gridID);
+	  lat = gridInqYsize(vars[varid].gridID);
+	}
+      else if ( gridtype == GRID_SPECTRAL && nsp == 0 )
+	{
+	  gridIDsp = vars[varid].gridID;
+	  nsp = gridInqSize(vars[varid].gridID);
+	  nsp = nsp/2;
+	}
+
+      if ( zaxistype == ZAXIS_HYBRID && nlev == 0 )
+	{
+	  zaxisIDml = vars[varid].zaxisID;
+	  nlev = zaxisInqSize(vars[varid].zaxisID);
+	  nlevp1 = nlev + 1;
+	  nvclev = nlev + 1;
+	}
+    }
+
+  if ( lat  == 0 ) cdoAbort("Gaussian grid not found!");
+  if ( nsp  == 0 ) cdoAbort("Spectral data not found!");
+  if ( nlev == 0 ) cdoAbort("Hybrid level not found!");
+
+  nlon = lon;
+  nlat = lat;
+
+
+  data_size = nlon+nlat + 2*nvclev + 2*nsp*2*nlev + nsp*2*nlevp1 + nlon*nlat*nlev;
+
+  if ( data_size*8 > 2147000000 )
+    {
+#if  defined  (NC_64BIT_OFFSET)
+      writemode = NC_CLOBBER | NC_64BIT_OFFSET;
+#else
+      cdoWarning("Datasize > 2GB and NC_64BIT_OFFSET not available!");
+#endif
+    }
+
   /* create file */
-  nce(nc_create(filename, NC_CLOBBER, &nc_file_id));
+  nce(nc_create(filename, writemode, &nc_file_id));
 
   strcpy(atttext, "IEEE");
   attlen = strlen(atttext);
@@ -384,42 +436,6 @@ static void write_e5ml(const char *filename, VAR *vars, int nvars, int vdate, in
 
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "file_type", strlen(strfiletype_ml), strfiletype_ml));
 
-  n2 = 2;
-
-  lon = 0; lat = 0; nsp = 0; nlev = 0; nlevp1 = 0; nvclev = 0;
-  for ( varid = 0; varid < nvars; ++varid )
-    {
-      gridtype  = vars[varid].gridtype;
-      zaxistype = vars[varid].zaxistype;
-
-      if ( gridtype == GRID_GAUSSIAN && lat == 0 )
-	{
-	  gridIDgp = vars[varid].gridID;
-	  lon = gridInqXsize(vars[varid].gridID);
-	  lat = gridInqYsize(vars[varid].gridID);
-	}
-      else if ( gridtype == GRID_SPECTRAL && nsp == 0 )
-	{
-	  gridIDsp = vars[varid].gridID;
-	  nsp = gridInqSize(vars[varid].gridID);
-	  nsp = nsp/2;
-	}
-
-      if ( zaxistype == ZAXIS_HYBRID && nlev == 0 )
-	{
-	  zaxisIDml = vars[varid].zaxisID;
-	  nlev = zaxisInqSize(vars[varid].zaxisID);
-	  nlevp1 = nlev + 1;
-	  nvclev = nlev + 1;
-	}
-    }
-
-  if ( lat  == 0 ) cdoAbort("Gaussian grid not found!");
-  if ( nsp  == 0 ) cdoAbort("Spectral data not found!");
-  if ( nlev == 0 ) cdoAbort("Hybrid level not found!");
-
-  nlon = lon;
-  nlat = lat;
   
   nce(nc_def_dim(nc_file_id, "lat", lat, &lat_dimid));
 
@@ -668,9 +684,9 @@ static void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, in
 #endif
 
 
-static int read_e5res(const char *filename, VAR **vars, ATTS *atts)
+static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 {
-  static char func[] = "read_e5res";
+  static char func[] = "import_e5res";
   int nvars = 0;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
@@ -1062,9 +1078,9 @@ static int read_e5res(const char *filename, VAR **vars, ATTS *atts)
 }
 
 
-static void write_e5res(const char *filename, VAR *vars, int nvars)
+static void export_e5res(const char *filename, VAR *vars, int nvars)
 {
-  static char func[] = "write_e5res";
+  static char func[] = "export_e5res";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
   int varid;
@@ -1411,8 +1427,8 @@ void *Echam5ini(void *argument)
   static char func[] = "Echam5ini";
   int operatorID;
   int operfunc;
-  int READ_E5ML,  READ_E5RES;
-  int WRITE_E5ML, WRITE_E5RES;
+  int IMPORT_E5ML, IMPORT_E5RES;
+  int EXPORT_E5ML, EXPORT_E5RES;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs = 0;
   int recID, varID, levelID;
@@ -1424,10 +1440,10 @@ void *Echam5ini(void *argument)
 
   cdoInitialize(argument);
 
-  READ_E5ML   = cdoOperatorAdd("read_e5ml",   func_read,  0, NULL);
-  READ_E5RES  = cdoOperatorAdd("read_e5res",  func_read,  0, NULL);
-  WRITE_E5ML  = cdoOperatorAdd("write_e5ml",  func_write, 0, NULL);
-  WRITE_E5RES = cdoOperatorAdd("write_e5res", func_write, 0, NULL);
+  IMPORT_E5ML  = cdoOperatorAdd("import_e5ml",  func_read,  0, NULL);
+  IMPORT_E5RES = cdoOperatorAdd("import_e5res", func_read,  0, NULL);
+  EXPORT_E5ML  = cdoOperatorAdd("export_e5ml",  func_write, 0, NULL);
+  EXPORT_E5RES = cdoOperatorAdd("export_e5res", func_write, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
@@ -1440,10 +1456,10 @@ void *Echam5ini(void *argument)
 
       iniatts(&atts);
 
-      if ( operatorID == READ_E5ML )
-	nvars = read_e5ml(cdoStreamName(0), &vars);
-      else if ( operatorID == READ_E5RES )
-	nvars = read_e5res(cdoStreamName(0), &vars, &atts);
+      if ( operatorID == IMPORT_E5ML )
+	nvars = import_e5ml(cdoStreamName(0), &vars);
+      else if ( operatorID == IMPORT_E5RES )
+	nvars = import_e5res(cdoStreamName(0), &vars, &atts);
       else
 	cdoAbort("Operator not implemented!");
 
@@ -1572,10 +1588,10 @@ void *Echam5ini(void *argument)
 
       streamClose(streamID1);
 
-      if ( operatorID == WRITE_E5ML )
-	write_e5ml(cdoStreamName(1), vars, nvars, vdate, vtime, ntr);
-      else if ( operatorID == WRITE_E5RES )
-	write_e5res(cdoStreamName(1), vars, nvars);
+      if ( operatorID == EXPORT_E5ML )
+	export_e5ml(cdoStreamName(1), vars, nvars, vdate, vtime, ntr);
+      else if ( operatorID == EXPORT_E5RES )
+	export_e5res(cdoStreamName(1), vars, nvars);
       else
 	cdoAbort("Operator not implemented!");
      
