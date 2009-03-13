@@ -161,7 +161,7 @@ void *Filter(void *argument)
   int *vdate = NULL, *vtime = NULL;
   int tunit;
   int incperiod0, incunit0, incunit, dpy, calendar;
-  int vdate0=0, vtime0=0, year0, month0, day0, hour0, minute0, vdateold;
+  int vdate0=0, vtime0=0, year0, month0, day0;
   double missval;
   double *array1, *array2;
   double fdata = 0;
@@ -199,38 +199,9 @@ void *Filter(void *argument)
   
   nvars = vlistNvars(vlistID1);
   
-  nalloc += NALLOC_INC;
-  vdate = (int *) realloc(vdate, nalloc*sizeof(int));
-  vtime = (int *) realloc(vtime, nalloc*sizeof(int));
-  vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
-  
-  
-  if ( taxisID1 != CDI_UNDEFID && taxisInqType(taxisID1) == TAXIS_RELATIVE )
-    {
-      vdate[0] = taxisInqRdate(taxisID1);
-      vtime[0] = taxisInqRtime(taxisID1);      
-    }
-  else
-    {
-      vdate[0] = taxisInqVdate(taxisID1);
-      vtime[0] = taxisInqVtime(taxisID1);                     
-    }
-  
-  decode_date(vdate[0], &year0, &month0, &day0);
-  decode_time(vtime[0], &hour0, &minute0);
-  
-  /*fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d  cal %i dpy %3i",
-          year0, month0, day0, hour0, minute0, calendar, dpy);
-  fprintf(stdout, "\n");*/
-  
   tsID = 0;    
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      int deltay, deltam;
-      juldate_t juldate0, juldate;
-      double jdelta;
-      int lperiod, incperiod;
-      int year, month, day, hour, minute;
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
@@ -239,26 +210,8 @@ void *Filter(void *argument)
           vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
         }
                        
-      if ( tsID > 0)        
-        {
-          vdate[tsID] = taxisInqVdate(taxisID1);
-          vtime[tsID] = taxisInqVtime(taxisID1);
-          decode_date(vdate[tsID], &year, &month, &day);
-          decode_time(vtime[tsID], &hour, &minute);
-          
-          if ( tsID > 1 ) 
-            {
-              decode_date(vdate[tsID-1], &year0, &month0, &day0);               
-              decode_time(vtime[tsID-1], &hour0, &minute0);
-            }
-        }
-      if ( month == 2 && day == 29 && 
-          ( day0 != day || month0 != month || year0 != year ) )
-        {
-          cdoWarning("filtering of multi-year times series only");
-          cdoWarning("  works properly with 365-day-calendar.");
-          cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)",year);
-        }
+      vdate[tsID] = taxisInqVdate(taxisID1);
+      vtime[tsID] = taxisInqVtime(taxisID1);
            
       vars[tsID] = (FIELD **) malloc(nvars*sizeof(FIELD *));
       
@@ -286,15 +239,25 @@ void *Filter(void *argument)
           vars[tsID][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
           streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
-          if( nmiss ) cdoAbort("Missing value support for operators in module Filter not added yet");
+          if ( nmiss ) cdoAbort("Missing value support for operators in module Filter not added yet");
         }
 
       /* get and check time increment */                   
       if ( tsID > 0)
         {    
+	  int deltay, deltam;
+	  juldate_t juldate0, juldate;
+	  double jdelta;
+	  int lperiod, incperiod;
+	  int year, month, day;
+
+          decode_date(vdate[tsID], &year, &month, &day);
+          
+	  decode_date(vdate[tsID-1], &year0, &month0, &day0);               
+
           juldate0 = juldate_encode(calendar, vdate[tsID-1], vtime[tsID-1]);        
           juldate  = juldate_encode(calendar, vdate[tsID], vtime[tsID]);         
-          jdelta  = juldate_to_seconds(juldate_sub(juldate, juldate0));
+          jdelta   = juldate_to_seconds(juldate_sub(juldate, juldate0));
          
           lperiod = (long)(jdelta+0.5);
           incperiod = (int) lperiod;
@@ -305,8 +268,8 @@ void *Filter(void *argument)
           
           if ( tsID == 1 ) 
             {           
-              /*printf("%4i %4.4i-%2.2i-%2.2i %2.2i:%2.2i\n", tsID, year, month, day, hour, minute);
-              printf("    %4.4i-%2.2i-%2.2i %2.2i:%2.2i\n",     year0,month0,day0,hour0,minute0);*/
+              /*printf("%4i %4.4i-%2.2i-%2.2i\n", tsID, year, month, day);
+              printf("    %4.4i-%2.2i-%2.2i\n",     year0,month0,day0);*/
               getTimeInc(lperiod, deltam, deltay, &incperiod0, &incunit0);
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero\n");
@@ -315,9 +278,19 @@ void *Filter(void *argument)
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
-            getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);          
+            getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);  
+        
+
+	  if ( incunit0 < 4 && month == 2 && day == 29 && 
+	       ( day0 != day || month0 != month || year0 != year ) )
+	    {
+	      cdoWarning("Filtering of multi-year times series only works properly with 365-day-calendar.");
+	      cdoWarning("  Please delete the day %i-02-29 (cdo del29feb)", year);
+	    }
+
           if ( ! ( incperiod == incperiod0 && incunit == incunit0 ) )
-            cdoWarning("Time increment in step %i differs from step 0", tsID);        
+            cdoWarning("Time increment in step %i (%d%s) differs from step 0 (%d%s)",
+		       tsID, incperiod, tunits[incunit], incperiod0, tunits[incunit0]);        
         }
       tsID++;
     }

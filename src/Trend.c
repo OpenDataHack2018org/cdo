@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -62,6 +62,12 @@ void *Trend(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  nvars    = vlistNvars(vlistID1);
+  nrecords = vlistNrecs(vlistID1);
+
+  for ( varID = 0; varID < nvars; varID++ )
+    vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
+
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
@@ -71,9 +77,6 @@ void *Trend(void *argument)
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID2);
-
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
 
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));

@@ -799,7 +799,8 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	  atype_class = H5Tget_class(atype);
 
 	  if ( strcmp(attname, "intercept") == 0 ||
-	       strcmp(attname, "offset")    == 0 )
+	       strcmp(attname, "offset")    == 0 ||
+	       strcmp(attname, "OFFSET")    == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
@@ -835,7 +836,9 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	      else
 		cdoWarning("Attribute %s has unsupported data type!", attname);
 	    }
-	  else if ( strcmp(attname, "gain") == 0 )
+	  else if ( strcmp(attname, "gain") == 0 ||
+		    strcmp(attname, "scaling_factor") == 0 ||
+		    strcmp(attname, "SCALING_FACTOR") == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
