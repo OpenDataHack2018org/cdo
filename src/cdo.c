@@ -75,6 +75,7 @@ int cdoDefaultByteorder = CDI_UNDEFID;
 int cdoDefaultTableID   = CDI_UNDEFID;
 
 int cdoHaveNC4          = FALSE;
+int cdoDiag        = FALSE;
 int cdoDisableFilesuffix = FALSE;
 int cdoDisableHistory = FALSE;
 int cdoZtype       = COMPRESS_NONE;
@@ -744,6 +745,17 @@ int main(int argc, char *argv[])
 	      cdoDisableFilesuffix = TRUE;
 	      if ( cdoVerbose )
 		fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
+	    }
+	}
+
+      envstr = getenv("CDO_DIAG");
+      if ( envstr )
+	{
+	  if ( atoi(envstr) == 1 )
+	    {
+	      cdoDiag = TRUE;
+	      if ( cdoVerbose )
+		fprintf(stderr, "CDO_DIAG = %s\n", envstr);
 	    }
 	}
   }

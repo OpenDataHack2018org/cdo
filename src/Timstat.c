@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -80,12 +80,14 @@ void *Timstat(void *argument)
   int otsID;
   long nsets;
   int i;
-  int streamID1, streamID2;
-  int vlistID1, vlistID2, taxisID1, taxisID2;
+  int streamID1, streamID2, streamID3;
+  int vlistID1, vlistID2, vlistID3, taxisID1, taxisID2, taxisID3;
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
   int taxis_has_bounds = FALSE;
+  int lvfrac = FALSE;
+  double vfrac = 1;
   double missval;
   FIELD **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
   FIELD field;
@@ -131,6 +133,22 @@ void *Timstat(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
+  if ( operfunc == func_mean )
+    {
+      int oargc = operatorArgc();
+      char **oargv = operatorArgv();
+
+      if ( oargc == 1 )
+	{
+	  lvfrac = TRUE;
+	  vfrac = atof(oargv[0]);
+	  if ( cdoVerbose ) cdoPrint("Set vfrac to %g", vfrac);
+	  if ( vfrac < 0 || vfrac > 1 ) cdoAbort("vfrac out of range!");
+	}
+      else if ( oargc > 1 )
+	cdoAbort("Too many arguments!");
+    }
+
   cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -154,6 +172,23 @@ void *Timstat(void *argument)
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
+
+  if ( cdoDiag )
+    {
+      char filename[4096];
+
+      strcpy(filename, "diag_");
+      strcat(filename, cdoStreamName(1));
+      streamID3 = streamOpenWrite(filename, cdoFiletype());
+      if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", filename);
+
+      vlistID3 = vlistDuplicate(vlistID1);
+
+      taxisID3 = taxisDuplicate(taxisID1);
+      vlistDefTaxis(vlistID3, taxisID3);
+
+      streamDefVlist(streamID3, vlistID2);
+    }
 
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
@@ -350,6 +385,40 @@ void *Timstat(void *argument)
 	      }
 	  }
 
+      if ( cdoVerbose ) cdoPrint("vfrac = %g, nsets = %d", vfrac, nsets);
+
+      if ( lvfrac && operfunc == func_mean )
+	for ( varID = 0; varID < nvars; varID++ )
+	  {
+	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    for ( levelID = 0; levelID < nlevel; levelID++ )
+	      {
+		missval = vars1[varID][levelID].missval;
+		if ( samp1[varID][levelID].ptr )
+		  {
+		    int irun = 0;
+		    for ( i = 0; i < gridsize; ++i )
+		      {
+			if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
+			  {
+			    vars1[varID][levelID].ptr[i] = missval;
+			    irun++;
+			  }
+		      }
+
+		    if ( irun )
+		      {
+			nmiss = 0;
+			for ( i = 0; i < gridsize; ++i )
+			  if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], missval) ) nmiss++;
+			vars1[varID][levelID].nmiss = nmiss;
+		      }
+		  }
+	      }
+	  }
+
       taxisDefVdate(taxisID2, vdate0);
       taxisDefVtime(taxisID2, vtime0);
       if ( taxis_has_bounds )
@@ -357,7 +426,21 @@ void *Timstat(void *argument)
 	  taxisDefVdateBounds(taxisID2, vdate_lb, vdate_ub);
 	  taxisDefVtimeBounds(taxisID2, vtime_lb, vtime_ub);
 	}
-      streamDefTimestep(streamID2, otsID++);
+      streamDefTimestep(streamID2, otsID);
+
+      if ( cdoDiag )
+	{
+	  taxisDefVdate(taxisID3, vdate0);
+	  taxisDefVtime(taxisID3, vtime0);
+	  if ( taxis_has_bounds )
+	    {
+	      taxisDefVdateBounds(taxisID3, vdate_lb, vdate_ub);
+	      taxisDefVtimeBounds(taxisID3, vtime_lb, vtime_ub);
+	    }
+	  streamDefTimestep(streamID3, otsID);
+	}
+
+      otsID++;
 
       for ( recID = 0; recID < nrecords; recID++ )
 	{
@@ -368,6 +451,14 @@ void *Timstat(void *argument)
 	    {
 	      streamDefRecord(streamID2, varID, levelID);
 	      streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	      if ( cdoDiag )
+		{
+		  if ( samp1[varID][levelID].ptr )
+		    {
+		      streamDefRecord(streamID3, varID, levelID);
+		      streamWriteRecord(streamID3, samp1[varID][levelID].ptr,  0);
+		    }
+		}
 	    }
 	}
 
@@ -393,6 +484,7 @@ void *Timstat(void *argument)
   free(samp1);
   if ( operfunc == func_std || operfunc == func_var ) free(vars2);
 
+  if ( cdoDiag ) streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
 

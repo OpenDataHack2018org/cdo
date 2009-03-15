@@ -67,6 +67,7 @@ extern int cdoZlevel;
 extern int cdoExpMode;
 
 extern int cdoDisableFilesuffix;
+extern int cdoDiag;
 
 void    cdiError(int cdiErrno, const char *fmt, ...);
 void    cdoAbort(const char *fmt, ...);
