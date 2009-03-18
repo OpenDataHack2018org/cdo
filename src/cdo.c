@@ -191,6 +191,8 @@ static void usage(void)
   */
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
   fprintf(stderr, "    -r             Convert from an absolute to a relative time axis\n");
+  fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
+  fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
   fprintf(stderr, "    -s             Silent mode\n");
   fprintf(stderr, "    -t <partab>    Set default parameter table name or file\n");
   fprintf(stderr, "                   Predefined tables: ");
@@ -610,7 +612,7 @@ int main(int argc, char *argv[])
 
   cdoHaveNC4 = have_netCDF4();
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhMRrsTuVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhMRrsSTuVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -680,6 +682,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'r':
 	  cdoDefaultTimeType = TAXIS_RELATIVE;
+	  break;
+	case 'S':
+	  cdoDiag = TRUE;
 	  break;
 	case 's':
 	  cdoSilentMode = TRUE;

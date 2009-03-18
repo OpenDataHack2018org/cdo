@@ -495,7 +495,7 @@ static MODULES Modules[] =
   { Enlarge,        EnlargeHelp,       EnlargeOperators,        1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,    1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       -1,  1 },
-  { Timeof,         NULL,              TimeofOperators,         1,  1 },
+  { Timeof,         NULL,              TimeofOperators,         1,  2 },
   { Expr,           ExprHelp,          ExprOperators,           1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,        1,  0 },
   { Fillmiss,       NULL,              FillmissOperators,       1,  1 },

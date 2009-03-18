@@ -80,8 +80,8 @@ void *Timstat(void *argument)
   int otsID;
   long nsets;
   int i;
-  int streamID1, streamID2, streamID3;
-  int vlistID1, vlistID2, vlistID3, taxisID1, taxisID2, taxisID3;
+  int streamID1, streamID2, streamID3 = -1;
+  int vlistID1, vlistID2, vlistID3, taxisID1, taxisID2, taxisID3 = -1;
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
@@ -173,25 +173,34 @@ void *Timstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  nvars    = vlistNvars(vlistID1);
+  nrecords = vlistNrecs(vlistID1);
+
   if ( cdoDiag )
     {
       char filename[4096];
 
-      strcpy(filename, "diag_");
+      strcpy(filename, cdoOperatorName(operatorID));
+      strcat(filename, "_");
       strcat(filename, cdoStreamName(1));
       streamID3 = streamOpenWrite(filename, cdoFiletype());
       if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", filename);
 
       vlistID3 = vlistDuplicate(vlistID1);
 
+      for ( varID = 0; varID < nvars; ++varID )
+	{
+	  vlistDefVarDatatype(vlistID3, varID, DATATYPE_INT32);
+	  vlistDefVarUnits(vlistID3, varID, "");
+	  vlistDefVarAddoffset(vlistID3, varID, 0);
+	  vlistDefVarScalefactor(vlistID3, varID, 1);
+	}
+
       taxisID3 = taxisDuplicate(taxisID1);
       vlistDefTaxis(vlistID3, taxisID3);
 
-      streamDefVlist(streamID3, vlistID2);
+      streamDefVlist(streamID3, vlistID3);
     }
-
-  nvars    = vlistNvars(vlistID1);
-  nrecords = vlistNrecs(vlistID1);
 
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));

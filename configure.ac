@@ -349,7 +349,7 @@ esac
 AC_SUBST([CPPFLAGS])
 AC_SUBST([AR])
 
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(Makefile src/Makefile cdo.spec)
 
 AC_MSG_NOTICE([
 
