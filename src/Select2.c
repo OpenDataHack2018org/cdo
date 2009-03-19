@@ -213,6 +213,7 @@ int pmlNum(pml_t *pml, const char *name)
 
 int pml_add_entry(pml_entry_t *entry, char *arg)
 {
+  static char func[] = "pml_add_entry";
   int status = 0;
 
   if ( entry->type == PML_INT )
