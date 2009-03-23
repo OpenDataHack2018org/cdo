@@ -574,7 +574,7 @@ void *Select2(void *argument)
 
 
 	  if ( cdoVerbose ) vlistPrint(vlistID1);
-	  
+
 	  vlistID0 = vlistDuplicate(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
@@ -584,6 +584,8 @@ void *Select2(void *argument)
 		if ( vlistInqFlag(vlistID1, varID, levID) == TRUE )
 		  vlistDefFlag(vlistID0, varID, levID, TRUE);
 	    }
+
+	  if ( cdoVerbose ) vlistPrint(vlistID0);
 
 	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
@@ -595,9 +597,7 @@ void *Select2(void *argument)
 
 	  ntsteps = vlistNtsteps(vlistID1);
 	  if ( ntsteps == 0 && nfiles > 1 )
-	    {
-	      int nvars = vlistNvars(vlistID1);
-	      
+	    {	      
 	      for ( varID = 0; varID < nvars; ++varID )
 		vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
 	    }
@@ -631,8 +631,8 @@ void *Select2(void *argument)
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		{
-		  varID2   = vlistFindVar(vlistID0, varID);
-		  levelID2 = vlistFindLevel(vlistID0, varID, levelID);
+		  varID2   = vlistFindVar(vlistID2, varID);
+		  levelID2 = vlistFindLevel(vlistID2, varID, levelID);
 
 		  streamDefRecord(streamID2, varID2, levelID2);
 		  if ( lcopy )
@@ -646,6 +646,7 @@ void *Select2(void *argument)
 		    }
 		}
      	    }
+
 	  tsID1++;
 	  tsID2++;
 	}
@@ -659,7 +660,6 @@ void *Select2(void *argument)
   vlistDestroy(vlistID2);
 
   if ( array ) free(array);
-
   if ( vars ) free(vars);
 
   cdoFinish();
