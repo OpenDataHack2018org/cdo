@@ -45,6 +45,8 @@ typedef struct {
   int mergelevel;
   int lgeoloc;
   int lregion;
+  int lprojtype;
+  int lmetadata;
   DSET_OBJ obj[MAX_DSETS];
 }
 DSETS;
@@ -342,7 +344,7 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
 
 #if  defined  (HAVE_LIBHDF5)
 static
-int read_geolocation(hid_t loc_id, int nx, int ny)
+int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 {
   static char func[] = "read_geolocation";
   int gridID = -1;
@@ -374,11 +376,14 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
 
   if ( cdoVerbose ) cdoPrint("Read geolocation:");
 
-  ptype_id = H5Topen(loc_id, "ProjType");
-  if ( ptype_id >= 0 )
+  if ( lprojtype )
     {
-      projection_name = H5Tget_member_name(ptype_id, 0);
-      H5Tclose(ptype_id);
+      ptype_id = H5Topen(loc_id, "ProjType");
+      if ( ptype_id >= 0 )
+	{
+	  projection_name = H5Tget_member_name(ptype_id, 0);
+	  H5Tclose(ptype_id);
+	}
     }
 
   str_tid = H5Tcopy(H5T_C_S1);
@@ -441,6 +446,14 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
   H5Dclose(region_id);
   H5Tclose(region_tid);
 
+  if ( region.xmin > region.xmax )
+    {
+      double xmin = region.xmin;
+      region.xmin = region.xmax;
+      region.xmax = xmin;
+      if ( cdoVerbose ) cdoPrint("  Swap xmin/xmax");
+    }
+
   if ( cdoVerbose ) 
     cdoPrint("  Region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
 	     region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy);
@@ -453,9 +466,11 @@ int read_geolocation(hid_t loc_id, int nx, int ny)
 
   if ( cdoVerbose ) cdoPrint("  Size: xsize=%d  ysize=%d", xsize, ysize);
 
+  if ( strcmp(proj.ellipsoid, "WSG-84") == 0 ) strcpy(proj.ellipsoid, "WGS-84");
+
   if ( nx == xsize && ny == ysize && 
        strcmp(proj.name, "sinusoidal") == 0 && 
-       strcmp(proj.ellipsoid, "WGS-84") == 0 )
+       strcmp(proj.ellipsoid, "WGS-84") == 0  )
     {
       gridID = defSinusoidalGrid(nx, ny, region.xmin, region.xmax, region.ymin, region.ymax, 
 				 region.dx, region.dy,
@@ -669,17 +684,17 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   char attname[256];
   H5T_class_t  type_class;
   H5T_class_t atype_class;
+  size_t atype_size;
   int     rank;
   int nx = 0, ny = 0, nz = 0, nt = 0;
   int gridsize, offset;
   double *array;
   double addoffset = 0, scalefactor = 1, missval = cdiInqMissval();
-  int lmissval = 0;
+  int laddoffset = 0, lscalefactor = 0, lmissval = 0;
   int nset;
-  int i;
+  int i, k;
   int ftype = 0;
   int len;
-  int laddoffset, lscalefactor;
   int dtype = DATATYPE_FLT32;
   char attstring[4096];     /* Buffer to read string attribute back */
   char varname[256];
@@ -759,8 +774,10 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
   len = (int) strlen(varname);
   if ( ((DSETS *) opdata)->mergelevel )
-    if ( isdigit(varname[len-1]) )
+    if ( isdigit(varname[len-1]) && memcmp(varname, "Data", 4) != 0 )
       {
+	if ( nt > 1 ) cdoAbort("Combination of nlevel > 1 and ntime > 1 not implemented!");
+       
 	nz = atoi(&varname[len-1]);
 	varname[len-1] = 0;
       }
@@ -796,21 +813,18 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	       strcmp(attname, "PALETTE") == 0 ) continue;
 
 	  atype_mem = H5Tget_native_type(atype, H5T_DIR_ASCEND);
+	  atype_size = H5Tget_size(atype);
 	  atype_class = H5Tget_class(atype);
 
+	  len = strlen(attname);
+	  for ( k = 0; k < len; ++k ) attname[k] = tolower(attname[k]);
+
 	  if ( strcmp(attname, "intercept") == 0 ||
-	       strcmp(attname, "offset")    == 0 ||
-	       strcmp(attname, "OFFSET")    == 0 )
+	       strcmp(attname, "offset")    == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
-		  status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
-		  if ( status >= 0 )
-		    {
-		      addoffset  = dattr;
-		      laddoffset = 1;
-		    }
-		  else
+		  if ( atype_size == 4 )
 		    {
 		      status = H5Aread(attr, H5T_NATIVE_FLOAT, &fattr);
 		      if ( status >= 0 )
@@ -818,9 +832,19 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 			  addoffset  = fattr;
 			  laddoffset = 1;
 			}
-		      else
-			cdoWarning("Reading of float attribute %s failed!", attname);
 		    }
+		  else
+		    {
+		      status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
+		      if ( status >= 0 )
+			{
+			  addoffset  = dattr;
+			  laddoffset = 1;
+			}
+		    }
+
+		  if ( laddoffset == 0 )
+		    cdoWarning("Reading of float attribute %s failed!", attname);
 		}
 	      else if ( atype_class == H5T_INTEGER )
 		{
@@ -837,18 +861,11 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		cdoWarning("Attribute %s has unsupported data type!", attname);
 	    }
 	  else if ( strcmp(attname, "gain") == 0 ||
-		    strcmp(attname, "scaling_factor") == 0 ||
-		    strcmp(attname, "SCALING_FACTOR") == 0 )
+		    strcmp(attname, "scaling_factor") == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
-		  status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
-		  if ( status >= 0 )
-		    {
-		      scalefactor  = dattr;
-		      lscalefactor = 1;
-		    }
-		  else
+		  if ( atype_size == 4 )
 		    {
 		      status = H5Aread(attr, H5T_NATIVE_FLOAT, &fattr);
 		      if ( status >= 0 )
@@ -856,9 +873,19 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 			  scalefactor  = fattr;
 			  lscalefactor = 1;
 			}
-		      else
-			cdoWarning("Reading of integer attribute %s failed!", attname);
 		    }
+		  else
+		    {
+		      status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
+		      if ( status >= 0 )
+			{
+			  scalefactor  = dattr;
+			  lscalefactor = 1;
+			}
+		    }
+
+		  if ( lscalefactor == 0 )
+		    cdoWarning("Reading of float attribute %s failed!", attname);
 		}
 	      else if ( atype_class == H5T_INTEGER )
 		{
@@ -874,20 +901,12 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	      else
 		cdoWarning("Attribute %s has unsupported data type!", attname);
 	    }
-	  else if ( strcmp(attname, "no_data_value") == 0 ||
-		    strcmp(attname, "nodata value") == 0  ||
-		    strcmp(attname, "nodata_value") == 0  ||
-		    strcmp(attname, "nodata") == 0 )
+	  else if ( strncmp(attname, "no_data", 7) == 0 ||
+		    strncmp(attname, "nodata", 6)  == 0 )
 	    {
 	      if ( atype_class == H5T_FLOAT )
 		{
-		  status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
-		  if ( status >= 0 )
-		    {
-		      missval  = dattr;
-		      lmissval = 1;
-		    }
-		  else
+		  if ( atype_size == 4 )
 		    {
 		      status = H5Aread(attr, H5T_NATIVE_FLOAT, &fattr);
 		      if ( status >= 0 )
@@ -895,9 +914,19 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 			  missval  = fattr;
 			  lmissval = 1;
 			}
-		      else
-			cdoWarning("Reading of integer attribute %s failed!", attname);
 		    }
+		  else
+		    {
+		      status = H5Aread(attr, H5T_NATIVE_DOUBLE, &dattr);
+		      if ( status >= 0 )
+			{
+			  missval  = dattr;
+			  lmissval = 1;
+			}
+		    }
+
+		  if ( lmissval == 0 )
+		    cdoWarning("Reading of float attribute %s failed!", attname);
 		}
 	      else if ( atype_class == H5T_INTEGER )
 		{
@@ -974,6 +1003,21 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       ((DSETS *) opdata)->obj[nset].nz       = nz;
       ((DSETS *) opdata)->obj[nset].nt       = nt;
       ((DSETS *) opdata)->obj[nset].gridsize = gridsize;
+
+      if ( nz > 1 )
+	{
+	  if ( ((DSETS *) opdata)->obj[nset].dtype != dtype )
+	    cdoWarning("Data type changes over levels!");
+
+	  if ( laddoffset && !DBL_IS_EQUAL(((DSETS *) opdata)->obj[nset].offset, addoffset) )
+	    cdoWarning("Offset changes over levels!");
+
+	  if ( lscalefactor && !DBL_IS_EQUAL(((DSETS *) opdata)->obj[nset].scale, scalefactor) )
+	    cdoWarning("Scalefactor changes over levels!");
+
+	  if ( lmissval && !DBL_IS_EQUAL(((DSETS *) opdata)->obj[nset].missval, missval) )
+	    cdoWarning("Missing value changes over levels!");	       
+	}
 
       ((DSETS *) opdata)->obj[nset].dtype    = dtype;
 
@@ -1076,7 +1120,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		    if ( mask[i] ) array[i] = missval;
 		}
 	      else
-		cdoWarning(" Missing value is inside of valid values!\n"
+		cdoWarning(" Missing value is inside the range of valid values!\n"
                            " Dataset %s,  Missval: %g,  Range: %g - %g",
 			   varname, missval, minval, maxval);
 	    }
@@ -1128,6 +1172,10 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
       {
 	((DSETS *) opdata)->lgeoloc = TRUE;
       }
+    else if ( strcmp(name, "Metadata") == 0 )
+      {
+	((DSETS *) opdata)->lmetadata = TRUE;
+      }
     break;
   case H5G_DATASET: 
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a dataset", name);
@@ -1148,6 +1196,10 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
     break;
   case H5G_TYPE: 
     if ( cdoVerbose ) cdoPrint(" Object with name %s is a named datatype", name);
+    if ( strcmp(name, "ProjType") == 0 )
+      {
+	((DSETS *) opdata)->lprojtype = TRUE;
+      }
     break;
   default:
     cdoAbort(" Unable to identify an object %s", name);
@@ -1159,7 +1211,7 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
 
 
 #if  defined  (HAVE_LIBHDF5)
-void get_global_att(hid_t file_id, int vlistID)
+void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
 {
   hid_t   attr, atype, atype_mem, obj_id, grp_id = -1;
   char attname[256];
@@ -1172,19 +1224,9 @@ void get_global_att(hid_t file_id, int vlistID)
 
   attstring[0] = 0;
 
-  obj_id = H5Gopen(file_id, "/");
+  obj_id = H5Gopen(file_id, obj_path);
 
   num_attrs = H5Aget_num_attrs(obj_id);
-  if ( num_attrs == 0 )
-    {
-      grp_id = H5Gopen(obj_id, "Metadata");
-
-      if ( grp_id < 0 ) return;
-
-      obj_id = grp_id;
-
-      num_attrs = H5Aget_num_attrs(obj_id);
-    }
 
   for( i = 0; i < num_attrs; i++ )
     {
@@ -1224,14 +1266,45 @@ void get_global_att(hid_t file_id, int vlistID)
 #endif
 
 
+int get_vdate(int vlistID)
+{
+  int vdate = 0;
+  int natts;
+  int i, len, type;
+  char name[256];
+  char attstr[256];
+
+  vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
+
+  for ( i = 0; i < natts; ++i )
+    {
+      vlistInqAtt(vlistID, CDI_GLOBAL, i, name, &type, &len);
+      if ( type == DATATYPE_TXT )
+	{
+	  if ( strcmp(name, "DateAndTime") == 0 ||
+	       strcmp(name, "Date_Time") == 0 )
+	    {
+	      vlistInqAttTxt(vlistID, CDI_GLOBAL, name, 256, attstr);
+	      vdate = atoi(attstr);
+	      if ( vdate < 999999 ) vdate = vdate*100 + 1;
+	    }
+	}
+    }
+
+  return (vdate);
+}
+
+
 void dsets_init(DSETS *dsets)
 {
   int i;
 
-  dsets->nsets = 0;
+  dsets->nsets      = 0;
   dsets->mergelevel = 0;
-  dsets->lgeoloc = 0;
-  dsets->lregion = 0;
+  dsets->lgeoloc    = 0;
+  dsets->lregion    = 0;
+  dsets->lprojtype  = 0;
+  dsets->lmetadata  = 0;
 
   for ( i = 0; i < MAX_DSETS; ++i )
     {
@@ -1269,10 +1342,13 @@ void *Importcmsaf(void *argument)
   hid_t	  file_id;	/* HDF5 File ID	        	*/
   herr_t  status;	/* Generic return value		*/
   DSETS dsets;
-  int vtime;
+  int vdate, vtime;
   int *vtimes = NULL;
 
   cdoInitialize(argument);
+
+  if ( cdoDefaultFileType == CDI_UNDEFID )
+    cdoDefaultFileType = FILETYPE_NC;
 
   dsets_init(&dsets);
 
@@ -1292,16 +1368,23 @@ void *Importcmsaf(void *argument)
   nz = dsets.obj[0].nz;
   nt = dsets.obj[0].nt;
 
+  for ( ivar = 0; ivar < dsets.nsets; ++ivar )
+    if ( dsets.obj[ivar].nt > 1 )
+      {
+	nt = dsets.obj[ivar].nt;
+	break;
+      }
+
   if ( nt > 1 )
     {
-      vtimes = (int *) malloc(dsets.obj[0].nt*sizeof(int));
+      vtimes = (int *) malloc(nt*sizeof(int));
       
-      for ( i = 0; i < nt; ++i ) vtimes[i] = i*100;
+      for ( i = 0; i < nt; ++i ) vtimes[i] = i*100 + 45;
 
-      if ( dsets.obj[0].time )
+      if ( dsets.obj[ivar].time )
 	{
 	  long itime;
-	  char *pline = dsets.obj[0].time;
+	  char *pline = dsets.obj[ivar].time;
 
 	  for ( i = 0; i < nt; ++i )
 	    {
@@ -1318,7 +1401,8 @@ void *Importcmsaf(void *argument)
 
   if ( cdoVerbose )
     for ( ivar = 0; ivar < dsets.nsets; ++ivar )
-      cdoPrint(" Var %d %-20s %dx%d nlev = %d", ivar, dsets.obj[ivar].name, nx, ny, nz);
+      cdoPrint(" Var %d %-20s %dx%d nlev = %d nts = %d", 
+	       ivar, dsets.obj[ivar].name, nx, ny, nz, dsets.obj[ivar].nt);
 
   for ( ivar = 1; ivar < dsets.nsets; ++ivar )
     {
@@ -1330,7 +1414,7 @@ void *Importcmsaf(void *argument)
 
   if ( dsets.lgeoloc )
     {
-      gridID = read_geolocation(file_id, nx, ny);
+      gridID = read_geolocation(file_id, nx, ny, dsets.lprojtype);
     }
   else if ( dsets.lregion )
     {
@@ -1358,7 +1442,13 @@ void *Importcmsaf(void *argument)
 
   vlistID = vlistCreate();
 
-  taxisID = taxisCreate(TAXIS_ABSOLUTE);
+  if ( nt > 1 )
+    taxisID = taxisCreate(TAXIS_RELATIVE);
+  else
+    taxisID = taxisCreate(TAXIS_ABSOLUTE);
+
+  taxisDefCalendar(taxisID, CALENDAR_STANDARD);
+
   vlistDefTaxis(vlistID, taxisID);
 
   for ( ivar = 0; ivar < dsets.nsets; ++ivar )
@@ -1389,7 +1479,11 @@ void *Importcmsaf(void *argument)
 	vlistDefVarAddoffset(vlistID, varID, dsets.obj[ivar].offset);
     }
 
-  get_global_att(file_id, vlistID);
+  get_global_att(file_id, "/", vlistID);
+  if ( dsets.lmetadata ) get_global_att(file_id, "Metadata", vlistID);
+
+  vdate = get_vdate(vlistID);
+  if ( vdate == 0 ) vdate = 10101;
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(1));
@@ -1398,7 +1492,7 @@ void *Importcmsaf(void *argument)
 
   for ( tsID = 0; tsID < nt; ++tsID )
     {
-      taxisDefVdate(taxisID, 0);
+      taxisDefVdate(taxisID, vdate);
       vtime = 0;
       if ( vtimes ) vtime = vtimes[tsID];
       taxisDefVtime(taxisID, vtime);
@@ -1407,6 +1501,8 @@ void *Importcmsaf(void *argument)
       for ( ivar = 0; ivar < dsets.nsets; ++ivar )
 	{
 	  varID   = ivar;
+
+	  if ( tsID > 0 && dsets.obj[ivar].nt == 1 ) continue;
 	  
 	  gridsize = dsets.obj[ivar].gridsize;
 	  missval  = dsets.obj[ivar].missval;

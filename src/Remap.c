@@ -78,6 +78,7 @@ void *Remap(void *argument)
   int need_gradiants = FALSE;
   int remap_non_global = FALSE;
   int remap_extrapolate = FALSE;
+  int lextrapolate = FALSE;
   int non_global;
   int lgridboxinfo = TRUE;
   int grid1sizemax;
@@ -226,9 +227,15 @@ void *Remap(void *argument)
       if ( *envstr )
 	{
 	  if ( memcmp(envstr, "ON", 2) == 0 || memcmp(envstr, "on", 2) == 0 )
-	    remap_extrapolate = TRUE;
+	    {
+	      lextrapolate = TRUE;
+	      remap_extrapolate = TRUE;
+	    }
 	  else if ( memcmp(envstr, "OFF", 3) == 0 || memcmp(envstr, "off", 3) == 0 )
-	    remap_extrapolate = FALSE;
+	    {
+	      lextrapolate = TRUE;
+	      remap_extrapolate = FALSE;
+	    }
 	  else
 	    cdoWarning("Environment variable REMAP_EXTRAPOLATE has wrong value!");
 
