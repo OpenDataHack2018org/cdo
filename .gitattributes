@@ -241,6 +241,7 @@ src/Hi.c -text
 src/Histogram.c -text
 src/Importamsr.c -text
 src/Importcmsaf.c -text
+src/Importgrads.c -text
 src/Info.c -text
 src/Input.c -text
 src/Intgrid.c -text
@@ -382,6 +383,8 @@ src/fieldmer.c -text
 src/fieldzon.c -text
 src/fourier.c -text
 src/functs.h -text
+src/gradsdeslib.c -text
+src/gradsdeslib.h -text
 src/grid.c -text
 src/grid.h -text
 src/grid_gme.c -text

@@ -38,6 +38,7 @@ cdo_SOURCES = Arith.c		\
               Histogram.c 	\
               Importamsr.c  	\
               Importcmsaf.c  	\
+              Importgrads.c  	\
               Info.c		\
               Input.c		\
               Intgrid.c 	\
@@ -156,6 +157,8 @@ cdo_SOURCES = Arith.c		\
               field2.c		\
               fieldmer.c  	\
               fieldzon.c  	\
+              gradsdeslib.c     \
+              gradsdeslib.h     \
               grid.c		\
               grid.h		\
               grid_gme.c	\

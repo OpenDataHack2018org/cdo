@@ -184,9 +184,9 @@ case "${HOSTNAME}" in
 # powerpc-ibm-aix5.2.0.0
     ecgate)
 	${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/home/ms/spdekplb/hmk/local/AIX \
+                    --with-netcdf=/usr/local/apps/netCDF/3.6.2/LP64_underscore \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qMAXMEM=-1 -qarch=auto -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix5.3.0.0
     vip*)
