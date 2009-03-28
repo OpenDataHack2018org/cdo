@@ -146,6 +146,7 @@ extern "C" {
 #define  TUNIT_DAY                4
 #define  TUNIT_MONTH              5
 #define  TUNIT_YEAR               6
+#define  TUNIT_QUARTER            7
 
 /* CALENDAR types */
 

@@ -3,8 +3,11 @@
 
 #define  gaint     int
 #define  gadouble  double
+#define  gafloat   float
 #define  galloc(x,y)  malloc(x)
 #define  gree(x,y)    free(x)
+#define  gaprnt(i,ch) printf("%s",ch)
+
 
 /* Handling of missing data values. After the data I/O is done, 
    grid values are tested to see if they are within a small range 
@@ -40,6 +43,58 @@ typedef struct {
 dset_obj_t;
 
 
+/* Date/time structure */
+struct dt {
+  gaint yr;
+  gaint mo;
+  gaint dy;
+  gaint hr;
+  gaint mn;
+};
+
+/* Structure that describes a variable in a file.  These structures
+   are built in arrays that are hung off of gafile structures.         */
+struct gavar {
+  char varnm[128];             /* Variable description.                */
+  char abbrv[16];              /* Variable abbreviation.               */
+  char longnm[257];            /* netcdf/hdf var name if different     */
+  gadouble units[16];          /* Units indicator.                     
+				  Vals 0-7 are for variable codes:
+				  grib, non-float data, nc/hdf dims
+				  Vals  8-11 are for grib level codes  */
+  gaint offset;                /* Offset in grid elements of the start
+                                  of this variable within a time group
+                                  within this file.                    */
+  gaint recoff;                /* Record (XY grid) offset of the start
+                                  of this variable within a time group */
+  gaint ncvid;                 /* netcdf vid for this variable         */
+  gaint sdvid;                 /* hdf vid for this variable            */
+  gaint levels;                /* Number of levels for this variable.
+                                  0 is special and indiates one grid is
+                                  available for the surface only.      */
+  gaint dfrm;                  /* format  type indicator
+  				  1 - unsigned char
+				  4 - int  			       */
+  gaint var_t ;                /* variable t transform                 */
+  gadouble scale;              /* scale factor for unpacking data      */
+  gadouble add;                /* offset value for unpacking data      */
+  gadouble undef;              /* undefined value                      */
+  gaint vecpair;               /* Variable has a vector pair           */
+  gaint isu;                   /* Variable is the u-component of a vector pair */
+  gaint isdvar;                /* Variable is a valid data variable (for SDF files) */
+  gaint nvardims;              /* Number of variable dimensions        */
+  gaint vardimids[100];        /* Variable dimension IDs. 	       */
+};
+
+/* Sructure for string substitution in templating -- the %ch template.  
+   This forms a linked list chained from pchsub1 in gafile */
+struct gachsub {
+  struct gachsub *forw;       /* Forward pointer */
+  gaint t1;                   /* First time for this substitution */
+  gaint t2;                   /* Last time.  -99 indicates open ended */
+  char *ch;                   /* Substitution string */
+};
+
 #define  MAX_RECLEN   512
 #define  MAX_NAMELEN  512
 typedef struct {
@@ -48,33 +103,53 @@ typedef struct {
   char title[MAX_NAMELEN];
   int bswap;
   long fhdr;
+  struct gachsub *pchsub1;     /* Pointer to first %ch substitution */
+  gaint ncflg;                 /* 1==netcdf  2==hdfsds */
   long xyhdr;
   int seqflg;
   int yrflg;
   int zrflg;
-  int tmplat;
+  gaint tmplat;                /* File name templating:
+                                   3==templating on E and T 
+                                   2==templating only on E 
+                                   1==templating only on T, or when 
+                                      ddf has 'options template', but no % in dset 
+                                   0==no templating  */
+  gaint *fnums;                /* File number for each time */
+  gaint fnumc;                 /* Current file number that is open */
   int pa2mb;
   int calendar;
   /* init !? */
-  double undef;
-  double ulow;
-  double uhi;
-  int dnum[5];               /* Dimension sizes for this file.        */
-  double (*gr2ab[5]) (double *, double);
+  FILE *infile;                /* File pointer.                         */
+  gaint type;                  /* Type of file:  1 = grid
+                                                 2 = simple station
+                                                 3 = mapped station
+                                                 4 = defined grid       */
+  gadouble undef;              /* Global undefined value for this file  */
+  gadouble ulow,uhi;           /* Undefined limits for missing data test  */
+  gaint dnum[5];               /* Dimension sizes for this file.        */
+  gaint vnum;                  /* Number of variables.                  */
+  struct gavar *pvar1;         /* Pointer to an array of structures.
+				  Each structure in the array has info
+				  about the specific variable.          */
+  gaint wrap;                  /* The grid globally 'wraps' in X        */
+  gadouble (*gr2ab[5]) (double *, double);
                                /* Addresses of routines to do conversion
                                   from grid coordinates to absolute
                                   coordinates for X, Y, Z.  All Date/time
                                   conversions handled by gr2t.          */
-  double (*ab2gr[5]) (double *, double);
+  gadouble (*ab2gr[5]) (double *, double);
                                /* Addresses of routines to do conversion
                                   from absolute coordinates to grid
                                   coordinates for X,Y,Z.  All date/time
                                   conversions handled by t2gr.          */
-  double *grvals[5];         /* Pointers to conversion information for
+  gadouble *grvals[5];         /* Pointers to conversion information for
                                   grid-to-absolute conversion routines. */
-  double *abvals[5];         /* Pointers to conversion information for
+  gadouble *abvals[5];         /* Pointers to conversion information for
                                   absolute-to-grid conversion routines. */
-
+  gaint linear[5];             /* Indicates if a dimension has a linear
+                                  grid/absolute coord transformation
+                                  (Time coordinate always linear).      */
   int nsets;
   int mergelevel;
   int lgeoloc;
@@ -92,5 +167,8 @@ int read_gradsdes(char *filename, dsets_t *pfi);
 gadouble liconv (gadouble *, gadouble);
 gadouble gr2lev (gadouble *, gadouble);
 gadouble lev2gr (gadouble *, gadouble);
+
+gaint cmpwrd (char *ch1, char *ch2);
+char *intprs (char *ch, int *val);
 
 #endif  /* _GRADSDESLIB_H */

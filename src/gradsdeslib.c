@@ -11,6 +11,11 @@
 
 extern int cdoDefaultDataType;
 
+static char pout[512];
+FILE *descr;             /* File descriptor pointer */
+int cal365 = 0;
+int fullyear = -999;
+
 void dsets_init(dsets_t *dsets)
 {
   int i;
@@ -27,9 +32,12 @@ void dsets_init(dsets_t *dsets)
   dsets->tmplat     = 0;
   dsets->pa2mb      = 0;
   dsets->calendar   = 0;
+  dsets->type       = 1;      /* Assume grid unless told otherwise */
+  dsets->ncflg      = 0;      /* Assume not netcdf */
+
+  dsets->pchsub1    = NULL;
 
   for ( i = 0; i < 5; ++i ) dsets->dnum[i]    = 0;
-  
 
   dsets->nsets      = 0;
   dsets->mergelevel = 0;
@@ -83,11 +91,222 @@ int qflag=0;
   }
 }
 
+/* Date/Time manipulation routines.  Note that these routines
+   are not particularly efficient, thus Date/Time conversions
+   should be kept to a minimum.                                      */
+
+static gaint mosiz[13] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+
+/* Test for leap year.  Rules are:
+
+      Divisible by 4, it is a leap year, unless....
+      Divisible by 100, it is not a leap year, unless...
+      Divisible by 400, it is a leap year.                           */
+
+gaint qleap (gaint year)  {
+gaint i,y;
+
+/*mf - disable if 365 day calendar mf*/
+
+ if(/*mfcmn.*/cal365 == 1) return(0);
+
+  y = year;
+
+  i = y / 4;
+  i = (i*4) - y;
+  if (i!=0) return (0);
+
+  i = y / 100;
+  i = (i*100) - y;
+  if (i!=0) return (1);
+
+  i = y / 400;
+  i = (i*400) - y;
+  if (i!=0) return (0);
+
+  return (1);
+
+
+}
+
+static char *mons[12] = {"jan","feb","mar","apr","may","jun",
+			 "jul","aug","sep","oct","nov","dec"};
+
+/* Parse an absolute date/time value.  Format is:
+
+   12:00z 1jan 1989 (jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec)
+
+   Must have Z or Month abbrev, or value is invalid.  'def' contains
+   higher order missing values (usually from tmin in pst).  Lower order
+   values are defaulted to be: dy = 1, hr = 0, mn = 0.              */
+
+char *adtprs (char *ch, struct dt *def, struct dt *dtim) {
+gaint val,flag,i;
+char *pos;
+char monam[5];
+
+  pos = ch;
+
+  dtim->mn = 0;
+  dtim->hr = 0;
+  dtim->dy = 1;
+
+  if (*ch>='0' && *ch<='9') {
+  flag = 0;
+    ch = intprs (ch,&val);
+    if (*ch == ':' || tolower(*ch) == 'z') {
+      if (val>23) {
+        gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+        sprintf (pout,"  Hour = %i -- greater than 23\n",val);
+        gaprnt (0,pout);
+        return (NULL);
+      }
+      dtim->hr = val;
+      if (*ch == ':') {
+        ch++;
+        if (*ch>='0' && *ch<='9') {
+          ch = intprs (ch,&val);
+          if (val>59) {
+            gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+            sprintf (pout,"  Minute = %i -- greater than 59\n",val);
+            gaprnt (0,pout);
+            return (NULL);
+          }
+          if (tolower(*ch)!='z') {
+            gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+            gaprnt (0,"  'z' delimiter is missing \n");
+            return (NULL);
+          }
+          dtim->mn = val;
+          ch++;
+          if (*ch>='0' && *ch<='9') ch = intprs (ch,&val);
+          else val = def->dy;
+        } else {
+          gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+          gaprnt (0,"  Missing minute value \n");
+          return (NULL);
+        }
+      } else {
+        ch++;
+        if (*ch>='0' && *ch<='9') ch = intprs (ch,&val);
+        else val = def->dy;
+      }
+    } else flag = 2;
+    dtim->dy = val;
+  } else flag = 1;
+
+  monam[0] = tolower(*ch);
+  monam[1] = tolower(*(ch+1));
+  monam[2] = tolower(*(ch+2));
+  monam[3] = '\0';
+
+  i = 0;
+  while (i<12 && !cmpwrd(monam,mons[i]) ) i++;
+  i++;
+
+  if (i==13) {
+    if (flag==1) {
+      gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+      gaprnt (0,"  Expected month abbreviation, none found\n");
+      return (NULL);
+    }
+    if (flag==2) {
+      gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+      gaprnt (0,"  Missing month abbreviation or 'z' delimiter\n");
+      return (NULL);
+    }
+    dtim->mo = def->mo;
+    dtim->yr = def->yr;
+  } else {
+    dtim->mo = i;
+    ch+=3;
+    /* parse year */
+    if (*ch>='0' && *ch<='9') {
+      /* use fullyear only if year 1 = 0001*/
+      if(*(ch+2)>='0' && *(ch+2)<='9') {
+	/*mfcmn.*/fullyear=1;
+      } else {
+	/*mfcmn.*/fullyear=0;
+      }
+      ch = intprs (ch,&val);
+    } else {
+      val = def->yr;
+    }
+
+    /* turn off setting of < 100 years to 1900 or 2000 */
+    if(/*mfcmn.*/fullyear == 0) {
+      if (val<50) val+=2000;
+      else if (val<100) val+=1900;
+    }
+    dtim->yr = val;
+  }
+
+  i = mosiz[dtim->mo];
+  if (dtim->mo==2 && qleap(dtim->yr)) i = 29;
+  if (dtim->dy > i) {
+    gaprnt (0,"Syntax Error:  Invalid Date/Time value.\n");
+    sprintf (pout,"  Day = %i -- greater than %i \n",dtim->dy,i);
+    gaprnt (0,pout);
+    return (NULL);
+  }
+  return (ch);
+}
+
+/* Parse a relative date/time (offset).  Format is:
+
+   nn (yr/mo/dy/hr/mn)
+
+   Examples:  5mo
+              1dy12hr
+              etc.
+
+   Missing values are filled in with 0s.                             */
+
+char *rdtprs (char *ch, struct dt *dtim) {
+gaint flag,val;
+char *pos;
+char id[3];
+
+  pos = ch;
+
+  dtim->yr = 0;
+  dtim->mo = 0;
+  dtim->dy = 0;
+  dtim->hr = 0;
+  dtim->mn = 0;
+
+  flag = 1;
+
+  while (*ch>='0' && *ch<='9') {
+    flag = 0;
+    ch = intprs(ch,&val);
+    id[0] = *ch; id[1] = *(ch+1); id[2] = '\0';
+    if (cmpwrd("yr",id)) dtim->yr = val;
+    else if (cmpwrd("mo",id)) dtim->mo = val;
+    else if (cmpwrd("dy",id)) dtim->dy = val;
+    else if (cmpwrd("hr",id)) dtim->hr = val;
+    else if (cmpwrd("mn",id)) dtim->mn = val;
+    else {
+      gaprnt (0,"Syntax Error:  Invalid Date/Time offset.\n");
+      sprintf (pout,"  Expecting yr/mo/dy/hr/mn, found %s\n",id);
+      gaprnt (0,pout);
+      return (NULL);
+    }
+    ch+=2;
+  }
+  if (flag) {
+    gaprnt (0,"Syntax Error:  Invalid Date/Time offset.\n");
+    gaprnt (0,"  No offset value given\n");
+    return (NULL);
+  }
+  return (ch);
+}
+
 /* Compares two strings.  A match occurs if the leading
    blank-delimited words in the two strings match.  CR and NULL also
    serve as delimiters.                                               */
 
-int cmpwrd (char *ch1, char *ch2) {
+gaint cmpwrd (char *ch1, char *ch2) {
 
   while (*ch1==' '||*ch1=='\t') ch1++;  /* Advance past leading blanks.     */
   while (*ch2==' '||*ch2=='\t') ch2++;
@@ -208,6 +427,19 @@ char *ch;
     ch1++;  ch2++;
   }
   *ch1 = '\0';
+}
+
+
+/* Determines word length up to next delimiter */
+
+gaint wrdlen (char *ch2) {
+gaint len;
+  len = 0;
+  while (*ch2!='\n' && *ch2!='\0' && *ch2!=' ' && *ch2!='\t') {
+    len++;
+    ch2++;
+  }
+  return(len);
 }
 
 /* Converts strings to double */
@@ -347,7 +579,7 @@ gadouble gr;
 }
 
 /* Process linear scaling args */
-/*
+
 gaint deflin (char *ch, dsets_t *pfi, gaint dim, gaint flag) {
 gadouble *vals,v1,v2;
 
@@ -387,10 +619,10 @@ err2:
   gree(vals,"179");
   return (1);
 }
-*/
+
 /* Process levels values in def record */
 /* Return codes:  -1 is memory allocation error, 1 is other error */
-/*
+
 gaint deflev (char *ch, char *rec, dsets_t *pfi, gaint dim) {
 gadouble *vvs,*vals,v1;
 gaint i;
@@ -441,11 +673,55 @@ err3:
   gree(vals,"f182");
   return (1);
 }
-*/
 
-void gaprnt (int i, char *ch)
-{
-  printf ("%s",ch);
+
+/*  handle var name of the form longnm=>abbrv
+    or just the abbrv with no long name */
+
+gaint getvnm (struct gavar *pvar, char *mrec) {
+gaint ib,i,j,k,len,flag;
+
+  ib = 0;
+  while (*(mrec+ib)==' ') ib++;
+
+  if (*(mrec+ib)=='\0' || *(mrec+ib)=='\n') return(1);
+
+  /* Scan for the '=>' string */
+  len = 0;
+  i = ib;
+  flag = 0;
+
+  while (1) {
+    if (*(mrec+i)==' ' || *(mrec+i)=='\0' || *(mrec+i)=='\n') break;
+    if (*(mrec+i)=='=' && *(mrec+i+1)=='>') {
+      flag = 1;
+      break;
+    }
+    len++ ; i++; 
+  }
+
+  if (flag) {
+    for (j=ib; j<i; j++) {
+      k = j-ib;
+      pvar->longnm[k] = *(mrec+j); 
+      /* substitute ~ for spaces in longname */
+      if (pvar->longnm[k]=='~') pvar->longnm[k]=' '; 
+    }
+    pvar->longnm[len] = '\0';
+    i+=2;
+  } else {
+    i = 0;
+    pvar->longnm[0] = '\0';
+  } 
+
+  if (*(mrec+i)=='\n' || *(mrec+i)=='\0') return (1);
+
+  getwrd (pvar->abbrv, mrec+i, 15);
+  lowcas(pvar->abbrv);
+
+  /* Check if 1st character is lower-case alphabetic */
+  if (islower(*(pvar->abbrv))) return(0);
+  else return (1);
 }
 
 
@@ -457,16 +733,20 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 {
   /* IsBigendian returns 1 for big endian byte order */
   static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
+  struct gavar *pvar;
+  struct dt tdef,dt1,dt2;
+  struct gachsub *pchsub;
   int status = 0;
   int reclen;
   int ichar;
   char rec[MAX_RECLEN], mrec[MAX_RECLEN];
   char *ch, *pos;
-  FILE *descr;
-  int i, ii, jj;
-  int hdrb, trlb;
-  int flgs[8];
+  int i, j, ii, jj;
+  gaint hdrb, trlb;
+  gaint size=0,rc,len,flag,tim1,tim2;
+  gaint flgs[8];
   int BYTEORDER = IsBigendian();
+  gadouble *vals;
   gadouble v1,v2,ev1,ev2,temp;
  
   hdrb = 0;
@@ -638,6 +918,60 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 		}
 	    }
 	}
+      /* Handle the chsub records.  time1, time2, then a string,  multiple times */
+      else if (cmpwrd("chsub",rec))
+	{
+	  /* point to first block in chain */
+	  pchsub = pfi->pchsub1;    
+	  if (pchsub!=NULL)
+	    {
+	      while (pchsub->forw!=NULL) {
+		pchsub = pchsub->forw;       /* advance to end of chain */
+	      }
+	    }
+	  flag = 0;
+	  ch = mrec;
+	  while (1) 
+	    {
+	      if ( (ch=nxtwrd(ch)) == NULL ) break;
+	      flag = 1;
+	      if ( (ch = intprs(ch,&tim1)) == NULL) break;
+	      if ( (ch=nxtwrd(ch)) == NULL ) break;
+	      if (*ch=='*' && (*(ch+1)==' '||*(ch+1)=='\t')) tim2 = -99;
+	      else if ( (ch = intprs(ch,&tim2)) == NULL) break;
+	      if ( (ch=nxtwrd(ch)) == NULL ) break;
+	      flag = 0;
+	      if (pchsub) 
+		{   /* chain exists */
+		  pchsub->forw = (struct gachsub *)galloc(sizeof(struct gachsub),"chsubnew");
+		  if (pchsub->forw==NULL) {
+		    gaprnt(0,"Open Error: memory allocation failed for pchsub\n");
+		    goto err8; 
+		  }
+		  pchsub = pchsub->forw;
+		  pchsub->forw = NULL;
+		} 
+	      else 
+		{        /* start a new chain */
+		  pfi->pchsub1 = (struct gachsub *)galloc(sizeof(struct gachsub),"chsub1");
+		  if (pfi->pchsub1==NULL)  {
+		    gaprnt(0,"Open Error: memory allocation failed for pchsub1\n");
+		    goto err8; 
+		  }
+		  pchsub = pfi->pchsub1;
+		  pchsub->forw = NULL;
+		}
+	      len = wrdlen(ch);
+	      if ((pchsub->ch = (char *)galloc(len+1,"chsubstr")) == NULL) goto err8;
+	      getwrd(pchsub->ch,ch,len);
+	      pchsub->t1 = tim1;
+	      pchsub->t2 = tim2;
+	    }
+	  if (flag) 
+	    {
+	      gaprnt (1,"Description file warning: Invalid chsub record; Ignored\n");
+	    }
+	}
       else if (cmpwrd("title",rec))
 	{
 	  if ( (ch=nxtwrd(mrec))==NULL )
@@ -689,7 +1023,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 	  pfi->ulow = pfi->undef - pfi->ulow;
 	  flgs[4] = 0;
 	}
-      /*
       else if (cmpwrd("xdef",rec))
 	{
 	  if (pfi->type == 2) continue;
@@ -805,7 +1138,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 	      if ( (pos = rdtprs(ch,&dt2))==NULL) goto err4b_tdef;
 	      v1 = (dt2.yr * 12) + dt2.mo;
 	      v2 = (dt2.dy * 1440) + (dt2.hr * 60) + dt2.mn;
-      *//* check if 0 dt *//*
+	      /* check if 0 dt */
 	      if ( (v1 == 0) && (v2 == 0) ) goto err4c_tdef;  
 	      if ((vals = (gadouble *)galloc(sizeof(gadouble)*8,"tvals5")) == NULL) goto err8; 
 	      *(vals) = dt1.yr;
@@ -822,14 +1155,391 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 	    } else goto err2;
 	  flgs[3] = 0;
 	}
-*/
+      else if (cmpwrd("vars",rec))
+	{
+	  if ( (ch = nxtwrd(rec)) == NULL) goto err5;
+	  if ( (pos = intprs(ch,&(pfi->vnum)))==NULL) goto err5;
+	  size = pfi->vnum * (sizeof(struct gavar) + 7 );
+	  if ((pvar = (struct gavar *)galloc(size,"pvar2")) == NULL) goto err8;
+	  pfi->pvar1 = pvar;
+	  i = 0;
+	  while (i<pfi->vnum)
+	    {
+	      /* initialize variables in the pvar structure */
+	      pvar->offset = 0; 
+	      pvar->recoff = 0;
+	      pvar->ncvid = -999;
+	      pvar->sdvid = -999;
+	      pvar->levels = 0;
+	      pvar->dfrm = 0;
+	      pvar->var_t = 0;
+	      pvar->scale = 1;
+	      pvar->add = 0;  
+	      pvar->undef= -9.99E33; 
+	      pvar->vecpair = -999;
+	      pvar->isu = 0;
+	      pvar->isdvar = 0;
+	      pvar->nvardims = 0; 
+
+	      /* get the complete variable declaration */
+	      if (fgets(rec,512,descr)==NULL) 
+		{
+		  gaprnt (0,"Open Error:  Unexpected EOF reading variables\n");
+		  sprintf (pout, "Was expecting %i records.  Found %i.\n", pfi->vnum, i);
+		  gaprnt (2,pout);
+		  goto retrn;
+		}
+	      /* remove any leading blanks from rec */
+	      reclen = strlen(rec);
+	      jj = 0;
+	      while (jj<reclen && rec[0]==' ')
+		{
+		  for (ii=0; ii<reclen; ii++) rec[ii] = rec[ii+1];
+		  jj++;
+		}
+	      /* replace newline with null at end of record */
+	      for (ichar = strlen(rec) - 1 ;  ichar >= 0 ;  --ichar)
+		{
+		  if (rec[ichar] == '\n')
+		    {
+		      rec[ichar] = '\0' ;
+		      break ; 
+		    }
+		}
+	      /* Keep mixed case and lower case versions of rec handy */
+	      strcpy (mrec,rec);
+	      lowcas(rec);
+	      /* Allow comments between VARS and ENDVARS */
+	      if (!isalnum(*(mrec)))
+		{
+		  /* Parse comment if it contains attribute metadata  */
+		  /*
+		  if ((strncmp("*:attr",mrec,6)==0) || (strncmp("@",mrec,1)==0)) {
+		    if ((ddfattr(mrec,pfi)) == -1) goto retrn;
+		    else continue;
+		  }
+		  else */continue; 
+		}
+	      if (cmpwrd("endvars",rec))
+		{
+		  gaprnt (0,"Open Error:  Unexpected ENDVARS record\n");
+		  sprintf (pout, "Was expecting %i records.  Found %i.\n", pfi->vnum, i);
+		  gaprnt (2,pout);
+		  goto err9;
+		}
+	
+	      /* get abbrv and full variable name if there */
+	      if ((getvnm(pvar, mrec))!=0) goto err6;
+
+	      /* parse the levels fields */
+	      if ( (ch=nxtwrd(rec))==NULL) goto err6;
+	      /* begin with 8th element of units aray for levels values */
+	      for (j=0;j<16;j++) pvar->units[j] = -999;
+	      j = 8;          
+	      while (1) 
+		{
+		  if (j==8) {
+		    /* first element is num levels */
+		    if ((ch=intprs(ch,&(pvar->levels)))==NULL) goto err6;      
+		  }
+		  else {
+		    /* remaining elements are grib2 level codes */
+		    if ((ch=getdbl(ch,&(pvar->units[j-1])))==NULL) goto err6;  
+		  }
+		  /* advance through comma-delimited list of levels args */
+		  while (*ch==' ') ch++;
+		  if (*ch=='\0' || *ch=='\n') goto err6;
+		  if (*ch!=',') break;
+		  ch++;
+		  while (*ch==',') { ch++; j++;}  /* advance past back to back commas */
+		  while (*ch==' ') ch++;
+		  if (*ch=='\0' || *ch=='\n') goto err6;
+		  j++;
+		  if (j>15) goto err6;
+		}
+
+	      /* parse the units fields; begin with 0th element for variable units */
+	      j = 0;
+	      pvar->nvardims=0;
+	      while (1)
+		{
+		  if (*ch=='x'||*ch=='y'||*ch=='z'||*ch=='t'||*ch=='e')
+		    { 
+		      if (*(ch+1)!=',' && *(ch+1)!=' ') goto err6;
+		      if (*ch=='x') { pvar->units[j] = -100; pvar->nvardims++; }
+		      if (*ch=='y') { pvar->units[j] = -101; pvar->nvardims++; }
+		      if (*ch=='z') { pvar->units[j] = -102; pvar->nvardims++; }
+		      if (*ch=='t') { pvar->units[j] = -103; pvar->nvardims++; }
+		      if (*ch=='e') { pvar->units[j] = -104; pvar->nvardims++; }
+		      ch++;
+		    } 
+		  else 
+		    {
+		      if ( (ch=getdbl(ch,&(pvar->units[j])))==NULL ) goto err6;
+		      /* no negative array indices for ncflag files */
+		      if ((pfi->ncflg) && (pvar->units[j] < 0))  goto err6;   
+		    }
+		  while (*ch==' ') ch++;
+		  if (*ch=='\0' || *ch=='\n') goto err6;
+		  if (*ch!=',') break;
+		  ch++;
+		  while (*ch==' ') ch++;
+		  if (*ch=='\0' || *ch=='\n') goto err6;
+		  j++;
+		  if (j>8) goto err6;
+		}
+
+	      /* parse the variable description */
+	      getstr (pvar->varnm,mrec+(ch-rec),127);
+
+
+	      /* var_t is for data files with dimension sequence: X, Y, Z, T, V */
+	      if ((pvar->units[0]==-1) && 
+		  (pvar->units[1]==20)) 
+		pvar->var_t = 1;
+
+	      /* non-float data types */
+	      if ((pvar->units[0]==-1) && 
+		  (pvar->units[1]==40))
+		{
+
+		  if (pvar->units[2]== 1) pvar->dfrm = 1;
+		  if (pvar->units[2]== 2)
+		    {
+		      pvar->dfrm = 2;
+		      if (pvar->units[3]==-1) pvar->dfrm = -2;
+		    }
+		  if (pvar->units[2]== 4) pvar->dfrm = 4;
+		}
+
+	      i++; pvar++;
+	    }
+
+	  /* Get ENDVARS statement and any additional comments */
+	  if (fgets(rec,512,descr)==NULL) {
+	    gaprnt (0,"Open Error:  Missing ENDVARS statement.\n");
+	    goto retrn;
+	  }
+	  /* Remove any leading blanks from rec */
+	  reclen = strlen(rec);
+	  jj = 0;
+	  while (jj<reclen && rec[0]==' ') {
+	    for (ii=0; ii<reclen; ii++) rec[ii] = rec[ii+1];
+	    jj++;
+	  }
+	  /* replace newline with null at end of record */
+	  for (ichar = strlen(rec) - 1 ;  ichar >= 0 ;  --ichar) {
+	    if (rec[ichar] == '\n') {
+	      rec[ichar] = '\0' ;
+	      break ; 
+	    }
+	  }
+	  /* Keep mixed case and lower case versions handy */
+	  strcpy (mrec,rec);
+	  lowcas(rec);
+	  while (!cmpwrd("endvars",rec)) 
+	    {
+	      /* see if it's an attribute comment */
+	      if (!isalnum(*(mrec))) {
+		/*
+		if ((strncmp("*:attr",mrec,6)==0) || (strncmp("@",mrec,1)==0)) {
+		  if ((ddfattr(mrec,pfi)) == -1) goto retrn;
+		}
+		*/
+	      }
+	      else {
+		sprintf(pout,"Open Error:  Looking for \"endvars\", found \"%s\" instead.\n",rec);
+		gaprnt (0,pout);
+		goto err9;
+	      }
+	      /* get a new record */
+	      if (fgets(rec,512,descr)==NULL) {
+		gaprnt (0,"Open Error:  Missing ENDVARS statement.\n");
+		goto retrn;
+	      }
+	      /* Remove any leading blanks from new record */
+	      reclen = strlen(rec);
+	      jj = 0;
+	      while (jj<reclen && rec[0]==' ') {
+		for (ii=0; ii<reclen; ii++) rec[ii] = rec[ii+1];
+		jj++;
+	      }
+	      /* replace newline with null at end of record */
+	      for (ichar = strlen(rec) - 1 ;  ichar >= 0 ;  --ichar) {
+		if (rec[ichar] == '\n') {
+		  rec[ichar] = '\0' ;
+		  break ; 
+		}
+	      }
+	      /* Keep mixed case and lower case versions handy */
+	      strcpy (mrec,rec);
+	      lowcas(rec);
+	    }
+	  /* vars block parsed without error */
+	  flgs[6] = 0;
+
+	} 
+      else
+	{
+	  /* parse error of .ctl file */
+	  gaprnt (0,"Open Error:  Unknown keyword in description file\n");
+	  goto err9;
+	}
     }
-  
-    /* Handle the chsub records.  time1, time2, then a string,  multiple times */
-      /*
-    } else if (cmpwrd("chsub",rec)) {
+
+  /* Done scanning!
+     Check if scanned stuff makes sense, and then set things up correctly */
+
+
+  /* Make sure there are no conflicting options and data types */
+  pvar=pfi->pvar1;
+  for (j=1; j<=pfi->vnum; j++) {
+    if (pvar->units[0]==-1 && pvar->units[1]==20) {
+      if (pfi->tmplat) {
+	gaprnt(0,"Open Error: Variables with transposed VAR-T dimensions cannot be templated together\n");
+	err=1;
+      }
+      if (hdrb>0) {
+	gaprnt(0,"Open Error: Variables with transposed VAR-T dimensions are incompatible with time headers\n");
+	err=1;
+      }
+      if (trlb>0) {
+	gaprnt(0,"Open Error: Variables with transposed VAR-T dimensions are incompatible with TRAILERBYTES\n");
+	err=1;
+      }
     }
-      */
+    pvar++;
+  }
+  if (err) goto retrn;
+
+
+  /* Figure out locations of variables within a time group */
+  pvar = pfi->pvar1;
+
+  /* Grid data */
+  if (pfi->type==1) {
+    pfi->gsiz = pfi->dnum[0] * pfi->dnum[1];
+    if (pfi->ppflag) pfi->gsiz = pfi->ppisiz * pfi->ppjsiz;
+    /* add the XY header to gsiz */
+    if (pfi->xyhdr) {
+      if (pvar->dfrm == 1) {
+	pfi->xyhdr = pfi->xyhdr*4/1;          
+      } 
+      else if (pvar->dfrm ==  2 || pvar->dfrm == -2 ) {
+	pfi->xyhdr = pfi->xyhdr*4/2;
+      } 
+      pfi->gsiz = pfi->gsiz + pfi->xyhdr;
+    }
+
+    /* adjust the size of hdrb and trlb for non-float data */
+    if (pvar->dfrm == 1) {
+      hdrb = hdrb*4/1;
+      trlb = trlb*4/1;
+    } 
+    else if (pvar->dfrm == 2 || pvar->dfrm == -2 ) {
+      hdrb = hdrb*4/2;
+      trlb = trlb*4/2;
+    } 
+    
+    if (pfi->seqflg) {
+      /* pad the grid size with 2 4-byte chunks */
+      if (pvar->dfrm == 1) {
+	pfi->gsiz += 8;
+      } 
+      else if (pvar->dfrm == 2 || pvar->dfrm == -2 ) {
+	pfi->gsiz += 4;
+      } 
+      else {
+	pfi->gsiz += 2;             
+      }
+      /* pad the header with 2 4-byte chunks*/
+      if (hdrb>0) {
+	if (pvar->dfrm == 1) {
+	  hdrb = hdrb + 8;
+	} 
+	else if (pvar->dfrm == 2 || pvar->dfrm == -2 ) {
+	  hdrb = hdrb + 4;
+	} 
+	else {
+	  hdrb += 2; 
+	}
+      }
+      /* how far we have to go into the file before getting to 1st var */
+      if (pvar->dfrm == 1) {
+	pvar->offset = 4+hdrb;
+	acum = 4+hdrb;
+      } 
+      else if (pvar->dfrm == 2 || pvar->dfrm == -2 ) {
+	pvar->offset = 2+hdrb;
+	acum = 2+hdrb;
+      } 
+      else {
+	pvar->offset = 1+hdrb;
+	acum = 1+hdrb;
+      } 
+    }
+    else {
+      /* how far we have to go into the file before getting to 1st var */
+      pvar->offset = hdrb;
+      acum = hdrb;
+    }
+
+    levs = pvar->levels;
+    if (levs==0) levs=1;
+    pvar->recoff = 0;
+    recacm = 0;
+    pvar++;
+    acumvz=acum;
+
+    for (i=1; i<pfi->vnum; i++) {
+      if (pvar->var_t) {   
+	acum = acum + levs*(pfi->gsiz)*(pfi->dnum[3]); 
+      } else {                              
+	acum = acum + (levs*pfi->gsiz);
+	acumstride = acum ;
+      }
+      recacm += levs;
+      pvar->offset = acum;
+      pvar->recoff = recacm;
+      levs = pvar->levels;
+      if (levs==0) levs=1;
+      pvar++;
+    }
+
+    recacm += levs;
+
+    /* last variable */
+    acum = acum + (levs*pfi->gsiz);
+
+    pfi->tsiz = acum;
+    pfi->trecs = recacm;
+    if (pfi->seqflg) pfi->tsiz-=1;
+    pfi->tsiz += trlb;
+    
+  } 
+  else {
+    fprintf(stderr, "Grid data type unsupported!");
+    return (-1);
+  }
+
+/* set the global calendar and check if we are trying to change with a new file...
+   we do this here to set the calandar for templating */
+
+  if (mfcmn.cal365<0) {
+    mfcmn.cal365=pfi->calendar;
+  } else {
+    if (pfi->calendar != mfcmn.cal365) {
+      gaprnt(0,"Attempt to change the global calendar...\n");
+      if (mfcmn.cal365) {
+	gaprnt(0,"The calendar is NOW 365 DAYS and you attempted to open a standard calendar file\n");
+      } else {
+	gaprnt(0,"The calendar is NOW STANDARD and you attempted to open a 365-day calendar file\n");
+      }
+      goto retrn;
+    }
+  }
+
+
 
   fclose(descr);
 
