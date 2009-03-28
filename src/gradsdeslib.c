@@ -742,12 +742,15 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   char rec[MAX_RECLEN], mrec[MAX_RECLEN];
   char *ch, *pos;
   int i, j, ii, jj;
+  off_t levs,acum,acumvz,recacm;
+  gaint acumstride=0;
   gaint hdrb, trlb;
   gaint size=0,rc,len,flag,tim1,tim2;
   gaint flgs[8];
   int BYTEORDER = IsBigendian();
   gadouble *vals;
   gadouble v1,v2,ev1,ev2,temp;
+  int err = 0;
  
   hdrb = 0;
   trlb = 0;
@@ -1419,7 +1422,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   /* Grid data */
   if (pfi->type==1) {
     pfi->gsiz = pfi->dnum[0] * pfi->dnum[1];
-    if (pfi->ppflag) pfi->gsiz = pfi->ppisiz * pfi->ppjsiz;
+    /* if (pfi->ppflag) pfi->gsiz = pfi->ppisiz * pfi->ppjsiz; */
     /* add the XY header to gsiz */
     if (pfi->xyhdr) {
       if (pvar->dfrm == 1) {
@@ -1525,12 +1528,12 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 /* set the global calendar and check if we are trying to change with a new file...
    we do this here to set the calandar for templating */
 
-  if (mfcmn.cal365<0) {
-    mfcmn.cal365=pfi->calendar;
+  if (/*mfcmn.*/cal365<0) {
+    /*mfcmn.*/cal365=pfi->calendar;
   } else {
-    if (pfi->calendar != mfcmn.cal365) {
+    if (pfi->calendar != /*mfcmn.*/cal365) {
       gaprnt(0,"Attempt to change the global calendar...\n");
-      if (mfcmn.cal365) {
+      if (/*mfcmn.*/cal365) {
 	gaprnt(0,"The calendar is NOW 365 DAYS and you attempted to open a standard calendar file\n");
       } else {
 	gaprnt(0,"The calendar is NOW STANDARD and you attempted to open a 365-day calendar file\n");

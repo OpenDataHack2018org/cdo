@@ -29,7 +29,10 @@ void *Importgrads(void *argument)
   dsets_t pfi;
   int vdate, vtime;
   int *vtimes = NULL;
-  int tcur, told;
+  int tcur, told,fnum;
+  int tmin=0,tmax=0;
+  char *ch=NULL;
+  off_t flen;
 
   cdoInitialize(argument);
 
@@ -37,7 +40,7 @@ void *Importgrads(void *argument)
 
   status = read_gradsdes((char *)cdoStreamName(0), &pfi);
   if ( cdoVerbose ) fprintf(stderr, "status %d\n", status);
-  if ( status ) return(1);
+  if ( status ) cdoAbort("read_gradsdes failed");
   /*
   printf("filename: %s\n", pfi.name);
   pfi.infile = fopen(pfi.name, "rb");
@@ -109,7 +112,6 @@ void *Importgrads(void *argument)
 	  continue;
 	} else {
 	  cdoAbort(" Could not open file: %s",ch);
-	  return(1);
 	}
       }
       if (pfi.tmplat) gree(ch,"312");
@@ -119,6 +121,7 @@ void *Importgrads(void *argument)
       flen = ftello(pfi.infile);
        
       /* Set up to skip appropriate amount and position */
+      /*
       if (skip > -1) {
 	fpos = skip;
       }
@@ -132,22 +135,19 @@ void *Importgrads(void *argument)
 	len = gagby(rec,88,4);
 	fpos = len*2 + 100;
       }
-       
+      */
       /* Main Loop */
+      /*
       irec=1;
       while (1) {
-	/* read a grib record */
 	rc = gribhdr(&ghdr);      
 	if (rc) break;
-	/* compare to each 2-d variable in the 5-D data volume
-	   defined by the descriptor file for a match */
 	rcgr = gribrec(&ghdr,pfi,pindx,tmin,tmax,e);
 	if (rcgr==0) didmatch=1;
 	if (rcgr>=100) didmatch=rcgr;
 	irec++;
       }
        
-      /* see how we did */
       if (rc==50) {
 	printf (" grib1map error: I/O error reading GRIB file\n");
 	printf ("                possible cause is premature EOF\n");
@@ -157,7 +157,7 @@ void *Importgrads(void *argument)
 	printf (" grib1map error: GRIB file format error (rc = %i)\n",rc);
 	return(rc);
       }
-       
+      */
       /* break out if not templating */
       if (!pfi.tmplat) break;
       

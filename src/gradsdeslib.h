@@ -102,6 +102,14 @@ typedef struct {
   char dnam[MAX_NAMELEN];
   char title[MAX_NAMELEN];
   int bswap;
+  long gsiz;                   /* Number of elements in a grid (x*y)    */
+                               /* This is for actual grid on disk,
+                                  not psuedo grid (when pp in force) */
+  long tsiz;                   /* Number of elements in an entire time
+                                  group (all variables at all levels
+                                  for one time).                        */
+  gaint trecs;                 /* Number of records (XY grids) per time
+                                  group.                                */
   long fhdr;
   struct gachsub *pchsub1;     /* Pointer to first %ch substitution */
   gaint ncflg;                 /* 1==netcdf  2==hdfsds */
