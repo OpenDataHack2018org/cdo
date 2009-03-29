@@ -16,53 +16,80 @@ FILE *descr;             /* File descriptor pointer */
 int cal365 = 0;
 int fullyear = -999;
 
-void dsets_init(dsets_t *dsets)
+void dsets_init(dsets_t *pfi)
 {
   int i;
 
-  dsets->name[0]    = 0;
-  dsets->dnam[0]    = 0;
-  dsets->title[0]   = 0;
-  dsets->bswap      = 0;
-  dsets->fhdr       = 0;
-  dsets->xyhdr      = 0;
-  dsets->seqflg     = 0;
-  dsets->yrflg      = 0;
-  dsets->zrflg      = 0;
-  dsets->tmplat     = 0;
-  dsets->pa2mb      = 0;
-  dsets->calendar   = 0;
-  dsets->type       = 1;      /* Assume grid unless told otherwise */
-  dsets->ncflg      = 0;      /* Assume not netcdf */
+  pfi->name[0]    = 0;
+  pfi->dnam[0]    = 0;
+  pfi->title[0]   = 0;
+  pfi->bswap      = 0;
+  pfi->fhdr       = 0;
+  pfi->xyhdr      = 0;
+  pfi->seqflg     = 0;
+  pfi->yrflg      = 0;
+  pfi->zrflg      = 0;
+  pfi->tmplat     = 0;
+  pfi->pa2mb      = 0;
+  pfi->calendar   = 0;
+  pfi->type       = 1;      /* Assume grid unless told otherwise */
+  pfi->idxflg = 0;       /* Assume binary */
+  pfi->ncflg      = 0;      /* Assume not netcdf */
 
-  dsets->pchsub1    = NULL;
+  pfi->undef = -9.99E33; 
 
-  for ( i = 0; i < 5; ++i ) dsets->dnum[i]    = 0;
+  pfi->pvar1 = NULL;
+  pfi->ens1 = NULL;
 
-  dsets->nsets      = 0;
-  dsets->mergelevel = 0;
-  dsets->lgeoloc    = 0;
-  dsets->lregion    = 0;
-  dsets->lprojtype  = 0;
-  dsets->lmetadata  = 0;
+  pfi->pchsub1    = NULL;
+
+  for ( i = 0; i < 5; ++i ) pfi->dnum[i]    = 0;
+
+  pfi->nsets      = 0;
+  pfi->mergelevel = 0;
+  pfi->lgeoloc    = 0;
+  pfi->lregion    = 0;
+  pfi->lprojtype  = 0;
+  pfi->lmetadata  = 0;
 
   for ( i = 0; i < MAX_DSETS; ++i )
     {
-      dsets->obj[i].nx          = 0;
-      dsets->obj[i].ny          = 0;
-      dsets->obj[i].nz          = 0;
-      dsets->obj[i].name        = NULL;
-      dsets->obj[i].description = NULL;
-      dsets->obj[i].units       = NULL;
-      dsets->obj[i].title       = NULL;
-      dsets->obj[i].time        = NULL;
-      dsets->obj[i].dtype       = cdoDefaultDataType;
-      dsets->obj[i].lscale      = 0;
-      dsets->obj[i].loffset     = 0;
-      dsets->obj[i].lmissval    = 0;
-      dsets->obj[i].missval     = cdiInqMissval();
-      dsets->obj[i].array       = NULL;   
+      pfi->obj[i].nx          = 0;
+      pfi->obj[i].ny          = 0;
+      pfi->obj[i].nz          = 0;
+      pfi->obj[i].name        = NULL;
+      pfi->obj[i].description = NULL;
+      pfi->obj[i].units       = NULL;
+      pfi->obj[i].title       = NULL;
+      pfi->obj[i].time        = NULL;
+      pfi->obj[i].dtype       = cdoDefaultDataType;
+      pfi->obj[i].lscale      = 0;
+      pfi->obj[i].loffset     = 0;
+      pfi->obj[i].lmissval    = 0;
+      pfi->obj[i].missval     = cdiInqMissval();
+      pfi->obj[i].array       = NULL;   
     }
+}
+
+/* Byte swap requested number of 4 byte elements */
+
+void gabswp (void *r, gaint cnt) {
+gaint i;
+char *ch1,*ch2,*ch3,*ch4,cc1,cc2;
+
+  ch1 = (char *)r;
+  ch2 = ch1+1;
+  ch3 = ch2+1;
+  ch4 = ch3+1;
+  for (i=0; i<cnt; i++) {
+    cc1 = *ch1;
+    cc2 = *ch2;
+    *ch1 = *ch4;
+    *ch2 = *ch3;
+    *ch3 = cc2;
+    *ch4 = cc1;
+    ch1+=4; ch2+=4; ch3+=4; ch4+=4;
+  }
 }
 
 /*mf version
@@ -96,6 +123,13 @@ int qflag=0;
    should be kept to a minimum.                                      */
 
 static gaint mosiz[13] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
+static gaint momn[13] = {0,44640,40320,44640,43200,44640,43200,
+                        44640,44640,43200,44640,43200,44640};
+static gaint mnacum[13] = {0,0,44640,84960,129600,172800,217440,
+                        260640,305280,349920,393120,437760,480960};
+static gaint mnacul[13] = {0,0,44640,86400,131040,174240,218880,
+                        262080,306720,351360,394560,439200,482400};
+
 
 /* Test for leap year.  Rules are:
 
@@ -125,8 +159,206 @@ gaint i,y;
   if (i!=0) return (0);
 
   return (1);
+}
 
+/* Add an offset to a time.  Output to dto.                          */
 
+void timadd (struct dt *dtim, struct dt *dto) {
+gaint i;
+gaint cont;
+
+  /* First add months and years.  Normalize as needed.               */
+  dto->mo += dtim->mo;
+  dto->yr += dtim->yr;
+
+  while (dto->mo>12) {
+    dto->mo -= 12;
+    dto->yr++;
+  }
+
+  /* Add minutes, hours, and days directly.  Then normalize
+     to days, then normalize extra days to months/years.             */
+
+  dto->mn += dtim->mn;
+  dto->hr += dtim->hr;
+  dto->dy += dtim->dy;
+
+  if (dto->mn > 59) {
+    i = dto->mn / 60;
+    dto->hr += i;
+    dto->mn = dto->mn - (i*60);
+  }
+  if (dto->hr > 23) {
+    i = dto->hr / 24;
+    dto->dy += i;
+    dto->hr = dto->hr - (i*24);
+  }
+
+  cont = 1;
+  while (dto->dy > mosiz[dto->mo] && cont) {
+    if (dto->mo==2 && qleap(dto->yr)) {
+      if (dto->dy == 29) cont=0;
+      else {
+        dto->dy -= 29;
+        dto->mo++;
+      }
+    } else {
+      dto->dy -= mosiz[dto->mo];
+      dto->mo++;
+    }
+    while (dto->mo > 12) {dto->mo-=12; dto->yr++;}
+  }
+}
+
+/* Subtract an offset from a time.  Subtract minutes/hours/days
+   first so that we will exactly reverse the operation of timadd     */
+
+void timsub (struct dt *dtim, struct dt *dto) {
+gaint s1,s2;
+
+  /* Subtract minutes, hour, and days directly.  Then normalize
+     to days, then normalize deficient days from months/years.       */
+
+  dto->mn = dtim->mn - dto->mn;
+  dto->hr = dtim->hr - dto->hr;
+  dto->dy = dtim->dy - dto->dy;
+  s1 = dto->mo; s2 = dto->yr;
+  dto->mo = dtim->mo;
+  dto->yr = dtim->yr;
+
+  while (dto->mn < 0) {dto->mn+=60; dto->hr--;}
+  while (dto->hr < 0) {dto->hr+=24; dto->dy--;}
+
+  while (dto->dy < 1) {
+    dto->mo--;
+    if (dto->mo < 1) {dto->mo=12; dto->yr--;}
+    if (dto->mo==2 && qleap(dto->yr)) dto->dy += 29;
+    else dto->dy += mosiz[dto->mo];
+  }
+
+  /* Now subtract months and years.  Normalize as needed.            */
+
+  dto->mo = dto->mo - s1;
+  dto->yr = dto->yr - s2;
+
+  while (dto->mo < 1) {dto->mo+=12; dto->yr--;}
+
+  /* Adjust for leaps */
+
+  if (dto->mo==2 && dto->dy==29 && !qleap(dto->yr)) {
+    dto->mo=3; dto->dy=1;
+  }
+}
+
+/* Convert from a t grid coordinate to an absolute time.           */
+
+void gr2t (gadouble *vals, gadouble gr, struct dt *dtim) {
+struct dt stim;
+gadouble *moincr,*mnincr;
+gadouble v;
+
+  /* Get constants associated with this conversion                   */
+  stim.yr = (gaint)(*vals+0.1);
+  stim.mo = (gaint)(*(vals+1)+0.1);
+  stim.dy = (gaint)(*(vals+2)+0.1);
+  stim.hr = (gaint)(*(vals+3)+0.1);
+  stim.mn = (gaint)(*(vals+4)+0.1);
+  moincr = vals+5;
+  mnincr = vals+6;
+
+  /* Initialize output time                                          */
+  dtim->yr = 0;
+  dtim->mo = 0;
+  dtim->dy = 0;
+  dtim->hr = 0;
+  dtim->mn = 0;
+
+  /* Do conversion if increment is in minutes.                       */
+  if (*mnincr>0.1) {
+    v = *mnincr * (gr-1.0);
+    if (v>0.0) v = v + 0.5;   /* round */
+    else v = v - 0.5;
+    dtim->mn = (gaint)v;
+    if (dtim->mn<0) {
+      dtim->mn = -1 * dtim->mn;
+      timsub (&stim,dtim);
+    } else {
+      timadd (&stim,dtim);
+    }
+    return;
+
+  /* Do conversion if increment is in months.  Same as for minutes,
+     except special handling is required for partial months.   
+     JMA There is a bug here, and some precision decisions that need attention */
+
+  } else {
+    v = *moincr * (gr-1.0);
+    if (v<0.0) dtim->mo = (gaint)(v-0.9999); /* round (sort of)       */
+    else dtim->mo = (gaint)(v+0.0001);
+    v = v - (gadouble)dtim->mo;                /* Get fractional month  */
+    if (dtim->mo<0) {
+      dtim->mo = -1 * dtim->mo;
+      timsub (&stim,dtim);
+    } else timadd (&stim,dtim);
+    if (v<0.0001) return;         /* if fraction small, return       */
+
+    if (dtim->mo==2 && qleap(dtim->yr) ) {
+      v = v * 41760.0;
+    } else {
+      v = v * (gadouble)momn[dtim->mo];
+    }
+    stim = *dtim;
+    dtim->yr = 0;
+    dtim->mo = 0;
+    dtim->dy = 0;
+    dtim->hr = 0;
+    dtim->mn = (gaint)(v+0.5);
+    timadd (&stim,dtim);
+    return;
+  }
+}
+
+/* Calculate the difference between two times and return the
+   difference in minutes.   The calculation is time2 - time1, so
+   if time2 is earlier than time1, the result is negative.           */
+
+gaint timdif (struct dt *dtim1, struct dt *dtim2) {
+gaint min1,min2,yr;
+struct dt *temp;
+gaint swap,mo1,mo2;
+
+  swap = 0;
+  if (dtim1->yr > dtim2->yr) {
+    temp = dtim1;
+    dtim1 = dtim2;
+    dtim2 = temp;
+    swap = 1;
+  }
+
+  min1 = 0;
+  min2 = 0;
+
+  yr = dtim1->yr;
+  while (yr < dtim2->yr) {
+    if (qleap(yr)) min2 += 527040L;
+    else min2 += 525600L;
+    yr++;
+  }
+
+  mo1 = dtim1->mo;
+  mo2 = dtim2->mo;
+  if (qleap(dtim1->yr)) {
+    min1 = min1+mnacul[mo1]+(dtim1->dy*1440L)+(dtim1->hr*60L)+dtim1->mn;
+  } else {
+    min1 = min1+mnacum[mo1]+(dtim1->dy*1440L)+(dtim1->hr*60L)+dtim1->mn;
+  }
+  if (qleap(dtim2->yr)) {
+    min2 = min2+mnacul[mo2]+(dtim2->dy*1440L)+(dtim2->hr*60L)+dtim2->mn;
+  } else {
+    min2 = min2+mnacum[mo2]+(dtim2->dy*1440L)+(dtim2->hr*60L)+dtim2->mn;
+  }
+  if (swap) return (min1-min2);
+  else return (min2-min1);
 }
 
 static char *mons[12] = {"jan","feb","mar","apr","may","jun",
@@ -725,6 +957,276 @@ gaint ib,i,j,k,len,flag;
 }
 
 
+/* Given a file name template and a dt structure, fill in to get the file name */
+
+char *gafndt (char *fn, struct dt *dtim, struct dt *dtimi, gadouble *vals, 
+	      struct gachsub *pch1st, struct gaens *ens1st, gaint t, gaint e, gaint *flag) {
+struct gachsub *pchsub;
+struct gaens *ens;
+struct dt stim;
+gaint len,olen,iv,tdif,i,tused,eused;
+char *fnout, *in, *out, *work, *in2, *out2;
+
+  tused = eused = 0;
+  olen = 0;
+  while (*(fn+olen)) olen++;
+  olen+=5;
+  fnout = (char *)galloc(olen,"fnout");
+  if (fnout==NULL) return (NULL);
+
+  in = fn;
+  out = fnout;
+
+  while (*in) {
+    pchsub = pch1st;
+    ens = ens1st;
+    /* handle template strings for initial time */
+    if (*in=='%' && *(in+1)=='i') {
+      tused=1;
+      if (*(in+2)=='x' && *(in+3)=='1') { 
+        sprintf (out,"%i",dtimi->yr/10);
+        while (*out) out++;
+        in+=4;
+      } else if (*(in+2)=='x' && *(in+3)=='3') {
+        sprintf (out,"%03i",dtimi->yr/10);
+        out+=3; in+=4;
+      } else if (*(in+2)=='y' && *(in+3)=='2') {
+        iv = dtimi->yr/100;
+        iv = dtimi->yr - iv*100;
+        sprintf (out,"%02i",iv);
+        out+=2;  in+=4;
+      } else if (*(in+2)=='y' && *(in+3)=='4') {
+        sprintf (out,"%04i",dtimi->yr);
+        out+=4;  in+=4;
+      } else if (*(in+2)=='m' && *(in+3)=='1') {
+          sprintf (out,"%i",dtimi->mo);
+        while (*out) out++;
+        in+=4;
+      } else if (*(in+2)=='m' && *(in+3)=='2') {
+        sprintf (out,"%02i",dtimi->mo);
+        out+=2;  in+=4;
+      } else if (*(in+2)=='m' && *(in+3)=='h') {
+        if (dtimi->dy < 16) *out='a';
+        else *out = 'b';
+        out+=1;  in+=4;
+      } else if (*(in+2)=='m' && *(in+3)=='H') {
+        if (dtimi->dy < 16) *out='A';
+        else *out = 'B';
+        out+=1;  in+=4;
+      } else if (*(in+2)=='m' && *(in+3)=='c') {
+        *out = *(mons[dtimi->mo-1]);
+        *(out+1) = *(mons[dtimi->mo-1]+1);
+        *(out+2) = *(mons[dtimi->mo-1]+2);
+        out+=3;  in+=4;
+      } else if (*(in+2)=='d' && *(in+3)=='1') {
+        sprintf (out,"%i",dtimi->dy);
+        while (*out) out++;
+        in+=4;
+      } else if (*(in+2)=='d' && *(in+3)=='2') {
+        sprintf (out,"%02i",dtimi->dy);
+        out+=2;  in+=4;
+      } else if (*(in+2)=='h' && *(in+3)=='1') {
+        sprintf (out,"%i",dtimi->hr);
+        while (*out) out++;
+        in+=4;
+      } else if (*(in+2)=='h' && *(in+3)=='2') {
+        sprintf (out,"%02i",dtimi->hr);
+        out+=2;  in+=4;
+      } else if (*(in+2)=='h' && *(in+3)=='3') {
+        sprintf (out,"%03i",dtimi->hr);
+        out+=3;  in+=4;
+      } else if (*(in+2)=='n' && *(in+3)=='2') {
+        sprintf (out,"%02i",dtimi->mn);
+        out+=2;  in+=4;
+      } else {
+        *out = *in;
+        in++; out++;
+      }
+    } 
+    /* handle template strings for any time */
+    else if (*in=='%' && *(in+1)=='x' && *(in+2)=='1') { /* x: decades */
+      tused=1;
+      sprintf (out,"%i",dtim->yr/10);
+      while (*out) out++;
+      in+=3;
+    } else if (*in=='%' && *(in+1)=='x' && *(in+2)=='3') { 
+      tused=1;
+      sprintf (out,"%03i",dtim->yr/10);
+      out+=3; in+=3;
+    } else if (*in=='%' && *(in+1)=='y' && *(in+2)=='2') {
+      tused=1;
+      iv = dtim->yr/100;
+      iv = dtim->yr - iv*100;
+      sprintf (out,"%02i",iv);
+      out+=2;  in+=3;
+    } else if (*in=='%' && *(in+1)=='y' && *(in+2)=='4') {
+      tused=1;
+      sprintf (out,"%04i",dtim->yr);
+      out+=4;  in+=3;
+    } else if (*in=='%' && *(in+1)=='m' && *(in+2)=='1') {
+      tused=1;
+      sprintf (out,"%i",dtim->mo);
+      while (*out) out++;
+      in+=3;
+    } else if (*in=='%' && *(in+1)=='m' && *(in+2)=='2') {
+      tused=1;
+      sprintf (out,"%02i",dtim->mo);
+      out+=2;  in+=3;
+    } else if (*in=='%' && *(in+1)=='m' && *(in+2)=='h') {
+      tused=1;
+      if (dtim->dy < 16) *out='a';
+      else *out = 'b';
+      out+=1;  in+=3;
+    } else if (*in=='%' && *(in+1)=='m' && *(in+2)=='H') {
+      tused=1;
+      if (dtim->dy < 16) *out='A';
+      else *out = 'B';
+      out+=1;  in+=3;
+    } else if (*in=='%' && *(in+1)=='m' && *(in+2)=='c') {
+      tused=1;
+      *out = *(mons[dtim->mo-1]);
+      *(out+1) = *(mons[dtim->mo-1]+1);
+      *(out+2) = *(mons[dtim->mo-1]+2);
+      out+=3;  in+=3;
+    } else if (*in=='%' && *(in+1)=='d' && *(in+2)=='1') {
+      tused=1;
+      sprintf (out,"%i",dtim->dy);
+      while (*out) out++;
+      in+=3;
+    } else if (*in=='%' && *(in+1)=='d' && *(in+2)=='2') {
+      tused=1;
+      sprintf (out,"%02i",dtim->dy);
+      out+=2;  in+=3;
+    } else if (*in=='%' && *(in+1)=='h' && *(in+2)=='1') {
+      tused=1;
+      sprintf (out,"%i",dtim->hr);
+      while (*out) out++;
+      in+=3;
+    } else if (*in=='%' && *(in+1)=='h' && *(in+2)=='2') {
+      tused=1;
+      sprintf (out,"%02i",dtim->hr);
+      out+=2;  in+=3;
+    } else if (*in=='%' && *(in+1)=='h' && *(in+2)=='3') {
+      tused=1;
+      sprintf (out,"%03i",dtim->hr);
+      out+=3;  in+=3;
+    } else if (*in=='%' && *(in+1)=='n' && *(in+2)=='2') {
+      tused=1;
+      sprintf (out,"%02i",dtim->mn);
+      out+=2;  in+=3;
+    } 
+    /* forecast times */
+    else if (*in=='%' && *(in+1)=='f' && *(in+2)=='2') {
+      tused=1;
+      stim.yr = (gaint)(*vals+0.1);
+      stim.mo = (gaint)(*(vals+1)+0.1);
+      stim.dy = (gaint)(*(vals+2)+0.1);
+      stim.hr = (gaint)(*(vals+3)+0.1);
+      stim.mn = (gaint)(*(vals+4)+0.1);
+      tdif = timdif(dtimi,dtim);
+      tdif = (tdif+30)/60;
+      if (tdif<99) sprintf (out,"%02i",tdif);
+      else sprintf (out,"%i",tdif);
+      while (*out) out++;
+      in+=3;
+    } else if (*in=='%' && *(in+1)=='f' && *(in+2)=='3') {
+      tused=1;
+      stim.yr = (gaint)(*vals+0.1);
+      stim.mo = (gaint)(*(vals+1)+0.1);
+      stim.dy = (gaint)(*(vals+2)+0.1);
+      stim.hr = (gaint)(*(vals+3)+0.1);
+      stim.mn = (gaint)(*(vals+4)+0.1);
+      tdif = timdif(dtimi,dtim); 
+      tdif = (tdif+30)/60;
+      if (tdif<999) sprintf (out,"%03i",tdif);
+      else sprintf (out,"%i",tdif);
+      while (*out) out++;
+      in+=3;
+    } 
+    /* string substitution */
+    else if (*in=='%' && *(in+1)=='c' && *(in+2)=='h') {
+      tused=1;
+      while (pchsub) {
+        if (t>=pchsub->t1 && (pchsub->t2 == -99 || t<=pchsub->t2) ) {
+          len = wrdlen(pchsub->ch);    /* Reallocate output string */
+          olen += len;
+          work = (char *)galloc(olen,"work");
+          if (work==NULL) {
+            gree(fnout,"f240");
+            return (NULL);
+          }
+          in2 = fnout; 
+	  out2 = work;
+          while (in2!=out) {
+            *out2 = *in2;
+            in2++; out2++;
+          }
+          gree(fnout,"f241");     
+          fnout = work;
+          out = out2;
+          getwrd(out,pchsub->ch,len);
+          out += len;
+          break;
+        }
+        pchsub = pchsub->forw;
+      }
+      in+=3;
+    } 
+    /* ensemble name substitution */
+    else if  (*in=='%' && *(in+1)=='e') {
+      eused=1;
+      if (ens == NULL) {
+	gree(fnout,"f242");
+	return (NULL);
+      } else {
+	/* advance through array of ensemble structures, till we reach ensemble 'e' */
+	i=1;
+	while (i!=e) { i++; ens++; }
+	len = strlen(ens->name);
+	if (len < 1) {
+	  gree(fnout,"f243");
+	  return (NULL);
+	}
+	olen += len;
+	work = (char *)galloc(olen,"work2");     /* Reallocate output string */
+	if (work==NULL) {
+	  gree(fnout,"f244");
+	  return (NULL);
+	}
+	in2 = fnout;            /* copy the string we've got so far */
+	out2 = work;
+	while (in2!=out) {
+	  *out2 = *in2;
+	  in2++; out2++;
+	}
+	gree(fnout,"f245");
+	fnout = work;
+	out = out2;
+	getwrd(out,ens->name,len);
+	out += len;
+      }
+      in+=2;
+    }
+    else {
+      *out = *in;
+      in++; out++;
+    }
+  }
+  *out = '\0';
+  if (eused==1 && tused==1) {
+    *flag = 3;                       /* templating on E and T */
+  } 
+  else if (eused==1 && tused==0) {
+    *flag = 2;                       /* templating only on E */
+  }
+  else if (eused==0 && tused==1) { 
+    *flag = 1;                       /* templating only on T */
+  }
+  else {
+    *flag = 0;                       /* no templating */
+  }
+  return (fnout);
+}
 
 #undef  IsBigendian
 #define IsBigendian()  ( u_byteorder.c[sizeof(long) - 1] )
@@ -734,7 +1236,8 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   /* IsBigendian returns 1 for big endian byte order */
   static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
   struct gavar *pvar;
-  struct dt tdef,dt1,dt2;
+  struct gaens *ens;
+  struct dt tdef,tdefe,tdefi,dt1,dt2;
   struct gachsub *pchsub;
   int status = 0;
   int reclen;
@@ -746,10 +1249,10 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   gaint acumstride=0;
   gaint hdrb, trlb;
   gaint size=0,rc,len,flag,tim1,tim2;
-  gaint flgs[8];
+  gaint flgs[8],e,t;
   int BYTEORDER = IsBigendian();
   gadouble *vals;
-  gadouble v1,v2,ev1,ev2,temp;
+  gadouble v1,v2,temp;
   int err = 0;
  
   hdrb = 0;
@@ -1393,6 +1896,40 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   /* Done scanning!
      Check if scanned stuff makes sense, and then set things up correctly */
 
+  pfi->ulow = fabs(pfi->undef/EPSILON);
+  pfi->uhi  = pfi->undef + pfi->ulow;
+  pfi->ulow = pfi->undef - pfi->ulow;
+
+  /* If no EDEF entry was found, set up the default values */
+  if (pfi->ens1==NULL) {
+      pfi->dnum[4]=1;
+      /* set up linear scaling */
+      if ((vals = (gadouble *)galloc(sizeof(gadouble)*6,"evals3")) == NULL) goto err8;
+      v1=v2=1;
+      *(vals+1) = v1 - v2;
+      *(vals) = v2;
+      *(vals+2) = -999.9;
+      pfi->grvals[4] = vals;
+      *(vals+4) = -1.0 * ( (v1-v2)/v2 );
+      *(vals+3) = 1.0/v2;
+      *(vals+5) = -999.9;
+      pfi->abvals[4] = vals+3;
+      pfi->ab2gr[4] = liconv;
+      pfi->gr2ab[4] = liconv;
+      pfi->linear[4] = 1;
+      /* Allocate memory and initialize one ensemble structure */
+      ens = (struct gaens *)galloc(sizeof(struct gaens),"ens5");
+      if (ens==NULL) {
+	gaprnt(0,"Open Error: memory allocation failed for default ens\n");
+	goto err8;
+      }
+      pfi->ens1 = ens;
+      sprintf(ens->name,"1");
+      ens->length = pfi->dnum[3];
+      ens->gt = 1;
+      gr2t(pfi->grvals[3],1,&ens->tinit);
+      for (j=0;j<4;j++) ens->grbcode[j]=-999;
+  }
 
   /* Make sure there are no conflicting options and data types */
   pvar=pfi->pvar1;
@@ -1432,6 +1969,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 	pfi->xyhdr = pfi->xyhdr*4/2;
       } 
       pfi->gsiz = pfi->gsiz + pfi->xyhdr;
+      printf("gridsize %d %d %d %d\n", pfi->gsiz, pfi->xyhdr, pfi->dnum[0], pfi->dnum[1]);
     }
 
     /* adjust the size of hdrb and trlb for non-float data */
@@ -1510,6 +2048,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
     }
 
     recacm += levs;
+    printf("recs %d\n", recacm);
 
     /* last variable */
     acum = acum + (levs*pfi->gsiz);
@@ -1518,6 +2057,8 @@ int read_gradsdes(char *filename, dsets_t *pfi)
     pfi->trecs = recacm;
     if (pfi->seqflg) pfi->tsiz-=1;
     pfi->tsiz += trlb;
+
+    printf("pfi->tsiz %d %d\n", pfi->tsiz, pfi->trecs);
     
   } 
   else {
@@ -1541,6 +2082,113 @@ int read_gradsdes(char *filename, dsets_t *pfi)
       goto retrn;
     }
   }
+
+  /* If the file name is a time series template, figure out
+     which times go with which files, so we don't waste a lot
+     of time later opening and closing files unnecessarily. */
+
+  printf("pfi->dnum[3] = %d, pfi->dnum[4] = %d\n",pfi->dnum[3],pfi->dnum[4]);
+  if (pfi->tmplat) 
+    {
+      /* The fnums array is the size of the time axis 
+	 multiplied by the size of the ensemble axis. 
+	 It contains the t index which generates the filename 
+	 that contains the data for each timestep.
+	 If the ensemble has no data file for a given time, 
+	 the fnums value will be -1 */
+      pfi->fnums = (gaint *)galloc(sizeof(gaint)*pfi->dnum[3]*pfi->dnum[4],"fnums1");   
+      if (pfi->fnums==NULL) {
+	gaprnt(0,"Open Error: memory allocation failed for fnums\n");
+	goto err8;
+      }
+      /* get dt structure for t=1 */
+      gr2t(pfi->grvals[3],1.0,&tdefi); 
+      /* loop over ensembles */
+      ens=pfi->ens1;
+      e=1;
+      while (e<=pfi->dnum[4])
+	{
+	  j = -1; 
+	  t=1;
+	  /* set fnums value to -1 for time steps before ensemble initial time */
+	  while (t<ens->gt) {
+	    pfi->fnums[t-1] = j;                                                    
+	    t++;
+	  }
+	  j = ens->gt;
+	  /* get dt structure for ensemble initial time */
+	  gr2t(pfi->grvals[3],ens->gt,&tdefe);
+	  /* get filename for initial time of current ensemble member  */
+	  ch = gafndt(pfi->name,&tdefe,&tdefe,pfi->abvals[3],pfi->pchsub1,pfi->ens1,ens->gt,e,&flag);   
+	  if (ch==NULL) {
+	    sprintf(pout,"Open Error: couldn't determine data file name for e=%d t=%d\n",e,ens->gt);
+	    gaprnt(0,pout);
+	    goto err8;
+	  }
+	  /* set the pfi->tmplat flag to the flag returned by gafndt */
+	  if (flag==0) {
+	    gaprnt(1,"Warning: OPTIONS keyword \"template\" is used, but the \n");
+	    gaprnt(1,"   DSET entry contains no substitution templates.\n");
+	    pfi->tmplat = 1;
+	  } else {
+	    pfi->tmplat = flag; 
+	  }
+	  /* for non-indexed, non-netcdf/hdf, gridded data */
+	  if (pfi->type==1) {                /* gridded data   */
+	    if (pfi->ncflg==0) {             /* not netcdf/hdf */
+	      if (pfi->idxflg==0) {          /* not indexed    */
+		if ((flag==1) && (pfi->dnum[4]>1)) {
+		  gaprnt(0,"Open Error: If the data type is gridded binary, \n");
+		  gaprnt(0,"  and the E dimension size is greater than 1 \n");
+		  gaprnt(0,"  and templating in the T dimension is used,\n");
+		  gaprnt(0,"  then templating in the E dimension must also be used.\n");
+		  goto retrn;
+		}
+	      }
+	      else if (pfi->idxflg==1) {     /* GRIB1 */
+		if ((flag<2) && (pfi->dnum[4]>1)) {
+		  gaprnt(0,"Open Error: If the data type is GRIB1 \n");
+		  gaprnt(0,"  and the E dimension size is greater than 1 \n");
+		  gaprnt(0,"  then templating in the E dimension must be used.\n");
+		  goto retrn;
+		}
+	      }
+	    }
+	  }
+	  pfi->fnums[t-1] = j;                                                    
+	  /* loop over remaining valid times for this ensemble */
+	  for (t=ens->gt+1; t<ens->gt+ens->length; t++) {
+	    /* get filename for time index=t ens=e */
+	    gr2t(pfi->grvals[3],(gadouble)t,&tdef);
+	    pos = gafndt(pfi->name,&tdef,&tdefe,pfi->abvals[3],pfi->pchsub1,pfi->ens1,t,e,&flag);  
+	    if (pos==NULL) {
+	      sprintf(pout,"Open Error: couldn't determine data file name for e=%d t=%d\n",e,t);
+	      gaprnt(0,pout);
+	      goto err8;
+	    }
+	    if (strcmp(ch,pos)!=0) {    /* filename has changed */
+	      j = t;   
+	      gree(ch,"f176");
+	      ch = pos;
+	    }
+	    else {
+	      gree(pos,"f176a");
+	    }
+	    pfi->fnums[+t-1] = j;                                                    
+	  }
+	  gree(ch,"f177");
+	  
+	  /* set fnums value to -1 for time steps after ensemble final time */
+	  j = -1;
+	  while (t<=pfi->dnum[3]) {
+	    pfi->fnums[t-1] = j;                                                    
+	    t++;
+	  }
+	  e++; ens++;
+	}
+      pfi->fnumc = 0;
+      pfi->fnume = 0;
+    }
 
 
 

@@ -23,7 +23,6 @@ void *Importgrads(void *argument)
   int ivar;
   int varID, levelID, tsID;
   int nx, ny, nz, nt, gridsize;
-  double *array;
   double missval, minval, maxval;
   int  status;
   dsets_t pfi;
@@ -33,6 +32,17 @@ void *Importgrads(void *argument)
   int tmin=0,tmax=0;
   char *ch=NULL;
   off_t flen;
+  int nvars;
+  int recID;
+  int e, flag;
+  size_t rc, recsize;
+  int recoffset;
+  char *rec = NULL;
+  struct gavar *pvar;
+  struct dt dtim, dtimi;
+  double fmin, fmax;
+  float *farray;
+  double *array;
 
   cdoInitialize(argument);
 
@@ -47,8 +57,35 @@ void *Importgrads(void *argument)
   if ( pfi.infile==NULL )  cdoAbort("Open failed on %s!", pfi.name);
   fclose (pfi.infile);
   */
+
+  nvars = pfi.vnum;
+  pvar = pfi.pvar1;
+  printf("gridsize %d %d %d %d\n", pfi.gsiz, pfi.xyhdr, pfi.dnum[0], pfi.dnum[1]);
+  printf("dims %d %d %d %d\n", pfi.dnum[0], pfi.dnum[1], pfi.dnum[2], pfi.dnum[3]);
+
+  gridsize = pfi.dnum[0]*pfi.dnum[1];
+  recoffset = pfi.xyhdr*4;
+  if ( pfi.seqflg ) recoffset += 4;
+
+  recsize = pfi.gsiz*4;
+  rec = (char *) malloc(recsize);
+
+  array = (double *) malloc(gridsize*sizeof(double));
+
+  for ( ivar = 0; ivar < nvars; ++ivar )
+    {
+      fprintf(stderr, "%s %s %d %d %d %d %s %d \n", 
+	      pvar->abbrv, pvar->longnm, pvar->offset, pvar->recoff, pvar->levels, pvar->nvardims, pvar->varnm, pvar->var_t);
+      pvar++;
+    }
+
+  if (pfi.tmplat)
+    for ( i = 0; i <  pfi.dnum[3]; ++i )
+      printf("%d %d\n", i, pfi.fnums[i]);
+
   pfi.infile = NULL;
   tcur = 0;
+  e = 1;
   while (1)
     {    /* loop over all times for this ensemble */
       if (pfi.tmplat)
@@ -69,6 +106,7 @@ void *Importgrads(void *argument)
 	    /* increment time step until fnums changes */
 	    while (told==pfi.fnums[tcur-1] && tcur<=pfi.dnum[3]) {
 	      tcur++;
+	      if ( tcur > pfi.dnum[3] ) break;
 	    }
 	  }
 
@@ -83,18 +121,21 @@ void *Importgrads(void *argument)
 	  tmin = tcur;
 	  tmax = tcur-1;
 	  fnum = pfi.fnums[tcur-1];
-	  /*
 	  if (fnum != -1) {
-	    while (fnum == pfi.fnums[tmax]) tmax++;
+	    while (fnum == pfi.fnums[tmax])
+	      {
+		tmax++; 
+		if (tmax == pfi.dnum[3]) break;
+	      }
 	    gr2t(pfi.grvals[3], (gadouble)tcur, &dtim); 
 	    gr2t(pfi.grvals[3], (gadouble)1, &dtimi);
 	    ch = gafndt(pfi.name, &dtim, &dtimi, pfi.abvals[3], pfi.pchsub1, NULL,tcur,e,&flag);
 	    if (ch==NULL) {
 	      printf(" grib1map error: couldn't determine data file name for e=%d t=%d\n",e,tcur);
-	      return(1);
+	      /* return(1);*/
+	      exit (-1);
 	    }
 	  }
-	  */
 	}
       else { 
 	/* Data set is not templated */
@@ -103,6 +144,7 @@ void *Importgrads(void *argument)
 	tmax = pfi.dnum[3];
       }
        
+      fprintf(stderr, "tmin %d tmax %d\n", tmin, tmax);
       /* Open this file and position to start of first record */
       if ( cdoVerbose) cdoPrint(" opening file: %s",ch);
       pfi.infile = fopen(ch,"rb");
@@ -119,45 +161,46 @@ void *Importgrads(void *argument)
       /* Get file size */
       fseeko(pfi.infile,0L,2);
       flen = ftello(pfi.infile);
+
+      printf("flen %d tsiz %d\n", flen, pfi.tsiz);
        
-      /* Set up to skip appropriate amount and position */
-      /*
-      if (skip > -1) {
-	fpos = skip;
-      }
-      else {
-	fseeko (pfi.infile,0,0);
-	rc = fread (rec,1,100,pfi.infile);
-	if (rc<100) {
-	  printf (" grib1map error: I/O error reading header\n");
-	  return(1);
+      fseeko (pfi.infile,0,0);
+
+      for ( tsID = tmin-1; tsID < tmax; ++tsID )
+	{
+	  gr2t(pfi.grvals[3], (gadouble)(tsID+1), &dtim); 
+	  printf("tsID = %d %d-%d-%d %d:%d\n", tsID, dtim.yr, dtim.mo, dtim.dy, dtim.hr, dtim.mn);
+	  for ( recID = 0; recID < pfi.trecs; ++recID )
+	    {
+	      rc = fread (rec, 1, recsize, pfi.infile);
+	      if ( rc < recsize )
+		{
+		  fprintf (stderr, "I/O error reading record!\n");
+		  exit(-1);
+		}
+	      if ( pfi.bswap ) gabswp(rec+recoffset, gridsize);
+	      farray = (float *) (rec+recoffset);
+	      fmin =  1.e33;
+	      fmax = -1.e33;
+	      nmiss = 0;
+	      for ( i = 0; i < gridsize; ++i )
+		{
+		  array[i] = (double) farray[i];
+		  if ( array[i] > pfi.ulow && array[i] < pfi.uhi )
+		    {
+		      array[i] = pfi.undef;
+		      nmiss++;
+		    }
+		  else
+		    {
+		      if ( array[i] < fmin ) fmin = array[i];
+		      if ( array[i] > fmax ) fmax = array[i];
+		    }
+		}
+	      printf("%d %d %g %g %d %d\n", tsID, recID, fmin, fmax, recoffset, nmiss);
+	    }
 	}
-	len = gagby(rec,88,4);
-	fpos = len*2 + 100;
-      }
-      */
-      /* Main Loop */
-      /*
-      irec=1;
-      while (1) {
-	rc = gribhdr(&ghdr);      
-	if (rc) break;
-	rcgr = gribrec(&ghdr,pfi,pindx,tmin,tmax,e);
-	if (rcgr==0) didmatch=1;
-	if (rcgr>=100) didmatch=rcgr;
-	irec++;
-      }
-       
-      if (rc==50) {
-	printf (" grib1map error: I/O error reading GRIB file\n");
-	printf ("                possible cause is premature EOF\n");
-	break;
-      }
-      if (rc>1 && rc!=98) {
-	printf (" grib1map error: GRIB file format error (rc = %i)\n",rc);
-	return(rc);
-      }
-      */
+
       /* break out if not templating */
       if (!pfi.tmplat) break;
       

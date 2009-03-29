@@ -95,6 +95,16 @@ struct gachsub {
   char *ch;                   /* Substitution string */
 };
 
+/* Structure for ensemble metadata */
+struct gaens {
+  char name[16];             /* name of ensemble */
+  gaint length;              /* length of time axis */
+  struct dt tinit;           /* initial time */
+  gaint gt;                  /* initial time in grid units */
+  gaint grbcode[4];          /* grib2 codes */
+};
+
+
 #define  MAX_RECLEN   512
 #define  MAX_NAMELEN  512
 typedef struct {
@@ -117,14 +127,6 @@ typedef struct {
   int seqflg;
   int yrflg;
   int zrflg;
-  gaint tmplat;                /* File name templating:
-                                   3==templating on E and T 
-                                   2==templating only on E 
-                                   1==templating only on T, or when 
-                                      ddf has 'options template', but no % in dset 
-                                   0==no templating  */
-  gaint *fnums;                /* File number for each time */
-  gaint fnumc;                 /* Current file number that is open */
   int pa2mb;
   int calendar;
   /* init !? */
@@ -140,6 +142,7 @@ typedef struct {
   struct gavar *pvar1;         /* Pointer to an array of structures.
 				  Each structure in the array has info
 				  about the specific variable.          */
+  struct gaens *ens1;          /* pointer to array of ensemble structures */
   gaint wrap;                  /* The grid globally 'wraps' in X        */
   gadouble (*gr2ab[5]) (double *, double);
                                /* Addresses of routines to do conversion
@@ -158,6 +161,17 @@ typedef struct {
   gaint linear[5];             /* Indicates if a dimension has a linear
                                   grid/absolute coord transformation
                                   (Time coordinate always linear).      */
+  gaint idxflg;                /* File records are indexed; 1==grib,station 2==grib2 */
+  gaint tmplat;                /* File name templating:
+                                   3==templating on E and T 
+                                   2==templating only on E 
+                                   1==templating only on T, or when 
+                                      ddf has 'options template', but no % in dset 
+                                   0==no templating  */
+  gaint *fnums;                /* File number for each time */
+  gaint fnumc;                 /* Current file number that is open */
+  gaint fnume;                 /* Current ensemble file number that is open */
+
   int nsets;
   int mergelevel;
   int lgeoloc;
@@ -175,8 +189,12 @@ int read_gradsdes(char *filename, dsets_t *pfi);
 gadouble liconv (gadouble *, gadouble);
 gadouble gr2lev (gadouble *, gadouble);
 gadouble lev2gr (gadouble *, gadouble);
+void gr2t (gadouble *, gadouble, struct dt *);
+char *gafndt (char *, struct dt *, struct dt *, gadouble *, 
+	      struct gachsub *, struct gaens *, gaint, gaint, gaint *);
 
 gaint cmpwrd (char *ch1, char *ch2);
 char *intprs (char *ch, int *val);
+void gabswp (void *r, gaint cnt);
 
 #endif  /* _GRADSDESLIB_H */
