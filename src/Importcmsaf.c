@@ -1119,7 +1119,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 		  cdoPrint("Dataset %s: changed missval to %g and datatype to INT16!",
 			   varname, missval);
 
-		  for ( i = 0; i < gridsize; i++ )
+		  for ( i = 0; i < gridsize*nt; i++ )
 		    if ( mask[i] ) array[i] = missval;
 		}
 	      else
