@@ -601,8 +601,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       gridID1 = gridIDnew;
       rg->gridID1 = gridIDnew;
-      
-      /* rg->no_fall_back = TRUE; */
     }
 
   if ( gridInqSize(rg->gridID1) > 1 && 
@@ -693,8 +691,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       gridID1 = gridIDnew;
       rg->gridID1 = gridIDnew;
-       
-      /* rg->no_fall_back = TRUE; */
     }
 
   if ( map_type == MAP_TYPE_DISTWGT )
