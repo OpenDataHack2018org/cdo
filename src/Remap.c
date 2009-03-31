@@ -346,6 +346,7 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
+      if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
       non_global = remap_non_global || !gridIsCircular(gridID1);
       if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
 	   (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
@@ -561,6 +562,7 @@ void *Remap(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  gridsize = gridInqSize(gridID1);
 
+	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 	  non_global = remap_non_global || !gridIsCircular(gridID1);
 	  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
 	       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
@@ -575,12 +577,7 @@ void *Remap(void *argument)
 	      int nx, ny;
 	      nx = gridInqXsize(gridID1);
 	      ny = gridInqYsize(gridID1);
-	      /* gridsize_new = gridsize + 2*(nx+1) + 2*(ny+1); */
 	      gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
-	      /*
-	      fprintf(stderr, "Data on rotated grid found!\n");
-	      fprintf(stderr, "gridsize %d %d %d %d\n", gridsize, gridsize_new, nx, ny);
-	      */
 	      if ( gridsize_new > grid1sizemax )
 		{
 		  grid1sizemax = gridsize_new;
@@ -643,6 +640,7 @@ void *Remap(void *argument)
 
 	      if ( remaps[r].gridID != gridID1 )
 		{
+		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 		  remaps[r].grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
 		  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&

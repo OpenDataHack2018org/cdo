@@ -2566,7 +2566,8 @@ static char *RemapgridHelp[] = {
     "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
-    "        By default the extrapolation is enabled for remapdis and remapnn.",
+    "        By default the extrapolation is enabled for remapdis, remapnn",
+    "        and for circular grids.",
     NULL
 };
 
@@ -2623,7 +2624,8 @@ static char *GenweightsHelp[] = {
     "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
-    "        By default the extrapolation is enabled for remapdis and remapnn.",
+    "        By default the extrapolation is enabled for remapdis, remapnn",
+    "        and for circular grids.",
     NULL
 };
 
@@ -2653,7 +2655,8 @@ static char *RemapHelp[] = {
     "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
-    "        By default the extrapolation is enabled for remapdis and remapnn.",
+    "        By default the extrapolation is enabled for remapdis, remapnn",
+    "        and for circular grids.",
     NULL
 };
 
@@ -2686,7 +2689,7 @@ static char *RemapetaHelp[] = {
     "    This operator interpolates between different vertical hybrid levels. ",
     "    This include the preparation of consistent data for the free atmosphere.",
     "    The procedure for the vertical interpolation is based on the HIRLAM scheme",
-    "    and was adapted from \{INTERA}.",
+    "    and was adapted from INTERA.",
     "    The vertical interpolation is based on the vertical integration of the",
     "    hydrostatic equation with few adjustments. The basic tasks are the following one:",
     "    - at first integration of hydrostatic equation",
@@ -2708,7 +2711,7 @@ static char *RemapetaHelp[] = {
     "    are merged. With the resulting temperature/pressure correction the hydrostatic",
     "    equation is integrated again and adjusted to the reference level finding",
     "    the final surface pressure correction. A more detailed description of",
-    "    the interpolation can be found in \{INTERA}.",
+    "    the interpolation can be found in INTERA.",
     "",
     "PARAMETER",
     "    vct  STRING  File name of an ASCII dataset with the vertical coordinate table",
