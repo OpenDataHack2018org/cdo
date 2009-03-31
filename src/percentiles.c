@@ -25,8 +25,8 @@
 #include "nth_element.h"
 #include "percentiles.h"
 
-#define NBINS_DEFAULT 100
-#define NBINS_MINIMUM 10
+#define NBINS_DEFAULT 101
+#define NBINS_MINIMUM 11
 
 #define DBL_CAPACITY(n) ((int)(((n) * sizeof(int)) / sizeof(double)))
 #define DBL_PTR(p) ((double *) (p))

@@ -1538,7 +1538,7 @@ static char *TimselpctlHelp[] = {
     "    steps in ifile1.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    timselmin and timselmax operations, respectively.",
@@ -1557,7 +1557,7 @@ static char *TimselpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -1667,7 +1667,7 @@ static char *TimpctlHelp[] = {
     "    This operator computes percentiles over all time steps in ifile1.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    timmin and timmax operations, respectively.",
@@ -1681,7 +1681,7 @@ static char *TimpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -1743,7 +1743,7 @@ static char *HourpctlHelp[] = {
     "    This operator computes percentiles over all time steps of the same hour in ifile1.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    hourmin and hourmax operations, respectively.",
@@ -1758,7 +1758,7 @@ static char *HourpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -1820,7 +1820,7 @@ static char *DaypctlHelp[] = {
     "    This operator computes percentiles over all time steps of the same day in ifile1.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by defining the",
+    "    histogram bins is 101. The default can be overridden by defining the",
     "    environment variable CDO_PCTL_NBINS. The files ifile2 and",
     "    ifile3 should be the result of corresponding daymin and daymax",
     "    operations, respectively.",
@@ -1835,7 +1835,7 @@ static char *DaypctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -1897,7 +1897,7 @@ static char *MonpctlHelp[] = {
     "    This operator computes percentiles over all time steps of the same month in ifile1.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    monmin and monmax operations, respectively.",
@@ -1912,7 +1912,7 @@ static char *MonpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -1974,7 +1974,7 @@ static char *YearpctlHelp[] = {
     "    This operator computes percentiles over all time steps of the same year in ifile1.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    yearmin and yearmax operations, respectively.",
@@ -1989,7 +1989,7 @@ static char *YearpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -2053,7 +2053,7 @@ static char *SeaspctlHelp[] = {
     "    This operator computes percentiles over all time steps in ifile1 of the same season.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    seasmin and seasmax operations, respectively.",
@@ -2070,7 +2070,7 @@ static char *SeaspctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -2177,7 +2177,7 @@ static char *YdaypctlHelp[] = {
     "    This operator writes a certain percentile of each day of year in ifile1 to ofile.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    ydaymin and ydaymax operations, respectively.",
@@ -2193,7 +2193,7 @@ static char *YdaypctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -2254,7 +2254,7 @@ static char *YmonpctlHelp[] = {
     "    This operator writes a certain percentile of each month of year in ifile1 to ofile.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    ymonmin and ymonmax operations, respectively.",
@@ -2270,7 +2270,7 @@ static char *YmonpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -2338,7 +2338,7 @@ static char *YseaspctlHelp[] = {
     "    This operator writes a certain percentile of each season in ifile1 to ofile.",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    yseasmin and yseasmax operations, respectively.",
@@ -2355,7 +2355,7 @@ static char *YseaspctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 
@@ -2432,7 +2432,7 @@ static char *YdrunpctlHelp[] = {
     "    to a certain day of year. ",
     "    The algorithm uses histograms with minimum and maximum bounds given in",
     "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 100. The default can be overridden by setting the",
+    "    histogram bins is 101. The default can be overridden by setting the",
     "    environment variable CDO_PCTL_NBINS to a different value. The files",
     "    ifile2 and ifile3 should be the result of corresponding",
     "    ydrunmin and ydrunmax operations, respectively.",
@@ -2457,7 +2457,7 @@ static char *YdrunpctlHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
-    "        Sets the number of histogram bins. The default number is 100.",
+    "        Sets the number of histogram bins. The default number is 101.",
     NULL
 };
 

@@ -1,4 +1,4 @@
-2009-03-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2009-4-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 	
 	* using CDI library version 1.3.1
 	* set default calendar to proleptic gregorian
@@ -15,6 +15,7 @@
 	* added predefined lonlat grid for germany, europe and africa
 	* gridFromName: define GRID with one point lon=<LON>_lat=<LAT>
 	* sellonlatbox: select box from circular curvilinear grids
+	* CDO_PCTL_NBINS: set default number of bins to 101
 	* intlevel: use zaxis attributes from input [report: Carmen Ulmen]
 	* ml2pl: added support for Geopotential Height [request: Katharina Klehmet]
 	* remapbil, remapbic: enable extrapolation with REMAP_EXTRAPOLATE=ON

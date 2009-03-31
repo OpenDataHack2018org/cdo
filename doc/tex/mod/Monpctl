@@ -11,7 +11,7 @@
 This operator computes percentiles over all time steps of the same month in @file{ifile1}.
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
-histogram bins is 100. The default can be overridden by setting the
+histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files
 @file{ifile2} and @file{ifile3} should be the result of corresponding
 @mod{monmin} and @mod{monmax} operations, respectively.
@@ -52,7 +52,7 @@ INTEGER  Percentile number in {1, ..., 99}
 
 @BeginEnvironment
 @Item = CDO_PCTL_NBINS
-Sets the number of histogram bins. The default number is 100.
+Sets the number of histogram bins. The default number is 101.
 @EndEnvironment
 
 
