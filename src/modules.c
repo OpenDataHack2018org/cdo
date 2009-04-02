@@ -260,7 +260,7 @@ void *Wct(void *argument);
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
-#define  TimeofOperators        {"timeof"}
+#define  TimeofOperators        {"eof", "eofspatial", "eoftime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
