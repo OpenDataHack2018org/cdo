@@ -17,7 +17,10 @@
 
 /*
    This module contains the following operators:
-
+     
+     Timeof        eof             EOF in spatial or time space
+     Timeof        eofspatial      EOF in spatial space
+     Timeof        eoftime         EOF in time space 
 */
 #define WEIGHTS 1
 
@@ -29,15 +32,19 @@
 #include "pstream.h"
 #include "statistic.h"
 
-void *Timeof(void *argument)
+// NO MISSING VALUE SUPPORT ADDED SO FAR
+
+void *Timeof(void * argument)
 {
   static char func[] = "Timeof";
+  enum {EOF_, EOF_TIME, EOF_SPATIAL};
   int operatorID;
+  int operfunc;
   int streamID1, streamID2, streamID3;
   int gridsize;
   int vdate = 0, vtime = 0;
   int nrecs, nvars, nlevs ;
-  int i, ii, j, i1, i2;
+  int i, ii, j, i1, i2, j1, j2;
   int nmiss;
   int tsID;
   int varID, recID, levelID, gridID;
@@ -46,39 +53,42 @@ void *Timeof(void *argument)
   int gridID1, gridID2, gridID3;
   int ngrids;
   int reached_eof;
-  int npack;
+  int npack, nts;
   int *pack;
   int ***iwork;
   int n_eig;
+  int grid_space, time_space;
   double *w;
   double sum_w;
   double missval;
   double *xvals, *yvals;
-  FIELD **fwork;
+  FIELD ***fwork;
   FIELD ***o, ***o2; 
   FIELD in;     
-
-  cdoInitialize(argument);
   
-  n_eig = atoi(operatorArgv()[0]);
-  cdoOperatorAdd("timeof", 0, 0, NULL);  
+  cdoInitialize(argument);
+  cdoOperatorAdd("eof",       EOF_,       0, NULL);
+  cdoOperatorAdd("eoftime",   EOF_TIME,   0, NULL);
+  cdoOperatorAdd("eofspatial",EOF_SPATIAL,0, NULL);
+  
   operatorID = cdoOperatorID();
-  printf("initialized operator %i\n", operatorID);
+  operfunc = cdoOperatorFunc(operatorID);
+  
+  operatorInputArg("Number of eigen functions to write out");  
+  n_eig = atoi(operatorArgv()[0]);
   
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
   vlistID1 = streamInqVlist(streamID1); 
   taxisID1 = vlistInqTaxis(vlistID1);
-  printf("opened stream1 (%i) for reading\n", streamID1);
   
   gridsize = vlistGridsizeMax(vlistID1);
+  gridID1 = vlistInqVarGrid(vlistID1, 0);
   nvars = vlistNvars(vlistID1);
   nrecs = vlistNrecs(vlistID1); 
   taxisID1 = vlistInqTaxis(vlistID1);
   w = (double*)malloc(gridsize*sizeof(double));
   gridWeights(gridID1, &w[0]);
-  
-  printf("got stream1 properties\n");
   
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
@@ -86,7 +96,6 @@ void *Timeof(void *argument)
   taxisID2 = taxisDuplicate(taxisID1); 
   vlistDefTaxis(vlistID2, taxisID2);  
   
-  printf("set stream to properties\n");
   
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
   if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
@@ -110,15 +119,72 @@ void *Timeof(void *argument)
     vlistChangeGridIndex(vlistID3, i, gridID3);
   
   reached_eof=0;
+  tsID = 0;
   
+  /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
+  
+  if ( operfunc == EOF_ || operfunc == EOF_TIME)
+    {
+      while ( TRUE )
+        {      
+          if ( reached_eof ) continue;
+          nrecs = streamInqTimestep(streamID1, tsID);
+          if ( nrecs == 0 )
+            {
+              reached_eof = 1;
+              break;
+            }              
+          tsID++;      
+        }
+      nts = tsID;
+      reached_eof = 0;
+      streamID1 = streamOpenRead(cdoStreamName(0));
+      if ( nts < gridsize || operfunc == EOF_TIME) 
+       {
+         time_space = 1;
+         grid_space = 0;
+       }
+      else 
+        {
+          time_space = 0;
+          grid_space = 1;
+        }
+    }
+  else if ( operfunc == EOF_SPATIAL )
+    {
+      time_space = 0;
+      grid_space = 1;
+    }  
+  
+  if ( time_space )    
+    {
+      if ( n_eig > nts )
+        {
+          cdoWarning("Solving in time-space:");
+          cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps.");
+          cdoWarning("Setting n_eig to %i.", nts);
+          cdoWarning("If You want to force a solution in grid-space use operator eofspatial");
+          n_eig = nts;
+        }  
+    }
+  else if ( grid_space )
+    if ( n_eig > gridsize )
+      {
+        cdoWarning("Solving in sptial space");
+        cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps");
+        cdoWarning("Setting n_eig to %i", gridsize);
+        cdoWarning("If You want to force a solution in time-space use operator eoftime");  
+        n_eig = gridsize;
+      }  
+  
+  // ALLOCATION OF FIELDS 
   in.ptr = (double *) malloc(gridsize*sizeof(double));
-
-  fwork = (FIELD **) malloc(nvars*sizeof(FIELD*));
+  
+  fwork = (FIELD ***) malloc(nvars*sizeof(FIELD**));
   o     = (FIELD ***)malloc(nvars*sizeof(FIELD**));
   o2    = (FIELD ***)malloc(nvars*sizeof(FIELD**));
   iwork = (int ***) malloc(nvars*sizeof(int **));
   
-
   for ( varID = 0; varID < nvars; ++varID )
     {
       gridID1  = vlistInqVarGrid(vlistID1, varID);      
@@ -126,26 +192,44 @@ void *Timeof(void *argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);      
       
-      fwork[varID] = (FIELD *)  malloc(nlevs*sizeof(FIELD));
-      o[varID]     = (FIELD **) malloc(nlevs*sizeof(FIELD*));     
-      o2[varID]    = (FIELD **) malloc(nlevs*sizeof(FIELD*));
-      iwork[varID] = (int ** )  malloc(nlevs*sizeof(int* ));
+      fwork[varID] = (FIELD **)  malloc(nlevs*sizeof(FIELD*));
+      o[varID]     = (FIELD **)  malloc(nlevs*sizeof(FIELD*));     
+      o2[varID]    = (FIELD **)  malloc(nlevs*sizeof(FIELD*));
+      iwork[varID] = (int  **)   malloc(nlevs*sizeof(int* ));
       
-
       for ( levelID = 0; levelID < nlevs; ++levelID )
         { 
-          fwork[varID][levelID].grid    = gridID1;
-          fwork[varID][levelID].nmiss   = 0;
-          fwork[varID][levelID].missval = missval;
-          fwork[varID][levelID].ptr     = (double *)malloc(gridsize*gridsize*sizeof(double));
-          for ( i = 0; i < gridsize*gridsize; ++i )
-            fwork[varID][levelID].ptr[i] = 0;
-
-          iwork[varID][levelID] = (int *) malloc(gridsize*gridsize*sizeof(int));
-          memset(iwork[varID][levelID], 0, gridsize*gridsize*sizeof(int)); 
+          if ( grid_space )
+            {
+              fwork[varID][levelID] = (FIELD *) malloc (1*sizeof(FIELD));
+              fwork[varID][levelID][0].grid    = gridID1;
+              fwork[varID][levelID][0].nmiss   = 0;
+              fwork[varID][levelID][0].missval = missval;
+              fwork[varID][levelID][0].ptr     = (double *)malloc(gridsize*gridsize*sizeof(double));
+              for ( i = 0; i < gridsize*gridsize; ++i )
+                fwork[varID][levelID][0].ptr[i] = 0;
+              iwork[varID][levelID] = (int *) malloc(gridsize*gridsize*sizeof(int));
+              memset(iwork[varID][levelID], 0, gridsize*gridsize*sizeof(int)); 
+            }
+          else if ( time_space ) 
+            {
+              fwork[varID][levelID] = (FIELD *) malloc (nts*sizeof(FIELD));
+              for ( tsID=0; tsID<nts; tsID++ )
+                {
+                  fwork[varID][levelID][tsID].grid    = gridID1;
+                  fwork[varID][levelID][tsID].nmiss   = 0;
+                  fwork[varID][levelID][tsID].missval = missval;
+                  fwork[varID][levelID][tsID].ptr     = (double *)malloc(gridsize*sizeof(double));
+                  for ( i = 0; i < gridsize; ++i )
+                    fwork[varID][levelID][tsID].ptr[i] = 0;
+                  
+                }
+              iwork[varID][levelID] = (int *) malloc (gridsize*sizeof(int));
+            }                    
           
           o[varID][levelID] = (FIELD *) malloc(n_eig*sizeof(FIELD));
           o2[varID][levelID]= (FIELD *) malloc(gridsize*sizeof(FIELD));
+          
           for ( i = 0; i < n_eig; i++ )
             {
               o[varID][levelID][i].grid   = gridID2;
@@ -163,20 +247,19 @@ void *Timeof(void *argument)
             }
         }      
     }    
+  
   tsID=0; 
-  printf("allocated\n");
-  /* Read the data and reate covariance matrices for each var & level */
+  /* Read the data and create covariance matrices for each var & level */
   while ( TRUE )
     {      
-      if ( reached_eof ) continue;
-      
+      if ( reached_eof ) continue;    
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 )
         {
           reached_eof = 1;
           break;
         }
-          
+      
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);    
       
@@ -188,126 +271,193 @@ void *Timeof(void *argument)
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));          
           missval = in.missval = vlistInqVarMissval(vlistID1, varID);           
           
-          streamReadRecord(streamID1, in.ptr, &in.nmiss);   
-          for ( i = 0; i < gridsize; ++i )
-            {     
-              for ( i2 = 0; i2 <= i; i2++ )
-                {                
-                  if ( ( ! DBL_IS_EQUAL(in.ptr[i], missval) ) && 
-                      ( ! DBL_IS_EQUAL(in.ptr[i2], missval) ) )                            
-                    {
-                      tmp = in.ptr[i]*in.ptr[i2];                    
-                      fwork[varID][levelID].ptr[i*gridsize+i2] += tmp;                      
-                      iwork[varID][levelID][i*gridsize+i2]++;                                        
-                    }                 
-                }           
-            }	   
-          /* creater lower triangular of covariance matrix; */
-          for (i=0;i<gridsize;i++)
-            for(i2=0;i2<i;i2++)
+          streamReadRecord(streamID1, in.ptr, &in.nmiss); 
+          if ( grid_space )
+            {
+              for ( i1 = 0; i1 < gridsize; ++i1 )
+                {                    
+                  for ( i2 = i1; i2 <= gridsize; i2++ )
+                    {                
+                      if ( ( ! DBL_IS_EQUAL(in.ptr[i1], missval) ) && 
+                          ( ! DBL_IS_EQUAL(in.ptr[i2], missval) ) )                            
+                        {
+                          tmp = in.ptr[i1]*in.ptr[i2];                    
+                          fwork[varID][levelID][0].ptr[i1*gridsize+i2] += tmp;                      
+                          iwork[varID][levelID][i1*gridsize+i2]++;                                        
+                        }   
+                      else
+                        cdoWarning("Missing value support not checked for this operator!");
+                    }           
+                }	 
+            }
+          else if ( time_space )                    
+            for ( i=0; i<gridsize; ++i )         
               {
-                fwork[varID][levelID].ptr[i2*gridsize+i]=fwork[varID][levelID].ptr[i*gridsize+i2];
-                iwork[varID][levelID][i2*gridsize+i]    =iwork[varID][levelID][i*gridsize+i2];
+                fwork[varID][levelID][tsID].ptr[i] = in.ptr[i];                      
+                if ( ! DBL_IS_EQUAL(in.ptr[i], missval ) )
+                  iwork[varID][levelID][i]++;
+                else
+                  cdoAbort("No missing value support for EOF in time space");
               }
-              
+                  
         }                                  
       tsID++;
     }
-  printf("read\n");
+  if ( grid_space ) 
+    for ( i1=0; i1<gridsize; ++i1 )
+      for ( i2=0; i2<i1; ++i2 )                  
+        {
+          fwork[varID][levelID][0].ptr[i1*gridsize+i2] = 
+          fwork[varID][levelID][0].ptr[i2*gridsize+i1];
+          iwork[varID][levelID][i1*gridsize+i2] = 
+          iwork[varID][levelID][i2*gridsize+i1];
+        }
+  
   pack = (int *)malloc(gridsize*sizeof(int));   
   
   for ( varID = 0; varID < nvars; varID++ )
-    {
+    {         
       for ( levelID = 0; levelID < nlevs; levelID++ )
         {
+          int i2;
           double **cov;
           double *eigv;
-          int i2;
-
           npack = 0;
-          sum_w = 0;
-          memset(pack, 0, gridsize*sizeof(int));
-          for ( i = 0; i < gridsize; i++ )
-            {        
-              for ( i2 = 0; i2 < gridsize; i2++ )              
-                  if (!iwork[varID][levelID][i2*gridsize+i])
-                    break;
+          sum_w = 0;          
+          if ( grid_space ) 
+            {      
+              memset(pack, 0, gridsize*sizeof(int));                
+              for ( i1 = 0; i1 < gridsize; i1++ )
+                {        
+                  for ( i2 = 0; i2 < gridsize; i2++ )              
+                    if (!iwork[varID][levelID][i2*gridsize+i])
+                      break;
+                  
+                  if ( i2 == gridsize )
+                    pack[npack++] = i1;                                   
+                }          
+              for(i1=0;i1<npack;i1++)
+                sum_w += w[pack[i1]];
+              cov = (double **)malloc(npack*sizeof(double *));
+              for (i1=0; i1<npack; i1++ )
+                cov[i1] = (double*)malloc(npack*sizeof(double));
               
-              if ( i2 == gridsize )
-                {
-                  pack[npack] = i;                  
-                  npack++;        
-                  sum_w += w[i];
-                }            
-            }          
-          
-          cov = (double **)malloc(npack*sizeof(double *));
-          eigv = (double *)malloc(npack*sizeof(double));
-          
-          for (i1=0;i1<npack;i1++) 
-            { 
-              cov[i1]=(double*)malloc(npack*sizeof(double));
-              for (i2 = 0; i2 < npack; i2++ )                               
-                if ( iwork[varID][levelID][i1*gridsize+i2] )
-                  {                    
-                    cov[i1][i2] = fwork[varID][levelID].ptr[pack[i2]*gridsize+pack[i1]];                                   
-                    /* weight and normalize the covariances */
-                    if ( ! WEIGHTS )
-                      cov[i1][i2] /= (iwork[varID][levelID][i1*gridsize+i2] - 1.);
-                    else if ( WEIGHTS )
-                      cov[i1][i2] *= sqrt(w[pack[i1]])*sqrt (w[pack[i2]]) / sum_w / (iwork[varID][levelID][i1*gridsize+i2] - 1.);
+              for (i1=0;i1<npack;i1++) 
+                {                                                       
+                  for (i2 = i1; i2 < npack; i2++ )                               
+                    if ( iwork[varID][levelID][pack[i1]*gridsize+pack[i2]] )
+                      {                    
+                        cov[i2][i1] = cov[i1][i2] = 
+                        fwork[varID][levelID][0].ptr[pack[i1]*gridsize+pack[i2]]* // covariance
+                        sqrt(w[pack[i1]]) * sqrt (w[pack[i2]]) / sum_w /          // weights
+                        (iwork[varID][levelID][pack[i1]*gridsize+pack[i2]] - 1.); // number of data contributing                        
+                        
+                      }
+                }
+            }        
+          else if ( time_space ) 
+            {  
+              sum_w = 0;
+              for ( i=0; i < gridsize ;i++ )
+                if ( iwork[varID][levelID][i] )                                    
+                  {
+                    pack[npack] = i;                                          
+                    npack++;
+                    sum_w += w[i];
                   }
-            }   
-        
-          eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], npack, n_eig, func);
+              
+              cov = (double **) malloc (nts*sizeof(double*)); 
+              for ( j1=0; j1<nts; j1++)
+                cov[j1] = (double*)malloc(nts*sizeof(double));
+              for ( j1=0; j1<nts; j1++)
+                {                  
+                  for ( j2=j1; j2<nts; j2++ )
+                    {
+                      double sum = 0;
+                      for ( i=0; i<npack; i++ )
+                        { 
+                          sum   += w[pack[i]]*
+                          fwork[varID][levelID][j1].ptr[pack[i]]*
+                          fwork[varID][levelID][j2].ptr[pack[i]];    
+                        }                      
+                      cov[j2][j1] = cov[j1][j2] = sum / sum_w / (nts - 1);                      
+                    }
+                }             
+            } 
+
+          /* solve the eigen problem */
+          if ( time_space ) 
+            {
+              printf("solving in time_space\n");
+              eigv = (double *)malloc(nts*sizeof(double));
+              eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], nts, nts, func);
+            }
+          else if ( grid_space )
+            {                           
+              eigv = (double *)malloc(npack*sizeof(double));
+              eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], npack, npack, func);
+            }           
           /* cov contains the eigenvectors, eigv the eigenvalues */
+          
+          
           for (i=0;i<n_eig;i++)
             {      
               float sum2=0;
-              /*
-               for (j=0;j<npack;j++)                
-               {
-               if ( ! WEIGHTS ) sum2+= cov[i][j]*cov[i][j];
-               else if ( WEIGHTS) sum2 += cov[i][j]*cov[i][j]/w[pack[j]]*sum_w;
-               }
-               
-               sum2 = 1./sum2;
-               printf("sum2 %7.5f  ", sum2);
-               */
-              
-              for(j=0;j<npack;j++)
-                {
-                  if ( ! WEIGHTS )
-                    o[varID][levelID][i].ptr[pack[j]] = -/* sum2 **/ cov[i][j];                                
-                  else if ( WEIGHTS )
-                    o[varID][levelID][i].ptr[pack[j]] = -/* sum2 **/ cov[i][j] /*/ sqrt(w[pack[j]]/sum_w)*/;                  
-                }
               o2[varID][levelID][i].ptr[0] = eigv[i];
-              
-              
-               sum2=0;
-             
-               for(j=0;j<npack;j++)
-                  sum2+=o[varID][levelID][i].ptr[pack[j]]*o[varID][levelID][i].ptr[pack[j]];
-               printf("sum2 %7.5f\n", sum2);
-               
+                           
+              if ( grid_space )
+                {
+                  for(j=0;j<npack;j++)
+                    {
+                      if ( ! WEIGHTS )
+                        o[varID][levelID][i].ptr[pack[j]] = cov[i][j];                                
+                      else if ( WEIGHTS )
+                        o[varID][levelID][i].ptr[pack[j]] = cov[i][j] / sqrt(w[pack[j]] / sum_w);                  
+                    }                                             
+                }
+              else if ( time_space )
+                {                  
+                  for ( i2=0; i2<npack; i2++ )
+                    {
+                      double sum = 0;
+                      for ( j=0; j<nts; j++ )
+                        sum += fwork[varID][levelID][j].ptr[pack[i2]] * cov[i][j];                      
+                      o[varID][levelID][i].ptr[pack[i2]] = sum;
+                    }                  
+                  // NORMALIZING
+                  double sum=0;                                    
+                  for ( i2=0; i2<npack; i2++ )                    
+                    sum += w[pack[i2]] * 
+                    o[varID][levelID][i].ptr[pack[i2]] * 
+                    o[varID][levelID][i].ptr[pack[i2]];                                
+                  if ( sum > 0 ) 
+                    {
+                      sum = sqrt(sum / sum_w);
+                      for( i2=0; i2<npack; i2++ )                        
+                        o[varID][levelID][i].ptr[pack[i2]] /= sum;                                              
+                    }
+                  else
+                    {
+                      for( i2=0; i2<npack; i2++ )
+                        o[varID][levelID][i].ptr[pack[i2]] = missval;
+                    }
+                }                  
             }
         }
     }
-    
-  streamDefVlist(streamID3, vlistID3);
-  streamDefVlist(streamID2, vlistID2);
   
+  streamDefVlist(streamID3, vlistID3);
+  streamDefVlist(streamID2, vlistID2);  
   for ( tsID=0; tsID<n_eig; tsID++ )
     {
       taxisDefVdate(taxisID3, 0); 
       taxisDefVtime(taxisID3, 0);
       streamDefTimestep(streamID3, tsID); 
-     
+      
       taxisDefVdate(taxisID2, 0);
       taxisDefVtime(taxisID2, 0);  
       streamDefTimestep(streamID2, tsID); 
-       
+      
       for ( varID = 0; varID < nvars; varID++ )
         {
           nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
@@ -327,7 +477,7 @@ void *Timeof(void *argument)
             }     
         }
     }
-          
+  
   for ( varID=0;varID<nvars;varID++)
     {
       for(levelID=0;levelID<nlevs;levelID++)
@@ -346,7 +496,7 @@ void *Timeof(void *argument)
       free(o2[varID]);
       free(fwork[varID]);
       free(iwork[varID]);
-
+      
     }
   
   free(o);
@@ -362,4 +512,5 @@ void *Timeof(void *argument)
   cdoFinish();   
   
   return (0);  
+  
 }
