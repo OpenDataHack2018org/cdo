@@ -56,7 +56,7 @@ void *Timeof(void * argument)
   int npack, nts;
   int *pack;
   int ***iwork;
-  int n_eig;
+  int n_eig, n;
   int grid_space, time_space;
   double *w;
   double sum_w;
@@ -164,19 +164,22 @@ void *Timeof(void * argument)
           cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps.");
           cdoWarning("Setting n_eig to %i.", nts);
           cdoWarning("If You want to force a solution in grid-space use operator eofspatial");
-          n_eig = nts;
+          n_eig = nts;          
         }  
+      n=nts;
     }
   else if ( grid_space )
-    if ( n_eig > gridsize )
-      {
-        cdoWarning("Solving in sptial space");
-        cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps");
-        cdoWarning("Setting n_eig to %i", gridsize);
-        cdoWarning("If You want to force a solution in time-space use operator eoftime");  
-        n_eig = gridsize;
-      }  
-  
+    {
+      if ( n_eig > gridsize )
+        {
+          cdoWarning("Solving in sptial space");
+          cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps");
+          cdoWarning("Setting n_eig to %i", gridsize);
+          cdoWarning("If You want to force a solution in time-space use operator eoftime");  
+          n_eig = gridsize;
+        }  
+      n=gridsize;
+    }
   // ALLOCATION OF FIELDS 
   in.ptr = (double *) malloc(gridsize*sizeof(double));
   
@@ -230,14 +233,17 @@ void *Timeof(void * argument)
           o[varID][levelID] = (FIELD *) malloc(n_eig*sizeof(FIELD));
           o2[varID][levelID]= (FIELD *) malloc(gridsize*sizeof(FIELD));
           
-          for ( i = 0; i < n_eig; i++ )
+          for ( i = 0; i < n; i++ )
             {
-              o[varID][levelID][i].grid   = gridID2;
-              o[varID][levelID][i].nmiss  = 0;
-              o[varID][levelID][i].missval= missval;
-              o[varID][levelID][i].ptr    = (double *)malloc(gridsize*sizeof(double));
-              for ( ii = 0; ii < gridsize; ++ii )
-                o[varID][levelID][i].ptr[ii] = 0;
+              if ( i < n_eig )
+                {
+                  o[varID][levelID][i].grid   = gridID2;
+                  o[varID][levelID][i].nmiss  = 0;
+                  o[varID][levelID][i].missval= missval;
+                  o[varID][levelID][i].ptr    = (double *)malloc(gridsize*sizeof(double));
+                  for ( ii = 0; ii < gridsize; ++ii )
+                    o[varID][levelID][i].ptr[ii] = 0;
+                }
               
               o2[varID][levelID][i].grid    = gridID3;
               o2[varID][levelID][i].nmiss   = 0;
@@ -384,21 +390,11 @@ void *Timeof(void * argument)
                     }
                 }             
             } 
-
-          /* solve the eigen problem */
-          if ( time_space ) 
-            {
-              printf("solving in time_space\n");
-              eigv = (double *)malloc(nts*sizeof(double));
-              eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], nts, nts, func);
-            }
-          else if ( grid_space )
-            {                           
-              eigv = (double *)malloc(npack*sizeof(double));
-              eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], npack, npack, func);
-            }           
-          /* cov contains the eigenvectors, eigv the eigenvalues */
           
+          /* solve the eigen problem */
+          eigv = (double *)malloc(n*sizeof(double));
+          eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], n, n, func);
+          /* cov contains the eigenvectors, eigv the eigenvalues */
           
           for (i=0;i<n_eig;i++)
             {      
@@ -448,7 +444,7 @@ void *Timeof(void * argument)
   
   streamDefVlist(streamID3, vlistID3);
   streamDefVlist(streamID2, vlistID2);  
-  for ( tsID=0; tsID<n_eig; tsID++ )
+  for ( tsID=0; tsID<n; tsID++ )
     {
       taxisDefVdate(taxisID3, 0); 
       taxisDefVtime(taxisID3, 0);
@@ -463,21 +459,24 @@ void *Timeof(void * argument)
           nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           for ( levelID=0; levelID < nlevs;levelID++ )
             {           
-              nmiss = 0;              
-              for ( i = 0; i < gridsize; i++ )
-                if ( DBL_IS_EQUAL(o[varID][levelID][tsID].ptr[i], missval) ) nmiss++;              
-              streamDefRecord(streamID2, varID, levelID);              
-              streamWriteRecord(streamID2, o[varID][levelID][tsID].ptr, nmiss);
-              
+              if ( tsID < n_eig )
+                {
+                  nmiss = 0;              
+                  for ( i = 0; i < gridsize; i++ )
+                    if ( DBL_IS_EQUAL(o[varID][levelID][tsID].ptr[i], missval) ) nmiss++;              
+                  streamDefRecord(streamID2, varID, levelID);              
+                  streamWriteRecord(streamID2, o[varID][levelID][tsID].ptr, nmiss);      
+                }
+
               if ( DBL_IS_EQUAL(o2[varID][levelID][tsID].ptr[i], missval) ) nmiss = 1;
               else nmiss = 0;
               streamDefRecord(streamID3, varID, levelID);
               streamWriteRecord(streamID3, o2[varID][levelID][tsID].ptr,nmiss);
-              
+
             }     
         }
     }
-  
+            
   for ( varID=0;varID<nvars;varID++)
     {
       for(levelID=0;levelID<nlevs;levelID++)
