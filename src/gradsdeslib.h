@@ -18,30 +18,6 @@
 
 #define EPSILON 1e5
 
-#define  MAX_DSETS  1024
-
-typedef struct {
-  char *name;
-  char *description;
-  char *units;
-  char *title;
-  char *time;
-  int dtype;
-  int nx;
-  int ny;
-  int nz;
-  int nt;
-  int gridsize;
-  int lscale;
-  int loffset;
-  int lmissval;
-  double scale;
-  double offset;
-  double missval;
-  double *array;
-}
-dset_obj_t;
-
 
 /* Date/time structure */
 struct dt {
@@ -171,14 +147,6 @@ typedef struct {
   gaint *fnums;                /* File number for each time */
   gaint fnumc;                 /* Current file number that is open */
   gaint fnume;                 /* Current ensemble file number that is open */
-
-  int nsets;
-  int mergelevel;
-  int lgeoloc;
-  int lregion;
-  int lprojtype;
-  int lmetadata;
-  dset_obj_t obj[MAX_DSETS];
 }
 dsets_t;
 

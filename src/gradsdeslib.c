@@ -44,31 +44,6 @@ void dsets_init(dsets_t *pfi)
   pfi->pchsub1    = NULL;
 
   for ( i = 0; i < 5; ++i ) pfi->dnum[i]    = 0;
-
-  pfi->nsets      = 0;
-  pfi->mergelevel = 0;
-  pfi->lgeoloc    = 0;
-  pfi->lregion    = 0;
-  pfi->lprojtype  = 0;
-  pfi->lmetadata  = 0;
-
-  for ( i = 0; i < MAX_DSETS; ++i )
-    {
-      pfi->obj[i].nx          = 0;
-      pfi->obj[i].ny          = 0;
-      pfi->obj[i].nz          = 0;
-      pfi->obj[i].name        = NULL;
-      pfi->obj[i].description = NULL;
-      pfi->obj[i].units       = NULL;
-      pfi->obj[i].title       = NULL;
-      pfi->obj[i].time        = NULL;
-      pfi->obj[i].dtype       = cdoDefaultDataType;
-      pfi->obj[i].lscale      = 0;
-      pfi->obj[i].loffset     = 0;
-      pfi->obj[i].lmissval    = 0;
-      pfi->obj[i].missval     = cdiInqMissval();
-      pfi->obj[i].array       = NULL;   
-    }
 }
 
 /* Byte swap requested number of 4 byte elements */
@@ -1969,7 +1944,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 	pfi->xyhdr = pfi->xyhdr*4/2;
       } 
       pfi->gsiz = pfi->gsiz + pfi->xyhdr;
-      printf("gridsize %d %d %d %d\n", pfi->gsiz, pfi->xyhdr, pfi->dnum[0], pfi->dnum[1]);
     }
 
     /* adjust the size of hdrb and trlb for non-float data */
@@ -2048,7 +2022,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
     }
 
     recacm += levs;
-    printf("recs %d\n", recacm);
 
     /* last variable */
     acum = acum + (levs*pfi->gsiz);
@@ -2056,10 +2029,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
     pfi->tsiz = acum;
     pfi->trecs = recacm;
     if (pfi->seqflg) pfi->tsiz-=1;
-    pfi->tsiz += trlb;
-
-    printf("pfi->tsiz %d %d\n", pfi->tsiz, pfi->trecs);
-    
+    pfi->tsiz += trlb;    
   } 
   else {
     fprintf(stderr, "Grid data type unsupported!");
@@ -2087,7 +2057,6 @@ int read_gradsdes(char *filename, dsets_t *pfi)
      which times go with which files, so we don't waste a lot
      of time later opening and closing files unnecessarily. */
 
-  printf("pfi->dnum[3] = %d, pfi->dnum[4] = %d\n",pfi->dnum[3],pfi->dnum[4]);
   if (pfi->tmplat) 
     {
       /* The fnums array is the size of the time axis 
