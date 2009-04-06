@@ -46,13 +46,70 @@ void get_dim_vals(dsets_t *pfi, double *vals, int dimlen, int dim)
   
 }
 
+
+static
+void rev_yvals(double *yvals, int ny)
+{
+  int i;
+  double dum;
+
+  for ( i = 0; i < ny/2; ++i )
+    {
+      dum = yvals[i];
+      yvals[i] = yvals[ny-1-i];
+      yvals[ny-1-i] = dum;
+    }
+}
+
+
+static
+int y_is_gauss(double *gridyvals, int ysize)
+{
+  static char func[] = "y_is_gauss";
+  int lgauss = FALSE;
+  int i;
+
+  if ( ysize > 2 )
+    {
+      double *yvals, *yw;
+      yvals = (double *) malloc(ysize*sizeof(double));
+      yw    = (double *) malloc(ysize*sizeof(double));
+      gaussaw(yvals, yw, ysize);
+      free(yw);
+      for ( i = 0; i < (int) ysize; i++ )
+	yvals[i] = asin(yvals[i])/M_PI*180.0;
+
+      for ( i = 0; i < (int) ysize; i++ )
+	if ( fabs(yvals[i] - gridyvals[i]) >
+	     ((yvals[0] - yvals[1])/500) ) break;
+		      
+      if ( i == (int) ysize ) lgauss = TRUE;
+
+      /* check S->N */
+      if ( lgauss == FALSE )
+	{		  
+	  for ( i = 0; i < (int) ysize; i++ )
+	    if ( fabs(yvals[i] - gridyvals[ysize-i-1]) >
+		 ((yvals[0] - yvals[1])/500) ) break;
+		      
+	  if ( i == (int) ysize ) lgauss = TRUE;
+	}
+
+      free(yvals);
+    }
+
+  return (lgauss);
+}
+
+
 static
 int define_grid(dsets_t *pfi)
 {
   static char func[] = "define_grid";
-  int gridID;
+  int gridID, gridtype;
   int nx, ny;
   double *xvals, *yvals;
+  int lgauss;
 
   nx = pfi->dnum[0];
   ny = pfi->dnum[1];
@@ -63,7 +120,14 @@ int define_grid(dsets_t *pfi)
   get_dim_vals(pfi, xvals, nx, 0);
   get_dim_vals(pfi, yvals, ny, 1);
 
-  gridID = gridCreate(GRID_LONLAT, nx*ny);
+  if ( pfi->yrflg ) rev_yvals(yvals, ny);
+
+  lgauss = y_is_gauss(yvals, ny);
+
+  if ( lgauss ) gridtype = GRID_GAUSSIAN;
+  else          gridtype = GRID_LONLAT;
+
+  gridID = gridCreate(gridtype, nx*ny);
   gridDefXsize(gridID, nx);
   gridDefYsize(gridID, ny);
 
@@ -120,7 +184,7 @@ void *Importgrads(void *argument)
 {
   static char func[] = "Importgrads";
   int streamID;
-  int gridID = -1, zaxisID, taxisID, vlistID;
+  int gridID = -1, zaxisID, zaxisIDsfc, taxisID, vlistID;
   int i;
   int nmiss, n_nan;
   int ivar;
@@ -144,6 +208,7 @@ void *Importgrads(void *argument)
   double fmin, fmax;
   float *farray;
   double *array;
+  double sfclevel = 0;
   int *recVarID, *recLevelID;
 
   cdoInitialize(argument);
@@ -165,7 +230,9 @@ void *Importgrads(void *argument)
 
   zaxisID = define_level(&pfi);
   if ( cdoVerbose ) zaxisPrint(zaxisID);
-  nlevels = zaxisInqSize(zaxisID);
+
+  zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
+  zaxisDefLevels(zaxisIDsfc, &sfclevel);
 
   vlistID = vlistCreate();
 
@@ -181,7 +248,18 @@ void *Importgrads(void *argument)
 		pvar->abbrv, pvar->longnm, pvar->offset, pvar->recoff, pvar->levels, 
 		pvar->nvardims, pvar->varnm, pvar->var_t);
       */
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+      nlevels = pvar->levels;
+      
+      if ( nlevels == 0 )
+	{
+	  nlevels = 1;
+	  varID = vlistDefVar(vlistID, gridID, zaxisIDsfc, TIME_VARIABLE);
+	}
+      else
+	{
+	  if ( nlevels != zaxisInqSize(zaxisID) ) cdoAbort("Number of levels differ!");
+	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+	}
 
       vlistDefVarName(vlistID, varID, pvar->abbrv);
       vlistDefVarLongname(vlistID, varID, pvar->varnm);
