@@ -38,6 +38,7 @@
 #define  MAX_PROCESS   128
 #define  MAX_STREAM     64
 #define  MAX_OPERATOR  128
+#define  MAX_ARGC     4096
 
 
 typedef struct {
@@ -68,7 +69,7 @@ typedef struct {
   char    *operatorName;
   char    *operatorArg;
   int      oargc;
-  char    *oargv[256];
+  char    *oargv[MAX_ARGC];
   char     prompt[64];
   int      noper;
   OPERATOR Operator[MAX_OPERATOR];
@@ -601,7 +602,7 @@ void processDefArgument(const char *argument)
   int oargc = 0;
   char **oargv = Process[processID].oargv;
 
-  /*printf("argument %s\n", argument);*/
+  /*printf("argument: %s\n", argument);*/
   Process[processID].xoperator    = getOperator(argument);
   Process[processID].operatorName = getOperatorName(Process[processID].xoperator);
   Process[processID].operatorArg  = getOperatorArg(Process[processID].xoperator);
@@ -617,7 +618,12 @@ void processDefArgument(const char *argument)
 	{
 	  *commapos++ = '\0';
 	  if ( strlen(commapos) )
-	    oargv[oargc++] = commapos;	  
+	    {
+	      if ( oargc >= MAX_ARGC )
+		cdoAbort("Too many parameter (limit=%d)!", MAX_ARGC);
+
+	      oargv[oargc++] = commapos;
+	    }
 	}
       Process[processID].oargc = oargc;
     }
