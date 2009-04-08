@@ -172,7 +172,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src
 #
-EXTRA_DIST = config/default OPERATORS doc/cdo.pdf doc/cdo_refcard.pdf
+EXTRA_DIST = config/default OPERATORS doc/cdo.pdf doc/cdo_refcard.pdf cdo.spec
 #
 CLEANFILES = `ls *~`
 all: all-recursive

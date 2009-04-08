@@ -1563,6 +1563,7 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
 	{
 	  if ( i == dst_add[n] )
 	    {
+	    printf("%d %d\n", i, n);
 	      for ( k = 0; k < ncls; k++ )
 		if ( IS_EQUAL(src_array[src_add[n]], src_cls[k]) ) break;
 	      
@@ -1578,17 +1579,20 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
       */
       /* only for sorted dst_add! */
       {
-      int min_add, max_add;
+      int min_add = 1, max_add = 0;
 
       for ( n = 0; n < num_links; n++ )
 	if ( i == dst_add[n] ) break;
 
-      min_add = n;
-	    
-      for ( n = min_add+1; n < num_links; n++ )
-	if ( i != dst_add[n] ) break;
+      if ( n < num_links )
+	{
+	  min_add = n;
+	  
+	  for ( n = min_add+1; n < num_links; n++ )
+	    if ( i != dst_add[n] ) break;
 
-      max_add = n;
+	  max_add = n;
+	}
 
       ncls = 0;
       for ( n = min_add; n < max_add; n++ )
@@ -1605,7 +1609,7 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
 	  src_wts[k] += map_wts[0][n];
 	}
       }
-
+      
       if ( ncls )
 	{
 	  imax = 0;

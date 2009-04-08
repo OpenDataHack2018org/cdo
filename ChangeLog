@@ -24,6 +24,7 @@
 	* remapcon: eliminate srch_mask (~40% speed up)
 	* remapcon: change bound_box to int type (~25% speed up)
 	* remapcon: optimization of inner loop (~7% speed up)
+	* remaplaf: bug fix for fields with missing values
 	* genYbounds: bug fix for non global fields
 	* mermean: bug fix for weights from 'zonmean' (report: Michael Sigmond)
 	* replaced strncpy/strncmp by memcpy/memcmp
