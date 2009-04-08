@@ -2022,7 +2022,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
       /* Check to see if points are land points */
       for ( n = 0; n < 4; n++ )
-	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
 	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  If point found, find local i,j coordinates for weights  */
@@ -2115,7 +2115,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
-	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
 		{
 		  if ( rg->grid1_mask[src_add[n]-1] )
 		    icount++;
@@ -2256,7 +2256,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
       /* Check to see if points are land points */
       for ( n = 0; n < 4; n++ )
-	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
 	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
       /*  If point found, find local i,j coordinates for weights  */
@@ -2372,7 +2372,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
-	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid first */
+	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
 		{
 		  if ( rg->grid1_mask[src_add[n]-1] )
 		    icount++;
@@ -2683,7 +2683,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 	{
 	  nbr_mask[n] = FALSE;
 
-	  /* Uwe Schulzweida: check if nbr_add is valid first */
+	  /* Uwe Schulzweida: check if nbr_add is valid */
 	  if ( nbr_add[n] > 0 )
 	    if ( rg->grid1_mask[nbr_add[n]-1] )
 	      {
@@ -2907,7 +2907,6 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   double coslon_dst;       /* cos(lon) of destination grid point */
   double sinlat_dst;       /* sin(lat) of destination grid point */
   double sinlon_dst;       /* sin(lon) of destination grid point */
-  double dist_tot;         /* sum of neighbor distances (for normalizing) */
   double *coslat, *sinlat; /* cosine, sine of grid lats (for distance)    */
   double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
   double wgtstmp;          /* hold the link weight                        */
@@ -2972,24 +2971,20 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
          Compute weights based on inverse distance
          if mask is false, eliminate those points
       */
-      dist_tot = ZERO;
-
       nbr_mask = FALSE;
 
-      /* Uwe Schulzweida: check if nbr_add is valid first */
+      /* Uwe Schulzweida: check if nbr_add is valid */
       if ( nbr_add > 0 )
 	if ( rg->grid1_mask[nbr_add-1] )
 	  {
-	    nbr_dist = ONE/nbr_dist;
-	    dist_tot = dist_tot + nbr_dist;
 	    nbr_mask = TRUE;
 	  }
 
-      /* Normalize weights and store the link */
+      /* Store the link */
 
       if ( nbr_mask )
 	{
-	  wgtstmp = nbr_dist/dist_tot;
+	  wgtstmp = ONE;
 
 	  rg->grid2_frac[dst_add] = ONE;
 #if defined (_OPENMP)
@@ -5070,7 +5065,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       grid2_centroid_lat[grid2_add] += rv->wts[0][n];
     }
 
-  /* Uwe Schulzweida: check if grid2_add is valid first */
+  /* Uwe Schulzweida: check if grid2_add is valid */
   if ( lcheck )
   if ( grid2_add != -1 )
     /* Unvectorized loop: print */
