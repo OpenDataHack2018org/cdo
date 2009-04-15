@@ -1154,7 +1154,7 @@ void eca4(const ECA_REQUEST_4 *request)
                   farnum2(&num1[levelID], field);
                   
                   for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) && DBL_IS_EQUAL(num1[levelID].ptr[i], request->consecutiveDays) )
+                    if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) && IS_EQUAL(num1[levelID].ptr[i], request->consecutiveDays) )
                       var1[levelID].ptr[i] = ivdate;
                 }
               else
@@ -1163,7 +1163,7 @@ void eca4(const ECA_REQUEST_4 *request)
                   farnum2(&num2[levelID], field);
 
                   for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) && DBL_IS_EQUAL(num2[levelID].ptr[i], request->consecutiveDays) )
+                    if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) && IS_EQUAL(num2[levelID].ptr[i], request->consecutiveDays) )
                       var2[levelID].ptr[i] = ivdate;
                 }
             }

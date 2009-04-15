@@ -308,6 +308,7 @@ void cdologs(int noper)
   struct tm *date_and_time;
   int i;
   int status;
+  int uselock = 1;
   int date = 0, ncdo = 0, nhours = 0;
   int date0 = 0, ncdo0, noper0, nhours0;
   double cputime0;
@@ -354,28 +355,35 @@ void cdologs(int noper)
       return;
     }
 
-  /*
-    memset(&mylock, 0, sizeof(struct flock));
-    status = fcntl(logfileno, F_GETLK, &mylock);
-    filestatus(&mylock);
-  */
 
-  mylock.l_type   = F_WRLCK;
-  mylock.l_whence = SEEK_SET;
-  mylock.l_start  = 0;
-  mylock.l_len    = 0;
-
-  /*
-  status = fcntl(logfileno, F_SETLKW, &mylock);
-  */
-  for ( i = 0; i < 100; i++ )
+  if ( (int) lseek(logfileno, (off_t) 0, SEEK_END) == 0 ) uselock = 0;
+  status = (int) lseek(logfileno, 0, SEEK_SET);
+  
+  if ( uselock )
     {
-      status = fcntl(logfileno, F_SETLK, &mylock);
-      if ( status == 0 ) break;
-      usleep(10000);
+      /*
+	memset(&mylock, 0, sizeof(struct flock));
+	status = fcntl(logfileno, F_GETLK, &mylock);
+	filestatus(&mylock);
+      */
+
+      mylock.l_type   = F_WRLCK;
+      mylock.l_whence = SEEK_SET;
+      mylock.l_start  = 0;
+      mylock.l_len    = 0;
+
+      /*
+	status = fcntl(logfileno, F_SETLKW, &mylock);
+      */
+      for ( i = 0; i < 100; i++ )
+	{
+	  status = fcntl(logfileno, F_SETLK, &mylock);
+	  if ( status == 0 ) break;
+	  usleep(10000);
+	}
+      errno = 0;
+      if ( status != 0 ) goto endlabel;
     }
-  errno = 0;
-  if ( status != 0 ) goto endlabel;
 
   status = fstat(logfileno, &filestat);
   errno = 0;
@@ -424,8 +432,11 @@ void cdologs(int noper)
 
  endlabel:
 
-  mylock.l_type = F_UNLCK;
-  status = fcntl(logfileno, F_SETLK, &mylock);
+  if ( uselock )
+    {
+      mylock.l_type = F_UNLCK;
+      status = fcntl(logfileno, F_SETLK, &mylock);
+    }
 
   close(logfileno);
 
@@ -690,6 +701,7 @@ void cdologo(int noper)
   int  logfileno;
   int i;
   int status;
+  int uselock = 1;
   int nhours = 0;
   int nhours0 = 0;
   double cputime0 = 0;
@@ -729,22 +741,28 @@ void cdologo(int noper)
       return;
     }
 
-  mylock.l_type   = F_WRLCK;
-  mylock.l_whence = SEEK_SET;
-  mylock.l_start  = 0;
-  mylock.l_len    = 0;
-
-  /*
-  status = fcntl(logfileno, F_SETLKW, &mylock);
-  */
-  for ( i = 0; i < 100; i++ )
+  if ( (int) lseek(logfileno, (off_t) 0, SEEK_END) == 0 ) uselock = 0;
+  status = (int) lseek(logfileno, 0, SEEK_SET);
+  
+  if ( uselock )
     {
-      status = fcntl(logfileno, F_SETLK, &mylock);
-      if ( status == 0 ) break;
-      usleep(10000);
+      mylock.l_type   = F_WRLCK;
+      mylock.l_whence = SEEK_SET;
+      mylock.l_start  = 0;
+      mylock.l_len    = 0;
+
+      /*
+	status = fcntl(logfileno, F_SETLKW, &mylock);
+      */
+      for ( i = 0; i < 100; i++ )
+	{
+	  status = fcntl(logfileno, F_SETLK, &mylock);
+	  if ( status == 0 ) break;
+	  usleep(10000);
+	}
+      errno = 0;
+      if ( status != 0 ) goto endlabel;
     }
-  errno = 0;
-  if ( status != 0 ) goto endlabel;
 
   status = fstat(logfileno, &filestat);
   errno = 0;
@@ -805,8 +823,11 @@ void cdologo(int noper)
 
  endlabel:
 
-  mylock.l_type = F_UNLCK;
-  status = fcntl(logfileno, F_SETLK, &mylock);
+  if ( uselock )
+    {
+      mylock.l_type = F_UNLCK;
+      status = fcntl(logfileno, F_SETLK, &mylock);
+    }
 
   close(logfileno);
 

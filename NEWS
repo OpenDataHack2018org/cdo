@@ -1,6 +1,25 @@
 CDO NEWS
 --------
 
+Version 1.3.1 (15 April 2009):
+
+   * New features:
+      o The default calendar is now set to "proleptic gregorian".
+        To use a standard calendar set the environment variable CDI_CALENDAR=standard.
+      o Added support for Lambert Conformal Conic projections
+      o Added support for missval = NaN
+   * Changed operators:
+      o ml2pl: added support for Geopotential Height
+      o Settime: added "seconds" support to operator "settunits", "settaxis" and "shifttime"
+      o percentile: change default number of bins from 100 to 101
+   * Fixed bugs:
+      o import_cmsaf: bug fix for datasets with gain/offset and more than 1 timestep
+      o remaplaf: bug fix for fields with missing values
+      o remapnn: bug fix for distance equal zero
+      o mermean: bug fix for weights from 'zonmean' (cdo mermean -zonmean)
+      o chlevel: fixed bug that happens when the list of oldlev,newlev 
+                 contains the same level more than once
+
 Version 1.3.0 (15 January 2009):
 
    * New features:

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@ void *Change(void *argument)
   double chlevels[MAXARG];
   int  chltypes[MAXARG];              
   double *levels = NULL;
+  double *newlevels = NULL;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -159,7 +160,11 @@ void *Change(void *argument)
 	  zaxisID1 = vlistZaxis(vlistID2, index);
 	  nlevs = zaxisInqSize(zaxisID1);
 	  levels = (double *) malloc(nlevs*sizeof(double));
+	  newlevels = (double *) malloc(nlevs*sizeof(double));
 	  zaxisInqLevels(zaxisID1, levels);
+
+	  for ( k = 0; k < nlevs; k++ ) newlevels[k] = levels[k];
+
 	  nfound = 0;
 	  for ( i = 0; i < nch; i += 2 )
 	    for ( k = 0; k < nlevs; k++ )
@@ -171,13 +176,14 @@ void *Change(void *argument)
 	      for ( i = 0; i < nch; i += 2 )
 		for ( k = 0; k < nlevs; k++ )
 		  if ( fabs(levels[k] - chlevels[i]) < 0.001 )
-		    levels[k] = chlevels[i+1];
+		    newlevels[k] = chlevels[i+1];
 
-	      zaxisDefLevels(zaxisID2, levels);
+	      zaxisDefLevels(zaxisID2, newlevels);
 	      vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 	    }
 
 	  free(levels);
+	  free(newlevels);
 	}
     }
   else if ( operatorID == CHLEVELC || operatorID == CHLEVELV )

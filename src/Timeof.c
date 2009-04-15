@@ -60,6 +60,7 @@ void *Timeof(void * argument)
   int grid_space, time_space;
   double *w;
   double sum_w;
+  double sum;
   double missval;
   double *xvals, *yvals;
   FIELD ***fwork;
@@ -379,7 +380,7 @@ void *Timeof(void * argument)
                 {                  
                   for ( j2=j1; j2<nts; j2++ )
                     {
-                      double sum = 0;
+                      sum = 0;
                       for ( i=0; i<npack; i++ )
                         { 
                           sum   += w[pack[i]]*
@@ -415,13 +416,13 @@ void *Timeof(void * argument)
                 {                  
                   for ( i2=0; i2<npack; i2++ )
                     {
-                      double sum = 0;
+                      sum = 0;
                       for ( j=0; j<nts; j++ )
                         sum += fwork[varID][levelID][j].ptr[pack[i2]] * cov[i][j];                      
                       o[varID][levelID][i].ptr[pack[i2]] = sum;
                     }                  
                   // NORMALIZING
-                  double sum=0;                                    
+                  sum=0;                                    
                   for ( i2=0; i2<npack; i2++ )                    
                     sum += w[pack[i2]] * 
                     o[varID][levelID][i].ptr[pack[i2]] * 

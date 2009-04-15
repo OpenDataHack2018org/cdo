@@ -130,7 +130,7 @@ make_symmetric_matrix_triangular (double **a, int n,
         {
           for (k = 0; k < i; k++)
             scale += fabs (a[i][k]);
-          if ( DBL_IS_EQUAL(scale, 0) )
+          if ( DBL_IS_EQUAL(scale, 0.) )
             e[i] = a[i][i - 1];
           else
             {
@@ -284,7 +284,7 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
               b = c * e[i];
               e[i + 1] = r = pythagoras (f, g);
               
-              if ( DBL_IS_EQUAL(r, 0) )
+              if ( DBL_IS_EQUAL(r, 0.) )
                 {
                   d[i + 1] -= p;
                   e[m] = 0;
@@ -306,7 +306,7 @@ eigen_solution_of_triangular_matrix (double *d, double *e, int n,
                 }
             }
           
-          if ( DBL_IS_EQUAL(r, 0) && i >= l ) continue;
+          if ( DBL_IS_EQUAL(r, 0.) && i >= l ) continue;
           
           d[l] -= p;
           e[l] = g;
@@ -397,7 +397,7 @@ lu_decomposition (double **a, int n, int *index, int *sign)
         if ((temp = fabs (a[i][j])) > big)
           big = temp;
       
-      if ( DBL_IS_EQUAL(big, 0) ) return 0;
+      if ( DBL_IS_EQUAL(big, 0.) ) return 0;
       
       v[i] = 1 / big;
     }
@@ -436,7 +436,7 @@ lu_decomposition (double **a, int n, int *index, int *sign)
         }
       index[j] = imax;
       
-      if ( DBL_IS_EQUAL(a[j][j], 0) ) return 0;
+      if ( DBL_IS_EQUAL(a[j][j], 0.) ) return 0;
       
       if (j != n)
         {
@@ -710,7 +710,7 @@ incomplete_beta (double a, double b, double x, const char *prompt)
       exit (4);
     }
   
-  c = (DBL_IS_EQUAL(x, 0) || DBL_IS_EQUAL(x, 1)) ? 0 :
+  c = (DBL_IS_EQUAL(x, 0.) || DBL_IS_EQUAL(x, 1.)) ? 0 :
   exp (lngamma (a + b) - lngamma (a) - lngamma (b) + a * log (x) + b * log (1 - x));
   
   if (x < (a + 1) / (a + b + 2))

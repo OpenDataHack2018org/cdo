@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -38,10 +38,10 @@
 void *Set(void *argument)
 {
   static char func[] = "Set";
-  int SETPARTAB, SETPARTABV, SETCODE, SETNAME, SETLEVEL, SETLTYPE;
+  int SETPARTAB, SETPARTABV, SETCODE, SETNAME, SETLEVEL, SETLTYPE, SETTABNUM;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs, nvars, newval = -1;
+  int nrecs, nvars, newval = -1, tabnum = 0;
   int tsID1, recID, varID, levelID;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
@@ -64,6 +64,7 @@ void *Set(void *argument)
   SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
   SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
   SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
+  SETTABNUM  = cdoOperatorAdd("settabnum",  0, 0, "GRIB table number");
 
   operatorID = cdoOperatorID();
 
@@ -75,6 +76,10 @@ void *Set(void *argument)
   else if ( operatorID == SETNAME )
     {
       newname = operatorArgv()[0];
+    }
+  else if ( operatorID == SETTABNUM )
+    {
+      tabnum = atoi(operatorArgv()[0]);
     }
   else if ( operatorID == SETPARTAB )
     {
@@ -131,6 +136,14 @@ void *Set(void *argument)
   else if ( operatorID == SETNAME )
     {
       vlistDefVarName(vlistID2, 0, newname);
+    }
+  else if ( operatorID == SETTABNUM )
+    {
+      int tableID;
+      tableID = tableDef(-1, tabnum, NULL);
+      nvars = vlistNvars(vlistID2);
+      for ( varID = 0; varID < nvars; varID++ )
+	vlistDefVarTable(vlistID2, varID, tableID);
     }
   else if ( operatorID == SETPARTAB || operatorID == SETPARTABV )
     {

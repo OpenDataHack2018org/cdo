@@ -129,7 +129,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 	    c = 'm';
 	  else if ( DBL_IS_EQUAL(x, max) && !DBL_IS_EQUAL(min, max) )
 	    c = 'M';
-	  else if ( DBL_IS_EQUAL(x, 0) )
+	  else if ( DBL_IS_EQUAL(x, 0.) )
 	    c = '*';
 	  else if ( x < 0 )
 	    {
