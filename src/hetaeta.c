@@ -344,11 +344,11 @@ void hetaeta(int ltq, int ngp, int *imiss,
   shared(ngp, ph1_2, lnph1_2, fi1_2, pf1_2, lnpf1_2, tv1_2, theta1_2, rh1_2, zvar_2, ph2_2, lnph2_2, fi2_2, pf2_2, rh_pbl_2, \
 	 theta_pbl_2, rh2_2, wgt_2, vars_pbl_2, idx_2, af1, bf1, etaf1, etah2, af2, bf2, etaf2, w1, w2, jl1, jl2, \
 	 ltq, nvars, imiss, nlev1p1, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, ps2, nlev2p1, ah2, bh2, \
-	 nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt, stderr, rair_d_cpair, zq1, zt1) \
+	 nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt, rair_d_cpair) \
   firstprivate(lpsmod) \
   private(ij, iv, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, theta_pbl, rh2, wgt, vars_pbl, \
 	  k, ijk, jlev, idx, ompthID, zdff, jlevr, zdffl, jnop, zsumt, zsump, zsumpp, zsumtp, zb, zc, zps, zbb, \
-	  fiadj, pbl_lim, jjblt, pbl_lim_need, ijk1, ijk2, klo, dteta, dfi, ztv) \
+	  fiadj, pbl_lim, jjblt, pbl_lim_need, ijk1, ijk2, klo, dteta, dfi, ztv, zq1, zt1) \
   schedule(dynamic,1)
 #endif
   for ( ij = 0; ij < ngp; ++ij )

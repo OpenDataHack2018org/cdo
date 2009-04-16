@@ -2927,7 +2927,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)			\
+  shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)  \
   private(n)
 #endif
   for ( n = 0; n < grid1_size; n++ )
@@ -2944,7 +2944,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(rg, rv, grid2_size, coslat, coslon, sinlat, sinlon)		\
-  private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, dist_tot, \
+  private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst,   \
 	  nbr_add, nbr_dist, nbr_mask, wgtstmp)	\
   schedule(dynamic,1)
 #endif
