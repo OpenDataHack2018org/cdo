@@ -162,7 +162,7 @@ static void usage(void)
 
   /*  fprintf(stderr, "%s\n", CDO_Version);*/
   /*  fprintf(stderr, "\n");*/
-  fprintf(stderr, "usage : cdo  [Options]  [Operators]  [Operands]\n");
+  fprintf(stderr, "usage : cdo  [Options]  Operator1  [-Operator2  [-OperatorN]]\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
@@ -210,9 +210,6 @@ static void usage(void)
   fprintf(stderr, "  Operators:\n");
   operatorPrintAll();
 
-  fprintf(stderr, "\n");
-  fprintf(stderr, "  Operands:\n");
-  fprintf(stderr, "    The path name of the input/output files for the operator.\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2009 Uwe Schulzweida\n", VERSION);
   fprintf(stderr, "  Available from http://www.mpimet.mpg.de/cdo\n");
