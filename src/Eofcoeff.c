@@ -111,6 +111,7 @@ void *Eofcoeff(void * argument)
   for ( varID=0; varID<nvars; varID++)
     eof[varID] = (FIELD **) malloc(nlevs*sizeof(FIELD*));
   reached_eof=0;
+  eofID = 0;
   while ( 1 )       
    {     
      nrecs = streamInqTimestep(streamID1, eofID);
@@ -225,7 +226,7 @@ void *Eofcoeff(void * argument)
           for (eofID = 0; eofID < neof; eofID++ )
             {
               if ( recID == 0 ) streamDefTimestep(streamIDs[eofID],tsID);
-              fprintf(stderr, "ts%i rec%i eof%i\n", tsID, recID, eofID);                            
+              if ( recID == 0 ) fprintf(stderr, "ts%i rec%i eof%i\n", tsID, recID, eofID);
               out.ptr[0]  = 0;
               out.grid    = gridID3;
               out.missval = missval2;            
@@ -253,7 +254,13 @@ void *Eofcoeff(void * argument)
       tsID++;
     }
   
+  for ( eofID = 0; eofID < neof; eofID++) streamClose(streamIDs[eofID]);
+
+  streamClose(streamID2);
+  streamClose(streamID1);
   
   cdoFinish();
+
+  return (0);
 }
 

@@ -24,6 +24,7 @@ cdo_SOURCES = Arith.c		\
               Enlarge.c     	\
               Enlargegrid.c     \
               Ensstat.c     	\
+              Eofcoeff.c     	\
               Exprf.c     	\
               Filedes.c 	\
               Fillmiss.c 	\
