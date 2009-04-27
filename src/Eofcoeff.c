@@ -29,6 +29,8 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+void    vlistDefVarTime(int vlistID, int varID, int timeID);
+
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 void *Eofcoeff(void * argument)
