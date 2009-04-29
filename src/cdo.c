@@ -130,7 +130,7 @@ static void version(void)
 #if defined (COMP_VERSION)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
 #endif
-#if defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL)
+#if defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL) || defined (_OPENMP)
   fprintf(stderr, "    with:");
 #if defined (HAVE_LIBSZ)
   fprintf(stderr, " libsz");
@@ -143,6 +143,9 @@ static void version(void)
 #endif
 #if defined (HAVE_LIBCURL)
   fprintf(stderr, " libcurl");
+#endif
+#if defined (_OPENMP)
+  fprintf(stderr, " OpenMP");
 #endif
   fprintf(stderr, "\n");
 #endif
@@ -189,6 +192,7 @@ static void usage(void)
   fprintf(stderr, "    -p <prec>      Set the precision of the output data in bytes\n");
   fprintf(stderr, "                   (4/8 for nc, nc2, nc4, srv, ext, ieg; 1/2/3 for grb)\n");
   */
+  fprintf(stderr, "    -Q             Sort netCDF variable names\n");
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
   fprintf(stderr, "    -r             Convert from an absolute to a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
@@ -609,7 +613,7 @@ int main(int argc, char *argv[])
 
   cdoHaveNC4 = have_netCDF4();
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhMRrsSTuVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhMQRrsSTuVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -673,9 +677,12 @@ int main(int argc, char *argv[])
 	case 'p':
 	  setDefaultDataTypeByte(cdoOptarg);
 	  break;
+	case 'Q':
+	  cdiDefGlobal("SORTNAME", TRUE);
+	  break;
 	case 'R':
 	  cdoRegulargrid = TRUE;
-	  cdiDefGlobal("CD_REGULARGRID", TRUE);
+	  cdiDefGlobal("REGULARGRID", TRUE);
 	  break;
 	case 'r':
 	  cdoDefaultTimeType = TAXIS_RELATIVE;

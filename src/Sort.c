@@ -42,7 +42,7 @@ typedef struct
 }
 RecInfo;
 
-
+static
 int cmpreccode(const void *s1, const void *s2)
 {
   int cmp = 0;
@@ -57,7 +57,7 @@ int cmpreccode(const void *s1, const void *s2)
   return (cmp);
 }
 
-
+static
 int cmpreclevel(const void *s1, const void *s2)
 {
   int cmp = 0;
@@ -72,7 +72,7 @@ int cmpreclevel(const void *s1, const void *s2)
   return (cmp);
 }
 
-
+static
 int cmprecname(const void *s1, const void *s2)
 {
   RecInfo *x = (RecInfo *) s1;
@@ -81,7 +81,7 @@ int cmprecname(const void *s1, const void *s2)
   return (strcmp(x->name, y->name));
 }
 
-
+static
 int findrec(RecInfo *recInfo[], int nrecords, int varID, int levelID)
 {
   int index;

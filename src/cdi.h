@@ -169,7 +169,7 @@ void    cdiPrintVersion(void);
 
 void    cdiDefMissval(double missval);
 double  cdiInqMissval(void);
-int     cdiDefGlobal(const char *string, int val);
+void    cdiDefGlobal(const char *string, int val);
 
 /* STREAM control routines */
 
