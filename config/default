@@ -203,7 +203,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/aix53/hdf5-1.8.2 \
                     --with-szlib=/sw/aix53/szip-2.1 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
- 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qmaxmem=-1 -qstrict -qarch=auto -qtune=auto -qreport -qsmp=omp -DHAVE_MMAP"
+ 	            CC=xlc_r CFLAGS="-g -O4 -q64 -qlargepage -blpdata -qreport -qsmp=omp -DHAVE_MMAP"
 	;;
     vip*)
 	${CONFPATH}configure --prefix=$HOME/local \

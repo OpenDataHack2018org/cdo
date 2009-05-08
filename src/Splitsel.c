@@ -124,8 +124,8 @@ void *Splitsel(void *argument)
   nsets = 0;
   while ( TRUE )
     {
-      sprintf(filename+nchars, "%03d", index);
-      sprintf(filename+nchars+3, "%s", filesuffix);
+      sprintf(filename+nchars, "%06d", index);
+      sprintf(filename+nchars+6, "%s", filesuffix);
 	  
       if ( cdoVerbose ) cdoPrint("create file %s", filename);
       streamID2 = streamOpenWrite(filename, cdoFiletype());

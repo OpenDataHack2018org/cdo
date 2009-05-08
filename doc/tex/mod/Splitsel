@@ -21,7 +21,7 @@
 @IfMan
 This operator splits a dataset into pieces, one for each adjacent
 sequence t1, ...., tn of time steps of the same selected time range.
-Appends three digits with the sequence number to @file{oprefix} to 
+Appends six digits with the sequence number to @file{oprefix} to 
 form the output file names.
 @EndifMan
 @IfDoc
