@@ -4389,11 +4389,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(grid1_centroid_lon, grid1_centroid_lat, \
-#ifndef STORE_LINK_CNSRV_FAST
          grid_store, \
-#else
-         link_add2, link_add1, \
-#endif
          rv, cdoVerbose, max_subseg, grid1_bound_box, grid2_bound_box, \
 	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
   private(ompthID, lmask, srch_add, min_add, max_add, n, n2, k, num_srch_cells, max_srch_cells, \
@@ -4677,11 +4673,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(grid2_centroid_lon, grid2_centroid_lat, \
-#ifndef STORE_LINK_CNSRV_FAST
          grid_store, \
-#else
-         link_add2, link_add1, \
-#endif
          rv, cdoVerbose, max_subseg, grid1_bound_box, grid2_bound_box, \
 	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
   private(ompthID, lmask, srch_add, min_add, max_add, n, n2, k, num_srch_cells, max_srch_cells, grid1_addm4, grid2_addm4, \
