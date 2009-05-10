@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2007-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -50,7 +50,8 @@ void hetaeta(int ltq, int ngp, int *imiss,
 	     double *tscor, double *pscor, double *secor);
 
 
-static void setmissval(int nvals, int *imiss, double missval, double *array)
+static 
+void setmissval(int nvals, int *imiss, double missval, double *array)
 {
   int i;
 
@@ -63,8 +64,61 @@ static void setmissval(int nvals, int *imiss, double missval, double *array)
     }
 }
 
+static
+void corr_hum(int gridsize, double *q, double q_min)
+{
+  long i;
+
+  for ( i = 0; i < (long) gridsize; ++i )
+    {
+      if ( q[i] < q_min ) q[i] = q_min;
+    }
+}
  
-static void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval)
+static
+long ncctop(long nlev, long nlevp1, double *vct_a, double *vct_b)
+{
+  /*
+    Description:
+    Defines highest level *ncctop* where condensation is allowed.
+    
+    Author:
+  
+    E. Roeckner, MPI, October 2001
+  */
+  /* local variables */
+  long nctop = 0;
+  long jk;
+  double    za, zb, zph[nlevp1], zp[nlev];
+  double    cptop  =  1000.;   /* min. pressure level for cond. */
+
+  /* half level pressure values, assuming 101320. Pa surface pressure */
+
+  for ( jk = 0; jk < (long) nlevp1; ++jk )
+    {
+      za = vct_a[jk];
+      zb = vct_b[jk];
+      zph[jk] = za + zb*101320.;
+    }
+
+  /* full level pressure */
+
+  for ( jk = 0; jk < (long)nlev; ++jk )
+    zp[jk] = (zph[jk] + zph[jk+1])*0.5;
+
+  /* search for pressure level cptop (Pa) */
+
+  for ( jk = 0; jk < (long)nlev; ++jk )
+    {
+      nctop = jk;
+      if ( zp[jk] >= cptop ) break;
+    }
+
+  return (nctop);
+}
+
+static
+void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval)
 {
   int i;
   double xmin =  DBL_MAX;
@@ -131,10 +185,16 @@ void *Remapeta(void *argument)
   int lfis2 = FALSE;
   int varids[MAX_VARS3D];
   int *imiss = NULL;
+  long nctop;
   double *array = NULL;
   double **vars1 = NULL, **vars2 = NULL;
   double minval, maxval;
   double missval = 0;
+  double ps_min =  20000, ps_max = 120000;
+  double fis_min = -100000, fis_max = 100000;
+  double t_min = 170, t_max = 320;
+  double q_min = 0, q_max = 0.1;
+  double cconst = 1.E-6;
 
   cdoInitialize(argument);
 
@@ -508,7 +568,7 @@ void *Remapeta(void *argument)
 
 	  minmax(ngp, ps1, imiss, &minval, &maxval);
 
-	  if ( minval < 20000 || maxval > 150000 )
+	  if ( minval < ps_min || maxval > ps_max )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	  if ( minval < -1.e10 || maxval > 1.e10 )
@@ -518,7 +578,7 @@ void *Remapeta(void *argument)
 
 	  minmax(ngp, fis1, imiss, &minval, &maxval);
 
-	  if ( minval < -100000 || maxval > 100000 )
+	  if ( minval < fis_min || maxval > fis_max )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 
 	  if ( minval < -1.e10 || maxval > 1.e10 )
@@ -527,6 +587,37 @@ void *Remapeta(void *argument)
 
       if ( lfis2 == FALSE )
 	for ( i = 0; i < ngp; i++ ) fis2[i] = fis1[i];
+
+      if ( ltq )
+	{
+	  varID = tempID;
+	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
+	    {
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      offset   = gridsize*levelID;
+	      single2  = t1 + offset;
+
+	      minmax(ngp, single2, imiss, &minval, &maxval);
+	      if ( minval < t_min || maxval > t_max )
+		cdoWarning("Output temperature at level %d out of range (min=%g max=%g)!",
+			   levelID+1, minval, maxval);
+	    }
+
+	  varID = sqID;
+	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
+	    {
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      offset   = gridsize*levelID;
+	      single2  = q1 + offset;
+
+	      minmax(ngp, single2, imiss, &minval, &maxval);
+	      if ( minval < q_min || maxval > q_max )
+		cdoWarning("Output humidity at level %d out of range (min=%g max=%g)!",
+			   levelID+1, minval, maxval);
+	    }
+	}
 
       if ( nvars3D || ltq )
 	hetaeta(ltq, ngp, imiss,
@@ -538,6 +629,8 @@ void *Remapeta(void *argument)
 		t2, q2,
 		nvars3D, vars1, vars2,
 		tscor, pscor, secor);
+
+      nctop = ncctop((long) nlevh2, (long) nlevh2+1, a2, b2);
 
       if ( geopID != -1 )
 	{
@@ -570,6 +663,11 @@ void *Remapeta(void *argument)
 	      offset   = gridsize*levelID;
 	      single2  = t2 + offset;
 
+	      minmax(ngp, single2, imiss, &minval, &maxval);
+	      if ( minval < t_min || maxval > t_max )
+		cdoWarning("Output temperature at level %d out of range (min=%g max=%g)!",
+			   levelID+1, minval, maxval);
+
 	      if ( gridsize == ngp ) setmissval(ngp, imiss, missval, single2);
 	      streamDefRecord(streamID2, varID, levelID);
 	      streamWriteRecord(streamID2, single2, nmissout);
@@ -582,6 +680,16 @@ void *Remapeta(void *argument)
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 	      single2  = q2 + offset;
+
+	      corr_hum(gridsize, single2, q_min);
+
+	      if ( levelID < nctop )
+		for ( i = 0; i < gridsize; ++i ) single2[i] = cconst;
+
+	      minmax(ngp, single2, imiss, &minval, &maxval);
+	      if ( minval < q_min || maxval > q_max )
+		cdoWarning("Output humidity at level %d out of range (min=%g max=%g)!",
+			   levelID+1, minval, maxval);
 
 	      if ( gridsize == ngp ) setmissval(ngp, imiss, missval, single2);
 	      streamDefRecord(streamID2, varID, levelID);

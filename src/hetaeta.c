@@ -13,17 +13,16 @@
 #include <stdio.h>
 
 const double ap0  = 100000.0;
-const double apr  = 101325.0;
+const double apr  = 101325.0;   /* reference pressure */
 const double aipr = 1.0/101325.0;
 
-/* pressure of reference geopotential */
-const double p_firef = 40000.0;
+const double p_firef = 40000.0; /* pressure of reference geopotential */
 
 const double epsilon = 0.622;
 const double rair    = 287.04;
 const double cpair   = 1004.6;
 
-const double eta_pbl = 0.8;
+const double eta_pbl = 0.8;     /* upper limit of BPL eta coordiante */
 
 const double g = 9.81;
 
