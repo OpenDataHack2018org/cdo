@@ -72,9 +72,8 @@
 #if defined (STORE_LINK_CNSRV_FAST)
 struct grid_blk
 {
-  /* int *grid1_link; */
+  int idx0, size;
   int *grid2_link;
-  /* double *wts[4]; */
   struct grid_blk *next;
 };
 
@@ -82,6 +81,7 @@ typedef struct grid_blk grid_blk_t;
 
 typedef struct
 {
+  int resize_increment;
   int gridsize2;
   int nblks;
   grid_blk_t *grid_blk;
@@ -4138,16 +4138,19 @@ void store_link_cnsrv_fast(remapvars_t *rv, int add1, int add2, double *weights,
   grid_blk = grid_store->grid_blk;
   for ( iblk = 0; iblk < grid_store->nblks; ++iblk )
     {
-      nlink = grid_blk->grid2_link[add2];
-      if ( nlink >= 0 )
-	if ( add1 == rv->grid1_add[nlink] )
-	  {
-	    rv->wts[0][nlink] += weights[0];
-	    rv->wts[1][nlink] += weights[1];
-	    rv->wts[2][nlink] += weights[2];
+      if ( add2 >= grid_blk->idx0 && add2 < grid_blk->idx0+grid_blk->size )
+	{
+	  nlink = grid_blk->grid2_link[add2];
+	  if ( nlink >= 0  )
+	    if ( add1 == rv->grid1_add[nlink] )
+	      {
+		rv->wts[0][nlink] += weights[0];
+		rv->wts[1][nlink] += weights[1];
+		rv->wts[2][nlink] += weights[2];
       
-	    return;
-	  }
+		return;
+	      }
+	}
       grid_blk = grid_blk->next;
     }
 
@@ -4161,23 +4164,36 @@ void store_link_cnsrv_fast(remapvars_t *rv, int add1, int add2, double *weights,
   grid_blk2 = &grid_store->grid_blk;
   for ( iblk = 0; iblk < grid_store->nblks; ++iblk )
     {
-      if ( (*grid_blk2)->grid2_link[add2] == -1 )
+      grid_blk = *grid_blk2;
+      if ( add2 >= grid_blk->idx0 && add2 < grid_blk->idx0+grid_blk->size )
 	{
-	  (*grid_blk2)->grid2_link[add2] = nlink;
-	  break;
+	  if ( grid_blk->grid2_link[add2] == -1 )
+	    {
+	      grid_blk->grid2_link[add2] = nlink;
+	      break;
+	    }
+	}
+      else
+	{
+	  /* resize */
+	  /* break */
 	}
       grid_blk2 = &(*grid_blk2)->next;
     }
 
   if ( iblk == grid_store->nblks )
     {
-      grid_blk_t *grid_blk_new;
-      grid_blk_new = (grid_blk_t *) malloc(sizeof(grid_blk_t));
-      grid_blk_new->next = NULL;
-      grid_blk_new->grid2_link = (int *) malloc(grid_store->gridsize2*sizeof(int));
-      for ( i = 0; i < grid_store->gridsize2; ++i ) grid_blk_new->grid2_link[i] = -1;
-      grid_blk_new->grid2_link[add2] = nlink;
-      *grid_blk2 = grid_blk_new;
+      grid_blk = (grid_blk_t *) malloc(sizeof(grid_blk_t));
+      grid_blk->idx0 = 0;
+      grid_blk->size = grid_store->gridsize2;
+      grid_blk->next = NULL;
+      grid_blk->grid2_link = (int *) malloc(grid_store->gridsize2*sizeof(int));
+
+      for ( i = grid_blk->idx0; i < grid_blk->idx0+grid_blk->size; ++i )
+	grid_blk->grid2_link[i] = -1;
+
+      grid_blk->grid2_link[add2] = nlink;
+      *grid_blk2 = grid_blk;
       grid_store->nblks++;
     }
 
@@ -4289,6 +4305,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #ifdef STORE_LINK_CNSRV_FAST
   grid_store_t grid_store;
 
+  grid_store.resize_increment = 64;
   grid_store.nblks = 0;
   grid_store.gridsize2 = rg->grid2_size;
   grid_store.grid_blk = NULL;
@@ -5061,10 +5078,21 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   {
     grid_blk_t *grid_blk, *grid_blk_f;
     int iblk;
+    int i, j;
 
     grid_blk = grid_store.grid_blk;
     for ( iblk = 0; iblk < grid_store.nblks; ++iblk )
       {
+	if ( cdoVerbose )
+	  {
+	    j = 0;
+	    for ( i = grid_blk->idx0; i < grid_blk->idx0+grid_blk->size; ++i )
+	      if ( grid_blk->grid2_link[i] != -1 ) j++;
+
+	    fprintf(stderr, "nblks = %d  blk = %d  gridsize = %d  nlinks = %d\n",
+		    grid_store.nblks, iblk, grid_store.gridsize2, j);
+	  }
+
 	grid_blk_f = grid_blk;
 	free(grid_blk->grid2_link);
 	grid_blk = grid_blk->next;
