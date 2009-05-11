@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@
 #include "interpol.h"
 
 
-void fillmiss(FIELD *field1, FIELD *field2)
+void fillmiss(FIELD *field1, FIELD *field2, int nfill)
 {
   static char func[] = "fillmiss";
   int gridID, nx, ny, i, j;
@@ -118,10 +118,15 @@ void fillmiss(FIELD *field1, FIELD *field2)
 	    else { s2 = xu*ko/kv + xo*ku/kv; k2 = 2; }
 
 	    kk = k1 + k2;
-	    if      ( kk == 0 ) cdoAbort("no point found!");
-	    else if ( k1 == 0 ) matrix2[j][i] = s2;
-	    else if ( k2 == 0 ) matrix2[j][i] = s1;
-	    else                matrix2[j][i] = s1*k2/kk + s2*k1/kk;
+	    if ( kk >= nfill )
+	      {
+		if      ( kk == 0 ) cdoAbort("no point found!");
+		else if ( k1 == 0 ) matrix2[j][i] = s2;
+		else if ( k2 == 0 ) matrix2[j][i] = s1;
+		else  matrix2[j][i] = s1*k2/kk + s2*k1/kk;
+	      }
+	    else
+	      matrix2[j][i] = matrix1[j][i];
 
 	    /* matrix1[j][i] = matrix2[j][i]; */
 	  }
@@ -149,8 +154,22 @@ void *Fillmiss(void *argument)
   int gridID1 = -1;
   FIELD field1, field2;
   int taxisID1, taxisID2;
+  int nmiss, i, nfill = 1;
 
   cdoInitialize(argument);
+
+  {
+    int oargc = operatorArgc();
+    char **oargv = operatorArgv();
+
+    if ( oargc == 1 )
+      {
+	nfill = atoi(oargv[0]);
+	if ( nfill < 1 || nfill > 4 ) cdoAbort("nfill out of range!");
+      }
+    else if ( oargc > 1 )
+      cdoAbort("Too many arguments!");
+  }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -198,11 +217,17 @@ void *Fillmiss(void *argument)
 
 	  field2.grid    = field1.grid;
 	  field2.nmiss   = 0;
+	  field2.missval = field1.missval;
 
-	  fillmiss(&field1, &field2);
+	  fillmiss(&field1, &field2, nfill);
+
+	  gridsize = gridInqSize(field2.grid);
+	  nmiss = 0;
+	  for ( i = 0; i < gridsize; ++i )
+	    if ( DBL_IS_EQUAL(field2.ptr[i], field2.missval) ) nmiss++;
 
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, field2.ptr, field2.nmiss);
+	  streamWriteRecord(streamID2, field2.ptr, nmiss);
 	}
       tsID++;
     }

@@ -35,7 +35,6 @@
   SCRIP functionality is currently being added to the Earth System Modeling Framework
   and is part of the European PRISM framework.
 
-
   Documentation
   =============
 
@@ -68,7 +67,7 @@
 #include "grid.h"
 #include "remap.h"
 
-#define STORE_LINK_CNSRV_FAST 1  /* test optimized version of store_link_cnsrv */
+#define STORE_LINK_CNSRV_FAST 1 /* test optimized version of store_link_cnsrv */
 
 #if defined (STORE_LINK_CNSRV_FAST)
 struct grid_blk
@@ -5058,6 +5057,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       rg->grid2_frac[grid2_add] += weights[rv->num_wts];
     }
 
+#if defined (STORE_LINK_CNSRV_FAST)
   {
     grid_blk_t *grid_blk, *grid_blk_f;
     int iblk;
@@ -5072,6 +5072,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       }
     
   }
+#endif
 
   /* Finish centroid computation */
 
