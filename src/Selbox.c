@@ -485,8 +485,15 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       for ( ilat = 0; ilat < nlat1; ilat++ ) yvals1[ilat] *= yfact;
       for ( ilon = 0; ilon < nlon1; ilon++ ) xvals1[ilon] *= xfact;
 
-      xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
-      if ( IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
+      if ( IS_NOT_EQUAL(xlon1, xlon2) )
+	{
+	  xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
+	  if ( IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
+	}
+      else
+	{
+	  xlon2 += 0.00001;
+	}
       xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
       xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
 

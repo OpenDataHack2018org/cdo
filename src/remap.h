@@ -1,4 +1,19 @@
 
+#define  RESTR_TYPE  double  /* restrict data types: 0 -> double, float; 1 -> int */
+
+typedef RESTR_TYPE restr_t;
+/*
+#if RESTR_TYPE == int
+#  define RESTR_SCALE(x) ((int) (0.5+100000000*(x)))
+#  define RESTR_ABS(x)   abs(x)
+#else
+#  define RESTR_SCALE(x) (x)
+#  define RESTR_ABS(x)   fabs(x)
+#endif
+*/
+#  define RESTR_SCALE(x) (x)
+#  define RESTR_ABS(x)   fabs(x)
+
 
 #define  NORM_OPT_NONE      1
 #define  NORM_OPT_DESTAREA  2
@@ -62,8 +77,8 @@ typedef struct {
   /* int      luse_grid1_area;   */ /* use area from grid file         */
   /* int      luse_grid2_area;   */ /* use area from grid file         */
 
-  double  *grid1_bound_box;    /* lat/lon bounding box for use    */
-  double  *grid2_bound_box;    /* in restricting grid searches    */
+  restr_t *grid1_bound_box;    /* lat/lon bounding box for use    */
+  restr_t *grid2_bound_box;    /* in restricting grid searches    */
 
   int      restrict_type;
   int      num_srch_bins;      /* num of bins for restricted srch */
@@ -71,8 +86,8 @@ typedef struct {
   int     *bin_addr1;       /* min,max adds for grid1 cells in this lat bin  */
   int     *bin_addr2;       /* min,max adds for grid2 cells in this lat bin  */
 
-  double  *bin_lats;        /* min,max latitude for each search bin   */
-  double  *bin_lons;        /* min,max longitude for each search bin  */
+  restr_t *bin_lats;        /* min,max latitude for each search bin   */
+  restr_t *bin_lons;        /* min,max longitude for each search bin  */
 }
 remapgrid_t;
 

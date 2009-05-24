@@ -85,12 +85,15 @@ void *Diff(void *argument)
   array1 = (double *) malloc(gridsize*sizeof(double));
   array2 = (double *) malloc(gridsize*sizeof(double));
 
-  if ( operatorID == DIFFV )
-    fprintf(stdout, "               Date  Time Varname     Level    Size    Miss :"
-	    " S Z  Max_Absdiff Max_Reldiff\n");
-  else if ( operatorID == DIFF )
-    fprintf(stdout, "               Date  Time Code  Level    Size    Miss :"
-	    " S Z  Max_Absdiff Max_Reldiff\n");
+  if ( ! cdoSilentMode )
+    {
+      if ( operatorID == DIFFV )
+	fprintf(stdout, "               Date  Time Varname     Level    Size    Miss :"
+		" S Z  Max_Absdiff Max_Reldiff\n");
+      else if ( operatorID == DIFF )
+	fprintf(stdout, "               Date  Time Code  Level    Size    Miss :"
+		" S Z  Max_Absdiff Max_Reldiff\n");
+    }
 
   indg = 0;
   tsID = 0;
@@ -125,19 +128,20 @@ void *Diff(void *argument)
 	  missval1 = vlistInqVarMissval(vlistID1, varID1);
 	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
-	  if ( operatorID == DIFFV || operatorID == DIFF )
-	    {
-	      if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID1, varname);
+	  if ( ! cdoSilentMode )
+	    if ( operatorID == DIFFV || operatorID == DIFF )
+	      {
+		if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID1, varname);
+		
+		if ( operatorID == DIFFV )
+		  fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %-8s ",
+			  indg, year, month, day, hour, minute, varname);
+		else if ( operatorID == DIFF )
+		  fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %3d",
+			  indg, year, month, day, hour, minute, code);
 
-	      if ( operatorID == DIFFV )
-		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %-8s ",
-			indg, year, month, day, hour, minute, varname);
-	      else if ( operatorID == DIFF )
-		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %3d",
-			indg, year, month, day, hour, minute, code);
-
-	      fprintf(stdout, " %7g ", zaxisInqLevel(zaxisID, levelID));
-	    }
+		fprintf(stdout, " %7g ", zaxisInqLevel(zaxisID, levelID));
+	      }
 
 	  streamReadRecord(streamID1, array1, &nmiss1);
 	  streamReadRecord(streamID2, array2, &nmiss2);
@@ -167,13 +171,14 @@ void *Diff(void *argument)
 		}
 	    }
 
-	  if ( operatorID == DIFFV || operatorID == DIFF )
-	    {
-	      fprintf(stdout, "%7d %7d :", gridsize, MAX(nmiss1, nmiss2));
-
-	      fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
-	      fprintf(stdout, "%#12.5g%#12.5g\n", absm, relm);
-	    }
+	  if ( ! cdoSilentMode )
+	    if ( operatorID == DIFFV || operatorID == DIFF )
+	      {
+		fprintf(stdout, "%7d %7d :", gridsize, MAX(nmiss1, nmiss2));
+		
+		fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
+		fprintf(stdout, "%#12.5g%#12.5g\n", absm, relm);
+	      }
 
 	  ngrec++;
 	  if ( absm > 0     || relm > 0     ) ndrec++;

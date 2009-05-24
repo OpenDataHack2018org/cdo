@@ -1605,7 +1605,7 @@ int gridFromName(const char *gridname)
       /* only one gridpoint */
       pline = &gridname[3];
       if ( *pline == '=' ) pline++;
-      if ( isdigit((int) *pline) )
+      if ( isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-' )
 	{
 	  grid.type = GRID_LONLAT;
 	  grid.xsize = 1;
@@ -1618,8 +1618,10 @@ int gridFromName(const char *gridname)
 	  if ( ! (pline[0] == 'l' &&  pline[1] == 'a' && pline[2] == 't') ) return(gridID);
 	  pline += 3;
 	  if ( *pline == '=' ) pline++;
-	  if ( ! isdigit((int) *pline) ) return(gridID);
-	  grid.yvals[0] = atof(pline);
+	  if ( isdigit((int) *pline) || ispunct((int) *pline) || *pline == '-' )
+	    grid.yvals[0] = atof(pline);
+	  else
+	    return (gridID);
 	}
     }
   else if ( gridname[0] == 'g' && gridname[1] == 'm' && gridname[2] == 'e' ) /* gme<NI> */
