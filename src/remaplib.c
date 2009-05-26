@@ -4148,7 +4148,7 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
     arrays if necessary.
 */
 static
-void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *weights,
+void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict weights,
 		      int *link_add1[2], int *link_add2[2])
 {
   /*

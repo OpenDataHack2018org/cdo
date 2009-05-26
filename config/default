@@ -47,7 +47,7 @@ case "${HOSTNAME}" in
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # x86_64-suse-linux
-    tornado5)
+    tornado2|tornado5)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/sles10-x64 \
 	            --with-netcdf=/sw/sles10-x64/netcdf-4.0.1 \
 	            --with-hdf5=/sw/sles10-x64/hdf5-1.8.2 \
@@ -83,7 +83,7 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
-                    CC=g++ CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -pedantic"
 	;;
 # etch-ia32
     etch-ia32 | gata | baba)
@@ -93,7 +93,7 @@ case "${HOSTNAME}" in
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -Wno-long-long -ansi -pedantic -std=c99"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -pedantic"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --program-suffix=_${SGE_SUFFIX} \
@@ -162,19 +162,19 @@ case "${HOSTNAME}" in
     cs*)
 	${CONFPATH}configure --prefix=$HOME/local \
          	    --with-netcdf=/pool/netcdf/netcdf-3.6.0-p1 \
-		    CC=c++ \
+		    CC=cc \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
     sx6)
 	${CONFPATH}configure --host=sx6 --prefix=$HOME/local \
                     --with-netcdf=/pool/SX-6/netcdf/netcdf-3.6.0-p1 \
-		    CC=sxc++ AR=sxar \
+		    CC=sxcc AR=sxar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
     es)
 	${CONFPATH}configure --host=sx6 --prefix=$HOME/local/ES \
                     --with-netcdf=/S/n010/home010/c0148/local/SX \
-		    CC=esc++ AR=esar \
+		    CC=escc AR=esar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
 # mips-sgi-irix6.5

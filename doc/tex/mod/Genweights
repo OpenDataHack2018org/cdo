@@ -123,7 +123,7 @@ and for circular grids.
 
 @BeginNote
 For this module the author has converted the original Fortran 90 SCRIP 
-software to ANSI C. If there are any problems send a bug report to CDO and
+software to ANSI C99. If there are any problems send a bug report to CDO and
 not to SCRIP!
 @EndNote
 

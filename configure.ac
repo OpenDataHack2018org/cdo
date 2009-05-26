@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(cdo, 1.3.2beta2, Uwe.Schulzweida@zmaw.de)
+AC_INIT(cdo, 1.3.2beta3, Uwe.Schulzweida@zmaw.de)
 
 CONFIG_ABORT=yes
 
@@ -15,7 +15,8 @@ AM_CONFIG_HEADER(src/config.h)
 AM_INIT_AUTOMAKE
 
 # Checks for programs.
-AC_PROG_CC
+AC_PROG_CC([gcc c99])
+AC_PROG_CC_C99
 AC_PROG_RANLIB
 AC_PROG_INSTALL
 AC_CHECK_PROGS(AR, ar, [ar])
@@ -350,6 +351,13 @@ AC_SUBST([CPPFLAGS])
 AC_SUBST([AR])
 
 AC_OUTPUT(Makefile src/Makefile cdo.spec)
+
+if test "$ac_cv_prog_cc_c99" = "no" ; then
+AC_MSG_NOTICE([
+
+  Warning: The C compiler does not accept ANSI C99 source code!
+])
+fi
 
 AC_MSG_NOTICE([
 
