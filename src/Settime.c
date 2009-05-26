@@ -77,7 +77,7 @@ void *Settime(void *argument)
   int gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 0, incunit = 0;
-  int year, month, day, hour, minute;
+  int year = 0, month = 0, day, hour, minute;
   int day0;
   int calendar;
   int newcalendar = CALENDAR_STANDARD;
@@ -320,9 +320,7 @@ void *Settime(void *argument)
 		  decode_date(vdate, &year, &month, &day0);
 		}
 	      else
-		{
-		  decode_date(vdate, &year, &month, &day);
-	      
+		{	      
 		  month += ijulinc;
 
 		  while ( month > 12 ) { month -= 12; year++; }
@@ -330,6 +328,8 @@ void *Settime(void *argument)
 
 		  if ( day0 == 31 )
 		    day = days_per_month(calendar, year, month);
+		  else
+		    day = day0;
 
 		  vdate = encode_date(year, month, day);
 		}
