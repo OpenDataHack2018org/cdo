@@ -129,7 +129,7 @@ typedef struct {
 }
 remap_t;
 
-void remap_set_max_iter(int max_iter);
+void remap_set_max_iter(long max_iter);
 
 void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg);
 void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv);
@@ -137,14 +137,13 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv);
 void remapVarsFree(remapvars_t *rv);
 void remapGridFree(remapgrid_t *rg);
 
-void remap(double *dst_array, double missval, int dst_size, int dst_array_dim,
-	   double **map_wts, int map_wts_dim,
-	   int *dst_add, int *src_add, 
-	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
+void remap(double *dst_array, double missval, long dst_size, long num_links, double **map_wts, 
+	   long num_wts, const int *dst_add, const int *src_add, const double *src_array, 
+	   const double *src_grad1, const double *src_grad2, const double *src_grad3,
 	   remaplink_t links);
 
-void remap_laf(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
-	       int *dst_add, int *src_add, double *src_array);
+void remap_laf(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
+	       const int *dst_add, const int *src_add, const double *src_array);
 
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv);
 void remap_bicub(remapgrid_t *rg, remapvars_t *rv);
@@ -154,13 +153,14 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv);
 
 void resize_remap_vars(remapvars_t *rv, int increment);
 
-void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, double *array1, double *array2, double missval);
-void remap_gradients(remapgrid_t rg, double *array, double *grad1_lat,
-		     double *grad1_lon, double *grad1_latlon);
+void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *array1, 
+		const double *array2, double missval);
+void remap_gradients(remapgrid_t rg, const double *array, double * restrict grad1_lat,
+		     double * restrict grad1_lon, double * restrict grad1_latlon);
 
 void reorder_links(remapvars_t *rv);
 
-void sort_add(long num_links, long num_wts, int *add1, int *add2, double **weights);
+void sort_add(long num_links, long num_wts, int * restrict add1, int * restrict add2, double ** restrict weights);
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
 		       int remap_order, remapgrid_t rg, remapvars_t rv);

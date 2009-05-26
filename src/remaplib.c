@@ -164,7 +164,7 @@ void remapGridFree(remapgrid_t *rg)
 void remapVarsFree(remapvars_t *rv)
 {
   static char func[] = "remapVarsFree";
-  int i;
+  long i;
 
   if ( rv->pinit == TRUE )
     {
@@ -201,9 +201,10 @@ void remapVarsFree(remapvars_t *rv)
 
 /*****************************************************************************/
 
-void genXbounds(int xsize, int ysize, double *grid_center_lon, double *grid_corner_lon, double dlon)
+void genXbounds(long xsize, long ysize, const double *grid_center_lon, 
+		double *grid_corner_lon, double dlon)
 {
-  int i, j, index;
+  long i, j, index;
   double minlon, maxlon;
 
   if ( ! (dlon > 0) ) dlon = 360./xsize;
@@ -262,9 +263,9 @@ double genYmax(double y1, double y2)
 
 /*****************************************************************************/
 
-void genYbounds(int xsize, int ysize, double *grid_center_lat, double *grid_corner_lat)
+void genYbounds(long xsize, long ysize, const double *grid_center_lat, double *grid_corner_lat)
 {
-  int i, j, index;
+  long i, j, index;
   double minlat, maxlat;
   double firstlat, lastlat;
 
@@ -354,7 +355,7 @@ void remapGridInitPointer(remapgrid_t *rg)
 void remapGridRealloc(int map_type, remapgrid_t *rg)
 {
   static char func[] = "remapGridRealloc";
-  int nalloc;
+  long nalloc;
 
   if ( rg->grid1_nvgp )
     rg->grid1_vgpm     = (int *) realloc(rg->grid1_vgpm, rg->grid1_nvgp*sizeof(int));
@@ -424,7 +425,8 @@ void remapGridRealloc(int map_type, remapgrid_t *rg)
 
 /*****************************************************************************/
 static
-void boundbox_from_corners(long size, long nc, double *corner_lon, double *corner_lat, restr_t *bound_box)
+void boundbox_from_corners(long size, long nc, const double *corner_lon,
+			   const double *corner_lat, restr_t *bound_box)
 {
   long i4, inc, i, j;
 
@@ -452,7 +454,8 @@ void boundbox_from_corners(long size, long nc, double *corner_lon, double *corne
 }
 
 static
-void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, double *center_lon, double *center_lat, restr_t *bound_box)
+void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny,
+			  const double *center_lon, const double *center_lat, restr_t *bound_box)
 {
   long n4, i, j, k, n, ip1, jp1;
   long n_add, e_add, ne_add;
@@ -573,7 +576,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	(gridInqType(gridID1) == GRID_LONLAT && rg->non_global)) )
     {
       int gridIDnew;
-      int nx, ny, nxp4, nyp4;
+      long nx, ny, nxp4, nyp4;
       double *xvals, *yvals;
 
       nx = gridInqXsize(gridID1);
@@ -632,8 +635,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
        (gridInqType(gridID1) == GRID_CURVILINEAR && rg->non_global) )
     {
       int gridIDnew;
-      int gridsize, gridsize_new;
-      int nx, ny, nxp4, nyp4;
+      long gridsize, gridsize_new;
+      long nx, ny, nxp4, nyp4;
       double *xvals, *yvals;
 
       gridsize = gridInqSize(gridID1);
@@ -1288,7 +1291,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 {
   static char func[] = "remapVarsInit";
-  int i;
+  long i;
 
   /* Initialize all pointer */
   if ( rv->pinit == FALSE )
@@ -1351,7 +1354,7 @@ void resize_remap_vars(remapvars_t *rv, int increment)
     Input variables:
     int  increment  ! the number of links to add(subtract) to arrays
   */
-  int i;
+  long i;
 
   /*  Reallocate arrays at new size */
 
@@ -1376,9 +1379,9 @@ void resize_remap_vars(remapvars_t *rv, int increment)
      
   -----------------------------------------------------------------------
 */
-void remap(double *dst_array, double missval, int dst_size, int num_links, double **map_wts, int num_wts,
-	   int *dst_add, int *src_add, 
-	   double *src_array, double *src_grad1, double *src_grad2, double *src_grad3,
+void remap(double *dst_array, double missval, long dst_size, long num_links, double **map_wts, 
+	   long num_wts, const int *dst_add, const int *src_add, const double *src_array, 
+	   const double *src_grad1, const double *src_grad2, const double *src_grad3,
 	   remaplink_t links)
 {
   /*
@@ -1405,8 +1408,8 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
   */
 
   /* Local variables */
-
-  int n, iorder;
+  long n;
+  int iorder;
 
   /* Check the order of the interpolation */
 
@@ -1482,11 +1485,11 @@ void remap(double *dst_array, double missval, int dst_size, int num_links, doubl
 }
 
 
-int get_max_add(int num_links, int size, int *add)
+long get_max_add(long num_links, long size, const int *add)
 {
   static char func[] = "get_max_add";
-  int n, i;
-  int max_add;
+  long n, i;
+  long max_add;
   int *isum;
 
   isum = (int *) malloc(size*sizeof(int));
@@ -1508,8 +1511,8 @@ int get_max_add(int num_links, int size, int *add)
      
   -----------------------------------------------------------------------
 */
-void remap_laf(double *dst_array, double missval, int dst_size, int num_links, double **map_wts,
-	       int *dst_add, int *src_add, double *src_array)
+void remap_laf(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
+	       const int *dst_add, const int *src_add, const double *src_array)
 {
   /*
     Input arrays:
@@ -1528,8 +1531,8 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
 
   /* Local variables */
   static char func[] = "remap_laf";
-  int i, n, k, ncls, imax;
-  int max_cls;
+  long i, n, k, ncls, imax;
+  long max_cls;
   double wts;
   double *src_cls;
   double *src_wts;
@@ -1663,10 +1666,10 @@ void remap_laf(double *dst_array, double missval, int dst_size, int num_links, d
 
 #define  DEFAULT_MAX_ITER  100
 
-static int     Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i,j iteration */
-static double  converge = 1.e-10;            /* Convergence criterion */
+static long    Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i,j iteration */
+static const double  converge = 1.e-10;      /* Convergence criterion */
 
-void remap_set_max_iter(int max_iter)
+void remap_set_max_iter(long max_iter)
 {
   if ( max_iter > 0 ) Max_Iter = max_iter;
 }
@@ -1683,10 +1686,10 @@ void remap_set_max_iter(int max_iter)
    source grid and returns the corners needed for a bilinear interpolation.
 */
 static
-void grid_search(remapgrid_t *rg, int *src_add, double *src_lats, double *src_lons, 
-		 double plat, double plon, int *src_grid_dims,
-		 double *src_center_lat, double *src_center_lon,
-		 restr_t *src_grid_bound_box, int *src_bin_add)
+void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_lats, 
+		 double * restrict src_lons,  double plat, double plon, const int *src_grid_dims,
+		 const double *src_center_lat, const double *src_center_lon,
+		 const restr_t *src_grid_bound_box, const int *src_bin_add)
 {
   /*
     Output variables:
@@ -1710,10 +1713,10 @@ void grid_search(remapgrid_t *rg, int *src_add, double *src_lats, double *src_lo
     int src_bin_add[][2]           ! latitude bins for restricting
   */
   /*  Local variables */
-  int n, next_n, srch_add;                   /* dummy indices                    */
-  int nx, ny;                                /* dimensions of src grid           */
-  int min_add, max_add;                      /* addresses for restricting search */
-  int i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses                        */
+  long n, next_n, srch_add;                   /* dummy indices                    */
+  long nx, ny;                                /* dimensions of src grid           */
+  long min_add, max_add;                      /* addresses for restricting search */
+  long i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses                        */
 
   /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
@@ -1765,7 +1768,6 @@ void grid_search(remapgrid_t *rg, int *src_add, double *src_lats, double *src_lo
 	  */
 
           /* Determine neighbor addresses */
-
           j = srch_add/nx;
           i = srch_add - j*nx;
 
@@ -1951,7 +1953,7 @@ void grid_search(remapgrid_t *rg, int *src_add, double *src_lats, double *src_lo
   and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bilin(remapvars_t *rv, int dst_add, int *src_add, double *weights)
+void store_link_bilin(remapvars_t *rv, int dst_add, const int *src_add, const double *weights)
 {
   /*
     Input variables:
@@ -1959,8 +1961,8 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int *src_add, double *weight
     int src_add[4]    ! addresses on source grid
     double weights[4] ! array of remapping weights for these links
   */
-  int n;             /* dummy index */
-  int num_links_old; /* placeholder for old link number */
+  long n;             /* dummy index */
+  long num_links_old; /* placeholder for old link number */
 
   /*
      Increment number of links and check to see if remap arrays need
@@ -1992,9 +1994,9 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int *src_add, double *weight
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
-  int dst_add;        /*  destination addresss */
-  int n, icount;
-  int iter;           /*  iteration counters   */
+  long dst_add;        /*  destination addresss */
+  long n, icount;
+  long iter;           /*  iteration counters   */
 
   int src_add[4];     /*  address for the four source points */
 
@@ -2184,7 +2186,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bicub(remapvars_t *rv, int dst_add, int *src_add, double weights[4][4])
+void store_link_bicub(remapvars_t *rv, const int dst_add, const int *src_add, double weights[4][4])
 {
   /*
     Input variables:
@@ -2192,8 +2194,8 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int *src_add, double weights
     int src_add[4]       ! addresses on source grid
     double weights[4][4] ! array of remapping weights for these links
   */
-  int n, k;          /* dummy index */
-  int num_links_old; /* placeholder for old link number */
+  long n, k;          /* dummy index */
+  long num_links_old; /* placeholder for old link number */
 
   /*
      Increment number of links and check to see if remap arrays need
@@ -2226,9 +2228,9 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int *src_add, double weights
 void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
-  int n,icount;
-  int dst_add;        /*  destination addresss */
-  int iter;           /*  iteration counters   */
+  long n, icount;
+  long dst_add;        /*  destination addresss */
+  long iter;           /*  iteration counters   */
 
   int src_add[4];     /* address for the four source points */
 
@@ -2442,10 +2444,10 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
    point and computes a distance to each of the neighbors.
 */
 static
-void grid_search_nbr(remapgrid_t *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
-		     double coslat_dst, double coslon_dst, double sinlat_dst, double sinlon_dst,
-		     int *src_bin_add,
-		     double *sinlat, double *coslat, double *sinlon, double *coslon)
+void grid_search_nbr(remapgrid_t *rg, int * restrict nbr_add, double * restrict nbr_dist, 
+		     double plat, double plon, double coslat_dst, double coslon_dst, 
+		     double sinlat_dst, double sinlon_dst, const int *src_bin_add,
+		     const double *sinlat, const double *coslat, const double *sinlon, const double *coslon)
 {
   /*
     Output variables:
@@ -2465,9 +2467,8 @@ void grid_search_nbr(remapgrid_t *rg, int *nbr_add, double *nbr_dist, double pla
     double sinlon_dst    ! sin(lon)  of the search point
   */
   /*  Local variables */
-
-  int n, nmax, nadd, nchk;
-  int min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
+  long n, nmax, nadd, nchk;
+  long min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
   double distance;     /* angular distance */
   restr_t rlat, rlon;
 
@@ -2629,11 +2630,11 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 
   /*  Local variables */
 
-  int grid1_size;
-  int grid2_size;
+  long grid1_size;
+  long grid2_size;
+  long n;
+  long dst_add;                    /* destination address */
   int nbr_mask[num_neighbors];    /* mask at nearest neighbors */
-  int n;
-  int dst_add;                    /* destination address */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors     */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors */
   double coslat_dst;       /* cos(lat) of destination grid point */
@@ -2648,7 +2649,6 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   /*
     Compute mappings from grid1 to grid2
   */
-
   grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
@@ -2757,10 +2757,10 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
    point and computes a distance to each of the neighbors.
 */
 static
-void grid_search_nbr1(remapgrid_t *rg, int *nbr_add, double *nbr_dist, double plat, double plon, 
-		      double coslat_dst, double coslon_dst, double sinlat_dst, double sinlon_dst,
-		      int *src_bin_add, 
-                      double *sinlat, double *coslat, double *sinlon, double *coslon)
+void grid_search_nbr1(remapgrid_t *rg, int * restrict nbr_add, double * restrict nbr_dist, 
+		      double plat, double plon, double coslat_dst, double coslon_dst, 
+		      double sinlat_dst, double sinlon_dst, const int *src_bin_add, 
+                      const double *sinlat, const double *coslat, const double *sinlon, const double *coslon)
 {
   /*
     Output variables:
@@ -2780,9 +2780,8 @@ void grid_search_nbr1(remapgrid_t *rg, int *nbr_add, double *nbr_dist, double pl
     double sinlon_dst    ! sin(lon)  of the search point
   */
   /*  Local variables */
-
-  int n, nmax, nadd;
-  int min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
+  long n, nmax, nadd;
+  long min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
   double distance;     /* Angular distance */
   restr_t rlat, rlon;
 
@@ -2926,12 +2925,11 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   static char func[] = "remap_distwgt";
 
   /*  Local variables */
-
-  int grid1_size;
-  int grid2_size;
+  long grid1_size;
+  long grid2_size;
+  long n;
+  long dst_add;            /* destination address */
   int nbr_mask;            /* mask at nearest neighbors */
-  int n;
-  int dst_add;             /* destination address */
   int nbr_add;             /* source address at nearest neighbors     */
   double nbr_dist;         /* angular distance four nearest neighbors */
   double coslat_dst;       /* cos(lat) of destination grid point */
@@ -2945,7 +2943,6 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   /*
     Compute mappings from grid1 to grid2
   */
-
   grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
@@ -3047,12 +3044,11 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
     accurately.
 */
 static
-void pole_intersection(long *location,
-		       double *intrsct_lat, double *intrsct_lon, int *lcoinc, int *lthresh,
-		       double beglat, double beglon, double endlat, double endlon,
+void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
+		       int *lthresh, double beglat, double beglon, double endlat, double endlon,
 		       double *begseg, int lrevers,
-		       long num_srch_cells, long srch_corners, int *srch_add,
-		       double *srch_corner_lat, double *srch_corner_lon,
+		       long num_srch_cells, long srch_corners, const int *srch_add,
+		       const double *srch_corner_lat, const double *srch_corner_lon,
 		       int *luse_last, double *intrsct_x, double *intrsct_y,
 		       int *avoid_pole_count, double *avoid_pole_offset)
 {
@@ -3523,8 +3519,8 @@ static
 void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
 		  double beglat, double beglon, double endlat, double endlon, double *begseg,
 		  int lbegin, int lrevers,
-		  long num_srch_cells, long srch_corners, int *srch_add,
-		  double *srch_corner_lat, double *srch_corner_lon,
+		  long num_srch_cells, long srch_corners, const int *srch_add,
+		  const double *srch_corner_lat, const double *srch_corner_lon,
 		  int *last_loc, int *lthresh, double *intrsct_lat_off, double *intrsct_lon_off,
 		  int *luse_last, double *intrsct_x, double *intrsct_y,
 		  int *avoid_pole_count, double *avoid_pole_offset)
@@ -3929,7 +3925,6 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
   */
 
   /*  Local variables  */
-
   double dphi, sinth1, sinth2, costh1, costh2, fac;
   double phi1, phi2;
   double f1, f2, fint;
@@ -4012,10 +4007,10 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
 
 #if defined(STORE_LINK_CNSRV_FAST)
 static
-void grid_store_init(grid_store_t *grid_store, int gridsize)
+void grid_store_init(grid_store_t *grid_store, long gridsize)
 {
   const char func[] = "grid_store_init";
-  int iblk;
+  long iblk;
 
   grid_store->blk_size = BLK_SIZE;
   /* grid_store->blk_size = gridsize; */
@@ -4149,7 +4144,7 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
 */
 static
 void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict weights,
-		      int *link_add1[2], int *link_add2[2])
+		      int * restrict link_add1[2], int * restrict link_add2[2])
 {
   /*
     Input variables:
@@ -5073,9 +5068,9 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (STORE_LINK_CNSRV_FAST)
   {
     grid_layer_t *grid_layer, *grid_layer_f;
-    int ilayer;
-    int i, j;
-    int iblk;
+    long ilayer;
+    long i, j;
+    long iblk;
 
     for ( iblk = 0; iblk < grid_store->nblocks; ++iblk )
       {
@@ -5300,11 +5295,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
 /*****************************************************************************/
 
-void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, double *array1, double *array2, double missval)
+void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *array1, 
+		const double *array2, double missval)
 {
   static char func[] = "remap_stat";
-  int n, ns, i;
-  int idiff, imax, imin, icount;
+  long n, ns, i;
+  long idiff, imax, imin, icount;
   int *grid2_count;
   double minval, maxval, sum;
 	  
@@ -5423,12 +5419,12 @@ void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, double *array1,
 
 /*****************************************************************************/
 
-void remap_gradients(remapgrid_t rg, double *array, double *grad1_lat,
-		     double *grad1_lon, double *grad1_latlon)
+void remap_gradients(remapgrid_t rg, const double *array, double * restrict grad1_lat,
+		     double * restrict grad1_lon, double * restrict grad1_latlon)
 {
   static char func[] = "remap_gradients";
-  int n, nx, ny, grid1_size;
-  int i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
+  long n, nx, ny, grid1_size;
+  long i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
   double delew, delns;
   double grad1_lat_zero, grad1_lon_zero;
 
@@ -5622,7 +5618,7 @@ void remap_gradients(remapgrid_t rg, double *array, double *grad1_lat,
 
 /*****************************************************************************/
 
-void sort_add(long num_links, long num_wts, int *add1, int *add2, double **weights)
+void sort_add(long num_links, long num_wts, int * restrict add1, int * restrict add2, double ** restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -5841,11 +5837,11 @@ void sort_add(long num_links, long num_wts, int *add1, int *add2, double **weigh
 void reorder_links(remapvars_t *rv)
 {
   static char func[] = "reorder_links";
-  int j, nval = 0, num_blks = 0;
-  int lastval;
-  int nlinks;
-  int max_links = 0;
-  int n;
+  long j, nval = 0, num_blks = 0;
+  long lastval;
+  long nlinks;
+  long max_links = 0;
+  long n;
 
   printf("reorder_links\n");
   printf("rv->num_links %ld\n", rv->num_links);
@@ -5869,7 +5865,7 @@ void reorder_links(remapvars_t *rv)
       rv->links.max_links = max_links;
       rv->links.num_blks = num_blks;
 
-      printf("num_links %ld  max_links %d  num_blks %d\n", rv->num_links, max_links, num_blks);
+      printf("num_links %ld  max_links %ld  num_blks %ld\n", rv->num_links, max_links, num_blks);
 
       rv->links.num_links = (int *) malloc(num_blks*sizeof(int));
       rv->links.dst_add   = (int **) malloc(num_blks*sizeof(int *));
@@ -5909,7 +5905,7 @@ void reorder_links(remapvars_t *rv)
 	}
 
       rv->links.num_links[j] = nlinks;
-      printf("loop %d  nlinks %d\n", j+1, nlinks);
+      printf("loop %ld  nlinks %ld\n", j+1, nlinks);
     }
 }
 
