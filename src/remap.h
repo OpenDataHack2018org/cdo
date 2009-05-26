@@ -1,5 +1,5 @@
 
-#define  RESTR_TYPE  double  /* restrict data types: 0 -> double, float; 1 -> int */
+#define  RESTR_TYPE  int  /* restrict data types: 0 -> double, float; 1 -> int */
 
 typedef RESTR_TYPE restr_t;
 /*
@@ -11,8 +11,8 @@ typedef RESTR_TYPE restr_t;
 #  define RESTR_ABS(x)   fabs(x)
 #endif
 */
-#  define RESTR_SCALE(x) (x)
-#  define RESTR_ABS(x)   fabs(x)
+#  define RESTR_SCALE(x) ((int) (0.5+100000000*(x)))
+#  define RESTR_ABS(x)   abs(x)
 
 
 #define  NORM_OPT_NONE      1
@@ -39,9 +39,9 @@ typedef struct {
   int      lextrapolate;
   int      non_global;
   int      grid1_is_cyclic, grid2_is_cyclic;
-  int      grid1_size, grid2_size; /* total points on each grid */
+  long     grid1_size, grid2_size; /* total points on each grid */
   int      grid1_rank, grid2_rank; /* rank of each grid */
-  int      grid1_corners, grid2_corners; /* number of corners for each grid cell */
+  long     grid1_corners, grid2_corners; /* number of corners for each grid cell */
 
   int      grid1_dims[2], grid2_dims[2]; /* size of each grid dimension */
 
@@ -104,9 +104,9 @@ remaplink_t;
 
 typedef struct {
   int   pinit;            /* TRUE if the pointers are initialized     */
-  int   max_links;        /* current size of link arrays              */
-  int   num_links;        /* actual number of links for remapping     */
-  int   num_wts;          /* num of weights used in remapping         */
+  long  max_links;        /* current size of link arrays              */
+  long  num_links;        /* actual number of links for remapping     */
+  long  num_wts;          /* num of weights used in remapping         */
   int   map_type;         /* identifier for remapping method          */
   int   norm_opt;         /* option for normalization (conserv only)  */
   int   resize_increment; /* default amount to increase array size    */
@@ -160,7 +160,7 @@ void remap_gradients(remapgrid_t rg, double *array, double *grad1_lat,
 
 void reorder_links(remapvars_t *rv);
 
-void sort_add(int num_links, int num_wts, int *add1, int *add2, double **weights);
+void sort_add(long num_links, long num_wts, int *add1, int *add2, double **weights);
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
 		       int remap_order, remapgrid_t rg, remapvars_t rv);
