@@ -146,13 +146,13 @@ void remapGridFree(remapgrid_t *rg)
       if ( rg->grid2_corner_lat ) free(rg->grid2_corner_lat);
       if ( rg->grid2_corner_lon ) free(rg->grid2_corner_lon);
 
-      free(rg->grid1_bound_box);
-      free(rg->grid2_bound_box);
+      if ( rg->grid1_bound_box ) free(rg->grid1_bound_box);
+      if ( rg->grid2_bound_box ) free(rg->grid2_bound_box);
 
       free(rg->bin_addr1);
       free(rg->bin_addr2);
-      free(rg->bin_lats);
-      free(rg->bin_lons);
+      if ( rg->bin_lats ) free(rg->bin_lats);
+      if ( rg->bin_lons ) free(rg->bin_lons);
     }
   else
     fprintf(stderr, "%s Warning: grid not initialized!\n", func);
@@ -1214,6 +1214,12 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 		rg->bin_addr2[n*2+1] = MAX(nele, rg->bin_addr2[n*2+1]);
 	      }
 	}
+
+      if ( map_type == MAP_TYPE_CONSERV )
+	{
+	  free(rg->bin_lats); rg->bin_lats = NULL;
+	  free(rg->bin_lons); rg->bin_lons = NULL;
+	}
     }
   else if ( rg->restrict_type == RESTRICT_LATLON )
     {
@@ -1276,9 +1282,21 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 		rg->bin_addr2[2*n+1] = MAX(nele,rg->bin_addr2[2*n+1]);
 	      }
 	}
+
+      if ( map_type == MAP_TYPE_CONSERV )
+	{
+	  free(rg->bin_lats); rg->bin_lats = NULL;
+	  free(rg->bin_lons); rg->bin_lons = NULL;
+	}
     }
   else
     cdoAbort("Unknown search restriction method!");
+
+  if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
+    {
+      free(rg->grid1_bound_box); rg->grid1_bound_box = NULL;
+      free(rg->grid2_bound_box); rg->grid2_bound_box = NULL;
+    }
 
 }  /* remapGridInit */
 
@@ -1713,7 +1731,7 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
     int src_bin_add[][2]           ! latitude bins for restricting
   */
   /*  Local variables */
-  long n, next_n, srch_add;                   /* dummy indices                    */
+  long n, n2, next_n, srch_add, srch_add4;    /* dummy indices                    */
   long nx, ny;                                /* dimensions of src grid           */
   long min_add, max_add;                      /* addresses for restricting search */
   long i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses                        */
@@ -1737,13 +1755,16 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
   min_add = rg->grid1_size-1;
   max_add = 0;
 
-  for ( n = 0; n < rg->num_srch_bins; n++ )
-    if ( rlat >= rg->bin_lats[2*n  ] && rlat <= rg->bin_lats[2*n+1] &&
-	 rlon >= rg->bin_lons[2*n  ] && rlon <= rg->bin_lons[2*n+1] )
-      {
-	if ( src_bin_add[2*n  ] < min_add ) min_add = src_bin_add[2*n  ];
-	if ( src_bin_add[2*n+1] > max_add ) max_add = src_bin_add[2*n+1];
-      }
+  for ( n = 0; n < rg->num_srch_bins; ++n )
+    {
+      n2 = n*2;
+      if ( rlat >= rg->bin_lats[n2  ] && rlat <= rg->bin_lats[n2+1] &&
+	   rlon >= rg->bin_lons[n2  ] && rlon <= rg->bin_lons[n2+1] )
+	{
+	  if ( src_bin_add[n2  ] < min_add ) min_add = src_bin_add[n2  ];
+	  if ( src_bin_add[n2+1] > max_add ) max_add = src_bin_add[n2+1];
+	}
+    }
  
   /*
     Now perform a more detailed search 
@@ -1755,13 +1776,14 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
   /* Unvectorized loop: break and return */
   for ( srch_add = min_add; srch_add <= max_add; srch_add++ )
     {
+      srch_add4 = srch_add*4;
       /*
 	First check bounding box
       */
-      if ( rlat >= src_grid_bound_box[4*srch_add  ] && 
-           rlat <= src_grid_bound_box[4*srch_add+1] &&
-           rlon >= src_grid_bound_box[4*srch_add+2] &&
-	   rlon <= src_grid_bound_box[4*srch_add+3] )
+      if ( rlat >= src_grid_bound_box[srch_add4  ] && 
+           rlat <= src_grid_bound_box[srch_add4+1] &&
+           rlon >= src_grid_bound_box[srch_add4+2] &&
+	   rlon <= src_grid_bound_box[srch_add4+3] )
 	{
 	  /*
 	    We are within bounding box so get really serious
