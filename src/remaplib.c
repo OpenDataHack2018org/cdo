@@ -600,12 +600,8 @@ void check_lat_boundbox_range(long nlats, restr_t * restrict bound_box, double *
   for ( n = 0; n < nlats; n++ )
     {
       n4 = n*4;
-
-      if ( RESTR_SCALE(lats[n]) < bound_box[n4  ] )
-	bound_box[n4  ] = RESTR_SCALE(-PIH);
-
-      if ( RESTR_SCALE(lats[n]) > bound_box[n4+1] )
-	bound_box[n4+1] = RESTR_SCALE(PIH);
+      if ( RESTR_SCALE(lats[n]) < bound_box[n4  ] ) bound_box[n4  ] = RESTR_SCALE(-PIH);
+      if ( RESTR_SCALE(lats[n]) > bound_box[n4+1] ) bound_box[n4+1] = RESTR_SCALE( PIH);
     }
 }
 
@@ -4514,9 +4510,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  */
 		  num_subseg++;
 		  if ( num_subseg >= max_subseg )
-		    {
-		      cdoAbort("Integration stalled 1: num_subseg exceeded limit");
-		    }
+		    cdoAbort("Integration stalled 1: num_subseg exceeded limit");
 
 		  /* Uwe Schulzweida: skip very small regions */
 		  if ( num_subseg%1000 == 0 )
@@ -4787,9 +4781,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  */
 		  num_subseg++;
 		  if ( num_subseg >= max_subseg )
-		    {
-		      cdoAbort("Integration stalled 2: num_subseg exceeded limit");
-		    }
+		    cdoAbort("Integration stalled 2: num_subseg exceeded limit");
 
 		  /* Uwe Schulzweida: skip very small regions */
 		  if ( num_subseg%1000 == 0 )
