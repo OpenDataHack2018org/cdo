@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -39,7 +39,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
   int i, ilat, ilon, nlat, nlon;
   double u, v;
   double xval, yval;
-  double xpole, ypole;
+  double xpole, ypole, angle;
   double *xvals, *yvals;
 
   nlon = gridInqXsize(gridID);
@@ -47,6 +47,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
   xpole = gridInqXpole(gridID);
   ypole = gridInqYpole(gridID);
+  angle = gridInqAngle(gridID);
 
   xvals = (double *) malloc(nlon*sizeof(double));
   yvals = (double *) malloc(nlat*sizeof(double));
@@ -59,8 +60,8 @@ void rot_uv_back(int gridID, double *us, double *vs)
       {
 	i = ilat*nlon + ilon;
 
-        xval = rls_to_rl(yvals[ilat], xvals[ilon], ypole, xpole);
-        yval = phs_to_ph(yvals[ilat], xvals[ilon], ypole);
+        xval = lamrot_to_lam(yvals[ilat], xvals[ilon], ypole, xpole, angle);
+        yval = phirot_to_phi(yvals[ilat], xvals[ilon], ypole, angle);
 
 	usvs_to_uv(us[i], vs[i], yval, xval, ypole, xpole, &u, &v);
 	/*

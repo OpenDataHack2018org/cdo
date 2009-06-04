@@ -180,10 +180,11 @@ void gridGenRotBounds(int gridID, int nx, int ny,
   int i, j, index;
   double minlon, maxlon;
   double minlat, maxlat;
-  double xpole, ypole;
+  double xpole, ypole, angle;
 
   xpole = gridInqXpole(gridID);
   ypole = gridInqYpole(gridID);
+  angle = gridInqAngle(gridID);
 
   for ( j = 0; j < ny; j++ )
     {
@@ -204,15 +205,15 @@ void gridGenRotBounds(int gridID, int nx, int ny,
 	  maxlon = xbounds[2*i+1];
 
 	  index = j*4*nx + 4*i;
-	  xbounds2D[index+0] = rls_to_rl(minlat, minlon, ypole, xpole);
-	  xbounds2D[index+1] = rls_to_rl(minlat, maxlon, ypole, xpole);
-	  xbounds2D[index+2] = rls_to_rl(maxlat, maxlon, ypole, xpole);
-	  xbounds2D[index+3] = rls_to_rl(maxlat, minlon, ypole, xpole);
+	  xbounds2D[index+0] = lamrot_to_lam(minlat, minlon, ypole, xpole, angle);
+	  xbounds2D[index+1] = lamrot_to_lam(minlat, maxlon, ypole, xpole, angle);
+	  xbounds2D[index+2] = lamrot_to_lam(maxlat, maxlon, ypole, xpole, angle);
+	  xbounds2D[index+3] = lamrot_to_lam(maxlat, minlon, ypole, xpole, angle);
 
-	  ybounds2D[index+0] = phs_to_ph(minlat, minlon, ypole);
-	  ybounds2D[index+1] = phs_to_ph(minlat, maxlon, ypole);
-	  ybounds2D[index+2] = phs_to_ph(maxlat, maxlon, ypole);
-	  ybounds2D[index+3] = phs_to_ph(maxlat, minlon, ypole);
+	  ybounds2D[index+0] = phirot_to_phi(minlat, minlon, ypole, angle);
+	  ybounds2D[index+1] = phirot_to_phi(minlat, maxlon, ypole, angle);
+	  ybounds2D[index+2] = phirot_to_phi(maxlat, maxlon, ypole, angle);
+	  ybounds2D[index+3] = phirot_to_phi(maxlat, minlon, ypole, angle);
 	}
     }
 }
@@ -380,16 +381,17 @@ int gridToCurvilinear(int gridID1)
 
 	    if ( gridIsRotated(gridID1) )
 	      {
-		double xpole, ypole;
+		double xpole, ypole, angle;
 		
 		xpole = gridInqXpole(gridID1);
 		ypole = gridInqYpole(gridID1);
+		angle = gridInqAngle(gridID1);
 		
 		for ( j = 0; j < ny; j++ )
 		  for ( i = 0; i < nx; i++ )
 		    {
-		      xvals2D[j*nx+i] = rls_to_rl(yvals[j], xvals[i], ypole, xpole);
-		      yvals2D[j*nx+i] = phs_to_ph(yvals[j], xvals[i], ypole);
+		      xvals2D[j*nx+i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
+		      yvals2D[j*nx+i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
 		    }	    
 	      }
 	    else

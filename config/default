@@ -52,13 +52,14 @@ case "${HOSTNAME}" in
 	            --with-netcdf=/sw/sles10-x64/netcdf-4.0.1 \
 	            --with-hdf5=/sw/sles10-x64/hdf5-1.8.2 \
                     --with-szlib=/sw/sles10-x64/szip-2.1 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2 -fopenmp"
+#	            CC=suncc CFLAGS="-g -D_REENTRANT -fast -xopenmp"
 	;;        
     tornado1)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/sles9-x64 \
 	            --with-netcdf=/sw/sles9-x64/netcdf-3.6.2 \
                     --with-szlib=$HOME/local/sles9-x64 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
 	;;        
 # x86_64-etch-x64-linux
     squall1)
@@ -68,14 +69,14 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/etch-x64/hdf5-1.8.2 \
                     --with-szlib=/sw/etch-x64/szip-2.1-static \
                     --with-proj=$HOME/local/etch-x64/proj-4.6.1 \
-                    CC=gcc 'CFLAGS=-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal'
+                    CC=gcc 'CFLAGS=-g -D_REENTRANT -Wall -O2'
         else
    	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
 	            --with-netcdf=/sw/etch-x64/netcdf-3.6.2 \
                     --with-szlib=/sw/etch-x64/szip-2.1 \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
                     LIBS="-L/opt/gridware/sge/lib/lx24-amd64 -ldrmaa -ldl -L/usr/lib -lcurl" \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
         fi
 	;;        
 # i686-suse-linux
@@ -83,7 +84,7 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -pedantic"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
 	;;
 # etch-ia32
     etch-ia32 | gata | baba)
@@ -93,7 +94,7 @@ case "${HOSTNAME}" in
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal -pedantic"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --program-suffix=_${SGE_SUFFIX} \
@@ -101,7 +102,7 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local/etch-ia32 \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
                     LIBS="-L/opt/gridware/sge/lib/lx24-x86 -ldrmaa -ldl -L/usr/lib -lcurl" \
-                    CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+                    CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
         fi
         ;;
 # sarge-ia32
@@ -111,7 +112,7 @@ case "${HOSTNAME}" in
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
 	            --with-netcdf=/client \
                     --with-szlib=$HOME/local/LINUX \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX \
                     --program-suffix=_${SGE_SUFFIX} \
@@ -119,13 +120,13 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local/LINUX \
                     CPPFLAGS="-DHAVE_LIBDRMAA -I/opt/gridware/sge/include -DHAVE_LIBCURL -I/usr/include" \
                     LIBS="-L/opt/gridware/sge/lib/lx24-x86 -ldrmaa -ldl -L/usr/lib -lcurl" \
-                    CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall -W -Wfloat-equal"
+                    CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
         fi
 	;;
     regio01)
 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/LINUX0 \
 	            --with-netcdf=/client \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -O2 -Wall"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
 	;;
 # i386-pc-solaris2.10
     grim)

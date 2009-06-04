@@ -14,35 +14,57 @@
 #endif
 
 
-double rls_to_rl(double phis, double rlas, double polphi, double pollam)
+double lamrot_to_lam(double phirot, double lamrot, double polphi, double pollam, double polgam)
 {
   /*
-    Umrechnung von rlas (rot. System) auf rla (geo. System)
+    This function converts lambda from one rotated system to lambda in another
+    system. If the optional argument polgam is present, the other system
+    can also be a rotated one, where polgam is the angle between the two
+    north poles.
+    If polgam is not present, the other system is the real geographical
+    system.
 
-    phis   : Breite im rotierten System (N>0)
-    rlas   : Laenge im rotierten System (E>0)
-    polphi : Geographische Breite des Nordpols des rot. Systems
-    pollam : Geographische Laenge des Nordpols des rot. Systems
+    phirot : latitude in the rotated system
+    lamrot : longitude in the rotated system (E>0)
+    polphi : latitude of the rotated north pole
+    pollam : longitude of the rotated north pole
 
-    result : Geographische Laenge
+    result : longitude in the geographical system
   */
   double zsinpol, zcospol, zlampol;
-  double zphis, zrlas, zarg1, zarg2;
+  double zphirot, zlamrot, zarg1, zarg2;
+  double zgam;
 
   zsinpol = sin(deg2rad*polphi);
   zcospol = cos(deg2rad*polphi);
 
   zlampol = deg2rad*pollam;
-  zphis   = deg2rad*phis;
-  if ( rlas > 180.0 ) rlas -= 360.0;
-  zrlas   = deg2rad*rlas;
+  zphirot = deg2rad*phirot;
+  if ( lamrot > 180.0 ) lamrot -= 360.0;
+  zlamrot = deg2rad*lamrot;
 
-  zarg1   = sin(zlampol)*(- zsinpol*cos(zrlas)*cos(zphis)  +
-                            zcospol*           sin(zphis)) -
-            cos(zlampol)*           sin(zrlas)*cos(zphis);
-  zarg2   = cos(zlampol)*(- zsinpol*cos(zrlas)*cos(zphis)  +
-                            zcospol*           sin(zphis)) +
-            sin(zlampol)*           sin(zrlas)*cos(zphis);
+  if ( polgam > 0 )
+    {
+      zgam  = deg2rad*polgam;
+      zarg1 = sin(zlampol) *                                               
+ 	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
+ 	     + zcospol*sin(zphirot))                                              
+	- cos(zlampol)*cos(zphirot) * (sin(zlamrot)*cos(zgam) + cos(zlamrot)*sin(zgam));
+
+      zarg2 = cos(zlampol) *                                               
+ 	    (- zsinpol*cos(zphirot) * (cos(zlamrot)*cos(zgam) - sin(zlamrot)*sin(zgam)) 
+	     + zcospol*sin(zphirot))                                              
+	+ sin(zlampol)*cos(zphirot) * (sin(zlamrot)*cos(zgam) + cos(zlamrot)*sin(zgam));
+      }
+  else
+    {
+      zarg1 = sin(zlampol)*(- zsinpol*cos(zlamrot)*cos(zphirot)  +
+      		              zcospol*           sin(zphirot)) -
+	      cos(zlampol)*           sin(zlamrot)*cos(zphirot);
+      zarg2 = cos(zlampol)*(- zsinpol*cos(zlamrot)*cos(zphirot)  +
+                              zcospol*           sin(zphirot)) +
+              sin(zlampol)*           sin(zlamrot)*cos(zphirot);
+    }
 
   if ( fabs(zarg2) < 1.0e-20 ) zarg2 = 1.0e-20;
 
@@ -50,33 +72,47 @@ double rls_to_rl(double phis, double rlas, double polphi, double pollam)
 }
 
 
-double phs_to_ph(double phis, double rlas, double polphi)
+double phirot_to_phi(double phirot, double lamrot, double polphi, double polgam)
 {
   /*
-    Umrechnung von phis (rot. System) auf phi (geo. System)
+    This function converts phi from one rotated system to phi in another
+    system. If the optional argument polgam is present, the other system
+    can also be a rotated one, where polgam is the angle between the two
+    north poles.
+    If polgam is not present, the other system is the real geographical
+    system.
 
-    phis   : Breite im rotierten System (N>0)
-    rlas   : Laenge im rotierten System (E>0)
-    polphi : Geographische Breite des Nordpols des rot. Systems
+    phirot : latitude in the rotated system
+    lamrot : longitude in the rotated system (E>0)
+    polphi : latitude of the rotated north pole
+    polgam : angle between the north poles of the systems
 
-    result : Geographische Breite
+    result : latitude in the geographical system
   */
   double zsinpol, zcospol;
-  double zphis, zrlas, zarg;
+  double zphirot, zlamrot, zarg;
+  double zgam;
 
   zsinpol = sin(deg2rad*polphi);
   zcospol = cos(deg2rad*polphi);
 
-  zphis   = deg2rad*phis;
-  if ( rlas > 180.0 ) rlas -= 360.0;
-  zrlas   = deg2rad*rlas;
+  zphirot   = deg2rad*phirot;
+  if ( lamrot > 180.0 ) lamrot -= 360.0;
+  zlamrot   = deg2rad*lamrot;
 
-  zarg    = zcospol*cos(zphis)*cos(zrlas) + zsinpol*sin(zphis);
+  if ( polgam > 0 )
+    {
+      zgam = deg2rad*polgam;
+      zarg = zsinpol*sin(zphirot) +
+             zcospol*cos(zphirot)*(cos(zlamrot)*cos(zgam) - sin(zgam)*sin(zlamrot));
+    }
+  else
+    zarg   = zcospol*cos(zphirot)*cos(zlamrot) + zsinpol*sin(zphirot);
 
   return (rad2deg*asin(zarg));
 }
 
-
+static
 double rl_to_rls(double phi, double rla, double polphi, double pollam)
 {
   /*
@@ -109,7 +145,7 @@ double rl_to_rls(double phi, double rla, double polphi, double pollam)
   return (rad2deg*atan2(zarg1,zarg2));
 }
 
-
+static
 double ph_to_phs(double phi, double rla, double polphi, double pollam)
 {
   /*

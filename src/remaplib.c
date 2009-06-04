@@ -525,6 +525,90 @@ void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny,
     }
 }
 
+static
+void scale2(long nvals, double scalefactor, double * restrict vec1, double * restrict vec2)
+{
+  long n;
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) shared(nvals, scalefactor, vec1, vec2) private(n)
+#endif
+  for ( n = 0; n < nvals; n++ )
+    {
+      vec1[n] *= scalefactor;
+      vec2[n] *= scalefactor;
+    }
+}
+
+static
+void check_lon_range(long nlons, double *lons)
+{
+  long n;
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) shared(nlons, lons) private(n)
+#endif
+  for ( n = 0; n < nlons; n++ )
+    {
+      if ( lons[n] > PI2  ) lons[n] -= PI2;
+      if ( lons[n] < ZERO ) lons[n] += PI2;
+    }
+}
+
+static
+void check_lat_range(long nlats, double *lats)
+{
+  long n;
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) shared(nlats, lats) private(n)
+#endif
+  for ( n = 0; n < nlats; n++ )
+    {
+      if ( lats[n] >  PIH ) lats[n] =  PIH;
+      if ( lats[n] < -PIH ) lats[n] = -PIH;
+    }
+}
+
+static
+void check_lon_boundbox_range(long nlons, restr_t *bound_box)
+{
+  long n, n4;
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) shared(nlons, bound_box) private(n, n4)
+#endif
+  for ( n = 0; n < nlons; n++ )
+    {
+      n4 = n*4;
+      if ( RESTR_ABS(bound_box[n4+3] - bound_box[n4+2]) > RESTR_SCALE(PI) )
+	{
+	  bound_box[n4+2] = 0;
+	  bound_box[n4+3] = RESTR_SCALE(PI2);
+	}
+    }
+}
+
+static
+void check_lat_boundbox_range(long nlats, restr_t * restrict bound_box, double * restrict lats)
+{
+  long n, n4;
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n, n4)
+#endif
+  for ( n = 0; n < nlats; n++ )
+    {
+      n4 = n*4;
+
+      if ( RESTR_SCALE(lats[n]) < bound_box[n4  ] )
+	bound_box[n4  ] = RESTR_SCALE(-PIH);
+
+      if ( RESTR_SCALE(lats[n]) > bound_box[n4+1] )
+	bound_box[n4+1] = RESTR_SCALE(PIH);
+    }
+}
+
 /*****************************************************************************/
 
 void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg)
@@ -534,7 +618,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   int nbins;
   long i4;
   long n2, nele4;
-  long n, n4;  /* Loop counter                  */
+  long n;      /* Loop counter                  */
   long nele;   /* Element loop counter          */
   long i,j;    /* Logical 2d addresses          */
   long nx, ny;
@@ -832,27 +916,11 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   if ( memcmp(units, "degrees", 7) == 0 )
     {
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-      for ( i = 0; i < rg->grid1_size; i++ )
-	{
-	  rg->grid1_center_lat[i] *= DEG2RAD;
-	  rg->grid1_center_lon[i] *= DEG2RAD;
-	}
+      scale2(rg->grid1_size, DEG2RAD, rg->grid1_center_lat, rg->grid1_center_lon);
 
       /* Note: using units from latitude instead from bounds */
       if ( rg->grid1_corners && rg->lneed_grid1_corners )
-	{
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-	  for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
-	    {
-	      rg->grid1_corner_lat[i] *= DEG2RAD;
-	      rg->grid1_corner_lon[i] *= DEG2RAD;
-	    }
-	}
+	scale2( rg->grid1_corners*rg->grid1_size, DEG2RAD, rg->grid1_corner_lat, rg->grid1_corner_lon);
     }
   else if ( memcmp(units, "radian", 6) == 0 )
     {
@@ -908,27 +976,11 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   if ( memcmp(units, "degrees", 7) == 0 )
     {
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-      for ( i = 0; i < rg->grid2_size; i++ )
-	{
-	  rg->grid2_center_lat[i] *= DEG2RAD;
-	  rg->grid2_center_lon[i] *= DEG2RAD;
-	}
+      scale2(rg->grid2_size, DEG2RAD, rg->grid2_center_lat, rg->grid2_center_lon);
 
       /* Note: using units from latitude instead from bounds */
       if ( rg->grid2_corners && rg->lneed_grid2_corners )
-	{
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-	  for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
-	    {
-	      rg->grid2_corner_lat[i] *= DEG2RAD;
-	      rg->grid2_corner_lon[i] *= DEG2RAD;
-	    }
-	}
+	scale2( rg->grid2_corners*rg->grid2_size, DEG2RAD, rg->grid2_corner_lat, rg->grid2_corner_lon);
     }
   else if ( memcmp(units, "radian", 6) == 0 )
     {
@@ -942,91 +994,27 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   /* Convert longitudes to 0,2pi interval */
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-  for ( i = 0; i < rg->grid1_size; i++ )
-    {
-      if ( rg->grid1_center_lon[i] > PI2 )  rg->grid1_center_lon[i] -= PI2;
-      if ( rg->grid1_center_lon[i] < ZERO ) rg->grid1_center_lon[i] += PI2;
-    }
-
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-  for ( i = 0; i < rg->grid2_size; i++ )
-    {
-      if ( rg->grid2_center_lon[i] > PI2 )  rg->grid2_center_lon[i] -= PI2;
-      if ( rg->grid2_center_lon[i] < ZERO ) rg->grid2_center_lon[i] += PI2;
-    }
+  check_lon_range(rg->grid1_size, rg->grid1_center_lon);
+  check_lon_range(rg->grid2_size, rg->grid2_center_lon);
 
   if ( rg->grid1_corners && rg->lneed_grid1_corners )
-    {
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-      for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
-	{
-	  if ( rg->grid1_corner_lon[i] > PI2 )  rg->grid1_corner_lon[i] -= PI2;
-	  if ( rg->grid1_corner_lon[i] < ZERO ) rg->grid1_corner_lon[i] += PI2;
-	}
-    }
+    check_lon_range(rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lon);
 
   if ( rg->grid2_corners && rg->lneed_grid2_corners )
-    {
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-      for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
-	{
-	  if ( rg->grid2_corner_lon[i] > PI2 )  rg->grid2_corner_lon[i] -= PI2;
-	  if ( rg->grid2_corner_lon[i] < ZERO ) rg->grid2_corner_lon[i] += PI2;
-	}
-    }
+    check_lon_range(rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lon);
+
 
   /*  Make sure input latitude range is within the machine values for +/- pi/2 */
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-  for ( i = 0; i < rg->grid1_size; i++ )
-    {
-      if ( rg->grid1_center_lat[i] >  PIH ) rg->grid1_center_lat[i] =  PIH;
-      if ( rg->grid1_center_lat[i] < -PIH ) rg->grid1_center_lat[i] = -PIH;
-    }
+  check_lat_range(rg->grid1_size, rg->grid1_center_lat);
+  check_lat_range(rg->grid2_size, rg->grid2_center_lat);
 
   if ( rg->grid1_corners && rg->lneed_grid1_corners )
-    {
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-      for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
-	{
-	  if ( rg->grid1_corner_lat[i] >  PIH ) rg->grid1_corner_lat[i] =  PIH;
-	  if ( rg->grid1_corner_lat[i] < -PIH ) rg->grid1_corner_lat[i] = -PIH;
-	}
-    }
+    check_lat_range(rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lat);
   
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-  for ( i = 0; i < rg->grid2_size; i++ )
-    {
-      if ( rg->grid2_center_lat[i] >  PIH ) rg->grid2_center_lat[i] =  PIH;
-      if ( rg->grid2_center_lat[i] < -PIH ) rg->grid2_center_lat[i] = -PIH;
-    }
-
   if ( rg->grid2_corners && rg->lneed_grid2_corners )
-    {
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
-#endif
-      for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
-	{
-	  if ( rg->grid2_corner_lat[i] >  PIH ) rg->grid2_corner_lat[i] =  PIH;
-	  if ( rg->grid2_corner_lat[i] < -PIH ) rg->grid2_corner_lat[i] = -PIH;
-	}
-    }
+    check_lat_range(rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lat);
+
 
   /*  Compute bounding boxes for restricting future grid searches */
 
@@ -1095,61 +1083,16 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 			   rg->grid2_center_lon, rg->grid2_center_lat, rg->grid2_bound_box);
     }
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(n, n4)
-#endif
-  for ( n = 0; n < rg->grid1_size; n++ )
-    {
-      n4 = n*4;
-      if ( RESTR_ABS(rg->grid1_bound_box[n4+3] - rg->grid1_bound_box[n4+2]) > RESTR_SCALE(PI) )
-	{
-	  rg->grid1_bound_box[n4+2] = 0;
-	  rg->grid1_bound_box[n4+3] = RESTR_SCALE(PI2);
-	}
-    }
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(n, n4)
-#endif
-  for ( n = 0; n < rg->grid2_size; n++ )
-    {
-      n4 = n*4;
-      if ( RESTR_ABS(rg->grid2_bound_box[n4+3] - rg->grid2_bound_box[n4+2]) > RESTR_SCALE(PI) )
-	{
-	  rg->grid2_bound_box[n4+2] = 0;
-	  rg->grid2_bound_box[n4+3] = RESTR_SCALE(PI2);
-	}
-    }
+  check_lon_boundbox_range(rg->grid1_size, rg->grid1_bound_box);
+  check_lon_boundbox_range(rg->grid2_size, rg->grid2_bound_box);
+
 
   /* Try to check for cells that overlap poles */
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(n, n4)
-#endif
-  for ( n = 0; n < rg->grid1_size; n++ )
-    {
-      n4 = n*4;
+  check_lat_boundbox_range(rg->grid1_size, rg->grid1_bound_box, rg->grid1_center_lat);
+  check_lat_boundbox_range(rg->grid2_size, rg->grid2_bound_box, rg->grid2_center_lat);
 
-      if ( RESTR_SCALE(rg->grid1_center_lat[n]) < rg->grid1_bound_box[n4  ] )
-	rg->grid1_bound_box[n4  ] = RESTR_SCALE(-PIH);
-
-      if ( RESTR_SCALE(rg->grid1_center_lat[n]) > rg->grid1_bound_box[n4+1] )
-	rg->grid1_bound_box[n4+1] = RESTR_SCALE(PIH);
-    }
-
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(n, n4)
-#endif
-  for ( n = 0; n < rg->grid2_size; n++ )
-    {
-      n4 = n*4;
-
-      if ( RESTR_SCALE(rg->grid2_center_lat[n]) < rg->grid2_bound_box[n4  ] )
-	rg->grid2_bound_box[n4  ] = RESTR_SCALE(-PIH);
-
-      if ( RESTR_SCALE(rg->grid2_center_lat[n]) > rg->grid2_bound_box[n4+1] )
-	rg->grid2_bound_box[n4+1] = RESTR_SCALE(PIH);
-    }
 
   /*
     Set up and assign address ranges to search bins in order to 
@@ -1181,11 +1124,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	  rg->bin_addr2[2*n+1] = 0;
 	}
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(rg)	                       \
-  private(nele, nele4, n)
-#endif
       for ( nele = 0; nele < rg->grid1_size; nele++ )
 	{
 	  nele4 = nele*4;
@@ -1198,11 +1136,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	      }
 	}
 
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(rg)	                       \
-  private(nele, nele4, n)
-#endif
       for ( nele = 0; nele < rg->grid2_size; nele++ )
 	{
 	  nele4 = nele*4;
@@ -1685,7 +1618,7 @@ void remap_laf(double *dst_array, double missval, long dst_size, long num_links,
 #define  DEFAULT_MAX_ITER  100
 
 static long    Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i,j iteration */
-static const double  converge = 1.e-10;      /* Convergence criterion */
+static double  converge = 1.e-10;      /* Convergence criterion */
 
 void remap_set_max_iter(long max_iter)
 {
@@ -6576,13 +6509,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   grid1_units[attlen] = 0;
 
   if ( memcmp(grid1_units, "degrees", 7) == 0 )
-    {
-      for ( i = 0; i < rg->grid1_size; i++ )
-	{
-	  rg->grid1_center_lat[i] *= DEG2RAD;
-	  rg->grid1_center_lon[i] *= DEG2RAD;
-	}
-    }
+    scale2(rg->grid1_size, DEG2RAD, rg->grid1_center_lat, rg->grid1_center_lon);
   else if ( memcmp(grid1_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
 
@@ -6596,13 +6523,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       grid1_units[attlen] = 0;
 
       if ( memcmp(grid1_units, "degrees", 7) == 0 )
-	{
-	  for ( i = 0; i < rg->grid1_corners*rg->grid1_size; i++ )
-	    {
-	      rg->grid1_corner_lat[i] *= DEG2RAD;
-	      rg->grid1_corner_lon[i] *= DEG2RAD;
-	    }
-	}
+	scale2( rg->grid1_corners*rg->grid1_size, DEG2RAD, rg->grid1_corner_lat, rg->grid1_corner_lon);
       else if ( memcmp(grid1_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid1 corner lat/lon: proceeding assuming radians");
     }
@@ -6624,13 +6545,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   grid2_units[attlen] = 0;
 
   if ( memcmp(grid2_units, "degrees", 7) == 0 )
-    {
-      for ( i = 0; i < rg->grid2_size; i++ )
-	{
-	  rg->grid2_center_lat[i] *= DEG2RAD;
-	  rg->grid2_center_lon[i] *= DEG2RAD;
-	}
-    }
+    scale2(rg->grid2_size, DEG2RAD, rg->grid2_center_lat, rg->grid2_center_lon);
   else if ( memcmp(grid2_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
 
@@ -6644,13 +6559,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       grid2_units[attlen] = 0;
       
       if ( memcmp(grid2_units, "degrees", 7) == 0 )
-	{
-	  for ( i = 0; i < rg->grid2_corners*rg->grid2_size; i++ )
-	    {
-	      rg->grid2_corner_lat[i] *= DEG2RAD;
-	      rg->grid2_corner_lon[i] *= DEG2RAD;
-	    }
-	}
+	scale2( rg->grid2_corners*rg->grid2_size, DEG2RAD, rg->grid2_corner_lat, rg->grid2_corner_lon);
       else if ( memcmp(grid2_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid2 corner lat/lon: proceeding assuming radians");
     }

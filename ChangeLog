@@ -3,12 +3,15 @@
 	* using CDI library version 1.3.2
 	* change C compiler to ANSI C99
 	* added option -Q to sort netCDF variable names
+	* added support for the parameter 'angle' to transform rotated coordinates 
+	        to geographic coordinates [request: Beate Mueller]
 	* splitsel: change the number of output digits from 3 to 6
 	* settaxis: bug fix for increment 'months' [report: Ute Merkel]
 	* remaplib: change loop counter from int to long
 	* remaplaf: fixed buffer overflow
 	* remapcon: change max_subseg from 1000 to 100000
 	* Remapeta: correct humidity up to highest level *nctop* where condensation is allowed
+	* replace: bug fix for searching of parameter code/name
 	* Version 1.3.2 released
 
 2009-04-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

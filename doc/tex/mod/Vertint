@@ -14,7 +14,7 @@ To interpolate the temperature, the orography (surface geopotential) is also nee
 The pressure, temperature, and orography are identified by their code numbers.
 Supported parameter tables are: WMO standard table number 2 and ECMWF local table number 128.
 Use the alias  @bold{ml2plx}/@bold{ml2hlx} or the environment variable @env{EXTRAPOLATE}
-to extrapolate missing values.
+to extrapolate missing values. All input fields have to be on the same horizontal grid.
 @EndDescription
 @EndModule
 
@@ -54,6 +54,12 @@ FLOAT  Height levels in meter (max level: 65535 m)
 @Item = EXTRAPOLATE
 If set to 1 extrapolate missing values.
 @EndEnvironment
+
+
+@BeginNote
+The netCDF CF convention for vertical hybrid coordinates is 
+not supported, yet!
+@EndNote
 
 
 @BeginExample

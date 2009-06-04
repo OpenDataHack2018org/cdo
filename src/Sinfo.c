@@ -174,11 +174,14 @@ static void printGridInfo(int vlistID)
 	  
 	  if ( gridIsRotated(gridID) )
 	    {
-	      double lonpole, latpole;
+	      double lonpole, latpole, angle;
 	      lonpole = gridInqXpole(gridID);
 	      latpole = gridInqYpole(gridID);
+	      angle   = gridInqAngle(gridID);
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "northpole : lon = %.9g  lat = %.9g\n", lonpole, latpole);
+	      fprintf(stdout, "northpole : lon = %.9g  lat = %.9g", lonpole, latpole);
+	      if ( angle > 0 ) fprintf(stdout, "  angle = %.9g\n", angle);
+	      fprintf(stdout, "\n");
 	    }
 		
 	  if ( gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )

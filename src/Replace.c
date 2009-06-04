@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,7 @@ void *Replace(void *argument)
   int index;
   int streamID1, streamID2, streamID3;
   int vlistID1 , vlistID2, vlistID3;
-  int code1, code2;
+  int code1 = 0, code2;
   char varname1[128], varname2[128];
   int gridsize;
   int nmiss;
@@ -84,9 +84,17 @@ void *Replace(void *argument)
 	{
 	  code1 = vlistInqVarCode(vlistID1, varID1);
 	  vlistInqVarName(vlistID1, varID1, varname1);
-
 	  if ( strcmp(varname1, varname2) == 0 ) break;
-	  if ( code1 == code2 ) break;
+	}
+
+      if ( code2 > 0 && varID1 == nvars1 )
+	{
+	  for ( varID1 = 0; varID1 < nvars1; varID1++ )
+	    {
+	      code1 = vlistInqVarCode(vlistID1, varID1);
+	      vlistInqVarName(vlistID1, varID1, varname1);
+	      if ( code1 == code2 ) break;
+	    }
 	}
 
       if ( varID1 < nvars1 )
@@ -106,13 +114,14 @@ void *Replace(void *argument)
 	    cdoAbort("Variables have different number of levels!");
 
 	  if ( cdoVerbose )
-	    cdoPrint("Variable %s (code %d) replaced", varname2, code2);
+	    cdoPrint("Variable %s (code %d) replaced by  %s (code %d)",
+		     varname1, code1, varname2, code2);
 
 	  varlist1[nchvars] = varID1;
 	  varlist2[nchvars] = varID2;
 	  nchvars++;
 	  if ( nchvars > MAX_VARS )
-	    cdoAbort("internal problem - too many variables!");
+	    cdoAbort("Internal problem - too many variables!");
 	}
       else
 	{

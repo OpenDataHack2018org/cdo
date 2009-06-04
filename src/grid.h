@@ -25,8 +25,8 @@ void gme_grid(int gridsize, double *rlon, double *rlat,
               int ni, int nd, int ni2, int ni3);
 
 /* Rotated grid */
-double rls_to_rl(double phis, double rlas, double polphi, double pollam);
-double phs_to_ph(double phis, double rlas, double polphi);
+double lamrot_to_lam(double phis, double rlas, double polphi, double pollam, double polgam);
+double phirot_to_phi(double phis, double rlas, double polphi, double polgam);
 double rl_to_rls(double phi, double rla, double polphi, double pollam);
 double ph_to_phs(double phi, double rla, double polphi, double pollam);
 void usvs_to_uv(double us, double vs, double phi, double rla,
