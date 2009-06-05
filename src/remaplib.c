@@ -468,7 +468,7 @@ void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny,
 #endif
   for ( n = 0; n < size; n++ )
     {
-      n4 = 4*n;
+      n4 = n*4;
 
       /* Find N,S and NE points to this grid point */
       
@@ -1018,6 +1018,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     {
       if ( rg->lneed_grid1_corners )
 	{
+	  if ( cdoVerbose ) cdoPrint("Grid1: boundbox_from_corners");
+
 	  boundbox_from_corners(rg->grid1_size, rg->grid1_corners, 
 				rg->grid1_corner_lon, rg->grid1_corner_lat, rg->grid1_bound_box);
 	}
@@ -1042,8 +1044,19 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       nx = rg->grid1_dims[0];
       ny = rg->grid1_dims[1];
 
+      if ( cdoVerbose ) cdoPrint("Grid1: boundbox_from_center");
+
       boundbox_from_center(rg->grid1_is_cyclic, rg->grid1_size, nx, ny, 
 			   rg->grid1_center_lon, rg->grid1_center_lat, rg->grid1_bound_box);
+      if ( cdoVerbose )
+	for ( n = 0; n < rg->grid1_size; n++ )
+	  {
+	    printf("boundbox1 %d %g %g %g %g\n", n,
+		   (RAD2DEG*rg->grid1_bound_box[n*4])/RESTR_SFAC, 
+		   (RAD2DEG*rg->grid1_bound_box[n*4+1])/RESTR_SFAC,
+		   (RAD2DEG*rg->grid1_bound_box[n*4+2])/RESTR_SFAC,
+		   (RAD2DEG*rg->grid1_bound_box[n*4+3])/RESTR_SFAC);
+	  }
     }
 
 
@@ -1051,6 +1064,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     {
       if ( rg->lneed_grid2_corners )
 	{
+	  if ( cdoVerbose ) cdoPrint("Grid2: boundbox_from_corners");
+
 	  boundbox_from_corners(rg->grid2_size, rg->grid2_corners, 
 				rg->grid2_corner_lon, rg->grid2_corner_lat, rg->grid2_bound_box);
 	}
@@ -1074,6 +1089,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       nx = rg->grid2_dims[0];
       ny = rg->grid2_dims[1];
+
+      if ( cdoVerbose ) cdoPrint("Grid2: boundbox_from_center");
 
       boundbox_from_center(rg->grid2_is_cyclic, rg->grid2_size, nx, ny, 
 			   rg->grid2_center_lon, rg->grid2_center_lat, rg->grid2_bound_box);
@@ -1110,14 +1127,15 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       for ( n = 0; n < rg->num_srch_bins; n++ )
 	{
-	  rg->bin_lats[2*n  ] = RESTR_SCALE((n  )*dlat - PIH);
-	  rg->bin_lats[2*n+1] = RESTR_SCALE((n+1)*dlat - PIH);
-	  rg->bin_lons[2*n  ] = 0;
-	  rg->bin_lons[2*n+1] = RESTR_SCALE(PI2);
-	  rg->bin_addr1[2*n  ] = rg->grid1_size;
-	  rg->bin_addr1[2*n+1] = 0;
-	  rg->bin_addr2[2*n  ] = rg->grid2_size;
-	  rg->bin_addr2[2*n+1] = 0;
+	  n2 = n*2;
+	  rg->bin_lats[n2  ] = RESTR_SCALE((n  )*dlat - PIH);
+	  rg->bin_lats[n2+1] = RESTR_SCALE((n+1)*dlat - PIH);
+	  rg->bin_lons[n2  ] = 0;
+	  rg->bin_lons[n2+1] = RESTR_SCALE(PI2);
+	  rg->bin_addr1[n2  ] = rg->grid1_size;
+	  rg->bin_addr1[n2+1] = 0;
+	  rg->bin_addr2[n2  ] = rg->grid2_size;
+	  rg->bin_addr2[n2+1] = 0;
 	}
 
       for ( nele = 0; nele < rg->grid1_size; nele++ )
@@ -1131,6 +1149,17 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 		rg->bin_addr1[n*2+1] = MAX(nele, rg->bin_addr1[n*2+1]);
 	      }
 	}
+
+      if ( cdoVerbose )
+	for ( n = 0; n < rg->grid1_size; n++ )
+	  {
+	    printf("boundbox1 %d %g %g %g %g\n", n,
+		   (RAD2DEG*rg->grid1_bound_box[n*4])/RESTR_SFAC, 
+		   (RAD2DEG*rg->grid1_bound_box[n*4+1])/RESTR_SFAC,
+		   (RAD2DEG*rg->grid1_bound_box[n*4+2])/RESTR_SFAC,
+		   (RAD2DEG*rg->grid1_bound_box[n*4+3])/RESTR_SFAC);
+	  }
+      
 
       for ( nele = 0; nele < rg->grid2_size; nele++ )
 	{
@@ -1169,7 +1198,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       for ( j = 0; j < rg->num_srch_bins; j++ )
 	for ( i = 0; i < rg->num_srch_bins; i++ )
 	  {
-	    n2 = 2*n;
+	    n2 = n*2;
 	    rg->bin_lats[n2  ]  = RESTR_SCALE((j  )*dlat - PIH);
 	    rg->bin_lats[n2+1]  = RESTR_SCALE((j+1)*dlat - PIH);
 	    rg->bin_lons[n2  ]  = RESTR_SCALE((i  )*dlon);
@@ -1186,7 +1215,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       for ( nele = 0; nele < rg->grid1_size; nele++ )
 	{
-	  nele4 = 4*nele;
+	  nele4 = nele*4;
 	  for ( n = 0; n < rg->num_srch_bins; n++ )
 	    if ( rg->grid1_bound_box[nele4  ] <= rg->bin_lats[2*n+1] &&
 		 rg->grid1_bound_box[nele4+1] >= rg->bin_lats[2*n  ] &&
@@ -1200,7 +1229,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       for ( nele = 0; nele < rg->grid2_size; nele++ )
 	{
-	  nele4 = 4*nele;
+	  nele4 = nele*4;
 	  for ( n = 0; n < rg->num_srch_bins; n++ )
 	    if ( rg->grid2_bound_box[nele4  ] <= rg->bin_lats[2*n+1] &&
 		 rg->grid2_bound_box[nele4+1] >= rg->bin_lats[2*n  ] &&
@@ -2426,11 +2455,9 @@ void grid_search_nbr(remapgrid_t *rg, int * restrict nbr_add, double * restrict 
   rlat = RESTR_SCALE(plat);
   rlon = RESTR_SCALE(plon);
 
-  /*  Loop over source grid and find nearest neighbors */
+  /* Loop over source grid and find nearest neighbors                         */
+  /* Restrict the search using search bins expand the bins to catch neighbors */
 
-  /*
-    Restrict the search using search bins expand the bins to catch neighbors
-  */
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
       for ( n = 0; n < rg->num_srch_bins; n++ )
@@ -2495,7 +2522,7 @@ void grid_search_nbr(remapgrid_t *rg, int * restrict nbr_add, double * restrict 
       nbr_dist[n] = BIGNUM;
     }
 
-  /* Unvectorized loop: break (num_neighbors is constant 4) */
+  // printf("%g %g  min %d  max %d  range %d\n", plon, plat, min_add, max_add, max_add-min_add);
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
       /* Find distance to this point */
@@ -2510,10 +2537,8 @@ void grid_search_nbr(remapgrid_t *rg, int * restrict nbr_add, double * restrict 
 
       /* Uwe Schulzweida: if distance is zero, set to small number */
       if ( IS_EQUAL(distance, 0) ) distance = TINY;
-      /*
-         store the address and distance if this is one of the
-	 smallest four so far
-      */
+
+      /* Store the address and distance if this is one of the smallest four so far */
       for ( nchk = 0; nchk < num_neighbors; nchk++ )
 	{
           if ( distance < nbr_dist[nchk] )
@@ -2597,9 +2622,8 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
   double wgtstmp;          /* hold the link weight                        */
 
-  /*
-    Compute mappings from grid1 to grid2
-  */
+  /* Compute mappings from grid1 to grid2 */
+
   grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
@@ -2643,6 +2667,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
       sinlon_dst = sin(rg->grid2_center_lon[dst_add]);
 	
       /* Find nearest grid points on source grid and  distances to each point */
+
       grid_search_nbr(rg, nbr_add, nbr_dist, 
 		      rg->grid2_center_lat[dst_add],
 		      rg->grid2_center_lon[dst_add],
@@ -2683,7 +2708,6 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp critical
 #endif
 	      store_link_nbr(rv, nbr_add[n]-1, dst_add, wgtstmp);
-
 	    }
 	}
 
@@ -2739,12 +2763,9 @@ void grid_search_nbr1(remapgrid_t *rg, int * restrict nbr_add, double * restrict
   rlat = RESTR_SCALE(plat);
   rlon = RESTR_SCALE(plon);
 
-  /*  Loop over source grid and find nearest neighbors */
+  /* Loop over source grid and find nearest neighbors                         */
+  /* Restrict the search using search bins expand the bins to catch neighbors */
 
-  /*
-    Restrict the search using search bins
-    expand the bins to catch neighbors
-  */
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
       for ( n = 0; n < rg->num_srch_bins; n++ )
@@ -2806,19 +2827,20 @@ void grid_search_nbr1(remapgrid_t *rg, int * restrict nbr_add, double * restrict
   nbr_add[0]  = 0;
   nbr_dist[0] = BIGNUM;
 
+  // printf("%g %g  min %d  max %d  range %d\n", plon, plat, min_add, max_add, max_add-min_add);
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
       /* Find distance to this point */
 
       distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
 	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
+      /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
+                                     otherwise the result of acos(distance) is NaN */
       if ( distance >  1 ) distance =  1;
       if ( distance < -1 ) distance = -1;
       distance = acos(distance);
 
-      /*
-         Store the address and distance if this is the smallest so far
-      */
+      /* Store the address and distance if this is the smallest so far */
       if ( distance < nbr_dist[0] )
 	{
 	  nbr_add[0]  = nadd + 1;
@@ -2891,9 +2913,8 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
   double wgtstmp;          /* hold the link weight                        */
 
-  /*
-    Compute mappings from grid1 to grid2
-  */
+  /* Compute mappings from grid1 to grid2 */
+
   grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
