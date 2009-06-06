@@ -38,7 +38,7 @@ void *Eofcoeff(void * argument)
   static char func[] = "Eofcoeff";
   char eof_name[5], oname[1024], filesuffix[32];
   double *w;
-  double missval1, missval2;
+  double missval1=-999, missval2;
   double *xvals, *yvals;  
   FIELD ***eof;  
   FIELD in;  
@@ -52,7 +52,6 @@ void *Eofcoeff(void * argument)
   int streamID1, streamID2, *streamIDs;
   int taxisID1, taxisID2, taxisID3;
   int vlistID1, vlistID2, vlistID3;
-  int vdate = 0, vtime = 0;
    
   cdoInitialize(argument);
   cdoOperatorAdd("eofcoeff",  0,       0, NULL);
@@ -78,7 +77,11 @@ void *Eofcoeff(void * argument)
   if ( vlistGridsizeMax(vlistID1)==vlistGridsizeMax(vlistID2) )
     gridsize = vlistGridsizeMax(vlistID1);  
   else 
-    cdoAbort ("Gridsize of input files does not match");
+    {
+      gridsize=-1;
+      cdoAbort ("Gridsize of input files does not match");
+    }
+      
   
   if ( vlistNgrids(vlistID2) > 1 || vlistNgrids(vlistID1) > 1 )
     cdoAbort("Too many grids in input");
@@ -147,7 +150,7 @@ void *Eofcoeff(void * argument)
    }
   neof = eofID;  
   
-  if ( cdoVerbose) cdoPrint("%s contains %i eof's", cdoStreamName(0), neof);
+  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0), neof);
   // Create 1x1 Grid for output
   gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
@@ -162,8 +165,7 @@ void *Eofcoeff(void * argument)
   // Create var-list and time-axis for output
       
   ngrids = vlistNgrids(vlistID3);
-  if (cdoVerbose)
-    cdoPrint("streamID%i: ngrids for %i.eof: %i", streamIDs[eofID], eofID+1, ngrids);
+  
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID3, i, gridID3);     
   
@@ -228,24 +230,24 @@ void *Eofcoeff(void * argument)
           for (eofID = 0; eofID < neof; eofID++ )
             {
               if ( recID == 0 ) streamDefTimestep(streamIDs[eofID],tsID);
-              if ( recID == 0 ) fprintf(stderr, "ts%i rec%i eof%i\n", tsID, recID, eofID);
+              //if ( recID == 0 ) fprintf(stderr, "ts%i rec%i eof%i\n", tsID, recID, eofID);
               out.ptr[0]  = 0;
               out.grid    = gridID3;
               out.missval = missval2;            
               for(i=0;i<gridsize;i++)
                 {                  
-                  if (in.ptr[i] != missval2 && 
-                      eof[varID][levelID][eofID].ptr[i] != missval1 )
+                  if (! DBL_IS_EQUAL(in.ptr[i],missval2) && 
+                      ! DBL_IS_EQUAL(eof[varID][levelID][eofID].ptr[i],missval1 ))
                     {
                       double tmp = w[i]*in.ptr[i]*eof[varID][levelID][eofID].ptr[i];
                       out.ptr[0] += tmp;                   
                     }
                 }            
-              if ( out.ptr[0] ) nmiss=0;
+              if ( ! DBL_IS_EQUAL(out.ptr[0],0) ) nmiss=0;
               else { nmiss=1; out.ptr[0]=missval2; }
                       
               streamDefRecord(streamIDs[eofID], varID, levelID);
-              fprintf(stderr, "%d %d %d %d %d %g\n", streamIDs[eofID],tsID, recID, varID, levelID,*out.ptr);
+              //fprintf(stderr, "%d %d %d %d %d %g\n", streamIDs[eofID],tsID, recID, varID, levelID,*out.ptr);
               streamWriteRecord(streamIDs[eofID],out.ptr,nmiss);
             }
           if ( varID >= nvars )

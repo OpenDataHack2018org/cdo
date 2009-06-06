@@ -43,25 +43,25 @@ void *Timeof(void * argument)
   int streamID1, streamID2, streamID3;
   int gridsize;
   int vdate = 0, vtime = 0;
-  int nrecs, nvars, nlevs ;
+  int nrecs, nvars, nlevs=0 ;
   int i, ii, j, i1, i2, j1, j2;
   int nmiss;
   int tsID;
-  int varID, recID, levelID, gridID;
+  int varID, recID, levelID;
   int vlistID1, vlistID2 = -1, vlistID3 = -1;
   int taxisID1, taxisID2, taxisID3;
   int gridID1, gridID2, gridID3;
   int ngrids;
   int reached_eof;
-  int npack, nts;
+  int npack=0, nts=0;
   int *pack;
   int ***iwork;
-  int n_eig, n;
-  int grid_space, time_space;
+  int n_eig, n=0;
+  int grid_space=0, time_space=0;
   double *w;
   double sum_w;
   double sum;
-  double missval;
+  double missval=0;
   double *xvals, *yvals;
   FIELD ***fwork;
   FIELD ***o, ***o2; 
@@ -84,7 +84,7 @@ void *Timeof(void * argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   
   gridsize = vlistGridsizeMax(vlistID1);
-  gridID1 = vlistInqVarGrid(vlistID1, 0);
+  gridID2 = gridID1 = vlistInqVarGrid(vlistID1, 0);
   nvars = vlistNvars(vlistID1);
   nrecs = vlistNrecs(vlistID1); 
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -397,11 +397,11 @@ void *Timeof(void * argument)
           eigen_solution_of_symmetric_matrix(&cov[0], &eigv[0], n, n, func);
           /* cov contains the eigenvectors, eigv the eigenvalues */
           
+          for (i=0; i<n; i++)            
+            o2[varID][levelID][i].ptr[0] = eigv[i];
+          
           for (i=0;i<n_eig;i++)
-            {      
-              float sum2=0;
-              o2[varID][levelID][i].ptr[0] = eigv[i];
-                           
+            {                                               
               if ( grid_space )
                 {
                   for(j=0;j<npack;j++)
@@ -451,15 +451,19 @@ void *Timeof(void * argument)
       taxisDefVtime(taxisID3, 0);
       streamDefTimestep(streamID3, tsID); 
       
-      taxisDefVdate(taxisID2, 0);
-      taxisDefVtime(taxisID2, 0);  
-      streamDefTimestep(streamID2, tsID); 
+      if ( tsID < n_eig ) 
+        {
+          taxisDefVdate(taxisID2, 0);
+          taxisDefVtime(taxisID2, 0);  
+          streamDefTimestep(streamID2, tsID); 
+        }
       
       for ( varID = 0; varID < nvars; varID++ )
         {
           nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
           for ( levelID=0; levelID < nlevs;levelID++ )
-            {           
+            {    
+              fprintf(stderr, "%4i %4i\n", tsID, n_eig);
               if ( tsID < n_eig )
                 {
                   nmiss = 0;              
