@@ -1048,15 +1048,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       boundbox_from_center(rg->grid1_is_cyclic, rg->grid1_size, nx, ny, 
 			   rg->grid1_center_lon, rg->grid1_center_lat, rg->grid1_bound_box);
-      if ( cdoVerbose )
-	for ( n = 0; n < rg->grid1_size; n++ )
-	  {
-	    printf("boundbox1 %d %g %g %g %g\n", n,
-		   (RAD2DEG*rg->grid1_bound_box[n*4])/RESTR_SFAC, 
-		   (RAD2DEG*rg->grid1_bound_box[n*4+1])/RESTR_SFAC,
-		   (RAD2DEG*rg->grid1_bound_box[n*4+2])/RESTR_SFAC,
-		   (RAD2DEG*rg->grid1_bound_box[n*4+3])/RESTR_SFAC);
-	  }
     }
 
 
@@ -1149,17 +1140,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 		rg->bin_addr1[n*2+1] = MAX(nele, rg->bin_addr1[n*2+1]);
 	      }
 	}
-
-      if ( cdoVerbose )
-	for ( n = 0; n < rg->grid1_size; n++ )
-	  {
-	    printf("boundbox1 %d %g %g %g %g\n", n,
-		   (RAD2DEG*rg->grid1_bound_box[n*4])/RESTR_SFAC, 
-		   (RAD2DEG*rg->grid1_bound_box[n*4+1])/RESTR_SFAC,
-		   (RAD2DEG*rg->grid1_bound_box[n*4+2])/RESTR_SFAC,
-		   (RAD2DEG*rg->grid1_bound_box[n*4+3])/RESTR_SFAC);
-	  }
-      
 
       for ( nele = 0; nele < rg->grid2_size; nele++ )
 	{
@@ -2522,7 +2502,6 @@ void grid_search_nbr(remapgrid_t *rg, int * restrict nbr_add, double * restrict 
       nbr_dist[n] = BIGNUM;
     }
 
-  // printf("%g %g  min %d  max %d  range %d\n", plon, plat, min_add, max_add, max_add-min_add);
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
       /* Find distance to this point */
@@ -2609,8 +2588,8 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   long grid1_size;
   long grid2_size;
   long n;
-  long dst_add;                    /* destination address */
-  int nbr_mask[num_neighbors];    /* mask at nearest neighbors */
+  long dst_add;                   /* destination address                     */
+  int nbr_mask[num_neighbors];    /* mask at nearest neighbors               */
   int nbr_add[num_neighbors];     /* source address at nearest neighbors     */
   double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors */
   double coslat_dst;       /* cos(lat) of destination grid point */
@@ -2648,7 +2627,6 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
     }
 
   /* Loop over destination grid  */
-
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
@@ -2678,7 +2656,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 
       /*
          Compute weights based on inverse distance
-         if mask is false, eliminate those points
+	 if mask is false, eliminate those points
       */
       dist_tot = ZERO;
       for ( n = 0; n < num_neighbors; n++ )

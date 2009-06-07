@@ -11,10 +11,15 @@ typedef RESTR_TYPE restr_t;
 #  define RESTR_ABS(x)   fabs(x)
 #endif
 */
+
 #  define RESTR_SFAC     100000000
 #  define RESTR_SCALE(x) ((int) (0.5+RESTR_SFAC*(x)))
 #  define RESTR_ABS(x)   abs(x)
-
+/*
+#  define RESTR_SFAC     1.
+#  define RESTR_SCALE(x) (x)
+#  define RESTR_ABS(x)   fabs(x)
+*/
 
 #define  NORM_OPT_NONE      1
 #define  NORM_OPT_DESTAREA  2
