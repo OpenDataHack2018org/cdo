@@ -1676,7 +1676,7 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
 
   /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
-  double vec2_lat, vec2_lon, cross_product/*, cross_product_last = 0*/;
+  double vec2_lat, vec2_lon, cross_product;
   double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
   double dist_min, distance; /* For computing dist-weighted avg */
   int scross[4], scross_last = 0;
@@ -1685,9 +1685,8 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
   rlat = RESTR_SCALE(plat);
   rlon = RESTR_SCALE(plon);
 
-  /*
-    Restrict search first using bins
-  */
+  /* Restrict search first using bins */
+
   for ( n = 0; n < 4; n++ ) src_add[n] = 0;
 
   min_add = rg->grid1_size-1;
@@ -1704,28 +1703,22 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
 	}
     }
  
-  /*
-    Now perform a more detailed search 
-  */
+  /* Now perform a more detailed search */
+
   nx = src_grid_dims[0];
   ny = src_grid_dims[1];
 
   /* srch_loop */
-  /* Unvectorized loop: break and return */
   for ( srch_add = min_add; srch_add <= max_add; srch_add++ )
     {
       srch_add4 = srch_add*4;
-      /*
-	First check bounding box
-      */
+      /* First check bounding box */
       if ( rlat >= src_grid_bound_box[srch_add4  ] && 
            rlat <= src_grid_bound_box[srch_add4+1] &&
            rlon >= src_grid_bound_box[srch_add4+2] &&
 	   rlon <= src_grid_bound_box[srch_add4+3] )
 	{
-	  /*
-	    We are within bounding box so get really serious
-	  */
+	  /* We are within bounding box so get really serious */
 
           /* Determine neighbor addresses */
           j = srch_add/nx;
@@ -1764,9 +1757,7 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
           src_lons[2] = src_center_lon[ne_add];
           src_lons[3] = src_center_lon[n_add];
 
-	  /*
-	     For consistency, we must make sure all lons are in same 2pi interval
-	  */
+	  /* For consistency, we must make sure all lons are in same 2pi interval */
           vec1_lon = src_lons[0] - plon;
           if      ( vec1_lon >  PI ) src_lons[0] -= PI2;
           else if ( vec1_lon < -PI ) src_lons[0] += PI2;
@@ -1804,17 +1795,9 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
 
 	      cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
 
-	      /*
-		If cross product is less than ZERO, this cell doesn't work
-	      */
+	      /* If cross product is less than ZERO, this cell doesn't work    */
 	      /* 2008-10-16 Uwe Schulzweida: bug fix for cross_product eq zero */
-	      /*
-	      if ( n == 0 ) cross_product_last = cross_product;
 
-	      if ( cross_product*cross_product_last < ZERO ) break;
-
-	      cross_product_last = cross_product;
-	      */
 	      scross[n] = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
 
 	      if ( n == 0 ) scross_last = scross[n];
@@ -1828,13 +1811,11 @@ void grid_search(remapgrid_t *rg, int * restrict src_add, double * restrict src_
 	  if ( n >= 4 )
 	    {
 	      n = 0;
-	      if      ( scross[0]>=0&&scross[1]>=0&&scross[2]>=0&&scross[3]>=0 ) n = 4;
-	      else if ( scross[0]<=0&&scross[1]<=0&&scross[2]<=0&&scross[3]<=0 ) n = 4;
+	      if      ( scross[0]>=0 && scross[1]>=0 && scross[2]>=0 && scross[3]>=0 ) n = 4;
+	      else if ( scross[0]<=0 && scross[1]<=0 && scross[2]<=0 && scross[3]<=0 ) n = 4;
 	    }
 
-	  /*
-	    If cross products all same sign, we found the location
-	  */
+	  /* If cross products all same sign, we found the location */
           if ( n >= 4 )
 	    {
 	      src_add[0] = srch_add + 1;
