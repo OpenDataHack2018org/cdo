@@ -11,6 +11,7 @@ cdo_SOURCES = Arith.c		\
 	      Cat.c		\
 	      CDItest.c		\
 	      Change.c		\
+	      Change_e5slm.c	\
 	      Comp.c 		\
 	      Compc.c 		\
 	      Cond.c 		\

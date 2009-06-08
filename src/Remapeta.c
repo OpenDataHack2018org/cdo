@@ -120,7 +120,7 @@ long ncctop(long nlev, long nlevp1, double *vct_a, double *vct_b)
 static
 void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval)
 {
-  int i;
+  long i;
   double xmin =  DBL_MAX;
   double xmax = -DBL_MAX;
 

@@ -43,6 +43,7 @@ void *Arithlat(void *argument);
 void *Cat(void *argument);
 void *CDItest(void *argument);
 void *Change(void *argument);
+void *Change_e5slm(void *argument);
 void *Comp(void *argument);
 void *Compc(void *argument);
 void *Cond(void *argument);
@@ -247,6 +248,7 @@ void *Wct(void *argument);
 #define  CatOperators           {"cat"}
 #define  CDItestOperators       {"ncopy"}
 #define  ChangeOperators        {"chcode", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
+#define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
 #define  CondOperators          {"ifthen",  "ifnotthen"}
@@ -486,6 +488,7 @@ static MODULES Modules[] =
   { Cat,            CopyHelp,          CatOperators,           -1,  1 },
   { CDItest,        NULL,              CDItestOperators,        1,  1 },
   { Change,         ChangeHelp,        ChangeOperators,         1,  1 },
+  { Change_e5slm,   NULL,              Change_e5slmOperators,   1,  1 },
   { Comp,           CompHelp,          CompOperators,           2,  1 },
   { Compc,          CompcHelp,         CompcOperators,          1,  1 },
   { Cond,           CondHelp,          CondOperators,           2,  1 },
