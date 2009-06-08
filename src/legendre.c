@@ -306,10 +306,12 @@ void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc
 
 void sp2fc(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc, int nt)
 {
-  int lev, jmm, jfc, lat, nsp2;
+  long lev, jmm, jfc, lat, nsp2;
   double sar, sai;
-  double *far, *fai, *pol;
-  double *sal, *fal;
+  double *fal;
+  double * restrict far, * restrict fai;
+  const double * restrict pol;
+  const double * restrict sal;
 
   nsp2 = (nt+1)*(nt+2);
 
