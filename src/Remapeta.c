@@ -39,15 +39,16 @@
 #include <stdio.h>
 
 
-void hetaeta(int ltq, int ngp, int *imiss,
-	     int nlev1, double *ah1, double *bh1,
-             double *fis1, double *ps1, 
-             double *t1, double *q1,
-             int nlev2, double *ah2, double *bh2, 
-             double *fis2, double *ps2, 
-             double *t2, double *q2,
-	     int nvars, double **vars1, double **vars2,
-	     double *tscor, double *pscor, double *secor);
+void hetaeta(int ltq, int ngp, const int *imiss,
+	     int nlev1, const double *ah1, const double *bh1,
+             const double *fis1, const double *ps1, 
+             const double *t1, const double *q1,
+             int nlev2, const double *ah2, const double *bh2, 
+             const double *fis2, double * restrict ps2, 
+             double * restrict t2, double * restrict q2,
+	     int nvars, double **vars1, double ** restrict vars2,
+	     double * restrict tscor, double * restrict pscor,
+	     double * restrict secor);
 
 
 static 

@@ -31,9 +31,9 @@ FILE *old, *new;
 #endif
 
 
-static int int_index(int n, double *x1, double x2)
+static long int_index(long n, double *x1, double x2)
 {
-  int klo, khi, k;
+  long klo, khi, k;
 
   klo = 0;
   khi = n-1;
@@ -79,24 +79,25 @@ static double esat(double temperature)
 #define MAX_VARS  512
 
 /* Source from INTERA */
-void hetaeta(int ltq, int ngp, int *imiss,
-	     int nlev1, double *ah1, double *bh1,
-             double *fis1, double *ps1, 
-             double *t1, double *q1,
-             int nlev2, double *ah2, double *bh2, 
-             double *fis2, double *ps2, 
-             double *t2, double *q2,
-	     int nvars, double **vars1, double **vars2,
-	     double *tscor, double *pscor, double *secor)
+void hetaeta(int ltq, int ngp, const int *imiss,
+	     int nlev1, const double *ah1, const double *bh1,
+             const double *fis1, const double *ps1, 
+             const double *t1, const double *q1,
+             int nlev2, const double *ah2, const double *bh2, 
+             const double *fis2, double * restrict ps2, 
+             double * restrict t2, double * restrict q2,
+	     int nvars, const double **vars1, double ** restrict vars2,
+	     double * restrict tscor, double * restrict pscor,
+	     double * restrict secor)
 {
   static char func[] = "hetaeta";
   double epsm1i, zdff, zdffl, ztv, zb, zbb, zc, zps;
   double zsump, zsumpp, zsumt, zsumtp;
   double dfi, fiadj = 0, dteta = 0;
   double pbl_lim, pbl_lim_need;
-  int jblt, jjblt;
-  int k, iv, ij, ijk, ijk1, ijk2;
-  int jlev = 0, jlevr = 0, jnop;
+  long jblt, jjblt;
+  long k, iv, ij, ijk, ijk1, ijk2;
+  long jlev = 0, jlevr = 0, jnop;
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
   double *af1, *bf1, *etaf1, *pf1, *lnpf1;
   double *tv1, *theta1, *rh1;
@@ -108,12 +109,12 @@ void hetaeta(int ltq, int ngp, int *imiss,
   double *rh2;
   double *w1, *w2;
   double *wgt;
-  int *idx;
-  int *jl1, *jl2;
-  int nlev1p1;
-  int nlev2p1;
+  long *idx;
+  long *jl1, *jl2;
+  long nlev1p1;
+  long nlev2p1;
   int lpsmod = 1;
-  int klo;
+  long klo;
   double zq1, zt1;
   double rair_d_cpair;
 #if defined (_OPENMP)
@@ -122,8 +123,9 @@ void hetaeta(int ltq, int ngp, int *imiss,
   double **rh_pbl_2, **theta_pbl_2, **rh2_2;
   double **wgt_2;
   double ***vars_pbl_2;
-  int **idx_2;
-  int ompthID, i;
+  long **idx_2;
+  int ompthID;
+  long i;
   extern int ompNumThreads;
   double *vars_pbl[MAX_VARS];
 #else
@@ -160,7 +162,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
   pf2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
   rh2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
   wgt_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  idx_2    = (int **)    malloc(ompNumThreads*sizeof(int *));
+  idx_2    = (long **)    malloc(ompNumThreads*sizeof(long *));
 
   if ( ltq )
     {
@@ -193,7 +195,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
       pf2_2[i]    = (double *) malloc(nlev2*sizeof(double));
       rh2_2[i]    = (double *) malloc(nlev2*sizeof(double));
       wgt_2[i]    = (double *) malloc(nlev2*sizeof(double));
-      idx_2[i]    = (int *)    malloc(nlev2*sizeof(int));
+      idx_2[i]    = (long *)    malloc(nlev2*sizeof(long));
 
       if ( ltq )
 	{
@@ -234,7 +236,7 @@ void hetaeta(int ltq, int ngp, int *imiss,
   /* lnpf2  = (double *) malloc(nlev2*sizeof(double)); */
   rh2    = (double *) malloc(nlev2*sizeof(double));
   wgt    = (double *) malloc(nlev2*sizeof(double));
-  idx    = (int *)   malloc(nlev2*sizeof(int));
+  idx    = (long *)   malloc(nlev2*sizeof(long));
 
   if ( ltq )
     {
@@ -262,8 +264,8 @@ void hetaeta(int ltq, int ngp, int *imiss,
 
   w1     = (double *) malloc(nlev2*sizeof(double));
   w2     = (double *) malloc(nlev2*sizeof(double));
-  jl1    = (int *)    malloc(nlev2*sizeof(int));
-  jl2    = (int *)    malloc(nlev2*sizeof(int));
+  jl1    = (long *)    malloc(nlev2*sizeof(long));
+  jl2    = (long *)    malloc(nlev2*sizeof(long));
 
 
   /******* set coordinate system ETA's, A's, B's
