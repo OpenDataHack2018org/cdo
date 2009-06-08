@@ -213,6 +213,7 @@ src/Arithlat.c -text
 src/CDItest.c -text
 src/Cat.c -text
 src/Change.c -text
+src/Change_e5slm.c -text
 src/Comp.c -text
 src/Compc.c -text
 src/Cond.c -text
