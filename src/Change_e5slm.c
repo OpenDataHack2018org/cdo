@@ -66,8 +66,6 @@ void *Change_e5slm(void *argument)
   double minval, maxval;
   double *array = NULL;
   double *cland = NULL;
-  double *lake = NULL;
-  double *work = NULL;
 
   cdoInitialize(argument);
 
@@ -100,9 +98,8 @@ void *Change_e5slm(void *argument)
 
   gridsize = gridInqSize(vlistInqVarGrid(vlistIDslm, 0));
 
+  array = (double *) malloc(gridsize*sizeof(double));
   cland = (double *) malloc(gridsize*sizeof(double));
-  lake  = (double *) malloc(gridsize*sizeof(double));
-  work  = (double *) malloc(gridsize*sizeof(double));
   lsea  = (short *)  malloc(gridsize*sizeof(short));
 
   streamInqTimestep(streamIDslm, 0);
@@ -158,8 +155,6 @@ void *Change_e5slm(void *argument)
       codes[varID] = code;
     }
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  array = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -212,7 +207,10 @@ void *Change_e5slm(void *argument)
   streamClose(streamID1);
   streamClose(streamID2);
 
-  if ( array ) free(array);
+  free(array);
+  free(cland);
+  free(lsea);
+  free(codes);
 
   cdoFinish();
 
