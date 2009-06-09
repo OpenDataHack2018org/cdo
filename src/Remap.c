@@ -660,11 +660,18 @@ void *Remap(void *argument)
 		  */
 		  if ( gridInqType(gridID1) != GRID_CELL && lremap_num_srch_bins == FALSE )
 		    {
-		      int maxbins = 720;
-		      int ysize1 = gridInqYsize(gridID1);
-		      remap_num_srch_bins = ysize1/2 + ysize1%2;
-		      if ( remap_num_srch_bins > maxbins ) remap_num_srch_bins = maxbins;
-		      if ( remap_num_srch_bins < 1 )       remap_num_srch_bins = 1;
+		      if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
+			{
+			  remap_num_srch_bins = 1;
+			}
+		      else
+			{
+			  int maxbins = 720;
+			  int ysize1 = gridInqYsize(gridID1);
+			  remap_num_srch_bins = ysize1/2 + ysize1%2;
+			  if ( remap_num_srch_bins > maxbins ) remap_num_srch_bins = maxbins;
+			  if ( remap_num_srch_bins < 1 )       remap_num_srch_bins = 1;
+			}
 		    }
 
 		  remaps[r].grid.restrict_type = remap_restrict_type;
