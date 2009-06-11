@@ -534,8 +534,6 @@ double  gridInqYpole(int gridID);
 void    gridDefYpole(int gridID, double ypole);
 double  gridInqAngle(int gridID);
 void    gridDefAngle(int gridID, double angle);
-double  gridInqNpole(int gridID);
-void    gridDefNpole(int gridID, double npole);
 void    gridDefTrunc(int gridID, int trunc);
 int     gridInqTrunc(int gridID);
 /* Hexagonal GME grid */
