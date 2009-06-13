@@ -660,7 +660,7 @@ void *Remap(void *argument)
 		  */
 		  if ( gridInqType(gridID1) != GRID_CELL && lremap_num_srch_bins == FALSE )
 		    {
-		      if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
+		      if ( !remap_extrapolate && (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) )
 			{
 			  remap_num_srch_bins = 1;
 			}
