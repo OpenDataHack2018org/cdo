@@ -48,7 +48,7 @@ void *Diff(void *argument)
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[128];
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   int lfunc;
   double *array1, *array2;
   double absm, relm;
@@ -88,10 +88,10 @@ void *Diff(void *argument)
   if ( ! cdoSilentMode )
     {
       if ( operatorID == DIFFV )
-	fprintf(stdout, "               Date  Time Varname     Level    Size    Miss :"
+	fprintf(stdout, "               Date  Time    Varname     Level    Size    Miss :"
 		" S Z  Max_Absdiff Max_Reldiff\n");
       else if ( operatorID == DIFF )
-	fprintf(stdout, "               Date  Time Code  Level    Size    Miss :"
+	fprintf(stdout, "               Date  Time    Code  Level    Size    Miss :"
 		" S Z  Max_Absdiff Max_Reldiff\n");
     }
 
@@ -107,7 +107,7 @@ void *Diff(void *argument)
 	  vtime = taxisInqVtime(taxisID);
 
 	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute);
+	  decode_time(vtime, &hour, &minute, &second);
 	}
 
       nrecs2 = streamInqTimestep(streamID2, tsID);
@@ -134,11 +134,11 @@ void *Diff(void *argument)
 		if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID1, varname);
 		
 		if ( operatorID == DIFFV )
-		  fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %-8s ",
-			  indg, year, month, day, hour, minute, varname);
+		  fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %-8s ",
+			  indg, year, month, day, hour, minute, second, varname);
 		else if ( operatorID == DIFF )
-		  fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %3d",
-			  indg, year, month, day, hour, minute, code);
+		  fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d",
+			  indg, year, month, day, hour, minute, second, code);
 
 		fprintf(stdout, " %7g ", zaxisInqLevel(zaxisID, levelID));
 	      }

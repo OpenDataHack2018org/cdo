@@ -167,7 +167,7 @@ void intgrid(FIELD *field1, FIELD *field2)
 
 	  for ( ilat = 0; ilat < nlatIn; ilat++ )
 	    {
-	      fieldIn[ilat] = array + ilat*(nlonIn+1);;	  
+	      fieldIn[ilat] = array + ilat*(nlonIn+1);  
 	      memcpy(fieldIn[ilat], field[ilat], nlonIn*sizeof(double));
 	      fieldIn[ilat][nlonIn] = fieldIn[ilat][0];
 	      lonIn[nlonIn] = lonIn[0] + 360;

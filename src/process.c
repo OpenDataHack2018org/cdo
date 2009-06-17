@@ -775,8 +775,8 @@ int cdoOperatorAdd(const char *name, int func, int intval, const char *enter)
 
   if ( operID < MAX_OPERATOR )
     {
-      Process[processID].Operator[operID].func   = func;;
-      Process[processID].Operator[operID].intval = intval;;
+      Process[processID].Operator[operID].func   = func;
+      Process[processID].Operator[operID].intval = intval;
       Process[processID].Operator[operID].name   = name;
       Process[processID].Operator[operID].enter  = enter;
 

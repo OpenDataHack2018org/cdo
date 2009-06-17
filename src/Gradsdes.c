@@ -402,9 +402,9 @@ void *Gradsdes(void *argument)
   double *levels, level0, levinc = 0;
   double missval = 0;
   char Time[30], Incr[10] = {"1mn"}, *IncrKey[] = {"mn","hr","dy","mo","yr"};
-  int imn, ihh, iyy, imm, idd;
-  int imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
-  int imn0 = 0, ihh0 = 0, iyy0 = 0, imm0 = 0, idd0 = 0;
+  int isd, imn, ihh, iyy, imm, idd;
+  int isds = 0, imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
+  int isd0 = 0, imn0 = 0, ihh0 = 0, iyy0 = 0, imm0 = 0, idd0 = 0;
   int idmn, idhh, idmm, idyy, iddd;
   int dt=1, iik=0, mdt = 0;
   int gridsize = 0;
@@ -610,7 +610,7 @@ void *Gradsdes(void *argument)
 
       if ( tsID == 0 )
 	{
-	  decode_time(vtime, &ihhs, &imns);
+	  decode_time(vtime, &ihhs, &imns, &isds);
 	  decode_date(vdate, &iyys, &imms, &idds);
      
 	  if ( imms < 1 || imms > 12 )  imms=1;
@@ -624,7 +624,7 @@ void *Gradsdes(void *argument)
 
       if ( tsID == 1 )
 	{
-	  decode_time(vtime, &ihh, &imn);
+	  decode_time(vtime, &ihh, &imn, &isd);
 	  decode_date(vdate, &iyy, &imm, &idd);
 
 	  idmn = imn - imns;
@@ -663,7 +663,7 @@ void *Gradsdes(void *argument)
 
       if ( tsID > 0 && tsID < 6 && iik != 3 && (monavg == TRUE || monavg == -1) )
 	{
-	  decode_time(vtime, &ihh, &imn);
+	  decode_time(vtime, &ihh, &imn, &isd);
 	  decode_date(vdate, &iyy, &imm, &idd);
 
 	  idmn = imn - imns;

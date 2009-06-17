@@ -391,7 +391,7 @@ void *Importgrads(void *argument)
 		     tsID+1, dtim.yr, dtim.mo, dtim.dy, dtim.hr, dtim.mn);
 
 	  vdate = encode_date(dtim.yr, dtim.mo, dtim.dy);
-	  vtime = encode_time(dtim.hr, dtim.mn);
+	  vtime = encode_time(dtim.hr, dtim.mn, 0);
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
 	  streamDefTimestep(streamID, tsID);

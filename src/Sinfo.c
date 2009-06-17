@@ -343,7 +343,7 @@ void *Sinfo(void *argument)
   int streamID = 0;
   int vlistID;
   int prec;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   char pstr[4];
 
   cdoInitialize(argument);
@@ -518,10 +518,10 @@ void *Sinfo(void *argument)
 		  vtime = taxisInqRtime(taxisID);
 
 		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute);
+		  decode_time(vtime, &hour, &minute, &second);
 
-		  fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d",
-			  year, month, day, hour, minute);
+		  fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+			  year, month, day, hour, minute, second);
 		      
 		  unit = taxisInqTunit(taxisID);
 		  if ( unit != CDI_UNDEFID )
@@ -563,7 +563,7 @@ void *Sinfo(void *argument)
 		}
 	    }
 
-	  fprintf(stdout, "   YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm\n");
+	  fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
 
 	  ntimeout = 0;
 	  tsID = 0;
@@ -579,9 +579,10 @@ void *Sinfo(void *argument)
 	      vtime = taxisInqVtime(taxisID);
 
 	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute);
+	      decode_time(vtime, &hour, &minute, &second);
 
-	      fprintf(stdout, " %6.4d-%2.2d-%2.2d %2.2d:%2.2d", year, month, day, hour, minute);
+	      fprintf(stdout, " %5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		      year, month, day, hour, minute, second);
 	      ntimeout++;
 	      tsID++;
 	    }

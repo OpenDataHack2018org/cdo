@@ -77,7 +77,7 @@ void *Settime(void *argument)
   int gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 0, incunit = 0;
-  int year = 0, month = 0, day, hour, minute;
+  int year = 0, month = 0, day, hour, minute, second;
   int day0;
   int calendar;
   int newcalendar = CALENDAR_STANDARD;
@@ -125,8 +125,8 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  sscanf(timestr, "%d:%d", &hour, &minute);
-	  stime = encode_time(hour, minute);
+	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
+	  stime = encode_time(hour, minute, second);
 	}
 
       if ( operatorArgc() == 3 )

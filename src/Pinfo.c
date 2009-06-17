@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -46,7 +46,7 @@ void *Pinfo(void *argument)
   int vlistID1, vlistID2;
   int nmiss;
   int ivals = 0, imiss = 0;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   int vdate, vtime;
   double missval;
   double *array1 = NULL, *array2 = NULL;
@@ -92,17 +92,17 @@ void *Pinfo(void *argument)
       streamDefTimestep(streamID2, tsID);
 
       decode_date(vdate, &year, &month, &day);
-      decode_time(vtime, &hour, &minute);
+      decode_time(vtime, &hour, &minute, &second);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  if ( tsID == 0 && recID == 0 )
 	    {
 	      if ( operatorID == PINFOV )
-		fprintf(stdout, "   Rec :       Date  Time Varname     Level    Size    Miss :"
+		fprintf(stdout, "   Rec :       Date  Time    Varname     Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n");
 	      else
-		fprintf(stdout, "   Rec :       Date  Time Code  Level    Size    Miss :"
+		fprintf(stdout, "   Rec :       Date  Time    Code  Level    Size    Miss :"
 			"     Minimum        Mean     Maximum\n");
 	    }
 
@@ -119,11 +119,11 @@ void *Pinfo(void *argument)
 	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
 
 	  if ( operatorID == PINFOV )
-	    fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %-8s ",
-		    indg, year, month, day, hour, minute, varname);
+	    fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %-8s ",
+		    indg, year, month, day, hour, minute, second, varname);
 	  else
-	    fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %3d",
-		    indg, year, month, day, hour, minute, code);
+	    fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d",
+		    indg, year, month, day, hour, minute, second, code);
 
 	  level = zaxisInqLevel(zaxisID, levelID);
 	  fprintf(stdout, " %7g ", level);

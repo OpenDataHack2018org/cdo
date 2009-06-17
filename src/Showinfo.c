@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ void *Showinfo(void *argument)
   int taxisID;
   int streamID;
   int vlistID;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   int month0 = 0, nmonth, year0 = 0, nyear;
   char varname[256];
   char stdname[256];
@@ -162,9 +162,10 @@ void *Showinfo(void *argument)
 	    vtime = taxisInqVtime(taxisID);
 
 	    decode_date(vdate, &year, &month, &day);
-	    decode_time(vtime, &hour, &minute);
+	    decode_time(vtime, &hour, &minute, &second);
 
-	    fprintf(stdout, " %4.4d-%2.2d-%2.2d,%2.2d:%2.2d", year, month, day, hour, minute);
+	    fprintf(stdout, " %4.4d-%2.2d-%2.2d,%2.2d:%2.2d:%2.2d",
+		    year, month, day, hour, minute, second);
 	    tsID++;
 	    nout++;
 	  }

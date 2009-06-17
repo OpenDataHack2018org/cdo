@@ -570,7 +570,7 @@ void gridboxstat(FIELD *field1, FIELD *field2, int xinc, int yinc, int statfunc)
 	  }
 
 	field.size = isize;
-	xfield2[ilat][ilon] = fldfun(field, statfunc);;
+	xfield2[ilat][ilon] = fldfun(field, statfunc);
       }
 
   nmiss = 0;

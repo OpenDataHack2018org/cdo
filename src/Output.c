@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@ void *Output(void *argument)
   int vlistID;
   int nmiss, nout;
   int nlon, nlat;
-  int hour, minute;
+  int hour, minute, second;
   int year, month, day;
   int nelem = 0;
   int index;
@@ -188,13 +188,13 @@ void *Output(void *argument)
 		    cdoAbort("operator works only with one gridpoint!");
 
 		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute);
+		  decode_time(vtime, &hour, &minute, &second);
 
 		  /*
 		  xdate  = vdate - (vdate/100)*100 + (hour*60 + minute)/1440.;
 		  */
-		  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d %12.12g\n",
-			  year, month, day, hour, minute, array[0]);
+		  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %12.12g\n",
+			  year, month, day, hour, minute, second, array[0]);
 		}
 	      else if ( operatorID == OUTPUTFLD )
 		{

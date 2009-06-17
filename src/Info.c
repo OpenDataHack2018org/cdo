@@ -234,7 +234,7 @@ void *Info(void *argument)
   int vlistID;
   int nmiss;
   int ivals = 0, imiss = 0;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   char varname[128];
   double missval;
   double *array = NULL;
@@ -271,17 +271,17 @@ void *Info(void *argument)
 	  vtime = taxisInqVtime(taxisID);
 
 	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute);
+	  decode_time(vtime, &hour, &minute, &second);
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
 		  if ( operatorID == INFOV )
-		    fprintf(stdout, "%6d :       Date  Time Varname     Level    Size    Miss :"
+		    fprintf(stdout, "%6d :       Date  Time    Varname     Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n",  -(indf+1));
 		  else
-		    fprintf(stdout, "%6d :       Date  Time Code  Level    Size    Miss :"
+		    fprintf(stdout, "%6d :       Date  Time    Code  Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n",  -(indf+1));
 		}
 
@@ -298,11 +298,11 @@ void *Info(void *argument)
 	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);
 
 	      if ( operatorID == INFOV )
-		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %-8s ",
-			indg, year, month, day, hour, minute, varname);
+		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %-8s ",
+			indg, year, month, day, hour, minute, second, varname);
 	      else
-		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d %3d",
-			indg, year, month, day, hour, minute, code);
+		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d",
+			indg, year, month, day, hour, minute, second, code);
 
 	      level = zaxisInqLevel(zaxisID, levelID);
 	      fprintf(stdout, " %7g ", level);

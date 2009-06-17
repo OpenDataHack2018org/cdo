@@ -118,8 +118,8 @@ void printBounds(int taxisID, int calendar)
 {
   int vdate0, vdate1;
   int vtime0, vtime1;
-  int year0, month0, day0, hour0, minute0;
-  int year1, month1, day1, hour1, minute1;
+  int year0, month0, day0, hour0, minute0, second0;
+  int year1, month1, day1, hour1, minute1, second1;
   INT64 lperiod;
   int incperiod = 0, incunit = 0;
   juldate_t juldate1, juldate0;
@@ -131,13 +131,15 @@ void printBounds(int taxisID, int calendar)
   taxisInqVtimeBounds(taxisID, &vtime0, &vtime1);
 
   decode_date(vdate0, &year0, &month0, &day0);
-  decode_time(vtime0, &hour0, &minute0);
+  decode_time(vtime0, &hour0, &minute0, &second0);
 
   decode_date(vdate1, &year1, &month1, &day1);
-  decode_time(vtime1, &hour1, &minute1);
+  decode_time(vtime1, &hour1, &minute1, &second1);
 
-  fprintf(stdout, "%6.4d-%2.2d-%2.2d %2.2d:%2.2d", year0, month0, day0, hour0, minute0);
-  fprintf(stdout, "%6.4d-%2.2d-%2.2d %2.2d:%2.2d", year1, month1, day1, hour1, minute1);
+  fprintf(stdout, "%5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	  year0, month0, day0, hour0, minute0, second0);
+  fprintf(stdout, "%5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	  year1, month1, day1, hour1, minute1, second1);
 
   juldate0  = juldate_encode(calendar, vdate0, vtime0);
   juldate1  = juldate_encode(calendar, vdate1, vtime1);
@@ -165,8 +167,8 @@ void *Tinfo(void *argument)
   int taxisID;
   int streamID;
   int vlistID;
-  int year0, month0, day0, hour0, minute0;
-  int year, month, day, hour, minute;
+  int year0, month0, day0, hour0, minute0, second0;
+  int year, month, day, hour, minute, second;
   int calendar, unit;
   int incperiod0 = 0, incunit0 = 0;
   int incperiod1 = 0, incunit1 = 0;
@@ -210,10 +212,10 @@ void *Tinfo(void *argument)
 	      vtime = taxisInqRtime(taxisID);
 	      
 	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute);
+	      decode_time(vtime, &hour, &minute, &second);
 
-	      fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d",
-		      year, month, day, hour, minute);
+	      fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		      year, month, day, hour, minute, second);
 		      
 	      unit = taxisInqTunit(taxisID);
 	      if ( unit != CDI_UNDEFID ) printTunit(unit);
@@ -228,9 +230,9 @@ void *Tinfo(void *argument)
       calendar = taxisInqCalendar(taxisID);
 
       if ( taxisHasBounds(taxisID) ) 
-	fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement  YYYY-MM-DD hh:mm  YYYY-MM-DD hh:mm  Difference\n");
+	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Inrement YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss  Difference\n");
       else
-	fprintf(stdout, "\nTimestep  YYYY-MM-DD hh:mm   Inrement\n");
+	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Inrement\n");
 
       tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -239,15 +241,16 @@ void *Tinfo(void *argument)
 	  vtime = taxisInqVtime(taxisID);
 	  
 	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute);
+	  decode_time(vtime, &hour, &minute, &second);
 
-	  fprintf(stdout, "%6d  %6.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID+1, year, month, day, hour, minute);
+	  fprintf(stdout, "%6d  %5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		  tsID+1, year, month, day, hour, minute, second);
 	  if ( tsID )
 	    {
 	      int deltam, deltay;
 
 	      decode_date(vdate0, &year0, &month0, &day0);
-	      decode_time(vtime0, &hour0, &minute0);
+	      decode_time(vtime0, &hour0, &minute0, &second0);
 
 	      juldate0  = juldate_encode(calendar, vdate0, vtime0);
 	      juldate   = juldate_encode(calendar, vdate, vtime);
@@ -392,9 +395,10 @@ void *Tinfo(void *argument)
 	      vtime = vtimem[igap][its];
 
 	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute);
+	      decode_time(vtime, &hour, &minute, &second);
 
-	      fprintf(stdout, "   %4.4d-%2.2d-%2.2d %2.2d:%2.2d", year, month, day, hour, minute);
+	      fprintf(stdout, "   %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		      year, month, day, hour, minute, second);
 	      ntimeout++;
 	      tsID++;
 	    }

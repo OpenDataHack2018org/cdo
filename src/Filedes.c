@@ -132,7 +132,7 @@ void *Filedes(void *argument)
   else if ( operatorID == TAXISDES )
     {
       int vdate, vtime, ntsteps, nrecs;
-      int year, month, day, hour, minute;
+      int year, month, day, hour, minute, second;
       int taxisID, tsID;
 
       taxisID = vlistInqTaxis(vlistID);
@@ -166,10 +166,10 @@ void *Filedes(void *argument)
 		  vtime = taxisInqRtime(taxisID);
 
 		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute);
+		  decode_time(vtime, &hour, &minute, &second);
 
-		  fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d",
-			  year, month, day, hour, minute);
+		  fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+			  year, month, day, hour, minute, second);
 		      
 		  unit = taxisInqTunit(taxisID);
 		  if ( unit != CDI_UNDEFID )
@@ -211,8 +211,8 @@ void *Filedes(void *argument)
 		}
 	    }
 
-	  fprintf(stdout, "  time verification time        lower bound        upper bound\n");
-	  fprintf(stdout, "  step  YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm   YYYY-MM-DD hh:mm\n");
+	  fprintf(stdout, "  time verification time           lower bound           upper bound\n");
+	  fprintf(stdout, "  step  YYYY-MM-DD hh:mm:ss   YYYY-MM-DD hh:mm:ss   YYYY-MM-DD hh:mm:ss\n");
 
 	  tsID = 0;
 	  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -221,10 +221,11 @@ void *Filedes(void *argument)
 	      vtime = taxisInqVtime(taxisID);
 
 	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute);
+	      decode_time(vtime, &hour, &minute, &second);
 
 	      tsID++;
-	      fprintf(stdout, " %5d %4.4d-%2.2d-%2.2d %2.2d:%2.2d", tsID, year, month, day, hour, minute);
+	      fprintf(stdout, " %5d %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		      tsID, year, month, day, hour, minute, second);
 	      fprintf(stdout, "\n");
 	    }
 	}

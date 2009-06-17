@@ -178,7 +178,7 @@ void *Fldstat(void *argument)
 		    if ( j < nlat )
 		      {
 			int vdate, vtime, code;
-			int year, month, day, hour, minute;
+			int year, month, day, hour, minute, second;
 			double level;
 			double xval, yval;
 			xval = gridInqXval(field.grid, i);
@@ -186,19 +186,19 @@ void *Fldstat(void *argument)
 			vdate = taxisInqVdate(taxisID1);
 			vtime = taxisInqVtime(taxisID1);
 			decode_date(vdate, &year, &month, &day);
-			decode_time(vtime, &hour, &minute);
+			decode_time(vtime, &hour, &minute, &second);
 			code = vlistInqVarCode(vlistID1, varID);
 			level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
 			if ( tsID == 0 && recID == 0 )
 			  {
 			    if ( operfunc == func_min )
-			      fprintf(stdout, "  Date     Time  Code  Level   Lon      Lat          Minval\n");
+			      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
 			    else
-			      fprintf(stdout, "  Date     Time  Code  Level   Lon      Lat          Maxval\n");
+			      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
 			  }
 
-			fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
-				year, month, day, hour, minute,
+			fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
+				year, month, day, hour, minute, second,
 				code, level, xval, yval, sglval);
 		      }
 		  }

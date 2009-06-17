@@ -45,7 +45,7 @@ void *Intntime(void *argument)
   int offset;
   int calendar;
   int numts, it;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   int *recVarID, *recLevelID;
   int **nmiss1, **nmiss2, nmiss3;
   double missval1, missval2;
@@ -159,9 +159,9 @@ void *Intntime(void *argument)
 		cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
 	      */
 	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute);
-	      cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d",
-		       year, month, day, hour, minute);
+	      decode_time(vtime, &hour, &minute, &second);
+	      cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		       year, month, day, hour, minute, second);
 	    }
 
 	  taxisDefVdate(taxisID2, vdate);

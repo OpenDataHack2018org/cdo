@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -142,7 +142,7 @@ void *Gengrid(void *argument)
   vlistDefVarName(vlistID3, 0, "dummy");
   vlistDefVarDatatype(vlistID3, 0, DATATYPE_INT8);
 
-  taxisID3 = taxisCreate(TAXIS_ABSOLUTE);;
+  taxisID3 = taxisCreate(TAXIS_ABSOLUTE);
 
   vlistDefTaxis(vlistID3, taxisID3);
 

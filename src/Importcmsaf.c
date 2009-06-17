@@ -234,7 +234,7 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
 
   for ( i = 0; i < ny; ++i )
     {
-      yvals[i] = ymax - i*dx - dx/2;;
+      yvals[i] = ymax - i*dx - dx/2;
       /* printf("y[%d]=%g\n", i, yvals[i]); */
     }
 
@@ -271,7 +271,7 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
 
   for ( i = 0; i < ny; ++i )
     {
-      yvals[i] = ymax - i*dx - dx/2;;
+      yvals[i] = ymax - i*dx - dx/2;
       /* printf("y[%d]=%g\n", i, yvals[i]); */
     }
 

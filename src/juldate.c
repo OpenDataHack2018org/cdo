@@ -7,11 +7,11 @@ void decode_caldaysec(int calendar, int julday, int secofday, int *year, int *mo
 
 juldate_t juldate_encode(int calendar, int date, int time)
 {
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   juldate_t juldate;
 
   decode_date(date, &year, &month, &day);
-  decode_time(time, &hour, &minute);
+  decode_time(time, &hour, &minute, &second);
 
   encode_caldaysec(calendar, year, month, day, hour, minute, 
 		   &juldate.julday, &juldate.secofday);
@@ -22,13 +22,13 @@ juldate_t juldate_encode(int calendar, int date, int time)
 
 void juldate_decode(int calendar, juldate_t juldate, int *date, int *time)
 {
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   
   decode_caldaysec(calendar, juldate.julday, juldate.secofday, 
 		   &year, &month, &day, &hour, &minute);
 
   *date = encode_date(year, month, day);
-  *time = encode_time(hour, minute);
+  *time = encode_time(hour, minute, second);
 }
 
 

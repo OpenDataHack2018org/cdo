@@ -69,7 +69,7 @@ void *Seltime(void *argument)
   int lnts1;
   int ncts = 0, nts, it;
   int *selfound = NULL;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
   double selfval = 0, *fltarr, fval = 0;
@@ -193,8 +193,9 @@ void *Seltime(void *argument)
 		}
 	      else
 		{
-		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d", &year, &month, &day, &hour, &minute);
-		  fval = encode_time(hour, minute);
+		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
+				  &year, &month, &day, &hour, &minute, &second);
+		  fval = encode_time(hour, minute, second);
 		  if ( fabs(fval) > 0 ) fval /= 10000;
 		  fval += encode_date(year, month, day);
 		  listSetFlt(flist, i, fval);

@@ -46,7 +46,7 @@ void *Inttime(void *argument)
   int offset;
   int ijulinc, incperiod = 0, incunit = 3600;
   int calendar;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   int *recVarID, *recLevelID;
   int **nmiss1, **nmiss2, nmiss3;
   const char *datestr, *timestr;
@@ -80,8 +80,8 @@ void *Inttime(void *argument)
     }
   else
     {
-      sscanf(timestr, "%d:%d", &hour, &minute);
-      vtime = encode_time(hour, minute);
+      sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
+      vtime = encode_time(hour, minute, second);
     }
 
   if ( operatorArgc() == 3 )
@@ -218,9 +218,10 @@ void *Inttime(void *argument)
 		  cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
 		  */
 		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute);
-		  cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d  %f  %d",
-			   year, month, day, hour, minute, juldate_to_seconds(juldate), calendar);
+		  decode_time(vtime, &hour, &minute, &second);
+		  cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d  %f  %d",
+			   year, month, day, hour, minute, second,
+			   juldate_to_seconds(juldate), calendar);
 		}
 
 	      taxisDefVdate(taxisID2, vdate);

@@ -562,7 +562,7 @@ void *Outputgmt(void *argument)
   int zaxisID, taxisID;
   int ninc = 1;
   int vdate, vtime;
-  int year, month, day, hour, minute;
+  int year, month, day, hour, minute, second;
   char varname[256];
   double level;
   double missval;
@@ -859,7 +859,7 @@ void *Outputgmt(void *argument)
       vtime = taxisInqVtime(taxisID);
 
       decode_date(vdate, &year, &month, &day);
-      decode_time(vtime, &hour, &minute);
+      decode_time(vtime, &hour, &minute, &second);
 
       if ( tsID == 0 && operatorID != OUTPUTTRI )
 	{
@@ -878,7 +878,7 @@ void *Outputgmt(void *argument)
 	  fprintf(stdout, "#\n");
 	  fprintf(stdout, "# File  = %s\n", cdoStreamName(0));
 	  fprintf(stdout, "# Date  = %4.4d-%2.2d-%2.2d\n", year, month, day);
-	  fprintf(stdout, "# Time  = %2.2d:%2.2d\n", hour, minute);
+	  fprintf(stdout, "# Time  = %2.2d:%2.2d:%2.2d\n", hour, minute, second);
 	  fprintf(stdout, "# Name  = %s\n", varname);
 	  fprintf(stdout, "# Code  = %d\n", code);
 	}

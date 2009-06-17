@@ -1026,8 +1026,8 @@ static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 
 	      for ( i = 0; i < nlev; i++ )
 		{
-		  start[0] = 0;      start[1] = i;;
-		  count[0] = nvals;  count[1] = 1;;     
+		  start[0] = 0;      start[1] = i;
+		  count[0] = nvals;  count[1] = 1;  
 
 		  nce(nc_inq_varid(nc_file_id, name, &nc_var_id));
 		  nce(nc_get_vara_double(nc_file_id, nc_var_id, start, count, (*vars)[varid].ptr+i*nvals));
