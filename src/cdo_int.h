@@ -52,8 +52,8 @@ char *strdup(const char *s);
 
 
 /* sxxxYYYYMMDDhhmm0 */
-#define  DATE_LEN  16        /* allocate DTLEN+1 !!!! */
-#define  SET_DATE(dtstr, date, time)        (sprintf(dtstr, "%*d%*d", DATE_LEN-4, date, 4, time))
+#define  DATE_LEN  31        /* YYYYMMDDhhmmss allocate DTLEN+1 !!!! */
+#define  SET_DATE(dtstr, date, time)      (sprintf(dtstr, "%*d%*d", DATE_LEN-6, date, 6, time))
 #define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
 

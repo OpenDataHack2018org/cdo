@@ -90,7 +90,7 @@ void *Seltime(void *argument)
   SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
   SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
   SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm:ss)");
-  SELHOUR     = cdoOperatorAdd("selhour",     func_time,   100, "hours");
+  SELHOUR     = cdoOperatorAdd("selhour",     func_time, 10000, "hours");
   SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
   SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");
   SELYEAR     = cdoOperatorAdd("selyear",     func_date, 10000, "years");
@@ -100,8 +100,8 @@ void *Seltime(void *argument)
   moddat[SELTIMESTEP] =          1;
   /*  moddat[SELDATE]     = 1000000000; */
   moddat[SELDATE]     =          0;
-  moddat[SELTIME]     =      10000;
-  moddat[SELHOUR]     =        100;
+  moddat[SELTIME]     =    1000000;
+  moddat[SELHOUR]     =      10000;
   moddat[SELDAY]      =        100;
   moddat[SELMON]      =        100;
   moddat[SELYEAR]     = 1000000000;
@@ -359,7 +359,7 @@ void *Seltime(void *argument)
 	}
       else if ( operfunc == func_datetime )
 	{
-	  selfval = vdate + vtime/10000.;
+	  selfval = vdate + vtime/1000000.;
 	}
 
       if ( operatorID == SELDATE )

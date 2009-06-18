@@ -273,7 +273,7 @@ void *EcaCfd(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_cfd", 0, 16, NULL);
+  cdoOperatorAdd("eca_cfd", 0, 31, NULL);
   
   request.var1.name     = CFD_NAME;
   request.var1.longname = CFD_LONGNAME;
@@ -301,7 +301,7 @@ void *EcaCsu(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_csu", 0, 16, NULL);
+  cdoOperatorAdd("eca_csu", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argT = atof(operatorArgv()[0]);
 
@@ -334,7 +334,7 @@ void *EcaCwdi(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_cwdi", 0, 16, NULL);
+  cdoOperatorAdd("eca_cwdi", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
@@ -377,7 +377,7 @@ void *EcaCwfi(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_cwfi", 0, 16, NULL);
+  cdoOperatorAdd("eca_cwfi", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
 
@@ -415,7 +415,7 @@ void *EcaEtr(void *argument)
   ECA_REQUEST_3 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_etr", 0, 16, NULL);
+  cdoOperatorAdd("eca_etr", 0, 31, NULL);
   
   request.name     = ETR_NAME;
   request.longname = ETR_LONGNAME;
@@ -436,7 +436,7 @@ void *EcaFd(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_fd", 0, 16, NULL);
+  cdoOperatorAdd("eca_fd", 0, 31, NULL);
   
   request.var1.name     = FD_NAME;
   request.var1.longname = FD_LONGNAME;
@@ -468,7 +468,7 @@ void *EcaGsl(void *argument)
   ECA_REQUEST_4 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_gsl", 0, 8, NULL);
+  cdoOperatorAdd("eca_gsl", 0, 10, NULL);
   
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
@@ -507,7 +507,7 @@ void *EcaHd(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_hd", 0, 16, NULL);
+  cdoOperatorAdd("eca_hd", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) 
     {
@@ -546,7 +546,7 @@ void *EcaHwdi(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_hwdi", 0, 16, NULL);
+  cdoOperatorAdd("eca_hwdi", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) argT = atof(operatorArgv()[1]);
@@ -589,7 +589,7 @@ void *EcaHwfi(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_hwfi", 0, 16, NULL);
+  cdoOperatorAdd("eca_hwfi", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argN = atoi(operatorArgv()[0]);
 
@@ -627,7 +627,7 @@ void *EcaId(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_id", 0, 16, NULL);
+  cdoOperatorAdd("eca_id", 0, 31, NULL);
 
   request.var1.name     = ID_NAME;
   request.var1.longname = ID_LONGNAME;
@@ -657,7 +657,7 @@ void *EcaSu(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_su", 0, 16, NULL);
+  cdoOperatorAdd("eca_su", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argT = atof(operatorArgv()[0]);
   longname = (char *) malloc(strlen(SU_LONGNAME) + 40);
@@ -690,7 +690,7 @@ void *EcaTg10p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tg10p", 0, 16, NULL);
+  cdoOperatorAdd("eca_tg10p", 0, 31, NULL);
 
   request.var1.name     = TG10P_NAME;
   request.var1.longname = TG10P_LONGNAME;
@@ -715,7 +715,7 @@ void *EcaTg90p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tg90p", 0, 16, NULL);
+  cdoOperatorAdd("eca_tg90p", 0, 31, NULL);
 
   request.var1.name     = TG90P_NAME;
   request.var1.longname = TG90P_LONGNAME;
@@ -740,7 +740,7 @@ void *EcaTn10p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tn10p", 0, 16, NULL);
+  cdoOperatorAdd("eca_tn10p", 0, 31, NULL);
 
   request.var1.name     = TN10P_NAME;
   request.var1.longname = TN10P_LONGNAME;
@@ -765,7 +765,7 @@ void *EcaTn90p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tn90p", 0, 16, NULL);
+  cdoOperatorAdd("eca_tn90p", 0, 31, NULL);
 
   request.var1.name     = TN90P_NAME;
   request.var1.longname = TN90P_LONGNAME;
@@ -793,7 +793,7 @@ void *EcaTr(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tr", 0, 16, NULL);
+  cdoOperatorAdd("eca_tr", 0, 31, NULL);
 
   if ( operatorArgc() > 0 ) argT = atof(operatorArgv()[0]);
   longname = (char *) malloc(strlen(TR_LONGNAME) + 40);
@@ -826,7 +826,7 @@ void *EcaTx10p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tx10p", 0, 16, NULL);
+  cdoOperatorAdd("eca_tx10p", 0, 31, NULL);
 
   request.var1.name     = TX10P_NAME;
   request.var1.longname = TX10P_LONGNAME;
@@ -851,7 +851,7 @@ void *EcaTx90p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_tx90p", 0, 16, NULL);
+  cdoOperatorAdd("eca_tx90p", 0, 31, NULL);
  
   request.var1.name     = TX90P_NAME;
   request.var1.longname = TX90P_LONGNAME;
@@ -879,7 +879,7 @@ void *EcaCdd(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_cdd", 0, 16, NULL);
+  cdoOperatorAdd("eca_cdd", 0, 31, NULL);
 
   request.var1.name     = CDD_NAME;
   request.var1.longname = CDD_LONGNAME;
@@ -911,7 +911,7 @@ void *EcaCwd(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_cwd", 0, 16, NULL);
+  cdoOperatorAdd("eca_cwd", 0, 31, NULL);
 
   request.var1.name     = CWD_NAME;
   request.var1.longname = CWD_LONGNAME;
@@ -943,7 +943,7 @@ void *EcaR10mm(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r10mm", 0, 16, NULL);
+  cdoOperatorAdd("eca_r10mm", 0, 31, NULL);
   
   request.var1.name     = R10MM_NAME;
   request.var1.longname = R10MM_LONGNAME;
@@ -970,7 +970,7 @@ void *EcaR20mm(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r20mm", 0, 16, NULL);
+  cdoOperatorAdd("eca_r20mm", 0, 31, NULL);
 
   request.var1.name     = R20MM_NAME;
   request.var1.longname = R20MM_LONGNAME;
@@ -997,7 +997,7 @@ void *EcaR75p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r75p", 0, 16, NULL);
+  cdoOperatorAdd("eca_r75p", 0, 31, NULL);
 
   request.var1.name     = R75P_NAME;
   request.var1.longname = R75P_LONGNAME;
@@ -1023,7 +1023,7 @@ void *EcaR75ptot(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r75ptot", 0, 16, NULL);
+  cdoOperatorAdd("eca_r75ptot", 0, 31, NULL);
 
   request.var1.name     = R75PTOT_NAME;
   request.var1.longname = R75PTOT_LONGNAME;
@@ -1049,7 +1049,7 @@ void *EcaR90p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r90p", 0, 16, NULL);
+  cdoOperatorAdd("eca_r90p", 0, 31, NULL);
 
   request.var1.name     = R90P_NAME;
   request.var1.longname = R90P_LONGNAME;
@@ -1075,7 +1075,7 @@ void *EcaR90ptot(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r90ptot", 0, 16, NULL);
+  cdoOperatorAdd("eca_r90ptot", 0, 31, NULL);
 
   request.var1.name     = R90PTOT_NAME;
   request.var1.longname = R90PTOT_LONGNAME;
@@ -1101,7 +1101,7 @@ void *EcaR95p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r95p", 0, 16, NULL);
+  cdoOperatorAdd("eca_r95p", 0, 31, NULL);
 
   request.var1.name     = R95P_NAME;
   request.var1.longname = R95P_LONGNAME;
@@ -1127,7 +1127,7 @@ void *EcaR95ptot(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r95ptot", 0, 16, NULL);
+  cdoOperatorAdd("eca_r95ptot", 0, 31, NULL);
 
   request.var1.name     = R95PTOT_NAME;
   request.var1.longname = R95PTOT_LONGNAME;
@@ -1153,7 +1153,7 @@ void *EcaR99p(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r99p", 0, 16, NULL);
+  cdoOperatorAdd("eca_r99p", 0, 31, NULL);
 
   request.var1.name     = R99P_NAME;
   request.var1.longname = R99P_LONGNAME;
@@ -1179,7 +1179,7 @@ void *EcaR99ptot(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r99ptot", 0, 16, NULL);
+  cdoOperatorAdd("eca_r99ptot", 0, 31, NULL);
 
   request.var1.name     = R99PTOT_NAME;
   request.var1.longname = R99PTOT_LONGNAME;
@@ -1205,7 +1205,7 @@ void *EcaRr1(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_rr1", 0, 16, NULL);
+  cdoOperatorAdd("eca_rr1", 0, 31, NULL);
 
   request.var1.name     = RR1_NAME;
   request.var1.longname = RR1_LONGNAME;
@@ -1235,12 +1235,12 @@ void *EcaRx1day(void *argument)
   if ( operatorArgc() > 0 )
     {
       if ( 'm' == operatorArgv()[0][0] )
-        cdoOperatorAdd("eca_rx1day", 0, 6,  NULL); /* monthly mode */
+        cdoOperatorAdd("eca_rx1day", 0, 8,  NULL); /* monthly mode */
       else
         cdoWarning("Parameter value '%s' is invalid. The only valid value is 'm' indicating monthly mode. Operating in yearly mode now.");
     }
   else 
-    cdoOperatorAdd("eca_rx1day", 0, 16, NULL);
+    cdoOperatorAdd("eca_rx1day", 0, 31, NULL);
 
   request.var1.name     = RX1DAY_NAME;
   request.var1.longname = RX1DAY_LONGNAME;
@@ -1274,7 +1274,7 @@ void *EcaRx5day(void *argument)
   longname = (char *) malloc(strlen(RX5DAY_LONGNAME2) + 40);
   sprintf(longname, RX5DAY_LONGNAME2, argX);
   
-  cdoOperatorAdd("eca_rx5day", 0, 16, NULL);
+  cdoOperatorAdd("eca_rx5day", 0, 31, NULL);
 
   request.var1.name     = RX5DAY_NAME;
   request.var1.longname = RX5DAY_LONGNAME;
@@ -1307,7 +1307,7 @@ void *EcaSdii(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_sdii", 0, 16, NULL);
+  cdoOperatorAdd("eca_sdii", 0, 31, NULL);
 
   request.var1.name     = SDII_NAME;
   request.var1.longname = SDII_LONGNAME;
@@ -1334,7 +1334,7 @@ void *Fdns(void *argument)
   ECA_REQUEST_2 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("fdns", 0, 16, NULL);
+  cdoOperatorAdd("fdns", 0, 31, NULL);
 
   request.var1.name     = FDNS_NAME;
   request.var1.longname = FDNS_LONGNAME;
@@ -1364,7 +1364,7 @@ void *Strwin(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("strwin", 0, 16, NULL);
+  cdoOperatorAdd("strwin", 0, 31, NULL);
 
   if ( operatorArgc() > 0 )
     maxWind = atof(operatorArgv()[0]);
@@ -1405,7 +1405,7 @@ void *Strbre(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("strbre", 0, 16, NULL);
+  cdoOperatorAdd("strbre", 0, 31, NULL);
          
   request.var1.name     = STRBRE_NAME;
   request.var1.longname = STRBRE_LONGNAME;
@@ -1438,7 +1438,7 @@ void *Strgal(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("strgal", 0, 16, NULL);
+  cdoOperatorAdd("strgal", 0, 31, NULL);
          
   request.var1.name     = STRBRE_NAME;
   request.var1.longname = STRBRE_LONGNAME;
@@ -1471,7 +1471,7 @@ void *Hurr(void *argument)
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("hurr", 0, 16, NULL);
+  cdoOperatorAdd("hurr", 0, 31, NULL);
          
   request.var1.name     = HURR_NAME;
   request.var1.longname = HURR_LONGNAME;

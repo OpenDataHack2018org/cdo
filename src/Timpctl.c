@@ -257,11 +257,11 @@ void *Timpctl(void *argument)
   
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timpctl",  func_pctl, 16, NULL);
-  cdoOperatorAdd("yearpctl", func_pctl,  8, NULL);
-  cdoOperatorAdd("monpctl",  func_pctl,  6, NULL);
-  cdoOperatorAdd("daypctl",  func_pctl,  4, NULL);
-  cdoOperatorAdd("hourpctl", func_pctl,  2, NULL);
+  cdoOperatorAdd("timpctl",  func_pctl, 31, NULL);
+  cdoOperatorAdd("yearpctl", func_pctl, 10, NULL);
+  cdoOperatorAdd("monpctl",  func_pctl,  8, NULL);
+  cdoOperatorAdd("daypctl",  func_pctl,  6, NULL);
+  cdoOperatorAdd("hourpctl", func_pctl,  4, NULL);
 
   operatorID = cdoOperatorID();
   

@@ -1385,7 +1385,7 @@ void *Importcmsaf(void *argument)
     {
       vtimes = (int *) malloc(nt*sizeof(int));
       
-      for ( i = 0; i < nt; ++i ) vtimes[i] = i*100 + 45;
+      for ( i = 0; i < nt; ++i ) vtimes[i] = i*10000 + 45*100;
 
       if ( dsets.obj[ivar].time )
 	{
@@ -1394,8 +1394,8 @@ void *Importcmsaf(void *argument)
 
 	  for ( i = 0; i < nt; ++i )
 	    {
-	      itime = (int)strtol(pline, &pline, 10);
-	      if ( itime < 0 || itime > 2400 )
+	      itime = ((int)strtol(pline, &pline, 10))*100;
+	      if ( itime < 0 || itime > 240000 )
 		{
 		  cdoWarning("Wrong time string!");
 		  break;

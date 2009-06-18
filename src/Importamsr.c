@@ -223,12 +223,12 @@ void *Importamsr(void *argument)
 
       streamDefVlist(streamID, vlistID);
 
-      vtime = 130; /* 1:30 */
+      vtime = 13000; /* 1:30:00 */
       for ( tsID = 0; tsID < 2; ++tsID )
 	{
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
-	  vtime += 1200;  /* 13:30 */
+	  vtime += 120000;  /* 13:30:00 */
 	  streamDefTimestep(streamID, tsID);
 	  processDefTimesteps(streamID);
 

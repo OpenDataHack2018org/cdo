@@ -1,7 +1,8 @@
 2009-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.0
-	* change decode/encode_time to seconds
+	* added support of time units 'seconds' to all operators
+	  o all time parameter changed from hh:mm to hh:mm:ss!
 	* Version 1.4.0 released
 
 2009-06-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

@@ -1572,9 +1572,8 @@ void *Echam5ini(void *argument)
       if ( vdate == 0 )
 	{
 	  vdate = 19890101;
-	  vtime = 1200;
+	  vtime = 120000;
 	}
-      vtime *= 100;
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -1594,7 +1593,6 @@ void *Echam5ini(void *argument)
 	export_e5res(cdoStreamName(1), vars, nvars);
       else
 	cdoAbort("Operator not implemented!");
-     
     }
   else
     {

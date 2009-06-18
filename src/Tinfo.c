@@ -111,6 +111,11 @@ void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incuni
       *incperiod = deltay;
       *incunit = TU_YEARS;
     }
+  else
+    {
+      *incperiod = lperiod;
+      *incunit = TU_SECONDS;
+    }
 }
 
 static

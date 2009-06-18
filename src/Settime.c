@@ -50,10 +50,10 @@ int get_tunits(const char *unit, int *incunit, int *tunit)
   
   if      ( memcmp(unit, "seconds", len) == 0 ) { *incunit =     1; *tunit = TUNIT_SECOND;}
   else if ( memcmp(unit, "minutes", len) == 0 ) { *incunit =    60; *tunit = TUNIT_MINUTE;}
-  else if ( memcmp(unit, "hours", len)   == 0 ) { *incunit =  3600; *tunit = TUNIT_HOUR;}
-  else if ( memcmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;}
-  else if ( memcmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH;}
-  else if ( memcmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;}
+  else if ( memcmp(unit, "hours", len)   == 0 ) { *incunit =  3600; *tunit = TUNIT_HOUR;  }
+  else if ( memcmp(unit, "days", len)    == 0 ) { *incunit = 86400; *tunit = TUNIT_DAY;   }
+  else if ( memcmp(unit, "months", len)  == 0 ) { *incunit =     1; *tunit = TUNIT_MONTH; }
+  else if ( memcmp(unit, "years", len)   == 0 ) { *incunit =    12; *tunit = TUNIT_YEAR;  }
   else cdoAbort("time unit >%s< unsupported", unit);
 
   return (0);
@@ -342,7 +342,7 @@ void *Settime(void *argument)
 	}
       else if ( operatorID == SHIFTTIME )
 	{
-	  if ( incunit == 1 || incunit == 12 )
+	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
 	    {
 	      decode_date(vdate, &year, &month, &day);
 	      

@@ -62,10 +62,10 @@ void *Splittime(void *argument)
 
   cdoInitialize(argument);
 
-  SPLITHOUR = cdoOperatorAdd("splithour", func_time, 100, NULL);
-  SPLITDAY  = cdoOperatorAdd("splitday",  func_date,   1, NULL);
-  SPLITMON  = cdoOperatorAdd("splitmon",  func_date, 100, NULL);
-  SPLITSEAS = cdoOperatorAdd("splitseas", func_date, 100, NULL);
+  SPLITHOUR = cdoOperatorAdd("splithour", func_time, 10000, NULL);
+  SPLITDAY  = cdoOperatorAdd("splitday",  func_date,     1, NULL);
+  SPLITMON  = cdoOperatorAdd("splitmon",  func_date,   100, NULL);
+  SPLITSEAS = cdoOperatorAdd("splitseas", func_date,   100, NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorFunc(operatorID);

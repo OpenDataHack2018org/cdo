@@ -44,7 +44,7 @@ void *Inttime(void *argument)
   int taxisID1, taxisID2;
   int vdate, vtime;
   int offset;
-  int ijulinc, incperiod = 0, incunit = 3600;
+  int ijulinc, incperiod = 0, incunit = 3600, tunit = TUNIT_HOUR;
   int calendar;
   int year, month, day, hour, minute, second;
   int *recVarID, *recLevelID;
@@ -95,11 +95,12 @@ void *Inttime(void *argument)
       len = strlen(unit);
       if ( len )
 	{
-	  if      ( memcmp(unit, "minutes", len) == 0 ) incunit =    60;
-	  else if ( memcmp(unit, "hours", len)   == 0 ) incunit =  3600;
-	  else if ( memcmp(unit, "days", len)    == 0 ) incunit = 86400;
-	  else if ( memcmp(unit, "months", len)  == 0 ) incunit =     1;
-	  else if ( memcmp(unit, "years", len)   == 0 ) incunit =    12;
+	  if      ( memcmp(unit, "seconds", len) == 0 ) {incunit =     1; tunit = TUNIT_SECOND;}
+	  else if ( memcmp(unit, "minutes", len) == 0 ) {incunit =    60; tunit = TUNIT_MINUTE;}
+	  else if ( memcmp(unit, "hours", len)   == 0 ) {incunit =  3600; tunit = TUNIT_HOUR;  }
+	  else if ( memcmp(unit, "days", len)    == 0 ) {incunit = 86400; tunit = TUNIT_DAY;   }
+	  else if ( memcmp(unit, "months", len)  == 0 ) {incunit =     1; tunit = TUNIT_MONTH; }
+	  else if ( memcmp(unit, "years", len)   == 0 ) {incunit =    12; tunit = TUNIT_YEAR;  }
 	  else cdoAbort("unsupported time unit >%s<", unit);
 	}
     }
@@ -282,7 +283,7 @@ void *Inttime(void *argument)
 
 	  if ( ijulinc == 0 ) break;
 
-	  if ( incunit == 1 || incunit == 12 )
+	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
 	    {
 	      juldate_decode(calendar, juldate, &vdate, &vtime);
 

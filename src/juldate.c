@@ -1,8 +1,10 @@
 #include "cdo_int.h"
 
 
-void encode_caldaysec(int calendar, int year, int month, int day, int hour, int minute, int *julday, int *secofday);
-void decode_caldaysec(int calendar, int julday, int secofday, int *year, int *month, int *day, int *hour, int *minute);
+void encode_caldaysec(int calendar, int year, int month, int day, int hour, int minute, int second,
+		      int *julday, int *secofday);
+void decode_caldaysec(int calendar, int julday, int secofday, 
+		      int *year, int *month, int *day, int *hour, int *minute, int *second);
 
 
 juldate_t juldate_encode(int calendar, int date, int time)
@@ -13,7 +15,7 @@ juldate_t juldate_encode(int calendar, int date, int time)
   decode_date(date, &year, &month, &day);
   decode_time(time, &hour, &minute, &second);
 
-  encode_caldaysec(calendar, year, month, day, hour, minute, 
+  encode_caldaysec(calendar, year, month, day, hour, minute, second,
 		   &juldate.julday, &juldate.secofday);
 
   return (juldate);
@@ -25,7 +27,7 @@ void juldate_decode(int calendar, juldate_t juldate, int *date, int *time)
   int year, month, day, hour, minute, second;
   
   decode_caldaysec(calendar, juldate.julday, juldate.secofday, 
-		   &year, &month, &day, &hour, &minute);
+		   &year, &month, &day, &hour, &minute, &second);
 
   *date = encode_date(year, month, day);
   *time = encode_time(hour, minute, second);

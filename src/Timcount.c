@@ -57,11 +57,11 @@ void *Timcount(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timcount",  0, 16, NULL);
-  cdoOperatorAdd("yearcount", 0,  8, NULL);
-  cdoOperatorAdd("moncount",  0,  6, NULL);
-  cdoOperatorAdd("daycount",  0,  4, NULL);
-  cdoOperatorAdd("hourcount", 0,  2, NULL);
+  cdoOperatorAdd("timcount",  0, 31, NULL);
+  cdoOperatorAdd("yearcount", 0, 10, NULL);
+  cdoOperatorAdd("moncount",  0,  8, NULL);
+  cdoOperatorAdd("daycount",  0,  6, NULL);
+  cdoOperatorAdd("hourcount", 0,  4, NULL);
 
   operatorID = cdoOperatorID();
 
