@@ -238,6 +238,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
+		  flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.vals[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -273,6 +274,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
+		  flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.vct[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -308,6 +310,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
+		  flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.lbounds[i] = flev;
 		  while ( isalnum((int) *pline) ||
@@ -343,6 +346,7 @@ int zaxisFromFile(FILE *gfp)
 		      pline = line;
 		      pline = skipSeparator(pline);
 		    }
+		  flev = 0;
 		  sscanf(pline, "%lg", &flev);
 		  zaxis.ubounds[i] = flev;
 		  while ( isalnum((int) *pline) ||

@@ -77,7 +77,7 @@ void *Settime(void *argument)
   int gridsize;
   int tunit = TUNIT_DAY;
   int ijulinc = 0, incperiod = 0, incunit = 0;
-  int year = 0, month = 0, day, hour, minute, second;
+  int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
   int calendar;
   int newcalendar = CALENDAR_STANDARD;
@@ -91,10 +91,10 @@ void *Settime(void *argument)
   SETMON      = cdoOperatorAdd("setmon",      0, 0, "month");
   SETDAY      = cdoOperatorAdd("setday",      0, 0, "day");
   SETDATE     = cdoOperatorAdd("setdate",     0, 0, "date (format YYYY-MM-DD)");
-  SETTIME     = cdoOperatorAdd("settime",     0, 0, "time (format hh:mm)");
+  SETTIME     = cdoOperatorAdd("settime",     0, 0, "time (format hh:mm:ss)");
   SETTUNITS   = cdoOperatorAdd("settunits",   0, 0, "time units (seconds, minutes, hours, days, months, years)");
-  SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,hh:mm)");
-  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time<,units> (format YYYY-MM-DD,hh:mm)");
+  SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
+  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
   SETCALENDAR = cdoOperatorAdd("setcalendar", 0, 0, "calendar (standard, proleptic, 360days, 365days, 366days)");
   SHIFTTIME   = cdoOperatorAdd("shifttime",   0, 0, "shift value");
 
@@ -165,7 +165,7 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  sscanf(timestr, "%d:%d", &hour, &minute);
+	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
 	  newval = hour*100 + minute;
 	}
     }

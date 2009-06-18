@@ -69,7 +69,7 @@ void *Seltime(void *argument)
   int lnts1;
   int ncts = 0, nts, it;
   int *selfound = NULL;
-  int year, month, day, hour, minute, second;
+  int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
   double selfval = 0, *fltarr, fval = 0;
@@ -88,8 +88,8 @@ void *Seltime(void *argument)
   cdoInitialize(argument);
 
   SELTIMESTEP = cdoOperatorAdd("seltimestep", func_step,     1, "timesteps");
-  SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm)");
-  SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm)");
+  SELDATE     = cdoOperatorAdd("seldate",     func_datetime, 1, "start date and end date (format YYYY-MM-DDThh:mm:ss)");
+  SELTIME     = cdoOperatorAdd("seltime",     func_time,     1, "times (format hh:mm:ss)");
   SELHOUR     = cdoOperatorAdd("selhour",     func_time,   100, "hours");
   SELDAY      = cdoOperatorAdd("selday",      func_date,     1, "days");
   SELMON      = cdoOperatorAdd("selmon",      func_date,   100, "months");
@@ -181,7 +181,7 @@ void *Seltime(void *argument)
 	    }
 	  else
 	    {
-	      year = 0; month = 0; day = 0; hour = 0; minute = 0;
+	      year = 1; month = 1; day = 1; hour = 0; minute = 0, second = 0;
 	      if ( strchr(operatorArgv()[i], 'T') == NULL )
 		{
 		  status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
@@ -223,7 +223,7 @@ void *Seltime(void *argument)
 	    }
 	  else
 	    {
-	      sscanf(operatorArgv()[i], "%d:%d", &hour, &minute);
+	      sscanf(operatorArgv()[i], "%d:%d:d", &hour, &minute, &second);
 	      listSetInt(ilist, i, hour*100 + minute);
 	    }
 	}

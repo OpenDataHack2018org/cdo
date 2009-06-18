@@ -40,9 +40,9 @@ to the next.
 @Item = date
 STRING  Start date (format YYYY-MM-DD)
 @Item = time
-STRING  Start time (format hh:mm)
+STRING  Start time (format hh:mm:ss)
 @Item = inc
-STRING  Optional increment (minutes, hours, days, months, years) [default: 0hour]
+STRING  Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]
 @Item = n
 INTEGER Number of time steps from one time step to the next
 @EndParameter

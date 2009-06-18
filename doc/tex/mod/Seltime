@@ -108,7 +108,7 @@ Selects a month and optional an unlimited number of time steps before and after 
 @Item = timesteps
 INTEGER  Comma separated list of time steps
 @Item = times
-STRING   Comma separated list of times (format hh:mm)
+STRING   Comma separated list of times (format hh:mm:ss)
 @Item = hours
 INTEGER  Comma separated list of hours
 @Item = days
@@ -120,9 +120,9 @@ INTEGER  Comma separated list of years
 @Item = seasons
 STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
 @Item = date1
-STRING   Start date (format YYYY-MM-DDThh:mm)
+STRING   Start date (format YYYY-MM-DDThh:mm:ss)
 @Item = date2
-STRING   End date (format YYYY-MM-DDThh:mm)
+STRING   End date (format YYYY-MM-DDThh:mm:ss)
 @Item = nts1
 INTEGER  Number of time steps before the selected month [default: 0]
 @Item = nts2

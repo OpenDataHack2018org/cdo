@@ -58,7 +58,7 @@ void *Inttime(void *argument)
 
   cdoInitialize(argument);
 
-  operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm)");
+  operatorInputArg("date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   if ( operatorArgc() < 2 ) cdoAbort("Not enough arguments!");
 
   datestr = operatorArgv()[0];
@@ -70,6 +70,7 @@ void *Inttime(void *argument)
     }
   else
     {
+      year = 1; month = 1; day = 1;
       sscanf(datestr, "%d-%d-%d", &year, &month, &day);
       vdate = encode_date(year, month, day);
     }
@@ -80,6 +81,7 @@ void *Inttime(void *argument)
     }
   else
     {
+      hour = 0; minute = 0; second = 0;
       sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
       vtime = encode_time(hour, minute, second);
     }

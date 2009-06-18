@@ -1041,7 +1041,7 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( memcmp(pline, "gridlatlon", 10)  == 0 )
 	{
 	  int i;
-	  double flat, flon;
+	  double flat = 0, flon = 0;
 	  if ( grid.size == 0 ) grid.size = grid.xsize * grid.ysize;
 	  
 	  grid.xvals = (double *) malloc(grid.size*sizeof(double));
@@ -1270,6 +1270,7 @@ int input_ival(FILE *gfp, int *ival)
 
   if ( feof(gfp) ) return(0);
 
+  *ival = 0;
   read_items = fscanf(gfp, "%d", ival);
 
   return (read_items);

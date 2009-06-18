@@ -34,11 +34,15 @@
 
 int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double *ypos)
 {
-  int year, month, day, hour, minute, second;
+  int year = 0, month = 0, day = 0, hour = 0, minute = 0, second = 0;
   int date, time;
   int stat;
 
-  stat = fscanf(fp, "%d-%d-%d %d:%d:%d %lf %lf", &year, &month, &day, &hour, &minute, &second, xpos, ypos);
+  *xpos = 0;
+  *ypos = 0;
+
+  stat = fscanf(fp, "%d-%d-%d %d:%d:%d %lf %lf",
+		&year, &month, &day, &hour, &minute, &second, xpos, ypos);
 
   if ( stat != EOF )
     {

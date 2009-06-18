@@ -190,17 +190,13 @@ void *Output(void *argument)
 		  decode_date(vdate, &year, &month, &day);
 		  decode_time(vtime, &hour, &minute, &second);
 
-		  /*
-		  xdate  = vdate - (vdate/100)*100 + (hour*60 + minute)/1440.;
-		  */
 		  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %12.12g\n",
 			  year, month, day, hour, minute, second, array[0]);
 		}
 	      else if ( operatorID == OUTPUTFLD )
 		{
-		  hour   = vtime / 100;
-		  minute = vtime - hour*100;
-		  xdate  = vdate - (vdate/100)*100 + (hour*60 + minute)/1440.;
+		  decode_time(vtime, &hour, &minute, &second);
+		  xdate  = vdate - (vdate/100)*100 + (hour*3600 + minute*60 + second)/86400.;
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(array[i], missval) )
 		      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, yvals[i], xvals[i], array[i]);
