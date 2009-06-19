@@ -12,8 +12,8 @@
 	* added option -Q to sort netCDF variable names
 	* added support for the parameter 'angle' to transform rotated coordinates 
 	        to geographic coordinates [request: Beate Mueller]
-	* splitsel: change the number of output digits from 3 to 6
-	* settaxis: bug fix for increment 'months' [report: Ute Merkel]
+	* splitsel: changed the number of output digits from 3 to 6
+	* settaxis: bug fix for time increment 'months' [report: Ute Merkel]
 	* remaplib: change loop counter from int to long
 	* remaplaf: fixed buffer overflow
 	* remapcon: change max_subseg from 1000 to 100000

@@ -1,6 +1,20 @@
 CDO NEWS
 --------
 
+Version 1.3.2 (15 June 2009):
+
+   * New features:
+      o Changed compiler to ANSI C99
+      o Added option -Q to sort netCDF variable names
+   * Changed operators:
+      o splitsel: changed the number of output digits from 3 to 6
+      o remapeta: correct humidity up to highest level *nctop* where condensation is allowed
+      o remapcon: change max_subseg from 1000 to 100000
+   * Fixed bugs:
+      o settaxis: bug fix for time increment 'months'
+      o remaplaf: fixed buffer overflow
+      o remapdis, remapnn: set num_srch_bins to 1 if REMAP_EXTRAPOLATE=OFF
+
 Version 1.3.1 (16 April 2009):
 
    * New features:
