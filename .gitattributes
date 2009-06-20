@@ -115,6 +115,7 @@ doc/tex/mod/Importcmsaf -text
 doc/tex/mod/Info -text
 doc/tex/mod/Input -text
 doc/tex/mod/Intgrid -text
+doc/tex/mod/Intlevel -text
 doc/tex/mod/Inttime -text
 doc/tex/mod/Intyear -text
 doc/tex/mod/Invert -text
