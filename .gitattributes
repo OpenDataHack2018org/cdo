@@ -135,6 +135,7 @@ doc/tex/mod/Output -text
 doc/tex/mod/Outputgmt -text
 doc/tex/mod/Regres -text
 doc/tex/mod/Remap -text
+doc/tex/mod/Remapeta -text
 doc/tex/mod/Remapgrid -text
 doc/tex/mod/Replace -text
 doc/tex/mod/Rotuv -text

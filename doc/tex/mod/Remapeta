@@ -1,0 +1,87 @@
+@BeginModule
+@NewPage
+@Name      = Remapeta
+@Title     = Remap vertical hybrid level
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile ofile
+@Operators = remapeta
+
+@BeginDescription
+This operator interpolates between different vertical hybrid levels. 
+This include the preparation of consistent data for the free atmosphere.
+The procedure for the vertical interpolation is based on the HIRLAM scheme
+and was adapted from @cite{INTERA}.
+The vertical interpolation is based on the vertical integration of the
+hydrostatic equation with few adjustments. The basic tasks are the following one:
+@BeginItemize
+@Item = at first integration of hydrostatic equation
+@Item = extrapolation of surface pressure
+@Item = Planetary Boundary-Layer (PBL) profile interpolation
+@Item = interpolation in free atmosphere
+@Item = merging of both profiles
+@Item = final surface pressure correction
+@EndItemize
+
+The vertical interpolation corrects the surface pressure. This is simply
+a cut-off or an addition of air mass. This mass correction should not
+influence the geostrophic velocity field in the middle troposhere. Therefore
+the total mass above a given reference level is conserved. As reference level
+the geopotential height of the 500 hPa level is used. Near the surface the
+correction can affect the vertical structure of the PBL. Therefore the
+interpolation is done using the potential temperature. But in the free
+atmosphere above a certain n (n=0.8 defining the top of the PBL) the
+interpolation is done linearly. After the interpolation both profiles
+are merged. With the resulting temperature/pressure correction the hydrostatic
+equation is integrated again and adjusted to the reference level finding
+the final surface pressure correction. A more detailed description of
+the interpolation can be found in @cite{INTERA}.
+All input fields have to be on the same horizontal grid.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_remapeta
+@Title     = Remap vertical hybrid level
+@Parameter = vct [oro]
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = vct
+STRING  File name of an ASCII dataset with the vertical coordinate table
+@Item = oro
+STRING  File name with the orography (surf. geopotential) of the target dataset (optional)
+@EndParameter
+
+
+@BeginNote
+The code numbers or the variable names of the required parameter have to
+follow the \cite{ECHAM} convention. The netCDF CF convention
+for vertical hybrid coordinates is not supported, yet!
+@EndNote
+
+
+@BeginExample
+To remap between different hybrid model level data use:
+@BeginVerbatim
+   cdo remapeta,vct ifile ofile
+@EndVerbatim
+@C Here is an example of the vct file with 19 hybrid model level:
+@C @BeginVerbatim
+@C     0       0.00000000000000000       0.00000000000000000
+@C     1    2000.00000000000000000       0.00000000000000000
+@C     2    4000.00000000000000000       0.00000000000000000
+@C     3    6046.10937500000000000       0.00033899326808751
+@C     4    8267.92968750000000000       0.00335718691349030
+@C   ...
+@C    15    2549.96899414062500000       0.85643762350082397
+@C    16     783.19506835937500000       0.92874687910079956
+@C    17       0.00000000000000000       0.97298520803451538
+@C    18       0.00000000000000000       0.99228149652481079
+@C    19       0.00000000000000000       1.00000000000000000
+@C @EndVerbatim
+@EndExample
