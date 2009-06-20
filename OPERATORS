@@ -415,6 +415,7 @@ Operator catalog:
       Hurr       hurr            Hurricane days index per time period
       Importamsr import_amsr     Import AMSR binary files
       Importcmsaf import_cmsaf    Import CM-SAF HDF5 files
+      Importbinary import_binary   Import binary data sets
 -------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
