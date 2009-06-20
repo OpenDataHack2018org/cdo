@@ -2,7 +2,7 @@
 
 	* using CDI library version 1.4.0
 	* added support of time units 'seconds' to all operators
-	  o all time parameter changed from hh:mm to hh:mm:ss!
+	  - the format of all time parameter changed from hh:mm to hh:mm:ss!
 	* Version 1.4.0 released
 
 2009-06-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
