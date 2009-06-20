@@ -112,6 +112,7 @@ doc/tex/mod/Hourpctl -text
 doc/tex/mod/Hourstat -text
 doc/tex/mod/Hurr -text
 doc/tex/mod/Importamsr -text
+doc/tex/mod/Importbinary -text
 doc/tex/mod/Importcmsaf -text
 doc/tex/mod/Info -text
 doc/tex/mod/Input -text
@@ -253,8 +254,8 @@ src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text
 src/Importamsr.c -text
+src/Importbinary.c -text
 src/Importcmsaf.c -text
-src/Importgrads.c -text
 src/Info.c -text
 src/Input.c -text
 src/Intgrid.c -text

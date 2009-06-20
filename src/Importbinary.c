@@ -180,9 +180,9 @@ int define_level(dsets_t *pfi)
 }
 
 
-void *Importgrads(void *argument)
+void *Importbinary(void *argument)
 {
-  static char func[] = "Importgrads";
+  static char func[] = "Importbinary";
   int streamID;
   int gridID = -1, zaxisID, zaxisIDsfc, taxisID, vlistID;
   int i;
@@ -195,7 +195,7 @@ void *Importgrads(void *argument)
   int vdate, vtime;
   int tcur, told,fnum;
   int tmin=0,tmax=0;
-  char *ch=NULL;
+  char *ch = NULL;
   off_t flen;
   int nvars, nlevels, nrecs;
   int recID;

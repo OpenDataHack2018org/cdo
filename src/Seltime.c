@@ -223,7 +223,7 @@ void *Seltime(void *argument)
 	    }
 	  else
 	    {
-	      sscanf(operatorArgv()[i], "%d:%d:d", &hour, &minute, &second);
+	      sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
 	      listSetInt(ilist, i, hour*100 + minute);
 	    }
 	}

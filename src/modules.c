@@ -73,7 +73,7 @@ void *Harmonic(void *argument);
 void *Histogram(void *argument);
 void *Importamsr(void *argument);
 void *Importcmsaf(void *argument);
-void *Importgrads(void *argument);
+void *Importbinary(void *argument);
 void *Info(void *argument);
 void *Input(void *argument);
 void *Intgrid(void *argument);
@@ -280,7 +280,7 @@ void *Wct(void *argument);
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  ImportamsrOperators    {"import_amsr"}
 #define  ImportcmsafOperators   {"import_cmsaf"}
-#define  ImportgradsOperators   {"import_grads"}
+#define  ImportbinaryOperators  {"import_binary", "import_grads"}
 #define  InfoOperators          {"info", "infov", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
@@ -518,7 +518,7 @@ static MODULES Modules[] =
   { Histogram,      HistogramHelp,     HistogramOperators,      1,  1 },
   { Importamsr,     ImportamsrHelp,    ImportamsrOperators,     1,  1 },
   { Importcmsaf,    ImportcmsafHelp,   ImportcmsafOperators,    1,  1 },
-  { Importgrads,    NULL,              ImportgradsOperators,    1,  1 },
+  { Importbinary,   NULL,              ImportbinaryOperators,   1,  1 },
   { Info,           InfoHelp,          InfoOperators,          -1,  0 },
   { Input,          InputHelp,         InputOperators,          0,  1 },
   { Intgrid,        IntgridHelp,       IntgridOperators,        1,  1 },

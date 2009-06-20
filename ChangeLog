@@ -1,6 +1,7 @@
 2009-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.0
+	* New operator: import_binary - Import binary data sets via a GrADS data descriptor file
 	* added support of time units 'seconds' to all operators
 	  - the format of all time parameter changed from hh:mm to hh:mm:ss!
 	* Version 1.4.0 released

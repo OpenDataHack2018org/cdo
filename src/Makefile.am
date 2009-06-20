@@ -40,7 +40,7 @@ cdo_SOURCES = Arith.c		\
               Histogram.c 	\
               Importamsr.c  	\
               Importcmsaf.c  	\
-              Importgrads.c  	\
+              Importbinary.c  	\
               Info.c		\
               Input.c		\
               Intgrid.c 	\

@@ -327,7 +327,7 @@ void *Timeof(void * argument)
       for ( levelID = 0; levelID < nlevs; levelID++ )
         {
           int i2;
-          double **cov;
+          double **cov = NULL;
           double *eigv;
           npack = 0;
           sum_w = 0;          

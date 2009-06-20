@@ -60,7 +60,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Gengrid.$(OBJEXT) Gradsdes.$(OBJEXT) Gridboxstat.$(OBJEXT) \
 	Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) Histogram.$(OBJEXT) \
 	Importamsr.$(OBJEXT) Importcmsaf.$(OBJEXT) \
-	Importgrads.$(OBJEXT) Info.$(OBJEXT) Input.$(OBJEXT) \
+	Importbinary.$(OBJEXT) Info.$(OBJEXT) Input.$(OBJEXT) \
 	Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) Intlevel.$(OBJEXT) \
 	Inttime.$(OBJEXT) Intntime.$(OBJEXT) Intyear.$(OBJEXT) \
 	Invert.$(OBJEXT) Invertlev.$(OBJEXT) Log.$(OBJEXT) \
@@ -266,7 +266,7 @@ cdo_SOURCES = Arith.c		\
               Histogram.c 	\
               Importamsr.c  	\
               Importcmsaf.c  	\
-              Importgrads.c  	\
+              Importbinary.c  	\
               Info.c		\
               Input.c		\
               Intgrid.c 	\
@@ -603,8 +603,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Histogram.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importamsr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importbinary.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importcmsaf.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importgrads.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Info.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Input.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Intgrid.Po@am__quote@
