@@ -217,7 +217,8 @@ void *Importgrads(void *argument)
 
   status = read_gradsdes((char *)cdoStreamName(0), &pfi);
   if ( cdoVerbose ) fprintf(stderr, "status %d\n", status);
-  if ( status ) cdoAbort("Open failed on %s!", pfi.name);
+  //if ( status ) cdoAbort("Open failed on %s!", pfi.name);
+  if ( status ) cdoAbort("Open failed!");
 
   nrecs = pfi.trecs;
   nvars = pfi.vnum;
