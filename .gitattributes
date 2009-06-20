@@ -215,6 +215,7 @@ doc/tex/ref_intro_statis.tex -text
 doc/tex/ref_intro_transf.tex -text
 doc/tex/time.tex -text
 doc/tex/usage.tex -text
+doc/tex/zaxis.tex -text
 src/Arith.c -text
 src/Arithc.c -text
 src/Arithdays.c -text

@@ -1,0 +1,68 @@
+\section{Z-axis description}
+
+Sometimes it is necessary to change the description of a z-axis.
+This can be done with the operator \htmlref{setzaxis}{setzaxis}.
+This operator needs an ASCII formatted file with the description
+of the z-axis.
+The following keywords can be used to describe a z-axis:
+
+\vspace{3mm}
+\begin{tabular}[b]{lll}
+Keyword          & Datatype     & Description \\ \hline
+{\bf zaxistype}  & STRING       & type of the z-axis   \\
+{\bf size}       & INTEGER      & number of levels     \\
+{\bf levels}     & FLOAT ARRAY  & values of the levels \\
+{\bf lbounds}    & FLOAT ARRAY  & lower level bounds \\
+{\bf ubounds}    & FLOAT ARRAY  & upper level bounds \\
+{\bf vctsize}    & INTEGER      & number of vertical coordinate parameters \\
+{\bf vct}        & FLOAT ARRAY  & vertical coordinate table \\
+\end{tabular}
+\vspace{3mm}
+
+The keywords {\bf lbounds} and {\bf ubounds} are optional. {\bf vctsize} and {\bf vct} are only
+necessary to define hybrid model levels.
+
+%\newpage
+
+Available z-axis types:
+
+\vspace{3mm}
+\begin{tabular}[b]{lll}
+Z-axis type              & Description              &  Units        \\ \hline   
+{\bf surface}            & Surface                  &               \\
+{\bf pressure}           & Pressure level           &  pascal       \\
+{\bf hybrid}             & Hybrid model level       &               \\
+{\bf height}             & Height above ground      &  meter        \\
+{\bf depth\_below\_sea}  & Depth below sea level    &  meter        \\
+{\bf depth\_below\_land} & Depth below land surface &  centimeter   \\
+{\bf isentropic}         & Isentropic (theta) level &  kelvin       \\
+\end{tabular}
+\vspace{3mm}
+
+%\begin{minipage}[t]{\textwidth}
+Z-axis description example for pressure levels 100, 200, 500, 850 and 1000 hPa:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    zaxistype = pressure
+    size      = 5
+    levels    = 10000 20000 50000 85000 100000
+\end{lstlisting}
+%\end{minipage}
+
+%\begin{minipage}[t]{\textwidth}
+Z-axis description example for ECHAM5 L19 hybrid model levels:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{zebg}, basicstyle=\footnotesize]
+    zaxistype = hybrid
+    size      = 19
+    levels    = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+    vctsize   = 40
+    vct       = 0 2000 4000 6046.10938 8267.92578 10609.5117 12851.1016 14698.5
+                15861.125 16116.2383 15356.9258 13621.4609 11101.5625 8127.14453
+                5125.14062 2549.96875 783.195068 0 0 0 
+                0 0 0 0.000338993268 0.00335718691 0.0130700432 0.0340771675 
+                0.0706498027 0.12591666 0.201195419 0.295519829 0.405408859 
+                0.524931908 0.646107674 0.759697914 0.856437683 0.928747177 
+                0.972985268 0.992281914 1
+\end{lstlisting}
+%\end{minipage}
+
+\vspace{2mm}
