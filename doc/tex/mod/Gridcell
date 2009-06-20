@@ -1,0 +1,41 @@
+@BeginModule
+@NewPage
+@Name      = Gridcell
+@Title     = Grid cell quantities
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = gridarea gridweights
+
+@BeginDescription
+This module reads the grid cell area of the first grid from the input stream.
+If the grid cell area is missing it will be computed from the 
+grid description. Depending on the chosen operator the grid cell area or weights
+are written to the output stream.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_gridarea
+@Title     = Grid cell area
+
+@BeginDescription
+Writes the grid cell area to the output stream. If the grid cell area have to
+be computed it is scaled with the earth radius to square meters.
+@EndDescription
+@EndOperator
+
+@BeginOperator_gridweights
+@Title     = Grid cell weights
+
+@BeginDescription
+Writes the grid cell area weights to the output stream.
+@EndDescription
+@EndOperator
+
+
+@BeginEnvironment
+@Item = PLANET_RADIUS
+This variable is used to scale the computed grid cell areas to square meters. 
+By default PLANET_RADIUS is set to an earth radius of 6371000 meter.
+@EndEnvironment
+
