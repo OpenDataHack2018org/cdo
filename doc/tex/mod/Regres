@@ -1,0 +1,37 @@
+@BeginModule
+@NewPage
+@Name      = Regres
+@Title     = Regression
+@Section   = Regression
+@Class     = Regression
+@Arguments = ifile ofile
+@Operators = regres
+@EndModule
+
+
+@BeginOperator_regres
+@Title     = Regression
+
+@BeginDescription
+@IfMan
+The values of the input file @file{ifile} are assumed to be distributed as
+N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the
+parameter b. For every field element x only those time steps 
+t belong to the sample S(x), which have i(t,x) NE miss.
+@EndifMan
+@IfDoc
+The values of the input file @file{ifile} are assumed to be distributed as
+\begin{math}N(a+b t,\sigma^2)\end{math} with unknown @math{a},
+@math{b} and \begin{math}\sigma^2\end{math}. This operator estimates the
+parameter @math{b}.
+For every field element @math{x} only those time steps @math{t} belong
+to the sample \begin{math}S(x)\end{math}, which have \begin{math}i(t,x) \neq \mbox{miss}\end{math}.
+It is
+@BeginDisplayMath
+o(1,x) = \frac{\sum\limits_{t \in S(x)}\left(i(t,x) - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}i(t',x)\right)
+                                     \left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)}
+            {\sum\limits_{t \in S(x)}\left(t - \frac{1}{\#S(x)} \sum\limits_{t' \in S(x)}t'\right)^{2}}
+@EndDisplayMath
+@EndifDoc
+@EndDescription
+@EndOperator
