@@ -1,0 +1,17 @@
+@BeginModule
+@Name      = Invertlev
+@Title     = Invert levels
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = invertlev
+
+@BeginDescription
+This operator inverts the levels of all non hybrid 3D variables.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_invertlev
+@Title     = Invert levels
+@EndOperator

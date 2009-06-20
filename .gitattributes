@@ -118,6 +118,7 @@ doc/tex/mod/Intgrid -text
 doc/tex/mod/Inttime -text
 doc/tex/mod/Intyear -text
 doc/tex/mod/Invert -text
+doc/tex/mod/Invertlev -text
 doc/tex/mod/Maskbox -text
 doc/tex/mod/Mastrfu -text
 doc/tex/mod/Math -text
