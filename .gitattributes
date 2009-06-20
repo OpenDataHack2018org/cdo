@@ -154,6 +154,7 @@ doc/tex/mod/Setgatt -text
 doc/tex/mod/Setgrid -text
 doc/tex/mod/Sethalo -text
 doc/tex/mod/Setmiss -text
+doc/tex/mod/Setrange -text
 doc/tex/mod/Settime -text
 doc/tex/mod/Setzaxis -text
 doc/tex/mod/Showinfo -text

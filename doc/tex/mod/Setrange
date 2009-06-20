@@ -1,0 +1,71 @@
+@BeginModule
+@Name      = Setrange
+@Title     = Set range to constant
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = setrtoc setrtoc2
+
+@BeginDescription
+This module sets part of a field to a constant value or missing values. 
+Which part of the field is set depends on the chosen operator.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_setrtoc
+@Title     = Set range to constant
+@Parameter = rmin rmax c
+
+@BeginDescription
+@IfMan
+         / c      if i(t,x) GE rmin AND i(t,x) LE rmax
+o(t,x) = 
+         \ i(t,x) if i(t,x) LT rmin AND i(t,x) GT rmax
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \left\{
+\begin{array}{cll}
+ \mbox{c}   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl rmin} \wedge i(t,x) \leq \mbox{\sl rmax}  \\
+ i(t,x) & \mbox{if} \;\; i(t,x) < \mbox{\sl rmin} \vee i(t,x) > \mbox{\sl rmax}  \\
+\end{array}   \right.
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setrtoc2
+@Title     = Set range to constant others to constant2
+@Parameter = rmin rmax c c2
+
+@BeginDescription
+@IfMan
+         / c      if i(t,x) GE rmin AND i(t,x) LE rmax
+o(t,x) = 
+         \ c2     if i(t,x) LT rmin AND i(t,x) GT rmax
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \left\{
+\begin{array}{cll}
+ \mbox{c}   & \mbox{if} \;\; i(t,x) \geq \mbox{\sl rmin} \wedge i(t,x) \leq \mbox{\sl rmax}  \\
+ \mbox{c2} & \mbox{if} \;\; i(t,x) < \mbox{\sl rmin} \vee i(t,x) > \mbox{\sl rmax}  \\
+\end{array}   \right.
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginParameter rmax
+@Item = rmin
+FLOAT  Lower bound
+@Item = rmax
+FLOAT  Upper bound
+@Item = c
+FLOAT  New value - inside range
+@Item = c2
+FLOAT  New value - outside range
+@EndParameter
+
