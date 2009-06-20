@@ -1,0 +1,49 @@
+@BeginModule
+@NewPage
+@Name      = Maskregion
+@Title     = Mask regions
+@Section   = Modification
+@Class     = Modification
+@Arguments = ifile ofile
+@Operators = maskregion
+@EndModule
+
+
+@BeginOperator_maskregion
+@Title     = Mask regions
+@Parameter = regions
+
+@BeginDescription
+Masks different regions of a field. The elements inside a region 
+are untouched, the elements outside are set to missing value. All 
+input fields need to have the same horizontal grid.
+The user has to give ASCII formatted files with different regions.
+A region is defined by a polygon. Each line of a polygon description file 
+contains the longitude and latitude of one point.
+Each polygon description file can contain one or more polygons separated
+by a line with the character \&.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = regions
+STRING Comma separated list of ASCII formatted files with different regions
+@EndParameter
+
+
+@BeginExample
+To mask the region with the longitudes from 120E to 90W and
+latitudes from 20N to 20S on all input fields use:
+@BeginVerbatim
+   cdo maskregion,myregion ifile ofile
+@EndVerbatim
+For this example the  polygon description file @file{myregion} should contain 
+the following four coordinates:
+@BeginVerbatim
+  120  20
+  120 -20
+  270 -20
+  270  20
+@EndVerbatim
+@EndExample
