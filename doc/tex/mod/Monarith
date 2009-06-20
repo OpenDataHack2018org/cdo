@@ -1,0 +1,62 @@
+@BeginModule
+@NewPage
+@Name      = Monarith
+@Title     = Monthly arithmetic
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile1 ifile2 ofile
+@Operators = monadd monsub monmul mondiv
+
+@BeginDescription
+This module performs simple arithmetic of a time series and one
+time step with the same month and year. For each field in @file{ifile1}
+the corresponding field of the time step in @file{ifile2} with the
+same month and year is used. The header information in @file{ifile1}
+have to be the same as in @file{ifile2}. Usually @file{ifile2} is generated
+by a call of the module @mod{MONSTAT}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_monadd
+@Title     = Add monthly time series
+
+@BeginDescription
+Adds a time series and a monthly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_monsub
+@Title     = Subtract monthly time series
+
+@BeginDescription
+Subtracts a time series and a monthly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_monmul
+@Title     = Multiply monthly time series
+
+@BeginDescription
+Multiplies a time series and a monthly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_mondiv
+@Title     = Divide monthly time series
+
+@BeginDescription
+Divides a time series and a monthly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To subtract a monthly time average from a time series use:
+@BeginVerbatim
+   cdo monsub ifile -monavg ifile ofile
+@EndVerbatim
+@EndExample
