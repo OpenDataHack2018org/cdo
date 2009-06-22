@@ -30,6 +30,7 @@ doc/tex/cdo_adv.tex -text
 doc/tex/cdo_con.tex -text
 doc/tex/cdo_int.tex -text
 doc/tex/cdo_ref.tex -text
+doc/tex/cdo_ref_over.tex -text
 doc/tex/cdoprog.tex -text
 doc/tex/cleanup -text
 doc/tex/grid.tex -text
