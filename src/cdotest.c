@@ -131,7 +131,7 @@ static void writeNcFile(const char path[], const double array[], int length)
       } else {
         taxisDefVdate(taxisID, 20060701 + tsID - 6);
       }  
-      taxisDefVtime(taxisID, 235900);
+      taxisDefVtime(taxisID, 2359);
       streamDefTimestep(streamID, tsID);
       
       value = array[tsID];
