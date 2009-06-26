@@ -116,12 +116,14 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           i1 = i+(xinc-1);
           if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
           xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2.;
+          if ( isnan (xvals2[i]) )
+            fprintf(stderr, "NaN in xvals2[%i] (i=%i i1=%i) xvals1[i1]=%7.5f xvals1[i]=%7.5f\n", j, i, i1, xvals1[i1], xvals1[i]);
           if ( grid2_corner_lon )
             {
               grid2_corner_lon[2*j] = grid1_corner_lon[2*i];
               grid2_corner_lon[2*j+1] = grid1_corner_lon[2*i1+1];
             }
-          j++;
+          j++;        
         }
       j = 0;
       for ( i = 0; i < nlat1; i += yinc )
@@ -129,6 +131,8 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           i1 = i+(yinc-1);
           if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
           yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
+          if ( isnan (yvals2[i]) )
+            fprintf(stderr, "NaN in yvals2[%i] (i=%i i1=%i) yvals1[i1]=%7.5f yvals1[i]=%7.5f\n", j, i, i1, yvals1[i1], yvals1[i]);
           if ( grid2_corner_lat )
             {
               grid2_corner_lat[2*j] = grid1_corner_lat[2*i];
@@ -151,14 +155,13 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           gridDefNvertex(gridID2, 2);
           gridDefXbounds(gridID2, grid2_corner_lon);
           gridDefYbounds(gridID2, grid2_corner_lat);
-          
           free(grid2_corner_lon);
           free(grid2_corner_lat);
 
           free(grid1_corner_lon);
           free(grid1_corner_lat);
         }
-    }
+    } /* if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT ) */
   else if ( gridtype == GRID_CURVILINEAR )
     {
       int gridHasBounds = FALSE;
@@ -215,7 +218,9 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                       if ( y1 == y2*yinc && x1 == x2*xinc )
                         {
                           xvals2_0 = xvals1[g1_add];
-                          xvals2[g2_add] += xvals1[g1_add]/area_norm;                        
+                          xvals2[g2_add] = xvals1[g1_add]/area_norm;                        
+                          if ( isnan(xvals2[g2_add]) ) fprintf(stderr, "isnan 1: xvals2_0 %7.5f xvals2[%i] %7.5f\n", xvals2_0, g2_add, xvals2[g2_add]);
+                           yvals2[g2_add] = yvals1[g1_add]/area_norm;  
                         }
                       else if ( fabs(xvals1[g1_add] - xvals2_0) > 270. )
                         {
@@ -223,11 +228,22 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                             xvals2[g2_add] += (xvals1[g1_add]-360.)/area_norm;
                           else if ( ( xvals1[g1_add] - xvals2_0 ) < -270. )
                             xvals2[g2_add] += (xvals1[g1_add]+360.)/area_norm;
+                          if ( isnan(xvals2[g2_add]) ) fprintf(stderr, "isnan 2\n");
+                           yvals2[g2_add] += yvals1[g1_add]/area_norm;  
                         }
                       else                      
-                        xvals2[g2_add] += xvals1[g1_add]/area_norm;                                                                    
-                      yvals2[g2_add] += yvals1[g1_add]/area_norm;  
+                        {
+                          xvals2[g2_add] += xvals1[g1_add]/area_norm;                                                                    
+                          if ( isnan(xvals2[g2_add]) ) fprintf(stderr, "isnan 3\n");
+                          yvals2[g2_add] += yvals1[g1_add]/area_norm;  
+                        }
+                     
 
+                      if ( isnan(xvals2[g2_add]) )
+                        fprintf(stderr, "NaN in xvals2[%i]; last g1add %i (%7.5f) area-norm %7.5f\n", g2_add, g1_add, xvals1[g1_add], area_norm);                          
+                      if ( isnan(yvals2[g2_add]) )
+                        fprintf(stderr, "NaN in yvals2[%i]; last g1add %i (%7.5f) area-norm %7.5f\n", g2_add, g1_add, yvals1[g1_add], area_norm); 
+                      //fprintf(stderr, "%9g %9g\n", xvals2[g2_add], yvals2[g2_add], xvals1[g1_add], yvals1[g1_add]);
                       if ( gridHasBounds )
                         {/* 
                          =====================================================================
@@ -455,10 +471,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                   grid2_corner_lat[4*g2_add+0] = an_le;
                 }
               
-              if ( xvals2[g2_add] >  360. ) xvals2[g2_add] -= 360.;
-              if ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
-            }
-        }
+              while ( xvals2[g2_add] >  180. ) xvals2[g2_add] -= 360.;
+              while ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
+            } /* for ( x2 = 0; x2 < nlon2; x2++ ) */
+        } /* for ( y2 = 0; y2 < nlat2; y2++ ) */
       
       gridDefXvals(gridID2, xvals2);
       gridDefYvals(gridID2, yvals2);
@@ -470,18 +486,18 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       free(yvals1);
 
       if ( gridHasBounds )
-	{
-	  gridDefNvertex(gridID2, 4);
-	  gridDefXbounds(gridID2, grid2_corner_lon);
-	  gridDefYbounds(gridID2, grid2_corner_lat);
-
+        {
+          gridDefNvertex(gridID2, 4);
+          gridDefXbounds(gridID2, grid2_corner_lon);
+          gridDefYbounds(gridID2, grid2_corner_lat);
+          
           free(grid2_corner_lon);
           free(grid2_corner_lat);
-
+          
           free(grid1_corner_lon);
           free(grid1_corner_lat);
-	}
-    }
+        }
+    } /* else if ( gridtype == GRID_CURVILINEAR ) */
   else
     {
       cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
@@ -552,33 +568,33 @@ void gridboxstat(FIELD *field1, FIELD *field2, int xinc, int yinc, int statfunc)
   for ( ilat = 0; ilat < nlat2; ilat++ )
     for ( ilon = 0; ilon < nlon2; ilon++ )
       {
-	isize = 0;
-	field.nmiss = 0;
-	for ( j = 0; j < yinc; ++j )
-	  {
-	    jj = ilat*yinc+j;
-	    if ( jj >= nlat1 ) break;
-	    for ( i = 0; i < xinc; ++i )
-	      {
-		ii = ilon*xinc+i;
-		if ( ii >= nlon1 ) break;
-		field.ptr[isize] = xfield1[jj][ii];
-		if ( useWeight ) field.weight[isize] = weight[jj][ii];
-		if ( DBL_IS_EQUAL(field.ptr[isize], field.missval) ) field.nmiss++;
-		isize++;
-	      }
-	  }
-
-	field.size = isize;
-	xfield2[ilat][ilon] = fldfun(field, statfunc);
+        isize = 0;
+        field.nmiss = 0;
+        for ( j = 0; j < yinc; ++j )
+          {
+            jj = ilat*yinc+j;
+            if ( jj >= nlat1 ) break;
+            for ( i = 0; i < xinc; ++i )
+              {
+                ii = ilon*xinc+i;
+                if ( ii >= nlon1 ) break;
+                field.ptr[isize] = xfield1[jj][ii];
+                if ( useWeight ) field.weight[isize] = weight[jj][ii];
+                if ( DBL_IS_EQUAL(field.ptr[isize], field.missval) ) field.nmiss++;
+                isize++;
+              }
+          }
+        
+        field.size = isize;
+        xfield2[ilat][ilon] = fldfun(field, statfunc);
       }
-
+  
   nmiss = 0;
   for ( i = 0; i < nlat2*nlon2; i++ )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
+  
   field2->nmiss = nmiss;
-
+  
   free(xfield2);
   free(xfield1);
   free(field.ptr);
@@ -672,44 +688,44 @@ void *Gridboxstat(void *argument)
       streamDefTimestep(streamID2, tsID);
 
       for ( recID = 0; recID < nrecs; recID++ )
-	{
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
+        {
+          streamInqRecord(streamID1, &varID, &levelID);
+          streamReadRecord(streamID1, field1.ptr, &field1.nmiss);
 
-	  field1.grid = vlistInqVarGrid(vlistID1, varID);
-	  field1.size = gridInqSize(field1.grid);
-	  field1.missval = vlistInqVarMissval(vlistID1, varID);
+          field1.grid = vlistInqVarGrid(vlistID1, varID);
+          field1.size = gridInqSize(field1.grid);
+          field1.missval = vlistInqVarMissval(vlistID1, varID);
+          
+          field2.grid = gridID2;
+          field2.size = gridsize2;
+          field2.missval = field1.missval;
 
-	  field2.grid = gridID2;
-	  field2.size = gridsize2;
-	  field2.missval = field1.missval;
-
-	  if ( needWeights )
-	    {
-	      wstatus = gridWeights(field1.grid, field1.weight);
-	    }
-	  code = vlistInqVarCode(vlistID1, varID);
-	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
-	    cdoWarning("Using constant grid cell area weights for code %d!", oldcode=code);
-
-	  gridboxstat(&field1, &field2, xinc, yinc, operfunc);
-
-	  streamDefRecord(streamID2, varID,  levelID);
-	  streamWriteRecord(streamID2, field2.ptr, field2.nmiss);
-	}
+          if ( needWeights )
+            {
+              wstatus = gridWeights(field1.grid, field1.weight);
+            }
+          code = vlistInqVarCode(vlistID1, varID);
+          if ( wstatus != 0 && tsID == 0 && code != oldcode )
+            cdoWarning("Using constant grid cell area weights for code %d!", oldcode=code);
+          
+          gridboxstat(&field1, &field2, xinc, yinc, operfunc);
+          
+          streamDefRecord(streamID2, varID,  levelID);
+          streamWriteRecord(streamID2, field2.ptr, field2.nmiss);
+        }
       tsID++;
     }
-
+  
   streamClose(streamID2);
   streamClose(streamID1);
-
+  
   if ( field1.ptr )    free(field1.ptr);
   if ( field1.weight ) free(field1.weight);
-
+  
   if ( field2.ptr )    free(field2.ptr);
   if ( field2.weight ) free(field2.weight);
-
+  
   cdoFinish();
-
+  
   return (0);
 }
