@@ -130,7 +130,7 @@ STRING   Time (format HH:MM)
 @Item = inc
 STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]
 @Item = calendar
-STRING   Calendar (standard, 360days, 365days, 366days)
+STRING   Calendar (standard, proleptic, 360days, 365days, 366days)
 @Item = sval
 STRING   Shift value (e.g. -3hour)
 @EndParameter
