@@ -4075,7 +4075,7 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
 */
 static
 void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict weights,
-		      int * restrict link_add1[2], int * restrict link_add2[2])
+		      int *link_add1[2], int *link_add2[2])
 {
   /*
     Input variables:
