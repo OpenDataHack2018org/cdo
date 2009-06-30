@@ -100,7 +100,7 @@ void intlinarr(int nxm, double *ym, double *xm, int nx, double *y, double *x)
   int j, jj;
 
   for ( jj = 1; jj < nxm; jj++ )
-    for ( j = 0; jj < nx; j++ )
+    for ( j = 0; j < nx; j++ )
       if ( x[j] >= xm[jj-1] && x[j] <= xm[jj] )
 	y[j] = intlin(x[j], ym[jj-1], xm[jj-1], ym[jj], xm[jj]);
 }
