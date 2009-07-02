@@ -338,8 +338,8 @@ void *Set(void *argument)
       tsID1++;
     }
 
-  streamClose(streamID1);
   streamClose(streamID2);
+  streamClose(streamID1);
 
   if ( array ) free(array);
 
