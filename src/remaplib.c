@@ -1402,7 +1402,6 @@ void remap(double *dst_array, double missval, long dst_size, long num_links, dou
 	}
       else
 	{
-	  /* Unvectorized loop: Unvectorizable dependency */
 	  for ( n = 0; n < num_links; n++ )
 	    {
 	      /*
@@ -1416,7 +1415,6 @@ void remap(double *dst_array, double missval, long dst_size, long num_links, dou
     {
       if ( num_wts == 3 )
 	{
-	  /* Unvectorized loop: Unvectorizable dependency */
 	  for ( n = 0; n < num_links; n++ )
 	    {
 	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n] +
@@ -1426,7 +1424,6 @@ void remap(double *dst_array, double missval, long dst_size, long num_links, dou
 	}
       else if ( num_wts == 4 )
 	{
-	  /* Unvectorized loop: Unvectorizable dependency */
       	  for ( n = 0; n < num_links; n++ )
 	    {
               dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n] +
@@ -1540,7 +1537,6 @@ void remap_laf(double *dst_array, double missval, long dst_size, long num_links,
 	{
 	  if ( i == dst_add[n] )
 	    {
-	    printf("%d %d\n", i, n);
 	      for ( k = 0; k < ncls; k++ )
 		if ( IS_EQUAL(src_array[src_add[n]], src_cls[k]) ) break;
 	      
@@ -1617,6 +1613,55 @@ void remap_laf(double *dst_array, double missval, long dst_size, long num_links,
   free(src_cls);
   free(src_wts);
 #endif
+}
+
+
+/*
+  -----------------------------------------------------------------------
+
+  Performs the remapping based on weights computed elsewhere
+     
+  -----------------------------------------------------------------------
+*/
+void remap_sum(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
+	       const int *dst_add, const int *src_add, const double *src_array)
+{
+  /*
+    Input arrays:
+
+    int *dst_add         ! destination address for each link
+    int *src_add         ! source      address for each link
+
+    double **map_wts     ! remapping weights for each link
+
+    double *src_array    ! array with source field to be remapped
+
+    output variables:
+
+    double *dst_array    ! array for remapped field on destination grid
+  */
+  /* Local variables */
+  static char func[] = "remap_sum";
+  long n;
+
+  for ( n = 0; n < dst_size; n++ ) dst_array[n] = missval;
+
+#ifdef SX
+#pragma cdir nodep
+#endif
+  for ( n = 0; n < num_links; n++ )
+    if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
+
+  for ( n = 0; n < num_links; n++ )
+    {
+      /*
+	printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[0][n]);
+      */
+      //dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
+      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
+      printf("%ld %d %d %g %g %g\n", n, dst_add[n], src_add[n],
+	     src_array[src_add[n]], map_wts[0][n], dst_array[dst_add[n]]);
+    }
 }
 
 
@@ -4199,17 +4244,16 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   long ioffset;
   long grid1_addm4, grid2_addm4;
-  /* int max_subseg = 100000; *//* max number of subsegments per segment to prevent infinite loop */
   int max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
-                          /* 1000 is to small!!! */
+                           /* 1000 is to small!!! */
   long grid1_size;
   long grid2_size;
   long grid1_corners;
   long grid2_corners;
   long grid1_add;       /* current linear address for grid1 cell   */
   long grid2_add;       /* current linear address for grid2 cell   */
-  long min_add;          /* addresses for restricting search of     */
-  long max_add;          /* destination grid                        */
+  long min_add;         /* addresses for restricting search of     */
+  long max_add;         /* destination grid                        */
   long n, n2, k;        /* generic counters                        */
   long corner;          /* corner of cell that segment starts from */
   long next_corn;       /* corner of cell that segment ends on     */
@@ -5189,7 +5233,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   /* Uwe Schulzweida: check if grid2_add is valid */
   if ( lcheck )
   if ( grid2_add != -1 )
-    /* Unvectorized loop: print */
     for ( n = 0; n < grid2_size; n++ )
       {
         if ( rv->norm_opt == NORM_OPT_DESTAREA )

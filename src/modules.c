@@ -316,7 +316,7 @@ void *Wct(void *argument);
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
-#define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2"}
+#define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
 #define  RemapetaOperators      {"remapeta"}
 #define  ReplaceOperators       {"replace"}

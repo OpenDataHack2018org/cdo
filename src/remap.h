@@ -33,6 +33,7 @@ typedef RESTR_TYPE restr_t;
 
 #define  SUBMAP_TYPE_NONE   0
 #define  SUBMAP_TYPE_LAF    1
+#define  SUBMAP_TYPE_SUM    2
 
 #define  RESTRICT_LATITUDE  1
 #define  RESTRICT_LATLON    2
@@ -149,6 +150,9 @@ void remap(double *dst_array, double missval, long dst_size, long num_links, dou
 	   remaplink_t links);
 
 void remap_laf(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
+	       const int *dst_add, const int *src_add, const double *src_array);
+
+void remap_sum(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
 	       const int *dst_add, const int *src_add, const double *src_array);
 
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv);

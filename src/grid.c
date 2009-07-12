@@ -1050,6 +1050,7 @@ int gridGenArea(int gridID, double *area)
   int gridtype;
   int nv, gridsize;
   int lgrid_gen_bounds = FALSE;
+  double xa;
   double total_area;
   double *grid_center_lon = NULL;
   double *grid_center_lat = NULL;
@@ -1147,15 +1148,22 @@ int gridGenArea(int gridID, double *area)
 	  p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
 	  c2 = gc2cc(&p2);
 
+	  xa = areas(&c1, &c2, &c3);
+	  /*
 	  if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
 	       (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	       (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
-
-	  area[i] += areas(&c1, &c2, &c3);
-	  /*
-      printf("area: %d %g %g %g %g %g %g %g\n", i, area[i],
-	     p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+	       (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
+	    {
+	    printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i], 
+	    p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+	    }
 	  */
+	  if ( xa > 0.001 )
+	    if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+		 (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+		 (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+
+	  area[i] += xa;
 	}
 
       p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
@@ -1165,15 +1173,23 @@ int gridGenArea(int gridID, double *area)
       p2.lat = grid_corner_lat[i*nv+nv-1]*deg2rad;
       c2 = gc2cc(&p2);
 
+      xa = areas(&c1, &c2, &c3);
+      /*
       if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
 	   (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	   (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
-
-      area[i] += areas(&c1, &c2, &c3);
-      /*
-      printf("area: %d %g %g %g %g %g %g %g\n", i, area[i],
-	     p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+	   (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
+	{
+	printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i],
+	p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+	}
       */
+      if ( xa > 0.001 )
+	if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+	     (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+	     (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+
+      area[i] += xa;
+
       total_area += area[i];
     }
 

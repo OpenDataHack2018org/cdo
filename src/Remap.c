@@ -52,7 +52,7 @@
 void *Remap(void *argument)
 {
   static char func[] = "Remap";
-  enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, 
+  enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
         GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX};
   int operatorID;
   int operfunc;
@@ -104,6 +104,7 @@ void *Remap(void *argument)
   cdoOperatorAdd("remapdis",    REMAPDIS,    0, NULL);
   cdoOperatorAdd("remapnn",     REMAPNN,     0, NULL);
   cdoOperatorAdd("remaplaf",    REMAPLAF,    0, NULL);
+  cdoOperatorAdd("remapsum",    REMAPSUM,    0, NULL);
   cdoOperatorAdd("gencon",      GENCON,      1, NULL);
   cdoOperatorAdd("gencon2",     GENCON2,     1, NULL);
   cdoOperatorAdd("genbil",      GENBIL,      1, NULL);
@@ -456,6 +457,10 @@ void *Remap(void *argument)
       map_type = MAP_TYPE_CONSERV;
       submap_type = SUBMAP_TYPE_LAF;
       break;
+    case REMAPSUM:
+      map_type = MAP_TYPE_CONSERV;
+      submap_type = SUBMAP_TYPE_SUM;
+      break;
     case REMAPBIL:
     case GENBIL:
       map_type = MAP_TYPE_BILINEAR;
@@ -747,6 +752,9 @@ void *Remap(void *argument)
 	  if ( operfunc == REMAPLAF )
 	    remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 		  remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
+	  else if ( operfunc == REMAPSUM )
+	    remap_sum(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
+		  remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
 	  else
 	    remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
@@ -780,6 +788,24 @@ void *Remap(void *argument)
 		    }
 		}
 	    }
+
+	  if ( operfunc == REMAPSUM )
+	  {
+	    double array1sum = 0;
+	    double array2sum = 0;
+   
+	    for ( i = 0; i < gridsize; i++ )
+	      printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].grid.grid1_frac[i],remaps[r].grid.grid1_area[i],remaps[r].grid.grid1_frac[i]);
+	    for ( i = 0; i < gridsize; i++ )
+	      array1sum += remaps[r].grid.grid1_area[i];
+
+	    for ( i = 0; i < gridsize2; i++ )
+	      printf("2 %d %g %g %g %g\n", i, array2[i], remaps[r].grid.grid2_frac[i],remaps[r].grid.grid2_area[i],remaps[r].grid.grid2_frac[i]);
+	    for ( i = 0; i < gridsize2; i++ )
+	      array2sum += remaps[r].grid.grid2_area[i];
+
+	    printf("array1sum %g, array2sum %g\n", array1sum, array2sum);
+	  }
 
 	  vlistInqVarName(vlistID1, varID, varname);
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
