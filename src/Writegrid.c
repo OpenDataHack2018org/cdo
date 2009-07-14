@@ -70,15 +70,10 @@ void *Writegrid(void *argument)
       gridtype = gridInqType(gridID);
       gridsize = gridInqSize(gridID);
 
+      if ( gridtype == GRID_GME ) gridID = gridToCell(gridID);
+
       if ( gridtype != GRID_CURVILINEAR && gridtype != GRID_CELL )
-	{
-	  if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
-	    gridID = gridToCurvilinear(gridID);
-	  else if ( gridtype == GRID_GME )
-	    gridID = gridToCell(gridID);
-	  else
-	    cdoAbort("%s grid unsupported!", gridNamePtr(gridtype));
-	}
+	gridID = gridToCurvilinear(gridID);
 
       if ( gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0 )
 	cdoAbort("Grid corner missing!");

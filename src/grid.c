@@ -37,6 +37,25 @@
 #define  rad2deg  (180./M_PI)   /* conversion for rad to deg */
 
 
+void gridToDegree(const char *units, const char *string, int gridsize, double *array)
+{
+  long i;
+
+  if ( memcmp(units, "radian", 6) == 0 )
+    {
+      for ( i = 0; i < gridsize; i++ ) array[i] *= rad2deg;
+    }
+  else if ( memcmp(units, "degrees", 7) == 0 )
+    {
+      /* No conversion necessary */
+    }
+  else
+    {
+      cdoWarning("Unknown units supplied for %s: %s", string, "proceeding assuming degrees");
+    }
+}
+
+
 int gridToZonal(int gridID1)
 {
   static char func[] = "gridToZonal";
@@ -847,7 +866,7 @@ int gridToCurvilinear(int gridID1)
       }
     default:
       {
-	Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
+	Error(func, "Grid type >%s< unsupported!", gridNamePtr(gridtype));
 	break;
       }
     }
@@ -1033,7 +1052,7 @@ int gridToCell(int gridID1)
       }
     default:
       {
-	Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
+	Error(func, "Grid type %s unsupported!", gridNamePtr(gridtype));
 	break;
       }
     }

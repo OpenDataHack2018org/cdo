@@ -640,34 +640,24 @@ void *Outputgmt(void *argument)
   zaxisID = vlistInqVarZaxis(vlistID, varID);
   missval = vlistInqVarMissval(vlistID, varID);
 
-  if ( gridInqType(gridID) != GRID_LONLAT      &&
-       gridInqType(gridID) != GRID_GAUSSIAN    &&
-       gridInqType(gridID) != GRID_GME         &&
-       gridInqType(gridID) != GRID_CURVILINEAR &&
-       gridInqType(gridID) != GRID_CELL )
-    cdoAbort("Output of %s data failed!", gridNamePtr(gridInqType(gridID)));
-  
-  gridsize = gridInqSize(gridID);
+  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToCell(gridID);
 
   if ( gridInqType(gridID) != GRID_CELL && gridInqType(gridID) != GRID_CURVILINEAR )
     {
-      if ( gridInqType(gridID) == GRID_GME )
-	{
-	  gridID = gridToCell(gridID);
-	  grid_mask = (int *) malloc(gridsize*sizeof(int));
-	  gridInqMask(gridID, grid_mask);
-	}
-      else
-	{
-	  gridID = gridToCurvilinear(gridID);
-	  lgrid_gen_bounds = TRUE;
-	}
+      gridID = gridToCurvilinear(gridID);
+      lgrid_gen_bounds = TRUE;
     }
 
   gridsize = gridInqSize(gridID);
   nlon     = gridInqXsize(gridID);
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
+
+  if ( gridInqMask(gridID, NULL) )
+    {
+      grid_mask = (int *) malloc(gridsize*sizeof(int));
+      gridInqMask(gridID, grid_mask);
+    }
 
   if ( gridInqType(gridID) != GRID_CELL )
     {
@@ -710,26 +700,10 @@ void *Outputgmt(void *argument)
   gridInqXvals(gridID, grid_center_lon);
 
   /* Convert lat/lon units if required */
-
   gridInqYunits(gridID, units);
 
-  if ( memcmp(units, "radian", 6) == 0 )
-    {
-      for ( i = 0; i < gridsize; i++ )
-	{
-	  grid_center_lat[i] *= RAD2DEG;
-	  grid_center_lon[i] *= RAD2DEG;
-	}
-    }
-  else if ( memcmp(units, "degrees", 7) == 0 )
-    {
-      /* No conversion necessary */
-    }
-  else
-    {
-      cdoWarning("Unknown units supplied for grid1 center lat/lon: "
-		 "proceeding assuming degrees");
-    }
+  gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+  gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
 
   nvals = gridsize;
   plon = grid_center_lon;
@@ -788,24 +762,10 @@ void *Outputgmt(void *argument)
 	    cdoAbort("Grid corner missing!");
 	}
 
-      if ( memcmp(units, "radian", 6) == 0 )
-	{
-	  /* Note: using units from latitude instead from bounds */
-	  for ( i = 0; i < gridcorners*gridsize; i++ )
-	    {
-	      grid_corner_lat[i] *= RAD2DEG;
-	      grid_corner_lon[i] *= RAD2DEG;
-	    }
-	}
-      else if ( memcmp(units, "degrees", 7) == 0 )
-	{
-	  /* No conversion necessary */
-	}
-      else
-	{
-	  cdoWarning("Unknown units supplied for grid1 center lat/lon: "
-		     "proceeding assuming degrees");
-	}
+
+      /* Note: using units from latitude instead from bounds */
+      gridToDegree(units, "grid corner lon", gridcorners*gridsize, grid_corner_lon);
+      gridToDegree(units, "grid corner lat", gridcorners*gridsize, grid_corner_lat);
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
 	{

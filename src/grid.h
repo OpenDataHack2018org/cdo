@@ -1,6 +1,7 @@
 #ifndef _GRID_H
 #define _GRID_H
 
+void gridToDegree(const char *units, const char *string, int gridsize, double *array);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
 int gridToCell(int gridID);

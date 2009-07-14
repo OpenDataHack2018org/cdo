@@ -43,7 +43,7 @@ void *Output(void *argument)
   int varID, recID;
   int gridsize = 0;
   int gridID, zaxisID, code, vdate, vtime;
-  int gridtype, ngrids, gridID2;
+  int ngrids;
   int nrecs;
   int levelID;
   int tsID, taxisID;
@@ -58,7 +58,7 @@ void *Output(void *argument)
   int ndiffgrids;
   const char *format = NULL;
   double level;
-  double *xvals = NULL, *yvals = NULL;
+  double *grid_center_lon = NULL, *grid_center_lat = NULL;
   double *array = NULL;
   double xdate;
   double missval;
@@ -106,22 +106,23 @@ void *Output(void *argument)
 
       if ( operatorID == OUTPUTFLD )
 	{
-	  gridtype = gridInqType(gridID);
+	  char units[128];
 
-	  if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_CELL ||
-               gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
-	    {
-	      if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
-		gridID2 = gridToCell(gridID);
-	      else
-		gridID2 = gridID;
+	  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToCell(gridID);
 
-	      xvals = (double *) malloc(gridsize*sizeof(double));
-	      yvals = (double *) malloc(gridsize*sizeof(double));
-	      gridInqXvals(gridID2, xvals);
-	      gridInqYvals(gridID2, yvals);
-	    }	  
-	  else cdoAbort("Input grid unsupported!");
+	  if ( gridInqType(gridID) != GRID_CELL && gridInqType(gridID) != GRID_CURVILINEAR )
+	    gridID = gridToCurvilinear(gridID);
+
+	  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
+	  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
+	  gridInqXvals(gridID, grid_center_lon);
+	  gridInqYvals(gridID, grid_center_lat);
+
+	  /* Convert lat/lon units if required */
+	  gridInqYunits(gridID, units);
+
+	  gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+	  gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
 	}
 
       tsID = 0;
@@ -143,6 +144,8 @@ void *Output(void *argument)
 	      nlon     = gridInqXsize(gridID);
 	      nlat     = gridInqYsize(gridID);
 	      level    = zaxisInqLevel(zaxisID, levelID);
+	      
+	      if ( nlon*nlat != gridsize ) { nlon = gridsize; nlat = 1; }
 
 	      streamReadRecord(streamID, array, &nmiss);
 
@@ -199,7 +202,8 @@ void *Output(void *argument)
 		  xdate  = vdate - (vdate/100)*100 + (hour*3600 + minute*60 + second)/86400.;
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(array[i], missval) )
-		      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, yvals[i], xvals[i], array[i]);
+		      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, 
+			      grid_center_lat[i], grid_center_lon[i], array[i]);
 		}
 	      else if ( operatorID == OUTPUTARR )
 		{
@@ -230,8 +234,8 @@ void *Output(void *argument)
       streamClose(streamID);
 
       if ( array ) free(array);
-      if ( xvals ) free(xvals);
-      if ( yvals ) free(yvals);
+      if ( grid_center_lon ) free(grid_center_lon);
+      if ( grid_center_lat ) free(grid_center_lat);
     }
 
   cdoFinish();
