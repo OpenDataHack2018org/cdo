@@ -51,6 +51,9 @@ void *Seascount(void *argument)
   double missval;
   FIELD **vars1 = NULL;
   FIELD field;
+  enum {START_DEC, START_JAN};
+  int season_start = START_DEC;
+  char *envstr;
 
   cdoInitialize(argument);
 
@@ -58,6 +61,21 @@ void *Seascount(void *argument)
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  envstr = getenv("CDO_SEASON_START");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
+      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
+
+      if ( cdoVerbose )
+	{
+	  if      ( season_start == START_DEC )
+	    cdoPrint("Set SEASON_START to December");
+	  else if ( season_start == START_JAN )
+	    cdoPrint("Set SEASON_START to January");
+	}
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -118,16 +136,27 @@ void *Seascount(void *argument)
           if ( month < 0 || month > 16 )
             cdoAbort("Month %d out of range!", month);
 
-          if ( month <= 12 )
-            seas = (month % 12) / 3;
-          else
-            seas = month - 13;
+	  newmon = month;
+
+	  if ( season_start == START_DEC )
+	    {
+	      if ( newmon == 12 ) newmon = 0;
+
+	      if ( month <= 12 )
+		seas = (month % 12) / 3;
+	      else
+		seas = month - 13;
+	    }
+	  else
+	    {
+	      if ( month <= 12 )
+		seas = (month - 1) / 3;
+	      else
+		seas = month - 13;
+	    }
 
           if ( seas < 0 || seas > 3 )
             cdoAbort("Season %d out of range!", seas+1);
-
-          newmon = month;
-          if ( newmon == 12 ) newmon = 0;
 
           if ( nsets == 0 )
             {

@@ -5,6 +5,7 @@
 	* added support of time units 'seconds' to all operators
 	  - the format of all time parameter changed from hh:mm to hh:mm:ss!
 	* gridarea: added support for hexagonal GME grid and tripolar MPIOM grid
+	* Seasstat: added env. CDO_SEASON_START to set the start month of the seasons [request: Laurent Mortier]
 	* store_link_cnsrv: remove two restrict keywords (bug fix) [report: Clement Alo]
 	* Version 1.4.0 released
 

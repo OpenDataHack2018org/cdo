@@ -60,6 +60,9 @@ void *Yseaspctl(void *argument)
   FIELD field;
   int pn;
   HISTOGRAM_SET *hsets[NSEAS];
+  enum {START_DEC, START_JAN};
+  int season_start = START_DEC;
+  char *envstr;
 
   cdoInitialize(argument);
   cdoOperatorAdd("yseaspctl", func_pctl, 0, NULL);
@@ -69,6 +72,21 @@ void *Yseaspctl(void *argument)
       
   if ( pn < 1 || pn > 99 )
     cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+
+  envstr = getenv("CDO_SEASON_START");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
+      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
+
+      if ( cdoVerbose )
+	{
+	  if      ( season_start == START_DEC )
+	    cdoPrint("Set SEASON_START to December");
+	  else if ( season_start == START_JAN )
+	    cdoPrint("Set SEASON_START to January");
+	}
+    }
 
   for ( seas = 0; seas < NSEAS; seas++ )
     {
@@ -132,10 +150,21 @@ void *Yseaspctl(void *argument)
       if ( month < 0 || month > 16 )
 	cdoAbort("Month %d out of range!", month);
 
-      if ( month <= 12 )
-	seas = (month % 12) / 3;
+      if ( season_start == START_DEC )
+	{
+	  if ( month <= 12 )
+	    seas = (month % 12) / 3;
+	  else
+	    seas = month - 13;
+	}
       else
-	seas = month - 13;
+	{
+	  if ( month <= 12 )
+	    seas = (month - 1) / 3;
+	  else
+	    seas = month - 13;
+	}
+
       if ( seas < 0 || seas > 3 )
 	cdoAbort("Season %d out of range!", seas+1);
 

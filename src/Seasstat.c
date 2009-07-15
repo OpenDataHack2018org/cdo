@@ -42,6 +42,7 @@ void *Seasstat(void *argument)
   int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
+  int vdate1 = 0, vtime1 = 0;
   int nrecs, nrecords;
   int gridID, varID, levelID, recID;
   int tsID;
@@ -55,9 +56,16 @@ void *Seasstat(void *argument)
   int nvars, nlevel;
   int *recVarID, *recLevelID;
   int newseas, oldmon = 0, newmon;
+  int nseason = 0;
   double missval;
   FIELD **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
   FIELD field;
+  enum {START_DEC, START_JAN};
+  int season_start = START_DEC;
+  const char seas_str1[4][4] = {"DJF", "MAM", "JJA", "SON"};
+  const char seas_str2[4][4] = {"JFM", "AMJ", "JAS", "OND"};
+  const char *seas_str[4];
+  char *envstr;
 
   cdoInitialize(argument);
 
@@ -71,6 +79,26 @@ void *Seasstat(void *argument)
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  envstr = getenv("CDO_SEASON_START");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
+      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
+
+      if ( cdoVerbose )
+	{
+	  if      ( season_start == START_DEC )
+	    cdoPrint("Set SEASON_START to December");
+	  else if ( season_start == START_JAN )
+	    cdoPrint("Set SEASON_START to January");
+	}
+    }
+
+  if ( season_start == START_DEC )
+    for ( i = 0; i < 4; ++i ) seas_str[i] = seas_str1[i];
+  else
+    for ( i = 0; i < 4; ++i ) seas_str[i] = seas_str2[i];
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -146,23 +174,37 @@ void *Seasstat(void *argument)
 	  vtime = taxisInqVtime(taxisID1);
 	  year  =  vdate / 10000;
 	  month = (vdate - year*10000) / 100;
-	  if ( month < 0 || month > 16 )
+	  if ( month < 1 || month > 12 )
 	    cdoAbort("Month %d out of range!", month);
 
-	  if ( month <= 12 )
-	    seas = (month % 12) / 3;
+	  newmon = month;
+
+	  if ( season_start == START_DEC )
+	    {
+	      if ( newmon == 12 ) newmon = 0;
+
+	      if ( month <= 12 )
+		seas = (month % 12) / 3;
+	      else
+		seas = month - 13;
+	    }
 	  else
-	    seas = month - 13;
+	    {
+	      if ( month <= 12 )
+		seas = (month - 1) / 3;
+	      else
+		seas = month - 13;
+	    }
 
 	  if ( seas < 0 || seas > 3 )
 	    cdoAbort("Season %d out of range!", seas+1);
 
-	  newmon = month;
-	  if ( newmon == 12 ) newmon = 0;
-
 	  if ( nsets == 0 )
 	    {
-	      seas0 = seas;
+	      nseason++;
+	      vdate0 = vdate;
+	      vtime0 = vtime;
+	      seas0  = seas;
 	      oldmon = newmon;
 	    }
 
@@ -243,8 +285,8 @@ void *Seasstat(void *argument)
 		  farmoq(&vars2[varID][levelID], vars1[varID][levelID]);
 	      }
 
-	  vdate0 = vdate;
-	  vtime0 = vtime;
+	  vdate1 = vdate;
+	  vtime1 = vtime;
 	  nsets++;
 	  tsID++;
 	}
@@ -290,10 +332,25 @@ void *Seasstat(void *argument)
 	  }
 
       if ( cdoVerbose )
-	cdoPrint("%d %d nsets %d", vdate0, vtime0, nsets);
+	{
+	  int year0, month0, day0, hour0, minute0, second0;
+	  int year1, month1, day1, hour1, minute1, second1;
+	  decode_date(vdate0, &year0, &month0, &day0);
+	  decode_time(vtime0, &hour0, &minute0, &second0);
+	  decode_date(vdate1, &year1, &month1, &day1);
+	  decode_time(vtime1, &hour1, &minute1, &second1);
+	  cdoPrint("season %3d %3s "
+		   "start %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d "
+		   "end %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d "
+		   "ntimesteps %d", 
+		   nseason, seas_str[seas0],
+		   year0, month0, day0, hour0, minute0, second0,
+		   year1, month1, day1, hour1, minute1, second1,
+		   nsets);
+	}
 
-      taxisDefVdate(taxisID2, vdate0);
-      taxisDefVtime(taxisID2, vtime0);
+      taxisDefVdate(taxisID2, vdate1);
+      taxisDefVtime(taxisID2, vtime1);
       streamDefTimestep(streamID2, otsID++);
 
       if ( nsets < 3 )

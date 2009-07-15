@@ -66,6 +66,9 @@ void *Yseasstat(void *argument)
   double missval;
   FIELD **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
   FIELD field;
+  enum {START_DEC, START_JAN};
+  int season_start = START_DEC;
+  char *envstr;
 
   cdoInitialize(argument);
 
@@ -79,6 +82,21 @@ void *Yseasstat(void *argument)
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
+
+  envstr = getenv("CDO_SEASON_START");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
+      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
+
+      if ( cdoVerbose )
+	{
+	  if      ( season_start == START_DEC )
+	    cdoPrint("Set SEASON_START to December");
+	  else if ( season_start == START_JAN )
+	    cdoPrint("Set SEASON_START to January");
+	}
+    }
 
   for ( seas = 0; seas < NSEAS; seas++ )
     {
@@ -120,12 +138,22 @@ void *Yseasstat(void *argument)
       vtime = taxisInqVtime(taxisID1);
       decode_date(vdate, &year, &month, &day);
       if ( month < 0 || month > 16 )
-	cdoAbort("month %d out of range!", month);
+	cdoAbort("Month %d out of range!", month);
 
-      if ( month <= 12 )
-	seas = (month % 12) / 3;
+      if ( season_start == START_DEC )
+	{
+	  if ( month <= 12 )
+	    seas = (month % 12) / 3;
+	  else
+	    seas = month - 13;
+	}
       else
-	seas = month - 13;
+	{
+	  if ( month <= 12 )
+	    seas = (month - 1) / 3;
+	  else
+	    seas = month - 13;
+	}
 
       if ( seas < 0 || seas > 3 )
 	cdoAbort("Season %d out of range!", seas+1);
