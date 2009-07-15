@@ -9,6 +9,10 @@
 	* store_link_cnsrv: remove two restrict keywords (bug fix) [report: Clement Alo]
 	* Version 1.4.0 released
 
+2009-07-15  Ralf Mueller <Ralf.Mueller@zmaw.de>
+
+	* eca_gsl: bug fix for finalDay in ecacore:eca4 [report: Elke Keup-Thiel]
+
 2009-06-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.3.2

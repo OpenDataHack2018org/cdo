@@ -1185,7 +1185,7 @@ void eca4(const ECA_REQUEST_4 *request)
                         continue;
                   }
                   if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) ) {
-                  	var2[levelID].ptr[i] = ivdate;
+                  	var2[levelID].ptr[i] = ovdate;
                   }
                   
                   firstDay = (double) day_of_year((int)var1[levelID].ptr[i]);
