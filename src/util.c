@@ -22,6 +22,7 @@
 #include "cdo.h"
 #include "modules.h"
 #include "dmemory.h"
+#include "util.h"
 
 char *getProgname(char *string)
 {
@@ -169,3 +170,42 @@ void strtolower(char *str)
 	str[i] = tolower((int) str[i]);
     }
 }
+
+
+const char *seas_name_dec[4] = {"DJF", "MAM", "JJA", "SON"};
+const char *seas_name_jan[4] = {"JFM", "AMJ", "JAS", "OND"};
+
+int get_season_start(void)
+{
+  int season_start = START_DEC;
+  char *envstr;
+
+  envstr = getenv("CDO_SEASON_START");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
+      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
+      
+      if ( cdoVerbose )
+	{
+	  if      ( season_start == START_DEC )
+	    cdoPrint("Set SEASON_START to December");
+	  else if ( season_start == START_JAN )
+	    cdoPrint("Set SEASON_START to January");
+	}
+    }
+
+  return (season_start);
+}
+
+
+void get_season_name(const char *seas_name[4])
+{
+  long i;
+
+  if ( get_season_start() == START_DEC )
+    for ( i = 0; i < 4; ++i ) seas_name[i] = seas_name_dec[i];
+  else
+    for ( i = 0; i < 4; ++i ) seas_name[i] = seas_name_jan[i];
+}
+

@@ -36,6 +36,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "field.h"
+#include "util.h"
 
 
 #define  NSEAS       4
@@ -66,9 +67,7 @@ void *Yseasstat(void *argument)
   double missval;
   FIELD **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
   FIELD field;
-  enum {START_DEC, START_JAN};
-  int season_start = START_DEC;
-  char *envstr;
+  int season_start;
 
   cdoInitialize(argument);
 
@@ -83,21 +82,7 @@ void *Yseasstat(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
-  envstr = getenv("CDO_SEASON_START");
-  if ( envstr )
-    {
-      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
-      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
-
-      if ( cdoVerbose )
-	{
-	  if      ( season_start == START_DEC )
-	    cdoPrint("Set SEASON_START to December");
-	  else if ( season_start == START_JAN )
-	    cdoPrint("Set SEASON_START to January");
-	}
-    }
-
+  season_start = get_season_start();
   for ( seas = 0; seas < NSEAS; seas++ )
     {
       vars1[seas] = NULL;

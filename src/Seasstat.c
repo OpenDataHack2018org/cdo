@@ -32,6 +32,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 
 void *Seasstat(void *argument)
@@ -60,12 +61,8 @@ void *Seasstat(void *argument)
   double missval;
   FIELD **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
   FIELD field;
-  enum {START_DEC, START_JAN};
-  int season_start = START_DEC;
-  const char seas_str1[4][4] = {"DJF", "MAM", "JJA", "SON"};
-  const char seas_str2[4][4] = {"JFM", "AMJ", "JAS", "OND"};
-  const char *seas_str[4];
-  char *envstr;
+  int season_start;
+  const char *seas_name[4];
 
   cdoInitialize(argument);
 
@@ -80,25 +77,8 @@ void *Seasstat(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
-  envstr = getenv("CDO_SEASON_START");
-  if ( envstr )
-    {
-      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
-      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
-
-      if ( cdoVerbose )
-	{
-	  if      ( season_start == START_DEC )
-	    cdoPrint("Set SEASON_START to December");
-	  else if ( season_start == START_JAN )
-	    cdoPrint("Set SEASON_START to January");
-	}
-    }
-
-  if ( season_start == START_DEC )
-    for ( i = 0; i < 4; ++i ) seas_str[i] = seas_str1[i];
-  else
-    for ( i = 0; i < 4; ++i ) seas_str[i] = seas_str2[i];
+  season_start = get_season_start();
+  get_season_name(seas_name);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -343,7 +323,7 @@ void *Seasstat(void *argument)
 		   "start %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d "
 		   "end %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d "
 		   "ntimesteps %d", 
-		   nseason, seas_str[seas0],
+		   nseason, seas_name[seas0],
 		   year0, month0, day0, hour0, minute0, second0,
 		   year1, month1, day1, hour1, minute1, second1,
 		   nsets);

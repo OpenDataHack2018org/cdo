@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 
 #define  MAX_STREAMS 32
@@ -50,7 +51,6 @@ void *Splittime(void *argument)
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   char filesuffix[32];
   char filename[1024];
-  char *Seas[4] = {"DJF", "MAM", "JJA", "SON"};
   int index = 0;
   int i;
   int taxisID1, taxisID2;
@@ -59,6 +59,8 @@ void *Splittime(void *argument)
   int gridsize;
   int nmiss;
   double *array = NULL;
+  int season_start;
+  const char *seas_name[4];
 
   cdoInitialize(argument);
 
@@ -72,6 +74,9 @@ void *Splittime(void *argument)
   operintval = cdoOperatorIntval(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
+
+  season_start = get_season_start();
+  get_season_name(seas_name);
 
   for ( i = 0; i < MAX_STREAMS; i++ ) streamIDs[i] = -1;
   for ( i = 0; i < MAX_STREAMS; i++ ) tsIDs[i] = 0;
@@ -119,11 +124,21 @@ void *Splittime(void *argument)
 	      if ( index < 0 || index > 16 )
 		cdoAbort("Month %d out of range!", index);
 
-	      if ( index <= 12 )
-		index = (index % 12) / 3;
+	      if ( season_start == START_DEC )
+		{
+		  if ( index <= 12 )
+		    index = (index % 12) / 3;
+		  else
+		    index = index - 13;
+		}
 	      else
-		index = index - 13;
-
+		{
+		  if ( index <= 12 )
+		    index = (index - 1) / 3;
+		  else
+		    index = index - 13;
+		}
+	      
 	      if ( index < 0 || index > 3 )
 		cdoAbort("Season %d out of range!", index+1);
 	    }
@@ -141,7 +156,7 @@ void *Splittime(void *argument)
 	{
 	  if ( operatorID == SPLITSEAS )
 	    {
-	      sprintf(filename+nchars, "%3s", Seas[index]);
+	      sprintf(filename+nchars, "%3s", seas_name[index]);
 	      if ( filesuffix[0] )
 		sprintf(filename+nchars+3, "%s", filesuffix);
 	    }

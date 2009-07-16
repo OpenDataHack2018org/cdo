@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -24,5 +24,10 @@ char *getOperatorName(char *xoperator);
 
 char *makeArgument(int argc, char *argv[]);
 char *getFileArg(char *argument);
+
+enum {START_DEC, START_JAN};
+int get_season_start(void);
+void get_season_name(const char *seas_name[4]);
+
 
 #endif  /* _UTIL_H */

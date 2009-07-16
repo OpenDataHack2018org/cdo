@@ -121,17 +121,22 @@ void *Seltime(void *argument)
     {
       char Seas[3];
       int seas[4] = {FALSE, FALSE, FALSE, FALSE};
-      int ival[4] = {0, 0, 0, 0};
+      int imon[17]; /* 1-16 ! */
+      int ival;
       size_t len;
+      int season_start;
 
+      season_start = get_season_start();
       nsel = operatorArgc();
       if ( isdigit(*operatorArgv()[0]))
 	for ( i = 0; i < nsel; i++ )
 	  {
-	    if      ( atoi(operatorArgv()[i]) == 1 || atoi(operatorArgv()[i]) == 13 ) seas[0] = TRUE;
-	    else if ( atoi(operatorArgv()[i]) == 2 || atoi(operatorArgv()[i]) == 14 ) seas[1] = TRUE;
-	    else if ( atoi(operatorArgv()[i]) == 3 || atoi(operatorArgv()[i]) == 15 ) seas[2] = TRUE;
-	    else if ( atoi(operatorArgv()[i]) == 4 || atoi(operatorArgv()[i]) == 16 ) seas[3] = TRUE;
+	    ival = atoi(operatorArgv()[i]);
+	    if      ( ival == 1 || ival == 13 ) seas[0] = TRUE;
+	    else if ( ival == 2 || ival == 14 ) seas[1] = TRUE;
+	    else if ( ival == 3 || ival == 15 ) seas[2] = TRUE;
+	    else if ( ival == 4 || ival == 16 ) seas[3] = TRUE;
+	    else cdoAbort("Season %d not available!", ival);
 	  }
       else
 	for ( i = 0; i < nsel; i++ )
@@ -139,23 +144,47 @@ void *Seltime(void *argument)
 	    len = strlen(operatorArgv()[i]);
 	    if ( len > 3 ) len = 3;
 	    while ( len-- > 0 ) Seas[len] = toupper(operatorArgv()[i][len]);
-	    if      ( Seas[0] == 'D' && Seas[1] == 'J'  && Seas[2] == 'F' ) seas[0] = TRUE;
-	    else if ( Seas[0] == 'M' && Seas[1] == 'A'  && Seas[2] == 'M' ) seas[1] = TRUE;
-	    else if ( Seas[0] == 'J' && Seas[1] == 'J'  && Seas[2] == 'A' ) seas[2] = TRUE;
-	    else if ( Seas[0] == 'S' && Seas[1] == 'O'  && Seas[2] == 'N' ) seas[3] = TRUE;
+	    if ( season_start == START_DEC )
+	      {
+		if      ( memcmp(Seas, "DJF", 3) == 0 ) seas[0] = TRUE;
+		else if ( memcmp(Seas, "MAM", 3) == 0 ) seas[1] = TRUE;
+		else if ( memcmp(Seas, "JJA", 3) == 0 ) seas[2] = TRUE;
+		else if ( memcmp(Seas, "SON", 3) == 0 ) seas[3] = TRUE;
+		else cdoAbort("Season %s not available!", operatorArgv()[i]);
+	      }
+	    else
+	      {
+		if      ( memcmp(Seas, "JFM", 3) == 0 ) seas[0] = TRUE;
+		else if ( memcmp(Seas, "AMJ", 3) == 0 ) seas[1] = TRUE;
+		else if ( memcmp(Seas, "JAS", 3) == 0 ) seas[2] = TRUE;
+		else if ( memcmp(Seas, "OND", 3) == 0 ) seas[3] = TRUE;
+		else cdoAbort("Season %s not available!", operatorArgv()[i]);
+	      }
 	  }
 
-      nsel = 4;
+      for ( i = 0; i < 17; ++i ) imon[i] = 0;
 
-      if ( seas[0] ) { ival[0] = 12; ival[1] =  1; ival[2] =  2; ival[3] = 13; }
-      if ( seas[1] ) { ival[0] =  3; ival[1] =  4; ival[2] =  5; ival[3] = 14; }
-      if ( seas[2] ) { ival[0] =  6; ival[1] =  7; ival[2] =  8; ival[3] = 15; }
-      if ( seas[3] ) { ival[0] =  9; ival[1] = 10; ival[2] = 11; ival[3] = 16; }
+      if ( season_start == START_DEC )
+	{
+	  if ( seas[0] ) { imon[12]++; imon[ 1]++; imon[ 2]++; imon[13]++; }
+	  if ( seas[1] ) { imon[ 3]++; imon[ 4]++; imon[ 5]++; imon[14]++; }
+	  if ( seas[2] ) { imon[ 6]++; imon[ 7]++; imon[ 8]++; imon[15]++; }
+	  if ( seas[3] ) { imon[ 9]++; imon[10]++; imon[11]++; imon[16]++; }
+	}
+      else
+	{
+	  if ( seas[0] ) { imon[ 1]++; imon[ 2]++; imon[ 3]++; imon[13]++; }
+	  if ( seas[1] ) { imon[ 4]++; imon[ 5]++; imon[ 6]++; imon[14]++; }
+	  if ( seas[2] ) { imon[ 7]++; imon[ 8]++; imon[ 9]++; imon[15]++; }
+	  if ( seas[3] ) { imon[10]++; imon[11]++; imon[12]++; imon[16]++; }
+	}
 
-      listSetInt(ilist, 0, ival[0]);
-      listSetInt(ilist, 1, ival[1]);
-      listSetInt(ilist, 2, ival[2]);
-      listSetInt(ilist, 3, ival[3]);
+      nsel = 0;
+      for ( i = 1; i < 17; ++i )
+	{
+	  if ( imon[i] )
+	    listSetInt(ilist, nsel++, i);
+	}
     }
   else if ( operatorID == SELDATE )
     {

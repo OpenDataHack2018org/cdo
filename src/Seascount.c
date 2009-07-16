@@ -26,6 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 
 void *Seascount(void *argument)
@@ -51,9 +52,7 @@ void *Seascount(void *argument)
   double missval;
   FIELD **vars1 = NULL;
   FIELD field;
-  enum {START_DEC, START_JAN};
-  int season_start = START_DEC;
-  char *envstr;
+  int season_start;
 
   cdoInitialize(argument);
 
@@ -62,20 +61,7 @@ void *Seascount(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
 
-  envstr = getenv("CDO_SEASON_START");
-  if ( envstr )
-    {
-      if      ( strcmp(envstr, "DEC") == 0 ) season_start = START_DEC;
-      else if ( strcmp(envstr, "JAN") == 0 ) season_start = START_JAN;
-
-      if ( cdoVerbose )
-	{
-	  if      ( season_start == START_DEC )
-	    cdoPrint("Set SEASON_START to December");
-	  else if ( season_start == START_JAN )
-	    cdoPrint("Set SEASON_START to January");
-	}
-    }
+  season_start = get_season_start();
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
