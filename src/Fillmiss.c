@@ -103,7 +103,7 @@ void fillmiss(FIELD *field1, FIELD *field2, int nfill)
 	      if ( !DBL_IS_EQUAL(matrix1[io][i], missval) )
 		{ ko = j - io; xo = matrix1[io][i]; break; }
 	    
-	      /*  printf("%d %d %d %d %d %d %g %g %g %g\n", j,i,kr,kl,ku,ko,xr,xl,xu,xo);*/
+	    /*  printf("%d %d %d %d %d %d %g %g %g %g\n", j,i,kr,kl,ku,ko,xr,xl,xu,xo);*/
 
 	    kh = kl + kr;
 	    kv = ko + ku;
@@ -186,9 +186,9 @@ void *Fillmiss(void *argument)
     {
       gridID1 = vlistGrid(vlistID1, index);
 
-      if ( gridInqType(gridID1) != GRID_LONLAT &&
-	   gridInqType(gridID1) != GRID_GAUSSIAN )
-	cdoAbort("Interpolation of %s data failed!", gridNamePtr(gridInqType(gridID1)) );
+      if ( gridInqType(gridID1) == GRID_GME ||
+	   gridInqType(gridID1) == GRID_CELL )
+	cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
