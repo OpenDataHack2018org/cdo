@@ -458,7 +458,7 @@ void *EcaFd(void *argument)
 }
 
 
-/* 
+/*
  * Definition of GSL: Growing Season Length start at the first span of at least
  * 6 (argN) days with T > 5.0°C (argT) in first half of the year and ends at
  * the first span of ar least 6 (argN) days with T < 5.0°C (argT) in the second
