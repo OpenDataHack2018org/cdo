@@ -177,12 +177,12 @@ void *Cond(void *argument)
 	  if ( operatorID == IFTHEN )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
-		array3[i] = !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array1[i], 0) ? array2[i] : missval2;
+		array3[i] = !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : missval2;
 	    }
 	  else if ( operatorID == IFNOTTHEN )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
-		array3[i] = !DBL_IS_EQUAL(array1[i], missval1) && DBL_IS_EQUAL(array1[i], 0) ? array2[i] : missval2;
+		array3[i] = !DBL_IS_EQUAL(array1[i], missval1) && DBL_IS_EQUAL(array1[i], 0.) ? array2[i] : missval2;
 	    }
 	  else
 	    {

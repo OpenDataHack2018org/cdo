@@ -243,7 +243,7 @@ void *Eofcoeff(void * argument)
                       out.ptr[0] += tmp;                   
                     }
                 }            
-              if ( ! DBL_IS_EQUAL(out.ptr[0],0) ) nmiss=0;
+              if ( ! DBL_IS_EQUAL(out.ptr[0],0.) ) nmiss=0;
               else { nmiss=1; out.ptr[0]=missval2; }
                       
               streamDefRecord(streamIDs[eofID], varID, levelID);
