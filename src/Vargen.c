@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -41,16 +41,18 @@
 void *Vargen(void *argument)
 {
   static char func[] = "Vargen";
-  int RANDOM, CONST, TOPO;
+  int RANDOM, CONST, TOPO, FOR;
   int operatorID;
   int streamID;
-  int nrecs;
+  int nrecs, ntimesteps;
   int tsID, recID, varID, levelID;
   int gridsize, i;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
+  int vdate, vtime, julday;
   const char *gridfile;
-  double rconst = 0.0;
+  double rval, rstart = 0, rstop = 0, rinc = 0;
+  double rconst = 0;
   double *array;
 #if defined(WITH_ETOPO)
   double etopo_scale = 3;
@@ -64,6 +66,7 @@ void *Vargen(void *argument)
   RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name");
   CONST  = cdoOperatorAdd("const",  0, 0, "constant value, grid description file or name");
   TOPO   = cdoOperatorAdd("topo",   0, 0, "");
+  FOR    = cdoOperatorAdd("for",    0, 0, "start, end<, increment>");
 
   operatorID = cdoOperatorID();
 
@@ -72,15 +75,15 @@ void *Vargen(void *argument)
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(1);
       gridfile = operatorArgv()[0];
-      gridID  = cdoDefineGrid(gridfile);
+      gridID   = cdoDefineGrid(gridfile);
     }
   else if ( operatorID == CONST )
     {
       operatorInputArg(cdoOperatorEnter(operatorID));
       operatorCheckArgc(2);
-      rconst = atof(operatorArgv()[0]);
+      rconst   = atof(operatorArgv()[0]);
       gridfile = operatorArgv()[1];
-      gridID  = cdoDefineGrid(gridfile);
+      gridID   = cdoDefineGrid(gridfile);
     }
   else if ( operatorID == TOPO )
     {
@@ -98,15 +101,37 @@ void *Vargen(void *argument)
       gridDefXvals(gridID, lon);
       gridDefYvals(gridID, lat);
     }
+  else if ( operatorID == FOR )
+    {
+      operatorInputArg(cdoOperatorEnter(operatorID));
+      if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
+      if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
+
+      rstart = atof(operatorArgv()[0]);
+      rstop  = atof(operatorArgv()[1]);
+      if ( operatorArgc() == 3 )
+	rinc = atof(operatorArgv()[2]);
+      else
+	rinc = 1;
+
+      if ( DBL_IS_EQUAL(rinc, 0.0) ) cdoAbort("Increment is zero!");
+
+      gridID = gridCreate(GRID_GENERIC, 1);
+      gridDefXsize(gridID, 1);
+      gridDefYsize(gridID, 1);
+    }
 
 
   zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
 
   vlistID = vlistCreate();
-  /* varID   = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE); */
-  varID   = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
-  taxisID = taxisCreate(TAXIS_ABSOLUTE);
+  if ( operatorID == FOR )
+    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+  else
+    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+
+  taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
   streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
@@ -117,36 +142,54 @@ void *Vargen(void *argument)
   gridsize = gridInqSize(gridID);
   array = (double *) malloc(gridsize*sizeof(double));
 
-  tsID = 0;
-  streamDefTimestep(streamID, tsID);
+  if ( operatorID == FOR )
+    ntimesteps = 1.001 + ((rstop-rstart)/rinc);
+  else
+    ntimesteps = 1;
 
-  nrecs = 1;
-  for ( recID = 0; recID < nrecs; recID++ )
+  julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
+
+  for ( tsID = 0; tsID < ntimesteps; tsID++ )
     {
-      levelID = 0;
-      streamDefRecord(streamID, varID, levelID);
+      rval  = rstart + rinc*tsID;
+      vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
+      vtime = 0;
+      taxisDefVdate(taxisID, vdate);
+      taxisDefVtime(taxisID, vtime);
+      streamDefTimestep(streamID, tsID);
 
-      if ( operatorID == RANDOM )
+      nrecs = 1;
+      for ( recID = 0; recID < nrecs; recID++ )
 	{
-	  for ( i = 0; i < gridsize; i++ )
-	    array[i] = rand()/(RAND_MAX+1.0);
-	}
-      else if ( operatorID == CONST )
-	{
-	  for ( i = 0; i < gridsize; i++ )
-	    array[i] = rconst;
-	}
-      else if ( operatorID == TOPO )
-	{
+	  levelID = 0;
+	  streamDefRecord(streamID, varID, levelID);
+
+	  if ( operatorID == RANDOM )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array[i] = rand()/(RAND_MAX+1.0);
+	    }
+	  else if ( operatorID == CONST )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		array[i] = rconst;
+	    }
+	  else if ( operatorID == TOPO )
+	    {
 #if defined(WITH_ETOPO)
-	  for ( i = 0; i < gridsize; i++ )
-	    array[i] = (double)etopo[i]/etopo_scale;
+	      for ( i = 0; i < gridsize; i++ )
+		array[i] = (double)etopo[i]/etopo_scale;
 #else
-	  cdoAbort("Operator support disabled!");
+	      cdoAbort("Operator support disabled!");
 #endif
-	}      
+	    }
+	  else if ( operatorID == FOR )
+	    {
+	      array[0] = rval;
+	    }
 
-      streamWriteRecord(streamID, array, 0);
+	  streamWriteRecord(streamID, array, 0);
+	}
     }
 
   streamClose(streamID);
