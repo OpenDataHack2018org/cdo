@@ -195,7 +195,7 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/apps/netCDF/3.6.2/LP64_underscore \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qmaxmem=-1 -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix5.3.0.0
     blizzard*)
@@ -204,13 +204,13 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/aix53/hdf5-1.8.2 \
                     --with-szlib=/sw/aix53/szip-2.1 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
- 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qmaxmem=-1 -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+ 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
     vip*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qmaxmem=-1 -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix6.0.0.0
     hpc*)
@@ -219,13 +219,13 @@ case "${HOSTNAME}" in
                     --with-hdf5=/usr/local/lib/hdf5/1.8.1/LP64_underscore \
                     --with-szlib=$HOME/local \
                     --with-proj=$HOME/local \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qmaxmem=-1 -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix6.0.0.0
     dwd | p???et01)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/uhome/mpischul/local \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qmaxmem=-1 -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
 # hppa2.0w-hp-hpux11.11
     moon)

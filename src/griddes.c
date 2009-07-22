@@ -170,17 +170,20 @@ int gridDefine(GRID grid)
     case GRID_GAUSSIAN:
     case GRID_SINUSOIDAL:
       {
-	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
-	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+	if ( grid.size != 1 )
+	  {
+	    if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
+	    if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+	  }
 
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
 	gridID = gridCreate(grid.type, grid.size);
 
-	gridDefPrec(gridID, grid.prec);
+	if ( grid.xsize > 0 ) gridDefXsize(gridID, grid.xsize);
+	if ( grid.ysize > 0 ) gridDefYsize(gridID, grid.ysize);
 
-	gridDefXsize(gridID, grid.xsize);
-	gridDefYsize(gridID, grid.ysize);
+	gridDefPrec(gridID, grid.prec);
 
 	if ( (grid.def_xfirst || grid.def_xlast || grid.def_xinc) && grid.xvals == NULL )
 	  {
@@ -1649,7 +1652,7 @@ int gridFromName(const char *gridname)
 	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
 	}
     }
-  else if ( gridname[0] == 'g' && isdigit(gridname[1])) /* g<LON>x<LAT> */
+  else if ( gridname[0] == 'g' && isdigit(gridname[1])) /* g<LON>x<LAT> or g<SIZE> */
     {
       pline = &gridname[1];
       if ( isdigit((int) *pline) )
@@ -1657,13 +1660,20 @@ int gridFromName(const char *gridname)
 	  grid.type = GRID_GENERIC;
 	  grid.xsize = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
-	  pline++;
-	  grid.ysize = atoi(pline);
-	  while ( isdigit((int) *pline) ) pline++;
+	  if ( *pline )
+	    {
+	      pline++;
+	      grid.ysize = atoi(pline);
+	      while ( isdigit((int) *pline) ) pline++;
+	    }
+	  else if ( grid.xsize == 1 )
+	    {
+	      grid.size  = 1;
+	      grid.xsize = 0;
+	    }
 	}
     }
-  else if ( gridname[0] == 'g' && gridname[1] == 'e' && gridname[2] == 'r' && gridname[3] == 'm' && 
-	    gridname[4] == 'a' && gridname[5] == 'n' && gridname[6] == 'y' ) /* germany_Xdeg */
+  else if ( strncmp(gridname, "germany", 7) == 0 ) /* germany_Xdeg */
     {
       double lon1 =   5.6, lon2 = 15.2;
       double lat1 =  47.1, lat2 = 55.1;
@@ -1673,8 +1683,7 @@ int gridFromName(const char *gridname)
 
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
-  else if ( gridname[0] == 'e' && gridname[1] == 'u' && gridname[2] == 'r' && 
-	    gridname[3] == 'o' && gridname[4] == 'p' && gridname[5] == 'e' ) /* europe_Xdeg */
+  else if ( strncmp(gridname, "europe", 6) == 0 ) /* europe_Xdeg */
     {
       double lon1 = -30, lon2 = 60;
       double lat1 =  30, lat2 = 80;
@@ -1684,8 +1693,7 @@ int gridFromName(const char *gridname)
 
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
-  else if ( gridname[0] == 'a' && gridname[1] == 'f' && gridname[2] == 'r' && 
-	    gridname[3] == 'i' && gridname[4] == 'c' && gridname[5] == 'a' ) /* africa_Xdeg */
+  else if ( strncmp(gridname, "africa", 6) == 0 ) /* africa_Xdeg */
     {
       double lon1 = -20, lon2 = 60;
       double lat1 = -40, lat2 = 40;
