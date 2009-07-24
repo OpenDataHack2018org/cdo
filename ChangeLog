@@ -7,6 +7,7 @@
 	* gridarea: added support for hexagonal GME grid and tripolar MPIOM grid
 	* Seasstat: added env. CDO_SEASON_START to set the start month of seasons [request: Laurent Mortier]
 	* store_link_cnsrv: remove two restrict keywords (bug fix) [report: Clement Alo]
+	* shifttime: bug fix for negative time increments [report: Andreas Hänsler]
 	* Version 1.4.0 released
 
 2009-07-15  Ralf Mueller <Ralf.Mueller@zmaw.de>
