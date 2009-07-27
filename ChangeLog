@@ -6,6 +6,7 @@
 	  - the format of all time parameter changed from hh:mm to hh:mm:ss!
 	* gridarea: added support for hexagonal GME grid and tripolar MPIOM grid
 	* Seasstat: added env. CDO_SEASON_START to set the start month of seasons [request: Laurent Mortier]
+	* remapnn: added support for GRID_CELL without bounds (full grid search)
 	* store_link_cnsrv: remove two restrict keywords (bug fix) [report: Clement Alo]
 	* shifttime: bug fix for negative time increments [report: Andreas Hänsler]
 	* Version 1.4.0 released

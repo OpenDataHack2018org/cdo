@@ -794,7 +794,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       rg->gridID1 = gridIDnew;
     }
 
-  if ( map_type == MAP_TYPE_DISTWGT )
+  if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
     {
       if ( gridInqType(rg->gridID1) == GRID_CELL )
 	{
