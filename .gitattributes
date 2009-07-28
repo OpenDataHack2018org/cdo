@@ -433,6 +433,7 @@ src/percentiles.c -text
 src/percentiles.h -text
 src/pipe.c -text
 src/pipe.h -text
+src/printinfo.c -text
 src/process.c -text
 src/process.h -text
 src/pstream.c -text

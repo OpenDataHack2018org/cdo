@@ -28,7 +28,7 @@ extern "C" {
 /* File types */
 
 #define  FILETYPE_GRB             1   /* File type GRIB                       */
-#define  FILETYPE_GB2             2   /* File type GRIB version 2             */
+#define  FILETYPE_GRB2            2   /* File type GRIB version 2             */
 #define  FILETYPE_NC              3   /* File type netCDF                     */
 #define  FILETYPE_NC2             4   /* File type netCDF version 2 (64-bit)  */
 #define  FILETYPE_NC4             5   /* File type netCDF version 4 (classic) */

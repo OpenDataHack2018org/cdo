@@ -109,11 +109,11 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	pstream.$(OBJEXT) table.$(OBJEXT) userlog.$(OBJEXT) \
 	util.$(OBJEXT) legendre.$(OBJEXT) fourier.$(OBJEXT) \
 	specspace.$(OBJEXT) readline.$(OBJEXT) juldate.$(OBJEXT) \
-	vinterp.$(OBJEXT) zaxis.$(OBJEXT) par_io.$(OBJEXT) \
-	pthread_debug.$(OBJEXT) color.$(OBJEXT) list.$(OBJEXT) \
-	percentiles.$(OBJEXT) nth_element.$(OBJEXT) ecacore.$(OBJEXT) \
-	ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) Hi.$(OBJEXT) \
-	Wct.$(OBJEXT) statistic.$(OBJEXT)
+	vinterp.$(OBJEXT) zaxis.$(OBJEXT) printinfo.$(OBJEXT) \
+	par_io.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
+	list.$(OBJEXT) percentiles.$(OBJEXT) nth_element.$(OBJEXT) \
+	ecacore.$(OBJEXT) ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) \
+	Hi.$(OBJEXT) Wct.$(OBJEXT) statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_LDADD = $(LDADD)
 am_cdotest_OBJECTS = cdilib.$(OBJEXT) cdotest.$(OBJEXT)
@@ -420,6 +420,7 @@ cdo_SOURCES = Arith.c		\
               juldate.c  	\
               vinterp.c		\
               zaxis.c  		\
+	      printinfo.c 	\
 	      par_io.c 	        \
 	      par_io.h 	        \
 	      pthread_debug.c 	\
@@ -750,6 +751,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/percentiles.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pipe.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/printinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/process.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pstream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pthread_debug.Po@am__quote@
