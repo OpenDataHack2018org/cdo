@@ -29,9 +29,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-
-void printFiletype(int streamID, int vlistID);
-void printGridInfo(int vlistID);
+#include "printinfo.h"
 
 
 void *Sinfo(void *argument)

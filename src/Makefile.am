@@ -194,7 +194,7 @@ cdo_SOURCES = Arith.c		\
               juldate.c  	\
               vinterp.c		\
               zaxis.c  		\
-	      printinfo.c 	\
+	      printinfo.h 	\
 	      par_io.c 	        \
 	      par_io.h 	        \
 	      pthread_debug.c 	\

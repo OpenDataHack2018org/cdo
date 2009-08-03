@@ -73,7 +73,7 @@ void printFiletype(int streamID, int vlistID)
 }
 
 
-void printGridInfo(int vlistID)
+static void printGridInfo(int vlistID)
 {
   static char func[] = "printGridInfo";
   int ngrids, index;
@@ -113,35 +113,49 @@ void printGridInfo(int vlistID)
 	  yfirst = gridInqYval(gridID, 0);
 	  ylast  = gridInqYval(gridID, ysize-1);
 	  yinc   = gridInqYinc(gridID);
+
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-	    {
-	      fprintf(stdout, "size : dim = %d  nlat = %d\n", gridsize, ysize);
-	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "longitude : reduced\n");
-	    }
+	    fprintf(stdout, "size : dim = %d  nlat = %d\n", gridsize, ysize);
 	  else
+	    fprintf(stdout, "size      : dim = %d  nlon = %d  nlat = %d\n", gridsize, xsize, ysize);
+
+	  if ( xsize > 0 )
 	    {
-	      xfirst = gridInqXval(gridID, 0);
-	      xlast  = gridInqXval(gridID, xsize-1);
-	      xinc   = gridInqXinc(gridID);
-	      fprintf(stdout, "size      : dim = %d  nlon = %d  nlat = %d\n", gridsize, xsize, ysize);
+	      if ( gridtype == GRID_GAUSSIAN_REDUCED )
+		{
+		  fprintf(stdout, "size : dim = %d  nlat = %d\n", gridsize, ysize);
+		  fprintf(stdout, "%*s", nbyte0, "");
+		  fprintf(stdout, "longitude : reduced\n");
+		}
+	      else
+		{
+		  xfirst = gridInqXval(gridID, 0);
+		  xlast  = gridInqXval(gridID, xsize-1);
+		  xinc   = gridInqXinc(gridID);
+		  fprintf(stdout, "%*s", nbyte0, "");
+		  fprintf(stdout, "%-9s : first = %.9g", xname, xfirst);
+		  if ( xsize > 1 ) fprintf(stdout, "  last = %.9g", xlast);
+		  if ( IS_NOT_EQUAL(xinc, 0) )
+		    fprintf(stdout, "  inc = %.9g", xinc);
+		  fprintf(stdout, "  %s", xunits);
+		  if ( gridIsCircular(gridID) )
+		    fprintf(stdout, "  circular");
+		  fprintf(stdout, "\n");
+		}
+	    }
+
+	  if ( ysize > 0 )
+	    {
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "%-9s : first = %.9g  last = %.9g", xname, xfirst, xlast);
-	      if ( IS_NOT_EQUAL(xinc, 0) )
-		fprintf(stdout, "  inc = %.9g", xinc);
-	      fprintf(stdout, "  %s", xunits);
-	      if ( gridIsCircular(gridID) )
-		fprintf(stdout, "  circular");
+	      fprintf(stdout, "%-9s : first = %.9g", yname, yfirst);
+	      if ( ysize > 1 ) fprintf(stdout, "  last = %.9g", ylast);
+	      if ( IS_NOT_EQUAL(yinc, 0) && 
+		   (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL || 
+		    gridtype == GRID_LCC2 || gridtype == GRID_LAEA) )
+		fprintf(stdout, "  inc = %.9g", yinc);
+	      fprintf(stdout, "  %s", yunits);
 	      fprintf(stdout, "\n");
 	    }
-	  fprintf(stdout, "%*s", nbyte0, "");
-	  fprintf(stdout, "%-9s : first = %.9g  last = %.9g", yname, yfirst, ylast);
-	  if ( IS_NOT_EQUAL(yinc, 0) && 
-	       (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL || 
-		gridtype == GRID_LCC2 || gridtype == GRID_LAEA) )
-	    fprintf(stdout, "  inc = %.9g", yinc);
-	  fprintf(stdout, "  %s", yunits);
-	  fprintf(stdout, "\n");
 	  
 	  if ( gridIsRotated(gridID) )
 	    {
