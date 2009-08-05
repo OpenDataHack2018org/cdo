@@ -244,7 +244,7 @@ void intarea(FIELD *field1, FIELD *field2)
   double *planedat;
   double *lon_array, *lat_array, *lono_array, *lato_array;
   int irun;
-  int latfirst = 0, latlast;
+  int latfirst = 0, latlast = 0;
   int lonfirst = 0, lonlast;
 
   gridIDi    = field1->grid;

@@ -130,19 +130,22 @@ static void version(void)
 #if defined (COMP_VERSION)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
 #endif
-#if defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL) || defined (_OPENMP)
+#if defined (HAVE_LIBPTHREAD) || defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL) || defined (_OPENMP)
   fprintf(stderr, "    with:");
+#if defined (HAVE_LIBPTHREAD)
+  fprintf(stderr, " PTHREADS");
+#endif
 #if defined (HAVE_LIBSZ)
-  fprintf(stderr, " libsz");
+  fprintf(stderr, " SZ");
 #endif
 #if defined (HAVE_LIBPROJ)
-  fprintf(stderr, " libproj");
+  fprintf(stderr, " PROJ.4");
 #endif
 #if defined (HAVE_LIBDRMAA)
-  fprintf(stderr, " libdrmaa");
+  fprintf(stderr, " DRMAA");
 #endif
 #if defined (HAVE_LIBCURL)
-  fprintf(stderr, " libcurl");
+  fprintf(stderr, " CURL");
 #endif
 #if defined (_OPENMP)
   fprintf(stderr, " OpenMP");

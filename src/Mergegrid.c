@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -54,9 +54,10 @@ static void gen_index(int gridID1, int gridID2, int *index)
 
   if ( gridtype1 == GRID_LONLAT || gridtype1 == GRID_GAUSSIAN )
     {
+      /*
       if ( gridIsRotated(gridID1) )
 	cdoAbort("Rotated grids unsupported!");
-
+      */
       nlon1 = gridInqXsize(gridID1);
       nlat1 = gridInqYsize(gridID1);
 

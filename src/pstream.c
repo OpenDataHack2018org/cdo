@@ -624,7 +624,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 {
   static char func[] = "pstreamOpenWrite";
   int fileID;
-  int pstreamID;
+  int pstreamID = -1;
   int ispipe;
   PSTREAM *pstreamptr;
 
