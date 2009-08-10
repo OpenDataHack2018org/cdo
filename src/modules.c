@@ -343,7 +343,7 @@ void *Wct(void *argument);
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
-#define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss"}
+#define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
 #define  SetrangeOperators      {"setrtoc", "setrtoc2"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \

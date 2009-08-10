@@ -22,6 +22,7 @@
       Setmiss    setctomiss      Set constant to missing value
       Setmiss    setmisstoc      Set missing value to constant
       Setmiss    setrtomiss      Set range to missing value
+      Setmiss    setvrange       Set range of valid value
 */
 
 
@@ -42,7 +43,7 @@ int isnan(const double x);
 void *Setmiss(void *argument)
 {
   static char func[] = "Setmiss";
-  int SETMISSVAL, SETCTOMISS, SETMISSTOC, SETRTOMISS;
+  int SETMISSVAL, SETCTOMISS, SETMISSTOC, SETRTOMISS, SETVRANGE;
   int operatorID;
   int streamID1, streamID2;
   int gridsize;
@@ -64,6 +65,7 @@ void *Setmiss(void *argument)
   SETCTOMISS = cdoOperatorAdd("setctomiss", 0, 0, "constant");
   SETMISSTOC = cdoOperatorAdd("setmisstoc", 0, 0, "constant");
   SETRTOMISS = cdoOperatorAdd("setrtomiss", 0, 0, "range (min, max)");
+  SETVRANGE  = cdoOperatorAdd("setvrange",  0, 0, "range (min, max)");
 
   operatorID = cdoOperatorID();
 
@@ -109,6 +111,17 @@ void *Setmiss(void *argument)
       nvars = vlistNvars(vlistID2);
       for ( varID = 0; varID < nvars; varID++ )
 	vlistDefVarMissval(vlistID2, varID, missval2);
+    }
+
+  if ( operatorID == SETVRANGE )
+    {
+      double range[2];
+      range[0] = rmin;
+      range[1] = rmax;
+
+      nvars = vlistNvars(vlistID2);
+      for ( varID = 0; varID < nvars; varID++ )
+	vlistDefAttFlt(vlistID2, varID, "valid_range", 2, range);
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -178,7 +191,7 @@ void *Setmiss(void *argument)
 		    array[i] = rconst;
 		  }
 	    }
-	  else /* setrtomiss */
+	  else if ( operatorID == SETRTOMISS )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		if ( array[i] >= rmin && array[i] <= rmax )
@@ -186,6 +199,15 @@ void *Setmiss(void *argument)
 		    array[i] = missval;
 		    nmiss++;
 		  }
+	    }
+	  else if ( operatorID == SETVRANGE )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		if ( array[i] < rmin || array[i] > rmax ) array[i] = missval;
+
+	      nmiss = 0;
+	      for ( i = 0; i < gridsize; i++ )
+		if ( DBL_IS_EQUAL(array[i], missval) ) nmiss++;
 	    }
 
 	  streamDefRecord(streamID2, varID, levelID);

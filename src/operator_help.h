@@ -729,7 +729,7 @@ static char *SettimeHelp[] = {
     "    date      STRING   Date (format YYYY-MM-DD)",
     "    time      STRING   Time (format HH:MM)",
     "    inc       STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]",
-    "    calendar  STRING   Calendar (standard, 360days, 365days, 366days)",
+    "    calendar  STRING   Calendar (standard, proleptic, 360days, 365days, 366days)",
     "    sval      STRING   Shift value (e.g. -3hour)",
     NULL
 };
@@ -978,13 +978,14 @@ static char *EnlargeHelp[] = {
 
 static char *SetmissHelp[] = {
     "NAME",
-    "    setmissval, setctomiss, setmisstoc, setrtomiss - Set missing value",
+    "    setmissval, setctomiss, setmisstoc, setrtomiss, setvrange - Set missing value",
     "",
     "SYNOPSIS",
     "    setmissval,newmiss  ifile ofile",
     "    setctomiss,c  ifile ofile",
     "    setmisstoc,c  ifile ofile",
     "    setrtomiss,rmin,rmax  ifile ofile",
+    "    setvrange,rmin,rmax  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module sets part of a field to missing value or missing values",
@@ -1007,7 +1008,11 @@ static char *SetmissHelp[] = {
     "    setrtomiss  Set range to missing value",
     "                         / miss   if i(t,x) GE rmin AND i(t,x) LE rmax",
     "                o(t,x) = ",
-    "                         \\ i(t,x) if i(t,x) LT rmin AND i(t,x) GT rmax",
+    "                         \\ i(t,x) if i(t,x) LT rmin OR  i(t,x) GT rmax",
+    "    setvrange   Set valid range",
+    "                         / miss   if i(t,x) LT rmin OR  i(t,x) GT rmax",
+    "                o(t,x) = ",
+    "                         \\ i(t,x) if i(t,x) GE rmin AND i(t,x) LE rmax",
     "",
     "PARAMETER",
     "    newmiss  FLOAT  New missing value",

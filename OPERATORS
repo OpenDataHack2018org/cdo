@@ -143,6 +143,7 @@ Operator catalog:
       Setmiss    setctomiss      Set constant to missing value
       Setmiss    setmisstoc      Set missing value to constant
       Setmiss    setrtomiss      Set range to missing value
+      Setmiss    setvrange       Set valid range
 -------------------------------------------------------------
    Arithmetic
 -------------------------------------------------------------

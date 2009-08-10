@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.4.0
 	* New operator: import_binary - Import binary data sets via a GrADS data descriptor file
+	* New operator: setvrange - Set valid range [request: Jörg Trentmann]
 	* added support of time units 'seconds' to all operators
 	  - the format of all time parameter changed from hh:mm to hh:mm:ss!
 	* gridarea: added support for hexagonal GME grid and tripolar MPIOM grid
