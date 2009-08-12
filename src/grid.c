@@ -568,7 +568,10 @@ int gridToCurvilinear(int gridID1)
 		    }
 
 		if ( gridtype == GRID_SINUSOIDAL )
-		  sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
+		  {
+		    sinusoidal_to_geo(gridsize, xvals2D, yvals2D);
+		    /* correct_sinxvals(nx, ny, xvals2D); */
+		  }
 		else if ( gridtype == GRID_LAEA )
 		  laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
 		else if ( gridtype == GRID_LCC2 )
@@ -679,7 +682,19 @@ int gridToCurvilinear(int gridID1)
 			    }
 			
 			if ( gridtype == GRID_SINUSOIDAL )
-			  sinusoidal_to_geo(4*gridsize, xbounds2D, ybounds2D);
+			  {
+			    sinusoidal_to_geo(4*gridsize, xbounds2D, ybounds2D);
+			    /*
+			    xvals2D = (double *) malloc(gridsize*sizeof(double));
+			    for ( j = 0; j < 4; ++j )
+			      {
+				for ( i = 0; i < gridsize; ++i ) xvals2D[i] = xbounds2D[i*4+j];
+				correct_sinxvals(nx, ny, xvals2D);
+				for ( i = 0; i < gridsize; ++i ) xbounds2D[i*4+j] = xvals2D[i];
+			      }
+			    free(xvals2D);
+			    */
+			  }
 			else if ( gridtype == GRID_LAEA )
 			  laea_to_geo(gridID1, 4*gridsize, xbounds2D, ybounds2D);
 			else if ( gridtype == GRID_LCC2 )

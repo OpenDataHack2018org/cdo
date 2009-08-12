@@ -266,7 +266,7 @@ static void printGridInfo(int vlistID)
 	  fprintf(stdout, "            originLon = %g  originLat = %g  lonParY = %g\n",
 		  originLon, originLat, lonParY);
 	  fprintf(stdout, "%*s", nbyte0, "");	  
-	  fprintf(stdout, "            lat1 = %g  lat2 = %g  xinc = %gm  yinc = %gm\n", 
+	  fprintf(stdout, "            lat1 = %g  lat2 = %g  xinc = %g m  yinc = %g m\n", 
 		  lat1, lat2, xincm, yincm);
 	}
       else /* if ( gridtype == GRID_GENERIC ) */

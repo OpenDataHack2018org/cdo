@@ -134,21 +134,24 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	  for ( i = lon11; i <= lon12; i++ ) *pxvals2++ = xvals1[i];
 	  for ( i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
 
-	  if ( IS_EQUAL(xvals2[0], xvals2[nlon2-1]) ) xvals2[nlon2-1] += 360;
-
-	  if ( xvals2[0] > xvals2[nlon2-1] )
-	    for ( i = 0; i < nlon2; i++ )
-	      if ( xvals2[i] >= 180 ) xvals2[i] -= 360;
-
-	  for ( i = 0; i < nlon2; i++ )
+	  if ( memcmp(xunits, "degree", 6) == 0 )
 	    {
-	      if ( xvals2[i] < -180 ) xvals2[i] += 360;
-	      if ( xvals2[i] >  360 ) xvals2[i] -= 360;
-	    }
+	      if ( IS_EQUAL(xvals2[0], xvals2[nlon2-1]) ) xvals2[nlon2-1] += 360;
 
-	  for ( i = 1; i < nlon2; i++ )
-	    {
-	      if ( xvals2[i] < xvals2[i-1] ) xvals2[i] += 360;
+	      if ( xvals2[0] > xvals2[nlon2-1] )
+		for ( i = 0; i < nlon2; i++ )
+		  if ( xvals2[i] >= 180 ) xvals2[i] -= 360;
+
+	      for ( i = 0; i < nlon2; i++ )
+		{
+		  if ( xvals2[i] < -180 ) xvals2[i] += 360;
+		  if ( xvals2[i] >  360 ) xvals2[i] -= 360;
+		}
+
+	      for ( i = 1; i < nlon2; i++ )
+		{
+		  if ( xvals2[i] < xvals2[i-1] ) xvals2[i] += 360;
+		}
 	    }
 	}
       /*
@@ -803,7 +806,7 @@ void *Selbox(void *argument)
       gridtype = gridInqType(gridID1);
 
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
-	   (operatorID == SELINDEXBOX && gridtype == GRID_GENERIC && 
+	   (operatorID == SELINDEXBOX && (gridtype == GRID_GENERIC || gridtype == GRID_SINUSOIDAL) && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0 ) ||
 	   (operatorID == SELLONLATBOX && gridtype == GRID_CELL) )
 	{

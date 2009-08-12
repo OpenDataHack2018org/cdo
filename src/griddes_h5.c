@@ -249,6 +249,59 @@ void fill_gridvals(int xsize, int ysize, double *xvals, double *yvals)
 }
 
 
+void correct_sinxvals(int xsize, int ysize, double *xvals)
+{
+  long i, j, istart, index;
+  double xmin, xmax;
+
+  xmin = -180;
+  xmax =  180;
+
+  for ( j = 0; j < ysize; ++j )
+    {
+      istart = xsize/2-1;
+      xmin = xvals[j*xsize+istart];
+      for ( i = istart-1; i >= 0; i-- )
+	{
+	  index = j*xsize+i;
+	  if ( xvals[index] > xmin ) break;
+	  xmin = xvals[index];
+	}
+
+      if ( i >= 0 )
+	{
+	  istart = i;
+	  // printf("%d %d %g\n",j,i, xmin);
+	  for ( i = 0; i <= istart; ++i )
+	    {
+	      index = j*xsize+i;
+	      xvals[index] = xmin;
+	    }
+	}
+
+      istart = xsize/2;
+      xmax = xvals[j*xsize+istart];
+      for ( i = istart+1; i < xsize; i++ )
+	{
+	  index = j*xsize+i;
+	  if ( xvals[index] < xmax ) break;
+	  xmax = xvals[index];
+	}
+
+      if ( i < xsize )
+	{
+	  istart = i;
+	  // printf("%d %d %g\n",j,i, xmax);
+	  for ( i = istart; i < xsize; ++i )
+	    {
+	      index = j*xsize+i;
+	      xvals[index] = xmax;
+	    }
+	}
+    }
+}
+
+
 int gridFromH5file(const char *gridfile)
 {
   static char func[] = "gridFromH5file";

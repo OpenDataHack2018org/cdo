@@ -17,6 +17,8 @@ struct geo {
   double lat;
 };
 
+void correct_sinxvals(int xsize, int ysize, double *xvals);
+
 double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3);
 struct cart gc2cc(struct geo *position);
 void factorni(int kni, int *kni2, int *kni3);
