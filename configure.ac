@@ -149,6 +149,42 @@ else
 fi
 
 #  ----------------------------------------------------------------------
+#  Compile application with JASPER library
+#
+AC_MSG_CHECKING([whether a location for the JASPER library was specified])
+AC_ARG_WITH([jasper],
+            [AS_HELP_STRING([--with-jasper=<directory>],
+                            [Specify location of JASPER library. You must specify its location if GRIB_API was built with JASPER. Configure will expect to find subdirs include and lib.])],
+            [JASPERDIR=$with_jasper])
+if test -z "$JASPERDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$JASPERDIR])
+  LDFLAGS="$LDFLAGS -L$JASPERDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$JASPERDIR/include"
+  AC_CHECK_LIB(jasper, jas_init, , LDFLAGS="$LDFLAGS")
+# AC_SUBST([JASPERDIR], [$JASPERDIR])
+fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with GRIB_API library
+#
+AC_MSG_CHECKING([whether a location for the GRIB_API library was specified])
+AC_ARG_WITH([grib_api],
+            [AS_HELP_STRING([--with-grib_api=<directory>],
+                            [Specify location of GRIB_API library. Configure will expect to find subdirs include and lib.])],
+            [GRIB_APIDIR=$with_grib_api])
+if test -z "$GRIB_APIDIR" ; then
+  AC_MSG_RESULT([no])
+else
+  AC_MSG_RESULT([$GRIB_APIDIR])
+  LDFLAGS="$LDFLAGS -L$GRIB_APIDIR/lib"
+  CPPFLAGS="$CPPFLAGS -I$GRIB_APIDIR/include"
+  AC_CHECK_LIB(grib_api, grib_get_message, , LDFLAGS="$LDFLAGS")
+# AC_SUBST([GRIB_APIDIR], [$GRIB_APIDIR])
+fi
+
+#  ----------------------------------------------------------------------
 #  Compile application with HDF5 library
 #
 AC_MSG_CHECKING([whether a location for the HDF5 library was specified])
@@ -182,18 +218,30 @@ else
 fi
 
 #  ----------------------------------------------------------------------
-#  Compile interface with internal GRIB library
-#
-AC_ARG_WITH([grib],
-            [AC_HELP_STRING([--with-grib], [Use the internal GRIB library [default=yes]])],,
-             with_grib="yes")
+#  Enable GRIB support
 
-if test "${with_grib}" = "yes" ; then
-  AC_DEFINE(HAVE_LIBGRIB, [1], [Define to 1 for GRIB interface])
+AC_ARG_ENABLE(grib,AS_HELP_STRING([--enable-grib],[GRIB support [[default=yes]]]),enable_grib=${enableval},enable_grib=yes)
+
+if test "${enable_grib}" = "yes"; then
+  AC_DEFINE(HAVE_LIBGRIB, [1], [Define to 1 for GRIB support])
 fi
 
 AC_MSG_CHECKING([for GRIB support])
-AC_MSG_RESULT($with_grib)
+AC_MSG_RESULT($enable_grib)
+
+#  ----------------------------------------------------------------------
+#  Compile interface with internal CGRIBEX library
+#
+AC_ARG_WITH([cgribex],
+            [AC_HELP_STRING([--with-cgribex], [Use the GRIB library [default=yes]])],,
+             with_cgribex="yes")
+
+if test "${with_cgribex}" = "yes" ; then
+  AC_DEFINE(HAVE_LIBCGRIBEX, [1], [Define to 1 for GRIB1 decoding/encoding with cgribex])
+fi
+
+AC_MSG_CHECKING([for CGRIBEX support])
+AC_MSG_RESULT($with_cgribex)
 
 #  ----------------------------------------------------------------------
 #  Compile interface with internal SERVICE library

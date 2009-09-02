@@ -82,6 +82,8 @@ case "${HOSTNAME}" in
 # i686-suse-linux
     linux | laptop)
 	${CONFPATH}configure --prefix=$HOME/local \
+                    --with-jasper=/usr \
+                    --with-grib_api=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"

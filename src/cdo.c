@@ -161,7 +161,8 @@ static void version(void)
 }
 
 
-static void usage(void)
+static
+void usage(void)
 {
   int id = 0;
   char *name;
@@ -173,8 +174,8 @@ static void usage(void)
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (32/64 for nc, nc2, nc4, srv, ext, ieg; 1 - 32 for grb)\n");
-  fprintf(stderr, "    -f <format>    Format of the output file. (grb, nc, nc2, nc4, srv, ext or ieg)\n");
+  fprintf(stderr, "                   (32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 32 for grb/grb2)\n");
+  fprintf(stderr, "    -f <format>    Format of the output file. (grb, grb2, nc, nc2, nc4, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>_lat=<LAT>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
@@ -224,8 +225,8 @@ static void usage(void)
   fprintf(stderr, "  Report bugs to Uwe.Schulzweida@zmaw.de\n");
 }
 
-
-static void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
+static
+void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 {
   if ( phelp == NULL )
     printf("No help available for this operator!\n");
@@ -246,8 +247,8 @@ static void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
     }
 }
 
-
-static void cdoSetDebug(int level)
+static
+void cdoSetDebug(int level)
 {
   /*
     level   0: off
@@ -271,11 +272,11 @@ static void cdoSetDebug(int level)
 #endif
 }
 
-
 static int cdoOptind = 1;
 static char *cdoOptarg;
 
-static int cdoGetopt(int argc, char * const argv[], const char *optstring)
+static
+int cdoGetopt(int argc, char * const argv[], const char *optstring)
 {
   static int optpos = 0;
   int optval = -1, value;
@@ -322,12 +323,11 @@ static int cdoGetopt(int argc, char * const argv[], const char *optstring)
   return (optval);
 }
 
-
 #undef  IsBigendian
 #define IsBigendian()  ( u_byteorder.c[sizeof(long) - 1] )
 
-
-static void setDefaultDataType(char *datatypestr)
+static
+void setDefaultDataType(char *datatypestr)
 {
   static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
   int nbits = -1;
@@ -372,7 +372,7 @@ static void setDefaultDataType(char *datatypestr)
 	  else
 	    {
 	      fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-	      fprintf(stderr, "Use 32/64 for filetype nc, srv, ext, ieg and 1-32 for grb.\n");
+	      fprintf(stderr, "Use 32/64 for filetype nc/srv/ext/ieg and 1-32 for grb/grb2.\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
@@ -433,8 +433,8 @@ static void setDefaultDataType(char *datatypestr)
     }
 }
 
-
-static void setDefaultDataTypeByte(char *datatypestr)
+static
+void setDefaultDataTypeByte(char *datatypestr)
 {
   static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
   int datatype = -1;
@@ -452,7 +452,7 @@ static void setDefaultDataTypeByte(char *datatypestr)
       else
 	{
 	  fprintf(stderr, "Unsupported datatype %d!\n", datatype);
-	  fprintf(stderr, "Use 4/8 for filetype nc, srv, ext, ieg and 1/2/3 for grb.\n");
+	  fprintf(stderr, "Use 4/8 for filetype nc/srv/ext/ieg and 1/2/3 for grb/grb2.\n");
 	  exit(EXIT_FAILURE);
 	}
     }
@@ -477,26 +477,27 @@ static void setDefaultDataTypeByte(char *datatypestr)
     }
 }
 
-
+static
 void setDefaultFileType(char *filetypestr, int labort)
 {
   if ( filetypestr )
     {
       char *ftstr = filetypestr;
 
-      if      ( memcmp(filetypestr, "grb", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
-      else if ( memcmp(filetypestr, "nc2", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
-      else if ( memcmp(filetypestr, "nc4", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
-      else if ( memcmp(filetypestr, "nc",  2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
-      else if ( memcmp(filetypestr, "srv", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
-      else if ( memcmp(filetypestr, "ext", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_EXT; }
-      else if ( memcmp(filetypestr, "ieg", 3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_IEG; }
+      if      ( memcmp(filetypestr, "grb2", 4)  == 0 ) { ftstr += 4; cdoDefaultFileType = FILETYPE_GRB2;}
+      else if ( memcmp(filetypestr, "grb",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
+      else if ( memcmp(filetypestr, "nc2",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
+      else if ( memcmp(filetypestr, "nc4",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
+      else if ( memcmp(filetypestr, "nc",   2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
+      else if ( memcmp(filetypestr, "srv",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
+      else if ( memcmp(filetypestr, "ext",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_EXT; }
+      else if ( memcmp(filetypestr, "ieg",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_IEG; }
       else
 	{
 	  if ( labort )
 	    {
 	      fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-	      fprintf(stderr, "Available filetypes: grb, nc, nc2, nc4, srv, ext and ieg\n");
+	      fprintf(stderr, "Available filetypes: grb, grb2, nc, nc2, nc4, srv, ext and ieg\n");
 	      exit(EXIT_FAILURE);
 	    }
 	  else
@@ -517,8 +518,8 @@ void setDefaultFileType(char *filetypestr, int labort)
 	    {
 	      fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
 	      fprintf(stderr, "Use format[_nbits] with:\n");
-	      fprintf(stderr, "    format = grb, nc, nc2, nc4, srv, ext or ieg\n");
-	      fprintf(stderr, "    nbits  = 32/64 for nc, nc2, nc4, srv, ext, ieg; 1 - 32 for grb\n");
+	      fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, srv, ext or ieg\n");
+	      fprintf(stderr, "    nbits  = 32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 32 for grb/grb2\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
@@ -542,7 +543,7 @@ int cdoFiletype(void)
 #if  defined  (HAVE_LIBNETCDF)
 #include "netcdf.h"
 #endif
-
+static
 int have_netCDF4(void)
 {
   int haveNC4 = FALSE;
@@ -556,7 +557,7 @@ int have_netCDF4(void)
   return (haveNC4);
 }
 
-
+static
 void defineCompress(const char *arg)
 {
   size_t len = strlen(arg);
@@ -578,6 +579,56 @@ void defineCompress(const char *arg)
     }
   else
     fprintf(stderr, "Compression %s unsupported!\n", arg);
+}
+
+static
+void get_env_vars(void)
+{
+  char *envstr;
+
+  envstr = getenv("CDO_LOG_OFF");
+  if ( envstr )
+    {
+      if ( atoi(envstr) == 1 )
+	{
+	  cdoLogOff = TRUE;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
+	}
+    }
+
+  envstr = getenv("CDO_DISABLE_HISTORY");
+  if ( envstr )
+    {
+      if ( atoi(envstr) == 1 )
+	{
+	  cdoDisableHistory = TRUE;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
+	}
+    }
+
+  envstr = getenv("CDO_DISABLE_FILESUFFIX");
+  if ( envstr )
+    {
+      if ( atoi(envstr) == 1 )
+	{
+	  cdoDisableFilesuffix = TRUE;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
+	}
+    }
+
+  envstr = getenv("CDO_DIAG");
+  if ( envstr )
+    {
+      if ( atoi(envstr) == 1 )
+	{
+	  cdoDiag = TRUE;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_DIAG = %s\n", envstr);
+	}
+    }
 }
 
 
@@ -724,53 +775,7 @@ int main(int argc, char *argv[])
 	}
     }
 
-  {
-      char *envstr;
-
-      envstr = getenv("CDO_LOG_OFF");
-      if ( envstr )
-	{
-	  if ( atoi(envstr) == 1 )
-	    {
-	      cdoLogOff = TRUE;
-	      if ( cdoVerbose )
-		fprintf(stderr, "CDO_LOG_OFF         = %s\n", envstr);
-	    }
-	}
-
-      envstr = getenv("CDO_DISABLE_HISTORY");
-      if ( envstr )
-	{
-	  if ( atoi(envstr) == 1 )
-	    {
-	      cdoDisableHistory = TRUE;
-	      if ( cdoVerbose )
-		fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
-	    }
-	}
-
-      envstr = getenv("CDO_DISABLE_FILESUFFIX");
-      if ( envstr )
-	{
-	  if ( atoi(envstr) == 1 )
-	    {
-	      cdoDisableFilesuffix = TRUE;
-	      if ( cdoVerbose )
-		fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
-	    }
-	}
-
-      envstr = getenv("CDO_DIAG");
-      if ( envstr )
-	{
-	  if ( atoi(envstr) == 1 )
-	    {
-	      cdoDiag = TRUE;
-	      if ( cdoVerbose )
-		fprintf(stderr, "CDO_DIAG = %s\n", envstr);
-	    }
-	}
-  }
+  get_env_vars();
 
   if ( Debug || Version ) version();
 
@@ -979,7 +984,6 @@ int main(int argc, char *argv[])
   /* problems with alias!!! if ( operatorName ) free(operatorName); */ 
 
   /* malloc_stats(); */
-
 
   return (status);
 }
