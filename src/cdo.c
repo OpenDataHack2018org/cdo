@@ -175,6 +175,7 @@ void usage(void)
   fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 32 for grb/grb2)\n");
+  fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, grb2, nc, nc2, nc4, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>_lat=<LAT>\n");
