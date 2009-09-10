@@ -760,7 +760,7 @@ void *Gradsdes(void *argument)
       gridInqYvals(gridID, yvals);
       for ( i = 0; i < xsize*ysize; ++i )
 	{
-	  if ( xvals[i] > 180 ) xvals[i] -= 360;
+	  if ( xvals[i] > 180  ) xvals[i] -= 360;
 	  if ( xvals[i] < xmin ) xmin = xvals[i];
 	  if ( xvals[i] > xmax ) xmax = xvals[i];
 	  if ( yvals[i] < ymin ) ymin = yvals[i];
@@ -769,8 +769,8 @@ void *Gradsdes(void *argument)
       free(xvals);
       free(yvals);
 
-      xfirst = ((int)(xmin-1));
-      yfirst = ((int)(ymin-1));
+      xfirst = ((int)(xmin-0.0));
+      yfirst = ((int)(ymin-0.0));
       xrange = ((int)(xmax+1.5)) - xfirst;
       yrange = ((int)(ymax+1.5)) - yfirst;
 
@@ -778,10 +778,10 @@ void *Gradsdes(void *argument)
       for ( i = 0; i < ni; i++ )
 	{
 	  xinc = yinc = inc[i];
-	  nx = (int) (xrange / xinc);
-	  ny = (int) (yrange / yinc);
+	  nx = 1 + (int) (xrange / xinc);
+	  ny = 1 + (int) (yrange / yinc);
 
-	  if ( nx > 2*xsize && ny > 2*ysize ) break;
+	  if ( nx > 1.5*xsize && ny > 1.5*ysize ) break;
 	}
 
       fprintf(gdp, "XDEF %d LINEAR %f %f\n", nx, xfirst, xinc);

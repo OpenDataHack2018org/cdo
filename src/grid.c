@@ -321,6 +321,7 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   int projflag, scanflag;
   int status;
   long i;
+  proj_info_t proj;
 
   gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
 	     &projflag, &scanflag);
@@ -331,15 +332,19 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   if ( IS_NOT_EQUAL(xincm, yincm) )
     Warning(func, "X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
 	    xincm, yincm);
+  /*
   if ( IS_NOT_EQUAL(lat1, lat2) )
     Warning(func, "Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
 	    lat1, lat2);
-		
+  */
+  map_set(PROJ_LC, originLat, originLon, xincm, lonParY, lat1, lat2, &proj);
+
   for ( i = 0; i < gridsize; i++ )
     {
       xi = xvals[i];
       xj = yvals[i];
-      status = W3FB12(xi, xj, originLat, originLon, xincm, lonParY, lat1, &zlat, &zlon);
+      // status = W3FB12(xi, xj, originLat, originLon, xincm, lonParY, lat1, &zlat, &zlon);
+      ijll_lc(xi, xj, proj, &zlat, &zlon);
       xvals[i] = zlon;
       yvals[i] = zlat;
     }
