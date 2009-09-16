@@ -232,13 +232,13 @@ off_t   streamNvals(int streamID);
 void    streamReadVar(int streamID, int varID, double *data, int *nmiss);
 
 /*      streamWriteVar: Write a variable */
-void    streamWriteVar(int streamID, int varID, double *data, int nmiss);
+void    streamWriteVar(int streamID, int varID, const double *data, int nmiss);
 
 /*      streamReadVarSlice: Read a horizontal slice of a variable */
 void    streamReadVarSlice(int streamID, int varID, int levelID, double *data, int *nmiss);
 
 /*      streamWriteVarSlice: Write a horizontal slice of a variable */
-void    streamWriteVarSlice(int streamID, int varID, int levelID, double *data, int nmiss);
+void    streamWriteVarSlice(int streamID, int varID, int levelID, const double *data, int nmiss);
 
 
 /* STREAM record I/O routines */
@@ -246,7 +246,7 @@ void    streamWriteVarSlice(int streamID, int varID, int levelID, double *data, 
 void    streamInqRecord(int streamID, int *varID, int *levelID);
 void    streamDefRecord(int streamID, int  varID, int  levelID);
 void    streamReadRecord(int streamID, double *data, int *nmiss);
-void    streamWriteRecord(int streamID, double *data, int nmiss);
+void    streamWriteRecord(int streamID, const double *data, int nmiss);
 void    streamCopyRecord(int streamIDdest, int streamIDsrc);
 
 void    streamInqGinfo(int streamID, int *intnum, float *fltnum);
@@ -424,7 +424,7 @@ char   *gridNamePtr(int gridtype);
 
 void    gridCompress(int gridID);
 
-void    gridDefMask(int gridID, int *mask);
+void    gridDefMask(int gridID, const int *mask);
 int     gridInqMask(int gridID, int *mask);
 
 void    gridPrint(int gridID, int opt);
@@ -458,34 +458,34 @@ void    gridDefYsize(int gridID, int ysize);
 int     gridInqYsize(int gridID);
 
 /*      gridDefXvals: Define the values of a X-axis */
-void    gridDefXvals(int gridID, double *xvals);
+void    gridDefXvals(int gridID, const double *xvals);
 
 /*      gridInqXvals: Get all values of a X-axis */
 int     gridInqXvals(int gridID, double *xvals);
 
 /*      gridDefYvals: Define the values of a Y-axis */
-void    gridDefYvals(int gridID, double *yvals);
+void    gridDefYvals(int gridID, const double *yvals);
 
 /*      gridInqYvals: Get all values of a Y-axis */
 int     gridInqYvals(int gridID, double *yvals);
 
 /*      gridDefXname: Define the name of a X-axis */
-void    gridDefXname(int gridID, char *xname);
+void    gridDefXname(int gridID, const char *xname);
 
 /*      gridDefXlongname: Define the longname of a X-axis  */
-void    gridDefXlongname(int gridID, char *xlongname);
+void    gridDefXlongname(int gridID, const char *xlongname);
 
 /*      gridDefXunits: Define the units of a X-axis */
-void    gridDefXunits(int gridID, char *xunits);
+void    gridDefXunits(int gridID, const char *xunits);
 
 /*      gridDefYname: Define the name of a Y-axis */
-void    gridDefYname(int gridID, char *yname);
+void    gridDefYname(int gridID, const char *yname);
 
 /*      gridDefYlongname: Define the longname of a Y-axis */
-void    gridDefYlongname(int gridID, char *ylongname);
+void    gridDefYlongname(int gridID, const char *ylongname);
 
 /*      gridDefYunits: Define the units of a Y-axis */
-void    gridDefYunits(int gridID, char *yunits);
+void    gridDefYunits(int gridID, const char *yunits);
 
 /*      gridInqXname: Get the name of a X-axis */
 void    gridInqXname(int gridID, char *xname);
@@ -559,7 +559,7 @@ void gridDefLaea(int gridID, double earth_radius, double lon_0, double lat_0);
 void gridInqLaea(int gridID, double *earth_radius, double *lon_0, double *lat_0);
 
 
-void    gridDefArea(int gridID, double *area);
+void    gridDefArea(int gridID, const double *area);
 void    gridInqArea(int gridID, double *area);
 int     gridHasArea(int gridID);
 
@@ -570,18 +570,18 @@ void    gridDefNvertex(int gridID, int nvertex);
 int     gridInqNvertex(int gridID);
 
 /*      gridDefXbounds: Define the bounds of a X-axis */
-void    gridDefXbounds(int gridID, double *xbounds);
+void    gridDefXbounds(int gridID, const double *xbounds);
 
 /*      gridInqXbounds: Get the bounds of a X-axis */
 int     gridInqXbounds(int gridID, double *xbounds);
 
 /*      gridDefYbounds: Define the bounds of a Y-axis */
-void    gridDefYbounds(int gridID, double *ybounds);
+void    gridDefYbounds(int gridID, const double *ybounds);
 
 /*      gridInqYbounds: Get the bounds of a Y-axis */
 int     gridInqYbounds(int gridID, double *ybounds);
 
-void    gridDefRowlon(int gridID, int nrowlon, int *rowlon);
+void    gridDefRowlon(int gridID, int nrowlon, const int *rowlon);
 void    gridInqRowlon(int gridID, int *rowlon);
 void    gridChangeType(int gridID, int gridtype);
 
@@ -610,7 +610,7 @@ void    zaxisPrint(int zaxisID);
 int     zaxisSize(void);
 
 /*      zaxisDefLevels: Define the levels of a Z-axis */
-void    zaxisDefLevels(int zaxisID, double *levels);
+void    zaxisDefLevels(int zaxisID, const double *levels);
 
 /*      zaxisInqLevels: Get all levels of a Z-axis */
 void    zaxisInqLevels(int zaxisID, double *levels);
@@ -654,9 +654,9 @@ int     zaxisInqUbounds(int zaxisID, double *ubounds);
 int     zaxisInqWeights(int zaxisID, double *weights);
 double  zaxisInqLbound(int zaxisID, int index);
 double  zaxisInqUbound(int zaxisID, int index);
-void    zaxisDefLbounds(int zaxisID, double *lbounds);
-void    zaxisDefUbounds(int zaxisID, double *ubounds);
-void    zaxisDefWeights(int zaxisID, double *weights);
+void    zaxisDefLbounds(int zaxisID, const double *lbounds);
+void    zaxisDefUbounds(int zaxisID, const double *ubounds);
+void    zaxisDefWeights(int zaxisID, const double *weights);
 void    zaxisChangeType(int zaxisID, int zaxistype);
 
 /* TAXIS routines */

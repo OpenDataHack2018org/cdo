@@ -92,6 +92,8 @@ case "${HOSTNAME}" in
     etch-ia32 | gata | baba)
         if [ "$SGE_MODE" = "off" ] ; then
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
+                    --with-jasper=/usr \
+                    --with-grib_api=/scratch/local2/m214003/local \
 	            --with-netcdf=/sw/etch-ia32/netcdf-3.6.2 \
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
                     --with-szlib=$HOME/local/etch-ia32 \

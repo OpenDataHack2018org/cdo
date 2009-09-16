@@ -39,7 +39,7 @@ void farfun(FIELD *field1, FIELD field2, int function)
 void faradd(FIELD *field1, FIELD field2)
 {
   static char func[] = "faradd";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -80,7 +80,7 @@ void faradd(FIELD *field1, FIELD field2)
 void farsum(FIELD *field1, FIELD field2)
 {
   static char func[] = "farsum";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -122,7 +122,7 @@ void farsum(FIELD *field1, FIELD field2)
 void farsumq(FIELD *field1, FIELD field2)
 {
   static char func[] = "farsumq";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -164,7 +164,7 @@ void farsumq(FIELD *field1, FIELD field2)
 void farsub(FIELD *field1, FIELD field2)
 {
   static char func[] = "farsub";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -199,7 +199,7 @@ void farsub(FIELD *field1, FIELD field2)
 void farmul(FIELD *field1, FIELD field2)
 {
   static char func[] = "farmul";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -234,7 +234,7 @@ void farmul(FIELD *field1, FIELD field2)
 void fardiv(FIELD *field1, FIELD field2)
 {
   static char func[] = "fardiv";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -259,7 +259,7 @@ void fardiv(FIELD *field1, FIELD field2)
 void faratan2(FIELD *field1, FIELD field2)
 {
   static char func[] = "fardiv";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -284,7 +284,7 @@ void faratan2(FIELD *field1, FIELD field2)
 void farmin(FIELD *field1, FIELD field2)
 {
   static char func[] = "farmin";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -323,7 +323,7 @@ void farmin(FIELD *field1, FIELD field2)
 void farmax(FIELD *field1, FIELD field2)
 {
   static char func[] = "farmax";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -362,7 +362,7 @@ void farmax(FIELD *field1, FIELD field2)
 void farvar(FIELD *field1, FIELD field2, FIELD field3)
 {
   static char func[] = "farstd";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -407,7 +407,7 @@ void farvar(FIELD *field1, FIELD field2, FIELD field3)
 void farstd(FIELD *field1, FIELD field2, FIELD field3)
 {
   static char func[] = "farstd";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -437,7 +437,7 @@ void farstd(FIELD *field1, FIELD field2, FIELD field3)
 void farcvar(FIELD *field1, FIELD field2, double rconst1)
 {
   static char func[] = "farcvar";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;
@@ -481,7 +481,7 @@ void farcvar(FIELD *field1, FIELD field2, double rconst1)
 void farcstd(FIELD *field1, FIELD field2, double rconst1)
 {
   static char func[] = "farcstd";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -511,7 +511,7 @@ void farcstd(FIELD *field1, FIELD field2, double rconst1)
 void farmoq(FIELD *field1, FIELD field2)
 {
   static char func[] = "farmoq";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -562,7 +562,7 @@ void farmoq(FIELD *field1, FIELD field2)
 void farcount(FIELD *field1, FIELD field2)
 {
   static char func[] = "farcount";
-  int    i, len;
+  long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
   double missval1 = field1->missval;

@@ -531,7 +531,7 @@ void scale2(long nvals, double scalefactor, double * restrict vec1, double * res
   long n;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(nvals, scalefactor, vec1, vec2) private(n)
+#pragma omp parallel for default(none) shared(nvals, scalefactor, vec1, vec2)
 #endif
   for ( n = 0; n < nvals; n++ )
     {
@@ -546,7 +546,7 @@ void check_lon_range(long nlons, double *lons)
   long n;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(nlons, lons) private(n)
+#pragma omp parallel for default(none) shared(nlons, lons)
 #endif
   for ( n = 0; n < nlons; n++ )
     {
@@ -561,7 +561,7 @@ void check_lat_range(long nlats, double *lats)
   long n;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(nlats, lats) private(n)
+#pragma omp parallel for default(none) shared(nlats, lats)
 #endif
   for ( n = 0; n < nlats; n++ )
     {
@@ -576,7 +576,7 @@ void check_lon_boundbox_range(long nlons, restr_t *bound_box)
   long n, n4;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(nlons, bound_box) private(n, n4)
+#pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
 #endif
   for ( n = 0; n < nlons; n++ )
     {
@@ -595,7 +595,7 @@ void check_lat_boundbox_range(long nlats, restr_t * restrict bound_box, double *
   long n, n4;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n, n4)
+#pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
 #endif
   for ( n = 0; n < nlats; n++ )
     {
@@ -900,7 +900,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   /* Initialize logical mask */
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
+#pragma omp parallel for default(none) shared(rg)
 #endif
   for ( i = 0; i < rg->grid1_size; i++ ) rg->grid1_mask[i] = TRUE;
 
@@ -960,7 +960,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   /* Initialize logical mask */
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(rg) private(i)
+#pragma omp parallel for default(none) shared(rg)
 #endif
   for ( i = 0; i < rg->grid2_size; i++ ) rg->grid2_mask[i] = TRUE;
 
@@ -2641,8 +2641,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)			\
-  private(n)
+  shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)
 #endif
   for ( n = 0; n < grid1_size; n++ )
     {
@@ -2931,8 +2930,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)  \
-  private(n)
+  shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)
 #endif
   for ( n = 0; n < grid1_size; n++ )
     {
