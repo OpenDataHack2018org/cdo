@@ -910,7 +910,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   gridInqYunits(gridID1, units);
 
-  if ( memcmp(units, "degrees", 7) == 0 )
+  if ( memcmp(units, "degree", 6) == 0 )
     {
       scale2(rg->grid1_size, DEG2RAD, rg->grid1_center_lat, rg->grid1_center_lon);
 
@@ -970,7 +970,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   gridInqYunits(gridID2, units);
 
-  if ( memcmp(units, "degrees", 7) == 0 )
+  if ( memcmp(units, "degree", 6) == 0 )
     {
       scale2(rg->grid2_size, DEG2RAD, rg->grid2_center_lat, rg->grid2_center_lon);
 
@@ -6521,7 +6521,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, nc_srcgrdcntrlat_id, "units", &attlen));
   grid1_units[attlen] = 0;
 
-  if ( memcmp(grid1_units, "degrees", 7) == 0 )
+  if ( memcmp(grid1_units, "degree", 6) == 0 )
     scale2(rg->grid1_size, DEG2RAD, rg->grid1_center_lat, rg->grid1_center_lon);
   else if ( memcmp(grid1_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
@@ -6535,7 +6535,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_attlen(nc_file_id, nc_srcgrdcrnrlat_id, "units", &attlen));
       grid1_units[attlen] = 0;
 
-      if ( memcmp(grid1_units, "degrees", 7) == 0 )
+      if ( memcmp(grid1_units, "degree", 6) == 0 )
 	scale2( rg->grid1_corners*rg->grid1_size, DEG2RAD, rg->grid1_corner_lat, rg->grid1_corner_lon);
       else if ( memcmp(grid1_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid1 corner lat/lon: proceeding assuming radians");
@@ -6557,7 +6557,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, nc_dstgrdcntrlat_id, "units", &attlen));
   grid2_units[attlen] = 0;
 
-  if ( memcmp(grid2_units, "degrees", 7) == 0 )
+  if ( memcmp(grid2_units, "degree", 6) == 0 )
     scale2(rg->grid2_size, DEG2RAD, rg->grid2_center_lat, rg->grid2_center_lon);
   else if ( memcmp(grid2_units, "radian", 6) != 0 )
     cdoPrint("Unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
@@ -6571,7 +6571,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_attlen(nc_file_id, nc_dstgrdcrnrlat_id, "units", &attlen));
       grid2_units[attlen] = 0;
       
-      if ( memcmp(grid2_units, "degrees", 7) == 0 )
+      if ( memcmp(grid2_units, "degree", 6) == 0 )
 	scale2( rg->grid2_corners*rg->grid2_size, DEG2RAD, rg->grid2_corner_lat, rg->grid2_corner_lon);
       else if ( memcmp(grid2_units, "radian", 6) != 0 )
 	cdoPrint("Unknown units supplied for grid2 corner lat/lon: proceeding assuming radians");
