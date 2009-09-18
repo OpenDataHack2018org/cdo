@@ -21,8 +21,12 @@
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
+#include "grid.h"
 #include "pstream.h"
 #include "dtypes.h"
+#if defined (_OPENMP)
+#include <omp.h>
+#endif
 #include "ecacore.h"
 #include "ecautil.h"
 
@@ -979,10 +983,11 @@ void eca4(const ECA_REQUEST_4 *request)
   
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
-  int gridsize;
+  int gridsize, gridtype;
+  double *yvals;
   int ivdate = 0, ivtime = 0;
   int ovdate = 0, ovtime = 0;
-  int month;
+  int month, yearcnt = 0;
   int nrecs, nrecords;
   int gridID, zaxisID, varID, ovarID1, ovarID2, levelID, recID;
   int itsID;
@@ -994,9 +999,11 @@ void eca4(const ECA_REQUEST_4 *request)
   int nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  FIELD *num1 = NULL, *num2 = NULL, *var1 = NULL, *var2 = NULL;
-  FIELD field, mask;
-  double firstDay, finalDay;
+  FIELD *startCount          , *endCount;
+  FIELD *startDateWithHist[2], *endDateWithHist[2];
+  FIELD *gslDuration, *gslFirstDay;
+  FIELD fieldGt              , fieldLt             , mask;
+  int reinitializedCounts = FALSE;
   
   cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
 
@@ -1011,10 +1018,10 @@ void eca4(const ECA_REQUEST_4 *request)
 
   gridID = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
   if ( gridID != vlistInqVarGrid(ivlistID2, FIRST_VAR_ID) ) cdoAbort("Grid sizes of the input fields do not match!");
-  
+
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
   ovarID1 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
-  
+
   if ( IS_SET(request->name) )
     vlistDefVarName(ovlistID, ovarID1, request->name);
   if ( IS_SET(request->longname) ) 
@@ -1046,45 +1053,83 @@ void eca4(const ECA_REQUEST_4 *request)
 
   streamDefVlist(ostreamID, ovlistID);
 
-  nrecords   = vlistNrecs(ivlistID1);
-  recVarID   = (int *) malloc(nrecords*sizeof(int));
-  recLevelID = (int *) malloc(nrecords*sizeof(int));
+  nrecords    = vlistNrecs(ivlistID1);
+  recVarID    = (int *) malloc(nrecords*sizeof(int));
+  recLevelID  = (int *) malloc(nrecords*sizeof(int));
 
-  gridsize = gridInqSize(gridID);
-
-  field.ptr = (double *) malloc(gridsize*sizeof(double));
-  mask.ptr = (double *) malloc(gridsize*sizeof(double));
-  
-  nlevels = zaxisInqSize(zaxisID);
-  missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
-
-  num1 = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  num2 = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  var1 = (FIELD *) malloc(nlevels*sizeof(FIELD));
-  var2 = (FIELD *) malloc(nlevels*sizeof(FIELD));
-    
-  for ( levelID = 0; levelID < nlevels; levelID++ )
+  gridtype = gridInqType(gridID);
+  if ( gridtype != GRID_CELL && gridtype != GRID_CURVILINEAR ) 
     {
-      num1[levelID].grid    = gridID;
-      num1[levelID].nmiss   = 0;
-      num1[levelID].missval = missval;
-      num1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      num2[levelID].grid    = gridID;
-      num2[levelID].nmiss   = 0;
-      num2[levelID].missval = missval;
-      num2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      var1[levelID].grid    = gridID;
-      var1[levelID].nmiss   = 0;
-      var1[levelID].missval = missval;
-      var1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-
-      var2[levelID].grid    = gridID;
-      var2[levelID].nmiss   = 0;
-      var2[levelID].missval = missval;
-      var2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+      if ( gridtype == GRID_GME )
+        gridID = gridToCell(gridID);
+      else
+        gridID = gridToCurvilinear(gridID);
     }
+  gridsize    = gridInqSize(gridID);
+  /* for later check on northern\southern hemisphere */
+  yvals   = malloc(gridsize*sizeof(double));
+  gridInqYvals(gridID,yvals);
+
+  /* Two fields are needed because of the definition of gsl for northern and
+  * southern hemisphere                                                      */
+  fieldGt.ptr = (double *) malloc(gridsize*sizeof(double));
+  fieldLt.ptr = (double *) malloc(gridsize*sizeof(double));
+
+  /* field for the land-water-distribution */
+  mask.ptr    = (double *) malloc(gridsize*sizeof(double));
+
+  nlevels     = zaxisInqSize(zaxisID);
+  missval     = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
+
+  startCount  = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  endCount    = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  gslDuration = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  gslFirstDay = (FIELD *) malloc(nlevels*sizeof(FIELD));
+
+  /* because of the different definitions for northern and southern hemisphere,
+   * the values of the last year have to be present
+   * THE LAST YEAR HAS THE INDEX 1 */
+  for ( int h = 0; h < 2; h++ )
+  {
+    startDateWithHist[h] = (FIELD *) malloc(nlevels*sizeof(FIELD));
+    endDateWithHist[h]   = (FIELD *) malloc(nlevels*sizeof(FIELD));
+  }
+
+  for ( levelID = 0; levelID < nlevels; levelID++ )
+  {
+    startCount[levelID].grid     = gridID;
+    startCount[levelID].nmiss    = 0;
+    startCount[levelID].missval  = missval;
+    startCount[levelID].ptr      = (double *) malloc(gridsize*sizeof(double));
+
+    endCount[levelID].grid       = gridID;
+    endCount[levelID].nmiss      = 0;
+    endCount[levelID].missval    = missval;
+    endCount[levelID].ptr        = (double *) malloc(gridsize*sizeof(double));
+
+    gslDuration[levelID].grid    = gridID;
+    gslDuration[levelID].nmiss   = 0;
+    gslDuration[levelID].missval = missval;
+    gslDuration[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+    gslFirstDay[levelID].grid    = gridID;
+    gslFirstDay[levelID].nmiss   = 0;
+    gslFirstDay[levelID].missval = missval;
+    gslFirstDay[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+    for ( int h = 0; h < 2; h++ )
+    {
+      startDateWithHist[h][levelID].grid    = gridID;
+      startDateWithHist[h][levelID].nmiss   = 0;
+      startDateWithHist[h][levelID].missval = missval;
+      startDateWithHist[h][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+
+      endDateWithHist[h][levelID].grid      = gridID;
+      endDateWithHist[h][levelID].nmiss     = 0;
+      endDateWithHist[h][levelID].missval   = missval;
+      endDateWithHist[h][levelID].ptr       = (double *) malloc(gridsize*sizeof(double));
+    }
+  }
   
   itsID   = 0;
   otsID   = 0;
@@ -1107,11 +1152,17 @@ void eca4(const ECA_REQUEST_4 *request)
         {
           ivdate = taxisInqVdate(itaxisID);
           ivtime = taxisInqVtime(itaxisID);
-          
+
+          month = (ivdate % 10000) / 100;
+          if ( month < 1 || month > 12 ) cdoAbort("month %d out of range!", month);
+
 	  if ( nsets == 0 ) SET_DATE(indate2, ivdate, ivtime);
 	  SET_DATE(indate1, ivdate, ivtime);
 
-	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) break;
+	  if ( DATE_IS_NEQ(indate1, indate2, cmplen) ) {
+            reinitializedCounts = FALSE;
+            break;
+          }
 
           for ( recID = 0; recID < nrecs; recID++ )
             {
@@ -1128,43 +1179,112 @@ void eca4(const ECA_REQUEST_4 *request)
                 {
                   for ( i = 0; i < gridsize; i++ )
                     {
-                      num1[levelID].ptr[i] = missval;
-                      num2[levelID].ptr[i] = missval;
-                      var1[levelID].ptr[i] = missval;
-                      var2[levelID].ptr[i] = missval;
+                      startCount[levelID].ptr[i]           = missval;
+                      endCount[levelID].ptr[i]             = missval;
+                      gslDuration[levelID].ptr[i]          = missval;
+                      gslFirstDay[levelID].ptr[i]          = missval;
+                      /* reinitialize the current year */
+                      startDateWithHist[0][levelID].ptr[i] = missval;
+                      endDateWithHist[0][levelID].ptr[i]   = missval;
                     }
-                  num1[levelID].nmiss = gridsize;
-                  num2[levelID].nmiss = gridsize;
-                  var1[levelID].nmiss = gridsize;
-                  var2[levelID].nmiss = gridsize;
+                  startCount[levelID].nmiss           = gridsize;
+                  endCount[levelID].nmiss             = gridsize;
+                  gslDuration[levelID].nmiss          = missval;
+                  gslFirstDay[levelID].nmiss          = missval;
+                  /* reinitialize the current year */
+                  startDateWithHist[0][levelID].nmiss = gridsize;
+                  endDateWithHist[0][levelID].nmiss   = gridsize;
                 }
 
-              streamReadRecord(istreamID1, field.ptr, &field.nmiss);
-              field.grid    = num1[levelID].grid;
-              field.missval = num1[levelID].missval;
-
-              farsel(&field, mask);
+              streamReadRecord(istreamID1, fieldGt.ptr, &fieldGt.nmiss);
+              streamReadRecord(istreamID1, fieldLt.ptr, &fieldLt.nmiss);
+              fieldGt.grid    = startCount[levelID].grid;
+              fieldGt.missval = startCount[levelID].missval;
+              fieldLt.grid    = startCount[levelID].grid;
+              fieldLt.missval = startCount[levelID].missval;
               
-              month = (ivdate % 10000) / 100;
-              if ( month < 1 || month > 12 ) cdoAbort("month %d out of range!", month);
-              
-              if ( month < 7 ) 
+              /* Reinitialize the *Count-variables once at the begining of the
+               * second half of the year */
+              if ( month >= 7 && !reinitializedCounts )
                 {
-                  request->s1(&field, request->s1arg);
-                  farnum2(&num1[levelID], field);
-                  
                   for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) && IS_EQUAL(num1[levelID].ptr[i], request->consecutiveDays) )
-                      var1[levelID].ptr[i] = ivdate;
+                    {
+                      startCount[levelID].ptr[i]           = missval;
+                      endCount[levelID].ptr[i]             = missval;
+                    }
+                  startCount[levelID].nmiss           = gridsize;
+                  endCount[levelID].nmiss             = gridsize;
+
+                  reinitializedCounts = TRUE;
+                }
+
+              /* count the day with temperature larger/smaller than the given limit */
+#if defined (_OPENMP)
+#pragma omp sections
+#endif
+              {
+                //printf("Total Number of Thread:%d\n", omp_get_num_threads());
+#if defined (_OPENMP)
+#pragma omp section
+#endif
+                {
+                  //printf("ThreadNum: %d ",omp_get_thread_num());
+                  farsel(&fieldGt, mask);
+                  request->s1(&fieldGt, request->s1arg);
+                  farnum2(&startCount[levelID], fieldGt);
+                }
+#if defined (_OPENMP)
+#pragma omp section
+#endif
+                {
+                  //printf("ThreadNum: %d\n",omp_get_thread_num());
+                  farsel(&fieldLt, mask);
+                  request->s2(&fieldLt, request->s1arg);
+                  farnum2(&endCount[levelID]  , fieldLt);
+                }
+              } 
+              
+              if ( month < 7 )
+                {
+                  for ( i = 0; i < gridsize; i++ )
+                    /* dictinct between northern and southern sphere */
+                    /* start with south */
+                    if ( yvals[i] < 0 )
+                    {
+                      if ( DBL_IS_EQUAL(endDateWithHist[0][levelID].ptr[i], missval) && 
+                          IS_EQUAL(endCount[levelID].ptr[i], request->consecutiveDays) )
+                      {
+                        endDateWithHist[0][levelID].ptr[i] = ivdate;
+                      }
+                    }
+                    else
+                    {
+                      if ( DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i], missval) && 
+                           IS_EQUAL(startCount[levelID].ptr[i], request->consecutiveDays) )
+                      {
+                        startDateWithHist[0][levelID].ptr[i] = ivdate;
+                      }
+                    }
                 }
               else
                 {
-                  request->s2(&field, request->s2arg);
-                  farnum2(&num2[levelID], field);
-
                   for ( i = 0; i < gridsize; i++ )
-                    if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) && IS_EQUAL(num2[levelID].ptr[i], request->consecutiveDays) )
-                      var2[levelID].ptr[i] = ivdate;
+                    if ( yvals[i] < 0 )
+                    {
+                      if ( DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i], missval) && 
+                           IS_EQUAL(startCount[levelID].ptr[i], request->consecutiveDays) ) 
+                      {
+                        startDateWithHist[0][levelID].ptr[i] = ivdate;
+                      }
+                    }
+                    else
+                    {
+                      if ( DBL_IS_EQUAL(endDateWithHist[0][levelID].ptr[i], missval) && 
+                          IS_EQUAL(endCount[levelID].ptr[i], request->consecutiveDays) )
+                      {
+                        endDateWithHist[0][levelID].ptr[i] = ivdate;
+                      }
+                    }
                 }
             }
 
@@ -1176,74 +1296,83 @@ void eca4(const ECA_REQUEST_4 *request)
 
       if ( nrecs == 0 && nsets == 0 ) break;
 
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              for ( i = 0; i < gridsize; i++ )
-                {
-                  if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) ) {
-                  	var2[levelID].ptr[i] = missval;
-                        continue;
-                  }
-                  if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) ) {
-                  	var2[levelID].ptr[i] = ovdate;
-                  }
-                  
-                  firstDay = (double) day_of_year((int)var1[levelID].ptr[i]);
-                  finalDay = (double) day_of_year((int)var2[levelID].ptr[i]);
-                  
-                  var1[levelID].ptr[i] = finalDay - firstDay;
-                  var2[levelID].ptr[i] = firstDay;
-                }
-                
-              var1[levelID].nmiss = 0;
-              var2[levelID].nmiss = 0;
-              for ( i = 0; i < gridsize; i++ )
-                {
-                  if ( DBL_IS_EQUAL(var1[levelID].ptr[i], missval) )
-                    var1[levelID].nmiss++;
-                  if ( DBL_IS_EQUAL(var2[levelID].ptr[i], missval) )
-                    var2[levelID].nmiss++;
-                }
-            }
-      
-      taxisDefVdate(otaxisID, ovdate);
-      taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID++);
-
-      if ( otsID == 1 || vlistInqVarTime(ivlistID1, FIRST_VAR_ID) == TIME_VARIABLE )
+      adjustEndDate(nlevels, gridsize, yvals, missval, ovdate, startDateWithHist, endDateWithHist);
+      if (yearcnt != 0)
         {
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              streamDefRecord(ostreamID, ovarID1, levelID);
-              streamWriteRecord(ostreamID, var1[levelID].ptr, var1[levelID].nmiss);
-            }
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              streamDefRecord(ostreamID, ovarID2, levelID);
-              streamWriteRecord(ostreamID, var2[levelID].ptr, var2[levelID].nmiss);
-            }
+          computeGsl(nlevels, gridsize, yvals, missval,
+                    startDateWithHist,  endDateWithHist, 
+                    gslDuration, gslFirstDay,
+                    FALSE);
+
+          /* values of the privous year */
+          writeGslStream(ostreamID, otaxisID, otsID, 
+                        ovarID1, ovarID2,ivlistID1,
+                        FIRST_VAR_ID,
+                        gslDuration, gslFirstDay,
+                        encode_date(ovdate/10000 - 1, 12, 31), ovtime,  nlevels); otsID++;
         }
+      if (ovdate != ivdate)
+        {
+#if defined (_OPENMP)
+#pragma omp sections
+#endif
+          {
+            updateHist(startDateWithHist, nlevels, gridsize, yvals, FALSE);
+#if defined (_OPENMP)
+#pragma omp section
+#endif
+            updateHist(endDateWithHist,   nlevels, gridsize, yvals, TRUE);
+          }
+#if defined (_OPENMP)
+#pragma omp end sections
+#endif
+        }
+      else
+        {
+          computeGsl(nlevels, gridsize, yvals, missval,
+                    startDateWithHist,  endDateWithHist, 
+                    gslDuration, gslFirstDay,
+                    TRUE);
+          {writeGslStream(ostreamID, otaxisID, otsID, 
+			  ovarID1, ovarID2,ivlistID1,
+			  FIRST_VAR_ID,
+			  gslDuration, gslFirstDay,
+			  ovdate, ovtime, nlevels); otsID++;}
+        }
+      yearcnt++;
 
       if ( nrecs == 0 ) break;
     }
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
-      free(num1[levelID].ptr);
-      free(num2[levelID].ptr);
-      free(var1[levelID].ptr);
-      free(var2[levelID].ptr);
+      free(startCount[levelID].ptr);
+      free(endCount[levelID].ptr);
+      free(gslDuration[levelID].ptr);
+      free(gslFirstDay[levelID].ptr);
+      for (int h = 0; h < 2; h++)
+        {
+          free(startDateWithHist[h][levelID].ptr);
+          free(endDateWithHist[h][levelID].ptr);
+        }
     }  
-  free(num1);
-  free(num2);
-  free(var1);
-  free(var2);
+  for (int h = 0; h < 2; h++)
+    {
+      free(startDateWithHist[h]);
+      free(endDateWithHist[h]);
+    }
+  free(startCount);
+  free(endCount);
+  free(gslDuration);
+  free(gslFirstDay);
   
-  if ( IS_SET(field.ptr) ) free(field.ptr);
+  if ( IS_SET(fieldGt.ptr) ) free(fieldGt.ptr);
+  if ( IS_SET(fieldLt.ptr) ) free(fieldLt.ptr);
 
   if ( IS_SET(recVarID) )   free(recVarID);
   if ( IS_SET(recLevelID) ) free(recLevelID);
 
   streamClose(ostreamID);
   streamClose(istreamID1);
+
 }

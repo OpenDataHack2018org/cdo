@@ -475,6 +475,154 @@ void farselgtc(FIELD *field, double c)
   selcompc(field, c, gt);
 }
 
+void updateHist(FIELD *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth)
+{
+  int levelID,i;
+  
+  for ( levelID = 0; levelID < nlevels; levelID++ )
+    for ( i = 0; i < gridsize; i++ )
+      if ( onlyNorth )
+      {
+        if ( yvals[i] >= 0.0 )
+          field[1][levelID].ptr[i] = field[0][levelID].ptr[i];
+      }
+      else
+        field[1][levelID].ptr[i] = field[0][levelID].ptr[i];
+}
+
+void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int ovdate,
+                FIELD *startDateWithHist[2], FIELD *endDateWithHist[2]) 
+{
+  int levelID, i, ovdateSouth;
+  
+  ovdateSouth = MIN(encode_date(ovdate/10000,6,30),ovdate);
+
+  for ( levelID = 0; levelID < nlevels; levelID++ )
+    {
+      for ( i = 0; i < gridsize; i++ )
+        {
+          /* dictinct between northern and southern sphere */
+          /* start with north */
+          if ( yvals[i] >= 0 )
+	    {
+	      if ( DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i], missval) ) {
+		endDateWithHist[0][levelID].ptr[i] = missval;
+		continue;
+	      }
+	    
+	      if ( DBL_IS_EQUAL(endDateWithHist[0][levelID].ptr[i], missval) ) {
+		endDateWithHist[0][levelID].ptr[i] = ovdate;
+	      }
+	    }
+          else
+	    {
+	      if ( DBL_IS_EQUAL(startDateWithHist[1][levelID].ptr[i], missval) ) {
+		endDateWithHist[0][levelID].ptr[i] = missval;
+		continue;
+	      }
+	      if ( DBL_IS_EQUAL(endDateWithHist[0][levelID].ptr[i], missval) ) {
+		endDateWithHist[0][levelID].ptr[i] = ovdateSouth; 
+	      }
+	    }
+        }
+    }
+}
+
+void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
+                FIELD *startDateWithHist[2], FIELD *endDateWithHist[2],
+                FIELD *gslDuration, FIELD *gslFirstDay, 
+                int useCurrentYear) 
+{
+  int levelID, i; 
+  double firstDay, duration; 
+
+  if ( !useCurrentYear )
+    {
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+        {
+          for ( i = 0; i < gridsize; i++ )
+            {
+              /* start with northern sphere */
+              if ( yvals[i] >= 0 )
+                {
+                  duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int)   endDateWithHist[1][levelID].ptr[i]) - 
+                                       date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
+                  firstDay = (double) day_of_year((int) startDateWithHist[1][levelID].ptr[i]);
+                }
+              else
+                {
+                  duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int)   endDateWithHist[0][levelID].ptr[i]) - 
+                                       date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
+                  firstDay = (double) day_of_year((int) startDateWithHist[1][levelID].ptr[i]);
+                }
+              gslDuration[levelID].ptr[i] = duration;
+              gslFirstDay[levelID].ptr[i] = firstDay;
+            }
+        }
+    }
+  else
+    {
+      /* the current year can only have values for the northern hemisphere */
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+        {
+          for ( i = 0; i < gridsize; i++ )
+            {
+              if ( yvals[i] >= 0 )
+                {
+                  duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int)   endDateWithHist[0][levelID].ptr[i]) - 
+                                       date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[0][levelID].ptr[i]));
+                  firstDay = (double) day_of_year((int) startDateWithHist[0][levelID].ptr[i]);
+
+                  gslDuration[levelID].ptr[i] = duration;
+                  gslFirstDay[levelID].ptr[i] = firstDay;
+                }
+              else
+                {
+                  gslDuration[levelID].ptr[i] = missval;
+                  gslFirstDay[levelID].ptr[i] = missval;
+                }
+            }
+        }
+    }
 
 
+  for ( levelID = 0; levelID < nlevels; levelID++ )
+    {
+      gslDuration[levelID].nmiss = 0;
+      gslFirstDay[levelID].nmiss = 0;
+      for ( i = 0; i < gridsize; i++ )
+        {
+          if ( DBL_IS_EQUAL(gslDuration[levelID].ptr[i], missval) )
+            gslDuration[levelID].nmiss++;
+          if ( DBL_IS_EQUAL(gslFirstDay[levelID].ptr[i], missval) )
+            gslFirstDay[levelID].nmiss++;
+        }
+    }
+}
 
+void writeGslStream(int ostreamID, int otaxisID, int otsID, 
+                    int ovarID1, int ovarID2, int ivlistID1,
+                    int first_var_id,
+                    FIELD *gslDuration, FIELD *gslFirstDay,
+                    int vdate, int vtime, int nlevels)
+{
+  int levelID;
+
+  taxisDefVdate(otaxisID, vdate);
+  taxisDefVtime(otaxisID, vtime);
+  streamDefTimestep(ostreamID, otsID++);
+
+  if ( otsID == 1 || vlistInqVarTime(ivlistID1, first_var_id) == TIME_VARIABLE )
+    {
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+        {
+          streamDefRecord(ostreamID, ovarID1, levelID);
+          streamWriteRecord(ostreamID, gslDuration[levelID].ptr, gslDuration[levelID].nmiss);
+        }
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+        {
+          streamDefRecord(  ostreamID, ovarID2, levelID);
+          streamWriteRecord(ostreamID, gslFirstDay[levelID].ptr, gslFirstDay[levelID].nmiss);
+        }
+    }
+}

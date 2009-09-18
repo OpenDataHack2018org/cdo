@@ -14,6 +14,10 @@
 	* shifttime: bug fix for negative time increments [report: Andreas Hänsler]
 	* Version 1.4.0 released
 
+2009-09-18  Ralf Mueller <Ralf.Mueller@zmaw.de>
+
+	* eca_gsl: consideration of different growing season start for northern and southern hemisphere
+
 2009-07-15  Ralf Mueller <Ralf.Mueller@zmaw.de>
 
 	* eca_gsl: bug fix for finalDay in ecacore:eca4 [report: Elke Keup-Thiel]

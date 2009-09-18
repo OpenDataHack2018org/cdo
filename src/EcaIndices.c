@@ -104,7 +104,7 @@ static const char FD_NAME[]          = "frost_days_index_per_time_period";
 static const char FD_LONGNAME[]      = "Frost days index is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
 static const char FD_UNITS[]         = "No.";
 
-static const char GSL_NAME[]         = "growing_season_length_index";
+static const char GSL_NAME[]         = "thermal_growing_season_length";
 static const char GSL_LONGNAME[]     = "Counted are the number of days per calendar year between the first occurrence of at least %d consecutive days where the daily mean temperature is above %1.0f degree Celsius and the first occurrence of at least %d consecutive days after 1st of July where the daily mean temperature is below %1.0f degree Celsius. The time period should be defined by the bounds of the time coordinate.";
 static const char GSL_UNITS[]        = "No.";
 static const char GSL_NAME2[]        = "day_of_year_of_growing_season_start";
@@ -459,12 +459,14 @@ void *EcaFd(void *argument)
 
 
 /*
- * Definition of GSL: Growing Season Length start at the first span of at least
- * 6 (argN) days with T > 5.0°C (argT) in first half of the year and ends at
- * the first span of ar least 6 (argN) days with T < 5.0°C (argT) in the second
- * half.
+ * Definition of GSL: (Thermal) Growing Season Length start at the first span
+ * of at least 6 (argN) days with T > 5.0°C (argT) in first half of the year
+ * and ends at the first span of ar least 6 (argN) days with T < 5.0°C (argT)
+ * in the second half.
  * ATTENTION: Year of the northern hemisphere starts in january to
  * december, whereas for the southern hemisphere is goes from july to june!
+ * Hence, at least 18 Month of data is needed for computing the gsl of the
+ * whole earth.
 */
 void *EcaGsl(void *argument)
 {

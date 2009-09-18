@@ -285,4 +285,55 @@ void farseleqc(FIELD *field, double c);
  */  
 void farselnec(FIELD *field, double c);
 
+/**
+ * reset the fields real values to the missval for all levels
+ *
+ * @param field the input field, also holds the result
+ * @param nlevels   number of available levels
+ * @param gridsize  number of grid points
+ */
+void updateHist(FIELD *field[2], int nlevels, int gridsize, double *yvals, int onlyNorth);
+
+/*
+ * Compute the Gsl and its starting day
+ *
+ * @param int nlevels
+ * @param int gridsize
+ * @param double *yvals = array of latitudes
+ * @param int ysize = number of gridpoints in lat-direction
+ * @param double missval
+ * @param int ovdate = the last year, which has been fully processed
+ * @param FIELD *startDate
+ * @param FIELD *endDate
+ * @param FIELD *startDateWithHist[2]
+ * @param FIELD *endDateWithHist[2]
+ * @param FIELD *gslDuration
+ * @param FIELD *gslFirstDay
+ * @param int useCurrentYear = if TRUE, only measurements of the current year
+ *                             (index 0) are used for computation, i.e. that
+ *                             gsl can only be computed for the northern
+ *                             hemisphere (see definition of GSL: EcaGsl()
+ */
+void computeGsl(int nlevels, int gridsize, double *yvals, double missval, 
+                FIELD *startDateWithHist[2], FIELD *endDateWithHist[2],
+                FIELD *gslDuration, FIELD *gslFirstDay,
+                int useCurrentYear);
+
+/*
+ * Adjust the endDates found in the current year:
+ * if a starting date for gsl could be found, but no ending date, the end
+ * should be the last day of the corresponding year for norther and June, 30th
+ * for southern hemisphere
+ */
+void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int ovdate,
+                   FIELD *startDateWithHist[2], FIELD *endDateWithHist[2]);
+/*
+ * Write GSL related fields to an output stream
+ */
+void writeGslStream(int ostreamID, int otaxisID, int otsID, 
+                    int ovarID1, int ovarID2, int ivlistID1,
+                    int first_var_id,
+                    FIELD *gslDuration, FIELD *gslFirstDay,
+                    int vdate, int vtime,  int nlevels);
+
 #endif /*ECAUTIL_H_*/
