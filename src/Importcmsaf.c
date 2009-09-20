@@ -1334,8 +1334,8 @@ void dsets_init(dsets_t *dsets)
 
 void *Importcmsaf(void *argument)
 {
-#if  defined  (HAVE_LIBHDF5)
   static char func[] = "Importcmsaf";
+#if  defined  (HAVE_LIBHDF5)
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;
   int i, offset;
@@ -1350,12 +1350,14 @@ void *Importcmsaf(void *argument)
   dsets_t dsets;
   int vdate, vtime;
   int *vtimes = NULL;
+#endif
 
   cdoInitialize(argument);
 
   if ( cdoDefaultFileType == CDI_UNDEFID )
     cdoDefaultFileType = FILETYPE_NC;
 
+#if  defined  (HAVE_LIBHDF5)
   dsets_init(&dsets);
 
   /* Open an existing file. */
@@ -1568,7 +1570,7 @@ void *Importcmsaf(void *argument)
 
   cdoFinish();
 #else
-  cdoWarning("HDF5 support not compiled in!");
+  cdoAbort("HDF5 support not compiled in!");
 #endif
 
   return (0);
