@@ -985,9 +985,23 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( ftype )
 	{
-	  status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
-	  if ( status < 0 )
-	    cdoAbort("Reading of NATIVE_DOUBLE variable %s failed!", varname);
+	  if ( dtype == DATATYPE_FLT32 )
+	    {
+	      float *farray;
+	      int i;
+	      farray = (float *) malloc(gridsize*nt*sizeof(float));
+	      status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray);
+	      if ( status < 0 )
+		cdoAbort("Reading of NATIVE_FLOAT variable %s failed!", varname);
+	      for ( i = 0; i < gridsize*nt; ++i ) array[i] = farray[i];
+	      free(farray);
+	    }
+	  else
+	    {
+	      status = H5Dread(dset_id, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, array);
+	      if ( status < 0 )
+		cdoAbort("Reading of NATIVE_DOUBLE variable %s failed!", varname);
+	    }
 	}
       else
 	{
