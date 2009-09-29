@@ -469,7 +469,30 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 
   if ( cdoVerbose ) cdoPrint("  Size: xsize=%d  ysize=%d", xsize, ysize);
 
+  /* some CM-SAF files have incorrect entries for some metadata. */
+  /* these are corrected in the following sections. */
   if ( strcmp(proj.ellipsoid, "WSG-84") == 0 ) strcpy(proj.ellipsoid, "WGS-84");
+
+  if ( strcmp(proj.name, "sinusoidal") != 0  && 
+       nx == xsize && ny == ysize &&
+       region.xmin == -8887500 &&  region.xmax == 8887500 && 
+       region.ymin  -8887500 && region.ymax == 8887500 && 
+       region.dx == 15000 && region.dy  == 15000 )
+  {
+      if ( cdoVerbose ) cdoPrint("Replacing incorrect projection parameters for sinusoidal products:");
+      strcpy(proj.ellipsoid, "WGS-84");
+      strcpy(proj.name, "sinusoidal");
+      proj.parameter[0] = 0.0; 
+      proj.parameter[1] = 0.0;
+      proj.parameter[2] = 0.0; 
+      proj.parameter[3] = 0.0;  
+      proj.parameter[4] = -99.99;      
+      proj.parameter[5] = -99.99;          
+      if ( cdoVerbose ) 
+	  cdoPrint("proj1 = %g, proj2 = %g, proj3 = %g, proj4 = %g,",  
+		   proj.parameter[0], proj.parameter[1],  
+		   proj.parameter[2], proj.parameter[3]);
+  }
 
   if ( nx == xsize && ny == ysize && 
        strcmp(proj.name, "sinusoidal") == 0 && 

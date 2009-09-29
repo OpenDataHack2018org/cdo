@@ -118,6 +118,7 @@ void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incuni
     }
 }
 
+
 static
 void printBounds(int taxisID, int calendar)
 {
@@ -150,7 +151,6 @@ void printBounds(int taxisID, int calendar)
   juldate1  = juldate_encode(calendar, vdate1, vtime1);
   jdelta    = juldate_to_seconds(juldate_sub(juldate1, juldate0));
   lperiod   = (INT64)(jdelta+0.5);
-  incperiod = (int) lperiod;
 
   deltay = year1-year0;
   deltam = deltay*12 + (month1-month0);
@@ -165,10 +165,11 @@ void printBounds(int taxisID, int calendar)
 
 void *Tinfo(void *argument)
 {
+  int vdate_first = 0, vtime_first = 0;
   int vdate0 = 0, vtime0 = 0;
-  int vdate, vtime;
+  int vdate = 0, vtime = 0;
   int nrecs, ntsteps;
-  int tsID, ntimeout;
+  int tsID = 0, ntimeout;
   int taxisID;
   int streamID;
   int vlistID;
@@ -186,7 +187,7 @@ void *Tinfo(void *argument)
   int vdatem[MAX_GAPS][MAX_NTSM];
   int vtimem[MAX_GAPS][MAX_NTSM];
   juldate_t juldate, juldate0;
-  double jdelta;
+  double jdelta = 0, jdelta0 = 0;
   int i, len;
 	  
 
@@ -235,9 +236,9 @@ void *Tinfo(void *argument)
       calendar = taxisInqCalendar(taxisID);
 
       if ( taxisHasBounds(taxisID) ) 
-	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Inrement YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss  Difference\n");
+	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss  Difference\n");
       else
-	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Inrement\n");
+	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment\n");
 
       tsID = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -261,12 +262,11 @@ void *Tinfo(void *argument)
 	      juldate   = juldate_encode(calendar, vdate, vtime);
 	      jdelta    = juldate_to_seconds(juldate_sub(juldate, juldate0));
 	      lperiod   = (INT64)(jdelta+0.5);
-	      incperiod = (int) lperiod;
 
 	      deltay = year-year0;
 	      deltam = deltay*12 + (month-month0);
 
-	      getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);
+	      getTimeInc(lperiod, deltay, deltam, &incperiod, &incunit);
 
 	      /* fprintf(stdout, "  %g  %g  %g  %d", jdelta, jdelta/3600, fmod(jdelta,3600), incperiod%3600);*/
 	      len = fprintf(stdout, " %3d %s%s", incperiod, tunits[incunit], incperiod>1?"s":"");
@@ -274,6 +274,8 @@ void *Tinfo(void *argument)
 	    }
 	  else
 	    {
+	      vdate_first = vdate;
+	      vtime_first = vtime;
 	      fprintf(stdout, "   --------");
 	    }
 
@@ -281,10 +283,18 @@ void *Tinfo(void *argument)
 
 	  if ( tsID > 1 )
 	    {
+	      if ( jdelta0 > jdelta && tsID == 2 )
+		{
+		  jdelta0    = jdelta;
+		  incperiod0 = incperiod;
+		  incunit0   = incunit;
+		}
+
 	      if ( incperiod != incperiod0 || incunit != incunit0 )
 		{
 		  int ndate, ntime;
 		  int ijulinc = incperiod0 * iunits[incunit0];
+
 		  /*
 		  printf("%d %s changed to %d %s\n", 
 			 incperiod0, tunits[incunit0], incperiod, tunits[incunit]);
@@ -340,10 +350,14 @@ void *Tinfo(void *argument)
 			}			
 		      ntsm[ngaps] = its;
 		    }
-		  ngaps++;
-		  if ( cdoVerbose )
-		    fprintf(stdout, "  <--- Gap %d, missing %d timestep%s",
-			    ngaps, its, its>1?"s":"");
+
+		  if ( its > 0 )
+		    {
+		      ngaps++;
+		      if ( cdoVerbose )
+			fprintf(stdout, "  <--- Gap %d, missing %d timestep%s",
+				ngaps, its, its>1?"s":"");
+		    }
 		}
 	    }
 
@@ -351,6 +365,7 @@ void *Tinfo(void *argument)
 	    {
 	      if ( tsID == 1 )
 		{
+		  jdelta0    = jdelta;
 		  incperiod0 = incperiod;
 		  incunit0   = incunit;
 		}
@@ -366,6 +381,24 @@ void *Tinfo(void *argument)
 	  tsID++;
 	}
     }
+
+  streamClose(streamID);
+
+  fprintf(stdout, "\n");
+
+  decode_date(vdate_first, &year, &month, &day);
+  decode_time(vtime_first, &hour, &minute, &second);
+  fprintf(stdout, " Start date          : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d\n",
+	  year, month, day, hour, minute, second);
+
+  decode_date(vdate, &year, &month, &day);
+  decode_time(vtime, &hour, &minute, &second);
+  fprintf(stdout, " End date            : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d\n",
+	  year, month, day, hour, minute, second);
+  fprintf(stdout, " Increment           : %3d %s%s\n", 
+	  incperiod0, tunits[incunit0], incperiod0>1?"s":"");
+  fprintf(stdout, " Number of timesteps : %d\n", tsID);
+  fprintf(stdout, " Gaps identified     : %d\n", ngaps);
 
   if ( cdoVerbose && ngaps )
     {
@@ -410,8 +443,6 @@ void *Tinfo(void *argument)
 	  fprintf(stdout, "\n");
 	}
     }
-
-  streamClose(streamID);
 
   cdoFinish();
 
