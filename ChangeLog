@@ -15,6 +15,10 @@
 	* shifttime: bug fix for negative time increments [report: Andreas Hänsler]
 	* Version 1.4.0 released
 
+2009-09-29  Frank Kaspar <Frank.Kaspar@dwd.de>
+
+	* import_cmsaf: Replacing incorrect projection parameters for sinusoidal products
+
 2009-09-18  Ralf Mueller <Ralf.Mueller@zmaw.de>
 
 	* eca_gsl: consideration of different growing season start for northern and southern hemisphere
