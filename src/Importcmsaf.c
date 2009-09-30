@@ -475,9 +475,9 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 
   if ( strcmp(proj.name, "sinusoidal") != 0  && 
        nx == xsize && ny == ysize &&
-       region.xmin == -8887500 &&  region.xmax == 8887500 && 
-       region.ymin  -8887500 && region.ymax == 8887500 && 
-       region.dx == 15000 && region.dy  == 15000 )
+       (int)region.xmin == -8887500 &&  (int)region.xmax == 8887500 && 
+       (int)region.ymin  -8887500 && (int)region.ymax == 8887500 && 
+       (int)region.dx == 15000 && (int)region.dy  == 15000 )
   {
       if ( cdoVerbose ) cdoPrint("Replacing incorrect projection parameters for sinusoidal products:");
       strcpy(proj.ellipsoid, "WGS-84");
@@ -550,17 +550,14 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 static
 int read_region(hid_t loc_id, int nx, int ny)
 {
-  static char func[] = "read_region";
+  //static char func[] = "read_region";
   int gridID = -1;
-  hsize_t		memb_size[1] = {4};
   hid_t grp_id;
-  hid_t proj_id, region_id;
-  hid_t proj_tid, region_tid;
+  hid_t region_id;
+  hid_t region_tid;
   hid_t str64_tid, str128_tid, fltarr_tid;
   herr_t     status;
   hsize_t dims;
-  int xsize, ysize;
-  hid_t      file, dataset, datatype; /* Handles */
   typedef struct region_t {
     double area_extent[4];
     int xsize;
