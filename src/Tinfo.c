@@ -317,6 +317,7 @@ void *Tinfo(void *argument)
 
 	  fprintf(stdout, "%6d  %5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
 		  tsID+1, year, month, day, hour, minute, second);
+
 	  if ( tsID )
 	    {
 	      int deltam, deltay;
@@ -419,7 +420,7 @@ void *Tinfo(void *argument)
       fprintf(stdout, ":\n");
       for ( igap = 0; igap < ngaps; ++igap )
 	{
-	  fprintf(stdout, "  Gap %d between timestep %d and %d. Missing %d timestep%s",
+	  fprintf(stdout, "  Gap %d between timestep %d and %d, missing %d timestep%s",
 		  igap+1, rangetsm[igap][0], rangetsm[igap][1], ntsm[igap], ntsm[igap]>1?"s":"");
 	  if ( ntsm[igap] >= MAX_NTSM )
 	    {
