@@ -193,7 +193,7 @@ void *Output(void *argument)
 		  decode_date(vdate, &year, &month, &day);
 		  decode_time(vtime, &hour, &minute, &second);
 
-		  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %12.12g\n",
+		  fprintf(stdout, DATE_FORMAT" "TIME_FORMAT" %12.12g\n",
 			  year, month, day, hour, minute, second, array[0]);
 		}
 	      else if ( operatorID == OUTPUTFLD )

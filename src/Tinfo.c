@@ -142,9 +142,9 @@ void printBounds(int taxisID, int calendar)
   decode_date(vdate1, &year1, &month1, &day1);
   decode_time(vtime1, &hour1, &minute1, &second1);
 
-  fprintf(stdout, "%5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+  fprintf(stdout, DATE_FORMAT" "TIME_FORMAT,
 	  year0, month0, day0, hour0, minute0, second0);
-  fprintf(stdout, "%5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+  fprintf(stdout, DATE_FORMAT" "TIME_FORMAT,
 	  year1, month1, day1, hour1, minute1, second1);
 
   juldate0  = juldate_encode(calendar, vdate0, vtime0);
@@ -287,7 +287,7 @@ void *Tinfo(void *argument)
 	      decode_date(vdate, &year, &month, &day);
 	      decode_time(vtime, &hour, &minute, &second);
 
-	      fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	      fprintf(stdout, "     RefTime = "DATE_FORMAT" "TIME_FORMAT,
 		      year, month, day, hour, minute, second);
 		      
 	      unit = taxisInqTunit(taxisID);
@@ -316,7 +316,7 @@ void *Tinfo(void *argument)
 	  decode_date(vdate, &year, &month, &day);
 	  decode_time(vtime, &hour, &minute, &second);
 
-	  fprintf(stdout, "%6d  %5.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	  fprintf(stdout, "%6d  "DATE_FORMAT" "TIME_FORMAT,
 		  tsID+1, year, month, day, hour, minute, second);
 
 	  if ( tsID )
@@ -408,12 +408,12 @@ void *Tinfo(void *argument)
 
   decode_date(vdate_first, &year, &month, &day);
   decode_time(vtime_first, &hour, &minute, &second);
-  fprintf(stdout, " Start date          : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d\n",
+  fprintf(stdout, " Start date          : "DATE_FORMAT" "TIME_FORMAT"\n",
 	  year, month, day, hour, minute, second);
 
   decode_date(vdate, &year, &month, &day);
   decode_time(vtime, &hour, &minute, &second);
-  fprintf(stdout, " End date            : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d\n",
+  fprintf(stdout, " End date            : "DATE_FORMAT" "TIME_FORMAT"\n",
 	  year, month, day, hour, minute, second);
   fprintf(stdout, " Increment           : %3d %s%s\n", 
 	  incperiod0, tunits[incunit0], incperiod0>1?"s":"");
@@ -455,7 +455,7 @@ void *Tinfo(void *argument)
 	      decode_date(vdate, &year, &month, &day);
 	      decode_time(vtime, &hour, &minute, &second);
 
-	      fprintf(stdout, "   %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	      fprintf(stdout, "  "DATE_FORMAT" "TIME_FORMAT,
 		      year, month, day, hour, minute, second);
 	      ntimeout++;
 	      tsID++;

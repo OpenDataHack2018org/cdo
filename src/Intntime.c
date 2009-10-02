@@ -160,7 +160,7 @@ void *Intntime(void *argument)
 	      */
 	      decode_date(vdate, &year, &month, &day);
 	      decode_time(vtime, &hour, &minute, &second);
-	      cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	      cdoPrint(DATE_FORMAT" "TIME_FORMAT,
 		       year, month, day, hour, minute, second);
 	    }
 

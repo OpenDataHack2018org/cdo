@@ -168,7 +168,7 @@ void *Filedes(void *argument)
 		  decode_date(vdate, &year, &month, &day);
 		  decode_time(vtime, &hour, &minute, &second);
 
-		  fprintf(stdout, "     RefTime = %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+		  fprintf(stdout, "     RefTime = "DATE_FORMAT" "TIME_FORMAT,
 			  year, month, day, hour, minute, second);
 		      
 		  unit = taxisInqTunit(taxisID);
@@ -224,7 +224,7 @@ void *Filedes(void *argument)
 	      decode_time(vtime, &hour, &minute, &second);
 
 	      tsID++;
-	      fprintf(stdout, " %5d %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+	      fprintf(stdout, " %5d "DATE_FORMAT" "TIME_FORMAT,
 		      tsID, year, month, day, hour, minute, second);
 	      fprintf(stdout, "\n");
 	    }

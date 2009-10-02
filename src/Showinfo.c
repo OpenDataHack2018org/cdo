@@ -142,7 +142,7 @@ void *Showinfo(void *argument)
 	      {
 		/* if ( ndate == 10 ) { ndate = 0; fprintf(stdout, "\n"); } */
 		date0 = vdate;
-		fprintf(stdout, " %4.4d-%2.2d-%2.2d", year, month, day);
+		fprintf(stdout, " "DATE_FORMAT, year, month, day);
 		ndate++;
 	      }
 
@@ -164,7 +164,7 @@ void *Showinfo(void *argument)
 	    decode_date(vdate, &year, &month, &day);
 	    decode_time(vtime, &hour, &minute, &second);
 
-	    fprintf(stdout, " %4.4d-%2.2d-%2.2d,%2.2d:%2.2d:%2.2d",
+	    fprintf(stdout, " "DATE_FORMAT" "TIME_FORMAT,
 		    year, month, day, hour, minute, second);
 	    tsID++;
 	    nout++;

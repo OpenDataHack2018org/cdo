@@ -119,10 +119,10 @@ void *Pinfo(void *argument)
 	  if ( operatorID == PINFOV ) vlistInqVarName(vlistID1, varID, varname);
 
 	  if ( operatorID == PINFOV )
-	    fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %-8s ",
+	    fprintf(stdout, "%6d : "DATE_FORMAT" "TIME_FORMAT" %-8s ",
 		    indg, year, month, day, hour, minute, second, varname);
 	  else
-	    fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d",
+	    fprintf(stdout, "%6d : "DATE_FORMAT" "TIME_FORMAT" %3d",
 		    indg, year, month, day, hour, minute, second, code);
 
 	  level = zaxisInqLevel(zaxisID, levelID);

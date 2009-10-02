@@ -107,6 +107,10 @@ char *strdup(const char *s);
 #define CDO_EXP_LOCAL   1
 #define CDO_EXP_REMOTE  2
 
+#define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
+#define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
+
+
 enum {DATE_FIRST, DATE_LAST, DATE_MIDDLE};
 
 void strtolower(char *str);

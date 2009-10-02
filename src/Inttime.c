@@ -222,7 +222,7 @@ void *Inttime(void *argument)
 		  */
 		  decode_date(vdate, &year, &month, &day);
 		  decode_time(vtime, &hour, &minute, &second);
-		  cdoPrint("%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d  %f  %d",
+		  cdoPrint(DATE_FORMAT" "TIME_FORMAT"  %f  %d",
 			   year, month, day, hour, minute, second,
 			   juldate_to_seconds(juldate), calendar);
 		}

@@ -298,10 +298,10 @@ void *Info(void *argument)
 	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);
 
 	      if ( operatorID == INFOV )
-		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %-8s ",
+		fprintf(stdout, "%6d :"DATE_FORMAT" "TIME_FORMAT" %-8s ",
 			indg, year, month, day, hour, minute, second, varname);
 	      else
-		fprintf(stdout, "%6d : %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d",
+		fprintf(stdout, "%6d :"DATE_FORMAT" "TIME_FORMAT" %3d",
 			indg, year, month, day, hour, minute, second, code);
 
 	      level = zaxisInqLevel(zaxisID, levelID);

@@ -320,8 +320,8 @@ void *Seasstat(void *argument)
 	  decode_date(vdate1, &year1, &month1, &day1);
 	  decode_time(vtime1, &hour1, &minute1, &second1);
 	  cdoPrint("season %3d %3s "
-		   "start %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d "
-		   "end %4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d "
+		   "start "DATE_FORMAT" "TIME_FORMAT" "
+		   "end "DATE_FORMAT" "TIME_FORMAT" "
 		   "ntimesteps %d", 
 		   nseason, seas_name[seas0],
 		   year0, month0, day0, hour0, minute0, second0,
@@ -337,7 +337,7 @@ void *Seasstat(void *argument)
 	{
 	  int year, month, day;
 	  decode_date(vdate0, &year, &month, &day);
-	  cdoWarning("Season %3d (%4.4d-%2.2d-%2.2d) has only %d input time step%s!", 
+	  cdoWarning("Season %3d ("DATE_FORMAT") has only %d input time step%s!", 
 		     otsID, year, month, day, nsets, nsets == 1 ? "" : "s");
 	}
 

@@ -837,8 +837,8 @@ void *Outputgmt(void *argument)
 	    fprintf(stdout, "# Increment = %d\n", ninc);
 	  fprintf(stdout, "#\n");
 	  fprintf(stdout, "# File  = %s\n", cdoStreamName(0));
-	  fprintf(stdout, "# Date  = %4.4d-%2.2d-%2.2d\n", year, month, day);
-	  fprintf(stdout, "# Time  = %2.2d:%2.2d:%2.2d\n", hour, minute, second);
+	  fprintf(stdout, "# Date  = "DATE_FORMAT"\n", year, month, day);
+	  fprintf(stdout, "# Time  = "TIME_FORMAT"\n", hour, minute, second);
 	  fprintf(stdout, "# Name  = %s\n", varname);
 	  fprintf(stdout, "# Code  = %d\n", code);
 	}

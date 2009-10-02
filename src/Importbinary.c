@@ -388,7 +388,7 @@ void *Importbinary(void *argument)
 	{
 	  gr2t(pfi.grvals[3], (gadouble)(tsID+1), &dtim); 
 	  if ( cdoVerbose )
-	    cdoPrint(" Reading timestep: %3d  %4.4d-%2.2d-%2.2d %2.2d:%2.2d",
+	    cdoPrint(" Reading timestep: %3d "DATE_FORMAT" "TIME_FORMAT,
 		     tsID+1, dtim.yr, dtim.mo, dtim.dy, dtim.hr, dtim.mn);
 
 	  vdate = encode_date(dtim.yr, dtim.mo, dtim.dy);
