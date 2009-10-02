@@ -1,4 +1,4 @@
-2009-??-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2009-10-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.0
 	* New operator: import_binary - Import binary data sets via a GrADS data descriptor file

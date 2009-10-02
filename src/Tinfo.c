@@ -254,6 +254,7 @@ void *Tinfo(void *argument)
   int vtimem[MAX_GAPS][MAX_NTSM];
   juldate_t juldate, juldate0;
   double jdelta = 0, jdelta0 = 0;
+  int arrow;
   int i, len;
 	  
 
@@ -348,25 +349,34 @@ void *Tinfo(void *argument)
 
 	  if ( taxisHasBounds(taxisID) ) printBounds(taxisID, calendar);
 
-	  if ( tsID > 1 )
+	  if (  tsID > 1 && (incperiod != incperiod0 || incunit != incunit0) )
 	    {
-	      if ( jdelta0 > jdelta && tsID == 2 )
+	      if ( tsID == 2 && (jdelta0 > jdelta) )
 		{
 		  jdelta0    = jdelta;
 		  incperiod0 = incperiod;
 		  incunit0   = incunit;
-		}
 
-	      if ( incperiod != incperiod0 || incunit != incunit0 )
+		  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem,
+				 1, incperiod0, incunit0, vdate_first, vdate, vtime,
+				 calendar, day, juldate0, 
+				 juldate_encode(calendar, vdate_first, vtime_first));
+		  arrow = '^';
+		}
+	      else
 		{
 		  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem,
 				 tsID, incperiod0, incunit0, vdate, vdate0, vtime0,
 				 calendar, day0, juldate, juldate0);
+		  arrow = '<';
+		}
 
+	      if ( its > 0 )
+		{
 		  ngaps++;
 		  if ( cdoVerbose )
-		    fprintf(stdout, "  <--- Gap %d, missing %d timestep%s",
-			    ngaps, its, its>1?"s":"");
+		    fprintf(stdout, "  %c--- Gap %d, missing %d timestep%s",
+			    arrow, ngaps, its, its>1?"s":"");
 		}
 	    }
 
@@ -382,6 +392,7 @@ void *Tinfo(void *argument)
 	      incperiod1 = incperiod;
 	      incunit1   = incunit;
 	    }
+
 	  fprintf(stdout, "\n");
 
 	  vdate0 = vdate;

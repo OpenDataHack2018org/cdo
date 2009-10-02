@@ -1,6 +1,22 @@
 CDO NEWS
 --------
 
+Version 1.4.0 (5 October 2009):
+
+   * New features:
+      o added support of time units 'seconds' to all operators
+   * New operators:
+      o Import binary data sets (via a GrADS data descriptor file) - import_binary
+      o Set valid range - setvrange
+   * Changed operators:
+      o gridarea: added support for hexagonal GME grid and tripolar MPIOM grid
+      o remapnn: added support for unstructured grids without bounds (full grid search)
+      o Seasstat: added env. CDO_SEASON_START to set the start month of seasons
+      o import_cmsaf: read native float datatype and convert it to double
+      o ieg format: added support for Gaussian grids
+   * Fixed bugs:
+      o shifttime: bug fix for negative time increments
+
 Version 1.3.2 (15 June 2009):
 
    * New features:
