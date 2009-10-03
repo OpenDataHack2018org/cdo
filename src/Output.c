@@ -36,7 +36,7 @@
 void *Output(void *argument)
 {
   static char func[] = "Output";
-  int OUTPUT, OUTPUTINT, OUTPUTSRV, OUTPUTEXT, OUTPUTF, OUTPUTTS, OUTPUTFLD, OUTPUTARR;
+  int OUTPUT, OUTPUTINT, OUTPUTSRV, OUTPUTEXT, OUTPUTF, OUTPUTTS, OUTPUTFLD, OUTPUTARR, OUTPUTXYZ;
   int operatorID;
   int i;
   int indf;
@@ -73,6 +73,7 @@ void *Output(void *argument)
   OUTPUTTS  = cdoOperatorAdd("outputts",  0, 0, NULL);
   OUTPUTFLD = cdoOperatorAdd("outputfld", 0, 0, NULL);
   OUTPUTARR = cdoOperatorAdd("outputarr", 0, 0, NULL);
+  OUTPUTXYZ = cdoOperatorAdd("outputxyz", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -104,7 +105,7 @@ void *Output(void *argument)
 
       array = (double *) malloc(gridsize*sizeof(double));
 
-      if ( operatorID == OUTPUTFLD )
+      if ( operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ )
 	{
 	  char units[128];
 
@@ -204,6 +205,16 @@ void *Output(void *argument)
 		    if ( !DBL_IS_EQUAL(array[i], missval) )
 		      fprintf(stdout, "%g\t%g\t%g\t%g\n", xdate, 
 			      grid_center_lat[i], grid_center_lon[i], array[i]);
+		}
+	      else if ( operatorID == OUTPUTXYZ )
+		{
+		  if ( tsID == 0 && recID == 0 )
+		    {
+		      for ( i = 0; i < gridsize; i++ )
+			if ( !DBL_IS_EQUAL(array[i], missval) )
+			  fprintf(stdout, "%g\t%g\t%g\t%g\n",
+				  grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
+		    }
 		}
 	      else if ( operatorID == OUTPUTARR )
 		{
