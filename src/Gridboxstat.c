@@ -116,11 +116,9 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           i1 = i+(xinc-1);
           if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
           xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2.;
-          if ( isnan (xvals2[i]) )
-            fprintf(stderr, "NaN in xvals2[%i] (i=%i i1=%i) xvals1[i1]=%7.5f xvals1[i]=%7.5f\n", j, i, i1, xvals1[i1], xvals1[i]);
           if ( grid2_corner_lon )
             {
-              grid2_corner_lon[2*j] = grid1_corner_lon[2*i];
+              grid2_corner_lon[2*j  ] = grid1_corner_lon[2*i];
               grid2_corner_lon[2*j+1] = grid1_corner_lon[2*i1+1];
             }
           j++;        
@@ -131,8 +129,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           i1 = i+(yinc-1);
           if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
           yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
-          if ( isnan (yvals2[i]) )
-            fprintf(stderr, "NaN in yvals2[%i] (i=%i i1=%i) yvals1[i1]=%7.5f yvals1[i]=%7.5f\n", j, i, i1, yvals1[i1], yvals1[i]);
           if ( grid2_corner_lat )
             {
               grid2_corner_lat[2*j] = grid1_corner_lat[2*i];
@@ -219,8 +215,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                         {
                           xvals2_0 = xvals1[g1_add];
                           xvals2[g2_add] = xvals1[g1_add]/area_norm;                        
-                          if ( isnan(xvals2[g2_add]) ) fprintf(stderr, "isnan 1: xvals2_0 %7.5f xvals2[%i] %7.5f\n", xvals2_0, g2_add, xvals2[g2_add]);
-                           yvals2[g2_add] = yvals1[g1_add]/area_norm;  
                         }
                       else if ( fabs(xvals1[g1_add] - xvals2_0) > 270. )
                         {
@@ -228,22 +222,14 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                             xvals2[g2_add] += (xvals1[g1_add]-360.)/area_norm;
                           else if ( ( xvals1[g1_add] - xvals2_0 ) < -270. )
                             xvals2[g2_add] += (xvals1[g1_add]+360.)/area_norm;
-                          if ( isnan(xvals2[g2_add]) ) fprintf(stderr, "isnan 2\n");
-                           yvals2[g2_add] += yvals1[g1_add]/area_norm;  
+			  yvals2[g2_add] += yvals1[g1_add]/area_norm;  
                         }
                       else                      
                         {
                           xvals2[g2_add] += xvals1[g1_add]/area_norm;                                                                    
-                          if ( isnan(xvals2[g2_add]) ) fprintf(stderr, "isnan 3\n");
                           yvals2[g2_add] += yvals1[g1_add]/area_norm;  
                         }
                      
-
-                      if ( isnan(xvals2[g2_add]) )
-                        fprintf(stderr, "NaN in xvals2[%i]; last g1add %i (%7.5f) area-norm %7.5f\n", g2_add, g1_add, xvals1[g1_add], area_norm);                          
-                      if ( isnan(yvals2[g2_add]) )
-                        fprintf(stderr, "NaN in yvals2[%i]; last g1add %i (%7.5f) area-norm %7.5f\n", g2_add, g1_add, yvals1[g1_add], area_norm); 
-                      //fprintf(stderr, "%9g %9g\n", xvals2[g2_add], yvals2[g2_add], xvals1[g1_add], yvals1[g1_add]);
                       if ( gridHasBounds )
                         {/* 
                          =====================================================================
@@ -330,8 +316,8 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                                           lat2 = grid1_corner_lat[4*g1_add2+corner2];
                                           lon3 = grid1_corner_lon[4*g1_add3+corner2];
                                           lat3 = grid1_corner_lat[4*g1_add3+corner2];
-                                          if ((lon2 == lon && lat2 == lat)  ||
-                                              (lon3 == lon && lat3 == lat) )
+                                          if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))  ||
+                                              (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)) )
                                             c_flag[corner] = 1;
                                         }                                                                                                                                                                      
                                     }
@@ -365,10 +351,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                                           lat2 = grid1_corner_lat[4*g1_add2+corner2];
                                           lon3 = grid1_corner_lon[4*g1_add3+corner2];
                                           lat3 = grid1_corner_lat[4*g1_add3+corner2];
-                                          if ((lon2 == lon && lat2 == lat)  ||
-                                              (lon3 == lon && lat3 == lat) )
-                                            c_flag[corner] = 1;
-                                        }                                                                                                                                                                      
+                                         if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))  ||
+					     (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)) )
+                                             c_flag[corner] = 1;
+                                        } 
                                     }                                 
                                   for ( corner = 0; corner<4; corner++ )
                                     if ( !c_flag[corner] ) break;                                 
@@ -402,10 +388,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                                           lat2 = grid1_corner_lat[4*g1_add2+corner2];
                                           lon3 = grid1_corner_lon[4*g1_add3+corner2];
                                           lat3 = grid1_corner_lat[4*g1_add3+corner2];
-                                          if ((lon2 == lon && lat2 == lat)  ||
-                                              (lon3 == lon && lat3 == lat) )
+                                          if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))  ||
+					      (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)) )
                                             c_flag[corner] = 1;
-                                        }                                                                                                                                                                      
+                                        } 
                                     }                                  
                                   for ( corner = 0; corner<4; corner++ )
                                     if ( !c_flag[corner] ) break;                                 
@@ -437,10 +423,10 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                                           lat2 = grid1_corner_lat[4*g1_add2+corner2];
                                           lon3 = grid1_corner_lon[4*g1_add3+corner2];
                                           lat3 = grid1_corner_lat[4*g1_add3+corner2];
-                                          if ((lon2 == lon && lat2 == lat)  ||
-                                              (lon3 == lon && lat3 == lat) )
+                                          if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))  ||
+					      (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)) )
                                             c_flag[corner] = 1;
-                                        }                                                                                                                                                                      
+                                        }
                                     }                                 
                                   for ( corner = 0; corner<4; corner++ )
                                     if ( !c_flag[corner] ) break;                                 
