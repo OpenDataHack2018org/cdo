@@ -210,10 +210,61 @@ void *Output(void *argument)
 		{
 		  if ( tsID == 0 && recID == 0 )
 		    {
+		      char *fname = "frontplane.xyz";
+		      FILE *fp;
+		      double fmin = 0;
+		      double dx, x0, y0, z0, x, y, z;
 		      for ( i = 0; i < gridsize; i++ )
 			if ( !DBL_IS_EQUAL(array[i], missval) )
-			  fprintf(stdout, "%g\t%g\t%g\t%g\n",
-				  grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
+			  {
+			    if ( array[i] < fmin ) fmin = array[i];
+			    fprintf(stdout, "%g\t%g\t%g\t%g\n",
+				    grid_center_lon[i], grid_center_lat[i], array[i], array[i]);
+			  }
+		      fp = fopen(fname, "w");
+		      if ( fp == NULL ) cdoAbort("Open failed on %s", fname);
+		      // first front plane
+		      dx = (grid_center_lon[1] - grid_center_lon[0]);
+		      x0 = grid_center_lon[0]-dx/2;
+		      y0 = grid_center_lat[0]-dx/2;
+		      z0 = fmin;
+		      fprintf(fp, ">\n");
+		      for ( i = 0; i < nlon; ++i )
+			{
+			  x = x0;  y = y0; z = z0;
+			  fprintf(fp, "%g %g %g\n", x, y, z);
+			  x = x0;  y = y0; z = array[i];
+			  fprintf(fp, "%g %g %g\n", x, y, z);
+			  x = x0+dx;  y = y0;
+			  fprintf(fp, "%g %g %g\n", x, y, z);
+			  x0 = x; y0 = y0; z0 = z;
+			}
+		      x = x0;  y = y0; z = fmin;
+		      fprintf(fp, "%g %g %g\n", x, y, z);
+		      x = grid_center_lon[0]-dx/2;
+		      fprintf(fp, "%g %g %g\n", x, y, z);
+
+		      // second front plane
+		      x0 = grid_center_lon[0]-dx/2;
+		      y0 = grid_center_lat[0]-dx/2;
+		      z0 = fmin;
+		      fprintf(fp, ">\n");
+		      for ( i = 0; i < nlat; ++i )
+			{
+			  x = x0;  y = y0; z = z0;
+			  fprintf(fp, "%g %g %g\n", x, y, z);
+			  x = x0;  y = y0; z = array[i*nlon];
+			  fprintf(fp, "%g %g %g\n", x, y, z);
+			  x = x0;  y = y0+dx;
+			  fprintf(fp, "%g %g %g\n", x, y, z);
+			  x0 = x0; y0 = y; z0 = z;
+			}
+		      x = x0;  y = y0; z = fmin;
+		      fprintf(fp, "%g %g %g\n", x, y, z);
+		      y = grid_center_lat[0]-dx/2;
+		      fprintf(fp, "%g %g %g\n", x, y, z);
+
+		      fclose(fp);
 		    }
 		}
 	      else if ( operatorID == OUTPUTARR )

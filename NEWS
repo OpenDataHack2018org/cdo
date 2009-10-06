@@ -12,10 +12,10 @@ Version 1.4.0 (5 October 2009):
       o gridarea: added support for hexagonal GME grid and tripolar MPIOM grid
       o remapnn: added support for unstructured grids without bounds (full grid search)
       o Seasstat: added env. CDO_SEASON_START to set the start month of seasons
-      o import_cmsaf: read native float datatype and convert it to double
       o ieg format: added support for Gaussian grids
    * Fixed bugs:
       o shifttime: bug fix for negative time increments
+      o import_cmsaf: read native float datatype
 
 Version 1.3.2 (15 June 2009):
 
