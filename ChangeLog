@@ -1,3 +1,11 @@
+2009-10-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* IEG format: bug fix for lonlat grids
+	
+2009-10-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* cdotest:eca_gsl: bug fix [report: Harald Anlauf]
+
 2009-10-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.0
