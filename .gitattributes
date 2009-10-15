@@ -257,6 +257,7 @@ src/Histogram.c -text
 src/Importamsr.c -text
 src/Importbinary.c -text
 src/Importcmsaf.c -text
+src/Importobs.c -text
 src/Info.c -text
 src/Input.c -text
 src/Intgrid.c -text
