@@ -1,6 +1,9 @@
-2009-10-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2009-10-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* IEG format: bug fix for lonlat grids
+	* using CDI library version 1.4.0.1
+	* IEG format: bug fix for identification of lonlat grids
+	* GRIB format: bug fix for decoding of missing values (scalar version only)
+	* Version 1.4.0.1 released
 	
 2009-10-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

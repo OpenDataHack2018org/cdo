@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -185,6 +185,7 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
   int gridtype, gridID2;
   int nlon1, nlat1;
   int nlon2, nlat2;
+  int nmin, nmax;
   int i;
   int prec;
   int ilat, ilon;
@@ -203,6 +204,14 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
   nlon2 = nlon1 + lhalo + rhalo;
   nlat2 = nlat1;
 
+  nmin = 0;
+  nmax = nlon1;
+  if ( lhalo < 0 ) nmin  = -lhalo;
+  if ( rhalo < 0 ) nmax +=  rhalo;
+  /*
+  printf("nlon1=%d, nlon2=%d, lhalo=%d, rhalo=%d nmin=%d, nmax=%d\n",
+	 nlon1, nlon2, lhalo, rhalo, nmin, nmax);
+  */
   gridtype = gridInqType(gridID1);
   prec     = gridInqPrec(gridID1);
 
@@ -259,7 +268,7 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
 		  *pyvals2++ = yvals1[ilat*nlon1 + ilon];
 		}
 
-	      for ( ilon = 0; ilon < nlon1; ilon++ )
+	      for ( ilon = nmin; ilon < nmax; ilon++ )
 		{
 		  *pxvals2++ = xvals1[ilat*nlon1 + ilon];
 		  *pyvals2++ = yvals1[ilat*nlon1 + ilon];
@@ -275,7 +284,7 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
       else
 	{
 	  for ( i = nlon1-lhalo; i < nlon1; i++ ) *pxvals2++ = xvals1[i] - 360;
-	  for ( i = 0; i < nlon1; i++ ) *pxvals2++ = xvals1[i];
+	  for ( i = nmin; i < nmax; i++ ) *pxvals2++ = xvals1[i];
 	  for ( i = 0; i < rhalo; i++ ) *pxvals2++ = xvals1[i] + 360;
 
 	  for ( i = 0; i < nlat1; i++ ) yvals2[i] = yvals1[i];
@@ -327,7 +336,7 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
 		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
 		}
 
-	      for ( ilon = 0; ilon < 4*nlon1; ilon++ )
+	      for ( ilon = nmin; ilon < 4*nmax; ilon++ )
 		{
 		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
 		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
@@ -344,7 +353,7 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
 	{
 	  gridDefNvertex(gridID2, 2);
 	  for ( i = 2*(nlon1-lhalo); i < 2*nlon1; i++ ) *pxbounds2++ = xbounds1[i] - 360;
-	  for ( i = 0; i < 2*nlon1; i++ ) *pxbounds2++ = xbounds1[i];
+	  for ( i = 2*nmin; i < 2*nmax; i++ ) *pxbounds2++ = xbounds1[i];
 	  for ( i = 0; i < 2*rhalo; i++ ) *pxbounds2++ = xbounds1[i] + 360;
 
 	  for ( i = 0; i < 2*nlat2; i++ ) ybounds2[i] = ybounds1[i];
@@ -375,16 +384,28 @@ static int genindexgrid(int gridID1, int *lhalo, int *rhalo)
 
   nlon1 = gridInqXsize(gridID1);
 
-  if ( *lhalo < 0 || *lhalo > nlon1 )
+  if ( *lhalo > nlon1 )
     {
-      cdoWarning("left halo out of range. Set to 0.");
-      *lhalo = 0;
+      *lhalo = nlon1;
+      cdoWarning("left halo out of range. Set to %d.", *lhalo);
     }
 
-  if ( *rhalo < 0 || *rhalo > nlon1 )
+  if ( *lhalo < 0 && -(*lhalo) > nlon1/2 )
     {
-      cdoWarning("right halo out of range. Set to 0.");
-      *rhalo = 0;
+      *lhalo = -nlon1/2;
+      cdoWarning("left halo out of range. Set to %d.", *lhalo);
+    }
+
+  if ( *rhalo > nlon1 )
+    {
+      *rhalo = nlon1;
+      cdoWarning("right halo out of range. Set to %d.", rhalo);
+    }
+
+  if ( *rhalo < 0 && -(*rhalo) > nlon1/2 )
+    {
+      *rhalo = -nlon1/2;
+      cdoWarning("right halo out of range. Set to %d.", rhalo);
     }
 
   gridID2 = gengrid(gridID1, *lhalo, *rhalo);
@@ -397,16 +418,22 @@ static void halo(double *array1, int gridID1, double *array2, int lhalo, int rha
 {
   int nlon1, nlat;
   int ilat, ilon;
+  int nmin, nmax;
 
   nlon1 = gridInqXsize(gridID1);
-  nlat = gridInqYsize(gridID1);
+  nlat  = gridInqYsize(gridID1);
+
+  nmin = 0;
+  nmax = nlon1;
+  if ( lhalo < 0 ) nmin  = -lhalo;
+  if ( rhalo < 0 ) nmax +=  rhalo;
 
   for ( ilat = 0; ilat < nlat; ilat++ )
     {
       for ( ilon = nlon1-lhalo; ilon < nlon1; ilon++ )
 	*array2++ = array1[ilat*nlon1 + ilon];
 
-      for ( ilon = 0; ilon < nlon1; ilon++ )
+      for ( ilon = nmin; ilon < nmax; ilon++ )
 	*array2++ = array1[ilat*nlon1 + ilon];
 
       for ( ilon = 0; ilon < rhalo; ilon++ )
