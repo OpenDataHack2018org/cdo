@@ -96,7 +96,7 @@ case "${HOSTNAME}" in
                     --with-jasper=/usr \
                     --with-grib_api=/scratch/local2/m214003/local \
 	            --with-netcdf=/sw/etch-ia32/netcdf-3.6.2 \
-	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.0 \
+	            --with-hdf5=/usr \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
