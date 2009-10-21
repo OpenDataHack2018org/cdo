@@ -162,7 +162,7 @@ void *Settime(void *argument)
       if ( strchr(timestr, ':') )
 	{
 	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-	  newval = endcode_time(hour, minute, second);
+	  newval = encode_time(hour, minute, second);
 	}
       else
 	{

@@ -13,7 +13,7 @@ static
 void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 {
   int  code[]  = {11, 17, 33, 34, 1, 2/*, 3*/};
-  char *name[]  = {"temp", "unknown", "u", "v", "height", "pressure" /*, "station"*/};
+  char *name[]  = {"temp", "depoint", "u", "v", "height", "pressure" /*, "station"*/};
   char *units[] = {"Celsius", "", "m/s", "m/s", "m", "hPa" /*, ""*/};
   int i, varID;
 
@@ -205,6 +205,7 @@ void *Importobs(void *argument)
 	    if ( lat >= (yvals[j]-dy/2) && lat < (yvals[j]+dy/2) )  break;
 
 	  dx =  xvals[1] - xvals[0];
+	  if ( lon < (xvals[0] - dx/2) && lon < 0 ) lon+=360;
 	  for ( i = 0; i < xsize; ++i )
 	    if ( lon >= (xvals[i]-dx/2) && lon < (xvals[i]+dx/2) )  break;
 	  
