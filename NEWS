@@ -1,9 +1,10 @@
 CDO NEWS
 --------
 
-Version 1.4.0.1 (19 October 2009):
+Version 1.4.0.1 (21 October 2009):
 
    * Fixed bugs:
+      o seltime: bug fix for scanning of input parameter
       o IEG format: bug fix for identification of lonlat grids
       o GRIB format: bug fix for decoding of missing values (scalar version only)
 
