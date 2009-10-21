@@ -51,7 +51,7 @@ not to SCRIP!
 
 
 @BeginExample
-Say @file{ifile} contains fields on a regular quadrilateral grid.
+Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
 To remap all fields bilinear to a T42 Gaussian grid use:
 @BeginVerbatim
    cdo genbil,t42grid ifile remapweights.nc

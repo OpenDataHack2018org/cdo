@@ -246,19 +246,19 @@ void testEcaFd()
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0));
+  assert(DBL_IS_EQUAL(vars[0][0], 0.));
 
   writeNcFile("in.nc", array, 5);
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1));
+  assert(DBL_IS_EQUAL(vars[0][0], 1.));
 
   writeNcFile("in.nc", array, 6);
 
   submitCdoCommand("eca_fd in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 2));
+  assert(DBL_IS_EQUAL(vars[0][0], 2.));
   
   destroyVars(vars);
 }
@@ -284,15 +284,15 @@ void testEcaSu()
 
   submitCdoCommand("eca_su in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 2));
+  assert(DBL_IS_EQUAL(vars[0][0], 2.));
 
   submitCdoCommand("eca_su,20.0 in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 4));
+  assert(DBL_IS_EQUAL(vars[0][0], 4.));
 
   submitCdoCommand("eca_su,30.0 in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0));
+  assert(DBL_IS_EQUAL(vars[0][0], 0.));
   
   destroyVars(vars);
 }
@@ -321,28 +321,28 @@ void testFdns()
 
   submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0));
+  assert(DBL_IS_EQUAL(vars[0][0], 0.));
 
   writeNcFile("in1.nc", array1, 3);
   writeNcFile("in2.nc", array2, 3);
 
   submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 0));
+  assert(DBL_IS_EQUAL(vars[0][0], 0.));
 
   writeNcFile("in1.nc", array1, 4);
   writeNcFile("in2.nc", array2, 4);
 
   submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1));
+  assert(DBL_IS_EQUAL(vars[0][0], 1.));
 
   writeNcFile("in1.nc", array1, 5);
   writeNcFile("in2.nc", array2, 5);
 
   submitCdoCommand("fdns in1.nc in2.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1));
+  assert(DBL_IS_EQUAL(vars[0][0], 1.));
 
   writeNcFile("in1.nc", array1 + 4, 1);
   writeNcFile("in2.nc", array2 + 4, 1);
@@ -453,19 +453,19 @@ void testTimcount()
 
   submitCdoCommand("timcount in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1));
+  assert(DBL_IS_EQUAL(vars[0][0], 1.));
 
   writeNcFile("in.nc", array, 5);
 
   submitCdoCommand("timcount in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 2));
+  assert(DBL_IS_EQUAL(vars[0][0], 2.));
 
   writeNcFile("in.nc", array, 6);
 
   submitCdoCommand("timcount in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 3));
+  assert(DBL_IS_EQUAL(vars[0][0], 3.));
   
   destroyVars(vars);
 }
@@ -492,19 +492,19 @@ void testSeascount()
 
   submitCdoCommand("seascount in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 1));
+  assert(DBL_IS_EQUAL(vars[0][0], 1.));
 
   writeNcFile("in.nc", array, 5);
 
   submitCdoCommand("seascount in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 2));
+  assert(DBL_IS_EQUAL(vars[0][0], 2.));
 
   writeNcFile("in.nc", array, 6);
 
   submitCdoCommand("seascount in.nc out.nc");
   readNcFile("out.nc", vars, nvars, nts);
-  assert(DBL_IS_EQUAL(vars[0][0], 3));
+  assert(DBL_IS_EQUAL(vars[0][0], 3.));
   
   destroyVars(vars);
 }

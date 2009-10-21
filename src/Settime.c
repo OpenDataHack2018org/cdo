@@ -109,24 +109,24 @@ void *Settime(void *argument)
       datestr = operatorArgv()[0];
       timestr = operatorArgv()[1];
 
-      if ( strchr(datestr, '-') == NULL )
-	{
-	  sdate = atoi(datestr);
-	}
-      else
+      if ( strchr(datestr, '-') )
 	{
 	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
 	  sdate = encode_date(year, month, day);
 	}
-
-      if ( strchr(timestr, ':') == NULL )
-	{
-	  stime = atoi(timestr);
-	}
       else
+	{
+	  sdate = atoi(datestr);
+	}
+
+      if ( strchr(timestr, ':') )
 	{
 	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
 	  stime = encode_time(hour, minute, second);
+	}
+      else
+	{
+	  stime = atoi(timestr);
 	}
 
       if ( operatorArgc() == 3 )
@@ -144,14 +144,14 @@ void *Settime(void *argument)
     {
       if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
       datestr = operatorArgv()[0];
-      if ( strchr(datestr, '-') == NULL )
+      if ( strchr(datestr, '-') )
 	{
-	  newval = atoi(datestr);
+	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
+	  newval = encode_date(year, month, day);
 	}
       else
 	{
-	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-	  newval = year*10000 + month*100 + day;
+	  newval = atoi(datestr);
 	}
     }
   else if ( operatorID == SETTIME )
@@ -159,14 +159,14 @@ void *Settime(void *argument)
       if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
       timestr = operatorArgv()[0];
 
-      if ( strchr(timestr, ':') == NULL )
+      if ( strchr(timestr, ':') )
 	{
-	  newval = atoi(timestr);
+	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
+	  newval = endcode_time(hour, minute, second);
 	}
       else
 	{
-	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-	  newval = hour*100 + minute;
+	  newval = atoi(timestr);
 	}
     }
   else if ( operatorID == SHIFTTIME )

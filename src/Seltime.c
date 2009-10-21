@@ -211,7 +211,17 @@ void *Seltime(void *argument)
 	  else
 	    {
 	      year = 1; month = 1; day = 1; hour = 0; minute = 0, second = 0;
-	      if ( strchr(operatorArgv()[i], 'T') == NULL )
+	      if ( strchr(operatorArgv()[i], 'T') )
+		{
+		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
+				  &year, &month, &day, &hour, &minute, &second);
+		  fval = encode_time(hour, minute, second);
+		  if ( fabs(fval) > 0 ) fval /= 1000000;
+		  fval += encode_date(year, month, day);
+		  listSetFlt(flist, i, fval);
+		  set2 = FALSE;
+		}
+	      else
 		{
 		  status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
 		  fval = encode_date(year, month, day);
@@ -219,16 +229,6 @@ void *Seltime(void *argument)
 		  if ( nsel > 1 && i > 0 ) fval += 0.999;
 
 		  listSetFlt(flist, i, fval);
-		}
-	      else
-		{
-		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
-				  &year, &month, &day, &hour, &minute, &second);
-		  fval = encode_time(hour, minute, second);
-		  if ( fabs(fval) > 0 ) fval /= 10000;
-		  fval += encode_date(year, month, day);
-		  listSetFlt(flist, i, fval);
-		  set2 = FALSE;
 		}
 	    }
 	}
@@ -246,14 +246,14 @@ void *Seltime(void *argument)
       if ( nsel < 1 ) cdoAbort("Not enough arguments!");
       for ( i = 0; i < nsel; i++ )
 	{
-	  if ( strchr(operatorArgv()[i], ':') == NULL )
+	  if ( strchr(operatorArgv()[i], ':') )
 	    {
-	      listSetInt(ilist, i, atoi(operatorArgv()[i]));
+	      sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
+	      listSetInt(ilist, i, encode_time(hour, minute, second));
 	    }
 	  else
 	    {
-	      sscanf(operatorArgv()[i], "%d:%d:%d", &hour, &minute, &second);
-	      listSetInt(ilist, i, hour*100 + minute);
+	      listSetInt(ilist, i, atoi(operatorArgv()[i]));
 	    }
 	}
     }

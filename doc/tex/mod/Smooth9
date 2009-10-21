@@ -12,7 +12,7 @@
 @Title     = 9 point smoothing
 
 @BeginDescription
-Performs a 9 point smoothing on all fields with a regular quadrilateral grid.
+Performs a 9 point smoothing on all fields with a quadrilateral curvilinear grid.
 The result at each grid point is a weighted average of the grid point plus
 the 8 surrounding points. The center point receives a weight of 1.0, the 
 points at each side and above and below receive a weight of 0.5, and corner 
