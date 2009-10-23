@@ -754,9 +754,8 @@ void *Outputgmt(void *argument)
 	{
 	  if ( lgrid_gen_bounds )
 	    {
-	      if ( ! (lzon || lmer) )
-		genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon, 0);
-	      genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
+	      if ( ! lzon ) genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon, 0);
+	      if ( ! lmer ) genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
 	    }
 	  else
 	    cdoAbort("Grid corner missing!");
@@ -1035,7 +1034,16 @@ void *Outputgmt(void *argument)
 		    }
 		  else if ( lmer )
 		    {
-		      cdoAbort("Implementation for meridional data missing!\n");
+		      double xlev[4];
+		      xlev[0] = zaxis_lower_lev[levelID];
+		      xlev[1] = zaxis_upper_lev[levelID];
+		      xlev[2] = zaxis_upper_lev[levelID];
+		      xlev[3] = zaxis_lower_lev[levelID];
+		      for ( ic = 0; ic < 4; ic++ )
+			fprintf(stdout, "   %g  %g\n",
+				grid_corner_lon[i*4+ic], xlev[ic]);
+		      fprintf(stdout, "   %g  %g\n",
+			      grid_corner_lon[i*4], xlev[0]);
 		    }
 		  else if ( lhov )
 		    {

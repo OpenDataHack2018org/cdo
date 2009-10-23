@@ -1,3 +1,7 @@
+2009-10-23  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* outputbounds: added support for meridional data
+
 2009-10-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.0.1
