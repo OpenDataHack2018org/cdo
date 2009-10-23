@@ -311,7 +311,7 @@ void *Wct(void *argument);
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
-                                 "outputfld", "outputarr", "outputxyz"}
+                                 "outputfld", "outputarr", "outputxyz", "outputkey"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri"}
 #define  PressureOperators      {"fpressure", "hpressure"}
