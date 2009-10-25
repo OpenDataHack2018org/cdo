@@ -1036,9 +1036,9 @@ void *Outputgmt(void *argument)
 		    {
 		      double xlev[4];
 		      xlev[0] = zaxis_lower_lev[levelID];
-		      xlev[1] = zaxis_upper_lev[levelID];
+		      xlev[1] = zaxis_lower_lev[levelID];
 		      xlev[2] = zaxis_upper_lev[levelID];
-		      xlev[3] = zaxis_lower_lev[levelID];
+		      xlev[3] = zaxis_upper_lev[levelID];
 		      for ( ic = 0; ic < 4; ic++ )
 			fprintf(stdout, "   %g  %g\n",
 				grid_corner_lon[i*4+ic], xlev[ic]);
