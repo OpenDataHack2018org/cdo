@@ -164,7 +164,7 @@ void *Showinfo(void *argument)
 	    decode_date(vdate, &year, &month, &day);
 	    decode_time(vtime, &hour, &minute, &second);
 
-	    fprintf(stdout, " "DATE_FORMAT" "TIME_FORMAT,
+	    fprintf(stdout, " "DATE_FORMAT","TIME_FORMAT,
 		    year, month, day, hour, minute, second);
 	    tsID++;
 	    nout++;
