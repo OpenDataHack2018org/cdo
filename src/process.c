@@ -50,7 +50,9 @@ typedef struct {
 OPERATOR;
 
 typedef struct {
-  int      threadID;
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_t threadID;
+#endif
   int      nchild;
   int      nstream;
   int      streams[MAX_STREAM];
@@ -103,7 +105,7 @@ int processCreate(void)
     Error(func, "Limit of %d processes reached!", MAX_PROCESS);
 
 #if  defined  (HAVE_LIBPTHREAD)
-  Process[processID].threadID     = (int) pthread_self();
+  Process[processID].threadID     = pthread_self();
 #endif
   Process[processID].nstream      = 0;
   Process[processID].nchild       = 0;
@@ -129,12 +131,12 @@ int processSelf(void)
   static char func[] = "processSelf";
   int processID = 0;
 #if  defined  (HAVE_LIBPTHREAD)
-  int thID = (int) pthread_self();
+  pthread_t thID = pthread_self();
 
   pthread_mutex_lock(&processMutex);
 
   for ( processID = 0; processID < NumProcess; processID++ )
-    if ( Process[processID].threadID == thID ) break;
+    if ( pthread_equal(Process[processID].threadID, thID) ) break;
 
   if ( processID == NumProcess )
     {

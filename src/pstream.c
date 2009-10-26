@@ -199,8 +199,8 @@ static void pstream_init_entry(PSTREAM *pstreamptr)
   pstreamptr->name       = NULL;
 #if  defined  (HAVE_LIBPTHREAD)
   pstreamptr->pipe       = NULL;
-  pstreamptr->rthreadID  = 0;
-  pstreamptr->wthreadID  = 0;
+  //  pstreamptr->rthreadID  = 0;
+  //  pstreamptr->wthreadID  = 0;
 #endif
   pstreamptr->tsID0      = 0;
   pstreamptr->mfiles     = 0;
