@@ -19,8 +19,7 @@
    This module contains the following operators:
 
       Interpolate remapcon        First order conservative remapping
-      Interpolate remapcon2       Second order onservative remapping
-      Interpolate remaplaf        Largest area fraction
+      Interpolate remapcon2       Second order conservative remapping
       Interpolate remapbil        Bilinear interpolation
       Interpolate remapbic        Bicubic interpolation
       Interpolate remapdis        Distance-weighted averaging
@@ -28,7 +27,6 @@
       Interpolate remaplaf        Largest area fraction remapping
       Genweights  gencon          Generate first order conservative remap weights
       Genweights  gencon2         Generate second order conservative remap weights
-      Genweights  genlaf          Generate largest area fraction weights
       Genweights  genbil          Generate bilinear interpolation weights
       Genweights  genbic          Generate bicubic interpolation weights
       Genweights  gendis          Generate distance-weighted averaging weights
