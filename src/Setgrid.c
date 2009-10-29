@@ -48,6 +48,7 @@ void *Setgrid(void *argument)
   int nmiss;
   int found;
   int areasize = 0;
+  int lregular = 0;
   char *gridname = NULL;
   double *areaweight = NULL;
   double *array = NULL;
@@ -74,6 +75,7 @@ void *Setgrid(void *argument)
       else if ( strcmp(gridname, "cell") == 0 )        gridtype = GRID_CELL;
       else if ( strcmp(gridname, "lonlat") == 0 )      gridtype = GRID_LONLAT;
       else if ( strcmp(gridname, "gaussian") == 0 )    gridtype = GRID_GAUSSIAN;
+      else if ( strcmp(gridname, "regular") == 0 )    {gridtype = GRID_GAUSSIAN; lregular = 1;}
       else cdoAbort("%s grid unsupported!", gridname);
     }
   else if ( operatorID == SETGRIDAREA )
@@ -154,9 +156,21 @@ void *Setgrid(void *argument)
 	{
 	  gridID1 = vlistGrid(vlistID1, index);
 
-	  if      ( gridtype == GRID_CURVILINEAR ) gridID2 = gridToCurvilinear(gridID1);
-	  else if ( gridtype == GRID_CELL )        gridID2 = gridToCell(gridID1);
-	  else cdoAbort("%s grid unsupported!", gridname);
+	  if ( lregular )
+	    {
+	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
+		{
+		  gridPrint(vlistInqVarGrid(vlistID1, varID), 0);
+		  //gridID2 = gridToGaussian(gridID1);
+		  gridID2 = gridID1;
+		}
+	    }
+	  else
+	    {
+	      if      ( gridtype == GRID_CURVILINEAR ) gridID2 = gridToCurvilinear(gridID1);
+	      else if ( gridtype == GRID_CELL )        gridID2 = gridToCell(gridID1);
+	      else cdoAbort("%s grid unsupported!", gridname);
+	    }
 
 	  /*	  gridCompress(gridID2); */
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
@@ -198,6 +212,14 @@ void *Setgrid(void *argument)
 	  streamDefRecord(streamID2,  varID,  levelID);
 	  
 	  streamReadRecord(streamID1, array, &nmiss);
+	  if ( lregular )
+	    {
+	      if ( gridInqType(vlistInqVarGrid(vlistID1, varID)) == GRID_GAUSSIAN_REDUCED )
+		{
+		  //qu2reg();
+		}
+	    }
+
 	  streamWriteRecord(streamID2, array, nmiss);
 	}
       tsID++;

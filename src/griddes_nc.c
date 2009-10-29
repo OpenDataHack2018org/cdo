@@ -127,6 +127,7 @@ int gridFromNCfile(const char *gridfile)
   return (gridID);
 }
 
+
 void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 {
   static char func[] = "writeNCgrid";
