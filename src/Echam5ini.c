@@ -101,7 +101,7 @@ static void inivars_ml(VAR **vars)
   inivar(&(*vars)[2], GRID_SPECTRAL, ZAXIS_HYBRID,  155, "SD",  "divergence", "1/s");
   inivar(&(*vars)[3], GRID_SPECTRAL, ZAXIS_HYBRID,  130, "STP", "temperature", "K");
   /* Don't change the order (lsp must be the last one)! */
-  inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP", "log surface pressure", "K");
+  inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP", "log surface pressure", "");
 }
 
 
@@ -285,7 +285,7 @@ static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, i
   size_t nvals;
   size_t start[3], count[3];
   int dimidsp[9];
-  int varid;
+  int varid, code;
   int ilev;
   int lon, lat;
   int nlon, nlat, nlev, nlevp1, nvct, nsp, n2, i, nvclev;
@@ -524,6 +524,7 @@ static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, i
     {
       nvals = 0;
 
+      code      = vars[varid].code;
       gridtype  = vars[varid].gridtype;
       zaxistype = vars[varid].zaxistype;
 
@@ -531,9 +532,12 @@ static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, i
 
       if ( ilev == 1 )
 	{
-	  lspid = varid;
-	  if ( gridtype != GRID_SPECTRAL )
-	    cdoAbort("%s has wrong gridtype!", vars[varid].name);
+	  if ( code == 152 )
+	    {
+	      lspid = varid;
+	      if ( gridtype != GRID_SPECTRAL )
+		cdoAbort("%s has wrong gridtype!", vars[varid].name);
+	    }
 	  continue;
 	}
 
@@ -565,9 +569,9 @@ static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, i
 
       nce(nc_redef(nc_file_id));
       nce(nc_def_var(nc_file_id, vars[varid].name, NC_DOUBLE, 3, dimidsp, &nc_var_id));
-      if ( vars[varid].longname )
+      if ( vars[varid].longname && *vars[varid].longname)
 	nce(nc_put_att_text(nc_file_id, nc_var_id, "long_name", strlen(vars[varid].longname), vars[varid].longname));
-      if ( vars[varid].units )
+      if ( vars[varid].units && *vars[varid].units)
 	nce(nc_put_att_text(nc_file_id, nc_var_id, "units", strlen(vars[varid].units), vars[varid].units));
       nce(nc_enddef(nc_file_id));
 
@@ -1520,7 +1524,7 @@ void *Echam5ini(void *argument)
   else if ( operfunc == func_write )
     {
       VAR *vars = NULL;
-      int gridID, zaxisID, gridtype, zaxistype, gridsize, nlev;
+      int code, gridID, zaxisID, gridtype, zaxistype, gridsize, nlev;
       char name[256], longname[256], units[256];
       int taxisID, vdate, vtime;
       int ntr = 0;
@@ -1537,14 +1541,34 @@ void *Echam5ini(void *argument)
 
       for ( varID = 0; varID < nvars; ++varID )
 	{
+	  code = vlistInqVarCode(vlistID1, varID);
 	  vlistInqVarName(vlistID1, varID, name);
 	  vlistInqVarLongname(vlistID1, varID, longname);
 	  vlistInqVarUnits(vlistID1, varID, units);
 
-	  gridID = vlistInqVarGrid(vlistID1, varID);
+	  if ( code < 0 ) code = 0;
+	  if ( strncmp(name, "var", 3) == 0 )
+	    {
+	      if ( code > 0 )
+		{
+		  if ( code == 133 )
+		    { strcpy(name, "Q"); strcpy(longname, "specific humidity"); strcpy(units, "kg/kg"); }
+		  if ( code == 138 )
+		    { strcpy(name, "SVO"); strcpy(longname, "vorticity"); strcpy(units, "1/s"); }
+		  if ( code == 155 )
+		    { strcpy(name, "SD"); strcpy(longname, "divergence"); strcpy(units, "1/s"); }
+		  if ( code == 130 )
+		    { strcpy(name, "STP"); strcpy(longname, "temperature"); strcpy(units, "K"); }
+		  if ( code == 152 )
+		    { strcpy(name, "LSP"); strcpy(longname, "log surface pressure"); }
+		}
+	    }
+	  else if ( strncmp(name, "LSP", 3) == 0 ) code = 152;
+
+	  gridID  = vlistInqVarGrid(vlistID1, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID1, varID);
 
-	  gridtype = gridInqType(gridID);
+	  gridtype  = gridInqType(gridID);
 	  zaxistype = zaxisInqType(zaxisID);
 
 	  if ( gridtype == GRID_SPECTRAL && ntr == 0 )
@@ -1555,7 +1579,9 @@ void *Echam5ini(void *argument)
 	  gridsize = gridInqSize(gridID);
 	  nlev     = zaxisInqSize(zaxisID);
 
-	  inivar(&vars[varID], gridtype, zaxistype,  0, name, longname, units);
+	  if ( zaxistype == ZAXIS_HYBRID && nlev == 1 ) zaxistype = ZAXIS_SURFACE;
+
+	  inivar(&vars[varID], gridtype, zaxistype, code, name, longname, units);
 	  
 	  vars[varID].gridID    = gridID;
 	  vars[varID].zaxisID   = zaxisID;
