@@ -212,7 +212,8 @@ void usage(void)
 
   fprintf(stderr, "    -V             Print the version number\n");
   fprintf(stderr, "    -v             Print extra details for some operators\n");
-  fprintf(stderr, "    -z szip        Compress GRIB records with szip\n");
+  fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
+  fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
   fprintf(stderr, "        zip        Deflate compression of netCDF4 variables\n");
   fprintf(stderr, "\n");
 
@@ -569,6 +570,11 @@ void defineCompress(const char *arg)
       cdoZtype  = COMPRESS_SZIP;
       cdoZlevel = 0;
     }
+  else if ( memcmp(arg, "jpeg", len) == 0 )
+    {
+      cdoZtype = COMPRESS_JPEG;
+      cdoZlevel = 0;
+    }
   else if ( memcmp(arg, "gzip", len) == 0 )
     {
       cdoZtype  = COMPRESS_GZIP;
@@ -580,7 +586,7 @@ void defineCompress(const char *arg)
       cdoZlevel = 1;
     }
   else
-    fprintf(stderr, "Compression %s unsupported!\n", arg);
+    fprintf(stderr, "%s compression unsupported!\n", arg);
 }
 
 static

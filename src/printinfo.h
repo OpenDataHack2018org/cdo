@@ -69,6 +69,26 @@ void printFiletype(int streamID, int vlistID)
 	}
     }
 
+  if ( filetype == FILETYPE_GRB2 )
+    {
+      int nvars, varID;
+      int ztype;
+
+      nvars = vlistNvars(vlistID);
+
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  ztype = vlistInqVarZtype(vlistID, varID);
+	  if ( ztype )
+	    {
+	      if ( ztype == COMPRESS_JPEG )
+		printf(" JPEG");
+
+	      break;
+	    }
+	}
+    }
+
   printf("\n");
 }
 

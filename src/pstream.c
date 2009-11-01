@@ -707,7 +707,10 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	  streamDefZlevel(fileID, cdoZlevel);
 
 	  if ( cdoZtype == COMPRESS_SZIP && (filetype != FILETYPE_GRB && filetype != FILETYPE_NC4) )
-	    cdoWarning("SZIP compression not available for non GRIB/netCDF4 data!");
+	    cdoWarning("SZIP compression not available for non GRIB1/netCDF4 data!");
+
+	  if ( cdoZtype == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
+	    cdoWarning("SZIP compression not available for non GRIB2 data!");
 
 	  if ( cdoZtype == COMPRESS_ZIP && filetype != FILETYPE_NC4 )
 	    cdoWarning("Deflate compression not available for non netCDF4 data!");

@@ -43,6 +43,7 @@ extern "C" {
 #define  COMPRESS_GZIP            2
 #define  COMPRESS_BZIP2           3
 #define  COMPRESS_ZIP             4
+#define  COMPRESS_JPEG            5
 
 /* external data types */
 
