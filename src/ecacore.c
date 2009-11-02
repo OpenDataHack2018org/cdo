@@ -1323,9 +1323,11 @@ void eca4(const ECA_REQUEST_4 *request)
 #endif
             updateHist(endDateWithHist,   nlevels, gridsize, yvals, TRUE);
           }
+	  /*
 #if defined (_OPENMP)
 #pragma omp end sections
 #endif
+	  */
         }
       else
         {
