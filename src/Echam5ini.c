@@ -135,7 +135,8 @@ static int import_e5ml(const char *filename, VAR **vars)
   double *xvals, *yvals, *vct, *levs;
 
   /* open file and check file type */
-  nce(nc_open(filename, NC_NOWRITE, &nc_file_id));
+  /* nce(nc_open(filename, NC_NOWRITE, &nc_file_id)); */
+  nc_file_id = pcdf_openread(filename);
 
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "file_type", filetype));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));
@@ -723,7 +724,8 @@ static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   const int attstringlen = 8192; char attstring[8192];
 
   /* open file and check file type */
-  nce(nc_open(filename, NC_NOWRITE, &nc_file_id));
+  /* nce(nc_open(filename, NC_NOWRITE, &nc_file_id)); */
+  nc_file_id = pcdf_openread(filename);
 
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "file_type", filetype));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));

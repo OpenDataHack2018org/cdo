@@ -1361,3 +1361,22 @@ int pstreamInqFiletype(int pstreamID)
 
   return (filetype);
 }
+
+
+int pcdf_openread(const char *filename)
+{
+  static char func[] = "pcdf_openread";
+  int fileID;
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_lock(&streamOpenReadMutex);
+#endif
+
+  fileID = cdf_openread(filename);
+
+#if  defined  (HAVE_LIBPTHREAD)
+  pthread_mutex_unlock(&streamOpenReadMutex);
+#endif
+
+  return (fileID);
+}

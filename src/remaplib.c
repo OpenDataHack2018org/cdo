@@ -6291,7 +6291,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   /* Open file and read some global information */
 
-  nce(nc_open(interp_file, NC_NOWRITE, &nc_file_id));
+  /* nce(nc_open(interp_file, NC_NOWRITE, &nc_file_id)); */
+  nc_file_id = pcdf_openread(interp_file);
 
   /* Map name */
 

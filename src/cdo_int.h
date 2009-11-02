@@ -168,6 +168,9 @@ void    cdologo(int noper);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 
+int  cdf_openread(const char *filename);
+int pcdf_openread(const char *filename);
+
 void printFiletype(int streamID, int vlistID);
 
 void job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath);
