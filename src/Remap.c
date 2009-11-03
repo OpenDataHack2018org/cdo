@@ -345,6 +345,11 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
+      if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
+	{
+	  if ( !lextrapolate ) remap_extrapolate = TRUE;
+	}
+
       if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
       non_global = remap_non_global || !gridIsCircular(gridID1);
       if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
