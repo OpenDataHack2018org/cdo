@@ -1,6 +1,6 @@
 2009-11-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* gennn: set remap_extrapolate = TRUE (bug fix) [report: Helmut Frank]
+	* remap: bug fix for weights from gennn (set remap_extrapolate = TRUE) [report: Helmut Frank]
 
 2009-11-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
