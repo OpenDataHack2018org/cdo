@@ -1021,16 +1021,27 @@ void *Outputgmt(void *argument)
 
 		  if ( lzon )
 		    {
-		      double xlev[4];
-		      xlev[0] = zaxis_lower_lev[levelID];
-		      xlev[1] = zaxis_upper_lev[levelID];
-		      xlev[2] = zaxis_upper_lev[levelID];
-		      xlev[3] = zaxis_lower_lev[levelID];
+		      double xlev[4], xlat[4];
+		      double levmin = zaxis_lower_lev[levelID];
+		      double levmax = zaxis_upper_lev[levelID];
+		      double latmin = grid_corner_lat[i*4+0];
+		      double latmax = grid_corner_lat[i*4+0];
+		      for ( ic = 1; ic < 4; ic++ )
+			{
+			  if ( grid_corner_lat[i*4+ic] < latmin ) latmin = grid_corner_lat[i*4+ic];
+			  if ( grid_corner_lat[i*4+ic] > latmax ) latmax = grid_corner_lat[i*4+ic];
+			}
+		      xlev[0] = levmin;
+		      xlev[1] = levmax;
+		      xlev[2] = levmax;
+		      xlev[3] = levmin;
+		      xlat[0] = latmin;
+		      xlat[1] = latmin;
+		      xlat[2] = latmax;
+		      xlat[3] = latmax;
 		      for ( ic = 0; ic < 4; ic++ )
-			fprintf(stdout, "   %g  %g\n",
-				grid_corner_lat[i*4+ic], xlev[ic]);
-		      fprintf(stdout, "   %g  %g\n",
-			      grid_corner_lat[i*4], xlev[0]);
+			fprintf(stdout, "   %g  %g\n", xlat[ic], xlev[ic]);
+		      fprintf(stdout, "   %g  %g\n", xlat[0], xlev[0]);
 		    }
 		  else if ( lmer )
 		    {
