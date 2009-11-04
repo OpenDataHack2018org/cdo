@@ -1045,16 +1045,27 @@ void *Outputgmt(void *argument)
 		    }
 		  else if ( lmer )
 		    {
-		      double xlev[4];
-		      xlev[0] = zaxis_lower_lev[levelID];
-		      xlev[1] = zaxis_lower_lev[levelID];
-		      xlev[2] = zaxis_upper_lev[levelID];
-		      xlev[3] = zaxis_upper_lev[levelID];
+		      double xlev[4], xlon[4];
+		      double levmin = zaxis_lower_lev[levelID];
+		      double levmax = zaxis_upper_lev[levelID];
+		      double lonmin = grid_corner_lon[i*4+0];
+		      double lonmax = grid_corner_lon[i*4+0];
+		      for ( ic = 1; ic < 4; ic++ )
+			{
+			  if ( grid_corner_lon[i*4+ic] < lonmin ) lonmin = grid_corner_lon[i*4+ic];
+			  if ( grid_corner_lon[i*4+ic] > lonmax ) lonmax = grid_corner_lon[i*4+ic];
+			}
+		      xlev[0] = levmin;
+		      xlev[1] = levmin;
+		      xlev[2] = levmax;
+		      xlev[3] = levmax;
+		      xlon[0] = lonmin;
+		      xlon[1] = lonmax;
+		      xlon[2] = lonmax;
+		      xlon[3] = lonmin;
 		      for ( ic = 0; ic < 4; ic++ )
-			fprintf(stdout, "   %g  %g\n",
-				grid_corner_lon[i*4+ic], xlev[ic]);
-		      fprintf(stdout, "   %g  %g\n",
-			      grid_corner_lon[i*4], xlev[0]);
+			fprintf(stdout, "   %g  %g\n", xlon[ic], xlev[ic]);
+		      fprintf(stdout, "   %g  %g\n", xlon[0], xlev[0]);
 		    }
 		  else if ( lhov )
 		    {

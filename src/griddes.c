@@ -588,6 +588,20 @@ double *readfield4(GRID *grid, int record, char *format, char *filename)
 }
 */
 
+double readflt(const char *name, const char *pline)
+{
+  const char func[] = "readflt";
+  double val;
+  char *endptr;
+
+  val = strtod(pline, &endptr);
+  if ( pline == endptr )
+    Warning(func, "Couldn't read value for %s, set to zero!", name);
+
+  return (val);
+}
+
+
 int gridFromFile(FILE *gfp, const char *dname)
 {
   static char func[] = "gridFromFile";
@@ -701,87 +715,87 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( memcmp(pline, "xfirst", 6)  == 0 )
 	{
-	  grid.xfirst = atof(skipSeparator(pline + 6));
+	  grid.xfirst = readflt("xfirst", skipSeparator(pline + 6));
 	  grid.def_xfirst = TRUE;
 	}
       else if ( memcmp(pline, "lonfirst", 8)  == 0 )
 	{
-	  grid.xfirst = atof(skipSeparator(pline + 8));
+	  grid.xfirst = readflt("lonfirst", skipSeparator(pline + 8));
 	  grid.def_xfirst = TRUE;
 	}
       else if ( memcmp(pline, "yfirst", 6)  == 0 )
 	{
-	  grid.yfirst = atof(skipSeparator(pline + 6));
+	  grid.yfirst = readflt("yfirst", skipSeparator(pline + 6));
 	  grid.def_yfirst = TRUE;
 	}
       else if ( memcmp(pline, "latfirst", 8)  == 0 )
 	{
-	  grid.yfirst = atof(skipSeparator(pline + 8));
+	  grid.yfirst = readflt("latfirst", skipSeparator(pline + 8));
 	  grid.def_yfirst = TRUE;
 	}
       else if ( memcmp(pline, "xlast", 5)  == 0 )
 	{
-	  grid.xlast = atof(skipSeparator(pline + 5));
+	  grid.xlast = readflt("xlast", skipSeparator(pline + 5));
 	  grid.def_xlast = TRUE;
 	}
       else if ( memcmp(pline, "lonlast", 7)  == 0 )
 	{
-	  grid.xlast = atof(skipSeparator(pline + 7));
+	  grid.xlast = readflt("lonlast", skipSeparator(pline + 7));
 	  grid.def_xlast = TRUE;
 	}
       else if ( memcmp(pline, "ylast", 5)  == 0 )
 	{
-	  grid.ylast = atof(skipSeparator(pline + 5));
+	  grid.ylast = readflt("ylast", skipSeparator(pline + 5));
 	  grid.def_ylast = TRUE;
 	}
       else if ( memcmp(pline, "latlast", 7)  == 0 )
 	{
-	  grid.ylast = atof(skipSeparator(pline + 7));
+	  grid.ylast = readflt("latlast", skipSeparator(pline + 7));
 	  grid.def_ylast = TRUE;
 	}
       else if ( memcmp(pline, "xinc", 4)  == 0 )
 	{
-	  grid.xinc = atof(skipSeparator(pline + 4));
+	  grid.xinc = readflt("xinc", skipSeparator(pline + 4));
 	  grid.def_xinc = TRUE;
 	}
       else if ( memcmp(pline, "loninc", 6)  == 0 )
 	{
-	  grid.xinc = atof(skipSeparator(pline + 6));
+	  grid.xinc = readflt("loninc", skipSeparator(pline + 6));
 	  grid.def_xinc = TRUE;
 	}
       else if ( memcmp(pline, "yinc", 4)  == 0 )
 	{
-	  grid.yinc = atof(skipSeparator(pline + 4));
+	  grid.yinc = readflt("yinc", skipSeparator(pline + 4));
 	  grid.def_yinc = TRUE;
 	}
       else if ( memcmp(pline, "latinc", 6)  == 0 )
 	{
-	  grid.yinc = atof(skipSeparator(pline + 6));
+	  grid.yinc = readflt("latinc", skipSeparator(pline + 6));
 	  grid.def_yinc = TRUE;
 	}
       else if ( memcmp(pline, "originLon", 9)  == 0 )
 	{
-	  grid.originLon = atof(skipSeparator(pline + 9));
+	  grid.originLon = readflt("originLon", skipSeparator(pline + 9));
 	  grid.def_originLon = TRUE;
 	}
       else if ( memcmp(pline, "originLat", 9)  == 0 )
 	{
-	  grid.originLat = atof(skipSeparator(pline + 9));
+	  grid.originLat = readflt("originLat", skipSeparator(pline + 9));
 	  grid.def_originLat = TRUE;
 	}
       else if ( memcmp(pline, "lonParY", 7)  == 0 )
 	{
-	  grid.lonParY = atof(skipSeparator(pline + 7));
+	  grid.lonParY = readflt("lonParY", skipSeparator(pline + 7));
 	  grid.def_lonParY = TRUE;
 	}
       else if ( memcmp(pline, "lat1", 4)  == 0 )
 	{
-	  grid.lat1 = atof(skipSeparator(pline + 4));
+	  grid.lat1 = readflt("lat1", skipSeparator(pline + 4));
 	  grid.def_lat1 = TRUE;
 	}
       else if ( memcmp(pline, "lat2", 4)  == 0 )
 	{
-	  grid.lat2 = atof(skipSeparator(pline + 4));
+	  grid.lat2 = readflt("lat2", skipSeparator(pline + 4));
 	  grid.def_lat2 = TRUE;
 	}
       else if ( memcmp(pline, "projection", 10)  == 0 )
@@ -802,46 +816,46 @@ int gridFromFile(FILE *gfp, const char *dname)
 	}
       else if ( memcmp(pline, "a", 1)  == 0 )
 	{
-	  grid.a = atof(skipSeparator(pline + 1));
+	  grid.a = readflt("a", skipSeparator(pline + 1));
 	}
       else if ( memcmp(pline, "lon_0", 5)  == 0 )
 	{
-	  grid.lon_0 = atof(skipSeparator(pline + 5));
+	  grid.lon_0 = readflt("lon_0", skipSeparator(pline + 5));
 	  grid.def_lon_0 = TRUE;
 	}
       else if ( memcmp(pline, "lat_0", 5)  == 0 )
 	{
-	  grid.lat_0 = atof(skipSeparator(pline + 5));
+	  grid.lat_0 = readflt("lat_0", skipSeparator(pline + 5));
 	  grid.def_lat_0 = TRUE;
 	}
       else if ( memcmp(pline, "lat_1", 5)  == 0 )
 	{
-	  grid.lat_1 = atof(skipSeparator(pline + 5));
+	  grid.lat_1 = readflt("lat_1", skipSeparator(pline + 5));
 	  grid.def_lat_1 = TRUE;
 	}
       else if ( memcmp(pline, "lat_2", 5)  == 0 )
 	{
-	  grid.lat_2 = atof(skipSeparator(pline + 5));
+	  grid.lat_2 = readflt("lat_2", skipSeparator(pline + 5));
 	  grid.def_lat_2 = TRUE;
 	}
       else if ( memcmp(pline, "xnpole", 6)  == 0 )
 	{
-	  grid.xpole = atof(skipSeparator(pline + 6));
+	  grid.xpole = readflt("xnpole", skipSeparator(pline + 6));
 	  grid.isRotated = TRUE;
 	}
       else if ( memcmp(pline, "lonpole", 7)  == 0 )
 	{
-	  grid.xpole = atof(skipSeparator(pline + 7));
+	  grid.xpole = readflt("lonpole", skipSeparator(pline + 7));
 	  grid.isRotated = TRUE;
 	}
       else if ( memcmp(pline, "ynpole", 6)  == 0 )
 	{
-	  grid.ypole = atof(skipSeparator(pline + 6));
+	  grid.ypole = readflt("ynpole", skipSeparator(pline + 6));
 	  grid.isRotated = TRUE;
 	}
       else if ( memcmp(pline, "latpole", 7)  == 0 )
 	{
-	  grid.ypole = atof(skipSeparator(pline + 7));
+	  grid.ypole = readflt("latpole", skipSeparator(pline + 7));
 	  grid.isRotated = TRUE;
 	}
       /*
