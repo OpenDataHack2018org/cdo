@@ -160,9 +160,7 @@ void *Setgrid(void *argument)
 	    {
 	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 		{
-		  gridPrint(vlistInqVarGrid(vlistID1, varID), 0);
-		  //gridID2 = gridToGaussian(gridID1);
-		  gridID2 = gridID1;
+		  gridID2 = gridToRegular(gridID1);
 		}
 	    }
 	  else
@@ -196,7 +194,11 @@ void *Setgrid(void *argument)
   streamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
 
-  gridsize = vlistGridsizeMax(vlistID1);
+  if ( lregular )
+    gridsize = vlistGridsizeMax(vlistID2);
+  else
+    gridsize = vlistGridsizeMax(vlistID1);
+
   array = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
@@ -214,9 +216,12 @@ void *Setgrid(void *argument)
 	  streamReadRecord(streamID1, array, &nmiss);
 	  if ( lregular )
 	    {
-	      if ( gridInqType(vlistInqVarGrid(vlistID1, varID)) == GRID_GAUSSIAN_REDUCED )
+	      gridID1 = vlistInqVarGrid(vlistID1, varID);
+	      gridID2 = vlistInqVarGrid(vlistID2, varID);
+	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 		{
-		  //qu2reg();
+		  double missval = vlistInqVarMissval(vlistID1, varID);
+		  field2regular(gridID1, gridID2, missval, array, nmiss);
 		}
 	    }
 

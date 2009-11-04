@@ -1,5 +1,6 @@
 2009-11-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* setgridtype: added parameter regular to convert reduced gaussian grids
 	* gridFromFile: check floating point parameter
 
 2009-11-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

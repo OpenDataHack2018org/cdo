@@ -479,6 +479,78 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 #endif
 }
 
+int    qu2reg3(double *pfield, int *kpoint, int klat, int klon,
+	       double msval, int *kret, int omisng, int operio, int oveggy);
+
+void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss)
+{
+  static char func[] = "field2regular";
+  int nlon, nlat;
+  int gridtype;
+  int lmiss, lperio, lveggy;
+  int iret;
+  int *rowlonptr;
+
+  gridtype = gridInqType(gridID1);
+
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error(func, "Not a reduced gaussian grid!");
+
+  nlat = gridInqYsize(gridID1);
+  nlon = 2*nlat;
+
+  rowlonptr = (int *) malloc(nlat*sizeof(int));
+
+  if ( gridInqSize(gridID2) != nlon*nlat ) Error(func, "Gridsize differ!");
+
+  gridInqRowlon(gridID1, rowlonptr);
+
+  lmiss = nmiss > 0;
+  lperio = 1;
+  lveggy = 0;
+
+  (void) qu2reg3(array, rowlonptr, nlat, nlon, missval, &iret, lmiss, lperio, lveggy);
+
+  free(rowlonptr);
+}
+
+
+int gridToRegular(int gridID1)
+{
+  static char func[] = "gridToRegular";
+  int gridID2;
+  int gridtype, gridsize;
+  int nx, ny;
+  long i;
+  double *xvals = NULL, *yvals = NULL;
+
+  gridtype = gridInqType(gridID1);
+
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error(func, "Not a reduced gaussian grid!");
+
+  ny = gridInqYsize(gridID1);
+  nx = 2*ny;
+  gridsize = nx*ny;
+
+  gridID2  = gridCreate(GRID_GAUSSIAN, gridsize);
+	  
+  gridDefXsize(gridID2, nx);
+  gridDefYsize(gridID2, ny);
+  
+  xvals = (double *) malloc(nx*sizeof(double));
+  yvals = (double *) malloc(ny*sizeof(double));
+
+  for ( i = 0; i < nx; ++i ) xvals[i] = i * 360./nx;
+  gridInqYvals(gridID1, yvals);
+
+  gridDefXvals(gridID2, xvals);
+  gridDefYvals(gridID2, yvals);
+
+  free(xvals);
+  free(yvals);
+
+  return (gridID2);
+}
+
 
 int gridToCurvilinear(int gridID1)
 {
