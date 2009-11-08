@@ -606,7 +606,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 {
   static char func[] = "gridFromFile";
   char line[MAX_LINE_LEN], *pline;
-  /* char path[4096]; */
   int gridID = -1;
   int size;
   grid_t grid;
@@ -1718,8 +1717,7 @@ int gridFromName(const char *gridname)
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
 
-  if ( grid.type != -1 )
-    gridID = gridDefine(grid);
+  if ( grid.type != -1 ) gridID = gridDefine(grid);
 
   return (gridID);
 }
