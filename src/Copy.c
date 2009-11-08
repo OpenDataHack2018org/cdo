@@ -97,6 +97,7 @@ void *Copy(void *argument)
 	  array = (double *) malloc(gridsize*sizeof(double));
 	  if ( cdoParIO )
 	    {
+	      fprintf(stderr, "Parallel reading enabled!\n");
 	      parIO.array = (double *) malloc(gridsize*sizeof(double));
 	      parIO.array_size = gridsize;
 	    }
