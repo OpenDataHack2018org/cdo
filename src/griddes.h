@@ -55,10 +55,10 @@ typedef struct {
   char    ylongname[128];
   char    yunits[128];
 }
-GRID;
+grid_t;
 
-void gridInit(GRID *grid);
-int gridDefine(GRID grid);
+void gridInit(grid_t *grid);
+int gridDefine(grid_t grid);
 
 int gridFromNCfile(const char *gridfile);
 int gridFromH5file(const char *gridfile);
