@@ -148,8 +148,8 @@ doc/tex/mod/Runstat -text
 doc/tex/mod/Seaspctl -text
 doc/tex/mod/Seasstat -text
 doc/tex/mod/Selbox -text
-doc/tex/mod/Select -text
 doc/tex/mod/Seltime -text
+doc/tex/mod/Selvar -text
 doc/tex/mod/Set -text
 doc/tex/mod/Setbox -text
 doc/tex/mod/Setgatt -text
