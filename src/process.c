@@ -393,8 +393,11 @@ static int getGlobArgc(int argc, char *argv[], int globArgc)
       printf("%d %d %d\n", i, argc, globArgc);
       if ( i < argc )
       */
-	Error(processInqPrompt(),
-	      "Unlimited input streams not allowed in CDO pipes (Operator %s)!", opername);
+      streamInCnt = 1;
+      /*
+      Error(processInqPrompt(),
+	    "Unlimited input streams not allowed in CDO pipes (Operator %s)!", opername);
+      */
     }
 
   if ( streamOutCnt != 1 )

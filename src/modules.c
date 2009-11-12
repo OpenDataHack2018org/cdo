@@ -24,7 +24,7 @@
 #include "error.h"
 
 
-#define  MAX_MOD_OPERATORS  99        /* maximum number of operators for a module */
+#define  MAX_MOD_OPERATORS  128       /* maximum number of operators for a module */
 
 typedef struct {
   void *(*func)(void *);              /* Module                   */
