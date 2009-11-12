@@ -324,7 +324,7 @@ static char *SplitselHelp[] = {
     NULL
 };
 
-static char *SelectHelp[] = {
+static char *SelvarHelp[] = {
     "NAME",
     "    selcode, delcode, selname, delname, selstdname, sellevel, sellevidx, selgrid, ",
     "    selgridname, selzaxis, selzaxisname, selltype, seltabnum - Select fields",

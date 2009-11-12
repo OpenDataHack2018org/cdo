@@ -18,19 +18,19 @@
 /*
    This module contains the following operators:
 
-      Select     selcode         Select codes
-      Select     delcode         Delete codes
-      Select     selname         Select variables
-      Select     delname         Delete variables
-      Select     selstdname      Select variables by CF standard name
-      Select     sellevel        Select levels
-      Select     sellevidx       Select levels by index
-      Select     selgrid         Select grids
-      Select     selgridname     Select grid by name
-      Select     selzaxis        Select zaxis
-      Select     selzaxisname    Select zaxis by name
-      Select     seltabnum       Select parameter table number
-      Select     selltype        Select GRIB level type 
+      Selvar     selcode         Select codes
+      Selvar     delcode         Delete codes
+      Selvar     selname         Select variables
+      Selvar     delname         Delete variables
+      Selvar     selstdname      Select variables by CF standard name
+      Selvar     sellevel        Select levels
+      Selvar     sellevidx       Select levels by index
+      Selvar     selgrid         Select grids
+      Selvar     selgridname     Select grid by name
+      Selvar     selzaxis        Select zaxis
+      Selvar     selzaxisname    Select zaxis by name
+      Selvar     seltabnum       Select parameter table number
+      Selvar     selltype        Select GRIB level type 
 */
 
 
@@ -47,9 +47,9 @@
 #include "list.h"
 
 
-void *Select(void *argument)
+void *Selvar(void *argument)
 {
-  const char func[] = "Select";
+  const char func[] = "Selvar";
   int SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME, SELLTYPE; 
   int SELTABNUM, DELCODE, DELNAME, SELSTDNAME;
   int operatorID;

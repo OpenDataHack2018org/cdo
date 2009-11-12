@@ -80,7 +80,7 @@ cdo_SOURCES = Arith.c		\
               Seaspctl.c 	\
               Seasstat.c 	\
               Selbox.c  	\
-              Select.c  	\
+              Selvar.c  	\
               Select2.c  	\
               Seloperator.c  	\
               Selrec.c  	\
