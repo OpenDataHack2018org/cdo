@@ -26,9 +26,7 @@
       Selvar     sellevel        Select levels
       Selvar     sellevidx       Select levels by index
       Selvar     selgrid         Select grids
-      Selvar     selgridname     Select grid by name
       Selvar     selzaxis        Select zaxis
-      Selvar     selzaxisname    Select zaxis by name
       Selvar     seltabnum       Select parameter table number
       Selvar     selltype        Select GRIB level type 
 */
@@ -36,6 +34,7 @@
 
 #include <string.h>
 #include <math.h>   /* fabs */
+#include <ctype.h>  /* isdigit */
 
 #include "cdi.h"
 #include "cdo.h"
@@ -50,7 +49,7 @@
 void *Selvar(void *argument)
 {
   const char func[] = "Selvar";
-  int SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELGRIDNAME, SELZAXIS, SELZAXISNAME, SELLTYPE; 
+  int SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELZAXIS, SELLTYPE; 
   int SELTABNUM, DELCODE, DELNAME, SELSTDNAME;
   int operatorID;
   int streamID1, streamID2;
@@ -71,6 +70,7 @@ void *Selvar(void *argument)
   int vlistID1 = -1, vlistID2 = -1;
   int isel;
   int i;
+  int intlist, byname;
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
@@ -82,18 +82,16 @@ void *Selvar(void *argument)
 
   cdoInitialize(argument);
 
-  SELCODE      = cdoOperatorAdd("selcode",      0, 0, "codes");
-  SELNAME      = cdoOperatorAdd("selname",      0, 0, "vars");
+  SELCODE      = cdoOperatorAdd("selcode",      0, 0, "code numbers");
+  SELNAME      = cdoOperatorAdd("selname",      0, 0, "variable names");
   SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 0, "standard names");
   SELLEVEL     = cdoOperatorAdd("sellevel",     0, 0, "levels");
   SELLEVIDX    = cdoOperatorAdd("sellevidx",    0, 0, "index of levels");
-  SELGRID      = cdoOperatorAdd("selgrid",      0, 0, "gridIDs");
-  SELGRIDNAME  = cdoOperatorAdd("selgridname",  0, 0, "grid names");
-  SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 0, "zaxisIDs");
-  SELZAXISNAME = cdoOperatorAdd("selzaxisname", 0, 0, "zaxis names");
-  SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 0, "table number");
-  DELCODE      = cdoOperatorAdd("delcode",      0, 0, "codes");
-  DELNAME      = cdoOperatorAdd("delname",      0, 0, "vars");
+  SELGRID      = cdoOperatorAdd("selgrid",      0, 0, "list of grid names or numbers");
+  SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 0, "list of zaxis names or numbers");
+  SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 0, "table numbers");
+  DELCODE      = cdoOperatorAdd("delcode",      0, 0, "code numbers");
+  DELNAME      = cdoOperatorAdd("delname",      0, 0, "variable names");
   SELLTYPE     = cdoOperatorAdd("selltype",     0, 0, "GRIB level types"); 
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
@@ -102,8 +100,11 @@ void *Selvar(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
+  intlist = FALSE;
+  byname  = TRUE;
+
   if ( operatorID == SELNAME || operatorID == DELNAME || operatorID == SELSTDNAME ||
-       operatorID == SELGRIDNAME || operatorID == SELZAXISNAME )
+       operatorID == SELGRID || operatorID == SELZAXIS )
     {
       nsel     = operatorArgc();
       argnames = operatorArgv();
@@ -111,6 +112,15 @@ void *Selvar(void *argument)
       if ( cdoVerbose )
 	for ( i = 0; i < nsel; i++ )
 	  printf("name %d = %s\n", i+1, argnames[i]);
+
+      if ( operatorID == SELGRID || operatorID == SELZAXIS )
+	{
+	  if ( nsel > 0 && isdigit(*argnames[0]) )
+	    {
+	      intlist = TRUE;
+	      byname  = FALSE;
+	    }
+	}
     }
   else if ( operatorID == SELLEVEL )
     {
@@ -122,6 +132,11 @@ void *Selvar(void *argument)
 	  printf("flt %d = %g\n", i+1, fltarr[i]);
     }
   else
+    {
+      intlist = TRUE;
+    }
+
+  if ( intlist )
     {
       nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
       intarr = (int *) listArrayPtr(ilist);
@@ -209,7 +224,7 @@ void *Selvar(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
-	      else if ( operatorID == SELGRID )
+	      else if ( operatorID == SELGRID && byname == FALSE )
 		{
 		  if ( intarr[isel] == (gridID+1) )
 		    {
@@ -217,7 +232,7 @@ void *Selvar(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
-	      else if ( operatorID == SELGRIDNAME )
+	      else if ( operatorID == SELGRID && byname == TRUE )
 		{
 		  if ( memcmp(argnames[isel], gridname, strlen(argnames[isel])) == 0 )
 		    {
@@ -225,7 +240,7 @@ void *Selvar(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
-	      else if ( operatorID == SELZAXIS )
+	      else if ( operatorID == SELZAXIS && byname == FALSE )
 		{
 		  if ( intarr[isel] == (zaxisID+1) )
 		    {
@@ -233,7 +248,7 @@ void *Selvar(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
-	      else if ( operatorID == SELZAXISNAME )
+	      else if ( operatorID == SELZAXIS && byname == TRUE )
 		{
 		  if ( memcmp(argnames[isel], zaxisname, strlen(argnames[isel])) == 0 )
 		    {
@@ -303,19 +318,19 @@ void *Selvar(void *argument)
 	    {
 	      cdoWarning("Level index %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELGRID )
+	  else if ( operatorID == SELGRID && byname == FALSE )
 	    {
 	      cdoWarning("Grid %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELGRIDNAME )
+	  else if ( operatorID == SELGRID && byname == TRUE )
 	    {
 	      cdoWarning("Grid name %s not found!", argnames[isel]);
 	    }
-	  else if ( operatorID == SELZAXIS )
+	  else if ( operatorID == SELZAXIS && byname == FALSE )
 	    {
 	      cdoWarning("Zaxis %d not found!", intarr[isel]);
 	    }
-	  else if ( operatorID == SELZAXISNAME )
+	  else if ( operatorID == SELZAXIS && byname == TRUE )
 	    {
 	      cdoWarning("Zaxis name %s not found!", argnames[isel]);
 	    }

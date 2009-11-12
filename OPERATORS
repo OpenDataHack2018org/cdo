@@ -56,19 +56,17 @@ Operator catalog:
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
-      Select     selcode         Select variables by code number
-      Select     delcode         Delete variables by code number
-      Select     selname         Select variables by name
-      Select     delname         Delete variables by name
-      Select     selstdname      Select variables by standard name
-      Select     sellevel        Select levels
-      Select     sellevidx       Select levels by index
-      Select     selgrid         Select grids
-      Select     selgridname     Select grids by name
-      Select     selzaxis        Select z-axes
-      Select     selzaxisname    Select z-axes by name
-      Select     selltype        Select GRIB level types
-      Select     seltabnum       Select parameter table numbers
+      Selvar     selcode         Select variables by code number
+      Selvar     delcode         Delete variables by code number
+      Selvar     selname         Select variables by name
+      Selvar     delname         Delete variables by name
+      Selvar     selstdname      Select variables by standard name
+      Selvar     sellevel        Select levels
+      Selvar     sellevidx       Select levels by index
+      Selvar     selgrid         Select grids
+      Selvar     selzaxis        Select z-axes
+      Selvar     selltype        Select GRIB level types
+      Selvar     seltabnum       Select parameter table numbers
       Seltime    seltimestep     Select time steps
       Seltime    seltime         Select times
       Seltime    selhour         Select hours

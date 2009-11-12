@@ -333,8 +333,8 @@ void *Wct(void *argument);
 /* QR */
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
-#define  SelvarOperators        {"selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", "selgridname", \
-                                 "selzaxis", "selzaxisname", "seltabnum", "delcode", "delname", "selltype"}
+#define  SelvarOperators        {"selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
+                                 "selzaxis", "seltabnum", "delcode", "delname", "selltype"}
 #define  Select2Operators       {"select"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}
@@ -732,6 +732,8 @@ static char *opalias[][2] =
   {"remapcon1",           "remaplaf"   },
   {"remapdis1",           "remapnn"    },
   {"showvar",             "showname"   },
+  {"selgridname",         "selgrid"    },
+  {"selzaxisname",        "selzaxis"   },
   {"selvar",              "selname"    },
   {"setvar",              "setname"    },
   {"sortvar",             "sortname"   },
