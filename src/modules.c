@@ -117,8 +117,8 @@ void *Seaspctl(void *argument);
 /* QR */
 void *Seasstat(void *argument);
 void *Selbox(void *argument);
+void *Select(void *argument);
 void *Selvar(void *argument);
-void *Select2(void *argument);
 void *Seloperator(void *argument);
 void *Selrec(void *argument);
 void *Seltime(void *argument);
@@ -333,9 +333,9 @@ void *Wct(void *argument);
 /* QR */
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
+#define  SelectOperators        {"select"}
 #define  SelvarOperators        {"selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
                                  "selzaxis", "seltabnum", "delcode", "delname", "selltype"}
-#define  Select2Operators       {"select"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
@@ -567,7 +567,7 @@ static MODULES Modules[] =
   /* QR */
   { Seasstat,       SeasstatHelp,      SeasstatOperators,       1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,         1,  1 },
-  { Select2,        NULL,              Select2Operators,       -1,  1 },
+  { Select,         NULL,              SelectOperators,        -1,  1 },
   { Selvar,         SelvarHelp,        SelvarOperators,         1,  1 },
   { Selrec,         SelvarHelp,        SelrecOperators,         1,  1 },
   { Seloperator,    NULL,              SeloperatorOperators,    1,  1 },

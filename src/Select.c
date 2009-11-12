@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Select2     select         Select fields
+      Select      select         Select fields
 */
 
 
@@ -420,9 +420,9 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 }
 
 
-void *Select2(void *argument)
+void *Select(void *argument)
 {
-  const char func[] = "Select2";
+  const char func[] = "Select";
   int SELECT;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
