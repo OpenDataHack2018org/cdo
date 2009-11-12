@@ -44,6 +44,7 @@ void    vlistDefVarTime(int vlistID, int varID, int timeID);
 #define  PML_DATE        4
 #define  PML_TIME        4
 
+/*
 typedef struct {
   char *name;
   int maxpar;
@@ -51,6 +52,14 @@ typedef struct {
   char *par;
 }
 PARAMETER;
+
+static PARAMETER Parameter[] =
+{
+  {"code", 1024, 0, NULL},
+};
+
+static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
+*/
 
 #define PML_DEF(name, size, txt)      int flag_##name[size]; int npar_##name = 0; int max_##name = size; const char str_##name[] = txt
 #define PML_DEF_INT(name, size, txt)  int par_##name[size]; int name = 0; PML_DEF(name, size, txt)
@@ -70,13 +79,6 @@ PARAMETER;
 #define PAR_CHECK_INT(name)           par_check_int(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_FLT(name)           par_check_flt(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_WORD(name)          par_check_word(npar_##name, par_##name, flag_##name, name)
-
-static PARAMETER Parameter[] =
-{
-  {"code", 1024, 0, NULL},
-};
-
-static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 
 #define MAX_PML_ENTRY  256
 

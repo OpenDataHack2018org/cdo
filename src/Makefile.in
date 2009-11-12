@@ -73,7 +73,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Remap.$(OBJEXT) Remapeta.$(OBJEXT) Replace.$(OBJEXT) \
 	Rotuv.$(OBJEXT) Runpctl.$(OBJEXT) Runstat.$(OBJEXT) \
 	Seascount.$(OBJEXT) Seaspctl.$(OBJEXT) Seasstat.$(OBJEXT) \
-	Selbox.$(OBJEXT) Selvar.$(OBJEXT) Select2.$(OBJEXT) \
+	Selbox.$(OBJEXT) Select.$(OBJEXT) Selvar.$(OBJEXT) \
 	Seloperator.$(OBJEXT) Selrec.$(OBJEXT) Seltime.$(OBJEXT) \
 	Set.$(OBJEXT) Setbox.$(OBJEXT) Setgatt.$(OBJEXT) \
 	Setgrid.$(OBJEXT) Sethalo.$(OBJEXT) Setmiss.$(OBJEXT) \
@@ -306,8 +306,8 @@ cdo_SOURCES = Arith.c		\
               Seaspctl.c 	\
               Seasstat.c 	\
               Selbox.c  	\
+              Select.c  	\
               Selvar.c  	\
-              Select2.c  	\
               Seloperator.c  	\
               Selrec.c  	\
               Seltime.c 	\
@@ -646,7 +646,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Seaspctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Seasstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selbox.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Select2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Select.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Seloperator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Selrec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Seltime.Po@am__quote@
