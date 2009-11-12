@@ -1,11 +1,11 @@
 @BeginModule
 @NewPage
-@Name      = Select
+@Name      = Selvar
 @Title     = Select fields
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selname delname selstdname sellevel sellevidx selgrid selgridname selzaxis selzaxisname selltype seltabnum
+@Operators = selcode delcode selname delname selstdname sellevel sellevidx selgrid selzaxis selltype seltabnum
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -94,32 +94,12 @@ Selects all fields with grids in a user given list.
 @EndOperator
 
 
-@BeginOperator_selgridname
-@Title     = Select grids by name
-@Parameter = gridnames
-
-@BeginDescription
-Selects all fields with grid names in a user given list.
-@EndDescription
-@EndOperator
-
-
 @BeginOperator_selzaxis
 @Title     = Select z-axes
 @Parameter = zaxes
 
 @BeginDescription
 Selects all fields with z-axes in a user given list.
-@EndDescription
-@EndOperator
-
-
-@BeginOperator_selzaxisname
-@Title     = Select z-axes by name
-@Parameter = zaxisnames
-
-@BeginDescription
-Selects all fields with z-axis names in a user given list.
 @EndDescription
 @EndOperator
 
@@ -169,13 +149,9 @@ INTEGER  Comma separated list of index of levels
 @Item = ltypes
 INTEGER  Comma separated list of GRIB level types
 @Item = grids
-INTEGER  Comma separated list of grid numbers
-@Item = gridnames
-STRING   Comma separated list of grid names
+STRING   Comma separated list of grid names or numbers
 @Item = zaxes
-INTEGER  Comma separated list of z-axis numbers
-@Item = zaxisnames
-STRING   Comma separated list of z-axis names
+STRING   Comma separated list of z-axis names or numbers
 @Item = tabnums
 INTEGER  Comma separated list of parameter table numbers
 @C @Item = records
@@ -183,14 +159,14 @@ INTEGER  Comma separated list of parameter table numbers
 @EndParameter
 
 
-@C @BeginExample
-@CAssume an input dataset has three variables with the code numbers 129, 130 and 139.
-@CTo select the variables with the code number 129 and 139 use:
-@C@BeginVerbatim
-@C   cdo selcode,129,139 ifile ofile
-@C@EndVerbatim
-@CYou can also select the code number 129 and 139 by deleting the code number 130 with:
-@C@BeginVerbatim
-@C   cdo delcode,130 ifile ofile
-@C@EndVerbatim
-@C@EndExample
+@BeginExample
+Assume an input dataset has three variables with the code numbers 129, 130 and 139.
+To select the variables with the code number 129 and 139 use:
+@BeginVerbatim
+   cdo selcode,129,139 ifile ofile
+@EndVerbatim
+You can also select the code number 129 and 139 by deleting the code number 130 with:
+@BeginVerbatim
+   cdo delcode,130 ifile ofile
+@EndVerbatim
+@EndExample
