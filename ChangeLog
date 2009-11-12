@@ -1,3 +1,7 @@
+2009-11-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* change number of input streams from unlimited to 1 in pipes
+	
 2009-11-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added default zaxis name "surface"
