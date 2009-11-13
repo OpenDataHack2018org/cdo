@@ -267,7 +267,8 @@ void *Wct(void *argument);
 #define  EofcoeffOperators      {"eofcoeff"}
 #define  TimeofOperators        {"eof", "eofspatial", "eoftime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
-#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "pardes", "taxisdes", "vlist", "partab", "partab2"}
+#define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
+                                 "taxisdes", "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}

@@ -85,7 +85,7 @@ void printAtts(int vlistID, int varID)
 
 void *Filedes(void *argument)
 {
-  int GRIDDES, GRIDDES2, ZAXISDES, VCT, PARDES, TAXISDES, FILEDES, VLIST, PARTAB, PARTAB2;
+  int GRIDDES, GRIDDES2, ZAXISDES, VCT, VCT2, PARDES, TAXISDES, FILEDES, VLIST, PARTAB, PARTAB2;
   int operatorID;
   int streamID = 0;
   int zaxisID;
@@ -95,15 +95,16 @@ void *Filedes(void *argument)
 
   cdoInitialize(argument);
 
-  GRIDDES  = cdoOperatorAdd("griddes",  0, 0, NULL);
-  GRIDDES2 = cdoOperatorAdd("griddes2", 0, 0, NULL);
-  ZAXISDES = cdoOperatorAdd("zaxisdes", 0, 0, NULL);
-  TAXISDES = cdoOperatorAdd("taxisdes", 0, 0, NULL);
-  VCT      = cdoOperatorAdd("vct",      0, 0, NULL);
-  PARDES   = cdoOperatorAdd("pardes",   0, 0, NULL);
-  FILEDES  = cdoOperatorAdd("filedes",  0, 0, NULL);
-  VLIST    = cdoOperatorAdd("vlist",    0, 0, NULL);
-  PARTAB   = cdoOperatorAdd("partab",   0, 0, NULL);
+  GRIDDES  = cdoOperatorAdd("griddes",   0, 0, NULL);
+  GRIDDES2 = cdoOperatorAdd("griddes2",  0, 0, NULL);
+  ZAXISDES = cdoOperatorAdd("zaxisdes",  0, 0, NULL);
+  TAXISDES = cdoOperatorAdd("taxisdes",  0, 0, NULL);
+  VCT      = cdoOperatorAdd("vct",       0, 0, NULL);
+  VCT2     = cdoOperatorAdd("vct2",      0, 0, NULL);
+  PARDES   = cdoOperatorAdd("pardes",    0, 0, NULL);
+  FILEDES  = cdoOperatorAdd("filedes",   0, 0, NULL);
+  VLIST    = cdoOperatorAdd("vlist",     0, 0, NULL);
+  PARTAB   = cdoOperatorAdd("partab",    0, 0, NULL);
   PARTAB2  = cdoOperatorAdd("partab2",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -230,7 +231,7 @@ void *Filedes(void *argument)
 	    }
 	}
     }
-  else if ( operatorID == VCT )
+  else if ( operatorID == VCT || operatorID == VCT2 )
     {
       for ( index = 0; index < nzaxis; index++)
 	{
@@ -245,11 +246,35 @@ void *Filedes(void *argument)
 	      vct     = zaxisInqVctPtr(zaxisID);
 		
 	      if ( vctsize%2 == 0 )
-		for ( i = 0; i < vctsize/2; i++ )
-		  fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
+		{
+		  if ( operatorID == VCT )
+		    {
+		      for ( i = 0; i < vctsize/2; i++ )
+			fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
+		    }
+		  else
+		    {
+		      int nbyte0, nbyte;
+		      fprintf(stdout, "vctsize   = %d\n", vctsize);
+		      nbyte0 = fprintf(stdout, "vct       = ");
+		      nbyte = nbyte0;
+		      for ( i = 0; i < vctsize; i++ )
+			{
+			  if ( nbyte > 70 || i == vctsize/2 )
+			    {
+			      fprintf(stdout, "\n%*s", nbyte0, "");
+			      nbyte = nbyte0;
+			    }
+			  nbyte += fprintf(stdout, "%.9g ", vct[i]);
+			}
+		      fprintf(stdout, "\n");
+		    }
+		}
 	      else
 		for ( i = 0; i < vctsize; i++ )
 		  fprintf(stdout, "%5d %25.17f\n", i, vct[i]);
+
+	      break;
 	    }
 	}
     }

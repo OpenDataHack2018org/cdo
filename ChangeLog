@@ -3,6 +3,7 @@
 	* change number of input streams from unlimited to 1 in pipes
 	* rename module Select to Selvar
 	* rename selgridname/selzaxisname to selgrid/selzaxis
+	* added operator vct2
 	
 2009-11-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
