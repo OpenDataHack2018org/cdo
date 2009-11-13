@@ -569,10 +569,9 @@ void *Select(void *argument)
 	      
 	      if ( levID < nlevs ) npar++;
 	    }
-      
 
 	  if ( npar == 0 )
-	    cdoAbort("No parameter selected!");
+	    cdoAbort("No variable selected!");
 
 
 	  if ( cdoVerbose ) vlistPrint(vlistID1);

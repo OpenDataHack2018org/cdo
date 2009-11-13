@@ -4,6 +4,7 @@
 	* rename module Select to Selvar
 	* rename selgridname/selzaxisname to selgrid/selzaxis
 	* added operator vct2
+	* Selvar: abort if no variable is selected
 	
 2009-11-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

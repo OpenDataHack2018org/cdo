@@ -70,6 +70,7 @@ void *Selvar(void *argument)
   int vlistID1 = -1, vlistID2 = -1;
   int isel;
   int i;
+  int npar;
   int intlist, byname;
   int lcopy = FALSE;
   int gridsize;
@@ -293,6 +294,21 @@ void *Selvar(void *argument)
 	    }
 	}
     }
+
+  npar = 0;
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+      nlevs   = zaxisInqSize(zaxisID);
+
+      for ( levID = 0; levID < nlevs; levID++ )
+	if ( vlistInqFlag(vlistID1, varID, levID) == TRUE ) break;
+	      
+      if ( levID < nlevs ) npar++;
+    }
+  
+  if ( npar == 0 )
+    cdoAbort("No variable selected!");
 
   for ( isel = 0; isel < nsel; isel++ )
     {
