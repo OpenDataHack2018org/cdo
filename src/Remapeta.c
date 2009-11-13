@@ -149,6 +149,57 @@ void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval
   *maxval = xmax;
 }
 
+double *vctFromFile(const char *filename, int *nvct)
+{
+  static char func[] = "vctFromFile";
+  char line[1024], *pline;
+  int num, i = 0;
+  int nlevh2, nvct2;
+  int maxvct = 8192;
+  double *vct2;
+  FILE *fp;
+
+
+  fp = fopen(filename, "r");
+  if ( fp == NULL ) { perror(filename); exit(EXIT_FAILURE); }
+
+  vct2 = (double *) malloc(maxvct*sizeof(double));
+
+  while ( readline(fp, line, 1024) )
+    {
+      if ( line[0] == '#' ) continue;
+      if ( line[0] == '\0' ) continue;
+
+      pline = line;
+      num = (int) strtod(pline, &pline);
+      if ( pline == NULL ) cdoAbort("Format error in VCT file %s!", filename);
+      if ( num != i ) cdoWarning("Inconsistent VCT file, entry %d is %d.", i, num);
+      
+      if ( i+maxvct/2 >= maxvct-1 ) cdoAbort("Too many values in VCT file!");
+
+      vct2[i] = strtod(pline, &pline);
+      if ( pline == NULL ) cdoAbort("Format error in VCT file %s!", filename);
+
+      vct2[i+maxvct/2] = strtod(pline, &pline);
+
+      i++;
+    }
+
+  fclose(fp);
+
+  nvct2 = 2*i;
+  nlevh2 = i - 1;
+
+  for ( i = 0; i < nlevh2+1; ++i )
+    vct2[i+nvct2/2] = vct2[i+maxvct/2];
+  
+  vct2 = (double *) realloc(vct2, nvct2*sizeof(double));
+
+  *nvct = nvct2;
+
+  return (vct2);
+}
+
 
 #define  MAX_VARS3D  1024
 
@@ -164,7 +215,7 @@ void *Remapeta(void *argument)
   int i, offset, iv;
   int tsID, varID, levelID;
   int nvars, nvars3D = 0;
-  int zaxisID2, zaxisIDh = -1, nzaxis;
+  int zaxisID2, zaxisIDh = -1, nzaxis, surfaceID;
   int ngrids, gridID, zaxisID;
   int nlevel;
   int nvct1, nvct2 = 0;
@@ -196,6 +247,7 @@ void *Remapeta(void *argument)
   double t_min = 170, t_max = 320;
   double q_min = 0, q_max = 0.1;
   double cconst = 1.E-6;
+  const char *fname;
 
   cdoInitialize(argument);
 
@@ -207,47 +259,12 @@ void *Remapeta(void *argument)
 
   if ( operatorID == REMAPETA )
     {
-      const char *fname = operatorArgv()[0];
-      char line[1024], *pline;
-      int num, i = 0;
-      int maxvct = 8192;
-      
-      FILE *fp;
 
-      fp = fopen(fname, "r");
-      if ( fp == NULL ) { perror(fname); exit(EXIT_FAILURE); }
-
-      vct2 = (double *) malloc(maxvct*sizeof(double));
-
-      while ( readline(fp, line, 1024) )
-	{
-          if ( line[0] == '#' ) continue;
-          if ( line[0] == '\0' ) continue;
-
-	  pline = line;
-	  num = (int) strtod(pline, &pline);
-	  if ( pline == NULL ) cdoAbort("Format error in VCT file %s!", fname);
-	  if ( num != i ) cdoWarning("Inconsistent VCT file, entry %d is %d.", i, num);
-
-	  vct2[i] = strtod(pline, &pline);
-	  if ( pline == NULL ) cdoAbort("Format error in VCT file %s!", fname);
-
-	  vct2[i+maxvct/2] = strtod(pline, &pline);
-
-	  i++;
-	}
-
-      fclose(fp);
+      vct2 = vctFromFile(operatorArgv()[0], &nvct2);
+      nlevh2 = nvct2/2 - 1;
 
       a2 = vct2;
-      b2 = vct2 + i;
-      nvct2 = 2*i;
-      nlevh2 = i - 1;
-
-      for ( i = 0; i < nlevh2+1; ++i )
-	vct2[i+nvct2/2] = vct2[i+maxvct/2];
-
-      vct2 = (double *) realloc(vct2, 2*i*sizeof(double));
+      b2 = vct2 + nvct2/2;
 
       if ( cdoVerbose )
 	for ( i = 0; i < nlevh2+1; ++i )
@@ -259,7 +276,7 @@ void *Remapeta(void *argument)
 	  fname = operatorArgv()[1];
 
 	  streamID1 = streamOpenRead(fname);
-	  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
+	  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", fname);
 
 	  vlistID1 = streamInqVlist(streamID1);
 
@@ -345,39 +362,48 @@ void *Remapeta(void *argument)
   if ( nvct2 == 0 ) cdoAbort("Internal problem, vct2 undefined!");
   zaxisDefVct(zaxisID2, nvct2, vct2);
 
+  surfaceID = zaxisFromName("surface");
+
   nzaxis  = vlistNzaxis(vlistID1);
   lhavevct = FALSE;
   for ( i = 0; i < nzaxis; i++ )
     {
       zaxisID = vlistZaxis(vlistID1, i);
       nlevel  = zaxisInqSize(zaxisID);
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel > 1 )
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	{
-	  nvct1 = zaxisInqVctSize(zaxisID);
-	  if ( nlevel == (nvct1/2 - 1) )
+	  if ( nlevel > 1 )
 	    {
-	      if ( lhavevct == FALSE )
+	      nvct1 = zaxisInqVctSize(zaxisID);
+	      if ( nlevel == (nvct1/2 - 1) )
 		{
-		  lhavevct = TRUE;
-		  zaxisIDh = zaxisID;
-		  nlevh1    = nlevel;
+		  if ( lhavevct == FALSE )
+		    {
+		      lhavevct = TRUE;
+		      zaxisIDh = zaxisID;
+		      nlevh1    = nlevel;
 	      
-		  vct1 = (double *) malloc(nvct1*sizeof(double));
-		  memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
+		      vct1 = (double *) malloc(nvct1*sizeof(double));
+		      memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
+		      
+		      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
-		  vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-
-		  a1 = vct1;
-		  b1 = vct1 + nvct1/2;
-		  if ( cdoVerbose )
-		    for ( i = 0; i < nvct1/2; ++i )
-		      fprintf(stdout, "vct1: %5d %25.17f %25.17f\n", i, vct1[i], vct1[nvct1/2+i]);
+		      a1 = vct1;
+		      b1 = vct1 + nvct1/2;
+		      if ( cdoVerbose )
+			for ( i = 0; i < nvct1/2; ++i )
+			  fprintf(stdout, "vct1: %5d %25.17f %25.17f\n", i, vct1[i], vct1[nvct1/2+i]);
+		    }
+		  else
+		    {
+		      if ( memcmp(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double)) == 0 )
+			vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
+		    }
 		}
-	      else
-		{
-		  if ( memcmp(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double)) == 0 )
-		    vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-		}
+	    }
+	  else
+	    {
+	      vlistChangeZaxisIndex(vlistID2, i, surfaceID);
 	    }
 	}
     }
@@ -750,6 +776,8 @@ void *Remapeta(void *argument)
   free(fis1);
 
   free(array);
+  free(vct2);
+  if ( vct1 ) free(vct1);
 
   cdoFinish();
 

@@ -127,5 +127,6 @@ void gridGenXvals(int xsize, double xfirst, double xlast, double xinc, double *x
 void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast, double yinc, double *yvals);
 
 int gridFromName(const char *gridname);
+int zaxisFromName(const char *zaxisname);
 
 #endif  /* _CDO_H */
