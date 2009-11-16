@@ -138,6 +138,9 @@ static void version(void)
 #if defined (HAVE_LIBSZ)
   fprintf(stderr, " SZ");
 #endif
+#if defined (HAVE_LIBJASPER)
+  fprintf(stderr, " JASPER");
+#endif
 #if defined (HAVE_LIBPROJ)
   fprintf(stderr, " PROJ.4");
 #endif
@@ -737,6 +740,7 @@ int main(int argc, char *argv[])
 	  numThreads = atoi(cdoOptarg);
 	  break;
 	case 'p':
+	  fprintf(stderr, "CDO option -p is obsolete and will be removed in the next release, please switch to -b <bits>!\n");
 	  setDefaultDataTypeByte(cdoOptarg);
 	  break;
 	case 'Q':
