@@ -1,5 +1,6 @@
 2009-11-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* New operator: sethalo - Set the left and right bounds of a field
 	* change number of input streams from unlimited to 1 in pipes
 	* rename module Select to Selvar
 	* rename selgridname/selzaxisname to selgrid/selzaxis

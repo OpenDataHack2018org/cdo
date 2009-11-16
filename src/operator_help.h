@@ -3201,6 +3201,27 @@ static char *HistogramHelp[] = {
     NULL
 };
 
+static char *SethaloHelp[] = {
+    "NAME",
+    "    sethalo - Set the left and right bounds of a field",
+    "",
+    "SYNOPSIS",
+    "    sethalo,lhalo,rhalo  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator sets the left and right bounds of the rectangularly",
+    "    understood fields. Positive numbers of the parameter lhalo enlarges ",
+    "    the left bound by the given number of columns from the right bound. The",
+    "    parameter rhalo does the similar for the right bound.",
+    "    Negative numbers of the parameter lhalo/rhalo can be used to remove",
+    "    the given number of columns of the left and right bounds.",
+    "",
+    "PARAMETER",
+    "    lhalo  INTEGER  Left halo",
+    "    rhalo  INTEGER  Right halo",
+    NULL
+};
+
 static char *WctHelp[] = {
     "NAME",
     "    wct - Windchill temperature",

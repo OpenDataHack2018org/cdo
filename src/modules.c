@@ -577,7 +577,7 @@ static MODULES Modules[] =
   { Setbox,         SetboxHelp,        SetboxOperators,         1,  1 },
   { Setgatt,        SetgattHelp,       SetgattOperators,        1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,        1,  1 },
-  { Sethalo,        NULL,              SethaloOperators,        1,  1 },
+  { Sethalo,        SethaloHelp,       SethaloOperators,        1,  1 },
   { Setrange,       SetrangeHelp,      SetrangeOperators,       1,  1 },
   { Setrcaname,     NULL,              SetrcanameOperators,     1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,        1,  1 },

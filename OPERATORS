@@ -406,6 +406,7 @@ Operator catalog:
       Histogram  histsum         Histogram sum
       Histogram  histmean        Histogram mean
       Histogram  histfreq        Histogram frequency
+      Sethalo    sethalo         Set the left and right bounds of a field
       Wct        wct             Windchill temperature
       Fdns       fdns            Frost days where no snow index per time period
       Strwin     strwin          Strong wind days index per time period
