@@ -268,7 +268,7 @@ void *Wct(void *argument);
 #define  TimeofOperators        {"eof", "eofspatial", "eoftime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
-                                 "taxisdes", "vlist", "partab", "partab2"}
+                                 "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
@@ -352,8 +352,8 @@ void *Wct(void *argument);
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
-#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showcode", "showname", \
-                                 "showstdname", "showlevel", "showltype", "showformat"}
+#define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", \
+                                 "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  Smooth9Operators       {"smooth9"}
 #define  SortOperators          {"sortcode", "sortname", "sortlevel"}

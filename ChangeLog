@@ -1,3 +1,8 @@
+2009-11-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* showtime: removed output of date, only print time string hh:mm:ss
+	* convert date and time to string for printing
+
 2009-11-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* New operator: sethalo - Set the left and right bounds of a field

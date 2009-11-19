@@ -133,6 +133,8 @@ int ntr2nlat(int ntr);
 int ntr2nlat_linear(int ntr);
 int compNlon(int nlat);
 
+void date2str(int date, char *datestr, int maxlen);
+void time2str(int time, char *timestr, int maxlen);
 
 typedef struct {
   int   date;

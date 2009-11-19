@@ -313,20 +313,15 @@ void *Seasstat(void *argument)
 
       if ( cdoVerbose )
 	{
-	  int year0, month0, day0, hour0, minute0, second0;
-	  int year1, month1, day1, hour1, minute1, second1;
-	  decode_date(vdate0, &year0, &month0, &day0);
-	  decode_time(vtime0, &hour0, &minute0, &second0);
-	  decode_date(vdate1, &year1, &month1, &day1);
-	  decode_time(vtime1, &hour1, &minute1, &second1);
-	  cdoPrint("season %3d %3s "
-		   "start "DATE_FORMAT" "TIME_FORMAT" "
-		   "end "DATE_FORMAT" "TIME_FORMAT" "
-		   "ntimesteps %d", 
+	  char vdatestr0[32], vtimestr0[32];
+	  char vdatestr1[32], vtimestr1[32];
+	  date2str(vdate0, vdatestr0, sizeof(vdatestr0));
+	  time2str(vtime0, vtimestr0, sizeof(vtimestr0));
+	  date2str(vdate1, vdatestr1, sizeof(vdatestr1));
+	  time2str(vtime1, vtimestr1, sizeof(vtimestr1));
+	  cdoPrint("season %3d %3s start %s %s end %s %s ntimesteps %d", 
 		   nseason, seas_name[seas0],
-		   year0, month0, day0, hour0, minute0, second0,
-		   year1, month1, day1, hour1, minute1, second1,
-		   nsets);
+		   vdatestr0, vtimestr0, vdatestr1, vtimestr1, nsets);
 	}
 
       taxisDefVdate(taxisID2, vdate1);
@@ -335,10 +330,10 @@ void *Seasstat(void *argument)
 
       if ( nsets < 3 )
 	{
-	  int year, month, day;
-	  decode_date(vdate0, &year, &month, &day);
-	  cdoWarning("Season %3d ("DATE_FORMAT") has only %d input time step%s!", 
-		     otsID, year, month, day, nsets, nsets == 1 ? "" : "s");
+	  char vdatestr[32];
+	  date2str(vdate0, vdatestr, sizeof(vdatestr));
+	  cdoWarning("Season %3d (%s) has only %d input time step%s!", 
+		     otsID, vdatestr, nsets, nsets == 1 ? "" : "s");
 	}
 
       for ( recID = 0; recID < nrecords; recID++ )

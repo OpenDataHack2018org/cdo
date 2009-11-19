@@ -51,12 +51,12 @@ void *Sinfo(void *argument)
   char varname[128];
   char longname[128];
   char units[128];
+  char vdatestr[32], vtimestr[32];
   double level;
   char *modelptr, *instptr;
   int streamID = 0;
   int vlistID;
   int prec;
-  int year, month, day, hour, minute, second;
   char pstr[4];
 
   cdoInitialize(argument);
@@ -230,11 +230,10 @@ void *Sinfo(void *argument)
 		  vdate = taxisInqRdate(taxisID);
 		  vtime = taxisInqRtime(taxisID);
 
-		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute, &second);
+		  date2str(vdate, vdatestr, sizeof(vdatestr));
+		  time2str(vtime, vtimestr, sizeof(vtimestr));
 
-		  fprintf(stdout, "     RefTime = "DATE_FORMAT" "TIME_FORMAT,
-			  year, month, day, hour, minute, second);
+		  fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 		      
 		  unit = taxisInqTunit(taxisID);
 		  if ( unit != CDI_UNDEFID )
@@ -291,11 +290,11 @@ void *Sinfo(void *argument)
 	      vdate = taxisInqVdate(taxisID);
 	      vtime = taxisInqVtime(taxisID);
 
-	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute, &second);
+	      date2str(vdate, vdatestr, sizeof(vdatestr));
+	      time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	      fprintf(stdout, " "DATE_FORMAT" "TIME_FORMAT,
-		      year, month, day, hour, minute, second);
+	      fprintf(stdout, " %s %s", vdatestr, vtimestr);
+
 	      ntimeout++;
 	      tsID++;
 	    }

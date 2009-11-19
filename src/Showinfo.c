@@ -40,7 +40,7 @@
 
 void *Showinfo(void *argument)
 {
-  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWDATETIME, SHOWCODE;
+  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWTIMESTAMP, SHOWCODE;
   int SHOWNAME, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
   int operatorID;
   int varID, zaxisID;
@@ -61,17 +61,17 @@ void *Showinfo(void *argument)
 
   cdoInitialize(argument);
 
-  SHOWYEAR     = cdoOperatorAdd("showyear",      0, 0, NULL);
-  SHOWMON      = cdoOperatorAdd("showmon",       0, 0, NULL);
-  SHOWDATE     = cdoOperatorAdd("showdate",      0, 0, NULL);
-  SHOWTIME     = cdoOperatorAdd("showtime",      0, 0, NULL);
-  SHOWDATETIME = cdoOperatorAdd("showdatetime",  0, 0, NULL);
-  SHOWCODE     = cdoOperatorAdd("showcode",      0, 0, NULL);
-  SHOWNAME     = cdoOperatorAdd("showname",      0, 0, NULL);
-  SHOWSTDNAME  = cdoOperatorAdd("showstdname",   0, 0, NULL);
-  SHOWLEVEL    = cdoOperatorAdd("showlevel",     0, 0, NULL);
-  SHOWLTYPE    = cdoOperatorAdd("showltype",     0, 0, NULL);
-  SHOWFORMAT   = cdoOperatorAdd("showformat",    0, 0, NULL);
+  SHOWYEAR      = cdoOperatorAdd("showyear",      0, 0, NULL);
+  SHOWMON       = cdoOperatorAdd("showmon",       0, 0, NULL);
+  SHOWDATE      = cdoOperatorAdd("showdate",      0, 0, NULL);
+  SHOWTIME      = cdoOperatorAdd("showtime",      0, 0, NULL);
+  SHOWTIMESTAMP = cdoOperatorAdd("showtimestamp", 0, 0, NULL);
+  SHOWCODE      = cdoOperatorAdd("showcode",      0, 0, NULL);
+  SHOWNAME      = cdoOperatorAdd("showname",      0, 0, NULL);
+  SHOWSTDNAME   = cdoOperatorAdd("showstdname",   0, 0, NULL);
+  SHOWLEVEL     = cdoOperatorAdd("showlevel",     0, 0, NULL);
+  SHOWLTYPE     = cdoOperatorAdd("showltype",     0, 0, NULL);
+  SHOWFORMAT    = cdoOperatorAdd("showformat",    0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -171,7 +171,7 @@ void *Showinfo(void *argument)
 	  }
       fprintf(stdout, "\n");
     }
-  else if ( operatorID == SHOWDATETIME )
+  else if ( operatorID == SHOWTIMESTAMP )
     {
       nout = 0;
       tsID = 0;
@@ -184,7 +184,7 @@ void *Showinfo(void *argument)
 
 	    date2str(vdate, vdatestr, sizeof(vdatestr));
 	    time2str(vtime, vtimestr, sizeof(vtimestr));
-	    fprintf(stdout, " %s,%s", vdatestr, vtimestr);
+	    fprintf(stdout, " %sT%s", vdatestr, vtimestr);
 
 	    tsID++;
 	    nout++;

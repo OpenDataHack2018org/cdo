@@ -215,16 +215,15 @@ void *Inttime(void *argument)
 
 	      if ( cdoVerbose )
 		{
+		  char vdatestr[32], vtimestr[32];	  
 		  /*
 		  cdoPrint("juldate1 %f", juldate_to_seconds(juldate1));
 		  cdoPrint("juldate  %f", juldate_to_seconds(juldate));
 		  cdoPrint("juldate2 %f", juldate_to_seconds(juldate2));
 		  */
-		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute, &second);
-		  cdoPrint(DATE_FORMAT" "TIME_FORMAT"  %f  %d",
-			   year, month, day, hour, minute, second,
-			   juldate_to_seconds(juldate), calendar);
+		  date2str(vdate, vdatestr, sizeof(vdatestr));
+		  time2str(vtime, vtimestr, sizeof(vtimestr));
+		  cdoPrint("%s %s  %f  %d", vdatestr, vtimestr, juldate_to_seconds(juldate), calendar);
 		}
 
 	      taxisDefVdate(taxisID2, vdate);

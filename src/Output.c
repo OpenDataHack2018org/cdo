@@ -50,8 +50,6 @@ void *Output(void *argument)
   int vlistID;
   int nmiss, nout;
   int nlon, nlat;
-  int hour, minute, second;
-  int year, month, day;
   int nelem = 0;
   int index;
   int ndiffgrids;
@@ -233,17 +231,19 @@ void *Output(void *argument)
 		}
 	      else if ( operatorID == OUTPUTTS )
 		{
+		  char vdatestr[32], vtimestr[32];
+	  
 		  if ( gridsize > 1 )
 		    cdoAbort("operator works only with one gridpoint!");
 
-		  decode_date(vdate, &year, &month, &day);
-		  decode_time(vtime, &hour, &minute, &second);
+		  date2str(vdate, vdatestr, sizeof(vdatestr));
+		  time2str(vtime, vtimestr, sizeof(vtimestr));
 
-		  fprintf(stdout, DATE_FORMAT" "TIME_FORMAT" %12.12g\n",
-			  year, month, day, hour, minute, second, array[0]);
+		  fprintf(stdout, "%s %s %12.12g\n", vdatestr, vtimestr, array[0]);
 		}
 	      else if ( operatorID == OUTPUTFLD )
 		{
+		  int hour, minute, second;
 		  decode_time(vtime, &hour, &minute, &second);
 		  xdate  = vdate - (vdate/100)*100 + (hour*3600 + minute*60 + second)/86400.;
 		  for ( i = 0; i < gridsize; i++ )

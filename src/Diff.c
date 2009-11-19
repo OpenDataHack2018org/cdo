@@ -47,9 +47,9 @@ void *Diff(void *argument)
   int taxisID;
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
-  char varname[128];
-  int year, month, day, hour, minute, second;
   int lfunc;
+  char varname[128];
+  char vdatestr[32], vtimestr[32];	  
   double *array1, *array2;
   double absm, relm;
   double missval1, missval2;
@@ -105,9 +105,9 @@ void *Diff(void *argument)
 	{
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);
-
-	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute, &second);
+	  
+	  date2str(vdate, vdatestr, sizeof(vdatestr));
+	  time2str(vtime, vtimestr, sizeof(vtimestr));
 	}
 
       nrecs2 = streamInqTimestep(streamID2, tsID);
@@ -134,11 +134,9 @@ void *Diff(void *argument)
 		if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID1, varname);
 		
 		if ( operatorID == DIFFV )
-		  fprintf(stdout, "%6d :"DATE_FORMAT" "TIME_FORMAT" %-8s ",
-			  indg, year, month, day, hour, minute, second, varname);
+		  fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr, varname);
 		else if ( operatorID == DIFF )
-		  fprintf(stdout, "%6d :"DATE_FORMAT" "TIME_FORMAT" %3d",
-			  indg, year, month, day, hour, minute, second, code);
+		  fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
 
 		fprintf(stdout, " %7g ", zaxisInqLevel(zaxisID, levelID));
 	      }

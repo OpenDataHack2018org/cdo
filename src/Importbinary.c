@@ -210,6 +210,7 @@ void *Importbinary(void *argument)
   double *array;
   double sfclevel = 0;
   int *recVarID, *recLevelID;
+  char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
 
@@ -387,12 +388,15 @@ void *Importbinary(void *argument)
       for ( tsID = tmin-1; tsID < tmax; ++tsID )
 	{
 	  gr2t(pfi.grvals[3], (gadouble)(tsID+1), &dtim); 
-	  if ( cdoVerbose )
-	    cdoPrint(" Reading timestep: %3d "DATE_FORMAT" "TIME_FORMAT,
-		     tsID+1, dtim.yr, dtim.mo, dtim.dy, dtim.hr, dtim.mn);
-
 	  vdate = encode_date(dtim.yr, dtim.mo, dtim.dy);
 	  vtime = encode_time(dtim.hr, dtim.mn, 0);
+
+	  date2str(vdate, vdatestr, sizeof(vdatestr));
+	  time2str(vtime, vtimestr, sizeof(vtimestr));
+
+	  if ( cdoVerbose )
+	    cdoPrint(" Reading timestep: %3d %s %s", tsID+1, vdatestr, vtimestr);
+
 	  taxisDefVdate(taxisID, vdate);
 	  taxisDefVtime(taxisID, vtime);
 	  streamDefTimestep(streamID, tsID);

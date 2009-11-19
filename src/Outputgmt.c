@@ -562,7 +562,6 @@ void *Outputgmt(void *argument)
   int zaxisID, taxisID;
   int ninc = 1;
   int vdate, vtime;
-  int year, month, day, hour, minute, second;
   char varname[256];
   double level;
   double missval;
@@ -580,6 +579,7 @@ void *Outputgmt(void *argument)
   CPT cpt;
   int grid_is_circular;
   char units[128];
+  char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
 
@@ -816,9 +816,9 @@ void *Outputgmt(void *argument)
     {
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
-
-      decode_date(vdate, &year, &month, &day);
-      decode_time(vtime, &hour, &minute, &second);
+	      
+      date2str(vdate, vdatestr, sizeof(vdatestr));
+      time2str(vtime, vtimestr, sizeof(vtimestr));
 
       if ( tsID == 0 && operatorID != OUTPUTTRI )
 	{
@@ -836,8 +836,8 @@ void *Outputgmt(void *argument)
 	    fprintf(stdout, "# Increment = %d\n", ninc);
 	  fprintf(stdout, "#\n");
 	  fprintf(stdout, "# File  = %s\n", cdoStreamName(0));
-	  fprintf(stdout, "# Date  = "DATE_FORMAT"\n", year, month, day);
-	  fprintf(stdout, "# Time  = "TIME_FORMAT"\n", hour, minute, second);
+	  fprintf(stdout, "# Date  = %s\n", vdatestr);
+	  fprintf(stdout, "# Time  = %s\n", vtimestr);
 	  fprintf(stdout, "# Name  = %s\n", varname);
 	  fprintf(stdout, "# Code  = %d\n", code);
 	}

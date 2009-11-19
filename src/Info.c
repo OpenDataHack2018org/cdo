@@ -217,6 +217,36 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 }
 
 
+void date2str(int date, char *datestr, int maxlen)
+{
+  static char func[] = "date2str";
+  int year, month, day;
+  int len;
+
+  decode_date(date, &year, &month, &day);
+
+  len = sprintf(datestr, DATE_FORMAT, year, month, day);
+
+  if ( len > ( maxlen-1) )
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+}
+
+
+void time2str(int time, char *timestr, int maxlen)
+{
+  static char func[] = "time2str";
+  int hour, minute, second;
+  int len;
+
+  decode_time(time, &hour, &minute, &second);
+
+  len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
+
+  if ( len > ( maxlen-1) )
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+}
+
+
 void *Info(void *argument)
 {
   static char func[] = "Info";
@@ -234,8 +264,8 @@ void *Info(void *argument)
   int vlistID;
   int nmiss;
   int ivals = 0, imiss = 0;
-  int year, month, day, hour, minute, second;
   char varname[128];
+  char vdatestr[32], vtimestr[32];
   double missval;
   double *array = NULL;
   double level;
@@ -270,8 +300,8 @@ void *Info(void *argument)
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);
 
-	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute, &second);
+	  date2str(vdate, vdatestr, sizeof(vdatestr));
+	  time2str(vtime, vtimestr, sizeof(vtimestr));
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
@@ -298,11 +328,9 @@ void *Info(void *argument)
 	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);
 
 	      if ( operatorID == INFOV )
-		fprintf(stdout, "%6d :"DATE_FORMAT" "TIME_FORMAT" %-8s ",
-			indg, year, month, day, hour, minute, second, varname);
+		fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr, varname);
 	      else
-		fprintf(stdout, "%6d :"DATE_FORMAT" "TIME_FORMAT" %3d",
-			indg, year, month, day, hour, minute, second, code);
+		fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
 
 	      level = zaxisInqLevel(zaxisID, levelID);
 	      fprintf(stdout, " %7g ", level);

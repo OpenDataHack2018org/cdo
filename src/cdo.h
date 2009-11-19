@@ -79,13 +79,6 @@ void timer_report(void);
 void timer_start(int it);
 void timer_stop(int it);
 
-void    timerStart(int timer);
-void    timerStop(int timer);
-void    timerClear(int timer);
-void    timerPrint(int timer);
-void    timersPrint(void);
-void    timersInit(void);
-
 void    operatorInputArg(const char *enter);
 int     operatorArgc(void);
 char  **operatorArgv(void);

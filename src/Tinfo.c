@@ -124,28 +124,29 @@ void printBounds(int taxisID, int calendar)
 {
   int vdate0, vdate1;
   int vtime0, vtime1;
-  int year0, month0, day0, hour0, minute0, second0;
-  int year1, month1, day1, hour1, minute1, second1;
+  int year0, month0, day0;
+  int year1, month1, day1;
   INT64 lperiod;
   int incperiod = 0, incunit = 0;
   juldate_t juldate1, juldate0;
   double jdelta;
   int deltam, deltay;
   int i, len;
+  char vdatestr[32], vtimestr[32];
 
   taxisInqVdateBounds(taxisID, &vdate0, &vdate1);
   taxisInqVtimeBounds(taxisID, &vtime0, &vtime1);
 
   decode_date(vdate0, &year0, &month0, &day0);
-  decode_time(vtime0, &hour0, &minute0, &second0);
-
   decode_date(vdate1, &year1, &month1, &day1);
-  decode_time(vtime1, &hour1, &minute1, &second1);
 
-  fprintf(stdout, DATE_FORMAT" "TIME_FORMAT,
-	  year0, month0, day0, hour0, minute0, second0);
-  fprintf(stdout, DATE_FORMAT" "TIME_FORMAT,
-	  year1, month1, day1, hour1, minute1, second1);
+  date2str(vdate0, vdatestr, sizeof(vdatestr));
+  time2str(vtime0, vtimestr, sizeof(vtimestr));	  
+  fprintf(stdout, "%s %s", vdatestr, vtimestr);
+
+  date2str(vdate1, vdatestr, sizeof(vdatestr));
+  time2str(vtime1, vtimestr, sizeof(vtimestr));	  
+  fprintf(stdout, " %s %s", vdatestr, vtimestr);
 
   juldate0  = juldate_encode(calendar, vdate0, vtime0);
   juldate1  = juldate_encode(calendar, vdate1, vtime1);
@@ -239,8 +240,8 @@ void *Tinfo(void *argument)
   int taxisID;
   int streamID;
   int vlistID;
-  int year0, month0, day0, hour0, minute0, second0;
-  int year, month, day, hour, minute, second;
+  int year0, month0, day0;
+  int year, month, day;
   int calendar, unit;
   int incperiod0 = 0, incunit0 = 0;
   int incperiod1 = 0, incunit1 = 0;
@@ -256,7 +257,7 @@ void *Tinfo(void *argument)
   double jdelta = 0, jdelta0 = 0;
   int arrow;
   int i, len;
-	  
+  char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
 
@@ -284,11 +285,10 @@ void *Tinfo(void *argument)
 	      vdate = taxisInqRdate(taxisID);
 	      vtime = taxisInqRtime(taxisID);
 	      
-	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute, &second);
+	      date2str(vdate, vdatestr, sizeof(vdatestr));
+	      time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	      fprintf(stdout, "     RefTime = "DATE_FORMAT" "TIME_FORMAT,
-		      year, month, day, hour, minute, second);
+	      fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 		      
 	      unit = taxisInqTunit(taxisID);
 	      if ( unit != CDI_UNDEFID ) printTunit(unit);
@@ -314,17 +314,17 @@ void *Tinfo(void *argument)
 	  vtime = taxisInqVtime(taxisID);
 	  
 	  decode_date(vdate, &year, &month, &day);
-	  decode_time(vtime, &hour, &minute, &second);
+	      
+	  date2str(vdate, vdatestr, sizeof(vdatestr));
+	  time2str(vtime, vtimestr, sizeof(vtimestr));
 
-	  fprintf(stdout, "%6d  "DATE_FORMAT" "TIME_FORMAT,
-		  tsID+1, year, month, day, hour, minute, second);
+	  fprintf(stdout, "%6d  %s %s", tsID+1, vdatestr, vtimestr);
 
 	  if ( tsID )
 	    {
 	      int deltam, deltay;
 
 	      decode_date(vdate0, &year0, &month0, &day0);
-	      decode_time(vtime0, &hour0, &minute0, &second0);
 
 	      juldate0  = juldate_encode(calendar, vdate0, vtime0);
 	      juldate   = juldate_encode(calendar, vdate, vtime);
@@ -406,15 +406,14 @@ void *Tinfo(void *argument)
 
   fprintf(stdout, "\n");
 
-  decode_date(vdate_first, &year, &month, &day);
-  decode_time(vtime_first, &hour, &minute, &second);
-  fprintf(stdout, " Start date          : "DATE_FORMAT" "TIME_FORMAT"\n",
-	  year, month, day, hour, minute, second);
+  date2str(vdate_first, vdatestr, sizeof(vdatestr));
+  time2str(vtime_first, vtimestr, sizeof(vtimestr));
+  fprintf(stdout, " Start date          : %s %s\n", vdatestr, vtimestr);
 
-  decode_date(vdate, &year, &month, &day);
-  decode_time(vtime, &hour, &minute, &second);
-  fprintf(stdout, " End date            : "DATE_FORMAT" "TIME_FORMAT"\n",
-	  year, month, day, hour, minute, second);
+  date2str(vdate, vdatestr, sizeof(vdatestr));
+  time2str(vtime, vtimestr, sizeof(vtimestr));
+  fprintf(stdout, " End date            : %s %s\n", vdatestr, vtimestr);
+
   fprintf(stdout, " Increment           : %3d %s%s\n", 
 	  incperiod0, tunits[incunit0], incperiod0>1?"s":"");
   fprintf(stdout, " Number of timesteps : %d\n", tsID);
@@ -452,11 +451,10 @@ void *Tinfo(void *argument)
 	      vdate = vdatem[igap][its];
 	      vtime = vtimem[igap][its];
 
-	      decode_date(vdate, &year, &month, &day);
-	      decode_time(vtime, &hour, &minute, &second);
+	      date2str(vdate, vdatestr, sizeof(vdatestr));
+	      time2str(vtime, vtimestr, sizeof(vtimestr));
+	      fprintf(stdout, "  %s %s", vdatestr, vtimestr);
 
-	      fprintf(stdout, "  "DATE_FORMAT" "TIME_FORMAT,
-		      year, month, day, hour, minute, second);
 	      ntimeout++;
 	      tsID++;
 	    }

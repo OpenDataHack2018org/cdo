@@ -610,8 +610,8 @@ void *Gradsdes(void *argument)
 
       if ( tsID == 0 )
 	{
-	  decode_time(vtime, &ihhs, &imns, &isds);
 	  decode_date(vdate, &iyys, &imms, &idds);
+	  decode_time(vtime, &ihhs, &imns, &isds);
      
 	  if ( imms < 1 || imms > 12 )  imms=1;
 
@@ -624,8 +624,8 @@ void *Gradsdes(void *argument)
 
       if ( tsID == 1 )
 	{
-	  decode_time(vtime, &ihh, &imn, &isd);
 	  decode_date(vdate, &iyy, &imm, &idd);
+	  decode_time(vtime, &ihh, &imn, &isd);
 
 	  idmn = imn - imns;
 	  idhh = ihh - ihhs;
@@ -663,8 +663,8 @@ void *Gradsdes(void *argument)
 
       if ( tsID > 0 && tsID < 6 && iik != 3 && (monavg == TRUE || monavg == -1) )
 	{
-	  decode_time(vtime, &ihh, &imn, &isd);
 	  decode_date(vdate, &iyy, &imm, &idd);
+	  decode_time(vtime, &ihh, &imn, &isd);
 
 	  idmn = imn - imns;
 	  idhh = ihh - ihhs;

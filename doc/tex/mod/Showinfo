@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile
-@Operators = showformat showcode showname showstdname showlevel showltype showyear showmon showdate showtime
+@Operators = showformat showcode showname showstdname showlevel showltype showyear showmon showdate showtime showtimestamp
 
 @BeginDescription
 This module prints the format, variables, levels or times of the input dataset.
@@ -86,19 +86,28 @@ Prints all months.
 
 
 @BeginOperator_showdate
-@Title     = Show dates
+@Title     = Show date information
 
 @BeginDescription
-Prints all dates.
+Prints date information of all time steps (format YYYY-MM-DD).
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_showtime
-@Title     = Show time steps
+@Title     = Show time information
 
 @BeginDescription
-Prints all time steps.
+Prints time information of all time steps (format hh:mm:ss).
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_showtimestamp
+@Title     = Show timestamp
+
+@BeginDescription
+Prints timestamp of all time steps (format YYYY-MM-DDThh:mm:ss).
 @EndDescription
 @EndOperator
 
