@@ -40,7 +40,8 @@
 
 void *Showinfo(void *argument)
 {
-  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWCODE, SHOWNAME, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
+  int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWDATETIME, SHOWCODE;
+  int SHOWNAME, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
@@ -52,23 +53,25 @@ void *Showinfo(void *argument)
   int taxisID;
   int streamID;
   int vlistID;
-  int year, month, day, hour, minute, second;
+  int year, month, day;
   int month0 = 0, nmonth, year0 = 0, nyear;
   char varname[256];
   char stdname[256];
+  char vdatestr[32], vtimestr[32];
 
   cdoInitialize(argument);
 
-  SHOWYEAR    = cdoOperatorAdd("showyear",      0, 0, NULL);
-  SHOWMON     = cdoOperatorAdd("showmon",       0, 0, NULL);
-  SHOWDATE    = cdoOperatorAdd("showdate",      0, 0, NULL);
-  SHOWTIME    = cdoOperatorAdd("showtime",      0, 0, NULL);
-  SHOWCODE    = cdoOperatorAdd("showcode",      0, 0, NULL);
-  SHOWNAME    = cdoOperatorAdd("showname",      0, 0, NULL);
-  SHOWSTDNAME = cdoOperatorAdd("showstdname",   0, 0, NULL);
-  SHOWLEVEL   = cdoOperatorAdd("showlevel",     0, 0, NULL);
-  SHOWLTYPE   = cdoOperatorAdd("showltype",     0, 0, NULL);
-  SHOWFORMAT  = cdoOperatorAdd("showformat",    0, 0, NULL);
+  SHOWYEAR     = cdoOperatorAdd("showyear",      0, 0, NULL);
+  SHOWMON      = cdoOperatorAdd("showmon",       0, 0, NULL);
+  SHOWDATE     = cdoOperatorAdd("showdate",      0, 0, NULL);
+  SHOWTIME     = cdoOperatorAdd("showtime",      0, 0, NULL);
+  SHOWDATETIME = cdoOperatorAdd("showdatetime",  0, 0, NULL);
+  SHOWCODE     = cdoOperatorAdd("showcode",      0, 0, NULL);
+  SHOWNAME     = cdoOperatorAdd("showname",      0, 0, NULL);
+  SHOWSTDNAME  = cdoOperatorAdd("showstdname",   0, 0, NULL);
+  SHOWLEVEL    = cdoOperatorAdd("showlevel",     0, 0, NULL);
+  SHOWLTYPE    = cdoOperatorAdd("showltype",     0, 0, NULL);
+  SHOWFORMAT   = cdoOperatorAdd("showformat",    0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -136,13 +139,13 @@ void *Showinfo(void *argument)
 	  {
 	    vdate = taxisInqVdate(taxisID);
 	 
-	    decode_date(vdate, &year, &month, &day);
+	    date2str(vdate, vdatestr, sizeof(vdatestr));
 
 	    if ( tsID == 0 || date0 != vdate )
 	      {
 		/* if ( ndate == 10 ) { ndate = 0; fprintf(stdout, "\n"); } */
 		date0 = vdate;
-		fprintf(stdout, " "DATE_FORMAT, year, month, day);
+		fprintf(stdout, " %s", vdatestr);
 		ndate++;
 	      }
 
@@ -158,14 +161,31 @@ void *Showinfo(void *argument)
 	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	  {
 	    /* if ( nout == 4 ) { nout = 0; fprintf(stdout, "\n"); } */
+	    vtime = taxisInqVtime(taxisID);
+
+	    time2str(vtime, vtimestr, sizeof(vtimestr));
+	    fprintf(stdout, " %s", vtimestr);
+
+	    tsID++;
+	    nout++;
+	  }
+      fprintf(stdout, "\n");
+    }
+  else if ( operatorID == SHOWDATETIME )
+    {
+      nout = 0;
+      tsID = 0;
+      if ( ntsteps != 0 )
+	while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	  {
+	    /* if ( nout == 4 ) { nout = 0; fprintf(stdout, "\n"); } */
 	    vdate = taxisInqVdate(taxisID);
 	    vtime = taxisInqVtime(taxisID);
 
-	    decode_date(vdate, &year, &month, &day);
-	    decode_time(vtime, &hour, &minute, &second);
+	    date2str(vdate, vdatestr, sizeof(vdatestr));
+	    time2str(vtime, vtimestr, sizeof(vtimestr));
+	    fprintf(stdout, " %s,%s", vdatestr, vtimestr);
 
-	    fprintf(stdout, " "DATE_FORMAT","TIME_FORMAT,
-		    year, month, day, hour, minute, second);
 	    tsID++;
 	    nout++;
 	  }
