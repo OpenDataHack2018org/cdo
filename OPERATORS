@@ -28,8 +28,9 @@ Operator catalog:
       Showinfo   showltype       Show GRIB level types
       Showinfo   showyear        Show years
       Showinfo   showmon         Show months
-      Showinfo   showdate        Show dates
-      Showinfo   showtime        Show time steps
+      Showinfo   showdate        Show date information
+      Showinfo   showtime        Show time information
+      Showinfo   showtimestamp   Show timestamp
       Filedes    pardes          Parameter description
       Filedes    griddes         Grid description
       Filedes    zaxisdes        Z-axis description
