@@ -230,24 +230,24 @@ off_t   streamNvals(int streamID);
 /* STREAM var I/O routines */
 
 /*      streamReadVar: Read a variable */
-void    streamReadVar(int streamID, int varID, double *data, int *nmiss);
+void    streamReadVar(int streamID, int varID, double *data_vec, int *nmiss);
 
 /*      streamWriteVar: Write a variable */
-void    streamWriteVar(int streamID, int varID, const double *data, int nmiss);
+void    streamWriteVar(int streamID, int varID, const double *data_vec, int nmiss);
 
 /*      streamReadVarSlice: Read a horizontal slice of a variable */
-void    streamReadVarSlice(int streamID, int varID, int levelID, double *data, int *nmiss);
+void    streamReadVarSlice(int streamID, int varID, int levelID, double *data_vec, int *nmiss);
 
 /*      streamWriteVarSlice: Write a horizontal slice of a variable */
-void    streamWriteVarSlice(int streamID, int varID, int levelID, const double *data, int nmiss);
+void    streamWriteVarSlice(int streamID, int varID, int levelID, const double *data_vec, int nmiss);
 
 
 /* STREAM record I/O routines */
 
 void    streamInqRecord(int streamID, int *varID, int *levelID);
 void    streamDefRecord(int streamID, int  varID, int  levelID);
-void    streamReadRecord(int streamID, double *data, int *nmiss);
-void    streamWriteRecord(int streamID, const double *data, int nmiss);
+void    streamReadRecord(int streamID, double *data_vec, int *nmiss);
+void    streamWriteRecord(int streamID, const double *data_vec, int nmiss);
 void    streamCopyRecord(int streamIDdest, int streamIDsrc);
 
 void    streamInqGinfo(int streamID, int *intnum, float *fltnum);
@@ -333,6 +333,12 @@ int     vlistInqVarZtype(int vlistID, int varID);
 void    vlistDefVarZlevel(int vlistID, int varID, int zlevel);
 int     vlistInqVarZlevel(int vlistID, int varID);
 
+/*      vlistDefVarParam: Define the parameter number of a Variable */
+void    vlistDefVarParam(int vlistID, int varID, int param);
+
+/*      vlistInqVarParam: Get the parameter number of a Variable */
+int     vlistInqVarParam(int vlistID, int varID);
+
 /*      vlistDefVarCode: Define the code number of a Variable */
 void    vlistDefVarCode(int vlistID, int varID, int code);
 
@@ -358,15 +364,17 @@ void    vlistDefVarName(int vlistID, int varID, const char *name);
 /*      vlistInqVarName: Get the name of a Variable */
 void    vlistInqVarName(int vlistID, int varID, char *name);
 
+/*      vlistDefVarStdname: Define the standard name of a Variable */
+void    vlistDefVarStdname(int vlistID, int varID, const char *stdname);
+
+/*      vlistInqVarStdname: Get the standard name of a Variable */
+void    vlistInqVarStdname(int vlistID, int varID, char *stdname);
+
 /*      vlistDefVarLongname: Define the long name of a Variable */
 void    vlistDefVarLongname(int vlistID, int varID, const char *longname);
 
-void    vlistDefVarStdname(int vlistID, int varID, const char *stdname);
-
 /*      vlistInqVarLongname: Get the long name of a Variable */
 void    vlistInqVarLongname(int vlistID, int varID, char *longname);
-
-void    vlistInqVarStdname(int vlistID, int varID, char *stdname);
 
 /*      vlistDefVarUnits: Define the units of a Variable */
 void    vlistDefVarUnits(int vlistID, int varID, const char *units);
@@ -403,18 +411,24 @@ int     vlistMergedLevel(int vlistID, int varID, int levelID);
 
 /* VLIST attributes */
 
+/*      vlistInqNatts: Get number of variable attributes assigned to this variable */
 int     vlistInqNatts(int vlistID, int varID, int *nattsp);
-
+/*      vlistInqAtt: Get information about an attribute */
 int     vlistInqAtt(int vlistID, int varID, int attrnum, char *name, int *typep, int *lenp);
-
 int     vlistDelAtt(int vlistID, int varID, const char *name);
 
-int     vlistDefAttInt(int vlistID, int varID, const char *name, int len, const int *ip);
-int     vlistDefAttFlt(int vlistID, int varID, const char *name, int len, const double *dp);
+/*      vlistDefAttInt: Define an integer attribute */
+int     vlistDefAttInt(int vlistID, int varID, const char *name, int len, const int *ip_vec);
+/*      vlistDefAttInt: Define a floating point attribute */
+int     vlistDefAttFlt(int vlistID, int varID, const char *name, int len, const double *dp_vec);
+/*      vlistDefAttInt: Define a text attribute */
 int     vlistDefAttTxt(int vlistID, int varID, const char *name, int len, const char *tp);
 
-int     vlistInqAttInt(int vlistID, int varID, const char *name, int mlen, int *ip);
-int     vlistInqAttFlt(int vlistID, int varID, const char *name, int mlen, double *dp);
+/*      vlistInqAttInt: Get the value(s) of an integer attribute */
+int     vlistInqAttInt(int vlistID, int varID, const char *name, int mlen, int *ip_vec);
+/*      vlistInqAttInt: Get the value(s) of a floating point attribute */
+int     vlistInqAttFlt(int vlistID, int varID, const char *name, int mlen, double *dp_vec);
+/*      vlistInqAttInt: Get the value(s) of a text attribute */
 int     vlistInqAttTxt(int vlistID, int varID, const char *name, int mlen, char *tp);
 
 
@@ -425,8 +439,8 @@ char   *gridNamePtr(int gridtype);
 
 void    gridCompress(int gridID);
 
-void    gridDefMask(int gridID, const int *mask);
-int     gridInqMask(int gridID, int *mask);
+void    gridDefMask(int gridID, const int *mask_vec);
+int     gridInqMask(int gridID, int *mask_vec);
 
 void    gridPrint(int gridID, int opt);
 int     gridSize(void);
@@ -459,16 +473,16 @@ void    gridDefYsize(int gridID, int ysize);
 int     gridInqYsize(int gridID);
 
 /*      gridDefXvals: Define the values of a X-axis */
-void    gridDefXvals(int gridID, const double *xvals);
+void    gridDefXvals(int gridID, const double *xvals_vec);
 
 /*      gridInqXvals: Get all values of a X-axis */
-int     gridInqXvals(int gridID, double *xvals);
+int     gridInqXvals(int gridID, double *xvals_vec);
 
 /*      gridDefYvals: Define the values of a Y-axis */
-void    gridDefYvals(int gridID, const double *yvals);
+void    gridDefYvals(int gridID, const double *yvals_vec);
 
 /*      gridInqYvals: Get all values of a Y-axis */
-int     gridInqYvals(int gridID, double *yvals);
+int     gridInqYvals(int gridID, double *yvals_vec);
 
 /*      gridDefXname: Define the name of a X-axis */
 void    gridDefXname(int gridID, const char *xname);
@@ -560,8 +574,8 @@ void gridDefLaea(int gridID, double earth_radius, double lon_0, double lat_0);
 void gridInqLaea(int gridID, double *earth_radius, double *lon_0, double *lat_0);
 
 
-void    gridDefArea(int gridID, const double *area);
-void    gridInqArea(int gridID, double *area);
+void    gridDefArea(int gridID, const double *area_vec);
+void    gridInqArea(int gridID, double *area_vec);
 int     gridHasArea(int gridID);
 
 /*      gridDefNvertex: Define the number of vertex of a Gridbox */
@@ -571,19 +585,19 @@ void    gridDefNvertex(int gridID, int nvertex);
 int     gridInqNvertex(int gridID);
 
 /*      gridDefXbounds: Define the bounds of a X-axis */
-void    gridDefXbounds(int gridID, const double *xbounds);
+void    gridDefXbounds(int gridID, const double *xbounds_vec);
 
 /*      gridInqXbounds: Get the bounds of a X-axis */
-int     gridInqXbounds(int gridID, double *xbounds);
+int     gridInqXbounds(int gridID, double *xbounds_vec);
 
 /*      gridDefYbounds: Define the bounds of a Y-axis */
-void    gridDefYbounds(int gridID, const double *ybounds);
+void    gridDefYbounds(int gridID, const double *ybounds_vec);
 
 /*      gridInqYbounds: Get the bounds of a Y-axis */
-int     gridInqYbounds(int gridID, double *ybounds);
+int     gridInqYbounds(int gridID, double *ybounds_vec);
 
-void    gridDefRowlon(int gridID, int nrowlon, const int *rowlon);
-void    gridInqRowlon(int gridID, int *rowlon);
+void    gridDefRowlon(int gridID, int nrowlon, const int *rowlon_vec);
+void    gridInqRowlon(int gridID, int *rowlon_vec);
 void    gridChangeType(int gridID, int gridtype);
 
 /* ZAXIS routines */
@@ -611,10 +625,10 @@ void    zaxisPrint(int zaxisID);
 int     zaxisSize(void);
 
 /*      zaxisDefLevels: Define the levels of a Z-axis */
-void    zaxisDefLevels(int zaxisID, const double *levels);
+void    zaxisDefLevels(int zaxisID, const double *levels_vec);
 
 /*      zaxisInqLevels: Get all levels of a Z-axis */
-void    zaxisInqLevels(int zaxisID, double *levels);
+void    zaxisInqLevels(int zaxisID, double *levels_vec);
 
 /*      zaxisDefLevel: Define one level of a Z-axis */
 void    zaxisDefLevel(int zaxisID, int levelID, double levels);
@@ -647,17 +661,17 @@ void    zaxisDefLtype(int zaxisID, int ltype);
 int     zaxisInqLtype(int zaxisID);
 
 const double *zaxisInqLevelsPtr(int zaxisID);
-void    zaxisDefVct(int zaxisID, int size, const double *vct);
+void    zaxisDefVct(int zaxisID, int size, const double *vct_vec);
 int     zaxisInqVctSize(int zaxisID);
 const double *zaxisInqVctPtr(int zaxisID);
-int     zaxisInqLbounds(int zaxisID, double *lbounds);
-int     zaxisInqUbounds(int zaxisID, double *ubounds);
-int     zaxisInqWeights(int zaxisID, double *weights);
+int     zaxisInqLbounds(int zaxisID, double *lbounds_vec);
+int     zaxisInqUbounds(int zaxisID, double *ubounds_vec);
+int     zaxisInqWeights(int zaxisID, double *weights_vec);
 double  zaxisInqLbound(int zaxisID, int index);
 double  zaxisInqUbound(int zaxisID, int index);
-void    zaxisDefLbounds(int zaxisID, const double *lbounds);
-void    zaxisDefUbounds(int zaxisID, const double *ubounds);
-void    zaxisDefWeights(int zaxisID, const double *weights);
+void    zaxisDefLbounds(int zaxisID, const double *lbounds_vec);
+void    zaxisDefUbounds(int zaxisID, const double *ubounds_vec);
+void    zaxisDefWeights(int zaxisID, const double *weights_vec);
 void    zaxisChangeType(int zaxisID, int zaxistype);
 
 /* TAXIS routines */
