@@ -39,7 +39,7 @@ void *Sinfo(void *argument)
   int indf;
   int varID;
   int gridsize = 0;
-  int gridID, zaxisID, code;
+  int gridID, zaxisID, code, tabnum;
   int zaxistype, ltype;
   int vdate, vtime;
   int nrecs, nvars, nzaxis, ntsteps;
@@ -92,6 +92,7 @@ void *Sinfo(void *argument)
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  code    = vlistInqVarCode(vlistID, varID);
+	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
 	  gridID  = vlistInqVarGrid(vlistID, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
 
@@ -116,9 +117,9 @@ void *Sinfo(void *argument)
 	  if ( operatorID == SINFOV )
 	    fprintf(stdout, "%-10s", varname);
 	  else if ( operatorID == SINFOP )
-	    fprintf(stdout, "%03d.%03d ", tableInqNum(vlistInqVarTable(vlistID, varID)), code);
+	    fprintf(stdout, "%03d.%03d ", tabnum, code);
 	  else
-	    fprintf(stdout, "%4d %4d", tableInqNum(vlistInqVarTable(vlistID, varID)), code);
+	    fprintf(stdout, "%4d %4d", tabnum, code);
 
 	  timeID = vlistInqVarTime(vlistID, varID);
 	  if ( timeID == TIME_CONSTANT )
