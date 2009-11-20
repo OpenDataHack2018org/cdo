@@ -133,6 +133,7 @@ int ntr2nlat(int ntr);
 int ntr2nlat_linear(int ntr);
 int compNlon(int nlat);
 
+void param2str(int param, char *paramstr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);
 

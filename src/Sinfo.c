@@ -39,7 +39,7 @@ void *Sinfo(void *argument)
   int indf;
   int varID;
   int gridsize = 0;
-  int gridID, zaxisID, code, tabnum;
+  int gridID, zaxisID, code, tabnum, param;
   int zaxistype, ltype;
   int vdate, vtime;
   int nrecs, nvars, nzaxis, ntsteps;
@@ -51,6 +51,7 @@ void *Sinfo(void *argument)
   char varname[128];
   char longname[128];
   char units[128];
+  char paramstr[32];
   char vdatestr[32], vtimestr[32];
   double level;
   char *modelptr, *instptr;
@@ -82,7 +83,7 @@ void *Sinfo(void *argument)
 		"%6d : Institut Source   Varname      Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
       else if ( operatorID == SINFOP )
 	fprintf(stdout,
-		"%6d : Institut Source   Param     Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
+		"%6d : Institut Source   Param       Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
       else
 	fprintf(stdout,
 		"%6d : Institut Source  Table Code   Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
@@ -91,10 +92,14 @@ void *Sinfo(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
+	  param   = vlistInqVarParam(vlistID, varID);
 	  code    = vlistInqVarCode(vlistID, varID);
 	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
 	  gridID  = vlistInqVarGrid(vlistID, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
+
+	  if ( param == -1 ) param = 255*1000000+tabnum*1000+code;
+	  param2str(param, paramstr, sizeof(paramstr));
 
 	  if ( operatorID == SINFOV ) vlistInqVarName(vlistID, varID, varname);
 
@@ -115,17 +120,27 @@ void *Sinfo(void *argument)
 	    fprintf(stdout, "unknown  ");
 
 	  if ( operatorID == SINFOV )
-	    fprintf(stdout, "%-10s", varname);
+	    fprintf(stdout, "%-12s", varname);
 	  else if ( operatorID == SINFOP )
-	    fprintf(stdout, "%03d.%03d ", tabnum, code);
+	    fprintf(stdout, "%-12s", paramstr);
 	  else
 	    fprintf(stdout, "%4d %4d", tabnum, code);
 
 	  timeID = vlistInqVarTime(vlistID, varID);
-	  if ( timeID == TIME_CONSTANT )
-	    fprintf(stdout, " constant");
+	  if ( operatorID == SINFOP )
+	    {
+	      if ( timeID == TIME_CONSTANT )
+		fprintf(stdout, "con ");
+	      else
+		fprintf(stdout, "var ");
+	    }
 	  else
-	    fprintf(stdout, " variable");
+	    {
+	      if ( timeID == TIME_CONSTANT )
+		fprintf(stdout, " constant");
+	      else
+		fprintf(stdout, " variable");
+	    }
 
 	  prec = vlistInqVarDatatype(vlistID, varID);
 	  if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");

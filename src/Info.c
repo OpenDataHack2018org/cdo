@@ -217,6 +217,51 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 }
 
 
+void decode_param(int param, int *dis, int *cat, int *num)
+{
+  int iparam;
+
+  *dis  =  param / 1000000;
+  iparam  = param - *dis*1000000;
+  if ( iparam < 0 ) iparam = -iparam;
+  *cat = iparam / 1000;
+  *num = iparam - *cat*1000;
+}
+
+int encode_param(int dis, int cat, int num)
+{
+  int param;
+  int inum;
+
+  inum = num;
+  if ( num < 0 ) inum = -num;
+  param = dis*1000000 + cat*1000 + inum;
+  if ( num < 0 ) param = -param;
+
+  return (param);
+}
+
+
+void param2str(int param, char *paramstr, int maxlen)
+{
+  static char func[] = "param2str";
+  int dis, cat, num;
+  int len;
+
+  decode_param(param, &dis, &cat, &num);
+
+  if ( dis == 255 && (cat == 255 || cat == 0 ) )
+    len = sprintf(paramstr, "%d", num);
+  else  if ( dis == 255 )
+    len = sprintf(paramstr, "%d.%d", cat, num);
+  else
+    len = sprintf(paramstr, "%d.%d.%d", dis, cat, num);
+
+  if ( len > ( maxlen-1) )
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+}
+
+
 void date2str(int date, char *datestr, int maxlen)
 {
   static char func[] = "date2str";
