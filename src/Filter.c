@@ -251,9 +251,9 @@ void *Filter(void *argument)
 	  int lperiod, incperiod;
 	  int year, month, day;
 
-          decode_date(vdate[tsID], &year, &month, &day);
+          cdiDecodeDate(vdate[tsID], &year, &month, &day);
           
-	  decode_date(vdate[tsID-1], &year0, &month0, &day0);               
+	  cdiDecodeDate(vdate[tsID-1], &year0, &month0, &day0);               
 
           juldate0 = juldate_encode(calendar, vdate[tsID-1], vtime[tsID-1]);        
           juldate  = juldate_encode(calendar, vdate[tsID], vtime[tsID]);         

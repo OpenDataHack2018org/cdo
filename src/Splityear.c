@@ -96,7 +96,7 @@ void *Splityear(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
-      decode_date(vdate, &year2, &mon2, &day);
+      cdiDecodeDate(vdate, &year2, &mon2, &day);
 
       if ( tsID == 0 || year1 != year2 || (year1 == year2 && mon1 > mon2) )
 	{

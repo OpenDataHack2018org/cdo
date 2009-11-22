@@ -495,7 +495,7 @@ void adjustEndDate(int nlevels, int gridsize, double *yvals, double missval, int
 {
   int levelID, i, ovdateSouth;
   
-  ovdateSouth = MIN(encode_date(ovdate/10000,6,30),ovdate);
+  ovdateSouth = MIN(cdiEncodeDate(ovdate/10000,6,30),ovdate);
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {

@@ -244,7 +244,7 @@ void *Output(void *argument)
 	      else if ( operatorID == OUTPUTFLD )
 		{
 		  int hour, minute, second;
-		  decode_time(vtime, &hour, &minute, &second);
+		  cdiDecodeTime(vtime, &hour, &minute, &second);
 		  xdate  = vdate - (vdate/100)*100 + (hour*3600 + minute*60 + second)/86400.;
 		  for ( i = 0; i < gridsize; i++ )
 		    if ( !DBL_IS_EQUAL(array[i], missval) )

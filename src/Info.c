@@ -217,38 +217,13 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 }
 
 
-void decode_param(int param, int *dis, int *cat, int *num)
-{
-  int iparam;
-
-  *dis  =  param / 1000000;
-  iparam  = param - *dis*1000000;
-  if ( iparam < 0 ) iparam = -iparam;
-  *cat = iparam / 1000;
-  *num = iparam - *cat*1000;
-}
-
-int encode_param(int dis, int cat, int num)
-{
-  int param;
-  int inum;
-
-  inum = num;
-  if ( num < 0 ) inum = -num;
-  param = dis*1000000 + cat*1000 + inum;
-  if ( num < 0 ) param = -param;
-
-  return (param);
-}
-
-
 void param2str(int param, char *paramstr, int maxlen)
 {
   static char func[] = "param2str";
   int dis, cat, num;
   int len;
 
-  decode_param(param, &dis, &cat, &num);
+  cdiDecodeParam(param, &dis, &cat, &num);
 
   if ( dis == 255 && (cat == 255 || cat == 0 ) )
     len = sprintf(paramstr, "%d", num);
@@ -268,7 +243,7 @@ void date2str(int date, char *datestr, int maxlen)
   int year, month, day;
   int len;
 
-  decode_date(date, &year, &month, &day);
+  cdiDecodeDate(date, &year, &month, &day);
 
   len = sprintf(datestr, DATE_FORMAT, year, month, day);
 
@@ -283,7 +258,7 @@ void time2str(int time, char *timestr, int maxlen)
   int hour, minute, second;
   int len;
 
-  decode_time(time, &hour, &minute, &second);
+  cdiDecodeTime(time, &hour, &minute, &second);
 
   len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
 

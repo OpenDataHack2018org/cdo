@@ -185,8 +185,8 @@ void *Fldstat(void *argument)
 			yval = gridInqYval(field.grid, j);
 			vdate = taxisInqVdate(taxisID1);
 			vtime = taxisInqVtime(taxisID1);
-			decode_date(vdate, &year, &month, &day);
-			decode_time(vtime, &hour, &minute, &second);
+			cdiDecodeDate(vdate, &year, &month, &day);
+			cdiDecodeTime(vtime, &hour, &minute, &second);
 			code = vlistInqVarCode(vlistID1, varID);
 			level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
 			if ( tsID == 0 && recID == 0 )

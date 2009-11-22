@@ -112,7 +112,7 @@ void *Settime(void *argument)
       if ( strchr(datestr, '-') )
 	{
 	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-	  sdate = encode_date(year, month, day);
+	  sdate = cdiEncodeDate(year, month, day);
 	}
       else
 	{
@@ -122,7 +122,7 @@ void *Settime(void *argument)
       if ( strchr(timestr, ':') )
 	{
 	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-	  stime = encode_time(hour, minute, second);
+	  stime = cdiEncodeTime(hour, minute, second);
 	}
       else
 	{
@@ -147,7 +147,7 @@ void *Settime(void *argument)
       if ( strchr(datestr, '-') )
 	{
 	  sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-	  newval = encode_date(year, month, day);
+	  newval = cdiEncodeDate(year, month, day);
 	}
       else
 	{
@@ -162,7 +162,7 @@ void *Settime(void *argument)
       if ( strchr(timestr, ':') )
 	{
 	  sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-	  newval = encode_time(hour, minute, second);
+	  newval = cdiEncodeTime(hour, minute, second);
 	}
       else
 	{
@@ -317,7 +317,7 @@ void *Settime(void *argument)
 	      if ( tsID1 == 0 )
 		{
 		  vdate = sdate;
-		  decode_date(vdate, &year, &month, &day0);
+		  cdiDecodeDate(vdate, &year, &month, &day0);
 		}
 	      else
 		{	      
@@ -331,7 +331,7 @@ void *Settime(void *argument)
 		  else
 		    day = day0;
 
-		  vdate = encode_date(year, month, day);
+		  vdate = cdiEncodeDate(year, month, day);
 		}
 	    }
 	  else
@@ -344,14 +344,14 @@ void *Settime(void *argument)
 	{
 	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
 	    {
-	      decode_date(vdate, &year, &month, &day);
+	      cdiDecodeDate(vdate, &year, &month, &day);
 	      
 	      month += ijulinc;
 
 	      while ( month > 12 ) { month -= 12; year++; }
 	      while ( month <  1 ) { month += 12; year--; }
 
-	      vdate = encode_date(year, month, day);
+	      vdate = cdiEncodeDate(year, month, day);
 	    }
 	  else
 	    {
@@ -369,13 +369,13 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  decode_date(vdate, &year, &month, &day);
+	  cdiDecodeDate(vdate, &year, &month, &day);
 
 	  if ( operatorID == SETYEAR ) year  = newval;
 	  if ( operatorID == SETMON  ) month = newval;
 	  if ( operatorID == SETDAY  ) day   = newval;
       
-	  vdate = encode_date(year, month, day);
+	  vdate = cdiEncodeDate(year, month, day);
 
 	  if ( operatorID == SETDATE  ) vdate = newval;
 	  if ( operatorID == SETTIME  ) vtime = newval;

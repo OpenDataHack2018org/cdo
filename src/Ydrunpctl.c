@@ -168,7 +168,7 @@ void *Ydrunpctl(void *argument)
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      decode_date(vdate, &year, &month, &day);
+      cdiDecodeDate(vdate, &year, &month, &day);
 
       if ( month >= 1 && month <= 12 )
 	dayoy = (month-1)*31 + day;
@@ -257,7 +257,7 @@ void *Ydrunpctl(void *argument)
       vdate = datetime[ndates].date;
       vtime = datetime[ndates].time;
       
-      decode_date(vdate, &year, &month, &day);
+      cdiDecodeDate(vdate, &year, &month, &day);
 
       if ( month >= 1 && month <= 12 )
 	dayoy = (month-1)*31 + day;

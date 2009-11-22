@@ -72,7 +72,7 @@ void *Inttime(void *argument)
     {
       year = 1; month = 1; day = 1;
       sscanf(datestr, "%d-%d-%d", &year, &month, &day);
-      vdate = encode_date(year, month, day);
+      vdate = cdiEncodeDate(year, month, day);
     }
 
   if ( strchr(timestr, ':') == NULL )
@@ -83,7 +83,7 @@ void *Inttime(void *argument)
     {
       hour = 0; minute = 0; second = 0;
       sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
-      vtime = encode_time(hour, minute, second);
+      vtime = cdiEncodeTime(hour, minute, second);
     }
 
   if ( operatorArgc() == 3 )
@@ -286,14 +286,14 @@ void *Inttime(void *argument)
 	    {
 	      juldate_decode(calendar, juldate, &vdate, &vtime);
 
-	      decode_date(vdate, &year, &month, &day);
+	      cdiDecodeDate(vdate, &year, &month, &day);
 	      
 	      month += ijulinc;
 
 	      while ( month > 12 ) { month -= 12; year++; }
 	      while ( month <  1 ) { month += 12; year--; }
 
-	      vdate = encode_date(year, month, day);
+	      vdate = cdiEncodeDate(year, month, day);
 		
 	      juldate = juldate_encode(calendar, vdate, vtime);
 	    }

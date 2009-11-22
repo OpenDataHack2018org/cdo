@@ -93,7 +93,7 @@ void *Showinfo(void *argument)
 	  {
 	    vdate = taxisInqVdate(taxisID);
 
-	    decode_date(vdate, &year, &month, &day);
+	    cdiDecodeDate(vdate, &year, &month, &day);
 	 
 	    if ( tsID == 0 || year0 != year )
 	      {
@@ -116,7 +116,7 @@ void *Showinfo(void *argument)
 	  {
 	    vdate = taxisInqVdate(taxisID);
 
-	    decode_date(vdate, &year, &month, &day);
+	    cdiDecodeDate(vdate, &year, &month, &day);
 	 
 	    if ( tsID == 0 || month0 != month )
 	      {

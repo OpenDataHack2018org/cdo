@@ -9,6 +9,7 @@ extern "C" {
 
 #define  CDI_UNDEFID             -1
 #define  CDI_GLOBAL              -1   /* Global var ID for vlist  */
+#define  CDI_UNDEFPARAM  2147483647
 
 /* Byte order */
 
@@ -171,6 +172,23 @@ void    cdiPrintVersion(void);
 void    cdiDefMissval(double missval);
 double  cdiInqMissval(void);
 void    cdiDefGlobal(const char *string, int val);
+
+/* CDI converter routines */
+
+/* param format:  DDDCCCNNN */
+
+void    cdiDecodeParam(int param, int *dis, int *cat, int *num);
+int     cdiEncodeParam(int dis, int cat, int num);
+
+/* date format:  YYYYMMDD */
+/* time format:  hhmmss   */
+
+void    cdiDecodeDate(int date, int *year, int *month, int *day);
+int     cdiEncodeDate(int year, int month, int day);
+
+void    cdiDecodeTime(int time, int *hour, int *minute, int *second);
+int     cdiEncodeTime(int hour, int minute, int second);
+
 
 /* STREAM control routines */
 
@@ -397,7 +415,7 @@ int     vlistInqVarTimave(int vlistID, int varID);
 void    vlistDefVarTimaccu(int vlistID, int varID, int timaccu);
 int     vlistInqVarTimaccu(int vlistID, int varID);
 int     vlistInqVarSize(int vlistID, int varID);
-int     vlistInqVarID(int vlistID, int code);
+int     vlistInqVarID(int vlistID, int param);
 
 void    vlistDefIndex(int vlistID, int varID, int levID, int index);
 int     vlistInqIndex(int vlistID, int varID, int levID);

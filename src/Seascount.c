@@ -118,7 +118,7 @@ void *Seascount(void *argument)
         {
           vdate = taxisInqVdate(taxisID1);
           vtime = taxisInqVtime(taxisID1);
-	  decode_date(vdate, &year, &month, &day);
+	  cdiDecodeDate(vdate, &year, &month, &day);
           if ( month < 0 || month > 16 )
             cdoAbort("Month %d out of range!", month);
 

@@ -46,8 +46,8 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 
   if ( stat != EOF )
     {
-      date = encode_date(year, month, day);
-      time = encode_time(hour, minute, second);
+      date = cdiEncodeDate(year, month, day);
+      time = cdiEncodeTime(hour, minute, second);
       *juldate = juldate_encode(calendar, date, time);
     }
 

@@ -168,7 +168,7 @@ void *Seaspctl(void *argument)
 	{
 	  vdate1 = taxisInqVdate(taxisID1);
 	  vtime1 = taxisInqVtime(taxisID1);
-	  decode_date(vdate1, &year, &month, &day);
+	  cdiDecodeDate(vdate1, &year, &month, &day);
 	  if ( month < 0 || month > 16 )
 	    cdoAbort("Month %d out of range!", month);
 

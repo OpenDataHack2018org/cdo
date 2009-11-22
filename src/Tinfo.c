@@ -137,8 +137,8 @@ void printBounds(int taxisID, int calendar)
   taxisInqVdateBounds(taxisID, &vdate0, &vdate1);
   taxisInqVtimeBounds(taxisID, &vtime0, &vtime1);
 
-  decode_date(vdate0, &year0, &month0, &day0);
-  decode_date(vdate1, &year1, &month1, &day1);
+  cdiDecodeDate(vdate0, &year0, &month0, &day0);
+  cdiDecodeDate(vdate1, &year1, &month1, &day1);
 
   date2str(vdate0, vdatestr, sizeof(vdatestr));
   time2str(vtime0, vtimestr, sizeof(vtimestr));	  
@@ -185,7 +185,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 	  ndate = vdate0;
 	  while ( TRUE )
 	    {
-	      decode_date(ndate, &year, &month, &day);
+	      cdiDecodeDate(ndate, &year, &month, &day);
 	      
 	      month += ijulinc;
 				  
@@ -195,7 +195,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 	      if ( day0 == 31 )
 		day = days_per_month(calendar, year, month);
 	      
-	      ndate = encode_date(year, month, day);
+	      ndate = cdiEncodeDate(year, month, day);
 	      ntime = vtime0;
 	      if ( ndate >= vdate ) break;
 	      /* printf("\n1 %d %d\n", ndate, ntime); */
@@ -313,7 +313,7 @@ void *Tinfo(void *argument)
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);
 	  
-	  decode_date(vdate, &year, &month, &day);
+	  cdiDecodeDate(vdate, &year, &month, &day);
 	      
 	  date2str(vdate, vdatestr, sizeof(vdatestr));
 	  time2str(vtime, vtimestr, sizeof(vtimestr));
@@ -324,7 +324,7 @@ void *Tinfo(void *argument)
 	    {
 	      int deltam, deltay;
 
-	      decode_date(vdate0, &year0, &month0, &day0);
+	      cdiDecodeDate(vdate0, &year0, &month0, &day0);
 
 	      juldate0  = juldate_encode(calendar, vdate0, vtime0);
 	      juldate   = juldate_encode(calendar, vdate, vtime);

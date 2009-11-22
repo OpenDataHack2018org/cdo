@@ -388,8 +388,8 @@ void *Importbinary(void *argument)
       for ( tsID = tmin-1; tsID < tmax; ++tsID )
 	{
 	  gr2t(pfi.grvals[3], (gadouble)(tsID+1), &dtim); 
-	  vdate = encode_date(dtim.yr, dtim.mo, dtim.dy);
-	  vtime = encode_time(dtim.hr, dtim.mn, 0);
+	  vdate = cdiEncodeDate(dtim.yr, dtim.mo, dtim.dy);
+	  vtime = cdiEncodeTime(dtim.hr, dtim.mn, 0);
 
 	  date2str(vdate, vdatestr, sizeof(vdatestr));
 	  time2str(vtime, vtimestr, sizeof(vtimestr));

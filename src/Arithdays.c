@@ -94,7 +94,7 @@ void *Arithdays(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
-      decode_date(vdate, &year, &month, &day);
+      cdiDecodeDate(vdate, &year, &month, &day);
 
       if ( operfunc2 == func_month )
 	rconst = days_per_month(calendar, year, month);

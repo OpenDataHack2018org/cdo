@@ -128,7 +128,7 @@ void *Ymonpctl(void *argument)
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      decode_date(vdate, &year, &month, &day);
+      cdiDecodeDate(vdate, &year, &month, &day);
       if ( month < 0 || month >= NMONTH )
 	cdoAbort("Month %d out of range!", month);
 
@@ -188,7 +188,7 @@ void *Ymonpctl(void *argument)
 
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      decode_date(vdate, &year, &month, &day);
+      cdiDecodeDate(vdate, &year, &month, &day);
       if ( month < 0 || month >= NMONTH )
 	cdoAbort("Month %d out of range!", month);
 

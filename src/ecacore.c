@@ -1309,7 +1309,7 @@ void eca4(const ECA_REQUEST_4 *request)
                         ovarID1, ovarID2,ivlistID1,
                         FIRST_VAR_ID,
                         gslDuration, gslFirstDay,
-                        encode_date(ovdate/10000 - 1, 12, 31), ovtime,  nlevels); otsID++;
+                        cdiEncodeDate(ovdate/10000 - 1, 12, 31), ovtime,  nlevels); otsID++;
         }
       if (ovdate != ivdate)
         {

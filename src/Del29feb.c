@@ -78,7 +78,7 @@ void *Del29feb(void *argument)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      decode_date(vdate, &year, &month, &day);
+      cdiDecodeDate(vdate, &year, &month, &day);
 
       if ( month == 2 && day == 29 )
 	{

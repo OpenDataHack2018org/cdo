@@ -123,8 +123,8 @@ void *Yhourstat(void *argument)
 
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
-      decode_date(vdate, &year, &month, &day);
-      decode_time(vtime, &hour, &minute, &second);
+      cdiDecodeDate(vdate, &year, &month, &day);
+      cdiDecodeTime(vtime, &hour, &minute, &second);
 
       if ( month >= 1 && month <= 12 && hour >= 0 && hour < 24 )
 	houroy = ((month-1)*31 + day - 1)*24 + hour;
