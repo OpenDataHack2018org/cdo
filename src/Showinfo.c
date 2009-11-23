@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Showinfo   showparam       Show parameters
       Showinfo   showcode        Show code numbers
       Showinfo   showname        Show variable names
       Showinfo   showstdname     Show variable standard names
@@ -41,7 +42,7 @@
 void *Showinfo(void *argument)
 {
   int SHOWYEAR, SHOWMON, SHOWDATE, SHOWTIME, SHOWTIMESTAMP, SHOWCODE;
-  int SHOWNAME, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
+  int SHOWPARAM, SHOWNAME, SHOWSTDNAME, SHOWLEVEL, SHOWLTYPE, SHOWFORMAT;
   int operatorID;
   int varID, zaxisID;
   int vdate, vtime;
@@ -67,6 +68,7 @@ void *Showinfo(void *argument)
   SHOWTIME      = cdoOperatorAdd("showtime",      0, 0, NULL);
   SHOWTIMESTAMP = cdoOperatorAdd("showtimestamp", 0, 0, NULL);
   SHOWCODE      = cdoOperatorAdd("showcode",      0, 0, NULL);
+  SHOWPARAM     = cdoOperatorAdd("showparam",     0, 0, NULL);
   SHOWNAME      = cdoOperatorAdd("showname",      0, 0, NULL);
   SHOWSTDNAME   = cdoOperatorAdd("showstdname",   0, 0, NULL);
   SHOWLEVEL     = cdoOperatorAdd("showlevel",     0, 0, NULL);
@@ -199,6 +201,24 @@ void *Showinfo(void *argument)
 	  /* if ( nout == 20 ) { nout = 0; fprintf(stdout, "\n"); } */
 	  fprintf(stdout, " %d", vlistInqVarCode(vlistID, varID));
 	  nout++;
+	}
+      fprintf(stdout, "\n");
+    }
+  else if ( operatorID == SHOWPARAM )
+    {
+      int param, code, tabnum;
+      char paramstr[32];
+      
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  param   = vlistInqVarParam(vlistID, varID);
+	  code    = vlistInqVarCode(vlistID, varID);
+	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
+
+	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(255, tabnum, code);
+	  param2str(param, paramstr, sizeof(paramstr));
+
+	  fprintf(stdout, " %s", paramstr);
 	}
       fprintf(stdout, "\n");
     }

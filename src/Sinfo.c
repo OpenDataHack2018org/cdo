@@ -120,9 +120,9 @@ void *Sinfo(void *argument)
 	    fprintf(stdout, "unknown  ");
 
 	  if ( operatorID == SINFOV )
-	    fprintf(stdout, "%-12s", varname);
+	    fprintf(stdout, "%-11s ", varname);
 	  else if ( operatorID == SINFOP )
-	    fprintf(stdout, "%-12s", paramstr);
+	    fprintf(stdout, "%-11s ", paramstr);
 	  else
 	    fprintf(stdout, "%4d %4d   ", tabnum, code);
 

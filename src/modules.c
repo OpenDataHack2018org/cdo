@@ -353,7 +353,7 @@ void *Wct(void *argument);
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
 #define  SetzaxisOperators      {"setzaxis"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", \
-                                 "showname", "showstdname", "showlevel", "showltype", "showformat"}
+                                 "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  Smooth9Operators       {"smooth9"}
 #define  SortOperators          {"sortcode", "sortname", "sortlevel"}
