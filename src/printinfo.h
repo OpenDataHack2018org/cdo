@@ -1,3 +1,56 @@
+#define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
+#define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
+
+void date2str(int date, char *datestr, int maxlen)
+{
+  static char func[] = "date2str";
+  int year, month, day;
+  int len;
+
+  cdiDecodeDate(date, &year, &month, &day);
+
+  len = sprintf(datestr, DATE_FORMAT, year, month, day);
+
+  if ( len > ( maxlen-1) )
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+}
+
+
+void time2str(int time, char *timestr, int maxlen)
+{
+  static char func[] = "time2str";
+  int hour, minute, second;
+  int len;
+
+  cdiDecodeTime(time, &hour, &minute, &second);
+
+  len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
+
+  if ( len > ( maxlen-1) )
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+}
+
+
+void param2str(int param, char *paramstr, int maxlen)
+{
+  static char func[] = "param2str";
+  int dis, cat, num;
+  int len;
+
+  cdiDecodeParam(param, &dis, &cat, &num);
+
+  if ( dis == 255 && (cat == 255 || cat == 0 ) )
+    len = sprintf(paramstr, "%d", num);
+  else  if ( dis == 255 )
+    len = sprintf(paramstr, "%d.%d", cat, num);
+  else
+    len = sprintf(paramstr, "%d.%d.%d", dis, cat, num);
+
+  if ( len > ( maxlen-1) )
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+}
+
+
 void printFiletype(int streamID, int vlistID)
 {
   int filetype;

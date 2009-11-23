@@ -217,66 +217,17 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 }
 
 
-void param2str(int param, char *paramstr, int maxlen)
-{
-  static char func[] = "param2str";
-  int dis, cat, num;
-  int len;
-
-  cdiDecodeParam(param, &dis, &cat, &num);
-
-  if ( dis == 255 && (cat == 255 || cat == 0 ) )
-    len = sprintf(paramstr, "%d", num);
-  else  if ( dis == 255 )
-    len = sprintf(paramstr, "%d.%d", cat, num);
-  else
-    len = sprintf(paramstr, "%d.%d.%d", dis, cat, num);
-
-  if ( len > ( maxlen-1) )
-    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
-}
-
-
-void date2str(int date, char *datestr, int maxlen)
-{
-  static char func[] = "date2str";
-  int year, month, day;
-  int len;
-
-  cdiDecodeDate(date, &year, &month, &day);
-
-  len = sprintf(datestr, DATE_FORMAT, year, month, day);
-
-  if ( len > ( maxlen-1) )
-    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
-}
-
-
-void time2str(int time, char *timestr, int maxlen)
-{
-  static char func[] = "time2str";
-  int hour, minute, second;
-  int len;
-
-  cdiDecodeTime(time, &hour, &minute, &second);
-
-  len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
-
-  if ( len > ( maxlen-1) )
-    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
-}
-
-
 void *Info(void *argument)
 {
   static char func[] = "Info";
-  int INFO, INFOV, MAP;
+  int INFO, INFOV, INFOP, MAP;
   int operatorID;
   int i;
   int indf, indg;
   int varID, recID;
   int gridsize = 0;
-  int gridID, zaxisID, code, vdate, vtime;
+  int gridID, zaxisID, code, tabnum, param;
+  int vdate, vtime;
   int nrecs;
   int levelID;
   int tsID, taxisID;
@@ -285,6 +236,7 @@ void *Info(void *argument)
   int nmiss;
   int ivals = 0, imiss = 0;
   char varname[128];
+  char paramstr[32];
   char vdatestr[32], vtimestr[32];
   double missval;
   double *array = NULL;
@@ -295,6 +247,7 @@ void *Info(void *argument)
 
   INFO  = cdoOperatorAdd("info",  0, 0, NULL);
   INFOV = cdoOperatorAdd("infov", 0, 0, NULL);
+  INFOP = cdoOperatorAdd("infop", 0, 0, NULL);
   MAP   = cdoOperatorAdd("map",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -328,7 +281,10 @@ void *Info(void *argument)
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
 		  if ( operatorID == INFOV )
-		    fprintf(stdout, "%6d :       Date  Time    Varname     Level    Size    Miss :"
+		    fprintf(stdout, "%6d :       Date  Time    Varname      Level    Size    Miss :"
+			    "     Minimum        Mean     Maximum\n",  -(indf+1));
+		  else if ( operatorID == INFOP )
+		    fprintf(stdout, "%6d :       Date  Time    Param        Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n",  -(indf+1));
 		  else
 		    fprintf(stdout, "%6d :       Date  Time    Code  Level    Size    Miss :"
@@ -339,21 +295,28 @@ void *Info(void *argument)
 	      streamReadRecord(streamID, array, &nmiss);
 
 	      indg += 1;
-	      code     = vlistInqVarCode(vlistID, varID);
+	      param   = vlistInqVarParam(vlistID, varID);
+	      code    = vlistInqVarCode(vlistID, varID);
+	      tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
 	      gridID   = vlistInqVarGrid(vlistID, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
 	      missval  = vlistInqVarMissval(vlistID, varID);
 	      gridsize = gridInqSize(gridID);
 
+	      if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(255, tabnum, code);
+	      param2str(param, paramstr, sizeof(paramstr));
+
 	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);
 
 	      if ( operatorID == INFOV )
-		fprintf(stdout, "%6d :%s %s %-8s ", indg, vdatestr, vtimestr, varname);
+		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, varname);
+	      else if ( operatorID == INFOP )
+		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, paramstr);
 	      else
-		fprintf(stdout, "%6d :%s %s %3d", indg, vdatestr, vtimestr, code);
+		fprintf(stdout, "%6d :%s %s %3d ", indg, vdatestr, vtimestr, code);
 
 	      level = zaxisInqLevel(zaxisID, levelID);
-	      fprintf(stdout, " %7g ", level);
+	      fprintf(stdout, "%7g ", level);
 
 	      fprintf(stdout, "%7d %7d :", gridsize, nmiss);
 

@@ -284,7 +284,7 @@ void *Wct(void *argument);
 #define  ImportbinaryOperators  {"import_binary", "import_grads"}
 #define  ImportcmsafOperators   {"import_cmsaf"}
 #define  ImportobsOperators     {"import_obs"}
-#define  InfoOperators          {"info", "infov", "map"}
+#define  InfoOperators          {"info", "infov", "infop", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}

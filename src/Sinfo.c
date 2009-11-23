@@ -80,13 +80,13 @@ void *Sinfo(void *argument)
 
       if ( operatorID == SINFOV )
 	fprintf(stdout,
-		"%6d : Institut Source   Varname      Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
+		"%6d : Institut Source   Varname     Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
       else if ( operatorID == SINFOP )
 	fprintf(stdout,
 		"%6d : Institut Source   Param       Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
       else
 	fprintf(stdout,
-		"%6d : Institut Source  Table Code   Time   Typ  Grid Size Num  Levels Num\n",  -(indf+1));
+		"%6d : Institut Source  Table Code   Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
 
       nvars = vlistNvars(vlistID);
 
@@ -124,23 +124,14 @@ void *Sinfo(void *argument)
 	  else if ( operatorID == SINFOP )
 	    fprintf(stdout, "%-12s", paramstr);
 	  else
-	    fprintf(stdout, "%4d %4d", tabnum, code);
+	    fprintf(stdout, "%4d %4d   ", tabnum, code);
 
 	  timeID = vlistInqVarTime(vlistID, varID);
-	  if ( operatorID == SINFOP )
-	    {
-	      if ( timeID == TIME_CONSTANT )
-		fprintf(stdout, "con ");
-	      else
-		fprintf(stdout, "var ");
-	    }
+
+	  if ( timeID == TIME_CONSTANT )
+	    fprintf(stdout, "con ");
 	  else
-	    {
-	      if ( timeID == TIME_CONSTANT )
-		fprintf(stdout, " constant");
-	      else
-		fprintf(stdout, " variable");
-	    }
+	    fprintf(stdout, "var ");
 
 	  prec = vlistInqVarDatatype(vlistID, varID);
 	  if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");
