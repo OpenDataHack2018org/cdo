@@ -258,7 +258,7 @@ void *Wct(void *argument);
 #define  CopyOperators          {"copy", "selall"}
 #define  Del29febOperators      {"del29feb"}
 #define  DetrendOperators       {"detrend"}
-#define  DiffOperators          {"diff", "diffv", "sdiff"}
+#define  DiffOperators          {"diff", "diffp", "diffv", "sdiff"}
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
                                  "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}

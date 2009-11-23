@@ -226,7 +226,8 @@ void *Info(void *argument)
   int indf, indg;
   int varID, recID;
   int gridsize = 0;
-  int gridID, zaxisID, code, tabnum, param;
+  int gridID, zaxisID;
+  int code, tabnum, param;
   int vdate, vtime;
   int nrecs;
   int levelID;
@@ -295,9 +296,9 @@ void *Info(void *argument)
 	      streamReadRecord(streamID, array, &nmiss);
 
 	      indg += 1;
-	      param   = vlistInqVarParam(vlistID, varID);
-	      code    = vlistInqVarCode(vlistID, varID);
-	      tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
+	      param    = vlistInqVarParam(vlistID, varID);
+	      code     = vlistInqVarCode(vlistID, varID);
+	      tabnum   = tableInqNum(vlistInqVarTable(vlistID, varID));
 	      gridID   = vlistInqVarGrid(vlistID, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
 	      missval  = vlistInqVarMissval(vlistID, varID);
