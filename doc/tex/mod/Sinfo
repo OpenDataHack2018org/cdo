@@ -45,14 +45,14 @@ and parameter table to identify the variables.
 @BeginExample
 To print short information of a dataset use:
 @BeginVerbatim
-   cdo sinfo ifile
+   cdo sinfov ifile
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 variables over 12 time steps:
 @BeginVerbatim
-    -1 : Institut Source  Table Code   Time   Typ  Grid Size Num  Levels Num
-     1 : MPIMET   ECHAM5.3  128  129 constant F32      2048   1       1   1
-     2 : MPIMET   ECHAM5.3  128  130 variable F32      2048   1       4   2
-     3 : MPIMET   ECHAM5.3  128  139 variable F32      2048   1       1   1
+    -1 : Institut Source  Varname  Time  Typ  Grid Size Num  Levels Num
+     1 : MPIMET   ECHAM5  GEOSP    con   F32      2048   1       1   1
+     2 : MPIMET   ECHAM5  T        var   F32      2048   1       4   2
+     3 : MPIMET   ECHAM5  TSURF    var   F32      2048   1       1   1
    Horizontal grids :
      1 : gaussian     > size      : dim = 2048  nlon = 64  nlat = 32
                         longitude : first = 0  last = 354.375  inc = 5.625
