@@ -317,6 +317,7 @@ src/Showinfo.c -text
 src/Sinfo.c -text
 src/Smooth9.c -text
 src/Sort.c -text
+src/Sorttimestamp.c -text
 src/Specinfo.c -text
 src/Spectral.c -text
 src/Spectrum.c -text

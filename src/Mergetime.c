@@ -36,7 +36,7 @@ void *Mergetime(void *argument)
   int streamID1, streamID2 = CDI_UNDEFID;
   int tsID2 = 0, recID, varID, levelID;
   int vlistID1, vlistID2;
-  int streamCnt, nfiles, fileID;
+  int nfiles, fileID;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int lcopy = FALSE;
   int gridsize;
@@ -60,8 +60,7 @@ void *Mergetime(void *argument)
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  streamCnt = cdoStreamCnt();
-  nfiles = streamCnt - 1;
+  nfiles = cdoStreamCnt() - 1;
 
   sf = (sfile_t *) malloc(nfiles*sizeof(sfile_t));
 

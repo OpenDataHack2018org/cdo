@@ -22,9 +22,6 @@
 */
 
 
-#include <stdio.h>
-#include <math.h>
-
 #if defined (_OPENMP)
 #  include <omp.h>
 #endif
@@ -32,10 +29,12 @@
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
+#include "pstream.h"
 
 
-#define  NALLOC_INC  1000
+#define  NALLOC_INC  1024
 
+static
 int cmpdarray(const void *s1, const void *s2)
 {
   int cmp = 0;
@@ -49,6 +48,7 @@ int cmpdarray(const void *s1, const void *s2)
 
   return (cmp);
 }
+
 
 void *Timsort(void *argument)
 {

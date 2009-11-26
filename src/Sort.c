@@ -40,14 +40,14 @@ typedef struct
   double   level;
   char     name[128];
 }
-RecInfo;
+recinfo_t;
 
 static
 int cmpreccode(const void *s1, const void *s2)
 {
   int cmp = 0;
-  RecInfo *x = (RecInfo *) s1;
-  RecInfo *y = (RecInfo *) s2;
+  recinfo_t *x = (recinfo_t *) s1;
+  recinfo_t *y = (recinfo_t *) s2;
   /*
   printf("%d %d  %d %d\n", x->code, y->code, x, y);
   */
@@ -61,8 +61,8 @@ static
 int cmpreclevel(const void *s1, const void *s2)
 {
   int cmp = 0;
-  RecInfo *x = (RecInfo *) s1;
-  RecInfo *y = (RecInfo *) s2;
+  recinfo_t *x = (recinfo_t *) s1;
+  recinfo_t *y = (recinfo_t *) s2;
   /*
   printf("%g %g  %d %d\n", x->level, y->level, x, y);
   */
@@ -75,14 +75,14 @@ int cmpreclevel(const void *s1, const void *s2)
 static
 int cmprecname(const void *s1, const void *s2)
 {
-  RecInfo *x = (RecInfo *) s1;
-  RecInfo *y = (RecInfo *) s2;
+  recinfo_t *x = (recinfo_t *) s1;
+  recinfo_t *y = (recinfo_t *) s2;
 
   return (strcmp(x->name, y->name));
 }
 
 static
-int findrec(RecInfo *recInfo[], int nrecords, int varID, int levelID)
+int findrec(recinfo_t *recInfo[], int nrecords, int varID, int levelID)
 {
   int index;
 
@@ -112,7 +112,7 @@ void *Sort(void *argument)
   int *recNmiss;
   double *single;
   double **vardata = NULL;
-  RecInfo **recInfo;
+  recinfo_t **recInfo;
   int taxisID1, taxisID2;
 
   cdoInitialize(argument);
@@ -151,8 +151,8 @@ void *Sort(void *argument)
 
   recNmiss   = (int *) malloc(nrecords*sizeof(int));
 
-  recInfo    = (RecInfo **) malloc(nrecords*sizeof(RecInfo *));
-  recInfo[0] = (RecInfo *) malloc(nrecords*sizeof(RecInfo));
+  recInfo    = (recinfo_t **) malloc(nrecords*sizeof(recinfo_t *));
+  recInfo[0] = (recinfo_t *) malloc(nrecords*sizeof(recinfo_t));
 
   for ( index = 1; index < nrecords; index++ )
     recInfo[index] = recInfo[0] + index;
@@ -201,11 +201,11 @@ void *Sort(void *argument)
       if ( tsID == 0 )
 	{
 	  if      ( operatorID == SORTCODE )
-	    qsort(recInfo[0], nrecords, sizeof(RecInfo), cmpreccode);
+	    qsort(recInfo[0], nrecords, sizeof(recinfo_t), cmpreccode);
 	  else if ( operatorID == SORTNAME )
-	    qsort(recInfo[0], nrecords, sizeof(RecInfo), cmprecname);
+	    qsort(recInfo[0], nrecords, sizeof(recinfo_t), cmprecname);
 	  else if ( operatorID == SORTLEVEL )
-	    qsort(recInfo[0], nrecords, sizeof(RecInfo), cmpreclevel);
+	    qsort(recInfo[0], nrecords, sizeof(recinfo_t), cmpreclevel);
 	}
 
       for ( recID = 0; recID < nrecords; recID++ )

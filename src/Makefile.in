@@ -79,41 +79,42 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Setgrid.$(OBJEXT) Sethalo.$(OBJEXT) Setmiss.$(OBJEXT) \
 	Setrange.$(OBJEXT) Setrcaname.$(OBJEXT) Settime.$(OBJEXT) \
 	Setzaxis.$(OBJEXT) Showinfo.$(OBJEXT) Sinfo.$(OBJEXT) \
-	Smooth9.$(OBJEXT) Sort.$(OBJEXT) Specinfo.$(OBJEXT) \
-	Spectral.$(OBJEXT) Spectrum.$(OBJEXT) Split.$(OBJEXT) \
-	Splitrec.$(OBJEXT) Splitsel.$(OBJEXT) Splittime.$(OBJEXT) \
-	Splityear.$(OBJEXT) Subtrend.$(OBJEXT) Templates.$(OBJEXT) \
-	Test.$(OBJEXT) Tests.$(OBJEXT) Timcount.$(OBJEXT) \
-	Timeof.$(OBJEXT) Timpctl.$(OBJEXT) Timsort.$(OBJEXT) \
-	Timselpctl.$(OBJEXT) Timselstat.$(OBJEXT) Timstat.$(OBJEXT) \
-	Timstat2.$(OBJEXT) Timstat3.$(OBJEXT) Tinfo.$(OBJEXT) \
-	Transpose.$(OBJEXT) Trend.$(OBJEXT) Trms.$(OBJEXT) \
-	Vardup.$(OBJEXT) Vargen.$(OBJEXT) Varrms.$(OBJEXT) \
-	Vertint.$(OBJEXT) Vertstat.$(OBJEXT) Vertwind.$(OBJEXT) \
-	Wind.$(OBJEXT) Writegrid.$(OBJEXT) Writerandom.$(OBJEXT) \
-	Yhourstat.$(OBJEXT) Ydaypctl.$(OBJEXT) Ydaystat.$(OBJEXT) \
-	Ydrunpctl.$(OBJEXT) Ydrunstat.$(OBJEXT) Ymonarith.$(OBJEXT) \
-	Ymonpctl.$(OBJEXT) Ymonstat.$(OBJEXT) Yseaspctl.$(OBJEXT) \
-	Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) cdilib.$(OBJEXT) \
-	commandline.$(OBJEXT) exception.$(OBJEXT) expr_yacc.$(OBJEXT) \
-	expr_lex.$(OBJEXT) expr.$(OBJEXT) cdo.$(OBJEXT) \
-	cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) field.$(OBJEXT) \
-	fieldc.$(OBJEXT) field2.$(OBJEXT) fieldmer.$(OBJEXT) \
-	fieldzon.$(OBJEXT) gradsdeslib.$(OBJEXT) grid.$(OBJEXT) \
-	grid_gme.$(OBJEXT) grid_lcc.$(OBJEXT) grid_rot.$(OBJEXT) \
-	griddes.$(OBJEXT) griddes_nc.$(OBJEXT) griddes_h5.$(OBJEXT) \
-	hetaeta.$(OBJEXT) history.$(OBJEXT) institution.$(OBJEXT) \
-	interpol.$(OBJEXT) job.$(OBJEXT) modules.$(OBJEXT) \
-	namelist.$(OBJEXT) normal.$(OBJEXT) pipe.$(OBJEXT) \
-	process.$(OBJEXT) remaplib.$(OBJEXT) timer.$(OBJEXT) \
-	realtime.$(OBJEXT) pstream.$(OBJEXT) table.$(OBJEXT) \
-	userlog.$(OBJEXT) util.$(OBJEXT) legendre.$(OBJEXT) \
-	fourier.$(OBJEXT) specspace.$(OBJEXT) readline.$(OBJEXT) \
-	juldate.$(OBJEXT) vinterp.$(OBJEXT) zaxis.$(OBJEXT) \
-	par_io.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
-	list.$(OBJEXT) percentiles.$(OBJEXT) nth_element.$(OBJEXT) \
-	ecacore.$(OBJEXT) ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) \
-	Hi.$(OBJEXT) Wct.$(OBJEXT) statistic.$(OBJEXT)
+	Smooth9.$(OBJEXT) Sort.$(OBJEXT) Sorttimestamp.$(OBJEXT) \
+	Specinfo.$(OBJEXT) Spectral.$(OBJEXT) Spectrum.$(OBJEXT) \
+	Split.$(OBJEXT) Splitrec.$(OBJEXT) Splitsel.$(OBJEXT) \
+	Splittime.$(OBJEXT) Splityear.$(OBJEXT) Subtrend.$(OBJEXT) \
+	Templates.$(OBJEXT) Test.$(OBJEXT) Tests.$(OBJEXT) \
+	Timcount.$(OBJEXT) Timeof.$(OBJEXT) Timpctl.$(OBJEXT) \
+	Timsort.$(OBJEXT) Timselpctl.$(OBJEXT) Timselstat.$(OBJEXT) \
+	Timstat.$(OBJEXT) Timstat2.$(OBJEXT) Timstat3.$(OBJEXT) \
+	Tinfo.$(OBJEXT) Transpose.$(OBJEXT) Trend.$(OBJEXT) \
+	Trms.$(OBJEXT) Vardup.$(OBJEXT) Vargen.$(OBJEXT) \
+	Varrms.$(OBJEXT) Vertint.$(OBJEXT) Vertstat.$(OBJEXT) \
+	Vertwind.$(OBJEXT) Wind.$(OBJEXT) Writegrid.$(OBJEXT) \
+	Writerandom.$(OBJEXT) Yhourstat.$(OBJEXT) Ydaypctl.$(OBJEXT) \
+	Ydaystat.$(OBJEXT) Ydrunpctl.$(OBJEXT) Ydrunstat.$(OBJEXT) \
+	Ymonarith.$(OBJEXT) Ymonpctl.$(OBJEXT) Ymonstat.$(OBJEXT) \
+	Yseaspctl.$(OBJEXT) Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) \
+	cdilib.$(OBJEXT) commandline.$(OBJEXT) exception.$(OBJEXT) \
+	expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) expr.$(OBJEXT) \
+	cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) \
+	field.$(OBJEXT) fieldc.$(OBJEXT) field2.$(OBJEXT) \
+	fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) gradsdeslib.$(OBJEXT) \
+	grid.$(OBJEXT) grid_gme.$(OBJEXT) grid_lcc.$(OBJEXT) \
+	grid_rot.$(OBJEXT) griddes.$(OBJEXT) griddes_nc.$(OBJEXT) \
+	griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) history.$(OBJEXT) \
+	institution.$(OBJEXT) interpol.$(OBJEXT) job.$(OBJEXT) \
+	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
+	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
+	timer.$(OBJEXT) realtime.$(OBJEXT) pstream.$(OBJEXT) \
+	table.$(OBJEXT) userlog.$(OBJEXT) util.$(OBJEXT) \
+	legendre.$(OBJEXT) fourier.$(OBJEXT) specspace.$(OBJEXT) \
+	readline.$(OBJEXT) juldate.$(OBJEXT) vinterp.$(OBJEXT) \
+	zaxis.$(OBJEXT) par_io.$(OBJEXT) pthread_debug.$(OBJEXT) \
+	color.$(OBJEXT) list.$(OBJEXT) percentiles.$(OBJEXT) \
+	nth_element.$(OBJEXT) ecacore.$(OBJEXT) ecautil.$(OBJEXT) \
+	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Wct.$(OBJEXT) \
+	statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_LDADD = $(LDADD)
 am_cdotest_OBJECTS = cdilib.$(OBJEXT) cdotest.$(OBJEXT)
@@ -325,6 +326,7 @@ cdo_SOURCES = Arith.c		\
               Sinfo.c   	\
               Smooth9.c   	\
               Sort.c      	\
+              Sorttimestamp.c   \
               Specinfo.c	\
               Spectral.c	\
               Spectrum.c	\
@@ -665,6 +667,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Smooth9.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sort.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sorttimestamp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Specinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Spectral.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Spectrum.Po@am__quote@

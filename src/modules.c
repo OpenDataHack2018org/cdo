@@ -136,6 +136,7 @@ void *Showinfo(void *argument);
 void *Sinfo(void *argument);
 void *Smooth9(void *argument);
 void *Sort(void *argument);
+void *Sorttimestamp(void *argument);
 void *Specinfo(void *argument);
 void *Spectral(void *argument);
 void *Spectrum(void *argument);
@@ -357,6 +358,7 @@ void *Wct(void *argument);
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  Smooth9Operators       {"smooth9"}
 #define  SortOperators          {"sortcode", "sortname", "sortlevel"}
+#define  SorttimestampOperators {"sorttimestamp"}
 #define  SpecinfoOperators      {"specinfo"}
 #define  SpectralOperators      {"gp2sp", "gp2spl", "sp2gp", "sp2gpl", "sp2sp", "spcut"}
 #define  SpectrumOperators      {"spectrum"}
@@ -587,6 +589,7 @@ static MODULES Modules[] =
   { Sinfo,          SinfoHelp,         SinfoOperators,         -1,  0 },
   { Smooth9,        Smooth9Help,       Smooth9Operators,        1,  1 },
   { Sort,           NULL,              SortOperators,           1,  1 },
+  { Sorttimestamp,  NULL,              SorttimestampOperators, -1,  1 },
   { Specinfo,       NULL,              SpecinfoOperators,       0,  0 },
   { Spectral,       SpectralHelp,      SpectralOperators,       1,  1 },
   { Spectrum,       NULL,              SpectrumOperators,       1,  1 },

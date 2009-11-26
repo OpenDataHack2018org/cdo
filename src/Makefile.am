@@ -99,6 +99,7 @@ cdo_SOURCES = Arith.c		\
               Sinfo.c   	\
               Smooth9.c   	\
               Sort.c      	\
+              Sorttimestamp.c   \
               Specinfo.c	\
               Spectral.c	\
               Spectrum.c	\
