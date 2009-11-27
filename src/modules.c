@@ -358,11 +358,11 @@ void *Wct(void *argument);
 #define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
 #define  Smooth9Operators       {"smooth9"}
 #define  SortOperators          {"sortcode", "sortname", "sortlevel"}
-#define  SorttimestampOperators {"sorttimestamp"}
+#define  SorttimestampOperators {"sorttimestamp", "sorttaxis"}
 #define  SpecinfoOperators      {"specinfo"}
 #define  SpectralOperators      {"gp2sp", "gp2spl", "sp2gp", "sp2gpl", "sp2sp", "spcut"}
 #define  SpectrumOperators      {"spectrum"}
-#define  SplitOperators         {"splitcode", "splitname", "splitlevel", "splitgrid", "splitzaxis"}
+#define  SplitOperators         {"splitcode", "splitname", "splitlevel", "splitgrid", "splitzaxis", "splittabnum"}
 #define  SplitrecOperators      {"splitrec"}
 #define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}

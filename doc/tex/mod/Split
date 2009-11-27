@@ -5,7 +5,7 @@
 @Section   = File operations
 @Class     = File operation
 @Arguments = ifile oprefix
-@Operators = splitcode splitname splitlevel splitgrid splitzaxis
+@Operators = splitcode splitname splitlevel splitgrid splitzaxis splittabnum
 
 @BeginDescription
 This module splits a dataset to several files with names
@@ -69,14 +69,24 @@ form the output file names.
 @EndOperator
 
 
-@BeginOperator_splitrec
-@Title     = Split records
+@BeginOperator_splittabnum
+@Title     = Split parameter table numbers
 
 @BeginDescription
-Splits a dataset into pieces, one for each record.
-Appends six digits with the record number to @file{oprefix} to 
+Splits a dataset into pieces, one for each GRIB1 parameter table number.
+Appends three digits with the table number to @file{oprefix} to 
 form the output file names.
 @EndDescription
+
+
+@c @BeginOperator_splitrec
+@c @Title     = Split records
+
+@c @BeginDescription
+@c Splits a dataset into pieces, one for each record.
+@c Appends six digits with the record number to @file{oprefix} to 
+@c form the output file names.
+@c @EndDescription
 
 
 @BeginExample

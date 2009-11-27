@@ -1,3 +1,7 @@
+2009-11-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* New operator: splittabnum - Split parameter table numbers
+
 2009-11-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* showtime: removed output of date, only print time string hh:mm:ss

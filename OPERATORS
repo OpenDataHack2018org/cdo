@@ -48,6 +48,7 @@ Operator catalog:
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split z-axes
+      Split      splittabnum     Split parameter table numbers
       Splittime  splithour       Split hours
       Splittime  splitday        Split days
       Splittime  splitmon        Split months
