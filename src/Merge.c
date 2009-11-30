@@ -26,6 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 
 void *Merge(void *argument)
@@ -47,6 +48,7 @@ void *Merge(void *argument)
   int gridsize;
   int nmiss;
   int taxisID1, taxisID2;
+  const char *ofilename;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -84,8 +86,14 @@ void *Merge(void *argument)
       vlistPrint(vlistID2);
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(streamCnt-1));
+  ofilename = cdoStreamName(streamCnt-1);
+
+  if ( fileExist(ofilename) )
+    if ( !userFileOverwrite(ofilename) )
+      cdoAbort("Outputfile %s already exist!", ofilename);
+       
+  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);
 
   vlistDefTaxis(vlistID2, taxisID2);
   streamDefVlist(streamID2, vlistID2);

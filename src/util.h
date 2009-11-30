@@ -30,4 +30,7 @@ int get_season_start(void);
 void get_season_name(const char *seas_name[4]);
 
 
+int fileExist(const char *filename);
+int userFileOverwrite(const char *filename);
+
 #endif  /* _UTIL_H */

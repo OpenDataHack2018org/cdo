@@ -1,3 +1,7 @@
+2009-11-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* merge, mergetime: don't overwrite existing files
+	
 2009-11-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* New operator: splittabnum - Split parameter table numbers

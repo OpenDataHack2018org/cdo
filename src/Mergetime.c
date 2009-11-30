@@ -22,12 +22,11 @@
 */
 
 
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 
 void *Mergetime(void *argument)
@@ -43,6 +42,7 @@ void *Mergetime(void *argument)
   int nmiss;
   int vdate, vtime;
   int next_fileID;
+  const char *ofilename;
   double *array = NULL;
   typedef struct
   {
@@ -99,9 +99,15 @@ void *Mergetime(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+  ofilename = cdoStreamName(nfiles);
+
+  if ( fileExist(ofilename) )
+    if ( !userFileOverwrite(ofilename) )
+      cdoAbort("Outputfile %s already exist!", ofilename);
+
+  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
   if ( streamID2 < 0 )
-    cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));
+    cdiError(streamID2, "Open failed on %s", ofilename);
 
   if ( ! lcopy )
     {
