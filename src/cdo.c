@@ -175,7 +175,7 @@ void usage(void)
   fprintf(stderr, "usage : cdo  [Options]  Operator1  [-Operator2  [-OperatorN]]\n");
   fprintf(stderr, "\n");
   fprintf(stderr, "  Options:\n");
-  fprintf(stderr, "    -a             Convert from a relative to an absolute time axis\n");
+  fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
   fprintf(stderr, "                   (32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 32 for grb/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
@@ -202,7 +202,7 @@ void usage(void)
   */
   fprintf(stderr, "    -Q             Sort netCDF variable names\n");
   fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
-  fprintf(stderr, "    -r             Convert from an absolute to a relative time axis\n");
+  fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
   fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
   fprintf(stderr, "    -s             Silent mode\n");
