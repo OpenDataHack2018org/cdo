@@ -15,9 +15,9 @@ cp $FILE tmp1
 #
 gmtset PAPER_MEDIA = Custom_500x170
 #
-pscoast -P -JG-20/60/5.6 -Rg   -B0g30 -Dc -G150/150/150 -K -X0.1 -Y0.1  > plot.ps
-psxy    -P -JG-20/60/5.6 -Rg -M tmp1 -W2p,cyan          -O -K >> plot.ps
-pscoast -P -JN1/11 -Rg   -B0g30 -Dc -G150/150/150 -O -K -X6 >> plot.ps
-psxy    -P -JN1/11 -Rg -M tmp1 -W2p,cyan          -O  >> plot.ps
+pscoast -P -JG-20/60/5.6 -Rg   -B0g30 -Dc -G169/194/139 -S232/240/255 -K -X0.1 -Y0.1  > plot.ps
+psxy    -P -JG-20/60/5.6 -Rg -M tmp1 -W2p,black          -O -K >> plot.ps
+pscoast -P -JN1/11 -Rg   -B0g30 -Dc -G169/194/139 -S236/240/255 -O -K -X6 >> plot.ps
+psxy    -P -JN1/11 -Rg -M tmp1 -W2p,black          -O  >> plot.ps
 #
 rm -f tmp1
