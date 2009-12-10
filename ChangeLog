@@ -1,3 +1,7 @@
+2009-12-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Enstat: change vlistCompare to func_sftn
+	
 2009-11-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* merge, mergetime: don't overwrite existing files
