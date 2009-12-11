@@ -37,14 +37,14 @@ void param2str(int param, char *paramstr, int maxlen)
   int dis, cat, num;
   int len;
 
-  cdiDecodeParam(param, &dis, &cat, &num);
+  cdiDecodeParam(param, &num, &cat, &dis);
 
   if ( dis == 255 && (cat == 255 || cat == 0 ) )
     len = sprintf(paramstr, "%d", num);
   else  if ( dis == 255 )
-    len = sprintf(paramstr, "%d.%d", cat, num);
+    len = sprintf(paramstr, "%d.%d", num, cat);
   else
-    len = sprintf(paramstr, "%d.%d.%d", dis, cat, num);
+    len = sprintf(paramstr, "%d.%d.%d", num, cat, dis);
 
   if ( len > ( maxlen-1) )
     fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);

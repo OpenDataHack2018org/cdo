@@ -215,7 +215,7 @@ void *Showinfo(void *argument)
 	  code    = vlistInqVarCode(vlistID, varID);
 	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
 
-	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(255, tabnum, code);
+	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
 	  param2str(param, paramstr, sizeof(paramstr));
 
 	  fprintf(stdout, " %s", paramstr);
