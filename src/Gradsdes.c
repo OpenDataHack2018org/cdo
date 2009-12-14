@@ -721,7 +721,7 @@ void *Gradsdes(void *argument)
 		  if ( checksize < 0L || checksize > 2147483647L )
 		    {
 		      nrecords -= nrecsout;
-		      cdoWarning("GRIB file to large for GrADS! Only the first %d time steps (2GB) are processed.",
+		      cdoWarning("GRIB file too large for GrADS! Only the first %d time steps (2GB) are processed.",
 				 tsID);
 		      goto LABEL_STOP;
 		    }

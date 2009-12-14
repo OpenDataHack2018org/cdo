@@ -1,3 +1,7 @@
+2009-12-14  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Vertint: set default table number to 0
+	
 2009-12-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Ensstat: change vlistCompare to func_sftn

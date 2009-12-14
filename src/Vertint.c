@@ -357,7 +357,7 @@ void *Vertint(void *argument)
 	      temp_code  =  11;
 	      ps_code    =   1;
 	    }
-	  else if ( tableNum == 128 )
+	  else if ( tableNum == 128 || tableNum == 0 )
 	    {
 	      mode = ECHAM_MODE;
 	      geop_code  = 129;
@@ -396,10 +396,10 @@ void *Vertint(void *argument)
 
       if ( mode == ECHAM_MODE )
 	{
-	  if      ( code == geop_code  && nlevel == 1     ) geopID  = varID;
-	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
-	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
-	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID  = varID;
+	  if      ( code == geop_code  && nlevel == 1     ) geopID    = varID;
+	  else if ( code == temp_code  && nlevel == nhlev ) tempID    = varID;
+	  else if ( code == ps_code    && nlevel == 1     ) psID      = varID;
+	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID    = varID;
 	  else if ( code == 156        && nlevel == nhlev ) gheightID = varID;
 	}
       else if ( mode == WMO_MODE )

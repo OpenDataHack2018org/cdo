@@ -4243,7 +4243,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   long ioffset;
   long grid1_addm4, grid2_addm4;
   int max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
-                           /* 1000 is to small!!! */
+                           /* 1000 is too small!!! */
   long grid1_size;
   long grid2_size;
   long grid1_corners;
