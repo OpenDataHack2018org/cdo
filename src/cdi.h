@@ -177,8 +177,8 @@ void    cdiDefGlobal(const char *string, int val);
 
 /* param format:  DDDCCCNNN */
 
-void    cdiDecodeParam(int param, int *num, int *cat, int *dis);
-int     cdiEncodeParam(int num, int cat, int dis);
+void    cdiDecodeParam(int param, int *pnum, int *pcat, int *pdis);
+int     cdiEncodeParam(int pnum, int pcat, int pdis);
 
 /* date format:  YYYYMMDD */
 /* time format:    hhmmss */

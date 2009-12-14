@@ -18,6 +18,8 @@
 /*
    This module contains the following operators:
 
+      Selvar     selparam        Select parameter (format: code.tabnum  or  pnum.pcat.pdis)
+      Selvar     delparam        Delete parameter (format: code.tabnum  or  pnum.pcat.pdis)
       Selvar     selcode         Select codes
       Selvar     delcode         Delete codes
       Selvar     selname         Select variables
@@ -49,19 +51,20 @@
 void *Selvar(void *argument)
 {
   const char func[] = "Selvar";
-  int SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELZAXIS, SELLTYPE; 
-  int SELTABNUM, DELCODE, DELNAME, SELSTDNAME;
+  int SELPARAM, SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELZAXIS, SELLTYPE; 
+  int SELTABNUM, DELPARAM, DELCODE, DELNAME, SELSTDNAME;
   int operatorID;
   int streamID1, streamID2;
   int tsID, nrecs;
   int nvars, nlevs;
-  int code, tabnum, gridID, zaxisID, levID;
+  int code, tabnum, param, gridID, zaxisID, levID;
   double level;
   int varID2, levelID2;
   int recID, varID, levelID;
   int *intarr = NULL, nsel = 0;
   int *selfound = NULL;
   double *fltarr = NULL;
+  char paramstr[32];
   char varname[256];
   char stdname[256];
   char gridname[256];
@@ -83,6 +86,7 @@ void *Selvar(void *argument)
 
   cdoInitialize(argument);
 
+  SELPARAM     = cdoOperatorAdd("selparam",     0, 0, "parameter");
   SELCODE      = cdoOperatorAdd("selcode",      0, 0, "code numbers");
   SELNAME      = cdoOperatorAdd("selname",      0, 0, "variable names");
   SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 0, "standard names");
@@ -91,6 +95,7 @@ void *Selvar(void *argument)
   SELGRID      = cdoOperatorAdd("selgrid",      0, 0, "list of grid names or numbers");
   SELZAXIS     = cdoOperatorAdd("selzaxis",     0, 0, "list of zaxis names or numbers");
   SELTABNUM    = cdoOperatorAdd("seltabnum",    0, 0, "table numbers");
+  DELPARAM     = cdoOperatorAdd("delparam",     0, 0, "parameter");
   DELCODE      = cdoOperatorAdd("delcode",      0, 0, "code numbers");
   DELNAME      = cdoOperatorAdd("delname",      0, 0, "variable names");
   SELLTYPE     = cdoOperatorAdd("selltype",     0, 0, "GRIB level types"); 
@@ -104,8 +109,8 @@ void *Selvar(void *argument)
   intlist = FALSE;
   byname  = TRUE;
 
-  if ( operatorID == SELNAME || operatorID == DELNAME || operatorID == SELSTDNAME ||
-       operatorID == SELGRID || operatorID == SELZAXIS )
+  if ( operatorID == SELPARAM || operatorID == DELPARAM || operatorID == SELNAME || operatorID == DELNAME || 
+       operatorID == SELSTDNAME || operatorID == SELGRID || operatorID == SELZAXIS )
     {
       nsel     = operatorArgc();
       argnames = operatorArgv();
@@ -168,6 +173,7 @@ void *Selvar(void *argument)
     {
       vlistInqVarName(vlistID1, varID, varname);
       vlistInqVarStdname(vlistID1, varID, stdname);
+      param   = vlistInqVarParam(vlistID1, varID);
       code    = vlistInqVarCode(vlistID1, varID);
       tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
       gridID  = vlistInqVarGrid(vlistID1, varID);
@@ -175,6 +181,9 @@ void *Selvar(void *argument)
       nlevs   = zaxisInqSize(zaxisID);
       gridName(gridInqType(gridID), gridname);
       zaxisName(zaxisInqType(zaxisID), zaxisname);
+
+      if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
+      param2str(param, paramstr, sizeof(paramstr));
 
       for ( levID = 0; levID < nlevs; levID++ )
 	{
@@ -188,6 +197,14 @@ void *Selvar(void *argument)
 	      if ( operatorID == SELCODE )
 		{
 		  if ( intarr[isel] == code )
+		    {
+		      vlistDefFlag(vlistID1, varID, levID, TRUE);
+		      selfound[isel] = TRUE;
+		    }
+		}
+	      else if ( operatorID == SELPARAM )
+		{
+		  if ( strcmp(argnames[isel], paramstr) == 0 )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
@@ -281,6 +298,14 @@ void *Selvar(void *argument)
 		      selfound[isel] = TRUE;
 		    }
 		}
+	      else if ( operatorID == DELPARAM )
+		{
+		  if ( strcmp(argnames[isel], paramstr) == 0 )
+		    {
+		      vlistDefFlag(vlistID1, varID, levID, FALSE);
+		      selfound[isel] = TRUE;
+		    }
+		}
 	      else if ( operatorID == SELLTYPE )
 		{
 		  ltype = zaxis2ltype(zaxisID);
@@ -317,6 +342,10 @@ void *Selvar(void *argument)
 	  if ( operatorID == SELCODE || operatorID == DELCODE )
 	    {
 	      cdoWarning("Code number %d not found!", intarr[isel]);
+	    }
+	  else if ( operatorID == SELPARAM || operatorID == DELPARAM )
+	    {
+	      cdoWarning("Parameter %s not found!", argnames[isel]);
 	    }
 	  else if ( operatorID == SELNAME || operatorID == DELNAME )
 	    {

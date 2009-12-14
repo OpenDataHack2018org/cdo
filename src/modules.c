@@ -336,8 +336,8 @@ void *Wct(void *argument);
 #define  SeasstatOperators      {"seasmin",  "seasmax",  "seassum",  "seasmean",  "seasavg",  "seasvar",  "seasstd"}
 #define  SelboxOperators        {"sellonlatbox", "selindexbox"}
 #define  SelectOperators        {"select"}
-#define  SelvarOperators        {"selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
-                                 "selzaxis", "seltabnum", "delcode", "delname", "selltype"}
+#define  SelvarOperators        {"selparam", "selcode", "selname", "selstdname", "sellevel", "sellevidx", "selgrid", \
+                                 "selzaxis", "seltabnum", "delparam", "delcode", "delname", "selltype"}
 #define  SeloperatorOperators   {"seloperator"}
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
