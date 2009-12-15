@@ -20,33 +20,37 @@ value results in $0$.
 \vspace{2mm}
 \begin{minipage}[t]{8cm}
 
-\begin{tabular}[t]{|c||c|c|}
+\ifpdf
+\begin{longtable}[t]{|c||c|c|c|}
+\else
+\begin{tabular}[t]{|c||c|c|c|}
+\fi
 \hline
-\makebox[2.3cm]{\bf addition}&  \makebox[2cm]{\bf b} & \makebox[2cm]{\bf miss} \\
-\hline
-\hline
-   {\bf a}        &       $a + b$   &    $miss$ \\
-\hline
-  {\bf miss}      &       $miss$    &    $miss$ \\
-\hline
-\end{tabular}
-
-\vspace{1mm}
-
-\begin{tabular}[t]{|c||c|c|}
-\hline
-\makebox[2.3cm]{\bf subtraction}&  \makebox[2cm]{\bf b} & \makebox[2cm]{\bf miss} \\
+\makebox[2.3cm]{\bf addition}&  \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
 \hline
 \hline
-   {\bf a}        &       $a - b$   &    $miss$ \\
+   {\bf a}        &       $a + b$   & &   $miss$ \\
 \hline
-  {\bf miss}      &       $miss$    &    $miss$ \\
+  {\bf miss}      &       $miss$    & &   $miss$ \\
 \hline
-\end{tabular}
-
-\vspace{1mm}
-
-\begin{tabular}[b]{|c||c|c|c|}
+%\end{tabular}
+%
+%\vspace{1mm}
+%
+%\begin{tabular}[t]{|c||c|c|}
+\hline
+\makebox[2.3cm]{\bf subtraction}&  \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\hline
+\hline
+   {\bf a}        &       $a - b$   &  &  $miss$ \\
+\hline
+  {\bf miss}      &       $miss$    &  &  $miss$ \\
+\hline
+%\end{tabular}
+%
+%\vspace{1mm}
+%
+%\begin{tabular}[b]{|c||c|c|c|}
 \hline
 \makebox[2.3cm]{\bf multiplication} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf 0} & \makebox[2cm]{\bf miss} \\
 \hline
@@ -57,11 +61,11 @@ value results in $0$.
 \hline
   {\bf miss}      &       $miss$    &     $0$   &    $miss$ \\
 \hline
-\end{tabular}
-
-\vspace{1mm}
-
-\begin{tabular}[b]{|c||c|c|c|}
+%\end{tabular}
+%
+%\vspace{1mm}
+%
+%\begin{tabular}[b]{|c||c|c|c|}
 \hline
 \makebox[2.3cm]{\bf division} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf 0} & \makebox[2cm]{\bf miss} \\
 \hline
@@ -72,49 +76,53 @@ value results in $0$.
 \hline
   {\bf miss}      &       $mis$s    &    $miss$ &    $miss$ \\
 \hline
+%\end{tabular}
+%
+%\vspace{1mm}
+%
+%\begin{tabular}[b]{|c||c|c|}
+\hline
+\makebox[2.3cm]{\bf maximum} & \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\hline
+\hline
+   {\bf a}        &      $max(a,b)$ & &    $a$   \\
+\hline
+  {\bf miss}      &        $b$      & &   $miss$ \\
+\hline
+%\end{tabular}
+%
+%\vspace{1mm}
+%
+%\begin{tabular}[b]{|c||c|c|}
+\hline
+\makebox[2.3cm]{\bf minimum} & \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\hline
+\hline
+   {\bf a}        &      $min(a,b)$ &  &   $a$   \\
+\hline
+  {\bf miss}      &        $b$      &  &  $miss$ \\
+\hline
+%\end{tabular}
+%%\end{minipage}
+%
+%\hspace{2cm}
+%%\begin{minipage}[t]{8cm}
+%\vspace{1mm}
+%
+%\begin{tabular}[b]{|c||c|c|}
+\hline
+\makebox[2.3cm]{\bf sum} & \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\hline
+\hline
+   {\bf a}        &         $a + b$ & &     $a$   \\
+\hline
+  {\bf miss}      &        $b$      & &   $miss$ \\
+\hline
+\ifpdf
+\end{longtable}
+\else
 \end{tabular}
-
-\vspace{1mm}
-
-\begin{tabular}[b]{|c||c|c|}
-\hline
-\makebox[2.3cm]{\bf maximum} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf miss} \\
-\hline
-\hline
-   {\bf a}        &      $max(a,b)$ &     $a$   \\
-\hline
-  {\bf miss}      &        $b$      &    $miss$ \\
-\hline
-\end{tabular}
-
-\vspace{1mm}
-
-\begin{tabular}[b]{|c||c|c|}
-\hline
-\makebox[2.3cm]{\bf minimum} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf miss} \\
-\hline
-\hline
-   {\bf a}        &      $min(a,b)$ &     $a$   \\
-\hline
-  {\bf miss}      &        $b$      &    $miss$ \\
-\hline
-\end{tabular}
-\end{minipage}
-
-\hspace{2cm}
-\begin{minipage}[t]{8cm}
-\vspace{1mm}
-
-\begin{tabular}[b]{|c||c|c|}
-\hline
-\makebox[2.3cm]{\bf sum} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf miss} \\
-\hline
-\hline
-   {\bf a}        &         $a + b$ &     $a$   \\
-\hline
-  {\bf miss}      &        $b$      &    $miss$ \\
-\hline
-\end{tabular}
+\fi
 
 \end{minipage}
 

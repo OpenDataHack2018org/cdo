@@ -2,8 +2,24 @@
 %\documentclass[DIV16,BCOR1cm,10pt,a4paper,fleqn]{scrreprt}         % for pdf output
 %\documentclass[DIV16,BCOR1cm,11pt,a4paper,fleqn]{report}         % for pdf output
 
-%\usepackage[pdftex]{hyperref}
-\usepackage{graphics}
+% To allow automatic selection of the right graphics type ...
+% preset \pdfoutput for older latex installation, it is allways definted for
+% news ones
+\ifx\pdfoutput\undefined
+\gdef\pdfoutput{0}
+\fi
+
+\newif\ifpdf
+\ifnum\pdfoutput=0
+% latex is called for dvi output
+   \pdffalse
+   \usepackage{graphicx}
+\else
+% pdflatex is called for pdf output
+   \pdftrue
+   \usepackage[pdftex]{graphicx}
+   \usepackage[pdftex]{hyperref}
+\fi
 
 \usepackage{textcomp}
 
@@ -44,6 +60,7 @@
 \usepackage{array,colortbl}    % color table
 
 \usepackage{listings}
+\usepackage{longtable}
 \usepackage{color}
 \definecolor{zebg}{rgb}{1,1,.8} %elfenbeinfarbig 
 
@@ -67,15 +84,6 @@
 %thumbpdf cdo
 %pdflatex cdo
 
-% To allow automatic selection of the right graphics type ...
-
-\newif\ifpdf
-\ifx\pdfoutput\undefined
-   \pdffalse                    % LaTeX
-\else
-   \pdfoutput=1                 % PDFLaTeX
-   \pdftrue
-\fi
 
 \usepackage{thumbpdf}
 
@@ -181,14 +189,15 @@
 
 \input{appendix}
 
-%\input{catalog}
 
 \clearpage
 \ifpdf
 \phantomsection
-\fi
 \addcontentsline{toc}{chapter}{\indexname}
-
 \printindex
+\else
+\input{catalog}
+\input{alphabetic_list}
+\fi
 
 \end{document}

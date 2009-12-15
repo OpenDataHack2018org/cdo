@@ -17,15 +17,15 @@ libraries should be installed:
 \item Unidata \href{http://www.unidata.ucar.edu/packages/netcdf}{netCDF} library
       ({\tt http://www.unidata.ucar.edu/packages/netcdf})
       version 3 or higher. \\
-      This is needed to process \htmlref{netCDF}{netCDF} files with {\CDO}. 
+      This is needed to process netCDF \cite{netCDF} files with {\CDO}. 
 \item HDF5 \href{http://www.hdfgroup.org/doc_resource/SZIP}{szip} library
       ({\tt http://www.hdfgroup.org/doc\_resource/SZIP})
       version 2.1 or higher. \\
-      This is needed to process szip compressed \htmlref{GRIB}{GRIB} files with {\CDO}. 
+      This is needed to process szip compressed GRIB \cite{GRIB} files with {\CDO}. 
 \item \href{http://www.hdfgroup.org/HDF5}{HDF5} library
       ({\tt http://www.hdfgroup.org/HDF5})
       version 1.6 or higher. \\
-      This is needed to import \htmlref{CM-SAF}{CM-SAF} HDF5 files with the {\CDO}
+      This is needed to import  CM-SAF \cite{CM-SAF} HDF5 files with the {\CDO}
       operator {\bf import\_cmsaf}. 
 \item \href{http://trac.osgeo.org/proj}{PROJ.4} library
       ({\tt http://trac.osgeo.org/proj})
@@ -61,7 +61,7 @@ Compilation is done by performing the following steps:
     ./configure
 \end{verbatim}
 
-Or with \htmlref{netCDF}{netCDF} support:
+Or with netCDF \cite{netCDF} support:
  
 \begin{verbatim}
     ./configure --with-netcdf=<netCDF root directory>
@@ -78,7 +78,7 @@ build with HDF5 support:
 
 You have to specify also the location of the SZLIB if HDF5 was build with SZLIB support.\\
 
-To enable \htmlref{szip}{szip} support add:
+To enable szip \cite{szip} support add:
  
 \begin{verbatim}
     --with-szlib=<SZLIB root directory>

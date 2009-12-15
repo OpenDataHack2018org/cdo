@@ -8,6 +8,8 @@ $moddir     = "mod";
 $modules    = "Modules";
 $help       = "operator_help.h";
 $catalog    = "catalog.tex";
+$abclist    = "alphabetic_list.tex";
+@oplist     = ();
 $refover    = "cdo_ref_over.tex";
 #$reference  = "xxx.tex";
 $refcard    = "cdo_refcard.tex";
@@ -17,6 +19,7 @@ open(README,   ">OPERATORS");
 open(CDOHTML,   ">cdo_oper.html");
 open(HELPFILE, ">$help");
 open(TCFILE,   ">$catalog");
+open(ABCLIST,  ">$abclist");
 open(TROVER,   ">$refover");
 #open(TRFILE,   ">$reference");
 open(TRCARD,   ">$refcard");
@@ -49,6 +52,11 @@ print CDOHTML "<H2 align=\"center\">CDO  -  Climate Data Operators</H2>\n";
 print TCFILE "\\chapter*{\\label{opercat}Operator catalog}\n";
 print TCFILE "\\addcontentsline{toc}{chapter}{Operator catalog}\n";
 print TCFILE "\n";
+print ABCLIST "\\chapter*{\\label{operlist}Alphabetic List of Operators}\n";
+print ABCLIST "\\addcontentsline{toc}{chapter}{Operator list}\n";
+print ABCLIST "\n";
+print ABCLIST "\\noindent\n";
+print ABCLIST "\\begin{longtable}{ll}\n";
 #
 if ( $threecols == 1 ) {
   print TRCARD "\\documentclass[landscape,a4paper]{article}\n";
@@ -606,6 +614,7 @@ while (<MOFILE>) {
  	print TCFILE "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
  	print TCFILE "& $otitle ";
  	print TCFILE "\\\\ \n";
+        push @oplist, "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} & $otitle \\\\ \n";
 
 	$otitlem = $otitle;
 	$otitlem =~ s/</\$<\$/og;
@@ -966,9 +975,17 @@ print TRCARD "\\end{document}\n";
 #print TCFILE "\\end{tabular*}\n";
 #print TCFILE "\n";
 #
+
+foreach my $line (sort(@oplist)){
+  print ABCLIST $line;
+}
+print ABCLIST "\\end{longtable}\n";
+print ABCLIST "\n";
+
 close(HELPFILE);
 close(TRFILE);
 close(TCFILE);
+close(ABCLIST);
 close(TROVER);
 close(TRCARD);
 close(MOFILE);
