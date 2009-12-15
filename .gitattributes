@@ -47,6 +47,7 @@ doc/tex/install.tex -text
 doc/tex/logo/cdo_logo.eps -text
 doc/tex/logo/cdo_logo.pdf -text
 doc/tex/makedoc -text
+doc/tex/makehtml -text
 doc/tex/makepdf -text
 doc/tex/makerefcard -text
 doc/tex/missval.tex -text

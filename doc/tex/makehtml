@@ -1,0 +1,3 @@
+#!/bin/sh
+if [ ! -d ../html ];then mkdir ../html ;fi
+htlatex cdo.tex "html" "" -d../html/
