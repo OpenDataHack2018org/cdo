@@ -67,9 +67,8 @@
 #include "remap.h"
 
 
-/*#define STORE_LINK_CNSRV_FAST 1 *//* test optimized version of store_link_cnsrv */
+/* used for store_link_fast */
 
-#if defined (STORE_LINK_CNSRV_FAST)
 #define BLK_SIZE 4096
 #define BLK_NUM(x) (x/grid_store->blk_size)
 #define BLK_IDX(x) (x%grid_store->blk_size)
@@ -90,7 +89,7 @@ typedef struct
   int *nlayers;
   grid_layer_t **layers;
 } grid_store_t;
-#endif
+
 
 /* constants */
 
@@ -623,6 +622,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   int gridID2_gme = -1;
   double dlat, dlon;                /* lat/lon intervals for search bins  */
 
+  rg->fast = FALSE;
 
   if ( lextrapolate > 0 )
     rg->lextrapolate = TRUE;
@@ -3979,7 +3979,6 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
 }  /* line_integral */
 
 
-#if defined(STORE_LINK_CNSRV_FAST)
 static
 void grid_store_init(grid_store_t *grid_store, long gridsize)
 {
@@ -4109,7 +4108,6 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
 
 }  /* store_link_cnsrv_fast */
 
-#else
 
 /*
     This routine stores the address and weight for this link in
@@ -4220,7 +4218,6 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict w
   link_add2[1][add2] = (int)nlink;
 
 }  /* store_link_cnsrv */
-#endif
 
 
 /*
@@ -4239,6 +4236,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   /* local variables */
 
   int lcheck = TRUE;
+  int store_link_fast = FALSE;
 
   long ioffset;
   long grid1_addm4, grid2_addm4;
@@ -4285,10 +4283,8 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   double *srch_corner_lat;  /* lat of each corner of srch cells */
   double *srch_corner_lon;  /* lon of each corner of srch cells */
 
-#ifndef STORE_LINK_CNSRV_FAST
   int *link_add1[2];        /* min,max link add to restrict search */
   int *link_add2[2];        /* min,max link add to restrict search */
-#endif
 
   /* Intersection */
   int last_loc = -1;        /* save location when crossing threshold  */
@@ -4303,13 +4299,15 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   int avoid_pole_count = 0;         /* count attempts to avoid pole  */
   double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
   restr_t  bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
+  grid_store_t *grid_store = NULL;
 
-#ifdef STORE_LINK_CNSRV_FAST
-  grid_store_t *grid_store;
+  store_link_fast = rg->fast;
 
-  grid_store = (grid_store_t *) malloc(sizeof(grid_store_t));
-  grid_store_init(grid_store, rg->grid2_size);
-#endif
+  if ( store_link_fast )
+    {
+      grid_store = (grid_store_t *) malloc(sizeof(grid_store_t));
+      grid_store_init(grid_store, rg->grid2_size);
+    }
 
   if ( cdoVerbose )
     {
@@ -4325,30 +4323,31 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   grid1_corners = rg->grid1_corners;
   grid2_corners = rg->grid2_corners;
 
-#ifndef STORE_LINK_CNSRV_FAST
-  link_add1[0] = (int *) malloc(grid1_size*sizeof(int));
-  link_add1[1] = (int *) malloc(grid1_size*sizeof(int));
-  link_add2[0] = (int *) malloc(grid2_size*sizeof(int));
-  link_add2[1] = (int *) malloc(grid2_size*sizeof(int));
+  if ( ! store_link_fast )
+    {
+      link_add1[0] = (int *) malloc(grid1_size*sizeof(int));
+      link_add1[1] = (int *) malloc(grid1_size*sizeof(int));
+      link_add2[0] = (int *) malloc(grid2_size*sizeof(int));
+      link_add2[1] = (int *) malloc(grid2_size*sizeof(int));
 
 #if defined (SX)
 #pragma vdir nodep
 #endif
-  for ( n = 0; n < grid1_size; n++ )
-    {
-      link_add1[0][n] = -1;
-      link_add1[1][n] = -1;
-    }
+      for ( n = 0; n < grid1_size; n++ )
+	{
+	  link_add1[0][n] = -1;
+	  link_add1[1][n] = -1;
+	}
 
 #if defined (SX)
 #pragma vdir nodep
 #endif
-  for ( n = 0; n < grid2_size; n++ )
-    {
-      link_add2[0][n] = -1;
-      link_add2[1][n] = -1;
+      for ( n = 0; n < grid2_size; n++ )
+	{
+	  link_add2[0][n] = -1;
+	  link_add2[1][n] = -1;
+	}
     }
-#endif
 
   /* Initialize centroid arrays */
 
@@ -4594,11 +4593,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp critical
 #endif
 			{
-#if defined (STORE_LINK_CNSRV_FAST)
-			  store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
-#else
-			  store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
-#endif
+			  if ( store_link_fast )
+			    store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
+			  else
+			    store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
 			  rg->grid2_frac[grid2_add] += weights[rv->num_wts];
 			}
@@ -4868,11 +4866,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp critical
 #endif
 			{
-#if defined (STORE_LINK_CNSRV_FAST)
-			  store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
-#else
-			  store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
-#endif
+			  if ( store_link_fast )
+			    store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
+			  else
+			    store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
 			  rg->grid1_frac[grid1_add] += weights[0];
 			}
@@ -4968,11 +4965,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( grid1_add != -1 && grid2_add != -1 )
     {
-#if defined (STORE_LINK_CNSRV_FAST)
-      store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
-#else
-      store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
-#endif
+      if ( store_link_fast )
+	store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
+      else
+	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
       rg->grid1_frac[grid1_add] += weights[0];
       rg->grid2_frac[grid2_add] += weights[rv->num_wts  ];
@@ -5024,55 +5020,54 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( grid1_add != -1 && grid2_add != -1 )
     {
-#if defined (STORE_LINK_CNSRV_FAST)
-      store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
-#else
-      store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
-#endif
+      if ( store_link_fast )
+	store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
+      else
+	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
       rg->grid1_frac[grid1_add] += weights[0];
       rg->grid2_frac[grid2_add] += weights[rv->num_wts];
     }
 
-#if defined (STORE_LINK_CNSRV_FAST)
-  {
-    grid_layer_t *grid_layer, *grid_layer_f;
-    long ilayer;
-    long i, j;
-    long iblk;
+  if ( store_link_fast )
+    {
+      grid_layer_t *grid_layer, *grid_layer_f;
+      long ilayer;
+      long i, j;
+      long iblk;
 
-    for ( iblk = 0; iblk < grid_store->nblocks; ++iblk )
-      {
-	j = 0;
-	grid_layer = grid_store->layers[iblk];
-	for ( ilayer = 0; ilayer < grid_store->nlayers[iblk]; ++ilayer )
-	  {
-	    if ( cdoVerbose )
-	      {
-		for ( i = 0; i < grid_store->blksize[iblk]; ++i )
-		  if ( grid_layer->grid2_link[i] != -1 ) j++;
-	      }
+      for ( iblk = 0; iblk < grid_store->nblocks; ++iblk )
+	{
+	  j = 0;
+	  grid_layer = grid_store->layers[iblk];
+	  for ( ilayer = 0; ilayer < grid_store->nlayers[iblk]; ++ilayer )
+	    {
+	      if ( cdoVerbose )
+		{
+		  for ( i = 0; i < grid_store->blksize[iblk]; ++i )
+		    if ( grid_layer->grid2_link[i] != -1 ) j++;
+		}
+	      
+	      grid_layer_f = grid_layer;
+	      free(grid_layer->grid2_link);
+	      grid_layer = grid_layer->next;
+	      free(grid_layer_f);
+	    }
 
-	    grid_layer_f = grid_layer;
-	    free(grid_layer->grid2_link);
-	    grid_layer = grid_layer->next;
-	    free(grid_layer_f);
-	  }
+	  if ( cdoVerbose )
+	    {
+	      fprintf(stderr, "block = %ld nlayers = %d  allocated = %d  used = %ld\n",
+		      iblk+1, grid_store->nlayers[iblk], 
+		      grid_store->nlayers[iblk]*grid_store->blksize[iblk], j);
+	    }
+	}
 
-	if ( cdoVerbose )
-	  {
-	    fprintf(stderr, "block = %d nlayers = %d  allocated = %d  used = %d\n",
-		    iblk+1, grid_store->nlayers[iblk], 
-		    grid_store->nlayers[iblk]*grid_store->blksize[iblk], j);
-	  }
-      }
+      free(grid_store->blksize);
+      free(grid_store->layers);
+      free(grid_store->nlayers);
+      free(grid_store);
+    }
 
-    free(grid_store->blksize);
-    free(grid_store->layers);
-    free(grid_store->nlayers);
-    free(grid_store);
-  }
-#endif
 
   /* Finish centroid computation */
 
@@ -5250,12 +5245,13 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   free(grid2_centroid_lat);
   free(grid2_centroid_lon);
 
-#ifndef STORE_LINK_CNSRV_FAST
-  free(link_add1[0]);
-  free(link_add1[1]);
-  free(link_add2[0]);
-  free(link_add2[1]);
-#endif
+  if ( ! store_link_fast )
+    {
+      free(link_add1[0]);
+      free(link_add1[1]);
+      free(link_add2[0]);
+      free(link_add2[1]);
+    }
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 

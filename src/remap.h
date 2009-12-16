@@ -43,6 +43,7 @@ typedef struct {
   int      pinit;            /* TRUE if the pointers are initialized     */
   int      gridID1;
   int      gridID2;
+  int      fast;
   int      lextrapolate;
   int      non_global;
   int      grid1_is_cyclic, grid2_is_cyclic;
