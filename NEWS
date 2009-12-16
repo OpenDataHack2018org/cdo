@@ -4,7 +4,8 @@ CDO NEWS
 Version 1.4.1 (15 December 2009):
 
    * New features:
-      o using CDI library version 1.4.1 (improved GRIB and netCDF support)
+      o using CDI library version 1.4.1
+        improved GRIB and netCDF support and performance
    * New operators:
       o splittabnum - Split parameter table numbers
       o sethalo - Set the left and right bounds of a field

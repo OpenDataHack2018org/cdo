@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(cdo, 1.4.1beta8, Uwe.Schulzweida@zmaw.de)
+AC_INIT(cdo, 1.4.1, Uwe.Schulzweida@zmaw.de)
 
 CONFIG_ABORT=yes
 
