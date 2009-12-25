@@ -622,7 +622,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   int gridID2_gme = -1;
   double dlat, dlon;                /* lat/lon intervals for search bins  */
 
-  rg->fast = FALSE;
+  rg->store_link_fast = FALSE;
 
   if ( lextrapolate > 0 )
     rg->lextrapolate = TRUE;
@@ -3984,14 +3984,20 @@ void grid_store_init(grid_store_t *grid_store, long gridsize)
 {
   const char func[] = "grid_store_init";
   long iblk;
+  long blksize[] = {128, 256, 512, 1024, 2048, 4096, 8192};
+  long nblks = sizeof(blksize)/sizeof(long);
 
-  grid_store->blk_size = BLK_SIZE;
-  /* grid_store->blk_size = gridsize; */
+  for ( iblk = nblks-1; iblk >= 0; --iblk )
+    if ( gridsize/blksize[iblk] > 99 ) break;
+
+  if ( iblk < 0 ) iblk = 0;
+
+  /* grid_store->blk_size = BLK_SIZE; */
+  grid_store->blk_size = blksize[iblk];
   grid_store->max_size = gridsize;
 
   grid_store->nblocks = grid_store->max_size/grid_store->blk_size;
-  if ( grid_store->max_size%grid_store->blk_size > 0 )
-    grid_store->nblocks++;
+  if ( grid_store->max_size%grid_store->blk_size > 0 ) grid_store->nblocks++;
 
   if ( cdoVerbose )
     fprintf(stdout, "blksize = %d  lastblksize = %d  max_size = %d  nblocks = %d\n", 
@@ -4013,9 +4019,8 @@ void grid_store_init(grid_store_t *grid_store, long gridsize)
 }
 
 /*
-    This routine stores the address and weight for this link in
-    the appropriate address and weight arrays and resizes those
-    arrays if necessary.
+    This routine stores the address and weight for this link in the appropriate 
+    address and weight arrays and resizes those arrays if necessary.
 */
 static
 void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weights, grid_store_t *grid_store)
@@ -4110,9 +4115,8 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
 
 
 /*
-    This routine stores the address and weight for this link in
-    the appropriate address and weight arrays and resizes those
-    arrays if necessary.
+    This routine stores the address and weight for this link in the appropriate 
+    address and weight arrays and resizes those arrays if necessary.
 */
 static
 void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict weights,
@@ -4236,7 +4240,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   /* local variables */
 
   int lcheck = TRUE;
-  int store_link_fast = FALSE;
 
   long ioffset;
   long grid1_addm4, grid2_addm4;
@@ -4301,9 +4304,8 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   restr_t  bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
   grid_store_t *grid_store = NULL;
 
-  store_link_fast = rg->fast;
 
-  if ( store_link_fast )
+  if ( rg->store_link_fast )
     {
       grid_store = (grid_store_t *) malloc(sizeof(grid_store_t));
       grid_store_init(grid_store, rg->grid2_size);
@@ -4323,7 +4325,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   grid1_corners = rg->grid1_corners;
   grid2_corners = rg->grid2_corners;
 
-  if ( ! store_link_fast )
+  if ( ! rg->store_link_fast )
     {
       link_add1[0] = (int *) malloc(grid1_size*sizeof(int));
       link_add1[1] = (int *) malloc(grid1_size*sizeof(int));
@@ -4393,7 +4395,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(grid1_centroid_lon, grid1_centroid_lat, \
-         link_add1, link_add2, \
+         grid_store, link_add1, link_add2,	 \
          rv, cdoVerbose, max_subseg, \
 	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
   private(ompthID, lmask, srch_add, min_add, max_add, n, n2, k, num_srch_cells, max_srch_cells, \
@@ -4593,7 +4595,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp critical
 #endif
 			{
-			  if ( store_link_fast )
+			  if ( rg->store_link_fast )
 			    store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
 			  else
 			    store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
@@ -4664,7 +4666,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(grid2_centroid_lon, grid2_centroid_lat, \
-         link_add1, link_add2, \
+         grid_store, link_add1, link_add2, \
          rv, cdoVerbose, max_subseg, \
 	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
   private(ompthID, lmask, srch_add, min_add, max_add, n, n2, k, num_srch_cells, max_srch_cells, grid1_addm4, grid2_addm4, \
@@ -4866,7 +4868,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp critical
 #endif
 			{
-			  if ( store_link_fast )
+			  if ( rg->store_link_fast )
 			    store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
 			  else
 			    store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
@@ -4965,7 +4967,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( grid1_add != -1 && grid2_add != -1 )
     {
-      if ( store_link_fast )
+      if ( rg->store_link_fast )
 	store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
       else
 	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
@@ -5020,7 +5022,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( grid1_add != -1 && grid2_add != -1 )
     {
-      if ( store_link_fast )
+      if ( rg->store_link_fast )
 	store_link_cnsrv_fast(rv, grid1_add, grid2_add, weights, grid_store);
       else
 	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
@@ -5029,7 +5031,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       rg->grid2_frac[grid2_add] += weights[rv->num_wts];
     }
 
-  if ( store_link_fast )
+  if ( rg->store_link_fast )
     {
       grid_layer_t *grid_layer, *grid_layer_f;
       long ilayer;
@@ -5245,7 +5247,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   free(grid2_centroid_lat);
   free(grid2_centroid_lon);
 
-  if ( ! store_link_fast )
+  if ( ! rg->store_link_fast )
     {
       free(link_add1[0]);
       free(link_add1[1]);

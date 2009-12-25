@@ -74,7 +74,7 @@ void *Remap(void *argument)
   int remap_test = 0;
   int remap_order = 1;
   int need_gradiants = FALSE;
-  int remap_fast = FALSE;
+  int remap_store_link_fast = TRUE;
   int remap_non_global = FALSE;
   int remap_extrapolate = FALSE;
   int lextrapolate = FALSE;
@@ -219,16 +219,16 @@ void *Remap(void *argument)
 	}
     }
 
-  envstr = getenv("REMAP_FAST");
+  envstr = getenv("REMAP_STORE_LINK_FAST");
   if ( envstr )
     {
       int ival;
       ival = atoi(envstr);
       if ( ival > 0 )
 	{
-	  remap_fast = ival;
+	  remap_store_link_fast = ival;
 	  if ( cdoVerbose )
-	    cdoPrint("Set REMAP_FAST to %d", remap_fast);
+	    cdoPrint("Set REMAP_STORE_LINK_FAST to %d", remap_store_link_fast);
 	}
     }
 
@@ -705,7 +705,7 @@ void *Remap(void *argument)
 		  
 		  /* initialize grid information for both grids */
 		  remapGridInit(map_type, remap_extrapolate, gridID1, gridID2, &remaps[r].grid);
-		  remaps[r].grid.fast = remap_fast;
+		  remaps[r].grid.store_link_fast = remap_store_link_fast;
 		}
 
 	      remaps[r].gridID = gridID1;

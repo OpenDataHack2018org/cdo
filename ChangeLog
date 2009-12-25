@@ -1,3 +1,7 @@
+2009-12-23  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remapcon, remaplaf: speed up by fast store of links
+
 2009-12-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Version 1.4.1 released
