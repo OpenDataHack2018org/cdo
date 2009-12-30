@@ -16,6 +16,10 @@ extern "C" {
 #define  CDI_BIGENDIAN            0   /* Byte order BIGENDIAN     */
 #define  CDI_LITTLEENDIAN         1   /* Byte order LITTLEENDIAN  */
 
+#define  CDI_REAL                 1   /* Real numbers             */
+#define  CDI_COMP                 2   /* Complex numbers          */
+#define  CDI_BOTH                 3   /* Both numbers             */
+
 /* Error identifier */
 
 #define	 CDI_NOERR        	  0   /* No Error                             */
@@ -297,6 +301,9 @@ void    vlistMerge(int vlistID2, int vlistID1);
 
 void    vlistPrint(int vlistID);
 
+/*      vlistNumber: Number type in a variable list */
+int     vlistNumber(int vlistID);
+
 /*      vlistNvars: Number of variables in a variable list */
 int     vlistNvars(int vlistID);
 
@@ -368,6 +375,12 @@ void    vlistDefVarDatatype(int vlistID, int varID, int datatype);
 
 /*      vlistInqVarDatatype: Get the data type of a Variable */
 int     vlistInqVarDatatype(int vlistID, int varID);
+
+/*      vlistDefVarNumber: Define the number type of a Variable */
+void    vlistDefVarNumber(int vlistID, int varID, int number);
+
+/*      vlistInqVarNumber: Get the number type of a Variable */
+int     vlistInqVarNumber(int vlistID, int varID);
 
 void    vlistDefVarInstitut(int vlistID, int varID, int instID);
 int     vlistInqVarInstitut(int vlistID, int varID);

@@ -897,6 +897,12 @@ int pstreamInqVlist(int pstreamID)
 
   pstreamptr->vlistID = vlistID;
 
+  if ( vlistNumber(vlistID) == CDI_COMP && cdoStreamNumber() == CDI_REAL )
+    cdoAbort("Complex fields are not supported by this operator!");
+
+  if ( vlistNumber(vlistID) == CDI_REAL && cdoStreamNumber() == CDI_COMP )
+    cdoAbort("This operator needs complex fields!");
+
   processDefVarNum(vlistNvars(vlistID), pstreamID);
 
   return (vlistID);

@@ -235,14 +235,16 @@ void *Info(void *argument)
   int streamID = 0;
   int vlistID;
   int nmiss;
-  int ivals = 0, imiss = 0;
+  int number;
+  int ivals = 0, nvals = 0;
+  int imiss = 0;
   char varname[128];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
   double missval;
   double *array = NULL;
   double level;
-  double arrmin, arrmax, arrmean, arrvar;
+  double arrmin = 0, arrmax = 0, arrmean = 0, arrvar = 0;
 
   cdoInitialize(argument);
 
@@ -264,6 +266,7 @@ void *Info(void *argument)
 
       gridsize = vlistGridsizeMax(vlistID);
 
+      if ( vlistNumber(vlistID) != CDI_REAL ) gridsize *= 2;
       array = (double *) malloc(gridsize*sizeof(double));
 
       indg = 0;
@@ -302,6 +305,7 @@ void *Info(void *argument)
 	      gridID   = vlistInqVarGrid(vlistID, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
 	      missval  = vlistInqVarMissval(vlistID, varID);
+	      number   = vlistInqVarNumber(vlistID, varID);
 	      gridsize = gridInqSize(gridID);
 
 	      if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
@@ -322,63 +326,92 @@ void *Info(void *argument)
 	      fprintf(stdout, "%7d %7d :", gridsize, nmiss);
 
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
-		   (gridsize == 1 && nmiss == 0) )
+		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
 		{
 		  fprintf(stdout, "            %#12.5g\n", array[0]);
 		}
 	      else
 		{
-		  if ( nmiss > 0 )
+		  if ( number == CDI_REAL )
 		    {
-		      ivals = 0;
-		      arrmean = 0;
-		      arrvar  = 0;
-		      arrmin  =  1e50;
-		      arrmax  = -1e50;
-		      for ( i = 0; i < gridsize; i++ )
+		      if ( nmiss > 0 )
 			{
-			  if ( !DBL_IS_EQUAL(array[i], missval) )
+			  ivals   = 0;
+			  arrmean = 0;
+			  arrvar  = 0;
+			  arrmin  =  1e50;
+			  arrmax  = -1e50;
+			  for ( i = 0; i < gridsize; i++ )
 			    {
+			      if ( !DBL_IS_EQUAL(array[i], missval) )
+				{
+				  if ( array[i] < arrmin ) arrmin = array[i];
+				  if ( array[i] > arrmax ) arrmax = array[i];
+				  arrmean += array[i];
+				  arrvar  += array[i]*array[i];
+				  ivals++;
+				}
+			    }
+			  imiss = gridsize - ivals;
+			  nvals = ivals;
+			}
+		      else
+			{
+			  arrmean = array[0];
+			  arrvar  = array[0];
+			  arrmin  = array[0];
+			  arrmax  = array[0];
+			  /*
+#pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize)	\
+                                       reduction(+:arrmean, arrvar)
+			  */
+			  for ( i = 1; i < gridsize; i++ )
+			    {
+			      /* #pragma omp critical */
 			      if ( array[i] < arrmin ) arrmin = array[i];
+			      /* #pragma omp critical */
 			      if ( array[i] > arrmax ) arrmax = array[i];
 			      arrmean += array[i];
 			      arrvar  += array[i]*array[i];
-			      ivals++;
+			    }
+			  nvals = gridsize;
+			}
+
+		      if ( nvals )
+			{
+			  arrmean = arrmean/nvals;
+			  arrvar  = arrvar/nvals - arrmean*arrmean;
+			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean, arrmax);
+			}
+		      else
+			{
+			  fprintf(stdout, "                     nan\n");
+			}
+		    }
+		  else
+		    {
+		      int nvals_r = 0, nvals_i = 0;
+		      double arrsum_r, arrsum_i, arrmean_r = 0, arrmean_i = 0;
+		      arrsum_r = 0;
+		      arrsum_i = 0;
+		      
+		      for ( i = 0; i < gridsize; i++ )
+			{
+			  if ( !DBL_IS_EQUAL(array[i*2], missval) )
+			    {
+			      arrsum_r += array[i*2];
+			      nvals_r++;
+			    }
+			  if ( !DBL_IS_EQUAL(array[i*2+1], missval) )
+			    {
+			      arrsum_i += array[i*2+1];
+			      nvals_i++;
 			    }
 			}
-		      imiss = gridsize - ivals;
-		      gridsize = ivals;
-		    }
-		  else
-		    {
-		      arrmean = array[0];
-		      arrvar  = array[0];
-		      arrmin  = array[0];
-		      arrmax  = array[0];
-		      /*
-#pragma omp parallel for default(none) shared(arrmin, arrmax, array, gridsize)	\
-                                       reduction(+:arrmean, arrvar)
-		      */
-		      for ( i = 1; i < gridsize; i++ )
-			{
-			  /* #pragma omp critical */
-			  if ( array[i] < arrmin ) arrmin = array[i];
-			  /* #pragma omp critical */
-			  if ( array[i] > arrmax ) arrmax = array[i];
-			  arrmean += array[i];
-			  arrvar  += array[i]*array[i];
-			}
-		    }
 
-		  if ( gridsize )
-		    {
-		      arrmean = arrmean/gridsize;
-		      arrvar  = arrvar/gridsize - arrmean*arrmean;
-		      fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean, arrmax);
-		    }
-		  else
-		    {
-		      fprintf(stdout, "                     nan\n");
+		      if ( nvals_r > 0 ) arrmean_r = arrsum_r / nvals_r;
+		      if ( nvals_i > 0 ) arrmean_i = arrsum_i / nvals_i;
+		      fprintf(stdout, "  -  (%#12.5g,%#12.5g)  -\n", arrmean_r, arrmean_i);
 		    }
 
 		  if ( imiss != nmiss && nmiss > 0 )

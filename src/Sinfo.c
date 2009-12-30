@@ -57,7 +57,7 @@ void *Sinfo(void *argument)
   char *modelptr, *instptr;
   int streamID = 0;
   int vlistID;
-  int prec;
+  int prec, number;
   char pstr[4];
 
   cdoInitialize(argument);
@@ -134,17 +134,27 @@ void *Sinfo(void *argument)
 	    fprintf(stdout, "var ");
 
 	  prec = vlistInqVarDatatype(vlistID, varID);
-	  if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");
-	  else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
-	  else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
-	  else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
-	  else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
-	  else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
-	  else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");
-	  else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
-	  else if ( prec == DATATYPE_UINT16 ) strcpy(pstr, "U16");
-	  else if ( prec == DATATYPE_UINT32 ) strcpy(pstr, "U32");
-	  else                                strcpy(pstr, "-1");
+	  number = vlistInqVarNumber(vlistID, varID);
+	  if ( number == CDI_REAL )
+	    {
+	      if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");
+	      else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
+	      else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
+	      else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
+	      else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
+	      else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
+	      else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");
+	      else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
+	      else if ( prec == DATATYPE_UINT16 ) strcpy(pstr, "U16");
+	      else if ( prec == DATATYPE_UINT32 ) strcpy(pstr, "U32");
+	      else                                strcpy(pstr, "-1");
+	    }
+	  else
+	    {
+	      if      ( prec == DATATYPE_FLT32  ) strcpy(pstr, "C32");
+	      else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "C64");
+	      else                                strcpy(pstr, "-2");
+	    }
 
 	  fprintf(stdout, " %-3s", pstr);
 

@@ -42,44 +42,44 @@
 
 
 typedef struct {
-  int func;
-  int intval;
+  int         func;
+  int         intval;
   const char *name;
   const char *enter;
 }
-OPERATOR;
+operator_t;
 
 typedef struct {
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_t threadID;
 #endif
-  int      nchild;
-  int      nstream;
-  int      streams[MAX_STREAM];
-  double   s_utime;
-  double   s_stime;
-  double   a_utime;
-  double   a_stime;
-  double   cputime;
+  short      nchild;
+  short      nstream;
+  short      streams[MAX_STREAM];
+  double     s_utime;
+  double     s_stime;
+  double     a_utime;
+  double     a_stime;
+  double     cputime;
 
-  off_t    nvals;
-  int      nvars;
-  int      ntimesteps;
-  int      streamCnt;
-  char   **streamNames;
-  char    *xoperator;
-  char    *operatorName;
-  char    *operatorArg;
-  int      oargc;
-  char    *oargv[MAX_ARGC];
-  char     prompt[64];
-  int      noper;
-  OPERATOR Operator[MAX_OPERATOR];
+  off_t      nvals;
+  short      nvars;
+  int        ntimesteps;
+  short      streamCnt;
+  char     **streamNames;
+  char      *xoperator;
+  char      *operatorName;
+  char      *operatorArg;
+  int        oargc;
+  char      *oargv[MAX_ARGC];
+  char       prompt[64];
+  short      noper;
+  operator_t operator[MAX_OPERATOR];
 }
-PROCESS;
+process_t;
 
 
-static PROCESS Process[MAX_PROCESS];
+static process_t Process[MAX_PROCESS];
 
 static int NumProcess = 0;
 
@@ -333,8 +333,8 @@ const char *processOperator(void)
   return (Process[processID].xoperator);
 }
 
-
-static char *getOperatorArg(const char *xoperator)
+static
+char *getOperatorArg(const char *xoperator)
 {
   static char func[] = "getOperatorArg";
   char *commapos;
@@ -359,11 +359,10 @@ static char *getOperatorArg(const char *xoperator)
   return (operatorArg);
 }
 
-
 static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams);
 
-
-static int getGlobArgc(int argc, char *argv[], int globArgc)
+static
+int getGlobArgc(int argc, char *argv[], int globArgc)
 {
   int streamInCnt;
   int streamOutCnt;
@@ -413,8 +412,8 @@ static int getGlobArgc(int argc, char *argv[], int globArgc)
   return (globArgc);
 }
 
-
-static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
+static
+int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 {
   while ( nstreams > 0 )
     {
@@ -436,8 +435,8 @@ static int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
   return (globArgc);
 }
 
-
-static int getStreamCnt(int argc, char *argv[])
+static
+int getStreamCnt(int argc, char *argv[])
 {
   int streamCnt = 0;
   int globArgc = 1;
@@ -457,8 +456,8 @@ static int getStreamCnt(int argc, char *argv[])
   return (streamCnt);
 }
 
-
-static void setStreamNames(int argc, char *argv[])
+static
+void setStreamNames(int argc, char *argv[])
 {
   static char func[] = "setStreamNames";
   int processID = processSelf();
@@ -494,8 +493,8 @@ static void setStreamNames(int argc, char *argv[])
     }
 }
 
-
-static void checkStreamCnt(void)
+static
+void checkStreamCnt(void)
 {
   int processID = processSelf();
   int streamInCnt, streamOutCnt;
@@ -546,7 +545,8 @@ static void checkStreamCnt(void)
 
 #define  MAX_ARGV  8192
 
-static void setStreams(const char *argument)
+static
+void setStreams(const char *argument)
 {
   static char func[] = "setStreams";
   int processID = processSelf();
@@ -780,10 +780,10 @@ int cdoOperatorAdd(const char *name, int func, int intval, const char *enter)
 
   if ( operID < MAX_OPERATOR )
     {
-      Process[processID].Operator[operID].func   = func;
-      Process[processID].Operator[operID].intval = intval;
-      Process[processID].Operator[operID].name   = name;
-      Process[processID].Operator[operID].enter  = enter;
+      Process[processID].operator[operID].func   = func;
+      Process[processID].operator[operID].intval = intval;
+      Process[processID].operator[operID].name   = name;
+      Process[processID].operator[operID].enter  = enter;
 
       Process[processID].noper++;
     }
@@ -804,8 +804,8 @@ int cdoOperatorID(void)
   if ( Process[processID].noper > 0 )
     {
       for ( operID = 0; operID < Process[processID].noper; operID++ )
-	if ( Process[processID].Operator[operID].name )
-	  if ( strcmp(Process[processID].operatorName, Process[processID].Operator[operID].name) == 0 ) break;
+	if ( Process[processID].operator[operID].name )
+	  if ( strcmp(Process[processID].operatorName, Process[processID].operator[operID].name) == 0 ) break;
 
       if ( operID == Process[processID].noper )
 	cdoAbort("Operator not callable by this name!");
@@ -823,7 +823,7 @@ int cdoOperatorFunc(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].Operator[operID].func);
+  return (Process[processID].operator[operID].func);
 }
 
 
@@ -831,7 +831,7 @@ int cdoOperatorIntval(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].Operator[operID].intval);
+  return (Process[processID].operator[operID].intval);
 }
 
 
@@ -839,7 +839,7 @@ const char *cdoOperatorName(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].Operator[operID].name);
+  return (Process[processID].operator[operID].name);
 }
 
 
@@ -847,5 +847,13 @@ const char *cdoOperatorEnter(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].Operator[operID].enter);
+  return (Process[processID].operator[operID].enter);
+}
+
+
+int cdoStreamNumber()
+{
+  int processID = processSelf();
+
+  return (operatorStreamNumber(Process[processID].operatorName));
 }
