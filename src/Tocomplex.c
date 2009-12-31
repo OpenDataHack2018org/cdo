@@ -22,25 +22,26 @@
 #include "pstream.h"
 
 
-void *Del29feb(void *argument)
+void *Tocomplex(void *argument)
 {
-  const char func[] = "Del29feb";
+  const char func[] = "Tocomplex";
+  int RETOCOMPLEX, IMTOCOMPLEX;
+  int operatorID;
   int streamID1, streamID2;
   int tsID, tsID2, nrecs;
   int recID, varID, levelID;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
-  int vdate, vtime;
-  int copytimestep;
-  int lcopy = FALSE;
-  int gridsize;
-  int nmiss;
-  int year, month, day;
-  double *array = NULL;
+  int i, gridsize;
+  int nmiss, nvars;
+  double *array1 = NULL, *array2 = NULL;
 
   cdoInitialize(argument);
 
-  if ( UNCHANGED_RECORD ) lcopy = TRUE;
+  RETOCOMPLEX = cdoOperatorAdd("retocomplex", 0, 0, NULL);
+  IMTOCOMPLEX = cdoOperatorAdd("imtocomplex", 0, 0, NULL);
+
+  operatorID = cdoOperatorID();
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -48,9 +49,12 @@ void *Del29feb(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
 
+  nvars = vlistNvars(vlistID2);
+  for ( varID = 0; varID < nvars; ++varID )
+    vlistDefVarNumber(vlistID2, varID, CDI_COMP);
+
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
-  taxisDefCalendar(taxisID2, CALENDAR_365DAYS);
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
@@ -58,51 +62,45 @@ void *Del29feb(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  if ( ! lcopy )
-    {
-      gridsize = vlistGridsizeMax(vlistID1);
-      array = (double *) malloc(gridsize*sizeof(double));
-    }
+  gridsize = vlistGridsizeMax(vlistID1);
+  array1 = (double *) malloc(gridsize*sizeof(double));
+  array2 = (double *) malloc(2*gridsize*sizeof(double));
       
   tsID  = 0;
   tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
-      vdate = taxisInqVdate(taxisID1);
-      vtime = taxisInqVtime(taxisID1);
+      taxisCopyTimestep(taxisID2, taxisID1);
 
-      cdiDecodeDate(vdate, &year, &month, &day);
+      streamDefTimestep(streamID2, tsID2++);
 
-      if ( month == 2 && day == 29 )
+      for ( recID = 0; recID < nrecs; recID++ )
 	{
-	  copytimestep = FALSE;
-	  if ( cdoVerbose )
-	    cdoPrint("Delete %4.4d-%2.2d-%2.2d at timestep %d", year, month, day, tsID+1);
-	}
-      else
-	copytimestep = TRUE;
+	  streamInqRecord(streamID1, &varID, &levelID);
+	  streamDefRecord(streamID2, varID, levelID);
+	      
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
-      if ( copytimestep )
-	{
-	  taxisCopyTimestep(taxisID2, taxisID1);
+	  streamReadRecord(streamID1, array1, &nmiss);
 
-	  streamDefTimestep(streamID2, tsID2++);
-
-
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  if ( operatorID == RETOCOMPLEX )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
-	      streamDefRecord(streamID2, varID, levelID);
-	      if ( lcopy )
+	      for ( i = 0; i < gridsize; ++i )
 		{
-		  streamCopyRecord(streamID2, streamID1);
-		}
-	      else
-		{
-		  streamReadRecord(streamID1, array, &nmiss);
-		  streamWriteRecord(streamID2, array, nmiss);
+		  array2[2*i]   = array1[i];
+		  array2[2*i+1] = 0;
 		}
 	    }
+	  else if ( operatorID == IMTOCOMPLEX )
+	    {
+	      for ( i = 0; i < gridsize; ++i )
+		{
+		  array2[2*i]   = 0;
+		  array2[2*i+1] = array1[i];
+		}
+	    }
+
+	  streamWriteRecord(streamID2, array2, nmiss);
 	}
        
       tsID++;
@@ -111,8 +109,8 @@ void *Del29feb(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( ! lcopy )
-    if ( array ) free(array);
+  if ( array1 ) free(array1);
+  if ( array2 ) free(array2);
 
   vlistDestroy(vlistID2);
 

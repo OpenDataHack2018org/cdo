@@ -159,6 +159,7 @@ void *Timstat(void *argument);
 void *Timstat2(void *argument);
 void *Timstat3(void *argument);
 void *Tinfo(void *argument);
+void *Tocomplex(void *argument);
 void *Transpose(void *argument);
 void *Trend(void *argument);
 void *Trms(void *argument);
@@ -377,6 +378,7 @@ void *Wct(void *argument);
 #define  Timstat2Operators      {"timcor"}
 #define  Timstat3Operators      {"meandiff2test", "varquot2test"}
 #define  TinfoOperators         {"tinfo"}
+#define  TocomplexOperators     {"retocomplex", "imtocomplex"}
 #define  TransposeOperators     {"transxy"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
@@ -592,6 +594,7 @@ static modules_t Modules[] =
   { Timstat2,       NULL,              Timstat2Operators,      CDI_REAL,  2,  1 },
   { Timstat3,       NULL,              Timstat3Operators,      CDI_REAL,  2,  1 },
   { Tinfo,          NULL,              TinfoOperators,         CDI_REAL,  1,  0 },
+  { Tocomplex,      NULL,              TocomplexOperators,     CDI_REAL,  1,  1 },
   { Transpose,      NULL,              TransposeOperators,     CDI_REAL,  1,  1 },
   { Trend,          TrendHelp,         TrendOperators,         CDI_REAL,  1,  2 },
   { Trms,           NULL,              TrmsOperators,          CDI_REAL,  2,  1 },
