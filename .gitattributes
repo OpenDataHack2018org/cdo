@@ -402,7 +402,7 @@ src/field2.c -text
 src/fieldc.c -text
 src/fieldmer.c -text
 src/fieldzon.c -text
-src/fourier.c -text
+src/fouriertrans.c -text
 src/functs.h -text
 src/gradsdeslib.c -text
 src/gradsdeslib.h -text

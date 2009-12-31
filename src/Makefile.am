@@ -191,7 +191,7 @@ cdo_SOURCES = Arith.c		\
               userlog.c 	\
               util.c		\
               legendre.c 	\
-              fourier.c  	\
+              fouriertrans.c  	\
 	      specspace.c 	\
               readline.c  	\
               juldate.c  	\
