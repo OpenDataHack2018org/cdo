@@ -86,7 +86,7 @@ void fft_set(double *trigs, int *ifax, int n)
     }
 }
 
-
+static
 int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 	   int inc1, int inc2, int inc3, int inc4,
 	   int lot, int n, int ifac, int la)
@@ -1026,7 +1026,7 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
   return 0;
 }
 
-
+static
 int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 	   int inc1, int inc2, int inc3, int inc4,
 	   int lot, int n, int ifac, int la)
