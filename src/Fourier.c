@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -15,57 +15,25 @@
   GNU General Public License for more details.
 */
 
-/*
-   This module contains the following operators:
-
-      Detrend    detrend         Detrend
-*/
-
+#if defined (_OPENMP)
+#  include <omp.h>
+#endif
 
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "statistic.h"
 
 
 #define  NALLOC_INC  1024
 
 
-static
-void detrend(int nts, double missval1, double *array1, double *array2)
+void *Fourier(void *argument)
 {
-  int j;
-  int n;
-  double sumj, sumjj;
-  double sumx, sumjx;
-  double work1, work2;
-  double missval2 = missval1;
-
-  sumx = sumjx = 0;
-  sumj = sumjj = n = 0;
-  for ( j = 0; j < nts; j++ )
-    if ( !DBL_IS_EQUAL(array1[j], missval1) )
-      {
-	sumx  += array1[j];
-	sumjx += j * array1[j];
-	sumj  += j;
-	sumjj += j * j;
-	n++;
-      }
-
-  work1 = DIV(SUB(sumjx, DIV(MUL(sumx, sumj), n) ),
-	      SUB(sumjj, DIV(MUL(sumj, sumj), n)) );
-  work2 = SUB(DIV(sumx, n), MUL(work1, DIV(sumj, n)));
-
-  for ( j = 0; j < nts; j++ )
-    array2[j] = SUB(array1[j], ADD(work2, MUL(j, work1)));
-
-}
-
-
-void *Detrend(void *argument)
-{
-  static char func[] = "Detrend";
+  const char func[] = "Fourier";
+  int ompthID;
+  int bit, sign;
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
@@ -79,10 +47,21 @@ void *Detrend(void *argument)
   int nvars, nlevel;
   int *vdate = NULL, *vtime = NULL;
   double missval;
-  double *array1, *array2;
   FIELD ***vars = NULL;
+  typedef struct
+  {
+    double *real;
+    double *imag;
+    double *work_r;
+    double *work_i;
+  } memory_t;
+  memory_t *mem = NULL;
+
 
   cdoInitialize(argument);
+
+  operatorInputArg("the sign of the exponent (-1 for normal or 1 for reverse transformation)!");
+  sign = atoi(operatorArgv()[0]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -138,7 +117,7 @@ void *Detrend(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double *) malloc(2*gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -148,8 +127,19 @@ void *Detrend(void *argument)
 
   nts = tsID;
 
-  array1 = (double *) malloc(nts*sizeof(double));
-  array2 = (double *) malloc(nts*sizeof(double));
+  for ( bit = nts; !(bit & 1); bit >>= 1 );
+
+  mem = (memory_t *) malloc(ompNumThreads*sizeof(memory_t));
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      mem[i].real = (double *) malloc(nts*sizeof(double));
+      mem[i].imag = (double *) malloc(nts*sizeof(double));
+      if ( bit != 1 )
+	{
+	  mem[i].work_r = (double *) malloc(nts*sizeof(double));
+	  mem[i].work_i = (double *) malloc(nts*sizeof(double));
+	}
+    }
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -159,21 +149,47 @@ void *Detrend(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(i, ompthID, tsID)
+#endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
+#if defined (_OPENMP)
+              ompthID = omp_get_thread_num();
+#else
+              ompthID = 0;
+#endif
 	      for ( tsID = 0; tsID < nts; tsID++ )
-		array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+		{
+		  mem[ompthID].real[tsID] = vars[tsID][varID][levelID].ptr[2*i];
+		  mem[ompthID].imag[tsID] = vars[tsID][varID][levelID].ptr[2*i+1];
+		}
 
-	      detrend(nts, missval, array1, array2);
+	      if ( bit == 1 )	/* nts is a power of 2 */
+		fft(mem[ompthID].real, mem[ompthID].imag, nts, sign);
+	      else
+		ft_r(mem[ompthID].real, mem[ompthID].imag, nts, sign, mem[ompthID].work_r, mem[ompthID].work_i);
 
 	      for ( tsID = 0; tsID < nts; tsID++ )
-		vars[tsID][varID][levelID].ptr[i] = array2[tsID];
+		{
+		  vars[tsID][varID][levelID].ptr[2*i]   = mem[ompthID].real[tsID];
+		  vars[tsID][varID][levelID].ptr[2*i+1] = mem[ompthID].imag[tsID];
+		}
 	    }
 	}
     }
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      free(mem[i].real);
+      free(mem[i].imag);
+      if ( bit != 1 )
+	{
+	  free(mem[i].work_r);
+	  free(mem[i].work_i);
+	}
+    }
+  free(mem);
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
@@ -208,5 +224,5 @@ void *Detrend(void *argument)
 
   cdoFinish();
 
-  return (0);
+  return (NULL);
 }
