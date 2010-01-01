@@ -85,6 +85,8 @@ extern "C" {
 #define  DATATYPE_PACK30         30
 #define  DATATYPE_PACK31         31
 #define  DATATYPE_PACK32         32
+#define  DATATYPE_CPX32          64
+#define  DATATYPE_CPX64         128
 #define  DATATYPE_FLT32         132
 #define  DATATYPE_FLT64         164
 #define  DATATYPE_INT8          208
@@ -99,6 +101,7 @@ extern "C" {
 #define  DATATYPE_INT           251
 #define  DATATYPE_FLT           252
 #define  DATATYPE_TXT           253
+#define  DATATYPE_CPX           254
 
 
 /* GRID types */
@@ -375,12 +378,6 @@ void    vlistDefVarDatatype(int vlistID, int varID, int datatype);
 
 /*      vlistInqVarDatatype: Get the data type of a Variable */
 int     vlistInqVarDatatype(int vlistID, int varID);
-
-/*      vlistDefVarNumber: Define the number type of a Variable */
-void    vlistDefVarNumber(int vlistID, int varID, int number);
-
-/*      vlistInqVarNumber: Get the number type of a Variable */
-int     vlistInqVarNumber(int vlistID, int varID);
 
 void    vlistDefVarInstitut(int vlistID, int varID, int instID);
 int     vlistInqVarInstitut(int vlistID, int varID);

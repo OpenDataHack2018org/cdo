@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -57,7 +57,7 @@ void *Sinfo(void *argument)
   char *modelptr, *instptr;
   int streamID = 0;
   int vlistID;
-  int prec, number;
+  int datatype;
   char pstr[4];
 
   cdoInitialize(argument);
@@ -133,28 +133,21 @@ void *Sinfo(void *argument)
 	  else
 	    fprintf(stdout, "var ");
 
-	  prec = vlistInqVarDatatype(vlistID, varID);
-	  number = vlistInqVarNumber(vlistID, varID);
-	  if ( number == CDI_REAL )
-	    {
-	      if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");
-	      else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
-	      else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
-	      else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
-	      else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
-	      else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
-	      else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");
-	      else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
-	      else if ( prec == DATATYPE_UINT16 ) strcpy(pstr, "U16");
-	      else if ( prec == DATATYPE_UINT32 ) strcpy(pstr, "U32");
-	      else                                strcpy(pstr, "-1");
-	    }
-	  else
-	    {
-	      if      ( prec == DATATYPE_FLT32  ) strcpy(pstr, "C32");
-	      else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "C64");
-	      else                                strcpy(pstr, "-2");
-	    }
+	  datatype = vlistInqVarDatatype(vlistID, varID);
+
+	  if      ( datatype == DATATYPE_PACK   ) strcpy(pstr, "P0");
+	  else if ( datatype > 0 && datatype <= 32  ) sprintf(pstr, "P%d", datatype);
+	  else if ( datatype == DATATYPE_CPX32  ) strcpy(pstr, "C32");
+	  else if ( datatype == DATATYPE_CPX64  ) strcpy(pstr, "C64");
+	  else if ( datatype == DATATYPE_FLT32  ) strcpy(pstr, "F32");
+	  else if ( datatype == DATATYPE_FLT64  ) strcpy(pstr, "F64");
+	  else if ( datatype == DATATYPE_INT8   ) strcpy(pstr, "I8");
+	  else if ( datatype == DATATYPE_INT16  ) strcpy(pstr, "I16");
+	  else if ( datatype == DATATYPE_INT32  ) strcpy(pstr, "I32");
+	  else if ( datatype == DATATYPE_UINT8  ) strcpy(pstr, "U8");
+	  else if ( datatype == DATATYPE_UINT16 ) strcpy(pstr, "U16");
+	  else if ( datatype == DATATYPE_UINT32 ) strcpy(pstr, "U32");
+	  else                                    strcpy(pstr, "-1");
 
 	  fprintf(stdout, " %-3s", pstr);
 
