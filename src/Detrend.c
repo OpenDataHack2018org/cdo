@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -21,6 +21,9 @@
       Detrend    detrend         Detrend
 */
 
+#if defined (_OPENMP)
+#  include <omp.h>
+#endif
 
 #include "cdi.h"
 #include "cdo.h"
@@ -66,6 +69,7 @@ void detrend(int nts, double missval1, double *array1, double *array2)
 void *Detrend(void *argument)
 {
   static char func[] = "Detrend";
+  int ompthID;
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;
@@ -79,8 +83,13 @@ void *Detrend(void *argument)
   int nvars, nlevel;
   int *vdate = NULL, *vtime = NULL;
   double missval;
-  double *array1, *array2;
   FIELD ***vars = NULL;
+  typedef struct
+  {
+    double *array1;
+    double *array2;
+  } memory_t;
+  memory_t *mem = NULL;
 
   cdoInitialize(argument);
 
@@ -148,8 +157,12 @@ void *Detrend(void *argument)
 
   nts = tsID;
 
-  array1 = (double *) malloc(nts*sizeof(double));
-  array2 = (double *) malloc(nts*sizeof(double));
+  mem = (memory_t *) malloc(ompNumThreads*sizeof(memory_t));
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      mem[i].array1 = (double *) malloc(nts*sizeof(double));
+      mem[i].array2 = (double *) malloc(nts*sizeof(double));
+    }
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -159,21 +172,33 @@ void *Detrend(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(i, ompthID, tsID)
+#endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
+#if defined (_OPENMP)
+              ompthID = omp_get_thread_num();
+#else
+              ompthID = 0;
+#endif
 	      for ( tsID = 0; tsID < nts; tsID++ )
-		array1[tsID] = vars[tsID][varID][levelID].ptr[i];
+		mem[ompthID].array1[tsID] = vars[tsID][varID][levelID].ptr[i];
 
-	      detrend(nts, missval, array1, array2);
+	      detrend(nts, missval, mem[ompthID].array1, mem[ompthID].array2);
 
 	      for ( tsID = 0; tsID < nts; tsID++ )
-		vars[tsID][varID][levelID].ptr[i] = array2[tsID];
+		vars[tsID][varID][levelID].ptr[i] = mem[ompthID].array2[tsID];
 	    }
 	}
     }
 
-  if ( array1 ) free(array1);
-  if ( array2 ) free(array2);
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      free(mem[i].array1);
+      free(mem[i].array2);
+    }
+  free(mem);
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {

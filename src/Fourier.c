@@ -120,6 +120,9 @@ void *Fourier(void *argument)
 	  vars[tsID][varID][levelID].ptr = (double *) malloc(2*gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
+
+	  if ( nmiss > 0 )
+	    cdoAbort("Missing values are not allowed!");
 	}
 
       tsID++;
