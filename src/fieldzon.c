@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 /* QR */
 
 
-void zonfun(FIELD field1, FIELD *field2, int function)
+void zonfun(field_t field1, field_t *field2, int function)
 {
   if      ( function == func_min )  zonmin(field1, field2);
   else if ( function == func_max )  zonmax(field1, field2);  
@@ -36,7 +36,7 @@ void zonfun(FIELD field1, FIELD *field2, int function)
 }
 
 
-void zonmin(FIELD field1, FIELD *field2)
+void zonmin(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -77,7 +77,7 @@ void zonmin(FIELD field1, FIELD *field2)
 }
 
 
-void zonmax(FIELD field1, FIELD *field2)
+void zonmax(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -118,7 +118,7 @@ void zonmax(FIELD field1, FIELD *field2)
 }
 
 
-void zonsum(FIELD field1, FIELD *field2)
+void zonsum(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -153,7 +153,7 @@ void zonsum(FIELD field1, FIELD *field2)
 }
 
 
-void zonmean(FIELD field1, FIELD *field2)
+void zonmean(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid     = field1.grid;
@@ -199,7 +199,7 @@ void zonmean(FIELD field1, FIELD *field2)
 }
 
 
-void zonavg(FIELD field1, FIELD *field2)
+void zonavg(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid     = field1.grid;
@@ -244,7 +244,7 @@ void zonavg(FIELD field1, FIELD *field2)
 }
 
 
-void zonvar(FIELD field1, FIELD *field2)
+void zonvar(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid     = field1.grid;
@@ -296,7 +296,7 @@ void zonvar(FIELD field1, FIELD *field2)
 }
 
 
-void zonstd(FIELD field1, FIELD *field2)
+void zonstd(field_t field1, field_t *field2)
 {
   int j, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -321,7 +321,7 @@ void zonstd(FIELD field1, FIELD *field2)
 }
 
 /* RQ */
-void zonpctl(FIELD field1, FIELD *field2, int p)
+void zonpctl(field_t field1, field_t *field2, int p)
 {
   static const char func[] = "zonpctl";
 

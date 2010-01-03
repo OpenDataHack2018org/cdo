@@ -47,7 +47,7 @@ static double windchillTemperature(double t, double ff, double missval)
 }
 
 
-static void farexpr(FIELD *field1, FIELD field2, double (*expression)(double, double, double))
+static void farexpr(field_t *field1, field_t field2, double (*expression)(double, double, double))
 {
   static char func[] = "farexpr";
   int   i, len;
@@ -97,7 +97,7 @@ void *Wct(void *argument)
   int levelID1, levelID2;
   int vlistID1, vlistID2, vlistID3;
   int taxisID1, taxisID2, taxisID3;
-  FIELD field1, field2;
+  field_t field1, field2;
 
   cdoInitialize(argument);
   cdoOperatorAdd("wct", 0, 0, NULL);

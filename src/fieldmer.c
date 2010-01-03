@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@
 #include "nth_element.h"
 /* QR */
 
-void merfun(FIELD field1, FIELD *field2, int function)
+void merfun(field_t field1, field_t *field2, int function)
 {
   if      ( function == func_min )  mermin(field1, field2);
   else if ( function == func_max )  mermax(field1, field2);  
@@ -35,7 +35,7 @@ void merfun(FIELD field1, FIELD *field2, int function)
 }
 
 
-void mermin(FIELD field1, FIELD *field2)
+void mermin(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -76,7 +76,7 @@ void mermin(FIELD field1, FIELD *field2)
 }
 
 
-void mermax(FIELD field1, FIELD *field2)
+void mermax(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -117,7 +117,7 @@ void mermax(FIELD field1, FIELD *field2)
 }
 
 
-void mersum(FIELD field1, FIELD *field2)
+void mersum(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -152,7 +152,7 @@ void mersum(FIELD field1, FIELD *field2)
 }
 
 
-void mermean(FIELD field1, FIELD *field2)
+void mermean(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -200,7 +200,7 @@ void mermean(FIELD field1, FIELD *field2)
 }
 
 
-void meravg(FIELD field1, FIELD *field2)
+void meravg(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid     = field1.grid;
@@ -247,7 +247,7 @@ void meravg(FIELD field1, FIELD *field2)
 }
 
 
-void mervar(FIELD field1, FIELD *field2)
+void mervar(field_t field1, field_t *field2)
 {
   int i, j, nx, ny, rnmiss = 0;
   int    grid    = field1.grid;
@@ -301,7 +301,7 @@ void mervar(FIELD field1, FIELD *field2)
 }
 
 
-void merstd(FIELD field1, FIELD *field2)
+void merstd(field_t field1, field_t *field2)
 {
   int i, nx, rnmiss = 0;
   int    grid    = field1.grid;
@@ -326,7 +326,7 @@ void merstd(FIELD field1, FIELD *field2)
 }
 
 /* RQ */
-void merpctl(FIELD field1, FIELD *field2, int p)
+void merpctl(field_t field1, field_t *field2, int p)
 {
   static const char func[] = "merpctl";
 

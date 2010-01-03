@@ -50,7 +50,7 @@ static double humidityIndex(double t, double e, double r, double missval)
 }
 
 
-static void farexpr(FIELD *field1, FIELD field2, FIELD field3, double (*expression)(double, double, double, double))
+static void farexpr(field_t *field1, field_t field2, field_t field3, double (*expression)(double, double, double, double))
 {
   static char func[] = "farexpr";
   int   i, len;
@@ -104,7 +104,7 @@ void *Hi(void *argument)
   int levelID1, levelID2, levelID3;
   int vlistID1, vlistID2, vlistID3, vlistID4;
   int taxisID1, taxisID2, taxisID3, taxisID4;
-  FIELD field1, field2, field3;
+  field_t field1, field2, field3;
 
   cdoInitialize(argument);
   cdoOperatorAdd("hi", 0, 0, NULL);

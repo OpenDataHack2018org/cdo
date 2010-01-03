@@ -56,7 +56,7 @@ void *Ydrunpctl(void *argument)
   int nvars, nlevels;
   int *recVarID, *recLevelID;
   double missval;
-  FIELD ***vars1 = NULL, **vars2[NDAY];
+  field_t ***vars1 = NULL, **vars2[NDAY];
   datetime_t *datetime;
   int taxisID1, taxisID2, taxisID3, taxisID4;
   int calendar, dpy;
@@ -65,7 +65,7 @@ void *Ydrunpctl(void *argument)
   int vdates2[NDAY], vtimes2[NDAY];
   int nsets[NDAY];
   int year, month, day, dayoy;
-  FIELD field;
+  field_t field;
   int pn;
   HISTOGRAM_SET *hsets[NDAY];
     
@@ -129,11 +129,11 @@ void *Ydrunpctl(void *argument)
 
   datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
   
-  vars1 = (FIELD ***) malloc((ndates+1)*sizeof(FIELD **));
+  vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   
   for ( its = 0; its < ndates; its++ )
     {
-      vars1[its] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+      vars1[its] = (field_t **) malloc(nvars*sizeof(field_t *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -142,7 +142,7 @@ void *Ydrunpctl(void *argument)
 	  nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 
-	  vars1[its][varID] = (FIELD *) malloc(nlevels*sizeof(FIELD));
+	  vars1[its][varID] = (field_t *) malloc(nlevels*sizeof(field_t));
 
 	  for ( levelID = 0; levelID < nlevels; levelID++ )
 	    {
@@ -183,7 +183,7 @@ void *Ydrunpctl(void *argument)
 
       if ( vars2[dayoy] == NULL )
 	{
-	  vars2[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars2[dayoy] = (field_t **) malloc(nvars*sizeof(field_t *));
           hsets[dayoy] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -193,7 +193,7 @@ void *Ydrunpctl(void *argument)
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 	      missval  = vlistInqVarMissval(vlistID2, varID);
 
-	      vars2[dayoy][varID] = (FIELD *)  malloc(nlevels*sizeof(FIELD));
+	      vars2[dayoy][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[dayoy], varID, nlevels, gridID);
 	      
 	      for ( levelID = 0; levelID < nlevels; levelID++ )

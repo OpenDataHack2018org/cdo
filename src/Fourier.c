@@ -47,7 +47,7 @@ void *Fourier(void *argument)
   int nvars, nlevel;
   int *vdate = NULL, *vtime = NULL;
   double missval;
-  FIELD ***vars = NULL;
+  field_t ***vars = NULL;
   typedef struct
   {
     double *real;
@@ -88,13 +88,13 @@ void *Fourier(void *argument)
 	  nalloc += NALLOC_INC;
 	  vdate = (int *) realloc(vdate, nalloc*sizeof(int));
 	  vtime = (int *) realloc(vtime, nalloc*sizeof(int));
-	  vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
+	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       vdate[tsID] = taxisInqVdate(taxisID1);
       vtime[tsID] = taxisInqVtime(taxisID1);
 
-      vars[tsID] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+      vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -102,7 +102,7 @@ void *Fourier(void *argument)
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-	  vars[tsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
+	  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
 
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ double _FROOT_(double x, double missval1)
 }
 
 
-double fldfun(FIELD field, int function)
+double fldfun(field_t field, int function)
 {
   double rval = 0;
 
@@ -64,7 +64,7 @@ double fldfun(FIELD field, int function)
   return rval;
 }
 
-double fldmin(FIELD field)
+double fldmin(field_t field)
 {
   int i;
   int    len     = field.size;
@@ -94,7 +94,7 @@ double fldmin(FIELD field)
 }
 
 
-double fldmax(FIELD field)
+double fldmax(field_t field)
 {
   int i;
   int    len     = field.size;
@@ -124,7 +124,7 @@ double fldmax(FIELD field)
 }
 
 
-double fldsum(FIELD field)
+double fldsum(field_t field)
 {
   int i;
   int    len     = field.size;
@@ -149,7 +149,7 @@ double fldsum(FIELD field)
 }
 
 
-double fldmean(FIELD field)
+double fldmean(field_t field)
 {
   int i;
   int    len      = field.size;
@@ -184,7 +184,7 @@ double fldmean(FIELD field)
 }
 
 
-double fldavg(FIELD field)
+double fldavg(field_t field)
 {
   int i;
   int    len      = field.size;
@@ -219,7 +219,7 @@ double fldavg(FIELD field)
 }
 
 
-double fldvar(FIELD field)
+double fldvar(field_t field)
 {
   int i;
   int    len     = field.size;
@@ -258,7 +258,7 @@ double fldvar(FIELD field)
 }
 
 
-double fldstd(FIELD field)
+double fldstd(field_t field)
 {
   double missval = field.missval;
   double rvar, rstd;
@@ -271,7 +271,7 @@ double fldstd(FIELD field)
 }
 
 
-void fldrms(FIELD field, FIELD field2, FIELD *field3)
+void fldrms(field_t field, field_t field2, field_t *field3)
 {
   int i, len, rnmiss = 0;
   int    grid1    = field.grid;
@@ -321,7 +321,7 @@ void fldrms(FIELD field, FIELD field2, FIELD *field3)
 }
 
 
-void varrms(FIELD field, FIELD field2, FIELD *field3)
+void varrms(field_t field, field_t field2, field_t *field3)
 {
   int i, k, nlev, len, rnmiss = 0;
   int    zaxis    = field.zaxis;
@@ -374,7 +374,7 @@ void varrms(FIELD field, FIELD field2, FIELD *field3)
 }
 
 /* RQ */
-double fldpctl(FIELD field, int p)
+double fldpctl(field_t field, int p)
 {
   static const char func[] = "fldpctl";
   

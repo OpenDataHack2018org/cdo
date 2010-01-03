@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -63,9 +63,9 @@ void *Timeof(void * argument)
   double sum;
   double missval=0;
   double *xvals, *yvals;
-  FIELD ***fwork;
-  FIELD ***o, ***o2; 
-  FIELD in;     
+  field_t ***fwork;
+  field_t ***o, ***o2; 
+  field_t in;     
   
   cdoInitialize(argument);
   cdoOperatorAdd("eof",       EOF_,       0, NULL);
@@ -181,12 +181,12 @@ void *Timeof(void * argument)
         }  
       n=gridsize;
     }
-  // ALLOCATION OF FIELDS 
+  // ALLOCATION OF field_tS 
   in.ptr = (double *) malloc(gridsize*sizeof(double));
   
-  fwork = (FIELD ***) malloc(nvars*sizeof(FIELD**));
-  o     = (FIELD ***)malloc(nvars*sizeof(FIELD**));
-  o2    = (FIELD ***)malloc(nvars*sizeof(FIELD**));
+  fwork = (field_t ***) malloc(nvars*sizeof(field_t**));
+  o     = (field_t ***)malloc(nvars*sizeof(field_t**));
+  o2    = (field_t ***)malloc(nvars*sizeof(field_t**));
   iwork = (int ***) malloc(nvars*sizeof(int **));
   
   for ( varID = 0; varID < nvars; ++varID )
@@ -196,16 +196,16 @@ void *Timeof(void * argument)
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);      
       
-      fwork[varID] = (FIELD **)  malloc(nlevs*sizeof(FIELD*));
-      o[varID]     = (FIELD **)  malloc(nlevs*sizeof(FIELD*));     
-      o2[varID]    = (FIELD **)  malloc(nlevs*sizeof(FIELD*));
+      fwork[varID] = (field_t **)  malloc(nlevs*sizeof(field_t*));
+      o[varID]     = (field_t **)  malloc(nlevs*sizeof(field_t*));     
+      o2[varID]    = (field_t **)  malloc(nlevs*sizeof(field_t*));
       iwork[varID] = (int  **)   malloc(nlevs*sizeof(int* ));
       
       for ( levelID = 0; levelID < nlevs; ++levelID )
         { 
           if ( grid_space )
             {
-              fwork[varID][levelID] = (FIELD *) malloc (1*sizeof(FIELD));
+              fwork[varID][levelID] = (field_t *) malloc (1*sizeof(field_t));
               fwork[varID][levelID][0].grid    = gridID1;
               fwork[varID][levelID][0].nmiss   = 0;
               fwork[varID][levelID][0].missval = missval;
@@ -217,7 +217,7 @@ void *Timeof(void * argument)
             }
           else if ( time_space ) 
             {
-              fwork[varID][levelID] = (FIELD *) malloc (nts*sizeof(FIELD));
+              fwork[varID][levelID] = (field_t *) malloc (nts*sizeof(field_t));
               for ( tsID=0; tsID<nts; tsID++ )
                 {
                   fwork[varID][levelID][tsID].grid    = gridID1;
@@ -231,8 +231,8 @@ void *Timeof(void * argument)
               iwork[varID][levelID] = (int *) malloc (gridsize*sizeof(int));
             }                    
           
-          o[varID][levelID] = (FIELD *) malloc(n_eig*sizeof(FIELD));
-          o2[varID][levelID]= (FIELD *) malloc(gridsize*sizeof(FIELD));
+          o[varID][levelID] = (field_t *) malloc(n_eig*sizeof(field_t));
+          o2[varID][levelID]= (field_t *) malloc(gridsize*sizeof(field_t));
           
           for ( i = 0; i < n; i++ )
             {

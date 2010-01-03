@@ -57,8 +57,8 @@ void *Ydaypctl(void *argument)
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY], vtimes2[NDAY];
   double missval;
-  FIELD **vars1[NDAY];
-  FIELD field;
+  field_t **vars1[NDAY];
+  field_t field;
   int pn;
   HISTOGRAM_SET *hsets[NDAY];
 
@@ -144,7 +144,7 @@ void *Ydaypctl(void *argument)
 
       if ( vars1[dayoy] == NULL )
 	{
-	  vars1[dayoy] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars1[dayoy] = (field_t **) malloc(nvars*sizeof(field_t *));
           hsets[dayoy] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -154,7 +154,7 @@ void *Ydaypctl(void *argument)
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[dayoy][varID] = (FIELD *)  malloc(nlevels*sizeof(FIELD));
+	      vars1[dayoy][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[dayoy], varID, nlevels, gridID);
 	      
 	      for ( levelID = 0; levelID < nlevels; levelID++ )

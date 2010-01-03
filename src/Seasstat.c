@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -59,8 +59,8 @@ void *Seasstat(void *argument)
   int newseas, oldmon = 0, newmon;
   int nseason = 0;
   double missval;
-  FIELD **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
-  FIELD field;
+  field_t **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
+  field_t field;
   int season_start;
   const char *seas_name[4];
 
@@ -105,10 +105,10 @@ void *Seasstat(void *argument)
 
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
-  vars1 = (FIELD **) malloc(nvars*sizeof(FIELD *));
-  samp1 = (FIELD **) malloc(nvars*sizeof(FIELD *));
+  vars1 = (field_t **) malloc(nvars*sizeof(field_t *));
+  samp1 = (field_t **) malloc(nvars*sizeof(field_t *));
   if ( operfunc == func_std || operfunc == func_var )
-    vars2 = (FIELD **) malloc(nvars*sizeof(FIELD *));
+    vars2 = (field_t **) malloc(nvars*sizeof(field_t *));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -117,10 +117,10 @@ void *Seasstat(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       missval  = vlistInqVarMissval(vlistID1, varID);
 
-      vars1[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
-      samp1[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+      vars1[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
+      samp1[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
       if ( operfunc == func_std || operfunc == func_var )
-	vars2[varID] = (FIELD *)  malloc(nlevel*sizeof(FIELD));
+	vars2[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
 
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{

@@ -56,8 +56,8 @@ void *Ymonpctl(void *argument)
   int vdates1[NMONTH], vtimes1[NMONTH];
   int vdates2[NMONTH], vtimes2[NMONTH];
   double missval;
-  FIELD **vars1[NMONTH];
-  FIELD field;
+  field_t **vars1[NMONTH];
+  field_t field;
   int pn;
   HISTOGRAM_SET *hsets[NMONTH];
 
@@ -137,7 +137,7 @@ void *Ymonpctl(void *argument)
 
       if ( vars1[month] == NULL )
 	{
-	  vars1[month] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars1[month] = (field_t **) malloc(nvars*sizeof(field_t *));
           hsets[month] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -147,7 +147,7 @@ void *Ymonpctl(void *argument)
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[month][varID] = (FIELD *)  malloc(nlevels*sizeof(FIELD));
+	      vars1[month][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[month], varID, nlevels, gridID);
 	      
 	      for ( levelID = 0; levelID < nlevels; levelID++ )

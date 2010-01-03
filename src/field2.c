@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 #include "cdi.h"
 
 
-void farfun(FIELD *field1, FIELD field2, int function)
+void farfun(field_t *field1, field_t field2, int function)
 {
   if      ( function == func_add   ) faradd(field1, field2);
   else if ( function == func_min   ) farmin(field1, field2);
@@ -36,7 +36,7 @@ void farfun(FIELD *field1, FIELD field2, int function)
 }
 
 
-void faradd(FIELD *field1, FIELD field2)
+void faradd(field_t *field1, field_t field2)
 {
   static char func[] = "faradd";
   long   i, len;
@@ -77,7 +77,7 @@ void faradd(FIELD *field1, FIELD field2)
 }
 
 
-void farsum(FIELD *field1, FIELD field2)
+void farsum(field_t *field1, field_t field2)
 {
   static char func[] = "farsum";
   long   i, len;
@@ -119,7 +119,7 @@ void farsum(FIELD *field1, FIELD field2)
 }
 
 
-void farsumq(FIELD *field1, FIELD field2)
+void farsumq(field_t *field1, field_t field2)
 {
   static char func[] = "farsumq";
   long   i, len;
@@ -161,7 +161,7 @@ void farsumq(FIELD *field1, FIELD field2)
 }
 
 
-void farsub(FIELD *field1, FIELD field2)
+void farsub(field_t *field1, field_t field2)
 {
   static char func[] = "farsub";
   long   i, len;
@@ -196,7 +196,7 @@ void farsub(FIELD *field1, FIELD field2)
 }
 
 
-void farmul(FIELD *field1, FIELD field2)
+void farmul(field_t *field1, field_t field2)
 {
   static char func[] = "farmul";
   long   i, len;
@@ -231,7 +231,7 @@ void farmul(FIELD *field1, FIELD field2)
 }
 
 
-void fardiv(FIELD *field1, FIELD field2)
+void fardiv(field_t *field1, field_t field2)
 {
   static char func[] = "fardiv";
   long   i, len;
@@ -256,7 +256,7 @@ void fardiv(FIELD *field1, FIELD field2)
 }
 
 
-void faratan2(FIELD *field1, FIELD field2)
+void faratan2(field_t *field1, field_t field2)
 {
   static char func[] = "fardiv";
   long   i, len;
@@ -281,7 +281,7 @@ void faratan2(FIELD *field1, FIELD field2)
 }
 
 
-void farmin(FIELD *field1, FIELD field2)
+void farmin(field_t *field1, field_t field2)
 {
   static char func[] = "farmin";
   long   i, len;
@@ -320,7 +320,7 @@ void farmin(FIELD *field1, FIELD field2)
 }
 
 
-void farmax(FIELD *field1, FIELD field2)
+void farmax(field_t *field1, field_t field2)
 {
   static char func[] = "farmax";
   long   i, len;
@@ -359,7 +359,7 @@ void farmax(FIELD *field1, FIELD field2)
 }
 
 
-void farvar(FIELD *field1, FIELD field2, FIELD field3)
+void farvar(field_t *field1, field_t field2, field_t field3)
 {
   static char func[] = "farstd";
   long   i, len;
@@ -404,7 +404,7 @@ void farvar(FIELD *field1, FIELD field2, FIELD field3)
 }
 
 
-void farstd(FIELD *field1, FIELD field2, FIELD field3)
+void farstd(field_t *field1, field_t field2, field_t field3)
 {
   static char func[] = "farstd";
   long   i, len;
@@ -434,7 +434,7 @@ void farstd(FIELD *field1, FIELD field2, FIELD field3)
 }
 
 
-void farcvar(FIELD *field1, FIELD field2, double rconst1)
+void farcvar(field_t *field1, field_t field2, double rconst1)
 {
   static char func[] = "farcvar";
   long   i, len;
@@ -478,7 +478,7 @@ void farcvar(FIELD *field1, FIELD field2, double rconst1)
 }
 
 
-void farcstd(FIELD *field1, FIELD field2, double rconst1)
+void farcstd(field_t *field1, field_t field2, double rconst1)
 {
   static char func[] = "farcstd";
   long   i, len;
@@ -508,7 +508,7 @@ void farcstd(FIELD *field1, FIELD field2, double rconst1)
 }
 
 
-void farmoq(FIELD *field1, FIELD field2)
+void farmoq(field_t *field1, field_t field2)
 {
   static char func[] = "farmoq";
   long   i, len;
@@ -559,7 +559,7 @@ void farmoq(FIELD *field1, FIELD field2)
  * @param field1 the 1st input field, also holds the result
  * @param field2 the 2nd input field
  */  
-void farcount(FIELD *field1, FIELD field2)
+void farcount(field_t *field1, field_t field2)
 {
   static char func[] = "farcount";
   long   i, len;

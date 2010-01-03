@@ -57,8 +57,8 @@ void *Yseaspctl(void *argument)
   int vdates1[NSEAS], vtimes1[NSEAS];
   int vdates2[NSEAS], vtimes2[NSEAS];
   double missval;
-  FIELD **vars1[NSEAS];
-  FIELD field;
+  field_t **vars1[NSEAS];
+  field_t field;
   int pn;
   HISTOGRAM_SET *hsets[NSEAS];
   int season_start;
@@ -158,7 +158,7 @@ void *Yseaspctl(void *argument)
 
       if ( vars1[seas] == NULL )
 	{
-	  vars1[seas] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars1[seas] = (field_t **) malloc(nvars*sizeof(field_t *));
           hsets[seas] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -168,7 +168,7 @@ void *Yseaspctl(void *argument)
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[seas][varID] = (FIELD *)  malloc(nlevels*sizeof(FIELD));
+	      vars1[seas][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[seas], varID, nlevels, gridID);
 	      
 	      for ( levelID = 0; levelID < nlevels; levelID++ )

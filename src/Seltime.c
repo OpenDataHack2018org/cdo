@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ void *Seltime(void *argument)
   int *vdate_list = NULL, *vtime_list = NULL;
   double missval;
   double *single;
-  FIELD ***vars = NULL;
+  field_t ***vars = NULL;
 
   cdoInitialize(argument);
 
@@ -335,11 +335,11 @@ void *Seltime(void *argument)
 	  nts1 = 1;
 	}
 
-      vars  = (FIELD ***) malloc(nts1*sizeof(FIELD **));
+      vars  = (field_t ***) malloc(nts1*sizeof(field_t **));
 
       for ( tsID = 0; tsID < nts1; tsID++ )
 	{
-	  vars[tsID] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
@@ -350,7 +350,7 @@ void *Seltime(void *argument)
 		  nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  gridsize = gridInqSize(gridID);
 		  
-		  vars[tsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
+		  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
 
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {

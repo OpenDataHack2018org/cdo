@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -69,7 +69,7 @@ void *Sorttimestamp(void *argument)
   int nvars = 0, nlevel;
   int *vdate = NULL, *vtime = NULL;
   double missval;
-  FIELD ***vars = NULL;
+  field_t ***vars = NULL;
   timeinfo_t *timeinfo;
 
   cdoInitialize(argument);
@@ -105,13 +105,13 @@ void *Sorttimestamp(void *argument)
 	      nalloc += NALLOC_INC;
 	      vdate = (int *) realloc(vdate, nalloc*sizeof(int));
 	      vtime = (int *) realloc(vtime, nalloc*sizeof(int));
-	      vars  = (FIELD ***) realloc(vars, nalloc*sizeof(FIELD **));
+	      vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
 	    }
 
 	  vdate[xtsID] = taxisInqVdate(taxisID1);
 	  vtime[xtsID] = taxisInqVtime(taxisID1);
 
-	  vars[xtsID] = (FIELD **) malloc(nvars*sizeof(FIELD *));
+	  vars[xtsID] = (field_t **) malloc(nvars*sizeof(field_t *));
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
@@ -119,7 +119,7 @@ void *Sorttimestamp(void *argument)
 	      missval = vlistInqVarMissval(vlistID1, varID);
 	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      
-	      vars[xtsID][varID] = (FIELD *) malloc(nlevel*sizeof(FIELD));
+	      vars[xtsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{

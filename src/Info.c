@@ -236,7 +236,6 @@ void *Info(void *argument)
   int vlistID;
   int nmiss;
   int number;
-  int datatype;
   int ivals = 0, nvals = 0;
   int imiss = 0;
   char varname[128];
@@ -307,12 +306,7 @@ void *Info(void *argument)
 	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
 	      missval  = vlistInqVarMissval(vlistID, varID);
 	      gridsize = gridInqSize(gridID);
-	      datatype = vlistInqVarDatatype(vlistID, varID);
-
-	      if ( datatype == DATATYPE_CPX32 || datatype == DATATYPE_CPX64 )
-		number = CDI_COMP;
-	      else
-		number = CDI_REAL;
+	      number   = vlistInqVarNumber(vlistID, varID);
 
 	      if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
 	      param2str(param, paramstr, sizeof(paramstr));
