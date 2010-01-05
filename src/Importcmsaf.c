@@ -1144,7 +1144,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	{
 	  if ( ! (missval < minval || missval > maxval) )
 	    {
-	      if ( DBL_IS_EQUAL(missval, 255) && dtype == DATATYPE_UINT8 )
+	      if ( DBL_IS_EQUAL(missval, 255.) && dtype == DATATYPE_UINT8 )
 		{
 		  missval = -255;
 		  dtype   = DATATYPE_INT16;
