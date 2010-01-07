@@ -1,4 +1,4 @@
-2009-01-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2010-01-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added module Fourier
 	* Detrend: OpenMP parallelization
