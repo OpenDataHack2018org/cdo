@@ -5957,6 +5957,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   size_t start[2];
   size_t count[2];
   double weights[4];
+  int writemode = NC_CLOBBER;
 
   switch ( rv.norm_opt )
     {
@@ -5998,8 +5999,11 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
       break;
     }
 
+#if  defined  (NC_64BIT_OFFSET)
+  // writemode = NC_CLOBBER | NC_64BIT_OFFSET;
+#endif
   /* Create netCDF file for mapping and define some global attributes */
-  nce(nc_create(interp_file, NC_CLOBBER, &nc_file_id));
+  nce(nc_create(interp_file, writemode, &nc_file_id));
 
   /* Map name */
   nce(nc_put_att_text(nc_file_id, NC_GLOBAL, "title", strlen(map_name), map_name));
