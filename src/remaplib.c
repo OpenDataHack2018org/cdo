@@ -5954,6 +5954,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
   int i, n;
+  size_t filesize;
   size_t start[2];
   size_t count[2];
   double weights[4];
@@ -5999,9 +6000,22 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
       break;
     }
 
+  filesize = rg.grid1_size*(4*8 + 4 + rg.grid1_corners*2*8) +
+             rg.grid2_size*(4*8 + 4 + rg.grid2_corners*2*8) +
+             rv.num_links*(4 + 4 + rv.num_wts*8);
+
+  if ( cdoVerbose )
+    cdoPrint("Filesize for remap weights: ~%lu\n", (unsigned long) filesize);
+    
+  if ( filesize > 0x7FFFFC00 ) /* 2**31 - 1024 (<2GB) */
+    {
 #if  defined  (NC_64BIT_OFFSET)
-  // writemode = NC_CLOBBER | NC_64BIT_OFFSET;
+      writemode = NC_CLOBBER | NC_64BIT_OFFSET;
+#else
+      cdoAbort("Filesize for remap weights is too large!");
 #endif
+    }
+
   /* Create netCDF file for mapping and define some global attributes */
   nce(nc_create(interp_file, writemode, &nc_file_id));
 
