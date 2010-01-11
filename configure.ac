@@ -6,22 +6,32 @@ CONFIG_ABORT=yes
 
 echo "configuring ${PACKAGE_NAME} ${PACKAGE_VERSION}"
 
-AC_ARG_VAR(AR,     [AR archive command]) 
+AC_ARG_VAR(AR,[AR archive command]) 
 
 AC_CONFIG_AUX_DIR(config)
-AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
+AC_CANONICAL_BUILD
 
 AM_CONFIG_HEADER(src/config.h)
 AM_INIT_AUTOMAKE
 
-# Checks for programs.
-AC_PROG_CC([gcc c99])
+# Check building environment
+AC_CHECK_TOOL([CC],[gcc],[:])
 AC_PROG_CC_C99
 AC_PROG_RANLIB
+AC_CHECK_TOOL([AR],[ar],[:])
+AC_CHECK_TOOL([CPP],[cpp],[:])
+AC_CHECK_TOOL([LD],[ld],[:])
+AC_CHECK_TOOL([NM],[nm],[:])
+AC_CHECK_TOOL([AR],[ar],[:])
+AC_CHECK_TOOL([AS],[as],[:])
+AC_CHECK_TOOL([DLLTOOL],[dlltool],[:])
+AC_CHECK_TOOL([OBJDUMP],[objdump],[:])
+AC_CHECK_TOOL([STRIP],[strip],[:])
+AC_CHECK_TOOL([RANLIB],[ranlib],[:])
 AC_PROG_INSTALL
-AC_CHECK_PROGS(AR, ar, [ar])
 
-# Check large file support on 32 bit systems
+# Check large file support on 32 bit system
 AC_SYS_LARGEFILE
 
 # Checks for library functions.
@@ -83,16 +93,20 @@ AC_CHECK_LIB(m, floor)
 #  Checks for pthread library
 #
 AC_ARG_WITH([threads],
-            [AC_HELP_STRING([--with-threads],
-                            [Use the pthread library [default=yes]])],,)
-
-if test "$with_threads" = "no" ; then
-  AC_MSG_CHECKING([for pthread library])
-  AC_MSG_RESULT([suppressed])
-else
-  AC_CHECK_HEADERS(pthread.h)
-  AC_CHECK_LIB(pthread, pthread_create)
-fi
+            [AC_HELP_STRING([--with-threads=<directory>],
+                            [Use the pthread library [default=yes]])],
+            [],
+            [with_threads=yes])
+AS_CASE([$with_threads],
+        [no],[AC_MSG_CHECKING([for pthread library])
+              AC_MSG_RESULT([suppressed])],
+        [yes],[AC_CHECK_HEADERS(pthread.h)
+               AC_CHECK_LIB(pthread, pthread_create)],
+        [*],[THREADDIR=$with_threads
+             LDFLAGS="$LDFLAGS -L$THREADDIR/lib"
+             CPPFLAGS="$CPPFLAGS -I$THREADDIR/include"
+             AC_CHECK_HEADERS(pthread.h)
+             AC_CHECK_LIB(pthread, pthread_create,,LDFLAGS="$LDFLAGS")])
 
 #  ----------------------------------------------------------------------
 #  Checks for PROJ.4 library
@@ -126,7 +140,7 @@ else
   AC_MSG_RESULT([$ZLIBDIR])
   LDFLAGS="$LDFLAGS -L$ZLIBDIR/lib"
   CPPFLAGS="$CPPFLAGS -I$ZLIBDIR/include"
-#  AC_CHECK_LIB(z, xxx, , LDFLAGS="$LDFLAGS")
+  AC_CHECK_LIB(z, zlibVersion, , LDFLAGS="$LDFLAGS")
 # AC_SUBST([ZLIBDIR], [$ZLIBDIR])
 fi
 
@@ -162,8 +176,7 @@ else
   AC_MSG_RESULT([$JASPERDIR])
   LDFLAGS="$LDFLAGS -L$JASPERDIR/lib"
   CPPFLAGS="$CPPFLAGS -I$JASPERDIR/include"
-  AC_CHECK_LIB(jasper, jas_init, , LDFLAGS="$LDFLAGS")
-# AC_SUBST([JASPERDIR], [$JASPERDIR])
+  AC_SEARCH_LIBS([jas_init],[jasper],,AC_MSG_WARN(Could not find jasper))
 fi
 
 #  ----------------------------------------------------------------------

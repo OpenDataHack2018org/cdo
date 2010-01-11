@@ -42,9 +42,6 @@
 /* Define to 1 for IEG interface */
 #undef HAVE_LIBIEG
 
-/* Define to 1 if you have the `jasper' library (-ljasper). */
-#undef HAVE_LIBJASPER
-
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
@@ -68,6 +65,9 @@
 
 /* Define to 1 if you have the `sz' library (-lsz). */
 #undef HAVE_LIBSZ
+
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
