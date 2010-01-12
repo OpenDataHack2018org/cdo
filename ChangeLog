@@ -1,6 +1,10 @@
+2010-01-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* replace: added support for time constant fields [request: Wei Wei]
+	
 2010-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* Genweights: use netCDF2 (64bit) for large remap weights files [request Daniel Goll]
+	* Genweights: use netCDF2 (64bit) for large remap weights files [request: Daniel Goll]
 	
 2010-01-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
