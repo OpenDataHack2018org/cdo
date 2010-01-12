@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -717,7 +717,7 @@ void *Gradsdes(void *argument)
 	      
 		  streamInqGinfo(streamID, &intnum[index], &fltnum[index]);
 
-		  checksize = (long)intnum[index] + gridsize*intnum[index+2]/8;
+		  checksize = (long)intnum[index] + (long)gridsize*intnum[index+2]/8;
 		  if ( checksize < 0L || checksize > 2147483647L )
 		    {
 		      nrecords -= nrecsout;
