@@ -1,3 +1,7 @@
+2010-01-14  Frank Kaspar <Frank.Kaspar@dwd.de>
+
+	* import_cmsaf: added more corrections for wrong projection parameter
+
 2010-01-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* replace: added support for time constant fields [request: Wei Wei]
