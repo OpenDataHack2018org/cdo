@@ -1,3 +1,8 @@
+2010-01-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Zonstat: added support for generic grids
+	* Merstat: added support for generic grids
+
 2010-01-14  Frank Kaspar <Frank.Kaspar@dwd.de>
 
 	* import_cmsaf: added more corrections for wrong projection parameter

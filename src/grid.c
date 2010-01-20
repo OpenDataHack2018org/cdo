@@ -68,13 +68,9 @@ int gridToZonal(int gridID1)
   gridsize = gridInqYsize(gridID1);
   gridID2  = gridCreate(gridtype, gridsize);
 	  
-  if ( gridtype != GRID_LONLAT &&
-       gridtype != GRID_GAUSSIAN &&
-       (gridtype == GRID_GENERIC && gridsize <= 1) )
-    {
-      Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
-    }
-  else
+  if ( gridtype == GRID_LONLAT   ||
+       gridtype == GRID_GAUSSIAN ||
+       gridtype == GRID_GENERIC )
     {
       gridDefXsize(gridID2, 1);
       gridDefYsize(gridID2, gridsize);
@@ -90,6 +86,10 @@ int gridToZonal(int gridID1)
 
 	  free(yvals);
 	}
+    }
+  else
+    {
+      Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
     }
 
   return (gridID2);
@@ -108,29 +108,28 @@ int gridToMeridional(int gridID1)
   gridsize = gridInqXsize(gridID1);
   gridID2  = gridCreate(gridtype, gridsize);
 	  
-  switch (gridtype)
+  if ( gridtype == GRID_LONLAT   ||
+       gridtype == GRID_GAUSSIAN ||
+       gridtype == GRID_GENERIC )
     {
-    case GRID_LONLAT:
-    case GRID_GAUSSIAN:
-      {
-	gridDefXsize(gridID2, gridsize);
-	gridDefYsize(gridID2, 1);
+      gridDefXsize(gridID2, gridsize);
+      gridDefYsize(gridID2, 1);
 
-	xvals = (double *) malloc(gridsize*sizeof(double));
+      if ( gridInqXvals(gridID1, NULL) )
+	{
+	  xvals = (double *) malloc(gridsize*sizeof(double));
 
-	gridInqXvals(gridID1, xvals);
-	gridDefXvals(gridID2, xvals);
-	gridDefYvals(gridID2, &yval);
+	  gridInqXvals(gridID1, xvals);
+	  gridDefXvals(gridID2, xvals);
 
-	free(xvals);
+	  free(xvals);
+	}
 
-	break;
-      }
-    default:
-      {
-	Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
-	break;
-      }
+      gridDefYvals(gridID2, &yval);
+    }
+  else
+    {
+      Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
     }
 
   return (gridID2);
@@ -1319,18 +1318,18 @@ int gridWeights(int gridID, double *grid_wgts)
     }
   else
     {
-      if ( gridtype != GRID_LONLAT      &&
-	   gridtype != GRID_GAUSSIAN    &&
-	   gridtype != GRID_LCC         &&
-	   gridtype != GRID_GME         &&
-	   gridtype != GRID_CURVILINEAR &&
-	   gridtype != GRID_CELL )
+      if ( gridtype == GRID_LONLAT      ||
+	   gridtype == GRID_GAUSSIAN    ||
+	   gridtype == GRID_LCC         ||
+	   gridtype == GRID_GME         ||
+	   gridtype == GRID_CURVILINEAR ||
+	   gridtype == GRID_CELL )
 	{
-	  a_status = 1;
+	  a_status = gridGenArea(gridID, grid_area);
 	}
       else
 	{
-	  a_status = gridGenArea(gridID, grid_area);
+	  a_status = 1;
 	}
     }
 

@@ -44,7 +44,7 @@ void *Merstat(void *argument)
   int operfunc;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
-  int gridID1, gridID2, lastgrid = -1;
+  int gridID1, gridID2 = -1, lastgrid = -1;
   int wstatus = FALSE;
   int code = 0, oldcode = 0;
   int nlonmax;
@@ -111,11 +111,18 @@ void *Merstat(void *argument)
 
   index = 0;
   gridID1 = vlistGrid(vlistID1, index);
-  if ( gridInqType(gridID1) != GRID_LONLAT &&
-       gridInqType(gridID1) != GRID_GAUSSIAN )
-    cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
 
-  gridID2 = gridToMeridional(gridID1);
+  if ( gridInqType(gridID1) == GRID_LONLAT   ||
+       gridInqType(gridID1) == GRID_GAUSSIAN ||
+       gridInqType(gridID1) == GRID_GENERIC )
+    {
+      gridID2 = gridToMeridional(gridID1);
+    }
+  else
+    {
+      cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
+    }
+
   vlistChangeGridIndex(vlistID2, index, gridID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
