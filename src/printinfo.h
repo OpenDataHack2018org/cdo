@@ -31,26 +31,6 @@ void time2str(int time, char *timestr, int maxlen)
 }
 
 
-void param2str(int param, char *paramstr, int maxlen)
-{
-  static char func[] = "param2str";
-  int dis, cat, num;
-  int len;
-
-  cdiDecodeParam(param, &num, &cat, &dis);
-
-  if ( dis == 255 && (cat == 255 || cat == 0 ) )
-    len = sprintf(paramstr, "%d", num);
-  else  if ( dis == 255 )
-    len = sprintf(paramstr, "%d.%d", num, cat);
-  else
-    len = sprintf(paramstr, "%d.%d.%d", num, cat, dis);
-
-  if ( len > ( maxlen-1) )
-    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
-}
-
-
 void printFiletype(int streamID, int vlistID)
 {
   int filetype;

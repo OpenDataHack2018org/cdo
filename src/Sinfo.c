@@ -99,7 +99,7 @@ void *Sinfo(void *argument)
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
 
 	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
-	  param2str(param, paramstr, sizeof(paramstr));
+	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  if ( operatorID == SINFOV ) vlistInqVarName(vlistID, varID, varname);
 

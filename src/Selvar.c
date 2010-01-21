@@ -183,7 +183,7 @@ void *Selvar(void *argument)
       zaxisName(zaxisInqType(zaxisID), zaxisname);
 
       if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
-      param2str(param, paramstr, sizeof(paramstr));
+      cdiParamToString(param, paramstr, sizeof(paramstr));
 
       for ( levID = 0; levID < nlevs; levID++ )
 	{

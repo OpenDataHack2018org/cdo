@@ -182,7 +182,9 @@ void    cdiDefGlobal(const char *string, int val);
 
 /* CDI converter routines */
 
-/* param format:  DDDCCCNNN */
+/* parameter */
+
+void    cdiParamToString(int param, char *paramstr, int maxlen);
 
 void    cdiDecodeParam(int param, int *pnum, int *pcat, int *pdis);
 int     cdiEncodeParam(int pnum, int pcat, int pdis);

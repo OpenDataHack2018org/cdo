@@ -137,7 +137,7 @@ void *Diff(void *argument)
 	  missval2 = vlistInqVarMissval(vlistID2, varID2);
 
 	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
-	  param2str(param, paramstr, sizeof(paramstr));
+	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  if ( ! cdoSilentMode )
 	    if ( operatorID == DIFFP || operatorID == DIFFV || operatorID == DIFF )

@@ -309,7 +309,7 @@ void *Info(void *argument)
 	      number   = vlistInqVarNumber(vlistID, varID);
 
 	      if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
-	      param2str(param, paramstr, sizeof(paramstr));
+	      cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);
 
