@@ -9,7 +9,6 @@ extern "C" {
 
 #define  CDI_UNDEFID             -1
 #define  CDI_GLOBAL              -1   /* Global var ID for vlist  */
-#define  CDI_UNDEFPARAM  2147483647
 
 /* Byte order */
 

@@ -308,7 +308,6 @@ void *Info(void *argument)
 	      gridsize = gridInqSize(gridID);
 	      number   = vlistInqVarNumber(vlistID, varID);
 
-	      if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
 	      cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);

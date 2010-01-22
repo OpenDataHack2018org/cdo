@@ -98,7 +98,6 @@ void *Sinfo(void *argument)
 	  gridID  = vlistInqVarGrid(vlistID, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
 
-	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  if ( operatorID == SINFOV ) vlistInqVarName(vlistID, varID, varname);

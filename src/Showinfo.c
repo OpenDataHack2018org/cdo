@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -215,7 +215,6 @@ void *Showinfo(void *argument)
 	  code    = vlistInqVarCode(vlistID, varID);
 	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
 
-	  if ( param == CDI_UNDEFPARAM ) param = cdiEncodeParam(code, tabnum, 255);
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  fprintf(stdout, " %s", paramstr);
