@@ -37,7 +37,7 @@ void *Diff(void *argument)
   int indg;
   int varID1, varID2, recID;
   int gridsize;
-  int code, tabnum, param;
+  int code, param;
   int gridID, zaxisID, vdate, vtime;
   int nrecs, nrecs2;
   int levelID;
@@ -129,7 +129,6 @@ void *Diff(void *argument)
 
 	  param    = vlistInqVarParam(vlistID1, varID1);
 	  code     = vlistInqVarCode(vlistID1, varID1);
-	  tabnum   = tableInqNum(vlistInqVarTable(vlistID1, varID1));
 	  gridID   = vlistInqVarGrid(vlistID1, varID1);
 	  zaxisID  = vlistInqVarZaxis(vlistID1, varID1);
 	  gridsize = gridInqSize(gridID);

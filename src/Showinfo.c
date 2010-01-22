@@ -206,15 +206,12 @@ void *Showinfo(void *argument)
     }
   else if ( operatorID == SHOWPARAM )
     {
-      int param, code, tabnum;
+      int param;
       char paramstr[32];
       
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  param   = vlistInqVarParam(vlistID, varID);
-	  code    = vlistInqVarCode(vlistID, varID);
-	  tabnum  = tableInqNum(vlistInqVarTable(vlistID, varID));
-
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  fprintf(stdout, " %s", paramstr);
