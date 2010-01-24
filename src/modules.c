@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -51,6 +51,7 @@ void *Compc(void *argument);
 void *Cond(void *argument);
 void *Cond2(void *argument);
 void *Condc(void *argument);
+void *Complextorect(void *argument);
 void *Copy(void *argument);
 void *Del29feb(void *argument);
 void *Detrend(void *argument);
@@ -244,6 +245,7 @@ void *Wct(void *argument);
 #define  CondOperators          {"ifthen",  "ifnotthen"}
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
+#define  ComplextorectOperators {"complextorect"}
 #define  CopyOperators          {"copy", "selall"}
 #define  Del29febOperators      {"del29feb"}
 #define  DetrendOperators       {"detrend"}
@@ -473,6 +475,7 @@ static modules_t Modules[] =
   { Cond,           CondHelp,          CondOperators,          CDI_REAL,  2,  1 },
   { Cond2,          Cond2Help,         Cond2Operators,         CDI_REAL,  3,  1 },
   { Condc,          CondcHelp,         CondcOperators,         CDI_REAL,  1,  1 },
+  { Complextorect,  NULL,              ComplextorectOperators, CDI_COMP,  1,  2 },
   { Copy,           CopyHelp,          CopyOperators,          CDI_REAL, -1,  1 },
   { Del29feb,       NULL,              Del29febOperators,      CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },

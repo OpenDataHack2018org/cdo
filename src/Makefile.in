@@ -51,14 +51,14 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Arithlat.$(OBJEXT) Cat.$(OBJEXT) CDItest.$(OBJEXT) \
 	Change.$(OBJEXT) Change_e5slm.$(OBJEXT) Comp.$(OBJEXT) \
 	Compc.$(OBJEXT) Cond.$(OBJEXT) Cond2.$(OBJEXT) Condc.$(OBJEXT) \
-	Copy.$(OBJEXT) Del29feb.$(OBJEXT) Detrend.$(OBJEXT) \
-	Diff.$(OBJEXT) Echam5ini.$(OBJEXT) Enlarge.$(OBJEXT) \
-	Enlargegrid.$(OBJEXT) Ensstat.$(OBJEXT) Eofcoeff.$(OBJEXT) \
-	Exprf.$(OBJEXT) Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) \
-	Filter.$(OBJEXT) Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) \
-	Fourier.$(OBJEXT) Gengrid.$(OBJEXT) Gradsdes.$(OBJEXT) \
-	Gridboxstat.$(OBJEXT) Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) \
-	Histogram.$(OBJEXT) Importamsr.$(OBJEXT) \
+	Complextorect.$(OBJEXT) Copy.$(OBJEXT) Del29feb.$(OBJEXT) \
+	Detrend.$(OBJEXT) Diff.$(OBJEXT) Echam5ini.$(OBJEXT) \
+	Enlarge.$(OBJEXT) Enlargegrid.$(OBJEXT) Ensstat.$(OBJEXT) \
+	Eofcoeff.$(OBJEXT) Exprf.$(OBJEXT) Filedes.$(OBJEXT) \
+	Fillmiss.$(OBJEXT) Filter.$(OBJEXT) Fldrms.$(OBJEXT) \
+	Fldstat.$(OBJEXT) Fourier.$(OBJEXT) Gengrid.$(OBJEXT) \
+	Gradsdes.$(OBJEXT) Gridboxstat.$(OBJEXT) Gridcell.$(OBJEXT) \
+	Harmonic.$(OBJEXT) Histogram.$(OBJEXT) Importamsr.$(OBJEXT) \
 	Importbinary.$(OBJEXT) Importcmsaf.$(OBJEXT) \
 	Importobs.$(OBJEXT) Info.$(OBJEXT) Input.$(OBJEXT) \
 	Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) Intlevel.$(OBJEXT) \
@@ -245,6 +245,7 @@ cdo_SOURCES = Arith.c		\
 	      Cond.c 		\
 	      Cond2.c 		\
 	      Condc.c 		\
+              Complextorect.c   \
 	      Copy.c		\
               Del29feb.c	\
               Detrend.c		\
@@ -583,6 +584,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Change_e5slm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Comp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Compc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Complextorect.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cond.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cond2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Condc.Po@am__quote@

@@ -231,6 +231,7 @@ src/Change.c -text
 src/Change_e5slm.c -text
 src/Comp.c -text
 src/Compc.c -text
+src/Complextorect.c -text
 src/Cond.c -text
 src/Cond2.c -text
 src/Condc.c -text
