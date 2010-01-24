@@ -25,10 +25,10 @@
 void *Complextorect(void *argument)
 {
   const char func[] = "Complextorect";
-  //  int COMPLEXTORECT;
-  int operatorID;
+  // int COMPLEXTORECT;
+  // int operatorID;
   int streamID1, streamID2, streamID3;
-  int tsID, tsID2, nrecs;
+  int tsID, nrecs;
   int recID, varID, levelID;
   int vlistID1, vlistID2, vlistID3;
   int taxisID1, taxisID2, taxisID3;
