@@ -65,12 +65,12 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PML_DEF_INT(name, size, txt)  int par_##name[size]; int name = 0; PML_DEF(name, size, txt)
 #define PML_DEF_FLT(name, size, txt)  double par_##name[size]; double name = 0; PML_DEF(name, size, txt)
 #define PML_DEF_WORD(name, size, txt) char *par_##name[size]; char *name = 0; PML_DEF(name, size, txt)
-#define PML_INIT_INT(name)            memset(flag_##name, 0, max_##name * sizeof(int));
-#define PML_INIT_FLT(name)            memset(flag_##name, 0, max_##name * sizeof(int));
-#define PML_INIT_WORD(name)           memset(flag_##name, 0, max_##name * sizeof(int));
-#define PML_ADD_INT(nml, name)  pmlAdd(nml, #name, PML_INT,  0, par_##name, sizeof(par_##name)/sizeof(int))
-#define PML_ADD_FLT(nml, name)  pmlAdd(nml, #name, PML_FLT,  0, par_##name, sizeof(par_##name)/sizeof(double))
-#define PML_ADD_WORD(nml, name) pmlAdd(nml, #name, PML_WORD, 0, par_##name, sizeof(par_##name)/sizeof(char *))
+#define PML_INIT_INT(name)            memset(flag_##name, 0, max_##name * sizeof(int))
+#define PML_INIT_FLT(name)            memset(flag_##name, 0, max_##name * sizeof(int))
+#define PML_INIT_WORD(name)           memset(flag_##name, 0, max_##name * sizeof(int))
+#define PML_ADD_INT(nml, name)        pmlAdd(nml, #name, PML_INT,  0, par_##name, sizeof(par_##name)/sizeof(int))
+#define PML_ADD_FLT(nml, name)        pmlAdd(nml, #name, PML_FLT,  0, par_##name, sizeof(par_##name)/sizeof(double))
+#define PML_ADD_WORD(nml, name)       pmlAdd(nml, #name, PML_WORD, 0, par_##name, sizeof(par_##name)/sizeof(char *))
 #define PML_NUM(nml, name)            npar_##name = pmlNum(nml, #name)
 #define PML_PAR(name)                 npar_##name, par_##name, name
 #define PAR_CHECK_INT_FLAG(name)      par_check_int_flag(npar_##name, par_##name, flag_##name, str_##name)
@@ -282,10 +282,10 @@ int pmlRead(pml_t *pml, int argc, char **argv)
   char *parbuf;
   int bufsize = 0;
   int status = 0;
-
+  /*
   if ( cdoVerbose )
     for ( i = 0; i < argc; ++i ) printf("pmlRead: %d %s\n", i, argv[i]);
-
+  */
   for ( i = 0; i < argc; ++i )
     {
       len = strlen(argv[i]);
@@ -362,7 +362,7 @@ int par_check_int(int npar, int *parlist, int *flaglist, int par)
 
   found = 0;
   for ( i = 0; i < npar; i++ )
-    if ( par == parlist[i] ) { found = 1; flaglist[i] = TRUE; break; }
+    if ( par == parlist[i] ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
 }
@@ -374,7 +374,7 @@ int par_check_flt(int npar, double *parlist, int *flaglist, double par)
 
   found = 0;
   for ( i = 0; i < npar; i++ )
-    if ( fabs(par - parlist[i]) < 1.e-4 ) { found = 1; flaglist[i] = TRUE; break; }
+    if ( fabs(par - parlist[i]) < 1.e-4 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
 }
@@ -386,7 +386,7 @@ int par_check_word(int npar, char **parlist, int *flaglist, char *par)
 
   found = 0;
   for ( i = 0; i < npar; i++ )
-    if ( strcmp(par, parlist[i]) == 0 ) { found = 1; flaglist[i] = TRUE; break; }
+    if ( strcmp(par, parlist[i]) == 0 ) { found = 1; flaglist[i] = TRUE;/* break;*/}
 
   return (found);
 }
@@ -473,11 +473,11 @@ void *Select(void *argument)
 
   nsel     = operatorArgc();
   argnames = operatorArgv();
-
+  /*
   if ( cdoVerbose )
     for ( i = 0; i < nsel; i++ )
       printf("name %d = %s\n", i+1, argnames[i]);
-
+  */
   pml = pmlNew("SELECT");
 
   PML_ADD_INT(pml, code);
@@ -532,7 +532,7 @@ void *Select(void *argument)
 	      vars[varID] = FALSE;
 	      
 	      if ( npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
-	      if ( npar_name && PAR_CHECK_WORD(name) )   vars[varID] = TRUE;
+	      if ( npar_name  && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
 	      if ( npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
 	    }
 
@@ -588,7 +588,7 @@ void *Select(void *argument)
 	    cdoAbort("No variable selected!");
 
 
-	  if ( cdoVerbose ) vlistPrint(vlistID1);
+	  // if ( cdoVerbose ) vlistPrint(vlistID1);
 
 	  vlistID0 = vlistDuplicate(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -600,12 +600,12 @@ void *Select(void *argument)
 		  vlistDefFlag(vlistID0, varID, levID, TRUE);
 	    }
 
-	  if ( cdoVerbose ) vlistPrint(vlistID0);
+	  // if ( cdoVerbose ) vlistPrint(vlistID0);
 
 	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 
-	  if ( cdoVerbose ) vlistPrint(vlistID2);
+	  // if ( cdoVerbose ) vlistPrint(vlistID2);
 
 	  taxisID2 = taxisDuplicate(taxisID1);
 	  vlistDefTaxis(vlistID2, taxisID2);
