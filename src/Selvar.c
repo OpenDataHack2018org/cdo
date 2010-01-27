@@ -18,8 +18,8 @@
 /*
    This module contains the following operators:
 
-      Selvar     selparam        Select parameter (format: code.tabnum  or  pnum.pcat.pdis)
-      Selvar     delparam        Delete parameter (format: code.tabnum  or  pnum.pcat.pdis)
+      Selvar     selparam        Select parameter (format: code.tabnum  or  pnum.cat.dis)
+      Selvar     delparam        Delete parameter (format: code.tabnum  or  pnum.cat.dis)
       Selvar     selcode         Select codes
       Selvar     delcode         Delete codes
       Selvar     selname         Select variables
@@ -117,7 +117,7 @@ void *Selvar(void *argument)
 
       if ( cdoVerbose )
 	for ( i = 0; i < nsel; i++ )
-	  printf("name %d = %s\n", i+1, argnames[i]);
+	  fprintf(stderr, "name %d = %s\n", i+1, argnames[i]);
 
       if ( operatorID == SELGRID || operatorID == SELZAXIS )
 	{
@@ -188,7 +188,7 @@ void *Selvar(void *argument)
 	{
 	  level = zaxisInqLevel(zaxisID, levID);
 
-	  if ( operatorID == DELCODE || operatorID == DELNAME )
+	  if ( operatorID == DELCODE || operatorID == DELNAME || operatorID == DELPARAM )
 	    vlistDefFlag(vlistID1, varID, levID, TRUE);
 
 	  for ( isel = 0; isel < nsel; isel++ )
@@ -332,7 +332,7 @@ void *Selvar(void *argument)
     }
   
   if ( npar == 0 )
-    cdoAbort("No variable selected!");
+    cdoAbort("No variables selected!");
 
   for ( isel = 0; isel < nsel; isel++ )
     {
