@@ -318,7 +318,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
 
       if ( i == pml->size )
 	{
-	  fprintf(stderr, "Parameter >%s< not available!\n", argv[istart]);
+	  fprintf(stderr, "Parameter >%s< has not a valid keyword!\n", argv[istart]);
 	  status = 2;
 	  goto END_LABEL;
 	}
@@ -433,7 +433,9 @@ void *Select(void *argument)
   int zaxisID, levID;
   int varID2, levelID2;
   int recID, varID, levelID;
+  int iparam;
   int nsel;
+  char paramstr[32];
   char varname[256];
   char stdname[256];
   char **argnames = NULL;
@@ -451,10 +453,12 @@ void *Select(void *argument)
   pml_t *pml;
   PML_DEF_INT(code,    1024, "Code number");
   PML_DEF_FLT(level,   1024, "Level");
+  PML_DEF_WORD(name,   1024, "Variable name");
   PML_DEF_WORD(param,  1024, "Parameter");
 
   PML_INIT_INT(code);
   PML_INIT_FLT(level);
+  PML_INIT_WORD(name);
   PML_INIT_WORD(param);
 
   cdoInitialize(argument);
@@ -478,6 +482,7 @@ void *Select(void *argument)
 
   PML_ADD_INT(pml, code);
   PML_ADD_FLT(pml, level);
+  PML_ADD_WORD(pml, name);
   PML_ADD_WORD(pml, param);
 
   pmlRead(pml, nsel, argnames);
@@ -486,6 +491,7 @@ void *Select(void *argument)
 
   PML_NUM(pml, code);
   PML_NUM(pml, level);
+  PML_NUM(pml, name);
   PML_NUM(pml, param);
   /*
   pmlDelete(pml);
@@ -513,13 +519,20 @@ void *Select(void *argument)
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      vlistInqVarName(vlistID1, varID, varname);
-	      param = varname;
-	      vlistInqVarStdname(vlistID1, varID, stdname);
+	      iparam   = vlistInqVarParam(vlistID1, varID);
 	      code    = vlistInqVarCode(vlistID1, varID);
+	      vlistInqVarName(vlistID1, varID, varname);
+	      vlistInqVarStdname(vlistID1, varID, stdname);
+
+	      cdiParamToString(iparam, paramstr, sizeof(paramstr));
+
+	      name  = varname;
+	      param = paramstr;
+
 	      vars[varID] = FALSE;
 	      
 	      if ( npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
+	      if ( npar_name && PAR_CHECK_WORD(name) )   vars[varID] = TRUE;
 	      if ( npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
 	    }
 
@@ -556,6 +569,7 @@ void *Select(void *argument)
 
 	  PAR_CHECK_INT_FLAG(code);
 	  PAR_CHECK_FLT_FLAG(level);
+	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
 	  npar = 0;
