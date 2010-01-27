@@ -73,6 +73,7 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PML_ADD_WORD(nml, name)       pmlAdd(nml, #name, PML_WORD, 0, par_##name, sizeof(par_##name)/sizeof(char *))
 #define PML_NUM(nml, name)            npar_##name = pmlNum(nml, #name)
 #define PML_PAR(name)                 npar_##name, par_##name, name
+
 #define PAR_CHECK_INT_FLAG(name)      par_check_int_flag(npar_##name, par_##name, flag_##name, str_##name)
 #define PAR_CHECK_FLT_FLAG(name)      par_check_flt_flag(npar_##name, par_##name, flag_##name, str_##name)
 #define PAR_CHECK_WORD_FLAG(name)     par_check_word_flag(npar_##name, par_##name, flag_##name, str_##name)
@@ -80,7 +81,27 @@ static int NumParameter = sizeof(Parameter) / sizeof(Parameter[0]);
 #define PAR_CHECK_FLT(name)           par_check_flt(npar_##name, par_##name, flag_##name, name)
 #define PAR_CHECK_WORD(name)          par_check_word(npar_##name, par_##name, flag_##name, name)
 
-#define MAX_PML_ENTRY  256
+#define MAX_PLIST_ENTRY  256
+#define MAX_PML_ENTRY    256
+
+typedef struct
+{
+  char *text;
+  size_t len;
+  void *ptr;
+  int type;
+  int occ;
+  int dis;
+  size_t size;
+} plist_entry_t;
+
+
+typedef struct
+{
+  int size;
+  plist_entry_t *entry[MAX_PLIST_ENTRY];
+} plist_t;
+
 
 typedef struct
 {
@@ -104,7 +125,8 @@ typedef struct
 } pml_t;
 
 
-static void pml_init(pml_t *pml, const char *name)
+static
+void pml_init(pml_t *pml, const char *name)
 {
   static char func[] = "pml_init";
   pml->size = 0;
