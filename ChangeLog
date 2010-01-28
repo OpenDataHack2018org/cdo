@@ -1,3 +1,7 @@
+2010-01-28  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Ensstat: don't overwrite existing files
+
 2010-01-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Zonstat: added support for generic grids

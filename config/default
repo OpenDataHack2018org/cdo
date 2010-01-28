@@ -47,19 +47,13 @@ case "${HOSTNAME}" in
                     CC=icc CFLAGS="-g -O2 -Wall -fno-alias"
 	;;
 # x86_64-suse-linux
-    tornado2|tornado5)
+    tornado*)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/sles10-x64 \
 	            --with-netcdf=/sw/sles10-x64/netcdf-4.0.1 \
 	            --with-hdf5=/sw/sles10-x64/hdf5-1.8.2 \
                     --with-szlib=/sw/sles10-x64/szip-2.1 \
 	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2 -fopenmp -static"
 #	            CC=suncc CFLAGS="-g -D_REENTRANT -fast -xopenmp"
-	;;        
-    tornado1)
- 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/sles9-x64 \
-	            --with-netcdf=/sw/sles9-x64/netcdf-3.6.2 \
-                    --with-szlib=$HOME/local/sles9-x64 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
 	;;        
 # x86_64-etch-x64-linux
     squall*)

@@ -57,6 +57,13 @@ void *Merge(void *argument)
 
   streamCnt = cdoStreamCnt();
   nmerge    = streamCnt - 1;
+
+  ofilename = cdoStreamName(streamCnt-1);
+
+  if ( fileExist(ofilename) )
+    if ( !userFileOverwrite(ofilename) )
+      cdoAbort("Outputfile %s already exist!", ofilename);
+
   streamIDs = (int *) malloc(nmerge*sizeof(int));
   vlistIDs  = (int *) malloc(nmerge*sizeof(int));
 
@@ -85,12 +92,6 @@ void *Merge(void *argument)
       for ( index = 0; index < nmerge; index++ ) vlistPrint(vlistIDs[index]);
       vlistPrint(vlistID2);
     }
-
-  ofilename = cdoStreamName(streamCnt-1);
-
-  if ( fileExist(ofilename) )
-    if ( !userFileOverwrite(ofilename) )
-      cdoAbort("Outputfile %s already exist!", ofilename);
        
   streamID2 = streamOpenWrite(ofilename, cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);

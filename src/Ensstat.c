@@ -62,6 +62,7 @@ void *Ensstat(void *argument)
   double *array2 = NULL;
   field_t *field;
   int fileID, nfiles;
+  const char *ofilename;
   typedef struct
   {
     int streamID;
@@ -105,6 +106,12 @@ void *Ensstat(void *argument)
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files.", nfiles);
 
+  ofilename = cdoStreamName(nfiles);
+
+  if ( fileExist(ofilename) )
+    if ( !userFileOverwrite(ofilename) )
+      cdoAbort("Outputfile %s already exist!", ofilename);
+
   ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
 
   field = (field_t *) malloc(ompNumThreads*sizeof(field_t));
@@ -144,8 +151,8 @@ void *Ensstat(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));
+  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);
 
   streamDefVlist(streamID2, vlistID2);
 	  
