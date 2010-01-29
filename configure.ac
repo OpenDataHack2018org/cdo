@@ -82,7 +82,7 @@ if test -z "$HOST" ; then HOST="unknown"; fi;
 
 AC_DEFINE_UNQUOTED(HOST_NAME, ["$HOST"], [Host name])
 
-AC_DEFINE_UNQUOTED(SYSTEM_TYPE, ["$ac_cv_target"], [System type])
+AC_DEFINE_UNQUOTED(SYSTEM_TYPE, ["$ac_cv_build"], [System type])
 
 #  ----------------------------------------------------------------------
 #  Check for math library

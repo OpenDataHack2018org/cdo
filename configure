@@ -7145,7 +7145,7 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define SYSTEM_TYPE "$ac_cv_target"
+#define SYSTEM_TYPE "$ac_cv_build"
 _ACEOF
 
 
