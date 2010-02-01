@@ -953,7 +953,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 	  for ( varID = 0; varID < nvars; varID++ )
 	    vlistDefVarDatatype(vlistID, varID, cdoDefaultDataType);
 
-	  if ( cdoDefaultDataType == DATATYPE_FLT64 )
+	  if ( cdoDefaultDataType == DATATYPE_FLT64 || cdoDefaultDataType == DATATYPE_FLT32 )
 	    {
 	      for ( varID = 0; varID < nvars; varID++ )
 		{
