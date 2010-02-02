@@ -337,9 +337,9 @@ void *Info(void *argument)
 			  ivals   = 0;
 			  arrmean = 0;
 			  arrvar  = 0;
-			  arrmin  =  1e50;
-			  arrmax  = -1e50;
-			  for ( i = 0; i < gridsize; i++ )
+			  arrmin  =  1.e300;
+			  arrmax  = -1.e300;
+			  for ( i = 0; i < gridsize; ++i )
 			    {
 			      if ( !DBL_IS_EQUAL(array[i], missval) )
 				{

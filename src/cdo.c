@@ -68,31 +68,33 @@ char *Progname;
 
 int ompNumThreads = 1;
 
-int cdoDefaultFileType  = CDI_UNDEFID;
-int cdoDefaultDataType  = CDI_UNDEFID;
-int cdoDefaultTimeType  = CDI_UNDEFID;
-int cdoDefaultByteorder = CDI_UNDEFID;
-int cdoDefaultTableID   = CDI_UNDEFID;
+int cdoDefaultFileType   = CDI_UNDEFID;
+int cdoDefaultDataType   = CDI_UNDEFID;
+int cdoDefaultTimeType   = CDI_UNDEFID;
+int cdoDefaultByteorder  = CDI_UNDEFID;
+int cdoDefaultTableID    = CDI_UNDEFID;
 
-int cdoHaveNC4          = FALSE;
-int cdoDiag        = FALSE;
+int cdoCheckDatarange    = FALSE;
+
+int cdoHaveNC4           = FALSE;
+int cdoDiag              = FALSE;
 int cdoDisableFilesuffix = FALSE;
-int cdoDisableHistory = FALSE;
-int cdoZtype       = COMPRESS_NONE;
-int cdoZlevel      = 0;
-int cdoLogOff      = FALSE;
-int cdoSilentMode  = FALSE;
-int cdoRegulargrid = FALSE;
-int cdoBenchmark   = FALSE;
-int cdoTimer       = FALSE;
-int cdoVerbose     = FALSE;
-int cdoDebug       = 0;
-int cdoCompress    = FALSE;
-int cdoInteractive = FALSE;
-int cdoParIO       = FALSE;
+int cdoDisableHistory    = FALSE;
+int cdoZtype             = COMPRESS_NONE;
+int cdoZlevel            = 0;
+int cdoLogOff            = FALSE;
+int cdoSilentMode        = FALSE;
+int cdoRegulargrid       = FALSE;
+int cdoBenchmark         = FALSE;
+int cdoTimer             = FALSE;
+int cdoVerbose           = FALSE;
+int cdoDebug             = 0;
+int cdoCompress          = FALSE;
+int cdoInteractive       = FALSE;
+int cdoParIO             = FALSE;
 
-int cdoExpMode     = -1;
-char *cdoExpName   = NULL;
+int cdoExpMode           = -1;
+char *cdoExpName         = NULL;
 void exp_run(int argc, char *argv[], char *cdoExpName);
 
 
@@ -678,7 +680,7 @@ int main(int argc, char *argv[])
 
   cdoHaveNC4 = have_netCDF4();
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBdhMQRrsSTuVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMQRrsSTuVvZ")) != -1 )
     {
       switch (c)
 	{
@@ -690,6 +692,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'B':
 	  cdoBenchmark = TRUE;
+	  break;
+	case 'c':
+	  cdoCheckDatarange = TRUE;
 	  break;
 	case 'd':
 	  Debug = 1;

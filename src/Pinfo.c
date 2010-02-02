@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -140,8 +140,8 @@ void *Pinfo(void *argument)
 		  ivals = 0;
 		  arrmean = 0;
 		  arrvar  = 0;
-		  arrmin  =  1e50;
-		  arrmax  = -1e50;
+		  arrmin  =  1.e300;
+		  arrmax  = -1.e300;
 		  for ( i = 0; i < gridsize; i++ )
 		    {
 		      if ( !DBL_IS_EQUAL(array1[i], missval) )
