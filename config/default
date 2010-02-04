@@ -179,12 +179,6 @@ case "${HOSTNAME}" in
 		    CC=escc AR=esar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
-# mips-sgi-irix6.5
-    ecgate1)
-	${CONFPATH}configure --prefix=$HOME/local \
- 	            --with-netcdf=/home/ms/spdekplb/hmk/include,/home/ms/spdekplb/hmk/lib64 \
-	            CC=cc CFLAGS="-O -64"
-	;;
 # 5000-fujitsu-uxpv4.1_ES
     vpp5*)
 	${CONFPATH}configure --prefix=$HOME \
@@ -192,7 +186,7 @@ case "${HOSTNAME}" in
 	            CC=vcc CFLAGS="-O -Wv,-m3 -K4"
 	;;
 # powerpc-ibm-aix5.2.0.0
-    ecgate)
+    ecga*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/apps/netCDF/3.6.2/LP64_underscore \
                     --with-szlib=$HOME/local \
