@@ -63,7 +63,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/etch-x64/hdf5-1.8.2 \
                     --with-szlib=/sw/etch-x64/szip-2.1-static \
                     --with-proj=$HOME/local/etch-x64/proj-4.6.1 \
-                    CC=gcc 'CFLAGS=-g -D_REENTRANT -Wall -O2'
+                    CC=gcc 'CFLAGS=-g -D_REENTRANT -Wall -O2 -fopenmp -static'
         else
    	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
 	            --with-netcdf=/sw/etch-x64/netcdf-3.6.2 \

@@ -1,6 +1,19 @@
 CDO NEWS
 --------
 
+Version 1.4.2 (8 February 2010):
+
+   * New features:
+      o using CDI library version 1.4.2
+        improved GRIB1 support and performance
+   * Changed operators:
+      o remapcon, remaplaf: speed up by fast store of links
+      o replace: added support for time constant fields
+      o module Genweights: use netCDF2 (64bit) for large remap weights files
+      o module Zonstat, Merstat: added support for generic grids
+      o module Ensstat: don't overwrite existing files
+      o import_cmsaf: added more corrections for wrong projection parameter
+
 Version 1.4.1 (15 December 2009):
 
    * New features:
