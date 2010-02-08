@@ -33,7 +33,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
-#define fast 1
+
 
 static
 int genBoxGrid(int gridID1, int xinc, int yinc)
@@ -48,6 +48,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   int corner, add, g2_add; 
   int g1_add;
   int circular = gridIsCircular(gridID1) ;
+  int gridHasBounds = FALSE;
   double *xvals1, *yvals1, *xvals2, *yvals2;
   double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
@@ -68,7 +69,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
     }
 
   if ( xinc < 1 || yinc < 1 )
-    cdoAbort("xinc and yinc must not be smaller than 1");
+    cdoAbort("xinc and yinc must not be smaller than 1!");
   
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR )
     {
@@ -85,14 +86,20 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       gridDefXsize(gridID2, nlon2);
       gridDefYsize(gridID2, nlat2);
     }
+  else
+    {
+      cdoAbort("Unsupported grid: %s", gridNamePtr(gridtype));
+    }
 
   if ( xinc > nlon1 || yinc > nlat1 )
-    cdoAbort("xinc and/or yinc exceeds gridsize");
-
+    cdoAbort("xinc and/or yinc exceeds gridsize!");
 
   
   if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT )
     {
+      if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
+        gridHasBounds = TRUE;
+
       xvals1 = (double *) malloc(nlon1*sizeof(double));
       yvals1 = (double *) malloc(nlat1*sizeof(double));
       xvals2 = (double *) malloc(nlon2*sizeof(double));
@@ -100,7 +107,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
-      if ( gridInqYbounds(gridID1, NULL) && gridInqXbounds(gridID1, NULL) )
+      if ( gridHasBounds )
         {
           grid1_corner_lon = (double *) malloc(2*nlon1*sizeof(double));
           grid1_corner_lat = (double *) malloc(2*nlat1*sizeof(double));
@@ -116,7 +123,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           i1 = i+(xinc-1);
           if ( i1 >= nlon1-1 ) i1 = nlon1-1; 
           xvals2[j] = xvals1[i] + (xvals1[i1] - xvals1[i])/2.;
-          if ( grid2_corner_lon )
+          if ( gridHasBounds )
             {
               grid2_corner_lon[2*j  ] = grid1_corner_lon[2*i];
               grid2_corner_lon[2*j+1] = grid1_corner_lon[2*i1+1];
@@ -129,9 +136,9 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           i1 = i+(yinc-1);
           if ( i1 >= nlat1-1 ) i1 = nlat1-1; 
           yvals2[j] = yvals1[i] + (yvals1[i1] - yvals1[i])/2;
-          if ( grid2_corner_lat )
+          if ( gridHasBounds )
             {
-              grid2_corner_lat[2*j] = grid1_corner_lat[2*i];
+              grid2_corner_lat[2*j]   = grid1_corner_lat[2*i];
               grid2_corner_lat[2*j+1] = grid1_corner_lat[2*i1+1];
             }
           j++;
@@ -146,7 +153,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       free(xvals1);
       free(yvals1);
       
-      if ( grid2_corner_lon && grid2_corner_lat )
+      if ( gridHasBounds )
         {
           gridDefNvertex(gridID2, 2);
           gridDefXbounds(gridID2, grid2_corner_lon);
@@ -160,7 +167,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
     } /* if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT ) */
   else if ( gridtype == GRID_CURVILINEAR )
     {
-      int gridHasBounds = FALSE;
       
       if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
         gridHasBounds = TRUE;
@@ -169,7 +175,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       yvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
       xvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
       yvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
-      
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
       
@@ -179,7 +184,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           grid1_corner_lat = (double *) malloc(4*nlon1*nlat1*sizeof(double));
           grid2_corner_lon = (double *) malloc(4*nlon2*nlat2*sizeof(double));
           grid2_corner_lat = (double *) malloc(4*nlon2*nlat2*sizeof(double));
-          
           gridInqXbounds(gridID1, grid1_corner_lon);
           gridInqYbounds(gridID1, grid1_corner_lat);
         }
@@ -190,7 +194,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
         {
           for ( x2 = 0; x2 < nlon2; x2++ )
             {
-              g2_add = (y2*nlon2+x2); 
+              g2_add = (y2*nlon2+x2);
               on_up = on_lo = 360.; ox_up = ox_lo = -360.;
               an_ri = an_le =  90.; ax_ri = ax_le =  -90.; 
               
@@ -215,6 +219,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                         {
                           xvals2_0 = xvals1[g1_add];
                           xvals2[g2_add] = xvals1[g1_add]/area_norm;                        
+                          yvals2[g2_add] = yvals1[g1_add]/area_norm;
                         }
                       else if ( fabs(xvals1[g1_add] - xvals2_0) > 270. )
                         {
@@ -226,8 +231,8 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                         }
                       else                      
                         {
-                          xvals2[g2_add] += xvals1[g1_add]/area_norm;                                                                    
-                          yvals2[g2_add] += yvals1[g1_add]/area_norm;  
+                          xvals2[g2_add] += xvals1[g1_add]/area_norm;
+                          yvals2[g2_add] += yvals1[g1_add]/area_norm;
                         }
                      
                       if ( gridHasBounds )
@@ -457,8 +462,8 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                   grid2_corner_lat[4*g2_add+0] = an_le;
                 }
               
-              while ( xvals2[g2_add] >  180. ) xvals2[g2_add] -= 360.;
-              while ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
+	      //  while ( xvals2[g2_add] >  180. ) xvals2[g2_add] -= 360.;
+	      //  while ( xvals2[g2_add] < -180. ) xvals2[g2_add] += 360.;
             } /* for ( x2 = 0; x2 < nlon2; x2++ ) */
         } /* for ( y2 = 0; y2 < nlat2; y2++ ) */
       

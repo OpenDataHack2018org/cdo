@@ -1,3 +1,11 @@
+2010-02-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added new module Gridboxstat
+	
+2010-02-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* netCDF+packed data: check that all values are inside the valid range
+	
 2010-02-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remove netCDF offset/scalefactor if option -b 32 is set
