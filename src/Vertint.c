@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -507,7 +507,7 @@ void *Vertint(void *argument)
 		if ( minval < -9000 || maxval > 90000 )
 		  cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
 		if ( minval >= 0 && maxval <= 1000 )
-		  cdoWarning("Surface geopotential has unexpected range (min=%g max=%g)!", minval, maxval);
+		  cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
 	      }
 	    }
 
