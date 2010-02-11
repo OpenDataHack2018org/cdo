@@ -252,6 +252,8 @@ static void printGridInfo(int vlistID)
 	{
 	  fprintf(stdout, "size      : dim = %d  truncation = %d  spc = %d\n",
 		  gridsize, trunc, gridsize/2);
+	  fprintf(stdout, "%*s", nbyte0, "");
+	  fprintf(stdout, "            complexPacking = %d\n", gridInqComplexPacking(gridID));
 	}
       else if ( gridtype == GRID_GME )
 	{

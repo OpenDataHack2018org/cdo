@@ -181,7 +181,17 @@ void *Sorttimestamp(void *argument)
 
       if ( tsID > 0 )
 	{
-	  if ( IS_EQUAL(timeinfo[tsID].datetime, timeinfo[lasttsID].datetime) ) continue;
+	  if ( IS_EQUAL(timeinfo[tsID].datetime, timeinfo[lasttsID].datetime) )
+	    {
+	      if ( cdoVerbose )
+		{
+		  char vdatestr[32], vtimestr[32];
+		  date2str(vdate[xtsID], vdatestr, sizeof(vdatestr));
+		  time2str(vtime[xtsID], vtimestr, sizeof(vtimestr));
+		  cdoPrint("Timestep %4d %s %s already exist, skipped!", xtsID, vdatestr, vtimestr);
+		}
+	      continue;
+	    }
 	}
 
       lasttsID = tsID;
