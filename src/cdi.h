@@ -647,6 +647,9 @@ void    gridDefRowlon(int gridID, int nrowlon, const int *rowlon_vec);
 void    gridInqRowlon(int gridID, int *rowlon_vec);
 void    gridChangeType(int gridID, int gridtype);
 
+void    gridDefComplexPacking(int gridID, int lpack);
+int     gridInqComplexPacking(int gridID);
+
 /* ZAXIS routines */
 
 void    zaxisName(int zaxistype, char *zaxisname);
