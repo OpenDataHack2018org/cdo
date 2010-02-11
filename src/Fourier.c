@@ -98,9 +98,9 @@ void *Fourier(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  gridID  = vlistInqVarGrid(vlistID1, varID);
+	  missval = vlistInqVarMissval(vlistID1, varID);
+	  nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
 	  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
 
@@ -120,9 +120,6 @@ void *Fourier(void *argument)
 	  vars[tsID][varID][levelID].ptr = (double *) malloc(2*gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
-
-	  if ( nmiss > 0 )
-	    cdoAbort("Missing values are not allowed!");
 	}
 
       tsID++;
@@ -157,6 +154,7 @@ void *Fourier(void *argument)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
+	      int lmiss = 0;
 #if defined (_OPENMP)
               ompthID = omp_get_thread_num();
 #else
@@ -166,17 +164,21 @@ void *Fourier(void *argument)
 		{
 		  mem[ompthID].real[tsID] = vars[tsID][varID][levelID].ptr[2*i];
 		  mem[ompthID].imag[tsID] = vars[tsID][varID][levelID].ptr[2*i+1];
+		  if ( DBL_IS_EQUAL(mem[ompthID].real[tsID], missval) ) lmiss = 1;
 		}
 
-	      if ( bit == 1 )	/* nts is a power of 2 */
-		fft(mem[ompthID].real, mem[ompthID].imag, nts, sign);
-	      else
-		ft_r(mem[ompthID].real, mem[ompthID].imag, nts, sign, mem[ompthID].work_r, mem[ompthID].work_i);
-
-	      for ( tsID = 0; tsID < nts; tsID++ )
+	      if ( lmiss == 0 )
 		{
-		  vars[tsID][varID][levelID].ptr[2*i]   = mem[ompthID].real[tsID];
-		  vars[tsID][varID][levelID].ptr[2*i+1] = mem[ompthID].imag[tsID];
+		  if ( bit == 1 )	/* nts is a power of 2 */
+		    fft(mem[ompthID].real, mem[ompthID].imag, nts, sign);
+		  else
+		    ft_r(mem[ompthID].real, mem[ompthID].imag, nts, sign, mem[ompthID].work_r, mem[ompthID].work_i);
+
+		  for ( tsID = 0; tsID < nts; tsID++ )
+		    {
+		      vars[tsID][varID][levelID].ptr[2*i]   = mem[ompthID].real[tsID];
+		      vars[tsID][varID][levelID].ptr[2*i+1] = mem[ompthID].imag[tsID];
+		    }
 		}
 	    }
 	}
