@@ -407,6 +407,8 @@ void *Info(void *argument)
 			    }
 			}
 
+		      imiss = gridsize - nvals_r;
+
 		      if ( nvals_r > 0 ) arrmean_r = arrsum_r / nvals_r;
 		      if ( nvals_i > 0 ) arrmean_i = arrsum_i / nvals_i;
 		      fprintf(stdout, "  -  (%#12.5g,%#12.5g)  -\n", arrmean_r, arrmean_i);
