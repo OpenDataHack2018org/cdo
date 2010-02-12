@@ -338,7 +338,7 @@ void setDefaultDataType(char *datatypestr)
 {
   static union {unsigned long l; unsigned char c[sizeof(long)];} u_byteorder = {1};
   int nbits = -1;
-  enum {D_UINT, D_INT, D_FLT};
+  enum {D_UINT, D_INT, D_FLT, D_CPX};
   int dtype = -1;
 
   if      ( *datatypestr == 'i' || *datatypestr == 'I' )
@@ -354,6 +354,11 @@ void setDefaultDataType(char *datatypestr)
   else if ( *datatypestr == 'f' || *datatypestr == 'F' )
     {
       dtype = D_FLT;
+      datatypestr++;
+    }
+  else if ( *datatypestr == 'c' || *datatypestr == 'C' )
+    {
+      dtype = D_CPX;
       datatypestr++;
     }
 
@@ -414,6 +419,16 @@ void setDefaultDataType(char *datatypestr)
 	      else
 		{
 		  fprintf(stderr, "Unsupported number of bits = %d for datatype FLT!\n", nbits);
+		  exit(EXIT_FAILURE);
+		}
+	    }
+	  else if ( dtype == D_CPX )
+	    {
+	      if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_CPX32;
+	      else if ( nbits == 64 ) cdoDefaultDataType = DATATYPE_CPX64;
+	      else
+		{
+		  fprintf(stderr, "Unsupported number of bits = %d for datatype CPX!\n", nbits);
 		  exit(EXIT_FAILURE);
 		}
 	    }
