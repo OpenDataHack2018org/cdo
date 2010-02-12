@@ -395,14 +395,12 @@ void *Info(void *argument)
 		      
 		      for ( i = 0; i < gridsize; i++ )
 			{
-			  if ( !DBL_IS_EQUAL(array[i*2], missval) )
+			  if ( !DBL_IS_EQUAL(array[i*2],   missval) && 
+			       !DBL_IS_EQUAL(array[i*2+1], missval) )
 			    {
 			      arrsum_r += array[i*2];
-			      nvals_r++;
-			    }
-			  if ( !DBL_IS_EQUAL(array[i*2+1], missval) )
-			    {
 			      arrsum_i += array[i*2+1];
+			      nvals_r++;
 			      nvals_i++;
 			    }
 			}

@@ -164,7 +164,8 @@ void *Fourier(void *argument)
 		{
 		  mem[ompthID].real[tsID] = vars[tsID][varID][levelID].ptr[2*i];
 		  mem[ompthID].imag[tsID] = vars[tsID][varID][levelID].ptr[2*i+1];
-		  if ( DBL_IS_EQUAL(mem[ompthID].real[tsID], missval) ) lmiss = 1;
+		  if ( DBL_IS_EQUAL(mem[ompthID].real[tsID], missval) ||
+		       DBL_IS_EQUAL(mem[ompthID].imag[tsID], missval) ) lmiss = 1;
 		}
 
 	      if ( lmiss == 0 )
@@ -178,6 +179,14 @@ void *Fourier(void *argument)
 		    {
 		      vars[tsID][varID][levelID].ptr[2*i]   = mem[ompthID].real[tsID];
 		      vars[tsID][varID][levelID].ptr[2*i+1] = mem[ompthID].imag[tsID];
+		    }
+		}
+	      else
+		{
+		  for ( tsID = 0; tsID < nts; tsID++ )
+		    {
+		      vars[tsID][varID][levelID].ptr[2*i]   = missval;
+		      vars[tsID][varID][levelID].ptr[2*i+1] = missval;
 		    }
 		}
 	    }
