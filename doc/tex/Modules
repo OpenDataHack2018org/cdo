@@ -75,7 +75,6 @@ Subtrend      Regression
 Remapgrid     Interpolation
 Genweights    Interpolation
 Remap         Interpolation
-Intgrid       Interpolation
 Remapeta      Interpolation
 Vertint       Interpolation
 Intlevel      Interpolation
