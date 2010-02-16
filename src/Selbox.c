@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -669,22 +669,22 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
 
   if ( *lat1 < 1 )
     {
-      cdoWarning("first latitude index out of range. Set to 1.");
+      cdoWarning("First latitude index out of range, set to 1!");
       *lat1 = 1;
     }
   if ( *lat2 > nlat1 )
     {
-      cdoWarning("last latitude index out of range. Set to %d.", nlat1);
+      cdoWarning("Last latitude index out of range, set to %d!", nlat1);
       *lat2 = nlat1;
     }
   if ( *lon11 < 1 )
     {
-      cdoWarning("first longitude index out of range. Set to 1.");
+      cdoWarning("First longitude index out of range, set to 1!");
       *lon11 = 1;
     }
   if ( *lon12 > nlon1+1 )
     {
-      cdoWarning("last longitude index out of range. Set to %d.", nlon1);
+      cdoWarning("Last longitude index out of range, set to %d!", nlon1);
       *lon12 = nlon1;
     }
 

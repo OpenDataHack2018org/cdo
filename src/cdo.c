@@ -84,7 +84,6 @@ int cdoZtype             = COMPRESS_NONE;
 int cdoZlevel            = 0;
 int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
-int cdoRegulargrid       = FALSE;
 int cdoBenchmark         = FALSE;
 int cdoTimer             = FALSE;
 int cdoVerbose           = FALSE;
@@ -92,6 +91,8 @@ int cdoDebug             = 0;
 int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
+int cdoRegulargrid       = FALSE;
+
 
 int cdoExpMode           = -1;
 char *cdoExpName         = NULL;
