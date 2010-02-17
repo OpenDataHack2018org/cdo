@@ -18,10 +18,11 @@
 #define  C_EARTH_RADIUS  (6371000.0)
 double PlanetRadius = C_EARTH_RADIUS;
 
-void geninx(int ntr, double *f, double *g)
+
+void geninx(long ntr, double *f, double *g)
 {
-  int m2,n2;
-  int m, n ;
+  long m2,n2;
+  long m, n ;
 
   for ( m = 0; m <= ntr; m++ )
     {
