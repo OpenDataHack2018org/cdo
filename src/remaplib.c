@@ -1388,7 +1388,7 @@ void remap(double *dst_array, double missval, long dst_size, long num_links, dou
     {
       if ( links.option == TRUE )
 	{
-	  int j;
+	  long j;
 	  for ( j = 0; j < links.num_blks; j++ )
 	    {
 #ifdef SX
@@ -1552,7 +1552,7 @@ void remap_laf(double *dst_array, double missval, long dst_size, long num_links,
       */
       /* only for sorted dst_add! */
       {
-      int min_add = 1, max_add = 0;
+      long min_add = 1, max_add = 0;
 
       for ( n = 0; n < num_links; n++ )
 	if ( i == dst_add[n] ) break;
@@ -4153,8 +4153,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict w
 #if STRIPED
 #define STRIPLENGTH 4096
   {
-    int ilink = max_link + 1;
-    int strip, estrip;
+    long ilink = max_link + 1;
+    long strip, estrip;
     nlink = 0;
     for ( strip=min_link; strip <= max_link; strip+=STRIPLENGTH )
       {
@@ -4172,7 +4172,7 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double * restrict w
   }
 #else
   {
-    int ilink = max_link + 1;
+    long ilink = max_link + 1;
     for ( nlink = min_link; nlink <= max_link; nlink++ )
       {
 	if ( add2 == rv->grid2_add[nlink] )
@@ -5953,7 +5953,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   char grid2_units[] = "radians";
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
-  int i, n;
+  long i, n;
   size_t filesize;
   size_t start[2];
   size_t count[2];
@@ -6287,7 +6287,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   int nc_dstadd_id;         /* id for map destination address           */
   int nc_rmpmatrix_id;      /* id for remapping matrix                  */
 
-  int i, n;                 /* dummy index */
+  long i, n;                 /* dummy index */
 
   char map_name[1024];
   char map_method[64];      /* character string for map_type             */

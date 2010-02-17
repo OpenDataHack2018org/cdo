@@ -1999,7 +1999,7 @@ void fc2gp(double *trig, int *ifax, double *fc, double *gp, int nlat, int nlon, 
   /* x(j) = sum(k=0,...,n-1)(c(k)*exp(2*i*j*k*pi/nlon))             */
   /*        where c(k) = a(k) + i*b(k) and c(n-k) = a(k)-i*b(k)     */
 
-  if ( ifax[9] != nlon ) fprintf(stderr, "gp2fc: wrong initialization!\n");
+  if ( ifax[9] != nlon ) fprintf(stderr, "fc2gp: wrong initialization!\n");
 
   nfax = ifax[0];
 
