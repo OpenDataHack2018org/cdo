@@ -28,16 +28,16 @@
 #define  D60  (S60+S60)
 
 
-int get_nfft(void)
+long get_nfft(void)
 {
-  return ((int) NFFT);
+  return ((long) NFFT);
 }
 
 
-void fft_set(double *trigs, int *ifax, int n)
+void fft_set(double *trigs, long *ifax, long n)
 {
-  int j, k, nfax, len = n;
-  int nhl;
+  long j, k, nfax, len = n;
+  long nhl;
   double del, angle;
 
   del = 4.0*asin(1.0) / n;
@@ -81,15 +81,15 @@ void fft_set(double *trigs, int *ifax, int n)
 
   if ( n > 8 )
     {
-      fprintf(stderr, "fft does not work with len %d\n", len);
+      fprintf(stderr, "fft does not work with len %ld\n", len);
       exit(1);
     }
 }
 
 static
 int rpassc(double *a, double *b, double *c, double *d, double *trigs,
-	   int inc1, int inc2, int inc3, int inc4,
-	   int lot, int n, int ifac, int la)
+	   long inc1, long inc2, long inc3, long inc4,
+	   long lot, long n, long ifac, long la)
 {
   /*
      rpassc' - performs one pass through data as part;
@@ -114,16 +114,16 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
      3 - ifac only catered for if la=n/ifac;
    */
 
-  int i0, i1, i2, i3, i4, i5, i6, i7;
-  int j0, j1, j2, j3, j4, j5, j6, j7;
-  int ia, ib, ic, id, ie, iF;
-  int ja, jb, jc, jd, je, jf;
-  int i, j, k, l, m, ijk;
-  int ibase, jbase;
-  int iink, jink;
-  int jump;
-  int kstop;
-  int kb, kc, kd, ke, kf;
+  long i0, i1, i2, i3, i4, i5, i6, i7;
+  long j0, j1, j2, j3, j4, j5, j6, j7;
+  long ia, ib, ic, id, ie, iF;
+  long ja, jb, jc, jd, je, jf;
+  long i, j, k, l, m, ijk;
+  long ibase, jbase;
+  long iink, jink;
+  long jump;
+  long kstop;
+  long kb, kc, kd, ke, kf;
 
   double c1, c2, c3, c4, c5;
   double s1, s2, s3, s4, s5;
@@ -1028,8 +1028,8 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 
 static
 int qpassc(double *a, double *b, double *c, double *d, double *trigs,
-	   int inc1, int inc2, int inc3, int inc4,
-	   int lot, int n, int ifac, int la)
+	   long inc1, long inc2, long inc3, long inc4,
+	   long lot, long n, long ifac, long la)
 {
   /*
      qpassc - performs one pass through data as part
@@ -1050,16 +1050,16 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
      la     is the product of previous factors
    */
 
-  int i0, i1, i2, i3, i4, i5, i6, i7;
-  int j0, j1, j2, j3, j4, j5, j6, j7;
-  int ia, ib, ic;
-  int ja, jb, jc;
-  int i, j, k, l, m, ijk;
-  int ibase, jbase;
-  int iink, jink;
-  int jump;
-  int kstop;
-  int kb, kc, kd, ke, kf;
+  long i0, i1, i2, i3, i4, i5, i6, i7;
+  long j0, j1, j2, j3, j4, j5, j6, j7;
+  long ia, ib, ic;
+  long ja, jb, jc;
+  long i, j, k, l, m, ijk;
+  long ibase, jbase;
+  long iink, jink;
+  long jump;
+  long kstop;
+  long kb, kc, kd, ke, kf;
 
   double a0, a1, a2, a3;
   double b0, b1, b2, b3;
@@ -1975,15 +1975,15 @@ int qpassc(double *a, double *b, double *c, double *d, double *trigs,
 /* ====================== */
 /* Fast Fourier Transform */
 /* ====================== */
-void fc2gp(double *trig, int *ifax, double *fc, double *gp, int nlat, int nlon, int nlev, int nfc)
+void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlon, long nlev, long nfc)
 {
   static char func[] = "fc2gp";
-  int lot, fou, ia, ifac, jump, k, la;
-  int lat, lev, lon, nfax, rix, wix;
+  long lot, fou, ia, ifac, jump, k, la;
+  long lat, lev, lon, nfax, rix, wix;
   double *wfc, *wgp, *wpt;
-  int nx, nblox, nvex, nvex0, nb;
-  int istart, i, j, ibase, jbase, jj, ii, ix;
-  int *istartv;
+  long nx, nblox, nvex, nvex0, nb;
+  long istart, i, j, ibase, jbase, jj, ii, ix;
+  long *istartv;
 
 
   /* fc2gp performs fourier to gridpoint transforms using           */
@@ -2034,7 +2034,7 @@ void fc2gp(double *trig, int *ifax, double *fc, double *gp, int nlat, int nlon, 
   nvex  = lot - (nblox-1)*NFFT;
   nvex0 = nvex;
 
-  istartv = (int *) malloc(nblox*sizeof(int));
+  istartv = (long *) malloc(nblox*sizeof(long));
 
   istart = 0;
   for ( nb = 0; nb < nblox; nb++ )
@@ -2146,105 +2146,21 @@ void fc2gp(double *trig, int *ifax, double *fc, double *gp, int nlat, int nlon, 
 }
 
 
-void fc2gpold(double *fc, double *gp, int nlat, int nlon, int nlev, int nfc)
-{
-  static char func[] = "fc2gp";
-  static int ifax[10];
-  static double *trig = NULL;
-  int lot, fou, ia, ifac, j, jump, k, la;
-  int lat, lev, lon, nfax, rix, wix;
-  double *wfc, *wgp, *wpt;
-
-
-  /* fc2gp performs fourier to gridpoint transforms using           */
-  /* multiple fast fourier transform of length nlon                 */
-  /*                                                                */
-  /* fc   - real array of fourier coefficients fc[nlev][nfc][nlat]  */
-  /* gp   - real array of gridpoints           gp[nlev][nlat][nlon] */
-  /* nlat - Number of latitudes                                     */
-  /* nlon - Number of longitudes                                    */
-  /* nlev - Number of levels                                        */
-  /* nfc  - Number of fourier coefficients on 1 latitude            */
-
-  /* x(j) = sum(k=0,...,n-1)(c(k)*exp(2*i*j*k*pi/nlon))             */
-  /*        where c(k) = a(k) + i*b(k) and c(n-k) = a(k)-i*b(k)     */
-
-  if ( ifax[9] != nlon )
-    {
-      if ( trig ) free (trig);
-      trig = (double *) malloc(nlon * sizeof(double));
-      fft_set (trig, ifax, nlon);
-    }
-
-  nfax = ifax[0];
-
-  jump = (nlon + 2) | 1;
-  lot  = nlev * nlat;
-
-  wfc = (double *) malloc(lot * jump * sizeof(double));
-  wgp = (double *) malloc(lot * jump * sizeof(double));
-
-  for ( lev = 0; lev < nlev; ++lev )
-    {
-      for ( lat = 0; lat < nlat; ++lat )
-	{
-	  wix = jump * (lat + lev * nlat);
-	  rix = lat + lev * nlat * nfc;
-	  for ( fou = 0; fou < nfc; ++fou )
-	    wfc[wix + fou] = fc[rix + fou * nlat];
-	  for ( fou = nfc; fou < jump; ++fou )
-	    wfc[wix + fou] = 0.0;
-	  wfc[wix + 1] = 0.5 * wfc[wix];
-	}
-    }
-
-  ia = 1;
-  la = 1;
-
-  for ( k = 0; k < nfax; ++k )
-    {
-      ifac = ifax[k + 1];
-
-      if ( k & 1 )
-	rpassc (wgp, wgp+la, wfc+ia, wfc+ia+ifac*la, trig,
-		1, 1, jump, jump, lot, nlon, ifac, la);
-      else
-	rpassc (wfc+ia, wfc+ia+la, wgp, wgp+ifac*la, trig,
-		1, 1, jump, jump, lot, nlon, ifac, la);
-
-      la *= ifac;
-      ia = 0;
-    }
-
-  if ( nfax & 1 )
-    wpt = wgp;
-  else
-    wpt = wfc;
-
-  for ( j = 0; j < lot; ++j )
-    for ( lon = 0; lon < nlon; ++lon )
-      gp[lon + j*nlon] = wpt[lon + j*jump];
-
-  free(wgp);
-  free(wfc);
-}
-
-
-void gp2fc(double *trig, int *ifax, double *gp, double *fc, int nlat, int nlon, int nlev, int nfc)
+void gp2fc(double *trig, long *ifax, double *gp, double *fc, long nlat, long nlon, long nlev, long nfc)
 {
   static char func[] = "gp2fc";
-  int lot, fou, ia, ifac, jump, k, la;
-  int lat, lev, lon, nfax, rix, wix;
+  long lot, fou, ia, ifac, jump, k, la;
+  long lat, lev, lon, nfax, rix, wix;
   double *wfc, *wgp, *wpt;
-  int nx, nblox, nvex, nb;
-  int istart, i, j, ibase, jbase, jj, ii, ix, iz;
+  long nx, nblox, nvex, nb;
+  long istart, i, j, ibase, jbase, jj, ii, ix, iz;
 
 
-  /* fc2gp performs fourier to gridpoint transforms using           */
+  /* gp2fc performs gridpoint to fourier transforms using           */
   /* multiple fast fourier transform of length nlon                 */
   /*                                                                */
-  /* fc   - real array of fourier coefficients fc[nlev][nfc][nlat]  */
   /* gp   - real array of gridpoints           gp[nlev][nlat][nlon] */
+  /* fc   - real array of fourier coefficients fc[nlev][nfc][nlat]  */
   /* nlat - Number of latitudes                                     */
   /* nlon - Number of longitudes                                    */
   /* nlev - Number of levels                                        */
@@ -2357,95 +2273,6 @@ void gp2fc(double *trig, int *ifax, double *gp, double *fc, int nlat, int nlon, 
 	  fc[wix + nlat] = 0.0;
 	  for ( fou = 2; fou < nfc; ++fou )
 	    fc[wix + fou * nlat] = wpt[rix + fou];
-	}
-    }
-
-  free(wgp);
-  free(wfc);
-}
-
-
-void gp2fcold(double *gp, double *fc, int nlat, int nlon, int nlev, int nfc)
-{
-  static char func[] = "gp2fc";
-  static int ifax[10];
-  static double *trig = NULL;
-  int lot, fou, ia, ifac, jump, k, j, la;
-  int lat, lev, lon, nfax, rix, wix;
-  double *wfc, *wgp, *wpt;
-
-
-  /* fc2gp performs fourier to gridpoint transforms using           */
-  /* multiple fast fourier transform of length nlon                 */
-  /*                                                                */
-  /* fc   - real array of fourier coefficients fc[nlev][nfc][nlat]  */
-  /* gp   - real array of gridpoints           gp[nlev][nlat][nlon] */
-  /* nlat - Number of latitudes                                     */
-  /* nlon - Number of longitudes                                    */
-  /* nlev - Number of levels                                        */
-  /* nfc  - Number of fourier coefficients on 1 latitude            */
-
-  /* a(k) =  (1/n) * sum(j=0,...,n-1)(x(j) * cos(2*j*k*pi/n))       */
-  /* b(k) = -(1/n) * sum(j=0,...,n-1)(x(j) * sin(2*j*k*pi/n))       */
-
-  if ( ifax[9] != nlon )
-    {
-      if ( trig ) free (trig);
-      trig = (double *) malloc(nlon * sizeof(double));
-      fft_set (trig, ifax, nlon);
-    }
-
-  nfax = ifax[0];
-
-  jump = (nlon + 2) | 1;
-  lot = nlev * nlat;
-
-  wfc = (double *) malloc (lot * jump * sizeof(double));
-  wgp = (double *) malloc (lot * jump * sizeof(double));
-
-  rix = 0;
-  wix = 0;
-  for ( j = 0; j < lot; ++j )
-    {
-      for ( lon = 0; lon < nlon; ++lon )
-	wgp[wix + lon] = gp[rix + lon];
-      wgp[wix + nlon] = 0.0;
-      wgp[wix + nlon + 1] = 0.0;
-      rix += nlon;
-      wix += jump;
-    }
-
-  ia = 0;
-  la = nlon;
-
-  for ( k = 0; k < nfax; ++k )
-    {
-      ifac = ifax[nfax - k];
-      la /= ifac;
-      if (k & 1)
-	qpassc (wfc, wfc+ifac*la, wgp+ia, wgp+ia+la, trig,
-		1, 1, jump, jump, lot, nlon, ifac, la);
-      else
-	qpassc (wgp+ia, wgp+ia+ifac*la, wfc, wfc+la, trig,
-		1, 1, jump, jump, lot, nlon, ifac, la);
-      ia = 1;
-    }
-
-  if (nfax & 1)
-    wpt = wfc;
-  else
-    wpt = wgp + 1;
-
-  for ( lev = 0; lev < nlev; ++lev )
-    {
-      for ( lat = 0; lat < nlat; ++lat )
-	{
-	  rix = jump * (lat + lev * nlat);
-	  wix = lat + lev * nlat * nfc;
-	  fc[wix] = wpt[rix];
-	  fc[wix + nlat] = 0.0;
-	  for ( fou = 2; fou < nfc; ++fou )
-	    fc[wix + fou * nlat] = wpt[rix + fou - 1];
 	}
     }
 
