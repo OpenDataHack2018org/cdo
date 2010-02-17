@@ -7,19 +7,19 @@ extern "C" {
 
 void h2p(double *phlev, double *hlev, int nphlev);
 
-void presh(double *pf, double *php, double *vct, double *ps, int nhlev, int ngp);
+void presh(double * restrict fullp, double * halfp, const double *vct, const double *ps, long nhlev, long ngp);
 
-void genind(int *nx, double *plev, double *fullp, int ngp, int nplev, int nhlev);
+void genind(int *nx, const double *plev, const double *fullp, long ngp, long nplev, long nhlev);
 void genindmiss(int *nx, double *plev, int ngp, int nplev, double *ps_prog, int *pnmiss);
 
-void extra_P(double *slp, double *halfp, double *fullp, double *geop, double *temp, int ngp);
+void extra_P(double *slp, double *halfp, double *fullp, double *geop, double *temp, long ngp);
 
-void interp_T(double *geop, double *gt, double *pt, double *fullp, double *halfp,
-              int *nx, double *plev, int nplev, int ngp, int nhlev, double missval);
-void interp_Z(double *geop, double *gz, double *pz, double *fullp, double *halfp,
-	      int *nx, double *gt, double *plev, int nplev, int ngp, int nhlev, double missval);
-void interp_X(double *gt, double *pt, double *hyb_press,
-	      int *nx, double *plev, int nplev, int ngp, int nhlev, double missval);
+void interp_T(const double *geop, const double *gt, double *pt, const double *fullp, const double *halfp,
+              const int *nx, const double *plev, long nplev, long ngp, long nhlev, double missval);
+void interp_Z(const double *geop, const double *gz, double *pz, const double *fullp, const double *halfp,
+	      const int *nx, const double *gt, const double *plev, long nplev, long ngp, long nhlev, double missval);
+void interp_X(const double *gt, double *pt, const double *hyb_press, const int *nx, const double *plev, long nplev,
+	      long ngp, long nhlev, double missval);
 
 #if defined(__cplusplus)
 }

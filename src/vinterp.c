@@ -58,9 +58,9 @@ void p2h(double *hlev, double *plev, int nphlev)
 }  /* p2h */
 
 
-void presh(double *fullp, double *halfp, double *vct, double *ps, int nhlev, int ngp)
+void presh(double * restrict fullp, double * halfp, const double *vct, const double *ps, long nhlev, long ngp)
 {
-  int i, lh;
+  long i, lh;
   double zp, ze;
   double *halfpres = halfp;
 
@@ -89,11 +89,11 @@ void presh(double *fullp, double *halfp, double *vct, double *ps, int nhlev, int
 } /* presh */
 
 
-void genind(int *nx, double *plev, double *fullp, int ngp, int nplev, int nhlev)
+void genind(int *nx, const double *plev, const double *fullp, long ngp, long nplev, long nhlev)
 {
-  int  i, lp, lh;
+  long  i, lp, lh;
   int *nxl;
-  double pres, *fullpres;
+  double pres;
 
   memset(nx, 0, ngp*nplev*sizeof(int));
 
@@ -104,11 +104,10 @@ void genind(int *nx, double *plev, double *fullp, int ngp, int nplev, int nhlev)
     {
       pres = plev[lp];
       nxl  = nx + lp*ngp;
-      fullpres = fullp;
       for ( lh = 0; lh < nhlev; lh++ )
 	for ( i = 0; i < ngp ; i++ )
 	   {
-	     if ( pres > fullpres[lh*ngp+i] ) nxl[i] = lh;
+	     if ( pres > fullp[lh*ngp+i] ) nxl[i] = lh;
 	   }
     }
 
@@ -142,12 +141,12 @@ void genindmiss(int *nx, double *plev, int ngp, int nplev, double *ps_prog, int 
 }  /* genindmiss */
 
 
-void extra_P(double *slp, double *halfp, double *fullp, double *geop, double *temp, int ngp)
+void extra_P(double *slp, double *halfp, double *fullp, double *geop, double *temp, long ngp)
 {
   double alpha, tstar, tmsl, zprt, zprtal;
   double zrg;
   double zlapse = 0.0065;
-  int j;
+  long j;
 
   zrg = 1.0 / Grav;
 
@@ -280,12 +279,12 @@ double extra_Z(double pres, double halfp, double fullp, double geop, double temp
 }  /* extra_Z */
 
 
-void interp_X(double *gt, double *pt, double *hyb_press, int *nx, double *plev, int nplev,
-	     int ngp, int nhlev, double missval)
+void interp_X(const double *gt, double *pt, const double *hyb_press, const int *nx, const double *plev, long nplev,
+	      long ngp, long nhlev, double missval)
 {
-  int lp, i;
-  int nl, nh;
-  int *nxl;
+  long lp, i;
+  long nl, nh;
+  const int *nxl;
   double *ptl;
   double pres;
 
@@ -316,12 +315,12 @@ void interp_X(double *gt, double *pt, double *hyb_press, int *nx, double *plev, 
 }  /* interp_X */
 
 
-void interp_T(double *geop, double *gt, double *pt, double *fullp, double *halfp,
-              int *nx, double *plev, int nplev, int ngp, int nhlev, double missval)
+void interp_T(const double *geop, const double *gt, double *pt, const double *fullp, const double *halfp,
+              const int *nx, const double *plev, long nplev, long ngp, long nhlev, double missval)
 {
-  int lp, i;
-  int nl, nh;
-  int *nxl;
+  long lp, i;
+  long nl, nh;
+  const int *nxl;
   double *ptl;
   double pres;
 
@@ -368,12 +367,12 @@ void interp_T(double *geop, double *gt, double *pt, double *fullp, double *halfp
 }  /* interp_T */
 
 
-void interp_Z(double *geop, double *gz, double *pz, double *fullp, double *halfp,
-	      int *nx, double *gt, double *plev, int nplev, int ngp, int nhlev, double missval)
+void interp_Z(const double *geop, const double *gz, double *pz, const double *fullp, const double *halfp,
+	      const int *nx, const double *gt, const double *plev, long nplev, long ngp, long nhlev, double missval)
 {
-  int lp, i;
-  int nl,nh;
-  int *nxl;
+  long lp, i;
+  long nl, nh;
+  const int *nxl;
   double *pzl;
   double pres;
 

@@ -45,7 +45,7 @@ void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 void spec2spec(int gridIDin, double *arrayIn, int gridIDout, double *arrayOut);
 void speccut(int gridIDin, double *arrayIn, double *arrayOut, int *waves);
 
-void sp2fc(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc, int nt);
+void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nlat, long nfc, long nt);
 void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, int nt);
 
 void fc2gp(double *trig, long *ifax, double *fc, double *gp, long nlat, long nlon, long nlev, long nfc);
