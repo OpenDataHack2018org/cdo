@@ -23,9 +23,9 @@ double RD            = C_EARTH_RD;
 int Mars = 0;
 
 
-void h2p(double *phlev, double *hlev, int nphlev)
+void h2p(double * restrict phlev, const double * restrict hlev, long nphlev)
 {
-  int  k;
+  long k;
   double exp_arg;
   double height;
 
@@ -46,9 +46,9 @@ void h2p(double *phlev, double *hlev, int nphlev)
 }  /* h2p */
 
 
-void p2h(double *hlev, double *plev, int nphlev)
+void p2h(double * restrict hlev, const double * restrict plev, long nphlev)
 {
-  int  k;
+  long  k;
 
   for ( k = 0; k < nphlev; k++ )
     {
@@ -58,7 +58,8 @@ void p2h(double *hlev, double *plev, int nphlev)
 }  /* p2h */
 
 
-void presh(double * restrict fullp, double * halfp, const double *vct, const double *ps, long nhlev, long ngp)
+void presh(double * restrict fullp, double * halfp, const double *restrict vct,
+	   const double *restrict ps, long nhlev, long ngp)
 {
   long i, lh;
   double zp, ze;
@@ -89,7 +90,7 @@ void presh(double * restrict fullp, double * halfp, const double *vct, const dou
 } /* presh */
 
 
-void genind(int *nx, const double *plev, const double *fullp, long ngp, long nplev, long nhlev)
+void genind(int *nx, const double * restrict plev, const double * restrict fullp, long ngp, long nplev, long nhlev)
 {
   long  i, lp, lh;
   int *nxl;
@@ -114,9 +115,9 @@ void genind(int *nx, const double *plev, const double *fullp, long ngp, long npl
 }  /* genind */
 
 
-void genindmiss(int *nx, double *plev, int ngp, int nplev, double *ps_prog, int *pnmiss)
+void genindmiss(int *nx, const double * restrict plev, int ngp, int nplev, const double * restrict ps_prog, int * restrict pnmiss)
 {
-  int i, lp;
+  long i, lp;
   int *nxl;
   double pres;
 
@@ -141,7 +142,8 @@ void genindmiss(int *nx, double *plev, int ngp, int nplev, double *ps_prog, int 
 }  /* genindmiss */
 
 
-void extra_P(double *slp, double *halfp, double *fullp, double *geop, double *temp, long ngp)
+void extra_P(double * restrict slp, const double * restrict halfp, const double * restrict fullp,
+	     const double * restrict geop, const double * restrict temp, long ngp)
 {
   double alpha, tstar, tmsl, zprt, zprtal;
   double zrg;
@@ -279,8 +281,8 @@ double extra_Z(double pres, double halfp, double fullp, double geop, double temp
 }  /* extra_Z */
 
 
-void interp_X(const double *gt, double *pt, const double *hyb_press, const int *nx, const double *plev, long nplev,
-	      long ngp, long nhlev, double missval)
+void interp_X(const double * restrict gt, double *pt, const double * restrict hyb_press, const int *nx,
+	      const double * restrict plev, long nplev, long ngp, long nhlev, double missval)
 {
   long lp, i;
   long nl, nh;
@@ -315,8 +317,9 @@ void interp_X(const double *gt, double *pt, const double *hyb_press, const int *
 }  /* interp_X */
 
 
-void interp_T(const double *geop, const double *gt, double *pt, const double *fullp, const double *halfp,
-              const int *nx, const double *plev, long nplev, long ngp, long nhlev, double missval)
+void interp_T(const double * restrict geop, const double * restrict gt, double *pt, const double * restrict fullp,
+	      const double * restrict halfp, const int *nx, const double * restrict plev, long nplev, long ngp,
+	      long nhlev, double missval)
 {
   long lp, i;
   long nl, nh;
@@ -367,8 +370,9 @@ void interp_T(const double *geop, const double *gt, double *pt, const double *fu
 }  /* interp_T */
 
 
-void interp_Z(const double *geop, const double *gz, double *pz, const double *fullp, const double *halfp,
-	      const int *nx, const double *gt, const double *plev, long nplev, long ngp, long nhlev, double missval)
+void interp_Z(const double * restrict geop, const double * restrict gz, double *pz, const double * restrict fullp,
+	      const double * restrict halfp, const int *nx, const double * restrict gt, const double * restrict plev,
+	      long nplev, long ngp, long nhlev, double missval)
 {
   long lp, i;
   long nl, nh;
