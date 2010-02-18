@@ -310,8 +310,8 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
   double sar, sai;
   double *fal;
   double * restrict far, * restrict fai;
-  const double *pol;
-  const double *sal;
+  const double * restrict pol;
+  const double * restrict sal;
 
   nsp2 = (nt+1)*(nt+2);
 

@@ -145,16 +145,16 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv);
 void remapVarsFree(remapvars_t *rv);
 void remapGridFree(remapgrid_t *rg);
 
-void remap(double *dst_array, double missval, long dst_size, long num_links, double **map_wts, 
-	   long num_wts, const int *dst_add, const int *src_add, const double *src_array, 
-	   const double *src_grad1, const double *src_grad2, const double *src_grad3,
+void remap(double * restrict dst_array, double missval, long dst_size, long num_links, double ** restrict map_wts, 
+	   long num_wts, const int * restrict dst_add, const int * restrict src_add, const double * restrict src_array, 
+	   const double * restrict src_grad1, const double * restrict src_grad2, const double * restrict src_grad3,
 	   remaplink_t links);
 
-void remap_laf(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
-	       const int *dst_add, const int *src_add, const double *src_array);
+void remap_laf(double * restrict dst_array, double missval, long dst_size, long num_links, double ** restrict map_wts,
+	       const int * restrict dst_add, const int * restrict src_add, const double * restrict src_array);
 
-void remap_sum(double *dst_array, double missval, long dst_size, long num_links, double **map_wts,
-	       const int *dst_add, const int *src_add, const double *src_array);
+void remap_sum(double * restrict dst_array, double missval, long dst_size, long num_links, double ** restrict map_wts,
+	       const int * restrict dst_add, const int * restrict src_add, const double * restrict src_array);
 
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv);
 void remap_bicub(remapgrid_t *rg, remapvars_t *rv);
@@ -164,9 +164,9 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv);
 
 void resize_remap_vars(remapvars_t *rv, int increment);
 
-void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *array1, 
-		const double *array2, double missval);
-void remap_gradients(remapgrid_t rg, const double *array, double * restrict grad1_lat,
+void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double * restrict array1, 
+		const double * restrict array2, double missval);
+void remap_gradients(remapgrid_t rg, const double * restrict array, double * restrict grad1_lat,
 		     double * restrict grad1_lon, double * restrict grad1_latlon);
 
 void reorder_links(remapvars_t *rv);
