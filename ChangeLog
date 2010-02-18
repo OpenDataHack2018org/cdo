@@ -1,5 +1,12 @@
+2010-02-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.4.3
+	* changed GRIB1 default packing type of spherical harmonics to complex
+	* Version 1.4.3 released
+
 2010-02-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* using CDI library version 1.4.2
 	* Added new module Gridboxstat (testversion)
 	* Version 1.4.2 released
 	
