@@ -197,7 +197,7 @@ void usage(void)
   fprintf(stderr, "\n");
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
-  fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n"));
+  fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
 #if defined (_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");

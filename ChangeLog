@@ -2,6 +2,7 @@
 
 	* using CDI library version 1.4.3
 	* changed GRIB1 default packing type of spherical harmonics to complex
+	* added CDO option -M to indicate that the I/O streams have missing values
 	* Version 1.4.3 released
 
 2010-02-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
