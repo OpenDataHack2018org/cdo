@@ -197,6 +197,7 @@ void usage(void)
   fprintf(stderr, "\n");
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
+  fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n"));
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
 #if defined (_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
@@ -698,7 +699,7 @@ int main(int argc, char *argv[])
 
   cdoHaveNC4 = have_netCDF4();
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMQRrsSTuVvZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMQRrsSTuVvXZ")) != -1 )
     {
       switch (c)
 	{
@@ -756,8 +757,8 @@ int main(int argc, char *argv[])
 	case 'm':
 	  cdiDefMissval(atof(cdoOptarg));
 	  break;
-	case 'M': /* multi threaded I/O */
-	  cdoParIO = TRUE;
+	case 'M':
+	  cdiDefGlobal("HAVE_MISSVAL", TRUE);
 	  break;
 	case 'P':
 	  numThreads = atoi(cdoOptarg);
@@ -796,6 +797,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'v':
 	  cdoVerbose = TRUE;
+	  break;
+	case 'X': /* multi threaded I/O */
+	  cdoParIO = TRUE;
 	  break;
 	case 'Z':
 	  cdoCompress = TRUE;
