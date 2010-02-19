@@ -212,7 +212,7 @@ else
 
   LDFLAGS="$LDFLAGS -L$HDF5DIR/lib"
   CPPFLAGS="$CPPFLAGS -I$HDF5DIR/include"
-  AC_CHECK_LIB([hdf5], [H5Fopen], [], [nc_hdf5_lib_missing=yes], [-lz])
+  AC_CHECK_LIB([hdf5], [H5Fopen], [], [nc_hdf5_lib_missing=yes], [-lz -lsz])
 # AC_SUBST([HDF5DIR], [$HDF5DIR])
   if test "x$nc_hdf5_lib_missing" = xyes; then
     AC_MSG_ERROR([Can't find the hdf5 header and/or library, or can't link a program \
@@ -220,7 +220,7 @@ else
     --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
     specified with the --with-szlib option.])
   else
-    LIBS="${LIBS} -lz"
+    LIBS="${LIBS} -lz -lsz"
 # Check for the HDF5 High Level library.
     AC_CHECK_LIB([hdf5_hl], [H5DSis_scale], [], [nc_hdf5_hl_lib_missing=yes])
 #    if test "x$nc_hdf5_hl_lib_missing" = xyes; then
