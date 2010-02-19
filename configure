@@ -8194,7 +8194,7 @@ if test "${ac_cv_lib_hdf5_H5Fopen+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lhdf5 -lz $LIBS"
+LIBS="-lhdf5 -lz -lsz $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -8272,7 +8272,7 @@ echo "$as_me: error: Can't find the hdf5 header and/or library, or can't link a 
     specified with the --with-szlib option." >&2;}
    { (exit 1); exit 1; }; }
   else
-    LIBS="${LIBS} -lz"
+    LIBS="${LIBS} -lz -lsz"
 # Check for the HDF5 High Level library.
 
 { echo "$as_me:$LINENO: checking for H5DSis_scale in -lhdf5_hl" >&5

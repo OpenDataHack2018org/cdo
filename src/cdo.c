@@ -135,6 +135,8 @@ static void version(void)
 #endif
 #if defined (HAVE_LIBPTHREAD) || defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL) || defined (_OPENMP)
   fprintf(stderr, "    with:");
+  if ( cdoHaveNC4 ) 
+    fprintf(stderr, " NC4");
 #if defined (HAVE_LIBPTHREAD)
   fprintf(stderr, " PTHREADS");
 #endif
