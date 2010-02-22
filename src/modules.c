@@ -238,7 +238,7 @@ void *Wct(void *argument);
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
 #define  CDItestOperators       {"ncopy"}
-#define  ChangeOperators        {"chcode", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
+#define  ChangeOperators        {"chcode", "chtabnum", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}

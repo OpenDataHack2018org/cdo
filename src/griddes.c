@@ -641,6 +641,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      grid.type = GRID_CURVILINEAR;
 	      grid.nvertex = 4;
 	    }
+	  else if ( memcmp(pline, "spectral", 4)  == 0 )
+	    grid.type = GRID_SPECTRAL;
 	  else if ( memcmp(pline, "cell", 4)  == 0 )
 	    grid.type = GRID_CELL;
 	  else if ( memcmp(pline, "gme", 3)  == 0 )

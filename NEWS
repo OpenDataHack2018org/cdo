@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.4.3 (22 February 2010):
+
+   * New features:
+      o changed GRIB1 default packing type of spherical harmonics to complex
+
 Version 1.4.2 (8 February 2010):
 
    * New features:
