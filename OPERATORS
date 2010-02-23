@@ -357,7 +357,6 @@ Operator catalog:
       Genweights gencon2         Generate 2nd order conservative remap weights
       Genweights genlaf          Generate largest area fraction remap weights
       Remap      remap           SCRIP grid remapping
-      Intgrid    interpolate     PINGO grid interpolation
       Remapeta   remapeta        Remap vertical hybrid level
       Vertint    ml2pl           Model to pressure level interpolation
       Vertint    ml2hl           Model to height level interpolation

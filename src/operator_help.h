@@ -2664,24 +2664,6 @@ static char *RemapHelp[] = {
     NULL
 };
 
-static char *IntgridHelp[] = {
-    "NAME",
-    "    interpolate - Grid interpolation",
-    "",
-    "SYNOPSIS",
-    "    interpolate,grid  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    This module contains operators to interpolate all input fields to a new grid.",
-    "    All interpolation methods in this module only work on regular lon/lat grids.",
-    "    This is the grid interpolation from PINGO.",
-    "    For a detailed description of this interpolation method see PINGO.",
-    "",
-    "PARAMETER",
-    "    grid  STRING  Target grid description file or name",
-    NULL
-};
-
 static char *RemapetaHelp[] = {
     "NAME",
     "    remapeta - Remap vertical hybrid level",
@@ -3589,7 +3571,7 @@ static char *EcaFdHelp[] = {
 
 static char *EcaGslHelp[] = {
     "NAME",
-    "    eca_gsl - Growing season length index",
+    "    eca_gsl - Thermal Growing season length index",
     "",
     "SYNOPSIS",
     "    eca_gsl[,nday[,T[,fland]]]  ifile1 ifile2 ofile",
@@ -3597,16 +3579,23 @@ static char *EcaGslHelp[] = {
     "DESCRIPTION",
     "    Let ifile1 be a time series of daily mean temperatures TG,",
     "    and ifile2 be a land-water mask.",
-    "    Then counted are the number of days between the first occurrence",
-    "    of at least nday consecutive days with TG > T and the first occurrence",
-    "    after 1 July of at least nday consecutive days with TG < T. The",
-    "    numbers nday and T are optional parameter with default nday = 6",
+    "    Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:",
+    "    \\begin{enumerate}",
+    "    \\item frist occurrence of at least nday consecutive days with TG > T within the first 6 months",
+    "    \\item first occurrence of at least nday consecutive days with TG < T within the last 6 months",
+    "    \\end{enumerate}",
+    "    On northern hemispere, this period corresponds with the regular year, whereas",
+    "    on southern hemispere, it starts at july $1^{st}$. Please note, that this",
+    "    definition may lead to weird results concerning values TG = T: In the first",
+    "    half of the period, these days do not contribute to the gsl, but they do within the second",
+    "    half.\\\\",
+    "    The numbers nday and T are optional parameter with default nday = 6",
     "    and T = 5 °C. The number fland is an optional parameter with",
     "    default value fland = 0.5 and denotes the fraction of a grid point that",
     "    have to be covered by land in order to be included in the calculation. A",
     "    further output variable is the start day of year of the growing season.",
     "    Note that TG have to be given in units of Kelvin, whereas T have to be given",
-    "    in degrees Celsius.",
+    "    in degrees Celsius.\\\\",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
     "",
