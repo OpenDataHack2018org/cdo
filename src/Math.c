@@ -192,7 +192,7 @@ void *Math(void *argument)
 	      break;
 	    case RECI:
 	      for ( i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array1[i], 0) ? missval1 : 1/array1[i];
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) || DBL_IS_EQUAL(array1[i], 0.) ? missval1 : 1/array1[i];
 	      break;
 	    default:
 	      cdoAbort("operator not implemented!");
