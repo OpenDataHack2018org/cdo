@@ -15,7 +15,7 @@ Within a period of 12 months, the thermal growing season length is officially de
 @Item = frist occurrence of at least nday consecutive days with TG $>$ T within the first 6 months
 @Item = first occurrence of at least nday consecutive days with TG $<$ T within the last 6 months
 @EndItemize
-On northern hemispere, this period corresponds with the regular year > f, whereas
+On northern hemispere, this period corresponds with the regular year, whereas
 on southern hemispere, it starts at july $1^{st}$. Please note, that this
 definition may lead to weird results concerning values TG = T: In the first
 half of the period, these days do not contribute to the gsl, but they do within the second half.
