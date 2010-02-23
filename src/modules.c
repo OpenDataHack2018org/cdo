@@ -505,7 +505,7 @@ static modules_t Modules[] =
   { Importobs,      NULL,              ImportobsOperators,     CDI_REAL,  1,  1 },
   { Info,           InfoHelp,          InfoOperators,          CDI_BOTH, -1,  0 },
   { Input,          InputHelp,         InputOperators,         CDI_REAL,  0,  1 },
-  { Intgrid,        IntgridHelp,       IntgridOperators,       CDI_REAL,  1,  1 },
+  { Intgrid,        NULL,              IntgridOperators,       CDI_REAL,  1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,   CDI_REAL,  1,  1 },
   { Intlevel,       IntlevelHelp,      IntlevelOperators,      CDI_REAL,  1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,       CDI_REAL,  1,  1 },
