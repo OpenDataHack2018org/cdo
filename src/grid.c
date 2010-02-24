@@ -994,9 +994,11 @@ int gridToCell(int gridID1)
 }
 
 static
-double cell_area(long i, long nv, double grid_center_lon, double grid_center_lat)
+double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_lat,
+		 double *grid_corner_lon, double *grid_corner_lat)
 {
   long k;
+  double xa;
   double area;
   struct geo p1, p2, p3;
   struct cart c1, c2, c3;
@@ -1066,11 +1068,10 @@ int gridGenArea(int gridID, double *area)
 {
   static char func[] = "gridGenArea";
   int status = 0;
-  int i, k;
   int gridtype;
-  int nv, gridsize;
   int lgrid_gen_bounds = FALSE;
-  double xa;
+  long i;
+  long nv, gridsize;
   double total_area;
   double *grid_center_lon = NULL;
   double *grid_center_lat = NULL;
@@ -1154,7 +1155,7 @@ int gridGenArea(int gridID, double *area)
   total_area = 0;
   for ( i = 0; i < gridsize; ++i )
     {
-      area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat);
+      area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
       //     total_area += area[i];
     }
 
