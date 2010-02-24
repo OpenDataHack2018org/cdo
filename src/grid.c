@@ -993,6 +993,74 @@ int gridToCell(int gridID1)
   return (gridID2);
 }
 
+static
+double cell_area(long i, long nv, double grid_center_lon, double grid_center_lat)
+{
+  long k;
+  double area;
+  struct geo p1, p2, p3;
+  struct cart c1, c2, c3;
+
+  area = 0;
+      
+  p3.lon = grid_center_lon[i]*deg2rad; 
+  p3.lat = grid_center_lat[i]*deg2rad;
+  c3 = gc2cc(&p3);
+      
+  for ( k = 1; k < nv; ++k )
+    {
+      p1.lon = grid_corner_lon[i*nv+k-1]*deg2rad; 
+      p1.lat = grid_corner_lat[i*nv+k-1]*deg2rad;
+      c1 = gc2cc(&p1);
+      p2.lon = grid_corner_lon[i*nv+k]*deg2rad; 
+      p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
+      c2 = gc2cc(&p2);
+
+      xa = areas(&c1, &c2, &c3);
+      /*
+	if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+	(fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+	(fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
+	{
+	printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i], 
+	p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+	}
+      */
+      if ( xa > 0.001 )
+	if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+	     (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+	     (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+      
+      area += xa;
+    }
+
+  p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
+  p1.lat = grid_corner_lat[i*nv+0]*deg2rad;
+  c1 = gc2cc(&p1);
+  p2.lon = grid_corner_lon[i*nv+nv-1]*deg2rad; 
+  p2.lat = grid_corner_lat[i*nv+nv-1]*deg2rad;
+  c2 = gc2cc(&p2);
+
+  xa = areas(&c1, &c2, &c3);
+  /*
+    if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+    (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+    (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
+    {
+    printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i],
+    p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
+    }
+  */
+  if ( xa > 0.001 )
+    if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
+	 (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
+	 (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+  
+  area += xa;
+
+  return (area);
+}
+
 
 int gridGenArea(int gridID, double *area)
 {
@@ -1009,8 +1077,6 @@ int gridGenArea(int gridID, double *area)
   double *grid_corner_lon = NULL;
   double *grid_corner_lat = NULL;
   int *grid_mask = NULL;
-  struct geo p1, p2, p3;
-  struct cart c1, c2, c3;
 
   gridsize = gridInqSize(gridID);
   gridtype = gridInqType(gridID);
@@ -1088,67 +1154,11 @@ int gridGenArea(int gridID, double *area)
   total_area = 0;
   for ( i = 0; i < gridsize; ++i )
     {
-      area[i] = 0;
-      
-      p3.lon = grid_center_lon[i]*deg2rad; 
-      p3.lat = grid_center_lat[i]*deg2rad;
-      c3 = gc2cc(&p3);
-      
-      for ( k = 1; k < nv; ++k )
-	{
-	  p1.lon = grid_corner_lon[i*nv+k-1]*deg2rad; 
-	  p1.lat = grid_corner_lat[i*nv+k-1]*deg2rad;
-	  c1 = gc2cc(&p1);
-	  p2.lon = grid_corner_lon[i*nv+k]*deg2rad; 
-	  p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
-	  c2 = gc2cc(&p2);
-
-	  xa = areas(&c1, &c2, &c3);
-	  /*
-	  if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-	       (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	       (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
-	    {
-	    printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i], 
-	    p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
-	    }
-	  */
-	  if ( xa > 0.001 )
-	    if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-		 (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-		 (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
-
-	  area[i] += xa;
-	}
-
-      p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
-      p1.lat = grid_corner_lat[i*nv+0]*deg2rad;
-      c1 = gc2cc(&p1);
-      p2.lon = grid_corner_lon[i*nv+nv-1]*deg2rad; 
-      p2.lat = grid_corner_lat[i*nv+nv-1]*deg2rad;
-      c2 = gc2cc(&p2);
-
-      xa = areas(&c1, &c2, &c3);
-      /*
-      if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-	   (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	   (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
-	{
-	printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i],
-	p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
-	}
-      */
-      if ( xa > 0.001 )
-	if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-	     (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	     (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
-
-      area[i] += xa;
-
-      total_area += area[i];
+      area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat);
+      //     total_area += area[i];
     }
 
-  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
+  //  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
 
   free(grid_center_lon);
   free(grid_center_lat);
