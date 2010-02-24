@@ -1153,6 +1153,11 @@ int gridGenArea(int gridID, double *area)
     }
   
   total_area = 0;
+#if defined (_OPENMP)
+#pragma omp parallel for default(none)        \
+  shared(gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat) \
+  private(i)
+#endif
   for ( i = 0; i < gridsize; ++i )
     {
       area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
