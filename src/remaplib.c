@@ -1130,6 +1130,11 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	  rg->bin_addr2[n2+1] = 0;
 	}
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  private(n, nele4)		       \
+  shared(rg)
+#endif
       for ( nele = 0; nele < rg->grid1_size; nele++ )
 	{
 	  nele4 = nele*4;
@@ -1142,6 +1147,11 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	      }
 	}
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  private(n, nele4)		       \
+  shared(rg)
+#endif
       for ( nele = 0; nele < rg->grid2_size; nele++ )
 	{
 	  nele4 = nele*4;
