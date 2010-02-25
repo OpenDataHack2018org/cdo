@@ -618,6 +618,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   long nele;   /* Element loop counter          */
   long i,j;    /* Logical 2d addresses          */
   long nx, ny;
+  int lgrid1_destroy = FALSE, lgrid2_destroy = FALSE;
   int lgrid1_gen_bounds = FALSE, lgrid2_gen_bounds = FALSE;
   int gridID1_gme = -1;
   int gridID2_gme = -1;
@@ -821,6 +822,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	}
       else
 	{
+	  lgrid1_destroy = TRUE;
 	  gridID1 = gridToCurvilinear(rg->gridID1);
 	  lgrid1_gen_bounds = TRUE;
 	}
@@ -838,6 +840,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	}
       else
 	{
+	  lgrid2_destroy = TRUE;
 	  gridID2 = gridToCurvilinear(rg->gridID2);
 	  lgrid2_gen_bounds = TRUE;
 	}
@@ -929,6 +932,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 		 "proceeding assuming radians");
     }
 
+  if ( lgrid1_destroy ) gridDestroy(gridID1);
+
   /* Data for grid 2 */
 
   rg->grid2_dims[0] = gridInqXsize(gridID2);
@@ -988,6 +993,8 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       cdoWarning("Unknown units supplied for grid2 center lat/lon: "
 		 "proceeding assuming radians");
     }
+
+  if ( lgrid2_destroy ) gridDestroy(gridID2);
 
   /* Convert longitudes to 0,2pi interval */
 

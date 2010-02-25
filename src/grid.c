@@ -236,21 +236,26 @@ void gridGenRotBounds(int gridID, int nx, int ny,
     }
 }
 
-
-void gridGenXbounds2D(int nx, int ny, double *xbounds, double *xbounds2D)
+static
+void gridGenXbounds2D(int nx, int ny, const double * restrict xbounds, double * restrict xbounds2D)
 {
   long i, j, index;
   double minlon, maxlon;
 
-  for ( i = 0; i < nx; i++ )
+#if defined (_OPENMP)
+#pragma omp parallel for default(none)        \
+  shared(nx, ny, xbounds, xbounds2D)	      \
+  private(i, j, minlon, maxlon, index)
+#endif
+  for ( i = 0; i < nx; ++i )
     {
-      minlon = xbounds[2*i];
+      minlon = xbounds[2*i  ];
       maxlon = xbounds[2*i+1];
 
-      for ( j = 0; j < ny; j++ )
+      for ( j = 0; j < ny; ++j )
 	{
 	  index = j*4*nx + 4*i;
-	  xbounds2D[index+0] = minlon;
+	  xbounds2D[index  ] = minlon;
 	  xbounds2D[index+1] = maxlon;
 	  xbounds2D[index+2] = maxlon;
 	  xbounds2D[index+3] = minlon;
@@ -258,29 +263,34 @@ void gridGenXbounds2D(int nx, int ny, double *xbounds, double *xbounds2D)
     }
 }
 
-
-void gridGenYbounds2D(int nx, int ny, double *ybounds, double *ybounds2D)
+static
+void gridGenYbounds2D(int nx, int ny, const double * restrict ybounds, double * restrict ybounds2D)
 {
   long i, j, index;
   double minlat, maxlat;
 
-  for ( j = 0; j < ny; j++ )
+#if defined (_OPENMP)
+#pragma omp parallel for default(none)        \
+  shared(nx, ny, ybounds, ybounds2D)	      \
+  private(i, j, minlat, maxlat, index)
+#endif
+  for ( j = 0; j < ny; ++j )
     {
       if ( ybounds[0] > ybounds[1] )
 	{
-	  maxlat = ybounds[2*j];
+	  maxlat = ybounds[2*j  ];
 	  minlat = ybounds[2*j+1];
 	}
       else
 	{
 	  maxlat = ybounds[2*j+1];
-	  minlat = ybounds[2*j];
+	  minlat = ybounds[2*j  ];
 	}
 
-      for ( i = 0; i < nx; i++ )
+      for ( i = 0; i < nx; ++i )
 	{
 	  index = j*4*nx + 4*i;
-	  ybounds2D[index+0] = minlat;
+	  ybounds2D[index  ] = minlat;
 	  ybounds2D[index+1] = minlat;
 	  ybounds2D[index+2] = maxlat;
 	  ybounds2D[index+3] = maxlat;
@@ -1070,6 +1080,7 @@ int gridGenArea(int gridID, double *area)
   int status = 0;
   int gridtype;
   int lgrid_gen_bounds = FALSE;
+  int lgriddestroy = FALSE;
   long i;
   long nv, gridsize;
   double total_area;
@@ -1099,12 +1110,14 @@ int gridGenArea(int gridID, double *area)
     {
       if ( gridtype == GRID_GME )
 	{
+	  lgriddestroy = TRUE;
 	  gridID = gridToCell(gridID);
 	  grid_mask = (int *) malloc(gridsize*sizeof(int));
 	  gridInqMask(gridID, grid_mask);
 	}
       else
 	{
+	  lgriddestroy = TRUE;
 	  gridID = gridToCurvilinear(gridID);
 	  lgrid_gen_bounds = TRUE;
 	}
@@ -1151,6 +1164,8 @@ int gridGenArea(int gridID, double *area)
 	  return (status);
 	}
     }
+
+  if ( lgriddestroy ) gridDestroy(gridID);
   
   total_area = 0;
 #if defined (_OPENMP)
