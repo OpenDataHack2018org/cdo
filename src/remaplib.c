@@ -454,8 +454,8 @@ void boundbox_from_corners(long size, long nc, const double * restrict corner_lo
 }
 
 static
-void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny,
-			  const double * restrict center_lon, const double * restrict center_lat, restr_t * restrict bound_box)
+void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, const double * restrict center_lon,
+			  const double * restrict center_lat, restr_t * restrict bound_box)
 {
   long n4, i, j, k, n, ip1, jp1;
   long n_add, e_add, ne_add;

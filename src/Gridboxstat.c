@@ -497,7 +497,6 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   return gridID2;
 }
 
-
 static
 void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statfunc)
 {
@@ -511,8 +510,7 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   double **weight = NULL;
   double *array1, *array2;
   double missval;
-  int i, j, ii, jj;
-  double **xfield2;
+  long ig, i, j, ii, jj;
   field_t field;
   int isize;
   int useWeight = FALSE;
@@ -551,34 +549,31 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
       weight[ilat] = field1->weight + ilat*nlon1;
 
 
-  xfield2 = (double **) malloc(nlat2 * sizeof(double *));
+  for ( ig = 0; ig < nlat2*nlon2; ++ig )
+    {
+      ilat = ig/nlon2;
+      ilon = ig - ilat*nlon2;
 
-  for ( ilat = 0; ilat < nlat2; ilat++ )
-    xfield2[ilat] = array2 + ilat*nlon2;
-
-  for ( ilat = 0; ilat < nlat2; ilat++ )
-    for ( ilon = 0; ilon < nlon2; ilon++ )
-      {
-        isize = 0;
-        field.nmiss = 0;
-        for ( j = 0; j < yinc; ++j )
-          {
-            jj = ilat*yinc+j;
-            if ( jj >= nlat1 ) break;
-            for ( i = 0; i < xinc; ++i )
-              {
-                ii = ilon*xinc+i;
-                if ( ii >= nlon1 ) break;
-                field.ptr[isize] = xfield1[jj][ii];
-                if ( useWeight ) field.weight[isize] = weight[jj][ii];
-                if ( DBL_IS_EQUAL(field.ptr[isize], field.missval) ) field.nmiss++;
-                isize++;
-              }
-          }
+      isize = 0;
+      field.nmiss = 0;
+      for ( j = 0; j < yinc; ++j )
+	{
+	  jj = ilat*yinc+j;
+	  if ( jj >= nlat1 ) break;
+	  for ( i = 0; i < xinc; ++i )
+	    {
+	      ii = ilon*xinc+i;
+	      if ( ii >= nlon1 ) break;
+	      field.ptr[isize] = xfield1[jj][ii];
+	      if ( useWeight ) field.weight[isize] = weight[jj][ii];
+	      if ( DBL_IS_EQUAL(field.ptr[isize], field.missval) ) field.nmiss++;
+	      isize++;
+	    }
+	}
         
-        field.size = isize;
-        xfield2[ilat][ilon] = fldfun(field, statfunc);
-      }
+      field.size = isize;
+      field2->ptr[ig] = fldfun(field, statfunc);
+    }
   
   nmiss = 0;
   for ( i = 0; i < nlat2*nlon2; i++ )
@@ -586,7 +581,6 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   
   field2->nmiss = nmiss;
   
-  free(xfield2);
   free(xfield1);
   free(field.ptr);
   if ( useWeight )
@@ -601,6 +595,7 @@ void *Gridboxstat(void *argument)
   int operfunc;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
+  int lastgrid = -1;
   int wstatus = FALSE;
   int code = 0, oldcode = 0;
   int index, ngrids;
@@ -691,8 +686,9 @@ void *Gridboxstat(void *argument)
           field2.size = gridsize2;
           field2.missval = field1.missval;
 
-          if ( needWeights )
+          if ( needWeights && field1.grid != lastgrid )
             {
+	      lastgrid = field1.grid;
               wstatus = gridWeights(field1.grid, field1.weight);
             }
           code = vlistInqVarCode(vlistID1, varID);
