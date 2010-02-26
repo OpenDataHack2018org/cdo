@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 
-
 /*
  * if DEBUG_MEMORY is defined setenv MEMORY_DEBUG to debug memory
  */

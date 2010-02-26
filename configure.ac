@@ -38,7 +38,7 @@ AC_SYS_LARGEFILE
 AC_FUNC_MMAP
 
 # Checks for library malloc.
-AC_CHECK_LIB(malloc, mallinfo)
+AC_CHECK_LIB(malloc, malloc)
 
 # Checks for structures.
 AC_CHECK_MEMBERS([struct stat.st_blksize])
@@ -46,12 +46,14 @@ AC_CHECK_MEMBERS([struct stat.st_blksize])
 # Checks for header files
 AC_CHECK_HEADERS(sys/resource.h)
 AC_CHECK_HEADERS(sys/times.h)
+AC_CHECK_HEADERS(malloc.h)
+
+# Checks for the availability of functions
+AC_CHECK_FUNCS(mallinfo)
 
 # Checks for the availability of ANSI-C99 functions
 AC_CHECK_FUNCS(isnan)
-
 AC_CHECK_FUNCS(getrlimit)
-
 AC_CHECK_FUNCS(gethostname)
 
 # Checks for compiler

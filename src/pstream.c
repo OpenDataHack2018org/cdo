@@ -1447,7 +1447,7 @@ void cdoFinish(void)
 
   if ( processID == 0 )
     {
-      int mu[] = {'B', 'K', 'M', 'G', 'T'};
+      int mu[] = {'b', 'k', 'm', 'g', 't'};
       int muindex = 0;
       long memmax;
       extern int cdoLogOff;
@@ -1479,7 +1479,7 @@ void cdoFinish(void)
   else
     {
       if ( ! cdoSilentMode )
-	fprintf(stderr, " ( %.2fs %s)\n", c_cputime, memstring);
+	fprintf(stderr, " ( %.2fs )\n", c_cputime);
     }
 
   if ( cdoBenchmark && processID == 0 )
