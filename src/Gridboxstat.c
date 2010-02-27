@@ -506,24 +506,29 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   int ilat, ilon;
   int gridID1, gridID2;
   int nmiss;
-  double **xfield1;
-  double **weight = NULL;
   double *array1, *array2;
   double missval;
-  long ig, i, j, ii, jj;
-  field_t field;
+  long ig, i, j, ii, jj, index;
+  long gridsize;
+  long ompthID;
+  field_t *field;
   int isize;
   int useWeight = FALSE;
 
   if ( field1->weight ) useWeight = TRUE;
 
-  field.size    = xinc*yinc;
-  field.ptr     = (double *) malloc(field.size*sizeof(double));
-  field.weight  = NULL;
-  if ( useWeight )
-    field.weight  = (double *) malloc(field.size*sizeof(double));
-  field.missval = field1->missval;
-  field.nmiss   = 0;
+  gridsize      = xinc*yinc;
+  field = (field_t *) malloc(ompNumThreads*sizeof(field_t));
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      field[i].size    = gridsize;
+      field[i].ptr     = (double *) malloc(gridsize*sizeof(double));
+      field[i].weight  = NULL;
+      if ( useWeight )
+	field[i].weight  = (double *) malloc(gridsize*sizeof(double));
+      field[i].missval = field1->missval;
+      field[i].nmiss   = 0;
+    }
   
   gridID1 = field1->grid;
   gridID2 = field2->grid;
@@ -537,25 +542,22 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   nlon2 = gridInqXsize(gridID2);
   nlat2 = gridInqYsize(gridID2);
 
-  xfield1 = (double **) malloc(nlat1*sizeof(double *));
-  if ( useWeight )
-    weight  = (double **) malloc(nlat1*sizeof(double *));
 
-  for ( ilat = 0; ilat < nlat1; ilat++ )
-    xfield1[ilat] = array1 + ilat*nlon1;
-
-  if ( useWeight )
-    for ( ilat = 0; ilat < nlat1; ilat++ )
-      weight[ilat] = field1->weight + ilat*nlon1;
-
-
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(ig, ilat, ilon, j, jj, i, ii, index, isize, ompthID)
+#endif
   for ( ig = 0; ig < nlat2*nlon2; ++ig )
     {
+#if defined (_OPENMP)
+      ompthID = omp_get_thread_num();
+#else
+      ompthID = 0;
+#endif
       ilat = ig/nlon2;
       ilon = ig - ilat*nlon2;
 
       isize = 0;
-      field.nmiss = 0;
+      field[ompthID].nmiss = 0;
       for ( j = 0; j < yinc; ++j )
 	{
 	  jj = ilat*yinc+j;
@@ -563,16 +565,17 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
 	  for ( i = 0; i < xinc; ++i )
 	    {
 	      ii = ilon*xinc+i;
+	      index = jj*nlon1 + ii;
 	      if ( ii >= nlon1 ) break;
-	      field.ptr[isize] = xfield1[jj][ii];
-	      if ( useWeight ) field.weight[isize] = weight[jj][ii];
-	      if ( DBL_IS_EQUAL(field.ptr[isize], field.missval) ) field.nmiss++;
+	      field[ompthID].ptr[isize] = array1[index];
+	      if ( useWeight ) field[ompthID].weight[isize] = field1->weight[index];
+	      if ( DBL_IS_EQUAL(field[ompthID].ptr[isize], field[ompthID].missval) ) field[ompthID].nmiss++;
 	      isize++;
 	    }
 	}
         
-      field.size = isize;
-      field2->ptr[ig] = fldfun(field, statfunc);
+      field[ompthID].size = isize;
+      field2->ptr[ig] = fldfun(field[ompthID], statfunc);
     }
   
   nmiss = 0;
@@ -581,10 +584,13 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   
   field2->nmiss = nmiss;
   
-  free(xfield1);
-  free(field.ptr);
-  if ( useWeight )
-    free(field.weight);
+  for ( i = 0; i < ompNumThreads; i++ )
+    {
+      if ( field[i].ptr    ) free(field[i].ptr);
+      if ( field[i].weight ) free(field[i].weight);
+    }
+
+  if ( field ) free(field);
 }
 
 
