@@ -27,6 +27,9 @@
       Gridboxstat    gridboxvar          Gridbox variance
 */
 
+#if defined (_OPENMP)
+#  include <omp.h>
+#endif
 
 #include "cdi.h"
 #include "cdo.h"

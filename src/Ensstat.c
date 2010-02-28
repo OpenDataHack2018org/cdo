@@ -28,7 +28,6 @@
       Ensstat    enspctl         Ensemble percentiles
 */
 
-
 #if defined (_OPENMP)
 #  include <omp.h>
 #endif

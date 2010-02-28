@@ -229,6 +229,7 @@ static void dumpmap()
   int swpflg = 0;
   int i;
   struct gaindx indx;
+  size_t nbytes;
   FILE *mapfp;
 
   indx.hipnt = NULL;
@@ -242,47 +243,47 @@ static void dumpmap()
   /* check the version number */
 
   fseek(mapfp, 1, 0);
-  fread(&vermap, sizeof(unsigned char), 1, mapfp);
+  nbytes = fread(&vermap, sizeof(unsigned char), 1, mapfp);
 
   if ( vermap == 2 )
     {
       printf("gribmap version = %d\n", vermap);
       fseek(mapfp, 2, 0);
 
-      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
       indx.hinum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
       
-      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
       indx.hfnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
 
-      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
       indx.intnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
 
-      fread(mrec, sizeof(unsigned char), 4, mapfp);
+      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
       indx.fltnum = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
 
-      fread(mrec, sizeof(unsigned char), 7, mapfp);
+      nbytes = fread(mrec, sizeof(unsigned char), 7, mapfp);
 
       if ( indx.hinum > 0 )
 	{
 	  indx.hipnt = (int *) malloc(sizeof(int)*indx.hinum);
 	  for ( i = 0; i < indx.hinum; i++ )
 	    {
-	      fread(mrec, sizeof(unsigned char), 4, mapfp);
+	      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
 	      indx.hipnt[i] = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
 	    }
 	}
       if ( indx.hfnum > 0 )
 	{
 	  indx.hfpnt = (float *) malloc(sizeof(float)*indx.hfnum);
-	  fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
+	  nbytes = fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
 	}
       if ( indx.intnum > 0 )
 	{
 	  indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
 	  for ( i = 0; i < indx.intnum; i++ )
 	    {
-	      fread(mrec, sizeof(unsigned char), 4, mapfp);
+	      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
 	      indx.intpnt[i] = GET_UINT4(mrec[0],mrec[1],mrec[2],mrec[3]);
 	      if ( indx.intpnt[i] < 0 ) indx.intpnt[i] = 0x7fffffff - indx.intpnt[i] + 1;
 	    }
@@ -292,7 +293,7 @@ static void dumpmap()
 	  indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
 	  for ( i = 0; i < indx.fltnum; i++ )
 	    {
-	      fread(urec, sizeof(unsigned char), 4, mapfp);
+	      nbytes = fread(urec, sizeof(unsigned char), 4, mapfp);
 	      indx.fltpnt[i] = ibm2flt(urec);
 	    }
 	}
@@ -300,7 +301,7 @@ static void dumpmap()
   else
     {
       fseek(mapfp, 0, 0);
-      fread (&indx, sizeof(struct gaindx), 1, mapfp);
+      nbytes = fread (&indx, sizeof(struct gaindx), 1, mapfp);
       if ( indx.type>>24 > 0 ) swpflg = 1;
       if ( swpflg ) printf("swap endian!\n");
       if ( swpflg ) gabswp((float *)&indx.type, 5);
@@ -308,25 +309,25 @@ static void dumpmap()
       if ( indx.hinum > 0 )
 	{
 	  indx.hipnt = (int *) malloc(sizeof(int)*indx.hinum);
-	  fread (indx.hipnt, sizeof(int), indx.hinum, mapfp);
+	  nbytes = fread (indx.hipnt, sizeof(int), indx.hinum, mapfp);
 	  if ( swpflg ) gabswp((float *)(indx.hipnt),indx.hinum);
 	}
       if ( indx.hfnum > 0 )
 	{
 	  indx.hfpnt = (float *) malloc(sizeof(float)*indx.hfnum);
-	  fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
+	  nbytes = fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
 	  if ( swpflg ) gabswp(indx.hfpnt,indx.hfnum);
 	}
       if ( indx.intnum > 0 )
 	{
 	  indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
-	  fread (indx.intpnt,sizeof(int),indx.intnum,mapfp);
+	  nbytes = fread (indx.intpnt,sizeof(int),indx.intnum,mapfp);
 	  if ( swpflg ) gabswp((float *)(indx.intpnt),indx.intnum);
 	}
       if ( indx.fltnum > 0 )
 	{
 	  indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
-	  fread (indx.fltpnt,sizeof(float),indx.fltnum,mapfp);
+	  nbytes = fread (indx.fltpnt,sizeof(float),indx.fltnum,mapfp);
 	  if ( swpflg ) gabswp(indx.fltpnt,indx.fltnum);
 	}
     }

@@ -97,7 +97,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   double pbl_lim, pbl_lim_need;
   long jblt, jjblt;
   long k, iv, ij, ijk, ijk1, ijk2;
-  long jlev = 0, jlevr = 0, jnop;
+  long jlev = 0, jlevr, jnop;
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
   double *af1, *bf1, *etaf1, *pf1, *lnpf1;
   double *tv1, *theta1, *rh1;
@@ -461,7 +461,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	  zdff = fi1[jlev+1]-fis2[ij];
       
 	  /* get the number of points used for estimation of regression coefficients */
-      
+	  jlevr = 0;
 	  for ( k = jlev-1; k > 0; --k )
 	    {
 	      jlevr = k;
