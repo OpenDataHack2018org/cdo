@@ -709,29 +709,32 @@ static char *opalias[][2] =
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));
 
-static int similar(char *a, char *b, int level_a, int level_b)
+
+static
+int similar(const char *a, const char *b, int alen, int blen)
 {
+  if ( alen > 2 && blen > 2 && strstr(b, a) )
+    return TRUE;
+
   while ( *a && *b && *a == *b )
     { 
-      a++ ;
-      b++ ;
+      a++;
+      b++;
     }
   if ( !*a && !*b )
-    return TRUE ;
+    return TRUE;
   /*
-  printf("%d %d %s %s\n", level_a, level_b, a, b);
+    printf("%d %d %s %s\n", alen, blen, a, b);
   */
+  if ( alen >= 2 && blen >= 1 && *a && similar(a+1, b, alen-2, blen-1) )
+    return TRUE;
 
-  if ( level_a >= 2 && level_b >= 1 && *a && 
-       similar(a+1, b, level_a-2, level_b-1) )
-    return TRUE ;
+  if ( alen >= 1 && blen >= 2 && *b && similar(a, b+1, alen-1, blen-2) )
+    return TRUE;
 
-  if ( level_a >= 1 && level_b >= 2 && *b && 
-       similar(a, b+1, level_a-1, level_b-2 ) )
-    return TRUE ;
-
-  return FALSE ; 
+  return FALSE; 
 }
+
 
 char *operatorAlias(char *operatorName)
 {
@@ -755,7 +758,8 @@ char *operatorAlias(char *operatorName)
   return (operatorNameNew);
 }
 
-static int operatorInqModID(char *operatorName)
+static
+int operatorInqModID(char *operatorName)
 {
   static char func[] = "operatorInqModID";
   int i, j, modID = -1;
