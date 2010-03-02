@@ -127,12 +127,6 @@ void *Arith(void *argument)
 
   if ( filltype == FILL_NONE )
     vlistCompare(vlistID1, vlistID2, func_sft);
-  
-  if ( operfunc == func_mul || operfunc == func_div )
-    {
-      nospec(vlistID1);
-      nospec(vlistID2);
-    }
 
   gridsize = vlistGridsizeMax(vlistIDx1);
 
