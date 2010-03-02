@@ -73,9 +73,6 @@ void *Ymonarith(void *argument)
   vlistID3 = vlistDuplicate(vlistID1);
 
   vlistCompare(vlistID1, vlistID2, func_sft);
-  
-  if ( operfunc == func_mul || operfunc == func_div )
-    nospec(vlistID1);
 
   gridsize = vlistGridsizeMax(vlistID1);
 
