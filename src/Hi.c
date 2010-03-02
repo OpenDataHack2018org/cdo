@@ -127,8 +127,6 @@ void *Hi(void *argument)
   vlistCompare(vlistID1, vlistID2, func_sft);
   vlistCompare(vlistID1, vlistID3, func_sft);
   
-  nospec(vlistID1);
-
   gridsize = vlistGridsizeMax(vlistID1);
 
   field1.ptr = (double *) malloc(gridsize*sizeof(double));

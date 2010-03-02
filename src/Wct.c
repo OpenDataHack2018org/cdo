@@ -115,8 +115,6 @@ void *Wct(void *argument)
 
   vlistCompare(vlistID1, vlistID2, func_sft);
   
-  nospec(vlistID1);
-
   gridsize = vlistGridsizeMax(vlistID1);
 
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
