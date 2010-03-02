@@ -195,8 +195,8 @@ case "${HOSTNAME}" in
 # powerpc-ibm-aix5.3.0.0
     blizzard*)
 	${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/sw/aix61/netcdf-4.1.1-rc1 \
-                    --with-hdf5=/sw/aix61/hdf5-1.8.4-patch1 \
+                    --with-netcdf=/sw/aix53/netcdf-4.0.1-ibm \
+                    --with-hdf5=/sw/aix53/hdf5-1.8.2 \
                     --with-szlib=/sw/aix53/szip-2.1 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
  	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
