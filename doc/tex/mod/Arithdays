@@ -9,7 +9,8 @@
 
 @BeginDescription
 This module multiplies or divides each time step of a dataset with the corresponding
-days per month or days per year.
+days per month or days per year. The result of these functions depends on the used
+calendar of the input data.
 @EndDescription
 @EndModule
 
