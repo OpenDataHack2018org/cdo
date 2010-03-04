@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -105,6 +105,7 @@ void *Input(void *argument)
       gridID = cdoDefineGrid(operatorArgv()[0]);
     }
 
+  levels[0] = 0;
   nrecs = 0;
 
   tsID = 0;
@@ -232,6 +233,7 @@ void *Input(void *argument)
       if ( nrecs == 0 )
 	{
 	  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+	  zaxisDefLevels(zaxisID, levels);
 
 	  vlistID = vlistCreate();
 	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
