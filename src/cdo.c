@@ -61,7 +61,7 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-char CDO_Version[] = "Climate Data Operators version "VERSION" (http://www.mpimet.mpg.de/cdo)";
+char CDO_Version[] = "Climate Data Operators version "VERSION" (http://code.zmaw.de/projects/cdo)";
 
 
 char *Progname;
@@ -231,9 +231,9 @@ void usage(void)
 
   fprintf(stderr, "\n");
   fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2010 Uwe Schulzweida\n", VERSION);
-  fprintf(stderr, "  Available from http://www.mpimet.mpg.de/cdo\n");
+  //  fprintf(stderr, "  Available from <http://code.zmaw.de/projects/cdo>\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
-  fprintf(stderr, "  Report bugs to Uwe.Schulzweida@zmaw.de\n");
+  fprintf(stderr, "  Report bugs to <http://code.zmaw.de/projects/cdo>\n");
 }
 
 static
