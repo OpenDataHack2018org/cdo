@@ -495,7 +495,7 @@ static modules_t Modules[] =
   { Fourier,        NULL,              FourierOperators,       CDI_COMP,  1,  1 },
   { Gengrid,        NULL,              GengridOperators,       CDI_REAL,  2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,      CDI_REAL,  1,  0 },
-  { Gridboxstat,    NULL,              GridboxstatOperators,   CDI_REAL,  1,  1 },
+  { Gridboxstat,    GridboxstatHelp,   GridboxstatOperators,   CDI_REAL,  1,  1 },
   { Gridcell,       GridcellHelp,      GridcellOperators,      CDI_REAL,  1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,      CDI_REAL,  1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,     CDI_REAL,  1,  1 },

@@ -180,7 +180,7 @@ INTEGER  Percentile number in {1, ..., 99}
 
 
 @c @BeginNote
-@c Use CDO option '-v' in order to get the geographic position of the
+@c Use CDO option '-v' in order to print the geographic position of the
 @c minimum and maximum to stdout.
 @c @EndNote
 

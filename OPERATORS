@@ -222,6 +222,13 @@ Operator catalog:
       Merstat    mervar          Meridional variance
       Merstat    merstd          Meridional standard deviation
       Merstat    merpctl         Meridional percentiles
+      Gridboxstat gridboxmin      Gridbox minimum
+      Gridboxstat gridboxmax      Gridbox maximum
+      Gridboxstat gridboxsum      Gridbox sum
+      Gridboxstat gridboxmean     Gridbox mean
+      Gridboxstat gridboxavg      Gridbox average
+      Gridboxstat gridboxvar      Gridbox variance
+      Gridboxstat gridboxstd      Gridbox standard deviation
       Vertstat   vertmin         Vertical minimum
       Vertstat   vertmax         Vertical maximum
       Vertstat   vertsum         Vertical sum

@@ -1,0 +1,95 @@
+@BeginModule
+@NewPage
+@Name      = Gridboxstat
+@Title     = Statistical values over grid boxes
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = ifile ofile
+@Operators = gridboxmin gridboxmax gridboxsum gridboxmean gridboxavg gridboxvar gridboxstd
+
+@BeginDescription
+This module computes statistical values over surrounding grid boxes.
+According to the chosen operator the minimum, maximum, sum, average, 
+variance, or standard deviation of the neighboring grid boxes is written to @file{ofile}.
+All gridbox operators only works on quadrilateral curvilinear grids.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_gridboxmin
+@Title     = Gridbox minimum
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxmax
+@Title     = Gridbox maximum
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxsum
+@Title     = Gridbox sum
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxmean
+@Title     = Gridbox mean
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxavg
+@Title     = Gridbox average
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxvar
+@Title     = Gridbox variance
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_gridboxstd
+@Title     = Gridbox standard deviation
+@Parameter = nx, ny
+
+@BeginDescription
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = nx
+INTEGER  Number of grid boxes in x direction
+@Item = ny
+INTEGER  Number of grid boxes in y direction
+@EndParameter
+
+
+@BeginExample
+To compute the mean over 10x10 grid boxes of the input field use:
+@BeginVerbatim
+   cdo gridboxmean,10,10 ifile ofile
+@EndVerbatim
+@EndExample

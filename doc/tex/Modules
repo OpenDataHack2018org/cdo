@@ -42,6 +42,7 @@ Ensstat       Statistical values
 Fldstat       Statistical values
 Zonstat       Statistical values
 Merstat       Statistical values
+Gridboxstat    Statistical values
 Vertstat      Statistical values
 Timselstat    Statistical values
 Timselpctl    Statistical values
