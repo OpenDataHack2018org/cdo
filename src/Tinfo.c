@@ -302,7 +302,7 @@ void *Tinfo(void *argument)
 
       calendar = taxisInqCalendar(taxisID);
 
-      if ( taxisHasBounds(taxisID) ) 
+      if ( taxisHasBounds(taxisID) )
 	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference\n");
       else
 	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment\n");

@@ -752,6 +752,8 @@ void    taxisDefRtime(int taxisID, int time);
 
 int     taxisHasBounds(int taxisID);
 
+void    taxisDeleteBounds(int taxisID);
+
 void    taxisDefVdateBounds(int taxisID, int vdate_lb, int vdate_ub);
 
 void    taxisDefVtimeBounds(int taxisID, int vtime_lb, int vtime_ub);
