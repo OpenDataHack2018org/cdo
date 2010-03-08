@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2007-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -142,7 +142,7 @@ void printBounds(int taxisID, int calendar)
 
   date2str(vdate0, vdatestr, sizeof(vdatestr));
   time2str(vtime0, vtimestr, sizeof(vtimestr));	  
-  fprintf(stdout, "%s %s", vdatestr, vtimestr);
+  fprintf(stdout, " %s %s", vdatestr, vtimestr);
 
   date2str(vdate1, vdatestr, sizeof(vdatestr));
   time2str(vtime1, vtimestr, sizeof(vtimestr));	  
@@ -303,7 +303,7 @@ void *Tinfo(void *argument)
       calendar = taxisInqCalendar(taxisID);
 
       if ( taxisHasBounds(taxisID) ) 
-	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss  Difference\n");
+	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  Difference\n");
       else
 	fprintf(stdout, "\nTimestep YYYY-MM-DD hh:mm:ss   Increment\n");
 
