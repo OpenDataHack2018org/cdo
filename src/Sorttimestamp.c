@@ -89,6 +89,11 @@ void *Sorttimestamp(void *argument)
 	{
 	  vlistID2 = vlistDuplicate(vlistID1);
 	  taxisID2 = taxisDuplicate(taxisID1);
+	  if ( taxisHasBounds(taxisID2) )
+	    {
+	      cdoWarning("Time bounds unsupported by this operator, removed!");
+	      taxisDeleteBounds(taxisID2);
+	    }
 	}
       else
 	{
