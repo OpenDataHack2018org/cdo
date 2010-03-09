@@ -79,6 +79,7 @@ void *Settime(void *argument)
   int ijulinc = 0, incperiod = 0, incunit = 0;
   int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
   int day0;
+  int taxis_has_bounds, copy_timestep = FALSE;
   int calendar;
   int newcalendar = CALENDAR_STANDARD;
   const char *datestr, *timestr;
@@ -212,7 +213,8 @@ void *Settime(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  ntsteps = vlistNtsteps(vlistID1);
+  taxis_has_bounds = taxisHasBounds(taxisID1);
+  ntsteps  = vlistNtsteps(vlistID1);
 
   if ( ntsteps == 0 )
     {
@@ -228,6 +230,8 @@ void *Settime(void *argument)
 
   if ( operatorID == SETREFTIME )
     {
+      copy_timestep = TRUE;
+
       if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
 	{
 	  cdoPrint("Changing absolute to relative time axis!");
@@ -242,6 +246,8 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETTUNITS )
     {
+      copy_timestep = TRUE;
+
       if ( taxisInqType(taxisID1) == TAXIS_ABSOLUTE )
 	{
 	  cdoPrint("Changing absolute to relative time axis!");
@@ -254,6 +260,8 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETCALENDAR )
     {
+      copy_timestep = TRUE;
+
       /*
       if ( ((char *)argument)[0] == '-' )
 	cdoAbort("This operator does not work with pipes!");
@@ -283,14 +291,15 @@ void *Settime(void *argument)
     {
       taxisDefTunit(taxisID2, tunit);
     }
-  else if ( operatorID == SETREFTIME )
-    {
-      taxisDefRdate(taxisID2, sdate);
-      taxisDefRtime(taxisID2, stime);
-    }
   else if ( operatorID == SETCALENDAR )
     {
       taxisDefCalendar(taxisID2, newcalendar);
+    }
+
+  if ( taxis_has_bounds && copy_timestep == FALSE )
+    {
+      cdoWarning("Time bounds unsupported by this operator, removed!");
+      taxisDeleteBounds(taxisID2);
     }
 
   vlistDefTaxis(vlistID2, taxisID2);
@@ -363,7 +372,7 @@ void *Settime(void *argument)
 			 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
 	    }
 	}
-      else if ( operatorID == SETREFTIME || operatorID == SETCALENDAR )
+      else if ( operatorID == SETREFTIME || operatorID == SETCALENDAR || operatorID == SETTUNITS )
 	{
 	  ;
 	}
@@ -381,8 +390,20 @@ void *Settime(void *argument)
 	  if ( operatorID == SETTIME  ) vtime = newval;
 	}
 
-      taxisDefVdate(taxisID2, vdate);
-      taxisDefVtime(taxisID2, vtime);
+      if ( copy_timestep )
+	{
+	  taxisCopyTimestep(taxisID2, taxisID1);
+	  if ( operatorID == SETREFTIME )
+	    {
+	      taxisDefRdate(taxisID2, sdate);
+	      taxisDefRtime(taxisID2, stime);
+	    }
+	}
+      else
+	{
+	  taxisDefVdate(taxisID2, vdate);
+	  taxisDefVtime(taxisID2, vtime);
+	}
 
       streamDefTimestep(streamID2, tsID1);
 	       
