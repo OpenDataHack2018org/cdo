@@ -174,7 +174,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
   int ndate, ntime;
   int ijulinc = incperiod0 * iunits[incunit0];
 
-  if ( ngaps < MAX_GAPS )
+  if ( ijulinc > 0 && ngaps < MAX_GAPS )
     {
       rangetsm[ngaps][0] = tsID;
       rangetsm[ngaps][1] = tsID+1;
@@ -183,6 +183,7 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 	{
 	  its = 0;
 	  ndate = vdate0;
+	  printf("fill_gap %d\n", ndate);
 	  while ( TRUE )
 	    {
 	      cdiDecodeDate(ndate, &year, &month, &day);
