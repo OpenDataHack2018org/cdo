@@ -1389,10 +1389,14 @@ int gridFromName(const char *gridname)
 	  grid.ntr = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 	  if      ( cmpstr(pline, "grid", len) == 0 ) grid.type = GRID_GAUSSIAN;
+	  else if ( cmpstr(pline, "zon",  len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
       
 	  grid.ysize = ntr2nlat_linear(grid.ntr);
-	  grid.xsize = compNlon(grid.ysize);
+	  if ( cmpstr(pline, "zon",  len) == 0 )
+	    grid.xsize = 1;
+	  else
+	    grid.xsize = compNlon(grid.ysize);
 
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
@@ -1409,10 +1413,14 @@ int gridFromName(const char *gridname)
 	  grid.ntr = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 	  if      ( cmpstr(pline, "grid", len) == 0 ) grid.type = GRID_GAUSSIAN;
+	  else if ( cmpstr(pline, "zon",  len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
       
 	  grid.ysize = ntr2nlat(grid.ntr);
-	  grid.xsize = compNlon(grid.ysize);
+	  if ( cmpstr(pline, "zon",  len) == 0 )
+	    grid.xsize = 1;
+	  else
+	    grid.xsize = compNlon(grid.ysize);
 
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {

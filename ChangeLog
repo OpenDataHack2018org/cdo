@@ -1,3 +1,7 @@
+2010-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added predefined grid t<RES>zon
+	
 2010-03-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: added support for const/var (bug fix) [report: Youmin Chen]
