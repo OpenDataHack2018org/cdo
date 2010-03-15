@@ -136,7 +136,7 @@ void *Cat(void *argument)
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2,  varID,  levelID);
-	  
+
 	      if ( lcopy )
 		{
 		  streamCopyRecord(streamID2, streamID1); 

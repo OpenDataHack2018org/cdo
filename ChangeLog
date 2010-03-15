@@ -1,5 +1,6 @@
 2010-03-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* pstreamWriteRecord: check pstreamptr->varlist (bug fix) [report: Kevin Sieck]
 	* added operator fldcor to correlate two fields (test version)
 	
 2010-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

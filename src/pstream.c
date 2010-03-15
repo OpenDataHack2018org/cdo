@@ -938,7 +938,7 @@ const char *cdoComment(void)
   return (comment);
 }
 
-
+static
 void pstreamDefVarlist(PSTREAM *pstreamptr, int vlistID)
 {
   static char func[] = "pstreamDefVarlist";
@@ -1198,8 +1198,9 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
       int varID = pstreamptr->varID;
       if ( cdoTimer ) timer_start(timer_write);
 
-      if ( pstreamptr->varlist[varID].check_datarange )
-	pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
+      if ( pstreamptr->varlist )
+	if ( pstreamptr->varlist[varID].check_datarange )
+	  pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 
       streamWriteRecord(pstreamptr->fileID, data, nmiss);
       if ( cdoTimer ) timer_stop(timer_write);
