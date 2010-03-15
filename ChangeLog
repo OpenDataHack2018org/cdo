@@ -1,3 +1,7 @@
+2010-03-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added operator fldcor to correlate two fields (test version)
+	
 2010-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added predefined grid t<RES>zon
@@ -6,6 +10,10 @@
 
 	* expr: added support for const/var (bug fix) [report: Youmin Chen]
 	
+2010-03-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added support for netCDF time bounds (bug fix) [report: Beate Geyer]
+
 2010-03-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Released module Gridboxstat

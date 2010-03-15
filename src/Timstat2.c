@@ -37,10 +37,9 @@ void *Timstat2(void *argument)
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
-  int gridsize;
   int vdate = 0, vtime = 0;
   int nrecs, nrecs2, nrecs3, nvars, *nlevs ;
-  int i;
+  long i, gridsize;
   int tsID;
   int varID, recID, levelID, gridID;
   int nmiss1, nmiss2;
@@ -65,6 +64,7 @@ void *Timstat2(void *argument)
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
+
   streamID2 = streamOpenRead(cdoStreamName(1));
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
@@ -74,7 +74,6 @@ void *Timstat2(void *argument)
 
   vlistCompare(vlistID1, vlistID2, func_sft);
  
-  gridsize = vlistGridsizeMax(vlistID1);
   nvars = vlistNvars(vlistID1);
   nrecs = vlistNrecs(vlistID1);
   nrecs3 = nrecs;
@@ -90,6 +89,8 @@ void *Timstat2(void *argument)
 
   streamDefVlist(streamID3, vlistID3);
  
+  gridsize = vlistGridsizeMax(vlistID1);
+
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
   memset(field1.ptr, 0, gridsize*sizeof(double));
   field2.ptr = (double *) malloc(gridsize*sizeof(double));

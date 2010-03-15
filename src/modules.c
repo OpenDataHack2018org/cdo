@@ -68,6 +68,7 @@ void *Fillmiss(void *argument);
 void *Filter(void *argument);
 void *Fldrms(void *argument);
 void *Fldstat(void *argument);
+void *Fldstat2(void *argument);
 void *Fourier(void *argument);
 void *Gengrid(void *argument);
 void *Gradsdes(void *argument);
@@ -264,6 +265,7 @@ void *Wct(void *argument);
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
+#define  Fldstat2Operators      {"fldcor"}
 #define  FourierOperators       {"fourier"}
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
@@ -492,6 +494,7 @@ static modules_t Modules[] =
   { Filter,         NULL,              FilterOperators,        CDI_REAL,  1,  1 },
   { Fldrms,         NULL,              FldrmsOperators,        CDI_REAL,  2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,       CDI_REAL,  1,  1 },
+  { Fldstat2,       NULL,              Fldstat2Operators,      CDI_REAL,  2,  1 },
   { Fourier,        NULL,              FourierOperators,       CDI_COMP,  1,  1 },
   { Gengrid,        NULL,              GengridOperators,       CDI_REAL,  2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,      CDI_REAL,  1,  0 },

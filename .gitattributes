@@ -252,6 +252,7 @@ src/Fillmiss.c -text
 src/Filter.c -text
 src/Fldrms.c -text
 src/Fldstat.c -text
+src/Fldstat2.c -text
 src/Fourier.c -text
 src/Gengrid.c -text
 src/Gradsdes.c -text
