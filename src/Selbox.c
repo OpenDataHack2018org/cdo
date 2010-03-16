@@ -331,7 +331,6 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
   return (gridID2);
 }
 
-
 static
 int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
@@ -503,7 +502,8 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
       for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
 
-      (*lon22)--;
+      /* (*lon22)--; */
+
       xlon1 -= 360;
       xlon2 -= 360;
 
@@ -550,7 +550,6 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   if ( (*lon22 - *lon21 + 1 <= 0)  && (*lon12 - *lon11 + 1 <= 0)  )
     cdoAbort("Longitudinal dimension is too small!");
   */
-
   free(xvals1);
   free(yvals1);
 

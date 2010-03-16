@@ -110,7 +110,8 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 }
 
 
-static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+static
+void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   static char func[] = "genlonlatbox";  
   int nlon1, nlat1;
@@ -141,7 +142,8 @@ static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
   for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
   for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
 
-  (*lon22)--;
+  /* (*lon22)--; */
+
   xlon1 -= 360;
   xlon2 -= 360;
 
