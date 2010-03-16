@@ -502,7 +502,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
       for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
 
-      /* (*lon22)--; */
+      if ( *lon22 >= nlon1 ) (*lon22)--;
 
       xlon1 -= 360;
       xlon2 -= 360;
