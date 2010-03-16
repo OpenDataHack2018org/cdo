@@ -90,7 +90,6 @@ void *Arith(void *argument)
 
   ntsteps1 = vlistNtsteps(vlistID1);
   ntsteps2 = vlistNtsteps(vlistID2);
-  printf("nts1 %d  nts2 %d\n", ntsteps1, ntsteps2);
 
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
