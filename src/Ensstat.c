@@ -108,9 +108,10 @@ void *Ensstat(void *argument)
 
   ofilename = cdoStreamName(nfiles);
 
-  if ( fileExist(ofilename) )
-    if ( !userFileOverwrite(ofilename) )
-      cdoAbort("Outputfile %s already exist!", ofilename);
+  if ( !cdoSilentMode )
+    if ( fileExist(ofilename) )
+      if ( !userFileOverwrite(ofilename) )
+	cdoAbort("Outputfile %s already exist!", ofilename);
 
   ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
 

@@ -101,9 +101,10 @@ void *Mergetime(void *argument)
 
   ofilename = cdoStreamName(nfiles);
 
-  if ( fileExist(ofilename) )
-    if ( !userFileOverwrite(ofilename) )
-      cdoAbort("Outputfile %s already exist!", ofilename);
+  if ( !cdoSilentMode )
+    if ( fileExist(ofilename) )
+      if ( !userFileOverwrite(ofilename) )
+	cdoAbort("Outputfile %s already exist!", ofilename);
 
   streamID2 = streamOpenWrite(ofilename, cdoFiletype());
   if ( streamID2 < 0 )
