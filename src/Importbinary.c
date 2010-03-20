@@ -142,7 +142,7 @@ int define_grid(dsets_t *pfi)
 
 
 static
-int define_level(dsets_t *pfi)
+int define_level(dsets_t *pfi, int nlev)
 {
   static char func[] = "define_level";
   int zaxisID = -1;
@@ -161,7 +161,10 @@ int define_level(dsets_t *pfi)
       if ( nz == 1 && IS_EQUAL(zvals[0], 0) )
 	zaxisID = zaxisCreate(ZAXIS_SURFACE, nz);
       else
-	zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
+	{
+	  if ( nlev > 0 && nlev < nz ) nz = nlev;
+	  zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
+	}
       zaxisDefLevels(zaxisID, zvals);
 
       free(zvals);
@@ -188,7 +191,7 @@ void *Importbinary(void *argument)
   int i;
   int nmiss, n_nan;
   int ivar;
-  int varID, levelID, tsID;
+  int varID = -1, levelID, tsID;
   int gridsize;
   int  status;
   dsets_t pfi;
@@ -196,7 +199,6 @@ void *Importbinary(void *argument)
   int tcur, told,fnum;
   int tmin=0,tmax=0;
   char *ch = NULL;
-  off_t flen;
   int nvars, nlevels, nrecs;
   int recID;
   int e, flag;
@@ -210,6 +212,7 @@ void *Importbinary(void *argument)
   double *array;
   double sfclevel = 0;
   int *recVarID, *recLevelID;
+  int *var_zaxisID;
   char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
@@ -230,7 +233,7 @@ void *Importbinary(void *argument)
   gridID = define_grid(&pfi);
   if ( cdoVerbose ) gridPrint(gridID, 1);
 
-  zaxisID = define_level(&pfi);
+  zaxisID = define_level(&pfi, 0);
   if ( cdoVerbose ) zaxisPrint(zaxisID);
 
   zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
@@ -238,8 +241,9 @@ void *Importbinary(void *argument)
 
   vlistID = vlistCreate();
 
-  recVarID   = (int *) malloc(nrecs*sizeof(int));
-  recLevelID = (int *) malloc(nrecs*sizeof(int));
+  var_zaxisID = (int *) malloc(nvars*sizeof(int));
+  recVarID    = (int *) malloc(nrecs*sizeof(int));
+  recLevelID  = (int *) malloc(nrecs*sizeof(int));
 
   recID = 0;
   for ( ivar = 0; ivar < nvars; ++ivar )
@@ -259,12 +263,38 @@ void *Importbinary(void *argument)
 	}
       else
 	{
-	  if ( nlevels != zaxisInqSize(zaxisID) ) cdoAbort("Number of levels differ!");
-	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+	  if ( nlevels > zaxisInqSize(zaxisID) )
+	    cdoAbort("Variable %s has too many number of levels!", pvar->abbrv);
+	  else if ( nlevels < zaxisInqSize(zaxisID) )
+	    {
+	      int vid, zid, nlev;
+	      for ( vid = 0; vid < ivar; ++vid )
+		{
+		  zid = var_zaxisID[vid];
+		  nlev = zaxisInqSize(zid);
+		  if ( nlev == nlevels ) break;
+		}
+
+	      if ( vid == ivar ) zid = define_level(&pfi, nlevels);
+	      varID = vlistDefVar(vlistID, gridID, zid, TIME_VARIABLE);
+	    }
+	  else
+	    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
 	}
 
+      var_zaxisID[varID] = vlistInqVarZaxis(vlistID, varID);
+
       vlistDefVarName(vlistID, varID, pvar->abbrv);
-      vlistDefVarLongname(vlistID, varID, pvar->varnm);
+      {
+	size_t len = strlen(pvar->varnm);
+	char *longname = pvar->varnm;
+	if ( longname[0] == '\'' && longname[len-1] == '\'' )
+	  {
+	    longname[len-1] = 0;
+	    longname++;
+	  }
+	vlistDefVarLongname(vlistID, varID, longname);
+      }
       vlistDefVarDatatype(vlistID, varID, DATATYPE_FLT32);
       vlistDefVarMissval(vlistID, varID, pfi.undef);
 
@@ -461,8 +491,9 @@ void *Importbinary(void *argument)
 
   free(array);
 
-  if ( recVarID   ) free(recVarID);
-  if ( recLevelID ) free(recLevelID);
+  if ( var_zaxisID ) free(var_zaxisID);
+  if ( recVarID    ) free(recVarID);
+  if ( recLevelID  ) free(recLevelID);
 
   cdoFinish();
 

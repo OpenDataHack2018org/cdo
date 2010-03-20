@@ -1,3 +1,7 @@
+2010-03-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* import_binary: added support for variables with different number of levels [report: Dennis Shea]
+
 2010-03-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* pstreamWriteRecord: check pstreamptr->varlist (bug fix) [report: Kevin Sieck]
