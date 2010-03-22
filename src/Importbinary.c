@@ -267,7 +267,7 @@ void *Importbinary(void *argument)
 	    cdoAbort("Variable %s has too many number of levels!", pvar->abbrv);
 	  else if ( nlevels < zaxisInqSize(zaxisID) )
 	    {
-	      int vid, zid, nlev;
+	      int vid, zid = -1, nlev;
 	      for ( vid = 0; vid < ivar; ++vid )
 		{
 		  zid = var_zaxisID[vid];
