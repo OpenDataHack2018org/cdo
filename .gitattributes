@@ -351,6 +351,7 @@ src/Tocomplex.c -text
 src/Transpose.c -text
 src/Trend.c -text
 src/Trms.c -text
+src/Tstepcount.c -text
 src/Vardup.c -text
 src/Vargen.c -text
 src/Varrms.c -text

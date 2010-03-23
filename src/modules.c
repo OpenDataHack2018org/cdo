@@ -166,6 +166,7 @@ void *Tocomplex(void *argument);
 void *Transpose(void *argument);
 void *Trend(void *argument);
 void *Trms(void *argument);
+void *Tstepcount(void *argument);
 void *Vardup(void *argument);
 void *Vargen(void *argument);
 void *Varrms(void *argument);
@@ -388,6 +389,7 @@ void *Wct(void *argument);
 #define  TransposeOperators     {"transxy"}
 #define  TrendOperators         {"trend"}
 #define  TrmsOperators          {"trms"}
+#define  TstepcountOperators    {"tstepcount"}
 #define  VardupOperators        {"pardup", "parmul"}
 #define  VargenOperators        {"random", "const", "topo", "for"}
 #define  VarrmsOperators        {"varrms"}
@@ -607,6 +609,7 @@ static modules_t Modules[] =
   { Transpose,      NULL,              TransposeOperators,     CDI_REAL,  1,  1 },
   { Trend,          TrendHelp,         TrendOperators,         CDI_REAL,  1,  2 },
   { Trms,           NULL,              TrmsOperators,          CDI_REAL,  2,  1 },
+  { Tstepcount,     NULL,              TstepcountOperators,    CDI_REAL,  1,  1 },
   { Vardup,         NULL,              VardupOperators,        CDI_REAL,  1,  1 },
   { Vargen,         VargenHelp,        VargenOperators,        CDI_REAL,  0,  1 },
   { Varrms,         NULL,              VarrmsOperators,        CDI_REAL,  2,  1 },

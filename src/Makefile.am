@@ -129,6 +129,7 @@ cdo_SOURCES = Arith.c		\
               Transpose.c  	\
               Trend.c  		\
               Trms.c  		\
+              Tstepcount.c      \
               Vardup.c  	\
               Vargen.c  	\
               Varrms.c  	\
