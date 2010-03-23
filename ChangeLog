@@ -1,6 +1,15 @@
+2010-03-23  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added operator tstepcount: count number of timesteps (experimental) [request: Swantje Preuschmann]
+
 2010-03-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* import_binary: added support for variables with different number of levels [report: Dennis Shea]
+
+2010-03-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* sellonlatbox: bug fix for parameter lon2 [report: Alberto Maurizi]
+	* random: added optional parameter seed
 
 2010-03-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
