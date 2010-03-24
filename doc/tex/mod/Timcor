@@ -1,0 +1,45 @@
+@BeginModule
+@Name      = Timcor
+@Title     = Correlation in time
+@Section   = Correlation
+@Class     = Correlation
+@Arguments = ifile1 ifile2 ofile
+@Operators = timcor
+@EndModule
+
+
+@BeginOperator_timcor
+@Title     = Correlation in time
+
+@BeginDescription
+The correlation coefficient is a quantity that gives the quality of a least 
+squares fitting to the original data. This operator correlates each gridpoint
+of two fields over all timesteps. With
+@IfMan
+
+S(x) = {t, i_1(t,x) != missval and i_2(t,x) != missval}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+S(x) = \{t, i_1(t,x) \neq missval \wedge i_2(t,x) \neq missval\}
+@EndDisplayMath
+@EndifDoc
+it is
+@IfMan
+
+o(1,x) = Cor{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+o(1,x) = \frac{\sum\limits_{t \in S(x)} i_1(t,x) i_2(t,x) - 
+                n\ \overline{i_1(t,x)}\ \overline{i_2(t,x)} }
+                {\sqrt{ \left(\sum\limits_{t \in S(x)} i_1(t,x)^2 -
+                            n\ \overline{i_1(t,x)}^2 \right)
+                        \left(\sum\limits_{t \in S(x)} i_2(t,x)^2 -
+                            n\ \overline{i_2(t,x)}^2 \right) }}
+@EndDisplayMath
+@EndifDoc
+For every gridpoint @math{x} only those timesteps @math{t} belong to the sample,
+which have @math{i_1(t,x) \neq missval} and @math{i_2(t,x) \neq missval}.
+@EndDescription
+@EndOperator

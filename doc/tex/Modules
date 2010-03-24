@@ -42,7 +42,7 @@ Ensstat       Statistical values
 Fldstat       Statistical values
 Zonstat       Statistical values
 Merstat       Statistical values
-Gridboxstat    Statistical values
+Gridboxstat   Statistical values
 Vertstat      Statistical values
 Timselstat    Statistical values
 Timselpctl    Statistical values
@@ -69,6 +69,8 @@ Yseasstat     Statistical values
 Yseaspctl     Statistical values
 Ydrunstat     Statistical values
 Ydrunpctl     Statistical values
+Fldcor        Correlation
+Timcor        Correlation
 Regres        Regression
 Detrend       Regression
 Trend         Regression
@@ -95,15 +97,15 @@ Rotuv         Miscellaneous
 Mastrfu       Miscellaneous
 Histogram     Miscellaneous
 Sethalo       Miscellaneous
+Importamsr    Miscellaneous
+Importcmsaf   Miscellaneous
+Importbinary  Miscellaneous
 Wct           Miscellaneous
 Fdns          Miscellaneous
 Strwin        Miscellaneous
 Strbre        Miscellaneous
 Strgal        Miscellaneous
 Hurr          Miscellaneous
-Importamsr    Miscellaneous
-Importcmsaf   Miscellaneous
-Importbinary  Miscellaneous
 EcaCdd        Climate indices
 EcaCfd        Climate indices
 EcaCsu        Climate indices

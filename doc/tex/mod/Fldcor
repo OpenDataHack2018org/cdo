@@ -1,0 +1,47 @@
+@BeginModule
+@NewPage
+@Name      = Fldcor
+@Title     = Correlation of grid space
+@Section   = Correlation
+@Class     = Correlation
+@Arguments = ifile1 ifile2 ofile
+@Operators = fldcor
+@EndModule
+
+
+@BeginOperator_fldcor
+@Title     = Correlation in grid space
+
+@BeginDescription
+The correlation coefficient is a quantity that gives the quality of a least 
+squares fitting to the original data. This operator correlates all gridpoints
+of two fields for each timestep. With
+@IfMan
+
+S(t) = {x, i_1(t,x) != missval and i_2(t,x) != missval}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+S(t) = \{x, i_1(t,x) \neq missval \wedge i_2(t,x) \neq missval\}
+@EndDisplayMath
+@EndifDoc
+it is
+@IfMan
+
+o(t,1) = Cor{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+o(t,1) = \frac{\sum\limits_{x \in S(t)} i_1(t,x) i_2(t,x) w(x) - 
+                      \overline{i_1(t,x)}\ \overline{i_2(t,x)}\sum\limits_{x \in S(t)} w(x) }
+                   {\sqrt{ \left(\sum\limits_{x \in S(t)} i_1(t,x)^2 w(x) -
+                      \overline{i_1(t,x)}^2 \sum\limits_{x \in S(t)} w(x) \right)
+                           \left(\sum\limits_{x \in S(t)} i_2(t,x)^2 w(x) -
+                      \overline{i_2(t,x)}^2 \sum\limits_{x \in S(t)} w(x) \right) }}
+@EndDisplayMath
+@EndifDoc
+where @math{w(x)} are the area weights obtained by the input stream.
+For every timestep @math{t} only those field elements @math{x} belong to the sample,
+which have @math{i_1(t,x) \neq missval} and @math{i_2(t,x) \neq missval}.
+@EndDescription
+@EndOperator

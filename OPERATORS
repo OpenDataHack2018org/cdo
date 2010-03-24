@@ -340,6 +340,11 @@ Operator catalog:
       Ydrunstat  ydrunstd        Multi-year daily running standard deviation
       Ydrunpctl  ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
+   Correlation
+-------------------------------------------------------------
+      Fldcor     fldcor          Correlation in grid space
+      Timcor     timcor          Correlation in time
+-------------------------------------------------------------
    Regression
 -------------------------------------------------------------
       Regres     regres          Regression
@@ -415,15 +420,15 @@ Operator catalog:
       Histogram  histmean        Histogram mean
       Histogram  histfreq        Histogram frequency
       Sethalo    sethalo         Set the left and right bounds of a field
+      Importamsr import_amsr     Import AMSR binary files
+      Importcmsaf import_cmsaf    Import CM-SAF HDF5 files
+      Importbinary import_binary   Import binary data sets
       Wct        wct             Windchill temperature
       Fdns       fdns            Frost days where no snow index per time period
       Strwin     strwin          Strong wind days index per time period
       Strbre     strbre          Strong breeze days index per time period
       Strgal     strgal          Strong gale days index per time period
       Hurr       hurr            Hurricane days index per time period
-      Importamsr import_amsr     Import AMSR binary files
-      Importcmsaf import_cmsaf    Import CM-SAF HDF5 files
-      Importbinary import_binary   Import binary data sets
 -------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------

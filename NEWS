@@ -1,6 +1,21 @@
 CDO NEWS
 --------
 
+Version 1.4.4 (?? April 2010):
+
+   * New operators:
+      o fldcor: correlation in grid space
+      o timcor: correlation in time
+      o gridbox<stat>: computes statistical values over surrounding grid boxes
+   * Changed operators:
+      o import_binary: added support for variables with different number of levels
+      o random: added optional parameter 'seed'
+   * Fixed bugs:
+      o Added support for netCDF time bounds
+      o sellonlatbox: parameter lon2 was not inclusiv
+      o expr: added support for const/var
+      o inputsrv: added level information
+
 Version 1.4.3 (22 February 2010):
 
    * New features:
