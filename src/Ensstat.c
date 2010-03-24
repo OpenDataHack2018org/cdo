@@ -220,7 +220,13 @@ void *Ensstat(void *argument)
 	        array2[i] = fldfun(field[ompthID], operfunc);
 	      /* QR */
 
-	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) ) nmiss++;
+	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) )
+		{
+#if defined (_OPENMP)
+#pragma omp atomic
+#endif
+		  nmiss++;
+		}
 	    }
 
 	  streamDefRecord(streamID2, varID, levelID);
