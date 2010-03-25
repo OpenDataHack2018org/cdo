@@ -70,7 +70,7 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldvar",  func_var,  0, NULL);
   cdoOperatorAdd("fldstd",  func_std,  0, NULL);
   /* RQ */
-  cdoOperatorAdd("fldpctl", func_pctl,  0, NULL);
+  cdoOperatorAdd("fldpctl", func_pctl, 0, NULL);
   /* QR */
 
   operatorID = cdoOperatorID();

@@ -361,7 +361,7 @@ void farmax(field_t *field1, field_t field2)
 
 void farvar(field_t *field1, field_t field2, field_t field3)
 {
-  static char func[] = "farstd";
+  static char func[] = "farvar";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -382,7 +382,10 @@ void farvar(field_t *field1, field_t field2, field_t field3)
     {
       for ( i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
-	  array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
+	  {
+	    array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
+	    if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
+	  }
 	else
 	  array1[i] = missval1;
     }
@@ -391,12 +394,13 @@ void farvar(field_t *field1, field_t field2, field_t field3)
       for ( i = 0; i < len; i++ )
 	{
 	  array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
+	  if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
 	}
     }
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0.0 )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
 	array1[i] = missval1;
 	field1->nmiss++;
@@ -422,14 +426,14 @@ void farstd(field_t *field1, field_t field2, field_t field3)
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0.0 )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
 	array1[i] = missval1;
 	field1->nmiss++;
       }
     else
       {
-	array1[i] = sqrt(array1[i]);
+	array1[i] = IS_NOT_EQUAL(array1[i], 0) ? sqrt(array1[i]) : 0;
       }
 }
 
@@ -456,7 +460,10 @@ void farcvar(field_t *field1, field_t field2, double rconst1)
     {
       for ( i = 0; i < len; i++ )
 	if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
-	  array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
+	  {
+	    array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
+	    if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
+	  }
 	else
 	  array1[i] = missval1;
     }
@@ -465,12 +472,13 @@ void farcvar(field_t *field1, field_t field2, double rconst1)
       for ( i = 0; i < len; i++ )
 	{
 	  array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
+	  if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
 	}
     }
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0.0 )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
 	array1[i] = missval1;
 	field1->nmiss++;
@@ -496,14 +504,14 @@ void farcstd(field_t *field1, field_t field2, double rconst1)
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
-    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0.0 )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
       {
 	array1[i] = missval1;
 	field1->nmiss++;
       }
     else
       {
-	array1[i] = sqrt(array1[i]);
+	array1[i] = IS_NOT_EQUAL(array1[i], 0) ? sqrt(array1[i]) : 0;
       }
 }
 

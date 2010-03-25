@@ -11,6 +11,7 @@ Version 1.4.4 (?? April 2010):
       o import_binary: added support for variables with different number of levels
       o random: added optional parameter 'seed'
    * Fixed bugs:
+      o standard deviation: change the result from missval to zero, if variance is zero
       o Added support for netCDF time bounds
       o sellonlatbox: parameter lon2 was not inclusiv
       o expr: added support for const/var

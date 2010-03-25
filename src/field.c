@@ -253,6 +253,7 @@ double fldvar(field_t field)
     }
 
   rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
+  if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
   return (rvar);
 }
@@ -265,7 +266,14 @@ double fldstd(field_t field)
 
   rvar = fldvar(field);
 
-  rstd = (IS_NOT_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
+  if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
+    {
+      rstd = missval;
+    }
+  else
+    {
+      rstd = IS_NOT_EQUAL(rvar, 0) ? sqrt(rvar) : 0;
+    }
 
   return (rstd);
 }

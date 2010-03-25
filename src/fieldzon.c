@@ -286,6 +286,7 @@ void zonvar(field_t field1, field_t *field2)
 	}
 
       rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval1;
+      if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
       if ( DBL_IS_EQUAL(rvar, missval1) ) rnmiss++;
 
@@ -310,7 +311,15 @@ void zonstd(field_t field1, field_t *field2)
   for ( j = 0; j < ny; j++ )
     {
       rvar = field2->ptr[j];
-      rstd = (IS_NOT_EQUAL(rvar, 0) && !DBL_IS_EQUAL(rvar, missval)) ? sqrt(rvar) : missval;
+
+      if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
+	{
+	  rstd = missval;
+	}
+      else
+	{
+	  rstd = IS_NOT_EQUAL(rvar, 0) ? sqrt(rvar) : 0;
+	}
 
       if ( DBL_IS_EQUAL(rvar, missval) ) rnmiss++;
 
