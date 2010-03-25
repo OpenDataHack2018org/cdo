@@ -26,8 +26,8 @@ have the same value.
 
 
 @BeginOperator_random
-@Title     = Create a field with random values
-@Parameter = grid
+@Title     = Create a field with random numbers
+@Parameter = grid [seed]
 
 @BeginDescription
 Creates a field with rectangularly distrubuted random numbers in the interval [0,1].
@@ -38,6 +38,8 @@ Creates a field with rectangularly distrubuted random numbers in the interval [0
 @BeginParameter
 @Item = const
 FLOAT   Constant
+@Item = seed
+INTEGER The seed for a new sequence of pseudo-random numbers [default: 1]
 @Item = grid
 STRING  Target grid description file or name
 @EndParameter

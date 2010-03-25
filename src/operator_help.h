@@ -3178,7 +3178,7 @@ static char *VargenHelp[] = {
     "",
     "SYNOPSIS",
     "    const,const,grid  ofile",
-    "    random,grid  ofile",
+    "    random,grid[,seed]  ofile",
     "",
     "DESCRIPTION",
     "    Generates a dataset with one field. The size of the field",
@@ -3190,11 +3190,12 @@ static char *VargenHelp[] = {
     "    const   Create a constant field",
     "            Creates a constant field. All field elements of the grid",
     "            have the same value.",
-    "    random  Create a field with random values",
+    "    random  Create a field with random numbers",
     "            Creates a field with rectangularly distrubuted random numbers in the interval [0,1].",
     "",
     "PARAMETER",
     "    const  FLOAT   Constant",
+    "    seed   INTEGER  The seed for a new sequence of pseudo-random numbers [default: 1]",
     "    grid   STRING  Target grid description file or name",
     NULL
 };
