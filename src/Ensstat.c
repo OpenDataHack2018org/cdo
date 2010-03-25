@@ -182,6 +182,10 @@ void *Ensstat(void *argument)
       
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(fileID, streamID, nmiss) \
+                                     lastprivate(varID, levelID)
+#endif
 	  for ( fileID = 0; fileID < nfiles; fileID++ )
 	    {
 	      streamID = ef[fileID].streamID;
