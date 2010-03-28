@@ -141,7 +141,7 @@ void cdolog(const char *prompt, double cputime)
 
   if ( status == 0 )
     {
-      write(logfileno, logstring, slen);
+      status = write(logfileno, logstring, slen);
 
       mylock.l_type   = F_UNLCK;
       status = fcntl(logfileno, F_SETLK, &mylock);
