@@ -42,7 +42,7 @@
 
 */
 /*
-  2009-05-25 Uwe Schulzweida: Change restict data type from double to int
+  2009-05-25 Uwe Schulzweida: Changed restict data type from double to int
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
@@ -5904,7 +5904,8 @@ void reorder_links(remapvars_t *rv)
 
 
 #if  defined  (HAVE_LIBNETCDF)
-static void nce(int istat)
+static
+void nce(int istat)
 {
   /*
     This routine provides a simple interface to netCDF error message routine.
