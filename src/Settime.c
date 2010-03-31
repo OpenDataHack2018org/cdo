@@ -401,6 +401,9 @@ void *Settime(void *argument)
 	}
       else
 	{
+	  int numavg = taxisInqNumavg(taxisID1);
+	  taxisDefNumavg(taxisID2, numavg);
+
 	  taxisDefVdate(taxisID2, vdate);
 	  taxisDefVtime(taxisID2, vtime);
 	}
