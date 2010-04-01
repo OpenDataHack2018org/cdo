@@ -246,9 +246,11 @@ cdo_SOURCES = Arith.c		\
 	      statistic.h       \
 	      cdi.h
 #
-#cdo_LDADD = $(LDFLAGS) -lm
+AM_CPPFLAGS = $(NETCDF_C_INCLUDE) $(HDF5_C_INCLUDE) $(GRIB_API_C_INCLUDE) $(ZLIB_C_INCLUDE) $(SZLIB_C_INCLUDE) $(PROJ_C_INCLUDE) $(CPPFLAGS)
 #
-#cdotest_LDADD = $(LDFLAGS) -lm
+cdo_LDADD   =  @NETCDF_C_LIB@     @HDF5_C_LIB@       @GRIB_API_C_LIB@      @ZLIB_C_LIB@      @SZLIB_C_LIB@      @PROJ_C_LIB@       @LDFLAGS@ @LIBS@
+#
+cdotest_LDADD = $(cdo_LDADD)
 #
 cdotest_SOURCES = cdi.h 	\
 		  cdilib.c 	\

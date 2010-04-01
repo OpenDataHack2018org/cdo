@@ -30,14 +30,11 @@
 /* Define to 1 for GRIB support */
 #undef HAVE_LIBGRIB
 
-/* Define to 1 if you have the `grib_api' library (-lgrib_api). */
+/* GRIB_API library is present if defined to 1 */
 #undef HAVE_LIBGRIB_API
 
-/* Define to 1 if you have the `hdf5' library (-lhdf5). */
+/* HDF 5 library is present if defined to 1 */
 #undef HAVE_LIBHDF5
-
-/* Define to 1 if you have the `hdf5_hl' library (-lhdf5_hl). */
-#undef HAVE_LIBHDF5_HL
 
 /* Define to 1 for IEG interface */
 #undef HAVE_LIBIEG
@@ -48,13 +45,10 @@
 /* Define to 1 if you have the `malloc' library (-lmalloc). */
 #undef HAVE_LIBMALLOC
 
-/* Define to 1 if you have the `nc-dap' library (-lnc-dap). */
-#undef HAVE_LIBNC_DAP
-
-/* Define to 1 if you have the `netcdf' library (-lnetcdf). */
+/* NETCDF library is present if defined to 1 */
 #undef HAVE_LIBNETCDF
 
-/* Define to 1 if you have the `proj' library (-lproj). */
+/* PROJ library is present if defined to 1 */
 #undef HAVE_LIBPROJ
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
@@ -63,10 +57,10 @@
 /* Define to 1 for SERVICE interface */
 #undef HAVE_LIBSERVICE
 
-/* Define to 1 if you have the `sz' library (-lsz). */
+/* SZLIB library is present if defined to 1 */
 #undef HAVE_LIBSZ
 
-/* Define to 1 if you have the `z' library (-lz). */
+/* ZLIB library is present if defined to 1 */
 #undef HAVE_LIBZ
 
 /* Define to 1 if you have the `mallinfo' function. */
@@ -80,9 +74,6 @@
 
 /* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
-
-/* Define to 1 if you have the <netcdf.h> header file. */
-#undef HAVE_NETCDF_H
 
 /* Define to 1 if you have the <pthread.h> header file. */
 #undef HAVE_PTHREAD_H
@@ -99,7 +90,7 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if `st_blksize' is member of `struct stat'. */
+/* Define to 1 if `struct stat' is a member of `st_blksize'. */
 #undef HAVE_STRUCT_STAT_ST_BLKSIZE
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
@@ -134,6 +125,9 @@
 
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION

@@ -143,6 +143,9 @@ static void version(void)
 #if defined (HAVE_LIBSZ)
   fprintf(stderr, " SZ");
 #endif
+#if defined (HAVE_LIBZ)
+  fprintf(stderr, " Z");
+#endif
 #if defined (HAVE_LIBJASPER)
   fprintf(stderr, " JASPER");
 #endif
