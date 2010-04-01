@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -47,11 +47,58 @@
 #include "grid.h"
 
 
+enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
+      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX};
+
+static
+void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_order)
+{
+  switch ( operfunc )
+    {
+    case REMAPCON:
+    case GENCON:
+      *map_type = MAP_TYPE_CONSERV;
+      *remap_order = 1;
+      break;
+    case REMAPCON2:
+    case GENCON2:
+      *map_type = MAP_TYPE_CONSERV;
+      *remap_order = 2;
+      break;
+    case REMAPLAF:
+    case GENLAF:
+      *map_type = MAP_TYPE_CONSERV;
+      *submap_type = SUBMAP_TYPE_LAF;
+      break;
+    case REMAPSUM:
+      *map_type = MAP_TYPE_CONSERV;
+      *submap_type = SUBMAP_TYPE_SUM;
+      break;
+    case REMAPBIL:
+    case GENBIL:
+      *map_type = MAP_TYPE_BILINEAR;
+      break;
+    case REMAPBIC:
+    case GENBIC:
+      *map_type = MAP_TYPE_BICUBIC;
+      break;
+    case REMAPDIS:
+    case GENDIS:
+      *map_type = MAP_TYPE_DISTWGT;
+      break;
+    case REMAPNN:
+    case GENNN:
+      *map_type = MAP_TYPE_DISTWGT1;
+      break;
+    default:
+      cdoAbort("Unknown mapping method");
+    }
+}
+
+
 void *Remap(void *argument)
 {
   static char func[] = "Remap";
-  enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
-        GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX};
   int operatorID;
   int operfunc;
   int streamID1, streamID2 = -1;
@@ -309,10 +356,10 @@ void *Remap(void *argument)
 	   gridInqType(gridID1) != GRID_CELL )
 	{
 	  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
-	    cdoAbort("Remapping of %s data failed! Use CDO option -R to convert reduced to regular grid!",
+	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
 		     gridNamePtr(gridInqType(gridID1)));
 	  else
-	    cdoAbort("Remapping of %s data failed!", gridNamePtr(gridInqType(gridID1)));
+	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
 	}
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
@@ -457,46 +504,7 @@ void *Remap(void *argument)
       if ( remap_test ) reorder_links(&remaps[0].vars);
     }
 
-  switch ( operfunc )
-    {
-    case REMAPCON:
-    case GENCON:
-      map_type = MAP_TYPE_CONSERV;
-      remap_order = 1;
-      break;
-    case REMAPCON2:
-    case GENCON2:
-      map_type = MAP_TYPE_CONSERV;
-      remap_order = 2;
-      break;
-    case REMAPLAF:
-    case GENLAF:
-      map_type = MAP_TYPE_CONSERV;
-      submap_type = SUBMAP_TYPE_LAF;
-      break;
-    case REMAPSUM:
-      map_type = MAP_TYPE_CONSERV;
-      submap_type = SUBMAP_TYPE_SUM;
-      break;
-    case REMAPBIL:
-    case GENBIL:
-      map_type = MAP_TYPE_BILINEAR;
-      break;
-    case REMAPBIC:
-    case GENBIC:
-      map_type = MAP_TYPE_BICUBIC;
-      break;
-    case REMAPDIS:
-    case GENDIS:
-      map_type = MAP_TYPE_DISTWGT;
-      break;
-    case REMAPNN:
-    case GENNN:
-      map_type = MAP_TYPE_DISTWGT1;
-      break;
-    default:
-      cdoAbort("Unknown mapping method");
-    }
+  get_map_type(operfunc, &map_type, &submap_type, &remap_order);
 
   if ( map_type == MAP_TYPE_CONSERV )
     {

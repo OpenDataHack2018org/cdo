@@ -134,7 +134,7 @@ void *Intgridtraj(void *argument)
 
       if ( gridInqType(gridID1) != GRID_LONLAT &&
 	   gridInqType(gridID1) != GRID_GAUSSIAN )
-	cdoAbort("Interpolation of %s data failed!", gridNamePtr(gridInqType(gridID1)) );
+	cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)) );
 
       vlistChangeGridIndex(vlistID2, index, gridID2);
     }
