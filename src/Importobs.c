@@ -125,7 +125,7 @@ void *Importobs(void *argument)
   gridID = cdoDefineGrid(operatorArgv()[0]);
 
   if ( gridInqType(gridID) != GRID_LONLAT ) 
-    cdoAbort("%s grid unsupported!", gridNamePtr(gridInqType(gridID)));
+    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID)));
 
   gridsize = gridInqSize(gridID);
   xsize = gridInqXsize(gridID);

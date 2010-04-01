@@ -438,9 +438,9 @@ int gridDefine(grid_t grid)
     default:
       {
 	if ( grid.type == -1 )
-	  Error(func, "gridtype undefined!");
+	  Error(func, "Undefined grid type!");
 	else
-	  Error(func, "%s grid unsupported!", gridNamePtr(grid.type));
+	  Error(func, "Unsupported grid type: %s", gridNamePtr(grid.type));
       }
     }
 

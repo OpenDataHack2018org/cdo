@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -76,7 +76,7 @@ void *Setgrid(void *argument)
       else if ( strcmp(gridname, "lonlat") == 0 )      gridtype = GRID_LONLAT;
       else if ( strcmp(gridname, "gaussian") == 0 )    gridtype = GRID_GAUSSIAN;
       else if ( strcmp(gridname, "regular") == 0 )    {gridtype = GRID_GAUSSIAN; lregular = 1;}
-      else cdoAbort("%s grid unsupported!", gridname);
+      else cdoAbort("Unsupported grid name: %s", gridname);
     }
   else if ( operatorID == SETGRIDAREA )
     {
@@ -167,7 +167,7 @@ void *Setgrid(void *argument)
 	    {
 	      if      ( gridtype == GRID_CURVILINEAR ) gridID2 = gridToCurvilinear(gridID1);
 	      else if ( gridtype == GRID_CELL )        gridID2 = gridToCell(gridID1);
-	      else cdoAbort("%s grid unsupported!", gridname);
+	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 
 	  /*	  gridCompress(gridID2); */

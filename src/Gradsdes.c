@@ -502,7 +502,7 @@ void *Gradsdes(void *argument)
       else
 	{
 	  vlistInqVarName(vlistID, varID, varname);
-	  cdoPrint("%s grid unsupported, skipped variable %s",
+	  cdoPrint("Unsupported grid type >%s<, skipped variable %s",
 		   gridNamePtr(gridInqType(vlistInqVarGrid(vlistID, varID))), varname);
 	  vars[varID] = FALSE;
 	}

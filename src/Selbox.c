@@ -832,10 +832,10 @@ void *Selbox(void *argument)
 	}
       else
 	{
-	  cdoPrint("%s grid unsupported!", gridNamePtr(gridtype));
+	  cdoPrint("Unsupported grid type: %s", gridNamePtr(gridtype));
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
 	    cdoPrint("Use option -R to convert Gaussian reduced grid to a regular grid!");
-	  cdoAbort("unsupported grid!");
+	  cdoAbort("Unsupported grid type!");
 	}
     }
 
