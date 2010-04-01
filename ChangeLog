@@ -1,3 +1,7 @@
+2010-04-01  Martin Claus  <mclaus@ifm-geomar.de>
+
+	* vertwind: added missing value support
+	
 2010-03-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* standard deviation (bug fix): change the result from missval to zero, if variance is zero [report: Jaison-Thomas Ambadan]
