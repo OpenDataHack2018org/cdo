@@ -11,11 +11,13 @@ Version 1.4.4 (?? April 2010):
       o import_binary: added support for variables with different number of levels
       o random: added optional parameter 'seed'
    * Fixed bugs:
-      o standard deviation: change the result from missval to zero, if variance is zero
+      o standard deviation: changed the result from missval to zero, if variance is zero
       o Added support for netCDF time bounds
       o sellonlatbox: parameter lon2 was not inclusiv
-      o expr: added support for const/var
+      o expr: added support for calculations of const/var
+      o setday: writes sometimes wrong date information with GRIB result from afterburner
       o inputsrv: added level information
+      o merge: added support to merge levels with datasets in netCDF format
 
 Version 1.4.3 (22 February 2010):
 
