@@ -58,6 +58,7 @@ void *Selvar(void *argument)
   int tsID, nrecs;
   int nvars, nlevs;
   int code, tabnum, param, gridID, zaxisID, levID;
+  int grididx, zaxisidx;
   double level;
   int varID2, levelID2;
   int recID, varID, levelID;
@@ -173,12 +174,14 @@ void *Selvar(void *argument)
     {
       vlistInqVarName(vlistID1, varID, varname);
       vlistInqVarStdname(vlistID1, varID, stdname);
-      param   = vlistInqVarParam(vlistID1, varID);
-      code    = vlistInqVarCode(vlistID1, varID);
-      tabnum  = tableInqNum(vlistInqVarTable(vlistID1, varID));
-      gridID  = vlistInqVarGrid(vlistID1, varID);
-      zaxisID = vlistInqVarZaxis(vlistID1, varID);
-      nlevs   = zaxisInqSize(zaxisID);
+      param    = vlistInqVarParam(vlistID1, varID);
+      code     = vlistInqVarCode(vlistID1, varID);
+      tabnum   = tableInqNum(vlistInqVarTable(vlistID1, varID));
+      gridID   = vlistInqVarGrid(vlistID1, varID);
+      grididx  = vlistGridIndex(vlistID1, gridID);
+      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+      zaxisidx = vlistZaxisIndex(vlistID1, zaxisID);
+      nlevs    = zaxisInqSize(zaxisID);
       gridName(gridInqType(gridID), gridname);
       zaxisName(zaxisInqType(zaxisID), zaxisname);
 
@@ -243,7 +246,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELGRID && byname == FALSE )
 		{
-		  if ( intarr[isel] == (gridID+1) )
+		  if ( intarr[isel] == (grididx+1) )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
@@ -259,7 +262,7 @@ void *Selvar(void *argument)
 		}
 	      else if ( operatorID == SELZAXIS && byname == FALSE )
 		{
-		  if ( intarr[isel] == (zaxisID+1) )
+		  if ( intarr[isel] == (zaxisidx+1) )
 		    {
 		      vlistDefFlag(vlistID1, varID, levID, TRUE);
 		      selfound[isel] = TRUE;
