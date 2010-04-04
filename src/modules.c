@@ -46,6 +46,7 @@ void *Cat(void *argument);
 void *CDItest(void *argument);
 void *Change(void *argument);
 void *Change_e5slm(void *argument);
+void *Cloudlayer(void *argument);
 void *Comp(void *argument);
 void *Compc(void *argument);
 void *Cond(void *argument);
@@ -242,6 +243,7 @@ void *Wct(void *argument);
 #define  CDItestOperators       {"ncopy"}
 #define  ChangeOperators        {"chcode", "chtabnum", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
+#define  CloudlayerOperators    {"cloudlayer"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
 #define  CondOperators          {"ifthen",  "ifnotthen"}
@@ -474,6 +476,7 @@ static modules_t Modules[] =
   { CDItest,        NULL,              CDItestOperators,       CDI_REAL,  1,  1 },
   { Change,         ChangeHelp,        ChangeOperators,        CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  CDI_REAL,  1,  1 },
+  { Cloudlayer,     NULL,              CloudlayerOperators,    CDI_REAL,  1,  1 },
   { Comp,           CompHelp,          CompOperators,          CDI_REAL,  2,  1 },
   { Compc,          CompcHelp,         CompcOperators,         CDI_REAL,  1,  1 },
   { Cond,           CondHelp,          CondOperators,          CDI_REAL,  2,  1 },

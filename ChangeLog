@@ -1,3 +1,7 @@
+2010-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added operator cloudlayer: compute low, mid and high clouds [request: Daniel Klocke]
+
 2010-04-01  Martin Claus  <mclaus@ifm-geomar.de>
 
 	* vertwind: added missing value support

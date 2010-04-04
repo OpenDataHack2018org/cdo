@@ -12,6 +12,7 @@ cdo_SOURCES = Arith.c		\
 	      CDItest.c		\
 	      Change.c		\
 	      Change_e5slm.c	\
+	      Cloudlayer.c 	\
 	      Comp.c 		\
 	      Compc.c 		\
 	      Cond.c 		\
