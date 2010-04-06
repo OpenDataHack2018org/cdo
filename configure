@@ -7457,7 +7457,7 @@ $as_echo "suppressed" >&6; } ;; #(
      ;;
 esac
 else
-  with_netcdf=yes
+  with_netcdf=no
 fi
 
 if test "x$with_netcdf" != xno; then :

@@ -212,7 +212,7 @@ AC_ARG_WITH([netcdf],
                            AC_MSG_RESULT([suppressed])],
                      [yes|auto],[],
                      [*],[NETCDFROOT=$with_netcdf])],
-            [with_netcdf=yes])
+            [with_netcdf=no])
 AS_IF([test "x$with_netcdf" != xno],
       [AC_MSG_CHECKING([for location of NETCDF Library])
        HAVE_NETCDF=yes
