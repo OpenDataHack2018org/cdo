@@ -95,6 +95,58 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_orde
     }
 }
 
+static
+int maptype2operfunc(int map_type, int submap_type, int remap_order)
+{
+  int operfunc = -1;
+
+  if ( map_type == MAP_TYPE_CONSERV )
+    {
+      if ( submap_type == SUBMAP_TYPE_LAF )
+	{
+	  operfunc = REMAPLAF;
+	  cdoPrint("Using remaplaf");
+	}
+      else
+	{
+	  if ( remap_order == 2 )
+	    {
+	      operfunc = REMAPCON2;
+	      cdoPrint("Using remapcon2");
+	    }
+	  else
+	    {
+	      operfunc = REMAPCON;
+	      cdoPrint("Using remapcon");
+	    }
+	}
+    }
+  else if ( map_type == MAP_TYPE_BILINEAR )
+    {
+      operfunc = REMAPBIL;
+      cdoPrint("Using remapbil");
+    }
+  else if ( map_type == MAP_TYPE_BICUBIC )
+    {
+      operfunc = REMAPBIC;
+      cdoPrint("Using remapbic");
+    }
+  else if ( map_type == MAP_TYPE_DISTWGT )
+    {
+      operfunc = REMAPDIS;
+      cdoPrint("Using remapdis");
+    }
+  else if ( map_type == MAP_TYPE_DISTWGT1 )
+    {
+      operfunc = REMAPNN;
+      cdoPrint("Using remapnn");
+    }
+  else
+    cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
+
+  return (operfunc);
+}
+
 
 void *Remap(void *argument)
 {
@@ -128,6 +180,7 @@ void *Remap(void *argument)
   int non_global;
   int lgridboxinfo = TRUE;
   int grid1sizemax;
+  short *remapgrids = NULL;
   char varname[128];
   double missval;
   double *array1 = NULL, *array2 = NULL;
@@ -342,8 +395,11 @@ void *Remap(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
+  remapgrids = (short *) malloc(ngrids*sizeof(short));
   for ( index = 0; index < ngrids; index++ )
     {
+      remapgrids[index] = TRUE;
+
       gridID1 = vlistGrid(vlistID1, index);
 
       if ( gridInqType(gridID1) != GRID_LONLAT      &&
@@ -358,14 +414,25 @@ void *Remap(void *argument)
 	  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
 		     gridNamePtr(gridInqType(gridID1)));
+	  else if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 )
+	    remapgrids[index] = FALSE;
 	  else
 	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
 	}
 
-      vlistChangeGridIndex(vlistID2, index, gridID2);
+      if ( remapgrids[index] )
+	vlistChangeGridIndex(vlistID2, index, gridID2);
     }
 
-  gridID1 = vlistGrid(vlistID1, 0);
+  for ( index = 0; index < ngrids; index++ )
+    {
+      if ( remapgrids[index] == TRUE ) break;
+    }
+
+  if ( index == ngrids )
+    cdoAbort("No remappable grid found!");
+
+  gridID1 = vlistGrid(vlistID1, index);
 
   if ( max_remaps == 0 )
     {
@@ -457,49 +524,7 @@ void *Remap(void *argument)
       if ( remaps[0].grid.grid2_size != gridsize2 )
 	cdoAbort("Size of target grid and weights from %s differ!", remap_file);
 
-      if ( map_type == MAP_TYPE_CONSERV )
-        {
-	  if ( submap_type == SUBMAP_TYPE_LAF )
-	    {
-	      operfunc = REMAPLAF;
-	      cdoPrint("Using remaplaf");
-	    }
-	  else
-	    {
-	      if ( remap_order == 2 )
-		{
-		  operfunc = REMAPCON2;
-		  cdoPrint("Using remapcon2");
-		}
-	      else
-		{
-		  operfunc = REMAPCON;
-		  cdoPrint("Using remapcon");
-		}
-	    }
-	}
-      else if ( map_type == MAP_TYPE_BILINEAR )
-        {
-	  operfunc = REMAPBIL;
-	  cdoPrint("Using remapbil");
-	}
-      else if ( map_type == MAP_TYPE_BICUBIC )
-        {
-	  operfunc = REMAPBIC;
-	  cdoPrint("Using remapbic");
-	}
-      else if ( map_type == MAP_TYPE_DISTWGT )
-        {
-	  operfunc = REMAPDIS;
-	  cdoPrint("Using remapdis");
-	}
-      else if ( map_type == MAP_TYPE_DISTWGT1 )
-        {
-	  operfunc = REMAPNN;
-	  cdoPrint("Using remapnn");
-	}
-      else
-	cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
+      operfunc = maptype2operfunc(map_type, submap_type, remap_order);
 
       if ( remap_test ) reorder_links(&remaps[0].vars);
     }
@@ -581,6 +606,17 @@ void *Remap(void *argument)
 	  streamReadRecord(streamID1, array1, &nmiss1);
 
 	  gridID1 = vlistInqVarGrid(vlistID1, varID);
+
+	  if ( remapgrids[vlistGridIndex(vlistID1, gridID1)] == FALSE )
+	    {
+	      if ( lwrite_remap ) continue;
+	      else
+		{
+		  nmiss2 = nmiss1;
+		  *array2 = *array1;
+		  goto SKIPVAR;
+		}
+	    }
 
 	  if ( map_type != MAP_TYPE_CONSERV && 
 	       gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
@@ -877,6 +913,8 @@ void *Remap(void *argument)
 	  for ( i = 0; i < gridsize2; i++ )
 	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss2++;
 
+	SKIPVAR:
+
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, array2, nmiss2);
 	}
@@ -892,6 +930,7 @@ void *Remap(void *argument)
 
   streamClose(streamID1);
 
+  if ( remapgrids ) free(remapgrids);
   if ( imask )  free(imask);
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
