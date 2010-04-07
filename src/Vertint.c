@@ -64,7 +64,7 @@ void *Vertint(void *argument)
   int code;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
-  char varname[128];
+  char varname[128], stdname[128];
   int *vars = NULL;
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;
@@ -383,15 +383,21 @@ void *Vertint(void *argument)
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
-
 	  strtolower(varname);
 
-	  /*                        ECHAM                            ECMWF       */
-	  if      ( strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0 ) code = 129;
-	  else if ( strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0 ) code = 130;
-	  else if ( strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0 ) code = 134;
-	  else if ( strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0 ) code = 152;
-	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
+	  vlistInqVarStdname(vlistID1, varID, stdname);
+	  strtolower(stdname);
+
+	  if ( strcmp(stdname, "surface_air_pressure") == 0 ) code = 134;
+	  else
+	    {
+	      /*                        ECHAM                            ECMWF       */
+	      if      ( strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0 ) code = 129;
+	      else if ( strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0 ) code = 130;
+	      else if ( strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0 ) code = 134;
+	      else if ( strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0 ) code = 152;
+	      /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
+	    }
 	}
 
       if ( mode == ECHAM_MODE )

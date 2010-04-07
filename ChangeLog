@@ -1,6 +1,6 @@
 2010-04-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* Remap: bypass variables with generic gridtype and only one gridpoint
+	* Remap: bypass variables with gridtype generic and only one gridpoint
 
 2010-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
