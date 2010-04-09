@@ -155,6 +155,9 @@ extern "C" {
 #define  TUNIT_MONTH              5
 #define  TUNIT_YEAR               6
 #define  TUNIT_QUARTER            7
+#define  TUNIT_3HOURS             8
+#define  TUNIT_6HOURS             9
+#define  TUNIT_12HOURS           10
 
 /* TSTEP types */
 
