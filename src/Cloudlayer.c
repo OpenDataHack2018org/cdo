@@ -199,11 +199,12 @@ void *Cloudlayer(void *argument)
 	  if ( strcmp(varname, "aclcac") == 0 ) code = 223;
 	}
 
-      if  ( code == aclcac_code ) aclcacID  = varID;
+      if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE || zaxisInqType(zaxisID) == ZAXIS_HYBRID )
+	if  ( code == aclcac_code ) aclcacID  = varID;
     }
 
   if ( aclcacID == -1 )
-    cdoAbort("Cloud cover (code 223) not found!");
+    cdoAbort("Cloud cover (code 223) not found on pressure or hybrid levels!");
 
   missval = vlistInqVarMissval(vlistID1, aclcacID);
   gridID  = vlistInqVarGrid(vlistID1, aclcacID);
