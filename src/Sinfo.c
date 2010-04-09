@@ -253,6 +253,12 @@ void *Sinfo(void *argument)
 			fprintf(stdout, "  Units = months");
 		      else if ( unit == TUNIT_DAY )
 			fprintf(stdout, "  Units = days");
+		      else if ( unit == TUNIT_12HOURS )
+			fprintf(stdout, "  Units = 12hours");
+		      else if ( unit == TUNIT_6HOURS )
+			fprintf(stdout, "  Units = 6hours");
+		      else if ( unit == TUNIT_3HOURS )
+			fprintf(stdout, "  Units = 3hours");
 		      else if ( unit == TUNIT_HOUR )
 			fprintf(stdout, "  Units = hours");
 		      else if ( unit == TUNIT_MINUTE )

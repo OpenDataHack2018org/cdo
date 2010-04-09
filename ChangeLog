@@ -1,3 +1,7 @@
+2010-04-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added support for time units 3hours and 6hours [request: Jaison-Thomas Ambadan]
+	
 2010-04-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Remap: bypass variables with gridtype generic and only one gridpoint
