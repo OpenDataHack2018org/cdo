@@ -384,7 +384,6 @@ Operator catalog:
       Spectral   gp2sp           Gridpoint to spectral
       Spectral   gp2spl          Gridpoint to spectral (linear)
       Spectral   sp2sp           Spectral to spectral
-      Spectral   spcut           Cut spectral wave number
       Wind       dv2uv           Divergence and vorticity to U and V wind
       Wind       dv2uvl          Divergence and vorticity to U and V wind (linear)
       Wind       uv2dv           U and V wind to divergence and vorticity

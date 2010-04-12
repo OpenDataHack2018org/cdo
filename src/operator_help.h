@@ -2878,7 +2878,7 @@ static char *IntyearHelp[] = {
 
 static char *SpectralHelp[] = {
     "NAME",
-    "    sp2gp, sp2gpl, gp2sp, gp2spl, sp2sp, spcut - Spectral transformation",
+    "    sp2gp, sp2gpl, gp2sp, gp2spl, sp2sp - Spectral transformation",
     "",
     "SYNOPSIS",
     "    sp2gp  ifile ofile",
@@ -2886,7 +2886,6 @@ static char *SpectralHelp[] = {
     "    gp2sp  ifile ofile",
     "    gp2spl  ifile ofile",
     "    sp2sp,trunc  ifile ofile",
-    "    spcut,wnums  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module transforms fields on Gaussian grids to spectral coefficients ",
@@ -2926,8 +2925,6 @@ static char *SpectralHelp[] = {
     "            Change the triangular truncation of all spectral fields.",
     "            The operator performs downward conversion by cutting the resolution.",
     "            Upward conversions are achieved by filling in zeros.",
-    "    spcut   Cut spectral wave number",
-    "            Set the user defined wave numbers to zero.",
     "",
     "PARAMETER",
     "    trunc  INTEGER  New spectral resolution",
@@ -3195,7 +3192,7 @@ static char *VargenHelp[] = {
     "",
     "PARAMETER",
     "    const  FLOAT   Constant",
-    "    seed   INTEGER  The seed for a new sequence of pseudo-random numbers [default: 1]",
+    "    seed   INTEGER The seed for a new sequence of pseudo-random numbers [default: 1]",
     "    grid   STRING  Target grid description file or name",
     NULL
 };

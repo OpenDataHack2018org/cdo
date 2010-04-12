@@ -5,7 +5,7 @@
 @Section   = Transformation
 @Class     = Transformation
 @Arguments = ifile ofile
-@Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp spcut
+@Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp
 
 @BeginDescription
 This module transforms fields on Gaussian grids to spectral coefficients 
