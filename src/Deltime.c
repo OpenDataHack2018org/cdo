@@ -15,6 +15,7 @@
   GNU General Public License for more details.
 */
 
+#include <ctype.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -25,6 +26,8 @@
 void *Deltime(void *argument)
 {
   const char func[] = "Deltime";
+  int DELDAY, DEL29FEB;
+  int operatorID;
   int streamID1, streamID2;
   int tsID, tsID2, nrecs;
   int recID, varID, levelID;
@@ -35,10 +38,49 @@ void *Deltime(void *argument)
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
+  int nfound;
   int year, month, day;
+  int dday, dmon;
   double *array = NULL;
+  const char *cmons[]={"", "jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
 
   cdoInitialize(argument);
+
+  DELDAY   = cdoOperatorAdd("delday",   0, 0, NULL);
+  DEL29FEB = cdoOperatorAdd("del29feb", 0, 0, NULL);
+
+  operatorID = cdoOperatorID();
+
+  if ( operatorID == DEL29FEB )
+    {
+      dday = 29;
+      dmon = 2;
+    }
+  else
+    {
+      int im;
+      int nsel;
+      char *sarg;
+      nsel = operatorArgc();
+      if ( nsel < 1 ) cdoAbort("Not enough arguments!");
+      if ( nsel > 1 ) cdoAbort("Too many arguments!");
+      sarg = operatorArgv()[0];
+      dday = atoi(sarg);
+      dmon = 0;
+      while ( isdigit(*sarg) ) *sarg++;
+      if ( isalpha(*sarg) )
+	{
+	  char smon[32];
+	  strncpy(smon, sarg, 32);
+	  strtolower(smon);
+	  for ( im = 0; im < 12; ++im )
+	    if ( memcmp(smon, cmons[im+1], 3) == 0 ) break;
+
+	  if ( im < 12 ) dmon = im + 1;
+	}
+    }
+
+  if ( cdoVerbose ) cdoPrint("delete day %d%s", dday, cmons[dmon]);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -64,6 +106,7 @@ void *Deltime(void *argument)
       array = (double *) malloc(gridsize*sizeof(double));
     }
       
+  nfound = 0;
   tsID  = 0;
   tsID2 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -73,8 +116,9 @@ void *Deltime(void *argument)
 
       cdiDecodeDate(vdate, &year, &month, &day);
 
-      if ( month == 2 && day == 29 )
+      if ( day == dday && (month == dmon || dmon == 0) )
 	{
+	  nfound++;
 	  copytimestep = FALSE;
 	  if ( cdoVerbose )
 	    cdoPrint("Delete %4.4d-%2.2d-%2.2d at timestep %d", year, month, day, tsID+1);
@@ -109,6 +153,9 @@ void *Deltime(void *argument)
 
   streamClose(streamID2);
   streamClose(streamID1);
+
+  if ( nfound == 0 )
+    cdoWarning("Day %d%s not found!", dday, cmons[dmon]);
 
   if ( ! lcopy )
     if ( array ) free(array);

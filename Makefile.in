@@ -51,6 +51,11 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/acx_c_package.m4 \
 	$(top_srcdir)/m4/ac_lang_program_fortran.m4 \
 	$(top_srcdir)/m4/acx_lang_fortran_check_include.m4 \
 	$(top_srcdir)/m4/acx_lang_c_check_include.m4 \
+	$(top_srcdir)/m4/ac_fc_freeform.m4 \
+	$(top_srcdir)/m4/acx_fc_library_ldflags.m4 \
+	$(top_srcdir)/m4/ac_lang_program_fortran.m4 \
+	$(top_srcdir)/m4/acx_lang_fortran_check_include.m4 \
+	$(top_srcdir)/m4/acx_lang_c_check_include.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)

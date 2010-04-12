@@ -421,8 +421,7 @@ void *Gradsdes(void *argument)
   double *array = NULL;
   double xfirst, yfirst, xinc, yinc;
   double *xvals, *yvals;
-  char *cmons[]={"jan","feb","mar","apr","may","jun",
-		 "jul","aug","sep","oct","nov","dec"};
+  const char *cmons[]={"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
       
   cdoInitialize(argument);
 
