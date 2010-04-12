@@ -275,7 +275,7 @@ src/Cond.c -text
 src/Cond2.c -text
 src/Condc.c -text
 src/Copy.c -text
-src/Del29feb.c -text
+src/Deltime.c -text
 src/Detrend.c -text
 src/Diff.c -text
 src/EcaIndices.c -text

@@ -20,7 +20,7 @@ cdo_SOURCES = Arith.c		\
 	      Condc.c 		\
               Complextorect.c   \
 	      Copy.c		\
-              Del29feb.c	\
+              Deltime.c      	\
               Detrend.c		\
               Diff.c		\
               Echam5ini.c     	\

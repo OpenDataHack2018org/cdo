@@ -70,7 +70,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Change.$(OBJEXT) Change_e5slm.$(OBJEXT) Cloudlayer.$(OBJEXT) \
 	Comp.$(OBJEXT) Compc.$(OBJEXT) Cond.$(OBJEXT) Cond2.$(OBJEXT) \
 	Condc.$(OBJEXT) Complextorect.$(OBJEXT) Copy.$(OBJEXT) \
-	Del29feb.$(OBJEXT) Detrend.$(OBJEXT) Diff.$(OBJEXT) \
+	Deltime.$(OBJEXT) Detrend.$(OBJEXT) Diff.$(OBJEXT) \
 	Echam5ini.$(OBJEXT) Enlarge.$(OBJEXT) Enlargegrid.$(OBJEXT) \
 	Ensstat.$(OBJEXT) Eofcoeff.$(OBJEXT) Exprf.$(OBJEXT) \
 	Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) Filter.$(OBJEXT) \
@@ -295,7 +295,7 @@ cdo_SOURCES = Arith.c		\
 	      Condc.c 		\
               Complextorect.c   \
 	      Copy.c		\
-              Del29feb.c	\
+              Deltime.c      	\
               Detrend.c		\
               Diff.c		\
               Echam5ini.c     	\
@@ -657,7 +657,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cond2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Condc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Copy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Del29feb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Deltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Detrend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Diff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EcaIndices.Po@am__quote@

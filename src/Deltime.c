@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -22,9 +22,9 @@
 #include "pstream.h"
 
 
-void *Del29feb(void *argument)
+void *Deltime(void *argument)
 {
-  const char func[] = "Del29feb";
+  const char func[] = "Deltime";
   int streamID1, streamID2;
   int tsID, tsID2, nrecs;
   int recID, varID, levelID;
@@ -87,7 +87,6 @@ void *Del29feb(void *argument)
 	  taxisCopyTimestep(taxisID2, taxisID1);
 
 	  streamDefTimestep(streamID2, tsID2++);
-
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {

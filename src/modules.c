@@ -54,7 +54,7 @@ void *Cond2(void *argument);
 void *Condc(void *argument);
 void *Complextorect(void *argument);
 void *Copy(void *argument);
-void *Del29feb(void *argument);
+void *Deltime(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
 void *Echam5ini(void *argument);
@@ -251,7 +251,7 @@ void *Wct(void *argument);
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
 #define  ComplextorectOperators {"complextorect"}
 #define  CopyOperators          {"copy", "selall"}
-#define  Del29febOperators      {"del29feb"}
+#define  DeltimeOperators       {"delday", "del29feb"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffp", "diffv", "sdiff"}
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
@@ -484,7 +484,7 @@ static modules_t Modules[] =
   { Condc,          CondcHelp,         CondcOperators,         CDI_REAL,  1,  1 },
   { Complextorect,  NULL,              ComplextorectOperators, CDI_COMP,  1,  2 },
   { Copy,           CopyHelp,          CopyOperators,          CDI_REAL, -1,  1 },
-  { Del29feb,       NULL,              Del29febOperators,      CDI_REAL,  1,  1 },
+  { Deltime,        NULL,              DeltimeOperators,       CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
   { Diff,           DiffHelp,          DiffOperators,          CDI_REAL,  2,  0 },
   { Echam5ini,      NULL,              Echam5iniOperators,     CDI_REAL,  1,  1 },
