@@ -449,6 +449,8 @@ void spcut(double *arrayIn, double *arrayOut, int trunc, int *waves)
 	    {
 	      *arrayOut++ = 0.0;
 	      *arrayOut++ = 0.0;
+	      arrayIn++;
+	      arrayIn++;
 	    }
 	}
     }
