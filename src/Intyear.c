@@ -171,12 +171,14 @@ void *Intyear(void *argument)
 		      if ( !DBL_IS_EQUAL(array1[i], missval1) &&
 			   !DBL_IS_EQUAL(array2[i], missval2) )
 			array3[i] = array1[i]*fac1 + array2[i]*fac2;
+		      /* 2010-04-19 Uwe Schulzweida: removed 
 		      else if ( DBL_IS_EQUAL(array1[i], missval1) &&
 				!DBL_IS_EQUAL(array2[i], missval2) && fac2 >= 0.5 )
 			array3[i] = array2[i];
 		      else if ( DBL_IS_EQUAL(array2[i], missval2) &&
 				!DBL_IS_EQUAL(array1[i], missval1) && fac1 >= 0.5 )
 			array3[i] = array1[i];
+		      */
 		      else
 			{
 			  array3[i] = missval1;
