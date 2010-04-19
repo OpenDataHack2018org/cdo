@@ -1,5 +1,6 @@
 2010-04-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+        * fldsum: change result from 0 to missval, if missing values found [report: Angelika Heil]
 	* intyear: set the interpolation result always to missval, if missing values found [report: Angelika Heil]
 
 2010-04-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

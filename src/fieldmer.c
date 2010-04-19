@@ -37,7 +37,8 @@ void merfun(field_t field1, field_t *field2, int function)
 
 void mermin(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -78,7 +79,8 @@ void mermin(field_t field1, field_t *field2)
 
 void mermax(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -119,7 +121,9 @@ void mermax(field_t field1, field_t *field2)
 
 void mersum(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  long   nvals   = 0;
+  int    rnmiss  = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -133,10 +137,20 @@ void mersum(field_t field1, field_t *field2)
     {
       if ( nmiss > 0 )
 	{
+	  nvals = 0;
 	  rsum = 0;
 	  for ( j = 0; j < ny; j++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
-	      rsum += array[j*nx+i];
+	      {
+		rsum += array[j*nx+i];
+		nvals++;
+	      }
+
+	  if ( !nvals )
+	    {
+	      rsum = missval;
+	      rnmiss++;
+	    }
 	}
       else
 	{
@@ -154,7 +168,8 @@ void mersum(field_t field1, field_t *field2)
 
 void mermean(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval1 = field1.missval;
@@ -202,7 +217,8 @@ void mermean(field_t field1, field_t *field2)
 
 void meravg(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid     = field1.grid;
   int    nmiss    = field1.nmiss;
   double missval1 = field1.missval;
@@ -249,7 +265,8 @@ void meravg(field_t field1, field_t *field2)
 
 void mervar(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -304,7 +321,8 @@ void mervar(field_t field1, field_t *field2)
 
 void merstd(field_t field1, field_t *field2)
 {
-  int i, nx, rnmiss = 0;
+  long   i, nx;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
   double rvar, rstd;
@@ -339,7 +357,8 @@ void merpctl(field_t field1, field_t *field2, int p)
 {
   static const char func[] = "merpctl";
 
-  int i, j, l, nx, ny, rnmiss = 0;
+  long   i, j, l, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;

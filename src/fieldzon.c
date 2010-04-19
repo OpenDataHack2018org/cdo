@@ -38,7 +38,8 @@ void zonfun(field_t field1, field_t *field2, int function)
 
 void zonmin(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -79,7 +80,8 @@ void zonmin(field_t field1, field_t *field2)
 
 void zonmax(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -120,7 +122,9 @@ void zonmax(field_t field1, field_t *field2)
 
 void zonsum(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  long   nvals   = 0;
+  int    rnmiss  = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;
@@ -134,11 +138,21 @@ void zonsum(field_t field1, field_t *field2)
     {
       if ( nmiss > 0 )
 	{
+	  nvals = 0;
 	  rsum = 0;
 	  for ( i = 0; i < nx; i++ )
 	    if ( !DBL_IS_EQUAL(array[j*nx+i], missval) )
-	      rsum += array[j*nx+i];
-	}
+	      {
+		rsum += array[j*nx+i];
+		nvals++;
+	      }
+
+	  if ( !nvals )
+	    {
+	      rsum = missval;
+	      rnmiss++;
+	    }
+ 	}
       else
 	{
 	  rsum = 0;
@@ -155,7 +169,8 @@ void zonsum(field_t field1, field_t *field2)
 
 void zonmean(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid     = field1.grid;
   int    nmiss    = field1.nmiss;
   double missval1 = field1.missval;
@@ -201,7 +216,8 @@ void zonmean(field_t field1, field_t *field2)
 
 void zonavg(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid     = field1.grid;
   int    nmiss    = field1.nmiss;
   double missval1 = field1.missval;
@@ -246,7 +262,8 @@ void zonavg(field_t field1, field_t *field2)
 
 void zonvar(field_t field1, field_t *field2)
 {
-  int i, j, nx, ny, rnmiss = 0;
+  long   i, j, nx, ny;
+  int    rnmiss = 0;
   int    grid     = field1.grid;
   int    nmiss    = field1.nmiss;
   double missval1 = field1.missval;
@@ -299,7 +316,8 @@ void zonvar(field_t field1, field_t *field2)
 
 void zonstd(field_t field1, field_t *field2)
 {
-  int j, ny, rnmiss = 0;
+  long   j, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   double missval = field1.missval;
   double rvar, rstd;
@@ -334,7 +352,8 @@ void zonpctl(field_t field1, field_t *field2, int p)
 {
   static const char func[] = "zonpctl";
 
-  int i, j, l, nx, ny, rnmiss = 0;
+  long   i, j, l, nx, ny;
+  int    rnmiss = 0;
   int    grid    = field1.grid;
   int    nmiss   = field1.nmiss;
   double missval = field1.missval;

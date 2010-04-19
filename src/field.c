@@ -66,8 +66,8 @@ double fldfun(field_t field, int function)
 
 double fldmin(field_t field)
 {
-  int i;
-  int    len     = field.size;
+  long   i;
+  long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;
   double *array  = field.ptr;
@@ -96,8 +96,8 @@ double fldmin(field_t field)
 
 double fldmax(field_t field)
 {
-  int i;
-  int    len     = field.size;
+  long   i;
+  long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;
   double *array  = field.ptr;
@@ -126,8 +126,9 @@ double fldmax(field_t field)
 
 double fldsum(field_t field)
 {
-  int i;
-  int    len     = field.size;
+  long   i;
+  long   nvals   = 0;
+  long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;
   double *array  = field.ptr;
@@ -137,7 +138,12 @@ double fldsum(field_t field)
     {
       for ( i = 0; i < len; i++ ) 
 	if ( !DBL_IS_EQUAL(array[i], missval) )
-	  rsum += array[i];
+	  {
+	    rsum += array[i];
+	    nvals++;
+	  }
+
+      if ( !nvals ) rsum = missval;
     }
   else
     {
@@ -151,8 +157,8 @@ double fldsum(field_t field)
 
 double fldmean(field_t field)
 {
-  int i;
-  int    len      = field.size;
+  long   i;
+  long   len      = field.size;
   int    nmiss    = field.nmiss;
   double missval1 = field.missval;
   double missval2 = field.missval;
@@ -186,8 +192,8 @@ double fldmean(field_t field)
 
 double fldavg(field_t field)
 {
-  int i;
-  int    len      = field.size;
+  long   i;
+  long   len      = field.size;
   int    nmiss    = field.nmiss;
   double missval1 = field.missval;
   double missval2 = field.missval;
@@ -221,8 +227,8 @@ double fldavg(field_t field)
 
 double fldvar(field_t field)
 {
-  int i;
-  int    len     = field.size;
+  long   i;
+  long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;
   double *array  = field.ptr;
@@ -281,7 +287,8 @@ double fldstd(field_t field)
 
 void fldrms(field_t field, field_t field2, field_t *field3)
 {
-  int i, len, rnmiss = 0;
+  long   i, len;
+  int    rnmiss = 0;
   int    grid1    = field.grid;
   int    nmiss1   = field.nmiss;
   double *array1  = field.ptr;
@@ -331,7 +338,8 @@ void fldrms(field_t field, field_t field2, field_t *field3)
 
 void varrms(field_t field, field_t field2, field_t *field3)
 {
-  int i, k, nlev, len, rnmiss = 0;
+  long   i, k, nlev, len;
+  int    rnmiss = 0;
   int    zaxis    = field.zaxis;
   int    grid1    = field.grid;
   int    nmiss1   = field.nmiss;
@@ -386,13 +394,13 @@ double fldpctl(field_t field, int p)
 {
   static const char func[] = "fldpctl";
   
-  int    len     = field.size;
+  long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;
   double *array  = field.ptr;
   double *array2;
 	
-  int i, j;
+  long i, j;
   double pctl = missval;
   
   if ( len - nmiss > 0 )
