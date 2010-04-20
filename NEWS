@@ -12,6 +12,7 @@ Version 1.4.4 (?? April 2010):
       o random: added optional parameter 'seed'
    * Fixed bugs:
       o standard deviation: changed the result from missval to zero, if variance is zero
+      o fldsum: change result from 0 to missval, if only missing values found
       o intyear: set the interpolation result always to missval, if missing values found
       o Added support for netCDF time bounds
       o sellonlatbox: parameter lon2 was not inclusiv
