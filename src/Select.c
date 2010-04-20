@@ -647,6 +647,7 @@ void *Select(void *argument)
 	  if ( ! lcopy )
 	    {
 	      gridsize = vlistGridsizeMax(vlistID1);
+	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 	      array = (double *) malloc(gridsize*sizeof(double));
 	    }
 	}

@@ -552,7 +552,7 @@ static modules_t Modules[] =
   { Seaspctl,       SeaspctlHelp,      SeaspctlOperators,      CDI_REAL,  3,  1 },
   { Seasstat,       SeasstatHelp,      SeasstatOperators,      CDI_REAL,  1,  1 },
   { Selbox,         SelboxHelp,        SelboxOperators,        CDI_REAL,  1,  1 },
-  { Select,         NULL,              SelectOperators,        CDI_REAL, -1,  1 },
+  { Select,         NULL,              SelectOperators,        CDI_BOTH, -1,  1 },
   { Selvar,         SelvarHelp,        SelvarOperators,        CDI_BOTH,  1,  1 },
   { Selrec,         SelvarHelp,        SelrecOperators,        CDI_BOTH,  1,  1 },
   { Seloperator,    NULL,              SeloperatorOperators,   CDI_REAL,  1,  1 },
