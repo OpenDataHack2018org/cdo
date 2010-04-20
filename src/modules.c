@@ -556,7 +556,7 @@ static modules_t Modules[] =
   { Selvar,         SelvarHelp,        SelvarOperators,        CDI_BOTH,  1,  1 },
   { Selrec,         SelvarHelp,        SelrecOperators,        CDI_BOTH,  1,  1 },
   { Seloperator,    NULL,              SeloperatorOperators,   CDI_REAL,  1,  1 },
-  { Seltime,        SeltimeHelp,       SeltimeOperators,       CDI_REAL,  1,  1 },
+  { Seltime,        SeltimeHelp,       SeltimeOperators,       CDI_BOTH,  1,  1 },
   { Set,            SetHelp,           SetOperators,           CDI_REAL,  1,  1 },
   { Setbox,         SetboxHelp,        SetboxOperators,        CDI_REAL,  1,  1 },
   { Setgatt,        SetgattHelp,       SetgattOperators,       CDI_REAL,  1,  1 },
