@@ -312,13 +312,13 @@ void *Wct(void *argument);
                                  "outputfld", "outputarr", "outputxyz", "outputkey"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri"}
-#define  PressureOperators      {"fpressure", "hpressure"}
+#define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap_fl"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
-#define  RemapetaOperators      {"remapeta"}
+#define  RemapetaOperators      {"remapeta", "remapeta_scale"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
@@ -714,6 +714,8 @@ static char *opalias[][2] =
   {"sort",                "timsort"    },
   {"write_e5ml",          "export_e5ml"},
   {"eca_r1mm",            "eca_rr1"    },
+  {"fpressure",           "pressure_fl"},
+  {"hpressure",           "pressure_hl"},
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));

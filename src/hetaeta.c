@@ -31,7 +31,8 @@ FILE *old, *new;
 #endif
 
 
-static long int_index(long n, double *x1, double x2)
+static
+long int_index(long n, double *x1, double x2)
 {
   long klo, khi, k;
 
@@ -56,8 +57,8 @@ static long int_index(long n, double *x1, double x2)
   return (klo);
 }
 
-
-static double esat(double temperature)
+static
+double esat(double temperature)
 {
   double zes;
   double es;
@@ -207,7 +208,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	{
 	  if ( nvars > MAX_VARS )
 	    {
-	      fprintf(stderr, "To many vars (max = %d)!\n", MAX_VARS);
+	      fprintf(stderr, "Too many vars (max = %d)!\n", MAX_VARS);
 	      exit(-1);
 	    }
 	  vars_pbl_2[i]  = (double **) malloc(nvars*sizeof(double *));
