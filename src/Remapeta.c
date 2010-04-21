@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2007-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -149,6 +149,7 @@ void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval
   *maxval = xmax;
 }
 
+
 double *vctFromFile(const char *filename, int *nvct)
 {
   static char func[] = "vctFromFile";
@@ -200,13 +201,27 @@ double *vctFromFile(const char *filename, int *nvct)
   return (vct2);
 }
 
+static
+void vert_sum(double *sum, double *var3d, long gridsize, long nlevel)
+{
+  long i, k;
+
+  for ( i = 0; i < gridsize; ++i ) sum[i] = 0;
+
+  for ( k = 0; k < nlevel; ++k )
+    for ( i = 0; i < gridsize; ++i )
+      {
+	sum[i] += var3d[k*gridsize + i];
+      }
+}
+
 
 #define  MAX_VARS3D  1024
 
 void *Remapeta(void *argument)
 {
   static char func[] = "Remapeta";
-  int REMAPETA;
+  int REMAPETA, REMAPETAS;
   int operatorID;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
@@ -239,6 +254,7 @@ void *Remapeta(void *argument)
   int *imiss = NULL;
   long nctop;
   double *array = NULL;
+  double *sum1 = NULL, *sum2 = NULL;
   double **vars1 = NULL, **vars2 = NULL;
   double minval, maxval;
   double missval = 0;
@@ -251,13 +267,13 @@ void *Remapeta(void *argument)
 
   cdoInitialize(argument);
 
-  REMAPETA = cdoOperatorAdd("remapeta", 0, 0, "VCT file name");
+  REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
+  REMAPETAS = cdoOperatorAdd("remapeta_s", 0, 0, "VCT file name");
 
   operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == REMAPETA )
     {
 
       vct2 = vctFromFile(operatorArgv()[0], &nvct2);
@@ -480,6 +496,12 @@ void *Remapeta(void *argument)
     {
       if ( tempID != -1 ) cdoAbort("Temperature without humidity unsupported!");
       if ( sqID   != -1 ) cdoAbort("Humidity without temperature unsupported!");
+    }
+
+  if ( operatorID == REMAPETAS )
+    {
+      sum1 = (double *) malloc(ngp*sizeof(double));
+      sum2 = (double *) malloc(ngp*sizeof(double));
     }
 
   array = (double *) malloc(ngp*sizeof(double));
@@ -727,12 +749,31 @@ void *Remapeta(void *argument)
       for ( iv = 0; iv < nvars3D; ++iv )
 	{
 	  varID = varids[iv];
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+
+	  if ( operatorID == REMAPETAS )
+	    {
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	      vert_sum(sum1, vars1[iv], gridsize, nlevel);
+
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      vert_sum(sum2, vars2[iv], gridsize, nlevel);
+	    }
+
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      offset   = gridsize*levelID;
 	      single2  = vars2[iv] + offset;
+
+	      if ( operatorID == REMAPETAS )
+		{
+		  for ( i = 0; i < gridsize; ++i )
+		    single2[i] = single2[i]*sum1[i]/sum2[i];
+		}
 
 	      if ( gridsize == ngp ) setmissval(ngp, imiss, missval, single2);
 	      streamDefRecord(streamID2, varID, levelID);
@@ -774,6 +815,9 @@ void *Remapeta(void *argument)
   free(fis2);
   free(ps1);
   free(fis1);
+
+  if ( sum1 ) free(sum1);
+  if ( sum2 ) free(sum2);
 
   free(array);
   free(vct2);
