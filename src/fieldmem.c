@@ -65,6 +65,7 @@ field_t **field_calloc(int vlistID, int ptype)
   return (field_allocate(vlistID, ptype, 1));
 }
 
+
 void field_free(field_t **field, int vlistID)
 {
   static const char *func = "field_free";
@@ -79,7 +80,7 @@ void field_free(field_t **field, int vlistID)
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
 	  if ( field[varID][levelID].ptr )    free(field[varID][levelID].ptr);
-	  if ( field[varID][levelID].weight ) free(field[varID][levelID].weight);
+       	  if ( field[varID][levelID].weight ) free(field[varID][levelID].weight);
 	}
 
       free(field[varID]);

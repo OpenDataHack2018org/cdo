@@ -120,23 +120,7 @@ void *Tstepcount(void *argument)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-
-	  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
-
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      vars[tsID][varID][levelID].grid    = gridID;
-	      vars[tsID][varID][levelID].missval = missval;
-	      vars[tsID][varID][levelID].ptr     = NULL;
-	    }
-	}
+      vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -217,21 +201,8 @@ void *Tstepcount(void *argument)
     }
 
   for ( tsID = 0; tsID < nts; tsID++ )
-    {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      if ( vars[tsID][varID][levelID].ptr )
-		{
-		  free(vars[tsID][varID][levelID].ptr);
-		}
-	    }
-	  free(vars[tsID][varID]);
-	}
-      free(vars[tsID]);
-    }
+    field_free(vars[tsID], vlistID1);
+
   if ( vars  ) free(vars);
 
   streamClose(streamID2);
