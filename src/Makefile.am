@@ -167,6 +167,7 @@ cdo_SOURCES = Arith.c		\
               field2.c		\
               fieldmer.c  	\
               fieldzon.c  	\
+              fieldmem.c  	\
               gradsdeslib.c     \
               gradsdeslib.h     \
               grid.c		\

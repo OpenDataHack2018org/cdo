@@ -443,6 +443,7 @@ src/field.c -text
 src/field.h -text
 src/field2.c -text
 src/fieldc.c -text
+src/fieldmem.c -text
 src/fieldmer.c -text
 src/fieldzon.c -text
 src/fouriertrans.c -text

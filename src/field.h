@@ -15,9 +15,13 @@
   GNU General Public License for more details.
 */
 
-#ifndef _field_t_H
-#define _field_t_H
+#ifndef _FIELD_H
+#define _FIELD_H
 
+#define  FIELD_NONE 0
+#define  FIELD_ALL  1
+#define  FIELD_PTR  2
+#define  FILED_WGT  3
 
 #define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
 #define  FSUB(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
@@ -132,4 +136,4 @@ void faratan2(field_t *field1, field_t field2);
 void farcount(field_t *field1, field_t field2);
 /* QR */
 
-#endif  /* _field_t_H */
+#endif  /* _FIELD_H */

@@ -119,21 +119,21 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	expr.$(OBJEXT) cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) \
 	cdo_vlist.$(OBJEXT) field.$(OBJEXT) fieldc.$(OBJEXT) \
 	field2.$(OBJEXT) fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) \
-	gradsdeslib.$(OBJEXT) grid.$(OBJEXT) grid_gme.$(OBJEXT) \
-	grid_lcc.$(OBJEXT) grid_rot.$(OBJEXT) griddes.$(OBJEXT) \
-	griddes_nc.$(OBJEXT) griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) \
-	history.$(OBJEXT) institution.$(OBJEXT) interpol.$(OBJEXT) \
-	job.$(OBJEXT) modules.$(OBJEXT) namelist.$(OBJEXT) \
-	normal.$(OBJEXT) pipe.$(OBJEXT) process.$(OBJEXT) \
-	remaplib.$(OBJEXT) timer.$(OBJEXT) realtime.$(OBJEXT) \
-	pstream.$(OBJEXT) table.$(OBJEXT) userlog.$(OBJEXT) \
-	util.$(OBJEXT) legendre.$(OBJEXT) fouriertrans.$(OBJEXT) \
-	specspace.$(OBJEXT) readline.$(OBJEXT) juldate.$(OBJEXT) \
-	vinterp.$(OBJEXT) zaxis.$(OBJEXT) par_io.$(OBJEXT) \
-	pthread_debug.$(OBJEXT) color.$(OBJEXT) list.$(OBJEXT) \
-	percentiles.$(OBJEXT) nth_element.$(OBJEXT) ecacore.$(OBJEXT) \
-	ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) Hi.$(OBJEXT) \
-	Wct.$(OBJEXT) statistic.$(OBJEXT)
+	fieldmem.$(OBJEXT) gradsdeslib.$(OBJEXT) grid.$(OBJEXT) \
+	grid_gme.$(OBJEXT) grid_lcc.$(OBJEXT) grid_rot.$(OBJEXT) \
+	griddes.$(OBJEXT) griddes_nc.$(OBJEXT) griddes_h5.$(OBJEXT) \
+	hetaeta.$(OBJEXT) history.$(OBJEXT) institution.$(OBJEXT) \
+	interpol.$(OBJEXT) job.$(OBJEXT) modules.$(OBJEXT) \
+	namelist.$(OBJEXT) normal.$(OBJEXT) pipe.$(OBJEXT) \
+	process.$(OBJEXT) remaplib.$(OBJEXT) timer.$(OBJEXT) \
+	realtime.$(OBJEXT) pstream.$(OBJEXT) table.$(OBJEXT) \
+	userlog.$(OBJEXT) util.$(OBJEXT) legendre.$(OBJEXT) \
+	fouriertrans.$(OBJEXT) specspace.$(OBJEXT) readline.$(OBJEXT) \
+	juldate.$(OBJEXT) vinterp.$(OBJEXT) zaxis.$(OBJEXT) \
+	par_io.$(OBJEXT) pthread_debug.$(OBJEXT) color.$(OBJEXT) \
+	list.$(OBJEXT) percentiles.$(OBJEXT) nth_element.$(OBJEXT) \
+	ecacore.$(OBJEXT) ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) \
+	Hi.$(OBJEXT) Wct.$(OBJEXT) statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES =
 am_cdotest_OBJECTS = cdilib.$(OBJEXT) cdotest.$(OBJEXT)
@@ -442,6 +442,7 @@ cdo_SOURCES = Arith.c		\
               field2.c		\
               fieldmer.c  	\
               fieldzon.c  	\
+              fieldmem.c  	\
               gradsdeslib.c     \
               gradsdeslib.h     \
               grid.c		\
@@ -807,6 +808,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/field2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldmem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldmer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fieldzon.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fouriertrans.Po@am__quote@
