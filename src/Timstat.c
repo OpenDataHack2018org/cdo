@@ -75,7 +75,7 @@ void *Timstat(void *argument)
   int vdate_lb = 0, vdate_ub = 0, date_lb = 0, date_ub = 0;
   int vtime_lb = 0, vtime_ub = 0, time_lb = 0, time_ub = 0;
   int nrecs, nrecords;
-  int gridID, varID, levelID, recID;
+  int varID, levelID, recID;
   int tsID;
   int otsID;
   long nsets;
@@ -209,42 +209,10 @@ void *Timstat(void *argument)
 
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
-  vars1 = (field_t **) malloc(nvars*sizeof(field_t *));
-  samp1 = (field_t **) malloc(nvars*sizeof(field_t *));
+  vars1 = field_malloc(vlistID1, FIELD_PTR);
+  samp1 = field_malloc(vlistID1, FIELD_NONE);
   if ( operfunc == func_std || operfunc == func_var )
-    vars2 = (field_t **) malloc(nvars*sizeof(field_t *));
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      missval  = vlistInqVarMissval(vlistID1, varID);
-
-      vars1[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
-      samp1[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
-      if ( operfunc == func_std || operfunc == func_var )
-	vars2[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
-
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-	  vars1[varID][levelID].grid    = gridID;
-	  vars1[varID][levelID].nmiss   = 0;
-	  vars1[varID][levelID].missval = missval;
-	  vars1[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	  samp1[varID][levelID].grid    = gridID;
-	  samp1[varID][levelID].nmiss   = 0;
-	  samp1[varID][levelID].missval = missval;
-	  samp1[varID][levelID].ptr     = NULL;
-	  if ( operfunc == func_std || operfunc == func_var )
-	    {
-	      vars2[varID][levelID].grid    = gridID;
-	      vars2[varID][levelID].nmiss   = 0;
-	      vars2[varID][levelID].missval = missval;
-	      vars2[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	    }
-	}
-    }
+    vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   tsID    = 0;
   otsID   = 0;
@@ -474,24 +442,11 @@ void *Timstat(void *argument)
       if ( nrecs == 0 ) break;
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-	  free(vars1[varID][levelID].ptr);
-	  if ( samp1[varID][levelID].ptr ) free(samp1[varID][levelID].ptr);
-	  if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID][levelID].ptr);
-	}
 
-      free(vars1[varID]);
-      free(samp1[varID]);
-      if ( operfunc == func_std || operfunc == func_var ) free(vars2[varID]);
-    }
-
-  free(vars1);
-  free(samp1);
-  if ( operfunc == func_std || operfunc == func_var ) free(vars2);
+  field_free(vars1, vlistID1);
+  field_free(samp1, vlistID1);
+  if ( operfunc == func_std || operfunc == func_var )
+    field_free(vars2, vlistID1);
 
   if ( cdoDiag ) streamClose(streamID3);
   streamClose(streamID2);

@@ -78,8 +78,8 @@ void field_free(field_t **field, int vlistID)
       nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
-	  if ( field[varID][levelID].ptr ) free(field[varID][levelID].ptr);
-	  if ( field[varID][levelID].ptr ) free(field[varID][levelID].ptr);
+	  if ( field[varID][levelID].ptr )    free(field[varID][levelID].ptr);
+	  if ( field[varID][levelID].weight ) free(field[varID][levelID].weight);
 	}
 
       free(field[varID]);

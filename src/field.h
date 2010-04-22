@@ -23,6 +23,7 @@
 #define  FIELD_PTR  2
 #define  FILED_WGT  3
 
+
 #define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
 #define  FSUB(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
 #define  FMUL(x,y)  (DBL_IS_EQUAL((x),0.)||IS_EQUAL((y),0.) ? 0 : DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)*(y))
@@ -55,6 +56,12 @@ typedef struct {
   double  *ptr;
 }
 field_t;
+
+/* fieldmem.c */
+
+field_t **field_malloc(int vlistID, int ptype);
+field_t **field_calloc(int vlistID, int ptype);
+void      field_free(field_t **field, int vlistID);
 
 /* field.c */
 
