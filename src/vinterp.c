@@ -80,12 +80,14 @@ void presh(double * restrict fullp, double * halfp, const double *restrict vct,
 
       halfpres += ngp;
     }
-
   memcpy(halfpres, ps, ngp*sizeof(double));
 
-  halfpres = halfp;
-
-  for ( i = 0; i < ngp*nhlev; i++ ) fullp[i] = 0.5 * (halfpres[i] + halfpres[i+ngp]);
+  if ( fullp )
+    {
+      halfpres = halfp;
+      for ( i = 0; i < ngp*nhlev; i++ )
+	fullp[i] = 0.5 * (halfpres[i] + halfpres[i+ngp]);
+    }
 
 } /* presh */
 

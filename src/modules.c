@@ -318,7 +318,7 @@ void *Wct(void *argument);
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
-#define  RemapetaOperators      {"remapeta", "remapeta_s"}
+#define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}

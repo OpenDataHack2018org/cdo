@@ -215,13 +215,27 @@ void vert_sum(double *sum, double *var3d, long gridsize, long nlevel)
       }
 }
 
+static
+void vert_sumw(double *sum, double *var3d, long gridsize, long nlevel, double *deltap)
+{
+  long i, k;
+
+  for ( i = 0; i < gridsize; ++i ) sum[i] = 0;
+
+  for ( k = 0; k < nlevel; ++k )
+    for ( i = 0; i < gridsize; ++i )
+      {
+	sum[i] += var3d[k*gridsize + i]*deltap[k*gridsize + i];
+      }
+}
+
 
 #define  MAX_VARS3D  1024
 
 void *Remapeta(void *argument)
 {
   static char func[] = "Remapeta";
-  int REMAPETA, REMAPETAS;
+  int REMAPETA, REMAPETAS, REMAPETAZ;
   int operatorID;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
@@ -254,6 +268,8 @@ void *Remapeta(void *argument)
   int *imiss = NULL;
   long nctop;
   double *array = NULL;
+  double *deltap1 = NULL, *deltap2 = NULL;
+  double *half_press1 = NULL, *half_press2 = NULL;
   double *sum1 = NULL, *sum2 = NULL;
   double **vars1 = NULL, **vars2 = NULL;
   double minval, maxval;
@@ -269,6 +285,7 @@ void *Remapeta(void *argument)
 
   REMAPETA  = cdoOperatorAdd("remapeta",   0, 0, "VCT file name");
   REMAPETAS = cdoOperatorAdd("remapeta_s", 0, 0, "VCT file name");
+  REMAPETAZ = cdoOperatorAdd("remapeta_z", 0, 0, "VCT file name");
 
   operatorID = cdoOperatorID();
 
@@ -397,7 +414,7 @@ void *Remapeta(void *argument)
 		    {
 		      lhavevct = TRUE;
 		      zaxisIDh = zaxisID;
-		      nlevh1    = nlevel;
+		      nlevh1   = nlevel;
 	      
 		      vct1 = (double *) malloc(nvct1*sizeof(double));
 		      memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
@@ -498,10 +515,18 @@ void *Remapeta(void *argument)
       if ( sqID   != -1 ) cdoAbort("Humidity without temperature unsupported!");
     }
 
-  if ( operatorID == REMAPETAS )
+  if ( operatorID == REMAPETAS || operatorID == REMAPETAZ)
     {
       sum1 = (double *) malloc(ngp*sizeof(double));
       sum2 = (double *) malloc(ngp*sizeof(double));
+    }
+
+  if ( operatorID == REMAPETAZ )
+    {
+      deltap1 = (double *) malloc(ngp*nlevh1*sizeof(double));
+      deltap2 = (double *) malloc(ngp*nlevh2*sizeof(double));
+      half_press1 = (double *) malloc(ngp*(nlevh1+1)*sizeof(double));
+      half_press2 = (double *) malloc(ngp*(nlevh2+1)*sizeof(double));
     }
 
   array = (double *) malloc(ngp*sizeof(double));
@@ -757,11 +782,40 @@ void *Remapeta(void *argument)
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      vert_sum(sum1, vars1[iv], gridsize, nlevel);
+	      vert_sum(sum1, vars1[iv], gridsize, nlevh1);
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      vert_sum(sum2, vars2[iv], gridsize, nlevel);
+	      vert_sum(sum2, vars2[iv], gridsize, nlevh2);
+	    }
+	  else if ( operatorID == REMAPETAZ )
+	    {
+	      int k;
+
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+
+	      presh(NULL, half_press1, vct1, ps1, nlevh1, gridsize);
+	      for ( k = 0; k < nlevh1; ++k )
+		for ( i = 0; i < ngp; ++i )
+		  {
+		    deltap1[k*ngp+i] = half_press1[(k+1)*ngp+i] - half_press1[k*ngp+i];
+		    deltap1[k*ngp+i] = log(deltap1[k*ngp+i]);
+		  }
+	      vert_sumw(sum1, vars1[iv], gridsize, nlevh1, deltap1);
+
+
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+
+	      presh(NULL, half_press2, vct2, ps1, nlevh2, gridsize);
+	      for ( k = 0; k < nlevh2; ++k )
+		for ( i = 0; i < ngp; ++i )
+		  {
+		    deltap2[k*ngp+i] = half_press2[(k+1)*ngp+i] - half_press2[k*ngp+i];
+		    deltap2[k*ngp+i] = log(deltap2[k*ngp+i]);
+		  }
+	      vert_sumw(sum2, vars2[iv], gridsize, nlevh2, deltap2);
 	    }
 
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -769,8 +823,13 @@ void *Remapeta(void *argument)
 	      offset   = gridsize*levelID;
 	      single2  = vars2[iv] + offset;
 
-	      if ( operatorID == REMAPETAS )
+	      if ( operatorID == REMAPETAS || operatorID == REMAPETAZ )
 		{
+		  /*
+		  for ( i = 0; i < gridsize; ++i )
+		    if ( i %100 == 0 )
+		      printf("%d %g %g %g %g %g\n",i, single2[i], sum1[i], sum2[i], sum1[i]/sum2[i], single2[i]*sum1[i]/sum2[i]);
+		  */
 		  for ( i = 0; i < gridsize; ++i )
 		    single2[i] = single2[i]*sum1[i]/sum2[i];
 		}
@@ -818,6 +877,12 @@ void *Remapeta(void *argument)
 
   if ( sum1 ) free(sum1);
   if ( sum2 ) free(sum2);
+
+  if ( deltap1 ) free(deltap1);
+  if ( deltap2 ) free(deltap2);
+
+  if ( half_press1 ) free(half_press1);
+  if ( half_press2 ) free(half_press2);
 
   free(array);
   free(vct2);

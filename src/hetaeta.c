@@ -265,8 +265,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
   w1     = (double *) malloc(nlev2*sizeof(double));
   w2     = (double *) malloc(nlev2*sizeof(double));
-  jl1    = (long *)    malloc(nlev2*sizeof(long));
-  jl2    = (long *)    malloc(nlev2*sizeof(long));
+  jl1    = (long *)   malloc(nlev2*sizeof(long));
+  jl2    = (long *)   malloc(nlev2*sizeof(long));
 
 
   /******* set coordinate system ETA's, A's, B's
