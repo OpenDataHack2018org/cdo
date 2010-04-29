@@ -1,3 +1,8 @@
+2010-04-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.4.4
+	* Version 1.4.4 released
+
 2010-04-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * fldsum: change result from 0 to missval, if only missing values found [report: Angelika Heil]

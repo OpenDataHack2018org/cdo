@@ -1,25 +1,30 @@
 CDO NEWS
 --------
 
-Version 1.4.4 (?? April 2010):
+Version 1.4.4 (29 April 2010):
 
-   * New operators:
-      o fldcor: correlation in grid space
-      o timcor: correlation in time
-      o gridbox<stat>: computes statistical values over surrounding grid boxes
-   * Changed operators:
-      o import_binary: added support for variables with different number of levels
-      o random: added optional parameter 'seed'
-   * Fixed bugs:
-      o standard deviation: changed the result from missval to zero, if variance is zero
-      o fldsum: change result from 0 to missval, if only missing values found
-      o intyear: set the interpolation result always to missval, if missing values found
-      o Added support for netCDF time bounds
-      o sellonlatbox: parameter lon2 was not inclusiv
-      o expr: added support for calculations of const/var
-      o setday: writes sometimes wrong date information with GRIB result from afterburner
-      o inputsrv: added level information
-      o merge: added support to merge levels with datasets in netCDF format
+   New operators:
+
+     * fldcor: correlation in grid space
+     * timcor: correlation in time
+     * gridbox<stat>: computes statistical values over surrounding grid boxes
+
+   Changed operators:
+
+     * import_binary: added support for variables with different number of levels
+     * random: added optional parameter 'seed'
+
+   Fixed bugs:
+
+     * standard deviation: changed the result from missval to zero, if variance is zero
+     * fldsum: change result from 0 to missval, if only missing values found
+     * intyear: set the interpolation result always to missval, if missing values found
+     * Added support for netCDF time bounds
+     * sellonlatbox: parameter lon2 was not inclusiv
+     * expr: added support for calculations of const/var
+     * setday: writes sometimes wrong date information with GRIB result from afterburner
+     * inputsrv: added level information
+     * merge: added support to merge levels with datasets in netCDF format
 
 Version 1.4.3 (22 February 2010):
 
