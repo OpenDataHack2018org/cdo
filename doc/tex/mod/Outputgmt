@@ -2,7 +2,7 @@
 @NewPage
 @Name      = Outputgmt
 @Title     = Formatted GMT output
-@Section   = Formatted I/O
+@Section   = Import/Export
 @Arguments = ifiles
 @Operators = outputcenter outputbounds
 @EndModule

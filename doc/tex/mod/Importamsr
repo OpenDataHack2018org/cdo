@@ -2,7 +2,7 @@
 @NewPage
 @Name      = Importamsr
 @Title     = Import AMSR binary files
-@Section   = Miscellaneous
+@Section   = Import/Export
 @Arguments = ifile ofile
 @Operators = import_amsr
 

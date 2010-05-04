@@ -2,7 +2,7 @@
 @NewPage
 @Name      = Input
 @Title     = Formatted input
-@Section   = Formatted I/O
+@Section   = Import/Export
 @Arguments = ofile
 @Operators = input inputsrv inputext
 

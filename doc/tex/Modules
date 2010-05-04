@@ -85,8 +85,11 @@ Inttime       Interpolation
 Intyear       Interpolation
 Spectral      Transformation
 Wind          Transformation
-Input         Formatted I/O
-Output        Formatted I/O
+Importbinary  Import/Export
+Importcmsaf   Import/Export
+Importamsr    Import/Export
+Input         Import/Export
+Output        Import/Export
 Gridcell      Miscellaneous
 Gradsdes      Miscellaneous
 Smooth9       Miscellaneous
@@ -97,9 +100,6 @@ Rotuv         Miscellaneous
 Mastrfu       Miscellaneous
 Histogram     Miscellaneous
 Sethalo       Miscellaneous
-Importamsr    Miscellaneous
-Importcmsaf   Miscellaneous
-Importbinary  Miscellaneous
 Wct           Miscellaneous
 Fdns          Miscellaneous
 Strwin        Miscellaneous

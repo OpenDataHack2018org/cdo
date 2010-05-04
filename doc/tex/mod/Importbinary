@@ -2,7 +2,7 @@
 @NewPage
 @Name      = Importbinary
 @Title     = Import binary data sets
-@Section   = Miscellaneous
+@Section   = Import/Export
 @Arguments = ifile ofile
 @Operators = import_binary
 

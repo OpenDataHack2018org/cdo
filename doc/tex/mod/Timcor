@@ -1,6 +1,6 @@
 @BeginModule
 @Name      = Timcor
-@Title     = Correlation in time
+@Title     = Correlation over time
 @Section   = Correlation
 @Class     = Correlation
 @Arguments = ifile1 ifile2 ofile
@@ -9,7 +9,7 @@
 
 
 @BeginOperator_timcor
-@Title     = Correlation in time
+@Title     = Correlation over time
 
 @BeginDescription
 The correlation coefficient is a quantity that gives the quality of a least 

@@ -2,7 +2,7 @@
 @NewPage
 @Name      = Output
 @Title     = Formatted output
-@Section   = Formatted I/O
+@Section   = Import/Export
 @Arguments = ifiles
 @Operators = output outputf outputint outputsrv outputext
 
