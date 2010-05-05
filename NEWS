@@ -6,7 +6,7 @@ Version 1.4.4 (29 April 2010):
    New operators:
 
      * fldcor: correlation in grid space
-     * timcor: correlation in time
+     * timcor: correlation over time
      * gridbox<stat>: computes statistical values over surrounding grid boxes
 
    Changed operators:
