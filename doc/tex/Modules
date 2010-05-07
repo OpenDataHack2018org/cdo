@@ -38,37 +38,38 @@ Arith	      Arithmetic
 Monarith      Arithmetic
 Ymonarith     Arithmetic
 Arithdays     Arithmetic
+Consecstat    Statistical values
+Daypctl       Statistical values
+Daystat       Statistical values
 Ensstat       Statistical values
 Fldstat       Statistical values
-Zonstat       Statistical values
-Merstat       Statistical values
 Gridboxstat   Statistical values
-Vertstat      Statistical values
-Timselstat    Statistical values
-Timselpctl    Statistical values
-Runstat       Statistical values
-Runpctl       Statistical values
-Timstat       Statistical values
-Timpctl       Statistical values
-Hourstat      Statistical values
 Hourpctl      Statistical values
-Daystat       Statistical values
-Daypctl       Statistical values
-Monstat       Statistical values
+Hourstat      Statistical values
+Merstat       Statistical values
 Monpctl       Statistical values
-Yearstat      Statistical values
-Yearpctl      Statistical values
-Seasstat      Statistical values
+Monstat       Statistical values
+Runpctl       Statistical values
+Runstat       Statistical values
 Seaspctl      Statistical values
-Yhourstat     Statistical values
-Ydaystat      Statistical values
+Seasstat      Statistical values
+Timpctl       Statistical values
+Timselpctl    Statistical values
+Timselstat    Statistical values
+Timstat       Statistical values
+Vertstat      Statistical values
 Ydaypctl      Statistical values
-Ymonstat      Statistical values
-Ymonpctl      Statistical values
-Yseasstat     Statistical values
-Yseaspctl     Statistical values
-Ydrunstat     Statistical values
+Ydaystat      Statistical values
 Ydrunpctl     Statistical values
+Ydrunstat     Statistical values
+Yearpctl      Statistical values
+Yearstat      Statistical values
+Yhourstat     Statistical values
+Ymonpctl      Statistical values
+Ymonstat      Statistical values
+Yseaspctl     Statistical values
+Yseasstat     Statistical values
+Zonstat       Statistical values
 Fldcor        Correlation
 Timcor        Correlation
 Regres        Regression

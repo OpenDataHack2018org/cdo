@@ -127,6 +127,7 @@ void farfun(field_t *field1, field_t field2, int function);
 void faradd(field_t *field1, field_t field2);
 void farsum(field_t *field1, field_t field2);
 void farsumq(field_t *field1, field_t field2);
+void farsumtr(field_t *field1, field_t field2, double refval);
 void farsub(field_t *field1, field_t field2);
 void farmul(field_t *field1, field_t field2);
 void fardiv(field_t *field1, field_t field2);

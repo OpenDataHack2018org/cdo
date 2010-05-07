@@ -119,6 +119,61 @@ void farsum(field_t *field1, field_t field2)
 }
 
 
+/* 
+ * Compute the occurrence of values in field, if they do not equal refval.
+ * This can be used to compute the lengths of multiple periods in a timeseries.
+ * Missing field values are handled like refval, i.e. they stop a running
+ * period. If there is missing data in the occurence field, missing fields
+ * values do not change anything (they do not start a non-period by setting
+ * occurrence to zero).
+ */
+void farsumtr(field_t *occur, field_t field, double refval)
+{
+  static char func[] = "farsumtr";
+  long   i, len;
+  double omissval = occur->missval;
+  double  *oarray = occur->ptr;
+  double fmissval = field.missval;
+  double  *farray = field.ptr;
+
+  len    = gridInqSize(occur->grid);
+  if ( len != gridInqSize(field.grid) )
+    cdoAbort("Fields have different gridsize (%s)", func);
+
+  if ( occur->nmiss > 0 || field.nmiss > 0 )
+    {
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) schedule(static)
+#endif
+      for ( i = 0; i < len; i++ )
+	if ( !DBL_IS_EQUAL(farray[i], fmissval) )
+	  {
+	    if ( !DBL_IS_EQUAL(oarray[i], omissval) )
+	      oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
+	    else
+	      oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : 1.0;
+	  }
+	else
+	{
+	  if ( !DBL_IS_EQUAL(oarray[i], omissval) )
+	    oarray[i] = 0.0;
+	}
+
+      occur->nmiss = 0;
+      for ( i = 0; i < len; i++ )
+	if ( DBL_IS_EQUAL(oarray[i], omissval) ) occur->nmiss++;
+    }
+  else
+    {
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared)
+#endif
+      for ( i = 0; i < len; i++ ) 
+	oarray[i] = (DBL_IS_EQUAL(farray[i], refval)) ? 0.0 : oarray[i] + 1.0;
+    }
+}
+
+
 void farsumq(field_t *field1, field_t field2)
 {
   static char func[] = "farsumq";
