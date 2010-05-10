@@ -140,7 +140,7 @@ void *Consecstat (void *argument)
   int levelID, nlevels; 
   int gridID, gridsize;
   double missval;
-  static double refval = 0.0;
+  double refval = 0.0;
 
   field_t **vars = NULL, **hist = NULL, **periods = NULL;
   field_t field;
