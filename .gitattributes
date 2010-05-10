@@ -275,6 +275,7 @@ src/Complextorect.c -text
 src/Cond.c -text
 src/Cond2.c -text
 src/Condc.c -text
+src/Consecstat.c -text
 src/Copy.c -text
 src/Deltime.c -text
 src/Detrend.c -text
