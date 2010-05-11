@@ -5,6 +5,42 @@
 #include "field.h"
 
 
+
+static void field_init(double *array, int size, int initmode)
+{
+  int i;
+
+  switch ( initmode )
+  {
+    case FIELD_INIT:
+      memset(array, 0, size*sizeof(double));
+      break;
+
+    case FIELD_PINIT_STATIC:
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) schedule(static)
+      for (i = 0; i < size; i++)
+        array[i] = 0.0;
+#else
+      memset(array, 0, size*sizeof(double));
+#endif
+      break;
+
+    case FIELD_PINIT_DYNAMIC:
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) schedule(dynamic)
+      for (i = 0; i < size; i++)
+        array[i] = 0.0;
+#else
+      memset(array, 0, size*sizeof(double));
+#endif
+      break;
+
+    default:
+      ;;
+  }
+}
+
 field_t **field_allocate(int vlistID, int ptype, int init)
 {
   static const char *func = "field_allocate";
@@ -39,14 +75,17 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
 	    {
 	      field[varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].ptr, 0, gridsize*sizeof(double));
+/* 	      if ( init ) memset(field[varID][levelID].ptr, 0, gridsize*sizeof(double));
+ */
+	      if ( init ) field_init(field[varID][levelID].ptr, gridsize, init);
 	    }
 
-	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
-	    {
-	      field[varID][levelID].weight = (double *) malloc(gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].weight, 0, gridsize*sizeof(double));
-	    }    
+/* 	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
+ * 	    {
+ * 	      field[varID][levelID].weight = (double *) malloc(gridsize*sizeof(double));
+ * 	      if ( init ) memset(field[varID][levelID].weight, 0, gridsize*sizeof(double));
+ * 	    }    
+ */
 	}
     }
 
@@ -63,6 +102,12 @@ field_t **field_malloc(int vlistID, int ptype)
 field_t **field_calloc(int vlistID, int ptype)
 {
   return (field_allocate(vlistID, ptype, 1));
+}
+
+
+field_t **field_palloc(int vlistID, int ptype, int itype)
+{
+  return (field_allocate(vlistID, ptype, itype));
 }
 
 
@@ -87,35 +132,4 @@ void field_free(field_t **field, int vlistID)
     }
 
   free(field);
-}
-
-static void field_init(double *array, int size, int initmode)
-{
-  int i;
-
-  switch ( initmode )
-  {
-    case FIELD_INIT:
-      memset(array, 0, size*sizeof(double));
-      break;
-
-    case FIELD_PINIT_STATIC:
-#if defined (_OPENMP)
-#pragma omp parallel for schedule(static) private(i)
-#endif
-      for (i = 0; i < size; i++)
-        array[i] = 0.0;
-      break;
-
-    case FIELD_PINIT_DYNAMIC:
-#if defined (_OPENMP)
-#pragma omp parallel for schedule(dynamic) private(i)
-#endif
-      for (i = 0; i < size; i++)
-        array[i] = 0.0;
-      break;
-
-    default:
-      ;;
-  }
 }

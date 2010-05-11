@@ -65,6 +65,7 @@ field_t;
 
 field_t **field_malloc(int vlistID, int ptype);
 field_t **field_calloc(int vlistID, int ptype);
+field_t **field_palloc(int vlistID, int ptype, int itype);
 void      field_free(field_t **field, int vlistID);
 
 /* field.c */
