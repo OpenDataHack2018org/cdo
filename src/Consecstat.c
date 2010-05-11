@@ -259,7 +259,7 @@ void *Consecstat (void *argument)
       }
     }
   }
-  
+
   field_free(vars, ivlistID);
   field_free(hist, ivlistID);
   if ( operatorID == CONSECTS )
