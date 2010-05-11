@@ -229,9 +229,15 @@ void *Consecstat (void *argument)
             streamDefRecord(ostreamID, varID, levelID);
             streamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
           }
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) schedule(static)
+          for ( i = 0; i < gridInqSize(vars[varID][levelID].grid); i++ )
+            hist[varID][levelID].ptr[i] = vars[varID][levelID].ptr[i];
+#else
           memcpy(hist[varID][levelID].ptr,
                  vars[varID][levelID].ptr,
                  gridInqSize(vars[varID][levelID].grid)*sizeof(double));
+#endif
           break;
         default:
           printf (SWITCHWARN,func);
