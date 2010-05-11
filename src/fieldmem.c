@@ -88,3 +88,34 @@ void field_free(field_t **field, int vlistID)
 
   free(field);
 }
+
+static void field_init(double *array, int size, int initmode)
+{
+  int i;
+
+  switch ( initmode )
+  {
+    case FIELD_INIT:
+      memset(array, 0, size*sizeof(double));
+      break;
+
+    case FIELD_PINIT_STATIC:
+#if defined (_OPENMP)
+#pragma omp parallel for schedule(static) private(i)
+#endif
+      for (i = 0; i < size; i++)
+        array[i] = 0.0;
+      break;
+
+    case FIELD_PINIT_DYNAMIC:
+#if defined (_OPENMP)
+#pragma omp parallel for schedule(dynamic) private(i)
+#endif
+      for (i = 0; i < size; i++)
+        array[i] = 0.0;
+      break;
+
+    default:
+      ;;
+  }
+}

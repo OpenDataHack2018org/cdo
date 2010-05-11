@@ -23,6 +23,10 @@
 #define  FIELD_PTR  2
 #define  FILED_WGT  3
 
+#define  FIELD_NO_INIT       0
+#define  FIELD_INIT          1
+#define  FIELD_PINIT_STATIC  2
+#define  FIELD_PINIT_DYNAMIC 3
 
 #define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
 #define  FSUB(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
