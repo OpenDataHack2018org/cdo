@@ -69,15 +69,15 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Arithlat.$(OBJEXT) Cat.$(OBJEXT) CDItest.$(OBJEXT) \
 	Change.$(OBJEXT) Change_e5slm.$(OBJEXT) Cloudlayer.$(OBJEXT) \
 	Comp.$(OBJEXT) Compc.$(OBJEXT) Cond.$(OBJEXT) Cond2.$(OBJEXT) \
-	Condc.$(OBJEXT) Complextorect.$(OBJEXT) Consecstat.$(OBJEXT) \
-	Copy.$(OBJEXT) Deltime.$(OBJEXT) Detrend.$(OBJEXT) \
-	Diff.$(OBJEXT) Echam5ini.$(OBJEXT) Enlarge.$(OBJEXT) \
-	Enlargegrid.$(OBJEXT) Ensstat.$(OBJEXT) Eofcoeff.$(OBJEXT) \
-	Exprf.$(OBJEXT) Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) \
-	Filter.$(OBJEXT) Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) \
-	Fldstat2.$(OBJEXT) Fourier.$(OBJEXT) Gengrid.$(OBJEXT) \
-	Gradsdes.$(OBJEXT) Gridboxstat.$(OBJEXT) Gridcell.$(OBJEXT) \
-	Harmonic.$(OBJEXT) Histogram.$(OBJEXT) Importamsr.$(OBJEXT) \
+	Condc.$(OBJEXT) Complextorect.$(OBJEXT) Copy.$(OBJEXT) \
+	Deltime.$(OBJEXT) Detrend.$(OBJEXT) Diff.$(OBJEXT) \
+	Echam5ini.$(OBJEXT) Enlarge.$(OBJEXT) Enlargegrid.$(OBJEXT) \
+	Ensstat.$(OBJEXT) Eofcoeff.$(OBJEXT) Exprf.$(OBJEXT) \
+	Filedes.$(OBJEXT) Fillmiss.$(OBJEXT) Filter.$(OBJEXT) \
+	Fldrms.$(OBJEXT) Fldstat.$(OBJEXT) Fldstat2.$(OBJEXT) \
+	Fourier.$(OBJEXT) Gengrid.$(OBJEXT) Gradsdes.$(OBJEXT) \
+	Gridboxstat.$(OBJEXT) Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) \
+	Histogram.$(OBJEXT) Importamsr.$(OBJEXT) \
 	Importbinary.$(OBJEXT) Importcmsaf.$(OBJEXT) \
 	Importobs.$(OBJEXT) Info.$(OBJEXT) Input.$(OBJEXT) \
 	Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) Intlevel.$(OBJEXT) \
@@ -294,7 +294,6 @@ cdo_SOURCES = Arith.c		\
 	      Cond2.c 		\
 	      Condc.c 		\
               Complextorect.c   \
-              Consecstat.c      \
 	      Copy.c		\
               Deltime.c      	\
               Detrend.c		\
@@ -658,7 +657,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cond.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cond2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Condc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Consecstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Copy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Deltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Detrend.Po@am__quote@

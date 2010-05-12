@@ -19,7 +19,6 @@ cdo_SOURCES = Arith.c		\
 	      Cond2.c 		\
 	      Condc.c 		\
               Complextorect.c   \
-              Consecstat.c      \
 	      Copy.c		\
               Deltime.c      	\
               Detrend.c		\
