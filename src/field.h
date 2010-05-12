@@ -23,10 +23,6 @@
 #define  FIELD_PTR  2
 #define  FILED_WGT  3
 
-#define  FIELD_NO_INIT       0
-#define  FIELD_INIT          1
-#define  FIELD_PINIT_STATIC  2
-#define  FIELD_PINIT_DYNAMIC 3
 
 #define  FADD(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)+(y))
 #define  FSUB(x,y)  (DBL_IS_EQUAL((x),missval1) || DBL_IS_EQUAL((y),missval2) ? missval1 : (x)-(y))
@@ -65,7 +61,6 @@ field_t;
 
 field_t **field_malloc(int vlistID, int ptype);
 field_t **field_calloc(int vlistID, int ptype);
-field_t **field_palloc(int vlistID, int ptype, int itype);
 void      field_free(field_t **field, int vlistID);
 
 /* field.c */

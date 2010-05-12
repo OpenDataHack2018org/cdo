@@ -63,7 +63,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     if ( current.nmiss > 0 || history.nmiss > 0 )
     {
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) schedule(static)
+#pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
       {
@@ -87,7 +87,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     else
     {
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) schedule(static)
+#pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
         parray[i] = ( DBL_IS_EQUAL(carray[i], 0.0)  && IS_NOT_EQUAL(harray[i], 0.0) ) ? harray[i] : pmissval;
@@ -98,7 +98,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     if ( current.nmiss > 0 )
     {
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) schedule(static)
+#pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
         if ( !DBL_IS_EQUAL(carray[i], cmissval) )
@@ -113,7 +113,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     else
     {
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) schedule(static)
+#pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
         parray[i] = ( DBL_IS_EQUAL(carray[i], 0.0) ) ? pmissval : carray[i];
@@ -124,7 +124,6 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
   for ( i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(parray[i], pmissval) ) periods->nmiss++;
 }
-
 
 void *Consecstat (void *argument)
 {
@@ -165,13 +164,46 @@ void *Consecstat (void *argument)
 
   field.ptr = (double *) malloc(vlistGridsizeMax(ovlistID)*sizeof(double));
   nvars     = vlistNvars(ivlistID);
-  vars      = field_palloc(ivlistID, FIELD_PTR, FIELD_PINIT_STATIC);
-  hist      = field_palloc(ivlistID, FIELD_PTR, FIELD_PINIT_STATIC);
+  vars      = (field_t **) malloc(nvars*sizeof(field_t *));
+  hist      = (field_t **) malloc(nvars*sizeof(field_t *));
   if ( operatorID == CONSECTS )
-    periods = field_palloc(ivlistID, FIELD_PTR, FIELD_PINIT_STATIC);
+    periods   = (field_t **) malloc(nvars*sizeof(field_t *));
 
   for ( varID = 0; varID < nvars; varID++ )
-    vlistDefVarUnits(ovlistID, varID, "steps");
+  {
+    gridID      = vlistInqVarGrid(ovlistID, varID);
+    gridsize    = gridInqSize(gridID);
+    missval     = vlistInqVarMissval(ovlistID, varID);
+    nlevels     = zaxisInqSize(vlistInqVarZaxis(ovlistID, varID));
+
+    vars[varID] = (field_t *) malloc(nlevels*sizeof(field_t));
+    if ( operatorID == CONSECTS )
+    {
+      periods[varID] = (field_t *) malloc(nlevels*sizeof(field_t));
+      hist[varID]    = (field_t *) malloc(nlevels*sizeof(field_t));
+    }
+
+
+    for ( levelID = 0; levelID < nlevels; levelID++ )
+    {
+      vars[varID][levelID].grid    = gridID;
+      vars[varID][levelID].missval = missval;
+      vars[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+      vars[varID][levelID].nmiss   = 0;
+      if ( operatorID == CONSECTS )
+      {
+        hist[varID][levelID].grid       = gridID;
+        hist[varID][levelID].missval    = missval;
+        hist[varID][levelID].ptr        = (double *) malloc(gridsize*sizeof(double));
+        hist[varID][levelID].nmiss      = 0;
+        periods[varID][levelID].grid    = gridID;
+        periods[varID][levelID].missval = missval;
+        periods[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+        periods[varID][levelID].nmiss   = 0;
+      }
+    }
+    vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
+  }
 
   ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(1));
@@ -209,12 +241,6 @@ void *Consecstat (void *argument)
       streamReadRecord(istreamID, field.ptr, &field.nmiss);
       field.grid    = vlistInqVarGrid(ovlistID, varID);
       field.missval = vlistInqVarMissval(ovlistID, varID);
-/* Localize 4 OpenMP */
-#if defined (_OPENMP)
-#pragma omp parallel for default(shared) schedule(static)
-      for ( i = 0; i < gridInqSize(field.grid); i++ )
-        field.ptr[i] = field.ptr[i];
-#endif
       farsumtr(&vars[varID][levelID], field, refval);
       switch (operatorID)
       {
@@ -265,11 +291,29 @@ void *Consecstat (void *argument)
       }
     }
   }
-
-  field_free(vars, ivlistID);
-  field_free(hist, ivlistID);
-  if ( operatorID == CONSECTS )
-    field_free(periods, ivlistID);
+  
+  for ( varID = 0; varID < nvars; varID++ )
+  {
+    nlevels = zaxisInqSize(vlistInqVarZaxis(ovlistID, varID));
+    for ( levelID = 0; levelID < nlevels; levelID++ )
+    {
+      if ( vars[varID][levelID].ptr ) free(vars[varID][levelID].ptr);
+      if ( operatorID == CONSECTS )
+      {
+        if ( hist[varID][levelID].ptr ) free(hist[varID][levelID].ptr);
+        if ( periods[varID][levelID].ptr ) free(periods[varID][levelID].ptr);
+      }
+    }
+    free(vars[varID]);
+    if ( operatorID == CONSECTS )
+    {
+      free(hist[varID]);
+      free(periods[varID]);
+    }
+  }
+  if ( vars )    free(vars);
+  if ( hist )    free(hist);
+  if ( periods ) free(periods);
 
   streamClose(istreamID);
   streamClose(ostreamID);
