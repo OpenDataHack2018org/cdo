@@ -30,8 +30,8 @@ current file format.
 To calculate principal coefficients of the first 40 EOFs of ifile, 
 and write the to ofile, use:
 @BeginVerbatim
-   cdo eof,40 ifile eof_file evec_file
-   cdo eofcoeff eof_file evec_file obase
+   cdo eof,40 anom_file evec_file eof_file
+   cdo eofcoeff eof_file anom_file obase
 @EndVerbatim
 The principal coefficients of the first EOF will be in the file
 @file{obase\_000000.nc}
@@ -40,7 +40,7 @@ If the dataset @file{ifile} does not containt anomalies, process them first,
 and use:
 @BeginVerbatim
    cdo sub ifile1 -timmean ifile1 anom_file	
-   cdo eof,40 anom_file eof_file evec_file
+   cdo eof,40 anom_file evec_file eof_file
    cdo eofcoeff eof_file anom_file obase 	
 @EndVerbatim
 @EndExample
