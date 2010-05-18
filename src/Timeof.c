@@ -117,32 +117,34 @@ void *Timeof(void * argument)
       weight[i]=1;
 
 
-  /*  eigenvectors */
+  /*  eigenvalues */
   streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+  if ( streamID2 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(1));
   vlistID2    = vlistDuplicate(vlistID1);
   taxisID2    = taxisDuplicate(taxisID1);
-  gridID2     = gridDuplicate(gridID1);
   vlistDefTaxis(vlistID2, taxisID2);
-
-  /*  eigenvalues */
-  streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
-  vlistID3    = vlistDuplicate(vlistID1);
-  taxisID3    = taxisDuplicate(taxisID1);
-  vlistDefTaxis(vlistID3, taxisID3);
-  gridID3     = gridCreate(GRID_LONLAT, 1);
-  gridDefXsize(gridID3, 1);
-  gridDefYsize(gridID3, 1);
+  gridID2     = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID2, 1);
+  gridDefYsize(gridID2, 1);
   xvals       = (double*) malloc(1*sizeof(double));
   yvals       = (double*) malloc(1*sizeof(double));
   xvals[0]    = 0;
   yvals[0]    = 0;
-  gridDefXvals(gridID3, xvals);
-  gridDefYvals(gridID3, yvals);
-  ngrids      = vlistNgrids(vlistID3);
+  gridDefXvals(gridID2, xvals);
+  gridDefYvals(gridID2, yvals);
+  ngrids      = vlistNgrids(vlistID2);
   for ( i = 0; i < ngrids; i++ )
-    vlistChangeGridIndex(vlistID3, i, gridID3);
+    vlistChangeGridIndex(vlistID2, i, gridID2);
+
+  /*  eigenvectors */
+  streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
+  vlistID3    = vlistDuplicate(vlistID1);
+  taxisID3    = taxisDuplicate(taxisID1);
+  gridID3     = gridDuplicate(gridID1);
+  vlistDefTaxis(vlistID3, taxisID3);
+
+  /*  eigenvalues */
 
   reached_eof = 0;
   tsID        = 0;
@@ -501,19 +503,19 @@ void *Timeof(void * argument)
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
   if ( cdoTimer ) timer_start(timer_write);
-  streamDefVlist(streamID3, vlistID3);
   streamDefVlist(streamID2, vlistID2);
+  streamDefVlist(streamID3, vlistID3);
   for ( tsID = 0; tsID < n; tsID++ )
     {
-      taxisDefVdate(taxisID3, 0);
-      taxisDefVtime(taxisID3, 0);
-      streamDefTimestep(streamID3, tsID);
+      taxisDefVdate(taxisID2, 0);
+      taxisDefVtime(taxisID2, 0);
+      streamDefTimestep(streamID2, tsID);
 
       if ( tsID < n_eig )
         {
-          taxisDefVdate(taxisID2, 0);
-          taxisDefVtime(taxisID2, 0);
-          streamDefTimestep(streamID2, tsID);
+          taxisDefVdate(taxisID3, 0);
+          taxisDefVtime(taxisID3, 0);
+          streamDefTimestep(streamID3, tsID);
         }
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -527,14 +529,14 @@ void *Timeof(void * argument)
                   for ( i = 0; i < gridsize; i++ )
                     if ( DBL_IS_EQUAL(eigenvectors[varID][levelID][tsID].ptr[i], missval) ) nmiss++;
 
-                  streamDefRecord(streamID2, varID, levelID);
-                  streamWriteRecord(streamID2, eigenvectors[varID][levelID][tsID].ptr, nmiss);
+                  streamDefRecord(streamID3, varID, levelID);
+                  streamWriteRecord(streamID3, eigenvectors[varID][levelID][tsID].ptr, nmiss);
                 }
 
               if ( DBL_IS_EQUAL(eigenvalues[varID][levelID][tsID].ptr[i], missval) ) nmiss = 1;
               else nmiss = 0;
-              streamDefRecord(streamID3, varID, levelID);
-              streamWriteRecord(streamID3, eigenvalues[varID][levelID][tsID].ptr,nmiss);
+              streamDefRecord(streamID2, varID, levelID);
+              streamWriteRecord(streamID2, eigenvalues[varID][levelID][tsID].ptr,nmiss);
 
             }
         }
