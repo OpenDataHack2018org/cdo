@@ -3,6 +3,7 @@
 	* Added operator eof - Calculate EOFs in spatial or time space
         * Added operator eoftime - Calculate EOFs in time space
         * Added operator eofspatial - Calculate EOFs in spatial space
+	* Added operator eofcoeff - Principal coefficients of EOFs
 
 2010-05-17  Ralf Mueller  <Ralf.Mueller@zmaw.de>
 

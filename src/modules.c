@@ -494,7 +494,7 @@ static modules_t Modules[] =
   { Enlarge,        EnlargeHelp,       EnlargeOperators,       CDI_REAL,  1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       CDI_REAL, -1,  1 },
-  { Eofcoeff,       NULL,              EofcoeffOperators,      CDI_REAL,  2,  1 },
+  { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2,  1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,       CDI_BOTH,  1,  0 },

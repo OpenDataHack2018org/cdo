@@ -7,6 +7,7 @@ Version 1.4.5 ( 2010):
      * eof: Calculate EOFs in spatial or time space
      * eoftime: Calculate EOFs in time space
      * eofspatial: Calculate EOFs in spatial space
+     * eofcoeff: Principal coefficients of EOFs
      * consecsum: Consecutive Sum
      * consects: Consecutive Timesteps
 

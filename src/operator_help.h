@@ -2660,6 +2660,26 @@ static char *EOFsHelp[] = {
     NULL
 };
 
+static char *EofcoeffHelp[] = {
+    "NAME",
+    "    eofcoeff - Principal coefficients of EOFs",
+    "",
+    "SYNOPSIS",
+    "    eofcoeff  ifile1 ifile2 obase",
+    "",
+    "DESCRIPTION",
+    "    This module calculates the time series of the principal coefficients for given EOF",
+    "    (empirical orthogonal functions) and data. Time steps in ifile1 are ",
+    "    assumed to be the EOFs, Time steps in ifile2 are assumed to be the",
+    "    time series. ",
+    "    There will be a separate file containing a time series of principal coefficients",
+    "    with time information from ifile2 for each EOF in ifile1. Files",
+    "    will be numbered as <obase>\\_<neof>.<suffix> where neof is the number of the",
+    "    EOF (time step) in ifile1 and suffix is a file-suffix derived from the ",
+    "    current file format. ",
+    NULL
+};
+
 static char *RemapgridHelp[] = {
     "NAME",
     "    remapbil, remapbic, remapdis, remapnn, remapcon, remapcon2, remaplaf - ",

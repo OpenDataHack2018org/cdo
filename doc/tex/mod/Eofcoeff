@@ -1,0 +1,46 @@
+@BeginModule
+@NewPage
+@Name      = Eofcoeff
+@Title     = Principal coefficients of EOFs
+@Section   = EOFs
+@Class     = EOFs
+@Arguments = ifile1 ifile2 obase
+@Operators = eofcoeff
+
+@BeginDescription
+This module calculates the time series of the principal coefficients for given EOF
+(empirical orthogonal functions) and data. Time steps in @file{ifile1} are 
+assumed to be the EOFs, Time steps in @file{ifile2} are assumed to be the
+time series. 
+There will be a separate file containing a time series of principal coefficients
+with time information from @file{ifile2} for each EOF in @file{ifile1}. Files
+will be numbered as @file{<obase>\_<neof>.<suffix>} where neof is the number of the
+EOF (time step) in @file{ifile1} and suffix is a file-suffix derived from the 
+current file format. 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eofcoeff
+@Title     = Principal coefficients of EOFs
+@EndOperator
+
+
+@BeginExample
+To calculate principal coefficients of the first 40 EOFs of ifile, 
+and write the to ofile, use:
+@BeginVerbatim
+   cdo eof,40 ifile eof_file evec_file
+   cdo eofcoeff eof_file evec_file obase
+@EndVerbatim
+The principal coefficients of the first EOF will be in the file
+@file{obase\_000000.nc}
+
+If the dataset @file{ifile} does not containt anomalies, process them first,
+and use:
+@BeginVerbatim
+   cdo sub ifile1 -timmean ifile1 anom_file	
+   cdo eof,40 anom_file eof_file evec_file
+   cdo eofcoeff eof_file anom_file obase 	
+@EndVerbatim
+@EndExample
