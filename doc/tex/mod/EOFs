@@ -3,12 +3,53 @@
 @Name      = EOFs
 @Title     = Empirical Orthogonal Functions
 @Section   = EOFs
-@Class     = EOFs
+@Class     = EOF calculation
 @Arguments = ifile ofile1 ofile2
 @Operators = eof eoftime eofspatial
 
 @BeginDescription
-This module calculates empirical orthogonal functions of the data in @file{ifile}.
+This module calculates empirical orthogonal functions of the data in @file{ifile}. 
+An introduction to the theory of principal component analysis as applied here can
+be found in: 
+   Rudolph W. Peisendorfer: Principal Component Analysis, Elsevier (1988).
+Details about calculation in the time- and spatial spaces are found in:
+   Hans von Storch, Walter Zwiers: Statistical Analysis in Climate Research, 
+   Cambridge University Press (1999).
+EOFs are defined as the eigen values of the scatter matrix (covariance matrix) of
+the data. 
+@IfDoc
+For the sake of simplicity, samples are regarded as time series of vectors @math{z} (with the spatial
+dimensions reduced to one). Thus, the scatter matrix @math{S} can be written as
+@BeginDisplaymath
+S = \sum_{t=1}^{n} z(t)z^T(t)
+@EndDisplayMath
+This matrix has a set of orthonormal eigenvectors @math{e_j, j=1,\ldots p}, which
+are called {\it empirical orthogonal functions (EOFs) of the sample} @math{z}. Let
+the corresponding eigenvalues be denoted as @math{\lambda_j}.
+The vectors @math{e_j} are spatial patterns which explain a certain amount of variance of the 
+time series @math{z(t)} that is related linearly to @math{\lambda_j}. Thus, the eigenvector with 
+the largest eigenvalue (1st EOF) explains the most variance and so forth.  
+
+Let @math{p} the number of points in a sample @math{z(t_0)}, then the orthogonality of eigen-
+vectors reads as 
+@BeginDisplayMath
+\sum_{x=1}^{p}e_j(x)e_k(x)=\left\{\begin{array}{c}0 \if j\ne k\\ 1 \if j=k\end{array}\right.
+@EndDisplayMath
+
+If all EOFs @math{e_j} with @math{\lambda_j\ne 0} are calculated, the data can be reconstructed
+from
+@BeginDisplayMath
+	z(t,x)=\sum_{j=1}^{p}a_j(t)e_j(x)
+@EndDisplayMath
+where @math{a_j} are called the {\it principal components} or {\it principal coefficients} or 
+{\it EOF coefficients} of @math{z}. These coefficients as readily seen from above 
+are calculated as the projection of an EOF @math{e_j} onto a time step of the data sample 
+@math{z(t_0)} as
+@BeginDisplayMath
+	a_j(t) = \sum_{x=1}^{p}e_j(x)z(t,x) = z^T(T)e_j.
+@EndDisplayMath
+@EndifDoc
+
 If operator @mod{eof} is chosen, the EOFs are computed in either time or spatial
 space, whichever is the fastest. If the user already knows, which computation
 is faster, the module can be forced to perform a computation in time or gridspace

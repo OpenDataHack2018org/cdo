@@ -3,7 +3,7 @@
 @Name      = Eofcoeff
 @Title     = Principal coefficients of EOFs
 @Section   = EOFs
-@Class     = EOFs
+@Class     = Eof coefficients
 @Arguments = ifile1 ifile2 obase
 @Operators = eofcoeff
 
@@ -11,10 +11,20 @@
 This module calculates the time series of the principal coefficients for given EOF
 (empirical orthogonal functions) and data. Time steps in @file{ifile1} are 
 assumed to be the EOFs, Time steps in @file{ifile2} are assumed to be the
-time series. 
+time series. Weights are taken into account, which is why EOF output is \bf{not} weighted. 
+@IfDoc
+Given a set of EOFs @math{e_j} and a time series of data @math{z(t)} 
+with @math{p} entries for each time step from which @math{e_j} have been calculated, this 
+operator calculates the time series of the projections of data onto each EOF
+@BeginDisplayMath
+o_j(t) = \sum_{x=1}^{p} z(t,x)e_j(x)
+@EndDisplayMath
+with a seperate file @math{o_j} for each EOF.
+@EndifDoc
+
 There will be a separate file containing a time series of principal coefficients
 with time information from @file{ifile2} for each EOF in @file{ifile1}. Files
-will be numbered as @file{<obase>\_<neof>.<suffix>} where neof is the number of the
+will be numbered as @file{<obase>_<neof>.<suffix>} where neof is the number of the
 EOF (time step) in @file{ifile1} and suffix is a file-suffix derived from the 
 current file format. 
 @EndDescription
@@ -22,7 +32,7 @@ current file format.
 
 
 @BeginOperator_eofcoeff
-@Title     = Principal coefficients of EOFs
+@Title     = Calculate principal coefficients for all EOFs in @file{ifile1}
 @EndOperator
 
 
@@ -34,7 +44,7 @@ and write the to ofile, use:
    cdo eofcoeff eof_file anom_file obase
 @EndVerbatim
 The principal coefficients of the first EOF will be in the file
-@file{obase\_000000.nc}
+@file{obase_000000.nc}
 
 If the dataset @file{ifile} does not containt anomalies, process them first,
 and use:
