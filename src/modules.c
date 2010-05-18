@@ -53,6 +53,7 @@ void *Cond(void *argument);
 void *Cond2(void *argument);
 void *Condc(void *argument);
 void *Complextorect(void *argument);
+void *Consecstat(void *argument);
 void *Copy(void *argument);
 void *Deltime(void *argument);
 void *Detrend(void *argument);
@@ -250,6 +251,7 @@ void *Wct(void *argument);
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
 #define  ComplextorectOperators {"complextorect"}
+#define  ConsecstatOperators    {"consects", "consecsum"}
 #define  CopyOperators          {"copy", "selall"}
 #define  DeltimeOperators       {"delday", "del29feb"}
 #define  DetrendOperators       {"detrend"}
@@ -483,6 +485,7 @@ static modules_t Modules[] =
   { Cond2,          Cond2Help,         Cond2Operators,         CDI_REAL,  3,  1 },
   { Condc,          CondcHelp,         CondcOperators,         CDI_REAL,  1,  1 },
   { Complextorect,  NULL,              ComplextorectOperators, CDI_COMP,  1,  2 },
+  { Consecstat,     ConsecstatHelp,    ConsecstatOperators,    CDI_REAL,  1,  1 },
   { Copy,           CopyHelp,          CopyOperators,          CDI_REAL, -1,  1 },
   { Deltime,        NULL,              DeltimeOperators,       CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
