@@ -1,3 +1,14 @@
+2010-05-18  Cedrick Ansorge <Cedrick.Ansorge.zmaw.de>
+
+	* Added operator eof - Calculate EOFs in spatial or time space
+        * Added operator eoftime - Calculate EOFs in time space
+        * Added operator eofspatial - Calculate EOFs in spatial space
+
+2010-05-17  Ralf Mueller  <Ralf.Mueller@zmaw.de>
+
+	* Added operator consecsum - Consecutive Sum
+	* Added operator consects - Consecutive Timesteps
+
 2010-04-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.4

@@ -190,6 +190,8 @@ Operator catalog:
 -------------------------------------------------------------
    Statistical values
 -------------------------------------------------------------
+      Consecstat consecsum       Consecutive Sum
+      Consecstat consects        Consecutive Timesteps
       Ensstat    ensmin          Ensemble minimum
       Ensstat    ensmax          Ensemble maximum
       Ensstat    enssum          Ensemble sum
@@ -343,7 +345,7 @@ Operator catalog:
    Correlation
 -------------------------------------------------------------
       Fldcor     fldcor          Correlation in grid space
-      Timcor     timcor          Correlation in time
+      Timcor     timcor          Correlation over time
 -------------------------------------------------------------
    Regression
 -------------------------------------------------------------
@@ -351,6 +353,12 @@ Operator catalog:
       Detrend    detrend         Detrend
       Trend      trend           Trend
       Subtrend   subtrend        Subtract trend
+-------------------------------------------------------------
+   EOFs
+-------------------------------------------------------------
+      EOFs       eof             Calculate EOFs in spatial or time space
+      EOFs       eoftime         Calculate EOFs in time space
+      EOFs       eofspatial      Calculate EOFs in spatial space
 -------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------
@@ -389,8 +397,11 @@ Operator catalog:
       Wind       uv2dv           U and V wind to divergence and vorticity
       Wind       uv2dvl          U and V wind to divergence and vorticity (linear)
 -------------------------------------------------------------
-   Formatted I/O
+   Import/Export
 -------------------------------------------------------------
+      Importbinary import_binary   Import binary data sets
+      Importcmsaf import_cmsaf    Import CM-SAF HDF5 files
+      Importamsr import_amsr     Import AMSR binary files
       Input      input           ASCII input
       Input      inputsrv        SERVICE ASCII input
       Input      inputext        EXTRA ASCII input
@@ -419,9 +430,6 @@ Operator catalog:
       Histogram  histmean        Histogram mean
       Histogram  histfreq        Histogram frequency
       Sethalo    sethalo         Set the left and right bounds of a field
-      Importamsr import_amsr     Import AMSR binary files
-      Importcmsaf import_cmsaf    Import CM-SAF HDF5 files
-      Importbinary import_binary   Import binary data sets
       Wct        wct             Windchill temperature
       Fdns       fdns            Frost days where no snow index per time period
       Strwin     strwin          Strong wind days index per time period

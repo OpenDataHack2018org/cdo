@@ -28,14 +28,14 @@ replace missing values by 0 in @file{ifile}
 
 
 @BeginOperator_eof
-@Title     = Calculate neof EOFs in spatial or time space
+@Title     = Calculate EOFs in spatial or time space
 @Parameter = neof
 @EndOperator
 
 
 @BeginOperator_eoftime
 
-@Title     = Calculate neof EOFs in time space
+@Title     = Calculate EOFs in time space
 @Parameter = neof
 @EndOperator
 

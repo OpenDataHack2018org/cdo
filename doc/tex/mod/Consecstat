@@ -42,6 +42,6 @@ analysis like min, max or mean, everything else is set to misvall.
 @BeginExample
 For a given time series of daily temperatures, the periods of summer days can be calculated with inplace maskting the input field:
 @BeginVerbatim
-   cdo consecsts -gtc,20.0 ifile1 ofile
+   cdo consects -gtc,20.0 ifile1 ofile
 @EndVerbatim
 @EndExample
