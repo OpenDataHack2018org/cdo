@@ -261,7 +261,7 @@ void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
               break;
           if (m == l)
             {
-              printf("found solution after %i Iteration\n", iter++);
+	      // printf("found solution after %i Iteration\n", iter++);
               break;
             }
           iter++;

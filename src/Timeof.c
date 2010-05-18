@@ -352,9 +352,8 @@ void *Timeof(void * argument)
 		    {
 		      if ( missval_warning == 0 )
 			{
-			  cdoWarning("Missing Value Support not Checked for this Operator");
-			  cdoWarning("Does not work with changing locations");
-			  cdoWarning("of missing values in time\n\n");
+			  cdoWarning("Missing Value Support not Checked for this Operator!");
+			  cdoWarning("Does not work with changing locations of missing values in time.");
 			  missval_warning = 1;
 			}
 		      datafields[varID][levelID][tsID].ptr[i] = 0;
@@ -581,5 +580,4 @@ void *Timeof(void * argument)
   cdoFinish();
 
   return (0);
-
 }
