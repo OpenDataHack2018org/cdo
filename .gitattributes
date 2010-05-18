@@ -67,7 +67,7 @@ doc/tex/mod/Daypctl -text
 doc/tex/mod/Daystat -text
 doc/tex/mod/Detrend -text
 doc/tex/mod/Diff -text
-doc/tex/mod/EOF -text
+doc/tex/mod/EOFs -text
 doc/tex/mod/EcaCdd -text
 doc/tex/mod/EcaCfd -text
 doc/tex/mod/EcaCsu -text
@@ -215,7 +215,7 @@ doc/tex/ref_intro_climat.tex -text
 doc/tex/ref_intro_compar.tex -text
 doc/tex/ref_intro_condit.tex -text
 doc/tex/ref_intro_correl.tex -text
-doc/tex/ref_intro_eof.tex -text
+doc/tex/ref_intro_eofs.tex -text
 doc/tex/ref_intro_file_o.tex -text
 doc/tex/ref_intro_import.tex -text
 doc/tex/ref_intro_inform.tex -text
@@ -283,6 +283,7 @@ src/Copy.c -text
 src/Deltime.c -text
 src/Detrend.c -text
 src/Diff.c -text
+src/EOFs.c -text
 src/EcaIndices.c -text
 src/Echam5ini.c -text
 src/Enlarge.c -text
@@ -381,7 +382,6 @@ src/Templates.c -text
 src/Test.c -text
 src/Tests.c -text
 src/Timcount.c -text
-src/Timeof.c -text
 src/Timpctl.c -text
 src/Timselpctl.c -text
 src/Timselstat.c -text

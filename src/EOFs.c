@@ -40,9 +40,9 @@
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
-void *Timeof(void * argument)
+void *EOFs(void * argument)
 {
-  static char func[] = "Timeof";
+  static char func[] = "EOFs";
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
   int operatorID;
   int operfunc;
@@ -119,7 +119,7 @@ void *Timeof(void * argument)
 
   /*  eigenvalues */
   streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(1));
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
   vlistID2    = vlistDuplicate(vlistID1);
   taxisID2    = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);

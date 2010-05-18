@@ -76,7 +76,7 @@ Regres        Regression
 Detrend       Regression
 Trend         Regression
 Subtrend      Regression
-EOF           EOF
+EOFs          EOFs
 Remapgrid     Interpolation
 Genweights    Interpolation
 Remap         Interpolation

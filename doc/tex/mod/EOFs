@@ -1,9 +1,9 @@
 @BeginModule
 @NewPage
-@Name      = EOF
+@Name      = EOFs
 @Title     = Empirical Orthogonal Functions
-@Section   = EOF
-@Class     = EOF
+@Section   = EOFs
+@Class     = EOFs
 @Arguments = ifile ofile1 ofile2
 @Operators = eof eoftime eofspatial
 

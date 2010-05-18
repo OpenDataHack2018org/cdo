@@ -18,6 +18,7 @@ cdo_SOURCES = Arith.c		\
 	      Cond.c 		\
 	      Cond2.c 		\
 	      Condc.c 		\
+	      Consecstat.c      \
               Complextorect.c   \
 	      Copy.c		\
               Deltime.c      	\
@@ -28,6 +29,7 @@ cdo_SOURCES = Arith.c		\
               Enlargegrid.c     \
               Ensstat.c     	\
               Eofcoeff.c     	\
+              EOFs.c     	\
               Exprf.c     	\
               Filedes.c 	\
               Fillmiss.c 	\
@@ -117,7 +119,6 @@ cdo_SOURCES = Arith.c		\
               Test.c    	\
               Tests.c    	\
               Timcount.c 	\
-              Timeof.c 		\
               Timpctl.c 	\
               Timsort.c 	\
               Timselpctl.c 	\
