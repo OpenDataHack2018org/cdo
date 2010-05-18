@@ -1,0 +1,67 @@
+@BeginModule
+@NewPage
+@Name      = EOF
+@Title     = Empirical Orthogonal Functions
+@Section   = EOF
+@Class     = EOF
+@Arguments = ifile ofile1 ofile2
+@Operators = eof eoftime eofspatial
+
+@BeginDescription
+This module calculates empirical orthogonal functions of the data in @file{ifile}.
+If operator @mod{eof} is chosen, the EOFs are computed in either time or spatial
+space, whichever is the fastest. If the user already knows, which computation
+is faster, the module can be forced to perform a computation in time or gridspace
+by using the operators @mod{eoftime} or @mod{eofspatial}, respectively. This can enhance 
+performance, especially for very long time series, where the number of time steps
+is larger than the number of grid-points.
+Data in @file{ifile} are assumed to be anomalies. If they are not, the behavior 
+of this module is @bold{not} well defined. 
+After execution @file{ofile1} will contain the eigen-values and @file{ofile2} the
+eigenvectors.
+Missing value support is not fully supported. It is only checked for non-changing
+masks of missing values in time. Although there still will be results, they are
+not trustworthy, and a warning will occur. In the latter case we suggest to 
+replace missing values by 0 in @file{ifile} 
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eof
+@Title     = Calculate neof EOFs in spatial or time space
+@Parameter = neof
+@EndOperator
+
+
+@BeginOperator_eoftime
+
+@Title     = Calculate neof EOFs in time space
+@Parameter = neof
+@EndOperator
+
+
+@BeginOperator_eofspatial
+@Title     = Calculate EOFs in spatial space
+@Parameter = neof
+@EndOperator
+
+
+@BeginParameter neof
+@Item = neof
+INTEGER  Number of eigen functions
+@EndParameter
+
+
+@BeginExample
+To calculate the first 40 EOFs of a data-set containing anomalies use:
+@BeginVerbatim
+   cdo eof,40 ifile ofile1 ofile2
+@EndVerbatim
+
+If the dataset does not containt anomalies, process them first,
+and use:
+@BeginVerbatim
+   cdo sub ifile1 -timmean ifile1 anom_file	
+   cdo eof,40 anom_file ofile1 ofile2	
+@EndVerbatim
+@EndExample

@@ -67,6 +67,7 @@ doc/tex/mod/Daypctl -text
 doc/tex/mod/Daystat -text
 doc/tex/mod/Detrend -text
 doc/tex/mod/Diff -text
+doc/tex/mod/EOF -text
 doc/tex/mod/EcaCdd -text
 doc/tex/mod/EcaCfd -text
 doc/tex/mod/EcaCsu -text
@@ -214,6 +215,7 @@ doc/tex/ref_intro_climat.tex -text
 doc/tex/ref_intro_compar.tex -text
 doc/tex/ref_intro_condit.tex -text
 doc/tex/ref_intro_correl.tex -text
+doc/tex/ref_intro_eof.tex -text
 doc/tex/ref_intro_file_o.tex -text
 doc/tex/ref_intro_import.tex -text
 doc/tex/ref_intro_inform.tex -text
