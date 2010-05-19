@@ -141,6 +141,7 @@ void *Cloudlayer(void *argument)
   int ngp = 0, ngrids;
   int aclcac_code;
   int aclcacID = -1;
+  int nvars2 = 0;
   int kmin[NVARS], kmax[NVARS];
   char varname[128];
   double sfclevel = 0;
@@ -148,8 +149,21 @@ void *Cloudlayer(void *argument)
   double *aclcac = NULL;
   double *cloud[NVARS];
   double missval;
+  double pmin = 0, pmax = 0;
 
   cdoInitialize(argument);
+
+  if ( operatorArgc() > 0 )
+    {
+      operatorCheckArgc(2);
+      nvars2 = 1;
+      pmin = atof(operatorArgv()[0]);
+      pmax = atof(operatorArgv()[1]);
+    }
+  else
+    {
+      nvars2 = NVARS;
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -215,7 +229,7 @@ void *Cloudlayer(void *argument)
   nhlev  = nlevel+1;
 
   aclcac = (double *) malloc(gridsize*nlevel*sizeof(double));
-  for ( varID = 0; varID < NVARS; ++varID )
+  for ( varID = 0; varID < nvars2; ++varID )
     cloud[varID] = (double *) malloc(gridsize*sizeof(double));
 
   if ( zaxisInqType(zaxisID) == ZAXIS_PRESSURE )
@@ -239,9 +253,16 @@ void *Cloudlayer(void *argument)
 	  printf("level %d %g\n", levelID, plevs[levelID]);
 	}
       */
-      pl_index(&kmax[2], &kmin[2],  5000., 44000., nlevel, plevs);
-      pl_index(&kmax[1], &kmin[1], 46000., 73000., nlevel, plevs);
-      pl_index(&kmax[0], &kmin[0], 75000.,101300., nlevel, plevs);
+      if ( nvars2 == 1 )
+	{
+	  pl_index(&kmax[0], &kmin[0], pmin, pmax, nlevel, plevs);
+	}
+      else
+	{
+	  pl_index(&kmax[2], &kmin[2],  5000., 44000., nlevel, plevs);
+	  pl_index(&kmax[1], &kmin[1], 46000., 73000., nlevel, plevs);
+	  pl_index(&kmax[0], &kmin[0], 75000.,101300., nlevel, plevs);
+	}
 
       free(plevs);
     }
@@ -262,9 +283,16 @@ void *Cloudlayer(void *argument)
 	  vct2plev(vct, plevs, nlevs);
 	  free(vct);
 
-	  hl_index(&kmax[2], &kmin[2],  5000., 44000., nhlev, plevs);
-	  hl_index(&kmax[1], &kmin[1], 46000., 73000., nhlev, plevs);
-	  hl_index(&kmax[0], &kmin[0], 75000.,101300., nhlev, plevs);
+	  if ( nvars2 == 1 )
+	    {
+	      hl_index(&kmax[0], &kmin[0], pmin, pmax, nhlev, plevs);
+	    }
+	  else
+	    {
+	      hl_index(&kmax[2], &kmin[2],  5000., 44000., nhlev, plevs);
+	      hl_index(&kmax[1], &kmin[1], 46000., 73000., nhlev, plevs);
+	      hl_index(&kmax[0], &kmin[0], 75000.,101300., nhlev, plevs);
+	    }
 
 	  free(plevs);
  	}
@@ -280,23 +308,34 @@ void *Cloudlayer(void *argument)
 
   vlistID2 = vlistCreate();
 
-  varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
-  vlistDefVarCode(vlistID2, varID, 34);
-  vlistDefVarName(vlistID2, varID, "low_cld");
-  vlistDefVarLongname(vlistID2, varID, "low cloud");
-  vlistDefVarMissval(vlistID2, varID, missval);
+  if ( nvars2 == 1 )
+    {
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
+      vlistDefVarCode(vlistID2, varID, 33);
+      vlistDefVarName(vlistID2, varID, "cld_lay");
+      vlistDefVarLongname(vlistID2, varID, "cloud layer");
+      vlistDefVarMissval(vlistID2, varID, missval);
+    }
+  else
+    {
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
+      vlistDefVarCode(vlistID2, varID, 34);
+      vlistDefVarName(vlistID2, varID, "low_cld");
+      vlistDefVarLongname(vlistID2, varID, "low cloud");
+      vlistDefVarMissval(vlistID2, varID, missval);
 
-  varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
-  vlistDefVarCode(vlistID2, varID, 35);
-  vlistDefVarName(vlistID2, varID, "mid_cld");
-  vlistDefVarLongname(vlistID2, varID, "mid cloud");
-  vlistDefVarMissval(vlistID2, varID, missval);
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
+      vlistDefVarCode(vlistID2, varID, 35);
+      vlistDefVarName(vlistID2, varID, "mid_cld");
+      vlistDefVarLongname(vlistID2, varID, "mid cloud");
+      vlistDefVarMissval(vlistID2, varID, missval);
 
-  varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
-  vlistDefVarCode(vlistID2, varID, 36);
-  vlistDefVarName(vlistID2, varID, "hih_cld");
-  vlistDefVarLongname(vlistID2, varID, "high cloud");
-  vlistDefVarMissval(vlistID2, varID, missval);
+      varID = vlistDefVar(vlistID2, gridID, surfaceID, TIME_VARIABLE);
+      vlistDefVarCode(vlistID2, varID, 36);
+      vlistDefVarName(vlistID2, varID, "hih_cld");
+      vlistDefVarLongname(vlistID2, varID, "high cloud");
+      vlistDefVarMissval(vlistID2, varID, missval);
+    }
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
@@ -330,18 +369,18 @@ void *Cloudlayer(void *argument)
 	    }
 	}
 
-      for ( varID = 0; varID < NVARS; ++varID )
+      for ( varID = 0; varID < nvars2; ++varID )
 	{
 	  for ( i = 0; i < gridsize; i++ ) cloud[varID][i] = missval;
 	}
 
-      for ( varID = 0; varID < NVARS; ++varID )
+      for ( varID = 0; varID < nvars2; ++varID )
 	{
 	  if ( kmax[varID] != -1 && kmin[varID] != -1 )
 	    layer_cloud(aclcac, cloud[varID], kmax[varID], kmin[varID], gridsize);
 	}
 
-      for ( varID = 0; varID < NVARS; ++varID )
+      for ( varID = 0; varID < nvars2; ++varID )
 	{
 	  nmiss = 0;
 	  for ( i = 0; i < gridsize; i++ )
@@ -360,7 +399,7 @@ void *Cloudlayer(void *argument)
   vlistDestroy(vlistID2);
 
   free(aclcac);
-  for ( varID = 0; varID < NVARS; ++varID )
+  for ( varID = 0; varID < nvars2; ++varID )
     free(cloud[varID]);
 
   cdoFinish();
