@@ -94,7 +94,7 @@ case "${HOSTNAME}" in
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-                    LIBS=-ljpeg \
+                    LIBS="-ljpeg"\
 	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
         else
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \

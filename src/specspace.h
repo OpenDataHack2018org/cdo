@@ -23,7 +23,7 @@ typedef struct {
 }
 DVTRANS;
 
-void dv2ps(double *div, double *pot, int nlev, int ntr);
+void dv2ps(const double * restrict div, double * restrict pot, long nlev, long ntr);
 
 SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag);
 void sptrans_delete(SPTRANS *sptrans);
