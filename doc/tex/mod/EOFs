@@ -15,55 +15,67 @@ be found in:
 Details about calculation in the time- and spatial spaces are found in:
    Hans von Storch, Walter Zwiers: Statistical Analysis in Climate Research, 
    Cambridge University Press (1999).
+
+
 EOFs are defined as the eigen values of the scatter matrix (covariance matrix) of
 the data. 
 @IfDoc
-For the sake of simplicity, samples are regarded as time series of vectors @math{z} (with the spatial
-dimensions reduced to one). Thus, the scatter matrix @math{S} can be written as
-@BeginDisplaymath
-S = \sum_{t=1}^{n} z(t)z^T(t)
+For the sake of simplicity, samples are regarded as time series 
+@BeginDisplayMath
+\left(z(t)\right), t\in\{1,\ldots,n\}
 @EndDisplayMath
-This matrix has a set of orthonormal eigenvectors @math{e_j, j=1,\ldots p}, which
+of (column-) vectors @math{z(t)} with @math{p} entries (where @math{p} is the gridsize). 
+Thus, assuming~@math{\langle z_j(t)\rangle=0~\forall~1\le j\le p}, the scatter 
+matrix @math{S} can be written as
+@BeginDisplaymath
+S = \sum_{t=1}^{n} \left[\sqrt{W}z(t)\right]\left[\sqrt{W}z(t)\right]^T
+@EndDisplayMath
+where @math{W} is the diagonal matrix containing the area weight of cell @math{x} in @math{z} at @math{W(x,x)}.
+
+
+The matrix @math{S} has a set of orthonormal eigenvectors @math{e_j, j=1,\ldots p}, which
 are called {\it empirical orthogonal functions (EOFs) of the sample} @math{z}. Let
 the corresponding eigenvalues be denoted as @math{\lambda_j}.
 The vectors @math{e_j} are spatial patterns which explain a certain amount of variance of the 
-time series @math{z(t)} that is related linearly to @math{\lambda_j}. Thus, the eigenvector with 
-the largest eigenvalue (1st EOF) explains the most variance and so forth.  
-
-Let @math{p} the number of points in a sample @math{z(t_0)}, then the orthogonality of eigen-
-vectors reads as 
+time series @math{z(t)} that is related linearly to @math{\lambda_j}. Thus, the spatial pattern
+defined by the first eigenvector ( the one with the (largest) eigenvalue ) is the pattern which
+explains a maximum possible amount of variance of the sample @math{z(t)} Let @math{p} the number of points in a sample @math{z(t_0)}, then the orthonormality of 
+eigenvectors reads as 
 @BeginDisplayMath
-\sum_{x=1}^{p}e_j(x)e_k(x)=\left\{\begin{array}{c}0 \if j\ne k\\ 1 \if j=k\end{array}\right.
+\sum_{x=1}^{p}\left[\sqrt{W(x,x)}e_j(x)\right]\left[\sqrt{W(x,x)}e_k(x)\right]=
+\sum_{x=1}^{p}W(x,x)e_j(x)e_k(x)=
+\left\{\begin{array}{c}0~if~j\ne k\\ 1~if~j=k\end{array}\right.
 @EndDisplayMath
-
 If all EOFs @math{e_j} with @math{\lambda_j\ne 0} are calculated, the data can be reconstructed
 from
 @BeginDisplayMath
-	z(t,x)=\sum_{j=1}^{p}a_j(t)e_j(x)
+	z(t,x)=\sum_{j=1}^{p}W(x,x)a_j(t)e_j(x)
 @EndDisplayMath
 where @math{a_j} are called the {\it principal components} or {\it principal coefficients} or 
-{\it EOF coefficients} of @math{z}. These coefficients as readily seen from above 
+{\it EOF coefficients} of @math{z}. These coefficients - as readily seen from above - 
 are calculated as the projection of an EOF @math{e_j} onto a time step of the data sample 
 @math{z(t_0)} as
 @BeginDisplayMath
-	a_j(t) = \sum_{x=1}^{p}e_j(x)z(t,x) = z^T(T)e_j.
+	a_j(t_0) = \sum_{x=1}^{p}\left[\sqrt{W(x,x)} e_j(x)\right]\left[\sqrt{W(x,x)}z(t_0,x)\right] =
+	 \left[\sqrt{W} z(t_0)\right]^T\left[\sqrt{W}e_j\right].
 @EndDisplayMath
 @EndifDoc
-
 If operator @mod{eof} is chosen, the EOFs are computed in either time or spatial
 space, whichever is the fastest. If the user already knows, which computation
 is faster, the module can be forced to perform a computation in time or gridspace
 by using the operators @mod{eoftime} or @mod{eofspatial}, respectively. This can enhance 
 performance, especially for very long time series, where the number of time steps
-is larger than the number of grid-points.
-Data in @file{ifile} are assumed to be anomalies. If they are not, the behavior 
-of this module is @bold{not} well defined. 
-After execution @file{ofile1} will contain the eigen-values and @file{ofile2} the
-eigenvectors.
-Missing value support is not fully supported. It is only checked for non-changing
+is larger than the number of grid-points. Data in @file{ifile} are assumed to be anomalies. If they are not, the behavior 
+of this module is @bold{not} well defined. After execution @file{ofile1} will contain the eigen-values and @file{ofile2} the
+eigenvectors @math{e_j}. Note, thate the resulting EOF in @file{ifile2} is 
+@math{e_j} and thus @bold{not weighted} for consistency.
+
+Missing values are not fully supported. Support is only checked for non-changing
 masks of missing values in time. Although there still will be results, they are
 not trustworthy, and a warning will occur. In the latter case we suggest to 
-replace missing values by 0 in @file{ifile} 
+replace missing values by 0 in @file{ifile}. 
+
+
 @EndDescription
 @EndModule
 
