@@ -1,0 +1,144 @@
+
+
+\newpage
+\subsection{EOFS - Empirical Orthogonal Functions}
+\index{eof}
+\index{eoftime}
+\index{eofspatial}
+\label{EOFS}
+\label{eof}
+\label{eoftime}
+\label{eofspatial}
+
+\subsection*{Synopsis}
+
+\hspace*{8mm}{$<\!operator\!>$}{\sl ,neof} \ {\tt ifile ofile1 ofile2}
+
+
+\subsection*{Description}
+
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+This module calculates empirical orthogonal functions of the data in {\tt ifile}.
+If operator {\htmlref{eof}{eof}} is chosen, the EOFs are computed in either time or spatial
+space, whichever is the fastest. If the user already knows, which computation
+is faster, the module can be forced to perform a computation in time or gridspace
+by using the operators {\htmlref{eoftime}{eoftime}} or {\htmlref{eofspatial}{eofspatial}}, respectively. This can enhance 
+performance, especially for very long time series, where the number of time steps
+is larger than the number of grid-points.
+Data in {\tt ifile} are assumed to be anomalies. If they are not, the behavior 
+of this module is {\bf not} well defined. 
+After execution {\tt ofile1} will contain the eigen-values and {\tt ofile2} the
+eigenvectors.
+Missing value support is not fully supported. It is only checked for non-changing
+masks of missing values in time. Although there still will be results, they are
+not trustworthy, and a warning will occur. In the latter case we suggest to 
+replace missing values by 0 in {\tt ifile} 
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+
+\subsection*{Operators}
+
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+\begin{defalist}{\bf eofspatial \ }
+\item[{\bf eof}\ \ \hfill]
+Calculate EOFs in spatial or time space \\
+\item[{\bf eoftime}\ \ \hfill]
+Calculate EOFs in time space \\
+\item[{\bf eofspatial}\ \ \hfill]
+Calculate EOFs in spatial space \\
+\end{defalist}
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+
+\subsection*{Parameter}
+
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+\begin{defalist}{\sl neof \ }
+\item[{\sl neof}\ \ \hfill]
+\makebox[20mm][l]{\sf \small INTEGER}  Number of eigen functions
+\end{defalist}
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+
+\subsection*{Example}
+
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+To calculate the first 40 EOFs of a data-set containing anomalies use:
+\begin{lstlisting}[backgroundcolor=\color{zebg}, basicstyle=\small]
+   cdo eof,40 ifile ofile1 ofile2
+\end{lstlisting}
+
+If the dataset does not containt anomalies, process them first,
+and use:
+\begin{lstlisting}[backgroundcolor=\color{zebg}, basicstyle=\small]
+   cdo sub ifile1 -timmean ifile1 anom_file	
+   cdo eof,40 anom_file ofile1 ofile2	
+\end{lstlisting}
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+
+
+\newpage
+\subsection{EOFCOEFF - Principal coefficients of EOFs}
+\index{eofcoeff}
+\label{EOFCOEFF}
+\label{eofcoeff}
+
+\subsection*{Synopsis}
+
+\hspace*{8mm}{\bf eofcoeff}{\sl } \ {\tt ifile1 ifile2 obase}
+
+
+\subsection*{Description}
+
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+This module calculates the time series of the principal coefficients for given EOF
+(empirical orthogonal functions) and data. Time steps in {\tt ifile1} are 
+assumed to be the EOFs, Time steps in {\tt ifile2} are assumed to be the
+time series. 
+There will be a separate file containing a time series of principal coefficients
+with time information from {\tt ifile2} for each EOF in {\tt ifile1}. Files
+will be numbered as {\tt $<$obase$>$\_$<$neof$>$.$<$suffix$>$} where neof is the number of the
+EOF (time step) in {\tt ifile1} and suffix is a file-suffix derived from the 
+current file format. 
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+\end{minipage}
+\addtolength{\miniwidth}{8mm}
+
+\subsection*{Example}
+
+\setlength{\miniwidth}{\textwidth}
+\addtolength{\miniwidth}{-8mm}
+\hspace*{8mm}\begin{minipage}{\miniwidth}
+To calculate principal coefficients of the first 40 EOFs of ifile, 
+and write the to ofile, use:
+\begin{lstlisting}[backgroundcolor=\color{zebg}, basicstyle=\small]
+   cdo eof,40 anom_file evec_file eof_file
+   cdo eofcoeff eof_file anom_file obase
+\end{lstlisting}
+The principal coefficients of the first EOF will be in the file
+{\tt obase\_000000.nc}
+
+If the dataset {\tt ifile} does not containt anomalies, process them first,
+and use:
+\begin{lstlisting}[backgroundcolor=\color{zebg}, basicstyle=\small]
+   cdo sub ifile1 -timmean ifile1 anom_file	
+   cdo eof,40 anom_file evec_file eof_file
+   cdo eofcoeff eof_file anom_file obase 	
+\end{lstlisting}
+\end{minipage}
+\addtolength{\miniwidth}{8mm}

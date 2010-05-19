@@ -227,6 +227,7 @@ doc/tex/ref_intro_regres.tex -text
 doc/tex/ref_intro_select.tex -text
 doc/tex/ref_intro_statis.tex -text
 doc/tex/ref_intro_transf.tex -text
+doc/tex/ref_man_eofs.tex -text
 doc/tex/time.tex -text
 doc/tex/usage.tex -text
 doc/tex/zaxis.tex -text
