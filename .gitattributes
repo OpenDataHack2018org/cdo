@@ -466,6 +466,7 @@ src/griddes.h -text
 src/griddes_h5.c -text
 src/griddes_nc.c -text
 src/hetaeta.c -text
+src/hetaeta.h -text
 src/history.c -text
 src/institution.c -text
 src/interpol.c -text

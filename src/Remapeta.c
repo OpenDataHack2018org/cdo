@@ -33,22 +33,7 @@
 #include "functs.h"
 #include "vinterp.h"
 #include "list.h"
-
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-
-void hetaeta(int ltq, int ngp, const int *imiss,
-	     int nlev1, const double * restrict ah1, const double * restrict bh1,
-             const double * restrict fis1, const double * restrict ps1, 
-             const double * restrict t1, const double * restrict q1,
-             int nlev2, const double * restrict ah2, const double * restrict bh2, 
-             const double * restrict fis2, double * restrict ps2, 
-             double * restrict t2, double * restrict q2,
-	     int nvars, double ** restrict vars1, double ** restrict vars2,
-	     double * restrict tscor, double * restrict pscor,
-	     double * restrict secor);
+#include "hetaeta.h"
 
 
 static 
@@ -266,6 +251,7 @@ void *Remapeta(void *argument)
   int lfis2 = FALSE;
   int varids[MAX_VARS3D];
   int *imiss = NULL;
+  int timer_hetaeta = 0;
   long nctop;
   double *array = NULL;
   double *deltap1 = NULL, *deltap2 = NULL;
@@ -280,6 +266,8 @@ void *Remapeta(void *argument)
   double q_min = 0, q_max = 0.1;
   double cconst = 1.E-6;
   const char *fname;
+
+  if ( cdoTimer ) timer_hetaeta = timer_new("Remapeta_hetaeta");
 
   cdoInitialize(argument);
 
@@ -694,15 +682,19 @@ void *Remapeta(void *argument)
 	}
 
       if ( nvars3D || ltq )
-	hetaeta(ltq, ngp, imiss,
-		nlevh1, a1, b1,
-		fis1, ps1,
-		t1, q1,
-		nlevh2, a2, b2,
-		fis2, ps2,
-		t2, q2,
-		nvars3D, vars1, vars2,
-		tscor, pscor, secor);
+	{
+	  if ( cdoTimer ) timer_start(timer_hetaeta);
+	  hetaeta(ltq, ngp, imiss,
+		  nlevh1, a1, b1,
+		  fis1, ps1,
+		  t1, q1,
+		  nlevh2, a2, b2,
+		  fis2, ps2,
+		  t2, q2,
+		  nvars3D, vars1, vars2,
+		  tscor, pscor, secor);
+	  if ( cdoTimer ) timer_stop(timer_hetaeta);
+	}
 
       nctop = ncctop((long) nlevh2, (long) nlevh2+1, a2, b2);
 

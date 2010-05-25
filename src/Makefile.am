@@ -181,6 +181,7 @@ cdo_SOURCES = Arith.c		\
               griddes_nc.c	\
               griddes_h5.c	\
               hetaeta.c		\
+              hetaeta.h   	\
               history.c		\
               institution.c 	\
               interpol.c 	\

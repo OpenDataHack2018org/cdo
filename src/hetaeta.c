@@ -12,6 +12,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "hetaeta.h"
+
 const double ap0  = 100000.0;
 const double apr  = 101325.0;   /* reference pressure */
 const double aipr = 1.0/101325.0;
@@ -163,7 +165,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   pf2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
   rh2_2    = (double **) malloc(ompNumThreads*sizeof(double *));
   wgt_2    = (double **) malloc(ompNumThreads*sizeof(double *));
-  idx_2    = (long **)    malloc(ompNumThreads*sizeof(long *));
+  idx_2    = (long **)   malloc(ompNumThreads*sizeof(long *));
 
   if ( ltq )
     {
@@ -196,7 +198,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
       pf2_2[i]    = (double *) malloc(nlev2*sizeof(double));
       rh2_2[i]    = (double *) malloc(nlev2*sizeof(double));
       wgt_2[i]    = (double *) malloc(nlev2*sizeof(double));
-      idx_2[i]    = (long *)    malloc(nlev2*sizeof(long));
+      idx_2[i]    = (long *)   malloc(nlev2*sizeof(long));
 
       if ( ltq )
 	{
