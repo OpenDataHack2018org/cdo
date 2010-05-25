@@ -209,12 +209,11 @@ case "${HOSTNAME}" in
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix6.0.0.0
-    hpc*)
+    c1a*)
 	${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/usr/local/lib/netcdf/3.6.2/LP64_underscore \
-                    --with-hdf5=/usr/local/lib/hdf5/1.8.1/LP64_underscore \
-                    --with-szlib=$HOME/local \
-                    --with-proj=$HOME/local \
+                    --with-netcdf=/usr/local/apps/netcdf/3.6.3/LP64 \
+                    --with-hdf5=/usr/local/apps/hdf5/1.8.1/LP64 \
+                    --with-szlib=/usr/local/apps/szip/2.1/LP64 \
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
 	;;
 # powerpc-ibm-aix6.0.0.0

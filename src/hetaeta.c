@@ -101,6 +101,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   long jblt, jjblt;
   long k, iv, ij, ijk, ijk1, ijk2;
   long jlev = 0, jlevr, jnop;
+  double *zt2 = NULL, *zq2 = NULL;
   double /* *etah1,*/ *ph1, *lnph1, *fi1;
   double *af1, *bf1, *etaf1, *pf1, *lnpf1;
   double *tv1, *theta1, *rh1;
@@ -121,6 +122,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
   double zq1, zt1;
   double rair_d_cpair;
 #if defined (_OPENMP)
+  double **zt2_2, **zq2_2;
   double **ph1_2, **lnph1_2, **fi1_2, **pf1_2, **lnpf1_2, **tv1_2, **theta1_2, **rh1_2, **zvar_2;
   double **ph2_2, **lnph2_2, **fi2_2, **pf2_2;
   double **rh_pbl_2, **theta_pbl_2, **rh2_2;
@@ -169,6 +171,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
   if ( ltq )
     {
+      zt2_2       = (double **) malloc(ompNumThreads*sizeof(double *));
+      zq2_2       = (double **) malloc(ompNumThreads*sizeof(double *));
       rh_pbl_2    = (double **) malloc(ompNumThreads*sizeof(double *));
       theta_pbl_2 = (double **) malloc(ompNumThreads*sizeof(double *));
     }
@@ -202,6 +206,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
       if ( ltq )
 	{
+	  zt2_2[i]       = (double *) malloc(nlev2*sizeof(double));
+	  zq2_2[i]       = (double *) malloc(nlev2*sizeof(double));
 	  rh_pbl_2[i]    = (double *) malloc(nlev2*sizeof(double));
 	  theta_pbl_2[i] = (double *) malloc(nlev2*sizeof(double));
 	}
@@ -243,6 +249,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
   if ( ltq )
     {
+      zt2       = (double *) malloc(nlev2*sizeof(double));
+      zq2       = (double *) malloc(nlev2*sizeof(double));
       rh_pbl    = (double *) malloc(nlev2*sizeof(double));
       theta_pbl = (double *) malloc(nlev2*sizeof(double));
     }
@@ -346,11 +354,13 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ngp, ph1_2, lnph1_2, fi1_2, pf1_2, lnpf1_2, tv1_2, theta1_2, rh1_2, zvar_2, ph2_2, lnph2_2, fi2_2, pf2_2, rh_pbl_2, \
+         zt2_2, zq2_2, \
 	 theta_pbl_2, rh2_2, wgt_2, vars_pbl_2, idx_2, af1, bf1, etaf1, etah2, af2, bf2, etaf2, w1, w2, jl1, jl2, \
 	 ltq, nvars, imiss, nlev1p1, ah1, bh1, ps1, nlev1, epsm1i, q1, t1, fis1, fis2, ps2, nlev2p1, ah2, bh2, \
 	 nlev2, vars1, vars2, t2, q2, tscor, pscor, secor, jblt, rair_d_cpair) \
   firstprivate(lpsmod) \
   private(ij, iv, ph1, lnph1, fi1, pf1, lnpf1, tv1, theta1, rh1, zvar, ph2, lnph2, fi2, pf2, rh_pbl, theta_pbl, rh2, wgt, vars_pbl, \
+          zt2, zq2, \
 	  k, ijk, jlev, idx, ompthID, zdff, jlevr, zdffl, jnop, zsumt, zsump, zsumpp, zsumtp, zb, zc, zps, zbb, \
 	  fiadj, pbl_lim, jjblt, pbl_lim_need, ijk1, ijk2, klo, dteta, dfi, ztv, zq1, zt1) \
   schedule(dynamic,1)
@@ -382,6 +392,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
       if ( ltq )
 	{
+	  zt2       = zt2_2[ompthID];
+	  zq2       = zq2_2[ompthID];
 	  rh_pbl    = rh_pbl_2[ompthID];
 	  theta_pbl = theta_pbl_2[ompthID];
 	}
@@ -566,6 +578,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
       /******* PBL profile interpolation */
       /* tension spline interpolation with full eta levels */
+
       if ( ltq )
 	for ( k = jjblt; k < nlev2; ++k )
 	  {
@@ -601,12 +614,12 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	      ijk = k*ngp+ij;
 	      zvar[k] = t1[ijk];
 	    }
+
 	  for ( k = 0; k <= jjblt; ++k )
 	    {
-	      ijk = k*ngp+ij;
 	      klo = idx[k];
-	      t2[ijk] = wgt[k]*zvar[klo] + (1-wgt[k])*zvar[klo+1];
-	      rh2[k]  = wgt[k]*rh1[klo]  + (1-wgt[k])*rh1[klo+1];
+	      zt2[k] = wgt[k]*zvar[klo] + (1-wgt[k])*zvar[klo+1];
+	      rh2[k] = wgt[k]*rh1[klo]  + (1-wgt[k])*rh1[klo+1];
 	    }
 	}
 
@@ -630,7 +643,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
       if ( ltq )
 	{
 	  /* correction of potential temperature at top of PBL */
-	  dteta = t2[jjblt*ngp+ij]*pow(apr/pf2[jjblt], rair_d_cpair)-theta_pbl[jjblt];
+	  dteta = zt2[jjblt]*pow(apr/pf2[jjblt], rair_d_cpair)-theta_pbl[jjblt];
 	  
 	  /* merge top layer values */
 	  rh2[jjblt] = 0.5*(rh2[jjblt]+rh_pbl[jjblt]);
@@ -646,8 +659,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
       if ( ltq )
 	for ( k = jjblt+1; k < nlev2; ++k ) 
 	  {
-	    ijk = k*ngp+ij;
-	    t2[ijk]  = (theta_pbl[k]+dteta)*pow(pf2[k]/apr, rair_d_cpair);
+	    zt2[k] = (theta_pbl[k]+dteta)*pow(pf2[k]/apr, rair_d_cpair);
 	    rh2[k] = rh_pbl[k];
 	  }
 
@@ -661,8 +673,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
       if ( ltq )
 	for ( k = 0; k < nlev2; ++k )
 	  {
-	    ijk = k*ngp+ij;
-	    q2[ijk] = rh2[k]*epsilon*esat(t2[ijk])/pf2[k];
+	    zq2[k] = rh2[k]*epsilon*esat(zt2[k])/pf2[k];
 	  }
 
       /******* reference level correction */
@@ -675,8 +686,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	  /* problem at top level, top pressure is zero per definition */
 	  for ( k = nlev2-1; k > 0; --k )
 	    {
-	      ijk = k*ngp+ij;
-	      fi2[k] = fi2[k+1]+rair*t2[ijk]*(lnph2[k+1]-lnph2[k])*(1.0+epsm1i*q2[ijk]);
+	      fi2[k] = fi2[k+1]+rair*zt2[k]*(lnph2[k+1]-lnph2[k])*(1.0+epsm1i*zq2[k]);
 	    }
 
 	  /* search next level above reference level in new system */
@@ -689,7 +699,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	  /* correct surface pressure */
 	  dfi = fiadj-(fi2[jlev+1]+(fi2[jlev]-fi2[jlev+1])* 
 		       log(ph2[jlev+1]/p_firef)/log(ph2[jlev+1]/ph2[jlev]));
-	  ztv     = (1.0+epsm1i*q2[(nlev2-1)*ngp+ij])*t2[(nlev2-1)*ngp+ij];
+	  ztv     = (1.0+epsm1i*zq2[nlev2-1])*zt2[nlev2-1];
 	  ps2[ij] = ps2[ij] *exp(dfi/(rair*ztv));
 	}
 
@@ -703,8 +713,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
 	  for ( k = 0; k < nlev2; ++k )
 	    {
-	      ijk = k*ngp+ij;
-	      q2[ijk] = rh2[k]*epsilon*esat(t2[ijk])/pf2[k];
+	      zq2[k] = rh2[k]*epsilon*esat(zt2[k])/pf2[k];
 	    }
 	}
 
@@ -713,7 +722,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	for ( k = nlev2-1; k >= 0; --k )
 	  { 
 	    ijk = k*ngp+ij;
-	    if ( ltq ) { t = t2[ijk]; q = q2[ijk]; fi = fi2[k]; }
+	    if ( ltq ) { t = t2[k]; q = zq2[k]; fi = fi2[k]; }
 	    else       { t = 0; q = 0; fi = 0; }
 	    fprintf(new, "%3d %18.10f %18.10f %18.10f %18.10f", k, fi/g, pf2[k], t, q);
 	    for ( iv = 0; iv < nvars; ++iv ) fprintf(new, " %18.10f", vars2[iv][ijk]);
@@ -731,6 +740,14 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	  secor[ij] = tv1[nlev1-1]*(cpair+rair*(1.0-ph1[nlev1-1]
 		     /(ps1[ij]-ph1[nlev1-1])*log(ps1[ij]/ph1[nlev1-1])));
 	}
+
+      if ( ltq )
+	for ( k = 0; k < nlev2; ++k ) 
+	  {
+	    ijk = k*ngp+ij;
+	    t2[ijk] = zt2[k];
+	    q2[ijk] = zq2[k];
+	  }
 
     } /* end for ij */
 
@@ -766,6 +783,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
       if ( ltq )
 	{
+	  free(zt2_2[i]); 
+	  free(zq2_2[i]); 
 	  free(rh_pbl_2[i]); 
 	  free(theta_pbl_2[i]); 
 	}   
@@ -801,6 +820,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
   if ( ltq )
     {
+      free(zt2_2);
+      free(zq2_2);
       free(rh_pbl_2);
       free(theta_pbl_2);
     }
@@ -834,6 +855,8 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 
   if ( ltq )
     {
+      free(zt2); 
+      free(zq2); 
       free(rh_pbl); 
       free(theta_pbl); 
     }   
