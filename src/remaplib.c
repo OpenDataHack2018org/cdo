@@ -5114,6 +5114,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (SX)
 #pragma vdir nodep
 #endif
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
+  private(n, grid1_add, grid2_add, weights, norm_factor)
+#endif
       for ( n = 0; n < rv->num_links; n++ )
 	{
 	  grid1_add = rv->grid1_add[n]; grid2_add = rv->grid2_add[n];
@@ -5134,6 +5139,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (SX)
 #pragma vdir nodep
 #endif
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
+  private(n, grid1_add, grid2_add, weights, norm_factor)
+#endif
       for ( n = 0; n < rv->num_links; n++ )
 	{
 	  grid1_add = rv->grid1_add[n]; grid2_add = rv->grid2_add[n];
@@ -5153,6 +5163,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
     {
 #if defined (SX)
 #pragma vdir nodep
+#endif
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
+  private(n, grid1_add, grid2_add, weights, norm_factor)
 #endif
       for ( n = 0; n < rv->num_links; n++ )
 	{
