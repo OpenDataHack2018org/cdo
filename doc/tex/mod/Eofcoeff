@@ -53,7 +53,8 @@ and write them to files beginning with obase, use:
    cdo eofcoeff eof_file anom_file obase
 @EndVerbatim
 The principal coefficients of the first EOF will be in the file
-@file{obase\_000000.nc} (and so forth for higher EOFs).
+@file{obase\_000000.nc} (and so forth for higher EOFs, 
+@math{n}th EOF will be in @file{obase\_<n-1>}).
 
 If the dataset @file{ifile} does not containt anomalies, process them first,
 and use:

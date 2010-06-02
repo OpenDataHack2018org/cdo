@@ -1,1 +1,51 @@
-This section contains modules to compute Empirical Orthogonal Functions.
+This section contains modules to compute Empirical Orthogonal Functions and 
+- once they are computed - their principal coefficients. An introduction to the theory 
+of principal component analysis as applied here can be found in:\\ 
+~~Rudolph W. Peisendorfer: Principal Component Analysis, Elsevier (1988).\\
+Details about calculation in the time- and spatial spaces are found in:\\
+~~Hans von Storch, Walter Zwiers: Statistical Analysis in Climate Research, 
+   Cambridge University Press (1999).
+
+EOFs are defined as the eigen values of the scatter matrix (covariance matrix) of
+the data. For the sake of simplicity, samples are regarded as {\bf time series of anomalies}
+\begin{equation}
+\left(z(t)\right), t\in\{1,\ldots,n\}
+\end{equation}
+of (column-) vectors \(z(t)\) with \(p\) entries (where \(p\) is the gridsize). 
+Thus, using the fact, that \(z_j(t)\) are anomalies, i.e.
+\begin{equation}
+\langle z_j\rangle=n^{-1}\sum_{i=1}^{n}z_j(i)=0~\forall~1\le j \le p
+\end{equation} the scatter matrix \(\mathbf{S}\) can be written as
+\begin{equation}
+\mathbf{S} = \sum_{t=1}^{n} \left[\sqrt{\mathbf{W}}z(t)\right]\left[\sqrt{\mathbf{W}}z(t)\right]^T
+\end{equation}
+where \(\mathbf{W}\) is the diagonal matrix containing the area weight of cell \(p_0\) 
+in \(z\) at \(\mathbf{W}(x,x)\).
+
+The matrix \(\mathbf{S}\) has a set of orthonormal eigenvectors \(e_j, j=1,\ldots p\), which
+are called {\it empirical orthogonal functions (EOFs) of the sample \(z\)}. (Please note, that \(e_j\) 
+is the eigenvector of \(\mathbf{S}\) and not the weighted eigen-vector which would be 
+\(\mathbf{W}e_j\).) Let the corresponding eigenvalues be denoted \(\lambda_j\).
+The vectors \(e_j\) are spatial patterns which explain a certain amount of variance of the 
+time series \(z(t)\) that is related linearly to \(\lambda_j\). Thus, the spatial pattern
+defined by the first eigenvector (the one with the largest eigenvalue ) is the pattern which
+explains a maximum possible amount of variance of the sample \(z(t)\). The orthonormality of 
+eigenvectors reads as 
+\begin{equation}
+\sum_{x=1}^{p}\left[\sqrt{\mathbf{W}(x,x)}e_j(x)\right]\left[\sqrt{\mathbf{W}(x,x)}e_k(x)\right]=
+\sum_{x=1}^{p}\mathbf{W}(x,x)e_j(x)e_k(x)=
+\left\{\begin{array}{c}0~if~j\ne k\\ 1~if~j=k\end{array}\right.
+\end{equation}
+If all EOFs \(e_j\) with \(\lambda_j\ne 0\) are calculated, the data can be reconstructed
+from
+\begin{equation}
+	z(t,x)=\sum_{j=1}^{p}\mathbf{W}(x,x)a_j(t)e_j(x)
+\end{equation}
+where \(a_j\) are called the {\it principal components} or {\it principal coefficients} or 
+{\it EOF coefficients} of \(z\). These coefficients - as readily seen from above - 
+are calculated as the projection of an EOF \(e_j\) onto a time step of the data sample 
+\(z(t_0)\) as
+\begin{equation}
+	a_j(t_0) = \sum_{x=1}^{p}\left[\sqrt{\mathbf{W}(x,x)} e_j(x)\right]\left[\sqrt{\mathbf{W}(x,x)}z(t_0,x)\right] =
+	 \left[\sqrt{\mathbf{W}} z(t_0)\right]^T\left[\sqrt{\mathbf{W}}e_j\right].
+\end{equation}
