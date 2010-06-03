@@ -19,8 +19,9 @@ space, whichever is the fastest. If the user already knows, which computation
 is faster, the module can be forced to perform a computation in time or gridspace
 by using the operators @mod{eoftime} or @mod{eofspatial}, respectively. This can enhance 
 performance, especially for very long time series, where the number of time steps
-is larger than the number of grid-points. Data in @file{ifile} are assumed to be anomalies. If they are not, the behavior 
-of this module is @bold{not} well defined. After execution @file{ofile1} will contain the eigen-values and @file{ofile2} the
+is larger than the number of grid-points. Data in @file{ifile} are assumed to be anomalies.
+If they are not, the behavior of this module is @bold{not} well defined. 
+After execution @file{ofile1} will contain the eigen-values and @file{ofile2} the
 eigenvectors @math{e_j}. Note, thate the resulting EOF in @file{ifile2} is 
 @math{e_j} and thus @bold{not weighted} for consistency.
 

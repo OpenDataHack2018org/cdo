@@ -8,17 +8,17 @@ Details about calculation in the time- and spatial spaces are found in:\\
 
 EOFs are defined as the eigen values of the scatter matrix (covariance matrix) of
 the data. For the sake of simplicity, samples are regarded as {\bf time series of anomalies}
-\begin{equation}
+\begin{displaymath}
 \left(z(t)\right), t\in\{1,\ldots,n\}
-\end{equation}
+\end{displaymath}
 of (column-) vectors \(z(t)\) with \(p\) entries (where \(p\) is the gridsize). 
 Thus, using the fact, that \(z_j(t)\) are anomalies, i.e.
-\begin{equation}
+\begin{displaymath}
 \langle z_j\rangle=n^{-1}\sum_{i=1}^{n}z_j(i)=0~\forall~1\le j \le p
-\end{equation} the scatter matrix \(\mathbf{S}\) can be written as
-\begin{equation}
+\end{displaymath} the scatter matrix \(\mathbf{S}\) can be written as
+\begin{displaymath}
 \mathbf{S} = \sum_{t=1}^{n} \left[\sqrt{\mathbf{W}}z(t)\right]\left[\sqrt{\mathbf{W}}z(t)\right]^T
-\end{equation}
+\end{displaymath}
 where \(\mathbf{W}\) is the diagonal matrix containing the area weight of cell \(p_0\) 
 in \(z\) at \(\mathbf{W}(x,x)\).
 
@@ -31,21 +31,21 @@ time series \(z(t)\) that is related linearly to \(\lambda_j\). Thus, the spatia
 defined by the first eigenvector (the one with the largest eigenvalue ) is the pattern which
 explains a maximum possible amount of variance of the sample \(z(t)\). The orthonormality of 
 eigenvectors reads as 
-\begin{equation}
+\begin{displaymath}
 \sum_{x=1}^{p}\left[\sqrt{\mathbf{W}(x,x)}e_j(x)\right]\left[\sqrt{\mathbf{W}(x,x)}e_k(x)\right]=
 \sum_{x=1}^{p}\mathbf{W}(x,x)e_j(x)e_k(x)=
 \left\{\begin{array}{c}0~if~j\ne k\\ 1~if~j=k\end{array}\right.
-\end{equation}
+\end{displaymath}
 If all EOFs \(e_j\) with \(\lambda_j\ne 0\) are calculated, the data can be reconstructed
 from
-\begin{equation}
+\begin{displaymath}
 	z(t,x)=\sum_{j=1}^{p}\mathbf{W}(x,x)a_j(t)e_j(x)
-\end{equation}
+\end{displaymath}
 where \(a_j\) are called the {\it principal components} or {\it principal coefficients} or 
 {\it EOF coefficients} of \(z\). These coefficients - as readily seen from above - 
 are calculated as the projection of an EOF \(e_j\) onto a time step of the data sample 
 \(z(t_0)\) as
-\begin{equation}
+\begin{displaymath}
 	a_j(t_0) = \sum_{x=1}^{p}\left[\sqrt{\mathbf{W}(x,x)} e_j(x)\right]\left[\sqrt{\mathbf{W}(x,x)}z(t_0,x)\right] =
 	 \left[\sqrt{\mathbf{W}} z(t_0)\right]^T\left[\sqrt{\mathbf{W}}e_j\right].
-\end{equation}
+\end{displaymath}

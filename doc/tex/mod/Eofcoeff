@@ -41,7 +41,7 @@ current file format.
 
 
 @BeginOperator_eofcoeff
-@Title     = Calculate principal coefficients for all EOFs in @file{ifile1}
+@Title     = Calculate principal coefficients of EOFs
 @EndOperator
 
 

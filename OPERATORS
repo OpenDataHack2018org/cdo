@@ -359,7 +359,7 @@ Operator catalog:
       EOFs       eof             Calculate EOFs in spatial or time space
       EOFs       eoftime         Calculate EOFs in time space
       EOFs       eofspatial      Calculate EOFs in spatial space
-      Eofcoeff   eofcoeff        Principal coefficients of EOFs
+      Eofcoeff   eofcoeff        Calculate principal coefficients of EOFs
 -------------------------------------------------------------
    Interpolation
 -------------------------------------------------------------
