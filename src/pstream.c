@@ -1312,6 +1312,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 	}
 
       if ( cdoTimer ) timer_start(timer_write);
+      if ( tsID > 0 ) streamSync(pstreamptr->fileID);
       streamDefTimestep(pstreamptr->fileID, tsID);
       if ( cdoTimer ) timer_stop(timer_write);
     }
