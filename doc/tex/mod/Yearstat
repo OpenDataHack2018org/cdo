@@ -162,6 +162,6 @@ To compute the yearly mean of a time series use:
 @EndVerbatim
 To compute the yearly mean from the correct weighted monthly mean use:
 @BeginVerbatim
-   cdo mulc,12 -divdpy -yearmean -muldpm ifile ofile
+   cdo divdpy -yearsum -muldpm ifile ofile
 @EndVerbatim
 @EndExample

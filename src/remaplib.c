@@ -5885,7 +5885,7 @@ void reorder_links(remapvars_t *rv)
   if ( num_blks )
     {
       rv->links.max_links = max_links;
-      rv->links.num_blks = num_blks;
+      rv->links.num_blks  = num_blks;
 
       printf("num_links %ld  max_links %ld  num_blks %ld\n", rv->num_links, max_links, num_blks);
 

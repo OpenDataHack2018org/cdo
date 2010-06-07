@@ -64,11 +64,11 @@ Assume an input dataset is a monthly mean time series.
 To compute the yearly mean from the correct weighted monthly mean use:
 @BeginVerbatim
    cdo muldpm ifile tmpfile1
-   cdo yearavg tmpfile1 tmpfile2
-   cdo mulc,12 -divdpy tmpfile2 ofile
+   cdo yearsum tmpfile1 tmpfile2
+   cdo divdpy tmpfile2 ofile
 @EndVerbatim
 Or all in one command line:
 @BeginVerbatim
-   cdo mulc,12 -divdpy -yearavg -muldpm ifile ofile
+   cdo divdpy -yearsum -muldpm ifile ofile
 @EndVerbatim
 @EndExample

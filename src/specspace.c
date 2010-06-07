@@ -532,7 +532,7 @@ void dv2ps(const double * restrict div, double * restrict pot, long nlev, long n
 	    *pot++ = *div++ * fact;
 	    *pot++ = *div++ * fact;
 	  }
-      }
+    }
 }
 
 
