@@ -289,7 +289,7 @@ void *Remapeta(void *argument)
 
       if ( cdoVerbose )
 	for ( i = 0; i < nlevh2+1; ++i )
-	  fprintf(stdout, "vct2: %5d %25.17f %25.17f\n", i, vct2[i], vct2[nvct2/2+i]);
+	  cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
 
       if ( operatorArgc() == 2 )
 	{
@@ -387,6 +387,10 @@ void *Remapeta(void *argument)
 
   nzaxis  = vlistNzaxis(vlistID1);
   lhavevct = FALSE;
+
+  if ( cdoVerbose )
+    cdoPrint("nzaxis: %d", nzaxis);
+
   for ( i = 0; i < nzaxis; i++ )
     {
       zaxisID = vlistZaxis(vlistID1, i);
@@ -396,6 +400,10 @@ void *Remapeta(void *argument)
 	  if ( nlevel > 1 )
 	    {
 	      nvct1 = zaxisInqVctSize(zaxisID);
+
+              if ( cdoVerbose )
+                cdoPrint("i: %d, vct1 size of zaxisID %d = %d", i, zaxisID, nvct1);
+
 	      if ( nlevel == (nvct1/2 - 1) )
 		{
 		  if ( lhavevct == FALSE )
@@ -404,6 +412,9 @@ void *Remapeta(void *argument)
 		      zaxisIDh = zaxisID;
 		      nlevh1   = nlevel;
 	      
+                      if ( cdoVerbose )
+                        cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nlevh1   = %d", zaxisIDh, nlevel);
+ 
 		      vct1 = (double *) malloc(nvct1*sizeof(double));
 		      memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
 		      
@@ -413,7 +424,7 @@ void *Remapeta(void *argument)
 		      b1 = vct1 + nvct1/2;
 		      if ( cdoVerbose )
 			for ( i = 0; i < nvct1/2; ++i )
-			  fprintf(stdout, "vct1: %5d %25.17f %25.17f\n", i, vct1[i], vct1[nvct1/2+i]);
+			  cdoPrint("vct1: %5d %25.17f %25.17f", i, vct1[i], vct1[nvct1/2+i]);
 		    }
 		  else
 		    {
@@ -421,12 +432,22 @@ void *Remapeta(void *argument)
 			vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 		    }
 		}
+              else 
+                {
+		  if ( cdoVerbose )
+		    cdoPrint("nlevel /= (nvct1/2 - 1): nlevel = %d", nlevel);
+                }
 	    }
 	  else
 	    {
 	      vlistChangeZaxisIndex(vlistID2, i, surfaceID);
 	    }
 	}
+      else
+        {
+	  if ( cdoVerbose )
+	    cdoPrint("i: %d, type of zaxisID %d not ZAXIS_HYBRID", i, zaxisID);
+        }
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

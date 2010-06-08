@@ -60,8 +60,22 @@ STRING  File name with the orography (surf. geopotential) of the target dataset 
 
 @BeginNote
 The code numbers or the variable names of the required parameter have to
-follow the \cite{ECHAM} convention. The netCDF CF convention
-for vertical hybrid coordinates is not supported, yet!
+follow the \cite{ECHAM} convention.
+@C The netCDF CF convention for vertical hybrid coordinates is not supported, yet!
+Presently, the vertical coordinate definition of a netCDF file has also to follow the 
+ECHAM convention. This means:
+@BeginItemize
+@Item = the dimension of the full level coordinate and the corresponding variable is called mlev,
+@Item = the dimension of the half level coordinate and the corresponding variable is called ilev (ilev must have one element more than mlev)
+@Item = the hybrid vertical coefficient a is given in units of Pa and called hyai (hyam for level midpoints)
+@Item = the hybrid vertical coefficient b is given in units of 1 and called hybi (hybm for level midpoints)
+@Item = the mlev variable has a borders attribute containing the character string 'ilev'
+@EndItemize
+Use the @mod{sinfo} command to test if your vertical coordinate system is recognized as hybrid system.
+
+In case @mod{remapeta} complains about not finding any data on hybrid model levels you may wish
+to use the @mod{setzaxis} command to generate a zaxis description which conforms to the ECHAM convention.
+See section "1.4 Z-axis description" for an example how to define a hybrid Z-axis.
 @EndNote
 
 
@@ -70,18 +84,18 @@ To remap between different hybrid model level data use:
 @BeginVerbatim
    cdo remapeta,vct ifile ofile
 @EndVerbatim
-@C Here is an example of the vct file with 19 hybrid model level:
-@C @BeginVerbatim
-@C     0       0.00000000000000000       0.00000000000000000
-@C     1    2000.00000000000000000       0.00000000000000000
-@C     2    4000.00000000000000000       0.00000000000000000
-@C     3    6046.10937500000000000       0.00033899326808751
-@C     4    8267.92968750000000000       0.00335718691349030
-@C   ...
-@C    15    2549.96899414062500000       0.85643762350082397
-@C    16     783.19506835937500000       0.92874687910079956
-@C    17       0.00000000000000000       0.97298520803451538
-@C    18       0.00000000000000000       0.99228149652481079
-@C    19       0.00000000000000000       1.00000000000000000
-@C @EndVerbatim
+Here is an example vct file with 19 hybrid model level:
+@BeginVerbatim
+    0       0.00000000000000000       0.00000000000000000
+    1    2000.00000000000000000       0.00000000000000000
+    2    4000.00000000000000000       0.00000000000000000
+    3    6046.10937500000000000       0.00033899326808751
+    4    8267.92968750000000000       0.00335718691349030
+  ...
+   15    2549.96899414062500000       0.85643762350082397
+   16     783.19506835937500000       0.92874687910079956
+   17       0.00000000000000000       0.97298520803451538
+   18       0.00000000000000000       0.99228149652481079
+   19       0.00000000000000000       1.00000000000000000
+@EndVerbatim
 @EndExample
