@@ -4,7 +4,6 @@
 
   Copyright (C) 2007-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
-
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; version 2 of the License.
@@ -575,7 +574,9 @@ void *Remapeta(void *argument)
 
   if ( zaxisIDh != -1 && geopID == -1 )
     {
-      cdoWarning("Orography (geosp) not found - using zero orography!");
+      if ( ltq )
+	cdoWarning("Orography (geosp) not found - using zero orography!");
+
       memset(fis1, 0, ngp*sizeof(double));
     }
 
