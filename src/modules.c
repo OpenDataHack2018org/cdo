@@ -47,12 +47,13 @@ void *CDItest(void *argument);
 void *Change(void *argument);
 void *Change_e5slm(void *argument);
 void *Cloudlayer(void *argument);
+void *Command(void *argument);
 void *Comp(void *argument);
 void *Compc(void *argument);
+void *Complextorect(void *argument);
 void *Cond(void *argument);
 void *Cond2(void *argument);
 void *Condc(void *argument);
-void *Complextorect(void *argument);
 void *Consecstat(void *argument);
 void *Copy(void *argument);
 void *Deltime(void *argument);
@@ -245,12 +246,13 @@ void *Wct(void *argument);
 #define  ChangeOperators        {"chcode", "chtabnum", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
+#define  CommandOperators       {"command", "com", "cmd"}
 #define  CompOperators          {"eq",  "ne",  "le",  "lt",  "ge",  "gt"}
 #define  CompcOperators         {"eqc", "nec", "lec", "ltc", "gec", "gtc"}
+#define  ComplextorectOperators {"complextorect"}
 #define  CondOperators          {"ifthen",  "ifnotthen"}
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
-#define  ComplextorectOperators {"complextorect"}
 #define  ConsecstatOperators    {"consects", "consecsum"}
 #define  CopyOperators          {"copy", "selall"}
 #define  DeltimeOperators       {"delday", "del29feb"}
@@ -479,12 +481,13 @@ static modules_t Modules[] =
   { Change,         ChangeHelp,        ChangeOperators,        CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    CDI_REAL,  1,  1 },
+  { Command,        NULL,              CommandOperators,       CDI_REAL,  1,  0 },
   { Comp,           CompHelp,          CompOperators,          CDI_REAL,  2,  1 },
   { Compc,          CompcHelp,         CompcOperators,         CDI_REAL,  1,  1 },
+  { Complextorect,  NULL,              ComplextorectOperators, CDI_COMP,  1,  2 },
   { Cond,           CondHelp,          CondOperators,          CDI_REAL,  2,  1 },
   { Cond2,          Cond2Help,         Cond2Operators,         CDI_REAL,  3,  1 },
   { Condc,          CondcHelp,         CondcOperators,         CDI_REAL,  1,  1 },
-  { Complextorect,  NULL,              ComplextorectOperators, CDI_COMP,  1,  2 },
   { Consecstat,     ConsecstatHelp,    ConsecstatOperators,    CDI_REAL,  1,  1 },
   { Copy,           CopyHelp,          CopyOperators,          CDI_REAL, -1,  1 },
   { Deltime,        NULL,              DeltimeOperators,       CDI_REAL,  1,  1 },

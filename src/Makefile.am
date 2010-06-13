@@ -13,13 +13,14 @@ cdo_SOURCES = Arith.c		\
 	      Change.c		\
 	      Change_e5slm.c	\
 	      Cloudlayer.c 	\
+	      Command.c 	\
 	      Comp.c 		\
 	      Compc.c 		\
+              Complextorect.c   \
 	      Cond.c 		\
 	      Cond2.c 		\
 	      Condc.c 		\
 	      Consecstat.c      \
-              Complextorect.c   \
 	      Copy.c		\
               Deltime.c      	\
               Detrend.c		\
