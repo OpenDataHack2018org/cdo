@@ -164,6 +164,7 @@ cdo_SOURCES = Arith.c		\
               cdo.c		\
               cdo_pthread.c 	\
               cdo_vlist.c 	\
+              counter.h 	\
               field.c 		\
               fieldc.c 		\
               field2.c		\

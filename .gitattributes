@@ -430,6 +430,7 @@ src/color.c -text
 src/color.h -text
 src/commandline.c -text
 src/config.h.in -text
+src/counter.h -text
 src/dmemory.h -text
 src/dtypes.h -text
 src/ecacore.c -text

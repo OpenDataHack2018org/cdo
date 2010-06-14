@@ -24,12 +24,14 @@
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
+#include "counter.h"
 
 int streamID = 0;
 int vlistID = 0;
 int varID = 0;
 int levelID = 0;
-int tsID = 0;
+int tsID1 = 0;
+int tsID2 = 59;
 double *array = NULL;
 
 #define MAX_LINE 256
@@ -133,31 +135,41 @@ int com_quit(char *arg)
 int com_stat(char *arg)
 {
   int nrecs;
+  int tsID;
 
-  nrecs = streamInqTimestep(streamID, tsID);
-  if ( nrecs == 0 )
+  for ( tsID = tsID1; tsID <= tsID2; ++tsID )
     {
-      fprintf(stderr, "Timestep %d out of range!\n", tsID);
-    }
-  else
-    {
-      int i;
-      int nmiss;
-      int gridsize;
-      double fmin = 1.e50 , fmax = -1.e50, fmean = 0;
-      streamReadVarSlice(streamID, varID, levelID, array, &nmiss);
-      gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      for ( i = 0; i < gridsize; ++i )
+      nrecs = streamInqTimestep(streamID, tsID);
+      if ( nrecs == 0 )
 	{
-	  if ( array[i] < fmin ) fmin = array[i];
-	  if ( array[i] > fmax ) fmax = array[i];
-	  fmean += array[i];
+	  fprintf(stderr, "Timestep %d out of range!\n", tsID+1);
+	  break;
 	}
-      fmean /= gridsize;
-
-      fprintf(stdout, "%g %g %g\n", fmin, fmean, fmax);
+      else
+	{
+	  int i;
+	  int nmiss;
+	  int gridsize;
+	  double fmin = 1.e50 , fmax = -1.e50, fmean = 0;
+	  counter_t counter;
+	  
+	  counter_start(&counter);
+	  streamReadVarSlice(streamID, varID, levelID, array, &nmiss);
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
+	  for ( i = 0; i < gridsize; ++i )
+	    {
+	      if ( array[i] < fmin ) fmin = array[i];
+	      if ( array[i] > fmax ) fmax = array[i];
+	      fmean += array[i];
+	    }
+	  fmean /= gridsize;
+	  counter_stop(&counter);
+	  
+	  fprintf(stdout, "%d %d %d %g %g %g (%gs)\n",
+		  tsID+1, varID+1, levelID+1, fmin, fmean, fmax,
+		  counter_cputime(counter));
+	}
     }
-
   return (0);
 }
 
@@ -258,7 +270,7 @@ void *Command(void *argument)
 {
   static char func[] = "Command";
   int nrecs;
-  int tsID, recID, varID, levelID;
+  int recID, varID, levelID;
   int gridsize;
   int nmiss;
   int taxisID;
@@ -311,19 +323,6 @@ void *Command(void *argument)
 	}
     }
 */
-  /*
-  tsID = 0;
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-    {
-      for ( recID = 0; recID < nrecs; recID++ )
-	{
-	  streamInqRecord(streamID, &varID, &levelID);
-	  
-	  streamReadRecord(streamID, array, &nmiss);
-	}
-      tsID++;
-    }
-  */
   
   streamClose(streamID);
 
