@@ -1,7 +1,7 @@
 /*
   This is a C library of the Fortran SCRIP version 1.4
 
-  ===>>> Please send bug reports to Uwe.Schulzweida@zmaw.de <<<===
+  ===>>> Please send bug reports to1 Uwe.Schulzweida@zmaw.de <<<===
 
   Spherical Coordinate Remapping and Interpolation Package (SCRIP)
   ================================================================
@@ -116,7 +116,7 @@ static double south_thresh =-2.00;  /* threshold for coord transf. */
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
+extern int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
 
 void remapGridFree(remapgrid_t *rg)
@@ -5637,6 +5637,228 @@ void remap_gradients(remapgrid_t rg, const double * restrict array, double * res
 
 /*****************************************************************************/
 
+void sort_add_test(long num_links, long num_wts, int * restrict add1, int * restrict add2, double ** restrict weights)
+{
+  static char *func = "sort_add_test";
+  /*
+    This routine sorts address and weight arrays based on the
+    destination address with the source address as a secondary
+    sorting criterion. The method is a standard heap sort.
+  */
+  /*
+    Input and Output arrays:
+    
+       long num_links; ! num of links for this mapping
+       long num_wts;   ! num of weights for this mapping
+       add1,           ! destination address array [num_links]
+       add2            ! source      address array
+       weights         ! remapping weights [num_links][num_wts]
+  */
+
+  /* Local variables */
+
+  int add1_tmp, add2_tmp;  /* temp for addresses during swap     */
+  int idx_tmp, *idx;
+  long lvl, final_lvl;     /* level indexes for heap sort levels */
+  long chk_lvl1, chk_lvl2, max_lvl;
+  long i, n;
+  double wgttmp[4];        /* temp for holding wts during swap   */
+
+  if ( cdoTimer ) timer_start(timer_remap_sort);
+
+  if ( num_links <= 1 ) return;
+
+  /*
+  for ( n = 0; n < num_links; n++ )
+    printf("in: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
+  */
+
+  idx = (int *) malloc(num_links*sizeof(int));
+  for ( i = 0; i < num_links; ++i ) idx[i] = i;
+  /*
+    start at the lowest level (N/2) of the tree and shift lower 
+    values to the bottom of the tree, promoting the larger numbers
+  */
+  for ( lvl = num_links/2-1; lvl >= 0; lvl-- )
+    {
+      final_lvl = lvl;
+      add1_tmp = add1[lvl];
+      add2_tmp = add2[lvl];
+      idx_tmp  = idx[lvl];
+
+      /* Loop until proper level is found for this link, or reach bottom */
+
+      for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
+	{
+	  /* Find the largest of the two daughters */
+
+          chk_lvl1 = 2*final_lvl+1;
+          chk_lvl2 = 2*final_lvl+2;
+          if ( chk_lvl1 == num_links-1 ) chk_lvl2 = chk_lvl1;
+
+          if ((add1[chk_lvl1] >  add1[chk_lvl2]) ||
+	     ((add1[chk_lvl1] == add1[chk_lvl2]) &&
+              (add2[chk_lvl1] >  add2[chk_lvl2])))
+            max_lvl = chk_lvl1;
+          else 
+            max_lvl = chk_lvl2;
+
+          /*
+	    If the parent is greater than both daughters,
+	    the correct level has been found
+	  */
+          if ((add1_tmp >  add1[max_lvl]) ||
+             ((add1_tmp == add1[max_lvl]) &&
+              (add2_tmp >  add2[max_lvl])))
+	    {
+	      add1[final_lvl] = add1_tmp;
+	      add2[final_lvl] = add2_tmp;
+	      idx[final_lvl]  = idx_tmp;
+
+	      break;
+	    }
+	  else
+	    {
+	      /*
+		Otherwise, promote the largest daughter and push
+		down one level in the tree.  If haven"t reached
+		the end of the tree, repeat the process.  Otherwise
+		store last values and exit the loop
+	      */
+	      add1[final_lvl] = add1[max_lvl];
+	      add2[final_lvl] = add2[max_lvl];
+	      idx[final_lvl]  = idx[max_lvl];
+
+	      final_lvl = max_lvl;
+	      if ( 2*final_lvl+1 >= num_links )
+		{
+		  add1[final_lvl] = add1_tmp;
+		  add2[final_lvl] = add2_tmp;
+		  idx[final_lvl]  = idx_tmp;
+
+		  break;
+		}
+	    }
+	}
+
+      if ( i == num_links )
+	cdoAbort("Internal problem; link 1 not found!");
+    }
+
+  /*
+    Now that the heap has been sorted, strip off the top (largest)
+    value and promote the values below
+  */
+
+  for ( lvl = num_links-1; lvl >= 2; lvl-- )
+    {
+      /* Move the top value and insert it into the correct place */
+
+      add1_tmp  = add1[lvl];
+      add1[lvl] = add1[0];
+
+      add2_tmp  = add2[lvl];
+      add2[lvl] = add2[0];
+
+      idx_tmp  = idx[lvl];
+      idx[lvl] = idx[0];
+
+      /* As above this loop sifts the tmp values down until proper level is reached */
+
+      final_lvl = 0;
+
+      for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
+	{
+	  /* Find the largest of the two daughters */
+
+          chk_lvl1 = 2*final_lvl+1;
+          chk_lvl2 = 2*final_lvl+2;
+          if ( chk_lvl2 >= lvl ) chk_lvl2 = chk_lvl1;
+
+          if ((add1[chk_lvl1] >  add1[chk_lvl2]) ||
+             ((add1[chk_lvl1] == add1[chk_lvl2]) &&
+              (add2[chk_lvl1] >  add2[chk_lvl2])))
+            max_lvl = chk_lvl1;
+          else 
+            max_lvl = chk_lvl2;
+
+          /*
+	    If the parent is greater than both daughters,
+	    the correct level has been found
+	  */
+          if ((add1_tmp >  add1[max_lvl]) ||
+             ((add1_tmp == add1[max_lvl]) &&
+              (add2_tmp >  add2[max_lvl])))
+	    {
+	      add1[final_lvl] = add1_tmp;
+	      add2[final_lvl] = add2_tmp;
+	      idx[final_lvl]  = idx_tmp;
+
+	      break;
+	    }
+	  else
+	    {
+	      /*
+		Otherwise, promote the largest daughter and push
+		down one level in the tree.  If haven't reached
+		the end of the tree, repeat the process.  Otherwise
+		store last values and exit the loop
+	      */
+	      add1[final_lvl] = add1[max_lvl];
+	      add2[final_lvl] = add2[max_lvl];
+	      idx[final_lvl]  = idx[max_lvl];
+
+	      final_lvl = max_lvl;
+	      if ( 2*final_lvl+1 >= lvl )
+		{
+		  add1[final_lvl] = add1_tmp;
+		  add2[final_lvl] = add2_tmp;
+		  idx[final_lvl]  = idx_tmp;
+
+		  break;
+		}
+	    }
+	}
+
+      if ( i == num_links )
+	cdoAbort("Internal problem; link 2 not found!");
+    }
+
+  /* Swap the last two entries */
+
+  add1_tmp = add1[1];
+  add1[1]  = add1[0];
+  add1[0]  = add1_tmp;
+
+  add2_tmp = add2[1];
+  add2[1]  = add2[0];
+  add2[0]  = add2_tmp;
+
+  idx_tmp = idx[1];
+  idx[1]  = idx[0];
+  idx[0]  = idx_tmp;
+
+  for ( i = 0; i < num_links; ++i )
+    {
+      for ( n = 0; n < num_wts; n++ )
+	wgttmp[n]     = weights[n][i];
+
+      for ( n = 0; n < num_wts; n++ )
+	weights[n][i] = weights[n][idx[i]];
+
+      for ( n = 0; n < num_wts; n++ )
+	weights[n][idx[i]] = wgttmp[n];
+    }
+
+  free(idx);
+  /*
+  for ( n = 0; n < num_links; n++ )
+    printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
+  */
+  if ( cdoTimer ) timer_stop(timer_remap_sort);
+} /* sort_add_test */
+
+
 void sort_add(long num_links, long num_wts, int * restrict add1, int * restrict add2, double ** restrict weights)
 {
   /*
@@ -5661,6 +5883,8 @@ void sort_add(long num_links, long num_wts, int * restrict add1, int * restrict 
   long chk_lvl1, chk_lvl2, max_lvl;
   long i, n;
   double wgttmp[4];        /* temp for holding wts during swap   */
+
+  if ( cdoTimer ) timer_start(timer_remap_sort);
 
   if ( num_links <= 1 ) return;
 
@@ -5848,6 +6072,7 @@ void sort_add(long num_links, long num_wts, int * restrict add1, int * restrict 
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
+  if ( cdoTimer ) timer_stop(timer_remap_sort);
 } /* sort_add */
 
 

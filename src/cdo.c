@@ -100,7 +100,7 @@ void exp_run(int argc, char *argv[], char *cdoExpName);
 
 
 int timer_total, timer_read, timer_write;
-int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
+int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
 
 #define PRINT_RLIMIT(resource) \
@@ -1008,6 +1008,7 @@ int main(int argc, char *argv[])
 	  timer_read       = timer_new("read");
 	  timer_write      = timer_new("write");
 	  timer_remap      = timer_new("remap");
+	  timer_remap_sort = timer_new("remap sort");
 	  timer_remap_con  = timer_new("remap con");
 	  timer_remap_con2 = timer_new("remap con2");
 	  timer_remap_con3 = timer_new("remap con3");
