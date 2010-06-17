@@ -344,6 +344,7 @@ src/Regres.c -text
 src/Remap.c -text
 src/Remapeta.c -text
 src/Replace.c -text
+src/Replacevalues.c -text
 src/Rotuv.c -text
 src/Runpctl.c -text
 src/Runstat.c -text
@@ -362,7 +363,6 @@ src/Setgatt.c -text
 src/Setgrid.c -text
 src/Sethalo.c -text
 src/Setmiss.c -text
-src/Setrange.c -text
 src/Setrcaname.c -text
 src/Settime.c -text
 src/Setzaxis.c -text
