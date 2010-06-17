@@ -1,3 +1,4 @@
+/* Automatically created with makedoc, don't edit! */
 
 static char *InfoHelp[] = {
     "NAME",

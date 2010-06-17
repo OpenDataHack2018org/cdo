@@ -16,7 +16,7 @@ $refcard    = "cdo_refcard.tex";
 $class      = "cdo_class";
 #
 open(README,   ">OPERATORS");
-open(CDOHTML,   ">cdo_oper.html");
+open(CDOHTML,  ">cdo_oper.html");
 open(HELPFILE, ">$help");
 open(TCFILE,   ">$catalog");
 open(ABCLIST,  ">$abclist");
@@ -123,6 +123,8 @@ print TRCARD "\n";
 print TRCARD "\\vspace*{2mm}\n";
 print TRCARD "\\subsection*{Operators}\n";
 print TRCARD "\n";
+#
+print HELPFILE "/* Automatically created with makedoc, don't edit! */\n";
 #
 $help_print = 1;
 $oldchap = "oldchap";
