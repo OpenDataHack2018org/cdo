@@ -114,6 +114,7 @@ void *Regres(void *argument);
 void *Remap(void *argument);
 void *Remapeta(void *argument);
 void *Replace(void *argument);
+void *Replacevalues(void *argument);
 void *Rotuv(void *argument);
 void *Runpctl(void *argument);
 void *Runstat(void *argument);
@@ -132,7 +133,6 @@ void *Setgatt(void *argument);
 void *Setgrid(void *argument);
 void *Sethalo(void *argument);
 void *Setmiss(void *argument);
-void *Setrange(void *argument);
 void *Setrcaname(void *argument);
 void *Settime(void *argument);
 void *Setzaxis(void *argument);
@@ -324,6 +324,7 @@ void *Wct(void *argument);
 #define    GenweightsOperators  {"gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
 #define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
+#define  ReplacevaluesOperators {"setvals", "setrtoc", "setrtoc2"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runvar",  "runstd"}
@@ -344,7 +345,6 @@ void *Wct(void *argument);
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
-#define  SetrangeOperators      {"setrtoc", "setrtoc2"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
@@ -551,6 +551,7 @@ static modules_t Modules[] =
   { Remap,          GenweightsHelp,    GenweightsOperators,    CDI_REAL,  1,  1 },
   { Remapeta,       RemapetaHelp,      RemapetaOperators,      CDI_REAL,  1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,       CDI_REAL,  2,  1 },
+  { Replacevalues,  ReplacevaluesHelp, ReplacevaluesOperators, CDI_REAL,  1,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,         CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       CDI_REAL,  1,  1 },
@@ -568,7 +569,6 @@ static modules_t Modules[] =
   { Setgatt,        SetgattHelp,       SetgattOperators,       CDI_REAL,  1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,       CDI_REAL,  1,  1 },
   { Sethalo,        SethaloHelp,       SethaloOperators,       CDI_REAL,  1,  1 },
-  { Setrange,       SetrangeHelp,      SetrangeOperators,      CDI_REAL,  1,  1 },
   { Setrcaname,     NULL,              SetrcanameOperators,    CDI_REAL,  1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,       CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       CDI_REAL,  1,  1 },

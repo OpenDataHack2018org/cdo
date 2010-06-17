@@ -1,3 +1,7 @@
+2010-06-17  Etienne Tourigny <tourigny@sca.uqam.ca>
+
+	* Added operator setvals - Set list of old values to new values
+
 2010-05-18  Cedrick Ansorge <Cedrick.Ansorge.zmaw.de>
 
 	* Added operator eof - Calculate EOFs in spatial or time space

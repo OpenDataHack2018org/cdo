@@ -1,15 +1,24 @@
 @BeginModule
-@Name      = Setrange
-@Title     = Set range to constant
+@Name      = Replacevalues
+@Title     = Replace variable values
 @Section   = Miscellaneous
 @Arguments = ifile ofile
-@Operators = setrtoc setrtoc2
+@Operators = setvals setrtoc setrtoc2
 
 @BeginDescription
-This module sets part of a field to a constant value or missing values. 
-Which part of the field is set depends on the chosen operator.
+This module replaces old variable values with new values, depending on the operator.
 @EndDescription
 @EndModule
+
+
+@BeginOperator_setvals
+@Title     = Set list of old values to new values
+@Parameter = oldval newval [...]
+
+@BeginDescription
+Supply a list of n pairs of old and new values.
+@EndDescription
+@EndOperator
 
 
 @BeginOperator_setrtoc
@@ -58,14 +67,16 @@ o(t,x) = \left\{
 @EndOperator
 
 
-@BeginParameter rmax
+@BeginParameter
+@Item = oldval,newval,...
+FLOAT   Pairs of old and new values
 @Item = rmin
-FLOAT  Lower bound
+FLOAT   Lower bound
 @Item = rmax
-FLOAT  Upper bound
+FLOAT   Upper bound
 @Item = c
-FLOAT  New value - inside range
+FLOAT   New value - inside range
 @Item = c2
-FLOAT  New value - outside range
+FLOAT   New value - outside range
 @EndParameter
 

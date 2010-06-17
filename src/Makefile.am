@@ -80,6 +80,7 @@ cdo_SOURCES = Arith.c		\
               Remap.c  	        \
               Remapeta.c    	\
               Replace.c  	\
+              Replacevalues.c  	\
               Rotuv.c     	\
               Runpctl.c  	\
               Runstat.c  	\
@@ -98,7 +99,6 @@ cdo_SOURCES = Arith.c		\
 	      Setgrid.c		\
 	      Sethalo.c		\
               Setmiss.c 	\
-              Setrange.c 	\
               Setrcaname.c 	\
 	      Settime.c		\
 	      Setzaxis.c	\

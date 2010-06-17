@@ -151,6 +151,7 @@ doc/tex/mod/Remap -text
 doc/tex/mod/Remapeta -text
 doc/tex/mod/Remapgrid -text
 doc/tex/mod/Replace -text
+doc/tex/mod/Replacevalues -text
 doc/tex/mod/Rotuv -text
 doc/tex/mod/Runpctl -text
 doc/tex/mod/Runstat -text
@@ -165,7 +166,6 @@ doc/tex/mod/Setgatt -text
 doc/tex/mod/Setgrid -text
 doc/tex/mod/Sethalo -text
 doc/tex/mod/Setmiss -text
-doc/tex/mod/Setrange -text
 doc/tex/mod/Settime -text
 doc/tex/mod/Setzaxis -text
 doc/tex/mod/Showinfo -text

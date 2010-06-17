@@ -3304,19 +3304,21 @@ static char *Smooth9Help[] = {
     NULL
 };
 
-static char *SetrangeHelp[] = {
+static char *ReplacevaluesHelp[] = {
     "NAME",
-    "    setrtoc, setrtoc2 - Set range to constant",
+    "    setvals, setrtoc, setrtoc2 - Replace variable values",
     "",
     "SYNOPSIS",
+    "    setvals,oldval,newval[,...]  ifile ofile",
     "    setrtoc,rmin,rmax,c  ifile ofile",
     "    setrtoc2,rmin,rmax,c,c2  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This module sets part of a field to a constant value or missing values. ",
-    "    Which part of the field is set depends on the chosen operator.",
+    "    This module replaces old variable values with new values, depending on the operator.",
     "",
     "OPERATORS",
+    "    setvals   Set list of old values to new values",
+    "              Supply a list of n pairs of old and new values.",
     "    setrtoc   Set range to constant",
     "                       / c      if i(t,x) GE rmin AND i(t,x) LE rmax",
     "              o(t,x) = ",
@@ -3327,10 +3329,11 @@ static char *SetrangeHelp[] = {
     "                       \\ c2     if i(t,x) LT rmin AND i(t,x) GT rmax",
     "",
     "PARAMETER",
-    "    rmin  FLOAT  Lower bound",
-    "    rmax  FLOAT  Upper bound",
-    "    c     FLOAT  New value - inside range",
-    "    c2    FLOAT  New value - outside range",
+    "    oldval,newval,...  FLOAT   Pairs of old and new values",
+    "    rmin               FLOAT   Lower bound",
+    "    rmax               FLOAT   Upper bound",
+    "    c                  FLOAT   New value - inside range",
+    "    c2                 FLOAT   New value - outside range",
     NULL
 };
 

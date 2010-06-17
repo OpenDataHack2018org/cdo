@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
 
+      Setvals     setvals       Set list of old values to new values
       Setrtoc     setrtoc       Set range to new value
       Setrtoc2    setrtoc2      Set range to new value others to value2
 */
@@ -33,7 +34,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-
+#include "list.h"
 
 double arg2val(char *arg)
 {
@@ -42,10 +43,10 @@ double arg2val(char *arg)
   else return atof(arg);
 }
 
-void *Setrange(void *argument)
+void *Replacevalues(void *argument)
 {
-  static char func[] = "Setrange";
-  int SETRTOC, SETRTOC2;
+  static char func[] = "Replacevalues";
+  int  SETVALS, SETRTOC, SETRTOC2;
   int operatorID;
   int streamID1, streamID2;
   int gridsize;
@@ -54,7 +55,10 @@ void *Setrange(void *argument)
   int varID, levelID;
   int vlistID1, vlistID2;
   int nmiss;
-  int i;
+  int nvals;
+  LIST *flist = listNew(FLT_LIST);
+  double *fltarr = NULL;
+  int i, j;
   double missval;
   double rmin = 0, rmax = 0;
   double *array;
@@ -63,6 +67,7 @@ void *Setrange(void *argument)
 
   cdoInitialize(argument);
 
+  SETVALS = cdoOperatorAdd("setvals", 0, 0, "I1,O1,...,In,On");
   SETRTOC = cdoOperatorAdd("setrtoc", 0, 0, "range (min, max), value");
   SETRTOC2 = cdoOperatorAdd("setrtoc2", 0, 0, "range (min, max), value1, value2");
 
@@ -70,7 +75,15 @@ void *Setrange(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
-  if ( operatorID == SETRTOC )
+  if ( operatorID == SETVALS )
+    {
+      nvals = args2fltlist(operatorArgc(), operatorArgv(), flist);
+      if ( nvals < 2 ) cdoAbort("Too few arguments!");
+      if ( nvals % 2 != 0 )  cdoAbort("Need pairs of arguments!");
+      fltarr = (double *) listArrayPtr(flist);
+      nvals = nvals / 2;
+    }
+  else if ( operatorID == SETRTOC )
     {
       operatorCheckArgc(3);
       rmin = arg2val(operatorArgv()[0]);
@@ -120,7 +133,25 @@ void *Setrange(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	  missval = vlistInqVarMissval(vlistID1, varID);
 
-	  if ( operatorID == SETRTOC )
+	  if ( operatorID == SETVALS )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		if ( !DBL_IS_EQUAL(array[i], missval) )
+		  {
+		    /* printf("\nelem %d val %f ",i,array[i]); */
+		    for (j=0; j < nvals; j++)
+		      {
+			if ( DBL_IS_EQUAL(array[i], fltarr[j*2] ) )
+			  {
+			    array[i] = fltarr[j*2+1];
+			    /* printf("j=%d %f %f ",j,fltarr[j*2],fltarr[j*2+1]); */
+			    break;
+			  }
+			
+		      }
+		  }
+	    }
+	  else if ( operatorID == SETRTOC )
 	    {
 	      for ( i = 0; i < gridsize; i++ )
 		if ( !DBL_IS_EQUAL(array[i], missval) )
@@ -157,6 +188,8 @@ void *Setrange(void *argument)
   streamClose(streamID1);
 
   if ( array ) free(array);
+
+  listDelete(flist);
 
   cdoFinish();
 
