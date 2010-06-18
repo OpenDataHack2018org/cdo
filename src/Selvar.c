@@ -33,9 +33,6 @@
       Selvar     selltype        Select GRIB level type 
 */
 
-
-#include <string.h>
-#include <math.h>   /* fabs */
 #include <ctype.h>  /* isdigit */
 
 #include "cdi.h"

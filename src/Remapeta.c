@@ -20,10 +20,7 @@
       Remapeta     remapeta          Model to model level interpolation
 */
 
-
 #include <ctype.h>
-#include <string.h>
-#include <math.h>
 
 #include "cdi.h"
 #include "cdo.h"

@@ -21,8 +21,6 @@
       Intyear    intyear         Year interpolation
 */
 
-
-#include <string.h>
 #include <ctype.h>
 
 #include "cdi.h"

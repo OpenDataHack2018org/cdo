@@ -27,8 +27,6 @@
 */
 
 
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
@@ -48,7 +46,7 @@ void *Split(void *argument)
   int tsID, recID, levelID, zaxisID, levID;
   int varID2, levelID2;
   int vlistID1, vlistID2;
-  int  *vlistIDs = NULL, *streamIDs = NULL;
+  int *vlistIDs = NULL, *streamIDs = NULL;
   int  itmp[999];
   double ftmp[999];
   char filesuffix[32];
@@ -427,14 +425,14 @@ void *Split(void *argument)
 
   for ( index = 0; index < nsplit; index++ )
     {
-      vlistDestroy(vlistIDs[index]);
       streamClose(streamIDs[index]);
+      vlistDestroy(vlistIDs[index]);
     }
  
   if ( ! lcopy )
     if ( array ) free(array);
 
-  if ( vlistIDs ) free(vlistIDs);
+  if ( vlistIDs  ) free(vlistIDs);
   if ( streamIDs ) free(streamIDs);
 
   cdoFinish();

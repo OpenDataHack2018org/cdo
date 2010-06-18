@@ -15,10 +15,7 @@
   GNU General Public License for more details.
 */
 
-
 #include <ctype.h>
-#include <string.h>
-#include <math.h>
 
 #include "cdi.h"
 #include "cdo.h"

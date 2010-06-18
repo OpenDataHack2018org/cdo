@@ -30,8 +30,6 @@
       Settime    shifttime       Shift timesteps
 */
 
-
-#include <string.h>
 #include <ctype.h>  /* isdigit */
 
 #include "cdi.h"

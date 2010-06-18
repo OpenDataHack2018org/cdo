@@ -27,11 +27,6 @@
       Runstat    runstd          Running standard deviation
 */
 
-
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

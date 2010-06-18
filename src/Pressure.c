@@ -22,10 +22,7 @@
       Pressure    pressure_hl          Pressure on half hybrid level
 */
 
-
 #include <ctype.h>
-#include <string.h>
-#include <math.h>
 
 #include "cdi.h"
 #include "cdo.h"

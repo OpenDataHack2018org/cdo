@@ -23,9 +23,6 @@
       Maskbox    maskregion      Mask regions
 */
 
-
-#include <string.h>
-#include <stdlib.h>
 #include <ctype.h>
 
 #include "cdi.h"

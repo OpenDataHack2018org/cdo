@@ -22,10 +22,6 @@
       Selbox     selindexbox     Select index box
 */
 
-
-#include <string.h>
-#include <stdlib.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

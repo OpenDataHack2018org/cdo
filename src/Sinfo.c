@@ -21,9 +21,6 @@
       Sinfo      sinfo           Short dataset information
 */
 
-
-#include <stdio.h>
-#include <string.h>
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

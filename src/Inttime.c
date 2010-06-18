@@ -21,8 +21,6 @@
       Inttime    inttime         Time interpolation
 */
 
-
-#include <string.h>
 #include <ctype.h>  /* isdigit */
 
 #include "cdi.h"

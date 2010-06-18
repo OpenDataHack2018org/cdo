@@ -21,10 +21,6 @@
       Sort sortcode  Sort by code number
 */
 
-
-#include <string.h>
-#include <stdlib.h>  /* qsort */
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

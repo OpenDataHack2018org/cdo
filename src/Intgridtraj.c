@@ -20,10 +20,7 @@
 
 */
 
-
-#include <string.h>
 #include <ctype.h>
-#include <math.h>
 
 #include "cdi.h"
 #include "cdo.h"

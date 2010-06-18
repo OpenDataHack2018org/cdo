@@ -21,9 +21,6 @@
       writegrid Write grid
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

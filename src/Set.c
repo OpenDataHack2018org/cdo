@@ -25,9 +25,6 @@
       Set        setltype        Set GRIB level type
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

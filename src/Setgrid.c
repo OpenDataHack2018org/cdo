@@ -22,9 +22,6 @@
       Setgrid    setgridtype     Set grid type
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

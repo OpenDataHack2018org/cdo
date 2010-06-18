@@ -21,9 +21,6 @@
         Timstat2        timcor      correlates two data files on the same grid
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

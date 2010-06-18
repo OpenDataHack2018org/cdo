@@ -27,9 +27,6 @@
       Arith      atan2           Arc tangent of two fields
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

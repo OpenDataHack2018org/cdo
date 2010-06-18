@@ -21,10 +21,6 @@
       Wct     wct          Compute the windchill temperature (degree C)
 */
 
-
-#include <string.h>
-#include <math.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

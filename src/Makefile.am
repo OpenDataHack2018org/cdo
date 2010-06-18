@@ -102,6 +102,7 @@ cdo_SOURCES = Arith.c		\
               Setrcaname.c 	\
 	      Settime.c		\
 	      Setzaxis.c	\
+	      Scatter.c	        \
               Showinfo.c	\
               Sinfo.c   	\
               Smooth9.c   	\

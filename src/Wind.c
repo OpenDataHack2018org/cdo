@@ -24,9 +24,6 @@
                                  velocity potential and stream function
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

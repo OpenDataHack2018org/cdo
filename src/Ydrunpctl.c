@@ -21,11 +21,6 @@
       Ydrunpctl    ydrunpctl         Multi-year daily running percentiles
 */
 
-
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

@@ -24,9 +24,6 @@
       Ymonarith  ymondiv         Divide multi-year monthly time series
 */
 
-
-#include <string.h>
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

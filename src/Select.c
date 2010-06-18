@@ -21,10 +21,6 @@
       Select      select         Select fields
 */
 
-
-#include <string.h>
-#include <math.h>   /* fabs */
-
 #include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"

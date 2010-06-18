@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -22,13 +22,6 @@
       Setrtoc     setrtoc       Set range to new value
       Setrtoc2    setrtoc2      Set range to new value others to value2
 */
-
-
-#if  defined  (HAVE_CONFIG_H)
-#  include "config.h"
-#endif
-
-#include <string.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -55,7 +48,7 @@ void *Replacevalues(void *argument)
   int varID, levelID;
   int vlistID1, vlistID2;
   int nmiss;
-  int nvals;
+  int nvals = 0;
   LIST *flist = listNew(FLT_LIST);
   double *fltarr = NULL;
   int i, j;
