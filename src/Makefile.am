@@ -39,6 +39,7 @@ cdo_SOURCES = Arith.c		\
               Fldstat.c 	\
               Fldstat2.c 	\
               Fourier.c 	\
+              Gather.c 	        \
               Gengrid.c 	\
               Gradsdes.c 	\
               Gridboxstat.c 	\

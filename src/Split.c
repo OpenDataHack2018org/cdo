@@ -19,7 +19,7 @@
    This module contains the following operators:
 
       Split      splitcode       Split codes
-      Split      splitname       Split variables
+      Split      splitname       Split  variables
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split zaxis

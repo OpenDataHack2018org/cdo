@@ -73,6 +73,7 @@ void *Fldrms(void *argument);
 void *Fldstat(void *argument);
 void *Fldstat2(void *argument);
 void *Fourier(void *argument);
+void *Gather(void *argument);
 void *Gengrid(void *argument);
 void *Gradsdes(void *argument);
 void *Gridboxstat(void *argument);
@@ -275,6 +276,7 @@ void *Wct(void *argument);
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
 #define  Fldstat2Operators      {"fldcor"}
 #define  FourierOperators       {"fourier"}
+#define  GatherOperators        {"gather"}
 #define  GengridOperators       {"gengrid"}
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
 #define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", \
@@ -509,6 +511,7 @@ static modules_t Modules[] =
   { Fldstat,        FldstatHelp,       FldstatOperators,       CDI_REAL,  1,  1 },
   { Fldstat2,       FldcorHelp,        Fldstat2Operators,      CDI_REAL,  2,  1 },
   { Fourier,        NULL,              FourierOperators,       CDI_COMP,  1,  1 },
+  { Gather,         NULL,              GatherOperators,        CDI_REAL, -1,  1 },
   { Gengrid,        NULL,              GengridOperators,       CDI_REAL,  2,  1 },
   { Gradsdes,       GradsdesHelp,      GradsdesOperators,      CDI_REAL,  1,  0 },
   { Gridboxstat,    GridboxstatHelp,   GridboxstatOperators,   CDI_REAL,  1,  1 },
