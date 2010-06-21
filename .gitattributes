@@ -21,6 +21,10 @@ config/missing -text
 config/mkinstalldirs -text
 /configure -text
 /configure.ac -text
+contrib/cdoCompletion.bash -text
+contrib/cdoCompletion.tcsh -text
+contrib/cdoCompletion.zsh -text
+contrib/makecompl.rb -text
 doc/cdo.pdf -text
 doc/cdo_refcard.pdf -text
 doc/tex/Modules -text
