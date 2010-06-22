@@ -14,15 +14,20 @@
 # CDO's License
 #
 require 'optparse'
-require 'rdoc/usage'
-bin  = '../src/cdo'
-opts = OptionParser.new
-opts.on("-h","--help")  {RDoc::usage}
-opts.on("-b","--binary CMD") {|cmd| bin = cmd}
-opts.parse(ARGV)
+
+options = {:bin => '../src/cdo'}
+OptionParser.new do |opts|
+  opts.banner = "Usage:  makecompl.rb [-h- [-b CMD]"
+  opts.separator ""
+  opts.separator "Options are ..."
+
+opts.on("-h","--help","Show this help")  {puts opts}
+opts.on("-b","--binary CMD","Choose a CDO binary different from #{options[:bin]}") {|cmd| options[:bin] = cmd}
+end.parse!
+#=============================================================================== 
 
 outfile   = 'cdoCompletion'
-cmd       = bin + ' 2>&1'
+cmd       = options[:bin] + ' 2>&1'
 complCmds = { 
   :tcsh => ['set cdoCmpl = (\\','); complete cdo \'c/-/$cdoCmpl/\' \'n/*/f/\''],
   :zsh  => ['compctl -k "(',')" -f cdo'],
