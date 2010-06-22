@@ -56,18 +56,17 @@ int cmpx(const void *s1, const void *s2)
 }
 
 static
-int cmpy(const void *s1, const void *s2)
+int cmpxy(const void *s1, const void *s2)
 {
   int cmp = 0;
   xyinfo_t *xy1 = (xyinfo_t *) s1;
   xyinfo_t *xy2 = (xyinfo_t *) s2;
 
-  if      ( xy1->y < xy2->y ) cmp = -1;
-  else if ( xy1->y > xy2->y ) cmp =  1;
+  if      ( xy1->y < xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x < xy2->x) ) cmp = -1;
+  else if ( xy1->y > xy2->y || (!(fabs(xy1->y - xy2->y) > 0) && xy1->x > xy2->x) ) cmp =  1;
 
   return (cmp);
 }
-
 
 static
 int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
@@ -76,7 +75,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   int fileID;
   int gridID;
   int gridID2 = -1;
-  int gridtype;
+  int gridtype = -1;
   int xsize = 0, ysize = 0;
   int xsize2, ysize2;
   int nx, ny, ix, iy, i, j, ij, offset;
@@ -106,22 +105,26 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       gridInqXvals(gridID, xvals[fileID]);
       gridInqYvals(gridID, yvals[fileID]);
 
-      printf("fileID %d, gridID %d\n", fileID, gridID);
+      // printf("fileID %d, gridID %d\n", fileID, gridID);
 
       xyinfo[fileID].x  = xvals[fileID][0];
       xyinfo[fileID].y  = yvals[fileID][0];
       xyinfo[fileID].id = fileID;
     }
-
+  /*
   for ( fileID = 0; fileID < nfiles; fileID++ )
     printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  
+  */
   qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
-  qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpy);  	      
-
+  /*
   for ( fileID = 0; fileID < nfiles; fileID++ )
     printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-
+  */
+  qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy);  	      
+  /*
+  for ( fileID = 0; fileID < nfiles; fileID++ )
+    printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
+  */
   nx = 1;
   for ( fileID = 1; fileID < nfiles; fileID++ )
     {
@@ -129,7 +132,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       else break;
     }
   ny = nfiles/nx;
-  printf("nx %d  ny %d\n", nx, ny);
+  // printf("nx %d  ny %d\n", nx, ny);
   xsize2 = nx*xsize;
   ysize2 = ny*ysize;
 
@@ -150,8 +153,10 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 	  ix = fileID - iy*nx;
 
           offset = iy*xsize2*ysize + ix*xsize;
-	  printf("fileID %d %d, iy %d, ix %d, offset %d\n", fileID, xyinfo[fileID].id, iy, ix, offset);
-
+	  /*
+	  printf("fileID %d %d, iy %d, ix %d, offset %d\n",
+		 fileID, xyinfo[fileID].id, iy, ix, offset);
+	  */
 	  ij = 0;
 	  for ( j = 0; j < ysize; ++j )
 	    for ( i = 0; i < xsize; ++i )
@@ -169,6 +174,24 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 
   free(xvals2);
   free(yvals2);
+
+  {
+    char string[1024];
+    string[0] = 0;
+    gridID = vlistGrid(ef[0].vlistID, igrid);
+    gridInqXname(gridID, string);
+    gridDefXname(gridID2, string);
+    gridInqYname(gridID, string);
+    gridDefYname(gridID2, string);
+    gridInqXlongname(gridID, string);
+    gridDefXlongname(gridID2, string);
+    gridInqYlongname(gridID, string);
+    gridDefYlongname(gridID2, string);
+    gridInqXunits(gridID, string);
+    gridDefXunits(gridID2, string);
+    gridInqYunits(gridID, string);
+    gridDefYunits(gridID2, string);
+  }
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -192,7 +215,7 @@ void *Gather(void *argument)
   int varID, recID;
   int gridsize = 0;
   int gridsize2;
-  int gridID, gridID2;
+  int gridID2;
   int *gridIDs = NULL;
   int nrecs, nrecs0;
   int ngrids;
@@ -256,9 +279,8 @@ void *Gather(void *argument)
     gridindex[fileID] = (int *) malloc(gridsize*sizeof(int));
 
   for ( i = 0; i < ngrids; ++i )
-    {
-      gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
-    }
+    gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
+
 
   vlistID2 = vlistDuplicate(vlistID1);
   taxisID1 = vlistInqTaxis(vlistID1);
@@ -267,7 +289,7 @@ void *Gather(void *argument)
 
   gridID2 = gridIDs[0];
   gridsize2 = gridInqSize(gridID2);
-  printf("gridsize2 %d\n", gridsize2);
+  // printf("gridsize2 %d\n", gridsize2);
   for ( i = 1; i < ngrids; ++i )
     {
       if ( gridsize2 != gridInqSize(gridIDs[i]) )
