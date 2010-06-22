@@ -406,7 +406,7 @@ AC_SUBST([CLIBS])
 AC_SUBST([INCLUDES])
 AC_SUBST([AR])
 
-AC_OUTPUT(Makefile src/Makefile cdo.spec)
+AC_OUTPUT(Makefile src/Makefile contrib/Makefile cdo.spec)
 
 if test "$ac_cv_prog_cc_c99" = "no" ; then
 AC_MSG_NOTICE([
