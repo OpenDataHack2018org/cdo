@@ -2,7 +2,7 @@ EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zs
 
 all-local:
 	if test -x /usr/bin/ruby -o -x /usr/local/bin/ruby ; then \
-	  ruby $(srcdir)/makecompl.rb; \
+	  ruby $(srcdir)/makecompl.rb -h completions4cdo; \
 	fi
 
-CLEANFILES  = `ls cdoCompletion.*`
+CLEANFILES  = `ls completions4cdo.*`
