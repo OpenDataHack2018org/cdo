@@ -1,19 +1,19 @@
 compctl -k "(
+-M \
+-P \
+-Q \
+-R \
+-S \
+-V \
 -a \
 -b \
 -f \
 -g \
 -h \
--M \
 -m \
--P \
--Q \
--R \
 -r \
--S \
 -s \
 -t \
--V \
 -v \
 -z \
 abs -abs \
