@@ -188,7 +188,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zsh
-CLEANFILES = `ls cdoCompletion.*`
+CLEANFILES = `ls completions4cdo.*`
 all: all-am
 
 .SUFFIXES:
@@ -371,7 +371,7 @@ uninstall-am:
 
 all-local:
 	if test -x /usr/bin/ruby -o -x /usr/local/bin/ruby ; then \
-	  ruby $(srcdir)/makecompl.rb; \
+	  ruby $(srcdir)/makecompl.rb -o completions4cdo; \
 	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
