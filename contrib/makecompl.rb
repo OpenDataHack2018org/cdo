@@ -34,7 +34,7 @@ def getOperators
   cmd       = $opts[:bin] + ' 2>&1'
   help      = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
   if 5 >= help.size
-    puts "Operators could not get listen by running the CDO binary (#{$opts[:bin]})"
+    puts "Operators could not get listed by running the CDO binary (#{$opts[:bin]})"
     puts "Create operator list by scanning the documentation..."
     Dir.glob('../doc/tex/mod/*').map {|mod|
       File.open(mod).readlines.grep(/Operators/).map {|line| line.chomp.split('=')[-1].split(' ')}
@@ -47,8 +47,8 @@ def getOptions
   cmd     = $opts[:bin] + ' 2>&1'
   options = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}.find_all {|item| /^-/.match(item)}.map {|o| o[0,2]}
   if options.empty?
-    puts "Commandline options could not be created."
-    puts "Go on processing operators only"
+    puts "Commandline options could not get listed by running the CDO binary (#{$opts[:bin]})"
+    puts "Go on processing operators only ..."
     return []
   end
   options
