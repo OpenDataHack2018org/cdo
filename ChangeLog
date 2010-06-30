@@ -1,3 +1,8 @@
+2010-06-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* bug fix for wrong result of SZIP compressed GRIB records with 24 bit 
+	  data and compression ratio < 1.05 [report: Aiko Voigt]
+
 2010-06-28  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Version 1.4.5 released
