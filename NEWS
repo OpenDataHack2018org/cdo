@@ -3,8 +3,10 @@ CDO NEWS
 
 Version 1.4.5.1 (?? July 2010):
 
+   New features:
+     * GRIB1 decode: Correct ZeroShiftError of simple packed spherical harmonics
    Fixed bugs:
-     * wrong result of SZIP compressed GRIB records with 24 bit data and compression ratio < 1.05 
+     * wrong result of SZIP compressed GRIB records with 24 packing and a compression ratio < 1.05 
 
 Version 1.4.5 (28 June 2010):
 
