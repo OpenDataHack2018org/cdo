@@ -1,3 +1,7 @@
+2010-07-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Version 1.4.5.1 released
+
 2010-07-05 Edi Kirk <E.Kirk@gmx.de>
 
 	* GRIB1 decode: Correct ZeroShiftError of simple packed spherical harmonics

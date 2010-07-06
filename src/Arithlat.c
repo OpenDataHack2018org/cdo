@@ -28,11 +28,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#include <math.h>
-
-#ifndef  M_PI
-#define  M_PI		3.14159265358979323846	/* pi */
-#endif
 
 #ifndef  DEG2RAD
 #define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
