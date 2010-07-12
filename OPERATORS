@@ -414,10 +414,13 @@ Operator catalog:
 -------------------------------------------------------------
    Miscellaneous
 -------------------------------------------------------------
-      Gridcell   gridarea        Grid cell area
-      Gridcell   gridweights     Grid cell weights
       Gradsdes   gradsdes1       GrADS data descriptor file (version 1 GRIB map)
       Gradsdes   gradsdes2       GrADS data descriptor file (version 2 GRIB map)
+      Filter     bandpass        Bandpass filtering
+      Filter     lowpass         Lowpass filtering
+      Filter     highpass        Highpass filtering
+      Gridcell   gridarea        Grid cell area
+      Gridcell   gridweights     Grid cell weights
       Smooth9    smooth9         9 point smoothing
       Replacevalues setvals         Set list of old values to new values
       Replacevalues setrtoc         Set range to constant

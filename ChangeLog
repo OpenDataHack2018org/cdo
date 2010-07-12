@@ -1,3 +1,7 @@
+2010-07-12  Cedrick Ansorge <Cedrick.Ansorge@zmaw.de>
+
+	* Added module Filter - Time series filtering
+
 2010-07-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Version 1.4.5.1 released
@@ -19,7 +23,7 @@
 
 	* Added operator setvals - Set list of old values to new values
 
-2010-05-18  Cedrick Ansorge <Cedrick.Ansorge.zmaw.de>
+2010-05-18  Cedrick Ansorge <Cedrick.Ansorge@zmaw.de>
 
 	* Added operator eof - Calculate EOFs in spatial or time space
         * Added operator eoftime - Calculate EOFs in time space

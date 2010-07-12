@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Gridcell
 @Title     = Grid cell quantities
 @Section   = Miscellaneous
