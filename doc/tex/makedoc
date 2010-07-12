@@ -604,7 +604,7 @@ while (<MOFILE>) {
 	$operpara = $oparameter;
 
 	if ( $norefoper == 0 ) {
-	  printf README ("      %-10s %-15s %s\n", $modulefile, $operator, $otitle);
+	  printf README ("   %-13s %-15s %s\n", $modulefile, $operator, $otitle);
 	  print CDOHTML "<tr>\n";
 	  print CDOHTML "<td WIDTH=\"30%\" BGCOLOR=\"#FFF1B3\"> $operator </A> </td>\n";
 	  print CDOHTML "<td WIDTH=\"70%\" BGCOLOR=\"#FFFFCC\"> $otitle </td>\n";

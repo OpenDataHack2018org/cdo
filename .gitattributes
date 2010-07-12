@@ -27,6 +27,7 @@ contrib/cdoCompletion.bash -text
 contrib/cdoCompletion.tcsh -text
 contrib/cdoCompletion.zsh -text
 contrib/makecompl.rb -text
+doc/OpenMP -text
 doc/cdo.pdf -text
 doc/cdo_refcard.pdf -text
 doc/tex/Modules -text

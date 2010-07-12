@@ -1,0 +1,27 @@
+   Module       Operator        Description
+-----------------------------------------------------------
+   Detrend      detrend         Detrend
+   Ensstat      ensmin          Ensemble minimum
+   Ensstat      ensmax          Ensemble maximum
+   Ensstat      enssum          Ensemble sum
+   Ensstat      ensmean         Ensemble mean
+   Ensstat      ensavg          Ensemble average
+   Ensstat      ensvar          Ensemble variance
+   Ensstat      ensstd          Ensemble standard deviation
+   Ensstat      enspctl         Ensemble percentiles
+   Fourier      fourier         Fourier transformation
+   Gridboxstat  gridboxmin      Gridbox minimum
+   Gridboxstat  gridboxmax      Gridbox maximum
+   Gridboxstat  gridboxsum      Gridbox sum
+   Gridboxstat  gridboxmean     Gridbox mean
+   Gridboxstat  gridboxavg      Gridbox average
+   Gridboxstat  gridboxvar      Gridbox variance
+   Gridboxstat  gridboxstd      Gridbox standard deviation
+   Remapeta     remapeta        Remap vertical hybrid level
+   Remapgrid    remapbil        Bilinear interpolation
+   Remapgrid    remapbic        Bicubic interpolation
+   Remapgrid    remapdis        Distance-weighted average remapping
+   Remapgrid    remapnn         Nearest neighbor remapping
+   Remapgrid    remapcon        First order conservative remapping
+   Remapgrid    remapcon2       Second order conservative remapping
+   Remapgrid    remaplaf        Largest area fraction remapping

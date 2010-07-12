@@ -519,7 +519,12 @@ void *Remapeta(void *argument)
       if ( tempID != -1 ) cdoAbort("Temperature without humidity unsupported!");
       if ( sqID   != -1 ) cdoAbort("Humidity without temperature unsupported!");
     }
-
+  /*
+  if ( ltq == FALSE )
+    {
+      cdoWarning("Temperature and Humidity not found!");
+    }
+  */
   if ( operatorID == REMAPETAS || operatorID == REMAPETAZ)
     {
       sum1 = (double *) malloc(ngp*sizeof(double));
