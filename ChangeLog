@@ -1,3 +1,7 @@
+2010-07-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* seldate: open output file only when time steps found (bug fix) [report: Hannes Reuter]
+
 2010-07-12  Cedrick Ansorge <Cedrick.Ansorge@zmaw.de>
 
 	* Added module Filter - Time series filtering

@@ -50,7 +50,7 @@ void *Seltime(void *argument)
   int operatorID;
   int operfunc, intval;
   int moddat[NOPERATORS];
-  int streamID1, streamID2;
+  int streamID1, streamID2 = -1;
   int tsID, tsID2, nrecs;
   int recID, varID, levelID;
   int *intarr, nsel = 0, selival;
@@ -303,11 +303,6 @@ void *Seltime(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
-
-  streamDefVlist(streamID2, vlistID2);
-
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
@@ -434,6 +429,14 @@ void *Seltime(void *argument)
 
       if ( copytimestep || copy_nts2 )
 	{
+	  if ( tsID2 == 0 )
+	    {
+	      streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+	      if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+
+	      streamDefVlist(streamID2, vlistID2);
+	    }
+
 	  if ( lnts1 && ncts == 0 )
 	    {
 	      nts = nts1;
@@ -568,7 +571,7 @@ void *Seltime(void *argument)
       tsID++;
     }
 
-  streamClose(streamID2);
+  if ( streamID2 != -1 ) streamClose(streamID2);
   streamClose(streamID1);
  
   if ( operatorID == SELSMON )
