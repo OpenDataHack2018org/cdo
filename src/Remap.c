@@ -46,6 +46,10 @@
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
       GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX};
 
+enum {HEAP_SORT, MERGE_SORT};
+
+#define SORT_MODE MERGE_SORT
+
 static
 void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_order)
 {
@@ -784,8 +788,37 @@ void *Remap(void *argument)
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 
-	      sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-		       remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, remaps[r].vars.wts);
+	      //sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+	      //         remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, remaps[r].vars.wts);
+	      if ( SORT_MODE == MERGE_SORT )
+		{ /* 
+		  ** use a combination of the old sort_add and a split and 
+		  ** merge approach. The chunk size is determined by      
+		  ** MERGE_SORT_LIMIT_SIZE in remaplib.c. OpenMP parallelism
+		  ** is supported
+		  */   
+		  int numThreads;
+		  //		  printf("Calling sort_iter:\nnum_links: %li\nnum_wts:   %li\n",
+		  //			 remaps[r].vars.num_links,remaps[r].vars.num_wts);
+#if defined (_OPENMP)
+#pragma omp parallel
+		  {
+		  numThreads = omp_get_num_threads(); 
+		  }
+#else
+		  numThreads = 1;
+#endif
+		  printf("using %i threads\n",numThreads);
+		  sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+			    remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
+			    remaps[r].vars.wts,numThreads);
+		}
+	      else if ( SORT_MODE == HEAP_SORT )
+		{ /* use a pure heap sort without any support of parallelism */
+		  sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+			   remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
+			   remaps[r].vars.wts);
+		}
 	      	      
 	      if ( lwrite_remap ) goto WRITE_REMAP;
 
