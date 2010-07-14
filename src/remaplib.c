@@ -113,13 +113,6 @@ typedef struct
 #define  PIH      HALF*PI
 
 
-/* MERGE SORT DEFINES */
-#define MERGE_SORT_CHUNKS          64
-#define MERGE_SORT_LIMIT_SIZE      4096 //num_links/(MERGE_SORT_CHUNKS*omp_get_num_procs())
-
-#define VERBOSE_PAR  0
-#define VERBOSE      0
-
 /* static double north_thresh = 1.45;  */ /* threshold for coord transf. */
 /* static double south_thresh =-2.00;  */ /* threshold for coord transf. */
 static double north_thresh = 2.00;  /* threshold for coord transf. */
@@ -6953,12 +6946,47 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 **          XXXXXXXXXXX       XXXXXXXX     XXX     XXXX         XXX
 ********************************************************************************** */
 
-int first_sort_iter_call = 1;
-int numThreads = 1;
-int par_depth;
+/* MERGE SORT DEFINES */
+#define MERGE_SORT_CHUNKS          64
+#define MERGE_SORT_LIMIT_SIZE      4096 //num_links/(MERGE_SORT_CHUNKS*omp_get_num_procs())
 
-void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2, 
-	      double **weights, int parent)
+
+static
+void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
+{      
+  /*
+    This routine writes to idx a list of indices relative to *l11 and *l12
+    --> l11, l12, and l21,l22 each need to be allocated in 
+        a signle block of memory
+    The order is thus, that (I) l11[idx[i]]<l11[idx[i+1]]	
+                        OR (II) l11[idx[i]]==l11[idx[i+1]] && l21[idx[i]]<l21[idx[i+1]]
+		       where 0 <= i < nl
+  */    		       
+
+
+  int i1=0, i2=0, i=0, ii;
+  const int n1=nl[0], n2=nl[1];
+
+  i=0;
+  while ( i2 < n2 && i1 < n1 ) 
+    {
+      if ( ( l11[i1] < l21[i2] ) ||
+	   ( l11[i1] == l21[i2] && l12[i1] < l22[i2] ) )
+	{ idx[i] = i1;    i1++; }
+      else
+	{ idx[i] = n1+i2; i2++; }
+      i++;
+    }
+
+  for ( ii=i1; i1 < n1; ii++ ) {idx[i] = i1;    i++; i1++; }
+  for ( ii=i2; i2 < n2; ii++ ) {idx[i] = n1+i2; i++; i2++; }
+
+  return;
+}
+
+static
+void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict add2, 
+	      double *restrict *restrict weights, int parent, int par_depth)
 {
   /*
     This routine is the core of merge-sort. It does the following
@@ -6976,7 +7004,6 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
 
      Parameters:
      -----------
-       int nsplit        | (only 2 allowed) number of segments to split the data
        long num_links    | length of arrays add1 and add2 (MUST be of same length
        int *add1 *add2   | arrays with addresses, that are used as sorting criteria (ascending)
        double ** weights | weights for each address that have to be kept in the same order 
@@ -6989,13 +7016,12 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
 
   static char func[] = "sort_par";
 
+  const int nsplit = 2;                      /* (only 2 allowed) number of segments to split the data */
   int nl[nsplit];                            /* number of links in each sub-array              */
-  int thread_id,thread_num;                  /* thread id and number of threads                */
   int who_am_i,depth,my_depth;               /* current depth, depth of children and index
 						to be parent in next call to sort_par          */
-  int num_procs;
-  int *add_srt, *add_end;                    /* arrays for start and end index of sub array    */
-  int **add1s, **add2s;                      /* pointers to sub arrays for sort and merge step */
+  int add_srt[nsplit], add_end[nsplit];      /* arrays for start and end index of sub array    */
+  int *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
   int *tmp;                                  /* pointer to buffer for merging of address lists */
   double *tmp2 = NULL;                       /* pointer to buffer for merging weight lists     */
   double **wgttmp = NULL;                    /* pointer to buffer for swap weights             */
@@ -7010,11 +7036,7 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
       exit(-1);
     }
 
-  add_srt = (int *)  malloc (nsplit*sizeof(int));
-  add_end = (int *)  malloc (nsplit*sizeof(int));
-  add1s   = (int **) malloc (nsplit*sizeof(int*));
-  add2s   = (int **) malloc (nsplit*sizeof(int*));
-  idx     = ( long * ) malloc ((num_links)*sizeof(long));
+  idx = (long *) malloc(num_links*sizeof(long));
 
   /* SPLIT AND SORT THE DATA FRAGMENTS */
   /*
@@ -7033,7 +7055,6 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
   nl[0]      = num_links/nsplit;   nl[1]      = num_links-nl[0];
   add_end[0] = nl[0];              add_end[1] = num_links;
 
-  num_procs = numThreads;
   depth = (int) (log(parent)/log(2));
 
 #if defined (_OPENMP)
@@ -7042,9 +7063,8 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
     {
       omp_set_nested(1);            
       if ( omp_get_nested() == 0 )
-	printf("Warning: openMP implementation seems to not support\n"
-	       "         nested parallelism. Maximum of CPUs used  \n"
-	       "         is 2 instead of %i.\n",num_procs);
+	printf("Warning: openMP implementation seems to not support nested parallelism.\n"
+	       "Maximum of CPUs used is 2 instead of %i.\n", ompNumThreads);
     }                                    
 #endif
 
@@ -7056,15 +7076,14 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
 
 #if defined (_OPENMP)
 #pragma omp parallel for if(depth<par_depth) \
-        private(i,n,m,wgttmp,thread_id,who_am_i,my_depth) \
-        shared(weights,thread_num) num_threads(2)
+        private(i,n,m,wgttmp,who_am_i,my_depth) \
+        shared(weights) num_threads(2)
 #endif
   for ( i=0; i < nsplit; i++ )
     {
 
       who_am_i = nsplit*parent+i;
       my_depth = (int) (log(parent)/log(2))+1;
-      int pow2d = 1 << my_depth;
 
 #if defined (_OPENMP)
       //      if ( 1 )
@@ -7097,20 +7116,26 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
                                                               /* ********************** */
   merge_lists(nl,add1s[0],add2s[0],add1s[1],add2s[1], idx);   /* MERGE THE SEGMENTS     */
                                                               /* ********************** */
-  tmp = malloc ( num_links*sizeof(int) );
+  tmp = malloc(num_links*sizeof(int));
   
+#if defined (_OPENMP)
 #pragma omp if ( depth < par_depth ) parallel for private(i) num_threads(2)
+#endif
   for ( i=0; i< num_links; i++ )
     tmp[i] = add1[idx[i]];
   
+#if defined (_OPENMP)
 #pragma omp if ( depth < par_depth ) parallel for private(i) num_threads(2)
+#endif
   for ( i=0; i< num_links; i++ )
     {
       add1[i] = tmp[i];
       tmp[i] = add2[idx[i]];
     }
   
+#if defined (_OPENMP)
 #pragma omp if ( depth < par_depth ) parallel for private(i) num_threads(2)
+#endif
   for ( i=0; i<num_links; i++ )
     add2[i] = tmp[i];
   
@@ -7119,30 +7144,30 @@ void sort_par(int nsplit, long num_links, long num_wts, int *add1, int *add2,
   
   tmp2 = (double *) malloc ( num_links*num_wts*sizeof(double) );
   
+#if defined (_OPENMP)
 #pragma omp if ( depth < par_depth ) parallel for private(i,n) num_threads(2)
+#endif
   for ( i=0; i<num_links; i++ )
     for ( n = 0; n< num_wts; n++ )
       tmp2[num_wts*i + n] = weights[n][idx[i]];
   
+#if defined (_OPENMP)
 #pragma omp if ( depth < par_depth ) parallel for private(i,n) num_threads(2)
+#endif
   for ( i=0; i<num_links; i++ )
     for ( n = 0; n< num_wts; n++ )
       weights[n][i] = tmp2[num_wts*i+n];
   
   free(tmp2);
   tmp2 = NULL;
+  
+  free(idx);
 
-free(add1s);
-free(add2s);
-free(add_srt);
-free(add_end);
-
-free(idx);
-
-return;
+  return;
 }
 
-void sort_iter(long num_links, long num_wts, int *add1, int *add2, double **weights,int parent)
+
+void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights, int parent)
 {
   /*
     This routine is an interface between the parallelized (merge-sort) 
@@ -7165,59 +7190,27 @@ void sort_iter(long num_links, long num_wts, int *add1, int *add2, double **weig
 		     been called before
 		   + determines number of threads to use on first call of sort_iter(...)
   */
+  static int first_sort_iter_call = 1;
+  static int par_depth = 1;
               
   if ( first_sort_iter_call )
     {
       first_sort_iter_call = 0; 
-      numThreads = parent;   
+      par_depth = (int)(log(parent)/log(2));
       parent = 1;
-      par_depth = (int)(log(numThreads)/log(2));
-
     }
 
   if ( num_links > MERGE_SORT_LIMIT_SIZE )
     {
-      sort_par(2,num_links,num_wts,add1,add2,weights,parent);
-      if ( VERBOSE ) printf (" finished iteration parent %i\n", parent);
-      return;
+      sort_par(num_links, num_wts, add1, add2, weights, parent, par_depth);
+      if ( cdoVerbose ) cdoPrint("Finished iteration parent %i\n", parent);
     }
-
-  sort_add(num_links,num_wts,add1,add2,weights);
-
-  return;
-
-}
-
-
-void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
-{      
-  /*
-    This routine writes to idx a list of indices relative to *l11 and *l12
-    --> l11, l12, and l21,l22 each need to be allocated in 
-        a signle block of memory
-    The order is thus, that (I) l11[idx[i]]<l11[idx[i+1]]	
-                        OR (II) l11[idx[i]]==l11[idx[i+1]] && l21[idx[i]]<l21[idx[i+1]]
-		       where 0 <= i < nl
-  */    		       
-
-
-  int i1=0, i2=0, i=0, ii;
-  const int n1=nl[0], n2=nl[1];
-
-  i=0;
-  while ( i2 < n2 && i1 < n1 ) 
+  else
     {
-      if ( ( l11[i1] < l21[i2] ) ||
-	   ( l11[i1] == l21[i2] && l12[i1] < l22[i2] ) )
-	{ idx[i] = i1;    i1++; }
-      else
-	{ idx[i] = n1+i2; i2++; }
-      i++;
+      sort_add(num_links, num_wts, add1, add2, weights);
     }
 
-  for ( ii=i1; i1 < n1; ii++ ) {idx[i] = i1;    i++; i1++; }
-  for ( ii=i2; i2 < n2; ii++ ) {idx[i] = n1+i2; i++; i2++; }
-
   return;
+
 }
 

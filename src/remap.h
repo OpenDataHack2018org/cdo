@@ -176,8 +176,7 @@ void reorder_links(remapvars_t *rv);
 
 void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights);
 void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights);
-void sort_iter(long num_links, long num_wts, int *add1, int *add2, double **weights, int parent);
-void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx);
+void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights, int parent);
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
 		       int remap_order, remapgrid_t rg, remapvars_t rv);
