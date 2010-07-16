@@ -2974,7 +2974,6 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
     }
 
   /* Loop over destination grid  */
-
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
@@ -4443,8 +4442,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
 	  last_loc, lcoinc, bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2) \
-  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)	\
-  schedule(dynamic,1)
+  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
 #endif
   for ( grid1_add = 0; grid1_add < grid1_size; grid1_add++ )
     {
@@ -4714,8 +4712,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
 	  last_loc, lcoinc, bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2) \
-  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)	\
-  schedule(dynamic,1)
+  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
 #endif
   for ( grid2_add = 0; grid2_add < grid2_size; grid2_add++ )
     {
@@ -7119,13 +7116,13 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   tmp = malloc(num_links*sizeof(int));
   
 #if defined (_OPENMP)
-#pragma omp if ( depth < par_depth ) parallel for private(i) num_threads(2)
+#pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
   for ( i=0; i< num_links; i++ )
     tmp[i] = add1[idx[i]];
   
 #if defined (_OPENMP)
-#pragma omp if ( depth < par_depth ) parallel for private(i) num_threads(2)
+#pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
   for ( i=0; i< num_links; i++ )
     {
@@ -7134,7 +7131,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
     }
   
 #if defined (_OPENMP)
-#pragma omp if ( depth < par_depth ) parallel for private(i) num_threads(2)
+#pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
   for ( i=0; i<num_links; i++ )
     add2[i] = tmp[i];
@@ -7145,14 +7142,14 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   tmp2 = (double *) malloc ( num_links*num_wts*sizeof(double) );
   
 #if defined (_OPENMP)
-#pragma omp if ( depth < par_depth ) parallel for private(i,n) num_threads(2)
+#pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
 #endif
   for ( i=0; i<num_links; i++ )
     for ( n = 0; n< num_wts; n++ )
       tmp2[num_wts*i + n] = weights[n][idx[i]];
   
 #if defined (_OPENMP)
-#pragma omp if ( depth < par_depth ) parallel for private(i,n) num_threads(2)
+#pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
 #endif
   for ( i=0; i<num_links; i++ )
     for ( n = 0; n< num_wts; n++ )
@@ -7211,6 +7208,5 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
     }
 
   return;
-
 }
 
