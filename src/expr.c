@@ -5,9 +5,13 @@
 
 #include "cdi.h"
 #include "cdo.h"
+#include "cdo_int.h"
+#include "field.h"
 #include "expr.h"
 #include "expr_yacc.h"
 
+
+#define	 UMISS(func, oper)  fprintf(stderr, "Internal problem in %s: missing value support not implemented for operation '%c'!\n", func, oper);
 
 typedef struct {
   int type;
@@ -73,12 +77,15 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   nodeType *p;
   int ngp, i;
   int nlev, k;
+  int nmiss;
   int gridID, zaxisID;
-  double missval;
+  double missval1, missval2;
 
-  gridID  = p2->gridID;
-  zaxisID = p2->zaxisID;
-  missval = p2->missval;
+  gridID   = p2->gridID;
+  zaxisID  = p2->zaxisID;
+  nmiss    = p2->nmiss;
+  missval1 = p2->missval;
+  missval2 = p2->missval;
 
   ngp  = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
@@ -90,40 +97,86 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
   p->u.var.nm = strdupx("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
-  p->missval  = missval;
+  p->missval  = missval1;
 
   p->data = (double *) malloc(ngp*nlev*sizeof(double));
 
   switch ( oper )
     {
     case '+':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->u.con.value + p2->data[i+k*ngp];
+      if ( nmiss > 0 )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = ADD(p1->u.con.value, p2->data[i+k*ngp]);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->u.con.value + p2->data[i+k*ngp];
+	}
       break;
     case '-':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->u.con.value - p2->data[i+k*ngp];
+      if ( nmiss > 0 )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = SUB(p1->u.con.value, p2->data[i+k*ngp]);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->u.con.value - p2->data[i+k*ngp];
+	}
       break;
     case '*':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->u.con.value * p2->data[i+k*ngp];
+      if ( nmiss > 0 )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = MUL(p1->u.con.value, p2->data[i+k*ngp]);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->u.con.value * p2->data[i+k*ngp];
+	}
       break;
     case '/':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->u.con.value / p2->data[i+k*ngp];
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = DIV(p1->u.con.value, p2->data[i+k*ngp]);
+	}
       break;
     case '^':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = pow(p1->u.con.value, p2->data[i+k*ngp]);
+      if ( nmiss > 0 )
+	{
+	  UMISS(func, oper);
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = pow(p1->u.con.value, p2->data[i+k*ngp]);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = pow(p1->u.con.value, p2->data[i+k*ngp]);
+	}
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", func, oper);
     }
+
+  nmiss = 0;
+  for ( k = 0; k < nlev; k++ )
+    for ( i = 0; i < ngp; i++ )
+      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval1) ) nmiss++;
+
+  p->nmiss = nmiss;
 
   if ( p2->tmpvar ) free(p2->data);
 
@@ -137,12 +190,15 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   nodeType *p;
   int ngp, i;
   int nlev, k;
+  int nmiss;
   int gridID, zaxisID;
-  double missval;
+  double missval1, missval2;
 
-  gridID  = p1->gridID;
-  zaxisID = p1->zaxisID;
-  missval = p1->missval;
+  gridID   = p1->gridID;
+  zaxisID  = p1->zaxisID;
+  nmiss    = p1->nmiss;
+  missval1 = p1->missval;
+  missval2 = p1->missval;
 
   ngp  = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
@@ -154,40 +210,93 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
   p->u.var.nm = strdupx("tmp");
   p->gridID   = gridID;
   p->zaxisID  = zaxisID;
-  p->missval  = missval;
+  p->missval  = missval1;
 
   p->data = (double *) malloc(ngp*nlev*sizeof(double));
 
   switch ( oper )
     {
     case '+':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->data[i+k*ngp] + p2->u.con.value;
+      if ( nmiss > 0 )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = ADD(p1->data[i+k*ngp], p2->u.con.value);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->data[i+k*ngp] + p2->u.con.value;
+	}
       break;
     case '-':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->data[i+k*ngp] - p2->u.con.value;
+      if ( nmiss > 0 )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = SUB(p1->data[i+k*ngp], p2->u.con.value);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->data[i+k*ngp] - p2->u.con.value;
+	}
       break;
     case '*':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->data[i+k*ngp] * p2->u.con.value;
+      if ( nmiss > 0 )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = MUL(p1->data[i+k*ngp], p2->u.con.value);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->data[i+k*ngp] * p2->u.con.value;
+	}
       break;
     case '/':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = p1->data[i+k*ngp] / p2->u.con.value;
+      if ( nmiss > 0 || IS_EQUAL(p2->u.con.value, 0) )
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = DIV(p1->data[i+k*ngp], p2->u.con.value);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = p1->data[i+k*ngp] / p2->u.con.value;
+	}
       break;
     case '^':
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = pow(p1->data[i+k*ngp], p2->u.con.value);
+      if ( nmiss > 0 )
+	{
+	  UMISS(func, oper);
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = pow(p1->data[i+k*ngp], p2->u.con.value);
+	}
+      else
+	{
+	  for ( k = 0; k < nlev; k++ )
+	    for ( i = 0; i < ngp; i++ )
+	      p->data[i+k*ngp] = pow(p1->data[i+k*ngp], p2->u.con.value);
+	}
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", func, oper);
     }
+
+  nmiss = 0;
+  for ( k = 0; k < nlev; k++ )
+    for ( i = 0; i < ngp; i++ )
+      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval1) ) nmiss++;
+
+  p->nmiss = nmiss;
 
   if ( p1->tmpvar ) free(p1->data);
 
@@ -305,6 +414,9 @@ void ex_copy(nodeType *p2, nodeType *p1)
   for ( k = 0; k < nlev; k++ )
     for ( i = 0; i < ngp; i++ )
       p2->data[i+k*ngp] = p1->data[i+k*ngp];
+
+  p2->missval = p1->missval;
+  p2->nmiss   = p1->nmiss;
 }
 
 static
@@ -584,7 +696,7 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 
 	  if ( varID == nvars )
 	    {
-	      cdoAbort("variable >%s< not found!", p->u.var.nm);
+	      cdoAbort("Variable >%s< not found!", p->u.var.nm);
 	    }
 	  else
 	    {
@@ -620,7 +732,10 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 	  p->missval = missval;
           p->nmiss   = 0;
 	  if ( ! parse_arg->init )
-	    p->data    = parse_arg->vardata1[varID];
+	    {
+	      p->data  = parse_arg->vardata1[varID];
+	      p->nmiss = parse_arg->nmiss[varID];
+	    }
 	  p->tmpvar  = 0;
 	  rnode = p;
 	}
@@ -689,8 +804,8 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 		  p->gridID  = parse_arg->gridID2;
 		  p->zaxisID = parse_arg->zaxisID2;
 		  p->missval = missval;
-		  p->data = parse_arg->vardata2[varID];
-		  p->tmpvar = 0;
+		  p->data    = parse_arg->vardata2[varID];
+		  p->tmpvar  = 0;
 
 		  ex_copy(p, rnode);
 
