@@ -7,6 +7,8 @@ Version 1.4.6 (?? September 2010):
      * bandpass: Bandpass filtering
      * lowpass:  Lowpass filtering
      * highpass: Highpass filtering
+   Changed operators:
+     * expr, exprf: added missing values support
    Fixed bugs:
      * seldate: open output file only when time steps found
 

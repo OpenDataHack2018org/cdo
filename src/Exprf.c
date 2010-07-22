@@ -24,7 +24,7 @@
       Exprf      aexprf          Append evaluated expressions from script file
 */
 /*
-Operatoren: +, -, *, \
+Operatoren: +, -, *, \, ^
 Functions: sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
 Functions: min, max, avg, std, var
 Constansts: M_PI, M_E

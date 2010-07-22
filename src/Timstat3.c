@@ -283,7 +283,7 @@ void *Timstat3(void *argument)
 	      if ( !DBL_IS_EQUAL(temp0, missval1) && temp0 < 0 ) /* This is possible because */
 		temp0 = 0;	                                 /* of rounding errors       */
 
-	      stddev_estimator = ROOT(DIV(temp0, deg_of_freedom));
+	      stddev_estimator = SQRT(DIV(temp0, deg_of_freedom));
 	      mean_estimator = -rconst;
 	      for ( j = 0; j < n_in; j++ )
 		{
@@ -301,7 +301,7 @@ void *Timstat3(void *argument)
 					     var_factor[j]), fnvals));
 		}
 
-	      norm = ROOT(temp1);
+	      norm = SQRT(temp1);
 	      
 	      temp2 = DIV(DIV(mean_estimator, norm), stddev_estimator);
 	      fractil = deg_of_freedom < 1 ? missval1 :

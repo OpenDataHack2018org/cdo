@@ -208,7 +208,7 @@ void *Timstat2(void *argument)
 	      temp5 = SUB(work[varID][levelID][3].ptr[i], DIV(temp3, nvals2));
 	      temp6 = MUL(temp4, temp5);
 
-	      work[varID][levelID][0].ptr[i] = DIV(temp1, ROOT(temp6));
+	      work[varID][levelID][0].ptr[i] = DIV(temp1, SQRT(temp6));
 	      /*
 		if ( work[varID][levelID][0].ptr[i] < -1)
 		  work[varID][levelID][0].ptr[i] = -1;

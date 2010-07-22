@@ -54,7 +54,7 @@ void trms(field_t field1, field_t field2, double *dp, field_t *field3)
 	rsumw = ADD(rsumw, wp);
       }
 
-  ravg = ROOT(DIV(rsum, rsumw));
+  ravg = SQRT(DIV(rsum, rsumw));
 
   if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 

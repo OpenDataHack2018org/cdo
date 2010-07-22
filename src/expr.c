@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <errno.h>
 
 #include "cdi.h"
 #include "cdo.h"
@@ -155,10 +156,9 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
     case '^':
       if ( nmiss > 0 )
 	{
-	  UMISS(func, oper);
 	  for ( k = 0; k < nlev; k++ )
 	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = pow(p1->u.con.value, p2->data[i+k*ngp]);
+	      p->data[i+k*ngp] = POW(p1->u.con.value, p2->data[i+k*ngp]);
 	}
       else
 	{
@@ -275,10 +275,9 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
     case '^':
       if ( nmiss > 0 )
 	{
-	  UMISS(func, oper);
 	  for ( k = 0; k < nlev; k++ )
 	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = pow(p1->data[i+k*ngp], p2->u.con.value);
+	      p->data[i+k*ngp] = POW(p1->data[i+k*ngp], p2->u.con.value);
 	}
       else
 	{
@@ -311,6 +310,13 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
   int ngp, ngp1, ngp2, i;
   int nlev, nlev1, nlev2, k;
   int loff1, loff2;
+  int nmiss, nmiss1, nmiss2;
+  double missval1, missval2;
+
+  nmiss1   = p1->nmiss;
+  nmiss2   = p2->nmiss;
+  missval1 = p1->missval;
+  missval2 = p2->missval;
 
   ngp1 = gridInqSize(p1->gridID);
   ngp2 = gridInqSize(p2->gridID);
@@ -366,29 +372,76 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
       switch ( oper )
 	{
 	case '+':
-	  for ( i = 0; i < ngp; i++ )
-	    p->data[i+k*ngp] = p1->data[i+loff1] + p2->data[i+loff2];
+	  if ( nmiss1 > 0 || nmiss2 > 0 )
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = ADD(p1->data[i+loff1], p2->data[i+loff2]);
+	    }
+	  else
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = p1->data[i+loff1] + p2->data[i+loff2];
+	    }
 	  break;
 	case '-':
-	  for ( i = 0; i < ngp; i++ )
-	    p->data[i+k*ngp] = p1->data[i+loff1] - p2->data[i+loff2];
+	  if ( nmiss1 > 0 || nmiss2 > 0 )
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = SUB(p1->data[i+loff1], p2->data[i+loff2]);
+	    }
+	  else
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = p1->data[i+loff1] - p2->data[i+loff2];
+	    }
 	  break;
 	case '*':
-	  for ( i = 0; i < ngp; i++ )
-	    p->data[i+k*ngp] = p1->data[i+loff1] * p2->data[i+loff2];
+	  if ( nmiss1 > 0 || nmiss2 > 0 )
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = MUL(p1->data[i+loff1], p2->data[i+loff2]);
+	    }
+	  else
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = p1->data[i+loff1] * p2->data[i+loff2];
+	    }
 	  break;
 	case '/':
-	  for ( i = 0; i < ngp; i++ )
-	    p->data[i+k*ngp] = p1->data[i+loff1] / p2->data[i+loff2];
+	  if ( nmiss1 > 0 || nmiss2 > 0 )
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = DIV(p1->data[i+loff1], p2->data[i+loff2]);
+	    }
+	  else
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = p1->data[i+loff1] / p2->data[i+loff2];
+	    }
 	  break;
 	case '^':
-	  for ( i = 0; i < ngp; i++ )
-	    p->data[i+k*ngp] = pow(p1->data[i+loff1], p2->data[i+loff2]);
+	  if ( nmiss1 > 0 || nmiss2 > 0 )
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = POW(p1->data[i+loff1], p2->data[i+loff2]);
+	    }
+	  else
+	    {
+	      for ( i = 0; i < ngp; i++ )
+		p->data[i+k*ngp] = pow(p1->data[i+loff1], p2->data[i+loff2]);
+	    }
 	  break;
 	default:
 	  cdoAbort("%s: operator %c unsupported!", func, oper);
 	}
     }
+
+  nmiss = 0;
+  for ( k = 0; k < nlev; k++ )
+    for ( i = 0; i < ngp; i++ )
+      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval1) ) nmiss++;
+
+  p->nmiss = nmiss;
 
   if ( p1->tmpvar ) free(p1->data);
   if ( p2->tmpvar ) free(p2->data);
@@ -491,10 +544,12 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
   int nlev, k;
   int gridID, zaxisID;
   int funcID = -1;
+  int nmiss;
   double missval;
 
   gridID  = p1->gridID;
   zaxisID = p1->zaxisID;
+  nmiss   = p1->nmiss;
   missval = p1->missval;
 
   ngp  = gridInqSize(gridID);
@@ -521,18 +576,33 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
   if ( funcID == -1 )
     cdoAbort("function %s not available!", fun);
 
-  if ( strcmp("log", fun) == 0 )
+  if ( nmiss > 0 )
     {
       for ( k = 0; k < nlev; k++ )
 	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = log(p1->data[i+k*ngp]);
+	  {
+	    errno = -1;
+	    p->data[i+k*ngp] = DBL_IS_EQUAL(p1->data[i+k*ngp], missval) ? missval : fun_sym_tbl[funcID].func(p1->data[i+k*ngp]);
+	    if ( errno == EDOM || errno == ERANGE ) p->data[i+k*ngp] = missval;
+	  }
     }
   else
     {
       for ( k = 0; k < nlev; k++ )
 	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = fun_sym_tbl[funcID].func(p1->data[i+k*ngp]);
+	  {
+	    errno = -1;
+	    p->data[i+k*ngp] = fun_sym_tbl[funcID].func(p1->data[i+k*ngp]);
+	    if ( errno == EDOM || errno == ERANGE ) p->data[i+k*ngp] = missval;
+	  }
     }
+
+  nmiss = 0;
+  for ( k = 0; k < nlev; k++ )
+    for ( i = 0; i < ngp; i++ )
+      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval) ) nmiss++;
+
+  p->nmiss = nmiss;
 
   if ( p1->tmpvar ) free(p1->data);
 
@@ -567,12 +637,14 @@ nodeType *ex_uminus_var(nodeType *p1)
   nodeType *p;
   int ngp, i;
   int nlev, k;
+  int nmiss;
   int gridID, zaxisID;
   double missval;
 
-  gridID  = p1->gridID;
-  zaxisID = p1->zaxisID;
-  missval = p1->missval;
+  gridID   = p1->gridID;
+  zaxisID  = p1->zaxisID;
+  nmiss    = p1->nmiss;
+  missval  = p1->missval;
 
   ngp  = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
@@ -588,10 +660,21 @@ nodeType *ex_uminus_var(nodeType *p1)
 
   p->data = (double *) malloc(ngp*nlev*sizeof(double));
 
-  for ( k = 0; k < nlev; k++ )
-    for ( i = 0; i < ngp; i++ )
-      p->data[i+k*ngp] = -(p1->data[i+k*ngp]);
+  if ( nmiss > 0 )
+    {
+      for ( k = 0; k < nlev; k++ )
+	for ( i = 0; i < ngp; i++ )
+	  p->data[i+k*ngp] = DBL_IS_EQUAL(p1->data[i+k*ngp], missval) ? missval : -(p1->data[i+k*ngp]);
+    }
+  else
+    {
+      for ( k = 0; k < nlev; k++ )
+	for ( i = 0; i < ngp; i++ )
+	  p->data[i+k*ngp] = -(p1->data[i+k*ngp]);
+    }
 
+  p->nmiss = nmiss;
+  
   return (p);
 }
 

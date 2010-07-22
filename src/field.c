@@ -42,9 +42,14 @@ double _FDIV_(double x, double y, double missval1, double missval2)
   return FDIV(x, y);
 }
 
-double _FROOT_(double x, double missval1)
+double _FPOW_(double x, double y, double missval1, double missval2)
 {
-  return FROOT(x);
+  return FPOW(x, y);
+}
+
+double _FSQRT_(double x, double missval1)
+{
+  return FSQRT(x);
 }
 
 
@@ -327,7 +332,7 @@ void fldrms(field_t field, field_t field2, field_t *field3)
     }
     */
 
-  ravg = ROOT(DIV(rsum, rsumw));
+  ravg = SQRT(DIV(rsum, rsumw));
 
   if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 
@@ -381,7 +386,7 @@ void varrms(field_t field, field_t field2, field_t *field3)
     }
     */
 
-  ravg = ROOT(DIV(rsum, rsumw));
+  ravg = SQRT(DIV(rsum, rsumw));
 
   if ( DBL_IS_EQUAL(ravg, missval1) ) rnmiss++;
 

@@ -1,3 +1,7 @@
+2010-07-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Module Expr: added missing value support [request: Marco van Hulten]
+
 2010-07-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridFromNCfile: check grid_dims

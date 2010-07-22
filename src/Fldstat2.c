@@ -58,7 +58,7 @@ double corr(double * restrict in0, double * restrict in1,
 
   out = wsum0 ?
         FDIV((sum01 * wsum0 - sum0 * sum1),
-	     FROOT((sum00 * wsum0 - sum0 * sum0) *
+	     FSQRT((sum00 * wsum0 - sum0 * sum0) *
 		   (sum11 * wsum0 - sum1 * sum1))) : missval;
 
   return (out);

@@ -144,7 +144,7 @@ void *Math(void *argument)
 	      break;
 	    case SQRT:
 	      for ( i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : ROOT(array1[i]);
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : SQRT(array1[i]);
 	      break;
 	    case EXP:
 	      for ( i = 0; i < gridsize; i++ )
