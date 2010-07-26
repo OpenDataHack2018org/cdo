@@ -20,7 +20,7 @@
 
 char *getProgname(char *string);
 char *getOperator(const char *argument);
-char *getOperatorName(char *xoperator);
+char *getOperatorName(const char *xoperator);
 
 char *makeArgument(int argc, char *argv[]);
 char *getFileArg(char *argument);

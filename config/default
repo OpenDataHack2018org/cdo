@@ -196,8 +196,22 @@ case "${HOSTNAME}" in
 	            --with-netcdf=$HOME/PROJ \
 	            CC=vcc CFLAGS="-O -Wv,-m3 -K4"
 	;;
+# x86_64-unknown-linux-gnu (rhel55)
+    lizard*)
+        LDFLAGS="-Wl,-rpath=/sw/rhel55-x64/jasper-1.900.1/lib:/sw/rhel55-x64/hdf5-1.8.5-threadsafe/lib:/sw/rhel55-x64/szip-2.1/lib:/sw/rhel55-x64/netcdf-4.1.1/lib -lpng"
+        export LDFLAGS
+	${CONFPATH}configure --prefix=$HOME/local/rhel55-x64 \
+                    --with-jasper=/sw/rhel55-x64/jasper-1.900.1 \
+                    --with-grib_api=/sw/rhel55-x64/grib_api-1.9.0 \
+                    --with-netcdf=/sw/rhel55-x64/netcdf-4.1.1 \
+                    --with-hdf5=/sw/rhel55-x64/hdf5-1.8.5-threadsafe \
+                    --with-szlib=/sw/rhel55-x64/szip-2.1 \
+                    --with-zlib=/usr \
+ 	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -O2"
+	;;
 # powerpc-ibm-aix5.2.0.0
     ecga*)
+
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/usr/local/apps/netCDF/3.6.2/LP64_underscore \
                     --with-szlib=$HOME/local \

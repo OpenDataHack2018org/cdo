@@ -12,16 +12,14 @@
 #include "expr_yacc.h"
 
 
-#define	 UMISS(func, oper)  fprintf(stderr, "Internal problem in %s: missing value support not implemented for operation '%c'!\n", func, oper);
-
 typedef struct {
   int type;
   char *name;                      /* function name            */
   double (*func)(double);          /* pointer to function      */
 }
-FUNC;
+func_t;
 
-static FUNC fun_sym_tbl[] =
+static func_t fun_sym_tbl[] =
 {
   /* scalar functions */
   {0, "sqrt",  sqrt},
@@ -76,8 +74,8 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 {
   static char func[] = "expr_con_var";
   nodeType *p;
-  int ngp, i;
-  int nlev, k;
+  long ngp, i;
+  long nlev;
   int nmiss;
   int gridID, zaxisID;
   double missval1, missval2;
@@ -107,64 +105,55 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
     case '+':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = ADD(p1->u.con.value, p2->data[i+k*ngp]);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = ADD(p1->u.con.value, p2->data[i]);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->u.con.value + p2->data[i+k*ngp];
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->u.con.value + p2->data[i];
 	}
       break;
     case '-':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = SUB(p1->u.con.value, p2->data[i+k*ngp]);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = SUB(p1->u.con.value, p2->data[i]);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->u.con.value - p2->data[i+k*ngp];
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->u.con.value - p2->data[i];
 	}
       break;
     case '*':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = MUL(p1->u.con.value, p2->data[i+k*ngp]);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = MUL(p1->u.con.value, p2->data[i]);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->u.con.value * p2->data[i+k*ngp];
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->u.con.value * p2->data[i];
 	}
       break;
     case '/':
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = DIV(p1->u.con.value, p2->data[i+k*ngp]);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = DIV(p1->u.con.value, p2->data[i]);
 	}
       break;
     case '^':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = POW(p1->u.con.value, p2->data[i+k*ngp]);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = POW(p1->u.con.value, p2->data[i]);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = pow(p1->u.con.value, p2->data[i+k*ngp]);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = pow(p1->u.con.value, p2->data[i]);
 	}
       break;
     default:
@@ -172,9 +161,8 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
     }
 
   nmiss = 0;
-  for ( k = 0; k < nlev; k++ )
-    for ( i = 0; i < ngp; i++ )
-      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval1) ) nmiss++;
+  for ( i = 0; i < ngp*nlev; i++ )
+    if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
 
@@ -188,8 +176,8 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
   static char func[] = "expr_var_con";
   nodeType *p;
-  int ngp, i;
-  int nlev, k;
+  long ngp, i;
+  long nlev;
   int nmiss;
   int gridID, zaxisID;
   double missval1, missval2;
@@ -219,71 +207,61 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
     case '+':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = ADD(p1->data[i+k*ngp], p2->u.con.value);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = ADD(p1->data[i], p2->u.con.value);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->data[i+k*ngp] + p2->u.con.value;
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->data[i] + p2->u.con.value;
 	}
       break;
     case '-':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = SUB(p1->data[i+k*ngp], p2->u.con.value);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = SUB(p1->data[i], p2->u.con.value);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->data[i+k*ngp] - p2->u.con.value;
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->data[i] - p2->u.con.value;
 	}
       break;
     case '*':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = MUL(p1->data[i+k*ngp], p2->u.con.value);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = MUL(p1->data[i], p2->u.con.value);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->data[i+k*ngp] * p2->u.con.value;
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->data[i] * p2->u.con.value;
 	}
       break;
     case '/':
       if ( nmiss > 0 || IS_EQUAL(p2->u.con.value, 0) )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = DIV(p1->data[i+k*ngp], p2->u.con.value);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = DIV(p1->data[i], p2->u.con.value);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = p1->data[i+k*ngp] / p2->u.con.value;
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->data[i] / p2->u.con.value;
 	}
       break;
     case '^':
       if ( nmiss > 0 )
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = POW(p1->data[i+k*ngp], p2->u.con.value);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = POW(p1->data[i], p2->u.con.value);
 	}
       else
 	{
-	  for ( k = 0; k < nlev; k++ )
-	    for ( i = 0; i < ngp; i++ )
-	      p->data[i+k*ngp] = pow(p1->data[i+k*ngp], p2->u.con.value);
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = pow(p1->data[i], p2->u.con.value);
 	}
       break;
     default:
@@ -291,9 +269,8 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
     }
 
   nmiss = 0;
-  for ( k = 0; k < nlev; k++ )
-    for ( i = 0; i < ngp; i++ )
-      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval1) ) nmiss++;
+  for ( i = 0; i < ngp*nlev; i++ )
+    if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
 
@@ -307,9 +284,9 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 {
   static char func[] = "expr_var_var";
   nodeType *p;
-  int ngp, ngp1, ngp2, i;
-  int nlev, nlev1, nlev2, k;
-  int loff1, loff2;
+  long ngp, ngp1, ngp2, i;
+  long nlev, nlev1, nlev2, k;
+  long loff1, loff2;
   int nmiss, nmiss1, nmiss2;
   double missval1, missval2;
 
@@ -437,9 +414,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
     }
 
   nmiss = 0;
-  for ( k = 0; k < nlev; k++ )
-    for ( i = 0; i < ngp; i++ )
-      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval1) ) nmiss++;
+  for ( i = 0; i < ngp*nlev; i++ )
+    if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
 
   p->nmiss = nmiss;
 
@@ -452,8 +428,8 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 static
 void ex_copy(nodeType *p2, nodeType *p1)
 {
-  int ngp, ngp1, ngp2, i;
-  int nlev, k;
+  long ngp, ngp1, ngp2, i;
+  long nlev;
 
   if ( cdoVerbose )
     printf("\tcopy %s\n", p1->u.var.nm);
@@ -464,9 +440,8 @@ void ex_copy(nodeType *p2, nodeType *p1)
   ngp = ngp2;
   nlev = zaxisInqSize(p2->zaxisID);
 
-  for ( k = 0; k < nlev; k++ )
-    for ( i = 0; i < ngp; i++ )
-      p2->data[i+k*ngp] = p1->data[i+k*ngp];
+  for ( i = 0; i < ngp*nlev; i++ )
+    p2->data[i] = p1->data[i];
 
   p2->missval = p1->missval;
   p2->nmiss   = p1->nmiss;
@@ -540,8 +515,8 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 {
   static char func[] = "ex_fun_var";
   nodeType *p;
-  int ngp, i;
-  int nlev, k;
+  long ngp, i;
+  long nlev;
   int gridID, zaxisID;
   int funcID = -1;
   int nmiss;
@@ -578,29 +553,26 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 
   if ( nmiss > 0 )
     {
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  {
-	    errno = -1;
-	    p->data[i+k*ngp] = DBL_IS_EQUAL(p1->data[i+k*ngp], missval) ? missval : fun_sym_tbl[funcID].func(p1->data[i+k*ngp]);
-	    if ( errno == EDOM || errno == ERANGE ) p->data[i+k*ngp] = missval;
-	  }
+      for ( i = 0; i < ngp*nlev; i++ )
+	{
+	  errno = -1;
+	  p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : fun_sym_tbl[funcID].func(p1->data[i]);
+	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
+	}
     }
   else
     {
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  {
-	    errno = -1;
-	    p->data[i+k*ngp] = fun_sym_tbl[funcID].func(p1->data[i+k*ngp]);
-	    if ( errno == EDOM || errno == ERANGE ) p->data[i+k*ngp] = missval;
-	  }
+      for ( i = 0; i < ngp*nlev; i++ )
+	{
+	  errno = -1;
+	  p->data[i] = fun_sym_tbl[funcID].func(p1->data[i]);
+	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
+	}
     }
 
   nmiss = 0;
-  for ( k = 0; k < nlev; k++ )
-    for ( i = 0; i < ngp; i++ )
-      if ( DBL_IS_EQUAL(p->data[i+k*ngp], missval) ) nmiss++;
+  for ( i = 0; i < ngp*nlev; i++ )
+    if ( DBL_IS_EQUAL(p->data[i], missval) ) nmiss++;
 
   p->nmiss = nmiss;
 
@@ -635,8 +607,8 @@ nodeType *ex_uminus_var(nodeType *p1)
 {
   static char func[] = "ex_uminus_var";
   nodeType *p;
-  int ngp, i;
-  int nlev, k;
+  long ngp, i;
+  long nlev;
   int nmiss;
   int gridID, zaxisID;
   double missval;
@@ -662,15 +634,13 @@ nodeType *ex_uminus_var(nodeType *p1)
 
   if ( nmiss > 0 )
     {
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = DBL_IS_EQUAL(p1->data[i+k*ngp], missval) ? missval : -(p1->data[i+k*ngp]);
+      for ( i = 0; i < ngp*nlev; i++ )
+	p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : -(p1->data[i]);
     }
   else
     {
-      for ( k = 0; k < nlev; k++ )
-	for ( i = 0; i < ngp; i++ )
-	  p->data[i+k*ngp] = -(p1->data[i+k*ngp]);
+      for ( i = 0; i < ngp*nlev; i++ )
+	p->data[i] = -(p1->data[i]);
     }
 
   p->nmiss = nmiss;

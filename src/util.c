@@ -68,7 +68,7 @@ char *getOperator(const char *argument)
 
 char *operatorAlias(char *operatorName);
 
-char *getOperatorName(char *operatorArg)
+char *getOperatorName(const char *operatorArg)
 {
   static char func[] = "getOperatorName";
   char *commapos;
@@ -145,6 +145,7 @@ char *getFileArg(char *argument)
 
   return (fileArg);
 }
+
 
 void input_int(char *arg, int intarr[], int maxint, int *nintfound)
 {

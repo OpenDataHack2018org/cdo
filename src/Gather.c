@@ -92,7 +92,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       gridID = vlistGrid(ef[fileID].vlistID, igrid);
       gridtype = gridInqType(gridID);
       if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ||
-	     (gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)) )
+	    (gridtype == GRID_GENERIC && gridInqXsize(gridID) > 0 && gridInqYsize(gridID) > 0)) )
 	cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
       if ( xsize == 0 ) xsize = gridInqXsize(gridID);
@@ -111,20 +111,20 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       xyinfo[fileID].y  = yvals[fileID][0];
       xyinfo[fileID].id = fileID;
     }
-  /*
+  
   for ( fileID = 0; fileID < nfiles; fileID++ )
     printf("1 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
+  
   qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpx);  	      
-  /*
+  
   for ( fileID = 0; fileID < nfiles; fileID++ )
     printf("2 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
+  
   qsort(xyinfo, nfiles, sizeof(xyinfo_t), cmpxy);  	      
-  /*
+  
   for ( fileID = 0; fileID < nfiles; fileID++ )
     printf("3 %d %g %g \n",  xyinfo[fileID].id, xyinfo[fileID].x, xyinfo[fileID].y);
-  */
+  
   nx = 1;
   for ( fileID = 1; fileID < nfiles; fileID++ )
     {
