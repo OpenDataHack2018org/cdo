@@ -89,8 +89,8 @@ void *Ymonpctl(void *argument)
   vlistID3 = streamInqVlist(streamID3);
   vlistID4 = vlistDuplicate(vlistID1);
 
-  vlistCompare(vlistID1, vlistID2, func_hrd);
-  vlistCompare(vlistID1, vlistID3, func_hrd);
+  vlistCompare(vlistID1, vlistID2, CMP_HRD);
+  vlistCompare(vlistID1, vlistID3, CMP_HRD);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);

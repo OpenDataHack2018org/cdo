@@ -78,7 +78,7 @@ void *Cond(void *argument)
     }
 
   if ( filltype == FILL_NONE )
-    vlistCompare(vlistID1, vlistID2, func_sft);
+    vlistCompare(vlistID1, vlistID2, CMP_SFT);
   
   nospec(vlistID1);
   nospec(vlistID2);

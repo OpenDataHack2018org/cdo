@@ -94,7 +94,7 @@ void *Timstat3(void *argument)
       if ( is > 0 )
 	{
 	  vlistID2 = streamInqVlist(streamID[is]);
-	  vlistCompare(vlistID[0], vlistID2, func_sft);
+	  vlistCompare(vlistID[0], vlistID2, CMP_SFT);
 	}
     }
 

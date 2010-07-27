@@ -60,8 +60,8 @@ void *Subtrend(void *argument)
   vlistID3 = streamInqVlist(streamID3);
   vlistID4 = vlistDuplicate(vlistID1);
 
-  vlistCompare(vlistID1, vlistID2, func_sft);
-  vlistCompare(vlistID1, vlistID3, func_sft);
+  vlistCompare(vlistID1, vlistID2, CMP_SFT);
+  vlistCompare(vlistID1, vlistID3, CMP_SFT);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID4 = taxisDuplicate(taxisID1);

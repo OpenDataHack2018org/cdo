@@ -109,7 +109,6 @@ int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
 
 int     vlistIsSzipped(int vlistID);
-void    vlistCompare(int vlistID1, int vlistID2, int function);
 
 int  gridWeights(int gridID, double *weights);
 int  gridGenArea(int gridID, double *area);

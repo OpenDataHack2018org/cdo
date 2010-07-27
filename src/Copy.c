@@ -101,8 +101,8 @@ void *Copy(void *argument)
 	}
       else
 	{
-	  vlistCompare(vlistID1, vlistID2, func_sft);
-	  /* vlistCompare(vlistID1, vlistID2, func_hrd); */
+	  vlistCompare(vlistID1, vlistID2, CMP_SFT);
+	  /* vlistCompare(vlistID1, vlistID2, CMP_HRD); */
 	}
 
       tsID1 = 0;

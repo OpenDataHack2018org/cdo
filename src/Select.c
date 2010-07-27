@@ -649,8 +649,8 @@ void *Select(void *argument)
 	}
       else
 	{
-	  vlistCompare(vlistID0, vlistID1, func_sft);
-	  /* vlistCompare(vlistID1, vlistID2, func_hrd); */
+	  vlistCompare(vlistID0, vlistID1, CMP_SFT);
+	  /* vlistCompare(vlistID1, vlistID2, CMP_HRD); */
 	}
 
       tsID1 = 0;

@@ -48,7 +48,7 @@ void *Diff(void *argument)
   int taxisID;
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
-  int lfunc;
+  int cmpflag;
   char varname[128];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];	  
@@ -74,14 +74,9 @@ void *Diff(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = streamInqVlist(streamID2);
 
-  lfunc = func_sftn;
-  /*
-  if ( operatorID == DIFFV )
-    lfunc = func_sftn;
-  else
-    lfunc = func_sftc;
-  */
-  vlistCompare(vlistID1, vlistID2, lfunc);
+  cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
+
+  vlistCompare(vlistID1, vlistID2, cmpflag);
 
   gridsize = vlistGridsizeMax(vlistID1);
 

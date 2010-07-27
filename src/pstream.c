@@ -1259,7 +1259,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  vlistIDnew = streamInqVlist(fileID);
 	  if ( cdoTimer ) timer_stop(timer_read);
 
-	  vlistCompare(vlistIDold, vlistIDnew, func_hrd);
+	  vlistCompare(vlistIDold, vlistIDnew, CMP_HRD);
 	  vlistDestroy(vlistIDold);
 #if  defined  (HAVE_LIBPTHREAD)
 	  pthread_mutex_unlock(&streamOpenReadMutex);

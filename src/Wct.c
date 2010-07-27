@@ -109,7 +109,7 @@ void *Wct(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);
 
-  vlistCompare(vlistID1, vlistID2, func_sft);
+  vlistCompare(vlistID1, vlistID2, CMP_SFT);
   
   gridsize = vlistGridsizeMax(vlistID1);
 

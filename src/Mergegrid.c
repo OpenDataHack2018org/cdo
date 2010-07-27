@@ -182,7 +182,7 @@ void *Mergegrid(void *argument)
 
   vlistID2 = streamInqVlist(streamID2);
 
-  vlistCompare(vlistID1, vlistID2, func_code);
+  vlistCompare(vlistID1, vlistID2, CMP_CODE | CMP_NLEVEL);
 
   ndiffgrids = 0;
   for ( index = 1; index < vlistNgrids(vlistID1); index++ )

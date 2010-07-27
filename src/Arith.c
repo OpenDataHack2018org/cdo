@@ -123,7 +123,7 @@ void *Arith(void *argument)
     }
 
   if ( filltype == FILL_NONE )
-    vlistCompare(vlistID1, vlistID2, func_sft);
+    vlistCompare(vlistID1, vlistID2, CMP_SFT);
 
   gridsize = vlistGridsizeMax(vlistIDx1);
 
@@ -214,7 +214,7 @@ void *Arith(void *argument)
 		  vlistID2 = streamInqVlist(streamID2);
 		  vlistIDx2 = vlistID2;
 
-		  vlistCompare(vlistID1, vlistID2, func_sft);
+		  vlistCompare(vlistID1, vlistID2, CMP_SFT);
 
 		  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
 		  if ( nrecs2 == 0 )
