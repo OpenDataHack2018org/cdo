@@ -934,8 +934,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     }
   else
     {
-      cdoWarning("Unknown units supplied for grid1 center lat/lon: "
-		 "proceeding assuming radians");
+      cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
     }
 
   if ( lgrid1_destroy ) gridDestroy(gridID1);
@@ -996,8 +995,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     }
   else
     {
-      cdoWarning("Unknown units supplied for grid2 center lat/lon: "
-		 "proceeding assuming radians");
+      cdoWarning("Unknown units supplied for grid2 center lat/lon: proceeding assuming radians");
     }
 
   if ( lgrid2_destroy ) gridDestroy(gridID2);

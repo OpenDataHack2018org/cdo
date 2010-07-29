@@ -50,23 +50,26 @@ void *Gridcell(void *argument)
 
   cdoInitialize(argument);
 
-  envstr = getenv("PLANET_RADIUS");
-  if ( envstr )
-    {
-      double fval;
-      fval = atof(envstr);
-      if ( fval > 0 )
-	{
-	  PlanetRadius = fval;
-	  if ( cdoVerbose )
-	    cdoPrint("Set PlanetRadius to %g", PlanetRadius);
-	}
-    }
-
   GRIDAREA = cdoOperatorAdd("gridarea",     0,  0, NULL);
   GRIDWGTS = cdoOperatorAdd("gridweights",  0,  0, NULL);
 
   operatorID = cdoOperatorID();
+
+  if ( operatorID == GRIDAREA || operatorID == GRIDWGTS )
+    {
+      envstr = getenv("PLANET_RADIUS");
+      if ( envstr )
+	{
+	  double fval;
+	  fval = atof(envstr);
+	  if ( fval > 0 )
+	    {
+	      PlanetRadius = fval;
+	      if ( cdoVerbose )
+		cdoPrint("Set PlanetRadius to %g", PlanetRadius);
+	    }
+	}
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -120,20 +123,12 @@ void *Gridcell(void *argument)
   if ( operatorID == GRIDAREA )
     {
       gridtype = gridInqType(gridID);
-      if ( gridtype != GRID_LONLAT      &&
-	   gridtype != GRID_GAUSSIAN    &&
-	   gridtype != GRID_LCC     &&
-	   gridtype != GRID_GME         &&
-	   gridtype != GRID_CURVILINEAR &&
-	   gridtype != GRID_CELL )
-	{
-	  if ( gridInqType(gridID) == GRID_GAUSSIAN_REDUCED )
-	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
-		     gridNamePtr(gridtype));
-	  else
-	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
-	}
-      else
+      if ( gridtype == GRID_LONLAT      ||
+	   gridtype == GRID_GAUSSIAN    ||
+	   gridtype == GRID_LCC         ||
+	   gridtype == GRID_GME         ||
+	   gridtype == GRID_CURVILINEAR ||
+	   gridtype == GRID_CELL )
 	{
 	  if ( gridHasArea(gridID) )
 	    {
@@ -153,6 +148,14 @@ void *Gridcell(void *argument)
 	      for ( i = 0; i < gridsize; ++i )
 		grid_area[i] *= PlanetRadius*PlanetRadius;
 	    }
+	}
+      else
+	{
+	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
+	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
+		     gridNamePtr(gridtype));
+	  else
+	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
 	}
 
       pdata = grid_area;
