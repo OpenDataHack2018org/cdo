@@ -107,10 +107,14 @@ int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 }
 
 
+void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
+		  int nlon1, int nlat1, double *xvals1, double *yvals1,
+		  int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22);
+
 static
-void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+void genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  static char func[] = "genlonlatbox";  
+  static char func[] = "genlonlatgrid";  
   int nlon1, nlat1;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
@@ -131,56 +135,9 @@ void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
 
-  xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
-  if ( IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;
-  xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
-  xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
-
-  for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
-  for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
-
-  if ( *lon22 >= nlon1 ) (*lon22)--;
-
-  xlon1 -= 360;
-  xlon2 -= 360;
-
-  for ( *lon11 = 0; xvals1[*lon11] < xlon1; (*lon11)++ );
-  for ( *lon12 = *lon11; *lon12 < nlon1 && xvals1[*lon12] < xlon2; (*lon12)++ );
-
-  (*lon12)--;
-
-  if ( *lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0 )
-    cdoAbort("Longitudinal dimension is too small!");
-
-  if ( yvals1[0] > yvals1[nlat1 - 1] )
-    {
-      if ( xlat1 > xlat2 )
-	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat1; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat2; (*lat2)-- );
-	}
-      else
-	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] > xlat2; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] < xlat1; (*lat2)-- );
-	}
-    }
-  else
-    {
-      if ( xlat1 < xlat2 )
-	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat1; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat2; (*lat2)-- );
-	}
-      else
-	{
-	  for ( *lat1 = 0; *lat1 < nlat1 && yvals1[*lat1] < xlat2; (*lat1)++ );
-	  for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat1; (*lat2)-- );
-	}
-    }
-
-  if ( *lat2 - *lat1 + 1 <= 0 )
-    cdoAbort("Latitudinal dimension is too small!");
+  genlonlatbox(xlon1, xlon2, xlat1, xlat2,
+	       nlon1, nlat1, xvals1, yvals1,
+	       lat1, lat2, lon11, lon12, lon21, lon22);
 
   free(xvals1);
   free(yvals1);
@@ -457,7 +414,7 @@ void *Maskbox(void *argument)
  
   if ( operatorID == MASKLONLATBOX )
     {
-      genlonlatbox(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
+      genlonlatgrid(gridID, &lat1, &lat2, &lon11, &lon12, &lon21, &lon22);
       maskbox(mask, gridID, lat1, lat2, lon11, lon12, lon21, lon22);
     }
   if ( operatorID == MASKINDEXBOX )

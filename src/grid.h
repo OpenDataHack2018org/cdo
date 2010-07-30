@@ -74,4 +74,5 @@ void ijll_lc(double i, double j, proj_info_t proj, double *lat, double *lon);
 int W3FB12(double xi, double xj, double alat1, double elon1, double dx,
 	   double elonv, double alatan, double *alat, double *elon);
 */
+
 #endif  /* _GRID_H */
