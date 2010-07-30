@@ -472,11 +472,10 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	  *lat2 = iymax;
 	  *lon21 = ixmin;
 	  *lon22 = ixmax;
-	}
-      
-      if ( cdoVerbose )
-	fprintf(stderr, " ixmin=%d, ixmax=%d, iymin=%d, iymax=%d\n", *lon21, *lon22, *lat1, *lat2);
-      
+	}      
+
+      if ( *lat2 - *lat1 + 1 <= 0 )
+	cdoAbort("Latitudinal dimension is too small!");
     }
   else
     {
@@ -498,7 +497,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
       for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
 
-      if ( *lon22 >= nlon1 ) (*lon22)--;
+      if ( *lon22 >= nlon1 || xvals1[*lon22] > xlon2 ) (*lon22)--;
 
       xlon1 -= 360;
       xlon2 -= 360;
@@ -537,15 +536,11 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	      for ( *lat2 = nlat1 - 1; *lat2 && yvals1[*lat2] > xlat1; (*lat2)-- );
 	    }
 	}
+
+      if ( *lat2 - *lat1 + 1 <= 0 )
+	cdoAbort("Latitudinal dimension is too small!");
     }
 
-  if ( *lat2 - *lat1 + 1 <= 0 )
-    cdoAbort("Latitudinal dimension is too small!");
-
-  /*
-  if ( (*lon22 - *lon21 + 1 <= 0)  && (*lon12 - *lon11 + 1 <= 0)  )
-    cdoAbort("Longitudinal dimension is too small!");
-  */
   free(xvals1);
   free(yvals1);
 
@@ -833,6 +828,13 @@ void *Selbox(void *argument)
 	    cdoPrint("Use option -R to convert Gaussian reduced grid to a regular grid!");
 	  cdoAbort("Unsupported grid type!");
 	}
+    }
+
+  if ( cdoVerbose )
+    {
+      if ( gridtype != GRID_CELL )
+	cdoPrint("idx1,idx2,idy1,idy2: %d,%d,%d,%d",
+		 sbox[0].lon21+1, sbox[0].lon22+1, sbox[0].lat1+1, sbox[0].lat2+1);
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
