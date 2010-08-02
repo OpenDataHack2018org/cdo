@@ -650,10 +650,10 @@ void *Outputgmt(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  if ( gridInqMask(gridID, NULL) )
+  if ( gridInqMaskGME(gridID, NULL) )
     {
       grid_mask = (int *) malloc(gridsize*sizeof(int));
-      gridInqMask(gridID, grid_mask);
+      gridInqMaskGME(gridID, grid_mask);
     }
 
   if ( gridInqType(gridID) != GRID_CELL )

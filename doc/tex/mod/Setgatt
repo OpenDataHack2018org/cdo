@@ -61,7 +61,7 @@ dimensions: ...
 variables: ...
 
 // global attributes:
-                :myatt = "myattcontens" ;
+                :myatt = "myattcontents" ;
 }
 @EndVerbatim
 @EndExample

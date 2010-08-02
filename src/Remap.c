@@ -534,7 +534,7 @@ void *Remap(void *argument)
 	  remaps[0].grid.grid2_vgpm = (int *) realloc(remaps[0].grid.grid2_vgpm,
 						      gridInqSize(gridID2)*sizeof(int));
 	  gridID2_gme = gridToCell(gridID2);
-	  gridInqMask(gridID2_gme, remaps[0].grid.grid2_vgpm);
+	  gridInqMaskGME(gridID2_gme, remaps[0].grid.grid2_vgpm);
 	  for ( i = 0; i < gridsize2; ++i )
 	    if ( remaps[0].grid.grid2_vgpm[i] ) isize++;
 	  gridsize2 = isize;

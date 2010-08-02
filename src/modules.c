@@ -281,7 +281,7 @@ void *Wct(void *argument);
 #define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
 #define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", \
                                  "gridboxvar", "gridboxstd"}
-#define  GridcellOperators      {"gridarea", "gridweights"}
+#define  GridcellOperators      {"gridarea", "gridweights", "gridmask"}
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
 #define  ImportamsrOperators    {"import_amsr"}

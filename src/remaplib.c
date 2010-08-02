@@ -914,7 +914,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 #endif
   for ( i = 0; i < grid1_size; i++ ) rg->grid1_mask[i] = TRUE;
 
-  if ( gridInqType(rg->gridID1) == GRID_GME ) gridInqMask(gridID1_gme, rg->grid1_vgpm);
+  if ( gridInqType(rg->gridID1) == GRID_GME ) gridInqMaskGME(gridID1_gme, rg->grid1_vgpm);
 
   /* Convert lat/lon units if required */
 
@@ -975,7 +975,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 #endif
   for ( i = 0; i < grid2_size; i++ ) rg->grid2_mask[i] = TRUE;
 
-  if ( gridInqType(rg->gridID2) == GRID_GME ) gridInqMask(gridID2_gme, rg->grid2_vgpm);
+  if ( gridInqType(rg->gridID2) == GRID_GME ) gridInqMaskGME(gridID2_gme, rg->grid2_vgpm);
 
   /* Convert lat/lon units if required */
 
@@ -6761,7 +6761,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   remapGridRealloc(rv->map_type, rg);
 
-  if ( gridInqType(gridID1) == GRID_GME ) gridInqMask(gridID1_gme_c, rg->grid1_vgpm);    
+  if ( gridInqType(gridID1) == GRID_GME ) gridInqMaskGME(gridID1_gme_c, rg->grid1_vgpm);    
 
   rv->pinit = TRUE;
   for ( i = 0; i < 4; i++ ) rv->wts[i] = NULL;

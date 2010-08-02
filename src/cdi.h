@@ -490,6 +490,9 @@ char   *gridNamePtr(int gridtype);
 
 void    gridCompress(int gridID);
 
+void    gridDefMaskGME(int gridID, const int *mask_vec);
+int     gridInqMaskGME(int gridID, int *mask_vec);
+
 void    gridDefMask(int gridID, const int *mask_vec);
 int     gridInqMask(int gridID, int *mask_vec);
 

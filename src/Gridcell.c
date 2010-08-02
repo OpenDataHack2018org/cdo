@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
 
       Gridcell   gridarea        Grid cell area in m^2
       Gridcell   gridweights     Grid cell weights
+      Gridcell   gridmask        Grid mask
 */
 
 
@@ -32,19 +33,18 @@
 void *Gridcell(void *argument)
 {
   static char func[] = "Gridcell";
-  int GRIDAREA, GRIDWGTS;
+  int GRIDAREA, GRIDWGTS, GRIDMASK;
   int operatorID;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridID, zaxisID;
-  int gridsize, gridtype;
+  int gridtype;
   int status;
   int ngrids;
   int tsID, varID, levelID, taxisID;
-  double *grid_area = NULL;
-  double *grid_wgts = NULL;
-  double *pdata;
+  long i, gridsize;
   char *envstr;
+  double *array = NULL;
   double  EarthRadius = 6371000; /* default radius of the earth in m */
   double PlanetRadius = EarthRadius;
 
@@ -52,6 +52,7 @@ void *Gridcell(void *argument)
 
   GRIDAREA = cdoOperatorAdd("gridarea",     0,  0, NULL);
   GRIDWGTS = cdoOperatorAdd("gridweights",  0,  0, NULL);
+  GRIDMASK = cdoOperatorAdd("gridmask",     0,  0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -96,7 +97,14 @@ void *Gridcell(void *argument)
       vlistDefVarUnits(vlistID2, varID, "m2");
     }
   else if ( operatorID == GRIDWGTS )
-    vlistDefVarName(vlistID2, varID, "cell_weights");
+    {
+      vlistDefVarName(vlistID2, varID, "cell_weights");
+    }
+  else if ( operatorID == GRIDMASK )
+    {
+      vlistDefVarName(vlistID2, varID, "grid_mask");
+      vlistDefVarDatatype(vlistID2, varID, DATATYPE_UINT8);
+    }
 
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID);
@@ -108,8 +116,7 @@ void *Gridcell(void *argument)
 
 
   gridsize = gridInqSize(gridID);
-  grid_area = (double *) malloc(gridsize*sizeof(double));
-  grid_wgts = (double *) malloc(gridsize*sizeof(double));
+  array = (double *) malloc(gridsize*sizeof(double));
 
 
   tsID = 0;
@@ -133,20 +140,18 @@ void *Gridcell(void *argument)
 	  if ( gridHasArea(gridID) )
 	    {
 	      if ( cdoVerbose ) cdoPrint("Using existing grid cell area!");
-	      gridInqArea(gridID, grid_area);
+	      gridInqArea(gridID, array);
 	    }
 	  else
 	    {
-	      int i;
-
-	      status = gridGenArea(gridID, grid_area);
+	      status = gridGenArea(gridID, array);
 	      if ( status == 1 )
 		cdoAbort("Grid corner missing!");
 	      else if ( status == 2 )
 		cdoAbort("Can't compute grid cell areas for this grid!");
 
 	      for ( i = 0; i < gridsize; ++i )
-		grid_area[i] *= PlanetRadius*PlanetRadius;
+		array[i] *= PlanetRadius*PlanetRadius;
 	    }
 	}
       else
@@ -157,26 +162,37 @@ void *Gridcell(void *argument)
 	  else
 	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
 	}
-
-      pdata = grid_area;
     }
-  else
+  else if ( operatorID == GRIDWGTS )
     {
-      status = gridWeights(gridID, grid_wgts);
+      status = gridWeights(gridID, array);
       if ( status != 0 )
 	  cdoWarning("Using constant grid cell area weights!");
+    }
+  else if ( operatorID == GRIDMASK )
+    {
+      int *mask;
+      mask = (int *) malloc(gridsize*sizeof(int));
+      if ( gridInqMask(gridID, NULL) )
+	{
+	  gridInqMask(gridID, mask);
+	}
+      else
+	{
+	  for ( i = 0; i < gridsize; ++i ) mask[i] = 1;
+	}
 
-      pdata = grid_wgts;
+      for ( i = 0; i < gridsize; ++i ) array[i] = mask[i];
+      free(mask);
     }
 
-  streamWriteRecord(streamID2, pdata, 0);
+  streamWriteRecord(streamID2, array, 0);
 
 
   streamClose(streamID2);
   streamClose(streamID1);
 
-  if ( grid_area ) free(grid_area);
-  if ( grid_wgts ) free(grid_wgts);
+  if ( array ) free(array);
 
   cdoFinish();
 

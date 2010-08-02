@@ -975,7 +975,7 @@ int gridToCell(int gridID1)
 	gridDefXvals(gridID2, xvals);
 	gridDefYvals(gridID2, yvals);
 
-	gridDefMask(gridID2, imask);
+	gridDefMaskGME(gridID2, imask);
 
 	gridDefNvertex(gridID2, nv);
 
@@ -1201,7 +1201,7 @@ int gridGenArea(int gridID, double *area)
 	  lgriddestroy = TRUE;
 	  gridID = gridToCell(gridID);
 	  grid_mask = (int *) malloc(gridsize*sizeof(int));
-	  gridInqMask(gridID, grid_mask);
+	  gridInqMaskGME(gridID, grid_mask);
 	}
       else
 	{
@@ -1294,7 +1294,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
     {
       gridID = gridToCell(gridID);	  
       grid_mask = (int *) malloc(gridsize*sizeof(int));
-      gridInqMask(gridID, grid_mask);
+      gridInqMaskGME(gridID, grid_mask);
     }
 
   total_area = 0;
