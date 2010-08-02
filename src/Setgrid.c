@@ -20,6 +20,8 @@
 
       Setgrid    setgrid         Set grid
       Setgrid    setgridtype     Set grid type
+      Setgrid    setgridarea     Set grid area
+      Setgrid    setgridmask     Set grid mask
 */
 
 #include "cdi.h"
@@ -32,7 +34,7 @@
 void *Setgrid(void *argument)
 {
   static char func[] = "Setgrid";
-  int SETGRID, SETGRIDTYPE, SETGRIDAREA;
+  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
@@ -41,12 +43,15 @@ void *Setgrid(void *argument)
   int taxisID1, taxisID2;
   int gridID1, gridID2 = -1;
   int ngrids, index;
-  int gridsize, gridtype = -1;
+  int gridtype = -1;
   int nmiss;
   int found;
-  int areasize = 0;
+  long i, gridsize;
+  long areasize = 0;
+  long masksize = 0;
   int lregular = 0;
   char *gridname = NULL;
+  double *gridmask = NULL;
   double *areaweight = NULL;
   double *array = NULL;
 
@@ -55,6 +60,7 @@ void *Setgrid(void *argument)
   SETGRID     = cdoOperatorAdd("setgrid",     0, 0, "grid description file or name");
   SETGRIDTYPE = cdoOperatorAdd("setgridtype", 0, 0, "grid type");
   SETGRIDAREA = cdoOperatorAdd("setgridarea", 0, 0, "filename with area weights");
+  SETGRIDMASK = cdoOperatorAdd("setgridmask", 0, 0, "filename with grid mask");
 
   operatorID = cdoOperatorID();
 
@@ -99,7 +105,6 @@ void *Setgrid(void *argument)
 
       if ( cdoVerbose )
 	{
-	  int i;
 	  double arrmean, arrmin, arrmax;
 
 	  arrmean = areaweight[0];
@@ -115,6 +120,33 @@ void *Setgrid(void *argument)
 
 	  cdoPrint("areaweights: %d %#12.5g%#12.5g%#12.5g", areasize, arrmin, arrmean, arrmax);
 	}
+    }
+  else if ( operatorID == SETGRIDMASK )
+    {
+      int streamID, vlistID, gridID;
+      char *maskfile;
+      double missval;
+
+      maskfile = operatorArgv()[0];
+      streamID = streamOpenRead(maskfile);
+      if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", maskfile);
+
+      vlistID = streamInqVlist(streamID);
+
+      nrecs = streamInqTimestep(streamID, 0);
+      streamInqRecord(streamID, &varID, &levelID);
+
+      missval  = vlistInqVarMissval(vlistID, varID);
+      gridID   = vlistInqVarGrid(vlistID, varID);
+      masksize = gridInqSize(gridID);
+      gridmask = (double *) malloc(masksize*sizeof(double));
+  
+      streamReadRecord(streamID, gridmask, &nmiss);
+
+      streamClose(streamID);
+
+      for ( i = 0; i < masksize; i++ )
+	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -187,6 +219,32 @@ void *Setgrid(void *argument)
 	    }
 	}
     }
+  else if ( operatorID == SETGRIDMASK )
+    {
+      ngrids = vlistNgrids(vlistID1);
+      for ( index = 0; index < ngrids; index++ )
+	{
+	  gridID1  = vlistGrid(vlistID1, index);
+	  gridtype = gridInqType(gridID1);
+	  gridsize = gridInqSize(gridID1);
+	  if ( gridsize == masksize )
+	    {
+	      int *mask;
+	      mask = (int *) malloc(masksize*sizeof(int));
+	      for ( i = 0; i < masksize; i++ )
+		{
+		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
+		    mask[i] = 0;
+		  else
+		    mask[i] = NINT(gridmask[i]);
+		}
+	      gridID2 = gridDuplicate(gridID1);
+	      gridDefMask(gridID2, mask);
+	      vlistChangeGridIndex(vlistID2, index, gridID2);
+	      free(mask);
+	    }
+	}
+    }
 
   streamDefVlist(streamID2, vlistID2);
   //vlistPrint(vlistID2);
@@ -230,6 +288,7 @@ void *Setgrid(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
+  if ( gridmask ) free(gridmask);
   if ( areaweight ) free(areaweight);
   if ( array ) free(array);
 

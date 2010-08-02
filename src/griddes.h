@@ -2,6 +2,7 @@
 #define _GRIDDES_H
 
 typedef struct {
+  int    *mask;
   double *xvals;
   double *yvals;
   double *xbounds;

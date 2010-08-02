@@ -560,6 +560,21 @@ int gridToRegular(int gridID1)
   return (gridID2);
 }
 
+static
+void gridCopyMask(int gridID1, int gridID2, long gridsize)
+{
+  static char func[] = "gridCopyMask";
+
+  if ( gridInqMask(gridID1, NULL) )
+    {
+      int *mask;
+      mask = (int *) malloc(gridsize*sizeof(int));
+      gridInqMask(gridID1, mask);
+      gridDefMask(gridID2, mask);
+      free(mask);
+    }
+}
+
 
 int gridToCurvilinear(int gridID1)
 {
@@ -803,6 +818,8 @@ int gridToCurvilinear(int gridID1)
 	      }
 	  }
 
+	gridCopyMask(gridID1, gridID2, gridsize);
+
 	break;
       }
     default:
@@ -932,6 +949,8 @@ int gridToCell(int gridID1)
 	    free(ybounds2D);
 	  }
 
+	gridCopyMask(gridID1, gridID2, gridsize);
+
 	break;
       }
     case GRID_GME:
@@ -991,6 +1010,8 @@ int gridToCell(int gridID1)
 	free (xbounds);
 	free (ybounds);
 	
+	gridCopyMask(gridID1, gridID2, gridsize);
+
 	break;
       }
     default:
@@ -1002,7 +1023,6 @@ int gridToCell(int gridID1)
 
   return (gridID2);
 }
-
 
 static
 double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3)
@@ -1089,7 +1109,6 @@ double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3)
 
   return areas;
 }
-
 
 static
 double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_lat,

@@ -57,6 +57,7 @@ int gridFromNCfile(const char *gridfile)
   int nc_gridclon_id;  /* netCDF grid corner lon var id */
   int nc_gridlat_id;   /* netCDF grid center lat var id */
   int nc_gridlon_id;   /* netCDF grid center lon var id */
+  int nc_gridmask_id;  /* netCDF grid mask id           */
 
   nc_type xtype;
   size_t attlen;
@@ -86,7 +87,6 @@ int gridFromNCfile(const char *gridfile)
 	   nc_inq_varid(nc_file_id, "grid_corner_lat", &nc_gridclat_id) != NC_NOERR || 
 	   nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id) != NC_NOERR ) return (gridID);
 
-      nce(nc_inq_varid(nc_file_id, "grid_dims", &nc_griddims_id));
       nce(nc_get_var_int(nc_file_id, nc_griddims_id, grid_dims));
 
       if ( grid_rank == 1 )
@@ -112,11 +112,6 @@ int gridFromNCfile(const char *gridfile)
       grid.xbounds = (double *) malloc(grid.nvertex*grid.size*sizeof(double));
       grid.ybounds = (double *) malloc(grid.nvertex*grid.size*sizeof(double));
 
-      nce(nc_inq_varid(nc_file_id, "grid_center_lat", &nc_gridlat_id));
-      nce(nc_inq_varid(nc_file_id, "grid_center_lon", &nc_gridlon_id));
-      nce(nc_inq_varid(nc_file_id, "grid_corner_lat", &nc_gridclat_id));
-      nce(nc_inq_varid(nc_file_id, "grid_corner_lon", &nc_gridclon_id));
-
       nce(nc_inq_vartype(nc_file_id, nc_gridlat_id, &xtype));
       if ( xtype == NC_FLOAT )  grid.prec = DATATYPE_FLT32;
       else                      grid.prec = DATATYPE_FLT64;
@@ -132,6 +127,21 @@ int gridFromNCfile(const char *gridfile)
       nce(nc_inq_attlen(nc_file_id, nc_gridlat_id, "units", &attlen));
       nce(nc_get_att_text(nc_file_id, nc_gridlat_id, "units", grid.yunits));
       grid.yunits[attlen] = 0;
+
+      if ( nc_inq_varid(nc_file_id, "grid_imask", &nc_gridmask_id) == NC_NOERR )
+	{
+	  int i;
+	  grid.mask = (int *) malloc(grid.size*sizeof(int));
+	  nce(nc_get_var_int(nc_file_id, nc_gridmask_id, grid.mask));
+	  for ( i = 0; i < grid.size; ++i )
+	    if ( grid.mask[i] != 1 ) break;
+
+	  if ( i == grid.size )
+	    {
+	      free(grid.mask);
+	      grid.mask = NULL;
+	    }
+	}
 
       gridID = gridDefine(grid);
     }

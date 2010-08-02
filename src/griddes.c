@@ -58,6 +58,7 @@ void extClose(int fileID);
 
 void gridInit(grid_t *grid)
 {
+  grid->mask          = NULL;
   grid->xvals         = NULL;
   grid->yvals         = NULL;
   grid->xbounds       = NULL;
@@ -270,6 +271,13 @@ int gridDefine(grid_t grid)
 	    gridDefXpole(gridID, grid.xpole);
 	    gridDefYpole(gridID, grid.ypole);
 	  }
+
+	if ( grid.mask )
+	  {
+	    gridDefMask(gridID, grid.mask);
+	    free(grid.mask);
+	  }
+
 	break;
       }
     case GRID_CURVILINEAR:
@@ -323,6 +331,12 @@ int gridDefine(grid_t grid)
 	    free(grid.ybounds);
 	  }
 
+	if ( grid.mask )
+	  {
+	    gridDefMask(gridID, grid.mask);
+	    free(grid.mask);
+	  }
+
 	break;
       }
     case GRID_LCC:
@@ -349,6 +363,12 @@ int gridDefine(grid_t grid)
 
 	gridDefLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
 		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
+
+	if ( grid.mask )
+	  {
+	    gridDefMask(gridID, grid.mask);
+	    free(grid.mask);
+	  }
 
 	break;
       }
@@ -399,6 +419,12 @@ int gridDefine(grid_t grid)
 
 	gridDefLcc2(gridID, grid.a, grid.lon_0, grid.lat_0, grid.lat_1, grid.lat_2);
 
+	if ( grid.mask )
+	  {
+	    gridDefMask(gridID, grid.mask);
+	    free(grid.mask);
+	  }
+
 	break;
       }
     case GRID_SPECTRAL:
@@ -415,13 +441,13 @@ int gridDefine(grid_t grid)
 	gridDefTrunc(gridID, grid.ntr);
 
 	gridDefComplexPacking(gridID, grid.lcomplex);
-	
+
 	break;
       }
     case GRID_GME:
       {
-	if ( grid.nd == 0 ) Error(func, "nd undefined!");
-	if ( grid.ni == 0 ) Error(func, "ni undefined!");
+	if ( grid.nd   == 0 ) Error(func, "nd undefined!");
+	if ( grid.ni   == 0 ) Error(func, "ni undefined!");
 	if ( grid.size == 0 ) Error(func, "size undefined!");
 
 	gridID = gridCreate(grid.type, grid.size);
@@ -433,6 +459,12 @@ int gridDefine(grid_t grid)
 	gridDefGMEni2(gridID, grid.ni2);
 	gridDefGMEni3(gridID, grid.ni3);
 	
+	if ( grid.mask )
+	  {
+	    gridDefMask(gridID, grid.mask);
+	    free(grid.mask);
+	  }
+
 	break;
       }
     default:
@@ -454,7 +486,8 @@ int gridDefine(grid_t grid)
   return (gridID);
 }
 
-static char *skipSeparator(char *pline)
+static
+char *skipSeparator(char *pline)
 {
   while ( isspace((int) *pline) ) pline++;
   if ( *pline == '=' || *pline == ':' ) pline++;
@@ -462,6 +495,7 @@ static char *skipSeparator(char *pline)
 
   return (pline);
 }
+
 
 void fnmexp2(char *out, char *in1, const char *in2)
 {
@@ -892,6 +926,40 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      grid.yvals[i] = flat;
 	      grid.xvals[i] = flon;
 	    }
+	}
+      else if ( cmpstr(pline, "mask", len)  == 0 )
+	{
+	  int i = 0;
+	  long lval;
+	  char *endptr;
+
+	  size = grid.size;
+
+	  if ( size > 0 )
+	    {
+	      pline = skipSeparator(pline + len);
+	      grid.mask = (int *) malloc(size*sizeof(int));
+
+	      for ( i = 0; i < size; i++ )
+		{
+		  endptr = pline;
+		  lval = strtol(pline, &endptr, 10);
+		  if ( pline == endptr )
+		    {
+		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
+			{
+			  Warning(func, "Incomplete command: >mask<");
+			  break;
+			}
+		      pline = line;
+		      lval = strtol(pline, &endptr, 10);
+		    }
+		  grid.mask[i] = (int)lval;
+		  pline = endptr;
+		}
+	    }
+	  else
+	    Warning(func, "gridsize undefined!");
 	}
       else if ( cmpstr(pline, "xvals", len)  == 0 )
 	{

@@ -133,7 +133,7 @@ void *Consecstat (void *argument)
   int i;
   int istreamID, itaxisID, ivlistID, itsID;
   int ostreamID, otaxisID, ovlistID, otsID;
-  int vdate, vtime;
+  int vdate = 0, vtime = 0;
   int histvdate = 0, histvtime = 0;
   int recID, nrecs;
   int varID, nvars;
