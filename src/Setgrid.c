@@ -34,7 +34,7 @@
 void *Setgrid(void *argument)
 {
   static char func[] = "Setgrid";
-  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK;
+  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
@@ -57,14 +57,16 @@ void *Setgrid(void *argument)
 
   cdoInitialize(argument);
 
-  SETGRID     = cdoOperatorAdd("setgrid",     0, 0, "grid description file or name");
-  SETGRIDTYPE = cdoOperatorAdd("setgridtype", 0, 0, "grid type");
-  SETGRIDAREA = cdoOperatorAdd("setgridarea", 0, 0, "filename with area weights");
-  SETGRIDMASK = cdoOperatorAdd("setgridmask", 0, 0, "filename with grid mask");
+  SETGRID       = cdoOperatorAdd("setgrid",       0, 0, "grid description file or name");
+  SETGRIDTYPE   = cdoOperatorAdd("setgridtype",   0, 0, "grid type");
+  SETGRIDAREA   = cdoOperatorAdd("setgridarea",   0, 0, "filename with area weights");
+  SETGRIDMASK   = cdoOperatorAdd("setgridmask",   0, 0, "filename with grid mask");
+  UNSETGRIDMASK = cdoOperatorAdd("unsetgridmask", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
-  operatorInputArg(cdoOperatorEnter(operatorID));  
+  if ( operatorID != UNSETGRIDMASK )
+    operatorInputArg(cdoOperatorEnter(operatorID));  
 
   if ( operatorID == SETGRID )
     {
@@ -209,7 +211,6 @@ void *Setgrid(void *argument)
       for ( index = 0; index < ngrids; index++ )
 	{
 	  gridID1  = vlistGrid(vlistID1, index);
-	  gridtype = gridInqType(gridID1);
 	  gridsize = gridInqSize(gridID1);
 	  if ( gridsize == areasize )
 	    {
@@ -225,7 +226,6 @@ void *Setgrid(void *argument)
       for ( index = 0; index < ngrids; index++ )
 	{
 	  gridID1  = vlistGrid(vlistID1, index);
-	  gridtype = gridInqType(gridID1);
 	  gridsize = gridInqSize(gridID1);
 	  if ( gridsize == masksize )
 	    {
@@ -243,6 +243,17 @@ void *Setgrid(void *argument)
 	      vlistChangeGridIndex(vlistID2, index, gridID2);
 	      free(mask);
 	    }
+	}
+    }
+  else if ( operatorID == UNSETGRIDMASK )
+    {
+      ngrids = vlistNgrids(vlistID1);
+      for ( index = 0; index < ngrids; index++ )
+	{
+	  gridID1  = vlistGrid(vlistID1, index);
+	  gridID2 = gridDuplicate(gridID1);
+	  gridDefMask(gridID2, NULL);
+	  vlistChangeGridIndex(vlistID2, index, gridID2);
 	}
     }
 

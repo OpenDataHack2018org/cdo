@@ -1,3 +1,7 @@
+2010-08-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added grid mask support
+	
 2010-07-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sellonlatbox: the last lon index is sometimes incorrect (bug fix) [report:Flore Mounier]
