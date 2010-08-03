@@ -3,6 +3,9 @@ CDO NEWS
 
 Version 1.4.6 (?? September 2010):
 
+   New features:
+     * Changed predefined gaussian grid names from t<RES>grid to n<N>
+       Use n80 instead of t106grid
    New operators:
      * bandpass: Bandpass filtering
      * lowpass:  Lowpass filtering

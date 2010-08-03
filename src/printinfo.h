@@ -228,6 +228,7 @@ static void printGridInfo(int vlistID)
 	      fprintf(stdout, "available :");
 	      if ( gridInqXbounds(gridID, NULL) ) fprintf(stdout, " xbounds");
 	      if ( gridInqYbounds(gridID, NULL) ) fprintf(stdout, " ybounds");
+	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
 	      fprintf(stdout, "\n");
 	    }
 	  
@@ -352,6 +353,7 @@ static void printGridInfo(int vlistID)
 	      if ( gridInqXbounds(gridID, NULL) ) fprintf(stdout, " xbounds");
 	      if ( gridInqYbounds(gridID, NULL) ) fprintf(stdout, " ybounds");
 	      if ( gridHasArea(gridID) )          fprintf(stdout, " area");
+	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
 	      fprintf(stdout, "\n");
 	    }
 	}

@@ -189,7 +189,7 @@ void usage(void)
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, grb2, nc, nc2, nc4, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
-  fprintf(stderr, "                   t<RES>grid, t<RES>spec, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>_lat=<LAT>\n");
+  fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>_lat=<LAT>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");

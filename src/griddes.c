@@ -1569,6 +1569,27 @@ int gridFromName(const char *gridname)
 	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
 	}
     }
+  else if ( gridname[0] == 'n' ) /* n<RES> */
+    {
+      pline = &gridname[1];
+      if ( isdigit((int) *pline) )
+	{
+	  int n;
+	  n = atoi(pline);
+	  while ( isdigit((int) *pline) ) pline++;
+
+	  grid.type = GRID_GAUSSIAN;
+	  grid.ysize = n*2;
+
+	  if ( cmpstr(pline, "zon",  len) == 0 )
+	    grid.xsize = 1;
+	  else
+	    grid.xsize = compNlon(grid.ysize);
+
+	  grid.def_xfirst = TRUE;
+	  grid.def_yfirst = TRUE;	      
+	}
+    }
   else if ( gridname[0] == 'g' && isdigit(gridname[1])) /* g<LON>x<LAT> or g<SIZE> */
     {
       pline = &gridname[1];
