@@ -784,10 +784,6 @@ void *Remap(void *argument)
 		}
 
 	      memcpy(remaps[r].grid.grid1_mask, imask, remaps[r].grid.grid1_size*sizeof(int));
-	      /*
-	      for ( i = 0; i < gridsize; i++ )
-		if ( remaps[r].grid.grid1_mask[i] ) remaps[r].grid.grid1_mask[i] = imask[i];
-	      */
 
 	      if ( map_type == MAP_TYPE_CONSERV )
 		{

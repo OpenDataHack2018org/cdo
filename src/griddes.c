@@ -937,6 +937,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 
 	  if ( size > 0 )
 	    {
+	      long count = 0;
 	      pline = skipSeparator(pline + len);
 	      grid.mask = (int *) malloc(size*sizeof(int));
 
@@ -955,7 +956,14 @@ int gridFromFile(FILE *gfp, const char *dname)
 		      lval = strtol(pline, &endptr, 10);
 		    }
 		  grid.mask[i] = (int)lval;
+		  if ( grid.mask[i] == 1 ) count++;
 		  pline = endptr;
+		}
+
+	      if ( count == size )
+		{
+		  free(grid.mask);
+		  grid.mask = NULL;
 		}
 	    }
 	  else

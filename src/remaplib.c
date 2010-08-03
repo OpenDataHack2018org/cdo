@@ -970,10 +970,24 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   /* Initialize logical mask */
 
+  if ( gridInqMask(rg->gridID2, NULL) )
+    {
+      gridInqMask(rg->gridID2, rg->grid2_mask);
+      for ( i = 0; i < grid2_size; i++ )
+	{
+	  if ( rg->grid2_mask[i] > 0 && rg->grid2_mask[i] < 255 )
+	    rg->grid2_mask[i] = TRUE;
+	  else
+	    rg->grid2_mask[i] = FALSE;
+	}
+    }
+  else
+    {
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(grid2_size, rg)
 #endif
-  for ( i = 0; i < grid2_size; i++ ) rg->grid2_mask[i] = TRUE;
+      for ( i = 0; i < grid2_size; i++ ) rg->grid2_mask[i] = TRUE;
+    }
 
   if ( gridInqType(rg->gridID2) == GRID_GME ) gridInqMaskGME(gridID2_gme, rg->grid2_vgpm);
 
