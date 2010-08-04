@@ -35,20 +35,20 @@ replace missing values by 0 in @file{ifile}.
 
 
 @BeginOperator_eof
-@Title     = Calculate EOFs in spatial or time space
+@Title     = Calculate EOFs in spatial or time space (seperately for each level)
 @Parameter = neof
 @EndOperator
 
 
 @BeginOperator_eoftime
 
-@Title     = Calculate EOFs in time space
+@Title     = Calculate EOFs in time space (seperately for each level)
 @Parameter = neof
 @EndOperator
 
 
 @BeginOperator_eofspatial
-@Title     = Calculate EOFs in spatial space
+@Title     = Calculate EOFs in spatial space (seperately for each level)
 @Parameter = neof
 @EndOperator
 
