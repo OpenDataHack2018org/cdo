@@ -1467,15 +1467,16 @@ int gridFromName(const char *gridname)
 	  if      ( cmpstr(pline, "grid", len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "zon",  len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
+	  else                                        grid.type = GRID_SPECTRAL;
       
-	  grid.ysize = ntr2nlat_linear(grid.ntr);
-	  if ( cmpstr(pline, "zon",  len) == 0 )
-	    grid.xsize = 1;
-	  else
-	    grid.xsize = compNlon(grid.ysize);
-
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
+	      grid.ysize = ntr2nlat_linear(grid.ntr);
+	      if ( cmpstr(pline, "zon",  len) == 0 )
+		grid.xsize = 1;
+	      else
+		grid.xsize = compNlon(grid.ysize);
+
 	      grid.def_xfirst = TRUE;
 	      grid.def_yfirst = TRUE;	      
 	    }
@@ -1491,15 +1492,16 @@ int gridFromName(const char *gridname)
 	  if      ( cmpstr(pline, "grid", len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "zon",  len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
+	  else                                        grid.type = GRID_SPECTRAL;
       
-	  grid.ysize = ntr2nlat(grid.ntr);
-	  if ( cmpstr(pline, "zon",  len) == 0 )
-	    grid.xsize = 1;
-	  else
-	    grid.xsize = compNlon(grid.ysize);
-
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
+	      grid.ysize = ntr2nlat(grid.ntr);
+	      if ( cmpstr(pline, "zon",  len) == 0 )
+		grid.xsize = 1;
+	      else
+		grid.xsize = compNlon(grid.ysize);
+
 	      grid.def_xfirst = TRUE;
 	      grid.def_yfirst = TRUE;	      
 	    }
@@ -1569,7 +1571,7 @@ int gridFromName(const char *gridname)
 	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
 	}
     }
-  else if ( gridname[0] == 'n' ) /* n<RES> */
+  else if ( gridname[0] == 'n' ) /* n<N> */
     {
       pline = &gridname[1];
       if ( isdigit((int) *pline) )
