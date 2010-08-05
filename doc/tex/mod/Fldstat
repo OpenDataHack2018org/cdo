@@ -175,7 +175,7 @@ o(t,1) = \mbox{\bf pth percentile} \{i(t,x'), x_1 < x' \leq x_n\}
 
 @BeginParameter
 @Item = p
-INTEGER  Percentile number in {1, ..., 99}
+FLOAT  Percentile number in {0, ..., 100}
 @EndParameter
 
 

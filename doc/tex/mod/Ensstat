@@ -147,7 +147,7 @@ o(t,x) = \mbox{\bf pth percentile} \{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 
 @BeginParameter
 @Item = p
-INTEGER  Percentile number in {1, ..., 99}
+FLOAT  Percentile number in {0, ..., 100}
 @EndParameter
 
 

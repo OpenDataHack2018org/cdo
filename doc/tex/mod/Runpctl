@@ -37,7 +37,7 @@ o(t+(nts-1)/2,x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,
 
 @BeginParameter
 @Item = p
-INTEGER  Percentile number in {1, ..., 99}
+FLOAT    Percentile number in {0, ..., 100}
 @Item = nts
 INTEGER  Number of time steps
 @EndParameter

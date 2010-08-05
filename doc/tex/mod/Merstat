@@ -93,7 +93,7 @@ For every longitude the pth percentile over all latitudes is computed.
 
 @BeginParameter
 @Item = p
-INTEGER  Percentile number in {1, ..., 99}
+FLOAT  Percentile number in {0, ..., 100}
 @EndParameter
 
 

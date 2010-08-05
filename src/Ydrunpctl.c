@@ -61,7 +61,7 @@ void *Ydrunpctl(void *argument)
   int nsets[NDAY];
   int year, month, day, dayoy;
   field_t field;
-  int pn;
+  double pn;
   HISTOGRAM_SET *hsets[NDAY];
     
   cdoInitialize(argument);
@@ -69,11 +69,11 @@ void *Ydrunpctl(void *argument)
 
   operatorInputArg("percentile number, number of timesteps");
   operatorCheckArgc(2);
-  pn     = atoi(operatorArgv()[0]);
+  pn     = atof(operatorArgv()[0]);
   ndates = atoi(operatorArgv()[1]);
 
-  if ( pn < 1 || pn > 99 )
-    cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+  if ( !(pn > 0 && pn < 100) )
+    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
   
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     {

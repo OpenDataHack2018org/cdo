@@ -1,3 +1,7 @@
+2010-08-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* changed percentile parameter type from integer to float [request: Nikolaus Groll]
+	
 2010-08-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* changed predefined gaussian grid names from t<RES>grid to n<N>

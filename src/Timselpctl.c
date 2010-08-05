@@ -52,7 +52,7 @@ void *Timselpctl(void *argument)
   double missval;
   field_t **vars1 = NULL;
   field_t field;
-  int pn;
+  double pn;
   HISTOGRAM_SET *hset = NULL;
 
   cdoInitialize(argument);
@@ -65,13 +65,13 @@ void *Timselpctl(void *argument)
   if ( nargc < 2 )
     cdoAbort("Too few arguments! Need %d found %d.", 2, nargc);
 
-  pn      = atoi(operatorArgv()[0]);
+  pn     = atof(operatorArgv()[0]);
   ndates = atoi(operatorArgv()[1]);
   if ( nargc > 2 ) noffset = atoi(operatorArgv()[2]);
   if ( nargc > 3 ) nskip   = atoi(operatorArgv()[3]);
 
-  if ( pn < 1 || pn > 99 )
-    cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+  if ( !(pn > 0 && pn < 100) )
+    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
 
   if ( cdoVerbose ) cdoPrint("nsets = %d, noffset = %d, nskip = %d", ndates, noffset, nskip);
 

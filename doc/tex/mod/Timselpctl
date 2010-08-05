@@ -48,7 +48,7 @@ o(t,x) = \mbox{\bf pth percentile} \{i(t',x), t_1 < t' \le t_n\}
 
 @BeginParameter
 @Item = p
-INTEGER  Percentile number in {1, ..., 99}
+FLOAT    Percentile number in {0, ..., 100}
 @Item = nsets
 INTEGER  Number of input time steps for each output time step
 @Item = noffset

@@ -53,7 +53,7 @@ void *Seaspctl(void *argument)
   double missval;
   field_t **vars1 = NULL;
   field_t field;
-  int pn;
+  double pn;
   HISTOGRAM_SET *hset = NULL;
   int season_start;
 
@@ -62,10 +62,10 @@ void *Seaspctl(void *argument)
   cdoOperatorAdd("seaspctl", func_pctl, 0, NULL);
 
   operatorInputArg("percentile number");
-  pn = atoi(operatorArgv()[0]);
+  pn = atof(operatorArgv()[0]);
       
-  if ( pn < 1 || pn > 99 )
-    cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
+  if ( !(pn > 0 && pn < 100) )
+    cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
 
   season_start = get_season_start();
 

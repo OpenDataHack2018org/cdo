@@ -6,6 +6,7 @@ Version 1.4.6 (?? September 2010):
    New features:
      * Changed predefined gaussian grid names from t<RES>grid to n<N>
        Use n80 instead of t106grid
+     * Changed percentile parameter type from integer to float
    New operators:
      * bandpass: Bandpass filtering
      * lowpass:  Lowpass filtering

@@ -49,7 +49,7 @@ o(\mbox{4},x) = \mbox{\bf pth percentile} \{i(t,x), \mbox{month}(i(t)) = \mbox{0
 
 @BeginParameter
 @Item = p
-INTEGER  Percentile number in {1, ..., 99}
+FLOAT  Percentile number in {0, ..., 100}
 @EndParameter
 
 

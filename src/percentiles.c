@@ -121,7 +121,7 @@ static int histAddValue(HISTOGRAM *hist, double value)
 }
 
 
-static double histGetPercentile(const HISTOGRAM *hist, int p)
+static double histGetPercentile(const HISTOGRAM *hist, double p)
 {
   double s, t;
   int i = 0, count = 0;
@@ -129,8 +129,8 @@ static double histGetPercentile(const HISTOGRAM *hist, int p)
   assert( hist != NULL );
   assert( hist->nsamp > 0 );
   assert( hist->nbins > 0 );
-  assert( p > 0 );
-  assert( p < 100 );
+  assert( p >= 0 );
+  assert( p <= 100 );
   
   s = hist->nsamp * (p / 100.0);
   
@@ -374,7 +374,7 @@ void hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const fi
 }
 
 
-void hsetGetVarLevelPercentiles(field_t *field, const HISTOGRAM_SET *hset, int varID, int levelID, int p)
+void hsetGetVarLevelPercentiles(field_t *field, const HISTOGRAM_SET *hset, int varID, int levelID, double p)
 {
   static const char func[] = "hsetGetVarLevelPercentiles";
   double *array = field->ptr;

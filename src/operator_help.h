@@ -1311,7 +1311,7 @@ static char *EnsstatHelp[] = {
     "             o(t,x) = pth percentile {i1(t,x), i2(t,x), ..., in(t,x)}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     NULL
 };
 
@@ -1375,7 +1375,7 @@ static char *FldstatHelp[] = {
     "             o(t,1) = pth percentile {i(t,x'), x_1<x'<=x_n}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     NULL
 };
 
@@ -1420,7 +1420,7 @@ static char *ZonstatHelp[] = {
     "             For every latitude the pth percentile over all longitudes is computed.",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     NULL
 };
 
@@ -1465,7 +1465,7 @@ static char *MerstatHelp[] = {
     "             For every longitude the pth percentile over all latitudes is computed.",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     NULL
 };
 
@@ -1612,7 +1612,7 @@ static char *TimselpctlHelp[] = {
     "    o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}",
     "",
     "PARAMETER",
-    "    p        INTEGER  Percentile number in {1, ..., 99}",
+    "    p        FLOAT    Percentile number in {0, ..., 100}",
     "    nsets    INTEGER  Number of input time steps for each output time step",
     "    noffset  INTEGER  Number of input time steps skipped before the first time step range (optional)",
     "    nskip    INTEGER  Number of input time steps skipped between time step ranges (optional)",
@@ -1680,7 +1680,7 @@ static char *RunpctlHelp[] = {
     "    o(t+(nts-1)/2,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x)}",
     "",
     "PARAMETER",
-    "    p    INTEGER  Percentile number in {1, ..., 99}",
+    "    p    FLOAT    Percentile number in {0, ..., 100}",
     "    nts  INTEGER  Number of time steps",
     NULL
 };
@@ -1739,7 +1739,7 @@ static char *TimpctlHelp[] = {
     "    o(1,x) = pth percentile {i(t',x), t_1<t'<=t_n}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -1816,7 +1816,7 @@ static char *HourpctlHelp[] = {
     "    o(t,x) = pth percentile {i(t',x), t_1<t'<=t_n}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -1893,7 +1893,7 @@ static char *DaypctlHelp[] = {
     "    o(t,x) = pth percentile {i(t',x), t_1<t'<=t_n}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -1970,7 +1970,7 @@ static char *MonpctlHelp[] = {
     "    o(t,x) = pth percentile {i(t',x), t_1<t'<=t_n}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -2047,7 +2047,7 @@ static char *YearpctlHelp[] = {
     "    o(t,x) = pth percentile {i(t',x), t_1<t'<=t_n}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -2128,7 +2128,7 @@ static char *SeaspctlHelp[] = {
     "    o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -2251,7 +2251,7 @@ static char *YdaypctlHelp[] = {
     "    o(366,x) = pth percentile {i(t,x), day(i(t)) = 366}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -2328,7 +2328,7 @@ static char *YmonpctlHelp[] = {
     "    o(12,x) = pth percentile {i(t,x), month(i(t)) = 12}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -2413,7 +2413,7 @@ static char *YseaspctlHelp[] = {
     "    o(4,x) = pth percentile {i(t,x), month(i(t)) = 09, 10, 11}",
     "",
     "PARAMETER",
-    "    p  INTEGER  Percentile number in {1, ..., 99}",
+    "    p  FLOAT  Percentile number in {0, ..., 100}",
     "",
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
@@ -2514,7 +2514,7 @@ static char *YdrunpctlHelp[] = {
     "    o(366,x) = pth percentile {i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}",
     "",
     "PARAMETER",
-    "    p    INTEGER  Percentile number in {1, ..., 99}",
+    "    p    FLOAT    Percentile number in {0, ..., 100}",
     "    nts  INTEGER  Number of time steps",
     "",
     "ENVIRONMENT",
