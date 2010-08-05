@@ -24,7 +24,10 @@ void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
                                           double **a, int n_eig, const char *prompt);
 int lu_decomposition (double **a, int n, int *index, int *sign);
 void lu_backsubstitution (double **a, int n, int *index, double *b);
-void heap_sort (double *eig_val, double **a, int n);
+
+// moved to statistic.h to make heap_sort accessible for other modules
+// void heap_sort (double *eig_val, double **a, int n);
+
 static double gamma_help_1 (double a, double x, const char *prompt);
 static double gamma_help_2 (double a, double x, const char *prompt);
 static double beta_help (double a, double b, double x, const char *prompt);

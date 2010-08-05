@@ -1275,15 +1275,18 @@ int gridGenArea(int gridID, double *area)
   if ( lgriddestroy ) gridDestroy(gridID);
   
   total_area = 0;
+
+  fprintf(stderr, "entering parallel region in gridInqArea\n");
+
 #if defined (_OPENMP)
-#pragma omp parallel for default(none)        \
+#pragma omp parallel for default(none)					\
   shared(gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat) \
   private(i)
 #endif
   for ( i = 0; i < gridsize; ++i )
     {
       area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
-      //     total_area += area[i];
+      //      total_area += area[i];
     }
 
   //  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
@@ -1442,11 +1445,15 @@ int gridWeights(int gridID, double *grid_wgts)
   int a_status, w_status;
   double *grid_area;
 
+  fprintf(stderr, "in function gridWeights\n");
+
   gridtype = gridInqType(gridID);
   gridsize = gridInqSize(gridID);
   
   grid_area = (double *) malloc(gridsize*sizeof(double));
 
+  fprintf(stderr, "gridWeights tpye %i size %i\n", gridtype,gridsize);
+  fprintf(stderr, "gridHasArea? %i\n",gridHasArea(gridID));
   a_status = 0;
 
   if ( gridHasArea(gridID) )
@@ -1463,7 +1470,10 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_CURVILINEAR ||
 	   gridtype == GRID_CELL )
 	{
+	  if ( cdoVerbose ) cdoPrint("generating grid Area\n");
+	  fprintf(stderr, "calling gridGenArea()\n");
 	  a_status = gridGenArea(gridID, grid_area);
+	  fprintf(stderr, "returned from gridGenArea with status %i\n",a_status);
 	}
       else
 	{
@@ -1487,6 +1497,8 @@ int gridWeights(int gridID, double *grid_wgts)
     printf("weights: %d %d %d %g %g\n", a_status, w_status, i, grid_area[i], grid_wgts[i]);
   */
   free(grid_area);
+
+  fprintf(stderr, "returning from gridWeights with status %i\n",w_status);
 
   return (w_status);
 }
