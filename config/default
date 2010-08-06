@@ -24,6 +24,15 @@ fi
 set -x
 #
 case "${HOSTNAME}" in
+# i386-apple-darwin10
+    hama*)
+	${CONFPATH}configure --prefix=$HOME/local \
+                    --with-netcdf=/opt/local \
+                    --with-hdf5=/opt/local \
+                    --with-szlib=/opt/local \
+                    --with-proj=/opt/local \
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
+	;;
 # ia64-xxx-linux
     ds*)
         if [ "$SGE_MODE" = "off" ] ; then
