@@ -332,6 +332,7 @@ int pstreamOpenRead(const char *argument)
       int rval;
       pthread_t thrID;
       pthread_attr_t attr;
+      struct sched_param param;
       size_t len;
       size_t stacksize;
       int status;
@@ -359,7 +360,11 @@ int pstreamOpenRead(const char *argument)
       if ( status ) SysError(func, "pthread_attr_init failed for '%s'\n", newarg+1);
       status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
       if ( status ) SysError(func, "pthread_attr_setdetachstate failed for '%s'\n", newarg+1);
-
+      /*
+      param.sched_priority = 0;
+      status = pthread_attr_setschedparam(&attr, &param);
+      if ( status ) SysError(func, "pthread_attr_setschedparam failed for '%s'\n", newarg+1);
+      */
       /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
       /* if ( status ) SysError(func, "pthread_attr_setinheritsched failed for '%s'\n", newarg+1); */
 
@@ -1355,7 +1360,9 @@ void cdoInitialize(void *argument)
   int processID;
 
 #if defined (_OPENMP)
+#if !(defined __APPLE__ && defined __MACH__)
   omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
+#endif
 #endif
 
   processID = processCreate();

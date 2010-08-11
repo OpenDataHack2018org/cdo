@@ -955,7 +955,7 @@ int main(int argc, char *argv[])
   omp_set_num_threads(numThreads);
   ompNumThreads = omp_get_max_threads();
   if ( omp_get_max_threads() > omp_get_num_procs() )
-    fprintf(stderr, " Number of threads is greater than number of CPUs=%d!\n", omp_get_num_procs());
+    fprintf(stderr, "Warning: Number of OMP threads is greater than number of CPUs=%d!\n", omp_get_num_procs());
   if ( cdoVerbose )
     fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d\n",
 	    omp_get_num_procs(), omp_get_max_threads());
