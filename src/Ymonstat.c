@@ -37,6 +37,21 @@
 
 #define  NMONTH     17
 
+
+static
+int cmpint(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  int *x = (int *) s1;
+  int *y = (int *) s2;
+
+  if      ( *x < *y ) cmp = -1;
+  else if ( *x > *y ) cmp =  1;
+
+  return (cmp);
+}
+
+
 void *Ymonstat(void *argument)
 {
   static char func[] = "Ymonstat";
@@ -126,6 +141,7 @@ void *Ymonstat(void *argument)
 
       vdates[month] = vdate;
       vtimes[month] = vtime;
+      // mon[month] = vdate;
 
       if ( vars1[month] == NULL )
 	{
@@ -241,10 +257,29 @@ void *Ymonstat(void *argument)
       tsID++;
     }
 
+  /* sort output time steps */
+  /*
+  nmon = 0;
+  for ( month = 0; month < NMONTH; month++ )
+    {
+      if ( nsets[month] == 0 )
+	for ( i = month+1; i < NMONTH; i++ ) mon[i-1] = mon[i];
+      else
+	nmon++;
+    }
+
+  qsort(mon, nmon, sizeof(int), cmpint);
+	      
+  for ( i = 0; i < nmon; i++ )
+    {
+      cdiDecodeDate(mon[i], &year, &month, &day);
+      mon[i] = month;
+    }
+  */
   for ( i = 0; i < nmon; i++ )
     {
       month = mon[i];
-      if ( nsets[month] == 0 ) cdoAbort("Internal problem, nsets[%d] not set!", month);
+      if ( nsets[month] == 0 ) cdoAbort("Internal problem, nsets[%d] not defined!", month);
 
       if ( operfunc == func_mean || operfunc == func_avg )
 	for ( varID = 0; varID < nvars; varID++ )
