@@ -1361,9 +1361,7 @@ void cdoInitialize(void *argument)
   int processID;
 
 #if defined (_OPENMP)
-#if !(defined __APPLE__ && defined __MACH__)
   omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
-#endif
 #endif
 
   processID = processCreate();
