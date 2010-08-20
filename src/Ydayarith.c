@@ -18,10 +18,10 @@
 /*
    This module contains the following operators:
 
-      Ymonarith  ymonadd         Add multi-year monthly time series
-      Ymonarith  ymonsub         Subtract multi-year monthly time series
-      Ymonarith  ymonmul         Multiply multi-year monthly time series
-      Ymonarith  ymondiv         Divide multi-year monthly time series
+      Ydayarith  ydayadd         Add multi-year daily time series
+      Ydayarith  ydaysub         Subtract multi-year daily time series
+      Ydayarith  ydaymul         Multiply multi-year daily time series
+      Ydayarith  ydaydiv         Divide multi-year daily time series
 */
 
 #include "cdi.h"
@@ -30,11 +30,11 @@
 #include "pstream.h"
 
 
-#define  MAX_MON    20
+#define  MAX_DAY   1232
 
-void *Ymonarith(void *argument)
+void *Ydayarith(void *argument)
 {
-  static char func[] = "Ymonarith";
+  static char func[] = "Ydayarith";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
@@ -47,15 +47,15 @@ void *Ymonarith(void *argument)
   int taxisID1, taxisID2, taxisID3;
   int vdate, vtime, year, mon, day;
   field_t field1, field2;
-  int **varnmiss2[MAX_MON];
-  double **vardata2[MAX_MON];
+  int **varnmiss2[MAX_DAY];
+  double **vardata2[MAX_DAY];
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ymonadd", func_add, 0, NULL);
-  cdoOperatorAdd("ymonsub", func_sub, 0, NULL);
-  cdoOperatorAdd("ymonmul", func_mul, 0, NULL);
-  cdoOperatorAdd("ymondiv", func_div, 0, NULL);
+  cdoOperatorAdd("ydayadd", func_add, 0, NULL);
+  cdoOperatorAdd("ydaysub", func_sub, 0, NULL);
+  cdoOperatorAdd("ydaymul", func_mul, 0, NULL);
+  cdoOperatorAdd("ydaydiv", func_div, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorFunc(operatorID);
@@ -88,7 +88,7 @@ void *Ymonarith(void *argument)
 
   nvars  = vlistNvars(vlistID2);
 
-  for ( mon = 0; mon < MAX_MON ; mon++ ) vardata2[mon] = NULL;
+  for ( day = 0; day < MAX_DAY ; day++ ) vardata2[day] = NULL;
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
@@ -96,19 +96,20 @@ void *Ymonarith(void *argument)
       vdate = taxisInqVdate(taxisID2);
 
       cdiDecodeDate(vdate, &year, &mon, &day);
-      if ( mon < 0 || mon >= MAX_MON ) cdoAbort("Month %d out of range!", mon);
+      day += mon*100;
+      if ( day < 0 || day >= MAX_DAY ) cdoAbort("Day %d out of range!", day);
 
-      if ( vardata2[mon] != NULL ) cdoAbort("Month %d already allocatd!", mon);
+      if ( vardata2[day] != NULL ) cdoAbort("Day %d already allocatd!", day);
 
-      vardata2[mon]  = (double **) malloc(nvars*sizeof(double *));
-      varnmiss2[mon] = (int **) malloc(nvars*sizeof(int *));
+      vardata2[day]  = (double **) malloc(nvars*sizeof(double *));
+      varnmiss2[day] = (int **) malloc(nvars*sizeof(int *));
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  nlev     = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	  vardata2[mon][varID]  = (double *) malloc(nlev*gridsize*sizeof(double));
-	  varnmiss2[mon][varID] = (int *) malloc(nlev*sizeof(int));
+	  vardata2[day][varID]  = (double *) malloc(nlev*gridsize*sizeof(double));
+	  varnmiss2[day][varID] = (int *) malloc(nlev*sizeof(int));
 	}
 
       for ( recID = 0; recID < nrecs; recID++ )
@@ -118,8 +119,8 @@ void *Ymonarith(void *argument)
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
 
-	  streamReadRecord(streamID2, vardata2[mon][varID]+offset, &field2.nmiss);
-	  varnmiss2[mon][varID][levelID] = field2.nmiss;
+	  streamReadRecord(streamID2, vardata2[day][varID]+offset, &field2.nmiss);
+	  varnmiss2[day][varID][levelID] = field2.nmiss;
 	}
 
       tsID++;
@@ -133,7 +134,8 @@ void *Ymonarith(void *argument)
       vtime = taxisInqVtime(taxisID1);
 
       cdiDecodeDate(vdate, &year, &mon, &day);
-      if ( mon < 0 || mon >= MAX_MON ) cdoAbort("Month %d out of range!", mon);
+      day += mon*100;
+      if ( day < 0 || day >= MAX_DAY ) cdoAbort("Day %d out of range!", day);
 
       taxisDefVdate(taxisID3, vdate);
       taxisDefVtime(taxisID3, vtime);
@@ -147,9 +149,9 @@ void *Ymonarith(void *argument)
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	  offset   = gridsize*levelID;
-	  if ( vardata2[mon] == NULL ) cdoAbort("Month %d not found!", mon);
-	  memcpy(field2.ptr, vardata2[mon][varID]+offset, gridsize*sizeof(double));
-	  field2.nmiss = varnmiss2[mon][varID][levelID];
+	  if ( vardata2[day] == NULL ) cdoAbort("Day %d not found!", day);
+	  memcpy(field2.ptr, vardata2[day][varID]+offset, gridsize*sizeof(double));
+	  field2.nmiss = varnmiss2[day][varID][levelID];
 
 	  field1.grid    = vlistInqVarGrid(vlistID1, varID);
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
@@ -169,17 +171,17 @@ void *Ymonarith(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-  for ( mon = 0; mon < MAX_MON ; mon++ ) 
-    if ( vardata2[mon] )
+  for ( day = 0; day < MAX_DAY ; day++ ) 
+    if ( vardata2[day] )
       {
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    free(vardata2[mon][varID]);
-	    free(varnmiss2[mon][varID]);
+	    free(vardata2[day][varID]);
+	    free(varnmiss2[day][varID]);
 	  }
 
-	free(vardata2[mon]);
-	free(varnmiss2[mon]);
+	free(vardata2[day]);
+	free(varnmiss2[day]);
       }
 
   if ( field1.ptr ) free(field1.ptr);

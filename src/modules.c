@@ -182,6 +182,7 @@ void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
 void *Yhourstat(void *argument);
+void *Ydayarith(void *argument);
 void *Ydaypctl(void *argument);
 void *Ydaystat(void *argument);
 void *Ydrunpctl(void *argument);
@@ -411,6 +412,7 @@ void *Wct(void *argument);
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
 #define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourvar", "yhourstd"}
+#define  YdayarithOperators     {"ydayadd", "ydaysub", "ydaymul", "ydaydiv"}
 #define  YdaypctlOperators      {"ydaypctl"}
 #define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydayvar", "ydaystd"}
 #define  YdrunpctlOperators     {"ydrunpctl"}
@@ -635,6 +637,7 @@ static modules_t Modules[] =
   { Writegrid,      NULL,              WritegridOperators,     CDI_REAL,  1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,   CDI_REAL,  1,  1 },
   { Yhourstat,      YhourstatHelp,     YhourstatOperators,     CDI_REAL,  1,  1 },
+  { Ydayarith,      NULL,              YdayarithOperators,     CDI_REAL,  2,  1 },
   { Ydaypctl,       YdaypctlHelp,      YdaypctlOperators,      CDI_REAL,  3,  1 },
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,      CDI_REAL,  1,  1 },
   { Ydrunpctl,      YdrunpctlHelp,     YdrunpctlOperators,     CDI_REAL,  3,  1 },

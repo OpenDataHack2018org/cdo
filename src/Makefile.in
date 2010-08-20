@@ -112,30 +112,30 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Vardup.$(OBJEXT) Vargen.$(OBJEXT) Varrms.$(OBJEXT) \
 	Vertint.$(OBJEXT) Vertstat.$(OBJEXT) Vertwind.$(OBJEXT) \
 	Wind.$(OBJEXT) Writegrid.$(OBJEXT) Writerandom.$(OBJEXT) \
-	Yhourstat.$(OBJEXT) Ydaypctl.$(OBJEXT) Ydaystat.$(OBJEXT) \
-	Ydrunpctl.$(OBJEXT) Ydrunstat.$(OBJEXT) Ymonarith.$(OBJEXT) \
-	Ymonpctl.$(OBJEXT) Ymonstat.$(OBJEXT) Yseaspctl.$(OBJEXT) \
-	Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) cdilib.$(OBJEXT) \
-	commandline.$(OBJEXT) exception.$(OBJEXT) expr_yacc.$(OBJEXT) \
-	expr_lex.$(OBJEXT) expr.$(OBJEXT) cdo.$(OBJEXT) \
-	cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) field.$(OBJEXT) \
-	fieldc.$(OBJEXT) field2.$(OBJEXT) fieldmer.$(OBJEXT) \
-	fieldzon.$(OBJEXT) fieldmem.$(OBJEXT) gradsdeslib.$(OBJEXT) \
-	grid.$(OBJEXT) grid_gme.$(OBJEXT) grid_lcc.$(OBJEXT) \
-	grid_rot.$(OBJEXT) griddes.$(OBJEXT) griddes_nc.$(OBJEXT) \
-	griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) history.$(OBJEXT) \
-	institution.$(OBJEXT) interpol.$(OBJEXT) job.$(OBJEXT) \
-	modules.$(OBJEXT) namelist.$(OBJEXT) normal.$(OBJEXT) \
-	pipe.$(OBJEXT) process.$(OBJEXT) remaplib.$(OBJEXT) \
-	timer.$(OBJEXT) realtime.$(OBJEXT) pstream.$(OBJEXT) \
-	table.$(OBJEXT) userlog.$(OBJEXT) util.$(OBJEXT) \
-	legendre.$(OBJEXT) fouriertrans.$(OBJEXT) specspace.$(OBJEXT) \
-	readline.$(OBJEXT) juldate.$(OBJEXT) vinterp.$(OBJEXT) \
-	zaxis.$(OBJEXT) par_io.$(OBJEXT) pthread_debug.$(OBJEXT) \
-	color.$(OBJEXT) list.$(OBJEXT) percentiles.$(OBJEXT) \
-	nth_element.$(OBJEXT) ecacore.$(OBJEXT) ecautil.$(OBJEXT) \
-	EcaIndices.$(OBJEXT) Hi.$(OBJEXT) Wct.$(OBJEXT) \
-	statistic.$(OBJEXT)
+	Yhourstat.$(OBJEXT) Ydayarith.$(OBJEXT) Ydaypctl.$(OBJEXT) \
+	Ydaystat.$(OBJEXT) Ydrunpctl.$(OBJEXT) Ydrunstat.$(OBJEXT) \
+	Ymonarith.$(OBJEXT) Ymonpctl.$(OBJEXT) Ymonstat.$(OBJEXT) \
+	Yseaspctl.$(OBJEXT) Yseasstat.$(OBJEXT) Zonstat.$(OBJEXT) \
+	cdilib.$(OBJEXT) commandline.$(OBJEXT) exception.$(OBJEXT) \
+	expr_yacc.$(OBJEXT) expr_lex.$(OBJEXT) expr.$(OBJEXT) \
+	cdo.$(OBJEXT) cdo_pthread.$(OBJEXT) cdo_vlist.$(OBJEXT) \
+	field.$(OBJEXT) fieldc.$(OBJEXT) field2.$(OBJEXT) \
+	fieldmer.$(OBJEXT) fieldzon.$(OBJEXT) fieldmem.$(OBJEXT) \
+	gradsdeslib.$(OBJEXT) grid.$(OBJEXT) grid_gme.$(OBJEXT) \
+	grid_lcc.$(OBJEXT) grid_rot.$(OBJEXT) griddes.$(OBJEXT) \
+	griddes_nc.$(OBJEXT) griddes_h5.$(OBJEXT) hetaeta.$(OBJEXT) \
+	history.$(OBJEXT) institution.$(OBJEXT) interpol.$(OBJEXT) \
+	job.$(OBJEXT) modules.$(OBJEXT) namelist.$(OBJEXT) \
+	normal.$(OBJEXT) pipe.$(OBJEXT) process.$(OBJEXT) \
+	remaplib.$(OBJEXT) timer.$(OBJEXT) realtime.$(OBJEXT) \
+	pstream.$(OBJEXT) table.$(OBJEXT) userlog.$(OBJEXT) \
+	util.$(OBJEXT) legendre.$(OBJEXT) fouriertrans.$(OBJEXT) \
+	specspace.$(OBJEXT) readline.$(OBJEXT) juldate.$(OBJEXT) \
+	vinterp.$(OBJEXT) zaxis.$(OBJEXT) par_io.$(OBJEXT) \
+	pthread_debug.$(OBJEXT) color.$(OBJEXT) list.$(OBJEXT) \
+	percentiles.$(OBJEXT) nth_element.$(OBJEXT) ecacore.$(OBJEXT) \
+	ecautil.$(OBJEXT) EcaIndices.$(OBJEXT) Hi.$(OBJEXT) \
+	Wct.$(OBJEXT) statistic.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 cdo_DEPENDENCIES =
 am_cdotest_OBJECTS = cdilib.$(OBJEXT) cdotest.$(OBJEXT)
@@ -422,6 +422,7 @@ cdo_SOURCES = Arith.c		\
               Writegrid.c 	\
               Writerandom.c 	\
               Yhourstat.c  	\
+	      Ydayarith.c       \
               Ydaypctl.c  	\
               Ydaystat.c  	\
               Ydrunpctl.c  	\
@@ -793,6 +794,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Wind.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Writerandom.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ydayarith.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ydaypctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ydaystat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Ydrunpctl.Po@am__quote@

@@ -415,6 +415,7 @@ src/Wct.c -text
 src/Wind.c -text
 src/Writegrid.c -text
 src/Writerandom.c -text
+src/Ydayarith.c -text
 src/Ydaypctl.c -text
 src/Ydaystat.c -text
 src/Ydrunpctl.c -text

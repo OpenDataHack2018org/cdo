@@ -145,6 +145,7 @@ cdo_SOURCES = Arith.c		\
               Writegrid.c 	\
               Writerandom.c 	\
               Yhourstat.c  	\
+	      Ydayarith.c       \
               Ydaypctl.c  	\
               Ydaystat.c  	\
               Ydrunpctl.c  	\
