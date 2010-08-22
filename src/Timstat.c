@@ -64,7 +64,7 @@
 
 void *Timstat(void *argument)
 {
-  static char func[] = "Timstat";
+  static const char *func = "Timstat";
   int operatorID;
   int operfunc;
   int cmplen;

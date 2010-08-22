@@ -36,7 +36,7 @@
 
 static void invertLonDes(int vlistID)
 {
-  static char func[] = "invertLonDes";
+  static const char *func = "invertLonDes";
   int index, ngrids;
   int gridID1, gridID2;
   int nlat, nlon, size;
@@ -135,7 +135,7 @@ static void invertLonDes(int vlistID)
 
 static void invertLatDes(int vlistID)
 {
-  static char func[] = "invertLatDes";
+  static const char *func = "invertLatDes";
   int index, ngrids;
   int gridID1, gridID2;
   int nlat, nlon, size;
@@ -235,7 +235,7 @@ static void invertLatDes(int vlistID)
 
 static void invertLonData(double *array1, double *array2, int gridID1)
 {
-  static char func[] = "invertLonData";
+  static const char *func = "invertLonData";
   int nlat, nlon;
   int ilat, ilon;
   double **field1, **field2;
@@ -263,7 +263,7 @@ static void invertLonData(double *array1, double *array2, int gridID1)
 
 static void invertLatData(double *array1, double *array2, int gridID1)
 {
-  static char func[] = "invertLatData";
+  static const char *func = "invertLatData";
   int nlat, nlon;
   int ilat;
   double **field1, **field2;
@@ -290,7 +290,7 @@ static void invertLatData(double *array1, double *array2, int gridID1)
 
 void *Invert(void *argument)
 {
-  static char func[] = "Invert";
+  static const char *func = "Invert";
   int INVERTLAT, INVERTLON, INVERTLATDES, INVERTLONDES, INVERTLATDATA, INVERTLONDATA;
   int operatorID;
   int operfunc1, operfunc2;

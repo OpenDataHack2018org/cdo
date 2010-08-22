@@ -39,7 +39,7 @@
 
 void *Merstat(void *argument)
 {
-  static char func[] = "Merstat";
+  static const char *func = "Merstat";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

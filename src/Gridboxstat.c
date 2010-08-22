@@ -41,7 +41,7 @@
 static
 int genBoxGrid(int gridID1, int xinc, int yinc)
 {
-  static char func[] = "genBoxGrid";
+  static const char *func = "genBoxGrid";
   int i, j, i1;
   int gridID2 = -1, gridtype;
   int gridsize1 = 0, nlon1 = 0, nlat1 = 0;
@@ -503,7 +503,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 static
 void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statfunc)
 {
-  static char func[] = "gridboxstat";
+  static const char *func = "gridboxstat";
   int nlon1, nlat1;
   int nlon2, nlat2;
   int ilat, ilon;
@@ -599,7 +599,7 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
 
 void *Gridboxstat(void *argument)
 {
-  static char func[] = "Gridboxstat";
+  static const char *func = "Gridboxstat";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

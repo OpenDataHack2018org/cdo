@@ -28,7 +28,7 @@
 
 void *CDItest(void *argument)
 {
-  static char func[] = "CDItest";
+  static const char *func = "CDItest";
   int NCOPY;
   int operatorID;
   int streamID1, streamID2;

@@ -34,7 +34,7 @@
 
 void *Timcount(void *argument)
 {
-  static char func[] = "Timcount";
+  static const char *func = "Timcount";
   int operatorID;
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];

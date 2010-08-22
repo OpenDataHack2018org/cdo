@@ -48,7 +48,7 @@ static double humidityIndex(double t, double e, double r, double missval)
 
 static void farexpr(field_t *field1, field_t field2, field_t field3, double (*expression)(double, double, double, double))
 {
-  static char func[] = "farexpr";
+  static const char *func = "farexpr";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -90,7 +90,7 @@ static void farexpr(field_t *field1, field_t field2, field_t field3, double (*ex
    
 void *Hi(void *argument)
 {
-  static char func[] = "Hi";
+  static const char *func = "Hi";
   int streamID1, streamID2, streamID3, streamID4;
   int gridsize;
   int nrecs, nrecs2, nrecs3, recID;

@@ -150,7 +150,7 @@ double det_lat_atovs(double s, double s0, double lts, double c, double re)
 static
 int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
 {
-  static char func[] = "defLonLatGrid";
+  static const char *func = "defLonLatGrid";
   int gridID;
   int nrx, nry, i;
   double c;
@@ -218,7 +218,7 @@ static
 int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 		      double dx, double dy, double p1, double p2, double p3, double p4)
 {
-  static char func[] = "defSinusoidalGrid";
+  static const char *func = "defSinusoidalGrid";
   int gridID;
   int i;
   double *xvals, *yvals;
@@ -255,7 +255,7 @@ static
 int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 		double dx, double dy, double a, double lon0, double lat0)
 {
-  static char func[] = "defLaeaGrid";
+  static const char *func = "defLaeaGrid";
   int gridID;
   int i;
   double *xvals, *yvals;
@@ -349,7 +349,7 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
 static
 int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 {
-  static char func[] = "read_geolocation";
+  static const char *func = "read_geolocation";
   int gridID = -1;
   hid_t grp_id;
   hid_t proj_id, region_id;
@@ -618,7 +618,7 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 static
 int read_region(hid_t loc_id, int nx, int ny)
 {
-  //static char func[] = "read_region";
+  //static const char *func = "read_region";
   int gridID = -1;
   hid_t grp_id;
   hid_t region_id;
@@ -762,7 +762,7 @@ int read_region(hid_t loc_id, int nx, int ny)
 static
 void read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
-  static char func[] = "read_dataset";
+  static const char *func = "read_dataset";
   hid_t dset_id, type_id;
   hid_t   dataspace;   
   hsize_t dims_out[9];  /* dataset dimensions           */
@@ -1436,7 +1436,7 @@ void dsets_init(dsets_t *dsets)
 
 void *Importcmsaf(void *argument)
 {
-  static char func[] = "Importcmsaf";
+  static const char *func = "Importcmsaf";
 #if  defined  (HAVE_LIBHDF5)
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;

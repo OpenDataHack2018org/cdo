@@ -90,7 +90,7 @@ pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int processCreate(void)
 {
-  static char func[] = "processCreate";
+  static const char *func = "processCreate";
   int processID;
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -128,7 +128,7 @@ int processCreate(void)
 
 int processSelf(void)
 {
-  static char func[] = "processSelf";
+  static const char *func = "processSelf";
   int processID = 0;
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_t thID = pthread_self();
@@ -156,7 +156,7 @@ int processSelf(void)
 
 int processNums(void)
 {
-  static char func[] = "processNums";
+  static const char *func = "processNums";
   int pnums = 0;
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -175,7 +175,7 @@ int processNums(void)
 
 void processAddNvals(off_t nvals)
 {
-  static char func[] = "processAddNvals";
+  static const char *func = "processAddNvals";
   int processID = processSelf();
 
   Process[processID].nvals += nvals;
@@ -184,7 +184,7 @@ void processAddNvals(off_t nvals)
 
 off_t processInqNvals(int processID)
 {
-  static char func[] = "processInqNvals";
+  static const char *func = "processInqNvals";
   off_t nvals = 0;
 
   nvals = Process[processID].nvals;
@@ -195,7 +195,7 @@ off_t processInqNvals(int processID)
 
 void processAddStream(int streamID)
 {
-  static char func[] = "processAddStream";
+  static const char *func = "processAddStream";
   int processID = processSelf();
   int sindex;
 
@@ -316,7 +316,7 @@ int cdoStreamCnt(void)
 
 const char *cdoStreamName(int cnt)
 {
-  static char func[] = "cdoInqStreamName";
+  static const char *func = "cdoInqStreamName";
   int processID = processSelf();
 
   if ( cnt > Process[processID].streamCnt || cnt < 0 )
@@ -336,7 +336,7 @@ const char *processOperator(void)
 static
 char *getOperatorArg(const char *xoperator)
 {
-  static char func[] = "getOperatorArg";
+  static const char *func = "getOperatorArg";
   char *commapos;
   char *operatorArg = NULL;
   size_t len;
@@ -459,7 +459,7 @@ int getStreamCnt(int argc, char *argv[])
 static
 void setStreamNames(int argc, char *argv[])
 {
-  static char func[] = "setStreamNames";
+  static const char *func = "setStreamNames";
   int processID = processSelf();
   int i;
   int globArgc = 1;
@@ -548,7 +548,7 @@ void checkStreamCnt(void)
 static
 void setStreams(const char *argument)
 {
-  static char func[] = "setStreams";
+  static const char *func = "setStreams";
   int processID = processSelf();
   int streamCnt;
   int i;
@@ -716,7 +716,7 @@ void operatorCheckArgc(int numargs)
 
 void operatorInputArg(const char *enter)
 {
-  static char func[] = "operatorInputArg";
+  static const char *func = "operatorInputArg";
   char line[1024];
   char *pline = line;
   int processID = processSelf();

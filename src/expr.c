@@ -49,7 +49,7 @@ static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 static
 nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
-  static char func[] = "expr_con_con";
+  static const char *func = "expr_con_con";
   nodeType *p;
 
   p = (nodeType *) malloc(sizeof(nodeType));
@@ -72,7 +72,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 {
-  static char func[] = "expr_con_var";
+  static const char *func = "expr_con_var";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -174,7 +174,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
-  static char func[] = "expr_var_con";
+  static const char *func = "expr_var_con";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -282,7 +282,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 {
-  static char func[] = "expr_var_var";
+  static const char *func = "expr_var_var";
   nodeType *p;
   long ngp, ngp1, ngp2, i;
   long nlev, nlev1, nlev2, k;
@@ -485,7 +485,7 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *ex_fun_con(char *fun, nodeType *p1)
 {
-  static char func[] = "ex_fun_con";
+  static const char *func = "ex_fun_con";
   nodeType *p;
   int i;
   int funcID = -1;
@@ -513,7 +513,7 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
 static
 nodeType *ex_fun_var(char *fun, nodeType *p1)
 {
-  static char func[] = "ex_fun_var";
+  static const char *func = "ex_fun_var";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -605,7 +605,7 @@ nodeType *ex_fun(char *fun, nodeType *p1)
 static
 nodeType *ex_uminus_var(nodeType *p1)
 {
-  static char func[] = "ex_uminus_var";
+  static const char *func = "ex_uminus_var";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -651,7 +651,7 @@ nodeType *ex_uminus_var(nodeType *p1)
 static
 nodeType *ex_uminus_con(nodeType *p1)
 {
-  static char func[] = "ex_uminus_con";
+  static const char *func = "ex_uminus_con";
   nodeType *p;
 
   p = (nodeType *) malloc(sizeof(nodeType));
@@ -709,7 +709,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
 
 nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 {
-  static char func[] = "ex";
+  static const char *func = "ex";
   int gridID1 = -1, zaxisID1 = -1, timeID1 = -1;
   double missval = 0;
   char varname[256];

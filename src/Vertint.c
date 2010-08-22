@@ -36,7 +36,7 @@
 
 void *Vertint(void *argument)
 {
-  static char func[] = "Vertint";
+  static const char *func = "Vertint";
   int ML2PL, ML2HL, ML2PLX, ML2HLX;
   int ML2PL_LP, ML2HL_LP, ML2PLX_LP, ML2HLX_LP;
   int operatorID;

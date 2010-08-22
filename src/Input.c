@@ -68,7 +68,7 @@ static int input_darray(int nval, double *array)
 
 void *Input(void *argument)
 {
-  static char func[] = "Input";
+  static const char *func = "Input";
   int INPUT, INPUTSRV, INPUTEXT;
   int operatorID;
   int varID = 0;

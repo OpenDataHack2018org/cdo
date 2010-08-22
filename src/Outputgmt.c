@@ -153,7 +153,7 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
-  static char func[] = "verify_grid";
+  static const char *func = "verify_grid";
   int i0, i, j, k, l;
   int l0;
   int nout;
@@ -534,7 +534,7 @@ void make_cyclic(double *array1, double *array2, int nlon, int nlat)
 
 void *Outputgmt(void *argument)
 {
-  static char func[] = "Outputgmt";
+  static const char *func = "Outputgmt";
   int GRIDVERIFY, OUTPUTCENTER, OUTPUTCENTER2, OUTPUTCENTERCPT, OUTPUTBOUNDS;
   int OUTPUTBOUNDSCPT, OUTPUTVECTOR, OUTPUTTRI;
   int operatorID;

@@ -71,7 +71,7 @@ int n_finished;
 
 void *EOFs(void * argument)
 {
-  static char func[] = "EOFs";
+  static const char *func = "EOFs";
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
   int operatorID;
   int operfunc;

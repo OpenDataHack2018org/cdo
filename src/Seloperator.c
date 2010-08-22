@@ -23,7 +23,7 @@
 
 void *Seloperator(void *argument)
 {
-  static char func[] = "Seloperator";
+  static const char *func = "Seloperator";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;

@@ -53,7 +53,7 @@ char *get_strtimeptr()
 
 void cdoInqHistory(int fileID)
 {
-  static char func[] = "cdoInqHistory";
+  static const char *func = "cdoInqHistory";
 
   if ( ghistory )
     {
@@ -81,7 +81,7 @@ void cdoInqHistory(int fileID)
 
 void cdoDefHistory(int fileID, char *histstring)
 {
-  static char func[] = "cdoDefHistory";
+  static const char *func = "cdoDefHistory";
   char *history = NULL;
   size_t historysize = 0;
   char *strtimeptr;

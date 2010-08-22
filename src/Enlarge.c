@@ -30,7 +30,7 @@
 
 void *Enlarge(void *argument)
 {
-  static char func[] = "Enlarge";
+  static const char *func = "Enlarge";
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridID1, gridID2;

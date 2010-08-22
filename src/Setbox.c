@@ -30,7 +30,7 @@
 
 static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22, double *constant)
 {
-  static char func[] = "genlonlatbox";  
+  static const char *func = "genlonlatbox";  
   int nlon1, nlat1;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
@@ -200,7 +200,7 @@ static void setcbox(double constant, double *array, int gridID,
 
 void *Setbox(void *argument)
 {
-  static char func[] = "Setcbox";
+  static const char *func = "Setcbox";
   int SETCLONLATBOX, SETCINDEXBOX;
   int operatorID;
   int streamID1, streamID2;

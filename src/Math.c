@@ -43,7 +43,7 @@
 
 void *Math(void *argument)
 {
-  static char func[] = "Math";
+  static const char *func = "Math";
   enum {ABS, FINT, FNINT, SQR, SQRT, EXP, LN, LOG10, SIN, COS, TAN, ASIN, ACOS, ATAN, POW, RECI};
   int operatorID;
   int operfunc;

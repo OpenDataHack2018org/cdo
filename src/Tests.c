@@ -24,7 +24,7 @@
 
 void *Tests(void *argument)
 {
-  static char func[] = "Tests";
+  static const char *func = "Tests";
   int NORMAL, STUDENTT, CHISQUARE, BETA, FISHER;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

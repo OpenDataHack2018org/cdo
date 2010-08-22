@@ -69,7 +69,7 @@ int correlation(long gridsize, double missval1, double missval2, int *nofvals,
 
 void *Timstat2(void *argument)
 {
-  static char func[] = "Timstat2";
+  static const char *func = "Timstat2";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;

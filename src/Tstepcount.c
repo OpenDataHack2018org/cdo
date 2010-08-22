@@ -57,7 +57,7 @@ double tstepcount(long nts, double missval1, double *array1, double refval)
 
 void *Tstepcount(void *argument)
 {
-  static char func[] = "Tstepcount";
+  static const char *func = "Tstepcount";
   int ompthID;
   int gridsize;
   int nrecs;

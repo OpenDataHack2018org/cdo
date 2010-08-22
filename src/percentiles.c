@@ -71,7 +71,7 @@ static void histBinValue(HISTOGRAM *hist, double value)
 
 static void histBin(HISTOGRAM *hist)
 {
-  static const char func[] = "histBin";
+  static const char *func = "histBin";
   int i;
   double *values;
   
@@ -155,7 +155,7 @@ static double histGetPercentile(const HISTOGRAM *hist, double p)
 
 HISTOGRAM_SET *hsetCreate(int nvars)
 {
-  static const char func[] = "hsetCreate";
+  static const char *func = "hsetCreate";
   int varID;
   HISTOGRAM_SET *hset;
   
@@ -185,7 +185,7 @@ HISTOGRAM_SET *hsetCreate(int nvars)
 
 void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
 {
-  static const char func[] = "hsetCreateVarLevels";
+  static const char *func = "hsetCreateVarLevels";
   int nvars, nhists, nbins, levelID, histID;
   HISTOGRAM *hists;
   
@@ -237,7 +237,7 @@ void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
 
 void hsetDestroy(HISTOGRAM_SET *hset)
 {
-  static const char func[] = "hsetDestroy";
+  static const char *func = "hsetDestroy";
   int varID, levelID, histID, nhists;
   
   if ( hset != NULL )
@@ -266,7 +266,7 @@ void hsetDestroy(HISTOGRAM_SET *hset)
 
 void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const field_t *field1, const field_t *field2)
 {
-  static const char func[] = "hsetDefVarLevelBounds";
+  static const char *func = "hsetDefVarLevelBounds";
   const double *array1 = field1->ptr;
   const double *array2 = field2->ptr;
   
@@ -322,7 +322,7 @@ void hsetDefVarLevelBounds(HISTOGRAM_SET *hset, int varID, int levelID, const fi
 
 void hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const field_t *field)
 {
-  static const char func[] = "hsetAddVarLevelValues";
+  static const char *func = "hsetAddVarLevelValues";
   const double *array = field->ptr;
   int i, grid, nvars, nlevels, nhists, nign = 0;
   HISTOGRAM *hists;
@@ -376,7 +376,7 @@ void hsetAddVarLevelValues(HISTOGRAM_SET *hset, int varID, int levelID, const fi
 
 void hsetGetVarLevelPercentiles(field_t *field, const HISTOGRAM_SET *hset, int varID, int levelID, double p)
 {
-  static const char func[] = "hsetGetVarLevelPercentiles";
+  static const char *func = "hsetGetVarLevelPercentiles";
   double *array = field->ptr;
   int i, nvars, nlevels, nhists, grid;
   HISTOGRAM *hists;

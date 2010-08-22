@@ -38,7 +38,7 @@ void farfun(field_t *field1, field_t field2, int function)
 
 void faradd(field_t *field1, field_t field2)
 {
-  static char func[] = "faradd";
+  static const char *func = "faradd";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -79,7 +79,7 @@ void faradd(field_t *field1, field_t field2)
 
 void farsum(field_t *field1, field_t field2)
 {
-  static char func[] = "farsum";
+  static const char *func = "farsum";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -129,7 +129,7 @@ void farsum(field_t *field1, field_t field2)
  */
 void farsumtr(field_t *occur, field_t field, double refval)
 {
-  static char func[] = "farsumtr";
+  static const char *func = "farsumtr";
   long   i, len;
   double omissval = occur->missval;
   double  *oarray = occur->ptr;
@@ -176,7 +176,7 @@ void farsumtr(field_t *occur, field_t field, double refval)
 
 void farsumq(field_t *field1, field_t field2)
 {
-  static char func[] = "farsumq";
+  static const char *func = "farsumq";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -218,7 +218,7 @@ void farsumq(field_t *field1, field_t field2)
 
 void farsub(field_t *field1, field_t field2)
 {
-  static char func[] = "farsub";
+  static const char *func = "farsub";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -253,7 +253,7 @@ void farsub(field_t *field1, field_t field2)
 
 void farmul(field_t *field1, field_t field2)
 {
-  static char func[] = "farmul";
+  static const char *func = "farmul";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -288,7 +288,7 @@ void farmul(field_t *field1, field_t field2)
 
 void fardiv(field_t *field1, field_t field2)
 {
-  static char func[] = "fardiv";
+  static const char *func = "fardiv";
   long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
@@ -313,7 +313,7 @@ void fardiv(field_t *field1, field_t field2)
 
 void faratan2(field_t *field1, field_t field2)
 {
-  static char func[] = "fardiv";
+  static const char *func = "fardiv";
   long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
@@ -338,7 +338,7 @@ void faratan2(field_t *field1, field_t field2)
 
 void farmin(field_t *field1, field_t field2)
 {
-  static char func[] = "farmin";
+  static const char *func = "farmin";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -377,7 +377,7 @@ void farmin(field_t *field1, field_t field2)
 
 void farmax(field_t *field1, field_t field2)
 {
-  static char func[] = "farmax";
+  static const char *func = "farmax";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -416,7 +416,7 @@ void farmax(field_t *field1, field_t field2)
 
 void farvar(field_t *field1, field_t field2, field_t field3)
 {
-  static char func[] = "farvar";
+  static const char *func = "farvar";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -465,7 +465,7 @@ void farvar(field_t *field1, field_t field2, field_t field3)
 
 void farstd(field_t *field1, field_t field2, field_t field3)
 {
-  static char func[] = "farstd";
+  static const char *func = "farstd";
   long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
@@ -495,7 +495,7 @@ void farstd(field_t *field1, field_t field2, field_t field3)
 
 void farcvar(field_t *field1, field_t field2, double rconst1)
 {
-  static char func[] = "farcvar";
+  static const char *func = "farcvar";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;
@@ -543,7 +543,7 @@ void farcvar(field_t *field1, field_t field2, double rconst1)
 
 void farcstd(field_t *field1, field_t field2, double rconst1)
 {
-  static char func[] = "farcstd";
+  static const char *func = "farcstd";
   long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
@@ -573,7 +573,7 @@ void farcstd(field_t *field1, field_t field2, double rconst1)
 
 void farmoq(field_t *field1, field_t field2)
 {
-  static char func[] = "farmoq";
+  static const char *func = "farmoq";
   long   i, len;
   int    grid1    = field1->grid;
   double missval1 = field1->missval;
@@ -624,7 +624,7 @@ void farmoq(field_t *field1, field_t field2)
  */  
 void farcount(field_t *field1, field_t field2)
 {
-  static char func[] = "farcount";
+  static const char *func = "farcount";
   long   i, len;
   int    grid1    = field1->grid;
   int    nmiss1   = field1->nmiss;

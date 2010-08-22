@@ -31,7 +31,7 @@
 
 void *Condc(void *argument)
 {
-  static char func[] = "Condc";
+  static const char *func = "Condc";
   int IFTHENC, IFNOTTHENC;
   int operatorID;
   int streamID1, streamID2;

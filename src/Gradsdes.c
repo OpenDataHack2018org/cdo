@@ -220,7 +220,7 @@ static int flt2ibm(float x, unsigned char *ibm) {
 
 static void dumpmap()
 {
-  static char func[] = "dumpmap";
+  static const char *func = "dumpmap";
   unsigned char urec[4];
   unsigned char vermap;
   unsigned char mrec[512];
@@ -366,7 +366,7 @@ static void dumpmap()
 
 void *Gradsdes(void *argument)
 {
-  static char func[] = "Gradsdes";
+  static const char *func = "Gradsdes";
   int GRADSDES1, GRADSDES2, DUMPMAP;
   int operatorID;
   int streamID = 0;

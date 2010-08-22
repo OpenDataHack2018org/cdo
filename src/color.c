@@ -157,7 +157,7 @@ void cptInit(CPT *cpt)
 
 int cptRead(FILE *fp, CPT *cpt)
 {
-  static char func[] = "cptRead";
+  static const char *func = "cptRead";
   int ncolors;
   int status = 0;
   /* Opens and reads a color palette file in RGB, HSV, or CMYK of arbitrary length */

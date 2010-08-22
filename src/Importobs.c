@@ -92,7 +92,7 @@ int getDate(const char *name)
 
 void *Importobs(void *argument)
 {
-  static char func[] = "Importobs";
+  static const char *func = "Importobs";
   int operatorID;
   char line[MAX_LINE_LEN];
   int streamID;

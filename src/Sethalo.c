@@ -28,7 +28,7 @@
 
 static int gentpngrid(int gridID1)
 {
-  static char func[] = "gentpngrid";  
+  static const char *func = "gentpngrid";  
   int gridtype, gridID2;
   int nlon1, nlat1;
   int nlon2, nlat2;
@@ -177,7 +177,7 @@ static int gentpngrid(int gridID1)
 
 static int gengrid(int gridID1, int lhalo, int rhalo)
 {
-  static char func[] = "gengrid";  
+  static const char *func = "gengrid";  
   int gridtype, gridID2;
   int nlon1, nlat1;
   int nlon2, nlat2;
@@ -463,7 +463,7 @@ static void tpnhalo(double *array1, int gridID1, double *array2)
 
 void *Sethalo(void *argument)
 {
-  static char func[] = "Sethalo";
+  static const char *func = "Sethalo";
   int SETHALO, TPNHALO;
   int operatorID;
   int streamID1, streamID2;

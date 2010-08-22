@@ -787,7 +787,7 @@ char *operatorAlias(char *operatorName)
 static
 int operatorInqModID(char *operatorName)
 {
-  static char func[] = "operatorInqModID";
+  static const char *func = "operatorInqModID";
   int i, j, modID = -1;
 
   if ( operatorName )

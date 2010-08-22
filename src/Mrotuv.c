@@ -193,7 +193,7 @@ void p_to_uv_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 
 void *Mrotuv(void *argument)
 {
-  static char func[] = "Mrotuv";
+  static const char *func = "Mrotuv";
   int streamID1, streamID2, streamID3;
   int nrecs;
   int tsID, recID, levelID;

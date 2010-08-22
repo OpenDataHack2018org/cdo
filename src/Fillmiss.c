@@ -29,7 +29,7 @@
 
 void fillmiss(field_t *field1, field_t *field2, int nfill)
 {
-  static char func[] = "fillmiss";
+  static const char *func = "fillmiss";
   int gridID, nx, ny, i, j;
   int nmiss1, nmiss2 = 0;
   int kr, ku, kl, ko;
@@ -141,7 +141,7 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
 
 void *Fillmiss(void *argument)
 {
-  static char func[] = "Fillmiss";
+  static const char *func = "Fillmiss";
   int streamID1, streamID2;
   int nrecs, ngrids;
   int index;

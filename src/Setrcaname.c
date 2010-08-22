@@ -24,7 +24,7 @@
 
 void *Setrcaname(void *argument)
 {
-  static char func[] = "Setrcaname";
+  static const char *func = "Setrcaname";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;

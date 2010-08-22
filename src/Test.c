@@ -67,7 +67,7 @@ void *Test2(void *argument)
 
 void *Testdata(void *argument)
 {
-  static char func[] = "Copy";
+  static const char *func = "Copy";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID1, tsID2, recID, varID, levelID;

@@ -31,7 +31,7 @@
 
 int genThinoutGrid(int gridID1, int xinc, int yinc)
 {
-  static char func[] = "genThinoutGrid";
+  static const char *func = "genThinoutGrid";
   int ilon, ilat, olon, olat;
   int gridID2, gridtype;
   int gridsize1, nlon1, nlat1;
@@ -90,7 +90,7 @@ int genThinoutGrid(int gridID1, int xinc, int yinc)
 
 int genBoxavgGrid(int gridID1, int xinc, int yinc)
 {
-  static char func[] = "genBoxavgGrid";
+  static const char *func = "genBoxavgGrid";
   int i, j, i1;
   int gridID2, gridtype;
   int gridsize1, nlon1, nlat1;
@@ -184,7 +184,7 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 
 void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
 {
-  static char func[] = "boxavg";
+  static const char *func = "boxavg";
   int nlon1, nlat1;
   int nlon2, nlat2;
   int ilat, ilon;
@@ -254,7 +254,7 @@ void boxavg(field_t *field1, field_t *field2, int xinc, int yinc)
 
 void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
 {
-  static char func[] = "thinout";
+  static const char *func = "thinout";
   int nlon1, nlat1;
   int nlon2, nlat2;
   int ilat, ilon, olat, olon;
@@ -314,7 +314,7 @@ void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
 
 void *Intgrid(void *argument)
 {
-  static char func[] = "Intgrid";
+  static const char *func = "Intgrid";
   int INTGRID, INTPOINT, INTERPOLATE, BOXAVG, THINOUT;
   int operatorID;
   int streamID1, streamID2;

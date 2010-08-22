@@ -29,7 +29,7 @@
 
 void *Pinfo(void *argument)
 {
-  static char func[] = "Pinfo";
+  static const char *func = "Pinfo";
   int PINFO, PINFOV;
   int operatorID;
   int i;

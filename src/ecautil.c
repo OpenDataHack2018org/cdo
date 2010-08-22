@@ -146,7 +146,7 @@ unsigned long day_of_year(int date)
  */  
 static void count(field_t *field1, const field_t *field2, double mode)
 {
-  static const char func[] = "count";
+  static const char *func = "count";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -231,7 +231,7 @@ static void count(field_t *field1, const field_t *field2, double mode)
  */  
 static void selcomp(field_t *field1, const field_t *field2, int (*compare)(double, double))
 {
-  static const char func[] = "selcomp";
+  static const char *func = "selcomp";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -371,7 +371,7 @@ void farnum3(field_t *field1, field_t field2, double n)
 
 void farsel(field_t *field1, field_t field2)
 {
-  static const char func[] = "farsel";
+  static const char *func = "farsel";
   int   i, len;
   const int     grid1    = field1->grid;
   const double  missval1 = field1->missval;

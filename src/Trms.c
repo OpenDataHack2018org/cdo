@@ -64,7 +64,7 @@ void trms(field_t field1, field_t field2, double *dp, field_t *field3)
 
 void *Trms(void *argument)
 {
-  static char func[] = "Trms";
+  static const char *func = "Trms";
   int streamID1, streamID2, streamID3;
   int vlistID1, vlistID2, vlistID3;
   int gridID1, gridID3, lastgrid = -1;

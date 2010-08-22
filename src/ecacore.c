@@ -38,7 +38,7 @@
 
 void eca1(const ECA_REQUEST_1 *request)
 {
-  static const char func[] = "eca1";
+  static const char *func = "eca1";
   const int operatorID = cdoOperatorID();
   
   int cmplen;
@@ -398,7 +398,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
 void eca2(const ECA_REQUEST_2 *request)
 {
-  static const char func[] = "eca2";
+  static const char *func = "eca2";
   const int operatorID = cdoOperatorID();
   
   int cmplen;
@@ -776,7 +776,7 @@ void eca2(const ECA_REQUEST_2 *request)
 
 void eca3(const ECA_REQUEST_3 *request)
 {
-  static const char func[] = "eca3";
+  static const char *func = "eca3";
   const int operatorID = cdoOperatorID();
   
   int cmplen;
@@ -978,7 +978,7 @@ void eca3(const ECA_REQUEST_3 *request)
 
 void eca4(const ECA_REQUEST_4 *request)
 {
-  static const char func[] = "eca4";
+  static const char *func = "eca4";
   const int operatorID = cdoOperatorID();
   
   int cmplen;

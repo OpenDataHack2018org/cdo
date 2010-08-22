@@ -31,7 +31,7 @@
 
 void *Seascount(void *argument)
 {
-  static char func[] = "Seascount";
+  static const char *func = "Seascount";
   int operatorID;
   int operfunc;
   int gridsize;

@@ -114,7 +114,7 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
 static
 void genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  static char func[] = "genlonlatgrid";  
+  static const char *func = "genlonlatgrid";  
   int nlon1, nlat1;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
@@ -235,7 +235,7 @@ static void maskbox(int *mask, int gridID,
 
 static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
-  static char func[] = "maskregion";
+  static const char *func = "maskregion";
   int i, j;
   int nlon, nlat;
   int ilat, ilon;
@@ -326,7 +326,7 @@ static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, 
 
 void *Maskbox(void *argument)
 {
-  static char func[] = "Maskbox";
+  static const char *func = "Maskbox";
   int MASKLONLATBOX, MASKINDEXBOX, MASKREGION;
   int operatorID;
   int streamID1, streamID2;

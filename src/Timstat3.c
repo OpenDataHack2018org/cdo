@@ -35,7 +35,7 @@
 
 void *Timstat3(void *argument)
 {
-  static char func[] = "Timstat3";
+  static const char *func = "Timstat3";
   int VARQUOT2TEST, MEANDIFF2TEST;
   int operatorID;
   int *streamID, streamID3;

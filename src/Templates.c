@@ -23,7 +23,7 @@
 
 void *Template1(void *argument)
 {
-  static char func[] = "Template1";
+  static const char *func = "Template1";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;
@@ -100,7 +100,7 @@ void *Template1(void *argument)
 
 void *Template2(void *argument)
 {
-  static char func[] = "Template2";
+  static const char *func = "Template2";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID, recID, varID, levelID;

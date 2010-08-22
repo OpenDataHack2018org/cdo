@@ -35,7 +35,7 @@
 
 void *Compc(void *argument)
 {
-  static char func[] = "Compc";
+  static const char *func = "Compc";
   int EQC, NEC, LEC, LTC, GEC, GTC;
   int operatorID;
   int streamID1, streamID2;

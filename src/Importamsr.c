@@ -97,7 +97,7 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
 static
 void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 {
-  static char func[] = "read_amsr_averaged";
+  static const char *func = "read_amsr_averaged";
   int varID, i, gridsize;
   unsigned char *amsr_data = NULL;
   double xminval, xscale, missval;
@@ -165,7 +165,7 @@ int getDate(const char *name)
 
 void *Importamsr(void *argument)
 {
-  static char func[] = "Importamsr";
+  static const char *func = "Importamsr";
   int streamID;
   int tsID;
   int gridID, zaxisID, taxisID, vlistID;

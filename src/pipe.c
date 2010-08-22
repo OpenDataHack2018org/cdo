@@ -35,7 +35,7 @@ static int PipeDebug = 0;
 
 static void pipe_init(PIPE *pipe)
 {
-  static char func[] = "pipe_init";
+  static const char *func = "pipe_init";
   pthread_mutexattr_t m_attr;
   pthread_condattr_t c_attr;
 
@@ -117,7 +117,7 @@ static void pipe_init(PIPE *pipe)
 
 PIPE *pipeNew()
 {
-  static char func[] = "pipeNew";  
+  static const char *func = "pipeNew";  
   PIPE *pipe;
 
   pipe = (PIPE *) malloc(sizeof(PIPE));
@@ -130,7 +130,7 @@ PIPE *pipeNew()
 
 void pipeDelete(PIPE *pipe)
 {
-  static char func[] = "pipeDelete";  
+  static const char *func = "pipeDelete";  
 
   if ( pipe )
     {
@@ -150,7 +150,7 @@ void pipeDelete(PIPE *pipe)
 
 void pipeDefVlist(PSTREAM *pstreamptr, int vlistID)
 {
-  static char func[] = "pipeDefVlist";
+  static const char *func = "pipeDefVlist";
   char *pname = pstreamptr->name;
   PIPE *pipe;
 
@@ -169,7 +169,7 @@ void pipeDefVlist(PSTREAM *pstreamptr, int vlistID)
 
 int pipeInqVlist(PSTREAM *pstreamptr)
 {
-  static char func[] = "pipeInqVlist";
+  static const char *func = "pipeInqVlist";
   char *pname = pstreamptr->name;
   PIPE *pipe;
   int vlistID;
@@ -194,7 +194,7 @@ int pipeInqVlist(PSTREAM *pstreamptr)
 
 int pipeInqTimestep(PSTREAM *pstreamptr, int tsID)
 {
-  static char func[] = "pipeInqTimestep";
+  static const char *func = "pipeInqTimestep";
   char *pname = pstreamptr->name;
   PIPE *pipe;
   int nrecs;
@@ -252,7 +252,7 @@ int pipeInqTimestep(PSTREAM *pstreamptr, int tsID)
 
 void pipeDefTimestep(PSTREAM *pstreamptr, int tsID)
 {
-  static char func[] = "pipeDefTimestep";
+  static const char *func = "pipeDefTimestep";
   char *pname = pstreamptr->name;
   int nrecs;
   PIPE *pipe;
@@ -303,7 +303,7 @@ sleep(1);
 
 int pipeInqRecord(PSTREAM *pstreamptr, int *varID, int *levelID)
 {
-  static char func[] = "pipeInqRecord";
+  static const char *func = "pipeInqRecord";
   char *pname = pstreamptr->name;
   PIPE *pipe;
   int condSignal = FALSE;
@@ -370,7 +370,7 @@ int pipeInqRecord(PSTREAM *pstreamptr, int *varID, int *levelID)
 
 void pipeDefRecord(PSTREAM *pstreamptr, int varID, int levelID)
 {
-  static char func[] = "pipeDefRecord";
+  static const char *func = "pipeDefRecord";
   char *pname = pstreamptr->name;
   PIPE *pipe;
   int condSignal = FALSE;
@@ -421,7 +421,7 @@ void pipeDefRecord(PSTREAM *pstreamptr, int varID, int levelID)
 
 void pipeCopyRecord(PSTREAM *pstreamptr_out, PSTREAM *pstreamptr_in)
 {
-  static char func[] = "pipeCopyRecord";
+  static const char *func = "pipeCopyRecord";
   char *ipname = pstreamptr_in->name;
   char *opname = pstreamptr_out->name;
   PIPE *pipe;
@@ -461,7 +461,7 @@ void pipeCopyRecord(PSTREAM *pstreamptr_out, PSTREAM *pstreamptr_in)
 
 void pipeReadRecord(PSTREAM *pstreamptr, double *data, int *nmiss)
 {
-  static char func[] = "pipeReadRecord";
+  static const char *func = "pipeReadRecord";
   char *pname = pstreamptr->name;
   PIPE *pipe;
 
@@ -557,7 +557,7 @@ void pipeReadRecord(PSTREAM *pstreamptr, double *data, int *nmiss)
 
 void pipeWriteRecord(PSTREAM *pstreamptr, double *data, int nmiss)
 {
-  static char func[] = "pipeWriteRecord";
+  static const char *func = "pipeWriteRecord";
   char *pname = pstreamptr->name;
   PIPE *pipe;
 

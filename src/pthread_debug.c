@@ -130,7 +130,7 @@ void Pthread_debug(int debug)
 int Pthread_create(const char *caller, pthread_t *th,
 		   pthread_attr_t *attr, void * (*start_routine)(void *), void *arg)
 {
-  static char func[] = "Pthread_create";
+  static const char *func = "Pthread_create";
   int status;
 
   if ( PTHREAD_Debug ) Message(caller, "+%s", func);
@@ -154,7 +154,7 @@ int Pthread_create(const char *caller, pthread_t *th,
 
 int Pthread_join(const char *caller, pthread_t th, void **thread_return)
 {
-  static char func[] = "Pthread_join";
+  static const char *func = "Pthread_join";
   int status;
 
   //  if ( PTHREAD_Debug ) Message(caller, "+%s (thID = %ld)", func, (void *) th);
@@ -169,7 +169,7 @@ int Pthread_join(const char *caller, pthread_t th, void **thread_return)
 
 void Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
 {
-  static char func[] = "Pthread_mutex_lock";
+  static const char *func = "Pthread_mutex_lock";
   int status;
 
   if ( PTHREAD_Debug ) Message(caller, "+%s (mutex = %p)", func, (void *) mutex);
@@ -196,7 +196,7 @@ void Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
 
 void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
 {
-  static char func[] = "Pthread_mutex_unlock";
+  static const char *func = "Pthread_mutex_unlock";
   int status;
 
   if ( PTHREAD_Debug ) Message(caller, "+%s (mutex = %p)", func, (void *) mutex);
@@ -223,7 +223,7 @@ void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
 
 void Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
 {
-  static char func[] = "Pthread_cond_signal";
+  static const char *func = "Pthread_cond_signal";
 
   if ( PTHREAD_Debug ) Message(caller, "+%s (cond = %p)", func, (void *) cond);
 
@@ -235,7 +235,7 @@ void Pthread_cond_signal(const char *caller, pthread_cond_t *cond)
 
 void Pthread_cond_wait(const char *caller, pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
-  static char func[] = "Pthread_cond_wait";
+  static const char *func = "Pthread_cond_wait";
 
   if ( PTHREAD_Debug ) Message(caller, "+%s (cond = %p, mutex =  %p)",
 			       func, (void *) cond, (void *) mutex);

@@ -32,7 +32,7 @@
 
 void *Gridcell(void *argument)
 {
-  static char func[] = "Gridcell";
+  static const char *func = "Gridcell";
   int GRIDAREA, GRIDWGTS, GRIDMASK;
   int operatorID;
   int streamID1, streamID2;

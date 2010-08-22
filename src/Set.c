@@ -34,7 +34,7 @@
 
 void *Set(void *argument)
 {
-  static char func[] = "Set";
+  static const char *func = "Set";
   int SETPARTAB, SETPARTABV, SETCODE, SETNAME, SETLEVEL, SETLTYPE, SETTABNUM;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

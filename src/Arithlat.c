@@ -35,7 +35,7 @@
 
 void *Arithlat(void *argument)
 {
-  static char func[] = "Arithlat";
+  static const char *func = "Arithlat";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

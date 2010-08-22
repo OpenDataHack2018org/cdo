@@ -31,7 +31,7 @@
 /* Same code as Trend ! */
 void *Regres(void *argument)
 {
-  static char func[] = "Regres";
+  static const char *func = "Regres";
   int gridsize;
   int vdate = 0, vtime = 0;
   int nrecs, nrecords;

@@ -33,7 +33,7 @@
 static
 void rot_uv_back(int gridID, double *us, double *vs)
 {
-  static char func[] = "rot_uv_back";
+  static const char *func = "rot_uv_back";
   int i, ilat, ilon, nlat, nlon;
   double u, v;
   double xval, yval;
@@ -79,7 +79,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
 void *Rotuv(void *argument)
 {
-  static char func[] = "Rotuv";
+  static const char *func = "Rotuv";
   int streamID1, streamID2;
   int nrecs;
   int tsID, recID, varID, levelID;

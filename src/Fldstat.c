@@ -38,7 +38,7 @@
 
 void *Fldstat(void *argument)
 {
-  static char func[] = "Fldstat";
+  static const char *func = "Fldstat";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

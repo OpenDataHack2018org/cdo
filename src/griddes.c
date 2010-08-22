@@ -163,7 +163,7 @@ int getoptname(char *optname, const char *optstring, int nopt)
 
 int gridDefine(grid_t grid)
 {
-  static char func[] = "gridDefine";
+  static const char *func = "gridDefine";
   int gridID = UNDEFID;
   int i;
 
@@ -556,7 +556,7 @@ void fnmexp2(char *out, char *in1, const char *in2)
 /*
 double *readfield(grid_t *grid, int record, char *format, char *filename)
 {
-  static char func[] = "readfield";
+  static const char *func = "readfield";
   int fileID, rxysize, ierr, irec;
   double *vals;
 
@@ -592,7 +592,7 @@ double *readfield(grid_t *grid, int record, char *format, char *filename)
 /*
 double *readfield4(grid_t *grid, int record, char *format, char *filename)
 {
-  static char func[] = "readfield4";
+  static const char *func = "readfield4";
   int fileID, rxysize, ierr, irec;
   double *vals;
 
@@ -643,7 +643,7 @@ double readflt(const char *name, const char *pline)
 
 int gridFromFile(FILE *gfp, const char *dname)
 {
-  static char func[] = "gridFromFile";
+  static const char *func = "gridFromFile";
   char line[MAX_LINE_LEN], *pline;
   int gridID = -1;
   int size;
@@ -1213,7 +1213,7 @@ int input_darray(FILE *gfp, int n_values, double *array)
 
 int gridFromPingo(FILE *gfp, const char *dname)
 {
-  static char func[] = "gridFromPingo";
+  static const char *func = "gridFromPingo";
   int gridID = -1;
   int i;
   int nlon, nlat;
@@ -1348,7 +1348,7 @@ int nlat2ntr_linear(int nlat)
 
 int ntr2nlat(int ntr)
 {
-  static char func[] = "ntr2nlat";
+  static const char *func = "ntr2nlat";
   int nlat, nlat2;
 
   nlat = NINT((ntr*3.+1.)/2.);
@@ -1368,7 +1368,7 @@ int ntr2nlat(int ntr)
 
 int ntr2nlat_linear(int ntr)
 {
-  static char func[] = "ntr2nlat_linear";
+  static const char *func = "ntr2nlat_linear";
   int nlat, nlat2;
 
   nlat = NINT((ntr*2.+1.)/2.);
@@ -1421,7 +1421,7 @@ int compNlon(int nlat)
 
 void gen_grid_lonlat(grid_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
-  static char func[] = "gen_grid_lonlat";
+  static const char *func = "gen_grid_lonlat";
   int nlon, nlat, i;
 
   grid->type = GRID_LONLAT;
@@ -1449,7 +1449,7 @@ void gen_grid_lonlat(grid_t *grid, const char *pline, double inc, double lon1, d
 
 int gridFromName(const char *gridname)
 {
-  static char func[] = "gridFromName";
+  static const char *func = "gridFromName";
   const char *pline;
   int gridID = UNDEFID;
   grid_t grid;
@@ -1652,7 +1652,7 @@ int gridFromName(const char *gridname)
 
 int cdoDefineGrid(const char *gridfile)
 {
-  static char func[] = "cdoDefineGrid";
+  static const char *func = "cdoDefineGrid";
   FILE *gfp;
   char buffer[4];
   int gridID = -1;

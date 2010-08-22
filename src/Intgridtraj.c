@@ -54,7 +54,7 @@ int readnextpos(FILE *fp, int calendar, juldate_t *juldate, double *xpos, double
 
 void *Intgridtraj(void *argument)
 {
-  static char func[] = "Intgridtraj";
+  static const char *func = "Intgridtraj";
   int streamID1, streamID2;
   int nrecs, nvars, nlevel;
   int index, ngrids;

@@ -100,7 +100,7 @@ typedef struct
 
 void *Scatter(void *argument)
 {
-  static char func[] = "Scatter";
+  static const char *func = "Scatter";
   int nchars;
   int streamID1;
   int *vlistIDs = NULL, *streamIDs = NULL;

@@ -669,7 +669,7 @@ void get_env_vars(void)
 
 int main(int argc, char *argv[])
 {
-  static char func[] = "main";
+  static const char *func = "main";
   int c;
   int Debug = 0;
   int Version = 0;

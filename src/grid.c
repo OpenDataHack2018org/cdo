@@ -58,7 +58,7 @@ void gridToDegree(const char *units, const char *string, int gridsize, double *a
 
 int gridToZonal(int gridID1)
 {
-  static char func[] = "gridToZonal";
+  static const char *func = "gridToZonal";
   int gridID2;
   int gridtype, gridsize;
   double  xval = 0;
@@ -98,7 +98,7 @@ int gridToZonal(int gridID1)
 
 int gridToMeridional(int gridID1)
 {
-  static char func[] = "gridToMeridional";
+  static const char *func = "gridToMeridional";
   int gridID2;
   int gridtype, gridsize;
   double *xvals;
@@ -301,7 +301,7 @@ void gridGenYbounds2D(int nx, int ny, const double * restrict ybounds, double * 
 static
 char *gen_param(const char *fmt, ...)
 {
-  static char func[] = "get_param";
+  static const char *func = "get_param";
   va_list args;
   char str[256];
   char *rstr;
@@ -323,7 +323,7 @@ char *gen_param(const char *fmt, ...)
 static
 void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
-  static char func[] = "lcc_to_geo";
+  static const char *func = "lcc_to_geo";
   double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
   double zlat, zlon;
   double xi, xj;
@@ -400,7 +400,7 @@ static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  static char func[] = "laea_to_geo";
+  static const char *func = "laea_to_geo";
   PJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -445,7 +445,7 @@ static
 void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  static char func[] = "lcc2_to_geo";
+  static const char *func = "lcc2_to_geo";
   PJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -493,7 +493,7 @@ int    qu2reg3(double *pfield, int *kpoint, int klat, int klon,
 
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss)
 {
-  static char func[] = "field2regular";
+  static const char *func = "field2regular";
   int nlon, nlat;
   int gridtype;
   int lmiss, lperio, lveggy;
@@ -525,7 +525,7 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 
 int gridToRegular(int gridID1)
 {
-  static char func[] = "gridToRegular";
+  static const char *func = "gridToRegular";
   int gridID2;
   int gridtype, gridsize;
   int nx, ny;
@@ -563,7 +563,7 @@ int gridToRegular(int gridID1)
 static
 void gridCopyMask(int gridID1, int gridID2, long gridsize)
 {
-  static char func[] = "gridCopyMask";
+  static const char *func = "gridCopyMask";
 
   if ( gridInqMask(gridID1, NULL) )
     {
@@ -578,7 +578,7 @@ void gridCopyMask(int gridID1, int gridID2, long gridsize)
 
 int gridToCurvilinear(int gridID1)
 {
-  static char func[] = "gridToCurvilinear";
+  static const char *func = "gridToCurvilinear";
   int gridID2;
   int gridtype, gridsize;
   long index;
@@ -835,7 +835,7 @@ int gridToCurvilinear(int gridID1)
 
 int gridToCell(int gridID1)
 {
-  static char func[] = "gridToCell";
+  static const char *func = "gridToCell";
   int gridID2;
   int gridtype, gridsize;
 
@@ -1183,7 +1183,7 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
 
 int gridGenArea(int gridID, double *area)
 {
-  static char func[] = "gridGenArea";
+  static const char *func = "gridGenArea";
   int status = 0;
   int gridtype;
   int lgrid_gen_bounds = FALSE;
@@ -1300,7 +1300,7 @@ int gridGenArea(int gridID, double *area)
 
 int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 {
-  static char func[] = "gridGenWeights";
+  static const char *func = "gridGenWeights";
   int i, nvals, gridsize, gridtype;
   int status = 0;
   int *grid_mask = NULL;
@@ -1349,7 +1349,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 static
 int gridWeightsOld(int gridID, double *weights)
 {
-  static char func[] = "gridWeightsOld";
+  static const char *func = "gridWeightsOld";
   int status = FALSE;
   long i, j;
   int len;
@@ -1437,7 +1437,7 @@ int gridWeightsOld(int gridID, double *weights)
 
 int gridWeights(int gridID, double *grid_wgts)
 {
-  static char func[] = "gridWeights";
+  static const char *func = "gridWeights";
   int i, gridsize, gridtype;
   int a_status, w_status;
   double *grid_area;

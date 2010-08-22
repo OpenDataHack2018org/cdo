@@ -65,7 +65,7 @@ void rev_yvals(double *yvals, int ny)
 static
 int y_is_gauss(double *gridyvals, int ysize)
 {
-  static char func[] = "y_is_gauss";
+  static const char *func = "y_is_gauss";
   int lgauss = FALSE;
   int i;
 
@@ -105,7 +105,7 @@ int y_is_gauss(double *gridyvals, int ysize)
 static
 int define_grid(dsets_t *pfi)
 {
-  static char func[] = "define_grid";
+  static const char *func = "define_grid";
   int gridID, gridtype;
   int nx, ny;
   double *xvals, *yvals;
@@ -144,7 +144,7 @@ int define_grid(dsets_t *pfi)
 static
 int define_level(dsets_t *pfi, int nlev)
 {
-  static char func[] = "define_level";
+  static const char *func = "define_level";
   int zaxisID = -1;
   int nz;
 
@@ -185,7 +185,7 @@ int define_level(dsets_t *pfi, int nlev)
 
 void *Importbinary(void *argument)
 {
-  static char func[] = "Importbinary";
+  static const char *func = "Importbinary";
   int streamID;
   int gridID = -1, zaxisID, zaxisIDsfc, taxisID, vlistID;
   int i;

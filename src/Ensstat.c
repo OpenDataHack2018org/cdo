@@ -41,7 +41,7 @@
 
 void *Ensstat(void *argument)
 {
-  static char func[] = "Ensstat";
+  static const char *func = "Ensstat";
   int operatorID;
   int operfunc;
   int i;

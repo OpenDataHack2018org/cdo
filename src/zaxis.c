@@ -99,7 +99,7 @@ static int getoptname(char *optname, const char *optstring, int nopt)
 
 int zaxisDefine(zaxis_t zaxis)
 {
-  static char func[] = "zaxisDefine";
+  static const char *func = "zaxisDefine";
   int zaxisID = UNDEFID;
 
   if ( zaxis.type == -1 ) Error(func, "zaxistype undefined!");
@@ -152,7 +152,7 @@ static char *skipSeparator(char *pline)
 
 int zaxisFromFile(FILE *gfp)
 {
-  static char func[] = "zaxisFromFile";
+  static const char *func = "zaxisFromFile";
   char line[MAX_LINE_LEN], *pline;
   int zaxisID;
   zaxis_t zaxis;
@@ -371,7 +371,7 @@ int zaxisFromFile(FILE *gfp)
 
 int zaxisFromName(const char *zaxisname)
 {
-  static char func[] = "zaxisFromName";
+  static const char *func = "zaxisFromName";
   const char *pline;
   int zaxisID = UNDEFID;
   zaxis_t zaxis;
@@ -395,7 +395,7 @@ int zaxisFromName(const char *zaxisname)
 
 int cdoDefineZaxis(const char *zaxisfile)
 {
-  static char func[] = "cdoDefineZaxis";
+  static const char *func = "cdoDefineZaxis";
   FILE *zfp;
   int zaxisID = -1;
 

@@ -324,7 +324,7 @@ void *EcaCsu(void *argument)
 
 void *EcaCwdi(void *argument)
 {
-  static const char func[] = "EcaCwdi";
+  static const char *func = "EcaCwdi";
   char *longname;
   int argN = 6;
   double argT = 5.0;
@@ -368,7 +368,7 @@ void *EcaCwdi(void *argument)
 
 void *EcaCwfi(void *argument)
 {
-  static const char func[] = "EcaCwfi";
+  static const char *func = "EcaCwfi";
   char *longname;
   int argN = 6;
   ECA_REQUEST_2 request;
@@ -467,7 +467,7 @@ void *EcaFd(void *argument)
 */
 void *EcaGsl(void *argument)
 {
-  static const char func[] = "EcaGsl";
+  static const char *func = "EcaGsl";
   char *longname;
   int argN = 6; 
   double argT = 5.0;
@@ -546,7 +546,7 @@ void *EcaHd(void *argument)
 
 void *EcaHwdi(void *argument)
 {
-  static const char func[] = "EcaHwdi";
+  static const char *func = "EcaHwdi";
   char *longname;
   int argN = 6;
   double argT = 5.0;
@@ -590,7 +590,7 @@ void *EcaHwdi(void *argument)
 
 void *EcaHwfi(void *argument)
 {
-  static const char func[] = "EcaHwfi";
+  static const char *func = "EcaHwfi";
   char *longname;
   int argN = 6;
   ECA_REQUEST_2 request;
@@ -658,7 +658,7 @@ void *EcaId(void *argument)
 
 void *EcaSu(void *argument)
 {
-  static const char func[] = "EcaSu";
+  static const char *func = "EcaSu";
   char *longname;
   double argT = 25.0;
   ECA_REQUEST_1 request;
@@ -794,7 +794,7 @@ void *EcaTn90p(void *argument)
 
 void *EcaTr(void *argument)
 {
-  static const char func[] = "EcaTr";
+  static const char *func = "EcaTr";
   char *longname;
   double argT = 20.0;
   ECA_REQUEST_1 request;
@@ -1270,7 +1270,7 @@ void *EcaRx1day(void *argument)
 
 void *EcaRx5day(void *argument)
 {
-  static const char func[] = "EcaRx5day";
+  static const char *func = "EcaRx5day";
   char *longname;
   double argX = 50.0;
   ECA_REQUEST_1 request;
@@ -1365,7 +1365,7 @@ void *Fdns(void *argument)
 
 void *Strwin(void *argument)
 {
-  static const char func[] = "Strwin";
+  static const char *func = "Strwin";
   char *longname;
   double maxWind = 10.5;
   ECA_REQUEST_1 request;

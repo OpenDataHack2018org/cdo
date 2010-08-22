@@ -30,7 +30,7 @@
 
 void *Varrms(void *argument)
 {
-  static char func[] = "Varrms";
+  static const char *func = "Varrms";
   int streamID1, streamID2, streamID3;
   int vlistID1, vlistID2, vlistID3;
   int gridID1, gridID2, gridID3, lastgrid = -1;

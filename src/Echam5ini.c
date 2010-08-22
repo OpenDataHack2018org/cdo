@@ -75,7 +75,7 @@ static void iniatts(ATTS *atts)
 static void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
 	       const char *longname, const char *units)
 {
-  static char func[] = "inivar_ml";
+  static const char *func = "inivar_ml";
   
   var->gridtype  = gridtype;
   var->zaxistype = zaxistype;
@@ -91,7 +91,7 @@ static void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *
 
 static void inivars_ml(VAR **vars)
 {
-  static char func[] = "inivars_ml";
+  static const char *func = "inivars_ml";
 
   *vars = (VAR *) malloc((nvars_ml+1)*sizeof(VAR));
 
@@ -118,7 +118,7 @@ static void nce(int istat)
 
 static int import_e5ml(const char *filename, VAR **vars)
 {
-  static char func[] = "import_e5ml";
+  static const char *func = "import_e5ml";
   int nvars = 0;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_dim_id, nc_var_id;
@@ -280,7 +280,7 @@ static int import_e5ml(const char *filename, VAR **vars)
 
 static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
 {
-  static char func[] = "export_e5ml";
+  static const char *func = "export_e5ml";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
   size_t nvals;
@@ -616,7 +616,7 @@ static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, i
 #if  defined  (HAVE_LIBNETCDF)
 static void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
 {
-  static char func[] = "read_gg3d";
+  static const char *func = "read_gg3d";
   int nlev, nlat, nlon, gridsize, i;
   int gridtype, zaxistype;
   int nc_var_id;
@@ -654,7 +654,7 @@ static void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, in
 #if  defined  (HAVE_LIBNETCDF)
 static void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID, int nhgl, int nmp1)
 {
-  static char func[] = "read_fc4d";
+  static const char *func = "read_fc4d";
   int nlev, nfc, i;
   int gridtype, zaxistype;
   int nc_var_id;
@@ -691,7 +691,7 @@ static void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, in
 
 static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 {
-  static char func[] = "import_e5res";
+  static const char *func = "import_e5res";
   int nvars = 0;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
@@ -1086,7 +1086,7 @@ static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 
 static void export_e5res(const char *filename, VAR *vars, int nvars)
 {
-  static char func[] = "export_e5res";
+  static const char *func = "export_e5res";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
   int varid;
@@ -1430,7 +1430,7 @@ static void export_e5res(const char *filename, VAR *vars, int nvars)
 
 void *Echam5ini(void *argument)
 {
-  static char func[] = "Echam5ini";
+  static const char *func = "Echam5ini";
   int operatorID;
   int operfunc;
   int IMPORT_E5ML, IMPORT_E5RES;

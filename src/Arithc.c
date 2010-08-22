@@ -33,7 +33,7 @@
 
 void *Arithc(void *argument)
 {
-  static char func[] = "Arithc";
+  static const char *func = "Arithc";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

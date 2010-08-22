@@ -47,7 +47,7 @@ void minmax(int nvals, double *array, double *minval, double *maxval)
 
 void *Change_e5slm(void *argument)
 {
-  static char func[] = "Change_e5slm";
+  static const char *func = "Change_e5slm";
   int streamIDslm, streamID1, streamID2;
   const char *fn_slm;
   char name[256];

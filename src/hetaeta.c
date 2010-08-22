@@ -471,7 +471,7 @@ void hetaeta(int ltq, int ngp, const int *imiss,
 	     double *restrict tscor, double *restrict pscor,
 	     double *restrict secor)
 {
-  static char func[] = "hetaeta";
+  static const char *func = "hetaeta";
   double epsm1i;
   long jblt;
   long k, iv, ij;

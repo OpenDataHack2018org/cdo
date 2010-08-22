@@ -55,7 +55,7 @@ int cmpdatetime(const void *s1, const void *s2)
 
 void *Sorttimestamp(void *argument)
 {
-  static char func[] = "Sorttimestamp";
+  static const char *func = "Sorttimestamp";
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;

@@ -36,7 +36,7 @@
 
 void *Ymonpctl(void *argument)
 {
-  static char func[] = "Ymonpctl";
+  static const char *func = "Ymonpctl";
   int gridsize;
   int varID;
   int recID;

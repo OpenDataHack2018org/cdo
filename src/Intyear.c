@@ -33,7 +33,7 @@
 
 void *Intyear(void *argument)
 {
-  static char func[] = "Intyear";
+  static const char *func = "Intyear";
   int streamID1, streamID2;
   int nrecs;
   int i, iy;

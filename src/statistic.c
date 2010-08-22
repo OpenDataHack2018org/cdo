@@ -37,7 +37,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
 					 int n, int n_eig, const char *prompt)
 /* After return the rows (!!!) of a are the eigenvectors */
 {
-  static char func[] = "eigen_solution_of_symmetric_matrix";
+  static const char *func = "eigen_solution_of_symmetric_matrix";
   double *e;
   int i, j;
   double temp;
@@ -331,7 +331,7 @@ void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
 
 int solution_of_linear_equation (double **a, double *b, int n)
 {
-  static char func[] = "solution_of_linear_equation";
+  static const char *func = "solution_of_linear_equation";
   int *index;
   int sign;
   int not_singular;
@@ -351,7 +351,7 @@ int solution_of_linear_equation (double **a, double *b, int n)
 
 int inverse_of_matrix (double **a, double **b, int n)
 {
-  static char func[] = "inverse_of_matrix";
+  static const char *func = "inverse_of_matrix";
   int *index;
   int sign;
   int i, j;
@@ -384,7 +384,7 @@ int inverse_of_matrix (double **a, double **b, int n)
 
 int lu_decomposition (double **a, int n, int *index, int *sign)
 {
-  static char func[] = "decomposition";
+  static const char *func = "decomposition";
   int i, imax = 0, j, k;
   double big, sum, temp;
   double *v;
@@ -539,7 +539,7 @@ void fft (double *real, double *imag, int n, int sign)
 
 void ft (double *real, double *imag, int n, int sign)
 {				/* sign should be 1 (FT) or -1 (reverse FT) */
-  static char func[] = "ft";
+  static const char *func = "ft";
   int j, k;
   static double *work_r = 0, *work_i = 0;
   double sum_r, sum_i, norm;

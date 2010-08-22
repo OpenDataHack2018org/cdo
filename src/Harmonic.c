@@ -29,7 +29,7 @@
 
 void *Harmonic(void *argument)
 {
-  static char func[] = "Harmonic";
+  static const char *func = "Harmonic";
   int gridsize;
   int nrecs;
   int varID, levelID, recID;

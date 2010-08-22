@@ -34,7 +34,7 @@
 
 void *Ydayarith(void *argument)
 {
-  static char func[] = "Ydayarith";
+  static const char *func = "Ydayarith";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;

@@ -38,7 +38,7 @@
 
 void *Spectral(void *argument)
 {
-  static char func[] = "Spectral";
+  static const char *func = "Spectral";
   int GP2SP, GP2SPL, SP2GP, SP2GPL, SP2SP, SPCUT;
   int operatorID;
   int streamID1, streamID2;

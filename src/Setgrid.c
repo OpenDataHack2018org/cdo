@@ -33,7 +33,7 @@
 
 void *Setgrid(void *argument)
 {
-  static char func[] = "Setgrid";
+  static const char *func = "Setgrid";
   int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

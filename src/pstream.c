@@ -97,7 +97,7 @@ static pstreamPtrToIdx *_pstreamAvail = NULL;
 
 static void pstream_list_new(void)
 {
-  static char func[] = "pstream_list_new";
+  static const char *func = "pstream_list_new";
 
   assert(_pstreamList == NULL);
 
@@ -107,7 +107,7 @@ static void pstream_list_new(void)
 
 static void pstream_list_delete(void)
 {
-  static char func[] = "pstream_list_delete";
+  static const char *func = "pstream_list_delete";
 
   if ( _pstreamList ) free(_pstreamList);
 }
@@ -132,7 +132,7 @@ static void pstream_init_pointer(void)
 
 static PSTREAM *pstream_to_pointer(int idx)
 {
-  static char func[] = "pstream_to_pointer";
+  static const char *func = "pstream_to_pointer";
   PSTREAM *pstreamptr = NULL;
 
   PSTREAM_INIT
@@ -155,7 +155,7 @@ static PSTREAM *pstream_to_pointer(int idx)
 /* Create an index from a pointer */
 static int pstream_from_pointer(PSTREAM *ptr)
 {
-  static char func[] = "pstream_from_pointer";
+  static const char *func = "pstream_from_pointer";
   int      idx = -1;
   pstreamPtrToIdx *newptr;
 
@@ -214,7 +214,7 @@ static void pstream_init_entry(PSTREAM *pstreamptr)
 
 static PSTREAM *pstream_new_entry(void)
 {
-  static char func[] = "pstream_new_entry";
+  static const char *func = "pstream_new_entry";
   PSTREAM *pstreamptr;
 
   pstreamptr = (PSTREAM *) malloc(sizeof(PSTREAM));
@@ -227,7 +227,7 @@ static PSTREAM *pstream_new_entry(void)
 
 static void pstream_delete_entry(PSTREAM *pstreamptr)
 {
-  static char func[] = "pstream_delete_entry";
+  static const char *func = "pstream_delete_entry";
   int idx;
 
   idx = pstreamptr->self;
@@ -249,7 +249,7 @@ static void pstream_delete_entry(PSTREAM *pstreamptr)
 
 static void pstream_initialize(void)
 {
-  static char func[] = "pstream_initialize";
+  static const char *func = "pstream_initialize";
   char *env;
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -307,7 +307,7 @@ int pstreamIsPipe(int pstreamID)
 
 int pstreamOpenRead(const char *argument)
 {
-  static char func[] = "pstreamOpenRead";
+  static const char *func = "pstreamOpenRead";
   char *operatorArg = NULL;
   char *operatorName = NULL;
   int ispipe = FALSE;
@@ -630,7 +630,7 @@ void query_user_exit(const char *argument)
 
 int pstreamOpenWrite(const char *argument, int filetype)
 {
-  static char func[] = "pstreamOpenWrite";
+  static const char *func = "pstreamOpenWrite";
   int fileID;
   int pstreamID = -1;
   int ispipe;
@@ -741,7 +741,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 
 int pstreamOpenAppend(const char *argument)
 {
-  static char func[] = "pstreamOpenAppend";
+  static const char *func = "pstreamOpenAppend";
   int fileID;
   int pstreamID = -1;
   int ispipe;
@@ -786,7 +786,7 @@ int pstreamOpenAppend(const char *argument)
 
 void pstreamClose(int pstreamID)
 {
-  static char func[] = "pstreamClose";
+  static const char *func = "pstreamClose";
   PSTREAM *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
@@ -946,7 +946,7 @@ const char *cdoComment(void)
 static
 void pstreamDefVarlist(PSTREAM *pstreamptr, int vlistID)
 {
-  static char func[] = "pstreamDefVarlist";
+  static const char *func = "pstreamDefVarlist";
   int varID, nvars;
   int laddoffset, lscalefactor;
   int datatype, filetype;
@@ -1215,7 +1215,7 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 
 int pstreamInqTimestep(int pstreamID, int tsID)
 {
-  static char func[] = "pstreamInqTimestep";
+  static const char *func = "pstreamInqTimestep";
   int nrecs = 0;
   PSTREAM *pstreamptr;
 
@@ -1327,7 +1327,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 
 void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 {
-  static char func[] = "pstreamCopyRecord";
+  static const char *func = "pstreamCopyRecord";
   PSTREAM *pstreamptr_dest, *pstreamptr_src;
 
   if ( PSTREAM_Debug )
@@ -1357,7 +1357,7 @@ void pstreamDebug(int debug)
 
 void cdoInitialize(void *argument)
 {
-  static char func[] = "cdoInitialize";
+  static const char *func = "cdoInitialize";
   int processID;
 
 #if defined (_OPENMP)
@@ -1377,7 +1377,7 @@ void cdoInitialize(void *argument)
 
 void cdoFinish(void)
 {
-  static char func[] = "cdoFinish";
+  static const char *func = "cdoFinish";
   int processID = processSelf();
   int sindex, pstreamID;
   int nstream;
@@ -1532,7 +1532,7 @@ int pstreamInqFiletype(int pstreamID)
 
 int pcdf_openread(const char *filename)
 {
-  static char func[] = "pcdf_openread";
+  static const char *func = "pcdf_openread";
   int fileID;
 
 #if  defined  (HAVE_LIBPTHREAD)

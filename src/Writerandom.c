@@ -29,7 +29,7 @@
 
 void *Writerandom(void *argument)
 {
-  static char func[] = "Writerandom";
+  static const char *func = "Writerandom";
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridsize;

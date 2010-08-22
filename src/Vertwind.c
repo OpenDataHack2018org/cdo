@@ -35,7 +35,7 @@
 
 void *Vertwind(void *argument)
 {
-  static char func[] = "Vertwind";
+  static const char *func = "Vertwind";
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;

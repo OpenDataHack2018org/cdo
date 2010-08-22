@@ -60,7 +60,7 @@ static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 void *Ydrunstat(void *argument)
 {
-  static char func[] = "Ydrunstat";
+  static const char *func = "Ydrunstat";
   int operatorID;
   int operfunc;
   int gridsize;
@@ -328,7 +328,7 @@ void *Ydrunstat(void *argument)
 
 static YDAY_STATS *ydstatCreate(int vlistID)
 {
-  static const char func[] = "ydstatCreate";
+  static const char *func = "ydstatCreate";
   int dayoy;
   
   YDAY_STATS *stats = (YDAY_STATS *) malloc(sizeof(YDAY_STATS));
@@ -348,7 +348,7 @@ static YDAY_STATS *ydstatCreate(int vlistID)
 
 static void ydstatDestroy(YDAY_STATS *stats)
 {
-  static const char func[] = "ydstatDestroy";
+  static const char *func = "ydstatDestroy";
   int dayoy, varID, levelID, nvars, nlevels;
   
   if ( stats != NULL )
@@ -386,7 +386,7 @@ static void ydstatDestroy(YDAY_STATS *stats)
 
 static void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
 {
-  static const char func[] = "ydstatCreateVars1";
+  static const char *func = "ydstatCreateVars1";
   int varID, levelID, nvars, nlevels;
   int gridID, gridsize;
   double missval;
@@ -416,7 +416,7 @@ static void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
 
 static void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
 {
-  static const char func[] = "ydstatCreateVars2";
+  static const char *func = "ydstatCreateVars2";
   int varID, levelID, nvars, nlevels;
   int gridID, gridsize;
   double missval;

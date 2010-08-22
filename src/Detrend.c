@@ -68,7 +68,7 @@ void detrend(int nts, double missval1, double *array1, double *array2)
 
 void *Detrend(void *argument)
 {
-  static char func[] = "Detrend";
+  static const char *func = "Detrend";
   int ompthID;
   int gridsize;
   int nrecs;

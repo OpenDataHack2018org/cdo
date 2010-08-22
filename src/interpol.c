@@ -108,7 +108,7 @@ void intlinarr(int nxm, double *ym, double *xm, int nx, double *y, double *x)
 
 void intgrid(field_t *field1, field_t *field2)
 {
-  static char func[] = "intgrid";
+  static const char *func = "intgrid";
   int nlonIn, nlatIn;
   int nlonOut, nlatOut;
   int ilat, ilon;
@@ -225,7 +225,7 @@ void intgrid(field_t *field1, field_t *field2)
 
 void intarea(field_t *field1, field_t *field2)
 {
-  static char func[] = "intarea";
+  static const char *func = "intarea";
   int gridsize_i, gridsize_o;
   int gridIDi;
   double *arrayIn;
@@ -468,7 +468,7 @@ C
 /* source code from pingo */
 void interpolate(field_t *field1, field_t *field2)
 {
-  static char func[] = "interpolate";
+  static const char *func = "interpolate";
   int i;
   double *lono_array, *lato_array, *lono, *lato;
   double *lon_array, *lat_array, *lon, *lat;
@@ -974,7 +974,7 @@ void interpolate(field_t *field1, field_t *field2)
 /* source code from pingo */
 void contrast(void)
 {
-  static char func[] = "contrast";
+  static const char *func = "contrast";
 
   int rec = 1;
   int nlat, nlon;

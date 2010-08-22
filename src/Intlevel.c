@@ -156,7 +156,7 @@ static void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *l
 
 void *Intlevel(void *argument)
 {
-  static char func[] = "Intlevel";
+  static const char *func = "Intlevel";
   int INTLEVEL, INTLEVELX;
   int operatorID;
   int streamID1, streamID2;

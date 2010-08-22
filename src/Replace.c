@@ -31,7 +31,7 @@
 
 void *Replace(void *argument)
 {
-  static char func[] = "Replace";
+  static const char *func = "Replace";
   int varID;
   int varID1, nvars1;
   int varID2, nvars2;

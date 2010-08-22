@@ -37,7 +37,7 @@ static void listInit(LIST *list, int type)
 
 LIST *listNew(int type)
 {
-  static char func[] = "listNew";
+  static const char *func = "listNew";
   LIST *list = NULL;
 
   if ( type != INT_LIST && type != FLT_LIST )
@@ -56,7 +56,7 @@ LIST *listNew(int type)
 
 void listDelete(LIST *list)
 {
-  static char func[] = "listDelete";
+  static const char *func = "listDelete";
 
   if ( list )
     {
@@ -74,7 +74,7 @@ void *listArrayPtr(LIST *list)
 
 static void listCheck(LIST *list, int num)
 {
-  static char func[] = "listCheck";
+  static const char *func = "listCheck";
 
   while ( list->nalloc < (num+1) )
     {

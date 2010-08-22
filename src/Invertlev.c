@@ -32,7 +32,7 @@
 
 static void invertLevDes(int vlistID)
 {
-  static char func[] = "invertLevDes";
+  static const char *func = "invertLevDes";
   int index, nzaxis;
   int zaxisID1, zaxisID2;
   int nlev;
@@ -105,7 +105,7 @@ static void invertLevDes(int vlistID)
 
 void *Invertlev(void *argument)
 {
-  static char func[] = "Invertlev";
+  static const char *func = "Invertlev";
   int INVERTLEV;
   int operatorID;
   int operfunc;

@@ -233,7 +233,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 
 void *Gather(void *argument)
 {
-  static char func[] = "Gather";
+  static const char *func = "Gather";
   int i;
   int nvars;
   int cmpfunc;

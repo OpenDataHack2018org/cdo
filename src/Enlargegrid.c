@@ -29,7 +29,7 @@
 
 static void gen_index(int gridID1, int gridID2, int *index)
 {
-  static char func[] = "gen_index";
+  static const char *func = "gen_index";
   int nlat1, nlon1;
   int nlat2, nlon2;
   int gridtype1, gridtype2;
@@ -150,7 +150,7 @@ static void gen_index(int gridID1, int gridID2, int *index)
 
 void *Enlargegrid(void *argument)
 {
-  static char func[] = "Enlargegrid";
+  static const char *func = "Enlargegrid";
   int varID;
   int nrecs = 0;
   int tsID, recID, levelID;

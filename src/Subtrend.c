@@ -30,7 +30,7 @@
 
 void *Subtrend(void *argument)
 {
-  static char func[] = "Subtrend";
+  static const char *func = "Subtrend";
   int gridsize;
   int nrecs, nrecords;
   int gridID, varID, levelID, recID;

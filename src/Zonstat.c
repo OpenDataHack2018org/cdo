@@ -39,7 +39,7 @@
 
 void *Zonstat(void *argument)
 {
-  static char func[] = "Zonstat";
+  static const char *func = "Zonstat";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

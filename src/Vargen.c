@@ -35,9 +35,17 @@
 #endif
 
 
+#if defined(WITH_ETOPO)
+  static double etopo_scale = 3;
+  static const short etopo[] = {
+#include "etopo.h"
+  };
+#endif
+
+
 void *Vargen(void *argument)
 {
-  static char func[] = "Vargen";
+  static const char *func = "Vargen";
   int RANDOM, CONST, TOPO, FOR;
   int operatorID;
   int streamID;
@@ -51,12 +59,6 @@ void *Vargen(void *argument)
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
   double *array;
-#if defined(WITH_ETOPO)
-  double etopo_scale = 3;
-  static const short etopo[] = {
-#include "etopo.h"
-  };
-#endif
 
   cdoInitialize(argument);
 

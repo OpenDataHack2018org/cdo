@@ -45,7 +45,7 @@ enum {CONSECSUM, CONSECTS};
 
 static void selEndOfPeriod(field_t *periods, field_t history, field_t current, int isLastTimestep)
 {
-  static char func[] = "selEndOfPeriod";
+  static const char *func = "selEndOfPeriod";
   long   i, len;
   double pmissval = periods->missval;
   double  *parray = periods->ptr;
@@ -127,7 +127,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
 
 void *Consecstat (void *argument)
 {
-  static char func[] = "Consecstat";
+  static const char *func = "Consecstat";
   int operatorID;
 
   int i;

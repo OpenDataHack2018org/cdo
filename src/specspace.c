@@ -48,7 +48,7 @@ void geninx(long ntr, double *f, double *g)
 void legini_old(int ntr, int nlat, double *poli, double *pold,
 		double *pol2, double *pol3, double *coslat, double *rcoslat, int flag)
 {
-  static char func[] = "legini_old";
+  static const char *func = "legini_old";
   int waves, dimsp;
   int jgl, jm, jn;
   int jsp;
@@ -122,7 +122,7 @@ void legini_old(int ntr, int nlat, double *poli, double *pold,
 
 void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
 {
-  static char func[] = "legini";
+  static const char *func = "legini";
   int waves, dimsp, dimpnm;
   int jgl, jm, jn, is;
   int isp, latn, lats;
@@ -178,7 +178,7 @@ void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
 
 void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  static char func[] = "grid2spec";
+  static const char *func = "grid2spec";
   int ntr, nlat, nlon, nfc;
   int nlev = 1;
   int waves;
@@ -202,7 +202,7 @@ void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
    
 void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  static char func[] = "spec2grid";
+  static const char *func = "spec2grid";
   int ntr, nlat, nlon, nfc;
   int nlev = 1;
   int waves;
@@ -247,7 +247,7 @@ void speccut(int gridIDin, double *arrayIn, double *arrayOut, int *waves)
 
 SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 {
-  static char func[] = "sptrans_new";
+  static const char *func = "sptrans_new";
   SPTRANS *sptrans;
   int dimsp;
 
@@ -291,7 +291,7 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 
 void sptrans_delete(SPTRANS *sptrans)
 {
-  static char func[] = "sptrans_delete";
+  static const char *func = "sptrans_delete";
 
   if ( sptrans )
     {
@@ -310,7 +310,7 @@ void sptrans_delete(SPTRANS *sptrans)
 
 DVTRANS *dvtrans_new(int ntr)
 {
-  static char func[] = "dvtrans_new";
+  static const char *func = "dvtrans_new";
   DVTRANS *dvtrans;
   int dimsp;
 
@@ -332,7 +332,7 @@ DVTRANS *dvtrans_new(int ntr)
 
 void dvtrans_delete(DVTRANS *dvtrans)
 {
-  static char func[] = "dvtrans_delete";
+  static const char *func = "dvtrans_delete";
 
   if ( dvtrans )
     {
@@ -553,7 +553,7 @@ void trans_uv2dv(SPTRANS *sptrans, int nlev,
 		 int gridID1, double *gu, double *gv,
 		 int gridID2, double *sd, double *svo)
 {
-  static char func[] = "trans_uv2dv";
+  static const char *func = "trans_uv2dv";
   int ntr, nlat, nlon, nfc;
   int waves;
   double *fpwork1, *fpwork2;
@@ -591,7 +591,7 @@ void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev,
 		 int gridID1, double *sd, double *svo,
 		 int gridID2, double *gu, double *gv)
 {
-  static char func[] = "trans_dv2uv";
+  static const char *func = "trans_dv2uv";
   int ntr, nlat, nlon, nfc;
   int waves;
   int dimsp;

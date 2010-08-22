@@ -3,7 +3,7 @@
 
 void date2str(int date, char *datestr, int maxlen)
 {
-  static char func[] = "date2str";
+  static const char *func = "date2str";
   int year, month, day;
   int len;
 
@@ -18,7 +18,7 @@ void date2str(int date, char *datestr, int maxlen)
 
 void time2str(int time, char *timestr, int maxlen)
 {
-  static char func[] = "time2str";
+  static const char *func = "time2str";
   int hour, minute, second;
   int len;
 
@@ -128,7 +128,7 @@ void printFiletype(int streamID, int vlistID)
 
 static void printGridInfo(int vlistID)
 {
-  static char func[] = "printGridInfo";
+  static const char *func = "printGridInfo";
   int ngrids, index;
   int gridID, gridtype, trunc, gridsize, xsize, ysize;
   int nbyte0;

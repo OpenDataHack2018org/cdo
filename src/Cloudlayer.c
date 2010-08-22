@@ -122,7 +122,7 @@ void pl_index(int *kmax, int *kmin, double pmax, double pmin, long nlevs, double
 
 void *Cloudlayer(void *argument)
 {
-  static char func[] = "Cloudlayer";
+  static const char *func = "Cloudlayer";
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
