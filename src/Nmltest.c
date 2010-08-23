@@ -30,7 +30,7 @@
 
 void *Nmltest(void *argument)
 {
-  NAMELIST *nml;
+  namelist_t *nml;
   int i1[5] = {-99, -99, -99, -99, -99};
   int i2    = -99;
   char lop[99] = "";

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -155,7 +155,7 @@ void *Set(void *argument)
       else
 	{
 	  FILE *fp;
-	  NAMELIST *nml;
+	  namelist_t *nml;
 	  int nml_code, nml_new_code, nml_table, nml_datatype, nml_name, nml_new_name, nml_stdname;
 	  int nml_longname, nml_units, nml_ltype;
 	  int locc, i;
@@ -186,7 +186,7 @@ void *Set(void *argument)
 	      
 	  while ( ! feof(fp) )
 	    {
-	      namelistClear(nml);
+	      namelistReset(nml);
 
 	      namelistRead(fp, nml);
 
