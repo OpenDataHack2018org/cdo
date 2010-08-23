@@ -58,11 +58,11 @@ double fldfun(field_t field, int function)
   double rval = 0;
 
   if      ( function == func_min  )  rval = fldmin(field);
-  else if ( function == func_max  )  rval = fldmax(field);  
-  else if ( function == func_sum  )  rval = fldsum(field);  
-  else if ( function == func_mean )  rval = fldmean(field);  
-  else if ( function == func_avg  )  rval = fldavg(field);  
-  else if ( function == func_std  )  rval = fldstd(field);  
+  else if ( function == func_max  )  rval = fldmax(field);
+  else if ( function == func_sum  )  rval = fldsum(field);
+  else if ( function == func_mean )  rval = fldmean(field);
+  else if ( function == func_avg  )  rval = fldavg(field);
+  else if ( function == func_std  )  rval = fldstd(field);
   else if ( function == func_var  )  rval = fldvar(field);
   else cdoAbort("function %d not implemented!", function);
 
@@ -398,29 +398,29 @@ void varrms(field_t field, field_t field2, field_t *field3)
 double fldpctl(field_t field, int p)
 {
   static const char *func = "fldpctl";
-  
+
   long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;
   double *array  = field.ptr;
   double *array2;
-	
+
   long i, j;
   double pctl = missval;
-  
+
   if ( len - nmiss > 0 )
     {
       if ( nmiss > 0 )
         {
           array2 = (double *) malloc((len - nmiss)*sizeof(double));
-          
+
           for ( i = 0, j = 0; i < len; i++ ) 
             if ( !DBL_IS_EQUAL(array[i], missval) )
               array2[j++] = array[i];
 
           pctl = nth_element(array2, j, (int)ceil(j*(p/100.0))-1);
-          
-          free(array2);	  
+
+          free(array2);
         }
       else
         {
@@ -431,3 +431,15 @@ double fldpctl(field_t field, int p)
   return pctl;
 }
 /* QR */
+
+/*  update the number non missing values */
+void fldunm(field_t *field)
+{
+  long i;
+  double *array  = field->ptr;
+  double missval = field->missval;
+
+  field->nmiss = 0;
+  for ( i = 0; i < field->size; i++ )
+    if ( DBL_IS_EQUAL(field->ptr[i], field->missval) ) field->nmiss++;
+}

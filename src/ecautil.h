@@ -336,4 +336,5 @@ void writeGslStream(int ostreamID, int otaxisID, int otsID,
                     field_t *gslDuration, field_t *gslFirstDay,
                     int vdate, int vtime,  int nlevels);
 
+int hasValues(field_t *field, int nlevels);
 #endif /*ECAUTIL_H_*/
