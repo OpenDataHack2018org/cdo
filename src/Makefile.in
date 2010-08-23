@@ -79,7 +79,7 @@ am_cdo_OBJECTS = Arith.$(OBJEXT) Arithc.$(OBJEXT) Arithdays.$(OBJEXT) \
 	Fldstat2.$(OBJEXT) Fourier.$(OBJEXT) Gather.$(OBJEXT) \
 	Gengrid.$(OBJEXT) Gradsdes.$(OBJEXT) Gridboxstat.$(OBJEXT) \
 	Gridcell.$(OBJEXT) Harmonic.$(OBJEXT) Histogram.$(OBJEXT) \
-	Importamsr.$(OBJEXT) Importbinary.$(OBJEXT) \
+	IFS2ICON.$(OBJEXT) Importamsr.$(OBJEXT) Importbinary.$(OBJEXT) \
 	Importcmsaf.$(OBJEXT) Importobs.$(OBJEXT) Info.$(OBJEXT) \
 	Input.$(OBJEXT) Intgrid.$(OBJEXT) Intgridtraj.$(OBJEXT) \
 	Intlevel.$(OBJEXT) Inttime.$(OBJEXT) Intntime.$(OBJEXT) \
@@ -323,6 +323,7 @@ cdo_SOURCES = Arith.c		\
               Gridcell.c 	\
               Harmonic.c 	\
               Histogram.c 	\
+              IFS2ICON.c  	\
               Importamsr.c  	\
               Importbinary.c  	\
               Importcmsaf.c  	\
@@ -695,6 +696,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Histogram.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IFS2ICON.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importamsr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importbinary.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Importcmsaf.Po@am__quote@

@@ -314,6 +314,7 @@ src/Gridcell.c -text
 src/Harmonic.c -text
 src/Hi.c -text
 src/Histogram.c -text
+src/IFS2ICON.c -text
 src/Importamsr.c -text
 src/Importbinary.c -text
 src/Importcmsaf.c -text

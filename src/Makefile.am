@@ -46,6 +46,7 @@ cdo_SOURCES = Arith.c		\
               Gridcell.c 	\
               Harmonic.c 	\
               Histogram.c 	\
+              IFS2ICON.c  	\
               Importamsr.c  	\
               Importbinary.c  	\
               Importcmsaf.c  	\

@@ -80,6 +80,7 @@ void *Gridboxstat(void *argument);
 void *Gridcell(void *argument);
 void *Harmonic(void *argument);
 void *Histogram(void *argument);
+void *IFS2ICON(void *argument);
 void *Importamsr(void *argument);
 void *Importbinary(void *argument);
 void *Importcmsaf(void *argument);
@@ -285,6 +286,7 @@ void *Wct(void *argument);
 #define  GridcellOperators      {"gridarea", "gridweights", "gridmask"}
 #define  HarmonicOperators      {"harmonic"}
 #define  HistogramOperators     {"histcount", "histsum", "histmean", "histfreq"}
+#define  IFS2ICONOperators      {"ifs2icon"}
 #define  ImportamsrOperators    {"import_amsr"}
 #define  ImportbinaryOperators  {"import_binary", "import_grads"}
 #define  ImportcmsafOperators   {"import_cmsaf"}
@@ -520,6 +522,7 @@ static modules_t Modules[] =
   { Gridcell,       GridcellHelp,      GridcellOperators,      CDI_REAL,  1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,      CDI_REAL,  1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,     CDI_REAL,  1,  1 },
+  { IFS2ICON,       NULL,              IFS2ICONOperators,      CDI_REAL,  1,  1 },
   { Importamsr,     ImportamsrHelp,    ImportamsrOperators,    CDI_REAL,  1,  1 },
   { Importbinary,   ImportbinaryHelp,  ImportbinaryOperators,  CDI_REAL,  1,  1 },
   { Importcmsaf,    ImportcmsafHelp,   ImportcmsafOperators,   CDI_REAL,  1,  1 },
