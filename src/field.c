@@ -432,14 +432,28 @@ double fldpctl(field_t field, int p)
 }
 /* QR */
 
+/*  field_t UTILITIES */
 /*  update the number non missing values */
 void fldunm(field_t *field)
 {
   long i;
-  double *array  = field->ptr;
-  double missval = field->missval;
 
   field->nmiss = 0;
   for ( i = 0; i < field->size; i++ )
     if ( DBL_IS_EQUAL(field->ptr[i], field->missval) ) field->nmiss++;
+}
+
+/*  check for non missval values */
+int fldhvs(field_t *fieldPtr, int nlevels)
+{
+  int level;
+  field_t field;
+
+  for ( level = 0; level < nlevels; level++)
+    {
+      field = fieldPtr[level];
+      if ( field.nmiss != field.size )
+        return TRUE;
+    }
+  return FALSE;
 }

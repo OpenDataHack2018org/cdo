@@ -626,17 +626,3 @@ void writeGslStream(int ostreamID, int otaxisID, int otsID,
         }
     }
 }
-
-int hasValues(field_t *fieldPtr, int nlevels)
-{
-  int level;
-  field_t field;
-
-  for ( level = 0; level < nlevels; level++)
-  {
-    field = fieldPtr[level];
-    if ( field.nmiss != field.size )
-      return TRUE;
-  }
-  return FALSE;
-}

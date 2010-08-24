@@ -79,7 +79,8 @@ double fldvar(field_t field);
 /* RQ */
 double fldpctl(field_t field, int k);
 /* QR */
-void fldunm(field_t *field);
+void   fldunm(field_t *field);
+int    fldhvs(field_t *field, int nlevels);
 
 /* fieldzon.c */
 

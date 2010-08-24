@@ -1320,7 +1320,8 @@ void eca4(const ECA_REQUEST_4 *request)
                     /* start with south */
                     if ( yvals[i] < 0 )
                     {
-                      /* south: periods can also start in the first half of the year */
+                      /* south: periods can also start in the first half of the
+                       * year, but this date has already gone into the history */
                       if ( DBL_IS_EQUAL(startDateWithHist[1][levelID].ptr[i], missval) &&
                            IS_EQUAL(startCount[levelID].ptr[i], request->consecutiveDays) )
                       {
@@ -1418,7 +1419,7 @@ void eca4(const ECA_REQUEST_4 *request)
                           cdiEncodeDate(ovdate/10000 - 1, 12, 31), ovtime,  nlevels); otsID++;}
         }
 
-      /*  if there is a next year */
+      /*  if there is a previous year */
       if (ovdate != ivdate)
       {
         /*  if the first year of data was processed, the history has to
@@ -1429,17 +1430,17 @@ void eca4(const ECA_REQUEST_4 *request)
           {
             /*  Check for non missing values, i.e. is there any data for the
              *  previous year? */
-            if ( hasValues(startDateWithHist[1], nlevels) )
+            if ( fldhvs(startDateWithHist[1], nlevels) )
               {
-              computeGsl(nlevels, gridsize, yvals, missval,
-                         startDateWithHist, endDateWithHist,
-                         gslDuration, gslFirstDay,
-                         FALSE);
-              {writeGslStream(ostreamID, otaxisID, otsID,
-                              ovarID1, ovarID2,ivlistID1,
-                              FIRST_VAR_ID,
-                              gslDuration, gslFirstDay,
-                              cdiEncodeDate(ovdate/10000 - 1,12,31), ovtime, nlevels); otsID++;}
+                computeGsl(nlevels, gridsize, yvals, missval,
+                          startDateWithHist, endDateWithHist,
+                          gslDuration, gslFirstDay,
+                          FALSE);
+                {writeGslStream(ostreamID, otaxisID, otsID,
+                                ovarID1, ovarID2,ivlistID1,
+                                FIRST_VAR_ID,
+                                gslDuration, gslFirstDay,
+                                cdiEncodeDate(ovdate/10000 - 1,12,31), ovtime, nlevels); otsID++;}
               }
             isFirstYear = FALSE;
           }
