@@ -240,6 +240,11 @@ doc/tex/time.tex -text
 doc/tex/usage.tex -text
 doc/tex/zaxis.tex -text
 m4/acx_options.m4 -text
+m4/libtool.m4 -text
+m4/ltoptions.m4 -text
+m4/ltsugar.m4 -text
+m4/ltversion.m4 -text
+m4/lt~obsolete.m4 -text
 src/Arith.c -text
 src/Arithc.c -text
 src/Arithdays.c -text
