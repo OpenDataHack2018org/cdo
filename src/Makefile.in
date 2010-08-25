@@ -54,32 +54,35 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
-am_cdo_OBJECTS = cdo-Arith.$(OBJEXT) cdo-Arithc.$(OBJEXT) \
-	cdo-Arithdays.$(OBJEXT) cdo-Arithlat.$(OBJEXT) \
-	cdo-Cat.$(OBJEXT) cdo-CDItest.$(OBJEXT) cdo-Change.$(OBJEXT) \
-	cdo-Change_e5slm.$(OBJEXT) cdo-Cloudlayer.$(OBJEXT) \
-	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
+	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
+	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) cdo-Cat.$(OBJEXT) \
+	cdo-Change.$(OBJEXT) cdo-Change_e5slm.$(OBJEXT) \
+	cdo-Cloudlayer.$(OBJEXT) cdo-Command.$(OBJEXT) \
+	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
 	cdo-Deltime.$(OBJEXT) cdo-Detrend.$(OBJEXT) cdo-Diff.$(OBJEXT) \
+	cdo-EOFs.$(OBJEXT) cdo-EcaIndices.$(OBJEXT) \
 	cdo-Echam5ini.$(OBJEXT) cdo-Enlarge.$(OBJEXT) \
 	cdo-Enlargegrid.$(OBJEXT) cdo-Ensstat.$(OBJEXT) \
-	cdo-Eofcoeff.$(OBJEXT) cdo-EOFs.$(OBJEXT) cdo-Exprf.$(OBJEXT) \
+	cdo-Eofcoeff.$(OBJEXT) cdo-Exprf.$(OBJEXT) \
 	cdo-Filedes.$(OBJEXT) cdo-Fillmiss.$(OBJEXT) \
 	cdo-Filter.$(OBJEXT) cdo-Fldrms.$(OBJEXT) \
 	cdo-Fldstat.$(OBJEXT) cdo-Fldstat2.$(OBJEXT) \
 	cdo-Fourier.$(OBJEXT) cdo-Gather.$(OBJEXT) \
 	cdo-Gengrid.$(OBJEXT) cdo-Gradsdes.$(OBJEXT) \
 	cdo-Gridboxstat.$(OBJEXT) cdo-Gridcell.$(OBJEXT) \
-	cdo-Harmonic.$(OBJEXT) cdo-Histogram.$(OBJEXT) \
-	cdo-IFS2ICON.$(OBJEXT) cdo-Importamsr.$(OBJEXT) \
-	cdo-Importbinary.$(OBJEXT) cdo-Importcmsaf.$(OBJEXT) \
-	cdo-Importobs.$(OBJEXT) cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) \
-	cdo-Intgrid.$(OBJEXT) cdo-Intgridtraj.$(OBJEXT) \
-	cdo-Intlevel.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
-	cdo-Intntime.$(OBJEXT) cdo-Intyear.$(OBJEXT) \
-	cdo-Invert.$(OBJEXT) cdo-Invertlev.$(OBJEXT) cdo-Log.$(OBJEXT) \
+	cdo-Harmonic.$(OBJEXT) cdo-Hi.$(OBJEXT) \
+	cdo-Histogram.$(OBJEXT) cdo-IFS2ICON.$(OBJEXT) \
+	cdo-Importamsr.$(OBJEXT) cdo-Importbinary.$(OBJEXT) \
+	cdo-Importcmsaf.$(OBJEXT) cdo-Importobs.$(OBJEXT) \
+	cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) cdo-Intgrid.$(OBJEXT) \
+	cdo-Intgridtraj.$(OBJEXT) cdo-Intlevel.$(OBJEXT) \
+	cdo-Intntime.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
+	cdo-Intyear.$(OBJEXT) cdo-Invert.$(OBJEXT) \
+	cdo-Invertlev.$(OBJEXT) cdo-Log.$(OBJEXT) \
 	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
 	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
 	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
@@ -91,17 +94,17 @@ am_cdo_OBJECTS = cdo-Arith.$(OBJEXT) cdo-Arithc.$(OBJEXT) \
 	cdo-Remap.$(OBJEXT) cdo-Remapeta.$(OBJEXT) \
 	cdo-Replace.$(OBJEXT) cdo-Replacevalues.$(OBJEXT) \
 	cdo-Rotuv.$(OBJEXT) cdo-Runpctl.$(OBJEXT) \
-	cdo-Runstat.$(OBJEXT) cdo-Seascount.$(OBJEXT) \
-	cdo-Seaspctl.$(OBJEXT) cdo-Seasstat.$(OBJEXT) \
-	cdo-Selbox.$(OBJEXT) cdo-Select.$(OBJEXT) cdo-Selvar.$(OBJEXT) \
-	cdo-Seloperator.$(OBJEXT) cdo-Selrec.$(OBJEXT) \
-	cdo-Seltime.$(OBJEXT) cdo-Set.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
+	cdo-Runstat.$(OBJEXT) cdo-Scatter.$(OBJEXT) \
+	cdo-Seascount.$(OBJEXT) cdo-Seaspctl.$(OBJEXT) \
+	cdo-Seasstat.$(OBJEXT) cdo-Selbox.$(OBJEXT) \
+	cdo-Select.$(OBJEXT) cdo-Seloperator.$(OBJEXT) \
+	cdo-Selrec.$(OBJEXT) cdo-Seltime.$(OBJEXT) \
+	cdo-Selvar.$(OBJEXT) cdo-Set.$(OBJEXT) cdo-Setbox.$(OBJEXT) \
 	cdo-Setgatt.$(OBJEXT) cdo-Setgrid.$(OBJEXT) \
 	cdo-Sethalo.$(OBJEXT) cdo-Setmiss.$(OBJEXT) \
 	cdo-Setrcaname.$(OBJEXT) cdo-Settime.$(OBJEXT) \
-	cdo-Setzaxis.$(OBJEXT) cdo-Scatter.$(OBJEXT) \
-	cdo-Showinfo.$(OBJEXT) cdo-Sinfo.$(OBJEXT) \
-	cdo-Smooth9.$(OBJEXT) cdo-Sort.$(OBJEXT) \
+	cdo-Setzaxis.$(OBJEXT) cdo-Showinfo.$(OBJEXT) \
+	cdo-Sinfo.$(OBJEXT) cdo-Smooth9.$(OBJEXT) cdo-Sort.$(OBJEXT) \
 	cdo-Sorttimestamp.$(OBJEXT) cdo-Specinfo.$(OBJEXT) \
 	cdo-Spectral.$(OBJEXT) cdo-Spectrum.$(OBJEXT) \
 	cdo-Split.$(OBJEXT) cdo-Splitrec.$(OBJEXT) \
@@ -109,49 +112,47 @@ am_cdo_OBJECTS = cdo-Arith.$(OBJEXT) cdo-Arithc.$(OBJEXT) \
 	cdo-Splityear.$(OBJEXT) cdo-Subtrend.$(OBJEXT) \
 	cdo-Templates.$(OBJEXT) cdo-Test.$(OBJEXT) cdo-Tests.$(OBJEXT) \
 	cdo-Timcount.$(OBJEXT) cdo-Timpctl.$(OBJEXT) \
-	cdo-Timsort.$(OBJEXT) cdo-Timselpctl.$(OBJEXT) \
-	cdo-Timselstat.$(OBJEXT) cdo-Timstat.$(OBJEXT) \
+	cdo-Timselpctl.$(OBJEXT) cdo-Timselstat.$(OBJEXT) \
+	cdo-Timsort.$(OBJEXT) cdo-Timstat.$(OBJEXT) \
 	cdo-Timstat2.$(OBJEXT) cdo-Timstat3.$(OBJEXT) \
 	cdo-Tinfo.$(OBJEXT) cdo-Tocomplex.$(OBJEXT) \
 	cdo-Transpose.$(OBJEXT) cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vardup.$(OBJEXT) \
 	cdo-Vargen.$(OBJEXT) cdo-Varrms.$(OBJEXT) \
 	cdo-Vertint.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
-	cdo-Vertwind.$(OBJEXT) cdo-Wind.$(OBJEXT) \
+	cdo-Vertwind.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-Wind.$(OBJEXT) \
 	cdo-Writegrid.$(OBJEXT) cdo-Writerandom.$(OBJEXT) \
-	cdo-Yhourstat.$(OBJEXT) cdo-Ydayarith.$(OBJEXT) \
-	cdo-Ydaypctl.$(OBJEXT) cdo-Ydaystat.$(OBJEXT) \
-	cdo-Ydrunpctl.$(OBJEXT) cdo-Ydrunstat.$(OBJEXT) \
+	cdo-Ydayarith.$(OBJEXT) cdo-Ydaypctl.$(OBJEXT) \
+	cdo-Ydaystat.$(OBJEXT) cdo-Ydrunpctl.$(OBJEXT) \
+	cdo-Ydrunstat.$(OBJEXT) cdo-Yhourstat.$(OBJEXT) \
 	cdo-Ymonarith.$(OBJEXT) cdo-Ymonpctl.$(OBJEXT) \
 	cdo-Ymonstat.$(OBJEXT) cdo-Yseaspctl.$(OBJEXT) \
 	cdo-Yseasstat.$(OBJEXT) cdo-Zonstat.$(OBJEXT) \
-	cdo-commandline.$(OBJEXT) cdo-exception.$(OBJEXT) \
-	cdo-expr_yacc.$(OBJEXT) cdo-expr_lex.$(OBJEXT) \
-	cdo-expr.$(OBJEXT) cdo-cdo.$(OBJEXT) cdo-cdo_pthread.$(OBJEXT) \
-	cdo-cdo_vlist.$(OBJEXT) cdo-field.$(OBJEXT) \
-	cdo-fieldc.$(OBJEXT) cdo-field2.$(OBJEXT) \
-	cdo-fieldmer.$(OBJEXT) cdo-fieldzon.$(OBJEXT) \
-	cdo-fieldmem.$(OBJEXT) cdo-gradsdeslib.$(OBJEXT) \
-	cdo-grid.$(OBJEXT) cdo-grid_gme.$(OBJEXT) \
-	cdo-grid_lcc.$(OBJEXT) cdo-grid_rot.$(OBJEXT) \
-	cdo-griddes.$(OBJEXT) cdo-griddes_nc.$(OBJEXT) \
-	cdo-griddes_h5.$(OBJEXT) cdo-hetaeta.$(OBJEXT) \
-	cdo-history.$(OBJEXT) cdo-institution.$(OBJEXT) \
-	cdo-interpol.$(OBJEXT) cdo-job.$(OBJEXT) cdo-modules.$(OBJEXT) \
-	cdo-namelist.$(OBJEXT) cdo-normal.$(OBJEXT) cdo-pipe.$(OBJEXT) \
-	cdo-process.$(OBJEXT) cdo-remaplib.$(OBJEXT) \
-	cdo-timer.$(OBJEXT) cdo-realtime.$(OBJEXT) \
-	cdo-pstream.$(OBJEXT) cdo-table.$(OBJEXT) \
-	cdo-userlog.$(OBJEXT) cdo-util.$(OBJEXT) \
-	cdo-legendre.$(OBJEXT) cdo-fouriertrans.$(OBJEXT) \
-	cdo-specspace.$(OBJEXT) cdo-readline.$(OBJEXT) \
-	cdo-juldate.$(OBJEXT) cdo-vinterp.$(OBJEXT) \
-	cdo-zaxis.$(OBJEXT) cdo-par_io.$(OBJEXT) \
-	cdo-pthread_debug.$(OBJEXT) cdo-color.$(OBJEXT) \
-	cdo-list.$(OBJEXT) cdo-percentiles.$(OBJEXT) \
-	cdo-nth_element.$(OBJEXT) cdo-ecacore.$(OBJEXT) \
-	cdo-ecautil.$(OBJEXT) cdo-EcaIndices.$(OBJEXT) \
-	cdo-Hi.$(OBJEXT) cdo-Wct.$(OBJEXT) cdo-statistic.$(OBJEXT)
+	cdo-cdo_pthread.$(OBJEXT) cdo-cdo_vlist.$(OBJEXT) \
+	cdo-color.$(OBJEXT) cdo-commandline.$(OBJEXT) \
+	cdo-ecacore.$(OBJEXT) cdo-ecautil.$(OBJEXT) \
+	cdo-exception.$(OBJEXT) cdo-expr.$(OBJEXT) \
+	cdo-expr_lex.$(OBJEXT) cdo-expr_yacc.$(OBJEXT) \
+	cdo-field.$(OBJEXT) cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
+	cdo-fieldmem.$(OBJEXT) cdo-fieldmer.$(OBJEXT) \
+	cdo-fieldzon.$(OBJEXT) cdo-fouriertrans.$(OBJEXT) \
+	cdo-gradsdeslib.$(OBJEXT) cdo-grid.$(OBJEXT) \
+	cdo-grid_gme.$(OBJEXT) cdo-grid_lcc.$(OBJEXT) \
+	cdo-grid_rot.$(OBJEXT) cdo-griddes.$(OBJEXT) \
+	cdo-griddes_h5.$(OBJEXT) cdo-griddes_nc.$(OBJEXT) \
+	cdo-hetaeta.$(OBJEXT) cdo-history.$(OBJEXT) \
+	cdo-institution.$(OBJEXT) cdo-interpol.$(OBJEXT) \
+	cdo-job.$(OBJEXT) cdo-juldate.$(OBJEXT) cdo-legendre.$(OBJEXT) \
+	cdo-list.$(OBJEXT) cdo-modules.$(OBJEXT) \
+	cdo-namelist.$(OBJEXT) cdo-normal.$(OBJEXT) \
+	cdo-nth_element.$(OBJEXT) cdo-par_io.$(OBJEXT) \
+	cdo-percentiles.$(OBJEXT) cdo-pipe.$(OBJEXT) \
+	cdo-process.$(OBJEXT) cdo-pstream.$(OBJEXT) \
+	cdo-pthread_debug.$(OBJEXT) cdo-readline.$(OBJEXT) \
+	cdo-realtime.$(OBJEXT) cdo-remaplib.$(OBJEXT) \
+	cdo-specspace.$(OBJEXT) cdo-statistic.$(OBJEXT) \
+	cdo-table.$(OBJEXT) cdo-timer.$(OBJEXT) cdo-userlog.$(OBJEXT) \
+	cdo-util.$(OBJEXT) cdo-vinterp.$(OBJEXT) cdo-zaxis.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 am__DEPENDENCIES_1 =
 cdo_DEPENDENCIES = $(am__append_1) $(am__DEPENDENCIES_1)
@@ -326,257 +327,51 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 #
-cdo_SOURCES = Arith.c		\
-	      Arithc.c 		\
-	      Arithdays.c 	\
-	      Arithlat.c        \
-	      Cat.c		\
-	      CDItest.c		\
-	      Change.c		\
-	      Change_e5slm.c	\
-	      Cloudlayer.c 	\
-	      Command.c 	\
-	      Comp.c 		\
-	      Compc.c 		\
-              Complextorect.c   \
-	      Cond.c 		\
-	      Cond2.c 		\
-	      Condc.c 		\
-	      Consecstat.c      \
-	      Copy.c		\
-              Deltime.c      	\
-              Detrend.c		\
-              Diff.c		\
-              Echam5ini.c     	\
-              Enlarge.c     	\
-              Enlargegrid.c     \
-              Ensstat.c     	\
-              Eofcoeff.c     	\
-              EOFs.c     	\
-              Exprf.c     	\
-              Filedes.c 	\
-              Fillmiss.c 	\
-              Filter.c 		\
-              Fldrms.c 		\
-              Fldstat.c 	\
-              Fldstat2.c 	\
-              Fourier.c 	\
-              Gather.c 	        \
-              Gengrid.c 	\
-              Gradsdes.c 	\
-              Gridboxstat.c 	\
-              Gridcell.c 	\
-              Harmonic.c 	\
-              Histogram.c 	\
-              IFS2ICON.c  	\
-              Importamsr.c  	\
-              Importbinary.c  	\
-              Importcmsaf.c  	\
-              Importobs.c  	\
-              Info.c		\
-              Input.c		\
-              Intgrid.c 	\
-              Intgridtraj.c 	\
-              Intlevel.c 	\
-              Inttime.c 	\
-              Intntime.c 	\
-              Intyear.c 	\
-              Invert.c  	\
-              Invertlev.c  	\
-              Log.c  	        \
-              Maskbox.c 	\
-              Mastrfu.c 	\
-              Math.c   		\
-              Merge.c   	\
-              Mergegrid.c   	\
-              Mergetime.c   	\
-              Merstat.c   	\
-              Monarith.c        \
-              Mrotuv.c	 	\
-              Mrotuvb.c	 	\
-              Ninfo.c 		\
-              Nmltest.c 	\
-              Output.c  	\
-              Outputgmt.c  	\
-              Pinfo.c  	        \
-              Pressure.c  	\
-              Regres.c  	\
-              Remap.c  	        \
-              Remapeta.c    	\
-              Replace.c  	\
-              Replacevalues.c  	\
-              Rotuv.c     	\
-              Runpctl.c  	\
-              Runstat.c  	\
-              Seascount.c 	\
-              Seaspctl.c 	\
-              Seasstat.c 	\
-              Selbox.c  	\
-              Select.c  	\
-              Selvar.c  	\
-              Seloperator.c  	\
-              Selrec.c  	\
-              Seltime.c 	\
-	      Set.c		\
-	      Setbox.c		\
-	      Setgatt.c		\
-	      Setgrid.c		\
-	      Sethalo.c		\
-              Setmiss.c 	\
-              Setrcaname.c 	\
-	      Settime.c		\
-	      Setzaxis.c	\
-	      Scatter.c	        \
-              Showinfo.c	\
-              Sinfo.c   	\
-              Smooth9.c   	\
-              Sort.c      	\
-              Sorttimestamp.c   \
-              Specinfo.c	\
-              Spectral.c	\
-              Spectrum.c	\
-              Split.c   	\
-              Splitrec.c 	\
-              Splitsel.c 	\
-              Splittime.c 	\
-              Splityear.c 	\
-              Subtrend.c        \
-              Templates.c    	\
-              Test.c    	\
-              Tests.c    	\
-              Timcount.c 	\
-              Timpctl.c 	\
-              Timsort.c 	\
-              Timselpctl.c 	\
-              Timselstat.c 	\
-              Timstat.c 	\
-              Timstat2.c 	\
-              Timstat3.c 	\
-              Tinfo.c 		\
-              Tocomplex.c 	\
-              Transpose.c  	\
-              Trend.c  		\
-              Trms.c  		\
-              Tstepcount.c      \
-              Vardup.c  	\
-              Vargen.c  	\
-              Varrms.c  	\
-              Vertint.c 	\
-              Vertstat.c 	\
-              Vertwind.c 	\
-              Wind.c         	\
-              Writegrid.c 	\
-              Writerandom.c 	\
-              Yhourstat.c  	\
-	      Ydayarith.c       \
-              Ydaypctl.c  	\
-              Ydaystat.c  	\
-              Ydrunpctl.c  	\
-              Ydrunstat.c  	\
-	      Ymonarith.c       \
-              Ymonpctl.c  	\
-              Ymonstat.c  	\
-              Yseaspctl.c  	\
-              Yseasstat.c  	\
-              Zonstat.c 	\
-              commandline.c 	\
-              exception.c 	\
-              expr_yacc.h 	\
-              expr_yacc.c 	\
-              expr_lex.c 	\
-              expr.c 		\
-              expr.h 		\
-              cdo.c		\
-              cdo_pthread.c 	\
-              cdo_vlist.c 	\
-              counter.h 	\
-              field.c 		\
-              fieldc.c 		\
-              field2.c		\
-              fieldmer.c  	\
-              fieldzon.c  	\
-              fieldmem.c  	\
-              gradsdeslib.c     \
-              gradsdeslib.h     \
-              grid.c		\
-              grid.h		\
-              grid_gme.c	\
-              grid_lcc.c	\
-              grid_rot.c	\
-              griddes.c		\
-              griddes.h		\
-              griddes_nc.c	\
-              griddes_h5.c	\
-              hetaeta.c		\
-              hetaeta.h   	\
-              history.c		\
-              institution.c 	\
-              interpol.c 	\
-              job.c 	  	\
-              modules.c		\
-              namelist.c 	\
-              normal.c		\
-              pipe.c		\
-              process.c 	\
-              remaplib.c     	\
-              timer.c   	\
-              realtime.c   	\
-              pstream.c		\
-              table.c		\
-              userlog.c 	\
-              util.c		\
-              legendre.c 	\
-              fouriertrans.c  	\
-	      specspace.c 	\
-              readline.c  	\
-              juldate.c  	\
-              vinterp.c		\
-              zaxis.c  		\
-	      printinfo.h 	\
-	      par_io.c 	        \
-	      par_io.h 	        \
-	      pthread_debug.c 	\
-	      pthread_debug.h 	\
-	      color.c 	        \
-	      color.h 	        \
-	      list.c 	        \
-	      list.h 	        \
-              field.h		\
-              dmemory.h		\
-              dtypes.h		\
-              error.h		\
-              functs.h		\
-              cdo.h		\
-              cdo_int.h		\
-              interpol.h 	\
-              operator_help.h 	\
-              modules.h		\
-              remap.h           \
-              pipe.h		\
-              process.h		\
-              pstream.h		\
-              pstream_int.h	\
-              specspace.h 	\
-              vinterp.h 	\
-              namelist.h 	\
-              util.h		\
-              timebase.h	\
-              etopo.h		\
-              percentiles.c	\
-              percentiles.h	\
-              nth_element.c	\
-              nth_element.h	\
-	      ecacore.h		\
-	      ecacore.c		\
-	      ecautil.h		\
-	      ecautil.c		\
-	      EcaIndices.c	\
-	      Hi.c		\
-	      Wct.c             \
-	      statistic.c       \
-	      statistic.h       \
-	      cdi.h
-
+cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
+	Cat.c Change.c Change_e5slm.c Cloudlayer.c Command.c Comp.c \
+	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
+	Copy.c Deltime.c Detrend.c Diff.c EOFs.c EcaIndices.c \
+	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Eofcoeff.c \
+	Exprf.c Filedes.c Fillmiss.c Filter.c Fldrms.c Fldstat.c \
+	Fldstat2.c Fourier.c Gather.c Gengrid.c Gradsdes.c \
+	Gridboxstat.c Gridcell.c Harmonic.c Hi.c Histogram.c \
+	IFS2ICON.c Importamsr.c Importbinary.c Importcmsaf.c \
+	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
+	Intntime.c Inttime.c Intyear.c Invert.c Invertlev.c Log.c \
+	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
+	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
+	Output.c Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c \
+	Remapeta.c Replace.c Replacevalues.c Rotuv.c Runpctl.c \
+	Runstat.c Scatter.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
+	Select.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
+	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c \
+	Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c \
+	Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c Split.c \
+	Splitrec.c Splitsel.c Splittime.c Splityear.c Subtrend.c \
+	Templates.c Test.c Tests.c Timcount.c Timpctl.c Timselpctl.c \
+	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
+	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c \
+	Vargen.c Varrms.c Vertint.c Vertstat.c Vertwind.c Wct.c Wind.c \
+	Writegrid.c Writerandom.c Ydayarith.c Ydaypctl.c Ydaystat.c \
+	Ydrunpctl.c Ydrunstat.c Yhourstat.c Ymonarith.c Ymonpctl.c \
+	Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdi.h cdo.h \
+	cdo_int.h cdo_pthread.c cdo_vlist.c color.c color.h \
+	commandline.c counter.h dmemory.h dtypes.h ecacore.c ecacore.h \
+	ecautil.c ecautil.h error.h etopo.h exception.c expr.c expr.h \
+	expr_lex.c expr_yacc.c expr_yacc.h field.c field.h field2.c \
+	fieldc.c fieldmem.c fieldmer.c fieldzon.c fouriertrans.c \
+	functs.h gradsdeslib.c gradsdeslib.h grid.c grid.h grid_gme.c \
+	grid_lcc.c grid_rot.c griddes.c griddes.h griddes_h5.c \
+	griddes_nc.c hetaeta.c hetaeta.h history.c institution.c \
+	interpol.c interpol.h job.c juldate.c legendre.c list.c list.h \
+	modules.c modules.h namelist.c namelist.h normal.c \
+	nth_element.c nth_element.h operator_help.h par_io.c par_io.h \
+	percentiles.c percentiles.h pipe.c pipe.h printinfo.h \
+	process.c process.h pstream.c pstream.h pstream_int.h \
+	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
+	remaplib.c specspace.c specspace.h statistic.c statistic.h \
+	table.c timebase.h timer.c userlog.c util.c util.h vinterp.c \
+	vinterp.h zaxis.c
 cdo_LDADD = $(am__append_1) $(am__append_2) @NETCDF_LDFLAGS@ \
 	@HDF5_LDFLAGS@ @GRIB_API_LDFLAGS@ @ZLIB_LDFLAGS@ \
 	@SZLIB_LDFLAGS@ @PROJ_LDFLAGS@ @LDFLAGS@ @LIBS@ $(am__empty)
@@ -940,6 +735,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+cdo-cdo.o: cdo.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-cdo.o -MD -MP -MF $(DEPDIR)/cdo-cdo.Tpo -c -o cdo-cdo.o `test -f 'cdo.c' || echo '$(srcdir)/'`cdo.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-cdo.Tpo $(DEPDIR)/cdo-cdo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cdo.c' object='cdo-cdo.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-cdo.o `test -f 'cdo.c' || echo '$(srcdir)/'`cdo.c
+
+cdo-cdo.obj: cdo.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-cdo.obj -MD -MP -MF $(DEPDIR)/cdo-cdo.Tpo -c -o cdo-cdo.obj `if test -f 'cdo.c'; then $(CYGPATH_W) 'cdo.c'; else $(CYGPATH_W) '$(srcdir)/cdo.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-cdo.Tpo $(DEPDIR)/cdo-cdo.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cdo.c' object='cdo-cdo.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-cdo.obj `if test -f 'cdo.c'; then $(CYGPATH_W) 'cdo.c'; else $(CYGPATH_W) '$(srcdir)/cdo.c'; fi`
+
 cdo-Arith.o: Arith.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Arith.o -MD -MP -MF $(DEPDIR)/cdo-Arith.Tpo -c -o cdo-Arith.o `test -f 'Arith.c' || echo '$(srcdir)/'`Arith.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Arith.Tpo $(DEPDIR)/cdo-Arith.Po
@@ -996,20 +805,6 @@ cdo-Arithlat.obj: Arithlat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Arithlat.obj `if test -f 'Arithlat.c'; then $(CYGPATH_W) 'Arithlat.c'; else $(CYGPATH_W) '$(srcdir)/Arithlat.c'; fi`
 
-cdo-Cat.o: Cat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Cat.o -MD -MP -MF $(DEPDIR)/cdo-Cat.Tpo -c -o cdo-Cat.o `test -f 'Cat.c' || echo '$(srcdir)/'`Cat.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Cat.Tpo $(DEPDIR)/cdo-Cat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Cat.c' object='cdo-Cat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Cat.o `test -f 'Cat.c' || echo '$(srcdir)/'`Cat.c
-
-cdo-Cat.obj: Cat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Cat.obj -MD -MP -MF $(DEPDIR)/cdo-Cat.Tpo -c -o cdo-Cat.obj `if test -f 'Cat.c'; then $(CYGPATH_W) 'Cat.c'; else $(CYGPATH_W) '$(srcdir)/Cat.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Cat.Tpo $(DEPDIR)/cdo-Cat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Cat.c' object='cdo-Cat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Cat.obj `if test -f 'Cat.c'; then $(CYGPATH_W) 'Cat.c'; else $(CYGPATH_W) '$(srcdir)/Cat.c'; fi`
-
 cdo-CDItest.o: CDItest.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CDItest.o -MD -MP -MF $(DEPDIR)/cdo-CDItest.Tpo -c -o cdo-CDItest.o `test -f 'CDItest.c' || echo '$(srcdir)/'`CDItest.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CDItest.Tpo $(DEPDIR)/cdo-CDItest.Po
@@ -1023,6 +818,20 @@ cdo-CDItest.obj: CDItest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDItest.c' object='cdo-CDItest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDItest.obj `if test -f 'CDItest.c'; then $(CYGPATH_W) 'CDItest.c'; else $(CYGPATH_W) '$(srcdir)/CDItest.c'; fi`
+
+cdo-Cat.o: Cat.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Cat.o -MD -MP -MF $(DEPDIR)/cdo-Cat.Tpo -c -o cdo-Cat.o `test -f 'Cat.c' || echo '$(srcdir)/'`Cat.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Cat.Tpo $(DEPDIR)/cdo-Cat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Cat.c' object='cdo-Cat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Cat.o `test -f 'Cat.c' || echo '$(srcdir)/'`Cat.c
+
+cdo-Cat.obj: Cat.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Cat.obj -MD -MP -MF $(DEPDIR)/cdo-Cat.Tpo -c -o cdo-Cat.obj `if test -f 'Cat.c'; then $(CYGPATH_W) 'Cat.c'; else $(CYGPATH_W) '$(srcdir)/Cat.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Cat.Tpo $(DEPDIR)/cdo-Cat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Cat.c' object='cdo-Cat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Cat.obj `if test -f 'Cat.c'; then $(CYGPATH_W) 'Cat.c'; else $(CYGPATH_W) '$(srcdir)/Cat.c'; fi`
 
 cdo-Change.o: Change.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Change.o -MD -MP -MF $(DEPDIR)/cdo-Change.Tpo -c -o cdo-Change.o `test -f 'Change.c' || echo '$(srcdir)/'`Change.c
@@ -1234,6 +1043,34 @@ cdo-Diff.obj: Diff.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Diff.obj `if test -f 'Diff.c'; then $(CYGPATH_W) 'Diff.c'; else $(CYGPATH_W) '$(srcdir)/Diff.c'; fi`
 
+cdo-EOFs.o: EOFs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EOFs.o -MD -MP -MF $(DEPDIR)/cdo-EOFs.Tpo -c -o cdo-EOFs.o `test -f 'EOFs.c' || echo '$(srcdir)/'`EOFs.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EOFs.Tpo $(DEPDIR)/cdo-EOFs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EOFs.c' object='cdo-EOFs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EOFs.o `test -f 'EOFs.c' || echo '$(srcdir)/'`EOFs.c
+
+cdo-EOFs.obj: EOFs.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EOFs.obj -MD -MP -MF $(DEPDIR)/cdo-EOFs.Tpo -c -o cdo-EOFs.obj `if test -f 'EOFs.c'; then $(CYGPATH_W) 'EOFs.c'; else $(CYGPATH_W) '$(srcdir)/EOFs.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EOFs.Tpo $(DEPDIR)/cdo-EOFs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EOFs.c' object='cdo-EOFs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EOFs.obj `if test -f 'EOFs.c'; then $(CYGPATH_W) 'EOFs.c'; else $(CYGPATH_W) '$(srcdir)/EOFs.c'; fi`
+
+cdo-EcaIndices.o: EcaIndices.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EcaIndices.o -MD -MP -MF $(DEPDIR)/cdo-EcaIndices.Tpo -c -o cdo-EcaIndices.o `test -f 'EcaIndices.c' || echo '$(srcdir)/'`EcaIndices.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EcaIndices.Tpo $(DEPDIR)/cdo-EcaIndices.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EcaIndices.c' object='cdo-EcaIndices.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EcaIndices.o `test -f 'EcaIndices.c' || echo '$(srcdir)/'`EcaIndices.c
+
+cdo-EcaIndices.obj: EcaIndices.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EcaIndices.obj -MD -MP -MF $(DEPDIR)/cdo-EcaIndices.Tpo -c -o cdo-EcaIndices.obj `if test -f 'EcaIndices.c'; then $(CYGPATH_W) 'EcaIndices.c'; else $(CYGPATH_W) '$(srcdir)/EcaIndices.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EcaIndices.Tpo $(DEPDIR)/cdo-EcaIndices.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EcaIndices.c' object='cdo-EcaIndices.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EcaIndices.obj `if test -f 'EcaIndices.c'; then $(CYGPATH_W) 'EcaIndices.c'; else $(CYGPATH_W) '$(srcdir)/EcaIndices.c'; fi`
+
 cdo-Echam5ini.o: Echam5ini.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Echam5ini.o -MD -MP -MF $(DEPDIR)/cdo-Echam5ini.Tpo -c -o cdo-Echam5ini.o `test -f 'Echam5ini.c' || echo '$(srcdir)/'`Echam5ini.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Echam5ini.Tpo $(DEPDIR)/cdo-Echam5ini.Po
@@ -1303,20 +1140,6 @@ cdo-Eofcoeff.obj: Eofcoeff.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff.c' object='cdo-Eofcoeff.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Eofcoeff.obj `if test -f 'Eofcoeff.c'; then $(CYGPATH_W) 'Eofcoeff.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff.c'; fi`
-
-cdo-EOFs.o: EOFs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EOFs.o -MD -MP -MF $(DEPDIR)/cdo-EOFs.Tpo -c -o cdo-EOFs.o `test -f 'EOFs.c' || echo '$(srcdir)/'`EOFs.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EOFs.Tpo $(DEPDIR)/cdo-EOFs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EOFs.c' object='cdo-EOFs.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EOFs.o `test -f 'EOFs.c' || echo '$(srcdir)/'`EOFs.c
-
-cdo-EOFs.obj: EOFs.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EOFs.obj -MD -MP -MF $(DEPDIR)/cdo-EOFs.Tpo -c -o cdo-EOFs.obj `if test -f 'EOFs.c'; then $(CYGPATH_W) 'EOFs.c'; else $(CYGPATH_W) '$(srcdir)/EOFs.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EOFs.Tpo $(DEPDIR)/cdo-EOFs.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EOFs.c' object='cdo-EOFs.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EOFs.obj `if test -f 'EOFs.c'; then $(CYGPATH_W) 'EOFs.c'; else $(CYGPATH_W) '$(srcdir)/EOFs.c'; fi`
 
 cdo-Exprf.o: Exprf.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Exprf.o -MD -MP -MF $(DEPDIR)/cdo-Exprf.Tpo -c -o cdo-Exprf.o `test -f 'Exprf.c' || echo '$(srcdir)/'`Exprf.c
@@ -1514,6 +1337,20 @@ cdo-Harmonic.obj: Harmonic.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Harmonic.obj `if test -f 'Harmonic.c'; then $(CYGPATH_W) 'Harmonic.c'; else $(CYGPATH_W) '$(srcdir)/Harmonic.c'; fi`
 
+cdo-Hi.o: Hi.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Hi.o -MD -MP -MF $(DEPDIR)/cdo-Hi.Tpo -c -o cdo-Hi.o `test -f 'Hi.c' || echo '$(srcdir)/'`Hi.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Hi.Tpo $(DEPDIR)/cdo-Hi.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Hi.c' object='cdo-Hi.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Hi.o `test -f 'Hi.c' || echo '$(srcdir)/'`Hi.c
+
+cdo-Hi.obj: Hi.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Hi.obj -MD -MP -MF $(DEPDIR)/cdo-Hi.Tpo -c -o cdo-Hi.obj `if test -f 'Hi.c'; then $(CYGPATH_W) 'Hi.c'; else $(CYGPATH_W) '$(srcdir)/Hi.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Hi.Tpo $(DEPDIR)/cdo-Hi.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Hi.c' object='cdo-Hi.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Hi.obj `if test -f 'Hi.c'; then $(CYGPATH_W) 'Hi.c'; else $(CYGPATH_W) '$(srcdir)/Hi.c'; fi`
+
 cdo-Histogram.o: Histogram.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Histogram.o -MD -MP -MF $(DEPDIR)/cdo-Histogram.Tpo -c -o cdo-Histogram.o `test -f 'Histogram.c' || echo '$(srcdir)/'`Histogram.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Histogram.Tpo $(DEPDIR)/cdo-Histogram.Po
@@ -1668,20 +1505,6 @@ cdo-Intlevel.obj: Intlevel.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Intlevel.obj `if test -f 'Intlevel.c'; then $(CYGPATH_W) 'Intlevel.c'; else $(CYGPATH_W) '$(srcdir)/Intlevel.c'; fi`
 
-cdo-Inttime.o: Inttime.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Inttime.o -MD -MP -MF $(DEPDIR)/cdo-Inttime.Tpo -c -o cdo-Inttime.o `test -f 'Inttime.c' || echo '$(srcdir)/'`Inttime.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Inttime.Tpo $(DEPDIR)/cdo-Inttime.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Inttime.c' object='cdo-Inttime.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Inttime.o `test -f 'Inttime.c' || echo '$(srcdir)/'`Inttime.c
-
-cdo-Inttime.obj: Inttime.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Inttime.obj -MD -MP -MF $(DEPDIR)/cdo-Inttime.Tpo -c -o cdo-Inttime.obj `if test -f 'Inttime.c'; then $(CYGPATH_W) 'Inttime.c'; else $(CYGPATH_W) '$(srcdir)/Inttime.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Inttime.Tpo $(DEPDIR)/cdo-Inttime.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Inttime.c' object='cdo-Inttime.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Inttime.obj `if test -f 'Inttime.c'; then $(CYGPATH_W) 'Inttime.c'; else $(CYGPATH_W) '$(srcdir)/Inttime.c'; fi`
-
 cdo-Intntime.o: Intntime.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Intntime.o -MD -MP -MF $(DEPDIR)/cdo-Intntime.Tpo -c -o cdo-Intntime.o `test -f 'Intntime.c' || echo '$(srcdir)/'`Intntime.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Intntime.Tpo $(DEPDIR)/cdo-Intntime.Po
@@ -1695,6 +1518,20 @@ cdo-Intntime.obj: Intntime.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Intntime.c' object='cdo-Intntime.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Intntime.obj `if test -f 'Intntime.c'; then $(CYGPATH_W) 'Intntime.c'; else $(CYGPATH_W) '$(srcdir)/Intntime.c'; fi`
+
+cdo-Inttime.o: Inttime.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Inttime.o -MD -MP -MF $(DEPDIR)/cdo-Inttime.Tpo -c -o cdo-Inttime.o `test -f 'Inttime.c' || echo '$(srcdir)/'`Inttime.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Inttime.Tpo $(DEPDIR)/cdo-Inttime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Inttime.c' object='cdo-Inttime.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Inttime.o `test -f 'Inttime.c' || echo '$(srcdir)/'`Inttime.c
+
+cdo-Inttime.obj: Inttime.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Inttime.obj -MD -MP -MF $(DEPDIR)/cdo-Inttime.Tpo -c -o cdo-Inttime.obj `if test -f 'Inttime.c'; then $(CYGPATH_W) 'Inttime.c'; else $(CYGPATH_W) '$(srcdir)/Inttime.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Inttime.Tpo $(DEPDIR)/cdo-Inttime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Inttime.c' object='cdo-Inttime.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Inttime.obj `if test -f 'Inttime.c'; then $(CYGPATH_W) 'Inttime.c'; else $(CYGPATH_W) '$(srcdir)/Inttime.c'; fi`
 
 cdo-Intyear.o: Intyear.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Intyear.o -MD -MP -MF $(DEPDIR)/cdo-Intyear.Tpo -c -o cdo-Intyear.o `test -f 'Intyear.c' || echo '$(srcdir)/'`Intyear.c
@@ -2088,6 +1925,20 @@ cdo-Runstat.obj: Runstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Runstat.obj `if test -f 'Runstat.c'; then $(CYGPATH_W) 'Runstat.c'; else $(CYGPATH_W) '$(srcdir)/Runstat.c'; fi`
 
+cdo-Scatter.o: Scatter.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Scatter.o -MD -MP -MF $(DEPDIR)/cdo-Scatter.Tpo -c -o cdo-Scatter.o `test -f 'Scatter.c' || echo '$(srcdir)/'`Scatter.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Scatter.Tpo $(DEPDIR)/cdo-Scatter.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Scatter.c' object='cdo-Scatter.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Scatter.o `test -f 'Scatter.c' || echo '$(srcdir)/'`Scatter.c
+
+cdo-Scatter.obj: Scatter.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Scatter.obj -MD -MP -MF $(DEPDIR)/cdo-Scatter.Tpo -c -o cdo-Scatter.obj `if test -f 'Scatter.c'; then $(CYGPATH_W) 'Scatter.c'; else $(CYGPATH_W) '$(srcdir)/Scatter.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Scatter.Tpo $(DEPDIR)/cdo-Scatter.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Scatter.c' object='cdo-Scatter.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Scatter.obj `if test -f 'Scatter.c'; then $(CYGPATH_W) 'Scatter.c'; else $(CYGPATH_W) '$(srcdir)/Scatter.c'; fi`
+
 cdo-Seascount.o: Seascount.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Seascount.o -MD -MP -MF $(DEPDIR)/cdo-Seascount.Tpo -c -o cdo-Seascount.o `test -f 'Seascount.c' || echo '$(srcdir)/'`Seascount.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Seascount.Tpo $(DEPDIR)/cdo-Seascount.Po
@@ -2158,20 +2009,6 @@ cdo-Select.obj: Select.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Select.obj `if test -f 'Select.c'; then $(CYGPATH_W) 'Select.c'; else $(CYGPATH_W) '$(srcdir)/Select.c'; fi`
 
-cdo-Selvar.o: Selvar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selvar.o -MD -MP -MF $(DEPDIR)/cdo-Selvar.Tpo -c -o cdo-Selvar.o `test -f 'Selvar.c' || echo '$(srcdir)/'`Selvar.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Selvar.Tpo $(DEPDIR)/cdo-Selvar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Selvar.c' object='cdo-Selvar.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selvar.o `test -f 'Selvar.c' || echo '$(srcdir)/'`Selvar.c
-
-cdo-Selvar.obj: Selvar.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selvar.obj -MD -MP -MF $(DEPDIR)/cdo-Selvar.Tpo -c -o cdo-Selvar.obj `if test -f 'Selvar.c'; then $(CYGPATH_W) 'Selvar.c'; else $(CYGPATH_W) '$(srcdir)/Selvar.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Selvar.Tpo $(DEPDIR)/cdo-Selvar.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Selvar.c' object='cdo-Selvar.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selvar.obj `if test -f 'Selvar.c'; then $(CYGPATH_W) 'Selvar.c'; else $(CYGPATH_W) '$(srcdir)/Selvar.c'; fi`
-
 cdo-Seloperator.o: Seloperator.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Seloperator.o -MD -MP -MF $(DEPDIR)/cdo-Seloperator.Tpo -c -o cdo-Seloperator.o `test -f 'Seloperator.c' || echo '$(srcdir)/'`Seloperator.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Seloperator.Tpo $(DEPDIR)/cdo-Seloperator.Po
@@ -2213,6 +2050,20 @@ cdo-Seltime.obj: Seltime.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Seltime.c' object='cdo-Seltime.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Seltime.obj `if test -f 'Seltime.c'; then $(CYGPATH_W) 'Seltime.c'; else $(CYGPATH_W) '$(srcdir)/Seltime.c'; fi`
+
+cdo-Selvar.o: Selvar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selvar.o -MD -MP -MF $(DEPDIR)/cdo-Selvar.Tpo -c -o cdo-Selvar.o `test -f 'Selvar.c' || echo '$(srcdir)/'`Selvar.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Selvar.Tpo $(DEPDIR)/cdo-Selvar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Selvar.c' object='cdo-Selvar.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selvar.o `test -f 'Selvar.c' || echo '$(srcdir)/'`Selvar.c
+
+cdo-Selvar.obj: Selvar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Selvar.obj -MD -MP -MF $(DEPDIR)/cdo-Selvar.Tpo -c -o cdo-Selvar.obj `if test -f 'Selvar.c'; then $(CYGPATH_W) 'Selvar.c'; else $(CYGPATH_W) '$(srcdir)/Selvar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Selvar.Tpo $(DEPDIR)/cdo-Selvar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Selvar.c' object='cdo-Selvar.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Selvar.obj `if test -f 'Selvar.c'; then $(CYGPATH_W) 'Selvar.c'; else $(CYGPATH_W) '$(srcdir)/Selvar.c'; fi`
 
 cdo-Set.o: Set.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Set.o -MD -MP -MF $(DEPDIR)/cdo-Set.Tpo -c -o cdo-Set.o `test -f 'Set.c' || echo '$(srcdir)/'`Set.c
@@ -2339,20 +2190,6 @@ cdo-Setzaxis.obj: Setzaxis.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Setzaxis.c' object='cdo-Setzaxis.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Setzaxis.obj `if test -f 'Setzaxis.c'; then $(CYGPATH_W) 'Setzaxis.c'; else $(CYGPATH_W) '$(srcdir)/Setzaxis.c'; fi`
-
-cdo-Scatter.o: Scatter.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Scatter.o -MD -MP -MF $(DEPDIR)/cdo-Scatter.Tpo -c -o cdo-Scatter.o `test -f 'Scatter.c' || echo '$(srcdir)/'`Scatter.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Scatter.Tpo $(DEPDIR)/cdo-Scatter.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Scatter.c' object='cdo-Scatter.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Scatter.o `test -f 'Scatter.c' || echo '$(srcdir)/'`Scatter.c
-
-cdo-Scatter.obj: Scatter.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Scatter.obj -MD -MP -MF $(DEPDIR)/cdo-Scatter.Tpo -c -o cdo-Scatter.obj `if test -f 'Scatter.c'; then $(CYGPATH_W) 'Scatter.c'; else $(CYGPATH_W) '$(srcdir)/Scatter.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Scatter.Tpo $(DEPDIR)/cdo-Scatter.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Scatter.c' object='cdo-Scatter.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Scatter.obj `if test -f 'Scatter.c'; then $(CYGPATH_W) 'Scatter.c'; else $(CYGPATH_W) '$(srcdir)/Scatter.c'; fi`
 
 cdo-Showinfo.o: Showinfo.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Showinfo.o -MD -MP -MF $(DEPDIR)/cdo-Showinfo.Tpo -c -o cdo-Showinfo.o `test -f 'Showinfo.c' || echo '$(srcdir)/'`Showinfo.c
@@ -2620,20 +2457,6 @@ cdo-Timpctl.obj: Timpctl.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timpctl.obj `if test -f 'Timpctl.c'; then $(CYGPATH_W) 'Timpctl.c'; else $(CYGPATH_W) '$(srcdir)/Timpctl.c'; fi`
 
-cdo-Timsort.o: Timsort.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timsort.o -MD -MP -MF $(DEPDIR)/cdo-Timsort.Tpo -c -o cdo-Timsort.o `test -f 'Timsort.c' || echo '$(srcdir)/'`Timsort.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Timsort.Tpo $(DEPDIR)/cdo-Timsort.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Timsort.c' object='cdo-Timsort.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timsort.o `test -f 'Timsort.c' || echo '$(srcdir)/'`Timsort.c
-
-cdo-Timsort.obj: Timsort.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timsort.obj -MD -MP -MF $(DEPDIR)/cdo-Timsort.Tpo -c -o cdo-Timsort.obj `if test -f 'Timsort.c'; then $(CYGPATH_W) 'Timsort.c'; else $(CYGPATH_W) '$(srcdir)/Timsort.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Timsort.Tpo $(DEPDIR)/cdo-Timsort.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Timsort.c' object='cdo-Timsort.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timsort.obj `if test -f 'Timsort.c'; then $(CYGPATH_W) 'Timsort.c'; else $(CYGPATH_W) '$(srcdir)/Timsort.c'; fi`
-
 cdo-Timselpctl.o: Timselpctl.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timselpctl.o -MD -MP -MF $(DEPDIR)/cdo-Timselpctl.Tpo -c -o cdo-Timselpctl.o `test -f 'Timselpctl.c' || echo '$(srcdir)/'`Timselpctl.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Timselpctl.Tpo $(DEPDIR)/cdo-Timselpctl.Po
@@ -2661,6 +2484,20 @@ cdo-Timselstat.obj: Timselstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Timselstat.c' object='cdo-Timselstat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timselstat.obj `if test -f 'Timselstat.c'; then $(CYGPATH_W) 'Timselstat.c'; else $(CYGPATH_W) '$(srcdir)/Timselstat.c'; fi`
+
+cdo-Timsort.o: Timsort.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timsort.o -MD -MP -MF $(DEPDIR)/cdo-Timsort.Tpo -c -o cdo-Timsort.o `test -f 'Timsort.c' || echo '$(srcdir)/'`Timsort.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Timsort.Tpo $(DEPDIR)/cdo-Timsort.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Timsort.c' object='cdo-Timsort.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timsort.o `test -f 'Timsort.c' || echo '$(srcdir)/'`Timsort.c
+
+cdo-Timsort.obj: Timsort.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timsort.obj -MD -MP -MF $(DEPDIR)/cdo-Timsort.Tpo -c -o cdo-Timsort.obj `if test -f 'Timsort.c'; then $(CYGPATH_W) 'Timsort.c'; else $(CYGPATH_W) '$(srcdir)/Timsort.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Timsort.Tpo $(DEPDIR)/cdo-Timsort.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Timsort.c' object='cdo-Timsort.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Timsort.obj `if test -f 'Timsort.c'; then $(CYGPATH_W) 'Timsort.c'; else $(CYGPATH_W) '$(srcdir)/Timsort.c'; fi`
 
 cdo-Timstat.o: Timstat.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Timstat.o -MD -MP -MF $(DEPDIR)/cdo-Timstat.Tpo -c -o cdo-Timstat.o `test -f 'Timstat.c' || echo '$(srcdir)/'`Timstat.c
@@ -2872,6 +2709,20 @@ cdo-Vertwind.obj: Vertwind.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Vertwind.obj `if test -f 'Vertwind.c'; then $(CYGPATH_W) 'Vertwind.c'; else $(CYGPATH_W) '$(srcdir)/Vertwind.c'; fi`
 
+cdo-Wct.o: Wct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Wct.o -MD -MP -MF $(DEPDIR)/cdo-Wct.Tpo -c -o cdo-Wct.o `test -f 'Wct.c' || echo '$(srcdir)/'`Wct.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Wct.Tpo $(DEPDIR)/cdo-Wct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Wct.c' object='cdo-Wct.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Wct.o `test -f 'Wct.c' || echo '$(srcdir)/'`Wct.c
+
+cdo-Wct.obj: Wct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Wct.obj -MD -MP -MF $(DEPDIR)/cdo-Wct.Tpo -c -o cdo-Wct.obj `if test -f 'Wct.c'; then $(CYGPATH_W) 'Wct.c'; else $(CYGPATH_W) '$(srcdir)/Wct.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Wct.Tpo $(DEPDIR)/cdo-Wct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Wct.c' object='cdo-Wct.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Wct.obj `if test -f 'Wct.c'; then $(CYGPATH_W) 'Wct.c'; else $(CYGPATH_W) '$(srcdir)/Wct.c'; fi`
+
 cdo-Wind.o: Wind.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Wind.o -MD -MP -MF $(DEPDIR)/cdo-Wind.Tpo -c -o cdo-Wind.o `test -f 'Wind.c' || echo '$(srcdir)/'`Wind.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Wind.Tpo $(DEPDIR)/cdo-Wind.Po
@@ -2913,20 +2764,6 @@ cdo-Writerandom.obj: Writerandom.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Writerandom.c' object='cdo-Writerandom.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Writerandom.obj `if test -f 'Writerandom.c'; then $(CYGPATH_W) 'Writerandom.c'; else $(CYGPATH_W) '$(srcdir)/Writerandom.c'; fi`
-
-cdo-Yhourstat.o: Yhourstat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Yhourstat.o -MD -MP -MF $(DEPDIR)/cdo-Yhourstat.Tpo -c -o cdo-Yhourstat.o `test -f 'Yhourstat.c' || echo '$(srcdir)/'`Yhourstat.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Yhourstat.Tpo $(DEPDIR)/cdo-Yhourstat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Yhourstat.c' object='cdo-Yhourstat.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Yhourstat.o `test -f 'Yhourstat.c' || echo '$(srcdir)/'`Yhourstat.c
-
-cdo-Yhourstat.obj: Yhourstat.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Yhourstat.obj -MD -MP -MF $(DEPDIR)/cdo-Yhourstat.Tpo -c -o cdo-Yhourstat.obj `if test -f 'Yhourstat.c'; then $(CYGPATH_W) 'Yhourstat.c'; else $(CYGPATH_W) '$(srcdir)/Yhourstat.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Yhourstat.Tpo $(DEPDIR)/cdo-Yhourstat.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Yhourstat.c' object='cdo-Yhourstat.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Yhourstat.obj `if test -f 'Yhourstat.c'; then $(CYGPATH_W) 'Yhourstat.c'; else $(CYGPATH_W) '$(srcdir)/Yhourstat.c'; fi`
 
 cdo-Ydayarith.o: Ydayarith.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ydayarith.o -MD -MP -MF $(DEPDIR)/cdo-Ydayarith.Tpo -c -o cdo-Ydayarith.o `test -f 'Ydayarith.c' || echo '$(srcdir)/'`Ydayarith.c
@@ -2997,6 +2834,20 @@ cdo-Ydrunstat.obj: Ydrunstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ydrunstat.c' object='cdo-Ydrunstat.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ydrunstat.obj `if test -f 'Ydrunstat.c'; then $(CYGPATH_W) 'Ydrunstat.c'; else $(CYGPATH_W) '$(srcdir)/Ydrunstat.c'; fi`
+
+cdo-Yhourstat.o: Yhourstat.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Yhourstat.o -MD -MP -MF $(DEPDIR)/cdo-Yhourstat.Tpo -c -o cdo-Yhourstat.o `test -f 'Yhourstat.c' || echo '$(srcdir)/'`Yhourstat.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Yhourstat.Tpo $(DEPDIR)/cdo-Yhourstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Yhourstat.c' object='cdo-Yhourstat.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Yhourstat.o `test -f 'Yhourstat.c' || echo '$(srcdir)/'`Yhourstat.c
+
+cdo-Yhourstat.obj: Yhourstat.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Yhourstat.obj -MD -MP -MF $(DEPDIR)/cdo-Yhourstat.Tpo -c -o cdo-Yhourstat.obj `if test -f 'Yhourstat.c'; then $(CYGPATH_W) 'Yhourstat.c'; else $(CYGPATH_W) '$(srcdir)/Yhourstat.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Yhourstat.Tpo $(DEPDIR)/cdo-Yhourstat.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Yhourstat.c' object='cdo-Yhourstat.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Yhourstat.obj `if test -f 'Yhourstat.c'; then $(CYGPATH_W) 'Yhourstat.c'; else $(CYGPATH_W) '$(srcdir)/Yhourstat.c'; fi`
 
 cdo-Ymonarith.o: Ymonarith.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ymonarith.o -MD -MP -MF $(DEPDIR)/cdo-Ymonarith.Tpo -c -o cdo-Ymonarith.o `test -f 'Ymonarith.c' || echo '$(srcdir)/'`Ymonarith.c
@@ -3082,90 +2933,6 @@ cdo-Zonstat.obj: Zonstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Zonstat.obj `if test -f 'Zonstat.c'; then $(CYGPATH_W) 'Zonstat.c'; else $(CYGPATH_W) '$(srcdir)/Zonstat.c'; fi`
 
-cdo-commandline.o: commandline.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-commandline.o -MD -MP -MF $(DEPDIR)/cdo-commandline.Tpo -c -o cdo-commandline.o `test -f 'commandline.c' || echo '$(srcdir)/'`commandline.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-commandline.Tpo $(DEPDIR)/cdo-commandline.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commandline.c' object='cdo-commandline.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-commandline.o `test -f 'commandline.c' || echo '$(srcdir)/'`commandline.c
-
-cdo-commandline.obj: commandline.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-commandline.obj -MD -MP -MF $(DEPDIR)/cdo-commandline.Tpo -c -o cdo-commandline.obj `if test -f 'commandline.c'; then $(CYGPATH_W) 'commandline.c'; else $(CYGPATH_W) '$(srcdir)/commandline.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-commandline.Tpo $(DEPDIR)/cdo-commandline.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commandline.c' object='cdo-commandline.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-commandline.obj `if test -f 'commandline.c'; then $(CYGPATH_W) 'commandline.c'; else $(CYGPATH_W) '$(srcdir)/commandline.c'; fi`
-
-cdo-exception.o: exception.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-exception.o -MD -MP -MF $(DEPDIR)/cdo-exception.Tpo -c -o cdo-exception.o `test -f 'exception.c' || echo '$(srcdir)/'`exception.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-exception.Tpo $(DEPDIR)/cdo-exception.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exception.c' object='cdo-exception.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-exception.o `test -f 'exception.c' || echo '$(srcdir)/'`exception.c
-
-cdo-exception.obj: exception.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-exception.obj -MD -MP -MF $(DEPDIR)/cdo-exception.Tpo -c -o cdo-exception.obj `if test -f 'exception.c'; then $(CYGPATH_W) 'exception.c'; else $(CYGPATH_W) '$(srcdir)/exception.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-exception.Tpo $(DEPDIR)/cdo-exception.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exception.c' object='cdo-exception.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-exception.obj `if test -f 'exception.c'; then $(CYGPATH_W) 'exception.c'; else $(CYGPATH_W) '$(srcdir)/exception.c'; fi`
-
-cdo-expr_yacc.o: expr_yacc.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_yacc.o -MD -MP -MF $(DEPDIR)/cdo-expr_yacc.Tpo -c -o cdo-expr_yacc.o `test -f 'expr_yacc.c' || echo '$(srcdir)/'`expr_yacc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_yacc.Tpo $(DEPDIR)/cdo-expr_yacc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_yacc.c' object='cdo-expr_yacc.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_yacc.o `test -f 'expr_yacc.c' || echo '$(srcdir)/'`expr_yacc.c
-
-cdo-expr_yacc.obj: expr_yacc.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_yacc.obj -MD -MP -MF $(DEPDIR)/cdo-expr_yacc.Tpo -c -o cdo-expr_yacc.obj `if test -f 'expr_yacc.c'; then $(CYGPATH_W) 'expr_yacc.c'; else $(CYGPATH_W) '$(srcdir)/expr_yacc.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_yacc.Tpo $(DEPDIR)/cdo-expr_yacc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_yacc.c' object='cdo-expr_yacc.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_yacc.obj `if test -f 'expr_yacc.c'; then $(CYGPATH_W) 'expr_yacc.c'; else $(CYGPATH_W) '$(srcdir)/expr_yacc.c'; fi`
-
-cdo-expr_lex.o: expr_lex.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_lex.o -MD -MP -MF $(DEPDIR)/cdo-expr_lex.Tpo -c -o cdo-expr_lex.o `test -f 'expr_lex.c' || echo '$(srcdir)/'`expr_lex.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_lex.Tpo $(DEPDIR)/cdo-expr_lex.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_lex.c' object='cdo-expr_lex.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_lex.o `test -f 'expr_lex.c' || echo '$(srcdir)/'`expr_lex.c
-
-cdo-expr_lex.obj: expr_lex.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_lex.obj -MD -MP -MF $(DEPDIR)/cdo-expr_lex.Tpo -c -o cdo-expr_lex.obj `if test -f 'expr_lex.c'; then $(CYGPATH_W) 'expr_lex.c'; else $(CYGPATH_W) '$(srcdir)/expr_lex.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_lex.Tpo $(DEPDIR)/cdo-expr_lex.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_lex.c' object='cdo-expr_lex.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_lex.obj `if test -f 'expr_lex.c'; then $(CYGPATH_W) 'expr_lex.c'; else $(CYGPATH_W) '$(srcdir)/expr_lex.c'; fi`
-
-cdo-expr.o: expr.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr.o -MD -MP -MF $(DEPDIR)/cdo-expr.Tpo -c -o cdo-expr.o `test -f 'expr.c' || echo '$(srcdir)/'`expr.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr.Tpo $(DEPDIR)/cdo-expr.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr.c' object='cdo-expr.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr.o `test -f 'expr.c' || echo '$(srcdir)/'`expr.c
-
-cdo-expr.obj: expr.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr.obj -MD -MP -MF $(DEPDIR)/cdo-expr.Tpo -c -o cdo-expr.obj `if test -f 'expr.c'; then $(CYGPATH_W) 'expr.c'; else $(CYGPATH_W) '$(srcdir)/expr.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr.Tpo $(DEPDIR)/cdo-expr.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr.c' object='cdo-expr.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr.obj `if test -f 'expr.c'; then $(CYGPATH_W) 'expr.c'; else $(CYGPATH_W) '$(srcdir)/expr.c'; fi`
-
-cdo-cdo.o: cdo.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-cdo.o -MD -MP -MF $(DEPDIR)/cdo-cdo.Tpo -c -o cdo-cdo.o `test -f 'cdo.c' || echo '$(srcdir)/'`cdo.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-cdo.Tpo $(DEPDIR)/cdo-cdo.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cdo.c' object='cdo-cdo.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-cdo.o `test -f 'cdo.c' || echo '$(srcdir)/'`cdo.c
-
-cdo-cdo.obj: cdo.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-cdo.obj -MD -MP -MF $(DEPDIR)/cdo-cdo.Tpo -c -o cdo-cdo.obj `if test -f 'cdo.c'; then $(CYGPATH_W) 'cdo.c'; else $(CYGPATH_W) '$(srcdir)/cdo.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-cdo.Tpo $(DEPDIR)/cdo-cdo.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cdo.c' object='cdo-cdo.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-cdo.obj `if test -f 'cdo.c'; then $(CYGPATH_W) 'cdo.c'; else $(CYGPATH_W) '$(srcdir)/cdo.c'; fi`
-
 cdo-cdo_pthread.o: cdo_pthread.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-cdo_pthread.o -MD -MP -MF $(DEPDIR)/cdo-cdo_pthread.Tpo -c -o cdo-cdo_pthread.o `test -f 'cdo_pthread.c' || echo '$(srcdir)/'`cdo_pthread.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-cdo_pthread.Tpo $(DEPDIR)/cdo-cdo_pthread.Po
@@ -3194,6 +2961,118 @@ cdo-cdo_vlist.obj: cdo_vlist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-cdo_vlist.obj `if test -f 'cdo_vlist.c'; then $(CYGPATH_W) 'cdo_vlist.c'; else $(CYGPATH_W) '$(srcdir)/cdo_vlist.c'; fi`
 
+cdo-color.o: color.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-color.o -MD -MP -MF $(DEPDIR)/cdo-color.Tpo -c -o cdo-color.o `test -f 'color.c' || echo '$(srcdir)/'`color.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-color.Tpo $(DEPDIR)/cdo-color.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='color.c' object='cdo-color.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-color.o `test -f 'color.c' || echo '$(srcdir)/'`color.c
+
+cdo-color.obj: color.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-color.obj -MD -MP -MF $(DEPDIR)/cdo-color.Tpo -c -o cdo-color.obj `if test -f 'color.c'; then $(CYGPATH_W) 'color.c'; else $(CYGPATH_W) '$(srcdir)/color.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-color.Tpo $(DEPDIR)/cdo-color.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='color.c' object='cdo-color.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-color.obj `if test -f 'color.c'; then $(CYGPATH_W) 'color.c'; else $(CYGPATH_W) '$(srcdir)/color.c'; fi`
+
+cdo-commandline.o: commandline.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-commandline.o -MD -MP -MF $(DEPDIR)/cdo-commandline.Tpo -c -o cdo-commandline.o `test -f 'commandline.c' || echo '$(srcdir)/'`commandline.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-commandline.Tpo $(DEPDIR)/cdo-commandline.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commandline.c' object='cdo-commandline.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-commandline.o `test -f 'commandline.c' || echo '$(srcdir)/'`commandline.c
+
+cdo-commandline.obj: commandline.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-commandline.obj -MD -MP -MF $(DEPDIR)/cdo-commandline.Tpo -c -o cdo-commandline.obj `if test -f 'commandline.c'; then $(CYGPATH_W) 'commandline.c'; else $(CYGPATH_W) '$(srcdir)/commandline.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-commandline.Tpo $(DEPDIR)/cdo-commandline.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='commandline.c' object='cdo-commandline.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-commandline.obj `if test -f 'commandline.c'; then $(CYGPATH_W) 'commandline.c'; else $(CYGPATH_W) '$(srcdir)/commandline.c'; fi`
+
+cdo-ecacore.o: ecacore.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecacore.o -MD -MP -MF $(DEPDIR)/cdo-ecacore.Tpo -c -o cdo-ecacore.o `test -f 'ecacore.c' || echo '$(srcdir)/'`ecacore.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecacore.Tpo $(DEPDIR)/cdo-ecacore.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecacore.c' object='cdo-ecacore.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecacore.o `test -f 'ecacore.c' || echo '$(srcdir)/'`ecacore.c
+
+cdo-ecacore.obj: ecacore.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecacore.obj -MD -MP -MF $(DEPDIR)/cdo-ecacore.Tpo -c -o cdo-ecacore.obj `if test -f 'ecacore.c'; then $(CYGPATH_W) 'ecacore.c'; else $(CYGPATH_W) '$(srcdir)/ecacore.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecacore.Tpo $(DEPDIR)/cdo-ecacore.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecacore.c' object='cdo-ecacore.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecacore.obj `if test -f 'ecacore.c'; then $(CYGPATH_W) 'ecacore.c'; else $(CYGPATH_W) '$(srcdir)/ecacore.c'; fi`
+
+cdo-ecautil.o: ecautil.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecautil.o -MD -MP -MF $(DEPDIR)/cdo-ecautil.Tpo -c -o cdo-ecautil.o `test -f 'ecautil.c' || echo '$(srcdir)/'`ecautil.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecautil.Tpo $(DEPDIR)/cdo-ecautil.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecautil.c' object='cdo-ecautil.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecautil.o `test -f 'ecautil.c' || echo '$(srcdir)/'`ecautil.c
+
+cdo-ecautil.obj: ecautil.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecautil.obj -MD -MP -MF $(DEPDIR)/cdo-ecautil.Tpo -c -o cdo-ecautil.obj `if test -f 'ecautil.c'; then $(CYGPATH_W) 'ecautil.c'; else $(CYGPATH_W) '$(srcdir)/ecautil.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecautil.Tpo $(DEPDIR)/cdo-ecautil.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecautil.c' object='cdo-ecautil.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecautil.obj `if test -f 'ecautil.c'; then $(CYGPATH_W) 'ecautil.c'; else $(CYGPATH_W) '$(srcdir)/ecautil.c'; fi`
+
+cdo-exception.o: exception.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-exception.o -MD -MP -MF $(DEPDIR)/cdo-exception.Tpo -c -o cdo-exception.o `test -f 'exception.c' || echo '$(srcdir)/'`exception.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-exception.Tpo $(DEPDIR)/cdo-exception.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exception.c' object='cdo-exception.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-exception.o `test -f 'exception.c' || echo '$(srcdir)/'`exception.c
+
+cdo-exception.obj: exception.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-exception.obj -MD -MP -MF $(DEPDIR)/cdo-exception.Tpo -c -o cdo-exception.obj `if test -f 'exception.c'; then $(CYGPATH_W) 'exception.c'; else $(CYGPATH_W) '$(srcdir)/exception.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-exception.Tpo $(DEPDIR)/cdo-exception.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='exception.c' object='cdo-exception.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-exception.obj `if test -f 'exception.c'; then $(CYGPATH_W) 'exception.c'; else $(CYGPATH_W) '$(srcdir)/exception.c'; fi`
+
+cdo-expr.o: expr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr.o -MD -MP -MF $(DEPDIR)/cdo-expr.Tpo -c -o cdo-expr.o `test -f 'expr.c' || echo '$(srcdir)/'`expr.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr.Tpo $(DEPDIR)/cdo-expr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr.c' object='cdo-expr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr.o `test -f 'expr.c' || echo '$(srcdir)/'`expr.c
+
+cdo-expr.obj: expr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr.obj -MD -MP -MF $(DEPDIR)/cdo-expr.Tpo -c -o cdo-expr.obj `if test -f 'expr.c'; then $(CYGPATH_W) 'expr.c'; else $(CYGPATH_W) '$(srcdir)/expr.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr.Tpo $(DEPDIR)/cdo-expr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr.c' object='cdo-expr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr.obj `if test -f 'expr.c'; then $(CYGPATH_W) 'expr.c'; else $(CYGPATH_W) '$(srcdir)/expr.c'; fi`
+
+cdo-expr_lex.o: expr_lex.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_lex.o -MD -MP -MF $(DEPDIR)/cdo-expr_lex.Tpo -c -o cdo-expr_lex.o `test -f 'expr_lex.c' || echo '$(srcdir)/'`expr_lex.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_lex.Tpo $(DEPDIR)/cdo-expr_lex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_lex.c' object='cdo-expr_lex.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_lex.o `test -f 'expr_lex.c' || echo '$(srcdir)/'`expr_lex.c
+
+cdo-expr_lex.obj: expr_lex.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_lex.obj -MD -MP -MF $(DEPDIR)/cdo-expr_lex.Tpo -c -o cdo-expr_lex.obj `if test -f 'expr_lex.c'; then $(CYGPATH_W) 'expr_lex.c'; else $(CYGPATH_W) '$(srcdir)/expr_lex.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_lex.Tpo $(DEPDIR)/cdo-expr_lex.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_lex.c' object='cdo-expr_lex.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_lex.obj `if test -f 'expr_lex.c'; then $(CYGPATH_W) 'expr_lex.c'; else $(CYGPATH_W) '$(srcdir)/expr_lex.c'; fi`
+
+cdo-expr_yacc.o: expr_yacc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_yacc.o -MD -MP -MF $(DEPDIR)/cdo-expr_yacc.Tpo -c -o cdo-expr_yacc.o `test -f 'expr_yacc.c' || echo '$(srcdir)/'`expr_yacc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_yacc.Tpo $(DEPDIR)/cdo-expr_yacc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_yacc.c' object='cdo-expr_yacc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_yacc.o `test -f 'expr_yacc.c' || echo '$(srcdir)/'`expr_yacc.c
+
+cdo-expr_yacc.obj: expr_yacc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-expr_yacc.obj -MD -MP -MF $(DEPDIR)/cdo-expr_yacc.Tpo -c -o cdo-expr_yacc.obj `if test -f 'expr_yacc.c'; then $(CYGPATH_W) 'expr_yacc.c'; else $(CYGPATH_W) '$(srcdir)/expr_yacc.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-expr_yacc.Tpo $(DEPDIR)/cdo-expr_yacc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_yacc.c' object='cdo-expr_yacc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_yacc.obj `if test -f 'expr_yacc.c'; then $(CYGPATH_W) 'expr_yacc.c'; else $(CYGPATH_W) '$(srcdir)/expr_yacc.c'; fi`
+
 cdo-field.o: field.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-field.o -MD -MP -MF $(DEPDIR)/cdo-field.Tpo -c -o cdo-field.o `test -f 'field.c' || echo '$(srcdir)/'`field.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-field.Tpo $(DEPDIR)/cdo-field.Po
@@ -3207,6 +3086,20 @@ cdo-field.obj: field.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='field.c' object='cdo-field.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-field.obj `if test -f 'field.c'; then $(CYGPATH_W) 'field.c'; else $(CYGPATH_W) '$(srcdir)/field.c'; fi`
+
+cdo-field2.o: field2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-field2.o -MD -MP -MF $(DEPDIR)/cdo-field2.Tpo -c -o cdo-field2.o `test -f 'field2.c' || echo '$(srcdir)/'`field2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-field2.Tpo $(DEPDIR)/cdo-field2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='field2.c' object='cdo-field2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-field2.o `test -f 'field2.c' || echo '$(srcdir)/'`field2.c
+
+cdo-field2.obj: field2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-field2.obj -MD -MP -MF $(DEPDIR)/cdo-field2.Tpo -c -o cdo-field2.obj `if test -f 'field2.c'; then $(CYGPATH_W) 'field2.c'; else $(CYGPATH_W) '$(srcdir)/field2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-field2.Tpo $(DEPDIR)/cdo-field2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='field2.c' object='cdo-field2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-field2.obj `if test -f 'field2.c'; then $(CYGPATH_W) 'field2.c'; else $(CYGPATH_W) '$(srcdir)/field2.c'; fi`
 
 cdo-fieldc.o: fieldc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fieldc.o -MD -MP -MF $(DEPDIR)/cdo-fieldc.Tpo -c -o cdo-fieldc.o `test -f 'fieldc.c' || echo '$(srcdir)/'`fieldc.c
@@ -3222,19 +3115,19 @@ cdo-fieldc.obj: fieldc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fieldc.obj `if test -f 'fieldc.c'; then $(CYGPATH_W) 'fieldc.c'; else $(CYGPATH_W) '$(srcdir)/fieldc.c'; fi`
 
-cdo-field2.o: field2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-field2.o -MD -MP -MF $(DEPDIR)/cdo-field2.Tpo -c -o cdo-field2.o `test -f 'field2.c' || echo '$(srcdir)/'`field2.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-field2.Tpo $(DEPDIR)/cdo-field2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='field2.c' object='cdo-field2.o' libtool=no @AMDEPBACKSLASH@
+cdo-fieldmem.o: fieldmem.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fieldmem.o -MD -MP -MF $(DEPDIR)/cdo-fieldmem.Tpo -c -o cdo-fieldmem.o `test -f 'fieldmem.c' || echo '$(srcdir)/'`fieldmem.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fieldmem.Tpo $(DEPDIR)/cdo-fieldmem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fieldmem.c' object='cdo-fieldmem.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-field2.o `test -f 'field2.c' || echo '$(srcdir)/'`field2.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fieldmem.o `test -f 'fieldmem.c' || echo '$(srcdir)/'`fieldmem.c
 
-cdo-field2.obj: field2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-field2.obj -MD -MP -MF $(DEPDIR)/cdo-field2.Tpo -c -o cdo-field2.obj `if test -f 'field2.c'; then $(CYGPATH_W) 'field2.c'; else $(CYGPATH_W) '$(srcdir)/field2.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-field2.Tpo $(DEPDIR)/cdo-field2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='field2.c' object='cdo-field2.obj' libtool=no @AMDEPBACKSLASH@
+cdo-fieldmem.obj: fieldmem.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fieldmem.obj -MD -MP -MF $(DEPDIR)/cdo-fieldmem.Tpo -c -o cdo-fieldmem.obj `if test -f 'fieldmem.c'; then $(CYGPATH_W) 'fieldmem.c'; else $(CYGPATH_W) '$(srcdir)/fieldmem.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fieldmem.Tpo $(DEPDIR)/cdo-fieldmem.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fieldmem.c' object='cdo-fieldmem.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-field2.obj `if test -f 'field2.c'; then $(CYGPATH_W) 'field2.c'; else $(CYGPATH_W) '$(srcdir)/field2.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fieldmem.obj `if test -f 'fieldmem.c'; then $(CYGPATH_W) 'fieldmem.c'; else $(CYGPATH_W) '$(srcdir)/fieldmem.c'; fi`
 
 cdo-fieldmer.o: fieldmer.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fieldmer.o -MD -MP -MF $(DEPDIR)/cdo-fieldmer.Tpo -c -o cdo-fieldmer.o `test -f 'fieldmer.c' || echo '$(srcdir)/'`fieldmer.c
@@ -3264,19 +3157,19 @@ cdo-fieldzon.obj: fieldzon.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fieldzon.obj `if test -f 'fieldzon.c'; then $(CYGPATH_W) 'fieldzon.c'; else $(CYGPATH_W) '$(srcdir)/fieldzon.c'; fi`
 
-cdo-fieldmem.o: fieldmem.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fieldmem.o -MD -MP -MF $(DEPDIR)/cdo-fieldmem.Tpo -c -o cdo-fieldmem.o `test -f 'fieldmem.c' || echo '$(srcdir)/'`fieldmem.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fieldmem.Tpo $(DEPDIR)/cdo-fieldmem.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fieldmem.c' object='cdo-fieldmem.o' libtool=no @AMDEPBACKSLASH@
+cdo-fouriertrans.o: fouriertrans.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fouriertrans.o -MD -MP -MF $(DEPDIR)/cdo-fouriertrans.Tpo -c -o cdo-fouriertrans.o `test -f 'fouriertrans.c' || echo '$(srcdir)/'`fouriertrans.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fouriertrans.Tpo $(DEPDIR)/cdo-fouriertrans.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fouriertrans.c' object='cdo-fouriertrans.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fieldmem.o `test -f 'fieldmem.c' || echo '$(srcdir)/'`fieldmem.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fouriertrans.o `test -f 'fouriertrans.c' || echo '$(srcdir)/'`fouriertrans.c
 
-cdo-fieldmem.obj: fieldmem.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fieldmem.obj -MD -MP -MF $(DEPDIR)/cdo-fieldmem.Tpo -c -o cdo-fieldmem.obj `if test -f 'fieldmem.c'; then $(CYGPATH_W) 'fieldmem.c'; else $(CYGPATH_W) '$(srcdir)/fieldmem.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fieldmem.Tpo $(DEPDIR)/cdo-fieldmem.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fieldmem.c' object='cdo-fieldmem.obj' libtool=no @AMDEPBACKSLASH@
+cdo-fouriertrans.obj: fouriertrans.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fouriertrans.obj -MD -MP -MF $(DEPDIR)/cdo-fouriertrans.Tpo -c -o cdo-fouriertrans.obj `if test -f 'fouriertrans.c'; then $(CYGPATH_W) 'fouriertrans.c'; else $(CYGPATH_W) '$(srcdir)/fouriertrans.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fouriertrans.Tpo $(DEPDIR)/cdo-fouriertrans.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fouriertrans.c' object='cdo-fouriertrans.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fieldmem.obj `if test -f 'fieldmem.c'; then $(CYGPATH_W) 'fieldmem.c'; else $(CYGPATH_W) '$(srcdir)/fieldmem.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fouriertrans.obj `if test -f 'fouriertrans.c'; then $(CYGPATH_W) 'fouriertrans.c'; else $(CYGPATH_W) '$(srcdir)/fouriertrans.c'; fi`
 
 cdo-gradsdeslib.o: gradsdeslib.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-gradsdeslib.o -MD -MP -MF $(DEPDIR)/cdo-gradsdeslib.Tpo -c -o cdo-gradsdeslib.o `test -f 'gradsdeslib.c' || echo '$(srcdir)/'`gradsdeslib.c
@@ -3362,20 +3255,6 @@ cdo-griddes.obj: griddes.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-griddes.obj `if test -f 'griddes.c'; then $(CYGPATH_W) 'griddes.c'; else $(CYGPATH_W) '$(srcdir)/griddes.c'; fi`
 
-cdo-griddes_nc.o: griddes_nc.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-griddes_nc.o -MD -MP -MF $(DEPDIR)/cdo-griddes_nc.Tpo -c -o cdo-griddes_nc.o `test -f 'griddes_nc.c' || echo '$(srcdir)/'`griddes_nc.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-griddes_nc.Tpo $(DEPDIR)/cdo-griddes_nc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='griddes_nc.c' object='cdo-griddes_nc.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-griddes_nc.o `test -f 'griddes_nc.c' || echo '$(srcdir)/'`griddes_nc.c
-
-cdo-griddes_nc.obj: griddes_nc.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-griddes_nc.obj -MD -MP -MF $(DEPDIR)/cdo-griddes_nc.Tpo -c -o cdo-griddes_nc.obj `if test -f 'griddes_nc.c'; then $(CYGPATH_W) 'griddes_nc.c'; else $(CYGPATH_W) '$(srcdir)/griddes_nc.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-griddes_nc.Tpo $(DEPDIR)/cdo-griddes_nc.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='griddes_nc.c' object='cdo-griddes_nc.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-griddes_nc.obj `if test -f 'griddes_nc.c'; then $(CYGPATH_W) 'griddes_nc.c'; else $(CYGPATH_W) '$(srcdir)/griddes_nc.c'; fi`
-
 cdo-griddes_h5.o: griddes_h5.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-griddes_h5.o -MD -MP -MF $(DEPDIR)/cdo-griddes_h5.Tpo -c -o cdo-griddes_h5.o `test -f 'griddes_h5.c' || echo '$(srcdir)/'`griddes_h5.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-griddes_h5.Tpo $(DEPDIR)/cdo-griddes_h5.Po
@@ -3389,6 +3268,20 @@ cdo-griddes_h5.obj: griddes_h5.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='griddes_h5.c' object='cdo-griddes_h5.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-griddes_h5.obj `if test -f 'griddes_h5.c'; then $(CYGPATH_W) 'griddes_h5.c'; else $(CYGPATH_W) '$(srcdir)/griddes_h5.c'; fi`
+
+cdo-griddes_nc.o: griddes_nc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-griddes_nc.o -MD -MP -MF $(DEPDIR)/cdo-griddes_nc.Tpo -c -o cdo-griddes_nc.o `test -f 'griddes_nc.c' || echo '$(srcdir)/'`griddes_nc.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-griddes_nc.Tpo $(DEPDIR)/cdo-griddes_nc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='griddes_nc.c' object='cdo-griddes_nc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-griddes_nc.o `test -f 'griddes_nc.c' || echo '$(srcdir)/'`griddes_nc.c
+
+cdo-griddes_nc.obj: griddes_nc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-griddes_nc.obj -MD -MP -MF $(DEPDIR)/cdo-griddes_nc.Tpo -c -o cdo-griddes_nc.obj `if test -f 'griddes_nc.c'; then $(CYGPATH_W) 'griddes_nc.c'; else $(CYGPATH_W) '$(srcdir)/griddes_nc.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-griddes_nc.Tpo $(DEPDIR)/cdo-griddes_nc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='griddes_nc.c' object='cdo-griddes_nc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-griddes_nc.obj `if test -f 'griddes_nc.c'; then $(CYGPATH_W) 'griddes_nc.c'; else $(CYGPATH_W) '$(srcdir)/griddes_nc.c'; fi`
 
 cdo-hetaeta.o: hetaeta.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-hetaeta.o -MD -MP -MF $(DEPDIR)/cdo-hetaeta.Tpo -c -o cdo-hetaeta.o `test -f 'hetaeta.c' || echo '$(srcdir)/'`hetaeta.c
@@ -3460,6 +3353,48 @@ cdo-job.obj: job.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-job.obj `if test -f 'job.c'; then $(CYGPATH_W) 'job.c'; else $(CYGPATH_W) '$(srcdir)/job.c'; fi`
 
+cdo-juldate.o: juldate.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-juldate.o -MD -MP -MF $(DEPDIR)/cdo-juldate.Tpo -c -o cdo-juldate.o `test -f 'juldate.c' || echo '$(srcdir)/'`juldate.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-juldate.Tpo $(DEPDIR)/cdo-juldate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='juldate.c' object='cdo-juldate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-juldate.o `test -f 'juldate.c' || echo '$(srcdir)/'`juldate.c
+
+cdo-juldate.obj: juldate.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-juldate.obj -MD -MP -MF $(DEPDIR)/cdo-juldate.Tpo -c -o cdo-juldate.obj `if test -f 'juldate.c'; then $(CYGPATH_W) 'juldate.c'; else $(CYGPATH_W) '$(srcdir)/juldate.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-juldate.Tpo $(DEPDIR)/cdo-juldate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='juldate.c' object='cdo-juldate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-juldate.obj `if test -f 'juldate.c'; then $(CYGPATH_W) 'juldate.c'; else $(CYGPATH_W) '$(srcdir)/juldate.c'; fi`
+
+cdo-legendre.o: legendre.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-legendre.o -MD -MP -MF $(DEPDIR)/cdo-legendre.Tpo -c -o cdo-legendre.o `test -f 'legendre.c' || echo '$(srcdir)/'`legendre.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-legendre.Tpo $(DEPDIR)/cdo-legendre.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='legendre.c' object='cdo-legendre.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-legendre.o `test -f 'legendre.c' || echo '$(srcdir)/'`legendre.c
+
+cdo-legendre.obj: legendre.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-legendre.obj -MD -MP -MF $(DEPDIR)/cdo-legendre.Tpo -c -o cdo-legendre.obj `if test -f 'legendre.c'; then $(CYGPATH_W) 'legendre.c'; else $(CYGPATH_W) '$(srcdir)/legendre.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-legendre.Tpo $(DEPDIR)/cdo-legendre.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='legendre.c' object='cdo-legendre.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-legendre.obj `if test -f 'legendre.c'; then $(CYGPATH_W) 'legendre.c'; else $(CYGPATH_W) '$(srcdir)/legendre.c'; fi`
+
+cdo-list.o: list.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-list.o -MD -MP -MF $(DEPDIR)/cdo-list.Tpo -c -o cdo-list.o `test -f 'list.c' || echo '$(srcdir)/'`list.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-list.Tpo $(DEPDIR)/cdo-list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='cdo-list.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-list.o `test -f 'list.c' || echo '$(srcdir)/'`list.c
+
+cdo-list.obj: list.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-list.obj -MD -MP -MF $(DEPDIR)/cdo-list.Tpo -c -o cdo-list.obj `if test -f 'list.c'; then $(CYGPATH_W) 'list.c'; else $(CYGPATH_W) '$(srcdir)/list.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-list.Tpo $(DEPDIR)/cdo-list.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='cdo-list.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-list.obj `if test -f 'list.c'; then $(CYGPATH_W) 'list.c'; else $(CYGPATH_W) '$(srcdir)/list.c'; fi`
+
 cdo-modules.o: modules.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-modules.o -MD -MP -MF $(DEPDIR)/cdo-modules.Tpo -c -o cdo-modules.o `test -f 'modules.c' || echo '$(srcdir)/'`modules.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-modules.Tpo $(DEPDIR)/cdo-modules.Po
@@ -3502,6 +3437,48 @@ cdo-normal.obj: normal.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-normal.obj `if test -f 'normal.c'; then $(CYGPATH_W) 'normal.c'; else $(CYGPATH_W) '$(srcdir)/normal.c'; fi`
 
+cdo-nth_element.o: nth_element.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-nth_element.o -MD -MP -MF $(DEPDIR)/cdo-nth_element.Tpo -c -o cdo-nth_element.o `test -f 'nth_element.c' || echo '$(srcdir)/'`nth_element.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-nth_element.Tpo $(DEPDIR)/cdo-nth_element.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nth_element.c' object='cdo-nth_element.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-nth_element.o `test -f 'nth_element.c' || echo '$(srcdir)/'`nth_element.c
+
+cdo-nth_element.obj: nth_element.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-nth_element.obj -MD -MP -MF $(DEPDIR)/cdo-nth_element.Tpo -c -o cdo-nth_element.obj `if test -f 'nth_element.c'; then $(CYGPATH_W) 'nth_element.c'; else $(CYGPATH_W) '$(srcdir)/nth_element.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-nth_element.Tpo $(DEPDIR)/cdo-nth_element.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nth_element.c' object='cdo-nth_element.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-nth_element.obj `if test -f 'nth_element.c'; then $(CYGPATH_W) 'nth_element.c'; else $(CYGPATH_W) '$(srcdir)/nth_element.c'; fi`
+
+cdo-par_io.o: par_io.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-par_io.o -MD -MP -MF $(DEPDIR)/cdo-par_io.Tpo -c -o cdo-par_io.o `test -f 'par_io.c' || echo '$(srcdir)/'`par_io.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-par_io.Tpo $(DEPDIR)/cdo-par_io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='par_io.c' object='cdo-par_io.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-par_io.o `test -f 'par_io.c' || echo '$(srcdir)/'`par_io.c
+
+cdo-par_io.obj: par_io.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-par_io.obj -MD -MP -MF $(DEPDIR)/cdo-par_io.Tpo -c -o cdo-par_io.obj `if test -f 'par_io.c'; then $(CYGPATH_W) 'par_io.c'; else $(CYGPATH_W) '$(srcdir)/par_io.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-par_io.Tpo $(DEPDIR)/cdo-par_io.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='par_io.c' object='cdo-par_io.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-par_io.obj `if test -f 'par_io.c'; then $(CYGPATH_W) 'par_io.c'; else $(CYGPATH_W) '$(srcdir)/par_io.c'; fi`
+
+cdo-percentiles.o: percentiles.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-percentiles.o -MD -MP -MF $(DEPDIR)/cdo-percentiles.Tpo -c -o cdo-percentiles.o `test -f 'percentiles.c' || echo '$(srcdir)/'`percentiles.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-percentiles.Tpo $(DEPDIR)/cdo-percentiles.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='percentiles.c' object='cdo-percentiles.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-percentiles.o `test -f 'percentiles.c' || echo '$(srcdir)/'`percentiles.c
+
+cdo-percentiles.obj: percentiles.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-percentiles.obj -MD -MP -MF $(DEPDIR)/cdo-percentiles.Tpo -c -o cdo-percentiles.obj `if test -f 'percentiles.c'; then $(CYGPATH_W) 'percentiles.c'; else $(CYGPATH_W) '$(srcdir)/percentiles.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-percentiles.Tpo $(DEPDIR)/cdo-percentiles.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='percentiles.c' object='cdo-percentiles.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-percentiles.obj `if test -f 'percentiles.c'; then $(CYGPATH_W) 'percentiles.c'; else $(CYGPATH_W) '$(srcdir)/percentiles.c'; fi`
+
 cdo-pipe.o: pipe.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pipe.o -MD -MP -MF $(DEPDIR)/cdo-pipe.Tpo -c -o cdo-pipe.o `test -f 'pipe.c' || echo '$(srcdir)/'`pipe.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pipe.Tpo $(DEPDIR)/cdo-pipe.Po
@@ -3530,33 +3507,47 @@ cdo-process.obj: process.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-process.obj `if test -f 'process.c'; then $(CYGPATH_W) 'process.c'; else $(CYGPATH_W) '$(srcdir)/process.c'; fi`
 
-cdo-remaplib.o: remaplib.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-remaplib.o -MD -MP -MF $(DEPDIR)/cdo-remaplib.Tpo -c -o cdo-remaplib.o `test -f 'remaplib.c' || echo '$(srcdir)/'`remaplib.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-remaplib.Tpo $(DEPDIR)/cdo-remaplib.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='remaplib.c' object='cdo-remaplib.o' libtool=no @AMDEPBACKSLASH@
+cdo-pstream.o: pstream.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pstream.o -MD -MP -MF $(DEPDIR)/cdo-pstream.Tpo -c -o cdo-pstream.o `test -f 'pstream.c' || echo '$(srcdir)/'`pstream.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pstream.Tpo $(DEPDIR)/cdo-pstream.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pstream.c' object='cdo-pstream.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remaplib.o `test -f 'remaplib.c' || echo '$(srcdir)/'`remaplib.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pstream.o `test -f 'pstream.c' || echo '$(srcdir)/'`pstream.c
 
-cdo-remaplib.obj: remaplib.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-remaplib.obj -MD -MP -MF $(DEPDIR)/cdo-remaplib.Tpo -c -o cdo-remaplib.obj `if test -f 'remaplib.c'; then $(CYGPATH_W) 'remaplib.c'; else $(CYGPATH_W) '$(srcdir)/remaplib.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-remaplib.Tpo $(DEPDIR)/cdo-remaplib.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='remaplib.c' object='cdo-remaplib.obj' libtool=no @AMDEPBACKSLASH@
+cdo-pstream.obj: pstream.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pstream.obj -MD -MP -MF $(DEPDIR)/cdo-pstream.Tpo -c -o cdo-pstream.obj `if test -f 'pstream.c'; then $(CYGPATH_W) 'pstream.c'; else $(CYGPATH_W) '$(srcdir)/pstream.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pstream.Tpo $(DEPDIR)/cdo-pstream.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pstream.c' object='cdo-pstream.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remaplib.obj `if test -f 'remaplib.c'; then $(CYGPATH_W) 'remaplib.c'; else $(CYGPATH_W) '$(srcdir)/remaplib.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pstream.obj `if test -f 'pstream.c'; then $(CYGPATH_W) 'pstream.c'; else $(CYGPATH_W) '$(srcdir)/pstream.c'; fi`
 
-cdo-timer.o: timer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-timer.o -MD -MP -MF $(DEPDIR)/cdo-timer.Tpo -c -o cdo-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-timer.Tpo $(DEPDIR)/cdo-timer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='cdo-timer.o' libtool=no @AMDEPBACKSLASH@
+cdo-pthread_debug.o: pthread_debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pthread_debug.o -MD -MP -MF $(DEPDIR)/cdo-pthread_debug.Tpo -c -o cdo-pthread_debug.o `test -f 'pthread_debug.c' || echo '$(srcdir)/'`pthread_debug.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pthread_debug.Tpo $(DEPDIR)/cdo-pthread_debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pthread_debug.c' object='cdo-pthread_debug.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pthread_debug.o `test -f 'pthread_debug.c' || echo '$(srcdir)/'`pthread_debug.c
 
-cdo-timer.obj: timer.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-timer.obj -MD -MP -MF $(DEPDIR)/cdo-timer.Tpo -c -o cdo-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-timer.Tpo $(DEPDIR)/cdo-timer.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='cdo-timer.obj' libtool=no @AMDEPBACKSLASH@
+cdo-pthread_debug.obj: pthread_debug.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pthread_debug.obj -MD -MP -MF $(DEPDIR)/cdo-pthread_debug.Tpo -c -o cdo-pthread_debug.obj `if test -f 'pthread_debug.c'; then $(CYGPATH_W) 'pthread_debug.c'; else $(CYGPATH_W) '$(srcdir)/pthread_debug.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pthread_debug.Tpo $(DEPDIR)/cdo-pthread_debug.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pthread_debug.c' object='cdo-pthread_debug.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pthread_debug.obj `if test -f 'pthread_debug.c'; then $(CYGPATH_W) 'pthread_debug.c'; else $(CYGPATH_W) '$(srcdir)/pthread_debug.c'; fi`
+
+cdo-readline.o: readline.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-readline.o -MD -MP -MF $(DEPDIR)/cdo-readline.Tpo -c -o cdo-readline.o `test -f 'readline.c' || echo '$(srcdir)/'`readline.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-readline.Tpo $(DEPDIR)/cdo-readline.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readline.c' object='cdo-readline.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-readline.o `test -f 'readline.c' || echo '$(srcdir)/'`readline.c
+
+cdo-readline.obj: readline.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-readline.obj -MD -MP -MF $(DEPDIR)/cdo-readline.Tpo -c -o cdo-readline.obj `if test -f 'readline.c'; then $(CYGPATH_W) 'readline.c'; else $(CYGPATH_W) '$(srcdir)/readline.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-readline.Tpo $(DEPDIR)/cdo-readline.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readline.c' object='cdo-readline.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-readline.obj `if test -f 'readline.c'; then $(CYGPATH_W) 'readline.c'; else $(CYGPATH_W) '$(srcdir)/readline.c'; fi`
 
 cdo-realtime.o: realtime.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-realtime.o -MD -MP -MF $(DEPDIR)/cdo-realtime.Tpo -c -o cdo-realtime.o `test -f 'realtime.c' || echo '$(srcdir)/'`realtime.c
@@ -3572,19 +3563,47 @@ cdo-realtime.obj: realtime.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-realtime.obj `if test -f 'realtime.c'; then $(CYGPATH_W) 'realtime.c'; else $(CYGPATH_W) '$(srcdir)/realtime.c'; fi`
 
-cdo-pstream.o: pstream.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pstream.o -MD -MP -MF $(DEPDIR)/cdo-pstream.Tpo -c -o cdo-pstream.o `test -f 'pstream.c' || echo '$(srcdir)/'`pstream.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pstream.Tpo $(DEPDIR)/cdo-pstream.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pstream.c' object='cdo-pstream.o' libtool=no @AMDEPBACKSLASH@
+cdo-remaplib.o: remaplib.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-remaplib.o -MD -MP -MF $(DEPDIR)/cdo-remaplib.Tpo -c -o cdo-remaplib.o `test -f 'remaplib.c' || echo '$(srcdir)/'`remaplib.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-remaplib.Tpo $(DEPDIR)/cdo-remaplib.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='remaplib.c' object='cdo-remaplib.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pstream.o `test -f 'pstream.c' || echo '$(srcdir)/'`pstream.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remaplib.o `test -f 'remaplib.c' || echo '$(srcdir)/'`remaplib.c
 
-cdo-pstream.obj: pstream.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pstream.obj -MD -MP -MF $(DEPDIR)/cdo-pstream.Tpo -c -o cdo-pstream.obj `if test -f 'pstream.c'; then $(CYGPATH_W) 'pstream.c'; else $(CYGPATH_W) '$(srcdir)/pstream.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pstream.Tpo $(DEPDIR)/cdo-pstream.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pstream.c' object='cdo-pstream.obj' libtool=no @AMDEPBACKSLASH@
+cdo-remaplib.obj: remaplib.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-remaplib.obj -MD -MP -MF $(DEPDIR)/cdo-remaplib.Tpo -c -o cdo-remaplib.obj `if test -f 'remaplib.c'; then $(CYGPATH_W) 'remaplib.c'; else $(CYGPATH_W) '$(srcdir)/remaplib.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-remaplib.Tpo $(DEPDIR)/cdo-remaplib.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='remaplib.c' object='cdo-remaplib.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pstream.obj `if test -f 'pstream.c'; then $(CYGPATH_W) 'pstream.c'; else $(CYGPATH_W) '$(srcdir)/pstream.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remaplib.obj `if test -f 'remaplib.c'; then $(CYGPATH_W) 'remaplib.c'; else $(CYGPATH_W) '$(srcdir)/remaplib.c'; fi`
+
+cdo-specspace.o: specspace.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-specspace.o -MD -MP -MF $(DEPDIR)/cdo-specspace.Tpo -c -o cdo-specspace.o `test -f 'specspace.c' || echo '$(srcdir)/'`specspace.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-specspace.Tpo $(DEPDIR)/cdo-specspace.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='specspace.c' object='cdo-specspace.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-specspace.o `test -f 'specspace.c' || echo '$(srcdir)/'`specspace.c
+
+cdo-specspace.obj: specspace.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-specspace.obj -MD -MP -MF $(DEPDIR)/cdo-specspace.Tpo -c -o cdo-specspace.obj `if test -f 'specspace.c'; then $(CYGPATH_W) 'specspace.c'; else $(CYGPATH_W) '$(srcdir)/specspace.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-specspace.Tpo $(DEPDIR)/cdo-specspace.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='specspace.c' object='cdo-specspace.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-specspace.obj `if test -f 'specspace.c'; then $(CYGPATH_W) 'specspace.c'; else $(CYGPATH_W) '$(srcdir)/specspace.c'; fi`
+
+cdo-statistic.o: statistic.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-statistic.o -MD -MP -MF $(DEPDIR)/cdo-statistic.Tpo -c -o cdo-statistic.o `test -f 'statistic.c' || echo '$(srcdir)/'`statistic.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-statistic.Tpo $(DEPDIR)/cdo-statistic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='statistic.c' object='cdo-statistic.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-statistic.o `test -f 'statistic.c' || echo '$(srcdir)/'`statistic.c
+
+cdo-statistic.obj: statistic.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-statistic.obj -MD -MP -MF $(DEPDIR)/cdo-statistic.Tpo -c -o cdo-statistic.obj `if test -f 'statistic.c'; then $(CYGPATH_W) 'statistic.c'; else $(CYGPATH_W) '$(srcdir)/statistic.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-statistic.Tpo $(DEPDIR)/cdo-statistic.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='statistic.c' object='cdo-statistic.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-statistic.obj `if test -f 'statistic.c'; then $(CYGPATH_W) 'statistic.c'; else $(CYGPATH_W) '$(srcdir)/statistic.c'; fi`
 
 cdo-table.o: table.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-table.o -MD -MP -MF $(DEPDIR)/cdo-table.Tpo -c -o cdo-table.o `test -f 'table.c' || echo '$(srcdir)/'`table.c
@@ -3599,6 +3618,20 @@ cdo-table.obj: table.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='table.c' object='cdo-table.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-table.obj `if test -f 'table.c'; then $(CYGPATH_W) 'table.c'; else $(CYGPATH_W) '$(srcdir)/table.c'; fi`
+
+cdo-timer.o: timer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-timer.o -MD -MP -MF $(DEPDIR)/cdo-timer.Tpo -c -o cdo-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-timer.Tpo $(DEPDIR)/cdo-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='cdo-timer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
+
+cdo-timer.obj: timer.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-timer.obj -MD -MP -MF $(DEPDIR)/cdo-timer.Tpo -c -o cdo-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-timer.Tpo $(DEPDIR)/cdo-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='timer.c' object='cdo-timer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
 
 cdo-userlog.o: userlog.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-userlog.o -MD -MP -MF $(DEPDIR)/cdo-userlog.Tpo -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
@@ -3628,76 +3661,6 @@ cdo-util.obj: util.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-util.obj `if test -f 'util.c'; then $(CYGPATH_W) 'util.c'; else $(CYGPATH_W) '$(srcdir)/util.c'; fi`
 
-cdo-legendre.o: legendre.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-legendre.o -MD -MP -MF $(DEPDIR)/cdo-legendre.Tpo -c -o cdo-legendre.o `test -f 'legendre.c' || echo '$(srcdir)/'`legendre.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-legendre.Tpo $(DEPDIR)/cdo-legendre.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='legendre.c' object='cdo-legendre.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-legendre.o `test -f 'legendre.c' || echo '$(srcdir)/'`legendre.c
-
-cdo-legendre.obj: legendre.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-legendre.obj -MD -MP -MF $(DEPDIR)/cdo-legendre.Tpo -c -o cdo-legendre.obj `if test -f 'legendre.c'; then $(CYGPATH_W) 'legendre.c'; else $(CYGPATH_W) '$(srcdir)/legendre.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-legendre.Tpo $(DEPDIR)/cdo-legendre.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='legendre.c' object='cdo-legendre.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-legendre.obj `if test -f 'legendre.c'; then $(CYGPATH_W) 'legendre.c'; else $(CYGPATH_W) '$(srcdir)/legendre.c'; fi`
-
-cdo-fouriertrans.o: fouriertrans.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fouriertrans.o -MD -MP -MF $(DEPDIR)/cdo-fouriertrans.Tpo -c -o cdo-fouriertrans.o `test -f 'fouriertrans.c' || echo '$(srcdir)/'`fouriertrans.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fouriertrans.Tpo $(DEPDIR)/cdo-fouriertrans.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fouriertrans.c' object='cdo-fouriertrans.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fouriertrans.o `test -f 'fouriertrans.c' || echo '$(srcdir)/'`fouriertrans.c
-
-cdo-fouriertrans.obj: fouriertrans.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-fouriertrans.obj -MD -MP -MF $(DEPDIR)/cdo-fouriertrans.Tpo -c -o cdo-fouriertrans.obj `if test -f 'fouriertrans.c'; then $(CYGPATH_W) 'fouriertrans.c'; else $(CYGPATH_W) '$(srcdir)/fouriertrans.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-fouriertrans.Tpo $(DEPDIR)/cdo-fouriertrans.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='fouriertrans.c' object='cdo-fouriertrans.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-fouriertrans.obj `if test -f 'fouriertrans.c'; then $(CYGPATH_W) 'fouriertrans.c'; else $(CYGPATH_W) '$(srcdir)/fouriertrans.c'; fi`
-
-cdo-specspace.o: specspace.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-specspace.o -MD -MP -MF $(DEPDIR)/cdo-specspace.Tpo -c -o cdo-specspace.o `test -f 'specspace.c' || echo '$(srcdir)/'`specspace.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-specspace.Tpo $(DEPDIR)/cdo-specspace.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='specspace.c' object='cdo-specspace.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-specspace.o `test -f 'specspace.c' || echo '$(srcdir)/'`specspace.c
-
-cdo-specspace.obj: specspace.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-specspace.obj -MD -MP -MF $(DEPDIR)/cdo-specspace.Tpo -c -o cdo-specspace.obj `if test -f 'specspace.c'; then $(CYGPATH_W) 'specspace.c'; else $(CYGPATH_W) '$(srcdir)/specspace.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-specspace.Tpo $(DEPDIR)/cdo-specspace.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='specspace.c' object='cdo-specspace.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-specspace.obj `if test -f 'specspace.c'; then $(CYGPATH_W) 'specspace.c'; else $(CYGPATH_W) '$(srcdir)/specspace.c'; fi`
-
-cdo-readline.o: readline.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-readline.o -MD -MP -MF $(DEPDIR)/cdo-readline.Tpo -c -o cdo-readline.o `test -f 'readline.c' || echo '$(srcdir)/'`readline.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-readline.Tpo $(DEPDIR)/cdo-readline.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readline.c' object='cdo-readline.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-readline.o `test -f 'readline.c' || echo '$(srcdir)/'`readline.c
-
-cdo-readline.obj: readline.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-readline.obj -MD -MP -MF $(DEPDIR)/cdo-readline.Tpo -c -o cdo-readline.obj `if test -f 'readline.c'; then $(CYGPATH_W) 'readline.c'; else $(CYGPATH_W) '$(srcdir)/readline.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-readline.Tpo $(DEPDIR)/cdo-readline.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='readline.c' object='cdo-readline.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-readline.obj `if test -f 'readline.c'; then $(CYGPATH_W) 'readline.c'; else $(CYGPATH_W) '$(srcdir)/readline.c'; fi`
-
-cdo-juldate.o: juldate.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-juldate.o -MD -MP -MF $(DEPDIR)/cdo-juldate.Tpo -c -o cdo-juldate.o `test -f 'juldate.c' || echo '$(srcdir)/'`juldate.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-juldate.Tpo $(DEPDIR)/cdo-juldate.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='juldate.c' object='cdo-juldate.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-juldate.o `test -f 'juldate.c' || echo '$(srcdir)/'`juldate.c
-
-cdo-juldate.obj: juldate.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-juldate.obj -MD -MP -MF $(DEPDIR)/cdo-juldate.Tpo -c -o cdo-juldate.obj `if test -f 'juldate.c'; then $(CYGPATH_W) 'juldate.c'; else $(CYGPATH_W) '$(srcdir)/juldate.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-juldate.Tpo $(DEPDIR)/cdo-juldate.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='juldate.c' object='cdo-juldate.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-juldate.obj `if test -f 'juldate.c'; then $(CYGPATH_W) 'juldate.c'; else $(CYGPATH_W) '$(srcdir)/juldate.c'; fi`
-
 cdo-vinterp.o: vinterp.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-vinterp.o -MD -MP -MF $(DEPDIR)/cdo-vinterp.Tpo -c -o cdo-vinterp.o `test -f 'vinterp.c' || echo '$(srcdir)/'`vinterp.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-vinterp.Tpo $(DEPDIR)/cdo-vinterp.Po
@@ -3725,174 +3688,6 @@ cdo-zaxis.obj: zaxis.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='zaxis.c' object='cdo-zaxis.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-zaxis.obj `if test -f 'zaxis.c'; then $(CYGPATH_W) 'zaxis.c'; else $(CYGPATH_W) '$(srcdir)/zaxis.c'; fi`
-
-cdo-par_io.o: par_io.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-par_io.o -MD -MP -MF $(DEPDIR)/cdo-par_io.Tpo -c -o cdo-par_io.o `test -f 'par_io.c' || echo '$(srcdir)/'`par_io.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-par_io.Tpo $(DEPDIR)/cdo-par_io.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='par_io.c' object='cdo-par_io.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-par_io.o `test -f 'par_io.c' || echo '$(srcdir)/'`par_io.c
-
-cdo-par_io.obj: par_io.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-par_io.obj -MD -MP -MF $(DEPDIR)/cdo-par_io.Tpo -c -o cdo-par_io.obj `if test -f 'par_io.c'; then $(CYGPATH_W) 'par_io.c'; else $(CYGPATH_W) '$(srcdir)/par_io.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-par_io.Tpo $(DEPDIR)/cdo-par_io.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='par_io.c' object='cdo-par_io.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-par_io.obj `if test -f 'par_io.c'; then $(CYGPATH_W) 'par_io.c'; else $(CYGPATH_W) '$(srcdir)/par_io.c'; fi`
-
-cdo-pthread_debug.o: pthread_debug.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pthread_debug.o -MD -MP -MF $(DEPDIR)/cdo-pthread_debug.Tpo -c -o cdo-pthread_debug.o `test -f 'pthread_debug.c' || echo '$(srcdir)/'`pthread_debug.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pthread_debug.Tpo $(DEPDIR)/cdo-pthread_debug.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pthread_debug.c' object='cdo-pthread_debug.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pthread_debug.o `test -f 'pthread_debug.c' || echo '$(srcdir)/'`pthread_debug.c
-
-cdo-pthread_debug.obj: pthread_debug.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-pthread_debug.obj -MD -MP -MF $(DEPDIR)/cdo-pthread_debug.Tpo -c -o cdo-pthread_debug.obj `if test -f 'pthread_debug.c'; then $(CYGPATH_W) 'pthread_debug.c'; else $(CYGPATH_W) '$(srcdir)/pthread_debug.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-pthread_debug.Tpo $(DEPDIR)/cdo-pthread_debug.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pthread_debug.c' object='cdo-pthread_debug.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-pthread_debug.obj `if test -f 'pthread_debug.c'; then $(CYGPATH_W) 'pthread_debug.c'; else $(CYGPATH_W) '$(srcdir)/pthread_debug.c'; fi`
-
-cdo-color.o: color.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-color.o -MD -MP -MF $(DEPDIR)/cdo-color.Tpo -c -o cdo-color.o `test -f 'color.c' || echo '$(srcdir)/'`color.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-color.Tpo $(DEPDIR)/cdo-color.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='color.c' object='cdo-color.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-color.o `test -f 'color.c' || echo '$(srcdir)/'`color.c
-
-cdo-color.obj: color.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-color.obj -MD -MP -MF $(DEPDIR)/cdo-color.Tpo -c -o cdo-color.obj `if test -f 'color.c'; then $(CYGPATH_W) 'color.c'; else $(CYGPATH_W) '$(srcdir)/color.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-color.Tpo $(DEPDIR)/cdo-color.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='color.c' object='cdo-color.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-color.obj `if test -f 'color.c'; then $(CYGPATH_W) 'color.c'; else $(CYGPATH_W) '$(srcdir)/color.c'; fi`
-
-cdo-list.o: list.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-list.o -MD -MP -MF $(DEPDIR)/cdo-list.Tpo -c -o cdo-list.o `test -f 'list.c' || echo '$(srcdir)/'`list.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-list.Tpo $(DEPDIR)/cdo-list.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='cdo-list.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-list.o `test -f 'list.c' || echo '$(srcdir)/'`list.c
-
-cdo-list.obj: list.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-list.obj -MD -MP -MF $(DEPDIR)/cdo-list.Tpo -c -o cdo-list.obj `if test -f 'list.c'; then $(CYGPATH_W) 'list.c'; else $(CYGPATH_W) '$(srcdir)/list.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-list.Tpo $(DEPDIR)/cdo-list.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='list.c' object='cdo-list.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-list.obj `if test -f 'list.c'; then $(CYGPATH_W) 'list.c'; else $(CYGPATH_W) '$(srcdir)/list.c'; fi`
-
-cdo-percentiles.o: percentiles.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-percentiles.o -MD -MP -MF $(DEPDIR)/cdo-percentiles.Tpo -c -o cdo-percentiles.o `test -f 'percentiles.c' || echo '$(srcdir)/'`percentiles.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-percentiles.Tpo $(DEPDIR)/cdo-percentiles.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='percentiles.c' object='cdo-percentiles.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-percentiles.o `test -f 'percentiles.c' || echo '$(srcdir)/'`percentiles.c
-
-cdo-percentiles.obj: percentiles.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-percentiles.obj -MD -MP -MF $(DEPDIR)/cdo-percentiles.Tpo -c -o cdo-percentiles.obj `if test -f 'percentiles.c'; then $(CYGPATH_W) 'percentiles.c'; else $(CYGPATH_W) '$(srcdir)/percentiles.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-percentiles.Tpo $(DEPDIR)/cdo-percentiles.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='percentiles.c' object='cdo-percentiles.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-percentiles.obj `if test -f 'percentiles.c'; then $(CYGPATH_W) 'percentiles.c'; else $(CYGPATH_W) '$(srcdir)/percentiles.c'; fi`
-
-cdo-nth_element.o: nth_element.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-nth_element.o -MD -MP -MF $(DEPDIR)/cdo-nth_element.Tpo -c -o cdo-nth_element.o `test -f 'nth_element.c' || echo '$(srcdir)/'`nth_element.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-nth_element.Tpo $(DEPDIR)/cdo-nth_element.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nth_element.c' object='cdo-nth_element.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-nth_element.o `test -f 'nth_element.c' || echo '$(srcdir)/'`nth_element.c
-
-cdo-nth_element.obj: nth_element.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-nth_element.obj -MD -MP -MF $(DEPDIR)/cdo-nth_element.Tpo -c -o cdo-nth_element.obj `if test -f 'nth_element.c'; then $(CYGPATH_W) 'nth_element.c'; else $(CYGPATH_W) '$(srcdir)/nth_element.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-nth_element.Tpo $(DEPDIR)/cdo-nth_element.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nth_element.c' object='cdo-nth_element.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-nth_element.obj `if test -f 'nth_element.c'; then $(CYGPATH_W) 'nth_element.c'; else $(CYGPATH_W) '$(srcdir)/nth_element.c'; fi`
-
-cdo-ecacore.o: ecacore.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecacore.o -MD -MP -MF $(DEPDIR)/cdo-ecacore.Tpo -c -o cdo-ecacore.o `test -f 'ecacore.c' || echo '$(srcdir)/'`ecacore.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecacore.Tpo $(DEPDIR)/cdo-ecacore.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecacore.c' object='cdo-ecacore.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecacore.o `test -f 'ecacore.c' || echo '$(srcdir)/'`ecacore.c
-
-cdo-ecacore.obj: ecacore.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecacore.obj -MD -MP -MF $(DEPDIR)/cdo-ecacore.Tpo -c -o cdo-ecacore.obj `if test -f 'ecacore.c'; then $(CYGPATH_W) 'ecacore.c'; else $(CYGPATH_W) '$(srcdir)/ecacore.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecacore.Tpo $(DEPDIR)/cdo-ecacore.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecacore.c' object='cdo-ecacore.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecacore.obj `if test -f 'ecacore.c'; then $(CYGPATH_W) 'ecacore.c'; else $(CYGPATH_W) '$(srcdir)/ecacore.c'; fi`
-
-cdo-ecautil.o: ecautil.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecautil.o -MD -MP -MF $(DEPDIR)/cdo-ecautil.Tpo -c -o cdo-ecautil.o `test -f 'ecautil.c' || echo '$(srcdir)/'`ecautil.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecautil.Tpo $(DEPDIR)/cdo-ecautil.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecautil.c' object='cdo-ecautil.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecautil.o `test -f 'ecautil.c' || echo '$(srcdir)/'`ecautil.c
-
-cdo-ecautil.obj: ecautil.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-ecautil.obj -MD -MP -MF $(DEPDIR)/cdo-ecautil.Tpo -c -o cdo-ecautil.obj `if test -f 'ecautil.c'; then $(CYGPATH_W) 'ecautil.c'; else $(CYGPATH_W) '$(srcdir)/ecautil.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-ecautil.Tpo $(DEPDIR)/cdo-ecautil.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='ecautil.c' object='cdo-ecautil.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-ecautil.obj `if test -f 'ecautil.c'; then $(CYGPATH_W) 'ecautil.c'; else $(CYGPATH_W) '$(srcdir)/ecautil.c'; fi`
-
-cdo-EcaIndices.o: EcaIndices.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EcaIndices.o -MD -MP -MF $(DEPDIR)/cdo-EcaIndices.Tpo -c -o cdo-EcaIndices.o `test -f 'EcaIndices.c' || echo '$(srcdir)/'`EcaIndices.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EcaIndices.Tpo $(DEPDIR)/cdo-EcaIndices.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EcaIndices.c' object='cdo-EcaIndices.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EcaIndices.o `test -f 'EcaIndices.c' || echo '$(srcdir)/'`EcaIndices.c
-
-cdo-EcaIndices.obj: EcaIndices.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EcaIndices.obj -MD -MP -MF $(DEPDIR)/cdo-EcaIndices.Tpo -c -o cdo-EcaIndices.obj `if test -f 'EcaIndices.c'; then $(CYGPATH_W) 'EcaIndices.c'; else $(CYGPATH_W) '$(srcdir)/EcaIndices.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EcaIndices.Tpo $(DEPDIR)/cdo-EcaIndices.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='EcaIndices.c' object='cdo-EcaIndices.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EcaIndices.obj `if test -f 'EcaIndices.c'; then $(CYGPATH_W) 'EcaIndices.c'; else $(CYGPATH_W) '$(srcdir)/EcaIndices.c'; fi`
-
-cdo-Hi.o: Hi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Hi.o -MD -MP -MF $(DEPDIR)/cdo-Hi.Tpo -c -o cdo-Hi.o `test -f 'Hi.c' || echo '$(srcdir)/'`Hi.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Hi.Tpo $(DEPDIR)/cdo-Hi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Hi.c' object='cdo-Hi.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Hi.o `test -f 'Hi.c' || echo '$(srcdir)/'`Hi.c
-
-cdo-Hi.obj: Hi.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Hi.obj -MD -MP -MF $(DEPDIR)/cdo-Hi.Tpo -c -o cdo-Hi.obj `if test -f 'Hi.c'; then $(CYGPATH_W) 'Hi.c'; else $(CYGPATH_W) '$(srcdir)/Hi.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Hi.Tpo $(DEPDIR)/cdo-Hi.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Hi.c' object='cdo-Hi.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Hi.obj `if test -f 'Hi.c'; then $(CYGPATH_W) 'Hi.c'; else $(CYGPATH_W) '$(srcdir)/Hi.c'; fi`
-
-cdo-Wct.o: Wct.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Wct.o -MD -MP -MF $(DEPDIR)/cdo-Wct.Tpo -c -o cdo-Wct.o `test -f 'Wct.c' || echo '$(srcdir)/'`Wct.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Wct.Tpo $(DEPDIR)/cdo-Wct.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Wct.c' object='cdo-Wct.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Wct.o `test -f 'Wct.c' || echo '$(srcdir)/'`Wct.c
-
-cdo-Wct.obj: Wct.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Wct.obj -MD -MP -MF $(DEPDIR)/cdo-Wct.Tpo -c -o cdo-Wct.obj `if test -f 'Wct.c'; then $(CYGPATH_W) 'Wct.c'; else $(CYGPATH_W) '$(srcdir)/Wct.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Wct.Tpo $(DEPDIR)/cdo-Wct.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Wct.c' object='cdo-Wct.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Wct.obj `if test -f 'Wct.c'; then $(CYGPATH_W) 'Wct.c'; else $(CYGPATH_W) '$(srcdir)/Wct.c'; fi`
-
-cdo-statistic.o: statistic.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-statistic.o -MD -MP -MF $(DEPDIR)/cdo-statistic.Tpo -c -o cdo-statistic.o `test -f 'statistic.c' || echo '$(srcdir)/'`statistic.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-statistic.Tpo $(DEPDIR)/cdo-statistic.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='statistic.c' object='cdo-statistic.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-statistic.o `test -f 'statistic.c' || echo '$(srcdir)/'`statistic.c
-
-cdo-statistic.obj: statistic.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-statistic.obj -MD -MP -MF $(DEPDIR)/cdo-statistic.Tpo -c -o cdo-statistic.obj `if test -f 'statistic.c'; then $(CYGPATH_W) 'statistic.c'; else $(CYGPATH_W) '$(srcdir)/statistic.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-statistic.Tpo $(DEPDIR)/cdo-statistic.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='statistic.c' object='cdo-statistic.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-statistic.obj `if test -f 'statistic.c'; then $(CYGPATH_W) 'statistic.c'; else $(CYGPATH_W) '$(srcdir)/statistic.c'; fi`
 
 cdotest-cdotest.o: cdotest.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdotest_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdotest-cdotest.o -MD -MP -MF $(DEPDIR)/cdotest-cdotest.Tpo -c -o cdotest-cdotest.o `test -f 'cdotest.c' || echo '$(srcdir)/'`cdotest.c
