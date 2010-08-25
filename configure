@@ -620,6 +620,7 @@ USE_INTERNAL_CDI_TRUE
 CDI_LDFLAGS
 CDI_C_INCLUDE
 CDI_C_LIB
+PROJ_INCLUDE
 PROJ_LDFLAGS
 ENABLE_IEG
 ENABLE_EXTRA
@@ -17740,7 +17741,19 @@ $as_echo_n "checking for proj library... " >&6; }
                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; } ;; #(
   yes) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing pj_init" >&5
+    for ac_header in projects.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "projects.h" "ac_cv_header_projects_h" "$ac_includes_default"
+if test "x$ac_cv_header_projects_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PROJECTS_H 1
+_ACEOF
+
+fi
+
+done
+
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing pj_init" >&5
 $as_echo_n "checking for library containing pj_init... " >&6; }
 if test "${ac_cv_search_pj_init+set}" = set; then :
   $as_echo_n "(cached) " >&6
@@ -17801,11 +17814,26 @@ else
 fi
 
                             PROJ_LDFLAGS=" -lproj"
+
+                            PROJ_INCLUDE=""
  ;; #(
   *) :
     PROJ_ROOT=$with_proj
                           if test -d "$PROJ_ROOT"; then :
   LDFLAGS="$LDFLAGS -L$PROJ_ROOT/lib"
+                                 CPPFLAGS="$CPPFLAGS -I$PROJ_ROOT/include"
+                                 for ac_header in projects.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "projects.h" "ac_cv_header_projects_h" "$ac_includes_default"
+if test "x$ac_cv_header_projects_h" = x""yes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_PROJECTS_H 1
+_ACEOF
+
+fi
+
+done
+
                                  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing pj_init" >&5
 $as_echo_n "checking for library containing pj_init... " >&6; }
 if test "${ac_cv_search_pj_init+set}" = set; then :
@@ -17867,6 +17895,8 @@ else
 fi
 
                                  PROJ_LDFLAGS=" -L$PROJ_ROOT/lib -lproj"
+
+                                 PROJ_INCLUDE=" -I$PROJ_ROOT/include"
 
 else
   as_fn_error $? "$PROJ_ROOT is not a directory! PROJ suppressed" "$LINENO" 5
