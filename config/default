@@ -234,7 +234,7 @@ case "${HOSTNAME}" in
                     --with-zlib=/sw/aix53/zlib-1.2.3 \
                     --with-szlib=/sw/aix53/szip-2.1 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
- 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+ 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP" LDFLAGS="-brtl"
 	;;
     vip*)
 	${CONFPATH}configure --prefix=$HOME/local \

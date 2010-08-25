@@ -2,8 +2,6 @@
 #
 bin_PROGRAMS = cdo
 #
-noinst_PROGRAMS = cdotest
-#
 cdo_SOURCES = Arith.c		\
 	      Arithc.c 		\
 	      Arithdays.c 	\
@@ -157,7 +155,6 @@ cdo_SOURCES = Arith.c		\
               Yseaspctl.c  	\
               Yseasstat.c  	\
               Zonstat.c 	\
-	      cdilib.c 		\
               commandline.c 	\
               exception.c 	\
               expr_yacc.h 	\
@@ -255,18 +252,30 @@ cdo_SOURCES = Arith.c		\
 	      statistic.c       \
 	      statistic.h       \
 	      cdi.h
-#
-AM_CPPFLAGS = $(NETCDF_C_INCLUDE) $(HDF5_C_INCLUDE) $(GRIB_API_C_INCLUDE) $(ZLIB_C_INCLUDE) $(SZLIB_C_INCLUDE) $(PROJ_C_INCLUDE) $(CPPFLAGS)
-#
-cdo_LDADD   =  @NETCDF_C_LIB@     @HDF5_C_LIB@       @GRIB_API_C_LIB@      @ZLIB_C_LIB@      @SZLIB_C_LIB@      @PROJ_C_LIB@       @LDFLAGS@ @LIBS@
-#
-cdotest_LDADD = $(cdo_LDADD)
-#
-cdotest_SOURCES = cdi.h 	\
-		  cdilib.c 	\
-		  cdo_int.h 	\
-		  cdotest.c
-#
+
+cdo_LDADD     =
+cdo_CPPFLAGS  =
+if USE_INTERNAL_CDI
+cdo_LDADD    += $(top_builddir)/libcdi/src/libcdi.la
+else
+cdo_LDADD    += @CDI_LDFLAGS@
+endif
+cdo_LDADD    += @NETCDF_LDFLAGS@ \
+		@HDF5_LDFLAGS@ \
+		@GRIB_API_LDFLAGS@ \
+		@ZLIB_LDFLAGS@ \
+		@SZLIB_LDFLAGS@ \
+		@PROJ_LDFLAGS@ \
+		@LDFLAGS@ \
+		@LIBS@
+
+noinst_PROGRAMS  = cdotest
+cdotest_SOURCES  = cdi.h	\
+		   cdo_int.h	\
+	           cdotest.c
+cdotest_LDADD    = $(cdo_LDADD)
+cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
+
 userlog.o: userlog.c config.h
 	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c `test -f '$<' || echo '$(srcdir)/'`$<
 #
