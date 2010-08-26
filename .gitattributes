@@ -404,7 +404,6 @@ src/Yseaspctl.c -text
 src/Yseasstat.c -text
 src/Zonstat.c -text
 src/cdi.h -text
-src/cdilib.c -text
 src/cdo.c -text
 src/cdo.h -text
 src/cdo_int.h -text
