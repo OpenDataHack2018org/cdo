@@ -33,6 +33,7 @@ typedef struct {
 typedef struct {
   char nml_name[32];
   int debug_level;
+  int force_remap
 } nml_control_t;
 
 
@@ -89,6 +90,7 @@ void nml_control_init(nml_control_t *nml_control)
 {
   strcpy(nml_control->nml_name, "control");
   nml_control->debug_level = 0;
+  nml_control->force_remap = 0;
 }
 
 static
@@ -96,6 +98,7 @@ void nml_control_print(nml_control_t nml_control)
 { 
   fprintf(stdout, "Namelist: %s\n", nml_control.nml_name);
   fprintf(stdout, "  debug_level = %d\n", nml_control.debug_level);
+  fprintf(stdout, "  force_remap = %d\n", nml_control.force_remap);
 }
 
 static
@@ -109,14 +112,17 @@ int nml_control_read(FILE *fp_nml, nml_control_t *nml_control)
     {
       namelist_t *nml;
       NML_DEF_INT(debug_level, 1, 0);
+      NML_DEF_INT(force_remap, 1, 0);
 
       nml = namelistNew(nml_control->nml_name);
 
       NML_ADD_INT(nml, debug_level);
+      NML_ADD_INT(nml, force_remap);
       
       namelistRead(fp_nml, nml);
 
       if ( (NML_NUM(nml, debug_level)) ) nml_control->debug_level = seldebug_level[0];
+      if ( (NML_NUM(nml, force_remap)) ) nml_control->force_remap = selforce_remap[0];
 
       namelistDelete(nml);
     }
@@ -262,7 +268,7 @@ void *IFS2ICON(void *argument)
   operatorCheckArgc(2);
 
   /* read namelists */
-  nmlfile   = operatorArgv()[0];
+  nmlfile = operatorArgv()[0];
 
   fp_nml = fopen(nmlfile, "r");
   if ( fp_nml == NULL ) cdoAbort("Open failed on %s", nmlfile);
@@ -289,7 +295,7 @@ void *IFS2ICON(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
-  /* vlistPrint(vlistID2);*/
+  vlistPrint(vlistID2);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);

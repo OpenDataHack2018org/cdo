@@ -3,6 +3,10 @@
 	* using CDI library version 1.4.6
 	* Version 1.4.6 released
 
+2010-08-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* sellevel: copy zaxis meta data name and units (bug fix) [report: Don Murray]
+	
 2010-08-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * pstreamDefTimestep: removed call to streamSync (very slow on GPFS)
