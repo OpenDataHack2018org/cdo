@@ -112,6 +112,7 @@ void *Vargen(void *argument)
     }
   else if ( operatorID == FOR )
     {
+      double lon = 0, lat = 0;
       operatorInputArg(cdoOperatorEnter(operatorID));
       if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 3 ) cdoAbort("Too many arguments!");
@@ -125,9 +126,11 @@ void *Vargen(void *argument)
 
       if ( DBL_IS_EQUAL(rinc, 0.0) ) cdoAbort("Increment is zero!");
 
-      gridID = gridCreate(GRID_GENERIC, 1);
+      gridID = gridCreate(GRID_LONLAT, 1);
       gridDefXsize(gridID, 1);
       gridDefYsize(gridID, 1);
+      gridDefXvals(gridID, &lon);
+      gridDefYvals(gridID, &lat);
     }
 
 
