@@ -63,11 +63,12 @@ void *Output(void *argument)
   char name[128];
   int len;
   int npar = 0;
+  int year, month, day;
   char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
-  enum                     {kvalue,  kcode,  kname,  klon,  klat,  klev,  kdate,  ktime};
-  const char *Keynames[] = {"value", "code", "name", "lon", "lat", "lev", "date", "time"};
+  enum                     {kvalue,  kcode,  kname,  klon,  klat,  klev,  kdate,  ktime,  kyear,  kmonth,  kday};
+  const char *Keynames[] = {"value", "code", "name", "lon", "lat", "lev", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -175,6 +176,8 @@ void *Output(void *argument)
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);
 
+	  cdiDecodeDate(vdate, &year, &month, &day);
+
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
 	      streamInqRecord(streamID, &varID, &levelID);
@@ -267,6 +270,9 @@ void *Output(void *argument)
 			  else if ( keys[k] == klev   ) fprintf(stdout, "%6g ", level);
 			  else if ( keys[k] == kdate  ) fprintf(stdout, "%8d ", vdate);
 			  else if ( keys[k] == ktime  ) fprintf(stdout, "%6d ", vtime);
+			  else if ( keys[k] == kyear  ) fprintf(stdout, "%5d ", year);
+			  else if ( keys[k] == kmonth ) fprintf(stdout, "%2d ", month);
+			  else if ( keys[k] == kday   ) fprintf(stdout, "%2d ", day);
 			}
 		      fprintf(stdout, "\n");
 		    }
