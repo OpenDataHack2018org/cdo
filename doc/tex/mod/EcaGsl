@@ -10,15 +10,18 @@
 @BeginDescription
 Let @file{ifile1} be a time series of daily mean temperatures TG,
 and @file{ifile2} be a land-water mask.
-Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:
+Within a period of 12 months, the thermal growing season length is officially
+defined as the number of days between:
 @BeginItemize
-@Item = frist occurrence of at least nday consecutive days with TG $>$ T within the first 6 months
+@Item = frist occurrence of at least nday consecutive days with TG $>$ T
 @Item = first occurrence of at least nday consecutive days with TG $<$ T within the last 6 months
 @EndItemize
 On northern hemispere, this period corresponds with the regular year, whereas
 on southern hemispere, it starts at july $1^{st}$. Please note, that this
 definition may lead to weird results concerning values TG = T: In the first
-half of the period, these days do not contribute to the gsl, but they do within the second half.
+half of the period, these days do not contribute to the gsl, but they do within
+the second half. Moreover this definition could lead to discontinuous values in
+equatorial regions.
 
 The numbers nday and T are optional parameter with default nday = 6
 and T = 5 @celsius. The number fland is an optional parameter with
