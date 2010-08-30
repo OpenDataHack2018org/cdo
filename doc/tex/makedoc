@@ -35,10 +35,10 @@ my %ecaVars;
 open(ECANAMES,$ecaIndicesFile);
 while (<ECANAMES>) {
   if (my ($found) = m/($search_pattern)/o) {
-    my $eca        = lc($2);
-    my $name       = $3;
+    my $eca        = "eca_".lc($2);
+    my $var        = $3;
     $ecaVars{$eca} = [] unless exists $ecaVars{$eca};
-    push @{$ecaVars{$eca}}, $name;
+    push @{$ecaVars{$eca}}, $var;
   }
 }
 #foreach $eca (sort keys %ecaVars) {
