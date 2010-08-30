@@ -36,37 +36,6 @@
 #include "pstream.h"
 #include "statistic.h"
 
-/* ********************************** */
-/* HEADER FOR PARALLEL EIGEN SOLUTION */
-/*  -->SEE END OF ROUTINE             */
-/* ********************************** */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <time.h>
-
-#define PI_QU 1*atan(1)
-#define PI_HA 2*atan(1)
-#define PI    4*atan(1)
-#define MAX_ITER 20
-#define FNORM_PRECISION 1e-12
-
-void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, 
-						 int n1, int n2, const char func[]);
-int jacobi_1side(double **M, double *A, int n);
-void annihilate_1side(double **M, int i, int j, int k, int n);
-
-int n_finished;
-
-/* **************************************** */
-/* ENDOF HEADER FOR PARALLEL EIGEN SOLUTION */
-/*  -->SEE END OF ROUTINE                   */
-/* **************************************** */
-
-
-
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 void *EOFs(void * argument)
@@ -495,17 +464,17 @@ void *EOFs(void * argument)
               if ( grid_space )
 		// Do not need to normalize by
 		// w[pack[j]]/sum_w (checked) --> find out why!!!
-#if defined (_OPENMP)
-#pragma omp parallel for private(j)
-#endif
+		//#if defined (_OPENMP)
+		//#pragma omp parallel for private(j)
+		//#endif
 		for(j = 0; j < npack; j++)
 		  eigenvectors[varID][levelID][i].ptr[pack[j]] = 
 		    cov[i][j] / sqrt(weight[pack[j]]);
               else if ( time_space )
                 {
-#if defined (_OPENMP)
-#pragma omp parallel for private(i2,sum) shared(datafields,eigenvectors)
-#endif
+		  //#if defined (_OPENMP)
+		  //#pragma omp parallel for private(i2,sum) shared(datafields,eigenvectors)
+		  //#endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     {
                       sum = 0;
@@ -517,10 +486,10 @@ void *EOFs(void * argument)
                   // NORMALIZING
                   sum = 0;
 
-#if defined (_OPENMP)
-#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
-  shared(eigenvectors,weight,pack,varID,levelID,i,npack)
-#endif
+		  //#if defined (_OPENMP)
+		  //#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
+		  //  shared(eigenvectors,weight,pack,varID,levelID,i,npack)
+		  //#endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     sum += weight[pack[i2]] *
                            eigenvectors[varID][levelID][i].ptr[pack[i2]] *
@@ -529,19 +498,19 @@ void *EOFs(void * argument)
                     {
                       sum = sqrt(sum);
 		      // sum = sqrt(sum/sum_w);
-#if defined (_OPENMP)
-#pragma omp parallel for private(i2) default(none) \
-  shared(npack,varID,levelID,i,pack,sum,eigenvectors)
-#endif
+		      //#if defined (_OPENMP)
+		      //#pragma omp parallel for private(i2) default(none) \
+		      //  shared(npack,varID,levelID,i,pack,sum,eigenvectors)
+		      //#endif
                       for( i2 = 0; i2 < npack; i2++ )
                         eigenvectors[varID][levelID][i].ptr[pack[i2]] /= sum;
                     }
                   else
 		    {
-#if defined (_OPENMP)
-#pragma omp parallel for private(i2) default(none) \
-  shared(npack,varID,levelID,i,pack,sum,eigenvectors,missval)
-#endif
+		      //#if defined (_OPENMP)
+		      //#pragma omp parallel for private(i2) default(none) \
+		      //  shared(npack,varID,levelID,i,pack,sum,eigenvectors,missval)
+		      //#endif
 		      for( i2 = 0; i2 < npack; i2++ )
 			eigenvectors[varID][levelID][i].ptr[pack[i2]] = missval;
 		    }
@@ -632,218 +601,5 @@ void *EOFs(void * argument)
   cdoFinish();
 
   return (0);
-}
-
-/* ******************************************************************************** */
-/*                                                                                  */
-/*   P A R A L L E L   S O L U T I O N   O F   T H E   E I G E N   P R O B L E M    */
-/*                     WITH ONE SIDED JACOBI ALGORITHM                              */
-/*                                                                                  */
-/* ******************************************************************************** */
-
-
-void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, int n2, const char func[])
-{
-
-  if ( n1 != n2 )
-    {
-      fprintf(stderr, 
-	      "WARNING: Parallel eigenvalue computation of non-squared matrices\n"
-	      "         Not implemented yet.\n"
-	      "         Using sequential algorithm");                              
-      eigen_solution_of_symmetric_matrix(M,A,n1,n2,func);
-    }
-  else
-    jacobi_1side(M,A,n1);
-
-  return;
-}
-
-/* ******************************************************************************** */
-/* This routine rotates columns/rows i and j of a symmetric Matrix M in a fashion,  */
-/* thus that the dot product of columns i and j 0 afterwards                        */
-/*                                                                                  */
-/* As this is done by a right-multiplication with a rotation matrix, which only     */
-/* changes columns i and j, this can be carried out for n/2 pairs of columns at     */
-/* the same time.                                                                   */
-/* ******************************************************************************** */
-void annihilate_1side(double **M, int i, int j, int k, int n)
-{
-
-  double tk, ck, sk, alpha=0, beta=0, gamma=0, zeta=0;
-  double tmp, *mi=NULL, *mj=NULL;
-  const char func[] = "annihilate_1side";
-  int first_annihilation = 0;
-  int r;
-
-  i--; j--;
-
-  mi = malloc(n*sizeof(double));
-  mj = malloc(n*sizeof(double));
-
-  if ( ! mj || ! mi) 
-    fprintf(stderr, 
-	    "ERROR: allocation error - cannot allocate memory\n"
-	    "ERROR: check stacksize and physically available memory\n");
-
-  if ( j < i ) { int tmp = i; i = j; j = tmp; }
-  
-  for ( r=0; r<n; r++ ) {
-      alpha += M[j][r]*M[j][r];
-      beta  += M[i][r]*M[i][r];
-      gamma += M[i][r]*M[j][r];
-  }
-
-  tmp = fabs(gamma/sqrt(alpha/beta));
-
-  if ( tmp < FNORM_PRECISION ) {
-#if defined (_OPENMP)
-    #pragma omp critical 
-#endif
-    {
-      n_finished++;
-    }
-    free(mi);
-    free(mj);
-    return;
-  }
-  
-  zeta = (beta-alpha)/(2.*gamma);  // tan(2*theta)
-  tk = 1./(fabs(zeta)+sqrt(1.+zeta*zeta)); 
-  tk = zeta>0? tk : -tk;       // = cot(2*theta)
-  ck = 1./sqrt(1.+tk*tk);      // = cos(theta)
-  sk = ck*tk;                  // = sin(theta)
-  
-  // calculate a_i,j - tilde
-  for ( r=0; r<n; r++ ) {
-    mi[r] = ck*M[i][r]  + sk*M[j][r];
-    mj[r] =-sk*M[i][r]  + ck*M[j][r];
-  }
-  
-  for ( r=0; r<n; r++ ) {
-    M[i][r] = mi[r];
-    M[j][r] = mj[r];
-  }
-
-  free(mi);
-  free(mj);
-
-  return;
-}
-
-int jacobi_1side(double **M, double *A, int n)
-{
-  const char func[] = "jacobi_1side";
-  
-  int i,j,k,m,r,i_ann,j_ann;
-  int n_iter = 0;
-  int idx;
-  int count=0;
-  int **annihilations, *annihilations_buff;
-
-  annihilations_buff = malloc (n*n*2*sizeof(int));
-  annihilations = malloc((n*n)*sizeof(int*));
-
-  for(i=0;i<n*n;i++)
-    annihilations[i] = & annihilations_buff[2*i];
-
-  for( k=1; k<n+1; k++ ) {
-    if ( k < n ) {
-      for ( i=1;i<=(int)ceil(1./2.*(n-k));i++ ) {
-	j = n-k+2-i;
-        annihilations[count][0] = i;
-        annihilations[count][1] = j;
-	count++;
-      }
-      if ( k > 2 ) {
-        for ( i=n-k+2;i<=n-(int)floor(1./2.*k);i++ ) {
-          j = 2*n-k+2-i;
-          annihilations[count][0] = i;
-          annihilations[count][1] = j;
-          count++;
-        }
-      }
-    }
-    else if ( k == n ) {
-      for(i=2;i<=(int)ceil(1./2.*n);i++) {
-        j = n+2-i;
-        annihilations[count][0] = i;
-        annihilations[count][1] = j;
-        count++;
-      }
-    }
-  }
-
-  //  fprintf(stderr, "%i annihilations per sweep\n",count);
-
-  n_finished = 0;
-
-  //  override global openmp settings works
-  //  omp_set_num_threads(2);
-
-  while ( n_iter < MAX_ITER && n_finished < count ) {
-    n_finished = 0;
-    if ( n%2 == 1 ) {
-      for(m=0;m<n;m++) {
-#if defined (_OPENMP)
-	#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
-#endif
-        for(i=0;i<n/2;i++) {
-          idx = m*(n/2)+i;
-	  i_ann = annihilations[idx][0];
-	  j_ann = annihilations[idx][1];
-          if ( i_ann != j_ann && i_ann && j_ann ) 
-	    annihilate_1side(M,i_ann,j_ann,0,n);
-	}
-      }
-    }
-    else { // n%2 == 0                                                                               
-      for(m=0;m<n;m++) {
-#if defined (_OPENMP)
-	#pragma omp parallel for private(i,idx,i_ann,j_ann) shared(M,annihilations,n) reduction(+:n_finished)
-#endif
-        for(i=0;i<n/2-(m%2);i++) {
-	  idx = m/2 * ( n/2 + n/2-1);
-          if ( m % 2 ) idx += n/2;
-	  i_ann = annihilations[idx+i][0];
-	  j_ann = annihilations[idx+i][1];
-          if ( i_ann && j_ann && i_ann != j_ann ) 
-	    annihilate_1side(M,i_ann,j_ann,0,n);
-        }
-      }
-    }
-    n_iter++;
-  }
-
-  //  fprintf(stderr,"finished after %i sweeps (n_finished %i)\n",n_iter,n_finished);
-
-  if ( n_iter == MAX_ITER )
-    {
-      fprintf(stderr, 
-	      "WARNING: Eigenvalue computation with one-sided jacobi scheme\n"
-	      "         Did not converge properly. %i pairs of columns did\n"
-	      "         not achieve requested orthogonality of %10.6g\n",
-	      count-n_finished, FNORM_PRECISION);
-      for ( i=0; i<n; i++ )
-	memset(M[i],0,n*sizeof(double));
-      memset(A,0,n*sizeof(double));
-    }
-  // calculate  eigen values as sqrt(||m_i||)
-  for ( i=0; i<n; i++ )
-    {
-      A[i] = 0;
-      for ( r=0; r<n; r++ )
-	A[i] += M[i][r] * M[i][r];
-      A[i] = sqrt(A[i]);
-      for ( r=0; r<n; r++ )
-	M[i][r] /= A[i];
-    }
-
-  heap_sort(A,M,n);
-
-  free(annihilations);
-  free(annihilations_buff);
-   
-  return n_iter;
 }
 
