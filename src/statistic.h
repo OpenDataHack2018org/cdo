@@ -31,5 +31,9 @@ double fisher (double m, double n, double x, const char *prompt);
 // make heap sort accessible for eigen value computation in EOFs.c
 void heap_sort (double *eig_val, double **a, int n);
 
+// make parallel eigen solution accessible for eigen value computation in EOF3d.c
+void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, 
+						 int n1, int n2, const char func[]);
+
 
 #endif

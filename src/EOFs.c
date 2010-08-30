@@ -36,6 +36,8 @@
 #include "pstream.h"
 #include "statistic.h"
 
+
+
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 void *EOFs(void * argument)
@@ -464,17 +466,17 @@ void *EOFs(void * argument)
               if ( grid_space )
 		// Do not need to normalize by
 		// w[pack[j]]/sum_w (checked) --> find out why!!!
-		//#if defined (_OPENMP)
-		//#pragma omp parallel for private(j)
-		//#endif
+#if defined (_OPENMP)
+#pragma omp parallel for private(j)
+#endif
 		for(j = 0; j < npack; j++)
 		  eigenvectors[varID][levelID][i].ptr[pack[j]] = 
 		    cov[i][j] / sqrt(weight[pack[j]]);
               else if ( time_space )
                 {
-		  //#if defined (_OPENMP)
-		  //#pragma omp parallel for private(i2,sum) shared(datafields,eigenvectors)
-		  //#endif
+#if defined (_OPENMP)
+#pragma omp parallel for private(i2,sum) shared(datafields,eigenvectors)
+#endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     {
                       sum = 0;
@@ -486,10 +488,10 @@ void *EOFs(void * argument)
                   // NORMALIZING
                   sum = 0;
 
-		  //#if defined (_OPENMP)
-		  //#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
-		  //  shared(eigenvectors,weight,pack,varID,levelID,i,npack)
-		  //#endif
+#if defined (_OPENMP)
+#pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
+  shared(eigenvectors,weight,pack,varID,levelID,i,npack)
+#endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     sum += weight[pack[i2]] *
                            eigenvectors[varID][levelID][i].ptr[pack[i2]] *
@@ -498,19 +500,19 @@ void *EOFs(void * argument)
                     {
                       sum = sqrt(sum);
 		      // sum = sqrt(sum/sum_w);
-		      //#if defined (_OPENMP)
-		      //#pragma omp parallel for private(i2) default(none) \
-		      //  shared(npack,varID,levelID,i,pack,sum,eigenvectors)
-		      //#endif
+#if defined (_OPENMP)
+#pragma omp parallel for private(i2) default(none) \
+  shared(npack,varID,levelID,i,pack,sum,eigenvectors)
+#endif
                       for( i2 = 0; i2 < npack; i2++ )
                         eigenvectors[varID][levelID][i].ptr[pack[i2]] /= sum;
                     }
                   else
 		    {
-		      //#if defined (_OPENMP)
-		      //#pragma omp parallel for private(i2) default(none) \
-		      //  shared(npack,varID,levelID,i,pack,sum,eigenvectors,missval)
-		      //#endif
+#if defined (_OPENMP)
+#pragma omp parallel for private(i2) default(none) \
+  shared(npack,varID,levelID,i,pack,sum,eigenvectors,missval)
+#endif
 		      for( i2 = 0; i2 < npack; i2++ )
 			eigenvectors[varID][levelID][i].ptr[pack[i2]] = missval;
 		    }
