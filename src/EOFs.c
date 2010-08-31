@@ -466,16 +466,16 @@ void *EOFs(void * argument)
               if ( grid_space )
 		// Do not need to normalize by
 		// w[pack[j]]/sum_w (checked) --> find out why!!!
-#if defined (_OPENMP)
-#pragma omp parallel for private(j)
-#endif
+		//#if defined (_OPENMP)
+		//#pragma omp parallel for private(j)
+		//#endif
 		for(j = 0; j < npack; j++)
 		  eigenvectors[varID][levelID][i].ptr[pack[j]] = 
 		    cov[i][j] / sqrt(weight[pack[j]]);
               else if ( time_space )
                 {
 #if defined (_OPENMP)
-#pragma omp parallel for private(i2,sum) shared(datafields,eigenvectors)
+#pragma omp parallel for private(i2,j,sum) shared(datafields,eigenvectors)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     {
