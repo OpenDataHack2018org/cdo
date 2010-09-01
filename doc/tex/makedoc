@@ -537,6 +537,9 @@ while (<MOFILE>) {
     $help_spaces = 0;
     print_description(@moddeslines);
 
+    # Add list of variables created by this operator. This can only be done for
+    # eca_* operators
+
     if ( $#moddeslines >= 0 ) {
       print TRFILE "\\end{minipage}\n";
       print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
