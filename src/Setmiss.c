@@ -121,7 +121,7 @@ void *Setmiss(void *argument)
 
       nvars = vlistNvars(vlistID2);
       for ( varID = 0; varID < nvars; varID++ )
-	vlistDefAttFlt(vlistID2, varID, "valid_range", 2, range);
+	vlistDefAttFlt(vlistID2, varID, "valid_range", DATATYPE_FLT64, 2, range);
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

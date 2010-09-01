@@ -1354,12 +1354,12 @@ void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
       else if ( type_class == H5T_INTEGER )
 	{
 	  H5Aread(attr, H5T_NATIVE_INT, &attint);
-	  vlistDefAttInt(vlistID, CDI_GLOBAL, attname, 1, &attint);
+	  vlistDefAttInt(vlistID, CDI_GLOBAL, attname, DATATYPE_INT32, 1, &attint);
 	} 
       else if ( type_class == H5T_FLOAT )
 	{
 	  H5Aread(attr, H5T_NATIVE_DOUBLE, &attflt);
-	  vlistDefAttFlt(vlistID, CDI_GLOBAL, attname, 1, &attflt);
+	  vlistDefAttFlt(vlistID, CDI_GLOBAL, attname, DATATYPE_FLT64, 1, &attflt);
 	} 
       H5Tclose(atype_mem);
       H5Aclose(attr);
