@@ -159,7 +159,6 @@ cdo_SOURCES += Arith.c         \
                Yseaspctl.c     \
                Yseasstat.c     \
                Zonstat.c       \
-               cdi.h           \
                cdo.h           \
                cdo_int.h       \
                cdo_pthread.c   \
@@ -271,8 +270,7 @@ cdo_LDADD    += @NETCDF_LDFLAGS@ \
 		@LIBS@
 
 noinst_PROGRAMS  = cdotest
-cdotest_SOURCES  = cdi.h	\
-		   cdo_int.h	\
+cdotest_SOURCES  = cdo_int.h	\
 	           cdotest.c
 cdotest_LDADD    = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
