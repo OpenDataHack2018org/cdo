@@ -88,6 +88,8 @@ case "${HOSTNAME}" in
 	            --with-netcdf=$HOME/src/cdo/branches/libs4cdo/build-split/netcdf-4.1.1 \
 	              --with-hdf5=$HOME/src/cdo/branches/libs4cdo/build-split/hdf5-1.8.4 \
                      --with-szlib=$HOME/src/cdo/branches/libs4cdo/build-split/szip-2.1 \
+                      --with-proj=$HOME/src/cdo/branches/libs4cdo/build-split/proj-4.6.1 \
+                      --with-pic \
 	            CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -fPIC"
 	;;        
 # i686-suse-linux
