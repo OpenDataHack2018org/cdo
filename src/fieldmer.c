@@ -17,7 +17,7 @@
 
 #include "cdo.h"
 #include "cdo_int.h"
-#include "cdi.h"
+#include <cdi.h>
 /* RQ */
 #include "nth_element.h"
 /* QR */

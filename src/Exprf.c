@@ -34,7 +34,7 @@ Constansts: M_PI, M_E
 #include <sys/stat.h>  /* stat */
 #include <unistd.h>    /* stat */
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"

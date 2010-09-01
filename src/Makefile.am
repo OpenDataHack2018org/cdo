@@ -256,6 +256,7 @@ cdo_SOURCES += Arith.c         \
 cdo_LDADD     =
 cdo_CPPFLAGS  =
 if USE_INTERNAL_CDI
+cdo_CPPFLAGS += -I$(top_srcdir)/libcdi/src
 cdo_LDADD    += $(top_builddir)/libcdi/src/libcdi.la
 else
 cdo_LDADD    += @CDI_LDFLAGS@

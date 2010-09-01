@@ -21,7 +21,7 @@
 
 #include <ctype.h>  /* isspace */
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "counter.h"

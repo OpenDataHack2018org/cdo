@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "operator_help.h"
 #include "modules.h"

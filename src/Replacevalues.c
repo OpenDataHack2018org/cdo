@@ -23,7 +23,7 @@
       Setrtoc2    setrtoc2      Set range to new value others to value2
 */
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"

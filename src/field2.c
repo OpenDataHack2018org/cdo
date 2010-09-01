@@ -17,7 +17,7 @@
 
 #include "cdo.h"
 #include "cdo_int.h"
-#include "cdi.h"
+#include <cdi.h>
 
 
 void farfun(field_t *field1, field_t field2, int function)

@@ -32,7 +32,7 @@
 FILE *popen(const char *command, const char *type);
 int pclose(FILE *stream);
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "dtypes.h"

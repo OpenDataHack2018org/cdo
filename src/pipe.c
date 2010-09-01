@@ -24,7 +24,7 @@
 #include <string.h>
 #include "pipe.h"
 #include "pstream_int.h"
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "error.h"
 #include "dmemory.h"

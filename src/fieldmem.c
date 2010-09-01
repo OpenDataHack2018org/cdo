@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "cdi.h"
+#include <cdi.h>
 #include "dmemory.h"
 #include "field.h"
 

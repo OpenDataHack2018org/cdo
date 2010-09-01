@@ -35,8 +35,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-@USE_INTERNAL_CDI_TRUE@am__append_1 = $(top_builddir)/libcdi/src/libcdi.la
-@USE_INTERNAL_CDI_FALSE@am__append_2 = @CDI_LDFLAGS@
+@USE_INTERNAL_CDI_TRUE@am__append_1 = -I$(top_srcdir)/libcdi/src
+@USE_INTERNAL_CDI_TRUE@am__append_2 = $(top_builddir)/libcdi/src/libcdi.la
+@USE_INTERNAL_CDI_FALSE@am__append_3 = @CDI_LDFLAGS@
 noinst_PROGRAMS = cdotest$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -155,10 +156,10 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-util.$(OBJEXT) cdo-vinterp.$(OBJEXT) cdo-zaxis.$(OBJEXT)
 cdo_OBJECTS = $(am_cdo_OBJECTS)
 am__DEPENDENCIES_1 =
-cdo_DEPENDENCIES = $(am__append_1) $(am__DEPENDENCIES_1)
+cdo_DEPENDENCIES = $(am__append_2) $(am__DEPENDENCIES_1)
 am_cdotest_OBJECTS = cdotest-cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
-am__DEPENDENCIES_2 = $(am__append_1) $(am__DEPENDENCIES_1)
+am__DEPENDENCIES_2 = $(am__append_2) $(am__DEPENDENCIES_1)
 cdotest_DEPENDENCIES = $(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -372,10 +373,10 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	remaplib.c specspace.c specspace.h statistic.c statistic.h \
 	table.c timebase.h timer.c userlog.c util.c util.h vinterp.c \
 	vinterp.h zaxis.c
-cdo_LDADD = $(am__append_1) $(am__append_2) @NETCDF_LDFLAGS@ \
+cdo_LDADD = $(am__append_2) $(am__append_3) @NETCDF_LDFLAGS@ \
 	@HDF5_LDFLAGS@ @GRIB_API_LDFLAGS@ @ZLIB_LDFLAGS@ \
 	@SZLIB_LDFLAGS@ @PROJ_LDFLAGS@ @LDFLAGS@ @LIBS@ $(am__empty)
-cdo_CPPFLAGS = 
+cdo_CPPFLAGS = $(am__append_1)
 cdotest_SOURCES = cdi.h	\
 		   cdo_int.h	\
 	           cdotest.c

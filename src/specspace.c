@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "cdo.h"
-#include "cdi.h"
+#include <cdi.h>
 #ifndef _DMEMORY_H
 #  include "dmemory.h"
 #endif

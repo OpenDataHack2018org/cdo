@@ -21,7 +21,7 @@
       Change_e5slm      change_e5slm          Change ECHAM5 sea land mask
 */
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"

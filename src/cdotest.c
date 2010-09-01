@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "cdi.h"
+#include <cdi.h>
 #include "cdo_int.h"
 
 
