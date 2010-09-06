@@ -95,7 +95,7 @@ void *EOFs(void * argument)
   cdoOperatorAdd("eofspatial",EOF_SPATIAL,0, NULL);
 
   operatorID  = cdoOperatorID();
-  operfunc    = cdoOperatorFunc(operatorID);
+  operfunc    = cdoOperatorF1(operatorID);
 
   operatorInputArg("Number of eigen functions to write out");
   n_eig       = atoi(operatorArgv()[0]);

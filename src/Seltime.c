@@ -108,8 +108,8 @@ void *Seltime(void *argument)
 
   operatorID = cdoOperatorID();
 
-  operfunc = cdoOperatorFunc(operatorID);
-  intval   = cdoOperatorIntval(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
+  intval   = cdoOperatorF2(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 

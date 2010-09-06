@@ -314,7 +314,7 @@ void *Invert(void *argument)
   INVERTLONDATA = cdoOperatorAdd("invertlondata", func_fld, 0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc1 = cdoOperatorFunc(operatorID);
+  operfunc1 = cdoOperatorF1(operatorID);
   if ( operatorID == INVERTLAT || operatorID == INVERTLATDES || operatorID == INVERTLATDATA )
     operfunc2 = func_lat;
   else

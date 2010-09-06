@@ -93,7 +93,7 @@ void *Fldstat2(void *argument)
   cdoOperatorAdd("fldcor", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std )

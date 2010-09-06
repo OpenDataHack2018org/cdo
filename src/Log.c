@@ -44,8 +44,8 @@ void *Log(void *argument)
   SPERCLOGO = cdoOperatorAdd("sperclogo",  1, 5, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorFunc(operatorID);
-  dumptype   = cdoOperatorIntval(operatorID);
+  operfunc   = cdoOperatorF1(operatorID);
+  dumptype   = cdoOperatorF2(operatorID);
 
   if ( cdoStreamName(0)[0] == '-' )
     cdoAbort("This operator does not work with pipes!");

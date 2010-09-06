@@ -92,7 +92,7 @@ void *Ymonstat(void *argument)
   cdoOperatorAdd("ymonstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   for ( month = 0; month < NMONTH; month++ )
     {

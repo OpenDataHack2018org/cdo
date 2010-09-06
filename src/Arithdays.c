@@ -57,8 +57,8 @@ void *Arithdays(void *argument)
   cdoOperatorAdd("divdpy", func_div, func_year,  NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
-  operfunc2 = cdoOperatorIntval(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
+  operfunc2 = cdoOperatorF2(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));

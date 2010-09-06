@@ -80,7 +80,7 @@ void *Math(void *argument)
   cdoOperatorAdd("reci",  RECI,  0, NULL);
  
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == POW )
     {

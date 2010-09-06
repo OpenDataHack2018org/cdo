@@ -69,7 +69,7 @@ void *Timselstat(void *argument)
   cdoOperatorAdd("timselstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   operatorInputArg("nsets <noffset <nskip>>");
 

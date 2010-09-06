@@ -54,7 +54,7 @@ void *Arithc(void *argument)
   cdoOperatorAdd("divc", func_div, 0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   operatorInputArg("constant value");
   rconst = atof(operatorArgv()[0]);

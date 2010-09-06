@@ -42,8 +42,8 @@
 
 
 typedef struct {
-  int         func;
-  int         intval;
+  int         f1;
+  int         f2;
   const char *name;
   const char *enter;
 }
@@ -773,15 +773,15 @@ void operatorInputArg(const char *enter)
 }
 
 
-int cdoOperatorAdd(const char *name, int func, int intval, const char *enter)
+int cdoOperatorAdd(const char *name, int f1, int f2, const char *enter)
 {
   int processID = processSelf();
   int operID = Process[processID].noper;
 
   if ( operID < MAX_OPERATOR )
     {
-      Process[processID].operator[operID].func   = func;
-      Process[processID].operator[operID].intval = intval;
+      Process[processID].operator[operID].f1     = f1;
+      Process[processID].operator[operID].f2     = f2;
       Process[processID].operator[operID].name   = name;
       Process[processID].operator[operID].enter  = enter;
 
@@ -819,19 +819,19 @@ int cdoOperatorID(void)
 }
 
 
-int cdoOperatorFunc(int operID)
+int cdoOperatorF1(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].operator[operID].func);
+  return (Process[processID].operator[operID].f1);
 }
 
 
-int cdoOperatorIntval(int operID)
+int cdoOperatorF2(int operID)
 {
   int processID = processSelf();
 
-  return (Process[processID].operator[operID].intval);
+  return (Process[processID].operator[operID].f2);
 }
 
 

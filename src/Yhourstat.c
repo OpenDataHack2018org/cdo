@@ -80,7 +80,7 @@ void *Yhourstat(void *argument)
   cdoOperatorAdd("yhourstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   for ( houroy = 0; houroy < NHOUR; houroy++ )
     {

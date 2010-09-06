@@ -74,7 +74,7 @@ void *Merstat(void *argument)
   /* QR */
  
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   /* RQ */
   if ( operfunc == func_pctl )

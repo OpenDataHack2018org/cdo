@@ -1452,7 +1452,7 @@ void *Echam5ini(void *argument)
   EXPORT_E5RES = cdoOperatorAdd("export_e5res", func_write, 0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == func_read )
     {

@@ -92,8 +92,8 @@ void *Vertint(void *argument)
   ML2HLX_LP = cdoOperatorAdd("ml2hlx_lp", func_hl, type_log, "height levels in meter");
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
-  opertype = cdoOperatorIntval(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
+  opertype = cdoOperatorF2(operatorID);
 
   if ( operatorID == ML2PL || operatorID == ML2HL || operatorID == ML2PL_LP || operatorID == ML2HL_LP )
     {

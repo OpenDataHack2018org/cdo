@@ -75,7 +75,7 @@ void *Seasstat(void *argument)
   cdoOperatorAdd("seasstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   season_start = get_season_start();
   get_season_name(seas_name);

@@ -59,7 +59,7 @@ void *Seascount(void *argument)
   cdoOperatorAdd("seascount", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   season_start = get_season_start();
 

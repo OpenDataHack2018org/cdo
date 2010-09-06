@@ -65,7 +65,7 @@ void *Timcount(void *argument)
 
   operatorID = cdoOperatorID();
 
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -77,7 +77,7 @@ void *Timcount(void *argument)
   for ( varID = 0; varID < nvars; varID++ )
       vlistDefVarUnits(vlistID2, varID, "No.");
 
-  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(vlistID2, 1);
+  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(vlistID2, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisCreate(TAXIS_ABSOLUTE);

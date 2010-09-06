@@ -65,7 +65,7 @@ static void timpctl(int operatorID)
   if ( !(pn >= 0 && pn <= 100) )
     cdoAbort("Illegal argument: percentile number %g is not in the range 0..100!", pn);
 
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -82,7 +82,7 @@ static void timpctl(int operatorID)
   vlistCompare(vlistID1, vlistID2, CMP_HRD);
   vlistCompare(vlistID1, vlistID3, CMP_HRD);
   
-  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(vlistID4, 1);
+  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(vlistID4, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);

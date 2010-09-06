@@ -79,7 +79,7 @@ void *Ydaystat(void *argument)
   cdoOperatorAdd("ydaystd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )
     {

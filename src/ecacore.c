@@ -60,7 +60,7 @@ void eca1(const ECA_REQUEST_1 *request)
   field_t *var12 = NULL, *samp1 = NULL, *samp2 = NULL, *var13 = NULL, *var21 = NULL, *var23 = NULL, *var;
   field_t field1, field2;
   
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID = streamOpenRead(cdoStreamName(0));
   if ( istreamID < 0 ) cdiError(istreamID, "Open failed on %s", cdoStreamName(0));
@@ -91,7 +91,7 @@ void eca1(const ECA_REQUEST_1 *request)
         vlistDefVarUnits(ovlistID, varID, request->var2.units);
     }
     
-  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID = vlistInqTaxis(ivlistID);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
@@ -420,7 +420,7 @@ void eca2(const ECA_REQUEST_2 *request)
   field_t *var14 = NULL, *samp1 = NULL, *samp2 = NULL, *samp3 = NULL, *total = NULL, *var15 = NULL, *var22 = NULL, *var;
   field_t field1, field2;
   
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
   if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
@@ -457,7 +457,7 @@ void eca2(const ECA_REQUEST_2 *request)
         vlistDefVarUnits(ovlistID, varID, request->var2.units);
     }
 
-  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
@@ -799,7 +799,7 @@ void eca3(const ECA_REQUEST_3 *request)
   field_t *var1 = NULL, *var2 = NULL;
   field_t field1, field2;
   
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
   if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
@@ -824,7 +824,7 @@ void eca3(const ECA_REQUEST_3 *request)
   if ( IS_SET(request->units) ) 
     vlistDefVarUnits(ovlistID, varID, request->units);
 
-  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID1 = vlistInqTaxis(ivlistID1);
   itaxisID2 = vlistInqTaxis(ivlistID2);
@@ -1007,7 +1007,7 @@ void eca4(const ECA_REQUEST_4 *request)
   int isFirstYear = TRUE;
   int missCount;
 
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
   if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
@@ -1040,7 +1040,7 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( IS_SET(request->units2) ) 
     vlistDefVarUnits(ovlistID, ovarID2, request->units2);
 
-  if ( cdoOperatorIntval(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
+  if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(ovlistID, 1);
 
   itaxisID = vlistInqTaxis(ivlistID1);
   otaxisID = taxisCreate(TAXIS_RELATIVE);

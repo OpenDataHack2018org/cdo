@@ -67,8 +67,8 @@ void *Splittime(void *argument)
   SPLITSEAS = cdoOperatorAdd("splitseas", func_date,   100, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorFunc(operatorID);
-  operintval = cdoOperatorIntval(operatorID);
+  operfunc   = cdoOperatorF1(operatorID);
+  operintval = cdoOperatorF2(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 

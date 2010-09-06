@@ -58,7 +58,7 @@ void *Ninfo(void *argument)
   cdoOperatorAdd("nlevel", NLEVEL, 0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   streamID = streamOpenRead(cdoStreamName(0));
   if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(0));

@@ -213,8 +213,8 @@ void *Remap(void *argument)
   cdoOperatorAdd("remap",       REMAPXXX,    0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorFunc(operatorID);
-  lwrite_remap = cdoOperatorIntval(operatorID);
+  operfunc   = cdoOperatorF1(operatorID);
+  lwrite_remap = cdoOperatorF2(operatorID);
 
   if ( operfunc == REMAPDIS || operfunc == GENDIS ||
        operfunc == REMAPNN  || operfunc == GENNN )

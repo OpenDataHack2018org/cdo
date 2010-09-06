@@ -131,7 +131,7 @@ void *Timstat(void *argument)
   cdoOperatorAdd("hourstd",  func_std,   4, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   if ( operfunc == func_mean )
     {
@@ -149,7 +149,7 @@ void *Timstat(void *argument)
 	cdoAbort("Too many arguments!");
     }
 
-  cmplen = DATE_LEN - cdoOperatorIntval(operatorID);
+  cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
@@ -157,7 +157,7 @@ void *Timstat(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
 
-  if ( cdoOperatorIntval(operatorID) == 31 ) vlistDefNtsteps(vlistID2, 1);
+  if ( cdoOperatorF2(operatorID) == 31 ) vlistDefNtsteps(vlistID2, 1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxis_has_bounds = taxisHasBounds(taxisID1);

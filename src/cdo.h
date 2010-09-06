@@ -95,8 +95,8 @@ int     cdoStreamNumber(void);
 int     cdoStreamCnt(void);
 int     cdoOperatorAdd(const char *name, int func, int intval, const char *enter);
 int     cdoOperatorID(void);
-int     cdoOperatorFunc(int operID);
-int     cdoOperatorIntval(int operID);
+int     cdoOperatorF1(int operID);
+int     cdoOperatorF2(int operID);
 const char *cdoOperatorName(int operID);
 const char *cdoOperatorEnter(int operID);
 

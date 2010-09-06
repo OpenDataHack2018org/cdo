@@ -61,7 +61,7 @@ void *Splitsel(void *argument)
   cdoOperatorAdd("splitsel",  0,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 

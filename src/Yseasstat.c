@@ -80,7 +80,7 @@ void *Yseasstat(void *argument)
   cdoOperatorAdd("yseasstd",  func_std,  0, NULL);
 
   operatorID = cdoOperatorID();
-  operfunc = cdoOperatorFunc(operatorID);
+  operfunc = cdoOperatorF1(operatorID);
 
   season_start = get_season_start();
   for ( seas = 0; seas < NSEAS; seas++ )
