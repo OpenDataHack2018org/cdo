@@ -20,6 +20,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "pstream.h"
 #include "ecautil.h"
 
 
@@ -610,19 +611,16 @@ void writeGslStream(int ostreamID, int otaxisID, int otsID,
 
   taxisDefVdate(otaxisID, vdate);
   taxisDefVtime(otaxisID, vtime);
-  streamDefTimestep(ostreamID, otsID++);
+  streamDefTimestep(ostreamID, otsID);
 
-  if ( otsID == 1 || vlistInqVarTime(ivlistID1, first_var_id) == TIME_VARIABLE )
+  for ( levelID = 0; levelID < nlevels; levelID++ )
     {
-      for ( levelID = 0; levelID < nlevels; levelID++ )
-        {
-          streamDefRecord(ostreamID, ovarID1, levelID);
-          streamWriteRecord(ostreamID, gslDuration[levelID].ptr, gslDuration[levelID].nmiss);
-        }
-      for ( levelID = 0; levelID < nlevels; levelID++ )
-        {
-          streamDefRecord(  ostreamID, ovarID2, levelID);
-          streamWriteRecord(ostreamID, gslFirstDay[levelID].ptr, gslFirstDay[levelID].nmiss);
-        }
+      streamDefRecord(ostreamID, ovarID1, levelID);
+      streamWriteRecord(ostreamID, gslDuration[levelID].ptr, gslDuration[levelID].nmiss);
+    }
+  for ( levelID = 0; levelID < nlevels; levelID++ )
+    {
+      streamDefRecord(  ostreamID, ovarID2, levelID);
+      streamWriteRecord(ostreamID, gslFirstDay[levelID].ptr, gslFirstDay[levelID].nmiss);
     }
 }

@@ -1213,7 +1213,8 @@ void eca4(const ECA_REQUEST_4 *request)
                 }
 
               streamReadRecord(istreamID1, fieldGt.ptr, &fieldGt.nmiss);
-              streamReadRecord(istreamID1, fieldLt.ptr, &fieldLt.nmiss);
+              memcpy(fieldLt.ptr, fieldGt.ptr, gridsize*sizeof(double));
+              fieldLt.nmiss = fieldGt.nmiss;
               fieldGt.grid    = startCount[levelID].grid;
               fieldGt.missval = startCount[levelID].missval;
               fieldLt.grid    = startCount[levelID].grid;
