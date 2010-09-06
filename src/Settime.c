@@ -96,16 +96,16 @@ void *Settime(void *argument)
 
   cdoInitialize(argument);
 
-  SETYEAR     = cdoOperatorAdd("setyear",     0, 0, "year");
-  SETMON      = cdoOperatorAdd("setmon",      0, 0, "month");
-  SETDAY      = cdoOperatorAdd("setday",      0, 0, "day");
-  SETDATE     = cdoOperatorAdd("setdate",     0, 0, "date (format YYYY-MM-DD)");
-  SETTIME     = cdoOperatorAdd("settime",     0, 0, "time (format hh:mm:ss)");
-  SETTUNITS   = cdoOperatorAdd("settunits",   0, 0, "time units (seconds, minutes, hours, days, months, years)");
-  SETTAXIS    = cdoOperatorAdd("settaxis",    0, 0, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
-  SETREFTIME  = cdoOperatorAdd("setreftime",  0, 0, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
-  SETCALENDAR = cdoOperatorAdd("setcalendar", 0, 0, "calendar (standard, proleptic, 360days, 365days, 366days)");
-  SHIFTTIME   = cdoOperatorAdd("shifttime",   0, 0, "shift value");
+  SETYEAR     = cdoOperatorAdd("setyear",     0,  0, "year");
+  SETMON      = cdoOperatorAdd("setmon",      0,  0, "month");
+  SETDAY      = cdoOperatorAdd("setday",      0,  0, "day");
+  SETDATE     = cdoOperatorAdd("setdate",     0,  0, "date (format YYYY-MM-DD)");
+  SETTIME     = cdoOperatorAdd("settime",     0,  0, "time (format hh:mm:ss)");
+  SETTUNITS   = cdoOperatorAdd("settunits",   0,  0, "time units (seconds, minutes, hours, days, months, years)");
+  SETTAXIS    = cdoOperatorAdd("settaxis",    0,  0, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
+  SETREFTIME  = cdoOperatorAdd("setreftime",  0,  0, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
+  SETCALENDAR = cdoOperatorAdd("setcalendar", 0,  0, "calendar (standard, proleptic, 360days, 365days, 366days)");
+  SHIFTTIME   = cdoOperatorAdd("shifttime",   0,  0, "shift value");
 
   operatorID = cdoOperatorID();
 
@@ -390,7 +390,9 @@ void *Settime(void *argument)
 
 	  if ( operatorID == SETYEAR ) year  = newval;
 	  if ( operatorID == SETMON  ) month = newval;
+	  if ( operatorID == SETMON && (month < 0 || month > 16) ) cdoAbort("parameter month=%d out of range!", month);
 	  if ( operatorID == SETDAY  ) day   = newval;
+	  if ( operatorID == SETDAY && (day < 0 || day > 31) ) cdoAbort("parameter day=%d %d out of range!", day);
       
 	  vdate = cdiEncodeDate(year, month, day);
 
