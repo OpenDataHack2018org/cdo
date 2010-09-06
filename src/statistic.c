@@ -14,7 +14,6 @@
 #define PI_QU 1*atan(1)
 #define PI_HA 2*atan(1)
 #define PI    4*atan(1)
-#define MAX_ITER 20
 #define FNORM_PRECISION 1e-12
 
 int jacobi_1side(double **M, double *A, int n);
