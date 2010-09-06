@@ -539,6 +539,21 @@ while (<MOFILE>) {
 
     # Add list of variables created by this operator. This can only be done for
     # eca_* operators
+    if (exists $ecaVars{$hkeys[0]}) {
+      print HELPFILE "    \"\",\n";
+      print HELPFILE "    \"VARIABLES\",\n";
+
+      print TRFILE "\n\\subsection*{Variables}\n\n";
+      my @ecavarlines;
+      my $ecaOp  = $hkeys[0];
+      my $ecaOpx = $ecaOp;
+      my $ecaOpx =~ s/_/\\_/g;
+      push(@ecavarlines, "The following variable are creates by $ecaOp: ");
+      my @ecavars =@{$ecaVars{$hkeys[0]}};
+      my $ecavars = join(", ", @ecavars);
+#      $ecavars =~ s/_/\\_/g;
+      push(@ecavarlines,$ecavars);
+    }
 
     if ( $#moddeslines >= 0 ) {
       print TRFILE "\\end{minipage}\n";
