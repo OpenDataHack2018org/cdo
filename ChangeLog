@@ -1,3 +1,10 @@
+2010-09-07 Ralf Mueller <ralf.mueller@zmaw.de>
+
+	* using libtool for linking (rpath)
+	* include libcdi as subproject
+	* eca_gsl: adjust implementation to fit definition by ECA [report: Stefan Fronzek]
+	* eca_gsl: make useable in pipes (bug fix) [report: Stefan Fronzek]
+
 2010-09-6  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.6
