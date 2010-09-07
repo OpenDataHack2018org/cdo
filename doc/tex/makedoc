@@ -6,7 +6,7 @@ $prog       = "CDO";
 $longname   = "Climate Data Operators";
 $moddir     = "mod";
 $modules    = "Modules";
-$help       = "operator_help.h";
+$help       = "../../src/operator_help.h";
 $catalog    = "catalog.tex";
 $abclist    = "alphabetic_list.tex";
 @oplist     = ();
@@ -15,7 +15,7 @@ $refover    = "cdo_ref_over.tex";
 $refcard    = "cdo_refcard.tex";
 $class      = "cdo_class";
 #
-open(README,   ">OPERATORS");
+open(README,   ">../../OPERATORS");
 open(CDOHTML,  ">cdo_oper.html");
 open(HELPFILE, ">$help");
 open(TCFILE,   ">$catalog");
@@ -534,26 +534,19 @@ while (<MOFILE>) {
       print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
     }
 
-    $help_spaces = 0;
-    print_description(@moddeslines);
-
     # Add list of variables created by this operator. This can only be done for
     # eca_* operators
     if (exists $ecaVars{$hkeys[0]}) {
-      print HELPFILE "    \"\",\n";
-      print HELPFILE "    \"VARIABLES\",\n";
-
-      print TRFILE "\n\\subsection*{Variables}\n\n";
-      my @ecavarlines;
-      my $ecaOp  = $hkeys[0];
-      my $ecaOpx = $ecaOp;
-      my $ecaOpx =~ s/_/\\_/g;
-      push(@ecavarlines, "The following variable are creates by $ecaOp: ");
-      my @ecavars =@{$ecaVars{$hkeys[0]}};
-      my $ecavars = join(", ", @ecavars);
-#      $ecavars =~ s/_/\\_/g;
-      push(@ecavarlines,$ecavars);
+      push(@moddeslines, "The following variables are created: ");
+      push(@moddeslines, '@BEGINITEMIZE');
+      foreach $var (@{$ecaVars{$hkeys[0]}}) {
+        push(@moddeslines, '@ITEM = '.$var);
+      }
+      push(@moddeslines, '@ENDITEMIZE');
     }
+
+    $help_spaces = 0;
+    print_description(@moddeslines);
 
     if ( $#moddeslines >= 0 ) {
       print TRFILE "\\end{minipage}\n";
@@ -1075,6 +1068,7 @@ sub print_description {
       if ( $help_print == 1 ) {
 	printf HELPFILE ("    \"    %*s%s- ${value}\",\n", $nspace, "");
       }
+      $value =~ s/_/\\_/g;
       print TRFILE "\\item  $value\n";
     } elsif ( $list == 1 && "$kword" eq "\@ITEM" ) {
       ($kopt, $value) = split(/\s*=\s*/, $line, 2);
