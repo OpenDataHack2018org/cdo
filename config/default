@@ -29,7 +29,7 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/opt/local \
                     --with-hdf5=/opt/local \
-                    --with-szlib=/opt/local \
+                    --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
 	;;

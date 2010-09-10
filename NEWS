@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.4.6 (?? September 2010):
+Version 1.4.6 (10 September 2010):
 
    New features:
      * Changed predefined gaussian grid names from t<RES>grid to n<N>
@@ -12,6 +12,7 @@ Version 1.4.6 (?? September 2010):
      * lowpass:  Lowpass filtering
      * highpass: Highpass filtering
    Changed operators:
+     * eca_gsl: adjust implementation to fit definition by ECA
      * expr, exprf: added missing values support
    Fixed bugs:
      * seldate: open output file only when time steps found
