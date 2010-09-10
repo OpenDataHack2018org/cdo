@@ -33,7 +33,7 @@ typedef struct {
 typedef struct {
   char nml_name[32];
   int debug_level;
-  int force_remap
+  int force_remap;
 } nml_control_t;
 
 
