@@ -6,9 +6,6 @@
 /* Compiler version */
 #undef COMP_VERSION
 
-/* Define to 1 if you have the <cdi.h> header file. */
-#undef HAVE_CDI_H
-
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
@@ -35,9 +32,6 @@
 
 /* Define to 1 if you have the <jasper.h> header file. */
 #undef HAVE_JASPER_H
-
-/* Define to 1 if you have the `cdi' library (-lcdi). */
-#undef HAVE_LIBCDI
 
 /* Define to 1 for GRIB1 decoding/encoding with cgribex */
 #undef HAVE_LIBCGRIBEX

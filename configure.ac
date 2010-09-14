@@ -126,34 +126,24 @@ AC_ARG_WITH([proj],
             [AC_MSG_CHECKING([for the PROJ library])
              AC_MSG_RESULT([suppressed])])
 #  ----------------------------------------------------------------------
-#  Compile with CDI: external installation or provided by this CDO package
+#  Compile with CDI
 INTERNAL_CDI_DIR=libcdi
-AC_MSG_CHECKING([for cdi library])
-AC_ARG_WITH([cdi],
-            [AC_HELP_STRING([--with-cdi=<yes|no|directory>],
-                            [Use external installation of the CDI library [default=no]])],
-            [],
-            [with_cdi=no])
-AS_CASE([$with_cdi],
-        [no],[AC_MSG_RESULT([suppressed. Use internal CDI from '$INTERNAL_CDI_DIR'])],
-        [yes],[AC_MSG_RESULT([in default directory])
-               AC_CHECK_HEADERS([cdi.h])
-               AC_CHECK_LIB([cdi],[cdiPrintVersion])],
-        [*],[CDI_ROOT=$with_cdi
-             SavedLDFLAGS="$LDFLAGS"
-             LDFLAGS="$LDFLAGS -L$CDI_ROOT/lib"
-             CPPFLAGS="$CPPFLAGS -I$CDI_ROOT/include"
-             AC_SUBST([CDI_C_LIB],["$LDFLAGS"])
-             AC_SUBST([CDI_C_INCLUDE],["$CPPFLAGS"])
-             AC_MSG_RESULT([in $CDI_ROOT])
-             AC_CHECK_HEADER([cdi.h])
-             AC_SEARCH_LIBS([cdiPrintVersion],[cdi],,,[$CDI_LDFLAGS])
-             AC_SUBST([CDI_LDFLAGS])
-             LDFLAGS="$LDFLAGS"])
-AM_CONDITIONAL([USE_INTERNAL_CDI],[test x$with_cdi = 'xno'])
-AS_IF([test x$with_cdi = 'xno'],[AC_SUBST([INTERNAL_CDI],[true])],[AC_SUBST([INTERNAL_CDI],[false])])
-#  ----------------------------------------------------------------------
-AS_IF([test x$with_cdi = "xno"],[AC_CONFIG_SUBDIRS([libcdi])],[])
+# At the moment, there are two possible CDI bindgins
+# (default)             linking directly to CDI's object files in ./libcdi/src
+# (--enable-cdi-shared) build and link to a shared CDI library
+AC_MSG_CHECKING([for building shared cdi bindings])
+AC_ARG_ENABLE([cdi-shared],
+              [AS_HELP_STRING([--enable-cdi-shared],[Build, install and link CDO with a shared CDI library [default=no]])],
+              [AS_IF([test "x$enable_cdi_shared" == "xno"],
+                     [enable_cdi_shared=no],
+                     [enable_cdi_shared=yes])],[enable_cdi_shared=no])
+AC_MSG_RESULT([$enable_cdi_shared])
+# save CDI binding mode for later automake use
+AM_CONDITIONAL([ENABLE_CDI_SHARED],[test x$enable_cdi_shared = 'xyes'])
+# create shell variables for the representation of configure results
+AS_IF([test x$enable_cdi_shared = 'xno'],[AC_SUBST([ENABLE_CDI_SHARED],[false])],[AC_SUBST([ENABLE_CDI_SHARED],[true])])
+# scan libcdi for CDI as a subproject
+AC_CONFIG_SUBDIRS([libcdi])
 #  ----------------------------------------------------------------------
 AC_SUBST([CPPFLAGS])
 AC_SUBST([FCFLAGS])

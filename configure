@@ -614,12 +614,9 @@ CLIBS
 CLDFLAGS
 FCFLAGS
 subdirs
-INTERNAL_CDI
-USE_INTERNAL_CDI_FALSE
-USE_INTERNAL_CDI_TRUE
-CDI_LDFLAGS
-CDI_C_INCLUDE
-CDI_C_LIB
+ENABLE_CDI_SHARED
+ENABLE_CDI_SHARED_FALSE
+ENABLE_CDI_SHARED_TRUE
 PROJ_INCLUDE
 PROJ_LDFLAGS
 ENABLE_IEG
@@ -779,7 +776,7 @@ enable_service
 enable_extra
 enable_ieg
 with_proj
-with_cdi
+enable_cdi_shared
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1426,6 +1423,8 @@ Optional Features:
   --enable-service        Use the service library [default=yes]
   --enable-extra          Use the extra library [default=yes]
   --enable-ieg            Use the ieg library [default=yes]
+  --enable-cdi-shared     Build, install and link CDO with a shared CDI
+                          library [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1455,9 +1454,6 @@ Optional Packages:
                           --with-jasper-root
   --with-proj=<directory> Specify location of PROJ library for cartographic
                           projections.
-  --with-cdi=<yes|no|directory>
-                          Use external installation of the CDI library
-                          [default=no]
 
 Some influential environment variables:
   CC          C compiler command
@@ -17912,182 +17908,48 @@ $as_echo "suppressed" >&6; }
 fi
 
 #  ----------------------------------------------------------------------
-#  Compile with CDI: external installation or provided by this CDO package
+#  Compile with CDI
 INTERNAL_CDI_DIR=libcdi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cdi library" >&5
-$as_echo_n "checking for cdi library... " >&6; }
-
-# Check whether --with-cdi was given.
-if test "${with_cdi+set}" = set; then :
-  withval=$with_cdi;
+# At the moment, there are two possible CDI bindgins
+# (default)             linking directly to CDI's object files in ./libcdi/src
+# (--enable-cdi-shared) build and link to a shared CDI library
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for building shared cdi bindings" >&5
+$as_echo_n "checking for building shared cdi bindings... " >&6; }
+# Check whether --enable-cdi-shared was given.
+if test "${enable_cdi_shared+set}" = set; then :
+  enableval=$enable_cdi_shared; if test "x$enable_cdi_shared" == "xno"; then :
+  enable_cdi_shared=no
 else
-  with_cdi=no
+  enable_cdi_shared=yes
 fi
-
-case $with_cdi in #(
-  no) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed. Use internal CDI from '$INTERNAL_CDI_DIR'" >&5
-$as_echo "suppressed. Use internal CDI from '$INTERNAL_CDI_DIR'" >&6; } ;; #(
-  yes) :
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: in default directory" >&5
-$as_echo "in default directory" >&6; }
-               for ac_header in cdi.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "cdi.h" "ac_cv_header_cdi_h" "$ac_includes_default"
-if test "x$ac_cv_header_cdi_h" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_CDI_H 1
-_ACEOF
-
-fi
-
-done
-
-               { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cdiPrintVersion in -lcdi" >&5
-$as_echo_n "checking for cdiPrintVersion in -lcdi... " >&6; }
-if test "${ac_cv_lib_cdi_cdiPrintVersion+set}" = set; then :
-  $as_echo_n "(cached) " >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcdi  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+  enable_cdi_shared=no
+fi
 
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cdiPrintVersion ();
-int
-main ()
-{
-return cdiPrintVersion ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_cdi_cdiPrintVersion=yes
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_cdi_shared" >&5
+$as_echo "$enable_cdi_shared" >&6; }
+# save CDI binding mode for later automake use
+ if test x$enable_cdi_shared = 'xyes'; then
+  ENABLE_CDI_SHARED_TRUE=
+  ENABLE_CDI_SHARED_FALSE='#'
 else
-  ac_cv_lib_cdi_cdiPrintVersion=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cdi_cdiPrintVersion" >&5
-$as_echo "$ac_cv_lib_cdi_cdiPrintVersion" >&6; }
-if test "x$ac_cv_lib_cdi_cdiPrintVersion" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCDI 1
-_ACEOF
-
-  LIBS="-lcdi $LIBS"
-
-fi
- ;; #(
-  *) :
-    CDI_ROOT=$with_cdi
-             SavedLDFLAGS="$LDFLAGS"
-             LDFLAGS="$LDFLAGS -L$CDI_ROOT/lib"
-             CPPFLAGS="$CPPFLAGS -I$CDI_ROOT/include"
-             CDI_C_LIB="$LDFLAGS"
-
-             CDI_C_INCLUDE="$CPPFLAGS"
-
-             { $as_echo "$as_me:${as_lineno-$LINENO}: result: in $CDI_ROOT" >&5
-$as_echo "in $CDI_ROOT" >&6; }
-             ac_fn_c_check_header_mongrel "$LINENO" "cdi.h" "ac_cv_header_cdi_h" "$ac_includes_default"
-if test "x$ac_cv_header_cdi_h" = x""yes; then :
-
+  ENABLE_CDI_SHARED_TRUE='#'
+  ENABLE_CDI_SHARED_FALSE=
 fi
 
-
-             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing cdiPrintVersion" >&5
-$as_echo_n "checking for library containing cdiPrintVersion... " >&6; }
-if test "${ac_cv_search_cdiPrintVersion+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cdiPrintVersion ();
-int
-main ()
-{
-return cdiPrintVersion ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' cdi; do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib $CDI_LDFLAGS $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_search_cdiPrintVersion=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext
-  if test "${ac_cv_search_cdiPrintVersion+set}" = set; then :
-  break
-fi
-done
-if test "${ac_cv_search_cdiPrintVersion+set}" = set; then :
+# create shell variables for the representation of configure results
+if test x$enable_cdi_shared = 'xno'; then :
+  ENABLE_CDI_SHARED=false
 
 else
-  ac_cv_search_cdiPrintVersion=no
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_cdiPrintVersion" >&5
-$as_echo "$ac_cv_search_cdiPrintVersion" >&6; }
-ac_res=$ac_cv_search_cdiPrintVersion
-if test "$ac_res" != no; then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+  ENABLE_CDI_SHARED=true
 
 fi
+# scan libcdi for CDI as a subproject
 
 
-             LDFLAGS="$LDFLAGS" ;; #(
-  *) :
-     ;;
-esac
- if test x$with_cdi = 'xno'; then
-  USE_INTERNAL_CDI_TRUE=
-  USE_INTERNAL_CDI_FALSE='#'
-else
-  USE_INTERNAL_CDI_TRUE='#'
-  USE_INTERNAL_CDI_FALSE=
-fi
+subdirs="$subdirs libcdi"
 
-if test x$with_cdi = 'xno'; then :
-  INTERNAL_CDI=true
-
-else
-  INTERNAL_CDI=false
-
-fi
-#  ----------------------------------------------------------------------
-
-
-if test x$with_cdi = "xno"; then :
-  subdirs="$subdirs libcdi"
-
-fi
 #  ----------------------------------------------------------------------
 
 
@@ -18216,8 +18078,8 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${USE_INTERNAL_CDI_TRUE}" && test -z "${USE_INTERNAL_CDI_FALSE}"; then
-  as_fn_error $? "conditional \"USE_INTERNAL_CDI\" was never defined.
+if test -z "${ENABLE_CDI_SHARED_TRUE}" && test -z "${ENABLE_CDI_SHARED_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_CDI_SHARED\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

@@ -18,9 +18,7 @@
    "RANLIB"             : "@RANLIB@",
    "INSTALL"            : "@INSTALL@",
    "cdi"                : {
-     "use_internal_cdi" : @INTERNAL_CDI@,
-     "lib"              : "@CDI_C_LIB@",
-     "include"          : "@CDI_C_INCLUDE@"
+     "enable_cdi_shared" : @ENABLE_CDI_SHARED@
    },
   "threads"    : {
     "lib"      : "@THREADS_LDFLAGS@",
