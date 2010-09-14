@@ -2659,9 +2659,9 @@ static char *EOFsHelp[] = {
     "    ",
     "",
     "OPERATORS",
-    "    eof         Calculate EOFs in spatial or time space",
-    "    eoftime     Calculate EOFs in time space",
-    "    eofspatial  Calculate EOFs in spatial space",
+    "    eof         Calculate EOFs in spatial or time space (seperately for each level)",
+    "    eoftime     Calculate EOFs in time space (seperately for each level)",
+    "    eofspatial  Calculate EOFs in spatial space (seperately for each level)",
     "",
     "PARAMETER",
     "    neof  INTEGER  Number of eigen functions",
@@ -3650,6 +3650,9 @@ static char *EcaCddHelp[] = {
     "    periods of more than 5 days.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - consecutive_dry_days_index_per_time_period",
+    "    - number_of_cdd_periods_with_more_than_5days_per_time_period",
     NULL
 };
 
@@ -3666,6 +3669,8 @@ static char *EcaCfdHelp[] = {
     "    TN < 0 Â°C. Note that TN have to be given in units of Kelvin.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - consecutive_frost_days_index_per_time_period",
     NULL
 };
 
@@ -3684,6 +3689,8 @@ static char *EcaCsuHelp[] = {
     "    in degrees Celsius.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - consecutive_summer_days_index_per_time_period",
     "",
     "PARAMETER",
     "    T  DOUBLE   Temperature threshold (° Celsius, default: T = 25° Celsius)",
@@ -3704,6 +3711,9 @@ static char *EcaCwdHelp[] = {
     "    periods of more than 5 days.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - consecutive_wet_days_index_per_time_period",
+    "    - number_of_cwd_periods_with_more_than_5days_per_time_period",
     NULL
 };
 
@@ -3725,6 +3735,9 @@ static char *EcaCwdiHelp[] = {
     "    have to be given in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - cold_wave_duration_index_wrt_mean_of_reference_period",
+    "    - cold_waves_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -3750,6 +3763,9 @@ static char *EcaCwfiHelp[] = {
     "    same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - cold_spell_days_index_wrt_10th_percentile_of_reference_period",
+    "    - cold_spell_periods_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -3770,6 +3786,8 @@ static char *EcaEtrHelp[] = {
     "    Note that TX and TN have to be given in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time steps in ifile1 and ifile2.",
+    "    The following variables are created: ",
+    "    - intra_period_extreme_temperature_range",
     NULL
 };
 
@@ -3786,6 +3804,8 @@ static char *EcaFdHelp[] = {
     "    that TN have to be given in units of Kelvin.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - frost_days_index_per_time_period",
     NULL
 };
 
@@ -3799,13 +3819,16 @@ static char *EcaGslHelp[] = {
     "DESCRIPTION",
     "    Let ifile1 be a time series of daily mean temperatures TG,",
     "    and ifile2 be a land-water mask.",
-    "    Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:",
-    "    - frist occurrence of at least nday consecutive days with TG $>$ T within the first 6 months",
+    "    Within a period of 12 months, the thermal growing season length is officially",
+    "    defined as the number of days between:",
+    "    - frist occurrence of at least nday consecutive days with TG $>$ T",
     "    - first occurrence of at least nday consecutive days with TG $<$ T within the last 6 months",
     "    On northern hemispere, this period corresponds with the regular year, whereas",
     "    on southern hemispere, it starts at july $1^{st}$. Please note, that this",
     "    definition may lead to weird results concerning values TG = T: In the first",
-    "    half of the period, these days do not contribute to the gsl, but they do within the second half.",
+    "    half of the period, these days do not contribute to the gsl, but they do within",
+    "    the second half. Moreover this definition could lead to discontinuous values in",
+    "    equatorial regions.",
     "    ",
     "    The numbers nday and T are optional parameter with default nday = 6",
     "    and T = 5 Â°C. The number fland is an optional parameter with",
@@ -3817,6 +3840,9 @@ static char *EcaGslHelp[] = {
     "    ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - thermal_growing_season_length",
+    "    - day_of_year_of_growing_season_start",
     "",
     "PARAMETER",
     "    nday   INTEGER  Number of consecutive days (default: nday = 6)",
@@ -3841,6 +3867,8 @@ static char *EcaHdHelp[] = {
     "    and T2 have to be given in degrees Celsius.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - heating_degree_days_per_time_period",
     "",
     "PARAMETER",
     "    T1  DOUBLE   Temperature limit (° Celsius, default: T1 = 17° Celsius)",
@@ -3866,6 +3894,9 @@ static char *EcaHwdiHelp[] = {
     "    have to be given in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - heat_wave_duration_index_wrt_mean_of_reference_period",
+    "    - heat_waves_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -3891,6 +3922,9 @@ static char *EcaHwfiHelp[] = {
     "    same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - warm_spell_days_index_wrt_90th_percentile_of_reference_period",
+    "    - warm_spell_periods_per_time_period",
     "",
     "PARAMETER",
     "    nday  INTEGER  Number of consecutive days (default: nday = 6)",
@@ -3910,6 +3944,8 @@ static char *EcaIdHelp[] = {
     "    that TX have to be given in units of Kelvin.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - ice_days_index_per_time_period",
     NULL
 };
 
@@ -3925,6 +3961,8 @@ static char *EcaR10mmHelp[] = {
     "    then counted is the number of days where RR is at least 10 mm. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - heavy_precipitation_days_index_per_time_period",
     NULL
 };
 
@@ -3940,6 +3978,8 @@ static char *EcaR20mmHelp[] = {
     "    then counted is the number of days where RR is at least 20 mm. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - very_heavy_precipitation_days_index_per_time_period",
     NULL
 };
 
@@ -3957,6 +3997,8 @@ static char *EcaR75pHelp[] = {
     "    is the percentage of wet days with RR > RRn75. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - moderate_wet_days_wrt_75th_percentile_of_reference_period",
     NULL
 };
 
@@ -3975,6 +4017,8 @@ static char *EcaR75ptotHelp[] = {
     "    to the total precipitation sum. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - precipitation_percent_due_to_R75p_days",
     NULL
 };
 
@@ -3992,6 +4036,8 @@ static char *EcaR90pHelp[] = {
     "    is the percentage of wet days with RR > RRn90. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - wet_days_wrt_90th_percentile_of_reference_period",
     NULL
 };
 
@@ -4010,6 +4056,8 @@ static char *EcaR90ptotHelp[] = {
     "    to the total precipitation sum. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - precipitation_percent_due_to_R90p_days",
     NULL
 };
 
@@ -4027,6 +4075,8 @@ static char *EcaR95pHelp[] = {
     "    is the percentage of wet days with RR > RRn95. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - very_wet_days_wrt_95th_percentile_of_reference_period",
     NULL
 };
 
@@ -4045,6 +4095,8 @@ static char *EcaR95ptotHelp[] = {
     "    to the total precipitation sum. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - precipitation_percent_due_to_R95p_days",
     NULL
 };
 
@@ -4062,6 +4114,8 @@ static char *EcaR99pHelp[] = {
     "    is the percentage of wet days with RR > RRn99. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - extremely_wet_days_wrt_99th_percentile_of_reference_period",
     NULL
 };
 
@@ -4080,6 +4134,8 @@ static char *EcaR99ptotHelp[] = {
     "    to the total precipitation sum. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - precipitation_percent_due_to_R99p_days",
     NULL
 };
 
@@ -4095,6 +4151,8 @@ static char *EcaRr1Help[] = {
     "    then counted is the number of days where RR is at least 1 mm. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - wet_days_index_per_time_period",
     NULL
 };
 
@@ -4112,6 +4170,8 @@ static char *EcaRx1dayHelp[] = {
     "    amounts are determined for each month. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - highest_one_day_precipitation_amount_per_time_period",
     "",
     "PARAMETER",
     "    mode  STRING   Operation mode (optional). If mode = 'm' then maximum daily precipitation amounts are determined for each month",
@@ -4133,6 +4193,9 @@ static char *EcaRx5dayHelp[] = {
     "    x = 50 mm.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - highest_five_day_precipitation_amount_per_time_period",
+    "    - number_of_5day_heavy_precipitation_periods_per_time_period",
     "",
     "PARAMETER",
     "    x  FLOAT   Precipitation threshold (mm, default: x = 50 mm)",
@@ -4152,6 +4215,8 @@ static char *EcaSdiiHelp[] = {
     "    to ofile. ",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - simple_daily_intensitiy_index_per_time_period",
     NULL
 };
 
@@ -4169,6 +4234,8 @@ static char *EcaSuHelp[] = {
     "    have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - summer_days_index_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (degree Celsius, default: T = 25° Celsius)",
@@ -4190,6 +4257,8 @@ static char *EcaTg10pHelp[] = {
     "    in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - cold_days_percent_wrt_10th_percentile_of_reference_period",
     NULL
 };
 
@@ -4208,6 +4277,8 @@ static char *EcaTg90pHelp[] = {
     "    in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - warm_days_percent_wrt_90th_percentile_of_reference_period",
     NULL
 };
 
@@ -4226,6 +4297,8 @@ static char *EcaTn10pHelp[] = {
     "    in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - cold_nights_percent_wrt_10th_percentile_of_reference_period",
     NULL
 };
 
@@ -4244,6 +4317,8 @@ static char *EcaTn90pHelp[] = {
     "    in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - warm_nights_percent_wrt_90th_percentile_of_reference_period",
     NULL
 };
 
@@ -4261,6 +4336,8 @@ static char *EcaTrHelp[] = {
     "    have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile.",
+    "    The following variables are created: ",
+    "    - tropical_nights_index_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (° Celsius, default: T = 20° Celsius)",
@@ -4282,6 +4359,8 @@ static char *EcaTx10pHelp[] = {
     "    in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - very_cold_days_percent_wrt_10th_percentile_of_reference_period",
     NULL
 };
 
@@ -4300,5 +4379,7 @@ static char *EcaTx90pHelp[] = {
     "    in the same units.",
     "    The date information of a time step in ofile is the date of",
     "    the last contributing time step in ifile1.",
+    "    The following variables are created: ",
+    "    - very_warm_days_percent_wrt_90th_percentile_of_reference_period",
     NULL
 };
