@@ -259,49 +259,50 @@ cdo_CPPFLAGS += -I$(top_srcdir)/libcdi/src
 if ENABLE_CDI_SHARED
 cdo_LDADD    += $(top_builddir)/libcdi/src/libcdi.la
 else
-cdo_LDADD    += $(top_srcdir)/libcdi/src/basetime.lo \
-		$(top_srcdir)/libcdi/src/binary.lo \
-		$(top_srcdir)/libcdi/src/calendar.lo \
-		$(top_srcdir)/libcdi/src/cdf_int.lo \
-		$(top_srcdir)/libcdi/src/cdf.lo \
-		$(top_srcdir)/libcdi/src/cdi_error.lo \
-		$(top_srcdir)/libcdi/src/cdi_util.lo \
-		$(top_srcdir)/libcdi/src/cgribexlib.lo \
-		$(top_srcdir)/libcdi/src/dmemory.lo \
-		$(top_srcdir)/libcdi/src/error.lo \
-		$(top_srcdir)/libcdi/src/extralib.lo \
-		$(top_srcdir)/libcdi/src/file.lo \
-		$(top_srcdir)/libcdi/src/gaussgrid.lo \
-		$(top_srcdir)/libcdi/src/gribapi.lo \
-		$(top_srcdir)/libcdi/src/grid.lo \
-		$(top_srcdir)/libcdi/src/ieglib.lo \
-		$(top_srcdir)/libcdi/src/institution.lo \
-		$(top_srcdir)/libcdi/src/model.lo \
-		$(top_srcdir)/libcdi/src/servicelib.lo \
-		$(top_srcdir)/libcdi/src/stream_cdf.lo \
-		$(top_srcdir)/libcdi/src/stream_cgribex.lo \
-		$(top_srcdir)/libcdi/src/stream_ext.lo \
-		$(top_srcdir)/libcdi/src/stream_grb.lo \
-		$(top_srcdir)/libcdi/src/stream_gribapi.lo \
-		$(top_srcdir)/libcdi/src/stream_history.lo \
-		$(top_srcdir)/libcdi/src/stream_ieg.lo \
-		$(top_srcdir)/libcdi/src/stream_int.lo \
-		$(top_srcdir)/libcdi/src/stream.lo \
-		$(top_srcdir)/libcdi/src/stream_record.lo \
-		$(top_srcdir)/libcdi/src/stream_srv.lo \
-		$(top_srcdir)/libcdi/src/stream_var.lo \
-		$(top_srcdir)/libcdi/src/swap.lo \
-		$(top_srcdir)/libcdi/src/table.lo \
-		$(top_srcdir)/libcdi/src/taxis.lo \
-		$(top_srcdir)/libcdi/src/timebase.lo \
-		$(top_srcdir)/libcdi/src/tsteps.lo \
-		$(top_srcdir)/libcdi/src/util.lo \
-		$(top_srcdir)/libcdi/src/varscan.lo \
-		$(top_srcdir)/libcdi/src/version.lo \
-		$(top_srcdir)/libcdi/src/vlist.lo \
-		$(top_srcdir)/libcdi/src/vlist_att.lo \
-		$(top_srcdir)/libcdi/src/vlist_var.lo \
-		$(top_srcdir)/libcdi/src/zaxis.lo
+# cdo_LDADD    += $(top_srcdir)/libcdi/src/basetime.lo \
+# 		$(top_srcdir)/libcdi/src/binary.lo \
+# 		$(top_srcdir)/libcdi/src/calendar.lo \
+# 		$(top_srcdir)/libcdi/src/cdf_int.lo \
+# 		$(top_srcdir)/libcdi/src/cdf.lo \
+# 		$(top_srcdir)/libcdi/src/cdi_error.lo \
+# 		$(top_srcdir)/libcdi/src/cdi_util.lo \
+# 		$(top_srcdir)/libcdi/src/cgribexlib.lo \
+# 		$(top_srcdir)/libcdi/src/dmemory.lo \
+# 		$(top_srcdir)/libcdi/src/error.lo \
+# 		$(top_srcdir)/libcdi/src/extralib.lo \
+# 		$(top_srcdir)/libcdi/src/file.lo \
+# 		$(top_srcdir)/libcdi/src/gaussgrid.lo \
+# 		$(top_srcdir)/libcdi/src/gribapi.lo \
+# 		$(top_srcdir)/libcdi/src/grid.lo \
+# 		$(top_srcdir)/libcdi/src/ieglib.lo \
+# 		$(top_srcdir)/libcdi/src/institution.lo \
+# 		$(top_srcdir)/libcdi/src/model.lo \
+# 		$(top_srcdir)/libcdi/src/servicelib.lo \
+# 		$(top_srcdir)/libcdi/src/stream_cdf.lo \
+# 		$(top_srcdir)/libcdi/src/stream_cgribex.lo \
+# 		$(top_srcdir)/libcdi/src/stream_ext.lo \
+# 		$(top_srcdir)/libcdi/src/stream_grb.lo \
+# 		$(top_srcdir)/libcdi/src/stream_gribapi.lo \
+# 		$(top_srcdir)/libcdi/src/stream_history.lo \
+# 		$(top_srcdir)/libcdi/src/stream_ieg.lo \
+# 		$(top_srcdir)/libcdi/src/stream_int.lo \
+# 		$(top_srcdir)/libcdi/src/stream.lo \
+# 		$(top_srcdir)/libcdi/src/stream_record.lo \
+# 		$(top_srcdir)/libcdi/src/stream_srv.lo \
+# 		$(top_srcdir)/libcdi/src/stream_var.lo \
+# 		$(top_srcdir)/libcdi/src/swap.lo \
+# 		$(top_srcdir)/libcdi/src/table.lo \
+# 		$(top_srcdir)/libcdi/src/taxis.lo \
+# 		$(top_srcdir)/libcdi/src/timebase.lo \
+# 		$(top_srcdir)/libcdi/src/tsteps.lo \
+# 		$(top_srcdir)/libcdi/src/util.lo \
+# 		$(top_srcdir)/libcdi/src/varscan.lo \
+# 		$(top_srcdir)/libcdi/src/version.lo \
+# 		$(top_srcdir)/libcdi/src/vlist.lo \
+# 		$(top_srcdir)/libcdi/src/vlist_att.lo \
+# 		$(top_srcdir)/libcdi/src/vlist_var.lo \
+# 		$(top_srcdir)/libcdi/src/zaxis.lo
+cdo_LDADD += $(filter-out $(top_srcdir)/libcdi/src/cdiFortran.lo,$(wildcard $(top_srcdir)/libcdi/src/*.lo))
 endif
 cdo_LDADD +=    @NETCDF_LDFLAGS@ \
 		@HDF5_LDFLAGS@ \
