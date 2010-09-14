@@ -265,7 +265,6 @@ cdo_LDADD    += $(top_srcdir)/libcdi/src/basetime.lo \
 		$(top_srcdir)/libcdi/src/cdf_int.lo \
 		$(top_srcdir)/libcdi/src/cdf.lo \
 		$(top_srcdir)/libcdi/src/cdi_error.lo \
-		$(top_srcdir)/libcdi/src/cdiFortran.lo \
 		$(top_srcdir)/libcdi/src/cdi_util.lo \
 		$(top_srcdir)/libcdi/src/cgribexlib.lo \
 		$(top_srcdir)/libcdi/src/dmemory.lo \

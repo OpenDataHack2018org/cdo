@@ -42,7 +42,6 @@ bin_PROGRAMS = cdo$(EXEEXT)
 @ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/cdf_int.lo \
 @ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/cdf.lo \
 @ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/cdi_error.lo \
-@ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/cdiFortran.lo \
 @ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/cdi_util.lo \
 @ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/cgribexlib.lo \
 @ENABLE_CDI_SHARED_FALSE@		$(top_srcdir)/libcdi/src/dmemory.lo \
