@@ -283,14 +283,20 @@ AC_ARG_WITH([proj],
 #  How to build CDI into CDI? 
 INTERNAL_CDI_DIR=libcdi
 # At the moment, there are two possible CDI bindings
-# (default)             linking directly to CDI's object files in ./libcdi/src
+# (default)          linking directly to CDI's object files, i.e. a libtool
+#                    convenience library
 # (--enable-cdi-lib) build and link to a shared CDI library
-AC_MSG_CHECKING([for build a separate CDI library and link CDO to it |valid for CDO build only|])
+AC_MSG_CHECKING([for build a separate CDI library and link CDO to it])
 AC_ARG_ENABLE([cdi-lib],
-              [AS_HELP_STRING([--enable-cdi-lib],[build + install a CDI library [default=no] and link CDO to it |CDO build only|])],
+              [AS_HELP_STRING([--enable-cdi-lib],[build, install and link to a CDI library [default=no]])],
               [AS_IF([test "x$enable_cdi_lib" != "xno"],
                      [enable_cdi_lib=yes],
-                     [enable_cdi_lib=no])],[enable_cdi_lib=no])
+                     [enable_cdi_lib=no
+                      CDO_DISABLE_CDILIB=1
+                      export CDO_DISABLE_CDILIB])],
+              [enable_cdi_lib=no
+               CDO_DISABLE_CDILIB=1
+               export CDO_DISABLE_CDILIB])
 AC_MSG_RESULT([$enable_cdi_lib])
 # save CDI binding mode for later automake use
 AM_CONDITIONAL([ENABLE_CDI_LIB],[test x$enable_cdi_lib = 'xyes'])
@@ -298,4 +304,15 @@ AM_CONDITIONAL([ENABLE_CDI_LIB],[test x$enable_cdi_lib = 'xyes'])
 AS_IF([test x$enable_cdi_lib = 'xno'],[AC_SUBST([ENABLE_CDI_LIB],[false])],[AC_SUBST([ENABLE_CDI_LIB],[true])])
 # scan libcdi for CDI as a subproject
 AC_CONFIG_SUBDIRS([libcdi])
+#  ----------------------------------------------------------------------
+#  Build a static CDO
+AC_MSG_CHECKING([for building an additional static CDO binary])
+AC_ARG_ENABLE([all-static],
+              [AS_HELP_STRING([--enable-all-static],[build a completely statically linked CDO binary [default=no]])],
+              [AS_IF([test "x$enable_all_static" != "xno"],
+                     [enable_all_static=yes],
+                     [enable_all_static=no])],
+              [enable_all_static=no])
+AC_MSG_RESULT([$enable_all_static])
+AM_CONDITIONAL([ENABLE_ALL_STATIC],[test x$enable_all_static = 'xyes'])
 ])

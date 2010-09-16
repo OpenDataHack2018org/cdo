@@ -613,6 +613,8 @@ INCLUDES
 CLIBS
 CLDFLAGS
 FCFLAGS
+ENABLE_ALL_STATIC_FALSE
+ENABLE_ALL_STATIC_TRUE
 subdirs
 ENABLE_CDI_LIB
 ENABLE_CDI_LIB_FALSE
@@ -777,6 +779,7 @@ enable_extra
 enable_ieg
 with_proj
 enable_cdi_lib
+enable_all_static
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1423,8 +1426,10 @@ Optional Features:
   --enable-service        Use the service library [default=yes]
   --enable-extra          Use the extra library [default=yes]
   --enable-ieg            Use the ieg library [default=yes]
-  --enable-cdi-lib        build + install a CDI library [default=no] and link
-                          CDO to it |CDO build only|
+  --enable-cdi-lib        build, install and link to a CDI library
+                          [default=no]
+  --enable-all-static     build a completely statically linked CDO binary
+                          [default=no]
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -17912,19 +17917,24 @@ fi
 #  How to build CDI into CDI?
 INTERNAL_CDI_DIR=libcdi
 # At the moment, there are two possible CDI bindings
-# (default)             linking directly to CDI's object files in ./libcdi/src
+# (default)          linking directly to CDI's object files, i.e. a libtool
+#                    convenience library
 # (--enable-cdi-lib) build and link to a shared CDI library
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for build a separate CDI library and link CDO to it |valid for CDO build only|" >&5
-$as_echo_n "checking for build a separate CDI library and link CDO to it |valid for CDO build only|... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for build a separate CDI library and link CDO to it" >&5
+$as_echo_n "checking for build a separate CDI library and link CDO to it... " >&6; }
 # Check whether --enable-cdi-lib was given.
 if test "${enable_cdi_lib+set}" = set; then :
   enableval=$enable_cdi_lib; if test "x$enable_cdi_lib" != "xno"; then :
   enable_cdi_lib=yes
 else
   enable_cdi_lib=no
+                      CDO_DISABLE_CDILIB=1
+                      export CDO_DISABLE_CDILIB
 fi
 else
   enable_cdi_lib=no
+               CDO_DISABLE_CDILIB=1
+               export CDO_DISABLE_CDILIB
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_cdi_lib" >&5
@@ -17948,6 +17958,31 @@ else
 fi
 # scan libcdi for CDI as a subproject
 subdirs="$subdirs libcdi"
+
+#  ----------------------------------------------------------------------
+#  Build a static CDO
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for building an additional static CDO binary" >&5
+$as_echo_n "checking for building an additional static CDO binary... " >&6; }
+# Check whether --enable-all-static was given.
+if test "${enable_all_static+set}" = set; then :
+  enableval=$enable_all_static; if test "x$enable_all_static" != "xno"; then :
+  enable_all_static=yes
+else
+  enable_all_static=no
+fi
+else
+  enable_all_static=no
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_all_static" >&5
+$as_echo "$enable_all_static" >&6; }
+ if test x$enable_all_static = 'xyes'; then
+  ENABLE_ALL_STATIC_TRUE=
+  ENABLE_ALL_STATIC_FALSE='#'
+else
+  ENABLE_ALL_STATIC_TRUE='#'
+  ENABLE_ALL_STATIC_FALSE=
+fi
 
 
 #  ----------------------------------------------------------------------
@@ -18080,6 +18115,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_CDI_LIB_TRUE}" && test -z "${ENABLE_CDI_LIB_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_CDI_LIB\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_ALL_STATIC_TRUE}" && test -z "${ENABLE_ALL_STATIC_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_ALL_STATIC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

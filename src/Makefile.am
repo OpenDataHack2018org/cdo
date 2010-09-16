@@ -1,6 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 #
 bin_PROGRAMS = cdo
+if ENABLE_ALL_STATIC
+bin_PROGRAMS += cdo_static
+endif
 #
 cdo_SOURCES  = cdo.c
 cdo_SOURCES += Arith.c         \
@@ -252,67 +255,20 @@ cdo_SOURCES += Arith.c         \
                vinterp.h       \
                zaxis.c
 
-cdo_LDADD     =
-cdo_CPPFLAGS  =
-
-cdo_CPPFLAGS += -I$(top_srcdir)/libcdi/src
-if ENABLE_CDI_LIB
-cdo_LDADD    += $(top_builddir)/libcdi/src/libcdi.la
-else
-# cdo_LDADD    += $(top_builddir)/libcdi/src/basetime.lo \
-# 		$(top_builddir)/libcdi/src/binary.lo \
-# 		$(top_builddir)/libcdi/src/calendar.lo \
-# 		$(top_builddir)/libcdi/src/cdf_int.lo \
-# 		$(top_builddir)/libcdi/src/cdf.lo \
-# 		$(top_builddir)/libcdi/src/cdi_error.lo \
-# 		$(top_builddir)/libcdi/src/cdi_util.lo \
-# 		$(top_builddir)/libcdi/src/cgribexlib.lo \
-# 		$(top_builddir)/libcdi/src/dmemory.lo \
-# 		$(top_builddir)/libcdi/src/error.lo \
-# 		$(top_builddir)/libcdi/src/extralib.lo \
-# 		$(top_builddir)/libcdi/src/file.lo \
-# 		$(top_builddir)/libcdi/src/gaussgrid.lo \
-# 		$(top_builddir)/libcdi/src/gribapi.lo \
-# 		$(top_builddir)/libcdi/src/grid.lo \
-# 		$(top_builddir)/libcdi/src/ieglib.lo \
-# 		$(top_builddir)/libcdi/src/institution.lo \
-# 		$(top_builddir)/libcdi/src/model.lo \
-# 		$(top_builddir)/libcdi/src/servicelib.lo \
-# 		$(top_builddir)/libcdi/src/stream_cdf.lo \
-# 		$(top_builddir)/libcdi/src/stream_cgribex.lo \
-# 		$(top_builddir)/libcdi/src/stream_ext.lo \
-# 		$(top_builddir)/libcdi/src/stream_grb.lo \
-# 		$(top_builddir)/libcdi/src/stream_gribapi.lo \
-# 		$(top_builddir)/libcdi/src/stream_history.lo \
-# 		$(top_builddir)/libcdi/src/stream_ieg.lo \
-# 		$(top_builddir)/libcdi/src/stream_int.lo \
-# 		$(top_builddir)/libcdi/src/stream.lo \
-# 		$(top_builddir)/libcdi/src/stream_record.lo \
-# 		$(top_builddir)/libcdi/src/stream_srv.lo \
-# 		$(top_builddir)/libcdi/src/stream_var.lo \
-# 		$(top_builddir)/libcdi/src/swap.lo \
-# 		$(top_builddir)/libcdi/src/table.lo \
-# 		$(top_builddir)/libcdi/src/taxis.lo \
-# 		$(top_builddir)/libcdi/src/timebase.lo \
-# 		$(top_builddir)/libcdi/src/tsteps.lo \
-# 		$(top_builddir)/libcdi/src/util.lo \
-# 		$(top_builddir)/libcdi/src/varscan.lo \
-# 		$(top_builddir)/libcdi/src/version.lo \
-# 		$(top_builddir)/libcdi/src/vlist.lo \
-# 		$(top_builddir)/libcdi/src/vlist_att.lo \
-# 		$(top_builddir)/libcdi/src/vlist_var.lo \
-# 		$(top_builddir)/libcdi/src/zaxis.lo
-cdo_LDADD += $(filter-out $(top_builddir)/libcdi/src/cdiFortran.lo,$(wildcard $(top_builddir)/libcdi/src/*.lo))
-endif
-
-cdo_LDADD +=    @NETCDF_LDFLAGS@ \
+cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
+cdo_LDADD    = $(top_builddir)/libcdi/src/libcdi.la @LIBS@
+cdo_LDFLAGS  =  @LDFLAGS@ \
+		@NETCDF_LDFLAGS@ \
 		@HDF5_LDFLAGS@ \
 		@GRIB_API_LDFLAGS@ \
 		@ZLIB_LDFLAGS@ \
 		@SZLIB_LDFLAGS@ \
-		@PROJ_LDFLAGS@ \
-		@LDFLAGS@ \
-		@LIBS@
+		@PROJ_LDFLAGS@
+
+cdo_static_SOURCES  = $(cdo_SOURCES)
+cdo_static_CPPFLAGS = $(cdo_CPPFLAGS)
+cdo_static_LDADD    = $(cdo_LDADD)
+cdo_static_LDFLAGS  = -all-static $(cdo_LDFLAGS)
 
 noinst_PROGRAMS  = cdotest
 cdotest_SOURCES  = cdo_int.h	\
