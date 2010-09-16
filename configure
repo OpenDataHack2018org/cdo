@@ -614,9 +614,9 @@ CLIBS
 CLDFLAGS
 FCFLAGS
 subdirs
-ENABLE_CDI_SHARED
-ENABLE_CDI_SHARED_FALSE
-ENABLE_CDI_SHARED_TRUE
+ENABLE_CDI_LIB
+ENABLE_CDI_LIB_FALSE
+ENABLE_CDI_LIB_TRUE
 PROJ_INCLUDE
 PROJ_LDFLAGS
 ENABLE_IEG
@@ -776,7 +776,7 @@ enable_service
 enable_extra
 enable_ieg
 with_proj
-enable_cdi_shared
+enable_cdi_lib
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1423,8 +1423,8 @@ Optional Features:
   --enable-service        Use the service library [default=yes]
   --enable-extra          Use the extra library [default=yes]
   --enable-ieg            Use the ieg library [default=yes]
-  --enable-cdi-shared     Build, install and link CDO with a shared CDI
-                          library [default=no]
+  --enable-cdi-lib        build + install a CDI library [default=no] and link
+                          CDO to it |CDO build only|
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -1448,7 +1448,7 @@ Optional Packages:
   --with-jasper=<directory>
                           Specify location of JASPER library. You must specify
                           its location if GRIB_API was built with JASPER.
-  --with-jasper=<yes|no|directory>
+  --with-grib-api=<yes|no|directory>
                           library for grib2 compression; if a directory is
                           given, it will be used as a value for
                           --with-jasper-root
@@ -16194,7 +16194,9 @@ _ACEOF
 fi
 
 #  ----------------------------------------------------------------------
-# Add basic configure options
+# Add configure options
+
+
 
 #  ----------------------------------------------------------------------
 #  Checks for pthread library
@@ -17724,7 +17726,6 @@ fi
 $as_echo "$enable_ieg" >&6; }
 ENABLE_IEG=$enable_ieg
 
-
 #  ----------------------------------------------------------------------
 #  Checks for PROJ.4 library
 
@@ -17908,47 +17909,46 @@ $as_echo "suppressed" >&6; }
 fi
 
 #  ----------------------------------------------------------------------
-#  Compile with CDI
+#  How to build CDI into CDI?
 INTERNAL_CDI_DIR=libcdi
-# At the moment, there are two possible CDI bindgins
+# At the moment, there are two possible CDI bindings
 # (default)             linking directly to CDI's object files in ./libcdi/src
-# (--enable-cdi-shared) build and link to a shared CDI library
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for building shared cdi bindings" >&5
-$as_echo_n "checking for building shared cdi bindings... " >&6; }
-# Check whether --enable-cdi-shared was given.
-if test "${enable_cdi_shared+set}" = set; then :
-  enableval=$enable_cdi_shared; if test "x$enable_cdi_shared" == "xno"; then :
-  enable_cdi_shared=no
+# (--enable-cdi-lib) build and link to a shared CDI library
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for build a separate CDI library and link CDO to it |valid for CDO build only|" >&5
+$as_echo_n "checking for build a separate CDI library and link CDO to it |valid for CDO build only|... " >&6; }
+# Check whether --enable-cdi-lib was given.
+if test "${enable_cdi_lib+set}" = set; then :
+  enableval=$enable_cdi_lib; if test "x$enable_cdi_lib" != "xno"; then :
+  enable_cdi_lib=yes
 else
-  enable_cdi_shared=yes
+  enable_cdi_lib=no
 fi
 else
-  enable_cdi_shared=no
+  enable_cdi_lib=no
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_cdi_shared" >&5
-$as_echo "$enable_cdi_shared" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $enable_cdi_lib" >&5
+$as_echo "$enable_cdi_lib" >&6; }
 # save CDI binding mode for later automake use
- if test x$enable_cdi_shared = 'xyes'; then
-  ENABLE_CDI_SHARED_TRUE=
-  ENABLE_CDI_SHARED_FALSE='#'
+ if test x$enable_cdi_lib = 'xyes'; then
+  ENABLE_CDI_LIB_TRUE=
+  ENABLE_CDI_LIB_FALSE='#'
 else
-  ENABLE_CDI_SHARED_TRUE='#'
-  ENABLE_CDI_SHARED_FALSE=
+  ENABLE_CDI_LIB_TRUE='#'
+  ENABLE_CDI_LIB_FALSE=
 fi
 
 # create shell variables for the representation of configure results
-if test x$enable_cdi_shared = 'xno'; then :
-  ENABLE_CDI_SHARED=false
+if test x$enable_cdi_lib = 'xno'; then :
+  ENABLE_CDI_LIB=false
 
 else
-  ENABLE_CDI_SHARED=true
+  ENABLE_CDI_LIB=true
 
 fi
 # scan libcdi for CDI as a subproject
-
-
 subdirs="$subdirs libcdi"
+
 
 #  ----------------------------------------------------------------------
 
@@ -18078,8 +18078,8 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${ENABLE_CDI_SHARED_TRUE}" && test -z "${ENABLE_CDI_SHARED_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_CDI_SHARED\" was never defined.
+if test -z "${ENABLE_CDI_LIB_TRUE}" && test -z "${ENABLE_CDI_LIB_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_CDI_LIB\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

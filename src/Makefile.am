@@ -256,7 +256,7 @@ cdo_LDADD     =
 cdo_CPPFLAGS  =
 
 cdo_CPPFLAGS += -I$(top_srcdir)/libcdi/src
-if ENABLE_CDI_SHARED
+if ENABLE_CDI_LIB
 cdo_LDADD    += $(top_builddir)/libcdi/src/libcdi.la
 else
 # cdo_LDADD    += $(top_builddir)/libcdi/src/basetime.lo \
@@ -304,6 +304,7 @@ else
 # 		$(top_builddir)/libcdi/src/zaxis.lo
 cdo_LDADD += $(filter-out $(top_builddir)/libcdi/src/cdiFortran.lo,$(wildcard $(top_builddir)/libcdi/src/*.lo))
 endif
+
 cdo_LDADD +=    @NETCDF_LDFLAGS@ \
 		@HDF5_LDFLAGS@ \
 		@GRIB_API_LDFLAGS@ \

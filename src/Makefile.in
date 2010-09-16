@@ -35,7 +35,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = cdo$(EXEEXT)
-@ENABLE_CDI_SHARED_TRUE@am__append_1 = $(top_builddir)/libcdi/src/libcdi.la
+@ENABLE_CDI_LIB_TRUE@am__append_1 = $(top_builddir)/libcdi/src/libcdi.la
 # cdo_LDADD    += $(top_builddir)/libcdi/src/basetime.lo \
 # 		$(top_builddir)/libcdi/src/binary.lo \
 # 		$(top_builddir)/libcdi/src/calendar.lo \
@@ -79,7 +79,7 @@ bin_PROGRAMS = cdo$(EXEEXT)
 # 		$(top_builddir)/libcdi/src/vlist_att.lo \
 # 		$(top_builddir)/libcdi/src/vlist_var.lo \
 # 		$(top_builddir)/libcdi/src/zaxis.lo
-@ENABLE_CDI_SHARED_FALSE@am__append_2 = $(filter-out $(top_builddir)/libcdi/src/cdiFortran.lo,$(wildcard $(top_builddir)/libcdi/src/*.lo))
+@ENABLE_CDI_LIB_FALSE@am__append_2 = $(filter-out $(top_builddir)/libcdi/src/cdiFortran.lo,$(wildcard $(top_builddir)/libcdi/src/*.lo))
 noinst_PROGRAMS = cdotest$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -250,7 +250,7 @@ ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
-ENABLE_CDI_SHARED = @ENABLE_CDI_SHARED@
+ENABLE_CDI_LIB = @ENABLE_CDI_LIB@
 ENABLE_CGRIBEX = @ENABLE_CGRIBEX@
 ENABLE_EXTRA = @ENABLE_EXTRA@
 ENABLE_GRIB = @ENABLE_GRIB@

@@ -96,54 +96,8 @@ AC_SUBST([SYSTEM_TYPE],["$ac_cv_build"])
 #  Check for math library
 AC_CHECK_LIB([m],[floor])
 #  ----------------------------------------------------------------------
-# Add basic configure options
+# Add configure options
 ACX_OPTIONS
-#  ----------------------------------------------------------------------
-#  Checks for PROJ.4 library
-AC_ARG_WITH([proj],
-            [AS_HELP_STRING([--with-proj=<directory>],
-                            [Specify location of PROJ library for cartographic projections.])],
-            [AS_CASE(["$with_proj"],
-                     [no],[AC_MSG_CHECKING([for proj library])
-                           AC_MSG_RESULT([suppressed])],
-                     [yes],[AC_CHECK_HEADERS([projects.h])
-                            AC_SEARCH_LIBS([pj_init],[proj],[AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
-                                           [AC_MSG_ERROR([Could not link to PROJ library!])])
-                            AC_SUBST([PROJ_LDFLAGS],[" -lproj"])
-                            AC_SUBST([PROJ_INCLUDE],[""])],
-                     [*],[PROJ_ROOT=$with_proj
-                          AS_IF([test -d "$PROJ_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$PROJ_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$PROJ_ROOT/include"
-                                 AC_CHECK_HEADERS([projects.h])
-                                 AC_SEARCH_LIBS([pj_init],
-                                                [proj],
-                                                [AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
-                                                [AC_MSG_ERROR([Could not link to PROJ library!])])
-                                 AC_SUBST([PROJ_LDFLAGS],[" -L$PROJ_ROOT/lib -lproj"])
-                                 AC_SUBST([PROJ_INCLUDE],[" -I$PROJ_ROOT/include"])],
-                                [AC_MSG_ERROR([$PROJ_ROOT is not a directory! PROJ suppressed])])])],
-            [AC_MSG_CHECKING([for the PROJ library])
-             AC_MSG_RESULT([suppressed])])
-#  ----------------------------------------------------------------------
-#  Compile with CDI
-INTERNAL_CDI_DIR=libcdi
-# At the moment, there are two possible CDI bindgins
-# (default)             linking directly to CDI's object files in ./libcdi/src
-# (--enable-cdi-shared) build and link to a shared CDI library
-AC_MSG_CHECKING([for building shared cdi bindings])
-AC_ARG_ENABLE([cdi-shared],
-              [AS_HELP_STRING([--enable-cdi-shared],[Build, install and link CDO with a shared CDI library [default=no]])],
-              [AS_IF([test "x$enable_cdi_shared" == "xno"],
-                     [enable_cdi_shared=no],
-                     [enable_cdi_shared=yes])],[enable_cdi_shared=no])
-AC_MSG_RESULT([$enable_cdi_shared])
-# save CDI binding mode for later automake use
-AM_CONDITIONAL([ENABLE_CDI_SHARED],[test x$enable_cdi_shared = 'xyes'])
-# create shell variables for the representation of configure results
-AS_IF([test x$enable_cdi_shared = 'xno'],[AC_SUBST([ENABLE_CDI_SHARED],[false])],[AC_SUBST([ENABLE_CDI_SHARED],[true])])
-# scan libcdi for CDI as a subproject
-AC_CONFIG_SUBDIRS([libcdi])
 #  ----------------------------------------------------------------------
 AC_SUBST([CPPFLAGS])
 AC_SUBST([FCFLAGS])

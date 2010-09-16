@@ -168,7 +168,7 @@ AC_ARG_WITH([jasper],
 #  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
 AC_ARG_WITH([grib_api],
-            [AS_HELP_STRING([--with-jasper=<yes|no|directory>],
+            [AS_HELP_STRING([--with-grib-api=<yes|no|directory>],
                             [library for grib2 compression; if a directory is given, it will be used as a value for --with-jasper-root])],
             [AS_CASE(["$with_grib_api"],
                      [no],[AC_MSG_CHECKING([for GRIB_API library])
@@ -252,4 +252,50 @@ AC_ARG_ENABLE([ieg],
                enable_ieg=yes])
 AC_MSG_RESULT([$enable_ieg])
 AC_SUBST([ENABLE_IEG],[$enable_ieg])
+#  ----------------------------------------------------------------------
+#  Checks for PROJ.4 library
+AC_ARG_WITH([proj],
+            [AS_HELP_STRING([--with-proj=<directory>],
+                            [Specify location of PROJ library for cartographic projections.])],
+            [AS_CASE(["$with_proj"],
+                     [no],[AC_MSG_CHECKING([for proj library])
+                           AC_MSG_RESULT([suppressed])],
+                     [yes],[AC_CHECK_HEADERS([projects.h])
+                            AC_SEARCH_LIBS([pj_init],[proj],[AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
+                                           [AC_MSG_ERROR([Could not link to PROJ library!])])
+                            AC_SUBST([PROJ_LDFLAGS],[" -lproj"])
+                            AC_SUBST([PROJ_INCLUDE],[""])],
+                     [*],[PROJ_ROOT=$with_proj
+                          AS_IF([test -d "$PROJ_ROOT"],
+                                [LDFLAGS="$LDFLAGS -L$PROJ_ROOT/lib"
+                                 CPPFLAGS="$CPPFLAGS -I$PROJ_ROOT/include"
+                                 AC_CHECK_HEADERS([projects.h])
+                                 AC_SEARCH_LIBS([pj_init],
+                                                [proj],
+                                                [AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
+                                                [AC_MSG_ERROR([Could not link to PROJ library!])])
+                                 AC_SUBST([PROJ_LDFLAGS],[" -L$PROJ_ROOT/lib -lproj"])
+                                 AC_SUBST([PROJ_INCLUDE],[" -I$PROJ_ROOT/include"])],
+                                [AC_MSG_ERROR([$PROJ_ROOT is not a directory! PROJ suppressed])])])],
+            [AC_MSG_CHECKING([for the PROJ library])
+             AC_MSG_RESULT([suppressed])])
+#  ----------------------------------------------------------------------
+#  How to build CDI into CDI? 
+INTERNAL_CDI_DIR=libcdi
+# At the moment, there are two possible CDI bindings
+# (default)             linking directly to CDI's object files in ./libcdi/src
+# (--enable-cdi-lib) build and link to a shared CDI library
+AC_MSG_CHECKING([for build a separate CDI library and link CDO to it |valid for CDO build only|])
+AC_ARG_ENABLE([cdi-lib],
+              [AS_HELP_STRING([--enable-cdi-lib],[build + install a CDI library [default=no] and link CDO to it |CDO build only|])],
+              [AS_IF([test "x$enable_cdi_lib" != "xno"],
+                     [enable_cdi_lib=yes],
+                     [enable_cdi_lib=no])],[enable_cdi_lib=no])
+AC_MSG_RESULT([$enable_cdi_lib])
+# save CDI binding mode for later automake use
+AM_CONDITIONAL([ENABLE_CDI_LIB],[test x$enable_cdi_lib = 'xyes'])
+# create shell variables for the representation of configure results
+AS_IF([test x$enable_cdi_lib = 'xno'],[AC_SUBST([ENABLE_CDI_LIB],[false])],[AC_SUBST([ENABLE_CDI_LIB],[true])])
+# scan libcdi for CDI as a subproject
+AC_CONFIG_SUBDIRS([libcdi])
 ])
