@@ -55,12 +55,12 @@ typedef struct {
   double    stdlon;   // Longitude parallel to y-axis (-180->180E)
   double    truelat1; // First true latitude (all projections)
   double    truelat2; // Second true lat (LC only)
-  double    hemi;     // 1 for NH, -1 for SH
   double    cone;     // Cone factor for LC projections
   double    polei;    // Computed i-location of pole point
   double    polej;    // Computed j-location of pole point
   double    rsw;      // Computed radius to SW corner
   double    rebydx;   // Earth radius divided by dx
+  int       hemi;     // 1 for NH, -1 for SH
   int       init;     // Flag to indicate if this struct is ready for use
 } proj_info_t;
 
