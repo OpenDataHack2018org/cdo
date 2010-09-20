@@ -103,17 +103,11 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS="-g -D_REENTRANT -fopenmp -static -Wall -W -Wfloat-equal -pedantic -O2"
     ;;
 # i386-pc-solaris2.10
-    grim)
+    grim | mil* )
 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10-x86 \
                     --with-netcdf=/client \
                     --with-szlib=$HOME/local/solaris10-x86 \
                     CC=cc CFLAGS="-g -mt -fast"
-	;;
-# sparc-sun-solaris2.10
-    xxf)
-	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/solaris10 \
-                    --with-netcdf=/sw/solaris10/netcdf-3.6.2 \
-                    CC=cc CFLAGS="-g -mt -xO3 -m64"
 	;;
 # sx6-nec-superux12.2
     cs*)

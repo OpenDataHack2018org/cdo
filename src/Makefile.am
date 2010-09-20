@@ -276,7 +276,9 @@ cdotest_SOURCES  = cdo_int.h	\
 cdotest_LDADD    = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
 
-userlog.o: userlog.c config.h
-	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c `test -f '$<' || echo '$(srcdir)/'`$<
+cdo-userlog.o: userlog.c config.h
+	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
+cdo_static-userlog.o: userlog.c config.h
+	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
 #
 CLEANFILES  = `ls *~`

@@ -3973,13 +3973,6 @@ cdo-timer.obj: timer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
 
-cdo-userlog.o: userlog.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-userlog.o -MD -MP -MF $(DEPDIR)/cdo-userlog.Tpo -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-userlog.Tpo $(DEPDIR)/cdo-userlog.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='userlog.c' object='cdo-userlog.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
-
 cdo-userlog.obj: userlog.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-userlog.obj -MD -MP -MF $(DEPDIR)/cdo-userlog.Tpo -c -o cdo-userlog.obj `if test -f 'userlog.c'; then $(CYGPATH_W) 'userlog.c'; else $(CYGPATH_W) '$(srcdir)/userlog.c'; fi`
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-userlog.Tpo $(DEPDIR)/cdo-userlog.Po
@@ -6927,13 +6920,6 @@ cdo_static-timer.obj: timer.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-timer.obj `if test -f 'timer.c'; then $(CYGPATH_W) 'timer.c'; else $(CYGPATH_W) '$(srcdir)/timer.c'; fi`
 
-cdo_static-userlog.o: userlog.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-userlog.o -MD -MP -MF $(DEPDIR)/cdo_static-userlog.Tpo -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-userlog.Tpo $(DEPDIR)/cdo_static-userlog.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='userlog.c' object='cdo_static-userlog.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
-
 cdo_static-userlog.obj: userlog.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-userlog.obj -MD -MP -MF $(DEPDIR)/cdo_static-userlog.Tpo -c -o cdo_static-userlog.obj `if test -f 'userlog.c'; then $(CYGPATH_W) 'userlog.c'; else $(CYGPATH_W) '$(srcdir)/userlog.c'; fi`
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-userlog.Tpo $(DEPDIR)/cdo_static-userlog.Po
@@ -7206,8 +7192,10 @@ uninstall-am: uninstall-binPROGRAMS
 	tags uninstall uninstall-am uninstall-binPROGRAMS
 
 
-userlog.o: userlog.c config.h
-	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c `test -f '$<' || echo '$(srcdir)/'`$<
+cdo-userlog.o: userlog.c config.h
+	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
+cdo_static-userlog.o: userlog.c config.h
+	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
