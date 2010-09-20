@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.4.7 (?? December 2010):
+
+   New operators:
+     * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
+
 Version 1.4.6 (17 September 2010):
 
    New features:

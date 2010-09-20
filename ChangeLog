@@ -1,3 +1,7 @@
+2010-09-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* New module: Ydayarith (ydayadd, ydaysub, ydaymul, ydaydiv)
+
 2010-09-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.6

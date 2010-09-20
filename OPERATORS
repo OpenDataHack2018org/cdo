@@ -183,6 +183,10 @@ Operator catalog:
    Ymonarith     ymonsub         Subtract multi-year monthly time series
    Ymonarith     ymonmul         Multiply multi-year monthly time series
    Ymonarith     ymondiv         Divide multi-year monthly time series
+   Ydayarith     ydayadd         Add multi-year daily time series
+   Ydayarith     ydaysub         Subtract multi-year daily time series
+   Ydayarith     ydaymul         Multiply multi-year daily time series
+   Ydayarith     ydaydiv         Divide multi-year daily time series
    Arithdays     muldpm          Multiply with days per month
    Arithdays     divdpm          Divide by days per month
    Arithdays     muldpy          Multiply with days per year
@@ -356,9 +360,9 @@ Operator catalog:
 -------------------------------------------------------------
    EOFs
 -------------------------------------------------------------
-   EOFs          eof             Calculate EOFs in spatial or time space
-   EOFs          eoftime         Calculate EOFs in time space
-   EOFs          eofspatial      Calculate EOFs in spatial space
+   EOFs          eof             Calculate EOFs in spatial or time space (seperately for each level)
+   EOFs          eoftime         Calculate EOFs in time space (seperately for each level)
+   EOFs          eofspatial      Calculate EOFs in spatial space (seperately for each level)
    Eofcoeff      eofcoeff        Calculate principal coefficients of EOFs
 -------------------------------------------------------------
    Interpolation

@@ -1219,6 +1219,33 @@ static char *YmonarithHelp[] = {
     NULL
 };
 
+static char *YdayarithHelp[] = {
+    "NAME",
+    "    ydayadd, ydaysub, ydaymul, ydaydiv - Multi-year daily arithmetic",
+    "",
+    "SYNOPSIS",
+    "    <operator>  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    This module performs simple arithmetic of a time series and one",
+    "    time step with the same day of year. For each field in ifile1",
+    "    the corresponding field of the time step in ifile2 with the",
+    "    same day of year is used. The header information in ifile1",
+    "    have to be the same as in ifile2. Usually ifile2 is generated",
+    "    by a call of the module YDAYSTAT.",
+    "",
+    "OPERATORS",
+    "    ydayadd  Add multi-year daily time series",
+    "             Adds a time series and a multi-year daily time series.",
+    "    ydaysub  Subtract multi-year daily time series",
+    "             Subtracts a time series and a multi-year daily time series.",
+    "    ydaymul  Multiply multi-year daily time series",
+    "             Multiplies a time series and a multi-year daily time series.",
+    "    ydaydiv  Divide multi-year daily time series",
+    "             Divides a time series and a multi-year daily time series.",
+    NULL
+};
+
 static char *ArithdaysHelp[] = {
     "NAME",
     "    muldpm, divdpm, muldpy, divdpy - Arithmetic with days",
