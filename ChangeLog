@@ -1,3 +1,7 @@
+2010-09-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Fldstat2: replace macros FDIV and FSORT by function calls DIV and SORT
+	
 2010-09-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* New module: Ydayarith (ydayadd, ydaysub, ydaymul, ydaydiv)
