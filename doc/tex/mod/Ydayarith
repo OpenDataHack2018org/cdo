@@ -1,0 +1,62 @@
+@BeginModule
+@NewPage
+@Name      = Ydayarith
+@Title     = Multi-year daily arithmetic
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile1 ifile2 ofile
+@Operators = ydayadd ydaysub ydaymul ydaydiv
+
+@BeginDescription
+This module performs simple arithmetic of a time series and one
+time step with the same day of year. For each field in @file{ifile1}
+the corresponding field of the time step in @file{ifile2} with the
+same day of year is used. The header information in @file{ifile1}
+have to be the same as in @file{ifile2}. Usually @file{ifile2} is generated
+by a call of the module @mod{YDAYSTAT}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_ydayadd
+@Title     = Add multi-year daily time series
+
+@BeginDescription
+Adds a time series and a multi-year daily time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaysub
+@Title     = Subtract multi-year daily time series
+
+@BeginDescription
+Subtracts a time series and a multi-year daily time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaymul
+@Title     = Multiply multi-year daily time series
+
+@BeginDescription
+Multiplies a time series and a multi-year daily time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaydiv
+@Title     = Divide multi-year daily time series
+
+@BeginDescription
+Divides a time series and a multi-year daily time series.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To subtract a multi-year daily time average from a time series use:
+@BeginVerbatim
+   cdo ydaysub ifile -ydayavg ifile ofile
+@EndVerbatim
+@EndExample
