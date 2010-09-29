@@ -78,13 +78,7 @@ void *Harmonic(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   filesuffix[0] = 0;
-  if ( cdoDisableFilesuffix == FALSE )
-    {
-      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
-      if ( cdoDefaultFileType == FILETYPE_GRB )
-	if ( vlistIsSzipped(vlistID1) || cdoZtype == COMPRESS_SZIP )
-	  strcat(filesuffix, ".sz");
-    }
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
 
   streamIDs = (int*) malloc(n_out*sizeof(int));
 

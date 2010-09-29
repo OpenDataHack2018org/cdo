@@ -68,7 +68,6 @@ extern int cdoZlevel;
 
 extern int cdoExpMode;
 
-extern int cdoDisableFilesuffix;
 extern int cdoDiag;
 
 void    cdiError(int cdiErrno, const char *fmt, ...);
@@ -109,6 +108,7 @@ int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
 
 int     vlistIsSzipped(int vlistID);
+void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID);
 
 int  gridWeights(int gridID, double *weights);
 int  gridGenArea(int gridID, double *area);

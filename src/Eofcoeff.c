@@ -101,14 +101,7 @@ void *Eofcoeff(void * argument)
   nchars = strlen(oname);
   
   filesuffix[0] = 0;
-  if ( cdoDisableFilesuffix == FALSE )
-    {
-      strcat(filesuffix, streamFilesuffix(cdoDefaultFileType));
-      if ( cdoDefaultFileType == FILETYPE_GRB )
-        if ( vlistIsSzipped(vlistID1) || cdoZtype == COMPRESS_SZIP )
-          strcat(filesuffix, ".sz");
-    }
- 
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
   
   eof = (field_t ***) malloc (nvars * sizeof(field_t**) );
   for ( varID=0; varID<nvars; varID++)

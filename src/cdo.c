@@ -78,7 +78,6 @@ int cdoCheckDatarange    = FALSE;
 
 int cdoHaveNC4           = FALSE;
 int cdoDiag              = FALSE;
-int cdoDisableFilesuffix = FALSE;
 int cdoDisableHistory    = FALSE;
 int cdoZtype             = COMPRESS_NONE;
 int cdoZlevel            = 0;
@@ -93,6 +92,7 @@ int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
 
+char cdo_file_suffix[32];
 
 int cdoExpMode           = -1;
 char *cdoExpName         = NULL;
@@ -124,7 +124,8 @@ int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, timer_rema
       }
 
 
-static void version(void)
+static
+void cdo_version(void)
 {
   fprintf(stderr, "%s\n", CDO_Version);
 #if defined (COMPILER)
@@ -257,6 +258,25 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 	  if ( lprint ) printf("%s\n", *phelp);
 
 	  phelp++;
+	}
+    }
+}
+
+
+void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID)
+{
+  if ( strncmp(cdo_file_suffix, "NULL", 4) )
+    {
+      if ( cdo_file_suffix[0] != 0 )
+	{
+	  strncat(filesuffix, cdo_file_suffix, maxlen-1);
+	}
+      else
+	{
+	  strncat(filesuffix, streamFilesuffix(filetype), maxlen-1);
+	  if ( cdoDefaultFileType == FILETYPE_GRB )
+	    if ( vlistIsSzipped(vlistID) || cdoZtype == COMPRESS_SZIP )
+	      strncat(filesuffix, ".sz", maxlen-1);
 	}
     }
 }
@@ -643,12 +663,25 @@ void get_env_vars(void)
 	}
     }
 
+  cdo_file_suffix[0] = 0;
+
+  envstr = getenv("CDO_FILE_SUFFIX");
+  if ( envstr )
+    {
+      if ( envstr[0] )
+	{
+	  strncat(cdo_file_suffix, envstr, sizeof(cdo_file_suffix)-1);
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_FILE_SUFFIX = %s\n", envstr);
+	}
+    }
+
   envstr = getenv("CDO_DISABLE_FILESUFFIX");
   if ( envstr )
     {
       if ( atoi(envstr) == 1 )
 	{
-	  cdoDisableFilesuffix = TRUE;
+	  strcat(cdo_file_suffix, "NULL");
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
 	}
@@ -819,7 +852,7 @@ int main(int argc, char *argv[])
 
   get_env_vars();
 
-  if ( Debug || Version ) version();
+  if ( Debug || Version ) cdo_version();
 
   if ( Debug )
     {

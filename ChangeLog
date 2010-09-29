@@ -1,6 +1,10 @@
+2010-09-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added env. CDO_FILE_SUFFIX to set the file suffix of CDO generated file names
+	
 2010-09-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* Fldstat2: replace macros FDIV and FSORT by function calls DIV and SORT
+	* Fldstat2: replaced macros FDIV and FSQRT by function calls DIV and SQRT
 	
 2010-09-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
