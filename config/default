@@ -92,15 +92,14 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
         ;;
 # dap enabled
-    egmont)
+    egmont | columbine)
  	  ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
-                    --with-jasper=/sw/etch-ia32/jasper-1.900.1 \
 	            --with-netcdf=/sw/etch-ia32/netcdf-4.1.1-gcc \
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.4-threadsafe \
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
+                    --with-szlib=/sw/etch-ia32/szip-2.1 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-                    LIBS="-lcurl -lgssapi_krb5 -lssl -lcrypto -ldl -lidn -ldes425 -lkrb5 -lk5crypto -lcom_err -lkrb5support -lresolv" \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -fopenmp -static -Wall -W -Wfloat-equal -pedantic -O2"
+	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
     ;;
 # i386-pc-solaris2.10
     grim | mil* )
