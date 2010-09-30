@@ -4,12 +4,13 @@
 @Title     = Split a dataset
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile oprefix
+@Arguments = ifile obase
 @Operators = splitcode splitname splitlevel splitgrid splitzaxis splittabnum
 
 @BeginDescription
-This module splits a dataset to several files with names
-formed from the field header information and the string @file{oprefix}.
+This module splits @file{ifile} into pieces. The output files will be named @file{<obase><xxx><suffix>}
+where @file{suffix} is the filename extension derived from the file format. @file{xxx} and the contents 
+of the output files depends on the chosen operator. 
 @EndDescription
 @EndModule
 
@@ -19,8 +20,7 @@ formed from the field header information and the string @file{oprefix}.
 
 @BeginDescription
 Splits a dataset into pieces, one for each different code number.
-Appends three digits with the code number to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have three digits with the code number.
 @EndDescription
 @EndOperator
 
@@ -30,8 +30,7 @@ form the output file names.
 
 @BeginDescription
 Splits a dataset into pieces, one for each variable name.
-Appends a string with the variable name to @file{oprefix} to 
-form the output file names.
+@file{xxx} will be a string with the variable name.
 @EndDescription
 @EndOperator
 
@@ -41,8 +40,7 @@ form the output file names.
 
 @BeginDescription
 Splits a dataset into pieces, one for each different level.
-Appends six digits with the level to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have six digits with the level.
 @EndDescription
 @EndOperator
 
@@ -52,8 +50,7 @@ form the output file names.
 
 @BeginDescription
 Splits a dataset into pieces, one for each different grid.
-Appends two digits with the grid number to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have two digits with the grid number.
 @EndDescription
 @EndOperator
 
@@ -63,8 +60,7 @@ form the output file names.
 
 @BeginDescription
 Splits a dataset into pieces, one for each different z-axis.
-Appends two digits with the z-axis number to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have two digits with the z-axis number.
 @EndDescription
 @EndOperator
 
@@ -74,8 +70,7 @@ form the output file names.
 
 @BeginDescription
 Splits a dataset into pieces, one for each GRIB1 parameter table number.
-Appends three digits with the table number to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have three digits with the GRIB1 parameter table number.
 @EndDescription
 
 
@@ -84,9 +79,16 @@ form the output file names.
 
 @c @BeginDescription
 @c Splits a dataset into pieces, one for each record.
-@c Appends six digits with the record number to @file{oprefix} to 
-@c form the output file names.
+@c @file{xxx} will have six digits with the record number.
 @c @EndDescription
+
+
+@BeginEnvironment
+@Item = CDO_FILE_SUFFIX
+This environment variable can be used to set the default file suffix. This suffix will be
+added to the output file names instead of the filename extension derived from the file format. 
+Set this variable to NULL to disable the adding of a file suffix.
+@EndEnvironment
 
 
 @BeginExample

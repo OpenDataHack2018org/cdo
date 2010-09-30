@@ -4,7 +4,7 @@
 @Title     = Year interpolation
 @Section   = Interpolation
 @Class     = Interpolation
-@Arguments = ifile1 ifile2 oprefix
+@Arguments = ifile1 ifile2 obase
 @Operators = intyear
 @EndModule
 
@@ -13,11 +13,13 @@
 @Title     = Interpolation between two years
 @Parameter = years
 
+
 @BeginDescription
-This operator performs linear interpolation between two years
-time step by time step. Appends four digits with the year to 
-@file{oprefix} to form the output file names.
+This operator performs linear interpolation between two years, time step by time step.
+The output files will be named @file{<obase><yyyy><suffix>} where @file{yyyy} will be the year and 
+@file{suffix} is the filename extension derived from the file format.
 @EndDescription
+
 
 @BeginParameter years
 @Item = years
@@ -26,12 +28,18 @@ INTEGER  Comma separated list of years
 @EndOperator
 
 
+@BeginEnvironment
+@Item = CDO_FILE_SUFFIX
+This environment variable can be used to set the default file suffix. This suffix will be
+added to the output file names instead of the filename extension derived from the file format. 
+Set this variable to NULL to disable the adding of a file suffix.
+@EndEnvironment
+
+
 @BeginExample
-Assume there are two monthly mean datasets over a year.
-The first dataset has 12 time steps for the year 1985
-and the second one for the year 1990.
-To interpolate the years between 1985 and 1990 month
-by month use:
+Assume there are two monthly mean datasets over a year. The first dataset 
+has 12 time steps for the year 1985 and the second one for the year 1990.
+To interpolate the years between 1985 and 1990 month by month use:
 @BeginVerbatim
    cdo intyear,1986,1987,1988,1989 ifile1 ifile2 year
 @EndVerbatim

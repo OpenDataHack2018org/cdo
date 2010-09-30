@@ -32,10 +32,9 @@ with~\sum_{t=1}^{n}o_j(t)=0\forall j\in\{1,\ldots,p\}.
 @EndifDoc
 
 There will be a separate file containing a time series of principal coefficients
-with time information from @file{ifile2} for each EOF in @file{ifile1}. Files
-will be numbered as @file{<obase>\_<neof>.<suffix>} where @math{neof+1} is the number of the
-EOF (time step) in @file{ifile1} and suffix is a file-suffix derived from the 
-current file format. 
+with time information from @file{ifile2} for each EOF in @file{ifile1}. Output files
+will be numbered as @file{<obase><neof><suffix>} where @file{neof+1} is the number of the
+EOF (time step) in @file{ifile1} and @file{suffix} is the filename extension derived from the file format. 
 @EndDescription
 @EndModule
 
@@ -43,6 +42,14 @@ current file format.
 @BeginOperator_eofcoeff
 @Title     = Calculate principal coefficients of EOFs
 @EndOperator
+
+
+@BeginEnvironment
+@Item = CDO_FILE_SUFFIX
+This environment variable can be used to set the default file suffix. This suffix will be
+added to the output file names instead of the filename extension derived from the file format. 
+Set this variable to NULL to disable the adding of a file suffix.
+@EndEnvironment
 
 
 @BeginExample
@@ -53,14 +60,14 @@ and write them to files beginning with obase, use:
    cdo eofcoeff eof_file anom_file obase
 @EndVerbatim
 The principal coefficients of the first EOF will be in the file
-@file{obase\_000000.nc} (and so forth for higher EOFs, 
-@math{n}th EOF will be in @file{obase\_<n-1>}).
+@file{obase000000.nc} (and so forth for higher EOFs, 
+@math{n}th EOF will be in @file{obase<n-1>}).
 
 If the dataset @file{ifile} does not containt anomalies, process them first,
 and use:
 @BeginVerbatim
    cdo sub ifile -timmean ifile anom_file	
    cdo eof,40 anom_file eval_file eof_file
-   cdo eofcoeff eof_file anom_file obase 	
+   cdo eofcoeff eof_file anom_file obase	
 @EndVerbatim
 @EndExample

@@ -3,12 +3,12 @@
 @Name      = Splitsel
 @Title     = Split selected time steps
 @Section   = File operations
-@Arguments = ifile oprefix
+@Arguments = ifile obase
 @Operators = splitsel
 
 @C @BeginDescription
 @C This module splits time steps of a dataset to several files with names
-@C formed from the field header information and @file{oprefix}.
+@C formed from the field header information and @file{obase}.
 @C @EndDescription
 @EndModule
 
@@ -18,20 +18,20 @@
 @Parameter = nsets [noffset] [nskip]
 
 @BeginDescription
-@IfMan
-This operator splits a dataset into pieces, one for each adjacent
-sequence t1, ...., tn of time steps of the same selected time range.
-Appends six digits with the sequence number to @file{oprefix} to 
-form the output file names.
-@EndifMan
-@IfDoc
-This operator splits a dataset into pieces, one for each adjacent
-sequence \begin{math}t_1, ...., t_n\end{math} of time steps of the same selected time range.
-Appends three digits with the sequence number to @file{oprefix} to 
-form the output file names.
-@EndifDoc
+This operator splits @file{ifile} into pieces, one for each adjacent
+sequence @math{t_1, ...., t_n} of time steps of the same selected time range.
+The output files will be named @file{<obase><nnnnnn><suffix>} where @file{nnnnnn} is the 
+sequence number and @file{suffix} is the filename extension derived from the file format.
 @EndDescription
 @EndOperator
+
+
+@BeginEnvironment
+@Item = CDO_FILE_SUFFIX
+This environment variable can be used to set the default file suffix. This suffix will be
+added to the output file names instead of the filename extension derived from the file format. 
+Set this variable to NULL to disable the adding of a file suffix.
+@EndEnvironment
 
 
 @BeginParameter noffset

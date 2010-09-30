@@ -4,12 +4,13 @@
 @Title     = Split time steps of a dataset
 @Section   = File operations
 @Class     = File operation
-@Arguments = ifile oprefix
+@Arguments = ifile obase
 @Operators = splithour splitday splitmon splitseas splityear
 
 @BeginDescription
-This module splits time steps of a dataset to several files with names
-formed from the field header information and the string  @file{oprefix}.
+This module splits @file{ifile} into  time steps pieces. The output files will be named
+@file{<obase><xxx><suffix>} where @file{suffix} is the filename extension derived from the file format. 
+@file{xxx} and the contents of the output files depends on the chosen operator. 
 @EndDescription
 @EndModule
 
@@ -19,8 +20,7 @@ formed from the field header information and the string  @file{oprefix}.
 
 @BeginDescription
 Splits a file into pieces, one for each different hour.
-Appends two digits with the hour to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have two digits with the hour.
 @EndDescription
 @EndOperator
 
@@ -30,8 +30,7 @@ form the output file names.
 
 @BeginDescription
 Splits a file into pieces, one for each different day.
-Appends two digits with the day to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have two digits with the day.
 @EndDescription
 @EndOperator
 
@@ -41,8 +40,7 @@ form the output file names.
 
 @BeginDescription
 Splits a file into pieces, one for each different month.
-Appends two digits with the month to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have two digits with the month.
 @EndDescription
 @EndOperator
 
@@ -52,8 +50,7 @@ form the output file names.
 
 @BeginDescription
 Splits a file into pieces, one for each different season.
-Appends three characters with the season to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have three characters with the season.
 @EndDescription
 @EndOperator
 
@@ -63,10 +60,17 @@ form the output file names.
 
 @BeginDescription
 Splits a file into pieces, one for each different year.
-Appends four digits with the year to @file{oprefix} to 
-form the output file names.
+@file{xxx} will have four digits with the year.
 @EndDescription
 @EndOperator
+
+
+@BeginEnvironment
+@Item = CDO_FILE_SUFFIX
+This environment variable can be used to set the default file suffix. This suffix will be
+added to the output file names instead of the filename extension derived from the file format. 
+Set this variable to NULL to disable the adding of a file suffix.
+@EndEnvironment
 
 
 @BeginExample

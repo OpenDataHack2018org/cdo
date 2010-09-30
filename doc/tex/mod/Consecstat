@@ -9,7 +9,7 @@
 
 @BeginDescription
 This module computes periods over all time steps in @file{ifile} where a
-certain property is valid. The propery can be choosen by creating a mask from
+certain property is valid. The propery can be chosen by creating a mask from
 the original data, which is the expected input format for operators of this
 module. Depending on the operator full information about each period or
 just its length and ending date are computed.
