@@ -50,7 +50,7 @@ void *Splitsel(void *argument)
 
   /* from Splittime.c */
   int nchars;
-  char *filesuffix;
+  char filesuffix[32];
   char filename[1024];
   int index = 0;
   int lcopy = FALSE;
@@ -97,7 +97,9 @@ void *Splitsel(void *argument)
 
   strcpy(filename, cdoStreamName(1));
   nchars = strlen(filename);
-  filesuffix = streamFilesuffix(cdoDefaultFileType);
+
+  filesuffix[0] = 0;
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
 
   if ( ! lcopy )
     {
