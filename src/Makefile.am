@@ -27,13 +27,15 @@ cdo_SOURCES += Arith.c         \
                Deltime.c       \
                Detrend.c       \
                Diff.c          \
-               EOFs.c          \
+               EOFs.c          \	
+	       Eof3d.c         \	
                EcaIndices.c    \
                Echam5ini.c     \
                Enlarge.c       \
                Enlargegrid.c   \
                Ensstat.c       \
                Eofcoeff.c      \
+	       Eofcoeff3d.c    \
                Exprf.c         \
                Filedes.c       \
                Fillmiss.c      \
