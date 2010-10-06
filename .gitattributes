@@ -274,7 +274,9 @@ src/Echam5ini.c -text
 src/Enlarge.c -text
 src/Enlargegrid.c -text
 src/Ensstat.c -text
+src/Eof3d.c -text
 src/Eofcoeff.c -text
+src/Eofcoeff3d.c -text
 src/Exprf.c -text
 src/Filedes.c -text
 src/Fillmiss.c -text

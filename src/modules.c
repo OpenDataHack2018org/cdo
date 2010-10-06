@@ -64,7 +64,9 @@ void *Enlarge(void *argument);
 void *Enlargegrid(void *argument);
 void *Ensstat(void *argument);
 void *Eofcoeff(void *argument);
+void *Eofcoeff3d(void *argument);
 void *EOFs(void *argument);
+void *EOF3d(void *argument);
 void *Expr(void *argument);
 void *Filedes(void *argument);
 void *Fillmiss(void *argument);
@@ -268,7 +270,9 @@ void *Wct(void *argument);
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
 #define  EofcoeffOperators      {"eofcoeff"}
+#define  Eofcoeff3dOperators    {"eofcoeff3d"}
 #define  EOFsOperators          {"eof", "eofspatial", "eoftime"}
+#define  EOF3dOperators         {"eof3d","eof3dspatial","eof3dtime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
                                  "vlist", "partab", "partab2"}
@@ -506,7 +510,9 @@ static modules_t Modules[] =
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       CDI_REAL, -1,  1 },
   { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2,  1 },
+  { Eofcoeff3d,     NULL,              Eofcoeff3dOperators,    CDI_REAL,  2,  1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
+  { EOF3d,          NULL,              EOF3dOperators,         CDI_REAL,  1,  2 },
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,       CDI_BOTH,  1,  0 },
   { Fillmiss,       NULL,              FillmissOperators,      CDI_REAL,  1,  1 },
