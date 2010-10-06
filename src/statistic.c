@@ -14,7 +14,8 @@
 #define PI_QU 1*atan(1)
 #define PI_HA 2*atan(1)
 #define PI    4*atan(1)
-#define FNORM_PRECISION 1e-12
+#define FNORM_PRECISION 1e-06
+#define MAX_JACOBI_ITER 100
 
 int jacobi_1side(double **M, double *A, int n);
 void annihilate_1side(double **M, int i, int j, int k, int n);
@@ -269,7 +270,7 @@ double pythagoras (double a, double b)
     return M_SQRT2 * abs_a;
 }
 
-#define MAX_ITER 10000
+#define MAX_ITER 1000
 
 void eigen_solution_of_triangular_matrix (double *d, double *e, int n,
 					  double **a, int n_eig, const char *prompt)
@@ -1388,7 +1389,7 @@ int jacobi_1side(double **M, double *A, int n)
   //  override global openmp settings works
   //  omp_set_num_threads(2);
 
-  while ( n_iter < MAX_ITER && n_finished < count ) {
+  while ( n_iter < MAX_JACOBI_ITER && n_finished < count ) {
     n_finished = 0;
     if ( n%2 == 1 ) {
       for(m=0;m<n;m++) {
@@ -1424,16 +1425,19 @@ int jacobi_1side(double **M, double *A, int n)
 
   //  fprintf(stderr,"finished after %i sweeps (n_finished %i)\n",n_iter,n_finished);
 
-  if ( n_iter == MAX_ITER )
+  if ( n_iter == MAX_JACOBI_ITER )
     {
       fprintf(stderr, 
 	      "WARNING: Eigenvalue computation with one-sided jacobi scheme\n"
 	      "         Did not converge properly. %i pairs of columns did\n"
 	      "         not achieve requested orthogonality of %10.6g\n",
 	      count-n_finished, FNORM_PRECISION);
-      for ( i=0; i<n; i++ )
+
+      /*
+	for ( i=0; i<n; i++ )
 	memset(M[i],0,n*sizeof(double));
-      memset(A,0,n*sizeof(double));
+	memset(A,0,n*sizeof(double));
+      */
     }
   // calculate  eigen values as sqrt(||m_i||)
   for ( i=0; i<n; i++ )
