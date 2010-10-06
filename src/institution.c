@@ -31,6 +31,7 @@
 
 int cdoDefaultInstID = UNDEFID;
 
+static
 int readInstitution(const char *instfile)
 {
   static const char *func = "readInstitution";
@@ -96,6 +97,7 @@ int readInstitution(const char *instfile)
 
   return (instID);
 }
+
 
 void defineInstitution(char *instarg)
 {
