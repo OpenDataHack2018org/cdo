@@ -15,7 +15,7 @@
 #define PI_HA 2*atan(1)
 #define PI    4*atan(1)
 #define FNORM_PRECISION 1e-06
-#define MAX_JACOBI_ITER 100
+#define MAX_JACOBI_ITER 20
 
 int jacobi_1side(double **M, double *A, int n);
 void annihilate_1side(double **M, int i, int j, int k, int n);
@@ -1428,16 +1428,18 @@ int jacobi_1side(double **M, double *A, int n)
   if ( n_iter == MAX_JACOBI_ITER )
     {
       fprintf(stderr, 
-	      "WARNING: Eigenvalue computation with one-sided jacobi scheme\n"
-	      "         Did not converge properly. %i pairs of columns did\n"
-	      "         not achieve requested orthogonality of %10.6g\n",
-	      count-n_finished, FNORM_PRECISION);
+	      "statistics-module (Warning): Eigenvalue computation with one-sided jacobi scheme\n"
+	      "                             Did not converge properly. %i of %i pairs of columns did\n"
+	      "                             not achieve requested orthogonality of %10.6g\n",
+	      count-n_finished,count, FNORM_PRECISION);
 
-      /*
-	for ( i=0; i<n; i++ )
-	memset(M[i],0,n*sizeof(double));
-	memset(A,0,n*sizeof(double));
-      */
+      if ( n_finished == 0 ) 
+	// Do not overwrite results in case of insufficient convergence
+	for ( i=0; i<n; i++ ) {
+	  memset(M[i],0,n*sizeof(double));
+	  memset(A,0,n*sizeof(double));
+	}
+      return -1;
     }
   // calculate  eigen values as sqrt(||m_i||)
   for ( i=0; i<n; i++ )
@@ -1449,12 +1451,11 @@ int jacobi_1side(double **M, double *A, int n)
       for ( r=0; r<n; r++ )
 	M[i][r] /= A[i];
     }
-
   heap_sort(A,M,n);
-
+  
   free(annihilations);
   free(annihilations_buff);
-   
+  
   return n_iter;
 }
 
