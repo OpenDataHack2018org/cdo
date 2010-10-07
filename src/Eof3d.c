@@ -190,6 +190,9 @@ void *EOF3d(void * argument)
   vlistDefTaxis(vlistID3, taxisID3);
   
 
+  if ( cdoVerbose )
+    cdoPrint("Initialized streams");
+
   /*  eigenvalues */
 
   reached_eof = 0;
@@ -225,6 +228,9 @@ void *EOF3d(void * argument)
       n_eig = nts;
     }
   n = nts;
+
+  if ( cdoVerbose ) 
+    cdoPrint("counted %i timesteps",n);
 
   if ( cdoTimer ) timer_stop(timer_init);
   if ( cdoTimer ) timer_start(timer_alloc);
@@ -263,8 +269,8 @@ void *EOF3d(void * argument)
 	datacounts[varID][i] = 0;
       
       eigenvectors[varID] = (field_t *) malloc(n_eig*sizeof(field_t));
-      eigenvalues[varID]  = (field_t *) malloc(temp_size*sizeof(field_t));
-      
+      eigenvalues[varID]  = (field_t *) malloc(nts*sizeof(field_t));
+
       for ( i = 0; i < n; i++ )
 	{
 	  if ( i < n_eig )
@@ -284,6 +290,10 @@ void *EOF3d(void * argument)
 	  eigenvalues[varID][i].ptr[0]  = missval;
 	}
     }
+
+  if ( cdoVerbose)
+    cdoPrint("allocated eigenvalue/eigenvector with nts=%i, n=%i, gridsize=%i for processing in %s",
+	     nts,n,gridsize,"time_space");
   
   if ( cdoTimer ) timer_stop(timer_alloc);
 
@@ -335,6 +345,9 @@ void *EOF3d(void * argument)
       tsID++;
     }
 
+  if ( cdoVerbose ) 
+    cdoPrint("Read data for %i variables",nvars);
+  
   pack = (int *) malloc(temp_size*sizeof(int)); //TODO
   miss = (int *) malloc(temp_size*sizeof(int));
 
@@ -342,6 +355,17 @@ void *EOF3d(void * argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
+      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      temp_size = gridsize * nlevs;
+
+      if ( cdoVerbose )  {
+	char vname[64];
+	vlistInqVarName(vlistID1,varID,&vname[0]);
+	cdoPrint("============================================================================");
+	cdoPrint("Calculating covariance matrix and SVD for var%i (%s)",varID,vname);
+      }
+
       npack        = 0;    // TODO already set to 0
       sum_w        = 0;
 
@@ -350,18 +374,32 @@ void *EOF3d(void * argument)
       sum_w = 0;
       for ( i = 0; i < temp_size ; i++ )
 	{
-	  if ( datacounts[varID][i] )
+	  if ( datacounts[varID][i] > 1)
 	    {
 	      pack[npack] = i;
 	      npack++;
 	      sum_w += weight[i%gridsize];
 	    }
 	}
+
+      if ( npack < 1 ) {
+	char vname[64];
+	vlistInqVarName(vlistID1,varID,&vname[0]);
+	cdoWarning("Refusing to calculate EOF from a single time step for var%i (%s)",varID,&vname[0]);
+	continue;
+      }
+
 	  
       cov = (double **) malloc (nts*sizeof(double*));
       for ( j1 = 0; j1 < nts; j1++)
 	cov[j1] = (double*) malloc(nts*sizeof(double));
-      
+      eigv = (double *) malloc(n*sizeof(double));
+
+      if ( cdoVerbose )  {
+	cdoPrint("varID %i allocated eigv and cov with nts=%i and n=%i",varID,nts,n);
+	cdoPrint("   npack=%i, nts=%i temp_size=%i",npack,nts,temp_size);
+      }
+
       for ( j1 = 0; j1 < nts; j1++)
 	for ( j2 = j1; j2 < nts; j2++ )
 	  {
@@ -372,13 +410,17 @@ void *EOF3d(void * argument)
 		datafields[varID][j2].ptr[pack[i]];
 	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 	  }
-      
-      /* SOLVE THE EIGEN PROBLEM */
+      if ( cdoVerbose ) 
+	cdoPrint("calculated cov-matrix");
 
+      /* SOLVE THE EIGEN PROBLEM */
       if ( cdoTimer ) timer_stop(timer_cov);
+
+
       if ( cdoTimer ) timer_start(timer_eig);
 
-      eigv = (double *) malloc(n*sizeof(double));
+      if ( cdoVerbose ) 
+	cdoPrint("Processed correlation matrix for var %2i | npack: %4i",varID,n);
 
       if ( eigen_mode == JACOBI ) 
 	parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
@@ -386,9 +428,12 @@ void *EOF3d(void * argument)
 	eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 
+      if ( cdoVerbose ) 
+	cdoPrint("Processed SVD decomposition for var %i from %i x %i matrix",varID,n,n);
+
       for( eofID=0; eofID<n; eofID++ )
 	eigenvalues[varID][eofID].ptr[0] = eigv[eofID];
-
+      
       if ( cdoTimer ) timer_stop(timer_eig);
       if ( cdoTimer ) timer_start(timer_post);
 
@@ -419,11 +464,18 @@ void *EOF3d(void * argument)
 
       if ( cdoTimer ) timer_stop(timer_post);
 
+      if ( eigv ) free(eigv);
+      for ( i=0; i<n; i++ )
+	if ( cov[i] ) 
+	  free(cov[i]);
     }         /* for ( varID = 0; varID < nvars; varID ++ )    */
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 
+
   if ( cdoTimer ) timer_start(timer_write);
+
+  cdoPrint("Started writing");
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
 
@@ -466,10 +518,12 @@ void *EOF3d(void * argument)
   if ( cdoTimer ) timer_stop(timer_write);
   
   if ( cdoTimer ) timer_start(timer_finish);
+
+  cdoPrint("Started cleanup in eof3d");
   
   for ( varID = 0; varID < nvars; varID++)
     {
-      for(i = 0; i < gridsize; i++)
+      for(i = 0; i < nts; i++)
 	{
 	  if ( i < n_eig )
 	    free(eigenvectors[varID][i].ptr);
