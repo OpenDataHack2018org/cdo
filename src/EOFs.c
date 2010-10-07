@@ -36,14 +36,17 @@
 #include "pstream.h"
 #include "statistic.h"
 
-
+enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 
 void *EOFs(void * argument)
 {
   static const char *func = "EOFs";
+  char *envstr;
+
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
+
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
@@ -66,14 +69,19 @@ void *EOFs(void * argument)
   int grid_space=0, time_space=0;
   int missval_warning=0;
   int timer_init, timer_alloc, timer_read, timer_cov, timer_eig, timer_post, timer_write, timer_finish;
+
   double *weight;
   double sum_w;
   double sum;
   double missval=0;
   double *xvals, *yvals;
+  double **cov, *eigv;
+
   field_t ***datafields;
   field_t ***eigenvectors, ***eigenvalues;
   field_t in;
+
+  enum T_EIGEN_MODE eigen_mode = JACOBI;
 
   if ( cdoTimer ) {
     timer_init = timer_new("Timeof init");
@@ -100,6 +108,20 @@ void *EOFs(void * argument)
   operatorInputArg("Number of eigen functions to write out");
   n_eig       = atoi(operatorArgv()[0]);
 
+  envstr = getenv("CDO_SVD_MODE");
+  
+  if ( envstr && !strncmp(envstr,"danielson_lanczos",17) ) 
+    eigen_mode = DANIELSON_LANCZOS;
+  else if ( envstr && ! strncmp(envstr,"jacobi",6 ) )
+    eigen_mode = JACOBI;
+  else if ( envstr ) {
+    cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
+    cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
+    cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
+  }
+
+
+
   streamID1   = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
   vlistID1    = streamInqVlist(streamID1);
@@ -118,7 +140,7 @@ void *EOFs(void * argument)
       weight[i]=1;
 
 
-  /*  eigenvalues */
+  /* eigenvalues */
   streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
   vlistID2    = vlistDuplicate(vlistID1);
@@ -145,6 +167,9 @@ void *EOFs(void * argument)
   gridID3     = gridDuplicate(gridID1);
   vlistDefTaxis(vlistID3, taxisID3);
 
+
+  if ( cdoVerbose )
+    cdoPrint("Initialized streams");
   /*  eigenvalues */
 
   reached_eof = 0;
@@ -153,6 +178,9 @@ void *EOFs(void * argument)
   /* COUNT NUMBER OF TIMESTEPS if EOF_ or EOF_TIME */
   if ( operfunc == EOF_ || operfunc == EOF_TIME)
     {
+      if ( cdoVerbose ) 
+	cdoPrint("Counting timesteps in ifile");
+      
       while ( TRUE )
         {
           if ( reached_eof ) continue;
@@ -163,6 +191,9 @@ void *EOFs(void * argument)
             }
           tsID++;
         }
+
+      if ( cdoVerbose ) 
+	cdoPrint("Counted %i timeSteps",tsID);
 
       nts         = tsID;
       //TODO close on streamID1 ??  streamClose(streamID1);
@@ -210,9 +241,14 @@ void *EOFs(void * argument)
       n = gridsize;
     }
 
+  if ( cdoVerbose ) 
+    cdoPrint("Calculating %i eigenvectors and %i eigenvalues in %s\n",
+	     n_eig,n,grid_space==1?"grid_space" : "time_space");
+
   if ( cdoTimer ) timer_stop(timer_init);
   
   if ( cdoTimer ) timer_start(timer_alloc);
+
   /* allocation of temporary fields and output structures */
   in.ptr       = (double    *) malloc(gridsize*sizeof(double));
   datafields   = (field_t ***) malloc(nvars*sizeof(field_t**));
@@ -268,7 +304,7 @@ void *EOFs(void * argument)
             }
 
           eigenvectors[varID][levelID] = (field_t *) malloc(n_eig*sizeof(field_t));
-          eigenvalues[varID][levelID]  = (field_t *) malloc(gridsize*sizeof(field_t));
+          eigenvalues[varID][levelID]  = (field_t *) malloc(n*sizeof(field_t));
 
           for ( i = 0; i < n; i++ )
             {
@@ -291,8 +327,10 @@ void *EOFs(void * argument)
         }
     }
 
-  if ( cdoTimer ) timer_stop(timer_alloc);
+  if ( cdoVerbose )
+    cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%i gridsize=%i",nts,gridsize);
 
+  if ( cdoTimer ) timer_stop(timer_alloc);
   if ( cdoTimer ) timer_start(timer_read);
   tsID = 0;
 
@@ -374,27 +412,52 @@ void *EOFs(void * argument)
           datacounts[varID][levelID][i1*gridsize+i2]        = datacounts[varID][levelID][i2*gridsize+i1];
         }
 
+  /*
   pack = (int *) malloc(gridsize*sizeof(int)); //TODO
   miss = (int *) malloc(gridsize*sizeof(int));
+  */
 
   if ( cdoTimer ) timer_stop(timer_read);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
+      char vname[64];
+      vlistInqVarName(vlistID1,varID,&vname[0]);
+      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+
+      if ( cdoVerbose )  {
+	char *vname;
+	vname = (char *) malloc ( 64*sizeof(char) );
+	vlistInqVarName(vlistID1,varID,vname);
+	cdoPrint("Calculating cov matrices for %i levels of var%i (%s)",nlevs,varID,vname);
+	free(vname);
+      }
+	
+
       for ( levelID = 0; levelID < nlevs; levelID++ )
         {
 	  if ( cdoTimer ) timer_start(timer_cov);
 
+	  if ( cdoVerbose ) 
+	    cdoPrint("processing level %i",levelID);
+
           int i2;
-          double **cov = NULL; //TODO covariance matrix / eigenvectors after solving
-          double *eigv = (double *) malloc(n*sizeof(double)); //TODO eigenvalues
+          cov = NULL;          // TODO covariance matrix / eigenvectors after solving
+          eigv = NULL;         // TODO eigenvalues
+	  pack = NULL;
+	  miss = NULL;
           npack        = 0;    // TODO already set to 0
           sum_w        = 0;
+
           if ( grid_space )
             {
+	      pack = (int *) malloc ( gridsize * sizeof(int) );
+	      miss = (int *) malloc ( gridsize * sizeof(int) );
+
               for ( i1 = 0; i1 < gridsize; i1++ )
                 {
-		  if (datacounts[varID][levelID][i1*gridsize + i1]!=0) 
+		  if (datacounts[varID][levelID][i1*gridsize + i1] > 1) 
 		    pack[npack++] = i1;
 		  else
 		    miss[i1] = 1;
@@ -407,6 +470,8 @@ void *EOFs(void * argument)
 	      n = npack;
               for (i1 = 0; i1 < npack; i1++ )
                 cov[i1] = (double*) malloc(npack*sizeof(double));
+	      eigv = (double *) malloc ( npack * sizeof(double));
+
 
               for (i1 = 0; i1 < npack; i1++)
 		for (i2 = i1; i2 < npack; i2++ )
@@ -419,6 +484,10 @@ void *EOFs(void * argument)
           else if ( time_space )
             {
               sum_w = 0;
+
+	      pack = (int *) malloc ( gridsize * sizeof(int) );
+	      miss = (int *) malloc ( gridsize * sizeof(int) );
+
               for ( i = 0; i < gridsize ; i++ )
                 {
 		  if ( datacounts[varID][levelID][i] )
@@ -429,20 +498,29 @@ void *EOFs(void * argument)
 		    }
 		}
 
+	      if ( cdoVerbose )
+		cdoPrint("allocating cov with %i x %i elements | npack=%i",nts,nts,npack);
+
               cov = (double **) malloc (nts*sizeof(double*));
               for ( j1 = 0; j1 < nts; j1++)
                 cov[j1] = (double*) malloc(nts*sizeof(double));
+	      eigv = (double *) malloc (nts*sizeof(double));
+
 
               for ( j1 = 0; j1 < nts; j1++)
 		for ( j2 = j1; j2 < nts; j2++ )
 		  {
 		    sum = 0;
-		    for ( i = 0; i < npack; i++ )
+		    for ( i = 0; i < npack; i++ ) {
 		      sum += weight[pack[i]]*
                              datafields[varID][levelID][j1].ptr[pack[i]]*
                              datafields[varID][levelID][j2].ptr[pack[i]];
+		    }
 		    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 		  }
+	      if ( cdoVerbose )
+		cdoPrint("finished calculation of cov-matrix for var %s\n",&vname[0]);
+
             }
 
 	  if ( cdoTimer ) timer_stop(timer_cov);
@@ -450,12 +528,14 @@ void *EOFs(void * argument)
           /* SOLVE THE EIGEN PROBLEM */
 	  if ( cdoTimer ) timer_start(timer_eig);
 	  
-	  parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
+	  if ( eigen_mode == JACOBI ) 
+	    // TODO: use return status (>0 okay, -1 did not converge at all) 
+	    parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
+	  else 
+	    eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
 
 	  if ( cdoTimer ) timer_stop(timer_eig);
 	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
-	  // need to multiply igen values by sum_w
-	  // TODO --> find out why!
 	  
 	  if ( cdoTimer ) timer_start(timer_post);
           for (i = 0; i < n; i++)
@@ -464,11 +544,6 @@ void *EOFs(void * argument)
           for (i = 0; i < n_eig; i++)
             {
               if ( grid_space )
-		// Do not need to normalize by
-		// w[pack[j]]/sum_w (checked) --> find out why!!!
-		//#if defined (_OPENMP)
-		//#pragma omp parallel for private(j)
-		//#endif
 		for(j = 0; j < npack; j++)
 		  eigenvectors[varID][levelID][i].ptr[pack[j]] = 
 		    cov[i][j] / sqrt(weight[pack[j]]);
@@ -519,13 +594,26 @@ void *EOFs(void * argument)
                 } // else if ( time_space )
             } // for ( i = 0; i < n_eig; i++ )
 	  if ( cdoTimer ) timer_stop(timer_post);
+
+	  if ( eigv ) free(eigv);
+	  for ( i=0; i<n; i++ )
+	    if ( cov[i] ) free(cov[i]);
+	  if ( cov ) free(cov);
+	  if ( miss ) free(miss);
+	  if ( pack ) free(pack);
+
         } // for ( levelID = 0; levelID < nlevs; levelID ++ )
     } // for ( varID = 0; varID < nvars; varID ++ )
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
+
   if ( cdoTimer ) timer_start(timer_write);
+
+  cdoPrint("starting to write results");
+
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
+
   for ( tsID = 0; tsID < n; tsID++ )
     {
       taxisDefVdate(taxisID2, 0);
@@ -563,20 +651,32 @@ void *EOFs(void * argument)
         }
     }
 
+  cdoPrint("stopping timers");
+
   if ( cdoTimer ) timer_stop(timer_write);
 
   if ( cdoTimer ) timer_start(timer_finish);
+
+  cdoPrint("freeing pointers");
   
   for ( varID = 0; varID < nvars; varID++)
     {
+      char vname[64];
+      vlistInqVarName(vlistID1,varID,&vname[0]);
+      nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      gridsize =  gridInqSize(vlistInqVarGrid(vlistID1, varID));
+      
       for(levelID = 0; levelID < nlevs; levelID++)
         {
-          for(i = 0; i < gridsize; i++)
+	  int n_use = time_space == 1? nts : gridsize;
+          for(i = 0; i < n_use; i++)
             {
-              if ( i < n_eig )
-                free(eigenvectors[varID][levelID][i].ptr);
-              free(eigenvalues[varID][levelID][i].ptr);
-            }
+              if ( i < n_eig ) 
+                if (eigenvectors[varID][levelID][i].ptr)
+		  free(eigenvectors[varID][levelID][i].ptr);
+	      if (eigenvalues[varID][levelID][i].ptr)
+		free(eigenvalues[varID][levelID][i].ptr);
+	    }
           free(eigenvectors[varID][levelID]);
           free(eigenvalues[varID][levelID]);
           free(datacounts[varID][levelID]);
