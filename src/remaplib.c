@@ -5135,6 +5135,30 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
         grid2_centroid_lon[n] = grid2_centroid_lon[n]/rg->grid2_area[n];
       }
 
+  /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 1.e-14 */
+  /*
+  num_links = rv->num_links;
+  for ( n = 0; n < num_links; n++ )
+    {
+      if ( fabs(rv->wts[0][n]) < 1.e-9 )
+	{
+	  int i;
+	  num_links--;
+	  for ( i = n; i < num_links; i++ )
+	    {
+	      rv->wts[0][i] = rv->wts[0][i+1];
+	      rv->wts[1][i] = rv->wts[1][i+1];
+	      rv->wts[2][i] = rv->wts[2][i+1];
+
+	      rv->grid1_add[i] = rv->grid1_add[i+1];
+	      rv->grid2_add[i] = rv->grid2_add[i+1];
+	    }
+	}
+    }
+  if ( cdoVerbose )
+    cdoPrint("Removed number of links = %ld", rv->num_links - num_links);
+  rv->num_links = num_links;
+  */
   /* Include centroids in weights and normalize using destination area if requested */
 
   num_links = rv->num_links;
@@ -5438,7 +5462,10 @@ void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *r
 	  icount = 0;
 	  for ( i = 0; i < rg.grid2_size; i++ )
 	    if ( grid2_count[i] >= imin && grid2_count[i] < imax ) icount++;
-	  cdoPrint("num of rows with entries between %d - %d  %d", imin, imax-1, icount);
+
+	  if ( icount )
+	    cdoPrint("num of rows with entries between %d - %d  %d", imin, imax-1, icount);
+
 	  imin = imin + idiff;
 	  imax = imax + idiff;
 	}

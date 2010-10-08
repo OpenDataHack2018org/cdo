@@ -65,17 +65,18 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
 	cdo-Deltime.$(OBJEXT) cdo-Detrend.$(OBJEXT) cdo-Diff.$(OBJEXT) \
-	cdo-EOFs.$(OBJEXT) cdo-EcaIndices.$(OBJEXT) \
-	cdo-Echam5ini.$(OBJEXT) cdo-Enlarge.$(OBJEXT) \
-	cdo-Enlargegrid.$(OBJEXT) cdo-Ensstat.$(OBJEXT) \
-	cdo-Eofcoeff.$(OBJEXT) cdo-Exprf.$(OBJEXT) \
-	cdo-Filedes.$(OBJEXT) cdo-Fillmiss.$(OBJEXT) \
-	cdo-Filter.$(OBJEXT) cdo-Fldrms.$(OBJEXT) \
-	cdo-Fldstat.$(OBJEXT) cdo-Fldstat2.$(OBJEXT) \
-	cdo-Fourier.$(OBJEXT) cdo-Gather.$(OBJEXT) \
-	cdo-Gengrid.$(OBJEXT) cdo-Gradsdes.$(OBJEXT) \
-	cdo-Gridboxstat.$(OBJEXT) cdo-Gridcell.$(OBJEXT) \
-	cdo-Harmonic.$(OBJEXT) cdo-Hi.$(OBJEXT) \
+	cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
+	cdo-EcaIndices.$(OBJEXT) cdo-Echam5ini.$(OBJEXT) \
+	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
+	cdo-Ensstat.$(OBJEXT) cdo-Ensstat2.$(OBJEXT) \
+	cdo-Eofcoeff.$(OBJEXT) cdo-Eofcoeff3d.$(OBJEXT) \
+	cdo-Exprf.$(OBJEXT) cdo-Filedes.$(OBJEXT) \
+	cdo-Fillmiss.$(OBJEXT) cdo-Filter.$(OBJEXT) \
+	cdo-Fldrms.$(OBJEXT) cdo-Fldstat.$(OBJEXT) \
+	cdo-Fldstat2.$(OBJEXT) cdo-Fourier.$(OBJEXT) \
+	cdo-Gather.$(OBJEXT) cdo-Gengrid.$(OBJEXT) \
+	cdo-Gradsdes.$(OBJEXT) cdo-Gridboxstat.$(OBJEXT) \
+	cdo-Gridcell.$(OBJEXT) cdo-Harmonic.$(OBJEXT) cdo-Hi.$(OBJEXT) \
 	cdo-Histogram.$(OBJEXT) cdo-IFS2ICON.$(OBJEXT) \
 	cdo-Importamsr.$(OBJEXT) cdo-Importbinary.$(OBJEXT) \
 	cdo-Importcmsaf.$(OBJEXT) cdo-Importobs.$(OBJEXT) \
@@ -171,18 +172,20 @@ am__objects_1 = cdo_static-cdo.$(OBJEXT) cdo_static-Arith.$(OBJEXT) \
 	cdo_static-Consecstat.$(OBJEXT) cdo_static-Copy.$(OBJEXT) \
 	cdo_static-Deltime.$(OBJEXT) cdo_static-Detrend.$(OBJEXT) \
 	cdo_static-Diff.$(OBJEXT) cdo_static-EOFs.$(OBJEXT) \
-	cdo_static-EcaIndices.$(OBJEXT) cdo_static-Echam5ini.$(OBJEXT) \
-	cdo_static-Enlarge.$(OBJEXT) cdo_static-Enlargegrid.$(OBJEXT) \
-	cdo_static-Ensstat.$(OBJEXT) cdo_static-Eofcoeff.$(OBJEXT) \
-	cdo_static-Exprf.$(OBJEXT) cdo_static-Filedes.$(OBJEXT) \
-	cdo_static-Fillmiss.$(OBJEXT) cdo_static-Filter.$(OBJEXT) \
-	cdo_static-Fldrms.$(OBJEXT) cdo_static-Fldstat.$(OBJEXT) \
-	cdo_static-Fldstat2.$(OBJEXT) cdo_static-Fourier.$(OBJEXT) \
-	cdo_static-Gather.$(OBJEXT) cdo_static-Gengrid.$(OBJEXT) \
-	cdo_static-Gradsdes.$(OBJEXT) cdo_static-Gridboxstat.$(OBJEXT) \
-	cdo_static-Gridcell.$(OBJEXT) cdo_static-Harmonic.$(OBJEXT) \
-	cdo_static-Hi.$(OBJEXT) cdo_static-Histogram.$(OBJEXT) \
-	cdo_static-IFS2ICON.$(OBJEXT) cdo_static-Importamsr.$(OBJEXT) \
+	cdo_static-Eof3d.$(OBJEXT) cdo_static-EcaIndices.$(OBJEXT) \
+	cdo_static-Echam5ini.$(OBJEXT) cdo_static-Enlarge.$(OBJEXT) \
+	cdo_static-Enlargegrid.$(OBJEXT) cdo_static-Ensstat.$(OBJEXT) \
+	cdo_static-Ensstat2.$(OBJEXT) cdo_static-Eofcoeff.$(OBJEXT) \
+	cdo_static-Eofcoeff3d.$(OBJEXT) cdo_static-Exprf.$(OBJEXT) \
+	cdo_static-Filedes.$(OBJEXT) cdo_static-Fillmiss.$(OBJEXT) \
+	cdo_static-Filter.$(OBJEXT) cdo_static-Fldrms.$(OBJEXT) \
+	cdo_static-Fldstat.$(OBJEXT) cdo_static-Fldstat2.$(OBJEXT) \
+	cdo_static-Fourier.$(OBJEXT) cdo_static-Gather.$(OBJEXT) \
+	cdo_static-Gengrid.$(OBJEXT) cdo_static-Gradsdes.$(OBJEXT) \
+	cdo_static-Gridboxstat.$(OBJEXT) cdo_static-Gridcell.$(OBJEXT) \
+	cdo_static-Harmonic.$(OBJEXT) cdo_static-Hi.$(OBJEXT) \
+	cdo_static-Histogram.$(OBJEXT) cdo_static-IFS2ICON.$(OBJEXT) \
+	cdo_static-Importamsr.$(OBJEXT) \
 	cdo_static-Importbinary.$(OBJEXT) \
 	cdo_static-Importcmsaf.$(OBJEXT) \
 	cdo_static-Importobs.$(OBJEXT) cdo_static-Info.$(OBJEXT) \
@@ -447,28 +450,29 @@ top_srcdir = @top_srcdir@
 cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Cat.c Change.c Change_e5slm.c Cloudlayer.c Command.c Comp.c \
 	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
-	Copy.c Deltime.c Detrend.c Diff.c EOFs.c EcaIndices.c \
-	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Eofcoeff.c \
-	Exprf.c Filedes.c Fillmiss.c Filter.c Fldrms.c Fldstat.c \
-	Fldstat2.c Fourier.c Gather.c Gengrid.c Gradsdes.c \
-	Gridboxstat.c Gridcell.c Harmonic.c Hi.c Histogram.c \
-	IFS2ICON.c Importamsr.c Importbinary.c Importcmsaf.c \
-	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
-	Intntime.c Inttime.c Intyear.c Invert.c Invertlev.c Log.c \
-	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
-	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
-	Output.c Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c \
-	Remapeta.c Replace.c Replacevalues.c Rotuv.c Runpctl.c \
-	Runstat.c Scatter.c Seascount.c Seaspctl.c Seasstat.c Selbox.c \
-	Select.c Seloperator.c Selrec.c Seltime.c Selvar.c Set.c \
-	Setbox.c Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c \
-	Settime.c Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c \
-	Sorttimestamp.c Specinfo.c Spectral.c Spectrum.c Split.c \
-	Splitrec.c Splitsel.c Splittime.c Splityear.c Subtrend.c \
-	Templates.c Test.c Tests.c Timcount.c Timpctl.c Timselpctl.c \
-	Timselstat.c Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c \
-	Tocomplex.c Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c \
-	Vargen.c Varrms.c Vertint.c Vertstat.c Vertwind.c Wct.c Wind.c \
+	Copy.c Deltime.c Detrend.c Diff.c EOFs.c Eof3d.c EcaIndices.c \
+	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat2.c \
+	Eofcoeff.c Eofcoeff3d.c Exprf.c Filedes.c Fillmiss.c Filter.c \
+	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
+	Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
+	Histogram.c IFS2ICON.c Importamsr.c Importbinary.c \
+	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
+	Intgridtraj.c Intlevel.c Intntime.c Inttime.c Intyear.c \
+	Invert.c Invertlev.c Log.c Maskbox.c Mastrfu.c Math.c Merge.c \
+	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
+	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
+	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
+	Replacevalues.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
+	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
+	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
+	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
+	Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c Sorttimestamp.c \
+	Specinfo.c Spectral.c Spectrum.c Split.c Splitrec.c Splitsel.c \
+	Splittime.c Splityear.c Subtrend.c Templates.c Test.c Tests.c \
+	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
+	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c Vargen.c \
+	Varrms.c Vertint.c Vertstat.c Vertwind.c Wct.c Wind.c \
 	Writegrid.c Writerandom.c Ydayarith.c Ydaypctl.c Ydaystat.c \
 	Ydrunpctl.c Ydrunstat.c Yhourstat.c Ymonarith.c Ymonpctl.c \
 	Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h cdo_int.h \
@@ -657,7 +661,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Enlarge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Enlargegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ensstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ensstat2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eof3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Exprf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Filedes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Fillmiss.Po@am__quote@
@@ -868,7 +875,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Enlarge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Enlargegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Ensstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Ensstat2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Eof3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Eofcoeff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Eofcoeff3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Exprf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Filedes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo_static-Fillmiss.Po@am__quote@
@@ -1397,6 +1407,20 @@ cdo-EOFs.obj: EOFs.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-EOFs.obj `if test -f 'EOFs.c'; then $(CYGPATH_W) 'EOFs.c'; else $(CYGPATH_W) '$(srcdir)/EOFs.c'; fi`
 
+cdo-Eof3d.o: Eof3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Eof3d.o -MD -MP -MF $(DEPDIR)/cdo-Eof3d.Tpo -c -o cdo-Eof3d.o `test -f 'Eof3d.c' || echo '$(srcdir)/'`Eof3d.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Eof3d.Tpo $(DEPDIR)/cdo-Eof3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eof3d.c' object='cdo-Eof3d.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Eof3d.o `test -f 'Eof3d.c' || echo '$(srcdir)/'`Eof3d.c
+
+cdo-Eof3d.obj: Eof3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Eof3d.obj -MD -MP -MF $(DEPDIR)/cdo-Eof3d.Tpo -c -o cdo-Eof3d.obj `if test -f 'Eof3d.c'; then $(CYGPATH_W) 'Eof3d.c'; else $(CYGPATH_W) '$(srcdir)/Eof3d.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Eof3d.Tpo $(DEPDIR)/cdo-Eof3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eof3d.c' object='cdo-Eof3d.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Eof3d.obj `if test -f 'Eof3d.c'; then $(CYGPATH_W) 'Eof3d.c'; else $(CYGPATH_W) '$(srcdir)/Eof3d.c'; fi`
+
 cdo-EcaIndices.o: EcaIndices.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EcaIndices.o -MD -MP -MF $(DEPDIR)/cdo-EcaIndices.Tpo -c -o cdo-EcaIndices.o `test -f 'EcaIndices.c' || echo '$(srcdir)/'`EcaIndices.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-EcaIndices.Tpo $(DEPDIR)/cdo-EcaIndices.Po
@@ -1467,6 +1491,20 @@ cdo-Ensstat.obj: Ensstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat.obj `if test -f 'Ensstat.c'; then $(CYGPATH_W) 'Ensstat.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat.c'; fi`
 
+cdo-Ensstat2.o: Ensstat2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ensstat2.o -MD -MP -MF $(DEPDIR)/cdo-Ensstat2.Tpo -c -o cdo-Ensstat2.o `test -f 'Ensstat2.c' || echo '$(srcdir)/'`Ensstat2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Ensstat2.Tpo $(DEPDIR)/cdo-Ensstat2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat2.c' object='cdo-Ensstat2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat2.o `test -f 'Ensstat2.c' || echo '$(srcdir)/'`Ensstat2.c
+
+cdo-Ensstat2.obj: Ensstat2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ensstat2.obj -MD -MP -MF $(DEPDIR)/cdo-Ensstat2.Tpo -c -o cdo-Ensstat2.obj `if test -f 'Ensstat2.c'; then $(CYGPATH_W) 'Ensstat2.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Ensstat2.Tpo $(DEPDIR)/cdo-Ensstat2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat2.c' object='cdo-Ensstat2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat2.obj `if test -f 'Ensstat2.c'; then $(CYGPATH_W) 'Ensstat2.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat2.c'; fi`
+
 cdo-Eofcoeff.o: Eofcoeff.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Eofcoeff.o -MD -MP -MF $(DEPDIR)/cdo-Eofcoeff.Tpo -c -o cdo-Eofcoeff.o `test -f 'Eofcoeff.c' || echo '$(srcdir)/'`Eofcoeff.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Eofcoeff.Tpo $(DEPDIR)/cdo-Eofcoeff.Po
@@ -1480,6 +1518,20 @@ cdo-Eofcoeff.obj: Eofcoeff.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff.c' object='cdo-Eofcoeff.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Eofcoeff.obj `if test -f 'Eofcoeff.c'; then $(CYGPATH_W) 'Eofcoeff.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff.c'; fi`
+
+cdo-Eofcoeff3d.o: Eofcoeff3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Eofcoeff3d.o -MD -MP -MF $(DEPDIR)/cdo-Eofcoeff3d.Tpo -c -o cdo-Eofcoeff3d.o `test -f 'Eofcoeff3d.c' || echo '$(srcdir)/'`Eofcoeff3d.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Eofcoeff3d.Tpo $(DEPDIR)/cdo-Eofcoeff3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff3d.c' object='cdo-Eofcoeff3d.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Eofcoeff3d.o `test -f 'Eofcoeff3d.c' || echo '$(srcdir)/'`Eofcoeff3d.c
+
+cdo-Eofcoeff3d.obj: Eofcoeff3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Eofcoeff3d.obj -MD -MP -MF $(DEPDIR)/cdo-Eofcoeff3d.Tpo -c -o cdo-Eofcoeff3d.obj `if test -f 'Eofcoeff3d.c'; then $(CYGPATH_W) 'Eofcoeff3d.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff3d.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Eofcoeff3d.Tpo $(DEPDIR)/cdo-Eofcoeff3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff3d.c' object='cdo-Eofcoeff3d.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Eofcoeff3d.obj `if test -f 'Eofcoeff3d.c'; then $(CYGPATH_W) 'Eofcoeff3d.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff3d.c'; fi`
 
 cdo-Exprf.o: Exprf.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Exprf.o -MD -MP -MF $(DEPDIR)/cdo-Exprf.Tpo -c -o cdo-Exprf.o `test -f 'Exprf.c' || echo '$(srcdir)/'`Exprf.c
@@ -4344,6 +4396,20 @@ cdo_static-EOFs.obj: EOFs.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-EOFs.obj `if test -f 'EOFs.c'; then $(CYGPATH_W) 'EOFs.c'; else $(CYGPATH_W) '$(srcdir)/EOFs.c'; fi`
 
+cdo_static-Eof3d.o: Eof3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Eof3d.o -MD -MP -MF $(DEPDIR)/cdo_static-Eof3d.Tpo -c -o cdo_static-Eof3d.o `test -f 'Eof3d.c' || echo '$(srcdir)/'`Eof3d.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Eof3d.Tpo $(DEPDIR)/cdo_static-Eof3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eof3d.c' object='cdo_static-Eof3d.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Eof3d.o `test -f 'Eof3d.c' || echo '$(srcdir)/'`Eof3d.c
+
+cdo_static-Eof3d.obj: Eof3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Eof3d.obj -MD -MP -MF $(DEPDIR)/cdo_static-Eof3d.Tpo -c -o cdo_static-Eof3d.obj `if test -f 'Eof3d.c'; then $(CYGPATH_W) 'Eof3d.c'; else $(CYGPATH_W) '$(srcdir)/Eof3d.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Eof3d.Tpo $(DEPDIR)/cdo_static-Eof3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eof3d.c' object='cdo_static-Eof3d.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Eof3d.obj `if test -f 'Eof3d.c'; then $(CYGPATH_W) 'Eof3d.c'; else $(CYGPATH_W) '$(srcdir)/Eof3d.c'; fi`
+
 cdo_static-EcaIndices.o: EcaIndices.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-EcaIndices.o -MD -MP -MF $(DEPDIR)/cdo_static-EcaIndices.Tpo -c -o cdo_static-EcaIndices.o `test -f 'EcaIndices.c' || echo '$(srcdir)/'`EcaIndices.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-EcaIndices.Tpo $(DEPDIR)/cdo_static-EcaIndices.Po
@@ -4414,6 +4480,20 @@ cdo_static-Ensstat.obj: Ensstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Ensstat.obj `if test -f 'Ensstat.c'; then $(CYGPATH_W) 'Ensstat.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat.c'; fi`
 
+cdo_static-Ensstat2.o: Ensstat2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Ensstat2.o -MD -MP -MF $(DEPDIR)/cdo_static-Ensstat2.Tpo -c -o cdo_static-Ensstat2.o `test -f 'Ensstat2.c' || echo '$(srcdir)/'`Ensstat2.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Ensstat2.Tpo $(DEPDIR)/cdo_static-Ensstat2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat2.c' object='cdo_static-Ensstat2.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Ensstat2.o `test -f 'Ensstat2.c' || echo '$(srcdir)/'`Ensstat2.c
+
+cdo_static-Ensstat2.obj: Ensstat2.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Ensstat2.obj -MD -MP -MF $(DEPDIR)/cdo_static-Ensstat2.Tpo -c -o cdo_static-Ensstat2.obj `if test -f 'Ensstat2.c'; then $(CYGPATH_W) 'Ensstat2.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat2.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Ensstat2.Tpo $(DEPDIR)/cdo_static-Ensstat2.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat2.c' object='cdo_static-Ensstat2.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Ensstat2.obj `if test -f 'Ensstat2.c'; then $(CYGPATH_W) 'Ensstat2.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat2.c'; fi`
+
 cdo_static-Eofcoeff.o: Eofcoeff.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Eofcoeff.o -MD -MP -MF $(DEPDIR)/cdo_static-Eofcoeff.Tpo -c -o cdo_static-Eofcoeff.o `test -f 'Eofcoeff.c' || echo '$(srcdir)/'`Eofcoeff.c
 @am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Eofcoeff.Tpo $(DEPDIR)/cdo_static-Eofcoeff.Po
@@ -4427,6 +4507,20 @@ cdo_static-Eofcoeff.obj: Eofcoeff.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff.c' object='cdo_static-Eofcoeff.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Eofcoeff.obj `if test -f 'Eofcoeff.c'; then $(CYGPATH_W) 'Eofcoeff.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff.c'; fi`
+
+cdo_static-Eofcoeff3d.o: Eofcoeff3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Eofcoeff3d.o -MD -MP -MF $(DEPDIR)/cdo_static-Eofcoeff3d.Tpo -c -o cdo_static-Eofcoeff3d.o `test -f 'Eofcoeff3d.c' || echo '$(srcdir)/'`Eofcoeff3d.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Eofcoeff3d.Tpo $(DEPDIR)/cdo_static-Eofcoeff3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff3d.c' object='cdo_static-Eofcoeff3d.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Eofcoeff3d.o `test -f 'Eofcoeff3d.c' || echo '$(srcdir)/'`Eofcoeff3d.c
+
+cdo_static-Eofcoeff3d.obj: Eofcoeff3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Eofcoeff3d.obj -MD -MP -MF $(DEPDIR)/cdo_static-Eofcoeff3d.Tpo -c -o cdo_static-Eofcoeff3d.obj `if test -f 'Eofcoeff3d.c'; then $(CYGPATH_W) 'Eofcoeff3d.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff3d.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo_static-Eofcoeff3d.Tpo $(DEPDIR)/cdo_static-Eofcoeff3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Eofcoeff3d.c' object='cdo_static-Eofcoeff3d.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo_static-Eofcoeff3d.obj `if test -f 'Eofcoeff3d.c'; then $(CYGPATH_W) 'Eofcoeff3d.c'; else $(CYGPATH_W) '$(srcdir)/Eofcoeff3d.c'; fi`
 
 cdo_static-Exprf.o: Exprf.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_static_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo_static-Exprf.o -MD -MP -MF $(DEPDIR)/cdo_static-Exprf.Tpo -c -o cdo_static-Exprf.o `test -f 'Exprf.c' || echo '$(srcdir)/'`Exprf.c

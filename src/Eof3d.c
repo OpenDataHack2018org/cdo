@@ -37,8 +37,9 @@ enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 #include "cdo_int.h"
 #include "pstream.h"
 #include "statistic.h"
+#if defined (_OPENMP)
 #include "omp.h"
-
+#endif
 
 // NO MISSING VALUE SUPPORT ADDED SO FAR
 

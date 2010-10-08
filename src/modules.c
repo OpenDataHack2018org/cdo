@@ -63,6 +63,7 @@ void *Echam5ini(void *argument);
 void *Enlarge(void *argument);
 void *Enlargegrid(void *argument);
 void *Ensstat(void *argument);
+void *Ensstat2(void *argument);
 void *Eofcoeff(void *argument);
 void *Eofcoeff3d(void *argument);
 void *EOFs(void *argument);
@@ -269,6 +270,7 @@ void *Wct(void *argument);
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
 #define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
+#define  Ensstat2Operators      {"ensf1", "ensf2", "ensf3", "ensf4", "ensf5"}
 #define  EofcoeffOperators      {"eofcoeff"}
 #define  Eofcoeff3dOperators    {"eofcoeff3d"}
 #define  EOFsOperators          {"eof", "eofspatial", "eoftime"}
@@ -509,8 +511,9 @@ static modules_t Modules[] =
   { Enlarge,        EnlargeHelp,       EnlargeOperators,       CDI_REAL,  1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       CDI_REAL, -1,  1 },
+  { Ensstat2,       NULL,              Ensstat2Operators,      CDI_REAL, -1,  1 },
   { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2,  1 },
-  { Eofcoeff3d,     NULL,              Eofcoeff3dOperators,    CDI_REAL,  2,  1 },
+  { Eofcoeff3d,     EofcoeffHelp,      Eofcoeff3dOperators,    CDI_REAL,  2,  1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
   { EOF3d,          NULL,              EOF3dOperators,         CDI_REAL,  1,  2 },
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
