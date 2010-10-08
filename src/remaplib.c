@@ -1417,8 +1417,7 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 #ifdef SX
 #pragma cdir nodep
 #endif
-  for ( n = 0; n < num_links; n++ )
-    if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
+  for ( n = 0; n < num_links; n++ ) dst_array[dst_add[n]] = ZERO;
 
   if ( iorder == 1 )   /* First order remapping */
     {
