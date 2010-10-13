@@ -327,7 +327,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                                           if ((IS_EQUAL(lon2, lon) && IS_EQUAL(lat2, lat))  ||
                                               (IS_EQUAL(lon3, lon) && IS_EQUAL(lat3, lat)) )
                                             c_flag[corner] = 1;
-                                        }                                                                                                                                                                      
+                                        }
                                     }
                                   for ( corner = 0; corner<4; corner++ )
                                     if ( !c_flag[corner] ) break;                                 

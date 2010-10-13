@@ -245,3 +245,56 @@ int userFileOverwrite(const char *filename)
 
   return (status);
 }
+
+int stdin_is_tty  = 0;
+int stdout_is_tty = 0;
+
+void init_is_tty(void)
+{
+  struct stat statbuf;
+  fstat(0, &statbuf);
+  if ( S_ISCHR(statbuf.st_mode) ) stdin_is_tty = 1;  
+  fstat(1, &statbuf);
+  if ( S_ISCHR(statbuf.st_mode) ) stdout_is_tty = 1;  
+}
+
+
+void progressStatus(double offset, double refval, double curval)
+{
+  static int lhead = FALSE;
+  static int nch = 0;;
+  static int cval = -1;
+  int ival;
+
+  if ( !stdout_is_tty ) return;
+
+  offset = offset < 0 ? 0: offset;
+  offset = offset > 1 ? 1: offset;
+  refval = refval < 0 ? 0: refval;
+  refval = refval > 1 ? 1: refval;
+  curval = curval < 0 ? 0: curval;
+  curval = curval > 1 ? 1: curval;
+
+  ival = (offset + refval*curval)*100;
+
+  if ( cval == -1 )
+    {
+      nch = fprintf(stdout, "%s: %3d%%", processInqPrompt(), 0);
+      fflush(stdout);
+      lhead = TRUE;
+    }
+
+  if ( ival != cval )
+    {
+      cval = ival;
+      fprintf(stdout, "\b\b\b\b%3d%%", cval);
+      fflush(stdout);
+    }
+
+  if ( cval == 100 && lhead )
+    {
+      lhead = FALSE;
+      while ( nch-- ) fprintf(stdout, "\b");
+      fflush(stdout);
+    }
+}

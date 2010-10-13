@@ -717,6 +717,8 @@ int main(int argc, char *argv[])
   char *argument = NULL;
   extern int dmemory_ExitOnError;
 
+  init_is_tty();
+
   dmemory_ExitOnError = 1;
 
   /* mallopt(M_MMAP_MAX, 0); */

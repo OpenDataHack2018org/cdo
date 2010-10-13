@@ -1,7 +1,7 @@
 /*
   This is a C library of the Fortran SCRIP version 1.4
 
-  ===>>> Please send bug reports to1 Uwe.Schulzweida@zmaw.de <<<===
+  ===>>> Please send bug reports to Uwe.Schulzweida@zmaw.de <<<===
 
   Spherical Coordinate Remapping and Interpolation Package (SCRIP)
   ================================================================
@@ -30,10 +30,6 @@
   Distance-weighted averaging
   ---------------------------
   Distance-weighted average of a user-specified number of nearest neighbor values.
-
-
-  SCRIP functionality is currently being added to the Earth System Modeling Framework
-  and is part of the European PRISM framework.
 
   Documentation
   =============
@@ -67,6 +63,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "remap.h"
+#include "util.h"  /* progressStatus */
 
 
 /* used for store_link_fast */
@@ -4462,6 +4459,8 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
+      if ( cdoTimer ) progressStatus(0, 0.5, ((double)(grid1_add+1))/(grid1_size));
+
       /*restrict searches first using search bins */
 
       min_add = grid2_size - 1;
@@ -4731,6 +4730,8 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       ompthID = omp_get_thread_num();
       srch_add = srch_add2[ompthID];
 #endif
+
+      if ( cdoTimer ) progressStatus(0.5, 0.5, ((double)(grid2_add+1))/(grid2_size));
 
       /*restrict searches first using search bins */
 
