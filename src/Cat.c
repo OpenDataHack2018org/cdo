@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2008 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -21,14 +21,11 @@
       Copy       cat             Concatenate datasets
 */
 
-#if  defined  (HAVE_CONFIG_H)
-#  include "config.h" /* large file */
-#endif
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
@@ -38,7 +35,7 @@ void *Cat(void *argument)
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID1, tsID2 = 0, recID, varID, levelID;
-  int vlistID1, vlistID2;
+  int vlistID1, vlistID2 = CDI_UNDEFID;
   int streamCnt, nfiles, indf;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int lcopy = FALSE;
@@ -66,17 +63,7 @@ void *Cat(void *argument)
 
       if ( indf == 0 )
 	{
-	  int fileExist = FALSE;
-	  FILE *fp;
-
-	  fp = fopen(cdoStreamName(nfiles), "r");
-	  if ( fp )
-	    {
-	      fclose(fp);
-	      fileExist = TRUE;
-	    }
-
-	  if ( fileExist )
+	  if ( fileExist(cdoStreamName(nfiles)) )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
 	      if ( streamID2 < 0 )
@@ -88,7 +75,7 @@ void *Cat(void *argument)
 	      vlistCompare(vlistID1, vlistID2, CMP_SFT);
 
 	      tsID2 = vlistNtsteps(vlistID2);
-	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for constant data only */
+	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for time constant data only */
 	    }
 	  else
 	    {
@@ -120,6 +107,10 @@ void *Cat(void *argument)
 	      gridsize = vlistGridsizeMax(vlistID1);
 	      array = (double *) malloc(gridsize*sizeof(double));
 	    }
+	}
+      else
+	{
+	  vlistCompare(vlistID1, vlistID2, CMP_SFT);
 	}
 
       tsID1 = 0;

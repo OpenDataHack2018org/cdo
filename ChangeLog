@@ -1,3 +1,7 @@
+2010-10-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Cat: call vlistCompare for all input files
+	
 2010-09-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added env. CDO_FILE_SUFFIX to set the file suffix of CDO generated file names
