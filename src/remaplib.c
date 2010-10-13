@@ -2052,6 +2052,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
+      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
+
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
       plat = rg->grid2_center_lat[dst_add];
@@ -2286,6 +2288,8 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
+      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
+
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
       plat = rg->grid2_center_lat[dst_add];
@@ -2700,6 +2704,8 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
+      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
+
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
       coslat_dst = cos(rg->grid2_center_lat[dst_add]);
@@ -2992,6 +2998,8 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
+      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
+
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
       coslat_dst = cos(rg->grid2_center_lat[dst_add]);
