@@ -108,7 +108,7 @@ void fft2(double *real, double *imag, const int n, const int isign)
 
 
 /* include from Tinfo.c */
-void getTimeInc(int lperiod, int deltam, int deltay, int *incperiod, int *incunit);
+void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit);
 
 void create_fmasc(const int nts, const double fdata, const double fmin, const double fmax, int *fmasc)
 {
@@ -161,7 +161,7 @@ void *Filter(void *argument)
   int *vdate = NULL, *vtime = NULL;
   int tunit;
   int incperiod0, incunit0, incunit, dpy, calendar;
-  int vdate0=0, vtime0=0, year0, month0, day0;
+  int year0, month0, day0;
   double missval;
   double *array1, *array2;
   double fdata = 0;
@@ -245,10 +245,9 @@ void *Filter(void *argument)
       /* get and check time increment */                   
       if ( tsID > 0)
         {    
-	  int deltay, deltam;
 	  juldate_t juldate0, juldate;
 	  double jdelta;
-	  int lperiod, incperiod;
+	  int incperiod = 0;
 	  int year, month, day;
 
           cdiDecodeDate(vdate[tsID], &year, &month, &day);
@@ -258,19 +257,12 @@ void *Filter(void *argument)
           juldate0 = juldate_encode(calendar, vdate[tsID-1], vtime[tsID-1]);        
           juldate  = juldate_encode(calendar, vdate[tsID], vtime[tsID]);         
           jdelta   = juldate_to_seconds(juldate_sub(juldate, juldate0));
-         
-          lperiod = (long)(jdelta+0.5);
-          incperiod = (int) lperiod;
-          
-          deltay = year-year0;
-          deltam = deltay*12 + (month-month0);
-          
           
           if ( tsID == 1 ) 
             {           
               /*printf("%4i %4.4i-%2.2i-%2.2i\n", tsID, year, month, day);
               printf("    %4.4i-%2.2i-%2.2i\n",     year0,month0,day0);*/
-              getTimeInc(lperiod, deltam, deltay, &incperiod0, &incunit0);
+              getTimeInc(jdelta, vdate[tsID-1], vdate[tsID], &incperiod0, &incunit0);
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero\n");
               incunit = incunit0;
@@ -278,7 +270,7 @@ void *Filter(void *argument)
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
-            getTimeInc(lperiod, deltam, deltay, &incperiod, &incunit);  
+            getTimeInc(jdelta, vdate[tsID-1], vdate[tsID], &incperiod, &incunit);  
         
 
 	  if ( incunit0 < 4 && month == 2 && day == 29 && 
