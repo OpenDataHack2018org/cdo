@@ -5,7 +5,7 @@
 @Section   = EOFs
 @Class     = EOF calculation
 @Arguments = ifile ofile1 ofile2
-@Operators = eof eoftime eofspatial eof3d eof3time
+@Operators = eof eoftime eofspatial eof3d
 
 @BeginDescription
 This module calculates empirical orthogonal functions of the data in @file{ifile} 
@@ -35,7 +35,7 @@ replace missing values by 0 in @file{ifile}.
 
 
 @BeginOperator_eof
-@Title     = Calculate EOFs in spatial or time space (seperately for each level)
+@Title     = Calculate EOFs in spatial or time space
 @Parameter = neof
 @EndOperator
 
@@ -51,13 +51,13 @@ replace missing values by 0 in @file{ifile}.
 
 @BeginOperator_eoftime
 
-@Title     = Calculate EOFs in time space (seperately for each level)
+@Title     = Calculate EOFs in time space
 @Parameter = neof
 @EndOperator
 
 
 @BeginOperator_eofspatial
-@Title     = Calculate EOFs in spatial space (seperately for each level)
+@Title     = Calculate EOFs in spatial space
 @Parameter = neof
 @EndOperator
 

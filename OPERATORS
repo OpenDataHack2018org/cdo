@@ -360,9 +360,9 @@ Operator catalog:
 -------------------------------------------------------------
    EOFs
 -------------------------------------------------------------
-   EOFs          eof             Calculate EOFs in spatial or time space (seperately for each level)
-   EOFs          eoftime         Calculate EOFs in time space (seperately for each level)
-   EOFs          eofspatial      Calculate EOFs in spatial space (seperately for each level)
+   EOFs          eof             Calculate EOFs in spatial or time space
+   EOFs          eoftime         Calculate EOFs in time space
+   EOFs          eofspatial      Calculate EOFs in spatial space
    EOFs          eof3d           Calculate 3-Dimensional EOFs in time space
    Eofcoeff      eofcoeff        Calculate principal coefficients of EOFs
 -------------------------------------------------------------
