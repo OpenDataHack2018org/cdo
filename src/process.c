@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2009 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -399,7 +399,7 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
       */
     }
 
-  if ( streamOutCnt != 1 )
+  if ( streamOutCnt > 1 )
     Error(processInqPrompt(), 
 	  "More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
 
@@ -500,9 +500,16 @@ void checkStreamCnt(void)
   int streamInCnt, streamOutCnt;
   int streamCnt = 0;
   int i, j;
+  int obase = FALSE;
 
   streamInCnt  = operatorStreamInCnt(Process[processID].operatorName);
   streamOutCnt = operatorStreamOutCnt(Process[processID].operatorName);
+
+  if ( streamOutCnt == -1 )
+    {
+      streamOutCnt = 1;
+      obase = TRUE;
+    }
 
   if ( streamInCnt == -1 && streamOutCnt == -1 )
     Error(processInqPrompt(), "I/O stream counts unlimited no allowed");
@@ -533,13 +540,17 @@ void checkStreamCnt(void)
   for ( i = streamInCnt; i < streamCnt; i++ )
     {
       if ( Process[processID].streamNames[i][0] == '-' )
-	Error(processInqPrompt(), "Output file name %s must not begin with \"-\"!\n",
-	      Process[processID].streamNames[i]);
-      else
-	for ( j = 0; j < streamInCnt; j++ ) /* does not work with files in pipes */
-	  if ( strcmp(Process[processID].streamNames[i], Process[processID].streamNames[j]) == 0 )
-	    Error(processInqPrompt(), "Output file name %s is equal to input file name"
-		  " on position %d!\n", Process[processID].streamNames[i], j+1);
+	{
+	  Error(processInqPrompt(), "Output file name %s must not begin with \"-\"!\n",
+		Process[processID].streamNames[i]);
+	}
+      else if ( !obase )
+	{
+	  for ( j = 0; j < streamInCnt; j++ ) /* does not work with files in pipes */
+	    if ( strcmp(Process[processID].streamNames[i], Process[processID].streamNames[j]) == 0 )
+	      Error(processInqPrompt(), "Output file name %s is equal to input file name"
+		    " on position %d!\n", Process[processID].streamNames[i], j+1);
+	}
     }  
 }
 

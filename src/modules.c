@@ -482,6 +482,7 @@ void *Wct(void *argument);
 
 static modules_t Modules[] =
 {
+  /* stream out -1 means usage of obase */
   /*
     function        help function      operator names          number     num streams
                                                                type       in  out
@@ -512,8 +513,8 @@ static modules_t Modules[] =
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       CDI_REAL, -1,  1 },
   { Ensstat2,       NULL,              Ensstat2Operators,      CDI_REAL, -1,  1 },
-  { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2,  1 },
-  { Eofcoeff3d,     EofcoeffHelp,      Eofcoeff3dOperators,    CDI_REAL,  2,  1 },
+  { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2, -1 },
+  { Eofcoeff3d,     EofcoeffHelp,      Eofcoeff3dOperators,    CDI_REAL,  2, -1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
   { EOF3d,          NULL,              EOF3dOperators,         CDI_REAL,  1,  2 },
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
@@ -543,7 +544,7 @@ static modules_t Modules[] =
   { Intlevel,       IntlevelHelp,      IntlevelOperators,      CDI_REAL,  1,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,       CDI_REAL,  1,  1 },
   { Intntime,       InttimeHelp,       IntntimeOperators,      CDI_REAL,  1,  1 },
-  { Intyear,        IntyearHelp,       IntyearOperators,       CDI_REAL,  2,  1 },
+  { Intyear,        IntyearHelp,       IntyearOperators,       CDI_REAL,  2, -1 },
   { Invert,         InvertHelp,        InvertOperators,        CDI_REAL,  1,  1 },
   { Invertlev,      InvertlevHelp,     InvertlevOperators,     CDI_REAL,  1,  1 },
   { Log,            NULL,              LogOperators,           CDI_REAL,  1,  0 },
@@ -601,11 +602,11 @@ static modules_t Modules[] =
   { Specinfo,       NULL,              SpecinfoOperators,      CDI_REAL,  0,  0 },
   { Spectral,       SpectralHelp,      SpectralOperators,      CDI_REAL,  1,  1 },
   { Spectrum,       NULL,              SpectrumOperators,      CDI_REAL,  1,  1 },
-  { Split,          SplitHelp,         SplitOperators,         CDI_BOTH,  1,  1 },
-  { Splitrec,       SplitHelp,         SplitrecOperators,      CDI_BOTH,  1,  1 },
-  { Splitsel,       SplitselHelp,      SplitselOperators,      CDI_BOTH,  1,  1 },
-  { Splittime,      SplittimeHelp,     SplittimeOperators,     CDI_BOTH,  1,  1 },
-  { Splityear,      SplittimeHelp,     SplityearOperators,     CDI_BOTH,  1,  1 },
+  { Split,          SplitHelp,         SplitOperators,         CDI_BOTH,  1, -1 },
+  { Splitrec,       SplitHelp,         SplitrecOperators,      CDI_BOTH,  1, -1 },
+  { Splitsel,       SplitselHelp,      SplitselOperators,      CDI_BOTH,  1, -1 },
+  { Splittime,      SplittimeHelp,     SplittimeOperators,     CDI_BOTH,  1, -1 },
+  { Splityear,      SplittimeHelp,     SplityearOperators,     CDI_BOTH,  1, -1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,      CDI_REAL,  3,  1 },
   { Template1,      NULL,              Template1Operators,     CDI_REAL,  1,  1 },
   { Template2,      NULL,              Template2Operators,     CDI_REAL,  1,  1 },
