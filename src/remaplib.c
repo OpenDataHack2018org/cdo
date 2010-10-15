@@ -4469,7 +4469,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
       if ( cdoTimer ) progressStatus(0, 0.5, ((double)(grid1_add+1))/(grid1_size));
 
-      /*restrict searches first using search bins */
+      /* restrict searches first using search bins */
 
       min_add = grid2_size - 1;
       max_add = 0;
@@ -4741,7 +4741,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
       if ( cdoTimer ) progressStatus(0.5, 0.5, ((double)(grid2_add+1))/(grid2_size));
 
-      /*restrict searches first using search bins */
+      /* restrict searches first using search bins */
 
       min_add = grid1_size - 1;
       max_add = 0;

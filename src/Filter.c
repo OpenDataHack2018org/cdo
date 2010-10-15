@@ -33,11 +33,12 @@
 
 
 #define  NALLOC_INC  1000
-#define PI2 6.2832
-#define HALF 0.5
+#define  PI2         6.2832
+#define  HALF        0.5
 
 /* FAST FOURIER TRANSFORMATION (bare) */
-void fft2(double *real, double *imag, const int n, const int isign)
+static
+void fft2(double *real, double *imag, int n, int isign)
 {
   int nn, mmax, m, j, istep, i;
   double wtemp, wr, wpr, wpi, wi, theta, tempr, tempi, tmp;   
@@ -110,7 +111,8 @@ void fft2(double *real, double *imag, const int n, const int isign)
 /* include from Tinfo.c */
 void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit);
 
-void create_fmasc(const int nts, const double fdata, const double fmin, const double fmax, int *fmasc)
+static
+void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
 {
   double dimin, dimax;
   int i, imin, imax;
@@ -126,18 +128,20 @@ void create_fmasc(const int nts, const double fdata, const double fmin, const do
     fmasc[i] = fmasc[nts-i] = 1; 
   
 }
-  
-void filter(const int nts, const int *fmasc, double *array1, double *array2)
+
+static
+void filter(int nts, const int *fmasc, double *array1, double *array2)
 {  
   int i;
 
-  fft2(&array1[0], &array2[0], nts, 1);
+  fft2(array1, array2, nts, 1);
   for ( i = 0; i < nts; i++ )
     if ( ! fmasc[i] )  array1[i] = array2[i] = 0;
-  fft2(&array1[0], &array2[0], nts, -1);
+  fft2(array1, array2, nts, -1);
   
-   return;
+  return;
 }
+
 
 void *Filter(void *argument)
 {
@@ -250,8 +254,7 @@ void *Filter(void *argument)
 	  int incperiod = 0;
 	  int year, month, day;
 
-          cdiDecodeDate(vdate[tsID], &year, &month, &day);
-          
+          cdiDecodeDate(vdate[tsID],   &year,  &month,  &day);
 	  cdiDecodeDate(vdate[tsID-1], &year0, &month0, &day0);               
 
           juldate0 = juldate_encode(calendar, vdate[tsID-1], vtime[tsID-1]);        
@@ -300,7 +303,7 @@ void *Filter(void *argument)
   
   array1 = (double *) malloc(nts2*sizeof(double));
   array2 = (double *) malloc(nts2*sizeof(double));
-  fmasc = (int *) calloc(nts2,sizeof(int));
+  fmasc  = (int *) calloc(nts2, sizeof(int));
    
   switch(operfunc)
   {
@@ -329,7 +332,7 @@ void *Filter(void *argument)
     }      
   }
   
-  create_fmasc(nts2, fdata, fmin, fmax, &fmasc[0]); 
+  create_fmasc(nts2, fdata, fmin, fmax, fmasc); 
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -338,8 +341,7 @@ void *Filter(void *argument)
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
-        {
-         
+        { 
           for ( i = 0; i < gridsize; i+=2 )
             {
               for ( tsID = 0; tsID < nts; tsID++ )                              
@@ -351,11 +353,11 @@ void *Filter(void *argument)
               /* zero padding up to next power of to */
               for ( tsID = nts; tsID < nts2; tsID++ )                
                 {
-                  array1[tsID]=0;       
-                  array2[tsID]=0;
+                  array1[tsID] = 0;       
+                  array2[tsID] = 0;
                 }
                             
-              filter(nts2, fmasc, &array1[0], &array2[0]);                         
+              filter(nts2, fmasc, array1, array2);                         
 
               for ( tsID = 0; tsID < nts; tsID++ )
                 {
@@ -384,7 +386,8 @@ void *Filter(void *argument)
               if ( vars[tsID][varID][levelID].ptr )
                 {
                   nmiss = vars[tsID][varID][levelID].nmiss;
-                  streamDefRecord(streamID2, varID, levelID);
+		  //fprintf(stderr, "%d %d %d %g\n", tsID, varID, levelID, vars[tsID][varID][levelID].ptr[0]);
+		  streamDefRecord(streamID2, varID, levelID);
                   streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
                   free(vars[tsID][varID][levelID].ptr);
                 }
