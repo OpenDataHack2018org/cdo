@@ -923,7 +923,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
       /* Note: using units from latitude instead from bounds */
       if ( rg->grid1_corners && rg->lneed_grid1_corners )
-	scale2( rg->grid1_corners*rg->grid1_size, DEG2RAD, rg->grid1_corner_lat, rg->grid1_corner_lon);
+	scale2(rg->grid1_corners*rg->grid1_size, DEG2RAD, rg->grid1_corner_lat, rg->grid1_corner_lon);
     }
   else if ( memcmp(units, "radian", 6) == 0 )
     {
@@ -2044,7 +2044,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, rv, Max_Iter, converge)   \
+  shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
           deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
 	  determinant, sum_wgts)	\
@@ -2052,7 +2052,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
-      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2280,7 +2280,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, rv, Max_Iter, converge)   \
+  shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
           deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
 	  determinant, sum_wgts)	\
@@ -2288,7 +2288,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
-      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2697,14 +2697,14 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, rv, grid2_size, coslat, coslon, sinlat, sinlon)		\
+  shared(ompNumThreads, cdoTimer, rg, rv, grid2_size, coslat, coslon, sinlat, sinlon)	\
   private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, dist_tot, \
 	  nbr_add, nbr_dist, nbr_mask, wgtstmp)	\
   schedule(dynamic,1)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
-      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2991,14 +2991,14 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   /* grid_loop1 */
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(rg, rv, grid2_size, coslat, coslon, sinlat, sinlon)		\
+  shared(ompNumThreads, cdoTimer, rg, rv, grid2_size, coslat, coslon, sinlat, sinlon)	\
   private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst,   \
 	  nbr_add, nbr_dist, nbr_mask, wgtstmp)	\
   schedule(dynamic,1)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
-      if ( cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -4449,7 +4449,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(nbins, grid1_centroid_lon, grid1_centroid_lat,	\
+  shared(ompNumThreads, cdoTimer, nbins, grid1_centroid_lon, grid1_centroid_lat,	\
          grid_store, link_add1, link_add2,	 \
          rv, cdoVerbose, max_subseg, \
 	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
@@ -4467,7 +4467,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
-      if ( cdoTimer ) progressStatus(0, 0.5, ((double)(grid1_add+1))/(grid1_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 0.5, ((double)(grid1_add+1))/(grid1_size));
 
       /* restrict searches first using search bins */
 
@@ -4721,7 +4721,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(nbins, grid2_centroid_lon, grid2_centroid_lat,	\
+  shared(ompNumThreads, cdoTimer, nbins, grid2_centroid_lon, grid2_centroid_lat,	\
          grid_store, link_add1, link_add2, \
          rv, cdoVerbose, max_subseg, \
 	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
@@ -4739,7 +4739,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
-      if ( cdoTimer ) progressStatus(0.5, 0.5, ((double)(grid2_add+1))/(grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0.5, 0.5, ((double)(grid2_add+1))/(grid2_size));
 
       /* restrict searches first using search bins */
 
