@@ -28,6 +28,7 @@
 #include "pstream.h"
 #include "statistic.h"
 
+
 #define  NIN     2
 #define  NOUT    1
 #define  NFWORK  4
@@ -38,7 +39,8 @@ void *Timstat3(void *argument)
   static const char *func = "Timstat3";
   int VARQUOT2TEST, MEANDIFF2TEST;
   int operatorID;
-  int *streamID, streamID3;
+  int streamID[NIN], streamID3;
+  int vlistID[NIN], vlistID2 = -1, vlistID3 = -1;
   int gridsize;
   int vdate = 0, vtime = 0;
   int nrecs, nrecs3, nvars, nlevs ;
@@ -47,17 +49,16 @@ void *Timstat3(void *argument)
   int varID, recID, levelID, gridID;
   int nmiss3;
   int *recVarID, *recLevelID;
-  int *vlistID, vlistID2 = -1, vlistID3 = -1;
   int taxisID1, taxisID3;
   double rconst, risk;
   double fnvals0, fnvals1;
   double missval, missval1, missval2;
   double fractil_1, fractil_2, statistic;
-  field_t **fwork[NFWORK];
   double temp0, temp1, temp2, temp3;
   int ***iwork[NIWORK];
-  field_t *in, *out;
-  int *reached_eof;
+  field_t **fwork[NFWORK];
+  field_t in[NIN], out[NOUT];
+  int reached_eof[NIN];
   int n_in = NIN;
 
 
@@ -81,9 +82,6 @@ void *Timstat3(void *argument)
       if ( risk <= 0 || risk >= 1 )
 	cdoAbort("Risk must be greater than 0 and lower than 1!");
     }
-
-  streamID = (int *) malloc(NIN*sizeof(int));
-  vlistID  = (int *) malloc(NIN*sizeof(int));
 
   for ( is = 0; is < NIN; ++is )
     {
@@ -115,14 +113,11 @@ void *Timstat3(void *argument)
 
   streamDefVlist(streamID3, vlistID3);
 
-  reached_eof = (int *) malloc(NIN*sizeof(int));
-  memset(reached_eof, 0, NIN*sizeof(int));
+  for ( i = 0; i < NIN; ++i ) reached_eof[i] = 0;
 
-  in = (field_t *) malloc(NIN*sizeof(field_t));
   for ( i = 0; i < NIN; ++i )
     in[i].ptr = (double *) malloc(gridsize*sizeof(double));
   				 
-  out = (field_t *) malloc(NOUT*sizeof(field_t));
   for ( i = 0; i < NOUT; ++i )
     out[i].ptr = (double *) malloc(gridsize*sizeof(double));
   				 
@@ -343,14 +338,8 @@ void *Timstat3(void *argument)
   for ( is = 0; is < NIN; ++is )
     streamClose(streamID[is]);
 
-  free(streamID);
-  free(vlistID);
-  free(reached_eof);
-
   for ( i = 0; i < NIN; ++i ) free(in[i].ptr);
-  free(in);
   for ( i = 0; i < NOUT; ++i ) free(out[i].ptr);
-  free(out);
 
   free(recVarID);
   free(recLevelID);

@@ -31,17 +31,16 @@ STRING  Target grid description file or name
 
 
 @BeginExample
-Assumed you want to add two datasets. The first dataset is on a
-T21 grid (2048 field elements) and the second dataset is only a
-global mean (1 field element).
-Before you can add these two datasets the second dataset have to be
-enlarged to the grid size of the first dataset:
+Assumed you want to add two datasets. The first dataset is a field on a global grid
+(n field elements) and the second dataset is only a global mean (1 field element).
+Before you can add these two datasets the second dataset have to be enlarged to the 
+grid size of the first dataset:
 @BeginVerbatim
-   cdo enlarge,t21grid ifile2 tmpfile
+   cdo enlarge,ifile1 ifile2 tmpfile
    cdo add ifile1 tmpfile ofile
 @EndVerbatim
 Or shorter using operator piping:
 @BeginVerbatim
-   cdo add ifile1 -enlarge,t21grid ifile2 ofile
+   cdo add ifile1 -enlarge,ifile1 ifile2 ofile
 @EndVerbatim
 @EndExample

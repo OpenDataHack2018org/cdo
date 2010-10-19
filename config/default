@@ -82,7 +82,7 @@ case "${HOSTNAME}" in
     etch-ia32 | gata | baba)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --with-jasper=/sw/etch-ia32/jasper-1.900.1 \
-                    --with-grib_api=/scratch/local2/m214003/local \
+                    --with-grib_api=$HOME/local/etch-ia32/grib_api-1.9.5 \
 	            --with-netcdf=/sw/etch-ia32/netcdf-4.1.1-gcc \
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.4-threadsafe \
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
