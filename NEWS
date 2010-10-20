@@ -5,6 +5,7 @@ Version 1.4.7 (?? December 2010):
 
    New operators:
      * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
+     * dv2ps: Divergence and vorticity to velocity potential and stream function
 
 Version 1.4.6 (17 September 2010):
 

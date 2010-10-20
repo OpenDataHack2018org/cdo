@@ -402,6 +402,7 @@ Operator catalog:
    Wind          dv2uvl          Divergence and vorticity to U and V wind (linear)
    Wind          uv2dv           U and V wind to divergence and vorticity
    Wind          uv2dvl          U and V wind to divergence and vorticity (linear)
+   Wind          dv2ps           D and V to velocity potential and stream function
 -------------------------------------------------------------
    Import/Export
 -------------------------------------------------------------

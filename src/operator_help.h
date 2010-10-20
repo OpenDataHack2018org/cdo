@@ -3074,7 +3074,7 @@ static char *SpectralHelp[] = {
 
 static char *WindHelp[] = {
     "NAME",
-    "    dv2uv, dv2uvl, uv2dv, uv2dvl - Wind transformation",
+    "    dv2uv, dv2uvl, uv2dv, uv2dvl, dv2ps - Wind transformation",
     "",
     "SYNOPSIS",
     "    <operator>  ifile ofile",
@@ -3115,6 +3115,10 @@ static char *WindHelp[] = {
     "            is calculated from the number of latitudes by:",
     "            ",
     "               trunc = (nlat*2 - 1) / 2",
+    "    dv2ps   D and V to velocity potential and stream function",
+    "            Calculate spherical harmonic coefficients of velocity potential and stream function from ",
+    "            spherical harmonic coefficients of relative divergence and vorticity. The divergence and ",
+    "            vorticity need to have the names sd and svo or code numbers 155 and 138.",
     NULL
 };
 

@@ -4,7 +4,7 @@
 @Section   = Transformation
 @Class     = Transformation
 @Arguments = ifile ofile
-@Operators = dv2uv dv2uvl uv2dv uv2dvl 
+@Operators = dv2uv dv2uvl uv2dv uv2dvl dv2ps
 
 @BeginDescription
 This module converts relative divergence and vorticity to U and V wind and vice versa.
@@ -100,6 +100,17 @@ is calculated from the number of latitudes by:
    \mbox{trunc} = (\mbox{nlat}*2 - 1) / \fbox{2}
 @EndMath
 @EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_dv2ps
+@Title     = D and V to velocity potential and stream function
+
+@BeginDescription
+Calculate spherical harmonic coefficients of velocity potential and stream function from 
+spherical harmonic coefficients of relative divergence and vorticity. The divergence and 
+vorticity need to have the names sd and svo or code numbers 155 and 138.
 @EndDescription
 @EndOperator
 

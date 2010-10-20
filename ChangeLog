@@ -1,3 +1,7 @@
+2010-10-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added docu for operator dv2ps
+	
 2010-10-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Cat: call vlistCompare for all input files
