@@ -28,12 +28,20 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
+
+
+static
+double orthodrome(double px1, double py1, double px2, double py2)
+{
+  return acos(sin(py1)*sin(py2)+cos(py1)*cos(py2)*cos(px2-px1));
+}
 
 
 void *Gridcell(void *argument)
 {
   static const char *func = "Gridcell";
-  int GRIDAREA, GRIDWGTS, GRIDMASK;
+  int GRIDAREA, GRIDWGTS, GRIDMASK, GRIDDX, GRIDDY;
   int operatorID;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
@@ -41,6 +49,7 @@ void *Gridcell(void *argument)
   int gridtype;
   int status;
   int ngrids;
+  int need_radius;
   int tsID, varID, levelID, taxisID;
   long i, gridsize;
   char *envstr;
@@ -50,13 +59,17 @@ void *Gridcell(void *argument)
 
   cdoInitialize(argument);
 
-  GRIDAREA = cdoOperatorAdd("gridarea",     0,  0, NULL);
-  GRIDWGTS = cdoOperatorAdd("gridweights",  0,  0, NULL);
+  GRIDAREA = cdoOperatorAdd("gridarea",     1,  0, NULL);
+  GRIDWGTS = cdoOperatorAdd("gridweights",  1,  0, NULL);
   GRIDMASK = cdoOperatorAdd("gridmask",     0,  0, NULL);
+  GRIDDX   = cdoOperatorAdd("griddx",       1,  0, NULL);
+  GRIDDY   = cdoOperatorAdd("griddy",       1,  0, NULL);
 
   operatorID = cdoOperatorID();
 
-  if ( operatorID == GRIDAREA || operatorID == GRIDWGTS )
+  need_radius = cdoOperatorF1(operatorID);
+
+  if ( need_radius )
     {
       envstr = getenv("PLANET_RADIUS");
       if ( envstr )
@@ -104,6 +117,18 @@ void *Gridcell(void *argument)
     {
       vlistDefVarName(vlistID2, varID, "grid_mask");
       vlistDefVarDatatype(vlistID2, varID, DATATYPE_UINT8);
+    }
+  else if ( operatorID == GRIDDX )
+    {
+      vlistDefVarName(vlistID2, varID, "dx");
+      vlistDefVarLongname(vlistID2, varID, "delta x");
+      vlistDefVarUnits(vlistID2, varID, "m");
+    }
+  else if ( operatorID == GRIDDY )
+    {
+      vlistDefVarName(vlistID2, varID, "dy");
+      vlistDefVarLongname(vlistID2, varID, "delta y");
+      vlistDefVarUnits(vlistID2, varID, "m");
     }
 
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
@@ -184,6 +209,114 @@ void *Gridcell(void *argument)
 
       for ( i = 0; i < gridsize; ++i ) array[i] = mask[i];
       free(mask);
+    }
+  else if ( operatorID == GRIDDX || operatorID == GRIDDY )
+    {
+      gridtype = gridInqType(gridID);
+      if ( gridtype == GRID_LONLAT      ||
+	   gridtype == GRID_GAUSSIAN    ||
+	   gridtype == GRID_LCC         ||
+	   gridtype == GRID_CURVILINEAR )
+	{
+	  long i, j, xsize, ysize;
+	  double *xv, *yv;
+	  double len1 = 0, len2 = 0;
+	  char units[128];
+
+	  if ( gridtype != GRID_CURVILINEAR )
+	    gridID = gridToCurvilinear(gridID);
+
+	  gridsize = gridInqSize(gridID);
+	  xsize = gridInqXsize(gridID);
+	  ysize = gridInqYsize(gridID);
+
+	  xv = (double *) malloc(gridsize*sizeof(double));
+	  yv = (double *) malloc(gridsize*sizeof(double));
+
+	  gridInqXvals(gridID, xv);
+	  gridInqYvals(gridID, yv);
+
+	  /* Convert lat/lon units if required */
+
+	  gridInqXunits(gridID, units);
+
+	  if ( memcmp(units, "degree", 6) == 0 )
+	    {
+	      for ( i = 0; i < gridsize; ++i )
+		{
+		  xv[i] *= DEG2RAD;
+		  yv[i] *= DEG2RAD;
+		}
+	    }
+	  else if ( memcmp(units, "radian", 6) == 0 )
+	    {
+	      /* No conversion necessary */
+	    }
+	  else
+	    {
+	      cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
+	    }
+
+	  if ( operatorID == GRIDDX )
+	    {
+	      for ( j = 0; j < ysize; ++j )
+		for ( i = 0; i < xsize; ++i )
+		  {
+		    if ( i == 0 )
+		      {
+			len2 = orthodrome(xv[j*xsize+i], yv[j*xsize+i], xv[j*xsize+i+1], yv[j*xsize+i+1]);
+			len1 = len2;
+		      }
+		    else if ( i == (xsize-1) )
+		      {
+			len1 = orthodrome(xv[j*xsize+i-1], yv[j*xsize+i-1], xv[j*xsize+i], yv[j*xsize+i]);
+			len2 = len1;
+		      }
+		    else
+		      {
+			len1 = orthodrome(xv[j*xsize+i-1], yv[j*xsize+i-1], xv[j*xsize+i], yv[j*xsize+i]);
+			len2 = orthodrome(xv[j*xsize+i], yv[j*xsize+i], xv[j*xsize+i+1], yv[j*xsize+i+1]);
+		      }
+
+		    array[j*xsize+i] = 0.5*(len1+len2)*PlanetRadius;
+		  }
+	    }
+	  else
+	    {
+	      for ( i = 0; i < xsize; ++i )
+	        for ( j = 0; j < ysize; ++j )
+		  {
+		    if ( j == 0 )
+		      {
+			len2 = orthodrome(xv[j*xsize+i], yv[j*xsize+i], xv[(j+1)*xsize+i], yv[(j+1)*xsize+i]);
+			len1 = len2;
+		      }
+		    else if ( j == (ysize-1) )
+		      {
+			len1 = orthodrome(xv[(j-1)*xsize+i], yv[(j-1)*xsize+i], xv[j*xsize+i], yv[j*xsize+i]);
+			len2 = len1;
+		      }
+		    else
+		      {
+			len1 = orthodrome(xv[(j-1)*xsize+i], yv[(j-1)*xsize+i], xv[j*xsize+i], yv[j*xsize+i]);
+			len2 = orthodrome(xv[j*xsize+i], yv[j*xsize+i], xv[(j+1)*xsize+i], yv[(j+1)*xsize+i]);
+		      }
+
+		    array[j*xsize+i] = 0.5*(len1+len2)*PlanetRadius;
+		  }
+	    }
+
+	  free(xv);
+	  free(yv);
+	}
+      else
+	{
+	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
+	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
+		     gridNamePtr(gridtype));
+	  else
+	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
+	}
     }
 
   streamWriteRecord(streamID2, array, 0);
