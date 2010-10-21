@@ -179,8 +179,11 @@ void *Ydaystat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+	  if ( tsID == 0 )
+	    {
+	      recVarID[recID]   = varID;
+	      recLevelID[recID] = levelID;
+	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -291,20 +294,21 @@ void *Ydaystat(void *argument)
 
 	taxisDefVdate(taxisID2, vdates[dayoy]);
 	taxisDefVtime(taxisID2, vtimes[dayoy]);
-	streamDefTimestep(streamID2, otsID++);
+	streamDefTimestep(streamID2, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	      {
-		streamDefRecord(streamID2, varID, levelID);
-		streamWriteRecord(streamID2, vars1[dayoy][varID][levelID].ptr,
-				  vars1[dayoy][varID][levelID].nmiss);
-	      }
+	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	    streamDefRecord(streamID2, varID, levelID);
+	    streamWriteRecord(streamID2, vars1[dayoy][varID][levelID].ptr,
+			      vars1[dayoy][varID][levelID].nmiss);
 	  }
+
+	otsID++;
       }
 
   for ( dayoy = 0; dayoy < NDAY; dayoy++ )

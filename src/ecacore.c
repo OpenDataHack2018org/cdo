@@ -318,42 +318,42 @@ void eca1(const ECA_REQUEST_1 *request)
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID++);
+      streamDefTimestep(ostreamID, otsID);
 
-      if ( otsID == 1 || vlistInqVarTime(ivlistID, FIRST_VAR_ID) == TIME_VARIABLE )
-        {
-          varID = 0;
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              if ( IS_SET(request->var1.f3) )
-                var = &var13[levelID];
-              else 
-                var = &var12[levelID];
+      if ( otsID && vlistInqVarTime(ivlistID, FIRST_VAR_ID) == TIME_CONSTANT ) continue;
+
+      varID = 0;
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+	{
+	  if ( IS_SET(request->var1.f3) )
+	    var = &var13[levelID];
+	  else 
+	    var = &var12[levelID];
               
-              farsel(var, samp1[levelID]);
+	  farsel(var, samp1[levelID]);
                
-              streamDefRecord(ostreamID, varID, levelID);
-              streamWriteRecord(ostreamID, var->ptr, var->nmiss);
-            }
-          if ( IS_SET(request->var2.h2) || IS_SET(request->var2.h3) )
-            {
-              varID = 1;
-              for ( levelID = 0; levelID < nlevels; levelID++ )
-                {
-                  if ( IS_SET(request->var2.h3) )
-                    var = &var23[levelID];
-                  else 
-                    var = &var21[levelID];
+	  streamDefRecord(ostreamID, varID, levelID);
+	  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	}
+      if ( IS_SET(request->var2.h2) || IS_SET(request->var2.h3) )
+	{
+	  varID = 1;
+	  for ( levelID = 0; levelID < nlevels; levelID++ )
+	    {
+	      if ( IS_SET(request->var2.h3) )
+		var = &var23[levelID];
+	      else 
+		var = &var21[levelID];
                   
-                  farsel(var, samp1[levelID]);
+	      farsel(var, samp1[levelID]);
                   
-                  streamDefRecord(ostreamID, varID, levelID);
-                  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
-               }
-            }
+	      streamDefRecord(ostreamID, varID, levelID);
+	      streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	    }
         }
 
       if ( nrecs == 0 ) break;
+      otsID++;
     }
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -694,41 +694,41 @@ void eca2(const ECA_REQUEST_2 *request)
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID++);
+      streamDefTimestep(ostreamID, otsID);
 
-      if ( otsID == 1 || vlistInqVarTime(ivlistID1, FIRST_VAR_ID) == TIME_VARIABLE )
-        {
-          varID = 0;
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              if ( IS_SET(request->var1.f5) )
-                var = &var15[levelID];
-              else 
-                var = &var14[levelID];
+      if ( otsID && vlistInqVarTime(ivlistID1, FIRST_VAR_ID) == TIME_CONSTANT ) continue;
+
+      varID = 0;
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+	{
+	  if ( IS_SET(request->var1.f5) )
+	    var = &var15[levelID];
+	  else 
+	    var = &var14[levelID];
               
-              farsel(var, samp1[levelID]);
-              farsel(var, samp2[levelID]);
+	  farsel(var, samp1[levelID]);
+	  farsel(var, samp2[levelID]);
               
-              streamDefRecord(ostreamID, varID, levelID);
-              streamWriteRecord(ostreamID, var->ptr, var->nmiss);
-            }
-          if ( IS_SET(request->var2.h2) )
-            {
-              varID = 1;
-              for ( levelID = 0; levelID < nlevels; levelID++ )
-                {
-                  var = &var22[levelID];
+	  streamDefRecord(ostreamID, varID, levelID);
+	  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	}
+      if ( IS_SET(request->var2.h2) )
+	{
+	  varID = 1;
+	  for ( levelID = 0; levelID < nlevels; levelID++ )
+	    {
+	      var = &var22[levelID];
+              
+	      farsel(var, samp1[levelID]);
+	      farsel(var, samp2[levelID]);
                   
-                  farsel(var, samp1[levelID]);
-                  farsel(var, samp2[levelID]);
-                  
-                  streamDefRecord(ostreamID, varID, levelID);
-                  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
-               }
-            }
+	      streamDefRecord(ostreamID, varID, levelID);
+	      streamWriteRecord(ostreamID, var->ptr, var->nmiss);
+	    }
         }
 
       if ( nrecs == 0 ) break;
+      otsID++;
     }
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
@@ -941,19 +941,19 @@ void eca3(const ECA_REQUEST_3 *request)
 
       taxisDefVdate(otaxisID, ovdate);
       taxisDefVtime(otaxisID, ovtime);
-      streamDefTimestep(ostreamID, otsID++);
+      streamDefTimestep(ostreamID, otsID);
 
-      if ( otsID == 1 || vlistInqVarTime(ivlistID1, FIRST_VAR_ID) == TIME_VARIABLE )
-        {
-          varID = 0;
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              streamDefRecord(ostreamID, varID, levelID);
-              streamWriteRecord(ostreamID, var1[levelID].ptr, var1[levelID].nmiss);
-            }
-        }
+      if ( otsID && vlistInqVarTime(ivlistID1, FIRST_VAR_ID) == TIME_CONSTANT ) continue;
+
+      varID = 0;
+      for ( levelID = 0; levelID < nlevels; levelID++ )
+	{
+	  streamDefRecord(ostreamID, varID, levelID);
+	  streamWriteRecord(ostreamID, var1[levelID].ptr, var1[levelID].nmiss);
+	}
 
       if ( nrecs == 0 ) break;
+      otsID++;
     }
 
   for ( levelID = 0; levelID < nlevels; levelID++ )

@@ -202,8 +202,11 @@ void *Ymonpctl(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+	  if ( tsID == 0 )
+	    {
+	      recVarID[recID]   = varID;
+	      recLevelID[recID] = levelID;
+	    }
 
 	  streamReadRecord(streamID1, vars1[month][varID][levelID].ptr, &nmiss);
 	  vars1[month][varID][levelID].nmiss = nmiss;
@@ -235,19 +238,20 @@ void *Ymonpctl(void *argument)
 
 	taxisDefVdate(taxisID4, vdates1[month]);
 	taxisDefVtime(taxisID4, vtimes1[month]);
-	streamDefTimestep(streamID4, otsID++);
+	streamDefTimestep(streamID4, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	      {
-		streamDefRecord(streamID4, varID, levelID);
-		streamWriteRecord(streamID4, vars1[month][varID][levelID].ptr, vars1[month][varID][levelID].nmiss);
-	      }
+	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	    streamDefRecord(streamID4, varID, levelID);
+	    streamWriteRecord(streamID4, vars1[month][varID][levelID].ptr, vars1[month][varID][levelID].nmiss);
 	  }
+
+	otsID++;
       }
 
   for ( month = 0; month < NMONTH; month++ )

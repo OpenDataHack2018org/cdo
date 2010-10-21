@@ -244,21 +244,21 @@ void *Seaspctl(void *argument)
 
       taxisDefVdate(taxisID4, vdate4);
       taxisDefVtime(taxisID4, vtime4);
-      streamDefTimestep(streamID4, otsID++);
+      streamDefTimestep(streamID4, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	    {
-	      streamDefRecord(streamID4, varID, levelID);
-	      streamWriteRecord(streamID4, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
-	    }
+	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	  streamDefRecord(streamID4, varID, levelID);
+	  streamWriteRecord(streamID4, vars1[varID][levelID].ptr, vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
+      otsID++;
     }
 
   for ( varID = 0; varID < nvars; varID++ )

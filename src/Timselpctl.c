@@ -139,12 +139,22 @@ void *Timselpctl(void *argument)
     {
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
-      tsID++;
+
+      for ( recID = 0; recID < nrecs; recID++ )
+	{
+	  streamInqRecord(streamID1, &varID, &levelID);
+
+	  if ( tsID == 0 )
+	    {
+	      recVarID[recID]   = varID;
+	      recLevelID[recID] = levelID;
+	    }
+	}
     }
 
   if ( tsID < noffset )
     {
-      cdoWarning("noffset larger than number of timesteps!");
+      cdoWarning("noffset is larger than number of timesteps!");
       goto LABEL_END;
     }
 
@@ -153,14 +163,16 @@ void *Timselpctl(void *argument)
     {
       nrecs = streamInqTimestep(streamID2, otsID);
       if ( nrecs != streamInqTimestep(streamID3, otsID) )
-        cdoAbort("Number of records in time step %d of %s and %s are different!", otsID+1, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("Number of records in time step %d of %s and %s are different!",
+		 otsID+1, cdoStreamName(1), cdoStreamName(2));
 
       vdate2 = taxisInqVdate(taxisID2);
       vtime2 = taxisInqVtime(taxisID2);
       vdate3 = taxisInqVdate(taxisID3);
       vtime3 = taxisInqVtime(taxisID3);
       if ( vdate2 != vdate3 || vtime2 != vtime3 )
-        cdoAbort("Verification dates for time step %d of %s and %s are different!", otsID+1, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("Verification dates for time step %d of %s and %s are different!",
+		 otsID+1, cdoStreamName(1), cdoStreamName(2));
       
       for ( recID = 0; recID < nrecs; recID++ )
         {
@@ -192,8 +204,11 @@ void *Timselpctl(void *argument)
 	    {
 	      streamInqRecord(streamID1, &varID, &levelID);
 
-	      recVarID[recID]   = varID;
-	      recLevelID[recID] = levelID;
+	      if ( tsID == 0 )
+		{
+		  recVarID[recID]   = varID;
+		  recLevelID[recID] = levelID;
+		}
 
 	      streamReadRecord(streamID1, vars1[varID][levelID].ptr, &nmiss);
 	      vars1[varID][levelID].nmiss = nmiss;
@@ -209,9 +224,11 @@ void *Timselpctl(void *argument)
       if ( nrecs == 0 && nsets == 0 ) break;
 
       if ( vdate2 != vdate4 )
-        cdoAbort("Verification dates for time step %d of %s, %s and %s are different!", otsID+1, cdoStreamName(1), cdoStreamName(2), cdoStreamName(3));
+        cdoAbort("Verification dates for time step %d of %s, %s and %s are different!",
+		 otsID+1, cdoStreamName(1), cdoStreamName(2), cdoStreamName(3));
       if ( vtime2 != vtime4 )
-        cdoAbort("Verification times for time step %d of %s, %s and %s are different!", otsID+1, cdoStreamName(1), cdoStreamName(2), cdoStreamName(3));
+        cdoAbort("Verification times for time step %d of %s, %s and %s are different!",
+		 otsID+1, cdoStreamName(1), cdoStreamName(2), cdoStreamName(3));
 
       for ( varID = 0; varID < nvars; varID++ )
         {
@@ -224,21 +241,21 @@ void *Timselpctl(void *argument)
 
       taxisDefVdate(taxisID4, vdate4);
       taxisDefVtime(taxisID4, vtime4);
-      streamDefTimestep(streamID4, otsID++);
+      streamDefTimestep(streamID4, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	    {
-	      streamDefRecord(streamID4, varID, levelID);
-	      streamWriteRecord(streamID4, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
-	    }
+	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	  streamDefRecord(streamID4, varID, levelID);
+	  streamWriteRecord(streamID4, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
+      otsID++;
 
       for ( i = 0; i < nskip; i++ )
 	{

@@ -6,6 +6,8 @@ Version 1.4.7 (?? December 2010):
    New operators:
      * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
      * dv2ps: Divergence and vorticity to velocity potential and stream function
+   Fixed bugs:
+     * Yseasstat: bug fix for datasets with time constant fields
 
 Version 1.4.6 (17 September 2010):
 

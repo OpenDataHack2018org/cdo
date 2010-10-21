@@ -117,7 +117,7 @@ void *Splitsel(void *argument)
     }
   if ( tsID < noffset )
     {
-      cdoWarning("noffset larger than number of timesteps!");
+      cdoWarning("noffset is larger than number of timesteps!");
       goto LABEL_END;
     }
 

@@ -275,20 +275,21 @@ void *Ydrunstat(void *argument)
       {
 	taxisDefVdate(taxisID2, stats->vdate[dayoy]);
 	taxisDefVtime(taxisID2, stats->vtime[dayoy]);
-	streamDefTimestep(streamID2, otsID++);
+	streamDefTimestep(streamID2, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	      {
-		streamDefRecord(streamID2, varID, levelID);
-		streamWriteRecord(streamID2, stats->vars1[dayoy][varID][levelID].ptr,
-		  stats->vars1[dayoy][varID][levelID].nmiss);
-	      }
+	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	    streamDefRecord(streamID2, varID, levelID);
+	    streamWriteRecord(streamID2, stats->vars1[dayoy][varID][levelID].ptr,
+			      stats->vars1[dayoy][varID][levelID].nmiss);
 	  }
+
+	otsID++;
       }
   
   for ( its = 0; its < ndates; its++ )

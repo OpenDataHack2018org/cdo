@@ -324,19 +324,20 @@ void *Runstat(void *argument)
 
       taxisDefVdate(taxisID2, datetime[ndates].date);
       taxisDefVtime(taxisID2, datetime[ndates].time);
-      streamDefTimestep(streamID2, otsID++);
+      streamDefTimestep(streamID2, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
 	{
 	  varID    = recVarID[recID];
 	  levelID  = recLevelID[recID];
 
-	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
-	    }
+	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	  streamDefRecord(streamID2, varID, levelID);
+	  streamWriteRecord(streamID2, vars1[0][varID][levelID].ptr, vars1[0][varID][levelID].nmiss);
 	}
+
+      otsID++;
 
       datetime[ndates] = datetime[0];
       vars1[ndates] = vars1[0];

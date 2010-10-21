@@ -181,8 +181,11 @@ void *Yhourstat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+	  if ( tsID == 0 )
+	    {
+	      recVarID[recID]   = varID;
+	      recLevelID[recID] = levelID;
+	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -293,20 +296,21 @@ void *Yhourstat(void *argument)
 
 	taxisDefVdate(taxisID2, vdates[houroy]);
 	taxisDefVtime(taxisID2, vtimes[houroy]);
-	streamDefTimestep(streamID2, otsID++);
+	streamDefTimestep(streamID2, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	      {
-		streamDefRecord(streamID2, varID, levelID);
-		streamWriteRecord(streamID2, vars1[houroy][varID][levelID].ptr,
-				  vars1[houroy][varID][levelID].nmiss);
-	      }
+	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	    streamDefRecord(streamID2, varID, levelID);
+	    streamWriteRecord(streamID2, vars1[houroy][varID][levelID].ptr,
+			      vars1[houroy][varID][levelID].nmiss);
 	  }
+
+	otsID++;
       }
 
   for ( houroy = 0; houroy < NHOUR; houroy++ )

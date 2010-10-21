@@ -325,20 +325,21 @@ void *Ydrunpctl(void *argument)
 
 	taxisDefVdate(taxisID4, vdates1[dayoy]);
 	taxisDefVtime(taxisID4, vtimes1[dayoy]);
-	streamDefTimestep(streamID4, otsID++);
+	streamDefTimestep(streamID4, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	      {
-		streamDefRecord(streamID4, varID, levelID);
-		streamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr,
-		  vars2[dayoy][varID][levelID].nmiss);
-	      }
+	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	    streamDefRecord(streamID4, varID, levelID);
+	    streamWriteRecord(streamID4, vars2[dayoy][varID][levelID].ptr,
+			      vars2[dayoy][varID][levelID].nmiss);
 	  }
+
+	otsID++;
       }
   
   for ( its = 0; its < ndates; its++ )
