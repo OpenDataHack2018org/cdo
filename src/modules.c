@@ -939,7 +939,7 @@ void operatorPrintAll(void)
   nbyte = fprintf(stderr, "   ");
   for ( i = 0; i < nop; i++ )
     {
-      if ( nbyte > 65 )
+      if ( nbyte > 75 )
 	{
 	  fprintf(stdout, "\n");
 	  nbyte = fprintf(stderr, "   ");
