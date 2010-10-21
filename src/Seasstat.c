@@ -326,14 +326,14 @@ void *Seasstat(void *argument)
 
       taxisDefVdate(taxisID2, vdate1);
       taxisDefVtime(taxisID2, vtime1);
-      streamDefTimestep(streamID2, otsID++);
+      streamDefTimestep(streamID2, otsID);
 
       if ( nsets < 3 )
 	{
 	  char vdatestr[32];
 	  date2str(vdate0, vdatestr, sizeof(vdatestr));
 	  cdoWarning("Season %3d (%s) has only %d input time step%s!", 
-		     otsID, vdatestr, nsets, nsets == 1 ? "" : "s");
+		     otsID+1, vdatestr, nsets, nsets == 1 ? "" : "s");
 	}
 
       for ( recID = 0; recID < nrecords; recID++ )
@@ -341,14 +341,14 @@ void *Seasstat(void *argument)
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
-	    }
+	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	  streamDefRecord(streamID2, varID, levelID);
+	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
 	}
 
       if ( nrecs == 0 ) break;
+      otsID++;
     }
 
   for ( varID = 0; varID < nvars; varID++ )

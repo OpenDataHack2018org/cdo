@@ -333,7 +333,6 @@ void *Ymonstat(void *argument)
 	  
 	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
 
-	  printf("%d %d %d %d\n", otsID, recID, varID, levelID);
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, vars1[month][varID][levelID].ptr,
 			    vars1[month][varID][levelID].nmiss);

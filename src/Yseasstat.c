@@ -190,8 +190,11 @@ void *Yseasstat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+	  if ( tsID == 0 )
+	    {
+	      recVarID[recID]   = varID;
+	      recLevelID[recID] = levelID;
+	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -302,20 +305,21 @@ void *Yseasstat(void *argument)
 
 	taxisDefVdate(taxisID2, vdates[seas]);
 	taxisDefVtime(taxisID2, vtimes[seas]);
-	streamDefTimestep(streamID2, otsID++);
+	streamDefTimestep(streamID2, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
 	  {
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	      {
-		streamDefRecord(streamID2, varID, levelID);
-		streamWriteRecord(streamID2, vars1[seas][varID][levelID].ptr,
-				  vars1[seas][varID][levelID].nmiss);
-	      }
+	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	    streamDefRecord(streamID2, varID, levelID);
+	    streamWriteRecord(streamID2, vars1[seas][varID][levelID].ptr,
+			      vars1[seas][varID][levelID].nmiss);
 	  }
+
+	otsID++;
       }
 
   for ( seas = 0; seas < NSEAS; seas++ )
