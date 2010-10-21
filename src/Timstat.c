@@ -417,29 +417,27 @@ void *Timstat(void *argument)
 	  streamDefTimestep(streamID3, otsID);
 	}
 
-      otsID++;
-
       for ( recID = 0; recID < nrecords; recID++ )
 	{
 	  varID   = recVarID[recID];
 	  levelID = recLevelID[recID];
 
-	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
+	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	  streamDefRecord(streamID2, varID, levelID);
+	  streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
+	  if ( cdoDiag )
 	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, vars1[varID][levelID].ptr,  vars1[varID][levelID].nmiss);
-	      if ( cdoDiag )
+	      if ( samp1[varID][levelID].ptr )
 		{
-		  if ( samp1[varID][levelID].ptr )
-		    {
-		      streamDefRecord(streamID3, varID, levelID);
+		  streamDefRecord(streamID3, varID, levelID);
 		      streamWriteRecord(streamID3, samp1[varID][levelID].ptr,  0);
-		    }
 		}
 	    }
 	}
 
       if ( nrecs == 0 ) break;
+      otsID++;
     }
 
 

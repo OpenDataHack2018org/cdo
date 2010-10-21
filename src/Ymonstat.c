@@ -37,7 +37,7 @@
 
 #define  NMONTH     17
 
-
+/*
 static
 int cmpint(const void *s1, const void *s2)
 {
@@ -50,7 +50,7 @@ int cmpint(const void *s1, const void *s2)
 
   return (cmp);
 }
-
+*/
 
 void *Ymonstat(void *argument)
 {
@@ -188,8 +188,11 @@ void *Ymonstat(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  recVarID[recID]   = varID;
-	  recLevelID[recID] = levelID;
+	  if ( tsID == 0 )
+	    {
+	      recVarID[recID]   = varID;
+	      recLevelID[recID] = levelID;
+	    }
 
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
@@ -321,20 +324,22 @@ void *Ymonstat(void *argument)
 
       taxisDefVdate(taxisID2, vdates[month]);
       taxisDefVtime(taxisID2, vtimes[month]);
-      streamDefTimestep(streamID2, otsID++);
+      streamDefTimestep(streamID2, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
 	{
 	  varID    = recVarID[recID];
 	  levelID  = recLevelID[recID];
 	  
-	  if ( otsID == 1 || vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE )
-	    {
-	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, vars1[month][varID][levelID].ptr,
-				vars1[month][varID][levelID].nmiss);
-	    }
+	  if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+
+	  printf("%d %d %d %d\n", otsID, recID, varID, levelID);
+	  streamDefRecord(streamID2, varID, levelID);
+	  streamWriteRecord(streamID2, vars1[month][varID][levelID].ptr,
+			    vars1[month][varID][levelID].nmiss);
 	}
+
+      otsID++;
     }
 
   for ( month = 0; month < NMONTH; month++ )
