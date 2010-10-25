@@ -269,7 +269,7 @@ void *Wct(void *argument);
                                  "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
-#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
+#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl","enscrps","ensbrs"}
 #define  Ensstat2Operators      {"ensf1", "ensf2", "ensf3", "ensf4", "ensf5"}
 #define  EofcoeffOperators      {"eofcoeff"}
 #define  Eofcoeff3dOperators    {"eofcoeff3d"}
