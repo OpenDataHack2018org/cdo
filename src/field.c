@@ -20,7 +20,10 @@
 #include <cdi.h>
 /* RQ */
 #include "nth_element.h"
+#include "merge_sort2.h"
 /* QR */
+
+double crps_det_integrate(double *a, const double d, const int n);
 
 double _FADD_(double x, double y, double missval1, double missval2)
 {
@@ -64,9 +67,42 @@ double fldfun(field_t field, int function)
   else if ( function == func_avg  )  rval = fldavg(field);
   else if ( function == func_std  )  rval = fldstd(field);
   else if ( function == func_var  )  rval = fldvar(field);
+  else if ( function == func_crps )  rval = fldcrps(field);
+  else if ( function == func_brs )    rval = fldbrs(field);
   else cdoAbort("function %d not implemented!", function);
 
   return rval;
+}
+
+double fldcrps(field_t field)
+{
+  double crps;
+  long   len     = field.size;
+  int    nmiss   = field.nmiss;
+  double *array  = field.ptr;
+
+  if ( nmiss > 0 ) 
+    cdoAbort("Missing values not implemented in crps calculation");
+
+  // Use first value as reference
+  sort_iter_single(len-1,&array[1],ompNumThreads);
+
+  return crps_det_integrate(&array[1],array[0],len-1);
+}
+
+double fldbrs(field_t field) 
+{
+  long      len   = field.size;
+  int     nmiss   = field.nmiss;
+  double *array   = field.ptr;
+  double brs = 0;
+  int i;
+
+  // Use first value as reference
+  for ( i=1; i<len; i++ )
+    brs += (array[i] - array[0]) * (array[i] - array[0]);
+
+  return brs;
 }
 
 double fldmin(field_t field)
@@ -457,3 +493,42 @@ int fldhvs(field_t *fieldPtr, int nlevels)
     }
   return FALSE;
 }
+
+
+
+double crps_det_integrate(double *a, const double d, const int n)
+{
+  /* *************************************************************************** */
+  /* This routine finds the area between the cdf described by the ordered array  */
+  /* of doubles (double *a) and the Heavyside function H(d)                      */
+  /* INPUT ARGUMENTS:                                                            */
+  /*     double *a  - ordered array of doubles describing a cdf                  */
+  /*                  as cdf(a[i]) = ( (double)i )/ n                            */
+  /*     double d   - describing a reference value                               */
+  /*     int n      - the length of array a                                      */
+  /* RETURN VALUE:                                                               */
+  /*     double     - area under the curve in units of a                         */
+  /* *************************************************************************** */
+
+  double area = 0; 
+  double tmp;
+  int i;
+#if defined (_OPENMP)
+#pragma omp parallel for if ( n>10000 ) shared(a) private(i) \
+  reduction(+:area) schedule(static,10000) 
+#endif                                                     /* **************************** */
+  for ( i=1; i<n; i++ ) {                                  /* INTEGRATE CURVE AREA         */
+    if ( a[i] < d )                                        /* left of heavyside            */
+      area += (a[i]-a[i-1])*(double)i*i/n/n;                   /*                              */
+    else if ( a[i-1] > d )                                 /* right of heavyside           */
+      area += (a[i]-a[i-1])*(1.-(double)i/n)*(1.-(double)i/n);              /*                              */
+    else if ( a[i-1] < d && a[i] > d ) {                   /* hitting jump pf heavyside    */
+      area += (d-a[i-1]) * (double)i*i/n/n;                    /* (occurs exactly once!)       */
+      area += (a[i]-d) * (1.-(double)i/n)*(1.-(double)i/n);                 /* **************************** */
+    }
+  }
+
+
+  return(area);
+}
+

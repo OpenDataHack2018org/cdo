@@ -218,6 +218,8 @@ cdo_SOURCES += Arith.c         \
                legendre.c      \
                list.c          \
                list.h          \
+	       merge_sort2.c   \
+	       merge_sort2.h   \
                modules.c       \
                modules.h       \
                namelist.c      \

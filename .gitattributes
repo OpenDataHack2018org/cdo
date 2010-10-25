@@ -466,6 +466,8 @@ src/juldate.c -text
 src/legendre.c -text
 src/list.c -text
 src/list.h -text
+src/merge_sort2.c -text
+src/merge_sort2.h -text
 src/modules.c -text
 src/modules.h -text
 src/namelist.c -text

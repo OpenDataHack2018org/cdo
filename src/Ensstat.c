@@ -26,6 +26,9 @@
       Ensstat    ensstd          Ensemble standard deviation
       Ensstat    ensvar          Ensemble variance
       Ensstat    enspctl         Ensemble percentiles
+
+      Ensstat    enscrps         Ensemble cumulative ranked probability score
+      Ensstat    ensbrs          Ensemble brier score
 */
 
 #if defined (_OPENMP)
@@ -86,6 +89,11 @@ void *Ensstat(void *argument)
   /* RQ */
   cdoOperatorAdd("enspctl", func_pctl,  0, NULL);
   /* QR */
+
+  /* >>> Cedrick Ansorge 18.10.2010 */
+  cdoOperatorAdd("enscrps", func_crps, 0, NULL);
+  cdoOperatorAdd("ensbrs",  func_brs,  0, NULL);
+  /* <<< Cedrick Ansorge 18.10.2010 */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
