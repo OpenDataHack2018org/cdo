@@ -82,6 +82,10 @@ double fldpctl(field_t field, int k);
 void   fldunm(field_t *field);
 int    fldhvs(field_t *field, int nlevels);
 
+/* ENS VALIDATION */
+double fldcrps(field_t field);
+double fldbrs(field_t field);
+
 /* fieldzon.c */
 
 void zonfun(field_t field1, field_t *field2, int function);

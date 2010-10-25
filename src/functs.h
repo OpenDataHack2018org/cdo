@@ -15,6 +15,9 @@
 #define  func_pctl  17
 /* QR */
 
+#define  func_crps  18
+#define  func_brs   19
+
 #define  func_fld   21
 
 #define  func_add   41
