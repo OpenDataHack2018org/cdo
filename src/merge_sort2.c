@@ -143,11 +143,11 @@ void sort_par(const long num_links, double *restrict add1, int parent, int par_d
   /* ********************************* */
   /* Idea I: one CPU merges top-down, the other one bottom-up */
   {
-    uint64_t end,start;
-    start = mach_absolute_time();                         /* ********************** */
+    //    uint64_t end,start;
+    //    start = mach_absolute_time();                         /* ********************** */
     merge_lists(nl,add1s[0],add1s[1], idx);                     /* MERGE THE SEGMENTS     */
-    end = mach_absolute_time();                           /* ********************** */
-    merge_time += end-start;
+    //    end = mach_absolute_time();                           /* ********************** */
+    //    merge_time += end-start;
   }
 
   tmp = malloc(num_links*sizeof(double));
@@ -212,10 +212,9 @@ void sort_iter_single(const long num_links, double *restrict add1, int parent)
 
   if ( parent == 1 ) {
     first_sort_iter_call = 1;
-    mach_timebase_info_data_t info = {0,0};
-    mach_timebase_info(&info);
-
-    merge_time = merge_time * (info.numer / info.denom)/1000./num_links;
+    //    mach_timebase_info_data_t info = {0,0};
+    //    mach_timebase_info(&info);
+    //    merge_time = merge_time * (info.numer / info.denom)/1000./num_links;
     //    fprintf(stderr,"%12.8g ",merge_time);
     
     merge_time = 0;

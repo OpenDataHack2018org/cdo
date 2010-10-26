@@ -8,7 +8,6 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
-#include <mach/mach_time.h>
 
 #if defined (_OPENMP)
 #include <omp.h>
