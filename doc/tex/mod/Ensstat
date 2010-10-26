@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifiles ofile
-@Operators = ensmin ensmax enssum ensmean ensavg ensvar ensstd enspctl ensbrs enscrps
+@Operators = ensmin ensmax enssum ensmean ensavg ensvar ensstd enspctl
 
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
@@ -144,42 +144,10 @@ o(t,x) = \mbox{\bf pth percentile} \{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndDescription
 @EndOperator
 
-
-@BeginOperator_ensbrs
-@Title     = Brier score
-
-@BeginDescription
-@IfMan
-o(t,x) = (i2(t,x)-i1(t,x))^2 + (i3(t,x)-i1(t,x))^2 + ... + (in(t,x)-i1(t,x))^2
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \sum_{j=2}^{n} (i_j(t,x)-i_1(t,x))^2
-@EndMath
-@EndifDoc
-@EndDescription
-@EndOperator
-
-@BeginOperator_enscrps
-@Title     = Cumulative Ranked Probability score
-
-@BeginDescription
-@IfMan
-o(t,x) = crps( {i1(t,x)}, {i2(t,x),...,in(t,x)} )
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = crps( \{i_1(t,x)\}, \{i_2(t,x),\ldots,i_n(t,x)\} )
-@EndMath
-@EndifDoc
-@EndDescription
-@EndOperator
-
 @BeginParameter
 @Item = p
 FLOAT  Percentile number in {0, ..., 100}
 @EndParameter
-
 
 @BeginExample
 To compute the ensemble mean over 6 input files use:
