@@ -30,14 +30,15 @@
 
 #if defined (__GNUC__)
 #if __GNUC__ > 2
-#  define WITH_ETOPO 1
+#  define WITH_DATA 1
 #endif
 #endif
 
 
-#if defined(WITH_ETOPO)
-  static double etopo_scale = 3;
-  static const short etopo[] = {
+#if defined(WITH_DATA)
+  static double etopo_scale  = 3;
+  static double etopo_offset = 11000;
+  static const unsigned short etopo[] = {
 #include "etopo.h"
   };
 #endif
@@ -46,7 +47,7 @@
 void *Vargen(void *argument)
 {
   static const char *func = "Vargen";
-  int RANDOM, CONST, TOPO, FOR;
+  int RANDOM, CONST, FOR, TOPO, TEMP, MASK;
   int operatorID;
   int streamID;
   int nrecs, ntimesteps;
@@ -65,7 +66,7 @@ void *Vargen(void *argument)
   RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name, <seed>");
   CONST  = cdoOperatorAdd("const",  0, 0, "constant value, grid description file or name");
   TOPO   = cdoOperatorAdd("topo",   0, 0, "");
-  FOR    = cdoOperatorAdd("for",    0, 0, "start, end<, increment>");
+  FOR    = cdoOperatorAdd("for",    0, 0, "start, end, <increment>");
 
   operatorID = cdoOperatorID();
 
@@ -191,9 +192,9 @@ void *Vargen(void *argument)
 	    }
 	  else if ( operatorID == TOPO )
 	    {
-#if defined(WITH_ETOPO)
+#if defined(WITH_DATA)
 	      for ( i = 0; i < gridsize; i++ )
-		array[i] = (double)etopo[i]/etopo_scale;
+		array[i] = (double)etopo[i]/etopo_scale - etopo_offset;
 #else
 	      cdoAbort("Operator support disabled!");
 #endif
