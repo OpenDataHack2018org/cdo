@@ -181,6 +181,8 @@ cdo_SOURCES += Arith.c         \
                ecautil.h       \
                error.h         \
                etopo.h         \
+               temp.h          \
+               mask.h          \
                exception.c     \
                expr.c          \
                expr.h          \

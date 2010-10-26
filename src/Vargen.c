@@ -41,6 +41,18 @@
   static const unsigned short etopo[] = {
 #include "etopo.h"
   };
+
+  static double temp_scale  =  500;
+  static double temp_offset = -220;
+  static const unsigned short temp[] = {
+#include "temp.h"
+  };
+
+  static double mask_scale  =  1;
+  static double mask_offset =  0;
+  static const unsigned short mask[] = {
+#include "mask.h"
+  };
 #endif
 
 
@@ -65,8 +77,10 @@ void *Vargen(void *argument)
 
   RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name, <seed>");
   CONST  = cdoOperatorAdd("const",  0, 0, "constant value, grid description file or name");
-  TOPO   = cdoOperatorAdd("topo",   0, 0, "");
   FOR    = cdoOperatorAdd("for",    0, 0, "start, end, <increment>");
+  TOPO   = cdoOperatorAdd("topo",   0, 0, NULL);
+  TEMP   = cdoOperatorAdd("temp",   0, 0, NULL);
+  MASK   = cdoOperatorAdd("mask",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -95,7 +109,7 @@ void *Vargen(void *argument)
       gridfile = operatorArgv()[1];
       gridID   = cdoDefineGrid(gridfile);
     }
-  else if ( operatorID == TOPO )
+  else if ( operatorID == TOPO || operatorID == TEMP || operatorID == MASK )
     {
       int nlon, nlat, i;
       double lon[720], lat[360];
@@ -144,10 +158,12 @@ void *Vargen(void *argument)
   else
     varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
+  vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
+
   taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
-  if ( operatorID == RANDOM || operatorID == CONST || operatorID == TOPO )
+  if ( operatorID == RANDOM || operatorID == CONST || operatorID == TOPO || operatorID == TEMP || operatorID == MASK )
     vlistDefNtsteps(vlistID, 1);
 
   streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
@@ -194,7 +210,25 @@ void *Vargen(void *argument)
 	    {
 #if defined(WITH_DATA)
 	      for ( i = 0; i < gridsize; i++ )
-		array[i] = (double)etopo[i]/etopo_scale - etopo_offset;
+		array[i] = etopo[i]/etopo_scale - etopo_offset;
+#else
+	      cdoAbort("Operator support disabled!");
+#endif
+	    }
+	  else if ( operatorID == TEMP )
+	    {
+#if defined(WITH_DATA)
+	      for ( i = 0; i < gridsize; i++ )
+		array[i] = temp[i]/temp_scale - temp_offset;
+#else
+	      cdoAbort("Operator support disabled!");
+#endif
+	    }
+	  else if ( operatorID == MASK )
+	    {
+#if defined(WITH_DATA)
+	      for ( i = 0; i < gridsize; i++ )
+		array[i] = mask[i]/mask_scale - mask_offset;
 #else
 	      cdoAbort("Operator support disabled!");
 #endif

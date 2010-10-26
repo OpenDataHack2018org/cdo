@@ -410,7 +410,7 @@ void *Wct(void *argument);
 #define  TrmsOperators          {"trms"}
 #define  TstepcountOperators    {"tstepcount"}
 #define  VardupOperators        {"pardup", "parmul"}
-#define  VargenOperators        {"random", "const", "topo", "for"}
+#define  VargenOperators        {"random", "const", "for", "topo", "temp", "mask"}
 #define  VarrmsOperators        {"varrms"}
 #define  VertintOperators       {"ml2pl", "ml2hl", "ml2plx", "ml2hlx", \
                                  "ml2pl_lp", "ml2hl_lp", "ml2plx_lp", "ml2hlx_lp"}
