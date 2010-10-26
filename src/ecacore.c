@@ -1003,7 +1003,7 @@ void eca4(const ECA_REQUEST_4 *request)
   field_t *startDateWithHist[2], *endDateWithHist[2];
   field_t *gslDuration, *gslFirstDay;
   field_t fieldGt              , fieldLt             , mask;
-  int resetAtJan, resetAtJul = FALSE;
+  int resetAtJan = FALSE, resetAtJul = FALSE;
   int isFirstYear = TRUE;
   int missCount;
 

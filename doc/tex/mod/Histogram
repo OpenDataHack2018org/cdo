@@ -54,7 +54,7 @@ Mean of elements in the bin range.
 @Parameter = bounds
 
 @BeginDescription
-Frequency of elements in the bin range.
+Relative frequency of elements in the bin range.
 @EndDescription
 @EndOperator
 

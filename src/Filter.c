@@ -305,6 +305,8 @@ void *Filter(void *argument)
   array2 = (double *) malloc(nts2*sizeof(double));
   fmasc  = (int *) calloc(nts2, sizeof(int));
    
+  for ( tsID = 0; tsID < nts; tsID++ ) array2[tsID] = 0;
+
   switch(operfunc)
   {
     case BAND: 
@@ -350,6 +352,7 @@ void *Filter(void *argument)
                   if ( i < gridsize - 1 )                 
                     array2[tsID] = vars[tsID][varID][levelID].ptr[i+1];
                 }
+
               /* zero padding up to next power of to */
               for ( tsID = nts; tsID < nts2; tsID++ )                
                 {
