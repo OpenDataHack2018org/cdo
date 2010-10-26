@@ -2,12 +2,13 @@
 #define _MERGE_SORT2_H_
 
 /* MERGE SORT DEFINES */
-#define cdoVerbose 0
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include "cdo.h"
 
 #if defined (_OPENMP)
 #include <omp.h>

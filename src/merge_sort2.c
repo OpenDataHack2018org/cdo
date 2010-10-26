@@ -1,42 +1,18 @@
 #include "merge_sort2.h"
 
-/* ******************************************************************************** 
-    XXX       XXX    XXXXXXXXXX    XXXXXXXXXX       XXXXXXXXXXX   XXXXXXXXXX
-    XXXX     XXXX    XXXXXXXXXX    XXXXXXXXXXX     XXXXXXXXXXX    XXXXXXXXXX
-    XXXXX   XXXXX    XXX           XXX     XXX     XXX            XXX
-    XXXXXX XXXXXX    XXXXXXXXX     XXXX  XXXX      XXX            XXXXXXXX
-    XXX  XXX  XXX    XXXXXXXXX     XXXXXXX         XXX     XXXX   XXXXXXXX
-    XXX   X   XXX    XXX           XXX XXXX        XXX      XXX   XXX
-    XXX       XXX    XXXXXXXXXX    XXX   XXXX      XXXXXXXXXXXX   XXXXXXXXXX
-    XXX       XXX    XXXXXXXXXX    XXX     XXXX     XXXXXXXXXX    XXXXXXXXXX
-
-
-           XXXXXXXXXXX      XXXXXXXX     XXXXXXXXXX      XXXXXXXXXXXXX
-          XXXXXXXXXXX      XXX    XXX    XXXXXXXXXXX     XXXXXXXXXXXXX
-          XXX             XXX      XXX   XXX     XXX          XXX
-          XXXXXXXXXXX     XXX      XXX   XXXX  XXXX           XXX
-           XXXXXXXXXXX    XXX      XXX   XXXXXXXX             XXX
-                   XXX    XXX      XXX   XXX XXXX             XXX
-           XXXXXXXXXXX     XXX    XXX    XXX   XXXX           XXX
-          XXXXXXXXXXX       XXXXXXXX     XXX     XXXX         XXX
-********************************************************************************** */
-
 static
 void merge_lists(int *nl, const double *restrict l1, const double *restrict l2, long *idx)
 {      
   /*
     This routine writes to idx a list of indices relative to *l11 and *l12
-    --> l11, l12, and l21,l22 each need to be allocated in 
+    --> l1, and l2 need to be allocated in 
         a signle block of memory
-    The order is thus, that (I) l11[idx[i]]<l11[idx[i+1]]	
+    The order is thus, that (I) l1[idx[i]]<=l1[idx[i+1]]	
 		       where 0 <= i < nl
   */    		       
 
-
-  int i1=0, i2=0, i=0, ii;
   const int n1=nl[0], n2=nl[1];
-
-  i=0;
+  int i1=0, i2=0, i=0, ii=0;
 
   while ( i2 < n2 && i1 < n1 ) 
     {
@@ -78,8 +54,10 @@ void sort_par(const long num_links, double *restrict add1, int parent, int par_d
 			   sub-array within the original array 
   */
 
+  const char func[] = "sort_par";
 
-  const int nsplit = 2;                      /* (only 2 allowed) number of segments to split the data */
+  const int nsplit = 2;                      /* (only 2 allowed) number of segments to split 
+						the data */
   int nl[nsplit];                            /* number of links in each sub-array              */
   int who_am_i,depth,my_depth;               /* current depth, depth of children and index
 						to be parent in next call to sort_par          */
@@ -142,6 +120,7 @@ void sort_par(const long num_links, double *restrict add1, int parent, int par_d
   /* THIS BIT NEEDS TO BE PARALLELIZED */
   /* ********************************* */
   /* Idea I: one CPU merges top-down, the other one bottom-up */
+  /*         ideally they should meet in the middle :)        */
   {
     //    uint64_t end,start;
     //    start = mach_absolute_time();                         /* ********************** */
@@ -230,12 +209,11 @@ void sort_add(const long num_links, double *restrict add1)
     This routine sorts address and weight arrays based on the
     destination address with the source address as a secondary
     sorting criterion. The method is a standard heap sort.
-  */
-  /*
+
     Input and Output arrays:
     
        long num_links; ! num of links for this mapping
-       add1,           ! destination address array [num_links]
+       double *add1    ! destination address array [num_links]
   */
 
   /* Local variables */
@@ -247,10 +225,6 @@ void sort_add(const long num_links, double *restrict add1)
 
   if ( num_links <= 1 ) return;
 
-  /*
-  for ( n = 0; n < num_links; n++ )
-    printf("in: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
-  */
   /*
     start at the lowest level (N/2) of the tree and shift lower 
     values to the bottom of the tree, promoting the larger numbers
@@ -303,7 +277,7 @@ void sort_add(const long num_links, double *restrict add1)
 	}
 
       if ( i == num_links ) {
-	cdoAbort(stderr,"Internal problem; link 1 not found!\n");
+	cdoAbort("Internal problem; link 1 not found!\n");
 	exit(1);
       }
     }
@@ -366,7 +340,7 @@ void sort_add(const long num_links, double *restrict add1)
 	}
 
       if ( i == num_links ) {
-	cdoAbort(stderr,"Internal problem; link 2 not found!\n");
+	cdoAbort("Internal problem; link 2 not found!\n");
       }
     }
 
@@ -376,10 +350,6 @@ void sort_add(const long num_links, double *restrict add1)
   add1[1]  = add1[0];
   add1[0]  = add1_tmp;
 
-  /*
-  for ( n = 0; n < num_links; n++ )
-    printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
-  */
 } /* sort_add */
 
 

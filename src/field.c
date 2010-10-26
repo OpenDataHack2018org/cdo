@@ -68,7 +68,7 @@ double fldfun(field_t field, int function)
   else if ( function == func_std  )  rval = fldstd(field);
   else if ( function == func_var  )  rval = fldvar(field);
   else if ( function == func_crps )  rval = fldcrps(field);
-  else if ( function == func_brs )    rval = fldbrs(field);
+  else if ( function == func_brs )   rval = fldbrs(field);
   else cdoAbort("function %d not implemented!", function);
 
   return rval;
@@ -83,11 +83,16 @@ double fldcrps(field_t field)
 
   if ( nmiss > 0 ) 
     cdoAbort("Missing values not implemented in crps calculation");
+  // possible handling of missing values:
+  // (1) strip them off, and sort array without missing values
+  //     using only (len - 1 - nmiss) values
+  // (2) modify merge_sort in a way, that missing values will
+  //     always go to the end of the list
 
   // Use first value as reference
   sort_iter_single(len-1,&array[1],ompNumThreads);
-
   return crps_det_integrate(&array[1],array[0],len-1);
+
 }
 
 double fldbrs(field_t field) 
@@ -95,14 +100,31 @@ double fldbrs(field_t field)
   long      len   = field.size;
   int     nmiss   = field.nmiss;
   double *array   = field.ptr;
+  double missval  = field.missval;
+
   double brs = 0;
-  int i;
+  int i,count=0;
 
-  // Use first value as reference
-  for ( i=1; i<len; i++ )
-    brs += (array[i] - array[0]) * (array[i] - array[0]);
+  // Using first value as reference
+  if ( nmiss == 0 ) 
+    {
+      for ( i=1; i<len; i++ )
+	brs += (array[i] - array[0]) * (array[i] - array[0]);
+      count = i-1;
+    }
+  else 
+    {
+      if ( array[0] == missval ) 
+	return missval;
+      for ( i=1; i<len; i++ )
+	if ( array[i] != missval ) 
+	  {
+	    brs += (array[i] - array[0]) * (array[i] - array[0]);
+	    count ++;
+	  }
+    }
 
-  return brs;
+  return brs/count;
 }
 
 double fldmin(field_t field)
