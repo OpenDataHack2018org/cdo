@@ -64,5 +64,17 @@ In this section the abbreviations as in the following table are used:
 \sqrt{
   \left ( \sum_{j=1}^{n} w_j \right )^{-1} \sum\limits_{i=1}^{n} w_i \, 
   \left ( x_i - \left ( \sum_{j=1}^{n} w_j \right )^{-1} \sum\limits_{j=1}^{n} w_j \, x_j \right)^2 } \\
+\\
+\begin{array}{l}
+\makebox[3cm][l]{Cumulative Ranked} \\
+\makebox[3cm][l]{Probability Score} \\
+\makebox[3cm][l]{{\bf crps}} \\
+\end{array}
+ &  &
+\int_{-\infty}^{\infty} \left[ H(x_1) - cdf(\{x_2\ldots x_n\})|_{r} \right]^2 dr \\
 \end{eqnarray*}
+\hspace{1cm} with \(cdf(X)|_r\) being the cumulative distribution function of \(\{x_i,i=2\ldots n\}\) at \(r\)\\
+
+\hspace{1cm} and \(H(x)\) the Heavyside function jumping at \(x\).
+
 }}
