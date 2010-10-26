@@ -466,6 +466,7 @@ src/juldate.c -text
 src/legendre.c -text
 src/list.c -text
 src/list.h -text
+src/mask.h -text
 src/merge_sort2.c -text
 src/merge_sort2.h -text
 src/modules.c -text
@@ -499,6 +500,7 @@ src/specspace.h -text
 src/statistic.c -text
 src/statistic.h -text
 src/table.c -text
+src/temp.h -text
 src/timebase.h -text
 src/timer.c -text
 src/userlog.c -text
