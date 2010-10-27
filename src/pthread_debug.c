@@ -180,13 +180,13 @@ void Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
       switch (status)
 	{
 	case EINVAL:
-	  Error(func, "the mutex has not been properly initialized");
+	  Error(func, "The mutex has not been properly initialized!");
 	  break;
 	case EDEADLK:
-	  Error(func, "the mutex is already locked by the calling thread");
+	  Error(func, "The mutex is already locked by the calling thread!");
 	  break;
 	default:
-	  Error(func, "status %d unknown", status, (void *) mutex);
+	  Error(func, "Status %d unknown!", status, (void *) mutex);
 	}
     }
 
@@ -207,13 +207,13 @@ void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
       switch (status)
 	{
 	case EINVAL:
-	  Error(func, "the mutex has not been properly initialized");
+	  Error(func, "The mutex has not been properly initialized!");
 	  break;
 	case EPERM:
-	  Error(func, "the calling thread does not own the mutex");
+	  Error(func, "The calling thread does not own the mutex!");
 	  break;
 	default:
-	  Error(func, "status %d unknown", status);
+	  Error(func, "Status %d unknown!", status);
 	}
     }
 
