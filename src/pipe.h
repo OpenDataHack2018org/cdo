@@ -27,7 +27,7 @@
 #if  defined  (HAVE_LIBPTHREAD)
 
 #include <pthread.h>
-#include <pthread_debug.h>
+#include "pthread_debug.h"
 
 #endif
 

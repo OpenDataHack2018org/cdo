@@ -29,7 +29,7 @@ void merge_lists(int *nl, const double *restrict l1, const double *restrict l2, 
 }
 
 static
-void sort_par(const long num_links, double *restrict add1, int parent, int par_depth)
+void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 {
   /*
     This routine is the core of merge-sort. It does the following
@@ -130,12 +130,12 @@ void sort_par(const long num_links, double *restrict add1, int parent, int par_d
   }
 
   tmp = malloc(num_links*sizeof(double));
-  
+
 #if defined (_OPENMP)
-#pragma omp parallel for if ( depth < par_depth && num_links > 4096 )	\
+#pragma omp parallel for if ( depth < par_depth /* && num_links > 4096*/ ) \
     private(i) num_threads(2) schedule(static,1024)
 #endif
-  for ( i=0; i< num_links; i++ )
+  for ( i=0; i < num_links; i++ )
     tmp[i] = add1[idx[i]];
   
   memcpy(add1,tmp,num_links*sizeof(double));
@@ -148,62 +148,8 @@ void sort_par(const long num_links, double *restrict add1, int parent, int par_d
   return;
 }
 
-
-void sort_iter_single(const long num_links, double *restrict add1, int parent)
-{
-  /*
-    This routine is an interface between the parallelized (merge-sort) 
-    and the sequential sorting algorithm for addresses implemented in
-    the library. 
-    It iterates 1 level into the binary tree if the single data chunks
-    to sort are larger than the maximum size prescribed. Otherwise, it
-    just sorts the chunk using the sort_add routine as implemented 
-    originally. 
-    Note, that even on a single CPU, the merge sort algorithm can be
-    considerably faster (up to about 30% for a reasonable chunk size)
-  */
-
-  /* Parameters as in sort_par 
-     additional parameters 
-     int mod;      (enum TPAR_MODE) determines wether tomake use of merge sort
-     int parent;   !!! CAUTION !!!
-                   + determines level and position of data chunk within 
-                     the original heap (level = log_2(who_am_i)) if sort_iter(...) has not
-		     been called before
-		   + determines number of threads to use on first call of sort_iter(...)
-  */
-
-  int par_depth = 1;
-              
-  if ( first_sort_iter_call )
-    {
-      first_sort_iter_call = 0; 
-      par_depth = (int)(log(parent)/log(2));
-      MERGE_SORT_LIMIT_SIZE = num_links/parent/2 ;
-      if ( MERGE_SORT_LIMIT_SIZE < 4096 ) MERGE_SORT_LIMIT_SIZE = 4096;
-      parent = 1;
-    }
-
-  if ( num_links > MERGE_SORT_LIMIT_SIZE )
-    sort_par(num_links, add1, parent, par_depth);
-  else
-    sort_add(num_links,add1);
-
-  if ( parent == 1 ) {
-    first_sort_iter_call = 1;
-    //    mach_timebase_info_data_t info = {0,0};
-    //    mach_timebase_info(&info);
-    //    merge_time = merge_time * (info.numer / info.denom)/1000./num_links;
-    //    fprintf(stderr,"%12.8g ",merge_time);
-    
-    merge_time = 0;
-  }
-
-  return;
-}
-
 static
-void sort_add(const long num_links, double *restrict add1)
+void sort_add(long num_links, double *restrict add1)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -353,4 +299,55 @@ void sort_add(const long num_links, double *restrict add1)
 } /* sort_add */
 
 
+void sort_iter_single(long num_links, double *restrict add1, int parent)
+{
+  /*
+    This routine is an interface between the parallelized (merge-sort) 
+    and the sequential sorting algorithm for addresses implemented in
+    the library. 
+    It iterates 1 level into the binary tree if the single data chunks
+    to sort are larger than the maximum size prescribed. Otherwise, it
+    just sorts the chunk using the sort_add routine as implemented 
+    originally. 
+    Note, that even on a single CPU, the merge sort algorithm can be
+    considerably faster (up to about 30% for a reasonable chunk size)
+  */
 
+  /* Parameters as in sort_par 
+     additional parameters 
+     int mod;      (enum TPAR_MODE) determines wether tomake use of merge sort
+     int parent;   !!! CAUTION !!!
+                   + determines level and position of data chunk within 
+                     the original heap (level = log_2(who_am_i)) if sort_iter(...) has not
+		     been called before
+		   + determines number of threads to use on first call of sort_iter(...)
+  */
+
+  int par_depth = 1;
+              
+  if ( first_sort_iter_call )
+    {
+      first_sort_iter_call = 0; 
+      par_depth = (int)(log(parent)/log(2));
+      MERGE_SORT_LIMIT_SIZE = num_links/parent/2 ;
+      if ( MERGE_SORT_LIMIT_SIZE < 4096 ) MERGE_SORT_LIMIT_SIZE = 4096;
+      parent = 1;
+    }
+ 
+  if ( num_links > MERGE_SORT_LIMIT_SIZE )
+    sort_par(num_links, add1, parent, par_depth);
+  else
+    sort_add(num_links,add1);
+
+  if ( parent == 1 ) {
+    first_sort_iter_call = 1;
+    //    mach_timebase_info_data_t info = {0,0};
+    //    mach_timebase_info(&info);
+    //    merge_time = merge_time * (info.numer / info.denom)/1000./num_links;
+    //    fprintf(stderr,"%12.8g ",merge_time);
+    
+    merge_time = 0;
+  }
+
+  return;
+}

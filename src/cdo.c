@@ -31,7 +31,7 @@
 #include <sys/resource.h>   /* getrlimit */
 #endif
 #endif
-#include <unistd.h>         /* sysconf */
+#include <unistd.h>         /* sysconf, gethostname */
 
 #if defined (SX)
 #define RLIM_T  long long
