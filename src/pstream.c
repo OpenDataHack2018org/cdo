@@ -86,7 +86,7 @@ static pthread_mutex_t _pstream_mutex;
 
 typedef struct _pstreamPtrToIdx {
   int idx;
-  PSTREAM *ptr;
+  pstream_t *ptr;
   struct _pstreamPtrToIdx *next;
 } pstreamPtrToIdx;
 
@@ -95,7 +95,8 @@ static pstreamPtrToIdx *_pstreamList  = NULL;
 static pstreamPtrToIdx *_pstreamAvail = NULL;
 
 
-static void pstream_list_new(void)
+static
+void pstream_list_new(void)
 {
   static const char *func = "pstream_list_new";
 
@@ -104,16 +105,16 @@ static void pstream_list_new(void)
   _pstreamList = (pstreamPtrToIdx *) malloc(_pstream_max*sizeof(pstreamPtrToIdx));
 }
 
-
-static void pstream_list_delete(void)
+static
+void pstream_list_delete(void)
 {
   static const char *func = "pstream_list_delete";
 
   if ( _pstreamList ) free(_pstreamList);
 }
 
-
-static void pstream_init_pointer(void)
+static
+void pstream_init_pointer(void)
 {
   int  i;
   
@@ -129,11 +130,11 @@ static void pstream_init_pointer(void)
   _pstreamAvail = _pstreamList;
 }
 
-
-static PSTREAM *pstream_to_pointer(int idx)
+static
+pstream_t *pstream_to_pointer(int idx)
 {
   static const char *func = "pstream_to_pointer";
-  PSTREAM *pstreamptr = NULL;
+  pstream_t *pstreamptr = NULL;
 
   PSTREAM_INIT
 
@@ -151,9 +152,9 @@ static PSTREAM *pstream_to_pointer(int idx)
   return (pstreamptr);
 }
 
-
 /* Create an index from a pointer */
-static int pstream_from_pointer(PSTREAM *ptr)
+static
+int pstream_from_pointer(pstream_t *ptr)
 {
   static const char *func = "pstream_from_pointer";
   int      idx = -1;
@@ -185,8 +186,8 @@ static int pstream_from_pointer(PSTREAM *ptr)
   return (idx);
 }
 
-
-static void pstream_init_entry(PSTREAM *pstreamptr)
+static
+void pstream_init_entry(pstream_t *pstreamptr)
 {
   pstreamptr->self       = pstream_from_pointer(pstreamptr);
 
@@ -211,21 +212,21 @@ static void pstream_init_entry(PSTREAM *pstreamptr)
 #endif
 }
 
-
-static PSTREAM *pstream_new_entry(void)
+static
+pstream_t *pstream_new_entry(void)
 {
   static const char *func = "pstream_new_entry";
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
-  pstreamptr = (PSTREAM *) malloc(sizeof(PSTREAM));
+  pstreamptr = (pstream_t *) malloc(sizeof(pstream_t));
 
   if ( pstreamptr ) pstream_init_entry(pstreamptr);
 
   return (pstreamptr);
 }
 
-
-static void pstream_delete_entry(PSTREAM *pstreamptr)
+static
+void pstream_delete_entry(pstream_t *pstreamptr)
 {
   static const char *func = "pstream_delete_entry";
   int idx;
@@ -246,8 +247,8 @@ static void pstream_delete_entry(PSTREAM *pstreamptr)
     Message(func, "Removed idx %d from pstream list", idx);
 }
 
-
-static void pstream_initialize(void)
+static
+void pstream_initialize(void)
 {
   static const char *func = "pstream_initialize";
   char *env;
@@ -274,11 +275,11 @@ static void pstream_initialize(void)
   _pstream_init = TRUE;
 }
 
-
-static int pstreamFindID(const char *name)
+static
+int pstreamFindID(const char *name)
 {
   int pstreamID;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   for ( pstreamID = 0; pstreamID < _pstream_max; pstreamID++ )
     {
@@ -297,7 +298,7 @@ static int pstreamFindID(const char *name)
 
 int pstreamIsPipe(int pstreamID)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -313,7 +314,7 @@ int pstreamOpenRead(const char *argument)
   int ispipe = FALSE;
   int fileID;
   int pstreamID;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   PSTREAM_INIT
 
@@ -568,7 +569,6 @@ int pstreamOpenRead(const char *argument)
   return (pstreamID);
 }
 
-
 static
 void query_user_exit(const char *argument)
 {
@@ -634,7 +634,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
   int fileID;
   int pstreamID = -1;
   int ispipe;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   PSTREAM_INIT
 
@@ -745,7 +745,7 @@ int pstreamOpenAppend(const char *argument)
   int fileID;
   int pstreamID = -1;
   int ispipe;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   ispipe = memcmp(argument, "(pipe", 5) == 0;
 
@@ -787,7 +787,7 @@ int pstreamOpenAppend(const char *argument)
 void pstreamClose(int pstreamID)
 {
   static const char *func = "pstreamClose";
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -797,7 +797,7 @@ void pstreamClose(int pstreamID)
   if ( pstreamptr->ispipe )
     {
 #if  defined  (HAVE_LIBPTHREAD)
-      PIPE *pipe;
+      pipe_t *pipe;
       int lread = FALSE, lwrite = FALSE;
       pthread_t threadID = pthread_self();
 
@@ -890,7 +890,7 @@ void pstreamClose(int pstreamID)
 int pstreamInqVlist(int pstreamID)
 {
   int vlistID;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -908,9 +908,9 @@ int pstreamInqVlist(int pstreamID)
 
       if ( cdoDefaultTimeType != CDI_UNDEFID )
 	taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
-    }
 
-  pstreamptr->vlistID = vlistID;
+      pstreamptr->vlistID = vlistID;
+    }
 
   if ( vlistNumber(vlistID) == CDI_COMP && cdoStreamNumber() == CDI_REAL )
     cdoAbort("Complex fields are not supported by this operator!");
@@ -944,7 +944,7 @@ const char *cdoComment(void)
 }
 
 static
-void pstreamDefVarlist(PSTREAM *pstreamptr, int vlistID)
+void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 {
   static const char *func = "pstreamDefVarlist";
   int varID, nvars;
@@ -1014,7 +1014,7 @@ void pstreamDefVarlist(PSTREAM *pstreamptr, int vlistID)
 
 void pstreamDefVlist(int pstreamID, int vlistID)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -1059,7 +1059,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
 int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -1080,7 +1080,7 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 
 void pstreamDefRecord(int pstreamID, int varID, int levelID)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
   
@@ -1103,7 +1103,7 @@ void pstreamDefRecord(int pstreamID, int varID, int levelID)
 
 void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamReadRecord)!");
 
@@ -1122,7 +1122,7 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 }
 
 
-void pstreamCheckDatarange(PSTREAM *pstreamptr, int varID, double *array, int nmiss)
+void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int nmiss)
 {
   long i, ivals, gridsize;
   int datatype;
@@ -1186,7 +1186,7 @@ void pstreamCheckDatarange(PSTREAM *pstreamptr, int varID, double *array, int nm
 
 void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamWriteRecord)!");
 
@@ -1217,7 +1217,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 {
   static const char *func = "pstreamInqTimestep";
   int nrecs = 0;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -1297,7 +1297,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 
 void pstreamDefTimestep(int pstreamID, int tsID)
 {
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -1328,7 +1328,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 {
   static const char *func = "pstreamCopyRecord";
-  PSTREAM *pstreamptr_dest, *pstreamptr_src;
+  pstream_t *pstreamptr_dest, *pstreamptr_src;
 
   if ( PSTREAM_Debug )
     Message(func, "pstreamIDdest = %d  pstreamIDsrc = %d", pstreamIDdest, pstreamIDsrc);
@@ -1388,7 +1388,7 @@ void cdoFinish(void)
   double e_utime, e_stime;
   double c_cputime = 0, c_usertime = 0, c_systime = 0;
   double p_cputime = 0, p_usertime = 0, p_systime = 0;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
 #if  defined  (HAVE_LIBPTHREAD)
   if ( PSTREAM_Debug )
@@ -1515,7 +1515,7 @@ void cdoFinish(void)
 int pstreamInqFiletype(int pstreamID)
 {
   int filetype;
-  PSTREAM *pstreamptr;
+  pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 

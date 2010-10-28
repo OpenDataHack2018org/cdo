@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2006 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,8 @@
 
 static int PipeDebug = 0;
 
-static void pipe_init(PIPE *pipe)
+static
+void pipe_init(pipe_t *pipe)
 {
   static const char *func = "pipe_init";
   pthread_mutexattr_t m_attr;
@@ -115,12 +116,12 @@ static void pipe_init(PIPE *pipe)
 }
 
 
-PIPE *pipeNew()
+pipe_t *pipeNew()
 {
   static const char *func = "pipeNew";  
-  PIPE *pipe;
+  pipe_t *pipe;
 
-  pipe = (PIPE *) malloc(sizeof(PIPE));
+  pipe = (pipe_t *) malloc(sizeof(pipe_t));
 
   pipe_init(pipe);
 
@@ -128,7 +129,7 @@ PIPE *pipeNew()
 }
 
 
-void pipeDelete(PIPE *pipe)
+void pipeDelete(pipe_t *pipe)
 {
   static const char *func = "pipeDelete";  
 
@@ -148,11 +149,11 @@ void pipeDelete(PIPE *pipe)
 }
 
 
-void pipeDefVlist(PSTREAM *pstreamptr, int vlistID)
+void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
 {
   static const char *func = "pipeDefVlist";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
 
   if ( PipeDebug )
     Message(func, "%s pstreamID %d", pname, pstreamptr->self);
@@ -167,11 +168,11 @@ void pipeDefVlist(PSTREAM *pstreamptr, int vlistID)
 }
 
 
-int pipeInqVlist(PSTREAM *pstreamptr)
+int pipeInqVlist(pstream_t *pstreamptr)
 {
   static const char *func = "pipeInqVlist";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
   int vlistID;
 
   if ( PipeDebug )
@@ -192,11 +193,11 @@ int pipeInqVlist(PSTREAM *pstreamptr)
 }
 
 
-int pipeInqTimestep(PSTREAM *pstreamptr, int tsID)
+int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 {
   static const char *func = "pipeInqTimestep";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
   int nrecs;
 
   if ( PipeDebug )
@@ -250,12 +251,12 @@ int pipeInqTimestep(PSTREAM *pstreamptr, int tsID)
 }
 
 
-void pipeDefTimestep(PSTREAM *pstreamptr, int tsID)
+void pipeDefTimestep(pstream_t *pstreamptr, int tsID)
 {
   static const char *func = "pipeDefTimestep";
   char *pname = pstreamptr->name;
   int nrecs;
-  PIPE *pipe;
+  pipe_t *pipe;
 
   if ( PipeDebug )
     Message(func, "%s pstreamID %d", pname, pstreamptr->self);
@@ -301,11 +302,11 @@ sleep(1);
 }
 
 
-int pipeInqRecord(PSTREAM *pstreamptr, int *varID, int *levelID)
+int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 {
   static const char *func = "pipeInqRecord";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
   int condSignal = FALSE;
 
   if ( PipeDebug )
@@ -368,11 +369,11 @@ int pipeInqRecord(PSTREAM *pstreamptr, int *varID, int *levelID)
 }
 
 
-void pipeDefRecord(PSTREAM *pstreamptr, int varID, int levelID)
+void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
 {
   static const char *func = "pipeDefRecord";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
   int condSignal = FALSE;
 
   if ( PipeDebug )
@@ -419,12 +420,12 @@ void pipeDefRecord(PSTREAM *pstreamptr, int varID, int levelID)
 }
 
 
-void pipeCopyRecord(PSTREAM *pstreamptr_out, PSTREAM *pstreamptr_in)
+void pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
 {
   static const char *func = "pipeCopyRecord";
   char *ipname = pstreamptr_in->name;
   char *opname = pstreamptr_out->name;
-  PIPE *pipe;
+  pipe_t *pipe;
 
   if ( PipeDebug )
     Message(func, "%s pstreamIDin %d", ipname, pstreamptr_in->self);
@@ -459,11 +460,11 @@ void pipeCopyRecord(PSTREAM *pstreamptr_out, PSTREAM *pstreamptr_in)
 }
 
 
-void pipeReadRecord(PSTREAM *pstreamptr, double *data, int *nmiss)
+void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 {
   static const char *func = "pipeReadRecord";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
 
   *nmiss = 0;
   if ( PipeDebug )
@@ -480,7 +481,7 @@ void pipeReadRecord(PSTREAM *pstreamptr, double *data, int *nmiss)
 
   if ( pipe->hasdata == 2 )
     {
-      PSTREAM *pstreamptr_in;
+      pstream_t *pstreamptr_in;
 
       pstreamptr_in = pipe->pstreamptr_in;
       /*
@@ -555,11 +556,11 @@ void pipeReadRecord(PSTREAM *pstreamptr, double *data, int *nmiss)
 }
 
 
-void pipeWriteRecord(PSTREAM *pstreamptr, double *data, int nmiss)
+void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
 {
   static const char *func = "pipeWriteRecord";
   char *pname = pstreamptr->name;
-  PIPE *pipe;
+  pipe_t *pipe;
 
   if ( PipeDebug )
     Message(func, "%s pstreamID %d", pname, pstreamptr->self);
