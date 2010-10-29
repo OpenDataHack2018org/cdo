@@ -34,9 +34,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = cdo$(EXEEXT) $(am__EXEEXT_1)
+bin_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2)
 @ENABLE_ALL_STATIC_TRUE@am__append_1 = cdo_static
+@ENABLE_ALL_STATIC_FALSE@am__append_2 = cdo
 noinst_PROGRAMS = cdotest$(EXEEXT)
+@ENABLE_ALL_STATIC_TRUE@am__append_3 = -all-static
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
@@ -53,6 +55,7 @@ CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 @ENABLE_ALL_STATIC_TRUE@am__EXEEXT_1 = cdo_static$(EXEEXT)
+@ENABLE_ALL_STATIC_FALSE@am__EXEEXT_2 = cdo$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
@@ -284,6 +287,9 @@ cdo_static_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 am_cdotest_OBJECTS = cdotest-cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
 cdotest_DEPENDENCIES = $(am__DEPENDENCIES_1)
+cdotest_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(cdotest_LDFLAGS) \
+	$(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -513,6 +519,7 @@ cdotest_SOURCES = cdo_int.h	\
 
 cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
+cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_3)
 #
 CLEANFILES = `ls *~`
 all: config.h
@@ -627,7 +634,7 @@ cdo_static$(EXEEXT): $(cdo_static_OBJECTS) $(cdo_static_DEPENDENCIES)
 	$(cdo_static_LINK) $(cdo_static_OBJECTS) $(cdo_static_LDADD) $(LIBS)
 cdotest$(EXEEXT): $(cdotest_OBJECTS) $(cdotest_DEPENDENCIES) 
 	@rm -f cdotest$(EXEEXT)
-	$(LINK) $(cdotest_OBJECTS) $(cdotest_LDADD) $(LIBS)
+	$(cdotest_LINK) $(cdotest_OBJECTS) $(cdotest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

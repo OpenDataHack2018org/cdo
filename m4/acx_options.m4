@@ -280,7 +280,7 @@ AC_ARG_WITH([proj],
             [AC_MSG_CHECKING([for the PROJ library])
              AC_MSG_RESULT([suppressed])])
 #  ----------------------------------------------------------------------
-#  How to build CDI into CDI? 
+#  How to build CDI into CDO? 
 INTERNAL_CDI_DIR=libcdi
 # At the moment, there are two possible CDI bindings
 # (default)          linking directly to CDI's object files, i.e. a libtool

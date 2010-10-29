@@ -1,8 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 #
-bin_PROGRAMS = cdo
+bin_PROGRAMS =
 if ENABLE_ALL_STATIC
 bin_PROGRAMS += cdo_static
+else
+bin_PROGRAMS += cdo
 endif
 #
 cdo_SOURCES  = cdo.c
@@ -282,6 +284,10 @@ cdotest_SOURCES  = cdo_int.h	\
 	           cdotest.c
 cdotest_LDADD    = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
+cdotest_LDFLAGS  = $(cdo_LDFLAGS)
+if ENABLE_ALL_STATIC
+cdotest_LDFLAGS  += -all-static
+endif
 
 cdo-userlog.o: userlog.c config.h
 	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
