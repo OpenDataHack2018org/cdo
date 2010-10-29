@@ -1,11 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 #
-bin_PROGRAMS =
-if ENABLE_ALL_STATIC
-bin_PROGRAMS += cdo_static
-else
-bin_PROGRAMS += cdo
-endif
+bin_PROGRAMS = cdo
 #
 cdo_SOURCES  = cdo.c
 cdo_SOURCES += Arith.c         \
@@ -274,10 +269,9 @@ cdo_LDFLAGS  =  @LDFLAGS@ \
 		@SZLIB_LDFLAGS@ \
 		@PROJ_LDFLAGS@
 
-cdo_static_SOURCES  = $(cdo_SOURCES)
-cdo_static_CPPFLAGS = $(cdo_CPPFLAGS)
-cdo_static_LDADD    = $(cdo_LDADD)
-cdo_static_LDFLAGS  = -all-static $(cdo_LDFLAGS)
+if ENABLE_ALL_STATIC
+cdo_LDFLAGS  += -all-static
+endif
 
 noinst_PROGRAMS  = cdotest
 cdotest_SOURCES  = cdo_int.h	\
