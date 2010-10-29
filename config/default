@@ -99,7 +99,7 @@ case "${HOSTNAME}" in
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
                     --with-szlib=/sw/etch-ia32/szip-2.1 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            --enable-all-static --disable-shared CC=icc CFLAGS="-g -fast -openmp" AR=xiar LD=xild
+	            --enable-all-static CC=icc CFLAGS="-g -fast -openmp" AR=xiar LD=xild
 #	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
     ;;
 # i386-pc-solaris2.10
