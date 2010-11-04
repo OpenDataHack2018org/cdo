@@ -32,7 +32,6 @@
 
 void *Setgatt(void *argument)
 {
-  static const char *func = "Setgatt";
   int SETGATT, SETGATTS;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

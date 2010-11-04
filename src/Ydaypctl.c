@@ -37,7 +37,6 @@
 
 void *Ydaypctl(void *argument)
 {
-  static const char *func = "Ydaypctl";
   int gridsize;
   int varID;
   int recID;

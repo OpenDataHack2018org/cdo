@@ -268,7 +268,6 @@ void readcmd(const char *prompt, char *line, int size)
 
 void *Command(void *argument)
 {
-  static const char *func = "Command";
   int nrecs;
   int recID, varID, levelID;
   int gridsize;

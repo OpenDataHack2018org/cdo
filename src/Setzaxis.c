@@ -29,7 +29,6 @@
 
 void *Setzaxis(void *argument)
 {
-  static const char *func = "Setzaxis";
   int SETZAXIS;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

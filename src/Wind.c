@@ -34,7 +34,6 @@
 
 void *Wind(void *argument)
 {
-  static const char *func = "Wind";
   int UV2DV, UV2DVL, DV2UV, DV2UVL, DV2PS;
   int operatorID;
   int streamID1, streamID2;

@@ -45,7 +45,6 @@
 
 void *Seltime(void *argument)
 {
-  const char func[] = "Seltime";
   int SELTIMESTEP, SELDATE, SELTIME, SELHOUR, SELDAY, SELMON, SELYEAR, SELSEAS, SELSMON;
   int operatorID;
   int operfunc, intval;

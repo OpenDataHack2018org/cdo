@@ -30,7 +30,6 @@
 
 void *Gengrid(void *argument)
 {
-  static const char *func = "Gengrid";
   int streamID1, streamID2, streamID3;
   int vlistID1, vlistID2, vlistID3;
   int gridID1, gridID2, gridID3;

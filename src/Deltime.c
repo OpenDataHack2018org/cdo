@@ -25,7 +25,6 @@
 
 void *Deltime(void *argument)
 {
-  const char func[] = "Deltime";
   int DELDAY, DEL29FEB;
   int operatorID;
   int streamID1, streamID2;

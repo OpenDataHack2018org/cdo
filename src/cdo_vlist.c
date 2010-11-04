@@ -24,7 +24,6 @@ static
 void compareGrids(int gridID1, int gridID2)
 {
   /* compare grids of first variable */
-  static const char *func = "compareGrids";
   int xsize, ysize;
   int i;
 
@@ -109,7 +108,6 @@ void compareGrids(int gridID1, int gridID2)
 
 void vlistCompare(int vlistID1, int vlistID2, int flag)
 {
-  static const char *func = "vlistCompare";
   int varID, nvars;
 
   if ( vlistNvars(vlistID1) != vlistNvars(vlistID2) )

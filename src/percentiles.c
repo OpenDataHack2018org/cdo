@@ -71,7 +71,6 @@ static void histBinValue(HISTOGRAM *hist, double value)
 
 static void histBin(HISTOGRAM *hist)
 {
-  static const char *func = "histBin";
   int i;
   double *values;
   
@@ -237,7 +236,6 @@ void hsetCreateVarLevels(HISTOGRAM_SET *hset, int varID, int nlevels, int grid)
 
 void hsetDestroy(HISTOGRAM_SET *hset)
 {
-  static const char *func = "hsetDestroy";
   int varID, levelID, histID, nhists;
   
   if ( hset != NULL )

@@ -31,7 +31,8 @@
 #include "pstream.h"
 
 
-static int input_iarray(int nval, int *array)
+static
+int input_iarray(int nval, int *array)
 {
   int i, n;
   int ival = 0;
@@ -68,7 +69,6 @@ static int input_darray(int nval, double *array)
 
 void *Input(void *argument)
 {
-  static const char *func = "Input";
   int INPUT, INPUTSRV, INPUTEXT;
   int operatorID;
   int varID = 0;

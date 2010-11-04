@@ -145,7 +145,6 @@ void filter(int nts, const int *fmasc, double *array1, double *array2)
 
 void *Filter(void *argument)
 {
-  static const char *func = "Filter";
   enum {BAND, HIGH, LOW};
   char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
   int iunits[] = {31536000, 525600, 8760, 365, 12, 1};

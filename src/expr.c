@@ -485,7 +485,6 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *ex_fun_con(char *fun, nodeType *p1)
 {
-  static const char *func = "ex_fun_con";
   nodeType *p;
   int i;
   int funcID = -1;
@@ -513,7 +512,6 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
 static
 nodeType *ex_fun_var(char *fun, nodeType *p1)
 {
-  static const char *func = "ex_fun_var";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -605,7 +603,6 @@ nodeType *ex_fun(char *fun, nodeType *p1)
 static
 nodeType *ex_uminus_var(nodeType *p1)
 {
-  static const char *func = "ex_uminus_var";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -651,7 +648,6 @@ nodeType *ex_uminus_var(nodeType *p1)
 static
 nodeType *ex_uminus_con(nodeType *p1)
 {
-  static const char *func = "ex_uminus_con";
   nodeType *p;
 
   p = (nodeType *) malloc(sizeof(nodeType));
@@ -709,7 +705,6 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
 
 nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 {
-  static const char *func = "ex";
   int gridID1 = -1, zaxisID1 = -1, timeID1 = -1;
   double missval = 0;
   char varname[256];

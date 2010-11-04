@@ -31,7 +31,6 @@
 static
 int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
-  static const char *func = "gengrid";  
   int gridtype, gridID2;
   int nlon1, nlat1;
   int nlon2, nlat2;
@@ -227,7 +226,6 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 static
 int gengridcell(int gridID1, int gridsize2, int *cellidx)
 {
-  static const char *func = "gengridcell";  
   int gridtype, gridID2;
   int gridsize1;
   int i, k, nv;
@@ -395,7 +393,6 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
 static
 int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  static const char *func = "genlonlatgrid";  
   int ilon, ilat;
   int nlon1, nlat1;
   int gridtype, gridID2;
@@ -564,7 +561,6 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 static
 int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 {
-  static const char *func = "gencellgrid";  
   int gridtype, gridID2;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2, x, xval, yval;
@@ -752,7 +748,6 @@ void window_cell(double *array1, int gridID1, double *array2, int gridsize2, int
 
 void *Selbox(void *argument)
 {
-  static const char *func = "Selbox";
   int SELLONLATBOX, SELINDEXBOX;
   int operatorID;
   int streamID1, streamID2;

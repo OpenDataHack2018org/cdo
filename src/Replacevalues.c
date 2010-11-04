@@ -38,7 +38,6 @@ double arg2val(char *arg)
 
 void *Replacevalues(void *argument)
 {
-  static const char *func = "Replacevalues";
   int  SETVALS, SETRTOC, SETRTOC2;
   int operatorID;
   int streamID1, streamID2;

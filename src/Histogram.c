@@ -29,7 +29,6 @@
 
 void *Histogram(void *argument)
 {
-  static const char *func = "Histogram";
   int HISTCOUNT, HISTSUM, HISTMEAN, HISTFREQ;
   int operatorID;
   int streamID1, streamID2;

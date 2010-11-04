@@ -155,7 +155,6 @@ static
 void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y, 
 		  double *grid2x, double *grid2y, double *grid3x, double *grid3y)
 {
-  static const char *func = "uv_to_p_grid";
   int gridsizex;
   int i, j;
   double gx, gy;
@@ -261,7 +260,6 @@ void uv_to_p_grid(int nlon, int nlat, double *grid1x, double *grid1y,
 
 void *Mrotuvb(void *argument)
 {
-  static const char *func = "Mrotuvb";
   int streamID1, streamID2, streamID3;
   int nrecs, nrecs2;
   int tsID, recID, levelID;

@@ -42,7 +42,6 @@ int isnan(const double x);
 
 void *Setmiss(void *argument)
 {
-  static const char *func = "Setmiss";
   int SETMISSVAL, SETCTOMISS, SETMISSTOC, SETRTOMISS, SETVRANGE;
   int operatorID;
   int streamID1, streamID2;

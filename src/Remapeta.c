@@ -133,7 +133,6 @@ void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval
 
 double *vctFromFile(const char *filename, int *nvct)
 {
-  static const char *func = "vctFromFile";
   char line[1024], *pline;
   int num, i = 0;
   int nlevh2, nvct2;
@@ -215,7 +214,6 @@ void vert_sumw(double *sum, double *var3d, long gridsize, long nlevel, double *d
 
 void *Remapeta(void *argument)
 {
-  static const char *func = "Remapeta";
   int REMAPETA, REMAPETAS, REMAPETAZ;
   int operatorID;
   int streamID1, streamID2;

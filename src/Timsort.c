@@ -52,7 +52,6 @@ int cmpdarray(const void *s1, const void *s2)
 
 void *Timsort(void *argument)
 {
-  static const char *func = "Timsort";
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;

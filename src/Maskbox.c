@@ -114,7 +114,6 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
 static
 void genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  static const char *func = "genlonlatgrid";  
   int nlon1, nlat1;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
@@ -144,7 +143,8 @@ void genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, in
 }
 
 
-static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+static
+void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   int nlon1, nlat1;
   int temp;
@@ -216,8 +216,9 @@ static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon1
 }
 
 
-static void maskbox(int *mask, int gridID,
-		   int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+static
+void maskbox(int *mask, int gridID,
+	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int nlon, nlat;
   int ilat, ilon;
@@ -233,9 +234,9 @@ static void maskbox(int *mask, int gridID,
 }
 
 
-static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
+static
+void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
-  static const char *func = "maskregion";
   int i, j;
   int nlon, nlat;
   int ilat, ilon;
@@ -326,7 +327,6 @@ static void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, 
 
 void *Maskbox(void *argument)
 {
-  static const char *func = "Maskbox";
   int MASKLONLATBOX, MASKINDEXBOX, MASKREGION;
   int operatorID;
   int streamID1, streamID2;

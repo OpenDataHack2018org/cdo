@@ -83,7 +83,6 @@ static void farexpr(field_t *field1, field_t field2, double (*expression)(double
    
 void *Wct(void *argument)
 {
-  static const char *func = "Wct";
   int streamID1, streamID2, streamID3;
   int gridsize;
   int nrecs, nrecs2, recID;

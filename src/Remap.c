@@ -148,7 +148,6 @@ int maptype2operfunc(int map_type, int submap_type, int remap_order)
 
 void *Remap(void *argument)
 {
-  static const char *func = "Remap";
   int operatorID;
   int operfunc;
   int streamID1, streamID2 = -1;

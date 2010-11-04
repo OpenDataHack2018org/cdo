@@ -43,7 +43,6 @@ char *getProgname(char *string)
 
 char *getOperator(const char *argument)
 {
-  static const char *func = "getOperator";
   char *operatorArg = NULL;
   char *blankpos;
   size_t len;
@@ -70,7 +69,6 @@ char *operatorAlias(char *operatorName);
 
 char *getOperatorName(const char *operatorArg)
 {
-  static const char *func = "getOperatorName";
   char *commapos;
   char *operatorName = NULL;
   size_t len;
@@ -99,7 +97,6 @@ char *getOperatorName(const char *operatorArg)
 
 char *makeArgument(int argc, char *argv[])
 {
-  static const char *func = "makeArgument";
   char *argument = NULL;
   int iarg;
   size_t len, pos = 0, off = 0;
@@ -124,7 +121,6 @@ char *makeArgument(int argc, char *argv[])
 
 char *getFileArg(char *argument)
 {
-  static const char *func = "getFileArg";
   char *fileArg = NULL;
   char *parg;
   char *blankpos;

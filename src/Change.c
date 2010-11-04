@@ -37,7 +37,6 @@
 
 void *Change(void *argument)
 {
-  static const char *func = "Change";
   int CHCODE, CHTABNUM, CHNAME, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

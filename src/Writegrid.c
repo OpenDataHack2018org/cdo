@@ -30,7 +30,6 @@
 
 void *Writegrid(void *argument)
 {
-  static const char *func = "Writegrid";
   int streamID;
   int vlistID;
   int gridID;

@@ -43,7 +43,6 @@
 
 void *Yhourstat(void *argument)
 {
-  static const char *func = "Yhourstat";
   int operatorID;
   int operfunc;
   int gridsize;

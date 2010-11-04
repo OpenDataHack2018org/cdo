@@ -30,7 +30,6 @@
 
 void transxy(int gridID, double *array1, double *array2)
 {
-  static const char *func = "transxy";
   int i, j;
   int nx, ny;
   double **a2D1, **a2D2;
@@ -55,7 +54,6 @@ void transxy(int gridID, double *array1, double *array2)
 
 void *Transpose(void *argument)
 {
-  static const char *func = "Transpose";
   int streamID1, streamID2;
   int gridsize;
   int ngrids, index;

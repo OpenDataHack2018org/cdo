@@ -31,7 +31,6 @@ void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Cat(void *argument)
 {
-  static const char *func = "Cat";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
   int tsID1, tsID2 = 0, recID, varID, levelID;

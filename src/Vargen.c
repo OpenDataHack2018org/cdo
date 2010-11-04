@@ -58,7 +58,6 @@
 
 void *Vargen(void *argument)
 {
-  static const char *func = "Vargen";
   int RANDOM, CONST, FOR, TOPO, TEMP, MASK;
   int operatorID;
   int streamID;

@@ -31,7 +31,6 @@
 
 void *Splityear(void *argument)
 {
-  static const char *func = "Splityear";
   int nchars;
   int streamID1, streamID2 = -1;
   int varID;

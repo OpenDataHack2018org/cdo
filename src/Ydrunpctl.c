@@ -35,7 +35,6 @@
 
 void *Ydrunpctl(void *argument)
 {
-  static const char *func = "Ydrunpctl";
   int gridsize;
   int varID;
   int recID;

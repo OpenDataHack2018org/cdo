@@ -24,7 +24,6 @@ static
 void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nsx, int nsy,
 	      int **gridindex, int nsplit, int gridsize2)
 {
-  static char *func = "genGrids";
   int gridID2;
   int gridtype;
   int gridsize, nx, ny;
@@ -100,7 +99,6 @@ typedef struct
 
 void *Scatter(void *argument)
 {
-  static const char *func = "Scatter";
   int nchars;
   int streamID1;
   int *vlistIDs = NULL, *streamIDs = NULL;

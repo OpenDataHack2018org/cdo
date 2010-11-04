@@ -33,7 +33,6 @@
 
 void *Arithdays(void *argument)
 {
-  static const char *func = "Arithdays";
   int operatorID;
   int operfunc, operfunc2;
   int streamID1, streamID2;

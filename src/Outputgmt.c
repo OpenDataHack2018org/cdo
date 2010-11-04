@@ -47,7 +47,8 @@
 #endif
 
 
-static int pnpoly(int npol, double *xp, double *yp, double x, double y)
+static
+int pnpoly(int npol, double *xp, double *yp, double x, double y)
 {
   int i, j, c = 0;
 
@@ -62,7 +63,8 @@ static int pnpoly(int npol, double *xp, double *yp, double x, double y)
 }
 
 
-static double PolygonArea_old(int np, double *xp, double *yp)
+static
+double PolygonArea_old(int np, double *xp, double *yp)
 {
    int i, j;
    double area = 0;
@@ -80,7 +82,8 @@ static double PolygonArea_old(int np, double *xp, double *yp)
 }
 
 
-static double PolygonArea(int np, double *xp, double *yp, double yc)
+static
+double PolygonArea(int np, double *xp, double *yp, double yc)
 {
    int i, j;
    double area = 0.;
@@ -153,7 +156,6 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
-  static const char *func = "verify_grid";
   int i0, i, j, k, l;
   int l0;
   int nout;
@@ -534,7 +536,6 @@ void make_cyclic(double *array1, double *array2, int nlon, int nlat)
 
 void *Outputgmt(void *argument)
 {
-  static const char *func = "Outputgmt";
   int GRIDVERIFY, OUTPUTCENTER, OUTPUTCENTER2, OUTPUTCENTERCPT, OUTPUTBOUNDS;
   int OUTPUTBOUNDSCPT, OUTPUTVECTOR, OUTPUTTRI;
   int operatorID;

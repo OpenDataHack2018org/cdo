@@ -356,7 +356,6 @@ void remapGridInitPointer(remapgrid_t *rg)
 
 void remapGridRealloc(int map_type, remapgrid_t *rg)
 {
-  static const char *func = "remapGridRealloc";
   long nalloc;
 
   if ( rg->grid1_nvgp )
@@ -611,7 +610,6 @@ void check_lat_boundbox_range(long nlats, restr_t *restrict bound_box, double *r
 
 void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg)
 {
-  static const char *func = "remapGridInit";
   char units[128];
   int nbins;
   long i4;
@@ -1279,7 +1277,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 */
 void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 {
-  static const char *func = "remapVarsInit";
   long i;
 
   /* Initialize all pointer */
@@ -1338,7 +1335,6 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 */
 void resize_remap_vars(remapvars_t *rv, int increment)
 {
-  static const char *func = "resize_remap_vars";
   /*
     Input variables:
     int  increment  ! the number of links to add(subtract) to arrays
@@ -1472,7 +1468,6 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 
 long get_max_add(long num_links, long size, const int *restrict add)
 {
-  static const char *func = "get_max_add";
   long n, i;
   long max_add;
   int *isum;
@@ -1515,7 +1510,6 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   */
 
   /* Local variables */
-  static const char *func = "remap_laf";
   long i, n, k, ncls, imax;
   long max_cls;
   double wts;
@@ -1673,7 +1667,6 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
     double *dst_array    ! array for remapped field on destination grid
   */
   /* Local variables */
-  static const char *func = "remap_sum";
   long n;
 
   for ( n = 0; n < dst_size; n++ ) dst_array[n] = missval;
@@ -2649,8 +2642,6 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 */
 void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 {
-  static const char *func = "remap_distwgt";
-
   /*  Local variables */
 
   long grid1_size;
@@ -2945,7 +2936,6 @@ void store_link_nbr1(remapvars_t *rv, int add1, int add2, double weights)
 */
 void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 {
-  static const char *func = "remap_distwgt";
 
   /*  Local variables */
   long grid1_size;
@@ -3074,7 +3064,6 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 		       int *luse_last, double *intrsct_x, double *intrsct_y,
 		       int *avoid_pole_count, double *avoid_pole_offset)
 {
-  static const char *func = "pole_intersection";
   /*
     Intent(in): 
     double beglat, beglon,  ! beginning lat/lon endpoints for segment
@@ -4030,7 +4019,6 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
 static
 void grid_store_init(grid_store_t *grid_store, long gridsize)
 {
-  const char func[] = "grid_store_init";
   long iblk;
   long blksize[] = {128, 256, 512, 1024, 2048, 4096, 8192};
   long nblks = sizeof(blksize)/sizeof(long);
@@ -4075,7 +4063,6 @@ void grid_store_init(grid_store_t *grid_store, long gridsize)
 static
 void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weights, grid_store_t *grid_store)
 {
-  static const char *func = "store_link_cnsrv_fast";
   /*
     Input variables:
     int  add1         ! address on grid1
@@ -4288,8 +4275,6 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 */
 void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 {
-  static const char *func = "remap_conserv";
-
   /* local variables */
 
   int lcheck = TRUE;
@@ -4452,7 +4437,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   shared(ompNumThreads, cdoTimer, nbins, grid1_centroid_lon, grid1_centroid_lat,	\
          grid_store, link_add1, link_add2,	 \
          rv, cdoVerbose, max_subseg, \
-	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
+	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, srch_add2, lwarn) \
   private(ompthID, lmask, srch_add, min_add, max_add, n, n2, k, num_srch_cells, max_srch_cells, \
 	  grid1_add, grid2_add, grid1_addm4, grid2_addm4, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
@@ -4724,7 +4709,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   shared(ompNumThreads, cdoTimer, nbins, grid2_centroid_lon, grid2_centroid_lat,	\
          grid_store, link_add1, link_add2, \
          rv, cdoVerbose, max_subseg, \
-	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, func, srch_add2, lwarn) \
+	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, srch_add2, lwarn) \
   private(ompthID, lmask, srch_add, min_add, max_add, n, n2, k, num_srch_cells, max_srch_cells, grid1_addm4, grid2_addm4, \
 	  grid1_add, grid2_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
@@ -5362,7 +5347,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *restrict array1, 
 		const double *restrict array2, double missval)
 {
-  static const char *func = "remap_stat";
   long n, ns, i;
   long idiff, imax, imin, icount;
   int *grid2_count;
@@ -5489,7 +5473,6 @@ void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *r
 void remap_gradients(remapgrid_t rg, const double *restrict array, double *restrict grad1_lat,
 		     double *restrict grad1_lon, double *restrict grad1_latlon)
 {
-  static const char *func = "remap_gradients";
   long n, nx, ny, grid1_size;
   long i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw;
   double delew, delns;
@@ -5687,7 +5670,6 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
 
 void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights)
 {
-  static char *func = "sort_add_test";
   /*
     This routine sorts address and weight arrays based on the
     destination address with the source address as a secondary
@@ -6128,7 +6110,6 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 
 void reorder_links(remapvars_t *rv)
 {
-  static const char *func = "reorder_links";
   long j, nval = 0, num_blks = 0;
   long lastval;
   long nlinks;
@@ -6586,7 +6567,6 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   /* Local variables */
 
-  static const char *func = "read_remap_scrip";
   int status;
   int nc_file_id;           /* id for netCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
@@ -7057,8 +7037,6 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 			   sub-array within the original array 
   */
 
-
-  static const char *func = "sort_par";
 
   const int nsplit = 2;                      /* (only 2 allowed) number of segments to split the data */
   int nl[nsplit];                            /* number of links in each sub-array              */

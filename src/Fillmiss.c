@@ -29,7 +29,6 @@
 
 void fillmiss(field_t *field1, field_t *field2, int nfill)
 {
-  static const char *func = "fillmiss";
   int gridID, nx, ny, i, j;
   int nmiss1, nmiss2 = 0;
   int kr, ku, kl, ko;
@@ -139,9 +138,9 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
   free(matrix1);
 }
 
+
 void *Fillmiss(void *argument)
 {
-  static const char *func = "Fillmiss";
   int streamID1, streamID2;
   int nrecs, ngrids;
   int index;

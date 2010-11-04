@@ -79,7 +79,8 @@ struct gaindx {
 
 /* Byte swap requested number of 4 byte elements */
 
-static void gabswp (void *r, int cnt) {
+static
+void gabswp (void *r, int cnt) {
 int i;
 char *ch1,*ch2,*ch3,*ch4,cc1,cc2;
 
@@ -105,7 +106,8 @@ char *ch1,*ch2,*ch3,*ch4,cc1,cc2;
  *                      Wesley Ebisuzaki
  */
 
-static float ibm2flt(unsigned char *ibm) {
+static
+float ibm2flt(unsigned char *ibm) {
 
 	int positive, power;
 	unsigned int abspower;
@@ -142,8 +144,8 @@ static float ibm2flt(unsigned char *ibm) {
  *
  * doesn't handle subnormal numbers
  */
-
-static int flt2ibm(float x, unsigned char *ibm) {
+static
+int flt2ibm(float x, unsigned char *ibm) {
 
 	int sign, exp, i;
 	double mant;
@@ -218,9 +220,9 @@ static int flt2ibm(float x, unsigned char *ibm) {
 
 #define  PutInt(buf, cnt, ival)   (ival < 0 ? Put4Byte(buf, cnt, 0x7fffffff - ival + 1) : Put4Byte(buf, cnt, ival))
 
-static void dumpmap()
+static
+void dumpmap()
 {
-  static const char *func = "dumpmap";
   unsigned char urec[4];
   unsigned char vermap;
   unsigned char mrec[512];
@@ -366,7 +368,6 @@ static void dumpmap()
 
 void *Gradsdes(void *argument)
 {
-  static const char *func = "Gradsdes";
   int GRADSDES1, GRADSDES2, DUMPMAP;
   int operatorID;
   int streamID = 0;

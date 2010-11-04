@@ -35,7 +35,6 @@
 
 void *Split(void *argument)
 {
-  static const char *func = "Split";
   int SPLITCODE, SPLITNAME, SPLITLEVEL, SPLITGRID, SPLITZAXIS, SPLITTABNUM;
   int operatorID;
   int nchars;

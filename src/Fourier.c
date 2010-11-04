@@ -31,7 +31,6 @@
 
 void *Fourier(void *argument)
 {
-  const char func[] = "Fourier";
   int ompthID;
   int bit, sign;
   int gridsize;

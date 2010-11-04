@@ -56,8 +56,6 @@ LIST *listNew(int type)
 
 void listDelete(LIST *list)
 {
-  static const char *func = "listDelete";
-
   if ( list )
     {
       if ( list->array ) free(list->array);
@@ -74,8 +72,6 @@ void *listArrayPtr(LIST *list)
 
 static void listCheck(LIST *list, int num)
 {
-  static const char *func = "listCheck";
-
   while ( list->nalloc < (num+1) )
     {
       list->nalloc += list->allinc;

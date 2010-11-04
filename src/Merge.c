@@ -31,7 +31,6 @@
 
 void *Merge(void *argument)
 {
-  static const char *func = "Merge";
   int streamID1 = -1, streamID2 = -1;
   int varID, varID2;
   int nrecs = 0;

@@ -37,7 +37,6 @@
 
 void *Vertstat(void *argument)
 {
-  static const char *func = "Vertstat";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

@@ -26,9 +26,9 @@
 #include "pstream.h"
 
 
-static int gentpngrid(int gridID1)
+static
+int gentpngrid(int gridID1)
 {
-  static const char *func = "gentpngrid";  
   int gridtype, gridID2;
   int nlon1, nlat1;
   int nlon2, nlat2;
@@ -175,9 +175,9 @@ static int gentpngrid(int gridID1)
 }
 
 
-static int gengrid(int gridID1, int lhalo, int rhalo)
+static
+int gengrid(int gridID1, int lhalo, int rhalo)
 {
-  static const char *func = "gengrid";  
   int gridtype, gridID2;
   int nlon1, nlat1;
   int nlon2, nlat2;
@@ -368,7 +368,8 @@ static int gengrid(int gridID1, int lhalo, int rhalo)
 }
 
 
-static int genindexgrid(int gridID1, int *lhalo, int *rhalo)
+static
+int genindexgrid(int gridID1, int *lhalo, int *rhalo)
 {
   int gridID2;
   int nlon1;
@@ -410,7 +411,8 @@ static int genindexgrid(int gridID1, int *lhalo, int *rhalo)
 }
 
 
-static void halo(double *array1, int gridID1, double *array2, int lhalo, int rhalo)
+static
+void halo(double *array1, int gridID1, double *array2, int lhalo, int rhalo)
 {
   int nlon1, nlat;
   int ilat, ilon;
@@ -438,7 +440,8 @@ static void halo(double *array1, int gridID1, double *array2, int lhalo, int rha
 }
 
 
-static void tpnhalo(double *array1, int gridID1, double *array2)
+static
+void tpnhalo(double *array1, int gridID1, double *array2)
 {
   int nlon, nlat;
   int ilat, ilon, ilonr;
@@ -463,7 +466,6 @@ static void tpnhalo(double *array1, int gridID1, double *array2)
 
 void *Sethalo(void *argument)
 {
-  static const char *func = "Sethalo";
   int SETHALO, TPNHALO;
   int operatorID;
   int streamID1, streamID2;

@@ -37,7 +37,6 @@
 
 void *Yseaspctl(void *argument)
 {
-  static const char *func = "Yseaspctl";
   int gridsize;
   int varID;
   int recID;

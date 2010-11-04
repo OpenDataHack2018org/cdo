@@ -455,8 +455,6 @@ void varrms(field_t field, field_t field2, field_t *field3)
 /* RQ */
 double fldpctl(field_t field, int p)
 {
-  static const char *func = "fldpctl";
-
   long   len     = field.size;
   int    nmiss   = field.nmiss;
   double missval = field.missval;

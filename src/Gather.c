@@ -84,7 +84,6 @@ int cmpxy_gt(const void *s1, const void *s2)
 static
 int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 {
-  static char *func = "genGrid";
   int lsouthnorth = TRUE;
   int fileID;
   int gridID;
@@ -233,7 +232,6 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
 
 void *Gather(void *argument)
 {
-  static const char *func = "Gather";
   int i;
   int nvars;
   int cmpfunc;

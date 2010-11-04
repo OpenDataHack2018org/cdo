@@ -95,7 +95,6 @@ int findrec(recinfo_t *recInfo[], int nrecords, int varID, int levelID)
 
 void *Sort(void *argument)
 {
-  static const char *func = "Sort";
   int SORTCODE, SORTNAME, SORTLEVEL;
   int operatorID;
   int streamID1, streamID2;

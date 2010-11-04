@@ -31,7 +31,6 @@ void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Copy(void *argument)
 {
-  static const char *func = "Copy";
   int COPY, SELALL;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

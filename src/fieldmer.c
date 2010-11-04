@@ -355,8 +355,6 @@ void merstd(field_t field1, field_t *field2)
 /* RQ */
 void merpctl(field_t field1, field_t *field2, int p)
 {
-  static const char *func = "merpctl";
-
   long   i, j, l, nx, ny;
   int    rnmiss = 0;
   int    grid    = field1.grid;

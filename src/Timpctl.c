@@ -33,9 +33,9 @@
 #include "percentiles.h"
 
 
-static void timpctl(int operatorID)
+static
+void timpctl(int operatorID)
 {
-  static const char *func = "timpctl";
   int cmplen;
   char indate1[DATE_LEN+1], indate2[DATE_LEN+1];
   int gridsize;

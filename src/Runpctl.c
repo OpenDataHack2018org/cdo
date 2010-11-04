@@ -35,7 +35,6 @@
 
 void *Runpctl(void *argument)
 {
-  static const char *func = "Runpctl";
   int gridsize;
   int varID;
   int recID;

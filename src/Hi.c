@@ -90,7 +90,6 @@ static void farexpr(field_t *field1, field_t field2, field_t field3, double (*ex
    
 void *Hi(void *argument)
 {
-  static const char *func = "Hi";
   int streamID1, streamID2, streamID3, streamID4;
   int gridsize;
   int nrecs, nrecs2, nrecs3, recID;

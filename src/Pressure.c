@@ -34,7 +34,6 @@
 
 void *Pressure(void *argument)
 {
-  static const char *func = "Pressure";
   int PRESSURE_FL, PRESSURE_HL, DELTAP_FL, DELTAH_FL;
   int operatorID;
   int mode;

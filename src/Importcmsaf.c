@@ -119,7 +119,6 @@ void get_grid_info(double c0, double re, int *nrxp, int *nryp,
   *cp   = c;
 }
 
-
 static
 double det_lon_atovs(double r, double r0, double lts, double c, double re)
 {
@@ -131,7 +130,6 @@ double det_lon_atovs(double r, double r0, double lts, double c, double re)
 
   return (xla);
 }
-
 
 static
 double det_lat_atovs(double s, double s0, double lts, double c, double re)
@@ -146,11 +144,9 @@ double det_lat_atovs(double s, double s0, double lts, double c, double re)
   return (phi);
 }
 
-
 static
 int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
 {
-  static const char *func = "defLonLatGrid";
   int gridID;
   int nrx, nry, i;
   double c;
@@ -213,12 +209,10 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
   return (gridID);
 }
 
-
 static
 int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 		      double dx, double dy, double p1, double p2, double p3, double p4)
 {
-  static const char *func = "defSinusoidalGrid";
   int gridID;
   int i;
   double *xvals, *yvals;
@@ -250,12 +244,10 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   return (gridID);
 }
 
-
 static
 int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ymax, 
 		double dx, double dy, double a, double lon0, double lat0)
 {
-  static const char *func = "defLaeaGrid";
   int gridID;
   int i;
   double *xvals, *yvals;
@@ -288,7 +280,6 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
 
   return (gridID);
 }
-
 
 static
 int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double *lat0)
@@ -344,12 +335,10 @@ int scan_pcs_def(char *pcs_def, char proj[128], double *a, double *lon0, double 
   return (nfound);
 }
 
-
 #if  defined  (HAVE_LIBHDF5)
 static
 int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 {
-  static const char *func = "read_geolocation";
   int gridID = -1;
   hid_t grp_id;
   hid_t proj_id, region_id;
@@ -613,12 +602,10 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
 }
 #endif
 
-
 #if  defined  (HAVE_LIBHDF5)
 static
 int read_region(hid_t loc_id, int nx, int ny)
 {
-  //static const char *func = "read_region";
   int gridID = -1;
   hid_t grp_id;
   hid_t region_id;
@@ -757,12 +744,10 @@ int read_region(hid_t loc_id, int nx, int ny)
 }
 #endif
 
-
 #if  defined  (HAVE_LIBHDF5)
 static
 void read_dataset(hid_t loc_id, const char *name, void *opdata)
 {
-  static const char *func = "read_dataset";
   hid_t dset_id, type_id;
   hid_t   dataspace;   
   hsize_t dims_out[9];  /* dataset dimensions           */
@@ -1249,7 +1234,6 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 }
 #endif
 
-
 #if  defined  (HAVE_LIBHDF5)
 static herr_t
 obj_info(hid_t loc_id, const char *name, void *opdata)
@@ -1371,7 +1355,6 @@ void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
 }
 #endif
 
-
 static
 int get_vdate(int vlistID)
 {
@@ -1400,7 +1383,6 @@ int get_vdate(int vlistID)
 
   return (vdate);
 }
-
 
 static
 void dsets_init(dsets_t *dsets)
@@ -1433,10 +1415,8 @@ void dsets_init(dsets_t *dsets)
     }
 }
 
-
 void *Importcmsaf(void *argument)
 {
-  static const char *func = "Importcmsaf";
 #if  defined  (HAVE_LIBHDF5)
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;

@@ -60,7 +60,6 @@ static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
 
 void *Ydrunstat(void *argument)
 {
-  static const char *func = "Ydrunstat";
   int operatorID;
   int operfunc;
   int gridsize;
@@ -327,9 +326,9 @@ void *Ydrunstat(void *argument)
   return (0);
 }
 
-static YDAY_STATS *ydstatCreate(int vlistID)
+static
+YDAY_STATS *ydstatCreate(int vlistID)
 {
-  static const char *func = "ydstatCreate";
   int dayoy;
   
   YDAY_STATS *stats = (YDAY_STATS *) malloc(sizeof(YDAY_STATS));
@@ -347,9 +346,9 @@ static YDAY_STATS *ydstatCreate(int vlistID)
   return stats;
 }
 
-static void ydstatDestroy(YDAY_STATS *stats)
+static
+void ydstatDestroy(YDAY_STATS *stats)
 {
-  static const char *func = "ydstatDestroy";
   int dayoy, varID, levelID, nvars, nlevels;
   
   if ( stats != NULL )
@@ -385,9 +384,9 @@ static void ydstatDestroy(YDAY_STATS *stats)
     }
 }
 
-static void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
+static
+void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
 {
-  static const char *func = "ydstatCreateVars1";
   int varID, levelID, nvars, nlevels;
   int gridID, gridsize;
   double missval;
@@ -415,9 +414,9 @@ static void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
     }
 }
 
-static void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
+static
+void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
 {
-  static const char *func = "ydstatCreateVars2";
   int varID, levelID, nvars, nlevels;
   int gridID, gridsize;
   double missval;
@@ -445,8 +444,9 @@ static void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
     }
 }
 
-static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
-  field_t **vars1, field_t **vars2, int nsets, int operfunc)
+static
+void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
+		  field_t **vars1, field_t **vars2, int nsets, int operfunc)
 {
   int varID, levelID, nvars, nlevels;
   int gridsize;
@@ -514,7 +514,8 @@ static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
   stats->nsets[dayoy] += nsets;
 }
 
-static void ydstatFinalize(YDAY_STATS *stats, int operfunc)
+static
+void ydstatFinalize(YDAY_STATS *stats, int operfunc)
 {
   int varID, levelID, nvars, nlevels;
   int dayoy;

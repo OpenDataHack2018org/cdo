@@ -33,7 +33,6 @@
 
 void *Ensstat2(void *argument)
 {
-  static const char *func = "Ensstat2";
   int operatorID;
   int operfunc;
   int i;

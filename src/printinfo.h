@@ -126,9 +126,9 @@ void printFiletype(int streamID, int vlistID)
 }
 
 
-static void printGridInfo(int vlistID)
+static
+void printGridInfo(int vlistID)
 {
-  static const char *func = "printGridInfo";
   int ngrids, index;
   int gridID, gridtype, trunc, gridsize, xsize, ysize;
   int nbyte0;

@@ -36,7 +36,6 @@ static int PipeDebug = 0;
 static
 void pipe_init(pipe_t *pipe)
 {
-  static const char *func = "pipe_init";
   pthread_mutexattr_t m_attr;
   pthread_condattr_t c_attr;
 
@@ -118,7 +117,6 @@ void pipe_init(pipe_t *pipe)
 
 pipe_t *pipeNew()
 {
-  static const char *func = "pipeNew";  
   pipe_t *pipe;
 
   pipe = (pipe_t *) malloc(sizeof(pipe_t));
@@ -131,8 +129,6 @@ pipe_t *pipeNew()
 
 void pipeDelete(pipe_t *pipe)
 {
-  static const char *func = "pipeDelete";  
-
   if ( pipe )
     {
       if ( pipe->mutex )     free(pipe->mutex);

@@ -36,7 +36,6 @@
 
 void *Ymonpctl(void *argument)
 {
-  static const char *func = "Ymonpctl";
   int gridsize;
   int varID;
   int recID;

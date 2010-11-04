@@ -8,7 +8,7 @@
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; version 2 of the License.
-
+/Users/m214003/cdt/work/cdo/src
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -301,7 +301,6 @@ void gridGenYbounds2D(int nx, int ny, const double * restrict ybounds, double * 
 static
 char *gen_param(const char *fmt, ...)
 {
-  static const char *func = "get_param";
   va_list args;
   char str[256];
   char *rstr;
@@ -400,7 +399,6 @@ static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  static const char *func = "laea_to_geo";
   PJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -445,7 +443,6 @@ static
 void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  static const char *func = "lcc2_to_geo";
   PJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -563,8 +560,6 @@ int gridToRegular(int gridID1)
 static
 void gridCopyMask(int gridID1, int gridID2, long gridsize)
 {
-  static const char *func = "gridCopyMask";
-
   if ( gridInqMask(gridID1, NULL) )
     {
       int *mask;
@@ -1117,6 +1112,7 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
   long k;
   double xa;
   double area;
+  double lim = 179*deg2rad;
   struct geo p1, p2, p3;
   struct cart c1, c2, c3;
 
@@ -1136,19 +1132,10 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
       c2 = gc2cc(&p2);
 
       xa = areas(&c1, &c2, &c3);
-      /*
-	if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-	(fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	(fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
-	{
-	printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i], 
-	p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
-	}
-      */
       if ( xa > 0.001 )
-	if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-	     (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	     (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+	if ( (fabs(p1.lon - p2.lon) > lim) ||
+	     (fabs(p2.lon - p3.lon) > lim) ||
+	     (fabs(p3.lon - p1.lon) > lim) ) return(2);
       
       area += xa;
     }
@@ -1161,19 +1148,10 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
   c2 = gc2cc(&p2);
 
   xa = areas(&c1, &c2, &c3);
-  /*
-    if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-    (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-    (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) )
-    {
-    printf("area: %d %g %g %g %g %g %g %g %g\n", i, xa, area[i],
-    p1.lon*rad2deg, p1.lat*rad2deg, p2.lon*rad2deg, p2.lat*rad2deg, p3.lon*rad2deg, p3.lat*rad2deg);
-    }
-  */
   if ( xa > 0.001 )
-    if ( (fabs(p1.lon*rad2deg - p2.lon*rad2deg) > 179) ||
-	 (fabs(p2.lon*rad2deg - p3.lon*rad2deg) > 179) ||
-	 (fabs(p3.lon*rad2deg - p1.lon*rad2deg) > 179) ) return(2);
+    if ( (fabs(p1.lon - p2.lon) > lim) ||
+	 (fabs(p2.lon - p3.lon) > lim) ||
+	 (fabs(p3.lon - p1.lon) > lim) ) return(2);
   
   area += xa;
 
@@ -1183,7 +1161,6 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
 
 int gridGenArea(int gridID, double *area)
 {
-  static const char *func = "gridGenArea";
   int status = 0;
   int gridtype;
   int lgrid_gen_bounds = FALSE;
@@ -1271,9 +1248,38 @@ int gridGenArea(int gridID, double *area)
 	  return (status);
 	}
     }
+  
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+
+    gridInqXunits(gridID, units);
+
+    if ( memcmp(units, "degree", 6) == 0 )
+      {
+	/* No conversion necessary */
+      }
+    else if ( memcmp(units, "radian", 6) == 0 )
+      {
+	for ( i = 0; i < gridsize; ++i )
+	  {
+	    grid_center_lon[i] *= rad2deg;
+	    grid_center_lat[i] *= rad2deg;
+	  }
+	for ( i = 0; i < gridsize*nv; ++i )
+	  {
+	    grid_corner_lon[i] *= rad2deg;
+	    grid_corner_lat[i] *= rad2deg;
+	  }
+      }
+    else
+      {
+	cdoWarning("Unknown units supplied for grid1 center lat/lon: proceeding assuming radians");
+      }
+  }
 
   if ( lgriddestroy ) gridDestroy(gridID);
-  
+
   total_area = 0;
 #if defined (_OPENMP)
 #pragma omp parallel for default(none)        \
@@ -1300,7 +1306,6 @@ int gridGenArea(int gridID, double *area)
 
 int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 {
-  static const char *func = "gridGenWeights";
   int i, nvals, gridsize, gridtype;
   int status = 0;
   int *grid_mask = NULL;
@@ -1349,7 +1354,6 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 static
 int gridWeightsOld(int gridID, double *weights)
 {
-  static const char *func = "gridWeightsOld";
   int status = FALSE;
   long i, j;
   int len;
@@ -1437,7 +1441,6 @@ int gridWeightsOld(int gridID, double *weights)
 
 int gridWeights(int gridID, double *grid_wgts)
 {
-  static const char *func = "gridWeights";
   int i, gridsize, gridtype;
   int a_status, w_status;
   double *grid_area;

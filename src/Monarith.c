@@ -32,7 +32,6 @@
 
 void *Monarith(void *argument)
 {
-  static const char *func = "Monarith";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;

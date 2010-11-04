@@ -70,7 +70,6 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
 
 void *Settime(void *argument)
 {
-  static const char *func = "Settime";
   int SETYEAR, SETMON, SETDAY, SETDATE, SETTIME, SETTUNITS;
   int SETTAXIS, SETREFTIME, SETCALENDAR, SHIFTTIME;
   int operatorID;

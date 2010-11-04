@@ -48,7 +48,6 @@ void geninx(long ntr, double *f, double *g)
 void legini_old(int ntr, int nlat, double *poli, double *pold,
 		double *pol2, double *pol3, double *coslat, double *rcoslat, int flag)
 {
-  static const char *func = "legini_old";
   int waves, dimsp;
   int jgl, jm, jn;
   int jsp;
@@ -122,7 +121,6 @@ void legini_old(int ntr, int nlat, double *poli, double *pold,
 
 void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
 {
-  static const char *func = "legini";
   int waves, dimsp, dimpnm;
   int jgl, jm, jn, is;
   int isp, latn, lats;
@@ -178,7 +176,6 @@ void legini(int ntr, int nlat, double *poli, double *pold, double *rcoslat)
 
 void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  static const char *func = "grid2spec";
   int ntr, nlat, nlon, nfc;
   int nlev = 1;
   int waves;
@@ -202,7 +199,6 @@ void grid2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
    
 void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
-  static const char *func = "spec2grid";
   int ntr, nlat, nlon, nfc;
   int nlev = 1;
   int waves;
@@ -247,7 +243,6 @@ void speccut(int gridIDin, double *arrayIn, double *arrayOut, int *waves)
 
 SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 {
-  static const char *func = "sptrans_new";
   SPTRANS *sptrans;
   int dimsp;
 
@@ -291,8 +286,6 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 
 void sptrans_delete(SPTRANS *sptrans)
 {
-  static const char *func = "sptrans_delete";
-
   if ( sptrans )
     {
       if ( sptrans->trig ) { free(sptrans->trig);  sptrans->trig = NULL; }
@@ -310,7 +303,6 @@ void sptrans_delete(SPTRANS *sptrans)
 
 DVTRANS *dvtrans_new(int ntr)
 {
-  static const char *func = "dvtrans_new";
   DVTRANS *dvtrans;
   int dimsp;
 
@@ -332,8 +324,6 @@ DVTRANS *dvtrans_new(int ntr)
 
 void dvtrans_delete(DVTRANS *dvtrans)
 {
-  static const char *func = "dvtrans_delete";
-
   if ( dvtrans )
     {
       if ( dvtrans->f1 ) { free(dvtrans->f1);  dvtrans->f1 = NULL; }

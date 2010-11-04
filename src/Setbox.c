@@ -28,9 +28,9 @@
 #include "pstream.h"
 
 
-static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22, double *constant)
+static
+void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22, double *constant)
 {
-  static const char *func = "genlonlatbox";  
   int nlon1, nlat1;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
@@ -107,7 +107,8 @@ static void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon
 }
 
 
-static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22, double *constant)
+static
+void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22, double *constant)
 {
   int nlon1, nlat1;
   int temp;
@@ -180,8 +181,9 @@ static void genindexbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon1
 }
 
 
-static void setcbox(double constant, double *array, int gridID,
-		   int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+static
+void setcbox(double constant, double *array, int gridID,
+	     int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int nlon, nlat;
   int ilat, ilon;
@@ -200,7 +202,6 @@ static void setcbox(double constant, double *array, int gridID,
 
 void *Setbox(void *argument)
 {
-  static const char *func = "Setcbox";
   int SETCLONLATBOX, SETCINDEXBOX;
   int operatorID;
   int streamID1, streamID2;

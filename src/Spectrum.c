@@ -151,7 +151,6 @@ void spectrum(int nrec, double *data, double *spectrum, double *real, double *im
 
 void *Spectrum(void *argument)
 {
-  static const char *func = "Spectrum";
   int gridsize;
   int nrecs;
   int gridID, varID, levelID, recID;

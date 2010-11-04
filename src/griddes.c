@@ -1348,7 +1348,6 @@ int nlat2ntr_linear(int nlat)
 
 int ntr2nlat(int ntr)
 {
-  static const char *func = "ntr2nlat";
   int nlat, nlat2;
 
   nlat = NINT((ntr*3.+1.)/2.);
@@ -1368,7 +1367,6 @@ int ntr2nlat(int ntr)
 
 int ntr2nlat_linear(int ntr)
 {
-  static const char *func = "ntr2nlat_linear";
   int nlat, nlat2;
 
   nlat = NINT((ntr*2.+1.)/2.);
@@ -1421,7 +1419,6 @@ int compNlon(int nlat)
 
 void gen_grid_lonlat(grid_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
-  static const char *func = "gen_grid_lonlat";
   int nlon, nlat, i;
 
   grid->type = GRID_LONLAT;
@@ -1449,7 +1446,6 @@ void gen_grid_lonlat(grid_t *grid, const char *pline, double inc, double lon1, d
 
 int gridFromName(const char *gridname)
 {
-  static const char *func = "gridFromName";
   const char *pline;
   int gridID = UNDEFID;
   grid_t grid;

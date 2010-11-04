@@ -35,7 +35,6 @@
 
 void *Arith(void *argument)
 {
-  static const char *func = "Arith";
   int operatorID;
   int operfunc;
   enum {FILL_NONE, FILL_TS, FILL_REC, FILL_RECTS, FILL_FILE};

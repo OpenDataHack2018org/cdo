@@ -31,7 +31,6 @@
 
 void *Mergetime(void *argument)
 {
-  static const char *func = "Mergetime";
   int streamID1, streamID2 = CDI_UNDEFID;
   int tsID2 = 0, recID, varID, levelID;
   int vlistID1, vlistID2;

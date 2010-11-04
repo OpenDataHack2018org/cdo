@@ -133,7 +133,6 @@ int nml_control_read(FILE *fp_nml, nml_control_t *nml_control)
 static
 void read_param(const char *paramfile, param_t *param, int maxparam, int *nparam)
 {
-  static const char *func = "read_param";
   FILE *fp;
   namelist_t *nml;
   int nml_itype, nml_name, nml_pos;
@@ -238,7 +237,6 @@ void read_param(const char *paramfile, param_t *param, int maxparam, int *nparam
 
 void *IFS2ICON(void *argument)
 {
-  static const char *func = "IFS2ICON";
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1, tabnum = 0;
   int tsID1, recID, varID, levelID;

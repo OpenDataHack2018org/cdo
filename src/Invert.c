@@ -34,9 +34,9 @@
 #include "error.h"
 
 
-static void invertLonDes(int vlistID)
+static
+void invertLonDes(int vlistID)
 {
-  static const char *func = "invertLonDes";
   int index, ngrids;
   int gridID1, gridID2;
   int nlat, nlon, size;
@@ -133,9 +133,9 @@ static void invertLonDes(int vlistID)
     }
 }
 
-static void invertLatDes(int vlistID)
+static
+void invertLatDes(int vlistID)
 {
-  static const char *func = "invertLatDes";
   int index, ngrids;
   int gridID1, gridID2;
   int nlat, nlon, size;
@@ -232,10 +232,9 @@ static void invertLatDes(int vlistID)
     }
 }
 
-
-static void invertLonData(double *array1, double *array2, int gridID1)
+static
+void invertLonData(double *array1, double *array2, int gridID1)
 {
-  static const char *func = "invertLonData";
   int nlat, nlon;
   int ilat, ilon;
   double **field1, **field2;
@@ -260,10 +259,9 @@ static void invertLonData(double *array1, double *array2, int gridID1)
   if ( field2 ) free(field2);
 }
 
-
-static void invertLatData(double *array1, double *array2, int gridID1)
+static
+void invertLatData(double *array1, double *array2, int gridID1)
 {
-  static const char *func = "invertLatData";
   int nlat, nlon;
   int ilat;
   double **field1, **field2;
@@ -290,7 +288,6 @@ static void invertLatData(double *array1, double *array2, int gridID1)
 
 void *Invert(void *argument)
 {
-  static const char *func = "Invert";
   int INVERTLAT, INVERTLON, INVERTLATDES, INVERTLONDES, INVERTLATDATA, INVERTLONDATA;
   int operatorID;
   int operfunc1, operfunc2;

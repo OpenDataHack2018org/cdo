@@ -124,7 +124,6 @@ typedef struct
 static
 void pml_init(pml_t *pml, const char *name)
 {
-  static const char *func = "pml_init";
   pml->size = 0;
   pml->dis  = 1;
   pml->name = strdup(name);
@@ -133,7 +132,6 @@ void pml_init(pml_t *pml, const char *name)
 
 pml_t *pmlNew(const char *name)
 {
-  static const char *func = "pmlNew";
   pml_t *pml;
 
   pml = (pml_t *) malloc(sizeof(pml_t));
@@ -180,7 +178,6 @@ void pmlPrint(pml_t *pml)
 
 int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t size)
 {
-  static const char *func = "pmlAdd";
   pml_entry_t *pml_entry;
   int entry = 0;
 
@@ -233,7 +230,6 @@ int pmlNum(pml_t *pml, const char *name)
 
 int pml_add_entry(pml_entry_t *entry, char *arg)
 {
-  static const char *func = "pml_add_entry";
   int status = 0;
 
   if ( entry->type == PML_INT )
@@ -287,7 +283,6 @@ void pmlProcess(pml_entry_t *entry, int argc, char **argv)
 
 int pmlRead(pml_t *pml, int argc, char **argv)
 {
-  static const char *func = "pmlRead";
   pml_entry_t *entry = NULL;
   pml_entry_t *pentry[MAX_PML_ENTRY];
   int params[MAX_PML_ENTRY];
@@ -442,7 +437,6 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 
 void *Select(void *argument)
 {
-  const char func[] = "Select";
   int SELECT;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;

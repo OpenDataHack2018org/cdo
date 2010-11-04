@@ -29,7 +29,6 @@
 
 void *Smooth9(void *argument)
 {
-  static const char *func = "Smooth9";
   int operatorID;
   int operfunc;
   int streamID1, streamID2;

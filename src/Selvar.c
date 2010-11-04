@@ -47,7 +47,6 @@
 
 void *Selvar(void *argument)
 {
-  const char func[] = "Selvar";
   int SELPARAM, SELCODE, SELNAME, SELLEVEL, SELLEVIDX, SELGRID, SELZAXIS, SELLTYPE; 
   int SELTABNUM, DELPARAM, DELCODE, DELNAME, SELSTDNAME;
   int operatorID;

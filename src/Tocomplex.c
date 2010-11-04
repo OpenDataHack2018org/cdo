@@ -24,7 +24,6 @@
 
 void *Tocomplex(void *argument)
 {
-  const char func[] = "Tocomplex";
   int RETOCOMPLEX, IMTOCOMPLEX;
   int operatorID;
   int streamID1, streamID2;

@@ -93,11 +93,9 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
     }
 }
 
-
 static
 void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
 {
-  static const char *func = "read_amsr_averaged";
   int varID, i, gridsize;
   unsigned char *amsr_data = NULL;
   double xminval, xscale, missval;
@@ -132,7 +130,6 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
   free(amsr_data);
 }
 
-
 static
 void write_data(int streamID, int nvars, double *data[], int *nmiss)
 {
@@ -144,7 +141,6 @@ void write_data(int streamID, int nvars, double *data[], int *nmiss)
       streamWriteRecord(streamID, data[varID], nmiss[varID]);
     }
 }
-
 
 static
 int getDate(const char *name)
@@ -165,7 +161,6 @@ int getDate(const char *name)
 
 void *Importamsr(void *argument)
 {
-  static const char *func = "Importamsr";
   int streamID;
   int tsID;
   int gridID, zaxisID, taxisID, vlistID;

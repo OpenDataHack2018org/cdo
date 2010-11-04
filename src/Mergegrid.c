@@ -27,9 +27,9 @@
 #include "pstream.h"
 
 
-static void gen_index(int gridID1, int gridID2, int *index)
+static
+void gen_index(int gridID1, int gridID2, int *index)
 {
-  static const char *func = "gen_index";
   int nlat1, nlon1;
   int nlat2, nlon2;
   int gridtype1, gridtype2;
@@ -151,7 +151,6 @@ static void gen_index(int gridID1, int gridID2, int *index)
 
 void *Mergegrid(void *argument)
 {
-  static const char *func = "Mergegrid";
   int varID;
   int nrecs = 0;
   int tsID, recID, levelID;

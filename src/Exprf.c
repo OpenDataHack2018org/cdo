@@ -43,7 +43,6 @@ Constansts: M_PI, M_E
 
 void *Expr(void *argument)
 {
-  static const char *func = "Expr";
   int EXPR, EXPRF, AEXPR, AEXPRF;
   int operatorID;
   char *exprs = NULL;

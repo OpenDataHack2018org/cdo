@@ -40,7 +40,6 @@ double orthodrome(double px1, double py1, double px2, double py2)
 
 void *Gridcell(void *argument)
 {
-  static const char *func = "Gridcell";
   int GRIDAREA, GRIDWGTS, GRIDMASK, GRIDDX, GRIDDY;
   int operatorID;
   int streamID1, streamID2;

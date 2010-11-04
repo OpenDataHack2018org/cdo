@@ -34,7 +34,6 @@
 
 void *Ymonarith(void *argument)
 {
-  static const char *func = "Ymonarith";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;

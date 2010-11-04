@@ -67,7 +67,6 @@ double corr(double * restrict in0, double * restrict in1,
 
 void *Fldstat2(void *argument)
 {
-  static const char *func = "Fldstat2";
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;

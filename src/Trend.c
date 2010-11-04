@@ -30,7 +30,6 @@
 
 void *Trend(void *argument)
 {
-  static const char *func = "Trend";
   int gridsize;
   int vdate = 0, vtime = 0;
   int nrecs, nrecords;

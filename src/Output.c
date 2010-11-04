@@ -34,7 +34,6 @@
 
 void *Output(void *argument)
 {
-  static const char *func = "Output";
   int OUTPUT, OUTPUTINT, OUTPUTSRV, OUTPUTEXT, OUTPUTF, OUTPUTTS, OUTPUTFLD, OUTPUTARR, OUTPUTXYZ, OUTPUTKEY;
   int operatorID;
   int i;

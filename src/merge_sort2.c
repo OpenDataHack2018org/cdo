@@ -54,8 +54,6 @@ void sort_par(long num_links, double *restrict add1, int parent, int par_depth)
 			   sub-array within the original array 
   */
 
-  const char func[] = "sort_par";
-
   const int nsplit = 2;                      /* (only 2 allowed) number of segments to split 
 						the data */
   int nl[nsplit];                            /* number of links in each sub-array              */

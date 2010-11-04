@@ -32,7 +32,6 @@
 
 void *Seaspctl(void *argument)
 {
-  static const char *func = "Seaspctl";
   int gridsize;
   int vdate1 = 0, vtime1 = 0;
   int vdate2 = 0, vtime2 = 0;

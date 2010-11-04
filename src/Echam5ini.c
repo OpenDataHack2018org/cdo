@@ -63,20 +63,18 @@ typedef struct {
   char   *atxtentry[1024];
 } ATTS;
 
-
-static void iniatts(ATTS *atts)
+static
+void iniatts(ATTS *atts)
 {
   atts->naint = 0;
   atts->naflt = 0;
   atts->natxt = 0;
 }
 
-
-static void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
+static
+void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *name,
 	       const char *longname, const char *units)
-{
-  static const char *func = "inivar_ml";
-  
+{  
   var->gridtype  = gridtype;
   var->zaxistype = zaxistype;
   var->code      = code;
@@ -88,11 +86,9 @@ static void inivar(VAR *var, int gridtype, int zaxistype, int code, const char *
   if ( units )    var->units     = strdup(units);
 }
 
-
-static void inivars_ml(VAR **vars)
+static
+void inivars_ml(VAR **vars)
 {
-  static const char *func = "inivars_ml";
-
   *vars = (VAR *) malloc((nvars_ml+1)*sizeof(VAR));
 
   inivar(&(*vars)[0], GRID_GAUSSIAN, ZAXIS_HYBRID,  133, "Q",   "specific humidity", "kg/kg");
@@ -103,9 +99,9 @@ static void inivars_ml(VAR **vars)
   inivar(&(*vars)[4], GRID_SPECTRAL, ZAXIS_SURFACE, 152, "LSP", "log surface pressure", "");
 }
 
-
 #if  defined  (HAVE_LIBNETCDF)
-static void nce(int istat)
+static
+void nce(int istat)
 {
   /*
     This routine provides a simple interface to netCDF error message routine.
@@ -115,10 +111,9 @@ static void nce(int istat)
 }
 #endif
 
-
-static int import_e5ml(const char *filename, VAR **vars)
+static
+int import_e5ml(const char *filename, VAR **vars)
 {
-  static const char *func = "import_e5ml";
   int nvars = 0;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_dim_id, nc_var_id;
@@ -277,10 +272,9 @@ static int import_e5ml(const char *filename, VAR **vars)
   return (nvars);
 }
 
-
-static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
+static
+void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, int vtime, int ntr)
 {
-  static const char *func = "export_e5ml";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
   size_t nvals;
@@ -612,11 +606,10 @@ static void export_e5ml(const char *filename, VAR *vars, int nvars, int vdate, i
 #endif
 }
 
-
 #if  defined  (HAVE_LIBNETCDF)
-static void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
+static
+void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID)
 {
-  static const char *func = "read_gg3d";
   int nlev, nlat, nlon, gridsize, i;
   int gridtype, zaxistype;
   int nc_var_id;
@@ -652,7 +645,8 @@ static void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, in
 #endif
 
 #if  defined  (HAVE_LIBNETCDF)
-static void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID, int nhgl, int nmp1)
+static
+void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID, int nhgl, int nmp1)
 {
   static const char *func = "read_fc4d";
   int nlev, nfc, i;
@@ -688,10 +682,9 @@ static void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, in
 }
 #endif
 
-
-static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
+static
+int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 {
-  static const char *func = "import_e5res";
   int nvars = 0;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
@@ -1083,10 +1076,9 @@ static int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   return (nvars);
 }
 
-
-static void export_e5res(const char *filename, VAR *vars, int nvars)
+static
+void export_e5res(const char *filename, VAR *vars, int nvars)
 {
-  static const char *func = "export_e5res";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_var_id;
   int varid;
@@ -1430,7 +1422,6 @@ static void export_e5res(const char *filename, VAR *vars, int nvars)
 
 void *Echam5ini(void *argument)
 {
-  static const char *func = "Echam5ini";
   int operatorID;
   int operfunc;
   int IMPORT_E5ML, IMPORT_E5RES;

@@ -304,7 +304,6 @@ void correct_sinxvals(int xsize, int ysize, double *xvals)
 
 int gridFromH5file(const char *gridfile)
 {
-  static const char *func = "gridFromH5file";
   int gridID = -1;
 #if  defined  (HAVE_LIBHDF5)
   hid_t	  file_id;	/* HDF5 File ID	        	*/

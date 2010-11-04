@@ -30,7 +30,6 @@
 
 void *Vardup(void *argument)
 {
-  static const char *func = "Vardup";
   int PARDUP, PARMUL;
   int operatorID;
   int streamID1, streamID2;

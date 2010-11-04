@@ -350,8 +350,6 @@ void zonstd(field_t field1, field_t *field2)
 /* RQ */
 void zonpctl(field_t field1, field_t *field2, int p)
 {
-  static const char *func = "zonpctl";
-
   long   i, j, l, nx, ny;
   int    rnmiss = 0;
   int    grid    = field1.grid;

@@ -30,7 +30,6 @@
 
 void *Cond(void *argument)
 {
-  static const char *func = "Cond";
   int IFTHEN, IFNOTTHEN;
   int operatorID;
   enum {FILL_NONE, FILL_TS, FILL_REC};

@@ -33,7 +33,6 @@ void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Eofcoeff(void * argument)
 {
-  static const char *func = "Eofcoeff";
   char eof_name[5], oname[1024], filesuffix[32];
   double *w;
   double missval1=-999, missval2;

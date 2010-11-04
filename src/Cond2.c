@@ -29,7 +29,6 @@
 
 void *Cond2(void *argument)
 {
-  static const char *func = "Cond2";
   int IFTHENELSE;
   int operatorID;
   enum {FILL_NONE, FILL_TS, FILL_REC};

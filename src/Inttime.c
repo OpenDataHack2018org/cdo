@@ -32,7 +32,6 @@
 
 void *Inttime(void *argument)
 {
-  static const char *func = "Inttime";
   int streamID1, streamID2;
   int nrecs, nvars, nlevel;
   int i, nrecords;

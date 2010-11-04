@@ -43,7 +43,6 @@
 
 void *Yseasstat(void *argument)
 {
-  static const char *func = "Yseasstat";
   int operatorID;
   int operfunc;
   int gridsize;

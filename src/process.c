@@ -175,7 +175,6 @@ int processNums(void)
 
 void processAddNvals(off_t nvals)
 {
-  static const char *func = "processAddNvals";
   int processID = processSelf();
 
   Process[processID].nvals += nvals;
@@ -184,7 +183,6 @@ void processAddNvals(off_t nvals)
 
 off_t processInqNvals(int processID)
 {
-  static const char *func = "processInqNvals";
   off_t nvals = 0;
 
   nvals = Process[processID].nvals;
@@ -336,7 +334,6 @@ const char *processOperator(void)
 static
 char *getOperatorArg(const char *xoperator)
 {
-  static const char *func = "getOperatorArg";
   char *commapos;
   char *operatorArg = NULL;
   size_t len;
@@ -459,7 +456,6 @@ int getStreamCnt(int argc, char *argv[])
 static
 void setStreamNames(int argc, char *argv[])
 {
-  static const char *func = "setStreamNames";
   int processID = processSelf();
   int i;
   int globArgc = 1;
@@ -727,7 +723,6 @@ void operatorCheckArgc(int numargs)
 
 void operatorInputArg(const char *enter)
 {
-  static const char *func = "operatorInputArg";
   char line[1024];
   char *pline = line;
   int processID = processSelf();

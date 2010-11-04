@@ -34,7 +34,6 @@
 
 void *Comp(void *argument)
 {
-  static const char *func = "Comp";
   int EQ, NE, LE, LT, GE, GT;
   int operatorID;
   enum {FILL_NONE, FILL_TS, FILL_REC};

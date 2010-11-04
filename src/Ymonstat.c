@@ -54,7 +54,6 @@ int cmpint(const void *s1, const void *s2)
 
 void *Ymonstat(void *argument)
 {
-  static const char *func = "Ymonstat";
   int operatorID;
   int operfunc;
   int gridsize;

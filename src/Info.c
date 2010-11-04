@@ -219,7 +219,6 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
 void *Info(void *argument)
 {
-  static const char *func = "Info";
   int INFO, INFOV, INFOP, MAP;
   int operatorID;
   int i;

@@ -98,8 +98,6 @@ static pstreamPtrToIdx *_pstreamAvail = NULL;
 static
 void pstream_list_new(void)
 {
-  static const char *func = "pstream_list_new";
-
   assert(_pstreamList == NULL);
 
   _pstreamList = (pstreamPtrToIdx *) malloc(_pstream_max*sizeof(pstreamPtrToIdx));
@@ -108,8 +106,6 @@ void pstream_list_new(void)
 static
 void pstream_list_delete(void)
 {
-  static const char *func = "pstream_list_delete";
-
   if ( _pstreamList ) free(_pstreamList);
 }
 
@@ -215,7 +211,6 @@ void pstream_init_entry(pstream_t *pstreamptr)
 static
 pstream_t *pstream_new_entry(void)
 {
-  static const char *func = "pstream_new_entry";
   pstream_t *pstreamptr;
 
   pstreamptr = (pstream_t *) malloc(sizeof(pstream_t));
@@ -946,7 +941,6 @@ const char *cdoComment(void)
 static
 void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 {
-  static const char *func = "pstreamDefVarlist";
   int varID, nvars;
   int laddoffset, lscalefactor;
   int datatype, filetype;

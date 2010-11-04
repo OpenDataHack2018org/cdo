@@ -35,7 +35,6 @@
 
 void *Splittime(void *argument)
 {
-  static const char *func = "Splittime";
   int SPLITHOUR, SPLITDAY, SPLITMON, SPLITSEAS;
   int operatorID;
   int operfunc, operintval;

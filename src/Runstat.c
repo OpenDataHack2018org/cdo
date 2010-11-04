@@ -77,7 +77,6 @@ void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 
 void *Runstat(void *argument)
 {
-  static const char *func = "Runstat";
   int operatorID;
   int operfunc;
   int gridsize;

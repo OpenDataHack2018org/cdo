@@ -30,7 +30,6 @@
 
 void *Diff(void *argument)
 {
-  static const char *func = "Diff";
   int DIFF, DIFFP, DIFFV, SDIFF;
   int operatorID;
   int i;

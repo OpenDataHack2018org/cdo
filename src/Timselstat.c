@@ -36,7 +36,6 @@
 
 void *Timselstat(void *argument)
 {
-  static const char *func = "Timselstat";
   int operatorID;
   int operfunc;
   int gridsize;

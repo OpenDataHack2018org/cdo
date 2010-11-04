@@ -27,7 +27,6 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
     }
 }
 
-
 static
 void init_data(int vlistID, int nvars, double *data[])
 {
@@ -45,7 +44,6 @@ void init_data(int vlistID, int nvars, double *data[])
 	}
     } 
 }
-
 
 static
 void write_data(int streamID, int vlistID, int nvars, double *data[])
@@ -71,7 +69,6 @@ void write_data(int streamID, int vlistID, int nvars, double *data[])
     }
 }
 
-
 static
 int getDate(const char *name)
 {
@@ -92,7 +89,6 @@ int getDate(const char *name)
 
 void *Importobs(void *argument)
 {
-  static const char *func = "Importobs";
   int operatorID;
   char line[MAX_LINE_LEN];
   int streamID;

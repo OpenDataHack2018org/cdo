@@ -30,9 +30,9 @@
 #include "pstream.h"
 
 
-static void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
+static
+void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
 {
-  static const char *func = "mastrfu";
   int nlev;
   int nlat;
   int ilev, ilat, n;
@@ -86,7 +86,6 @@ static void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
 
 void *Mastrfu(void *argument)
 {
-  static const char *func = "Mastrfu";
   int streamID1, streamID2;
   int nrecs;
   int tsID, recID, varID, levelID;

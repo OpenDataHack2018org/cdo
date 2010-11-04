@@ -24,7 +24,6 @@
 
 void *Complextorect(void *argument)
 {
-  const char func[] = "Complextorect";
   // int COMPLEXTORECT;
   // int operatorID;
   int streamID1, streamID2, streamID3;
