@@ -176,6 +176,10 @@ static const char CWD_NAME2[]        = "number_of_cwd_periods_with_more_than_5da
 static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS2[]       = "No.";
 
+static const char RINDEX_NAME[]       = "precipitation_days_index_per_time_period";
+static const char RINDEX_LONGNAME[]   = "precipitation days is the number of days per time period with daily precipitation sum exceeding RR mm. The time period should be defined by the bounds of the time coordinate.";
+static const char RINDEX_UNITS[]      = "No.";
+
 static const char R10MM_NAME[]       = "heavy_precipitation_days_index_per_time_period";
 static const char R10MM_LONGNAME[]   = "Heavy precipitation days is the number of days per time period with daily precipitation sum exceeding 10 mm. The time period should be defined by the bounds of the time coordinate.";
 static const char R10MM_UNITS[]      = "No.";
@@ -945,18 +949,57 @@ void *EcaCwd(void *argument)
 }
 
 
-void *EcaR10mm(void *argument)
+void *EcaRainIndex(void *argument)
 {
+  int ECA_RAININDEX, ECA_R10MM, ECA_R20MM;
+  int operatorID;
+  double rr = 0;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
-  cdoOperatorAdd("eca_r10mm", 0, 31, NULL);
+
+  ECA_RAININDEX = cdoOperatorAdd("eca_rainindex", 0, 31, NULL);
+  ECA_R10MM     = cdoOperatorAdd("eca_r10mm",     0, 31, NULL);
+  ECA_R20MM     = cdoOperatorAdd("eca_r20mm",     0, 31, NULL);
+
+  operatorID = cdoOperatorID();
+
+  if ( operatorID == ECA_RAININDEX )
+    {
+      operatorInputArg("RR");
+
+      if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
+      if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+
+      rr = atof(operatorArgv()[0]);
+
+      if ( rr < 0 ) cdoAbort("Parameter out of range: RR = %d", rr);
+
+      request.var1.name     = RINDEX_NAME;
+      request.var1.longname = RINDEX_LONGNAME;
+      request.var1.units    = RINDEX_UNITS;
+    }
+  else if ( operatorID == ECA_R10MM )
+    {
+      rr = 10;
+
+      request.var1.name     = R10MM_NAME;
+      request.var1.longname = R10MM_LONGNAME;
+      request.var1.units    = R10MM_UNITS;
+    }
+  else if ( operatorID == ECA_R20MM )
+    {
+      rr = 20;
+
+      request.var1.name     = R20MM_NAME;
+      request.var1.longname = R20MM_LONGNAME;
+      request.var1.units    = R20MM_UNITS;
+    }
   
-  request.var1.name     = R10MM_NAME;
-  request.var1.longname = R10MM_LONGNAME;
-  request.var1.units    = R10MM_UNITS;
+  if ( cdoVerbose ) cdoPrint("RR = %g", rr);
+
   request.var1.f1       = farselgec;
-  request.var1.f1arg    = 10.0;
+  request.var1.f1arg    = rr;
   request.var1.f2       = farnum;
   request.var1.f3       = NULL;
   request.var1.mulc     = 0.0;   
@@ -965,33 +1008,6 @@ void *EcaR10mm(void *argument)
   request.var2.h2       = NULL;
   request.var2.h3       = NULL;
   
-  eca1(&request);
-  cdoFinish();
-  
-  return (0);
-}
-
-
-void *EcaR20mm(void *argument)
-{
-  ECA_REQUEST_1 request;
-  
-  cdoInitialize(argument);
-  cdoOperatorAdd("eca_r20mm", 0, 31, NULL);
-
-  request.var1.name     = R20MM_NAME;
-  request.var1.longname = R20MM_LONGNAME;
-  request.var1.units    = R20MM_UNITS;
-  request.var1.f1       = farselgec;
-  request.var1.f1arg    = 20.0;
-  request.var1.f2       = farnum;
-  request.var1.f3       = NULL;
-  request.var1.mulc     = 0.0;   
-  request.var1.addc     = 0.0;    
-  request.var1.epilog   = NONE;
-  request.var2.h2       = NULL;
-  request.var2.h3       = NULL;
-    
   eca1(&request);
   cdoFinish();
   

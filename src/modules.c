@@ -219,8 +219,7 @@ void *EcaTx90p(void *argument);
 void *EcaCdd(void *argument);
 void *EcaCwd(void *argument);
 void *EcaRr1(void *argument);
-void *EcaR10mm(void *argument);
-void *EcaR20mm(void *argument);
+void *EcaRainIndex(void *argument);
 void *EcaR75p(void *argument);
 void *EcaR75ptot(void *argument);
 void *EcaR90p(void *argument);
@@ -454,6 +453,7 @@ void *Wct(void *argument);
 #define  EcaCddOperators        {"eca_cdd"}
 #define  EcaCwdOperators        {"eca_cwd"}
 #define  EcaRr1Operators        {"eca_rr1"}
+#define  EcaRainIndexOperators  {"eca_rainindex"}
 #define  EcaR10mmOperators      {"eca_r10mm"}
 #define  EcaR20mmOperators      {"eca_r20mm"}
 #define  EcaR75pOperators       {"eca_r75p"}
@@ -682,8 +682,9 @@ static modules_t Modules[] =
   { EcaCdd,         EcaCddHelp,        EcaCddOperators,        CDI_REAL,  1,  1 },
   { EcaCwd,         EcaCwdHelp,        EcaCwdOperators,        CDI_REAL,  1,  1 },
   { EcaRr1,         EcaRr1Help,        EcaRr1Operators,        CDI_REAL,  1,  1 },
-  { EcaR10mm,       EcaR10mmHelp,      EcaR10mmOperators,      CDI_REAL,  1,  1 },
-  { EcaR20mm,       EcaR20mmHelp,      EcaR20mmOperators,      CDI_REAL,  1,  1 },
+  { EcaRainIndex,   NULL,              EcaRainIndexOperators,  CDI_REAL,  1,  1 },
+  { EcaRainIndex,   EcaR10mmHelp,      EcaR10mmOperators,      CDI_REAL,  1,  1 },
+  { EcaRainIndex,   EcaR20mmHelp,      EcaR20mmOperators,      CDI_REAL,  1,  1 },
   { EcaR75p,        EcaR75pHelp,       EcaR75pOperators,       CDI_REAL,  2,  1 },
   { EcaR75ptot,     EcaR75ptotHelp,    EcaR75ptotOperators,    CDI_REAL,  2,  1 },
   { EcaR90p,        EcaR90pHelp,       EcaR90pOperators,       CDI_REAL,  2,  1 },
