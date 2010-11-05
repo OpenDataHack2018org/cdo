@@ -204,6 +204,8 @@ Operator catalog:
    Ensstat       ensvar          Ensemble variance
    Ensstat       ensstd          Ensemble standard deviation
    Ensstat       enspctl         Ensemble percentiles
+   Ensstat2      ensbrs          Brier score
+   Ensstat2      enscrps         Cumulative Ranked Probability score
    Fldstat       fldmin          Field minimum
    Fldstat       fldmax          Field maximum
    Fldstat       fldsum          Field sum
