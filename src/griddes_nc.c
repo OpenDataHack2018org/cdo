@@ -158,6 +158,7 @@ int gridFromNCfile(const char *gridfile)
 
 void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 {
+  static const char *func = "writeNCgrid";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_file_id;      /* netCDF grid file id           */
   int nc_gridsize_id;  /* netCDF grid size dim id       */
