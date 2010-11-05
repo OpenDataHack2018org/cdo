@@ -94,7 +94,7 @@ int com_help(char *arg)
 
   if ( !printed )
     {
-      printf ("No commands match â%sâ. Possibilties are:\n", arg);
+      printf ("No commands match '%s'. Possibilties are:\n", arg);
       for (i = 0; commands[i].name; i++)
 	{
 	  /* Print in six columns. */
