@@ -297,7 +297,7 @@ void *Wct(void *argument);
 #define  ImportobsOperators     {"import_obs"}
 #define  InfoOperators          {"info", "infov", "infop", "map"}
 #define  InputOperators         {"input", "inputsrv", "inputext"}
-#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "intarea", "boxavg", "thinout"}
+#define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  IntlevelOperators      {"intlevel", "intlevelx"}
 #define  InttimeOperators       {"inttime"}

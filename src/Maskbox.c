@@ -33,6 +33,7 @@
 #define MAX_LINE 256
 #define MAX_VALS 1048576
 
+static
 int ReadCoords(double *xvals, double *yvals, const char *polyfile, FILE *fp)
 {
   double xcoord, ycoord;
@@ -133,6 +134,15 @@ void genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, in
 
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
+
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID1, units);
+    gridToDegree(units, "grid center lon", nlon1, xvals1);
+    gridInqYunits(gridID1, units);
+    gridToDegree(units, "grid center lat", nlat1, yvals1);
+  }
 
   genlonlatbox(xlon1, xlon2, xlat1, xlat2,
 	       nlon1, nlat1, xvals1, yvals1,
@@ -253,6 +263,15 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);  
+
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID, units);
+    gridToDegree(units, "grid center lon", nlon, xvals);
+    gridInqYunits(gridID, units);
+    gridToDegree(units, "grid center lat", nlat, yvals);
+  }
 
   xmin = xvals[0];
   ymin = yvals[0];

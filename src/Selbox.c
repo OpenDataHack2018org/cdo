@@ -401,7 +401,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   int grid_is_circular;
   char xunits[128];
   char yunits[128];
-  double xfact, yfact;
+  double xfact = 1, yfact = 1;
 
   operatorCheckArgc(4);
 
@@ -434,15 +434,8 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   gridInqXunits(gridID1, xunits);
   gridInqYunits(gridID1, yunits);
 
-  if ( memcmp(xunits, "radian", 6) == 0 )
-    xfact = RAD2DEG;
-  else
-    xfact = 1;
-
-  if ( memcmp(yunits, "radian", 6) == 0 )
-    yfact = RAD2DEG;
-  else
-    yfact = 1;
+  if ( memcmp(xunits, "radian", 6) == 0 ) xfact = RAD2DEG;
+  if ( memcmp(yunits, "radian", 6) == 0 ) yfact = RAD2DEG;
 
   if ( gridtype == GRID_CURVILINEAR )
     {

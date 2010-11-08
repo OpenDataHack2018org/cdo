@@ -135,6 +135,15 @@ void *Importobs(void *argument)
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID, units);
+    gridToDegree(units, "grid center lon", gridsize, xvals);
+    gridInqYunits(gridID, units);
+    gridToDegree(units, "grid center lat", gridsize, yvals);
+  }
+
   fp = fopen(cdoStreamName(0), "r");
   if ( fp == NULL ) { perror(cdoStreamName(0)); exit(EXIT_FAILURE); }
 

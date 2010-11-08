@@ -149,8 +149,6 @@ void *Output(void *argument)
 
       if ( operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ || operatorID == OUTPUTKEY )
 	{
-	  char units[128];
-
 	  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToCell(gridID);
 
 	  if ( gridInqType(gridID) != GRID_CELL && gridInqType(gridID) != GRID_CURVILINEAR )
@@ -162,10 +160,13 @@ void *Output(void *argument)
 	  gridInqYvals(gridID, grid_center_lat);
 
 	  /* Convert lat/lon units if required */
-	  gridInqXunits(gridID, units);
-	  gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
-	  gridInqYunits(gridID, units);
-	  gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
+	  {
+	    char units[128];
+	    gridInqXunits(gridID, units);
+	    gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+	    gridInqYunits(gridID, units);
+	    gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
+	  }
 	}
 
       tsID = 0;

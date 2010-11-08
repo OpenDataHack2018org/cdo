@@ -26,6 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 static
@@ -51,6 +52,15 @@ void genlonlatbox(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
   gridInqXvals(gridID1, xvals1);
   gridInqYvals(gridID1, yvals1);
+
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID1, units);
+    gridToDegree(units, "grid center lon", nlon1, xvals1);
+    gridInqYunits(gridID1, units);
+    gridToDegree(units, "grid center lat", nlat1, yvals1);
+  }
 
   xlon2 -= 360 * floor ((xlon2 - xlon1) / 360);
   if ( IS_EQUAL(xlon1, xlon2) ) xlon2 += 360;

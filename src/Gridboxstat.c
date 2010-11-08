@@ -36,6 +36,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "functs.h"
+#include "grid.h"
 
 
 static
@@ -179,6 +180,15 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       yvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
+
+      /* Convert lat/lon units if required */
+      {
+	char units[128];
+	gridInqXunits(gridID1, units);
+	gridToDegree(units, "grid center lon", nlon1*nlat1, xvals1);
+	gridInqYunits(gridID1, units);
+	gridToDegree(units, "grid center lat", nlon1*nlat1, yvals1);
+      }
       
       if ( gridHasBounds )
         {
@@ -188,6 +198,15 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           grid2_corner_lat = (double *) malloc(4*nlon2*nlat2*sizeof(double));
           gridInqXbounds(gridID1, grid1_corner_lon);
           gridInqYbounds(gridID1, grid1_corner_lat);
+
+	  /* Convert lat/lon units if required */
+	  {
+	    char units[128];
+	    gridInqXunits(gridID1, units);
+	    gridToDegree(units, "grid corner lon", 4*nlon1*nlat1, grid1_corner_lon);
+	    gridInqYunits(gridID1, units);
+	    gridToDegree(units, "grid corner lat", 4*nlon1*nlat1, grid1_corner_lat);
+	  }
         }
       
       /* Process grid2 bounds */
