@@ -698,9 +698,9 @@ void *Outputgmt(void *argument)
   gridInqXvals(gridID, grid_center_lon);
 
   /* Convert lat/lon units if required */
-  gridInqYunits(gridID, units);
-
+  gridInqXunits(gridID, units);
   gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+  gridInqYunits(gridID, units);
   gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
 
   nvals = gridsize;

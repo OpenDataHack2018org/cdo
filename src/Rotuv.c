@@ -33,7 +33,7 @@
 static
 void rot_uv_back(int gridID, double *us, double *vs)
 {
-  int i, ilat, ilon, nlat, nlon;
+  long i, ilat, ilon, nlat, nlon;
   double u, v;
   double xval, yval;
   double xpole, ypole, angle;
@@ -51,6 +51,17 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
+
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID, units);
+    gridToDegree(units, "xpole", 1, &xpole);
+    gridToDegree(units, "grid center lon", nlon, xvals);
+    gridInqYunits(gridID, units);
+    gridToDegree(units, "ypole", 1, &ypole);
+    gridToDegree(units, "grid center lat", nlat, yvals);
+  }
 
   for ( ilat = 0; ilat < nlat; ilat++ )
     for ( ilon = 0; ilon < nlon; ilon++ )

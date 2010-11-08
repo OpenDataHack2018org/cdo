@@ -330,8 +330,26 @@ void *Mrotuvb(void *argument)
   gridInqXvals(gridID1, grid1x);
   gridInqYvals(gridID1, grid1y);
 
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID1, units);
+    gridToDegree(units, "grid1 center lon", gridsize, grid1x);
+    gridInqYunits(gridID1, units);
+    gridToDegree(units, "grid1 center lat", gridsize, grid1y);
+  }
+
   gridInqXvals(gridID2, grid2x);
   gridInqYvals(gridID2, grid2y);
+
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridID2, units);
+    gridToDegree(units, "grid2 center lon", gridsize, grid2x);
+    gridInqYunits(gridID2, units);
+    gridToDegree(units, "grid2 center lat", gridsize, grid2y);
+  }
 
   uv_to_p_grid(nlon, nlat, grid1x, grid1y, grid2x, grid2y, grid3x, grid3y);
 
