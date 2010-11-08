@@ -335,7 +335,7 @@ int gengrid(int gridID1, int lhalo, int rhalo)
 		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
 		}
 
-	      for ( ilon = nmin; ilon < 4*nmax; ilon++ )
+	      for ( ilon = 4*nmin; ilon < 4*nmax; ilon++ )
 		{
 		  *pxbounds2++ = xbounds1[4*ilat*nlon1 + ilon];
 		  *pybounds2++ = ybounds1[4*ilat*nlon1 + ilon];
