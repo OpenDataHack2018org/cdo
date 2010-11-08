@@ -25,6 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 static
@@ -80,8 +81,26 @@ void gen_index(int gridID1, int gridID2, int *index)
       gridInqXvals(gridID1, xvals1);
       gridInqYvals(gridID1, yvals1);
 
+      /* Convert lat/lon units if required */
+      {
+	char units[128];
+	gridInqXunits(gridID1, units);
+	gridToDegree(units, "grid1 center lon", nlon1, xvals1);
+	gridInqYunits(gridID1, units);
+	gridToDegree(units, "grid1 center lat", nlat1, yvals1);
+      }
+
       gridInqXvals(gridID2, xvals2);
       gridInqYvals(gridID2, yvals2);
+
+      /* Convert lat/lon units if required */
+      {
+	char units[128];
+	gridInqXunits(gridID2, units);
+	gridToDegree(units, "grid2 center lon", nlon2, xvals2);
+	gridInqYunits(gridID2, units);
+	gridToDegree(units, "grid2 center lat", nlat2, yvals2);
+      }
 
       for ( i2 = 0; i2 < nlat2; i2++ )
 	{

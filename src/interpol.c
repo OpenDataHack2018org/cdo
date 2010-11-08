@@ -4,6 +4,7 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
+#include "grid.h"
 
 
 double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const double *ym,
@@ -283,6 +284,15 @@ void interpolate(field_t *field1, field_t *field2)
   gridInqXvals(gridIDi, lon);
   gridInqYvals(gridIDi, lat);
 
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridIDi, units);
+    gridToDegree(units, "grid1 center lon", nlon, lon);
+    gridInqYunits(gridIDi, units);
+    gridToDegree(units, "grid1 center lat", nlat, lat);
+  }
+
   if ( nlon > 1 )
     {
       lon[-1] = lon[nlon - 1] - 360 > 2*lon[0] - lon[1] ?
@@ -319,6 +329,15 @@ void interpolate(field_t *field1, field_t *field2)
 
   gridInqXvals(gridIDo, lono);
   gridInqYvals(gridIDo, lato);
+
+  /* Convert lat/lon units if required */
+  {
+    char units[128];
+    gridInqXunits(gridIDo, units);
+    gridToDegree(units, "grid2 center lon", out_nlon, lono);
+    gridInqYunits(gridIDo, units);
+    gridToDegree(units, "grid2 center lat", out_nlat, lato);
+  }
 
   for ( i = 0; i < out_nlon - 1; i++ )
     if (lono[i + 1] <= lono[i]) break;
