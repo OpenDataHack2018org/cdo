@@ -33,10 +33,6 @@
 #include "grid.h"
 
 
-#define  deg2rad  (M_PI/180.)   /* conversion for deg to rad */
-#define  rad2deg  (180./M_PI)   /* conversion for rad to deg */
-
-
 void gridToDegree(const char *units, const char *string, int gridsize, double *array)
 {
   long i;
@@ -45,13 +41,13 @@ void gridToDegree(const char *units, const char *string, int gridsize, double *a
     {
       for ( i = 0; i < gridsize; i++ ) array[i] *= rad2deg;
     }
-  else if ( memcmp(units, "degrees", 7) == 0 )
+  else if ( memcmp(units, "degree", 6) == 0 )
     {
       /* No conversion necessary */
     }
   else
     {
-      cdoWarning("Unknown units supplied for %s: %s", string, "proceeding assuming degrees");
+      cdoWarning("Unknown units supplied for %s: %s", string, "proceeding assuming degrees!");
     }
 }
 

@@ -1,3 +1,8 @@
+2010-11-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* sethalo: added support grid units radian
+	* fldmean: gives wrong result for grid units radian (bug fix) [report: Pilar Ripodas]
+	
 2010-10-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Yseasstat: bug fix for datasets with time constant fields [report: Ute Merkel]
@@ -56,7 +61,7 @@
 	
 2010-07-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* sellonlatbox: the last lon index is sometimes incorrect (bug fix) [report:Flore Mounier]
+	* sellonlatbox: fix rounding error of the last lon index [report:Flore Mounier]
 	
 2010-07-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

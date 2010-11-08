@@ -24,6 +24,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 static
@@ -174,7 +175,6 @@ int gentpngrid(int gridID1)
   return (gridID2);
 }
 
-
 static
 int gengrid(int gridID1, int lhalo, int rhalo)
 {
@@ -193,6 +193,7 @@ int gengrid(int gridID1, int lhalo, int rhalo)
   double *xbounds2 = NULL, *ybounds2 = NULL;
   double *pxvals2 = NULL, *pyvals2 = NULL;
   double *pxbounds2 = NULL, *pybounds2 = NULL;
+  double cpi2 = M_PI*2;
 
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
@@ -230,6 +231,8 @@ int gengrid(int gridID1, int lhalo, int rhalo)
   gridDefYname(gridID2, yname);
   gridDefYlongname(gridID2, ylongname);
   gridDefYunits(gridID2, yunits);
+
+  if ( memcmp(xunits, "degree", 6) == 0 ) cpi2 *= rad2deg;
 
   if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
     {
@@ -279,9 +282,9 @@ int gengrid(int gridID1, int lhalo, int rhalo)
 	}
       else
 	{
-	  for ( i = nlon1-lhalo; i < nlon1; i++ ) *pxvals2++ = xvals1[i] - 360;
+	  for ( i = nlon1-lhalo; i < nlon1; i++ ) *pxvals2++ = xvals1[i] - cpi2;
 	  for ( i = nmin; i < nmax; i++ ) *pxvals2++ = xvals1[i];
-	  for ( i = 0; i < rhalo; i++ ) *pxvals2++ = xvals1[i] + 360;
+	  for ( i = 0; i < rhalo; i++ ) *pxvals2++ = xvals1[i] + cpi2;
 
 	  for ( i = 0; i < nlat1; i++ ) yvals2[i] = yvals1[i];
 	}
@@ -348,9 +351,9 @@ int gengrid(int gridID1, int lhalo, int rhalo)
       else
 	{
 	  gridDefNvertex(gridID2, 2);
-	  for ( i = 2*(nlon1-lhalo); i < 2*nlon1; i++ ) *pxbounds2++ = xbounds1[i] - 360;
+	  for ( i = 2*(nlon1-lhalo); i < 2*nlon1; i++ ) *pxbounds2++ = xbounds1[i] - cpi2;
 	  for ( i = 2*nmin; i < 2*nmax; i++ ) *pxbounds2++ = xbounds1[i];
-	  for ( i = 0; i < 2*rhalo; i++ ) *pxbounds2++ = xbounds1[i] + 360;
+	  for ( i = 0; i < 2*rhalo; i++ ) *pxbounds2++ = xbounds1[i] + cpi2;
 
 	  for ( i = 0; i < 2*nlat2; i++ ) ybounds2[i] = ybounds1[i];
 	}

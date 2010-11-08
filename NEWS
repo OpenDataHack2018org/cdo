@@ -7,7 +7,9 @@ Version 1.4.7 (?? December 2010):
      * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
      * dv2ps: Divergence and vorticity to velocity potential and stream function
    Fixed bugs:
+     * fldmean: gives wrong result for grid units radian
      * Yseasstat: bug fix for datasets with time constant fields
+     * Sellevel: fix problem with hybrid model levels and netCDF output
 
 Version 1.4.6 (17 September 2010):
 
@@ -26,6 +28,7 @@ Version 1.4.6 (17 September 2010):
    Fixed bugs:
      * sellevel: copy zaxis meta data name and units
      * seldate: open output file only when time steps found
+     * sellonlatbox: fix rounding error of the last lon index
 
 Version 1.4.5.1 (05 July 2010):
 

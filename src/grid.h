@@ -1,6 +1,10 @@
 #ifndef _GRID_H
 #define _GRID_H
 
+#define  deg2rad  (M_PI/180.)   /* conversion for deg to rad */
+#define  rad2deg  (180./M_PI)   /* conversion for rad to deg */
+
+
 void gridToDegree(const char *units, const char *string, int gridsize, double *array);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
