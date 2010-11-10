@@ -3,6 +3,8 @@ CDO NEWS
 
 Version 1.4.7 (?? December 2010):
 
+   New features:
+     * improved support for netCDF output from WRF model (import time and grid variables)
    New operators:
      * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
      * dv2ps: Divergence and vorticity to velocity potential and stream function

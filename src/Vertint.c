@@ -282,11 +282,6 @@ void *Vertint(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
-
-  streamDefVlist(streamID2, vlistID2);
-
   nvars = vlistNvars(vlistID1);
 
   vars      = (int *) malloc(nvars*sizeof(int));
@@ -469,6 +464,11 @@ void *Vertint(void *argument)
       else
 	cdoAbort("Surface pressure not found!");
     }
+
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+
+  streamDefVlist(streamID2, vlistID2);
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
