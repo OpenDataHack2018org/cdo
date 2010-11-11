@@ -59,7 +59,7 @@ void *Fldstat(void *argument)
   int pn = 0;
   /* QR */
 
-  int showHeader = FALSE;
+  int showHeader = TRUE;
 
   cdoInitialize(argument);
 
@@ -159,49 +159,54 @@ void *Fldstat(void *argument)
 	  /* QR */
 
 	  if ( cdoVerbose )
-	    if ( operfunc == func_min || operfunc == func_max )
-	      {
-		if ( gridInqType(field.grid) == GRID_GAUSSIAN ||
-		     gridInqType(field.grid) == GRID_LONLAT )
-		  {
-		    int i = 0, j, nlon, nlat;
-		    nlon = gridInqXsize(field.grid);
-		    nlat = gridInqYsize(field.grid);
-		    for ( j = 0; j < nlat; ++j )
-		      {
-			for ( i = 0; i < nlon; ++i )
-			  {
-			    if ( DBL_IS_EQUAL(field.ptr[j*nlon+i], sglval) )
-                              {
-                                int vdate, vtime, code;
-                                int year, month, day, hour, minute, second;
-                                double level;
-                                double xval, yval;
-                                xval  = gridInqXval(field.grid, i);
-                                yval  = gridInqYval(field.grid, j);
-                                vdate = taxisInqVdate(taxisID1);
-                                vtime = taxisInqVtime(taxisID1);
-                                cdiDecodeDate(vdate, &year, &month, &day);
-                                cdiDecodeTime(vtime, &hour, &minute, &second);
-                                code  = vlistInqVarCode(vlistID1, varID);
-                                level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
-                                if ( showHeader && tsID == 0 && recID == 0 )
+            {
+              if ( operfunc == func_min || operfunc == func_max )
+                {
+                  if ( gridInqType(field.grid) == GRID_GAUSSIAN ||
+                      gridInqType(field.grid) == GRID_LONLAT )
+                    {
+                      int i = 0, j, nlon, nlat;
+                      int vdate, vtime, code;
+                      int year, month, day, hour, minute, second;
+                      double level;
+                      vdate = taxisInqVdate(taxisID1);
+                      vtime = taxisInqVtime(taxisID1);
+                      cdiDecodeDate(vdate, &year, &month, &day);
+                      cdiDecodeTime(vtime, &hour, &minute, &second);
+                      code  = vlistInqVarCode(vlistID1, varID);
+                      level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
+                      nlon  = gridInqXsize(field.grid);
+                      nlat  = gridInqYsize(field.grid);
+                      for ( j = 0; j < nlat; ++j )
+                        {
+                          for ( i = 0; i < nlon; ++i )
+                            {
+                              if ( DBL_IS_EQUAL(field.ptr[j*nlon+i], sglval) )
                                 {
-                                  if ( operfunc == func_min )
-                                    fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
-                                  else
-                                    fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
-                                  showHead = TRUE;
-                                }
+/*                                   printf("%d %d %.2f ",i,j,sglval);
+ */
+                                  double xval, yval;
+                                  xval  = gridInqXval(field.grid, i);
+                                  yval  = gridInqYval(field.grid, j);
+                                  if ( showHeader )
+                                  {
+                                    if ( operfunc == func_min )
+                                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
+                                    else
+                                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
 
-                                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
-                                    year, month, day, hour, minute, second,
-                                    code, level, xval, yval, sglval);
-                              }
-			  }
-		      }
-		  }
-	      }
+                                    showHeader = FALSE;
+                                  }
+
+                                  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
+                                      year, month, day, hour, minute, second,
+                                      code, level, xval, yval, sglval);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
 	  if ( DBL_IS_EQUAL(sglval, field.missval) )
 	    nmiss = 1;
