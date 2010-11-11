@@ -85,6 +85,8 @@ int    fldhvs(field_t *field, int nlevels);
 /* ENS VALIDATION */
 double fldcrps(field_t field);
 double fldbrs(field_t field);
+double fldrank(field_t field);
+double fldroc(field_t field);
 
 /* fieldzon.c */
 

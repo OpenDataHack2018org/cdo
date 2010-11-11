@@ -15,8 +15,10 @@
 #define  func_pctl  17
 /* QR */
 
-#define  func_crps  18
-#define  func_brs   19
+#define  func_crps  100
+#define  func_brs   101
+#define  func_rank  102
+#define  func_roc   103
 
 #define  func_fld   21
 

@@ -60,6 +60,7 @@ double fldfun(field_t field, int function)
 {
   double rval = 0;
 
+  // Why is this not a switch-case statement?
   if      ( function == func_min  )  rval = fldmin(field);
   else if ( function == func_max  )  rval = fldmax(field);
   else if ( function == func_sum  )  rval = fldsum(field);
@@ -67,11 +68,45 @@ double fldfun(field_t field, int function)
   else if ( function == func_avg  )  rval = fldavg(field);
   else if ( function == func_std  )  rval = fldstd(field);
   else if ( function == func_var  )  rval = fldvar(field);
+  
   else if ( function == func_crps )  rval = fldcrps(field);
   else if ( function == func_brs )   rval = fldbrs(field);
+
+  else if ( function == func_rank )  rval = fldrank(field);
+  else if ( function == func_roc )   rval = fldroc(field);
   else cdoAbort("function %d not implemented!", function);
 
   return rval;
+}
+
+double fldrank(field_t field) 
+{
+  double res;
+  // Using first value as reference (observation)
+  double *array  =  &(field.ptr[1]);
+  double val     = array[0];
+  double missval = field.missval;
+  int nmiss      = field.nmiss;
+  long len       = field.size-1;
+  int j;
+  
+  if ( nmiss ) 
+    return(missval);
+
+  sort_iter_single(len,array,0);
+
+  if ( val >= array[len-1] ) 
+    return len;
+  else 
+    for ( j=0; j<len; j++ )
+      if ( array[j] > val )
+	return j;
+}
+
+
+double fldroc(field_t field) 
+{
+  return field.missval;
 }
 
 double fldcrps(field_t field)

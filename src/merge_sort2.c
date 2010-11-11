@@ -289,7 +289,6 @@ void sort_add(long num_links, double *restrict add1)
     }
 
   /* Swap the last two entries */
-
   add1_tmp = add1[1];
   add1[1]  = add1[0];
   add1[0]  = add1_tmp;

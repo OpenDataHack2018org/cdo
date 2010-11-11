@@ -24,6 +24,8 @@ typedef RESTR_TYPE restr_t;
 #  define RESTR_ABS(x)   fabs(x)
 */
 
+#define TINY_FRAC 1.e-10
+
 #define  NORM_OPT_NONE      1
 #define  NORM_OPT_DESTAREA  2
 #define  NORM_OPT_FRACAREA  3

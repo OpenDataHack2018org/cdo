@@ -116,6 +116,9 @@ static double north_thresh = 2.00;  /* threshold for coord transf. */
 static double south_thresh =-2.00;  /* threshold for coord transf. */
 
 double intlin(double x, double y1, double x1, double y2, double x2);
+void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, 
+	       double *restrict *restrict weights, int parent);
+
 
 extern int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, timer_remap_con3;
 

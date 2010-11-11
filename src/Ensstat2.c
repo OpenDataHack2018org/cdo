@@ -17,7 +17,9 @@
 
 /*
    This module contains the following operators:
-
+   Ensstat3       ensrkhist_space  Ensemble ranked histogram averaged over time
+   Ensstat3       ensrkhist_time   Ensemble ranked histogram averaged over space
+   Ensstat3       ensroccurve      Ensamble Receiver Operating Characteristics
 */
 
 #if defined (_OPENMP)
@@ -31,7 +33,7 @@
 #include "util.h"
 
 
-void *Ensstat2(void *argument)
+void *Ensstat3(void *argument)
 {
   int operatorID;
   int operfunc;
@@ -64,11 +66,9 @@ void *Ensstat2(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("ensmin",  func_min,  0, NULL);
-  cdoOperatorAdd("ensmax",  func_max,  0, NULL);
-  cdoOperatorAdd("enssum",  func_sum,  0, NULL);
-  cdoOperatorAdd("ensmean", func_mean, 0, NULL);
-  cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
+  cdoOperatorAdd("ensroc",          func_roc,     0, NULL);
+  cdoOperatorAdd("ensrkhist_space", func_rank, 0, NULL);
+  cdoOperatorAdd("ensrkhist_time",  func_rank, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
@@ -88,6 +88,9 @@ void *Ensstat2(void *argument)
   ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
 
   field = (field_t *) malloc(ompNumThreads*sizeof(field_t));
+  // should each thread be allocating memory locally????
+  // ("first touch strategy")
+  // --> #pragma omp parallel for ...
   for ( i = 0; i < ompNumThreads; i++ )
     {
       field[i].size   = nfiles;
@@ -112,7 +115,7 @@ void *Ensstat2(void *argument)
   nvars = vlistNvars(ef[0].vlistID);
   if ( nvars == 1 ) 
     cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-  else
+  else // What is this supposed to do different? - is there missing a bracket?
     cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
 
   for ( fileID = 1; fileID < nfiles; fileID++ )
