@@ -59,6 +59,8 @@ void *Fldstat(void *argument)
   int pn = 0;
   /* QR */
 
+  int showHeader = FALSE;
+
   cdoInitialize(argument);
 
   cdoOperatorAdd("fldmin",  func_min,  0, NULL);
@@ -171,30 +173,30 @@ void *Fldstat(void *argument)
 			  {
 			    if ( DBL_IS_EQUAL(field.ptr[j*nlon+i], sglval) )
                               {
-                                  int vdate, vtime, code;
-                                  int year, month, day, hour, minute, second;
-                                  double level;
-                                  double xval, yval;
-                                  xval  = gridInqXval(field.grid, i);
-                                  yval  = gridInqYval(field.grid, j);
-                                  vdate = taxisInqVdate(taxisID1);
-                                  vtime = taxisInqVtime(taxisID1);
-                                  cdiDecodeDate(vdate, &year, &month, &day);
-                                  cdiDecodeTime(vtime, &hour, &minute, &second);
-                                  code  = vlistInqVarCode(vlistID1, varID);
-                                  level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
-                                  if ( tsID == 0 && recID == 0 )
-                                  {
-                                    if ( operfunc == func_min )
-                                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
-                                    else
-                                      fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
-                                  }
+                                int vdate, vtime, code;
+                                int year, month, day, hour, minute, second;
+                                double level;
+                                double xval, yval;
+                                xval  = gridInqXval(field.grid, i);
+                                yval  = gridInqYval(field.grid, j);
+                                vdate = taxisInqVdate(taxisID1);
+                                vtime = taxisInqVtime(taxisID1);
+                                cdiDecodeDate(vdate, &year, &month, &day);
+                                cdiDecodeTime(vtime, &hour, &minute, &second);
+                                code  = vlistInqVarCode(vlistID1, varID);
+                                level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
+                                if ( showHeader && tsID == 0 && recID == 0 )
+                                {
+                                  if ( operfunc == func_min )
+                                    fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Minval\n");
+                                  else
+                                    fprintf(stdout, "  Date     Time     Code  Level   Lon      Lat          Maxval\n");
+                                  showHead = TRUE;
+                                }
 
-                                  fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
-                                      year, month, day, hour, minute, second,
-                                      code, level, xval, yval, sglval);
-
+                                fprintf(stdout, "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d %3d %7g %9.7g %9.7g %12.5g\n",
+                                    year, month, day, hour, minute, second,
+                                    code, level, xval, yval, sglval);
                               }
 			  }
 		      }
