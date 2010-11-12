@@ -45,7 +45,6 @@ enum {CONSECSUM, CONSECTS};
 
 static void selEndOfPeriod(field_t *periods, field_t history, field_t current, int isLastTimestep)
 {
-  static const char *func = "selEndOfPeriod";
   long   i, len;
   double pmissval = periods->missval;
   double  *parray = periods->ptr;
@@ -56,7 +55,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
 
   len = gridInqSize(periods->grid);
   if ( len != gridInqSize(current.grid) || (gridInqSize(current.grid) != gridInqSize(history.grid)) )
-    cdoAbort("Fields have different gridsize (%s)", func);
+    cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if (!isLastTimestep)
   {
@@ -127,9 +126,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
 
 void *Consecstat (void *argument)
 {
-  static const char *func = "Consecstat";
   int operatorID;
-
   int i;
   int istreamID, itaxisID, ivlistID, itsID;
   int ostreamID, otaxisID, ovlistID, otsID;
@@ -232,7 +229,7 @@ void *Consecstat (void *argument)
         }
         break;
       default:
-        printf (SWITCHWARN,func);
+        printf (SWITCHWARN,__func__);
     }
 
     for ( recID = 0; recID < nrecs; recID++ )
@@ -266,7 +263,7 @@ void *Consecstat (void *argument)
 #endif
           break;
         default:
-          printf (SWITCHWARN,func);
+          printf (SWITCHWARN,__func__);
       }
     }
     histvdate = vdate;

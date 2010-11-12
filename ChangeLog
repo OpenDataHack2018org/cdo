@@ -4,7 +4,7 @@
 	
 2010-11-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* sethalo: added support grid units radian
+	* sethalo: added support for grid units radian
 	* sethalo: correct lower bound of grid bounds for negative halos (bug fix)
 	* fldmean: gives wrong result for grid units radian (bug fix) [report: Pilar Ripodas]
 	

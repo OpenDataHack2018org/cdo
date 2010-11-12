@@ -45,7 +45,6 @@ enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 
 void *EOF3d(void * argument)
 {
-  static const char *func = "EOFs";
   char *envstr;
 
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
@@ -424,9 +423,9 @@ void *EOF3d(void * argument)
 	cdoPrint("Processed correlation matrix for var %2i | npack: %4i",varID,n);
 
       if ( eigen_mode == JACOBI ) 
-	parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
+	parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,__func__);
       else 
-	eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
+	eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,__func__);
       /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 
       if ( cdoVerbose ) 

@@ -24,7 +24,6 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
 #if  defined  (HAVE_LIBDRMAA)
 static drmaa_job_template_t *create_job_template(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath)
 {
-  static const char *func = "create_job_template";
   drmaa_job_template_t *job = NULL;
 
   char error[DRMAA_ERROR_STRING_BUFFER];

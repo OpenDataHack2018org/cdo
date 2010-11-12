@@ -49,7 +49,6 @@ static int NumFunc = sizeof(fun_sym_tbl) / sizeof(fun_sym_tbl[0]);
 static
 nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 {
-  static const char *func = "expr_con_con";
   nodeType *p;
 
   p = (nodeType *) malloc(sizeof(nodeType));
@@ -63,7 +62,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
     case '*':  p->u.con.value = p1->u.con.value * p2->u.con.value; break;
     case '/':  p->u.con.value = p1->u.con.value / p2->u.con.value; break;
     case '^':  p->u.con.value = pow(p1->u.con.value, p2->u.con.value); break;
-    default:   cdoAbort("%s: operator %c unsupported!", func, oper);
+    default:   cdoAbort("%s: operator %c unsupported!", __func__, oper);
     }
 
   return (p);
@@ -72,7 +71,6 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 {
-  static const char *func = "expr_con_var";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -157,7 +155,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 	}
       break;
     default:
-      cdoAbort("%s: operator %c unsupported!", func, oper);
+      cdoAbort("%s: operator %c unsupported!", __func__, oper);
     }
 
   nmiss = 0;
@@ -174,7 +172,6 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
-  static const char *func = "expr_var_con";
   nodeType *p;
   long ngp, i;
   long nlev;
@@ -265,7 +262,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 	}
       break;
     default:
-      cdoAbort("%s: operator %c unsupported!", func, oper);
+      cdoAbort("%s: operator %c unsupported!", __func__, oper);
     }
 
   nmiss = 0;
@@ -282,7 +279,6 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 static
 nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 {
-  static const char *func = "expr_var_var";
   nodeType *p;
   long ngp, ngp1, ngp2, i;
   long nlev, nlev1, nlev2, k;
@@ -409,7 +405,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 	    }
 	  break;
 	default:
-	  cdoAbort("%s: operator %c unsupported!", func, oper);
+	  cdoAbort("%s: operator %c unsupported!", __func__, oper);
 	}
     }
 

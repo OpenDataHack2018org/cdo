@@ -125,8 +125,6 @@ extern int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, tim
 
 void remapGridFree(remapgrid_t *rg)
 {
-  static const char *func = "remapGridFree";
-
   if ( rg->pinit == TRUE )
     {
       rg->pinit = FALSE;
@@ -158,7 +156,7 @@ void remapGridFree(remapgrid_t *rg)
       if ( rg->bin_lons ) free(rg->bin_lons);
     }
   else
-    fprintf(stderr, "%s Warning: grid not initialized!\n", func);
+    fprintf(stderr, "%s Warning: grid not initialized!\n", __func__);
 
 } /* remapGridFree */
 
@@ -166,7 +164,6 @@ void remapGridFree(remapgrid_t *rg)
 
 void remapVarsFree(remapvars_t *rv)
 {
-  static const char *func = "remapVarsFree";
   long i, num_blks;
 
   if ( rv->pinit == TRUE )
@@ -199,7 +196,7 @@ void remapVarsFree(remapvars_t *rv)
 	}
     }
   else
-    fprintf(stderr, "%s Warning: vars not initialized!\n", func);
+    fprintf(stderr, "%s Warning: vars not initialized!\n", __func__);
 
 } /* remapVarsFree */
 

@@ -29,8 +29,6 @@
 
 void *Splitsel(void *argument)
 {
-  static const char *func = "Splitsel";
-
   /* from Selstat.c */
   int operatorID;
   int operfunc;

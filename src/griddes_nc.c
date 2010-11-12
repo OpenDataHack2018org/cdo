@@ -45,7 +45,6 @@ int cdf_openread(const char *filename)
 
 int gridFromNCfile(const char *gridfile)
 {
-  static const char *func = "gridFromNCfile";
   int gridID = -1;
 #if  defined  (HAVE_LIBNETCDF)
   int nc_file_id;      /* netCDF grid file id           */
@@ -158,7 +157,6 @@ int gridFromNCfile(const char *gridfile)
 
 void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
 {
-  static const char *func = "writeNCgrid";
 #if  defined  (HAVE_LIBNETCDF)
   int nc_file_id;      /* netCDF grid file id           */
   int nc_gridsize_id;  /* netCDF grid size dim id       */

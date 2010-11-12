@@ -147,7 +147,6 @@ unsigned long day_of_year(int date)
  */  
 static void count(field_t *field1, const field_t *field2, double mode)
 {
-  static const char *func = "count";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -160,7 +159,7 @@ static void count(field_t *field1, const field_t *field2, double mode)
   len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
-    cdoAbort("Fields have different gridsize (%s)", func);
+    cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 )
     {
@@ -232,7 +231,6 @@ static void count(field_t *field1, const field_t *field2, double mode)
  */  
 static void selcomp(field_t *field1, const field_t *field2, int (*compare)(double, double))
 {
-  static const char *func = "selcomp";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -246,7 +244,7 @@ static void selcomp(field_t *field1, const field_t *field2, int (*compare)(doubl
   len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
-    cdoAbort("Fields have different gridsize (%s)", func);
+    cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 )
     {
@@ -372,7 +370,6 @@ void farnum3(field_t *field1, field_t field2, double n)
 
 void farsel(field_t *field1, field_t field2)
 {
-  static const char *func = "farsel";
   int   i, len;
   const int     grid1    = field1->grid;
   const double  missval1 = field1->missval;
@@ -385,7 +382,7 @@ void farsel(field_t *field1, field_t field2)
   len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
-    cdoAbort("Fields have different gridsize (%s)", func);
+    cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss2 > 0 )
     {

@@ -543,7 +543,6 @@ void trans_uv2dv(SPTRANS *sptrans, int nlev,
 		 int gridID1, double *gu, double *gv,
 		 int gridID2, double *sd, double *svo)
 {
-  static const char *func = "trans_uv2dv";
   int ntr, nlat, nlon, nfc;
   int waves;
   double *fpwork1, *fpwork2;
@@ -581,7 +580,6 @@ void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev,
 		 int gridID1, double *sd, double *svo,
 		 int gridID2, double *gu, double *gv)
 {
-  static const char *func = "trans_dv2uv";
   int ntr, nlat, nlon, nfc;
   int waves;
   int dimsp;

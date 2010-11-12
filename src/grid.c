@@ -8,7 +8,6 @@
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation; version 2 of the License.
-/Users/m214003/cdt/work/cdo/src
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,7 +53,6 @@ void gridToDegree(const char *units, const char *string, int gridsize, double *a
 
 int gridToZonal(int gridID1)
 {
-  static const char *func = "gridToZonal";
   int gridID2;
   int gridtype, gridsize;
   double  xval = 0;
@@ -94,7 +92,6 @@ int gridToZonal(int gridID1)
 
 int gridToMeridional(int gridID1)
 {
-  static const char *func = "gridToMeridional";
   int gridID2;
   int gridtype, gridsize;
   double *xvals;
@@ -318,7 +315,6 @@ char *gen_param(const char *fmt, ...)
 static
 void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
-  static const char *func = "lcc_to_geo";
   double originLon, originLat, lonParY, lat1, lat2, xincm, yincm;
   double zlat, zlon;
   double xi, xj;
@@ -486,7 +482,6 @@ int    qu2reg3(double *pfield, int *kpoint, int klat, int klon,
 
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss)
 {
-  static const char *func = "field2regular";
   int nlon, nlat;
   int gridtype;
   int lmiss, lperio, lveggy;
@@ -518,7 +513,6 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 
 int gridToRegular(int gridID1)
 {
-  static const char *func = "gridToRegular";
   int gridID2;
   int gridtype, gridsize;
   int nx, ny;
@@ -569,7 +563,6 @@ void gridCopyMask(int gridID1, int gridID2, long gridsize)
 
 int gridToCurvilinear(int gridID1)
 {
-  static const char *func = "gridToCurvilinear";
   int gridID2;
   int gridtype, gridsize;
   long index;
@@ -826,10 +819,8 @@ int gridToCurvilinear(int gridID1)
 
 int gridToCell(int gridID1)
 {
-  static const char *func = "gridToCell";
   int gridID2;
   int gridtype, gridsize;
-
 
   gridtype = gridInqType(gridID1);
   gridsize = gridInqSize(gridID1);

@@ -90,7 +90,6 @@ pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 
 int processCreate(void)
 {
-  static const char *func = "processCreate";
   int processID;
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -128,7 +127,6 @@ int processCreate(void)
 
 int processSelf(void)
 {
-  static const char *func = "processSelf";
   int processID = 0;
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_t thID = pthread_self();
@@ -156,7 +154,6 @@ int processSelf(void)
 
 int processNums(void)
 {
-  static const char *func = "processNums";
   int pnums = 0;
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -193,7 +190,6 @@ off_t processInqNvals(int processID)
 
 void processAddStream(int streamID)
 {
-  static const char *func = "processAddStream";
   int processID = processSelf();
   int sindex;
 
@@ -314,7 +310,6 @@ int cdoStreamCnt(void)
 
 const char *cdoStreamName(int cnt)
 {
-  static const char *func = "cdoInqStreamName";
   int processID = processSelf();
 
   if ( cnt > Process[processID].streamCnt || cnt < 0 )
@@ -555,7 +550,6 @@ void checkStreamCnt(void)
 static
 void setStreams(const char *argument)
 {
-  static const char *func = "setStreams";
   int processID = processSelf();
   int streamCnt;
   int i;

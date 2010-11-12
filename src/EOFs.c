@@ -42,7 +42,6 @@ enum T_EIGEN_MODE {JACOBI, DANIELSON_LANCZOS};
 
 void *EOFs(void * argument)
 {
-  static const char *func = "EOFs";
   char *envstr;
 
   enum {EOF_, EOF_TIME, EOF_SPATIAL};
@@ -530,9 +529,9 @@ void *EOFs(void * argument)
 	  
 	  if ( eigen_mode == JACOBI ) 
 	    // TODO: use return status (>0 okay, -1 did not converge at all) 
-	    parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
+	    parallel_eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,__func__);
 	  else 
-	    eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,func);
+	    eigen_solution_of_symmetric_matrix(&cov[0],&eigv[0],n,n,__func__);
 
 	  if ( cdoTimer ) timer_stop(timer_eig);
 	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */

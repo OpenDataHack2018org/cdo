@@ -648,7 +648,6 @@ void read_gg3d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxis
 static
 void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxisID, int nhgl, int nmp1)
 {
-  static const char *func = "read_fc4d";
   int nlev, nfc, i;
   int gridtype, zaxistype;
   int nc_var_id;
@@ -662,7 +661,7 @@ void read_fc4d(int nc_file_id, const char *name, VAR *var, int gridID, int zaxis
   nfc  = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
 
-  if ( nfc != nhgl*nmp1*2 ) cdoAbort("%s: inconsistent dimension length!", func);
+  if ( nfc != nhgl*nmp1*2 ) cdoAbort("%s: inconsistent dimension length!", __func__);
 
   var->gridID    = gridID;
   var->zaxisID   = zaxisID;

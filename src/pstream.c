@@ -129,7 +129,6 @@ void pstream_init_pointer(void)
 static
 pstream_t *pstream_to_pointer(int idx)
 {
-  static const char *func = "pstream_to_pointer";
   pstream_t *pstreamptr = NULL;
 
   PSTREAM_INIT
@@ -152,7 +151,6 @@ pstream_t *pstream_to_pointer(int idx)
 static
 int pstream_from_pointer(pstream_t *ptr)
 {
-  static const char *func = "pstream_from_pointer";
   int      idx = -1;
   pstreamPtrToIdx *newptr;
 
@@ -223,7 +221,6 @@ pstream_t *pstream_new_entry(void)
 static
 void pstream_delete_entry(pstream_t *pstreamptr)
 {
-  static const char *func = "pstream_delete_entry";
   int idx;
 
   idx = pstreamptr->self;
@@ -245,7 +242,6 @@ void pstream_delete_entry(pstream_t *pstreamptr)
 static
 void pstream_initialize(void)
 {
-  static const char *func = "pstream_initialize";
   char *env;
 
 #if  defined  (HAVE_LIBPTHREAD)
@@ -303,7 +299,6 @@ int pstreamIsPipe(int pstreamID)
 
 int pstreamOpenRead(const char *argument)
 {
-  static const char *func = "pstreamOpenRead";
   char *operatorArg = NULL;
   char *operatorName = NULL;
   int ispipe = FALSE;
@@ -625,7 +620,6 @@ void query_user_exit(const char *argument)
 
 int pstreamOpenWrite(const char *argument, int filetype)
 {
-  static const char *func = "pstreamOpenWrite";
   int fileID;
   int pstreamID = -1;
   int ispipe;
@@ -736,7 +730,6 @@ int pstreamOpenWrite(const char *argument, int filetype)
 
 int pstreamOpenAppend(const char *argument)
 {
-  static const char *func = "pstreamOpenAppend";
   int fileID;
   int pstreamID = -1;
   int ispipe;
@@ -781,7 +774,6 @@ int pstreamOpenAppend(const char *argument)
 
 void pstreamClose(int pstreamID)
 {
-  static const char *func = "pstreamClose";
   pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
@@ -1209,7 +1201,6 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 
 int pstreamInqTimestep(int pstreamID, int tsID)
 {
-  static const char *func = "pstreamInqTimestep";
   int nrecs = 0;
   pstream_t *pstreamptr;
 
@@ -1321,7 +1312,6 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 
 void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 {
-  static const char *func = "pstreamCopyRecord";
   pstream_t *pstreamptr_dest, *pstreamptr_src;
 
   if ( PSTREAM_Debug )
@@ -1351,7 +1341,6 @@ void pstreamDebug(int debug)
 
 void cdoInitialize(void *argument)
 {
-  static const char *func = "cdoInitialize";
   int processID;
 
 #if defined (_OPENMP)
@@ -1371,7 +1360,6 @@ void cdoInitialize(void *argument)
 
 void cdoFinish(void)
 {
-  static const char *func = "cdoFinish";
   int processID = processSelf();
   int sindex, pstreamID;
   int nstream;
@@ -1526,7 +1514,6 @@ int pstreamInqFiletype(int pstreamID)
 
 int pcdf_openread(const char *filename)
 {
-  static const char *func = "pcdf_openread";
   int fileID;
 
 #if  defined  (HAVE_LIBPTHREAD)

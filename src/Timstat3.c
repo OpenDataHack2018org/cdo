@@ -36,7 +36,6 @@
 
 void *Timstat3(void *argument)
 {
-  static const char *func = "Timstat3";
   int VARQUOT2TEST, MEANDIFF2TEST;
   int operatorID;
   int streamID[NIN], streamID3;
@@ -245,7 +244,7 @@ void *Timstat3(void *argument)
 	      else
 		beta_distr_constants((fnvals0 - 1) / 2,
 				     (fnvals1 - 1) / 2, 1 - risk,
-				     &fractil_1, &fractil_2, func);
+				     &fractil_1, &fractil_2, __func__);
 	      out[0].ptr[i] = DBL_IS_EQUAL(statistic, missval1) ? missval1 : 
 	       	              statistic <= fractil_1 || statistic >= fractil_2 ? 1 : 0;
 	    }
@@ -300,7 +299,7 @@ void *Timstat3(void *argument)
 	      
 	      temp2 = DIV(DIV(mean_estimator, norm), stddev_estimator);
 	      fractil = deg_of_freedom < 1 ? missval1 :
-		student_t_inv (deg_of_freedom, 1 - risk/2, func);
+		student_t_inv (deg_of_freedom, 1 - risk/2, __func__);
 
 	      out[0].ptr[i] = DBL_IS_EQUAL(temp2, missval1)|| DBL_IS_EQUAL(fractil, missval1) ? 
 		              missval1 : fabs(temp2) >= fractil;

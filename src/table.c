@@ -32,7 +32,6 @@
 
 int defineTable(char *tablearg)
 {
-  static const char *func = "defineTable";
   char *tablename;
   int tableID = UNDEFID;
 

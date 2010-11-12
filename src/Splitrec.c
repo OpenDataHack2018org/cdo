@@ -29,7 +29,6 @@
 
 void *Splitrec(void *argument)
 {
-  static const char *func = "Splitrec";
   int nchars;
   int streamID1, streamID2;
   int varID;

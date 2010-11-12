@@ -48,7 +48,6 @@ static double humidityIndex(double t, double e, double r, double missval)
 
 static void farexpr(field_t *field1, field_t field2, field_t field3, double (*expression)(double, double, double, double))
 {
-  static const char *func = "farexpr";
   int   i, len;
   const int     grid1    = field1->grid;
   const int     nmiss1   = field1->nmiss;
@@ -66,7 +65,7 @@ static void farexpr(field_t *field1, field_t field2, field_t field3, double (*ex
   len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) || len != gridInqSize(grid3) )
-    cdoAbort("Fields have different gridsize (%s)", func);
+    cdoAbort("Fields have different gridsize (%s)", __func__);
 
   if ( nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0 )
     {

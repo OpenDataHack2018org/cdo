@@ -147,7 +147,6 @@ void pipeDelete(pipe_t *pipe)
 
 void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
 {
-  static const char *func = "pipeDefVlist";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
 
@@ -166,7 +165,6 @@ void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
 
 int pipeInqVlist(pstream_t *pstreamptr)
 {
-  static const char *func = "pipeInqVlist";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
   int vlistID;
@@ -191,7 +189,6 @@ int pipeInqVlist(pstream_t *pstreamptr)
 
 int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 {
-  static const char *func = "pipeInqTimestep";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
   int nrecs;
@@ -249,7 +246,6 @@ int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 
 void pipeDefTimestep(pstream_t *pstreamptr, int tsID)
 {
-  static const char *func = "pipeDefTimestep";
   char *pname = pstreamptr->name;
   int nrecs;
   pipe_t *pipe;
@@ -300,7 +296,6 @@ sleep(1);
 
 int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 {
-  static const char *func = "pipeInqRecord";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
   int condSignal = FALSE;
@@ -367,7 +362,6 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 
 void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
 {
-  static const char *func = "pipeDefRecord";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
   int condSignal = FALSE;
@@ -418,7 +412,6 @@ void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
 
 void pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
 {
-  static const char *func = "pipeCopyRecord";
   char *ipname = pstreamptr_in->name;
   char *opname = pstreamptr_out->name;
   pipe_t *pipe;
@@ -458,7 +451,6 @@ void pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
 
 void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 {
-  static const char *func = "pipeReadRecord";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
 
@@ -491,7 +483,7 @@ void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
       pstreamptr = pstreamptr_in;
       while ( pstreamptr_in->ispipe )
 	{
-	  if ( PipeDebug ) fprintf(stderr, "%s: istream %d is pipe\n", func, pstreamptr_in->self);
+	  if ( PipeDebug ) fprintf(stderr, "%s: istream %d is pipe\n", __func__, pstreamptr_in->self);
 	  pstreamptr    = pstreamptr_in;
 	  pstreamptr_in = pstreamptr_in->pipe->pstreamptr_in;
 	  if ( pstreamptr_in == 0 ) break;
@@ -518,7 +510,7 @@ void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 	}
       else
 	{
-	  if ( PipeDebug ) fprintf(stderr, "%s: istream %d is file\n", func, pstreamptr_in->self);
+	  if ( PipeDebug ) fprintf(stderr, "%s: istream %d is file\n", __func__, pstreamptr_in->self);
 	  streamReadRecord(pstreamptr_in->fileID, data, nmiss);
 	}
     }
@@ -554,7 +546,6 @@ void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 
 void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
 {
-  static const char *func = "pipeWriteRecord";
   char *pname = pstreamptr->name;
   pipe_t *pipe;
 

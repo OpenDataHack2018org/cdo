@@ -37,12 +37,11 @@ static void listInit(LIST *list, int type)
 
 LIST *listNew(int type)
 {
-  static const char *func = "listNew";
   LIST *list = NULL;
 
   if ( type != INT_LIST && type != FLT_LIST )
     {
-      fprintf(stderr, "%s: type %d unsupported!\n", func, type);
+      fprintf(stderr, "%s: type %d unsupported!\n", __func__, type);
     }
   else
     {

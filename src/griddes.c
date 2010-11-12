@@ -163,7 +163,6 @@ int getoptname(char *optname, const char *optstring, int nopt)
 
 int gridDefine(grid_t grid)
 {
-  static const char *func = "gridDefine";
   int gridID = UNDEFID;
   int i;
 
@@ -556,7 +555,6 @@ void fnmexp2(char *out, char *in1, const char *in2)
 /*
 double *readfield(grid_t *grid, int record, char *format, char *filename)
 {
-  static const char *func = "readfield";
   int fileID, rxysize, ierr, irec;
   double *vals;
 
@@ -592,7 +590,6 @@ double *readfield(grid_t *grid, int record, char *format, char *filename)
 /*
 double *readfield4(grid_t *grid, int record, char *format, char *filename)
 {
-  static const char *func = "readfield4";
   int fileID, rxysize, ierr, irec;
   double *vals;
 
@@ -629,7 +626,6 @@ double *readfield4(grid_t *grid, int record, char *format, char *filename)
 
 double readflt(const char *name, const char *pline)
 {
-  const char func[] = "readflt";
   double val;
   char *endptr;
 
@@ -643,7 +639,6 @@ double readflt(const char *name, const char *pline)
 
 int gridFromFile(FILE *gfp, const char *dname)
 {
-  static const char *func = "gridFromFile";
   char line[MAX_LINE_LEN], *pline;
   int gridID = -1;
   int size;
@@ -1213,7 +1208,6 @@ int input_darray(FILE *gfp, int n_values, double *array)
 
 int gridFromPingo(FILE *gfp, const char *dname)
 {
-  static const char *func = "gridFromPingo";
   int gridID = -1;
   int i;
   int nlon, nlat;
@@ -1648,7 +1642,6 @@ int gridFromName(const char *gridname)
 
 int cdoDefineGrid(const char *gridfile)
 {
-  static const char *func = "cdoDefineGrid";
   FILE *gfp;
   char buffer[4];
   int gridID = -1;
