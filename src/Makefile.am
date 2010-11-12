@@ -31,7 +31,7 @@ cdo_SOURCES += Arith.c         \
                Enlarge.c       \
                Enlargegrid.c   \
                Ensstat.c       \
-               Ensstat2.c      \
+               Ensstat3.c      \
                Eofcoeff.c      \
 	       Eofcoeff3d.c    \
                Exprf.c         \
