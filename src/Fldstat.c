@@ -130,8 +130,21 @@ void *Fldstat(void *argument)
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID2, taxisID1);
-
       streamDefTimestep(streamID2, tsID);
+
+      /* Precompute date + time for later representation in verbose mode */
+      int vdate, vtime;
+      int year, month, day, hour, minute, second;
+      if ( cdoVerbose )
+        {
+          if ( operfunc == func_min || operfunc == func_max )
+            {
+              vdate = taxisInqVdate(taxisID1);
+              vtime = taxisInqVtime(taxisID1);
+              cdiDecodeDate(vdate, &year, &month, &day);
+              cdiDecodeTime(vtime, &hour, &minute, &second);
+            }
+        }
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -166,14 +179,7 @@ void *Fldstat(void *argument)
                       gridInqType(field.grid) == GRID_LONLAT )
                     {
                       int i = 0, j, nlon, nlat;
-                      int vdate, vtime, code;
-                      int year, month, day, hour, minute, second;
                       double level;
-                      vdate = taxisInqVdate(taxisID1);
-                      vtime = taxisInqVtime(taxisID1);
-                      cdiDecodeDate(vdate, &year, &month, &day);
-                      cdiDecodeTime(vtime, &hour, &minute, &second);
-                      code  = vlistInqVarCode(vlistID1, varID);
                       level = zaxisInqLevel(vlistInqVarZaxis(vlistID1, varID), levelID);
                       nlon  = gridInqXsize(field.grid);
                       nlat  = gridInqYsize(field.grid);
@@ -183,11 +189,9 @@ void *Fldstat(void *argument)
                             {
                               if ( DBL_IS_EQUAL(field.ptr[j*nlon+i], sglval) )
                                 {
-/*                                   printf("%d %d %.2f ",i,j,sglval);
- */
                                   double xval, yval;
-                                  xval  = gridInqXval(field.grid, i);
-                                  yval  = gridInqYval(field.grid, j);
+                                  xval = gridInqXval(field.grid,i);
+                                  yval = gridInqYval(field.grid,j);
                                   if ( showHeader )
                                   {
                                     if ( operfunc == func_min )
