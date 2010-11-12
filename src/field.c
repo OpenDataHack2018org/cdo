@@ -84,7 +84,7 @@ double fldrank(field_t field)
   double res;
   // Using first value as reference (observation)
   double *array  =  &(field.ptr[1]);
-  double val     = array[0];
+  double val     = array[-1];
   double missval = field.missval;
   int nmiss      = field.nmiss;
   long len       = field.size-1;
@@ -93,14 +93,17 @@ double fldrank(field_t field)
   if ( nmiss ) 
     return(missval);
 
-  sort_iter_single(len,array,0);
+  sort_iter_single(len,array,1);
 
-  if ( val >= array[len-1] ) 
-    return len;
+  if ( val > array[len-1] ) 
+    res=(double)len;
   else 
     for ( j=0; j<len; j++ )
-      if ( array[j] > val )
-	return j;
+      if ( array[j] >= val ) {
+	res=(double)j; 
+	break;
+      }
+  return res;
 }
 
 
@@ -111,7 +114,6 @@ double fldroc(field_t field)
 
 double fldcrps(field_t field)
 {
-  double crps;
   long   len     = field.size;
   int    nmiss   = field.nmiss;
   double *array  = field.ptr;
@@ -388,10 +390,10 @@ void fldrms(field_t field, field_t field2, field_t *field3)
   long   i, len;
   int    rnmiss = 0;
   int    grid1    = field.grid;
-  int    nmiss1   = field.nmiss;
+  //  int    nmiss1   = field.nmiss;
   double *array1  = field.ptr;
   int    grid2    = field2.grid;
-  int    nmiss2   = field2.nmiss;
+  //  int    nmiss2   = field2.nmiss;
   double *array2  = field2.ptr;
   double missval1 = field.missval;
   double missval2 = field2.missval;
@@ -440,10 +442,10 @@ void varrms(field_t field, field_t field2, field_t *field3)
   int    rnmiss = 0;
   int    zaxis    = field.zaxis;
   int    grid1    = field.grid;
-  int    nmiss1   = field.nmiss;
+  //  int    nmiss1   = field.nmiss;
   double *array1  = field.ptr;
   int    grid2    = field2.grid;
-  int    nmiss2   = field2.nmiss;
+  //  int    nmiss2   = field2.nmiss;
   double *array2  = field2.ptr;
   double missval1 = field.missval;
   double missval2 = field2.missval;
@@ -566,7 +568,7 @@ double crps_det_integrate(double *a, const double d, const int n)
   /* *************************************************************************** */
 
   double area = 0; 
-  double tmp;
+  //  double tmp;
   int i;
 #if defined (_OPENMP)
 #pragma omp parallel for if ( n>10000 ) shared(a) private(i) \
