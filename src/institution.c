@@ -73,7 +73,7 @@ int readInstitution(const char *instfile)
       if ( nvar == 2 && maxvar == 4 )
 	{
 	  if ( ! isdigit((int) pline[0]) )
-	    Error(func, "wrong format in line %d. Missing subcenter!", lnr);
+	    Error("wrong format in line %d. Missing subcenter!", lnr);
 
 	  subcenter = atoi(pline);
 	}
@@ -113,7 +113,7 @@ void defineInstitution(char *instarg)
     instID = institutInq(0, 0, instname, NULL);
 
   if ( instID == UNDEFID )
-    Error(func, "institution <%s> not found", instname);
+    Error("institution <%s> not found", instname);
 
   cdoDefaultInstID = instID;
 }

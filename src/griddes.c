@@ -176,8 +176,8 @@ int gridDefine(grid_t grid)
       {
 	if ( grid.size != 1 )
 	  {
-	    if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
-	    if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+	    if ( grid.xsize == 0 ) Error("xsize undefined!");
+	    if ( grid.ysize == 0 ) Error("ysize undefined!");
 	  }
 
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
@@ -291,8 +291,8 @@ int gridDefine(grid_t grid)
 
 	if ( grid.type == GRID_CURVILINEAR )
 	  {
-	    if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
-	    if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+	    if ( grid.xsize == 0 ) Error("xsize undefined!");
+	    if ( grid.ysize == 0 ) Error("ysize undefined!");
 	    gridDefXsize(gridID, grid.xsize);
 	    gridDefYsize(gridID, grid.ysize);
 	  }
@@ -341,8 +341,8 @@ int gridDefine(grid_t grid)
       }
     case GRID_LCC:
       {
-	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
-	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+	if ( grid.xsize == 0 ) Error("xsize undefined!");
+	if ( grid.ysize == 0 ) Error("ysize undefined!");
 
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
@@ -353,13 +353,13 @@ int gridDefine(grid_t grid)
 	gridDefXsize(gridID, grid.xsize);
 	gridDefYsize(gridID, grid.ysize);
 
-	if ( grid.def_originLon == FALSE ) Error(func, "originLon undefined!");
-	if ( grid.def_originLat == FALSE ) Error(func, "originLat undefined!");
-	if ( grid.def_lonParY   == FALSE ) Error(func, "lonParY undefined!");
-	if ( grid.def_lat1      == FALSE ) Error(func, "lat1 undefined!");
-	if ( grid.def_lat2      == FALSE ) Error(func, "lat2 undefined!");
-	if ( grid.def_xinc      == FALSE ) Error(func, "xinc undefined!");
-	if ( grid.def_yinc      == FALSE ) Error(func, "yinc undefined!");
+	if ( grid.def_originLon == FALSE ) Error("originLon undefined!");
+	if ( grid.def_originLat == FALSE ) Error("originLat undefined!");
+	if ( grid.def_lonParY   == FALSE ) Error("lonParY undefined!");
+	if ( grid.def_lat1      == FALSE ) Error("lat1 undefined!");
+	if ( grid.def_lat2      == FALSE ) Error("lat2 undefined!");
+	if ( grid.def_xinc      == FALSE ) Error("xinc undefined!");
+	if ( grid.def_yinc      == FALSE ) Error("yinc undefined!");
 
 	gridDefLCC(gridID, grid.originLon, grid.originLat, grid.lonParY,
 		   grid.lat1, grid.lat2, grid.xinc, grid.yinc, grid.projflag, grid.scanflag);
@@ -374,8 +374,8 @@ int gridDefine(grid_t grid)
       }
     case GRID_LCC2:
       {
-	if ( grid.xsize == 0 ) Error(func, "xsize undefined!");
-	if ( grid.ysize == 0 ) Error(func, "ysize undefined!");
+	if ( grid.xsize == 0 ) Error("xsize undefined!");
+	if ( grid.ysize == 0 ) Error("ysize undefined!");
 
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
@@ -412,9 +412,9 @@ int gridDefine(grid_t grid)
 	    free(grid.yvals);
 	  }	
 
-	if ( grid.def_lon_0     == FALSE ) Error(func, "lon_0 undefined!");
-	if ( grid.def_lat_0     == FALSE ) Error(func, "lat_0 undefined!");
-	if ( grid.def_lat_1     == FALSE ) Error(func, "lat_1 undefined!");
+	if ( grid.def_lon_0     == FALSE ) Error("lon_0 undefined!");
+	if ( grid.def_lat_0     == FALSE ) Error("lat_0 undefined!");
+	if ( grid.def_lat_1     == FALSE ) Error("lat_1 undefined!");
 	if ( grid.def_lat_2     == FALSE ) grid.def_lat_2 = grid.def_lat_1;
 
 	gridDefLcc2(gridID, grid.a, grid.lon_0, grid.lat_0, grid.lat_1, grid.lat_2);
@@ -430,7 +430,7 @@ int gridDefine(grid_t grid)
     case GRID_SPECTRAL:
       {
 	if ( grid.ntr == 0 )
-	  Error(func, "truncation undefined!");
+	  Error("truncation undefined!");
 	if ( grid.size == 0 )
 	  grid.size = (grid.ntr+1) * (grid.ntr+2);
 
@@ -446,9 +446,9 @@ int gridDefine(grid_t grid)
       }
     case GRID_GME:
       {
-	if ( grid.nd   == 0 ) Error(func, "nd undefined!");
-	if ( grid.ni   == 0 ) Error(func, "ni undefined!");
-	if ( grid.size == 0 ) Error(func, "size undefined!");
+	if ( grid.nd   == 0 ) Error("nd undefined!");
+	if ( grid.ni   == 0 ) Error("ni undefined!");
+	if ( grid.size == 0 ) Error("size undefined!");
 
 	gridID = gridCreate(grid.type, grid.size);
 
@@ -470,9 +470,9 @@ int gridDefine(grid_t grid)
     default:
       {
 	if ( grid.type == -1 )
-	  Error(func, "Undefined grid type!");
+	  Error("Undefined grid type!");
 	else
-	  Error(func, "Unsupported grid type: %s", gridNamePtr(grid.type));
+	  Error("Unsupported grid type: %s", gridNamePtr(grid.type));
       }
     }
 
@@ -560,9 +560,9 @@ double *readfield(grid_t *grid, int record, char *format, char *filename)
   int fileID, rxysize, ierr, irec;
   double *vals;
 
-  if ( grid->size == 0 )  Error(func, "grid size = 0!");
-  if ( format == NULL )   Error(func, "format undefined!");
-  if ( filename == NULL ) Error(func, "file name undefined!");
+  if ( grid->size == 0 )  Error("grid size = 0!");
+  if ( format == NULL )   Error("format undefined!");
+  if ( filename == NULL ) Error("file name undefined!");
 
   vals = (double *) malloc(grid->size*sizeof(double));
 
@@ -570,21 +570,21 @@ double *readfield(grid_t *grid, int record, char *format, char *filename)
     {
       int header[4];
       fileID = extOpen(filename, "r");
-      if ( fileID == UNDEFID ) SysError(func, filename);
+      if ( fileID == UNDEFID ) SysError(filename);
 
       for ( irec = 0; irec < record; irec++ )
 	{
 	  ierr = extReadHeader(fileID, header);
-	  if ( ierr <= 0 ) Error(func, "Record %d unexpected EOF in file %s", irec+1, filename);
+	  if ( ierr <= 0 ) Error("Record %d unexpected EOF in file %s", irec+1, filename);
 	}
       grid->prec   = extInqPrec(fileID);
       rxysize = header[3];
-      if ( rxysize != (int) grid->size ) Error(func, "unexpected record size of %d!", rxysize);
+      if ( rxysize != (int) grid->size ) Error("unexpected record size of %d!", rxysize);
       ierr = extReadDataDP(fileID, vals);
       extClose(fileID);
     }
   else
-    Error(func, "format %s unsupported!", format);
+    Error("format %s unsupported!", format);
 
   return (vals);
 }
@@ -596,9 +596,9 @@ double *readfield4(grid_t *grid, int record, char *format, char *filename)
   int fileID, rxysize, ierr, irec;
   double *vals;
 
-  if ( grid->size == 0 )  Error(func, "grid size = 0!");
-  if ( format == NULL )   Error(func, "format undefined!");
-  if ( filename == NULL ) Error(func, "file name undefined!");
+  if ( grid->size == 0 )  Error("grid size = 0!");
+  if ( format == NULL )   Error("format undefined!");
+  if ( filename == NULL ) Error("file name undefined!");
 
   vals  = (double *) malloc(4*grid->size*sizeof(double));
 
@@ -606,22 +606,22 @@ double *readfield4(grid_t *grid, int record, char *format, char *filename)
     {
       int header[4];
       fileID = extOpen(filename, "r");
-      if ( fileID == UNDEFID ) SysError(func, filename);
+      if ( fileID == UNDEFID ) SysError(filename);
 
       for ( irec = 0; irec < record; irec++ )
 	{
 	  ierr = extReadHeader(fileID, header);
-	  if ( ierr <= 0 ) Error(func, "Record %d unexpected EOF in file %s", irec+1, filename);
+	  if ( ierr <= 0 ) Error("Record %d unexpected EOF in file %s", irec+1, filename);
 	}
       grid->prec   = extInqPrec(fileID);
       rxysize = header[3];
-      if ( rxysize != (int) (4*grid->size) ) Error(func, "unexpected record size of %d!", rxysize);
+      if ( rxysize != (int) (4*grid->size) ) Error("unexpected record size of %d!", rxysize);
       ierr = extReadDataDP(fileID, vals);
 
       extClose(fileID);
     }
   else
-    Error(func, "format %s unsupported!", format);
+    Error("format %s unsupported!", format);
 
   return (vals);
 }
@@ -635,7 +635,7 @@ double readflt(const char *name, const char *pline)
 
   val = strtod(pline, &endptr);
   if ( pline == endptr )
-    Warning(func, "Couldn't read value for %s, set to zero!", name);
+    Warning("Couldn't read value for %s, set to zero!", name);
 
   return (val);
 }
@@ -695,7 +695,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  else if ( cmpstr(pline, "laea", len)  == 0 )
 	    grid.type = GRID_LAEA;
 	  else
-	    Warning(func, "Invalid grid name : %s", pline);
+	    Warning("Invalid grid name : %s", pline);
 	}
       else if ( cmpstr(pline, "gridprec", len)  == 0 )
 	{
@@ -861,7 +861,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      grid.scanflag = 64;
 	    }
 	  else
-	    Warning(func, "Invalid projection : %s", pline);
+	    Warning("Invalid projection : %s", pline);
 	}
       else if ( cmpstr(pline, "a", len)  == 0 )
 	{
@@ -919,7 +919,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    {
 	      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 		{
-		  Warning(func, "Incomplete command: >gridlatlon<");
+		  Warning("Incomplete command: >gridlatlon<");
 		  break;
 		}
 	      sscanf(line, "%lg %lg", &flat, &flon);
@@ -949,7 +949,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >mask<");
+			  Warning("Incomplete command: >mask<");
 			  break;
 			}
 		      pline = line;
@@ -967,7 +967,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		}
 	    }
 	  else
-	    Warning(func, "gridsize undefined!");
+	    Warning("gridsize undefined!");
 	}
       else if ( cmpstr(pline, "xvals", len)  == 0 )
 	{
@@ -993,7 +993,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >xvals<");
+			  Warning("Incomplete command: >xvals<");
 			  break;
 			}
 		      pline = line;
@@ -1004,7 +1004,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		}
 	    }
 	  else
-	    Warning(func, "xsize or gridsize undefined!");
+	    Warning("xsize or gridsize undefined!");
 	}
       else if ( cmpstr(pline, "yvals", len)  == 0 )
 	{
@@ -1030,7 +1030,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >yvals<");
+			  Warning("Incomplete command: >yvals<");
 			  break;
 			}
 		      pline = line;
@@ -1041,7 +1041,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		}
 	    }
 	  else
-	    Warning(func, "ysize or gridsize undefined!");
+	    Warning("ysize or gridsize undefined!");
 	}
       else if ( cmpstr(pline, "xbounds", len)  == 0 )
 	{
@@ -1072,7 +1072,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >xbounds<");
+			  Warning("Incomplete command: >xbounds<");
 			  break;
 			}
 		      pline = line;
@@ -1084,8 +1084,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    }
 	  else
 	    {
-	      if ( size         == 0 ) Warning(func, "xsize or gridsize undefined!");
-	      if ( grid.nvertex == 0 ) Warning(func, "nvertex undefined!");
+	      if ( size         == 0 ) Warning("xsize or gridsize undefined!");
+	      if ( grid.nvertex == 0 ) Warning("nvertex undefined!");
 	    }
 	}
       else if ( cmpstr(pline, "ybounds", len)  == 0 )
@@ -1117,7 +1117,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >ybounds<");
+			  Warning("Incomplete command: >ybounds<");
 			  break;
 			}
 		      pline = line;
@@ -1129,14 +1129,14 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    }
 	  else
 	    {
-	      if ( grid.ysize   == 0 ) Warning(func, "ysize or gridsize undefined!");
-	      if ( grid.nvertex == 0 ) Warning(func, "nvertex undefined!");
+	      if ( grid.ysize   == 0 ) Warning("ysize or gridsize undefined!");
+	      if ( grid.nvertex == 0 ) Warning("nvertex undefined!");
 	    }
 	}
       else
 	{
 	  if ( grid.type != UNDEFID )
-	    Warning(func, "Invalid grid command : >%s<", pline);
+	    Warning("Invalid grid command : >%s<", pline);
 	}
     }
   /*
@@ -1257,7 +1257,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	      grid.xvals[i] += 360;
 	      if ( i < nlon - 1 && grid.xvals[i+1] + 360 <= grid.xvals[i] )
 		{
-		  Message(func, "Longitudes are not in ascending order!");
+		  Message("Longitudes are not in ascending order!");
 		  return (gridID);
 		}
 	    }
@@ -1284,7 +1284,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	   grid.yvals[0]      < -90.001  || 
 	   grid.yvals[nlat-1] < -90.001 )
 	{
-	  Message(func, "Latitudes must be between 90 and -90!");
+	  Message("Latitudes must be between 90 and -90!");
 	  return (gridID);
 	}
 
@@ -1292,7 +1292,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	if ( IS_EQUAL(grid.yvals[i+1], grid.yvals[i]) || (i < nlat - 2 &&
 	    ((grid.yvals[i+1] > grid.yvals[i]) != (grid.yvals[i+2] > grid.yvals[i+1]))) )
 	  {
-	    Message(func, "Latitudes must be in descending or ascending order!");
+	    Message("Latitudes must be in descending or ascending order!");
 	    return (gridID);
 	  }
 		    
@@ -1357,7 +1357,7 @@ int ntr2nlat(int ntr)
       nlat2 = NINT(((ntr+1)*3.+1.)/2.);
       /*
       if ( nlat == nlat2 )
-	Error(func, "Computation of latitudes failed for truncation %d", ntr);
+	Error("Computation of latitudes failed for truncation %d", ntr);
       */
     }
 
@@ -1376,7 +1376,7 @@ int ntr2nlat_linear(int ntr)
       nlat2 = NINT(((ntr+1)*2.+1.)/2.);
       /*
       if ( nlat == nlat2 )
-	Error(func, "Computation of latitudes failed for truncation %d", ntr);
+	Error("Computation of latitudes failed for truncation %d", ntr);
       */
     }
 
@@ -1664,7 +1664,7 @@ int cdoDefineGrid(const char *gridfile)
   else
     {
       if ( fread(buffer, 1, 4, gfp) != 4 )
-	SysError(func, "Read grid from %s failed!", gridfile);
+	SysError("Read grid from %s failed!", gridfile);
 
       fclose(gfp);
 

@@ -102,7 +102,7 @@ int processCreate(void)
 #endif
 
   if ( processID >= MAX_PROCESS )
-    Error(func, "Limit of %d processes reached!", MAX_PROCESS);
+    Error("Limit of %d processes reached!", MAX_PROCESS);
 
 #if  defined  (HAVE_LIBPTHREAD)
   Process[processID].threadID     = pthread_self();
@@ -141,7 +141,7 @@ int processSelf(void)
   if ( processID == NumProcess )
     {
       if ( NumProcess > 0 )
-	Error(func, "Internal problem, process not found!");
+	Error("Internal problem, process not found!");
       else
 	processID = 0;
     }
@@ -202,7 +202,7 @@ void processAddStream(int streamID)
   sindex = Process[processID].nstream++;
 
   if ( sindex >= MAX_STREAM )
-    Error(func, "limit of %d streams per process reached!", MAX_STREAM);
+    Error("limit of %d streams per process reached!", MAX_STREAM);
 
   Process[processID].streams[sindex] = streamID;
 }
@@ -318,7 +318,7 @@ const char *cdoStreamName(int cnt)
   int processID = processSelf();
 
   if ( cnt > Process[processID].streamCnt || cnt < 0 )
-    Error(func, "count %d out of range!", cnt);
+    Error("count %d out of range!", cnt);
 
   return (Process[processID].streamNames[cnt]);
 }
@@ -576,7 +576,7 @@ void setStreams(const char *argument)
 	  string[i] = '\0';
 	  argv[argc++] = &string[i+1];
 	  if ( argc >= MAX_ARGV )
-	    Error(func, "Internal problem! More than %d arguments.", argc);
+	    Error("Internal problem! More than %d arguments.", argc);
 	}
     }
 
@@ -596,7 +596,7 @@ void setStreams(const char *argument)
   checkStreamCnt();
 
   if ( Process[processID].streamCnt != streamCnt )
-    Error(func, "Internal problem with stream count %d %d", Process[processID].streamCnt, streamCnt);
+    Error("Internal problem with stream count %d %d", Process[processID].streamCnt, streamCnt);
   /*
   for ( i = 0; i < streamCnt; i++ )
     fprintf(stderr, "stream %d %s\n", i+1, Process[processID].streamNames[i]);

@@ -68,7 +68,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
 	cdo-EcaIndices.$(OBJEXT) cdo-Echam5ini.$(OBJEXT) \
 	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
-	cdo-Ensstat.$(OBJEXT) cdo-Ensstat2.$(OBJEXT) \
+	cdo-Ensstat.$(OBJEXT) cdo-Ensstat3.$(OBJEXT) \
 	cdo-Eofcoeff.$(OBJEXT) cdo-Eofcoeff3d.$(OBJEXT) \
 	cdo-Exprf.$(OBJEXT) cdo-Filedes.$(OBJEXT) \
 	cdo-Fillmiss.$(OBJEXT) cdo-Filter.$(OBJEXT) \
@@ -335,7 +335,7 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Cat.c Change.c Change_e5slm.c Cloudlayer.c Command.c Comp.c \
 	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
 	Copy.c Deltime.c Detrend.c Diff.c EOFs.c Eof3d.c EcaIndices.c \
-	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat2.c \
+	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
 	Eofcoeff.c Eofcoeff3d.c Exprf.c Filedes.c Fillmiss.c Filter.c \
 	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
 	Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
@@ -534,7 +534,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Enlarge.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Enlargegrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ensstat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ensstat2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Ensstat3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eof3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff3d.Po@am__quote@
@@ -1151,19 +1151,19 @@ cdo-Ensstat.obj: Ensstat.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat.obj `if test -f 'Ensstat.c'; then $(CYGPATH_W) 'Ensstat.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat.c'; fi`
 
-cdo-Ensstat2.o: Ensstat2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ensstat2.o -MD -MP -MF $(DEPDIR)/cdo-Ensstat2.Tpo -c -o cdo-Ensstat2.o `test -f 'Ensstat2.c' || echo '$(srcdir)/'`Ensstat2.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Ensstat2.Tpo $(DEPDIR)/cdo-Ensstat2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat2.c' object='cdo-Ensstat2.o' libtool=no @AMDEPBACKSLASH@
+cdo-Ensstat3.o: Ensstat3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ensstat3.o -MD -MP -MF $(DEPDIR)/cdo-Ensstat3.Tpo -c -o cdo-Ensstat3.o `test -f 'Ensstat3.c' || echo '$(srcdir)/'`Ensstat3.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Ensstat3.Tpo $(DEPDIR)/cdo-Ensstat3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat3.c' object='cdo-Ensstat3.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat2.o `test -f 'Ensstat2.c' || echo '$(srcdir)/'`Ensstat2.c
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat3.o `test -f 'Ensstat3.c' || echo '$(srcdir)/'`Ensstat3.c
 
-cdo-Ensstat2.obj: Ensstat2.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ensstat2.obj -MD -MP -MF $(DEPDIR)/cdo-Ensstat2.Tpo -c -o cdo-Ensstat2.obj `if test -f 'Ensstat2.c'; then $(CYGPATH_W) 'Ensstat2.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat2.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Ensstat2.Tpo $(DEPDIR)/cdo-Ensstat2.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat2.c' object='cdo-Ensstat2.obj' libtool=no @AMDEPBACKSLASH@
+cdo-Ensstat3.obj: Ensstat3.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Ensstat3.obj -MD -MP -MF $(DEPDIR)/cdo-Ensstat3.Tpo -c -o cdo-Ensstat3.obj `if test -f 'Ensstat3.c'; then $(CYGPATH_W) 'Ensstat3.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat3.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Ensstat3.Tpo $(DEPDIR)/cdo-Ensstat3.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Ensstat3.c' object='cdo-Ensstat3.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat2.obj `if test -f 'Ensstat2.c'; then $(CYGPATH_W) 'Ensstat2.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat2.c'; fi`
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Ensstat3.obj `if test -f 'Ensstat3.c'; then $(CYGPATH_W) 'Ensstat3.c'; else $(CYGPATH_W) '$(srcdir)/Ensstat3.c'; fi`
 
 cdo-Eofcoeff.o: Eofcoeff.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Eofcoeff.o -MD -MP -MF $(DEPDIR)/cdo-Eofcoeff.Tpo -c -o cdo-Eofcoeff.o `test -f 'Eofcoeff.c' || echo '$(srcdir)/'`Eofcoeff.c

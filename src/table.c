@@ -61,7 +61,7 @@ int defineTable(char *tablearg)
     tableID = tableInq(-1, 0, tablename);
 
   if ( tableID == UNDEFID )
-    Error(func, "table <%s> not found", tablename);
+    Error("table <%s> not found", tablename);
 
   return (tableID);
 }

@@ -98,7 +98,7 @@ int gridFromNCfile(const char *gridfile)
 	{
 	  grid.type = GRID_CURVILINEAR;
 	  if ( grid.nvertex != 4 )
-	    Error(func, "curvilinear grid with %d corners unsupported", grid.nvertex);
+	    Error("curvilinear grid with %d corners unsupported", grid.nvertex);
 
 	  grid.xsize = grid_dims[0];
 	  grid.ysize = grid_dims[1];
@@ -327,6 +327,6 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   nce(nc_close(nc_file_id));
 
 #else
-  Error(func, "netCDF support not compiled in!");
+  Error("netCDF support not compiled in!");
 #endif
 }

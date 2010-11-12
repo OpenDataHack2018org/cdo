@@ -9,7 +9,9 @@
 
 #define  DEBUG_MEMORY
 
+#ifndef  WITH_CALLER_NAME
 #define  WITH_CALLER_NAME
+#endif
 
 extern size_t  memTotal(void);
 extern void    memDebug(int debug);

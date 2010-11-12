@@ -85,7 +85,7 @@ int gridToZonal(int gridID1)
     }
   else
     {
-      Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
+      Error("Gridtype %s unsupported!", gridNamePtr(gridtype));
     }
 
   return (gridID2);
@@ -125,7 +125,7 @@ int gridToMeridional(int gridID1)
     }
   else
     {
-      Error(func, "Gridtype %s unsupported!", gridNamePtr(gridtype));
+      Error("Gridtype %s unsupported!", gridNamePtr(gridtype));
     }
 
   return (gridID2);
@@ -334,11 +334,11 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
     while ( lonParY   < 0 ) lonParY   += 360;
   */
   if ( IS_NOT_EQUAL(xincm, yincm) )
-    Warning(func, "X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
+    Warning("X and Y increment must be equal on Lambert Conformal grid (Xinc = %g, Yinc = %g)\n", 
 	    xincm, yincm);
   /*
   if ( IS_NOT_EQUAL(lat1, lat2) )
-    Warning(func, "Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
+    Warning("Lat1 and Lat2 must be equal on Lambert Conformal grid (Lat1 = %g, Lat2 = %g)\n", 
 	    lat1, lat2);
   */
   map_set(PROJ_LC, originLat, originLon, xincm, lonParY, lat1, lat2, &proj);
@@ -495,14 +495,14 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 
   gridtype = gridInqType(gridID1);
 
-  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error(func, "Not a reduced gaussian grid!");
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced gaussian grid!");
 
   nlat = gridInqYsize(gridID1);
   nlon = 2*nlat;
 
   rowlonptr = (int *) malloc(nlat*sizeof(int));
 
-  if ( gridInqSize(gridID2) != nlon*nlat ) Error(func, "Gridsize differ!");
+  if ( gridInqSize(gridID2) != nlon*nlat ) Error("Gridsize differ!");
 
   gridInqRowlon(gridID1, rowlonptr);
 
@@ -527,7 +527,7 @@ int gridToRegular(int gridID1)
 
   gridtype = gridInqType(gridID1);
 
-  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error(func, "Not a reduced gaussian grid!");
+  if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced gaussian grid!");
 
   ny = gridInqYsize(gridID1);
   nx = 2*ny;
@@ -627,7 +627,7 @@ int gridToCurvilinear(int gridID1)
 	else
 	  {
 	    if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
-	      Error(func, "Grid has no values");
+	      Error("Grid has no values");
 
 	    xvals = (double *) malloc(nx*sizeof(double));
 	    yvals = (double *) malloc(ny*sizeof(double));
@@ -815,7 +815,7 @@ int gridToCurvilinear(int gridID1)
       }
     default:
       {
-	Error(func, "Grid type >%s< unsupported!", gridNamePtr(gridtype));
+	Error("Grid type >%s< unsupported!", gridNamePtr(gridtype));
 	break;
       }
     }
@@ -1007,7 +1007,7 @@ int gridToCell(int gridID1)
       }
     default:
       {
-	Error(func, "Grid type %s unsupported!", gridNamePtr(gridtype));
+	Error("Grid type %s unsupported!", gridNamePtr(gridtype));
 	break;
       }
     }

@@ -143,7 +143,7 @@ pstream_t *pstream_to_pointer(int idx)
       PSTREAM_UNLOCK
     }
   else
-    Error(func, "pstream index %d undefined!", idx);
+    Error("pstream index %d undefined!", idx);
 
   return (pstreamptr);
 }
@@ -169,15 +169,15 @@ int pstream_from_pointer(pstream_t *ptr)
 	  newptr->ptr   = ptr;
       
 	  if ( PSTREAM_Debug )
-	    Message(func, "Pointer %p has idx %d from pstream list", ptr, idx);
+	    Message("Pointer %p has idx %d from pstream list", ptr, idx);
 	}
       else
-	Warning(func, "Too many open pstreams (limit is %d)!", _pstream_max);
+	Warning("Too many open pstreams (limit is %d)!", _pstream_max);
 
       PSTREAM_UNLOCK
     }
   else
-    Error(func, "Internal problem (pointer %p undefined)", ptr);
+    Error("Internal problem (pointer %p undefined)", ptr);
 
   return (idx);
 }
@@ -239,7 +239,7 @@ void pstream_delete_entry(pstream_t *pstreamptr)
   PSTREAM_UNLOCK
 
   if ( PSTREAM_Debug )
-    Message(func, "Removed idx %d from pstream list", idx);
+    Message("Removed idx %d from pstream list", idx);
 }
 
 static
@@ -260,7 +260,7 @@ void pstream_initialize(void)
   if ( env ) _pstream_max = atoi(env);
 
   if ( PSTREAM_Debug )
-    Message(func, "PSTREAM_MAX = %d", _pstream_max);
+    Message("PSTREAM_MAX = %d", _pstream_max);
 
   pstream_list_new();
   atexit(pstream_list_delete);
@@ -314,7 +314,7 @@ int pstreamOpenRead(const char *argument)
   PSTREAM_INIT
 
   pstreamptr = pstream_new_entry();
-  if ( ! pstreamptr ) Error(func, "No memory");
+  if ( ! pstreamptr ) Error("No memory");
 
   pstreamID = pstreamptr->self;
 
@@ -353,21 +353,21 @@ int pstreamOpenRead(const char *argument)
 	fprintf(stderr, "%s: Started child process \"%s\".\n", processInqPrompt(), newarg+1);
 
       status = pthread_attr_init(&attr);
-      if ( status ) SysError(func, "pthread_attr_init failed for '%s'\n", newarg+1);
+      if ( status ) SysError("pthread_attr_init failed for '%s'\n", newarg+1);
       status = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-      if ( status ) SysError(func, "pthread_attr_setdetachstate failed for '%s'\n", newarg+1);
+      if ( status ) SysError("pthread_attr_setdetachstate failed for '%s'\n", newarg+1);
       /*
       param.sched_priority = 0;
       status = pthread_attr_setschedparam(&attr, &param);
-      if ( status ) SysError(func, "pthread_attr_setschedparam failed for '%s'\n", newarg+1);
+      if ( status ) SysError("pthread_attr_setschedparam failed for '%s'\n", newarg+1);
       */
       /* status = pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED); */
-      /* if ( status ) SysError(func, "pthread_attr_setinheritsched failed for '%s'\n", newarg+1); */
+      /* if ( status ) SysError("pthread_attr_setinheritsched failed for '%s'\n", newarg+1); */
 
       pthread_attr_getscope(&attr, &pthreadScope);
 
       /* status = pthread_attr_setscope(&attr, PTHREAD_SCOPE_PROCESS); */
-      /* if ( status ) SysError(func, "pthread_attr_setscope failed for '%s'\n", newarg+1); */
+      /* if ( status ) SysError("pthread_attr_setscope failed for '%s'\n", newarg+1); */
       /* If system scheduling scope is specified, then the thread is scheduled against all threads in the system */
       /* pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM); */
 
@@ -381,13 +381,13 @@ int pstreamOpenRead(const char *argument)
       if ( rval != 0 )
 	{
 	  errno = rval;
-	  SysError(func, "pthread_create failed for '%s'\n", newarg+1);
+	  SysError("pthread_create failed for '%s'\n", newarg+1);
 	}
 
       /* free(operatorName); */
       processAddStream(pstreamID);
       /*      pipeInqInfo(pstreamID); */
-      if ( PSTREAM_Debug ) Message(func, "pipe %s", pipename);
+      if ( PSTREAM_Debug ) Message("pipe %s", pipename);
 #else
       cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -488,7 +488,7 @@ int pstreamOpenRead(const char *argument)
 
 	      pfp = popen(command, "r");
 	      if ( pfp == 0 )
-		SysError(func, "popen %s failed", command);
+		SysError("popen %s failed", command);
 
 	      nfiles = 0;
 	      while ( readline(pfp, line, 4096) )
@@ -537,7 +537,7 @@ int pstreamOpenRead(const char *argument)
 	    }
 	}
 
-      if ( PSTREAM_Debug ) Message(func, "file %s", filename);
+      if ( PSTREAM_Debug ) Message("file %s", filename);
 
 #if  defined  (HAVE_LIBPTHREAD)
       pthread_mutex_lock(&streamOpenReadMutex);
@@ -638,10 +638,10 @@ int pstreamOpenWrite(const char *argument, int filetype)
   if ( ispipe )
     {
 #if  defined  (HAVE_LIBPTHREAD)
-      if ( PSTREAM_Debug ) Message(func, "pipe %s", argument);
+      if ( PSTREAM_Debug ) Message("pipe %s", argument);
       pstreamID = pstreamFindID(argument);
       if ( pstreamID == -1 )
-	Error(func, "%s not open", argument);
+	Error("%s not open", argument);
 
       pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -656,11 +656,11 @@ int pstreamOpenWrite(const char *argument, int filetype)
       char *filename = (char *) malloc(strlen(argument)+1);
 
       pstreamptr = pstream_new_entry();
-      if ( ! pstreamptr ) Error(func, "No memory");
+      if ( ! pstreamptr ) Error("No memory");
 
       pstreamID = pstreamptr->self;
   
-      if ( PSTREAM_Debug ) Message(func, "file %s", argument);
+      if ( PSTREAM_Debug ) Message("file %s", argument);
 
       if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
 
@@ -746,7 +746,7 @@ int pstreamOpenAppend(const char *argument)
 
   if ( ispipe )
     {
-      if ( PSTREAM_Debug ) Message(func, "pipe %s", argument);
+      if ( PSTREAM_Debug ) Message("pipe %s", argument);
       cdoAbort("this operator doesn't work with pipes!");
     }
   else
@@ -754,11 +754,11 @@ int pstreamOpenAppend(const char *argument)
       char *filename = (char *) malloc(strlen(argument)+1);
 
       pstreamptr = pstream_new_entry();
-      if ( ! pstreamptr ) Error(func, "No memory");
+      if ( ! pstreamptr ) Error("No memory");
 
       pstreamID = pstreamptr->self;
   
-      if ( PSTREAM_Debug ) Message(func, "file %s", argument);
+      if ( PSTREAM_Debug ) Message("file %s", argument);
 
       if ( cdoTimer ) timer_start(timer_write);
       fileID = streamOpenAppend(argument);
@@ -787,7 +787,7 @@ void pstreamClose(int pstreamID)
   pstreamptr = pstream_to_pointer(pstreamID);
 
   if ( pstreamptr == NULL )
-    Error(func, "Internal problem stream %d not open!", pstreamID);
+    Error("Internal problem stream %d not open!", pstreamID);
 
   if ( pstreamptr->ispipe )
     {
@@ -798,7 +798,7 @@ void pstreamClose(int pstreamID)
 
       if      ( pthread_equal(threadID, pstreamptr->rthreadID) ) lread  = TRUE;
       else if ( pthread_equal(threadID, pstreamptr->wthreadID) ) lwrite = TRUE;
-      else Error(func, "Internal problem! Close pipe %s", pstreamptr->name);
+      else Error("Internal problem! Close pipe %s", pstreamptr->name);
 
       if ( lread )
 	{
@@ -806,7 +806,7 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_lock(pipe->mutex);
 	  pipe->EOP = TRUE;
 	  if ( PSTREAM_Debug )
-	    Message(func, "%s read closed", pstreamptr->name);
+	    Message("%s read closed", pstreamptr->name);
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
 	  pthread_cond_signal(pipe->tsInq);
@@ -830,7 +830,7 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_lock(pipe->mutex);
 	  pipe->EOP = TRUE;
 	  if ( PSTREAM_Debug )
-	    Message(func, "%s write closed", pstreamptr->name);
+	    Message("%s write closed", pstreamptr->name);
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
 	  pthread_cond_signal(pipe->tsInq);
@@ -839,7 +839,7 @@ void pstreamClose(int pstreamID)
 	  while ( pstreamptr->isopen )
 	    {
 	      if ( PSTREAM_Debug )
-		Message(func, "wait of read close");
+		Message("wait of read close");
 	      pthread_cond_wait(pipe->isclosed, pipe->mutex);
 	    }
 	  pthread_mutex_unlock(pipe->mutex);
@@ -851,7 +851,7 @@ void pstreamClose(int pstreamID)
   else
     {
       if ( PSTREAM_Debug )
-	Message(func, "%s fileID %d\n", pstreamptr->name, pstreamptr->fileID);
+	Message("%s fileID %d\n", pstreamptr->name, pstreamptr->fileID);
 
       if ( pstreamptr->mode == 'r' )
 	{
@@ -1325,7 +1325,7 @@ void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
   pstream_t *pstreamptr_dest, *pstreamptr_src;
 
   if ( PSTREAM_Debug )
-    Message(func, "pstreamIDdest = %d  pstreamIDsrc = %d", pstreamIDdest, pstreamIDsrc);
+    Message("pstreamIDdest = %d  pstreamIDsrc = %d", pstreamIDdest, pstreamIDsrc);
 
   pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
   pstreamptr_src  = pstream_to_pointer(pstreamIDsrc);
@@ -1362,7 +1362,7 @@ void cdoInitialize(void *argument)
 
 #if  defined  (HAVE_LIBPTHREAD)
   if ( PSTREAM_Debug )
-     Message(func, "process %d  thread %ld", processSelf(), pthread_self());
+     Message("process %d  thread %ld", processSelf(), pthread_self());
 #endif
 
   processDefArgument((const char*) argument);
@@ -1386,7 +1386,7 @@ void cdoFinish(void)
 
 #if  defined  (HAVE_LIBPTHREAD)
   if ( PSTREAM_Debug )
-    Message(func, "process %d  thread %ld", processID, pthread_self());
+    Message("process %d  thread %ld", processID, pthread_self());
 #endif
 
   nvals = processInqNvals(processID);
@@ -1497,7 +1497,7 @@ void cdoFinish(void)
       pstreamID = processInqStreamID(sindex);
       pstreamptr = pstream_to_pointer(pstreamID);
       if ( PSTREAM_Debug )
-	Message(func, "process %d  stream %d  close streamID %d",
+	Message("process %d  stream %d  close streamID %d",
 		processID, sindex, pstreamID);
       if ( pstreamptr ) pstreamClose(pstreamID);
     }

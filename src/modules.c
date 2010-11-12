@@ -840,7 +840,7 @@ int operatorInqModID(char *operatorName)
 	{
 	  fclose(fp);
 	  fprintf(stderr, "Use commandline option -h for help.");
-	  Error(func, "operator missing! %s is a file on disk!", operatorName);
+	  Error("operator missing! %s is a file on disk!", operatorName);
 	}
       fprintf(stderr, "Operator >%s< not found!\n", operatorName);
       fprintf(stderr, "Similar operators are:\n");
@@ -876,7 +876,7 @@ int operatorInqModID(char *operatorName)
 
   if ( modID != -1 )
     if ( ! Modules[modID].func )
-      Error(func, "Module for operator >%s< not installed!", operatorName);
+      Error("Module for operator >%s< not installed!", operatorName);
 
   return (modID);
 }

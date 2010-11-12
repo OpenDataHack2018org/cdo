@@ -102,9 +102,9 @@ int zaxisDefine(zaxis_t zaxis)
   static const char *func = "zaxisDefine";
   int zaxisID = UNDEFID;
 
-  if ( zaxis.type == -1 ) Error(func, "zaxistype undefined!");
+  if ( zaxis.type == -1 ) Error("zaxistype undefined!");
 
-  if ( zaxis.size == 0 ) Error(func, "zaxis size undefined!");
+  if ( zaxis.size == 0 ) Error("zaxis size undefined!");
 
   zaxisID = zaxisCreate(zaxis.type, zaxis.size);
 
@@ -133,7 +133,7 @@ int zaxisDefine(zaxis_t zaxis)
       if ( zaxis.vctsize && zaxis.vct )
 	zaxisDefVct(zaxisID, zaxis.vctsize, zaxis.vct);
       else
-	Warning(func, "vct undefined!");	    
+	Warning("vct undefined!");	    
     }
 
   return (zaxisID);
@@ -193,7 +193,7 @@ int zaxisFromFile(FILE *gfp)
 	  else if ( memcmp(pline, "surface", 7)  == 0 )
 	    zaxis.type = ZAXIS_SURFACE;
 	  else
-	    Warning(func, "Invalid zaxisname : %s", pline);
+	    Warning("Invalid zaxisname : %s", pline);
 	}
       else if ( memcmp(pline, "size", 4)  == 0 )
 	{
@@ -232,7 +232,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >levels<");
+			  Warning("Incomplete command: >levels<");
 			  break;
 			}
 		      pline = line;
@@ -248,7 +248,7 @@ int zaxisFromFile(FILE *gfp)
 	    }
 	  else
 	    {
-	      Warning(func, "size undefined!");
+	      Warning("size undefined!");
 	    }
 	}
       else if ( memcmp(pline, "vct", 3)  == 0 )
@@ -268,7 +268,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >vct<");
+			  Warning("Incomplete command: >vct<");
 			  break;
 			}
 		      pline = line;
@@ -284,7 +284,7 @@ int zaxisFromFile(FILE *gfp)
 	    }
 	  else
 	    {
-	      Warning(func, "vctsize undefined!");
+	      Warning("vctsize undefined!");
 	    }
 	}
       else if ( memcmp(pline, "lbounds", 7)  == 0 )
@@ -304,7 +304,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >lbounds<");
+			  Warning("Incomplete command: >lbounds<");
 			  break;
 			}
 		      pline = line;
@@ -320,7 +320,7 @@ int zaxisFromFile(FILE *gfp)
 	    }
 	  else
 	    {
-	      Warning(func, "size undefined!");
+	      Warning("size undefined!");
 	    }
 	}
       else if ( memcmp(pline, "ubounds", 7)  == 0 )
@@ -340,7 +340,7 @@ int zaxisFromFile(FILE *gfp)
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
 			{
-			  Warning(func, "Incomplete command: >ubounds<");
+			  Warning("Incomplete command: >ubounds<");
 			  break;
 			}
 		      pline = line;
@@ -356,11 +356,11 @@ int zaxisFromFile(FILE *gfp)
 	    }
 	  else
 	    {
-	      Warning(func, "size undefined!");
+	      Warning("size undefined!");
 	    }
 	}
       else
-	Warning(func, "Invalid zaxis command : >%s<", pline);
+	Warning("Invalid zaxis command : >%s<", pline);
     }
 
   zaxisID = zaxisDefine(zaxis);

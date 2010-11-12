@@ -549,10 +549,10 @@ void trans_uv2dv(SPTRANS *sptrans, int nlev,
   double *fpwork1, *fpwork2;
 
   if ( gridInqType(gridID1) != GRID_GAUSSIAN )
-    Warning(func, "unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
+    Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
 
   if ( gridInqType(gridID2) != GRID_SPECTRAL )
-    Warning(func, "unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
+    Warning("unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
     
   ntr  = gridInqTrunc(gridID2);
   nlon = gridInqXsize(gridID1);
@@ -589,10 +589,10 @@ void trans_dv2uv(SPTRANS *sptrans, DVTRANS *dvtrans, int nlev,
   double *su, *sv;
 
   if ( gridInqType(gridID1) != GRID_SPECTRAL )
-    Warning(func, "unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
+    Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
 
   if ( gridInqType(gridID2) != GRID_GAUSSIAN )
-    Warning(func, "unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
+    Warning("unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
 
   ntr  = gridInqTrunc(gridID1);
   nlon = gridInqXsize(gridID2);
