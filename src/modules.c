@@ -514,7 +514,7 @@ static modules_t Modules[] =
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       CDI_REAL, -1,  1 },
   { Ensstat,        Ensstat2Help,      Ensstat2Operators,      CDI_REAL, -1,  1 },
-  { Ensstat3,       NULL,              Ensstat3Operators,      CDI_REAL, -1,  1 },
+  { Ensstat3,       Ensstat2Help,      Ensstat3Operators,      CDI_REAL, -1,  1 },
   { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2, -1 },
   { Eofcoeff3d,     EofcoeffHelp,      Eofcoeff3dOperators,    CDI_REAL,  2, -1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
@@ -747,6 +747,8 @@ static char *opalias[][2] =
   {"eca_r1mm",            "eca_rr1"    },
   {"fpressure",           "pressure_fl"},
   {"hpressure",           "pressure_hl"},
+  {"ensrkhistspace",      "ensrkhist_space"},
+  {"ensrkhisttime",       "ensrkhist_time"}
 };
 
 static int nopalias = sizeof(opalias) / (2*sizeof(opalias[0][0]));

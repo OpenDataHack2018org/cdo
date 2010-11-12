@@ -5,22 +5,24 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = obsfile ensfiles ofile
-@Operators = ensbrs enscrps
+@Operators = ensbrs enscrps ensrkhistspace ensrkhisttime
 
 @BeginDescription
-This module computes statistical values over an ensemble of input files.
-Depending on the chosen operator the Brier score or Cumulative ranked 
-probability score over all input files or a skill score is written to 
-@file{ofile}. The date information of a time step in @file{ofile} is the date of the 
-first input file.
+This module computes statistical values over the ensemble of @file{ensfiles} using
+@file{obsfile} as a reference. Depending on the chosen operator the Brier score, 
+Cumulative ranked probability score or a ranked Histogram over all Ensembles @file{ensfiles}
+with reference to @file{obsfile} is written to @file{ofile}. 
+The date and grid information of a time step in @file{ofile} is the date of the 
+first input file. Thus all input files are required to have the same structure in 
+terms of the gridsize, variable definitions and number of time steps. 
 
-All Operators in this module use @file{ifile1} as the reference (for instance 
-an observation) whereas files @file{ifile2} - @file{ifilen} are understood as 
-an ensemble consisting of n-1 members. 
+All Operators in this module use @file{obsfile} as the reference (for instance 
+an observation) whereas @file{ensfiles} are understood as an ensemble consisting 
+of n (where n is the number of @file{ensfiles}) members. 
 
-For the Brier score it is assumed, that both @file{obsfile} and @file{ifiles} 
+For the Brier score it is assumed, that both @file{obsfile} and @file{ensfiles} 
 contain probability information. Usually in a way that @file{obsfile} is a 
-mask indicating the occurence of an event and @file{ifiles} are forecast 
+mask indicating the occurence of an event and @file{ensfiles} are forecast 
 probabilities of the occurence of the event. Please also note below, that the 
 'Brier Score' is actually defined as half the score which was originally 
 defined by Brier. This is common practice for reasons of normalization. 
@@ -28,6 +30,19 @@ defined by Brier. This is common practice for reasons of normalization.
 The cumulative ranked probability score is understood as the integral of the 
 squared difference between the cumulative distribution function cdf(ensfiles(t,x)) 
 of the ensemble and a heavyside function H(obsfile(t,x)). 
+
+The operators ensrkhistspace and ensrkhisttime compute Ranked Histograms. 
+Therefor the vertical axis is utilized as the Histogram axis, which prohibits
+the use of files containing more than one level. The histogram axis has 
+nensfiles+1 bins with level 0 containing for each grid point the number of 
+observations being smaller as all ensembles and level nensfiles+1 indicating
+the number of observations being larger than all ensembles. 
+
+ensrkhistspace computes a ranked histogram at each time step reducing each 
+horizontal grid to a 1x1 grid and keeping the time axis as in @file{obsfile}. 
+Contrary ensrkhistspace  computes a histogram at each grid point keeping the 
+horizontal grid for each variable and reducing the time-axis. The time infor-
+mation is that from the last time step in @file{obsfile}. 
 @EndDescription
 @EndModule
 
@@ -60,6 +75,14 @@ o(t,x) = crps( \{i_1(t,x)\}, \{i_2(t,x),\ldots,i_n(t,x)\} )
 @EndMath
 @EndifDoc
 @EndDescription
+@EndOperator
+
+@BeginOperator_ensrkhistspace
+@Title      = Ranked Histogram averaged over time
+@EndOperator
+
+@BeginOperator_ensrkhisttime
+@Title      = Ranked Histogram averaged over space 
 @EndOperator
 
 @BeginExample
