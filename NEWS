@@ -11,7 +11,8 @@ Version 1.4.7 (?? December 2010):
    Fixed bugs:
      * fldmean: gives wrong result for grid units radian
      * Yseasstat: bug fix for datasets with time constant fields
-     * Sellevel: fix problem with hybrid model levels and netCDF output
+     * sellevel: fix problem with hybrid model levels and netCDF output
+     * sellonlatbox: fix rounding error of the last lon index
 
 Version 1.4.6 (17 September 2010):
 

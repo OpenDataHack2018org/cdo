@@ -353,7 +353,8 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
   for ( *lon11 = 0; xvals1[*lon11] < xlon1; (*lon11)++ );
   for ( *lon12 = *lon11; *lon12 < nlon1 && xvals1[*lon12] < xlon2; (*lon12)++ );
 
-  (*lon12)--;
+  //(*lon12)--;
+  if ( *lon12 >= nlon1 || xvals1[*lon12] > xlon2 ) (*lon12)--;
   
   if ( *lon12 - *lon11 + 1 + *lon22 - *lon21 + 1 <= 0 )
     cdoAbort("Longitudinal dimension is too small!");
@@ -388,7 +389,6 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
   if ( *lat2 - *lat1 + 1 <= 0 )
     cdoAbort("Latitudinal dimension is too small!");
 }
-
 
 static
 int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
@@ -445,9 +445,14 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
       if ( xlon1 > xlon2 ) 
 	cdoAbort("The second longitude have to be greater than the first one!");
-      if ( xlat1 > xlat2 )
-	cdoAbort("The second latitude have to be greater than the first one!");
 
+      if ( xlat1 > xlat2 )
+	{
+	  double xtemp = xlat1;
+	  xlat1 = xlat2;
+	  xlat2 = xtemp;
+	}
+	  
       *lat1 = nlat1-1;
       *lat2 = 0;
       *lon11 = 0;
@@ -760,8 +765,8 @@ void *Selbox(void *argument)
     int gridID1, gridID2;
     int *cellidx, nvals;
     int lat1, lat2, lon11, lon12, lon21, lon22; 
-  } SBOX;
-  SBOX *sbox = NULL;
+  } sbox_t;
+  sbox_t *sbox = NULL;
 
   cdoInitialize(argument);
 
@@ -787,7 +792,7 @@ void *Selbox(void *argument)
   for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
 
   ngrids = vlistNgrids(vlistID1);
-  sbox = (SBOX *) malloc(ngrids*sizeof(SBOX));
+  sbox = (sbox_t *) malloc(ngrids*sizeof(sbox_t));
 
   for ( index = 0; index < ngrids; index++ )
     {
