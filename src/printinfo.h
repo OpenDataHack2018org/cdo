@@ -3,7 +3,6 @@
 
 void date2str(int date, char *datestr, int maxlen)
 {
-  static const char *func = "date2str";
   int year, month, day;
   int len;
 
@@ -12,13 +11,12 @@ void date2str(int date, char *datestr, int maxlen)
   len = sprintf(datestr, DATE_FORMAT, year, month, day);
 
   if ( len > ( maxlen-1) )
-    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
 
 
 void time2str(int time, char *timestr, int maxlen)
 {
-  static const char *func = "time2str";
   int hour, minute, second;
   int len;
 
@@ -27,7 +25,7 @@ void time2str(int time, char *timestr, int maxlen)
   len = sprintf(timestr, TIME_FORMAT, hour, minute, second);
 
   if ( len > ( maxlen-1) )
-    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", func);
+    fprintf(stderr, "Internal problem (%s): sizeof input string is too small!\n", __func__);
 }
 
 
@@ -124,7 +122,6 @@ void printFiletype(int streamID, int vlistID)
 
   printf("\n");
 }
-
 
 static
 void printGridInfo(int vlistID)
