@@ -614,6 +614,8 @@ while (<MOFILE>) {
 
       $opernamex = $opername;
       $opernamex =~ s/_/\\_/g;
+      $operatorx = $operator;
+      $operatorx =~ s/_/\\_/g;
       if ( $#hkeys > 0 ) {
 	printf HELPFILE ("    \"    %-*s%s\",\n",
 			$maxlen, $operator, $otitle);
@@ -1100,8 +1102,11 @@ sub print_description {
       print TRFILE "\\end{displaymath}\n";
       print TRFILE "\n";
       $math = 0;
+#    } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
+#      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{zebg}, basicstyle=\\small]\n";
+#      $verb = 1;
     } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
-      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{zebg}, basicstyle=\\small]\n";
+      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{zebg}, basicstyle=\\ttfamily, columns=flexible]\n";
       $verb = 1;
     } elsif ( "$kword" eq "\@ENDVERBATIM" ) {
       print TRFILE "\\end{lstlisting}\n";

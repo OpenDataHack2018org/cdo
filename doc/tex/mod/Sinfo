@@ -48,7 +48,7 @@ To print short information of a dataset use:
    cdo sinfov ifile
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 variables over 12 time steps:
-@BeginVerbatim
+@BeginListing
     -1 : Institut Source  Varname  Time  Typ  Grid Size Num  Levels Num
      1 : MPIMET   ECHAM5  GEOSP    con   F32      2048   1       1   1
      2 : MPIMET   ECHAM5  T        var   F32      2048   1       4   2
@@ -65,5 +65,5 @@ YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss
 1987-01-31 12:00:00 1987-02-28 12:00:00 1987-03-31 12:00:00 1987-04-30 12:00:00
 1987-05-31 12:00:00 1987-06-30 12:00:00 1987-07-31 12:00:00 1987-08-31 12:00:00
 1987-09-30 12:00:00 1987-10-31 12:00:00 1987-11-30 12:00:00 1987-12-31 12:00:00
-@EndVerbatim
+@EndListing
 @EndExample

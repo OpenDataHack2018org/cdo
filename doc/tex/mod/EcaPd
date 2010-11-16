@@ -51,7 +51,7 @@ FLOAT   Daily precipitation amount threshold in [mm]
 
 
 @BeginNote
-Please note, that precipitation rates in [mm/s] or [kg m-2/s] have to be converted to
+Please note, that precipitation rates in [mm/s] have to be converted to
 precipitation amounts (multiply with 86400 s).
 @EndNote
 

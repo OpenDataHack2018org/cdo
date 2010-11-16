@@ -70,7 +70,7 @@ To print the grid description of this dataset use:
    cdo griddes ifile
 @EndVerbatim
 Result:
-@BeginVerbatim
+@BeginListing
    gridtype  : gaussian
    gridsize  : 2048
    xname     : lon
@@ -88,5 +88,5 @@ Result:
                8.306702 2.768903 -2.768903 -8.306702 -13.84448 -19.38223
                -24.91992 -30.4575 -35.99507 -41.53246 -47.06964 -52.6065
                -58.1429 -63.67863 -69.21297 -74.74454 -80.26877 -85.76058
-@EndVerbatim
+@EndListing
 @EndExample
