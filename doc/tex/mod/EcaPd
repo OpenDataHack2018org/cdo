@@ -1,0 +1,65 @@
+@BeginModule
+@NewPage
+@Name      = EcaPd
+@Title     = Precipitation days index per time period
+@Section   = Climate indices
+@Class     = Climate index
+@Arguments = ifile ofile
+@Operators = eca_pd eca_r10mm eca_r20mm
+
+@BeginDescription
+Let @file{ifile} be a time series of daily precipitation amounts RR in [mm]
+(or alternatively in [kg m-2]), then counted is the number of days where RR is at least @math{x} mm. 
+eca\_r10mm and eca\_r20mm are specific ECA operators with a daily precipitation amount of 10 
+and 20 mm respectively.
+The date information of a time step in ofile is the date of the last
+contributing time step in @file{ifile}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_eca_pd
+@Title     = Precipitation days index per time period
+@Parameter = x
+
+@BeginDescription
+Generic ECA operator with a daily precipitation sum exceeding @math{x} mm.
+@EndDescription
+@EndOperator
+
+@BeginOperator_eca_r10mm
+@Title     = Heavy precipitation days index per time period
+
+@BeginDescription
+Specific ECA operator with a daily precipitation sum exceeding 10 mm.
+@EndDescription
+@EndOperator
+
+@BeginOperator_eca_r20mm
+@Title     = Very heavy precipitation days index per time period
+
+@BeginDescription
+Specific ECA operator with a daily precipitation sum exceeding 20 mm.
+@EndDescription
+@EndOperator
+
+
+@BeginParameter x
+@Item = x
+FLOAT   Daily precipitation amount threshold in [mm]
+@EndParameter
+
+
+@BeginNote
+Please note, that precipitation rates in [mm/s] or [kg m-2/s] have to be converted to
+precipitation amounts (multiply with 86400 s).
+@EndNote
+
+
+@BeginExample
+To get the number of days with precipitation greater than 25 mm for 
+a time series of daily precipitation amounts use:
+@BeginVerbatim
+   cdo eca_pd,25 ifile ofile
+@EndVerbatim
+@EndExample

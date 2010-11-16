@@ -206,6 +206,8 @@ Operator catalog:
    Ensstat       enspctl         Ensemble percentiles
    Ensstat2      ensbrs          Brier score
    Ensstat2      enscrps         Cumulative Ranked Probability score
+   Ensstat2      ensrkhistspace  Ranked Histogram averaged over time
+   Ensstat2      ensrkhisttime   Ranked Histogram averaged over space
    Fldstat       fldmin          Field minimum
    Fldstat       fldmax          Field maximum
    Fldstat       fldsum          Field sum
@@ -465,8 +467,9 @@ Operator catalog:
    EcaHwdi       eca_hwdi        Heat wave duration index wrt mean of reference period
    EcaHwfi       eca_hwfi        Warm spell days index wrt 90th percentile of reference period
    EcaId         eca_id          Ice days index per time period
-   EcaR10mm      eca_r10mm       Heavy precipitation days index per time period
-   EcaR20mm      eca_r20mm       Very heavy precipitation days index per time period
+   EcaPd         eca_pd          Precipitation days index per time period
+   EcaPd         eca_r10mm       Heavy precipitation days index per time period
+   EcaPd         eca_r20mm       Very heavy precipitation days index per time period
    EcaR75p       eca_r75p        Moderate wet days wrt 75th percentile of reference period
    EcaR75ptot    eca_r75ptot     Precipitation percent due to R75p days
    EcaR90p       eca_r90p        Wet days wrt 90th percentile of reference period

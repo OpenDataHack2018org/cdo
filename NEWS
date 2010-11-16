@@ -7,9 +7,10 @@ Version 1.4.7 (?? December 2010):
      * improved support for netCDF output from WRF model (import time and grid variables)
    New operators:
      * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
+     * eca_pd: Precipitation days index per time period
      * dv2ps: Divergence and vorticity to velocity potential and stream function
    Fixed bugs:
-     * fldmean: gives wrong result for grid units radian
+     * fldmean: gives wrong result for grid units [radian]
      * Yseasstat: bug fix for datasets with time constant fields
      * sellevel: fix problem with hybrid model levels and netCDF output
      * sellonlatbox: fix rounding error of the last lon index

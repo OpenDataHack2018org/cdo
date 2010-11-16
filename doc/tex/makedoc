@@ -373,6 +373,7 @@ while (<MOFILE>) {
       if ( $len > $maxlen ) {
 	$maxlen = $len;
         $maxitem = $operator;
+	$maxitem =~ s/_/\\_/g;
       }
     }
     $maxlen += 2;
@@ -611,14 +612,14 @@ while (<MOFILE>) {
       $otitle = @oper_title[$opercnt-1];
       $oparameter = @oper_parameter[$opercnt-1];
 
+      $opernamex = $opername;
+      $opernamex =~ s/_/\\_/g;
       if ( $#hkeys > 0 ) {
 	printf HELPFILE ("    \"    %-*s%s\",\n",
 			$maxlen, $operator, $otitle);
 	if ( $xopercnt == 1 ) {
 	  print TRFILE "\\begin{defalist}{\\bf $maxitem \\ }\n";
 	}
-	$operatorx = $operator;
-	$operatorx =~ s/_/\\_/g;
 	print TRFILE "\\item[{\\bf $operatorx}\\ \\ \\hfill]\n";
 	print TRFILE "$otitle \\\\\n";
       }
@@ -628,7 +629,7 @@ while (<MOFILE>) {
 	  print TRCARD "\\rowcolor[gray]{.9}\n";
 	  print TRCARD "\\makebox[$len2][r]{Syntax} ";
 	  if ( $xopercnt == 2 ) {
-	    print TRCARD "& \\hspace*{0mm}{\\bf $opername}{\\sl $operpara} \ {\\tt $marguments} ";
+	    print TRCARD "& \\hspace*{0mm}{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments} ";
 	  } else {
 	    print TRCARD "& \\hspace*{0mm}{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments} ";
 	  }
@@ -751,6 +752,7 @@ while (<MOFILE>) {
 	  if ( $len > $maxlen ) {
 	    $maxlen = $len;
 	    $maxitem = $value;
+	    $maxitem =~ s/_/\\_/g;
 	  }
 	}
       }
@@ -1002,7 +1004,7 @@ while (<MOFILE>) {
 	print TRCARD "& \\hspace*{0mm}{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments} ";
       }
       print TRCARD "\\\\ \\hline \n";
-      
+
       print TRCARD "\\end{tabular*}\n";
       print TRCARD "\\vspace{1mm}\n";
       print TRCARD "\n";

@@ -125,8 +125,7 @@ EcaHd         Climate indices
 EcaHwdi       Climate indices
 EcaHwfi       Climate indices
 EcaId         Climate indices
-EcaR10mm      Climate indices
-EcaR20mm      Climate indices
+EcaPd         Climate indices
 EcaR75p       Climate indices
 EcaR75ptot    Climate indices
 EcaR90p       Climate indices

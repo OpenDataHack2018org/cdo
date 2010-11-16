@@ -176,9 +176,9 @@ static const char CWD_NAME2[]        = "number_of_cwd_periods_with_more_than_5da
 static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS2[]       = "No.";
 
-static const char RINDEX_NAME[]       = "precipitation_days_index_per_time_period";
-static const char RINDEX_LONGNAME[]   = "precipitation days is the number of days per time period with daily precipitation sum exceeding RR mm. The time period should be defined by the bounds of the time coordinate.";
-static const char RINDEX_UNITS[]      = "No.";
+static const char PD_NAME[]          = "precipitation_days_index_per_time_period";
+static const char PD_LONGNAME[]      = "precipitation days is the number of days per time period with daily precipitation sum exceeding %g mm. The time period should be defined by the bounds of the time coordinate.";
+static const char PD_UNITS[]         = "No.";
 
 static const char R10MM_NAME[]       = "heavy_precipitation_days_index_per_time_period";
 static const char R10MM_LONGNAME[]   = "Heavy precipitation days is the number of days per time period with daily precipitation sum exceeding 10 mm. The time period should be defined by the bounds of the time coordinate.";
@@ -942,39 +942,41 @@ void *EcaCwd(void *argument)
 }
 
 
-void *EcaRainIndex(void *argument)
+void *EcaPd(void *argument)
 {
-  int ECA_RAININDEX, ECA_R10MM, ECA_R20MM;
+  int ECA_PD, ECA_R10MM, ECA_R20MM;
   int operatorID;
-  double rr = 0;
+  char lnamebuffer[1024];
+  double threshold = 0;
   ECA_REQUEST_1 request;
   
   cdoInitialize(argument);
 
-  ECA_RAININDEX = cdoOperatorAdd("eca_rainindex", 0, 31, NULL);
-  ECA_R10MM     = cdoOperatorAdd("eca_r10mm",     0, 31, NULL);
-  ECA_R20MM     = cdoOperatorAdd("eca_r20mm",     0, 31, NULL);
+  ECA_PD      = cdoOperatorAdd("eca_pd",      0, 31, NULL);
+  ECA_R10MM   = cdoOperatorAdd("eca_r10mm",   0, 31, NULL);
+  ECA_R20MM   = cdoOperatorAdd("eca_r20mm",   0, 31, NULL);
 
   operatorID = cdoOperatorID();
 
-  if ( operatorID == ECA_RAININDEX )
+  if ( operatorID == ECA_PD )
     {
-      operatorInputArg("RR");
+      operatorInputArg("daily precipitation amount threshold in [mm]");
 
       if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
       if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
-      rr = atof(operatorArgv()[0]);
+      threshold = atof(operatorArgv()[0]);
 
-      if ( rr < 0 ) cdoAbort("Parameter out of range: RR = %d", rr);
+      if ( threshold < 0 ) cdoAbort("Parameter out of range: threshold = %d", threshold);
 
-      request.var1.name     = RINDEX_NAME;
-      request.var1.longname = RINDEX_LONGNAME;
-      request.var1.units    = RINDEX_UNITS;
+      sprintf(lnamebuffer, PD_LONGNAME, threshold);
+      request.var1.name     = PD_NAME;
+      request.var1.longname = lnamebuffer;
+      request.var1.units    = PD_UNITS;
     }
   else if ( operatorID == ECA_R10MM )
     {
-      rr = 10;
+      threshold = 10;
 
       request.var1.name     = R10MM_NAME;
       request.var1.longname = R10MM_LONGNAME;
@@ -982,17 +984,17 @@ void *EcaRainIndex(void *argument)
     }
   else if ( operatorID == ECA_R20MM )
     {
-      rr = 20;
+      threshold = 20;
 
       request.var1.name     = R20MM_NAME;
       request.var1.longname = R20MM_LONGNAME;
       request.var1.units    = R20MM_UNITS;
     }
   
-  if ( cdoVerbose ) cdoPrint("RR = %g", rr);
+  if ( cdoVerbose ) cdoPrint("threshold = %g", threshold);
 
   request.var1.f1       = farselgec;
-  request.var1.f1arg    = rr;
+  request.var1.f1arg    = threshold;
   request.var1.f2       = farnum;
   request.var1.f3       = NULL;
   request.var1.mulc     = 0.0;   
