@@ -13,25 +13,25 @@ extern int _ExitOnError;  /* If set to 1, exit on error (default 1)       */
 extern int _Verbose;      /* If set to 1, errors are reported (default 1) */
 extern int _Debug;        /* If set to 1, debuggig (default 0)            */
 
-void SysError(const char *caller, const char *fmt, ...);
-void    Error(const char *caller, const char *fmt, ...);
-void  Warning(const char *caller, const char *fmt, ...);
-void  Message(const char *caller, const char *fmt, ...);
+void SysError_(const char *caller, const char *fmt, ...);
+void    Error_(const char *caller, const char *fmt, ...);
+void  Warning_(const char *caller, const char *fmt, ...);
+void  Message_(const char *caller, const char *fmt, ...);
 
 #if  defined  WITH_CALLER_NAME
-#  define  SysError(...)  SysError(__func__, __VA_ARGS__)
-#  define     Error(...)     Error(__func__, __VA_ARGS__)
-#  define    Errorc(...)     Error(caller, __VA_ARGS__)
-#  define   Warning(...)   Warning(__func__, __VA_ARGS__)
-#  define   Message(...)   Message(__func__, __VA_ARGS__)
-#  define  Messagec(...)   Message(caller, __VA_ARGS__)
+#  define  SysError(...)  SysError_(__func__, __VA_ARGS__)
+#  define    Errorc(...)     Error_(  caller, __VA_ARGS__)
+#  define     Error(...)     Error_(__func__, __VA_ARGS__)
+#  define   Warning(...)   Warning_(__func__, __VA_ARGS__)
+#  define  Messagec(...)   Message_(  caller, __VA_ARGS__)
+#  define   Message(...)   Message_(__func__, __VA_ARGS__)
 #else
-#  define  SysError(...)  SysError((void *), __VA_ARGS__)
-#  define     Error(...)     Error((void *), __VA_ARGS__)
-#  define    Errorc(...)     Error((void *), __VA_ARGS__)
-#  define   Warning(...)   Warning((void *), __VA_ARGS__)
-#  define   Message(...)   Message((void *), __VA_ARGS__)
-#  define  Messagec(...)   Message((void *), __VA_ARGS__)
+#  define  SysError(...)  SysError_((void *), __VA_ARGS__)
+#  define    Errorc(...)     Error_((void *), __VA_ARGS__)
+#  define     Error(...)     Error_((void *), __VA_ARGS__)
+#  define   Warning(...)   Warning_((void *), __VA_ARGS__)
+#  define  Messagec(...)   Message_((void *), __VA_ARGS__)
+#  define   Message(...)   Message_((void *), __VA_ARGS__)
 #endif
 
 #endif  /* _ERROR_H */

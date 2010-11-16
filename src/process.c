@@ -360,6 +360,7 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
   int streamOutCnt;
   char *opername;
   char *comma_position;
+  const char *caller = processInqPrompt();
   /*
   { int i;
   for ( i = 0; i < argc; i++ )
@@ -386,14 +387,12 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
       */
       streamInCnt = 1;
       /*
-      Error(processInqPrompt(),
-	    "Unlimited input streams not allowed in CDO pipes (Operator %s)!", opername);
+      Errorc("Unlimited input streams not allowed in CDO pipes (Operator %s)!", opername);
       */
     }
 
   if ( streamOutCnt > 1 )
-    Error(processInqPrompt(), 
-	  "More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
+    Errorc("More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
 
   globArgc++;
 
@@ -407,11 +406,13 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
 static
 int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 {
+  const char *caller = processInqPrompt();
+
   while ( nstreams > 0 )
     {
       if ( globArgc >= argc )
 	{
-	  Error(processInqPrompt(), "Not enough arguments. Check command line!");
+	  Errorc("Not enough arguments. Check command line!");
 	  break;
 	}
       if ( argv[globArgc][0] == '-' )
@@ -492,6 +493,7 @@ void checkStreamCnt(void)
   int streamCnt = 0;
   int i, j;
   int obase = FALSE;
+  const char *caller = processInqPrompt();
 
   streamInCnt  = operatorStreamInCnt(Process[processID].operatorName);
   streamOutCnt = operatorStreamOutCnt(Process[processID].operatorName);
@@ -503,44 +505,44 @@ void checkStreamCnt(void)
     }
 
   if ( streamInCnt == -1 && streamOutCnt == -1 )
-    Error(processInqPrompt(), "I/O stream counts unlimited no allowed");
+    Errorc("I/O stream counts unlimited no allowed");
     
   if ( streamInCnt == -1 )
     {
       streamInCnt = Process[processID].streamCnt - streamOutCnt;
-      if ( streamInCnt < 1 ) Error(processInqPrompt(), "Input streams missing!");
+      if ( streamInCnt < 1 ) Errorc("Input streams missing!");
     }
 
   if ( streamOutCnt == -1 )
     {
       streamOutCnt = Process[processID].streamCnt - streamInCnt;
-      if ( streamInCnt < 1 ) Error(processInqPrompt(), "Output streams missing!");
+      if ( streamInCnt < 1 ) Errorc("Output streams missing!");
     }
 
   streamCnt = streamInCnt + streamOutCnt;
 
   if ( Process[processID].streamCnt > streamCnt )
-    Error(processInqPrompt(), "Too many streams!"
-	  " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
+    Errorc("Too many streams!"
+	   " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
   if ( Process[processID].streamCnt < streamCnt )
-    Error(processInqPrompt(), "Not enough streams specified!"
-	  " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
+    Errorc("Not enough streams specified!"
+	   " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
 
   for ( i = streamInCnt; i < streamCnt; i++ )
     {
       if ( Process[processID].streamNames[i][0] == '-' )
 	{
-	  Error(processInqPrompt(), "Output file name %s must not begin with \"-\"!\n",
-		Process[processID].streamNames[i]);
+	  Errorc("Output file name %s must not begin with \"-\"!\n",
+		 Process[processID].streamNames[i]);
 	}
       else if ( !obase )
 	{
 	  for ( j = 0; j < streamInCnt; j++ ) /* does not work with files in pipes */
 	    if ( strcmp(Process[processID].streamNames[i], Process[processID].streamNames[j]) == 0 )
-	      Error(processInqPrompt(), "Output file name %s is equal to input file name"
-		    " on position %d!\n", Process[processID].streamNames[i], j+1);
+	      Errorc("Output file name %s is equal to input file name"
+		     " on position %d!\n", Process[processID].streamNames[i], j+1);
 	}
     }  
 }

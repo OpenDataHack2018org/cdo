@@ -23,7 +23,7 @@ contributing time step in @file{ifile}.
 @Parameter = x
 
 @BeginDescription
-Generic ECA operator with a daily precipitation sum exceeding @math{x} mm.
+Generic ECA operator with daily precipitation sum exceeding @math{x} mm.
 @EndDescription
 @EndOperator
 
@@ -31,7 +31,7 @@ Generic ECA operator with a daily precipitation sum exceeding @math{x} mm.
 @Title     = Heavy precipitation days index per time period
 
 @BeginDescription
-Specific ECA operator with a daily precipitation sum exceeding 10 mm.
+Specific ECA operator with daily precipitation sum exceeding 10 mm.
 @EndDescription
 @EndOperator
 
@@ -39,7 +39,7 @@ Specific ECA operator with a daily precipitation sum exceeding 10 mm.
 @Title     = Very heavy precipitation days index per time period
 
 @BeginDescription
-Specific ECA operator with a daily precipitation sum exceeding 20 mm.
+Specific ECA operator with daily precipitation sum exceeding 20 mm.
 @EndDescription
 @EndOperator
 
