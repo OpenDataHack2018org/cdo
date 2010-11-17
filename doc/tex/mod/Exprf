@@ -93,8 +93,8 @@ The same example, but the instructions are read from a file:
    cdo exprf,myexpr ifile ofile
 @EndVerbatim
 The file @file{myexpr} contains:
-@BeginVerbatim
+@BeginListing
    var1 = aprl + aprc;
    var2 = ts - 273.15;
-@EndVerbatim
+@EndListing
 @EndExample

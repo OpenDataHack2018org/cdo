@@ -41,7 +41,7 @@ To convert a binary data file to netCDF use:
    cdo -f nc import_binary ifile.ctl ofile.nc
 @EndVerbatim
 Here is an example of a GrADS data descriptor file:
-@BeginVerbatim
+@BeginListing
    DSET  ^ifile.bin
    OPTIONS sequential
    UNDEF  -9e+33
@@ -52,7 +52,7 @@ Here is an example of a GrADS data descriptor file:
    VARS   1
    param  1  99  description of the variable
    ENDVARS
-@EndVerbatim
+@EndListing
 The binary data file ifile.bin contains one parameter on a global 1 degree lon/lat 
 grid written with FORTRAN record length headers (sequential).
 @EndExample

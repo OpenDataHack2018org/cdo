@@ -1106,7 +1106,7 @@ sub print_description {
 #      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{zebg}, basicstyle=\\small]\n";
 #      $verb = 1;
     } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
-      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{zebg}, basicstyle=\\ttfamily, columns=flexible]\n";
+      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{ccc2}, basicstyle=\\ttfamily, columns=flexible]\n";
       $verb = 1;
     } elsif ( "$kword" eq "\@ENDVERBATIM" ) {
       print TRFILE "\\end{lstlisting}\n";

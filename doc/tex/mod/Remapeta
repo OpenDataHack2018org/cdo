@@ -85,7 +85,7 @@ To remap between different hybrid model level data use:
    cdo remapeta,vct ifile ofile
 @EndVerbatim
 Here is an example vct file with 19 hybrid model level:
-@BeginVerbatim
+@BeginListing
     0       0.00000000000000000       0.00000000000000000
     1    2000.00000000000000000       0.00000000000000000
     2    4000.00000000000000000       0.00000000000000000
@@ -97,5 +97,5 @@ Here is an example vct file with 19 hybrid model level:
    17       0.00000000000000000       0.97298520803451538
    18       0.00000000000000000       0.99228149652481079
    19       0.00000000000000000       1.00000000000000000
-@EndVerbatim
+@EndListing
 @EndExample

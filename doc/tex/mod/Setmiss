@@ -149,13 +149,13 @@ below 273.15 Kelvin to missing value use:
    cdo setrtomiss,0,273.15 ifile ofile
 @EndVerbatim
 Result of '{\tt cdo info ifile}':
-@BeginVerbatim
+@BeginListing
    -1 :       Date  Time Code Level  Size  Miss :  Minimum     Mean  Maximum
     1 : 1987-12-31 12:00 139      0  2048     0 :   246.27   276.75   303.71
-@EndVerbatim
+@EndListing
 Result of '{\tt cdo info ofile}':
-@BeginVerbatim
+@BeginListing
    -1 :       Date  Time Code Level  Size  Miss :  Minimum     Mean  Maximum
     1 : 1987-12-31 12:00 139      0  2048   871 :   273.16   287.08   303.71
-@EndVerbatim
+@EndListing
 @EndExample

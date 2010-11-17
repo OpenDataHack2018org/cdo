@@ -98,7 +98,7 @@ To split this dataset into three pieces, one for each code number use:
    cdo splitcode ifile code
 @EndVerbatim
 Result of '{\tt dir code*}':
-@BeginVerbatim
+@BeginListing
    code129.grb code130.grb code139.grb
-@EndVerbatim
+@EndListing
 @EndExample

@@ -80,7 +80,7 @@ and 8 values per line use:
    cdo outputf,%8.4g,8 ifile
 @EndVerbatim
 Example result of a dataset with one field on 64 grid points:
-@BeginVerbatim
+@BeginListing
    261.7     262   257.8   252.5   248.8   247.7   246.3   246.1
    250.6   252.6   253.9   254.8     252   246.6   249.7   257.9
    273.4   266.2   259.8   261.6   257.2   253.4     251   263.7
@@ -89,5 +89,5 @@ Example result of a dataset with one field on 64 grid points:
    282.3   284.5   280.3   280.3     280   281.5   284.7   283.6
    292.9   290.5   293.9   292.6   292.7   292.8   294.1   293.6
    293.8   292.6   291.2   292.6   293.2   292.8     291   291.2
-@EndVerbatim 
+@EndListing
 @EndExample

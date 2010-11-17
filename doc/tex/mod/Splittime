@@ -81,8 +81,8 @@ variables into one separate file use:
    cdo splitmon ifile mon
 @EndVerbatim
 Result of '{\tt dir mon*}':
-@BeginVerbatim
+@BeginListing
    mon01.grb  mon02.grb  mon03.grb  mon04.grb  mon05.grb  mon06.grb
    mon07.grb  mon08.grb  mon09.grb  mon10.grb  mon11.grb  mon12.grb
-@EndVerbatim
+@EndListing
 @EndExample

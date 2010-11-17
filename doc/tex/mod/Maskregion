@@ -40,10 +40,10 @@ latitudes from 20N to 20S on all input fields use:
 @EndVerbatim
 For this example the  polygon description file @file{myregion} should contain 
 the following four coordinates:
-@BeginVerbatim
+@BeginListing
   120  20
   120 -20
   270 -20
   270  20
-@EndVerbatim
+@EndListing
 @EndExample

@@ -54,7 +54,7 @@ To set the global text attribute "myatt" to "myattcontents" in a netCDF file use
    cdo setgatt,myatt,myattcontents ifile ofile
 @EndVerbatim
 Result of '{\tt ncdump -h ofile}':
-@BeginVerbatim
+@BeginListing
 netcdf ofile {
 dimensions: ...
 
@@ -63,5 +63,5 @@ variables: ...
 // global attributes:
                 :myatt = "myattcontents" ;
 }
-@EndVerbatim
+@EndListing
 @EndExample
