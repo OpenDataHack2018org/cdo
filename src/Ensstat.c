@@ -86,7 +86,7 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensvar",  func_var,  0, NULL);
   cdoOperatorAdd("ensstd",  func_std,  0, NULL);
   /* RQ */
-  cdoOperatorAdd("enspctl", func_pctl,  0, NULL);
+  cdoOperatorAdd("enspctl", func_pctl, 0, NULL);
   /* QR */
 
   /* >>> Cedrick Ansorge 18.10.2010 */

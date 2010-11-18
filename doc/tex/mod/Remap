@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Remap
 @Title     = SCRIP grid remapping
 @Section   = Interpolation

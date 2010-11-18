@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Importamsr
 @Title     = Import AMSR binary files
 @Section   = Import/Export

@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Wind
 @Title     = Wind transformation
 @Section   = Transformation

@@ -35,10 +35,10 @@ FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)
 @EndParameter
 
 
-@BeginExample
-To compute the heat wave duration index of a time series of daily
-maximum temperatures use:
-@BeginVerbatim
-   cdo eca_hwdi txfile txnormfile ofile
-@EndVerbatim
-@EndExample
+@C @BeginExample
+@C To compute the heat wave duration index of a time series of daily
+@C maximum temperatures use:
+@C @BeginVerbatim
+@C    cdo eca_hwdi txfile txnormfile ofile
+@C @EndVerbatim
+@C @EndExample
