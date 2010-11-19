@@ -1,3 +1,7 @@
+2010-11-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* select: added paramter *ltype* [request: Jaison-Thomas Ambadan]
+	
 2010-11-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator eca_pd - Precipitation days index per time period [request: Barbara Hennemuth]

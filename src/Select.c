@@ -464,11 +464,13 @@ void *Select(void *argument)
   int *vars = NULL;
   pml_t *pml;
   PML_DEF_INT(code,    1024, "Code number");
+  PML_DEF_INT(ltype,   1024, "Level type");
   PML_DEF_FLT(level,   1024, "Level");
   PML_DEF_WORD(name,   1024, "Variable name");
   PML_DEF_WORD(param,  1024, "Parameter");
 
   PML_INIT_INT(code);
+  PML_INIT_INT(ltype);
   PML_INIT_FLT(level);
   PML_INIT_WORD(name);
   PML_INIT_WORD(param);
@@ -493,6 +495,7 @@ void *Select(void *argument)
   pml = pmlNew("SELECT");
 
   PML_ADD_INT(pml, code);
+  PML_ADD_INT(pml, ltype);
   PML_ADD_FLT(pml, level);
   PML_ADD_WORD(pml, name);
   PML_ADD_WORD(pml, param);
@@ -502,6 +505,7 @@ void *Select(void *argument)
   if ( cdoVerbose ) pmlPrint(pml);
 
   PML_NUM(pml, code);
+  PML_NUM(pml, ltype);
   PML_NUM(pml, level);
   PML_NUM(pml, name);
   PML_NUM(pml, param);
@@ -541,11 +545,23 @@ void *Select(void *argument)
 	      name  = varname;
 	      param = paramstr;
 
+	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      ltype   = zaxis2ltype(zaxisID);
+
 	      vars[varID] = FALSE;
 	      
-	      if ( npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
-	      if ( npar_name  && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
-	      if ( npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+	      if ( npar_ltype )
+		{
+		  if ( npar_code  && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
+		  if ( npar_name  && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
+		  if ( npar_param && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+		}
+	      else
+		{
+		  if ( npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
+		  if ( npar_name  && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
+		  if ( npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+		}
 	    }
 
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -580,6 +596,7 @@ void *Select(void *argument)
 	    }
 
 	  PAR_CHECK_INT_FLAG(code);
+	  PAR_CHECK_INT_FLAG(ltype);
 	  PAR_CHECK_FLT_FLAG(level);
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);

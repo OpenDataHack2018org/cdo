@@ -29,6 +29,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 #define MAX_LINE 256
 #define MAX_VALS 1048576
