@@ -244,7 +244,6 @@ void maskbox(int *mask, int gridID,
 	mask[nlon*ilat + ilon] = 0;
 }
 
-
 static
 void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nofcoords)
 {
@@ -275,16 +274,20 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
   }
 
   xmin = xvals[0];
-  ymin = yvals[0];
   xmax = xvals[0];
+  ymin = yvals[0];
   ymax = yvals[0];
 
-  for ( i = 0; i < nofcoords; i++)
+  for ( i = 1; i < nlon; i++ )
     {
-      if(xvals[i] < xmin) xmin = xvals[i];
-      if(yvals[i] < ymin) ymin = yvals[i];
-      if(xvals[i] > xmax) xmax = xvals[i];
-      if(yvals[i] > ymax) ymax = yvals[i];
+      if ( xvals[i] < xmin ) xmin = xvals[i];
+      if ( xvals[i] > xmax ) xmax = xvals[i];
+    }
+
+  for ( i = 1; i < nlat; i++ )
+    {
+      if ( yvals[i] < ymin ) ymin = yvals[i];
+      if ( yvals[i] > ymax ) ymax = yvals[i];
     }
 
   for ( ilat = 0; ilat < nlat; ilat++ )
@@ -294,10 +297,9 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 	{
           c = 0;
 	  xval = xvals[ilon];
-	  if(!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
-	  
-	  
-          if ( c == 0)
+	  if (!( ( ( xval > xmin ) || ( xval < xmax ) ) || ( (yval > ymin) || (yval < ymax) ) ) ) c = !c;
+	  	  
+          if ( c == 0 )
 	    {
 	      for (i = 0, j = nofcoords-1; i < nofcoords; j = i++)
 	    
@@ -313,10 +315,10 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
 		{
 		  if ( xvals[ilon] > 180 )
 		    {
-                         if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
-	                      ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
-		              ((xval-360) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
-			   c = !c;
+		      if ((((ycoords[i]<=yval) && (yval<ycoords[j])) ||
+			   ((ycoords[j]<=yval) && (yval<ycoords[i]))) &&
+			  ((xval-360) < (xcoords[j] - (xcoords[i])) * (yval - ycoords[i]) / (ycoords[j] - ycoords[i]) +(xcoords[i])))
+			c = !c;
 		    }
 		}
 	    }
@@ -341,7 +343,6 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
       
   free(xvals);
   free(yvals);
-
 }
 
 
