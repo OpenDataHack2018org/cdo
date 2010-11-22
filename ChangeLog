@@ -1,3 +1,7 @@
+2010-11-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* mulcoslat: added support for GME grids [request: Jaison-Thomas Ambadan]
+	
 2010-11-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* select: added paramter *ltype* [request: Jaison-Thomas Ambadan]
