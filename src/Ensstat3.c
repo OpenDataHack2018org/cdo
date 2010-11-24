@@ -32,39 +32,56 @@
 #include "pstream.h"
 #include "util.h"
 
+// Defines for rank histogram
 enum TDATA_TYPE {TIME, SPACE};
-
 #define time_data TIME
 #define space_data SPACE
+
+
+// Defines for Receiver Operating Characteristics (ROC)
+#define DEBUG_ROC 0
+enum CONTINGENCY_TYPE {TP, FP, FN, TN};
+/* TP - True positive  ( event     forecast and     occured)  HIT               */
+/* FP - False positive ( event     forecast and not occured)  FALSE ALARM       */
+/* TN - True negative  ( event not forecast and not ocurred)  CORRECT REJECTION */
+/* FN - False negative ( event not forecast and     ocurred)  MISSED            */
+
+enum ROC_ENUM_TYPE {TPR, FPR};
+/* TPR = True Positive Rate = TP / ( TP + FN ) */
+/* FNR = False Negtive Rate = FN / ( FP + TN ) */
+
+double roc_curve_integrate(const double **roc, const int n);
 
 void *Ensstat3(void *argument)
 {
   int operatorID;
   int operfunc, datafunc;
-  int i,j,binID;
-  int nvars;
+  int i,j;
+  int nvars,nbins, nrecs, nrecs0, nmiss, nens, nfiles;;
   int cmpflag;
-  int varID, recID;
+  int cum;
+  int chksum;                  // for check of histogram population 
+  int levelID, varID, recID, tsID, binID, ensID;
   int gridsize = 0;
   int gridID, gridID2;
   int have_miss;
-  int nrecs, nrecs0;
-  int levelID;
-  int tsID;
   int streamID = 0, streamID2;
   int vlistID, vlistID1, vlistID2;
-  int nmiss;
   int taxisID1, taxisID2;
   int zaxisID,zaxisID2;
   int ompthID;
   int *varID2;
   int time_mode;
+  int **array2 = NULL;
+  int **ctg_tab, *hist;         // contingency table and histogram
   double missval;
   double *levs;
+  double *dat;                  // pointer to ensemble data for ROC
+  double *uThresh, *lThresh;    // thresholds for histograms
+  double **roc;                 // receiver operating characteristics table
   double val;
-  int **array2 = NULL;
   field_t *field;
-  int fileID, nfiles;
+  int fileID;
   const char *ofilename;
 
   typedef struct
@@ -84,8 +101,15 @@ void *Ensstat3(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
   datafunc = cdoOperatorF2(operatorID);
+
+
+  if ( operfunc == func_roc ) {
+    operatorInputArg("Number of eigen functions to write out");
+    nbins       = atoi(operatorArgv()[0]);
+  }
   
   nfiles = cdoStreamCnt() - 1;
+  nens = nfiles-1;
 
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files.", nfiles);
@@ -98,7 +122,6 @@ void *Ensstat3(void *argument)
 	cdoAbort("Outputfile %s already exist!", ofilename);
 
   ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
-
 
   /* *************************************************** */
   /* should each thread be allocating memory locally???? */
@@ -123,7 +146,7 @@ void *Ensstat3(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = streamOpenRead(cdoStreamName(fileID));
-      fprintf(stderr,"opened %s\n",cdoStreamName(fileID));
+      //      fprintf(stderr,"opened %s\n",cdoStreamName(fileID));
       if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(fileID));
 
       vlistID = streamInqVlist(streamID);
@@ -132,7 +155,7 @@ void *Ensstat3(void *argument)
       ef[fileID].vlistID = vlistID;
     }
 
-  /* check that the contents is always the same */
+  /* check for identical contents of all ensemble members */
   nvars = vlistNvars(ef[0].vlistID);
   if ( nvars == 1 ) 
     cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
@@ -152,7 +175,9 @@ void *Ensstat3(void *argument)
     levs[i] = i;
   zaxisDefLevels(zaxisID2,levs);
   zaxisDefName(zaxisID2, "histogram_binID");
+
   time_mode = datafunc == TIME? TIME_VARIABLE : TIME_CONSTANT;
+
   for ( varID=0; varID<nvars; varID++) {
 
     /* **************************************************************** */
@@ -179,7 +204,6 @@ void *Ensstat3(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
   
-
   for ( varID=0; varID< nvars; varID++ ){
     if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) > 1 ) {
       cdoWarning("More than one level not supported when processing ranked histograms.");
@@ -189,30 +213,48 @@ void *Ensstat3(void *argument)
     }
   } 
 
-  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);
+  if ( operfunc != func_roc ) {
+    streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+    if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);
 
-  streamDefVlist(streamID2, vlistID2);
-	  
+    streamDefVlist(streamID2, vlistID2);
+  }
+
   gridsize = vlistGridsizeMax(vlistID1);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     ef[fileID].array = (double *) malloc(gridsize*sizeof(double));
 
-  if ( datafunc == SPACE ) 
+  if ( operfunc == func_rank && datafunc == SPACE ) 
     { /*need to memorize data for entire grid before writing          */
       array2 = (int **) malloc((nfiles+1)*sizeof(int*));
       for ( binID=0; binID<nfiles; binID++ ) 
 	array2[binID] = (int*) calloc ( gridsize, sizeof(int) );
     }
-  else /* data_func == TIME                                           */
+  else if ( operfunc == func_rank )
     {  /* can process data separately for each timestep and only need */
        /* to cumulate values over the grid                            */
       array2    = (int**) malloc ( (nfiles+1)*sizeof(int *));
       for ( binID=0; binID<nfiles; binID++ )
 	array2[binID] = (int *) calloc ( 1, sizeof(int) );
     }
-  
+
+  if ( operfunc == func_roc ) {
+    ctg_tab = (int **)    malloc ((nbins+1)*sizeof(int*) );
+    hist =    (int *)     malloc ( nbins*sizeof(int) );
+    uThresh = (double *)  malloc ( nbins*sizeof(double) );
+    lThresh = (double *)  malloc ( nbins*sizeof(double) );
+    roc     = (double **) malloc ((nbins+1)*sizeof(double*) );
+    
+    for  ( i=0; i<nbins; i++ ) {
+      ctg_tab[i] = (int *) calloc ( 4,sizeof(int) );
+      roc[i]     = (double*)calloc( 2,sizeof(double));
+      uThresh[i] = ((double)i+1)/nbins;
+      lThresh[i] = (double)i/nbins;
+    }
+    ctg_tab[nbins] = (int *)   calloc (4,sizeof(int));
+    roc[nbins]     = (double*) calloc (2,sizeof(double));
+  }
   
   
   tsID = 0;
@@ -227,12 +269,12 @@ void *Ensstat3(void *argument)
 	    cdoAbort("Number of records changed from %d to %d", nrecs0, nrecs);
 	}
 
-      if ( datafunc == TIME || tsID == 0 ) {
+      if ( operfunc == func_rank && ( datafunc == TIME || tsID == 0 ) ) {
 	taxisCopyTimestep(taxisID2, taxisID1);
 	if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
       }
 
-      fprintf(stderr,"TIMESTEP %i varID %i rec %i\n",tsID,varID,recID);
+      //      fprintf(stderr,"TIMESTEP %i varID %i rec %i\n",tsID,varID,recID);
       
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
@@ -252,7 +294,7 @@ void *Ensstat3(void *argument)
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  nmiss = 0;
-	  if ( datafunc == TIME ) 
+	  if ( datafunc == TIME && operfunc == func_rank) 
 	    for ( binID=0;binID<nfiles;binID++ )
 	      array2[binID][0] = 0;
 #if defined (_OPENMP)
@@ -280,39 +322,156 @@ void *Ensstat3(void *argument)
 	      
 	      // need to ignore all data for a gridpoint if a single ensemble
 	      // has a missing value at that gridpoint.
+	      if ( ! have_miss )  // only process if no missing value in ensemble
+		{
+		  switch( operfunc ) 
+		    {
+		    case ( func_rank ): 
+		      /* ****************/
+		      /* RANK HISTOGRAM */
+		      /* ************** */
+		      //		      for ( j=0; j<nfiles; j++ )
+		      //			fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
+		      //		      binID = (int) fldfun(field[ompthID], operfunc);
+		      //		      fprintf(stderr,"-->%i\n",binID);
+		      
+		      if ( datafunc == SPACE && ! have_miss) 
+			array2[binID][i]++;
+		      else if ( ! have_miss ) 
+			array2[binID][0]++;
+		      break;
 
-	      for ( j=0; j<nfiles; j++ )
-		fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
-	      binID = (int) fldfun(field[ompthID], operfunc);
-	      fprintf(stderr,"-->%i\n",binID);
+		    case ( func_roc ):
+		      /* ********************************** */
+		      /* RECEIVER OPERATING CHARACTERISTICS */
+		      /* ********************************** */
+		      dat = &field[ompthID].ptr[1];
+		      val = field[ompthID].ptr[0] > 0.5? 1 : 0;
 
-	      if ( datafunc == SPACE && ! have_miss) 
-		array2[binID][i]++;
-	      else if ( ! have_miss ) 
-		array2[binID][0]++;
+		      for ( binID=0; binID<nbins; binID++ )
+			hist[binID] = 0;
+
+		      for ( j=0; j<nens; j++ ) 
+			for ( binID=0; binID<nbins; binID++ ) 
+			  if ( dat[j] >= lThresh[binID] && dat[j] < uThresh[binID] )
+			    hist[binID]++;
+
+		      chksum = 0;
+		      for ( binID=0; binID<nbins; binID++ )
+			chksum += hist[binID];
+
+		      if ( chksum != nens )  exit(1);
+
+		      cum = 0;
+		      if ( val == 1. ) 
+			{
+			  // all true positives in first bin
+			  ctg_tab[0][TP] += nens;
+			  
+			  cum += hist[0];
+			  for ( binID=1; binID<nbins; binID++ ) 
+			    {
+			      ctg_tab[binID][TP] += nens-cum;
+			      ctg_tab[binID][FN] += cum;
+			      cum += hist[binID];
+			    }
+			  ctg_tab[binID][TP] += nens-cum;
+			  ctg_tab[binID][FN] += cum;
+			}
+		      else if ( val == 0. ) 
+			{
+			  // all false positives in first bin
+			  ctg_tab[0][FP] += nens;
+			  cum += hist[0];
+			  for ( binID=1; binID<nbins; binID++ ) 
+			    {
+			      ctg_tab[binID][FP] += nens-cum;
+			      ctg_tab[binID][TN] += cum;
+			      cum += hist[binID];
+			    }
+			  ctg_tab[binID][FP] += nens-cum;
+			  ctg_tab[binID][TN] += cum;
+			}
+		      break;
+		      
+		    }// switch ( operfunc )
+		}    // if ( ! have_miss ) 
+	    }        // for ( i=0; i<gridsize; i++ )
+
+	  if ( datafunc == TIME && operfunc == func_rank ) 
+	    {
+	      for ( binID=0; binID<nfiles; binID++ ) {
+		val = (double)array2[binID][0];
+		//		fprintf(stderr,"%i ",(int)val);
+		streamDefRecord(streamID2, varID2[varID], binID);
+		streamWriteRecord(streamID2,&val, nmiss);
+	      }
+	      fprintf(stderr,"\n");
 	    }
-
-	  if ( datafunc == TIME ) {
-	    for ( binID=0; binID<nfiles; binID++ ) {
-	      val = (double)array2[binID][0];
-	      fprintf(stderr,"%i ",(int)val);
-	      streamDefRecord(streamID2, varID2[varID], binID);
-	      streamWriteRecord(streamID2,&val, nmiss);
-	    }
-	  fprintf(stderr,"\n");
-	  }
-
-	}
+	  else if ( operfunc == func_roc ) 
+	    {
+	      if ( DEBUG_ROC ) {
+		fprintf(stderr, "#             :     TP     FP     FN     TN         TPR        FPR\n");
+		
+		for ( binID=0; binID<= nbins; binID++ )  {
+		  int p = ctg_tab[binID][TP] + ctg_tab[binID][FN];
+		  int n = ctg_tab[binID][FP] + ctg_tab[binID][TN];
+		  double tpr = ctg_tab[binID][TP]/(double) p;
+		  double fpr = ctg_tab[binID][FP]/(double) n;
+		  chksum += ctg_tab[binID][0] + ctg_tab[binID][1] + ctg_tab[binID][2] + ctg_tab[binID][3];
+		  
+		  roc[binID][TPR] = tpr;
+		  roc[binID][FPR] = fpr;
+		  
+		  fprintf(stderr, "%3i %10.4g: %6i %6i %6i %6i: %10.4g %10.4g\n",
+			  binID,binID<nbins?lThresh[binID]:1,
+			  ctg_tab[binID][0],ctg_tab[binID][1],ctg_tab[binID][2],ctg_tab[binID][3],
+			  tpr,fpr);
+		}
+		fprintf(stderr,"nbins %10i\n",nbins);
+		fprintf(stderr,"#ROC CurveArea: %10.6f\n",
+			roc_curve_integrate((const double **)roc,nbins));
+	      } // if ( DEBUG_ROC )
+	    }   // else if (operfunc == func_roc )
+	}       // for ( recID=0; recID<nrecs; recID++ )
       tsID++;
-    }
+    }           // do [...]
   while ( nrecs0 > 0 );
-  
-  for ( binID=0; binID<nfiles; binID++ ) {
-    double *tmpdoub = (double *)malloc (gridsize*sizeof(double));
-    for(i=0; i<gridsize; i++ )
-      tmpdoub[i] = (double) array2[binID][i];
-    streamDefRecord(streamID2,varID2[varID],binID);
-    streamWriteRecord(streamID2,tmpdoub,nmiss);
+
+
+
+  if ( operfunc == func_rank )
+    for ( binID=0; binID<nfiles; binID++ ) {
+      double *tmpdoub = (double *)malloc (gridsize*sizeof(double));
+      for(i=0; i<gridsize; i++ )
+	tmpdoub[i] = (double) array2[binID][i];
+      streamDefRecord(streamID2,varID2[varID],binID);
+      streamWriteRecord(streamID2,tmpdoub,nmiss);
+    }
+  else if ( operfunc = func_roc ) {
+    fprintf(stdout, "#             :     TP     FP     FN     TN         TPR        FPR\n");
+    
+    for ( i=0; i<= nbins; i++ )  {
+      int sum;
+      int p = ctg_tab[i][TP] + ctg_tab[i][FN];
+      int n = ctg_tab[i][FP] + ctg_tab[i][TN];
+      double tpr = ctg_tab[i][TP]/(double) p;
+      double fpr = ctg_tab[i][FP]/(double) n;
+      chksum += ctg_tab[i][0] + ctg_tab[i][1] + ctg_tab[i][2] + ctg_tab[i][3];
+      
+      roc[i][TPR] = tpr;
+      roc[i][FPR] = fpr;
+      
+      sum = ctg_tab[i][TP] + ctg_tab[i][TN] + ctg_tab[i][FP] + ctg_tab[i][FN];
+
+      fprintf(stdout, "%3i %10.4g: %6i %6i %6i %6i (%6i): %10.4g %10.4g\n",
+	      i,i<nbins?lThresh[i]:1,
+	      ctg_tab[i][0],ctg_tab[i][1],ctg_tab[i][2],ctg_tab[i][3],sum,
+	      tpr,fpr);
+    }
+ 
+    fprintf(stdout,"#ROC CurveArea: %10.6f\n",
+	    roc_curve_integrate((const double **)roc,nbins));
   }
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
@@ -321,7 +480,8 @@ void *Ensstat3(void *argument)
       streamClose(streamID);
     }
 
-  streamClose(streamID2);
+  if ( operfunc != func_roc ) 
+    streamClose(streamID2);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) free(ef[fileID].array);
@@ -344,4 +504,25 @@ void *Ensstat3(void *argument)
   cdoFinish();
   
   return (0);
+}
+
+
+double roc_curve_integrate(const double **roc, const int n) {
+  double y1, y0, x1,x0, dx, dy, area;
+  double step_area;
+  int i=0;
+  area = 0;
+
+  for ( i=1; i<=n; i++ ) {
+    x1 = roc[i][FPR]; x0 = roc[i-1][FPR];
+    y1 = roc[i][TPR]; y0 = roc[i-1][TPR];
+    dx = x1-x0;
+    dy = y1-y0;
+
+    step_area = -0.5*dx*dy - dx*y0;
+    area += step_area;
+  }
+
+  return area-0.5;
+
 }
