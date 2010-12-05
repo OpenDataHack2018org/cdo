@@ -168,7 +168,7 @@ AC_ARG_WITH([jasper],
 #  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
 AC_ARG_WITH([grib_api],
-            [AS_HELP_STRING([--with-grib-api=<yes|no|directory>],
+            [AS_HELP_STRING([--with-grib_api=<yes|no|directory>],
                             [library for grib2 compression; if a directory is given, it will be used as a value for --with-jasper-root])],
             [AS_CASE(["$with_grib_api"],
                      [no],[AC_MSG_CHECKING([for GRIB_API library])

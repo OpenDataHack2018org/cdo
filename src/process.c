@@ -461,18 +461,20 @@ void setStreamNames(int argc, char *argv[])
 
   while ( globArgc < argc )
     {
+      //     printf("arg %d %d %s\n", argc, globArgc, argv[globArgc]);
       if ( argv[globArgc][0] == '-' )
 	{
 	  globArgcStart = globArgc;
 
 	  globArgc = getGlobArgc(argc, argv, globArgc);
-
+	  //	  printf("globArgc %d\n", globArgc);
 	  len = 0;
 	  for ( i = globArgcStart; i < globArgc; i++ ) len += strlen(argv[i]) + 1;
 	  streamname = (char *) malloc(len);
 	  memcpy(streamname, argv[globArgcStart], len);
 	  for ( i = 1; i < (int) len-1; i++ ) if ( streamname[i] == '\0' ) streamname[i] = ' ';
 	  Process[processID].streamNames[Process[processID].streamCnt++] = streamname;
+	  //	  printf("streamname1: %s\n", streamname);
 	}
       else
 	{
@@ -480,6 +482,7 @@ void setStreamNames(int argc, char *argv[])
 	  streamname = (char *) malloc(len);
 	  strcpy(streamname, argv[globArgc]);
 	  Process[processID].streamNames[Process[processID].streamCnt++] = streamname;
+	  //	  printf("streamname2: %s\n", streamname);
 	  globArgc++;
 	}
     }
@@ -505,7 +508,7 @@ void checkStreamCnt(void)
     }
 
   if ( streamInCnt == -1 && streamOutCnt == -1 )
-    Errorc("I/O stream counts unlimited no allowed");
+    Errorc("I/O stream counts unlimited no allowed!");
     
   if ( streamInCnt == -1 )
     {

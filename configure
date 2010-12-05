@@ -1459,7 +1459,7 @@ Optional Packages:
   --with-jasper=<directory>
                           Specify location of JASPER library. You must specify
                           its location if GRIB_API was built with JASPER.
-  --with-grib-api=<yes|no|directory>
+  --with-grib_api=<yes|no|directory>
                           library for grib2 compression; if a directory is
                           given, it will be used as a value for
                           --with-jasper-root
