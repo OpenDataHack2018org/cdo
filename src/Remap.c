@@ -437,7 +437,9 @@ void *Remap(void *argument)
 	  else if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 )
 	    remapgrids[index] = FALSE;
 	  else
-	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
+	    {
+	      cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
+	    }
 	}
 
       if ( remapgrids[index] )

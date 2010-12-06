@@ -1375,6 +1375,7 @@ int get_vdate(int vlistID)
 	       strcmp(name, "Date_Time") == 0 )
 	    {
 	      vlistInqAttTxt(vlistID, CDI_GLOBAL, name, 256, attstr);
+	      attstr[len] = 0;
 	      vdate = atoi(attstr);
 	      if ( vdate < 999999 ) vdate = vdate*100 + 1;
 	    }
@@ -1414,6 +1415,7 @@ void dsets_init(dsets_t *dsets)
       dsets->obj[i].array       = NULL;   
     }
 }
+
 
 void *Importcmsaf(void *argument)
 {

@@ -40,7 +40,7 @@ void *Cat(void *argument)
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
-  int ntsteps;
+  int ntsteps, nvars;
   double *array = NULL;
 
   cdoInitialize(argument);
@@ -90,10 +90,18 @@ void *Cat(void *argument)
 	      vlistDefTaxis(vlistID2, taxisID2);
 	  
 	      ntsteps = vlistNtsteps(vlistID1);
-	      if ( ntsteps == 0 && nfiles > 1 )
+	      nvars   = vlistNvars(vlistID1);
+	      
+	      if ( ntsteps == 1 )
 		{
-		  int nvars = vlistNvars(vlistID1);
+		  for ( varID = 0; varID < nvars; ++varID )
+		    if ( vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE ) break;
 		  
+		  if ( varID == nvars ) ntsteps = 0;
+		}
+
+	      if ( ntsteps == 0 && nfiles > 1 )
+		{		  
 		  for ( varID = 0; varID < nvars; ++varID )
 		    vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
 		}

@@ -74,7 +74,7 @@ void *Settime(void *argument)
   int SETTAXIS, SETREFTIME, SETCALENDAR, SHIFTTIME;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs, newval = 0, ntsteps;
+  int nrecs, newval = 0, ntsteps, nvars;
   int tsID1, recID, varID, levelID;
   int vlistID1, vlistID2;
   int vdate, vtime;
@@ -206,7 +206,7 @@ void *Settime(void *argument)
       else if ( memcmp(cname, "360days",   len) == 0 ) { newcalendar = CALENDAR_360DAYS;}
       else if ( memcmp(cname, "365days",   len) == 0 ) { newcalendar = CALENDAR_365DAYS;}
       else if ( memcmp(cname, "366days",   len) == 0 ) { newcalendar = CALENDAR_366DAYS;}
-      else cdoAbort("calendar >%s< unsupported", cname);
+      else cdoAbort("Calendar >%s< unsupported!", cname);
     }
   else
     {
@@ -222,11 +222,18 @@ void *Settime(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   taxis_has_bounds = taxisHasBounds(taxisID1);
   ntsteps  = vlistNtsteps(vlistID1);
+  nvars = vlistNvars(vlistID1);
+
+  if ( ntsteps == 1 )
+    {
+      for ( varID = 0; varID < nvars; ++varID )
+	if ( vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE ) break;
+
+      if ( varID == nvars ) ntsteps = 0;
+    }
 
   if ( ntsteps == 0 )
     {
-      int nvars = vlistNvars(vlistID1);
-
       for ( varID = 0; varID < nvars; ++varID )
 	vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
     }

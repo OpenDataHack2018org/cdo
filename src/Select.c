@@ -640,6 +640,15 @@ void *Select(void *argument)
 	  vlistDefTaxis(vlistID2, taxisID2);
 
 	  ntsteps = vlistNtsteps(vlistID1);
+
+	  if ( ntsteps == 1 )
+	    {
+	      for ( varID = 0; varID < nvars; ++varID )
+		if ( vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE ) break;
+	      
+	      if ( varID == nvars ) ntsteps = 0;
+	    }
+
 	  if ( ntsteps == 0 && nfiles > 1 )
 	    {	      
 	      for ( varID = 0; varID < nvars; ++varID )

@@ -1,3 +1,7 @@
+2010-12-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Settime: bug fix for time independent variables in combination with other operators (pipes)
+	
 2010-11-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* mulcoslat: added support for GME grids [request: Jaison-Thomas Ambadan]

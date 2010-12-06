@@ -42,7 +42,7 @@ void *Copy(void *argument)
   int nmiss;
   int streamCnt, nfiles, indf;
   int taxisID1, taxisID2 = CDI_UNDEFID;
-  int ntsteps;
+  int ntsteps, nvars;
   double *array = NULL;
   par_io_t parIO;
 
@@ -79,10 +79,18 @@ void *Copy(void *argument)
 	  vlistDefTaxis(vlistID2, taxisID2);
 
 	  ntsteps = vlistNtsteps(vlistID1);
-	  if ( ntsteps == 0 && nfiles > 1 )
+	  nvars   = vlistNvars(vlistID1);
+
+	  if ( ntsteps == 1 )
 	    {
-	      int nvars = vlistNvars(vlistID1);
+	      for ( varID = 0; varID < nvars; ++varID )
+		if ( vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE ) break;
 	      
+	      if ( varID == nvars ) ntsteps = 0;
+	    }
+
+	  if ( ntsteps == 0 && nfiles > 1 )
+	    {	      
 	      for ( varID = 0; varID < nvars; ++varID )
 		vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
 	    }

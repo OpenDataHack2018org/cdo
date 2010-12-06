@@ -14,6 +14,7 @@ Version 1.4.7 (?? December 2010):
      * Yseasstat: bug fix for datasets with time constant fields
      * sellevel: fix problem with hybrid model levels and netCDF output
      * sellonlatbox: fix rounding error of the last lon index
+     * Settime: bug fix for time independent variables in combination with other operators (pipes)
 
 Version 1.4.6 (17 September 2010):
 
