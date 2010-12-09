@@ -1103,16 +1103,16 @@ sub print_description {
       print TRFILE "\n";
       $math = 0;
 #    } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
-#      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{zebg}, basicstyle=\\small]\n";
+#      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{pyellow}, basicstyle=\\small]\n";
 #      $verb = 1;
     } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
-      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{ccc2}, basicstyle=\\ttfamily, columns=flexible]\n";
+      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{pgreen}, basicstyle=\\ttfamily, columns=flexible]\n";
       $verb = 1;
     } elsif ( "$kword" eq "\@ENDVERBATIM" ) {
       print TRFILE "\\end{lstlisting}\n";
       $verb = 0;
     } elsif ( "$kword" eq "\@BEGINLISTING" ) {
-      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{zebg}, basicstyle=\\small]\n";
+      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{pyellow}, basicstyle=\\small]\n";
       $text = 1;
     } elsif ( "$kword" eq "\@ENDLISTING" ) {
       print TRFILE "\\end{lstlisting}\n";
