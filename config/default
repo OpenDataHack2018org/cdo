@@ -20,6 +20,7 @@ case "${HOSTNAME}" in
 # i386-apple-darwin10
     hama*)
 	${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
                     --with-netcdf=/opt/local \
                     --with-hdf5=/opt/local \
                     --with-szlib=$HOME/local \
@@ -89,9 +90,10 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local \
 	            CC=colorgcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
 	;;
-# etch-ia32
-    etch-ia32 | gata | baba)
+# i686-linux
+    etch-ia32 | gata)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
+                    --enable-maintainer-mode \
                     --with-jasper=/sw/etch-ia32/jasper-1.900.1 \
                     --with-grib_api=$HOME/local/etch-ia32/grib_api-1.9.5 \
 	            --with-netcdf=/sw/etch-ia32/netcdf-4.1.1-gcc \
