@@ -1,3 +1,7 @@
+2010-12-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* setclonlatbox: bug fix for 1x1 grids [report: Angelika Heil]
+	
 2010-12-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Settime: bug fix for time independent variables in combination with other operators (pipes)

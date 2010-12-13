@@ -339,12 +339,13 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
     {
       xlon2 += 0.00001;
     }
+
   xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
   xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
-  
+
   for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
   for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
-  
+
   if ( *lon22 >= nlon1 || xvals1[*lon22] > xlon2 ) (*lon22)--;
       
   xlon1 -= 360;
@@ -352,7 +353,7 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
 
   for ( *lon11 = 0; xvals1[*lon11] < xlon1; (*lon11)++ );
   for ( *lon12 = *lon11; *lon12 < nlon1 && xvals1[*lon12] < xlon2; (*lon12)++ );
-
+  
   //(*lon12)--;
   if ( *lon12 >= nlon1 || xvals1[*lon12] > xlon2 ) (*lon12)--;
   
