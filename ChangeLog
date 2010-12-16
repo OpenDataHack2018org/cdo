@@ -1,6 +1,10 @@
+2010-12-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* import_binary: check for gauss grids only when flag linear=0
+	
 2010-12-14  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* readline: filter carrage return '\r' [report: Christian Steger]
+	* readline: filter carriage return '\r' [report: Christian Steger]
 
 2010-12-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

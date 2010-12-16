@@ -104,7 +104,7 @@ int define_grid(dsets_t *pfi)
   int gridID, gridtype;
   int nx, ny;
   double *xvals, *yvals;
-  int lgauss;
+  int lgauss = FALSE;
 
   nx = pfi->dnum[0];
   ny = pfi->dnum[1];
@@ -117,7 +117,7 @@ int define_grid(dsets_t *pfi)
 
   if ( pfi->yrflg ) rev_yvals(yvals, ny);
 
-  lgauss = y_is_gauss(yvals, ny);
+  if ( pfi->linear[1] == 0 ) lgauss = y_is_gauss(yvals, ny);
 
   if ( lgauss ) gridtype = GRID_GAUSSIAN;
   else          gridtype = GRID_LONLAT;
