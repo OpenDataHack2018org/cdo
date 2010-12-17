@@ -10,6 +10,8 @@ Version 1.4.7 (?? December 2010):
      * eca_pd: Precipitation days index per time period
      * dv2ps: Divergence and vorticity to velocity potential and stream function
    Fixed bugs:
+     * eof: does not work in previous version
+     * eofcoeff: does not work in previous version
      * fldmean: gives wrong result for grid units [radian]
      * Yseasstat: bug fix for datasets with time constant fields
      * sellevel: fix problem with hybrid model levels and netCDF output

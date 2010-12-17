@@ -1,3 +1,7 @@
+2010-12-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	*eofcoeff: set size of eof_name to 6 (bug fix)
+
 2010-12-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* import_binary: check for gauss grids only when flag linear=0

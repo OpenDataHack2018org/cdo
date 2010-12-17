@@ -133,10 +133,9 @@ void *EOFs(void * argument)
 
   weight      = (double*) malloc(gridsize*sizeof(double));
   if ( WEIGHTS )
-      gridWeights(gridID1, &weight[0]);
+    gridWeights(gridID1, &weight[0]);
   else
-    for(i=0;i<gridsize;i++)
-      weight[i]=1;
+    for(i=0;i<gridsize;i++) weight[i]=1;
 
 
   /* eigenvalues */
@@ -144,6 +143,8 @@ void *EOFs(void * argument)
   if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
   vlistID2    = vlistDuplicate(vlistID1);
   taxisID2    = taxisDuplicate(taxisID1);
+  taxisDefRdate(taxisID2, 0);
+  taxisDefRtime(taxisID2, 0);
   vlistDefTaxis(vlistID2, taxisID2);
   gridID2     = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
@@ -164,6 +165,8 @@ void *EOFs(void * argument)
   vlistID3    = vlistDuplicate(vlistID1);
   taxisID3    = taxisDuplicate(taxisID1);
   gridID3     = gridDuplicate(gridID1);
+  taxisDefRdate(taxisID3, 0);
+  taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);
 
 
@@ -241,7 +244,7 @@ void *EOFs(void * argument)
     }
 
   if ( cdoVerbose ) 
-    cdoPrint("Calculating %i eigenvectors and %i eigenvalues in %s\n",
+    cdoPrint("Calculating %i eigenvectors and %i eigenvalues in %s",
 	     n_eig,n,grid_space==1?"grid_space" : "time_space");
 
   if ( cdoTimer ) timer_stop(timer_init);
@@ -350,7 +353,6 @@ void *EOFs(void * argument)
       for ( recID = 0; recID < nrecs; recID++ )
         {
           int i2;
-          double tmp;
 
           streamInqRecord(streamID1, &varID, &levelID);
           gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
@@ -518,7 +520,7 @@ void *EOFs(void * argument)
 		    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 		  }
 	      if ( cdoVerbose )
-		cdoPrint("finished calculation of cov-matrix for var %s\n",&vname[0]);
+		cdoPrint("finished calculation of cov-matrix for var %s",&vname[0]);
 
             }
 
@@ -608,7 +610,7 @@ void *EOFs(void * argument)
 
   if ( cdoTimer ) timer_start(timer_write);
 
-  cdoPrint("starting to write results");
+  if ( cdoVerbose ) cdoPrint("starting to write results");
 
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
@@ -650,13 +652,13 @@ void *EOFs(void * argument)
         }
     }
 
-  cdoPrint("stopping timers");
+  if ( cdoVerbose ) cdoPrint("stopping timers");
 
   if ( cdoTimer ) timer_stop(timer_write);
 
   if ( cdoTimer ) timer_start(timer_finish);
 
-  cdoPrint("freeing pointers");
+  if ( cdoVerbose ) cdoPrint("freeing pointers");
   
   for ( varID = 0; varID < nvars; varID++)
     {
