@@ -172,6 +172,8 @@ void *EOF3d(void * argument)
   zaxisDefLongname(zaxisID2,"Reduced zaxis from EOF3D - only one eigen value per 3D eigen vector");
 
   vlistID2 = vlistCreate();
+  taxisDefRdate(taxisID2, 0);
+  taxisDefRtime(taxisID2, 0);
   vlistDefTaxis(vlistID2, taxisID2);
 
   varID2 = (int *) malloc (nvars*sizeof(int));
@@ -187,6 +189,8 @@ void *EOF3d(void * argument)
   vlistID3    = vlistDuplicate(vlistID1);
   taxisID3    = taxisDuplicate(taxisID1);
   gridID3     = gridDuplicate(gridID1);
+  taxisDefRdate(taxisID3, 0);
+  taxisDefRtime(taxisID3, 0);
   vlistDefTaxis(vlistID3, taxisID3);
   
 
