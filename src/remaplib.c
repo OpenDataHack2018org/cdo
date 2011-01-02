@@ -5015,7 +5015,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
       rg->grid1_frac[grid1_add] += weights[0];
-      rg->grid2_frac[grid2_add] += weights[rv->num_wts  ];
+      rg->grid2_frac[grid2_add] += weights[rv->num_wts];
     }
 
   /* South Pole */
@@ -5129,7 +5129,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
         grid2_centroid_lon[n] = grid2_centroid_lon[n]/rg->grid2_area[n];
       }
 
-  /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 1.e-14 */
+  /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 1.e-9 */
   /*
   num_links = rv->num_links;
   for ( n = 0; n < num_links; n++ )
@@ -5786,7 +5786,6 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
     Now that the heap has been sorted, strip off the top (largest)
     value and promote the values below
   */
-
   for ( lvl = num_links-1; lvl >= 2; lvl-- )
     {
       /* Move the top value and insert it into the correct place */
@@ -5871,9 +5870,9 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
   add2[1]  = add2[0];
   add2[0]  = add2_tmp;
 
-  idx_tmp = idx[1];
-  idx[1]  = idx[0];
-  idx[0]  = idx_tmp;
+  idx_tmp  = idx[1];
+  idx[1]   = idx[0];
+  idx[0]   = idx_tmp;
 
   for ( n = 0; n < num_wts; n++ )
     for ( i = 0; i < num_links; ++i )
@@ -6000,7 +5999,6 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
     Now that the heap has been sorted, strip off the top (largest)
     value and promote the values below
   */
-
   for ( lvl = num_links-1; lvl >= 2; lvl-- )
     {
       /* Move the top value and insert it into the correct place */
