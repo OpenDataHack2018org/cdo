@@ -362,6 +362,8 @@ void *EOFs(void * argument)
 
           if ( grid_space )
             {
+	      // This could be done in parallel to save lots of time
+	      #pragma omp parallel for private(i1,i2) default(shared)
               for ( i1 = 0; i1 < gridsize; i1++ )
                 {
                   for ( i2 = i1; i2 < gridsize; i2++ )
@@ -507,7 +509,7 @@ void *EOFs(void * argument)
                 cov[j1] = (double*) malloc(nts*sizeof(double));
 	      eigv = (double *) malloc (nts*sizeof(double));
 
-
+	      #pragma omp parallel for private(j1,j2,i,sum) default(shared)
               for ( j1 = 0; j1 < nts; j1++)
 		for ( j2 = j1; j2 < nts; j2++ )
 		  {
