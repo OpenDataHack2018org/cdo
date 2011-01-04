@@ -5,12 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = obsfile ensfiles ofile
-@Operators = ensbrs enscrps ensrkhistspace ensrkhisttime
+@Operators = ensbrs enscrps ensrkhistspace ensrkhisttime ensroc
 
 @BeginDescription
 This module computes statistical values over the ensemble of @file{ensfiles} using
 @file{obsfile} as a reference. Depending on the chosen operator the Brier score, 
-Cumulative ranked probability score or a ranked Histogram over all Ensembles @file{ensfiles}
+Cumulative ranked probability score ranked Histogram or a roc-curve over all Ensembles @file{ensfiles}
 with reference to @file{obsfile} is written to @file{ofile}. 
 The date and grid information of a time step in @file{ofile} is the date of the 
 first input file. Thus all input files are required to have the same structure in 
@@ -83,6 +83,10 @@ o(t,x) = crps( \{i_1(t,x)\}, \{i_2(t,x),\ldots,i_n(t,x)\} )
 
 @BeginOperator_ensrkhisttime
 @Title      = Ranked Histogram averaged over space 
+@EndOperator
+
+@BeginOperator_ensroc
+@Title      = Ensemble Receiver Operating characteristics
 @EndOperator
 
 @BeginExample
