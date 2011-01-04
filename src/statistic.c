@@ -22,12 +22,14 @@ void annihilate_1side(double **M, int i, int j, int k, int n);
 
 int n_finished;
 
+// global variables to handle environment settings 
+double fnorm_precision;
+int max_jacobi_iter;
+
 /* **************************************** */
 /* ENDOF HEADER FOR PARALLEL EIGEN SOLUTION */
 /*  -->SEE END OF ROUTINE                   */
 /* **************************************** */
-
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1247,6 +1249,26 @@ double fisher(double m, double n, double x, const char *prompt)
 
 void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, int n2, const char func[])
 {
+  char *envstr;
+  /* Get Environment variables if set */
+  envstr = getenv("MAX_JACOBI_ITER");
+  if ( envstr ) {
+    max_jacobi_iter = atoi(envstr);
+    if ( cdoVerbose )
+      cdoPrint("Got environmental setting from MAX_JACOBI_ITER: %i",max_jacobi_iter);
+  }
+  else
+    max_jacobi_iter = MAX_JACOBI_ITER;
+   
+  envstr = getenv("FNORM_PRECISION");
+  if ( envstr ) {
+    fnorm_precision = strtod(envstr,NULL);
+    if ( cdoVerbose )
+      cdoPrint("Got environmental setting from FNORM_PRECISION: %10.6f",fnorm_precision);
+  }
+  else
+    fnorm_precision = FNORM_PRECISION;
+    
 
   if ( n1 != n2 )
     {
@@ -1298,7 +1320,7 @@ void annihilate_1side(double **M, int i, int j, int k, int n)
 
   tmp = fabs(gamma/sqrt(alpha/beta));
 
-  if ( tmp < FNORM_PRECISION ) {
+  if ( tmp < fnorm_precision ) {
 #if defined (_OPENMP)
     #pragma omp critical 
 #endif
@@ -1382,7 +1404,7 @@ int jacobi_1side(double **M, double *A, int n)
   //  override global openmp settings works
   //  omp_set_num_threads(2);
 
-  while ( n_iter < MAX_JACOBI_ITER && n_finished < count ) {
+  while ( n_iter < max_jacobi_iter && n_finished < count ) {
     n_finished = 0;
     if ( n%2 == 1 ) {
       for(m=0;m<n;m++) {
@@ -1416,23 +1438,28 @@ int jacobi_1side(double **M, double *A, int n)
     n_iter++;
   }
 
+  if ( cdoVerbose ) 
+    cdoPrint("Finished one-sided jacobi scheme for eigenvalue computation after %i iterations",n_iter);
+
   //  fprintf(stderr,"finished after %i sweeps (n_finished %i)\n",n_iter,n_finished);
 
-  if ( n_iter == MAX_JACOBI_ITER )
+  if ( n_iter == max_jacobi_iter && n_finished < count)
     {
       fprintf(stderr, 
 	      "statistics-module (Warning): Eigenvalue computation with one-sided jacobi scheme\n"
 	      "                             Did not converge properly. %i of %i pairs of columns did\n"
 	      "                             not achieve requested orthogonality of %10.6g\n",
-	      count-n_finished,count, FNORM_PRECISION);
+	      count-n_finished,count, fnorm_precision);
 
-      if ( n_finished == 0 ) 
-	// Do not overwrite results in case of insufficient convergence
+      if ( n_finished == 0 ) {
+	//	Do not overwrite results in case of insufficient convergence
+	cdoWarning("Setting Matrix and Eigenvalues to 0 before return");
 	for ( i=0; i<n; i++ ) {
 	  memset(M[i],0,n*sizeof(double));
 	  memset(A,0,n*sizeof(double));
 	}
-      return -1;
+	return -1;
+      }
     }
   // calculate  eigen values as sqrt(||m_i||)
   for ( i=0; i<n; i++ )
@@ -1444,6 +1471,7 @@ int jacobi_1side(double **M, double *A, int n)
       for ( r=0; r<n; r++ )
 	M[i][r] /= A[i];
     }
+
   heap_sort(A,M,n);
   
   free(annihilations);
