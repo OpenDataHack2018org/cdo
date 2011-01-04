@@ -30,6 +30,23 @@ masks of missing values in time. Although there still will be results, they are
 not trustworthy, and a warning will occur. In the latter case we suggest to 
 replace missing values by 0 in @file{ifile}. 
 
+Environmental settings are available to customize the way the eigenvalue computation
+is done:
+@bold{CDO_SVD_MODE} can be used to set the algorithm which is used to calculate the
+eigenvalues. Available Options are 
+(1) 'jacobi' for a one-sided parallel jacobi-algorithm (only executed in parallel if -P 
+flag is set.
+(2) 'danielson_lanczos' for a non-parallel d/l algorithm.
+Default: 'jacobi'
+
+@bold{MAX_JACOBI_ITER} Is the maximum integer number of annihilation sweeps that is executed
+if the jacobi-algorithm is used to compute the eigen values. Default: 5
+
+@bold{FNORM_PRECISION} Is the Frobenius norm of the matrix consisting of an annihilation pair
+of eigenvectors that is used to determine if the eigenvectors have reached a sufficient level
+ of convergence. If all annihilation-pairs of vectors have a norm below this value, the computation
+is considered to have converged properly. Otherwise, a warning will occur. Default: 1e-05	
+
 @EndDescription
 @EndModule
 
