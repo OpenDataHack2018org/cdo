@@ -645,7 +645,7 @@ void *EOFs(void * argument)
                   streamWriteRecord(streamID3, eigenvectors[varID][levelID][tsID].ptr, nmiss);
                 }
 
-              if ( DBL_IS_EQUAL(eigenvalues[varID][levelID][tsID].ptr[i], missval) ) nmiss = 1;
+              if ( DBL_IS_EQUAL(eigenvalues[varID][levelID][tsID].ptr[0], missval) ) nmiss = 1;
               else nmiss = 0;
               streamDefRecord(streamID2, varID, levelID);
               streamWriteRecord(streamID2, eigenvalues[varID][levelID][tsID].ptr,nmiss);
