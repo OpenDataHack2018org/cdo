@@ -119,8 +119,6 @@ void *EOFs(void * argument)
     cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
   }
 
-
-
   streamID1   = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
   vlistID1    = streamInqVlist(streamID1);
@@ -541,9 +539,9 @@ void *EOFs(void * argument)
 	  /* NOW: cov contains the eigenvectors, eigv the eigenvalues */
 	  
 	  if ( cdoTimer ) timer_start(timer_post);
-          for (i = 0; i < n; i++)
+          for (i = 0; i < n; i++) 
             eigenvalues[varID][levelID][i].ptr[0] = eigv[i]*sum_w;
-	  
+
           for (i = 0; i < n_eig; i++)
             {
               if ( grid_space )
