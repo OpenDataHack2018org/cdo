@@ -127,7 +127,6 @@ void *EOFs(void * argument)
   gridsize    = vlistGridsizeMax(vlistID1);
   nvars       = vlistNvars(vlistID1);
   nrecs       = vlistNrecs(vlistID1);
-  taxisID1    = vlistInqTaxis(vlistID1);
 
   weight      = (double*) malloc(gridsize*sizeof(double));
   if ( WEIGHTS )
@@ -197,6 +196,7 @@ void *EOFs(void * argument)
 
       nts         = tsID;
       //TODO close on streamID1 ??  streamClose(streamID1);
+      streamClose(streamID1);
       reached_eof = 0;
       streamID1   = streamOpenRead(cdoStreamName(0));
       if ( nts < gridsize || operfunc == EOF_TIME) {
@@ -678,9 +678,15 @@ void *EOFs(void * argument)
 	      if (eigenvalues[varID][levelID][i].ptr)
 		free(eigenvalues[varID][levelID][i].ptr);
 	    }
+	  if ( grid_space ) 
+	    free(datafields[varID][levelID][0].ptr);
+	  else if ( time_space )
+	    for (tsID=0; tsID<nts; tsID++ )
+	      free(datafields[varID][levelID][tsID].ptr);
           free(eigenvectors[varID][levelID]);
           free(eigenvalues[varID][levelID]);
           free(datacounts[varID][levelID]);
+	  free(datafields[varID][levelID]);
         }
       free(eigenvectors[varID]);
       free(eigenvalues[varID]);
@@ -694,10 +700,26 @@ void *EOFs(void * argument)
   free(datafields);
   free(datacounts);
   free(in.ptr);
+  free(weight);
+  free(xvals);
+  free(yvals);
+
 
   streamClose(streamID3);
   streamClose(streamID2);
   streamClose(streamID1);
+
+  //  vlistDestroy(vlistID1);
+  //  vlistDestroy(vlistID2);
+  //  vlistDestroy(vlistID3);
+
+  gridDestroy(gridID1);
+  gridDestroy(gridID2);
+  gridDestroy(gridID3);
+
+  //  taxisDestroy(taxisID1);
+  //  taxisDestroy(taxisID2);
+  //  taxisDestroy(taxisID3);
 
   if ( cdoTimer ) timer_stop(timer_finish);
 
