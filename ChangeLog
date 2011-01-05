@@ -3,6 +3,10 @@
 	* using CDI library version 1.4.6
 	* Version 1.4.6 released
 
+2011-01-05  Frank Kaspar <Frank.Kaspar@dwd.de>
+
+	* import_cmsaf: set max length of date string to 8 (bug fix)
+
 2011-01-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* import_cmsaf: added time information also for time constant fields [request: Frank Kaspar]

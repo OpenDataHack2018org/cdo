@@ -1375,6 +1375,7 @@ int get_vdate(int vlistID)
 	       strcmp(name, "Date_Time") == 0 )
 	    {
 	      vlistInqAttTxt(vlistID, CDI_GLOBAL, name, 256, attstr);
+	      if ( len > 8 ) len = 8;
 	      attstr[len] = 0;
 	      vdate = atoi(attstr);
 	      if ( vdate < 999999 ) vdate = vdate*100 + 1;
