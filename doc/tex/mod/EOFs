@@ -29,8 +29,8 @@ Missing values are not fully supported. Support is only checked for non-changing
 masks of missing values in time. Although there still will be results, they are
 not trustworthy, and a warning will occur. In the latter case we suggest to 
 replace missing values by 0 in @file{ifile}. 
-
 @EndModule
+
 
 @BeginOperator_eof
 @Title     = Calculate EOFs in spatial or time space
@@ -59,10 +59,12 @@ replace missing values by 0 in @file{ifile}.
 @EndOperator
 @EndDescription
 
+
 @BeginParameter neof
 @Item = neof
 INTEGER  Number of eigen functions
 @EndParameter
+
 
 @BeginExample
 To calculate the first 40 EOFs of a data-set containing anomalies use:
@@ -77,6 +79,7 @@ and use:
    cdo eof,40 anom_file ofile1 ofile2	
 @EndVerbatim
 @EndExample
+
 
 @BeginEnvironment
 @Item = CDO_SVD_MODE
@@ -97,4 +100,3 @@ a sufficient level of convergence. If all annihilation-pairs of vectors have
 a norm below this value, the computation is considered to have converged 
 properly. Otherwise, a warning will occur. The default value 1e-05.
 @EndEnvironment
-

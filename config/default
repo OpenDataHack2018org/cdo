@@ -171,6 +171,7 @@ case "${HOSTNAME}" in
 # powerpc-ibm-aix5.3.0.0
     blizzard*)
 	${CONFPATH}configure --prefix=$HOME/local \
+                    --with-jasper=/sw/aix53/jasper-1.900.1 \
                     --with-grib_api=/sw/aix61/ECMWF \
                     --with-netcdf=/sw/aix61/netcdf-4.1.1-rc2 \
                     --with-hdf5=/sw/aix61/hdf5-1.8.4-patch1-threadsafe \

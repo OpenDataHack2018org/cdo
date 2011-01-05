@@ -208,6 +208,7 @@ Operator catalog:
    Ensstat2      enscrps         Cumulative Ranked Probability score
    Ensstat2      ensrkhistspace  Ranked Histogram averaged over time
    Ensstat2      ensrkhisttime   Ranked Histogram averaged over space
+   Ensstat2      ensroc          Ensemble Receiver Operating characteristics
    Fldstat       fldmin          Field minimum
    Fldstat       fldmax          Field maximum
    Fldstat       fldsum          Field sum
