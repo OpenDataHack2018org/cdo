@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.4.7 (?? December 2010):
+Version 1.4.7 (06 January 2011):
 
    New features:
      * improved support for netCDF output from WRF model (import time and grid variables)
@@ -9,9 +9,11 @@ Version 1.4.7 (?? December 2010):
      * ydayadd, ydaysub, ydaymul, ydaydiv: Multi-year daily arithmetic
      * eca_pd: Precipitation days index per time period
      * dv2ps: Divergence and vorticity to velocity potential and stream function
+   Changed operators:
+     * import_cmsaf: added time information also for time constant fields
    Fixed bugs:
-     * eof: does not work in previous version
-     * eofcoeff: does not work in previous version
+     * eof: fix memory access violation
+     * eofcoeff: fix memory access violation
      * fldmean: gives wrong result for grid units [radian]
      * Yseasstat: bug fix for datasets with time constant fields
      * sellevel: fix problem with hybrid model levels and netCDF output

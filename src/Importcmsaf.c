@@ -1548,7 +1548,7 @@ void *Importcmsaf(void *argument)
       if ( dsets.obj[ivar].nt > 1 )
 	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
       else
-	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+	varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
 
       vlistDefVarName(vlistID, varID,  dsets.obj[ivar].name);
       if ( dsets.obj[ivar].description )
