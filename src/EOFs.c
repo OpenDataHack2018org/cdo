@@ -117,7 +117,14 @@ void *EOFs(void * argument)
     cdoWarning("Unknown environmental setting %s for CDO_SVD_MODE. Available options are",envstr);
     cdoWarning("  - 'jacobi' for a one-sided parallelized jacobi algorithm");
     cdoWarning("  - 'danielson_lanzcos' for the D/L algorithm");
+    envstr=NULL;
   }
+
+  if ( cdoVerbose ) 
+    cdoPrint("Using CDO_SVD_MODE '%s' from %s",
+	     eigen_mode==JACOBI?"jacobi":"danielson_lanczos",
+	     envstr?"Environment":" default");
+  
 
   streamID1   = streamOpenRead(cdoStreamName(0));
   if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));

@@ -1249,26 +1249,29 @@ double fisher(double m, double n, double x, const char *prompt)
 
 void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, int n2, const char func[])
 {
+  func = "statistics-module";
+
   char *envstr;
   /* Get Environment variables if set */
   envstr = getenv("MAX_JACOBI_ITER");
-  if ( envstr ) {
+  if ( envstr ) 
     max_jacobi_iter = atoi(envstr);
-    if ( cdoVerbose )
-      cdoPrint("Got environmental setting from MAX_JACOBI_ITER: %i",max_jacobi_iter);
-  }
   else
     max_jacobi_iter = MAX_JACOBI_ITER;
+  if ( cdoVerbose )
+    cdoPrint("Using MAX_JACOBI_ITER %i from %s",
+	     max_jacobi_iter, envstr?"Environment":"default");
+
    
   envstr = getenv("FNORM_PRECISION");
-  if ( envstr ) {
+  if ( envstr ) 
     fnorm_precision = strtod(envstr,NULL);
-    if ( cdoVerbose )
-      cdoPrint("Got environmental setting from FNORM_PRECISION: %10.6f",fnorm_precision);
-  }
   else
     fnorm_precision = FNORM_PRECISION;
-    
+
+  if ( cdoVerbose ) 
+    cdoPrint("Using FNORM_PRECISION %g from %s",
+	     fnorm_precision,envstr?"Environment":"default");
 
   if ( n1 != n2 )
     {
@@ -1297,7 +1300,7 @@ void annihilate_1side(double **M, int i, int j, int k, int n)
 
   double tk, ck, sk, alpha=0, beta=0, gamma=0, zeta=0;
   double tmp, *mi=NULL, *mj=NULL;
-  int first_annihilation = 0;
+  //  int first_annihilation = 0;
   int r;
 
   i--; j--;
