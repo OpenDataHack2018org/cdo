@@ -33,6 +33,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@MAINTAINER_MODE_TRUE@am__append_1 = `ls cdoCompletion.*`
 subdir = contrib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -197,7 +198,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zsh
-CLEANFILES = `ls completions4cdo.*`
+CLEANFILES = $(am__append_1)
 all: all-am
 
 .SUFFIXES:
@@ -276,6 +277,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
+@MAINTAINER_MODE_FALSE@all-local:
 all-am: Makefile all-local
 installdirs:
 install: install-am
@@ -385,10 +387,12 @@ uninstall-am:
 	uninstall uninstall-am
 
 
-all-local:
+completions:
 	if test -x /usr/bin/ruby -o -x /usr/local/bin/ruby ; then \
 	  ruby -KN $(srcdir)/makecompl.rb -o cdoCompletion; \
 	fi
+
+@MAINTAINER_MODE_TRUE@all-local: completions
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
