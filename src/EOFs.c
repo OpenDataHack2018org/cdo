@@ -67,7 +67,7 @@ void *EOFs(void * argument)
   int n_eig, n=0;
   int grid_space=0, time_space=0;
   int missval_warning=0;
-  int timer_init, timer_alloc, timer_read, timer_cov, timer_eig, timer_post, timer_write, timer_finish;
+  int timer_init = 0, timer_alloc = 0, timer_read = 0, timer_cov = 0, timer_eig = 0, timer_post = 0, timer_write = 0, timer_finish = 0;
 
   double *weight;
   double sum_w;
@@ -368,7 +368,9 @@ void *EOFs(void * argument)
           if ( grid_space )
             {
 	      // This could be done in parallel to save lots of time
-	      #pragma omp parallel for private(i1,i2) default(shared)
+#if defined (_OPENMP)
+#pragma omp parallel for private(i1,i2) default(shared)
+#endif
               for ( i1 = 0; i1 < gridsize; i1++ )
                 {
                   for ( i2 = i1; i2 < gridsize; i2++ )
@@ -514,8 +516,10 @@ void *EOFs(void * argument)
                 cov[j1] = (double*) malloc(nts*sizeof(double));
 	      eigv = (double *) malloc (nts*sizeof(double));
 
-	      #pragma omp parallel for private(j1,j2,i,sum) default(shared)
-              for ( j1 = 0; j1 < nts; j1++)
+#if defined (_OPENMP)
+#pragma omp parallel for private(j1,j2,i,sum) default(shared) schedule(dynamic)
+#endif
+              for ( j1 = 0; j1 < nts; j1++ )
 		for ( j2 = j1; j2 < nts; j2++ )
 		  {
 		    sum = 0;
@@ -526,9 +530,9 @@ void *EOFs(void * argument)
 		    }
 		    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 		  }
+
 	      if ( cdoVerbose )
 		cdoPrint("finished calculation of cov-matrix for var %s",&vname[0]);
-
             }
 
 	  if ( cdoTimer ) timer_stop(timer_cov);
