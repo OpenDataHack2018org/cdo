@@ -169,7 +169,7 @@ void *Filter(void *argument)
   double *array1, *array2;
   double fdata = 0;
   field_t ***vars = NULL;
-  double fmin, fmax;
+  double fmin = 0, fmax = 0;
   int *fmasc;
   
   cdoInitialize(argument);
