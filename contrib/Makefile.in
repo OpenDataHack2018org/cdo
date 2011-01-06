@@ -387,7 +387,7 @@ uninstall-am:
 
 all-local:
 	if test -x /usr/bin/ruby -o -x /usr/local/bin/ruby ; then \
-	  ruby -KN $(srcdir)/makecompl.rb -o completions4cdo; \
+	  ruby -KN $(srcdir)/makecompl.rb -o cdoCompletion; \
 	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
