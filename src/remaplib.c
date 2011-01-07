@@ -40,8 +40,8 @@
 /*
   2009-05-25 Uwe Schulzweida: Changed restict data type from double to int
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
+  2011-01-07 Uwe Schulzweida: Changed remap weights from 2D to 1D array
  */
-
 
 
 #if  defined  (HAVE_CONFIG_H)
@@ -116,9 +116,6 @@ static double north_thresh = 2.00;  /* threshold for coord transf. */
 static double south_thresh =-2.00;  /* threshold for coord transf. */
 
 double intlin(double x, double y1, double x1, double y2, double x2);
-void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, 
-	       double *restrict *restrict weights, int parent);
-
 
 extern int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
@@ -172,8 +169,7 @@ void remapVarsFree(remapvars_t *rv)
 
       free(rv->grid1_add);
       free(rv->grid2_add);
-      for ( i = 0; i < 4; i++ )
-	if ( rv->wts[i] ) free(rv->wts[i]);
+      free(rv->wts);
 
       if ( rv->links.option == TRUE )
 	{
@@ -1277,8 +1273,6 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 */
 void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 {
-  long i;
-
   /* Initialize all pointer */
   if ( rv->pinit == FALSE )
     {
@@ -1286,7 +1280,7 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 
       rv->grid1_add = NULL;
       rv->grid2_add = NULL;
-      for ( i = 0; i < 4; i++ ) rv->wts[i] = NULL;
+      rv->wts       = NULL;
     }
 
   /* Determine the number of weights */
@@ -1314,8 +1308,7 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
   rv->grid1_add = (int *) realloc(rv->grid1_add, rv->max_links*sizeof(int));
   rv->grid2_add = (int *) realloc(rv->grid2_add, rv->max_links*sizeof(int));
 
-  for ( i = 0; i < rv->num_wts; i++ )
-    rv->wts[i] = (double *) realloc(rv->wts[i], rv->max_links*sizeof(double));
+  rv->wts = (double *) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
 
   rv->links.option    = FALSE;
   rv->links.max_links = 0;
@@ -1339,7 +1332,6 @@ void resize_remap_vars(remapvars_t *rv, int increment)
     Input variables:
     int  increment  ! the number of links to add(subtract) to arrays
   */
-  long i;
 
   /*  Reallocate arrays at new size */
 
@@ -1350,8 +1342,7 @@ void resize_remap_vars(remapvars_t *rv, int increment)
       rv->grid1_add = (int *) realloc(rv->grid1_add, rv->max_links*sizeof(int));
       rv->grid2_add = (int *) realloc(rv->grid2_add, rv->max_links*sizeof(int));
 
-      for ( i = 0; i < rv->num_wts; i++ )
-	rv->wts[i] = (double *) realloc(rv->wts[i], rv->max_links*sizeof(double));
+      rv->wts = (double *) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
     }
 
 } /* resize_remap_vars */
@@ -1364,7 +1355,7 @@ void resize_remap_vars(remapvars_t *rv, int increment)
      
   -----------------------------------------------------------------------
 */
-void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict *restrict map_wts, 
+void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
 	   long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array, 
 	   const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3,
 	   remaplink_t links)
@@ -1377,7 +1368,7 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 
     int num_wts          ! num of weights used in remapping
 
-    double **map_wts     ! remapping weights for each link
+    double *map_wts      ! remapping weights for each link
 
     double *src_array    ! array with source field to be remapped
 
@@ -1424,7 +1415,7 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 #endif
 	      for ( n = 0; n < links.num_links[j]; n++ )
 		{
-		  dst_array[links.dst_add[j][n]] += src_array[links.src_add[j][n]]*map_wts[0][links.w_index[j][n]];
+		  dst_array[links.dst_add[j][n]] += src_array[links.src_add[j][n]]*map_wts[num_wts*links.w_index[j][n]];
 		}
 	    }
 	}
@@ -1433,9 +1424,9 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 	  for ( n = 0; n < num_links; n++ )
 	    {
 	      /*
-		printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[0][n]);
+		printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
 	      */
-	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
+	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
 	    }
 	}
     }
@@ -1445,19 +1436,19 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
 	{
 	  for ( n = 0; n < num_links; n++ )
 	    {
-	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n] +
-                                       src_grad1[src_add[n]]*map_wts[1][n] +
-                                       src_grad2[src_add[n]]*map_wts[2][n];
+	      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n] +
+                                       src_grad1[src_add[n]]*map_wts[num_wts*n+1] +
+                                       src_grad2[src_add[n]]*map_wts[num_wts*n+2];
 	    }
 	}
       else if ( num_wts == 4 )
 	{
       	  for ( n = 0; n < num_links; n++ )
 	    {
-              dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n] +
-                                       src_grad1[src_add[n]]*map_wts[1][n] +
-                                       src_grad2[src_add[n]]*map_wts[2][n] +
-                                       src_grad3[src_add[n]]*map_wts[3][n];
+              dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n] +
+                                       src_grad1[src_add[n]]*map_wts[num_wts*n+1] +
+                                       src_grad2[src_add[n]]*map_wts[num_wts*n+2] +
+                                       src_grad3[src_add[n]]*map_wts[num_wts*n+3];
 	    }
 	}
     }
@@ -1465,7 +1456,7 @@ void remap(double *restrict dst_array, double missval, long dst_size, long num_l
   if ( cdoTimer ) timer_stop(timer_remap);
 }
 
-
+static
 long get_max_add(long num_links, long size, const int *restrict add)
 {
   long n, i;
@@ -1491,8 +1482,8 @@ long get_max_add(long num_links, long size, const int *restrict add)
      
   -----------------------------------------------------------------------
 */
-void remap_laf(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict *restrict map_wts,
-	       const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
+void remap_laf(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
+	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
 {
   /*
     Input arrays:
@@ -1500,7 +1491,9 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
     int *dst_add         ! destination address for each link
     int *src_add         ! source      address for each link
 
-    double **map_wts     ! remapping weights for each link
+    int num_wts          ! num of weights used in remapping
+
+    double *map_wts      ! remapping weights for each link
 
     double *src_array    ! array with source field to be remapped
 
@@ -1544,7 +1537,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, \
-	 dst_array, max_cls) \
+	 num_wts, dst_array, max_cls)					\
   private(i, n, k, ompthID, src_cls, src_wts, ncls, imax, wts) \
   schedule(dynamic,1)
 #endif
@@ -1572,7 +1565,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 		  ncls++;
 		}
 	      
-	      src_wts[k] += map_wts[0][n];
+	      src_wts[k] += map_wts[num_wts*n];
 	    }
 	}
       */
@@ -1605,7 +1598,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 	      ncls++;
 	    }
 	      
-	  src_wts[k] += map_wts[0][n];
+	  src_wts[k] += map_wts[num_wts*n];
 	}
       }
       
@@ -1649,8 +1642,8 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
      
   -----------------------------------------------------------------------
 */
-void remap_sum(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict *restrict map_wts,
-	       const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
+void remap_sum(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
+	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
 {
   /*
     Input arrays:
@@ -1658,7 +1651,9 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
     int *dst_add         ! destination address for each link
     int *src_add         ! source      address for each link
 
-    double **map_wts     ! remapping weights for each link
+    int num_wts          ! num of weights used in remapping
+
+    double *map_wts      ! remapping weights for each link
 
     double *src_array    ! array with source field to be remapped
 
@@ -1680,12 +1675,12 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
   for ( n = 0; n < num_links; n++ )
     {
       /*
-	printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[0][n]);
+	printf("%5d %5d %5d %g # dst_add src_add n\n", dst_add[n], src_add[n], n, map_wts[num_wts*n]);
       */
-      //dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
-      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[0][n];
+      //dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
+      dst_array[dst_add[n]] += src_array[src_add[n]]*map_wts[num_wts*n];
       printf("%ld %d %d %g %g %g\n", n, dst_add[n], src_add[n],
-	     src_array[src_add[n]], map_wts[0][n], dst_array[dst_add[n]]);
+	     src_array[src_add[n]], map_wts[num_wts*n], dst_array[dst_add[n]]);
     }
 }
 
@@ -1991,7 +1986,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
     {
       rv->grid1_add[num_links_old+n] = src_add[n]-1;
       rv->grid2_add[num_links_old+n] = dst_add;
-      rv->wts   [0][num_links_old+n] = weights[n];
+      rv->wts      [num_links_old+n] = weights[n];
     }
 
 } /* store_link_bilin */
@@ -2171,10 +2166,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	      /* Renormalize weights */
 	      sum_wgts = 0.0;
 	      for ( n = 0; n < 4; n++ ) sum_wgts += src_lats[n];
-	      wgts[0] = src_lats[0]/sum_wgts;
-	      wgts[1] = src_lats[1]/sum_wgts;
-	      wgts[2] = src_lats[2]/sum_wgts;
-	      wgts[3] = src_lats[3]/sum_wgts;
+	      for ( n = 0; n < 4; n++ ) wgts[n] = src_lats[n]/sum_wgts;
 
 	      rg->grid2_frac[dst_add] = ONE;
 
@@ -2227,7 +2219,7 @@ void store_link_bicub(remapvars_t *rv, const int dst_add, const int *restrict sr
       rv->grid1_add[num_links_old+n] = src_add[n]-1;
       rv->grid2_add[num_links_old+n] = dst_add;
       for ( k = 0; k < 4; k++ )
-	rv->wts[k][num_links_old+n] = weights[k][n];
+	rv->wts[4*(num_links_old+n)+k] = weights[k][n];
     }
 
 } /* store_link_bicub */
@@ -2610,7 +2602,7 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
     Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
-    double weights[]  ! array of remapping weights for this link
+    double weights    ! remapping weight for this link
   */
   long nlink;
 
@@ -2627,7 +2619,7 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
   rv->grid1_add[nlink] = add1;
   rv->grid2_add[nlink] = add2;
 
-  rv->wts[0][nlink] = weights;
+  rv->wts[nlink] = weights;
 
 } /* store_link_nbr */
 
@@ -2904,7 +2896,7 @@ void store_link_nbr1(remapvars_t *rv, int add1, int add2, double weights)
     Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
-    double weights[]  ! array of remapping weights for this link
+    double weights    ! remapping weight for this link
   */
   long nlink;
 
@@ -2921,7 +2913,7 @@ void store_link_nbr1(remapvars_t *rv, int add1, int add2, double weights)
   rv->grid1_add[nlink] = add1;
   rv->grid2_add[nlink] = add2;
 
-  rv->wts[0][nlink] = weights;
+  rv->wts[nlink] = weights;
 
 } /* store_link_nbr1 */
 
@@ -3519,12 +3511,11 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
 
 /*
-   This routine finds the next intersection of a destination grid 
-   line with the line segment given by beglon, endlon, etc.
-   A coincidence flag is returned if the segment is entirely 
-   coincident with an ocean grid line.  The cells in which to search
-   for an intersection must have already been restricted in the
-   calling routine.
+   This routine finds the next intersection of a destination grid line with 
+   the line segment given by beglon, endlon, etc.
+   A coincidence flag is returned if the segment is entirely coincident with 
+   an ocean grid line.  The cells in which to search for an intersection must 
+   have already been restricted in the calling routine.
 */
 static
 void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int *lcoinc,
@@ -3920,19 +3911,18 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
    by the input lat/lon of the endpoints.
 */
 static
-void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2, 
+void line_integral(double *weights, double in_phi1, double in_phi2, 
 		   double theta1, double theta2, double grid1_lon, double grid2_lon)
 {
   /*
     Intent(in): 
-    int    num_wts               ! Number of weights to compute
     double in_phi1, in_phi2,     ! Longitude endpoints for the segment
     double theta1, theta2,       ! Latitude  endpoints for the segment
     double grid1_lon,            ! Reference coordinates for each
     double grid2_lon             ! Grid (to ensure correct 0,2pi interv.)
 
     Intent(out):
-    double weights[2*num_wts]    ! Line integral contribution to weights
+    double weights[6]            ! Line integral contribution to weights
   */
 
   /*  Local variables  */
@@ -3959,8 +3949,8 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
   */
   weights[0] = dphi*(sinth1 + sinth2);
   weights[1] = dphi*(costh1 + costh2 + (theta1*sinth1 + theta2*sinth2));
-  weights[num_wts  ] = weights[0];
-  weights[num_wts+1] = weights[1];
+  weights[3] = weights[0];
+  weights[4] = weights[1];
 
   /*
      The third and fifth weights are for the second-order phi gradient
@@ -4001,20 +3991,19 @@ void line_integral(double *weights, int num_wts, double in_phi1, double in_phi2,
   else if ( phi2 < -PI ) phi2 += PI2;
 
   if ( (phi2-phi1) <  PI  && (phi2-phi1) > -PI )
-    weights[num_wts+2] = dphi*(phi1*f1 + phi2*f2);
+    weights[5] = dphi*(phi1*f1 + phi2*f2);
   else
     {
       if ( phi1 > ZERO ) fac =  PI;
       else               fac = -PI;
 
       fint = f1 + (f2-f1)*(fac-phi1)/fabs(dphi);
-      weights[num_wts+2] = HALF*phi1*(phi1-fac)*f1 -
-                           HALF*phi2*(phi2+fac)*f2 +
-                           HALF*fac*(phi1+phi2)*fint;
+      weights[5] = HALF*phi1*(phi1-fac)*f1 -
+     	           HALF*phi2*(phi2+fac)*f2 +
+	           HALF*fac*(phi1+phi2)*fint;
     }
 
 }  /* line_integral */
-
 
 static
 void grid_store_init(grid_store_t *grid_store, long gridsize)
@@ -4056,6 +4045,45 @@ void grid_store_init(grid_store_t *grid_store, long gridsize)
     grid_store->blksize[grid_store->nblocks-1] = grid_store->max_size%grid_store->blk_size;
 }
 
+static
+void grid_store_delete(grid_store_t *grid_store)
+{
+  grid_layer_t *grid_layer, *grid_layer_f;
+  long ilayer;
+  long i, j;
+  long iblk;
+
+  for ( iblk = 0; iblk < grid_store->nblocks; ++iblk )
+    {
+      j = 0;
+      grid_layer = grid_store->layers[iblk];
+      for ( ilayer = 0; ilayer < grid_store->nlayers[iblk]; ++ilayer )
+	{
+	  if ( cdoVerbose )
+	    {
+	      for ( i = 0; i < grid_store->blksize[iblk]; ++i )
+		if ( grid_layer->grid2_link[i] != -1 ) j++;
+	    }
+	      
+	  grid_layer_f = grid_layer;
+	  free(grid_layer->grid2_link);
+	  grid_layer = grid_layer->next;
+	  free(grid_layer_f);
+	}
+
+      if ( cdoVerbose )
+	{
+	  fprintf(stderr, "block = %ld nlayers = %d  allocated = %d  used = %ld\n",
+		  iblk+1, grid_store->nlayers[iblk], 
+		  grid_store->nlayers[iblk]*grid_store->blksize[iblk], j);
+	}
+    }
+
+  free(grid_store->blksize);
+  free(grid_store->layers);
+  free(grid_store->nlayers);  
+}
+
 /*
     This routine stores the address and weight for this link in the appropriate 
     address and weight arrays and resizes those arrays if necessary.
@@ -4067,7 +4095,7 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
     Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
-    double weights[]  ! array of remapping weights for this link
+    double weights[6] ! array of remapping weights for this link
   */
   /* Local variables */
   long nlink; /* link index */
@@ -4107,9 +4135,9 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
 
   if ( lstore_link )
     {
-      rv->wts[0][nlink] += weights[0];
-      rv->wts[1][nlink] += weights[1];
-      rv->wts[2][nlink] += weights[2];
+      rv->wts[3*nlink+0] += weights[0];
+      rv->wts[3*nlink+1] += weights[1];
+      rv->wts[3*nlink+2] += weights[2];
 	      
       return;
     }
@@ -4147,9 +4175,9 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
   rv->grid1_add[nlink] = add1;
   rv->grid2_add[nlink] = add2;
 
-  rv->wts[0][nlink] = weights[0];
-  rv->wts[1][nlink] = weights[1];
-  rv->wts[2][nlink] = weights[2];
+  rv->wts[3*nlink+0] = weights[0];
+  rv->wts[3*nlink+1] = weights[1];
+  rv->wts[3*nlink+2] = weights[2];
 
 }  /* store_link_cnsrv_fast */
 
@@ -4166,7 +4194,7 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
     Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
-    double weights[]  ! array of remapping weights for this link
+    double weights[6] ! array of remapping weights for this link
   */
   /* Local variables */
   long nlink, min_link, max_link; /* link index */
@@ -4231,9 +4259,9 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 
   if ( nlink <= max_link )
     {
-      rv->wts[0][nlink] += weights[0];
-      rv->wts[1][nlink] += weights[1];
-      rv->wts[2][nlink] += weights[2];
+      rv->wts[3*nlink+0] += weights[0];
+      rv->wts[3*nlink+1] += weights[1];
+      rv->wts[3*nlink+2] += weights[2];
 
       return;
     }
@@ -4252,9 +4280,9 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
   rv->grid1_add[nlink] = add1;
   rv->grid2_add[nlink] = add2;
 
-  rv->wts[0][nlink] = weights[0];
-  rv->wts[1][nlink] = weights[1];
-  rv->wts[2][nlink] = weights[2];
+  rv->wts[3*nlink+0] = weights[0];
+  rv->wts[3*nlink+1] = weights[1];
+  rv->wts[3*nlink+2] = weights[2];
 
   if ( link_add1[0][add1] == -1 ) link_add1[0][add1] = (int)nlink;
   if ( link_add2[0][add2] == -1 ) link_add2[0][add2] = (int)nlink;
@@ -4291,7 +4319,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   long grid2_add;       /* current linear address for grid2 cell   */
   long min_add;         /* addresses for restricting search of     */
   long max_add;         /* destination grid                        */
-  long n, n2, k;        /* generic counters                        */
+  long n, n2, n3, k;    /* generic counters                        */
   long corner;          /* corner of cell that segment starts from */
   long next_corn;       /* corner of cell that segment ends on     */
   long nbins, num_links;
@@ -4615,10 +4643,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  /* Compute line integral for this subsegment. */
 
 		  if ( grid2_add != -1 )
-		    line_integral(weights, rv->num_wts, beglon, intrsct_lon, beglat, intrsct_lat,
+		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid1_center_lon[grid1_add], rg->grid2_center_lon[grid2_add]);
 		  else
-		    line_integral(weights, rv->num_wts, beglon, intrsct_lon, beglat, intrsct_lat,
+		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid1_center_lon[grid1_add], rg->grid1_center_lon[grid1_add]);
 
 		  /* If integrating in reverse order, change sign of weights */
@@ -4641,7 +4669,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 			  else
 			    store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
-			  rg->grid2_frac[grid2_add] += weights[rv->num_wts];
+			  rg->grid2_frac[grid2_add] += weights[3];
 			}
 			rg->grid1_frac[grid1_add] += weights[0];
 		      }
@@ -4886,10 +4914,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  /* Compute line integral for this subsegment. */
 
 		  if ( grid1_add != -1 )
-		    line_integral(weights, rv->num_wts, beglon, intrsct_lon, beglat, intrsct_lat,
+		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid1_center_lon[grid1_add], rg->grid2_center_lon[grid2_add]);
 		  else
-		    line_integral(weights, rv->num_wts, beglon, intrsct_lon, beglat, intrsct_lat,
+		    line_integral(weights, beglon, intrsct_lon, beglat, intrsct_lat,
 				  rg->grid2_center_lon[grid2_add], rg->grid2_center_lon[grid2_add]);
 
 		  /* If integrating in reverse order, change sign of weights */
@@ -4917,12 +4945,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
 			  rg->grid1_frac[grid1_add] += weights[0];
 			}
-			rg->grid2_frac[grid2_add] += weights[rv->num_wts];
+			rg->grid2_frac[grid2_add] += weights[3];
 		      }
 
-		  rg->grid2_area[grid2_add]     += weights[rv->num_wts  ];
-		  grid2_centroid_lat[grid2_add] += weights[rv->num_wts+1];
-		  grid2_centroid_lon[grid2_add] += weights[rv->num_wts+2];
+		  rg->grid2_area[grid2_add]     += weights[3];
+		  grid2_centroid_lat[grid2_add] += weights[4];
+		  grid2_centroid_lon[grid2_add] += weights[5];
 
 		  /* Reset beglat and beglon for next subsegment. */
 
@@ -5002,9 +5030,9 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( grid2_add != -1 )
     {
-      rg->grid2_area[grid2_add]     += weights[rv->num_wts  ];
-      grid2_centroid_lat[grid2_add] += weights[rv->num_wts+1];
-      grid2_centroid_lon[grid2_add] += weights[rv->num_wts+2];
+      rg->grid2_area[grid2_add]     += weights[3];
+      grid2_centroid_lat[grid2_add] += weights[4];
+      grid2_centroid_lon[grid2_add] += weights[5];
     }
 
   if ( grid1_add != -1 && grid2_add != -1 )
@@ -5015,7 +5043,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
       rg->grid1_frac[grid1_add] += weights[0];
-      rg->grid2_frac[grid2_add] += weights[rv->num_wts];
+      rg->grid2_frac[grid2_add] += weights[3];
     }
 
   /* South Pole */
@@ -5057,9 +5085,9 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( grid2_add != -1 )
     {
-      rg->grid2_area[grid2_add]     += weights[rv->num_wts  ];
-      grid2_centroid_lat[grid2_add] += weights[rv->num_wts+1];
-      grid2_centroid_lon[grid2_add] += weights[rv->num_wts+2];
+      rg->grid2_area[grid2_add]     += weights[3];
+      grid2_centroid_lat[grid2_add] += weights[4];
+      grid2_centroid_lon[grid2_add] += weights[5];
     }
 
   if ( grid1_add != -1 && grid2_add != -1 )
@@ -5070,45 +5098,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	store_link_cnsrv(rv, grid1_add, grid2_add, weights, link_add1, link_add2);
 
       rg->grid1_frac[grid1_add] += weights[0];
-      rg->grid2_frac[grid2_add] += weights[rv->num_wts];
+      rg->grid2_frac[grid2_add] += weights[3];
     }
 
   if ( rg->store_link_fast )
     {
-      grid_layer_t *grid_layer, *grid_layer_f;
-      long ilayer;
-      long i, j;
-      long iblk;
-
-      for ( iblk = 0; iblk < grid_store->nblocks; ++iblk )
-	{
-	  j = 0;
-	  grid_layer = grid_store->layers[iblk];
-	  for ( ilayer = 0; ilayer < grid_store->nlayers[iblk]; ++ilayer )
-	    {
-	      if ( cdoVerbose )
-		{
-		  for ( i = 0; i < grid_store->blksize[iblk]; ++i )
-		    if ( grid_layer->grid2_link[i] != -1 ) j++;
-		}
-	      
-	      grid_layer_f = grid_layer;
-	      free(grid_layer->grid2_link);
-	      grid_layer = grid_layer->next;
-	      free(grid_layer_f);
-	    }
-
-	  if ( cdoVerbose )
-	    {
-	      fprintf(stderr, "block = %ld nlayers = %d  allocated = %d  used = %ld\n",
-		      iblk+1, grid_store->nlayers[iblk], 
-		      grid_store->nlayers[iblk]*grid_store->blksize[iblk], j);
-	    }
-	}
-
-      free(grid_store->blksize);
-      free(grid_store->layers);
-      free(grid_store->nlayers);
+      grid_store_delete(grid_store);
       free(grid_store);
     }
 
@@ -5134,15 +5129,15 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   num_links = rv->num_links;
   for ( n = 0; n < num_links; n++ )
     {
-      if ( fabs(rv->wts[0][n]) < 1.e-9 )
+      if ( fabs(rv->wts[3*n]) < 1.e-9 )
 	{
 	  int i;
 	  num_links--;
 	  for ( i = n; i < num_links; i++ )
 	    {
-	      rv->wts[0][i] = rv->wts[0][i+1];
-	      rv->wts[1][i] = rv->wts[1][i+1];
-	      rv->wts[2][i] = rv->wts[2][i+1];
+	      rv->wts[3*i] = rv->wts[3*(i+1)];
+	      rv->wts[3*i] = rv->wts[3*(i+1)];
+	      rv->wts[3*i] = rv->wts[3*(i+1)];
 
 	      rv->grid1_add[i] = rv->grid1_add[i+1];
 	      rv->grid2_add[i] = rv->grid2_add[i+1];
@@ -5165,21 +5160,22 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
-  private(n, grid1_add, grid2_add, weights, norm_factor)
+  private(n, n3, grid1_add, grid2_add, weights, norm_factor)
 #endif
       for ( n = 0; n < num_links; n++ )
 	{
+	  n3 = n*3;
 	  grid1_add = rv->grid1_add[n]; grid2_add = rv->grid2_add[n];
-	  weights[0] = rv->wts[0][n]; weights[1] = rv->wts[1][n]; weights[2] = rv->wts[2][n];
+	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
 
           if ( IS_NOT_EQUAL(rg->grid2_area[grid2_add], 0) )
 	    norm_factor = ONE/rg->grid2_area[grid2_add];
           else
             norm_factor = ZERO;
 
-	  rv->wts[0][n] =  weights[0]*norm_factor;
-	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
-	  rv->wts[2][n] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;
+	  rv->wts[n3+0] =  weights[0]*norm_factor;
+	  rv->wts[n3+1] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
+	  rv->wts[n3+2] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;
 	}
     }
   else if ( rv->norm_opt == NORM_OPT_FRACAREA )
@@ -5190,21 +5186,22 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
-  private(n, grid1_add, grid2_add, weights, norm_factor)
+  private(n, n3, grid1_add, grid2_add, weights, norm_factor)
 #endif
       for ( n = 0; n < num_links; n++ )
 	{
+	  n3 = n*3;
 	  grid1_add = rv->grid1_add[n]; grid2_add = rv->grid2_add[n];
-	  weights[0] = rv->wts[0][n]; weights[1] = rv->wts[1][n]; weights[2] = rv->wts[2][n];
+	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
 
           if ( IS_NOT_EQUAL(rg->grid2_frac[grid2_add], 0) )
 	    norm_factor = ONE/rg->grid2_frac[grid2_add];
           else
             norm_factor = ZERO;
 
-	  rv->wts[0][n] =  weights[0]*norm_factor;
-	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
-	  rv->wts[2][n] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;
+	  rv->wts[n3+0] =  weights[0]*norm_factor;
+	  rv->wts[n3+1] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
+	  rv->wts[n3+2] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;
 	}
     }
   else if ( rv->norm_opt == NORM_OPT_NONE )
@@ -5215,18 +5212,19 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, rg, grid1_centroid_lat, grid1_centroid_lon)	\
-  private(n, grid1_add, grid2_add, weights, norm_factor)
+  private(n, n3, grid1_add, grid2_add, weights, norm_factor)
 #endif
       for ( n = 0; n < num_links; n++ )
 	{
+	  n3 = n*3;
 	  grid1_add = rv->grid1_add[n]; grid2_add = rv->grid2_add[n];
-	  weights[0] = rv->wts[0][n]; weights[1] = rv->wts[1][n]; weights[2] = rv->wts[2][n];
+	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
 
           norm_factor = ONE;
 
-	  rv->wts[0][n] =  weights[0]*norm_factor;
-	  rv->wts[1][n] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
-	  rv->wts[2][n] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;
+	  rv->wts[n3+0] =  weights[0]*norm_factor;
+	  rv->wts[n3+1] = (weights[1] - weights[0]*grid1_centroid_lat[grid1_add])*norm_factor;
+	  rv->wts[n3+2] = (weights[2] - weights[0]*grid1_centroid_lon[grid1_add])*norm_factor;
 	}
     }
 
@@ -5289,13 +5287,13 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	  grid1_add = rv->grid1_add[n];
 	  grid2_add = rv->grid2_add[n];
 
-	  if ( rv->wts[0][n] < -0.01 )
+	  if ( rv->wts[3*n] < -0.01 )
 	    cdoPrint("Map 1 weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
-		     grid1_add, grid2_add, n, rv->wts[0][n]);
+		     grid1_add, grid2_add, n, rv->wts[3*n]);
 
-	  if ( rv->norm_opt != NORM_OPT_NONE && rv->wts[0][n] > 1.01 )
+	  if ( rv->norm_opt != NORM_OPT_NONE && rv->wts[3*n] > 1.01 )
 	    cdoPrint("Map 1 weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
-		     grid1_add, grid2_add, n, rv->wts[0][n]);
+		     grid1_add, grid2_add, n, rv->wts[3*n]);
 	}
     }
 
@@ -5305,7 +5303,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   for ( n = 0; n < num_links; n++ )
     {
       grid2_add = rv->grid2_add[n];
-      grid2_centroid_lat[grid2_add] += rv->wts[0][n];
+      grid2_centroid_lat[grid2_add] += rv->wts[3*n];
     }
 
   /* Uwe Schulzweida: check if grid2_add is valid */
@@ -5668,7 +5666,7 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
 
 /*****************************************************************************/
 
-void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights)
+void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -5682,7 +5680,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
        long num_wts;   ! num of weights for this mapping
        add1,           ! destination address array [num_links]
        add2            ! source      address array
-       weights         ! remapping weights [num_links][num_wts]
+       weights         ! remapping weights [num_links*num_wts]
   */
 
   /* Local variables */
@@ -5692,7 +5690,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
   long lvl, final_lvl;     /* level indexes for heap sort levels */
   long chk_lvl1, chk_lvl2, max_lvl;
   long i, n;
-  double *wgt_tmp[4];
+  double *wgt_tmp;
 
   if ( cdoTimer ) timer_start(timer_remap_sort);
 
@@ -5706,11 +5704,8 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
   idx = (int *) malloc(num_links*sizeof(int));
   for ( i = 0; i < num_links; ++i ) idx[i] = i;
 
-  for ( n = 0; n < num_wts; n++ )
-    {
-      wgt_tmp[n] = (double*) malloc( num_links*sizeof(double));
-      memcpy(wgt_tmp[n], weights[n], num_links*sizeof(double));
-    }
+  wgt_tmp = (double*) malloc(num_wts*num_links*sizeof(double));
+  memcpy(wgt_tmp, weights, num_wts*num_links*sizeof(double));
 
   /*
     start at the lowest level (N/2) of the tree and shift lower 
@@ -5874,11 +5869,11 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
   idx[1]   = idx[0];
   idx[0]   = idx_tmp;
 
-  for ( n = 0; n < num_wts; n++ )
-    for ( i = 0; i < num_links; ++i )
-      weights[n][i] = wgt_tmp[n][idx[i]];
+  for ( i = 0; i < num_links; ++i )
+    for ( n = 0; n < num_wts; ++n )
+      weights[num_wts*i+n] = wgt_tmp[num_wts*idx[i]+n];
 
-  for ( n = 0; n < num_wts; n++ ) free(wgt_tmp[n]);
+  free(wgt_tmp);
   free(idx);
   /*
   for ( n = 0; n < num_links; n++ )
@@ -5888,7 +5883,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
 } /* sort_add_test */
 
 
-void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights)
+void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -5902,7 +5897,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
        long num_wts;   ! num of weights for this mapping
        add1,           ! destination address array [num_links]
        add2            ! source      address array
-       weights         ! remapping weights [num_links][num_wts]
+       weights         ! remapping weights [num_links*num_wts]
   */
 
   /* Local variables */
@@ -5931,7 +5926,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
       add1_tmp = add1[lvl];
       add2_tmp = add2[lvl];
       for ( n = 0; n < num_wts; n++ )
-	wgttmp[n] = weights[n][lvl];
+	wgttmp[n] = weights[num_wts*lvl+n];
 
       /* Loop until proper level is found for this link, or reach bottom */
 
@@ -5961,7 +5956,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	      add1[final_lvl] = add1_tmp;
 	      add2[final_lvl] = add2_tmp;
 	      for ( n = 0; n < num_wts; n++ )
-		weights[n][final_lvl] = wgttmp[n];
+		weights[num_wts*final_lvl+n] = wgttmp[n];
 
 	      break;
 	    }
@@ -5976,7 +5971,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	      add1[final_lvl] = add1[max_lvl];
 	      add2[final_lvl] = add2[max_lvl];
 	      for ( n = 0; n < num_wts; n++ )
-		weights[n][final_lvl] = weights[n][max_lvl];
+		weights[num_wts*final_lvl+n] = weights[num_wts*max_lvl+n];
 
 	      final_lvl = max_lvl;
 	      if ( 2*final_lvl+1 >= num_links )
@@ -5984,7 +5979,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 		  add1[final_lvl] = add1_tmp;
 		  add2[final_lvl] = add2_tmp;
 		  for ( n = 0; n < num_wts; n++ )
-		    weights[n][final_lvl] = wgttmp[n];
+		    weights[num_wts*final_lvl+n] = wgttmp[n];
 
 		  break;
 		}
@@ -6010,10 +6005,10 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
       add2[lvl] = add2[0];
 
       for ( n = 0; n < num_wts; n++ )
-        wgttmp[n] = weights[n][lvl];
+        wgttmp[n] = weights[num_wts*lvl+n];
 
       for ( n = 0; n < num_wts; n++ )
-        weights[n][lvl] = weights[n][0];
+        weights[num_wts*lvl+n] = weights[n];
 
       /* As above this loop sifts the tmp values down until proper level is reached */
 
@@ -6045,7 +6040,8 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	      add1[final_lvl] = add1_tmp;
 	      add2[final_lvl] = add2_tmp;
 	      for ( n = 0; n < num_wts; n++ )
-		weights[n][final_lvl] = wgttmp[n];
+		weights[num_wts*final_lvl+n] = wgttmp[n];
+
 	      break;
 	    }
 	  else
@@ -6059,7 +6055,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	      add1[final_lvl] = add1[max_lvl];
 	      add2[final_lvl] = add2[max_lvl];
 	      for ( n = 0; n < num_wts; n++ )
-		weights[n][final_lvl] = weights[n][max_lvl];
+		weights[num_wts*final_lvl+n] = weights[num_wts*max_lvl+n];
 
 	      final_lvl = max_lvl;
 	      if ( 2*final_lvl+1 >= lvl )
@@ -6067,7 +6063,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 		  add1[final_lvl] = add1_tmp;
 		  add2[final_lvl] = add2_tmp;
 		  for ( n = 0; n < num_wts; n++ )
-		    weights[n][final_lvl] = wgttmp[n];
+		    weights[num_wts*final_lvl+n] = wgttmp[n];
 
 		  break;
 		}
@@ -6088,19 +6084,15 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
   add2[1]  = add2[0];
   add2[0]  = add2_tmp;
 
-  for ( n = 0; n < num_wts; n++ )
-    wgttmp[n]     = weights[n][1];
-
-  for ( n = 0; n < num_wts; n++ )
-    weights[n][1] = weights[n][0];
-
-  for ( n = 0; n < num_wts; n++ )
-    weights[n][0] = wgttmp[n];
+  for ( n = 0; n < num_wts; n++ ) wgttmp[n]          = weights[num_wts+n];
+  for ( n = 0; n < num_wts; n++ ) weights[num_wts+n] = weights[n];
+  for ( n = 0; n < num_wts; n++ ) weights[n]         = wgttmp[n];
   /*
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
   if ( cdoTimer ) timer_stop(timer_remap_sort);
+
 } /* sort_add */
 
 
@@ -6141,7 +6133,7 @@ void reorder_links(remapvars_t *rv)
 
       printf("num_links %ld  max_links %ld  num_blks %ld\n", rv->num_links, max_links, num_blks);
 
-      rv->links.num_links = (int *) malloc(num_blks*sizeof(int));
+      rv->links.num_links = (int *)  malloc(num_blks*sizeof(int));
       rv->links.dst_add   = (int **) malloc(num_blks*sizeof(int *));
       rv->links.src_add   = (int **) malloc(num_blks*sizeof(int *));
       rv->links.w_index   = (int **) malloc(num_blks*sizeof(int *));
@@ -6262,11 +6254,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   char grid2_units[] = "radians";
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
-  long i, n;
+  long i;
   size_t filesize;
-  size_t start[2];
-  size_t count[2];
-  double weights[4];
   int writemode = NC_CLOBBER;
 
   switch ( rv.norm_opt )
@@ -6527,17 +6516,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   nce(nc_put_var_int(nc_file_id, nc_srcadd_id, rv.grid1_add));
   nce(nc_put_var_int(nc_file_id, nc_dstadd_id, rv.grid2_add));
 
-  for ( i = 0; i < rv.num_links; i++ )
-    {
-      start[0] = i;
-      start[1] = 0;
-      count[0] = 1;
-      count[1] = rv.num_wts;
-      for ( n = 0; n < rv.num_wts; n++ )
-	weights[n] = rv.wts[n][i];
-
-      nce(nc_put_vara_double(nc_file_id, nc_rmpmatrix_id, start, count, weights));
-    }
+  nce(nc_put_var_double(nc_file_id, nc_rmpmatrix_id, rv.wts));
 
   nce(nc_close(nc_file_id));
 
@@ -6595,7 +6574,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   int nc_dstadd_id;         /* id for map destination address           */
   int nc_rmpmatrix_id;      /* id for remapping matrix                  */
 
-  long i, n;                 /* dummy index */
+  long i;                   /* dummy index */
 
   char map_name[1024];
   char map_method[64];      /* character string for map_type             */
@@ -6606,9 +6585,6 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   char grid1_units[64];
   char grid2_units[64];
   size_t attlen, dimlen;
-  size_t start[2];
-  size_t count[2];
-  double weights[4];
 
   int gridID1_gme_c = -1;
 
@@ -6791,7 +6767,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( gridInqType(gridID1) == GRID_GME ) gridInqMaskGME(gridID1_gme_c, rg->grid1_vgpm);    
 
   rv->pinit = TRUE;
-  for ( i = 0; i < 4; i++ ) rv->wts[i] = NULL;
+  rv->wts = NULL;
 
   rv->max_links = rv->num_links;
 
@@ -6802,8 +6778,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   rv->grid1_add = (int *) malloc(rv->num_links*sizeof(int));
   rv->grid2_add = (int *) malloc(rv->num_links*sizeof(int));
 
-  for ( i = 0; i < rv->num_wts; i++ )
-    rv->wts[i] = (double *) malloc(rv->num_links*sizeof(double));
+  rv->wts = (double *) malloc(rv->num_wts*rv->num_links*sizeof(double));
 
   /* Get variable ids */
 
@@ -6916,18 +6891,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       rv->grid2_add[i]--;
     }
 
-  for ( i = 0; i < rv->num_links; i++ )
-    {
-      start[0] = i;
-      start[1] = 0;
-      count[0] = 1;
-      count[1] = rv->num_wts;
-
-      nce(nc_get_vara_double(nc_file_id, nc_rmpmatrix_id, start, count, weights));
-
-      for ( n = 0; n < rv->num_wts; n++ )
-	rv->wts[n][i] = weights[n];
-    }
+  nce(nc_get_var_double(nc_file_id, nc_rmpmatrix_id, rv->wts));
 
   /* Close input file */
 
@@ -6984,8 +6948,6 @@ void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
                         OR (II) l11[idx[i]]==l11[idx[i+1]] && l21[idx[i]]<l21[idx[i+1]]
 		       where 0 <= i < nl
   */    		       
-
-
   int i1=0, i2=0, i=0, ii;
   const int n1=nl[0], n2=nl[1];
 
@@ -7002,13 +6964,11 @@ void merge_lists(int *nl, int *l11, int *l12, int *l21, int *l22, long *idx)
 
   for ( ii=i1; i1 < n1; ii++ ) {idx[i] = i1;    i++; i1++; }
   for ( ii=i2; i2 < n2; ii++ ) {idx[i] = n1+i2; i++; i2++; }
-
-  return;
 }
 
 static
 void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict add2, 
-	      double *restrict *restrict weights, int parent, int par_depth)
+	      double *restrict weights, int parent, int par_depth)
 {
   /*
     This routine is the core of merge-sort. It does the following
@@ -7044,7 +7004,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   int *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
   int *tmp;                                  /* pointer to buffer for merging of address lists */
   double *tmp2 = NULL;                       /* pointer to buffer for merging weight lists     */
-  double **wgttmp = NULL;                    /* pointer to buffer for swap weights             */
+  double *wgttmp = NULL;                     /* pointer to buffer for swap weights             */
   long *idx;                                 /* index list to merge sub-arrays                 */
   long i,n,m;   
 
@@ -7111,20 +7071,17 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
       //	       who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
 #endif
             
-      wgttmp = malloc(num_wts*sizeof(double*));        
-      for ( n=0; n<num_wts; n++ )                      
-	{                                              
-	  wgttmp[n] = malloc ( nl[i] * sizeof(double));
-	  for ( m=0; m<nl[i]; m++ )
-	      wgttmp[n][m] = weights[n][add_srt[i]+m];
-	}
+      wgttmp = malloc(num_wts*nl[i]*sizeof(double*));        
+      for ( m = 0; m < nl[i]; m++ )
+	for ( n = 0; n < num_wts; n++ )                      
+	  wgttmp[num_wts*m+n] = weights[num_wts*(add_srt[i]+m)+n];
+
       sort_iter(nl[i], num_wts, add1s[i], add2s[i], wgttmp, who_am_i);
-      for ( n=0; n<num_wts; n++ )
-	{
-	  for ( m=0; m<nl[i]; m++ )
-	    weights[n][add_srt[i]+m] = wgttmp[n][m];
-	  free(wgttmp[n]);
-	}
+
+      for ( m = 0; m < nl[i]; m++ )
+	for ( n = 0; n < num_wts; n++ )
+	  weights[num_wts*(add_srt[i]+m)+n] = wgttmp[num_wts*m+n];
+
       free(wgttmp);
     }
 
@@ -7141,13 +7098,13 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
-  for ( i=0; i< num_links; i++ )
+  for ( i = 0; i < num_links; i++ )
     tmp[i] = add1[idx[i]];
   
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
-  for ( i=0; i< num_links; i++ )
+  for ( i = 0; i < num_links; i++ )
     {
       add1[i] = tmp[i];
       tmp[i] = add2[idx[i]];
@@ -7156,38 +7113,36 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
 #endif
-  for ( i=0; i<num_links; i++ )
+  for ( i = 0; i < num_links; i++ )
     add2[i] = tmp[i];
   
   free(tmp);
   tmp=NULL;
   
-  tmp2 = (double *) malloc ( num_links*num_wts*sizeof(double) );
+  tmp2 = (double *) malloc( num_links*num_wts*sizeof(double) );
   
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
 #endif
-  for ( i=0; i<num_links; i++ )
-    for ( n = 0; n< num_wts; n++ )
-      tmp2[num_wts*i + n] = weights[n][idx[i]];
+  for ( i = 0; i < num_links; i++ )
+    for ( n = 0; n < num_wts; n++ )
+      tmp2[num_wts*i + n] = weights[num_wts*idx[i]+n];
   
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
 #endif
-  for ( i=0; i<num_links; i++ )
-    for ( n = 0; n< num_wts; n++ )
-      weights[n][i] = tmp2[num_wts*i+n];
+  for ( i = 0; i < num_links; i++ )
+    for ( n = 0; n < num_wts; n++ )
+      weights[num_wts*i+n] = tmp2[num_wts*i+n];
   
   free(tmp2);
   tmp2 = NULL;
   
   free(idx);
-
-  return;
 }
 
 
-void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights, int parent)
+void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights, int parent)
 {
   /*
     This routine is an interface between the parallelized (merge-sort) 
@@ -7229,7 +7184,5 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
     {
       sort_add(num_links, num_wts, add1, add2, weights);
     }
-
-  return;
 }
 

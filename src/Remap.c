@@ -331,7 +331,7 @@ void *Remap(void *argument)
     {
       int ival;
       ival = atoi(envstr);
-      if ( ival > 0 )
+      if ( ival >= 0 )
 	{
 	  remap_non_global = ival;
 	  if ( cdoVerbose )
@@ -344,7 +344,7 @@ void *Remap(void *argument)
     {
       int ival;
       ival = atoi(envstr);
-      if ( ival > 0 )
+      if ( ival >= 0 )
 	{
 	  remap_store_link_fast = ival;
 	  if ( cdoVerbose )
@@ -845,10 +845,10 @@ void *Remap(void *argument)
 
 	  if ( operfunc == REMAPLAF )
 	    remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
+		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
 	  else if ( operfunc == REMAPSUM )
 	    remap_sum(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
+		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
 	  else
 	    remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,

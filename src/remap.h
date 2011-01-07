@@ -127,7 +127,7 @@ typedef struct {
   int  *grid1_add;        /* grid1 address for each link              */
   int  *grid2_add;        /* grid2 address for each link              */
 
-  double *wts[4];         /* map weights for each link [max_links][num_wts] */
+  double *wts;            /* map weights for each link [max_links*num_wts] */
 
   remaplink_t  links;
 }
@@ -150,16 +150,16 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv);
 void remapVarsFree(remapvars_t *rv);
 void remapGridFree(remapgrid_t *rg);
 
-void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict *restrict map_wts, 
+void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
 	   long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array, 
 	   const double *restrict src_grad1, const double *restrict src_grad2, const double *restrict src_grad3,
 	   remaplink_t links);
 
-void remap_laf(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict *restrict map_wts,
-	       const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);
+void remap_laf(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
+	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);
 
-void remap_sum(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict *restrict map_wts,
-	       const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);
+void remap_sum(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
+	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);
 
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv);
 void remap_bicub(remapgrid_t *rg, remapvars_t *rv);
@@ -176,9 +176,8 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
 
 void reorder_links(remapvars_t *rv);
 
-void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights);
-void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights);
-void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict *restrict weights, int parent);
+void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights);
+void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights, int parent);
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
 		       int remap_order, remapgrid_t rg, remapvars_t rv);

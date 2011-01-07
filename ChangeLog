@@ -1,3 +1,7 @@
+2011-01-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remaplib: Changed remap weights from 2D to 1D array
+	
 2011-01-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.6
