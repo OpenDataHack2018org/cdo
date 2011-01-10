@@ -150,7 +150,6 @@ doc/tex/mod/Mastrfu -text
 doc/tex/mod/Math -text
 doc/tex/mod/Merge -text
 doc/tex/mod/Mergegrid -text
-doc/tex/mod/Mergetime -text
 doc/tex/mod/Merstat -text
 doc/tex/mod/Monarith -text
 doc/tex/mod/Monpctl -text
@@ -170,6 +169,7 @@ doc/tex/mod/Runstat -text
 doc/tex/mod/Seaspctl -text
 doc/tex/mod/Seasstat -text
 doc/tex/mod/Selbox -text
+doc/tex/mod/Select -text
 doc/tex/mod/Seltime -text
 doc/tex/mod/Selvar -text
 doc/tex/mod/Set -text

@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Replace
 @Title     = Replace variables
 @Section   = File operations

@@ -1,0 +1,41 @@
+@BeginModule
+@NewPage
+@Name      = Select
+@Title     = Select fields
+@Section   = Selection
+@Class     = Selection
+@Arguments = ifiles ofile
+@Operators = select delete
+
+@BeginDescription
+This module selects some fields from @file{ifiles} and writes them to @file{ofile}.
+@file{ifiles} is an unlimited number of input files. All input files need to have 
+the same structure with the same variables on different time steps.
+The fields selected depends on the chosen operator and the parameters.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_select
+@Title     = Select fields
+@Parameter = keys
+
+@BeginDescription
+Selects all fields with keys in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_delete
+@Title     = Delete fields
+@Parameter = keys
+
+@BeginDescription
+Deletes all fields with keys in a user given list.
+@EndDescription
+@EndOperator
+
+@BeginParameter
+@Item = keys
+STRING  Comma separated list of keys
+@EndParameter

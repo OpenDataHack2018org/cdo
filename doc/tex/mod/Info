@@ -9,8 +9,9 @@
 
 @BeginDescription
 This module writes information about the structure and contents 
-of all input datasets to standard output. The information displayed 
-depends on the chosen operator.
+of all input files to standard output.  All input files need to have 
+the same structure with the same variables on different time steps.
+The information displayed depends on the chosen operator.
 @EndDescription
 @EndModule
 

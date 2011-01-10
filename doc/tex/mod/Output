@@ -8,8 +8,9 @@
 
 @BeginDescription
 This module prints all values of all input datasets to standard output.
-All input fields need to have the same horizontal grid. The format of the 
-output depends on the chosen operator.
+All input fields need to have the same horizontal grid. All input files 
+need to have the same structure with the same variables on different 
+time steps. The format of the output depends on the chosen operator.
 @EndDescription
 @EndModule
 

@@ -437,7 +437,7 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 
 void *Select(void *argument)
 {
-  int SELECT;
+  int SELECT, DELETE;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int tsID1, tsID2, nrecs;
@@ -453,6 +453,7 @@ void *Select(void *argument)
   char **argnames = NULL;
   int vlistID0 = -1, vlistID1 = -1, vlistID2 = -1;
   int i;
+  int result = FALSE;
   int lcopy = FALSE;
   int gridsize;
   int nmiss;
@@ -478,6 +479,7 @@ void *Select(void *argument)
   cdoInitialize(argument);
 
   SELECT  = cdoOperatorAdd("select", 0, 0, "parameter list");
+  DELETE  = cdoOperatorAdd("delete", 0, 0, "parameter list");
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -531,11 +533,27 @@ void *Select(void *argument)
 	{
 	  vlistClearFlag(vlistID1);
 	  nvars = vlistNvars(vlistID1);
-	  vars = (int *) malloc(nvars*sizeof(int));
+	  vars  = (int *) malloc(nvars*sizeof(int));
+
+	  if ( operatorID == DELETE )
+	    {
+	      result = FALSE;
+	      for ( varID = 0; varID < nvars; varID++ )
+		{
+		  zaxisID = vlistInqVarZaxis(vlistID1, varID);
+		  nlevs   = zaxisInqSize(zaxisID);
+		  for ( levID = 0; levID < nlevs; levID++ )
+		    vlistDefFlag(vlistID1, varID, levID, TRUE);
+		}
+	    }
+	  else
+	    {
+	      result = TRUE;
+	    }
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      iparam   = vlistInqVarParam(vlistID1, varID);
+	      iparam  = vlistInqVarParam(vlistID1, varID);
 	      code    = vlistInqVarCode(vlistID1, varID);
 	      vlistInqVarName(vlistID1, varID, varname);
 	      vlistInqVarStdname(vlistID1, varID, stdname);
@@ -577,18 +595,18 @@ void *Select(void *argument)
 		      
 		      if ( nlevs == 1 && IS_EQUAL(level, 0) )
 			{
-			  vlistDefFlag(vlistID1, varID, levID, TRUE);
+			  vlistDefFlag(vlistID1, varID, levID, result);
 			}
 		      else
 			{
 			  if ( npar_level )
 			    {
 			      if ( PAR_CHECK_FLT(level) )
-				vlistDefFlag(vlistID1, varID, levID, TRUE);
+				vlistDefFlag(vlistID1, varID, levID, result);
 			    }
 			  else
 			    {
-			      vlistDefFlag(vlistID1, varID, levID, TRUE);
+			      vlistDefFlag(vlistID1, varID, levID, result);
 			    }
 			}
 		    }
@@ -608,7 +626,7 @@ void *Select(void *argument)
 	      nlevs   = zaxisInqSize(zaxisID);
 
 	      for ( levID = 0; levID < nlevs; levID++ )
-		if ( vlistInqFlag(vlistID1, varID, levID) == TRUE ) break;
+		if ( vlistInqFlag(vlistID1, varID, levID) == result ) break;
 	      
 	      if ( levID < nlevs ) npar++;
 	    }
@@ -625,8 +643,7 @@ void *Select(void *argument)
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
 	      nlevs   = zaxisInqSize(zaxisID);
 	      for ( levID = 0; levID < nlevs; levID++ )
-		if ( vlistInqFlag(vlistID1, varID, levID) == TRUE )
-		  vlistDefFlag(vlistID0, varID, levID, TRUE);
+		vlistDefFlag(vlistID0, varID, levID, vlistInqFlag(vlistID1, varID, levID));
 	    }
 
 	  // if ( cdoVerbose ) vlistPrint(vlistID0);

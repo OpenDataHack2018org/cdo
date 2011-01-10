@@ -1,3 +1,7 @@
+2011-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added operator delete - Delete fields
+	
 2011-01-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplib: Changed remap weights from 2D to 1D array

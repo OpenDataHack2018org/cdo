@@ -130,6 +130,7 @@ without POSIX Threads support.
 \subsection{Operator parameter}
 
 Some operators need one or more parameter.
+A list of parameter is indicated by the seperator ','.
 
 \begin{itemize}
 \item STRING
@@ -151,12 +152,12 @@ of all fields to missing value:
 
 \item INTEGER
 
-A list of integers can be specified by {\it first/last[/inc]}.
+A range of integer parameter can be specified by {\it first}/{\it last}[/{\it inc}].
 To select the days 5, 6, 7, 8 and 9 use:
 \begin{verbatim}
    cdo selday,5/9 ifile ofile
 \end{verbatim}
-This is the same as:
+The result is the same as:
 \begin{verbatim}
    cdo selday,5,6,7,8,9 ifile ofile
 \end{verbatim}
