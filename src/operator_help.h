@@ -3363,8 +3363,8 @@ static char *OutputHelp[] = {
     "DESCRIPTION",
     "    This module prints all values of all input datasets to standard output.",
     "    All input fields need to have the same horizontal grid. All input files ",
-    "    need to have the same structure with the same variables on different ",
-    "    time steps. The format of the output depends on the chosen operator.",
+    "    need to have the same structure with the same variables.",
+    "    The format of the output depends on the chosen operator.",
     "",
     "OPERATORS",
     "    output     ASCII output",
@@ -3385,7 +3385,7 @@ static char *OutputHelp[] = {
     "",
     "PARAMETER",
     "    format  STRING  C-style format for one element (e.g. \%13.6g)",
-    "    nelem   INTEGER Number of elements for each row",
+    "    nelem   INTEGER Number of elements for each row (nelem max = gridsize)",
     NULL
 };
 
