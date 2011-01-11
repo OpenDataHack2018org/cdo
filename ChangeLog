@@ -1,3 +1,7 @@
+2011-01-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* sellonlatbox: does not work as expected (bug fix) [report: Jonathan Schubert]
+	
 2011-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator delete - Delete fields
