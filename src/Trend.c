@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -42,6 +42,7 @@ void *Trend(void *argument)
   int nvars, nlevel;
   int *recVarID, *recLevelID;
   int nwork = 5;
+  double zj;
   double temp1, temp2;
   double missval, missval1, missval2;
   field_t **work[5];
@@ -114,13 +115,13 @@ void *Trend(void *argument)
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      tsID++; /* don't move this line !!! */
-
+      zj = tsID + 1;
+      
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 
-	  if ( tsID == 1 )
+	  if ( tsID == 0 )
 	    {
 	      recVarID[recID]   = varID;
 	      recLevelID[recID] = levelID;
@@ -135,13 +136,14 @@ void *Trend(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( !DBL_IS_EQUAL(field1.ptr[i], missval) )
 	      {
-		work[0][varID][levelID].ptr[i] += tsID;
-		work[1][varID][levelID].ptr[i] += tsID * tsID;
-		work[2][varID][levelID].ptr[i] += tsID * field1.ptr[i];
+		work[0][varID][levelID].ptr[i] += zj;
+		work[1][varID][levelID].ptr[i] += zj * zj;
+		work[2][varID][levelID].ptr[i] += zj * field1.ptr[i];
 		work[3][varID][levelID].ptr[i] += field1.ptr[i];
 		work[4][varID][levelID].ptr[i]++;
 	      }      
 	}
+      tsID++;
     }
 	  
 

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -35,24 +35,27 @@
 
 
 static
-void detrend(int nts, double missval1, double *array1, double *array2)
+void detrend(long nts, double missval1, double *array1, double *array2)
 {
-  int j;
-  int n;
+  long n;
+  long j;
+  double zj;
   double sumj, sumjj;
   double sumx, sumjx;
   double work1, work2;
   double missval2 = missval1;
 
   sumx = sumjx = 0;
-  sumj = sumjj = n = 0;
+  sumj = sumjj = 0;
+  n = 0;
   for ( j = 0; j < nts; j++ )
     if ( !DBL_IS_EQUAL(array1[j], missval1) )
       {
+        zj = j;
 	sumx  += array1[j];
-	sumjx += j * array1[j];
-	sumj  += j;
-	sumjj += j * j;
+	sumjx += zj * array1[j];
+	sumj  += zj;
+	sumjj += zj * zj;
 	n++;
       }
 
@@ -62,7 +65,6 @@ void detrend(int nts, double missval1, double *array1, double *array2)
 
   for ( j = 0; j < nts; j++ )
     array2[j] = SUB(array1[j], ADD(work2, MUL(j, work1)));
-
 }
 
 

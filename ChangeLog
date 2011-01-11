@@ -1,5 +1,6 @@
 2011-01-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* detrend: integer overflow; wrong result for nts > 46340 (bug fix) [report: Torsten Seifert]
 	* sellonlatbox: does not work as expected (bug fix) [report: Jonathan Schubert]
 	
 2011-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
