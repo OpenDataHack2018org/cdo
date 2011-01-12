@@ -59,6 +59,7 @@ void *Copy(void *argument);
 void *Deltime(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
+void *Duplicate(void *argument);
 void *Echam5ini(void *argument);
 void *Enlarge(void *argument);
 void *Enlargegrid(void *argument);
@@ -264,6 +265,7 @@ void *Wct(void *argument);
 #define  DeltimeOperators       {"delday", "del29feb"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffp", "diffv", "sdiff"}
+#define  DuplicateOperators     {"duplicate"}
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
                                  "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
@@ -507,6 +509,7 @@ static modules_t Modules[] =
   { Deltime,        NULL,              DeltimeOperators,       CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
   { Diff,           DiffHelp,          DiffOperators,          CDI_REAL,  2,  0 },
+  { Duplicate,      NULL,              DuplicateOperators,     CDI_REAL,  1,  1 },
   { Echam5ini,      NULL,              Echam5iniOperators,     CDI_REAL,  1,  1 },
   { Enlarge,        EnlargeHelp,       EnlargeOperators,       CDI_REAL,  1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },

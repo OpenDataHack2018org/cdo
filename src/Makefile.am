@@ -24,6 +24,7 @@ cdo_SOURCES += Arith.c         \
                Deltime.c       \
                Detrend.c       \
                Diff.c          \
+               Duplicate.c     \
                EOFs.c          \
 	       Eof3d.c         \
                EcaIndices.c    \

@@ -65,7 +65,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
 	cdo-Deltime.$(OBJEXT) cdo-Detrend.$(OBJEXT) cdo-Diff.$(OBJEXT) \
-	cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
+	cdo-Duplicate.$(OBJEXT) cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
 	cdo-EcaIndices.$(OBJEXT) cdo-Echam5ini.$(OBJEXT) \
 	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
 	cdo-Ensstat.$(OBJEXT) cdo-Ensstat3.$(OBJEXT) \
@@ -335,18 +335,18 @@ top_srcdir = @top_srcdir@
 cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Cat.c Change.c Change_e5slm.c Cloudlayer.c Command.c Comp.c \
 	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
-	Copy.c Deltime.c Detrend.c Diff.c EOFs.c Eof3d.c EcaIndices.c \
-	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
-	Eofcoeff.c Eofcoeff3d.c Exprf.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
-	Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
-	Histogram.c IFS2ICON.c Importamsr.c Importbinary.c \
-	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
-	Intgridtraj.c Intlevel.c Intntime.c Inttime.c Intyear.c \
-	Invert.c Invertlev.c Log.c Maskbox.c Mastrfu.c Math.c Merge.c \
-	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
-	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
-	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
+	Copy.c Deltime.c Detrend.c Diff.c Duplicate.c EOFs.c Eof3d.c \
+	EcaIndices.c Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c \
+	Ensstat3.c Eofcoeff.c Eofcoeff3d.c Exprf.c Filedes.c \
+	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
+	Gather.c Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c \
+	Harmonic.c Hi.c Histogram.c IFS2ICON.c Importamsr.c \
+	Importbinary.c Importcmsaf.c Importobs.c Info.c Input.c \
+	Intgrid.c Intgridtraj.c Intlevel.c Intntime.c Inttime.c \
+	Intyear.c Invert.c Invertlev.c Log.c Maskbox.c Mastrfu.c \
+	Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c \
+	Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c \
+	Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
 	Replacevalues.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
@@ -529,6 +529,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Deltime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Detrend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Diff.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Duplicate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-EOFs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-EcaIndices.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Echam5ini.Po@am__quote@
@@ -1053,6 +1054,20 @@ cdo-Diff.obj: Diff.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Diff.c' object='cdo-Diff.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Diff.obj `if test -f 'Diff.c'; then $(CYGPATH_W) 'Diff.c'; else $(CYGPATH_W) '$(srcdir)/Diff.c'; fi`
+
+cdo-Duplicate.o: Duplicate.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Duplicate.o -MD -MP -MF $(DEPDIR)/cdo-Duplicate.Tpo -c -o cdo-Duplicate.o `test -f 'Duplicate.c' || echo '$(srcdir)/'`Duplicate.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Duplicate.Tpo $(DEPDIR)/cdo-Duplicate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Duplicate.c' object='cdo-Duplicate.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Duplicate.o `test -f 'Duplicate.c' || echo '$(srcdir)/'`Duplicate.c
+
+cdo-Duplicate.obj: Duplicate.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Duplicate.obj -MD -MP -MF $(DEPDIR)/cdo-Duplicate.Tpo -c -o cdo-Duplicate.obj `if test -f 'Duplicate.c'; then $(CYGPATH_W) 'Duplicate.c'; else $(CYGPATH_W) '$(srcdir)/Duplicate.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Duplicate.Tpo $(DEPDIR)/cdo-Duplicate.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Duplicate.c' object='cdo-Duplicate.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Duplicate.obj `if test -f 'Duplicate.c'; then $(CYGPATH_W) 'Duplicate.c'; else $(CYGPATH_W) '$(srcdir)/Duplicate.c'; fi`
 
 cdo-EOFs.o: EOFs.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-EOFs.o -MD -MP -MF $(DEPDIR)/cdo-EOFs.Tpo -c -o cdo-EOFs.o `test -f 'EOFs.c' || echo '$(srcdir)/'`EOFs.c
