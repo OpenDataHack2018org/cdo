@@ -109,13 +109,13 @@ void *Trend(void *argument)
 	}
     }
 
-  tsID    = 0;
+  tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       vdate = taxisInqVdate(taxisID1);
       vtime = taxisInqVtime(taxisID1);
 
-      zj = tsID + 1;
+      zj = tsID;
       
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -143,6 +143,7 @@ void *Trend(void *argument)
 		work[4][varID][levelID].ptr[i]++;
 	      }      
 	}
+
       tsID++;
     }
 	  

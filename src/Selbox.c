@@ -609,6 +609,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
     yfact = 1;
 
   /* find gridsize2 */
+  *cellidx = NULL;
   for ( i = 0; i < gridsize1; ++i )
     {
       xval = xvals1[i]*xfact;
@@ -905,8 +906,16 @@ void *Selbox(void *argument)
   if ( vars   ) free(vars);
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
-  free(sbox);
-  if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL ) free(sbox[index].cellidx);
+
+  if ( sbox )
+    {
+      if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL )
+	{
+	  for ( index = 0; index < ngrids; index++ )
+	    if ( sbox[index].cellidx ) free(sbox[index].cellidx);
+	}
+      free(sbox);
+    }
 
   cdoFinish();
 

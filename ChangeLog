@@ -1,11 +1,15 @@
-2011-01-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2011-01-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* detrend: integer overflow; wrong result for nts > 46340 (bug fix) [report: Torsten Seifert]
+
+2011-01-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* sellonlatbox: does not work as expected (bug fix) [report: Jonathan Schubert]
 	
 2011-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator delete - Delete fields
+	* sellonlatbox: cellidx was not initialized (bug fix) [report: Jaison Ambadan]
 	
 2011-01-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

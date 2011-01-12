@@ -120,7 +120,7 @@ void *Subtrend(void *argument)
     }
 
 
-  tsID    = 0;
+  tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
       taxisCopyTimestep(taxisID4, taxisID1);
@@ -139,7 +139,7 @@ void *Subtrend(void *argument)
 	  missval1 = missval;
 	  missval2 = missval;
 	  for ( i = 0; i < gridsize; i++ )
-	    field4.ptr[i] = SUB(field1.ptr[i], ADD(vars2[varID][levelID].ptr[i], MUL(vars3[varID][levelID].ptr[i], tsID+1)));
+	    field4.ptr[i] = SUB(field1.ptr[i], ADD(vars2[varID][levelID].ptr[i], MUL(vars3[varID][levelID].ptr[i], tsID)));
     
 	  nmiss = 0;
 	  for ( i = 0; i < gridsize; i++ )
