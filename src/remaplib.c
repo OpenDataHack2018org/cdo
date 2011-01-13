@@ -2448,48 +2448,18 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
 #define  num_neighbors  4  /* num nearest neighbors to interpolate from */
 
-/*
-   This routine finds the closest num_neighbor points to a search 
-   point and computes a distance to each of the neighbors.
-*/
 static
-void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nbr_dist, 
-		     double plat, double plon, double coslat_dst, double coslon_dst, 
-		     double sinlat_dst, double sinlon_dst, const int *restrict src_bin_add,
-		     const double *restrict sinlat, const double *restrict coslat,
-		     const double *restrict sinlon, const double *restrict coslon)
+void get_restict_add(remapgrid_t *rg, double plat, double plon, const int *restrict src_bin_add,
+		     long *minadd, long *maxadd)
 {
-  /*
-    Output variables:
-
-    int nbr_add[num_neighbors]     ! address of each of the closest points
-    double nbr_dist[num_neighbors] ! distance to each of the closest points
-
-    Input variables:
-
-    int src_bin_add[][2]  ! search bins for restricting search
-
-    double plat,         ! latitude  of the search point
-    double plon,         ! longitude of the search point
-    double coslat_dst,   ! cos(lat)  of the search point
-    double coslon_dst,   ! cos(lon)  of the search point
-    double sinlat_dst,   ! sin(lat)  of the search point
-    double sinlon_dst    ! sin(lon)  of the search point
-  */
-  /*  Local variables */
-  long n, nmax, nadd, nchk;
+  long n, nmax;
   long min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
   long nbins;
-  double distance;     /* angular distance */
   restr_t rlat, rlon;
 
   nbins = rg->num_srch_bins;
-
   rlat = RESTR_SCALE(plat);
   rlon = RESTR_SCALE(plon);
-
-  /* Loop over source grid and find nearest neighbors                         */
-  /* restrict the search using search bins expand the bins to catch neighbors */
 
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
@@ -2546,6 +2516,51 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
   else
     cdoAbort("Unknown search restriction method!");
 
+  *minadd = min_add;
+  *maxadd = max_add;
+
+  if ( cdoVerbose )
+    printf("plon %g plat %g min_add %ld max_add %ld diff %ld\n",
+	   plon, plat, min_add, max_add, max_add-min_add);
+}
+
+/*
+   This routine finds the closest num_neighbor points to a search 
+   point and computes a distance to each of the neighbors.
+*/
+static
+void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nbr_dist, 
+		     double plat, double plon, double coslat_dst, double coslon_dst, 
+		     double sinlat_dst, double sinlon_dst, const int *restrict src_bin_add,
+		     const double *restrict sinlat, const double *restrict coslat,
+		     const double *restrict sinlon, const double *restrict coslon)
+{
+  /*
+    Output variables:
+
+    int nbr_add[num_neighbors]     ! address of each of the closest points
+    double nbr_dist[num_neighbors] ! distance to each of the closest points
+
+    Input variables:
+
+    int src_bin_add[][2]  ! search bins for restricting search
+
+    double plat,         ! latitude  of the search point
+    double plon,         ! longitude of the search point
+    double coslat_dst,   ! cos(lat)  of the search point
+    double coslon_dst,   ! cos(lon)  of the search point
+    double sinlat_dst,   ! sin(lat)  of the search point
+    double sinlon_dst    ! sin(lon)  of the search point
+  */
+  /*  Local variables */
+  long n, nadd, nchk;
+  long min_add, max_add;
+  double distance;     /* Angular distance */
+
+  /* Loop over source grid and find nearest neighbors                         */
+  /* restrict the search using search bins expand the bins to catch neighbors */
+
+  get_restict_add(rg, plat, plon, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; n++ )
@@ -2586,7 +2601,6 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
     }
 
 }  /*  grid_search_nbr  */
-
 
 /*
   This routine stores the address and weight for this link in
@@ -2748,7 +2762,6 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 
 }  /* remap_distwgt */
 
-
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 /*                                                                         */
 /*      INTERPOLATION USING A DISTANCE-WEIGHTED AVERAGE WITH 1 NEIGHBOR    */
@@ -2784,74 +2797,14 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
     double sinlon_dst    ! sin(lon)  of the search point
   */
   /*  Local variables */
-  long n, nmax, nadd;
-  long min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
-  long nbins;
+  long nadd;
+  long min_add, max_add;
   double distance;     /* Angular distance */
-  restr_t rlat, rlon;
-
-  nbins = rg->num_srch_bins;
-  rlat = RESTR_SCALE(plat);
-  rlon = RESTR_SCALE(plon);
 
   /* Loop over source grid and find nearest neighbors                         */
   /* restrict the search using search bins expand the bins to catch neighbors */
 
-  if ( rg->restrict_type == RESTRICT_LATITUDE )
-    {
-      for ( n = 0; n < nbins; n++ )
-	{
-	  if ( rlat >= rg->bin_lats[2*n  ] && rlat <= rg->bin_lats[2*n+1] )
-	    {
-	      min_add = src_bin_add[2*n  ];
-	      max_add = src_bin_add[2*n+1];
-
-	      nm1 = MAX(n-1, 0);
-	      np1 = MIN(n+1, rg->num_srch_bins-1);
-
-	      min_add = MIN(min_add, src_bin_add[2*nm1  ]);
-	      max_add = MAX(max_add, src_bin_add[2*nm1+1]);
-	      min_add = MIN(min_add, src_bin_add[2*np1  ]);
-	      max_add = MAX(max_add, src_bin_add[2*np1+1]);
-	    }
-	}
-    }
-  else if ( rg->restrict_type == RESTRICT_LATLON )
-    {
-      n = 0;
-      nmax = NINT(sqrt((double)rg->num_srch_bins)) - 1;
-      for ( j = 0; j < nmax; j++ )
-	{
-	  jp1 = MIN(j+1,nmax);
-	  jm1 = MAX(j-1,0);
-	  for ( i = 0; i < nmax; i++ )
-	    {
-	      ip1 = MIN(i+1, nmax);
-	      im1 = MAX(i-1, 0);
-
-	      n = n+1;
-	      if ( rlat >= rg->bin_lats[2*n  ] && rlat <= rg->bin_lats[2*n+1] &&
-		   rlon >= rg->bin_lons[2*n  ] && rlon <= rg->bin_lons[2*n+1] )
-		{
-		  min_add = src_bin_add[2*n  ];
-		  max_add = src_bin_add[2*n+1];
-
-		  nm1 = (jm1-1)*nmax + im1;
-		  np1 = (jp1-1)*nmax + ip1;
-		  nm1 = MAX(nm1, 0);
-		  np1 = MIN(np1, rg->num_srch_bins-1);
-
-		  min_add = MIN(min_add, src_bin_add[2*nm1  ]);
-		  max_add = MAX(max_add, src_bin_add[2*nm1+1]);
-		  min_add = MIN(min_add, src_bin_add[2*np1  ]);
-		  max_add = MAX(max_add, src_bin_add[2*np1+1]);
-		}
-	    }
-	}
-    }
-  else
-    cdoAbort("Unknown search restriction method!");
-
+  get_restict_add(rg, plat, plon, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
   nbr_add[0]  = 0;
@@ -2878,7 +2831,6 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
     }
 
 }  /*  grid_search_nbr1  */
-
 
 /*
   This routine stores the address and weight for this link in
