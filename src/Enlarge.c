@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -98,6 +98,9 @@ void *Enlarge(void *argument)
 	  xsize1 = gridInqXsize(gridID1);
 	  ysize1 = gridInqYsize(gridID1);
 	  gridsize1 = gridInqSize(gridID1);
+
+	  if ( xsize1 == 0 ) xsize1 = 1;
+	  if ( ysize1 == 0 ) ysize1 = 1;
 
 	  /* printf("%d %d %d %d\n", xsize1, ysize1, xsize2, ysize2); */
 	  if ( xsize1 == 1 && ysize1 == ysize2 && xsize1*ysize1 == gridsize1 )

@@ -38,9 +38,9 @@
 
 */
 /*
+  2011-01-07 Uwe Schulzweida: Changed remap weights from 2D to 1D array
   2009-05-25 Uwe Schulzweida: Changed restict data type from double to int
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
-  2011-01-07 Uwe Schulzweida: Changed remap weights from 2D to 1D array
  */
 
 
@@ -2040,7 +2040,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2273,7 +2273,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(rg->grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2489,7 +2489,7 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
   rlon = RESTR_SCALE(plon);
 
   /* Loop over source grid and find nearest neighbors                         */
-  /*restrict the search using search bins expand the bins to catch neighbors */
+  /* restrict the search using search bins expand the bins to catch neighbors */
 
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
@@ -2548,7 +2548,6 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
 
 
   /* Initialize distance and address arrays */
-
   for ( n = 0; n < num_neighbors; n++ )
     {
       nbr_add[n]  = 0;
@@ -2558,7 +2557,6 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
       /* Find distance to this point */
-
       distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
 	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
       /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
@@ -2687,7 +2685,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2696,7 +2694,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
       sinlat_dst = sin(rg->grid2_center_lat[dst_add]);
       sinlon_dst = sin(rg->grid2_center_lon[dst_add]);
 	
-      /* Find nearest grid points on source grid and  distances to each point */
+      /* Find nearest grid points on source grid and distances to each point */
 
       grid_search_nbr(rg, nbr_add, nbr_dist, 
 		      rg->grid2_center_lat[dst_add],
@@ -2797,7 +2795,7 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
   rlon = RESTR_SCALE(plon);
 
   /* Loop over source grid and find nearest neighbors                         */
-  /*restrict the search using search bins expand the bins to catch neighbors */
+  /* restrict the search using search bins expand the bins to catch neighbors */
 
   if ( rg->restrict_type == RESTRICT_LATITUDE )
     {
@@ -2856,7 +2854,6 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
 
 
   /* Initialize distance and address arrays */
-
   nbr_add[0]  = 0;
   nbr_dist[0] = BIGNUM;
 
@@ -2864,7 +2861,6 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
   for ( nadd = min_add; nadd <= max_add; nadd++ )
     {
       /* Find distance to this point */
-
       distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
 	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
       /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
@@ -2980,7 +2976,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, ((double)(dst_add+1))/(grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -4480,7 +4476,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 0.5, ((double)(grid1_add+1))/(grid1_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 0.5, (grid1_add+1.)/grid1_size);
 
       /* restrict searches first using search bins */
 
@@ -4752,7 +4748,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0.5, 0.5, ((double)(grid2_add+1))/(grid2_size));
+      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0.5, 0.5, (grid2_add+1.)/grid2_size);
 
       /* restrict searches first using search bins */
 
