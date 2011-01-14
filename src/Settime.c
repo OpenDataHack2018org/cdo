@@ -222,7 +222,7 @@ void *Settime(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   taxis_has_bounds = taxisHasBounds(taxisID1);
   ntsteps  = vlistNtsteps(vlistID1);
-  nvars = vlistNvars(vlistID1);
+  nvars    = vlistNvars(vlistID1);
 
   if ( ntsteps == 1 )
     {
