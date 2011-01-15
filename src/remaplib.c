@@ -1158,8 +1158,13 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	    if ( rg->grid1_bound_box[nele4  ] <= rg->bin_lats[n*2+1] &&
 		 rg->grid1_bound_box[nele4+1] >= rg->bin_lats[n*2  ] )
 	      {
-		rg->bin_addr1[n*2  ] = MIN(nele, rg->bin_addr1[n*2  ]);
-		rg->bin_addr1[n*2+1] = MAX(nele, rg->bin_addr1[n*2+1]);
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
+		{
+		  rg->bin_addr1[n*2  ] = MIN(nele, rg->bin_addr1[n*2  ]);
+		  rg->bin_addr1[n*2+1] = MAX(nele, rg->bin_addr1[n*2+1]);
+		}
 	      }
 	}
 
@@ -1175,8 +1180,13 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	    if ( rg->grid2_bound_box[nele4  ] <= rg->bin_lats[n*2+1] &&
 		 rg->grid2_bound_box[nele4+1] >= rg->bin_lats[n*2  ] )
 	      {
-		rg->bin_addr2[n*2  ] = MIN(nele, rg->bin_addr2[n*2  ]);
-		rg->bin_addr2[n*2+1] = MAX(nele, rg->bin_addr2[n*2+1]);
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
+		{
+		  rg->bin_addr2[n*2  ] = MIN(nele, rg->bin_addr2[n*2  ]);
+		  rg->bin_addr2[n*2+1] = MAX(nele, rg->bin_addr2[n*2+1]);
+		}
 	      }
 	}
 
@@ -2040,7 +2050,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
+      if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2273,7 +2283,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
+      if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2699,7 +2709,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
+      if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -2928,7 +2938,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 #endif
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
     {
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
+      if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
 
@@ -4428,7 +4438,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0, 0.5, (grid1_add+1.)/grid1_size);
+      if ( ompNumThreads == 1 ) progressStatus(0, 0.5, (grid1_add+1.)/grid1_size);
 
       /* restrict searches first using search bins */
 
@@ -4700,7 +4710,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       srch_add = srch_add2[ompthID];
 #endif
 
-      if ( ompNumThreads == 1 && cdoTimer ) progressStatus(0.5, 0.5, (grid2_add+1.)/grid2_size);
+      if ( ompNumThreads == 1 ) progressStatus(0.5, 0.5, (grid2_add+1.)/grid2_size);
 
       /* restrict searches first using search bins */
 

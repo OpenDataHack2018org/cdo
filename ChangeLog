@@ -1,3 +1,7 @@
+2011-01-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remaplib: fix data race in calculation of bin_addr (OpenMP)
+	
 2011-01-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* detrend: integer overflow; wrong result for nts > 46340 (bug fix) [report: Torsten Seifert]
