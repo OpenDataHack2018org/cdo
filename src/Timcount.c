@@ -67,7 +67,6 @@ void *Timcount(void *argument)
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
-  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
