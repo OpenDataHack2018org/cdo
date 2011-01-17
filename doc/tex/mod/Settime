@@ -124,9 +124,9 @@ INTEGER  Value of the new year
 @Item = units
 STRING   Base units of the time axis (seconds, minutes, hours, days, months, years)
 @Item = date
-STRING   Date (format YYYY-MM-DD)
+STRING   Date (format: YYYY-MM-DD)
 @Item = time
-STRING   Time (format hh:mm:ss)
+STRING   Time (format: hh:mm:ss)
 @Item = inc
 STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]
 @Item = calendar

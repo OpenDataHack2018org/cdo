@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -98,8 +98,8 @@ void *Settime(void *argument)
   SETYEAR     = cdoOperatorAdd("setyear",     0,  0, "year");
   SETMON      = cdoOperatorAdd("setmon",      0,  0, "month");
   SETDAY      = cdoOperatorAdd("setday",      0,  0, "day");
-  SETDATE     = cdoOperatorAdd("setdate",     0,  0, "date (format YYYY-MM-DD)");
-  SETTIME     = cdoOperatorAdd("settime",     0,  0, "time (format hh:mm:ss)");
+  SETDATE     = cdoOperatorAdd("setdate",     0,  0, "date (format: YYYY-MM-DD)");
+  SETTIME     = cdoOperatorAdd("settime",     0,  0, "time (format: hh:mm:ss)");
   SETTUNITS   = cdoOperatorAdd("settunits",   0,  0, "time units (seconds, minutes, hours, days, months, years)");
   SETTAXIS    = cdoOperatorAdd("settaxis",    0,  0, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   SETREFTIME  = cdoOperatorAdd("setreftime",  0,  0, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
@@ -275,7 +275,6 @@ void *Settime(void *argument)
   else if ( operatorID == SETCALENDAR )
     {
       copy_timestep = TRUE;
-
       /*
       if ( ((char *)argument)[0] == '-' )
 	cdoAbort("This operator does not work with pipes!");
@@ -434,6 +433,7 @@ void *Settime(void *argument)
 	  streamReadRecord(streamID1, array, &nmiss);
 	  streamWriteRecord(streamID2, array, nmiss);
 	}
+      
       tsID1++;
     }
 
