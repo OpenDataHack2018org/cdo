@@ -27,15 +27,10 @@
       Ydaystat   ydaystd         Multi-year daily standard deviation
 */
 
-
-#include <stdio.h>
-#include <math.h>
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "field.h"
 
 
 #define  NDAY       373
@@ -98,7 +93,6 @@ void *Ydaystat(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
 

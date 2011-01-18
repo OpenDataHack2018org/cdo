@@ -105,8 +105,6 @@ void *Mergetime(void *argument)
 	cdoAbort("Outputfile %s already exist!", ofilename);
 
   streamID2 = streamOpenWrite(ofilename, cdoFiletype());
-  if ( streamID2 < 0 )
-    cdiError(streamID2, "Open failed on %s", ofilename);
 
   if ( ! lcopy )
     {

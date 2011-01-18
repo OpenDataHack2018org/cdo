@@ -209,7 +209,6 @@ void *Scatter(void *argument)
       if ( filesuffix[0] )
 	sprintf(filename+nchars+5, "%s", filesuffix);
       streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-      if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
       streamDefVlist(streamIDs[index], vlistIDs[index]);
     }

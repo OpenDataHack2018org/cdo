@@ -324,7 +324,6 @@ void *Importbinary(void *argument)
   vlistDefTaxis(vlistID, taxisID);
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID, vlistID);
 

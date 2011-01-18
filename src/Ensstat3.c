@@ -213,7 +213,6 @@ void *Ensstat3(void *argument)
 
   if ( operfunc != func_roc ) {
     streamID2 = streamOpenWrite(ofilename, cdoFiletype());
-    if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);
 
     streamDefVlist(streamID2, vlistID2);
   }

@@ -132,7 +132,6 @@ void *Split(void *argument)
 	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+3, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
 	  streamDefVlist(streamIDs[index], vlistIDs[index]);
 	}
@@ -185,7 +184,6 @@ void *Split(void *argument)
 	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+3, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
 	  streamDefVlist(streamIDs[index], vlistIDs[index]);
 	}
@@ -221,7 +219,6 @@ void *Split(void *argument)
 	  if ( filesuffix[0] )
 	    strcat(filename, filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
 	  streamDefVlist(streamIDs[index], vlistID2);
 	}
@@ -275,7 +272,6 @@ void *Split(void *argument)
 	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+6, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
 	  streamDefVlist(streamIDs[index], vlistID2);
 	}
@@ -319,7 +315,6 @@ void *Split(void *argument)
 	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
 	  streamDefVlist(streamIDs[index], vlistID2);
 	}
@@ -362,7 +357,6 @@ void *Split(void *argument)
 	  if ( filesuffix[0] )
 	    sprintf(filename+nchars+2, "%s", filesuffix);
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamIDs[index] < 0 ) cdiError(streamIDs[index], "Open failed on %s", filename);
 
 	  streamDefVlist(streamIDs[index], vlistID2);
 	}

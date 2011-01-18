@@ -21,15 +21,10 @@
       Ymonpctl   ymonpctl        Multi-year monthly percentiles
 */
 
-
-#include <stdio.h>
-#include <math.h>
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "field.h"
 #include "percentiles.h"
 
 #define  NMONTH     17
@@ -97,7 +92,6 @@ void *Ymonpctl(void *argument)
   vlistDefTaxis(vlistID4, taxisID4);
 
   streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
-  if ( streamID4 < 0 ) cdiError(streamID4, "Open failed on %s", cdoStreamName(3));
 
   streamDefVlist(streamID4, vlistID4);
 

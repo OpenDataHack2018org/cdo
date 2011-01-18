@@ -159,7 +159,6 @@ void *Ensstat(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(ofilename, cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", ofilename);
 
   streamDefVlist(streamID2, vlistID2);
 	  

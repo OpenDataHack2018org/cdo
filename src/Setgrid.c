@@ -130,7 +130,6 @@ void *Setgrid(void *argument)
 
       maskfile = operatorArgv()[0];
       streamID = streamOpenRead(maskfile);
-      if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", maskfile);
 
       vlistID = streamInqVlist(streamID);
 
@@ -151,7 +150,6 @@ void *Setgrid(void *argument)
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
-  if ( streamID1 < 0 ) cdiError(streamID1, "Open failed on %s", cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
@@ -161,7 +159,6 @@ void *Setgrid(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   if ( operatorID == SETGRID )
     {

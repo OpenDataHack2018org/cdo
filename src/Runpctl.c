@@ -21,15 +21,10 @@
       Runpctl    runpctl         Running percentiles
 */
 
-#include <stdio.h>
-#include <math.h>
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
-#include "field.h"
 #include "nth_element.h"
 
 
@@ -82,7 +77,6 @@ void *Runpctl(void *argument)
   dpy      = calendar_dpy(calendar);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
 

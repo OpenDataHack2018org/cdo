@@ -68,14 +68,9 @@ void *Complextorect(void *argument)
   vlistDefTaxis(vlistID3, taxisID3);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
-
-
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(2));
-
   streamDefVlist(streamID3, vlistID3);
 
   gridsize = vlistGridsizeMax(vlistID1);

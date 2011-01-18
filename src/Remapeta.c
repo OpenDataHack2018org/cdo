@@ -26,7 +26,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 #include "vinterp.h"
 #include "list.h"
 #include "hetaeta.h"
@@ -443,7 +442,6 @@ void *Remapeta(void *argument)
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
 

@@ -174,9 +174,7 @@ void *Eofcoeff(void * argument)
         strcat(oname, filesuffix);
       
       streamIDs[eofID] = streamOpenWrite(oname, cdoFiletype());
-      if ( streamIDs[eofID] < 0) 
-        cdiError(streamIDs[eofID], "Open failed on %s", oname);
-      else if (cdoVerbose) 
+      if (cdoVerbose) 
         cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID+1);
       
       streamDefVlist(streamIDs[eofID], vlistID3);

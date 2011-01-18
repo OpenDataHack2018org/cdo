@@ -26,7 +26,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 
 
 /* routine corr copied from PINGO */
@@ -126,7 +125,6 @@ void *Fldstat2(void *argument)
     vlistChangeGridIndex(vlistID3, index, gridID3);
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
 

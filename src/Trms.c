@@ -166,7 +166,6 @@ void *Trms(void *argument)
   if ( vctsize == 0 ) cdoAbort("VCT missing!");
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
 

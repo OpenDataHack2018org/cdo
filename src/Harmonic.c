@@ -90,7 +90,6 @@ void *Harmonic(void *argument)
 	sprintf(filename+nchars+1, "%s", filesuffix);
 
       streamID2 = streamOpenWrite(filename, cdoFiletype());
-      if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
       streamIDs[j] = streamID2;
 

@@ -41,7 +41,6 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "functs.h"
 #include "list.h"
 
 
@@ -397,7 +396,6 @@ void *Selvar(void *argument)
   nrecs = vlistNrecs(vlistID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
 

@@ -166,7 +166,6 @@ void *Vargen(void *argument)
     vlistDefNtsteps(vlistID, 1);
 
   streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
-  if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(0));
 
   streamDefVlist(streamID, vlistID);
 

@@ -195,7 +195,6 @@ void *Filter(void *argument)
   dpy = calendar_dpy(calendar); /* should be 365 !!! */
   
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
   
   streamDefVlist(streamID2, vlistID2);
   

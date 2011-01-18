@@ -25,7 +25,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 
 
 void *Gengrid(void *argument)
@@ -143,7 +142,6 @@ void *Gengrid(void *argument)
   vlistDefTaxis(vlistID3, taxisID3);
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
 

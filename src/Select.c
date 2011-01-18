@@ -27,7 +27,6 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "functs.h"
 #include "list.h"
 #include "namelist.h"
 
@@ -672,7 +671,6 @@ void *Select(void *argument)
 	    }
 
 	  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-	  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));
 
 	  streamDefVlist(streamID2, vlistID2);
 

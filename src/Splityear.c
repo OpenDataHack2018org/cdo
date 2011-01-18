@@ -113,7 +113,6 @@ void *Splityear(void *argument)
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
 	  streamID2 = streamOpenWrite(filename, cdoFiletype());
-	  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", filename);
 
 	  streamDefVlist(streamID2, vlistID2);
 	}

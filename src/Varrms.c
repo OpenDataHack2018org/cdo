@@ -25,7 +25,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
 
 
 void *Varrms(void *argument)
@@ -95,7 +94,6 @@ void *Varrms(void *argument)
   if ( ngrids > 1 ) cdoAbort("Too many different grids!");
 
   streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(streamID3, vlistID3);
 

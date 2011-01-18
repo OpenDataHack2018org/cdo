@@ -244,7 +244,6 @@ void *Input(void *argument)
 	  vlistDefTaxis(vlistID, taxisID);
 
 	  streamID = streamOpenWrite(cdoStreamName(0), output_filetype);
-	  if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(0));
 
 	  streamDefVlist(streamID, vlistID);
 	}

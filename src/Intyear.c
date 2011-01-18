@@ -102,7 +102,6 @@ void *Intyear(void *argument)
 	sprintf(filename+nchars+4, "%s", filesuffix);
       /*	  printf("filename %s\n", filename); */
       streamIDs[iy] = streamOpenWrite(filename, cdoFiletype());
-      if ( streamIDs[iy] < 0 ) cdiError(streamIDs[iy], "Open failed on %s", filename);
 
       streamDefVlist(streamIDs[iy], vlistID3);
     }

@@ -68,13 +68,9 @@ void *Trend(void *argument)
     vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
+  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
-
-  streamID3 = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( streamID3 < 0 ) cdiError(streamID3, "Open failed on %s", cdoStreamName(2));
-
   streamDefVlist(streamID3, vlistID2);
 
   recVarID   = (int *) malloc(nrecords*sizeof(int));

@@ -34,7 +34,6 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
-#include "functs.h"
 
 
 void *Zonstat(void *argument)
@@ -118,7 +117,6 @@ void *Zonstat(void *argument)
     vlistChangeGridIndex(vlistID2, index, gridID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID2, vlistID2);
 

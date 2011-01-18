@@ -25,8 +25,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "functs.h"
-#include "field.h"
 #include "percentiles.h"
 
 
@@ -105,7 +103,6 @@ void *Ydrunpctl(void *argument)
   dpy      = calendar_dpy(calendar);
 
   streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());
-  if ( streamID4 < 0 ) cdiError(streamID4, "Open failed on %s", cdoStreamName(3));
 
   streamDefVlist(streamID4, vlistID4);
 

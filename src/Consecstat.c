@@ -37,7 +37,6 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#include "field.h"
 #include "pstream.h"
 
 enum {CONSECSUM, CONSECTS};
@@ -202,7 +201,6 @@ void *Consecstat (void *argument)
   }
 
   ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(ostreamID, ovlistID);
 

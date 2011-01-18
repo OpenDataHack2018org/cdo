@@ -71,7 +71,6 @@ void *Change_e5slm(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(1));
 
   vlistID2 = vlistDuplicate(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);

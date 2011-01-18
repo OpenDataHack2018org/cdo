@@ -71,7 +71,6 @@ void *Copy(void *argument)
       if ( indf == 0 )
 	{
 	  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-	  if ( streamID2 < 0 ) cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));
 
 	  vlistID2 = vlistDuplicate(vlistID1);
 	  taxisID2 = taxisDuplicate(taxisID1);

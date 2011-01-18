@@ -64,8 +64,6 @@ void *Cat(void *argument)
 	  if ( fileExist(cdoStreamName(nfiles)) )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
-	      if ( streamID2 < 0 )
-		cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));
 
 	      vlistID2 = streamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
@@ -81,8 +79,6 @@ void *Cat(void *argument)
 		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles));
 
 	      streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
-	      if ( streamID2 < 0 )
-		cdiError(streamID2, "Open failed on %s", cdoStreamName(nfiles));
 
 	      vlistID2 = vlistDuplicate(vlistID1);
 	      taxisID2 = taxisDuplicate(taxisID1);

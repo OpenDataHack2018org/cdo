@@ -1596,7 +1596,6 @@ void *Importcmsaf(void *argument)
   if ( vdate == 0 ) vdate = 10101;
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(streamID, vlistID);
 

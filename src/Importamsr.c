@@ -204,7 +204,6 @@ void *Importamsr(void *argument)
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( streamID < 0 ) cdiError(streamID, "Open failed on %s", cdoStreamName(1));
 
   /*
     Longitude  is 0.25*xdim-0.125    degrees east
