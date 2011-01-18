@@ -34,8 +34,6 @@
 #include "list.h"
 
 
-#define  MAX_NTR  9999
-
 void *Spectral(void *argument)
 {
   int GP2SP, GP2SPL, SP2GP, SP2GPL, SP2SP, SPCUT;
@@ -51,7 +49,7 @@ void *Spectral(void *argument)
   int gridID;
   int nmiss;
   int ncut = 0;
-  int *wnums = NULL, waves[MAX_NTR];
+  int *wnums = NULL, *waves = NULL;
   int *vars;
   int lcopy = FALSE;
   double *array1 = NULL, *array2 = NULL;
@@ -198,26 +196,24 @@ void *Spectral(void *argument)
     }
   else if ( operatorID == SPCUT )
     {
-      int i, j;
+      long i, j, maxntr;
       gridID1 = gridIDsp;
 
       operatorInputArg("wave numbers");
       if ( gridID1 != -1 )
 	{
+	  maxntr = 1+gridInqTrunc(gridID1);
 	  ncut = args2intlist(operatorArgc(), operatorArgv(), ilist);
 	  wnums = (int *) listArrayPtr(ilist);
-	  for ( i = 0; i < MAX_NTR; i++ ) waves[i] = 1;
+	  waves = (int *) malloc(maxntr*sizeof(int));
+	  for ( i = 0; i < maxntr; i++ ) waves[i] = 1;
 	  for ( i = 0; i < ncut; i++ )
 	    {
 	      j = wnums[i] - 1;
-	      if ( j < 0 || j >= MAX_NTR )
-		cdoAbort("wave number %d out of range!", wnums[i]);
+	      if ( j < 0 || j >= maxntr )
+		cdoAbort("wave number %d out of range (min=1, max=%d)!", wnums[i], maxntr);
 	      waves[j] = 0;
 	    }
-	  /*
-	  for ( i = 0; i < 200; i++ )
-	    printf("%d %d\n", i+1, waves[i]);
-	  */
 	}
       else
 	cdoAbort("No spectral data found!");
@@ -303,6 +299,7 @@ void *Spectral(void *argument)
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
   if ( vars )   free(vars);
+  if ( waves )  free(waves);
 
   listDelete(ilist);
 

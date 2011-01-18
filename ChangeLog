@@ -1,3 +1,7 @@
+2011-01-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* spcut: only correct results with continuous wave numbers starting at 1 (bug fix)
+	
 2011-01-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplib: fix data race in calculation of bin_addr (OpenMP)

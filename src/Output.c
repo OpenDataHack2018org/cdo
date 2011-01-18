@@ -347,18 +347,49 @@ void *Output(void *argument)
 		}
 	      else
 		{
-		  nout = 0;
-		  for ( i = 0; i < gridsize; i++ )
+		  double minval, maxval;
+		  minval = array[0];
+		  maxval = array[0];
+		  if ( gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 )
 		    {
-		      if ( nout == 6 )
+		      for ( i = 1; i < gridsize; i++ )
 			{
-			  nout = 0;
+			  if ( array[i] < minval ) minval = array[i];
+			  if ( array[i] > maxval ) maxval = array[i];
+			}
+		    }
+
+		  if ( gridInqType(gridID) == GRID_SPECTRAL && gridsize <= 156 /* T11 */ &&
+		       minval >= -1 && maxval <= 12 )
+		    {
+		      long m, n, ntr;
+		      double *spc = array;
+		      ntr = gridInqTrunc(gridID);
+		      for ( m = 0; m <= ntr; m++ )
+			{
+			  for ( n = m; n <= ntr; n++ )
+			    {
+			      fprintf(stdout, "%3d", (int) *spc++);
+			      fprintf(stdout, "%3d", (int) *spc++);
+			    }
 			  fprintf(stdout, "\n");
 			}
-		      fprintf(stdout, " %12.6g", array[i]);
-		      nout++;
 		    }
-		  fprintf(stdout, "\n");
+		  else
+		    {
+		      nout = 0;
+		      for ( i = 0; i < gridsize; i++ )
+			{
+			  if ( nout == 6 )
+			    {
+			      nout = 0;
+			      fprintf(stdout, "\n");
+			    }
+			  fprintf(stdout, " %12.6g", array[i]);
+			  nout++;
+			}
+		      fprintf(stdout, "\n");
+		    }
 		}
 	    }
 	  tsID++;
