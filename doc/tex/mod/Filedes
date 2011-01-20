@@ -64,7 +64,7 @@ Prints the vertical coordinate table.
 @C    130  t             temperature [K]
 @C    139  tslm1         surface temperature of land [K]
 @C @EndVerbatim
-Assume all variables of the dataset are on a T21 gausssian grid.
+Assume all variables of the dataset are on a Gausssian N16 grid.
 To print the grid description of this dataset use:
 @BeginVerbatim
    cdo griddes ifile

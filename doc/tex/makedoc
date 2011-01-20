@@ -1138,9 +1138,10 @@ sub print_description {
 	  $line =~ s/ ifiles / {\\tt ifiles} /og;
 	  $line =~ s/\@math\{([^}]*)\}/\\begin{math}\1\\end{math}/og;
 	  $line =~ s/\@file\{([^}]*)\}/{\\tt \1}/og;
-	  $line =~ s/\@oper\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@var\{([^}]*)\}/{\\it \1}/og;
+	  $line =~ s/\@oper\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@mod\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
+	  $line =~ s/\@ref\{([^}]*)\}/{\\htmlref{\1}{\1}}/og;
 	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;
 	  $line =~ s/\@cite\{([^}]*)\}/\\cite{\1}/og;
 	  $line =~ s/\@bold\{([^}]*)\}/{\\bf \1}/og;
@@ -1155,9 +1156,10 @@ sub print_description {
 	$docline =~ s/\@newline//og;
 	$docline =~ s/\@math\{([^}]*)\}/\1/og;
 	$docline =~ s/\@file\{([^}]*)\}/\1/og;
-	$docline =~ s/\@oper\{([^}]*)\}/\1/og;
 	$docline =~ s/\@var\{([^}]*)\}/\1/og;
+	$docline =~ s/\@oper\{([^}]*)\}/\1/og;
 	$docline =~ s/\@mod\{([^}]*)\}/\1/og;
+	$docline =~ s/\@ref\{([^}]*)\}/\1/og;
 	$docline =~ s/\@env\{([^}]*)\}/\1/og;
 	$docline =~ s/\@cite\{([^}]*)\}/\1/og;
 	$docline =~ s/\@bold\{([^}]*)\}/\1/og;

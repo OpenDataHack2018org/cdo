@@ -124,8 +124,8 @@ not to SCRIP!
 
 @BeginExample
 Say @file{ifile} contains fields on a quadrilateral curvilinear grid.
-To remap all fields bilinear to a T42 Gaussian grid type:
+To remap all fields bilinear to a Gaussian N32 grid, type:
 @BeginVerbatim
-   cdo remapbil,t42grid ifile ofile
+   cdo remapbil,n32 ifile ofile
 @EndVerbatim
 @EndExample

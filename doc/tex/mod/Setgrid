@@ -58,8 +58,8 @@ STRING  Target grid type (curvilinear or cell)
 @BeginExample
 Assuming a dataset has fields on a grid with 2048 elements without or with wrong
 grid description.
-To set the grid description of all input fields to a T21 Gaussian grid (2048 gridpoints) use:
+To set the grid description of all input fields to a Gaussian N32 grid (8192 gridpoints) use:
 @BeginVerbatim
-   cdo setgrid,t21grid ifile ofile
+   cdo setgrid,n32 ifile ofile
 @EndVerbatim
 @EndExample

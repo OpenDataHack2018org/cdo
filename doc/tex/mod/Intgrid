@@ -77,8 +77,8 @@ STRING  Target grid description file or name
 
 @BeginExample
 Say @file{ifile} contains fields on a regular lon/lat grid.
-To interpolate all fields bilinear to a T42 Gaussian grid use:
+To interpolate all fields bilinear to a Gaussian N32 grid use:
 @BeginVerbatim
-   cdo intgridbil,t42grid ifile ofile
+   cdo intgridbil,n32 ifile ofile
 @EndVerbatim
 @EndExample

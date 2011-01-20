@@ -66,7 +66,7 @@ latitudes from 20N to 20S on all input fields use:
 @BeginVerbatim
    cdo masklonlatbox,120,-90,20,-20 ifile ofile
 @EndVerbatim
-If the input dataset has fields on a T21 Gaussian grid, the same box can
+If the input dataset has fields on a Gaussian N16 grid, the same box can
 be masked with @oper{maskindexbox} by:
 @BeginVerbatim
    cdo maskindexbox,23,48,13,20 ifile ofile
