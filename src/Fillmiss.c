@@ -182,7 +182,7 @@ void *Fillmiss(void *argument)
       gridID1 = vlistGrid(vlistID1, index);
 
       if ( gridInqType(gridID1) == GRID_GME ||
-	   gridInqType(gridID1) == GRID_CELL )
+	   gridInqType(gridID1) == GRID_UNSTRUCTURED )
 	cdoAbort("Interpolation of %s data unsupported!", gridNamePtr(gridInqType(gridID1)) );
     }
 

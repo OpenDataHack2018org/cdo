@@ -587,7 +587,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 
   gridsize1 = gridInqSize(gridID1);
 
-  if ( gridtype != GRID_CELL ) cdoAbort("Internal problem, wrong grid type!");
+  if ( gridtype != GRID_UNSTRUCTURED ) cdoAbort("Internal problem, wrong grid type!");
 
   xvals1 = (double *) malloc(gridsize1*sizeof(double));
   yvals1 = (double *) malloc(gridsize1*sizeof(double));
@@ -805,11 +805,11 @@ void *Selbox(void *argument)
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
 	   (operatorID == SELINDEXBOX && (gridtype == GRID_GENERIC || gridtype == GRID_SINUSOIDAL) && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0 ) ||
-	   (operatorID == SELLONLATBOX && gridtype == GRID_CELL) )
+	   (operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED) )
 	{
 	  if ( operatorID == SELLONLATBOX )
 	    {
-	      if ( gridtype == GRID_CELL )
+	      if ( gridtype == GRID_UNSTRUCTURED )
 		gridID2 = gencellgrid(gridID1, &sbox[index].nvals, &sbox[index].cellidx);
 	      else
 		gridID2 = genlonlatgrid(gridID1, &sbox[index].lat1, &sbox[index].lat2, &sbox[index].lon11, 
@@ -839,7 +839,7 @@ void *Selbox(void *argument)
 
   if ( cdoVerbose )
     {
-      if ( gridtype != GRID_CELL )
+      if ( gridtype != GRID_UNSTRUCTURED )
 	cdoPrint("idx1,idx2,idy1,idy2: %d,%d,%d,%d",
 		 sbox[0].lon21+1, sbox[0].lon22+1, sbox[0].lat1+1, sbox[0].lat2+1);
     }
@@ -877,7 +877,7 @@ void *Selbox(void *argument)
 
 	      gridsize2 = gridInqSize(sbox[index].gridID2);
 
-	      if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL )
+	      if ( operatorID == SELLONLATBOX  && gridtype == GRID_UNSTRUCTURED )
 		window_cell(array1, gridID1, array2, gridsize2, sbox[index].cellidx);
 	      else
 		window(array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, 
@@ -907,7 +907,7 @@ void *Selbox(void *argument)
 
   if ( sbox )
     {
-      if ( operatorID == SELLONLATBOX  && gridtype == GRID_CELL )
+      if ( operatorID == SELLONLATBOX  && gridtype == GRID_UNSTRUCTURED )
 	{
 	  for ( index = 0; index < ngrids; index++ )
 	    if ( sbox[index].cellidx ) free(sbox[index].cellidx);

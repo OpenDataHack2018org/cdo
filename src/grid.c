@@ -824,7 +824,7 @@ int gridToCell(int gridID1)
 
   gridtype = gridInqType(gridID1);
   gridsize = gridInqSize(gridID1);
-  gridID2  = gridCreate(GRID_CELL, gridsize);
+  gridID2  = gridCreate(GRID_UNSTRUCTURED, gridsize);
   gridDefPrec(gridID2, DATATYPE_FLT32);
 	  
   switch (gridtype)
@@ -1172,12 +1172,12 @@ int gridGenArea(int gridID, double *area)
        gridtype != GRID_SINUSOIDAL  &&
        gridtype != GRID_GME         &&
        gridtype != GRID_CURVILINEAR &&
-       gridtype != GRID_CELL )
+       gridtype != GRID_UNSTRUCTURED )
     {
       cdoAbort("Internal error! Unsupported gridtype: %s", gridNamePtr(gridtype)); 
     }
 
-  if ( gridtype != GRID_CELL && gridtype != GRID_CURVILINEAR )
+  if ( gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR )
     {
       if ( gridtype == GRID_GME )
 	{
@@ -1196,7 +1196,7 @@ int gridGenArea(int gridID, double *area)
 
   gridtype = gridInqType(gridID);
 
-  if ( gridtype == GRID_CELL )
+  if ( gridtype == GRID_UNSTRUCTURED )
     nv = gridInqNvertex(gridID);
   else
     nv = 4;
@@ -1451,7 +1451,7 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_LCC         ||
 	   gridtype == GRID_GME         ||
 	   gridtype == GRID_CURVILINEAR ||
-	   gridtype == GRID_CELL )
+	   gridtype == GRID_UNSTRUCTURED )
 	{
 	  a_status = gridGenArea(gridID, grid_area);
 	}

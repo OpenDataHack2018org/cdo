@@ -428,7 +428,7 @@ void *Remap(void *argument)
 	   gridInqType(gridID1) != GRID_SINUSOIDAL  &&
 	   gridInqType(gridID1) != GRID_GME         &&
 	   gridInqType(gridID1) != GRID_CURVILINEAR &&
-	   gridInqType(gridID1) != GRID_CELL )
+	   gridInqType(gridID1) != GRID_UNSTRUCTURED )
 	{
 	  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
@@ -744,7 +744,7 @@ void *Remap(void *argument)
 		    remaps[r].grid.luse_grid1_area = FALSE;
 		    remaps[r].grid.luse_grid2_area = FALSE;
 		  */
-		  if ( gridInqType(gridID1) != GRID_CELL && lremap_num_srch_bins == FALSE )
+		  if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == FALSE )
 		    {
 		      if ( !remap_extrapolate && (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) )
 			{

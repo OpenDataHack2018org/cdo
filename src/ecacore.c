@@ -1056,7 +1056,7 @@ void eca4(const ECA_REQUEST_4 *request)
   recLevelID  = (int *) malloc(nrecords*sizeof(int));
 
   gridtype = gridInqType(gridID);
-  if ( gridtype != GRID_CELL && gridtype != GRID_CURVILINEAR ) 
+  if ( gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR ) 
     {
       if ( gridtype == GRID_GME )
         gridID = gridToCell(gridID);

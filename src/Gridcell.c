@@ -157,7 +157,7 @@ void *Gridcell(void *argument)
 	   gridtype == GRID_LCC         ||
 	   gridtype == GRID_GME         ||
 	   gridtype == GRID_CURVILINEAR ||
-	   gridtype == GRID_CELL )
+	   gridtype == GRID_UNSTRUCTURED )
 	{
 	  if ( gridHasArea(gridID) )
 	    {

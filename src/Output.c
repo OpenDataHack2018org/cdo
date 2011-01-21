@@ -150,7 +150,7 @@ void *Output(void *argument)
 	{
 	  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToCell(gridID);
 
-	  if ( gridInqType(gridID) != GRID_CELL && gridInqType(gridID) != GRID_CURVILINEAR )
+	  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
 	    gridID = gridToCurvilinear(gridID);
 
 	  grid_center_lon = (double *) malloc(gridsize*sizeof(double));

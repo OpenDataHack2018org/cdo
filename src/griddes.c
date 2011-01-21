@@ -280,7 +280,7 @@ int gridDefine(grid_t grid)
 	break;
       }
     case GRID_CURVILINEAR:
-    case GRID_CELL:
+    case GRID_UNSTRUCTURED:
       {
 	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
 
@@ -675,8 +675,10 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    }
 	  else if ( cmpstr(pline, "spectral", len)  == 0 )
 	    grid.type = GRID_SPECTRAL;
+	  else if ( cmpstr(pline, "unstructured", len)  == 0 )
+	    grid.type = GRID_UNSTRUCTURED;
 	  else if ( cmpstr(pline, "cell", len)  == 0 )
-	    grid.type = GRID_CELL;
+	    grid.type = GRID_UNSTRUCTURED;
 	  else if ( cmpstr(pline, "gme", len)  == 0 )
 	    grid.type = GRID_GME;
 	  else if ( cmpstr(pline, "lcc2", len)  == 0 )
@@ -970,7 +972,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  double fval;
 	  char *endptr;
 
-	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_CELL )
+	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_UNSTRUCTURED )
 	    size = grid.size;
 	  else
 	    size = grid.xsize;
@@ -1007,7 +1009,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  double fval;
 	  char *endptr;
 
-	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_CELL )
+	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_UNSTRUCTURED )
 	    size = grid.size;
 	  else
 	    size = grid.ysize;
@@ -1049,7 +1051,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
 	    }
 
-	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_CELL )
+	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_UNSTRUCTURED )
 	    size = grid.size;
 	  else
 	    size = grid.xsize;
@@ -1094,7 +1096,7 @@ int gridFromFile(FILE *gfp, const char *dname)
 	      if ( grid.type == GRID_CURVILINEAR ) grid.nvertex = 4;
 	    }
 
-	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_CELL )
+	  if ( grid.type == GRID_CURVILINEAR || grid.type == GRID_UNSTRUCTURED )
 	    size = grid.size;
 	  else
 	    size = grid.ysize;

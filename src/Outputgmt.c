@@ -639,7 +639,7 @@ void *Outputgmt(void *argument)
 
   if ( gridInqType(gridID) == GRID_GME ) gridID = gridToCell(gridID);
 
-  if ( gridInqType(gridID) != GRID_CELL && gridInqType(gridID) != GRID_CURVILINEAR )
+  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
     {
       gridID = gridToCurvilinear(gridID);
       lgrid_gen_bounds = TRUE;
@@ -656,7 +656,7 @@ void *Outputgmt(void *argument)
       gridInqMaskGME(gridID, grid_mask);
     }
 
-  if ( gridInqType(gridID) != GRID_CELL )
+  if ( gridInqType(gridID) != GRID_UNSTRUCTURED )
     {
       if ( nlon == 1 && nlat  > 1 && nlev == 1 ) lhov = TRUE;
       if ( nlon == 1 && nlat  > 1 && nlev  > 1 ) lzon = TRUE;
@@ -683,7 +683,7 @@ void *Outputgmt(void *argument)
 	cdoAbort("Bounds not available hovmoeller data!");
     }
 
-  if ( gridInqType(gridID) == GRID_CELL )
+  if ( gridInqType(gridID) == GRID_UNSTRUCTURED )
     gridcorners = gridInqNvertex(gridID);
   else
     gridcorners = 4;

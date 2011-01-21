@@ -795,19 +795,19 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
     {
-      if ( gridInqType(rg->gridID1) == GRID_CELL )
+      if ( gridInqType(rg->gridID1) == GRID_UNSTRUCTURED )
 	{
 	  rg->luse_grid1_corners  = TRUE;
 	  rg->lneed_grid1_corners = FALSE; /* full grid search */
 	}
-      if ( gridInqType(rg->gridID2) == GRID_CELL )
+      if ( gridInqType(rg->gridID2) == GRID_UNSTRUCTURED )
 	{
 	  rg->luse_grid2_corners  = TRUE;
 	  rg->lneed_grid2_corners = FALSE; /* full grid search */
 	}
     }
 
-  if ( gridInqType(rg->gridID1) != GRID_CELL && gridInqType(rg->gridID1) != GRID_CURVILINEAR )
+  if ( gridInqType(rg->gridID1) != GRID_UNSTRUCTURED && gridInqType(rg->gridID1) != GRID_CURVILINEAR )
     {
       if ( gridInqType(rg->gridID1) == GRID_GME )
 	{
@@ -825,7 +825,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	}
     }
 
-  if ( gridInqType(rg->gridID2) != GRID_CELL && gridInqType(rg->gridID2) != GRID_CURVILINEAR )
+  if ( gridInqType(rg->gridID2) != GRID_UNSTRUCTURED && gridInqType(rg->gridID2) != GRID_CURVILINEAR )
     {
       if ( gridInqType(rg->gridID2) == GRID_GME )
 	{
@@ -849,22 +849,22 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   rg->grid1_is_cyclic = gridIsCircular(gridID1);
   rg->grid2_is_cyclic = gridIsCircular(gridID2);
 
-  if ( gridInqType(gridID1) == GRID_CELL )
+  if ( gridInqType(gridID1) == GRID_UNSTRUCTURED )
     rg->grid1_rank = 1;
   else
     rg->grid1_rank = 2;
 
-  if ( gridInqType(gridID2) == GRID_CELL )
+  if ( gridInqType(gridID2) == GRID_UNSTRUCTURED )
     rg->grid2_rank = 1;
   else
     rg->grid2_rank = 2;
 
-  if ( gridInqType(gridID1) == GRID_CELL )
+  if ( gridInqType(gridID1) == GRID_UNSTRUCTURED )
     rg->grid1_corners = gridInqNvertex(gridID1);
   else
     rg->grid1_corners = 4;
 
-  if ( gridInqType(gridID2) == GRID_CELL )
+  if ( gridInqType(gridID2) == GRID_UNSTRUCTURED )
     rg->grid2_corners = gridInqNvertex(gridID2);
   else
     rg->grid2_corners = 4;

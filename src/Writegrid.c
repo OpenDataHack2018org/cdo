@@ -49,7 +49,7 @@ void *Writegrid(void *argument)
 
   if ( gridtype == GRID_GME ) gridID = gridToCell(gridID);
 
-  if ( gridtype != GRID_CURVILINEAR && gridtype != GRID_CELL )
+  if ( gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED )
     gridID = gridToCurvilinear(gridID);
 
   if ( gridInqXbounds(gridID, NULL) == 0 || gridInqYbounds(gridID, NULL) == 0 )

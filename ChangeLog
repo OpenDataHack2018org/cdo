@@ -1,3 +1,7 @@
+2011-01-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+        * changed grid name GRID_CELL to GRID_UNSTRUCTURED
+
 2011-01-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* spcut: only correct results with continuous wave numbers starting at 1 (bug fix)

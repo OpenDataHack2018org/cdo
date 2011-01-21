@@ -99,7 +99,7 @@ void *Arithlat(void *argument)
 		  gridID = gridToCurvilinear(gridID);
 		}
 	      else if ( gridtype == GRID_CURVILINEAR ||
-			gridtype == GRID_CELL )
+			gridtype == GRID_UNSTRUCTURED )
 		{
 		  /* No conversion necessary */
 		}

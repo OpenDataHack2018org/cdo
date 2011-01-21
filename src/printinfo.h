@@ -260,7 +260,7 @@ void printGridInfo(int vlistID)
 	  nd = gridInqGMEnd(gridID);
 	  fprintf(stdout, "size      : dim = %d  nd = %d  ni = %d\n", gridsize, nd, ni);
 	}
-      else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_CELL )
+      else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
 	{
 	  if ( gridtype == GRID_CURVILINEAR )
 	    fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
@@ -337,7 +337,7 @@ void printGridInfo(int vlistID)
 	    }
 	}
 
-      if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_CELL ||
+      if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED ||
 	   gridtype == GRID_GENERIC || gridtype == GRID_LCC )
 	{
 	  if ( gridInqXvals(gridID, NULL) || gridInqYvals(gridID, NULL) || gridHasArea(gridID) ||

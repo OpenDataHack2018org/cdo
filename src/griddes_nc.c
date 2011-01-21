@@ -90,7 +90,7 @@ int gridFromNCfile(const char *gridfile)
 
       if ( grid_rank == 1 )
 	{
-	  grid.type = GRID_CELL;
+	  grid.type = GRID_UNSTRUCTURED;
 	  if ( (size_t)grid_dims[0] != grid_size ) return(gridID);
 	}
       else
@@ -191,7 +191,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
       grid_dims[0] = gridInqXsize(gridID);
       grid_dims[1] = gridInqYsize(gridID);
     }
-  else if ( gridtype == GRID_CELL )
+  else if ( gridtype == GRID_UNSTRUCTURED )
     {
       grid_rank = 1;
       grid_dims[0] = gridInqSize(gridID);

@@ -75,11 +75,12 @@ void *Setgrid(void *argument)
     {
       gridname = operatorArgv()[0];
 
-      if      ( strcmp(gridname, "curvilinear") == 0 ) gridtype = GRID_CURVILINEAR;
-      else if ( strcmp(gridname, "cell") == 0 )        gridtype = GRID_CELL;
-      else if ( strcmp(gridname, "lonlat") == 0 )      gridtype = GRID_LONLAT;
-      else if ( strcmp(gridname, "gaussian") == 0 )    gridtype = GRID_GAUSSIAN;
-      else if ( strcmp(gridname, "regular") == 0 )    {gridtype = GRID_GAUSSIAN; lregular = 1;}
+      if      ( strcmp(gridname, "curvilinear") == 0 )  gridtype = GRID_CURVILINEAR;
+      else if ( strcmp(gridname, "cell") == 0 )         gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "unstructured") == 0 ) gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "lonlat") == 0 )       gridtype = GRID_LONLAT;
+      else if ( strcmp(gridname, "gaussian") == 0 )     gridtype = GRID_GAUSSIAN;
+      else if ( strcmp(gridname, "regular") == 0 )     {gridtype = GRID_GAUSSIAN; lregular = 1;}
       else cdoAbort("Unsupported grid name: %s", gridname);
     }
   else if ( operatorID == SETGRIDAREA )
@@ -193,7 +194,7 @@ void *Setgrid(void *argument)
 	  else
 	    {
 	      if      ( gridtype == GRID_CURVILINEAR ) gridID2 = gridToCurvilinear(gridID1);
-	      else if ( gridtype == GRID_CELL )        gridID2 = gridToCell(gridID1);
+	      else if ( gridtype == GRID_UNSTRUCTURED )        gridID2 = gridToCell(gridID1);
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 
