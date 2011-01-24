@@ -112,7 +112,7 @@ void *Intyear(void *argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
       nrecs2 = streamInqTimestep(streamID2, tsID);
-      if ( nrecs2 == 0 ) cdoAbort("Not enough timesteps in second inputfile!");
+      if ( nrecs2 == 0 ) cdoAbort("Too few timesteps in second inputfile!");
 
       vtime  = taxisInqVtime(taxisID1);
       vdate1 = taxisInqVdate(taxisID1);

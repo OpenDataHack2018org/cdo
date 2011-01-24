@@ -112,7 +112,7 @@ void *Settime(void *argument)
 
   if ( operatorID == SETTAXIS || operatorID == SETREFTIME )
     {
-      if ( operatorArgc() < 2 ) cdoAbort("Not enough arguments!");
+      if ( operatorArgc() < 2 ) cdoAbort("Too few arguments!");
 
       datestr = operatorArgv()[0];
       timestr = operatorArgv()[1];
@@ -150,7 +150,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETDATE )
     {
-      if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
+      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
       datestr = operatorArgv()[0];
       if ( strchr(datestr, '-') )
 	{
@@ -164,7 +164,7 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETTIME )
     {
-      if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
+      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
       timestr = operatorArgv()[0];
 
       if ( strchr(timestr, ':') )

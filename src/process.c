@@ -412,7 +412,7 @@ int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
     {
       if ( globArgc >= argc )
 	{
-	  Errorc("Not enough arguments. Check command line!");
+	  Errorc("Too few arguments. Check command line!");
 	  break;
 	}
       if ( argv[globArgc][0] == '-' )
@@ -529,7 +529,7 @@ void checkStreamCnt(void)
 	   " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
   if ( Process[processID].streamCnt < streamCnt )
-    Errorc("Not enough streams specified!"
+    Errorc("Too few streams specified!"
 	   " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
 

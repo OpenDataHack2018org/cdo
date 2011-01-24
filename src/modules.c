@@ -356,7 +356,7 @@ void *Wct(void *argument);
 #define  SetOperators           {"setpartab", "setpartabv", "setcode", "setname", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
-#define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask"}
+#define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
 #define  SetrcanameOperators    {"setrcaname"}

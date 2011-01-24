@@ -61,7 +61,7 @@ void *Deltime(void *argument)
       int nsel;
       char *sarg;
       nsel = operatorArgc();
-      if ( nsel < 1 ) cdoAbort("Not enough arguments!");
+      if ( nsel < 1 ) cdoAbort("Too few arguments!");
       if ( nsel > 1 ) cdoAbort("Too many arguments!");
       sarg = operatorArgv()[0];
       dday = atoi(sarg);

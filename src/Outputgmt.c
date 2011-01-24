@@ -948,7 +948,7 @@ void *Outputgmt(void *argument)
 	    }
 	  else if ( operatorID == OUTPUTVECTOR )
 	    {
-	      if ( nrecs < 2 ) cdoAbort("No enough fields!");
+	      if ( nrecs < 2 ) cdoAbort("Too few fields!");
 
 	      memcpy(uf, array, gridsize*sizeof(double));
 	      streamInqRecord(streamID, &varID, &levelID);

@@ -33,7 +33,7 @@
 
 void *Setgrid(void *argument)
 {
-  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK;
+  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK, SETGRIDNUMBER;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
@@ -49,6 +49,7 @@ void *Setgrid(void *argument)
   long areasize = 0;
   long masksize = 0;
   int lregular = 0;
+  int number = 0, position = 0;
   char *gridname = NULL;
   double *gridmask = NULL;
   double *areaweight = NULL;
@@ -61,6 +62,7 @@ void *Setgrid(void *argument)
   SETGRIDAREA   = cdoOperatorAdd("setgridarea",   0, 0, "filename with area weights");
   SETGRIDMASK   = cdoOperatorAdd("setgridmask",   0, 0, "filename with grid mask");
   UNSETGRIDMASK = cdoOperatorAdd("unsetgridmask", 0, 0, NULL);
+  SETGRIDNUMBER = cdoOperatorAdd("setgridnumber", 0, 0, "grid number and optionally grid position");
 
   operatorID = cdoOperatorID();
 
@@ -69,10 +71,12 @@ void *Setgrid(void *argument)
 
   if ( operatorID == SETGRID )
     {
+      operatorCheckArgc(1);
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
     }
   else if ( operatorID == SETGRIDTYPE )
     {
+      operatorCheckArgc(1);
       gridname = operatorArgv()[0];
 
       if      ( strcmp(gridname, "curvilinear") == 0 )  gridtype = GRID_CURVILINEAR;
@@ -88,6 +92,7 @@ void *Setgrid(void *argument)
       int streamID, vlistID, gridID;
       char *areafile;
 
+      operatorCheckArgc(1);
       areafile = operatorArgv()[0];
 
       streamID = streamOpenRead(areafile);
@@ -129,6 +134,7 @@ void *Setgrid(void *argument)
       char *maskfile;
       double missval;
 
+      operatorCheckArgc(1);
       maskfile = operatorArgv()[0];
       streamID = streamOpenRead(maskfile);
 
@@ -149,6 +155,18 @@ void *Setgrid(void *argument)
       for ( i = 0; i < masksize; i++ )
 	if ( DBL_IS_EQUAL(gridmask[i], missval) ) gridmask[i] = 0;
     }
+  else if ( operatorID == SETGRIDNUMBER )
+    {
+      if ( operatorArgc() >= 1 && operatorArgc() <= 2 )
+	{
+	  number = atoi(operatorArgv()[0]);
+	  if ( operatorArgc() == 2 ) position = atoi(operatorArgv()[1]);
+	}
+      else
+	{
+	  operatorCheckArgc(1);
+	}
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -163,6 +181,27 @@ void *Setgrid(void *argument)
 
   if ( operatorID == SETGRID )
     {
+      found = 0;
+      ngrids = vlistNgrids(vlistID1);
+      for ( index = 0; index < ngrids; index++ )
+	{
+	  gridID1 = vlistGrid(vlistID1, index);
+
+	  if ( gridInqSize(gridID1) == gridInqSize(gridID2) )
+	    {
+	      vlistChangeGridIndex(vlistID2, index, gridID2);
+	      found++;
+	    }
+	}
+      if ( ! found ) cdoWarning("No grid with %d points found!", gridInqSize(gridID2));
+    }
+  else if ( operatorID == SETGRIDNUMBER )
+    {
+      gridID1 = vlistGrid(vlistID1, 0);
+      gridID2 = gridCreate(GRID_NUMBER, gridInqSize(gridID1));
+      gridDefNumber(gridID2, number);
+      gridDefPosition(gridID2, position);
+
       found = 0;
       ngrids = vlistNgrids(vlistID1);
       for ( index = 0; index < ngrids; index++ )

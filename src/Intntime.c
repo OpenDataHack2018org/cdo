@@ -55,7 +55,7 @@ void *Intntime(void *argument)
   cdoInitialize(argument);
 
   operatorInputArg("number of timesteps between 2 timesteps");
-  if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
+  if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
   numts = atoi(operatorArgv()[0]);
   if ( numts < 2 ) cdoAbort("parameter must be greater than 1!");

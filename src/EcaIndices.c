@@ -962,7 +962,7 @@ void *EcaPd(void *argument)
     {
       operatorInputArg("daily precipitation amount threshold in [mm]");
 
-      if ( operatorArgc() < 1 ) cdoAbort("Not enough arguments!");
+      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
       if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
       threshold = atof(operatorArgv()[0]);

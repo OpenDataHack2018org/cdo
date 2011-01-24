@@ -260,6 +260,15 @@ void printGridInfo(int vlistID)
 	  nd = gridInqGMEnd(gridID);
 	  fprintf(stdout, "size      : dim = %d  nd = %d  ni = %d\n", gridsize, nd, ni);
 	}
+      else if ( gridtype == GRID_NUMBER )
+	{
+	  int number, position;
+	  number   = gridInqNumber(gridID);
+	  position = gridInqPosition(gridID);
+	  fprintf(stdout, "size      : dim = %d\n", gridsize);
+	  fprintf(stdout, "%*s", nbyte0, "");
+	  fprintf(stdout, "grid      : number = %d  position = %d\n", number, position);
+	}
       else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
 	{
 	  if ( gridtype == GRID_CURVILINEAR )

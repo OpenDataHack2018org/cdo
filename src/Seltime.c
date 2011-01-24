@@ -187,7 +187,7 @@ void *Seltime(void *argument)
       int set2 = TRUE;
 
       nsel = operatorArgc();
-      if ( nsel < 1 ) cdoAbort("Not enough arguments!");
+      if ( nsel < 1 ) cdoAbort("Too few arguments!");
       for ( i = 0; i < nsel; i++)
 	{
 	  if      ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
@@ -239,7 +239,7 @@ void *Seltime(void *argument)
   else if ( operatorID == SELTIME )
     {
       nsel = operatorArgc();
-      if ( nsel < 1 ) cdoAbort("Not enough arguments!");
+      if ( nsel < 1 ) cdoAbort("Too few arguments!");
       for ( i = 0; i < nsel; i++ )
 	{
 	  if ( strchr(operatorArgv()[i], ':') )
