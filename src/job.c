@@ -398,7 +398,7 @@ int ftpget(int flag, const char *url, const char *path, const char *target, cons
     NULL, /* name to store the file as if succesful */
     NULL
   };
-  char filename[8196];
+  char filename[8192];
   char ftpcommand[1024];
   char errorbuffer[CURL_ERROR_SIZE];
   int stdout_is_tty = 0;
@@ -514,7 +514,7 @@ int ftprmd(const char *url, const char *path)
   CURL *curl;
   CURLcode res;
   struct curl_slist* commands = NULL ;
-  char filename[8196];
+  char filename[8192];
   char ftpcommand[1024];
   char errorbuffer[CURL_ERROR_SIZE];
 

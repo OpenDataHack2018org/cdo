@@ -175,7 +175,7 @@ void *Timstat(void *argument)
 
   if ( cdoDiag )
     {
-      char filename[4096];
+      char filename[8192];
 
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");

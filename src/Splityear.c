@@ -38,7 +38,7 @@ void *Splityear(void *argument)
   int tsID, tsID2, recID, levelID;
   int vlistID1, vlistID2;
   char filesuffix[32];
-  char filename[1024];
+  char filename[8192];
   int vdate;
   int day;
   int year1, year2;

@@ -45,7 +45,7 @@ void *Harmonic(void *argument)
   int vdate = 0, vtime = 0;
   int n_out, nout, n;
   char filesuffix[32];
-  char filename[1024];
+  char filename[8192];
   double missval;
   double sine, cosine;
   double *array;

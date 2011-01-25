@@ -49,7 +49,7 @@ void *Split(void *argument)
   int  itmp[999];
   double ftmp[999];
   char filesuffix[32];
-  char filename[1024];
+  char filename[8192];
   int nsplit = 0;
   int index;
   int i;
@@ -128,9 +128,25 @@ void *Split(void *argument)
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;
 
-	  sprintf(filename+nchars, "%03d", codes[index]);
-	  if ( filesuffix[0] )
-	    sprintf(filename+nchars+3, "%s", filesuffix);
+	  if ( codes[index] > 9999 )
+	    {
+	      sprintf(filename+nchars, "%05d", codes[index]);
+	      if ( filesuffix[0] )
+		sprintf(filename+nchars+5, "%s", filesuffix);
+	    }
+	  else if ( codes[index] > 999 )
+	    {
+	      sprintf(filename+nchars, "%04d", codes[index]);
+	      if ( filesuffix[0] )
+		sprintf(filename+nchars+4, "%s", filesuffix);
+	    }
+	  else
+	    {
+	      sprintf(filename+nchars, "%03d", codes[index]);
+	      if ( filesuffix[0] )
+		sprintf(filename+nchars+3, "%s", filesuffix);
+	    }
+
 	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
 
 	  streamDefVlist(streamIDs[index], vlistIDs[index]);

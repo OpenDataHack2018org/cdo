@@ -46,7 +46,7 @@ void *Intyear(void *argument)
   int *iyears, nyears = 0, *streamIDs = NULL;
   int nchars;
   char filesuffix[32];
-  char filename[1024];
+  char filename[8192];
   double fac1, fac2;
   double missval1, missval2;
   double *array1, *array2, *array3;

@@ -46,7 +46,7 @@ void *Splittime(void *argument)
   int vlistID1, vlistID2;
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   char filesuffix[32];
-  char filename[1024];
+  char filename[8192];
   int index = 0;
   int i;
   int taxisID1, taxisID2;

@@ -107,7 +107,7 @@ void *Scatter(void *argument)
   int tsID, recID, levelID;
   int vlistID1;
   char filesuffix[32];
-  char filename[4096];
+  char filename[8192];
   int index;
   int nsplit, nsx, nsy, ix, iy;
   int xinc, yinc;

@@ -49,7 +49,7 @@ void *Splitsel(void *argument)
   /* from Splittime.c */
   int nchars;
   char filesuffix[32];
-  char filename[1024];
+  char filename[8192];
   int index = 0;
   int lcopy = FALSE;
   double *array = NULL;

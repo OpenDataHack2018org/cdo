@@ -37,7 +37,7 @@ void *Splitrec(void *argument)
   int varID2, levelID2;
   int vlistID1, vlistID2;
   char filesuffix[32];
-  char filename[4096];
+  char filename[8192];
   int index;
   int lcopy = FALSE;
   int gridsize;
