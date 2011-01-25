@@ -157,7 +157,7 @@ AC_ARG_WITH([jasper],
                           AS_IF([test -d "$JASPER_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$JASPER_ROOT/lib"
                                  CPPFLAGS="$CPPFLAGS -I$JASPER_ROOT/include"
-                                 AC_SEARCH_LIBS([jas_init],
+                                 AC_SEARCH_LIBS([jas_stream_memopen],
                                                 [jasper],
                                                 [AC_DEFINE([HAVE_LIBJASPER],[1],[Define to 1 for JPEG compression for GRIB2])],
                                                 [AC_MSG_ERROR([Could not link to jasper library! Required for GRIB_API])])

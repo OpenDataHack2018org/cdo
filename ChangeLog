@@ -1,3 +1,7 @@
+2011-01-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* splitcode: added support for code numbers > 999
+	
 2011-01-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * changed grid name GRID_CELL to GRID_UNSTRUCTURED
