@@ -3398,8 +3398,8 @@ static char *GradsdesHelp[] = {
     "    <operator>  ifile",
     "",
     "DESCRIPTION",
-    "    Creates a GrADS data descriptor file. Supported file formats are GRIB,",
-    "    SERVICE, EXTRA and IEG. For GRIB files the GrADS map file is also ",
+    "    Creates a GrADS data descriptor file. Supported file formats are GRIB1,",
+    "    SERVICE, EXTRA and IEG. For GRIB1 files the GrADS map file is also ",
     "    generated. For SERVICE and EXTRA files the grid have to be specified with",
     "    the CDO option '-g <grid>'. This module takes ifile in order to create ",
     "    filenames for the descriptor (ifile.ctl) and the map (ifile.gmp) file.",
@@ -3408,10 +3408,10 @@ static char *GradsdesHelp[] = {
     "OPERATORS",
     "    gradsdes1  GrADS data descriptor file (version 1 GRIB map)",
     "               Creates a GrADS data descriptor file. Generated a machine",
-    "               specific version 1 GrADS map file for GRIB datasets.",
+    "               specific version 1 GrADS map file for GRIB1 datasets.",
     "    gradsdes2  GrADS data descriptor file (version 2 GRIB map)",
     "               Creates a GrADS data descriptor file. Generated a machine ",
-    "               independent version 2 GrADS map file for GRIB datasets.",
+    "               independent version 2 GrADS map file for GRIB1 datasets.",
     "               This map file can be used only with GrADS version 1.8 or newer. ",
     NULL
 };

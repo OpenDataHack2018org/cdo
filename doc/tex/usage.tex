@@ -24,7 +24,7 @@ The following options are available for all operators:
               \hline
               \rowcolor[gray]{.9}
                 \sl $<$format$>$ & \sl $<$nbits$>$ \\
-                {\tt grb}           & {\tt 1 - 32} \\
+                {\tt grb, grb2}     & {\tt 1 - 24} \\
                 {\tt nc, nc2, nc4}  & {\tt I8/I16/I32/F32/F64}   \\
                 {\tt srv, ext, ieg} & {\tt F32/F64}   \\
               \hline
@@ -41,13 +41,14 @@ The following options are available for all operators:
               \hline
               \rowcolor[gray]{.9}
               {\bf File format}          & \sl $<$format$>$ \\
-               GRIB version 1            & {\tt grb} \\
-               netCDF                    & {\tt nc}  \\
-               netCDF version 2 (64-bit) & {\tt nc2} \\
-               netCDF-4 classic (HDF5)   & {\tt nc4} \\
-               SERVICE                   & {\tt srv} \\
-               EXTRA                     & {\tt ext} \\
-               IEG                       & {\tt ieg} \\
+               GRIB version 1            & {\tt grb}  \\
+               GRIB version 2            & {\tt grb2} \\
+               netCDF                    & {\tt nc}   \\
+               netCDF version 2 (64-bit) & {\tt nc2}  \\
+               netCDF-4 classic (HDF5)   & {\tt nc4}  \\
+               SERVICE                   & {\tt srv}  \\
+               EXTRA                     & {\tt ext}  \\
+               IEG                       & {\tt ieg}  \\
               \hline
               \end{tabular}
               \vspace*{1mm}
@@ -64,7 +65,7 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}\sl -Q}
          \> Sort netCDF variable names. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -R}
-         \> Convert GRIB data from reduced to regular grid. \\
+         \> Convert GRIB1 data from reduced to regular grid (only with cgribex lib). \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -r}
          \> Generate a relative time axis. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -s}
@@ -77,7 +78,9 @@ The following options are available for all operators:
 \makebox[1.5in][l]{\hspace*{1cm}\sl -v}
          \> Print extra details for some operators. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -z szip}
-         \> Compress GRIB records with szip. \\
+         \> SZIP compression of GRIB1 records. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl \ \ jpeg}
+         \> JPEG compression of GRIB2 records. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl \ \ zip}
          \> Deflate compression of netCDF4 variables. \\
 \end{tabbing}

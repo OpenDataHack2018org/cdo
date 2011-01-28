@@ -186,7 +186,7 @@ void usage(void)
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4; F32/F64 for srv/ext/ieg; 1 - 32 for grb/grb2)\n");
+  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4; F32/F64 for srv/ext/ieg; 1 - 24 for grb/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
   fprintf(stderr, "    -f <format>    Format of the output file. (grb, grb2, nc, nc2, nc4, srv, ext or ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
@@ -211,7 +211,7 @@ void usage(void)
   fprintf(stderr, "                   (4/8 for nc, nc2, nc4, srv, ext, ieg; 1/2/3 for grb)\n");
   */
   fprintf(stderr, "    -Q             Sort netCDF variable names\n");
-  fprintf(stderr, "    -R             Convert GRIB data from reduced to regular grid\n");
+  fprintf(stderr, "    -R             Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
   fprintf(stderr, "                   contains the number of non missing values for each output period.\n");
@@ -411,7 +411,7 @@ void setDefaultDataType(char *datatypestr)
 	  else
 	    {
 	      fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-	      fprintf(stderr, "Use 32/64 for filetype nc/srv/ext/ieg and 1-32 for grb/grb2.\n");
+	      fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc/nc2/nc4; F32/F64 for srv/ext/ieg; 1 - 24 for grb/grb2.\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
@@ -569,7 +569,7 @@ void setDefaultFileType(char *filetypestr, int labort)
 	      fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
 	      fprintf(stderr, "Use format[_nbits] with:\n");
 	      fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, srv, ext or ieg\n");
-	      fprintf(stderr, "    nbits  = 32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 32 for grb/grb2\n");
+	      fprintf(stderr, "    nbits  = 32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 24 for grb/grb2\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
