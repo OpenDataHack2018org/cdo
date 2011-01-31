@@ -25,16 +25,18 @@ void *Isosurface(void *argument)
 {
   int streamID1, streamID2;
   int vlistID1, vlistID2;
-  int gridsize;
+  int gridsize, nlevel;
   int recID, nrecs;
   int gridID;
-  int i;
+  int i, offset;
   int tsID, varID, levelID;
   int nmiss, nvars;
   int zaxisID, nzaxis;
   double missval;
-  field_t *vars1 = NULL, *vars2 = NULL, *samp1 = NULL;
+  int *vars = NULL;
+  field_t *vars1 = NULL;
   field_t field;
+  double *single;
   int taxisID1, taxisID2;
 
   cdoInitialize(argument);
@@ -69,24 +71,21 @@ void *Isosurface(void *argument)
 
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
+  vars  =     (int *) malloc(nvars*sizeof(int));
   vars1 = (field_t *) malloc(nvars*sizeof(field_t));
-  samp1 = (field_t *) malloc(nvars*sizeof(field_t));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
+      zaxisID  = vlistInqVarZaxis(vlistID1, varID);
       gridsize = gridInqSize(gridID);
+      nlevel   = zaxisInqSize(zaxisID);
       missval  = vlistInqVarMissval(vlistID1, varID);
 
       vars1[varID].grid    = gridID;
-      vars1[varID].nsamp   = 0;
       vars1[varID].nmiss   = 0;
       vars1[varID].missval = missval;
-      vars1[varID].ptr     = (double *) malloc(gridsize*sizeof(double));
-      samp1[varID].grid    = gridID;
-      samp1[varID].nmiss   = 0;
-      samp1[varID].missval = missval;
-      samp1[varID].ptr     = NULL;
+      vars1[varID].ptr     = (double *) malloc(gridsize*nlevel*sizeof(double));
     }
 
   tsID = 0;
@@ -96,35 +95,56 @@ void *Isosurface(void *argument)
 
       streamDefTimestep(streamID2, tsID);
 
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  vars[varID] = FALSE;
+	  vars1[varID].nmiss = 0;
+	}
+
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-          vars1[varID].nsamp++;
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  streamReadRecord(streamID1, vars1[varID].ptr, &nmiss);
-	  vars1[varID].nmiss = nmiss;
+	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  offset   = gridsize*levelID;
+	  single   = vars1[varID].ptr + offset;
+	  
+	  streamReadRecord(streamID1, single, &nmiss);
+	  vars1[varID].nmiss += nmiss;
+	  vars[varID] = TRUE;
 	}
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
 	  streamDefRecord(streamID2, varID, 0);
 	  streamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
-	  vars1[varID].nsamp = 0;
+	}
+
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  if ( vars[varID] )
+	    {
+	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+	      for ( levelID = 0; levelID < nlevel; levelID++ )
+		{
+		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		  offset   = gridsize*levelID;
+		  single   = vars1[varID].ptr + offset;
+		  streamDefRecord(streamID2, varID, levelID);
+		  streamWriteRecord(streamID2, single, nmiss);
+		}
+	    }
 	}
 
       tsID++;
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      free(vars1[varID].ptr);
-      if ( samp1[varID].ptr ) free(samp1[varID].ptr);
-    }
-
+  for ( varID = 0; varID < nvars; varID++ ) free(vars1[varID].ptr);
   free(vars1);
-  free(samp1);
 
-  if ( field.ptr ) free(field.ptr);
+  free(vars);
+
+  free(field.ptr);
 
   streamClose(streamID2);
   streamClose(streamID1);

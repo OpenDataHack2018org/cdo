@@ -347,6 +347,7 @@ setgatts \
 setgrid \
 setgridarea \
 setgridmask \
+setgridnumber \
 setgridtype \
 sethalo \
 setlevel \
