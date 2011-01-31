@@ -66,6 +66,7 @@ cdo_SOURCES += Arith.c         \
                Intyear.c       \
                Invert.c        \
                Invertlev.c     \
+               Isosurface.c    \
                Log.c           \
                Maskbox.c       \
                Mastrfu.c       \
