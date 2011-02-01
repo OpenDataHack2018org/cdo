@@ -14,13 +14,13 @@
   /* #define YYPURE 1 *//* ??? */
 
 /* prototypes */
-nodeType *opr(int oper, int nops, ...);
-nodeType *var(char *nm);
-nodeType *con(double value);
-nodeType *fun(char *fname, nodeType *p);
+nodeType *expr_opr(int oper, int nops, ...);
+nodeType *expr_var(char *nm);
+nodeType *expr_con(double value);
+nodeType *expr_fun(char *fname, nodeType *p);
 
 void freeNode(nodeType *p);
-int ex(nodeType *p, parse_parm_t *parse_arg);
+int expr_run(nodeType *p, parse_parm_t *parse_arg);
 
 %}
 
@@ -50,46 +50,46 @@ program:
         ;
 
 function:
-          function stmt           { ex($2, (parse_parm_t *) parse_arg); freeNode($2); }
+          function stmt           { expr_run($2, (parse_parm_t *) parse_arg); freeNode($2); }
         | /* NULL */
         ;
 
 stmt:
-          ';'                     { $$ = opr(';', 2, NULL, NULL); }
+          ';'                     { $$ = expr_opr(';', 2, NULL, NULL); }
         | expr ';'                { $$ = $1; }
-        | VARIABLE '=' expr ';'   { $$ = opr('=', 2, var($1), $3); }
+        | VARIABLE '=' expr ';'   { $$ = expr_opr('=', 2, expr_var($1), $3); }
         | '{' stmt_list '}'       { $$ = $2; }
         ;
 
 stmt_list:
           stmt                    { $$ = $1; }
-        | stmt_list stmt          { $$ = opr(';', 2, $1, $2); }
+        | stmt_list stmt          { $$ = expr_opr(';', 2, $1, $2); }
         ;
 
 expr:
-          CONSTANT                { $$ = con($1); }
-        | VARIABLE                { $$ = var($1); }
-        | '-' expr %prec UMINUS   { $$ = opr(UMINUS, 1, $2); }
-        | expr '+' expr           { $$ = opr('+', 2, $1, $3); }
-        | expr '-' expr           { $$ = opr('-', 2, $1, $3); }
-        | expr '*' expr           { $$ = opr('*', 2, $1, $3); }
-        | expr '/' expr           { $$ = opr('/', 2, $1, $3); }
-        | expr '<' expr           { $$ = opr('<', 2, $1, $3); }
-        | expr '>' expr           { $$ = opr('>', 2, $1, $3); }
-        | expr '^' expr           { $$ = opr('^', 2, $1, $3); }
-        | expr GE expr            { $$ = opr(GE, 2, $1, $3); }
-        | expr LE expr            { $$ = opr(LE, 2, $1, $3); }
-        | expr NE expr            { $$ = opr(NE, 2, $1, $3); }
-        | expr EQ expr            { $$ = opr(EQ, 2, $1, $3); }
+          CONSTANT                { $$ = expr_con($1); }
+        | VARIABLE                { $$ = expr_var($1); }
+        | '-' expr %prec UMINUS   { $$ = expr_opr(UMINUS, 1, $2); }
+        | expr '+' expr           { $$ = expr_opr('+', 2, $1, $3); }
+        | expr '-' expr           { $$ = expr_opr('-', 2, $1, $3); }
+        | expr '*' expr           { $$ = expr_opr('*', 2, $1, $3); }
+        | expr '/' expr           { $$ = expr_opr('/', 2, $1, $3); }
+        | expr '<' expr           { $$ = expr_opr('<', 2, $1, $3); }
+        | expr '>' expr           { $$ = expr_opr('>', 2, $1, $3); }
+        | expr '^' expr           { $$ = expr_opr('^', 2, $1, $3); }
+        | expr GE expr            { $$ = expr_opr(GE, 2, $1, $3); }
+        | expr LE expr            { $$ = expr_opr(LE, 2, $1, $3); }
+        | expr NE expr            { $$ = expr_opr(NE, 2, $1, $3); }
+        | expr EQ expr            { $$ = expr_opr(EQ, 2, $1, $3); }
         | '(' expr ')'            { $$ = $2; }
-        | FUNCTION '(' expr ')'   { $$ = fun($1, $3); }
+        | FUNCTION '(' expr ')'   { $$ = expr_fun($1, $3); }
         ;
 
 %%
 
 #define SIZEOF_NODETYPE ((char *)&p->u.con - (char *)p)
 
-nodeType *con(double value)
+nodeType *expr_con(double value)
 {
   nodeType *p = NULL;
   size_t nodeSize;
@@ -106,7 +106,7 @@ nodeType *con(double value)
   return p;
 }
 
-nodeType *var(char *nm)
+nodeType *expr_var(char *nm)
 {
   nodeType *p = NULL;
   size_t nodeSize;
@@ -123,7 +123,7 @@ nodeType *var(char *nm)
   return p;
 }
 
-nodeType *fun(char *fname, nodeType *op)
+nodeType *expr_fun(char *fname, nodeType *op)
 {
   nodeType *p = NULL;
   size_t nodeSize;
@@ -141,7 +141,7 @@ nodeType *fun(char *fname, nodeType *op)
   return p;
 }
 
-nodeType *opr(int oper, int nops, ...)
+nodeType *expr_opr(int oper, int nops, ...)
 {
   va_list ap;
   nodeType *p = NULL;

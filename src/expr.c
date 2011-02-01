@@ -699,7 +699,7 @@ int exNode(nodeType *p, parse_parm_t *parse_arg)
 }
 
 
-nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
+nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 {
   int gridID1 = -1, zaxisID1 = -1, timeID1 = -1;
   double missval = 0;
@@ -788,14 +788,14 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
     case typeFun:
       if ( parse_arg->init )
 	{
-	  ex(p->u.fun.op, parse_arg);
+	  expr_run(p->u.fun.op, parse_arg);
 
 	  if ( parse_arg->debug )
 	    printf("\tcall \t%s\n", p->u.fun.name);
 	}
       else
 	{
-	  rnode = ex_fun(p->u.fun.name, ex(p->u.fun.op, parse_arg));
+	  rnode = ex_fun(p->u.fun.name, expr_run(p->u.fun.op, parse_arg));
 	}
       break;
     case typeOpr:
@@ -806,7 +806,7 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 	  parse_arg->zaxisID2 = -1;
           parse_arg->timeID2  = -1;
 
-	  rnode = ex(p->u.opr.op[1], parse_arg);
+	  rnode = expr_run(p->u.opr.op[1], parse_arg);
 
 	  if ( parse_arg->init )
 	    {
@@ -861,22 +861,22 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
         case UMINUS:    
 	  if ( parse_arg->init )
 	    {
-	      ex(p->u.opr.op[0], parse_arg);
+	      expr_run(p->u.opr.op[0], parse_arg);
 
 	      if ( parse_arg->debug )
 		printf("\tneg\n");
 	    }
 	  else
 	    {
-	      rnode = ex_uminus(ex(p->u.opr.op[0], parse_arg));
+	      rnode = ex_uminus(expr_run(p->u.opr.op[0], parse_arg));
 	    }
 
 	  break;
         default:
 	  if ( parse_arg->init )
 	    {
-	      ex(p->u.opr.op[0], parse_arg);
-	      ex(p->u.opr.op[1], parse_arg);
+	      expr_run(p->u.opr.op[0], parse_arg);
+	      expr_run(p->u.opr.op[1], parse_arg);
 	      if ( parse_arg->debug )
 		switch( p->u.opr.oper )
 		  {
@@ -894,7 +894,8 @@ nodeType *ex(nodeType *p, parse_parm_t *parse_arg)
 	    }
 	  else
 	    {
-	      rnode = expr(p->u.opr.oper, ex(p->u.opr.op[0], parse_arg), ex(p->u.opr.op[1], parse_arg));
+	      rnode = expr(p->u.opr.oper, expr_run(p->u.opr.op[0], parse_arg),
+			                  expr_run(p->u.opr.op[1], parse_arg));
 	    }
         }
     }
