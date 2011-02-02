@@ -21,47 +21,127 @@
 #include "pstream.h"
 
 
+double intlin(double x, double y1, double x1, double y2, double x2);
+
+static
+void isosurface(double isoval, long nlev1, double *lev1, field_t *field3D, field_t *field2D)
+{
+  long i, k, gridsize, nmiss;
+  int lmiss1, lmiss2;
+  double missval, val1, val2;
+  double *data2D, *data3D;
+
+  gridsize = gridInqSize(field3D->grid);
+  nmiss    = field3D->nmiss;
+  missval  = field3D->missval;
+  data3D   = field3D->ptr;
+  data2D   = field2D->ptr;
+
+  for ( i = 0; i < gridsize; ++i )
+    {
+      data2D[i] = missval;
+
+      for ( k = 0; k < (nlev1-1); ++k )
+	{
+	  val1 = data3D[k*gridsize+i];
+	  val2 = data3D[(k+1)*gridsize+i];
+
+	  if ( nmiss > 0 )
+	    {
+	      lmiss1 = DBL_IS_EQUAL(val1, missval);
+	      lmiss2 = DBL_IS_EQUAL(val2, missval);
+	      if ( lmiss1 && lmiss2 ) continue;
+	      if ( lmiss1 && IS_EQUAL(isoval, val2) ) data2D[i] = lev1[k+1];
+	      if ( lmiss2 && IS_EQUAL(isoval, val1) ) data2D[i] = lev1[k]  ;
+	      if ( lmiss1 || lmiss2 ) continue;
+	    }
+
+	  if ( (isoval >= val1 && isoval <= val2) || (isoval >= val2 && isoval <= val1) )
+	    {
+	      if ( IS_EQUAL(val1, val2) )
+		data2D[i] = lev1[k];
+	      else
+		data2D[i] = intlin(isoval, lev1[k], val1, lev1[k+1], val2);
+
+	      break;
+	    }
+	}
+    }
+
+  nmiss = 0;
+  for ( i = 0; i < gridsize; ++i )
+    if ( DBL_IS_EQUAL(data2D[i], missval) ) nmiss++;
+
+  field2D->missval = missval;
+  field2D->nmiss   = nmiss;
+}
+
+
 void *Isosurface(void *argument)
 {
   int streamID1, streamID2;
   int vlistID1, vlistID2;
-  int gridsize, nlevel;
+  int gridsize, nlevel = 0;
   int recID, nrecs;
   int gridID;
+  int nlev1;
   int i, offset;
   int tsID, varID, levelID;
   int nmiss, nvars;
-  int zaxisID, nzaxis;
+  int zaxisID, zaxisID1 = -1, zaxisIDsfc, nzaxis;
   double missval;
+  double isoval = 0;
   int *vars = NULL;
+  int *liso = NULL;
   field_t *vars1 = NULL;
   field_t field;
+  double *lev1;
   double *single;
   int taxisID1, taxisID2;
 
   cdoInitialize(argument);
 
+  operatorInputArg("isoval");
+
+  operatorCheckArgc(1);
+
+  isoval = atof(operatorArgv()[0]);
+
+  if ( cdoVerbose ) cdoPrint("Isoval: %g\n", isoval);
+
+
   streamID1 = streamOpenRead(cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
-
-  vlistClearFlag(vlistID1);
-  nvars = vlistNvars(vlistID1);
-  for ( varID = 0; varID < nvars; varID++ )
-    vlistDefFlag(vlistID1, varID, 0, TRUE);
-
-  vlistID2 = vlistCreate();
-  vlistCopyFlag(vlistID2, vlistID1);
+  vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
   nzaxis  = vlistNzaxis(vlistID1);
   for ( i = 0; i < nzaxis; i++ )
-    if ( zaxisInqSize(vlistZaxis(vlistID1, i)) > 1 )
-      vlistChangeZaxisIndex(vlistID2, i, zaxisID);
+    {
+      zaxisID = vlistZaxis(vlistID1, i);
+      nlevel  = zaxisInqSize(zaxisID);
+      if ( zaxisInqType(zaxisID) != ZAXIS_HYBRID && zaxisInqType(zaxisID) != ZAXIS_HYBRID_HALF )
+	if ( nlevel > 1 )
+	  {
+	    zaxisID1 = zaxisID;
+	    break;
+	  }
+    }
+
+  if ( i == nzaxis ) cdoAbort("No processable variable found!");
+
+  nlev1 = nlevel;
+  lev1  = (double *) malloc((nlev1)*sizeof(double));
+  zaxisInqLevels(zaxisID1, lev1);
+
+  zaxisIDsfc = zaxisCreate(ZAXIS_SURFACE, 1);
+  for ( i = 0; i < nzaxis; i++ )
+    if ( zaxisID1 == vlistZaxis(vlistID1, i) )
+      vlistChangeZaxisIndex(vlistID2, i, zaxisIDsfc);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -71,6 +151,9 @@ void *Isosurface(void *argument)
 
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
+  nvars = vlistNvars(vlistID1);
+
+  liso  =     (int *) malloc(nvars*sizeof(int));
   vars  =     (int *) malloc(nvars*sizeof(int));
   vars1 = (field_t *) malloc(nvars*sizeof(field_t));
 
@@ -82,7 +165,13 @@ void *Isosurface(void *argument)
       nlevel   = zaxisInqSize(zaxisID);
       missval  = vlistInqVarMissval(vlistID1, varID);
 
+      if ( zaxisID == zaxisID1 )
+	liso[varID] = TRUE;
+      else 
+	liso[varID] = FALSE;
+
       vars1[varID].grid    = gridID;
+      vars1[varID].zaxis   = zaxisID;
       vars1[varID].nmiss   = 0;
       vars1[varID].missval = missval;
       vars1[varID].ptr     = (double *) malloc(gridsize*nlevel*sizeof(double));
@@ -116,22 +205,26 @@ void *Isosurface(void *argument)
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  streamDefRecord(streamID2, varID, 0);
-	  streamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
-	}
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
 	  if ( vars[varID] )
 	    {
-	      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      for ( levelID = 0; levelID < nlevel; levelID++ )
+	      if ( liso )
 		{
-		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-		  offset   = gridsize*levelID;
-		  single   = vars1[varID].ptr + offset;
-		  streamDefRecord(streamID2, varID, levelID);
-		  streamWriteRecord(streamID2, single, nmiss);
+		  isosurface(isoval, nlev1, lev1, &vars1[varID], &field);
+
+		  streamDefRecord(streamID2, varID, 0);
+		  streamWriteRecord(streamID2, field.ptr, field.nmiss);
+		}
+	      else
+		{
+		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+		  for ( levelID = 0; levelID < nlevel; levelID++ )
+		    {
+		      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		      offset   = gridsize*levelID;
+		      single   = vars1[varID].ptr + offset;
+		      streamDefRecord(streamID2, varID, levelID);
+		      streamWriteRecord(streamID2, single, nmiss);
+		    }
 		}
 	    }
 	}
@@ -143,6 +236,8 @@ void *Isosurface(void *argument)
   free(vars1);
 
   free(vars);
+  free(liso);
+  if (lev1) free(lev1);
 
   free(field.ptr);
 

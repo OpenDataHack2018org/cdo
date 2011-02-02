@@ -294,12 +294,8 @@ void *Intlevel(void *argument)
   }
 
   for ( i = 0; i < nzaxis; i++ )
-    {
-      if ( zaxisID1 == vlistZaxis(vlistID1, i) )
-	{
-	  vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
-	}
-    }
+    if ( zaxisID1 == vlistZaxis(vlistID1, i) )
+      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
