@@ -2032,6 +2032,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   double determinant;            /*  matrix determinant                     */
   double sum_wgts;               /*  sum of weights for normalization       */
 
+  if ( ompNumThreads == 1 ) progressInit();
+
   /*
     Compute mappings from grid1 to grid2
   */
@@ -2264,6 +2266,8 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
   double mat1, mat2, mat3, mat4; /*  matrix elements                        */
   double determinant;            /*  matrix determinant                     */
   double sum_wgts;               /*  sum of weights for normalization       */
+
+  if ( ompNumThreads == 1 ) progressInit();
 
   /*
     Compute mappings from grid1 to grid2
@@ -2674,6 +2678,8 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
   double wgtstmp;          /* hold the link weight                        */
 
+  if ( ompNumThreads == 1 ) progressInit();
+
   /* Compute mappings from grid1 to grid2 */
 
   grid1_size = rg->grid1_size;
@@ -2902,6 +2908,8 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   double *coslat, *sinlat; /* cosine, sine of grid lats (for distance)    */
   double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
   double wgtstmp;          /* hold the link weight                        */
+
+  if ( ompNumThreads == 1 ) progressInit();
 
   /* Compute mappings from grid1 to grid2 */
 
@@ -4390,6 +4398,8 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   int avoid_pole_count = 0;         /* count attempts to avoid pole  */
   double avoid_pole_offset = TINY;  /* endpoint offset to avoid pole */
   grid_store_t *grid_store = NULL;
+
+  if ( ompNumThreads == 1 ) progressInit();
 
   nbins = rg->num_srch_bins;
 

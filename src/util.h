@@ -30,6 +30,8 @@ int get_season_start(void);
 void get_season_name(const char *seas_name[4]);
 
 void init_is_tty(void);
+
+void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
 int fileExist(const char *filename);

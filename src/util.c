@@ -255,11 +255,20 @@ void init_is_tty(void)
 }
 
 
+int ps_lhead = FALSE;
+int ps_nch = 0;
+int ps_cval = -1;
+
+void progressInit(void)
+{
+  ps_lhead = FALSE;
+  ps_nch = 0;;
+  ps_cval = -1;
+}
+
+
 void progressStatus(double offset, double refval, double curval)
 {
-  static int lhead = FALSE;
-  static int nch = 0;;
-  static int cval = -1;
   int ival;
 
   if ( !stdout_is_tty ) return;
@@ -273,24 +282,24 @@ void progressStatus(double offset, double refval, double curval)
 
   ival = (offset + refval*curval)*100;
 
-  if ( cval == -1 )
+  if ( ps_cval == -1 )
     {
-      nch = fprintf(stdout, "%s: %3d%%", processInqPrompt(), 0);
+      ps_nch = fprintf(stdout, "%s: %3d%%", processInqPrompt(), 0);
       fflush(stdout);
-      lhead = TRUE;
+      ps_lhead = TRUE;
     }
 
-  if ( ival != cval )
+  if ( ival != ps_cval )
     {
-      cval = ival;
-      fprintf(stdout, "\b\b\b\b%3d%%", cval);
+      ps_cval = ival;
+      fprintf(stdout, "\b\b\b\b%3d%%", ps_cval);
       fflush(stdout);
     }
 
-  if ( cval == 100 && lhead )
+  if ( ps_cval == 100 && ps_lhead )
     {
-      lhead = FALSE;
-      while ( nch-- ) fprintf(stdout, "\b");
+      ps_lhead = FALSE;
+      while ( ps_nch-- ) fprintf(stdout, "\b");
       fflush(stdout);
     }
 }
