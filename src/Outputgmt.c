@@ -166,18 +166,32 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
   check_corners = 0; /* don't execute corner checking (last loop) */
   nout = 0;
   sumarea = 0;
-  
-  /* Check if center is inside bounds of cell */
-#if defined (SX)  
-#pragma vdir nodep
-#endif  
+  /*
   for ( i = 0; i < gridsize; ++i )
     {
       lon = grid_center_lon[i];
       lat = grid_center_lat[i];
-#if defined (SX)  
-#pragma vdir nodep
-#endif  
+      for ( k = 0; k < ncorner; ++k )
+        {
+          lon_bounds[k] = grid_corner_lon[i*ncorner+k];
+          lat_bounds[k] = grid_corner_lat[i*ncorner+k];
+          if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
+          if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
+        }      
+      lon_bounds[ncorner] = lon_bounds[0];
+      lat_bounds[ncorner] = lat_bounds[0];
+      fprintf(stdout, " %6i %6i %9.4f %9.4f :",  nout, i+1, lon, lat);
+      for ( k = 0; k < ncorner; k++ )
+	fprintf(stdout, " %9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
+      fprintf(stdout, "\n");
+    }
+  */
+
+  /* Check if center is inside bounds of cell */
+  for ( i = 0; i < gridsize; ++i )
+    {
+      lon = grid_center_lon[i];
+      lat = grid_center_lat[i];
       for ( k = 0; k < ncorner; ++k )
         {
           lon_bounds[k] = grid_corner_lon[i*ncorner+k];
