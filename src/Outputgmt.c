@@ -42,11 +42,6 @@
 #include "color.h"
 
 
-#ifndef PI
-#define PI M_PI
-#endif
-
-
 static
 int pnpoly(int npol, double *xp, double *yp, double x, double y)
 {
@@ -88,21 +83,19 @@ double PolygonArea(int np, double *xp, double *yp, double yc)
    int i, j;
    double area = 0.;
 
-   /*Process area in Radians*/
-   for ( i = 0; i < np; i++ )
-       { xp[i] *= PI/180.; yp[i] *= PI/180.; }
-   yc *= PI/180.;
+   /* Process area in Radians */
    
    for ( i = 0; i < np; i++ )
      {
        j = (i + 1) % np;
-       area += xp[i] * yp[j];
-       area -= yp[i] * xp[j];
+       area += DEG2RAD*xp[i] * DEG2RAD*yp[j];
+       area -= DEG2RAD*yp[i] * DEG2RAD*xp[j];
      }
-   area *= 0.5 * cos(yc);
+   area *= 0.5 * cos(DEG2RAD*yc);
    return (area);
 }
 
+static
 int ccw(double p0x, double p0y, double p1x, double p1y, double p2x, double p2y)
 {
     /*
@@ -127,6 +120,7 @@ int ccw(double p0x, double p0y, double p1x, double p1y, double p2x, double p2y)
     return 0;
 }
 
+static
 int intersect(double pix, double piy, double pjx, double pjy,
               double pkx, double pky, double plx, double ply)
 {
@@ -188,7 +182,6 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
         {
           lon_bounds[k] = grid_corner_lon[i*ncorner+k];
           lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-	  //	  printf("%d %d %g %g %g %g\n", i, k, lon, lat, lon_bounds[k], lat_bounds[k]);
           if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
           if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
         }      
@@ -213,7 +206,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
             }
           area = PolygonArea(ncorner+1, lon_bounds, lat_bounds,lat);
           fprintf(stdout, " %6i %6i   %9.4f   %9.4f %10.5f :", 
-		  nout, i, lon, lat, area*pow(10,6));
+		  nout, i+1, lon, lat, area*pow(10,6));
           for ( k = 0; k < ncorner; k++ )
             fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
           fprintf(stdout, "\n");
@@ -271,10 +264,10 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
     cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
 
   if ( cdoVerbose ) 
-    fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
+    fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
 
-  if ( fabs( 100.*(sumarea - 4.*PI)/4.*PI) > 0.1)
-    cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
+  if ( fabs( 100.*(sumarea - 4.*M_PI)/4.*M_PI) > 0.1)
+    cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
   
   /* check that all cells are convex */
   
@@ -703,7 +696,6 @@ void *Outputgmt(void *argument)
   gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
   gridInqYunits(gridID, units);
   gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
-  printf("scale to degree: %s\n", units);
 
   nvals = gridsize;
   plon = grid_center_lon;
@@ -763,7 +755,6 @@ void *Outputgmt(void *argument)
 
 
       /* Note: using units from latitude instead from bounds */
-  printf("bounds scale to degree: %s\n", units);
       gridToDegree(units, "grid corner lon", gridcorners*gridsize, grid_corner_lon);
       gridToDegree(units, "grid corner lat", gridcorners*gridsize, grid_corner_lat);
 
