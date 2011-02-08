@@ -188,7 +188,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
         {
           lon_bounds[k] = grid_corner_lon[i*ncorner+k];
           lat_bounds[k] = grid_corner_lat[i*ncorner+k];
-	  printf("%d %d %g %g %g %g\n", i, k, lon, lat, lon_bounds[k], lat_bounds[k]);
+	  //	  printf("%d %d %g %g %g %g\n", i, k, lon, lat, lon_bounds[k], lat_bounds[k]);
           if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360;
           if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
         }      
