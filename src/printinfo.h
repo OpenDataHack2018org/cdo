@@ -260,7 +260,7 @@ void printGridInfo(int vlistID)
 	  nd = gridInqGMEnd(gridID);
 	  fprintf(stdout, "size      : dim = %d  nd = %d  ni = %d\n", gridsize, nd, ni);
 	}
-      else if ( gridtype == GRID_NUMBER )
+      else if ( gridtype == GRID_REFERENCE )
 	{
 	  int number, position;
 	  number   = gridInqNumber(gridID);
@@ -268,6 +268,13 @@ void printGridInfo(int vlistID)
 	  fprintf(stdout, "size      : dim = %d\n", gridsize);
 	  fprintf(stdout, "%*s", nbyte0, "");
 	  fprintf(stdout, "grid      : number = %d  position = %d\n", number, position);
+	  if ( gridInqReference(gridID, NULL) )
+	    {
+	      char reference_link[8192];
+	      gridInqReference(gridID, reference_link);
+	      fprintf(stdout, "%*s", nbyte0, "");
+	      fprintf(stdout, "path      : %s\n", reference_link);
+	    }
 	}
       else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
 	{

@@ -198,7 +198,7 @@ void *Setgrid(void *argument)
   else if ( operatorID == SETGRIDNUMBER )
     {
       gridID1 = vlistGrid(vlistID1, 0);
-      gridID2 = gridCreate(GRID_NUMBER, gridInqSize(gridID1));
+      gridID2 = gridCreate(GRID_REFERENCE, gridInqSize(gridID1));
       gridDefNumber(gridID2, number);
       gridDefPosition(gridID2, position);
 

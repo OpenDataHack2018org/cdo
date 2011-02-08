@@ -1006,6 +1006,56 @@ int gridToCell(int gridID1)
   return (gridID2);
 }
 
+
+int referenceToGrid(int gridID1)
+{
+  int gridID2 = -1;
+  int gridtype, gridsize;
+  char gridfile[8912];
+
+  gridsize = gridInqSize(gridID1);
+
+  if ( gridInqReference(gridID1, NULL) )
+    {
+      int streamID;
+      int number, position;
+
+      number = gridInqNumber(gridID1);
+      position = gridInqPosition(gridID1);
+      gridInqReference(gridID1, gridfile);
+
+      streamID = streamOpenRead(gridfile);
+      if ( streamID >= 0 )
+	{
+	  int vlistID, gridID = -1;
+	  int ngrids;
+	  vlistID = streamInqVlist(streamID);
+	  ngrids = vlistNgrids(vlistID);
+	  if ( position > 0 && position <= ngrids )
+	    {
+	      gridID = vlistGrid(vlistID, position-1);
+	      if ( gridInqSize(gridID) == gridsize )
+		gridID2 = gridDuplicate(gridID);
+	      else
+		cdoWarning("Grid size %d on position %d do not match! Path=%s", gridsize, position, gridfile);
+	    }
+	  else
+	    cdoWarning("Grid position %d not available! Path=%s", position, gridfile);
+
+	  streamClose(streamID);
+	}
+      else
+	cdoWarning("Reference to grid not found! Path=%s", gridfile);
+    }
+  else
+    {
+      cdoWarning("No reference to grid found!");
+    }
+
+  return (gridID2);
+}
+
+
 static
 double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3)
 {
@@ -1171,6 +1221,7 @@ int gridGenArea(int gridID, double *area)
        gridtype != GRID_LAEA        &&
        gridtype != GRID_SINUSOIDAL  &&
        gridtype != GRID_GME         &&
+       gridtype != GRID_REFERENCE   &&
        gridtype != GRID_CURVILINEAR &&
        gridtype != GRID_UNSTRUCTURED )
     {
@@ -1185,6 +1236,12 @@ int gridGenArea(int gridID, double *area)
 	  gridID = gridToCell(gridID);
 	  grid_mask = (int *) malloc(gridsize*sizeof(int));
 	  gridInqMaskGME(gridID, grid_mask);
+	}
+      else if ( gridtype == GRID_REFERENCE )
+	{
+	  lgriddestroy = TRUE;
+	  gridID = referenceToGrid(gridID);
+	  if ( gridID == -1 ) return (1);
 	}
       else
 	{
@@ -1449,7 +1506,11 @@ int gridWeights(int gridID, double *grid_wgts)
       if ( gridtype == GRID_LONLAT      ||
 	   gridtype == GRID_GAUSSIAN    ||
 	   gridtype == GRID_LCC         ||
+	   gridtype == GRID_LCC2        ||
+	   gridtype == GRID_LAEA        ||
+	   gridtype == GRID_SINUSOIDAL  ||
 	   gridtype == GRID_GME         ||
+	   gridtype == GRID_REFERENCE   ||
 	   gridtype == GRID_CURVILINEAR ||
 	   gridtype == GRID_UNSTRUCTURED )
 	{
