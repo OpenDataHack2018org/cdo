@@ -160,6 +160,7 @@ void *Remap(void *argument)
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
   int gridID1 = -1, gridID2;
+  int gridtype;
   int nmiss1, nmiss2, i, j, r;
   int *imask = NULL;
   int nremaps = 0;
@@ -420,15 +421,17 @@ void *Remap(void *argument)
       remapgrids[index] = TRUE;
 
       gridID1 = vlistGrid(vlistID1, index);
+      gridtype = gridInqType(gridID1);
 
-      if ( gridInqType(gridID1) != GRID_LONLAT      &&
-	   gridInqType(gridID1) != GRID_GAUSSIAN    &&
-	   gridInqType(gridID1) != GRID_LCC         &&
-	   gridInqType(gridID1) != GRID_LAEA        &&
-	   gridInqType(gridID1) != GRID_SINUSOIDAL  &&
-	   gridInqType(gridID1) != GRID_GME         &&
-	   gridInqType(gridID1) != GRID_CURVILINEAR &&
-	   gridInqType(gridID1) != GRID_UNSTRUCTURED )
+      if ( gridtype != GRID_LONLAT      &&
+	   gridtype != GRID_GAUSSIAN    &&
+	   gridtype != GRID_LCC         &&
+	   gridtype != GRID_LAEA        &&
+	   gridtype != GRID_SINUSOIDAL  &&
+	   gridtype != GRID_GME         &&
+	   gridtype != GRID_REFERENCE   &&
+	   gridtype != GRID_CURVILINEAR &&
+	   gridtype != GRID_UNSTRUCTURED )
 	{
 	  if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 	    cdoAbort("Unsupported grid type: %s, use CDO option -R to convert reduced to regular grid!",
@@ -436,9 +439,7 @@ void *Remap(void *argument)
 	  else if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 )
 	    remapgrids[index] = FALSE;
 	  else
-	    {
-	      cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
-	    }
+	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridInqType(gridID1)));
 	}
 
       if ( remapgrids[index] )
