@@ -152,7 +152,7 @@ int intersect(double pix, double piy, double pjx, double pjy,
 #ifndef MAX_CORNERS 
 #define MAX_CORNERS 8+1
 #endif
-void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
+void verify_grid(int gridtype, int gridsize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
@@ -210,18 +210,17 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
                 fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
               fprintf(stdout, "\n");
             }
-          area = PolygonArea(ncorner+1,lon_bounds,lat_bounds,lat);
+          area = PolygonArea(ncorner+1, lon_bounds, lat_bounds,lat);
           fprintf(stdout, " %6i %6i   %9.4f   %9.4f %10.5f :", 
 		  nout, i, lon, lat, area*pow(10,6));
           for ( k = 0; k < ncorner; k++ )
             fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
           fprintf(stdout, "\n");
-          
         }
     }
+
   if ( nout )
     cdoWarning("%d of %d points out of bounds!", nout, gridsize);
-  
   
   /* check that all cell bounds have the same orientation */
   
@@ -266,17 +265,17 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
           fprintf(stdout, "\n");
         }
     }
+
   if ( nout )
-		cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
+    cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
+
   if ( cdoVerbose ) 
     fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
+
   if ( fabs( 100.*(sumarea - 4.*PI)/4.*PI) > 0.1)
     cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*PI)/4.*PI );
   
-  
-  
   /* check that all cells are convex */
-  
   
   nout = 0;
   for ( i0 = 0; i0 < gridsize; i0++ )
@@ -365,7 +364,8 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 	    fprintf(stdout, "  %9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
           fprintf(stdout, "\n");         
 	}     
-		}
+    }
+
   if ( nout )
     cdoWarning("%d of %d cells are not Convex\n", nout, gridsize);
   
@@ -415,6 +415,7 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 		}					
 	    }
 	}
+
       if ( nout )
 	cdoWarning("%d of %d corners are lonely on the grid", nout, gridsize*ncorner);
     }
@@ -423,7 +424,7 @@ void verify_grid(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
 }
 
 
-void verify_grid_old(int gridtype, int gridsize, int xsize, int ysize, int ncorner,
+void verify_grid_old(int gridtype, int gridsize, int ncorner,
 		double *grid_center_lon, double *grid_center_lat,
 		double *grid_corner_lon, double *grid_corner_lat)
 {
@@ -701,6 +702,7 @@ void *Outputgmt(void *argument)
   gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
   gridInqYunits(gridID, units);
   gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
+  printf("scale to degree: %s\n", units);
 
   nvals = gridsize;
   plon = grid_center_lon;
@@ -760,6 +762,7 @@ void *Outputgmt(void *argument)
 
 
       /* Note: using units from latitude instead from bounds */
+  printf("bounds scale to degree: %s\n", units);
       gridToDegree(units, "grid corner lon", gridcorners*gridsize, grid_corner_lon);
       gridToDegree(units, "grid corner lat", gridcorners*gridsize, grid_corner_lat);
 
@@ -803,7 +806,7 @@ void *Outputgmt(void *argument)
     }
 
   if ( operatorID == GRIDVERIFY )
-    verify_grid(gridInqType(gridID), gridsize, nlon, nlat, gridcorners,
+    verify_grid(gridInqType(gridID), gridsize, gridcorners,
 		grid_center_lon, grid_center_lat,
 		grid_corner_lon, grid_corner_lat);
 

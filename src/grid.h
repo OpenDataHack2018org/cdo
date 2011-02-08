@@ -5,6 +5,7 @@
 #define  rad2deg  (180./M_PI)   /* conversion for rad to deg */
 
 
+int referenceToGrid(int gridID);
 void gridToDegree(const char *units, const char *string, int gridsize, double *array);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
