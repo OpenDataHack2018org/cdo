@@ -61,86 +61,87 @@ int pnpoly(int npol, double *xp, double *yp, double x, double y)
 static
 double PolygonArea_old(int np, double *xp, double *yp)
 {
-   int i, j;
-   double area = 0;
+  int i, j;
+  double area = 0;
 
-   for ( i = 0; i < np; i++ )
-     {
-       j = (i + 1) % np;
-       area += xp[i] * yp[j];
-       area -= yp[i] * xp[j];
-     }
+  for ( i = 0; i < np; i++ )
+    {
+      j = (i + 1) % np;
+      area += xp[i] * yp[j];
+      area -= yp[i] * xp[j];
+    }
 
-   area /= 2;
-   /* return(area < 0 ? -area : area); */
-   return (area);
+  area /= 2;
+  /* return(area < 0 ? -area : area); */
+  return (area);
 }
 
 
 static
 double PolygonArea(int np, double *xp, double *yp, double yc)
 {
-   int i, j;
-   double area = 0.;
+  int i, j;
+  double area = 0.;
 
-   /* Process area in Radians */
+  /* Process area in Radians */
    
-   for ( i = 0; i < np; i++ )
-     {
-       j = (i + 1) % np;
-       area += DEG2RAD*xp[i] * DEG2RAD*yp[j];
-       area -= DEG2RAD*yp[i] * DEG2RAD*xp[j];
-     }
-   area *= 0.5 * cos(DEG2RAD*yc);
-   return (area);
+  for ( i = 0; i < np; i++ )
+    {
+      j = (i + 1) % np;
+      area += DEG2RAD*xp[i] * DEG2RAD*yp[j];
+      area -= DEG2RAD*yp[i] * DEG2RAD*xp[j];
+    }
+  area *= 0.5 * cos(DEG2RAD*yc);
+  return (area);
 }
 
 static
 int ccw(double p0x, double p0y, double p1x, double p1y, double p2x, double p2y)
 {
-    /*
-     This function says wether the point are orientated clockwise
-     +1 psitive orientation
-     -1 negative orientation
+  /*
+    This function says wether the point are orientated clockwise
+    +1 positive orientation
+    -1 negative orientation
      0 points are on a line --> no orientation
-     
-     This is done by a comparision of the gradient of
-     dy1/dx1 = p1 - p0 vs.
-     dy2/dx2 = p2 - p0
-     To avoid singularities at dx1=0 OR dx2 = 0 we multiply with
-     dx1*dx2
-     */
-    double dx1, dx2, dy1, dy2;
-    dx1 = p1x - p0x; dy1 = p1y - p0y;
-    dx2 = p2x - p0x; dy2 = p2y - p0y;
-    if ( dx1*dy2 > dy1*dx2 ) return +1;
-    if ( dx1*dy2 < dy1*dx2 ) return -1;
-    if ( (dx1*dx2 < 0 ) || (dy1*dy2 < 0)) return -1;
-    if ( (dx1*dx1 + dy1*dy1) < (dx2*dx2 + dy2*dy2)) return +1;
-    return 0;
+    
+    This is done by a comparision of the gradient of
+    dy1/dx1 = p1 - p0 vs.
+    dy2/dx2 = p2 - p0
+    To avoid singularities at dx1=0 OR dx2 = 0 we multiply with dx1*dx2
+  */
+  double dx1, dx2, dy1, dy2;
+
+  dx1 = p1x - p0x; dy1 = p1y - p0y;
+  dx2 = p2x - p0x; dy2 = p2y - p0y;
+  if ( dx1*dy2 > dy1*dx2 ) return +1;
+  if ( dx1*dy2 < dy1*dx2 ) return -1;
+  if ( (dx1*dx2 < 0 ) || (dy1*dy2 < 0)) return -1;
+  if ( (dx1*dx1 + dy1*dy1) < (dx2*dx2 + dy2*dy2)) return +1;
+
+  return 0;
 }
 
 static
 int intersect(double pix, double piy, double pjx, double pjy,
               double pkx, double pky, double plx, double ply)
 {
-    /*This function returns if there is an intersection between the lines 
-        line1 between pi and pj and
-        line2 between pk and pl,
-      whereas pi = (pix, piy).
+  /*This function returns if there is an intersection between the lines 
+    line1 between pi and pj and
+    line2 between pk and pl,
+    whereas pi = (pix, piy).
       
-      This can done by means of ccw since the product of ccw(pi,pj,pk)*ccw(pi,pj,pl)
-      shows if pk and pl are on different or the same side(s) of the line1 (They must
-		  have different signums to be on different sides).
+    This can done by means of ccw since the product of ccw(pi,pj,pk)*ccw(pi,pj,pl)
+    shows if pk and pl are on different or the same side(s) of the line1 (They must
+    have different signums to be on different sides).
       
-      Consequently if and ONLY IF pk as well as pl are on different sides of line1
-      AND pi as well as pj are on different sides of line2 there HAS TO be an intersection.
-    */
+    Consequently if and ONLY IF pk as well as pl are on different sides of line1
+    AND pi as well as pj are on different sides of line2 there HAS TO be an intersection.
+  */
     
-    return ( ( ccw(pix, piy, pjx, pjy, pkx, pky) *
-               ccw(pix, piy, pjx, pjy, plx, ply) <= 0 ) &&
-             ( ccw(pkx, pky, plx, ply, pix, piy) *
-               ccw(pkx, pky, plx, ply, pjx, pjy) <= 0 ) );
+  return ( ( ccw(pix, piy, pjx, pjy, pkx, pky) *
+	     ccw(pix, piy, pjx, pjy, plx, ply) <= 0 ) &&
+	   ( ccw(pkx, pky, plx, ply, pix, piy) *
+	     ccw(pkx, pky, plx, ply, pjx, pjy) <= 0 ) );
 }
 
 #ifndef MAX_CORNERS 
@@ -192,6 +193,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
     {
       lon = grid_center_lon[i];
       lat = grid_center_lat[i];
+
       for ( k = 0; k < ncorner; ++k )
         {
           lon_bounds[k] = grid_corner_lon[i*ncorner+k];
@@ -267,7 +269,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
                 fprintf(stdout, "    lon_%2.2i     lat_%2.2i : ", k, k);
               fprintf(stdout, "\n");
             }
-          fprintf(stdout, "%6i %6i   %9.4f   %9.4f :", nout, i, lon, lat);
+          fprintf(stdout, "%6i %6i   %9.4f   %9.4f :", nout, i+1, lon, lat);
           for ( k = 0; k < ncorner; k++ )
             fprintf(stdout, " %9.4f  %9.4f : ", lon_bounds[k], lat_bounds[k]);
           fprintf(stdout, "\n");
@@ -280,7 +282,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
   if ( cdoVerbose ) 
     fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
 
-  if ( fabs( 100.*(sumarea - 4.*M_PI)/4.*M_PI) > 0.1)
+  if ( fabs(100.*(sumarea - 4.*M_PI)/4.*M_PI) > 0.1)
     cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
   
   /* check that all cells are convex */
@@ -289,17 +291,19 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
   for ( i0 = 0; i0 < gridsize; i0++ )
     {
       lon = grid_center_lon[i0];
+      lat = grid_center_lat[i0];
+
       for ( k = 0; k < ncorner; k++ )
-			  {
-			    lon_bounds[k] = grid_corner_lon[i0*ncorner+k];
-			    lat_bounds[k] = grid_corner_lat[i0*ncorner+k];
-			    /* Find cells that cover left and right border of the grid and adjust
-			       coordinates --> they become closed polygons on theta-phi plane! */
-			    if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360; 
-			    if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
-			  }
+	{
+	  lon_bounds[k] = grid_corner_lon[i0*ncorner+k];
+	  lat_bounds[k] = grid_corner_lat[i0*ncorner+k];
+	  /* Find cells that cover left and right border of the grid and adjust
+	     coordinates --> they become closed polygons on theta-phi plane! */
+	  if ( (lon - lon_bounds[k]) > 270 ) lon_bounds[k] += 360; 
+	  if ( (lon_bounds[k] - lon) > 270 ) lon_bounds[k] -= 360;
+	}
       
-			/* Reset found cuts for the current cell before starting the search */
+      /* Reset found cuts for the current cell before starting the search */
       for ( i = 0; i < ncorner; i ++ )
 	for ( j = 0; j < ncorner; j++ )
 	  cuts[i][j] = 0;
@@ -315,14 +319,16 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
 	     from one point to itself (j=i)*/
           for ( j = i+2 ; j < ncorner; j++ )
 	    {
-              /* Exclude the line between the last and first corner*/
-              if ( i == 0 && j == ncorner-1 ) continue;               
+              /* Exclude the line between the last and first corner */
+              if ( i == 0 && j == ncorner-1 ) continue;
+
 	      /* k = i+1: if starting point is in common lines to different corners
 		 do not intersect */
               for ( k = i+1; k < ncorner - 1; k++ )
 		{                  
                   if ( i == k ) l0 = j+1;
-                  else l0 = k+2;
+                  else          l0 = k+2;
+
                   for ( l = l0; l < ncorner; l++ )
 		    {
                       if ( cuts[k][l] && cuts[i][j] ) continue;
@@ -332,24 +338,26 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
 			 If so increment respective counters for intersections. 
 			 It is not relevant by which line a line is intersected - 
 			 it is only relevant if they is itersected! */
-                      if ( ! ( k==0 && l == ncorner-1 ) &&
-			   ( l != j ) && ( k != j )  )
+                      if ( ! ( k==0 && l == ncorner-1 ) && ( l != j ) && ( k != j )  )
 			{
                           if ( intersect(lon_bounds[i], lat_bounds[i], lon_bounds[j], lat_bounds[j],
-                                         lon_bounds[k], lat_bounds[k], lon_bounds[l], lat_bounds[l] ) )
-			    {cuts[i][j]++; cuts[k][l]++; cuts[j][i]++; cuts[l][k]++;}                                                        
+                                         lon_bounds[k], lat_bounds[k], lon_bounds[l], lat_bounds[l]) )
+			    {
+			      cuts[i][j]++; cuts[k][l]++; cuts[j][i]++; cuts[l][k]++;
+			    }
 			}
 		    }
 		}                  
 	    }
 	}
+
       convex = 1;
       /* The following loop covers all inner lines of the Polygon 
 	 (The assumption applies that the points are in cyclic order) */
       for ( i = 0; i < ncorner-1; i++ )
 	for ( j = i+2; j < ncorner; j++)
 	  {
-	    if ( i == 0 && j == ncorner-1 ) continue;
+	    if ( i == 0 && j == ncorner-1 ) continue;	   
 	    if ( ! cuts[i][j] ) convex = 0;
 	  }
       if ( !convex ) nout++;        
@@ -367,7 +375,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
               fprintf(stdout, "\n");
 	    }
           
-          fprintf(stdout, " %6i %6i   %9.4f   %9.4f :", nout, i0, lon, lat);
+          fprintf(stdout, " %6i %6i   %9.4f   %9.4f :", nout, i0+1, lon, lat);
           for ( k = 0; k < ncorner; k++ )
 	    fprintf(stdout, "  %9.4f %9.4f : ", lon_bounds[k], lat_bounds[k]);
           fprintf(stdout, "\n");         
