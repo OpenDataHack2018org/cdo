@@ -1011,6 +1011,7 @@ int referenceToGrid(int gridID1)
 {
   int gridID2 = -1;
   int gridtype, gridsize;
+  int offset = 7;
   char gridfile[8912];
 
   gridsize = gridInqSize(gridID1);
@@ -1024,7 +1025,8 @@ int referenceToGrid(int gridID1)
       position = gridInqPosition(gridID1);
       gridInqReference(gridID1, gridfile);
 
-      streamID = streamOpenRead(gridfile);
+      if ( gridfile[offset] != '/' ) offset--;
+      streamID = streamOpenRead(&gridfile[offset]);
       if ( streamID >= 0 )
 	{
 	  int vlistID, gridID = -1;
