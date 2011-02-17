@@ -32,25 +32,23 @@
 
 
 static 
-void setmissval(int nvals, int *imiss, double missval, double *array)
+void setmissval(long nvals, int *imiss, double missval, double *array)
 {
-  int i;
+  long i;
 
   if ( imiss )
     {
-      for ( i = 0; i < nvals; i++ )
-	{
-	  if ( imiss[i] ) array[i] = missval;
-	}
+      for ( i = 0; i < nvals; ++i )
+	if ( imiss[i] ) array[i] = missval;
     }
 }
 
 static
-void corr_hum(int gridsize, double *q, double q_min)
+void corr_hum(long gridsize, double *q, double q_min)
 {
   long i;
 
-  for ( i = 0; i < (long) gridsize; ++i )
+  for ( i = 0; i < gridsize; ++i )
     {
       if ( q[i] < q_min ) q[i] = q_min;
     }
@@ -75,7 +73,7 @@ long ncctop(long nlev, long nlevp1, double *vct_a, double *vct_b)
 
   /* half level pressure values, assuming 101320. Pa surface pressure */
 
-  for ( jk = 0; jk < (long) nlevp1; ++jk )
+  for ( jk = 0; jk < nlevp1; ++jk )
     {
       za = vct_a[jk];
       zb = vct_b[jk];
@@ -84,12 +82,12 @@ long ncctop(long nlev, long nlevp1, double *vct_a, double *vct_b)
 
   /* full level pressure */
 
-  for ( jk = 0; jk < (long)nlev; ++jk )
+  for ( jk = 0; jk < nlev; ++jk )
     zp[jk] = (zph[jk] + zph[jk+1])*0.5;
 
   /* search for pressure level cptop (Pa) */
 
-  for ( jk = 0; jk < (long)nlev; ++jk )
+  for ( jk = 0; jk < nlev; ++jk )
     {
       nctop = jk;
       if ( zp[jk] >= cptop ) break;
