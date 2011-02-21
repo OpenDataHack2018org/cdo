@@ -180,8 +180,8 @@ AC_ARG_WITH([grib_api],
                                            [AC_MSG_ERROR([Could not link to grib_api library])])],
                      [*],[GRIB_API_ROOT=$with_grib_api
                           AS_IF([test -d "$GRIB_API_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$GRIB_API_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$GRIB_API_ROOT/include"
+                                [LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS "
+                                 CPPFLAGS="-I$GRIB_API_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([grib_api.h])
                                  AC_SEARCH_LIBS([grib_get_message],
                                                 [grib_api],
