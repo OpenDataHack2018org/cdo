@@ -2094,14 +2094,13 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
   if ( ompNumThreads == 1 ) progressInit();
 
-  /*
-    Compute mappings from grid1 to grid2
-  */
+  /* Compute mappings from grid1 to grid2 */
+
   if ( rg->grid1_rank != 2 )
     cdoAbort("Can not do bilinear interpolation when grid1_rank != 2"); 
 
   /* Loop over destination grid */
-  /* grid_loop1 */
+
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
@@ -2110,6 +2109,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	  determinant, sum_wgts)	\
   schedule(dynamic,1)
 #endif
+  /* grid_loop1 */
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
       if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
@@ -2119,7 +2119,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
       plat = rg->grid2_center_lat[dst_add];
       plon = rg->grid2_center_lon[dst_add];
 
-      /*  Find nearest square of grid points on source grid  */
+      /* Find nearest square of grid points on source grid  */
       grid_search(rg, src_add, src_lats, src_lons, 
 		  plat, plon, rg->grid1_dims,
 		  rg->grid1_center_lat, rg->grid1_center_lon,
@@ -2130,12 +2130,12 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
 	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
-      /*  If point found, find local i,j coordinates for weights  */
+      /* If point found, find local i,j coordinates for weights  */
       if ( src_add[0] > 0 )
 	{
           rg->grid2_frac[dst_add] = ONE;
 
-	  /*  Iterate to find i,j for bilinear approximation  */
+	  /* Iterate to find i,j for bilinear approximation  */
 
           dth1 = src_lats[1] - src_lats[0];
           dth2 = src_lats[3] - src_lats[0];
@@ -2174,8 +2174,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
 	      determinant = mat1*mat4 - mat2*mat3;
 
-	      deli = (dthp*mat4 - mat2*dphp)/determinant;
-	      delj = (mat1*dphp - dthp*mat3)/determinant;
+	      deli = (dthp*mat4 - dphp*mat2)/determinant;
+	      delj = (dphp*mat1 - dthp*mat3)/determinant;
 
 	      if ( fabs(deli) < converge && fabs(delj) < converge ) break;
 
@@ -2204,7 +2204,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	      cdoPrint("Dest grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
 	      cdoPrint("Dest grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
 	      cdoPrint("Current i,j : %g %g", iguess, jguess);
-	      cdoAbort("Iteration for i,j exceed max iteration count of %d", Max_Iter);
+	      cdoPrint("fabs(deli), fabs(delj), converge : %g %g %g", fabs(deli), fabs(delj), converge);
+	      cdoAbort("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
 	    }
 
 	  /*
@@ -2329,14 +2330,13 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
   if ( ompNumThreads == 1 ) progressInit();
 
-  /*
-    Compute mappings from grid1 to grid2
-  */
+  /* Compute mappings from grid1 to grid2 */
+
   if ( rg->grid1_rank != 2 )
     cdoAbort("Can not do bicubic interpolation when grid1_rank != 2"); 
 
   /* Loop over destination grid */
-  /* grid_loop1 */
+
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
@@ -2345,6 +2345,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	  determinant, sum_wgts)	\
   schedule(dynamic,1)
 #endif
+  /* grid_loop1 */
   for ( dst_add = 0; dst_add < rg->grid2_size; dst_add++ )
     {
       if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/rg->grid2_size);
@@ -2354,7 +2355,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
       plat = rg->grid2_center_lat[dst_add];
       plon = rg->grid2_center_lon[dst_add];
 
-      /*  Find nearest square of grid points on source grid  */
+      /* Find nearest square of grid points on source grid  */
       grid_search(rg, src_add, src_lats, src_lons, 
 		  plat, plon, rg->grid1_dims,
 		  rg->grid1_center_lat, rg->grid1_center_lon,
@@ -2365,12 +2366,12 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
 	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
 
-      /*  If point found, find local i,j coordinates for weights  */
+      /* If point found, find local i,j coordinates for weights  */
       if ( src_add[0] > 0 )
 	{
           rg->grid2_frac[dst_add] = ONE;
 
-	  /*  Iterate to find i,j for bilinear approximation  */
+	  /* Iterate to find i,j for bilinear approximation  */
 
           dth1 = src_lats[1] - src_lats[0];
           dth2 = src_lats[3] - src_lats[0];
@@ -2409,8 +2410,8 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
 	      determinant = mat1*mat4 - mat2*mat3;
 
-	      deli = (dthp*mat4 - mat2*dphp)/determinant;
-	      delj = (mat1*dphp - dthp*mat3)/determinant;
+	      deli = (dthp*mat4 - dphp*mat2)/determinant;
+	      delj = (dphp*mat1 - dthp*mat3)/determinant;
 
 	      if ( fabs(deli) < converge && fabs(delj) < converge ) break;
 
@@ -2462,7 +2463,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	    }
           else
 	    {
-	      cdoAbort("Iteration for i,j exceed max iteration count of %d", Max_Iter);
+	      cdoAbort("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
 	    }
 	  
 	  /*
