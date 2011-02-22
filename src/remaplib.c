@@ -1758,7 +1758,7 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
 #define  DEFAULT_MAX_ITER  100
 
 static long    Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i,j iteration */
-static double  converge = 1.e-10;      /* Convergence criterion */
+static double  converge = 1.e-10;            /* Convergence criterion */
 
 void remap_set_max_iter(long max_iter)
 {
