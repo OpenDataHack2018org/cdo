@@ -10,7 +10,7 @@
 \put(0,0.0){\line(1,0){3.95}}
 \end{picture}
 \begin{flushright}
-{\small{Climate Data Operators \\ Version 1.4.7 \\ January 2011}}
+{\small{Climate Data Operators \\ Version 1.5.0 \\ March 2011}}
 \end{flushright}
 
 \vspace*{0mm}
@@ -37,9 +37,9 @@
 \makebox[0.85in][l]{{\bf{-a}}                  } & \makebox[2.76in][l]{Generate an absolute time axis} \\ \hline
 \makebox[0.85in][l]{{\bf{-b}} $<\!nbits\!>$    } & \makebox[2.76in][l]{Set the number of bits for the output precision} \\
                                                  & (I8/I16/I32/F32/F64 for nc,nc2,nc4; \\
-                                                 &  F32/F64 for srv,ext,ieg;  1-32 for grb) \\
+                                                 &  F32/F64 for srv,ext,ieg;  1-24 for grb,grb2) \\
                                                  & Add L or B for Little or Big endian byteorder\\ \hline
-\makebox[0.85in][l]{{\bf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Output file format (grb,nc,nc2,nc4,srv,ext,ieg)} \\ \hline
+\makebox[0.85in][l]{{\bf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Output format (grb,grb2,nc,nc2,nc4,srv,ext,ieg)} \\ \hline
 \makebox[0.85in][l]{{\bf{-g}} $<\!grid\!>$     } & \makebox[2.76in][l]{Grid or file name} \\
                                                  & Grid names: {\tt r<NX>x<NY>}, {\tt n<N>}, {\tt gme<NI>} \\ \hline
 \makebox[0.85in][l]{{\bf{-h}}                  } & \makebox[2.76in][l]{Help information for the operators} \\ \hline

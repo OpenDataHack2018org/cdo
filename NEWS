@@ -4,11 +4,12 @@ CDO NEWS
 Version 1.5.0 (?? March 2011):
 
    New features:
+     * Added GRIB2 support via ECMWF GRIB_API
      * Added support for netCDF level bounds
    Fixed bugs:
      * sellonlatbox: does not work as expected when selecting all longitutes
      * sellonlatbox: initialization missing for unstructured grids
-     * detrend: integer overflow; wrong result for nts > 46340
+     * detrend: integer overflow; wrong result for ntimesteps > 46340
      * spcut: only correct results with continuous wave numbers starting at 1
      * remaplib: fix data race in calculation of bin_addr (OpenMP)
 

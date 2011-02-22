@@ -237,8 +237,7 @@ static char *MergeHelp[] = {
     "               All input files need to have the same structure with the same variables ",
     "               on different time steps.",
     "               After this operation every input time step is in ofile and",
-    "               all time steps are sorted by date and time. Each input file is ",
-    "               required to have the same variables and different time steps.",
+    "               all time steps are sorted by date and time.",
     NULL
 };
 
