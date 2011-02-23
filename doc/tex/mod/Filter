@@ -82,7 +82,7 @@ FLOAT	Maximum frequency per year that passes the filter.
 	
 @BeginExample
 Now assume your data are still hourly for a time period of 5 years but with a 365/366-day-
-calendar and you want to suppress the variability on timescales greater ore equal to one year
+calendar and you want to suppress the variability on timescales greater or equal to one year
 (we suggest here to use a number x bigger than one (e.g. x=1.5) since there will be dominant 
 frequencies around the peak (if there is one) as well due to the issue that the time series is not of 
 infinite length). 
