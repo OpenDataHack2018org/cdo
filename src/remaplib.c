@@ -2098,7 +2098,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
+  shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
           deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
 	  determinant, sum_wgts)	\
@@ -2194,12 +2194,14 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	    }
           else
 	    {
-	      cdoPrint("Point coords: %g %g", plat, plon);
-	      cdoPrint("Dest grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-	      cdoPrint("Dest grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
-	      cdoPrint("Dest grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
-	      cdoPrint("Current i,j : %g %g", iguess, jguess);
-	      cdoPrint("fabs(deli), fabs(delj), converge : %g %g %g", fabs(deli), fabs(delj), converge);
+	      if ( cdoVerbose )
+		{
+		  cdoPrint("Point coords: %g %g", plat, plon);
+		  cdoPrint("Dest grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
+		  cdoPrint("Dest grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
+		  cdoPrint("Dest grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
+		  cdoPrint("Current i,j : %g %g", iguess, jguess);
+		}
 	      cdoAbort("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
 	    }
 
@@ -2212,7 +2214,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	{
 	  int lstore = TRUE;
 
-          for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -1*src_add[n] : src_add[n];
+          for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -src_add[n] : src_add[n];
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
@@ -2470,7 +2472,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	{
 	  int lstore = TRUE;
 
-          for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -1*src_add[n] : src_add[n];
+          for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -src_add[n] : src_add[n];
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
