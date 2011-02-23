@@ -17554,8 +17554,8 @@ fi
   *) :
     GRIB_API_ROOT=$with_grib_api
                           if test -d "$GRIB_API_ROOT"; then :
-  LDFLAGS="$LDFLAGS -L$GRIB_API_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$GRIB_API_ROOT/include"
+  LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS "
+                                 CPPFLAGS="-I$GRIB_API_ROOT/include $CPPFLAGS"
                                  for ac_header in grib_api.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "grib_api.h" "ac_cv_header_grib_api_h" "$ac_includes_default"

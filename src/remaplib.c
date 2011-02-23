@@ -1939,8 +1939,7 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
 
 	      if ( n == 0 ) scross_last = scross[n];
 
-	      if ( (scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0) )
-		break;
+	      if ( (scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0) ) break;
 
 	      scross_last = scross[n];
 	    } /* corner_loop */
@@ -1969,20 +1968,17 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
     } /* srch_loop */
 
   /*
-    If no cell found, point is likely either in a box that straddles either 
-    pole or is outside the grid. Fall back to a distance-weighted average 
-    of the four closest points. Go ahead and compute weights here, but store
-    in src_lats and return -add to prevent the parent routine from computing 
-    bilinear weights.
+    If no cell found, point is likely either in a box that straddles either pole or is outside 
+    the grid. Fall back to a distance-weighted average of the four closest points.
+    Go ahead and compute weights here, but store in src_lats and return -add to prevent the 
+    parent routine from computing bilinear weights.
   */
-
   if ( ! rg->lextrapolate ) return;
 
   /*
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-
   coslat_dst = cos(plat);
   sinlat_dst = sin(plat);
   coslon_dst = cos(plon);
@@ -2026,9 +2022,8 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
 
 
 /*
-  This routine stores the address and weight for four links 
-  associated with one destination point in the appropriate address 
-  and weight arrays and resizes those arrays if necessary.
+  This routine stores the address and weight for four links associated with one destination
+  point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
 static
 void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add, const double *restrict weights)
@@ -2072,15 +2067,15 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
-  long dst_add;        /*  destination addresss */
+  long dst_add;                  /*  destination addresss */
   long n, icount;
-  long iter;           /*  iteration counters   */
+  long iter;                     /*  iteration counters   */
 
-  int src_add[4];     /*  address for the four source points */
+  int src_add[4];                /*  address for the four source points     */
 
-  double src_lats[4]; /*  latitudes  of four bilinear corners */
-  double src_lons[4]; /*  longitudes of four bilinear corners */
-  double wgts[4];     /*  bilinear weights for four corners   */
+  double src_lats[4];            /*  latitudes  of four bilinear corners    */
+  double src_lons[4];            /*  longitudes of four bilinear corners    */
+  double wgts[4];                /*  bilinear weights for four corners      */
 
   double plat, plon;             /*  lat/lon coords of destination point    */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
@@ -2266,7 +2261,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bicub(remapvars_t *rv, const int dst_add, const int *restrict src_add, double weights[4][4])
+void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add, double weights[4][4])
 {
   /*
     Input variables:
