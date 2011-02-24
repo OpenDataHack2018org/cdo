@@ -5503,6 +5503,11 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
   nx = rg.grid1_dims[0];
   ny = rg.grid1_dims[1];
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none)        \
+  shared(grid1_size, grad1_lat, grad1_lon, grad1_latlon, rg, nx, ny, array) \
+  private(n, i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw, delew, delns, grad1_lat_zero, grad1_lon_zero)
+#endif
   for ( n = 0; n < grid1_size; n++ )
     {
       grad1_lat[n] = ZERO;
