@@ -2357,7 +2357,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge, lwarn)		\
+  shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge, lwarn)	\
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
 	  sum_wgts, search_result)					\
   schedule(dynamic,1)
