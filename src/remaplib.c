@@ -1777,10 +1777,10 @@ void remap_set_max_iter(long max_iter)
    source grid and returns the corners needed for a bilinear interpolation.
 */
 static
-void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lats, 
-		 double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
-		 const double *restrict src_center_lat, const double *restrict src_center_lon,
-		 const restr_t *restrict src_grid_bound_box, const int *restrict src_bin_add)
+int grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lats, 
+		double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
+		const double *restrict src_center_lat, const double *restrict src_center_lon,
+		const restr_t *restrict src_grid_bound_box, const int *restrict src_bin_add)
 {
   /*
     Output variables:
@@ -1815,6 +1815,7 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
   double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
   double dist_min, distance; /* For computing dist-weighted avg */
   int scross[4], scross_last = 0;
+  int search_result = 0;
   restr_t rlat, rlon;
 
   nbins = rg->num_srch_bins;
@@ -1822,7 +1823,7 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
   rlat = RESTR_SCALE(plat);
   rlon = RESTR_SCALE(plon);
 
-  /*restrict search first using bins */
+  /* restrict search first using bins */
 
   for ( n = 0; n < 4; n++ ) src_add[n] = 0;
 
@@ -1954,12 +1955,14 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
 	  /* If cross products all same sign, we found the location */
           if ( n >= 4 )
 	    {
-	      src_add[0] = srch_add + 1;
-	      src_add[1] = e_add + 1;
-	      src_add[2] = ne_add + 1;
-	      src_add[3] = n_add + 1;
+	      src_add[0] = srch_add;
+	      src_add[1] = e_add;
+	      src_add[2] = ne_add;
+	      src_add[3] = n_add;
 
-	      return;
+	      search_result = 1;
+
+	      return (search_result);
 	    }
 
 	  /* Otherwise move on to next cell */
@@ -1973,7 +1976,7 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
     Go ahead and compute weights here, but store in src_lats and return -add to prevent the 
     parent routine from computing bilinear weights.
   */
-  if ( ! rg->lextrapolate ) return;
+  if ( ! rg->lextrapolate ) return (search_result);
 
   /*
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
@@ -2004,7 +2007,8 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
 		      src_add [i] = src_add [i-1];
 		      src_lats[i] = src_lats[i-1];
 		    }
-		  src_add [n] = -srch_add - 1;
+		  search_result = -1;
+		  src_add [n] = srch_add;
 		  src_lats[n] = distance;
 		  dist_min = src_lats[3];
 		  break;
@@ -2018,6 +2022,7 @@ void grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_la
   for ( n = 0; n < 4; n++ ) distance += src_lons[n];
   for ( n = 0; n < 4; n++ ) src_lats[n] = src_lons[n]/distance;
 
+  return (search_result);
 }  /* grid_search */
 
 
@@ -2049,7 +2054,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 
   for ( n = 0; n < 4; n++ )
     {
-      rv->grid1_add[num_links_old+n] = src_add[n]-1;
+      rv->grid1_add[num_links_old+n] = src_add[n];
       rv->grid2_add[num_links_old+n] = dst_add;
       rv->wts      [num_links_old+n] = weights[n];
     }
@@ -2067,6 +2072,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
+  int  search_result;
   long dst_add;                  /*  destination addresss */
   long n, icount;
   long iter;                     /*  iteration counters   */
@@ -2101,7 +2107,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
           deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
-	  determinant, sum_wgts)	\
+	  determinant, sum_wgts, search_result)					\
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -2115,18 +2121,20 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
       plon = rg->grid2_center_lon[dst_add];
 
       /* Find nearest square of grid points on source grid  */
-      grid_search(rg, src_add, src_lats, src_lons, 
-		  plat, plon, rg->grid1_dims,
-		  rg->grid1_center_lat, rg->grid1_center_lon,
-		  rg->grid1_bound_box, rg->bin_addr1);
+      search_result = grid_search(rg, src_add, src_lats, src_lons, 
+				  plat, plon, rg->grid1_dims,
+				  rg->grid1_center_lat, rg->grid1_center_lon,
+				  rg->grid1_bound_box, rg->bin_addr1);
 
       /* Check to see if points are land points */
-      for ( n = 0; n < 4; n++ )
-	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
-	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
+      if ( search_result > 0 )
+	{
+	  for ( n = 0; n < 4; n++ )
+	    if ( ! rg->grid1_mask[src_add[n]] ) search_result = 0;
+	}
 
       /* If point found, find local i,j coordinates for weights  */
-      if ( src_add[0] > 0 )
+      if ( search_result > 0 )
 	{
           rg->grid2_frac[dst_add] = ONE;
 
@@ -2197,9 +2205,15 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	      if ( cdoVerbose )
 		{
 		  cdoPrint("Point coords: %g %g", plat, plon);
-		  cdoPrint("Dest grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-		  cdoPrint("Dest grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
-		  cdoPrint("Dest grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
+		  cdoPrint("Src grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
+		  cdoPrint("Src grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
+		  cdoPrint("Src grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
+		  cdoPrint("Src grid lats: %g %g %g %g",
+			   rg->grid1_center_lat[src_add[0]], rg->grid1_center_lat[src_add[1]],
+			   rg->grid1_center_lat[src_add[2]], rg->grid1_center_lat[src_add[3]]);
+		  cdoPrint("Src grid lons: %g %g %g %g",
+			   rg->grid1_center_lon[src_add[0]], rg->grid1_center_lon[src_add[1]],
+			   rg->grid1_center_lon[src_add[2]], rg->grid1_center_lon[src_add[3]]);
 		  cdoPrint("Current i,j : %g %g", iguess, jguess);
 		}
 	      cdoAbort("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
@@ -2210,28 +2224,18 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	    average instead (this is typically near the pole)
 	  */
 	}
-      else if ( src_add[0] < 0 )
+      else if ( search_result < 0 )
 	{
-	  int lstore = TRUE;
-
-          for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -src_add[n] : src_add[n];
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
-	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
-		{
-		  if ( rg->grid1_mask[src_add[n]-1] )
-		    icount++;
-		  else
-		    src_lats[n] = ZERO;
-		}
+	      if ( rg->grid1_mask[src_add[n]] )
+		icount++;
 	      else
-		{
-		  lstore = FALSE;
-		}
+		src_lats[n] = ZERO;
 	    }
 
-          if ( lstore && icount > 0 )
+          if ( icount > 0 )
 	    {
 	      /* Renormalize weights */
 	      sum_wgts = 0.0;
@@ -2286,7 +2290,7 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
 
   for ( n = 0; n < 4; n++ )
     {
-      rv->grid1_add[num_links_old+n] = src_add[n]-1;
+      rv->grid1_add[num_links_old+n] = src_add[n];
       rv->grid2_add[num_links_old+n] = dst_add;
       for ( k = 0; k < 4; k++ )
 	rv->wts[4*(num_links_old+n)+k] = weights[k][n];
@@ -2305,6 +2309,7 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
 void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
+  int  search_result;
   long n, icount;
   long dst_add;        /*  destination addresss */
   long iter;           /*  iteration counters   */
@@ -2339,7 +2344,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
   shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
           deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
-	  determinant, sum_wgts)	\
+	  determinant, sum_wgts, search_result)					\
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -2353,18 +2358,20 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
       plon = rg->grid2_center_lon[dst_add];
 
       /* Find nearest square of grid points on source grid  */
-      grid_search(rg, src_add, src_lats, src_lons, 
-		  plat, plon, rg->grid1_dims,
-		  rg->grid1_center_lat, rg->grid1_center_lon,
-		  rg->grid1_bound_box, rg->bin_addr1);
+      search_result = grid_search(rg, src_add, src_lats, src_lons, 
+				  plat, plon, rg->grid1_dims,
+				  rg->grid1_center_lat, rg->grid1_center_lon,
+				  rg->grid1_bound_box, rg->bin_addr1);
 
       /* Check to see if points are land points */
-      for ( n = 0; n < 4; n++ )
-	if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
-	  if ( ! rg->grid1_mask[src_add[n]-1] ) src_add[0] = 0;
+      if ( search_result > 0 )
+	{
+	  for ( n = 0; n < 4; n++ )
+	    if ( ! rg->grid1_mask[src_add[n]] ) search_result = 0;
+	}
 
       /* If point found, find local i,j coordinates for weights  */
-      if ( src_add[0] > 0 )
+      if ( search_result > 0 )
 	{
           rg->grid2_frac[dst_add] = ONE;
 
@@ -2468,28 +2475,18 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	    average instead (this is typically near the pole)
 	  */
 	}
-      else if ( src_add[0] < 0 )
+      else if ( search_result < 0 )
 	{
-	  int lstore = TRUE;
-
-          for ( n = 0; n < 4; n++ ) src_add[n] = src_add[n] < 0 ? -src_add[n] : src_add[n];
           icount = 0;
           for ( n = 0; n < 4; n++ )
 	    {
-	      if ( src_add[n] > 0 ) /* Uwe Schulzweida: check that src_add is valid */
-		{
-		  if ( rg->grid1_mask[src_add[n]-1] )
-		    icount++;
-		  else
-		    src_lats[n] = ZERO;
-		}
+	      if ( rg->grid1_mask[src_add[n]] )
+		icount++;
 	      else
-		{
-		  lstore = FALSE;
-		}
+		src_lats[n] = ZERO;
 	    }
 
-          if ( lstore && icount > 0 )
+          if ( icount > 0 )
 	    {
 	      /* Renormalize weights */
 	      sum_wgts = 0.0;
