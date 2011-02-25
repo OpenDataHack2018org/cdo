@@ -2061,6 +2061,71 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 
 } /* store_link_bilin */
 
+static
+long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
+{
+  long iter;                     /*  iteration counters   */
+  double iguess, jguess;         /*  current guess for bilinear coordinate  */
+  double deli, delj;             /*  corrections to i,j                     */
+  double dth1, dth2, dth3;       /*  some latitude  differences             */
+  double dph1, dph2, dph3;       /*  some longitude differences             */
+  double dthp, dphp;             /*  difference between point and sw corner */
+  double mat1, mat2, mat3, mat4; /*  matrix elements                        */
+  double determinant;            /*  matrix determinant                     */
+
+  /* Iterate to find i,j for bilinear approximation  */
+
+  dth1 = src_lats[1] - src_lats[0];
+  dth2 = src_lats[3] - src_lats[0];
+  dth3 = src_lats[2] - src_lats[1] - dth2;
+
+  dph1 = src_lons[1] - src_lons[0];
+  dph2 = src_lons[3] - src_lons[0];
+  dph3 = src_lons[2] - src_lons[1];
+
+  if ( dph1 >  THREE*PIH ) dph1 -= PI2;
+  if ( dph2 >  THREE*PIH ) dph2 -= PI2;
+  if ( dph3 >  THREE*PIH ) dph3 -= PI2;
+  if ( dph1 < -THREE*PIH ) dph1 += PI2;
+  if ( dph2 < -THREE*PIH ) dph2 += PI2;
+  if ( dph3 < -THREE*PIH ) dph3 += PI2;
+
+  dph3 = dph3 - dph2;
+
+  iguess = HALF;
+  jguess = HALF;
+
+  for ( iter = 0; iter < Max_Iter; iter++ )
+    {
+      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
+      dphp = plon - src_lons[0];
+      
+      if ( dphp >  THREE*PIH ) dphp -= PI2;
+      if ( dphp < -THREE*PIH ) dphp += PI2;
+
+      dphp = dphp - dph1*iguess - dph2*jguess - dph3*iguess*jguess;
+
+      mat1 = dth1 + dth3*jguess;
+      mat2 = dth2 + dth3*iguess;
+      mat3 = dph1 + dph3*jguess;
+      mat4 = dph2 + dph3*iguess;
+
+      determinant = mat1*mat4 - mat2*mat3;
+
+      deli = (dthp*mat4 - dphp*mat2)/determinant;
+      delj = (dphp*mat1 - dthp*mat3)/determinant;
+
+      if ( fabs(deli) < converge && fabs(delj) < converge ) break;
+
+      iguess += deli;
+      jguess += delj;
+    }
+
+  *ig = iguess;
+  *jg = jguess;
+
+  return (iter);
+}
 
 /*
   -----------------------------------------------------------------------
@@ -2085,12 +2150,6 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
   double plat, plon;             /*  lat/lon coords of destination point    */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
-  double deli, delj;             /*  corrections to i,j                     */
-  double dth1, dth2, dth3;       /*  some latitude  differences             */
-  double dph1, dph2, dph3;       /*  some longitude differences             */
-  double dthp, dphp;             /*  difference between point and sw corner */
-  double mat1, mat2, mat3, mat4; /*  matrix elements                        */
-  double determinant;            /*  matrix determinant                     */
   double sum_wgts;               /*  sum of weights for normalization       */
 
   if ( ompNumThreads == 1 ) progressInit();
@@ -2106,8 +2165,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
-          deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
-	  determinant, sum_wgts, search_result)					\
+	  sum_wgts, search_result)					\
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -2138,53 +2196,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	{
           rg->grid2_frac[dst_add] = ONE;
 
-	  /* Iterate to find i,j for bilinear approximation  */
-
-          dth1 = src_lats[1] - src_lats[0];
-          dth2 = src_lats[3] - src_lats[0];
-          dth3 = src_lats[2] - src_lats[1] - dth2;
-
-          dph1 = src_lons[1] - src_lons[0];
-          dph2 = src_lons[3] - src_lons[0];
-          dph3 = src_lons[2] - src_lons[1];
-
-          if ( dph1 >  THREE*PIH ) dph1 -= PI2;
-          if ( dph2 >  THREE*PIH ) dph2 -= PI2;
-          if ( dph3 >  THREE*PIH ) dph3 -= PI2;
-          if ( dph1 < -THREE*PIH ) dph1 += PI2;
-          if ( dph2 < -THREE*PIH ) dph2 += PI2;
-          if ( dph3 < -THREE*PIH ) dph3 += PI2;
-
-          dph3 = dph3 - dph2;
-
-          iguess = HALF;
-          jguess = HALF;
-
-          for ( iter = 0; iter < Max_Iter; iter++ )
-	    {
-	      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
-	      dphp = plon - src_lons[0];
-
-	      if ( dphp >  THREE*PIH ) dphp -= PI2;
-	      if ( dphp < -THREE*PIH ) dphp += PI2;
-
-	      dphp = dphp - dph1*iguess - dph2*jguess - dph3*iguess*jguess;
-
-	      mat1 = dth1 + dth3*jguess;
-	      mat2 = dth2 + dth3*iguess;
-	      mat3 = dph1 + dph3*jguess;
-	      mat4 = dph2 + dph3*iguess;
-
-	      determinant = mat1*mat4 - mat2*mat3;
-
-	      deli = (dthp*mat4 - dphp*mat2)/determinant;
-	      delj = (dphp*mat1 - dthp*mat3)/determinant;
-
-	      if ( fabs(deli) < converge && fabs(delj) < converge ) break;
-
-	      iguess += deli;
-	      jguess += delj;
-	    }
+	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess);
 
           if ( iter < Max_Iter )
 	    {
@@ -2322,12 +2334,6 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
   double plat, plon;             /*  lat/lon coords of destination point    */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
-  double deli, delj;             /*  corrections to i,j                     */
-  double dth1, dth2, dth3;       /*  some latitude  differences             */
-  double dph1, dph2, dph3;       /*  some longitude differences             */
-  double dthp, dphp;             /*  difference between point and sw corner */
-  double mat1, mat2, mat3, mat4; /*  matrix elements                        */
-  double determinant;            /*  matrix determinant                     */
   double sum_wgts;               /*  sum of weights for normalization       */
 
   if ( ompNumThreads == 1 ) progressInit();
@@ -2343,8 +2349,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
-          deli, delj, dth1, dth2, dth3, dph1, dph2, dph3, dthp, dphp, mat1, mat2, mat3, mat4, \
-	  determinant, sum_wgts, search_result)					\
+	  sum_wgts, search_result)					\
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -2375,53 +2380,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	{
           rg->grid2_frac[dst_add] = ONE;
 
-	  /* Iterate to find i,j for bilinear approximation  */
-
-          dth1 = src_lats[1] - src_lats[0];
-          dth2 = src_lats[3] - src_lats[0];
-          dth3 = src_lats[2] - src_lats[1] - dth2;
-
-          dph1 = src_lons[1] - src_lons[0];
-          dph2 = src_lons[3] - src_lons[0];
-          dph3 = src_lons[2] - src_lons[1];
-
-          if ( dph1 >  THREE*PIH ) dph1 -= PI2;
-          if ( dph2 >  THREE*PIH ) dph2 -= PI2;
-          if ( dph3 >  THREE*PIH ) dph3 -= PI2;
-          if ( dph1 < -THREE*PIH ) dph1 += PI2;
-          if ( dph2 < -THREE*PIH ) dph2 += PI2;
-          if ( dph3 < -THREE*PIH ) dph3 += PI2;
-
-          dph3 = dph3 - dph2;
-
-          iguess = HALF;
-          jguess = HALF;
-
-          for ( iter = 0; iter < Max_Iter; iter++ )
-	    {
-	      dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
-	      dphp = plon - src_lons[0];
-
-	      if ( dphp >  THREE*PIH ) dphp -= PI2;
-	      if ( dphp < -THREE*PIH ) dphp += PI2;
-
-	      dphp = dphp - dph1*iguess - dph2*jguess - dph3*iguess*jguess;
-
-	      mat1 = dth1 + dth3*jguess;
-	      mat2 = dth2 + dth3*iguess;
-	      mat3 = dph1 + dph3*jguess;
-	      mat4 = dph2 + dph3*iguess;
-
-	      determinant = mat1*mat4 - mat2*mat3;
-
-	      deli = (dthp*mat4 - dphp*mat2)/determinant;
-	      delj = (dphp*mat1 - dthp*mat3)/determinant;
-
-	      if ( fabs(deli) < converge && fabs(delj) < converge ) break;
-
-	      iguess += deli;
-	      jguess += delj;
-	    }
+	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess);
 
           if ( iter < Max_Iter )
 	    {
