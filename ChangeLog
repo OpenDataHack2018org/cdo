@@ -1,3 +1,7 @@
+2011-02-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remapbil: fix pole problem with gr15_psi grids [report: Karoline Block]
+
 2011-02-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* renamed function var to expr_var [report: Jed Kaplan]

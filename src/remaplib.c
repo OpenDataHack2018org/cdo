@@ -1896,6 +1896,7 @@ int grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lat
           src_lons[3] = src_center_lon[n_add];
 
 	  /* For consistency, we must make sure all lons are in same 2pi interval */
+
           vec1_lon = src_lons[0] - plon;
           if      ( vec1_lon >  PI ) src_lons[0] -= PI2;
           else if ( vec1_lon < -PI ) src_lons[0] += PI2;
@@ -2137,6 +2138,7 @@ long find_ij_weights(double plon, double plat, double *restrict src_lats, double
 void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
+  int  lwarn = TRUE;
   int  search_result;
   long dst_add;                  /*  destination addresss */
   long n, icount;
@@ -2163,7 +2165,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge, lwarn)  \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
 	  sum_wgts, search_result)					\
   schedule(dynamic,1)
@@ -2228,15 +2230,22 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 			   rg->grid1_center_lon[src_add[2]], rg->grid1_center_lon[src_add[3]]);
 		  cdoPrint("Current i,j : %g %g", iguess, jguess);
 		}
-	      cdoAbort("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
-	    }
 
-	  /*
-	    Search for bilinear failed - use a distance-weighted
-	    average instead (this is typically near the pole)
-	  */
+	      if ( cdoVerbose || lwarn )
+		{
+		  lwarn = FALSE;
+		  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		}
+
+	      search_result = -1;
+	    }
 	}
-      else if ( search_result < 0 )
+
+      /*
+	Search for bilinear failed - use a distance-weighted
+	average instead (this is typically near the pole)
+      */
+      if ( search_result < 0 )
 	{
           icount = 0;
           for ( n = 0; n < 4; n++ )
@@ -2321,6 +2330,7 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
 void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 {
   /*   Local variables */
+  int  lwarn = TRUE;
   int  search_result;
   long n, icount;
   long dst_add;        /*  destination addresss */
@@ -2347,7 +2357,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge)				\
+  shared(ompNumThreads, cdoTimer, rg, rv, Max_Iter, converge, lwarn)		\
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, \
 	  sum_wgts, search_result)					\
   schedule(dynamic,1)
@@ -2426,15 +2436,21 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	    }
           else
 	    {
-	      cdoAbort("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+	      if ( cdoVerbose || lwarn )
+		{
+		  lwarn = FALSE;
+		  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		}
+
+	      search_result = -1;
 	    }
-	  
-	  /*
-	    Search for bilinear failed - use a distance-weighted
-	    average instead (this is typically near the pole)
-	  */
 	}
-      else if ( search_result < 0 )
+	  
+      /*
+	Search for bilinear failed - use a distance-weighted
+	average instead (this is typically near the pole)
+      */
+      if ( search_result < 0 )
 	{
           icount = 0;
           for ( n = 0; n < 4; n++ )
