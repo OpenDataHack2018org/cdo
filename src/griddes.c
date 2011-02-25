@@ -1635,6 +1635,16 @@ int gridFromName(const char *gridname)
 
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
+  else if ( strncmp(gridname, "world", 5) == 0 ) /* world_Xdeg */
+    {
+      double lon1 = -180, lon2 = 180;
+      double lat1 =  -90, lat2 =  90;
+      double dll = 1;
+
+      pline = &gridname[5];
+  
+      gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
+    }
 
   if ( grid.type != -1 ) gridID = gridDefine(grid);
 
