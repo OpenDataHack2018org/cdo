@@ -467,6 +467,7 @@ void *Remapeta(void *argument)
 	    {
 	      if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
 	      else if ( strcmp(varname, "aps")     == 0 ) code = 134;
+	      else if ( strcmp(varname, "ps")      == 0 ) code = 134;
 	      else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
 	    }
 
