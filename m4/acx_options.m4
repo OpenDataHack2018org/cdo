@@ -272,19 +272,13 @@ AC_ARG_WITH([proj],
                             AC_SUBST([PROJ_INCLUDE],[""])],
                      [*],[PROJ_ROOT=$with_proj
                           AS_IF([test -d "$PROJ_ROOT"],
-                                [LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
+                                [LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$PROJ_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([projects.h])
                                  AC_SEARCH_LIBS([pj_init],
                                                 [proj],
                                                 [AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
                                                 [AC_MSG_ERROR([Could not link to PROJ library!])])
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  AC_SUBST([PROJ_LDFLAGS],[" -L$PROJ_ROOT/lib -lproj"])
                                  AC_SUBST([PROJ_INCLUDE],[" -I$PROJ_ROOT/include"])],
                                 [AC_MSG_ERROR([$PROJ_ROOT is not a directory! PROJ suppressed])])])],

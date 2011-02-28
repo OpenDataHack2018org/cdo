@@ -18168,10 +18168,7 @@ fi
   *) :
     PROJ_ROOT=$with_proj
                           if test -d "$PROJ_ROOT"; then :
-  LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
+  LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$PROJ_ROOT/include $CPPFLAGS"
                                  for ac_header in projects.h
 do :
@@ -18245,9 +18242,6 @@ else
   as_fn_error $? "Could not link to PROJ library!" "$LINENO" 5
 fi
 
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  PROJ_LDFLAGS=" -L$PROJ_ROOT/lib -lproj"
 
                                  PROJ_INCLUDE=" -I$PROJ_ROOT/include"
