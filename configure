@@ -16779,9 +16779,6 @@ fi
  ;; #(
   *) :
     ZLIB_ROOT=$with_zlib
-                          LDFLAGS_org="$LDFLAGS"
-                          CPPFLAGS_org="$CPPFLAGS"
-                          LIBS_org="$LIBS"
                           LDFLAGS="-L$ZLIB_ROOT/lib $LDFLAGS"
                           CPPFLAGS="-I$ZLIB_ROOT/include $CPPFLAGS"
                           for ac_header in zlib.h
@@ -16854,9 +16851,6 @@ $as_echo "#define HAVE_LIBZ 1" >>confdefs.h
 
 fi
 
-                          LDFLAGS="$LDFLAGS_org"
-                          CPPFLAGS="$CPPFLAGS_org"
-                          LIBS="$LIBS_org"
                           ZLIB_INCLUDE=" -I$ZLIB_ROOT/include"
 
                           ZLIB_LDFLAGS=" -L$ZLIB_ROOT/lib -lz"
@@ -17030,10 +17024,7 @@ fi
   *) :
     SZLIB_ROOT=$with_szlib
                           if test -d "$SZLIB_ROOT"; then :
-  LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$SZLIB_ROOT/lib $LDFLAGS"
+  LDFLAGS="-L$SZLIB_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$SZLIB_ROOT/include $CPPFLAGS"
                                  for ac_header in szlib.h
 do :
@@ -17107,9 +17098,6 @@ else
   as_fn_error $? "Could not link to szlib" "$LINENO" 5
 fi
 
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  SZLIB_LDFLAGS=" -L$SZLIB_ROOT/lib -lsz"
 
                                  SZLIB_INCLUDE=" -I$SZLIB_ROOT/include"
@@ -17284,10 +17272,7 @@ fi
   *) :
     HDF5_ROOT=$with_hdf5
                           if test -d "$HDF5_ROOT"; then :
-  LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
+  LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$HDF5_ROOT/include $CPPFLAGS"
                                  for ac_header in hdf5.h
 do :
@@ -17427,9 +17412,6 @@ $as_echo "$as_me: Cannot link to hdf5 high level interface! It is required for n
                                                 have_hdf5_hl=no
 fi
 
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  if test "x$have_libhdf5_hl" = 'xyes'; then :
   HDF5_LDFLAGS=" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"
 
@@ -17544,10 +17526,7 @@ fi
   *) :
     NETCDF_ROOT=$with_netcdf
                           if test -d "$NETCDF_ROOT"; then :
-  LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
+  LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$NETCDF_ROOT/include $CPPFLAGS"
                                  for ac_header in netcdf.h
 do :
@@ -17621,9 +17600,6 @@ else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
 
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  NETCDF_LDFLAGS=" -L$NETCDF_ROOT/lib -lnetcdf"
 
                                  NETCDF_INCLUDE=" -I$NETCDF_ROOT/include"

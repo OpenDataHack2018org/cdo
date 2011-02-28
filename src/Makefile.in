@@ -163,8 +163,7 @@ cdo_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 am_cdotest_OBJECTS = cdotest-cdotest.$(OBJEXT)
 cdotest_OBJECTS = $(am_cdotest_OBJECTS)
-am__DEPENDENCIES_1 = $(top_builddir)/libcdi/src/libcdi.la
-cdotest_DEPENDENCIES = $(am__DEPENDENCIES_1)
+cdotest_DEPENDENCIES = $(cdo_LDADD)
 cdotest_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(cdotest_LDFLAGS) \
 	$(LDFLAGS) -o $@
@@ -384,10 +383,9 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	readline.c realtime.c remap.h remaplib.c specspace.c \
 	specspace.h statistic.c statistic.h table.c timebase.h timer.c \
 	userlog.c util.c util.h vinterp.c vinterp.h zaxis.c
-cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src @SZLIB_INCLUDE@ @HDF5_INCLUDE@ @NETCDF_INCLUDE@ @PROJ_INCLUDE@
-cdo_LDADD = $(top_builddir)/libcdi/src/libcdi.la @LIBS@
-cdo_LDFLAGS = @HDF5_LDFLAGS@ @NETCDF_LDFLAGS@ @GRIB_API_LDFLAGS@ \
-	@ZLIB_LDFLAGS@ @SZLIB_LDFLAGS@ @PROJ_LDFLAGS@ $(am__append_1)
+cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
+cdo_LDADD = $(top_builddir)/libcdi/src/libcdi.la
+cdo_LDFLAGS = $(am__append_1)
 cdotest_SOURCES = cdo_int.h	\
 	           cdotest.c
 
