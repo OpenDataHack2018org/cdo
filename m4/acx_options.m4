@@ -185,19 +185,13 @@ AC_ARG_WITH([grib_api],
                                            [AC_MSG_ERROR([Could not link to grib_api library])])],
                      [*],[GRIB_API_ROOT=$with_grib_api
                           AS_IF([test -d "$GRIB_API_ROOT"],
-                                [LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS"
+                                [LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$GRIB_API_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([grib_api.h])
                                  AC_SEARCH_LIBS([grib_get_message],
                                                 [grib_api],
                                                 [AC_DEFINE([HAVE_LIBGRIB_API],[1],[GRIB_API library is present if defined to 1])],
                                                 [AC_MSG_ERROR([Could not link to grib_api library])])
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  AC_SUBST([GRIB_API_LDFLAGS],[" -L$GRIB_API_ROOT/lib -lgrib_api"])
                                  AC_SUBST([GRIB_API_INCLUDE],[" -I$GRIB_API_ROOT/include"])],
                                 [AC_MSG_ERROR([$GRIB_API_ROOT is not a directory! GRIB_API suppressed])])])],

@@ -17871,10 +17871,7 @@ fi
   *) :
     GRIB_API_ROOT=$with_grib_api
                           if test -d "$GRIB_API_ROOT"; then :
-  LDFLAGS_org="$LDFLAGS"
-                                 CPPFLAGS_org="$CPPFLAGS"
-                                 LIBS_org="$LIBS"
-                                 LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS"
+  LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$GRIB_API_ROOT/include $CPPFLAGS"
                                  for ac_header in grib_api.h
 do :
@@ -17948,9 +17945,6 @@ else
   as_fn_error $? "Could not link to grib_api library" "$LINENO" 5
 fi
 
-                                 LDFLAGS="$LDFLAGS_org"
-                                 CPPFLAGS="$CPPFLAGS_org"
-                                 LIBS="$LIBS_org"
                                  GRIB_API_LDFLAGS=" -L$GRIB_API_ROOT/lib -lgrib_api"
 
                                  GRIB_API_INCLUDE=" -I$GRIB_API_ROOT/include"
