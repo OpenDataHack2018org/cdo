@@ -43,10 +43,10 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/acinclude.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -266,6 +266,9 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
 PROJ_INCLUDE = @PROJ_INCLUDE@
 PROJ_LDFLAGS = @PROJ_LDFLAGS@
+PTHREAD_CC = @PTHREAD_CC@
+PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
+PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
@@ -278,6 +281,7 @@ THREADS_INCLUDE = @THREADS_INCLUDE@
 THREADS_LDFLAGS = @THREADS_LDFLAGS@
 USER_NAME = @USER_NAME@
 VERSION = @VERSION@
+ZLIB_INCLUDE = @ZLIB_INCLUDE@
 ZLIB_LDFLAGS = @ZLIB_LDFLAGS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
@@ -291,6 +295,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+ax_pthread_config = @ax_pthread_config@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -379,11 +384,10 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	readline.c realtime.c remap.h remaplib.c specspace.c \
 	specspace.h statistic.c statistic.h table.c timebase.h timer.c \
 	userlog.c util.c util.h vinterp.c vinterp.h zaxis.c
-cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
+cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src @SZLIB_INCLUDE@ @HDF5_INCLUDE@ @NETCDF_INCLUDE@ @PROJ_INCLUDE@
 cdo_LDADD = $(top_builddir)/libcdi/src/libcdi.la @LIBS@
-cdo_LDFLAGS = @LDFLAGS@ @NETCDF_LDFLAGS@ @HDF5_LDFLAGS@ \
-	@GRIB_API_LDFLAGS@ @ZLIB_LDFLAGS@ @SZLIB_LDFLAGS@ \
-	@PROJ_LDFLAGS@ $(am__append_1)
+cdo_LDFLAGS = @HDF5_LDFLAGS@ @NETCDF_LDFLAGS@ @GRIB_API_LDFLAGS@ \
+	@ZLIB_LDFLAGS@ @SZLIB_LDFLAGS@ @PROJ_LDFLAGS@ $(am__append_1)
 cdotest_SOURCES = cdo_int.h	\
 	           cdotest.c
 

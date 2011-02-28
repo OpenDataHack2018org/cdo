@@ -1,22 +1,25 @@
 AC_DEFUN([ACX_OPTIONS],
 [
 #  ----------------------------------------------------------------------
-#  Checks for pthread library
+#  Checks for multithreaded compiling + linking
 AC_ARG_WITH([threads],
-            [AC_HELP_STRING([--with-threads=<directory>],
-                            [Use the pthread library [default=yes]])],
+            [AC_HELP_STRING([--with-threads=<yes/no/directory>],
+                            [Compuile + link for multithreading [default=yes]])],
             [],
             [with_threads=yes])
 AS_CASE([$with_threads],
-        [no],[AC_MSG_CHECKING([for pthread library])
+        [no],[AC_MSG_CHECKING([multithreading])
               AC_MSG_RESULT([suppressed])],
-        [yes],[AC_CHECK_HEADERS(pthread.h)
-               AC_CHECK_LIB([pthread],[pthread_create])
-               AC_SUBST([THREADS_LDFLAGS],[" -lpthread"])
-               AC_SUBST([THREADS_INCLUDE],[""])],
+        [yes],[AX_PTHREAD([AC_DEFINE([HAVE_LIBPTHREAD],[1],[Define 1 for multithread support])],[AC_MSG_ERROR([multithreaded settings NOT found])])
+               LIBS="$PTHREAD_LIBS $LIBS"
+               CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+               CC="$PTHREAD_CC"
+               AS_ECHO(["CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS"])
+               AC_SUBST([THREADS_LDFLAGS],[])
+               AC_SUBST([THREADS_INCLUDE],[])],
         [*],[THREADS_ROOT=$with_threads
-             LDFLAGS="$LDFLAGS -L$THREADS_ROOT/lib"
-             CPPFLAGS="$CPPFLAGS -I$THREADS_ROOT/include"
+             LDFLAGS="-L$THREADS_ROOT/lib $LDFLAGS"
+             CPPFLAGS="-I$THREADS_ROOT/include $CPPFLAGS "
              AC_CHECK_HEADERS(pthread.h)
              AC_CHECK_LIB([pthread],[pthread_create])
              AC_SUBST([THREADS_LDFLAGS],[" -L$THREADS_ROOT/lib -lpthread"])
@@ -30,12 +33,20 @@ AC_ARG_WITH([zlib],
                            AC_MSG_RESULT([suppressed])],
                      [yes],[AC_CHECK_HEADERS(zlib.h)
                             AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
+                            AC_SUBST([ZLIB_INCLUDE],[])
                             AC_SUBST([ZLIB_LDFLAGS],[" -lz"])],
                      [*],[ZLIB_ROOT=$with_zlib
-                          LDFLAGS="$LDFLAGS -L$ZLIB_ROOT/lib"
-                          CPPFLAGS="$CPPFLAGS -I$ZLIB_ROOT/include"
+                          LDFLAGS_org="$LDFLAGS"
+                          CPPFLAGS_org="$CPPFLAGS"
+                          LIBS_org="$LIBS"
+                          LDFLAGS="-L$ZLIB_ROOT/lib $LDFLAGS"
+                          CPPFLAGS="-I$ZLIB_ROOT/include $CPPFLAGS"
                           AC_CHECK_HEADERS(zlib.h)
                           AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
+                          LDFLAGS="$LDFLAGS_org"
+                          CPPFLAGS="$CPPFLAGS_org"
+                          LIBS="$LIBS_org"
+                          AC_SUBST([ZLIB_INCLUDE],[" -I$ZLIB_ROOT/include"])
                           AC_SUBST([ZLIB_LDFLAGS],[" -L$ZLIB_ROOT/lib -lz"])])],
                      [AC_CHECK_HEADERS(zlib.h)
                       AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
@@ -56,13 +67,19 @@ AC_ARG_WITH([szlib],
                             AC_SUBST([SZLIB_INCLUDE],[""])],
                      [*],[SZLIB_ROOT=$with_szlib
                           AS_IF([test -d "$SZLIB_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$SZLIB_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$SZLIB_ROOT/include"
+                                [LDFLAGS_org="$LDFLAGS"
+                                 CPPFLAGS_org="$CPPFLAGS"
+                                 LIBS_org="$LIBS"
+                                 LDFLAGS="-L$SZLIB_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$SZLIB_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS(szlib.h)
                                  AC_SEARCH_LIBS([SZ_BufftoBuffCompress],
                                                 [sz],
                                                 [AC_DEFINE([HAVE_LIBSZ],[1],[Define to 1 for SZIP support])],
                                                 [AC_MSG_ERROR([Could not link to szlib])])
+                                 LDFLAGS="$LDFLAGS_org"
+                                 CPPFLAGS="$CPPFLAGS_org"
+                                 LIBS="$LIBS_org"
                                  AC_SUBST([SZLIB_LDFLAGS],[" -L$SZLIB_ROOT/lib -lsz"])
                                  AC_SUBST([SZLIB_INCLUDE],[" -I$SZLIB_ROOT/include"])],
                                 [AC_MSG_NOTICE([$SZLIB_ROOT is not a directory! SZLIB suppressed])])])],
@@ -91,8 +108,11 @@ AC_ARG_WITH([hdf5],
                             AC_SUBST([HDF5_INCLUDE],[""])],
                      [*],[HDF5_ROOT=$with_hdf5
                           AS_IF([test -d "$HDF5_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$HDF5_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$HDF5_ROOT/include"
+                                [LDFLAGS_org="$LDFLAGS"
+                                 CPPFLAGS_org="$CPPFLAGS"
+                                 LIBS_org="$LIBS"
+                                 LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$HDF5_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([hdf5.h])
                                  AC_SEARCH_LIBS([H5Fopen],
                                                 [hdf5],
@@ -106,6 +126,9 @@ AC_ARG_WITH([hdf5],
                                                                 --with-zlib option. If HDF5 was also built with szlib, then the location of szlib must also be \
                                                                 specified with the --with-szlib option..])
                                                 have_hdf5_hl=no])
+                                 LDFLAGS="$LDFLAGS_org"
+                                 CPPFLAGS="$CPPFLAGS_org"
+                                 LIBS="$LIBS_org"
                                  AS_IF([test "x$have_libhdf5_hl" = 'xyes'],
                                        [AC_SUBST([HDF5_LDFLAGS],[" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"])],
                                        [AC_SUBST([HDF5_LDFLAGS],[" -L$HDF5_ROOT/lib -lhdf5"])])
@@ -129,13 +152,19 @@ AC_ARG_WITH([netcdf],
                             AC_SUBST([NETCDF_INCLUDE],[""])],
                      [*],[NETCDF_ROOT=$with_netcdf
                           AS_IF([test -d "$NETCDF_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$NETCDF_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$NETCDF_ROOT/include"
+                                [LDFLAGS_org="$LDFLAGS"
+                                 CPPFLAGS_org="$CPPFLAGS"
+                                 LIBS_org="$LIBS"
+                                 LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$NETCDF_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([netcdf.h])
                                  AC_SEARCH_LIBS([nc_open],
                                                 [netcdf],
                                                 [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for NETCDF support])],
                                                 [AC_MSG_ERROR([Could not link to netcdf library])])
+                                 LDFLAGS="$LDFLAGS_org"
+                                 CPPFLAGS="$CPPFLAGS_org"
+                                 LIBS="$LIBS_org"
                                  AC_SUBST([NETCDF_LDFLAGS],[" -L$NETCDF_ROOT/lib -lnetcdf"])
                                  AC_SUBST([NETCDF_INCLUDE],[" -I$NETCDF_ROOT/include"])],
                                 [AC_MSG_NOTICE([$NETCDF_ROOT is not a directory! NETCDF suppressed])])])],
@@ -180,13 +209,19 @@ AC_ARG_WITH([grib_api],
                                            [AC_MSG_ERROR([Could not link to grib_api library])])],
                      [*],[GRIB_API_ROOT=$with_grib_api
                           AS_IF([test -d "$GRIB_API_ROOT"],
-                                [LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS "
+                                [LDFLAGS_org="$LDFLAGS"
+                                 CPPFLAGS_org="$CPPFLAGS"
+                                 LIBS_org="$LIBS"
+                                 LDFLAGS="-L$GRIB_API_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$GRIB_API_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([grib_api.h])
                                  AC_SEARCH_LIBS([grib_get_message],
                                                 [grib_api],
                                                 [AC_DEFINE([HAVE_LIBGRIB_API],[1],[GRIB_API library is present if defined to 1])],
                                                 [AC_MSG_ERROR([Could not link to grib_api library])])
+                                 LDFLAGS="$LDFLAGS_org"
+                                 CPPFLAGS="$CPPFLAGS_org"
+                                 LIBS="$LIBS_org"
                                  AC_SUBST([GRIB_API_LDFLAGS],[" -L$GRIB_API_ROOT/lib -lgrib_api"])
                                  AC_SUBST([GRIB_API_INCLUDE],[" -I$GRIB_API_ROOT/include"])],
                                 [AC_MSG_ERROR([$GRIB_API_ROOT is not a directory! GRIB_API suppressed])])])],
@@ -267,13 +302,19 @@ AC_ARG_WITH([proj],
                             AC_SUBST([PROJ_INCLUDE],[""])],
                      [*],[PROJ_ROOT=$with_proj
                           AS_IF([test -d "$PROJ_ROOT"],
-                                [LDFLAGS="$LDFLAGS -L$PROJ_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$PROJ_ROOT/include"
+                                [LDFLAGS_org="$LDFLAGS"
+                                 CPPFLAGS_org="$CPPFLAGS"
+                                 LIBS_org="$LIBS"
+                                 LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$PROJ_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([projects.h])
                                  AC_SEARCH_LIBS([pj_init],
                                                 [proj],
                                                 [AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
                                                 [AC_MSG_ERROR([Could not link to PROJ library!])])
+                                 LDFLAGS="$LDFLAGS_org"
+                                 CPPFLAGS="$CPPFLAGS_org"
+                                 LIBS="$LIBS_org"
                                  AC_SUBST([PROJ_LDFLAGS],[" -L$PROJ_ROOT/lib -lproj"])
                                  AC_SUBST([PROJ_INCLUDE],[" -I$PROJ_ROOT/include"])],
                                 [AC_MSG_ERROR([$PROJ_ROOT is not a directory! PROJ suppressed])])])],

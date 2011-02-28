@@ -262,11 +262,10 @@ cdo_SOURCES += Arith.c         \
                vinterp.h       \
                zaxis.c
 
-cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
+cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src @SZLIB_INCLUDE@ @HDF5_INCLUDE@ @NETCDF_INCLUDE@ @PROJ_INCLUDE@
 cdo_LDADD    = $(top_builddir)/libcdi/src/libcdi.la @LIBS@
-cdo_LDFLAGS  =  @LDFLAGS@ \
-		@NETCDF_LDFLAGS@ \
-		@HDF5_LDFLAGS@ \
+cdo_LDFLAGS  =  @HDF5_LDFLAGS@ \
+                @NETCDF_LDFLAGS@ \
 		@GRIB_API_LDFLAGS@ \
 		@ZLIB_LDFLAGS@ \
 		@SZLIB_LDFLAGS@ \
