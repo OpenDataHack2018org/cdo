@@ -48,8 +48,8 @@ case "${HOSTNAME}" in
 	            --with-netcdf=/sw/sles10-x64/netcdf-4.0.1 \
 	            --with-hdf5=/sw/sles10-x64/hdf5-1.8.2 \
                     --with-szlib=/sw/sles10-x64/szip-2.1 \
-	            CC=gcc CFLAGS='-g -D_REENTRANT -Wall -O2 -fopenmp'
-#	            CC=suncc CFLAGS="-g -D_REENTRANT -fast -xopenmp"
+	            CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
+#	            CC=suncc CFLAGS="-g -fast -xopenmp"
 	;;
 # x86_64-etch-x64-linux
 #    squall*)
@@ -59,7 +59,7 @@ case "${HOSTNAME}" in
 #                    --with-hdf5=/sw/etch-x64/hdf5-1.8.2 \
 #                    --with-szlib=/sw/etch-x64/szip-2.1-static \
 #                    --with-proj=/sw/etch-x64/proj-4.7.0 \
-#                    CC=gcc CFLAGS='-g -D_REENTRANT -Wall -O2 -fopenmp'
+#                    CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
 #	;;
 # x86_64-lenny-linux-gnu
     squall*)
@@ -68,7 +68,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/lenny-x64/hdf5-1.8.4p1-gcc \
                     --with-szlib=/sw/lenny-x64/szip-2.1 \
                     --with-proj=/sw/lenny-x64/proj-4.7.0 \
-                    CC=gcc CFLAGS='-g -D_REENTRANT -Wall -O2 -fopenmp'
+                    CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
 	;;
 # x86_64-archlinux
     thingol*)
@@ -89,7 +89,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=$HOME/local \
                     --with-hdf5=$HOME/local \
                     --with-szlib=$HOME/local \
-	            CC=colorgcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
+	            CC=colorgcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
 	;;
 # i686-linux
     etch-ia32 | gata)
@@ -102,7 +102,7 @@ case "${HOSTNAME}" in
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
                     --with-szlib=$HOME/local/etch-ia32 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2"
+	            CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2"
         ;;
 # dap enabled
     egmont | columbine)
@@ -113,7 +113,7 @@ case "${HOSTNAME}" in
                     --with-szlib=/sw/etch-ia32/szip-2.1 \
                     --with-proj=/sw/etch-ia32/proj-4.6.0 \
 	            --enable-all-static CC=icc CFLAGS="-g -fast -openmp" AR=xiar LD=xild
-#	            CC=gcc CFLAGS="-g -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
+#	            CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
     ;;
 # i386-pc-solaris2.10
     grim | mil* )
@@ -141,12 +141,6 @@ case "${HOSTNAME}" in
 		    CC=escc AR=esar \
                     CFLAGS="-O -Onooverlap,restrict=all -pvctl,fullmsg,noassume,loopcnt=1000000"
 	;;
-# 5000-fujitsu-uxpv4.1_ES
-    vpp5*)
-	${CONFPATH}configure --prefix=$HOME \
-	            --with-netcdf=$HOME/PROJ \
-	            CC=vcc CFLAGS="-O -Wv,-m3 -K4"
-	;;
 # x86_64-unknown-linux-gnu (rhel55)
     lizard*)
         LDFLAGS="-Wl,-rpath=/sw/rhel55-x64/jasper-1.900.1/lib:/sw/rhel55-x64/hdf5-1.8.5-threadsafe/lib:/sw/rhel55-x64/szip-2.1/lib:/sw/rhel55-x64/netcdf-4.1.1/lib -lpng"
@@ -158,7 +152,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/rhel55-x64/hdf5-1.8.5-threadsafe \
                     --with-szlib=/sw/rhel55-x64/szip-2.1 \
                     --with-zlib=/usr \
- 	            CC=gcc44 CFLAGS="-g -D_REENTRANT -Wall -O2 -fopenmp"
+ 	            CC=gcc44 CFLAGS="-g -Wall -O2 -fopenmp"
 	;;
 # powerpc-ibm-aix5.2.0.0
     ecga*)
@@ -189,7 +183,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
 # powerpc-ibm-aix6.0.0.0
     c1a*)
@@ -206,12 +200,6 @@ case "${HOSTNAME}" in
                     --with-netcdf=/uhome/mpischul/local \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
-	;;
-# hppa2.0w-hp-hpux11.11
-    moon)
-        ${CONFPATH}configure --prefix=$HOME/local \
-                    --with-netcdf=/S/n010/home010/c0148/local \
-	            CC=cc CFLAGS="-g -fast"
 	;;
     *)
 	echo "configuration for hostname $HOSTNAME not found!"
