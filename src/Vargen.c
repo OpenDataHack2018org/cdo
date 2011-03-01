@@ -157,12 +157,16 @@ void *Vargen(void *argument)
   else
     varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
+  if ( operatorID == MASK )
+    vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);
+
   vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
 
   taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
-  if ( operatorID == RANDOM || operatorID == CONST || operatorID == TOPO || operatorID == TEMP || operatorID == MASK )
+  if ( operatorID == RANDOM || operatorID == CONST || operatorID == TOPO ||
+       operatorID == TEMP || operatorID == MASK )
     vlistDefNtsteps(vlistID, 1);
 
   streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
