@@ -1459,8 +1459,10 @@ int gridFromName(const char *gridname)
 	  if      ( cmpstr(pline, "grid", len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "zon",  len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
-	  else                                        grid.type = GRID_SPECTRAL;
+	  else if ( cmpstr(pline, "",     len) == 0 ) grid.type = GRID_SPECTRAL;
       
+	  if ( pline[len] != 0 ) return (gridID);
+
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
 	      grid.ysize = ntr2nlat_linear(grid.ntr);
@@ -1484,8 +1486,10 @@ int gridFromName(const char *gridname)
 	  if      ( cmpstr(pline, "grid", len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "zon",  len) == 0 ) grid.type = GRID_GAUSSIAN;
 	  else if ( cmpstr(pline, "spec", len) == 0 ) grid.type = GRID_SPECTRAL;
-	  else                                        grid.type = GRID_SPECTRAL;
-      
+	  else if ( cmpstr(pline, "",     len) == 0 ) grid.type = GRID_SPECTRAL;
+     
+	  if ( pline[len] != 0 ) return (gridID);
+
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
 	      grid.ysize = ntr2nlat(grid.ntr);
