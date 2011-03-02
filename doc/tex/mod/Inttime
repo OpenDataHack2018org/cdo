@@ -49,9 +49,9 @@ INTEGER Number of time steps from one time step to the next
 
 
 @BeginExample
-Assumed a 6 hourly dataset starts at 1987-01-01 12:00.
+Assumed a 6 hourly dataset starts at 1987-01-01 12:00:00.
 To interpolate this time series to a one hourly dataset use:
 @BeginVerbatim
-   cdo inttime,1987-01-01,12:00,1hour ifile ofile
+   cdo inttime,1987-01-01,12:00:00,1hour ifile ofile
 @EndVerbatim
 @EndExample

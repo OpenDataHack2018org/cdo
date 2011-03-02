@@ -137,10 +137,10 @@ STRING   Shift value (e.g. -3hour)
 
 
 @BeginExample
-To set the time axis to 1987-01-16 12:00 with an increment of one
+To set the time axis to 1987-01-16 12:00:00 with an increment of one
 month for each time step use:
 @BeginVerbatim
-   cdo settaxis,1987-01-16,12:00,1mon ifile ofile
+   cdo settaxis,1987-01-16,12:00:00,1mon ifile ofile
 @EndVerbatim
 Result of '{\tt cdo showdate ofile}' for a dataset with 12 time steps:
 @BeginListing
