@@ -73,7 +73,8 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
   if ( xinc < 1 || yinc < 1 )
     cdoAbort("xinc and yinc must not be smaller than 1!");
   
-  if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT || gridtype == GRID_CURVILINEAR )
+  if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT ||
+       gridtype == GRID_CURVILINEAR || gridtype == GRID_GENERIC )
     {
       nlon1 = gridInqXsize(gridID1);
       nlat1 = gridInqYsize(gridID1);
@@ -167,6 +168,9 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
           free(grid1_corner_lat);
         }
     } /* if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_LONLAT ) */
+  else if ( gridtype == GRID_GENERIC )
+    {
+    }
   else if ( gridtype == GRID_CURVILINEAR )
     {
       
