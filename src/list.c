@@ -205,9 +205,14 @@ int args2fltlist(int argc, char **argv, LIST *list)
       
       if ( i != len )
 	{
-	  if      ( strcmp(argv[iarg],  "inf") == 0 ) tmp_val =  DBL_MAX;
-	  else if ( strcmp(argv[iarg], "-inf") == 0 ) tmp_val = -DBL_MAX;
-	  else                                        tmp_val = atof(argv[iarg]);
+	  /*
+	  if      ( strcmp(argv[iarg],  "inf") == 0 )
+	    tmp_val =  DBL_MAX;
+	  else if ( strcmp(argv[iarg], "-inf") == 0 )
+	    tmp_val = -DBL_MAX;
+	  else  
+	  */                                    
+	    tmp_val = atof(argv[iarg]);
 
 	  listSetFlt(list, nint++, tmp_val);
 	}

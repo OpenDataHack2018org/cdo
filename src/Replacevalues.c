@@ -29,11 +29,17 @@
 #include "pstream.h"
 #include "list.h"
 
+static
 double arg2val(char *arg)
 {
-  if (strcmp(arg,"inf")==0) return DBL_MAX;
-  else if (strcmp(arg,"-inf")==0) return -DBL_MAX;
-  else return atof(arg);
+  /*
+  if      ( strcmp(arg,"inf") == 0 )
+    return  DBL_MAX;
+  else if ( strcmp(arg,"-inf") == 0 )
+    return -DBL_MAX;
+  else
+  */
+    return atof(arg);
 }
 
 void *Replacevalues(void *argument)
@@ -59,8 +65,8 @@ void *Replacevalues(void *argument)
 
   cdoInitialize(argument);
 
-  SETVALS = cdoOperatorAdd("setvals", 0, 0, "I1,O1,...,In,On");
-  SETRTOC = cdoOperatorAdd("setrtoc", 0, 0, "range (min, max), value");
+  SETVALS  = cdoOperatorAdd("setvals" , 0, 0, "I1,O1,...,In,On");
+  SETRTOC  = cdoOperatorAdd("setrtoc",  0, 0, "range (min, max), value");
   SETRTOC2 = cdoOperatorAdd("setrtoc2", 0, 0, "range (min, max), value1, value2");
 
   operatorID = cdoOperatorID();
@@ -78,16 +84,16 @@ void *Replacevalues(void *argument)
   else if ( operatorID == SETRTOC )
     {
       operatorCheckArgc(3);
-      rmin = arg2val(operatorArgv()[0]);
-      rmax = arg2val(operatorArgv()[1]);
+      rmin   = arg2val(operatorArgv()[0]);
+      rmax   = arg2val(operatorArgv()[1]);
       newval = arg2val(operatorArgv()[2]);
     }
   else if ( operatorID == SETRTOC2 )
     {
       operatorCheckArgc(4);
-      rmin = arg2val(operatorArgv()[0]);
-      rmax = arg2val(operatorArgv()[1]);
-      newval = arg2val(operatorArgv()[2]);
+      rmin    = arg2val(operatorArgv()[0]);
+      rmax    = arg2val(operatorArgv()[1]);
+      newval  = arg2val(operatorArgv()[2]);
       newval2 = arg2val(operatorArgv()[3]);
     }
 

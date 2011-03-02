@@ -78,6 +78,7 @@ void *Setmiss(void *argument)
   else if ( operatorID == SETCTOMISS || operatorID == SETMISSTOC )
     {
       operatorCheckArgc(1);
+      /*
       if ( operatorArgv()[0][0] == 'n' || operatorArgv()[0][0] == 'N' )
 	{
 #if ! defined  (HAVE_ISNAN)
@@ -86,6 +87,7 @@ void *Setmiss(void *argument)
 	  rconst = 0.0/0.0;
 	}
       else
+      */
 	rconst = atof(operatorArgv()[0]);
     }
   else
