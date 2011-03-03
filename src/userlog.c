@@ -6,9 +6,9 @@
 #include <string.h>
 #include <time.h>
 /* #include <pwd.h> */
-#include <unistd.h>  /* write, close */
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>  /* write, close */
 #include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>  /* qsort */

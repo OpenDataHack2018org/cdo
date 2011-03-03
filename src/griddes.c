@@ -29,6 +29,12 @@
 #include <ctype.h>
 #include <math.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -1662,20 +1668,31 @@ int cdoDefineGrid(const char *gridfile)
   char buffer[4];
   int gridID = -1;
   size_t len;
+  struct stat filestat;
+  int fileno;
+  int isreg = FALSE;
 
-  gfp = fopen(gridfile, "r");
-  if ( gfp == NULL )
+  fileno = open(gridfile, O_RDONLY);
+  if ( fileno >= 0 )
     {
+      if ( fstat(fileno, &filestat) == 0 )
+	isreg = S_ISREG(filestat.st_mode);
+    }
+
+  if ( fileno == -1 || !isreg )
+    {
+      if ( isreg ) close(fileno);
+
       gridID = gridFromName(gridfile);
 
       if ( gridID == -1 ) cdoAbort("Open failed on %s!", gridfile);
     }
   else
     {
-      if ( fread(buffer, 1, 4, gfp) != 4 )
+      if ( read(fileno, buffer, 4) != 4 )
 	SysError("Read grid from %s failed!", gridfile);
 
-      fclose(gfp);
+      close(fileno);
 
       if ( cmpstr(buffer, "CDF", len) == 0 )
 	{
