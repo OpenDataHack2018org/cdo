@@ -57,7 +57,7 @@ STRING  Grid description file or name
 @BeginExample
 Assume an ASCII dataset contains a field on a global regular 
 grid with 32 longitudes and 16 latitudes (512 elements).
-To create a GRIB dataset from the ASCII dataset use:
+To create a GRIB1 dataset from the ASCII dataset use:
 @BeginVerbatim
    cdo -f grb input,r32x16 ofile.grb < my_ascii_data
 @EndVerbatim

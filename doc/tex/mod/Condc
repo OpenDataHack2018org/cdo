@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Condc
 @Title     = Conditional select a constant
 @Section   = Conditional selection

@@ -121,12 +121,12 @@ ybounds   =   23   26   36   32        26   27   37   36        27   27   37   3
 \end{figure}
 
 \newpage
-\section{Example description for unstructured grid cells}
-Here is an example of the {\CDO} description for unstructured grid cells.
+\section{Example description for an unstructured grid}
+Here is an example of the {\CDO} description for an unstructured grid.
 xvals/yvals describes the position of 30 independent hexagonal grid cells.
 The first 6 values of xbounds/ybounds are the corners of the first grid cell.
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pyellow}, basicstyle=\footnotesize]
-gridtype  = cell
+gridtype  = unstructured
 gridsize  = 30
 nvertex   = 6
 xvals     =  -36   36    0  -18   18  108   72   54   90  180 
@@ -174,7 +174,7 @@ ybounds   =   41   53   71   71   53   41        41   41   53   71   71   53
 }{
 {\scalebox{1}{\includegraphics{grids/cell}}}
 }
-\caption[cellgrid]{Orthographic and Robinson projection of the unstructured grid cells}
+\caption[cellgrid]{Orthographic and Robinson projection of the unstructured grid}
 \end{figure}
 
 %%% Local Variables: 

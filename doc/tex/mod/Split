@@ -92,7 +92,7 @@ Set this variable to NULL to disable the adding of a file suffix.
 
 
 @BeginExample
-Assume an input GRIB dataset with three variables, e.g. code number 129, 130 and 139.
+Assume an input GRIB1 dataset with three variables, e.g. code number 129, 130 and 139.
 To split this dataset into three pieces, one for each code number use:
 @BeginVerbatim
    cdo splitcode ifile code

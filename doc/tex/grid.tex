@@ -58,7 +58,7 @@ SCRIP is a Spherical Coordinate Remapping and Interpolation Package.
 It uses a common grid description in netCDF.
 You can use it to describe curvilinear grids or unstructured grid cells.
 For more information about this format see \cite{SCRIP}.
-That grid description format is only available if the program was compiled
+This grid description format is only available if the program was compiled
 with netCDF support.
 
 \vspace{2mm}
@@ -133,7 +133,7 @@ The following keywords can be used to describe a grid:
 \vspace{3mm}
 \begin{tabular}[b]{lll}
 Keyword           & Datatype     & Description \\ \hline
-\bf{gridtype}     & STRING       & type of the grid (gaussian, lonlat, curvilinear, cell) \\
+\bf{gridtype}     & STRING       & type of the grid (gaussian, lonlat, curvilinear, unstructured) \\
 \bf{gridsize}     & INTEGER      & size of the grid \\
 \bf{xsize}        & INTEGER      & size in x direction (number of longitudes) \\
 \bf{ysize}        & INTEGER      & size in y direction (number of latitudes) \\
@@ -181,7 +181,7 @@ with respect to the different grid types.
 \hspace{2cm}
 \begin{tabular}[c]{|l||c|c|c|c|}
 \hline
-gridtype   & lonlat      & gaussian    & curvilinear & cell \\
+gridtype   & lonlat      & gaussian    & curvilinear & unstructured \\
 \hline
 \hline
 gridsize   & xsize*ysize & xsize*ysize & xsize*ysize & {\bf ncell} \\

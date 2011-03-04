@@ -346,30 +346,6 @@ static char *SplitselHelp[] = {
     NULL
 };
 
-static char *SelectHelp[] = {
-    "NAME",
-    "    select, delete - Select fields",
-    "",
-    "SYNOPSIS",
-    "    <operator>,keys  ifiles ofile",
-    "",
-    "DESCRIPTION",
-    "    This module selects some fields from ifiles and writes them to ofile.",
-    "    ifiles is an unlimited number of input files. All input files need to have ",
-    "    the same structure with the same variables on different time steps.",
-    "    The fields selected depends on the chosen operator and the parameters.",
-    "",
-    "OPERATORS",
-    "    select  Select fields",
-    "            Selects all fields with keys in a user given list.",
-    "    delete  Delete fields",
-    "            Deletes all fields with keys in a user given list.",
-    "",
-    "PARAMETER",
-    "    keys  STRING  Comma separated list of keys",
-    NULL
-};
-
 static char *SelvarHelp[] = {
     "NAME",
     "    selcode, delcode, selname, delname, selstdname, sellevel, sellevidx, selgrid, ",

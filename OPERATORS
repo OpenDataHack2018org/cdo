@@ -58,8 +58,6 @@ Operator catalog:
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
-   Select        select          Select fields
-   Select        delete          Delete fields
    Selvar        selcode         Select variables by code number
    Selvar        delcode         Delete variables by code number
    Selvar        selname         Select variables by name

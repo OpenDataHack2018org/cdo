@@ -74,7 +74,7 @@ Set this variable to NULL to disable the adding of a file suffix.
 
 
 @BeginExample
-Assume the input GRIB dataset has time steps from
+Assume the input GRIB1 dataset has time steps from
 January to December. To split each month with all
 variables into one separate file use:
 @BeginVerbatim

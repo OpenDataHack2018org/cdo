@@ -20,6 +20,10 @@ libraries should be installed:
       ({\tt http://www.unidata.ucar.edu/packages/netcdf})
       version 3 or higher. \\
       This is needed to process netCDF \cite{netCDF} files with {\CDO}. 
+\item The ECMWF \href{http://www.ecmwf.int/products/data/software/grib_api.html}{GRIB\_API}
+      ({\tt http://www.ecmwf.int/products/data/software/grib\_api.html})
+      version 1.9.5 or higher.
+      This library is needed to process GRIB2 files with {\CDO}. 
 \item HDF5 \href{http://www.hdfgroup.org/doc_resource/SZIP}{szip} library
       ({\tt http://www.hdfgroup.org/doc\_resource/SZIP})
       version 2.1 or higher. \\
@@ -56,35 +60,37 @@ Compilation is done by performing the following steps:
     tar xf cdo-$VERSION.tar       # unpack it
     cd cdo-$VERSION
 \end{verbatim}
-
+%$
 \item Run the configure script:
  
 \begin{verbatim}
     ./configure
 \end{verbatim}
 
-Or with netCDF \cite{netCDF} support:
+\begin{itemize}
+\item Optionaly with netCDF \cite{netCDF} support:
  
 \begin{verbatim}
     ./configure --with-netcdf=<netCDF root directory>
 \end{verbatim}
 
-The netCDF-4 configuration depends on the netCDF-4 and HDF5 installation!
-You have to define the location of the HDF5 installation if netCDF-4 was 
-build with HDF5 support:
+\item The GRIB2 configuration depends on the GRIB\_API installation!
+Here is an example GRIB2 configuration with a JASPER enabled GRIB\_API version:
  
 \begin{verbatim}
-    ./configure --with-netcdf=<netCDF-4 root directory> \
-                --with-hdf5=<HDF5 root directory>
+    ./configure --with-gribapi=<GRIB_API root directory> \
+                --with-jasper=<JASPER root directory>
 \end{verbatim}
 
-You have to specify also the location of the SZLIB if HDF5 was build with SZLIB support.\\
+%%You have to specify also the location of the SZLIB if HDF5 was build with SZLIB support.\\
+%%
+%%\item To enable szip \cite{szip} support add:
+%% 
+%%\begin{verbatim}
+%%    --with-szlib=<SZLIB root directory>
+%%\end{verbatim}
 
-To enable szip \cite{szip} support add:
- 
-\begin{verbatim}
-    --with-szlib=<SZLIB root directory>
-\end{verbatim}
+\end{itemize}
 
 For an overview of other configuration options use
 

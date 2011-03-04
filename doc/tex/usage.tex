@@ -53,6 +53,8 @@ The following options are available for all operators:
               \end{tabular}
               \vspace*{1mm}
             } \\
+         \> GRIB2 is only available if {\CDO} was compiled with GRIB\_API support and all \\
+         \> netCDF file types are only available if {\CDO} was compiled with netCDF support! \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -g $<$grid$>$}
          \> Define the default grid description by name or from file (see chapter 1.3 on page \pageref{GRID_DESCRIPTION}). \\
          \> Available grid names are: {\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>}, {\tt gme<NI>} \\
@@ -72,7 +74,7 @@ The following options are available for all operators:
          \> Silent mode. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -t $<$partab$>$}
          \> Set the default parameter table name or file (see chapter 1.6 on page \pageref{PARAMETER_TABLE}).\\
-         \> Predefined tables are:  {\tt echam4 echam5 mpiom1}\\
+         \> Predefined tables are:  {\tt echam4 echam5 echam6 mpiom1 ecmwf remo}\\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -V}
          \> Print the version number. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -v}
