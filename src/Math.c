@@ -137,7 +137,7 @@ void *Math(void *argument)
 	      break;
 	    case SQR:
 	      for ( i = 0; i < gridsize; i++ )
-		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : MUL(array1[i], array1[i]);
+		array2[i] = DBL_IS_EQUAL(array1[i], missval1) ? missval1 : array1[i]*array1[i];
 	      break;
 	    case SQRT:
 	      for ( i = 0; i < gridsize; i++ )

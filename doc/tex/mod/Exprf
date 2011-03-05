@@ -1,6 +1,6 @@
 /*
 Operatoren: +, -, *, \
-Functions: sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
+Functions: abs, sqrt, exp, log, log10, sin, cos, tan, asin, acos, atan
 Functions: min, max, avg, std, var
 Constansts: M_PI, M_E
 */
@@ -27,6 +27,14 @@ division \begin{math}/\end{math} and exponentiation \^\  can be used.
 @EndifDoc
 The following intrinsic functions are available:
 @BeginList log10(x)
+@Item = abs(x)
+Absolute value of x
+@Item = int(x)
+Integer value of x
+@Item = nint(x)
+Nearest integer value of x
+@Item = sqr(x)
+Square of x
 @Item = sqrt(x)
 Square Root of x
 @Item = exp(x)

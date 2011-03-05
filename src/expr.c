@@ -12,6 +12,11 @@
 #include "expr_yacc.h"
 
 
+static double f_abs(double x)  { return (fabs(x));  }
+static double f_int(double x)  { return ((int)(x)); }
+static double f_nint(double x) { return (NINT(x));  }
+static double f_sqr(double x)  { return (x*x);      }
+
 typedef struct {
   int type;
   char *name;                      /* function name            */
@@ -22,6 +27,10 @@ func_t;
 static func_t fun_sym_tbl[] =
 {
   /* scalar functions */
+  {0, "abs",   f_abs},
+  {0, "int",   f_int},
+  {0, "nint",  f_nint},
+  {0, "sqr",   f_sqr},
   {0, "sqrt",  sqrt},
   {0, "exp",   exp},
   {0, "log",   log},
@@ -552,6 +561,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 	  errno = -1;
 	  p->data[i] = DBL_IS_EQUAL(p1->data[i], missval) ? missval : fun_sym_tbl[funcID].func(p1->data[i]);
 	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
+	  else if ( isnan(p->data[i]) )  p->data[i] = missval;
 	}
     }
   else
@@ -561,6 +571,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
 	  errno = -1;
 	  p->data[i] = fun_sym_tbl[funcID].func(p1->data[i]);
 	  if ( errno == EDOM || errno == ERANGE ) p->data[i] = missval;
+	  else if ( isnan(p->data[i]) )  p->data[i] = missval;
 	}
     }
 
