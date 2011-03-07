@@ -1,4 +1,8 @@
-2011-02-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2011-03-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gridToCell(GME): set X/Y units to degrees_east/degrees_north [report: Patrick Brockmann]
+
+2011-03-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: added functions abs(), int(), nint(), sqr()
 	
