@@ -9,7 +9,7 @@ int referenceToGrid(int gridID);
 void gridToDegree(const char *units, const char *string, int gridsize, double *array);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
-int gridToCell(int gridID);
+int gridToUnstructured(int gridID);
 int gridToCurvilinear(int gridID);
 int gridToRegular(int gridID);
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss);

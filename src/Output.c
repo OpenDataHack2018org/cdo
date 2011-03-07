@@ -148,7 +148,7 @@ void *Output(void *argument)
 
       if ( operatorID == OUTPUTFLD || operatorID == OUTPUTXYZ || operatorID == OUTPUTKEY )
 	{
-	  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToCell(gridID);
+	  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID);
 
 	  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
 	    gridID = gridToCurvilinear(gridID);

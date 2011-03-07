@@ -817,7 +817,7 @@ int gridToCurvilinear(int gridID1)
 }
 
 
-int gridToCell(int gridID1)
+int gridToUnstructured(int gridID1)
 {
   int gridID2;
   int gridtype, gridsize;
@@ -1235,7 +1235,7 @@ int gridGenArea(int gridID, double *area)
       if ( gridtype == GRID_GME )
 	{
 	  lgriddestroy = TRUE;
-	  gridID = gridToCell(gridID);
+	  gridID = gridToUnstructured(gridID);
 	  grid_mask = (int *) malloc(gridsize*sizeof(int));
 	  gridInqMaskGME(gridID, grid_mask);
 	}
@@ -1362,7 +1362,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
   
   if ( gridtype == GRID_GME )
     {
-      gridID = gridToCell(gridID);	  
+      gridID = gridToUnstructured(gridID);	  
       grid_mask = (int *) malloc(gridsize*sizeof(int));
       gridInqMaskGME(gridID, grid_mask);
     }

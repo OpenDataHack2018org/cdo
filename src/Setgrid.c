@@ -232,8 +232,8 @@ void *Setgrid(void *argument)
 	    }
 	  else
 	    {
-	      if      ( gridtype == GRID_CURVILINEAR ) gridID2 = gridToCurvilinear(gridID1);
-	      else if ( gridtype == GRID_UNSTRUCTURED )        gridID2 = gridToCell(gridID1);
+	      if      ( gridtype == GRID_CURVILINEAR  ) gridID2 = gridToCurvilinear(gridID1);
+	      else if ( gridtype == GRID_UNSTRUCTURED ) gridID2 = gridToUnstructured(gridID1);
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 

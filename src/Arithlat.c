@@ -105,7 +105,7 @@ void *Arithlat(void *argument)
 		}
 	      else if ( gridtype == GRID_GME )
 		{
-		  gridID = gridToCell(gridID);
+		  gridID = gridToUnstructured(gridID);
 		}
 	      else
 		{
