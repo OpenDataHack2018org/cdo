@@ -58,9 +58,10 @@ void *Vertint(void *argument)
   int nvct;
   int geop_needed = FALSE;
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
-  int code;
+  int code, param;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
+  char paramstr[32];
   char varname[128], stdname[128];
   int *vars = NULL;
   double missval;
@@ -289,7 +290,7 @@ void *Vertint(void *argument)
   varnmiss  = (int **) malloc(nvars*sizeof(int*));
   varinterp = (int *) malloc(nvars*sizeof(int));
 
-  maxlev   = nhlev > nplev ? nhlev : nplev;
+  maxlev   = nhlevh > nplev ? nhlevh : nplev;
 
   if ( Extrapolate == 0 )
     pnmiss   = (int *) malloc(nplev*sizeof(int));
@@ -326,7 +327,7 @@ void *Vertint(void *argument)
 	}
     }
 
-  if ( cdoVerbose && useTable ) cdoPrint("Use code tables!");
+  if ( cdoVerbose && useTable ) cdoPrint("Using code tables!");
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -337,7 +338,10 @@ void *Vertint(void *argument)
       instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
-      code = vlistInqVarCode(vlistID1, varID);
+      param    = vlistInqVarParam(vlistID1, varID);
+      code     = vlistInqVarCode(vlistID1, varID);
+
+      cdiParamToString(param, paramstr, sizeof(paramstr));
 
       if ( useTable )
 	{
@@ -369,7 +373,7 @@ void *Vertint(void *argument)
 	}
 
       if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Table = %d  Code = %d", mode, instNum, tableNum, code);
+	cdoPrint("Mode = %d  Center = %d  Param = %s", mode, instNum, paramstr);
 
       if ( code <= 0 )
 	{
@@ -393,17 +397,17 @@ void *Vertint(void *argument)
 
       if ( mode == ECHAM_MODE )
 	{
-	  if      ( code == geop_code  && nlevel == 1     ) geopID    = varID;
-	  else if ( code == temp_code  && nlevel == nhlev ) tempID    = varID;
-	  else if ( code == ps_code    && nlevel == 1     ) psID      = varID;
-	  else if ( code == lsp_code   && nlevel == 1     ) lnpsID    = varID;
-	  else if ( code == 156        && nlevel == nhlev ) gheightID = varID;
+	  if      ( code == geop_code  && nlevel == 1      ) geopID    = varID;
+	  else if ( code == temp_code  && nlevel == nhlevf ) tempID    = varID;
+	  else if ( code == ps_code    && nlevel == 1      ) psID      = varID;
+	  else if ( code == lsp_code   && nlevel == 1      ) lnpsID    = varID;
+	  else if ( code == 156        && nlevel == nhlevf ) gheightID = varID;
 	}
       else if ( mode == WMO_MODE )
 	{
-	  if      ( code == geop_code  && nlevel == 1     ) geopID  = varID;
-	  else if ( code == temp_code  && nlevel == nhlev ) tempID  = varID;
-	  else if ( code == ps_code    && nlevel == 1     ) psID    = varID;
+	  if      ( code == geop_code  && nlevel == 1      ) geopID  = varID;
+	  else if ( code == temp_code  && nlevel == nhlevf ) tempID  = varID;
+	  else if ( code == ps_code    && nlevel == 1      ) psID    = varID;
 	}
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
@@ -419,7 +423,7 @@ void *Vertint(void *argument)
 
       /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
       if ( zaxisID == zaxisIDh ||
-	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev) )
+	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
 	{
 	  varinterp[varID] = TRUE;
 	  vardata2[varID]  = (double *) malloc(gridsize*nplev*sizeof(double));
@@ -429,8 +433,8 @@ void *Vertint(void *argument)
       else
 	{
 	  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 )
-	    cdoWarning("Parameter %d has wrong number of levels, skipped! (code=%d nlevel=%d)",
-		       varID+1, code, nlevel);
+	    cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
+		       varID+1, paramstr, nlevel);
 	  varinterp[varID] = FALSE;
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
@@ -456,9 +460,10 @@ void *Vertint(void *argument)
     {
       if ( psID != -1 )
 	{
-	  code = vlistInqVarCode(vlistID1, psID);
+	  param = vlistInqVarParam(vlistID1, psID);
+	  cdiParamToString(param, paramstr, sizeof(paramstr));
 	  if ( cdoVerbose )
-	    cdoPrint("LOG surface pressure not found - using surface pressure (code %d)!", code);
+	    cdoPrint("LOG surface pressure not found - using surface pressure (param=%s)!", paramstr);
 	}
       else
 	cdoAbort("Surface pressure not found!");
@@ -589,8 +594,11 @@ void *Vertint(void *argument)
 		      hyb_press = full_press;
 		    }
 		  else
-		    cdoAbort("Number of hybrid level differ from full/half level (code %d)!",
-			     vlistInqVarCode(vlistID1, varID));
+		    {
+		      param = vlistInqVarParam(vlistID1, varID);
+		      cdiParamToString(param, paramstr, sizeof(paramstr));
+		      cdoAbort("Number of hybrid level differ from full/half level (param=%s)!", paramstr);
+		    }
 
 		  if ( varID == tempID )
 		    {

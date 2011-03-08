@@ -1,3 +1,7 @@
+2011-03-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* ml2pl: wrong result if input file contains full and half level data (bug fix) [report: Jaison Ambadan]
+
 2011-03-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridToCell(GME): set X/Y units to degrees_east/degrees_north [report: Patrick Brockmann]
