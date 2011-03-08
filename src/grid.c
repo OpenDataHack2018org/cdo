@@ -560,6 +560,23 @@ void gridCopyMask(int gridID1, int gridID2, long gridsize)
     }
 }
 
+static
+int check_range(long n, double *vals, double valid_min, double valid_max)
+{
+  int status = 0;
+  long i;
+
+  for ( i = 0; i < n; ++i )
+    {
+      if ( vals[i] < valid_min || vals[i] > valid_max )
+	{
+	  status = 1;
+	  break;
+	}
+    }
+
+  return (status);
+}
 
 int gridToCurvilinear(int gridID1)
 {
@@ -667,8 +684,8 @@ int gridToCurvilinear(int gridID1)
 	gridDefXvals(gridID2, xvals2D);
 	gridDefYvals(gridID2, yvals2D);
 
-	free(xvals2D);
-	free(yvals2D);
+	if ( xvals2D ) free(xvals2D);
+	if ( yvals2D ) free(yvals2D);
 
 	if ( gridtype == GRID_LCC )
 	  {		
@@ -707,6 +724,13 @@ int gridToCurvilinear(int gridID1)
 	      {
 		xbounds = (double *) malloc(2*nx*sizeof(double));
 		gridInqXbounds(gridID1, xbounds);
+		if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
+		  if ( check_range(2*nx, xbounds, -720, 720) )
+		    {
+		      cdoWarning("longitude bounds out of range, skipped!");
+		      free(xbounds);
+		      xbounds = NULL;
+		    }
 	      }
 	    else if ( nx > 1 )
 	      {
@@ -718,6 +742,13 @@ int gridToCurvilinear(int gridID1)
 	      {
 		ybounds = (double *) malloc(2*ny*sizeof(double));
 		gridInqYbounds(gridID1, ybounds);
+		if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
+		  if ( check_range(2*ny, ybounds, -180, 180) )
+		    {
+		      cdoWarning("latitude bounds out of range, skipped!");
+		      free(ybounds);
+		      ybounds = NULL;
+		    }
 	      }
 	    else if ( ny > 1 )
 	      {
@@ -730,8 +761,8 @@ int gridToCurvilinear(int gridID1)
 		  gridGenYbounds(ny, yvals, ybounds);
 	      }
 
-	    free(xvals);
-	    free(yvals);
+	    if ( xvals ) free(xvals);
+	    if ( yvals ) free(yvals);
 
 	    if ( xbounds && ybounds )
 	      {
@@ -795,10 +826,10 @@ int gridToCurvilinear(int gridID1)
 		gridDefXbounds(gridID2, xbounds2D);
 		gridDefYbounds(gridID2, ybounds2D);
 		
-		free(xbounds);
-		free(ybounds);
-		free(xbounds2D);
-		free(ybounds2D);
+		if ( xbounds )  free(xbounds);
+		if ( ybounds )  free(ybounds);
+		if ( xbounds2D) free(xbounds2D);
+		if ( ybounds2D) free(ybounds2D);
 	      }
 	  }
 
