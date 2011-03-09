@@ -1070,10 +1070,10 @@ int referenceToGrid(int gridID1)
 	      if ( gridInqSize(gridID) == gridsize )
 		gridID2 = gridDuplicate(gridID);
 	      else
-		cdoWarning("Grid size %d on position %d do not match! Path=%s", gridsize, position, gridfile);
+		cdoWarning("Grid size %d on position %d do not match! Reference=%s", gridsize, position, gridfile);
 	    }
 	  else
-	    cdoWarning("Grid position %d not available! Path=%s", position, gridfile);
+	    cdoWarning("Grid position %d not available! Reference=%s", position, gridfile);
 
 	  streamClose(streamID);
 	}

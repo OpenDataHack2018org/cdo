@@ -82,6 +82,7 @@ void *Setgrid(void *argument)
       if      ( strcmp(gridname, "curvilinear") == 0 )  gridtype = GRID_CURVILINEAR;
       else if ( strcmp(gridname, "cell") == 0 )         gridtype = GRID_UNSTRUCTURED;
       else if ( strcmp(gridname, "unstructured") == 0 ) gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "dereference") == 0 )  gridtype = GRID_REFERENCE;
       else if ( strcmp(gridname, "lonlat") == 0 )       gridtype = GRID_LONLAT;
       else if ( strcmp(gridname, "gaussian") == 0 )     gridtype = GRID_GAUSSIAN;
       else if ( strcmp(gridname, "regular") == 0 )     {gridtype = GRID_GAUSSIAN; lregular = 1;}
@@ -234,6 +235,11 @@ void *Setgrid(void *argument)
 	    {
 	      if      ( gridtype == GRID_CURVILINEAR  ) gridID2 = gridToCurvilinear(gridID1);
 	      else if ( gridtype == GRID_UNSTRUCTURED ) gridID2 = gridToUnstructured(gridID1);
+	      else if ( gridtype == GRID_REFERENCE    )
+		{
+		  gridID2 = referenceToGrid(gridID1);
+		  if ( gridID2 == -1 ) cdoAbort("grid reference not found!");
+ 		}
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 
