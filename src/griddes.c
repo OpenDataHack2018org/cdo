@@ -117,16 +117,19 @@ void gridInit(grid_t *grid)
   grid->ylast         = 0;
   grid->xinc          = 0;
   grid->yinc          = 0;
+  grid->nd            = 0;
+  grid->ni            = 0;
+  grid->ni2           = 0;
+  grid->ni3           = 0;
+  grid->number        = 0;
+  grid->position      = 0;
+  grid->path[0]       = 0;
   grid->xname[0]      = 0;
   grid->xlongname[0]  = 0;
   grid->xunits[0]     = 0;
   grid->yname[0]      = 0;
   grid->ylongname[0]  = 0;
   grid->yunits[0]     = 0;
-  grid->nd = 0;
-  grid->ni = 0;
-  grid->ni2 = 0;
-  grid->ni3 = 0;
 }
 
 
@@ -472,6 +475,16 @@ int gridDefine(grid_t grid)
 
 	break;
       }
+    case GRID_REFERENCE:
+      {
+	gridID = gridCreate(grid.type, grid.size);
+
+	gridDefNumber(gridID, grid.number);
+	gridDefPosition(gridID, grid.position);
+	if ( *grid.path ) gridDefReference(gridID, grid.path);
+
+	break;
+      }
     default:
       {
 	if ( grid.type == -1 )
@@ -687,6 +700,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_UNSTRUCTURED;
 	  else if ( cmpstr(pline, "gme", len)  == 0 )
 	    grid.type = GRID_GME;
+	  else if ( cmpstr(pline, "reference", len)  == 0 )
+	    grid.type = GRID_REFERENCE;
 	  else if ( cmpstr(pline, "lcc2", len)  == 0 )
 	    grid.type = GRID_LCC2;
 	  else if ( cmpstr(pline, "lcc", len)  == 0 )
@@ -748,6 +763,18 @@ int gridFromFile(FILE *gfp, const char *dname)
 	{
 	  grid.ni = atol(skipSeparator(pline + len));
           grid.nd = 10;
+	}
+      else if ( cmpstr(pline, "position", len)  == 0 )
+	{
+	  grid.position = atol(skipSeparator(pline + len));
+	}
+      else if ( cmpstr(pline, "number", len)  == 0 )
+	{
+	  grid.number = atol(skipSeparator(pline + len));
+	}
+      else if ( cmpstr(pline, "path", len)  == 0 )
+	{
+	  strcpy(grid.path, skipSeparator(pline + len));
 	}
       else if ( cmpstr(pline, "xsize", len)  == 0 )
 	{

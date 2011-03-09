@@ -50,6 +50,8 @@ typedef struct {
   int     def_xinc;
   int     def_yinc;
   int     nd, ni, ni2, ni3;
+  int     number, position;
+  char    path[16384];
   char    xname[128];
   char    xlongname[128];
   char    xunits[128];
