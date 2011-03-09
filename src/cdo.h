@@ -54,6 +54,7 @@ extern int cdoDefaultInstID;
 extern int cdoCheckDatarange;
 
 extern int cdoSilentMode;
+extern int cdoOverwriteMode;
 extern int cdoRegulargrid;
 extern int cdoBenchmark;
 extern int cdoTimer;

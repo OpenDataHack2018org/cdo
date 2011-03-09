@@ -146,7 +146,7 @@ void *Merge(void *argument)
 
   ofilename = cdoStreamName(streamCnt-1);
 
-  if ( !cdoSilentMode )
+  if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExist(ofilename) )
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exist!", ofilename);

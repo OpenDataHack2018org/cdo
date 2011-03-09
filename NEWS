@@ -6,6 +6,7 @@ Version 1.5.0 (?? March 2011):
    New features:
      * GRIB2 support via ECMWF GRIB_API
      * Added support for netCDF level bounds
+     * Added option -O to overwrite existing output file (only for ens<STAT>, merge, mergetime)
    Changed operators:
      * expr: added functions abs(), int(), nint(), sqr()
    Fixed bugs:

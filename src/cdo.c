@@ -83,6 +83,7 @@ int cdoZtype             = COMPRESS_NONE;
 int cdoZlevel            = 0;
 int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
+int cdoOverwriteMode     = FALSE;
 int cdoBenchmark         = FALSE;
 int cdoTimer             = FALSE;
 int cdoVerbose           = FALSE;
@@ -203,6 +204,7 @@ void usage(void)
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
+  fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
 #if defined (_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
@@ -736,7 +738,7 @@ int main(int argc, char *argv[])
 
   cdoHaveNC4 = have_netCDF4();
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMQRrsSTuVvXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMOQRrsSTuVvXZ")) != -1 )
     {
       switch (c)
 	{
@@ -796,6 +798,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'M':
 	  cdiDefGlobal("HAVE_MISSVAL", TRUE);
+	  break;
+	case 'O':
+	  cdoOverwriteMode = TRUE;
 	  break;
 	case 'P':
 	  numThreads = atoi(cdoOptarg);

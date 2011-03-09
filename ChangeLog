@@ -1,3 +1,12 @@
+2011-03-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.0
+	* Version 1.5.0 released
+
+2011-03-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* cdo: added option -O to overwrite existing output file [request: Chris Fletscher]
+
 2011-03-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* fldmean: check range of lon/lat bounds [report: Jonas Bhend]

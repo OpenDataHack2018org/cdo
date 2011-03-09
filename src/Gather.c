@@ -261,7 +261,7 @@ void *Gather(void *argument)
 
   ofilename = cdoStreamName(nfiles);
 
-  if ( !cdoSilentMode )
+  if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExist(ofilename) )
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exist!", ofilename);
