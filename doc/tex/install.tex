@@ -71,15 +71,15 @@ Compilation is done by performing the following steps:
 \item Optionaly with netCDF \cite{netCDF} support:
  
 \begin{verbatim}
-    ./configure --with-netcdf=<netCDF root directory>
+./configure --with-netcdf=<netCDF root directory>
 \end{verbatim}
 
 \item The GRIB2 configuration depends on the GRIB\_API installation!
 Here is an example GRIB2 configuration with a JASPER enabled GRIB\_API version:
  
 \begin{verbatim}
-    ./configure --with-grib_api=<GRIB_API root directory> \
-                --with-jasper=<JASPER root directory>
+./configure --with-grib_api=<GRIB_API root directory> \
+            --with-jasper=<JASPER root directory>
 \end{verbatim}
 
 %%You have to specify also the location of the SZLIB if HDF5 was build with SZLIB support.\\

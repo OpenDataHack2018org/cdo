@@ -51,7 +51,7 @@ STRING  File with area weights
 @Item = grid
 STRING  Target grid description file or name
 @Item = gridtype
-STRING  Target grid type (curvilinear or cell)
+STRING  Target grid type (curvilinear, unstructured or dereference)
 @EndParameter
 
 

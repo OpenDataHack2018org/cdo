@@ -807,7 +807,7 @@ static char *SetgridHelp[] = {
     "",
     "PARAMETER",
     "    grid      STRING  Target grid description file or name",
-    "    gridtype  STRING  Target grid type (curvilinear or cell)",
+    "    gridtype  STRING  Target grid type (curvilinear, unstructured or dereference)",
     NULL
 };
 
