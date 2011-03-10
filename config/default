@@ -21,12 +21,11 @@ case "${HOSTNAME}" in
     hama*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
+                    --with-jasper=/opt/local \
+                    --with-grib_api=$HOME/local/gribapi-1.9.8 \
                     --with-netcdf=/opt/local \
-                    --with-hdf5=/opt/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
-                    --with-jasper=/opt/local \
-                    --with-grib_api=$HOME/local/gribapi-1.9.5 \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
 	;;
 # ia64-xxx-linux

@@ -1,5 +1,6 @@
 set cdoCmpl = (\
 M \
+O \
 P \
 Q \
 R \

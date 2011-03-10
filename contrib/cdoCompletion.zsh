@@ -1,5 +1,6 @@
 compctl -k "(
 -M \
+-O \
 -P \
 -Q \
 -R \

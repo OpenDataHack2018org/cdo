@@ -1,5 +1,6 @@
 complete -W "
 -M \
+-O \
 -P \
 -Q \
 -R \
