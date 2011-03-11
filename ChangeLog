@@ -5,7 +5,8 @@
 
 2011-03-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* sinfo:  changed output of table and code number to parameter idenifier
+	* info:  changed output of table and code number to parameter idenifier
+	* sinfo: changed output of table and code number to parameter idenifier
 	
 2011-03-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

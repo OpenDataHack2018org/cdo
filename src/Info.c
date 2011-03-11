@@ -219,7 +219,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 
 void *Info(void *argument)
 {
-  int INFO, INFOV, INFOP, MAP;
+  int INFO, INFOP, INFON, INFOC, MAP;
   int operatorID;
   int i;
   int indf, indg;
@@ -248,8 +248,9 @@ void *Info(void *argument)
   cdoInitialize(argument);
 
   INFO  = cdoOperatorAdd("info",  0, 0, NULL);
-  INFOV = cdoOperatorAdd("infov", 0, 0, NULL);
   INFOP = cdoOperatorAdd("infop", 0, 0, NULL);
+  INFON = cdoOperatorAdd("infon", 0, 0, NULL);
+  INFOC = cdoOperatorAdd("infoc", 0, 0, NULL);
   MAP   = cdoOperatorAdd("map",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -282,14 +283,14 @@ void *Info(void *argument)
 	    {
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
-		  if ( operatorID == INFOV )
-		    fprintf(stdout, "%6d :       Date  Time    Varname      Level    Size    Miss :"
+		  if ( operatorID == INFON )
+		    fprintf(stdout, "%6d :       Date  Time    Name         Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n",  -(indf+1));
-		  else if ( operatorID == INFOP )
-		    fprintf(stdout, "%6d :       Date  Time    Param        Level    Size    Miss :"
+		  else if ( operatorID == INFOC )
+		    fprintf(stdout, "%6d :       Date  Time    Code  Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n",  -(indf+1));
 		  else
-		    fprintf(stdout, "%6d :       Date  Time    Code  Level    Size    Miss :"
+		    fprintf(stdout, "%6d :       Date  Time    Param        Level    Size    Miss :"
 			    "     Minimum        Mean     Maximum\n",  -(indf+1));
 		}
 
@@ -307,14 +308,14 @@ void *Info(void *argument)
 
 	      cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	      if ( operatorID == INFOV ) vlistInqVarName(vlistID, varID, varname);
+	      if ( operatorID == INFON ) vlistInqVarName(vlistID, varID, varname);
 
-	      if ( operatorID == INFOV )
+	      if ( operatorID == INFON )
 		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, varname);
-	      else if ( operatorID == INFOP )
-		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, paramstr);
-	      else
+	      else if ( operatorID == INFOC )
 		fprintf(stdout, "%6d :%s %s %3d ", indg, vdatestr, vtimestr, code);
+	      else
+		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, paramstr);
 
 	      level = zaxisInqLevel(zaxisID, levelID);
 	      fprintf(stdout, "%7g ", level);

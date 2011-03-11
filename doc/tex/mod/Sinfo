@@ -17,7 +17,7 @@ The information displayed depends on the chosen operator.
 
 
 @BeginOperator_sinfo
-@Title     = Short dataset information listed by parameter identifier
+@Title     = Short information listed by parameter identifier
 
 @BeginDescription
 Prints short information of a dataset. The information is divided into
@@ -35,7 +35,7 @@ And the last section contains short information of the time axis.
 
 
 @BeginOperator_sinfon
-@Title     = Short dataset information listed by parameter name
+@Title     = Short information listed by parameter name
 
 @BeginDescription
 The same as operator @oper{sinfo} but using the name instead of the 

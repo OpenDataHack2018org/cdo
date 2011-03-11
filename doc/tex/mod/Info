@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifiles
-@Operators = info infov map
+@Operators = info infon map
 
 @BeginDescription
 This module writes information about the structure and contents 
@@ -17,14 +17,14 @@ The information displayed depends on the chosen operator.
 
 
 @BeginOperator_info
-@Title     = Dataset information listed by code number
+@Title     = Dataset information listed by parameter identifier
 
 @BeginDescription
 Prints information and simple statistics for each field of all
 input datasets. For each field the operator prints one line with the following elements:
 @BeginItemize
 @Item = Date and Time
-@Item = Code number and Level
+@Item = Parameter identifier and Level
 @Item = Size of the grid and number of Missing values
 @Item = Minimum, Mean and Maximum \\
 The mean value is computed without the use of area weights!
@@ -33,12 +33,12 @@ The mean value is computed without the use of area weights!
 @EndOperator
 
 
-@BeginOperator_infov
-@Title     = Dataset information listed by variable name
+@BeginOperator_infon
+@Title     = Dataset information listed by parameter name
 
 @BeginDescription
-The same as operator @oper{info} but using the name instead of the code
-number to identify the variables.
+The same as operator @oper{info} but using the name instead of the
+identifier to label the parameter.
 @EndDescription
 @EndOperator
 
@@ -56,11 +56,11 @@ datasets. The map will be printed only for fields on a regular lon/lat grid.
 @BeginExample
 To print information and simple statistics for each field of a dataset use:
 @BeginVerbatim
-   cdo infov ifile
+   cdo infon ifile
 @EndVerbatim
-This is an example result of a dataset with one 2D variable over 12 time steps:
+This is an example result of a dataset with one 2D parameter over 12 time steps:
 @BeginListing
-   -1 :       Date  Time  Varname Level Size  Miss :  Minimum     Mean  Maximum
+   -1 :       Date  Time    Name  Level Size  Miss :  Minimum     Mean  Maximum
     1 : 1987-01-31 12:00:00 SST      0  2048  1361 :   232.77   266.65   305.31
     2 : 1987-02-28 12:00:00 SST      0  2048  1361 :   233.64   267.11   307.15
     3 : 1987-03-31 12:00:00 SST      0  2048  1361 :   225.31   267.52   307.67
