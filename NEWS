@@ -7,11 +7,14 @@ Version 1.5.0 (?? March 2011):
      * GRIB2 support via ECMWF GRIB_API
      * Added support for netCDF level bounds
      * Added option -O to overwrite existing output file (only for ens<STAT>, merge, mergetime)
+   New operators:
+     * selparam: Select parameters by identifier
+     * delparam: Delete parameters by identifier
    Changed operators:
      * expr: added functions abs(), int(), nint(), sqr()
-     * sinfo: changed output of table and code number to parameter idenifier
-     * info:  changed output of code number to parameter idenifier
-     * diff:  changed output of code number to parameter idenifier
+     * sinfo: changed output of table and code number to parameter identifier
+     * info:  changed output of code number to parameter identifier
+     * diff:  changed output of code number to parameter identifier
    Fixed bugs:
      * sellonlatbox: does not work as expected when selecting all longitutes
      * sellonlatbox: initialization missing for unstructured grids

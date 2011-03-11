@@ -5,9 +5,11 @@
 
 2011-03-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* sinfo: changed output of table and code number to parameter idenifier
-	* info:  changed output of code number to parameter idenifier
-	* diff:  changed output of code number to parameter idenifier
+	* Added operator selparam - Select parameters by identifier
+	* Added operator delparam - Delete parameters by identifier
+	* sinfo: changed output of table and code number to parameter identifier
+	* info:  changed output of code number to parameter identifier
+	* diff:  changed output of code number to parameter identifier
 	
 2011-03-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

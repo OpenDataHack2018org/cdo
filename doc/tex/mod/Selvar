@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = selcode delcode selname delname selstdname sellevel sellevidx selgrid selzaxis selltype seltabnum
+@Operators = selparam delparam selcode delcode selname delname selstdname sellevel sellevidx selgrid selzaxis selltype seltabnum
 
 @BeginDescription
 This module selects some fields from @file{ifile} and writes them to @file{ofile}.
@@ -14,8 +14,28 @@ The fields selected depends on the chosen operator and the parameters.
 @EndModule
 
 
+@BeginOperator_selparam
+@Title     = Select parameters by identifier
+@Parameter = params
+
+@BeginDescription
+Selects all fields with parameter identifiers in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_delparam
+@Title     = Delete parameters by identifier
+@Parameter = params
+
+@BeginDescription
+Deletes all fields with parameter identifiers in a user given list.
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_selcode
-@Title     = Select variables by code number
+@Title     = Select parameters by code number
 @Parameter = codes
 
 @BeginDescription
@@ -25,7 +45,27 @@ Selects all fields with code numbers in a user given list.
 
 
 @BeginOperator_delcode
-@Title     = Delete variables by code number
+@Title     = Delete parameters by code number
+@Parameter = codes
+
+@BeginDescription
+Deletes all fields with code numbers in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_selcode
+@Title     = Select parameters by code number
+@Parameter = codes
+
+@BeginDescription
+Selects all fields with code numbers in a user given list.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_delcode
+@Title     = Delete parameters by code number
 @Parameter = codes
 
 @BeginDescription
@@ -35,27 +75,27 @@ Deletes all fields with code numbers in a user given list.
 
 
 @BeginOperator_selname
-@Title     = Select variables by name
-@Parameter = varnames
+@Title     = Select parameters by name
+@Parameter = names
 
 @BeginDescription
-Selects all fields with variable names in a user given list.
+Selects all fields with parameter names in a user given list.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_delname
-@Title     = Delete variables by name
-@Parameter = varnames
+@Title     = Delete parameters by name
+@Parameter = names
 
 @BeginDescription
-Deletes all fields with variable names in a user given list.
+Deletes all fields with parameter names in a user given list.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_selstdname
-@Title     = Select variables by standard name
+@Title     = Select parameters by standard name
 @Parameter = stdnames
 
 @BeginDescription
@@ -136,9 +176,11 @@ This operator can not be used with netCDF data!
 
 
 @BeginParameter
+@Item = params
+INTEGER  Comma separated list of parameter identifiers
 @Item = codes
 INTEGER  Comma separated list of code numbers
-@Item = varnames
+@Item = names
 STRING   Comma separated list of variable names
 @Item = stdnames
 STRING   Comma separated list of standard names

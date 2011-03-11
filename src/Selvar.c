@@ -18,13 +18,13 @@
 /*
    This module contains the following operators:
 
-      Selvar     selparam        Select parameter (format: code.tabnum  or  pnum.cat.dis)
-      Selvar     delparam        Delete parameter (format: code.tabnum  or  pnum.cat.dis)
-      Selvar     selcode         Select codes
-      Selvar     delcode         Delete codes
-      Selvar     selname         Select variables
-      Selvar     delname         Delete variables
-      Selvar     selstdname      Select variables by CF standard name
+      Selvar     selparam        Select parameters by identifier (format: code.tabnum  or  pnum.cat.dis)
+      Selvar     delparam        Delete parameters by identifier (format: code.tabnum  or  pnum.cat.dis)
+      Selvar     selcode         Select parameters by code number
+      Selvar     delcode         Delete parameters by code number
+      Selvar     selname         Select parameters by name
+      Selvar     delname         Delete parameters by name
+      Selvar     selstdname      Select parameters by CF standard name
       Selvar     sellevel        Select levels
       Selvar     sellevidx       Select levels by index
       Selvar     selgrid         Select grids
@@ -82,7 +82,7 @@ void *Selvar(void *argument)
 
   cdoInitialize(argument);
 
-  SELPARAM     = cdoOperatorAdd("selparam",     0, 0, "parameter");
+  SELPARAM     = cdoOperatorAdd("selparam",     0, 0, "parameters");
   SELCODE      = cdoOperatorAdd("selcode",      0, 0, "code numbers");
   SELNAME      = cdoOperatorAdd("selname",      0, 0, "variable names");
   SELSTDNAME   = cdoOperatorAdd("selstdname",   0, 0, "standard names");

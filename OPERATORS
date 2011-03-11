@@ -58,11 +58,13 @@ Operator catalog:
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
-   Selvar        selcode         Select variables by code number
-   Selvar        delcode         Delete variables by code number
-   Selvar        selname         Select variables by name
-   Selvar        delname         Delete variables by name
-   Selvar        selstdname      Select variables by standard name
+   Selvar        selparam        Select parameters by identifier
+   Selvar        delparam        Delete parameters by identifier
+   Selvar        selcode         Select parameters by code number
+   Selvar        delcode         Delete parameters by code number
+   Selvar        selname         Select parameters by name
+   Selvar        delname         Delete parameters by name
+   Selvar        selstdname      Select parameters by standard name
    Selvar        sellevel        Select levels
    Selvar        sellevidx       Select levels by index
    Selvar        selgrid         Select grids
