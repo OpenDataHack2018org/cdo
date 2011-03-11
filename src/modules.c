@@ -370,7 +370,7 @@ void *Wct(void *argument);
 #define  ScatterOperators       {"scatter"}
 #define  ShowinfoOperators      {"showyear", "showmon", "showdate", "showtime", "showtimestamp", "showcode", \
                                  "showparam", "showname", "showstdname", "showlevel", "showltype", "showformat"}
-#define  SinfoOperators         {"sinfo", "sinfov", "sinfop"}
+#define  SinfoOperators         {"sinfo", "sinfop", "sinfon", "sinfoc"}
 #define  Smooth9Operators       {"smooth9"}
 #define  SortOperators          {"sortcode", "sortname", "sortlevel"}
 #define  SorttimestampOperators {"sorttimestamp", "sorttaxis"}
@@ -745,6 +745,7 @@ static char *opalias[][2] =
   {"selzaxisname",        "selzaxis"   },
   {"selvar",              "selname"    },
   {"setvar",              "setname"    },
+  {"sinfov",              "sinfon"   },
   {"sortvar",             "sortname"   },
   {"splitvar",            "splitname"  },
   {"sort",                "timsort"    },

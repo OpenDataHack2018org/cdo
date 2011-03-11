@@ -31,7 +31,7 @@
 
 void *Sinfo(void *argument)
 {
-  int SINFO, SINFOV, SINFOP;
+  int SINFO, SINFOP, SINFON, SINFOC;
   int operatorID;
   int indf;
   int varID;
@@ -60,8 +60,9 @@ void *Sinfo(void *argument)
   cdoInitialize(argument);
 
   SINFO  = cdoOperatorAdd("sinfo",  0, 0, NULL);
-  SINFOV = cdoOperatorAdd("sinfov", 0, 0, NULL);
   SINFOP = cdoOperatorAdd("sinfop", 0, 0, NULL);
+  SINFON = cdoOperatorAdd("sinfon", 0, 0, NULL);
+  SINFOC = cdoOperatorAdd("sinfoc", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -74,15 +75,15 @@ void *Sinfo(void *argument)
       printf("   File format: ");
       printFiletype(streamID, vlistID);
 
-      if ( operatorID == SINFOV )
+      if ( operatorID == SINFON )
 	fprintf(stdout,
-		"%6d : Institut Source   Varname     Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
-      else if ( operatorID == SINFOP )
-	fprintf(stdout,
-		"%6d : Institut Source   Param       Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
-      else
+		"%6d : Institut Source   Name        Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
+      else if ( operatorID == SINFOC )
 	fprintf(stdout,
 		"%6d : Institut Source  Table Code   Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
+      else
+	fprintf(stdout,
+		"%6d : Institut Source   Param       Time Typ  Grid Size Num  Levels Num\n",  -(indf+1));
 
       nvars = vlistNvars(vlistID);
 
@@ -96,7 +97,7 @@ void *Sinfo(void *argument)
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  if ( operatorID == SINFOV ) vlistInqVarName(vlistID, varID, varname);
+	  if ( operatorID == SINFON ) vlistInqVarName(vlistID, varID, varname);
 
 	  gridsize = gridInqSize(gridID);
 
@@ -114,12 +115,12 @@ void *Sinfo(void *argument)
 	  else
 	    fprintf(stdout, "unknown  ");
 
-	  if ( operatorID == SINFOV )
+	  if ( operatorID == SINFON )
 	    fprintf(stdout, "%-11s ", varname);
-	  else if ( operatorID == SINFOP )
-	    fprintf(stdout, "%-11s ", paramstr);
-	  else
+	  else if ( operatorID == SINFOC )
 	    fprintf(stdout, "%4d %4d   ", tabnum, code);
+	  else
+	    fprintf(stdout, "%-11s ", paramstr);
 
 	  timeID = vlistInqVarTime(vlistID, varID);
 

@@ -10,8 +10,8 @@ Operator catalog:
    Info          info            Dataset information listed by code number
    Info          infov           Dataset information listed by variable name
    Info          map             Dataset information and simple map
-   Sinfo         sinfo           Short dataset information listed by code number
-   Sinfo         sinfov          Short dataset information listed by variable name
+   Sinfo         sinfo           Short dataset information listed by parameter identifier
+   Sinfo         sinfon          Short dataset information listed by parameter name
    Diff          diff            Compare two datasets listed by code number
    Diff          diffv           Compare two datasets listed by variable name
    Ninfo         npar            Number of parameters

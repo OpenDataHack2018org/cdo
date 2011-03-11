@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifiles
-@Operators = sinfo sinfov sinfop
+@Operators = sinfo sinfon
 
 @BeginDescription
 This module writes information about the structure of @file{ifiles} to standard output.
@@ -17,14 +17,14 @@ The information displayed depends on the chosen operator.
 
 
 @BeginOperator_sinfo
-@Title     = Short dataset information listed by code number
+@Title     = Short dataset information listed by parameter identifier
 
 @BeginDescription
 Prints short information of a dataset. The information is divided into
-4 sections. Section 1 prints one line per variable with the following information:
+4 sections. Section 1 prints one line per parameter with the following information:
 @BeginItemize
 @Item = institute and source
-@Item = parameter table and code number
+@Item = parameter identifier
 @Item = horizontal grid size and number
 @Item = number of vertical levels and z-axis number
 @EndItemize
@@ -34,12 +34,12 @@ And the last section contains short information of the time axis.
 @EndOperator
 
 
-@BeginOperator_sinfov
-@Title     = Short dataset information listed by variable name
+@BeginOperator_sinfon
+@Title     = Short dataset information listed by parameter name
 
 @BeginDescription
-The same as operator @oper{sinfo} but using the name instead of the code number
-and parameter table to identify the variables.
+The same as operator @oper{sinfo} but using the name instead of the 
+identifier to label the parameter.
 @EndDescription
 @EndOperator
 
@@ -47,11 +47,11 @@ and parameter table to identify the variables.
 @BeginExample
 To print short information of a dataset use:
 @BeginVerbatim
-   cdo sinfov ifile
+   cdo sinfon ifile
 @EndVerbatim
-This is the result of an ECHAM5 dataset with 3 variables over 12 time steps:
+This is the result of an ECHAM5 dataset with 3 parameter over 12 time steps:
 @BeginListing
-    -1 : Institut Source  Varname  Time  Typ  Grid Size Num  Levels Num
+    -1 : Institut Source  Name    Time  Typ  Grid Size Num  Levels Num
      1 : MPIMET   ECHAM5  GEOSP    con   F32      2048   1       1   1
      2 : MPIMET   ECHAM5  T        var   F32      2048   1       4   2
      3 : MPIMET   ECHAM5  TSURF    var   F32      2048   1       1   1

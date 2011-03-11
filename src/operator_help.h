@@ -33,7 +33,7 @@ static char *InfoHelp[] = {
 
 static char *SinfoHelp[] = {
     "NAME",
-    "    sinfo, sinfov, sinfop - Short information",
+    "    sinfo, sinfon - Short information",
     "",
     "SYNOPSIS",
     "    <operator>  ifiles",
@@ -45,18 +45,18 @@ static char *SinfoHelp[] = {
     "    The information displayed depends on the chosen operator.",
     "",
     "OPERATORS",
-    "    sinfo   Short dataset information listed by code number",
+    "    sinfo   Short dataset information listed by parameter identifier",
     "            Prints short information of a dataset. The information is divided into",
-    "            4 sections. Section 1 prints one line per variable with the following information:",
+    "            4 sections. Section 1 prints one line per parameter with the following information:",
     "            - institute and source",
-    "            - parameter table and code number",
+    "            - parameter identifier",
     "            - horizontal grid size and number",
     "            - number of vertical levels and z-axis number",
     "            Section 2 and 3 gives a short overview of all horizontal and vertical grids.",
     "            And the last section contains short information of the time axis.",
-    "    sinfov  Short dataset information listed by variable name",
-    "            The same as operator sinfo but using the name instead of the code number",
-    "            and parameter table to identify the variables.",
+    "    sinfon  Short dataset information listed by parameter name",
+    "            The same as operator sinfo but using the name instead of the ",
+    "            identifier to label the parameter.",
     NULL
 };
 
