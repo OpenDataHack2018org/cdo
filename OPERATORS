@@ -12,8 +12,8 @@ Operator catalog:
    Info          map             Dataset information and simple map
    Sinfo         sinfo           Short information listed by parameter identifier
    Sinfo         sinfon          Short information listed by parameter name
-   Diff          diff            Compare two datasets listed by code number
-   Diff          diffv           Compare two datasets listed by variable name
+   Diff          diff            Compare two datasets listed by parameter id
+   Diff          diffn           Compare two datasets listed by parameter name
    Ninfo         npar            Number of parameters
    Ninfo         nlevel          Number of levels
    Ninfo         nyear           Number of years

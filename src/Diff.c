@@ -30,7 +30,7 @@
 
 void *Diff(void *argument)
 {
-  int DIFF, DIFFP, DIFFV, SDIFF;
+  int DIFF, DIFFP, DIFFN, DIFFC, SDIFF;
   int operatorID;
   int i;
   int indg;
@@ -59,7 +59,8 @@ void *Diff(void *argument)
 
   DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
   DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
-  DIFFV = cdoOperatorAdd("diffv", 0, 0, NULL);
+  DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
+  DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
   SDIFF = cdoOperatorAdd("sdiff", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -81,13 +82,13 @@ void *Diff(void *argument)
 
   if ( ! cdoSilentMode )
     {
-      if ( operatorID == DIFFV )
-	fprintf(stdout, "               Date  Time    Varname      Level    Size    Miss :"
+      if ( operatorID == DIFFN )
+	fprintf(stdout, "               Date  Time    Name         Level    Size    Miss :"
 		" S Z  Max_Absdiff Max_Reldiff\n");
-      else if ( operatorID == DIFFP )
+      else if ( operatorID == DIFF || operatorID == DIFFP )
 	fprintf(stdout, "               Date  Time    Param        Level    Size    Miss :"
 		" S Z  Max_Absdiff Max_Reldiff\n");
-      else if ( operatorID == DIFF )
+      else if ( operatorID == DIFFC )
 	fprintf(stdout, "               Date  Time    Code  Level    Size    Miss :"
 		" S Z  Max_Absdiff Max_Reldiff\n");
     }
@@ -129,15 +130,15 @@ void *Diff(void *argument)
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  if ( ! cdoSilentMode )
-	    if ( operatorID == DIFFP || operatorID == DIFFV || operatorID == DIFF )
+	    if ( operatorID == DIFF || operatorID == DIFFP || operatorID == DIFFN || operatorID == DIFFC )
 	      {
-		if ( operatorID == DIFFV ) vlistInqVarName(vlistID1, varID1, varname);
+		if ( operatorID == DIFFN ) vlistInqVarName(vlistID1, varID1, varname);
 		
-		if ( operatorID == DIFFV )
+		if ( operatorID == DIFFN )
 		  fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, varname);
-		else if ( operatorID == DIFFP )
+		else if ( operatorID == DIFF || operatorID == DIFFP )
 		  fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, paramstr);
-		else if ( operatorID == DIFF )
+		else if ( operatorID == DIFFC )
 		  fprintf(stdout, "%6d :%s %s %3d ", indg, vdatestr, vtimestr, code);
 
 		fprintf(stdout, "%7g ", zaxisInqLevel(zaxisID, levelID));
@@ -172,7 +173,7 @@ void *Diff(void *argument)
 	    }
 
 	  if ( ! cdoSilentMode )
-	    if ( operatorID == DIFFP || operatorID == DIFFV || operatorID == DIFF )
+	    if ( operatorID == DIFF || operatorID == DIFFP || operatorID == DIFFN || operatorID == DIFFC )
 	      {
 		fprintf(stdout, "%7d %7d :", gridsize, MAX(nmiss1, nmiss2));
 		

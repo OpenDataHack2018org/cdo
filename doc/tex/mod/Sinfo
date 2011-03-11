@@ -21,7 +21,8 @@ The information displayed depends on the chosen operator.
 
 @BeginDescription
 Prints short information of a dataset. The information is divided into
-4 sections. Section 1 prints one line per parameter with the following information:
+4 sections. Section 1 prints one line per parameter with the following 
+information:
 @BeginItemize
 @Item = institute and source
 @Item = parameter identifier

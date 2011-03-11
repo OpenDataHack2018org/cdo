@@ -5,7 +5,7 @@
 @Section   = Information
 @Class     = Information
 @Arguments = ifile1 ifile2
-@Operators = diff diffv
+@Operators = diff diffn
 
 @BeginDescription
 Compares the contents of two datasets field by field. The input
@@ -16,14 +16,14 @@ the same header information and dimensions.
 
 
 @BeginOperator_diff
-@Title     = Compare two datasets listed by code number
+@Title     = Compare two datasets listed by parameter id
 
 @BeginDescription
 Provides statistics on differences between two datasets.
 For each pair of fields the operator prints one line with the following information:
 @BeginItemize
 @Item = Date and Time
-@Item = Code number and Level
+@Item = Parameter identifier and Level
 @Item = Size of the grid and number of Missing values
 @Item = Occurrence of coefficient pairs with different signs (S)
 @Item = Occurrence of zero values (Z)
@@ -42,12 +42,12 @@ For each pair of fields the operator prints one line with the following informat
 @EndOperator
 
 
-@BeginOperator_diffv
-@Title     = Compare two datasets listed by variable name
+@BeginOperator_diffn
+@Title     = Compare two datasets listed by parameter name
 
 @BeginDescription
-The same as operator @oper{diff}. Using the name instead of the code number
-to identify the variable.
+The same as operator @oper{diff}. Using the name instead of the
+identifier to label the parameter.
 @EndDescription
 @EndOperator
 
@@ -55,11 +55,11 @@ to identify the variable.
 @BeginExample
 To print the difference for each field of two datasets use:
 @BeginVerbatim
-   cdo diffv ifile1 ifile2
+   cdo diffn ifile1 ifile2
 @EndVerbatim
-This is an example result of two datasets with one 2D variable over 12 time steps:
+This is an example result of two datasets with one 2D parameter over 12 time steps:
 @BeginListing
-             Date  Time  Varname Level Size  Miss : S Z Max_Absdiff Max_Reldiff
+             Date  Time    Name  Level Size  Miss : S Z Max_Absdiff Max_Reldiff
    1 : 1987-01-31 12:00:00 SST      0  2048  1361 : F F  0.00010681  4.1660e-07
    2 : 1987-02-28 12:00:00 SST      0  2048  1361 : F F  6.1035e-05  2.3742e-07
    3 : 1987-03-31 12:00:00 SST      0  2048  1361 : F F  7.6294e-05  3.3784e-07

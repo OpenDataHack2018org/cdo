@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -266,7 +266,7 @@ void *Wct(void *argument);
 #define  CopyOperators          {"copy", "selall"}
 #define  DeltimeOperators       {"delday", "del29feb"}
 #define  DetrendOperators       {"detrend"}
-#define  DiffOperators          {"diff", "diffp", "diffv", "sdiff"}
+#define  DiffOperators          {"diff", "diffp", "diffn", "diffc", "sdiff"}
 #define  DuplicateOperators     {"duplicate"}
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
                                  "export_e5ml", "export_e5res"}
@@ -718,6 +718,7 @@ static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
 static char *opalias[][2] =
 {
   {"anomaly",             "ymonsub"    },
+  {"diffv",               "diffn"      },
   {"ggstat",              "info"       },
   {"ggstats",             "sinfo"      },
   {"globavg",             "fldavg"     },

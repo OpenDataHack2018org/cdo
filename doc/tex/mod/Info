@@ -21,7 +21,8 @@ The information displayed depends on the chosen operator.
 
 @BeginDescription
 Prints information and simple statistics for each field of all
-input datasets. For each field the operator prints one line with the following elements:
+input datasets. For each field the operator prints one line with 
+the following elements:
 @BeginItemize
 @Item = Date and Time
 @Item = Parameter identifier and Level
