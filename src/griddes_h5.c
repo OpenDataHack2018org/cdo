@@ -541,10 +541,12 @@ int gridFromH5file(const char *gridfile)
 
   /* Close file */
   status = H5Fclose(file_id);
+
+ RETURN:
+
 #else
   cdoWarning("HDF5 support not compiled in!");
 #endif
 
- RETURN:
   return (gridID);
 }

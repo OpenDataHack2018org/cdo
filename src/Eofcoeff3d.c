@@ -35,7 +35,7 @@ void *Eofcoeff3d(void * argument)
 {
   char eof_name[6], oname[1024], filesuffix[32];
   double *w;
-  double missval1=-999, missval2;
+  double missval1=-999, missval2=-999;
   double *xvals, *yvals, *zvals;  
   field_t ***eof;  
   field_t in;  
@@ -247,7 +247,7 @@ void *Eofcoeff3d(void * argument)
                 }            
 
               if ( nmiss ) {
-		nmiss=1;
+		out[varID][eofID].nmiss=1;
 		out[varID][eofID].ptr[0]=missval2;
 	      }
             }
@@ -261,7 +261,7 @@ void *Eofcoeff3d(void * argument)
       for ( eofID = 0; eofID < neof; eofID++ ) {
 	for ( varID = 0; varID < nvars; varID++ ) {
 	  streamDefRecord(streamIDs[eofID], varID, 0);
-	  streamWriteRecord(streamIDs[eofID],out[varID][eofID].ptr,nmiss);
+	  streamWriteRecord(streamIDs[eofID],out[varID][eofID].ptr,out[varID][eofID].nmiss);
 	}
       }
 

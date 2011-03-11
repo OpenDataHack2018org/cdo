@@ -23,6 +23,7 @@
 
 #define  NALLOC_INC  1024
 
+void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Duplicate(void *argument)
 {

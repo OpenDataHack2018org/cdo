@@ -30,19 +30,20 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "util.h"
+#include "merge_sort2.h"
 
 void *Ensstat5(void *argument)
 {
   int operatorID;
   int operfunc, datafunc;
   int i,k;
-  int nvars,nrecs, nrecs0, nmiss, nens, nfiles,nlevs,valcount;
+  int nvars,nrecs = 0, nrecs0, nmiss, nens, nfiles,nlevs,valcount;
   int cmpflag;
   int cum;
   int levelID, varID, recID, tsID, binID, ensID;
   int gridsize = 0;
   int gridID, gridID2;
-  int have_miss;
+  int have_miss = 0;
   int streamID = 0, streamID2;
   int vlistID, vlistID1, vlistID2;
   int taxisID1, taxisID2;

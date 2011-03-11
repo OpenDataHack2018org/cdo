@@ -57,15 +57,15 @@ void *Ensstat3(void *argument)
   int operatorID;
   int operfunc, datafunc;
   int i,j;
-  int nvars,nbins, nrecs, nrecs0, nmiss, nens, nfiles;;
+  int nvars,nbins, nrecs = 0, nrecs0, nmiss, nens, nfiles;;
   int cmpflag;
   int cum;
   int chksum;                  // for check of histogram population 
-  int levelID, varID, recID, tsID, binID, ensID;
+  int levelID, varID, recID, tsID, binID = 0, ensID;
   int gridsize = 0;
   int gridID, gridID2;
-  int have_miss;
-  int streamID = 0, streamID2;
+  int have_miss = 0;
+  int streamID = 0, streamID2 = 0;
   int vlistID, vlistID1, vlistID2;
   int taxisID1, taxisID2;
   int zaxisID,zaxisID2;
@@ -73,12 +73,12 @@ void *Ensstat3(void *argument)
   int *varID2;
   int time_mode;
   int **array2 = NULL;
-  int **ctg_tab, *hist;         // contingency table and histogram
+  int **ctg_tab = NULL, *hist = NULL;         // contingency table and histogram
   double missval;
   double *levs;
   double *dat;                  // pointer to ensemble data for ROC
-  double *uThresh, *lThresh;    // thresholds for histograms
-  double **roc;                 // receiver operating characteristics table
+  double *uThresh = NULL, *lThresh = NULL;    // thresholds for histograms
+  double **roc = NULL;                 // receiver operating characteristics table
   double val;
   field_t *field;
   int fileID;
@@ -445,7 +445,7 @@ void *Ensstat3(void *argument)
       streamDefRecord(streamID2,varID2[varID],binID);
       streamWriteRecord(streamID2,tmpdoub,nmiss);
     }
-  else if ( operfunc = func_roc ) {
+  else if ( operfunc == func_roc ) {
     fprintf(stdout, "#             :     TP     FP     FN     TN         TPR        FPR\n");
     
     for ( i=0; i<= nbins; i++ )  {

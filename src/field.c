@@ -81,7 +81,7 @@ double fldfun(field_t field, int function)
 
 double fldrank(field_t field) 
 {
-  double res;
+  double res = 0;
   // Using first value as reference (observation)
   double *array  =  &(field.ptr[1]);
   double val     = array[-1];

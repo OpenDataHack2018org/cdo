@@ -50,7 +50,7 @@ void *EOF3d(void * argument)
   enum {EOF3D_, EOF3D_TIME, EOF3D_SPATIAL};
 
   int **datacounts;
-  int gridsize, temp_size;
+  int gridsize, temp_size = 0;
   int gridID1, gridID2, gridID3;
   int i, i2, j, j1, j2, eofID, varID, recID, levelID, tsID;
   int *miss;
@@ -62,17 +62,15 @@ void *EOF3d(void * argument)
   int reached_eof;
   int streamID1, streamID2, streamID3;
   int taxisID1, taxisID2, taxisID3;
-  int timer_init, timer_alloc, timer_read, timer_cov,
-    timer_eig, timer_post, timer_write, timer_finish;
+  int timer_init = 0, timer_alloc = 0, timer_read = 0, timer_cov = 0;
+  int timer_eig = 0, timer_post = 0, timer_write = 0, timer_finish = 0;
   int *varID2;
   int vdate=0, vtime=0;
   int vlistID1, vlistID2=-1, vlistID3=-1;
   int zaxisID2;
-  int maxlevs;  
 
   double missval=0;
   double sum_w, sum;
-  double tmp;
   double **cov = NULL;                                /* TODO: covariance matrix / eigenvectors after solving */
   double *eigv;
   double *weight;
@@ -104,7 +102,7 @@ void *EOF3d(void * argument)
   cdoOperatorAdd("eof3dspatial",EOF3D_SPATIAL,0, NULL);
 
   operatorID  = cdoOperatorID();
-  //  operfunc    = cdoOperatorFunc(operatorID);
+  operfunc    = cdoOperatorF1(operatorID);
 
   operatorInputArg("Number of eigen functions to write out");
   n_eig       = atoi(operatorArgv()[0]);
