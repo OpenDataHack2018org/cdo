@@ -20,6 +20,7 @@
 
       Set        setpartab       Set parameter table
       Set        setcode         Set code number
+      Set        setparam        Set parameter identifier
       Set        setname         Set variable name
       Set        setlevel        Set level
       Set        setltype        Set GRIB level type
@@ -31,10 +32,27 @@
 #include "pstream.h"
 #include "namelist.h"
 
+static
+int stringToParam(const char *paramstr)
+{
+  int param = 0;
+  int pnum = -1, pcat = 0, pdis = 255;
+  size_t len;
+
+  len = strlen(paramstr);
+
+  sscanf(paramstr, "%d.%d.%d", &pnum, &pcat, &pdis);
+  // printf("pnum, pcat, pdis: %d.%d.%d\n", pnum, pcat, pdis);
+
+  param = cdiEncodeParam(pnum, pcat, pdis);
+
+  return (param);
+}
+
 
 void *Set(void *argument)
 {
-  int SETPARTAB, SETPARTABV, SETCODE, SETNAME, SETLEVEL, SETLTYPE, SETTABNUM;
+  int SETPARTAB, SETPARTABV, SETCODE, SETPARAM, SETNAME, SETLEVEL, SETLTYPE, SETTABNUM;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1, tabnum = 0;
@@ -47,6 +65,7 @@ void *Set(void *argument)
   int tableID = -1;
   int tableformat = 0;
   int zaxistype;
+  int newparam = 0;
   char *newname = NULL, *partab = NULL;
   double newlevel = 0;
   double *levels = NULL;
@@ -57,6 +76,7 @@ void *Set(void *argument)
   SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table");
   SETPARTABV = cdoOperatorAdd("setpartabv", 0, 0, "parameter table");
   SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
+  SETPARAM   = cdoOperatorAdd("setparam",   0, 0, "parameter identifier (format: code[.tabnum] or num[.cat[.dis]])");
   SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
   SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
   SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
@@ -68,6 +88,10 @@ void *Set(void *argument)
   if ( operatorID == SETCODE || operatorID == SETLTYPE )
     {
       newval = atoi(operatorArgv()[0]);
+    }
+  else if ( operatorID == SETPARAM )
+    {
+      newparam = stringToParam(operatorArgv()[0]);
     }
   else if ( operatorID == SETNAME )
     {
@@ -128,6 +152,10 @@ void *Set(void *argument)
       nvars = vlistNvars(vlistID2);
       for ( varID = 0; varID < nvars; varID++ )
 	vlistDefVarCode(vlistID2, varID, newval);
+    }
+  else if ( operatorID == SETPARAM )
+    {
+      vlistDefVarParam(vlistID2, 0, newparam);
     }
   else if ( operatorID == SETNAME )
     {

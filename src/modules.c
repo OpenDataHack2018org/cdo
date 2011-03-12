@@ -357,7 +357,7 @@ void *Wct(void *argument);
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
-#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setname", "setlevel", "setltype", "settabnum"}
+#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setparam", "setname", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber"}

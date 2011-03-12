@@ -359,6 +359,7 @@ setmisstoc \
 setmissval \
 setmon \
 setname \
+setparam \
 setpartab \
 setpartabv \
 setreftime \
