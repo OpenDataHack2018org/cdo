@@ -5,7 +5,7 @@
 @Section   = File operations
 @Class     = File operation
 @Arguments = ifile obase
-@Operators = splitcode splitname splitlevel splitgrid splitzaxis splittabnum
+@Operators = splitcode splitparam splitname splitlevel splitgrid splitzaxis splittabnum
 
 @BeginDescription
 This module splits @file{ifile} into pieces. The output files will be named @file{<obase><xxx><suffix>}
@@ -21,6 +21,16 @@ of the output files depends on the chosen operator.
 @BeginDescription
 Splits a dataset into pieces, one for each different code number.
 @file{xxx} will have three digits with the code number.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_splitparam
+@Title     = Split parammeter identifiers
+
+@BeginDescription
+Splits a dataset into pieces, one for each different parammeter identifier.
+@file{xxx} will be a string with the parammeter identifier.
 @EndDescription
 @EndOperator
 

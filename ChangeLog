@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.0
 	* Version 1.5.0 released
 
+2011-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added operator splitparam - Split parameter identifiers
+
 2011-03-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator selparam - Select parameters by identifier
@@ -10,7 +14,7 @@
 	* sinfo: changed output of table and code number to parameter identifier
 	* info:  changed output of code number to parameter identifier
 	* diff:  changed output of code number to parameter identifier
-	
+
 2011-03-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* setgrid: added parameter: dereference

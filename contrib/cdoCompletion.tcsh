@@ -53,8 +53,9 @@ delname \
 delparam \
 detrend \
 diff \
+diffc \
+diffn \
 diffp \
-diffv \
 div \
 divc \
 divdpm \
@@ -188,8 +189,9 @@ import_binary \
 import_cmsaf \
 import_grads \
 info \
+infoc \
+infon \
 infop \
-infov \
 input \
 inputext \
 inputsrv \
@@ -386,8 +388,9 @@ showtimestamp \
 showyear \
 sin \
 sinfo \
+sinfoc \
+sinfon \
 sinfop \
-sinfov \
 smooth9 \
 sp2gp \
 sp2gpl \
@@ -400,6 +403,7 @@ splithour \
 splitlevel \
 splitmon \
 splitname \
+splitparam \
 splitrec \
 splitseas \
 splitsel \

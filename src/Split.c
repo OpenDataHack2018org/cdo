@@ -19,7 +19,8 @@
    This module contains the following operators:
 
       Split      splitcode       Split codes
-      Split      splitname       Split  variables
+      Split      splitparam      Split parameters
+      Split      splitname       Split variables
       Split      splitlevel      Split levels
       Split      splitgrid       Split grids
       Split      splitzaxis      Split zaxis
@@ -35,12 +36,12 @@
 
 void *Split(void *argument)
 {
-  int SPLITCODE, SPLITNAME, SPLITLEVEL, SPLITGRID, SPLITZAXIS, SPLITTABNUM;
+  int SPLITCODE, SPLITPARAM, SPLITNAME, SPLITLEVEL, SPLITGRID, SPLITZAXIS, SPLITTABNUM;
   int operatorID;
   int nchars;
   int streamID1;
   int varID;
-  int code, tabnum;
+  int code, tabnum, param;
   int nrecs, nvars, nzaxis, nlevs;
   int tsID, recID, levelID, zaxisID, levID;
   int varID2, levelID2;
@@ -61,6 +62,7 @@ void *Split(void *argument)
   cdoInitialize(argument);
 
   SPLITCODE   = cdoOperatorAdd("splitcode",   0, 0, NULL);
+  SPLITPARAM  = cdoOperatorAdd("splitparam",  0, 0, NULL);
   SPLITNAME   = cdoOperatorAdd("splitname",   0, 0, NULL);
   SPLITLEVEL  = cdoOperatorAdd("splitlevel",  0, 0, NULL);
   SPLITGRID   = cdoOperatorAdd("splitgrid",   0, 0, NULL);
@@ -152,6 +154,63 @@ void *Split(void *argument)
 	  streamDefVlist(streamIDs[index], vlistIDs[index]);
 	}
       if ( codes ) free(codes);
+    }
+  else if ( operatorID == SPLITPARAM )
+    {
+      char paramstr[32];
+      int *params = NULL;
+      nsplit = 0;
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  param = vlistInqVarParam(vlistID1, varID);
+	  for ( index = 0; index < varID; index++ )
+	    if ( param == vlistInqVarParam(vlistID1, index) ) break;
+
+	  if ( index == varID )
+	    {
+	      itmp[nsplit] = param;
+	      nsplit++;
+	    }
+	}
+
+      params    = (int *) malloc(nsplit*sizeof(int));
+      vlistIDs  = (int *) malloc(nsplit*sizeof(int));
+      streamIDs = (int *) malloc(nsplit*sizeof(int));
+      memcpy(params, itmp, nsplit*sizeof(int));
+
+      for ( index = 0; index < nsplit; index++ )
+	{
+	  vlistClearFlag(vlistID1);
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      param   = vlistInqVarParam(vlistID1, varID);
+	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      nlevs   = zaxisInqSize(zaxisID);
+	      if ( params[index] == param )
+		{
+		  for ( levID = 0; levID < nlevs; levID++ )
+		    {
+		      vlistDefIndex(vlistID1, varID, levID, index);
+		      vlistDefFlag(vlistID1, varID, levID, TRUE);
+		    }
+		}
+	    }
+
+	  vlistID2 = vlistCreate();
+	  vlistCopyFlag(vlistID2, vlistID1);
+	  vlistIDs[index] = vlistID2;
+
+	  cdiParamToString(params[index], paramstr, sizeof(paramstr));
+
+	  filename[nchars] = '\0';
+	  strcat(filename, paramstr);
+	  if ( filesuffix[0] )
+	    strcat(filename, filesuffix);
+	  streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
+
+	  streamDefVlist(streamIDs[index], vlistIDs[index]);
+	}
+      if ( params ) free(params);
     }
   else if ( operatorID == SPLITTABNUM )
     {
@@ -407,7 +466,6 @@ void *Split(void *argument)
 	  /*
 	    printf("%d %d %d %d %d %d\n", index, vlistID2, varID, levelID, varID2, levelID2);
 	  */
-
 	  streamDefRecord(streamIDs[index], varID2, levelID2);
 	  if ( lcopy )
 	    {

@@ -44,6 +44,7 @@ Operator catalog:
    Merge         merge           Merge datasets with different fields
    Merge         mergetime       Merge datasets sorted by date and time
    Split         splitcode       Split code numbers
+   Split         splitparam      Split parammeter identifiers
    Split         splitname       Split variable names
    Split         splitlevel      Split levels
    Split         splitgrid       Split grids

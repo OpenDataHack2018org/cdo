@@ -53,8 +53,9 @@ delname -delname \
 delparam -delparam \
 detrend -detrend \
 diff -diff \
+diffc -diffc \
+diffn -diffn \
 diffp -diffp \
-diffv -diffv \
 div -div \
 divc -divc \
 divdpm -divdpm \
@@ -188,8 +189,9 @@ import_binary -import_binary \
 import_cmsaf -import_cmsaf \
 import_grads -import_grads \
 info -info \
+infoc -infoc \
+infon -infon \
 infop -infop \
-infov -infov \
 input -input \
 inputext -inputext \
 inputsrv -inputsrv \
@@ -386,8 +388,9 @@ showtimestamp -showtimestamp \
 showyear -showyear \
 sin -sin \
 sinfo -sinfo \
+sinfoc -sinfoc \
+sinfon -sinfon \
 sinfop -sinfop \
-sinfov -sinfov \
 smooth9 -smooth9 \
 sp2gp -sp2gp \
 sp2gpl -sp2gpl \
@@ -400,6 +403,7 @@ splithour -splithour \
 splitlevel -splitlevel \
 splitmon -splitmon \
 splitname -splitname \
+splitparam -splitparam \
 splitrec -splitrec \
 splitseas -splitseas \
 splitsel -splitsel \

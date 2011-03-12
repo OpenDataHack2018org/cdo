@@ -377,7 +377,7 @@ void *Wct(void *argument);
 #define  SpecinfoOperators      {"specinfo"}
 #define  SpectralOperators      {"gp2sp", "gp2spl", "sp2gp", "sp2gpl", "sp2sp", "spcut"}
 #define  SpectrumOperators      {"spectrum"}
-#define  SplitOperators         {"splitcode", "splitname", "splitlevel", "splitgrid", "splitzaxis", "splittabnum"}
+#define  SplitOperators         {"splitcode", "splitparam", "splitname", "splitlevel", "splitgrid", "splitzaxis", "splittabnum"}
 #define  SplitrecOperators      {"splitrec"}
 #define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
