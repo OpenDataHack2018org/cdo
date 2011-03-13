@@ -5,6 +5,10 @@
 
 2011-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Added operator chparam -  Change parameter identifier
+
+2011-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* Added operator setparam - Set parameter identifiers
 	* Added operator splitparam - Split parameter identifiers
 
@@ -33,7 +37,7 @@
 2011-03-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: added functions abs(), int(), nint(), sqr()
-	
+
 2011-02-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remapbil: fix pole problem with gr15_psi grids [report: Karoline Block]
@@ -41,11 +45,11 @@
 2011-02-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* renamed function var to expr_var [report: Jed Kaplan]
-	
+
 2011-01-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* splitcode: added support for code numbers > 999
-	
+
 2011-01-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * changed grid name GRID_CELL to GRID_UNSTRUCTURED
@@ -53,11 +57,11 @@
 2011-01-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* spcut: only correct results with continuous wave numbers starting at 1 (bug fix)
-	
+
 2011-01-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplib: fix data race in calculation of bin_addr (OpenMP)
-	
+
 2011-01-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* detrend: integer overflow; wrong result for nts > 46340 (bug fix) [report: Torsten Seifert]
@@ -65,16 +69,16 @@
 2011-01-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sellonlatbox: does not work as expected (bug fix) [report: Jonathan Schubert]
-	
+
 2011-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator delete - Delete fields
 	* sellonlatbox: cellidx was not initialized (bug fix) [report: Jaison Ambadan]
-	
+
 2011-01-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplib: Changed remap weights from 2D to 1D array
-	
+
 2011-01-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.4.7
@@ -95,7 +99,7 @@
 2010-12-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* import_binary: check for gauss grids only when flag linear=0
-	
+
 2010-12-14  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* readline: filter carriage return '\r' [report: Christian Steger]
@@ -103,23 +107,23 @@
 2010-12-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* setclonlatbox: bug fix for 1x1 grids [report: Angelika Heil]
-	
+
 2010-12-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Settime: bug fix for time independent variables in combination with other operators (pipes)
-	
+
 2010-11-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* mulcoslat: added support for GME grids [request: Jaison-Thomas Ambadan]
-	
+
 2010-11-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* select: added paramter *ltype* [request: Jaison-Thomas Ambadan]
-	
+
 2010-11-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator eca_pd - Precipitation days index per time period [request: Barbara Hennemuth]
-	
+
 2010-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sellonlatbox: fix rounding error of the last lon index [report: Mondher Chekki]
@@ -127,29 +131,29 @@
 2010-11-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* ml2pl: open output stream after all error checks
-	
+
 2010-11-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sethalo: added support for grid units radian
 	* sethalo: correct lower bound of grid bounds for negative halos (bug fix)
 	* fldmean: gives wrong result for grid units radian (bug fix) [report: Pilar Ripodas]
-	
+
 2010-10-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Yseasstat: bug fix for datasets with time constant fields [report: Ute Merkel]
-	
+
 2010-10-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added docu for operator dv2ps
-	
+
 2010-10-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Cat: call vlistCompare for all input files
-	
+
 2010-09-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added env. CDO_FILE_SUFFIX to set the file suffix of CDO generated file names
-	
+
 2010-09-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Fldstat2: replaced macros FDIV and FSQRT by function calls DIV and SQRT

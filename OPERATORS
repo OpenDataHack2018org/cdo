@@ -126,6 +126,7 @@ Operator catalog:
    Settime       setcalendar     Set calendar
    Settime       shifttime       Shift time steps
    Change        chcode          Change code number
+   Change        chparam         Change parameter identifier
    Change        chname          Change variable name
    Change        chlevel         Change level
    Change        chlevelc        Change level of one code

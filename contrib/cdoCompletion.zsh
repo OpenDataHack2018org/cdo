@@ -34,6 +34,7 @@ chlevelc -chlevelc \
 chlevelv -chlevelv \
 chltype -chltype \
 chname -chname \
+chparam -chparam \
 chtabnum -chtabnum \
 consecsum -consecsum \
 consects -consects \

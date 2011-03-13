@@ -20,6 +20,7 @@
 
       Change     chcode          Change code number
       Change     chtabnum        Change GRIB1 parameter table number
+      Change     chparam         Change parameter identifier
       Change     chname          Change variable name
       Change     chlevel         Change level
       Change     chlevelc        Change level of one code
@@ -32,23 +33,25 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
+int stringToParam(const char *paramstr);
 
 #define  MAXARG     16384
 
 void *Change(void *argument)
 {
-  int CHCODE, CHTABNUM, CHNAME, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
+  int CHCODE, CHTABNUM, CHPARAM, CHNAME, CHLEVEL, CHLEVELC, CHLEVELV, CHLTYPE;  
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
   int tsID1, recID, varID = 0, levelID;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
-  int chcodes[MAXARG], chtabnums[MAXARG], nch = 0;
+  int chints[MAXARG], nch = 0;
   char *chnames[MAXARG];
   char varname[128];
   char *chname = NULL;
   int chcode = 0;
+  int param;
   int code, tabnum, i;
   int nmiss;
   int gridsize;
@@ -64,6 +67,7 @@ void *Change(void *argument)
 
   CHCODE   = cdoOperatorAdd("chcode",   0, 0, "pairs of old and new code numbers");
   CHTABNUM = cdoOperatorAdd("chtabnum", 0, 0, "pairs of old and new GRIB1 table numbers");
+  CHPARAM  = cdoOperatorAdd("chparam",  0, 0, "pairs of old and new parameter identifiers");
   CHNAME   = cdoOperatorAdd("chname",   0, 0, "pairs of old and new variable names");
   CHLEVEL  = cdoOperatorAdd("chlevel",  0, 0, "pairs of old and new levels");
   CHLEVELC = cdoOperatorAdd("chlevelc", 0, 0, "code number, old and new level");
@@ -76,19 +80,13 @@ void *Change(void *argument)
 
   nch = operatorArgc();
 
-  if ( operatorID == CHCODE )
+  if ( operatorID == CHCODE || operatorID == CHTABNUM )
     {
       if ( nch%2 ) cdoAbort("Odd number of input arguments!");
       for ( i = 0; i < nch; i++ )
-	chcodes[i] = atoi(operatorArgv()[i]);
+	chints[i] = atoi(operatorArgv()[i]);
     }
-  else if ( operatorID == CHTABNUM )
-    {
-      if ( nch%2 ) cdoAbort("Odd number of input arguments!");
-      for ( i = 0; i < nch; i++ )
-	chtabnums[i] = atoi(operatorArgv()[i]);
-    }
-  else if ( operatorID == CHNAME )
+  else if ( operatorID == CHPARAM || operatorID == CHNAME )
     {
       if ( nch%2 ) cdoAbort("Odd number of input arguments!");
       for ( i = 0; i < nch; i++ )
@@ -139,8 +137,8 @@ void *Change(void *argument)
 	{
 	  code = vlistInqVarCode(vlistID2, varID);
 	  for ( i = 0; i < nch; i += 2 )
-	    if ( code == chcodes[i] )
-	      vlistDefVarCode(vlistID2, varID, chcodes[i+1]);
+	    if ( code == chints[i] )
+	      vlistDefVarCode(vlistID2, varID, chints[i+1]);
 	}
     }
   else if ( operatorID == CHTABNUM )
@@ -151,11 +149,28 @@ void *Change(void *argument)
 	{
 	  tabnum = tableInqNum(vlistInqVarTable(vlistID2, varID));
 	  for ( i = 0; i < nch; i += 2 )
-	    if ( tabnum == chtabnums[i] )
+	    if ( tabnum == chints[i] )
 	      {
-		tableID = tableDef(-1, chtabnums[i+1], NULL);
+		tableID = tableDef(-1, chints[i+1], NULL);
 		vlistDefVarTable(vlistID2, varID, tableID);
 	      }
+	}
+    }
+  else if ( operatorID == CHPARAM )
+    {
+      nvars = vlistNvars(vlistID2);
+      for ( varID = 0; varID < nvars; varID++ )
+	{
+	  param = vlistInqVarParam(vlistID2, varID);
+	  if ( cdoVerbose )
+	    {
+	      int pnum, pcat, pdis;
+	      cdiDecodeParam(param, &pnum, &pcat, &pdis);
+	      cdoPrint("pnum, pcat, pdis: %d.%d.%d", pnum, pcat, pdis);
+	    }
+	  for ( i = 0; i < nch; i += 2 )
+	    if ( param == stringToParam(chnames[i]) )
+	      vlistDefVarParam(vlistID2, varID, stringToParam(chnames[i+1]));
 	}
     }
   else if ( operatorID == CHNAME )

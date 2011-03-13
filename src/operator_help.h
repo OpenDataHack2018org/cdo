@@ -766,10 +766,11 @@ static char *SettimeHelp[] = {
 
 static char *ChangeHelp[] = {
     "NAME",
-    "    chcode, chname, chlevel, chlevelc, chlevelv - Change field header",
+    "    chcode, chparam, chname, chlevel, chlevelc, chlevelv - Change field header",
     "",
     "SYNOPSIS",
     "    chcode,oldcode,newcode[,...]  ifile ofile",
+    "    chparam,oldparam,newparam,...  ifile ofile",
     "    chname,oldname,newname,...  ifile ofile",
     "    chlevel,oldlev,newlev,...  ifile ofile",
     "    chlevelc,code,oldlev,newlev  ifile ofile",
@@ -783,6 +784,8 @@ static char *ChangeHelp[] = {
     "OPERATORS",
     "    chcode    Change code number",
     "              Changes some user given code numbers to new user given values.",
+    "    chparam   Change parameter identifier",
+    "              Changes some user given parameter identifiers to new user given values.",
     "    chname    Change variable name",
     "              Changes some user given variable names to new user given names.",
     "    chlevel   Change level",
@@ -793,13 +796,14 @@ static char *ChangeHelp[] = {
     "              Changes one level of a user given variable name.",
     "",
     "PARAMETER",
-    "    code                 INTEGER  Code number",
-    "    oldcode,newcode,...  INTEGER  Pairs of old and new code numbers",
-    "    name                 STRING   Variable name",
-    "    oldname,newname,...  STRING   Pairs of old and new variable names",
-    "    oldlev               FLOAT    Old level",
-    "    newlev               FLOAT    New level",
-    "    oldlev,newlev,...    FLOAT    Pairs of old and new levels",
+    "    code                   INTEGER  Code number",
+    "    oldcode,newcode,...    INTEGER  Pairs of old and new code numbers",
+    "    oldparam,newparam,...  STRING   Pairs of old and new parameter identifiers",
+    "    name                   STRING   Variable name",
+    "    oldname,newname,...    STRING   Pairs of old and new variable names",
+    "    oldlev                 FLOAT    Old level",
+    "    newlev                 FLOAT    New level",
+    "    oldlev,newlev,...      FLOAT    Pairs of old and new levels",
     NULL
 };
 

@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = chcode chname chlevel chlevelc chlevelv
+@Operators = chcode chparam chname chlevel chlevelc chlevelv
 
 @BeginDescription
 This module reads fields from @file{ifile}, changes some header values
@@ -21,6 +21,16 @@ the chosen operator.
 
 @BeginDescription
 Changes some user given code numbers to new user given values.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_chparam
+@Title     = Change parameter identifier
+@Parameter = oldparam newparam ...
+
+@BeginDescription
+Changes some user given parameter identifiers to new user given values.
 @EndDescription
 @EndOperator
 
@@ -70,6 +80,8 @@ Changes one level of a user given variable name.
 INTEGER  Code number
 @Item = oldcode,newcode,...
 INTEGER  Pairs of old and new code numbers
+@Item = oldparam,newparam,...
+STRING   Pairs of old and new parameter identifiers
 @Item = name
 STRING   Variable name
 @Item = oldname,newname,...

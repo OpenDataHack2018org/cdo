@@ -32,17 +32,18 @@
 #include "pstream.h"
 #include "namelist.h"
 
-static
+
 int stringToParam(const char *paramstr)
 {
   int param = 0;
-  int pnum = -1, pcat = 0, pdis = 255;
+  int pnum = -1, pcat = 255, pdis = 255;
   size_t len;
 
   len = strlen(paramstr);
 
   sscanf(paramstr, "%d.%d.%d", &pnum, &pcat, &pdis);
-  // printf("pnum, pcat, pdis: %d.%d.%d\n", pnum, pcat, pdis);
+  
+  if ( cdoVerbose ) cdoPrint("pnum, pcat, pdis: %d.%d.%d", pnum, pcat, pdis);
 
   param = cdiEncodeParam(pnum, pcat, pdis);
 
