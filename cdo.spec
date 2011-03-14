@@ -4,7 +4,7 @@
 
 Name:           cdo
 #BuildRequires:  
-Version:        1.4.8rc8
+Version:        1.5.0
 Release:        1
 Summary:        Climate Data Operators
 License:        GNU GENERAL PUBLIC LICENSE Version 2, June 1991
