@@ -16,22 +16,24 @@ arbitrary number $a$ and the missing value is the missing value,
 and the table named "multiplication" shows that $0$ multiplied by missing
 value results in $0$.
 
+
 \hspace{2cm}
 \vspace{2mm}
 \begin{minipage}[t]{8cm}
 
-\ifpdf
-\begin{longtable}[t]{|c||c|c|c|}
-\else
-\begin{tabular}[t]{|c||c|c|c|}
-\fi
+%\ifpdf
+%\begin{longtable}[t]{|c||c|c|c|}
+%\else
+\begin{tabular}[t]{|>{\columncolor[gray]{.95}}c|c|c|c|}
+%\fi
 \hline
-\makebox[2.3cm]{\bf addition}&  \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf addition}&  \makebox[2cm]{b} & & \makebox[2cm]{miss} \\
 \hline
+  {a}         &       $a + b$   & &   $miss$ \\
 \hline
-   {\bf a}        &       $a + b$   & &   $miss$ \\
-\hline
-  {\bf miss}      &       $miss$    & &   $miss$ \\
+  {miss}      &       $miss$    & &   $miss$ \\
 \hline
 %\end{tabular}
 %
@@ -39,27 +41,13 @@ value results in $0$.
 %
 %\begin{tabular}[t]{|c||c|c|}
 \hline
-\makebox[2.3cm]{\bf subtraction}&  \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf subtraction}&  \makebox[2cm]{b} & & \makebox[2cm]{miss} \\
 \hline
+  {a}         &       $a - b$   &  &  $miss$ \\
 \hline
-   {\bf a}        &       $a - b$   &  &  $miss$ \\
-\hline
-  {\bf miss}      &       $miss$    &  &  $miss$ \\
-\hline
-%\end{tabular}
-%
-%\vspace{1mm}
-%
-%\begin{tabular}[b]{|c||c|c|c|}
-\hline
-\makebox[2.3cm]{\bf multiplication} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf 0} & \makebox[2cm]{\bf miss} \\
-\hline
-\hline
-   {\bf a}        &       $a * b$   &     $0$   &    $miss$ \\
-\hline
-   {\bf 0}        &        $0$      &     $0$   &     $0$   \\
-\hline
-  {\bf miss}      &       $miss$    &     $0$   &    $miss$ \\
+  {miss}      &       $miss$    &  &  $miss$ \\
 \hline
 %\end{tabular}
 %
@@ -67,14 +55,31 @@ value results in $0$.
 %
 %\begin{tabular}[b]{|c||c|c|c|}
 \hline
-\makebox[2.3cm]{\bf division} & \makebox[2cm]{\bf b} & \makebox[2cm]{\bf 0} & \makebox[2cm]{\bf miss} \\
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf multiplication} & \makebox[2cm]{b} & \makebox[2cm]{0} & \makebox[2cm]{miss} \\
 \hline
+  {a}         &       $a * b$   &     $0$   &    $miss$ \\
 \hline
-   {\bf a}        &       $a / b$   &    $miss$ &    $miss$ \\
+  {0}         &        $0$      &     $0$   &     $0$   \\
 \hline
-   {\bf 0}        &        $0$      &    $miss$ &    $miss$ \\
+  {miss}      &       $miss$    &     $0$   &    $miss$ \\
 \hline
-  {\bf miss}      &       $mis$s    &    $miss$ &    $miss$ \\
+%\end{tabular}
+%
+%\vspace{1mm}
+%
+%\begin{tabular}[b]{|c||c|c|c|}
+\hline
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf division} & \makebox[2cm]{b} & \makebox[2cm]{0} & \makebox[2cm]{miss} \\
+\hline
+  {a}         &       $a / b$   &    $miss$ &    $miss$ \\
+\hline
+  {0}        &        $0$      &    $miss$ &    $miss$ \\
+\hline
+  {miss}      &       $mis$s    &    $miss$ &    $miss$ \\
 \hline
 %\end{tabular}
 %
@@ -82,12 +87,13 @@ value results in $0$.
 %
 %\begin{tabular}[b]{|c||c|c|}
 \hline
-\makebox[2.3cm]{\bf maximum} & \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf maximum} & \makebox[2cm]{b} & & \makebox[2cm]{miss} \\
 \hline
+  {a}         &      $max(a,b)$ & &    $a$   \\
 \hline
-   {\bf a}        &      $max(a,b)$ & &    $a$   \\
-\hline
-  {\bf miss}      &        $b$      & &   $miss$ \\
+  {miss}      &        $b$      & &   $miss$ \\
 \hline
 %\end{tabular}
 %
@@ -95,12 +101,13 @@ value results in $0$.
 %
 %\begin{tabular}[b]{|c||c|c|}
 \hline
-\makebox[2.3cm]{\bf minimum} & \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf minimum} & \makebox[2cm]{b} & & \makebox[2cm]{miss} \\
 \hline
+  {a}         &      $min(a,b)$ &  &   $a$   \\
 \hline
-   {\bf a}        &      $min(a,b)$ &  &   $a$   \\
-\hline
-  {\bf miss}      &        $b$      &  &  $miss$ \\
+  {miss}      &        $b$      &  &  $miss$ \\
 \hline
 %\end{tabular}
 %%\end{minipage}
@@ -111,18 +118,19 @@ value results in $0$.
 %
 %\begin{tabular}[b]{|c||c|c|}
 \hline
-\makebox[2.3cm]{\bf sum} & \makebox[2cm]{\bf b} & & \makebox[2cm]{\bf miss} \\
+\rowcolor[gray]{.95}
+\cellcolor[gray]{.8}
+\makebox[2.3cm]{\bf sum} & \makebox[2cm]{b} & & \makebox[2cm]{miss} \\
 \hline
+  {a}         &         $a + b$ & &     $a$   \\
 \hline
-   {\bf a}        &         $a + b$ & &     $a$   \\
+  {miss}      &        $b$      & &   $miss$ \\
 \hline
-  {\bf miss}      &        $b$      & &   $miss$ \\
-\hline
-\ifpdf
-\end{longtable}
-\else
+%\ifpdf
+%\end{longtable}
+%\else
 \end{tabular}
-\fi
+%\fi
 
 \end{minipage}
 
