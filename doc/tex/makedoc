@@ -91,6 +91,7 @@ if ( $threecols == 1 ) {
 print TRCARD "\n";
 print TRCARD "\\usepackage{graphics}\n";
 print TRCARD "\\usepackage{array,colortbl}\n";
+print TRCARD "\\usepackage{color}\n";
 print TRCARD "\n";
 print TRCARD "% A4 29.7x21.0cm  11.7x8.26\n";
 print TRCARD "\\setlength{\\hoffset}{-0.8in}\n";
@@ -278,7 +279,7 @@ while (<MOFILE>) {
 	print TRCARD "\\noindent\n";
 	print TRCARD "\\hspace*{0.5in}\n";
 	print TRCARD "\\begin{tabular*}{2.8in}{|l|l|} \\hline\n";
-	print TRCARD "\\rowcolor[gray]{.9}\n";
+	print TRCARD "\\rowcolor{pgreen}\n";
 	print TRCARD "\\makebox[1.8in][c]{Available statistical functions} &\n";
 	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \\hline\n";
 	print TRCARD "minimum  & {\\bf min}   \\\\ \n";
@@ -360,7 +361,7 @@ while (<MOFILE>) {
 
     if ( $refskip == 0 ) {
       print TRCARD "\\noindent\n";
-      print TRCARD "\\begin{tabular*}{$len1}{|>{\\columncolor[gray]{.9}}l>{\\columncolor[gray]{.95}}l|} \\hline\n";
+      print TRCARD "\\begin{tabular*}{$len1}{|>{\\columncolor{pyellow}}ll|} \\hline\n";
     }
 
     print HELPFILE "    \"NAME\",\n";
@@ -629,11 +630,11 @@ while (<MOFILE>) {
       if ( "$otitle" ne "" ) {
 	if ( $refskip == 0 && $xopercnt > 1 && "$oparameter" ne "$operpara" ) {
 #	  print TRCARD "\\rowcolor[gray]{.9}\n";
-	  print TRCARD "\\makebox[$len2][r]{\\cellcolor[gray]{.8}Syntax} ";
+	  print TRCARD "\\multicolumn{2}{|>{\\columncolor{pgreen}}l|}";
 	  if ( $xopercnt == 2 ) {
-	    print TRCARD "& \\cellcolor[gray]{.85} \\hspace*{0mm}{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments} ";
+	    print TRCARD "{{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments}} ";
 	  } else {
-	    print TRCARD "& \\cellcolor[gray]{.85} \\hspace*{0mm}{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments} ";
+	    print TRCARD "{{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments}} ";
 	  }
 	  print TRCARD "\\\\ \\hline \n";
 	  $xopercnt = 1;
@@ -990,8 +991,8 @@ while (<MOFILE>) {
     print TRLIST "\n";
 
     if ( $refskip == 0 ) {
-      print TRCARD "\\rowcolor[gray]{.9}\n";
-      print TRCARD "\\makebox[$len2][r]{\\cellcolor[gray]{.8}Syntax} ";
+#     print TRCARD "\\rowcolor[gray]{.9}\n";
+      print TRCARD "\\multicolumn{2}{|>{\\columncolor{pgreen}}l|}";
     }
     if ( "$opername" eq "selpctl" )  {
       $marguments =~ s/ifile/in/og;
@@ -1001,9 +1002,9 @@ while (<MOFILE>) {
     $opernamex =~ s/_/\\_/g;
     if ( $refskip == 0 ) {
       if ( $xopercnt == 1 ) {
-	print TRCARD "& \\cellcolor[gray]{.85} \\hspace*{0mm}{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments} ";
+	print TRCARD "{{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments}} ";
       } else {
-	print TRCARD "& \\cellcolor[gray]{.85} \\hspace*{0mm}{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments} ";
+	print TRCARD "{{\$<\\!operator\\!>\$}{\\sl $operpara} \ {\\tt $marguments}} ";
       }
       print TRCARD "\\\\ \\hline \n";
 

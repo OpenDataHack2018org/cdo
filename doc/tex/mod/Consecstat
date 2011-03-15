@@ -16,6 +16,7 @@ just its length and ending date are computed.
 @EndDescription
 @EndModule
 
+
 @BeginOperator_consecsum
 @Title     = Consecutive Sum
 
@@ -40,7 +41,8 @@ analysis like min, max or mean, everything else is set to misvall.
 
 
 @BeginExample
-For a given time series of daily temperatures, the periods of summer days can be calculated with inplace maskting the input field:
+For a given time series of daily temperatures, the periods of summer days can be
+calculated with inplace maskting the input field:
 @BeginVerbatim
    cdo consects -gtc,20.0 ifile1 ofile
 @EndVerbatim

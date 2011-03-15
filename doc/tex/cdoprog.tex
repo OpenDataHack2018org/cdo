@@ -1,3 +1,7 @@
+\definecolor{pyellow}{rgb}{1, 0.98, 0.86}
+\definecolor{pgreen}{rgb}{1, 0.925, 0.70}
+%\definecolor{pgreen}{rgb}{0.92, 1, 0.91}
+
 \newcommand{\CDO}{{\bfseries\sffamily CDO\ }}
 \newcommand{\cdologo}{\includegraphics{logo/cdo_logo}}
 \vspace*{0mm}
@@ -33,7 +37,7 @@
 \vspace*{2mm}
 \subsection*{Options}
 \noindent
-\begin{tabular*}{3.95in}{|>{\columncolor[gray]{.9}}l>{\columncolor[gray]{.95}}l|} \hline
+\begin{tabular*}{3.95in}{|>{\columncolor{pyellow}}ll|} \hline
 \makebox[0.85in][l]{{\bf{-a}}                  } & \makebox[2.76in][l]{Generate an absolute time axis} \\ \hline
 \makebox[0.85in][l]{{\bf{-b}} $<\!nbits\!>$    } & \makebox[2.76in][l]{Set the number of bits for the output precision} \\
                                                  & (I8/I16/I32/F32/F64 for nc,nc2,nc4; \\
