@@ -158,7 +158,7 @@ case "${HOSTNAME}" in
 
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-jasper=/usr/local/lib/metaps/lib/grib_api/jasper_64 \
-                    --with-grib_api=$HOME/gribapi/1.9.5 \
+                    --with-grib_api=$HOME/gribapi/1.9.8 \
                     --with-netcdf=/usr/local/apps/netCDF/3.6.2/LP64 \
                     --with-szlib=$HOME/local \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
