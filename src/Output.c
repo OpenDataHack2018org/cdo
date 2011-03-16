@@ -41,6 +41,7 @@ void *Output(void *argument)
   int varID, recID;
   int gridsize = 0;
   int gridID, zaxisID, code, vdate, vtime;
+  int gridtype;
   int ngrids;
   int nrecs;
   int levelID;
@@ -66,8 +67,8 @@ void *Output(void *argument)
   char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
-  enum                     {kvalue,  kcode,  kname,  klon,  klat,  klev,  kdate,  ktime,  kyear,  kmonth,  kday};
-  const char *Keynames[] = {"value", "code", "name", "lon", "lat", "lev", "date", "time", "year", "month", "day"};
+  enum                     {kvalue,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  kdate,  ktime,  kyear,  kmonth,  kday};
+  const char *Keynames[] = {"value", "code", "name", "lon", "lat", "lev", "xind", "yind", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -143,6 +144,7 @@ void *Output(void *argument)
 
       gridID   = vlistGrid(vlistID, 0);
       gridsize = gridInqSize(gridID);
+      gridtype = gridInqType(gridID);
 
       array = (double *) malloc(gridsize*sizeof(double));
 
@@ -152,6 +154,8 @@ void *Output(void *argument)
 
 	  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
 	    gridID = gridToCurvilinear(gridID);
+
+	  gridtype = gridInqType(gridID);
 
 	  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
 	  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
@@ -255,10 +259,22 @@ void *Output(void *argument)
 		}
 	      else if ( operatorID == OUTPUTKEY )
 		{
+		  int xsize, ysize;
+		  int xind, yind;
+		  int l2d = FALSE;
+
+		  xsize = gridInqXsize(gridID);
+		  ysize = gridInqYsize(gridID);
+		  if ( gridtype == GRID_CURVILINEAR ) l2d = TRUE;
+		      
 		  for ( i = 0; i < gridsize; i++ )
 		    {
+		      yind = i;
+		      xind = i;
+		      if ( l2d ) { yind /= xsize; xind -= yind*xsize; }
 		      lon = grid_center_lon[i];
 		      lat = grid_center_lat[i];
+
 		      for ( k = 0; k < nkeys; ++k )
 			{
 			  if      ( keys[k] == kvalue ) fprintf(stdout, "%8g ", array[i]);
@@ -267,6 +283,8 @@ void *Output(void *argument)
 			  else if ( keys[k] == klon   ) fprintf(stdout, "%6g ", lon);
 			  else if ( keys[k] == klat   ) fprintf(stdout, "%6g ", lat);
 			  else if ( keys[k] == klev   ) fprintf(stdout, "%6g ", level);
+			  else if ( keys[k] == kxind  ) fprintf(stdout, "%4d ", xind+1);
+			  else if ( keys[k] == kyind  ) fprintf(stdout, "%4d ", yind+1);
 			  else if ( keys[k] == kdate  ) fprintf(stdout, "%8d ", vdate);
 			  else if ( keys[k] == ktime  ) fprintf(stdout, "%6d ", vtime);
 			  else if ( keys[k] == kyear  ) fprintf(stdout, "%5d ", year);
