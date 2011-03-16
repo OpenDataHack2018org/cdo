@@ -64,6 +64,7 @@ void *EOFs(void * argument)
   int reached_eof;
   int npack=0, nts=0;
   int *pack, *miss;
+  int *datacountv;
   int ***datacounts;
   int n_eig, n=0;
   int grid_space=0, time_space=0;
@@ -77,6 +78,8 @@ void *EOFs(void * argument)
   double *xvals, *yvals;
   double **cov, *eigv;
 
+  double *df1p, *df2p;
+  field_t *datafieldv;
   field_t ***datafields;
   field_t ***eigenvectors, ***eigenvalues;
   field_t in;
@@ -452,16 +455,19 @@ void *EOFs(void * argument)
         {
 	  if ( cdoTimer ) timer_start(timer_cov);
 
-	  if ( cdoVerbose ) 
-	    cdoPrint("processing level %i",levelID);
+	  if ( cdoVerbose ) cdoPrint("processing level %i",levelID);
 
           int i2;
-          cov = NULL;          // TODO covariance matrix / eigenvectors after solving
-          eigv = NULL;         // TODO eigenvalues
-	  pack = NULL;
-	  miss = NULL;
-          npack        = 0;    // TODO already set to 0
-          sum_w        = 0;
+
+	  datafieldv = datafields[varID][levelID];
+	  datacountv = datacounts[varID][levelID];
+
+          cov   = NULL; // TODO covariance matrix / eigenvectors after solving
+          eigv  = NULL; // TODO eigenvalues
+	  pack  = NULL;
+	  miss  = NULL;
+          npack = 0;    // TODO already set to 0
+          sum_w = 0;
 
           if ( grid_space )
             {
@@ -470,7 +476,7 @@ void *EOFs(void * argument)
 
               for ( i1 = 0; i1 < gridsize; i1++ )
                 {
-		  if (datacounts[varID][levelID][i1*gridsize + i1] > 1) 
+		  if (datacountv[i1*gridsize + i1] > 1) 
 		    pack[npack++] = i1;
 		  else
 		    miss[i1] = 1;
@@ -488,11 +494,11 @@ void *EOFs(void * argument)
 
               for (i1 = 0; i1 < npack; i1++)
 		for (i2 = i1; i2 < npack; i2++ )
-		  if ( datacounts[varID][levelID][pack[i1]*gridsize+pack[i2]] )
+		  if ( datacountv[pack[i1]*gridsize+pack[i2]] )
 		    cov[i2][i1] = cov[i1][i2] =
-			          datafields[varID][levelID][0].ptr[pack[i1]*gridsize+pack[i2]]*   // covariance
+			          datafieldv[0].ptr[pack[i1]*gridsize+pack[i2]]*   // covariance
                                   sqrt(weight[pack[i1]]) * sqrt (weight[pack[i2]]) / sum_w /       // weights
-                                  (datacounts[varID][levelID][pack[i1]*gridsize+pack[i2]]);   // number of data contributing
+                                  (datacountv[pack[i1]*gridsize+pack[i2]]);   // number of data contributing
             }
           else if ( time_space )
             {
@@ -503,7 +509,7 @@ void *EOFs(void * argument)
 
               for ( i = 0; i < gridsize ; i++ )
                 {
-		  if ( datacounts[varID][levelID][i] )
+		  if ( datacountv[i] )
 		    {
 		      pack[npack] = i;
 		      npack++;
@@ -520,17 +526,18 @@ void *EOFs(void * argument)
 	      eigv = (double *) malloc (nts*sizeof(double));
 
 #if defined (_OPENMP)
-#pragma omp parallel for private(j1,j2,i,sum) default(shared) schedule(dynamic)
+#pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
 #endif
               for ( j1 = 0; j1 < nts; j1++ )
 		for ( j2 = j1; j2 < nts; j2++ )
 		  {
 		    sum = 0;
-		    for ( i = 0; i < npack; i++ ) {
-		      sum += weight[pack[i]]*
-                             datafields[varID][levelID][j1].ptr[pack[i]]*
-                             datafields[varID][levelID][j2].ptr[pack[i]];
-		    }
+		    df1p = datafieldv[j1].ptr;
+		    df2p = datafieldv[j2].ptr;
+		    for ( i = 0; i < npack; i++ )
+		      {
+			sum += weight[pack[i]]*df1p[pack[i]]*df2p[pack[i]];
+		      }
 		    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 		  }
 
@@ -565,13 +572,13 @@ void *EOFs(void * argument)
               else if ( time_space )
                 {
 #if defined (_OPENMP)
-#pragma omp parallel for private(i2,j,sum) shared(datafields,eigenvectors)
+#pragma omp parallel for private(i2,j,sum) shared(datafieldv,eigenvectors)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
                     {
                       sum = 0;
                       for ( j = 0; j < nts; j++ )
-                        sum += datafields[varID][levelID][j].ptr[pack[i2]] * cov[i][j];
+                        sum += datafieldv[j].ptr[pack[i2]] * cov[i][j];
 
                       eigenvectors[varID][levelID][i].ptr[pack[i2]] = sum;
                     }
