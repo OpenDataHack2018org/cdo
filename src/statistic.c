@@ -17,8 +17,8 @@
 #define FNORM_PRECISION 1e-05
 #define MAX_JACOBI_ITER 5
 
-int jacobi_1side(double **M, double *A, int n);
-void annihilate_1side(double **M, int i, int j, int k, int n);
+int jacobi_1side(double **M, double *A, long n);
+void annihilate_1side(double **M, long i, long j, long k, long n);
 
 int n_finished;
 
@@ -1295,13 +1295,13 @@ void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, 
 /* changes columns i and j, this can be carried out for n/2 pairs of columns at     */
 /* the same time.                                                                   */
 /* ******************************************************************************** */
-void annihilate_1side(double **M, int i, int j, int k, int n)
+void annihilate_1side(double **M, long i, long j, long k, long n)
 {
 
   double tk, ck, sk, alpha=0, beta=0, gamma=0, zeta=0;
   double tmp, *mi=NULL, *mj=NULL;
   //  int first_annihilation = 0;
-  int r;
+  long r;
 
   i--; j--;
 
@@ -1359,11 +1359,12 @@ void annihilate_1side(double **M, int i, int j, int k, int n)
 }
 
 
-int jacobi_1side(double **M, double *A, int n)
+int jacobi_1side(double **M, double *A, long n)
 {  
-  int i,j,k,m,r,i_ann,j_ann;
+  long i,j,k,m,r;
+  long idx;
+  long i_ann,j_ann;
   int n_iter = 0;
-  int idx;
   int count=0;
   int **annihilations, *annihilations_buff;
 
