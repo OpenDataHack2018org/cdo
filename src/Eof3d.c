@@ -75,6 +75,7 @@ void *EOF3d(void * argument)
   double *eigv;
   double *weight;
   double *xvals, *yvals, *zvals;
+  double *df1p, *df2p;
 
   field_t **datafields;
   field_t **eigenvectors, **eigenvalues;
@@ -201,7 +202,6 @@ void *EOF3d(void * argument)
 
   if ( operfunc == EOF3D_SPATIAL )
     cdoAbort("Operator not Implemented - use eof3d or eof3dtime instead");
-
 
 
   /* COUNT NUMBER OF TIMESTEPS if EOF3D_ or EOF3D_TIME */
@@ -401,14 +401,18 @@ void *EOF3d(void * argument)
 	cdoPrint("   npack=%i, nts=%i temp_size=%i",npack,nts,temp_size);
       }
 
+
+#if defined (_OPENMP)
+#pragma omp parallel for private(j1,j2,sum,df1p,df2p) default(shared) schedule(static,2000)
+#endif 
       for ( j1 = 0; j1 < nts; j1++)
 	for ( j2 = j1; j2 < nts; j2++ )
 	  {
 	    sum = 0;
+	    df1p = datafields[varID][j1].ptr;
+	    df2p = datafields[varID][j2].ptr;
 	    for ( i = 0; i < npack; i++ )
-	      sum += weight[pack[i]%gridsize]*
-		datafields[varID][j1].ptr[pack[i]]*
-		datafields[varID][j2].ptr[pack[i]];
+	      sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
 	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 	  }
       if ( cdoVerbose ) 
@@ -440,6 +444,9 @@ void *EOF3d(void * argument)
 
       for (eofID = 0; eofID < n_eig; eofID++)
 	{
+#if defined (_OPENMP)
+#pragma omp parallel for private(i,j,sum) shared(datafields, eigenvectors)
+#endif 
 	  for ( i = 0; i < npack; i++ )
 	    {
 	      sum = 0;
@@ -449,16 +456,30 @@ void *EOF3d(void * argument)
 	    }
 	  // NORMALIZING
 	  sum = 0;
+
+#if defined (_OPENMP)
+#pragma omp parallel for private(i) default(none) reduction(+:sum) \
+  shared(eigenvectors,weight,pack,varID,eofID,npack,gridsize)
+#endif 
 	  for ( i = 0; i < npack; i++ )
-	    sum +=  /* weight[pack[i]%gridsize] * */
+	    sum +=  weight[pack[i]%gridsize] *
 	      eigenvectors[varID][eofID].ptr[pack[i]] *
 	      eigenvectors[varID][eofID].ptr[pack[i]];
-	  sum = sqrt(sum);
-	  
-	  if ( sum > 0 )
+
+	  if ( sum > 0 ) {
+	    sum = sqrt(sum);
+#if defined (_OPENMP)
+#pragma omp parallel for private(i) default(none) \
+  shared(sum,npack,eigenvectors,varID,eofID,pack)
+#endif
 	    for( i = 0; i < npack; i++ )
 	      eigenvectors[varID][eofID].ptr[pack[i]] /= sum;
+	  }
 	  else
+#if defined (_OPENMP)
+#pragma omp parallel for private(i) default(none) \
+  shared(eigenvectors,varID,eofID,pack,missval)
+#endif
 	    for( i = 0; i < npack; i++ )
 	      eigenvectors[varID][eofID].ptr[pack[i]] = missval;
 	}     /* for ( eofID = 0; eofID < n_eig; eofID++ )     */
