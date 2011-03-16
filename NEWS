@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.5.1 (?? ????? 2011):
+
+   Fixed bugs:
+     * eofspatial: integer overflow; wrong result for grid size > 46340
+
 Version 1.5.0 (15 March 2011):
 
    New features:

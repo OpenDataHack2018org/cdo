@@ -30,6 +30,7 @@
 
 #define WEIGHTS 1
 
+#include <limits.h>  // LONG_MAX
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -49,10 +50,10 @@ void *EOFs(void * argument)
   int operatorID;
   int operfunc;
   int streamID1, streamID2, streamID3;
-  int gridsize;
+  long gridsize;
+  long i, ii, j, i1, i2, j1, j2;
   int vdate = 0, vtime = 0;
   int nrecs, nvars, nlevs=0 ;
-  int i, ii, j, i1, i2, j1, j2;
   int nmiss;
   int tsID;
   int varID, recID, levelID;
@@ -236,10 +237,13 @@ void *EOFs(void * argument)
     }
   else if ( grid_space )
     {
+      if ( ((double)gridsize)*gridsize > (double)LONG_MAX )
+	cdoAbort("Grid space to large!");
+
       if ( n_eig > gridsize )
         {
-          cdoWarning("Solving in sptial space");
-          cdoWarning("Number of eigen-functions to write out is bigger than number of time-steps");
+          cdoWarning("Solving in spatial space");
+          cdoWarning("Number of eigen-functions to write out is bigger than grid size");
           cdoWarning("Setting n_eig to %i", gridsize);
           cdoWarning("If You want to force a solution in time-space use operator eoftime");
           n_eig = gridsize;
@@ -674,7 +678,7 @@ void *EOFs(void * argument)
     {
       char vname[64];
       vlistInqVarName(vlistID1,varID,&vname[0]);
-      nlevs               = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+      nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       gridsize =  gridInqSize(vlistInqVarGrid(vlistID1, varID));
       
       for(levelID = 0; levelID < nlevs; levelID++)

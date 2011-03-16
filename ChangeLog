@@ -1,5 +1,6 @@
 2011-03-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* eofspatial: integer overflow; wrong result for grid size > 46340 (bug fix) [report: Hans-Jürgen Panitz]
 	* outputkeys: added keys xind, yind [request: Nils Fischer]
 
 2011-03-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
