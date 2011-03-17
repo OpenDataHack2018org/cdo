@@ -478,7 +478,7 @@ void *EOF3d(void * argument)
 	  else
 #if defined (_OPENMP)
 #pragma omp parallel for private(i) default(none) \
-  shared(eigenvectors,varID,eofID,pack,missval)
+  shared(eigenvectors,varID,eofID,pack,missval,npack)
 #endif
 	    for( i = 0; i < npack; i++ )
 	      eigenvectors[varID][eofID].ptr[pack[i]] = missval;
