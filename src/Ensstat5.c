@@ -18,6 +18,7 @@
 /*
    This module contains the following operators:
    Ensstat5       enscrps          Ensemble cumulative ranked probability score
+   Ensstat5       ensbrs           Ensemble Brier score
 */
 
 #if defined (_OPENMP)
@@ -31,6 +32,8 @@
 #include "pstream.h"
 #include "util.h"
 #include "merge_sort2.h"
+
+enum OPERTYPE {CRPS, BRS};
 
 void *Ensstat5(void *argument)
 {
@@ -53,11 +56,14 @@ void *Ensstat5(void *argument)
   int xsize,ysize;
   double missval;
   double *alpha, *beta, *alpha_weights, *beta_weights;
+  double *brs_g, *brs_o, *brs_g_weights, *brs_o_weights;
   double xval=0; double yval=0;
+  double xa, *x;
   double *val;
   double *weights, sum_weights;
-  double reli, crps_pot,sprd, crps;
+  double crps_reli, crps_pot,sprd, crps;
   double heavyside0, heavysideN;
+  double brs_reli, brs_resol, brs_uncty, brs_thresh;
   double g,o,p;
   
   int fileID;
@@ -70,10 +76,11 @@ void *Ensstat5(void *argument)
     double *array;
   } ens_file_t;
   ens_file_t *ef = NULL;
-  
+
   cdoInitialize(argument);
   
-  cdoOperatorAdd("enscrps",   0,  0,   NULL);
+  cdoOperatorAdd("enscrps",   CRPS,  0,   NULL);
+  cdoOperatorAdd("ensbrs",    BRS,   0,   NULL);
   
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
@@ -82,12 +89,26 @@ void *Ensstat5(void *argument)
   nfiles = cdoStreamCnt() - 1;
   nens = nfiles-1;
 
-  val = (double *) calloc ( nfiles,sizeof(double) );
-  alpha=(double *) calloc ( nens+1,sizeof(double) );
-  beta =(double *) calloc ( nens+1,sizeof(double) );
-  alpha_weights=(double *) calloc ( nens+1,sizeof(double) );
-  beta_weights =(double *) calloc ( nens+1,sizeof(double) );
+  if ( operfunc == CRPS ) 
+    cdoPrint("ensstat - crps");
+  else if ( operfunc == BRS )  {
+    operatorInputArg("Threshold for Brier score?");
+    operatorCheckArgc(1);
+    brs_thresh = atof(operatorArgv()[0]);
+  }
 
+  val = (double *) calloc ( nfiles,sizeof(double) );
+  
+  if ( operfunc == CRPS ) {
+    alpha=(double *) calloc ( nens+1,sizeof(double) );
+    beta =(double *) calloc ( nens+1,sizeof(double) );
+    alpha_weights=(double *) calloc ( nens+1,sizeof(double) );
+    beta_weights =(double *) calloc ( nens+1,sizeof(double) );
+  }
+  else if ( operfunc == BRS ) {
+    brs_g = (double *) calloc ( nens+1,sizeof(double) );
+    brs_o = (double *) calloc ( nens+1,sizeof(double) );
+  }
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
 
@@ -115,6 +136,7 @@ void *Ensstat5(void *argument)
   
   /* check for identical contents of all ensemble members */
   nvars = vlistNvars(ef[0].vlistID);
+  fprintf(stderr,"nvars %i\n",nvars);
   if ( nvars == 1 ) 
     cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
   else 
@@ -212,6 +234,9 @@ void *Ensstat5(void *argument)
 
 	  nmiss = 0;
 	  valcount = 0;
+	  heavyside0 = 0;
+	  heavysideN = 0;
+
 	  for ( i = 0; i < gridsize; i++ )
 	    {
 	      have_miss = 0;
@@ -221,16 +246,17 @@ void *Ensstat5(void *argument)
 		  if ( DBL_IS_EQUAL(val[fileID], missval) ) 
 		    { have_miss = 1; break; }
 		}
-	      
-	      if ( ! have_miss )  // only process if no missing value in ensemble
+
+	      xa=val[0];                                     /* 1st file contains reference  */
+	      x = &val[1];                                   /* Ensembles start at 2nd   file*/
+	      sort_iter_single(nens,x,1);                    /* Sort The Ensemble Array      */
+
+	      // only process if no missing value in ensemble
+	      if ( ! have_miss && operfunc == CRPS )  
 		{
-		  double xa=val[0];                              /* 1st file contains reference  */
-		  double *x = &val[1];                           /* Ensembles start at 2nd   file*/
-		  sort_iter_single(nens,x,1);                    /* Sort The Ensemble Array      */
 
 		  if ( xa < x[0] ) {                             /* Consider outliers            */
 		    beta[0] += (x[0]-xa)*weights[i];
-		    beta_weights[0] += weights[i];
 		    heavyside0 += 1.;
 		  }
 		  if ( xa > x[nens-1] )  {
@@ -251,58 +277,145 @@ void *Ensstat5(void *argument)
 		    }
 		  }
 		}
+	      else if ( operfunc == BRS ) 
+		{
+		  int occ = xa>brs_thresh? 1 : 0;
+		  
+		  if ( x[0] > brs_thresh ) 
+		    brs_g[0] += weights[i];
+		  else if ( x[nens-1] < brs_thresh ) 
+		    brs_g[nens] += weights[i];		  
+		  else
+		    for ( k=0; k<nens-1; k++ ) {
+		      if ( x[k+1] >= brs_thresh && brs_thresh >= x[k] ) {
+			brs_g[k+1] += weights[i];
+			break;
+		      }
+		    }
+
+		  if ( x[0] > xa )
+		    brs_o[0] += weights[i];
+		  else if ( x[nens-1] < xa ) 
+		    brs_o[nens] += weights[i];
+		  else
+		    for ( k=0; k<nens-1; k++ ) {
+		      if ( x[k+1] >= xa && xa >= x[k] ) {
+			brs_o[k+1] += weights[i];
+			break;
+		      }
+		    }
+
+		}
 	    }        // for ( i=0; i<gridsize; i++ )
+	  
+	  if ( operfunc == CRPS ) {
 
-	  // First Bin
-	  p=0.; g=0.;
-	  o = heavyside0/gridsize;
-	  if ( o > 0. ) {
-	    g = beta[0]/o;
-	  }
-	  reli    = g * (o - p) * (o - p);
-	  crps_pot= g*o*(1.-o);
-	  crps    = g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
-
-	  // Middle Bins
-	  for ( k=1; k<nens; k++ ) {
-	    p = (double)k/(double)nens;
+	    // First Bin
+	    p=0.; g=0.;
+	    o = heavyside0/gridsize;
+	    if ( o > 0. ) {
+	      g = beta[0]/o;
+	    }
+	    crps_reli= g * (o - p) * (o - p);
+	    crps_pot = g*o*(1.-o);
+	    crps     = g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
 	    
-	    if ( ! DBL_IS_EQUAL(sum_weights,1.) ) {
-	      alpha[k] /= sum_weights; 
-	      beta[k] /= sum_weights;
+	    // Middle Bins
+	    for ( k=1; k<nens; k++ ) {
+	      p = (double)k/(double)nens;
+	      
+	      if ( ! DBL_IS_EQUAL(sum_weights,1.) ) {
+		alpha[k] /= sum_weights; 
+		beta[k] /= sum_weights;
+	      }
+	      
+	      g = alpha[k]+beta[k];
+	      o = beta[k] / ( alpha[k] + beta[k] ); 
+	      
+	      crps_reli    += g * (o - p) * (o - p);
+	      crps_pot+= g*o*(1.-o);
+	      crps    += g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
 	    }
 	    
-	    g = alpha[k]+beta[k];
-	    o = beta[k] / ( alpha[k] + beta[k] ); 
+	    // Last Bin
+	    p=1.; g=0.;
+	    o = 1. - heavysideN/gridsize; 
+	    if ( o != 1. ) {
+	      g = alpha[nens] / (1-o);
+	      
+	      crps_reli    += g * (o-p) * (o-p);
+	      crps_pot+= g*o*(1-o);
+	      crps    += g*( (1-o)*p*p  +  o*(1-p)*(1-p) );	  
+	    }
+	  } else if ( operfunc == BRS ) {
+	    double gsum=0;
+	    double obar=0; 
+	    double osum=0;
+	    double o,g,p;
 
-	    reli    += g * (o - p) * (o - p);
-	    crps_pot+= g*o*(1.-o);
-	    crps    += g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
+	    brs_reli=0;
+	    brs_resol=0;
+	    brs_uncty=0;
 
+	    for ( k=0; k<=nens; k++ ) {
+	      obar += brs_g[k]*brs_o[k];
+	      gsum += brs_g[k];
+	      osum += brs_o[k];
+	    }
+
+	    if ( abs(osum)-1 > 1e-06 || abs(gsum)-1 > 1e-06 )  {
+	      cdoAbort("Internal error - normalization constraint of problem not fulfilled");
+	      cdoAbort("This is likely due to missing values");
+	    }
+	    o=0; p=0; g=0;
+	    brs_uncty = obar * (1-obar);
+
+	    for ( k=0; k<=nens; k++ ) {
+
+	      g = brs_g[k];
+	      o = brs_o[k];
+	      p = k/(float)nens;
+
+	      brs_reli += g * ( o-p ) * ( o-p );
+	      brs_resol+= g * (o-obar) * (o-obar);
+	      //fprintf(stderr,"%12.6g %12.6g %12.6g %12.6g %12.6g\n",obar,o,g,p,osum);
+	      //fprintf(stderr,"%3i %12.6g %12.6g %12.6g %12.6g\n",k,brs_g[k], brs_reli,brs_resol, brs_uncty);
+	    }
+
+	    if ( cdoVerbose ) {
+	      cdoPrint("Brier score for var %i level %i calculated",varID, levelID);
+	      cdoPrint("obar %12.6g osum %12.6g gsum %12.6g",obar,osum,gsum);
+	      cdoPrint("brs  %12.6g reli %12.6g resol %12.6g u %12.6g",
+		       brs_reli-brs_resol+brs_uncty,brs_reli,brs_resol,brs_uncty);
+	    }
 	  }
+
 	  
-	  // Last Bin
-	  p=1.; g=0.;
-	  o = 1. - heavysideN/gridsize; 
-	  if ( o != 1. ) {
-	    g = alpha[nens] / (1-o);
-	    reli    += g * (o-p) * (o-p);
-	    crps_pot+= g*o*(1-o);
-	    crps    += g*( (1-o)*p*p  +  o*(1-p)*(1-p) );	  
+	  if ( cdoVerbose && operfunc == CRPS ) 
+	    cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g\n", 
+		     crps,crps_reli,crps_pot, crps_reli+crps_pot);
+	  if ( cdoVerbose && operfunc == BRS ) 
+	    cdoPrint("BRS:");
+	  
+	  switch ( operfunc ) {
+	  case ( CRPS ):
+	    streamDefRecord(streamID2,varID2[0],levelID);
+	    streamWriteRecord(streamID2,&crps_reli,have_miss);
+	    streamDefRecord(streamID2,varID2[1],levelID);
+	    streamWriteRecord(streamID2,&crps_pot,have_miss);
+	    memset(alpha, 0, (nens+1) * sizeof(double) );
+	    memset(beta,  0, (nens+1) * sizeof(double) ); 
+	    heavyside0=0;
+	    heavysideN=0;	  
+	    break;
+	  case ( BRS ):
+	    cdoPrint("Write Brier score here\n");
+
+	    memset(brs_o, 0, (nens+1)*sizeof(double) );
+	    memset(brs_g, 0, (nens+1)*sizeof(double) );
 	  }
 
-	  fprintf(stdout, "%12.6g %12.6g %12.6g %12.6g\n", reli,crps_pot, reli+crps_pot, crps);
-
-	  streamDefRecord(streamID2,varID2[0],levelID);
-	  streamWriteRecord(streamID2,&reli,have_miss);
-	  streamDefRecord(streamID2,varID2[1],levelID);
-	  streamWriteRecord(streamID2,&crps_pot,have_miss);
 	  
-	  memset(alpha, 0, (nens+1) * sizeof(double) );
-	  memset(beta,  0, (nens+1) * sizeof(double) ); 
-	  heavyside0=0;
-	  heavysideN=0;
-
 	}   // for ( recID = 0; recID < nrecs; recID++ ) 
       tsID++;
     }  while ( nrecs );
@@ -322,8 +435,6 @@ void *Ensstat5(void *argument)
   if ( ef ) free(ef);
   
   cdoFinish();
- 
+  
   return (0);
 }
-
-
