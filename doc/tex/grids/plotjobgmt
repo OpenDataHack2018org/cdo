@@ -11,13 +11,16 @@ else
 fi
 #
 #cdo outputbounds $FILE > tmp1
-cp $FILE tmp1
+cp ${FILE}.gmt tmp1
+cp ${FILE}1.gmt tmp2
 #
 gmtset PAPER_MEDIA = Custom_500x170
 #
 pscoast -P -JG-20/60/5.6 -Rg   -B0g30 -Dc -G169/194/139 -S232/240/255 -K -X0.1 -Y0.1  > plot.ps
 psxy    -P -JG-20/60/5.6 -Rg -M tmp1 -W2p,black          -O -K >> plot.ps
+psxy    -P -JG-20/60/5.6 -Rg -M tmp2 -W2p,red            -O -K >> plot.ps
 pscoast -P -JN1/11 -Rg   -B0g30 -Dc -G169/194/139 -S236/240/255 -O -K -X6 >> plot.ps
-psxy    -P -JN1/11 -Rg -M tmp1 -W2p,black          -O  >> plot.ps
+psxy    -P -JN1/11 -Rg -M tmp1 -W2p,black          -O -K >> plot.ps
+psxy    -P -JN1/11 -Rg -M tmp2 -W2p,red            -O    >> plot.ps
 #
-rm -f tmp1
+rm -f tmp1 tmp2
