@@ -5,12 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = obsfile ensfiles ofile
-@Operators = ensbrs enscrps ensrkhistspace ensrkhisttime ensroc
+@Operators = ensrkhistspace ensrkhisttime ensroc
 
 @BeginDescription
 This module computes statistical values over the ensemble of @file{ensfiles} using
-@file{obsfile} as a reference. Depending on the chosen operator the Brier score, 
-Cumulative ranked probability score ranked Histogram or a roc-curve over all Ensembles @file{ensfiles}
+@file{obsfile} as a reference. Depending on the operator a ranked Histogram or 
+a roc-curve over all Ensembles @file{ensfiles}
 with reference to @file{obsfile} is written to @file{ofile}. 
 The date and grid information of a time step in @file{ofile} is the date of the 
 first input file. Thus all input files are required to have the same structure in 
@@ -19,17 +19,6 @@ terms of the gridsize, variable definitions and number of time steps.
 All Operators in this module use @file{obsfile} as the reference (for instance 
 an observation) whereas @file{ensfiles} are understood as an ensemble consisting 
 of n (where n is the number of @file{ensfiles}) members. 
-
-For the Brier score it is assumed, that both @file{obsfile} and @file{ensfiles} 
-contain probability information. Usually in a way that @file{obsfile} is a 
-mask indicating the occurence of an event and @file{ensfiles} are forecast 
-probabilities of the occurence of the event. Please also note below, that the 
-'Brier Score' is actually defined as half the score which was originally 
-defined by Brier. This is common practice for reasons of normalization. 
-
-The cumulative ranked probability score is understood as the integral of the 
-squared difference between the cumulative distribution function cdf(ensfiles(t,x)) 
-of the ensemble and a heavyside function H(obsfile(t,x)). 
 
 The operators ensrkhistspace and ensrkhisttime compute Ranked Histograms. 
 Therefor the vertical axis is utilized as the Histogram axis, which prohibits
@@ -47,36 +36,6 @@ mation is that from the last time step in @file{obsfile}.
 @EndModule
 
 
-@BeginOperator_ensbrs
-@Title     = Brier score
-
-@BeginDescription
-@IfMan
-o(t,x) = (i2(t,x)-i1(t,x))^2 + (i3(t,x)-i1(t,x))^2 + ... + (in(t,x)-i1(t,x))^2
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = \sum_{j=2}^{n} (i_j(t,x)-i_1(t,x))^2
-@EndMath
-@EndifDoc
-@EndDescription
-@EndOperator
-
-@BeginOperator_enscrps
-@Title     = Cumulative Ranked Probability score
-
-@BeginDescription
-@IfMan
-o(t,x) = crps( {i1(t,x)}, {i2(t,x),...,in(t,x)} )
-@EndifMan
-@IfDoc
-@BeginMath
-o(t,x) = crps( \{i_1(t,x)\}, \{i_2(t,x),\ldots,i_n(t,x)\} )
-@EndMath
-@EndifDoc
-@EndDescription
-@EndOperator
-
 @BeginOperator_ensrkhistspace
 @Title      = Ranked Histogram averaged over time
 @EndOperator
@@ -90,13 +49,13 @@ o(t,x) = crps( \{i_1(t,x)\}, \{i_2(t,x),\ldots,i_n(t,x)\} )
 @EndOperator
 
 @BeginExample
-To compute the Brier score over 5 input files @file{ensfile1}-@file{ensfile5}
+To compute a rank histogram over 5 input files @file{ensfile1}-@file{ensfile5}
 given an observation in @file{obsfile} use:
 @BeginVerbatim
-   cdo ensbrs obsfile ensfile1 ensfile2 ensfile3 ensfile4 ensfile5 ofile
+   cdo ensrkhisttime obsfile ensfile1 ensfile2 ensfile3 ensfile4 ensfile5 ofile
 @EndVerbatim
 Or shorter with filename substitution:
 @BeginVerbatim
-   cdo ensbrs obsfile ensfile[1-5] ofile
+   cdo ensrkhisttime obsfile ensfile[1-5] ofile
 @EndVerbatim
 @EndExample

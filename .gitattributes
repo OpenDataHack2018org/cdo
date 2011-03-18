@@ -118,6 +118,7 @@ doc/tex/mod/EcaTx90p -text
 doc/tex/mod/Enlarge -text
 doc/tex/mod/Ensstat -text
 doc/tex/mod/Ensstat2 -text
+doc/tex/mod/Ensval -text
 doc/tex/mod/Eofcoeff -text
 doc/tex/mod/Exprf -text
 doc/tex/mod/Fdns -text
@@ -282,6 +283,7 @@ src/Enlargegrid.c -text
 src/Ensstat.c -text
 src/Ensstat3.c -text
 src/Ensstat5.c -text
+src/Ensval.c -text
 src/Eof3d.c -text
 src/Eofcoeff.c -text
 src/Eofcoeff3d.c -text

@@ -1,0 +1,96 @@
+@BeginModule
+@NewPage
+@Name      = Ensval
+@Title     = Ensemble validation tools
+@Section   = Statistical values
+@Class     = Statistic
+@Arguments = rfile ifiles ofilebase
+@Operators = enscrps ensbrs
+
+@BeginDescription
+This module computes ensemble validation scores and their decomposition such as 
+the Brier and cumulative ranked probability score (CRPS). 
+The first file is used as a reference it can be a climatology, observation or 
+reanalysis against which the skill of the ensembles given in ifiles is measured. 
+Depending on the operator a number of output files is generated each containing 
+the skill score and its decomposition corresponding to the operator. 
+The output is averaged  over horizontal fields using appropriate weights 
+for each level and timestep in rfile. 
+
+All input files need to have the same structure with the same variables.
+The date information of a time step in @file{ofile} is the date of the first input file.
+The output files are named as 
+@file{<ofilebase>.<type>.<filesuffix>} where @file{<type>} depends on the 
+operator and @file{<filesuffix>} is determined from the output file type. 
+There are three output files for operator enscrps and four output files 
+for operator ensbrs.
+
+The CRPS and its decomposition into Reliability and the potential 
+CRPS are calculated by an appropriate averaging over the field 
+members (note, that the CRPS does *not* average linearly). 
+In the three output files 
+@file{<type>} has the following meaning:
+@file{crps} for the CRPS, @file{reli} for the reliability 
+and @file{crpspot} for the potential crps. The relation 
+@BeginMath 
+CRPS = CRPS_{pot} + RELI
+@EndMath 
+holds. 	  
+
+The Brier score of the Ensemble given by @file{ifiles} with respect to the 
+reference given in @file{rfile} and the threshold x is calculated. 
+In the four output files @file{<type>} has the following meaning: 
+@file{brs} for the Brier score wrt threshold  x; 
+@file{brsreli} for the Brier score reliability wrt threshold x;
+@file{brsreso} for the Brier score resolution wrt threshold x;
+@file{brsunct} for the Brier score uncertainty wrt threshold x.
+In analogy to the CRPS the following relation holds:
+@BeginMath
+BRS(x) = RELI(x)-RESO(x)+ UNCT(x).
+@EndMath
+
+The implementation of the decomposition of the CRPS and Brier Score follows 
+  Hans Hersbach (2000): Decomposition of the Continuous Ranked Probability 
+  Score for Ensemble Prediction Systems, in: Weather and Forecasting (15) 
+  pp. 559-570. 
+
+The CRPS code decomposition has been verified against the CRAN - ensemble 
+validation package from R. Differences occur when grid-cell area is not 
+uniform as the implementation in R does not account for that. 
+
+@EndDescription
+@EndModule
+
+
+@BeginOperator_enscrps
+@Title     = Ensemble CRPS and decomposition
+@BeginDescription
+@EndDescription
+@EndOperator
+
+@BeginOperator_ensbrs
+@Title     = Ensemble Brier score 
+@Parameter = x
+
+@BeginDescription
+Ensemble Brier Score and Decomposition
+@EndDescription
+@EndOperator
+
+@BeginExample
+To compute the field averaged Brier score at x=5 over an ensemble with 5 members 
+@file{ensfile1-5} w.r.t. the reference @file{rfile} and write the results 
+to files @file{obase.brs.<suff>}, 
+@file{obase.brsreli<suff>},
+@file{obase.brsreso<suff>},
+@file{obase.brsunct<suff>} where @file{<suff>} is determined from the 
+output file type, use
+@BeginVerbatim
+   cdo ensbrs,5 rfile ensfile1 ensfile2 ensfile3 ensfile4 ensfile5 obase
+@EndVerbatim
+or shorter using file name substitution:
+@BeginVerbatim
+   cdo ensbrs,5 rfile ensfile[1-5] obase
+@EndVerbatim
+
+@EndExample
