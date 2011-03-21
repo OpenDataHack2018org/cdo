@@ -518,7 +518,7 @@ static modules_t Modules[] =
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },
   { Ensstat,        EnsstatHelp,       EnsstatOperators,       CDI_REAL, -1,  1 },
   { Ensstat3,       Ensstat2Help,      Ensstat3Operators,      CDI_REAL, -1,  1 },
-  { Ensval,         EnsstatHelp,       EnsvalOperators,        CDI_REAL, -1,  1 },
+  { Ensval,         EnsvalHelp,        EnsvalOperators,        CDI_REAL, -1,  1 },
   { Eofcoeff,       EofcoeffHelp,      EofcoeffOperators,      CDI_REAL,  2, -1 },
   { Eofcoeff3d,     EofcoeffHelp,      Eofcoeff3dOperators,    CDI_REAL,  2, -1 },
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
