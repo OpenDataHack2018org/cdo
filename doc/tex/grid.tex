@@ -137,8 +137,8 @@ Keyword           & Datatype     & Description \\ \hline
 \bf{gridsize}     & INTEGER      & size of the grid \\
 \bf{xsize}        & INTEGER      & size in x direction (number of longitudes) \\
 \bf{ysize}        & INTEGER      & size in y direction (number of latitudes) \\
-\bf{xvals}        & FLOAT ARRAY  & x values of the grid \\
-\bf{yvals}        & FLOAT ARRAY  & y values of the grid \\
+\bf{xvals}        & FLOAT ARRAY  & x values of the grid cell center \\
+\bf{yvals}        & FLOAT ARRAY  & y values of the grid cell center\\
 \bf{xnpole}       & FLOAT        & x value of the north pole (rotated grid) \\
 \bf{ynpole}       & FLOAT        & y value of the north pole (rotated grid) \\
 \bf{nvertex}      & INTEGER      & number of the vertices for all grid cells \\
@@ -222,6 +222,7 @@ ybounds    & 2*ysize & 2*ysize & 4*gridsize & nv*gridsize \\
 \vspace{3mm}
 
 The keywords nvertex, xbounds and ybounds are optional if area weights are not needed.
+The grid cell corners xbounds and ybounds have to rotate counterclockwise.
 
 \vspace{2mm}
 
