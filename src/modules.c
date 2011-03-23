@@ -330,7 +330,7 @@ void *Wct(void *argument);
 #define  NinfoOperators         {"nyear", "nmon", "ndate", "ntime", "ncode", "npar", "nlevel"}
 #define  NmltestOperators       {"nmltest"}
 #define  OutputOperators        {"output", "outputint", "outputsrv", "outputext", "outputf", "outputts", \
-                                 "outputfld", "outputarr", "outputxyz", "outputkey"}
+                                 "outputfld", "outputarr", "outputxyz", "outputtab"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri"}
 #define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap_fl"}
@@ -733,6 +733,7 @@ static char *opalias[][2] =
   {"chvar",               "chname"     },
   {"ncode",               "npar"       },
   {"nvar",                "npar"       },
+  {"outputkey",           "outputtab"  },
   {"vardes",              "pardes"     },
   {"delvar",              "delname"    },
   {"vardup",              "pardup"     },
@@ -745,7 +746,7 @@ static char *opalias[][2] =
   {"selzaxisname",        "selzaxis"   },
   {"selvar",              "selname"    },
   {"setvar",              "setname"    },
-  {"sinfov",              "sinfon"   },
+  {"sinfov",              "sinfon"     },
   {"sortvar",             "sortname"   },
   {"splitvar",            "splitname"  },
   {"sort",                "timsort"    },

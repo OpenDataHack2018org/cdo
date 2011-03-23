@@ -274,8 +274,8 @@ outputext \
 outputf \
 outputfld \
 outputint \
-outputkey \
 outputsrv \
+outputtab \
 outputts \
 outputxyz \
 pardes \
