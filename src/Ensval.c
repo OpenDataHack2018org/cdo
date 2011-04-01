@@ -90,6 +90,16 @@ void *Ensval(void *argument)
   } ens_file_t;
   ens_file_t *ef = NULL;
 
+
+  // INITIALIZE POINTERS
+  streamID2 = NULL;
+  varID2 = NULL;
+  alpha = NULL; beta = NULL; alpha_weights = NULL; beta_weights = NULL; 
+  brs_g = NULL; brs_o = NULL; brs_g_weights = NULL; brs_o_weights = NULL;
+  r = NULL;
+  x = NULL;
+  val = NULL;
+  weights = NULL; 
   int vlistCheck, gridsizeCheck;
   
   cdoInitialize(argument);
@@ -148,7 +158,8 @@ void *Ensval(void *argument)
       vlistID = streamInqVlist(streamID);
       
       ef[fileID].streamID = streamID;
-      ef[fileID].vlistID = vlistID;
+      ef[fileID].vlistID  = vlistID;
+      ef[fileID].array    = NULL;
     }
 
   if ( cdoVerbose ) 
@@ -156,11 +167,10 @@ void *Ensval(void *argument)
   
   /* check for identical contents of all ensemble members */
   nvars = vlistNvars(ef[0].vlistID);
-  fprintf(stderr,"nvars %i\n",nvars);
-  if ( nvars == 1 ) 
-    cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-  else 
-    cdoAbort("Only single-variable files supported");
+  if ( cdoVerbose ) 
+    cdoPrint("nvars %i\n",nvars);
+
+  cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
 
   for ( fileID = 1; fileID < nfiles; fileID++ )
     vlistCompare(ef[0].vlistID, ef[fileID].vlistID, cmpflag);
@@ -215,6 +225,8 @@ void *Ensval(void *argument)
 
     streamID2[stream] = streamOpenWrite(ofilename, cdoFiletype());    
 
+    free(ofilename);
+
     zaxisID2[stream] = zaxisDuplicate(zaxisID1);
     taxisID2[stream] = taxisDuplicate(taxisID1);
     vlistID2[stream] = vlistDuplicate(vlistID1);
@@ -233,30 +245,8 @@ void *Ensval(void *argument)
     fprintf(stderr,"stream %i vlist %3i gridsize %4i\n",stream,vlistCheck,gridsizeCheck);
   }
 
-  gridsize = vlistGridsizeMax(vlistID1);
-  weights=(double*) malloc (gridsize*sizeof(double));
-
-  gridID = vlistInqVarGrid(vlistID1, 0);
-  xsize = gridInqXsize(gridID);
-  ysize = gridInqYsize(gridID);
-
-  if ( xsize > 1 && ysize > 1 )  {
-    gridWeights(gridID, weights);
-    sum_weights=0;
-    for ( i=0; i<gridsize; i++ )  
-      sum_weights += weights[i];
-  }
-  else {
-    for ( i=0; i< gridsize; i++ )
-      weights[i] = 1./gridsize;
-    sum_weights=1.;
-  }
-
   if ( cdoVerbose ) 
     cdoPrint(" sum_weights %10.6f\n",sum_weights);
-
-  for ( fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = (double *) malloc(gridsize*sizeof(double));
   
   tsID = 0;
   do
@@ -269,30 +259,56 @@ void *Ensval(void *argument)
 	  if ( nrecs != nrecs0 )
 	    cdoAbort("Number of records changed from %d to %d at time Step", nrecs0, nrecs, tsID);
 	}
-
+      
       for ( stream = 0; stream < nostreams; stream++ ) {
 	taxisCopyTimestep(taxisID2[stream], taxisID1);
 	if ( nrecs0 > 0 ) streamDefTimestep(streamID2[stream], tsID);
       }
-
+      
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
-	  for ( fileID = 0; fileID < nfiles; fileID++ )
+
+	  for ( fileID = 0; fileID < nfiles; fileID++ ) 
 	    {
+	      streamInqRecord(fileID, &varID, &levelID);
+	      
+	      if ( fileID == 0 )
+		{
+		  gridID   = vlistInqVarGrid(vlistID1, varID);
+		  gridsize = gridInqSize(gridID);
+		  missval  = vlistInqVarMissval(vlistID1, varID);
+		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));//vlistGridsizeMax(vlistID1);
+		  if ( weights ) free(weights); 
+		  weights=(double*) malloc (gridsize*sizeof(double));
+		}
+
+	      if (ef[fileID].array ) free(ef[fileID].array);
+	      ef[fileID].array = (double *) malloc(gridsize*sizeof(double));
+
 	      streamID = ef[fileID].streamID;
-	      streamInqRecord(streamID, &varID, &levelID);
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
 	    }
 
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-
+	  xsize = gridInqXsize(gridID);
+	  ysize = gridInqYsize(gridID);
+	  
+	  if ( xsize > 1 && ysize > 1 )  {
+	    gridWeights(gridID, weights);
+	    sum_weights=0;
+	    for ( i=0; i<gridsize; i++ )  
+	      sum_weights += weights[i];
+	  }
+	  else {
+	    for ( i=0; i< gridsize; i++ )
+	      weights[i] = 1./gridsize;
+	    sum_weights=1.;
+	  }
+	  
 	  nmiss = 0;
 	  valcount = 0;
 	  heavyside0 = 0;
 	  heavysideN = 0;
-
+	  
 	  for ( i = 0; i < gridsize; i++ )
 	    {
 	      have_miss = 0;
@@ -302,15 +318,15 @@ void *Ensval(void *argument)
 		  if ( DBL_IS_EQUAL(val[fileID], missval) ) 
 		    { have_miss = 1; break; }
 		}
-
+	      
 	      xa=val[0];                                     /* 1st file contains reference  */
 	      x = &val[1];                                   /* Ensembles start at 2nd   file*/
 	      sort_iter_single(nens,x,1);                    /* Sort The Ensemble Array      */
-
+	      
 	      // only process if no missing value in ensemble
 	      if ( ! have_miss && operfunc == CRPS )  
 		{
-
+		  
 		  if ( xa < x[0] ) {                             /* Consider outliers            */
 		    beta[0] += (x[0]-xa)*weights[i];
 		    heavyside0 += 1.;
@@ -320,8 +336,8 @@ void *Ensval(void *argument)
 		    alpha_weights[nens] += weights[i];
 		    heavysideN += 1.;
 		  }
-
- 		  /* Loop start at zero ==> 1st ensemble (c-indexing) */
+		  
+		  /* Loop start at zero ==> 1st ensemble (c-indexing) */
 		  for ( k=0; k<nens-1; k++ ) {                   /* Cumulate alpha and beta      */
 		    if ( xa > x[k+1] )                           /* left of heavyside            */
 		      alpha[k+1]+= (x[k+1]-x[k]) * weights[i];   /*                              */
@@ -335,7 +351,7 @@ void *Ensval(void *argument)
 		}
 	      else if ( operfunc == BRS ) 
 		{
-		  int occ = xa>brs_thresh? 1 : 0;
+		  int occ = xa>brs_thresh? 0 : 1;
 		  
 		  if ( x[0] > brs_thresh ) 
 		    brs_g[0] += weights[i];
@@ -348,7 +364,7 @@ void *Ensval(void *argument)
 			break;
 		      }
 		    }
-
+		  
 		  if ( x[0] > xa )
 		    brs_o[0] += weights[i];
 		  else if ( x[nens-1] < xa ) 
@@ -360,12 +376,12 @@ void *Ensval(void *argument)
 			break;
 		      }
 		    }
-
+		  
 		}
 	    }        // for ( i=0; i<gridsize; i++ )
 	  
 	  if ( operfunc == CRPS ) {
-
+	    
 	    // First Bin
 	    p=0.; g=0.;
 	    o = heavyside0/gridsize;
@@ -392,7 +408,7 @@ void *Ensval(void *argument)
 	      crps_pot+= g*o*(1.-o);
 	      crps    += g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
 	    }
-	    
+		
 	    // Last Bin
 	    p=1.; g=0.;
 	    o = 1. - heavysideN/gridsize; 
@@ -406,47 +422,47 @@ void *Ensval(void *argument)
 	    r[CRPS_RES] = crps;
 	    r[CRPS_RELI]= crps_reli;
 	    r[CRPS_POT] = crps_pot;
-
+	    
 	  } else if ( operfunc == BRS ) {
 	    double gsum=0;
 	    double obar=0; 
 	    double osum=0;
 	    double o,g,p;
-
+	    
 	    brs_reli=0;
 	    brs_resol=0;
 	    brs_uncty=0;
-
+	    
 	    for ( k=0; k<=nens; k++ ) {
 	      obar += brs_g[k]*brs_o[k];
 	      gsum += brs_g[k];
 	      osum += brs_o[k];
 	    }
-
+	    
 	    if ( abs(osum)-1 > 1e-06 || abs(gsum)-1 > 1e-06 )  {
 	      cdoAbort("Internal error - normalization constraint of problem not fulfilled");
 	      cdoAbort("This is likely due to missing values");
 	    }
 	    o=0; p=0; g=0;
 	    brs_uncty = obar * (1-obar);
-
+	    
 	    for ( k=0; k<=nens; k++ ) {
-
+		  
 	      g = brs_g[k];
 	      o = brs_o[k];
 	      p = k/(float)nens;
-
+	      
 	      brs_reli += g * ( o-p ) * ( o-p );
 	      brs_resol+= g * (o-obar) * (o-obar);
 	      //fprintf(stderr,"%12.6g %12.6g %12.6g %12.6g %12.6g\n",obar,o,g,p,osum);
 	      //fprintf(stderr,"%3i %12.6g %12.6g %12.6g %12.6g\n",k,brs_g[k], brs_reli,brs_resol, brs_uncty);
 	    }
-
+	    
 	    r[BRS_RES] = brs_reli-brs_resol+brs_uncty;
 	    r[BRS_RELI]= brs_reli;
 	    r[BRS_RESOL]=brs_resol;
 	    r[BRS_UNCTY]=brs_uncty;
-
+	    
 	    if ( cdoVerbose ) {
 	      cdoPrint("Brier score for var %i level %i calculated",varID, levelID);
 	      cdoPrint("obar %12.6g osum %12.6g gsum %12.6g",obar,osum,gsum);
@@ -454,20 +470,23 @@ void *Ensval(void *argument)
 		       brs_reli-brs_resol+brs_uncty,brs_reli,brs_resol,brs_uncty);
 	    }
 	  }
-
 	  
-	  if ( cdoVerbose && operfunc == CRPS ) 
-	    cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g\n", 
-		     crps,crps_reli,crps_pot, crps_reli+crps_pot);
-	  if ( cdoVerbose && operfunc == BRS ) 
-	    cdoPrint("BRS:");
+	  
+	  //	  if ( cdoVerbose && operfunc == CRPS ) 
+	  cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g\n", 
+		   crps,crps_reli,crps_pot, crps_reli+crps_pot);
+	  //	  if ( cdoVerbose && operfunc == BRS ) 
+	  cdoPrint("BRS:");
 	  
 	  for ( stream =0; stream<nostreams; stream++ ) {
 	    streamDefRecord(streamID2[stream],varID,levelID);
-	    fprintf(stderr,"%12.6g\n",r[stream]);
+	    if ( isnan ( r[stream] )  ) {
+	      r[stream] = missval; 
+	      have_miss = 1;
+	    }
 	    streamWriteRecord(streamID2[stream],&r[stream],have_miss);
 	  }
-	   
+	  
 	  switch ( operfunc ) {
 	  case ( CRPS ) :
 	    memset(alpha, 0, (nens+1) * sizeof(double) );
@@ -480,12 +499,10 @@ void *Ensval(void *argument)
 	    memset(brs_g, 0, (nens+1)*sizeof(double) );
 	    break;
 	  }
-	  
-	  
 	}   // for ( recID = 0; recID < nrecs; recID++ ) 
       tsID++;
     }  while ( nrecs );
-  
+      
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = ef[fileID].streamID;
@@ -497,9 +514,36 @@ void *Ensval(void *argument)
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) free(ef[fileID].array);
-  
+
+  for ( stream=0; stream<nostreams; stream++ ) {
+    vlistDestroy(vlistID2[stream]);
+    taxisDestroy(taxisID2[stream]);
+    zaxisDestroy(zaxisID2[stream]);
+  }
+
+  //  vlistDestroy(vlistID1);
+  //  taxisDestroy(taxisID1);
+  //  zaxisDestroy(zaxisID1);
+
+  gridDestroy(gridID);
+  gridDestroy(gridID2);
+
   if ( ef ) free(ef);
-  
+  if ( weights ) free(weights);
+  if ( r ) free(r);
+  if ( alpha ) free(alpha);
+  if ( beta ) free(beta);
+  if ( alpha_weights ) free(alpha_weights);
+  if ( beta_weights ) free(beta_weights);
+  if ( brs_g ) free(brs_g);
+  if ( brs_o) free(brs_o);
+  if ( brs_g_weights ) free(brs_g_weights);
+  if ( brs_o_weights) free(brs_o_weights);
+  if ( val ) free(val);
+  if ( vlistID2 ) free(vlistID2);
+  if ( streamID2 ) free(streamID2);
+  if ( zaxisID2 ) free(zaxisID2);
+  if ( taxisID2 ) free(taxisID2);  
   cdoFinish();
   
   return (0);
