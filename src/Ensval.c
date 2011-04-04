@@ -70,7 +70,7 @@ void *Ensval(void *argument)
   double xval=0; double yval=0;
   double xa, *x;
   double *val;
-  double *weights, sum_weights;
+  double *weights, sum_weights = 0;
   double crps_reli, crps_pot,sprd, crps;
   double heavyside0, heavysideN;
   double brs,brs_reli, brs_resol, brs_uncty, brs_thresh;
@@ -78,7 +78,7 @@ void *Ensval(void *argument)
 
   int fileID;
   const char *ofilebase;
-  const char *ofilename;
+  char *ofilename;
   char file_suffix[32];
   char type_suffix[10];
 
