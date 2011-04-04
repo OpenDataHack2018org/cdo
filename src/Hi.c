@@ -115,8 +115,8 @@ void *Hi(void *argument)
   taxisID2 = vlistInqTaxis(vlistID2);
   taxisID3 = vlistInqTaxis(vlistID3);
 
-  vlistCompare(vlistID1, vlistID2, CMP_SFT);
-  vlistCompare(vlistID1, vlistID3, CMP_SFT);
+  vlistCompare(vlistID1, vlistID2, CMP_DIM);
+  vlistCompare(vlistID1, vlistID3, CMP_DIM);
   
   gridsize = vlistGridsizeMax(vlistID1);
 

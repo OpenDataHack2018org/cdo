@@ -78,7 +78,7 @@ void *Mergetime(void *argument)
   
   /* check that the contents is always the same */
   for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(sf[0].vlistID, sf[fileID].vlistID, CMP_HRD);
+    vlistCompare(sf[0].vlistID, sf[fileID].vlistID, CMP_ALL);
 
   /* read the first time step */
   for ( fileID = 0; fileID < nfiles; fileID++ )

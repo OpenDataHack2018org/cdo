@@ -68,7 +68,7 @@ void *Cat(void *argument)
 	      vlistID2 = streamInqVlist(streamID2);
 	      taxisID2 = vlistInqTaxis(vlistID2);
 
-	      vlistCompare(vlistID1, vlistID2, CMP_SFT);
+	      vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
 	      tsID2 = vlistNtsteps(vlistID2);
 	      if ( tsID2 == 0 ) tsID2 = 1; /* bug fix for time constant data only */
@@ -112,7 +112,7 @@ void *Cat(void *argument)
 	}
       else
 	{
-	  vlistCompare(vlistID1, vlistID2, CMP_SFT);
+	  vlistCompare(vlistID1, vlistID2, CMP_ALL);
 	}
 
       tsID1 = 0;

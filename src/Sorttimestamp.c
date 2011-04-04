@@ -95,7 +95,7 @@ void *Sorttimestamp(void *argument)
 	}
       else
 	{
-	  vlistCompare(vlistID2, vlistID1, CMP_HRD);
+	  vlistCompare(vlistID2, vlistID1, CMP_ALL);
 	}
 
       nvars = vlistNvars(vlistID1);

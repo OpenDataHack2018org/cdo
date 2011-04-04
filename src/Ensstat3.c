@@ -58,7 +58,6 @@ void *Ensstat3(void *argument)
   int operfunc, datafunc;
   int i,j;
   int nvars,nbins, nrecs = 0, nrecs0, nmiss, nens, nfiles;;
-  int cmpflag;
   int cum;
   int chksum;                  // for check of histogram population 
   int levelID, varID, recID, tsID, binID = 0, ensID;
@@ -154,14 +153,8 @@ void *Ensstat3(void *argument)
     }
 
   /* check for identical contents of all ensemble members */
-  nvars = vlistNvars(ef[0].vlistID);
-  if ( nvars == 1 ) 
-    cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-  else // What is this supposed to do different? - is there missing a bracket?
-    cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-
   for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, cmpflag);
+    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   vlistID1 = ef[0].vlistID;
   vlistID2 = vlistCreate();

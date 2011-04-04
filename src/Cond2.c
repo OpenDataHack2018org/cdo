@@ -75,9 +75,9 @@ void *Cond2(void *argument)
     }
 
   if ( filltype == FILL_NONE )
-    vlistCompare(vlistID1, vlistID2, CMP_SFT);
+    vlistCompare(vlistID1, vlistID2, CMP_DIM);
 
-  vlistCompare(vlistID2, vlistID3, CMP_SFT);
+  vlistCompare(vlistID2, vlistID3, CMP_DIM);
 
   nospec(vlistID1);
   nospec(vlistID2);

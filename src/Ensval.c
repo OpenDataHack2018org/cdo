@@ -50,7 +50,6 @@ void *Ensval(void *argument)
   int operfunc, datafunc;
   int i,k;
   int nvars,nrecs = 0, nrecs0, nmiss, nens, nfiles,nlevs,valcount, nostreams, ngrids;
-  int cmpflag;
   int cum;
   int levelID, varID, recID, tsID, binID, ensID;
   int gridsize = 0;
@@ -170,10 +169,8 @@ void *Ensval(void *argument)
   if ( cdoVerbose ) 
     cdoPrint("nvars %i\n",nvars);
 
-  cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-
   for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, cmpflag);
+    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   vlistID1 = ef[0].vlistID;
   taxisID1 = vlistInqTaxis(vlistID1);

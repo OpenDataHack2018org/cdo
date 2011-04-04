@@ -429,8 +429,7 @@ void eca2(const ECA_REQUEST_2 *request)
   ivlistID2 = streamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
-  vlistCompare(ivlistID1, ivlistID2, CMP_HRD);
-  vlistCompare(ivlistID1, ivlistID2, CMP_SFT);
+  vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
   
   gridID  = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
@@ -807,8 +806,7 @@ void eca3(const ECA_REQUEST_3 *request)
   ivlistID2 = streamInqVlist(istreamID2);
   ovlistID  = vlistCreate();
   
-  vlistCompare(ivlistID1, ivlistID2, CMP_HRD);
-  vlistCompare(ivlistID1, ivlistID2, CMP_SFT);
+  vlistCompare(ivlistID1, ivlistID2, CMP_ALL);
   
   gridID  = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);

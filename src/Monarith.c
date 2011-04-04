@@ -65,7 +65,7 @@ void *Monarith(void *argument)
   vlistID2 = streamInqVlist(streamID2);
   vlistID3 = vlistDuplicate(vlistID1);
 
-  vlistCompare(vlistID1, vlistID2, CMP_SFT);
+  vlistCompare(vlistID1, vlistID2, CMP_ALL);
   
   gridsize = vlistGridsizeMax(vlistID1);
 

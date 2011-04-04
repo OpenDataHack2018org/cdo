@@ -88,8 +88,8 @@ void *Ydrunpctl(void *argument)
   vlistID3 = streamInqVlist(streamID3);
   vlistID4 = vlistDuplicate(vlistID1);
 
-  vlistCompare(vlistID1, vlistID2, CMP_HRD);
-  vlistCompare(vlistID1, vlistID3, CMP_HRD);
+  vlistCompare(vlistID1, vlistID2, CMP_ALL);
+  vlistCompare(vlistID1, vlistID3, CMP_ALL);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);

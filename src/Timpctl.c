@@ -76,8 +76,8 @@ void timpctl(int operatorID)
   vlistID3 = streamInqVlist(streamID3);
   vlistID4 = vlistDuplicate(vlistID1);
 
-  vlistCompare(vlistID1, vlistID2, CMP_HRD);
-  vlistCompare(vlistID1, vlistID3, CMP_HRD);
+  vlistCompare(vlistID1, vlistID2, CMP_ALL);
+  vlistCompare(vlistID1, vlistID3, CMP_ALL);
   
   if ( cdoOperatorF2(operatorID) == 16 ) vlistDefNtsteps(vlistID4, 1);
 
