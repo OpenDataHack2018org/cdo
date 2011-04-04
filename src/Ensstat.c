@@ -47,8 +47,6 @@ void *Ensstat(void *argument)
   int operatorID;
   int operfunc;
   int i;
-  int nvars;
-  int cmpflag;
   int varID, recID;
   int gridsize = 0;
   int gridID;
@@ -143,14 +141,8 @@ void *Ensstat(void *argument)
     }
 
   /* check that the contents is always the same */
-  nvars = vlistNvars(ef[0].vlistID);
-  if ( nvars == 1 ) 
-    cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-  else
-    cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-
   for ( fileID = 1; fileID < nfiles; fileID++ )
-    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, cmpflag);
+    vlistCompare(ef[0].vlistID, ef[fileID].vlistID, CMP_ALL);
 
   vlistID1 = ef[0].vlistID;
   vlistID2 = vlistDuplicate(vlistID1);

@@ -132,20 +132,24 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	  vlistInqVarName(vlistID2, varID, name2);
 	  if ( strcmp(name1, name2) != 0 )
 	    {
-	      cdoWarning("Input streams have different variable names!");
+	      cdoWarning("Input streams have different parameters!");
 	      break;
 	    }
 	}
 
       if ( flag & CMP_GRIDSIZE )
-	if ( gridInqSize(vlistInqVarGrid(vlistID1, varID)) !=
-	     gridInqSize(vlistInqVarGrid(vlistID2, varID)) )
-	  cdoAbort("Grid size of the input fields do not match!");
+	{
+	  if ( gridInqSize(vlistInqVarGrid(vlistID1, varID)) !=
+	       gridInqSize(vlistInqVarGrid(vlistID2, varID)) )
+	    cdoAbort("Grid size of the input fields do not match!");
+	}
       
       if ( flag & CMP_NLEVEL )
-	if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
-	     zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )
-	  cdoAbort("Number of levels of the input fields do not match!");
+	{
+	  if ( zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
+	       zaxisInqSize(vlistInqVarZaxis(vlistID2, varID)) )
+	    cdoAbort("Number of levels of the input fields do not match!");
+	}
     }
 
   if ( flag & CMP_GRID )

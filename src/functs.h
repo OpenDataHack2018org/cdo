@@ -49,7 +49,8 @@ enum cmp_flag {
   CMP_NLEVEL   = 8,
   CMP_GRIDSIZE = 16,
   CMP_HRD      = CMP_CODE | CMP_GRIDSIZE,
-  CMP_SFT      = CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID,
+  CMP_SFT      =            CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID,
+  CMP_ALL      = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID,
 };
 
 void    vlistCompare(int vlistID1, int vlistID2, int flag);

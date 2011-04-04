@@ -1,3 +1,7 @@
+2011-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* intyear: check contents of input files [report: Angelika Heil]
+	
 2011-03-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* eofspatial: integer overflow; wrong result for grid size > 46340 (bug fix) [report: Hans-Jürgen Panitz]
@@ -39,7 +43,8 @@
 
 	* gridToCell(GME): set X/Y units to degrees_east/degrees_north [report: Patrick Brockmann]
 
-2011-03-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2011-03-05  Uwe Schulzweida  <Uwe.Schulzweida@zma  int nvars;
+w.de>
 
 	* expr: added functions abs(), int(), nint(), sqr()
 

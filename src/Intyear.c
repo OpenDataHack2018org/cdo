@@ -40,7 +40,6 @@ void *Intyear(void *argument)
   int gridsize;
   int vlistID1, vlistID2, vlistID3;
   int taxisID1, taxisID2, taxisID3;
-  int nrecs1, nrecs2;
   int vtime, vdate1, vdate2, vdate3, year1, year2;
   int nmiss1, nmiss2, nmiss3;
   int *iyears, nyears = 0, *streamIDs = NULL;
@@ -69,10 +68,7 @@ void *Intyear(void *argument)
   vlistID2 = streamInqVlist(streamID2);
   vlistID3 = vlistDuplicate(vlistID1);
 
-  nrecs1 = vlistNrecs(vlistID1);
-  nrecs2 = vlistNrecs(vlistID2);
-
-  if ( nrecs1 != nrecs2 ) cdoAbort("Number of variables in both inputfiles must be the same!");
+  vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
   gridsize = vlistGridsizeMax(vlistID1);
   array1 = (double *) malloc(gridsize*sizeof(double));
@@ -111,8 +107,8 @@ void *Intyear(void *argument)
     {
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
-      nrecs2 = streamInqTimestep(streamID2, tsID);
-      if ( nrecs2 == 0 ) cdoAbort("Too few timesteps in second inputfile!");
+      nrecs = streamInqTimestep(streamID2, tsID);
+      if ( nrecs == 0 ) cdoAbort("Too few timesteps in second inputfile!");
 
       vtime  = taxisInqVtime(taxisID1);
       vdate1 = taxisInqVdate(taxisID1);
