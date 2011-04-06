@@ -121,6 +121,8 @@ void *Ensval(void *argument)
     operatorCheckArgc(1);
     brs_thresh = atof(operatorArgv()[0]);
     nostreams = 4;
+
+    fprintf(stderr,"brs_thres %10.6f\n",brs_thresh);
   }
 
   // allocate array to hold results 
@@ -264,7 +266,6 @@ void *Ensval(void *argument)
       
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
-
 	  for ( fileID = 0; fileID < nfiles; fileID++ ) 
 	    {
 	      streamInqRecord(fileID, &varID, &levelID);
@@ -289,13 +290,13 @@ void *Ensval(void *argument)
 	  xsize = gridInqXsize(gridID);
 	  ysize = gridInqYsize(gridID);
 	  
-	  if ( xsize > 1 && ysize > 1 )  {
+	  /*	  if ( xsize > 1 && ysize > 1 )  {
 	    gridWeights(gridID, weights);
 	    sum_weights=0;
 	    for ( i=0; i<gridsize; i++ )  
 	      sum_weights += weights[i];
 	  }
-	  else {
+	  else*/ {
 	    for ( i=0; i< gridsize; i++ )
 	      weights[i] = 1./gridsize;
 	    sum_weights=1.;
@@ -319,8 +320,9 @@ void *Ensval(void *argument)
 	      xa=val[0];                                     /* 1st file contains reference  */
 	      x = &val[1];                                   /* Ensembles start at 2nd   file*/
 	      sort_iter_single(nens,x,1);                    /* Sort The Ensemble Array      */
-	      
+	                                                     /* to ascending order           */
 	      // only process if no missing value in ensemble
+
 	      if ( ! have_miss && operfunc == CRPS )  
 		{
 		  
@@ -348,8 +350,11 @@ void *Ensval(void *argument)
 		}
 	      else if ( operfunc == BRS ) 
 		{
-		  int occ = xa>brs_thresh? 0 : 1;
-		  
+		  int occ = xa > brs_thresh? 1 : 0;
+
+		  // brs_g[i] - number of enemble members with rank i that forecast event
+		  //          - event: value > brs_thresh
+		  //
 		  if ( x[0] > brs_thresh ) 
 		    brs_g[0] += weights[i];
 		  else if ( x[nens-1] < brs_thresh ) 
@@ -362,18 +367,22 @@ void *Ensval(void *argument)
 		      }
 		    }
 		  
-		  if ( x[0] > xa )
-		    brs_o[0] += weights[i];
-		  else if ( x[nens-1] < xa ) 
-		    brs_o[nens] += weights[i];
-		  else
-		    for ( k=0; k<nens-1; k++ ) {
-		      if ( x[k+1] >= xa && xa >= x[k] ) {
-			brs_o[k+1] += weights[i];
-			break;
-		      }
+		  // brs_o[i] - number of times that the obs is between
+		  //            Ensemble i-1 and i
+		  if ( 1 ) 
+		    {
+		      if ( x[0] > xa )
+			brs_o[0] += weights[i];
+		      else if ( x[nens-1] < xa ) 
+			brs_o[nens] += weights[i];
+		      else
+			for ( k=0; k<nens-1; k++ ) {
+			  if ( x[k+1] >= xa && xa >= x[k] ) {
+			    brs_o[k+1] += weights[i];
+			    break;
+			  }
+			}
 		    }
-		  
 		}
 	    }        // for ( i=0; i<gridsize; i++ )
 	  
@@ -401,9 +410,9 @@ void *Ensval(void *argument)
 	      g = alpha[k]+beta[k];
 	      o = beta[k] / ( alpha[k] + beta[k] ); 
 	      
-	      crps_reli    += g * (o - p) * (o - p);
-	      crps_pot+= g*o*(1.-o);
-	      crps    += g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
+	      crps_reli += g * (o - p) * (o - p);
+	      crps_pot  += g*o*(1.-o);
+	      crps      += g*( (1.-o)*p*p  +  o*(1.-p)*(1.-p) );	  
 	    }
 		
 	    // Last Bin
@@ -436,7 +445,7 @@ void *Ensval(void *argument)
 	      osum += brs_o[k];
 	    }
 	    
-	    if ( abs(osum)-1 > 1e-06 || abs(gsum)-1 > 1e-06 )  {
+	    if ( abs(osum-1) > 1e-06 || abs(gsum-1) > 1e-06 )  {
 	      cdoAbort("Internal error - normalization constraint of problem not fulfilled");
 	      cdoAbort("This is likely due to missing values");
 	    }
@@ -447,33 +456,31 @@ void *Ensval(void *argument)
 		  
 	      g = brs_g[k];
 	      o = brs_o[k];
-	      p = k/(float)nens;
+	      p = 1. - k / (float)nens; 
+	      // need p = 1 - k/nens here as k=0 if all members forecast event and k=nens if none does so. 
 	      
-	      brs_reli += g * ( o-p ) * ( o-p );
+	      brs_reli += g * ( o-p )  * ( o-p );
 	      brs_resol+= g * (o-obar) * (o-obar);
-	      //fprintf(stderr,"%12.6g %12.6g %12.6g %12.6g %12.6g\n",obar,o,g,p,osum);
-	      //fprintf(stderr,"%3i %12.6g %12.6g %12.6g %12.6g\n",k,brs_g[k], brs_reli,brs_resol, brs_uncty);
-	    }
-	    
-	    r[BRS_RES] = brs_reli-brs_resol+brs_uncty;
-	    r[BRS_RELI]= brs_reli;
-	    r[BRS_RESOL]=brs_resol;
-	    r[BRS_UNCTY]=brs_uncty;
+	     }
+	     
+	    r[BRS_RES]   = brs_reli-brs_resol+brs_uncty;
+	    r[BRS_RELI]  = brs_reli;
+	    r[BRS_RESOL] = brs_resol;
+	    r[BRS_UNCTY] = brs_uncty;
 	    
 	    if ( cdoVerbose ) {
-	      cdoPrint("Brier score for var %i level %i calculated",varID, levelID);
-	      cdoPrint("obar %12.6g osum %12.6g gsum %12.6g",obar,osum,gsum);
-	      cdoPrint("brs  %12.6g reli %12.6g resol %12.6g u %12.6g",
-		       brs_reli-brs_resol+brs_uncty,brs_reli,brs_resol,brs_uncty);
+	      //	      cdoPrint("Brier score for var %i level %i calculated",varID, levelID);
+	      cdoPrint("BRS: obar %12.6g "
+		       "brs  %12.6g reli %12.6g resol %12.6g u %12.6g",
+		       obar,brs_reli-brs_resol+brs_uncty,brs_reli,brs_resol,brs_uncty);  
+
 	    }
 	  }
 	  
 	  
-	  //	  if ( cdoVerbose && operfunc == CRPS ) 
-	  cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g\n", 
-		   crps,crps_reli,crps_pot, crps_reli+crps_pot);
-	  //	  if ( cdoVerbose && operfunc == BRS ) 
-	  cdoPrint("BRS:");
+	  if ( cdoVerbose && operfunc == CRPS ) 
+	    cdoPrint("CRPS:%12.6g reli:%12.6g crps_pot:%12.6g crps:%12.6g", 
+		     crps,crps_reli,crps_pot, crps_reli+crps_pot);
 	  
 	  for ( stream =0; stream<nostreams; stream++ ) {
 	    streamDefRecord(streamID2[stream],varID,levelID);
