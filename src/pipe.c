@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2010 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -148,16 +148,15 @@ void pipeDelete(pipe_t *pipe)
 void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   pstreamptr->vlistID = vlistID;
-  pthread_mutex_unlock(pipe->mutex);  
+  pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK  
 
   pthread_cond_signal(pipe->vlistDef);
 }
@@ -166,22 +165,21 @@ void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
 int pipeInqVlist(pstream_t *pstreamptr)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
   int vlistID;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   while ( pstreamptr->vlistID == -1 )
     {
-      if ( PipeDebug ) Message("%s wait of vlist", pname);
+      if ( PipeDebug ) Message("%s wait of vlistDef", pname);
       pthread_cond_wait(pipe->vlistDef, pipe->mutex);
     }
   vlistID = pstreamptr->vlistID;
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 
   return (vlistID);
 }
@@ -190,17 +188,15 @@ int pipeInqVlist(pstream_t *pstreamptr)
 int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
   int nrecs;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   pipe->usedata = FALSE;
-  pipe->recIDr = -1;
+  pipe->recIDr  = -1;
   if ( tsID != pipe->tsIDr+1 )
     {
       if ( ! (tsID == pipe->tsIDr && pipe->tsIDr == pipe->tsIDw && pipe->recIDr == -1) ) 
@@ -210,7 +206,7 @@ int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
   pipe->tsIDr = tsID;
   while ( pipe->tsIDw != tsID )
     {
-      if ( pipe->EOP == TRUE )
+      if ( pipe->EOP )
 	{
 	  if ( PipeDebug ) Message("%s EOP", pname);
 	  break;
@@ -231,12 +227,13 @@ int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
       pthread_cond_wait(pipe->tsDef, pipe->mutex);
     }
 
-  if ( pipe->EOP == TRUE )
+  if ( pipe->EOP )
     nrecs = 0;
   else
     nrecs = pipe->nrecs;
 
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 
   pthread_cond_signal(pipe->tsInq);
 
@@ -247,14 +244,12 @@ int pipeInqTimestep(pstream_t *pstreamptr, int tsID)
 void pipeDefTimestep(pstream_t *pstreamptr, int tsID)
 {
   char *pname = pstreamptr->name;
+  pipe_t *pipe = pstreamptr->pipe;
   int nrecs;
-  pipe_t *pipe;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   pipe->recIDw = -1;
   pipe->tsIDw++;
@@ -271,68 +266,68 @@ void pipeDefTimestep(pstream_t *pstreamptr, int tsID)
       for ( varID = 0; varID < vlistNvars(vlistID); varID++ )
 	if ( vlistInqVarTime(vlistID, varID) == TIME_VARIABLE )
 	  nrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+      // Message("nrecs = %d nvars = %d", nrecs, vlistNvars(vlistID));
     }
 
   pipe->nrecs = nrecs;
+  if ( PipeDebug ) Message("%s nrecs %d tsID %d %d %d", pname, nrecs, tsID, pipe->tsIDw, pipe->tsIDr);
+  if ( nrecs == 0 ) pipe->EOP = TRUE;
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
+
   pthread_cond_signal(pipe->tsDef);
-  /*
-sleep(1);
-*/
+  //sleep(1);
+
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->tsIDr < tsID )
     {
-      if ( pipe->EOP == TRUE )
+      if ( pipe->EOP )
 	{
 	  if ( PipeDebug ) Message("EOP");
 	  break;
 	}
-      if ( PipeDebug ) Message("%s wait of tsInq", pname);
+      if ( PipeDebug ) Message("%s wait of tsInq (tsID %d %d)", pname, tsID, pipe->tsIDr);
       pthread_cond_wait(pipe->tsInq, pipe->mutex);
     }
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 }
 
 
 int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
   int condSignal = FALSE;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
  
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
-
-  if ( PipeDebug )
-    Message("%s has no data %d %d", pname, pipe->recIDr, pipe->recIDw);
-
+  if ( PipeDebug ) Message("%s has no data %d %d", pname, pipe->recIDr, pipe->recIDw);
   if ( pipe->hasdata || pipe->usedata )
     {
       pipe->hasdata = 0;
       pipe->data = NULL;
       pipe->usedata = FALSE;
       condSignal = TRUE;
-    }
- 	  
+    }	  
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
+
   if ( condSignal ) pthread_cond_signal(pipe->readCond);
 
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
-
   pipe->usedata = TRUE;
-
   pipe->recIDr++;
   
-  if ( PipeDebug )
-    Message("%s recID %d %d", pname, pipe->recIDr, pipe->recIDw);  
+  if ( PipeDebug ) Message("%s recID %d %d", pname, pipe->recIDr, pipe->recIDw);  
 
   while ( pipe->recIDw != pipe->recIDr )
     {
-      if ( pipe->EOP == TRUE )
+      if ( pipe->EOP )
 	{
 	  if ( PipeDebug ) Message("EOP");
 	  break;
@@ -341,7 +336,7 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
       pthread_cond_wait(pipe->recDef, pipe->mutex);
     }
 
-  if ( pipe->EOP == TRUE )
+  if ( pipe->EOP )
     {
       *varID   = -1;
       *levelID = -1;
@@ -353,6 +348,7 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
     }
 
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 
   pthread_cond_signal(pipe->recInq);
 
@@ -363,50 +359,48 @@ int pipeInqRecord(pstream_t *pstreamptr, int *varID, int *levelID)
 void pipeDefRecord(pstream_t *pstreamptr, int varID, int levelID)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
   int condSignal = FALSE;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
-
-  if ( PipeDebug )
-    Message("%s has data %d %d", pname, pipe->recIDr, pipe->recIDw);
-	  
+  if ( PipeDebug ) Message("%s has data %d %d", pname, pipe->recIDr, pipe->recIDw);
   if ( pipe->hasdata )
     {
       pipe->hasdata = 0;
       pipe->data = NULL;
       condSignal = TRUE;
     }
-
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
+
   if ( condSignal ) pthread_cond_signal(pipe->readCond);
 
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   pipe->usedata = TRUE;
   pipe->recIDw++;
-
-  if ( PipeDebug )
-    Message("%s recID %d %d", pname, pipe->recIDr, pipe->recIDw);  
-
-  pipe->varID = varID;
+  pipe->varID   = varID;
   pipe->levelID = levelID;
+  if ( PipeDebug ) Message("%s recID %d %d", pname, pipe->recIDr, pipe->recIDw);  
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
+
   pthread_cond_signal(pipe->recDef);
 
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->recIDr < pipe->recIDw )
     {
       if ( pipe->tsIDw != pipe->tsIDr ) break;
-      if ( pipe->EOP == TRUE ) break;
+      if ( pipe->EOP ) break;
       if ( PipeDebug ) Message("%s wait of recInq %d", pname, pipe->recIDr);
       pthread_cond_wait(pipe->recInq, pipe->mutex);
     }
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 }
 
 
@@ -414,22 +408,21 @@ void pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
 {
   char *ipname = pstreamptr_in->name;
   char *opname = pstreamptr_out->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr_out->pipe;
 
-  if ( PipeDebug )
-    Message("%s pstreamIDin %d", ipname, pstreamptr_in->self);
-  if ( PipeDebug )
-    Message("%s pstreamIDout %d", opname, pstreamptr_out->self);
+  if ( PipeDebug ) Message("%s pstreamIDin %d", ipname, pstreamptr_in->self);
+  if ( PipeDebug ) Message("%s pstreamIDout %d", opname, pstreamptr_out->self);
 
-  pipe = pstreamptr_out->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   pipe->hasdata = 2; /* pipe */
   pipe->pstreamptr_in = pstreamptr_in;
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 
   pthread_cond_signal(pipe->writeCond);
 
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->hasdata )
     {
@@ -437,29 +430,28 @@ void pipeCopyRecord(pstream_t *pstreamptr_out, pstream_t *pstreamptr_in)
 
       if ( pipe->recIDw != pipe->recIDr ) break;
 
-      if ( pipe->EOP == TRUE )
+      if ( pipe->EOP )
 	{
 	  if ( PipeDebug ) Message("EOP");
 	  break;
 	}
-      if ( PipeDebug ) Message("%s wait of read record", opname);
+      if ( PipeDebug ) Message("%s wait of readCond", opname);
       pthread_cond_wait(pipe->readCond, pipe->mutex);
     }
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 }
 
 
 void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
 
   *nmiss = 0;
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
-
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->hasdata == 0 )
     {
@@ -539,6 +531,7 @@ void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
   pipe->hasdata = 0;
   pipe->data = NULL;
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 
   pthread_cond_signal(pipe->readCond);
 }
@@ -547,24 +540,26 @@ void pipeReadRecord(pstream_t *pstreamptr, double *data, int *nmiss)
 void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
 {
   char *pname = pstreamptr->name;
-  pipe_t *pipe;
+  pipe_t *pipe = pstreamptr->pipe;
 
-  if ( PipeDebug )
-    Message("%s pstreamID %d", pname, pstreamptr->self);
+  if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
-  pipe = pstreamptr->pipe;
   /*
   if ( ! pipe->usedata ) return;
   */
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   pipe->hasdata = 1; /* data pointer */
   pipe->data    = data;
   pipe->nmiss   = nmiss;
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
+
   pthread_cond_signal(pipe->writeCond);
 
   if ( PipeDebug ) Message("%s write record %d", pname, pipe->recIDw);
 
+  // LOCK
   pthread_mutex_lock(pipe->mutex);
   while ( pipe->hasdata )
     {
@@ -575,7 +570,7 @@ void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
       */
       if ( pipe->recIDw != pipe->recIDr ) break;
 
-      if ( pipe->EOP == TRUE )
+      if ( pipe->EOP )
 	{
 	  if ( PipeDebug ) Message("EOP");
 	  break;
@@ -584,6 +579,7 @@ void pipeWriteRecord(pstream_t *pstreamptr, double *data, int nmiss)
       pthread_cond_wait(pipe->readCond, pipe->mutex);
     }
   pthread_mutex_unlock(pipe->mutex);
+  // UNLOCK
 }
 
 

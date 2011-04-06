@@ -1,6 +1,7 @@
 2011-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* intyear: check contents of input files [report: Angelika Heil]
+	* pipeDefTimestep: set EOP if nrecs = 0 (dead lock) [report: Luis Kornnblueh]
 	
 2011-03-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

@@ -212,7 +212,7 @@ void usage(void)
   fprintf(stderr, "    -p <prec>      Set the precision of the output data in bytes\n");
   fprintf(stderr, "                   (4/8 for nc, nc2, nc4, srv, ext, ieg; 1/2/3 for grb)\n");
   */
-  fprintf(stderr, "    -Q             Sort netCDF variable names\n");
+  fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
   fprintf(stderr, "    -R             Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
   fprintf(stderr, "    -S             Create an extra output stream for the module TIMSTAT. This stream\n");
