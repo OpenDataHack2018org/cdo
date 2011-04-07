@@ -442,7 +442,7 @@ void *EOF3d(void * argument)
       if ( cdoTimer ) timer_stop(timer_eig);
       if ( cdoTimer ) timer_start(timer_post);
 
-      for (eofID = 0; eofID < n_eig; eofID++)
+      for ( eofID = 0; eofID < n_eig; eofID++ )
 	{
 #if defined (_OPENMP)
 #pragma omp parallel for private(i,j,sum) shared(datafields, eigenvectors)
@@ -490,7 +490,7 @@ void *EOF3d(void * argument)
       for ( i=0; i<n; i++ )
 	if ( cov[i] ) 
 	  free(cov[i]);
-    }         /* for ( varID = 0; varID < nvars; varID ++ )    */
+    }         /* for ( varID = 0; varID < nvars; varID++ )    */
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 

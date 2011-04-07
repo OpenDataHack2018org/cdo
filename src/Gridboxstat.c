@@ -295,7 +295,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                               /* lower right cell */
                               if ( ( y1 == (y2+1)*yinc -1 ) && (x1 == (x2+1)*xinc -1) )
                                 {
-                                  for ( corner = 0; corner < 4; corner ++ )
+                                  for ( corner = 0; corner < 4; corner++ )
                                     {                             
                                   add = 4*g1_add + corner;
                                       if ( grid1_corner_lon[add] > ox_lo )
@@ -308,7 +308,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
                               /* lower left cell */
                               if ( ( y1 == (y2+1)*yinc -1 ) && ( x1 == x2*xinc ) )
                                 {    
-                                  for ( corner = 0; corner < 4; corner ++ )
+                                  for ( corner = 0; corner < 4; corner++ )
                                     {
                                       add = 4*g1_add + corner;
                                       if ( grid1_corner_lon[add] < on_lo )

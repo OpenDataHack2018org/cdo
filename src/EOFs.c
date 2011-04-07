@@ -624,8 +624,8 @@ void *EOFs(void * argument)
 	  if ( miss ) free(miss);
 	  if ( pack ) free(pack);
 
-        } // for ( levelID = 0; levelID < nlevs; levelID ++ )
-    } // for ( varID = 0; varID < nvars; varID ++ )
+        } // for ( levelID = 0; levelID < nlevs; levelID++ )
+    } // for ( varID = 0; varID < nvars; varID++ )
 
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
 

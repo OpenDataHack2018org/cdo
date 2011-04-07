@@ -222,7 +222,7 @@ void *Eofcoeff3d(void * argument)
 
       taxisCopyTimestep(taxisID3, taxisID2);
 
-      for ( recID =0; recID< nrecs; recID ++ )
+      for ( recID =0; recID< nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);

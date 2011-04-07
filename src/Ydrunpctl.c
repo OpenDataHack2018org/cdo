@@ -267,7 +267,7 @@ void *Ydrunpctl(void *argument)
 	  nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      
 	  for ( levelID = 0; levelID < nlevels; levelID++ )
-	    for ( inp = 0; inp < ndates; inp ++ )
+	    for ( inp = 0; inp < ndates; inp++ )
 	      hsetAddVarLevelValues(hsets[dayoy], varID, levelID, &vars1[inp][varID][levelID]);
 	}
         

@@ -207,7 +207,7 @@ void *Eofcoeff(void * argument)
           streamDefTimestep(streamIDs[eofID],tsID);
         }
       */
-      for ( recID =0; recID< nrecs; recID ++ )
+      for ( recID =0; recID< nrecs; recID++ )
         {
           streamInqRecord(streamID2, &varID, &levelID);
           missval2 = vlistInqVarMissval(vlistID2, varID);

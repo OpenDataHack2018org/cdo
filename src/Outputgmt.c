@@ -304,7 +304,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
 	}
       
       /* Reset found cuts for the current cell before starting the search */
-      for ( i = 0; i < ncorner; i ++ )
+      for ( i = 0; i < ncorner; i++ )
 	for ( j = 0; j < ncorner; j++ )
 	  cuts[i][j] = 0;
       

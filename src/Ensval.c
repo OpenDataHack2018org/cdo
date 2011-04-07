@@ -513,13 +513,13 @@ void *Ensval(void *argument)
       streamClose(streamID);
     }
   
-  for ( stream = 0; stream < nostreams; stream ++ )
+  for ( stream = 0; stream < nostreams; stream++ )
     streamClose(streamID2[stream]);
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     if ( ef[fileID].array ) free(ef[fileID].array);
 
-  for ( stream=0; stream<nostreams; stream++ ) {
+  for ( stream = 0; stream < nostreams; stream++ ) {
     vlistDestroy(vlistID2[stream]);
     taxisDestroy(taxisID2[stream]);
     zaxisDestroy(zaxisID2[stream]);
