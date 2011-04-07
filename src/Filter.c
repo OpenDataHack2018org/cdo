@@ -23,9 +23,11 @@
       Filter    bandpass
 */
 
+#if defined ( _USE_FFTW3 ) 
+#include <fftw3.h>
+#endif
 
 #include <cdi.h>
-#include <fftw3.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
@@ -198,10 +200,11 @@ void *Filter(void *argument)
   field_t ***vars = NULL;
   double fmin = 0, fmax = 0;
   int *fmasc;
-
+#if defined ( _USE_FFTW3 ) 
   fftw_plan p_T2S, p_S2T;
   fftw_complex *out_fft;
   fftw_complex *in_fft;
+#endif
   
   cdoInitialize(argument);
 
@@ -393,7 +396,7 @@ void *Filter(void *argument)
             {
               for ( tsID = 0; tsID < nts; tsID++ )                              
                 {
-		  in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];                                         
+		  in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
 		  // in_fft[tsID][1] = vars[tsID][varID][levelID].ptr[i+1];
 		  in_fft[tsID][1] = 0;
 		}
@@ -407,14 +410,14 @@ void *Filter(void *argument)
 		}
 	    }
 #else 
-	  for ( i=0; i < gridsize; i ++  )  
+	  for ( i = 0; i < gridsize; i++ )  
 	    {
 	      // for some reason, the optimization using the complex transform independent of the 
 	      // real one in order to transform two time series at the same time does not work
 	      // properly here. 
 
 	      memset( array2,0,nts2*sizeof(double) );
-	      for ( tsID = 0; tsID < nts; tsID ++ )
+	      for ( tsID = 0; tsID < nts; tsID++ )
 		array1[tsID] = vars[tsID][varID][levelID].ptr[i];                                         
 	      /* zero padding up to next power of to */
               for ( ; tsID < nts2; tsID++ )                
