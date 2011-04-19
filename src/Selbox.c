@@ -343,6 +343,8 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
   xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
   xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
 
+  while ( nlon1 == 1 || (xvals1[nlon1-1] - xvals1[0]) >= 360 ) nlon1--;
+
   for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
   for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );
 
@@ -840,8 +842,12 @@ void *Selbox(void *argument)
   if ( cdoVerbose )
     {
       if ( gridtype != GRID_UNSTRUCTURED )
-	cdoPrint("idx1,idx2,idy1,idy2: %d,%d,%d,%d",
-		 sbox[0].lon21+1, sbox[0].lon22+1, sbox[0].lat1+1, sbox[0].lat2+1);
+	{
+	  cdoPrint("box1 - idx1,idx2,idy1,idy2: %d,%d,%d,%d",
+		   sbox[0].lon21+1, sbox[0].lon22+1, sbox[0].lat1+1, sbox[0].lat2+1);
+	  cdoPrint("box2 - idx1,idx2,idy1,idy2: %d,%d,%d,%d",
+		   sbox[0].lon11+1, sbox[0].lon12+1, sbox[0].lat1+1, sbox[0].lat2+1);
+	}
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
