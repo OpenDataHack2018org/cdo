@@ -143,10 +143,9 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 		  if ( xvals2[i] >  360 ) xvals2[i] -= 360;
 		}
 
-	      for ( i = 1; i < nlon2; i++ )
-		{
+	      if ( xvals2[0] > xvals2[nlon2-1] )
+		for ( i = 1; i < nlon2; i++ )
 		  if ( xvals2[i] < xvals2[i-1] ) xvals2[i] += 360;
-		}
 	    }
 	}
       /*
@@ -343,7 +342,7 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
   xlon2 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
   xlon1 -= 360 * floor ((xlon1 - xvals1[0]) / 360);
 
-  while ( nlon1 == 1 || (xvals1[nlon1-1] - xvals1[0]) >= 360 ) nlon1--;
+  // while ( nlon1 == 1 || (xvals1[nlon1-1] - xvals1[0]) >= 360 ) nlon1--;
 
   for ( *lon21 = 0; *lon21 < nlon1 && xvals1[*lon21] < xlon1; (*lon21)++ );
   for ( *lon22 = *lon21; *lon22 < nlon1 && xvals1[*lon22] < xlon2; (*lon22)++ );

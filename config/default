@@ -95,7 +95,7 @@ case "${HOSTNAME}" in
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
                     --enable-maintainer-mode \
                     --with-jasper=/sw/etch-ia32/jasper-1.900.1 \
-                    --with-grib_api=$HOME/local/etch-ia32/grib_api-1.9.8 \
+                    --with-grib_api=$HOME/local/etch-ia32/grib_api-1.9.9 \
 	            --with-netcdf=/sw/etch-ia32/netcdf-4.1.1-gcc \
 	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.4-threadsafe \
                     --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
@@ -169,8 +169,8 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-jasper=/sw/aix53/jasper-1.900.1 \
                     --with-grib_api=/sw/aix61/ECMWF \
-                    --with-netcdf=/sw/aix61/netcdf-4.1.1-rc2 \
-                    --with-hdf5=/sw/aix61/hdf5-1.8.4-patch1-threadsafe \
+                    --with-netcdf=/sw/aix61/netcdf-4.1.2-hdf5-threadsafe \
+                    --with-hdf5=/sw/aix61/hdf5-1.8.6-threadsafe \
                     --with-zlib=/sw/aix53/zlib-1.2.3 \
                     --with-szlib=/sw/aix53/szip-2.1 \
                     --with-proj=/sw/aix53/proj-4.6.1 \

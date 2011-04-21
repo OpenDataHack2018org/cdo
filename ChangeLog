@@ -1,7 +1,3 @@
-2011-04-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
-
-	* sellonlatbox: handle cyclic overlap of regular grids [report: Bernadette Fritzsch]
-
 2011-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* intyear: check contents of input files [report: Angelika Heil]
