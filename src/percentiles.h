@@ -31,9 +31,9 @@ typedef struct {
 HISTOGRAM;
 
 typedef struct {
-  int  nvars;
-  int *nlevels;
-  int *grids;
+  int    nvars;
+  int   *nlevels;
+  int   *grids;
   HISTOGRAM ***histograms;
 }
 HISTOGRAM_SET;

@@ -25,12 +25,12 @@
 #include "nth_element.h"
 #include "percentiles.h"
 
-#define NBINS_DEFAULT 101
-#define NBINS_MINIMUM 11
+#define NBINS_DEFAULT   101
+#define NBINS_MINIMUM    11
 
 #define DBL_CAPACITY(n) ((int)(((n) * sizeof(int)) / sizeof(double)))
-#define DBL_PTR(p) ((double *) (p))
-#define INT_PTR(p) ((int *) (p))
+#define DBL_PTR(p)      ((double *) (p))
+#define INT_PTR(p)      ((int *) (p))
 
 
 static int histGetEnvNBins()
@@ -48,9 +48,9 @@ static void histDefBounds(HISTOGRAM *hist, double a, double b)
   assert( hist != NULL );
   assert( hist->nbins > 0 );
   
-  hist->min = MIN(a, b);
-  hist->max = MAX(a, b);
-  hist->step = (hist->max - hist->min) / hist->nbins;
+  hist->min   = MIN(a, b);
+  hist->max   = MAX(a, b);
+  hist->step  = (hist->max - hist->min) / hist->nbins;
   hist->nsamp = 0;
 
   for ( i = 0; i < hist->nbins; i++ )
@@ -163,17 +163,17 @@ HISTOGRAM_SET *hsetCreate(int nvars)
   if ( hset == NULL )
     cdoAbort("Not enough memory (%s)", __func__);
     
-  hset->nvars = nvars;
+  hset->nvars   = nvars;
   hset->nlevels = (int *) malloc(nvars * sizeof(int));
-  hset->grids = (int *) malloc(nvars * sizeof(int));
+  hset->grids   = (int *) malloc(nvars * sizeof(int));
   hset->histograms = (HISTOGRAM ***) malloc(nvars * sizeof(HISTOGRAM **));
   if ( hset->histograms == NULL )
     cdoAbort("Not enough memory (%s)", __func__);
   
   for ( varID = 0; varID < nvars; varID++ )
     {
-      hset->nlevels[varID] = 0;
-      hset->grids[varID] = 0;
+      hset->nlevels[varID]    = 0;
+      hset->grids[varID]      = 0;
       hset->histograms[varID] = NULL;
     }
   
