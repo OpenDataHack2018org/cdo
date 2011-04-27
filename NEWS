@@ -7,6 +7,7 @@ Version 1.5.1 (?? ????? 2011):
      * Added support for netCDF4 classic format; option -f nc4c
    Fixed bugs:
      * eofspatial: integer overflow; wrong result for grid size > 46340
+     * eca_*: use the input calendar for the output streams
 
 Version 1.5.0 (15 March 2011):
 

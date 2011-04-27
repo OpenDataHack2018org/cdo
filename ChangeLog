@@ -1,6 +1,7 @@
 2011-04-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added support for netCDF4 classic format; option -f nc4c
+	* eca*: use the input calendar for the output streams (bug fix) [report: Martin Juckes]
 
 2011-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

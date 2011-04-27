@@ -95,7 +95,8 @@ void eca1(const ECA_REQUEST_1 *request)
   itaxisID = vlistInqTaxis(ivlistID);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  //  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefCalendar(otaxisID, taxisInqCalendar(itaxisID));
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -203,23 +204,16 @@ void eca1(const ECA_REQUEST_1 *request)
                     {
                       var12[levelID].ptr[i] = missval;
                       samp1[levelID].ptr[i] = missval;
-                      if ( IS_SET(samp2[levelID].ptr) )
-                        samp2[levelID].ptr[i] = 0.0;
-                      if ( IS_SET(request->var1.f3) ) 
-                        var13[levelID].ptr[i] = missval;
-                      if ( IS_SET(request->var2.h2) )
-                        var21[levelID].ptr[i] = missval;
-                      if ( IS_SET(request->var2.h3) )
-                        var23[levelID].ptr[i] = missval;
+                      if ( IS_SET(samp2[levelID].ptr) ) samp2[levelID].ptr[i] = 0.0;
+                      if ( IS_SET(request->var1.f3) ) var13[levelID].ptr[i] = missval;
+                      if ( IS_SET(request->var2.h2) ) var21[levelID].ptr[i] = missval;
+                      if ( IS_SET(request->var2.h3) ) var23[levelID].ptr[i] = missval;
                     }
                   var12[levelID].nmiss = gridsize;
                   samp1[levelID].nmiss = gridsize;
-                  if ( IS_SET(request->var1.f3) )
-                    var13[levelID].nmiss = gridsize;
-                  if ( IS_SET(request->var2.h2) )
-                    var21[levelID].nmiss = gridsize; 
-                  if ( IS_SET(request->var2.h3) )
-                    var23[levelID].nmiss = gridsize; 
+                  if ( IS_SET(request->var1.f3) ) var13[levelID].nmiss = gridsize;
+                  if ( IS_SET(request->var2.h2) ) var21[levelID].nmiss = gridsize; 
+                  if ( IS_SET(request->var2.h3) ) var23[levelID].nmiss = gridsize; 
                 }
 
               streamReadRecord(istreamID, field1.ptr, &field1.nmiss);
@@ -460,7 +454,8 @@ void eca2(const ECA_REQUEST_2 *request)
   itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  //  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefCalendar(otaxisID, taxisInqCalendar(itaxisID1));
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -825,7 +820,8 @@ void eca3(const ECA_REQUEST_3 *request)
   itaxisID2 = vlistInqTaxis(ivlistID2);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  //  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefCalendar(otaxisID, taxisInqCalendar(itaxisID1));
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
@@ -996,10 +992,9 @@ void eca4(const ECA_REQUEST_4 *request)
   field_t *startCount          , *endCount;
   field_t *startDateWithHist[2], *endDateWithHist[2];
   field_t *gslDuration, *gslFirstDay;
-  field_t fieldGt              , fieldLt             , mask;
+  field_t fieldGt, fieldLt, mask;
   int resetAtJan = FALSE, resetAtJul = FALSE;
   int isFirstYear = TRUE;
-  int missCount;
 
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
@@ -1039,7 +1034,8 @@ void eca4(const ECA_REQUEST_4 *request)
   itaxisID = vlistInqTaxis(ivlistID1);
   otaxisID = taxisCreate(TAXIS_RELATIVE);
   taxisDefTunit(otaxisID, TUNIT_MINUTE);
-  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  //  taxisDefCalendar(otaxisID, CALENDAR_PROLEPTIC);
+  taxisDefCalendar(otaxisID, taxisInqCalendar(itaxisID));
   taxisDefRdate(otaxisID, 19550101);
   taxisDefRtime(otaxisID, 0);
   vlistDefTaxis(ovlistID, otaxisID);
