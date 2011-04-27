@@ -24,9 +24,9 @@ The following options are available for all operators:
               \hline
               \rowcolor{pgreen}
                 \sl $<$format$>$ & \sl $<$nbits$>$ \\
-                {\tt grb, grb2}     & {\tt 1 - 24} \\
-                {\tt nc, nc2, nc4}  & {\tt I8/I16/I32/F32/F64}   \\
-                {\tt srv, ext, ieg} & {\tt F32/F64}   \\
+                {\tt grb, grb2}           & {\tt 1 - 24}              \\
+                {\tt nc, nc2, nc4, nc4c}  & {\tt I8/I16/I32/F32/F64}  \\
+                {\tt srv, ext, ieg}       & {\tt F32/F64}             \\
               \hline
               \end{tabular}
               \vspace*{1mm}
@@ -45,7 +45,8 @@ The following options are available for all operators:
                GRIB version 2            & {\tt grb2} \\
                netCDF                    & {\tt nc}   \\
                netCDF version 2 (64-bit) & {\tt nc2}  \\
-               netCDF-4 classic (HDF5)   & {\tt nc4}  \\
+               netCDF-4 (HDF5)           & {\tt nc4}  \\
+               netCDF-4 classic          & {\tt nc4c} \\
                SERVICE                   & {\tt srv}  \\
                EXTRA                     & {\tt ext}  \\
                IEG                       & {\tt ieg}  \\
