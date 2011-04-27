@@ -52,6 +52,9 @@ void printFiletype(int streamID, int vlistID)
     case FILETYPE_NC4:
       printf("netCDF4");
       break;
+    case FILETYPE_NC4C:
+      printf("netCDF4 classic");
+      break;
     case FILETYPE_SRV:
       printf("SERVICE");
       break;
@@ -78,7 +81,7 @@ void printFiletype(int streamID, int vlistID)
 	}
     }
 
-  if ( filetype == FILETYPE_GRB || filetype == FILETYPE_NC4 )
+  if ( filetype == FILETYPE_GRB || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
     {
       int nvars, varID;
       int ztype;

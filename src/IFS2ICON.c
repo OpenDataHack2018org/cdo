@@ -174,7 +174,7 @@ void read_param(const char *paramfile, param_t *param, int maxparam, int *nparam
 
 	  if ( nml->entry[nml_name]->occ == 0 )
 	    {
-	      cdoWarning("Parameter %d skipped, variable name not found!", nml_index);
+	      cdoWarning("Parameter %d skiped, variable name not found!", nml_index);
 	      continue;
 	    }
 

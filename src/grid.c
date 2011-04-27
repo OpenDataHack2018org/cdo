@@ -727,7 +727,7 @@ int gridToCurvilinear(int gridID1)
 		if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
 		  if ( check_range(2*nx, xbounds, -720, 720) )
 		    {
-		      cdoWarning("longitude bounds out of range, skipped!");
+		      cdoWarning("longitude bounds out of range, skiped!");
 		      free(xbounds);
 		      xbounds = NULL;
 		    }
@@ -745,7 +745,7 @@ int gridToCurvilinear(int gridID1)
 		if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN )
 		  if ( check_range(2*ny, ybounds, -180, 180) )
 		    {
-		      cdoWarning("latitude bounds out of range, skipped!");
+		      cdoWarning("latitude bounds out of range, skiped!");
 		      free(ybounds);
 		      ybounds = NULL;
 		    }

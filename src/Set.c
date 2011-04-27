@@ -233,7 +233,7 @@ void *Set(void *argument)
 		    {
 		      if ( nml->entry[nml_code]->occ == 0 )
 			{
-			  cdoPrint("Parameter %d skipped, code number not found!", nml_index);
+			  cdoPrint("Parameter %d skiped, code number not found!", nml_index);
 			  continue;
 			}
 		    }
@@ -241,7 +241,7 @@ void *Set(void *argument)
 		    {
 		      if ( nml->entry[nml_name]->occ == 0 )
 			{
-			  cdoWarning("Parameter %d skipped, variable name not found!", nml_index);
+			  cdoWarning("Parameter %d skiped, variable name not found!", nml_index);
 			  continue;
 			}
 		    }

@@ -433,7 +433,7 @@ void *Vertint(void *argument)
       else
 	{
 	  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 )
-	    cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
+	    cdoWarning("Parameter %d has wrong number of levels, skiped! (param=%s nlevel=%d)",
 		       varID+1, paramstr, nlevel);
 	  varinterp[varID] = FALSE;
 	  vardata2[varID]  = vardata1[varID];

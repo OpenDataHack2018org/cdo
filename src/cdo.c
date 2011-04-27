@@ -187,9 +187,9 @@ void usage(void)
   fprintf(stderr, "  Options:\n");
   fprintf(stderr, "    -a             Generate an absolute time axis\n");
   fprintf(stderr, "    -b <nbits>     Set the number of bits for the output precision\n");
-  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4; F32/F64 for srv/ext/ieg; 1 - 24 for grb/grb2)\n");
+  fprintf(stderr, "                   (I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for srv/ext/ieg; 1 - 24 for grb/grb2)\n");
   fprintf(stderr, "                   Add L or B to set the byteorder to Little or Big endian\n");
-  fprintf(stderr, "    -f <format>    Format of the output file. (grb, grb2, nc, nc2, nc4, srv, ext or ieg)\n");
+  fprintf(stderr, "    -f <format>    Format of the output file. (grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg)\n");
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
@@ -208,10 +208,6 @@ void usage(void)
 #if defined (_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
-  /*
-  fprintf(stderr, "    -p <prec>      Set the precision of the output data in bytes\n");
-  fprintf(stderr, "                   (4/8 for nc, nc2, nc4, srv, ext, ieg; 1/2/3 for grb)\n");
-  */
   fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
   fprintf(stderr, "    -R             Convert GRIB1 data from reduced to regular grid (only with cgribex)\n");
   fprintf(stderr, "    -r             Generate a relative time axis\n");
@@ -413,7 +409,7 @@ void setDefaultDataType(char *datatypestr)
 	  else
 	    {
 	      fprintf(stderr, "Unsupported number of bits %d!\n", nbits);
-	      fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc/nc2/nc4; F32/F64 for srv/ext/ieg; 1 - 24 for grb/grb2.\n");
+	      fprintf(stderr, "Use I8/I16/I32/F32/F64 for nc/nc2/nc4/nc4c; F32/F64 for srv/ext/ieg; 1 - 24 for grb/grb2.\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
@@ -539,6 +535,7 @@ void setDefaultFileType(char *filetypestr, int labort)
       else if ( memcmp(filetypestr, "grb1", 4)  == 0 ) { ftstr += 4; cdoDefaultFileType = FILETYPE_GRB; }
       else if ( memcmp(filetypestr, "grb",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_GRB; }
       else if ( memcmp(filetypestr, "nc2",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC2; }
+      else if ( memcmp(filetypestr, "nc4c", 4)  == 0 ) { ftstr += 4; cdoDefaultFileType = FILETYPE_NC4C;}
       else if ( memcmp(filetypestr, "nc4",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_NC4; }
       else if ( memcmp(filetypestr, "nc",   2)  == 0 ) { ftstr += 2; cdoDefaultFileType = FILETYPE_NC;  }
       else if ( memcmp(filetypestr, "srv",  3)  == 0 ) { ftstr += 3; cdoDefaultFileType = FILETYPE_SRV; }
@@ -549,7 +546,7 @@ void setDefaultFileType(char *filetypestr, int labort)
 	  if ( labort )
 	    {
 	      fprintf(stderr, "Unsupported filetype %s!\n", filetypestr);
-	      fprintf(stderr, "Available filetypes: grb, grb2, nc, nc2, nc4, srv, ext and ieg\n");
+	      fprintf(stderr, "Available filetypes: grb/grb2/nc/nc2/nc4/nc4c/srv/ext/ieg\n");
 	      exit(EXIT_FAILURE);
 	    }
 	  else
@@ -570,8 +567,8 @@ void setDefaultFileType(char *filetypestr, int labort)
 	    {
 	      fprintf(stderr, "Unexpected character >%c< in file type >%s<!\n", *ftstr, filetypestr);
 	      fprintf(stderr, "Use format[_nbits] with:\n");
-	      fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, srv, ext or ieg\n");
-	      fprintf(stderr, "    nbits  = 32/64 for nc/nc2/nc4/srv/ext/ieg; 1 - 24 for grb/grb2\n");
+	      fprintf(stderr, "    format = grb, grb2, nc, nc2, nc4, nc4c, srv, ext or ieg\n");
+	      fprintf(stderr, "    nbits  = 32/64 for nc/nc2/nc4/nc4c/srv/ext/ieg; 1 - 24 for grb/grb2\n");
 	      exit(EXIT_FAILURE);
 	    }
 	}
