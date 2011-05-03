@@ -270,34 +270,42 @@ void genYbounds(long xsize, long ysize, const double *restrict grid_center_lat,
   firstlat = grid_center_lat[0];
   lastlat  = grid_center_lat[xsize*ysize-1];
 
-  if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value!");
+  // if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value!");
 
   for ( j = 0; j < ysize; ++j )
     {
-      index = j*xsize;
-      if ( firstlat > lastlat )
+      if ( ysize == 1 )
 	{
-	  if ( j == 0 )
-	    maxlat = genYmax(grid_center_lat[index], grid_center_lat[index+xsize]);
-	  else
-	    maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
-
-	  if ( j == (ysize-1) )
-	    minlat = genYmin(grid_center_lat[index], grid_center_lat[index-xsize]);
-	  else
-	    minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
+	  minlat = grid_center_lat[0] - 360./ysize;
+	  maxlat = grid_center_lat[0] + 360./ysize;
 	}
       else
 	{
-	  if ( j == 0 )
-	    minlat = genYmin(grid_center_lat[index], grid_center_lat[index+xsize]);
-	  else
-	    minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
+	  index = j*xsize;
+	  if ( firstlat > lastlat )
+	    {
+	      if ( j == 0 )
+		maxlat = genYmax(grid_center_lat[index], grid_center_lat[index+xsize]);
+	      else
+		maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
 
-	  if ( j == (ysize-1) )
-	    maxlat = genYmax(grid_center_lat[index], grid_center_lat[index-xsize]);
+	      if ( j == (ysize-1) )
+		minlat = genYmin(grid_center_lat[index], grid_center_lat[index-xsize]);
+	      else
+		minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
+	    }
 	  else
-	    maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
+	    {
+	      if ( j == 0 )
+		minlat = genYmin(grid_center_lat[index], grid_center_lat[index+xsize]);
+	      else
+		minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
+
+	      if ( j == (ysize-1) )
+		maxlat = genYmax(grid_center_lat[index], grid_center_lat[index-xsize]);
+	      else
+		maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
+	    }
 	}
 
       for ( i = 0; i < xsize; ++i )

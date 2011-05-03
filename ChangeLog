@@ -1,3 +1,7 @@
+2011-05-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+        * bug fix: fldmean and similar operators fail with 1D grid (1 latitude value) [report: Etienne Tourigny]
+
 2011-04-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added support for netCDF4 classic format; option -f nc4c
