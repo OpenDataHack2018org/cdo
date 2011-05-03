@@ -154,11 +154,11 @@ void *Sinfo(void *argument)
 
 	  fprintf(stdout, "%9d", gridsize);
 
-	  fprintf(stdout, " %3d ", gridID + 1);
+	  fprintf(stdout, " %3d ", vlistGridIndex(vlistID, gridID) + 1);
 
 	  levelsize = zaxisInqSize(zaxisID);
 	  fprintf(stdout, " %6d", levelsize);
-	  fprintf(stdout, " %3d", zaxisID + 1);
+	  fprintf(stdout, " %3d", vlistZaxisIndex(vlistID, zaxisID) + 1);
 
 	  fprintf(stdout, "\n");
 	}
@@ -180,9 +180,9 @@ void *Sinfo(void *argument)
 	  zaxisInqUnits(zaxisID, units);
 	  units[12] = 0;
 	  if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
-	    nbyte0    = fprintf(stdout, "  %4d : %-10s  (ltype=%3d) : ", zaxisID+1, longname, ltype);
+	    nbyte0    = fprintf(stdout, "  %4d : %-10s  (ltype=%3d) : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, ltype);
 	  else
-	    nbyte0    = fprintf(stdout, "  %4d : %-16s  %5s : ", zaxisID+1, longname, units);
+	    nbyte0    = fprintf(stdout, "  %4d : %-16s  %5s : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, units);
 	  nbyte = nbyte0;
 	  for ( levelID = 0; levelID < levelsize; levelID++ )
 	    {

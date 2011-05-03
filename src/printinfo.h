@@ -150,7 +150,7 @@ void printGridInfo(int vlistID)
 
       /*	  nbyte0   = fprintf(stdout, "  %4d : %-23s : ",*/
       nbyte0   = fprintf(stdout, "  %4d : %-12s > ",
-			 gridID+1, gridNamePtr(gridtype));
+			 index+1, gridNamePtr(gridtype));
 
       if ( gridtype == GRID_LONLAT   ||
 	   gridtype == GRID_LCC2 ||
