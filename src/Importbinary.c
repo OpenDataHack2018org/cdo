@@ -197,11 +197,12 @@ void *Importbinary(void *argument)
   int streamID;
   int gridID = -1, zaxisID, zaxisIDsfc, taxisID, vlistID;
   int i;
-  int nmiss, n_nan;
+  int nmiss = 0, n_nan;
   int ivar;
   int varID = -1, levelID, tsID;
   int gridsize;
   int  status;
+  int datatype;
   dsets_t pfi;
   int vdate, vtime;
   int tcur, told,fnum;
@@ -215,6 +216,7 @@ void *Importbinary(void *argument)
   char *rec = NULL;
   struct gavar *pvar;
   struct dt dtim, dtimi;
+  double missval;
   double fmin, fmax;
   double *array;
   double sfclevel = 0;
@@ -304,8 +306,29 @@ void *Importbinary(void *argument)
 	  }
 	vlistDefVarLongname(vlistID, varID, longname);
       }
-      vlistDefVarDatatype(vlistID, varID, DATATYPE_FLT32);
-      vlistDefVarMissval(vlistID, varID, pfi.undef);
+
+      missval  = pfi.undef;
+      datatype = DATATYPE_FLT32;
+
+      if      ( pvar->dfrm ==  1 ) {
+	datatype = DATATYPE_UINT8;
+	if ( missval < 0 || missval > 255 ) missval = 255;
+      }
+      else if ( pvar->dfrm ==  2 )  {
+	datatype = DATATYPE_UINT16;
+	if ( missval < 0 || missval > 65535 ) missval = 65535;
+      }
+      else if ( pvar->dfrm == -2 )  {
+	datatype = DATATYPE_INT16;
+	if ( missval < -32768 || missval > 32767 ) missval = -32768;
+      }
+      else if ( pvar->dfrm ==  4 )  {
+	datatype = DATATYPE_INT32;
+	if ( missval < -2147483648 || missval > 2147483647 ) missval = -2147483646;
+      }
+
+      vlistDefVarDatatype(vlistID, varID, datatype);
+      vlistDefVarMissval(vlistID, varID, missval);
 
       for ( levelID = 0; levelID < nlevels; ++levelID )
 	{
@@ -460,7 +483,7 @@ void *Importbinary(void *argument)
 
 	      /* convert */
 	      if (var_dfrm[recID] == 1) {
-		char *carray = (void*)(rec + recoffset);
+		unsigned char *carray = (void*)(rec + recoffset);
 		for (i = 0; i < gridsize; ++i) array[i] = (double) carray[i];
 	      }
 	      else if (var_dfrm[recID] == 2) {
@@ -507,10 +530,9 @@ void *Importbinary(void *argument)
 		      if ( array[i] > fmax ) fmax = array[i];
 		    }
 		}
-	      /*
 	      if ( cdoVerbose )
 		printf("%d %d %g %g %d %d %d\n", tsID, recID, fmin, fmax, recoffset, nmiss, n_nan);
-	      */
+
 	      varID   = recVarID[recID];
 	      levelID = recLevelID[recID];
 	      streamDefRecord(streamID,  varID,  levelID);
