@@ -67,6 +67,22 @@ char *ch1,*ch2,*ch3,*ch4,cc1,cc2;
   }
 }
 
+/* Byte swap requested number of 2 byte elements */
+
+void gabswp2 (void *r, gaint cnt) {
+gaint i;
+char *ch1,*ch2,cc1;
+
+  ch1 = (char *)r;
+  ch2 = ch1+1;
+  for (i=0; i<cnt; i++) {
+    cc1  = *ch1;
+    *ch1 = *ch2;
+    *ch2 = cc1;
+    ch1+=4; ch2+=4;
+  }
+}
+
 /*mf version
   convert all upper case alphabetic characters to lower case.
   The GrADS system is case insensitive, and assumes lower case
@@ -1775,22 +1791,22 @@ int read_gradsdes(char *filename, dsets_t *pfi)
 
 
 	      /* var_t is for data files with dimension sequence: X, Y, Z, T, V */
-	      if ((pvar->units[0]==-1) && 
-		  (pvar->units[1]==20)) 
+	      if (((int)pvar->units[0]==-1) && 
+		  ((int)pvar->units[1]==20)) 
 		pvar->var_t = 1;
 
 	      /* non-float data types */
-	      if ((pvar->units[0]==-1) && 
-		  (pvar->units[1]==40))
+	      if (((int)pvar->units[0]==-1) && 
+		  ((int)pvar->units[1]==40))
 		{
 
-		  if (pvar->units[2]== 1) pvar->dfrm = 1;
-		  if (pvar->units[2]== 2)
+		  if ((int)pvar->units[2]== 1) pvar->dfrm = 1;
+		  if ((int)pvar->units[2]== 2)
 		    {
 		      pvar->dfrm = 2;
-		      if (pvar->units[3]==-1) pvar->dfrm = -2;
+		      if ((int)pvar->units[3]==-1) pvar->dfrm = -2;
 		    }
-		  if (pvar->units[2]== 4) pvar->dfrm = 4;
+		  if ((int)pvar->units[2]== 4) pvar->dfrm = 4;
 		}
 
 	      i++; pvar++;
@@ -1909,7 +1925,7 @@ int read_gradsdes(char *filename, dsets_t *pfi)
   /* Make sure there are no conflicting options and data types */
   pvar=pfi->pvar1;
   for (j=1; j<=pfi->vnum; j++) {
-    if (pvar->units[0]==-1 && pvar->units[1]==20) {
+    if ((int)pvar->units[0]==-1 && (int)pvar->units[1]==20) {
       if (pfi->tmplat) {
 	gaprnt(0,"Open Error: Variables with transposed VAR-T dimensions cannot be templated together\n");
 	err=1;

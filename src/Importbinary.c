@@ -216,11 +216,11 @@ void *Importbinary(void *argument)
   struct gavar *pvar;
   struct dt dtim, dtimi;
   double fmin, fmax;
-  float *farray;
   double *array;
   double sfclevel = 0;
   int *recVarID, *recLevelID;
   int *var_zaxisID;
+  int *var_dfrm = NULL;
   char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);
@@ -252,6 +252,7 @@ void *Importbinary(void *argument)
   var_zaxisID = (int *) malloc(nvars*sizeof(int));
   recVarID    = (int *) malloc(nrecs*sizeof(int));
   recLevelID  = (int *) malloc(nrecs*sizeof(int));
+  var_dfrm    = (int *) malloc(nrecs*sizeof(int));
 
   recID = 0;
   for ( ivar = 0; ivar < nvars; ++ivar )
@@ -311,6 +312,7 @@ void *Importbinary(void *argument)
 	  if ( recID >= nrecs ) cdoAbort("Internal problem with number of records!");
 	  recVarID[recID]   = varID;
 	  recLevelID[recID] = levelID;
+          var_dfrm[recID]   = pvar->dfrm;
 	  recID++;
 	}
 
@@ -412,6 +414,9 @@ void *Importbinary(void *argument)
 	}
       }
       if (pfi.tmplat) gree(ch,"312");
+
+      /* file header */
+      if (pfi.fhdr > 0) fseeko(pfi.infile, pfi.fhdr, SEEK_SET);
        
       /* Get file size */
       /*
@@ -440,18 +445,51 @@ void *Importbinary(void *argument)
 
 	  for ( recID = 0; recID < nrecs; ++recID )
 	    {
+	      /* record size depends on data type */
+	      if (var_dfrm[recID] == 1) {
+		recsize = pfi.gsiz;
+	      }
+	      else if ((var_dfrm[recID] == 2) || (var_dfrm[recID] == -2)) {
+		recsize = pfi.gsiz*2;
+	      }
+	      else {
+		recsize = pfi.gsiz*4;
+	      }
 	      rc = fread (rec, 1, recsize, pfi.infile);
 	      if ( rc < recsize ) cdoAbort("I/O error reading record!");
 
-	      if ( pfi.bswap ) gabswp(rec+recoffset, gridsize);
-	      farray = (float *) (rec+recoffset);
+	      /* convert */
+	      if (var_dfrm[recID] == 1) {
+		char *carray = (void*)(rec + recoffset);
+		for (i = 0; i < gridsize; ++i) array[i] = (double) carray[i];
+	      }
+	      else if (var_dfrm[recID] == 2) {
+		unsigned short *sarray = (void*)(rec + recoffset);
+	        if (pfi.bswap) gabswp2(sarray, gridsize);
+		for (i = 0; i < gridsize; ++i) array[i] = (double) sarray[i];
+	      }
+	      else if (var_dfrm[recID] == -2) {
+		short *sarray = (void*)(rec + recoffset);
+	        if (pfi.bswap) gabswp2(sarray, gridsize);
+		for (i = 0; i < gridsize; ++i) array[i] = (double) sarray[i];
+	      }
+	      else if (var_dfrm[recID] == 4) {
+		int *iarray = (void*)(rec + recoffset);
+	        if (pfi.bswap) gabswp(iarray, gridsize);
+		for (i = 0; i < gridsize; ++i) array[i] = (double) iarray[i];
+	      }
+	      else {
+		float *farray = (float *) (rec + recoffset);
+		if (pfi.bswap) gabswp(farray, gridsize);
+	        for ( i = 0; i < gridsize; ++i ) array[i] = (double) farray[i];
+	      }
+
 	      fmin =  1.e99;
 	      fmax = -1.e99;
 	      nmiss = 0;
 	      n_nan = 0;
 	      for ( i = 0; i < gridsize; ++i )
 		{
-		  array[i] = (double) farray[i];
 		  if ( array[i] > pfi.ulow && array[i] < pfi.uhi )
 		    {
 		      array[i] = pfi.undef;
@@ -462,7 +500,6 @@ void *Importbinary(void *argument)
 		      array[i] = pfi.undef;
 		      nmiss++;
 		      n_nan++;
-		      /* printf("Nan at %d\n", i); */
 		    }
 		  else
 		    {
@@ -497,10 +534,12 @@ void *Importbinary(void *argument)
   taxisDestroy(taxisID);
 
   free(array);
+  free(rec);
 
   if ( var_zaxisID ) free(var_zaxisID);
   if ( recVarID    ) free(recVarID);
   if ( recLevelID  ) free(recLevelID);
+  if ( var_dfrm    ) free(var_dfrm);
 
   cdoFinish();
 
