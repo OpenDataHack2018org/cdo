@@ -809,25 +809,36 @@ static char *ChangeHelp[] = {
 
 static char *SetgridHelp[] = {
     "NAME",
-    "    setgrid, setgridtype - Set grid type",
+    "    setgrid, setgridtype, setgridarea - Set grid information",
     "",
     "SYNOPSIS",
     "    setgrid,grid  ifile ofile",
     "    setgridtype,gridtype  ifile ofile",
+    "    setgridarea,gridarea  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This module sets the grid description of all fields with the same grid size",
-    "    as the new grid.",
+    "    This module modifies the metadata of the horizontal grid. Depending on the ",
+    "    chosen operator a new grid description is set, the coordinates are converted",
+    "    or the grid cell area is added.",
     "",
     "OPERATORS",
     "    setgrid      Set grid",
-    "                 Sets the grid description of all fields.",
+    "                 Sets a new grid description. The input fields need to have the same grid size",
+    "                 as the size of the target grid description.",
     "    setgridtype  Set grid type",
-    "                 Sets the grid type of all grids to a user given value.",
+    "                 Sets the grid type of all input fields. Use the parameter curvilinear or unstructued",
+    "                 to convert the grid type and the coordinates to a CURVILINEAR or UNSTRUCTUED grid.",
+    "                 The parameter dereference will dereference all grids with the grid type REFERENCE.",
+    "    setgridarea  Set grid cell area",
+    "                 Sets the grid cell area. The parameter gridarea is the path to a data file,",
+    "                 the first field is used as grid cell area. The input fields need to have the same",
+    "                 grid size as the grid cell area. The grid cell area is used to compute",
+    "                 the weights of each grid cell if needed by an operator, e.g. for fldmean.",
     "",
     "PARAMETER",
-    "    grid      STRING  Target grid description file or name",
-    "    gridtype  STRING  Target grid type (curvilinear, unstructured or dereference)",
+    "    grid      STRING  Grid description file or name",
+    "    gridtype  STRING  Grid type (curvilinear, unstructured or dereference)",
+    "    gridarea  STRING  Data file, the first field is used as grid cell area",
     NULL
 };
 
@@ -1331,7 +1342,7 @@ static char *ConsecstatHelp[] = {
     "    consects   Consecutive Timesteps",
     "               In contrast to the operator above consects only computes the lenght of each",
     "               period together with its last timestep. To be able to perform statistical",
-    "               analysis like min, max or mean, everything else is set to misvall.",
+    "               analysis like min, max or mean, everything else is set to missing value.",
     NULL
 };
 

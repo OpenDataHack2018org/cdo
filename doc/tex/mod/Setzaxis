@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Setzaxis
 @Title     = Set z-axis type
 @Section   = Modification

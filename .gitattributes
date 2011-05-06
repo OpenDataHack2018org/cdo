@@ -226,6 +226,7 @@ doc/tex/mod/Yseaspctl -text
 doc/tex/mod/Yseasstat -text
 doc/tex/mod/Zonstat -text
 doc/tex/mod/chdoc -text
+doc/tex/mod/syntax -text
 doc/tex/partab.tex -text
 doc/tex/ref_intro_arithm.tex -text
 doc/tex/ref_intro_climat.tex -text

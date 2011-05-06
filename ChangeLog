@@ -1,3 +1,8 @@
+2011-06-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.1
+	* Version 1.5.1 released
+
 2011-05-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* import_binary: Added support for 1 and 2 byte integer [code from: Karsten ???]

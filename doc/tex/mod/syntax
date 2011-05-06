@@ -1,0 +1,9 @@
+@bold{}  \bf
+@cite{}  \cite
+@env{}   \tt
+@file{}  \tt
+@math{}  \begin{math} \end{math}
+@mod{}   \htmlref{}{}
+@oper{}  \htmlref{}{}
+@ref{}   \htmlref{}{}
+@var{}   \it

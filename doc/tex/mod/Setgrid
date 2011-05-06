@@ -1,15 +1,16 @@
 @BeginModule
 @NewPage
 @Name      = Setgrid
-@Title     = Set grid type
+@Title     = Set grid information
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setgrid setgridtype
+@Operators = setgrid setgridtype setgridarea
 
 @BeginDescription
-This module sets the grid description of all fields with the same grid size
-as the new grid.
+This module modifies the metadata of the horizontal grid. Depending on the 
+chosen operator a new grid description is set, the coordinates are converted
+or the grid cell area is added.
 @EndDescription
 @EndModule
 
@@ -19,7 +20,8 @@ as the new grid.
 @Parameter = grid
 
 @BeginDescription
-Sets the grid description of all fields.
+Sets a new grid description. The input fields need to have the same grid size
+as the size of the target grid description.
 @EndDescription
 @EndOperator
 
@@ -29,29 +31,32 @@ Sets the grid description of all fields.
 @Parameter = gridtype
 
 @BeginDescription
-Sets the grid type of all grids to a user given value.
+Sets the grid type of all input fields. Use the parameter @env{curvilinear} or @env{unstructued}
+to convert the grid type and the coordinates to a CURVILINEAR or UNSTRUCTUED grid.
+The parameter @env{dereference} will dereference all grids with the grid type REFERENCE.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_setgridarea
-@Title     = Set grid area weights
-@Parameter = areafile
+@Title     = Set grid cell area
+@Parameter = gridarea
 
 @BeginDescription
-Sets the area weights of the first grid in @file{ifile} with the same
-size as in areafile.
-@EndDescription
-@Item = areafile
-STRING  File with area weights
+Sets the grid cell area. The parameter @var{gridarea} is the path to a data file,
+the first field is used as grid cell area. The input fields need to have the same
+grid size as the grid cell area. The grid cell area is used to compute
+the weights of each grid cell if needed by an operator, e.g. for @oper{fldmean}.
 @EndOperator
 
 
 @BeginParameter
 @Item = grid
-STRING  Target grid description file or name
+STRING  Grid description file or name
 @Item = gridtype
-STRING  Target grid type (curvilinear, unstructured or dereference)
+STRING  Grid type (curvilinear, unstructured or dereference)
+@Item = gridarea
+STRING  Data file, the first field is used as grid cell area
 @EndParameter
 
 

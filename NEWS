@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.5.1 (?? ????? 2011):
+Version 1.5.1 (?? June 2011):
 
    New features:
      * Added support for netCDF4 classic format; option -f nc4c

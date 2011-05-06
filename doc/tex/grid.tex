@@ -1,4 +1,7 @@
-\section{Grid description}
+\section{Horizontal grids}
+\label{HORIZONTAL_GRIDS}
+
+\subsection{Grid description}
 \label{GRID_DESCRIPTION}
 
 In the following situations it is necessary to give a description of a horizontal grid:
@@ -13,36 +16,36 @@ As now described, there are several possibilities to define a horizontal grid.
 Predefined grids are available for global regular, gaussian or icosahedral-hexagonal GME grids.
 
 
-\subsection{Predefined grids}
+\subsubsection{Predefined grids}
 
 The following pre-defined grid names are available: 
 {\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>} and {\tt gme<NI>}
 
-\subsection*{Global regular grid: {\tt r<NX>x<NY>}}
+\subsubsection*{Global regular grid: {\tt r<NX>x<NY>}}
     {\tt r<NX>x<NY>} defines a global regular lon/lat grid.
     The number of the longitudes {\tt <NX>} and the latitudes {\tt <NY>}
     can be selected at will.
     The longitudes start at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
     The latitudes go from south to north with an increment of (180/{\tt <NY>})$^\circ$.
 
-\subsection*{One grid point: {\tt lon=<LON>/lat=<LAT>}}
+\subsubsection*{One grid point: {\tt lon=<LON>/lat=<LAT>}}
     {\tt lon=<LON>/lat=<LAT>} defines a lon/lat grid with only one grid point.
 
-\subsection*{Global Gaussian grid: {\tt n<N>}}
+\subsubsection*{Global Gaussian grid: {\tt n<N>}}
     {\tt n<N>} defines a global Gaussian grid. {\tt N} specifies the number of
     latitudes lines between the Pole and the Equator.
     The longitudes start at 0$^\circ$ with an increment of (360/nlon)$^\circ$.
     The gaussian latitudes go from north to south.
 
-%\subsection*{Spherical harmonics: t$<$RES$>$spec}
+%\subsubsection*{Spherical harmonics: t$<$RES$>$spec}
 %    t$<$RES$>$spec defines the spectral coefficients of a global gaussian grid.
 %    Each valid triangular resolution can be used for $<$RES$>$.
 
-\subsection*{Global icosahedral-hexagonal GME grid: {\tt gme<NI>}}
+\subsubsection*{Global icosahedral-hexagonal GME grid: {\tt gme<NI>}}
     {\tt gme<NI>} defines a global icosahedral-hexagonal GME grid.
     {\tt NI} specifies the number of intervals on a main triangle side.
 
-\subsection{Grids from data files}
+\subsubsection{Grids from data files}
 
 You can use the grid description from an other datafile.
 The format of the datafile and the grid of the data field must
@@ -52,7 +55,7 @@ your variables and the grids.
 If there are more then one grid in the datafile the grid description of
 the first variable will be used.
 
-\subsection{SCRIP grids}
+\subsubsection{SCRIP grids}
 
 SCRIP is a Spherical Coordinate Remapping and Interpolation Package.
 It uses a common grid description in netCDF.
@@ -95,7 +98,7 @@ SCRIP grid description example of a curvilinear MPIOM \cite{MPIOM} GROB3 grid (o
 \end{lstlisting}
 %\end{minipage}
 
-\subsection{PINGO grids}
+\subsubsection{PINGO grids}
 
 PINGO uses a very simple grid description in ASCII format
 to describe regular longitude/latitude or global gaussian grids.
@@ -123,7 +126,7 @@ PINGO grid description example of a T21 gaussian grid:
 \end{lstlisting}
 %\end{minipage}
 
-\subsection{CDO grids}
+\subsubsection{CDO grids}
 
 All supported grids can also be described with the {\CDO} grid description.
 %The {\CDO} grid description is an ASCII formatted file.
@@ -317,3 +320,22 @@ in \htmlref{Appendix B}{appendixgrid}.
 
 % retilinear (geradlinig)
 
+
+\subsection{Grid area weights}
+\label{GRID_AREA_WEIGHTS}
+
+%A typical example is to compute the mean of a field with @oper{fldmean}.
+
+%The area weights are exclusive computed from the grid cell area. The netCDF variable for the cell area is 
+%defined by the attribute cell_measures:
+%
+%  var:cell_measures = "area: cell_area" ;
+%
+%If the cell area is not available then it will be computed from the geographical coordinates via spherical triangles.
+%This is only possible if the geographical coordinates of the grid cell corners are available or derivable.
+%Otherwise fldmean gives a warning message and uses constant area weights.
+%You can overwrite/set the grid cell area with the undocumented CDO function setgridarea. 
+%The parameter for this function is a data file with one field. This field must have the the size of 
+%the grid of the input file. Here is an example:
+%
+%  cdo fldmean -setgridarea,gridareafile  ifile ofile

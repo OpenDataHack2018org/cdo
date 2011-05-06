@@ -133,6 +133,7 @@ Operator catalog:
    Change        chlevelv        Change level of one variable
    Setgrid       setgrid         Set grid
    Setgrid       setgridtype     Set grid type
+   Setgrid       setgridarea     Set grid cell area
    Setzaxis      setzaxis        Set z-axis
    Setgatt       setgatt         Set global attribute
    Setgatt       setgatts        Set global attributes
