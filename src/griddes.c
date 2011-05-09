@@ -712,6 +712,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_SINUSOIDAL;
 	  else if ( cmpstr(pline, "laea", len)  == 0 )
 	    grid.type = GRID_LAEA;
+	  else if ( cmpstr(pline, "generic", len)  == 0 )
+	    grid.type = GRID_GENERIC;
 	  else
 	    Warning("Invalid grid name : %s", pline);
 	}
