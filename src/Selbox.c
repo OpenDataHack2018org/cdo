@@ -722,30 +722,60 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
 
 
 static
-void window(double *array1, int gridID1, double *array2,
-	    int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
+void window(int nwpv, double *array1, int gridID1, double *array2,
+	    long lat1, long lat2, long lon11, long lon12, long lon21, long lon22)
 {
-  int nlon1;
-  int ilat, ilon;
+  long nlon1;
+  long ilat, ilon;
 
   nlon1 = gridInqXsize(gridID1);
 
-  for ( ilat = lat1; ilat <= lat2; ilat++ )
+  if ( nwpv == 2 )
     {
-      for ( ilon = lon21; ilon <= lon22; ilon++ )
-	*array2++ = array1[ilat*nlon1 + ilon];
-      for ( ilon = lon11; ilon <= lon12; ilon++ )
-	*array2++ = array1[ilat*nlon1 + ilon];
+      for ( ilat = lat1; ilat <= lat2; ilat++ )
+	{
+	  for ( ilon = lon21; ilon <= lon22; ilon++ )
+	    {
+	      *array2++ = array1[ilat*nlon1*2 + ilon*2];
+	      *array2++ = array1[ilat*nlon1*2 + ilon*2+1];
+	    }
+	  for ( ilon = lon11; ilon <= lon12; ilon++ )
+	    {
+	      *array2++ = array1[ilat*nlon1*2 + ilon*2];
+	      *array2++ = array1[ilat*nlon1*2 + ilon*2+1];
+	    }
+	}
+    }
+  else
+    {
+      for ( ilat = lat1; ilat <= lat2; ilat++ )
+	{
+	  for ( ilon = lon21; ilon <= lon22; ilon++ )
+	    *array2++ = array1[ilat*nlon1 + ilon];
+	  for ( ilon = lon11; ilon <= lon12; ilon++ )
+	    *array2++ = array1[ilat*nlon1 + ilon];
+	}
     }
 }
 
 static
-void window_cell(double *array1, int gridID1, double *array2, int gridsize2, int *cellidx)
+void window_cell(int nwpv, double *array1, int gridID1, double *array2, long gridsize2, int *cellidx)
 {
-  int i;
+  long i;
 
-  for ( i = 0; i < gridsize2; ++i )
-    array2[i] = array1[cellidx[i]];
+  if ( nwpv == 2 )
+    {
+      for ( i = 0; i < gridsize2; ++i )
+	{
+	  array2[i*2]   = array1[cellidx[i]*2];
+	  array2[i*2+1] = array1[cellidx[i]*2+1];
+	}
+    }
+  else
+    {
+      for ( i = 0; i < gridsize2; ++i )
+	array2[i] = array1[cellidx[i]];
+    }
 }
 
 
@@ -763,6 +793,7 @@ void *Selbox(void *argument)
   int nmiss;
   int *vars;
   int i;
+  int nwpv; // number of words per value; real:1  complex:2
   double missval;
   double *array1 = NULL, *array2 = NULL;
   int taxisID1, taxisID2;
@@ -854,9 +885,11 @@ void *Selbox(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   array1 = (double *) malloc(gridsize*sizeof(double));
 
   gridsize2 = vlistGridsizeMax(vlistID2);
+  if ( vlistNumber(vlistID2) != CDI_REAL ) gridsize2 *= 2;
   array2 = (double *) malloc(gridsize2*sizeof(double));
 
   tsID = 0;
@@ -880,12 +913,18 @@ void *Selbox(void *argument)
 
 	      if ( index == ngrids ) cdoAbort("Internal problem, grid not found!");
 
+	      if ( vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX32 || 
+		   vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX64 )
+		nwpv = 2;
+	      else
+		nwpv = 1;
+
 	      gridsize2 = gridInqSize(sbox[index].gridID2);
 
 	      if ( operatorID == SELLONLATBOX  && gridtype == GRID_UNSTRUCTURED )
-		window_cell(array1, gridID1, array2, gridsize2, sbox[index].cellidx);
+		window_cell(nwpv, array1, gridID1, array2, gridsize2, sbox[index].cellidx);
 	      else
-		window(array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, 
+		window(nwpv, array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, 
 		       sbox[index].lon12, sbox[index].lon21, sbox[index].lon22);
 
 	      if ( nmiss )

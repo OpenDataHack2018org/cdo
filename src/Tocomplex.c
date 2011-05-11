@@ -64,6 +64,7 @@ void *Tocomplex(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  if ( cdoFiletype() != FILETYPE_EXT ) cdoAbort("Complex numbers need EXTRA format; used CDO option -f ext!");
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);

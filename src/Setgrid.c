@@ -307,6 +307,7 @@ void *Setgrid(void *argument)
   else
     gridsize = vlistGridsizeMax(vlistID1);
 
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
   array = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
