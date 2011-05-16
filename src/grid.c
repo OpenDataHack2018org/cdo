@@ -894,22 +894,30 @@ int gridToUnstructured(int gridID1)
 	gridInqXvals(gridID1, xvals);
 	gridInqYvals(gridID1, yvals);
 
-	for ( j = 0; j < ny; j++ )
-	  for ( i = 0; i < nx; i++ )
-	    {
-	      xvals2D[j*nx+i] = xvals[i];
-	      yvals2D[j*nx+i] = yvals[j];
-	    }
-
-	gridDefXvals(gridID2, xvals2D);
-	gridDefYvals(gridID2, yvals2D);
-
-	for ( j = 0; j < ny; j++ )
-	  for ( i = 0; i < nx; i++ )
-	    {
-	      xvals2D[j*nx+i] = xvals[i];
-	      yvals2D[j*nx+i] = yvals[j];
-	    }
+	if ( gridIsRotated(gridID1) )
+	  {
+	    double xpole, ypole, angle;
+	    
+	    xpole = gridInqXpole(gridID1);
+	    ypole = gridInqYpole(gridID1);
+	    angle = gridInqAngle(gridID1);
+		
+	    for ( j = 0; j < ny; j++ )
+	      for ( i = 0; i < nx; i++ )
+		{
+		  xvals2D[j*nx+i] = lamrot_to_lam(yvals[j], xvals[i], ypole, xpole, angle);
+		  yvals2D[j*nx+i] = phirot_to_phi(yvals[j], xvals[i], ypole, angle);
+		}
+	  }
+	else
+	  {
+	    for ( j = 0; j < ny; j++ )
+	      for ( i = 0; i < nx; i++ )
+		{
+		  xvals2D[j*nx+i] = xvals[i];
+		  yvals2D[j*nx+i] = yvals[j];
+		}
+	  }
 
 	gridDefXvals(gridID2, xvals2D);
 	gridDefYvals(gridID2, yvals2D);
@@ -942,23 +950,27 @@ int gridToUnstructured(int gridID1)
 	free(xvals);
 	free(yvals);
 
-	if ( xbounds )
+	if ( xbounds && ybounds )
 	  {
 	    xbounds2D = (double *) malloc(4*gridsize*sizeof(double));
-	    gridGenXbounds2D(nx, ny, xbounds, xbounds2D);
-	    gridDefXbounds(gridID2, xbounds2D);
-
-	    free(xbounds);
-	    free(xbounds2D);
-	  }
-
-	if ( ybounds )
-	  {
 	    ybounds2D = (double *) malloc(4*gridsize*sizeof(double));
-	    gridGenYbounds2D(nx, ny, ybounds, ybounds2D);
+
+	    if ( gridIsRotated(gridID1) )
+	      {
+		gridGenRotBounds(gridID1, nx, ny, xbounds, ybounds, xbounds2D, ybounds2D);
+	      }
+	    else
+	      {
+		gridGenXbounds2D(nx, ny, xbounds, xbounds2D);
+		gridGenYbounds2D(nx, ny, ybounds, ybounds2D);
+	      }
+
+	    gridDefXbounds(gridID2, xbounds2D);
 	    gridDefYbounds(gridID2, ybounds2D);
 
+	    free(xbounds);
 	    free(ybounds);
+	    free(xbounds2D);
 	    free(ybounds2D);
 	  }
 
