@@ -48,7 +48,7 @@ void *Change(void *argument)
   int taxisID1, taxisID2;
   int chints[MAXARG], nch = 0;
   char *chnames[MAXARG];
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   char *chname = NULL;
   int chcode = 0;
   int param;

@@ -286,7 +286,7 @@ void interpolate(field_t *field1, field_t *field2)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridIDi, units);
     gridToDegree(units, "grid1 center lon", nlon, lon);
     gridInqYunits(gridIDi, units);
@@ -332,7 +332,7 @@ void interpolate(field_t *field1, field_t *field2)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridIDo, units);
     gridToDegree(units, "grid2 center lon", out_nlon, lono);
     gridInqYunits(gridIDo, units);

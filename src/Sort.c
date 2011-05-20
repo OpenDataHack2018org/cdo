@@ -34,7 +34,7 @@ typedef struct
   int      levelID;
   int      code;
   double   level;
-  char     name[128];
+  char     name[CDI_MAX_NAME];
 }
 recinfo_t;
 

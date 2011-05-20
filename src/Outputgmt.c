@@ -577,7 +577,7 @@ void *Outputgmt(void *argument)
   int zaxisID, taxisID;
   int ninc = 1;
   int vdate, vtime;
-  char varname[256];
+  char varname[CDI_MAX_NAME];
   double level;
   double missval;
   double *array = NULL;
@@ -593,7 +593,7 @@ void *Outputgmt(void *argument)
   FILE *cpt_fp;
   CPT cpt;
   int grid_is_circular;
-  char units[128];
+  char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
 
   cdoInitialize(argument);

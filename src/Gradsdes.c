@@ -387,7 +387,7 @@ void *Gradsdes(void *argument)
   const char *datfile;
   char ctlfile[1024], *pctlfile;
   int len;
-  char varname[256], varlongname[256], varunits[256];
+  char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
   FILE *gdp;
   int yrev = FALSE;
   int zrev = FALSE;

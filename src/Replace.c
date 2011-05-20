@@ -42,7 +42,7 @@ void *Replace(void *argument)
   int streamID1, streamID2, streamID3;
   int vlistID1 , vlistID2, vlistID3;
   int code1 = 0, code2;
-  char varname1[128], varname2[128];
+  char varname1[CDI_MAX_NAME], varname2[CDI_MAX_NAME];
   int gridsize;
   int nmiss;
   int taxisID1, taxisID3;

@@ -142,8 +142,8 @@ void read_param(const char *paramfile, param_t *param, int maxparam, int *nparam
   int codenum, tabnum, levtype;
   int numparam = 0;
   char *datatype = NULL;
-  char *name = NULL, *itype = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
-  char varname[256];
+  char *name = NULL, *itype = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
+  char varname[CDI_MAX_NAME];
 
   fp = fopen(paramfile, "r");
   if ( fp == NULL ) cdoAbort("Open failed on %s!", paramfile);

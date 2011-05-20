@@ -186,7 +186,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 
       /* Convert lat/lon units if required */
       {
-	char units[128];
+	char units[CDI_MAX_NAME];
 	gridInqXunits(gridID1, units);
 	gridToDegree(units, "grid center lon", nlon1*nlat1, xvals1);
 	gridInqYunits(gridID1, units);
@@ -204,7 +204,7 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 
 	  /* Convert lat/lon units if required */
 	  {
-	    char units[128];
+	    char units[CDI_MAX_NAME];
 	    gridInqXunits(gridID1, units);
 	    gridToDegree(units, "grid corner lon", 4*nlon1*nlat1, grid1_corner_lon);
 	    gridInqYunits(gridID1, units);

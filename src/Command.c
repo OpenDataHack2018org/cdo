@@ -30,9 +30,9 @@
 typedef struct
 {
   int   param;
-  char  name[128];
-  char  longname[128];
-  char  units[128];
+  char  name[CDI_MAX_NAME];
+  char  longname[CDI_MAX_NAME];
+  char  units[CDI_MAX_NAME];
 } vars_t;
 
 vars_t *all_vars = NULL;

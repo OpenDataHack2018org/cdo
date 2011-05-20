@@ -62,7 +62,7 @@ void *Vertint(void *argument)
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
   char paramstr[32];
-  char varname[128], stdname[128];
+  char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   int *vars = NULL;
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;

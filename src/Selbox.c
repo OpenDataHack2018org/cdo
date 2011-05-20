@@ -38,8 +38,8 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   int i;
   int prec;
   int ilat, ilon;
-  char xname[128], xlongname[128], xunits[128];
-  char yname[128], ylongname[128], yunits[128];
+  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;
@@ -229,8 +229,8 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
   int gridsize1;
   int i, k, nv;
   int prec;
-  char xname[128], xlongname[128], xunits[128];
-  char yname[128], ylongname[128], yunits[128];
+  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;
@@ -403,8 +403,8 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
   int grid_is_circular;
-  char xunits[128];
-  char yunits[128];
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
   double xfact = 1, yfact = 1;
 
   operatorCheckArgc(4);
@@ -570,8 +570,8 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   int nvals = 0;
   int maxcell = 0;
   int cellinc = 4096;
-  char xunits[128];
-  char yunits[128];
+  char xunits[CDI_MAX_NAME];
+  char yunits[CDI_MAX_NAME];
   double xfact, yfact;
 
   operatorCheckArgc(4);

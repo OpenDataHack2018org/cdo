@@ -176,7 +176,7 @@ void writeNCgrid(const char *gridfile, int gridID, int *grid_imask)
   int gridtype;
   int gridsize;
   double *vals;
-  char units[128];
+  char units[CDI_MAX_NAME];
 
 
   gridtype = gridInqType(gridID);

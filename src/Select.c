@@ -447,8 +447,8 @@ void *Select(void *argument)
   int iparam;
   int nsel;
   char paramstr[32];
-  char varname[256];
-  char stdname[256];
+  char varname[CDI_MAX_NAME];
+  char stdname[CDI_MAX_NAME];
   char **argnames = NULL;
   int vlistID0 = -1, vlistID1 = -1, vlistID2 = -1;
   int i;

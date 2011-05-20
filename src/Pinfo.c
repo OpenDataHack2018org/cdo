@@ -45,7 +45,7 @@ void *Pinfo(void *argument)
   int nmiss;
   int ivals = 0, imiss = 0;
   int vdate, vtime;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];	  
   double missval;
   double *array1 = NULL, *array2 = NULL;

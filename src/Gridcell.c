@@ -218,7 +218,7 @@ void *Gridcell(void *argument)
 	  long i, j, xsize, ysize;
 	  double *xv, *yv;
 	  double len1 = 0, len2 = 0;
-	  char units[128];
+	  char units[CDI_MAX_NAME];
 
 	  if ( gridtype != GRID_CURVILINEAR )
 	    gridID = gridToCurvilinear(gridID);

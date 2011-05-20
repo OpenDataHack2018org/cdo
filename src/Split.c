@@ -266,7 +266,7 @@ void *Split(void *argument)
     }
   else if ( operatorID == SPLITNAME )
     {
-      char varname[128];
+      char varname[CDI_MAX_NAME];
       nsplit = nvars;
 
       vlistIDs  = (int *) malloc(nsplit*sizeof(int));

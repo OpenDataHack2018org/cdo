@@ -49,7 +49,7 @@ void *Change_e5slm(void *argument)
 {
   int streamIDslm, streamID1, streamID2;
   const char *fn_slm;
-  char name[256];
+  char name[CDI_MAX_NAME];
   int nrecs, code;
   int tsID, recID, varID, levelID;
   int gridsize;

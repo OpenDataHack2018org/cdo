@@ -54,7 +54,7 @@ void rot_uv_back(int gridID, double *us, double *vs)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
     gridToDegree(units, "xpole", 1, &xpole);
     gridToDegree(units, "grid center lon", nlon, xvals);
@@ -103,7 +103,7 @@ void *Rotuv(void *argument)
   int lfound[MAXARG];
   int chcodes[MAXARG];
   char *chvars[MAXARG];
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   int taxisID1, taxisID2;
   int *recVarID, *recLevelID;
   int **varnmiss;

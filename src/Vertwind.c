@@ -48,7 +48,7 @@ void *Vertwind(void *argument)
   int ngp = 0, ngrids;
   int temp_code, sq_code, ps_code, omega_code, lsp_code;
   int tempID = -1, sqID = -1, psID = -1, omegaID = -1, lnpsID = -1;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   double *vct = NULL;
   double tv, rho;
   double *level = NULL;

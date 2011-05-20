@@ -44,7 +44,7 @@ void *Arithlat(void *argument)
   int taxisID1, taxisID2;
   int nmiss;
   long gridsize, i;
-  char units[128];
+  char units[CDI_MAX_NAME];
   double *scale = NULL;
   double *array = NULL;
 

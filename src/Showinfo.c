@@ -56,8 +56,8 @@ void *Showinfo(void *argument)
   int vlistID;
   int year, month, day;
   int month0 = 0, nmonth, year0 = 0, nyear;
-  char varname[256];
-  char stdname[256];
+  char varname[CDI_MAX_NAME];
+  char stdname[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];
 
   cdoInitialize(argument);

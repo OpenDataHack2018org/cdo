@@ -179,7 +179,7 @@ void *Filedes(void *argument)
   else if ( operatorID == PARDES )
     {
       int varID, code;
-      char varname[128], varlongname[128], varunits[128];
+      char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -204,7 +204,7 @@ void *Filedes(void *argument)
     {
       int varID, code, tabnum, tableID, prec;
       char pstr[4];
-      char varname[128], varlongname[128], varstdname[128], varunits[128];
+      char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
       int natts;
       
       if (  operatorID == PARTAB2 )

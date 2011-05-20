@@ -84,7 +84,7 @@ void gen_index(int gridID1, int gridID2, int *index)
 
       /* Convert lat/lon units if required */
       {
-	char units[128];
+	char units[CDI_MAX_NAME];
 	gridInqXunits(gridID1, units);
 	gridToDegree(units, "grid1 center lon", nlon1, xvals1);
 	gridInqYunits(gridID1, units);
@@ -96,7 +96,7 @@ void gen_index(int gridID1, int gridID2, int *index)
 
       /* Convert lat/lon units if required */
       {
-	char units[128];
+	char units[CDI_MAX_NAME];
 	gridInqXunits(gridID2, units);
 	gridToDegree(units, "grid2 center lon", nlon2, xvals2);
 	gridInqYunits(gridID2, units);

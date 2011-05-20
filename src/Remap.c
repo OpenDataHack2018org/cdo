@@ -179,7 +179,7 @@ void *Remap(void *argument)
   int lgridboxinfo = TRUE;
   int grid1sizemax;
   short *remapgrids = NULL;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   double missval;
   double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;

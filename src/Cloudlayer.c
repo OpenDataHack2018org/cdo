@@ -139,7 +139,7 @@ void *Cloudlayer(void *argument)
   int aclcacID = -1;
   int nvars2 = 0;
   int kmin[NVARS], kmax[NVARS];
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   double sfclevel = 0;
   double *plevs = NULL;
   double *aclcac = NULL;

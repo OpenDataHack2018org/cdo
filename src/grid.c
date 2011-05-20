@@ -604,7 +604,7 @@ int gridToCurvilinear(int gridID1)
 	double *xvals2D, *yvals2D;
 	double *xbounds = NULL, *ybounds = NULL;
 	double *xbounds2D, *ybounds2D;
-	char xunits[128], yunits[128];
+	char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
 	double xscale = 1, yscale = 1;
 
 	nx = gridInqXsize(gridID1);
@@ -1340,7 +1340,7 @@ int gridGenArea(int gridID, double *area)
   
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
 
     gridInqXunits(gridID, units);
 

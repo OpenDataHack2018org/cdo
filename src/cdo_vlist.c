@@ -127,7 +127,7 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 
       if ( (flag & CMP_NAME) && nvars > 1 )
 	{
-	  char name1[256], name2[256];
+	  char name1[CDI_MAX_NAME], name2[CDI_MAX_NAME];
 	  vlistInqVarName(vlistID1, varID, name1);
 	  vlistInqVarName(vlistID2, varID, name2);
 	  if ( strcmp(name1, name2) != 0 )

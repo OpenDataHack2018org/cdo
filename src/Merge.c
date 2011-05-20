@@ -32,7 +32,7 @@
 static
 void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 {
-  char vname1[128], vname2[128];
+  char vname1[CDI_MAX_NAME], vname2[CDI_MAX_NAME];
   int k;
   int gridID1, gridID2;
   int zaxisID1, zaxisID2;

@@ -190,8 +190,8 @@ void *Set(void *argument)
 	  int nml_index = 0;
 	  int codenum, tabnum, levtype;
 	  char *datatype = NULL;
-	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[256] = "", units[256] = "";
-	  char varname[256];
+	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
+	  char varname[CDI_MAX_NAME];
 
 	  partab = operatorArgv()[0];
 	  fp = fopen(partab, "r");

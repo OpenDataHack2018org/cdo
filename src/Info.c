@@ -237,7 +237,7 @@ void *Info(void *argument)
   int number;
   int ivals = 0, nvals = 0;
   int imiss = 0;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
   double missval;

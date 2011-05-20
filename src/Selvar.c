@@ -61,10 +61,10 @@ void *Selvar(void *argument)
   int *selfound = NULL;
   double *fltarr = NULL;
   char paramstr[32];
-  char varname[256];
-  char stdname[256];
-  char gridname[256];
-  char zaxisname[256];
+  char varname[CDI_MAX_NAME];
+  char stdname[CDI_MAX_NAME];
+  char gridname[CDI_MAX_NAME];
+  char zaxisname[CDI_MAX_NAME];
   char **argnames = NULL;
   int vlistID1 = -1, vlistID2 = -1;
   int isel;

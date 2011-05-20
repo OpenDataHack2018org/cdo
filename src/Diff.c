@@ -48,7 +48,7 @@ void *Diff(void *argument)
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   int cmpflag;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];	  
   double *array1, *array2;

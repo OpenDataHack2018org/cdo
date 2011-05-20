@@ -32,7 +32,7 @@ void *Setrcaname(void *argument)
   char **rcsnames;
   FILE *fp;
   char line[MAX_LINE_LEN];
-  char sname[256], sdescription[256], sunits[256];
+  char sname[CDI_MAX_NAME], sdescription[CDI_MAX_NAME], sunits[CDI_MAX_NAME];
   int scode, sltype, slevel;
   int nvars;
   int zaxisID, ltype, code, nlev;

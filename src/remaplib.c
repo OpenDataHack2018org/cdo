@@ -614,7 +614,7 @@ void check_lat_boundbox_range(long nlats, restr_t *restrict bound_box, double *r
 static
 int expand_lonlat_grid(int gridID)
 {
-  char units[128];
+  char units[CDI_MAX_NAME];
   int gridIDnew;
   long nx, ny, nxp4, nyp4;
   double *xvals, *yvals;
@@ -666,7 +666,7 @@ int expand_lonlat_grid(int gridID)
 static
 int expand_curvilinear_grid(int gridID)
 {
-  char units[128];
+  char units[CDI_MAX_NAME];
   int gridIDnew;
   long gridsize, gridsize_new;
   long nx, ny, nxp4, nyp4;
@@ -945,7 +945,7 @@ void calc_lonlat_bins(remapgrid_t *rg, int map_type)
 
 void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg)
 {
-  char units[128];
+  char units[CDI_MAX_NAME];
   long i, i4;
   long nx, ny;
   long grid1_size, grid2_size;

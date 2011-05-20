@@ -226,7 +226,7 @@ void *Remapeta(void *argument)
   int nvct1, nvct2 = 0;
   int geopID = -1, tempID = -1, sqID = -1, psID = -1, lnpsID = -1, presID = -1;
   int code;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   double *single2;
   int taxisID1, taxisID2;
   int lhavevct;

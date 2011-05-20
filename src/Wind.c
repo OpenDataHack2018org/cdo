@@ -54,7 +54,7 @@ void *Wind(void *argument)
   int offset;
   SPTRANS *sptrans = NULL;
   DVTRANS *dvtrans = NULL;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   double *array1 = NULL;
   double *ivar1 = NULL, *ivar2 = NULL, *ovar1 = NULL, *ovar2 = NULL;
 

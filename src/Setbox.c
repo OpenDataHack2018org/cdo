@@ -59,7 +59,7 @@ void genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, in
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
     gridToDegree(units, "grid center lon", nlon1, xvals1);
     gridInqYunits(gridID1, units);

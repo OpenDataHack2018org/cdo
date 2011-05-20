@@ -62,7 +62,7 @@ void *Output(void *argument)
   double xdate;
   double missval;
   double lon, lat;
-  char name[128];
+  char name[CDI_MAX_NAME];
   int len;
   int npar = 0;
   int year, month, day;
@@ -169,7 +169,7 @@ void *Output(void *argument)
 
 	  /* Convert lat/lon units if required */
 	  {
-	    char units[128];
+	    char units[CDI_MAX_NAME];
 	    gridInqXunits(gridID, units);
 	    gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
 	    gridInqYunits(gridID, units);

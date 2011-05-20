@@ -35,8 +35,8 @@ int gentpngrid(int gridID1)
   int nlon2, nlat2;
   int prec;
   int ilat, ilon, ilonr, k, kr;
-  char xname[128], xlongname[128], xunits[128];
-  char yname[128], ylongname[128], yunits[128];
+  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;
@@ -185,8 +185,8 @@ int gengrid(int gridID1, int lhalo, int rhalo)
   int i;
   int prec;
   int ilat, ilon;
-  char xname[128], xlongname[128], xunits[128];
-  char yname[128], ylongname[128], yunits[128];
+  char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
+  char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
   double *xvals2 = NULL, *yvals2 = NULL;
   double *xbounds1 = NULL, *ybounds1 = NULL;

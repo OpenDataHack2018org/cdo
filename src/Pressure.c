@@ -52,7 +52,7 @@ void *Pressure(void *argument)
   int nvct;
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, pvarID;
   int code;
-  char varname[128];
+  char varname[CDI_MAX_NAME];
   double *vct = NULL;
   double *rvct = NULL; /* reduced VCT for LM */
   double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap_fl = NULL;

@@ -275,7 +275,7 @@ void *Mrotuv(void *argument)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
     gridToDegree(units, "grid center lon", gridsize, grid1x);
     gridInqYunits(gridID1, units);

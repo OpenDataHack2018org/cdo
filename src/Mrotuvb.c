@@ -329,7 +329,7 @@ void *Mrotuvb(void *argument)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
     gridToDegree(units, "grid1 center lon", gridsize, grid1x);
     gridInqYunits(gridID1, units);
@@ -341,7 +341,7 @@ void *Mrotuvb(void *argument)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridID2, units);
     gridToDegree(units, "grid2 center lon", gridsize, grid2x);
     gridInqYunits(gridID2, units);

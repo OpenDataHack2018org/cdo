@@ -113,7 +113,7 @@ void *Mastrfu(void *argument)
   if ( zaxisInqType(zaxisID) != ZAXIS_PRESSURE &&
        zaxisInqType(zaxisID) != ZAXIS_GENERIC )
     {
-      char longname[128];
+      char longname[CDI_MAX_NAME];
       zaxisInqLongname(zaxisID, longname);
       cdoWarning("Unexpected vertical grid %s!", longname);
     }

@@ -774,7 +774,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   int iattr;
   float fattr;
   double dattr;
-  char attname[256];
+  char attname[CDI_MAX_NAME];
   H5T_class_t  type_class;
   H5T_class_t atype_class;
   size_t atype_size;
@@ -790,7 +790,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   int len;
   int dtype = DATATYPE_FLT32;
   char attstring[4096];     /* Buffer to read string attribute back */
-  char varname[256];
+  char varname[CDI_MAX_NAME];
   short *mask = NULL;
   double minval, maxval;
   int nmiss;
@@ -1321,7 +1321,7 @@ static
 void get_global_att(hid_t file_id, const char *obj_path, int vlistID)
 {
   hid_t   attr, atype, atype_mem, obj_id, grp_id = -1;
-  char attname[256];
+  char attname[CDI_MAX_NAME];
   H5T_class_t  type_class;
   int attint;
   double attflt;
@@ -1378,8 +1378,8 @@ int get_vdate(int vlistID)
   int vdate = 0;
   int natts;
   int i, len, type;
-  char name[256];
-  char attstr[256];
+  char name[CDI_MAX_NAME];
+  char attstr[CDI_MAX_NAME];
 
   vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
 
@@ -1391,7 +1391,7 @@ int get_vdate(int vlistID)
 	  if ( strcmp(name, "DateAndTime") == 0 ||
 	       strcmp(name, "Date_Time") == 0 )
 	    {
-	      vlistInqAttTxt(vlistID, CDI_GLOBAL, name, 256, attstr);
+	      vlistInqAttTxt(vlistID, CDI_GLOBAL, name, CDI_MAX_NAME, attstr);
 	      if ( len > 8 ) len = 8;
 	      attstr[len] = 0;
 	      vdate = atoi(attstr);

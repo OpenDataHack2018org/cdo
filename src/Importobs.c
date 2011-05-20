@@ -155,7 +155,7 @@ void *Importobs(void *argument)
 
   /* Convert lat/lon units if required */
   {
-    char units[128];
+    char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
     gridToDegree(units, "grid center lon", gridsize, xvals);
     gridInqYunits(gridID, units);

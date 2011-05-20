@@ -38,9 +38,9 @@ typedef struct {
   int     vctsize;
   int     type;
   int     size;
-  char    name[128];
-  char    longname[256];
-  char    units[128];
+  char    name[CDI_MAX_NAME];
+  char    longname[CDI_MAX_NAME];
+  char    units[CDI_MAX_NAME];
 }
 zaxis_t;
 

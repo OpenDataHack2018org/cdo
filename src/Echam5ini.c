@@ -700,7 +700,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   int nvdims, nvatts;
   int dimidsp[9];
   int max_vars = 4096;
-  char name[256];
+  char name[CDI_MAX_NAME];
   int lon_dimid, lat_dimid, nhgl_dimid, nlevp1_dimid, spc_dimid, nvclev_dimid;
   int complex_dimid, nmp1_dimid, belowsurface_dimid, lev_dimid, ilev_dimid;
   int /* surface_dimid, height2m_dimid, height10m_dimid,*/ n2_dimid;
@@ -712,7 +712,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
   double attflt;
   size_t attlen, dimlen;
   nc_type xtype;
-  char attname[256];
+  char attname[CDI_MAX_NAME];
   const int attstringlen = 8192; char attstring[8192];
 
   /* open file and check file type */
@@ -1516,7 +1516,7 @@ void *Echam5ini(void *argument)
     {
       VAR *vars = NULL;
       int code, gridID, zaxisID, gridtype, zaxistype, gridsize, nlev;
-      char name[256], longname[256], units[256];
+      char name[CDI_MAX_NAME], longname[CDI_MAX_NAME], units[CDI_MAX_NAME];
       int taxisID, vdate, vtime;
       int ntr = 0;
 

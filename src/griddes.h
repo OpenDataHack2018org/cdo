@@ -52,12 +52,12 @@ typedef struct {
   int     nd, ni, ni2, ni3;
   int     number, position;
   char    path[16384];
-  char    xname[128];
-  char    xlongname[128];
-  char    xunits[128];
-  char    yname[128];
-  char    ylongname[128];
-  char    yunits[128];
+  char    xname[CDI_MAX_NAME];
+  char    xlongname[CDI_MAX_NAME];
+  char    xunits[CDI_MAX_NAME];
+  char    yname[CDI_MAX_NAME];
+  char    ylongname[CDI_MAX_NAME];
+  char    yunits[CDI_MAX_NAME];
 }
 grid_t;
 
