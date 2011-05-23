@@ -278,10 +278,11 @@ while (<MOFILE>) {
       if ( $chap eq "Statistical values" ) {
 	print TRCARD "\\noindent\n";
 	print TRCARD "\\hspace*{0.5in}\n";
-	print TRCARD "\\begin{tabular*}{2.8in}{|l|l|} \\hline\n";
-	print TRCARD "\\rowcolor{pgreen}\n";
+	print TRCARD "\\begin{tabular*}{2.8in}{|>{\\columncolor{pcolor1}}l>{\\columncolor{pcolor2}}l|} \\hline\n";
+	print TRCARD "\\rowcolor{pcolor3}\n";
 	print TRCARD "\\makebox[1.8in][c]{Available statistical functions} &\n";
-	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \\hline\n";
+	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \n";
+#	print TRCARD "\\makebox[0.65in][c]{\$<\\!stat\\!>\$} \\\\ \\hline\n";
 	print TRCARD "minimum  & {\\bf min}   \\\\ \n";
 	print TRCARD "maximum  & {\\bf max}   \\\\ \n";
 	print TRCARD "sum      & {\\bf sum}  \\\\ \n";
@@ -361,7 +362,7 @@ while (<MOFILE>) {
 
     if ( $refskip == 0 ) {
       print TRCARD "\\noindent\n";
-      print TRCARD "\\begin{tabular*}{$len1}{|>{\\columncolor{pyellow}}ll|} \\hline\n";
+      print TRCARD "\\begin{tabular*}{$len1}{|>{\\columncolor{pcolor2}}l>{\\columncolor{pcolor1}}l|} \\hline\n";
     }
 
     print HELPFILE "    \"NAME\",\n";
@@ -630,7 +631,7 @@ while (<MOFILE>) {
       if ( "$otitle" ne "" ) {
 	if ( $refskip == 0 && $xopercnt > 1 && "$oparameter" ne "$operpara" ) {
 #	  print TRCARD "\\rowcolor[gray]{.9}\n";
-	  print TRCARD "\\multicolumn{2}{|>{\\columncolor{pgreen}}l|}";
+	  print TRCARD "\\multicolumn{2}{|>{\\columncolor{pcolor3}}l|}";
 	  if ( $xopercnt == 2 ) {
 	    print TRCARD "{{\\bf $opernamex}{\\sl $operpara} \ {\\tt $marguments}} ";
 	  } else {
@@ -992,7 +993,7 @@ while (<MOFILE>) {
 
     if ( $refskip == 0 ) {
 #     print TRCARD "\\rowcolor[gray]{.9}\n";
-      print TRCARD "\\multicolumn{2}{|>{\\columncolor{pgreen}}l|}";
+      print TRCARD "\\multicolumn{2}{|>{\\columncolor{pcolor3}}l|}";
     }
     if ( "$opername" eq "selpctl" )  {
       $marguments =~ s/ifile/in/og;
@@ -1104,16 +1105,16 @@ sub print_description {
       print TRFILE "\n";
       $math = 0;
 #    } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
-#      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{pyellow}, basicstyle=\\small]\n";
+#      print TRFILE "\\begin{lstlisting}[backgroundcolor=\\color{pcolor1}, basicstyle=\\small]\n";
 #      $verb = 1;
     } elsif ( "$kword" eq "\@BEGINVERBATIM" ) {
-      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{pgreen}, basicstyle=\\ttfamily, columns=flexible]\n";
+      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{pcolor2}, basicstyle=\\ttfamily, columns=flexible]\n";
       $verb = 1;
     } elsif ( "$kword" eq "\@ENDVERBATIM" ) {
       print TRFILE "\\end{lstlisting}\n";
       $verb = 0;
     } elsif ( "$kword" eq "\@BEGINLISTING" ) {
-      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{pyellow}, basicstyle=\\small]\n";
+      print TRFILE "\\begin{lstlisting}[frame=single, backgroundcolor=\\color{pcolor1}, basicstyle=\\small]\n";
       $text = 1;
     } elsif ( "$kword" eq "\@ENDLISTING" ) {
       print TRFILE "\\end{lstlisting}\n";

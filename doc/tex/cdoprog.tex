@@ -1,6 +1,6 @@
-\definecolor{pyellow}{rgb}{1, 0.98, 0.86}
-\definecolor{pgreen}{rgb}{1, 0.925, 0.70}
-%\definecolor{pgreen}{rgb}{0.92, 1, 0.91}
+\definecolor{pcolor1}{rgb}{0.992, 0.980, 0.875}  % rgb: 253/250/223
+\definecolor{pcolor2}{rgb}{1.000, 0.925, 0.698}  % rgb: 255/236/178
+\definecolor{pcolor3}{rgb}{0.968, 0.756, 0.623}  % rgb: 247/193/159
 
 \newcommand{\CDO}{{\bfseries\sffamily CDO\ }}
 \newcommand{\cdologo}{\includegraphics{logo/cdo_logo}}
@@ -37,28 +37,28 @@
 \vspace*{2mm}
 \subsection*{Options}
 \noindent
-\begin{tabular*}{3.95in}{|>{\columncolor{pyellow}}ll|} \hline
-\makebox[0.85in][l]{{\bf{-a}}                  } & \makebox[2.76in][l]{Generate an absolute time axis} \\ \hline
+\begin{tabular*}{3.95in}{|>{\columncolor{pcolor2}}l>{\columncolor{pcolor1}}l|} \hline
+\makebox[0.85in][l]{{\bf{-a}}                  } & \makebox[2.76in][l]{Generate an absolute time axis} \\ %\hline
 \makebox[0.85in][l]{{\bf{-b}} $<\!nbits\!>$    } & \makebox[2.76in][l]{Set the number of bits for the output precision} \\
                                                  & (I8/I16/I32/F32/F64 for nc,nc2,nc4,nc4c; \\
                                                  &  F32/F64 for srv,ext,ieg;  1-24 for grb,grb2) \\
-                                                 & Add L or B for Little or Big endian byteorder\\ \hline
-\makebox[0.85in][l]{{\bf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Outputformat: grb,grb2,nc,nc2,nc4,nc4c,srv,ext,ieg} \\ \hline
+                                                 & Add L or B for Little or Big endian byteorder\\ %\hline
+\makebox[0.85in][l]{{\bf{-f}} $<\!format\!>$   } & \makebox[2.76in][l]{Outputformat: grb,grb2,nc,nc2,nc4,nc4c,srv,ext,ieg} \\ %\hline
 \makebox[0.85in][l]{{\bf{-g}} $<\!grid\!>$     } & \makebox[2.76in][l]{Grid or file name} \\
-                                                 & Grid names: {\tt r<NX>x<NY>}, {\tt n<N>}, {\tt gme<NI>} \\ \hline
-\makebox[0.85in][l]{{\bf{-h}}                  } & \makebox[2.76in][l]{Help information for the operators} \\ \hline
-\makebox[0.85in][l]{{\bf{-M}}                  } & \makebox[2.76in][l]{Indicate that the I/O streams have missing values} \\ \hline
-\makebox[0.85in][l]{{\bf{-m}} $<\!missval\!>$  } & \makebox[2.76in][l]{Set the default missing value (default: {\tt-9e+33})} \\ \hline 
-\makebox[0.85in][l]{{\bf{-O}}                  } & \makebox[2.76in][l]{Overwrite existing output file, if checked} \\ \hline
-\makebox[0.85in][l]{{\bf{-R}}                  } & \makebox[2.76in][l]{Convert GRIB1 data from reduced to regular grid} \\ \hline
-\makebox[0.85in][l]{{\bf{-r}}                  } & \makebox[2.76in][l]{Generate a relative time axis} \\ \hline
-\makebox[0.85in][l]{{\bf{-s}}                  } & \makebox[2.76in][l]{Silent mode} \\ \hline
+                                                 & Grid names: {\tt r<NX>x<NY>}, {\tt n<N>}, {\tt gme<NI>} \\ %\hline
+\makebox[0.85in][l]{{\bf{-h}}                  } & \makebox[2.76in][l]{Help information for the operators} \\ %\hline
+\makebox[0.85in][l]{{\bf{-M}}                  } & \makebox[2.76in][l]{Indicate that the I/O streams have missing values} \\ %\hline
+\makebox[0.85in][l]{{\bf{-m}} $<\!missval\!>$  } & \makebox[2.76in][l]{Set the default missing value (default: {\tt-9e+33})} \\ %\hline 
+\makebox[0.85in][l]{{\bf{-O}}                  } & \makebox[2.76in][l]{Overwrite existing output file, if checked} \\ %\hline
+\makebox[0.85in][l]{{\bf{-R}}                  } & \makebox[2.76in][l]{Convert GRIB1 data from reduced to regular grid} \\ %\hline
+\makebox[0.85in][l]{{\bf{-r}}                  } & \makebox[2.76in][l]{Generate a relative time axis} \\ %\hline
+\makebox[0.85in][l]{{\bf{-s}}                  } & \makebox[2.76in][l]{Silent mode} \\ %\hline
 \makebox[0.85in][l]{{\bf{-t}} $<\!table\!>$    } & \makebox[2.76in][l]{Set the parameter table name or file} \\
-                                                 & Predefined tables:  echam4 echam5 mpiom1 \\ \hline
-\makebox[0.85in][l]{{\bf{-V}}                  } & \makebox[2.76in][l]{Print the version number} \\ \hline
-\makebox[0.85in][l]{{\bf{-v}}                  } & \makebox[2.76in][l]{Print extra details for some operators} \\ \hline
+                                                 & Predefined tables:  echam4 echam5 mpiom1 \\ %\hline
+\makebox[0.85in][l]{{\bf{-V}}                  } & \makebox[2.76in][l]{Print the version number} \\ %\hline
+\makebox[0.85in][l]{{\bf{-v}}                  } & \makebox[2.76in][l]{Print extra details for some operators} \\ %\hline
 \makebox[0.85in][l]{{\bf{-z}} szip             } & \makebox[2.76in][l]{SZIP compression of GRIB1 records} \\ \hline
-% \makebox[0.85in][l]{{\bf{\ \ }} jpeg            } & \makebox[2.76in][l]{JPEG compression of GRIB2 records} \\ \hline
-% \makebox[0.85in][l]{{\bf{\ \ }} zip            } & \makebox[2.76in][l]{Deflate compression of netCDF4 variables} \\ \hline
+% \makebox[0.85in][l]{{\bf{\ \ }} jpeg            } & \makebox[2.76in][l]{JPEG compression of GRIB2 records} \\ %\hline
+% \makebox[0.85in][l]{{\bf{\ \ }} zip            } & \makebox[2.76in][l]{Deflate compression of netCDF4 variables} \\ %\hline
 \end{tabular*}
 

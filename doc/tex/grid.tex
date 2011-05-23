@@ -68,7 +68,7 @@ with netCDF support.
 
 %\begin{minipage}[t]{\textwidth}
 SCRIP grid description example of a curvilinear MPIOM \cite{MPIOM} GROB3 grid (only the netCDF header):
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pyellow}, basicstyle=\footnotesize]
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
     netcdf grob3s {
     dimensions:
             grid_size = 12120 ;
@@ -109,7 +109,7 @@ For more information about this format see \cite{PINGO}.
 
 %\begin{minipage}[t]{\textwidth}
 PINGO grid description example of a T21 gaussian grid:
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pyellow}, basicstyle=\footnotesize]
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
     Grid Description File
     (Comments start at non digit characters and end at end of line)
     First part: The dimensions.
@@ -182,10 +182,10 @@ with respect to the different grid types.
 
 \vspace{2mm}
 \hspace{2cm}
-\begin{tabular}[c]{|>{\columncolor{pyellow}}l|c|c|c|c|}
+\begin{tabular}[c]{|>{\columncolor{pcolor1}}l|c|c|c|c|}
 \hline
-\rowcolor{pyellow}
-\cellcolor{pgreen}
+\rowcolor{pcolor1}
+\cellcolor{pcolor2}
 gridtype   & lonlat      & gaussian    & curvilinear & unstructured \\
 \hline
 gridsize   & xsize*ysize & xsize*ysize & xsize*ysize & {\bf ncell} \\
@@ -231,7 +231,7 @@ The grid cell corners xbounds and ybounds have to rotate counterclockwise.
 
 %\begin{minipage}[t]{\textwidth}
 {\CDO} grid description example of a T21 gaussian grid:
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pyellow}, basicstyle=\footnotesize]
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
     gridtype = gaussian
     xsize    = 64
     ysize    = 32
@@ -248,7 +248,7 @@ The grid cell corners xbounds and ybounds have to rotate counterclockwise.
 
 %\begin{minipage}[t]{\textwidth}
 {\CDO} grid description example of a global regular grid with 60x30 points:
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pyellow}, basicstyle=\footnotesize]
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
     gridtype = lonlat
     xsize    =   60
     ysize    =   30
@@ -269,7 +269,7 @@ are for the rotated system.
 
 %\begin{minipage}[t]{\textwidth}
 {\CDO} grid description example of a regional rotated lon/lat grid:
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pyellow}, basicstyle=\footnotesize]
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
     gridtype = lonlat
     xsize    = 81
     ysize    = 91
