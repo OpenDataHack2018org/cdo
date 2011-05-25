@@ -93,6 +93,7 @@ typedef struct {
   restr_t *grid1_bound_box;    /* lat/lon bounding box for use    */
   restr_t *grid2_bound_box;    /* in restricting grid searches    */
 
+  double   threshhold;         /* threshold for coord transformation */
   int      restrict_type;
   int      num_srch_bins;      /* num of bins for restricted srch */
 

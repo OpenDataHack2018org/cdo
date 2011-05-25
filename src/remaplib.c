@@ -39,7 +39,7 @@
 */
 /*
   2011-01-07 Uwe Schulzweida: Changed remap weights from 2D to 1D array
-  2009-05-25 Uwe Schulzweida: Changed restict data type from double to int
+  2009-05-25 Uwe Schulzweida: Changed restrict data type from double to int
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
@@ -111,10 +111,10 @@ typedef struct
 #define  PIH      HALF*PI
 
 
-/* static double north_thresh = 1.45;  */ /* threshold for coord transf. */
-/* static double south_thresh =-2.00;  */ /* threshold for coord transf. */
-static double north_thresh = 2.00;  /* threshold for coord transf. */
-static double south_thresh =-2.00;  /* threshold for coord transf. */
+/* static double north_thresh =  1.45;  */ /* threshold for coord transformation */
+/* static double south_thresh = -2.00;  */ /* threshold for coord transformation */
+static double north_thresh =  2.00;  /* threshold for coord transformation */
+static double south_thresh = -2.00;  /* threshold for coord transformation */
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
@@ -955,6 +955,11 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
   int gridID2_gme = -1;
 
   rg->store_link_fast = FALSE;
+
+  north_thresh =  rg->threshhold;
+  south_thresh = -rg->threshhold;
+
+  if ( cdoVerbose ) cdoPrint("threshhold: north=%g  south=%g", north_thresh, south_thresh);
 
   if ( lextrapolate > 0 )
     rg->lextrapolate = TRUE;
@@ -2922,8 +2927,8 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #define  num_neighbors  4  /* num nearest neighbors to interpolate from */
 
 static
-void get_restict_add(remapgrid_t *rg, double plat, double plon, const int *restrict src_bin_add,
-		     long *minadd, long *maxadd)
+void get_restrict_add(remapgrid_t *rg, double plat, double plon, const int *restrict src_bin_add,
+		      long *minadd, long *maxadd)
 {
   long n, nmax;
   long min_add = 0, max_add = 0, nm1, np1, i, j, ip1, im1, jp1, jm1;
@@ -3033,7 +3038,7 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
   /* Loop over source grid and find nearest neighbors                         */
   /* restrict the search using search bins expand the bins to catch neighbors */
 
-  get_restict_add(rg, plat, plon, src_bin_add, &min_add, &max_add);
+  get_restrict_add(rg, plat, plon, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; n++ )
@@ -3279,7 +3284,7 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
   /* Loop over source grid and find nearest neighbors                         */
   /* restrict the search using search bins expand the bins to catch neighbors */
 
-  get_restict_add(rg, plat, plon, src_bin_add, &min_add, &max_add);
+  get_restrict_add(rg, plat, plon, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
   nbr_add[0]  = 0;
@@ -4801,8 +4806,8 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   int lcheck = TRUE;
 
   long ioffset;
-  int max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
-                           /* 1000 is too small!!! */
+  long max_subseg = 100000; /* max number of subsegments per segment to prevent infinite loop */
+                            /* 1000 is too small!!! */
   long grid1_size;
   long grid2_size;
   long grid1_corners;
@@ -4813,7 +4818,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   long corner;          /* corner of cell that segment starts from */
   long next_corn;       /* corner of cell that segment ends on     */
   long nbins, num_links;
-  int num_subseg;       /* number of subsegments                   */
+  long num_subseg;      /* number of subsegments                   */
 
   int lcoinc;           /* flag for coincident segments            */
   int lrevers;          /* flag for reversing direction of segment */
@@ -5022,10 +5027,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
           endlon = rg->grid1_corner_lon[ioffset+next_corn];
           lrevers = FALSE;
 
-          /* 
-	     To ensure exact path taken during both
-	     sweeps, always integrate segments in the same direction (SW to NE).
-          */
+	  /*  To ensure exact path taken during both sweeps, always integrate segments in the same direction (SW to NE). */
           if ( (endlat < beglat) || (IS_EQUAL(endlat, beglat) && endlon < beglon) )
 	    {
 	      beglat = rg->grid1_corner_lat[ioffset+next_corn];
@@ -5052,13 +5054,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	      */
 	      while ( IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon) )
 		{
- 		  /*
-		    Prevent infinite loops if integration gets stuck
-		    near cell or threshold boundary
-		  */
+		  /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
 		  num_subseg++;
 		  if ( num_subseg >= max_subseg )
-		    cdoAbort("Integration stalled 1: num_subseg exceeded limit");
+		    cdoAbort("Integration stalled: num_subseg exceeded limit (grid1[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+			     grid1_add, beglon, endlon, beglat, endlat);
 
 		  /* Uwe Schulzweida: skip very small regions */
 		  if ( num_subseg%1000 == 0 )
@@ -5066,7 +5066,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
 			{
 			  if ( cdoVerbose )
-			    cdoPrint("Skip very small region (grid1[%d]): lon = %g dlon = %g lat = %g dlat = %g",
+			    cdoPrint("Skip very small region (grid1[%d]): lon=%g dlon=%g lat=%g dlat=%g",
 				     grid1_add, beglon, endlon-beglon, beglat, endlat-beglat);
 			  break;
 			}
@@ -5084,13 +5084,13 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 			       &avoid_pole_count, &avoid_pole_offset);
 
 #if defined (_OPENMP)
-		  if ( lthresh )
+		  if ( lthresh && ompNumThreads > 1 )
 		    {
 		      lthresh = FALSE;
 		      if ( lwarn )
 			{
 			  lwarn = FALSE;
-			  printf("Warning: lthresh is enabled, may give wrong result with OpenMP!\n");
+			  cdoWarning("lthresh is enabled, may give wrong result with OpenMP!");
 			}
 		    }
 #endif
@@ -5135,7 +5135,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  grid1_centroid_lon[grid1_add] += weights[2];
 
 		  /* Reset beglat and beglon for next subsegment. */
-
 		  beglat = intrsct_lat;
 		  beglon = intrsct_lon;
 		}
@@ -5258,11 +5257,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
           endlon = rg->grid2_corner_lon[ioffset+next_corn];
           lrevers = FALSE;
 
-	  /*
-             To ensure exact path taken during both
-             sweeps, always integrate in the same direction
-          */
-
+	  /* To ensure exact path taken during both sweeps, always integrate in the same direction */
           if ( (endlat < beglat) || (IS_EQUAL(endlat, beglat) && endlon < beglon) )
 	    {
 	      beglat = rg->grid2_corner_lat[ioffset+next_corn];
@@ -5289,13 +5284,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	      */
 	      while ( IS_NOT_EQUAL(beglat, endlat) || IS_NOT_EQUAL(beglon, endlon) )
 		{
- 		  /*
-		    Prevent infinite loops if integration gets stuck
-		    near cell or threshold boundary
-		  */
+		  /*  Prevent infinite loops if integration gets stuck near cell or threshold boundary */
 		  num_subseg++;
 		  if ( num_subseg >= max_subseg )
-		    cdoAbort("Integration stalled 2: num_subseg exceeded limit");
+		    cdoAbort("Integration stalled: num_subseg exceeded limit (grid2[%d]: lon1=%g lon2=%g lat1=%g lat2=%g)!",
+			     grid2_add, beglon, endlon, beglat, endlat);
 
 		  /* Uwe Schulzweida: skip very small regions */
 		  if ( num_subseg%1000 == 0 )
@@ -5303,7 +5296,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		      if ( fabs(beglat-endlat) < 1.e-10 || fabs(beglon-endlon) < 1.e-10 )
 			{
 			  if ( cdoVerbose )
-			    cdoPrint("Skip very small region (grid2[%d]): lon = %g dlon = %g lat = %g dlat = %g",
+			    cdoPrint("Skip very small region (grid2[%d]): lon=%g dlon=%g lat=%g dlat=%g",
 				     grid2_add, beglon, endlon-beglon, beglat, endlat-beglat);
 			  break;
 			}
@@ -5321,13 +5314,13 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 			       &avoid_pole_count, &avoid_pole_offset);
 
 #if defined (_OPENMP)
-		  if ( lthresh )
+		  if ( lthresh && ompNumThreads > 1 )
 		    {
 		      lthresh = FALSE;
 		      if ( lwarn )
 			{
 			  lwarn = FALSE;
-			  printf("Warning: lthresh is enabled, may give wrong result with OpenMP!\n");
+			  cdoWarning("lthresh is enabled, may give wrong result with OpenMP!");
 			}
 		    }
 #endif
@@ -5375,7 +5368,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  grid2_centroid_lon[grid2_add] += weights[5];
 
 		  /* Reset beglat and beglon for next subsegment. */
-
 		  beglat = intrsct_lat;
 		  beglon = intrsct_lon;
 		}

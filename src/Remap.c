@@ -188,6 +188,7 @@ void *Remap(void *argument)
   char *remap_file = NULL;
   int lwrite_remap;
   int remap_max_iter = -1;
+  double remap_threshhold = 2;
   int remap_restrict_type = RESTRICT_LATITUDE;
   int remap_num_srch_bins = 180;
   int lremap_num_srch_bins = FALSE;
@@ -310,6 +311,19 @@ void *Remap(void *argument)
 	    cdoPrint("Set REMAP_RESTRICT_TYPE to latitude");
 	  else if ( remap_restrict_type == RESTRICT_LATLON )
 	    cdoPrint("Set REMAP_RESTRICT_TYPE to latlon");
+	}
+    }
+
+  envstr = getenv("REMAP_THRESHHOLD");
+  if ( envstr )
+    {
+      double fval;
+      fval = atof(envstr);
+      if ( fval > 0 )
+	{
+	  remap_threshhold = fval;
+	  if ( cdoVerbose )
+	    cdoPrint("Set REMAP_THRESHHOLD to %g", remap_threshhold);
 	}
     }
 
@@ -761,6 +775,7 @@ void *Remap(void *argument)
 			}
 		    }
 
+		  remaps[r].grid.threshhold    = remap_threshhold;
 		  remaps[r].grid.restrict_type = remap_restrict_type;
 		  remaps[r].grid.num_srch_bins = remap_num_srch_bins;
 		  remaps[r].grid.pinit = FALSE;
