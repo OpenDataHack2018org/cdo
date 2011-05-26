@@ -4842,7 +4842,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
   int **srch_add2;
   int ompthID, i;
-  int lwarn  = TRUE;
 #endif
   double *srch_corner_lat;  /* lat of each corner of srch cells */
   double *srch_corner_lon;  /* lon of each corner of srch cells */
@@ -4943,11 +4942,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   srch_add = (int *) malloc(grid2_size*sizeof(int));
 #endif
 
-  lthresh   = FALSE;
-  luse_last = FALSE;
-  avoid_pole_count  = 0;
-  avoid_pole_offset = TINY;
-
   srch_corners    = grid2_corners;
   max_srch_cells  = 0;
   srch_corner_lat = NULL;
@@ -4960,13 +4954,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   shared(ompNumThreads, cdoTimer, nbins, grid1_centroid_lon, grid1_centroid_lat, \
          grid_store, link_add1, link_add2,	 \
          rv, cdoVerbose, max_subseg, \
-	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, srch_add2, lwarn) \
+	 grid1_corners,	srch_corners, rg, grid2_size, grid1_size, srch_add2) \
   private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
 	  grid1_add, grid2_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
-	  last_loc, lcoinc) \
-  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
+	  last_loc, lcoinc, lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
 #endif
   for ( grid1_add = 0; grid1_add < grid1_size; grid1_add++ )
     {
@@ -4976,6 +4969,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #endif
 
       if ( ompNumThreads == 1 ) progressStatus(0, 0.5, (grid1_add+1.)/grid1_size);
+
+      lthresh   = FALSE;
+      luse_last = FALSE;
+      avoid_pole_count  = 0;
+      avoid_pole_offset = TINY;
 
       /* Get search cells */
       num_srch_cells = get_srch_cells(grid1_add, nbins, rg->bin_addr1, rg->bin_addr2,
@@ -5083,17 +5081,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 			       &luse_last, &intrsct_x, &intrsct_y,
 			       &avoid_pole_count, &avoid_pole_offset);
 
-#if defined (_OPENMP)
-		  if ( lthresh && ompNumThreads > 1 )
-		    {
-		      lthresh = FALSE;
-		      if ( lwarn )
-			{
-			  lwarn = FALSE;
-			  cdoWarning("lthresh is enabled, may give wrong result with OpenMP!");
-			}
-		    }
-#endif
 		  lbegin = FALSE;
 
 		  /* Compute line integral for this subsegment. */
@@ -5175,11 +5162,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   srch_add = (int *) malloc(grid1_size*sizeof(int));
 #endif
 
-  lthresh   = FALSE;
-  luse_last = FALSE;
-  avoid_pole_count  = 0;
-  avoid_pole_offset = TINY;
-
   srch_corners    = grid1_corners;
   max_srch_cells  = 0;
   srch_corner_lat = NULL;
@@ -5192,13 +5174,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   shared(ompNumThreads, cdoTimer, nbins, grid2_centroid_lon, grid2_centroid_lat, \
          grid_store, link_add1, link_add2, \
          rv, cdoVerbose, max_subseg, \
-	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, srch_add2, lwarn) \
+	 grid2_corners, srch_corners, rg, grid2_size, grid1_size, srch_add2) \
   private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
 	  grid1_add, grid2_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
-	  last_loc, lcoinc) \
-  firstprivate(lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
+	  last_loc, lcoinc, lthresh, luse_last, avoid_pole_count, avoid_pole_offset)
 #endif
   for ( grid2_add = 0; grid2_add < grid2_size; grid2_add++ )
     {
@@ -5208,6 +5189,11 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #endif
 
       if ( ompNumThreads == 1 ) progressStatus(0.5, 0.5, (grid2_add+1.)/grid2_size);
+
+      lthresh   = FALSE;
+      luse_last = FALSE;
+      avoid_pole_count  = 0;
+      avoid_pole_offset = TINY;
 
       /* Get search cells */
       num_srch_cells = get_srch_cells(grid2_add, nbins, rg->bin_addr2, rg->bin_addr1,
@@ -5313,17 +5299,6 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 			       &luse_last, &intrsct_x, &intrsct_y,
 			       &avoid_pole_count, &avoid_pole_offset);
 
-#if defined (_OPENMP)
-		  if ( lthresh && ompNumThreads > 1 )
-		    {
-		      lthresh = FALSE;
-		      if ( lwarn )
-			{
-			  lwarn = FALSE;
-			  cdoWarning("lthresh is enabled, may give wrong result with OpenMP!");
-			}
-		    }
-#endif
 		  lbegin = FALSE;
 
 		  /* Compute line integral for this subsegment. */
