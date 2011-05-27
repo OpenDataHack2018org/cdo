@@ -43,7 +43,7 @@
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
-//#define GRID_SEARCH_TEST
+// #define GRID_SEARCH_TEST
 
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
@@ -1799,13 +1799,51 @@ void remap_set_max_iter(long max_iter)
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 #if defined (GRID_SEARCH_TEST)
+
 static
-long get_srch_cells_2D(double plat, double plon, long nbins, const restr_t *restrict bin_lats, const restr_t *restrict bin_lons,
-                       const int *restrict bin_addr1, const restr_t *restrict grid1_bound_box, long grid1_size, int *restrict srch_add)
+void stack_fill(int is_cyclic, int gadd, int nx, int ny, int *nstack, int *nmask, int *stack, int *mask)
 {
+  int i, j;
+  int ip1 = -1, im1 = -1;
+  int jp1 = -1, jm1 = -1;
+  int n_add = -1, e_add = -1, s_add = -1, w_add = -1;
+
+  /* Determine neighbor addresses */
+  j = gadd/nx;
+  i = gadd - j*nx;
+
+  if      ( i < (nx-1) ) ip1 = i + 1;
+  else if ( is_cyclic )  ip1 = 0;
+
+  if      ( i > 0 )     im1 = i - 1;
+  else if ( is_cyclic ) im1 = nx-1;
+
+  if ( j < (ny-1) ) jp1 = j + 1;
+
+  if ( j > 0 ) jm1 = j - 1;
+
+
+  
+}
+
+static
+long get_srch_cells_2D(double plat, double plon, const int *restrict src_grid_dims, long nbins, 
+		       const restr_t *restrict bin_lats, const restr_t *restrict bin_lons,
+                       const int *restrict bin_addr1, const restr_t *restrict grid1_bound_box, 
+		       long grid1_size, int *restrict srch_add)
+{
+  /*
+    Input variables:
+
+    double plat                    ! latitude  of the search point
+    double plon                    ! longitude of the search point
+
+    int src_grid_dims[2]           ! size of each src grid dimension
+  */
   long num_srch_cells;  /* num cells in restricted search arrays */
   long min_add;         /* addresses for restricting search of   */
   long max_add;         /* destination grid                      */
+  long nx, ny;          /* dimensions of src grid                */
   long n, n2;           /* generic counters                      */
   long grid1_add;       /* current linear address for grid1 cell */
   long grid1_addm4;
@@ -1846,6 +1884,27 @@ long get_srch_cells_2D(double plat, double plon, long nbins, const restr_t *rest
 	  num_srch_cells++;
 	}
     }
+
+  nx = src_grid_dims[0];
+  ny = src_grid_dims[1];
+
+  {
+    int nmask = 0;
+    int nstack = 0;
+    int *mask;
+    int *stack;
+
+    mask = (int *) malloc(grid1_size*sizeof(int));
+    stack = (int *) malloc(grid1_size*sizeof(int));
+
+    // stack[nstack++] = grid1_add;
+    mask[nmask++] = grid1_add;
+
+    //  stack_fill(grid1_add, nx, ny, &nstack, &nmask, stack, mask);
+  
+    free(stack);
+    free(mask);
+  }
 
   // printf("%d %d %d %d %d\n", rlat, rlon, min_add, max_add, num_srch_cells);
   /*
@@ -2443,7 +2502,8 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 } /* store_link_bilin */
 
 static
-long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
+long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons,
+		     double *ig, double *jg)
 {
   long iter;                     /*  iteration counters   */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
@@ -2595,7 +2655,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
       /* Find nearest square of grid points on source grid  */
 
 #if defined (GRID_SEARCH_TEST)
-      num_srch_cells = get_srch_cells_2D(plat, plon, nbins, rg->bin_lats, rg->bin_lons,
+      num_srch_cells = get_srch_cells_2D(plat, plon, rg->grid1_dims, nbins, rg->bin_lats, rg->bin_lons,
      					 rg->bin_addr1, rg->grid1_bound_box, grid1_size, srch_add);
 
       search_result = grid_search_new(num_srch_cells, srch_add, rg, src_add, src_lats, src_lons, 
