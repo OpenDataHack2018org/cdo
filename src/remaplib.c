@@ -43,7 +43,7 @@
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
-// #define GRID_SEARCH_TEST
+//#define GRID_SEARCH_TEST
 
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
@@ -1801,29 +1801,46 @@ void remap_set_max_iter(long max_iter)
 #if defined (GRID_SEARCH_TEST)
 
 static
-void stack_fill(int is_cyclic, int gadd, int nx, int ny, int *nstack, int *nmask, int *stack, int *mask)
+void rsrch_cells(int is_cyclic, long gadd, long nx, long ny, long *num_srch_cells, int *srch_add, long *nwork, int *work,
+		restr_t rlat, restr_t rlon, const restr_t *restrict bound_box)
 {
-  int i, j;
-  int ip1 = -1, im1 = -1;
-  int jp1 = -1, jm1 = -1;
-  int n_add = -1, e_add = -1, s_add = -1, w_add = -1;
+  long i, j;
+  long ip1 = -1, im1 = -1;
+  long jp1 = -1, jm1 = -1;
+  long gaddm4;
 
-  /* Determine neighbor addresses */
-  j = gadd/nx;
-  i = gadd - j*nx;
+  //fprintf(stdout, "%ld, %ld, %ld, %ld, %ld\n", gadd, nx, ny, *nwork, *num_srch_cells);
+  for ( i = 0; i < *nwork; ++i )
+    if ( work[i] == gadd ) return;
 
-  if      ( i < (nx-1) ) ip1 = i + 1;
-  else if ( is_cyclic )  ip1 = 0;
+  work[(*nwork)++] = gadd;
 
-  if      ( i > 0 )     im1 = i - 1;
-  else if ( is_cyclic ) im1 = nx-1;
+  gaddm4 = gadd*4;
+  /* Check bounding box */
+  if ( rlat >= bound_box[gaddm4  ] && rlat <= bound_box[gaddm4+1] &&
+       rlon >= bound_box[gaddm4+2] && rlon <= bound_box[gaddm4+3] )
+    {
+      srch_add[(*num_srch_cells)++] = gadd;
 
-  if ( j < (ny-1) ) jp1 = j + 1;
+      /* Determine neighbor addresses */
+      j = gadd/nx;
+      i = gadd - j*nx;
 
-  if ( j > 0 ) jm1 = j - 1;
+      if      ( i < (nx-1) ) ip1 = i + 1;
+      else if ( is_cyclic )  ip1 = 0;
 
+      if      ( i > 0 )     im1 = i - 1;
+      else if ( is_cyclic ) im1 = nx-1;
 
-  
+      if ( j < (ny-1) ) jp1 = j + 1;
+
+      if ( j > 0 ) jm1 = j - 1;
+
+      if ( ip1 != -1 ) rsrch_cells(is_cyclic, j*nx+ip1, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
+      if ( im1 != -1 ) rsrch_cells(is_cyclic, j*nx+im1, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
+      if ( jp1 != -1 ) rsrch_cells(is_cyclic, jp1*nx+i, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
+      if ( jm1 != -1 ) rsrch_cells(is_cyclic, jm1*nx+i, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
+    }
 }
 
 static
@@ -1870,6 +1887,7 @@ long get_srch_cells_2D(double plat, double plon, const int *restrict src_grid_di
 
   /* Now perform a more detailed search */
 
+  //srch_add[0] = -1;
   num_srch_cells = 0;
   for ( grid1_add = min_add; grid1_add <= max_add; grid1_add++ )
     {
@@ -1880,8 +1898,9 @@ long get_srch_cells_2D(double plat, double plon, const int *restrict src_grid_di
 	   rlon >= grid1_bound_box[grid1_addm4+2] &&
 	   rlon <= grid1_bound_box[grid1_addm4+3] )
       	{
-	  srch_add[num_srch_cells] = grid1_add;
-	  num_srch_cells++;
+	  //	  srch_add[num_srch_cells] = grid1_add;
+	  //	  num_srch_cells++;
+	  break;
 	}
     }
 
@@ -1889,101 +1908,18 @@ long get_srch_cells_2D(double plat, double plon, const int *restrict src_grid_di
   ny = src_grid_dims[1];
 
   {
-    int nmask = 0;
-    int nstack = 0;
-    int *mask;
-    int *stack;
+    long nwork = 0;
+    int *work;
 
-    mask = (int *) malloc(grid1_size*sizeof(int));
-    stack = (int *) malloc(grid1_size*sizeof(int));
+    work = (int *) malloc(grid1_size*sizeof(int));
 
-    // stack[nstack++] = grid1_add;
-    mask[nmask++] = grid1_add;
-
-    //  stack_fill(grid1_add, nx, ny, &nstack, &nmask, stack, mask);
+    rsrch_cells(1, grid1_add, nx, ny, &num_srch_cells, srch_add, &nwork, work, rlat, rlon, grid1_bound_box);
+    //printf("%g %g %ld %d %ld\n", plat, plon, num_srch_cells, *srch_add, nwork);
+    //memcpy(srch_add, work, nwork*sizeof(int));
+    //num_srch_cells = nwork;
   
-    free(stack);
-    free(mask);
+    free(work);
   }
-
-  // printf("%d %d %d %d %d\n", rlat, rlon, min_add, max_add, num_srch_cells);
-  /*
-  static
-  int box_in_box(int *box1, int *box2)
-  {
-    int status;
-
-    status = (box1[0] <= box2[1]) && (box1[1] >= box2[0]) &&
-	     (box1[2] <= box2[3]) && (box1[3] >= box2[2]);
-
-    return (status);
-  }
-
-  static
-  int point_in_box(int *box, int rlat, int rlon)
-  {
-    int status;
-
-    status = (rlat >= box[0]) && (rlat <= box[1]) &&
-             (rlon >= box[2]) && (rlon <= box[3]);
-    
-    return (status);
-  }
-
-  box2[0] = ilat1;
-  box2[1] = ilat2;
-  box2[2] = ilon1;
-  box2[3] = ilon2;
-  i0 = fun(rlon);
-  j0 = fun(rlat);
-  for ( j = j0-1; j >= 0; j-- )
-    {
-      nimin = 0;
-      for ( i = i0-1; i >= 0; i-- )
-	{  
-	  grid1_add = j*nx+i;
-	  box1 = grid1_bound_box[grid1_add];
-	  if ( !box_in_box(box1, box2) ) break;
-	  if ( point_in_box(box1, rlat, rlon) ) srch_add[num_srch_cells++] = grid1_add;
-	  nimin++;
-	}
-      nimax = 0;
-      for ( i = i0; i < nx; i++ )
-	{
-	  grid1_add = j*nx+i;
-	  box1 = grid1_bound_box[grid1_add];
-	  if ( !box_in_box(box1, box2) ) break;
-	  if ( point_in_box(box1, rlat, rlon) ) srch_add[num_srch_cells++] = grid1_add;
-	  nimax++;
-	}
-
-      if ( nimin == 0 && nimax == 0 ) break;
-    }
-
-  for ( j = j0; j < ny; j++ )
-    {
-      nimin = 0;
-      for ( i = i0-1; i >= 0; i-- )
-	{  
-	  grid1_add = j*nx+i;
-	  box1 = grid1_bound_box[grid1_add];
-	  if ( !box_in_box(box1, box2) ) break;
-	  if ( point_in_box(box1, rlat, rlon) ) srch_add[num_srch_cells++] = grid1_add;
-	  nimin++;
-	}
-      nimax = 0;
-      for ( i = i0; i < nx; i++ )
-	{
-	  grid1_add = j*nx+i;
-	  box1 = grid1_bound_box[grid1_add];
-	  if ( !box_in_box(box1, box2) ) break;
-	  if ( point_in_box(box1, rlat, rlon) ) srch_add[num_srch_cells++] = grid1_add;
-	  nimax++;
-	}
-
-      if ( nimin == 0 && nimax == 0 ) break;
-    }
-  */
 
   return (num_srch_cells);
 }
@@ -2629,11 +2565,19 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   /* Loop over destination grid */
 
 #if defined (_OPENMP)
+#if defined (GRID_SEARCH_TEST)
+#pragma omp parallel for default(none) \
+  shared(ompNumThreads, cdoTimer, nbins, grid1_size, cdoVerbose, grid2_size, rg, rv, Max_Iter, converge, lwarn, srch_add2) \
+  private(ompthID, srch_add, num_srch_cells, dst_add, n, icount, iter, src_add, src_lats, src_lons, \
+	  wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
+  schedule(dynamic,1)
+#else
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, grid2_size, rg, rv, Max_Iter, converge, lwarn) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, \
 	  wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
   schedule(dynamic,1)
+#endif
 #endif
   /* grid_loop1 */
   for ( dst_add = 0; dst_add < grid2_size; dst_add++ )
