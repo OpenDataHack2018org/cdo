@@ -59,10 +59,6 @@ AC_CHECK_FUNCS(isnan)
 AC_CHECK_FUNCS(getrlimit)
 AC_CHECK_FUNCS(gethostname)
 
-# Checks for compiler
-COMPILER="$CC $CFLAGS"
-AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
-
 # Check compiler version
 case "$CC" in
   *gcc*)  COMP_VERSION=`$CC --version | head -n 1`;;
@@ -106,6 +102,10 @@ AC_SUBST([CLDFLAGS])
 AC_SUBST([CLIBS])
 AC_SUBST([INCLUDES])
 AC_SUBST([AR])
+
+# Checks for compiler
+COMPILER="$CC $CFLAGS"
+AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
 
 AC_OUTPUT(Makefile src/Makefile contrib/Makefile cdo.spec cdo.settings)
 

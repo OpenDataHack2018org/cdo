@@ -16123,14 +16123,6 @@ fi
 done
 
 
-# Checks for compiler
-COMPILER="$CC $CFLAGS"
-
-cat >>confdefs.h <<_ACEOF
-#define COMPILER "$COMPILER"
-_ACEOF
-
-
 # Check compiler version
 case "$CC" in
   *gcc*)  COMP_VERSION=`$CC --version | head -n 1`;;
@@ -18328,6 +18320,14 @@ fi
 
 
 
+
+
+# Checks for compiler
+COMPILER="$CC $CFLAGS"
+
+cat >>confdefs.h <<_ACEOF
+#define COMPILER "$COMPILER"
+_ACEOF
 
 
 ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile cdo.spec cdo.settings"
