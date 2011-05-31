@@ -76,7 +76,6 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 
 int cdoCheckDatarange    = FALSE;
 
-int cdoHaveNC4           = FALSE;
 int cdoDiag              = FALSE;
 int cdoDisableHistory    = FALSE;
 int cdoZtype             = COMPRESS_NONE;
@@ -137,8 +136,9 @@ void cdo_version(void)
 #endif
 #if defined (HAVE_LIBPTHREAD) || defined (HAVE_LIBSZ) || defined (HAVE_LIBPROJ) || defined (HAVE_LIBDRMAA) || defined (HAVE_LIBCURL) || defined (_OPENMP)
   fprintf(stderr, "    with:");
-  if ( cdoHaveNC4 ) 
-    fprintf(stderr, " NC4");
+#if  defined  (HAVE_NETCDF4)
+  fprintf(stderr, " NC4");
+#endif
 #if defined (HAVE_LIBPTHREAD)
   fprintf(stderr, " PTHREADS");
 #endif
@@ -588,24 +588,6 @@ int cdoFiletype(void)
   return (cdoDefaultFileType);
 }
 
-
-#if  defined  (HAVE_LIBNETCDF)
-#include "netcdf.h"
-#endif
-static
-int have_netCDF4(void)
-{
-  int haveNC4 = FALSE;
-
-#if  defined  (HAVE_LIBNETCDF)
-#if  defined  (NC_NETCDF4)
-  haveNC4 = TRUE;
-#endif
-#endif
-
-  return (haveNC4);
-}
-
 static
 void defineCompress(const char *arg)
 {
@@ -732,8 +714,6 @@ int main(int argc, char *argv[])
   if ( memcmp(Progname, "gm",  2) == 0 && strlen(Progname) > 2 ) noff = 2;
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
-
-  cdoHaveNC4 = have_netCDF4();
 
   while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMOQRrsSTuVvXZ")) != -1 )
     {
@@ -864,10 +844,6 @@ int main(int argc, char *argv[])
       if ( DebugLevel == 0 ) DebugLevel = 1;
       cdoSetDebug(DebugLevel);
       fprintf(stderr, "\n");
-      if ( cdoHaveNC4 )
-	fprintf(stderr, "cdoHaveNC4          = TRUE\n");
-      else
-	fprintf(stderr, "cdoHaveNC4          = FALSE\n");
       fprintf(stderr, "cdoDefaultFileType  = %d\n", cdoDefaultFileType);
       fprintf(stderr, "cdoDefaultDataType  = %d\n", cdoDefaultDataType);
       fprintf(stderr, "cdoDefaultByteorder = %d\n", cdoDefaultByteorder);
