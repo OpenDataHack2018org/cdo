@@ -167,14 +167,14 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 int vlistIsSzipped(int vlistID)
 {
   int lszip = FALSE;
-  int nvars, varID, ztype;
+  int nvars, varID, comptype;
 
   nvars = vlistNvars(vlistID);
 
   for ( varID = 0; varID < nvars; varID++ )
     {						
-      ztype = vlistInqVarZtype(vlistID, varID);
-      if ( ztype == COMPRESS_SZIP )
+      comptype = vlistInqVarCompType(vlistID, varID);
+      if ( comptype == COMPRESS_SZIP )
 	{
 	  lszip = TRUE;
 	  break;

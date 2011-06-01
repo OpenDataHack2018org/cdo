@@ -84,18 +84,18 @@ void printFiletype(int streamID, int vlistID)
   if ( filetype == FILETYPE_GRB || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
     {
       int nvars, varID;
-      int ztype;
+      int comptype;
 
       nvars = vlistNvars(vlistID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  ztype = vlistInqVarZtype(vlistID, varID);
-	  if ( ztype )
+	  comptype = vlistInqVarCompType(vlistID, varID);
+	  if ( comptype )
 	    {
-	      if ( ztype == COMPRESS_SZIP )
+	      if ( comptype == COMPRESS_SZIP )
 		printf(" SZIP");
-	      else if ( ztype == COMPRESS_ZIP )
+	      else if ( comptype == COMPRESS_ZIP )
 		printf(" ZIP");
 
 	      break;
@@ -106,16 +106,16 @@ void printFiletype(int streamID, int vlistID)
   if ( filetype == FILETYPE_GRB2 )
     {
       int nvars, varID;
-      int ztype;
+      int comptype;
 
       nvars = vlistNvars(vlistID);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  ztype = vlistInqVarZtype(vlistID, varID);
-	  if ( ztype )
+	  comptype = vlistInqVarCompType(vlistID, varID);
+	  if ( comptype )
 	    {
-	      if ( ztype == COMPRESS_JPEG )
+	      if ( comptype == COMPRESS_JPEG )
 		printf(" JPEG");
 
 	      break;

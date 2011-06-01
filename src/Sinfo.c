@@ -147,7 +147,7 @@ void *Sinfo(void *argument)
 
 	  fprintf(stdout, " %-3s", pstr);
 
-	  if ( vlistInqVarZtype(vlistID, varID) == COMPRESS_NONE )
+	  if ( vlistInqVarCompType(vlistID, varID) == COMPRESS_NONE )
 	    fprintf(stdout, " ");
 	  else
 	    fprintf(stdout, "z");

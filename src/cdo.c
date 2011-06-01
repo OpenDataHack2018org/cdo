@@ -78,8 +78,8 @@ int cdoCheckDatarange    = FALSE;
 
 int cdoDiag              = FALSE;
 int cdoDisableHistory    = FALSE;
-int cdoZtype             = COMPRESS_NONE;
-int cdoZlevel            = 0;
+int cdoCompType          = COMPRESS_NONE;  // compression type
+int cdoCompLevel         = 0;              // compression level
 int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
 int cdoOverwriteMode     = FALSE;
@@ -273,7 +273,7 @@ void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID
 	{
 	  strncat(filesuffix, streamFilesuffix(filetype), maxlen-1);
 	  if ( cdoDefaultFileType == FILETYPE_GRB )
-	    if ( vlistIsSzipped(vlistID) || cdoZtype == COMPRESS_SZIP )
+	    if ( vlistIsSzipped(vlistID) || cdoCompType == COMPRESS_SZIP )
 	      strncat(filesuffix, ".sz", maxlen-1);
 	}
     }
@@ -595,23 +595,23 @@ void defineCompress(const char *arg)
 
   if      ( memcmp(arg, "szip", len) == 0 )
     {
-      cdoZtype  = COMPRESS_SZIP;
-      cdoZlevel = 0;
+      cdoCompType  = COMPRESS_SZIP;
+      cdoCompLevel = 0;
     }
   else if ( memcmp(arg, "jpeg", len) == 0 )
     {
-      cdoZtype = COMPRESS_JPEG;
-      cdoZlevel = 0;
+      cdoCompType = COMPRESS_JPEG;
+      cdoCompLevel = 0;
     }
   else if ( memcmp(arg, "gzip", len) == 0 )
     {
-      cdoZtype  = COMPRESS_GZIP;
-      cdoZlevel = 6;
+      cdoCompType  = COMPRESS_GZIP;
+      cdoCompLevel = 6;
     }
   else if ( memcmp(arg, "zip", len) == 0 )
     {
-      cdoZtype  = COMPRESS_ZIP;
-      cdoZlevel = 1;
+      cdoCompType  = COMPRESS_ZIP;
+      cdoCompLevel = 1;
     }
   else
     fprintf(stderr, "%s compression unsupported!\n", arg);
