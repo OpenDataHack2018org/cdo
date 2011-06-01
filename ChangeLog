@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.1
 	* Version 1.5.1 released
 
+2011-06-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* setgridtype: convert curvilinear to unstructured grids [request: Steffen Tietsche]
+
 2011-05-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Remap: added env REMAP_THRESHHOLD to set the threshhold for coordinate transformation

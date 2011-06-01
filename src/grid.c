@@ -978,6 +978,15 @@ int gridToUnstructured(int gridID1)
 
 	break;
       }
+    case GRID_CURVILINEAR:
+      {
+	gridID2 = gridDuplicate(gridID1);
+	gridChangeType(gridID2, GRID_UNSTRUCTURED);
+	gridDefXsize(gridID2, gridsize);
+	gridDefYsize(gridID2, gridsize);
+
+	break;
+      }
     case GRID_GME:
       {
 	int nd, ni, ni2, ni3;
@@ -1041,7 +1050,7 @@ int gridToUnstructured(int gridID1)
       }
     default:
       {
-	Error("Grid type %s unsupported!", gridNamePtr(gridtype));
+	Error("Grid type >%s< unsupported!", gridNamePtr(gridtype));
 	break;
       }
     }
