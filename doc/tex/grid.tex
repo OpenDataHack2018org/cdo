@@ -1,6 +1,36 @@
 \section{Horizontal grids}
 \label{HORIZONTAL_GRIDS}
 
+Physical quantities of climate models are typically stored on a
+horizonal grid. 
+
+\subsection{Grid area weights}
+\label{GRID_AREA_WEIGHTS}
+
+One single point of a grid represents the mean of a grid cell.
+These grid cells are typically of different sizes, because the grid
+points are of varying distance.
+
+Area weights are individual weights for each grid cell. 
+%They take into account the different grid cell sizes when needed by a {\CDO} operator. 
+They are needed to compute the area weighted mean or
+variance of a set of grid cells (e.g. \htmlref{fldmean}{fldmean} - the mean value of all grid cells).
+In {\CDO} the area weights are derived from the grid cell area.
+If the cell area is not available then it will be computed from the geographical coordinates via spherical triangles.
+This is only possible if the geographical coordinates of the grid cell corners are available or derivable.
+Otherwise {\CDO} gives a warning message and uses constant are weights for all grid cells.
+
+The cell area is read automaticaly from a netCDF input file if a variable has the
+corresponding ``cell\_measures'' attribute, e.g.:
+
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\small]
+var:cell_measures = "area: cell_area" ;
+\end{lstlisting}
+
+If the computed cell area is not desired 
+then the {\CDO} operator \htmlref{setgridarea}{setgridarea} can be used to
+set or overwrite the grid cell area.
+
 \subsection{Grid description}
 \label{GRID_DESCRIPTION}
 
@@ -13,13 +43,12 @@ In the following situations it is necessary to give a description of a horizonta
 \end{itemize}
 
 As now described, there are several possibilities to define a horizontal grid.
-Predefined grids are available for global regular, gaussian or icosahedral-hexagonal GME grids.
-
 
 \subsubsection{Predefined grids}
 
-The following pre-defined grid names are available: 
-{\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>} and {\tt gme<NI>}
+Predefined grids are available for global regular, gaussian or icosahedral-hexagonal GME grids.
+% They have the following predefined grid names: 
+%{\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>} and {\tt gme<NI>}
 
 \subsubsection*{Global regular grid: {\tt r<NX>x<NY>}}
     {\tt r<NX>x<NY>} defines a global regular lon/lat grid.
@@ -57,12 +86,11 @@ the first variable will be used.
 
 \subsubsection{SCRIP grids}
 
-SCRIP is a Spherical Coordinate Remapping and Interpolation Package.
-It uses a common grid description in netCDF.
-You can use it to describe curvilinear grids or unstructured grid cells.
-For more information about this format see \cite{SCRIP}.
-This grid description format is only available if the program was compiled
-with netCDF support.
+SCRIP (Spherical Coordinate Remapping and Interpolation Package) uses
+a common grid description for curvilinear and unstructured grids.
+For more information about the convention see \cite{SCRIP}.
+This grid description is stored in netCDF. Therefor it is only
+available if {\CDO} was compiled with netCDF support.
 
 \vspace{2mm}
 
@@ -98,33 +126,33 @@ SCRIP grid description example of a curvilinear MPIOM \cite{MPIOM} GROB3 grid (o
 \end{lstlisting}
 %\end{minipage}
 
-\subsubsection{PINGO grids}
+% \subsubsection{PINGO grids}
 
-PINGO uses a very simple grid description in ASCII format
-to describe regular longitude/latitude or global gaussian grids.
-All PINGO grid description files are supported by {\CDO}. 
-For more information about this format see \cite{PINGO}.
+% PINGO uses a very simple grid description in ASCII format
+% to describe regular longitude/latitude or global gaussian grids.
+% All PINGO grid description files are supported by {\CDO}. 
+% For more information about this format see \cite{PINGO}.
 
-\vspace{2mm}
+% \vspace{2mm}
 
-%\begin{minipage}[t]{\textwidth}
-PINGO grid description example of a T21 gaussian grid:
-\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
-    Grid Description File
-    (Comments start at non digit characters and end at end of line)
-    First part: The dimensions.
-    64 32 = Number of longitudes and latitudes
-    Second part: The listed longitudes.
-    2 means equidistant longitudes
-    0.000000 5.625000 = Most western and second most western longitude
-    Third part: The listed latitudes.
-    32 means all 32 latitudes are given in the following list:
-     85.761  80.269  74.745  69.213  63.679  58.143  52.607  47.070
-     41.532  35.995  30.458  24.920  19.382  13.844   8.307   2.769
-     -2.769  -8.307 -13.844 -19.382 -24.920 -30.458 -35.995 -41.532
-    -47.070 -52.607 -58.143 -63.679 -69.213 -74.745 -80.269 -85.761
-\end{lstlisting}
-%\end{minipage}
+% %\begin{minipage}[t]{\textwidth}
+% PINGO grid description example of a T21 gaussian grid:
+% \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\footnotesize]
+%     Grid Description File
+%     (Comments start at non digit characters and end at end of line)
+%     First part: The dimensions.
+%     64 32 = Number of longitudes and latitudes
+%     Second part: The listed longitudes.
+%     2 means equidistant longitudes
+%     0.000000 5.625000 = Most western and second most western longitude
+%     Third part: The listed latitudes.
+%     32 means all 32 latitudes are given in the following list:
+%      85.761  80.269  74.745  69.213  63.679  58.143  52.607  47.070
+%      41.532  35.995  30.458  24.920  19.382  13.844   8.307   2.769
+%      -2.769  -8.307 -13.844 -19.382 -24.920 -30.458 -35.995 -41.532
+%     -47.070 -52.607 -58.143 -63.679 -69.213 -74.745 -80.269 -85.761
+% \end{lstlisting}
+% %\end{minipage}
 
 \subsubsection{CDO grids}
 
@@ -319,23 +347,3 @@ in \htmlref{Appendix B}{appendixgrid}.
 %  generic
 
 % retilinear (geradlinig)
-
-
-\subsection{Grid area weights}
-\label{GRID_AREA_WEIGHTS}
-
-%A typical example is to compute the mean of a field with @oper{fldmean}.
-
-%The area weights are exclusive computed from the grid cell area. The netCDF variable for the cell area is 
-%defined by the attribute cell_measures:
-%
-%  var:cell_measures = "area: cell_area" ;
-%
-%If the cell area is not available then it will be computed from the geographical coordinates via spherical triangles.
-%This is only possible if the geographical coordinates of the grid cell corners are available or derivable.
-%Otherwise fldmean gives a warning message and uses constant area weights.
-%You can overwrite/set the grid cell area with the undocumented CDO function setgridarea. 
-%The parameter for this function is a data file with one field. This field must have the the size of 
-%the grid of the input file. Here is an example:
-%
-%  cdo fldmean -setgridarea,gridareafile  ifile ofile
