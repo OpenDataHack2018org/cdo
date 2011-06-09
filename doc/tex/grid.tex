@@ -18,9 +18,9 @@ variance of a set of grid cells (e.g. \htmlref{fldmean}{fldmean} - the mean valu
 In {\CDO} the area weights are derived from the grid cell area.
 If the cell area is not available then it will be computed from the geographical coordinates via spherical triangles.
 This is only possible if the geographical coordinates of the grid cell corners are available or derivable.
-Otherwise {\CDO} gives a warning message and uses constant are weights for all grid cells.
+Otherwise {\CDO} gives a warning message and uses constant area weights for all grid cells.
 
-The cell area is read automaticaly from a netCDF input file if a variable has the
+The cell area is read automatically from a netCDF input file if a variable has the
 corresponding ``cell\_measures'' attribute, e.g.:
 
 \begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor1}, basicstyle=\small]
