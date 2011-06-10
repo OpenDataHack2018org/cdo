@@ -12,6 +12,8 @@ and @file{ifile2} be the 90th percentile RRn90 of daily precipitation
 amounts at wet days for any period used as reference. Then calculated
 is the ratio of the precipitation sum at wet days with RR > RRn90
 to the total precipitation sum. 
+RRn90 is calculated as the 90th percentile of all wet days of a given
+climate reference period.
 The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription

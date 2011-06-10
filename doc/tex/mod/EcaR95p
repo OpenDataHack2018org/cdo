@@ -12,6 +12,8 @@ Let @file{ifile1} be a time series of daily precipitation amounts RR,
 and @file{ifile2} be the 95th percentile RRn95 of daily precipitation
 amounts at wet days for any period used as reference. Then calculated
 is the percentage of wet days with RR > RRn95. 
+RRn95 is calculated as the 95th percentile of all wet days of a given
+climate reference period.
 The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription

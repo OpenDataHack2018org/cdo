@@ -11,8 +11,10 @@
 Let @file{ifile1} be a time series of daily mean temperatures TG, and
 @file{ifile2} be the 10th percentile TGn10 of daily mean temperatures
 for any period used as reference. Then calculated is the percentage
-of time where TG < TGn10. Note that both TG and TGn10 have to be given
-in the same units.
+of time where TG < TGn10.
+TGn10 is calculated as the 10th percentile of daily mean temperatures of a five 
+day window centred on each calendar day of a given climate reference period.
+Note that both TG and TGn10 have to be given in the same units.
 The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription

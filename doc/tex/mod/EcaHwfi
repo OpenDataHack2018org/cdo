@@ -14,8 +14,10 @@ for any period used as reference. Then counted is the number of days
 where, in intervals of at least nday consecutive days, TG > TGn90. The
 number nday is an optional parameter with default nday = 6. A further
 output variable is the number of warm-spell periods longer than or
-equal to nday days. Note that both TG and TGn90 have to be given in the
-same units.
+equal to nday days. 
+TGn90 is calculated as the 90th percentile of daily mean temperatures of a five 
+day window centred on each calendar day of a given climate reference period.
+Note that both TG and TGn90 have to be given in the same units.
 The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription

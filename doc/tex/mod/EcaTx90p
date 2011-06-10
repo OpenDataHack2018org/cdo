@@ -11,8 +11,10 @@
 Let @file{ifile1} be a time series of daily maximum temperatures TX, and
 @file{ifile2} be the 90th percentile TXn90 of daily maximum temperatures
 for any period used as reference. Then calculated is the percentage
-of time where TX > TXn90. Note that both TX and TXn90 have to be given
-in the same units.
+of time where TX > TXn90.
+TXn90 is calculated as the 90th percentile of daily maximum temperatures of a five 
+day window centred on each calendar day of a given climate reference period.
+Note that both TX and TXn90 have to be given in the same units.
 The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile1}.
 @EndDescription
