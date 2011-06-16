@@ -256,14 +256,14 @@ void init_is_tty(void)
 
 
 int ps_lhead = FALSE;
-int ps_nch = 0;
-int ps_cval = -1;
+int ps_nch   = 0;
+int ps_cval  = -1;
 
 void progressInit(void)
 {
   ps_lhead = FALSE;
-  ps_nch = 0;;
-  ps_cval = -1;
+  ps_nch   = 0;;
+  ps_cval  = -1;
 }
 
 
@@ -299,7 +299,7 @@ void progressStatus(double offset, double refval, double curval)
   if ( ps_cval == 100 && ps_lhead )
     {
       ps_lhead = FALSE;
-      while ( ps_nch-- ) fprintf(stdout, "\b");
+      while ( ps_nch-- ) fprintf(stdout, "\b \b");
       fflush(stdout);
     }
 }
