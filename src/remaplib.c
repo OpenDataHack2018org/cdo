@@ -1285,7 +1285,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     }
   else
     {
-      if ( rg->grid1_rank != 2 ) cdoAbort("Internal problem! Grid1 rank = %d\n", rg->grid1_rank);
+      if ( rg->grid1_rank != 2 ) cdoAbort("Internal problem, grid1 rank = %d!", rg->grid1_rank);
 
       nx = rg->grid1_dims[0];
       ny = rg->grid1_dims[1];
@@ -1322,7 +1322,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     }
   else
     {
-      if ( rg->grid2_rank != 2 ) cdoAbort("Internal problem! Grid2 rank = %d\n", rg->grid2_rank);
+      if ( rg->grid2_rank != 2 ) cdoAbort("Internal problem, grid2 rank = %d!", rg->grid2_rank);
 
       nx = rg->grid2_dims[0];
       ny = rg->grid2_dims[1];
@@ -5870,7 +5870,7 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
   double grad1_lat_zero, grad1_lon_zero;
 
   if ( rg.grid1_rank != 2 )
-    cdoAbort("Internal problem (remap_gradients)! Grid1 rank = %d\n", rg.grid1_rank);
+    cdoAbort("Internal problem (remap_gradients), grid1 rank = %d!", rg.grid1_rank);
 
   grid1_size = rg.grid1_size;
   nx = rg.grid1_dims[0];
@@ -6172,7 +6172,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
 	}
 
       if ( i == num_links )
-	cdoAbort("Internal problem; link 1 not found!");
+	cdoAbort("Internal problem, link 1 not found!");
     }
 
   /*
@@ -6250,7 +6250,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
 	}
 
       if ( i == num_links )
-	cdoAbort("Internal problem; link 2 not found!");
+	cdoAbort("Internal problem, link 2 not found!");
     }
 
   /* Swap the last two entries */
@@ -6385,7 +6385,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	}
 
       if ( i == num_links )
-	cdoAbort("Internal problem; link 1 not found!");
+	cdoAbort("Internal problem, link 1 not found!");
     }
 
   /*
@@ -6469,7 +6469,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	}
 
       if ( i == num_links )
-	cdoAbort("Internal problem; link 2 not found!");
+	cdoAbort("Internal problem, link 2 not found!");
     }
 
   /* Swap the last two entries */
@@ -6701,7 +6701,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
              rv.num_links*(4 + 4 + rv.num_wts*8);
 
   if ( cdoVerbose )
-    cdoPrint("Filesize for remap weights: ~%lu\n", (unsigned long) filesize);
+    cdoPrint("Filesize for remap weights: ~%lu", (unsigned long) filesize);
     
   if ( filesize > 0x7FFFFC00 ) /* 2**31 - 1024 (<2GB) */
     {
@@ -7565,7 +7565,7 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
   */
   static int first_sort_iter_call = 1;
   static int par_depth = 1;
-              
+
   if ( first_sort_iter_call )
     {
       first_sort_iter_call = 0; 
@@ -7576,11 +7576,10 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
   if ( num_links > MERGE_SORT_LIMIT_SIZE )
     {
       sort_par(num_links, num_wts, add1, add2, weights, parent, par_depth);
-      if ( cdoVerbose ) cdoPrint("Finished iteration parent %i\n", parent);
+      if ( cdoVerbose ) cdoPrint("Finished iteration parent %i", parent);
     }
   else
     {
       sort_add(num_links, num_wts, add1, add2, weights);
     }
 }
-
