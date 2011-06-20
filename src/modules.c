@@ -716,6 +716,7 @@ static int NumModules = sizeof(Modules) / sizeof(Modules[0]);
 static char *opalias[][2] =
 {
   {"anomaly",             "ymonsub"    },
+  {"deltap_fl",           "deltap"     },
   {"diffv",               "diffn"      },
   {"ggstat",              "info"       },
   {"ggstats",             "sinfo"      },
