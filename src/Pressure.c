@@ -20,6 +20,7 @@
 
       Pressure    pressure_fl          Pressure on full hybrid level
       Pressure    pressure_hl          Pressure on half hybrid level
+      Pressure    deltap               Difference of two half hybrid level
 */
 
 #include <ctype.h>
@@ -34,7 +35,7 @@
 
 void *Pressure(void *argument)
 {
-  int PRESSURE_FL, PRESSURE_HL, DELTAP_FL, DELTAH_FL;
+  int PRESSURE_FL, PRESSURE_HL, DELTAP;
   int operatorID;
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
@@ -55,8 +56,8 @@ void *Pressure(void *argument)
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
   double *rvct = NULL; /* reduced VCT for LM */
-  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap_fl = NULL;
-  double *hyb_press = NULL;
+  double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
+  double *pout = NULL;
   double *pdata = NULL;
   int taxisID1, taxisID2;
   int lhavevct;
@@ -64,13 +65,12 @@ void *Pressure(void *argument)
   int mono_level;
   int instNum, tableNum;
   int useTable;
-  LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
   PRESSURE_FL = cdoOperatorAdd("pressure_fl", 0, 0, NULL);
   PRESSURE_HL = cdoOperatorAdd("pressure_hl", 0, 0, NULL);
-  DELTAP_FL   = cdoOperatorAdd("deltap_fl",   0, 0, NULL);
+  DELTAP      = cdoOperatorAdd("deltap",      0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -210,14 +210,14 @@ void *Pressure(void *argument)
   if ( zaxisIDh != -1 && ngp > 0 )
     {
       ps_prog    = (double *) malloc(ngp*sizeof(double));
-      deltap_fl  = (double *) malloc(ngp*nhlevf*sizeof(double));
+      deltap     = (double *) malloc(ngp*nhlevf*sizeof(double));
       full_press = (double *) malloc(ngp*nhlevf*sizeof(double));
       half_press = (double *) malloc(ngp*nhlevh*sizeof(double));
     }
   else
     cdoAbort("No data on hybrid model level found!");
 
-  if ( operatorID == PRESSURE_FL || operatorID == DELTAP_FL )
+  if ( operatorID == PRESSURE_FL || operatorID == DELTAP )
     zaxisIDp = zaxisCreate(ZAXIS_HYBRID, nhlevf);
   else
     zaxisIDp = zaxisCreate(ZAXIS_HYBRID_HALF, nhlevh);
@@ -404,23 +404,23 @@ void *Pressure(void *argument)
       if ( operatorID == PRESSURE_FL )
 	{
 	  nlevel = nhlevf;
-	  hyb_press = full_press;
+	  pout = full_press;
 	}
-      else if ( operatorID == DELTAP_FL )
+      else if ( operatorID == DELTAP )
 	{
 	  nlevel = nhlevf;
 	  for ( k = 0; k < nhlevf; ++k )
 	    for ( i = 0; i < ngp; ++i )
 	      {
-		deltap_fl[k*ngp+i] = half_press[(k+1)*ngp+i] - half_press[k*ngp+i];
+		deltap[k*ngp+i] = half_press[(k+1)*ngp+i] - half_press[k*ngp+i];
 	      }
 
-	  hyb_press = deltap_fl;
+	  pout = deltap;
 	}
       else
 	{
 	  nlevel = nhlevh;
-	  hyb_press = half_press;
+	  pout = half_press;
 	}
 	  
       varID = 0;
@@ -428,7 +428,7 @@ void *Pressure(void *argument)
 	{
 	  streamDefRecord(streamID2, varID, levelID);
 	  offset = levelID*gridsize;
-	  streamWriteRecord(streamID2, hyb_press+offset, 0);
+	  streamWriteRecord(streamID2, pout+offset, 0);
 	}
 
       tsID++;
@@ -439,13 +439,11 @@ void *Pressure(void *argument)
 
   if ( pdata      ) free(pdata);
   if ( ps_prog    ) free(ps_prog);
-  if ( deltap_fl  ) free(deltap_fl);
+  if ( deltap     ) free(deltap);
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
   if ( vct        ) free(vct);
   if ( rvct       ) free(rvct);
-
-  listDelete(flist);
 
   cdoFinish();
 

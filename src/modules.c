@@ -333,7 +333,7 @@ void *Wct(void *argument);
                                  "outputfld", "outputarr", "outputxyz", "outputtab"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri"}
-#define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap_fl"}
+#define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
