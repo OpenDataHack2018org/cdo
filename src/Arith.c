@@ -84,10 +84,12 @@ void *Arith(void *argument)
 
   ntsteps1 = vlistNtsteps(vlistID1);
   ntsteps2 = vlistNtsteps(vlistID2);
+  if ( ntsteps1 == 0 ) ntsteps1 = 1;
+  if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
-      if ( ntsteps1 != 1 && ntsteps1 != 0 && (ntsteps2 == 1 || ntsteps2 == 0) )
+      if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_REC;
 	  cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1));
@@ -100,7 +102,7 @@ void *Arith(void *argument)
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
-      if ( (ntsteps1 == 1 || ntsteps1 == 0) && ntsteps2 != 1 && ntsteps2 != 0 )
+      if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_REC;
 	  cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
@@ -136,12 +138,12 @@ void *Arith(void *argument)
 
   if ( filltype == FILL_NONE )
     {
-      if ( ntsteps1 != 1 && ntsteps1 != 0 && (ntsteps2 == 1 || ntsteps2 == 0) )
+      if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
 	}
-      else if ( (ntsteps1 == 1 || ntsteps1 == 0) && ntsteps2 != 1 && ntsteps2 != 0 )
+      else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));

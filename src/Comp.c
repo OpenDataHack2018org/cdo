@@ -44,6 +44,7 @@ void *Comp(void *argument)
   int tsID;
   int varID, levelID;
   int offset;
+  int ntsteps1, ntsteps2;
   int vlistIDx1, vlistIDx2, vlistID1, vlistID2, vlistID3;
   int taxisIDx1, taxisID1, taxisID2, taxisID3;
   int nmiss1, nmiss2, nmiss3;
@@ -82,6 +83,11 @@ void *Comp(void *argument)
   taxisID2 = vlistInqTaxis(vlistID2);
   taxisIDx1 = taxisID1;
 
+  ntsteps1 = vlistNtsteps(vlistID1);
+  ntsteps2 = vlistNtsteps(vlistID2);
+  if ( ntsteps1 == 0 ) ntsteps1 = 1;
+  if ( ntsteps2 == 0 ) ntsteps2 = 1;
+
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
       filltype = FILL_REC;
@@ -114,19 +120,16 @@ void *Comp(void *argument)
   arrayx2 = array2;
 
   if ( cdoVerbose )
-    cdoPrint("Number of timesteps: file1 %d, file2 %d",
-	     vlistNtsteps(vlistID1), vlistNtsteps(vlistID2));
+    cdoPrint("Number of timesteps: file1 %d, file2 %d", ntsteps1, ntsteps2);
 
   if ( filltype == FILL_NONE )
     {
-      if ( vlistNtsteps(vlistID1) != 1 && vlistNtsteps(vlistID1) != 0 &&
-	  (vlistNtsteps(vlistID2) == 1 || vlistNtsteps(vlistID2) == 0) )
+      if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
 	}
-      else if ( (vlistNtsteps(vlistID1) == 1 || vlistNtsteps(vlistID1) == 0) &&
-		 vlistNtsteps(vlistID2) != 1 && vlistNtsteps(vlistID2) != 0 )
+      else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
@@ -150,7 +153,7 @@ void *Comp(void *argument)
 	}
     }
 
-  if ( filltype != FILL_NONE && vlistNtsteps(vlistID1) == 1 )
+  if ( filltype != FILL_NONE && ntsteps1 == 1 )
     {
       arrayx1 = array2;
       arrayx2 = array1;

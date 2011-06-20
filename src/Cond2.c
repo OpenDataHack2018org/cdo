@@ -39,6 +39,7 @@ void *Cond2(void *argument)
   int tsID;
   int varID, levelID;
   int offset;
+  int ntsteps1, ntsteps2;
   int vlistID1, vlistID2, vlistID3, vlistID4;
   int nmiss1, nmiss2, nmiss3, nmiss4;
   int i;
@@ -67,6 +68,11 @@ void *Cond2(void *argument)
   taxisID2 = vlistInqTaxis(vlistID2);
   taxisID4 = taxisDuplicate(taxisID2);
   vlistDefTaxis(vlistID4, taxisID4);
+
+  ntsteps1 = vlistNtsteps(vlistID1);
+  ntsteps2 = vlistNtsteps(vlistID2);
+  if ( ntsteps1 == 0 ) ntsteps1 = 1;
+  if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
   if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
@@ -99,12 +105,11 @@ void *Cond2(void *argument)
 
   if ( cdoVerbose )
     cdoPrint("Number of timesteps: file1 %d, file2 %d, file3 %d",
-	     vlistNtsteps(vlistID1), vlistNtsteps(vlistID2), vlistNtsteps(vlistID3));
+	     ntsteps1, ntsteps2, vlistNtsteps(vlistID3));
 
   if ( filltype == FILL_NONE )
     {
-      if ( (vlistNtsteps(vlistID1) == 1 || vlistNtsteps(vlistID1) == 0) &&
-	    vlistNtsteps(vlistID2) != 1 && vlistNtsteps(vlistID2) != 0 )
+      if ( ntsteps1 == 1 || ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
