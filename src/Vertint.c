@@ -448,7 +448,7 @@ void *Vertint(void *argument)
       geop = (double *) malloc(ngp*sizeof(double));
       if ( geopID == -1 )
 	{
-	  cdoWarning("Orography not found - using zero orography!");
+	  cdoWarning("Orography (surf. geopotential) not found - using zero orography!");
 	  memset(geop, 0, ngp*sizeof(double));
 	}
     }

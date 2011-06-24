@@ -31,7 +31,7 @@
       Genweights  genbic          Generate bicubic interpolation weights
       Genweights  gendis          Generate distance-weighted averaging weights
       Genweights  gennn           Generate nearest neighbor weights
-      Genweights  genlaf          Generate largest ares fraction weights
+      Genweights  genlaf          Generate largest area fraction weights
       Remap       remap           SCRIP grid remapping
 */
 
