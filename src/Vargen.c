@@ -26,6 +26,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "list.h"
 
 
 #if defined (__GNUC__)
@@ -55,14 +56,42 @@
   };
 #endif
 
+/*  some Constants for creating temperatur and pressure for the standard atmosphere */
+#define T_ZERO          (288.0)   /* surface temperatur [K] */
+#define T_DELTA         (-75.0)
+#define SCALEHEIGHT   (10000.0)   /* [m] */
+#define P_ZERO         (1000.0)   /* surface pressure [hPa] */
+#define C_EARTH_GRAV      (9.80665)
+#define C_R             (287.05)
+static double tmp4pressure = (-1)*(C_EARTH_GRAV*SCALEHEIGHT)/(C_R*T_ZERO);
+
+static double
+std_atm_temperatur(double height)
+{
+  /*
+    Compute the temperatur for the given height (in meters) according to the
+    solution of the hydrostatic atmosphere
+   */
+  return (T_ZERO + T_DELTA * exp((-1)*(height/SCALEHEIGHT)));
+}
+
+static double
+std_atm_pressure(double height)
+{
+  /*
+    Compute the pressure for the given height (in meters) according to the
+    solution of the hydrostatic atmosphere
+   */
+  return (P_ZERO * exp((-1)*tmp4pressure*log((exp(height/SCALEHEIGHT + T_DELTA)/(T_ZERO + T_DELTA)))));
+}
 
 void *Vargen(void *argument)
 {
-  int RANDOM, CONST, FOR, TOPO, TEMP, MASK;
+  int RANDOM, CONST, FOR, TOPO, TEMP, MASK, STDATM;
   int operatorID;
   int streamID;
-  int nrecs, ntimesteps;
-  int tsID, recID, varID, levelID;
+  int nrecs, ntimesteps, nlevels = 1;
+  int tsID, recID, varID, varID2, levelID;
   int gridsize, i;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
@@ -70,7 +99,8 @@ void *Vargen(void *argument)
   const char *gridfile;
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
-  double *array;
+  double *array, *levels;
+  LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
@@ -80,6 +110,7 @@ void *Vargen(void *argument)
   TOPO   = cdoOperatorAdd("topo",   0, 0, NULL);
   TEMP   = cdoOperatorAdd("temp",   0, 0, NULL);
   MASK   = cdoOperatorAdd("mask",   0, 0, NULL);
+  STDATM = cdoOperatorAdd("stdatm", 0, 0, "list of z-levels");
 
   operatorID = cdoOperatorID();
 
@@ -92,12 +123,12 @@ void *Vargen(void *argument)
       gridfile = operatorArgv()[0];
       gridID   = cdoDefineGrid(gridfile);
       if ( operatorArgc() == 2 )
-	{
-	  long idum;
-	  idum = atol(operatorArgv()[1]);
-	  if ( idum >= 0 && idum < 0x7FFFFFFF )
-	    seed = idum;
-	}
+        {
+          long idum;
+          idum = atol(operatorArgv()[1]);
+          if ( idum >= 0 && idum < 0x7FFFFFFF )
+            seed = idum;
+        }
       srand(seed);
     }
   else if ( operatorID == CONST )
@@ -134,9 +165,9 @@ void *Vargen(void *argument)
       rstart = atof(operatorArgv()[0]);
       rstop  = atof(operatorArgv()[1]);
       if ( operatorArgc() == 3 )
-	rinc = atof(operatorArgv()[2]);
+        rinc = atof(operatorArgv()[2]);
       else
-	rinc = 1;
+        rinc = 1;
 
       if ( DBL_IS_EQUAL(rinc, 0.0) ) cdoAbort("Increment is zero!");
 
@@ -146,9 +177,36 @@ void *Vargen(void *argument)
       gridDefXvals(gridID, &lon);
       gridDefYvals(gridID, &lat);
     }
+  else if ( operatorID == STDATM )
+    {
+      double lon = 0, lat = 0;
 
+      operatorInputArg("levels");
+      nlevels = args2fltlist(operatorArgc(), operatorArgv(), flist);
+      levels  = (double *) listArrayPtr(flist);
 
-  zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+      if ( cdoVerbose ) for ( i = 0; i < nlevels; ++i ) printf("levels %d: %g\n", i, levels[i]);
+
+      gridID = gridCreate(GRID_LONLAT, 1);
+      gridDefXsize(gridID, 1);
+      gridDefYsize(gridID, 1);
+      gridDefXvals(gridID, &lon);
+      gridDefYvals(gridID, &lat);
+    }
+
+  if ( operatorID == STDATM )
+    {
+      zaxisID = zaxisCreate(ZAXIS_HEIGHT, nlevels);
+      zaxisDefLevels(zaxisID  , levels);
+      zaxisDefName(zaxisID    , "level");
+      zaxisDefLongname(zaxisID, "Level");
+      zaxisDefUnits(zaxisID   , "meters");
+    }
+  else
+    {
+      zaxisID = zaxisCreate(ZAXIS_SURFACE, 1);
+      nlevels = 1;
+    }
 
   vlistID = vlistCreate();
 
@@ -156,17 +214,34 @@ void *Vargen(void *argument)
     varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
   else
     varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+  /*
+     For the standard atmosphere two output variables are generated: pressure and
+     temperatur. The first (varID) is pressure, second (varID2) is temperatur.
+     Add an additional variable for the standard atmosphere.
+   */
+/*   if ( operatorID == STDATM )
+ *     varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+ */
 
   if ( operatorID == MASK )
     vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);
 
-  vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
+  if ( operatorID != STDATM )
+    vlistID, varID, cdoOperatorName(operatorID);
+  else
+    {
+      vlistDefVarName(vlistID   , varID , "P");
+      vlistDefVarStdname(vlistID, varID , "air_pressure");
+/*       vlistDefVarName(vlistID   , varID2, "T");
+ *       vlistDefVarStdname(vlistID, varID2, "air_temperature");
+ */
+    }
 
   taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
   if ( operatorID == RANDOM || operatorID == CONST || operatorID == TOPO ||
-       operatorID == TEMP || operatorID == MASK )
+       operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
   streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
@@ -192,11 +267,14 @@ void *Vargen(void *argument)
       taxisDefVtime(taxisID, vtime);
       streamDefTimestep(streamID, tsID);
 
-      nrecs = 1;
+      nrecs = nlevels;
       for ( recID = 0; recID < nrecs; recID++ )
 	{
-	  levelID = 0;
+	  levelID = recID;
 	  streamDefRecord(streamID, varID, levelID);
+/*           if ( operatorID == STDATM )
+ *             streamDefRecord(streamID, varID2, levelID);
+ */
 
 	  if ( operatorID == RANDOM )
 	    {
@@ -238,6 +316,10 @@ void *Vargen(void *argument)
 	  else if ( operatorID == FOR )
 	    {
 	      array[0] = rval;
+	    }
+	  else if ( operatorID == STDATM )
+	    {
+	      array[0] = std_atm_temperatur(levels[levelID]);
 	    }
 
 	  streamWriteRecord(streamID, array, 0);
