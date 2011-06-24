@@ -230,7 +230,7 @@ void *Remapeta(void *argument)
   double *single2;
   int taxisID1, taxisID2;
   int lhavevct;
-  int nlevh1 = 0, nlevh2 = 0;
+  int nhlevf1 = 0, nhlevf2 = 0;
   double *lev2;
   double *vct1 = NULL, *vct2 = NULL;
   double *a1 = NULL, *b1 = NULL, *a2 = NULL, *b2 = NULL;
@@ -273,13 +273,13 @@ void *Remapeta(void *argument)
     {
 
       vct2 = vctFromFile(operatorArgv()[0], &nvct2);
-      nlevh2 = nvct2/2 - 1;
+      nhlevf2 = nvct2/2 - 1;
 
       a2 = vct2;
       b2 = vct2 + nvct2/2;
 
       if ( cdoVerbose )
-	for ( i = 0; i < nlevh2+1; ++i )
+	for ( i = 0; i < nhlevf2+1; ++i )
 	  cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
 
       if ( operatorArgc() == 2 )
@@ -363,9 +363,9 @@ void *Remapeta(void *argument)
 	}
     }
 
-  zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nlevh2);
-  lev2 = (double *) malloc(nlevh2*sizeof(double));
-  for ( i = 0; i < nlevh2; ++i ) lev2[i] = i+1;
+  zaxisID2 = zaxisCreate(ZAXIS_HYBRID, nhlevf2);
+  lev2 = (double *) malloc(nhlevf2*sizeof(double));
+  for ( i = 0; i < nhlevf2; ++i ) lev2[i] = i+1;
   zaxisDefLevels(zaxisID2, lev2);
   free(lev2);
 
@@ -399,10 +399,10 @@ void *Remapeta(void *argument)
 		    {
 		      lhavevct = TRUE;
 		      zaxisIDh = zaxisID;
-		      nlevh1   = nlevel;
+		      nhlevf1  = nlevel;
 	      
                       if ( cdoVerbose )
-                        cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nlevh1   = %d", zaxisIDh, nlevel);
+                        cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf1   = %d", zaxisIDh, nlevel);
  
 		      vct1 = (double *) malloc(nvct1*sizeof(double));
 		      memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
@@ -471,7 +471,7 @@ void *Remapeta(void *argument)
 	      else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
 	    }
 
-	  if ( nlevel == nlevh1 )
+	  if ( nlevel == nhlevf1 )
 	    {
 	      if      ( strcmp(varname, "t")       == 0 ) code = 130;
 	      else if ( strcmp(varname, "q")       == 0 ) code = 133;
@@ -491,7 +491,7 @@ void *Remapeta(void *argument)
 	cdoAbort("Spectral data unsupported!");
 
 
-      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nlevh1 )
+      if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlevf1 )
 	{
 	  if ( ! (code == 130 || code == 133) )
 	    varids[nvars3D++] = varID;
@@ -526,10 +526,10 @@ void *Remapeta(void *argument)
 
   if ( operatorID == REMAPETAZ )
     {
-      deltap1 = (double *) malloc(ngp*nlevh1*sizeof(double));
-      deltap2 = (double *) malloc(ngp*nlevh2*sizeof(double));
-      half_press1 = (double *) malloc(ngp*(nlevh1+1)*sizeof(double));
-      half_press2 = (double *) malloc(ngp*(nlevh2+1)*sizeof(double));
+      deltap1 = (double *) malloc(ngp*nhlevf1*sizeof(double));
+      deltap2 = (double *) malloc(ngp*nhlevf2*sizeof(double));
+      half_press1 = (double *) malloc(ngp*(nhlevf1+1)*sizeof(double));
+      half_press2 = (double *) malloc(ngp*(nhlevf2+1)*sizeof(double));
     }
 
   array = (double *) malloc(ngp*sizeof(double));
@@ -548,11 +548,11 @@ void *Remapeta(void *argument)
       pscor = (double *) malloc(ngp*sizeof(double));
       secor = (double *) malloc(ngp*sizeof(double));
 
-      t1    = (double *) malloc(ngp*nlevh1*sizeof(double));
-      q1    = (double *) malloc(ngp*nlevh1*sizeof(double));
+      t1    = (double *) malloc(ngp*nhlevf1*sizeof(double));
+      q1    = (double *) malloc(ngp*nhlevf1*sizeof(double));
 
-      t2    = (double *) malloc(ngp*nlevh2*sizeof(double));
-      q2    = (double *) malloc(ngp*nlevh2*sizeof(double));
+      t2    = (double *) malloc(ngp*nhlevf2*sizeof(double));
+      q2    = (double *) malloc(ngp*nhlevf2*sizeof(double));
     }
 
   if ( nvars3D )
@@ -562,15 +562,15 @@ void *Remapeta(void *argument)
 
       for ( varID = 0; varID < nvars3D; ++varID )
 	{
-	  vars1[varID] = (double *) malloc(ngp*nlevh1*sizeof(double));
-	  vars2[varID] = (double *) malloc(ngp*nlevh2*sizeof(double));
+	  vars1[varID] = (double *) malloc(ngp*nhlevf1*sizeof(double));
+	  vars2[varID] = (double *) malloc(ngp*nhlevf2*sizeof(double));
 	}
     }
 
   if ( zaxisIDh != -1 && geopID == -1 )
     {
       if ( ltq )
-	cdoWarning("Orography (geosp) not found - using zero orography!");
+	cdoWarning("Orography (surf. geopotential) not found - using zero orography!");
 
       memset(fis1, 0, ngp*sizeof(double));
     }
@@ -619,7 +619,7 @@ void *Remapeta(void *argument)
 	      else if ( ltq && varID == sqID )
 		memcpy(q1+offset, array, ngp*sizeof(double));
 	      /* else if ( zaxisID == zaxisIDh ) */
-	      else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == nlevh1 )
+	      else if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && nlevel == nhlevf1 )
 		{
 		  for ( i = 0; i < nvars3D; ++i )
 		    if ( varID == varids[i] ) break;
@@ -650,18 +650,12 @@ void *Remapeta(void *argument)
 	  if ( minval < ps_min || maxval > ps_max )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
-	  if ( minval < -1.e10 || maxval > 1.e10 )
-	    cdoAbort("Surface pressure out of range!");
-
 	  /* check range of geop */
 
 	  minmax(ngp, fis1, imiss, &minval, &maxval);
 
 	  if ( minval < fis_min || maxval > fis_max )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
-
-	  if ( minval < -1.e10 || maxval > 1.e10 )
-	    cdoAbort("Orography out of range!");
 	}
 
       if ( lfis2 == FALSE )
@@ -673,7 +667,7 @@ void *Remapeta(void *argument)
 	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      offset   = gridsize*levelID;
 	      single2  = t1 + offset;
 
@@ -687,7 +681,7 @@ void *Remapeta(void *argument)
 	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      offset   = gridsize*levelID;
 	      single2  = q1 + offset;
 
@@ -704,10 +698,10 @@ void *Remapeta(void *argument)
 	{
 	  if ( cdoTimer ) timer_start(timer_hetaeta);
 	  hetaeta(ltq, ngp, imiss,
-		  nlevh1, a1, b1,
+		  nhlevf1, a1, b1,
 		  fis1, ps1,
 		  t1, q1,
-		  nlevh2, a2, b2,
+		  nhlevf2, a2, b2,
 		  fis2, ps2,
 		  t2, q2,
 		  nvars3D, vars1, vars2,
@@ -715,7 +709,7 @@ void *Remapeta(void *argument)
 	  if ( cdoTimer ) timer_stop(timer_hetaeta);
 	}
 
-      nctop = ncctop((long) nlevh2, (long) nlevh2+1, a2, b2);
+      nctop = ncctop((long) nhlevf2, (long) nhlevf2+1, a2, b2);
 
       if ( geopID != -1 )
 	{
@@ -793,11 +787,11 @@ void *Remapeta(void *argument)
 	    {
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      vert_sum(sum1, vars1[iv], gridsize, nlevh1);
+	      vert_sum(sum1, vars1[iv], gridsize, nhlevf1);
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      vert_sum(sum2, vars2[iv], gridsize, nlevh2);
+	      vert_sum(sum2, vars2[iv], gridsize, nhlevf2);
 	    }
 	  else if ( operatorID == REMAPETAZ )
 	    {
@@ -806,27 +800,27 @@ void *Remapeta(void *argument)
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-	      presh(NULL, half_press1, vct1, ps1, nlevh1, gridsize);
-	      for ( k = 0; k < nlevh1; ++k )
+	      presh(NULL, half_press1, vct1, ps1, nhlevf1, gridsize);
+	      for ( k = 0; k < nhlevf1; ++k )
 		for ( i = 0; i < ngp; ++i )
 		  {
 		    deltap1[k*ngp+i] = half_press1[(k+1)*ngp+i] - half_press1[k*ngp+i];
 		    deltap1[k*ngp+i] = log(deltap1[k*ngp+i]);
 		  }
-	      vert_sumw(sum1, vars1[iv], gridsize, nlevh1, deltap1);
+	      vert_sumw(sum1, vars1[iv], gridsize, nhlevf1, deltap1);
 
 
 	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
 
-	      presh(NULL, half_press2, vct2, ps1, nlevh2, gridsize);
-	      for ( k = 0; k < nlevh2; ++k )
+	      presh(NULL, half_press2, vct2, ps1, nhlevf2, gridsize);
+	      for ( k = 0; k < nhlevf2; ++k )
 		for ( i = 0; i < ngp; ++i )
 		  {
 		    deltap2[k*ngp+i] = half_press2[(k+1)*ngp+i] - half_press2[k*ngp+i];
 		    deltap2[k*ngp+i] = log(deltap2[k*ngp+i]);
 		  }
-	      vert_sumw(sum2, vars2[iv], gridsize, nlevh2, deltap2);
+	      vert_sumw(sum2, vars2[iv], gridsize, nhlevf2, deltap2);
 	    }
 
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
