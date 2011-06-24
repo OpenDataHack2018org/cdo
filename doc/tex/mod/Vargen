@@ -6,7 +6,7 @@
 @Operators = const random stdatm
 
 @BeginDescription
-Generates a dataset with one field. The size of the field
+Generates a dataset with one or more fields. The field size
 is specified by the user given grid description.
 According to the chosen operator all field elements
 are constant or filled with random numbers.
@@ -47,38 +47,50 @@ The formulars are:
 P(z) = P_0 * exp(-1 * g/R * H/T_0 * log( (exp(z/H)*T_0 + T_Delta)/(T_0 + T_Delta))
 @EndifMan
 @IfMan
-T(z) = T_0 + T_Delta * (exp(-z/H) - 1))
+T(z) = T_0 + T_Delta * exp(-z/H)
 @EndifMan
 @IfDoc
 @BeginMath
 P(z) = P_0 \exp \left(- \frac{g}{R} \frac{H}{T_0} \log \left( \frac{\exp \left( \frac{z}{H} \right) T_0 + \Delta T}{T_0 + \Delta T} \right) \right)
 @EndMath
 @BeginMath
-T(z) = T_0 + \Delta T \left(\exp \left(- \frac{z}{H} \right) - 1 \right)
+T(z) = T_0 + \Delta T \exp \left(- \frac{z}{H} \right)
 @EndMath
 @EndifDoc
 
 with the following constants
 
 @IfMan
-T_0     = 288.15 K      surface temperature
-T_Delta = -75 K         Temperature lapse rate for 10Km
-P_0     = 1013.25 hPa   surface pressure
-H       = 10000.0 m     scale height
-g       = 9.81 m/s**2   earth gravity
-R       = 287.05 J/kg*K gas constant for air
+T_0     = 213 K           Offset to get a surface temperature of 288K
+T_Delta = 75 K            Temperature lapse rate for 10Km
+P_0     = 1013.25 hPa     Surface pressure
+H       = 10000.0 m       Scale height
+g       = 9.80665 m/s**2  Earth gravity
+R       = 287.05 J/kg*K   Gas constant for air
 @EndifMan
 @IfDoc
 @BeginEqnAry
- T_0     =& 288.15 \mbox{K} &: \mbox{surface temperature} \\
- \Delta T=& -75 \mbox{K} &: \mbox{Temperature lapse rate for 10Km} \\
+ T_0     =& 213 \mbox{K} &: \mbox{offset to get a surface temperature of 288K} \\
+ \Delta T=& 75 \mbox{K} &: \mbox{Temperature lapse rate for 10Km} \\
  P_0     =& 1013.25 \mbox{hPa} &: \mbox{surface pressure} \\
  H       =& 10000.0 \mbox{m} &: \mbox{scale height} \\
- g       =& 9.81 \frac{\mbox{m}}{\mbox{s}^2}   &: \mbox{earth gravity} \\
+ g       =& 9.80665 \frac{\mbox{m}}{\mbox{s}^2}   &: \mbox{earth gravity} \\
  R       =& 287.05 \frac{\mbox{J}}{\mbox{kgK}} &: \mbox{gas constant for air} \\
 @EndEqnAry
 @EndifDoc
+
+This is the solution for the hydrostatic equations and is only valid for the
+troposphere (constant positive lapse rate). The temperature increase in the
+stratosphere and other effects of the upper atmosphere are not taken into
+account.
 @EndDescription
+
+@BeginExample
+To create a standard atmosphere dataset on a given horizontal grid:
+@BeginVerbatim
+   cdo enlarge,gridfile -stdatm,10000,8000,5000,3000,2000,1000,500,200,0 ofile
+@EndVerbatim
+@EndExample
 @EndOperator
 
 @BeginParameter

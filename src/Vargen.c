@@ -20,6 +20,8 @@
 
       Vargen     const           Create a constant field
       Vargen     random          Field with random values
+      Vargen     stdatm          Field values for pressure and temperature for
+                                 the standard atmosphere
 */
 
 #include <cdi.h>
@@ -57,8 +59,8 @@
 #endif
 
 /*  some Constants for creating temperatur and pressure for the standard atmosphere */
-#define T_ZERO          (288.15)   /* sea level standard temperature [K] */
-#define T_DELTA         (-75.0)
+#define T_ZERO          (213.0)
+#define T_DELTA          (75.0)
 #define SCALEHEIGHT   (10000.0)   /* [m] */
 #define P_ZERO         (1013.25)  /* surface pressure [hPa] */
 #define C_EARTH_GRAV      (9.80665)
@@ -72,14 +74,7 @@ std_atm_temperatur(double height)
     Compute the temperatur for the given height (in meters) according to the
     solution of the hydrostatic atmosphere
    */
-  /*
-     return (T_ZERO + T_DELTA * exp((-1)*(height/SCALEHEIGHT)));
-
-     I suspect an error in the formular above, because 
-     * it does not reproduce the surface temperatur at height 0
-     * temperatur is increasing with height
-   */
-   return (T_ZERO - T_DELTA * (exp((-1)*(height/SCALEHEIGHT)) - 1));
+   return (T_ZERO + T_DELTA * exp((-1)*(height/SCALEHEIGHT)));
 }
 
 static double
