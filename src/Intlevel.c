@@ -19,6 +19,7 @@
    This module contains the following operators:
 
       Intlevel   intlevel        Linear level interpolation
+      Intlevel   intlevel3d      Linear level interpolation on a 3d vertical coordinates variable
 */
 
 #include <ctype.h>
@@ -158,7 +159,7 @@ void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
 
 void *Intlevel(void *argument)
 {
-  int INTLEVEL, INTLEVELX;
+  int INTLEVEL, INTLEVELX, INTLEVEL3D;
   int operatorID;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
@@ -188,8 +189,9 @@ void *Intlevel(void *argument)
 
   cdoInitialize(argument);
 
-  INTLEVEL  = cdoOperatorAdd("intlevel",  0, 0, NULL);
-  INTLEVELX = cdoOperatorAdd("intlevelx", 0, 0, NULL);
+  INTLEVEL   = cdoOperatorAdd("intlevel",  0, 0, NULL);
+  INTLEVELX  = cdoOperatorAdd("intlevelx", 0, 0, NULL);
+  INTLEVEL3D = cdoOperatorAdd("intlevel3d",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
