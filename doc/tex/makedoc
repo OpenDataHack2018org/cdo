@@ -1097,7 +1097,14 @@ sub print_description {
 #	  print TRFILE "\\vspace*{2mm}\n";
       print TRFILE "\n";
       $math = 0;
-    } elsif ( "$kword" eq "\@BEGINDISPLAYMATH" ) {
+    } elsif ( "$kword" eq "\@BEGINEQNARY" ) {
+      print TRFILE "\\begin{eqnarray*}\n";
+      $math = 1;
+    } elsif ( "$kword" eq "\@ENDEQNARY" ) {
+      print TRFILE "\\end{eqnarray*}\n";
+      print TRFILE "\n";
+      $math = 0;
+    }elsif ( "$kword" eq "\@BEGINDISPLAYMATH" ) {
       print TRFILE "\\begin{displaymath}\n";
       $math = 1;
     } elsif ( "$kword" eq "\@ENDDISPLAYMATH" ) {
