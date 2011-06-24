@@ -117,7 +117,7 @@ void *Vargen(void *argument)
   TOPO   = cdoOperatorAdd("topo",   0, 0, NULL);
   TEMP   = cdoOperatorAdd("temp",   0, 0, NULL);
   MASK   = cdoOperatorAdd("mask",   0, 0, NULL);
-  STDATM = cdoOperatorAdd("stdatm", 0, 0, "list of z-levels");
+  STDATM = cdoOperatorAdd("stdatm", 0, 0, "levels");
 
   operatorID = cdoOperatorID();
 
