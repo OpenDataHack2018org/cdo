@@ -63,7 +63,7 @@
 #define P_ZERO         (1000.0)   /* surface pressure [hPa] */
 #define C_EARTH_GRAV      (9.80665)
 #define C_R             (287.05)
-static double tmp4pressure = (-1)*(C_EARTH_GRAV*SCALEHEIGHT)/(C_R*T_ZERO);
+static double tmp4pressure = (C_EARTH_GRAV*SCALEHEIGHT)/(C_R*T_ZERO);
 
 static double
 std_atm_temperatur(double height)
@@ -82,7 +82,7 @@ std_atm_pressure(double height)
     Compute the pressure for the given height (in meters) according to the
     solution of the hydrostatic atmosphere
    */
-  return (P_ZERO * exp((-1)*tmp4pressure*log((exp(height/SCALEHEIGHT + T_DELTA)/(T_ZERO + T_DELTA)))));
+  return (P_ZERO * exp((-1)*tmp4pressure*log((exp(height/SCALEHEIGHT)*T_ZERO + T_DELTA)/(T_ZERO + T_DELTA))));
 }
 
 void *Vargen(void *argument)
@@ -90,7 +90,7 @@ void *Vargen(void *argument)
   int RANDOM, CONST, FOR, TOPO, TEMP, MASK, STDATM;
   int operatorID;
   int streamID;
-  int nrecs, ntimesteps, nlevels = 1;
+  int nrecs,nvars, ntimesteps, nlevels = 1;
   int tsID, recID, varID, varID2, levelID;
   int gridsize, i;
   int vlistID;
@@ -219,9 +219,8 @@ void *Vargen(void *argument)
      temperatur. The first (varID) is pressure, second (varID2) is temperatur.
      Add an additional variable for the standard atmosphere.
    */
-/*   if ( operatorID == STDATM )
- *     varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
- */
+  if ( operatorID == STDATM )
+    varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
 
   if ( operatorID == MASK )
     vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);
@@ -230,11 +229,14 @@ void *Vargen(void *argument)
     vlistID, varID, cdoOperatorName(operatorID);
   else
     {
-      vlistDefVarName(vlistID   , varID , "P");
-      vlistDefVarStdname(vlistID, varID , "air_pressure");
-/*       vlistDefVarName(vlistID   , varID2, "T");
- *       vlistDefVarStdname(vlistID, varID2, "air_temperature");
- */
+      vlistDefVarName(vlistID    , varID , "P");
+      vlistDefVarStdname(vlistID , varID , "air_pressure");
+      vlistDefVarLongname(vlistID, varID , "pressure");
+      vlistDefVarUnits(vlistID   , varID , "hPa");
+      vlistDefVarName(vlistID    , varID2, "T");
+      vlistDefVarStdname(vlistID , varID2, "air_temperature");
+      vlistDefVarLongname(vlistID, varID2, "temperature");
+      vlistDefVarUnits(vlistID   , varID2, "K");
     }
 
   taxisID = taxisCreate(TAXIS_RELATIVE);
@@ -258,6 +260,9 @@ void *Vargen(void *argument)
 
   julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
 
+  nvars = vlistNvars(vlistID);
+  nrecs = vlistNrecs(vlistID);
+
   for ( tsID = 0; tsID < ntimesteps; tsID++ )
     {
       rval  = rstart + rinc*tsID;
@@ -267,63 +272,62 @@ void *Vargen(void *argument)
       taxisDefVtime(taxisID, vtime);
       streamDefTimestep(streamID, tsID);
 
-      nrecs = nlevels;
-      for ( recID = 0; recID < nrecs; recID++ )
-	{
-	  levelID = recID;
-	  streamDefRecord(streamID, varID, levelID);
-/*           if ( operatorID == STDATM )
- *             streamDefRecord(streamID, varID2, levelID);
- */
+      for ( varID = 0; varID < nvars; varID++ )
+        {
+          nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
+          for ( levelID = 0; levelID < nlevels; levelID++ )
+            {
+              streamDefRecord(streamID, varID, levelID);
 
-	  if ( operatorID == RANDOM )
-	    {
-	      for ( i = 0; i < gridsize; i++ )
-		array[i] = rand()/(RAND_MAX+1.0);
-	    }
-	  else if ( operatorID == CONST )
-	    {
-	      for ( i = 0; i < gridsize; i++ )
-		array[i] = rconst;
-	    }
-	  else if ( operatorID == TOPO )
-	    {
+              if ( operatorID == RANDOM )
+                {
+                  for ( i = 0; i < gridsize; i++ )
+                    array[i] = rand()/(RAND_MAX+1.0);
+                }
+              else if ( operatorID == CONST )
+                {
+                  for ( i = 0; i < gridsize; i++ )
+                    array[i] = rconst;
+                }
+              else if ( operatorID == TOPO )
+                {
 #if defined(WITH_DATA)
-	      for ( i = 0; i < gridsize; i++ )
-		array[i] = etopo[i]/etopo_scale - etopo_offset;
+                  for ( i = 0; i < gridsize; i++ )
+                    array[i] = etopo[i]/etopo_scale - etopo_offset;
 #else
-	      cdoAbort("Operator support disabled!");
+                  cdoAbort("Operator support disabled!");
 #endif
-	    }
-	  else if ( operatorID == TEMP )
-	    {
+                }
+              else if ( operatorID == TEMP )
+                {
 #if defined(WITH_DATA)
-	      for ( i = 0; i < gridsize; i++ )
-		array[i] = temp[i]/temp_scale - temp_offset;
+                  for ( i = 0; i < gridsize; i++ )
+                    array[i] = temp[i]/temp_scale - temp_offset;
 #else
-	      cdoAbort("Operator support disabled!");
+                  cdoAbort("Operator support disabled!");
 #endif
-	    }
-	  else if ( operatorID == MASK )
-	    {
+                }
+              else if ( operatorID == MASK )
+                {
 #if defined(WITH_DATA)
-	      for ( i = 0; i < gridsize; i++ )
-		array[i] = mask[i]/mask_scale - mask_offset;
+                  for ( i = 0; i < gridsize; i++ )
+                    array[i] = mask[i]/mask_scale - mask_offset;
 #else
-	      cdoAbort("Operator support disabled!");
+                  cdoAbort("Operator support disabled!");
 #endif
-	    }
-	  else if ( operatorID == FOR )
-	    {
-	      array[0] = rval;
-	    }
-	  else if ( operatorID == STDATM )
-	    {
-	      array[0] = std_atm_temperatur(levels[levelID]);
-	    }
+                }
+              else if ( operatorID == FOR )
+                {
+                  array[0] = rval;
+                }
+              else if ( operatorID == STDATM )
+                {
+                  array[0] = (varID == varID2) ? std_atm_temperatur(levels[levelID]) : std_atm_pressure(levels[levelID]);
+                }
 
-	  streamWriteRecord(streamID, array, 0);
-	}
+              streamWriteRecord(streamID, array, 0);
+            }
+        }
     }
 
   streamClose(streamID);
