@@ -57,6 +57,7 @@ void *Condc(void *argument);
 void *Consecstat(void *argument);
 void *Copy(void *argument);
 void *Deltime(void *argument);
+void *Derivepar(void *argument);
 void *Detrend(void *argument);
 void *Diff(void *argument);
 void *Duplicate(void *argument);
@@ -265,6 +266,7 @@ void *Wct(void *argument);
 #define  ConsecstatOperators    {"consects", "consecsum"}
 #define  CopyOperators          {"copy", "selall"}
 #define  DeltimeOperators       {"delday", "del29feb"}
+#define  DeriveparOperators     {"geopotheight"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffp", "diffn", "diffc", "sdiff"}
 #define  DuplicateOperators     {"duplicate"}
@@ -510,6 +512,7 @@ static modules_t Modules[] =
   { Consecstat,     ConsecstatHelp,    ConsecstatOperators,    CDI_REAL,  1,  1 },
   { Copy,           CopyHelp,          CopyOperators,          CDI_REAL, -1,  1 },
   { Deltime,        NULL,              DeltimeOperators,       CDI_REAL,  1,  1 },
+  { Derivepar,      NULL,              DeriveparOperators,     CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
   { Diff,           DiffHelp,          DiffOperators,          CDI_REAL,  2,  0 },
   { Duplicate,      NULL,              DuplicateOperators,     CDI_REAL,  1,  1 },

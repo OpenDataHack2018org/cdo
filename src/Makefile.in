@@ -64,7 +64,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
-	cdo-Deltime.$(OBJEXT) cdo-Detrend.$(OBJEXT) cdo-Diff.$(OBJEXT) \
+	cdo-Deltime.$(OBJEXT) cdo-Derivepar.$(OBJEXT) \
+	cdo-Detrend.$(OBJEXT) cdo-Diff.$(OBJEXT) \
 	cdo-Duplicate.$(OBJEXT) cdo-EOFs.$(OBJEXT) cdo-Eof3d.$(OBJEXT) \
 	cdo-EcaIndices.$(OBJEXT) cdo-Echam5ini.$(OBJEXT) \
 	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
@@ -340,20 +341,21 @@ top_srcdir = @top_srcdir@
 cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Cat.c Change.c Change_e5slm.c Cloudlayer.c Command.c Comp.c \
 	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
-	Copy.c Deltime.c Detrend.c Diff.c Duplicate.c EOFs.c Eof3d.c \
-	EcaIndices.c Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c \
-	Ensstat3.c Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c Filedes.c \
-	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
-	Gather.c Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c \
-	Harmonic.c Hi.c Histogram.c IFS2ICON.c Importamsr.c \
-	Importbinary.c Importcmsaf.c Importobs.c Info.c Input.c \
-	Intgrid.c Intgridtraj.c Intlevel.c Intntime.c Inttime.c \
-	Intyear.c Invert.c Invertlev.c Isosurface.c Log.c Maskbox.c \
-	Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c \
-	Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c \
-	Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
-	Replace.c Replacevalues.c Rotuv.c Runpctl.c Runstat.c \
-	Scatter.c Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
+	Copy.c Deltime.c Derivepar.c Detrend.c Diff.c Duplicate.c \
+	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
+	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
+	Eofcoeff3d.c Exprf.c Filedes.c Fillmiss.c Filter.c Fldrms.c \
+	Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c Gradsdes.c \
+	Gridboxstat.c Gridcell.c Harmonic.c Hi.c Histogram.c \
+	IFS2ICON.c Importamsr.c Importbinary.c Importcmsaf.c \
+	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
+	Intntime.c Inttime.c Intyear.c Invert.c Invertlev.c \
+	Isosurface.c Log.c Maskbox.c Mastrfu.c Math.c Merge.c \
+	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
+	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
+	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
+	Replacevalues.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
+	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
 	Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c Sorttimestamp.c \
@@ -530,6 +532,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Consecstat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Copy.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Deltime.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Derivepar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Detrend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Diff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Duplicate.Po@am__quote@
@@ -1031,6 +1034,20 @@ cdo-Deltime.obj: Deltime.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Deltime.c' object='cdo-Deltime.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Deltime.obj `if test -f 'Deltime.c'; then $(CYGPATH_W) 'Deltime.c'; else $(CYGPATH_W) '$(srcdir)/Deltime.c'; fi`
+
+cdo-Derivepar.o: Derivepar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Derivepar.o -MD -MP -MF $(DEPDIR)/cdo-Derivepar.Tpo -c -o cdo-Derivepar.o `test -f 'Derivepar.c' || echo '$(srcdir)/'`Derivepar.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Derivepar.Tpo $(DEPDIR)/cdo-Derivepar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Derivepar.c' object='cdo-Derivepar.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Derivepar.o `test -f 'Derivepar.c' || echo '$(srcdir)/'`Derivepar.c
+
+cdo-Derivepar.obj: Derivepar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Derivepar.obj -MD -MP -MF $(DEPDIR)/cdo-Derivepar.Tpo -c -o cdo-Derivepar.obj `if test -f 'Derivepar.c'; then $(CYGPATH_W) 'Derivepar.c'; else $(CYGPATH_W) '$(srcdir)/Derivepar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Derivepar.Tpo $(DEPDIR)/cdo-Derivepar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Derivepar.c' object='cdo-Derivepar.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Derivepar.obj `if test -f 'Derivepar.c'; then $(CYGPATH_W) 'Derivepar.c'; else $(CYGPATH_W) '$(srcdir)/Derivepar.c'; fi`
 
 cdo-Detrend.o: Detrend.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Detrend.o -MD -MP -MF $(DEPDIR)/cdo-Detrend.Tpo -c -o cdo-Detrend.o `test -f 'Detrend.c' || echo '$(srcdir)/'`Detrend.c

@@ -22,6 +22,7 @@ cdo_SOURCES += Arith.c         \
                Consecstat.c    \
                Copy.c          \
                Deltime.c       \
+               Derivepar.c     \
                Detrend.c       \
                Diff.c          \
                Duplicate.c     \

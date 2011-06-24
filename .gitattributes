@@ -274,6 +274,7 @@ src/Condc.c -text
 src/Consecstat.c -text
 src/Copy.c -text
 src/Deltime.c -text
+src/Derivepar.c -text
 src/Detrend.c -text
 src/Diff.c -text
 src/Duplicate.c -text
