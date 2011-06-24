@@ -57,13 +57,13 @@
 #endif
 
 /*  some Constants for creating temperatur and pressure for the standard atmosphere */
-#define T_ZERO          (288.0)   /* surface temperatur [K] */
+#define T_ZERO          (288.15)   /* sea level standard temperature [K] */
 #define T_DELTA         (-75.0)
 #define SCALEHEIGHT   (10000.0)   /* [m] */
-#define P_ZERO         (1000.0)   /* surface pressure [hPa] */
+#define P_ZERO         (1013.25)  /* surface pressure [hPa] */
 #define C_EARTH_GRAV      (9.80665)
-#define C_R             (287.05)
-static double tmp4pressure = (C_EARTH_GRAV*SCALEHEIGHT)/(C_R*T_ZERO);
+#define C_R             (287.05)  /*  specific gas constant for air */
+static double TMP4PRESSURE = (C_EARTH_GRAV*SCALEHEIGHT)/(C_R*T_ZERO);
 
 static double
 std_atm_temperatur(double height)
@@ -72,7 +72,14 @@ std_atm_temperatur(double height)
     Compute the temperatur for the given height (in meters) according to the
     solution of the hydrostatic atmosphere
    */
-  return (T_ZERO + T_DELTA * exp((-1)*(height/SCALEHEIGHT)));
+  /*
+     return (T_ZERO + T_DELTA * exp((-1)*(height/SCALEHEIGHT)));
+
+     I suspect an error in the formular above, because 
+     * it does not reproduce the surface temperatur at height 0
+     * temperatur is increasing with height
+   */
+   return (T_ZERO - T_DELTA * (exp((-1)*(height/SCALEHEIGHT)) - 1));
 }
 
 static double
@@ -82,7 +89,7 @@ std_atm_pressure(double height)
     Compute the pressure for the given height (in meters) according to the
     solution of the hydrostatic atmosphere
    */
-  return (P_ZERO * exp((-1)*tmp4pressure*log((exp(height/SCALEHEIGHT)*T_ZERO + T_DELTA)/(T_ZERO + T_DELTA))));
+  return (P_ZERO * exp((-1)*TMP4PRESSURE*log((exp(height/SCALEHEIGHT)*T_ZERO + T_DELTA)/(T_ZERO + T_DELTA))));
 }
 
 void *Vargen(void *argument)
