@@ -45,7 +45,7 @@
 static double Grav          = C_EARTH_GRAV;
 static double RD            = C_EARTH_RD;
 
-void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor, int nlev)
+void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, double *pcw, double * pci, int nhor, int nlev)
 {
   int i, j;
   double vtmp;
@@ -157,7 +157,7 @@ void *Derivepar(void *argument)
   int ngrids, gridID, zaxisID;
   int nlevel;
   int nvct;
-  int geopID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1;
+  int geopID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1, clwcID = -1, ciwcID = -1;
   int code;
   char varname[CDI_MAX_NAME];
   double *single2;
@@ -166,7 +166,7 @@ void *Derivepar(void *argument)
   int nhlevf = 0;
   double *lev2;
   double *vct = NULL;
-  double *geop = NULL, *ps = NULL, *temp = NULL, *hum = NULL;
+  double *geop = NULL, *ps = NULL, *temp = NULL, *hum = NULL, *lwater = NULL, *iwater = NULL;
   double *geopotheight = NULL;
   int nmiss, nmissout = 0;
   int ltq = FALSE;
@@ -299,6 +299,8 @@ void *Derivepar(void *argument)
 	    {
 	      if      ( strcmp(varname, "t")       == 0 ) code = 130;
 	      else if ( strcmp(varname, "q")       == 0 ) code = 133;
+	      else if ( strcmp(varname, "clwc")    == 0 ) code = 246;
+	      else if ( strcmp(varname, "ciwc")    == 0 ) code = 247;
 	    }
 	}
 
@@ -307,6 +309,8 @@ void *Derivepar(void *argument)
       else if ( code == 133 ) humID     = varID;
       else if ( code == 134 ) psID      = varID;
       else if ( code == 152 ) lnpsID    = varID;
+      else if ( code == 246 ) clwcID    = varID;
+      else if ( code == 247 ) ciwcID    = varID;
 
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("Spectral data on model level unsupported!");
@@ -322,18 +326,22 @@ void *Derivepar(void *argument)
 	{
 	  if ( code == 130 ) tempID = -1;
 	  if ( code == 133 ) humID  = -1;
+	  if ( code == 246 ) clwcID  = -1;
+	  if ( code == 247 ) ciwcID  = -1;
 	}
     }
 
   if ( tempID == -1 ) cdoAbort("Temperature not found!");
 
-  array = (double *) malloc(ngp*sizeof(double));
+  array  = (double *) malloc(ngp*sizeof(double));
 
-  geop  = (double *) malloc(ngp*sizeof(double));
-  ps    = (double *) malloc(ngp*sizeof(double));
+  geop   = (double *) malloc(ngp*sizeof(double));
+  ps     = (double *) malloc(ngp*sizeof(double));
 
-  temp  = (double *) malloc(ngp*nhlevf*sizeof(double));
-  hum   = (double *) malloc(ngp*nhlevf*sizeof(double));
+  temp   = (double *) malloc(ngp*nhlevf*sizeof(double));
+  hum    = (double *) malloc(ngp*nhlevf*sizeof(double));
+  lwater = (double *) malloc(ngp*nhlevf*sizeof(double));
+  iwater = (double *) malloc(ngp*nhlevf*sizeof(double));
 
   half_press   = (double *) malloc(ngp*(nhlevf+1)*sizeof(double));
   geopotheight = (double *) malloc(ngp*(nhlevf+1)*sizeof(double));
@@ -405,6 +413,10 @@ void *Derivepar(void *argument)
 		memcpy(temp+offset, array, ngp*sizeof(double));
 	      else if ( varID == humID )
 		memcpy(hum+offset, array, ngp*sizeof(double));
+	      else if ( varID == clwcID )
+		memcpy(lwater+offset, array, ngp*sizeof(double));
+	      else if ( varID == ciwcID )
+		memcpy(iwater+offset, array, ngp*sizeof(double));
 	    }
 	}
 
@@ -462,7 +474,7 @@ void *Derivepar(void *argument)
       presh(NULL, half_press, vct, ps, nhlevf, ngp);
 
       memcpy(geopotheight+ngp*nhlevf, geop, ngp*sizeof(double));
-      MakeGeopotHeight(geopotheight, temp, hum, half_press, ngp, nhlevf);
+      MakeGeopotHeight(geopotheight, temp, hum, half_press,lwater,iwater, ngp, nhlevf);
 
       nmissout = 0;
       varID = 0;
