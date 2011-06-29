@@ -47,7 +47,6 @@ void *Diff(void *argument)
   int taxisID;
   int nmiss1, nmiss2;
   int ndrec = 0, nd2rec = 0, ngrec = 0;
-  int cmpflag;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];	  
@@ -71,9 +70,7 @@ void *Diff(void *argument)
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = streamInqVlist(streamID2);
 
-  cmpflag = CMP_NAME | CMP_GRIDSIZE | CMP_NLEVEL | CMP_GRID;
-
-  vlistCompare(vlistID1, vlistID2, cmpflag);
+  vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
   gridsize = vlistGridsizeMax(vlistID1);
 

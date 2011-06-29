@@ -122,7 +122,7 @@ void *Arith(void *argument)
     }
 
   if ( filltype == FILL_NONE )
-    vlistCompare(vlistID1, vlistID2, CMP_DIM);
+    vlistCompare(vlistID1, vlistID2, CMP_ALL);
 
   gridsize = vlistGridsizeMax(vlistIDx1);
 
