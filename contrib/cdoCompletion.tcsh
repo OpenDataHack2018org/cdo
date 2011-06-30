@@ -414,6 +414,7 @@ splityear \
 splitzaxis \
 sqr \
 sqrt \
+stdatm \
 strbre \
 strgal \
 strwin \

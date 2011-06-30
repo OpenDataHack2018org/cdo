@@ -18,6 +18,16 @@ set -x
 #
 case "${HOSTNAME}" in
 # i386-apple-darwin10
+    bailung*)
+	${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    --with-jasper=$HOME/local \
+                    --with-grib_api=$HOME/local \
+                    --with-netcdf=$HOME/local \
+                    --with-szlib=$HOME/local \
+                    --with-proj=/opt/local \
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
+	;;
     hama*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --enable-maintainer-mode \
