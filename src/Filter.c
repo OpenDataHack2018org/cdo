@@ -192,6 +192,8 @@ void *Filter(void *argument)
   int nvars, nlevel;
   int *vdate = NULL, *vtime = NULL;
   int tunit;
+  int taxis_has_bounds = FALSE;
+  int *date_lb=NULL, *date_ub=NULL, *time_lb=NULL, *time_ub=NULL;
   int incperiod0, incunit0, incunit, dpy, calendar;
   int year0, month0, day0;
   double missval;
@@ -221,6 +223,7 @@ void *Filter(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
+  taxis_has_bounds = taxisHasBounds(taxisID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -240,14 +243,24 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          vdate = (int *) realloc(vdate, nalloc*sizeof(int));
-          vtime = (int *) realloc(vtime, nalloc*sizeof(int));
-          vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+          vdate = (int *)       realloc(vdate,   nalloc*sizeof(int));
+          vtime = (int *)       realloc(vtime,   nalloc*sizeof(int));
+          vars  = (field_t ***) realloc(vars,    nalloc*sizeof(field_t **));
+	  date_lb=(int *)       realloc(date_lb, nalloc*sizeof(int));
+	  date_ub=(int *)       realloc(date_ub, nalloc*sizeof(int));
+	  time_lb=(int *)       realloc(time_lb, nalloc*sizeof(int));
+	  time_ub=(int *)       realloc(time_ub, nalloc*sizeof(int));
         }
                        
       vdate[tsID] = taxisInqVdate(taxisID1);
       vtime[tsID] = taxisInqVtime(taxisID1);
-           
+        
+      if ( taxis_has_bounds ) 
+	{
+	  taxisInqVdateBounds(taxisID1, &date_lb[tsID], &date_ub[tsID]);
+	  taxisInqVtimeBounds(taxisID1, &time_lb[tsID], &time_ub[tsID]);
+	}
+   
       vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
       
       for ( varID = 0; varID < nvars; varID++ )
@@ -438,6 +451,11 @@ void *Filter(void *argument)
     {
       taxisDefVdate(taxisID2, vdate[tsID]);
       taxisDefVtime(taxisID2, vtime[tsID]);
+      if ( taxis_has_bounds ) 
+	{
+	  taxisDefVdateBounds(taxisID2, date_lb[tsID], date_ub[tsID]);
+	  taxisDefVtimeBounds(taxisID2, time_lb[tsID], time_ub[tsID]);
+	}
       streamDefTimestep(streamID2, tsID);
     
       for ( varID = 0; varID < nvars; varID++ )
