@@ -13,6 +13,7 @@ Version 1.5.1 (?? July 2011):
      * enscrps: Ensemble CRPS and decomposition
      * ensbrs:  Ensemble Brier score
    Fixed bugs:
+     * detrend: added support for time bounds
      * Filter: added support for time bounds
      * eofspatial: integer overflow; wrong result for grid size > 46340
      * eca_*: use the input calendar for the output streams

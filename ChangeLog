@@ -3,9 +3,13 @@
 	* using CDI library version 1.5.1
 	* Version 1.5.1 released
 
+2011-07-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* detrend: added support for time bounds (bug fix) [report: Andy Aschwanden]
+
 2011-07-01  Cedrick.Ansorge <Cedrick.Ansorge@zmaw.de>
 
-	* Filter: added support for time bounds
+	* Filter: added support for time bounds (bug fix) [report: Andy Aschwanden]
 
 2011-06-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
