@@ -68,6 +68,30 @@ void detrend(long nts, double missval1, double *array1, double *array2)
 }
 
 
+void taxisInqDTinfo(int taxisID, dtinfo_t *dtinfo)
+{
+  dtinfo->v.date = taxisInqVdate(taxisID);
+  dtinfo->v.time = taxisInqVtime(taxisID);
+  if ( taxisHasBounds(taxisID) )
+    {
+      taxisInqVdateBounds(taxisID, &(dtinfo->b[0].date), &(dtinfo->b[1].date));
+      taxisInqVtimeBounds(taxisID, &(dtinfo->b[0].time), &(dtinfo->b[1].time));
+    }
+}
+
+
+void taxisDefDTinfo(int taxisID, dtinfo_t dtinfo)
+{
+  taxisDefVdate(taxisID, dtinfo.v.date);
+  taxisDefVtime(taxisID, dtinfo.v.time);
+  if ( taxisHasBounds(taxisID) )
+    {
+      taxisDefVdateBounds(taxisID, dtinfo.b[0].date, dtinfo.b[1].date);
+      taxisDefVtimeBounds(taxisID, dtinfo.b[0].time, dtinfo.b[1].time);
+    }
+}
+
+
 void *Detrend(void *argument)
 {
   int ompthID;
@@ -82,9 +106,9 @@ void *Detrend(void *argument)
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
   int nvars, nlevel;
-  int *vdate = NULL, *vtime = NULL;
   double missval;
   field_t ***vars = NULL;
+  dtinfo_t *dtinfo = NULL;
   typedef struct
   {
     double *array1;
@@ -115,13 +139,11 @@ void *Detrend(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vdate = (int *) realloc(vdate, nalloc*sizeof(int));
-	  vtime = (int *) realloc(vtime, nalloc*sizeof(int));
-	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	  dtinfo = (dtinfo_t *) realloc(dtinfo, nalloc*sizeof(dtinfo_t));
+	  vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
 	}
 
-      vdate[tsID] = taxisInqVdate(taxisID1);
-      vtime[tsID] = taxisInqVtime(taxisID1);
+      taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
 
       vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
 
@@ -201,8 +223,7 @@ void *Detrend(void *argument)
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
-      taxisDefVdate(taxisID2, vdate[tsID]);
-      taxisDefVtime(taxisID2, vtime[tsID]);
+      taxisDefDTinfo(taxisID2, dtinfo[tsID]);
       streamDefTimestep(streamID2, tsID);
 
       for ( varID = 0; varID < nvars; varID++ )
@@ -224,8 +245,7 @@ void *Detrend(void *argument)
     }
 
   if ( vars  ) free(vars);
-  if ( vdate ) free(vdate);
-  if ( vtime ) free(vtime);
+  if ( dtinfo ) free(dtinfo);
 
   streamClose(streamID2);
   streamClose(streamID1);

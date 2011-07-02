@@ -190,10 +190,8 @@ void *Filter(void *argument)
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
   int nvars, nlevel;
-  int *vdate = NULL, *vtime = NULL;
+  dtinfo_t *dtinfo = NULL;
   int tunit;
-  int taxis_has_bounds = FALSE;
-  int *date_lb=NULL, *date_ub=NULL, *time_lb=NULL, *time_ub=NULL;
   int incperiod0, incunit0, incunit, dpy, calendar;
   int year0, month0, day0;
   double missval;
@@ -223,7 +221,6 @@ void *Filter(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  taxis_has_bounds = taxisHasBounds(taxisID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -243,23 +240,11 @@ void *Filter(void *argument)
       if ( tsID >= nalloc )
         {
           nalloc += NALLOC_INC;
-          vdate = (int *)       realloc(vdate,   nalloc*sizeof(int));
-          vtime = (int *)       realloc(vtime,   nalloc*sizeof(int));
-          vars  = (field_t ***) realloc(vars,    nalloc*sizeof(field_t **));
-	  date_lb=(int *)       realloc(date_lb, nalloc*sizeof(int));
-	  date_ub=(int *)       realloc(date_ub, nalloc*sizeof(int));
-	  time_lb=(int *)       realloc(time_lb, nalloc*sizeof(int));
-	  time_ub=(int *)       realloc(time_ub, nalloc*sizeof(int));
+	  dtinfo = (dtinfo_t *)  realloc(dtinfo, nalloc*sizeof(dtinfo_t));
+          vars   = (field_t ***) realloc(vars,   nalloc*sizeof(field_t **));
         }
                        
-      vdate[tsID] = taxisInqVdate(taxisID1);
-      vtime[tsID] = taxisInqVtime(taxisID1);
-        
-      if ( taxis_has_bounds ) 
-	{
-	  taxisInqVdateBounds(taxisID1, &date_lb[tsID], &date_ub[tsID]);
-	  taxisInqVtimeBounds(taxisID1, &time_lb[tsID], &time_ub[tsID]);
-	}
+      taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
    
       vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
       
@@ -298,18 +283,18 @@ void *Filter(void *argument)
 	  int incperiod = 0;
 	  int year, month, day;
 
-          cdiDecodeDate(vdate[tsID],   &year,  &month,  &day);
-	  cdiDecodeDate(vdate[tsID-1], &year0, &month0, &day0);               
+          cdiDecodeDate(dtinfo[tsID].v.date,   &year,  &month,  &day);
+	  cdiDecodeDate(dtinfo[tsID-1].v.date, &year0, &month0, &day0);               
 
-          juldate0 = juldate_encode(calendar, vdate[tsID-1], vtime[tsID-1]);        
-          juldate  = juldate_encode(calendar, vdate[tsID], vtime[tsID]);         
+          juldate0 = juldate_encode(calendar, dtinfo[tsID-1].v.date, dtinfo[tsID-1].v.time);        
+          juldate  = juldate_encode(calendar, dtinfo[tsID].v.date, dtinfo[tsID].v.time);         
           jdelta   = juldate_to_seconds(juldate_sub(juldate, juldate0));
           
           if ( tsID == 1 ) 
             {           
               /*printf("%4i %4.4i-%2.2i-%2.2i\n", tsID, year, month, day);
               printf("    %4.4i-%2.2i-%2.2i\n",     year0,month0,day0);*/
-              getTimeInc(jdelta, vdate[tsID-1], vdate[tsID], &incperiod0, &incunit0);
+              getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod0, &incunit0);
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero\n");
               incunit = incunit0;
@@ -317,7 +302,7 @@ void *Filter(void *argument)
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
-            getTimeInc(jdelta, vdate[tsID-1], vdate[tsID], &incperiod, &incunit);  
+            getTimeInc(jdelta, dtinfo[tsID-1].v.date, dtinfo[tsID].v.date, &incperiod, &incunit);  
         
 
 	  if ( incunit0 < 4 && month == 2 && day == 29 && 
@@ -449,13 +434,7 @@ void *Filter(void *argument)
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {
-      taxisDefVdate(taxisID2, vdate[tsID]);
-      taxisDefVtime(taxisID2, vtime[tsID]);
-      if ( taxis_has_bounds ) 
-	{
-	  taxisDefVdateBounds(taxisID2, date_lb[tsID], date_ub[tsID]);
-	  taxisDefVtimeBounds(taxisID2, time_lb[tsID], time_ub[tsID]);
-	}
+      taxisDefDTinfo(taxisID2, dtinfo[tsID]);
       streamDefTimestep(streamID2, tsID);
     
       for ( varID = 0; varID < nvars; varID++ )
@@ -477,9 +456,8 @@ void *Filter(void *argument)
       free(vars[tsID]);
     }
 
-  if ( vars  ) free(vars);
-  if ( vdate ) free(vdate);
-  if ( vtime ) free(vtime);
+  if ( vars   ) free(vars);
+  if ( dtinfo ) free(dtinfo);
   
   streamClose(streamID2);
   streamClose(streamID1);

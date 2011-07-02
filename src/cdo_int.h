@@ -139,6 +139,11 @@ typedef struct {
   int   time;
 } datetime_t;
 
+typedef struct
+{
+  datetime_t v;
+  datetime_t b[2];
+} dtinfo_t;
 
 typedef struct {
   int   julday;
@@ -153,6 +158,8 @@ juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
 double    juldate_to_seconds(juldate_t juldate);
 
 void    datetime_avg(int dpy, int ndates, datetime_t *datetime);
+void    taxisInqDTinfo(int taxisID, dtinfo_t *dtinfo);
+void    taxisDefDTinfo(int taxisID, dtinfo_t dtinfo);
 
 int     days_per_month(int calendar, int year, int month);
 int     days_per_year(int calendar, int year);
