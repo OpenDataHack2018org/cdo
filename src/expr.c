@@ -755,6 +755,8 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	    }
 	  else
 	    {
+	      if ( varID >= MAX_VARS ) cdoAbort("Too many parameter (limit=%d)!", MAX_VARS);
+
 	      if ( parse_arg->var_needed[varID] == 0 )
 		{
 
@@ -767,6 +769,8 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	      zaxisID1 = vlistInqVarZaxis(parse_arg->vlistID1, varID);
 	      timeID1  = vlistInqVarTime(parse_arg->vlistID1, varID);
 	      missval  = vlistInqVarMissval(parse_arg->vlistID1, varID);
+
+	      parse_arg->missval2 = missval;
 
 	      if ( parse_arg->gridID2 == -1 )
 		parse_arg->gridID2 = gridID1;
@@ -832,6 +836,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 
 	      varID = vlistDefVar(parse_arg->vlistID2, parse_arg->gridID2, parse_arg->zaxisID2, parse_arg->timeID2);
 	      vlistDefVarName(parse_arg->vlistID2, varID, p->u.opr.op[0]->u.var.nm);
+	      vlistDefVarMissval(parse_arg->vlistID2, varID, parse_arg->missval2);
 	    }
 	  else
 	    {

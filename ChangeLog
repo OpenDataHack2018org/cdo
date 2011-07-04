@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.1
 	* Version 1.5.1 released
 
+2011-07-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Exprf:  wrong result for missing values != (double) -9.e33 (bug fix) [report: Michael Boettinger]
+	
 2011-07-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* detrend: added support for time bounds (bug fix) [report: Andy Aschwanden]
