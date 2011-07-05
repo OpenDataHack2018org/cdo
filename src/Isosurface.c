@@ -216,12 +216,19 @@ void *Isosurface(void *argument)
 		}
 	      else
 		{
-		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+		  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+		  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
+		  missval  = vlistInqVarMissval(vlistID2, varID);
+
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
 		      offset   = gridsize*levelID;
 		      single   = vars1[varID].ptr + offset;
+
+		      nmiss = 0;
+		      for ( i = 0; i < gridsize; ++i )
+			if ( DBL_IS_EQUAL(single[i], missval) ) nmiss++;
+
 		      streamDefRecord(streamID2, varID, levelID);
 		      streamWriteRecord(streamID2, single, nmiss);
 		    }
