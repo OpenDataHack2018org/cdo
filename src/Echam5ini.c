@@ -1444,6 +1444,9 @@ void *Echam5ini(void *argument)
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
 
+  if ( operatorID == EXPORT_E5ML && processSelf() != 0 )
+    cdoAbort("This operator can't be linked with other operators!");
+
   if ( operfunc == func_read )
     {
       VAR *vars = NULL;
