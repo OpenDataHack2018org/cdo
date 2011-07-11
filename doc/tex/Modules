@@ -87,6 +87,7 @@ Remap         Interpolation
 Remapeta      Interpolation
 Vertint       Interpolation
 Intlevel      Interpolation
+Intlevel3d    Interpolation
 Inttime       Interpolation
 Intyear       Interpolation
 Spectral      Transformation

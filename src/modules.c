@@ -96,6 +96,7 @@ void *Input(void *argument);
 void *Intgrid(void *argument);
 void *Intgridtraj(void *argument);
 void *Intlevel(void *argument);
+void *Intlevel3d(void *argument);
 void *Inttime(void *argument);
 void *Intntime(void *argument);
 void *Intyear(void *argument);
@@ -308,6 +309,7 @@ void *Wct(void *argument);
 #define  IntgridOperators       {"intgridbil", "intpoint", "interpolate", "boxavg", "thinout"}
 #define  IntgridtrajOperators   {"intgridtraj"}
 #define  IntlevelOperators      {"intlevel", "intlevelx"}
+#define  Intlevel3dOperators    {"intlevel3d", "intlevelx3d"}
 #define  InttimeOperators       {"inttime"}
 #define  IntntimeOperators      {"intntime"}
 #define  IntyearOperators       {"intyear"}
@@ -551,6 +553,7 @@ static modules_t Modules[] =
   { Intgrid,        NULL,              IntgridOperators,       CDI_REAL,  1,  1 },
   { Intgridtraj,    NULL,              IntgridtrajOperators,   CDI_REAL,  1,  1 },
   { Intlevel,       IntlevelHelp,      IntlevelOperators,      CDI_REAL,  1,  1 },
+  { Intlevel3d,     Intlevel3dHelp,    Intlevel3dOperators,    CDI_REAL,  2,  1 },
   { Inttime,        InttimeHelp,       InttimeOperators,       CDI_REAL,  1,  1 },
   { Intntime,       InttimeHelp,       IntntimeOperators,      CDI_REAL,  1,  1 },
   { Intyear,        IntyearHelp,       IntyearOperators,       CDI_REAL,  2, -1 },

@@ -3,6 +3,11 @@
 	* using CDI library version 1.5.1
 	* Version 1.5.1 released
 
+2011-07-11  Ralf Mueller  <ralf.mueller@zmaw.de>
+
+	* Added operator stdatm: standard atmosphere values for T,PS
+	* Added operator intlevel3d: vertical interpolation to/from 3d vertical coordinates
+
 2011-07-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Exprf:  wrong result for missing values != (double) -9.e33 (bug fix) [report: Michael Boettinger]

@@ -144,6 +144,7 @@ doc/tex/mod/Info -text
 doc/tex/mod/Input -text
 doc/tex/mod/Intgrid -text
 doc/tex/mod/Intlevel -text
+doc/tex/mod/Intlevel3d -text
 doc/tex/mod/Inttime -text
 doc/tex/mod/Intyear -text
 doc/tex/mod/Invert -text
@@ -315,6 +316,7 @@ src/Input.c -text
 src/Intgrid.c -text
 src/Intgridtraj.c -text
 src/Intlevel.c -text
+src/Intlevel3d.c -text
 src/Intntime.c -text
 src/Inttime.c -text
 src/Intyear.c -text

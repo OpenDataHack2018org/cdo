@@ -84,11 +84,12 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Importcmsaf.$(OBJEXT) cdo-Importobs.$(OBJEXT) \
 	cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) cdo-Intgrid.$(OBJEXT) \
 	cdo-Intgridtraj.$(OBJEXT) cdo-Intlevel.$(OBJEXT) \
-	cdo-Intntime.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
-	cdo-Intyear.$(OBJEXT) cdo-Invert.$(OBJEXT) \
-	cdo-Invertlev.$(OBJEXT) cdo-Isosurface.$(OBJEXT) \
-	cdo-Log.$(OBJEXT) cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) \
-	cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
+	cdo-Intlevel3d.$(OBJEXT) cdo-Intntime.$(OBJEXT) \
+	cdo-Inttime.$(OBJEXT) cdo-Intyear.$(OBJEXT) \
+	cdo-Invert.$(OBJEXT) cdo-Invertlev.$(OBJEXT) \
+	cdo-Isosurface.$(OBJEXT) cdo-Log.$(OBJEXT) \
+	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
+	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
 	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
 	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
 	cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
@@ -349,9 +350,9 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Gridboxstat.c Gridcell.c Harmonic.c Hi.c Histogram.c \
 	IFS2ICON.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
-	Intntime.c Inttime.c Intyear.c Invert.c Invertlev.c \
-	Isosurface.c Log.c Maskbox.c Mastrfu.c Math.c Merge.c \
-	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
+	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
+	Invertlev.c Isosurface.c Log.c Maskbox.c Mastrfu.c Math.c \
+	Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
 	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
 	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
 	Replacevalues.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
@@ -573,6 +574,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Intgrid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Intgridtraj.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Intlevel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Intlevel3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Intntime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Inttime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Intyear.Po@am__quote@
@@ -1608,6 +1610,20 @@ cdo-Intlevel.obj: Intlevel.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Intlevel.c' object='cdo-Intlevel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Intlevel.obj `if test -f 'Intlevel.c'; then $(CYGPATH_W) 'Intlevel.c'; else $(CYGPATH_W) '$(srcdir)/Intlevel.c'; fi`
+
+cdo-Intlevel3d.o: Intlevel3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Intlevel3d.o -MD -MP -MF $(DEPDIR)/cdo-Intlevel3d.Tpo -c -o cdo-Intlevel3d.o `test -f 'Intlevel3d.c' || echo '$(srcdir)/'`Intlevel3d.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Intlevel3d.Tpo $(DEPDIR)/cdo-Intlevel3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Intlevel3d.c' object='cdo-Intlevel3d.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Intlevel3d.o `test -f 'Intlevel3d.c' || echo '$(srcdir)/'`Intlevel3d.c
+
+cdo-Intlevel3d.obj: Intlevel3d.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Intlevel3d.obj -MD -MP -MF $(DEPDIR)/cdo-Intlevel3d.Tpo -c -o cdo-Intlevel3d.obj `if test -f 'Intlevel3d.c'; then $(CYGPATH_W) 'Intlevel3d.c'; else $(CYGPATH_W) '$(srcdir)/Intlevel3d.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Intlevel3d.Tpo $(DEPDIR)/cdo-Intlevel3d.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Intlevel3d.c' object='cdo-Intlevel3d.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Intlevel3d.obj `if test -f 'Intlevel3d.c'; then $(CYGPATH_W) 'Intlevel3d.c'; else $(CYGPATH_W) '$(srcdir)/Intlevel3d.c'; fi`
 
 cdo-Intntime.o: Intntime.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Intntime.o -MD -MP -MF $(DEPDIR)/cdo-Intntime.Tpo -c -o cdo-Intntime.o `test -f 'Intntime.c' || echo '$(srcdir)/'`Intntime.c

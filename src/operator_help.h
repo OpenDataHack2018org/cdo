@@ -3131,6 +3131,37 @@ static char *IntlevelHelp[] = {
     NULL
 };
 
+static char *Intlevel3dHelp[] = {
+    "NAME",
+    "    intlevel3d, intlevelx3d - Linear level interpolation for 3d height fields",
+    "",
+    "SYNOPSIS",
+    "    <operator>,icoordinate  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator performs a linear vertical interpolation of 3D variables fields",
+    "    with given 3D vertical coordinates.",
+    "",
+    "OPERATORS",
+    "    intlevel3d   Linear level interpolation onto a 3d vertical coordinate",
+    "                 To interpolate 3D variables from one set of 3d height levels",
+    "                 into another one where",
+    "                 - icoordinate contains a single 3d variable,",
+    "                   which represents the input 3d vert. coordinate",
+    "                 - ifile1 contains the source data,",
+    "                   which the vertical coordinate from icoordinate belongs to",
+    "                 - ifile2 only contains the target 3d height levels",
+    "                 ",
+    "                 call",
+    "                    cdo intlevel3,icoordinate ifile1 ifile2 ofile",
+    "    intlevelx3d  like intlevel3d but with extrapolation",
+    "",
+    "PARAMETER",
+    "    icoordinate  STRING  filename for vertical source coordinates variable",
+    "    ifile2       STRING target vertical coordinate field (intlevel3d only)",
+    NULL
+};
+
 static char *InttimeHelp[] = {
     "NAME",
     "    inttime, intntime - Time interpolation",

@@ -63,6 +63,7 @@ cdo_SOURCES += Arith.c         \
                Intgrid.c       \
                Intgridtraj.c   \
                Intlevel.c      \
+               Intlevel3d.c    \
                Intntime.c      \
                Inttime.c       \
                Intyear.c       \

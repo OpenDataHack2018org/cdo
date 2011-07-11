@@ -198,7 +198,9 @@ inputext \
 inputsrv \
 int \
 intlevel \
+intlevel3d \
 intlevelx \
+intlevelx3d \
 intntime \
 inttime \
 intyear \

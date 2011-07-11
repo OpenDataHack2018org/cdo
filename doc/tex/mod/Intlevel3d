@@ -1,0 +1,65 @@
+@BeginModule
+@NewPage
+@Name      = Intlevel3d
+@Title     = Linear level interpolation from/to 3d vertical coordinates
+@Section   = Interpolation
+@Class     = Interpolation
+@Arguments = ifile1 ifile2 ofile
+@Operators = intlevel3d intlevelx3d
+
+@BeginDescription
+This operator performs a linear vertical interpolation of 3D variables fields
+with given 3D vertical coordinates.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_intlevel3d
+@Title     = Linear level interpolation onto a 3d vertical coordinate
+@Parameter = icoordinate
+
+@BeginDescription
+@IfMan
+To interpolate 3D variables from one set of 3d height levels
+into another one where
+- icoordinate contains a single 3d variable,
+  which represents the input 3d vert. coordinate
+- ifile1 contains the source data,
+  which the vertical coordinate from icoordinate belongs to
+- ifile2 only contains the target 3d height levels
+
+call
+   cdo intlevel3,icoordinate ifile1 ifile2 ofile
+@EndifMan
+@EndDescription
+@EndOperator
+
+@BeginOperator_intlevelx3d
+@Title     = like intlevel3d but with extrapolation
+@Parameter = icoordinate
+@EndOperator
+
+
+@BeginParameter
+@Item = icoordinate
+STRING  filename for vertical source coordinates variable
+@Item = ifile2
+STRING target vertical coordinate field (intlevel3d only)
+@EndParameter
+
+@IfDoc
+@BeginExample
+To interpolate 3D variables from one set of 3d height levels into another one where
+@BeginItemize
+@Item
+@file{icoordinate} contains a single 3d variable, which represents the input 3d vert. coordinate
+@Item 
+@file{ifile1} contains the source data, which the vertical coordinate from icoordinate belongs to
+@Item
+@file{ifile2} only contains the target 3d height levels
+@EndItemize
+@BeginVerbatim
+   cdo intlevel3d,icoordinate ifile1 ifile2 ofile
+@EndVerbatim
+@EndExample
+@EndifDoc

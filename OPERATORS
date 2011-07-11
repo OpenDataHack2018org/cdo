@@ -398,6 +398,8 @@ Operator catalog:
    Vertint       ml2pl           Model to pressure level interpolation
    Vertint       ml2hl           Model to height level interpolation
    Intlevel      intlevel        Linear level interpolation
+   Intlevel3d    intlevel3d      Linear level interpolation onto a 3d vertical coordinate
+   Intlevel3d    intlevelx3d     like intlevel3d but with extrapolation
    Inttime       inttime         Interpolation between time steps
    Inttime       intntime        Interpolation between time steps
    Intyear       intyear         Interpolation between two years
