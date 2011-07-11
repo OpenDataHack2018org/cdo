@@ -188,7 +188,7 @@ void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, 
 
 void *Intlevel3d(void *argument)
 {
-  int INTLEVEL, INTLEVELX, INTLEVEL3D, INTLEVELX3D;
+  int INTLEVEL3D, INTLEVELX3D;
   int operatorID;
   int streamID0, streamID1, streamID2,streamID3;
   int vlistID0, vlistID1, vlistID2, vlistID3;
@@ -211,7 +211,7 @@ void *Intlevel3d(void *argument)
   double *lev1 = NULL, *lev2 = NULL;
   double *single1, *single2;
   double **vardata1 = NULL, **vardata2 = NULL;
-  int taxisID1, taxisID2, taxisID3;
+  int taxisID1, taxisID3;
   int *lev_idx1, *lev_idx2;
   double *lev_wgt1, *lev_wgt2;
   double *zlevels_in, *zlevels_out;
@@ -375,14 +375,14 @@ void *Intlevel3d(void *argument)
       for ( i = 0; i < gridSize ;i++)
       {
         zlevels_in[i]                      = -1.e33;
-        zlevels_in[(nlevi+1)*gridSize + i] = 1.e33;
+        zlevels_in[(nlevi+1)*gridSize + i] =  1.e33;
       }
     }
   else if ( ldown )
     {
       for ( i = 0; i < gridSize ;i++)
       {
-        zlevels_in[i]                      = 1.e33;
+        zlevels_in[i]                      =  1.e33;
         zlevels_in[(nlevi+1)*gridSize + i] = -1.e33;
       }
     }

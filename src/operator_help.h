@@ -3133,7 +3133,8 @@ static char *IntlevelHelp[] = {
 
 static char *Intlevel3dHelp[] = {
     "NAME",
-    "    intlevel3d, intlevelx3d - Linear level interpolation for 3d height fields",
+    "    intlevel3d, intlevelx3d - ",
+    "    Linear level interpolation from/to 3d vertical coordinates",
     "",
     "SYNOPSIS",
     "    <operator>,icoordinate  ifile1 ifile2 ofile",

@@ -142,8 +142,8 @@ void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
 	    {
 	      lev_idx1[i2] = idx1;
 	      lev_idx2[i2] = idx2;
-	      lev_wgt1[i2] = (lev1[lev_idx2[i2]] - lev2[i2]) / (lev1[lev_idx2[i2]] - lev1[lev_idx1[i2]]);
-	      lev_wgt2[i2] = (lev2[i2] - lev1[lev_idx1[i2]]) / (lev1[lev_idx2[i2]] - lev1[lev_idx1[i2]]);
+	      lev_wgt1[i2] = (lev1[idx2] - lev2[i2]) / (lev1[idx2] - lev1[idx1]);
+	      lev_wgt2[i2] = (lev2[i2] - lev1[idx1]) / (lev1[idx2] - lev1[idx1]);
 	    }
 	  lev_idx1[i2]--;
 	  lev_idx2[i2]--;
