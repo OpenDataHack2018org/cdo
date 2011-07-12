@@ -51,7 +51,7 @@ void *Pressure(void *argument)
   int ngrids, gridID, zaxisID;
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int nvct;
-  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, pvarID;
+  int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, pvarID = -1;
   int code;
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
@@ -320,24 +320,27 @@ void *Pressure(void *argument)
     }
 
   pvarID = lnpsID;
-  /* Log. surface pressure is spectral, use the surface pressure instead */
-  lnpsID = -1;
+  if ( zaxisIDh != -1 && lnpsID != -1 )
+    {
+      gridID = vlistInqVarGrid(vlistID1, lnpsID);
+      if ( gridInqType(gridID) == GRID_SPECTRAL )
+	{
+	  lnpsID = -1;
+	  cdoWarning("Spectral LOG surface pressure not supported - using surface pressure!");
+	}
+    }
+
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
-      if ( psID != -1 )
-	{
-	  pvarID = psID;
-	  code = vlistInqVarCode(vlistID1, psID);
-	  /* cdoPrint("LOG surface pressure not found - using surface pressure (code %d)!", code); */
-	}
-      else
+      pvarID = psID;
+      if ( psID == -1 )
 	cdoAbort("Surface pressure not found!");
     }
 
-  gridID   = vlistInqVarGrid(vlistID1, pvarID);
+  gridID = vlistInqVarGrid(vlistID1, pvarID);
   if ( gridInqType(gridID) == GRID_SPECTRAL )
     cdoAbort("Surface pressure on spectral representation not supported!");
-    
+
   gridsize = gridInqSize(gridID);
   pdata = (double *) malloc(gridsize*sizeof(double));
 
