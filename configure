@@ -781,7 +781,6 @@ enable_fast_install
 enable_dependency_tracking
 with_gnu_ld
 enable_libtool_lock
-with_gnu_ld
 enable_largefile
 with_threads
 with_zlib
@@ -808,12 +807,8 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP
-CPPFLAGS
 CXX
 CXXFLAGS
-LDFLAGS
-LIBS
-CPPFLAGS
 CCC
 CXXCPP'
 ac_subdirs_all='libcdi'
