@@ -101,5 +101,5 @@ INTEGER The seed for a new sequence of pseudo-random numbers [default: 1]
 @Item = grid
 STRING  Target grid description file or name
 @Item = levels
-FLOAT  Target levels
+FLOAT   Target levels in metre above surface
 @EndParameter

@@ -202,7 +202,7 @@ void *Vargen(void *argument)
       zaxisDefLevels(zaxisID  , levels);
       zaxisDefName(zaxisID    , "level");
       zaxisDefLongname(zaxisID, "Level");
-      zaxisDefUnits(zaxisID   , "meters");
+      zaxisDefUnits(zaxisID   , "m");
     }
   else
     {
