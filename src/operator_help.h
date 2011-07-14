@@ -3705,7 +3705,7 @@ static char *VargenHelp[] = {
     "    const   FLOAT   Constant",
     "    seed    INTEGER The seed for a new sequence of pseudo-random numbers [default: 1]",
     "    grid    STRING  Target grid description file or name",
-    "    levels  FLOAT  Target levels",
+    "    levels  FLOAT   Target levels in metre above surface",
     NULL
 };
 

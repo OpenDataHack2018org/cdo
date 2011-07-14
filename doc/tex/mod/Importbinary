@@ -35,6 +35,11 @@ TRAILERBYTES, UNDEF, VARS, XDEF, XYHEADER, YDEF, ZDEF
 @EndOperator
 
 
+@BeginNote
+Only 32-bit IEEE floats are supported in the binary data section!
+@EndNote
+
+
 @BeginExample
 To convert a binary data file to netCDF use:
 @BeginVerbatim
