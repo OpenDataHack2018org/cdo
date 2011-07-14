@@ -160,7 +160,7 @@ void printGridInfo(int vlistID)
 	  double xfirst = 0.0, xlast = 0.0;
 	  double yfirst = 0.0, ylast = 0.0;
 	  double xinc = 0.0, yinc = 0.0;
-	  
+
 	  yfirst = gridInqYval(gridID, 0);
 	  ylast  = gridInqYval(gridID, ysize-1);
 	  yinc   = gridInqYinc(gridID);
@@ -207,7 +207,7 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "  %s", yunits);
 	      fprintf(stdout, "\n");
 	    }
-	  
+
 	  if ( gridIsRotated(gridID) )
 	    {
 	      double lonpole, latpole, angle;
@@ -219,7 +219,7 @@ void printGridInfo(int vlistID)
 	      if ( angle > 0 ) fprintf(stdout, "  angle = %.9g", angle);
 	      fprintf(stdout, "\n");
 	    }
-		
+
 	  if ( gridInqXbounds(gridID, NULL) || gridInqYbounds(gridID, NULL) )
 	    {
 	      fprintf(stdout, "%*s", nbyte0, "");
@@ -229,7 +229,7 @@ void printGridInfo(int vlistID)
 	      if ( gridInqMask(gridID, NULL) )    fprintf(stdout, " mask");
 	      fprintf(stdout, "\n");
 	    }
-	  
+
 	  if ( gridtype == GRID_LAEA )
 	    {
 	      double a, lon_0, lat_0;
@@ -237,7 +237,7 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "projpar   : a = %g  lon_0 = %g  lat_0 = %g\n", a, lon_0, lat_0);
 	    }
-	  
+
 	  if ( gridtype == GRID_LCC2 )
 	    {
 	      double a, lon_0, lat_0, lat_1, lat_2;
@@ -249,10 +249,14 @@ void printGridInfo(int vlistID)
 	}
       else if ( gridtype == GRID_SPECTRAL )
 	{
-	  fprintf(stdout, "size      : dim = %d  truncation = %d  spc = %d\n",
+	  fprintf(stdout, "size      : dim = %d  truncation = %d  nsp = %d\n",
 		  gridsize, trunc, gridsize/2);
 	  fprintf(stdout, "%*s", nbyte0, "");
 	  fprintf(stdout, "            complexPacking = %d\n", gridInqComplexPacking(gridID));
+	}
+      else if ( gridtype == GRID_FOURIER )
+	{
+	  fprintf(stdout, "size      : dim = %d  nfc = %d\n", gridsize, gridsize/2);
 	}
       else if ( gridtype == GRID_GME )
 	{
@@ -314,7 +318,7 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "\n");
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "%-9s : min = %.9g  max = %.9g  %s\n", yname, yfirst, ylast, yunits);
-	      
+ 
 	      free(xvals);
 	      free(yvals);
 	    }
@@ -332,11 +336,11 @@ void printGridInfo(int vlistID)
 	    fprintf(stdout, "North Pole\n");
 	  else
 	    fprintf(stdout, "South Pole\n");
-	  fprintf(stdout, "%*s", nbyte0, "");	  
+	  fprintf(stdout, "%*s", nbyte0, "");
 	  fprintf(stdout, "            originLon = %g  originLat = %g  lonParY = %g\n",
 		  originLon, originLat, lonParY);
-	  fprintf(stdout, "%*s", nbyte0, "");	  
-	  fprintf(stdout, "            lat1 = %g  lat2 = %g  xinc = %g m  yinc = %g m\n", 
+	  fprintf(stdout, "%*s", nbyte0, "");
+	  fprintf(stdout, "            lat1 = %g  lat2 = %g  xinc = %g m  yinc = %g m\n",
 		  lat1, lat2, xincm, yincm);
 	}
       else /* if ( gridtype == GRID_GENERIC ) */
@@ -348,7 +352,7 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
 	      if ( gridIsCircular(gridID) )
 		{
-		  fprintf(stdout, "%*s", nbyte0, "");	  
+		  fprintf(stdout, "%*s", nbyte0, "");
 		  fprintf(stdout, "longitude :  circular\n");
 		}
 	    }
