@@ -36,7 +36,7 @@ TRAILERBYTES, UNDEF, VARS, XDEF, XYHEADER, YDEF, ZDEF
 
 
 @BeginNote
-Only 32-bit IEEE floats are supported in the binary data section!
+Only 32-bit IEEE floats are supported for standard binary files!
 @EndNote
 
 

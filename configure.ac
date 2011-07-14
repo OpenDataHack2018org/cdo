@@ -34,6 +34,9 @@ AC_CHECK_TOOL([RANLIB],[ranlib],[:])
 AC_PROG_INSTALL
 AC_PROG_CXX
 
+FC=no
+export FC
+
 # Check large file support on 32 bit system
 AC_SYS_LARGEFILE
 
