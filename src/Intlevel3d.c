@@ -199,6 +199,10 @@ void *Intlevel3d(void *argument)
   int nvars,nvct;
   int nzaxis;
   int nmiss;
+
+  int nlonIn, nlatIn, nlonOut, nlatOut;
+  double *lonIn, *latIn, *lonOut, *latOut;
+
   int zaxisID1 = -1, zaxisID3;
   int gridID, zaxisID;
   int nlevi, nlevo, nlevel = 0, maxlev;
@@ -259,8 +263,14 @@ void *Intlevel3d(void *argument)
     gridsize   = gridInqSize(gridID);
     nlevel     = zaxisInqSize(zaxisID);
 
-    zlevels_in = (double *) malloc(gridsize*(nlevel+2)*sizeof(double*));
+    nlonIn  = gridInqXsize(gridID);
+    nlatIn  = gridInqYsize(gridID);
+    lonIn   = (double *) malloc(nlonIn*sizeof(double));
+    latIn   = (double *) malloc(nlatIn*sizeof(double));
+    gridInqXvals(gridID, lonIn);
+    gridInqYvals(gridID, latIn);
 
+    zlevels_in = (double *) malloc(gridsize*(nlevel+2)*sizeof(double*));
     nlevi      = nlevel;   /* number of input levels for later use */
     gridsizei  = gridsize; /* horizontal gridsize of input z coordinate */
     nrecs      = streamInqTimestep(streamID0, 0);
@@ -289,6 +299,13 @@ void *Intlevel3d(void *argument)
     gridsize    = gridInqSize(gridID);
     nlevel      = zaxisInqSize(zaxisID);
 
+    nlonOut = gridInqXsize(gridID);
+    nlatOut = gridInqYsize(gridID);
+    lonOut  = (double *) malloc(nlonOut*sizeof(double));
+    latOut  = (double *) malloc(nlatOut*sizeof(double));
+    gridInqXvals(gridID, lonOut);
+    gridInqYvals(gridID, latOut);
+
     zlevels_out = (double *) malloc(gridsize*nlevel*sizeof(double));
     nlevo       = nlevel;  /* number of output levels for later use */
     gridsizeo   = gridsize;/* horizontal gridsize of output z coordinate */
@@ -310,11 +327,16 @@ void *Intlevel3d(void *argument)
   if ( 0 != zlevels_in_miss  )
     cdoAbort("Input vertical coordinate variables are not allowd to contian missing values.");
   else
-    cdoPrint("Input vertical coordinate has no missing values.");
+    {
+      if ( cdoVerbose ) cdoPrint("Input vertical coordinate has no missing values.");
+    }
   if ( 0 != zlevels_out_miss )
     cdoAbort("Output vertical coordinate variables are not allowd to contian missing values.");
   else
-    cdoPrint("Output vertical coordinate has no missing values.");
+    {
+      if ( cdoVerbose ) cdoPrint("Output vertical coordinate has no missing values.");
+    }
+
 
   /*
    * gridsize of input and output vertical coordinate must be equal
@@ -323,6 +345,18 @@ void *Intlevel3d(void *argument)
   if ( gridsizei != gridsizeo )
     cdoAbort("Input and output vertical coordinate must have the same gridsize");
    gridSize = gridsizeo;
+
+   /* input and output vertical coordinates must have exactly the same
+    * horizontal grid */
+   if ( nlonIn != nlonOut || 
+        nlatIn != nlatOut ||
+        memcmp(lonIn,lonOut,nlonIn*sizeof(double)) ||
+        memcmp(latIn,latOut,nlatIn*sizeof(double)) )
+     {
+       /* i =0; printf ( "lonIn:%g latIn:%g lonOut:%g latOut:%g\n",lonIn[i],latIn[i],lonOut[i],latOut[i] ); */
+       cdoAbort("Input and output vertical coordinates do NOT exactly have the same horizontal grid.");
+     }
+
   /*
    * Check for the correct vertical axis in the input: Variables with the same
    * number of levels as the input vertical levels from operators parameter
