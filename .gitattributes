@@ -291,6 +291,7 @@ src/Eof3d.c -text
 src/Eofcoeff.c -text
 src/Eofcoeff3d.c -text
 src/Exprf.c -text
+src/FC.c -text
 src/Filedes.c -text
 src/Fillmiss.c -text
 src/Filter.c -text

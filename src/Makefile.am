@@ -38,6 +38,7 @@ cdo_SOURCES += Arith.c         \
                Eofcoeff.c      \
 	       Eofcoeff3d.c    \
                Exprf.c         \
+               FC.c            \
                Filedes.c       \
                Fillmiss.c      \
                Filter.c        \

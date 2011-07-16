@@ -18,12 +18,10 @@
 /*
    This module contains the following operators:
 
-      Spectral   sp2gp           Spectral to gridpoint
-      Spectral   sp2gpl          Spectral to gridpoint linear
-      Spectral   gp2sp           Gridpoint to spectral
-      Spectral   gp2spl          Gridpoint to spectral linear
-      Spectral   sp2sp           Spectral to spectral
-      Spectral   spcut           Cut spectral wave number
+      FC         fc2sp           Fourier to spectral
+      FC         sp2fc           Spectral to fourier
+      FC         fc2gp           Fourier to gridpoint
+      FC         gp2fc           Gridpoint to fourier
 */
 
 #include <cdi.h>
@@ -34,9 +32,9 @@
 #include "list.h"
 
 
-void *Spectral(void *argument)
+void *FC(void *argument)
 {
-  int GP2SP, GP2SPL, SP2GP, SP2GPL, SP2SP, SPCUT;
+  int FC2SP, SP2FC, FC2GP, GP2FC;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, nvars;
@@ -44,28 +42,24 @@ void *Spectral(void *argument)
   int gridsize;
   int index, ngrids;
   int vlistID1, vlistID2;
-  int gridIDsp = -1, gridIDgp = -1;
+  int gridIDsp = -1, gridIDgp = -1, gridIDfc = -1;
   int gridID1 = -1, gridID2 = -1;
   int gridID;
   int nmiss;
-  int ncut = 0;
-  int *wnums = NULL, *waves = NULL;
   int *vars;
   int lcopy = FALSE;
-  double *array1 = NULL, *array2 = NULL;
   int taxisID1, taxisID2;
-  int nlon, nlat, ntr;
+  int nlon = 0, nlat = 0, ntr = 0;
+  int nsp = 0, nfc = 0;
+  double *array1 = NULL, *array2 = NULL;
   SPTRANS *sptrans = NULL;
-  LIST *ilist = listNew(INT_LIST);
 
   cdoInitialize(argument);
 
-  GP2SP  = cdoOperatorAdd("gp2sp",  0, 0, NULL);
-  GP2SPL = cdoOperatorAdd("gp2spl", 0, 0, NULL);
-  SP2GP  = cdoOperatorAdd("sp2gp",  0, 0, NULL);
-  SP2GPL = cdoOperatorAdd("sp2gpl", 0, 0, NULL);
-  SP2SP  = cdoOperatorAdd("sp2sp",  0, 0, NULL);
-  SPCUT  = cdoOperatorAdd("spcut",  0, 0, NULL);
+  FC2SP  = cdoOperatorAdd("fc2sp",  0, 0, NULL);
+  SP2FC  = cdoOperatorAdd("sp2fc", 0, 0, NULL);
+  FC2GP  = cdoOperatorAdd("fc2gp",  0, 0, NULL);
+  GP2FC  = cdoOperatorAdd("gp2fc", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -101,44 +95,49 @@ void *Spectral(void *argument)
 	  break;
 	}
     }
+  /* find first fourier grid */
+  for ( index = 0; index < ngrids; index++ )
+    {
+      gridID = vlistGrid(vlistID1, index);
+      if ( gridInqType(gridID) == GRID_FOURIER )
+	{
+	  gridIDfc = gridID;
+	  break;
+	}
+    }
 
   /* define output grid */
-  if ( operatorID == GP2SP || operatorID == GP2SPL )
+  if ( operatorID == FC2SP )
     {
-      gridID1 = gridIDgp;
+      if ( gridIDfc == -1 ) cdoWarning("No fourier data found!");
+
+      gridID1 = gridIDfc;
 
       if ( gridID1 != -1 )
 	{
-	  if ( operatorID == GP2SP )
-	    ntr = nlat2ntr(gridInqYsize(gridID1));
-	  else
-	    ntr = nlat2ntr_linear(gridInqYsize(gridID1));
+	  nfc  = gridInqSize(gridID1);
+	  ntr  = gridInqTrunc(gridID1);
+	  nlat = nfc2nlat(nfc, ntr);
 
 	  if ( gridIDsp != -1 )
 	    if ( ntr != gridInqTrunc(gridIDsp) ) gridIDsp = -1;
 
 	  if ( gridIDsp == -1 )
 	    {
-	      gridIDsp = gridCreate(GRID_SPECTRAL, (ntr+1)*(ntr+2));
+	      nsp = (ntr+1)*(ntr+2);
+	      gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
 	      gridDefTrunc(gridIDsp, ntr);
 	      gridDefComplexPacking(gridIDsp, 1);
 	    }
+
+	  gridID2 = gridIDsp;
+	  nlon = 2*nlat;
+	  ntr  = gridInqTrunc(gridID2);
+
+	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
 	}
-
-      if ( gridIDsp == -1 && gridInqType(vlistGrid(vlistID1, 0)) == GRID_GAUSSIAN_REDUCED )
-	cdoAbort("Gaussian reduced grid found. Use option -R to convert it to a regular grid!");
-
-      if ( gridIDsp == -1 ) cdoAbort("No Gaussian grid data found!");
-
-      gridID2 = gridIDsp;
-
-      nlon = gridInqXsize(gridID1);
-      nlat = gridInqYsize(gridID1);
-      ntr  = gridInqTrunc(gridID2);
-
-      sptrans = sptrans_new(nlon, nlat, ntr, 0);
     }
-  else if ( operatorID == SP2GP || operatorID == SP2GPL )
+  else if ( operatorID == SP2FC )
     {   
       if ( gridIDsp == -1 ) cdoWarning("No spectral data found!");
 
@@ -146,80 +145,89 @@ void *Spectral(void *argument)
 
       if ( gridID1 != -1 )
 	{
+	  ntr  = gridInqTrunc(gridID1);
+	  nlat = ntr2nlat(ntr);
+
+	  if ( gridIDfc != -1 )
+	    {
+	      if ( ntr != gridInqTrunc(gridIDfc) ) gridIDfc = -1;
+	    }
+
+	  if ( gridIDfc == -1 )
+	    {
+	      nfc = 2*nlat*(ntr+1);
+              gridIDfc = gridCreate(GRID_FOURIER, nfc);
+	      gridDefTrunc(gridIDfc, ntr);
+	    }
+
+	  gridID2 = gridIDfc;
+	  nlon = 2*nlat;
+      
+	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
+	}
+    }
+  else if ( operatorID == GP2FC )
+    {
+      if ( gridIDgp == -1 ) cdoWarning("No Gaussian grid data found!");
+
+      gridID1 = gridIDgp;
+
+      if ( gridID1 != -1 )
+	{
+	  nlon = gridInqXsize(gridID1);
+	  nlat = gridInqYsize(gridID1);
+	  ntr  = nlat2ntr(nlat);
+
+	  if ( gridIDfc != -1 )
+	    if ( ntr != gridInqTrunc(gridIDfc) ) gridIDfc = -1;
+
+	  if ( gridIDfc == -1 )
+	    {
+	      nfc = 2*nlat*(ntr+1);
+	      gridIDfc = gridCreate(GRID_FOURIER, nfc);
+	      gridDefTrunc(gridIDfc, ntr);
+	    }
+
+	  gridID2 = gridIDfc;
+	  nfc  = gridInqSize(gridID2);
+
+	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
+ 	}
+    }
+  else if ( operatorID == FC2GP )
+    {   
+      if ( gridIDfc == -1 ) cdoWarning("No fourier data found!");
+
+      gridID1 = gridIDfc;
+
+      if ( gridID1 != -1 )
+	{
+	  nfc  = gridInqSize(gridID1);
+	  ntr  = gridInqTrunc(gridID1);
+	  nlat = nfc2nlat(nfc, ntr);
+
 	  if ( gridIDgp != -1 )
 	    {
-	      if ( operatorID == SP2GP )
-		ntr = nlat2ntr(gridInqYsize(gridIDgp));
-	      else
-		ntr = nlat2ntr_linear(gridInqYsize(gridIDgp));
-
-	      if ( gridInqTrunc(gridIDsp) != ntr ) gridIDgp = -1;
+	      if ( nlat != gridInqYsize(gridIDgp) ) gridIDgp = -1;
 	    }
 
 	  if ( gridIDgp == -1 )
 	    {
 	      char gridname[20];
-	      if ( operatorID == SP2GP )
-		sprintf(gridname, "t%dgrid", gridInqTrunc(gridIDsp));
-	      else
-		sprintf(gridname, "tl%dgrid", gridInqTrunc(gridIDsp));
+	      sprintf(gridname, "t%dgrid", ntr);
 
 	      gridIDgp = gridFromName(gridname);
 	    }
 
 	  gridID2 = gridIDgp;
-
-	  ntr  = gridInqTrunc(gridID1);
 	  nlon = gridInqXsize(gridID2);
 	  nlat = gridInqYsize(gridID2);
       
 	  sptrans = sptrans_new(nlon, nlat, ntr, 0);
 	}
     }
-  else if ( operatorID == SP2SP )
-    {
-      gridID1 = gridIDsp;
 
-      operatorInputArg("truncation");
-      if ( gridID1 != -1 )
-	{
-	  int ntr = atoi(operatorArgv()[0]);
-	  int nsp = (ntr+1)*(ntr+2);
-	  gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
-	  gridDefTrunc(gridIDsp, ntr);
-	  gridDefComplexPacking(gridIDsp, 1);
-	}
-      else
-	cdoAbort("No spectral data found!");
-
-      gridID2 = gridIDsp;
-    }
-  else if ( operatorID == SPCUT )
-    {
-      long i, j, maxntr;
-      gridID1 = gridIDsp;
-
-      operatorInputArg("wave numbers");
-      if ( gridID1 != -1 )
-	{
-	  maxntr = 1+gridInqTrunc(gridID1);
-	  ncut = args2intlist(operatorArgc(), operatorArgv(), ilist);
-	  wnums = (int *) listArrayPtr(ilist);
-	  waves = (int *) malloc(maxntr*sizeof(int));
-	  for ( i = 0; i < maxntr; i++ ) waves[i] = 1;
-	  for ( i = 0; i < ncut; i++ )
-	    {
-	      j = wnums[i] - 1;
-	      if ( j < 0 || j >= maxntr )
-		cdoAbort("wave number %d out of range (min=1, max=%d)!", wnums[i], maxntr);
-	      waves[j] = 0;
-	    }
-	}
-      else
-	cdoAbort("No spectral data found!");
-
-      gridID2 = gridIDsp;
-    }
+  // printf("nfc %d, ntr %d, nlat %d, nlon %d\n", nfc, ntr, nlat, nlon);
 
   nvars = vlistNvars(vlistID2);
   vars  = (int *) malloc(nvars*sizeof(int));
@@ -260,17 +268,17 @@ void *Spectral(void *argument)
 	  if ( vars[varID] )
 	    {
 	      streamReadRecord(streamID1, array1, &nmiss);
-	      if ( nmiss ) cdoAbort("Missing values unsupported for spectral data!");
+	      if ( nmiss ) cdoAbort("Missing values unsupported for spectral/fourier data!");
 
 	      gridID1 = vlistInqVarGrid(vlistID1, varID);
-	      if ( operatorID == GP2SP || operatorID == GP2SPL )
-		grid2spec(sptrans, gridID1, array1, gridID2, array2);	      
-	      else if ( operatorID == SP2GP || operatorID == SP2GPL )
-		spec2grid(sptrans, gridID1, array1, gridID2, array2);
-	      else if ( operatorID == SP2SP )
-		spec2spec(gridID1, array1, gridID2, array2);
-	      else if ( operatorID == SPCUT )
-		speccut(gridID1, array1, array2, waves);
+	      if ( operatorID == FC2SP )
+		four2spec(sptrans, gridID1, array1, gridID2, array2);	      
+	      else if ( operatorID == SP2FC )
+		spec2four(sptrans, gridID1, array1, gridID2, array2);
+	      else if ( operatorID == FC2GP )
+		four2grid(sptrans, gridID1, array1, gridID2, array2);	      
+	      else if ( operatorID == GP2FC )
+		grid2four(sptrans, gridID1, array1, gridID2, array2);
 
 	      streamDefRecord(streamID2, varID, levelID);
 	      streamWriteRecord(streamID2, array2, nmiss);  
@@ -298,9 +306,6 @@ void *Spectral(void *argument)
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
   if ( vars )   free(vars);
-  if ( waves )  free(waves);
-
-  listDelete(ilist);
 
   sptrans_delete(sptrans);
 

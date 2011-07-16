@@ -1357,6 +1357,17 @@ int gridFromPingo(FILE *gfp, const char *dname)
 }
 
 
+int nfc2nlat(int nfc, int ntr)
+{
+  int nlat;
+
+  nlat = nfc / (ntr+1);
+  nlat /= 2;
+
+  return (nlat);
+}
+
+
 int nlat2ntr(int nlat)
 {
   int ntr;

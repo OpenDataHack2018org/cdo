@@ -71,7 +71,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Enlarge.$(OBJEXT) cdo-Enlargegrid.$(OBJEXT) \
 	cdo-Ensstat.$(OBJEXT) cdo-Ensstat3.$(OBJEXT) \
 	cdo-Ensval.$(OBJEXT) cdo-Eofcoeff.$(OBJEXT) \
-	cdo-Eofcoeff3d.$(OBJEXT) cdo-Exprf.$(OBJEXT) \
+	cdo-Eofcoeff3d.$(OBJEXT) cdo-Exprf.$(OBJEXT) cdo-FC.$(OBJEXT) \
 	cdo-Filedes.$(OBJEXT) cdo-Fillmiss.$(OBJEXT) \
 	cdo-Filter.$(OBJEXT) cdo-Fldrms.$(OBJEXT) \
 	cdo-Fldstat.$(OBJEXT) cdo-Fldstat2.$(OBJEXT) \
@@ -345,18 +345,18 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Copy.c Deltime.c Derivepar.c Detrend.c Diff.c Duplicate.c \
 	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
 	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
-	Eofcoeff3d.c Exprf.c Filedes.c Fillmiss.c Filter.c Fldrms.c \
-	Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c Gradsdes.c \
-	Gridboxstat.c Gridcell.c Harmonic.c Hi.c Histogram.c \
-	IFS2ICON.c Importamsr.c Importbinary.c Importcmsaf.c \
-	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
-	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
-	Invertlev.c Isosurface.c Log.c Maskbox.c Mastrfu.c Math.c \
-	Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
-	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
-	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
-	Replacevalues.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
-	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
+	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
+	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
+	Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
+	Histogram.c IFS2ICON.c Importamsr.c Importbinary.c \
+	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
+	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
+	Intyear.c Invert.c Invertlev.c Isosurface.c Log.c Maskbox.c \
+	Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c \
+	Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c \
+	Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
+	Replace.c Replacevalues.c Rotuv.c Runpctl.c Runstat.c \
+	Scatter.c Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
 	Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c Sorttimestamp.c \
@@ -549,6 +549,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Eofcoeff3d.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Exprf.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-FC.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Filedes.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Fillmiss.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Filter.Po@am__quote@
@@ -1260,6 +1261,20 @@ cdo-Exprf.obj: Exprf.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Exprf.c' object='cdo-Exprf.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Exprf.obj `if test -f 'Exprf.c'; then $(CYGPATH_W) 'Exprf.c'; else $(CYGPATH_W) '$(srcdir)/Exprf.c'; fi`
+
+cdo-FC.o: FC.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-FC.o -MD -MP -MF $(DEPDIR)/cdo-FC.Tpo -c -o cdo-FC.o `test -f 'FC.c' || echo '$(srcdir)/'`FC.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-FC.Tpo $(DEPDIR)/cdo-FC.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='FC.c' object='cdo-FC.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-FC.o `test -f 'FC.c' || echo '$(srcdir)/'`FC.c
+
+cdo-FC.obj: FC.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-FC.obj -MD -MP -MF $(DEPDIR)/cdo-FC.Tpo -c -o cdo-FC.obj `if test -f 'FC.c'; then $(CYGPATH_W) 'FC.c'; else $(CYGPATH_W) '$(srcdir)/FC.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-FC.Tpo $(DEPDIR)/cdo-FC.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='FC.c' object='cdo-FC.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-FC.obj `if test -f 'FC.c'; then $(CYGPATH_W) 'FC.c'; else $(CYGPATH_W) '$(srcdir)/FC.c'; fi`
 
 cdo-Filedes.o: Filedes.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Filedes.o -MD -MP -MF $(DEPDIR)/cdo-Filedes.Tpo -c -o cdo-Filedes.o `test -f 'Filedes.c' || echo '$(srcdir)/'`Filedes.c

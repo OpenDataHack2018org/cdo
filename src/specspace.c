@@ -2,8 +2,9 @@
 #include <math.h>
 #include <string.h>
 
-#include "cdo.h"
 #include <cdi.h>
+#include "cdo.h"
+#include "cdo_int.h"
 #ifndef _DMEMORY_H
 #  include "dmemory.h"
 #endif
@@ -220,6 +221,73 @@ void spec2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, d
 }
 
 
+void four2spec(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
+{
+  int ntr, nlat, nfc;
+  int nlev = 1;
+  int waves;
+    
+  ntr  = gridInqTrunc(gridIDout);
+  nlat = sptrans->nlat;
+
+  waves = ntr + 1;
+  nfc   = waves * 2;
+
+  fc2sp(arrayIn, arrayOut, sptrans->pold, nlev, nlat, nfc, ntr);
+}
+
+
+void spec2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
+{
+  int ntr, nlat, nfc;
+  int nlev = 1;
+  int waves;
+    
+  ntr  = gridInqTrunc(gridIDin);
+  nfc  = gridInqSize(gridIDout);
+  nlat = nfc2nlat(nfc, ntr);
+
+  waves = ntr + 1;
+  nfc   = waves * 2;
+
+  sp2fc(arrayIn, arrayOut, sptrans->poli, nlev, nlat, nfc, ntr);
+}
+
+
+void four2grid(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
+{
+  int ntr, nlat, nlon, nfc;
+  int nlev = 1;
+  int waves;
+
+  ntr  = gridInqTrunc(gridIDin);
+  nlon = gridInqXsize(gridIDout);
+  nlat = gridInqYsize(gridIDout);
+
+  waves = ntr + 1;
+  nfc   = waves * 2;
+
+  fc2gp(sptrans->trig, sptrans->ifax, arrayIn, arrayOut, nlat, nlon, nlev, nfc);
+}
+
+
+void grid2four(SPTRANS *sptrans, int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
+{
+  int nlat, nlon, nfc, ntr;
+  int nlev = 1;
+  int waves;
+
+  ntr  = gridInqTrunc(gridIDout);
+  nlon = gridInqXsize(gridIDin);
+  nlat = gridInqYsize(gridIDin);
+
+  waves = ntr + 1;
+  nfc   = waves * 2;
+
+  gp2fc(sptrans->trig, sptrans->ifax, arrayIn, arrayOut, nlat, nlon, nlev, nfc);
+}
+
+
 void spec2spec(int gridIDin, double *arrayIn, int gridIDout, double *arrayOut)
 {
   int ntrIn, ntrOut;
@@ -244,7 +312,7 @@ void speccut(int gridIDin, double *arrayIn, double *arrayOut, int *waves)
 SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
 {
   SPTRANS *sptrans;
-  int dimsp;
+  int nsp;
 
   sptrans = (SPTRANS *) malloc(sizeof(SPTRANS));
 
@@ -252,8 +320,8 @@ SPTRANS *sptrans_new(int nlon, int nlat, int ntr, int flag)
   sptrans->nlat = nlat;
   sptrans->ntr  = ntr;
 
-  dimsp = (ntr + 1)*(ntr + 2);
-  sptrans->poldim = dimsp / 2 * nlat;
+  nsp = (ntr + 1)*(ntr + 2);
+  sptrans->poldim = nsp / 2 * nlat;
 
   sptrans->trig = (double *) malloc(nlon * sizeof(double));
   fft_set(sptrans->trig, sptrans->ifax, nlon);

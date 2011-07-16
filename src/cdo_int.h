@@ -124,6 +124,8 @@ int zaxis2ltype(int zaxisID);
 int ztype2ltype(int zaxistype);
 int ltype2ztype(int ltype);
 
+
+int nfc2nlat(int nfc, int ntr);
 int nlat2ntr(int nlat);
 int nlat2ntr_linear(int nlat);
 int ntr2nlat(int ntr);

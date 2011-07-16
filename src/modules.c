@@ -72,6 +72,7 @@ void *Eofcoeff3d(void *argument);
 void *EOFs(void *argument);
 void *EOF3d(void *argument);
 void *Expr(void *argument);
+void *FC(void *argument);
 void *Filedes(void *argument);
 void *Fillmiss(void *argument);
 void *Filter(void *argument);
@@ -283,6 +284,7 @@ void *Wct(void *argument);
 #define  EOFsOperators          {"eof", "eofspatial", "eoftime"}
 #define  EOF3dOperators         {"eof3d","eof3dspatial","eof3dtime"}
 #define  ExprOperators          {"expr", "exprf", "aexpr", "aexprf"}
+#define  FCOperators            {"fc2sp", "sp2fc", "fc2gp", "gp2fc"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
                                  "vlist", "partab", "partab2"}
 #define  FillmissOperators      {"fillmiss"}
@@ -529,6 +531,7 @@ static modules_t Modules[] =
   { EOFs,           EOFsHelp,          EOFsOperators,          CDI_REAL,  1,  2 },
   { EOF3d,          NULL,              EOF3dOperators,         CDI_REAL,  1,  2 },
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
+  { FC,             NULL,              FCOperators,            CDI_REAL,  1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,       CDI_BOTH,  1,  0 },
   { Fillmiss,       NULL,              FillmissOperators,      CDI_REAL,  1,  1 },
   { Filter,         FilterHelp,        FilterOperators,        CDI_REAL,  1,  1 },
