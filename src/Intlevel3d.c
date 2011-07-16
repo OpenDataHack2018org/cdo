@@ -185,7 +185,6 @@ void gen_weights3d(int expol, int nlev1, int gridsize, double *lev1, int nlev2, 
     }
 }
 
-
 void *Intlevel3d(void *argument)
 {
   int INTLEVEL3D, INTLEVELX3D;
@@ -426,8 +425,8 @@ void *Intlevel3d(void *argument)
   /*
    * Create weights for later interpolation - assumption: input vertical correct is constant in time
    */
-  lev_idx1 = (int *) malloc(nlevo*gridSize*sizeof(int));
-  lev_idx2 = (int *) malloc(nlevo*gridSize*sizeof(int));
+  lev_idx1 = (int *)    malloc(nlevo*gridSize*sizeof(int));
+  lev_idx2 = (int *)    malloc(nlevo*gridSize*sizeof(int));
   lev_wgt1 = (double *) malloc(nlevo*gridSize*sizeof(double));
   lev_wgt2 = (double *) malloc(nlevo*gridSize*sizeof(double));
 
@@ -496,22 +495,40 @@ void *Intlevel3d(void *argument)
        *  * are NOT the output vertical coordinates itself
        */
       if ( zaxisID == zaxisID1 && varID != oz3dvarID && gridsize == gridSize)
-	{
-	  varinterp[varID] = TRUE;
-	  vardata2[varID]  = (double *) malloc(gridsize*nlevo*sizeof(double));
-	  varnmiss[varID]  = (int *) malloc(maxlev*sizeof(int));
-	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
+        {
+          nlonIn  = gridInqXsize(gridID);
+          nlatIn  = gridInqYsize(gridID);
+          lonIn   = (double *) malloc(nlonIn*sizeof(double));
+          latIn   = (double *) malloc(nlatIn*sizeof(double));
+          gridInqXvals(gridID, lonIn);
+          gridInqYvals(gridID, latIn);
 
-	}
+          if ( nlonIn != nlonOut || 
+               nlatIn != nlatOut ||
+               memcmp(lonIn,lonOut,nlonIn*sizeof(double)) ||
+               memcmp(latIn,latOut,nlatIn*sizeof(double)) )
+            {
+              varinterp[varID] = FALSE;
+              vardata2[varID]  = vardata1[varID];
+              varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
+              if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
+            }
+          else
+            {
+              varinterp[varID] = TRUE;
+              vardata2[varID]  = (double *) malloc(gridsize*nlevo*sizeof(double));
+              varnmiss[varID]  = (int *) malloc(maxlev*sizeof(int));
+              memset(varnmiss[varID], 0, maxlev*sizeof(int));
+            }
+        }
       else
-	{
-	  varinterp[varID] = FALSE;
-	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
+        {
+          varinterp[varID] = FALSE;
+          vardata2[varID]  = vardata1[varID];
+          varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
           if ( cdoVerbose ) cdoPrint("Ignore variable %s with %d levels\n",varname,nlevel);
-
-	}
-    }
+        }
+      }
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
