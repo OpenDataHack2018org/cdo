@@ -174,7 +174,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=/usr/local/apps/netCDF/3.6.2/LP64 \
                     --with-szlib=$HOME/local \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
 # powerpc-ibm-aix5.3.0.0
     blizzard*)
@@ -187,14 +187,14 @@ case "${HOSTNAME}" in
                     --with-szlib=/sw/aix53/szip-2.1 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
- 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
+ 	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
     vip*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=$HOME/local \
                     --with-szlib=$HOME/local \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
 # powerpc-ibm-aix6.0.0.0
     c1a*)
@@ -203,14 +203,14 @@ case "${HOSTNAME}" in
                     --with-hdf5=/usr/local/apps/hdf5/1.8.1/LP64 \
                     --with-szlib=/usr/local/apps/szip/2.1/LP64 \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
 # powerpc-ibm-aix6.0.0.0
     dwd | p???et01)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-netcdf=/uhome/mpischul/local \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
-	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
+	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
     *)
 	echo "configuration for hostname $HOSTNAME not found!"
