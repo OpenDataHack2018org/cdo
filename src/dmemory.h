@@ -31,7 +31,7 @@ extern void    Free   (const char *caller, const char *file, int line, void *ptr
 #if  defined  WITH_CALLER_NAME
 #  define  realloc(p, s)  Realloc(__func__, __FILE__, __LINE__, p, (size_t)s)
 #  define   calloc(n, s)   Calloc(__func__, __FILE__, __LINE__, n, (size_t)s)
-#  define   malloc(s)      Malloc(__FUNCTION__, __FILE__, __LINE__, (size_t)s)
+#  define   malloc(s)      Malloc(__func__, __FILE__, __LINE__, (size_t)s)
 #  define     free(p)        Free(__func__, __FILE__, __LINE__, p)
 #else
 #  define  realloc(p, s)  Realloc((void *) NULL, __FILE__, __LINE__, p, (size_t)s)
