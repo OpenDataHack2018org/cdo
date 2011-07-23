@@ -405,7 +405,7 @@ void *Remapeta(void *argument)
                         cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf1   = %d", zaxisIDh, nlevel);
  
 		      vct1 = (double *) malloc(nvct1*sizeof(double));
-		      memcpy(vct1, zaxisInqVctPtr(zaxisID), nvct1*sizeof(double));
+		      zaxisInqVct(zaxisID, vct1);
 		      
 		      vlistChangeZaxisIndex(vlistID2, i, zaxisID2);
 

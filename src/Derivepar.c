@@ -252,7 +252,7 @@ void *Derivepar(void *argument)
                         cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf   = %d", zaxisIDh, nlevel);
  
 		      vct = (double *) malloc(nvct*sizeof(double));
-		      memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		      zaxisInqVct(zaxisID, vct);
 
 		      if ( cdoVerbose )
 			for ( i = 0; i < nvct/2; ++i )

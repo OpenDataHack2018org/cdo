@@ -271,7 +271,7 @@ void *Cloudlayer(void *argument)
 	  double *vct;
 
 	  vct = (double *) malloc(nvct*sizeof(double));
-	  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+	  zaxisInqVct(zaxisID, vct);
 
 	  nlevs = nlevel + 1;
 	  plevs = (double *) malloc(nlevs*sizeof(double));

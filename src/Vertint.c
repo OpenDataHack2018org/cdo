@@ -196,7 +196,7 @@ void *Vertint(void *argument)
 		  nhlevh   = nhlevf + 1;
 	      
 		  vct = (double *) malloc(nvct*sizeof(double));
-		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 		}
@@ -217,7 +217,7 @@ void *Vertint(void *argument)
 		  nhlevh   = nhlev;
 	      
 		  vct = (double *) malloc(nvct*sizeof(double));
-		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 		}
@@ -233,9 +233,11 @@ void *Vertint(void *argument)
 		{
 		  int vctsize;
 		  int voff = 4;
-		  const double *pvct = zaxisInqVctPtr(zaxisID);
+		  
+		  rvct = (double *) malloc(nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, rvct);
 
-		  if ( (int)(pvct[0]+0.5) == 100000 && pvct[voff] < pvct[voff+1] )
+		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
 		    {
 		      lhavevct = TRUE;
 		      zaxisIDh = zaxisID;
@@ -245,8 +247,6 @@ void *Vertint(void *argument)
 
 		      vctsize = 2*nhlevh;
 		      vct = (double *) malloc(vctsize*sizeof(double));
-		      rvct = (double *) malloc(nvct*sizeof(double));
-		      memcpy(rvct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
 
 		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 

@@ -55,7 +55,6 @@ void *Pressure(void *argument)
   int code;
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
-  double *rvct = NULL; /* reduced VCT for LM */
   double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
   double *pout = NULL;
   double *pdata = NULL;
@@ -139,7 +138,7 @@ void *Pressure(void *argument)
 		  nhlevh   = nhlevf + 1;
 	      
 		  vct = (double *) malloc(nvct*sizeof(double));
-		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, vct);
 		}
 	    }
 	  else if ( nlevel == (nvct/2) )
@@ -153,7 +152,7 @@ void *Pressure(void *argument)
 		  nhlevh   = nhlev;
 	      
 		  vct = (double *) malloc(nvct*sizeof(double));
-		  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+		  zaxisInqVct(zaxisID, vct);
 		}
 	    }
 	  else if ( nlevel == (nvct - 4 - 1) )
@@ -162,9 +161,12 @@ void *Pressure(void *argument)
 		{
 		  int vctsize;
 		  int voff = 4;
-		  const double *pvct = zaxisInqVctPtr(zaxisID);
+		  double *rvct = NULL;
 
-		  if ( (int)(pvct[0]+0.5) == 100000 && pvct[voff] < pvct[voff+1] )
+		  rvct = (double *) malloc(nvct*sizeof(double));
+		  zaxisInqVct(zaxisID,rvct);
+
+		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
 		    {
 		      lhavevct = TRUE;
 		      zaxisIDh = zaxisID;
@@ -174,8 +176,6 @@ void *Pressure(void *argument)
 
 		      vctsize = 2*nhlevh;
 		      vct = (double *) malloc(vctsize*sizeof(double));
-		      rvct = (double *) malloc(nvct*sizeof(double));
-		      memcpy(rvct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
 
 		      /* calculate VCT for LM */
 
@@ -199,6 +199,7 @@ void *Pressure(void *argument)
 			    fprintf(stdout, "%5d %25.17f %25.17f\n", i, vct[i], vct[vctsize/2+i]);
 			}
 		    }
+		  free(rvct);
 		}
 	    }
 	}
@@ -446,7 +447,6 @@ void *Pressure(void *argument)
   if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
   if ( vct        ) free(vct);
-  if ( rvct       ) free(rvct);
 
   cdoFinish();
 

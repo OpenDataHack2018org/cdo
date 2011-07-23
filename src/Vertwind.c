@@ -170,7 +170,7 @@ void *Vertwind(void *argument)
       if ( nlevel == (nvct/2 - 1) )
 	{
 	  vct = (double *) malloc(nvct*sizeof(double));
-	  memcpy(vct, zaxisInqVctPtr(zaxisID), nvct*sizeof(double));
+	  zaxisInqVct(zaxisID, vct);
 	}
       else
 	cdoAbort("Unsupported vertical coordinate table format!");
