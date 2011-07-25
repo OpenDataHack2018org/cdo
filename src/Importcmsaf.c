@@ -835,7 +835,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
   else if ( H5Tequal(native_type, H5T_NATIVE_DOUBLE) > 0 ) {ftype=1; dtype = DATATYPE_FLT64;}
   else
     {
-      cdoWarning("Dataset %s skiped, unsupported native datatype!", varname);
+      cdoWarning("Dataset %s skipped, unsupported native datatype!", varname);
       goto RETURN;
     }
   H5Tclose(native_type);
@@ -860,7 +860,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
     }
   else
     {
-      cdoWarning("Dataset %s skiped, unsupported rank (=%d)!", varname, rank);
+      cdoWarning("Dataset %s skipped, unsupported rank (=%d)!", varname, rank);
       goto RETURN;
     }
 

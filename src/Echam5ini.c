@@ -896,7 +896,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 	{
 	  if ( (int)attlen > attstringlen )
 	    {
-	      fprintf(stderr, "Attribute %s too large, skiped!\n", attname);
+	      fprintf(stderr, "Attribute %s too large, skipped!\n", attname);
 	      continue;
 	    }
 	  nce(nc_get_att_text(nc_file_id, NC_GLOBAL, attname, attstring));
@@ -910,7 +910,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 	{
 	  if ( attlen > 1 )
 	    {
-	      fprintf(stderr, "Attribute %s too large, skiped!\n", attname);
+	      fprintf(stderr, "Attribute %s too large, skipped!\n", attname);
 	      continue;
 	    }
 	  nce(nc_get_att_int(nc_file_id, NC_GLOBAL, attname, &attint));
@@ -919,7 +919,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 	{
 	  if ( attlen > 1 )
 	    {
-	      fprintf(stderr, "Attribute %s too large, skiped!\n", attname);
+	      fprintf(stderr, "Attribute %s too large, skipped!\n", attname);
 	      continue;
 	    }
 	  nce(nc_get_att_double(nc_file_id, NC_GLOBAL, attname, &attflt));
