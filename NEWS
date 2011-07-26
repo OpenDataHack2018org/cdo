@@ -4,6 +4,11 @@ CDO NEWS
 Version 1.5.1 (12 July 2011):
 
    New features:
+     * replace: added support to replace single levels
+
+Version 1.5.1 (12 July 2011):
+
+   New features:
      * Added support for netCDF4 classic format; option -f nc4c
      * import_binary: Added support for 1 and 2 byte integer
    New operators:

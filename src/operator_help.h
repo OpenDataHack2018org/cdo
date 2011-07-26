@@ -210,7 +210,7 @@ static char *ReplaceHelp[] = {
     "    replace  ifile1 ifile2 ofile",
     "",
     "DESCRIPTION",
-    "    Replaces all common variables of ifile2 and ifile1 with those of ifile1",
+    "    Replaces all common fields of ifile2 and ifile1 with those of ifile1",
     "    and write the result to ofile.",
     "    Both input datasets need to have the same number of time steps.",
     NULL
@@ -3062,7 +3062,7 @@ static char *RemapetaHelp[] = {
     "    a cut-off or an addition of air mass. This mass correction should not",
     "    influence the geostrophic velocity field in the middle troposhere. Therefore",
     "    the total mass above a given reference level is conserved. As reference level",
-    "    the geopotential height of the 500 hPa level is used. Near the surface the",
+    "    the geopotential height of the 400 hPa level is used. Near the surface the",
     "    correction can affect the vertical structure of the PBL. Therefore the",
     "    interpolation is done using the potential temperature. But in the free",
     "    atmosphere above a certain n (n=0.8 defining the top of the PBL) the",

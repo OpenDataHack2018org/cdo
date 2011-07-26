@@ -1,5 +1,6 @@
 2011-07-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* replace: added support to replace single levels
 	* Vertstat: bug fix for streams with time invariant variables
 
 2011-07-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
@@ -15,7 +16,7 @@
 2011-07-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Exprf:  wrong result for missing values != (double) -9.e33 (bug fix) [report: Michael Boettinger]
-	
+
 2011-07-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* detrend: added support for time bounds (bug fix) [report: Andy Aschwanden]
@@ -49,7 +50,7 @@
 
 	* intyear: check contents of input files [report: Angelika Heil]
 	* pipeDefTimestep: set EOP if nrecs = 0 (dead lock) [report: Luis Kornnblueh]
-	
+
 2011-03-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* eofspatial: integer overflow; wrong result for grid size > 46340 (bug fix) [report: Hans-Jürgen Panitz]

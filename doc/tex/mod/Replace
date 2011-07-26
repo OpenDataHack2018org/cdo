@@ -13,7 +13,7 @@
 @Title     = Replace variables
 
 @BeginDescription
-Replaces all common variables of @file{ifile2} and @file{ifile1} with those of @file{ifile1}
+Replaces all common fields of @file{ifile2} and @file{ifile1} with those of @file{ifile1}
 and write the result to @file{ofile}.
 Both input datasets need to have the same number of time steps.
 @EndDescription
