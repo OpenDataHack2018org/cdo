@@ -188,39 +188,40 @@ void *Vertstat(void *argument)
 	    }
 	}
 
-      if ( operfunc == func_mean || operfunc == func_avg )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( samp1[varID].ptr == NULL )
-	      farcmul(&vars1[varID], 1.0/vars1[varID].nsamp);
-	    else
-	      fardiv(&vars1[varID], samp1[varID]);
-	  }
-      else if ( operfunc == func_std || operfunc == func_var )
-	for ( varID = 0; varID < nvars; varID++ )
-	  {
-	    if ( samp1[varID].ptr == NULL )
-	      {
-		if ( operfunc == func_std )
-		  farcstd(&vars1[varID], vars2[varID], 1.0/vars1[varID].nsamp);
-		else
-		  farcvar(&vars1[varID], vars2[varID], 1.0/vars1[varID].nsamp);
-	      }
-	    else
-	      {
-		farinv(&samp1[varID]);
-		if ( operfunc == func_std )
-		  farstd(&vars1[varID], vars2[varID], samp1[varID]);
-		else
-		  farvar(&vars1[varID], vars2[varID], samp1[varID]);
-	      }
-	  }
-
       for ( varID = 0; varID < nvars; varID++ )
 	{
-	  streamDefRecord(streamID2, varID, 0);
-	  streamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
-	  vars1[varID].nsamp = 0;
+	  if ( vars1[varID].nsamp )
+	    {
+	      if ( operfunc == func_mean || operfunc == func_avg )
+		{
+		  if ( samp1[varID].ptr == NULL )
+		    farcmul(&vars1[varID], 1.0/vars1[varID].nsamp);
+		  else
+		    fardiv(&vars1[varID], samp1[varID]);
+		}
+	      else if ( operfunc == func_std || operfunc == func_var )
+		{
+		  if ( samp1[varID].ptr == NULL )
+		    {
+		      if ( operfunc == func_std )
+			farcstd(&vars1[varID], vars2[varID], 1.0/vars1[varID].nsamp);
+		      else
+			farcvar(&vars1[varID], vars2[varID], 1.0/vars1[varID].nsamp);
+		    }
+		  else
+		    {
+		      farinv(&samp1[varID]);
+		      if ( operfunc == func_std )
+			farstd(&vars1[varID], vars2[varID], samp1[varID]);
+		      else
+			farvar(&vars1[varID], vars2[varID], samp1[varID]);
+		    }
+		}
+
+	      streamDefRecord(streamID2, varID, 0);
+	      streamWriteRecord(streamID2, vars1[varID].ptr, vars1[varID].nmiss);
+	      vars1[varID].nsamp = 0;
+	    }
 	}
 
       tsID++;

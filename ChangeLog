@@ -1,3 +1,7 @@
+2011-07-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Vertstat: bug fix for streams with time invariant variables
+
 2011-07-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.1
