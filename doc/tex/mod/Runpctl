@@ -46,6 +46,6 @@ INTEGER  Number of time steps
 @BeginExample
 To compute the running 50th percentile (median) over 9 time steps use:
 @BeginVerbatim
-   cdo runpctl,50,9 ifile -runmin,9 ifile -runmax,9 ifile ofile
+   cdo runpctl,50,9 ifile ofile
 @EndVerbatim
 @EndExample
