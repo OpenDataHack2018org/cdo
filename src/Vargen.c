@@ -228,7 +228,7 @@ void *Vargen(void *argument)
     vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);
 
   if ( operatorID != STDATM )
-    vlistID, varID, cdoOperatorName(operatorID);
+    vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
   else
     {
       vlistDefVarName(vlistID    , varID , "P");
