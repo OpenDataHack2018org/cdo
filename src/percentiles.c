@@ -94,6 +94,10 @@ static int histAddValue(HISTOGRAM *hist, double value)
   assert( hist != NULL );
   assert( hist->nbins > 0 );
 
+  /* 2011-08-01 Uwe Schulzweida: added check for rounding errors */
+  if ( value < hist->min && (hist->min-value) < 1e5 ) value = hist->min;
+  if ( value > hist->max && (value-hist->max) < 1e5 ) value = hist->max;
+
   if ( IS_EQUAL(hist->min, hist->max) )
     return 0;
   if ( value < hist->min || value > hist->max )

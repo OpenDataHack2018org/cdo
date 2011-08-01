@@ -1,3 +1,7 @@
+2011-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* histAddValue: added check for rounding errors
+	
 2011-07-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* replace: added support to replace single levels
