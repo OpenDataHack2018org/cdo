@@ -6,6 +6,7 @@ Version 1.5.2 (12 July 2011):
    New features:
      * replace: added support to replace single levels
    Fixed bugs:
+     * invertlat: bug fix for CURVILINEAR grids
      * import_binary: added support for OPTION ZREV
 
 Version 1.5.1 (12 July 2011):

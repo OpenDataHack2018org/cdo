@@ -1,5 +1,6 @@
 2011-08-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* invertlat: bug fix for CURVILINEAR grids [report: Christine Rademacher]
 	* import_binary: added support for OPTION ZREV (bug fix) [report: Rene Hommel]
 
 2011-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

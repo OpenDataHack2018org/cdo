@@ -24,6 +24,7 @@ case "${HOSTNAME}" in
                     --with-jasper=$HOME/local \
                     --with-grib_api=$HOME/local \
                     --with-netcdf=$HOME/local \
+                    --with-hdf5=$HOME/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"

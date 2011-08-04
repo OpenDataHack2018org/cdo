@@ -168,21 +168,34 @@ void invertLatDes(int vlistID)
 	  yv1 = (double *) malloc(size*sizeof(double));
 	  yv2 = (double *) malloc(size*sizeof(double));
 
-	  gridInqYvals(gridID1, yv1);
 
 	  if ( gridtype == GRID_CURVILINEAR )
 	    {
+	      gridInqXvals(gridID1, yv1);
+
 	      for ( ilat = 0; ilat < nlat; ilat++ )
 		for ( ilon = 0; ilon < nlon; ilon++ )
 		  yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
+
+	      gridDefXvals(gridID2, yv2);
+
+	      gridInqYvals(gridID1, yv1);
+
+	      for ( ilat = 0; ilat < nlat; ilat++ )
+		for ( ilon = 0; ilon < nlon; ilon++ )
+		  yv2[(nlat-ilat-1)*nlon + ilon] = yv1[ilat*nlon + ilon];
+
+	      gridDefYvals(gridID2, yv2);
 	    }
 	  else
 	    {
+	      gridInqYvals(gridID1, yv1);
+
 	      for ( ilat = 0; ilat < nlat; ilat++ )
 		yv2[nlat-ilat-1] = yv1[ilat];
-	    }
 
-	  gridDefYvals(gridID2, yv2);
+	      gridDefYvals(gridID2, yv2);
+	    }
 
 	  if ( yv2 ) free(yv2);
 	  if ( yv1 ) free(yv1);
