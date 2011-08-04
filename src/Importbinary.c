@@ -63,16 +63,16 @@ void get_dim_vals(dsets_t *pfi, double *vals, int dimlen, int dim)
 }
 
 static
-void rev_yvals(double *yvals, int ny)
+void rev_vals(double *vals, int n)
 {
   int i;
   double dum;
 
-  for ( i = 0; i < ny/2; ++i )
+  for ( i = 0; i < n/2; ++i )
     {
-      dum = yvals[i];
-      yvals[i] = yvals[ny-1-i];
-      yvals[ny-1-i] = dum;
+      dum = vals[i];
+      vals[i] = vals[n-1-i];
+      vals[n-1-i] = dum;
     }
 }
 
@@ -131,7 +131,7 @@ int define_grid(dsets_t *pfi)
   get_dim_vals(pfi, xvals, nx, 0);
   get_dim_vals(pfi, yvals, ny, 1);
 
-  if ( pfi->yrflg ) rev_yvals(yvals, ny);
+  if ( pfi->yrflg ) rev_vals(yvals, ny);
 
   if ( pfi->linear[1] == 0 ) lgauss = y_is_gauss(yvals, ny);
 
@@ -172,6 +172,7 @@ int define_level(dsets_t *pfi, int nlev)
       else
 	{
 	  if ( nlev > 0 && nlev < nz ) nz = nlev;
+	  if ( pfi->zrflg ) rev_vals(zvals, nz);
 	  zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
 	}
       zaxisDefLevels(zaxisID, zvals);
@@ -187,7 +188,6 @@ int define_level(dsets_t *pfi, int nlev)
       zaxisDefLevels(zaxisID, &level);
     }
 
-  
   return (zaxisID);
 }
 

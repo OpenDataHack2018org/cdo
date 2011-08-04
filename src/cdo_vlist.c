@@ -59,7 +59,7 @@ void compareGrids(int gridID1, int gridID2)
 		      for ( i = 0; i < ysize; ++i )
 			if ( fabs(yvals1[i] - yvals2[i]) > 1.e-5 )
 			  {
-			    printf("lat %g %g %g\n", yvals1[i], yvals2[i], yvals1[i] - yvals2[i]);
+			    // printf("lat %g %g %g\n", yvals1[i], yvals2[i], yvals1[i] - yvals2[i]);
 			    cdoWarning("Grid latitudes differ!");
 			    break;
 			  }

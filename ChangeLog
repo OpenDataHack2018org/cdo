@@ -1,7 +1,11 @@
+2011-08-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* import_binary: added support for OPTION ZREV (bug fix) [report: Rene Hommel]
+
 2011-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* histAddValue: added check for rounding errors
-	
+
 2011-07-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* replace: added support to replace single levels
@@ -50,7 +54,7 @@
 	* Added support for netCDF4 classic format; option -f nc4c
 	* eca*: use the input calendar for the output streams (bug fix) [report: Martin Juckes]
 
-2011-04-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2011-04-04  Uwe Schulzweida  <Uwe.Schulzweda@zmaw.de>
 
 	* intyear: check contents of input files [report: Angelika Heil]
 	* pipeDefTimestep: set EOP if nrecs = 0 (dead lock) [report: Luis Kornnblueh]
