@@ -1,5 +1,10 @@
 2011-08-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* expr: wrong result for expression 'const-var (e.g. 1-var)' (bug fix) [report: Hans-Jürgen Panitz]
+	           This bug was introduced in CDO version 1.5.1
+
+2011-08-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* invertlat: bug fix for CURVILINEAR grids [report: Christine Rademacher]
 	* import_binary: added support for OPTION ZREV (bug fix) [report: Rene Hommel]
 

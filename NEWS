@@ -1,13 +1,15 @@
 CDO NEWS
 --------
 
-Version 1.5.2 (12 July 2011):
+Version 1.5.2 (?? September 2011):
 
    New features:
      * replace: added support to replace single levels
    Fixed bugs:
      * invertlat: bug fix for CURVILINEAR grids
      * import_binary: added support for OPTION ZREV
+     * expr/exprf: wrong result for expression 'constant-field' and 'constant/field' (e.g. 1-field)
+                   This bug was introduced in CDO version 1.5.1.
 
 Version 1.5.1 (12 July 2011):
 

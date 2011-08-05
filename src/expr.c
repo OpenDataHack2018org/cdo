@@ -78,6 +78,107 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
 }
 
 static
+nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
+{
+  nodeType *p;
+  long ngp, i;
+  long nlev;
+  int nmiss;
+  int gridID, zaxisID;
+  double missval1, missval2;
+
+  gridID   = p2->gridID;
+  zaxisID  = p2->zaxisID;
+  nmiss    = p2->nmiss;
+  missval1 = p2->missval;
+  missval2 = p2->missval;
+
+  ngp  = gridInqSize(gridID);
+  nlev = zaxisInqSize(zaxisID);
+
+  p = (nodeType *) malloc(sizeof(nodeType));
+
+  p->type     = typeVar;
+  p->tmpvar   = 1;
+  p->u.var.nm = strdupx("tmp");
+  p->gridID   = gridID;
+  p->zaxisID  = zaxisID;
+  p->missval  = missval1;
+
+  p->data = (double *) malloc(ngp*nlev*sizeof(double));
+
+  switch ( oper )
+    {
+    case '+':
+      if ( nmiss > 0 )
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = ADD(p1->u.con.value, p2->data[i]);
+	}
+      else
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->u.con.value + p2->data[i];
+	}
+      break;
+    case '-':
+      if ( nmiss > 0 )
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = SUB(p1->u.con.value, p2->data[i]);
+	}
+      else
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->u.con.value - p2->data[i];
+	}
+      break;
+    case '*':
+      if ( nmiss > 0 )
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = MUL(p1->u.con.value, p2->data[i]);
+	}
+      else
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = p1->u.con.value * p2->data[i];
+	}
+      break;
+    case '/':
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = DIV(p1->u.con.value, p2->data[i]);
+	}
+      break;
+    case '^':
+      if ( nmiss > 0 )
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = POW(p1->u.con.value, p2->data[i]);
+	}
+      else
+	{
+	  for ( i = 0; i < ngp*nlev; i++ )
+	    p->data[i] = pow(p1->u.con.value, p2->data[i]);
+	}
+      break;
+    default:
+      cdoAbort("%s: operator %c unsupported!", __func__, oper);
+    }
+
+  nmiss = 0;
+  for ( i = 0; i < ngp*nlev; i++ )
+    if ( DBL_IS_EQUAL(p->data[i], missval1) ) nmiss++;
+
+  p->nmiss = nmiss;
+
+  if ( p2->tmpvar ) free(p2->data);
+
+  return (p);
+}
+
+static
 nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
 {
   nodeType *p;
@@ -376,7 +477,7 @@ nodeType *expr(int oper, nodeType *p1, nodeType *p2)
     }
   else if ( p1->type == typeCon && p2->type == typeVar )
     {
-      p = expr_var_con(oper, p2, p1);
+      p = expr_con_var(oper, p1, p2);
       if ( cdoVerbose )
 	printf("\t%g %c %s\n", p1->u.con.value, oper, p2->u.var.nm);
     }
