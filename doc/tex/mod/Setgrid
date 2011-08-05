@@ -31,9 +31,17 @@ as the size of the target grid description.
 @Parameter = gridtype
 
 @BeginDescription
-Sets the grid type of all input fields. Use the parameter @env{curvilinear} or @env{unstructued}
-to convert the grid type and the coordinates to a CURVILINEAR or UNSTRUCTUED grid.
-The parameter @env{dereference} will dereference all grids with the grid type REFERENCE.
+Sets the grid type of all input fields. The following grid types are available:
+@BeginList curvilinear
+@Item = curvilinear
+Converts regular grid to curvilinear grid
+@Item = unstructured
+Converts grid type to unstructured grid
+@Item = dereference
+Dereference grid type REFERENCE
+@Item = regular
+Converts reduced Gaussian grid to regular Gaussian grid
+@EndList
 @EndDescription
 @EndOperator
 
@@ -54,7 +62,7 @@ the weights of each grid cell if needed by an operator, e.g. for @oper{fldmean}.
 @Item = grid
 STRING  Grid description file or name
 @Item = gridtype
-STRING  Grid type (curvilinear, unstructured or dereference)
+STRING  Grid type (curvilinear, unstructured, regular or dereference)
 @Item = gridarea
 STRING  Data file, the first field is used as grid cell area
 @EndParameter

@@ -826,9 +826,11 @@ static char *SetgridHelp[] = {
     "                 Sets a new grid description. The input fields need to have the same grid size",
     "                 as the size of the target grid description.",
     "    setgridtype  Set grid type",
-    "                 Sets the grid type of all input fields. Use the parameter curvilinear or unstructued",
-    "                 to convert the grid type and the coordinates to a CURVILINEAR or UNSTRUCTUED grid.",
-    "                 The parameter dereference will dereference all grids with the grid type REFERENCE.",
+    "                 Sets the grid type of all input fields. The following grid types are available:",
+    "                 curvilinear"    "                 Converts regular grid to curvilinear grid",
+    "                 unstructured"    "                 Converts grid type to unstructured grid",
+    "                 dereference"    "                 Dereference grid type REFERENCE",
+    "                 regular    "    "                 Converts reduced Gaussian grid to regular Gaussian grid",
     "    setgridarea  Set grid cell area",
     "                 Sets the grid cell area. The parameter gridarea is the path to a data file,",
     "                 the first field is used as grid cell area. The input fields need to have the same",
@@ -837,7 +839,7 @@ static char *SetgridHelp[] = {
     "",
     "PARAMETER",
     "    grid      STRING  Grid description file or name",
-    "    gridtype  STRING  Grid type (curvilinear, unstructured or dereference)",
+    "    gridtype  STRING  Grid type (curvilinear, unstructured, regular or dereference)",
     "    gridarea  STRING  Data file, the first field is used as grid cell area",
     NULL
 };
