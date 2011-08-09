@@ -1,3 +1,7 @@
+2011-08-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* dv2uv: added support for GRIB2 parameter names (d, vo)
+
 2011-08-04  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: wrong result for expression 'const-var (e.g. 1-var)' (bug fix) [report: Hans-Jürgen Panitz]

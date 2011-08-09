@@ -49,7 +49,8 @@ void *Wind(void *argument)
   int lcopy = FALSE;
   int taxisID1, taxisID2;
   int nlon, nlat, ntr = -1;
-  int code;
+  int code, param;
+  int pnum, pcat, pdis;
   int varID1 = -1, varID2 = -1;
   int offset;
   SPTRANS *sptrans = NULL;
@@ -83,10 +84,12 @@ void *Wind(void *argument)
   nvars = vlistNvars(vlistID2);
   for ( varID = 0; varID < nvars; varID++ )
     {
+      param = vlistInqVarParam(vlistID2, varID);
+      cdiDecodeParam(param, &pnum, &pcat, &pdis);
+      code = pnum;
       if ( operatorID == UV2DV || operatorID == UV2DVL )
 	{
 	  /* search for u and v wind */
-	  code = vlistInqVarCode(vlistID1, varID);
 	  if ( code <= 0 )
 	    {
 	      vlistInqVarName(vlistID1, varID, varname);
@@ -102,8 +105,15 @@ void *Wind(void *argument)
       else if ( operatorID == DV2UV || operatorID == DV2UVL || operatorID == DV2PS )
 	{
 	  /* search for divergence and vorticity */
-	  code = vlistInqVarCode(vlistID1, varID);
-	  if ( code <= 0 )
+	  if ( pdis != 255 ) // GRIB2
+	    {
+	      vlistInqVarName(vlistID1, varID, varname);
+	      strtolower(varname);
+
+	      if      ( strcmp(varname, "d")  == 0 ) code = 155;
+	      else if ( strcmp(varname, "vo") == 0 ) code = 138;
+	    }
+	  else if ( code <= 0 )
 	    {
 	      vlistInqVarName(vlistID1, varID, varname);
 	      strtolower(varname);
@@ -116,7 +126,7 @@ void *Wind(void *argument)
 	  else if ( code == 138 ) varID2 = varID;
 	}
       else
-	cdoAbort("unexpected operatorID %d", operatorID);
+	cdoAbort("Unexpected operatorID %d", operatorID);
     }
 
   ngrids = vlistNgrids(vlistID1);
@@ -186,8 +196,8 @@ void *Wind(void *argument)
 
 	  vlistChangeVarGrid(vlistID2, varID1, gridID2);
 	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
-	  vlistDefVarCode(vlistID2, varID1, 155);
-	  vlistDefVarCode(vlistID2, varID2, 138);
+	  vlistDefVarParam(vlistID2, varID1, cdiEncodeParam(155, 128, 255));
+	  vlistDefVarParam(vlistID2, varID2, cdiEncodeParam(138, 128, 255));
 	  vlistDefVarName(vlistID2, varID1, "sd");
 	  vlistDefVarName(vlistID2, varID2, "svo");
 	  vlistDefVarLongname(vlistID2, varID1, "divergence");
@@ -243,8 +253,8 @@ void *Wind(void *argument)
 
 	  vlistChangeVarGrid(vlistID2, varID1, gridID2);
 	  vlistChangeVarGrid(vlistID2, varID2, gridID2);
-	  vlistDefVarCode(vlistID2, varID1, 131);
-	  vlistDefVarCode(vlistID2, varID2, 132);
+	  vlistDefVarParam(vlistID2, varID1, cdiEncodeParam(131, 128, 255));
+	  vlistDefVarParam(vlistID2, varID2, cdiEncodeParam(132, 128, 255));
 	  vlistDefVarName(vlistID2, varID1, "u");
 	  vlistDefVarName(vlistID2, varID2, "v");
 	  vlistDefVarLongname(vlistID2, varID1, "u-velocity");
@@ -275,8 +285,8 @@ void *Wind(void *argument)
 	  if ( gridID1 != vlistInqVarGrid(vlistID1, varID1) )
 	    cdoAbort("Divergence and vorticity must have the same grid represention!");
 
-	  vlistDefVarCode(vlistID2, varID1, 149);
-	  vlistDefVarCode(vlistID2, varID2, 148);
+	  vlistDefVarParam(vlistID2, varID1, cdiEncodeParam(149, 128, 255));
+	  vlistDefVarParam(vlistID2, varID2, cdiEncodeParam(148, 128, 255));
 	  vlistDefVarName(vlistID2, varID1, "velopot");
 	  vlistDefVarName(vlistID2, varID2, "stream");
 	  vlistDefVarLongname(vlistID2, varID1, "velocity potential");
