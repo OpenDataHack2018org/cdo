@@ -1738,7 +1738,6 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cdoDebug ) cdoPrint("Grid from netCDF file");
 	  gridID = gridFromNCfile(gridfile);
-	  return (gridID);
 	}
 
       if ( gridID == -1 )
@@ -1747,7 +1746,6 @@ int cdoDefineGrid(const char *gridfile)
 	    {
 	      if ( cdoDebug ) cdoPrint("Grid from HDF5 file");
 	      gridID = gridFromH5file(gridfile);
-	      return (gridID);
 	    }
 	}
 
