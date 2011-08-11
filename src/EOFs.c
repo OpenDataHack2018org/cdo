@@ -142,7 +142,8 @@ void *EOFs(void * argument)
   if ( WEIGHTS )
     gridWeights(gridID1, &weight[0]);
   else
-    for(i=0;i<gridsize;i++) weight[i]=1;
+    for(i=0;i<gridsize;i++) 
+      weight[i]=1;
 
 
   /* eigenvalues */
@@ -496,9 +497,9 @@ void *EOFs(void * argument)
 		for (i2 = i1; i2 < npack; i2++ )
 		  if ( datacountv[pack[i1]*gridsize+pack[i2]] )
 		    cov[i2][i1] = cov[i1][i2] =
-			          datafieldv[0].ptr[pack[i1]*gridsize+pack[i2]]*   // covariance
-                                  sqrt(weight[pack[i1]]) * sqrt (weight[pack[i2]]) / sum_w /       // weights
-                                  (datacountv[pack[i1]*gridsize+pack[i2]]);   // number of data contributing
+		      datafieldv[0].ptr[pack[i1]*gridsize+pack[i2]]*   // covariance
+		      sqrt(weight[pack[i1]]) * sqrt (weight[pack[i2]]) / sum_w /       // weights
+		      (datacountv[pack[i1]*gridsize+pack[i2]]);   // number of data contributing
             }
           else if ( time_space )
             {
@@ -568,7 +569,7 @@ void *EOFs(void * argument)
               if ( grid_space )
 		for(j = 0; j < npack; j++)
 		  eigenvectors[varID][levelID][i].ptr[pack[j]] = 
-		    cov[i][j] / sqrt(weight[pack[j]]);
+		    cov[i][j] /*/ sqrt(weight[pack[j]])*/;
               else if ( time_space )
                 {
 #if defined (_OPENMP)
@@ -590,13 +591,16 @@ void *EOFs(void * argument)
   shared(eigenvectors,weight,pack,varID,levelID,i,npack)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
-                    sum += weight[pack[i2]] *
-                           eigenvectors[varID][levelID][i].ptr[pack[i2]] *
-                           eigenvectors[varID][levelID][i].ptr[pack[i2]];
+		    /* 
+		    ** do not need to account for weights as eigenvectors 
+		    ** are non-weighted                                   
+		    */ 
+                    sum += /*weight[pack[i2]] **/
+		      eigenvectors[varID][levelID][i].ptr[pack[i2]] *
+		      eigenvectors[varID][levelID][i].ptr[pack[i2]];
                   if ( sum > 0 )
                     {
                       sum = sqrt(sum);
-		      // sum = sqrt(sum/sum_w);
 #if defined (_OPENMP)
 #pragma omp parallel for private(i2) default(none) \
   shared(npack,varID,levelID,i,pack,sum,eigenvectors)
