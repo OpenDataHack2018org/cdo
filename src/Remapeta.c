@@ -55,7 +55,7 @@ void corr_hum(long gridsize, double *q, double q_min)
 }
  
 static
-long ncctop(long nlev, long nlevp1, double *vct_a, double *vct_b)
+long ncctop(double cptop, long nlev, long nlevp1, double *vct_a, double *vct_b)
 {
   /*
     Description:
@@ -69,7 +69,7 @@ long ncctop(long nlev, long nlevp1, double *vct_a, double *vct_b)
   long nctop = 0;
   long jk;
   double    za, zb, zph[nlevp1], zp[nlev];
-  double    cptop  =  1000.;   /* min. pressure level for cond. */
+  // double    cptop  =  1000.;   /* min. pressure level for cond. */
 
   /* half level pressure values, assuming 101320. Pa surface pressure */
 
@@ -243,7 +243,7 @@ void *Remapeta(void *argument)
   int varids[MAX_VARS3D];
   int *imiss = NULL;
   int timer_hetaeta = 0;
-  long nctop;
+  long nctop = 0;
   double *array = NULL;
   double *deltap1 = NULL, *deltap2 = NULL;
   double *half_press1 = NULL, *half_press2 = NULL;
@@ -257,6 +257,8 @@ void *Remapeta(void *argument)
   double q_min = 0, q_max = 0.1;
   double cconst = 1.E-6;
   const char *fname;
+  char *envstr;
+  double cptop  = 0; /* min. pressure level for cond. */
 
   if ( cdoTimer ) timer_hetaeta = timer_new("Remapeta_hetaeta");
 
@@ -270,62 +272,70 @@ void *Remapeta(void *argument)
 
   operatorInputArg(cdoOperatorEnter(operatorID));
 
+  envstr = getenv("REMAPETA_PTOP");
+  if ( envstr )
     {
-
-      vct2 = vctFromFile(operatorArgv()[0], &nvct2);
-      nhlevf2 = nvct2/2 - 1;
-
-      a2 = vct2;
-      b2 = vct2 + nvct2/2;
-
-      if ( cdoVerbose )
-	for ( i = 0; i < nhlevf2+1; ++i )
-	  cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
-
-      if ( operatorArgc() == 2 )
+      double fval = atof(envstr);
+      if ( fval > 0 )
 	{
-	  lfis2 = TRUE;
-	  fname = operatorArgv()[1];
+	  cptop = fval;
+	  //	  if ( cdoVerbose )
+	  cdoPrint("Set REMAPETA_PTOP to %g", cptop);
+	}
+    }  
 
-	  streamID1 = streamOpenRead(fname);
+  vct2 = vctFromFile(operatorArgv()[0], &nvct2);
+  nhlevf2 = nvct2/2 - 1;
 
-	  vlistID1 = streamInqVlist(streamID1);
+  a2 = vct2;
+  b2 = vct2 + nvct2/2;
 
-	  streamInqRecord(streamID1, &varID, &levelID);
-	  gridID  = vlistInqVarGrid(vlistID1, varID);
-	  nfis2gp = gridInqSize(gridID);
+  if ( cdoVerbose )
+    for ( i = 0; i < nhlevf2+1; ++i )
+      cdoPrint("vct2: %5d %25.17f %25.17f", i, vct2[i], vct2[nvct2/2+i]);
 
-	  fis2  = (double *) malloc(nfis2gp*sizeof(double));
+  if ( operatorArgc() == 2 )
+    {
+      lfis2 = TRUE;
+      fname = operatorArgv()[1];
+      
+      streamID1 = streamOpenRead(fname);
 
-	  streamReadRecord(streamID1, fis2, &nmiss);
+      vlistID1 = streamInqVlist(streamID1);
 
-	  if ( nmiss )
+      streamInqRecord(streamID1, &varID, &levelID);
+      gridID  = vlistInqVarGrid(vlistID1, varID);
+      nfis2gp = gridInqSize(gridID);
+
+      fis2 = (double *) malloc(nfis2gp*sizeof(double));
+
+      streamReadRecord(streamID1, fis2, &nmiss);
+
+      if ( nmiss )
+	{
+	  missval = vlistInqVarMissval(vlistID1, varID);
+	  imiss = (int *) malloc (nfis2gp*sizeof(int));
+	  for ( i = 0; i < nfis2gp; ++i )
 	    {
-	      missval = vlistInqVarMissval(vlistID1, varID);
-	      imiss = (int *) malloc (nfis2gp*sizeof(int));
-	      for ( i = 0; i < nfis2gp; ++i )
-		{
-		  if ( DBL_IS_EQUAL(fis2[i], missval) )
-		    imiss[i] = 1;
-		  else 
-		    imiss[i] = 0;
-		}
-
-	      nmissout = nmiss;
+	      if ( DBL_IS_EQUAL(fis2[i], missval) )
+		imiss[i] = 1;
+	      else 
+		imiss[i] = 0;
 	    }
 
-	  /* check range of geop */
-
-	  minmax(nfis2gp, fis2, imiss, &minval, &maxval);
-
-	  if ( minval < -100000 || maxval > 100000 )
-	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
-
-	  if ( minval < -1.e10 || maxval > 1.e10 )
-	    cdoAbort("Orography out of range!");
-
-	  streamClose(streamID1); 
+	  nmissout = nmiss;
 	}
+
+      /* check range of geop */
+      minmax(nfis2gp, fis2, imiss, &minval, &maxval);
+
+      if ( minval < -100000 || maxval > 100000 )
+	cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+
+      if ( minval < -1.e10 || maxval > 1.e10 )
+	cdoAbort("Orography out of range!");
+
+      streamClose(streamID1); 
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -709,7 +719,8 @@ void *Remapeta(void *argument)
 	  if ( cdoTimer ) timer_stop(timer_hetaeta);
 	}
 
-      nctop = ncctop((long) nhlevf2, (long) nhlevf2+1, a2, b2);
+      if ( cptop > 0 )
+	nctop = ncctop(cptop, (long) nhlevf2, (long) nhlevf2+1, a2, b2);
 
       if ( geopID != -1 )
 	{

@@ -1,3 +1,8 @@
+2011-08-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+        * remapeta: Changed minimum pressure level for condensation from 1000Pa to 0Pa [request: Patrick Joeckel]
+                           Use env. REMAPETA_PTOP to set the minimum pressure level for condensation.
+
 2011-08-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* dv2uv: added support for GRIB2 parameter names (d, vo)

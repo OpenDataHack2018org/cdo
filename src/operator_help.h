@@ -3078,6 +3078,12 @@ static char *RemapetaHelp[] = {
     "PARAMETER",
     "    vct  STRING  File name of an ASCII dataset with the vertical coordinate table",
     "    oro  STRING  File name with the orography (surf. geopotential) of the target dataset (optional)",
+    "",
+    "ENVIRONMENT",
+    "    REMAPETA_PTOP",
+    "        Sets the minimum pressure level for condensation.",
+    "        Above this level the humidity is set to the constant 1.E-6.",
+    "        The default value is 0 Pa.",
     NULL
 };
 

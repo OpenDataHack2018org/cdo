@@ -58,6 +58,14 @@ STRING  File name with the orography (surf. geopotential) of the target dataset 
 @EndParameter
 
 
+@BeginEnvironment
+@Item = REMAPETA_PTOP
+Sets the minimum pressure level for condensation.
+Above this level the humidity is set to the constant 1.E-6.
+The default value is 0 Pa.
+@EndEnvironment
+
+
 @BeginNote
 The code numbers or the variable names of the required parameter have to
 follow the \cite{ECHAM} convention.
