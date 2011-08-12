@@ -49,7 +49,10 @@ void *Setgrid(void *argument)
   long areasize = 0;
   long masksize = 0;
   int lregular = 0;
+  int ligme = 0;
   int number = 0, position = 0;
+  int grid2_nvgp;
+  int *grid2_vgpm = NULL;
   char *gridname = NULL;
   double *gridmask = NULL;
   double *areaweight = NULL;
@@ -79,13 +82,13 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       gridname = operatorArgv()[0];
 
-      if      ( strcmp(gridname, "curvilinear") == 0 )  gridtype = GRID_CURVILINEAR;
-      else if ( strcmp(gridname, "cell") == 0 )         gridtype = GRID_UNSTRUCTURED;
-      else if ( strcmp(gridname, "unstructured") == 0 ) gridtype = GRID_UNSTRUCTURED;
-      else if ( strcmp(gridname, "dereference") == 0 )  gridtype = GRID_REFERENCE;
-      else if ( strcmp(gridname, "lonlat") == 0 )       gridtype = GRID_LONLAT;
-      else if ( strcmp(gridname, "gaussian") == 0 )     gridtype = GRID_GAUSSIAN;
-      else if ( strcmp(gridname, "regular") == 0 )     {gridtype = GRID_GAUSSIAN; lregular = 1;}
+      if      ( strcmp(gridname, "curvilinear") == 0 )   gridtype = GRID_CURVILINEAR;
+      else if ( strcmp(gridname, "cell") == 0 )          gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "unstructured") == 0 )  gridtype = GRID_UNSTRUCTURED;
+      else if ( strcmp(gridname, "dereference") == 0 )   gridtype = GRID_REFERENCE;
+      else if ( strcmp(gridname, "lonlat") == 0 )        gridtype = GRID_LONLAT;
+      else if ( strcmp(gridname, "gaussian") == 0 )      gridtype = GRID_GAUSSIAN;
+      else if ( strcmp(gridname, "regular") == 0 )      {gridtype = GRID_GAUSSIAN; lregular = 1;}
       else cdoAbort("Unsupported grid name: %s", gridname);
     }
   else if ( operatorID == SETGRIDAREA )
@@ -233,8 +236,23 @@ void *Setgrid(void *argument)
 	    }
 	  else
 	    {
-	      if      ( gridtype == GRID_CURVILINEAR  ) gridID2 = gridToCurvilinear(gridID1);
-	      else if ( gridtype == GRID_UNSTRUCTURED ) gridID2 = gridToUnstructured(gridID1);
+	      if      ( gridtype == GRID_CURVILINEAR  )
+		{
+		  gridID2 = gridToCurvilinear(gridID1);
+		}
+	      else if ( gridtype == GRID_UNSTRUCTURED )
+		{
+		  if ( gridInqType(gridID1) == GRID_GME ) ligme = 1;
+		  gridID2 = gridToUnstructured(gridID1);
+
+		  if ( ligme )
+		    {
+		      grid2_nvgp = gridInqSize(gridID2);
+		      gridCompress(gridID2);
+		      grid2_vgpm = (int *) malloc(grid2_nvgp*sizeof(int));
+		      gridInqMaskGME(gridID2, grid2_vgpm);
+		    }
+		}
 	      else if ( gridtype == GRID_REFERENCE    )
 		{
 		  gridID2 = referenceToGrid(gridID1);
@@ -323,6 +341,7 @@ void *Setgrid(void *argument)
 	  streamDefRecord(streamID2,  varID,  levelID);
 	  
 	  streamReadRecord(streamID1, array, &nmiss);
+
 	  if ( lregular )
 	    {
 	      gridID1 = vlistInqVarGrid(vlistID1, varID);
@@ -332,6 +351,14 @@ void *Setgrid(void *argument)
 		  double missval = vlistInqVarMissval(vlistID1, varID);
 		  field2regular(gridID1, gridID2, missval, array, nmiss);
 		}
+	    }
+	  else if ( gridInqType(gridID1) == GRID_GME )
+	    {
+	      int j = 0;
+	      gridID1 = vlistInqVarGrid(vlistID1, varID);
+	      gridsize = gridInqSize(gridID1);
+	      for ( i = 0; i < gridsize; i++ )
+		if ( grid2_vgpm[i] ) array[j++] = array[i];
 	    }
 
 	  streamWriteRecord(streamID2, array, nmiss);
@@ -345,6 +372,7 @@ void *Setgrid(void *argument)
   if ( gridmask ) free(gridmask);
   if ( areaweight ) free(areaweight);
   if ( array ) free(array);
+  if ( grid2_vgpm ) free(grid2_vgpm);
 
   cdoFinish();
 
