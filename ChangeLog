@@ -1,3 +1,11 @@
+2011-08-12  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
+
+        * eof, eoftime, eofspatial, eof3d - Empirical Orthogonal Functions:bug fix [report: Eileen Dahms and Frank Lunkeit]
+            There was a bug in the calculation of the Frobenius norm, which has only been triggered in some cases
+            when using a low precision. The normalization has been changed thus that the eigenvectors are not weighted
+            and their absolute is 1. The default settings for convergence have been changed to be more conservative:
+            CDO_SVD_MODE=jacobi    MAX_JACOBI_ITER=12     FNORM_PRECISION=1.e-12
+
 2011-08-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* setgridtype: compress GME grids [request: Jaison Ambadan]
