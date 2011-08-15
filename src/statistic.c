@@ -1295,7 +1295,7 @@ void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, 
 /* changes columns i and j, this can be carried out for n/2 pairs of columns at     */
 /* the same time.                                                                   */
 /* ******************************************************************************** */
-void (double **M, long i, long j, long k, long n)
+void annihilate_1side(double **M, long i, long j, long k, long n)
 {
 
   double tk, ck, sk, alpha=0, beta=0, gamma=0, zeta=0;
