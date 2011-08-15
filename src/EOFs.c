@@ -28,6 +28,7 @@
  * number of contributing values during summation.
  */
 
+//#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
 #include <limits.h>  // LONG_MAX
@@ -567,9 +568,15 @@ void *EOFs(void * argument)
           for (i = 0; i < n_eig; i++)
             {
               if ( grid_space )
-		for(j = 0; j < npack; j++)
-		  eigenvectors[varID][levelID][i].ptr[pack[j]] = 
-		    cov[i][j] /*/ sqrt(weight[pack[j]])*/;
+		{
+		  for(j = 0; j < npack; j++)
+		    eigenvectors[varID][levelID][i].ptr[pack[j]] = 
+#ifdef OLD_IMPLEMENTATION
+		      cov[i][j] / sqrt(weight[pack[j]]);
+#else
+		      cov[i][j] /*/ sqrt(weight[pack[j]])*/;
+#endif
+		}
               else if ( time_space )
                 {
 #if defined (_OPENMP)
@@ -591,13 +598,19 @@ void *EOFs(void * argument)
   shared(eigenvectors,weight,pack,varID,levelID,i,npack)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
-		    /* 
-		    ** do not need to account for weights as eigenvectors 
-		    ** are non-weighted                                   
-		    */ 
-                    sum += /*weight[pack[i2]] **/
+		    {
+		      /* 
+		      ** do not need to account for weights as eigenvectors are non-weighted                                   
+		      */ 
+#ifdef OLD_IMPLEMENTATION
+		      sum += weight[pack[i2]] *
+#else
+		      sum += /*weight[pack[i2]] **/
+#endif
 		      eigenvectors[varID][levelID][i].ptr[pack[i2]] *
 		      eigenvectors[varID][levelID][i].ptr[pack[i2]];
+		    }
+
                   if ( sum > 0 )
                     {
                       sum = sqrt(sum);
