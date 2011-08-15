@@ -1295,7 +1295,7 @@ void parallel_eigen_solution_of_symmetric_matrix(double **M, double *A, int n1, 
 /* changes columns i and j, this can be carried out for n/2 pairs of columns at     */
 /* the same time.                                                                   */
 /* ******************************************************************************** */
-void annihilate_1side(double **M, long i, long j, long k, long n)
+void (double **M, long i, long j, long k, long n)
 {
 
   double tk, ck, sk, alpha=0, beta=0, gamma=0, zeta=0;
@@ -1321,7 +1321,9 @@ void annihilate_1side(double **M, long i, long j, long k, long n)
       gamma += M[i][r]*M[j][r];
   }
 
-  tmp = fabs(gamma/sqrt(alpha/beta));
+  // 2011-08-15 Cedrick Ansorge: bug fix
+  //  tmp = fabs(gamma/sqrt(alpha/beta));
+  tmp = fabs(gamma/sqrt(alpha*beta));
 
   if ( tmp < fnorm_precision ) {
 #if defined (_OPENMP)
