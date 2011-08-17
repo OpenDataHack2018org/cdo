@@ -261,7 +261,6 @@ void *Setgrid(void *argument)
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 
-	  /*	  gridCompress(gridID2); */
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
 	}
     }
@@ -342,9 +341,9 @@ void *Setgrid(void *argument)
 	  
 	  streamReadRecord(streamID1, array, &nmiss);
 
+	  gridID1 = vlistInqVarGrid(vlistID1, varID);
 	  if ( lregular )
 	    {
-	      gridID1 = vlistInqVarGrid(vlistID1, varID);
 	      gridID2 = vlistInqVarGrid(vlistID2, varID);
 	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
 		{
@@ -355,7 +354,6 @@ void *Setgrid(void *argument)
 	  else if ( gridInqType(gridID1) == GRID_GME )
 	    {
 	      int j = 0;
-	      gridID1 = vlistInqVarGrid(vlistID1, varID);
 	      gridsize = gridInqSize(gridID1);
 	      for ( i = 0; i < gridsize; i++ )
 		if ( grid2_vgpm[i] ) array[j++] = array[i];
