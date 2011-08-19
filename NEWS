@@ -11,6 +11,7 @@ Version 1.5.2 (?? September 2011):
                  Above this level the humidity is set to the constant 1.E-6.
    Fixed bugs:
      * invertlat: bug fix for CURVILINEAR grids
+     * ymon<stat>: preserve time axis attributes (type and calendar)
      * import_binary: added support for OPTION ZREV
      * expr/exprf: wrong result for expression 'constant-field' and 'constant/field' (e.g. 1-field)
                    This bug was introduced in CDO version 1.5.1.

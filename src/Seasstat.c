@@ -85,7 +85,7 @@ void *Seasstat(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
+  taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

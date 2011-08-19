@@ -1,3 +1,7 @@
+2011-08-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* ymon<stat>: preserve time axis attributes (big fix) [report: Martin Juckes]
+
 2011-08-12  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
 
         * eof, eoftime, eofspatial, eof3d - Empirical Orthogonal Functions:bug fix [report: Eileen Dahms and Frank Lunkeit]
@@ -723,7 +727,7 @@ w.de>
 	* remapcon: bug fix for NORMALIZE_OPT 'dest' and 'none'
 	* Seltime: changed value of NOPERATORS (bug fix)
 	* Version 1.1.1 released
-	
+
 2008-01-24  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.1.0

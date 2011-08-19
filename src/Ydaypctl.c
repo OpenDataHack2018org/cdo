@@ -90,7 +90,7 @@ void *Ydaypctl(void *argument)
   taxisID3 = vlistInqTaxis(vlistID3);
   /* TODO - check that time axes 2 and 3 are equal */
 
-  taxisID4 = taxisCreate(TAXIS_ABSOLUTE);
+  taxisID4 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID4, taxisID4);
 
   streamID4 = streamOpenWrite(cdoStreamName(3), cdoFiletype());

@@ -160,10 +160,6 @@ void *Timstat(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   taxis_has_bounds = taxisHasBounds(taxisID1);
   taxisID2 = taxisDuplicate(taxisID1);
-  /*
-  taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
-  taxisDefCalendar(taxisID2, taxisInqCalendar(taxisID1));
-  */
   vlistDefTaxis(vlistID2, taxisID2);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
