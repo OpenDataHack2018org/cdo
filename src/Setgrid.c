@@ -248,9 +248,9 @@ void *Setgrid(void *argument)
 		  if ( ligme )
 		    {
 		      grid2_nvgp = gridInqSize(gridID2);
-		      gridCompress(gridID2);
 		      grid2_vgpm = (int *) malloc(grid2_nvgp*sizeof(int));
 		      gridInqMaskGME(gridID2, grid2_vgpm);
+		      gridCompress(gridID2);
 		    }
 		}
 	      else if ( gridtype == GRID_REFERENCE    )
