@@ -531,7 +531,7 @@ void *Importbinary(void *argument)
 		    }
 		}
 	      if ( cdoVerbose )
-		printf("%d %d %g %g %d %d %d\n", tsID, recID, fmin, fmax, recoffset, nmiss, n_nan);
+		printf("%3d %4d %3d %6d %6d %12.5g %12.5g\n", tsID, recID, recoffset, nmiss, n_nan, fmin, fmax);
 
 	      varID   = recVarID[recID];
 	      levelID = recLevelID[recID];
