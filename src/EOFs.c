@@ -28,7 +28,7 @@
  * number of contributing values during summation.
  */
 
-#define OLD_IMPLEMENTATION
+//#define OLD_IMPLEMENTATION
 #define WEIGHTS 1
 
 #include <limits.h>  // LONG_MAX
