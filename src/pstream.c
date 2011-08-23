@@ -1268,7 +1268,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  if ( cdoTimer ) timer_stop(timer_read);
 	}
 
-      if ( cdoDefaultTimeType != CDI_UNDEFID )
+      if ( nrecs > 0 && /* tsID == 0 && pstreamptr->vlistID != CDI_UNDEFID && */cdoDefaultTimeType != CDI_UNDEFID )
 	taxisDefType(vlistInqTaxis(pstreamptr->vlistID), cdoDefaultTimeType);
     }
 
@@ -1295,7 +1295,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 #endif
     {
       extern int cdoDefaultTimeType;
-      if ( cdoDefaultTimeType != CDI_UNDEFID )
+      if ( tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID )
 	{
 	  int taxisID, vlistID;
 	  vlistID = pstreamptr->vlistID;

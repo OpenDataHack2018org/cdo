@@ -14,8 +14,8 @@
 #define PI_QU 1*atan(1)
 #define PI_HA 2*atan(1)
 #define PI    4*atan(1)
-#define FNORM_PRECISION 1e-05
-#define MAX_JACOBI_ITER 5
+#define FNORM_PRECISION 1e-12
+#define MAX_JACOBI_ITER 12
 
 int jacobi_1side(double **M, double *A, long n);
 void annihilate_1side(double **M, long i, long j, long k, long n);
