@@ -781,7 +781,7 @@ void pstreamClose(int pstreamID)
   pstreamptr = pstream_to_pointer(pstreamID);
 
   if ( pstreamptr == NULL )
-    Error("Internal problem stream %d not open!", pstreamID);
+    Error("Internal problem, stream %d not open!", pstreamID);
 
   if ( pstreamptr->ispipe )
     {
@@ -1268,7 +1268,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  if ( cdoTimer ) timer_stop(timer_read);
 	}
 
-      if ( nrecs > 0 && /* tsID == 0 && pstreamptr->vlistID != CDI_UNDEFID && */cdoDefaultTimeType != CDI_UNDEFID )
+      if ( tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID )
 	taxisDefType(vlistInqTaxis(pstreamptr->vlistID), cdoDefaultTimeType);
     }
 

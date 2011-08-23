@@ -207,10 +207,12 @@ void *EOFs(void * argument)
 	cdoPrint("Counted %i timeSteps",tsID);
 
       nts         = tsID;
+      reached_eof = 0;
       //TODO close on streamID1 ??  streamClose(streamID1);
       streamClose(streamID1);
-      reached_eof = 0;
       streamID1   = streamOpenRead(cdoStreamName(0));
+      vlistID1    = streamInqVlist(streamID1);
+      taxisID1    = vlistInqTaxis(vlistID1);
       if ( nts < gridsize || operfunc == EOF_TIME) {
          time_space = 1;
          grid_space = 0;
