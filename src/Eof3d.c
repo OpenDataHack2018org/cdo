@@ -69,6 +69,9 @@ void *EOF3d(void * argument)
   int vlistID1, vlistID2=-1, vlistID3=-1;
   int zaxisID2;
 
+  int calendar = CALENDAR_STANDARD;
+  juldate_t juldate;
+
   double missval=0;
   double sum_w, sum;
   double **cov = NULL;                                /* TODO: covariance matrix / eigenvectors after solving */
@@ -501,16 +504,22 @@ void *EOF3d(void * argument)
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
 
+  vdate = 10101;
+  vtime = 0;
+  juldate = juldate_encode(calendar, vdate, vtime);
   for ( tsID = 0; tsID < n; tsID++ )
     {
-      taxisDefVdate(taxisID2, 0);
-      taxisDefVtime(taxisID2, 0);
+      juldate = juldate_add_seconds(60, juldate);
+      juldate_decode(calendar, juldate, &vdate, &vtime);
+
+      taxisDefVdate(taxisID2, vdate);
+      taxisDefVtime(taxisID2, vtime);
       streamDefTimestep(streamID2, tsID);
 
       if ( tsID < n_eig )
         {
-          taxisDefVdate(taxisID3, 0);
-          taxisDefVtime(taxisID3, 0);
+          taxisDefVdate(taxisID3, vdate);
+          taxisDefVtime(taxisID3, vtime);
           streamDefTimestep(streamID3, tsID);
         }
 

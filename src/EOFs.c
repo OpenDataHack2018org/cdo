@@ -72,6 +72,9 @@ void *EOFs(void * argument)
   int missval_warning=0;
   int timer_init = 0, timer_alloc = 0, timer_read = 0, timer_cov = 0, timer_eig = 0, timer_post = 0, timer_write = 0, timer_finish = 0;
 
+  int calendar = CALENDAR_STANDARD;
+  juldate_t juldate;
+
   double *weight;
   double sum_w;
   double sum;
@@ -655,16 +658,22 @@ void *EOFs(void * argument)
   streamDefVlist(streamID2, vlistID2);
   streamDefVlist(streamID3, vlistID3);
 
+  vdate = 10101;
+  vtime = 0;
+  juldate = juldate_encode(calendar, vdate, vtime);
   for ( tsID = 0; tsID < n; tsID++ )
     {
-      taxisDefVdate(taxisID2, 0);
-      taxisDefVtime(taxisID2, 0);
+      juldate = juldate_add_seconds(60, juldate);
+      juldate_decode(calendar, juldate, &vdate, &vtime);
+
+      taxisDefVdate(taxisID2, vdate);
+      taxisDefVtime(taxisID2, vtime);
       streamDefTimestep(streamID2, tsID);
 
       if ( tsID < n_eig )
         {
-          taxisDefVdate(taxisID3, 0);
-          taxisDefVtime(taxisID3, 0);
+          taxisDefVdate(taxisID3, vdate);
+          taxisDefVtime(taxisID3, vtime);
           streamDefTimestep(streamID3, tsID);
         }
 
