@@ -1,3 +1,7 @@
+2011-08-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* ifthenelse: Filling up stream1 by copying the first timestep (bug fix) [report: Ronny Petrik]
+
 2011-08-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.2
