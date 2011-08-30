@@ -104,7 +104,7 @@ void *Cond(void *argument)
 
   if ( filltype == FILL_NONE )
     {
-      if ( ntsteps1 == 1 || ntsteps2 != 1 )
+      if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
 	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
