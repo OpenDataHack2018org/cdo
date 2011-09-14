@@ -278,13 +278,13 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
     }
 
   if ( nout )
-    cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
+    cdoWarning("%d of %d grid cells have wrong orientation!", nout, gridsize);
 
   if ( cdoVerbose ) 
     fprintf(stdout, "area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
 
   if ( fabs(100.*(sumarea - 4.*M_PI)/4.*M_PI) > 0.1)
-    cdoWarning("area-error: %9.5f%%\n", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
+    cdoWarning("area-error: %9.5f%%", 100.*(sumarea - 4.*M_PI)/4.*M_PI );
   
   /* check that all cells are convex */
   
@@ -384,7 +384,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
     }
 
   if ( nout )
-    cdoWarning("%d of %d cells are not Convex\n", nout, gridsize);
+    cdoWarning("%d of %d cells are not Convex!", nout, gridsize);
   
   if ( check_corners )
     {
@@ -434,7 +434,7 @@ void verify_grid(int gridtype, int gridsize, int ncorner,
 	}
 
       if ( nout )
-	cdoWarning("%d of %d corners are lonely on the grid", nout, gridsize*ncorner);
+	cdoWarning("%d of %d corners are lonely on the grid!", nout, gridsize*ncorner);
     }
 
   free(alone_cell);
@@ -486,7 +486,7 @@ void verify_grid_old(int gridtype, int gridsize, int ncorner,
     }
 
   if ( nout > 0 )
-    cdoWarning("%d of %d points out of bounds!\n", nout, gridsize);
+    cdoWarning("%d of %d points out of bounds!", nout, gridsize);
 
 
   /* check that all cell bounds have the same orientation */
@@ -525,7 +525,7 @@ void verify_grid_old(int gridtype, int gridsize, int ncorner,
     }
 
   if ( nout > 0 )
-    cdoWarning("%d of %d grid cells have wrong orientation!\n", nout, gridsize);
+    cdoWarning("%d of %d grid cells have wrong orientation!", nout, gridsize);
 }
 
 
