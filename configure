@@ -811,7 +811,7 @@ CXX
 CXXFLAGS
 CCC
 CXXCPP'
-ac_subdirs_all='cdi'
+ac_subdirs_all='libcdi'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -18256,7 +18256,7 @@ fi
 
 #  ----------------------------------------------------------------------
 #  How to build CDI into CDO?
-INTERNAL_CDI_DIR=cdi
+INTERNAL_CDI_DIR=libcdi
 # At the moment, there are two possible CDI bindings
 # (default)          linking directly to CDI's object files, i.e. a libtool
 #                    convenience library
@@ -18298,7 +18298,7 @@ else
 
 fi
 # scan for CDI as a subproject
-subdirs="$subdirs cdi"
+subdirs="$subdirs libcdi"
 
 #  ----------------------------------------------------------------------
 #  Build a static CDO

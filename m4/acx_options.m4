@@ -286,7 +286,7 @@ AC_ARG_WITH([proj],
              AC_MSG_RESULT([suppressed])])
 #  ----------------------------------------------------------------------
 #  How to build CDI into CDO? 
-INTERNAL_CDI_DIR=cdi
+INTERNAL_CDI_DIR=libcdi
 # At the moment, there are two possible CDI bindings
 # (default)          linking directly to CDI's object files, i.e. a libtool
 #                    convenience library
@@ -308,7 +308,7 @@ AM_CONDITIONAL([ENABLE_CDI_LIB],[test x$enable_cdi_lib = 'xyes'])
 # create shell variables for the representation of configure results
 AS_IF([test x$enable_cdi_lib = 'xno'],[AC_SUBST([ENABLE_CDI_LIB],[false])],[AC_SUBST([ENABLE_CDI_LIB],[true])])
 # scan for CDI as a subproject
-AC_CONFIG_SUBDIRS([cdi])
+AC_CONFIG_SUBDIRS([libcdi])
 #  ----------------------------------------------------------------------
 #  Build a static CDO
 AC_MSG_CHECKING([for building an additional static CDO binary])
