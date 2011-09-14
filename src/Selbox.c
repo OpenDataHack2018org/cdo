@@ -29,6 +29,28 @@
 
 
 static
+void correct_xvals(long nlon, long inc, double *xvals)
+{
+  long i; 
+
+  if ( IS_EQUAL(xvals[0], xvals[(nlon-1)*inc]) ) xvals[(nlon-1)*inc] += 360;
+
+  if ( xvals[0] > xvals[(nlon-1)*inc] )
+    for ( i = 0; i < nlon; i++ )
+      if ( xvals[i*inc] >= 180 ) xvals[i*inc] -= 360;
+
+  for ( i = 0; i < nlon; i++ )
+    {
+      if ( xvals[i*inc] < -180 ) xvals[i*inc] += 360;
+      if ( xvals[i*inc] >  360 ) xvals[i*inc] -= 360;
+    }
+
+  if ( xvals[0] > xvals[(nlon-1)*inc] )
+    for ( i = 1; i < nlon; i++ )
+      if ( xvals[i*inc] < xvals[(i-1)*inc] ) xvals[i*inc] += 360;
+}
+
+static
 int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, int lon22)
 {
   int gridtype, gridID2;
@@ -129,24 +151,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	  for ( i = lon11; i <= lon12; i++ ) *pxvals2++ = xvals1[i];
 	  for ( i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
 
-	  if ( memcmp(xunits, "degree", 6) == 0 )
-	    {
-	      if ( IS_EQUAL(xvals2[0], xvals2[nlon2-1]) ) xvals2[nlon2-1] += 360;
-
-	      if ( xvals2[0] > xvals2[nlon2-1] )
-		for ( i = 0; i < nlon2; i++ )
-		  if ( xvals2[i] >= 180 ) xvals2[i] -= 360;
-
-	      for ( i = 0; i < nlon2; i++ )
-		{
-		  if ( xvals2[i] < -180 ) xvals2[i] += 360;
-		  if ( xvals2[i] >  360 ) xvals2[i] -= 360;
-		}
-
-	      if ( xvals2[0] > xvals2[nlon2-1] )
-		for ( i = 1; i < nlon2; i++ )
-		  if ( xvals2[i] < xvals2[i-1] ) xvals2[i] += 360;
-	    }
+	  if ( memcmp(xunits, "degree", 6) == 0 ) correct_xvals(nlon2, 1, xvals2);
 	}
       /*
       for ( i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);
@@ -207,6 +212,12 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 	  for ( i = 2*lon21; i < 2*(lon22+1); i++ ) *pxbounds2++ = xbounds1[i];
 	  for ( i = 2*lon11; i < 2*(lon12+1); i++ ) *pxbounds2++ = xbounds1[i];
 	  for ( i = 2*lat1;  i < 2*(lat2+1);  i++ ) *pybounds2++ = ybounds1[i];
+
+	  if ( memcmp(xunits, "degree", 6) == 0 )
+	    {
+	      correct_xvals(nlon2, 2, xbounds2);
+	      correct_xvals(nlon2, 2, xbounds2+1);
+	    }
 	}
 
       gridDefXbounds(gridID2, xbounds2);

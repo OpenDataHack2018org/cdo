@@ -4,6 +4,7 @@ CDO NEWS
 Version 1.5.3 (?? ??? 2011):
 
    Fixed bugs:
+     * sellonlatbox: correct lon bounds if necessary
      * ifthenelse: Filling up stream1 by copying the first timestep
 
 Version 1.5.2 (22 August 2011):

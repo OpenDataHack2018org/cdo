@@ -38,6 +38,7 @@ typedef struct {
   int     type;
   int     ntr;
   int    *rowlon;
+  int     genBounds;
   int     nvertex;
   int     size;
   int     xsize;

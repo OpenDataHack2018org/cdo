@@ -81,6 +81,7 @@ void gridInit(grid_t *grid)
   grid->isRotated     = FALSE;
   grid->ntr           = 0;
   grid->nvertex       = 0;
+  grid->genBounds     = FALSE;
 
   grid->originLon     = 0;
   grid->originLat     = 0;
@@ -201,8 +202,8 @@ int gridDefine(grid_t grid)
 	  {
 	    grid.xvals = (double *) malloc(grid.xsize*sizeof(double));
 	    gridGenXvals(grid.xsize, grid.xfirst, grid.xlast, grid.xinc, grid.xvals);
-	    /*
-	    if ( grid.type == GRID_GAUSSIAN && grid.xbounds == NULL && grid.xsize > 1 )
+
+	    if ( grid.genBounds && grid.xbounds == NULL && grid.xsize > 1 )
 	      {
 		grid.nvertex = 2;
 		grid.xbounds = (double *) malloc(grid.xsize*grid.nvertex*sizeof(double));
@@ -214,7 +215,6 @@ int gridDefine(grid_t grid)
 		grid.xbounds[0] = 2*grid.xvals[0] - grid.xbounds[1];
 		grid.xbounds[2*grid.xsize-1] = 2*grid.xvals[grid.xsize-1] - grid.xbounds[2*(grid.xsize-1)];
 	      }
-	    */
 	  }
 
 	if ( (grid.def_yfirst || grid.def_ylast || grid.def_yinc) && grid.yvals == NULL )
@@ -222,8 +222,8 @@ int gridDefine(grid_t grid)
 	    if ( ! grid.def_ylast ) grid.ylast = grid.yfirst;
 	    grid.yvals = (double *) malloc(grid.ysize*sizeof(double));
 	    gridGenYvals(grid.type, grid.ysize, grid.yfirst, grid.ylast, grid.yinc, grid.yvals);
-	    /*
-	    if ( grid.type == GRID_GAUSSIAN && grid.ybounds == NULL && grid.ysize > 1 )
+
+	    if ( grid.genBounds && grid.ybounds == NULL && grid.ysize > 1 )
 	      {
 		grid.nvertex = 2;
 		grid.ybounds = (double *) malloc(grid.ysize*grid.nvertex*sizeof(double));
@@ -244,7 +244,6 @@ int gridDefine(grid_t grid)
 		    grid.ybounds[grid.ysize*grid.nvertex-1] = 90;
 		  }
 	      }
-	    */
 	  }
 
 	if ( grid.xvals )
@@ -1624,11 +1623,12 @@ int gridFromName(const char *gridname)
 
 	  grid.type = GRID_GAUSSIAN;
 	  grid.ysize = n*2;
+	  grid.xsize = compNlon(grid.ysize);
 
-	  if ( cmpstr(pline, "zon",  len) == 0 )
+	  if ( cmpstr(pline, "zon",  len) == 0 ) 
 	    grid.xsize = 1;
-	  else
-	    grid.xsize = compNlon(grid.ysize);
+	  else if ( *pline == 'b' )
+	    grid.genBounds = TRUE;
 
 	  grid.def_xfirst = TRUE;
 	  grid.def_yfirst = TRUE;	      
