@@ -42,6 +42,145 @@
 
 #define  NOPERATORS  32
 
+static
+int seaslist(LIST *ilist)
+{
+  int i;
+  int nsel;
+  char Seas[3];
+  int seas[4] = {FALSE, FALSE, FALSE, FALSE};
+  int imon[17]; /* 1-16 ! */
+  int ival;
+  size_t len;
+  int season_start;
+
+  season_start = get_season_start();
+  nsel = operatorArgc();
+  if ( isdigit(*operatorArgv()[0]))
+    for ( i = 0; i < nsel; i++ )
+      {
+	ival = atoi(operatorArgv()[i]);
+	if      ( ival == 1 || ival == 13 ) seas[0] = TRUE;
+	else if ( ival == 2 || ival == 14 ) seas[1] = TRUE;
+	else if ( ival == 3 || ival == 15 ) seas[2] = TRUE;
+	else if ( ival == 4 || ival == 16 ) seas[3] = TRUE;
+	else cdoAbort("Season %d not available!", ival);
+      }
+  else
+    for ( i = 0; i < nsel; i++ )
+      {
+	len = strlen(operatorArgv()[i]);
+	if ( len > 3 ) len = 3;
+	while ( len-- > 0 ) Seas[len] = toupper(operatorArgv()[i][len]);
+	if ( season_start == START_DEC )
+	  {
+	    if      ( memcmp(Seas, "DJF", 3) == 0 ) seas[0] = TRUE;
+	    else if ( memcmp(Seas, "MAM", 3) == 0 ) seas[1] = TRUE;
+	    else if ( memcmp(Seas, "JJA", 3) == 0 ) seas[2] = TRUE;
+	    else if ( memcmp(Seas, "SON", 3) == 0 ) seas[3] = TRUE;
+	    else cdoAbort("Season %s not available!", operatorArgv()[i]);
+	  }
+	else
+	  {
+	    if      ( memcmp(Seas, "JFM", 3) == 0 ) seas[0] = TRUE;
+	    else if ( memcmp(Seas, "AMJ", 3) == 0 ) seas[1] = TRUE;
+	    else if ( memcmp(Seas, "JAS", 3) == 0 ) seas[2] = TRUE;
+	    else if ( memcmp(Seas, "OND", 3) == 0 ) seas[3] = TRUE;
+	    else cdoAbort("Season %s not available!", operatorArgv()[i]);
+	  }
+      }
+  
+  for ( i = 0; i < 17; ++i ) imon[i] = 0;
+  
+  if ( season_start == START_DEC )
+    {
+      if ( seas[0] ) { imon[12]++; imon[ 1]++; imon[ 2]++; imon[13]++; }
+      if ( seas[1] ) { imon[ 3]++; imon[ 4]++; imon[ 5]++; imon[14]++; }
+      if ( seas[2] ) { imon[ 6]++; imon[ 7]++; imon[ 8]++; imon[15]++; }
+      if ( seas[3] ) { imon[ 9]++; imon[10]++; imon[11]++; imon[16]++; }
+    }
+  else
+    {
+      if ( seas[0] ) { imon[ 1]++; imon[ 2]++; imon[ 3]++; imon[13]++; }
+      if ( seas[1] ) { imon[ 4]++; imon[ 5]++; imon[ 6]++; imon[14]++; }
+      if ( seas[2] ) { imon[ 7]++; imon[ 8]++; imon[ 9]++; imon[15]++; }
+      if ( seas[3] ) { imon[10]++; imon[11]++; imon[12]++; imon[16]++; }
+    }
+  
+  nsel = 0;
+  for ( i = 1; i < 17; ++i )
+    {
+      if ( imon[i] )
+	listSetInt(ilist, nsel++, i);
+    }
+
+  return (nsel);
+}
+
+static
+int datelist(LIST *flist)
+{
+  int nsel;
+  int i;
+  int status;
+  int set2 = TRUE;
+  int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
+  double fval = 0;
+
+  nsel = operatorArgc();
+  if ( nsel < 1 ) cdoAbort("Too few arguments!");
+  for ( i = 0; i < nsel; i++)
+    {
+      if      ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
+	{
+	  if ( i == 0 )
+	    fval = -99999999999.;
+	  else
+	    fval =  99999999999.;
+
+	  listSetFlt(flist, i,  fval);
+	}
+      else if ( strchr(operatorArgv()[i], '-') == NULL )
+	{
+	  fval = atof(operatorArgv()[i]);
+	  listSetFlt(flist, i, fval);
+	}
+      else
+	{
+	  year = 1; month = 1; day = 1; hour = 0; minute = 0, second = 0;
+	  if ( strchr(operatorArgv()[i], 'T') )
+	    {
+	      status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
+			      &year, &month, &day, &hour, &minute, &second);
+	      fval = cdiEncodeTime(hour, minute, second);
+	      if ( fabs(fval) > 0 ) fval /= 1000000;
+	      fval += cdiEncodeDate(year, month, day);
+	      listSetFlt(flist, i, fval);
+	      set2 = FALSE;
+	    }
+	  else
+	    {
+	      status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
+	      fval = cdiEncodeDate(year, month, day);
+	      
+	      if ( nsel > 1 && i > 0 ) fval += 0.999;
+
+	      listSetFlt(flist, i, fval);
+	    }
+	}
+    }
+
+  if ( nsel == 1 && set2 == TRUE )
+    {
+      fval += 0.999;
+      listSetFlt(flist, nsel, fval);
+      nsel = 2;
+    }
+
+  return (nsel);
+}
+
+
 void *Seltime(void *argument)
 {
   int SELTIMESTEP, SELDATE, SELTIME, SELHOUR, SELDAY, SELMON, SELYEAR, SELSEAS, SELSMON;
@@ -60,7 +199,6 @@ void *Seltime(void *argument)
   int i, isel;
   int lcopy = FALSE;
   int gridsize;
-  int status;
   int nmiss;
   int lnts1;
   int ncts = 0, nts, it;
@@ -115,126 +253,11 @@ void *Seltime(void *argument)
 
   if ( operatorID == SELSEAS )
     {
-      char Seas[3];
-      int seas[4] = {FALSE, FALSE, FALSE, FALSE};
-      int imon[17]; /* 1-16 ! */
-      int ival;
-      size_t len;
-      int season_start;
-
-      season_start = get_season_start();
-      nsel = operatorArgc();
-      if ( isdigit(*operatorArgv()[0]))
-	for ( i = 0; i < nsel; i++ )
-	  {
-	    ival = atoi(operatorArgv()[i]);
-	    if      ( ival == 1 || ival == 13 ) seas[0] = TRUE;
-	    else if ( ival == 2 || ival == 14 ) seas[1] = TRUE;
-	    else if ( ival == 3 || ival == 15 ) seas[2] = TRUE;
-	    else if ( ival == 4 || ival == 16 ) seas[3] = TRUE;
-	    else cdoAbort("Season %d not available!", ival);
-	  }
-      else
-	for ( i = 0; i < nsel; i++ )
-	  {
-	    len = strlen(operatorArgv()[i]);
-	    if ( len > 3 ) len = 3;
-	    while ( len-- > 0 ) Seas[len] = toupper(operatorArgv()[i][len]);
-	    if ( season_start == START_DEC )
-	      {
-		if      ( memcmp(Seas, "DJF", 3) == 0 ) seas[0] = TRUE;
-		else if ( memcmp(Seas, "MAM", 3) == 0 ) seas[1] = TRUE;
-		else if ( memcmp(Seas, "JJA", 3) == 0 ) seas[2] = TRUE;
-		else if ( memcmp(Seas, "SON", 3) == 0 ) seas[3] = TRUE;
-		else cdoAbort("Season %s not available!", operatorArgv()[i]);
-	      }
-	    else
-	      {
-		if      ( memcmp(Seas, "JFM", 3) == 0 ) seas[0] = TRUE;
-		else if ( memcmp(Seas, "AMJ", 3) == 0 ) seas[1] = TRUE;
-		else if ( memcmp(Seas, "JAS", 3) == 0 ) seas[2] = TRUE;
-		else if ( memcmp(Seas, "OND", 3) == 0 ) seas[3] = TRUE;
-		else cdoAbort("Season %s not available!", operatorArgv()[i]);
-	      }
-	  }
-
-      for ( i = 0; i < 17; ++i ) imon[i] = 0;
-
-      if ( season_start == START_DEC )
-	{
-	  if ( seas[0] ) { imon[12]++; imon[ 1]++; imon[ 2]++; imon[13]++; }
-	  if ( seas[1] ) { imon[ 3]++; imon[ 4]++; imon[ 5]++; imon[14]++; }
-	  if ( seas[2] ) { imon[ 6]++; imon[ 7]++; imon[ 8]++; imon[15]++; }
-	  if ( seas[3] ) { imon[ 9]++; imon[10]++; imon[11]++; imon[16]++; }
-	}
-      else
-	{
-	  if ( seas[0] ) { imon[ 1]++; imon[ 2]++; imon[ 3]++; imon[13]++; }
-	  if ( seas[1] ) { imon[ 4]++; imon[ 5]++; imon[ 6]++; imon[14]++; }
-	  if ( seas[2] ) { imon[ 7]++; imon[ 8]++; imon[ 9]++; imon[15]++; }
-	  if ( seas[3] ) { imon[10]++; imon[11]++; imon[12]++; imon[16]++; }
-	}
-
-      nsel = 0;
-      for ( i = 1; i < 17; ++i )
-	{
-	  if ( imon[i] )
-	    listSetInt(ilist, nsel++, i);
-	}
+      nsel = seaslist(ilist);
     }
   else if ( operatorID == SELDATE )
     {
-      int set2 = TRUE;
-
-      nsel = operatorArgc();
-      if ( nsel < 1 ) cdoAbort("Too few arguments!");
-      for ( i = 0; i < nsel; i++)
-	{
-	  if      ( operatorArgv()[i][0] == '-' && operatorArgv()[i][1] == 0 )
-	    {
-	      if ( i == 0 )
-		fval = -99999999999.;
-	      else
-		fval =  99999999999.;
-
-	      listSetFlt(flist, i,  fval);
-	    }
-	  else if ( strchr(operatorArgv()[i], '-') == NULL )
-	    {
-	      fval = atof(operatorArgv()[i]);
-	      listSetFlt(flist, i, fval);
-	    }
-	  else
-	    {
-	      year = 1; month = 1; day = 1; hour = 0; minute = 0, second = 0;
-	      if ( strchr(operatorArgv()[i], 'T') )
-		{
-		  status = sscanf(operatorArgv()[i], "%d-%d-%dT%d:%d:%d",
-				  &year, &month, &day, &hour, &minute, &second);
-		  fval = cdiEncodeTime(hour, minute, second);
-		  if ( fabs(fval) > 0 ) fval /= 1000000;
-		  fval += cdiEncodeDate(year, month, day);
-		  listSetFlt(flist, i, fval);
-		  set2 = FALSE;
-		}
-	      else
-		{
-		  status = sscanf(operatorArgv()[i], "%d-%d-%d", &year, &month, &day);
-		  fval = cdiEncodeDate(year, month, day);
-
-		  if ( nsel > 1 && i > 0 ) fval += 0.999;
-
-		  listSetFlt(flist, i, fval);
-		}
-	    }
-	}
-
-      if ( nsel == 1 && set2 == TRUE )
-	{
-	  fval += 0.999;
-	  listSetFlt(flist, nsel, fval);
-	  nsel = 2;
-	}
+      nsel = datelist(flist);
     }
   else if ( operatorID == SELTIME )
     {
@@ -254,7 +277,9 @@ void *Seltime(void *argument)
 	}
     }
   else
-    nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
+    {
+      nsel = args2intlist(operatorArgc(), operatorArgv(), ilist);
+    }
 
   if ( nsel < 1 ) cdoAbort("No timestep selected!");
 
@@ -416,9 +441,7 @@ void *Seltime(void *argument)
 	  if ( process_nts2 == TRUE )
 	    {
 	      if ( its2++ < nts2 )
-		{
-		  copy_nts2 = TRUE;
-		}
+		copy_nts2 = TRUE;
 	      else
 		process_nts2 = FALSE;
 	    }
