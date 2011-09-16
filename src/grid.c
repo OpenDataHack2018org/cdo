@@ -1198,7 +1198,7 @@ double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3)
 
 static
 double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_lat,
-		 double *grid_corner_lon, double *grid_corner_lat)
+		 double *grid_corner_lon, double *grid_corner_lat, int *status)
 {
   long k;
   double xa;
@@ -1223,11 +1223,17 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
       c2 = gc2cc(&p2);
 
       xa = areas(&c1, &c2, &c3);
+      /*
       if ( xa > 0.001 )
 	if ( (fabs(p1.lon - p2.lon) > lim) ||
 	     (fabs(p2.lon - p3.lon) > lim) ||
-	     (fabs(p3.lon - p1.lon) > lim) ) return(2);
-      
+	     (fabs(p3.lon - p1.lon) > lim) )
+	  {
+	    printf("%ld %ld xa %g\n", i, k, xa);
+	    printf("  dlon %g %g %g %g\n", lim, fabs(p1.lon - p2.lon), fabs(p2.lon - p3.lon), fabs(p3.lon - p1.lon));
+	    *status = 2;
+	  }
+      */
       area += xa;
     }
 
@@ -1239,11 +1245,17 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
   c2 = gc2cc(&p2);
 
   xa = areas(&c1, &c2, &c3);
+  /*
   if ( xa > 0.001 )
     if ( (fabs(p1.lon - p2.lon) > lim) ||
 	 (fabs(p2.lon - p3.lon) > lim) ||
-	 (fabs(p3.lon - p1.lon) > lim) ) return(2);
-  
+	 (fabs(p3.lon - p1.lon) > lim) )
+      {
+	printf("%ld %ld xa %g\n", i, k, xa);
+	printf("  dlon %g %g %g %g\n", lim, fabs(p1.lon - p2.lon), fabs(p2.lon - p3.lon), fabs(p3.lon - p1.lon));
+	*status = 2;
+      }
+  */
   area += xa;
 
   return (area);
@@ -1381,12 +1393,12 @@ int gridGenArea(int gridID, double *area)
   total_area = 0;
 #if defined (_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat) \
+  shared(gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, status) \
   private(i)
 #endif
   for ( i = 0; i < gridsize; ++i )
     {
-      area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat);
+      area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, &status);
       //     total_area += area[i];
     }
 

@@ -132,21 +132,9 @@ void *Gridcell(void *argument)
   taxisID = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
-
 
   gridsize = gridInqSize(gridID);
   array = (double *) malloc(gridsize*sizeof(double));
-
-
-  tsID = 0;
-  streamDefTimestep(streamID2, tsID);
-
-  varID   = 0;
-  levelID = 0;
-  streamDefRecord(streamID2, varID, levelID);
 
 
   if ( operatorID == GRIDAREA )
@@ -315,6 +303,18 @@ void *Gridcell(void *argument)
 	    cdoAbort("Unsupported grid type: %s", gridNamePtr(gridtype));
 	}
     }
+
+
+  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+
+  streamDefVlist(streamID2, vlistID2);
+
+  tsID = 0;
+  streamDefTimestep(streamID2, tsID);
+
+  varID   = 0;
+  levelID = 0;
+  streamDefRecord(streamID2, varID, levelID);
 
   streamWriteRecord(streamID2, array, 0);
 
