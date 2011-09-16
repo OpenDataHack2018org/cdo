@@ -9,6 +9,8 @@
 
 @BeginDescription
 This module converts relative divergence and vorticity to U and V wind and vice versa.
+Divergence and vorticity are spherical harmonic coefficients in spectral space and
+U and V are on a regular Gaussian grid.
 @EndDescription
 @EndModule
 
@@ -64,8 +66,8 @@ from the triangular truncation by:
 
 @BeginDescription
 Calculate spherical harmonic coefficients of relative divergence and vorticity
-from U and V wind. The U and V wind need to have the names u and v or
-the code numbers 131 and 132.
+from U and V wind. The U and V wind need to be on a Gaussian grid and need to have the 
+names u and v or the code numbers 131 and 132.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
 @IfMan
@@ -87,8 +89,8 @@ is calculated from the number of latitudes by:
 
 @BeginDescription
 Calculate spherical harmonic coefficients of relative divergence and vorticity
-from U and V wind. The U and V wind need to have the names u and v or
-the code numbers 131 and 132.
+from U and V wind. The U and V wind need to be on a Gaussian grid and need to have the 
+names u and v or the code numbers 131 and 132.
 The triangular truncation of the resulting spherical harmonics
 is calculated from the number of latitudes by:
 @IfMan
@@ -117,9 +119,8 @@ vorticity need to have the names sd and svo or code numbers 155 and 138.
 
 
 @BeginExample
-Assume a dataset has at least spherical harmonic coefficients
-of divergence and vorticity.
-To transform the spectral divergence and vorticity to U and V wind use:
+Assume a dataset has at least spherical harmonic coefficients of divergence and vorticity.
+To transform the spectral divergence and vorticity to U and V wind on a Gaussian grid use:
 @BeginVerbatim
    cdo dv2uv ifile ofile
 @EndVerbatim
