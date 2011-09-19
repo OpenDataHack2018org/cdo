@@ -163,14 +163,14 @@ static const char TX90P_LONGNAME[]   = "This is the percent of time per time per
 static const char TX90P_UNITS[]      = "Percent";
 
 static const char CDD_NAME[]         = "consecutive_dry_days_index_per_time_period";
-static const char CDD_LONGNAME[]     = "Consecutive dry days is the greatest number of consecutive days per time period with daily precipitation amount  below 1 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char CDD_LONGNAME[]     = "Consecutive dry days is the greatest number of consecutive days per time period with daily precipitation amount  below %g mm. The time period should be defined by the bounds of the time coordinate.";
 static const char CDD_UNITS[]        = "No.";
 static const char CDD_NAME2[]        = "number_of_cdd_periods_with_more_than_5days_per_time_period";
 static const char CDD_LONGNAME2[]    = "Number of cdd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
 static const char CDD_UNITS2[]       = "No.";
 
 static const char CWD_NAME[]         = "consecutive_wet_days_index_per_time_period";
-static const char CWD_LONGNAME[]     = "Consecutive wet days is the greatest number of consecutive days per time period with daily precipitation above 1 mm. The time period should be defined by the bounds of the time coordinate.";
+static const char CWD_LONGNAME[]     = "Consecutive wet days is the greatest number of consecutive days per time period with daily precipitation above %g mm. The time period should be defined by the bounds of the time coordinate.";
 static const char CWD_UNITS[]        = "No.";
 static const char CWD_NAME2[]        = "number_of_cwd_periods_with_more_than_5days_per_time_period";
 static const char CWD_LONGNAME2[]    = "Number of cwd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
@@ -881,15 +881,22 @@ void *EcaTx90p(void *argument)
 void *EcaCdd(void *argument)
 {
   ECA_REQUEST_1 request;
+  char lnamebuffer[1024];
+  double threshold = 1;
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cdd", 0, 31, NULL);
 
+  if ( operatorArgc() == 1 ) threshold = atof(operatorArgv()[0]);
+  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+
+  sprintf(lnamebuffer, CDD_LONGNAME, threshold);
+
   request.var1.name     = CDD_NAME;
-  request.var1.longname = CDD_LONGNAME;
+  request.var1.longname = lnamebuffer;
   request.var1.units    = CDD_UNITS;
   request.var1.f1       = farselltc;
-  request.var1.f1arg    = 1.0;
+  request.var1.f1arg    = threshold;
   request.var1.f2       = farnum2;
   request.var1.f3       = farmax;
   request.var1.mulc     = 0.0;
@@ -913,15 +920,22 @@ void *EcaCdd(void *argument)
 void *EcaCwd(void *argument)
 {
   ECA_REQUEST_1 request;
+  char lnamebuffer[1024];
+  double threshold = 1;
   
   cdoInitialize(argument);
   cdoOperatorAdd("eca_cwd", 0, 31, NULL);
 
+  if ( operatorArgc() == 1 ) threshold = atof(operatorArgv()[0]);
+  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+
+  sprintf(lnamebuffer, CWD_LONGNAME, threshold);
+
   request.var1.name     = CWD_NAME;
-  request.var1.longname = CWD_LONGNAME;
+  request.var1.longname = lnamebuffer;
   request.var1.units    = CWD_UNITS;
   request.var1.f1       = farselgec;
-  request.var1.f1arg    = 1.0;
+  request.var1.f1arg    = threshold;
   request.var1.f2       = farnum2;
   request.var1.f3       = farmax;
   request.var1.mulc     = 0.0;

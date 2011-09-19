@@ -1,3 +1,7 @@
+2011-09-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* eca_cdd, eca_cwd: variable parameter [request: Martin Stendel]
+
 2011-09-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridarea: bug fix for coarse grid cells with lons between 350 and 0 degrees [report: Aiko Voigt]
