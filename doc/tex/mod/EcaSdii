@@ -7,9 +7,9 @@
 @Operators = eca_sdii
 
 @BeginDescription
-Let @file{ifile} be a time series of daily precipitation amounts RR,
-then the mean precipitation amount at wet days (RR > 1 mm) is written
-to @file{ofile}. 
+Let @file{ifile} be a time series of daily precipitation amounts @math{RR}, then the mean 
+precipitation amount at wet days (@math{RR} > @math{R}) is written to @file{ofile}. 
+@math{R} is an optional parameter with default @math{R = 1 mm}.
 The date information of a time step in @file{ofile} is the date of
 the last contributing time step in @file{ifile}.
 @EndDescription
@@ -18,12 +18,18 @@ the last contributing time step in @file{ifile}.
 
 @BeginOperator_eca_sdii
 @Title     = Simple daily intensity index per time period
+@Parameter = [R]
 @EndOperator
 
 
+@BeginParameter
+@Item = R
+DOUBLE   Precipitation threshold (mm, default: R = 1 mm)
+@EndParameter
+
+
 @BeginExample
-To get the daily intensity index of a time series of daily precipitation
-amounts use:
+To get the daily intensity index of a time series of daily precipitation amounts use:
 @BeginVerbatim
    cdo eca_sdii rrfile ofile
 @EndVerbatim

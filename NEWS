@@ -4,7 +4,7 @@ CDO NEWS
 Version 1.5.3 (?? ??? 2011):
 
    New features:
-     * Variable input parameter for ECA operators eca_cdd, eca_cwd
+     * Variable input parameter for ECA operators: eca_cdd, eca_cwd, eca_rr1, eca_sdii
    Fixed bugs:
      * sellonlatbox: correct lon bounds if necessary
      * ifthenelse: Filling up stream1 by copying the first timestep
