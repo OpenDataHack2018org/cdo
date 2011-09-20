@@ -53,6 +53,10 @@ void interp_lev(int gridsize, double missval, double *vardata1, double *vardata2
 
       var1L1 = vardata1+gridsize*idx1;
       var1L2 = vardata1+gridsize*idx2;
+
+#if defined (_OPENMP)
+#pragma omp parallel for shared(gridsize, var2, var1L1, var1L2, wgt1, wgt2, missval) private(i, w1, w2)
+#endif
       for ( i = 0; i < gridsize; ++i )
 	{
 	  w1 = wgt1;
@@ -85,7 +89,6 @@ void interp_lev(int gridsize, double missval, double *vardata1, double *vardata2
 	}
     }
 }
-
 
 static
 void gen_weights(int expol, int nlev1, double *lev1, int nlev2, double *lev2,
