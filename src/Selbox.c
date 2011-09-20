@@ -60,6 +60,7 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
   int i;
   int prec;
   int ilat, ilon;
+  int lxvals, lyvals;
   char xname[CDI_MAX_NAME], xlongname[CDI_MAX_NAME], xunits[CDI_MAX_NAME];
   char yname[CDI_MAX_NAME], ylongname[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   double *xvals1 = NULL, *yvals1 = NULL;
@@ -106,65 +107,72 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
       gridDefYpole(gridID2, gridInqYpole(gridID1));
     }
 
-  if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
+  lxvals = gridInqXvals(gridID1, NULL);
+  lyvals = gridInqYvals(gridID1, NULL);
+
+  if ( gridtype == GRID_CURVILINEAR )
     {
-      if ( gridtype == GRID_CURVILINEAR )
+      if ( lxvals && lyvals )
 	{
 	  xvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
 	  yvals1 = (double *) malloc(nlon1*nlat1*sizeof(double));
 	  xvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
 	  yvals2 = (double *) malloc(nlon2*nlat2*sizeof(double));
 	}
-      else
-	{
-	  xvals1 = (double *) malloc(nlon1*sizeof(double));
-	  yvals1 = (double *) malloc(nlat1*sizeof(double));
-	  xvals2 = (double *) malloc(nlon2*sizeof(double));
-	  yvals2 = (double *) malloc(nlat2*sizeof(double));
-	}
+    }
+  else
+    {
+      if ( lxvals ) xvals1 = (double *) malloc(nlon1*sizeof(double));
+      if ( lyvals ) yvals1 = (double *) malloc(nlat1*sizeof(double));
+      if ( lxvals ) xvals2 = (double *) malloc(nlon2*sizeof(double));
+      if ( lyvals ) yvals2 = (double *) malloc(nlat2*sizeof(double));
+    }
 
-      pxvals2 = xvals2;
-      pyvals2 = yvals2;
+  pxvals2 = xvals2;
+  pyvals2 = yvals2;
 
-      gridInqXvals(gridID1, xvals1);
-      gridInqYvals(gridID1, yvals1);
+  if ( xvals1 ) gridInqXvals(gridID1, xvals1);
+  if ( yvals1 ) gridInqYvals(gridID1, yvals1);
 
-      if ( gridtype == GRID_CURVILINEAR )
-	{
-	  for ( ilat = lat1; ilat <= lat2; ilat++ )
-	    {
-	      for ( ilon = lon21; ilon <= lon22; ilon++ )
-		{
-		  *pxvals2++ = xvals1[ilat*nlon1 + ilon];
-		  *pyvals2++ = yvals1[ilat*nlon1 + ilon];
-		}
-	      for ( ilon = lon11; ilon <= lon12; ilon++ )
-		{
-		  *pxvals2++ = xvals1[ilat*nlon1 + ilon];
-		  *pyvals2++ = yvals1[ilat*nlon1 + ilon];
-		}
-	    }
-	}
-      else
+  if ( gridtype == GRID_CURVILINEAR )
+    {
+      if ( lxvals && lyvals )
+	for ( ilat = lat1; ilat <= lat2; ilat++ )
+	  {
+	    for ( ilon = lon21; ilon <= lon22; ilon++ )
+	      {
+		*pxvals2++ = xvals1[ilat*nlon1 + ilon];
+		*pyvals2++ = yvals1[ilat*nlon1 + ilon];
+	      }
+	    for ( ilon = lon11; ilon <= lon12; ilon++ )
+	      {
+		*pxvals2++ = xvals1[ilat*nlon1 + ilon];
+		*pyvals2++ = yvals1[ilat*nlon1 + ilon];
+	      }
+	  }
+    }
+  else
+    {
+      if ( lxvals )
 	{
 	  for ( i = lon21; i <= lon22; i++ ) *pxvals2++ = xvals1[i];
 	  for ( i = lon11; i <= lon12; i++ ) *pxvals2++ = xvals1[i];
-	  for ( i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
-
 	  if ( memcmp(xunits, "degree", 6) == 0 ) correct_xvals(nlon2, 1, xvals2);
 	}
-      /*
-      for ( i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);
-      for ( i = 0; i < nlon2; i++ ) printf("lon : %d %g\n", i+1, xvals2[i]);
-      */
-      gridDefXvals(gridID2, xvals2);
-      gridDefYvals(gridID2, yvals2);
-
-      free(xvals1);
-      free(yvals1);
-      free(xvals2);
-      free(yvals2);
+      
+      if ( lyvals ) for ( i = lat1;  i <= lat2;  i++ ) *pyvals2++ = yvals1[i];
     }
+  /*
+    for ( i = 0; i < nlat2; i++ ) printf("lat : %d %g\n", i+1, yvals2[i]);
+    for ( i = 0; i < nlon2; i++ ) printf("lon : %d %g\n", i+1, xvals2[i]);
+  */
+  if ( xvals2 ) gridDefXvals(gridID2, xvals2);
+  if ( yvals2 ) gridDefYvals(gridID2, yvals2);
+
+  if ( xvals1 ) free(xvals1);
+  if ( yvals1 ) free(yvals1);
+  if ( xvals2 ) free(xvals2);
+  if ( yvals2 ) free(yvals2);
 
   if ( gridInqXbounds(gridID1, NULL) && gridInqYbounds(gridID1, NULL) )
     {
@@ -231,7 +239,6 @@ int gengrid(int gridID1, int lat1, int lat2, int lon11, int lon12, int lon21, in
 
   return (gridID2);
 }
-
 
 static
 int gengridcell(int gridID1, int gridsize2, int *cellidx)
@@ -570,7 +577,6 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   return (gridID2);
 }
 
-
 static
 int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 {
@@ -653,7 +659,6 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   return (gridID2);
 }
 
-
 static
 int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
@@ -730,7 +735,6 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
 
   return (gridID2);
 }
-
 
 static
 void window(int nwpv, double *array1, int gridID1, double *array2,
