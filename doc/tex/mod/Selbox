@@ -20,7 +20,8 @@ All input fields need to have the same horizontal grid.
 
 @BeginDescription
 Selects a longitude/latitude box. The user has to give the 
-longitudes and latitudes of the edges of the box.
+longitudes and latitudes of the edges of the box. 
+Considered are only those grid cells with the grid center inside the lon/lat box.
 @EndDescription
 @EndOperator
 
