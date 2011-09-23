@@ -266,7 +266,7 @@ void *Wct(void *argument);
 #define  Cond2Operators         {"ifthenelse"}
 #define  CondcOperators         {"ifthenc", "ifnotthenc"}
 #define  ConsecstatOperators    {"consects", "consecsum"}
-#define  CopyOperators          {"copy", "selall"}
+#define  CopyOperators          {"copy", "selall", "szip"}
 #define  DeltimeOperators       {"delday", "del29feb"}
 #define  DeriveparOperators     {"geopotheight"}
 #define  DetrendOperators       {"detrend"}

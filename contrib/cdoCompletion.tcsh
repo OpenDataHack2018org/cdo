@@ -423,6 +423,7 @@ strwin \
 sub \
 subc \
 subtrend \
+szip \
 tan \
 temp \
 timavg \

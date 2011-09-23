@@ -31,7 +31,7 @@ void    vlistDefVarTime(int vlistID, int varID, int timeID);
 
 void *Copy(void *argument)
 {
-  int COPY, SELALL;
+  int COPY, SELALL, SZIP;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
@@ -50,10 +50,17 @@ void *Copy(void *argument)
 
   COPY    = cdoOperatorAdd("copy",   0, 0, NULL);
   SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
+  SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
   operatorID = cdoOperatorID();
+
+  if ( operatorID == SZIP )
+    {
+      cdoCompType  = COMPRESS_SZIP;
+      cdoCompLevel = 0;
+    }
 
   streamCnt = cdoStreamCnt();
   nfiles = streamCnt - 1;
@@ -118,7 +125,7 @@ void *Copy(void *argument)
 	       
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    { 
-	      if ( lcopy && operatorID == SELALL )
+	      if ( lcopy && (operatorID == SELALL || operatorID == SZIP) )
 		{
 		  streamInqRecord(streamID1, &varID, &levelID);
 		  streamDefRecord(streamID2,  varID,  levelID);
