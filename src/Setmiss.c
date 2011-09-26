@@ -53,6 +53,7 @@ void *Setmiss(void *argument)
   int vlistID1, vlistID2;
   int nmiss;
   int i;
+  int calendar;
   double missval, missval2 = 0;
   double rconst = 0, rmin = 0, rmax = 0;
   double *array;
@@ -60,15 +61,13 @@ void *Setmiss(void *argument)
 
   cdoInitialize(argument);
 
-  SETMISSVAL = cdoOperatorAdd("setmissval", 0, 0, "missing value");
-  SETCTOMISS = cdoOperatorAdd("setctomiss", 0, 0, "constant");
-  SETMISSTOC = cdoOperatorAdd("setmisstoc", 0, 0, "constant");
-  SETRTOMISS = cdoOperatorAdd("setrtomiss", 0, 0, "range (min, max)");
-  SETVRANGE  = cdoOperatorAdd("setvrange",  0, 0, "range (min, max)");
+  SETMISSVAL   = cdoOperatorAdd("setmissval",    0, 0, "missing value");
+  SETCTOMISS   = cdoOperatorAdd("setctomiss",    0, 0, "constant");
+  SETMISSTOC   = cdoOperatorAdd("setmisstoc",    0, 0, "constant");
+  SETRTOMISS   = cdoOperatorAdd("setrtomiss",    0, 0, "range (min, max)");
+  SETVRANGE    = cdoOperatorAdd("setvrange",     0, 0, "range (min, max)");
 
   operatorID = cdoOperatorID();
-
-  operatorInputArg(cdoOperatorEnter(operatorID));
 
   if ( operatorID == SETMISSVAL )
     {
@@ -105,6 +104,8 @@ void *Setmiss(void *argument)
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
+
+  calendar = taxisInqCalendar(taxisID1);  
 
   if ( operatorID == SETMISSVAL )
     {
@@ -212,6 +213,7 @@ void *Setmiss(void *argument)
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, array, nmiss);
 	}
+
       tsID++;
     }
 

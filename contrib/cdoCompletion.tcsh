@@ -258,6 +258,7 @@ monsum \
 monvar \
 mul \
 mulc \
+muldoy \
 muldpm \
 muldpy \
 ncode \
