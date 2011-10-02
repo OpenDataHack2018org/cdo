@@ -693,7 +693,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	      cdoCompType  = COMPRESS_SZIP;
 	      cdoCompLevel = 0;
 	    }
-	  else if ( filetype == FILETYPE_NC4 )
+	  else if ( filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
 	    {
 	      cdoCompType  = COMPRESS_ZIP;
 	      cdoCompLevel = 1;
@@ -705,13 +705,13 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	  streamDefCompType(fileID, cdoCompType);
 	  streamDefCompLevel(fileID, cdoCompLevel);
 
-	  if ( cdoCompType == COMPRESS_SZIP && (filetype != FILETYPE_GRB && filetype != FILETYPE_NC4) )
+	  if ( cdoCompType == COMPRESS_SZIP && (filetype != FILETYPE_GRB && filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
 	    cdoWarning("SZIP compression not available for non GRIB1/netCDF4 data!");
 
 	  if ( cdoCompType == COMPRESS_JPEG && filetype != FILETYPE_GRB2 )
 	    cdoWarning("SZIP compression not available for non GRIB2 data!");
 
-	  if ( cdoCompType == COMPRESS_ZIP && filetype != FILETYPE_NC4 )
+	  if ( cdoCompType == COMPRESS_ZIP && (filetype != FILETYPE_NC4 && filetype != FILETYPE_NC4C) )
 	    cdoWarning("Deflate compression not available for non netCDF4 data!");
 	}
       /*
@@ -966,7 +966,7 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
 
       datatype = varlist[varID].datatype;
 
-      if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 )
+      if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 || filetype == FILETYPE_NC4C )
 	{
 	  if ( datatype == DATATYPE_UINT8 && (filetype == FILETYPE_NC || filetype == FILETYPE_NC2) )
 	    {

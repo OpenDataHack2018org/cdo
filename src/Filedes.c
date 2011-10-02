@@ -287,6 +287,9 @@ void *Filedes(void *argument)
 	case FILETYPE_NC4:
 	  printf("  netCDF4 data\n");
 	  break;
+	case FILETYPE_NC4C:
+	  printf("  netCDF4 classic data\n");
+	  break;
 	case FILETYPE_SRV:
 	  printf("  SERVICE data\n");
 	  switch ( streamInqByteorder(streamID) )
