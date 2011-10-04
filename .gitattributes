@@ -230,6 +230,12 @@ doc/tex/mod/Zonstat -text
 doc/tex/mod/chdoc -text
 doc/tex/mod/syntax -text
 doc/tex/partab.tex -text
+doc/tex/poster/Fuss_MPIM_MPG_X3.pdf -text svneol=unset#unset
+doc/tex/poster/beamerposter.sty -text
+doc/tex/poster/beamerthemeMPIM.sty -text
+doc/tex/poster/cdo-poster.tex -text
+doc/tex/poster/figures/cdi.pdf -text
+doc/tex/poster/figures/cdo-redmine.png -text
 doc/tex/ref_intro_arithm.tex -text
 doc/tex/ref_intro_climat.tex -text
 doc/tex/ref_intro_compar.tex -text
