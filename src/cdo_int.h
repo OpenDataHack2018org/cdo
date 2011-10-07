@@ -177,8 +177,10 @@ void    cdologo(int noper);
 void    nospec(int vlistID);
 void    gridWrite(FILE *fp, int gridID);
 
+void openLock(void);
+void openUnlock(void);
+
 int  cdf_openread(const char *filename);
-int pcdf_openread(const char *filename);
 
 void printFiletype(int streamID, int vlistID);
 

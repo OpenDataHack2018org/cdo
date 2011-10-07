@@ -1753,7 +1753,9 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  int streamID;
 	  if ( cdoDebug ) cdoPrint("Grid from CDI file");
+	  openLock();
 	  streamID = streamOpenRead(gridfile);
+	  openUnlock();
 	  if ( streamID >= 0 )
 	    {
 	      int vlistID;

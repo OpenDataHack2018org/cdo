@@ -176,13 +176,13 @@ void *Sinfo(void *argument)
 	  levelsize = zaxisInqSize(zaxisID);
 	  /* zaxisInqLongname(zaxisID, longname); */
 	  zaxisName(zaxistype, longname);
-	  longname[16] = 0;
+	  longname[17] = 0;
 	  zaxisInqUnits(zaxisID, units);
 	  units[12] = 0;
 	  if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
-	    nbyte0    = fprintf(stdout, "  %4d : %-10s  (ltype=%3d) : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, ltype);
+	    nbyte0    = fprintf(stdout, "  %4d : %-11s  (ltype=%3d) : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, ltype);
 	  else
-	    nbyte0    = fprintf(stdout, "  %4d : %-16s  %5s : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, units);
+	    nbyte0    = fprintf(stdout, "  %4d : %-17s  %5s : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, units);
 	  nbyte = nbyte0;
 	  for ( levelID = 0; levelID < levelsize; levelID++ )
 	    {

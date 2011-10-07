@@ -51,6 +51,8 @@ void *Enlarge(void *argument)
   xsize2 = gridInqXsize(gridID2);
   ysize2 = gridInqYsize(gridID2);
 
+  if ( cdoVerbose ) fprintf(stderr, "gridID2 %d, xsize2 %d, ysize2 %d\n", gridID2, xsize2, ysize2);
+
   streamID1 = streamOpenRead(cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);

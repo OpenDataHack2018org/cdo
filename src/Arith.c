@@ -78,6 +78,8 @@ void *Arith(void *argument)
   vlistIDx1 = vlistID1;
   vlistIDx2 = vlistID2;
 
+  if ( cdoVerbose ) vlistPrint(vlistID1);
+
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = vlistInqTaxis(vlistID2);
   taxisIDx1 = taxisID1;

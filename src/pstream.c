@@ -1514,19 +1514,17 @@ int pstreamInqFiletype(int pstreamID)
 }
 
 
-int pcdf_openread(const char *filename)
+void openLock(void)
 {
-  int fileID;
-
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_lock(&streamOpenReadMutex);
-#endif
+#endif  
+}
 
-  fileID = cdf_openread(filename);
 
+void openUnlock(void)
+{
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
-
-  return (fileID);
 }

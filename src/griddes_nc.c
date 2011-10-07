@@ -33,7 +33,9 @@ int cdf_openread(const char *filename)
 #if  defined  (HAVE_LIBNETCDF)
   int nc_file_id;      /* netCDF grid file id           */
 
+  openLock();
   nce(nc_open(filename, NC_NOWRITE, &nc_file_id));
+  openUnlock();
   fileID = nc_file_id;
 #else
   cdoWarning("netCDF support not compiled in!");
@@ -69,7 +71,7 @@ int gridFromNCfile(const char *gridfile)
 
   /* open grid file and read grid size/name data */
   
-  nc_file_id = pcdf_openread(gridfile);
+  nc_file_id = cdf_openread(gridfile);
 
   if ( nc_inq_dimid(nc_file_id, "grid_size", &nc_gridsize_id)    == NC_NOERR &&
        nc_inq_dimid(nc_file_id, "grid_rank", &nc_gridrank_id)    == NC_NOERR &&

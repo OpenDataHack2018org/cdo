@@ -130,7 +130,7 @@ int import_e5ml(const char *filename, VAR **vars)
 
   /* open file and check file type */
   /* nce(nc_open(filename, NC_NOWRITE, &nc_file_id)); */
-  nc_file_id = pcdf_openread(filename);
+  nc_file_id = cdf_openread(filename);
 
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "file_type", filetype));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));
@@ -717,7 +717,7 @@ int import_e5res(const char *filename, VAR **vars, ATTS *atts)
 
   /* open file and check file type */
   /* nce(nc_open(filename, NC_NOWRITE, &nc_file_id)); */
-  nc_file_id = pcdf_openread(filename);
+  nc_file_id = cdf_openread(filename);
 
   nce(nc_get_att_text(nc_file_id, NC_GLOBAL, "file_type", filetype));
   nce(nc_inq_attlen(nc_file_id, NC_GLOBAL, "file_type", &attlen));
