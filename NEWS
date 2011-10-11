@@ -8,7 +8,7 @@ Version 1.5.3 (?? ??? 2011):
    Fixed bugs:
      * deflate compression with netCDF4 doesn't work (option: -z zip)
      * sellonlatbox: correct lon bounds if necessary
-     * ifthen, ifthenelse: Filling up stream1 by copying the first timestep
+     * ifthen, ifthenelse: uses only the first time step of the first input file
 
 Version 1.5.2 (22 August 2011):
 
