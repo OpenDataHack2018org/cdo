@@ -54,6 +54,7 @@ delname \
 delparam \
 detrend \
 diff \
+diff2 \
 diffc \
 diffn \
 diffp \

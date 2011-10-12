@@ -30,12 +30,13 @@
 
 void *Diff(void *argument)
 {
-  int DIFF, DIFFP, DIFFN, DIFFC, SDIFF;
+  int DIFF, DIFF2, DIFFP, DIFFN, DIFFC, SDIFF;
   int operatorID;
   int i;
   int indg;
   int varID1, varID2, recID;
   int gridsize;
+  int ndiff;
   int code, param;
   int gridID, zaxisID, vdate, vtime;
   int nrecs, nrecs2;
@@ -57,6 +58,7 @@ void *Diff(void *argument)
   cdoInitialize(argument);
 
   DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
+  DIFF2 = cdoOperatorAdd("diff2", 0, 0, NULL);
   DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
   DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
   DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
@@ -80,14 +82,15 @@ void *Diff(void *argument)
   if ( ! cdoSilentMode )
     {
       if ( operatorID == DIFFN )
-	fprintf(stdout, "               Date  Time    Name         Level    Size    Miss :"
-		" S Z  Max_Absdiff Max_Reldiff\n");
-      else if ( operatorID == DIFF || operatorID == DIFFP )
-	fprintf(stdout, "               Date  Time    Param        Level    Size    Miss :"
-		" S Z  Max_Absdiff Max_Reldiff\n");
+	fprintf(stdout, "               Date  Time    Name         Level    Size    Miss ");
+      else if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP )
+	fprintf(stdout, "               Date  Time    Param        Level    Size    Miss ");
       else if ( operatorID == DIFFC )
-	fprintf(stdout, "               Date  Time    Code  Level    Size    Miss :"
-		" S Z  Max_Absdiff Max_Reldiff\n");
+	fprintf(stdout, "               Date  Time    Code  Level    Size    Miss ");
+
+      if ( operatorID == DIFF2 ) fprintf(stdout, "   Diff ");
+
+      fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff\n");
     }
 
   indg = 0;
@@ -127,13 +130,13 @@ void *Diff(void *argument)
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  if ( ! cdoSilentMode )
-	    if ( operatorID == DIFF || operatorID == DIFFP || operatorID == DIFFN || operatorID == DIFFC )
+	    if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP || operatorID == DIFFN || operatorID == DIFFC )
 	      {
 		if ( operatorID == DIFFN ) vlistInqVarName(vlistID1, varID1, varname);
 		
 		if ( operatorID == DIFFN )
 		  fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, varname);
-		else if ( operatorID == DIFF || operatorID == DIFFP )
+		else if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP )
 		  fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, paramstr);
 		else if ( operatorID == DIFFC )
 		  fprintf(stdout, "%6d :%s %s %3d ", indg, vdatestr, vtimestr, code);
@@ -144,6 +147,7 @@ void *Diff(void *argument)
 	  streamReadRecord(streamID1, array1, &nmiss1);
 	  streamReadRecord(streamID2, array2, &nmiss2);
 
+	  ndiff = 0;
           absm = 0.0;
 	  relm = 0.0;
 	  dsgn = FALSE;
@@ -153,6 +157,8 @@ void *Diff(void *argument)
 	    {
 	      if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
+		  if ( fabs(array1[i] - array2[i]) > 0 ) ndiff++;
+
 		  absm = MAX(absm, fabs(array1[i]-array2[i]));
 		  if ( array1[i]*array2[i] < 0 )
 		    dsgn = TRUE;
@@ -165,16 +171,19 @@ void *Diff(void *argument)
 	      else if ( (DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2)) || 
 			(!DBL_IS_EQUAL(array1[i], missval1) && DBL_IS_EQUAL(array2[i], missval2)) )
 		{
+		  ndiff++;
 		  relm = 1.0;
 		}
 	    }
 
 	  if ( ! cdoSilentMode )
-	    if ( operatorID == DIFF || operatorID == DIFFP || operatorID == DIFFN || operatorID == DIFFC )
+	    if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP || operatorID == DIFFN || operatorID == DIFFC )
 	      {
-		fprintf(stdout, "%7d %7d :", gridsize, MAX(nmiss1, nmiss2));
+		fprintf(stdout, "%7d %7d ", gridsize, MAX(nmiss1, nmiss2));
+
+		if ( operatorID == DIFF2 )  fprintf(stdout, "%7d ", ndiff);
 		
-		fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
+		fprintf(stdout, ": %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
 		fprintf(stdout, "%#12.5g%#12.5g\n", absm, relm);
 	      }
 

@@ -270,7 +270,7 @@ void *Wct(void *argument);
 #define  DeltimeOperators       {"delday", "del29feb"}
 #define  DeriveparOperators     {"geopotheight"}
 #define  DetrendOperators       {"detrend"}
-#define  DiffOperators          {"diff", "diffp", "diffn", "diffc", "sdiff"}
+#define  DiffOperators          {"diff", "diff2", "diffp", "diffn", "diffc", "sdiff"}
 #define  DuplicateOperators     {"duplicate"}
 #define  Echam5iniOperators     {"import_e5ml", "import_e5res", \
                                  "export_e5ml", "export_e5res"}
