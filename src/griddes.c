@@ -1685,13 +1685,13 @@ int gridFromName(const char *gridname)
 
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
-  else if ( strncmp(gridname, "world", 5) == 0 ) /* world_Xdeg */
+  else if ( strncmp(gridname, "global", 6) == 0 ) /* global_Xdeg */
     {
       double lon1 = -180, lon2 = 180;
       double lat1 =  -90, lat2 =  90;
       double dll = 1;
 
-      pline = &gridname[5];
+      pline = &gridname[6];
   
       gen_grid_lonlat(&grid, pline, dll, lon1, lon2, lat1, lat2);
     }
