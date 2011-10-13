@@ -300,6 +300,7 @@ void *Pressure(void *argument)
 	  if      ( strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0 ) code = 129;
 	  else if ( strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0 ) code = 130;
 	  else if ( strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0 ) code = 134;
+	  else if ( strcmp(varname, "ps")    == 0 )                                 code = 134;
 	  else if ( strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0 ) code = 152;
 	  /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	}
