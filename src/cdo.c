@@ -135,14 +135,17 @@ void cdo_version(void)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
 #endif
   fprintf(stderr, "    with:");
+#if defined (HAVE_LIBPTHREAD)
+  fprintf(stderr, " PTHREADS");
+#endif
+#if defined (_OPENMP)
+  fprintf(stderr, " OpenMP");
+#endif
 #if  defined  (HAVE_NETCDF4)
   fprintf(stderr, " NC4");
 #endif
 #if  defined  (HAVE_LIBNC_DAP)
   fprintf(stderr, " OPeNDAP");
-#endif
-#if defined (HAVE_LIBPTHREAD)
-  fprintf(stderr, " PTHREADS");
 #endif
 #if defined (HAVE_LIBSZ)
   fprintf(stderr, " SZ");
@@ -162,9 +165,6 @@ void cdo_version(void)
 #if defined (HAVE_LIBCURL)
   fprintf(stderr, " CURL");
 #endif
-#if defined (_OPENMP)
-  fprintf(stderr, " OpenMP");
-#endif
   fprintf(stderr, "\n");
 #if defined (USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
   fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
@@ -173,7 +173,6 @@ void cdo_version(void)
   cdiPrintVersion();
   fprintf(stderr, "\n");
 }
-
 
 static
 void usage(void)
