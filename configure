@@ -634,19 +634,22 @@ ENABLE_EXTRA
 ENABLE_SERVICE
 ENABLE_CGRIBEX
 ENABLE_GRIB
+GRIB_API_LIBS
 GRIB_API_INCLUDE
-GRIB_API_LDFLAGS
-JASPER_LDFLAGS
+JASPER_LIBS
+NETCDF_LIBS
 NETCDF_INCLUDE
-NETCDF_LDFLAGS
+NETCDF_ROOT
+NC_CONFIG
+HDF5_LIBS
 HDF5_INCLUDE
-HDF5_LDFLAGS
+HDF5_ROOT
+SZLIB_LIBS
 SZLIB_INCLUDE
-SZLIB_LDFLAGS
-ZLIB_LDFLAGS
+ZLIB_LIBS
 ZLIB_INCLUDE
+THREADS_LIBS
 THREADS_INCLUDE
-THREADS_LDFLAGS
 PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
@@ -781,7 +784,6 @@ enable_fast_install
 enable_dependency_tracking
 with_gnu_ld
 enable_libtool_lock
-with_gnu_ld
 enable_largefile
 with_threads
 with_zlib
@@ -808,12 +810,8 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP
-CPPFLAGS
 CXX
 CXXFLAGS
-LDFLAGS
-LIBS
-CPPFLAGS
 CCC
 CXXCPP'
 ac_subdirs_all='libcdi'
@@ -1463,7 +1461,7 @@ Optional Packages:
                           both]
   --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
   --with-threads=<yes/no/directory>
-                          Compuile + link for multithreading [default=yes]
+                          Compile + link for multithreading [default=yes]
   --with-zlib=<yes|no|directory> (default=yes)
                           location of ZLIB compression library (lib and
                           include subdirs), nec. for HDF5/NETCDF4
@@ -16256,6 +16254,8 @@ else
   with_threads=yes
 fi
 
+THREADS_INCLUDE=''
+THREADS_LIBS=''
 case $with_threads in #(
   no) :
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking multithreading" >&5
@@ -16621,9 +16621,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
                LIBS="$PTHREAD_LIBS $LIBS"
                CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
                CC="$PTHREAD_CC"
-               $as_echo "CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS"
-
-                ;; #(
+               $as_echo "CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS" ;; #(
   *) :
     THREADS_ROOT=$with_threads
              LDFLAGS="-L$THREADS_ROOT/lib $LDFLAGS"
@@ -16685,15 +16683,17 @@ _ACEOF
 
 fi
 
-             THREADS_LDFLAGS=" -L$THREADS_ROOT/lib -lpthread"
-
-             THREADS_INCLUDE=" -I$THREADS_ROOT/include"
- ;; #(
+             THREADS_LIBS=" -L$THREADS_ROOT/lib -lpthread"
+             THREADS_INCLUDE=" -I$THREADS_ROOT/include" ;; #(
   *) :
      ;;
 esac
+
+
 #  ----------------------------------------------------------------------
 #  Link application to ZLIB library, needed for netcdf
+ZLIB_INCLUDE=''
+ZLIB_LIBS=''
 
 # Check whether --with-zlib was given.
 if test "${with_zlib+set}" = set; then :
@@ -16774,9 +16774,7 @@ $as_echo "#define HAVE_LIBZ 1" >>confdefs.h
 
 fi
 
-
-                            ZLIB_LDFLAGS=" -lz"
- ;; #(
+                            ZLIB_LIBS=" -lz" ;; #(
   *) :
     ZLIB_ROOT=$with_zlib
                           LDFLAGS="-L$ZLIB_ROOT/lib $LDFLAGS"
@@ -16852,9 +16850,7 @@ $as_echo "#define HAVE_LIBZ 1" >>confdefs.h
 fi
 
                           ZLIB_INCLUDE=" -I$ZLIB_ROOT/include"
-
-                          ZLIB_LDFLAGS=" -L$ZLIB_ROOT/lib -lz"
- ;; #(
+                          ZLIB_LIBS=" -L$ZLIB_ROOT/lib -lz" ;; #(
   *) :
      ;;
 esac
@@ -16929,12 +16925,16 @@ $as_echo "#define HAVE_LIBZ 1" >>confdefs.h
 
 fi
 
-                      ZLIB_LDFLAGS=" -lz"
-
+              ZLIB_LIBS=" -lz"
 fi
 
+
+
 #  ----------------------------------------------------------------------
-#  Compile application with SZLIB library, nedded for GRIB1 or for linking against hdf5/netcdf4
+#  Compile application with SZLIB library, needed for GRIB1 or for
+#  linking against hdf5/netcdf4
+SZLIB_INCLUDE=''
+SZLIB_LIBS=''
 
 # Check whether --with-szlib was given.
 if test "${with_szlib+set}" = set; then :
@@ -17017,10 +17017,7 @@ else
   as_fn_error $? "Could not link to szlib" "$LINENO" 5
 fi
 
-                            SZLIB_LDFLAGS=" -lsz"
-
-                            SZLIB_INCLUDE=""
- ;; #(
+                            SZLIB_LIBS=" -lsz" ;; #(
   *) :
     SZLIB_ROOT=$with_szlib
                           if test -d "$SZLIB_ROOT"; then :
@@ -17098,10 +17095,8 @@ else
   as_fn_error $? "Could not link to szlib" "$LINENO" 5
 fi
 
-                                 SZLIB_LDFLAGS=" -L$SZLIB_ROOT/lib -lsz"
-
+                                 SZLIB_LIBS=" -L$SZLIB_ROOT/lib -lsz"
                                  SZLIB_INCLUDE=" -I$SZLIB_ROOT/include"
-
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: $SZLIB_ROOT is not a directory! SZLIB suppressed" >&5
 $as_echo "$as_me: $SZLIB_ROOT is not a directory! SZLIB suppressed" >&6;}
@@ -17116,8 +17111,13 @@ $as_echo_n "checking for szlib library... " >&6; }
 $as_echo "suppressed" >&6; }
 fi
 
+
+
 #  ----------------------------------------------------------------------
 #  Link application with HDF5 library, required for netcdf4
+HDF5_ROOT=''
+HDF5_INCLUDE=''
+HDF5_LIBS=''
 
 # Check whether --with-hdf5 was given.
 if test "${with_hdf5+set}" = set; then :
@@ -17260,19 +17260,16 @@ $as_echo "$as_me: Cannot find hdf5 high level interface! It is required for netC
                                             have_hdf5_hl=no
 fi
 
-                            if test "x$have_libhdf5_hl" = 'xyes'; then :
-  HDF5_LDFLAGS=" -lhdf5_hl -lhdf5"
-
+                            if test "x$have_libhdf5_hl" = xyes; then :
+  HDF5_LIBS=" -lhdf5_hl -lhdf5"
 else
-  HDF5_LDFLAGS=" -lhdf5"
-
+  HDF5_LIBS=" -lhdf5"
 fi
-                            HDF5_INCLUDE=""
- ;; #(
+                             ;; #(
   *) :
-    HDF5_ROOT=$with_hdf5
-                          if test -d "$HDF5_ROOT"; then :
-  LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
+    if test -d "$with_hdf5"; then :
+  HDF5_ROOT="$with_hdf5"
+                                 LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$HDF5_ROOT/include $CPPFLAGS"
                                  for ac_header in hdf5.h
 do :
@@ -17413,17 +17410,14 @@ $as_echo "$as_me: Cannot link to hdf5 high level interface! It is required for n
 fi
 
                                  if test "x$have_libhdf5_hl" = 'xyes'; then :
-  HDF5_LDFLAGS=" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"
-
+  HDF5_LIBS=" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"
 else
-  HDF5_LDFLAGS=" -L$HDF5_ROOT/lib -lhdf5"
-
+  HDF5_LIBS=" -L$HDF5_ROOT/lib -lhdf5"
 fi
                                  HDF5_INCLUDE=" -I$HDF5_ROOT/include"
-
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: $HDF5_ROOT is not a directory! HDF5 suppressed" >&5
-$as_echo "$as_me: $HDF5_ROOT is not a directory! HDF5 suppressed" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: $with_hdf5 is not a directory! HDF5 suppressed" >&5
+$as_echo "$as_me: $with_hdf5 is not a directory! HDF5 suppressed" >&6;}
 fi ;; #(
   *) :
      ;;
@@ -17435,8 +17429,14 @@ $as_echo_n "checking for hdf5 library... " >&6; }
 $as_echo "suppressed" >&6; }
 fi
 
+
+
+
 #  ----------------------------------------------------------------------
 #  Compile application with netcdf
+NETCDF_ROOT=''
+NETCDF_INCLUDE=''
+NETCDF_LIBS=''
 
 # Check whether --with-netcdf was given.
 if test "${with_netcdf+set}" = set; then :
@@ -17519,14 +17519,76 @@ else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
 
-                            NETCDF_LDFLAGS=" -lnetcdf"
+                            NETCDF_LIBS=" -lnetcdf"
+                            # Extract the first word of "nc-config", so it can be a program name with args.
+set dummy nc-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_NC_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$NC_CONFIG"; then
+  ac_cv_prog_NC_CONFIG="$NC_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_NC_CONFIG="nc-config"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
 
-                            NETCDF_INCLUDE=""
- ;; #(
+fi
+fi
+NC_CONFIG=$ac_cv_prog_NC_CONFIG
+if test -n "$NC_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NC_CONFIG" >&5
+$as_echo "$NC_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+                            if test "x$NC_CONFIG" != "x"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's nc2 support" >&5
+$as_echo_n "checking netcdf's nc2 support... " >&6; }
+                                   if test "x$($NC_CONFIG --has-nc2)" = "xyes"; then :
+
+$as_echo "#define HAVE_NETCDF2 1" >>confdefs.h
+
+                                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+                                   { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's nc4 support" >&5
+$as_echo_n "checking netcdf's nc4 support... " >&6; }
+                                   if test "x$($NC_CONFIG --has-nc4)" = "xyes"; then :
+
+$as_echo "#define HAVE_NETCDF4 1" >>confdefs.h
+
+                                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+else
+  $as_echo Could not find nc-config! go on with default configuration
+fi ;; #(
   *) :
-    NETCDF_ROOT=$with_netcdf
-                          if test -d "$NETCDF_ROOT"; then :
-  LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
+    if test -d "$with_netcdf"; then :
+  NETCDF_ROOT=$with_netcdf
+                                 LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$NETCDF_ROOT/include $CPPFLAGS"
                                  for ac_header in netcdf.h
 do :
@@ -17600,13 +17662,67 @@ else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
 
-                                 NETCDF_LDFLAGS=" -L$NETCDF_ROOT/lib -lnetcdf"
-
+                                 NETCDF_LIBS=" -L$NETCDF_ROOT/lib -lnetcdf"
                                  NETCDF_INCLUDE=" -I$NETCDF_ROOT/include"
-
+                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking nc-config script" >&5
+$as_echo_n "checking nc-config script... " >&6; }
+                                 # Extract the first word of "nc-config", so it can be a program name with args.
+set dummy nc-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_NC_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: $NETCDF_ROOT is not a directory! NETCDF suppressed" >&5
-$as_echo "$as_me: $NETCDF_ROOT is not a directory! NETCDF suppressed" >&6;}
+  if test -n "$NC_CONFIG"; then
+  ac_cv_prog_NC_CONFIG="$NC_CONFIG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in "$NETCDF_ROOT/bin"
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_NC_CONFIG="$NETCDF_ROOT/bin/nc-config"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+NC_CONFIG=$ac_cv_prog_NC_CONFIG
+if test -n "$NC_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $NC_CONFIG" >&5
+$as_echo "$NC_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+                                 if test "x$NC_CONFIG" != "x"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking netcdf's OpenDAP support" >&5
+$as_echo_n "checking netcdf's OpenDAP support... " >&6; }
+                                   if test "x$($NC_CONFIG --has-dap)" = "xyes"; then :
+
+$as_echo "#define HAVE_LIBNC_DAP 1" >>confdefs.h
+
+                                          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Could not find nc-config! go on with default configuration" >&5
+$as_echo "Could not find nc-config! go on with default configuration" >&6; }
+fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: $with_netcdf is not a directory! NETCDF suppressed" >&5
+$as_echo "$as_me: $with_netcdf is not a directory! NETCDF suppressed" >&6;}
 fi ;; #(
   *) :
      ;;
@@ -17618,8 +17734,12 @@ $as_echo_n "checking for NETCDF library... " >&6; }
 $as_echo "suppressed" >&6; }
 fi
 
+
+
+
 #  ----------------------------------------------------------------------
 #  Link application with JASPER library (needed for GRIB2 compression)
+JASPER_LIBS=''
 
 # Check whether --with-jasper was given.
 if test "${with_jasper+set}" = set; then :
@@ -17702,7 +17822,7 @@ else
   as_fn_error $? "Could not link to jasper library! Required for GRIB_API" "$LINENO" 5
 fi
 
-                            JASPER_LDFLAGS=" -ljasper"
+                            JASPER_LIBS=" -ljasper"
  ;; #(
   *) :
     JASPER_ROOT=$with_jasper
@@ -17769,8 +17889,7 @@ else
   as_fn_error $? "Could not link to jasper library! Required for GRIB_API" "$LINENO" 5
 fi
 
-                                 JASPER_LDFLAGS=" -L$JASPER_ROOT/lib -ljasper"
-
+                                 JASPER_LIBS=" -L$JASPER_ROOT/lib -ljasper"
 else
   as_fn_error $? "$JASPER_ROOT is not a directory! JASPER suppressed" "$LINENO" 5
 fi ;; #(
@@ -17784,8 +17903,11 @@ $as_echo_n "checking for the JASPER library... " >&6; }
 $as_echo "suppressed" >&6; }
 fi
 
+
 #  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
+GRIB_API_INCLUDE=''
+GRIB_API_LIBS=''
 
 # Check whether --with-grib_api was given.
 if test "${with_grib_api+set}" = set; then :
@@ -17945,10 +18067,8 @@ else
   as_fn_error $? "Could not link to grib_api library" "$LINENO" 5
 fi
 
-                                 GRIB_API_LDFLAGS=" -L$GRIB_API_ROOT/lib -lgrib_api"
-
+                                 GRIB_API_LIBS=" -L$GRIB_API_ROOT/lib -lgrib_api"
                                  GRIB_API_INCLUDE=" -I$GRIB_API_ROOT/include"
-
 else
   as_fn_error $? "$GRIB_API_ROOT is not a directory! GRIB_API suppressed" "$LINENO" 5
 fi ;; #(
@@ -17961,6 +18081,8 @@ $as_echo_n "checking for the GRIB_API library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
+
+
 
 #  ----------------------------------------------------------------------
 #  Enable GRIB support

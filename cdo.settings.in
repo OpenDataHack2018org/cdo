@@ -20,22 +20,22 @@
      "enable_cdi_lib" : @ENABLE_CDI_LIB@
    },
   "threads"    : {
-    "lib"      : "@THREADS_LDFLAGS@",
+    "lib"      : "@THREADS_LIBS@",
     "include"  : "@THREADS_INCLUDE@"
   },
   "zlib"     : {
-    "lib"      : "@ZLIB_LDFLAGS@",
+    "lib"      : "@ZLIB_LIBS@",
   },
   "szlib"    : {
-    "lib"      : "@SZLIB_LDFLAGS@",
+    "lib"      : "@SZLIB_LIBS@",
     "include"  : "@SZLIB_INCLUDE@"
   },
   "hdf5"     : {
-    "lib"      : "@HDF5_LDFLAGS@",
+    "lib"      : "@HDF5_LIBS@",
     "include"  : "@HDF5_INCLUDE@"
   },
   "netcdf"   : {
-    "lib"      : "@NETCDF_LDFLAGS@",
+    "lib"      : "@NETCDF_LIBS@",
     "include"  : "@NETCDF_INCLUDE@"
   },
    "proj"               : {

@@ -4,9 +4,11 @@ AC_DEFUN([ACX_OPTIONS],
 #  Checks for multithreaded compiling + linking
 AC_ARG_WITH([threads],
             [AC_HELP_STRING([--with-threads=<yes/no/directory>],
-                            [Compuile + link for multithreading [default=yes]])],
+                            [Compile + link for multithreading [default=yes]])],
             [],
             [with_threads=yes])
+THREADS_INCLUDE=''
+THREADS_LIBS=''
 AS_CASE([$with_threads],
         [no],[AC_MSG_CHECKING([multithreading])
               AC_MSG_RESULT([suppressed])],
@@ -14,18 +16,20 @@ AS_CASE([$with_threads],
                LIBS="$PTHREAD_LIBS $LIBS"
                CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
                CC="$PTHREAD_CC"
-               AS_ECHO(["CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS"])
-               AC_SUBST([THREADS_LDFLAGS],[])
-               AC_SUBST([THREADS_INCLUDE],[])],
+               AS_ECHO(["CC:$CC CFLAGS:$CFLAGS LIBS:$LIBS"])],
         [*],[THREADS_ROOT=$with_threads
              LDFLAGS="-L$THREADS_ROOT/lib $LDFLAGS"
              CPPFLAGS="-I$THREADS_ROOT/include $CPPFLAGS "
              AC_CHECK_HEADERS(pthread.h)
              AC_CHECK_LIB([pthread],[pthread_create])
-             AC_SUBST([THREADS_LDFLAGS],[" -L$THREADS_ROOT/lib -lpthread"])
-             AC_SUBST([THREADS_INCLUDE],[" -I$THREADS_ROOT/include"])])
+             THREADS_LIBS=" -L$THREADS_ROOT/lib -lpthread"
+             THREADS_INCLUDE=" -I$THREADS_ROOT/include"])
+AC_SUBST([THREADS_INCLUDE])
+AC_SUBST([THREADS_LIBS])
 #  ----------------------------------------------------------------------
 #  Link application to ZLIB library, needed for netcdf
+ZLIB_INCLUDE=''
+ZLIB_LIBS=''
 AC_ARG_WITH([zlib],
             [AS_HELP_STRING([--with-zlib=<yes|no|directory> (default=yes)],[location of ZLIB compression library (lib and include subdirs), nec. for HDF5/NETCDF4])],
             [AS_CASE(["$with_zlib"],
@@ -33,20 +37,24 @@ AC_ARG_WITH([zlib],
                            AC_MSG_RESULT([suppressed])],
                      [yes],[AC_CHECK_HEADERS(zlib.h)
                             AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
-                            AC_SUBST([ZLIB_INCLUDE],[])
-                            AC_SUBST([ZLIB_LDFLAGS],[" -lz"])],
+                            ZLIB_LIBS=" -lz"],
                      [*],[ZLIB_ROOT=$with_zlib
                           LDFLAGS="-L$ZLIB_ROOT/lib $LDFLAGS"
                           CPPFLAGS="-I$ZLIB_ROOT/include $CPPFLAGS"
                           AC_CHECK_HEADERS(zlib.h)
                           AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
-                          AC_SUBST([ZLIB_INCLUDE],[" -I$ZLIB_ROOT/include"])
-                          AC_SUBST([ZLIB_LDFLAGS],[" -L$ZLIB_ROOT/lib -lz"])])],
+                          ZLIB_INCLUDE=" -I$ZLIB_ROOT/include"
+                          ZLIB_LIBS=" -L$ZLIB_ROOT/lib -lz"])],
                      [AC_CHECK_HEADERS(zlib.h)
                       AC_SEARCH_LIBS([deflate],[z],[AC_DEFINE([HAVE_LIBZ],[1],[Define 1 for ZLIB support])])
-                      AC_SUBST([ZLIB_LDFLAGS],[" -lz"])])
+              ZLIB_LIBS=" -lz"])
+AC_SUBST([ZLIB_INCLUDE])
+AC_SUBST([ZLIB_LIBS])
 #  ----------------------------------------------------------------------
-#  Compile application with SZLIB library, nedded for GRIB1 or for linking against hdf5/netcdf4
+#  Compile application with SZLIB library, needed for GRIB1 or for
+#  linking against hdf5/netcdf4
+SZLIB_INCLUDE=''
+SZLIB_LIBS=''
 AC_ARG_WITH([szlib],
             [AS_HELP_STRING([--with-szlib=<yes|no|directory> (default=no)],[location of szlib library, optional for GRIB1 and NETCDF4 compression])],
             [AS_CASE(["$with_szlib"],
@@ -57,8 +65,7 @@ AC_ARG_WITH([szlib],
                                            [sz],
                                            [AC_DEFINE([HAVE_LIBSZ],[1],[Define to 1 for SZIP support])],
                                            [AC_MSG_ERROR([Could not link to szlib])])
-                            AC_SUBST([SZLIB_LDFLAGS],[" -lsz"])
-                            AC_SUBST([SZLIB_INCLUDE],[""])],
+                            SZLIB_LIBS=" -lsz"],
                      [*],[SZLIB_ROOT=$with_szlib
                           AS_IF([test -d "$SZLIB_ROOT"],
                                 [LDFLAGS="-L$SZLIB_ROOT/lib $LDFLAGS"
@@ -68,13 +75,18 @@ AC_ARG_WITH([szlib],
                                                 [sz],
                                                 [AC_DEFINE([HAVE_LIBSZ],[1],[Define to 1 for SZIP support])],
                                                 [AC_MSG_ERROR([Could not link to szlib])])
-                                 AC_SUBST([SZLIB_LDFLAGS],[" -L$SZLIB_ROOT/lib -lsz"])
-                                 AC_SUBST([SZLIB_INCLUDE],[" -I$SZLIB_ROOT/include"])],
+                                 SZLIB_LIBS=" -L$SZLIB_ROOT/lib -lsz"
+                                 SZLIB_INCLUDE=" -I$SZLIB_ROOT/include"],
                                 [AC_MSG_NOTICE([$SZLIB_ROOT is not a directory! SZLIB suppressed])])])],
             [AC_MSG_CHECKING([for szlib library])
              AC_MSG_RESULT([suppressed])])
+AC_SUBST([SZLIB_INCLUDE])
+AC_SUBST([SZLIB_LIBS])
 #  ----------------------------------------------------------------------
 #  Link application with HDF5 library, required for netcdf4
+HDF5_ROOT=''
+HDF5_INCLUDE=''
+HDF5_LIBS=''
 AC_ARG_WITH([hdf5],
             [AS_HELP_STRING([--with-hdf5=<yes|no|directory> (default=no)],[location of hdf5 library, NETCDF4 requires hdf5 high level interface])],
             [AS_CASE(["$with_hdf5"],
@@ -90,13 +102,13 @@ AC_ARG_WITH([hdf5],
                                            [have_hdf5_hl=yes],
                                            [AC_MSG_NOTICE([Cannot find hdf5 high level interface! It is required for netCDF4.])
                                             have_hdf5_hl=no])
-                            AS_IF([test "x$have_libhdf5_hl" = 'xyes'],
-                                  [AC_SUBST([HDF5_LDFLAGS],[" -lhdf5_hl -lhdf5"])],
-                                  [AC_SUBST([HDF5_LDFLAGS],[" -lhdf5"])])
-                            AC_SUBST([HDF5_INCLUDE],[""])],
-                     [*],[HDF5_ROOT=$with_hdf5
-                          AS_IF([test -d "$HDF5_ROOT"],
-                                [LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
+                            AS_IF([test "x$have_libhdf5_hl" = xyes],
+                                  [HDF5_LIBS=" -lhdf5_hl -lhdf5"],
+                                  [HDF5_LIBS=" -lhdf5"])
+                            ],
+                     [*],[AS_IF([test -d "$with_hdf5"],
+                                [HDF5_ROOT="$with_hdf5"
+                                 LDFLAGS="-L$HDF5_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$HDF5_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([hdf5.h])
                                  AC_SEARCH_LIBS([H5Fopen],
@@ -112,14 +124,20 @@ AC_ARG_WITH([hdf5],
                                                                 specified with the --with-szlib option..])
                                                 have_hdf5_hl=no])
                                  AS_IF([test "x$have_libhdf5_hl" = 'xyes'],
-                                       [AC_SUBST([HDF5_LDFLAGS],[" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"])],
-                                       [AC_SUBST([HDF5_LDFLAGS],[" -L$HDF5_ROOT/lib -lhdf5"])])
-                                 AC_SUBST([HDF5_INCLUDE],[" -I$HDF5_ROOT/include"])],
-                                [AC_MSG_NOTICE([$HDF5_ROOT is not a directory! HDF5 suppressed])])])],
+                                       [HDF5_LIBS=" -L$HDF5_ROOT/lib -lhdf5_hl -lhdf5"],
+                                       [HDF5_LIBS=" -L$HDF5_ROOT/lib -lhdf5"])
+                                 HDF5_INCLUDE=" -I$HDF5_ROOT/include"],
+                                [AC_MSG_NOTICE([$with_hdf5 is not a directory! HDF5 suppressed])])])],
             [AC_MSG_CHECKING([for hdf5 library])
              AC_MSG_RESULT([suppressed])])
+AC_SUBST([HDF5_ROOT])
+AC_SUBST([HDF5_INCLUDE])
+AC_SUBST([HDF5_LIBS])
 #  ----------------------------------------------------------------------
 #  Compile application with netcdf
+NETCDF_ROOT=''
+NETCDF_INCLUDE=''
+NETCDF_LIBS=''
 AC_ARG_WITH([netcdf],
             [AS_HELP_STRING([--with-netcdf=<yes|no|directory> (default=yes)],[location of netcdf library (lib and include subdirs)])],
             [AS_CASE(["$with_netcdf"],
@@ -130,24 +148,46 @@ AC_ARG_WITH([netcdf],
                                            [netcdf],
                                            [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for NETCDF support])],
                                            [AC_MSG_ERROR([Could not link to netcdf library])])
-                            AC_SUBST([NETCDF_LDFLAGS],[" -lnetcdf"])
-                            AC_SUBST([NETCDF_INCLUDE],[""])],
-                     [*],[NETCDF_ROOT=$with_netcdf
-                          AS_IF([test -d "$NETCDF_ROOT"],
-                                [LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
+                            NETCDF_LIBS=" -lnetcdf"
+                            AC_CHECK_PROG(NC_CONFIG,nc-config,nc-config)
+                            AS_IF([test "x$NC_CONFIG" != "x"],
+                                  [AC_MSG_CHECKING([netcdf's nc2 support])
+                                   AS_IF([test "x$($NC_CONFIG --has-nc2)" = "xyes"],
+                                         [AC_DEFINE([HAVE_NETCDF2],[1],[Define to 1 for NETCDF2 support])
+                                          AC_MSG_RESULT([yes])],[AC_MSG_RESULT([no])])
+                                   AC_MSG_CHECKING([netcdf's nc4 support])
+                                   AS_IF([test "x$($NC_CONFIG --has-nc4)" = "xyes"],
+                                   [AC_DEFINE([HAVE_NETCDF4],[1],[Define to 1 for NETCDF4 support])
+                                    AC_MSG_RESULT([yes])],[AC_MSG_RESULT([no])])],
+                                  [AS_ECHO([Could not find nc-config! go on with default configuration])])],
+                     [*],[AS_IF([test -d "$with_netcdf"],
+                                [NETCDF_ROOT=$with_netcdf
+                                 LDFLAGS="-L$NETCDF_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$NETCDF_ROOT/include $CPPFLAGS"
                                  AC_CHECK_HEADERS([netcdf.h])
                                  AC_SEARCH_LIBS([nc_open],
                                                 [netcdf],
                                                 [AC_DEFINE([HAVE_LIBNETCDF],[1],[Define to 1 for NETCDF support])],
                                                 [AC_MSG_ERROR([Could not link to netcdf library])])
-                                 AC_SUBST([NETCDF_LDFLAGS],[" -L$NETCDF_ROOT/lib -lnetcdf"])
-                                 AC_SUBST([NETCDF_INCLUDE],[" -I$NETCDF_ROOT/include"])],
-                                [AC_MSG_NOTICE([$NETCDF_ROOT is not a directory! NETCDF suppressed])])])],
+                                 NETCDF_LIBS=" -L$NETCDF_ROOT/lib -lnetcdf"
+                                 NETCDF_INCLUDE=" -I$NETCDF_ROOT/include"
+                                 AC_MSG_CHECKING([nc-config script])
+                                 AC_CHECK_PROG(NC_CONFIG,nc-config,[$NETCDF_ROOT/bin/nc-config],,["$NETCDF_ROOT/bin"])
+                                 AS_IF([test "x$NC_CONFIG" != "x"],
+                                   [AC_MSG_CHECKING([netcdf's OpenDAP support])
+                                   AS_IF([test "x$($NC_CONFIG --has-dap)" = "xyes"],
+                                         [AC_DEFINE([HAVE_LIBNC_DAP],[1],[Define to 1 for NETCDF OpenDAP])
+                                          AC_MSG_RESULT([yes])],[AC_MSG_RESULT([no])])],
+                                   [AC_MSG_RESULT([Could not find nc-config! go on with default configuration])])],
+                                [AC_MSG_NOTICE([$with_netcdf is not a directory! NETCDF suppressed])])])],
             [AC_MSG_CHECKING([for NETCDF library])
              AC_MSG_RESULT([suppressed])])
+AC_SUBST([NETCDF_ROOT])
+AC_SUBST([NETCDF_INCLUDE])
+AC_SUBST([NETCDF_LIBS])
 #  ----------------------------------------------------------------------
 #  Link application with JASPER library (needed for GRIB2 compression)
+JASPER_LIBS=''
 AC_ARG_WITH([jasper],
             [AS_HELP_STRING([--with-jasper=<directory>],
                             [Specify location of JASPER library. You must specify its location if GRIB_API was built with JASPER.])],
@@ -157,7 +197,7 @@ AC_ARG_WITH([jasper],
                      [yes],[AC_CHECK_HEADERS([jasper.h])
                             AC_SEARCH_LIBS([jas_init],[jasper],[AC_DEFINE([HAVE_LIBJASPER],[1],[Define to 1 for JPEG compression for GRIB2])],
                                            [AC_MSG_ERROR([Could not link to jasper library! Required for GRIB_API])])
-                            AC_SUBST([JASPER_LDFLAGS],[" -ljasper"])],
+                            AC_SUBST([JASPER_LIBS],[" -ljasper"])],
                      [*],[JASPER_ROOT=$with_jasper
                           AS_IF([test -d "$JASPER_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$JASPER_ROOT/lib"
@@ -166,12 +206,15 @@ AC_ARG_WITH([jasper],
                                                 [jasper],
                                                 [AC_DEFINE([HAVE_LIBJASPER],[1],[Define to 1 for JPEG compression for GRIB2])],
                                                 [AC_MSG_ERROR([Could not link to jasper library! Required for GRIB_API])])
-                                 AC_SUBST([JASPER_LDFLAGS],[" -L$JASPER_ROOT/lib -ljasper"])],
+                                 JASPER_LIBS=" -L$JASPER_ROOT/lib -ljasper"],
                                 [AC_MSG_ERROR([$JASPER_ROOT is not a directory! JASPER suppressed])])])],
             [AC_MSG_CHECKING([for the JASPER library])
              AC_MSG_RESULT([suppressed])])
+AC_SUBST([JASPER_LIBS])
 #  ----------------------------------------------------------------------
 #  Compile application with GRIB_API library (for GRIB2 support)
+GRIB_API_INCLUDE=''
+GRIB_API_LIBS=''
 AC_ARG_WITH([grib_api],
             [AS_HELP_STRING([--with-grib_api=<yes|no|directory>],
                             [library for grib2 compression; if a directory is given, it will be used as a value for --with-jasper-root])],
@@ -192,11 +235,13 @@ AC_ARG_WITH([grib_api],
                                                 [grib_api],
                                                 [AC_DEFINE([HAVE_LIBGRIB_API],[1],[GRIB_API library is present if defined to 1])],
                                                 [AC_MSG_ERROR([Could not link to grib_api library])])
-                                 AC_SUBST([GRIB_API_LDFLAGS],[" -L$GRIB_API_ROOT/lib -lgrib_api"])
-                                 AC_SUBST([GRIB_API_INCLUDE],[" -I$GRIB_API_ROOT/include"])],
+                                 GRIB_API_LIBS=" -L$GRIB_API_ROOT/lib -lgrib_api"
+                                 GRIB_API_INCLUDE=" -I$GRIB_API_ROOT/include"],
                                 [AC_MSG_ERROR([$GRIB_API_ROOT is not a directory! GRIB_API suppressed])])])],
             [AC_MSG_CHECKING([for the GRIB_API library])
              AC_MSG_RESULT([suppressed])])
+AC_SUBST([GRIB_API_INCLUDE])
+AC_SUBST([GRIB_API_LIBS])
 #  ----------------------------------------------------------------------
 #  Enable GRIB support
 AC_MSG_CHECKING([for GRIB support])
