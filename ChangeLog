@@ -1,3 +1,8 @@
+2011-10-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.3
+	* Version 1.5.3 released
+
 2011-10-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * deflate compression with netCDF4 doesn't work (bug fix) [report: Geert Jan van Oldenborgh]
