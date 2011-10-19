@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.5.3 (17 October 2011):
+Version 1.5.3 (20 October 2011):
 
    New features:
      * Variable input parameter for ECA operators: eca_cdd, eca_cwd, eca_rr1, eca_sdii
@@ -9,6 +9,7 @@ Version 1.5.3 (17 October 2011):
      * deflate compression with netCDF4 doesn't work (option: -z zip)
      * sellonlatbox: correct lon bounds if necessary
      * ifthen, ifthenelse: uses only the first time step of the first input file
+     * module Monarith (monadd, monsub, monmul, mondiv): wrong result for 3D variables
 
 Version 1.5.2 (22 August 2011):
 

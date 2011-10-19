@@ -134,7 +134,10 @@ void *Monarith(void *argument)
 	    {
 	      streamInqRecord(streamID2, &varID, &levelID);
 
-	      streamReadRecord(streamID2, &vardata2[varID][levelID], &field2.nmiss);
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      offset   = gridsize*levelID;
+
+	      streamReadRecord(streamID2, vardata2[varID]+offset, &field2.nmiss);
 	      varnmiss2[varID][levelID] = field2.nmiss;
 	    }
 
@@ -166,6 +169,7 @@ void *Monarith(void *argument)
 	  streamDefRecord(streamID3, varID, levelID);
 	  streamWriteRecord(streamID3, field1.ptr, field1.nmiss);
 	}
+
       tsID++;
     }
 
