@@ -226,6 +226,7 @@ void *Setgrid(void *argument)
       for ( index = 0; index < ngrids; index++ )
 	{
 	  gridID1 = vlistGrid(vlistID1, index);
+	  gridID2 = -1;
 
 	  if ( lregular )
 	    {
@@ -260,6 +261,8 @@ void *Setgrid(void *argument)
  		}
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
+
+	  if ( gridID2 == -1 ) cdoAbort("Unsupported grid type!");
 
 	  vlistChangeGridIndex(vlistID2, index, gridID2);
 	}
