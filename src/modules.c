@@ -250,7 +250,7 @@ void *Wct(void *argument);
 
 
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
-#define  ArithcOperators        {"addc", "subc", "mulc", "divc"}
+#define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy", "muldoy"}
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}

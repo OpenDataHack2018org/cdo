@@ -1,3 +1,7 @@
+2011-10-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added operator mod - modulo [request: Swantje Preuschmann]
+
 2011-10-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.3

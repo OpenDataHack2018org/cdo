@@ -245,6 +245,7 @@ ml2pl -ml2pl \
 ml2pl_lp -ml2pl_lp \
 ml2plx -ml2plx \
 ml2plx_lp -ml2plx_lp \
+mod -mod \
 monadd -monadd \
 monavg -monavg \
 mondiv -mondiv \

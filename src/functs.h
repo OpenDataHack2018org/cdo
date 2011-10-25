@@ -26,6 +26,7 @@
 #define  func_sub   42
 #define  func_mul   43
 #define  func_div   44
+#define  func_mod   45
 
 #define  func_atan2 50
 
