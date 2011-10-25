@@ -86,6 +86,7 @@ void *Timstat(void *argument)
   int *recVarID, *recLevelID;
   int taxis_has_bounds = FALSE;
   int lvfrac = FALSE;
+  char vdatestr[32], vtimestr[32];
   double vfrac = 1;
   double missval;
   field_t **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
@@ -354,7 +355,12 @@ void *Timstat(void *argument)
 	      }
 	  }
 
-      if ( cdoVerbose ) cdoPrint("vfrac = %g, nsets = %d", vfrac, nsets);
+      if ( cdoVerbose )
+	{
+	  date2str(vdate0, vdatestr, sizeof(vdatestr));
+	  time2str(vtime0, vtimestr, sizeof(vtimestr));
+	  cdoPrint("%s %s  vfrac = %g, nsets = %d", vdatestr, vtimestr, vfrac, nsets);
+	}
 
       if ( lvfrac && operfunc == func_mean )
 	for ( varID = 0; varID < nvars; varID++ )
