@@ -67,6 +67,42 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
   return (0);
 }
 
+static
+void shifttime(int calendar, int tunit, int ijulinc, int *pdate, int *ptime)
+{
+  int year, month, day;
+  int vdate = *pdate;
+  int vtime = *ptime;
+  juldate_t juldate;
+
+  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
+    {
+      cdiDecodeDate(vdate, &year, &month, &day);
+	      
+      month += ijulinc;
+
+      while ( month > 12 ) { month -= 12; year++; }
+      while ( month <  1 ) { month += 12; year--; }
+
+      vdate = cdiEncodeDate(year, month, day);
+
+      *pdate = vdate;
+    }
+  else
+    {
+      juldate = juldate_encode(calendar, vdate, vtime);
+      juldate = juldate_add_seconds(ijulinc, juldate);
+      juldate_decode(calendar, juldate, &vdate, &vtime);
+
+      *pdate = vdate;
+      *ptime = vtime;
+
+      if ( cdoVerbose )
+	cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d",
+		 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
+    }
+}
+
 
 void *Settime(void *argument)
 {
@@ -78,6 +114,7 @@ void *Settime(void *argument)
   int tsID1, recID, varID, levelID;
   int vlistID1, vlistID2;
   int vdate, vtime;
+  int vdateb[2], vtimeb[2];
   int sdate = 0, stime = 0;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int nmiss;
@@ -308,11 +345,13 @@ void *Settime(void *argument)
       taxisDefCalendar(taxisID2, newcalendar);
     }
 
-  if ( taxis_has_bounds && copy_timestep == FALSE )
-    {
-      cdoWarning("Time bounds unsupported by this operator, removed!");
-      taxisDeleteBounds(taxisID2);
-    }
+  if ( operatorID != SHIFTTIME )
+    if ( taxis_has_bounds && copy_timestep == FALSE )
+      {
+	cdoWarning("Time bounds unsupported by this operator, removed!");
+	taxisDeleteBounds(taxisID2);
+	taxis_has_bounds = FALSE;
+      }
 
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -363,25 +402,13 @@ void *Settime(void *argument)
 	}
       else if ( operatorID == SHIFTTIME )
 	{
-	  if ( tunit == TUNIT_MONTH || tunit == TUNIT_YEAR )
+	  shifttime(calendar, tunit, ijulinc, &vdate, &vtime);
+	  if ( taxis_has_bounds )
 	    {
-	      cdiDecodeDate(vdate, &year, &month, &day);
-	      
-	      month += ijulinc;
-
-	      while ( month > 12 ) { month -= 12; year++; }
-	      while ( month <  1 ) { month += 12; year--; }
-
-	      vdate = cdiEncodeDate(year, month, day);
-	    }
-	  else
-	    {
-	      juldate = juldate_encode(calendar, vdate, vtime);
-	      juldate = juldate_add_seconds(ijulinc, juldate);
-	      juldate_decode(calendar, juldate, &vdate, &vtime);
-	      if ( cdoVerbose )
-		cdoPrint("juldate, ijulinc, vdate, vtime: %g %d %d %d",
-			 juldate_to_seconds(juldate), ijulinc, vdate, vtime);
+	      taxisInqVdateBounds(taxisID1, &vdateb[0], &vdateb[1]);
+	      taxisInqVtimeBounds(taxisID1, &vtimeb[0], &vtimeb[1]);	      
+	      shifttime(calendar, tunit, ijulinc, &vdateb[0], &vtimeb[0]);
+	      shifttime(calendar, tunit, ijulinc, &vdateb[1], &vtimeb[1]);
 	    }
 	}
       else if ( operatorID == SETREFTIME || operatorID == SETCALENDAR || operatorID == SETTUNITS )
@@ -420,6 +447,11 @@ void *Settime(void *argument)
 
 	  taxisDefVdate(taxisID2, vdate);
 	  taxisDefVtime(taxisID2, vtime);
+	  if ( taxis_has_bounds )
+	    {
+	      taxisDefVdateBounds(taxisID2, vdateb[0], vdateb[1]);
+	      taxisDefVtimeBounds(taxisID2, vtimeb[0], vtimeb[1]);
+	    }
 	}
 
       streamDefTimestep(streamID2, tsID1);

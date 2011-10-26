@@ -1,3 +1,7 @@
+2011-10-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* shifttime: added support for time bounds
+
 2011-10-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added operator mod - modulo [request: Swantje Preuschmann]
