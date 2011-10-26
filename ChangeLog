@@ -1,6 +1,7 @@
 2011-10-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* shifttime: added support for time bounds
+	* setvrange: don't set the attribute valid_range
 
 2011-10-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
