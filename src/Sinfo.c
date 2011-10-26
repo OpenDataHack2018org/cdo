@@ -283,6 +283,9 @@ void *Sinfo(void *argument)
 			fprintf(stdout, "  Calendar = unknown");
 		    }
 
+		  if ( taxisHasBounds(taxisID) )
+		    fprintf(stdout, "  Bounds = true");
+
 		  fprintf(stdout, "\n");
 		}
 	    }
