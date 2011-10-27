@@ -32,7 +32,7 @@ as the size of the target grid description.
 
 @BeginDescription
 Sets the grid type of all input fields. The following grid types are available:
-@BeginList curvilinear
+@BeginList unstructured
 @Item = curvilinear
 Converts regular grid to curvilinear grid
 @Item = unstructured
