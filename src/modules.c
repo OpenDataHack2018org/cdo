@@ -845,7 +845,10 @@ int operatorInqModID(char *operatorName)
 	  if ( modID != -1 ) break;
 	}
     }
-  
+
+  if ( modID == -1 && *operatorName == 0 )
+    Error("Operator name missing!");
+
   if ( modID == -1 )
     {
       FILE *fp;
@@ -858,6 +861,7 @@ int operatorInqModID(char *operatorName)
 	  fprintf(stderr, "Use commandline option -h for help.");
 	  Error("operator missing! %s is a file on disk!", operatorName);
 	}
+
       fprintf(stderr, "Operator >%s< not found!\n", operatorName);
       fprintf(stderr, "Similar operators are:\n");
       nbyte = fprintf(stderr, "   ");
