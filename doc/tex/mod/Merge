@@ -23,6 +23,9 @@ The number of fields per time step written to @file{ofile}
 is the sum of the field numbers per time step in all input datasets.
 The time series on all input datasets are required to have different
 fields and the same number of time steps.
+The fields in each different input file either have to be different variables
+or different levels of the same variable. A mixture of different variables on
+different levels in different input files is not allowed.
 @EndDescription
 @EndOperator
 
