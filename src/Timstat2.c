@@ -26,7 +26,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#define  NWORK  5
 
 static
 int correlation(long gridsize, double missval1, double missval2, int *nofvals, 
@@ -35,10 +34,12 @@ int correlation(long gridsize, double missval1, double missval2, int *nofvals,
   long i;
   int nvals, nmiss = 0;
   double temp0, temp1, temp2, temp3, temp4, temp5, temp6;
+  double cor;
 
   for ( i = 0; i < gridsize; i++ )
     {	  
       nvals = nofvals[i];
+
       if ( nvals > 0 )
 	{
 	  temp0 = MUL(work0[i], work1[i]);
@@ -49,18 +50,20 @@ int correlation(long gridsize, double missval1, double missval2, int *nofvals,
 	  temp5 = SUB(work3[i], DIV(temp3, nvals));
 	  temp6 = MUL(temp4, temp5);
 
-	  work0[i] = DIV(temp1, SQRT(temp6));
+	  cor = DIV(temp1, SQRT(temp6));
 	  /*
-	    if      ( work0[i] < -1)  work0[i] = -1;
-	    else if ( work0[i] >  1)  work0[i] =  1;
+	    if      ( cor < -1)  cor = -1;
+	    else if ( cor >  1)  cor =  1;
 	  */
-	  if ( DBL_IS_EQUAL(work0[i], missval1) ) nmiss++;
+	  if ( DBL_IS_EQUAL(cor, missval1) ) nmiss++;
 	}
-      else if ( nvals <= 0 ) 
+      else
 	{
 	  nmiss++;
-	  work0[i] = missval1;
+	  cor = missval1;
 	}
+
+      work0[i] = cor;
     }
 
   return nmiss;
@@ -71,6 +74,7 @@ void *Timstat2(void *argument)
 {
   int operatorID;
   int operfunc;
+  int nwork = 0;
   int streamID1, streamID2, streamID3;
   int vdate = 0, vtime = 0;
   int nrecs, nrecs2, nrecs3, nvars, nlevs;
@@ -88,10 +92,14 @@ void *Timstat2(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("timcor", 2, 1, NULL);
+  cdoOperatorAdd("timcor",   func_cor,   0, NULL);
+  cdoOperatorAdd("timcovar", func_covar, 0, NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
+
+  if      ( operfunc == func_cor   ) nwork = 5;
+  else if ( operfunc == func_covar ) nwork = 3;
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   streamID2 = streamOpenRead(cdoStreamName(1));
@@ -138,8 +146,8 @@ void *Timstat2(void *argument)
 	  nofvals[varID][levelID] = (int *) malloc(gridsize*sizeof(int));
 	  memset(nofvals[varID][levelID], 0, gridsize*sizeof(int));
       
-	  work[varID][levelID] = (double **) malloc(NWORK*sizeof(double *));
-	  for ( i = 0; i < NWORK; i++ )
+	  work[varID][levelID] = (double **) malloc(nwork*sizeof(double *));
+	  for ( i = 0; i < nwork; i++ )
 	    {
 	      work[varID][levelID][i] = (double *) malloc(gridsize*sizeof(double));
 	      memset(work[varID][levelID][i], 0, gridsize*sizeof(double));
@@ -222,7 +230,7 @@ void *Timstat2(void *argument)
       for ( levelID = 0; levelID < nlevs; levelID++ )
 	{
 	  free(nofvals[varID][levelID]);
-	  for ( i = 0; i < NWORK; i++ )
+	  for ( i = 0; i < nwork; i++ )
 	    free(work[varID][levelID][i]);
 	  free(work[varID][levelID]);
 	}

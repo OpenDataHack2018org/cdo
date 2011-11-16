@@ -431,6 +431,7 @@ tan -tan \
 temp -temp \
 timavg -timavg \
 timcor -timcor \
+timcovar -timcovar \
 timmax -timmax \
 timmean -timmean \
 timmin -timmin \

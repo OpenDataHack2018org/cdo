@@ -412,7 +412,7 @@ void *Wct(void *argument);
 #define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monstd"}
 #define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "daystd"}
 #define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourstd"}
-#define  Timstat2Operators      {"timcor"}
+#define  Timstat2Operators      {"timcor", "timcovar"}
 #define  Timstat3Operators      {"meandiff2test", "varquot2test"}
 #define  TinfoOperators         {"tinfo"}
 #define  TocomplexOperators     {"retocomplex", "imtocomplex"}
