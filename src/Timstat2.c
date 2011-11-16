@@ -69,6 +69,40 @@ int correlation(long gridsize, double missval1, double missval2, int *nofvals,
   return nmiss;
 }
 
+static
+int covariance(long gridsize, double missval1, double missval2, int *nofvals, 
+	       double *work0, double *work1, double *work2)
+{
+  long i;
+  int nvals, nmiss = 0;
+  double temp;
+  double dnvals;
+  double covar;
+
+  for ( i = 0; i < gridsize; i++ )
+    {	  
+      nvals = nofvals[i];
+      dnvals = nvals;
+
+      if ( nvals > 0 )
+	{
+	  temp = DIV(MUL(work0[i], work1[i]), dnvals*dnvals);
+	  covar = SUB(DIV(work2[i], dnvals), temp);
+
+	  if ( DBL_IS_EQUAL(covar, missval1) ) nmiss++;
+	}
+      else
+	{
+	  nmiss++;
+	  covar = missval1;
+	}
+
+      work0[i] = covar;
+    }
+
+  return nmiss;
+}
+
 
 void *Timstat2(void *argument)
 {
@@ -181,20 +215,37 @@ void *Timstat2(void *argument)
 
 	  streamReadRecord(streamID1, array1, &nmiss);
 	  streamReadRecord(streamID2, array2, &nmiss);
-	      	     
-	  for ( i = 0; i < gridsize; i++)
+
+	  if ( operfunc == func_cor )
 	    {
-	      if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
-		   ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
+	      for ( i = 0; i < gridsize; i++)
 		{
-		  work[varID][levelID][0][i] += array1[i];
-		  work[varID][levelID][1][i] += array2[i];
-		  work[varID][levelID][2][i] += ( array1[i]*array1[i] );
-		  work[varID][levelID][3][i] += ( array2[i]*array2[i] );
-		  work[varID][levelID][4][i] += ( array1[i]*array2[i] );
-		  nofvals[varID][levelID][i]++;
-		}
-	    }	 
+		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
+		       ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
+		    {
+		      work[varID][levelID][0][i] += array1[i];
+		      work[varID][levelID][1][i] += array2[i];
+		      work[varID][levelID][2][i] += array1[i]*array1[i];
+		      work[varID][levelID][3][i] += array2[i]*array2[i];
+		      work[varID][levelID][4][i] += array1[i]*array2[i];
+		      nofvals[varID][levelID][i]++;
+		    }
+		}	 
+	    }
+	  else if ( operfunc == func_covar )
+	    {
+	      for ( i = 0; i < gridsize; i++)
+		{
+		  if ( ( ! DBL_IS_EQUAL(array1[i], missval1) ) && 
+		       ( ! DBL_IS_EQUAL(array2[i], missval2) ) )
+		    {
+		      work[varID][levelID][0][i] += array1[i];
+		      work[varID][levelID][1][i] += array2[i];
+		      work[varID][levelID][2][i] += array1[i]*array2[i];
+		      nofvals[varID][levelID][i]++;
+		    }
+		}	 
+	    }
 	}
 
       tsID++;
@@ -215,10 +266,19 @@ void *Timstat2(void *argument)
       missval1 = vlistInqVarMissval(vlistID1, varID);
       missval2 = vlistInqVarMissval(vlistID2, varID);
 
-      nmiss = correlation(gridsize, missval1, missval2, nofvals[varID][levelID],
-			  work[varID][levelID][0], work[varID][levelID][1],
-			  work[varID][levelID][2], work[varID][levelID][3], 
-			  work[varID][levelID][4]);
+      if ( operfunc == func_cor )
+	{
+	  nmiss = correlation(gridsize, missval1, missval2, nofvals[varID][levelID],
+			      work[varID][levelID][0], work[varID][levelID][1],
+			      work[varID][levelID][2], work[varID][levelID][3], 
+			      work[varID][levelID][4]);
+	}
+      else if ( operfunc == func_covar )
+	{
+	  nmiss = covariance(gridsize, missval1, missval2, nofvals[varID][levelID],
+			     work[varID][levelID][0], work[varID][levelID][1],
+			     work[varID][levelID][2]);
+	}
 
       streamDefRecord(streamID3, varID, levelID);
       streamWriteRecord(streamID3, work[varID][levelID][0], nmiss);

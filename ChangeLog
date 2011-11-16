@@ -1,3 +1,7 @@
+2011-11-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added operator timcovar - covariance over time
+
 2011-10-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* shifttime: added support for time bounds

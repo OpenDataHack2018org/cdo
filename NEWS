@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.5.4 (?? December 2011):
+
+   New operators:
+     * timcovar: covariance over time
+
 Version 1.5.3 (20 October 2011):
 
    New features:
