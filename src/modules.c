@@ -291,7 +291,7 @@ void *Wct(void *argument);
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
-#define  Fldstat2Operators      {"fldcor"}
+#define  Fldstat2Operators      {"fldcor", "fldcovar"}
 #define  FourierOperators       {"fourier"}
 #define  GatherOperators        {"gather"}
 #define  GengridOperators       {"gengrid"}
@@ -727,6 +727,8 @@ static char *opalias[][2] =
   {"anomaly",             "ymonsub"    },
   {"deltap_fl",           "deltap"     },
   {"diffv",               "diffn"      },
+  {"covar0",              "timcovar"   },
+  {"covar0r",             "fldcovar"   },
   {"ggstat",              "info"       },
   {"ggstats",             "sinfo"      },
   {"globavg",             "fldavg"     },

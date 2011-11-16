@@ -1,6 +1,7 @@
 2011-11-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator timcovar - covariance over time
+	* Added operator fldcovar - covariance in grid space
 
 2011-10-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

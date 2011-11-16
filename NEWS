@@ -5,6 +5,7 @@ Version 1.5.4 (?? December 2011):
 
    New operators:
      * timcovar: covariance over time
+     * fldcovar: covariance in grid space
 
 Version 1.5.3 (20 October 2011):
 

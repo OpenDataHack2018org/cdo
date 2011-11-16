@@ -26,10 +26,10 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-
+/* correlation in time */
 static
-int correlation(long gridsize, double missval1, double missval2, int *nofvals, 
-		double *work0, double *work1, double *work2, double *work3, double *work4)
+int correlation_t(long gridsize, double missval1, double missval2, int *nofvals, 
+		  double *work0, double *work1, double *work2, double *work3, double *work4)
 {
   long i;
   int nvals, nmiss = 0;
@@ -69,9 +69,10 @@ int correlation(long gridsize, double missval1, double missval2, int *nofvals,
   return nmiss;
 }
 
+/* covariance in time */
 static
-int covariance(long gridsize, double missval1, double missval2, int *nofvals, 
-	       double *work0, double *work1, double *work2)
+int covariance_t(long gridsize, double missval1, double missval2, int *nofvals, 
+		 double *work0, double *work1, double *work2)
 {
   long i;
   int nvals, nmiss = 0;
@@ -268,16 +269,16 @@ void *Timstat2(void *argument)
 
       if ( operfunc == func_cor )
 	{
-	  nmiss = correlation(gridsize, missval1, missval2, nofvals[varID][levelID],
-			      work[varID][levelID][0], work[varID][levelID][1],
-			      work[varID][levelID][2], work[varID][levelID][3], 
-			      work[varID][levelID][4]);
+	  nmiss = correlation_t(gridsize, missval1, missval2, nofvals[varID][levelID],
+				work[varID][levelID][0], work[varID][levelID][1],
+				work[varID][levelID][2], work[varID][levelID][3], 
+				work[varID][levelID][4]);
 	}
       else if ( operfunc == func_covar )
 	{
-	  nmiss = covariance(gridsize, missval1, missval2, nofvals[varID][levelID],
-			     work[varID][levelID][0], work[varID][levelID][1],
-			     work[varID][levelID][2]);
+	  nmiss = covariance_t(gridsize, missval1, missval2, nofvals[varID][levelID],
+			       work[varID][levelID][0], work[varID][levelID][1],
+			       work[varID][levelID][2]);
 	}
 
       streamDefRecord(streamID3, varID, levelID);

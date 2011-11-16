@@ -130,6 +130,7 @@ fdns \
 filedes \
 fldavg \
 fldcor \
+fldcovar \
 fldmax \
 fldmean \
 fldmin \
