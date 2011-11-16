@@ -107,7 +107,7 @@ cdo -f nc remapbil,r360x180 -import_cmsaf cmsaf_product.hdf output.nc
 If you work with CM-SAF data on original satellite project, an additional file
 with information on geolocation is required, to perform such spatial operations:
 @BeginVerbatim
-cdo -f nc remapbil,r720x360 -setgrid,cmsaf_latlon.h5 -import_cmsaf cmsaf.hdf output.nc
+cdo -f nc remapbil,r720x360 -setgrid,cmsaf_latlon.h5 -import_cmsaf cmsaf.hdf out.nc
 @EndVerbatim
 
 Some CM-SAF data are stored as scaled integer values. For some operations, it
