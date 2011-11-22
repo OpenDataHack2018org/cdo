@@ -26,6 +26,8 @@ config/mkinstalldirs -text
 /configure.ac -text
 contrib/Makefile.am -text
 contrib/Makefile.in -text
+contrib/cdo-examples.rb -text
+contrib/cdo.rb -text
 contrib/cdoCompletion.bash -text
 contrib/cdoCompletion.tcsh -text
 contrib/cdoCompletion.zsh -text
