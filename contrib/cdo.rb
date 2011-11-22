@@ -1,9 +1,4 @@
-require 'tempfile'
-require 'thread'
 require 'pp'
-require 'extcsv'
-require 'optparse'
-require 'json'
 
 # ==============================================================================
 # CDO calling mechnism
