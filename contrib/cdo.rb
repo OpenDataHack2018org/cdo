@@ -138,7 +138,7 @@ module MyTempfile
     @@persistent_tempfiles = value
   end
   def MyTempfile.path
-    unless @persistent_tempfiles
+    unless @@persistent_tempfiles
       t = Tempfile.new(self.class.to_s)
       @@_tempfiles << t
       t.path
