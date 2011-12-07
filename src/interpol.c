@@ -14,21 +14,21 @@ double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const do
   double value = 0;
 
   for ( jj = 1; jj < nym; jj++ )
+    if ( y >= MIN(ym[jj-1], ym[jj]) && y <= MAX(ym[jj-1], ym[jj]) ) break;
+
+  for ( ii = 1; ii < nxm; ii++ )
+    if ( x >= xm[ii-1] && x <= xm[ii] ) break;
+
+  if ( jj < nym && ii < nxm )
     {
-      if ( y < MIN(ym[jj-1], ym[jj]) || 
-	   y > MAX(ym[jj-1], ym[jj]) ) continue;
-      for ( ii = 1; ii < nxm; ii++ )
-	{
-	  if ( x < xm[ii-1] || x > xm[ii] ) continue;
-	  value = fieldm[jj-1][ii-1] * (x-xm[ii]) * (y-ym[jj])
-	              / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
-	        + fieldm[jj-1][ii] * (x-xm[ii-1]) * (y-ym[jj])
-                      / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]))
-                + fieldm[jj][ii-1] * (x-xm[ii]) * (y-ym[jj-1])
-                      / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
-                + fieldm[jj][ii] * (x-xm[ii-1]) * (y-ym[jj-1])
-	              / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
-	}
+      value = fieldm[jj-1][ii-1] * (x-xm[ii]) * (y-ym[jj])
+	          / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
+            + fieldm[jj-1][ii] * (x-xm[ii-1]) * (y-ym[jj])
+                  / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]))
+            + fieldm[jj][ii-1] * (x-xm[ii]) * (y-ym[jj-1])
+                  / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
+            + fieldm[jj][ii] * (x-xm[ii-1]) * (y-ym[jj-1])
+                  / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
     }
 
   return value;
@@ -40,7 +40,6 @@ void intlinarr2(double missval,
 		int nx, int ny, double **field, const double *x, const double *y)
 {
   int i, ii, j , jj;
-  double ymin, ymax;
 
   for ( j = 0; j < ny; j++ )
     for ( i = 0; i < nx; i++ )
@@ -51,15 +50,10 @@ void intlinarr2(double missval,
       for ( i = 0; i < nx; i++ )
 	{
 	  for ( jj = 1; jj < nym; jj++ )
-	    {
-	      ymin = MIN(ym[jj-1], ym[jj]);
-	      ymax = MAX(ym[jj-1], ym[jj]);
-	      if ( y[j] >= ymin && y[j] <= ymax ) break;
-	    }
+	    if ( y[j] >= MIN(ym[jj-1], ym[jj]) && y[j] <= MAX(ym[jj-1], ym[jj]) ) break;
+
 	  for ( ii = 1; ii < nxm; ii++ )
-	    {
-	      if ( x[i] >= xm[ii-1] && x[i] <= xm[ii] ) break;
-	    }
+	    if ( x[i] >= xm[ii-1] && x[i] <= xm[ii] ) break;
 
 	  if ( jj < nym && ii < nxm )
 	    {
