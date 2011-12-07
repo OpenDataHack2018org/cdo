@@ -47,16 +47,18 @@ void intlinarr2(double missval,
 
   for ( j = 0; j < ny; j++ )
     {
-      for ( i = 0; i < nx; i++ )
+      for ( jj = 1; jj < nym; jj++ )
+	if ( y[j] >= MIN(ym[jj-1], ym[jj]) && y[j] <= MAX(ym[jj-1], ym[jj]) ) break;
+
+      if ( jj < nym )
 	{
-	  for ( jj = 1; jj < nym; jj++ )
-	    if ( y[j] >= MIN(ym[jj-1], ym[jj]) && y[j] <= MAX(ym[jj-1], ym[jj]) ) break;
-
-	  for ( ii = 1; ii < nxm; ii++ )
-	    if ( x[i] >= xm[ii-1] && x[i] <= xm[ii] ) break;
-
-	  if ( jj < nym && ii < nxm )
+	  for ( i = 0; i < nx; i++ )
 	    {
+	      for ( ii = 1; ii < nxm; ii++ )
+		if ( x[i] >= xm[ii-1] && x[i] <= xm[ii] ) break;
+
+	      if ( ii < nxm )
+		{
 		  field[j][i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[j]-ym[jj])
 		                          / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
 		              + fieldm[jj-1][ii] * (x[i]-xm[ii-1]) * (y[j]-ym[jj])
@@ -65,6 +67,7 @@ void intlinarr2(double missval,
                                           / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
                               + fieldm[jj][ii] * (x[i]-xm[ii-1]) * (y[j]-ym[jj-1])
 	              	                  / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
+		}
 	    }
 	}
     }
