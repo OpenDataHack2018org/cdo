@@ -193,7 +193,7 @@ void *Splittime(void *argument)
   for ( index = 0; index < MAX_STREAMS; index++ )
     {
       streamID2 = streamIDs[index];
-      if ( streamID2 >= 0 )  streamClose(streamID2);
+      if ( streamID2 >= 0 ) streamClose(streamID2);
     }
  
   if ( ! lcopy )

@@ -46,21 +46,23 @@ void intlinarr2(double missval,
     for ( i = 0; i < nx; i++ )
       field[j][i] = missval;
 
-  for ( jj = 1; jj < nym; jj++ )
+  for ( j = 0; j < ny; j++ )
     {
-      ymin = MIN(ym[jj-1], ym[jj]);
-      ymax = MAX(ym[jj-1], ym[jj]);
-      for ( j = 0; j < ny; j++ )
+      for ( i = 0; i < nx; i++ )
 	{
-	  if ( y[j] < ymin || y[j] > ymax ) continue;
+	  for ( jj = 1; jj < nym; jj++ )
+	    {
+	      ymin = MIN(ym[jj-1], ym[jj]);
+	      ymax = MAX(ym[jj-1], ym[jj]);
+	      if ( y[j] >= ymin && y[j] <= ymax ) break;
+	    }
 	  for ( ii = 1; ii < nxm; ii++ )
 	    {
-#if defined (SX)
-#pragma vdir nodep
-#endif
-	      for ( i = 0; i < nx; i++ )
-		{
-		  if ( x[i] < xm[ii-1] || x[i] > xm[ii] ) continue;
+	      if ( x[i] >= xm[ii-1] && x[i] <= xm[ii] ) break;
+	    }
+
+	  if ( jj < nym && ii < nxm )
+	    {
 		  field[j][i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[j]-ym[jj])
 		                          / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
 		              + fieldm[jj-1][ii] * (x[i]-xm[ii-1]) * (y[j]-ym[jj])
@@ -68,8 +70,7 @@ void intlinarr2(double missval,
                               + fieldm[jj][ii-1] * (x[i]-xm[ii]) * (y[j]-ym[jj-1])
                                           / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
                               + fieldm[jj][ii] * (x[i]-xm[ii-1]) * (y[j]-ym[jj-1])
-	               	                  / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
-		}
+	              	                  / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
 	    }
 	}
     }
