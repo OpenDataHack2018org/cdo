@@ -1,3 +1,7 @@
+2011-12-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* pstreamCheckDatarange: use nint() to round smin and smax [report: Kristina Fröhlich]
+
 2011-11-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added operator timcovar - covariance over time

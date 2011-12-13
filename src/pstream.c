@@ -1150,10 +1150,13 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 
   smin = (arrmin - addoffset)/scalefactor;
   smax = (arrmax - addoffset)/scalefactor;
-  /* only for int's
-  smin = NINT(smin);
-  smax = NINT(smax);
-  */
+
+  if ( datatype == DATATYPE_INT8  || datatype == DATATYPE_UINT8 ||
+       datatype == DATATYPE_INT16 || datatype == DATATYPE_UINT16 )
+    {
+      smin = NINT(smin);
+      smax = NINT(smax);
+    }
 
   if      ( datatype == DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
   else if ( datatype == DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }

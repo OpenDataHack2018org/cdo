@@ -126,26 +126,30 @@ void *Settime(void *argument)
   int taxis_has_bounds, copy_timestep = FALSE;
   int calendar;
   int newcalendar = CALENDAR_STANDARD;
+  int nargs;
   const char *datestr, *timestr;
   juldate_t juldate;
   double *array = NULL;
 
   cdoInitialize(argument);
 
-  SETYEAR     = cdoOperatorAdd("setyear",     0,  0, "year");
-  SETMON      = cdoOperatorAdd("setmon",      0,  0, "month");
-  SETDAY      = cdoOperatorAdd("setday",      0,  0, "day");
-  SETDATE     = cdoOperatorAdd("setdate",     0,  0, "date (format: YYYY-MM-DD)");
-  SETTIME     = cdoOperatorAdd("settime",     0,  0, "time (format: hh:mm:ss)");
-  SETTUNITS   = cdoOperatorAdd("settunits",   0,  0, "time units (seconds, minutes, hours, days, months, years)");
-  SETTAXIS    = cdoOperatorAdd("settaxis",    0,  0, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
-  SETREFTIME  = cdoOperatorAdd("setreftime",  0,  0, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
-  SETCALENDAR = cdoOperatorAdd("setcalendar", 0,  0, "calendar (standard, proleptic, 360days, 365days, 366days)");
-  SHIFTTIME   = cdoOperatorAdd("shifttime",   0,  0, "shift value");
+  SETYEAR     = cdoOperatorAdd("setyear",     0,  1, "year");
+  SETMON      = cdoOperatorAdd("setmon",      0,  1, "month");
+  SETDAY      = cdoOperatorAdd("setday",      0,  1, "day");
+  SETDATE     = cdoOperatorAdd("setdate",     0,  1, "date (format: YYYY-MM-DD)");
+  SETTIME     = cdoOperatorAdd("settime",     0,  1, "time (format: hh:mm:ss)");
+  SETTUNITS   = cdoOperatorAdd("settunits",   0,  1, "time units (seconds, minutes, hours, days, months, years)");
+  SETTAXIS    = cdoOperatorAdd("settaxis",    0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
+  SETREFTIME  = cdoOperatorAdd("setreftime",  0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
+  SETCALENDAR = cdoOperatorAdd("setcalendar", 0,  1, "calendar (standard, proleptic, 360days, 365days, 366days)");
+  SHIFTTIME   = cdoOperatorAdd("shifttime",   0,  1, "shift value");
 
   operatorID = cdoOperatorID();
+  // nargs = cdoOperatorF2(operatorID);
 
   operatorInputArg(cdoOperatorEnter(operatorID));
+
+  //  if ( operatorArgc()
 
   if ( operatorID == SETTAXIS || operatorID == SETREFTIME )
     {
