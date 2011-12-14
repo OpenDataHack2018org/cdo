@@ -5,6 +5,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "grid.h"
+#include "util.h"  /* progressStatus */
 
 
 double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const double *ym,
@@ -34,12 +35,56 @@ double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const do
   return value;
 }
 
+static
+long find_element(double x, long nelem, const double *array)
+{
+  long ii;
+
+  if ( array[0] < array[nelem-1] )
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii-1] && x <= array[ii] ) break;
+    }
+  else
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii] && x <= array[ii-1] ) break;
+    }
+
+  return (ii);
+}
+
+static
+long find_element_fast(double x, long nelem, const double *array)
+{
+  long ii;
+
+  if ( array[0] < array[nelem-1] )
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii-1] && x <= array[ii] ) break;
+    }
+  else
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii] && x <= array[ii-1] ) break;
+    }
+
+  return (ii);
+}
+
 
 void intlinarr2(double missval,
-		int nxm, int nym,  double **fieldm, const double *xm, const double *ym,
-		int nx, int ny, double **field, const double *x, const double *y)
+		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
+		long nx, long ny, double **field, const double *x, const double *y)
 {
-  int i, ii, j , jj;
+  long i, ii, j , jj;
+  long gridsize;
+  double findex = 0;
+
+  progressInit();
+
+  gridsize = nx*ny;
 
   for ( j = 0; j < ny; j++ )
     for ( i = 0; i < nx; i++ )
@@ -47,15 +92,16 @@ void intlinarr2(double missval,
 
   for ( j = 0; j < ny; j++ )
     {
-      for ( jj = 1; jj < nym; jj++ )
-	if ( y[j] >= MIN(ym[jj-1], ym[jj]) && y[j] <= MAX(ym[jj-1], ym[jj]) ) break;
+      jj = find_element(y[j], nym, ym);
 
       if ( jj < nym )
 	{
 	  for ( i = 0; i < nx; i++ )
 	    {
-	      for ( ii = 1; ii < nxm; ii++ )
-		if ( x[i] >= xm[ii-1] && x[i] <= xm[ii] ) break;
+	      findex = j*nx + i + 1;
+	      progressStatus(0, 1, findex/gridsize);
+
+	      ii = find_element(x[i], nxm, xm);
 
 	      if ( ii < nxm )
 		{
@@ -71,6 +117,8 @@ void intlinarr2(double missval,
 	    }
 	}
     }
+ 
+  if ( findex < gridsize ) progressStatus(0, 1, 1);
 }
 
 
