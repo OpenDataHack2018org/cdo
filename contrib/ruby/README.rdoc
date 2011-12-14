@@ -1,0 +1,64 @@
+= Cdo.rb - Use Ruby to access the power of CDO
+
+This package contains the module Cdo, which implements a ruby style access to
+the Climate Data operators CDO. CDO is a command line tool for processing
+gridded data. Its main focus if climate data, but it can by used for other
+purposes to. It accepts input formats GRIB1, GRIB2, NetCDF and several Fortran
+binary formats.
+
+== Installation
+
+=== Gem Installation
+
+Download and installCdo with the following.
+
+   gem install cdo
+
+=== Requirements
+
+Cdo should with any ruby version
+
+== Usage
+
+=== Run operators
+
+* File information
+    
+    Cdo.infov
+    Cdo.showlevels
+
+* Operators with regular output files
+
+    Cdo.timmin
+
+* Operators with options
+
+    Cdo.remap
+
+* Set global CDO options
+
+   Cdo.copy
+
+=== Tempfile helpers
+
+
+== Support, Issues, Bugs, ...
+
+Please use the forum or ticket system of CDOs official web page: http://code.zmaw.de/projects/cdo
+
+== License
+
+Cdo.rb makes use of the GPLv2D License
+
+:include: COPYING
+
+
+---
+
+= Other stuff
+
+Author::   Ralf Mueller <stark.dreamdetective@gmail.com>
+Requires:: Ruby 1.9 or later
+License::  Copyright 2011 by Ralf Mueller
+           Released under GPLv2 license.  See the COPYING
+           file included in the distribution.

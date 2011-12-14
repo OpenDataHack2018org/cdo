@@ -1,0 +1,18 @@
+require 'rubygems'
+
+spec = Gem::Specification.new do |s|
+  s.name              = "cdo"
+  s.version           = '1.0.0'
+  s.platform          = Gem::Platform::RUBY
+  s.files             = ["lib/cdo.rb"] + ["gemspec","COPYING","README.rdoc"]
+  s.description       = "Easy access to the Climate Data operators"
+  s.summary           = "Easy access to the Climate Data operators"
+  s.author            = "Ralf Mueller"
+  s.email             = "stark.dreamdetective@gmail.com"
+  s.homepage          = "http://code.zmaw.de/projects/cdo"
+  s.extra_rdoc_files  = ["README.rdoc","COPYING"]
+  s.license           = "GPLv2"
+  s.required_ruby_version = ">= 1.9"
+end
+
+# vim:ft=ruby
