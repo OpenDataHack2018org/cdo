@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'cdo'
 # example for using the CDO-Ruby module
 
 # Calling simple operators
@@ -22,7 +23,7 @@ ths = []
     Cdo.selname(varname,:in => ifile,:out => varfile)
   }
 }
-ths.each {|th.join}
+ths.each {|th| th.join}
 # another example with sub:
 Cdo.sub(:in => [oldfile,newfile].join(' '), :out => diff)
 
@@ -78,7 +79,7 @@ Cdo.expr("'p=#{PRES_EXPR['geopotheight']}'", :in => ifile, :out => presFile)
 Cdo.expr("'t=#{TEMP_EXPR['geopotheight']}'", :in => ifile, :out => tempFile)
 Cdo.chainCall("setname,#{rho} -divc,#{C_R} -div",in: [presFile,tempFile].join(' '), out: densityFile)
 
-# For debugging, it is helpfull, to avaoid the autmatic cleanup at the end of the scripts:
+# For debugging, it is helpfull, to avoid the automatic cleanup at the end of the scripts:
 MyTempfile.setPersist(true)
 # creates randomly names files. Switch on debugging with 
 Cdo.Debug = true
