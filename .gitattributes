@@ -33,7 +33,6 @@ contrib/makecompl.rb -text
 contrib/ruby/README.rdoc -text
 contrib/ruby/gemspec -text
 contrib/ruby/lib/cdo.rb -text
-contrib/ruby/test/cdo-examples.rb -text
 contrib/ruby/test/test_cdo.rb -text
 doc/cdo.pdf -text
 doc/cdo_refcard.pdf -text
