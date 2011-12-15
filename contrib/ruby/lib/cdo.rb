@@ -114,7 +114,7 @@ module Cdo
     if getOperators.include?(sym.to_s) or @@undocumentedOperators.include?(sym.to_s)
       io = args.find {|a| a.class == Hash}
       args.delete_if {|a| a.class == Hash}
-      if /(info|show|griddes)/.match(sym)
+      if /(diff|info|show|griddes)/.match(sym)
         run(" -#{sym.to_s} #{io[:in]} ",$stdout)
       else
         opts = args.empty? ? '' : ',' + args.reject {|a| a.class == Hash}.join(',')

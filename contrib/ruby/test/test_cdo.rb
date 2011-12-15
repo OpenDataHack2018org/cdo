@@ -75,6 +75,14 @@ class TestJobQueue < Test::Unit::TestCase
     Cdo.chainCall("-setname,veloc -copy",:in => "-random,r1x1",:out => ofile,:options => "-f nc")
     assert_equal(["veloc"],Cdo.showname(:in => ofile))
   end
+
+  def test_diff
+    diffv = Cdo.diffv(:in => "-random,r1x1 -random,r1x1")
+    assert_equal(diffv[1].split(' ')[4],"random")
+    assert_equal(diffv[1].split(' ')[-1],"0.53060")
+    diff  = Cdo.diff(:in => "-random,r1x1 -random,r1x1")
+    assert_equal(diff[1].split(' ')[-1],"0.53060")
+  end
 end
 
 #  # Calling simple operators
