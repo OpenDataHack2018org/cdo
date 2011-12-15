@@ -960,6 +960,13 @@ void operatorPrintAll(void)
 	  opernames[nop++] = Modules[i].operators[j++];
 	}
     }
+  /*
+   * Add operator aliases
+   */
+  for ( i = 0; i < nopalias; i++ )
+    {
+      opernames[nop++] = opalias[i][0];
+    }
 
   qsort(opernames, nop, sizeof(char *), cmpname);
 
