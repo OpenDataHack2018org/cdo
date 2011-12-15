@@ -1,3 +1,12 @@
+2012-01-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.4
+	* Version 1.5.4 released
+
+2011-12-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* pipeInqVlist: use pthread_cond_timedwait to wait 30 sec (bug fix) [report: Carsten Ehbrecht]
+
 2011-12-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* pstreamCheckDatarange: use nint() to round smin and smax [report: Kristina Fröhlich]

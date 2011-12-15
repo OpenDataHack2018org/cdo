@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h> // gettimeofday
 #include "pipe.h"
 #include "pstream_int.h"
 #include <cdi.h>
@@ -166,18 +167,30 @@ int pipeInqVlist(pstream_t *pstreamptr)
 {
   char *pname = pstreamptr->name;
   pipe_t *pipe = pstreamptr->pipe;
-  int vlistID;
+  int vlistID = -1;
+  struct timeval now;
+  struct timespec timeout;
+  int retcode = 0;
 
   if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
   // LOCK
   pthread_mutex_lock(pipe->mutex);
-  while ( pstreamptr->vlistID == -1 )
+  gettimeofday(&now, NULL);
+  timeout.tv_sec = now.tv_sec + 30;  // wait 30 seconds
+  timeout.tv_nsec = now.tv_usec * 1000;
+  while ( pstreamptr->vlistID == -1 && retcode == 0 )
     {
       if ( PipeDebug ) Message("%s wait of vlistDef", pname);
-      pthread_cond_wait(pipe->vlistDef, pipe->mutex);
+      //      pthread_cond_wait(pipe->vlistDef, pipe->mutex);
+      retcode = pthread_cond_timedwait(pipe->vlistDef, pipe->mutex, &timeout);
     }
-  vlistID = pstreamptr->vlistID;
+
+  if ( retcode == 0 )
+    vlistID = pstreamptr->vlistID;
+  else if ( PipeDebug ) 
+    Message("%s timeout!", pname);
+
   pthread_mutex_unlock(pipe->mutex);
   // UNLOCK
 

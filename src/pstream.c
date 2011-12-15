@@ -885,7 +885,11 @@ int pstreamInqVlist(int pstreamID)
 
 #if  defined  (HAVE_LIBPTHREAD)
   if ( pstreamptr->ispipe )
-    vlistID = pipeInqVlist(pstreamptr);
+    {
+      vlistID = pipeInqVlist(pstreamptr);
+      if ( vlistID == -1 )
+	cdoAbort("Couldn't read data from input stream %s!", pstreamptr->name);
+    }
   else
 #endif
     {
