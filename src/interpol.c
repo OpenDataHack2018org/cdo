@@ -8,10 +8,10 @@
 #include "util.h"  /* progressStatus */
 
 
-double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const double *ym,
+double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym,
 		   double x, double y)
 {
-  int ii, jj;
+  long ii, jj;
   double value = 0;
 
   for ( jj = 1; jj < nym; jj++ )
@@ -37,25 +37,6 @@ double intlinarr2p(int nxm, int nym, double **fieldm, const double *xm, const do
 
 static
 long find_element(double x, long nelem, const double *array)
-{
-  long ii;
-
-  if ( array[0] < array[nelem-1] )
-    {
-      for ( ii = 1; ii < nelem; ii++ )
-	if ( x >= array[ii-1] && x <= array[ii] ) break;
-    }
-  else
-    {
-      for ( ii = 1; ii < nelem; ii++ )
-	if ( x >= array[ii] && x <= array[ii-1] ) break;
-    }
-
-  return (ii);
-}
-
-static
-long find_element_fast(double x, long nelem, const double *array)
 {
   long ii;
 
@@ -137,14 +118,14 @@ double intlin(double x, double y1, double x1, double y2, double x2)
 }
 
 
-void intlinarr(int nxm, double *ym, double *xm, int nx, double *y, double *x)
+void intlinarr(long nxm, double *ym, double *xm, int nx, double *y, double *x)
 {
   /*
     xlinarr - lineare interpolation over 1D array
 
     Uwe Schulzweida  04/05/1995
   */
-  int j, jj;
+  long j, jj;
 
   for ( jj = 1; jj < nxm; jj++ )
     for ( j = 0; j < nx; j++ )
