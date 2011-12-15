@@ -40,6 +40,20 @@ class TestJobQueue < Test::Unit::TestCase
     assert_equal("File format: GRIB",info[0])
 
   end
+  def test_args
+    #Cdo.Debug = true
+    #MyTempfile.setPersist(true)
+    ofile0 = MyTempfile.path
+    ofile1 = MyTempfile.path
+    ofile2 = MyTempfile.path
+    ofile3 = MyTempfile.path
+    Cdo.stdatm(0,20,40,80,200,230,400,600,1100,:out => ofile0)
+    Cdo.intlevel(0,10,50,100,500,1000,  :in => ofile0,:out => ofile1)
+    Cdo.intlevel([0,10,50,100,500,1000],:in => ofile0,:out => ofile2)
+    Cdo.sub(:in => [ofile1,ofile2].join(' '),:out => ofile3)
+    info = Cdo.infon(:in => ofile3)
+    (1...info.size).each {|i| assert_equal(0.0,info[i].split[-1].to_f)}
+  end
   def test_operator_options
     ofile = MyTempfile.path
     targetLevels = [0,10,50,100,200,400,1000]
