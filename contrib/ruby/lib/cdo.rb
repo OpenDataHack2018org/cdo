@@ -63,7 +63,7 @@ module Cdo
       cmd << " 2>/dev/null"
       return IO.popen(cmd).read.split
     when nil
-      ofile = Tempfile.new("Ifs2Icon").path
+      ofile = Tempfile.new("Cdo.rb").path
     end
     cmd << "#{ofile}"
     call(cmd)
