@@ -169,7 +169,7 @@ int pipeInqVlist(pstream_t *pstreamptr)
   pipe_t *pipe = pstreamptr->pipe;
   int vlistID = -1;
   struct timeval now;
-  struct timespec timeout;
+  static struct timespec time_to_wait;
   int retcode = 0;
 
   if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
@@ -177,13 +177,13 @@ int pipeInqVlist(pstream_t *pstreamptr)
   // LOCK
   pthread_mutex_lock(pipe->mutex);
   gettimeofday(&now, NULL);
-  timeout.tv_sec = now.tv_sec + 30;  // wait 30 seconds
-  timeout.tv_nsec = now.tv_usec * 1000;
+  time_to_wait.tv_sec = now.tv_sec + 30;  // wait 30 seconds
+  time_to_wait.tv_nsec = now.tv_usec * 1000;
   while ( pstreamptr->vlistID == -1 && retcode == 0 )
     {
       if ( PipeDebug ) Message("%s wait of vlistDef", pname);
       //      pthread_cond_wait(pipe->vlistDef, pipe->mutex);
-      retcode = pthread_cond_timedwait(pipe->vlistDef, pipe->mutex, &timeout);
+      retcode = pthread_cond_timedwait(pipe->vlistDef, pipe->mutex, &time_to_wait);
     }
 
   if ( retcode == 0 )
