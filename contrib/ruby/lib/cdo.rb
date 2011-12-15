@@ -61,7 +61,7 @@ module Cdo
     case ofile
     when $stdout
       cmd << " 2>/dev/null"
-      return IO.popen(cmd).read.split
+      return IO.popen(cmd).readlines.map {|l| l.chomp.strip}
     when nil
       ofile = Tempfile.new("Cdo.rb").path
     end
