@@ -953,7 +953,6 @@ void operatorPrintAll(void)
 
   for ( i = 0; i < NumModules; i++ )
     {
-      if ( Modules[i].help == NULL ) continue;
       j = 0;
       while ( Modules[i].operators[j] )
 	{
