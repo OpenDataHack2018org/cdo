@@ -83,6 +83,15 @@ class TestJobQueue < Test::Unit::TestCase
     diff  = Cdo.diff(:in => "-random,r1x1 -random,r1x1")
     assert_equal(diff[1].split(' ')[-1],"0.53060")
   end
+
+  def test_bndLevels
+    ofile = MyTempfile.path
+    Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
+    assert_equal([0, 50.0, 150.0, 350.0, 650.0, 1100.0, 1700.0, 2500.0, 3500.0, 4500.0, 5500.0],
+                 Cdo.boundaryLevels(:in => "-selname,T #{ofile}"))
+    assert_equal([50.0, 100.0, 200.0, 300.0, 450.0, 600.0, 800.0, 1000.0, 1000.0, 1000.0],
+                 Cdo.thicknessOfLevels(:in => ofile))
+  end
 end
 
 #  # Calling simple operators

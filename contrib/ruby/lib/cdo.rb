@@ -88,7 +88,7 @@ module Cdo
   end
 
   def Cdo.boundaryLevels(args)
-    ilevels         = Cdo.showlevel(:in => args[:in]).map(&:to_f)
+    ilevels         = Cdo.showlevel(:in => args[:in])[0].split.map(&:to_f)
     bound_levels    = Array.new(ilevels.size+1)
     bound_levels[0] = 0
     (1..ilevels.size).each {|i| 
