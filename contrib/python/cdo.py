@@ -1,3 +1,7 @@
+from os import system,popen
+import re
+import subprocess
+
 method_dictionary = ["sinfov"]
 
 class Cdo(object):
@@ -27,8 +31,24 @@ class Cdo(object):
             # If the method isn't in our dictionary, act normal.
             raise AttributeError, method_name
 
-# Instantiate...
-cdo = Cdo()
+    def getOperators(self):
+      proc = subprocess.Popen(['cdo','-h'],stderr = subprocess.PIPE)
+      ret  = proc.communicate()
+      l    = ret[1].find("Operators:")
+      ops  = ret[1][l:-1].split("\n")[1:-1]
+      endI = ops.index('')
+      s    = ' '.join(ops[:endI]).strip()
+      s    = re.sub("\s+" , " ", s)
+      return s.split(" ")
 
-# Call an arbitrary method.
-cdo.sinfov(1,'str')
+
+if __name__ == '__main__':
+    cdo = Cdo()
+    s = cdo.getOperators()
+    print "#=============================================================="
+    for ss in s:
+      print "#=============================================================="
+      print ss
+
+    # Call an arbitrary method.
+    cdo.sinfov(1,'str')
