@@ -8,6 +8,82 @@
 #include "util.h"  /* progressStatus */
 
 
+/**
+* Find the interval i and i++ in which an element x fits
+* and return the bigger one of the interval borders.
+* @param *array sorted list
+* @param nelem  length of the sorted list
+* @param x      the element to find a position for 
+*
+* TODO: treat x which is an element of the list
+*/
+static
+long find_element(double x, long nelem, const double *array)
+{
+  long ii;
+  long mid = 0;
+  long first = 1;
+  long last = nelem;
+  static long iz = 0;
+
+  if ( array[0] < array[nelem-1] ) // ascending order
+    {
+      if ( x < array[0] || x > array[nelem-1] ) return (nelem);
+
+      /* find the interval (binary serach algorithm) */
+      for ( ii = 1; ii < nelem; ii++ )
+	{
+	  mid = first + ((last - first) / 2);
+      
+	  if ( x >= array[mid-1] && x <= array[mid] ) break;
+
+	  if ( array[mid] >= x )
+	    last = mid;
+	  else
+	    first = mid;
+	}
+    }
+  else
+    {
+      if ( x < array[nelem-1] || x > array[0] ) return (nelem);
+
+      /* find the interval (binary serach algorithm) */
+      for ( ii = 1; ii < nelem; ii++ )
+	{
+	  mid = first + ((last - first) / 2);
+      
+	  if ( x >= array[mid] && x <= array[mid-1] ) break;
+
+	  if ( array[mid] <= x )
+	    last = mid;
+	  else
+	    first = mid;
+	}
+    }
+
+  return (mid);
+}
+
+static
+long find_element_old(double x, long nelem, const double *array)
+{
+  long ii;
+
+  if ( array[0] < array[nelem-1] )
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii-1] && x <= array[ii] ) break;
+    }
+  else
+    {
+      for ( ii = 1; ii < nelem; ii++ )
+	if ( x >= array[ii] && x <= array[ii-1] ) break;
+    }
+
+  return (ii);
+}
+
+
 double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym,
 		   double x, double y)
 {
@@ -33,25 +109,6 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
     }
 
   return value;
-}
-
-static
-long find_element(double x, long nelem, const double *array)
-{
-  long ii;
-
-  if ( array[0] < array[nelem-1] )
-    {
-      for ( ii = 1; ii < nelem; ii++ )
-	if ( x >= array[ii-1] && x <= array[ii] ) break;
-    }
-  else
-    {
-      for ( ii = 1; ii < nelem; ii++ )
-	if ( x >= array[ii] && x <= array[ii-1] ) break;
-    }
-
-  return (ii);
 }
 
 
