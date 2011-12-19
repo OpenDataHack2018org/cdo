@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.4
 	* Version 1.5.4 released
 
+2011-12-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* timpctl: check index of bins (bug fix for NaNs) [report: Christopher Moseley]
+
 2011-12-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* pipeInqVlist: use pthread_cond_timedwait to wait 30 sec (bug fix) [report: Carsten Ehbrecht]
