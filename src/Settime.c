@@ -238,9 +238,9 @@ void *Settime(void *argument)
   else if ( operatorID == SETTUNITS )
     {
       int idum;
-      char *unit = operatorArgv()[0];
+      const char *timeunits = operatorArgv()[0];
       incperiod = 0;
-      get_tunits(unit, &incperiod, &idum, &tunit);
+      get_tunits(timeunits, &incperiod, &idum, &tunit);
     }
   else if ( operatorID == SETCALENDAR )
     {
