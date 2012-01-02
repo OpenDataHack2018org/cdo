@@ -183,11 +183,11 @@ void *Settime(void *argument)
 
       if ( operatorArgc() == 3 )
 	{
-	  char *unit = operatorArgv()[2];
-	  incperiod = atoi(unit);
-	  while ( isdigit((int) *unit) ) unit++;
+	  const char *timeunits = operatorArgv()[2];
+	  incperiod = (int)strtol(timeunits, NULL, 10);;
+	  while ( isdigit((int) *timeunits) ) timeunits++;
 
-	  get_tunits(unit, &incperiod, &incunit, &tunit);
+	  get_tunits(timeunits, &incperiod, &incunit, &tunit);
 	}
       /* increment in seconds */
       ijulinc = incperiod * incunit;
@@ -203,7 +203,8 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  newval = atoi(datestr);
+	  newval = (int)strtol(datestr, &rstr, 10);
+	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", datestr);
 	}
     }
   else if ( operatorID == SETTIME )
@@ -218,17 +219,18 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  newval = atoi(timestr);
+	  newval = (int)strtol(timestr, &rstr, 10);
+	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", timestr);
 	}
     }
   else if ( operatorID == SHIFTTIME )
     {
-      char *unit = operatorArgv()[0];
-      incperiod = atoi(unit);
-      if ( unit[0] == '-' || unit[0] == '+' ) unit++;
-      while ( isdigit((int) *unit) ) unit++;
+      const char *timeunits = operatorArgv()[0];
+      incperiod = (int)strtol(timeunits, NULL, 10);;
+      if ( timeunits[0] == '-' || timeunits[0] == '+' ) timeunits++;
+      while ( isdigit((int) *timeunits) ) timeunits++;
 
-      get_tunits(unit, &incperiod, &incunit, &tunit);
+      get_tunits(timeunits, &incperiod, &incunit, &tunit);
 
       /* increment in seconds */
       ijulinc = incperiod * incunit;
@@ -254,7 +256,8 @@ void *Settime(void *argument)
     }
   else
     {
-      newval = atoi(operatorArgv()[0]);
+      newval = (int)strtol(operatorArgv()[0], &rstr, 10);
+      if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", operatorArgv()[0]);
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
