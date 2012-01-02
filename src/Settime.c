@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -128,6 +128,7 @@ void *Settime(void *argument)
   int newcalendar = CALENDAR_STANDARD;
   int nargs;
   const char *datestr, *timestr;
+  char *rstr;
   juldate_t juldate;
   double *array = NULL;
 
@@ -165,7 +166,8 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  sdate = atoi(datestr);
+	  sdate = (int)strtol(datestr, &rstr, 10);
+	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", datestr);
 	}
 
       if ( strchr(timestr, ':') )
@@ -175,7 +177,8 @@ void *Settime(void *argument)
 	}
       else
 	{
-	  stime = atoi(timestr);
+	  stime = (int)strtol(timestr, &rstr, 10);
+	  if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", timestr);
 	}
 
       if ( operatorArgc() == 3 )
