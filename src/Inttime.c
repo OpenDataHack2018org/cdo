@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -91,21 +91,11 @@ void *Inttime(void *argument)
 
   if ( operatorArgc() == 3 )
     {
-      size_t len;
-      char *unit = operatorArgv()[2];
-      incperiod = atoi(unit);
-      while ( isdigit((int) *unit) ) unit++;
-      len = strlen(unit);
-      if ( len )
-	{
-	  if      ( memcmp(unit, "seconds", len) == 0 ) {incunit =     1; tunit = TUNIT_SECOND;}
-	  else if ( memcmp(unit, "minutes", len) == 0 ) {incunit =    60; tunit = TUNIT_MINUTE;}
-	  else if ( memcmp(unit, "hours", len)   == 0 ) {incunit =  3600; tunit = TUNIT_HOUR;  }
-	  else if ( memcmp(unit, "days", len)    == 0 ) {incunit = 86400; tunit = TUNIT_DAY;   }
-	  else if ( memcmp(unit, "months", len)  == 0 ) {incunit =     1; tunit = TUNIT_MONTH; }
-	  else if ( memcmp(unit, "years", len)   == 0 ) {incunit =    12; tunit = TUNIT_YEAR;  }
-	  else cdoAbort("unsupported time unit >%s<", unit);
-	}
+      const char *timeunits = operatorArgv()[2];
+      incperiod = (int)strtol(timeunits, NULL, 10);;
+      while ( isdigit((int) *timeunits) ) timeunits++;
+
+      get_tunits(timeunits, &incperiod, &incunit, &tunit);
     }
   /* increment in seconds */
   ijulinc = incperiod * incunit;
