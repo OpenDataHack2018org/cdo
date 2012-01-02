@@ -30,6 +30,9 @@
 #include "interpol.h"
 
 
+int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);
+
+
 void *Inttime(void *argument)
 {
   int streamID1, streamID2;
@@ -47,6 +50,7 @@ void *Inttime(void *argument)
   int *recVarID, *recLevelID;
   int **nmiss1, **nmiss2, nmiss3;
   const char *datestr, *timestr;
+  char *rstr;
   double missval1, missval2;
   juldate_t juldate1, juldate2, juldate;
   double fac1, fac2;
@@ -61,26 +65,28 @@ void *Inttime(void *argument)
   datestr = operatorArgv()[0];
   timestr = operatorArgv()[1];
 
-  if ( strchr(datestr, '-') == NULL )
-    {
-      vdate = atoi(datestr);
-    }
-  else
+  if ( strchr(datestr, '-') )
     {
       year = 1; month = 1; day = 1;
       sscanf(datestr, "%d-%d-%d", &year, &month, &day);
       vdate = cdiEncodeDate(year, month, day);
     }
-
-  if ( strchr(timestr, ':') == NULL )
-    {
-      vtime = atoi(timestr);
-    }
   else
+    {
+      vdate = (int)strtol(datestr, &rstr, 10);
+      if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", datestr);
+    }
+
+  if ( strchr(timestr, ':') )
     {
       hour = 0; minute = 0; second = 0;
       sscanf(timestr, "%d:%d:%d", &hour, &minute, &second);
       vtime = cdiEncodeTime(hour, minute, second);
+    }
+  else
+    {
+      vtime = (int)strtol(timestr, &rstr, 10);
+      if ( *rstr != 0 ) cdoAbort("Parameter string contains invalid characters: %s", timestr);
     }
 
   if ( operatorArgc() == 3 )
