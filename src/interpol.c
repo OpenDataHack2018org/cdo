@@ -1,6 +1,3 @@
-#include <string.h>
-#include <math.h>
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
