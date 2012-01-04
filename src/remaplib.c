@@ -49,10 +49,7 @@
 #  include "config.h"
 #endif
 
-#include <string.h>
 #include <limits.h>
-#include <float.h>
-#include <math.h>
 #include <time.h>
 
 #include <cdi.h>

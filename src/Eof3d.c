@@ -29,7 +29,7 @@
  */
 
 #if defined (_OPENMP)
-//#include <omp.h>
+#include <omp.h>
 #endif
 
 #include "cdi.h"
