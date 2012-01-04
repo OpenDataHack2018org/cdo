@@ -780,6 +780,11 @@ int main(int argc, char *argv[])
 	  cdoOverwriteMode = TRUE;
 	  break;
 	case 'P':
+	  if ( *cdoOptarg < '1' || *cdoOptarg > '9' )
+	    {
+	      fprintf(stderr, "Unexpected character in number of OpenMP threads (-P <nthreads>): %s!\n", cdoOptarg);
+	      exit(EXIT_FAILURE);
+	    }
 	  numThreads = atoi(cdoOptarg);
 	  break;
 	case 'p':
