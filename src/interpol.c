@@ -24,7 +24,6 @@ long find_element(double x, long nelem, const double *array)
   long mid = 0;
   long first = 1;
   long last = nelem;
-  static long iz = 0;
 
   if ( array[0] < array[nelem-1] ) // ascending order
     {
@@ -128,19 +127,28 @@ void intlinarr2(double missval,
     for ( i = 0; i < nx; i++ )
       field[j][i] = missval;
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, nx, ny, findex, gridsize)	\
+  private(j, i, jj, ii)				    \
+  schedule(dynamic,1)
+#endif
   for ( j = 0; j < ny; j++ )
     {
-      jj = find_element(y[j], nym, ym);
-
-      if ( jj < nym )
+      for ( i = 0; i < nx; i++ )
 	{
-	  for ( i = 0; i < nx; i++ )
+#if defined (_OPENMP)
+#pragma omp atomic
+#endif
+	  findex++;
+	  if ( ompNumThreads == 1 ) progressStatus(0, 1, findex/gridsize);
+
+	  jj = find_element(y[j], nym, ym);
+	  
+	  if ( jj < nym )
 	    {
-	      findex = j*nx + i + 1;
-	      progressStatus(0, 1, findex/gridsize);
-
 	      ii = find_element(x[i], nxm, xm);
-
+	      
 	      if ( ii < nxm )
 		{
 		  field[j][i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[j]-ym[jj])
