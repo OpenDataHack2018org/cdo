@@ -49,10 +49,6 @@
 #  include "config.h"
 #endif
 
-#if defined (_OPENMP)
-#  include <omp.h>
-#endif
-
 #include <string.h>
 #include <limits.h>
 #include <float.h>
