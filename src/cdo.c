@@ -232,7 +232,7 @@ void usage(void)
   operatorPrintAll();
 
   fprintf(stderr, "\n");
-  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2011 Uwe Schulzweida\n", VERSION);
+  fprintf(stderr, "  CDO version %s, Copyright (C) 2003-2012 Uwe Schulzweida\n", VERSION);
   //  fprintf(stderr, "  Available from <http://code.zmaw.de/projects/cdo>\n");
   fprintf(stderr, "  This is free software and comes with ABSOLUTELY NO WARRANTY\n");
   fprintf(stderr, "  Report bugs to <http://code.zmaw.de/projects/cdo>\n");
