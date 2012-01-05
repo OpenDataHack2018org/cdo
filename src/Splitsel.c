@@ -42,7 +42,7 @@ void *Splitsel(void *argument)
   int nmiss;
   int gridID;
   int nvars, nlevel;
-  int nconst, lconstout = FALSE;
+  int nconst;
 /*   int ndates = 0, noffset = 0, nskip = 0, nargc; */
   double ndates, noffset, nskip;
   int i2 = 0;
@@ -55,7 +55,6 @@ void *Splitsel(void *argument)
   int index = 0;
   int lcopy = FALSE;
   double missval;
-  double *single;
   double *array = NULL;
   field_t **vars = NULL;
 
@@ -102,7 +101,7 @@ void *Splitsel(void *argument)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
 
-  if ( ! lcopy )
+  //  if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
@@ -149,6 +148,14 @@ void *Splitsel(void *argument)
 	  cdoWarning("noffset is larger than number of timesteps!");
 	  goto LABEL_END;
 	}
+
+      if ( tsID == 0 && nconst )
+	for ( recID = 0; recID < nrecs; recID++ )
+	  {
+	    streamInqRecord(streamID1, &varID, &levelID);
+	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT )
+	      streamReadRecord(streamID1, vars[varID][levelID].ptr, &vars[varID][levelID].nmiss);
+	  }
     }
 
   index = 0;
@@ -167,7 +174,6 @@ void *Splitsel(void *argument)
 
       for ( ; nsets < (int)(ndates*(index+1)); nsets++ ) 
 	{
-
 	  nrecs = streamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 
@@ -178,12 +184,29 @@ void *Splitsel(void *argument)
 	  taxisCopyTimestep(taxisID2, taxisID1);
 	  streamDefTimestep(streamID2, tsID2);
 
+	  if ( tsID > 0 && tsID2 == 0 && nconst )
+	    {
+	      for ( varID = 0; varID < nvars; varID++ )
+		{
+		  if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT )
+		    {
+		      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+		      for ( levelID = 0; levelID < nlevel; levelID++ )
+			{
+			  streamDefRecord(streamID2, varID, levelID);
+			  nmiss = vars[varID][levelID].nmiss;
+			  streamWriteRecord(streamID2, vars[varID][levelID].ptr, nmiss);
+			}
+		    }
+		}
+	    }
+
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
 	      
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      streamDefRecord(streamID2,  varID,  levelID);
-	      if ( lcopy )
+	      if ( lcopy && !(tsID == 0 && nconst) )
 		{
 		  streamCopyRecord(streamID2, streamID1);
 		}
@@ -191,6 +214,17 @@ void *Splitsel(void *argument)
 		{
 		  streamReadRecord(streamID1, array, &nmiss);
 		  streamWriteRecord(streamID2, array, nmiss);
+
+		  if ( tsID == 0 && nconst )
+		    {
+		      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT )
+			{
+			  gridID  = vlistInqVarGrid(vlistID1, varID);
+			  gridsize = gridInqSize(gridID);
+			  memcpy(vars[varID][levelID].ptr, array, gridsize*sizeof(double));
+			  vars[varID][levelID].nmiss = nmiss;
+			}
+		    }
 		}
 	    }
 	  
@@ -221,8 +255,7 @@ void *Splitsel(void *argument)
 
   streamClose(streamID1);
  
-  if ( ! lcopy )
-    if ( array ) free(array);
+  if ( array ) free(array);
 
   if ( nconst )
     {

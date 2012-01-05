@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.4
 	* Version 1.5.4 released
 
+2012-01-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	splitsel: added support for constant fields [Bug #1701]
+
 2011-12-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* timpctl: check index of bins (bug fix for NaNs) [report: Christopher Moseley]
