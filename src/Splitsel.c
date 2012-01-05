@@ -54,7 +54,6 @@ void *Splitsel(void *argument)
   char filename[8192];
   int index = 0;
   int lcopy = FALSE;
-  double missval;
   double *array = NULL;
   field_t **vars = NULL;
 
@@ -122,7 +121,6 @@ void *Splitsel(void *argument)
 	  if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT )
 	    {
 	      gridID  = vlistInqVarGrid(vlistID1, varID);
-	      missval = vlistInqVarMissval(vlistID1, varID);
 	      nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      gridsize = gridInqSize(gridID);
 		  
@@ -131,7 +129,6 @@ void *Splitsel(void *argument)
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
 		  vars[varID][levelID].grid    = gridID;
-		  vars[varID][levelID].missval = missval;
 		  vars[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 		}
 	    }

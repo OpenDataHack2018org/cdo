@@ -8,7 +8,7 @@ Version 1.5.4 (?? January 2012):
      * fldcovar: covariance in grid space
    Fixed bugs:
      * splitsel: added support for constant fields [Bug #1701]
-     * combination of selection commands (e.g. selmon -selyear) do not terminate, if no result found
+     * combination of selection commands (e.g. selmon -selyear) do not terminate, if no result found [Bug #1640]
 
 Version 1.5.3 (20 October 2011):
 

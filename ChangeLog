@@ -6,6 +6,7 @@
 2012-01-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	splitsel: added support for constant fields [Bug #1701]
+	Splittime added support for constant fields
 
 2011-12-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
