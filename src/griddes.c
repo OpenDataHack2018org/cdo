@@ -70,6 +70,7 @@ void gridInit(grid_t *grid)
   grid->size          = 0;
   grid->xsize         = 0;
   grid->ysize         = 0;
+  grid->np            = 0;
   grid->lcomplex      = 1;
   grid->xpole         = 0;
   grid->ypole         = 0;
@@ -191,6 +192,7 @@ int gridDefine(grid_t grid)
 
 	if ( grid.xsize > 0 ) gridDefXsize(gridID, grid.xsize);
 	if ( grid.ysize > 0 ) gridDefYsize(gridID, grid.ysize);
+	if ( grid.np    > 0 ) gridDefNP(gridID, grid.np);
 
 	gridDefPrec(gridID, grid.prec);
 
@@ -723,6 +725,10 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( cmpstr(pline, "truncation", len)  == 0 )
 	{
 	  grid.ntr = atoi(skipSeparator(pline + len));
+	}
+      else if ( cmpstr(pline, "np", len)  == 0 )
+	{
+	  grid.np = atoi(skipSeparator(pline + len));
 	}
       else if ( cmpstr(pline, "complexpacking", len)  == 0 )
 	{
@@ -1507,6 +1513,7 @@ int gridFromName(const char *gridname)
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
 	      grid.ysize = ntr2nlat_linear(grid.ntr);
+	      grid.np    = grid.ysize/2;
 	      if ( cmpstr(pline, "zon",  len) == 0 )
 		grid.xsize = 1;
 	      else
@@ -1534,6 +1541,7 @@ int gridFromName(const char *gridname)
 	  if ( grid.type == GRID_GAUSSIAN )
 	    {
 	      grid.ysize = ntr2nlat(grid.ntr);
+	      grid.np    = grid.ysize/2;
 	      if ( cmpstr(pline, "zon",  len) == 0 )
 		grid.xsize = 1;
 	      else
@@ -1613,12 +1621,13 @@ int gridFromName(const char *gridname)
       pline = &gridname[1];
       if ( isdigit((int) *pline) )
 	{
-	  int n;
-	  n = atoi(pline);
+	  int np;
+	  np = atoi(pline);
 	  while ( isdigit((int) *pline) ) pline++;
 
 	  grid.type = GRID_GAUSSIAN;
-	  grid.ysize = n*2;
+	  grid.np    = np;
+	  grid.ysize = np*2;
 	  grid.xsize = compNlon(grid.ysize);
 
 	  if ( cmpstr(pline, "zon",  len) == 0 ) 
