@@ -11,6 +11,7 @@ int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
 int gridToUnstructured(int gridID);
 int gridToCurvilinear(int gridID);
+int gridCurvilinearToRegular(int gridID);
 int gridToRegular(int gridID);
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss);
 

@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -578,6 +578,7 @@ int check_range(long n, double *vals, double valid_min, double valid_max)
   return (status);
 }
 
+
 int gridToCurvilinear(int gridID1)
 {
   int gridID2;
@@ -1054,6 +1055,94 @@ int gridToUnstructured(int gridID1)
 	break;
       }
     }
+
+  return (gridID2);
+}
+
+
+int gridCurvilinearToRegular(int gridID1)
+{
+  int gridID2 = -1;
+  int gridtype, gridsize;
+  long index;
+  long i, j;
+  int nx, ny;
+  int lx = TRUE, ly = TRUE;
+  double *xvals = NULL, *yvals = NULL;
+  double *xvals2D = NULL, *yvals2D = NULL;
+	
+  gridtype = gridInqType(gridID1);
+  gridsize = gridInqSize(gridID1);
+
+  if ( gridtype != GRID_CURVILINEAR ) return (gridID2);
+
+  nx = gridInqXsize(gridID1);
+  ny = gridInqYsize(gridID1);
+	
+  xvals2D = (double *) malloc(gridsize*sizeof(double));
+  yvals2D = (double *) malloc(gridsize*sizeof(double));
+
+  gridInqXvals(gridID1, xvals2D);
+  gridInqYvals(gridID1, yvals2D);
+
+  xvals = (double *) malloc(nx*sizeof(double));
+  yvals = (double *) malloc(ny*sizeof(double));
+
+  gridInqXvals(gridID1, xvals);
+  gridInqYvals(gridID1, yvals);
+
+  for ( i = 0; i < nx; i++ ) xvals[i] = xvals2D[i];
+  for ( j = 0; j < ny; j++ ) yvals[j] = yvals2D[j*nx];
+
+  for ( j = 1; j < ny; j++ )
+    for ( i = 0; i < nx; i++ )
+      {
+	if ( IS_NOT_EQUAL(xvals[i], xvals2D[j*nx+i]) )
+	  {
+	    lx = FALSE;
+	    j = ny;
+	    break;
+	  }
+      }
+	
+  for ( i = 1; i < nx; i++ )
+    for ( j = 0; j < ny; j++ )
+      {
+	if ( IS_NOT_EQUAL(yvals[j], yvals2D[j*nx+i]) )
+	  {
+	    ly = FALSE;
+	    i = nx;
+	    break;
+	  }
+      }
+
+  free(xvals2D);
+  free(yvals2D);
+
+  if ( lx && ly )
+    {
+      char xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
+      
+      gridID2  = gridCreate(GRID_LONLAT, gridsize);
+      gridDefXsize(gridID2, nx);
+      gridDefYsize(gridID2, ny);
+      
+      //  gridDefPrec(gridID2, DATATYPE_FLT32);
+
+      gridInqXunits(gridID1, xunits);
+      gridInqYunits(gridID1, yunits);
+
+      gridToDegree(xunits, "grid1 center lon", nx, xvals);
+      gridToDegree(yunits, "grid1 center lat", ny, yvals);
+
+      gridDefXvals(gridID2, xvals);
+      gridDefYvals(gridID2, yvals);
+    }
+  /*
+  */
+
+  free(xvals);
+  free(yvals);
 
   return (gridID2);
 }

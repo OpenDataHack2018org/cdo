@@ -259,6 +259,11 @@ void *Setgrid(void *argument)
 		  gridID2 = referenceToGrid(gridID1);
 		  if ( gridID2 == -1 ) cdoAbort("grid reference not found!");
  		}
+	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_CURVILINEAR )
+		{
+		  gridID2 = gridCurvilinearToRegular(gridID1);
+		  if ( gridID2 == -1 ) cdoAbort("No regular grid found!");
+		}
 	      else cdoAbort("Unsupported grid name: %s", gridname);
 	    }
 
