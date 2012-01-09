@@ -6,13 +6,17 @@
 
 
 /**
-* Find the interval i and i++ in which an element x fits
-* and return the bigger one of the interval borders.
-* @param *array sorted list
+* Find the interval i-1 .. i in which an element x fits
+* and return i, the bigger one of the interval borders
+* or x itself if it is an interval border.
+* If the index of x is 0, return 1, thus the bigger border. (strange?)
+*
+* If no interval can be found return the length of the array.
+* TODO: Check whether the as strange marked behavior is intended.
+
+* @param *array ascending sorted list        TODO: check whether descending also needed
 * @param nelem  length of the sorted list
 * @param x      the element to find a position for 
-*
-* TODO: treat x which is an element of the list
 */
 static
 long find_element(double x, long nelem, const double *array)
@@ -24,36 +28,46 @@ long find_element(double x, long nelem, const double *array)
 
   if ( array[0] < array[nelem-1] ) // ascending order
     {
+      /* return the length of the array if x is out of bounds */
       if ( x < array[0] || x > array[nelem-1] ) return (nelem);
 
-      /* find the interval (binary serach algorithm) */
+      /* search for the interval in which x fits */
+      // implementation: binary search algorithm
       for ( ii = 1; ii < nelem; ii++ )
 	{
+	  // binary search: divide search room in the middle
 	  mid = first + ((last - first) / 2);
       
+	  /* return the bigger interval border of the interval in which x fits */
 	  if ( x >= array[mid-1] && x <= array[mid] ) break;
 
-	  if ( array[mid] >= x )
-	    last = mid;
-	  else
+	  // binary search: ignore half of the search room
+	  if ( x > array[mid] )
 	    first = mid;
+	  else
+	    last = mid;
 	}
     }
   else
     {
+      /* return the length of the array if x is out of bounds */
       if ( x < array[nelem-1] || x > array[0] ) return (nelem);
 
-      /* find the interval (binary serach algorithm) */
+      /* search for the interval in which x fits */
+      // implementation: binary search algorithm
       for ( ii = 1; ii < nelem; ii++ )
 	{
+	  // binary search: divide search room in the middle
 	  mid = first + ((last - first) / 2);
       
+	  /* return the bigger interval border of the interval in which x fits */
 	  if ( x >= array[mid] && x <= array[mid-1] ) break;
 
-	  if ( array[mid] <= x )
-	    last = mid;
-	  else
+	  // binary search: ignore half of the search room
+	  if ( x < array[mid] )
 	    first = mid;
+	  else
+	    last = mid;
 	}
     }
 
