@@ -31,6 +31,8 @@ contrib/cdoCompletion.tcsh -text
 contrib/cdoCompletion.zsh -text
 contrib/makecompl.rb -text
 contrib/python/cdo.py -text
+contrib/python/test/cdo.py -text
+contrib/python/test/test_cdo.py -text
 contrib/ruby/README.rdoc -text
 contrib/ruby/gemspec -text
 contrib/ruby/lib/cdo.rb -text
