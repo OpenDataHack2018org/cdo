@@ -2,9 +2,9 @@ require 'rubygems'
 
 spec = Gem::Specification.new do |s|
   s.name              = "cdo"
-  s.version           = '1.0.1'
+  s.version           = '1.0.2'
   s.platform          = Gem::Platform::RUBY
-  s.files             = ["lib/cdo.rb"] + ["gemspec","COPYING","README.rdoc"]
+  s.files             = ["lib/cdo.rb"] + ["gemspec","COPYING","README.rdoc","ChangeLog"]
   s.test_file         = "test/test_cdo.rb"
   s.description       = "Easy access to the Climate Data operators"
   s.summary           = "Easy access to the Climate Data operators"
