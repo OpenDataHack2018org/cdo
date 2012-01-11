@@ -23,13 +23,6 @@ class Cdo(object):
         self.operators = self.getOperators()
     
     def __getattr__(self, method_name):
-        """
-            This is called every time a class method or property 
-            is checked and/or called.
-            
-            In here we'll return a new function to handle what we
-            want to do.
-        """
         def get(self, *args,**kwargs):
             operator = [method_name]
             if args.__len__() != 0:
