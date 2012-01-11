@@ -78,7 +78,7 @@ class TestCdo < Test::Unit::TestCase
   end
 
   def test_diff
-    diffv = Cdo.diffv(:in => "-random,r1x1 -random,r1x1")
+    diffv = Cdo.diffn(:in => "-random,r1x1 -random,r1x1")
     assert_equal(diffv[1].split(' ')[4],"random")
     assert_equal(diffv[1].split(' ')[-1],"0.53060")
     diff  = Cdo.diff(:in => "-random,r1x1 -random,r1x1")
