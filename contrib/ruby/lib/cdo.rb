@@ -1,9 +1,24 @@
 require 'pp'
 
+# Copyright (C) 2011-2012 Ralf Mueller, ralf.mueller@zmaw.de
+# See COPYING file for copying and redistribution conditions.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
 # ==============================================================================
 # CDO calling mechnism
 module Cdo
-  State = {}
+  State = {
+    :debug => false,
+    :returnArray => false
+  }
   @@CDO = ENV['CDO'].nil? ? '/usr/bin/cdo' : ENV['CDO']
 
   # Only operators with documentation are accessible vie the build-in help.
@@ -17,6 +32,24 @@ module Cdo
   def Cdo.Debug
     State[:debug]
   end
+  def Cdo.returnArray=(value)
+    if value
+      begin
+        require "numru/netcdf"
+        include NumRu
+        State[:returnArray] = true
+
+      rescue LoadError
+        warn "Could not load ruby's netcdf bindings. Please install it."
+        raise
+      end
+    else
+      State[:returnArray] = value
+    end
+  end
+  def Cdo.returnArray
+    State[:returnArray]
+  end
 
   # test if @@CDO can be used
   def Cdo.checkCdo
@@ -28,12 +61,10 @@ module Cdo
       puts IO.popen(@@CDO + " -V").readlines
     end
   end
-
   def Cdo.setCdo(cdo)
     puts "Will use #{cdo} instead of #@@CDO" if Cdo.Debug
     @@CDO = cdo
   end
-
 
   def Cdo.getOperators
     cmd       = @@CDO + ' 2>&1'
@@ -67,7 +98,11 @@ module Cdo
     end
     cmd << "#{ofile}"
     call(cmd)
-    return ofile
+    if State[:returnArray]
+      return NetCDF.open(ofile)
+    else
+      return ofile
+    end
   end
 
   # Call an operator chain without checking opeartors

@@ -92,6 +92,16 @@ class TestJobQueue < Test::Unit::TestCase
     assert_equal([50.0, 100.0, 200.0, 300.0, 450.0, 600.0, 800.0, 1000.0, 1000.0, 1000.0],
                  Cdo.thicknessOfLevels(:in => ofile))
   end
+
+  def test_returnArray
+    ofile = MyTempfile.path
+    vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
+    assert_equal(ofile,vals)
+    Cdo.returnArray = true
+    vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
+    assert_equal(["lon","lat","level","P","T"],vals.var_names)
+    assert_equal(276,vals.var("T").get.flatten.mean.floor)
+  end
 end
 
 #  # Calling simple operators
