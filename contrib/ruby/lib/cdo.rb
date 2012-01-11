@@ -26,6 +26,36 @@ module Cdo
   @@undocumentedOperators = %w[geopotheight pressure_fl pressure_hl]
   @@addOperators          = %w[boundaryLevels thicknessOfLevels]
 
+  private
+  def Cdo.call(cmd)
+    if (State[:debug])
+      puts '# DEBUG ====================================================================='
+      puts cmd
+      puts '# DEBUG ====================================================================='
+      puts IO.popen(cmd).read
+    else
+      system(cmd + ' 1>/dev/null 2>&1 ')
+    end
+  end
+  def Cdo.run(cmd,ofile=nil,options='')
+    cmd = "#{@@CDO} -O #{options} #{cmd} "
+    case ofile
+    when $stdout
+      cmd << " 2>/dev/null"
+      return IO.popen(cmd).readlines.map {|l| l.chomp.strip}
+    when nil
+      ofile = Tempfile.new("Cdo.rb").path
+    end
+    cmd << "#{ofile}"
+    call(cmd)
+    if State[:returnArray]
+      return NetCDF.open(ofile)
+    else
+      return ofile
+    end
+  end
+
+  public
   def Cdo.Debug=(value)
     State[:debug] = value
   end
@@ -77,33 +107,6 @@ module Cdo
       help[help.index("Operators:")+1].split
     end
   end
-  def Cdo.call(cmd)
-    if (State[:debug])
-      puts '# DEBUG ====================================================================='
-      puts cmd
-      puts '# DEBUG ====================================================================='
-      puts IO.popen(cmd).read
-    else
-      system(cmd + ' 1>/dev/null 2>&1 ')
-    end
-  end
-  def Cdo.run(cmd,ofile=nil,options='')
-    cmd = "#{@@CDO} -O #{options} #{cmd} "
-    case ofile
-    when $stdout
-      cmd << " 2>/dev/null"
-      return IO.popen(cmd).readlines.map {|l| l.chomp.strip}
-    when nil
-      ofile = Tempfile.new("Cdo.rb").path
-    end
-    cmd << "#{ofile}"
-    call(cmd)
-    if State[:returnArray]
-      return NetCDF.open(ofile)
-    else
-      return ofile
-    end
-  end
 
   # Call an operator chain without checking opeartors
   def Cdo.chainCall(chain,*args)
@@ -120,26 +123,6 @@ module Cdo
       opts = args.empty? ? '' : ',' + args.reject {|a| a.class == Hash}.join(',')
       Cdo.run(" #{chain}#{opts} #{io[:in]} ",io[:out],io[:options])
     end
-  end
-
-  def Cdo.boundaryLevels(args)
-    ilevels         = Cdo.showlevel(:in => args[:in])[0].split.map(&:to_f)
-    bound_levels    = Array.new(ilevels.size+1)
-    bound_levels[0] = 0
-    (1..ilevels.size).each {|i| 
-      bound_levels[i] =bound_levels[i-1] + 2*(ilevels[i-1]-bound_levels[i-1])
-    }
-    bound_levels
-  end
-
-  def Cdo.thicknessOfLevels(args)
-    bound_levels = Cdo.boundaryLevels(args)
-    delta_levels    = []
-    bound_levels.each_with_index {|v,i| 
-      next if i == 0
-      delta_levels << v - bound_levels[i-1]
-    }
-    delta_levels
   end
 
   def Cdo.method_missing(sym, *args, &block)
@@ -159,7 +142,32 @@ module Cdo
       warn "Operator #{sym.to_s} not found"
     end
   end
+
+  #==================================================================
+  # Addional operotors:
+  #------------------------------------------------------------------
+  def Cdo.boundaryLevels(args)
+    ilevels         = Cdo.showlevel(:in => args[:in])[0].split.map(&:to_f)
+    bound_levels    = Array.new(ilevels.size+1)
+    bound_levels[0] = 0
+    (1..ilevels.size).each {|i| 
+      bound_levels[i] =bound_levels[i-1] + 2*(ilevels[i-1]-bound_levels[i-1])
+    }
+    bound_levels
+  end
+
+  def Cdo.thicknessOfLevels(args)
+    bound_levels = Cdo.boundaryLevels(args)
+    delta_levels    = []
+    bound_levels.each_with_index {|v,i| 
+      next if i == 0
+      delta_levels << v - bound_levels[i-1]
+    }
+    delta_levels
+  end
 end
+
+# Helper module for easy temp file handling
 module MyTempfile
   require 'tempfile'
   @@_tempfiles           = []
