@@ -1,8 +1,9 @@
 $:.unshift File.join(File.dirname(__FILE__),"..","lib")
 require 'test/unit'
 require 'cdo'
+require 'pp'
 
-class TestJobQueue < Test::Unit::TestCase
+class TestCdo < Test::Unit::TestCase
 
   DEFAULT_CDO_PATH = '/usr/bin/cdo'
   def setup
@@ -101,6 +102,15 @@ class TestJobQueue < Test::Unit::TestCase
     vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
     assert_equal(["lon","lat","level","P","T"],vals.var_names)
     assert_equal(276,vals.var("T").get.flatten.mean.floor)
+  end
+  def test_combine
+    ofile0, ofile1 = MyTempfile.path, MyTempfile.path
+    Cdo.fldsum(:in => Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:options => "-f nc"),:out => ofile0)
+    ofile1 = Cdo.fldsum(:in => "-stdatm,25,100,250,500,875,1400,2100,3000,4000,5000",:options => "-f nc")
+    Cdo.returnArray = true
+    diff = Cdo.sub(:in => [ofile0,ofile1].join(' '),:out => MyTempfile.path).var('T').get
+    assert_equal(0.0,diff.min)
+    assert_equal(0.0,diff.max)
   end
 end
 
