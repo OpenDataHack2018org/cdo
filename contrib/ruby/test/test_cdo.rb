@@ -102,6 +102,7 @@ class TestCdo < Test::Unit::TestCase
     vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
     assert_equal(["lon","lat","level","P","T"],vals.var_names)
     assert_equal(276,vals.var("T").get.flatten.mean.floor)
+    Cdo.returnArray = false
   end
   def test_combine
     ofile0, ofile1 = MyTempfile.path, MyTempfile.path
@@ -111,6 +112,14 @@ class TestCdo < Test::Unit::TestCase
     diff = Cdo.sub(:in => [ofile0,ofile1].join(' '),:out => MyTempfile.path).var('T').get
     assert_equal(0.0,diff.min)
     assert_equal(0.0,diff.max)
+    Cdo.returnArray = false
+  end
+  def test_simple_returnArray
+    ofile0, ofile1 = MyTempfile.path, MyTempfile.path
+    sum = Cdo.fldsum(:in => Cdo.stdatm(0,:options => "-f nc"),
+               :returnArray => true).var("P").get
+    assert_equal(1013.25,sum.min)
+    test_returnArray
   end
 end
 

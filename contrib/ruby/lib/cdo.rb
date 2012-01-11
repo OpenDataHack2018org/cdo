@@ -37,7 +37,7 @@ module Cdo
       system(cmd + ' 1>/dev/null 2>&1 ')
     end
   end
-  def Cdo.run(cmd,ofile=nil,options='')
+  def Cdo.run(cmd,ofile=nil,options='',returnArray=false)
     cmd = "#{@@CDO} -O #{options} #{cmd} "
     case ofile
     when $stdout
@@ -48,7 +48,7 @@ module Cdo
     end
     cmd << "#{ofile}"
     call(cmd)
-    if State[:returnArray]
+    if State[:returnArray] or returnArray
       return NetCDF.open(ofile)
     else
       return ofile
@@ -136,7 +136,7 @@ module Cdo
         run(" -#{sym.to_s} #{io[:in]} ",$stdout)
       else
         opts = args.empty? ? '' : ',' + args.reject {|a| a.class == Hash}.join(',')
-        run(" -#{sym.to_s}#{opts} #{io[:in]} ",io[:out],io[:options])
+        run(" -#{sym.to_s}#{opts} #{io[:in]} ",io[:out],io[:options],io[:returnArray])
       end
     else
       warn "Operator #{sym.to_s} not found"
