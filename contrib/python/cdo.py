@@ -20,8 +20,11 @@ class Cdo(object):
         else:
           self.CDO = 'cdo'
 
-        self.operators = self.getOperators()
-    
+        self.operators   = self.getOperators()
+        self.returnArray = False
+
+        self.debug = False
+
     def __getattr__(self, method_name):
         def get(self, *args,**kwargs):
             operator = [method_name]
@@ -41,26 +44,48 @@ class Cdo(object):
             if not kwargs.__contains__("options"):
               kwargs["options"] = ""
 
+            if not kwargs.__contains__("returnArray"):
+              kwargs["returnArray"] = False
+
             call = [self.CDO,kwargs["options"],','.join(operator),' '.join(io)]
-            print ' '.join(call)
-            print 'before'
+
+            if self.debug:
+              print ' '.join(call)
 
             proc = subprocess.Popen(' '.join(call),
-                shell  = True,
-                stderr = subprocess.PIPE,
-                stdout = subprocess.PIPE)
+                                    shell  = True,
+                                    stderr = subprocess.PIPE,
+                                    stdout = subprocess.PIPE)
             retvals = proc.communicate()
-            print retvals[0]
-            print retvals[1]
+
+            if self.debug:
+              print retvals[0]
+              print retvals[1]
+
+            if re.search('(info|show|griddes)',method_name):
+              return retvals[1].split('\n')
+            else:
+              if self.returnArray or kwargs["returnArray"]:
+                if not self.returnArray:
+                  self.loadCdf()
+
+                return self.cdf(kwargs["output"])
+              else:
+                return kwargs["output"]
 
           
 
         
-        if method_name in self.operators:
-            return get.__get__(self)
+        if ((method_name in self.__dict__) or (method_name in self.operators)):
+          if self.debug:
+            print("Found method:" + method_name)
+
+          return get.__get__(self)
         else:
-            # If the method isn't in our dictionary, act normal.
-            raise AttributeError, method_name
+          # If the method isn't in our dictionary, act normal.
+          print("#=====================================================")
+          print("Cannot find method:" + method_name)
+          raise AttributeError, method_name
 
     def getOperators(self):
         proc = subprocess.Popen([self.CDO,'-h'],stderr = subprocess.PIPE,stdout = subprocess.PIPE)
@@ -72,16 +97,19 @@ class Cdo(object):
         s    = re.sub("\s+" , " ", s)
         return s.split(" ")
 
+    def loadCdf(self):
+      try:
+        import pycdf as cdf
+        self.returnArray = True
+        self.cdf         = cdf.CDF
+      except ImportError:
+        raise ImportError,"Module pycdf is required to return numpy arrays."
 
-if __name__ == '__main__':
-   cdo = Cdo()
-   print(cdo.CDO)
-   s = cdo.operators
-   # Call an arbitrary operator of CDO
-   cdo.sinfov(input="-topo",options="-f nc")
-   print "#=============================================================="
-   cdo.sinfov(input="-remapnn,r36x18 -topo",options="-f nc")
-   print "#==========================================================================================="
-   f = 'ofile.nc'
-   cdo.expr("'z=log(abs(topo+1))*9.81'",input="-topo",output = f,options="-f nc")
-   cdo.infov(input=f)
+    def setReturnArray(self,value=True):
+      self.returnArray = value
+      if value:
+        self.loadCdf()
+
+
+    def unsetReturnArray(self):
+      self.setReturnArray(False)

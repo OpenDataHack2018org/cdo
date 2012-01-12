@@ -48,10 +48,20 @@ module Cdo
     end
     cmd << "#{ofile}"
     call(cmd)
-    if State[:returnArray] or returnArray
+    if returnArray or State[:returnArray]
+      Cdo.loadCdf unless State[:returnArray]
       return NetCDF.open(ofile)
     else
       return ofile
+    end
+  end
+  def Cdo.loadCdf
+    begin
+      require "numru/netcdf"
+      include NumRu
+    rescue LoadError
+      warn "Could not load ruby's netcdf bindings. Please install it."
+      raise
     end
   end
 
@@ -62,20 +72,14 @@ module Cdo
   def Cdo.Debug
     State[:debug]
   end
-  def Cdo.returnArray=(value)
+  def Cdo.setReturnArray(value=true)
     if value
-      begin
-        require "numru/netcdf"
-        include NumRu
-        State[:returnArray] = true
-
-      rescue LoadError
-        warn "Could not load ruby's netcdf bindings. Please install it."
-        raise
-      end
-    else
-      State[:returnArray] = value
+      Cdo.loadCdf
     end
+    State[:returnArray] = value
+  end
+  def Cdo.unsetReturnArray
+    setReturnArray(false)
   end
   def Cdo.returnArray
     State[:returnArray]
