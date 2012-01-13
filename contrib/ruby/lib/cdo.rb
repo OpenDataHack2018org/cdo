@@ -21,10 +21,29 @@ module Cdo
   }
   @@CDO = ENV['CDO'].nil? ? '/usr/bin/cdo' : ENV['CDO']
 
-  # Only operators with documentation are accessible vie the build-in help.
-  # Other have to be added manually
-  @@undocumentedOperators = %w[geopotheight pressure_fl pressure_hl]
-  @@addOperators          = %w[boundaryLevels thicknessOfLevels]
+  # Since cdo-1.5.4 undocumented operators are given with the -h option. For
+  # earlier version, they have to be provided manually
+  @@undocumentedOperators = %w[anomaly beta boxavg change_e5lsm change_e5mask
+    change_e5slm chisquare chvar cloudlayer cmd com command complextorect
+    covar0 covar0r daycount daylogs del29feb delday delete deltap deltap_fl
+    delvar diffv divcoslat dumplogo dumplogs duplicate eca_r1mm enlargegrid
+    ensrkhistspace ensrkhisttime eof3d eof3dspatial eof3dtime export_e5ml
+    export_e5res fc2gp fc2sp fillmiss fisher fldcovar fldrms fourier fpressure
+    gather gengrid geopotheight ggstat ggstats globavg gp2fc gradsdes
+    gridverify harmonic hourcount hpressure ifs2icon import_e5ml import_e5res
+    import_obs imtocomplex infos infov interpolate intgrid intgridbil
+    intgridtraj intpoint isosurface lmavg lmean lmmean lmstd log lsmean
+    meandiff2test mergegrid mod moncount monlogs mrotuv mrotuvb mulcoslat ncode
+    ncopy nmltest normal nvar outputbounds outputboundscpt outputcenter
+    outputcenter2 outputcentercpt outputkey outputtri outputvector outputvrml
+    pardup parmul pinfo pinfov pressure_fl pressure_hl read_e5ml remapcon1
+    remapdis1 retocomplex scalllogo scatter seascount select selgridname
+    seloperator selvar selzaxisname setrcaname setvar showvar sinfov smemlogo
+    snamelogo sort sortcode sortlevel sortname sorttaxis sorttimestamp sortvar
+    sp2fc specinfo spectrum sperclogo splitvar stimelogo studentt template1
+    template2 test test2 testdata thinout timcount timcovar tinfo transxy trms
+    tstepcount vardes vardup varmul varquot2test varrms vertwind write_e5ml
+    writegrid writerandom yearcount]
 
   private
   def Cdo.call(cmd)
@@ -66,10 +85,10 @@ module Cdo
   end
 
   public
-  def Cdo.Debug=(value)
+  def Cdo.debug=(value)
     State[:debug] = value
   end
-  def Cdo.Debug
+  def Cdo.debug
     State[:debug]
   end
   def Cdo.setReturnArray(value=true)
@@ -96,7 +115,7 @@ module Cdo
     end
   end
   def Cdo.setCdo(cdo)
-    puts "Will use #{cdo} instead of #@@CDO" if Cdo.Debug
+    puts "Will use #{cdo} instead of #@@CDO" if Cdo.debug
     @@CDO = cdo
   end
 
@@ -105,35 +124,17 @@ module Cdo
     help      = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
     if 5 >= help.size
       warn "Operators could not get listed by running the CDO binary (#{@@CDO})"
-      pp help if Cdo.Debug
+      pp help if Cdo.debug
       exit
-    else
-      help[help.index("Operators:")+1].split
     end
-  end
-
-  # Call an operator chain without checking opeartors
-  def Cdo.chainCall(chain,*args)
-    io = args.find {|a| a.class == Hash}
-    args.delete_if {|a| a.class == Hash}
-
-    chain   = chain.strip
-    firstOp = chain
-    firstOp = chain[0...[chain.index(','),chain.index(' ')].min] unless chain.index(',').nil?
-    firstOp = firstOp[1..-1] if firstOp[0] == '-'
-    if /(info|show|griddes)/.match(firstOp)
-      Cdo.run(" #{chain} #{io[:in]} ",$stdout)
-    else
-      opts = args.empty? ? '' : ',' + args.reject {|a| a.class == Hash}.join(',')
-      Cdo.run(" #{chain}#{opts} #{io[:in]} ",io[:out],io[:options])
-    end
+    (help[help.index("Operators:")+1].split + @@undocumentedOperators).uniq
   end
 
   def Cdo.method_missing(sym, *args, &block)
     # args is expected to look like [opt1,...,optN,:in => iStream,:out => oStream] where
     # iStream could be another CDO call (timmax(selname(Temp,U,V,ifile.nc))
     puts "Operator #{sym.to_s} is called" if State[:debug]
-    if getOperators.include?(sym.to_s) or @@undocumentedOperators.include?(sym.to_s)
+    if getOperators.include?(sym.to_s)
       io = args.find {|a| a.class == Hash}
       args.delete_if {|a| a.class == Hash}
       if /(diff|info|show|griddes)/.match(sym)
@@ -164,7 +165,7 @@ module Cdo
     bound_levels = Cdo.boundaryLevels(args)
     delta_levels    = []
     bound_levels.each_with_index {|v,i| 
-      next if i == 0
+      next if 0 == i
       delta_levels << v - bound_levels[i-1]
     }
     delta_levels
@@ -176,6 +177,7 @@ module MyTempfile
   require 'tempfile'
   @@_tempfiles           = []
   @@persistent_tempfiles = false
+  @@N                    = 10000000
   def MyTempfile.setPersist(value)
     @@persistent_tempfiles = value
   end
@@ -185,7 +187,7 @@ module MyTempfile
       @@_tempfiles << t
       t.path
     else
-      t = "_"+rand(10000000).to_s
+      t = "_"+rand(@@N).to_s
       @@_tempfiles << t
       t
     end

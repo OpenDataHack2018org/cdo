@@ -28,9 +28,12 @@ class TestCdo < Test::Unit::TestCase
   end
 
   def test_getOperators
-    %w[for random stdatm info showlevel sinfo remap mask topo thicknessOfLevels].each {|op|
-      assert(Cdo.getOperators.include?(op),"Operator '#{op}' not found") unless op == "thicknessOfLevels"
-      assert(Cdo.respond_to?(op),"Operator '#{op}' not found") if op == "thicknessOfLevels"
+    %w[for random stdatm info showlevel sinfo remap geopotheight mask topo thicknessOfLevels].each {|op|
+      if ["thicknessOfLevels"].include?(op)
+        assert(Cdo.respond_to?(op),"Operator '#{op}' not found")
+      else
+        assert(Cdo.getOperators.include?(op))
+      end
     }
   end
   def test_info
@@ -39,7 +42,6 @@ class TestCdo < Test::Unit::TestCase
 
     info = Cdo.sinfo(:in => "-stdatm,0")
     assert_equal("File format: GRIB",info[0])
-
   end
   def test_args
     #Cdo.Debug = true
@@ -73,7 +75,7 @@ class TestCdo < Test::Unit::TestCase
   def test_chain
     ofile     = MyTempfile.path
     #Cdo.Debug = true
-    Cdo.chainCall("-setname,veloc -copy",:in => "-random,r1x1",:out => ofile,:options => "-f nc")
+    Cdo.setname('veloc',:in => " -copy -random,r1x1",:out => ofile,:options => "-f nc")
     assert_equal(["veloc"],Cdo.showname(:in => ofile))
   end
 
@@ -162,12 +164,6 @@ end
 #               warn "Wrong usage of variable identifier for '#{var}' (class #{var.class})!"
 #             end
 #  Cdo.send(operator,var,:in => @ifile, :out => varfile)
-#  
-#  # For chaining operators, there is a special method:
-#  Cdo.chainCall("-setname,veloc -copy",:in => ifile,:out => ofile,:options => "-f nc")
-#  #   another example with 3 operators and a different hash syntax
-#  C_R          = 287.05
-#  Cdo.chainCall("setname,#{rho} -divc,#{C_R} -div",in: [pressureFile,temperatureFile].join(' '), out: densityFile)
 #  
 #  # Pass an array for operators with multiple options:
 #  #   Perform conservative remapping with pregenerated weights
