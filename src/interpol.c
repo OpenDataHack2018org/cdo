@@ -121,7 +121,7 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
   return value;
 }
 
-
+static
 void intlinarr2(double missval,
 		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
 		long nx, long ny, double **field, const double *x, const double *y)

@@ -1138,8 +1138,6 @@ int gridCurvilinearToRegular(int gridID1)
       gridDefXvals(gridID2, xvals);
       gridDefYvals(gridID2, yvals);
     }
-  /*
-  */
 
   free(xvals);
   free(yvals);

@@ -1459,20 +1459,30 @@ int compNlon(int nlat)
   return (nlon);
 }
 
-
+static
 void gen_grid_lonlat(grid_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
   int nlon, nlat, i;
+  int gridtype = GRID_LONLAT;
+  char *endptr;
 
-  grid->type = GRID_LONLAT;
-  
-  if ( *pline == '_' ) pline++;
-
-  if ( isdigit((int) *pline) || ispunct((int) *pline) )
+  if ( *pline != 0 )
     {
-      inc = atof(pline);
+      if ( *pline == '_' ) pline++;
+      else return;
+
+      if ( *pline == 0 ) return;
+
+      if ( ! isdigit((int) *pline) && !ispunct((int) *pline) ) return;
+
+      endptr = (char *) pline;
+      inc = strtod(pline, &endptr);
+      if ( *endptr != 0 ) return;
+
       if ( inc < 1e-9 ) inc = 1;
     }
+
+  grid->type = gridtype;
 
   nlon = (int) ((lon2 - lon1)/inc + 0.5);
   nlat = (int) ((lat2 - lat1)/inc + 0.5);
