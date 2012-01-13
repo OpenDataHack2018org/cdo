@@ -660,7 +660,7 @@ void *Outputgmt(void *argument)
 
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
     {
-      gridID = gridToCurvilinear(gridID);
+      gridID = gridToCurvilinear(gridID, 1);
       lgrid_gen_bounds = TRUE;
     }
 

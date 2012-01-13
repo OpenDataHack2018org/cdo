@@ -750,7 +750,7 @@ void *Gradsdes(void *argument)
       fprintf(gdp, "PDEF %d %d lcc %g %g 1 1 %g %g %g %g %g\n", 
 	      xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
 
-      gridID = gridToCurvilinear(gridID);
+      gridID = gridToCurvilinear(gridID, 0);
       xvals = (double *) malloc(xsize*ysize*sizeof(double));
       yvals = (double *) malloc(xsize*ysize*sizeof(double));
       gridInqXvals(gridID, xvals);

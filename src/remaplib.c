@@ -1005,7 +1005,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	gridInqType(rg->gridID1) == GRID_LAEA || 
 	gridInqType(rg->gridID1) == GRID_SINUSOIDAL) )
     {
-      rg->gridID1 = gridID1 = gridToCurvilinear(rg->gridID1);
+      rg->gridID1 = gridID1 = gridToCurvilinear(rg->gridID1, 1);
     }
 
   if ( !rg->lextrapolate && gridInqSize(rg->gridID1) > 1 &&
@@ -1042,7 +1042,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       else
 	{
 	  lgrid1_destroy = TRUE;
-	  gridID1 = gridToCurvilinear(rg->gridID1);
+	  gridID1 = gridToCurvilinear(rg->gridID1, 1);
 	  lgrid1_gen_bounds = TRUE;
 	}
     }
@@ -1060,7 +1060,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       else
 	{
 	  lgrid2_destroy = TRUE;
-	  gridID2 = gridToCurvilinear(rg->gridID2);
+	  gridID2 = gridToCurvilinear(rg->gridID2, 1);
 	  lgrid2_gen_bounds = TRUE;
 	}
     }

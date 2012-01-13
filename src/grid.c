@@ -579,7 +579,7 @@ int check_range(long n, double *vals, double valid_min, double valid_max)
 }
 
 
-int gridToCurvilinear(int gridID1)
+int gridToCurvilinear(int gridID1, int lbounds)
 {
   int gridID2;
   int gridtype, gridsize;
@@ -688,6 +688,8 @@ int gridToCurvilinear(int gridID1)
 	if ( xvals2D ) free(xvals2D);
 	if ( yvals2D ) free(yvals2D);
 
+	if ( !lbounds ) goto NO_BOUNDS;
+
 	if ( gridtype == GRID_LCC )
 	  {		
 	    xbounds2D = (double *) malloc(4*gridsize*sizeof(double));
@@ -762,9 +764,6 @@ int gridToCurvilinear(int gridID1)
 		  gridGenYbounds(ny, yvals, ybounds);
 	      }
 
-	    if ( xvals ) free(xvals);
-	    if ( yvals ) free(yvals);
-
 	    if ( xbounds && ybounds )
 	      {
 		xbounds2D = (double *) malloc(4*gridsize*sizeof(double));
@@ -833,6 +832,11 @@ int gridToCurvilinear(int gridID1)
 		if ( ybounds2D) free(ybounds2D);
 	      }
 	  }
+
+      NO_BOUNDS:
+
+	if ( xvals ) free(xvals);
+	if ( yvals ) free(yvals);
 
 	gridCopyMask(gridID1, gridID2, gridsize);
 
@@ -1399,7 +1403,7 @@ int gridGenArea(int gridID, double *area)
       else
 	{
 	  lgriddestroy = TRUE;
-	  gridID = gridToCurvilinear(gridID);
+	  gridID = gridToCurvilinear(gridID, 1);
 	  lgrid_gen_bounds = TRUE;
 	}
     }

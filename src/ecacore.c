@@ -1052,7 +1052,7 @@ void eca4(const ECA_REQUEST_4 *request)
       if ( gridtype == GRID_GME )
         gridID = gridToUnstructured(gridID);
       else
-        gridID = gridToCurvilinear(gridID);
+        gridID = gridToCurvilinear(gridID, 1);
     }
   gridsize    = gridInqSize(gridID);
   /* for later check on northern\southern hemisphere */

@@ -280,7 +280,7 @@ void intgrid(field_t *field1, field_t *field2)
       double *lon2, *lat2;
 
       if ( gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR )
-	gridID2 = gridToCurvilinear(gridID2);
+	gridID2 = gridToCurvilinear(gridID2, 0);
 
       if ( ! (gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)) )
 	cdoAbort("Target grid has no values");

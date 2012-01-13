@@ -239,7 +239,7 @@ void *Setgrid(void *argument)
 	    {
 	      if      ( gridtype == GRID_CURVILINEAR  )
 		{
-		  gridID2 = gridToCurvilinear(gridID1);
+		  gridID2 = gridToCurvilinear(gridID1, 1);
 		}
 	      else if ( gridtype == GRID_UNSTRUCTURED )
 		{
