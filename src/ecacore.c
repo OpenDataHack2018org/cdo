@@ -1050,7 +1050,7 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( gridtype != GRID_UNSTRUCTURED && gridtype != GRID_CURVILINEAR ) 
     {
       if ( gridtype == GRID_GME )
-        gridID = gridToUnstructured(gridID);
+        gridID = gridToUnstructured(gridID, 1);
       else
         gridID = gridToCurvilinear(gridID, 1);
     }

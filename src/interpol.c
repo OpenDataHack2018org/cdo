@@ -209,7 +209,7 @@ void intgrid(field_t *field1, field_t *field2)
   int gridID1, gridID2;
   int i, nmiss;
   double *lon1, *lat1;
-  double **array1_2D;
+  double **array1_2D = NULL;
   double **field;
   double *array = NULL;
   double *array1, *array2;
@@ -234,6 +234,10 @@ void intgrid(field_t *field1, field_t *field2)
 
   nlon2 = gridInqXsize(gridID2);
   nlat2 = gridInqYsize(gridID2);
+
+  array1_2D = (double **) malloc(nlat1*sizeof(double *));
+  for ( ilat = 0; ilat < nlat1; ilat++ )
+    array1_2D[ilat] = array1 + ilat*nlon1;
 
   if ( nlon2 == 1 && nlat2 == 1 )
     {
@@ -279,6 +283,8 @@ void intgrid(field_t *field1, field_t *field2)
       int gridsize2;
       double *lon2, *lat2;
 
+      if ( gridInqType(gridID2) == GRID_GME ) gridID2 = gridToUnstructured(gridID2, 0);
+
       if ( gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR )
 	gridID2 = gridToCurvilinear(gridID2, 0);
 
@@ -291,10 +297,6 @@ void intgrid(field_t *field1, field_t *field2)
       lat2 = (double *) malloc(gridsize2*sizeof(double));
       gridInqXvals(gridID2, lon2);
       gridInqYvals(gridID2, lat2);
-
-      array1_2D = (double **) malloc(nlat1*sizeof(double *));
-      for ( ilat = 0; ilat < nlat1; ilat++ )
-	array1_2D[ilat] = array1 + ilat*nlon1;
 
       intlinarr2(missval,
 		 nlon1, nlat1, array1_2D, lon1, lat1,

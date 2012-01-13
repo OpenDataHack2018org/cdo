@@ -244,7 +244,7 @@ void *Setgrid(void *argument)
 	      else if ( gridtype == GRID_UNSTRUCTURED )
 		{
 		  if ( gridInqType(gridID1) == GRID_GME ) ligme = 1;
-		  gridID2 = gridToUnstructured(gridID1);
+		  gridID2 = gridToUnstructured(gridID1, 1);
 
 		  if ( ligme )
 		    {

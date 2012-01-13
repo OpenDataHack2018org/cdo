@@ -96,7 +96,7 @@ void *Arithlat(void *argument)
 		   gridtype == GRID_GAUSSIAN    ||
 		   gridtype == GRID_LCC )
 		{
-		  gridID = gridToCurvilinear(gridID, 1);
+		  gridID = gridToCurvilinear(gridID, 0);
 		}
 	      else if ( gridtype == GRID_CURVILINEAR ||
 			gridtype == GRID_UNSTRUCTURED )
@@ -105,7 +105,7 @@ void *Arithlat(void *argument)
 		}
 	      else if ( gridtype == GRID_GME )
 		{
-		  gridID = gridToUnstructured(gridID);
+		  gridID = gridToUnstructured(gridID, 0);
 		}
 	      else
 		{

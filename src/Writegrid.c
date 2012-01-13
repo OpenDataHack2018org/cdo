@@ -47,7 +47,7 @@ void *Writegrid(void *argument)
   gridtype = gridInqType(gridID);
   gridsize = gridInqSize(gridID);
 
-  if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID);
+  if ( gridtype == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
   if ( gridtype != GRID_CURVILINEAR && gridtype != GRID_UNSTRUCTURED )
     gridID = gridToCurvilinear(gridID, 1);

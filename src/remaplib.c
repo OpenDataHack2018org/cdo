@@ -1033,7 +1033,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     {
       if ( gridInqType(rg->gridID1) == GRID_GME )
 	{
-	  gridID1_gme = gridToUnstructured(rg->gridID1);
+	  gridID1_gme = gridToUnstructured(rg->gridID1, 1);
 	  rg->grid1_nvgp = gridInqSize(gridID1_gme);
 	  gridID1 = gridDuplicate(gridID1_gme);
 	  gridCompress(gridID1);
@@ -1051,7 +1051,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     {
       if ( gridInqType(rg->gridID2) == GRID_GME )
 	{
-	  gridID2_gme = gridToUnstructured(rg->gridID2);
+	  gridID2_gme = gridToUnstructured(rg->gridID2, 1);
 	  rg->grid2_nvgp = gridInqSize(gridID2_gme);
 	  gridID2 = gridDuplicate(gridID2_gme);
 	  gridCompress(gridID2);
@@ -7150,7 +7150,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( gridInqType(gridID1) == GRID_GME )
     {
       rg->grid1_nvgp = gridInqSize(gridID1);
-      gridID1_gme_c = gridToUnstructured(gridID1);
+      gridID1_gme_c = gridToUnstructured(gridID1, 1);
     }
 
   remapGridRealloc(rv->map_type, rg);

@@ -656,7 +656,7 @@ void *Outputgmt(void *argument)
   zaxisID = vlistInqVarZaxis(vlistID, varID);
   missval = vlistInqVarMissval(vlistID, varID);
 
-  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID);
+  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 1);
 
   if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
     {
