@@ -16,7 +16,7 @@ Note, that this operator calculates a weighted dot product of the fields in
 @file{ifile1} and @file{ifile2}.
 @IfDoc
 Given a set of EOFs @math{e_j} and a time series of data @math{z(t)} 
-with @math{p} entries for each time step from which @math{e_j} have been calculated, this 
+with @math{p} entries for each timestep from which @math{e_j} have been calculated, this 
 operator calculates the time series of the projections of data onto each EOF
 @BeginDisplayMath
 o_j(t) = \sum_{x=1}^{p} W(x,x) z(t,x)e_j(x)
@@ -34,7 +34,7 @@ with~\sum_{t=1}^{n}o_j(t)=0\forall j\in\{1,\ldots,p\}.
 There will be a separate file containing a time series of principal coefficients
 with time information from @file{ifile2} for each EOF in @file{ifile1}. Output files
 will be numbered as @file{<obase><neof><suffix>} where @file{neof+1} is the number of the
-EOF (time step) in @file{ifile1} and @file{suffix} is the filename extension derived from the file format. 
+EOF (timestep) in @file{ifile1} and @file{suffix} is the filename extension derived from the file format. 
 @EndDescription
 @EndModule
 

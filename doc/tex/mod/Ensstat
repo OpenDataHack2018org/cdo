@@ -13,7 +13,7 @@ Depending on the chosen operator the minimum, maximum, sum, average, variance,
 standard deviation, a certain percentile over all input files or a skill score is written
 to @file{ofile}.
 All input files need to have the same structure with the same variables.
-The date information of a time step in @file{ofile} is the date of the first input file.
+The date information of a timestep in @file{ofile} is the date of the first input file.
 @EndDescription
 @EndModule
 

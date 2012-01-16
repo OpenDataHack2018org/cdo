@@ -8,10 +8,10 @@
 @Operators = eca_rr1
 
 @BeginDescription
-Let @file{ifile} be a time series of daily precipitation amounts @math{RR}, then counted is the 
-number of days where @math{RR} is at least @math{R}. @math{R} is an optional parameter with 
-default @math{R = 1 mm}. The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile}.
+Let @file{ifile} be a time series of daily precipitation amounts @math{RR}, then the number of 
+days where @math{RR} is at least @math{R} is counted. @math{R} is an optional parameter with 
+default @math{R = 1 mm}. The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

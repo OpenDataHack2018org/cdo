@@ -1,13 +1,13 @@
 @BeginModule
 @NewPage
 @Name      = Splitsel
-@Title     = Split selected time steps
+@Title     = Split selected timesteps
 @Section   = File operations
 @Arguments = ifile obase
 @Operators = splitsel
 
 @C @BeginDescription
-@C This module splits time steps of a dataset to several files with names
+@C This module splits timesteps of a dataset to several files with names
 @C formed from the field header information and @file{obase}.
 @C @EndDescription
 @EndModule
@@ -19,7 +19,7 @@
 
 @BeginDescription
 This operator splits @file{ifile} into pieces, one for each adjacent
-sequence @math{t_1, ...., t_n} of time steps of the same selected time range.
+sequence @math{t_1, ...., t_n} of timesteps of the same selected time range.
 The output files will be named @file{<obase><nnnnnn><suffix>} where @file{nnnnnn} is the 
 sequence number and @file{suffix} is the filename extension derived from the file format.
 @EndDescription
@@ -36,9 +36,9 @@ Set this variable to NULL to disable the adding of a file suffix.
 
 @BeginParameter noffset
 @Item = nsets
-INTEGER  Number of input time steps for each output file
+INTEGER  Number of input timesteps for each output file
 @Item = noffset
-INTEGER  Number of input time steps skipped before the first time step range (optional)
+INTEGER  Number of input timesteps skipped before the first timestep range (optional)
 @Item = nskip
-INTEGER  Number of input time steps skipped between time step ranges (optional)
+INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @EndParameter

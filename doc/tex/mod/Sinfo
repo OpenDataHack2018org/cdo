@@ -10,7 +10,7 @@
 @BeginDescription
 This module writes information about the structure of @file{ifiles} to standard output.
 @file{ifiles} is an unlimited number of input files. All input files need to have 
-the same structure with the same variables on different time steps.
+the same structure with the same variables on different timesteps.
 The information displayed depends on the chosen operator.
 @EndDescription
 @EndModule
@@ -50,7 +50,7 @@ To print short information of a dataset use:
 @BeginVerbatim
    cdo sinfon ifile
 @EndVerbatim
-This is the result of an ECHAM5 dataset with 3 parameter over 12 time steps:
+This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
 @BeginListing
     -1 : Institut Source  Name    Time  Typ  Grid Size Num  Levels Num
      1 : MPIMET   ECHAM5  GEOSP    con   F32      2048   1       1   1

@@ -1,14 +1,14 @@
 @BeginModule
 @NewPage
 @Name      = Splittime
-@Title     = Split time steps of a dataset
+@Title     = Split timesteps of a dataset
 @Section   = File operations
 @Class     = File operation
 @Arguments = ifile obase
 @Operators = splithour splitday splitmon splitseas splityear
 
 @BeginDescription
-This module splits @file{ifile} into  time steps pieces. The output files will be named
+This module splits @file{ifile} into  timesteps pieces. The output files will be named
 @file{<obase><xxx><suffix>} where @file{suffix} is the filename extension derived from the file format. 
 @file{xxx} and the contents of the output files depends on the chosen operator. 
 @EndDescription
@@ -74,7 +74,7 @@ Set this variable to NULL to disable the adding of a file suffix.
 
 
 @BeginExample
-Assume the input GRIB1 dataset has time steps from
+Assume the input GRIB1 dataset has timesteps from
 January to December. To split each month with all
 variables into one separate file use:
 @BeginVerbatim

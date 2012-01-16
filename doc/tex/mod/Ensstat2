@@ -12,9 +12,9 @@ This module computes statistical values over the ensemble of @file{ensfiles} usi
 @file{obsfile} as a reference. Depending on the operator a ranked Histogram or 
 a roc-curve over all Ensembles @file{ensfiles}
 with reference to @file{obsfile} is written to @file{ofile}. 
-The date and grid information of a time step in @file{ofile} is the date of the 
+The date and grid information of a timestep in @file{ofile} is the date of the 
 first input file. Thus all input files are required to have the same structure in 
-terms of the gridsize, variable definitions and number of time steps. 
+terms of the gridsize, variable definitions and number of timesteps. 
 
 All Operators in this module use @file{obsfile} as the reference (for instance 
 an observation) whereas @file{ensfiles} are understood as an ensemble consisting 
@@ -27,11 +27,11 @@ nensfiles+1 bins with level 0 containing for each grid point the number of
 observations being smaller as all ensembles and level nensfiles+1 indicating
 the number of observations being larger than all ensembles. 
 
-ensrkhistspace computes a ranked histogram at each time step reducing each 
+ensrkhistspace computes a ranked histogram at each timestep reducing each 
 horizontal grid to a 1x1 grid and keeping the time axis as in @file{obsfile}. 
 Contrary ensrkhistspace  computes a histogram at each grid point keeping the 
 horizontal grid for each variable and reducing the time-axis. The time infor-
-mation is that from the last time step in @file{obsfile}. 
+mation is that from the last timestep in @file{obsfile}. 
 @EndDescription
 @EndModule
 

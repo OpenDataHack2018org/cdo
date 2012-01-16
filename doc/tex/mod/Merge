@@ -19,10 +19,10 @@ merges them and writes the resulting dataset to @file{ofile}.
 
 @BeginDescription
 Merges time series of different fields from several input datasets.
-The number of fields per time step written to @file{ofile}
-is the sum of the field numbers per time step in all input datasets.
+The number of fields per timestep written to @file{ofile}
+is the sum of the field numbers per timestep in all input datasets.
 The time series on all input datasets are required to have different
-fields and the same number of time steps.
+fields and the same number of timesteps.
 The fields in each different input file either have to be different variables
 or different levels of the same variable. A mixture of different variables on
 different levels in different input files is not allowed.
@@ -34,17 +34,17 @@ different levels in different input files is not allowed.
 @Title     = Merge datasets sorted by date and time
 
 @BeginDescription
-Merges all time steps of all input files sorted by date and time.
+Merges all timesteps of all input files sorted by date and time.
 All input files need to have the same structure with the same variables 
-on different time steps.
-After this operation every input time step is in @file{ofile} and
-all time steps are sorted by date and time.
+on different timesteps.
+After this operation every input timestep is in @file{ofile} and
+all timesteps are sorted by date and time.
 @EndDescription
 @EndOperator
 
 
 @BeginExample
-Assume three datasets with the same number of time steps
+Assume three datasets with the same number of timesteps
 and different variables in each dataset.
 To merge these datasets to a new dataset use:
 @BeginVerbatim

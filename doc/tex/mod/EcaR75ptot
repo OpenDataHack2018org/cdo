@@ -9,13 +9,13 @@
 @BeginDescription
 Let @file{ifile1} be a time series of daily precipitation amounts RR,
 and @file{ifile2} be the 75th percentile RRn75 of daily precipitation
-amounts at wet days for any period used as reference. Then calculated
-is the ratio of the precipitation sum at wet days with RR > RRn75
-to the total precipitation sum. 
+amounts at wet days for any period used as reference. Then the ratio 
+of the precipitation sum at wet days with RR > RRn75 to the total 
+precipitation sum is calculated. 
 RRn75 is calculated as the 75th percentile of all wet days of a given
 climate reference period.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile1}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile1}.
 @EndDescription
 @EndModule
 

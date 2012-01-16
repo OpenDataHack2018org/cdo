@@ -15,7 +15,7 @@
 
 
 @BeginDescription
-This operator performs linear interpolation between two years, time step by time step.
+This operator performs linear interpolation between two years, timestep by timestep.
 The input files need to have the same structure with the same variables.
 The output files will be named @file{<obase><yyyy><suffix>} where @file{yyyy} will be the year and 
 @file{suffix} is the filename extension derived from the file format.
@@ -39,7 +39,7 @@ Set this variable to NULL to disable the adding of a file suffix.
 
 @BeginExample
 Assume there are two monthly mean datasets over a year. The first dataset 
-has 12 time steps for the year 1985 and the second one for the year 1990.
+has 12 timesteps for the year 1985 and the second one for the year 1990.
 To interpolate the years between 1985 and 1990 month by month use:
 @BeginVerbatim
    cdo intyear,1986,1987,1988,1989 ifile1 ifile2 year

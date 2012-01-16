@@ -31,8 +31,8 @@ further output variable is the start day of year of the growing season.
 Note that TG have to be given in units of Kelvin, whereas T have to be given
 in degrees Celsius.
 
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

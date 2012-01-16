@@ -18,7 +18,7 @@ The output is averaged  over horizontal fields using appropriate weights
 for each level and timestep in rfile. 
 
 All input files need to have the same structure with the same variables.
-The date information of a time step in @file{ofile} is the date of the first input file.
+The date information of a timestep in @file{ofile} is the date of the first input file.
 The output files are named as 
 @file{<ofilebase>.<type>.<filesuffix>} where @file{<type>} depends on the 
 operator and @file{<filesuffix>} is determined from the output file type. 

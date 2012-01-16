@@ -19,7 +19,7 @@ time axis is overwritten depends on the chosen operator.
 @Parameter = date
 
 @BeginDescription
-Sets the date in every time step to the same given value.
+Sets the date in every timestep to the same given value.
 @EndDescription
 @EndOperator
 
@@ -29,7 +29,7 @@ Sets the date in every time step to the same given value.
 @Parameter = time
 
 @BeginDescription
-Sets the time in every time step to the same given value.
+Sets the time in every timestep to the same given value.
 @EndDescription
 @EndOperator
 
@@ -39,7 +39,7 @@ Sets the time in every time step to the same given value.
 @Parameter = day
 
 @BeginDescription
-Sets the day in every time step to the same given value.
+Sets the day in every timestep to the same given value.
 @EndDescription
 @EndOperator
 
@@ -49,7 +49,7 @@ Sets the day in every time step to the same given value.
 @Parameter = month
 
 @BeginDescription
-Sets the month in every time step to the same given value.
+Sets the month in every timestep to the same given value.
 @EndDescription
 @EndOperator
 
@@ -59,7 +59,7 @@ Sets the month in every time step to the same given value.
 @Parameter = year
 
 @BeginDescription
-Sets the year in every time step to the same given value.
+Sets the year in every timestep to the same given value.
 @EndDescription
 @EndOperator
 
@@ -105,11 +105,11 @@ Sets the calendar of a relative time axis.
 
 
 @BeginOperator_shifttime
-@Title     = Shift time steps
+@Title     = Shift timesteps
 @Parameter = sval
 
 @BeginDescription
-Shifts all time steps by the parameter sval.
+Shifts all timesteps by the parameter sval.
 @EndDescription
 @EndOperator
 
@@ -138,11 +138,11 @@ STRING   Shift value (e.g. -3hour)
 
 @BeginExample
 To set the time axis to 1987-01-16 12:00:00 with an increment of one
-month for each time step use:
+month for each timestep use:
 @BeginVerbatim
    cdo settaxis,1987-01-16,12:00:00,1mon ifile ofile
 @EndVerbatim
-Result of '{\tt cdo showdate ofile}' for a dataset with 12 time steps:
+Result of '{\tt cdo showdate ofile}' for a dataset with 12 timesteps:
 @BeginListing
    1987-01-16 1987-02-16 1987-03-16 1987-04-16 1987-05-16 1987-06-16 \
    1987-07-16 1987-08-16 1987-09-16 1987-10-16 1987-11-16 1987-12-16

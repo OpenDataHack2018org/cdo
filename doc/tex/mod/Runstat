@@ -9,10 +9,10 @@
 
 @BeginDescription
 This module computes running statistical values over a selected number
-of time steps. Depending on the chosen operator the minimum, maximum,
+of timesteps. Depending on the chosen operator the minimum, maximum,
 sum, average, variance or standard deviation of a selected number of consecutive 
-time steps read from @file{ifile} is written to @file{ofile}. The date information 
-in @file{ofile} is the date of the middle contributing time step in @file{ifile}.
+timesteps read from @file{ifile} is written to @file{ofile}. The date information 
+in @file{ofile} is the date of the middle contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 
@@ -138,19 +138,19 @@ o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 
 @BeginParameter
 @Item = nts
-INTEGER  Number of time steps
+INTEGER  Number of timesteps
 @EndParameter
 
 
 @BeginEnvironment
 @Item = RUNSTAT_DATE
 Sets the date information in ofile to the "first", "last" or "middle" contributing
-time step in ifile.
+timestep in ifile.
 @EndEnvironment
 
 
 @BeginExample
-To compute the running mean over 9 time steps use:
+To compute the running mean over 9 timesteps use:
 @BeginVerbatim
    cdo runmean,9 ifile ofile
 @EndVerbatim

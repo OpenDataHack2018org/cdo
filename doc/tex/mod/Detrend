@@ -14,11 +14,11 @@
 @BeginDescription
 @IfMan
 Every time series in @file{ifile} is linearly detrended. For every field element x 
-only those time steps t belong to the sample S(x), which have i(t,x) NE miss.
+only those timesteps t belong to the sample S(x), which have i(t,x) NE miss.
 @EndifMan
 @IfDoc
 Every time series in @file{ifile} is linearly detrended.
-For every field element \begin{math}x\end{math} only those time steps \begin{math}t\end{math} belong to the sample
+For every field element \begin{math}x\end{math} only those timesteps \begin{math}t\end{math} belong to the sample
 \begin{math}S(x)\end{math}, which have \begin{math}i(t,x) \neq \mbox{miss}\end{math}.
 With
 @BeginDisplayMath
@@ -40,7 +40,7 @@ o(t,x) = i(t,x) - (a(x) + b(x)t)
 
 
 @BeginNote
-This operator has to keep the fields of all time steps concurrently in the memory.
+This operator has to keep the fields of all timesteps concurrently in the memory.
 If not enough memory is available use the operators @mod{trend} and @mod{subtrend}.
 @EndNote
 

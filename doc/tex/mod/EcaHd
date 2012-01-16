@@ -14,8 +14,8 @@ values TG < T2 are considered. If T1 and T2 are omitted, a temperature
 of 17 @celsius is used for both parameters. If only T1 is given, T2 is
 set to T1. Note that TG have to be given in units of kelvin, whereas T1
 and T2 have to be given in degrees Celsius.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

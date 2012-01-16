@@ -8,7 +8,7 @@
 @Operators = consecsum consects
 
 @BeginDescription
-This module computes periods over all time steps in @file{ifile} where a
+This module computes periods over all timesteps in @file{ifile} where a
 certain property is valid. The propery can be chosen by creating a mask from
 the original data, which is the expected input format for operators of this
 module. Depending on the operator full information about each period or

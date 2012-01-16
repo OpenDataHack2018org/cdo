@@ -34,7 +34,7 @@ Hints for efficient usage:
 @Item = the lowest frequency greater zero that can be contained in ifile is 1/(N*dT), 
 @Item = the greatest frequency is 1/(2dT) (Nyquist frequency),
 @EndItemize
-with N the number of time steps and dT the time increment of @file{ifile} in years. 
+with N the number of timesteps and dT the time increment of @file{ifile} in years. 
 @EndDescription
 @EndModule	
 

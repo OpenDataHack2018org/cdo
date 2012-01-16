@@ -1,18 +1,18 @@
 @BeginModule
 @NewPage
 @Name      = Timstat
-@Title     = Statistical values over all time steps
+@Title     = Statistical values over all timesteps
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
 @Operators = timmin timmax timsum timmean timavg timvar timstd
 
 @BeginDescription
-This module computes statistical  values over all time steps in @file{ifile}.
+This module computes statistical  values over all timesteps in @file{ifile}.
 Depending on the chosen operator the minimum, maximum, sum, average, variance
-or standard deviation of all time steps read from @file{ifile} is written to @file{ofile}.
-The date information of a time step in @file{ofile} is the date of the last 
-contributing time step in @file{ifile}.
+or standard deviation of all timesteps read from @file{ifile} is written to @file{ofile}.
+The date information of a timestep in @file{ofile} is the date of the last 
+contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 
@@ -130,7 +130,7 @@ o(1,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
 
 
 @BeginExample
-To compute the mean over all input time steps use:
+To compute the mean over all input timesteps use:
 @BeginVerbatim
    cdo timmean ifile ofile
 @EndVerbatim

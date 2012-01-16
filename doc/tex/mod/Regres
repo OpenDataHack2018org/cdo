@@ -16,7 +16,7 @@
 @IfMan
 The values of the input file @file{ifile} are assumed to be distributed as
 N(a+b*t,S^2) with unknown a, b and S^2. This operator estimates the
-parameter b. For every field element x only those time steps 
+parameter b. For every field element x only those timesteps 
 t belong to the sample S(x), which have i(t,x) NE miss.
 @EndifMan
 @IfDoc
@@ -24,7 +24,7 @@ The values of the input file @file{ifile} are assumed to be distributed as
 \begin{math}N(a+b t,\sigma^2)\end{math} with unknown @math{a},
 @math{b} and \begin{math}\sigma^2\end{math}. This operator estimates the
 parameter @math{b}.
-For every field element @math{x} only those time steps @math{t} belong
+For every field element @math{x} only those timesteps @math{t} belong
 to the sample \begin{math}S(x)\end{math}, which have \begin{math}i(t,x) \neq \mbox{miss}\end{math}.
 It is
 @BeginDisplayMath

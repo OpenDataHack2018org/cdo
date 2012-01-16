@@ -8,17 +8,17 @@
 @Operators = seaspctl
 
 @BeginDescription
-This operator computes percentiles over all time steps in @file{ifile1} of the same season.
+This operator computes percentiles over all timesteps in @file{ifile1} of the same season.
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
 histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files
 @file{ifile2} and @file{ifile3} should be the result of corresponding
 @mod{seasmin} and @mod{seasmax} operations, respectively.
-The date information of a time step in @file{ofile} is the date of the
-last contributing time step in @file{ifile1}. Be careful about the first
-and the last output time step, they may be incorrect values if the seasons
-have incomplete time steps.
+The date information of a timestep in @file{ofile} is the date of the
+last contributing timestep in @file{ifile1}. Be careful about the first
+and the last output timestep , they may be incorrect values if the seasons
+have incomplete timesteps.
 @EndDescription
 @EndModule
 
@@ -29,13 +29,13 @@ have incomplete time steps.
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
 \vspace*{1mm}
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 \vspace*{1mm}
 

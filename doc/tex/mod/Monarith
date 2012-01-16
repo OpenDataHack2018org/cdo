@@ -9,8 +9,8 @@
 
 @BeginDescription
 This module performs simple arithmetic of a time series and one
-time step with the same month and year. For each field in @file{ifile1}
-the corresponding field of the time step in @file{ifile2} with the
+timestep with the same month and year. For each field in @file{ifile1}
+the corresponding field of the timestep in @file{ifile2} with the
 same month and year is used. The header information in @file{ifile1}
 have to be the same as in @file{ifile2}. Usually @file{ifile2} is generated
 by an operator of the module @mod{MONSTAT}.

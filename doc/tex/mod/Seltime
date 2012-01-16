@@ -1,25 +1,25 @@
 @BeginModule
 @NewPage
 @Name      = Seltime
-@Title     = Select time steps
+@Title     = Select timesteps
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = seltimestep seltime selhour selday selmon selyear selseas seldate selsmon
+@Operators = seltimestepseltime selhour selday selmon selyear selseas seldate selsmon
 
 @BeginDescription
-This module selects user specified time steps from @file{ifile} and writes them to @file{ofile}.
-The time steps selected depends on the chosen operator and the parameters.
+This module selects user specified timesteps from @file{ifile} and writes them to @file{ofile}.
+The timesteps selected depends on the chosen operator and the parameters.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_seltimestep
-@Title     = Select time steps
+@Title     = Select timesteps
 @Parameter = timesteps
 
 @BeginDescription
-Selects all time steps with a time step in a user given list.
+Selects all timesteps with a timestep in a user given list.
 @EndDescription
 @EndOperator
 
@@ -29,7 +29,7 @@ Selects all time steps with a time step in a user given list.
 @Parameter = times
 
 @BeginDescription
-Selects all time steps with a time in a user given list.
+Selects all timesteps with a time in a user given list.
 @EndDescription
 @EndOperator
 
@@ -39,7 +39,7 @@ Selects all time steps with a time in a user given list.
 @Parameter = hours
 
 @BeginDescription
-Selects all time steps with a hour in a user given list.
+Selects all timesteps with a hour in a user given list.
 @EndDescription
 @EndOperator
 
@@ -49,7 +49,7 @@ Selects all time steps with a hour in a user given list.
 @Parameter = days
 
 @BeginDescription
-Selects all time steps with a day in a user given list.
+Selects all timesteps with a day in a user given list.
 @EndDescription
 @EndOperator
 
@@ -59,7 +59,7 @@ Selects all time steps with a day in a user given list.
 @Parameter = months
 
 @BeginDescription
-Selects all time steps with a month in a user given list.
+Selects all timesteps with a month in a user given list.
 @EndDescription
 @EndOperator
 
@@ -69,7 +69,7 @@ Selects all time steps with a month in a user given list.
 @Parameter = years
 
 @BeginDescription
-Selects all time steps with a year in a user given list.
+Selects all timesteps with a year in a user given list.
 @EndDescription
 @EndOperator
 
@@ -79,7 +79,7 @@ Selects all time steps with a year in a user given list.
 @Parameter = seasons
 
 @BeginDescription
-Selects all time steps with a month of a season in a user given list.
+Selects all timesteps with a month of a season in a user given list.
 @EndDescription
 @EndOperator
 
@@ -89,7 +89,7 @@ Selects all time steps with a month of a season in a user given list.
 @Parameter = date1 [date2]
 
 @BeginDescription
-Selects all time steps with a date in a user given range.
+Selects all timesteps with a date in a user given range.
 @EndDescription
 @EndOperator
 
@@ -99,14 +99,14 @@ Selects all time steps with a date in a user given range.
 @Parameter = month [nts1] [nts2]
 
 @BeginDescription
-Selects a month and optional an unlimited number of time steps before and after this month.
+Selects a month and optional an unlimited number of timesteps before and after this month.
 @EndDescription
 @EndOperator
 
 
 @BeginParameter
 @Item = timesteps
-INTEGER  Comma separated list of time steps
+INTEGER  Comma separated list of timesteps
 @Item = times
 STRING   Comma separated list of times (format hh:mm:ss)
 @Item = hours
@@ -124,9 +124,9 @@ STRING   Start date (format YYYY-MM-DDThh:mm:ss)
 @Item = date2
 STRING   End date (format YYYY-MM-DDThh:mm:ss)
 @Item = nts1
-INTEGER  Number of time steps before the selected month [default: 0]
+INTEGER  Number of timesteps before the selected month [default: 0]
 @Item = nts2
-INTEGER  Number of time steps after the selected month [default: nts1]
+INTEGER  Number of timesteps after the selected month [default: nts1]
 @EndParameter
 
 

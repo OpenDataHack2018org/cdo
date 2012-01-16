@@ -10,13 +10,13 @@
 @BeginDescription
 Let @file{ifile1} be a time series of daily minimum temperatures TN, and
 @file{ifile2} be the 10th percentile TNn10 of daily minimum temperatures
-for any period used as reference. Then calculated is the percentage
-of time where TN < TNn10.
+for any period used as reference. Then the percentage of time where TN < TNn10 
+is calculated.
 TNn10 is calculated as the 10th percentile of daily minimum temperatures of a five 
 day window centred on each calendar day of a given climate reference period.
 Note that both TN and TNn10 have to be given in the same units.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile1}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile1}.
 @EndDescription
 @EndModule
 
@@ -27,8 +27,8 @@ the last contributing time step in @file{ifile1}.
 
 
 @BeginExample
-To compute the percentage of time where the daily minimum temperature
-is less than the 10th percentile of the daily minimum temperature for
+To compute the percentage of timesteps with a daily minimum temperature
+smaller than the 10th percentile of the daily minimum temperatures for
 a given reference period use:
 @BeginVerbatim
    cdo eca_tn10p tnfile tnn10file ofile

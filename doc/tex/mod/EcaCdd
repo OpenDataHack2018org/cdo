@@ -8,11 +8,11 @@
 @Operators = eca_cdd
 
 @BeginDescription
-Let @file{ifile} be a time series of daily precipitation amounts @math{RR}, then counted is the 
-largest number of consecutive days where @math{RR} is less than @math{R}. @math{R} is an optional parameter with 
+Let @file{ifile} be a time series of daily precipitation amounts @math{RR}, then the largest number 
+of consecutive days where @math{RR} is less than @math{R} is counted. @math{R} is an optional parameter with 
 default @math{R = 1 mm}. A further output variable is the number of dry periods of more than 5 days.
-The date information of a time step in @file{ofile} is the date of the last contributing 
-time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of the last contributing 
+timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

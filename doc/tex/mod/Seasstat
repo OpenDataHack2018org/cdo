@@ -8,13 +8,13 @@
 @Operators = seasmin seasmax seassum seasmean seasavg seasvar seasstd
 
 @BeginDescription
-This module computes statistical values over time steps of the same season.
+This module computes statistical values over timesteps of the same season.
 Depending on the chosen operator the minimum, maximum, sum, average, variance
-or standard deviation of time steps of the same season is written to @file{ofile}.
-The date information of a time step in @file{ofile} is the date of the last 
-contributing time step in @file{ifile}. Be careful about the first and the last 
-output time step, they may be incorrect values if the seasons have incomplete 
-time steps.
+or standard deviation of timesteps of the same season is written to @file{ofile}.
+The date information of a timestep in @file{ofile} is the date of the last 
+contributing timestep in @file{ifile}. Be careful about the first and the last 
+output timestep , they may be incorrect values if the seasons have incomplete 
+timesteps.
 @EndDescription
 @EndModule
 
@@ -24,12 +24,12 @@ time steps.
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = min{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
@@ -44,12 +44,12 @@ o(t,x) = \mbox{\bf min}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = max{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
@@ -64,12 +64,12 @@ o(t,x) = \mbox{\bf max}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = sum{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \le t_n\}
@@ -84,12 +84,12 @@ o(t,x) = \mbox{\bf sum}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = mean{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
@@ -104,12 +104,12 @@ o(t,x) = \mbox{\bf mean}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = avg{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
@@ -124,12 +124,12 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = var{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
@@ -144,12 +144,12 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \le t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of time steps of the same season it is
+For every adjacent sequence t_1, ...,t_n of timesteps of the same season it is
 
 o(t,x) = std{i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of 
 the same season it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \le t_n\}

@@ -12,7 +12,7 @@
 @Title     = Sort over the time
 
 @BeginDescription
-Sorts the elements in ascending order over all time steps for every field position.
+Sorts the elements in ascending order over all timesteps for every field position.
 After sorting it is:
 
 @IfMan
@@ -29,7 +29,7 @@ o(t_1,x) <= o(t_2,x)   \mbox{\hspace*{1cm}}   \forall(t_1<t_2),x
 
 
 @BeginExample
-To sort all field elements of a dataset over all time steps use:
+To sort all field elements of a dataset over all timesteps use:
 @BeginVerbatim
    cdo timsort ifile ofile
 @EndVerbatim

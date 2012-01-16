@@ -61,10 +61,10 @@ Prints the number of different dates.
 
 
 @BeginOperator_ntime
-@Title     = Number of time steps
+@Title     = Number of timesteps
 
 @BeginDescription
-Prints the number of time steps.
+Prints the number of timesteps.
 @EndDescription
 @EndOperator
 

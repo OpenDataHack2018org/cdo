@@ -10,8 +10,8 @@
 Let @file{ifile} be a time series of daily precipitation amounts @math{RR}, then the mean 
 precipitation amount at wet days (@math{RR} > @math{R}) is written to @file{ofile}. 
 @math{R} is an optional parameter with default @math{R = 1 mm}.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

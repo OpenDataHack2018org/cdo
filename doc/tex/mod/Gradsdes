@@ -45,7 +45,7 @@ To create a GrADS data descriptor file from a GRIB1 dataset use:
 This will create a descriptor file with the name @file{ifile.ctl}
 and the map file @file{ifile.gmp}.
 
-Assumed the input GRIB1 dataset has 3 variables over 12 time steps on a Gaussian N16 grid.
+Assumed the input GRIB1 dataset has 3 variables over 12 timesteps on a Gaussian N16 grid.
 The contents of the resulting GrADS data description file is approximately:
 @BeginListing
    DSET  ^ifile.grb

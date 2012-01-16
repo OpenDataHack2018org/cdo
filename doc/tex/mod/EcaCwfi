@@ -17,8 +17,8 @@ equal to nday days.
 TGn10 is calculated as the 10th percentile of daily mean temperatures of a five 
 day window centred on each calendar day of a given climate reference period.
 Note that both TG and TGn10 have to be given in the same units.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile1}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile1}.
 @EndDescription
 @EndModule
 

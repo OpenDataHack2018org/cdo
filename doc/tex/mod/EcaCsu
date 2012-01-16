@@ -9,12 +9,12 @@
 
 @BeginDescription
 Let @file{ifile} be a time series of daily maximum temperatures TX,
-then counted is the largest number of consecutive days where TX > T.
+then the largest number of consecutive days where TX > T is counted.
 The number T is an optional parameter with default T = 25 @celsius.
 Note that TN have to be given in units of Kelvin, whereas T have to be given
 in degrees Celsius.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

@@ -24,7 +24,7 @@ It is
 o(t,x) = i_1(t,x) - (i_2(1,x) + i_3(1,x) \cdot t)
 @EndDisplayMath
 @EndifDoc
-where t is the time steps.
+where t is the timesteps.
 @EndDescription
 @EndOperator
 

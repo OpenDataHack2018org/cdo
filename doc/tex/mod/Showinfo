@@ -89,7 +89,7 @@ Prints all months.
 @Title     = Show date information
 
 @BeginDescription
-Prints date information of all time steps (format YYYY-MM-DD).
+Prints date information of all timesteps (format YYYY-MM-DD).
 @EndDescription
 @EndOperator
 
@@ -98,7 +98,7 @@ Prints date information of all time steps (format YYYY-MM-DD).
 @Title     = Show time information
 
 @BeginDescription
-Prints time information of all time steps (format hh:mm:ss).
+Prints time information of all timesteps (format hh:mm:ss).
 @EndDescription
 @EndOperator
 
@@ -107,7 +107,7 @@ Prints time information of all time steps (format hh:mm:ss).
 @Title     = Show timestamp
 
 @BeginDescription
-Prints timestamp of all time steps (format YYYY-MM-DDThh:mm:ss).
+Prints timestamp of all timesteps (format YYYY-MM-DDThh:mm:ss).
 @EndDescription
 @EndOperator
 

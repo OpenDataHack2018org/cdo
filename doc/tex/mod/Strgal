@@ -7,13 +7,13 @@
 
 @BeginDescription
 Let @file{ifile} be a time series of daily maximum horizontal wind speeds
-VX, then counted is the number of days where VX is greater than or equal 
-to 20.5 m/s. A further output variable is the maximum number of consecutive
+VX, then the number of days where VX is greater than or equal to 20.5 m/s 
+is counted. A further output variable is the maximum number of consecutive
 days with maximum wind speed greater than or equal to 20.5 m/s. Note that
 VX is defined as the square root of the sum of square of the zonal and
 meridional wind speeds and have to be given in units of m/s.
-The date information of a time step in @file{ofile} is the date of
-the last contributing time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of
+the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

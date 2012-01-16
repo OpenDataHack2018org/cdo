@@ -10,7 +10,7 @@ This operator selects field elements from @file{ifile2} or @file{ifile3} with re
 @file{ifile1} and writes them to @file{ofile}. The fields in @file{ifile1} are handled as a mask.
 A value not equal to zero is treated as "true", zero is treated as "false".
 The number of fields in @file{ifile1} has either to be the same as in @file{ifile2} or the 
-same as in one time step of @file{ifile2} or only one.
+same as in one timestep of @file{ifile2} or only one.
 @file{ifile2} and @file{ifile3} need to have the same number of fields.
 The fields in @file{ofile} inherit the meta data from @file{ifile2}.
 @EndDescription

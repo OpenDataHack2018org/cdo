@@ -15,8 +15,8 @@ histogram bins is 101. The default can be overridden by setting the
 environment variable @env{CDO_PCTL_NBINS} to a different value. The files
 @file{ifile2} and @file{ifile3} should be the result of corresponding
 @mod{timselmin} and @mod{timselmax} operations, respectively.
-The date information of a time step in @file{ofile} is the date of the last 
-contributing time step in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of the last 
+contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 
@@ -27,14 +27,14 @@ contributing time step in @file{ifile}.
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t1, ...., tn of time steps of the same 
+For every adjacent sequence t1, ...., tn of timesteps of the same 
 selected time range it is
 
 o(t,x) = pth percentile {i(t',x), t1 < t' <= tn}
 @EndifMan
 @IfDoc
 \vspace*{1mm}
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of time steps of the same 
+For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same 
 selected time range it is: \\
 \vspace*{1mm}
 
@@ -50,11 +50,11 @@ o(t,x) = \mbox{\bf pth percentile} \{i(t',x), t_1 < t' \le t_n\}
 @Item = p
 FLOAT    Percentile number in {0, ..., 100}
 @Item = nsets
-INTEGER  Number of input time steps for each output time step
+INTEGER  Number of input timesteps for each output timestep 
 @Item = noffset
-INTEGER  Number of input time steps skipped before the first time step range (optional)
+INTEGER  Number of input timesteps skipped before the first timestep range (optional)
 @Item = nskip
-INTEGER  Number of input time steps skipped between time step ranges (optional)
+INTEGER  Number of input timesteps skipped between timestep ranges (optional)
 @EndParameter
 
 

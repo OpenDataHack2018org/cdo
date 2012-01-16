@@ -10,7 +10,7 @@
 @BeginDescription
 This operator writes running percentile values for each day of year 
 in @file{ifile1} to @file{ofile}. A certain percentile is computed for all
-time steps in running windows of which the medium time step corresponds
+timesteps in running windows of which the medium timestep corresponds
 to a certain day of year. 
 The algorithm uses histograms with minimum and maximum bounds given in
 @file{ifile2} and @file{ifile3}, respectively. The default number of
@@ -22,8 +22,8 @@ The date information in an output field is the date of the medium time
 step in the last contributing running window.
 Note that the operator have to be applied to a continuous time series of daily
 measurements in order to yield physically meaningful results. Also note that
-the output time series begins (nts-1)/2 time steps after the first time step
-of the input time series and ends (nts-1)/2 time steps before the last.
+the output time series begins (nts-1)/2 timesteps after the first timestep 
+of the input time series and ends (nts-1)/2 timesteps before the last.
 For input data which are complete but not continuous, such as time series of
 daily measurements for the same month or season within different years, the
 operator only yields physically meaningful results if the input time series
@@ -62,7 +62,7 @@ o(\mbox{366},x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,x
 @Item = p
 FLOAT    Percentile number in {0, ..., 100}
 @Item = nts
-INTEGER  Number of time steps
+INTEGER  Number of timesteps
 @EndParameter
 
 
@@ -74,7 +74,7 @@ Sets the number of histogram bins. The default number is 101.
 
 @BeginExample
 Assume the input data provide a continuous time series of daily measurements. To compute
-the running multi-year daily 90th percentile over all input time steps for a running
+the running multi-year daily 90th percentile over all input timesteps for a running
 window of five days use:
 @BeginVerbatim
    cdo ydrunmin,5 ifile minfile

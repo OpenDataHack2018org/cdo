@@ -8,29 +8,29 @@
 @Operators = inttime intntime
 
 @BeginDescription
-This module performs linear interpolation between time steps.
+This module performs linear interpolation between timesteps.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_inttime
-@Title     = Interpolation between time steps
+@Title     = Interpolation between timesteps
 @Parameter = date time [inc]
 
 @BeginDescription
-This operator creates a new dataset by linear interpolation between time steps.
+This operator creates a new dataset by linear interpolation between timesteps.
 The user has to define the start date/time with an optional increment.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_intntime
-@Title     = Interpolation between time steps
+@Title     = Interpolation between timesteps
 @Parameter = n
 
 @BeginDescription
-This operator performs linear interpolation between time steps.
-The user has to define the number of time steps from one time step
+This operator performs linear interpolation between timesteps.
+The user has to define the number of timesteps from one timestep
 to the next.
 @EndDescription
 @EndOperator
@@ -44,7 +44,7 @@ STRING  Start time (format hh:mm:ss)
 @Item = inc
 STRING  Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]
 @Item = n
-INTEGER Number of time steps from one time step to the next
+INTEGER Number of timesteps from one timestep to the next
 @EndParameter
 
 

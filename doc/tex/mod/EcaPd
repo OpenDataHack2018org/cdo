@@ -9,11 +9,11 @@
 
 @BeginDescription
 Let @file{ifile} be a time series of daily precipitation amounts RR in [mm]
-(or alternatively in [kg m-2]), then counted is the number of days where RR is at least @math{x} mm. 
+(or alternatively in [kg m-2]), then the number of days where RR is at least @math{x} mm is counted. 
 eca\_r10mm and eca\_r20mm are specific ECA operators with a daily precipitation amount of 10 
 and 20 mm respectively.
-The date information of a time step in ofile is the date of the last
-contributing time step in @file{ifile}.
+The date information of a timestep in ofile is the date of the last
+contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

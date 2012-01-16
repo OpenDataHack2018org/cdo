@@ -10,14 +10,14 @@
 @BeginDescription
 This module writes running statistical values for each day of year
 in @file{ifile} to @file{ofile}. Depending on the chosen operator, the minimum,
-maximum, sum, average, variance or standard deviation of all time steps in
-running windows of wich the medium time step corresponds to a certain day of
+maximum, sum, average, variance or standard deviation of all timesteps in
+running windows of wich the medium timestep corresponds to a certain day of
 year is computed. The date information in an output field is the date of the
-medium time step in the last contributing running window.
+medium timestep in the last contributing running window.
 Note that the operator have to be applied to a continuous time series of daily
 measurements in order to yield physically meaningful results. Also note that
-the output time series begins (nts-1)/2 time steps after the first time step
-of the input time series and ends (nts-1)/2 time steps before the last one.
+the output time series begins (nts-1)/2 timesteps after the first timestep
+of the input time series and ends (nts-1)/2 timesteps before the last one.
 For input data which are complete but not continuous, such as time series of
 daily measurements for the same month or season within different years, the
 operator yields physically meaningful results only if the input time series
@@ -188,13 +188,13 @@ o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 
 @BeginParameter
 @Item = nts
-INTEGER  Number of time steps
+INTEGER  Number of timesteps
 @EndParameter
 
 
 @BeginExample
 Assume the input data provide a continuous time series of daily measurements. To compute
-the running multi-year daily mean over all input time steps for a running window of five
+the running multi-year daily mean over all input timesteps for a running window of five
 days use:
 @BeginVerbatim
    cdo ydrunmean,5 ifile ofile

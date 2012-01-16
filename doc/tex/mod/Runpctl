@@ -11,7 +11,7 @@
 This module computes running percentiles over a selected number of time
 steps in @file{ifile1}.
 The date information in @file{ofile} is the date of the medium contributing
-time step in @file{ifile1}.
+timestep in @file{ifile1}.
 @EndDescription
 @EndModule
 
@@ -39,12 +39,12 @@ o(t+(nts-1)/2,x) = \mbox{\bf pth percentile} \{i(t,x), i(t+1,x), ..., i(t+nts-1,
 @Item = p
 FLOAT    Percentile number in {0, ..., 100}
 @Item = nts
-INTEGER  Number of time steps
+INTEGER  Number of timesteps
 @EndParameter
 
 
 @BeginExample
-To compute the running 50th percentile (median) over 9 time steps use:
+To compute the running 50th percentile (median) over 9 timesteps use:
 @BeginVerbatim
    cdo runpctl,50,9 ifile ofile
 @EndVerbatim

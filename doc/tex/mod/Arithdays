@@ -8,7 +8,7 @@
 @Operators = muldpm divdpm muldpy divdpy
 
 @BeginDescription
-This module multiplies or divides each time step of a dataset with the corresponding
+This module multiplies or divides each timestep of a dataset with the corresponding
 days per month or days per year. The result of these functions depends on the used
 calendar of the input data.
 @EndDescription
