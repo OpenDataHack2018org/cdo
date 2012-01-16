@@ -30,7 +30,7 @@ contrib/cdoCompletion.bash -text
 contrib/cdoCompletion.tcsh -text
 contrib/cdoCompletion.zsh -text
 contrib/makecompl.rb -text
-contrib/python/cdo.py -text
+contrib/python/lib/cdo.py -text
 contrib/python/test/cdo.py -text
 contrib/python/test/test_cdo.py -text
 contrib/ruby/ChangeLog -text
