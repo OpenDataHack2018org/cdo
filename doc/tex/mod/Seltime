@@ -5,7 +5,7 @@
 @Section   = Selection
 @Class     = Selection
 @Arguments = ifile ofile
-@Operators = seltimestepseltime selhour selday selmon selyear selseas seldate selsmon
+@Operators = seltimestep seltime selhour selday selmon selyear selseas seldate selsmon
 
 @BeginDescription
 This module selects user specified timesteps from @file{ifile} and writes them to @file{ofile}.
