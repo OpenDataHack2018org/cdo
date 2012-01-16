@@ -7,6 +7,11 @@ class CdoTest(unittest.TestCase):
 
     def testCDO(self):
         print(cdo.CDO)
+        self.assertEqual('cdo',cdo.CDO)
+        newCDO="/usr/local/bin/cdo"
+        cdo.setCDO(newCDO)
+        self.assertEqual(newCDO,cdo.CDO)
+        cdo.setCDO('cdo')
 
     def testDbg(self):
         self.assertEqual(False,cdo.debug)

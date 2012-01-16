@@ -148,8 +148,11 @@ class Cdo(object):
     def unsetReturnArray(self):
       self.setReturnArray(False)
 
+    def setCDO(self,value):
+      self.CDO = value
+
     #==================================================================
-    # Addional operotors:
+    # Addional operators:
     #------------------------------------------------------------------
     def boundaryLevels(self,**kwargs):
       ilevels         = map(float,self.showlevel(input = kwargs['input'])[0].split())
