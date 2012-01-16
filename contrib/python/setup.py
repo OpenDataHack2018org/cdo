@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup, Extension
-from setup import *
+from setuptools import setup
 
 setup (name   = 'cdo',
   version     = '1.0.2',
@@ -9,4 +8,11 @@ setup (name   = 'cdo',
   license     = "GPLv2",
   description = """pyhton bindings to CDO""",
   py_modules  = ["cdo"],
+  url = "http://pypi.python.org/pypi/cdo",
+  classifiers = [
+        "Development Status :: 4 - Beta",
+        "Topic :: Utilities",
+        "Operating System :: POSIX",
+        "Programming Language :: Python",
+    ],
   )
