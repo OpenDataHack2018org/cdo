@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.4
 	* Version 1.5.4 released
 
+2012-01-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remaplib: use grid2_bound_box only for conservativ remapping
+
 2012-01-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* setgridtype: added support for grid type lonlat 

@@ -38,6 +38,7 @@
 
 */
 /*
+  2012-01-16 Uwe Schulzweida: alloc grid2_bound_box only for conservative remapping
   2011-01-07 Uwe Schulzweida: Changed remap weights from 2D to 1D array
   2009-05-25 Uwe Schulzweida: Changed restrict data type from double to int
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
@@ -419,7 +420,8 @@ void remapGridRealloc(int map_type, remapgrid_t *rg)
     }
 
   rg->grid1_bound_box = (restr_t *) realloc(rg->grid1_bound_box, 4*rg->grid1_size*sizeof(restr_t));
-  rg->grid2_bound_box = (restr_t *) realloc(rg->grid2_bound_box, 4*rg->grid2_size*sizeof(restr_t));
+  if ( rg->luse_grid2_corners )
+    rg->grid2_bound_box = (restr_t *) realloc(rg->grid2_bound_box, 4*rg->grid2_size*sizeof(restr_t));
 }
 
 /*****************************************************************************/
@@ -839,7 +841,6 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
   if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
     {
       free(rg->grid1_bound_box); rg->grid1_bound_box = NULL;
-      free(rg->grid2_bound_box); rg->grid2_bound_box = NULL;
     }
 }
 
@@ -928,9 +929,8 @@ void calc_lonlat_bins(remapgrid_t *rg, int map_type)
     }
 
   if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
-    {
+    { 
       free(rg->grid1_bound_box); rg->grid1_bound_box = NULL;
-      free(rg->grid2_bound_box); rg->grid2_bound_box = NULL;
     }
 }
 
@@ -1106,17 +1106,14 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	  gridInqXbounds(gridID1, rg->grid1_corner_lon);
 	  gridInqYbounds(gridID1, rg->grid1_corner_lat);
 	}
+      else if ( lgrid1_gen_bounds )
+	{
+	  genXbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lon, rg->grid1_corner_lon, 0);
+	  genYbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lat, rg->grid1_corner_lat);
+	}
       else
 	{
-	  if ( lgrid1_gen_bounds )
-	    {
-	      genXbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lon, rg->grid1_corner_lon, 0);
-	      genYbounds(rg->grid1_dims[0], rg->grid1_dims[1], rg->grid1_center_lat, rg->grid1_corner_lat);
-	    }
-	  else
-	    {
-	      cdoAbort("grid1 corner missing!");
-	    }
+	  cdoAbort("grid1 corner missing!");
 	}
     }
 
@@ -1167,17 +1164,14 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	  gridInqXbounds(gridID2, rg->grid2_corner_lon);
 	  gridInqYbounds(gridID2, rg->grid2_corner_lat);
 	}
+      else if ( lgrid2_gen_bounds )
+	{
+	  genXbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lon, rg->grid2_corner_lon, 0);
+	  genYbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lat, rg->grid2_corner_lat);
+	}
       else
 	{
-	  if ( lgrid2_gen_bounds )
-	    {
-	      genXbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lon, rg->grid2_corner_lon, 0);
-	      genYbounds(rg->grid2_dims[0], rg->grid2_dims[1], rg->grid2_center_lat, rg->grid2_corner_lat);
-	    }
-	  else
-	    {
-	      cdoAbort("grid2 corner missing!");
-	    }
+	  cdoAbort("grid2 corner missing!");
 	}
     }
 
@@ -1313,28 +1307,17 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	    }
 	}
     }
-  else
-    {
-      if ( rg->grid2_rank != 2 ) cdoAbort("Internal problem, grid2 rank = %d!", rg->grid2_rank);
-
-      nx = rg->grid2_dims[0];
-      ny = rg->grid2_dims[1];
-
-      if ( cdoVerbose ) cdoPrint("Grid2: boundbox_from_center");
-
-      boundbox_from_center(rg->grid2_is_cyclic, rg->grid2_size, nx, ny, 
-			   rg->grid2_center_lon, rg->grid2_center_lat, rg->grid2_bound_box);
-    }
-
 
   check_lon_boundbox_range(rg->grid1_size, rg->grid1_bound_box);
-  check_lon_boundbox_range(rg->grid2_size, rg->grid2_bound_box);
+  if ( rg->lneed_grid2_corners )
+    check_lon_boundbox_range(rg->grid2_size, rg->grid2_bound_box);
 
 
   /* Try to check for cells that overlap poles */
 
   check_lat_boundbox_range(rg->grid1_size, rg->grid1_bound_box, rg->grid1_center_lat);
-  check_lat_boundbox_range(rg->grid2_size, rg->grid2_bound_box, rg->grid2_center_lat);
+  if ( rg->lneed_grid2_corners )
+    check_lat_boundbox_range(rg->grid2_size, rg->grid2_bound_box, rg->grid2_center_lat);
 
 
   /*
