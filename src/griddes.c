@@ -1503,6 +1503,7 @@ int gridFromName(const char *gridname)
   int gridID = UNDEFID;
   grid_t grid;
   size_t len;
+  char *endptr;
 
   gridInit(&grid);
 
@@ -1607,11 +1608,15 @@ int gridFromName(const char *gridname)
       pline = &gridname[3];
       if ( isdigit((int) *pline) )
 	{
-	  grid.type = GRID_GME;
-	  grid.ni   = atoi(pline);
-	  grid.nd   = 10;
-	  factorni(grid.ni, &grid.ni2, &grid.ni3);
-	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
+	  long ni = strtol(pline, &endptr, 10);
+	  if ( *endptr == 0 )
+	    {
+	      grid.type = GRID_GME;
+	      grid.ni   = ni;
+	      grid.nd   = 10;
+	      factorni(grid.ni, &grid.ni2, &grid.ni3);
+	      grid.size = (grid.ni+1)*(grid.ni+1)*10;
+	    }
 	}
     }
   else if ( gridname[0] == 'n' && gridname[1] == 'i' ) /* ni<NI> */
@@ -1619,11 +1624,15 @@ int gridFromName(const char *gridname)
       pline = &gridname[2];
       if ( isdigit((int) *pline) )
 	{
-	  grid.type = GRID_GME;
-	  grid.ni   = atoi(pline);
-	  grid.nd   = 10;
-	  factorni(grid.ni, &grid.ni2, &grid.ni3);
-	  grid.size = (grid.ni+1)*(grid.ni+1)*10;
+	  long ni = strtol(pline, &endptr, 10);
+	  if ( *endptr == 0 )
+	    {
+	      grid.type = GRID_GME;
+	      grid.ni   = ni;
+	      grid.nd   = 10;
+	      factorni(grid.ni, &grid.ni2, &grid.ni3);
+	      grid.size = (grid.ni+1)*(grid.ni+1)*10;
+	    }
 	}
     }
   else if ( gridname[0] == 'n' ) /* n<N> */
@@ -1631,22 +1640,30 @@ int gridFromName(const char *gridname)
       pline = &gridname[1];
       if ( isdigit((int) *pline) )
 	{
-	  int np;
-	  np = atoi(pline);
-	  while ( isdigit((int) *pline) ) pline++;
+	  long np = strtol(pline, &endptr, 10);
+	  pline = endptr;
 
-	  grid.type = GRID_GAUSSIAN;
-	  grid.np    = np;
-	  grid.ysize = np*2;
-	  grid.xsize = compNlon(grid.ysize);
-
-	  if ( cmpstr(pline, "zon",  len) == 0 ) 
-	    grid.xsize = 1;
+	  if ( cmpstr(pline, "zon",  len) == 0 )
+	    {
+	      grid.xsize = 1;
+	      pline += 3;
+	    }
 	  else if ( *pline == 'b' )
-	    grid.genBounds = TRUE;
+	    {
+	      grid.genBounds = TRUE;
+	      pline++;
+	    }
 
-	  grid.def_xfirst = TRUE;
-	  grid.def_yfirst = TRUE;	      
+	  if ( *pline == 0 )
+	    {
+	      grid.type  = GRID_GAUSSIAN;
+	      grid.np    = np;
+	      grid.ysize = np*2;
+	      if ( !grid.xsize ) grid.xsize = compNlon(grid.ysize);
+
+	      grid.def_xfirst = TRUE;
+	      grid.def_yfirst = TRUE;	      
+	    }
 	}
     }
   else if ( gridname[0] == 'g' && isdigit(gridname[1])) /* g<LON>x<LAT> or g<SIZE> */
