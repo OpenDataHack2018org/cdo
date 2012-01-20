@@ -39,7 +39,9 @@ contrib/ruby/README.rdoc -text
 contrib/ruby/gemspec -text
 contrib/ruby/lib/cdo.rb -text
 contrib/ruby/test/test_cdo.rb -text
+doc/cdo-poster.pdf -text
 doc/cdo.pdf -text
+doc/cdoBrochureWeb.pdf -text svneol=unset#unset
 doc/cdo_refcard.pdf -text
 doc/eca_operator.pdf -text
 doc/tex/Modules -text
