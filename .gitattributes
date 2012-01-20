@@ -239,16 +239,17 @@ doc/tex/mod/Zonstat -text
 doc/tex/mod/chdoc -text
 doc/tex/mod/syntax -text
 doc/tex/partab.tex -text
-doc/tex/poster/MPG_SF.pdf -text svneol=unset#unset
-doc/tex/poster/MPIM_SF.pdf -text
-doc/tex/poster/beamerthemeMPIMET.sty -text
-doc/tex/poster/cdo-poster.tex -text
-doc/tex/poster/figures/cdi-structure.pdf -text svneol=unset#unset
-doc/tex/poster/figures/cdo-redmine.png -text
-doc/tex/poster/figures/cmsaf.pdf -text svneol=unset#unset
-doc/tex/poster/figures/grids.pdf -text
-doc/tex/poster/figures/grids2.pdf -text
-doc/tex/poster/mpimetcolors.sty -text
+doc/tex/poster/sab-cdo_2011/MPG_SF.pdf -text svneol=unset#unset
+doc/tex/poster/sab-cdo_2011/MPIM_SF.pdf -text
+doc/tex/poster/sab-cdo_2011/beamerthemeMPIMET.sty -text
+doc/tex/poster/sab-cdo_2011/cdo-poster.tex -text
+doc/tex/poster/sab-cdo_2011/figures/cdi-structure.graffle -text
+doc/tex/poster/sab-cdo_2011/figures/cdi-structure.pdf -text
+doc/tex/poster/sab-cdo_2011/figures/cdo-redmine.png -text
+doc/tex/poster/sab-cdo_2011/figures/cmsaf.pdf -text svneol=unset#unset
+doc/tex/poster/sab-cdo_2011/figures/grids.pdf -text
+doc/tex/poster/sab-cdo_2011/figures/grids2.pdf -text
+doc/tex/poster/sab-cdo_2011/mpimetcolors.sty -text
 doc/tex/ref_intro_arithm.tex -text
 doc/tex/ref_intro_climat.tex -text
 doc/tex/ref_intro_compar.tex -text
