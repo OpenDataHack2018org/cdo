@@ -5,6 +5,7 @@
 
 2012-01-23  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* remaplaf: using binary search (speedup)
 	* Timstepstat: added support for time bounds
 
 2012-01-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
