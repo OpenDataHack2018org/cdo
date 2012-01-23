@@ -1557,11 +1557,9 @@ int binary_search_int(const int *array, int len, int value)
       midpoint = low + (high - low)/2;      
  
       // check to see if value is equal to item in array
-      if (value == array[midpoint])
-        {                    
-	  return midpoint;
-        }
-      else if (value < array[midpoint])
+      if ( value == array[midpoint] )
+	return midpoint;
+      else if ( value < array[midpoint] )
 	high = midpoint - 1;
       else
 	low = midpoint + 1;
@@ -1668,10 +1666,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
       /* only for sorted dst_add! */
       {
       long min_add = 1, max_add = 0;
-      /*
-      for ( n = 0; n < num_links; n++ )
-	if ( i == dst_add[n] ) break;
-      */
+
       n = binary_search_int(dst_add, num_links, i);
 
       if ( n >= 0 && n < num_links )
