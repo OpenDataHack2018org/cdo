@@ -877,6 +877,7 @@ void *Remap(void *argument)
 
 	  gridsize2 = gridInqSize(gridID2);
 
+	  /* used only to check the result of remapcon
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
 	    {
 	      double grid2_err;
@@ -886,6 +887,7 @@ void *Remap(void *argument)
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
 		      grid2_err = remaps[r].grid.grid2_frac[i]*remaps[r].grid.grid2_area[i];
+		      //  printf("%d %g %g %g\n", i, grid2_err, remaps[r].grid.grid2_frac[i], remaps[r].grid.grid2_area[i]);
 		      if ( fabs(grid2_err) > 0 )
 			array2[i] = array2[i]/grid2_err;
 		      else
@@ -903,6 +905,7 @@ void *Remap(void *argument)
 		    }
 		}
 	    }
+	  */
 
 	  if ( operfunc == REMAPSUM )
 	  {

@@ -129,10 +129,10 @@ void remapGridFree(remapgrid_t *rg)
       free(rg->grid1_center_lon);
       free(rg->grid2_center_lat);
       free(rg->grid2_center_lon);
-      free(rg->grid1_area);
-      free(rg->grid2_area);
-      free(rg->grid1_frac);
-      free(rg->grid2_frac);
+      if ( rg->grid1_area ) free(rg->grid1_area);
+      if ( rg->grid2_area ) free(rg->grid2_area);
+      if ( rg->grid1_frac ) free(rg->grid1_frac);
+      if ( rg->grid2_frac ) free(rg->grid2_frac);
 
       if ( rg->grid1_corner_lat ) free(rg->grid1_corner_lat);
       if ( rg->grid1_corner_lon ) free(rg->grid1_corner_lon);
@@ -5505,18 +5505,18 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   /* Finish centroid computation */
 
-  for ( n = 0; n < grid1_size; n++ )
+  for ( n = 0; n < grid1_size; ++n )
     if ( IS_NOT_EQUAL(rg->grid1_area[n], 0) )
       {
-        grid1_centroid_lat[n] = grid1_centroid_lat[n]/rg->grid1_area[n];
-        grid1_centroid_lon[n] = grid1_centroid_lon[n]/rg->grid1_area[n];
+        grid1_centroid_lat[n] /= rg->grid1_area[n];
+        grid1_centroid_lon[n] /= rg->grid1_area[n];
       }
 
-  for ( n = 0; n < grid2_size; n++ )
+  for ( n = 0; n < grid2_size; ++n )
     if ( IS_NOT_EQUAL(rg->grid2_area[n], 0) )
       {
-        grid2_centroid_lat[n] = grid2_centroid_lat[n]/rg->grid2_area[n];
-        grid2_centroid_lon[n] = grid2_centroid_lon[n]/rg->grid2_area[n];
+        grid2_centroid_lat[n] /= rg->grid2_area[n];
+        grid2_centroid_lon[n] /= rg->grid2_area[n];
       }
 
   /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 1.e-9 */
@@ -5543,6 +5543,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
     cdoPrint("Removed number of links = %ld", rv->num_links - num_links);
   rv->num_links = num_links;
   */
+
   /* Include centroids in weights and normalize using destination area if requested */
 
   num_links = rv->num_links;
@@ -5627,19 +5628,13 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
     cdoPrint("Total number of links = %ld", rv->num_links);
 
   for ( n = 0; n < grid1_size; n++ )
-    if ( IS_NOT_EQUAL(rg->grid1_area[n], 0) ) rg->grid1_frac[n] = rg->grid1_frac[n]/rg->grid1_area[n];
+    if ( IS_NOT_EQUAL(rg->grid1_area[n], 0) ) rg->grid1_frac[n] /= rg->grid1_area[n];
 
   for ( n = 0; n < grid2_size; n++ )
-    if ( IS_NOT_EQUAL(rg->grid2_area[n], 0) ) rg->grid2_frac[n] = rg->grid2_frac[n]/rg->grid2_area[n];
+    if ( IS_NOT_EQUAL(rg->grid2_area[n], 0) ) rg->grid2_frac[n] /= rg->grid2_area[n];
 
   /* Perform some error checking on final weights  */
-  /*
-  for ( n = 0; n < grid2_size; n++ )
-    {
-      grid2_centroid_lat[n] = 0;
-      grid2_centroid_lon[n] = 0;
-    }
-  */
+
   if ( lcheck )
     {
       for ( n = 0; n < grid1_size; n++ )
@@ -5649,34 +5644,22 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
 	  if ( grid1_centroid_lat[n] < -PIH-.01 || grid1_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Grid 1 centroid lat error: %d %g", n, grid1_centroid_lat[n]);
+
+	  grid1_centroid_lat[n] = 0;
+	  grid1_centroid_lon[n] = 0;
 	}
-    }
 
-  for ( n = 0; n < grid1_size; n++ )
-    {
-      grid1_centroid_lat[n] = 0;
-      grid1_centroid_lon[n] = 0;
-    }
-
-  if ( lcheck )
-    {
       for ( n = 0; n < grid2_size; n++ )
 	{
 	  if ( rg->grid2_area[n] < -.01 )
 	    cdoPrint("Grid 2 area error: %d %g", n, rg->grid2_area[n]);
 	  if ( grid2_centroid_lat[n] < -PIH-.01 || grid2_centroid_lat[n] > PIH+.01 )
 	    cdoPrint("Grid 2 centroid lat error: %d %g", n, grid2_centroid_lat[n]);
+
+	  grid2_centroid_lat[n] = 0;
+	  grid2_centroid_lon[n] = 0;
 	}
-    }
 
-  for ( n = 0; n < grid2_size; n++ )
-    {
-      grid2_centroid_lat[n] = 0;
-      grid2_centroid_lon[n] = 0;
-    }
-
-  if ( lcheck )
-    {
       for ( n = 0; n < num_links; n++ )
 	{
 	  grid1_add = rv->grid1_add[n];
@@ -5690,33 +5673,27 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	    cdoPrint("Map 1 weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
 		     grid1_add, grid2_add, n, rv->wts[3*n]);
 	}
-    }
 
-#if defined (SX)
-#pragma vdir nodep
-#endif
-  for ( n = 0; n < num_links; n++ )
-    {
-      grid2_add = rv->grid2_add[n];
-      grid2_centroid_lat[grid2_add] += rv->wts[3*n];
-    }
+      for ( n = 0; n < num_links; n++ )
+	{
+	  grid2_add = rv->grid2_add[n];
+	  grid2_centroid_lat[grid2_add] += rv->wts[3*n];
+	}
 
-  /* Uwe Schulzweida: check if grid2_add is valid */
-  if ( lcheck )
-  if ( grid2_add != -1 )
-    for ( n = 0; n < grid2_size; n++ )
-      {
-        if ( rv->norm_opt == NORM_OPT_DESTAREA )
-          norm_factor = rg->grid2_frac[grid2_add];
-        else if ( rv->norm_opt == NORM_OPT_FRACAREA )
-          norm_factor = ONE;
-        else if ( rv->norm_opt == NORM_OPT_NONE )
-	  norm_factor = rg->grid2_area[grid2_add];
-
-        if ( fabs(grid2_centroid_lat[grid2_add] - norm_factor) > .01 )
-          cdoPrint("Error: sum of wts for map1 %d %g %g",
-		   grid2_add, grid2_centroid_lat[grid2_add], norm_factor);
-      }
+      /* 2012-01-24 Uwe Schulzweida: changed [grid2_add] to [n] (bug fix) */
+      for ( n = 0; n < grid2_size; n++ )
+	{
+	  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+	    norm_factor = rg->grid2_frac[n];
+	  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+	    norm_factor = ONE;
+	  else if ( rv->norm_opt == NORM_OPT_NONE )
+	    norm_factor = rg->grid2_area[n];
+	    
+	  if ( grid2_centroid_lat[n] > 0 && fabs(grid2_centroid_lat[n] - norm_factor) > .01 )
+	    cdoPrint("Error: sum of wts for map1 %d %g %g", n, grid2_centroid_lat[n], norm_factor);
+	}
+    } // lcheck
 
   free(grid1_centroid_lat);
   free(grid1_centroid_lon);
