@@ -877,7 +877,7 @@ void *Remap(void *argument)
 
 	  gridsize2 = gridInqSize(gridID2);
 
-	  /* used only to check the result of remapcon
+	  /* used only to check the result of remapcon */
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
 	    {
 	      double grid2_err;
@@ -905,7 +905,6 @@ void *Remap(void *argument)
 		    }
 		}
 	    }
-	  */
 
 	  if ( operfunc == REMAPSUM )
 	  {
