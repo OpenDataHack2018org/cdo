@@ -103,15 +103,18 @@ STRING  Target grid description file or name
 
 
 @BeginEnvironment
-@Item = NORMALIZE_OPT
-This variable is used to choose the normalization of the conservative 
-remapping. By default NORMALIZE_OPT is set to 'fracarea' and will
-include the destination area fraction in the output weights; other 
-options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
+@C @Item = NORMALIZE_OPT
+@C This variable is used to choose the normalization of the conservative 
+@C remapping. By default @env{NORMALIZE_OPT} is set to 'fracarea' and will
+@C include the destination area fraction in the output weights; other 
+@C options are 'none' and 'destarea' (for more information see \cite{SCRIP}).
 @Item = REMAP_EXTRAPOLATE
 This variable is used to switch the extrapolation feature 'on' or 'off'.
 By default the extrapolation is enabled for remapdis, remapnn
 and for circular grids.
+@Item = REMAP_AREA_MIN
+This variable is used to set the minimum destination area fraction. The default
+of this variable is 0.0.
 @EndEnvironment
 
 

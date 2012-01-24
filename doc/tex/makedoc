@@ -867,6 +867,7 @@ while (<MOFILE>) {
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
 	  $line =~ s/_/\\_/g;
+	  $line =~ s/\@env\{([^}]*)\}/{\\tt \1}/og;
 	  print TRFILE "$line\n";
 	  $lines = $lines + 1;
 	}
