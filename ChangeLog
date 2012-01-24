@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.4
 	* Version 1.5.4 released
 
+2012-01-24  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remapcon: added env REMAP_AREA_MIN, to set the minimum area fraction [request: Gernot Geppert]
+
 2012-01-23  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplaf: using binary search (speedup)
