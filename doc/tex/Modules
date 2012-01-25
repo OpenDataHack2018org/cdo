@@ -73,8 +73,10 @@ Yseasstat     Statistical values
 Yseaspctl     Statistical values
 Ydrunstat     Statistical values
 Ydrunpctl     Statistical values
-Fldcor        Correlation
-Timcor        Correlation
+Fldcor        Correlation and co.
+Timcor        Correlation and co.
+Fldcovar      Correlation and co.
+Timcovar      Correlation and co.
 Regres        Regression
 Detrend       Regression
 Trend         Regression

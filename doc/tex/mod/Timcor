@@ -1,8 +1,8 @@
 @BeginModule
 @Name      = Timcor
 @Title     = Correlation over time
-@Section   = Correlation
-@Class     = Correlation
+@Section   = Correlation and co.
+@Class     = Correlation and co.
 @Arguments = ifile1 ifile2 ofile
 @Operators = timcor
 @EndModule

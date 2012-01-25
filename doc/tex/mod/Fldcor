@@ -1,9 +1,9 @@
 @BeginModule
 @NewPage
 @Name      = Fldcor
-@Title     = Correlation of grid space
-@Section   = Correlation
-@Class     = Correlation
+@Title     = Correlation in grid space
+@Section   = Correlation and co.
+@Class     = Correlation and co.
 @Arguments = ifile1 ifile2 ofile
 @Operators = fldcor
 @EndModule
@@ -40,7 +40,7 @@ o(t,1) = \frac{\sum\limits_{x \in S(t)} i_1(t,x) i_2(t,x) w(x) -
                       \overline{i_2(t,x)}^2 \sum\limits_{x \in S(t)} w(x) \right) }}
 @EndDisplayMath
 @EndifDoc
-where @math{w(x)} are the area weights obtained by the input stream.
+where @math{w(x)} are the area weights obtained by the input streams.
 For every timestep @math{t} only those field elements @math{x} belong to the sample,
 which have @math{i_1(t,x) \neq missval} and @math{i_2(t,x) \neq missval}.
 @EndDescription

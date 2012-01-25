@@ -138,6 +138,7 @@ doc/tex/mod/Filedes -text
 doc/tex/mod/Fillmiss -text
 doc/tex/mod/Filter -text
 doc/tex/mod/Fldcor -text
+doc/tex/mod/Fldcovar -text
 doc/tex/mod/Fldstat -text
 doc/tex/mod/Genweights -text
 doc/tex/mod/Gradsdes -text
@@ -210,6 +211,7 @@ doc/tex/mod/Strgal -text
 doc/tex/mod/Strwin -text
 doc/tex/mod/Subtrend -text
 doc/tex/mod/Timcor -text
+doc/tex/mod/Timcovar -text
 doc/tex/mod/Timpctl -text
 doc/tex/mod/Timselpctl -text
 doc/tex/mod/Timselstat -text

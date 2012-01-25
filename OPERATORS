@@ -357,10 +357,12 @@ Operator catalog:
    Ydrunstat     ydrunstd        Multi-year daily running standard deviation
    Ydrunpctl     ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
-   Correlation
+   Correlation and co.
 -------------------------------------------------------------
    Fldcor        fldcor          Correlation in grid space
    Timcor        timcor          Correlation over time
+   Fldcovar      fldcovar        Covariance in grid space
+   Timcovar      timcovar        Covariance over time
 -------------------------------------------------------------
    Regression
 -------------------------------------------------------------

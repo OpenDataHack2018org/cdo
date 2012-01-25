@@ -2711,7 +2711,7 @@ static char *YdrunpctlHelp[] = {
 
 static char *FldcorHelp[] = {
     "NAME",
-    "    fldcor - Correlation of grid space",
+    "    fldcor - Correlation in grid space",
     "",
     "SYNOPSIS",
     "    fldcor  ifile1 ifile2 ofile",
@@ -2725,7 +2725,7 @@ static char *FldcorHelp[] = {
     "    it is",
     "    ",
     "    o(t,1) = Cor{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}",
-    "    where w(x) are the area weights obtained by the input stream.",
+    "    where w(x) are the area weights obtained by the input streams.",
     "    For every timestep t only those field elements x belong to the sample,",
     "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
     NULL
@@ -2747,6 +2747,47 @@ static char *TimcorHelp[] = {
     "    it is",
     "    ",
     "    o(1,x) = Cor{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}",
+    "    For every gridpoint x only those timesteps t belong to the sample,",
+    "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
+    NULL
+};
+
+static char *FldcovarHelp[] = {
+    "NAME",
+    "    fldcovar - Covariance in grid space",
+    "",
+    "SYNOPSIS",
+    "    fldcovar  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator calculates the covariance of two fields over all gridpoints",
+    "    for each timestep. With",
+    "    ",
+    "    S(t) = {x, i_1(t,x) != missval and i_2(t,x) != missval}",
+    "    it is",
+    "    ",
+    "    o(t,1) = Covar{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}",
+    "    where w(x) are the area weights obtained by the input streams.",
+    "    For every timestep t only those field elements x belong to the sample,",
+    "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
+    NULL
+};
+
+static char *TimcovarHelp[] = {
+    "NAME",
+    "    timcovar - Covariance over time",
+    "",
+    "SYNOPSIS",
+    "    timcovar  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator calculates the covariance of two fields at each gridpoint",
+    "    over all timesteps. With",
+    "    ",
+    "    S(x) = {t, i_1(t,x) != missval and i_2(t,x) != missval}",
+    "    it is",
+    "    ",
+    "    o(1,x) = Covar{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}",
     "    For every gridpoint x only those timesteps t belong to the sample,",
     "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
     NULL
@@ -2937,15 +2978,13 @@ static char *RemapgridHelp[] = {
     "    grid  STRING  Target grid description file or name",
     "",
     "ENVIRONMENT",
-    "    NORMALIZE_OPT    ",
-    "        This variable is used to choose the normalization of the conservative ",
-    "        remapping. By default NORMALIZE_OPT is set to 'fracarea' and will",
-    "        include the destination area fraction in the output weights; other ",
-    "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for remapdis, remapnn",
     "        and for circular grids.",
+    "    REMAP_AREA_MIN   ",
+    "        This variable is used to set the minimum destination area fraction. The default",
+    "        of this variable is 0.0.",
     NULL
 };
 
@@ -2995,15 +3034,13 @@ static char *GenweightsHelp[] = {
     "    grid  STRING  Target grid description file or name",
     "",
     "ENVIRONMENT",
-    "    NORMALIZE_OPT    ",
-    "        This variable is used to choose the normalization of the conservative ",
-    "        interpolation. By default NORMALIZE_OPT is set to 'fracarea' and will",
-    "        include the destination area fraction in the output weights; other ",
-    "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for remapdis, remapnn",
     "        and for circular grids.",
+    "    REMAP_AREA_MIN   ",
+    "        This variable is used to set the minimum destination area fraction. The default",
+    "        of this variable is 0.0.",
     NULL
 };
 
@@ -3027,15 +3064,13 @@ static char *RemapHelp[] = {
     "    weights  STRING  Interpolation weights (SCRIP netCDF file)",
     "",
     "ENVIRONMENT",
-    "    NORMALIZE_OPT    ",
-    "        This variable is used to choose the normalization of the conservative ",
-    "        interpolation. By default NORMALIZE_OPT is set to 'fracarea' and will",
-    "        include the destination area fraction in the output weights; other ",
-    "        options are 'none' and 'destarea' (for more information see {SCRIP}).",
     "    REMAP_EXTRAPOLATE",
     "        This variable is used to switch the extrapolation feature 'on' or 'off'.",
     "        By default the extrapolation is enabled for remapdis, remapnn",
     "        and for circular grids.",
+    "    REMAP_AREA_MIN   ",
+    "        This variable is used to set the minimum destination area fraction. The default",
+    "        of this variable is 0.0.",
     NULL
 };
 

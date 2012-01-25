@@ -1,0 +1,43 @@
+@BeginModule
+@NewPage
+@Name      = Fldcovar
+@Title     = Covariance in grid space
+@Section   = Correlation and co.
+@Class     = Correlation and co.
+@Arguments = ifile1 ifile2 ofile
+@Operators = fldcovar
+@EndModule
+
+
+@BeginOperator_fldcovar
+@Title     = Covariance in grid space
+
+@BeginDescription
+This operator calculates the covariance of two fields over all gridpoints
+for each timestep. With
+@IfMan
+
+S(t) = {x, i_1(t,x) != missval and i_2(t,x) != missval}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+S(t) = \{x, i_1(t,x) \neq missval \wedge i_2(t,x) \neq missval\}
+@EndDisplayMath
+@EndifDoc
+it is
+@IfMan
+
+o(t,1) = Covar{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+o(t,1) = \left( \sum\limits_{x \in S(t)} w(x) \right)^{-1} \sum\limits_{x \in S(t)} w(x) \, 
+         \left( i_1(t,x) - \frac{ \sum\limits_{x \in S(t)} w(x) \, i_1(t,x)}{\sum\limits_{x \in S(t)} w(x)} \right)
+         \left( i_2(t,x) - \frac{ \sum\limits_{x \in S(t)} w(x) \, i_2(t,x)}{\sum\limits_{x \in S(t)} w(x)} \right)
+@EndDisplayMath
+@EndifDoc
+where @math{w(x)} are the area weights obtained by the input streams.
+For every timestep @math{t} only those field elements @math{x} belong to the sample,
+which have @math{i_1(t,x) \neq missval} and @math{i_2(t,x) \neq missval}.
+@EndDescription
+@EndOperator

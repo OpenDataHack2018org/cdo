@@ -1,0 +1,39 @@
+@BeginModule
+@Name      = Timcovar
+@Title     = Covariance over time
+@Section   = Correlation and co.
+@Class     = Correlation and co.
+@Arguments = ifile1 ifile2 ofile
+@Operators = timcovar
+@EndModule
+
+
+@BeginOperator_timcovar
+@Title     = Covariance over time
+
+@BeginDescription
+This operator calculates the covariance of two fields at each gridpoint
+over all timesteps. With
+@IfMan
+
+S(x) = {t, i_1(t,x) != missval and i_2(t,x) != missval}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+S(x) = \{t, i_1(t,x) \neq missval \wedge i_2(t,x) \neq missval\}
+@EndDisplayMath
+@EndifDoc
+it is
+@IfMan
+
+o(1,x) = Covar{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}
+@EndifMan
+@IfDoc
+@BeginDisplayMath
+o(1,x) = n^{-1} \sum\limits_{t \in S(x)} \left(i_1(t,x) - \overline{i_1(t,x)} \right)^2 \left(i_2(t,x) - \overline{i_2(t,x)} \right)^2
+@EndDisplayMath
+@EndifDoc
+For every gridpoint @math{x} only those timesteps @math{t} belong to the sample,
+which have @math{i_1(t,x) \neq missval} and @math{i_2(t,x) \neq missval}.
+@EndDescription
+@EndOperator

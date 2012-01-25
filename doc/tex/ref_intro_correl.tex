@@ -1,1 +1,25 @@
-This sections contains modules for correlation in space and time.
+This sections contains modules for correlation and co. in grid space and over time.\\
+In this section the abbreviations as in the following table are used:
+
+\vspace{3mm}
+
+\fbox{\parbox{17cm}{
+\begin{eqnarray*}
+\begin{array}{l}
+\makebox[2.5cm][l]{Covariance} \\
+\makebox[2.5cm][l]{{\bf covar}} \\
+\end{array}
+ &  &
+ n^{-1} \sum_{i=1}^{n} (x_i - \overline{x})^2 (y_i - \overline{y})^2
+\\
+\begin{array}{l}
+\makebox[2.5cm][l]{{\bf covar} weighted by} \\
+\{w_i, i=1, ..., n\}  \\
+\end{array}
+ & &
+  \left( \sum_{j=1}^{n} w_j \right)^{-1} \sum\limits_{i=1}^{n} w_i \, 
+  \left( x_i - \left( \sum_{j=1}^{n} w_j \right)^{-1} \sum\limits_{j=1}^{n} w_j \, x_j \right)
+  \left( y_i - \left( \sum_{j=1}^{n} w_j \right)^{-1}  \sum\limits_{j=1}^{n} w_j \, y_j \right)
+\\
+\end{eqnarray*}
+}}
