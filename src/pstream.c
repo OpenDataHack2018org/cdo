@@ -865,6 +865,12 @@ void pstreamClose(int pstreamID)
 	    }
 	}
 
+      if ( pstreamptr->name )
+	{
+	  free(pstreamptr->name);
+	  pstreamptr->name = NULL;
+	}
+
       if ( pstreamptr->varlist )
 	{
 	  free(pstreamptr->varlist);
