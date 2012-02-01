@@ -1,5 +1,6 @@
 2012-02-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* mergetime: added env. SKIP_SAME_TIME to skip all double entries of the same timestamp [request: K. Houchi]
 	* Added operator rohpot - potential density for MPIOM (experimental) [request: Helmut Haak]
 
 2012-01-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
