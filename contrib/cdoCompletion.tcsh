@@ -410,6 +410,7 @@ remapnn \
 remapsum \
 replace \
 retocomplex \
+rhopot \
 rotuvb \
 runavg \
 runmax \

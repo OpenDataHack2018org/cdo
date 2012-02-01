@@ -93,6 +93,7 @@ cdo_SOURCES += Arith.c         \
                Remapeta.c      \
                Replace.c       \
                Replacevalues.c \
+               Rhopot.c        \
                Rotuv.c         \
                Runpctl.c       \
                Runstat.c       \

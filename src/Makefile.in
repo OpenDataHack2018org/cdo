@@ -98,7 +98,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
 	cdo-Remap.$(OBJEXT) cdo-Remapeta.$(OBJEXT) \
 	cdo-Replace.$(OBJEXT) cdo-Replacevalues.$(OBJEXT) \
-	cdo-Rotuv.$(OBJEXT) cdo-Runpctl.$(OBJEXT) \
+	cdo-Rhopot.$(OBJEXT) cdo-Rotuv.$(OBJEXT) cdo-Runpctl.$(OBJEXT) \
 	cdo-Runstat.$(OBJEXT) cdo-Scatter.$(OBJEXT) \
 	cdo-Seascount.$(OBJEXT) cdo-Seaspctl.$(OBJEXT) \
 	cdo-Seasstat.$(OBJEXT) cdo-Selbox.$(OBJEXT) \
@@ -358,7 +358,7 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c \
 	Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c \
 	Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
-	Replace.c Replacevalues.c Rotuv.c Runpctl.c Runstat.c \
+	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
 	Scatter.c Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
@@ -607,6 +607,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Remapeta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Replace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Replacevalues.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Rhopot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Rotuv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runstat.Po@am__quote@
@@ -2034,6 +2035,20 @@ cdo-Replacevalues.obj: Replacevalues.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Replacevalues.c' object='cdo-Replacevalues.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Replacevalues.obj `if test -f 'Replacevalues.c'; then $(CYGPATH_W) 'Replacevalues.c'; else $(CYGPATH_W) '$(srcdir)/Replacevalues.c'; fi`
+
+cdo-Rhopot.o: Rhopot.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Rhopot.o -MD -MP -MF $(DEPDIR)/cdo-Rhopot.Tpo -c -o cdo-Rhopot.o `test -f 'Rhopot.c' || echo '$(srcdir)/'`Rhopot.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Rhopot.Tpo $(DEPDIR)/cdo-Rhopot.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Rhopot.c' object='cdo-Rhopot.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Rhopot.o `test -f 'Rhopot.c' || echo '$(srcdir)/'`Rhopot.c
+
+cdo-Rhopot.obj: Rhopot.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Rhopot.obj -MD -MP -MF $(DEPDIR)/cdo-Rhopot.Tpo -c -o cdo-Rhopot.obj `if test -f 'Rhopot.c'; then $(CYGPATH_W) 'Rhopot.c'; else $(CYGPATH_W) '$(srcdir)/Rhopot.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Rhopot.Tpo $(DEPDIR)/cdo-Rhopot.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Rhopot.c' object='cdo-Rhopot.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Rhopot.obj `if test -f 'Rhopot.c'; then $(CYGPATH_W) 'Rhopot.c'; else $(CYGPATH_W) '$(srcdir)/Rhopot.c'; fi`
 
 cdo-Rotuv.o: Rotuv.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Rotuv.o -MD -MP -MF $(DEPDIR)/cdo-Rotuv.Tpo -c -o cdo-Rotuv.o `test -f 'Rotuv.c' || echo '$(srcdir)/'`Rotuv.c

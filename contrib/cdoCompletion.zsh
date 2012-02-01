@@ -410,6 +410,7 @@ remapnn -remapnn \
 remapsum -remapsum \
 replace -replace \
 retocomplex -retocomplex \
+rhopot -rhopot \
 rotuvb -rotuvb \
 runavg -runavg \
 runmax -runmax \

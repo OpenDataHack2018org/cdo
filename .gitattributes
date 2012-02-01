@@ -372,6 +372,7 @@ src/Remap.c -text
 src/Remapeta.c -text
 src/Replace.c -text
 src/Replacevalues.c -text
+src/Rhopot.c -text
 src/Rotuv.c -text
 src/Runpctl.c -text
 src/Runstat.c -text

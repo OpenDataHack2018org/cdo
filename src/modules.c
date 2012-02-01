@@ -127,6 +127,7 @@ void *Remapeta(void *argument);
 void *Replace(void *argument);
 void *Replacevalues(void *argument);
 void *Rotuv(void *argument);
+void *Rhopot(void *argument);
 void *Runpctl(void *argument);
 void *Runstat(void *argument);
 void *Seascount(void *argument);
@@ -348,6 +349,7 @@ void *Wct(void *argument);
 #define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
 #define  ReplacevaluesOperators {"setvals", "setrtoc", "setrtoc2"}
+#define  RhopotOperators        {"rhopot"}
 #define  RotuvOperators         {"rotuvb"}
 #define  RunpctlOperators       {"runpctl"}
 #define  RunstatOperators       {"runmin",  "runmax",  "runsum",  "runmean",  "runavg",  "runvar",  "runstd"}
@@ -588,6 +590,7 @@ static modules_t Modules[] =
   { Remapeta,       RemapetaHelp,      RemapetaOperators,      CDI_REAL,  1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,       CDI_REAL,  2,  1 },
   { Replacevalues,  ReplacevaluesHelp, ReplacevaluesOperators, CDI_REAL,  1,  1 },
+  { Rhopot,         NULL,              RhopotOperators,        CDI_REAL,  1,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,         CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       CDI_REAL,  1,  1 },
