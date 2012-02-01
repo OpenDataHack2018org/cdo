@@ -491,6 +491,8 @@ void *Derivepar(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
+  vlistDestroy(vlistID2);
+
   if ( imiss ) free(imiss);
 
   free(ps);
