@@ -162,6 +162,7 @@ cdo_SOURCES += Arith.c         \
                Ydaystat.c      \
                Ydrunpctl.c     \
                Ydrunstat.c     \
+               Yhourarith.c    \
                Yhourstat.c     \
                Ymonarith.c     \
                Ymonpctl.c      \

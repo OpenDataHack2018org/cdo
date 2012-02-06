@@ -243,6 +243,10 @@ static char *MergeHelp[] = {
     "               on different timesteps.",
     "               After this operation every input timestep is in ofile and",
     "               all timesteps are sorted by date and time.",
+    "",
+    "ENVIRONMENT",
+    "    SKIP_SAME_TIME",
+    "        If set to 1, skips all timesteps with a double entry of the same timestamp.",
     NULL
 };
 

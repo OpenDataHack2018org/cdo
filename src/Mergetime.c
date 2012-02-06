@@ -158,7 +158,7 @@ void *Mergetime(void *argument)
 	    char vdatestr[32], vtimestr[32];
 	    date2str(vdate, vdatestr, sizeof(vdatestr));
 	    time2str(vtime, vtimestr, sizeof(vtimestr));
-	    cdoPrint("Timestep %4d in stream %d (%s %s) already exist, skipped!", sf[fileID].tsID, sf[fileID].streamID, vdatestr, vtimestr);
+	    cdoPrint("Timestep %4d in stream %d (%s %s) already exist, skipped!", sf[fileID].tsID+1, sf[fileID].streamID, vdatestr, vtimestr);
 	    goto SKIP_TIMESTEP;
 	  }
 

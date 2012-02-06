@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -192,12 +192,13 @@ void *Vertwind(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
-void *Yhourstat(void *argument);
 void *Ydayarith(void *argument);
 void *Ydaypctl(void *argument);
 void *Ydaystat(void *argument);
 void *Ydrunpctl(void *argument);
 void *Ydrunstat(void *argument);
+void *Yhourarith(void *argument);
+void *Yhourstat(void *argument);
 void *Ymonarith(void *argument);
 void *Ymonpctl(void *argument);
 void *Ymonstat(void *argument);
@@ -292,7 +293,8 @@ void *Wct(void *argument);
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldvar", "fldstd", "fldpctl"}
-#define  Fldstat2Operators      {"fldcor", "fldcovar"}
+#define  FldcorOperators        {"fldcor"}
+#define  FldcovarOperators      {"fldcovar"}
 #define  FourierOperators       {"fourier"}
 #define  GatherOperators        {"gather"}
 #define  GengridOperators       {"gengrid"}
@@ -414,7 +416,8 @@ void *Wct(void *argument);
 #define    MonstatOperators     {"monmin",  "monmax",  "monsum",  "monmean",  "monavg",  "monvar",  "monstd"}
 #define    DaystatOperators     {"daymin",  "daymax",  "daysum",  "daymean",  "dayavg",  "dayvar",  "daystd"}
 #define    HourstatOperators    {"hourmin", "hourmax", "hoursum", "hourmean", "houravg", "hourvar", "hourstd"}
-#define  Timstat2Operators      {"timcor", "timcovar"}
+#define  TimcorOperators        {"timcor"}
+#define  TimcovarOperators      {"timcovar"}
 #define  Timstat3Operators      {"meandiff2test", "varquot2test"}
 #define  TinfoOperators         {"tinfo"}
 #define  TocomplexOperators     {"retocomplex", "imtocomplex"}
@@ -432,12 +435,13 @@ void *Wct(void *argument);
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
-#define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourvar", "yhourstd"}
 #define  YdayarithOperators     {"ydayadd", "ydaysub", "ydaymul", "ydaydiv"}
 #define  YdaypctlOperators      {"ydaypctl"}
 #define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydayvar", "ydaystd"}
 #define  YdrunpctlOperators     {"ydrunpctl"}
 #define  YdrunstatOperators     {"ydrunmin", "ydrunmax", "ydrunsum", "ydrunmean", "ydrunavg", "ydrunvar", "ydrunstd"}
+#define  YhourarithOperators    {"yhouradd", "yhoursub", "yhourmul", "yhourdiv"}
+#define  YhourstatOperators     {"yhourmin", "yhourmax", "yhoursum", "yhourmean", "yhouravg", "yhourvar", "yhourstd"}
 #define  YmonarithOperators     {"ymonadd", "ymonsub", "ymonmul", "ymondiv"}
 #define  YmonpctlOperators      {"ymonpctl"}
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonvar", "ymonstd"}
@@ -539,7 +543,8 @@ static modules_t Modules[] =
   { Filter,         FilterHelp,        FilterOperators,        CDI_REAL,  1,  1 },
   { Fldrms,         NULL,              FldrmsOperators,        CDI_REAL,  2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,       CDI_REAL,  1,  1 },
-  { Fldstat2,       FldcorHelp,        Fldstat2Operators,      CDI_REAL,  2,  1 },
+  { Fldstat2,       FldcorHelp,        FldcorOperators,        CDI_REAL,  2,  1 },
+  { Fldstat2,       FldcovarHelp,      FldcovarOperators,      CDI_REAL,  2,  1 },
   { Fourier,        NULL,              FourierOperators,       CDI_COMP,  1,  1 },
   { Gather,         NULL,              GatherOperators,        CDI_REAL, -1,  1 },
   { Gengrid,        NULL,              GengridOperators,       CDI_REAL,  2,  1 },
@@ -651,7 +656,8 @@ static modules_t Modules[] =
   { Timstat,        MonstatHelp,       MonstatOperators,       CDI_REAL,  1,  1 },
   { Timstat,        DaystatHelp,       DaystatOperators,       CDI_REAL,  1,  1 },
   { Timstat,        HourstatHelp,      HourstatOperators,      CDI_REAL,  1,  1 },
-  { Timstat2,       TimcorHelp,        Timstat2Operators,      CDI_REAL,  2,  1 },
+  { Timstat2,       TimcorHelp,        TimcorOperators,        CDI_REAL,  2,  1 },
+  { Timstat2,       TimcovarHelp,      TimcovarOperators,      CDI_REAL,  2,  1 },
   { Timstat3,       NULL,              Timstat3Operators,      CDI_REAL,  2,  1 },
   { Tinfo,          NULL,              TinfoOperators,         CDI_BOTH,  1,  0 },
   { Tocomplex,      NULL,              TocomplexOperators,     CDI_REAL,  1,  1 },
@@ -668,12 +674,13 @@ static modules_t Modules[] =
   { Wind,           WindHelp,          WindOperators,          CDI_REAL,  1,  1 },
   { Writegrid,      NULL,              WritegridOperators,     CDI_REAL,  1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,   CDI_REAL,  1,  1 },
-  { Yhourstat,      YhourstatHelp,     YhourstatOperators,     CDI_REAL,  1,  1 },
   { Ydayarith,      YdayarithHelp,     YdayarithOperators,     CDI_REAL,  2,  1 },
   { Ydaypctl,       YdaypctlHelp,      YdaypctlOperators,      CDI_REAL,  3,  1 },
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,      CDI_REAL,  1,  1 },
   { Ydrunpctl,      YdrunpctlHelp,     YdrunpctlOperators,     CDI_REAL,  3,  1 },
   { Ydrunstat,      YdrunstatHelp,     YdrunstatOperators,     CDI_REAL,  1,  1 },
+  { Yhourarith,     NULL,              YhourarithOperators,    CDI_REAL,  2,  1 },
+  { Yhourstat,      YhourstatHelp,     YhourstatOperators,     CDI_REAL,  1,  1 },
   { Ymonarith,      YmonarithHelp,     YmonarithOperators,     CDI_REAL,  2,  1 },
   { Ymonpctl,       YmonpctlHelp,      YmonpctlOperators,      CDI_REAL,  3,  1 },
   { Ymonstat,       YmonstatHelp,      YmonstatOperators,      CDI_REAL,  1,  1 },
