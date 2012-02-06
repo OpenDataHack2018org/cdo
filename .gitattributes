@@ -233,6 +233,7 @@ doc/tex/mod/Ydrunpctl -text
 doc/tex/mod/Ydrunstat -text
 doc/tex/mod/Yearpctl -text
 doc/tex/mod/Yearstat -text
+doc/tex/mod/Yhourarith -text
 doc/tex/mod/Yhourstat -text
 doc/tex/mod/Ymonarith -text
 doc/tex/mod/Ymonpctl -text

@@ -43,6 +43,12 @@ all timesteps are sorted by date and time.
 @EndOperator
 
 
+@BeginEnvironment
+@Item = SKIP_SAME_TIME
+If set to 1, skips all timesteps with a double entry of the same timestamp.
+@EndEnvironment
+
+
 @BeginExample
 Assume three datasets with the same number of timesteps
 and different variables in each dataset.

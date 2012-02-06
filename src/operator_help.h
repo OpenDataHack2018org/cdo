@@ -1305,6 +1305,33 @@ static char *YdayarithHelp[] = {
     NULL
 };
 
+static char *YhourarithHelp[] = {
+    "NAME",
+    "    yhouradd, yhoursub, yhourmul, yhourdiv - Multi-year hourly arithmetic",
+    "",
+    "SYNOPSIS",
+    "    <operator>  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    This module performs simple arithmetic of a time series and one",
+    "    timestep with the same hour and day of year. For each field in ifile1",
+    "    the corresponding field of the timestep in ifile2 with the",
+    "    same hour and day of year is used. The header information in ifile1",
+    "    have to be the same as in ifile2. Usually ifile2 is generated",
+    "    by an operator of the module YHOURSTAT.",
+    "",
+    "OPERATORS",
+    "    yhouradd  Add multi-year hourly time series",
+    "              Adds a time series and a multi-year hourly time series.",
+    "    yhoursub  Subtract multi-year hourly time series",
+    "              Subtracts a time series and a multi-year hourly time series.",
+    "    yhourmul  Multiply multi-year hourly time series",
+    "              Multiplies a time series and a multi-year hourly time series.",
+    "    yhourdiv  Divide multi-year hourly time series",
+    "              Divides a time series and a multi-year hourly time series.",
+    NULL
+};
+
 static char *ArithdaysHelp[] = {
     "NAME",
     "    muldpm, divdpm, muldpy, divdpy - Arithmetic with days",

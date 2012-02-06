@@ -650,11 +650,15 @@ yearpctl -yearpctl \
 yearstd -yearstd \
 yearsum -yearsum \
 yearvar -yearvar \
+yhouradd -yhouradd \
 yhouravg -yhouravg \
+yhourdiv -yhourdiv \
 yhourmax -yhourmax \
 yhourmean -yhourmean \
 yhourmin -yhourmin \
+yhourmul -yhourmul \
 yhourstd -yhourstd \
+yhoursub -yhoursub \
 yhoursum -yhoursum \
 yhourvar -yhourvar \
 ymonadd -ymonadd \

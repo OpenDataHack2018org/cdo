@@ -679,7 +679,7 @@ static modules_t Modules[] =
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,      CDI_REAL,  1,  1 },
   { Ydrunpctl,      YdrunpctlHelp,     YdrunpctlOperators,     CDI_REAL,  3,  1 },
   { Ydrunstat,      YdrunstatHelp,     YdrunstatOperators,     CDI_REAL,  1,  1 },
-  { Yhourarith,     NULL,              YhourarithOperators,    CDI_REAL,  2,  1 },
+  { Yhourarith,     YhourarithHelp,    YhourarithOperators,    CDI_REAL,  2,  1 },
   { Yhourstat,      YhourstatHelp,     YhourstatOperators,     CDI_REAL,  1,  1 },
   { Ymonarith,      YmonarithHelp,     YmonarithOperators,     CDI_REAL,  2,  1 },
   { Ymonpctl,       YmonpctlHelp,      YmonpctlOperators,      CDI_REAL,  3,  1 },

@@ -38,6 +38,7 @@ Arith	      Arithmetic
 Monarith      Arithmetic
 Ymonarith     Arithmetic
 Ydayarith     Arithmetic
+Yhourarith    Arithmetic
 Arithdays     Arithmetic
 Consecstat    Statistical values
 Ensstat       Statistical values

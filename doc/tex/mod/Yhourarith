@@ -1,0 +1,62 @@
+@BeginModule
+@NewPage
+@Name      = Yhourarith
+@Title     = Multi-year hourly arithmetic
+@Section   = Arithmetic
+@Class     = Arithmetic
+@Arguments = ifile1 ifile2 ofile
+@Operators = yhouradd yhoursub yhourmul yhourdiv
+
+@BeginDescription
+This module performs simple arithmetic of a time series and one
+timestep with the same hour and day of year. For each field in @file{ifile1}
+the corresponding field of the timestep in @file{ifile2} with the
+same hour and day of year is used. The header information in @file{ifile1}
+have to be the same as in @file{ifile2}. Usually @file{ifile2} is generated
+by an operator of the module @mod{YHOURSTAT}.
+@EndDescription
+@EndModule
+
+
+@BeginOperator_yhouradd
+@Title     = Add multi-year hourly time series
+
+@BeginDescription
+Adds a time series and a multi-year hourly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhoursub
+@Title     = Subtract multi-year hourly time series
+
+@BeginDescription
+Subtracts a time series and a multi-year hourly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourmul
+@Title     = Multiply multi-year hourly time series
+
+@BeginDescription
+Multiplies a time series and a multi-year hourly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_yhourdiv
+@Title     = Divide multi-year hourly time series
+
+@BeginDescription
+Divides a time series and a multi-year hourly time series.
+@EndDescription
+@EndOperator
+
+
+@BeginExample
+To subtract a multi-year hourly time average from a time series use:
+@BeginVerbatim
+   cdo yhoursub ifile -yhouravg ifile ofile
+@EndVerbatim
+@EndExample

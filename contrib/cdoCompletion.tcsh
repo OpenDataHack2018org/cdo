@@ -650,11 +650,15 @@ yearpctl \
 yearstd \
 yearsum \
 yearvar \
+yhouradd \
 yhouravg \
+yhourdiv \
 yhourmax \
 yhourmean \
 yhourmin \
+yhourmul \
 yhourstd \
+yhoursub \
 yhoursum \
 yhourvar \
 ymonadd \

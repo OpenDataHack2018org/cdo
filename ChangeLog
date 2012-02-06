@@ -1,3 +1,7 @@
+2012-02-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* New module: Yhourarith (yhouradd, yhoursub, yhourmul, yhourdiv)
+
 2012-02-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* mergetime: added env. SKIP_SAME_TIME to skip all double entries of the same timestamp [request: K. Houchi]
