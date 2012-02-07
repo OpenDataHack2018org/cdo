@@ -402,7 +402,7 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 
   nbpar = 0;
   params[nbpar++] = gen_param("proj=laea");
-  params[nbpar++] = gen_param("a=%g", a);
+  if ( a > 0 ) params[nbpar++] = gen_param("a=%g", a);
   params[nbpar++] = gen_param("lon_0=%g", lon_0);
   params[nbpar++] = gen_param("lat_0=%g", lat_0);
 
