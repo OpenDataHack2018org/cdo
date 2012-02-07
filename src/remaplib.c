@@ -2887,7 +2887,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	}
 	  
       /*
-	Search for bilinear failed - use a distance-weighted
+	Search for bicubic failed - use a distance-weighted
 	average instead (this is typically near the pole)
       */
       if ( search_result < 0 )
