@@ -534,7 +534,7 @@ void scale2(long nvals, double scalefactor, double *restrict vec1, double *restr
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(nvals, scalefactor, vec1, vec2)
 #endif
-  for ( n = 0; n < nvals; n++ )
+  for ( n = 0; n < nvals; ++n )
     {
       vec1[n] *= scalefactor;
       vec2[n] *= scalefactor;
@@ -549,7 +549,7 @@ void check_lon_range(long nlons, double *lons)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(nlons, lons)
 #endif
-  for ( n = 0; n < nlons; n++ )
+  for ( n = 0; n < nlons; ++n )
     {
       if ( lons[n] > PI2  ) lons[n] -= PI2;
       if ( lons[n] < ZERO ) lons[n] += PI2;
@@ -564,7 +564,7 @@ void check_lat_range(long nlats, double *lats)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(nlats, lats)
 #endif
-  for ( n = 0; n < nlats; n++ )
+  for ( n = 0; n < nlats; ++n )
     {
       if ( lats[n] >  PIH ) lats[n] =  PIH;
       if ( lats[n] < -PIH ) lats[n] = -PIH;
@@ -579,7 +579,7 @@ void check_lon_boundbox_range(long nlons, restr_t *bound_box)
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
 #endif
-  for ( n = 0; n < nlons; n++ )
+  for ( n = 0; n < nlons; ++n )
     {
       n4 = n*4;
       if ( RESTR_ABS(bound_box[n4+3] - bound_box[n4+2]) > RESTR_SCALE(PI) )
@@ -598,7 +598,7 @@ void check_lat_boundbox_range(long nlats, restr_t *restrict bound_box, double *r
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
 #endif
-  for ( n = 0; n < nlats; n++ )
+  for ( n = 0; n < nlats; ++n )
     {
       n4 = n*4;
       if ( RESTR_SCALE(lats[n]) < bound_box[n4  ] ) bound_box[n4  ] = RESTR_SCALE(-PIH);
