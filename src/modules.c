@@ -161,6 +161,7 @@ void *Splitrec(void *argument);
 void *Splitsel(void *argument);
 void *Splittime(void *argument);
 void *Splityear(void *argument);
+void *SSOpar(void *argument);
 void *Subtrend(void *argument);
 void *Template1(void *argument);
 void *Template2(void *argument);
@@ -389,6 +390,7 @@ void *Wct(void *argument);
 #define  SplitselOperators      {"splitsel"}
 #define  SplittimeOperators     {"splithour", "splitday", "splitmon", "splitseas"}
 #define  SplityearOperators     {"splityear"}
+#define  SSOparOperators        {"ssopar"}
 #define  SubtrendOperators      {"subtrend"}
 #define  Template1Operators     {"template1"}
 #define  Template2Operators     {"template2"}
@@ -551,7 +553,6 @@ static modules_t Modules[] =
   { Gridcell,       GridcellHelp,      GridcellOperators,      CDI_REAL,  1,  1 },
   { Harmonic,       NULL,              HarmonicOperators,      CDI_REAL,  1,  1 },
   { Histogram,      HistogramHelp,     HistogramOperators,     CDI_REAL,  1,  1 },
-  { IFS2ICON,       NULL,              IFS2ICONOperators,      CDI_REAL,  1,  1 },
   { Importamsr,     ImportamsrHelp,    ImportamsrOperators,    CDI_REAL,  1,  1 },
   { Importbinary,   ImportbinaryHelp,  ImportbinaryOperators,  CDI_REAL,  1,  1 },
   { Importcmsaf,    ImportcmsafHelp,   ImportcmsafOperators,   CDI_REAL,  1,  1 },
@@ -629,6 +630,7 @@ static modules_t Modules[] =
   { Splitsel,       SplitselHelp,      SplitselOperators,      CDI_BOTH,  1, -1 },
   { Splittime,      SplittimeHelp,     SplittimeOperators,     CDI_BOTH,  1, -1 },
   { Splityear,      SplittimeHelp,     SplityearOperators,     CDI_BOTH,  1, -1 },
+  { SSOpar,         NULL,              SSOparOperators,        CDI_REAL,  1,  1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,      CDI_REAL,  3,  1 },
   { Template1,      NULL,              Template1Operators,     CDI_REAL,  1,  1 },
   { Template2,      NULL,              Template2Operators,     CDI_REAL,  1,  1 },

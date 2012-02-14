@@ -376,6 +376,7 @@ src/Rhopot.c -text
 src/Rotuv.c -text
 src/Runpctl.c -text
 src/Runstat.c -text
+src/SSOpar.c -text
 src/Scatter.c -text
 src/Seascount.c -text
 src/Seaspctl.c -text

@@ -128,6 +128,7 @@ cdo_SOURCES += Arith.c         \
                Splitsel.c      \
                Splittime.c     \
                Splityear.c     \
+               SSOpar.c        \
                Subtrend.c      \
                Templates.c     \
                Test.c          \

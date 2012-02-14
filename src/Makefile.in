@@ -79,17 +79,16 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Gengrid.$(OBJEXT) cdo-Gradsdes.$(OBJEXT) \
 	cdo-Gridboxstat.$(OBJEXT) cdo-Gridcell.$(OBJEXT) \
 	cdo-Harmonic.$(OBJEXT) cdo-Hi.$(OBJEXT) \
-	cdo-Histogram.$(OBJEXT) cdo-IFS2ICON.$(OBJEXT) \
-	cdo-Importamsr.$(OBJEXT) cdo-Importbinary.$(OBJEXT) \
-	cdo-Importcmsaf.$(OBJEXT) cdo-Importobs.$(OBJEXT) \
-	cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) cdo-Intgrid.$(OBJEXT) \
-	cdo-Intgridtraj.$(OBJEXT) cdo-Intlevel.$(OBJEXT) \
-	cdo-Intlevel3d.$(OBJEXT) cdo-Intntime.$(OBJEXT) \
-	cdo-Inttime.$(OBJEXT) cdo-Intyear.$(OBJEXT) \
-	cdo-Invert.$(OBJEXT) cdo-Invertlev.$(OBJEXT) \
-	cdo-Isosurface.$(OBJEXT) cdo-Log.$(OBJEXT) \
-	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
-	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
+	cdo-Histogram.$(OBJEXT) cdo-Importamsr.$(OBJEXT) \
+	cdo-Importbinary.$(OBJEXT) cdo-Importcmsaf.$(OBJEXT) \
+	cdo-Importobs.$(OBJEXT) cdo-Info.$(OBJEXT) cdo-Input.$(OBJEXT) \
+	cdo-Intgrid.$(OBJEXT) cdo-Intgridtraj.$(OBJEXT) \
+	cdo-Intlevel.$(OBJEXT) cdo-Intlevel3d.$(OBJEXT) \
+	cdo-Intntime.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
+	cdo-Intyear.$(OBJEXT) cdo-Invert.$(OBJEXT) \
+	cdo-Invertlev.$(OBJEXT) cdo-Isosurface.$(OBJEXT) \
+	cdo-Log.$(OBJEXT) cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) \
+	cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
 	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
 	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
 	cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
@@ -114,14 +113,15 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Spectral.$(OBJEXT) cdo-Spectrum.$(OBJEXT) \
 	cdo-Split.$(OBJEXT) cdo-Splitrec.$(OBJEXT) \
 	cdo-Splitsel.$(OBJEXT) cdo-Splittime.$(OBJEXT) \
-	cdo-Splityear.$(OBJEXT) cdo-Subtrend.$(OBJEXT) \
-	cdo-Templates.$(OBJEXT) cdo-Test.$(OBJEXT) cdo-Tests.$(OBJEXT) \
-	cdo-Timcount.$(OBJEXT) cdo-Timpctl.$(OBJEXT) \
-	cdo-Timselpctl.$(OBJEXT) cdo-Timselstat.$(OBJEXT) \
-	cdo-Timsort.$(OBJEXT) cdo-Timstat.$(OBJEXT) \
-	cdo-Timstat2.$(OBJEXT) cdo-Timstat3.$(OBJEXT) \
-	cdo-Tinfo.$(OBJEXT) cdo-Tocomplex.$(OBJEXT) \
-	cdo-Transpose.$(OBJEXT) cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
+	cdo-Splityear.$(OBJEXT) cdo-SSOpar.$(OBJEXT) \
+	cdo-Subtrend.$(OBJEXT) cdo-Templates.$(OBJEXT) \
+	cdo-Test.$(OBJEXT) cdo-Tests.$(OBJEXT) cdo-Timcount.$(OBJEXT) \
+	cdo-Timpctl.$(OBJEXT) cdo-Timselpctl.$(OBJEXT) \
+	cdo-Timselstat.$(OBJEXT) cdo-Timsort.$(OBJEXT) \
+	cdo-Timstat.$(OBJEXT) cdo-Timstat2.$(OBJEXT) \
+	cdo-Timstat3.$(OBJEXT) cdo-Tinfo.$(OBJEXT) \
+	cdo-Tocomplex.$(OBJEXT) cdo-Transpose.$(OBJEXT) \
+	cdo-Trend.$(OBJEXT) cdo-Trms.$(OBJEXT) \
 	cdo-Tstepcount.$(OBJEXT) cdo-Vardup.$(OBJEXT) \
 	cdo-Vargen.$(OBJEXT) cdo-Varrms.$(OBJEXT) \
 	cdo-Vertint.$(OBJEXT) cdo-Vertstat.$(OBJEXT) \
@@ -352,22 +352,22 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
 	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
 	Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
-	Histogram.c IFS2ICON.c Importamsr.c Importbinary.c \
-	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
-	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
-	Intyear.c Invert.c Invertlev.c Isosurface.c Log.c Maskbox.c \
-	Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c \
-	Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c \
-	Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c \
-	Replace.c Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c \
-	Scatter.c Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
+	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
+	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
+	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
+	Invertlev.c Isosurface.c Log.c Maskbox.c Mastrfu.c Math.c \
+	Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
+	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
+	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
+	Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
+	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
 	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
 	Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c Sorttimestamp.c \
 	Specinfo.c Spectral.c Spectrum.c Split.c Splitrec.c Splitsel.c \
-	Splittime.c Splityear.c Subtrend.c Templates.c Test.c Tests.c \
-	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	Splittime.c Splityear.c SSOpar.c Subtrend.c Templates.c Test.c \
+	Tests.c Timcount.c Timpctl.c Timselpctl.c Timselstat.c \
+	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
 	Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c Vargen.c \
 	Varrms.c Vertint.c Vertstat.c Vertwind.c Wct.c Wind.c \
 	Writegrid.c Writerandom.c Ydayarith.c Ydaypctl.c Ydaystat.c \
@@ -569,7 +569,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Harmonic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Hi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Histogram.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-IFS2ICON.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Importamsr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Importbinary.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Importcmsaf.Po@am__quote@
@@ -612,6 +611,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Rotuv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runpctl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Runstat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-SSOpar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Scatter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seascount.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Seaspctl.Po@am__quote@
@@ -1491,20 +1491,6 @@ cdo-Histogram.obj: Histogram.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Histogram.c' object='cdo-Histogram.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Histogram.obj `if test -f 'Histogram.c'; then $(CYGPATH_W) 'Histogram.c'; else $(CYGPATH_W) '$(srcdir)/Histogram.c'; fi`
-
-cdo-IFS2ICON.o: IFS2ICON.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-IFS2ICON.o -MD -MP -MF $(DEPDIR)/cdo-IFS2ICON.Tpo -c -o cdo-IFS2ICON.o `test -f 'IFS2ICON.c' || echo '$(srcdir)/'`IFS2ICON.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-IFS2ICON.Tpo $(DEPDIR)/cdo-IFS2ICON.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='IFS2ICON.c' object='cdo-IFS2ICON.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-IFS2ICON.o `test -f 'IFS2ICON.c' || echo '$(srcdir)/'`IFS2ICON.c
-
-cdo-IFS2ICON.obj: IFS2ICON.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-IFS2ICON.obj -MD -MP -MF $(DEPDIR)/cdo-IFS2ICON.Tpo -c -o cdo-IFS2ICON.obj `if test -f 'IFS2ICON.c'; then $(CYGPATH_W) 'IFS2ICON.c'; else $(CYGPATH_W) '$(srcdir)/IFS2ICON.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-IFS2ICON.Tpo $(DEPDIR)/cdo-IFS2ICON.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='IFS2ICON.c' object='cdo-IFS2ICON.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-IFS2ICON.obj `if test -f 'IFS2ICON.c'; then $(CYGPATH_W) 'IFS2ICON.c'; else $(CYGPATH_W) '$(srcdir)/IFS2ICON.c'; fi`
 
 cdo-Importamsr.o: Importamsr.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Importamsr.o -MD -MP -MF $(DEPDIR)/cdo-Importamsr.Tpo -c -o cdo-Importamsr.o `test -f 'Importamsr.c' || echo '$(srcdir)/'`Importamsr.c
@@ -2541,6 +2527,20 @@ cdo-Splityear.obj: Splityear.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Splityear.c' object='cdo-Splityear.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Splityear.obj `if test -f 'Splityear.c'; then $(CYGPATH_W) 'Splityear.c'; else $(CYGPATH_W) '$(srcdir)/Splityear.c'; fi`
+
+cdo-SSOpar.o: SSOpar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-SSOpar.o -MD -MP -MF $(DEPDIR)/cdo-SSOpar.Tpo -c -o cdo-SSOpar.o `test -f 'SSOpar.c' || echo '$(srcdir)/'`SSOpar.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-SSOpar.Tpo $(DEPDIR)/cdo-SSOpar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='SSOpar.c' object='cdo-SSOpar.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-SSOpar.o `test -f 'SSOpar.c' || echo '$(srcdir)/'`SSOpar.c
+
+cdo-SSOpar.obj: SSOpar.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-SSOpar.obj -MD -MP -MF $(DEPDIR)/cdo-SSOpar.Tpo -c -o cdo-SSOpar.obj `if test -f 'SSOpar.c'; then $(CYGPATH_W) 'SSOpar.c'; else $(CYGPATH_W) '$(srcdir)/SSOpar.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-SSOpar.Tpo $(DEPDIR)/cdo-SSOpar.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='SSOpar.c' object='cdo-SSOpar.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-SSOpar.obj `if test -f 'SSOpar.c'; then $(CYGPATH_W) 'SSOpar.c'; else $(CYGPATH_W) '$(srcdir)/SSOpar.c'; fi`
 
 cdo-Subtrend.o: Subtrend.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Subtrend.o -MD -MP -MF $(DEPDIR)/cdo-Subtrend.Tpo -c -o cdo-Subtrend.o `test -f 'Subtrend.c' || echo '$(srcdir)/'`Subtrend.c

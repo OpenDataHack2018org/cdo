@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2007-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2012-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -45,7 +45,6 @@
 static double Grav          = C_EARTH_GRAV;
 static double RD            = C_EARTH_RD;
 
-static
 void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, double *pcw, double * pci, int nhor, int nlev)
 {
   int i, j;
@@ -143,7 +142,7 @@ void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval
 }
 
 
-void *Derivepar(void *argument)
+void *SSOpar(void *argument)
 {
   int GEOPOTHEIGHT;
   int operatorID;

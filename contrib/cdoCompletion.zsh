@@ -240,7 +240,6 @@ hpressure -hpressure \
 hurr -hurr \
 ifnotthen -ifnotthen \
 ifnotthenc -ifnotthenc \
-ifs2icon -ifs2icon \
 ifthen -ifthen \
 ifthenc -ifthenc \
 ifthenelse -ifthenelse \
@@ -553,6 +552,7 @@ splityear -splityear \
 splitzaxis -splitzaxis \
 sqr -sqr \
 sqrt -sqrt \
+ssopar -ssopar \
 stdatm -stdatm \
 stimelogo -stimelogo \
 strbre -strbre \
