@@ -257,7 +257,7 @@ void *Setgrid(void *argument)
 	      else if ( gridtype == GRID_REFERENCE    )
 		{
 		  gridID2 = referenceToGrid(gridID1);
-		  if ( gridID2 == -1 ) cdoAbort("grid reference not found!");
+		  if ( gridID2 == -1 ) cdoAbort("Grid reference not found!");
  		}
 	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_CURVILINEAR )
 		{

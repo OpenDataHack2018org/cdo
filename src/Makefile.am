@@ -54,7 +54,6 @@ cdo_SOURCES += Arith.c         \
                Harmonic.c      \
                Hi.c            \
                Histogram.c     \
-               IFS2ICON.c      \
                Importamsr.c    \
                Importbinary.c  \
                Importcmsaf.c   \
