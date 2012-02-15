@@ -5,7 +5,7 @@ To test the cdo operators use:
     ./test_operators
 
 The cdo operators are tested with python-unittests using the python-bindings for cdo.
-The python-bindings are located at cdo/contri/python/cdo.py.
+The python-bindings are located at cdo/contrib/python/cdo.py.
 The use is roughly exlained at:
     https://code.zmaw.de/projects/cdo/wiki/Cdo%7Brbpy%7D
 The documentation of the python unittest framework can be found at:

@@ -31,6 +31,7 @@ contrib/cdoCompletion.tcsh -text
 contrib/cdoCompletion.zsh -text
 contrib/makecompl.rb -text
 contrib/python/cdo.py -text
+contrib/python/optest/.checklib_pyunittest -text
 contrib/python/optest/README -text
 contrib/python/optest/cdo.py -text
 contrib/python/optest/test_diff.py -text

@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+# Hack to determine whether the unittest module is present.
+#
+# "python -m unittest" always returns error code 0 (success)
+# even if the message printed is:
+# /usr/bin/python: No module named unittest
+
+import sys
+try:
+  import unittest
+except:
+  sys.exit(2)
+
+sys.exit(0)

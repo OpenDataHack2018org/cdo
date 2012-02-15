@@ -1,22 +1,4 @@
 #!/bin/bash
-
-##  Wrapper script to call python's unittest framework
-##  in order to run the cdo operator tests
-##  present in the same directory.
-
-# Copyright (C) 2012 Yvonne Kuestermann, yvonne.kuestermann@zmaw.de
-# See COPYING file for copying and redistribution conditions.
-# 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; version 2 of the License.
-# 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-
 SCRIPTNAME=$(basename $0 .sh)
 EXIT_SUCCESS=0
 EXIT_FAILURE=1
@@ -25,22 +7,16 @@ EXIT_BUG=10
 VERBOSE='-v'
 PYTESTS=''
 
-# help text
+# functions
 function usage {
-    echo -n "Usage: $SCRIPTNAME [-qvh]] " >&2
-    echo    "[filenames|testnames|operatornames]" >&2
-    echo    "       -q    quiet mode" >&2
-    echo    "       -v    verbose mode (default)" >&2
-    echo    "       -h    show this help" >&2
+    # TODO: explain operators
+    echo "Usage: $SCRIPTNAME [-hq] [filenames|testnames|operatornames]" >&2
     [[ $# -eq 1 ]] && exit $1 || exit $EXIT_FAILURE
 }
-
 # options
-while getopts ':qvh' OPTION ; do
+while getopts ':qh' OPTION ; do
     case $OPTION in
     q) VERBOSE=''
-    ;;
-    v)
     ;;
     h) usage $EXIT_SUCCESS
     ;;
@@ -61,7 +37,12 @@ shift $(( OPTIND - 1 ))
 builtin hash python &> /dev/null
 if [ $? -eq 1 ]; then
     echo -e >&2 "Python seems not to be installed."
-    echo -e >&2 "Please install python to use \"$SCRIPTNAME\"."
+    echo -e >&2 "Please install python to use $SCRIPTNAME."
+    exit $EXIT_FAILURE
+fi
+if ! $(./.checklib_pyunittest); then 
+    echo -e >&2 "Python module \"unittest\" not found."
+    echo -e >&2 "Please install python's unittest to use \"$SCRIPTNAME\"."
     exit $EXIT_FAILURE
 fi
 
@@ -88,13 +69,10 @@ for ARG ; do
     if [ -s $testfile ]; then
         PYTESTS="$PYTESTS$pytest "
     else
-        # abort if one requested operator test does not exist
-        # TODO: provide a test template and point to it
-        #       in this error message.
-        echo    >&2 "No test for \"$operator\" available."
-        echo    >&2 "File \"$testfile\" does not exist."
-        echo -n >&2 "Feel free to add a test"
-        echo    >&2 "for the cdo operator \"$operator\"!"
+    # abort if one requested operator test does not exist
+        echo >&2 "No test for \"$operator\" available."
+        echo >&2 "File \"$testfile\" does not exist."
+        echo >&2 "Feel free to add a test for the cdo operator \"$operator\"!"
         exit $EXIT_FAILURE
     fi
 done
