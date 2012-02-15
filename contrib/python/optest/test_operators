@@ -1,3 +1,78 @@
 #!/bin/bash
+SCRIPTNAME=$(basename $0 .sh)
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_ERROR=2
+EXIT_BUG=10
+VERBOSE='-v'
+PYTESTS=''
 
-CDO="../../../src/cdo" python -m unittest discover -v
+# functions
+function usage {
+    # TODO: explain operators
+    echo "Usage: $SCRIPTNAME [-hq] [filenames|testnames|operatornames]" >&2
+    [[ $# -eq 1 ]] && exit $1 || exit $EXIT_FAILURE
+}
+# options
+while getopts ':qh' OPTION ; do
+    case $OPTION in
+    q) VERBOSE=''
+    ;;
+    h) usage $EXIT_SUCCESS
+    ;;
+    \?) echo "Unknown option \"-$OPTARG\"." >&2
+    usage $EXIT_ERROR
+    ;;
+    :) echo "Option \"-$OPTARG\" requires an argument." >&2
+    usage $EXIT_ERROR
+    ;;
+    *) echo "Bug in $SCRIPTNAME ..." >&2
+    usage $EXIT_BUG
+    ;;
+    esac
+done
+# skip used options
+shift $(( OPTIND - 1 ))
+
+builtin hash python &> /dev/null
+if [ $? -eq 1 ]; then
+    echo -e >&2 "Python seems not to be installed."
+    echo -e >&2 "Please install python to use $SCRIPTNAME."
+    exit $EXIT_FAILURE
+fi
+
+# if no cdo operator given,
+# run all operator tests
+if (( $# < 1 )) ; then
+    echo "Running all operator tests."
+    echo
+    CDO='../../../src/cdo' python -m unittest discover $VERBOSE
+    exit $EXIT_SUCCESS
+fi
+
+# analyze specified cdo operator tests
+# given as operator name, filename or testname
+for ARG ; do
+    # convert the operator-argument to the form
+    # requested by python's unittest
+    ARG=$(echo $ARG | sed 's/\.py$//g')
+    operator=$(echo $ARG | sed 's/^test_//g')
+    pytest="test_$operator"
+    testfile="$pytest.py"
+
+    # if a test for the given operator is available,
+    if [ -s $testfile ]; then
+        PYTESTS="$PYTESTS$pytest "
+    else
+    # abort if one requested operator test does not exist
+        echo >&2 "No test for \"$operator\" available."
+        echo >&2 "File \"$testfile\" does not exist."
+        echo >&2 "Feel free to add a test for the cdo operator \"$operator\"!"
+        exit $EXIT_FAILURE
+    fi
+done
+
+# run the specified cdo operator tests
+CDO='../../../src/cdo' python -m unittest $VERBOSE $PYTESTS
+
+exit $EXIT_SUCCESS
