@@ -1,0 +1,3 @@
+#!/bin/bash
+
+CDO="../../../src/cdo" python -m unittest discover -v
