@@ -31,13 +31,6 @@ contrib/cdoCompletion.tcsh -text
 contrib/cdoCompletion.zsh -text
 contrib/makecompl.rb -text
 contrib/python/cdo.py -text
-contrib/python/optest/.checklib_pyunittest -text
-contrib/python/optest/README -text
-contrib/python/optest/cdo.py -text
-contrib/python/optest/test_diff.py -text
-contrib/python/optest/test_info.py -text
-contrib/python/optest/test_intgridbil.py -text
-contrib/python/optest/test_operators -text
 contrib/python/setup.py -text
 contrib/python/test/cdo.py -text
 contrib/python/test/test_cdo.py -text
@@ -559,3 +552,10 @@ src/vinterp.c -text
 src/vinterp.h -text
 src/yacc_lex -text
 src/zaxis.c -text
+test/.checklib_pyunittest -text
+test/README -text
+test/cdo.py -text
+test/test_diff.py -text
+test/test_info.py -text
+test/test_intgridbil.py -text
+test/test_operators -text

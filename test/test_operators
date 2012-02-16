@@ -74,7 +74,7 @@ fi
 if (( $# < 1 )) ; then
     echo "Running all operator tests."
     echo
-    CDO='../../../src/cdo' python -m unittest discover $VERBOSE
+    CDO='../src/cdo' PYTHONPATH='../contrib/python/' python -m unittest discover $VERBOSE
     exit $EXIT_SUCCESS
 fi
 
@@ -104,6 +104,6 @@ for ARG ; do
 done
 
 # run the specified cdo operator tests
-CDO='../../../src/cdo' python -m unittest $VERBOSE $PYTESTS
+CDO='../src/cdo' PYTHONPATH='../contrib/python/' python -m unittest $VERBOSE $PYTESTS
 
 exit $EXIT_SUCCESS
