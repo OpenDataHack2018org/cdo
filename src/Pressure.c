@@ -55,6 +55,7 @@ void *Pressure(void *argument)
   int code, param;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
+  double minval, maxval;
   double *vct = NULL;
   double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
   double *pout = NULL;
@@ -394,19 +395,11 @@ void *Pressure(void *argument)
 	    memcpy(ps_prog, pdata, ngp*sizeof(double));
 
 	  /* check range of ps_prog */
-	  {
-	    double minval = ps_prog[0];
-	    double maxval = ps_prog[0];
-	    for ( i = 1; i < ngp; i++ )
-	      {
-		if      ( ps_prog[i] > maxval ) maxval = ps_prog[i];
-		else if ( ps_prog[i] < minval ) minval = ps_prog[i];
-	      }
+	  minmaxval(ngp, ps, NULL, &minval, &maxval);
 
-	    if ( minval < 20000 || maxval > 150000 )
-	      cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
-	  }
-
+	  if ( minval < MIN_PS || maxval > MAX_PS )
+	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+	    
 	  presh(full_press, half_press, vct, ps_prog, nhlevf, ngp);
 	}
 

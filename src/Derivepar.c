@@ -177,10 +177,6 @@ void *Derivepar(void *argument)
   double *half_press = NULL;
   double minval, maxval;
   double missval = 0;
-  double ps_min =  20000, ps_max = 120000;
-  double fis_min = -100000, fis_max = 100000;
-  double t_min = 150, t_max = 400;
-  double q_min = 0, q_max = 0.1;
   double cconst = 1.E-6;
   const char *fname;
 
@@ -427,13 +423,13 @@ void *Derivepar(void *argument)
 	  /* check range of ps_prog */
 	  minmaxval(ngp, ps, NULL, &minval, &maxval);
 
-	  if ( minval < ps_min || maxval > ps_max )
+	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	  /* check range of geop */
 	  minmaxval(ngp, geop, NULL, &minval, &maxval);
 
-	  if ( minval < fis_min || maxval > fis_max )
+	  if ( minval < MIN_FIS || maxval > MAX_FIS )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 	}
 
@@ -446,7 +442,7 @@ void *Derivepar(void *argument)
 	  single2  = temp + offset;
 
 	  minmaxval(ngp, single2, NULL, &minval, &maxval);
-	  if ( minval < t_min || maxval > t_max )
+	  if ( minval < MIN_T || maxval > MAX_T )
 	    cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!",
 		       levelID+1, minval, maxval);
 	}
@@ -462,10 +458,10 @@ void *Derivepar(void *argument)
 	      offset   = gridsize*levelID;
 	      single2  = hum + offset;
 
-	      corr_hum(gridsize, single2, q_min);
+	      corr_hum(gridsize, single2, MIN_Q);
 
 	      minmaxval(ngp, single2, NULL, &minval, &maxval);
-	      if ( minval < q_min || maxval > q_max )
+	      if ( minval < MIN_Q || maxval > MAX_Q )
 		cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!",
 			   levelID+1, minval, maxval);
 	    }
