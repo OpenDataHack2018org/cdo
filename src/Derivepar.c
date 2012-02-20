@@ -111,8 +111,8 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, double *
   for ( i = 0; i < nhor * (nlev+1); i++ ) geop[i] *= zrg;
 }
 
-static
-void minmaxval(int nvals, double *array, int *imiss, double *minval, double *maxval)
+
+void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval)
 {
   long i;
   double xmin =  DBL_MAX;
@@ -173,7 +173,6 @@ void *Derivepar(void *argument)
   double *geopotheight = NULL;
   int nmiss, nmissout = 0;
   int ltq = FALSE;
-  int *imiss = NULL;
   double *array = NULL;
   double *half_press = NULL;
   double minval, maxval;
@@ -426,13 +425,13 @@ void *Derivepar(void *argument)
       if ( zaxisIDh != -1 )
 	{
 	  /* check range of ps_prog */
-	  minmaxval(ngp, ps, imiss, &minval, &maxval);
+	  minmaxval(ngp, ps, NULL, &minval, &maxval);
 
 	  if ( minval < ps_min || maxval > ps_max )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	  /* check range of geop */
-	  minmaxval(ngp, geop, imiss, &minval, &maxval);
+	  minmaxval(ngp, geop, NULL, &minval, &maxval);
 
 	  if ( minval < fis_min || maxval > fis_max )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
@@ -446,7 +445,7 @@ void *Derivepar(void *argument)
 	  offset   = gridsize*levelID;
 	  single2  = temp + offset;
 
-	  minmaxval(ngp, single2, imiss, &minval, &maxval);
+	  minmaxval(ngp, single2, NULL, &minval, &maxval);
 	  if ( minval < t_min || maxval > t_max )
 	    cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!",
 		       levelID+1, minval, maxval);
@@ -465,7 +464,7 @@ void *Derivepar(void *argument)
 
 	      corr_hum(gridsize, single2, q_min);
 
-	      minmaxval(ngp, single2, imiss, &minval, &maxval);
+	      minmaxval(ngp, single2, NULL, &minval, &maxval);
 	      if ( minval < q_min || maxval > q_max )
 		cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!",
 			   levelID+1, minval, maxval);
@@ -493,8 +492,6 @@ void *Derivepar(void *argument)
   streamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if ( imiss ) free(imiss);
 
   free(ps);
   free(geop);

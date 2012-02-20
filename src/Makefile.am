@@ -177,6 +177,7 @@ cdo_SOURCES += Arith.c         \
                color.c         \
                color.h         \
                commandline.c   \
+               const.h       \
                counter.h       \
                dmemory.h       \
                dtypes.h        \

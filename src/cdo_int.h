@@ -33,6 +33,7 @@
 #include "functs.h"
 #include "dmemory.h"
 #include "process.h"
+#include "const.h"
 
 #ifndef strdupx
 #ifndef strdup
@@ -185,5 +186,8 @@ int  cdf_openread(const char *filename);
 void printFiletype(int streamID, int vlistID);
 
 void job_submit(const char *expname, const char *jobfilename, const char *jobname, const char *tmppath, const char *ftppath);
+
+void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval);
+
 
 #endif  /* _CDO_INT_H */
