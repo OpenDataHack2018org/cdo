@@ -325,6 +325,7 @@ void *Vertint(void *argument)
       if ( tableNum > 0 )
 	{
 	  useTable = TRUE;
+	  break;
 	}
     }
 
@@ -503,7 +504,6 @@ void *Vertint(void *argument)
 
 	      /* check range of geop */
 	      minmaxval(ngp, geop, NULL, &minval, &maxval);
-
 	      if ( minval < MIN_FIS || maxval > MAX_FIS )
 		cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
 	      if ( minval >= 0 && maxval <= 1000 )
@@ -517,7 +517,6 @@ void *Vertint(void *argument)
 
 	  /* check range of ps_prog */
 	  minmaxval(ngp, ps_prog, NULL, &minval, &maxval);
-
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 

@@ -157,11 +157,12 @@ void *Derivepar(void *argument)
   int tsID, varID, levelID;
   int nvars;
   int zaxisID2, zaxisIDh = -1, nzaxis, surfaceID;
-  int ngrids, gridID, zaxisID;
+  int ngrids, gridID = -1, zaxisID;
   int nlevel;
   int nvct;
   int geopID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1, clwcID = -1, ciwcID = -1;
-  int code;
+  int code, param;
+  char paramstr[32];
   char varname[CDI_MAX_NAME];
   double *single2;
   int taxisID1, taxisID2;
@@ -179,7 +180,8 @@ void *Derivepar(void *argument)
   double missval = 0;
   double cconst = 1.E-6;
   const char *fname;
-
+  int instNum, tableNum;
+  int useTable;
 
   cdoInitialize(argument);
 
@@ -271,6 +273,20 @@ void *Derivepar(void *argument)
 
   nvars = vlistNvars(vlistID1);
 
+  useTable = FALSE;
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
+
+      if ( tableNum > 0 )
+	{
+	  useTable = TRUE;
+	  break;
+	}
+    }
+
+  if ( cdoVerbose && useTable ) cdoPrint("Using code tables!");
+
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID  = vlistInqVarGrid(vlistID1, varID);
@@ -278,7 +294,10 @@ void *Derivepar(void *argument)
       nlevel  = zaxisInqSize(zaxisID);
 
       code = vlistInqVarCode(vlistID1, varID);
-      /* code = -1; */
+      param    = vlistInqVarParam(vlistID1, varID);
+
+      cdiParamToString(param, paramstr, sizeof(paramstr));
+
       if ( code <= 0 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
@@ -422,13 +441,11 @@ void *Derivepar(void *argument)
 	{
 	  /* check range of ps_prog */
 	  minmaxval(ngp, ps, NULL, &minval, &maxval);
-
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	  /* check range of geop */
 	  minmaxval(ngp, geop, NULL, &minval, &maxval);
-
 	  if ( minval < MIN_FIS || maxval > MAX_FIS )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 	}

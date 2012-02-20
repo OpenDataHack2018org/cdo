@@ -244,6 +244,7 @@ void *Pressure(void *argument)
       if ( tableNum > 0 )
 	{
 	  useTable = TRUE;
+	  break;
 	}
     }
 
@@ -383,7 +384,7 @@ void *Pressure(void *argument)
 	  if ( varID == pvarID )
 	    {	  
 	      streamReadRecord(streamID1, pdata, &nmiss);
-	      if ( nmiss > 0 ) cdoAbort("Missing values unsupported!");
+	      if ( nmiss > 0 ) cdoAbort("Missing valus unsupported!");
 	    }
 	}
 
@@ -396,7 +397,6 @@ void *Pressure(void *argument)
 
 	  /* check range of ps_prog */
 	  minmaxval(ngp, ps_prog, NULL, &minval, &maxval);
-
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 	    
