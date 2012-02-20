@@ -57,10 +57,10 @@ done
 # skip used options
 shift $(( OPTIND - 1 ))
 
-builtin hash python &> /dev/null
+builtin hash python2.7 &> /dev/null
 if [ $? -eq 1 ]; then
-    echo -e >&2 "Python seems not to be installed."
-    echo -e >&2 "Please install python to use $SCRIPTNAME."
+    echo -e >&2 "Python v2.7 seems not to be installed."
+    echo -e >&2 "Please install python v2.7 to use $SCRIPTNAME."
     exit $EXIT_FAILURE
 fi
 if ! $(./.checklib_pyunittest); then 
