@@ -52,7 +52,8 @@ void *Pressure(void *argument)
   int nhlev = 0, nhlevf = 0, nhlevh = 0, nlevel;
   int nvct;
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, pvarID = -1;
-  int code;
+  int code, param;
+  char paramstr[32];
   char varname[CDI_MAX_NAME];
   double *vct = NULL;
   double *ps_prog = NULL, *full_press = NULL, *half_press = NULL, *deltap = NULL;
@@ -291,7 +292,7 @@ void *Pressure(void *argument)
 	}
 
       if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Table = %d  Code = %d", mode, instNum, tableNum, code);
+	cdoPrint("Mode = %d  Center = %d  Param = %s", mode, instNum, paramstr);
 
       if ( code <= 0 )
 	{
