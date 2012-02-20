@@ -680,39 +680,6 @@ END SUBROUTINE uni_res
 */
 
 
-
-static
-void minmax(int nvals, double *array, int *imiss, double *minval, double *maxval)
-{
-  long i;
-  double xmin =  DBL_MAX;
-  double xmax = -DBL_MAX;
-
-  if ( imiss )
-    {
-      for ( i = 0; i < nvals; i++ )
-	{
-	  if ( ! imiss[i] )
-	    {
-	      if      ( array[i] > xmax ) xmax = array[i];
-	      else if ( array[i] < xmin ) xmin = array[i];
-	    }
-	}
-    }
-  else
-    {
-      for ( i = 0; i < nvals; i++ )
-	{
-	  if      ( array[i] > xmax ) xmax = array[i];
-	  else if ( array[i] < xmin ) xmin = array[i];
-	}
-    }
-
-  *minval = xmin;
-  *maxval = xmax;
-}
-
-
 void *SSOpar(void *argument)
 {
   int GEOPOTHEIGHT;
@@ -741,7 +708,6 @@ void *SSOpar(void *argument)
   double *geopotheight = NULL;
   int nmiss, nmissout = 0;
   int ltq = FALSE;
-  int *imiss = NULL;
   double *array = NULL;
   double *half_press = NULL;
   double minval, maxval;
@@ -995,16 +961,14 @@ void *SSOpar(void *argument)
 	{
 	  /* check range of ps_prog */
 
-	  minmax(ngp, ps, imiss, &minval, &maxval);
-
-	  if ( minval < ps_min || maxval > ps_max )
+	  minmaxval(ngp, ps, NULL, &minval, &maxval);
+	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
 	  /* check range of geop */
 
-	  minmax(ngp, geop, imiss, &minval, &maxval);
-
-	  if ( minval < fis_min || maxval > fis_max )
+	  minmaxval(ngp, geop, NULL, &minval, &maxval);
+	  if ( minval < MIN_FIS || maxval > MAX_FIS )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 	}
 
@@ -1016,8 +980,8 @@ void *SSOpar(void *argument)
 	  offset   = gridsize*levelID;
 	  single2  = temp + offset;
 
-	  minmax(ngp, single2, imiss, &minval, &maxval);
-	  if ( minval < t_min || maxval > t_max )
+	  minmaxval(ngp, single2, NULL, &minval, &maxval);
+	  if ( minval < MIN_T || maxval > MAX_T )
 	    cdoWarning("Input temperature at level %d out of range (min=%g max=%g)!",
 		       levelID+1, minval, maxval);
 	}
@@ -1039,8 +1003,6 @@ void *SSOpar(void *argument)
   streamClose(streamID1);
 
   vlistDestroy(vlistID2);
-
-  if ( imiss ) free(imiss);
 
   free(ps);
   free(geop);
