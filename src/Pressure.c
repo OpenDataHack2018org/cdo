@@ -256,7 +256,10 @@ void *Pressure(void *argument)
       instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
-      code = vlistInqVarCode(vlistID1, varID);
+      code     = vlistInqVarCode(vlistID1, varID);
+      param    = vlistInqVarParam(vlistID1, varID);
+
+      cdiParamToString(param, paramstr, sizeof(paramstr));
 
       if ( useTable )
 	{

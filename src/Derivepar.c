@@ -147,6 +147,8 @@ void *Derivepar(void *argument)
 {
   int GEOPOTHEIGHT;
   int operatorID;
+  int mode;
+  enum {ECHAM_MODE, WMO_MODE};
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridsize, ngp = 0;
