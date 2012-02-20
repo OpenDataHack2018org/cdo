@@ -27,24 +27,6 @@
 #include "pstream.h"
 
 
-static
-void minmax(int nvals, double *array, double *minval, double *maxval)
-{
-  long i;
-  double xmin =  DBL_MAX;
-  double xmax = -DBL_MAX;
-
-  for ( i = 0; i < nvals; i++ )
-    {
-      if      ( array[i] > xmax ) xmax = array[i];
-      else if ( array[i] < xmin ) xmin = array[i];
-    }
-
-  *minval = xmin;
-  *maxval = xmax;
-}
-
-
 void *Change_e5slm(void *argument)
 {
   int streamIDslm, streamID1, streamID2;
@@ -102,8 +84,7 @@ void *Change_e5slm(void *argument)
 
   if ( nmiss > 0 ) cdoAbort("SLM with missing values are unsupported!");
 
-  minmax(gridsize, cland, &minval, &maxval);
-
+  minmaxval(gridsize, cland, NULL, &minval, &maxval);
   if ( minval < 0 || maxval > 1 )
     cdoWarning("Values of SLM out of bounds! (minval=%g, maxval=%g)", minval , maxval);
 
