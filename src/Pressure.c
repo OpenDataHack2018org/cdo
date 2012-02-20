@@ -395,7 +395,7 @@ void *Pressure(void *argument)
 	    memcpy(ps_prog, pdata, ngp*sizeof(double));
 
 	  /* check range of ps_prog */
-	  minmaxval(ngp, ps, NULL, &minval, &maxval);
+	  minmaxval(ngp, ps_prog, NULL, &minval, &maxval);
 
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);

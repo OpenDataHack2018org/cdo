@@ -64,6 +64,7 @@ void *Vertint(void *argument)
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   int *vars = NULL;
+  double minval, maxval;
   double missval;
   double *plev = NULL, *phlev = NULL, *vct = NULL;
   double *rvct = NULL; /* reduced VCT for LM */
@@ -338,8 +339,8 @@ void *Vertint(void *argument)
       instNum  = institutInqCenter(vlistInqVarInstitut(vlistID1, varID));
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
-      param    = vlistInqVarParam(vlistID1, varID);
       code     = vlistInqVarCode(vlistID1, varID);
+      param    = vlistInqVarParam(vlistID1, varID);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
 
@@ -501,20 +502,12 @@ void *Vertint(void *argument)
 	      memcpy(geop, vardata1[geopID], ngp*sizeof(double));
 
 	      /* check range of geop */
-	      {
-		double minval = geop[0];
-		double maxval = geop[0];
-		for ( i = 1; i < ngp; i++ )
-		  {
-		    if      ( geop[i] > maxval ) maxval = geop[i];
-		    else if ( geop[i] < minval ) minval = geop[i];
-		  }
+	      minmaxval(ngp, geop, NULL, &minval, &maxval);
 
-		if ( minval < -9000 || maxval > 90000 )
-		  cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
-		if ( minval >= 0 && maxval <= 1000 )
-		  cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
-	      }
+	      if ( minval < MIN_FIS || maxval > MAX_FIS )
+		cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
+	      if ( minval >= 0 && maxval <= 1000 )
+		cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
 	    }
 
 	  if ( lnpsID != -1 )
@@ -523,18 +516,11 @@ void *Vertint(void *argument)
 	    memcpy(ps_prog, vardata1[psID], ngp*sizeof(double));
 
 	  /* check range of ps_prog */
-	  {
-	    double minval = ps_prog[0];
-	    double maxval = ps_prog[0];
-	    for ( i = 1; i < ngp; i++ )
-	      {
-		if      ( ps_prog[i] > maxval ) maxval = ps_prog[i];
-		else if ( ps_prog[i] < minval ) minval = ps_prog[i];
-	      }
+	  minmaxval(ngp, ps_prog, NULL, &minval, &maxval);
 
-	    if ( minval < 20000 || maxval > 150000 )
-	      cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
-	  }
+	  if ( minval < MIN_PS || maxval > MAX_PS )
+	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
+
 
 	  presh(full_press, half_press, vct, ps_prog, nhlevf, ngp);
 
