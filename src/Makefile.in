@@ -400,7 +400,7 @@ cdotest_LDADD = $(cdo_LDADD)
 cdotest_CPPFLAGS = $(cdo_CPPFLAGS)
 cdotest_LDFLAGS = $(cdo_LDFLAGS) $(am__append_2)
 #
-CLEANFILES = `ls *~`
+CLEANFILES = `ls *~ 2> /dev/null`
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 

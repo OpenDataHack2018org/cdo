@@ -290,4 +290,4 @@ cdo-userlog.o: userlog.c config.h
 cdo_static-userlog.o: userlog.c config.h
 	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
 #
-CLEANFILES  = `ls *~`
+CLEANFILES  = `ls *~ 2> /dev/null`
