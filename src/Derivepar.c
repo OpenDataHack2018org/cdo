@@ -510,7 +510,7 @@ void *Derivepar(void *argument)
 	      // corr_hum(gridsize, single2, MIN_Q);
 
 	      minmaxval(ngp, single2, NULL, &minval, &maxval);
-	      if ( minval < MIN_Q || maxval > MAX_Q )
+	      if ( minval < -0.1 || maxval > MAX_Q )
 		cdoWarning("Input humidity at level %d out of range (min=%g max=%g)!",
 			   levelID+1, minval, maxval);
 	    }
