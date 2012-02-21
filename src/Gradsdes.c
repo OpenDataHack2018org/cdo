@@ -950,7 +950,7 @@ void *Gradsdes(void *argument)
 	  nrecords += nrecsout;
 	  if ( nrecords >= maxrecs )
 	    {
-	      maxrecs += nrecords;
+	      maxrecs = nrecords;
 	      intnum = (int *) realloc(intnum, 3*maxrecs*sizeof(int));
 	      fltnum = (float *) realloc(fltnum, 3*maxrecs*sizeof(float));
 	    }
