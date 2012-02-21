@@ -845,9 +845,7 @@ void *Gradsdes(void *argument)
     }
 
   /* XYHEADER */
-
-  if ( xyheader )
-  fprintf(gdp, "XYHEADER  %d\n", xyheader);
+  if ( xyheader ) fprintf(gdp, "XYHEADER  %d\n", xyheader);
 
   /* TIME */
 
@@ -972,8 +970,7 @@ void *Gradsdes(void *argument)
 		  if ( checksize < 0L || checksize > 2147483647L )
 		    {
 		      nrecords -= nrecsout;
-		      cdoWarning("GRIB file too large for GrADS! Only the first %d time steps (2GB) are processed.",
-				 tsID);
+		      cdoWarning("GRIB file too large for GrADS! Only the first %d time steps (2GB) are processed.", tsID);
 		      goto LABEL_STOP;
 		    }
 		}
@@ -986,88 +983,10 @@ void *Gradsdes(void *argument)
  LABEL_STOP:
 
   /* XYDEF */
-
   xydef(gdp, gridID, &yrev);
 
   /* ZDEF */
-
-  nlevmax = 0;
-  for ( index = 0; index < nzaxis; index++ )
-    {
-      zaxisID = vlistZaxis(vlistID, index);
-      nlev    = zaxisInqSize(zaxisID);
-      if ( nlev > nlevmax )
-	{
-	  nlevmax = nlev;
-	  zaxisIDmax = zaxisID;
-	}
-    }
-
-  levels = (double *) malloc(nlevmax*sizeof(double));
-  zaxisInqLevels(zaxisIDmax, levels);
-  if ( zaxisInqType(zaxisIDmax) == ZAXIS_PRESSURE ) lplev = TRUE;
-  level0 = levels[0];
-  if ( nlevmax > 1 )
-    {
-      if ( levels[0] < levels[1] && zaxisInqType(zaxisIDmax) != ZAXIS_HYBRID )
-	zrev = TRUE;
-
-      levinc = levels[1] - levels[0];
-
-      if ( IS_EQUAL(levinc, 1) ) zrev = FALSE;
-
-      for ( i = 1; i < nlevmax; i++ )
-	{
-	  if ( IS_NOT_EQUAL(levinc, (levels[i] - levels[i-1])) )
-	    {
-	      levinc = 0;
-	      break;
-	    }
-	}
-    }
-
-  if ( IS_NOT_EQUAL(levinc, 0) )
-    fprintf(gdp,"ZDEF %d LINEAR %g %g\n", nlevmax, level0, levinc);
-  else
-    {
-      fprintf(gdp, "ZDEF %d LEVELS ", nlevmax);
-      j  = 0;
-      /* zrev not needed !!!
-      if ( zrev )
-	{
-	  for ( i = nlevmax-1; i >=0 ; i-- )
-	    {
-	      if ( lplev ) fprintf(gdp, "%g ", levels[i]/100);
-	      else         fprintf(gdp, "%d ", (int) levels[i]);
-	      j++;
-	      if ( j == 10 )
-		{
-		  fprintf(gdp, "\n");
-		  j = 0;
-		  if ( i != 0 ) fprintf(gdp, "               ");
-		}
-	    }
-	}
-      else
-      */
-	{
-	  for ( i = 0; i < nlevmax ; i++ )
-	    {
-	      if ( lplev ) fprintf(gdp, "%g ", levels[i]/100);
-	      else         fprintf(gdp, "%g ", levels[i]);
-	      j++;
-	      if ( j == 10 )
-		{
-		  fprintf(gdp, "\n");
-		  j = 0;
-		  if ( i != (nlevmax-1) ) fprintf(gdp, "               ");
-		}
-	    }
-	}
-      if ( j ) fprintf(gdp, "\n");
-    }
-
-  free(levels);
+  zdef(gdp, vlistID, &zrev);
 
   /* TDEF */
 
