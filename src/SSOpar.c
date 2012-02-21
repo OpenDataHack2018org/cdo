@@ -712,10 +712,6 @@ void *SSOpar(void *argument)
   double *half_press = NULL;
   double minval, maxval;
   double missval = 0;
-  double ps_min =  20000, ps_max = 120000;
-  double fis_min = -100000, fis_max = 100000;
-  double t_min = 150, t_max = 400;
-  double q_min = 0, q_max = 0.1;
   double cconst = 1.E-6;
   const char *fname;
 
