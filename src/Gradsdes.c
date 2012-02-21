@@ -364,7 +364,7 @@ void dumpmap()
 }
 
 static
-void xydef(FILE *gdp, int gridID, int *yrev)
+void ctl_xydef(FILE *gdp, int gridID, int *yrev)
 {
   int gridtype;
   int i, j;
@@ -527,7 +527,7 @@ void xydef(FILE *gdp, int gridID, int *yrev)
 }
 
 static
-void zdef(FILE *gdp, int vlistID, int *zrev)
+void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
 {
   int i, j, index;
   int zaxisIDmax = -1, nlevmax;
@@ -619,16 +619,104 @@ void zdef(FILE *gdp, int vlistID, int *zrev)
   free(levels);
 }
 
+static
+void ctl_undef(FILE *gdp, int vlistID)
+{
+  double missval;
+
+  missval = vlistInqVarMissval(vlistID, 0);
+  fprintf(gdp, "UNDEF  %g\n", missval);
+}
+
+static
+void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
+{
+  int varID, nvars;
+  int ltype, code;
+  int zaxisID, nlev;
+  int i, j;
+  int len;
+  int prec;
+  char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
+
+  nvars   = vlistNvars(vlistID);
+
+  /* VARS */
+
+  fprintf(gdp, "VARS  %d\n", nvarsout);
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( vars[varID] == TRUE )
+	{
+	  if ( filetype == FILETYPE_SRV ||
+	       filetype == FILETYPE_EXT ||
+	       filetype == FILETYPE_IEG )
+	    {
+	      prec = vlistInqVarDatatype(vlistID, varID);
+	      if ( prec != DATATYPE_FLT32 )
+		cdoAbort("datatype must be 4 bytes!");
+	    }
+
+	  zaxisID = vlistInqVarZaxis(vlistID, varID);
+	  ltype   = zaxisInqLtype(zaxisID);
+	  nlev    = zaxisInqSize(zaxisID);
+	  vlistInqVarName(vlistID, varID, varname);
+
+	  len = (int) strlen(varname);
+	  for ( i = 0; i < len; i++ )
+	    if ( varname[i] == '-' ) break;
+
+	  if ( i < len )
+	    for ( j = i; j < len; j++ )
+	      varname[j] = varname[j+1];
+
+	  vlistInqVarLongname(vlistID, varID, varlongname);
+	  vlistInqVarUnits(vlistID, varID, varunits);
+	  fprintf(gdp, "%-15s", varname);
+      
+	  if ( nlev == 1 ) nlev = 0;
+
+	  fprintf(gdp, "  %3d", nlev);
+
+	  if ( filetype == FILETYPE_GRB )
+	    {
+	      code = vlistInqVarCode(vlistID, varID);
+	      /*	      
+	      if      ( ltype == ZAXIS_SURFACE )  ltype = 1;
+	      else if ( ltype == ZAXIS_PRESSURE ) ltype = 99;
+	      else if ( nlev == 1 )  ltype = 1;
+	      else ltype = 99;
+	      */
+	      fprintf(gdp, "  %d,%d", code, ltype);
+	    }
+	  else
+	    fprintf(gdp, "  99");
+
+	  if ( varlongname[0] == 0 )
+	    fprintf(gdp, "  %s", varname);
+	  else
+	    fprintf(gdp, "  %s", varlongname);
+
+	  if ( varunits[0] != 0 )
+	    fprintf(gdp, "  [%s]", varunits);
+	
+	  fprintf(gdp, "\n");      
+	}
+    }
+
+  fprintf(gdp, "ENDVARS\n");
+}
+
 
 void *Gradsdes(void *argument)
 {
   int GRADSDES1, GRADSDES2, DUMPMAP;
   int operatorID;
   int streamID = 0;
-  int gridID = -1, zaxisID;
-  int zaxisIDmax = -1, nlevmax;
+  int gridID = -1;
   int gridtype = -1;
-  int nvars, ngrids, nzaxis, nlev;
+  int nvars, ngrids;
   int nvarsout;
   int ntsteps;
   int index;
@@ -637,24 +725,20 @@ void *Gradsdes(void *argument)
   int filetype, byteorder;
   int taxisID, nrecs;
   int vdate, vtime;
-  int ltype, code;
   const char *datfile;
   char ctlfile[1024], *pctlfile;
   int len;
-  char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
+  char varname[CDI_MAX_NAME];
   FILE *gdp;
   int yrev = FALSE;
   int zrev = FALSE;
-  int i, j;
+  int i;
   int xsize = 0, ysize = 0;
-  int prec, res;
-  int lplev = FALSE;
+  int res;
   int xyheader = 0;
   int nrecords = 0;
   int bigendian = FALSE, littleendian = FALSE;
   int sequential = FALSE;
-  double *levels, level0, levinc = 0;
-  double missval = 0;
   char Time[30], Incr[10] = {"1mn"}, *IncrKey[] = {"mn","hr","dy","mo","yr"};
   int isd, imn, ihh, iyy, imm, idd;
   int isds = 0, imns = 0, ihhs = 0, iyys = 0, imms = 0, idds = 0;
@@ -699,7 +783,6 @@ void *Gradsdes(void *argument)
   nvars   = vlistNvars(vlistID);
   ntsteps = vlistNtsteps(vlistID);
   ngrids  = vlistNgrids(vlistID);
-  nzaxis  = vlistNzaxis(vlistID);
 
   filetype  = streamInqFiletype(streamID);
   byteorder = streamInqByteorder(streamID);
@@ -983,10 +1066,10 @@ void *Gradsdes(void *argument)
  LABEL_STOP:
 
   /* XYDEF */
-  xydef(gdp, gridID, &yrev);
+  ctl_xydef(gdp, gridID, &yrev);
 
   /* ZDEF */
-  zdef(gdp, vlistID, &zrev);
+  ctl_zdef(gdp, vlistID, &zrev);
 
   /* TDEF */
 
@@ -1037,75 +1120,10 @@ void *Gradsdes(void *argument)
     }
     
   /* UNDEF */
+  ctl_undef(gdp, vlistID);
 
-  missval = vlistInqVarMissval(vlistID, 0);
-  fprintf(gdp, "UNDEF  %g\n", missval);
-  
   /* VARS */
-
-  fprintf(gdp, "VARS  %d\n", nvarsout);
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      if ( vars[varID] == TRUE )
-	{
-	  if ( filetype == FILETYPE_SRV ||
-	       filetype == FILETYPE_EXT ||
-	       filetype == FILETYPE_IEG )
-	    {
-	      prec = vlistInqVarDatatype(vlistID, varID);
-	      if ( prec != DATATYPE_FLT32 )
-		cdoAbort("datatype must be 4 bytes!");
-	    }
-
-	  zaxisID = vlistInqVarZaxis(vlistID, varID);
-	  ltype   = zaxisInqLtype(zaxisID);
-	  nlev    = zaxisInqSize(zaxisID);
-	  vlistInqVarName(vlistID, varID, varname);
-
-	  len = (int) strlen(varname);
-	  for ( i = 0; i < len; i++ )
-	    if ( varname[i] == '-' ) break;
-
-	  if ( i < len )
-	    for ( j = i; j < len; j++ )
-	      varname[j] = varname[j+1];
-
-	  vlistInqVarLongname(vlistID, varID, varlongname);
-	  vlistInqVarUnits(vlistID, varID, varunits);
-	  fprintf(gdp, "%-15s", varname);
-      
-	  if ( nlev == 1 ) nlev = 0;
-
-	  fprintf(gdp, "  %3d", nlev);
-
-	  if ( filetype == FILETYPE_GRB )
-	    {
-	      code = vlistInqVarCode(vlistID, varID);
-	      /*	      
-	      if      ( ltype == ZAXIS_SURFACE )  ltype = 1;
-	      else if ( ltype == ZAXIS_PRESSURE ) ltype = 99;
-	      else if ( nlev == 1 )  ltype = 1;
-	      else ltype = 99;
-	      */
-	      fprintf(gdp, "  %d,%d", code, ltype);
-	    }
-	  else
-	    fprintf(gdp, "  99");
-
-	  if ( varlongname[0] == 0 )
-	    fprintf(gdp, "  %s", varname);
-	  else
-	    fprintf(gdp, "  %s", varlongname);
-
-	  if ( varunits[0] != 0 )
-	    fprintf(gdp, "  [%s]", varunits);
-	
-	  fprintf(gdp, "\n");      
-	}
-    }
-
-  fprintf(gdp, "ENDVARS\n");
+  ctl_vars(gdp, filetype, vlistID, nvarsout, vars);
 
   /* INDEX file */
 
