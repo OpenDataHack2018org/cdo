@@ -538,8 +538,6 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
   *zrev = FALSE;
   nzaxis  = vlistNzaxis(vlistID);
 
-  /* ZDEF */
-
   nlevmax = 0;
   for ( index = 0; index < nzaxis; index++ )
     {
@@ -620,6 +618,23 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
 }
 
 static
+void ctl_options(FILE *gdp, int yrev, int zrev, int sequential, int bigendian, int littleendian)
+{
+  /* if ( filetype == FILETYPE_GRB ) zrev = FALSE; */
+
+  if ( yrev || zrev || sequential || bigendian || littleendian )
+    {
+      fprintf(gdp, "OPTIONS");
+      if ( yrev )         fprintf(gdp, " yrev");
+      if ( zrev )         fprintf(gdp, " zrev");
+      if ( sequential )   fprintf(gdp, " sequential");
+      if ( bigendian )    fprintf(gdp, " big_endian");
+      if ( littleendian ) fprintf(gdp, " little_endian");
+      fprintf(gdp, "\n");
+    }
+}
+
+static
 void ctl_undef(FILE *gdp, int vlistID)
 {
   double missval;
@@ -640,8 +655,6 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
 
   nvars   = vlistNvars(vlistID);
-
-  /* VARS */
 
   fprintf(gdp, "VARS  %d\n", nvarsout);
 
@@ -708,6 +721,114 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
   fprintf(gdp, "ENDVARS\n");
 }
 
+static
+void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum, float *fltnum)
+{
+  int i;
+  struct gaindx indx;
+  FILE *mapfp;
+  int hinum[4];
+
+  mapfp = fopen(ctlfile, "w");
+  if ( mapfp == NULL ) cdoAbort("Open failed on %s", ctlfile);
+
+  indx.type   = 1;  /* GRIB type */
+  indx.hinum  = 4;
+  indx.hfnum  = 0;
+  indx.intnum = 3 * nrecords;
+  indx.fltnum = 3 * nrecords;
+  indx.hipnt  = NULL;
+  indx.hfpnt  = NULL;
+  indx.intpnt = NULL;
+  indx.fltpnt = NULL;
+
+  hinum[0] = 1;
+  hinum[1] = 1;
+  hinum[2] = nrecords;
+  hinum[3] = 255;
+
+  if ( map_version == 2 )
+    {
+      int nb, bcnt, rc, j;
+      float fdum;
+      unsigned char *map;
+      unsigned char ibmfloat[4];
+      
+      /* calculate the size of the ver==1 index file */
+      
+      nb = 2 + (4*4) +  /* version in byte 2, then 4 ints with number of each data type */
+	indx.hinum*sizeof(int)+
+	indx.hfnum*sizeof(int)+
+	indx.intnum*sizeof(int)+
+	indx.fltnum*sizeof(float) ;
+      
+      /* add additional info */
+      
+      nb += 7;      /* base time (+ sec)  for compatibility with earlier version 2 maps */
+      nb += 8*4;    /* grvals for time <-> grid conversion */
+      
+      map = (unsigned char *) malloc(nb);
+      
+      bcnt = 0;
+      Put1Byte(map, bcnt, 0);
+      Put1Byte(map, bcnt, 2); /* version 2 */
+      
+      Put4Byte(map, bcnt, indx.hinum);
+      Put4Byte(map, bcnt, indx.hfnum);
+      Put4Byte(map, bcnt, indx.intnum);
+      Put4Byte(map, bcnt, indx.fltnum);
+      
+      Put2Byte(map, bcnt, 0);   /* initial year   */
+      Put1Byte(map, bcnt, 0);   /* initial month  */ 
+      Put1Byte(map, bcnt, 0);   /* initial day    */
+      Put1Byte(map, bcnt, 0);   /* initial hour   */
+      Put1Byte(map, bcnt, 0);   /* initial minute */
+      Put1Byte(map, bcnt, 0);   /* initial second */
+      
+      if( indx.hinum )
+	for ( i = 0; i < indx.hinum; i++ )
+	  Put4Byte(map, bcnt, hinum[i]);
+      
+      if( indx.hfnum ) {
+	/* blank for now */
+      }
+      
+      for ( i = 0; i < indx.intnum; i++ )
+	PutInt(map, bcnt, intnum[i]);
+      
+      for ( i = 0; i < indx.fltnum; i++)
+	{
+	  fdum= fltnum[i];
+	  rc = flt2ibm(fdum, ibmfloat); 
+	  if ( rc < 0 ) cdoAbort("overflow in IBM float conversion");
+	  for ( j = 0; j < 4; j++ ) map[bcnt++] = ibmfloat[j];
+	}
+      
+      /* write out the factors for converting from grid to absolute time */ 
+      
+      for ( i = 0; i < 8; i++)
+	{
+	  fdum = 0;
+	  rc = flt2ibm(fdum, ibmfloat); 
+	  if ( rc < 0 ) cdoAbort("overflow in IBM float conversion");
+	  for ( j = 0; j < 4; j++ ) map[bcnt++] = ibmfloat[j];
+	}
+      
+      fwrite(map, 1, bcnt, mapfp);
+	  
+      free(map);
+    }
+  else
+    {
+      fwrite(&indx, sizeof(struct gaindx), 1, mapfp);
+      fwrite(hinum, sizeof(int), 4, mapfp);
+      fwrite(intnum, sizeof(int), 3*nrecords, mapfp);
+      fwrite(fltnum, sizeof(float), 3*nrecords, mapfp);
+    }
+  
+  fclose(mapfp);
+}
+
 
 void *Gradsdes(void *argument)
 {
@@ -732,7 +853,6 @@ void *Gradsdes(void *argument)
   FILE *gdp;
   int yrev = FALSE;
   int zrev = FALSE;
-  int i;
   int xsize = 0, ysize = 0;
   int res;
   int xyheader = 0;
@@ -748,6 +868,7 @@ void *Gradsdes(void *argument)
   int gridsize = 0;
   long checksize = 0;
   int nmiss;
+  int map_version = 1;
   int nrecsout = 0;
   int maxrecs = 0;
   int monavg = -1;
@@ -765,6 +886,8 @@ void *Gradsdes(void *argument)
   DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
+
+  if ( operatorID == GRADSDES2 ) map_version = 2;
 
   if ( cdoStreamName(0)[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
@@ -904,7 +1027,6 @@ void *Gradsdes(void *argument)
     }
 
   /* DTYPE */
-
   if ( filetype == FILETYPE_GRB )
     {
       fprintf(gdp, "DTYPE  GRIB\n");
@@ -1105,133 +1227,21 @@ void *Gradsdes(void *argument)
     fprintf(gdp, "TITLE  %s  %dx%d grid\n", datfile, xsize, ysize);
 
   /* OPTIONS */
+  ctl_options(gdp, yrev, zrev, sequential, bigendian, littleendian);
 
-  /* if ( filetype == FILETYPE_GRB ) zrev = FALSE; */
-
-  if ( yrev || zrev || sequential || bigendian || littleendian )
-    {
-      fprintf(gdp, "OPTIONS");
-      if ( yrev )         fprintf(gdp, " yrev");
-      if ( zrev )         fprintf(gdp, " zrev");
-      if ( sequential )   fprintf(gdp, " sequential");
-      if ( bigendian )    fprintf(gdp, " big_endian");
-      if ( littleendian ) fprintf(gdp, " little_endian");
-      fprintf(gdp, "\n");
-    }
-    
   /* UNDEF */
   ctl_undef(gdp, vlistID);
 
   /* VARS */
   ctl_vars(gdp, filetype, vlistID, nvarsout, vars);
 
-  /* INDEX file */
 
+  /* INDEX file */
   if ( filetype == FILETYPE_GRB )
     {
-      struct gaindx indx;
-      FILE *mapfp;
-      int hinum[4];
-
-      mapfp = fopen(ctlfile, "w");
-      if ( mapfp == NULL ) cdoAbort("Open failed on %s", ctlfile);
-
-      indx.type   = 1;  /* GRIB type */
-      indx.hinum  = 4;
-      indx.hfnum  = 0;
-      indx.intnum = 3 * nrecords;
-      indx.fltnum = 3 * nrecords;
-      indx.hipnt  = NULL;
-      indx.hfpnt  = NULL;
-      indx.intpnt = NULL;
-      indx.fltpnt = NULL;
-
-      hinum[0] = 1;
-      hinum[1] = 1;
-      hinum[2] = nrecords;
-      hinum[3] = 255;
-
-      if ( operatorID == GRADSDES2 )
-	{
-	  int nb, bcnt, rc, j;
-	  float fdum;
-	  unsigned char *map;
-	  unsigned char ibmfloat[4];
-
-	  /* calculate the size of the ver==1 index file */
-
-	  nb = 2 + (4*4) +  /* version in byte 2, then 4 ints with number of each data type */
-	    indx.hinum*sizeof(int)+
-	    indx.hfnum*sizeof(int)+
-	    indx.intnum*sizeof(int)+
-	    indx.fltnum*sizeof(float) ;
-
-	  /* add additional info */
-
-	  nb += 7;      /* base time (+ sec)  for compatibility with earlier version 2 maps */
-	  nb += 8*4;    /* grvals for time <-> grid conversion */
-
-	  map = (unsigned char *) malloc(nb);
-
-	  bcnt = 0;
-	  Put1Byte(map, bcnt, 0);
-	  Put1Byte(map, bcnt, 2); /* version 2 */
-
-	  Put4Byte(map, bcnt, indx.hinum);
-	  Put4Byte(map, bcnt, indx.hfnum);
-	  Put4Byte(map, bcnt, indx.intnum);
-	  Put4Byte(map, bcnt, indx.fltnum);
-
-	  Put2Byte(map, bcnt, 0);   /* initial year   */
-	  Put1Byte(map, bcnt, 0);   /* initial month  */ 
-	  Put1Byte(map, bcnt, 0);   /* initial day    */
-	  Put1Byte(map, bcnt, 0);   /* initial hour   */
-	  Put1Byte(map, bcnt, 0);   /* initial minute */
-	  Put1Byte(map, bcnt, 0);   /* initial second */
-
-	  if( indx.hinum )
-	    for ( i = 0; i < indx.hinum; i++ )
-	      Put4Byte(map, bcnt, hinum[i]);
-
-	  if( indx.hfnum ) {
-	    /* blank for now */
-	  }
-
-	  for ( i = 0; i < indx.intnum; i++ )
-	    PutInt(map, bcnt, intnum[i]);
-
-	  for ( i = 0; i < indx.fltnum; i++)
-	    {
-	      fdum= fltnum[i];
-	      rc = flt2ibm(fdum, ibmfloat); 
-	      if ( rc < 0 ) cdoAbort("overflow in IBM float conversion");
-	      for ( j = 0; j < 4; j++ ) map[bcnt++] = ibmfloat[j];
-	    }
-
-	  /* write out the factors for converting from grid to absolute time */ 
-
-	  for ( i = 0; i < 8; i++)
-	    {
-	      fdum = 0;
-	      rc = flt2ibm(fdum, ibmfloat); 
-	      if ( rc < 0 ) cdoAbort("overflow in IBM float conversion");
-	      for ( j = 0; j < 4; j++ ) map[bcnt++] = ibmfloat[j];
-	    }
-
-	  fwrite(map, 1, bcnt, mapfp);
-
-	  free(map);
-	}
-      else
-	{
-	  fwrite(&indx, sizeof(struct gaindx), 1, mapfp);
-	  fwrite(hinum, sizeof(int), 4, mapfp);
-	  fwrite(intnum, sizeof(int), 3*nrecords, mapfp);
-	  fwrite(fltnum, sizeof(float), 3*nrecords, mapfp);
-	}
-
-      fclose(mapfp);
+      write_map_grib1(ctlfile, map_version, nrecords, intnum, fltnum);
     }
+
 
   streamClose(streamID);
 
