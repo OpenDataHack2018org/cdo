@@ -8,7 +8,7 @@
 @Operators = eca_tg10p
 
 @BeginDescription
-Let @file{ifile1} be a time series of daily mean temperatures TG, and
+Let @file{ifile1} be a time series of the daily mean temperature TG, and
 @file{ifile2} be the 10th percentile TGn10 of daily mean temperatures
 for any period used as reference. Then the percentage of time where 
 TG < TGn10 is calculated.

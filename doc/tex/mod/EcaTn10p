@@ -8,7 +8,7 @@
 @Operators = eca_tn10p
 
 @BeginDescription
-Let @file{ifile1} be a time series of daily minimum temperatures TN, and
+Let @file{ifile1} be a time serie of the daily minimum temperature TN, and
 @file{ifile2} be the 10th percentile TNn10 of daily minimum temperatures
 for any period used as reference. Then the percentage of time where TN < TNn10 
 is calculated.

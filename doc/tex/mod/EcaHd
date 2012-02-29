@@ -8,12 +8,12 @@
 @Operators = eca_hd
 
 @BeginDescription
-Let @file{ifile} be a time series of daily mean temperatures TG, then
-the heating degree days are defined as the sum of T1 - TG, where only
-values TG < T2 are considered. If T1 and T2 are omitted, a temperature
-of 17 @celsius is used for both parameters. If only T1 is given, T2 is
-set to T1. Note that TG have to be given in units of kelvin, whereas T1
-and T2 have to be given in degrees Celsius.
+Let @file{ifile} be a time series of the daily mean temperature TG, then
+the heating degree days are defined as the sum of @math{T1} - TG, where only
+values TG < @math{T2} are considered. If @math{T1} and @math{T2} are omitted, a temperature
+of 17 @celsius is used for both parameters. If only @math{T1} is given, @math{T2} is
+set to @math{T1}. Note that TG have to be given in units of kelvin, whereas @math{T1}
+and @math{T2} have to be given in degrees Celsius.
 The date information of a timestep in @file{ofile} is the date of
 the last contributing timestep in @file{ifile}.
 @EndDescription

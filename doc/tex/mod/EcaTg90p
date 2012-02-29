@@ -7,7 +7,7 @@
 @Operators = eca_tg90p
 
 @BeginDescription
-Let @file{ifile1} be a time series of daily mean temperatures TG, and
+Let @file{ifile1} be a time series of the daily mean temperature TG, and
 @file{ifile2} be the 90th percentile TGn90 of daily mean temperatures
 for any period used as reference. Then the percentage of time where TG > TGn90 
 is calculated. 

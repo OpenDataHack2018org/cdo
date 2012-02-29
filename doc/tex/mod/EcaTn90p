@@ -7,7 +7,7 @@
 @Operators = eca_tn90p
 
 @BeginDescription
-Let @file{ifile1} be a time series of daily minimum temperatures TN, and
+Let @file{ifile1} be a time series of the daily minimum temperature TN, and
 @file{ifile2} be the 90th percentile TNn90 of daily minimum temperatures
 for any period used as reference. Then the percentage of time where TN > TNn90 
 is calculated.

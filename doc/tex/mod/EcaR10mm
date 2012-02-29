@@ -8,7 +8,7 @@
 @Operators = eca_r10mm
 
 @BeginDescription
-Let @file{ifile} be a time series of daily precipitation amounts RR,
+Let @file{ifile} be a time series of the daily precipitation amount RR,
 then the number of days where RR is at least 10 mm is counted. 
 The date information of a timestep in @file{ofile} is the date of
 the last contributing timestep in @file{ifile}.

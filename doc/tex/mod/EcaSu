@@ -7,10 +7,10 @@
 @Operators = eca_su
 
 @BeginDescription
-Let @file{ifile} be a time series of daily maximum temperatures TX,
-then the number of days where TX > T is counted. The number T is
-an optional parameter with default T = 25 @celsius. Note that TX
-have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.
+Let @file{ifile} be a time series of the daily maximum temperature TX,
+then the number of days where TX > @math{T} is counted. The number @math{T} is
+an optional parameter with default @math{T} = 25 @celsius. Note that TX
+have to be given in units of Kelvin, whereas @math{T} have to be given in degrees Celsius.
 The date information of a timestep in @file{ofile} is the date of
 the last contributing timestep in @file{ifile}.
 @EndDescription

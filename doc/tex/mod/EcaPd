@@ -8,7 +8,7 @@
 @Operators = eca_pd eca_r10mm eca_r20mm
 
 @BeginDescription
-Let @file{ifile} be a time series of daily precipitation amounts RR in [mm]
+Let @file{ifile} be a time series of the daily precipitation amount RR in [mm]
 (or alternatively in [kg m-2]), then the number of days where RR is at least @math{x} mm is counted. 
 eca\_r10mm and eca\_r20mm are specific ECA operators with a daily precipitation amount of 10 
 and 20 mm respectively.

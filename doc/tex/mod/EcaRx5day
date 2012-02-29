@@ -11,8 +11,8 @@
 Let @file{ifile} be a time series of 5-day precipitation totals RR,
 then the maximum of RR is written to @file{ofile}. A further output
 variable is the number of 5 day period with precipitation totals
-greater than x mm, where x is an optional parameter with default
-x = 50 mm.
+greater than @math{x} mm, where @math{x} is an optional parameter with default
+@math{x} = 50 mm.
 The date information of a timestep in @file{ofile} is the date of
 the last contributing timestep in @file{ifile}.
 @EndDescription

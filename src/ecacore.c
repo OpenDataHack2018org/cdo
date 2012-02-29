@@ -481,7 +481,7 @@ void eca2(const ECA_REQUEST_2 *request)
   samp3 = (field_t *) malloc(nlevels*sizeof(field_t));
   
   if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
-    total  = (field_t *) malloc(nlevels*sizeof(field_t));
+    total = (field_t *) malloc(nlevels*sizeof(field_t));
   if ( IS_SET(request->var1.f5) )
     var15 = (field_t *) malloc(nlevels*sizeof(field_t));
   if ( IS_SET(request->var2.h2) )

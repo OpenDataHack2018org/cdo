@@ -865,6 +865,14 @@ int main(int argc, char *argv[])
       if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
       fprintf(stderr, "\n");
 
+#if defined (_OPENMP)
+      fprintf(stderr, "Predefined: _OPENMP\n");
+#endif 
+#if defined (__SSE2__)
+      fprintf(stderr, "Predefined: __SSE2__\n");
+#endif 
+      fprintf(stderr, "\n");
+
 #if defined (HAVE_MMAP)
       fprintf(stderr, "HAVE_MMAP\n");
 #endif

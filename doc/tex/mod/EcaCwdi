@@ -8,13 +8,13 @@
 @Operators = eca_cwdi
 
 @BeginDescription
-Let @file{ifile1} be a time series of daily minimum temperatures TN,
+Let @file{ifile1} be a time series of the daily minimum temperature TN,
 and let @file{ifile2} be the mean TNnorm of daily minimum temperatures
 for any period used as reference. Then counted is the number of days
-where, in intervals of at least nday consecutive days, TN < TNnorm - T.
-The numbers nday and T are optional parameters with default nday = 6
-and T = 5 @celsius. A further output variable is the number of cold
-waves longer than or equal to nday days.
+where, in intervals of at least @math{nday} consecutive days, TN < TNnorm - @math{T}.
+The numbers @math{nday} and @math{T} are optional parameters with default @math{nday} = 6
+and @math{T} = 5 @celsius. A further output variable is the number of cold
+waves longer than or equal to @math{nday} days.
 TNnorm is calculated as the mean of minimum temperatures of a five day 
 window centred on each calendar day of a given climate reference period.
 Note that both TN and TNnorm have to be given in the same units.

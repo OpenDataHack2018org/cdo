@@ -188,7 +188,7 @@ void timer_init(void)
 }
 
 
-int timer_new(char *text)
+int timer_new(const char *text)
 {
   int it;
 

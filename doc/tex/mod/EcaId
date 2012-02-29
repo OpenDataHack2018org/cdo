@@ -7,7 +7,7 @@
 @Operators = eca_id
 
 @BeginDescription
-Let @file{ifile} be a time series of daily maximum temperatures TX,
+Let @file{ifile} be a time series of the daily maximum temperature TX,
 then the number of days where TX < 0 @celsius is counted. Note
 that TX have to be given in units of Kelvin.
 The date information of a timestep in @file{ofile} is the date of

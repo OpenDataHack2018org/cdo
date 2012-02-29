@@ -7,13 +7,13 @@
 @Operators = eca_hwdi
 
 @BeginDescription
-Let @file{ifile1} be a time series of daily maximum temperatures TX,
+Let @file{ifile1} be a time series of the daily maximum temperature TX,
 and let @file{ifile2} be the mean TXnorm of daily maximum temperatures
 for any period used as reference. Then counted is the number of days
-where, in intervals of at least nday consecutive days, TX > TXnorm + T.
-The numbers nday and T are optional parameters with default nday = 6
-and T = 5 @celsius. A further output variable is the number of heat
-waves longer than or equal to nday days. 
+where, in intervals of at least @math{nday} consecutive days, TX > TXnorm + @math{T}.
+The numbers @math{nday} and @math{T} are optional parameters with default @math{nday} = 6
+and @math{T} = 5 @celsius. A further output variable is the number of heat
+waves longer than or equal to @math{nday} days. 
 TXnorm is calculated as the mean of maximum temperatures of a five day 
 window centred on each calendar day of a given climate reference period.
 Note that both TX and TXnorm have to be given in the same units.
