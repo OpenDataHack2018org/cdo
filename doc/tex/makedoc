@@ -315,6 +315,7 @@ while (<MOFILE>) {
     $mtitlem = $mtitle;
     $mtitlem =~ s/</\$<\$/og;
     $mtitlem =~ s/>/\$>\$/og;
+    $mtitlem =~ s/ wrt / w.r.t. /og;
     print TRFILE "\\subsection{$modname - $mtitlem}\n";
 #    print TRFILE "\\index{$modname}\n";
     foreach $tag (@hkeys) {
@@ -661,6 +662,7 @@ while (<MOFILE>) {
 	$otitlem = $otitle;
 	$otitlem =~ s/</\$<\$/og;
 	$otitlem =~ s/>/\$>\$/og;
+	$otitlem =~ s/ wrt / w.r.t. /og;
  	print TRLIST "\\hspace*{5mm}\\makebox[3cm][l]{\\bf \\htmlref{$operatorx}{$operator}} ";
  	print TRLIST "& $otitlem ";
  	print TRLIST "\\\\ \n";
