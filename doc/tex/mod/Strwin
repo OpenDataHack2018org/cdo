@@ -6,7 +6,7 @@
 @Operators = strwin
 
 @BeginDescription
-Let @file{ifile} be a time series of daily maximum horizontal wind speeds
+Let @file{ifile} be a time series of the daily maximum horizontal wind speed
 VX, then the number of days where VX > v is counted. The horizontal wind
 speed v is an optional parameter with default v = 10.5 m/s. A further
 output variable is the maximum number of consecutive days with maximum wind

@@ -7,7 +7,7 @@
 @Operators = strbre
 
 @BeginDescription
-Let @file{ifile} be a time series of daily maximum horizontal wind speeds
+Let @file{ifile} be a time series of the daily maximum horizontal wind speed
 VX, then the number of days where VX is greater than or equal to 10.5 m/s 
 is counted. A further output variable is the maximum number of consecutive
 days with maximum wind speed greater than or equal to 10.5 m/s. Note that
