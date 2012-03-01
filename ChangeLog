@@ -1,3 +1,13 @@
+2012-05-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.5
+	* Version 1.5.5 released
+
+2012-03-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* eca_rr1: missing value not set correctly (bug fix) [report: Hans-Juergen Panitz]
+	* ecacore: fix all missing values
+
 2012-02-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* geopotheight: added support for WMO code table

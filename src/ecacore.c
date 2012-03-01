@@ -66,7 +66,11 @@ void eca1(const ECA_REQUEST_1 *request)
   
   gridID  = vlistInqVarGrid(ivlistID, FIRST_VAR_ID);
   zaxisID = vlistInqVarZaxis(ivlistID, FIRST_VAR_ID);
+  missval = vlistInqVarMissval(ivlistID, FIRST_VAR_ID);
+
   varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
+
+  vlistDefVarMissval(ovlistID, varID, missval);
   
   if ( IS_SET(request->var1.name) )
     vlistDefVarName(ovlistID, varID, request->var1.name);
@@ -79,6 +83,8 @@ void eca1(const ECA_REQUEST_1 *request)
     {
       varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
   
+      vlistDefVarMissval(ovlistID, varID, missval);
+
       if ( IS_SET(request->var2.name) ) 
         vlistDefVarName(ovlistID, varID, request->var2.name);
       if ( IS_SET(request->var2.longname) ) 
@@ -116,7 +122,6 @@ void eca1(const ECA_REQUEST_1 *request)
     field2.ptr = NULL;
 
   nlevels = zaxisInqSize(zaxisID);
-  missval = vlistInqVarMissval(ivlistID, FIRST_VAR_ID);
 
   var12 = (field_t *) malloc(nlevels*sizeof(field_t));
   samp1 = (field_t *) malloc(nlevels*sizeof(field_t));
@@ -229,7 +234,7 @@ void eca1(const ECA_REQUEST_1 *request)
 		
               if ( IS_SET(request->var1.f1) ) 
                 request->var1.f1(&field1, request->var1.f1arg);
-              
+
               if ( field1.nmiss > 0 || IS_SET(samp2[levelID].ptr) )
                 {
                   if ( IS_NOT_SET(samp2[levelID].ptr) )
@@ -321,7 +326,7 @@ void eca1(const ECA_REQUEST_1 *request)
 	    var = &var12[levelID];
               
 	  farsel(var, samp1[levelID]);
-               
+
 	  streamDefRecord(ostreamID, varID, levelID);
 	  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
 	}
@@ -424,8 +429,13 @@ void eca2(const ECA_REQUEST_2 *request)
   
   gridID  = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
+  missval1 = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
+  missval2 = vlistInqVarMissval(ivlistID2, FIRST_VAR_ID);
+
   varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
   
+  vlistDefVarMissval(ovlistID, varID, missval1);
+
   if ( IS_SET(request->var1.name) ) 
     vlistDefVarName(ovlistID, varID, request->var1.name);
   if ( IS_SET(request->var1.longname) ) 
@@ -437,6 +447,8 @@ void eca2(const ECA_REQUEST_2 *request)
     {
       varID = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
   
+      vlistDefVarMissval(ovlistID, varID, missval1);
+
       if ( IS_SET(request->var2.name) ) 
         vlistDefVarName(ovlistID, varID, request->var2.name);
       if ( IS_SET(request->var2.longname) ) 
@@ -472,8 +484,6 @@ void eca2(const ECA_REQUEST_2 *request)
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
 
   nlevels = zaxisInqSize(zaxisID);
-  missval1 = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
-  missval2 = vlistInqVarMissval(ivlistID2, FIRST_VAR_ID);
   
   var14 = (field_t *) malloc(nlevels*sizeof(field_t));
   samp1 = (field_t *) malloc(nlevels*sizeof(field_t));
@@ -802,7 +812,11 @@ void eca3(const ECA_REQUEST_3 *request)
   
   gridID  = vlistInqVarGrid(ivlistID1, FIRST_VAR_ID);
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
+  missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
+
   varID   = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
+
+  vlistDefVarMissval(ovlistID, varID, missval);
   
   if ( IS_SET(request->name) ) 
     vlistDefVarName(ovlistID, varID, request->name);
@@ -838,7 +852,6 @@ void eca3(const ECA_REQUEST_3 *request)
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
 
   nlevels = zaxisInqSize(zaxisID);
-  missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
 
   var1 = (field_t *) malloc(nlevels*sizeof(field_t));
   var2 = (field_t *) malloc(nlevels*sizeof(field_t));
@@ -1008,7 +1021,11 @@ void eca4(const ECA_REQUEST_4 *request)
   if ( gridID != vlistInqVarGrid(ivlistID2, FIRST_VAR_ID) ) cdoAbort("Grid sizes of the input fields do not match!");
 
   zaxisID = vlistInqVarZaxis(ivlistID1, FIRST_VAR_ID);
+  missval = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
+
   ovarID1 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
+
+  vlistDefVarMissval(ovlistID, ovarID1, missval);
 
   if ( IS_SET(request->name) )
     vlistDefVarName(ovlistID, ovarID1, request->name);
@@ -1019,6 +1036,8 @@ void eca4(const ECA_REQUEST_4 *request)
 
   ovarID2 = vlistDefVar(ovlistID, gridID, zaxisID, TIME_VARIABLE);
   
+  vlistDefVarMissval(ovlistID, ovarID2, missval);
+
   if ( IS_SET(request->name2) ) 
     vlistDefVarName(ovlistID, ovarID2, request->name2);
   if ( IS_SET(request->longname2) ) 
@@ -1068,7 +1087,6 @@ void eca4(const ECA_REQUEST_4 *request)
   mask.ptr    = (double *) malloc(gridsize*sizeof(double));
 
   nlevels     = zaxisInqSize(zaxisID);
-  missval     = vlistInqVarMissval(ivlistID1, FIRST_VAR_ID);
 
   startCount  = (field_t *) malloc(nlevels*sizeof(field_t));
   endCount    = (field_t *) malloc(nlevels*sizeof(field_t));
