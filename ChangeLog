@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.5
 	* Version 1.5.5 released
 
+2012-03-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* replace: removed debug output [report: K. Houchi]
+
 2012-03-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* eca_rr1: missing value not set correctly (bug fix) [report: Hans-Juergen Panitz]
