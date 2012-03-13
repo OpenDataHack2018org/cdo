@@ -44,6 +44,7 @@ void *Arithdays(void *argument);
 void *Arithlat(void *argument);
 void *Cat(void *argument);
 void *CDItest(void *argument);
+void *CDIwrite(void *argument);
 void *Change(void *argument);
 void *Change_e5slm(void *argument);
 void *Cloudlayer(void *argument);
@@ -258,6 +259,7 @@ void *Wct(void *argument);
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
 #define  CDItestOperators       {"ncopy"}
+#define  CDIbenchOperators      {"cdiwrite"}
 #define  ChangeOperators        {"chcode", "chtabnum", "chparam", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
@@ -511,6 +513,7 @@ static modules_t Modules[] =
   { Arithlat,       NULL,              ArithlatOperators,      CDI_REAL,  1,  1 },
   { Cat,            CopyHelp,          CatOperators,           CDI_REAL, -1,  1 },
   { CDItest,        NULL,              CDItestOperators,       CDI_REAL,  1,  1 },
+  { CDIwrite,       NULL,              CDIwriteOperators,      CDI_REAL,  0,  1 },
   { Change,         ChangeHelp,        ChangeOperators,        CDI_REAL,  1,  1 },
   { Change_e5slm,   NULL,              Change_e5slmOperators,  CDI_REAL,  1,  1 },
   { Cloudlayer,     NULL,              CloudlayerOperators,    CDI_REAL,  1,  1 },
