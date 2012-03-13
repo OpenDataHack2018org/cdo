@@ -104,6 +104,7 @@ void *Invert(void *argument);
 void *Invertlev(void *argument);
 void *Isosurface(void *argument);
 void *Log(void *argument);
+void *Magplot(void *argument);
 void *Maskbox(void *argument);
 void *Mastrfu(void *argument);
 void *Math(void *argument);
@@ -323,6 +324,7 @@ void *Wct(void *argument);
 #define  IsosurfaceOperators    {"isosurface"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", \
                                  "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
+#define  MagplotOperators       {"magplot"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
@@ -570,6 +572,7 @@ static modules_t Modules[] =
   { Invertlev,      InvertlevHelp,     InvertlevOperators,     CDI_REAL,  1,  1 },
   { Isosurface,     NULL,              IsosurfaceOperators,    CDI_REAL,  1,  1 },
   { Log,            NULL,              LogOperators,           CDI_REAL,  1,  0 },
+  { Magplot,        NULL,              MagplotOperators,       CDI_REAL,  1,  1 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       CDI_REAL,  1,  1 },
   { Maskbox,        MaskregionHelp,    MaskregionOperators,    CDI_REAL,  1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,       CDI_REAL,  1,  1 },

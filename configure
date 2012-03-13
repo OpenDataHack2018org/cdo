@@ -627,6 +627,9 @@ subdirs
 ENABLE_CDI_LIB
 ENABLE_CDI_LIB_FALSE
 ENABLE_CDI_LIB_TRUE
+MAGICS_INCLUDE
+MAGICS_ROOT
+MAGICS_LIBS
 PROJ_INCLUDE
 PROJ_LDFLAGS
 ENABLE_IEG
@@ -798,6 +801,7 @@ enable_service
 enable_extra
 enable_ieg
 with_proj
+with_magics
 enable_cdi_lib
 enable_all_static
 '
@@ -1482,6 +1486,8 @@ Optional Packages:
                           --with-jasper-root
   --with-proj=<directory> Specify location of PROJ library for cartographic
                           projections.
+  --with-magics=<yes|no|directory>
+                          location of magics library (lib and include subdirs)
 
 Some influential environment variables:
   CC          C compiler command
@@ -18405,6 +18411,191 @@ $as_echo_n "checking for the PROJ library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
+
+#  ----------------------------------------------------------------------
+#  Compile application with MAGICS
+MAGICS_ROOT=''
+MAGICS_INCLUDE=''
+MAGICS_LIBS=''
+
+# Check whether --with-magics was given.
+if test "${with_magics+set}" = set; then :
+  withval=$with_magics; case "$with_magics" in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for magics library" >&5
+$as_echo_n "checking for magics library... " >&6; }
+                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; } ;; #(
+  yes) :
+    for ac_header in magics_api.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "magics_api.h" "ac_cv_header_magics_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_magics_api_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MAGICS_API_H 1
+_ACEOF
+
+fi
+
+done
+
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing mag_open" >&5
+$as_echo_n "checking for library containing mag_open... " >&6; }
+if ${ac_cv_search_mag_open+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char mag_open ();
+int
+main ()
+{
+return mag_open ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' MagPlus; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_mag_open=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_mag_open+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_mag_open+:} false; then :
+
+else
+  ac_cv_search_mag_open=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_mag_open" >&5
+$as_echo "$ac_cv_search_mag_open" >&6; }
+ac_res=$ac_cv_search_mag_open
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBMAGICS 1" >>confdefs.h
+
+else
+  as_fn_error $? "Could not link to magics library" "$LINENO" 5
+fi
+
+                            MAGICS_LIBS=" -lMagPlus"
+ ;; #(
+  *) :
+    if test -d "$with_magics"; then :
+  MAGICS_ROOT=$with_magics
+                                 LDFLAGS="-L$MAGICS_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$MAGICS_ROOT/include/magics $CPPFLAGS"
+                                 for ac_header in magics_api.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "magics_api.h" "ac_cv_header_magics_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_magics_api_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_MAGICS_API_H 1
+_ACEOF
+
+fi
+
+done
+
+                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing mag_open" >&5
+$as_echo_n "checking for library containing mag_open... " >&6; }
+if ${ac_cv_search_mag_open+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char mag_open ();
+int
+main ()
+{
+return mag_open ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' MagPlus; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_mag_open=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_mag_open+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_mag_open+:} false; then :
+
+else
+  ac_cv_search_mag_open=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_mag_open" >&5
+$as_echo "$ac_cv_search_mag_open" >&6; }
+ac_res=$ac_cv_search_mag_open
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBMAGICS 1" >>confdefs.h
+
+else
+  as_fn_error $? "Could not link to magics library" "$LINENO" 5
+fi
+
+                                 MAGICS_LIBS=" -L$MAGICS_ROOT/lib -lMagPlus"
+                                 MAGICS_INCLUDE=" -I$MAGICS_ROOT/include/magics"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: $with_magics is not a directory! MAGICS suppressed" >&5
+$as_echo "$as_me: $with_magics is not a directory! MAGICS suppressed" >&6;}
+fi ;; #(
+  *) :
+     ;;
+esac
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for MAGICS library" >&5
+$as_echo_n "checking for MAGICS library... " >&6; }
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; }
+fi
+
+
+
 
 #  ----------------------------------------------------------------------
 #  How to build CDI into CDO?

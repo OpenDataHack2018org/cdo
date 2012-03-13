@@ -159,6 +159,9 @@ void cdo_version(void)
 #if defined (HAVE_LIBPROJ)
   fprintf(stderr, " PROJ.4");
 #endif
+#if defined (HAVE_LIBMAGICS)
+  fprintf(stderr, " MAGICS");
+#endif
 #if defined (HAVE_LIBDRMAA)
   fprintf(stderr, " DRMAA");
 #endif

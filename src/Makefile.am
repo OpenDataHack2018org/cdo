@@ -71,6 +71,7 @@ cdo_SOURCES += Arith.c         \
                Invertlev.c     \
                Isosurface.c    \
                Log.c           \
+               Magplot.c       \
                Maskbox.c       \
                Mastrfu.c       \
                Math.c          \

@@ -294,6 +294,7 @@ lowpass \
 lsmean \
 lt \
 ltc \
+magplot \
 map \
 mask \
 maskindexbox \

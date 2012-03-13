@@ -27,6 +27,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=$HOME/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
+                    --with-magics=/Users/m214003/local/magics-2.14.9 \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
 	;;
     hama*)
