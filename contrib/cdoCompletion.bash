@@ -31,6 +31,7 @@ bandpass -bandpass \
 beta -beta \
 boxavg -boxavg \
 cat -cat \
+cdiwrite -cdiwrite \
 change_e5lsm -change_e5lsm \
 change_e5mask -change_e5mask \
 change_e5slm -change_e5slm \

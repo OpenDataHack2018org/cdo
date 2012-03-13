@@ -259,7 +259,7 @@ void *Wct(void *argument);
 #define  ArithlatOperators      {"mulcoslat", "divcoslat"}
 #define  CatOperators           {"cat"}
 #define  CDItestOperators       {"ncopy"}
-#define  CDIbenchOperators      {"cdiwrite"}
+#define  CDIwriteOperators      {"cdiwrite"}
 #define  ChangeOperators        {"chcode", "chtabnum", "chparam", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}

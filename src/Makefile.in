@@ -57,10 +57,10 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
-	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) cdo-Cat.$(OBJEXT) \
-	cdo-Change.$(OBJEXT) cdo-Change_e5slm.$(OBJEXT) \
-	cdo-Cloudlayer.$(OBJEXT) cdo-Command.$(OBJEXT) \
-	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) \
+	cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) cdo-Change.$(OBJEXT) \
+	cdo-Change_e5slm.$(OBJEXT) cdo-Cloudlayer.$(OBJEXT) \
+	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
@@ -347,14 +347,14 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 #
 cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
-	Cat.c Change.c Change_e5slm.c Cloudlayer.c Command.c Comp.c \
-	Compc.c Complextorect.c Cond.c Cond2.c Condc.c Consecstat.c \
-	Copy.c Deltime.c Derivepar.c Detrend.c Diff.c Duplicate.c \
-	EOFs.c Eof3d.c EcaIndices.c Echam5ini.c Enlarge.c \
-	Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c Eofcoeff.c \
-	Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c Filter.c \
-	Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c Gengrid.c \
-	Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
+	CDIwrite.c Cat.c Change.c Change_e5slm.c Cloudlayer.c \
+	Command.c Comp.c Compc.c Complextorect.c Cond.c Cond2.c \
+	Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c \
+	Diff.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
+	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
+	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
+	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c \
+	Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
 	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
@@ -527,6 +527,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithdays.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithlat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDItest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDIwrite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Cat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change_e5slm.Po@am__quote@
@@ -852,6 +853,20 @@ cdo-CDItest.obj: CDItest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDItest.c' object='cdo-CDItest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDItest.obj `if test -f 'CDItest.c'; then $(CYGPATH_W) 'CDItest.c'; else $(CYGPATH_W) '$(srcdir)/CDItest.c'; fi`
+
+cdo-CDIwrite.o: CDIwrite.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CDIwrite.o -MD -MP -MF $(DEPDIR)/cdo-CDIwrite.Tpo -c -o cdo-CDIwrite.o `test -f 'CDIwrite.c' || echo '$(srcdir)/'`CDIwrite.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CDIwrite.Tpo $(DEPDIR)/cdo-CDIwrite.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDIwrite.c' object='cdo-CDIwrite.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDIwrite.o `test -f 'CDIwrite.c' || echo '$(srcdir)/'`CDIwrite.c
+
+cdo-CDIwrite.obj: CDIwrite.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CDIwrite.obj -MD -MP -MF $(DEPDIR)/cdo-CDIwrite.Tpo -c -o cdo-CDIwrite.obj `if test -f 'CDIwrite.c'; then $(CYGPATH_W) 'CDIwrite.c'; else $(CYGPATH_W) '$(srcdir)/CDIwrite.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CDIwrite.Tpo $(DEPDIR)/cdo-CDIwrite.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDIwrite.c' object='cdo-CDIwrite.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDIwrite.obj `if test -f 'CDIwrite.c'; then $(CYGPATH_W) 'CDIwrite.c'; else $(CYGPATH_W) '$(srcdir)/CDIwrite.c'; fi`
 
 cdo-Cat.o: Cat.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Cat.o -MD -MP -MF $(DEPDIR)/cdo-Cat.Tpo -c -o cdo-Cat.o `test -f 'Cat.c' || echo '$(srcdir)/'`Cat.c
