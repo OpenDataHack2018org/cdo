@@ -65,7 +65,7 @@ void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon
   mag_close ();
 
 #else
-  Error("MAGICS support not compiled in!");
+  cdoAbort("MAGICS support not compiled in!");
 #endif
 
 }
