@@ -874,6 +874,9 @@ int main(int argc, char *argv[])
 #if defined (__SSE2__)
       fprintf(stderr, "Predefined: __SSE2__\n");
 #endif 
+#if defined (__GNUC__)
+      fprintf(stderr, "Predefined: __GNUC__\n");
+#endif 
       fprintf(stderr, "\n");
 
 #if defined (HAVE_MMAP)
