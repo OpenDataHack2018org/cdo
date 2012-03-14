@@ -169,8 +169,11 @@ int pipeInqVlist(pstream_t *pstreamptr)
   char *pname = pstreamptr->name;
   pipe_t *pipe = pstreamptr->pipe;
   int vlistID = -1;
-  struct timespec time_to_wait = {0, 0};
+  struct timespec time_to_wait;
   int retcode = 0;
+
+  time_to_wait.tv_sec  = 0;
+  time_to_wait.tv_nsec = 0;
 
   if ( PipeDebug ) Message("%s pstreamID %d", pname, pstreamptr->self);
 
