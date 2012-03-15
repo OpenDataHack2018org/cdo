@@ -220,7 +220,7 @@ void timer_check(int it)
     fprintf(rt_unit, "timer: invalid timer id %d\n", it);
 }
 
-static
+
 double timer_val(int it)
 {
   double val, dt;

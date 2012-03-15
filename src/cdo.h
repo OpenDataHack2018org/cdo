@@ -80,6 +80,7 @@ int  timer_new(const char *text);
 void timer_report(void);
 void timer_start(int it);
 void timer_stop(int it);
+double timer_val(int it);
 
 void    operatorInputArg(const char *enter);
 int     operatorArgc(void);

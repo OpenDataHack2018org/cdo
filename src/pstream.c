@@ -673,9 +673,9 @@ int pstreamOpenWrite(const char *argument, int filetype)
 #if  defined  (HAVE_LIBPTHREAD)
       pthread_mutex_lock(&streamOpenWriteMutex);
 #endif
-      if ( cdoTimer ) timer_start(timer_write);
+      timer_start(timer_write);
       fileID = streamOpenWrite(argument, filetype);
-      if ( cdoTimer ) timer_stop(timer_write);
+      timer_stop(timer_write);
 #if  defined  (HAVE_LIBPTHREAD)
       pthread_mutex_unlock(&streamOpenWriteMutex);
 #endif
@@ -755,9 +755,9 @@ int pstreamOpenAppend(const char *argument)
   
       if ( PSTREAM_Debug ) Message("file %s", argument);
 
-      if ( cdoTimer ) timer_start(timer_write);
+      timer_start(timer_write);
       fileID = streamOpenAppend(argument);
-      if ( cdoTimer ) timer_stop(timer_write);
+      timer_stop(timer_write);
       if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument);
       /*
       cdoInqHistory(fileID);
@@ -901,9 +901,9 @@ int pstreamInqVlist(int pstreamID)
     {
       extern int cdoDefaultTimeType;
 
-      if ( cdoTimer ) timer_start(timer_read);
+      timer_start(timer_read);
       vlistID = streamInqVlist(pstreamptr->fileID);
-      if ( cdoTimer ) timer_stop(timer_read);
+      timer_stop(timer_read);
 
       if ( cdoDefaultTimeType != CDI_UNDEFID )
 	taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
@@ -1048,9 +1048,9 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
       pstreamDefVarlist(pstreamptr, vlistID);
 
-      if ( cdoTimer ) timer_start(timer_write);
+      timer_start(timer_write);
       streamDefVlist(pstreamptr->fileID, vlistID);
-      if ( cdoTimer ) timer_stop(timer_write);
+      timer_stop(timer_write);
     }
 }
 
@@ -1067,9 +1067,9 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
   else
 #endif
     {
-      if ( cdoTimer ) timer_start(timer_read);
+      timer_start(timer_read);
       streamInqRecord(pstreamptr->fileID, varID, levelID);
-      if ( cdoTimer ) timer_stop(timer_read);
+      timer_stop(timer_read);
     }
 
   return (0);
@@ -1092,9 +1092,9 @@ void pstreamDefRecord(int pstreamID, int varID, int levelID)
   else
 #endif
     {
-      if ( cdoTimer ) timer_start(timer_write);
+      timer_start(timer_write);
       streamDefRecord(pstreamptr->fileID, varID, levelID);
-      if ( cdoTimer ) timer_stop(timer_write);
+      timer_stop(timer_write);
     }
 }
 
@@ -1113,9 +1113,9 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
   else
 #endif
     {
-      if ( cdoTimer ) timer_start(timer_read);
+      timer_start(timer_read);
       streamReadRecord(pstreamptr->fileID, data, nmiss);
-      if ( cdoTimer ) timer_stop(timer_read);
+      timer_stop(timer_read);
     }
 }
 
@@ -1202,14 +1202,14 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 #endif
     {
       int varID = pstreamptr->varID;
-      if ( cdoTimer ) timer_start(timer_write);
+      timer_start(timer_write);
 
       if ( pstreamptr->varlist )
 	if ( pstreamptr->varlist[varID].check_datarange )
 	  pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
 
       streamWriteRecord(pstreamptr->fileID, data, nmiss);
-      if ( cdoTimer ) timer_stop(timer_write);
+      timer_stop(timer_write);
     }
 }
 
@@ -1231,9 +1231,9 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 
       if ( pstreamptr->mfiles ) tsID -= pstreamptr->tsID0;
 
-      if ( cdoTimer ) timer_start(timer_read);
+      timer_start(timer_read);
       nrecs = streamInqTimestep(pstreamptr->fileID, tsID);
-      if ( cdoTimer ) timer_stop(timer_read);
+      timer_stop(timer_read);
 
       if ( nrecs == 0 && pstreamptr->mfiles &&
 	   (pstreamptr->nfiles < pstreamptr->mfiles) )
@@ -1259,10 +1259,10 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 #endif
 	  if ( cdoVerbose ) cdoPrint("Continuation file: %s", filename);
 
-	  if ( cdoTimer ) timer_start(timer_read);
+	  timer_start(timer_read);
 	  fileID = streamOpenRead(filename);
 	  vlistIDnew = streamInqVlist(fileID);
-	  if ( cdoTimer ) timer_stop(timer_read);
+	  timer_stop(timer_read);
 
 	  vlistCompare(vlistIDold, vlistIDnew, CMP_HRD);
 	  vlistDestroy(vlistIDold);
@@ -1276,9 +1276,9 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  pstreamptr->name   = filename;
 	  pstreamptr->fileID = fileID;
 
-	  if ( cdoTimer ) timer_start(timer_read);
+	  timer_start(timer_read);
 	  nrecs = streamInqTimestep(pstreamptr->fileID, 0);
-	  if ( cdoTimer ) timer_stop(timer_read);
+	  timer_stop(timer_read);
 	}
 
       if ( tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID )
@@ -1316,11 +1316,11 @@ void pstreamDefTimestep(int pstreamID, int tsID)
       	  taxisDefType(taxisID, cdoDefaultTimeType);
 	}
 
-      if ( cdoTimer ) timer_start(timer_write);
+      timer_start(timer_write);
       /* don't use sync -> very slow on GPFS */
       //  if ( tsID > 0 ) streamSync(pstreamptr->fileID);
       streamDefTimestep(pstreamptr->fileID, tsID);
-      if ( cdoTimer ) timer_stop(timer_write);
+      timer_stop(timer_write);
     }
 }
 

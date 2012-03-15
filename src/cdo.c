@@ -1033,11 +1033,12 @@ int main(int argc, char *argv[])
     }
   else
     {
+      timer_total      = timer_new("total");
+      timer_read       = timer_new("read");
+      timer_write      = timer_new("write");
+
       if ( cdoTimer )
 	{
-	  timer_total      = timer_new("total");
-	  timer_read       = timer_new("read");
-	  timer_write      = timer_new("write");
 	  timer_remap      = timer_new("remap");
 	  timer_remap_sort = timer_new("remap sort");
 	  timer_remap_con  = timer_new("remap con");
@@ -1045,11 +1046,11 @@ int main(int argc, char *argv[])
 	  timer_remap_con3 = timer_new("remap con3");
 	}
 
-      if ( cdoTimer ) timer_start(timer_total);
+      timer_start(timer_total);
 
       operatorModule(operatorName)(argument);
 
-      if ( cdoTimer ) timer_stop(timer_total);
+      timer_stop(timer_total);
 
       if ( cdoTimer ) timer_report();
     }
