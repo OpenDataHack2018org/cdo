@@ -100,7 +100,7 @@ void *CDIwrite(void *argument)
   unsigned int seed = 1;
   const char *gridfile;
   double file_size, data_size = 0;
-  double tw;
+  double tw, t0;
   double *levels = NULL;
   double ***vars = NULL;
   extern int timer_write;
@@ -172,6 +172,8 @@ void *CDIwrite(void *argument)
 	  
   julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
 
+  t0 = timer_val(timer_write);
+
   for ( tsID = 0; tsID < ntimesteps; tsID++ )
     {
       rval  = rstart + rinc*tsID;
@@ -190,6 +192,13 @@ void *CDIwrite(void *argument)
 	      data_size += gridsize*8;
             }
         }
+
+      if ( cdoVerbose )
+	{
+	  tw = timer_val(timer_write) - t0;
+	  t0 = timer_val(timer_write);
+	  cdoPrint("Timestep %d: %.2f seconds", tsID+1, tw);
+	}
     }
 
   streamClose(streamID);
