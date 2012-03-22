@@ -805,6 +805,10 @@ void *Remap(void *argument)
 		  remaps[r].vars.norm_opt = norm_opt;
 		  remaps[r].vars.pinit = FALSE;
 		  
+		  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC) &&
+		       (gridInqType(gridID1) == GRID_GME || gridInqType(gridID1) == GRID_UNSTRUCTURED) )
+		    cdoAbort("Bilinear/bicubic interpolation doesn't support unstructured source grids!");
+
 		  /* initialize grid information for both grids */
 		  remapGridInit(map_type, remap_extrapolate, gridID1, gridID2, &remaps[r].grid);
 		  remaps[r].grid.store_link_fast = remap_store_link_fast;
