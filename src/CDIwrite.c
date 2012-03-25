@@ -85,6 +85,7 @@ off_t filesize(const char *filename)
 
 void *CDIwrite(void *argument)
 {
+  int memtype = MEMTYPE_DOUBLE;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
   char *defaultgrid = "global_.2";
   int operatorID;
@@ -103,6 +104,7 @@ void *CDIwrite(void *argument)
   double tw, t0;
   double *levels = NULL;
   double ***vars = NULL;
+  float *farray = NULL;
   extern int timer_write;
 
   srand(seed);
@@ -149,6 +151,8 @@ void *CDIwrite(void *argument)
 	}
     }
 
+  if ( memtype == MEMTYPE_FLOAT ) farray = (float *) malloc(gridsize*sizeof(float));
+
   vlistID = vlistCreate();
 
   for ( i = 0; i < nvars; ++i )
@@ -188,8 +192,17 @@ void *CDIwrite(void *argument)
           for ( levelID = 0; levelID < nlevs; levelID++ )
             {
               streamDefRecord(streamID, varID, levelID);
-              streamWriteRecord(streamID, vars[varID][levelID], 0);
-	      data_size += gridsize*8;
+	      if ( memtype == MEMTYPE_FLOAT )
+		{
+		  for ( i = 0; i < gridsize; ++i ) farray[i] = vars[varID][levelID][i];
+		  streamWriteRecordFloat(streamID, farray, 0);
+		  data_size += gridsize*4;
+		}
+	      else
+		{
+		  streamWriteRecord(streamID, vars[varID][levelID], 0);
+		  data_size += gridsize*8;
+		}
             }
         }
 
@@ -206,7 +219,10 @@ void *CDIwrite(void *argument)
   tw = timer_val(timer_write);
 
   data_size /= 1024.*1024.*1024.;
-  cdoPrint("Wrote %.1f GB of 64 bit floats to %s %s", data_size, datatypestr(datatype), filetypestr(filetype));
+  if ( memtype == MEMTYPE_FLOAT )
+    cdoPrint("Wrote %.1f GB of 32 bit floats to %s %s", data_size, datatypestr(datatype), filetypestr(filetype));
+  else
+    cdoPrint("Wrote %.1f GB of 64 bit floats to %s %s", data_size, datatypestr(datatype), filetypestr(filetype));
 
   fsize = filesize(cdoStreamName(0));
   file_size = fsize;
@@ -221,6 +237,8 @@ void *CDIwrite(void *argument)
       for ( levelID = 0; levelID < nlevs; levelID++ ) free(vars[varID][levelID]);
     }
   free(vars);
+
+  if ( farray ) free(farray);
 
   cdoFinish();
 

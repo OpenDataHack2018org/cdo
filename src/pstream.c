@@ -1214,6 +1214,36 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 }
 
 
+void pstreamWriteRecordFloat(int pstreamID, float *data, int nmiss)
+{
+  pstream_t *pstreamptr;
+
+  if ( data == NULL ) cdoAbort("Data pointer not allocated (pstreamWriteRecord)!");
+
+  pstreamptr = pstream_to_pointer(pstreamID);
+
+#if  defined  (HAVE_LIBPTHREAD)
+  if ( pstreamptr->ispipe )
+    {
+      cdoAbort("pipeWriteRecord not implemented for memtype float!");
+      //pipeWriteRecord(pstreamptr, data, nmiss);
+    }
+  else
+#endif
+    {
+      int varID = pstreamptr->varID;
+      timer_start(timer_write);
+      /*
+      if ( pstreamptr->varlist )
+	if ( pstreamptr->varlist[varID].check_datarange )
+	  pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
+      */
+      streamWriteRecordFloat(pstreamptr->fileID, data, nmiss);
+      timer_stop(timer_write);
+    }
+}
+
+
 int pstreamInqTimestep(int pstreamID, int tsID)
 {
   int nrecs = 0;
