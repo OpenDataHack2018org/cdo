@@ -100,6 +100,7 @@ void *CDIwrite(void *argument)
   off_t fsize;
   unsigned int seed = 1;
   const char *gridfile;
+  char *envstr;
   double file_size, data_size = 0;
   double tw, t0;
   double *levels = NULL;
@@ -110,6 +111,13 @@ void *CDIwrite(void *argument)
   srand(seed);
 
   cdoInitialize(argument);
+
+  envstr = getenv("MEMTYPE");
+  if ( envstr )
+    {
+      if      ( strcmp(envstr, "float")  == 0 ) memtype = MEMTYPE_FLOAT;
+      else if ( strcmp(envstr, "double") == 0 ) memtype = MEMTYPE_DOUBLE;
+    }
 
   if ( cdoVerbose ) cdoPrint("parameter: <grid, <nlevs, <ntimesteps, <nvars>>>>");
   // operatorInputArg("<grid, <nlevs, <ntimesteps, <nvars>>>>");
@@ -194,7 +202,8 @@ void *CDIwrite(void *argument)
               streamDefRecord(streamID, varID, levelID);
 	      if ( memtype == MEMTYPE_FLOAT )
 		{
-		  for ( i = 0; i < gridsize; ++i ) farray[i] = vars[varID][levelID][i];
+		  double *darray = vars[varID][levelID];
+		  for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
 		  streamWriteRecordFloat(streamID, farray, 0);
 		  data_size += gridsize*4;
 		}
