@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -18,9 +18,9 @@
 /*
    This module contains the following operators:
 
-      Pressure    pressure_fl          Pressure on full hybrid level
-      Pressure    pressure_hl          Pressure on half hybrid level
-      Pressure    deltap               Difference of two half hybrid level
+      Pressure    pressure_fl          Pressure on full hybrid levels
+      Pressure    pressure_hl          Pressure on half hybrid levels
+      Pressure    deltap               Difference of two half hybrid levels
 */
 
 #include <ctype.h>
