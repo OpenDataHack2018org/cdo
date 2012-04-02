@@ -194,7 +194,7 @@ case "${HOSTNAME}" in
     blizzard*)
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-jasper=/sw/aix53/jasper-1.900.1 \
-                    --with-grib_api=/sw/aix61/ECMWF \
+                    --with-grib_api=/sw/aix61/grib_api-1.9.9 \
                     --with-netcdf=/sw/aix61/netcdf-4.1.1-hdf5-threadsafe-opt \
                     --with-hdf5=/sw/aix61/hdf5-1.8.4-patch1-threadsafe \
                     --with-zlib=/sw/aix53/zlib-1.2.3 \
