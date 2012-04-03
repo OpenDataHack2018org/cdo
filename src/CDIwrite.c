@@ -101,6 +101,7 @@ void *CDIwrite(void *argument)
   unsigned int seed = 1;
   const char *gridfile;
   char *envstr;
+  off_t values = 0;
   double file_size, data_size = 0;
   double tw, t0;
   double *levels = NULL;
@@ -199,6 +200,7 @@ void *CDIwrite(void *argument)
         {
           for ( levelID = 0; levelID < nlevs; levelID++ )
             {
+	      values += gridsize;
               streamDefRecord(streamID, varID, levelID);
 	      if ( memtype == MEMTYPE_FLOAT )
 		{
@@ -227,11 +229,12 @@ void *CDIwrite(void *argument)
 
   tw = timer_val(timer_write);
 
+  values /= 1000000;
   data_size /= 1024.*1024.*1024.;
   if ( memtype == MEMTYPE_FLOAT )
-    cdoPrint("Wrote %.1f GB of 32 bit floats to %s %s", data_size, datatypestr(datatype), filetypestr(filetype));
+    cdoPrint("Wrote %.1f GB of 32 bit floats to %s %s, %.1f milval/s", data_size, datatypestr(datatype), filetypestr(filetype), values/tw);
   else
-    cdoPrint("Wrote %.1f GB of 64 bit floats to %s %s", data_size, datatypestr(datatype), filetypestr(filetype));
+    cdoPrint("Wrote %.1f GB of 64 bit floats to %s %s, %.1f milval/s", data_size, datatypestr(datatype), filetypestr(filetype), values/tw);
 
   fsize = filesize(cdoStreamName(0));
   file_size = fsize;
