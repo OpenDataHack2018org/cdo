@@ -245,8 +245,8 @@ void *CDIwrite(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      free(vars[varID]);
       for ( levelID = 0; levelID < nlevs; levelID++ ) free(vars[varID][levelID]);
+      free(vars[varID]);
     }
   free(vars);
 
