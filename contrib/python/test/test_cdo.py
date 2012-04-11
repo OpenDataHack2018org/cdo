@@ -5,7 +5,6 @@ class CdoTest(unittest.TestCase):
 
     def testCDO(self):
         cdo = Cdo()
-        self.assertEqual('cdo',cdo.getCdo())
         newCDO="/usr/bin/cdo"
         if os.path.isfile(newCDO):
             cdo.setCdo(newCDO)
@@ -43,13 +42,19 @@ class CdoTest(unittest.TestCase):
         s   = cdo.infov(input=f)
         cdo.stdatm("0",output=f,options="-f nc")
 
-    def test_info(self):
+    def test_outputOperators(self):
         cdo = Cdo()
         levels = cdo.showlevel(input = "-stdatm,0")
         info   = cdo.sinfo(input = "-stdatm,0")
-        print(levels)
         self.assertEqual([0,0],map(float,levels))
         self.assertEqual("File format: GRIB",info[0])
+
+        values = cdo.outputkey("value",input="-stdatm,0")
+        self.assertEqual(["1013.25", "288"],values)
+        values = cdo.outputkey("value",input="-stdatm,0,10000")
+        self.assertEqual(["1013.25", "271.913", "288", "240.591"],values)
+        values = cdo.outputkey("level",input="-stdatm,0,10000")
+        self.assertEqual(["0", "10000","0", "10000"],values)
 
     def test_bndLevels(self):
         cdo = Cdo()

@@ -51,10 +51,12 @@ class Cdo(object):
 
         self.debug       = False
 
+        self.outputOperatorsPattern = '(diff|info|output|griddes|zaxisdes|show)'
+
     def __getattr__(self, method_name):
         def get(self, *args,**kwargs):
             operator          = [method_name]
-            operatorPrintsOut = re.search('(diff|info|show|griddes)',method_name)
+            operatorPrintsOut = re.search(self.outputOperatorsPattern,method_name)
 
             if args.__len__() != 0:
               for arg in args:
