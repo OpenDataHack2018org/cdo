@@ -59,6 +59,7 @@ void *Vertint(void *argument)
   int geop_needed = FALSE;
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
   int code, param;
+  int pnum, pcat, pdis;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
   char paramstr[32];
@@ -344,6 +345,8 @@ void *Vertint(void *argument)
       param    = vlistInqVarParam(vlistID1, varID);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
+      cdiDecodeParam(param, &pnum, &pcat, &pdis);
+      if ( pdis >= 0 && pdis < 255 ) code = -1;
 
       if ( useTable )
 	{
@@ -375,7 +378,7 @@ void *Vertint(void *argument)
 	}
 
       if ( cdoVerbose )
-	cdoPrint("Mode = %d  Center = %d  Param = %s", mode, instNum, paramstr);
+	cdoPrint("Mode = %d  Center = %d  Code = %d  Param = %s", mode, instNum, code, paramstr);
 
       if ( code <= 0 )
 	{
@@ -434,7 +437,7 @@ void *Vertint(void *argument)
 	}
       else
 	{
-	  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 )
+	  if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel > 1 )
 	    cdoWarning("Parameter %d has wrong number of levels, skipped! (param=%s nlevel=%d)",
 		       varID+1, paramstr, nlevel);
 	  varinterp[varID] = FALSE;

@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.5
 	* Version 1.5.5 released
 
+2012-04-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* ml2pl: added support for GRIB2 parameter names [Bug #2252]
+
 2012-03-14  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* pipeInqVlist: changed init of time_to_wait [Bug #2133]

@@ -7,6 +7,7 @@ Version 1.5.5 (?? May 2012):
      * yhouradd, yhoursub, yhourmul, yhourdiv: Multi-year hourly arithmetic
    Fixed bugs:
      * ECA operators: wrong result if missing value is not the default missing value (-9e33)
+     * ml2pl: added support for GRIB2 parameter names
      * replace: removed debug output 
 
 Version 1.5.4 (30 January 2012):
