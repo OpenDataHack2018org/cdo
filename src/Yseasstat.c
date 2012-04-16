@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -36,6 +36,27 @@
 
 #define  NSEAS       4
 
+typedef struct {
+  int vdate1;
+  int vtime1;
+  int vdate2;
+  int vtime2;
+}
+date_time_t;
+
+static
+void reorder_datetime(date_time_t **datetime)
+{
+}
+
+static 
+void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
+{
+  datetime->vdate1 = vdate_new;
+  datetime->vtime1 = vtime_new;
+}
+
+
 void *Yseasstat(void *argument)
 {
   int operatorID;
@@ -57,7 +78,7 @@ void *Yseasstat(void *argument)
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
-  int vdates[NSEAS], vtimes[NSEAS];
+  date_time_t datetime[NSEAS];
   double missval;
   field_t **vars1[NSEAS], **vars2[NSEAS], **samp1[NSEAS];
   field_t field;
@@ -79,10 +100,14 @@ void *Yseasstat(void *argument)
   season_start = get_season_start();
   for ( seas = 0; seas < NSEAS; seas++ )
     {
-      vars1[seas] = NULL;
-      vars2[seas] = NULL;
-      samp1[seas] = NULL;
-      nsets[seas] = 0;
+      vars1[seas]  = NULL;
+      vars2[seas]  = NULL;
+      samp1[seas]  = NULL;
+      nsets[seas]  = 0;
+      datetime[seas].vdate1 = 0;
+      datetime[seas].vtime1 = 0;
+      datetime[seas].vdate2 = 0;
+      datetime[seas].vtime2 = 0;
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -135,8 +160,7 @@ void *Yseasstat(void *argument)
       if ( seas < 0 || seas > 3 )
 	cdoAbort("Season %d out of range!", seas+1);
 
-      vdates[seas] = vdate;
-      vtimes[seas] = vtime;
+      set_date(vdate, vtime, &datetime[seas]);
 
       if ( vars1[seas] == NULL )
 	{
@@ -254,6 +278,8 @@ void *Yseasstat(void *argument)
       tsID++;
     }
 
+  // reorder_datetime(&datetime);
+
   for ( seas = 0; seas < NSEAS; seas++ )
     if ( nsets[seas] )
       {
@@ -295,8 +321,8 @@ void *Yseasstat(void *argument)
 		}
 	    }
 
-	taxisDefVdate(taxisID2, vdates[seas]);
-	taxisDefVtime(taxisID2, vtimes[seas]);
+	taxisDefVdate(taxisID2, datetime[seas].vdate1);
+	taxisDefVtime(taxisID2, datetime[seas].vtime1);
 	streamDefTimestep(streamID2, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
