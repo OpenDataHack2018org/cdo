@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.5
 	* Version 1.5.5 released
 
+2012-04-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Yseasstat: changed timestamp of DJF season to last timestep of February
+
 2012-04-16  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* ml2pl: added support for GRIB2 parameter names [Bug #2252]

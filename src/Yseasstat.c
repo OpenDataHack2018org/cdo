@@ -37,23 +37,25 @@
 #define  NSEAS       4
 
 typedef struct {
-  int vdate1;
-  int vtime1;
-  int vdate2;
-  int vtime2;
+  int vdate;
+  int vtime;
 }
 date_time_t;
 
-static
-void reorder_datetime(date_time_t **datetime)
-{
-}
 
 static 
 void set_date(int vdate_new, int vtime_new, date_time_t *datetime)
 {
-  datetime->vdate1 = vdate_new;
-  datetime->vtime1 = vtime_new;
+  int year, month, day;
+
+  cdiDecodeDate(vdate_new, &year, &month, &day);
+  if ( month == 12 ) vdate_new = cdiEncodeDate(year-1, month, day);
+
+  if ( vdate_new > datetime->vdate )
+    {
+      datetime->vdate = vdate_new;
+      datetime->vtime = vtime_new;
+    }
 }
 
 
@@ -104,10 +106,8 @@ void *Yseasstat(void *argument)
       vars2[seas]  = NULL;
       samp1[seas]  = NULL;
       nsets[seas]  = 0;
-      datetime[seas].vdate1 = 0;
-      datetime[seas].vtime1 = 0;
-      datetime[seas].vdate2 = 0;
-      datetime[seas].vtime2 = 0;
+      datetime[seas].vdate = 0;
+      datetime[seas].vtime = 0;
     }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
@@ -278,8 +278,6 @@ void *Yseasstat(void *argument)
       tsID++;
     }
 
-  // reorder_datetime(&datetime);
-
   for ( seas = 0; seas < NSEAS; seas++ )
     if ( nsets[seas] )
       {
@@ -321,8 +319,8 @@ void *Yseasstat(void *argument)
 		}
 	    }
 
-	taxisDefVdate(taxisID2, datetime[seas].vdate1);
-	taxisDefVtime(taxisID2, datetime[seas].vtime1);
+	taxisDefVdate(taxisID2, datetime[seas].vdate);
+	taxisDefVtime(taxisID2, datetime[seas].vtime);
 	streamDefTimestep(streamID2, otsID);
 
 	for ( recID = 0; recID < nrecords; recID++ )
