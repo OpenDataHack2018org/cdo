@@ -5,7 +5,7 @@
 
 2012-04-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* remaplib::grid_search: manipulate src_lons for zonal mean data
+	* remaplib: changed warning message for bil/bic interpolation
 
 2012-04-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

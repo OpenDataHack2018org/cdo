@@ -2282,12 +2282,6 @@ int grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lat
           src_lons[1] = src_center_lon[e_add];
           src_lons[2] = src_center_lon[ne_add];
           src_lons[3] = src_center_lon[n_add];
-	  /* 2012-04-20 Uwe Schulzweida: manipulate src_lons for zonal mean data */
-	  if ( nx == 1 && IS_EQUAL(src_lons[0], 0) )
-	    {
-	      src_lons[1] = 0.1;
-	      src_lons[2] = 0.1;
-	    }
 
 	  /* For consistency, we must make sure all lons are in same 2pi interval */
 
@@ -2680,7 +2674,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	      if ( cdoVerbose || lwarn )
 		{
 		  lwarn = FALSE;
-		  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		  //  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		  cdoWarning("Bilinear interpolation failed for some grid points - use a distance-weighted average instead!");
 		}
 
 	      search_result = -1;
@@ -2688,8 +2683,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	}
 
       /*
-	Search for bilinear failed - use a distance-weighted
-	average instead (this is typically near the pole)
+	Search for bilinear failed - use a distance-weighted average instead (this is typically near the pole)
       */
       if ( search_result < 0 )
 	{
@@ -2896,7 +2890,8 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	      if ( cdoVerbose || lwarn )
 		{
 		  lwarn = FALSE;
-		  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		  // cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		  cdoWarning("Bicubic interpolation failed for some grid points - use a distance-weighted average instead!");
 		}
 
 	      search_result = -1;
@@ -2904,8 +2899,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	}
 	  
       /*
-	Search for bicubic failed - use a distance-weighted
-	average instead (this is typically near the pole)
+	Search for bicubic failed - use a distance-weighted average instead (this is typically near the pole)
       */
       if ( search_result < 0 )
 	{
