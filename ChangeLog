@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.5
 	* Version 1.5.5 released
 
+2012-04-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remaplib::grid_search: manipulate src_lons for zonal mean data
+
 2012-04-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Yseasstat: changed timestamp of DJF season to last timestep of February

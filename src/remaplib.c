@@ -2282,6 +2282,12 @@ int grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lat
           src_lons[1] = src_center_lon[e_add];
           src_lons[2] = src_center_lon[ne_add];
           src_lons[3] = src_center_lon[n_add];
+	  /* 2012-04-20 Uwe Schulzweida: manipulate src_lons for zonal mean data */
+	  if ( nx == 1 && IS_EQUAL(src_lons[0], 0) )
+	    {
+	      src_lons[1] = 0.1;
+	      src_lons[2] = 0.1;
+	    }
 
 	  /* For consistency, we must make sure all lons are in same 2pi interval */
 
