@@ -92,18 +92,20 @@ class CdoTest(unittest.TestCase):
         ofile = MyTempfile().path()
         press = cdo.stdatm("0",output=ofile,options="-f nc")
         self.assertEqual(ofile,press)
-        press = cdo.stdatm("0",options="-f nc",returnArray=True).var("P").get()
+        a = cdo.readCdf(press)
+        variables = cdo.stdatm("0",options="-f nc",returnArray=True).variables
+        press = cdo.stdatm("0",options="-f nc",returnArray=True).variables['P'][:]
         self.assertEqual(1013.25,press.min())
         press = cdo.stdatm("0",output=ofile,options="-f nc")
         self.assertEqual(ofile,press)
         cdo.setReturnArray()
         outfile = 'test.nc'
-        press = cdo.stdatm("0",output=outfile,options="-f nc").var("P").get()
+        press = cdo.stdatm("0",output=outfile,options="-f nc").variables["P"][:]
         self.assertEqual(1013.25,press.min())
         cdo.unsetReturnArray()
         press = cdo.stdatm("0",output=outfile,options="-f nc")
         self.assertEqual(press,outfile)
-        press = cdo.stdatm("0",output=outfile,options="-f nc",returnArray=True).var("P").get()
+        press = cdo.stdatm("0",output=outfile,options="-f nc",returnArray=True).variables["P"][:]
         self.assertEqual(1013.25,press.min())
         print("press = "+press.min().__str__())
         cdo.unsetReturnArray()
@@ -122,7 +124,7 @@ class CdoTest(unittest.TestCase):
         sum = cdo.fldsum(input = stdatm)
         sum = cdo.fldsum(input = cdo.stdatm("0",options="-f nc"))
         sum = cdo.fldsum(input = cdo.stdatm("0",options="-f nc"),returnArray=True)
-        self.assertEqual(288.0,sum.var("T").get().min())
+        self.assertEqual(288.0,sum.variables["T"][:])
 
     def test_cdf(self):
         cdo = Cdo()
@@ -131,9 +133,14 @@ class CdoTest(unittest.TestCase):
         self.assertIn("cdf",cdo.__dict__)
         cdo.setReturnArray(False)
         sum = cdo.fldsum(input = cdo.stdatm("0",options="-f nc"),returnArray=True)
-        self.assertEqual(1013.25,sum.var("P").get().min())
+        self.assertEqual(1013.25,sum.variables["P"][:])
         cdo.unsetReturnArray()
 
+    def test_cdf_mod(self):
+        cdo =Cdo()
+        cdo.setReturnArray()
+        print('cdo.cdfMod:' + cdo.cdfMod)
+        self.assertEqual(cdo.cdfMod,"scipy")
     def test_thickness(self):
         cdo = Cdo()
         levels            = "25 100 250 500 875 1400 2100 3000 4000 5000".split(' ')
@@ -161,7 +168,7 @@ class CdoTest(unittest.TestCase):
             input= "-settunits,days  -setyear,2000 -for,1,4"
             cdfFile = cdo.copy(options="-f nc",input=input)
             cdf     = cdo.readCdf(cdfFile)
-            self.assertEqual(['lat','lon','for','time'],cdf.variables().keys())
+            self.assertEqual(['lat','lon','for','time'],cdf.variables.keys())
 
         def testTmp(self):
             cdo = Cdo()

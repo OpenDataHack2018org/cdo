@@ -53,6 +53,8 @@ class Cdo(object):
 
         self.outputOperatorsPattern = '(diff|info|output|griddes|zaxisdes|show)'
 
+        self.cdfMod      = ''
+
     def __getattr__(self, method_name):
         def get(self, *args,**kwargs):
             operator          = [method_name]
@@ -107,7 +109,7 @@ class Cdo(object):
                 if not self.returnArray:
                   self.loadCdf()
 
-                return self.cdf(kwargs["output"])
+                return self.readCdf(kwargs["output"])
               else:
                 return kwargs["output"]
 
@@ -137,10 +139,17 @@ class Cdo(object):
 
     def loadCdf(self):
       try:
-        import pycdf as cdf
-        self.cdf         = cdf.CDF
-      except ImportError:
-        raise ImportError,"Module pycdf is required to return numpy arrays."
+        import scipy.io.netcdf as cdf
+        self.cdf    = cdf
+        self.cdfMod = "scipy"
+      except:
+        try:
+          import netCDF4 as cdf
+          self.cdf    = cdf
+          self.cdfMod = "netcdf4"
+        except:
+          raise ImportError,"scipy or python-netcdf4 module is required to return numpy arrays."
+
 
     def setReturnArray(self,value=True):
       self.returnArray = value
@@ -161,6 +170,9 @@ class Cdo(object):
     #==================================================================
     # Addional operators:
     #------------------------------------------------------------------
+    def module_version(self):
+      '1.0.9'
+
     def boundaryLevels(self,**kwargs):
       ilevels         = map(float,self.showlevel(input = kwargs['input'])[0].split())
       bound_levels    = []
@@ -186,7 +198,16 @@ class Cdo(object):
       if not self.returnArray:
         self.loadCdf()
 
-      return self.cdf(iFile)
+      if ( "scipy" == self.cdfMod):
+        fileObj =  self.cdf.netcdf_file(iFile)
+      elif ( "netcdf4" == self.cdfMod ):
+        fileObj = self.cdf.Dataset(iFile)
+      else:
+        raise ImportError,"Could not import data from file '" + iFile + "'"
+
+      retval = fileObj
+      fileObj.close()
+      return retval
 
 
 
