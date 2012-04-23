@@ -206,7 +206,7 @@ void *CDIwrite(void *argument)
 		{
 		  double *darray = vars[varID][levelID];
 		  for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
-		  streamWriteRecordFloat(streamID, farray, 0);
+		  streamWriteRecordF(streamID, farray, 0);
 		  data_size += gridsize*4;
 		}
 	      else

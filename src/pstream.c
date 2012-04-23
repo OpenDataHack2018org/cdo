@@ -1214,7 +1214,7 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 }
 
 
-void pstreamWriteRecordFloat(int pstreamID, float *data, int nmiss)
+void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
 {
   pstream_t *pstreamptr;
 
@@ -1238,7 +1238,7 @@ void pstreamWriteRecordFloat(int pstreamID, float *data, int nmiss)
 	if ( pstreamptr->varlist[varID].check_datarange )
 	  pstreamCheckDatarange(pstreamptr, varID, data, nmiss);
       */
-      streamWriteRecordFloat(pstreamptr->fileID, data, nmiss);
+      streamWriteRecordF(pstreamptr->fileID, data, nmiss);
       timer_stop(timer_write);
     }
 }
