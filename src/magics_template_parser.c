@@ -15,6 +15,7 @@
 
 /* static int magics_template_parser( xmlNode * a_node ) */
 
+#if  defined  (HAVE_LIBMAGICS)
 #if  defined  (HAVE_LIBXML)
 int magics_template_parser( xmlNode * a_node )
 
@@ -198,3 +199,4 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 
 	return ret_flag;
 }
+#endif
