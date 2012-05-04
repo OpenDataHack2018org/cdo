@@ -1,6 +1,13 @@
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h" /* HAVE_LIBMAGICS */
+#endif
+
 #include "magics_template_parser.h"
 #include "StringUtilities.h"
+
+#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
+#endif
 
 #define DBG_MSG 0 
 
