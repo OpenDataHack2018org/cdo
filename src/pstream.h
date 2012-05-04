@@ -35,7 +35,7 @@
 #define  streamInqRecord          pstreamInqRecord
 
 #define  streamWriteRecord        pstreamWriteRecord
-#define  streamWriteRecordFloat   pstreamWriteRecordFloat
+#define  streamWriteRecordF       pstreamWriteRecordF
 #define  streamReadRecord         pstreamReadRecord
 /*
 #define  streamCopyRecord    pstreamCopyRecord
@@ -58,7 +58,7 @@ void    pstreamDefRecord(int pstreamID, int  varID, int  levelID);
 int     pstreamInqRecord(int pstreamID, int *varID, int *levelID);
 
 void    pstreamWriteRecord(int pstreamID, double *data, int nmiss);
-void    pstreamWriteRecordFloat(int pstreamID, float *data, int nmiss);
+void    pstreamWriteRecordF(int pstreamID, float *data, int nmiss);
 void    pstreamReadRecord(int pstreamID, double *data, int *nmiss);
 void    pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
