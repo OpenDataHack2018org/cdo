@@ -23,7 +23,7 @@ void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon
   mag_open ();
 
   // set the output device 
-  mag_setc ("output_format",    "pdf");
+  // mag_setc ("output_format",    "pdf");
   mag_setc ("output_name",      plotfile);
 
   // Set the input data arrays to magics++
@@ -39,27 +39,31 @@ void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon
   mag_setr("input_field_initial_longitude", -179.75);
   mag_setr("input_field_longitude_step", 0.5);
 
+  template_parser("new_temp.xml", NULL);
+
+  //  template_parser("result_template.xml", "temperature");
+  
 
   /* Area specification (SOUTH, WEST, NORTH, EAST ) */
-  mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -90.0);
-  mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE", -180.0);
-  mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   90.0);
-  mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE", 180.0);
+  //  mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -90.0);
+  // mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE", -180.0);
+  // mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   90.0);
+  // mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE", 180.0);
 
 
   /* set up the coastline attributes */
-  mag_setc ("map_coastline_colour", "khaki");
-  mag_setc ("map_grid_colour",      "grey");     
+  // mag_setc ("map_coastline_colour", "khaki");
+  // mag_setc ("map_grid_colour",      "grey");     
 
   /* define the contouring parameters */
-  mag_setc ("contour",                  "on");
-  mag_setc ("contour_line_colour",      "sky");
-  mag_setc ("CONTOUR_HIGHLIGHT_COLOUR", "GREEN");
-  mag_setc ("contour_label",            "on");
+  // mag_setc ("contour",                  "on");
+  // mag_setc ("contour_line_colour",      "sky");
+  // mag_setc ("CONTOUR_HIGHLIGHT_COLOUR", "GREEN");
+  // mag_setc ("contour_label",            "on");
   mag_cont ();
 
   /* plot the title text and the coastlines */
-  mag_text  ();
+  //mag_text  ();
   mag_coast ();
 
   mag_close ();

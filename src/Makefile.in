@@ -134,12 +134,15 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Ymonpctl.$(OBJEXT) cdo-Ymonstat.$(OBJEXT) \
 	cdo-Yseaspctl.$(OBJEXT) cdo-Yseasstat.$(OBJEXT) \
 	cdo-Zonstat.$(OBJEXT) cdo-cdo_pthread.$(OBJEXT) \
-	cdo-cdo_vlist.$(OBJEXT) cdo-color.$(OBJEXT) \
-	cdo-commandline.$(OBJEXT) cdo-ecacore.$(OBJEXT) \
-	cdo-ecautil.$(OBJEXT) cdo-exception.$(OBJEXT) \
-	cdo-expr.$(OBJEXT) cdo-expr_lex.$(OBJEXT) \
-	cdo-expr_yacc.$(OBJEXT) cdo-field.$(OBJEXT) \
-	cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
+	cdo-cdo_vlist.$(OBJEXT) cdo-template_parser.$(OBJEXT) \
+	cdo-results_template_parser.$(OBJEXT) \
+	cdo-magics_template_parser.$(OBJEXT) \
+	cdo-StringUtilities.$(OBJEXT) cdo-CdoMagicsMapper.$(OBJEXT) \
+	cdo-color.$(OBJEXT) cdo-commandline.$(OBJEXT) \
+	cdo-ecacore.$(OBJEXT) cdo-ecautil.$(OBJEXT) \
+	cdo-exception.$(OBJEXT) cdo-expr.$(OBJEXT) \
+	cdo-expr_lex.$(OBJEXT) cdo-expr_yacc.$(OBJEXT) \
+	cdo-field.$(OBJEXT) cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
 	cdo-fieldmem.$(OBJEXT) cdo-fieldmer.$(OBJEXT) \
 	cdo-fieldzon.$(OBJEXT) cdo-fouriertrans.$(OBJEXT) \
 	cdo-gradsdeslib.$(OBJEXT) cdo-grid.$(OBJEXT) \
@@ -376,7 +379,11 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Writegrid.c Writerandom.c Ydayarith.c Ydaypctl.c Ydaystat.c \
 	Ydrunpctl.c Ydrunstat.c Yhourarith.c Yhourstat.c Ymonarith.c \
 	Ymonpctl.c Ymonstat.c Yseaspctl.c Yseasstat.c Zonstat.c cdo.h \
-	cdo_int.h cdo_pthread.c cdo_vlist.c color.c color.h \
+	cdo_int.h cdo_pthread.c cdo_vlist.c template_parser.h \
+	template_parser.c results_template_parser.h \
+	results_template_parser.c magics_template_parser.h \
+	magics_template_parser.c StringUtilities.h StringUtilities.c \
+	CdoMagicsMapper.h CdoMagicsMapper.c color.c color.h \
 	commandline.c const.h counter.h dmemory.h dtypes.h ecacore.c \
 	ecacore.h ecautil.c ecautil.h error.h etopo.h temp.h mask.h \
 	exception.c expr.c expr.h expr_lex.c expr_yacc.c expr_yacc.h \
@@ -529,6 +536,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDItest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDIwrite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Cat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CdoMagicsMapper.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Change_e5slm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Cloudlayer.Po@am__quote@
@@ -650,6 +658,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Splitsel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Splittime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Splityear.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-StringUtilities.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Subtrend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Templates.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Test.Po@am__quote@
@@ -725,6 +734,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-juldate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-legendre.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-list.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-magics_template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-merge_sort2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-modules.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-namelist.Po@am__quote@
@@ -739,9 +749,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-readline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-realtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-remaplib.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-results_template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-specspace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-statistic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-table.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-template_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-userlog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-util.Po@am__quote@
@@ -3177,6 +3189,76 @@ cdo-cdo_vlist.obj: cdo_vlist.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='cdo_vlist.c' object='cdo-cdo_vlist.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-cdo_vlist.obj `if test -f 'cdo_vlist.c'; then $(CYGPATH_W) 'cdo_vlist.c'; else $(CYGPATH_W) '$(srcdir)/cdo_vlist.c'; fi`
+
+cdo-template_parser.o: template_parser.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-template_parser.o -MD -MP -MF $(DEPDIR)/cdo-template_parser.Tpo -c -o cdo-template_parser.o `test -f 'template_parser.c' || echo '$(srcdir)/'`template_parser.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-template_parser.Tpo $(DEPDIR)/cdo-template_parser.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='template_parser.c' object='cdo-template_parser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-template_parser.o `test -f 'template_parser.c' || echo '$(srcdir)/'`template_parser.c
+
+cdo-template_parser.obj: template_parser.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-template_parser.obj -MD -MP -MF $(DEPDIR)/cdo-template_parser.Tpo -c -o cdo-template_parser.obj `if test -f 'template_parser.c'; then $(CYGPATH_W) 'template_parser.c'; else $(CYGPATH_W) '$(srcdir)/template_parser.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-template_parser.Tpo $(DEPDIR)/cdo-template_parser.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='template_parser.c' object='cdo-template_parser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-template_parser.obj `if test -f 'template_parser.c'; then $(CYGPATH_W) 'template_parser.c'; else $(CYGPATH_W) '$(srcdir)/template_parser.c'; fi`
+
+cdo-results_template_parser.o: results_template_parser.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-results_template_parser.o -MD -MP -MF $(DEPDIR)/cdo-results_template_parser.Tpo -c -o cdo-results_template_parser.o `test -f 'results_template_parser.c' || echo '$(srcdir)/'`results_template_parser.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-results_template_parser.Tpo $(DEPDIR)/cdo-results_template_parser.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='results_template_parser.c' object='cdo-results_template_parser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-results_template_parser.o `test -f 'results_template_parser.c' || echo '$(srcdir)/'`results_template_parser.c
+
+cdo-results_template_parser.obj: results_template_parser.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-results_template_parser.obj -MD -MP -MF $(DEPDIR)/cdo-results_template_parser.Tpo -c -o cdo-results_template_parser.obj `if test -f 'results_template_parser.c'; then $(CYGPATH_W) 'results_template_parser.c'; else $(CYGPATH_W) '$(srcdir)/results_template_parser.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-results_template_parser.Tpo $(DEPDIR)/cdo-results_template_parser.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='results_template_parser.c' object='cdo-results_template_parser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-results_template_parser.obj `if test -f 'results_template_parser.c'; then $(CYGPATH_W) 'results_template_parser.c'; else $(CYGPATH_W) '$(srcdir)/results_template_parser.c'; fi`
+
+cdo-magics_template_parser.o: magics_template_parser.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-magics_template_parser.o -MD -MP -MF $(DEPDIR)/cdo-magics_template_parser.Tpo -c -o cdo-magics_template_parser.o `test -f 'magics_template_parser.c' || echo '$(srcdir)/'`magics_template_parser.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-magics_template_parser.Tpo $(DEPDIR)/cdo-magics_template_parser.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='magics_template_parser.c' object='cdo-magics_template_parser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-magics_template_parser.o `test -f 'magics_template_parser.c' || echo '$(srcdir)/'`magics_template_parser.c
+
+cdo-magics_template_parser.obj: magics_template_parser.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-magics_template_parser.obj -MD -MP -MF $(DEPDIR)/cdo-magics_template_parser.Tpo -c -o cdo-magics_template_parser.obj `if test -f 'magics_template_parser.c'; then $(CYGPATH_W) 'magics_template_parser.c'; else $(CYGPATH_W) '$(srcdir)/magics_template_parser.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-magics_template_parser.Tpo $(DEPDIR)/cdo-magics_template_parser.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='magics_template_parser.c' object='cdo-magics_template_parser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-magics_template_parser.obj `if test -f 'magics_template_parser.c'; then $(CYGPATH_W) 'magics_template_parser.c'; else $(CYGPATH_W) '$(srcdir)/magics_template_parser.c'; fi`
+
+cdo-StringUtilities.o: StringUtilities.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-StringUtilities.o -MD -MP -MF $(DEPDIR)/cdo-StringUtilities.Tpo -c -o cdo-StringUtilities.o `test -f 'StringUtilities.c' || echo '$(srcdir)/'`StringUtilities.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-StringUtilities.Tpo $(DEPDIR)/cdo-StringUtilities.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='StringUtilities.c' object='cdo-StringUtilities.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-StringUtilities.o `test -f 'StringUtilities.c' || echo '$(srcdir)/'`StringUtilities.c
+
+cdo-StringUtilities.obj: StringUtilities.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-StringUtilities.obj -MD -MP -MF $(DEPDIR)/cdo-StringUtilities.Tpo -c -o cdo-StringUtilities.obj `if test -f 'StringUtilities.c'; then $(CYGPATH_W) 'StringUtilities.c'; else $(CYGPATH_W) '$(srcdir)/StringUtilities.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-StringUtilities.Tpo $(DEPDIR)/cdo-StringUtilities.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='StringUtilities.c' object='cdo-StringUtilities.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-StringUtilities.obj `if test -f 'StringUtilities.c'; then $(CYGPATH_W) 'StringUtilities.c'; else $(CYGPATH_W) '$(srcdir)/StringUtilities.c'; fi`
+
+cdo-CdoMagicsMapper.o: CdoMagicsMapper.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CdoMagicsMapper.o -MD -MP -MF $(DEPDIR)/cdo-CdoMagicsMapper.Tpo -c -o cdo-CdoMagicsMapper.o `test -f 'CdoMagicsMapper.c' || echo '$(srcdir)/'`CdoMagicsMapper.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CdoMagicsMapper.Tpo $(DEPDIR)/cdo-CdoMagicsMapper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CdoMagicsMapper.c' object='cdo-CdoMagicsMapper.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CdoMagicsMapper.o `test -f 'CdoMagicsMapper.c' || echo '$(srcdir)/'`CdoMagicsMapper.c
+
+cdo-CdoMagicsMapper.obj: CdoMagicsMapper.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CdoMagicsMapper.obj -MD -MP -MF $(DEPDIR)/cdo-CdoMagicsMapper.Tpo -c -o cdo-CdoMagicsMapper.obj `if test -f 'CdoMagicsMapper.c'; then $(CYGPATH_W) 'CdoMagicsMapper.c'; else $(CYGPATH_W) '$(srcdir)/CdoMagicsMapper.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CdoMagicsMapper.Tpo $(DEPDIR)/cdo-CdoMagicsMapper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CdoMagicsMapper.c' object='cdo-CdoMagicsMapper.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CdoMagicsMapper.obj `if test -f 'CdoMagicsMapper.c'; then $(CYGPATH_W) 'CdoMagicsMapper.c'; else $(CYGPATH_W) '$(srcdir)/CdoMagicsMapper.c'; fi`
 
 cdo-color.o: color.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-color.o -MD -MP -MF $(DEPDIR)/cdo-color.Tpo -c -o cdo-color.o `test -f 'color.c' || echo '$(srcdir)/'`color.c

@@ -176,6 +176,16 @@ cdo_SOURCES += Arith.c         \
                cdo_int.h       \
                cdo_pthread.c   \
                cdo_vlist.c     \
+               template_parser.h   \	
+               template_parser.c   \
+               results_template_parser.h   \
+               results_template_parser.c   \
+               magics_template_parser.h   \
+               magics_template_parser.c   \
+               StringUtilities.h   \
+               StringUtilities.c   \
+               CdoMagicsMapper.h   \
+               CdoMagicsMapper.c   \
                color.c         \
                color.h         \
                commandline.c   \

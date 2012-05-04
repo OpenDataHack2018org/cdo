@@ -288,6 +288,8 @@ src/Arithlat.c -text
 src/CDItest.c -text
 src/CDIwrite.c -text
 src/Cat.c -text
+src/CdoMagicsMapper.c -text
+src/CdoMagicsMapper.h -text
 src/Change.c -text
 src/Change_e5slm.c -text
 src/Cloudlayer.c -text
@@ -411,6 +413,8 @@ src/Splitrec.c -text
 src/Splitsel.c -text
 src/Splittime.c -text
 src/Splityear.c -text
+src/StringUtilities.c -text
+src/StringUtilities.h -text
 src/Subtrend.c -text
 src/Templates.c -text
 src/Test.c -text
@@ -511,6 +515,8 @@ src/juldate.c -text
 src/legendre.c -text
 src/list.c -text
 src/list.h -text
+src/magics_template_parser.c -text
+src/magics_template_parser.h -text
 src/mask.h -text
 src/merge_sort2.c -text
 src/merge_sort2.h -text
@@ -540,12 +546,16 @@ src/readline.c -text
 src/realtime.c -text
 src/remap.h -text
 src/remaplib.c -text
+src/results_template_parser.c -text
+src/results_template_parser.h -text
 src/specspace.c -text
 src/specspace.h -text
 src/statistic.c -text
 src/statistic.h -text
 src/table.c -text
 src/temp.h -text
+src/template_parser.c -text
+src/template_parser.h -text
 src/timebase.h -text
 src/timer.c -text
 src/userlog.c -text
