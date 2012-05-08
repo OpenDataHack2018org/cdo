@@ -12,8 +12,9 @@
 #endif
 
 #if  defined  (HAVE_LIBXML)
-int magics_template_parser( xmlNode * a_node ); 
+int magics_template_parser( xmlNode * a_node );
 #endif
+
 int SetMagicsParameterValue( char *param_name, char *param_type, char *param_value );
 
 

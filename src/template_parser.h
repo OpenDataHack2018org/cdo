@@ -9,8 +9,14 @@
 #if  defined  (HAVE_LIBXML)
 #include<libxml/parser.h>
 #include<libxml/tree.h>
-#endif
+
 
 int template_parser( char *Filename, const char *varname );
+int init_XMLtemplate_parser( char *Filename );
+int updatemagics_and_results_nodes( );
+int quit_XMLtemplate_parser( );
+
+
+#endif
 
 #endif

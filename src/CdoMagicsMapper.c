@@ -18,9 +18,9 @@ typedef struct
 CdoMagicsMapper mapper[] =
 
 {
-	{ "clevs","mag_cont_levels","floatarray"},
-	{ "ccols","mag_colours","intarray"},
-	{ "color_table","mag_colour_tabe","intarray"}
+	{ "clevs","contour_level_list","floatarray"},
+	{ "ccols","mag_2","intarray"},
+	{ "color_table","mag_3","intarray"}
 
 };
 
@@ -51,12 +51,18 @@ void PrintResult ( const CdoMagicsMapper *c )
 int GetMagicsParameterInfo( const char *user_name, char **magics_name, char **magics_type )
 
 {
+       static int once = 1;
        int ret_flag = 0;
        CdoMagicsMapper target, *result;
        target.cdo_name = user_name; 
-       printf ("Finding  %s.\n", user_name);
 
        printf ("Finding  %s.\n", user_name);
+       if( once )
+       {
+       		qsort ( mapper, PARAM_COUNT, sizeof ( CdoMagicsMapper ), ( void * )Compare );
+		once = 0;
+       }
+
        result = bsearch ( &target, mapper, PARAM_COUNT, sizeof ( CdoMagicsMapper ),
                           ( void * )Compare );
        if ( result )
@@ -72,55 +78,3 @@ int GetMagicsParameterInfo( const char *user_name, char **magics_name, char **ma
        }
        return ret_flag;
 }
-     
-
-     /* Main program. */
-  
-/*   
-int main (void)
-
-{
-       int i;
-       char *user_name,*param_type,*param_name;
-       char *user_name1,*param_type1,*param_name1;
-	
-     
-       for ( i = 0; i < PARAM_COUNT; i++ )
-		PrintResult ( &mapper[i] );
-       printf ( "\n" );
-     
-       qsort ( mapper, PARAM_COUNT, sizeof ( CdoMagicsMapper ), ( void * )Compare );
-     
-       for ( i = 0; i < PARAM_COUNT; i++ )
-		PrintResult ( &mapper[i] );
-       printf ("\n");
-
-       user_name  = "clevs";
-
-       printf ( "Find UserName %s\n", user_name );
-     
-       if( !GetMagicsParameterInfo ( user_name, &param_name, &param_type  ) )
-       {
-	       printf ( "RESULT\t MAGICS Name:%s\t MAGICS Type:%s\n", param_name, param_type );
-       }
-       else
-         printf ("Couldn't find %s.\n", user_name);
-
-
-       user_name = "ccols";
-       printf ( "Find UserName %s\n", user_name );
-
-       if( !GetMagicsParameterInfo ( user_name, &param_name, &param_type  ) )
-       {
-	       printf ( "RESULT\t MAGICS Name:%s\t MAGICS Type:%s\n", param_name, param_type );
-       }
-       else
-         printf ("Couldn't find %s.\n", user_name);
-
-       for ( i = 0; i < PARAM_COUNT; i++ )
-		PrintResult ( &mapper[i] );
-       printf ("\n");
-
-       return 0;
-}
-*/

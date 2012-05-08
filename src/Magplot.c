@@ -12,11 +12,29 @@
 #include "magics_api.h"
 #endif
 
+
+#if  defined  (HAVE_LIBXML)
+
+#include<libxml/parser.h>
+#include<libxml/tree.h>
+#include "template_parser.h"
+#include "magics_template_parser.h"
+#include "results_template_parser.h"
+
+xmlDoc *param_doc = NULL;
+xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
+
+#endif
+
+
 static
-void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array)
+void magplot( const char *plotfile, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
 {
   long i;
+  char plotfilename[4096];
 
+  sprintf(plotfilename, "%s_%s", plotfile, varname);
+  printf("plotfilename: %s\n", plotfilename);
 #if  defined  (HAVE_LIBMAGICS)
 
   // open magics
@@ -24,7 +42,7 @@ void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon
 
   // set the output device 
   // mag_setc ("output_format",    "pdf");
-  mag_setc ("output_name",      plotfile);
+  mag_setc ("output_name",      plotfilename);
 
   // Set the input data arrays to magics++
    
@@ -39,13 +57,17 @@ void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon
   mag_setr("input_field_initial_longitude", -179.75);
   mag_setr("input_field_longitude_step", 0.5);
 
-  template_parser("new_temp.xml", NULL);
+  fprintf(stdout,"Entering From MAGICS node %s\n",root_node->name);
 
-  //  template_parser("result_template.xml", "temperature");
+  magics_template_parser( magics_node );
+  results_template_parser(results_node, varname );
+
+  //template_parser("new_temp.xml", NULL);
+  //template_parser("result_template.xml", "temperature");
   
 
   /* Area specification (SOUTH, WEST, NORTH, EAST ) */
-  //  mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -90.0);
+  // mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -90.0);
   // mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE", -180.0);
   // mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   90.0);
   // mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE", 180.0);
@@ -67,6 +89,7 @@ void magplot(const char *plotfile, long nlon, long nlat, double *grid_center_lon
   mag_coast ();
 
   mag_close ();
+  fprintf(stdout,"Exiting From MAGICS\n");
 
 #else
   cdoAbort("MAGICS support not compiled in!");
@@ -97,6 +120,8 @@ void *Magplot(void *argument)
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];
 
+  char  *Filename = "combined.xml";
+
   cdoInitialize(argument);
 
   streamID = streamOpenRead(cdoStreamName(0));
@@ -105,7 +130,6 @@ void *Magplot(void *argument)
   taxisID = vlistInqTaxis(vlistID);
 
   varID = 0;
-  vlistInqVarName(vlistID, varID, varname);
   gridID  = vlistInqVarGrid(vlistID, varID);
   zaxisID = vlistInqVarZaxis(vlistID, varID);
   missval = vlistInqVarMissval(vlistID, varID);
@@ -135,6 +159,15 @@ void *Magplot(void *argument)
   gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
 					
   tsID = 0;
+
+#if  defined  (HAVE_LIBXML)
+  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+  fprintf( stdout,"INPUT XML filename %s\n", Filename );
+  init_XMLtemplate_parser( Filename );
+  updatemagics_and_results_nodes( );
+#endif
+
+
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
       vdate = taxisInqVdate(taxisID);
@@ -148,9 +181,11 @@ void *Magplot(void *argument)
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
 
-	  magplot(cdoStreamName(1), nlon, nlat, grid_center_lon, grid_center_lat, array);
+	  vlistInqVarName(vlistID, varID, varname);
 
-	  break;
+	  magplot(cdoStreamName(1), varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
+
+	  //	  break;
 	}
 
       break;
@@ -164,7 +199,12 @@ void *Magplot(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
+#if  defined  (HAVE_LIBXML)
+  quit_XMLtemplate_parser( );
+#endif
+
   cdoFinish();
+
 
   return (0);
 }

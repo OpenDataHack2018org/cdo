@@ -1,21 +1,26 @@
 #include "template_parser.h"
+#include "magics_template_parser.h"
 #include "results_template_parser.h"
 
 #define DBG_MSG 1 
-/* Recursive function that prints the XML structure */
 
-/* extern  CdoMagicsMapper mapper[]; */
 
-extern int GetMagicsParameterInfo( const char *user_name, char *magics_name, char *magics_type );
+extern int GetMagicsParameterInfo( const char *user_name, char **magics_name, char **magics_type );
 
 #if  defined  (HAVE_LIBXML)
-int results_template_parser( xmlNode * a_node, const char *varname )
+
+extern xmlNode *results_node;
+
+
+/* Recursive function that sets the results parameters from the XML structure */
+
+int results_template_parser( xmlNode * a_node, const char *varname ) 
 
 {
     xmlNode *cur_node = NULL;
     xmlAttrPtr attr = NULL;
-    xmlChar    *param_name,*param_type,*param_value,*value;
-    char       *magics_param_name;
+    xmlChar    *param_name,*param_value,*value;
+    char       *magics_param_name,*param_type;
 
     for ( cur_node = a_node; cur_node; cur_node = cur_node->next )
     {
@@ -33,12 +38,15 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 	    {
 	 	value = xmlGetProp( cur_node, "version" );
 
-	    	if( DBG_MSG )
-			printf( "Version %s \n", value ); 
-
-		if( atof( value ) > 3.0f ) 
+		if( value )
 		{
-			return 1;
+	    		if( DBG_MSG )
+				printf( "Version %s \n", value ); 
+
+			if( atof( value ) > 3.0f ) 
+			{
+				return 1;
+			}
 		}
         	results_template_parser( cur_node->children, varname );
 		continue;
@@ -65,29 +73,33 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 	      printf("varname = %s  result_name = %s\n", varname, xmlGetProp( cur_node,"name"));
 
 	      if ( strcmp(varname, xmlGetProp( cur_node,"name")) == 0 )
-		{
+	      {
 		  for( attr = cur_node->properties; attr; attr = attr->next )
-		    {	
+		  {	
 		      if( attr != NULL )
-			{
+		      {
 			  printf( "Attr name: %s Conte: %s \n", attr->name, xmlNodeGetContent( attr->children ) );
 
-			  if( !GetMagicsParameterInfo( attr->name, magics_param_name, param_type ) )
-			    {
-			      printf("Setting corresponding Magics Parameter!\n");
+			  if( !GetMagicsParameterInfo( attr->name, &magics_param_name, &param_type ) )
+			  {
+			      printf("Setting corresponding Magics Parameter %s and type %s!\n",magics_param_name, param_type );
+			      param_value = xmlNodeGetContent( attr->children );
+	  fprintf(stderr, "param_value: %s\n", param_value);
 			      SetMagicsParameterValue( magics_param_name, param_type, param_value );
-			    }
+#if 0
+#endif
+			  }
 			  else
-			    {
+			  {
 			      printf("No corresponding Magics Parameter found!\n");
-			      
-			    }
-			}	
-		    }	
-		}
+			  }
+		      }	
+		  }	
+	      }
 	      else
-		{
-		}
+	      {
+	   	  printf("Var Name not matching!\n");
+	      }
 	    }
         }
     }

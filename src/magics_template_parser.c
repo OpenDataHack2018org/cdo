@@ -11,13 +11,16 @@
 
 #define DBG_MSG 0 
 
-/* Recursive function that prints the XML structure */
-
-/* static int magics_template_parser( xmlNode * a_node ) */
 
 #if  defined  (HAVE_LIBMAGICS)
 #if  defined  (HAVE_LIBXML)
-int magics_template_parser( xmlNode * a_node )
+
+extern xmlNode *magics_node;
+
+
+/* Recursive function that sets the Magics parameters from the XML structure */
+
+int magics_template_parser( xmlNode *a_node ) 
 
 {
     int param_set_flag;
@@ -25,7 +28,30 @@ int magics_template_parser( xmlNode * a_node )
     xmlAttrPtr attr = NULL;
     xmlChar    *param_name,*param_type,*param_value,*value;
 
-    for ( cur_node = a_node; cur_node; cur_node = cur_node->next )
+    if( a_node == NULL )
+        return 0;
+
+    fprintf( stdout,"Parsing the magics Node \n");
+
+    if( !strcmp( a_node->name, "magics" ) )
+    {
+ 	value = xmlGetProp( a_node, "version" );
+
+        if( value )
+        {
+	    	if( DBG_MSG )
+			printf( "Version %s \n", value ); 
+
+		if( atof( value ) > 3.0f ) 
+		{
+			return 1;
+		}
+        }
+
+    }
+
+
+    for ( cur_node = a_node->children; cur_node; cur_node = cur_node->next )
     {
 	param_name = NULL;
 	param_type = NULL;
@@ -37,31 +63,13 @@ int magics_template_parser( xmlNode * a_node )
 	    if( DBG_MSG )
             	printf( "Node Name: %s \n", cur_node->name );
 
-	    if( !strcmp( cur_node->name, "magics" ) )
-	    {
-	 	value = xmlGetProp( cur_node, "version" );
+            fprintf( stdout,"Node Name: %s \n", cur_node->name );
 
-	    	if( DBG_MSG )
-			printf( "Version %s \n", value ); 
-
-		if( atof( value ) > 3.0f ) 
-		{
-			return 1;
-		}
-        	magics_template_parser( cur_node->children );
-		continue;
-	     }
-		
-	
 	    if( cur_node->properties == NULL )
 	    {
 		if( cur_node->children == NULL )
 		{
 			printf( "NO ATTRIBUTES!!!\n" );
-		}
-		else 
-		{
-        		magics_template_parser( cur_node->children );
 		}
 	    }
 	    else
@@ -140,12 +148,14 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
     	/*   MAGICS++ FLOAT ARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"floatarray" ) )
 	{
+	  fprintf(stderr, "param_value: %s\n", param_value);
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
 		{
 			float_param_list = ( double *) malloc ( sizeof( double ) * split_str_count );
 			for( i = 0; i < split_str_count; i++ )
 			{
+			  fprintf(stderr, "%d %d %s\n", i, split_str_count, split_str[i]);
 				float_param_list[i] = atof( split_str[i] );			
 			}
 			mag_set1r( param_name, float_param_list, split_str_count );		
