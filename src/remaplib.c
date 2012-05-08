@@ -2700,8 +2700,9 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	    {
 	      /* Renormalize weights */
 	      sum_wgts = 0.0;
-	      for ( n = 0; n < 4; ++n ) sum_wgts += src_lats[n];
-	      for ( n = 0; n < 4; ++n ) wgts[n] = src_lats[n]/sum_wgts;
+	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
+	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
+	      for ( n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
 
 	      rg->grid2_frac[dst_add] = ONE;
 
