@@ -6,6 +6,7 @@
 2012-05-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remap_bilin: using fabs(src_lats[n]) for distance-weighted average (big fix) [report: Renate Brokopf]
+	* remap_bilic: using fabs(src_lats[n]) for distance-weighted average (big fix)
 
 2012-04-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

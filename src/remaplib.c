@@ -2917,8 +2917,9 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	    {
 	      /* Renormalize weights */
 	      sum_wgts = 0.0;
-	      for ( n = 0; n < 4; ++n ) sum_wgts += src_lats[n];
-	      for ( n = 0; n < 4; ++n ) wgts[0][n] = src_lats[n]/sum_wgts;
+	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
+	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
+	      for ( n = 0; n < 4; ++n ) wgts[0][n] = fabs(src_lats[n])/sum_wgts;
 	      for ( n = 0; n < 4; ++n ) wgts[1][n] = ZERO;
 	      for ( n = 0; n < 4; ++n ) wgts[2][n] = ZERO;
 	      for ( n = 0; n < 4; ++n ) wgts[3][n] = ZERO;
