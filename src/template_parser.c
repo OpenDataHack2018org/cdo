@@ -22,7 +22,6 @@ int template_parser(  char *Filename, const char *varname )
         xmlDoc         *doc = NULL;
         xmlNode        *root_element = NULL;
 
-	printf("XML File Name:\t%s\n",Filename);
         doc = xmlReadFile( Filename, NULL, 0 );
         if ( doc == NULL )
         {
@@ -41,7 +40,6 @@ int template_parser(  char *Filename, const char *varname )
 		  
 		  if( !strcmp( root_element->name, "magics" ) )
 		  {
-			printf( "Found Magics Template! \n" );
                   	if ( magics_template_parser( root_element ) == 1 )
 		  	{
 				printf( "Un-Supported version of Magics++! \n" );
@@ -50,12 +48,10 @@ int template_parser(  char *Filename, const char *varname )
 		  }
 		  else if( !strcmp( root_element->name, "results" ) )
 		  {
-			printf( "Found Results Template! \n" );
                   	results_template_parser( root_element, varname );
 			 /* Needs some error handling */
 		  }
 
- 
                   /*** free the document ***/
                   xmlFreeDoc( doc );
         }
@@ -80,7 +76,6 @@ int init_XMLtemplate_parser( char *Filename )
 {
 
 #if  defined  (HAVE_LIBXML)
-	printf( "XML File Name:\t%s\n",Filename );
         param_doc = xmlReadFile( Filename, NULL, 0 );
         if ( param_doc == NULL )
         {
@@ -114,24 +109,28 @@ int updatemagics_and_results_nodes(  )
     	return 0;
     }
 
-    fprintf( stdout, "Updating the Magics and Results Node\n" );
     for ( cur_node = root_node->children; cur_node; cur_node = cur_node->next )
     {   
         if ( cur_node->type == XML_ELEMENT_NODE )
         {   
     
+#if 0
             fprintf( stdout, "Node Name: %s \n", cur_node->name );
-
+#endif
             if( !strcmp( cur_node->name, "magics" ) ) 
             {
 		magics_node = cur_node;
+#if 0
                 fprintf( stdout, "Node Name: %s \n", cur_node->name );
+#endif
 	    }  
 
             if( !strcmp( cur_node->name, "results" ) ) 
             {
 		results_node = cur_node;
+#if 0
                 fprintf( stdout, "Node Name: %s \n", cur_node->name );
+#endif
 	    }  
 	}
     }
@@ -153,7 +152,9 @@ int quit_XMLtemplate_parser( )
         xmlCleanupParser( );
 	if( param_doc == NULL )
 		printf( "Cleaned XML parser\n" );
+#if 0
         fprintf( stdout, "Cleaned XML parser\n" );
+#endif
 	return 0;
 #else
 	fprintf(stderr, "XML support not compiled in!");

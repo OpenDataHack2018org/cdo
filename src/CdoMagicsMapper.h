@@ -7,6 +7,6 @@
 
 /* void FindMagicsStruct ( const char *user_name ); */
 
-int GetMagicsParameterInfo( const char *user_name, char **magics_name, char **magics_type );
+int GetMagicsParameterInfo( const char *user_name, char *param_value );
 
 #endif

@@ -31,7 +31,9 @@ int magics_template_parser( xmlNode *a_node )
     if( a_node == NULL )
         return 0;
 
+#if 0
     fprintf( stdout,"Parsing the magics Node \n");
+#endif
 
     if( !strcmp( a_node->name, "magics" ) )
     {
@@ -63,7 +65,9 @@ int magics_template_parser( xmlNode *a_node )
 	    if( DBG_MSG )
             	printf( "Node Name: %s \n", cur_node->name );
 
+#if 0
             fprintf( stdout,"Node Name: %s \n", cur_node->name );
+#endif
 
 	    if( cur_node->properties == NULL )
 	    {
@@ -78,7 +82,9 @@ int magics_template_parser( xmlNode *a_node )
 		param_name = xmlGetProp( cur_node,"parameter");
 		param_type = xmlGetProp(cur_node,"type");
 		param_value = xmlGetProp(cur_node,"value");
+#if 0
     		printf( "\t\tAttr name: %s Type: %s Value: %s \n", param_name,param_type,param_value);
+#endif
 		
     		param_set_flag = SetMagicsParameterValue( param_name, param_type, param_value );
 		
@@ -119,7 +125,9 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 		{
 			if( !strcmp( param_value, "off" ) || !strcmp( param_value, "OFF" ) )
 			{
+#if 0
 				printf( "Quiet Option %s \n", param_value ); 
+#endif
 				if( !unsetenv( "MAGPLUS_QUIET" ) )
 					printf( "Quiet Option %s is un-set successfully!!! \n", param_value ); 
 				else
@@ -128,7 +136,9 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 
 			if( !strcmp( param_value, "on" ) || !strcmp( param_value, "ON" ) )
 			{
+#if 0
 				printf( "Quiet Option %s \n", param_value ); 
+#endif
 				if( !setenv( "MAGPLUS_QUIET","1",1 ) )
 				{
 					printf( "Quiet Option %s is set successfully!!! \n", param_value ); 
@@ -148,14 +158,19 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
     	/*   MAGICS++ FLOAT ARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"floatarray" ) )
 	{
-	  fprintf(stderr, "param_value: %s\n", param_value);
+
+#if 0
+	        fprintf(stderr, "param_name : %s\tparam_value: %s\n", param_name, param_value);
+#endif
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
 		{
 			float_param_list = ( double *) malloc ( sizeof( double ) * split_str_count );
 			for( i = 0; i < split_str_count; i++ )
 			{
-			  fprintf(stderr, "%d %d %s\n", i, split_str_count, split_str[i]);
+#if 0
+			        fprintf(stderr, "%d %d %s\n", i, split_str_count, split_str[i]);
+#endif
 				float_param_list[i] = atof( split_str[i] );			
 			}
 			mag_set1r( param_name, float_param_list, split_str_count );		

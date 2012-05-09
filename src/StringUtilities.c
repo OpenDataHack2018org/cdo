@@ -20,13 +20,13 @@ int StringSplitWithSeperator( const char *source_string, const char seperator, c
 			sep_count++;
 	}	
  
-	temp_list  = ( char** )malloc ( sizeof( char* ) * sep_count );
+	temp_list  = ( char** )malloc ( sizeof( char* ) * sep_count+1 );
 
 	temp_str = strtok( duplicate_src, "," );
 	if( temp_str )
 		temp_list[0] = temp_str;
 
-	while( temp_str && n < sep_count-1 ) 
+	while( temp_str && n < sep_count ) 
 	{
 		temp_str = NULL;
 		temp_str = strtok( NULL, "," );
