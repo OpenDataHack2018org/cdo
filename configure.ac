@@ -64,11 +64,11 @@ AC_CHECK_FUNCS(gethostname)
 
 # Check compiler version
 case "$CC" in
+  pgcc*)  COMP_VERSION=`$CC -V | head -2 | tail -n 1`;;
   *gcc*)  COMP_VERSION=`$CC --version | head -n 1`;;
   g++*)   COMP_VERSION=`$CC --version | head -n 1`;;
   sxc*)   COMP_VERSION=`$CC -V 2>&1   | tail -n 1`;;
   xlc*)   COMP_VERSION=`$CC -qversion 2>&1   | head -n 1`;;
-  pgcc*)  COMP_VERSION=`$CC -V | head -2 | tail -n 1`;;
   *)      COMP_VERSION=`$CC -V 2>&1   | head -n 1`;;
 esac
 
