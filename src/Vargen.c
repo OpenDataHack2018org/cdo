@@ -101,7 +101,7 @@ void *Vargen(void *argument)
   const char *gridfile;
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
-  double *array, *levels;
+  double *array, *levels = NULL;
   LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
@@ -337,6 +337,7 @@ void *Vargen(void *argument)
   vlistDestroy(vlistID);
 
   if ( array ) free(array);
+  if ( levels ) free(levels); 
 
   cdoFinish();
 
