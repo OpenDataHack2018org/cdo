@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.5
 	* Version 1.5.5 released
 
+2012-05-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Ensstat3: nvars undefined (bug fix)
+	
 2012-05-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remap_bilin: using fabs(src_lats[n]) for distance-weighted average (big fix) [report: Renate Brokopf]
