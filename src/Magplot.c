@@ -34,7 +34,7 @@ void magplot( const char *plotfile, const char *varname, long nlon, long nlat, d
   char plotfilename[4096];
 
   sprintf(plotfilename, "%s_%s", plotfile, varname);
-  printf("plotfilename: %s\n", plotfilename);
+
 #if  defined  (HAVE_LIBMAGICS)
 
   // open magics
@@ -46,18 +46,19 @@ void magplot( const char *plotfile, const char *varname, long nlon, long nlat, d
 
   // Set the input data arrays to magics++
    
+  mag_setc("input_field_organization", "REGULAR");
+
   mag_set2r("input_field", array, nlon, nlat);
 
-  // mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
-  // mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
-    
-  mag_setr("input_field_initial_latitude", -89.75);
+  mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
+  mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
+  
+  mag_setr("input_field_initial_latitude", grid_center_lat[0]);
   mag_setr("input_field_latitude_step", 0.5);
 
-  mag_setr("input_field_initial_longitude", -179.75);
+  mag_setr("input_field_initial_longitude", grid_center_lon[0]);
   mag_setr("input_field_longitude_step", 0.5);
-
-  fprintf(stdout,"Entering From MAGICS node %s\n",root_node->name);
+ 
 
   magics_template_parser( magics_node );
   results_template_parser(results_node, varname );
@@ -67,10 +68,14 @@ void magplot( const char *plotfile, const char *varname, long nlon, long nlat, d
   
 
   /* Area specification (SOUTH, WEST, NORTH, EAST ) */
-  // mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -90.0);
-  // mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE", -180.0);
-  // mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   90.0);
-  // mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE", 180.0);
+  mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -80.0);
+  mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE", -170.0);
+  mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   80.0);
+  mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE", 170.0);
+  mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",    20.0);
+  mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE",  -20.0);
+  mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   70.0);
+  mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE",  50.0);
 
 
   /* set up the coastline attributes */
@@ -89,7 +94,7 @@ void magplot( const char *plotfile, const char *varname, long nlon, long nlat, d
   mag_coast ();
 
   mag_close ();
-  fprintf(stdout,"Exiting From MAGICS\n");
+  fprintf( stdout,"Exiting From MAGICS after creating %s\n",plotfilename );
 
 #else
   cdoAbort("MAGICS support not compiled in!");
@@ -162,7 +167,6 @@ void *Magplot(void *argument)
 
 #if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
-  fprintf( stdout,"INPUT XML filename %s\n", Filename );
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
 #endif
@@ -183,6 +187,7 @@ void *Magplot(void *argument)
 
 	  vlistInqVarName(vlistID, varID, varname);
 
+          fprintf( stderr," Creating PLOT for %s\n",varname );
 	  magplot(cdoStreamName(1), varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
 
 	  //	  break;
