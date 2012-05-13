@@ -1,3 +1,7 @@
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h" /* HAVE_LIBMAGICS */
+#endif
+
 #include "CdoMagicsMapper.h"
 
 #define PARAM_COUNT  sizeof( mapper ) / sizeof ( CdoMagicsMapper )
@@ -65,8 +69,10 @@ int Set_magics_param_CCOLS( char *user_name, char *param_value )
 		return 1;
 	printf("Setting the CCOLS magics params \n"); 
         
+#if  defined  (HAVE_LIBMAGICS)
         SetMagicsParameterValue( "contour_shade_colour_method", "string", "list" );
         SetMagicsParameterValue( "contour_shade_colour_list","stringarray", param_value );
+#endif
 #if 0
 #endif
 	return 0;
@@ -86,8 +92,12 @@ int Set_magics_param_CLEVS( char *user_name, char *param_value )
 {
 	if( user_name == NULL )
 		return 1;
+
+#if  defined  (HAVE_LIBMAGICS)
         SetMagicsParameterValue( "contour_level_selection_type","string", "level_list" );
         SetMagicsParameterValue( "contour_level_list","floatarray", param_value );
+#endif
+
 	return 0;
 }
 
@@ -95,7 +105,9 @@ int Set_magics_param_CLEVS( char *user_name, char *param_value )
 int Reset_magics_param_CLEVS( char *user_name )
 
 {
+#if  defined  (HAVE_LIBMAGICS)
         SetMagicsParameterValue( "contour_level_selection_type","string", "count" );
+#endif
 	printf("Re-Setting the CLEVS magics params \n"); 
 	return 0;
 }
@@ -107,7 +119,9 @@ int Set_magics_param_CTABLE( char *user_name, char *param_value )
 		return 1;
 	printf("Setting the CTABLE magics params \n"); 
 #if 0
+#if  defined  (HAVE_LIBMAGICS)
         SetMagicsParameterValue( "contour_level_list", "floatarray", param_value );
+#endif
 #endif
 	return 0;
 }
@@ -148,6 +162,7 @@ int GetMagicsParameterInfo( const char *user_name, char *param_value )
 {
        static int once = 1;
        int ret_flag = 0;
+#if  defined  (HAVE_LIBMAGICS)
        CdoMagicsMapper target, *result;
        target.cdo_name = user_name; 
 
@@ -173,5 +188,6 @@ int GetMagicsParameterInfo( const char *user_name, char *param_value )
 	 /* Call the Reset functions of all the features to Reset the magics params to default in the calling function */
          ret_flag = 1;
        }
+#endif
        return ret_flag;
 }
