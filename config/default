@@ -57,8 +57,8 @@ case "${HOSTNAME}" in
     tornado*)
  	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/sles10-x64 \
                     --enable-all-static \
-	            --with-netcdf=/sw/sles10-x64/netcdf-4.0.1 \
-	            --with-hdf5=/sw/sles10-x64/hdf5-1.8.2 \
+	            --with-netcdf=/sw/sles10-x64/netcdf-4.2-static \
+	            --with-hdf5=/sw/sles10-x64/hdf5-1.8.8-static \
                     --with-szlib=/sw/sles10-x64/szip-2.1 \
 	            CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
 #	            CC=suncc CFLAGS="-g -fast -xopenmp"
@@ -169,13 +169,13 @@ case "${HOSTNAME}" in
 	;;
 # x86_64-unknown-linux-gnu (rhel55)
     lizard*)
-        LDFLAGS="-Wl,-rpath=/sw/rhel55-x64/jasper-1.900.1/lib:/sw/rhel55-x64/hdf5-1.8.5-threadsafe/lib:/sw/rhel55-x64/szip-2.1/lib:/sw/rhel55-x64/netcdf-4.1.1/lib -lpng"
+        LDFLAGS="-lpng"
         export LDFLAGS
 	${CONFPATH}configure --prefix=$HOME/local/rhel55-x64 \
                     --with-jasper=/sw/rhel55-x64/jasper-1.900.1 \
                     --with-grib_api=/sw/rhel55-x64/grib_api-1.9.0 \
-                    --with-netcdf=/sw/rhel55-x64/netcdf-4.1.1 \
-                    --with-hdf5=/sw/rhel55-x64/hdf5-1.8.5-threadsafe \
+                    --with-netcdf=/sw/rhel55-x64/netcdf-4.2 \
+                    --with-hdf5=/sw/rhel55-x64/hdf5-1.8.8-threadsafe \
                     --with-szlib=/sw/rhel55-x64/szip-2.1 \
                     --with-zlib=/usr \
  	            CC=gcc44 CFLAGS="-g -Wall -O2 -fopenmp"
@@ -196,10 +196,9 @@ case "${HOSTNAME}" in
 	${CONFPATH}configure --prefix=$HOME/local \
                     --with-jasper=/sw/aix53/jasper-1.900.1 \
                     --with-grib_api=/sw/aix61/grib_api-1.9.9 \
-                    --with-netcdf=/sw/aix61/netcdf-4.1.1-hdf5-threadsafe-opt \
-                    --with-hdf5=/sw/aix61/hdf5-1.8.4-patch1-threadsafe \
-                    --with-zlib=/sw/aix53/zlib-1.2.3 \
-                    --with-szlib=/sw/aix53/szip-2.1 \
+                    --with-netcdf=/sw/aix61/netcdf-4.2-threadsafe \
+                    --with-hdf5=/sw/aix61/hdf5-1.8.8-threadsafe \
+                    --with-szlib=/sw/aix61/szip-2.1-threadsafe \
                     --with-proj=/sw/aix53/proj-4.6.1 \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
  	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
