@@ -83,12 +83,26 @@ off_t filesize(const char *filename)
   return pos;
 }
 
+static
+void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
+{
+  nvalues /= 1000000;
+  data_size /= 1024.*1024.*1024.;
+  if ( memtype == MEMTYPE_FLOAT )
+    cdoPrint("%s Wrote %.1f GB of 32 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), nvalues/tw);
+  else
+    cdoPrint("%s Wrote %.1f GB of 64 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), nvalues/tw);
+
+  file_size /= 1024.*1024.*1024.;
+  cdoPrint("%s Wrote %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size, tw, 1024*file_size/tw);
+}
+
+
 void *CDIwrite(void *argument)
 {
   int memtype = MEMTYPE_DOUBLE;
   int nvars = 10, nlevs = 0, ntimesteps = 30;
   char *defaultgrid = "global_.2";
-  int operatorID;
   int streamID;
   int tsID, varID, levelID;
   int gridsize, i;
@@ -96,20 +110,22 @@ void *CDIwrite(void *argument)
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
   int vdate, vtime, julday;
-  int filetype, datatype;
-  off_t fsize;
+  int filetype = -1, datatype = -1;
+  int irun, nruns = 1;
   unsigned int seed = 1;
   const char *gridfile;
+  char sinfo[64];
   char *envstr;
-  off_t values = 0;
-  double file_size, data_size = 0;
-  double tw, t0;
+  off_t nvalues = 0;
+  double file_size = 0, data_size = 0;
+  double tw, tw0, t0, twsum = 0;
   double *levels = NULL;
   double ***vars = NULL;
   float *farray = NULL;
   extern int timer_write;
 
   srand(seed);
+  sinfo[0] = 0;
 
   cdoInitialize(argument);
 
@@ -123,13 +139,17 @@ void *CDIwrite(void *argument)
   if ( cdoVerbose ) cdoPrint("parameter: <grid, <nlevs, <ntimesteps, <nvars>>>>");
   // operatorInputArg("<grid, <nlevs, <ntimesteps, <nvars>>>>");
 
-  if ( operatorArgc() > 4 ) cdoAbort("Too many arguments!");
+  if ( operatorArgc() > 5 ) cdoAbort("Too many arguments!");
 
   gridfile = defaultgrid;
-  if ( operatorArgc() >= 1 ) gridfile = operatorArgv()[0];
-  if ( operatorArgc() >= 2 ) nlevs = atol(operatorArgv()[1]);
-  if ( operatorArgc() >= 3 ) ntimesteps = atol(operatorArgv()[2]);
-  if ( operatorArgc() >= 4 ) nvars = atol(operatorArgv()[3]);
+  if ( operatorArgc() >= 1 ) nruns = atol(operatorArgv()[0]);
+  if ( operatorArgc() >= 2 ) gridfile = operatorArgv()[0];
+  if ( operatorArgc() >= 3 ) nlevs = atol(operatorArgv()[1]);
+  if ( operatorArgc() >= 4 ) ntimesteps = atol(operatorArgv()[2]);
+  if ( operatorArgc() >= 5 ) nvars = atol(operatorArgv()[3]);
+
+  if ( nruns <  0 ) nruns = 0;
+  if ( nruns > 99 ) nruns = 99;
 
   gridID   = cdoDefineGrid(gridfile);
   gridsize = gridInqSize(gridID);
@@ -138,6 +158,7 @@ void *CDIwrite(void *argument)
 
   if ( cdoVerbose )
     {
+      cdoPrint("nruns      : %d", nruns);
       cdoPrint("gridsize   : %d", gridInqSize);
       cdoPrint("nlevs      : %d", nlevs);
       cdoPrint("ntimesteps : %d", ntimesteps);
@@ -176,70 +197,75 @@ void *CDIwrite(void *argument)
 
   // vlistDefNtsteps(vlistID, 1);
 
-  streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
-
-  streamDefVlist(streamID, vlistID);
-
-  filetype = streamInqFiletype(streamID);
-  datatype = vlistInqVarDatatype(vlistID, 0);
-	  
-  julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
-
-  t0 = timer_val(timer_write);
-
-  for ( tsID = 0; tsID < ntimesteps; tsID++ )
+  for ( irun = 0; irun < nruns; ++irun )
     {
-      rval  = rstart + rinc*tsID;
-      vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
-      vtime = 0;
-      taxisDefVdate(taxisID, vdate);
-      taxisDefVtime(taxisID, vtime);
-      streamDefTimestep(streamID, tsID);
+      tw0 = timer_val(timer_write);
+      data_size = 0;
+      nvalues = 0;
 
-      for ( varID = 0; varID < nvars; varID++ )
-        {
-          for ( levelID = 0; levelID < nlevs; levelID++ )
-            {
-	      values += gridsize;
-              streamDefRecord(streamID, varID, levelID);
-	      if ( memtype == MEMTYPE_FLOAT )
-		{
-		  double *darray = vars[varID][levelID];
-		  for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
-		  streamWriteRecordF(streamID, farray, 0);
-		  data_size += gridsize*4;
-		}
-	      else
-		{
-		  streamWriteRecord(streamID, vars[varID][levelID], 0);
-		  data_size += gridsize*8;
-		}
-            }
-        }
+      streamID = streamOpenWrite(cdoStreamName(0), cdoFiletype());
 
-      if ( cdoVerbose )
+      streamDefVlist(streamID, vlistID);
+
+      filetype = streamInqFiletype(streamID);
+      datatype = vlistInqVarDatatype(vlistID, 0);
+	  
+      julday = date_to_julday(CALENDAR_PROLEPTIC, 19870101);
+
+      t0 = timer_val(timer_write);
+
+      for ( tsID = 0; tsID < ntimesteps; tsID++ )
 	{
-	  tw = timer_val(timer_write) - t0;
-	  t0 = timer_val(timer_write);
-	  cdoPrint("Timestep %d: %.2f seconds", tsID+1, tw);
+	  rval  = rstart + rinc*tsID;
+	  vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
+	  vtime = 0;
+	  taxisDefVdate(taxisID, vdate);
+	  taxisDefVtime(taxisID, vtime);
+	  streamDefTimestep(streamID, tsID);
+
+	  for ( varID = 0; varID < nvars; varID++ )
+	    {
+	      for ( levelID = 0; levelID < nlevs; levelID++ )
+		{
+		  nvalues += gridsize;
+		  streamDefRecord(streamID, varID, levelID);
+		  if ( memtype == MEMTYPE_FLOAT )
+		    {
+		      double *darray = vars[varID][levelID];
+		      for ( i = 0; i < gridsize; ++i ) farray[i] = darray[i];
+		      streamWriteRecordF(streamID, farray, 0);
+		      data_size += gridsize*4;
+		    }
+		  else
+		    {
+		      streamWriteRecord(streamID, vars[varID][levelID], 0);
+		      data_size += gridsize*8;
+		    }
+		}
+	    }
+
+	  if ( cdoVerbose )
+	    {
+	      tw = timer_val(timer_write) - t0;
+	      t0 = timer_val(timer_write);
+	      cdoPrint("Timestep %d: %.2f seconds", tsID+1, tw);
+	    }
 	}
+
+      streamClose(streamID);
+
+      tw = timer_val(timer_write) - tw0;
+      twsum += tw;
+
+      file_size = (double ) filesize(cdoStreamName(0));
+
+      if ( nruns > 1 ) sprintf(sinfo, "(run %d)", irun+1);
+
+      print_stat(sinfo, memtype, datatype, filetype, nvalues, data_size, file_size, tw);
     }
 
-  streamClose(streamID);
-
-  tw = timer_val(timer_write);
-
-  values /= 1000000;
-  data_size /= 1024.*1024.*1024.;
-  if ( memtype == MEMTYPE_FLOAT )
-    cdoPrint("Wrote %.1f GB of 32 bit floats to %s %s, %.1f milval/s", data_size, datatypestr(datatype), filetypestr(filetype), values/tw);
-  else
-    cdoPrint("Wrote %.1f GB of 64 bit floats to %s %s, %.1f milval/s", data_size, datatypestr(datatype), filetypestr(filetype), values/tw);
-
-  fsize = filesize(cdoStreamName(0));
-  file_size = fsize;
-  file_size /= 1024.*1024.*1024.;
-  cdoPrint("Wrote %.1f GB in %.1f seconds, total %.1f MB/s", file_size, tw, 1024*file_size/tw);
+  if ( nruns > 1 )
+    print_stat("(mean)", memtype, datatype, filetype, nvalues, data_size, file_size, twsum/nruns);
 
   vlistDestroy(vlistID);
 
