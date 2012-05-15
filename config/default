@@ -76,8 +76,8 @@ case "${HOSTNAME}" in
 # x86_64-lenny-linux-gnu
     squall*)
         ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/lenny-x64 \
-                    --with-netcdf=/sw/lenny-x64/netcdf-4.0.1-gcc \
-                    --with-hdf5=/sw/lenny-x64/hdf5-1.8.4p1-gcc \
+                    --with-netcdf=/sw/lenny-x64/netcdf-4.2-static \
+                    --with-hdf5=/sw/lenny-x64/hdf5-1.8.8-static \
                     --with-szlib=/sw/lenny-x64/szip-2.1 \
                     --with-proj=/sw/lenny-x64/proj-4.7.0 \
                     CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
