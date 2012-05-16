@@ -69,17 +69,17 @@ static pthread_mutex_t streamOpenWriteMutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_once_t _pstream_init_thread = PTHREAD_ONCE_INIT;
 static pthread_mutex_t _pstream_mutex;
 
-#  define PSTREAM_LOCK           pthread_mutex_lock(&_pstream_mutex);
-#  define PSTREAM_UNLOCK         pthread_mutex_unlock(&_pstream_mutex);
-#  define PSTREAM_INIT                               \
-   if ( _pstream_init == FALSE ) pthread_once(&_pstream_init_thread, pstream_initialize);
+#  define PSTREAM_LOCK()           pthread_mutex_lock(&_pstream_mutex)
+#  define PSTREAM_UNLOCK()         pthread_mutex_unlock(&_pstream_mutex)
+#  define PSTREAM_INIT()	  \
+   if ( _pstream_init == FALSE ) pthread_once(&_pstream_init_thread, pstream_initialize)
 
 #else
 
-#  define PSTREAM_LOCK
-#  define PSTREAM_UNLOCK
-#  define PSTREAM_INIT                               \
-   if ( _pstream_init == FALSE ) pstream_initialize();
+#  define PSTREAM_LOCK()
+#  define PSTREAM_UNLOCK()
+#  define PSTREAM_INIT()	  \
+   if ( _pstream_init == FALSE ) pstream_initialize()
 
 #endif
 
@@ -131,15 +131,15 @@ pstream_t *pstream_to_pointer(int idx)
 {
   pstream_t *pstreamptr = NULL;
 
-  PSTREAM_INIT
+  PSTREAM_INIT();
 
   if ( idx >= 0 && idx < _pstream_max )
     {
-      PSTREAM_LOCK
+      PSTREAM_LOCK();
 
       pstreamptr = _pstreamList[idx].ptr;
 
-      PSTREAM_UNLOCK
+      PSTREAM_UNLOCK();
     }
   else
     Error("pstream index %d undefined!", idx);
@@ -156,7 +156,7 @@ int pstream_from_pointer(pstream_t *ptr)
 
   if ( ptr )
     {
-      PSTREAM_LOCK
+      PSTREAM_LOCK();
 
       if ( _pstreamAvail )
 	{
@@ -172,7 +172,7 @@ int pstream_from_pointer(pstream_t *ptr)
       else
 	Warning("Too many open pstreams (limit is %d)!", _pstream_max);
 
-      PSTREAM_UNLOCK
+      PSTREAM_UNLOCK();
     }
   else
     Error("Internal problem (pointer %p undefined)", ptr);
@@ -225,7 +225,7 @@ void pstream_delete_entry(pstream_t *pstreamptr)
 
   idx = pstreamptr->self;
 
-  PSTREAM_LOCK
+  PSTREAM_LOCK();
 
   free(pstreamptr);
 
@@ -233,7 +233,7 @@ void pstream_delete_entry(pstream_t *pstreamptr)
   _pstreamList[idx].ptr  = 0;
   _pstreamAvail   	 = &_pstreamList[idx];
 
-  PSTREAM_UNLOCK
+  PSTREAM_UNLOCK();
 
   if ( PSTREAM_Debug )
     Message("Removed idx %d from pstream list", idx);
@@ -306,7 +306,7 @@ int pstreamOpenRead(const char *argument)
   int pstreamID;
   pstream_t *pstreamptr;
 
-  PSTREAM_INIT
+  PSTREAM_INIT();
 
   pstreamptr = pstream_new_entry();
   if ( ! pstreamptr ) Error("No memory");
@@ -627,7 +627,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
   int ispipe;
   pstream_t *pstreamptr;
 
-  PSTREAM_INIT
+  PSTREAM_INIT();
 
   ispipe = memcmp(argument, "(pipe", 5) == 0;
 
