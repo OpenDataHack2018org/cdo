@@ -73,6 +73,8 @@ cdo_SOURCES += Arith.c         \
                Isosurface.c    \
                Log.c           \
                Magplot.c       \
+               Magvector.c     \
+               Maggraph.c      \
                Maskbox.c       \
                Mastrfu.c       \
                Math.c          \

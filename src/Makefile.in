@@ -87,11 +87,13 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Intntime.$(OBJEXT) cdo-Inttime.$(OBJEXT) \
 	cdo-Intyear.$(OBJEXT) cdo-Invert.$(OBJEXT) \
 	cdo-Invertlev.$(OBJEXT) cdo-Isosurface.$(OBJEXT) \
-	cdo-Log.$(OBJEXT) cdo-Magplot.$(OBJEXT) cdo-Maskbox.$(OBJEXT) \
-	cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) cdo-Merge.$(OBJEXT) \
-	cdo-Mergegrid.$(OBJEXT) cdo-Mergetime.$(OBJEXT) \
-	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
-	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
+	cdo-Log.$(OBJEXT) cdo-Magplot.$(OBJEXT) \
+	cdo-Magvector.$(OBJEXT) cdo-Maggraph.$(OBJEXT) \
+	cdo-Maskbox.$(OBJEXT) cdo-Mastrfu.$(OBJEXT) cdo-Math.$(OBJEXT) \
+	cdo-Merge.$(OBJEXT) cdo-Mergegrid.$(OBJEXT) \
+	cdo-Mergetime.$(OBJEXT) cdo-Merstat.$(OBJEXT) \
+	cdo-Monarith.$(OBJEXT) cdo-Mrotuv.$(OBJEXT) \
+	cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
 	cdo-Nmltest.$(OBJEXT) cdo-Output.$(OBJEXT) \
 	cdo-Outputgmt.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
@@ -361,19 +363,20 @@ cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
 	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
 	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
 	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
-	Invertlev.c Isosurface.c Log.c Magplot.c Maskbox.c Mastrfu.c \
-	Math.c Merge.c Mergegrid.c Mergetime.c Merstat.c Monarith.c \
-	Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c \
-	Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
-	Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
-	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
-	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
-	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
-	Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c Sorttimestamp.c \
-	Specinfo.c Spectral.c Spectrum.c Split.c Splitrec.c Splitsel.c \
-	Splittime.c Splityear.c SSOpar.c Subtrend.c Templates.c Test.c \
-	Tests.c Timcount.c Timpctl.c Timselpctl.c Timselstat.c \
-	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	Invertlev.c Isosurface.c Log.c Magplot.c Magvector.c \
+	Maggraph.c Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c \
+	Mergetime.c Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c \
+	Nmltest.c Output.c Outputgmt.c Pinfo.c Pressure.c Regres.c \
+	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
+	Runpctl.c Runstat.c Scatter.c Seascount.c Seaspctl.c \
+	Seasstat.c Selbox.c Select.c Seloperator.c Selrec.c Seltime.c \
+	Selvar.c Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c \
+	Setmiss.c Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c \
+	Smooth9.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
+	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
+	Splityear.c SSOpar.c Subtrend.c Templates.c Test.c Tests.c \
+	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
+	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
 	Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c Vargen.c \
 	Varrms.c Vertint.c Vertstat.c Vertwind.c Wct.c Wind.c \
 	Writegrid.c Writerandom.c Ydayarith.c Ydaypctl.c Ydaystat.c \
@@ -599,7 +602,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Invertlev.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Isosurface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Log.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Maggraph.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Magplot.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Magvector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Maskbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Mastrfu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Math.Po@am__quote@
@@ -1775,6 +1780,34 @@ cdo-Magplot.obj: Magplot.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Magplot.c' object='cdo-Magplot.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Magplot.obj `if test -f 'Magplot.c'; then $(CYGPATH_W) 'Magplot.c'; else $(CYGPATH_W) '$(srcdir)/Magplot.c'; fi`
+
+cdo-Magvector.o: Magvector.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Magvector.o -MD -MP -MF $(DEPDIR)/cdo-Magvector.Tpo -c -o cdo-Magvector.o `test -f 'Magvector.c' || echo '$(srcdir)/'`Magvector.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Magvector.Tpo $(DEPDIR)/cdo-Magvector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Magvector.c' object='cdo-Magvector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Magvector.o `test -f 'Magvector.c' || echo '$(srcdir)/'`Magvector.c
+
+cdo-Magvector.obj: Magvector.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Magvector.obj -MD -MP -MF $(DEPDIR)/cdo-Magvector.Tpo -c -o cdo-Magvector.obj `if test -f 'Magvector.c'; then $(CYGPATH_W) 'Magvector.c'; else $(CYGPATH_W) '$(srcdir)/Magvector.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Magvector.Tpo $(DEPDIR)/cdo-Magvector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Magvector.c' object='cdo-Magvector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Magvector.obj `if test -f 'Magvector.c'; then $(CYGPATH_W) 'Magvector.c'; else $(CYGPATH_W) '$(srcdir)/Magvector.c'; fi`
+
+cdo-Maggraph.o: Maggraph.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Maggraph.o -MD -MP -MF $(DEPDIR)/cdo-Maggraph.Tpo -c -o cdo-Maggraph.o `test -f 'Maggraph.c' || echo '$(srcdir)/'`Maggraph.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Maggraph.Tpo $(DEPDIR)/cdo-Maggraph.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Maggraph.c' object='cdo-Maggraph.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Maggraph.o `test -f 'Maggraph.c' || echo '$(srcdir)/'`Maggraph.c
+
+cdo-Maggraph.obj: Maggraph.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Maggraph.obj -MD -MP -MF $(DEPDIR)/cdo-Maggraph.Tpo -c -o cdo-Maggraph.obj `if test -f 'Maggraph.c'; then $(CYGPATH_W) 'Maggraph.c'; else $(CYGPATH_W) '$(srcdir)/Maggraph.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Maggraph.Tpo $(DEPDIR)/cdo-Maggraph.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Maggraph.c' object='cdo-Maggraph.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Maggraph.obj `if test -f 'Maggraph.c'; then $(CYGPATH_W) 'Maggraph.c'; else $(CYGPATH_W) '$(srcdir)/Maggraph.c'; fi`
 
 cdo-Maskbox.o: Maskbox.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Maskbox.o -MD -MP -MF $(DEPDIR)/cdo-Maskbox.Tpo -c -o cdo-Maskbox.o `test -f 'Maskbox.c' || echo '$(srcdir)/'`Maskbox.c
