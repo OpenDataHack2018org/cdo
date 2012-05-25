@@ -13,6 +13,7 @@ int StringSplitWithSeperator( const char *source_string, const char seperator, c
 	  return 0;
 
 	duplicate_src = strdup( source_string );
+	printf("Sep Char is %c\n",seperator);
 
 	for( i = 0; i < str_len; i++ )
 	{
@@ -22,14 +23,14 @@ int StringSplitWithSeperator( const char *source_string, const char seperator, c
  
 	temp_list  = ( char** )malloc ( sizeof( char* ) * sep_count+1 );
 
-	temp_str = strtok( duplicate_src, "," );
+	temp_str = strtok( duplicate_src, &seperator );
 	if( temp_str )
 		temp_list[0] = temp_str;
 
 	while( temp_str && n < sep_count ) 
 	{
 		temp_str = NULL;
-		temp_str = strtok( NULL, "," );
+		temp_str = strtok( NULL, &seperator );
 		if( temp_str )
 			temp_list[++n] = temp_str;
  	}

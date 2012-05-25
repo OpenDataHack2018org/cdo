@@ -581,7 +581,7 @@ static modules_t Modules[] =
   { Log,            NULL,              LogOperators,           CDI_REAL,  1,  0 },
   { Magplot,        NULL,              MagplotOperators,       CDI_REAL,  1,  1 },
   { Magvector,      NULL,              MagvectorOperators,     CDI_REAL,  1,  1 },
-  { Maggraph,       NULL,              MaggraphOperators,      CDI_REAL,  1,  1 },
+  { Maggraph,       NULL,              MaggraphOperators,      CDI_REAL, -1,  1 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       CDI_REAL,  1,  1 },
   { Maskbox,        MaskregionHelp,    MaskregionOperators,    CDI_REAL,  1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,       CDI_REAL,  1,  1 },

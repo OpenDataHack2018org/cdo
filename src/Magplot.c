@@ -27,10 +27,11 @@ xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 #endif
 
 
-int CONTOUR, SHADED, GRFILL, VECTOR, STREAM;
+int CONTOUR, SHADED, GRFILL;
 
 static
 void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
+
 {
   static int once = 1;
   long i;
@@ -52,9 +53,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 
 #if  defined  (HAVE_LIBMAGICS)
 
-  mag_new ("PAGE");
-  // set the output device 
-  // mag_setc ("output_format",    "pdf");
   mag_setc ("output_name",      plotfilename);
 
   // Set the input data arrays to magics++
@@ -62,65 +60,99 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   mag_set2r("input_field", array, nlon, nlat);
 
   /*
-  mag_setc("input_field_organization", "REGULAR");
-  mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
-  mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
+  	mag_setc("input_field_organization", "REGULAR");
+  	mag_set2r("input_field_latitudes", grid_center_lat, nlon, nlat);
+  	mag_set2r("input_field_longitudes", grid_center_lon, nlon, nlat);
   */
+
   mag_setr("input_field_initial_latitude", grid_center_lat[0]);
   mag_setr("input_field_latitude_step", dlat);
 
   mag_setr("input_field_initial_longitude", grid_center_lon[0]);
-
   mag_setr("input_field_longitude_step", dlon);
  
 
+#if 0
   if( once )
   {
 	  magics_template_parser( magics_node );
 	  once = 0;
   }
+#endif
+
+  magics_template_parser( magics_node );
   results_template_parser(results_node, varname );
-
-  
-
-  /* Area specification (SOUTH, WEST, NORTH, EAST ) */
-  // mag_setr ("SUBPAGE_LOWER_LEFT_LATITUDE",   -90.0);
-  // mag_setr ("SUBPAGE_LOWER_LEFT_LONGITUDE", -180.0);
-  // mag_setr ("SUBPAGE_UPPER_RIGHT_LATITUDE",   90.0);
-  // mag_setr ("SUBPAGE_UPPER_RIGHT_LONGITUDE", 180.0);
 
 
   /* set up the coastline attributes */
-  // mag_setc ("map_coastline_colour", "khaki");
-  // mag_setc ("map_grid_colour",      "grey");     
+  /* mag_setc ("map_coastline_colour", "khaki"); */
+  /* mag_setc ("map_grid_colour",      "grey");  */ 
 
   /* define the contouring parameters */
   if ( operatorID == SHADED )
     {
-      mag_setc ("contour",                  "on");
-      // mag_setc ("contour_line_colour",      "sky");
-      // mag_setc ("CONTOUR_HIGHLIGHT_COLOUR", "GREEN");
-      mag_setc ("contour_shade",            "on");
-      mag_setc ("contour_shade_method",     "area_fill");
-      mag_setc ("contour_label",            "off");
+
+      mag_setc ( "contour", "on" );
+      mag_setc ( "contour_shade", "on" );
+      mag_setc ( "contour_shade_method", "area_fill" );
+      mag_setc ( "contour_label", "off" );
+
+      /* Adjust Set The page slightly to fit the legend */
+      mag_setr ( "subpage_x_length", 24. );
+      mag_setr ( "subpage_y_length", 30. );
+
+      /* Legend Settings */
+      mag_setc ( "legend", "on" );
+      mag_setc ( "legend_display_type", "continuous" );
+      mag_setc ( "legend_entry_plot_direction", "column" );
+      mag_setc ( "legend_box_mode", "positional" );
+      mag_setr ( "legend_box_x_position", 26.5 );
+      mag_setr ( "legend_box_y_position", 0.39 );
+      mag_setr ( "legend_box_x_length", 2.0 );
+      mag_setr ( "legend_box_y_length", 12.69 );
+
     }
   else if ( operatorID == CONTOUR )
     {
+
       mag_setc ("contour",                  "on");
       // mag_setc ("contour_line_colour",      "sky");
       // mag_setc ("CONTOUR_HIGHLIGHT_COLOUR", "GREEN");
       mag_setc ("contour_shade",            "off");
       mag_setc ("contour_label",            "on");
+
     }
   else if ( operatorID == GRFILL )
     {
+
+      mag_setc ( "contour", "on" );
+      mag_setc ( "contour_shade", "on" );
+
+      mag_setc ( "contour_shade_technique", "cell_shading" );
+
+      mag_setc ( "contour_shade_method", "area_fill" );
+      mag_setc ( "contour_label", "off" );
+
+      /* Adjust Set The page slightly to fit the legend */
+      mag_setr ( "subpage_x_length", 24. );
+      mag_setr ( "subpage_y_length", 30. );
+
+      /* Legend Settings */
+      mag_setc ( "legend", "on" );
+      mag_setc ( "legend_display_type", "continuous" );
+      mag_setc ( "legend_entry_plot_direction", "column" );
+      mag_setc ( "legend_box_mode", "positional" );
+      mag_setr ( "legend_box_x_position", 26.5 );
+      mag_setr ( "legend_box_y_position", 0.39 );
+      mag_setr ( "legend_box_x_length", 2.0 );
+      mag_setr ( "legend_box_y_length", 12.69 );
+
+      fprintf( stderr, " GrFILL Done!\n");
     }
 
-  mag_cont ();
-
   /* plot the title text and the coastlines */
-
-  //mag_text  ();
+  mag_cont ();
+  mag_text  ();
   mag_coast ();
 
 #else
@@ -184,8 +216,6 @@ void *Magplot(void *argument)
   CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
   SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
   GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
-  VECTOR  = cdoOperatorAdd("vector", 0, 0, NULL);
-  STREAM  = cdoOperatorAdd("stream", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -232,9 +262,6 @@ void *Magplot(void *argument)
 #endif
 
 
-#if  defined  (HAVE_LIBMAGICS)
-  init_MAGICS( );
-#endif
 
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
@@ -246,19 +273,37 @@ void *Magplot(void *argument)
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
+
+#if  defined  (HAVE_LIBMAGICS)
+	  init_MAGICS( );
+#endif
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
 
 	  vlistInqVarName(vlistID, varID, varname);
 
-          fprintf( stderr," Creating PLOT for %s\n",varname );
 
 	  if ( operatorID == SHADED || operatorID == CONTOUR || operatorID == GRFILL )
-	    magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
+          {
+
+                if( operatorID == SHADED )
+                   fprintf( stderr," Creating SHADED PLOT for %s\n",varname );
+                else if( operatorID == CONTOUR )
+                   fprintf( stderr," Creating CONTOUR PLOT for %s\n",varname );
+                else if( operatorID == GRFILL )
+                   fprintf( stderr," Creating GRFILL PLOT for %s\n",varname );
+
+	  	magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
+
+          }
 	  else
-	    printf("operator not implemented\n");
+	  	printf("operator not implemented\n");
 
 	  //	  break;
+
+#if  defined  (HAVE_LIBMAGICS)
+	  quit_MAGICS( );
+#endif
 	}
 
       break;
@@ -276,13 +321,8 @@ void *Magplot(void *argument)
   quit_XMLtemplate_parser( );
 #endif
 
-#if  defined  (HAVE_LIBMAGICS)
-  quit_MAGICS( );
-#endif
-
   cdoFinish();
 
-
   return (0);
-}
 
+}

@@ -117,7 +117,7 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 		ret_flag = 2;
 
 
-
+	
    	/*   MAGICS++ ENV RELATED PARAMETERS   */
 	if( !strcmp( param_type,"environvar" ) )
 	{
@@ -162,6 +162,8 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 #if 0
 	        fprintf(stderr, "param_name : %s\tparam_value: %s\n", param_name, param_value);
 #endif
+		if( strchr( param_value,';') )
+		    sep_char = ';';
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
 		{
@@ -189,6 +191,8 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
     	/*   MAGICS++ INT ARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"intarray" ) )
 	{
+	        if( strchr( param_value,';') )
+		    sep_char = ';';
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
 		{
@@ -212,7 +216,10 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
     	/*   MAGICS++ STRINGARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"stringarray" ) )
 	{
+		if( strchr( param_value,';') )
+		    sep_char = ';';
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
+		printf( "Input strarr is %s split str count is %d Sep char is %c\n",param_value, split_str_count, sep_char );
 		mag_set1c( param_name, (const char**)split_str, split_str_count );		
 		free( split_str );
 	}
