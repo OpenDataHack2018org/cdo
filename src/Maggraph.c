@@ -27,11 +27,22 @@
 #endif
 
 static
-void maggraph( const char *plotfile, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
+void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, int *vdate, int *vtime, double **datatab)
 {
+  long tsID, fileID;
+
+  for ( tsID = 0; tsID < nts; ++tsID )
+    {
+      printf("%6d %6d", vdate[tsID], vtime[tsID]);
+      for ( fileID = 0; fileID < nfiles; ++fileID )
+	printf(" %6g", datatab[fileID][tsID]);
+      printf("\n");
+    }
+
+#if  defined  (HAVE_LIBMAGICS)
+#endif
 
 }
-
 
 #if  defined  (HAVE_LIBMAGICS)
 
@@ -54,72 +65,103 @@ void quit_MAGICS( )
 
 #endif
 
+#define NINC_ALLOC 1024
 
 void *Maggraph(void *argument)
 {
   int operatorID;
-  int varID, recID;
-  int gridsize;
+  int varID, levelID, recID;
   int gridID;
   int nrecs;
-  int levelID;
   int tsID;
   int streamID;
-  int vlistID;
+  int vlistID, vlistID0 = -1;
   int nmiss;
-  int nlon, nlat;
-  int nlev;
   int zaxisID, taxisID;
-  int vdate, vtime;
+  int *vdate = NULL, *vtime = NULL;
+  int fileID, nfiles;
+  int nts = 0, nts_alloc = 0;
   char varname[CDI_MAX_NAME];
   double missval;
-  double *array = NULL;
-  double *grid_center_lat = NULL, *grid_center_lon = NULL;
-  char units[CDI_MAX_NAME];
-  char vdatestr[32], vtimestr[32];
-
+  double **datatab = NULL;
+  double val;
+  const char *ofilename;
   char  *Filename = "combined.xml";
 
   cdoInitialize(argument);
 
   // operatorID = cdoOperatorID();
 
-  streamID = streamOpenRead(cdoStreamName(0));
+  nfiles = cdoStreamCnt() - 1;
+  ofilename = cdoStreamName(nfiles);
 
-  vlistID = streamInqVlist(streamID);
-  taxisID = vlistInqTaxis(vlistID);
+  datatab = (double **) malloc(nfiles*sizeof(double *));
 
-  varID = 0;
-  gridID  = vlistInqVarGrid(vlistID, varID);
-  zaxisID = vlistInqVarZaxis(vlistID, varID);
-  missval = vlistInqVarMissval(vlistID, varID);
+  for ( fileID = 0; fileID < nfiles; fileID++ )
+    datatab[fileID] = NULL;
 
-  if ( gridInqType(gridID) == GRID_GME          ) cdoAbort("GME grid unspported!");
-  if ( gridInqType(gridID) == GRID_UNSTRUCTURED ) cdoAbort("Unstructured grid unspported!");
+  for ( fileID = 0; fileID < nfiles; fileID++ )
+    {
+      streamID = streamOpenRead(cdoStreamName(fileID));
 
-  if ( gridInqType(gridID) != GRID_CURVILINEAR )
-    gridID = gridToCurvilinear(gridID, 1);
+      vlistID = streamInqVlist(streamID);
+      taxisID = vlistInqTaxis(vlistID);
 
-  gridsize = gridInqSize(gridID);
-  nlon     = gridInqXsize(gridID);
-  nlat     = gridInqYsize(gridID);
-  nlev     = zaxisInqSize(zaxisID);
+      if ( fileID == 0 )
+	{
+	  vlistInqVarName(vlistID, 0, varname);
+	  gridID = vlistInqVarGrid(vlistID, 0);
 
-  array           = (double *) malloc(gridsize*sizeof(double));
-  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
-  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
+	  if ( gridInqSize(gridID) != 1 ) cdoAbort("Variable has more than one grid point!");
 
-  gridInqYvals(gridID, grid_center_lat);
-  gridInqXvals(gridID, grid_center_lon);
+	  vlistID0 = vlistDuplicate(vlistID);
+	}
+      else
+	{
+	  vlistCompare(vlistID0, vlistID, CMP_ALL);
+	}
 
-  /* Convert lat/lon units if required */
-  gridInqXunits(gridID, units);
-  gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
-  gridInqYunits(gridID, units);
-  gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
-					
-  tsID = 0;
+      tsID = 0;
+      while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+	{
+	  if ( nrecs != 1 ) cdoAbort("Input streams have more than one record!\n");
+	  if ( fileID == 0 )
+	    {
+	      nts++;
 
+	      if ( nts > nts_alloc )
+		{
+		  nts_alloc += NINC_ALLOC;
+		  datatab[fileID] = (double *) realloc(datatab[fileID], nts_alloc*sizeof(double));
+		  vdate = (int *) realloc(vdate, nts_alloc*sizeof(int));
+		  vtime = (int *) realloc(vtime, nts_alloc*sizeof(int));
+		}
+	      vdate[tsID] = taxisInqVdate(taxisID);
+	      vtime[tsID] = taxisInqVtime(taxisID);
+	    }
+	  else
+	    {
+	      if ( (tsID+1) > nts ) cdoAbort("Too many timesteps in stream %s", cdoStreamName(fileID));
+
+	      if ( tsID == 0 )
+		{
+		  datatab[fileID] = (double *) malloc(nts*sizeof(double));
+		}
+	    }
+	  
+	  for ( recID = 0; recID < nrecs; recID++ )
+	    {
+	      streamInqRecord(streamID, &varID, &levelID);
+	      streamReadRecord(streamID, &val, &nmiss);	
+	      datatab[fileID][tsID] = val;
+	    }
+
+	  tsID++;
+	}
+
+      streamClose(streamID);
+    }
+  
 #if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
@@ -131,38 +173,8 @@ void *Maggraph(void *argument)
   init_MAGICS( );
 #endif
 
-  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-    {
-      vdate = taxisInqVdate(taxisID);
-      vtime = taxisInqVtime(taxisID);
-	      
-      date2str(vdate, vdatestr, sizeof(vdatestr));
-      time2str(vtime, vtimestr, sizeof(vtimestr));
-
-      for ( recID = 0; recID < nrecs; recID++ )
-	{
-	  streamInqRecord(streamID, &varID, &levelID);
-	  streamReadRecord(streamID, array, &nmiss);
-
-	  vlistInqVarName(vlistID, varID, varname);
-
-          fprintf( stderr," Creating PLOT for %s\n",varname );
-
-	  maggraph(cdoStreamName(1), varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
-
-	  //	  break;
-	}
-
-      break;
-
-      tsID++;
-    }
-
-  streamClose(streamID);
-
-  if ( array  ) free(array);
-  if ( grid_center_lon ) free(grid_center_lon);
-  if ( grid_center_lat ) free(grid_center_lat);
+  cdoPrint(" Creating PLOT for %s", varname);
+  maggraph(ofilename, varname, nfiles, nts, vdate, vtime, datatab);
 
 #if  defined  (HAVE_LIBXML)
   quit_XMLtemplate_parser( );
@@ -172,9 +184,19 @@ void *Maggraph(void *argument)
   quit_MAGICS( );
 #endif
 
-  cdoFinish();
+  if ( vlistID0 != -1 ) vlistDestroy(vlistID0);
 
+  for ( fileID = 0; fileID < nfiles; fileID++ )
+    {
+      if ( datatab[fileID] ) free(datatab[fileID]);
+    }
+
+  free(datatab);
+
+  if ( vdate ) free(vdate);
+  if ( vtime ) free(vtime);
+
+  cdoFinish();
 
   return (0);
 }
-

@@ -22,15 +22,75 @@
 #include "results_template_parser.h"
 
 //xmlDoc *param_doc = NULL;
-//xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
+//extern xmlNode *root_node, *magics_node, *results_node;
+extern xmlNode  *magics_node;
 
 #endif
 
 int VECTOR, STREAM;
 
 static
-void magvector( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
+void magvector( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *uarray, double *varray )
+
 {
+	char plotfilename[4096];
+  long i;
+  double dlon = 0, dlat = 0;
+
+	if( uarray == NULL && varray == NULL )
+	{
+          	fprintf( stderr," No Velocity Components in input file, cannot creaate Vector PLOT!\n" );
+		return ;
+	}
+
+	if( uarray == NULL || varray == NULL )
+	{
+          	fprintf( stderr," Found only one Velocity Component in input file, cannot create Vector PLOT!\n" );
+		return ;
+	}
+
+  if ( nlon > 1 )
+    {
+      for ( i = 1; i < nlon; ++i ) dlon += (grid_center_lon[i] - grid_center_lon[i-1]);
+      dlon /= (nlon-1);
+    }
+  if ( nlat > 1 )
+    {
+      for ( i = 1; i < nlat; ++i ) dlat += (grid_center_lat[nlon*i] - grid_center_lat[nlon*(i-1)]);
+      dlat /= (nlat-1);
+    }
+
+#if  defined  (HAVE_LIBMAGICS)
+        
+        magics_template_parser( magics_node );
+
+        /* results_template_parser(results_node, varname ); */
+
+        sprintf(plotfilename, "%s", plotfile);
+
+        mag_setc ("output_name",      plotfilename);
+	/* Set the input data */
+
+	mag_set2r("input_wind_u_component", uarray, nlon, nlat);
+	mag_set2r("input_wind_v_component", varray, nlon, nlat);
+
+  mag_setr("input_field_initial_latitude", grid_center_lat[0]);
+  mag_setr("input_field_latitude_step", dlat);
+
+  mag_setr("input_field_initial_longitude", grid_center_lon[0]);
+  mag_setr("input_field_longitude_step", dlon);
+
+        if ( operatorID == VECTOR ) 
+	{
+		/* Magics functions for performing vector operation */
+		mag_coast();
+		mag_text();
+		mag_wind();
+	}
+#else
+        cdoAbort("MAGICS support not compiled in!");
+
+#endif
 
 }
 
@@ -58,6 +118,7 @@ void quit_MAGICS( )
 
 
 void *Magvector(void *argument)
+
 {
   int operatorID;
   int varID, recID;
@@ -73,9 +134,11 @@ void *Magvector(void *argument)
   int nlev;
   int zaxisID, taxisID;
   int vdate, vtime;
+  int found;
   char varname[CDI_MAX_NAME];
   double missval;
-  double *array = NULL;
+  double *uarray = NULL;
+  double *varray = NULL;
   double *grid_center_lat = NULL, *grid_center_lon = NULL;
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];
@@ -83,6 +146,7 @@ void *Magvector(void *argument)
   char  *Filename = "combined.xml";
 
   cdoInitialize(argument);
+
 
   VECTOR  = cdoOperatorAdd("vector", 0, 0, NULL);
   STREAM  = cdoOperatorAdd("stream", 0, 0, NULL);
@@ -94,6 +158,7 @@ void *Magvector(void *argument)
   vlistID = streamInqVlist(streamID);
   taxisID = vlistInqTaxis(vlistID);
 
+  found = 0;
   varID = 0;
   gridID  = vlistInqVarGrid(vlistID, varID);
   zaxisID = vlistInqVarZaxis(vlistID, varID);
@@ -110,7 +175,8 @@ void *Magvector(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  array           = (double *) malloc(gridsize*sizeof(double));
+  uarray           = (double *) malloc(gridsize*sizeof(double));
+  varray           = (double *) malloc(gridsize*sizeof(double));
   grid_center_lat = (double *) malloc(gridsize*sizeof(double));
   grid_center_lon = (double *) malloc(gridsize*sizeof(double));
 
@@ -147,25 +213,56 @@ void *Magvector(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID, &varID, &levelID);
-	  streamReadRecord(streamID, array, &nmiss);
 
 	  vlistInqVarName(vlistID, varID, varname);
 
-          fprintf( stderr," Creating PLOT for %s\n",varname );
+          if ( operatorID == VECTOR )
+	  {
+	    if( !strcmp( varname, "var131" ) || !strcmp(varname, "u") ) /* U Velocity as per GRIB */
+	  	{
+          		fprintf( stderr,"Found U VEL in Varname %s\n",varname );
+			streamReadRecord(streamID, uarray, &nmiss);
+			found ++;
+	  	}
 
-	  magvector(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
+	  	if( !strcmp( varname, "var132" ) || !strcmp(varname, "v") ) /* V Velocity as per GRIB */
+	  	{
+          		fprintf( stderr,"Found V VEL in Varname %s\n",varname );
+			streamReadRecord(streamID, varray, &nmiss);
+			found ++;
+	  	}	
 
-	  //	  break;
+	  	if( found == 2 )
+	    		break;
+	  }
+	  else if ( operatorID == STREAM )
+          	fprintf( stderr," Stream Operator Un-Supported!\n" );
+	  else 
+          	fprintf( stderr," Operator Un-Supported!\n" );
+		
+        }
+         
+        if ( operatorID == VECTOR )
+	{
+	  	if( found == 2 )
+	  	{
+          		fprintf( stderr,"Found Both U & V VEL, Creating vector fields! \n" );
+			magvector(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, uarray, varray );
+	  	}
+	  	else if( found == 1 )
+          		fprintf( stderr,"Found only one Velocity Component in input file, cannot creaate Vector PLOT!\n" );
+	  	else if( found == 0 )
+          		fprintf( stderr,"No Velocity Components in input file, cannot create Vector PLOT!\n" );
 	}
+        break;
 
-      break;
-
-      tsID++;
+        tsID++;
     }
 
   streamClose(streamID);
 
-  if ( array  ) free(array);
+  if ( uarray  ) free(uarray);
+  if ( varray  ) free(varray);
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
@@ -179,7 +276,6 @@ void *Magvector(void *argument)
 
   cdoFinish();
 
-
   return (0);
-}
 
+}
