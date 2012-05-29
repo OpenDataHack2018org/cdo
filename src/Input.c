@@ -240,7 +240,7 @@ void *Input(void *argument)
 
 	  missval = vlistInqVarMissval(vlistID, varID);
 
-	  taxisID = taxisCreate(TAXIS_ABSOLUTE);
+	  taxisID = taxisCreate(TAXIS_RELATIVE);
 	  vlistDefTaxis(vlistID, taxisID);
 
 	  streamID = streamOpenWrite(cdoStreamName(0), output_filetype);
