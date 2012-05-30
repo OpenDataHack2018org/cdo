@@ -234,8 +234,8 @@ void *Runstat(void *argument)
 	  streamReadRecord(streamID1, vars1[tsID][varID][levelID].ptr, &nmiss);
 	  vars1[tsID][varID][levelID].nmiss = nmiss;
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  missval = vars1[ndates-1][varID][levelID].missval;
+	  gridsize = gridInqSize(vars1[0][varID][levelID].grid);
+	  missval  = vars1[0][varID][levelID].missval;
 
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars1[tsID][varID][levelID].ptr[i], missval) )
@@ -246,16 +246,22 @@ void *Runstat(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    samp1[tsID][varID][levelID].ptr[i] = (double) imask[i];
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(i, inp)
+#endif
 	  for ( inp = 0; inp < tsID; inp++ )
 	    {
+	      double *ptr = samp1[inp][varID][levelID].ptr;
 	      for ( i = 0; i < gridsize; i++ )
-		if ( imask[i] > 0 )
-		  samp1[inp][varID][levelID].ptr[i]++;
+		if ( imask[i] > 0 ) ptr[i]++;
 	    }
 
 	  if ( operfunc == func_std || operfunc == func_var )
 	    {
 	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared)
+#endif
 	      for ( inp = 0; inp < tsID; inp++ )
 		{
 		  farsumq(&vars2[inp][varID][levelID], vars1[tsID][varID][levelID]);
@@ -264,6 +270,9 @@ void *Runstat(void *argument)
 	    }
 	  else
 	    {
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared)
+#endif
 	      for ( inp = 0; inp < tsID; inp++ )
 		{
 		  farfun(&vars1[inp][varID][levelID], vars1[tsID][varID][levelID], operfunc);
@@ -373,8 +382,8 @@ void *Runstat(void *argument)
 	  streamReadRecord(streamID1, vars1[ndates-1][varID][levelID].ptr, &nmiss);
 	  vars1[ndates-1][varID][levelID].nmiss = nmiss;
 
-	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  missval = vars1[ndates-1][varID][levelID].missval;
+	  gridsize = gridInqSize(vars1[0][varID][levelID].grid);
+	  missval  = vars1[0][varID][levelID].missval;
 
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars1[ndates-1][varID][levelID].ptr[i], missval) )
@@ -385,24 +394,33 @@ void *Runstat(void *argument)
 	  for ( i = 0; i < gridsize; i++ )
 	    samp1[ndates-1][varID][levelID].ptr[i] = (double) imask[i];
 
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared) private(i, inp)
+#endif
 	  for ( inp = 0; inp < ndates-1; inp++ )
 	    {
+	      double *ptr = samp1[inp][varID][levelID].ptr;
 	      for ( i = 0; i < gridsize; i++ )
-		if ( imask[i] > 0 )
-		  samp1[inp][varID][levelID].ptr[i]++;
+		if ( imask[i] > 0 ) ptr[i]++;
 	    }
 
 	  if ( operfunc == func_std || operfunc == func_var )
 	    {
+	      farmoq(&vars2[ndates-1][varID][levelID], vars1[ndates-1][varID][levelID]);
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared)
+#endif
 	      for ( inp = 0; inp < ndates-1; inp++ )
 		{
 		  farsumq(&vars2[inp][varID][levelID], vars1[ndates-1][varID][levelID]);
 		  farsum(&vars1[inp][varID][levelID], vars1[ndates-1][varID][levelID]);
 		}
-	      farmoq(&vars2[ndates-1][varID][levelID], vars1[ndates-1][varID][levelID]);
 	    }
 	  else
 	    {
+#if defined (_OPENMP)
+#pragma omp parallel for default(shared)
+#endif
 	      for ( inp = 0; inp < ndates-1; inp++ )
 		{
 		  farfun(&vars1[inp][varID][levelID], vars1[ndates-1][varID][levelID], operfunc);

@@ -1,7 +1,8 @@
 2012-05-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Runstat: optimize missing value handling (speedup)
-	
+	* Runstat: OpenMP parallelization over parameter nts
+
 2012-05-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* input: changed time axis to RELATIVE
