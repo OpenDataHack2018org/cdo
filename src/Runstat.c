@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -78,7 +78,7 @@ void *Runstat(void *argument)
 {
   int operatorID;
   int operfunc;
-  int gridsize;
+  int gridsize, gridsizemax;
   int i;
   int varID;
   int recID;
@@ -93,6 +93,7 @@ void *Runstat(void *argument)
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
+  int *imask;
   double missval;
   field_t ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
   datetime_t *datetime;
@@ -208,6 +209,9 @@ void *Runstat(void *argument)
 	}
     }
 
+  gridsizemax = vlistGridsizeMax(vlistID1);
+  imask = (int *) malloc(gridsizemax*sizeof(int));
+
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
       nrecs = streamInqTimestep(streamID1, tsID);
@@ -235,13 +239,19 @@ void *Runstat(void *argument)
 
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars1[tsID][varID][levelID].ptr[i], missval) )
-	      samp1[tsID][varID][levelID].ptr[i] = 0;
+	      imask[i] = 0;
 	    else
-	      {
-		samp1[tsID][varID][levelID].ptr[i] = 1;
-		for ( inp = 0; inp < tsID; inp++ )
+	      imask[i] = 1;
+
+	  for ( i = 0; i < gridsize; i++ )
+	    samp1[tsID][varID][levelID].ptr[i] = (double) imask[i];
+
+	  for ( inp = 0; inp < tsID; inp++ )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		if ( imask[i] > 0 )
 		  samp1[inp][varID][levelID].ptr[i]++;
-	      }
+	    }
 
 	  if ( operfunc == func_std || operfunc == func_var )
 	    {
@@ -269,7 +279,7 @@ void *Runstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[0][varID][levelID].ptr == NULL )
@@ -282,7 +292,7 @@ void *Runstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
-	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	    nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
 		if ( samp1[0][varID][levelID].ptr == NULL )
@@ -368,13 +378,19 @@ void *Runstat(void *argument)
 
 	  for ( i = 0; i < gridsize; i++ )
 	    if ( DBL_IS_EQUAL(vars1[ndates-1][varID][levelID].ptr[i], missval) )
-	      samp1[ndates-1][varID][levelID].ptr[i] = 0;
+	      imask[i] = 0;
 	    else
-	      {
-		samp1[ndates-1][varID][levelID].ptr[i] = 1;
-		for ( inp = 0; inp < ndates-1; inp++ )
+	      imask[i] = 1;
+
+	  for ( i = 0; i < gridsize; i++ )
+	    samp1[ndates-1][varID][levelID].ptr[i] = (double) imask[i];
+
+	  for ( inp = 0; inp < ndates-1; inp++ )
+	    {
+	      for ( i = 0; i < gridsize; i++ )
+		if ( imask[i] > 0 )
 		  samp1[inp][varID][levelID].ptr[i]++;
-	      }
+	    }
 
 	  if ( operfunc == func_std || operfunc == func_var )
 	    {
@@ -426,6 +442,7 @@ void *Runstat(void *argument)
 
   if ( recVarID   ) free(recVarID);
   if ( recLevelID ) free(recLevelID);
+  if ( imask )      free(imask);
 
   streamClose(streamID2);
   streamClose(streamID1);

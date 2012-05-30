@@ -429,7 +429,7 @@ void *Timstat(void *argument)
 	      if ( samp1[varID][levelID].ptr )
 		{
 		  streamDefRecord(streamID3, varID, levelID);
-		      streamWriteRecord(streamID3, samp1[varID][levelID].ptr,  0);
+		  streamWriteRecord(streamID3, samp1[varID][levelID].ptr, 0);
 		}
 	    }
 	}

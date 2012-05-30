@@ -1,5 +1,9 @@
 2012-05-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Runstat: optimize missing value handling (speedup)
+	
+2012-05-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* input: changed time axis to RELATIVE
 
 2012-05-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
