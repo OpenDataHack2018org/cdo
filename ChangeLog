@@ -1,6 +1,6 @@
 2012-05-31  Luis Kornblueh  <Luis.Kornblueh@zmaw.de>
 
-	* arradd: SSE2 version (performance +12%)
+	* arradd: SSE2 version (performance +15%)
 
 2012-05-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

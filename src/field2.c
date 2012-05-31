@@ -43,7 +43,7 @@ void arradd(const long n, double * const restrict a, const double * const restri
 {
   long i;
 
-  // SSE2 version is 12% faster than the original loop (tested with gcc47)
+  // SSE2 version is 15% faster than the original loop (tested with gcc47)
 #ifdef __SSE2__
   long residual =  n % 8;
   long ofs = n - residual;
