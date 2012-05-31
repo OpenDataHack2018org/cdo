@@ -1,3 +1,7 @@
+2012-05-31  Luis Kornblueh  <Luis.Kornblueh@zmaw.de>
+
+	* arradd: SSE2 version (performance +12%)
+
 2012-05-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Runstat: optimize missing value handling (speedup)
