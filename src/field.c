@@ -132,6 +132,7 @@ double fldcrps(field_t field)
 
 }
 
+
 double fldbrs(field_t field) 
 {
   long      len   = field.size;
@@ -151,10 +152,10 @@ double fldbrs(field_t field)
     }
   else 
     {
-      if ( array[0] == missval ) 
-	return missval;
+      if ( DBL_IS_EQUAL(array[0], missval) ) return missval;
+
       for ( i=1; i<len; i++ )
-	if ( array[i] != missval ) 
+	if ( !DBL_IS_EQUAL(array[i], missval) ) 
 	  {
 	    brs += (array[i] - array[0]) * (array[i] - array[0]);
 	    count ++;
@@ -163,6 +164,7 @@ double fldbrs(field_t field)
 
   return brs/count;
 }
+
 
 double fldmin(field_t field)
 {

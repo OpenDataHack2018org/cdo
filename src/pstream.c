@@ -323,7 +323,7 @@ int pstreamOpenRead(const char *argument)
       int rval;
       pthread_t thrID;
       pthread_attr_t attr;
-      struct sched_param param;
+      // struct sched_param param;
       size_t len;
       size_t stacksize;
       int status;
@@ -1231,7 +1231,7 @@ void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
   else
 #endif
     {
-      int varID = pstreamptr->varID;
+      // int varID = pstreamptr->varID;
       if ( processNums() == 1 ) timer_start(timer_write);
       /*
       if ( pstreamptr->varlist )

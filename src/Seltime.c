@@ -203,10 +203,10 @@ void *Seltime(void *argument)
   int lnts1;
   int ncts = 0, nts, it;
   int *selfound = NULL;
-  int year = 1, month = 1, day = 1, hour = 0, minute = 0, second = 0;
+  int hour = 0, minute = 0, second = 0;
   int nts1 = 0, nts2 = 0;
   int its1 = 0, its2 = 0;
-  double selfval = 0, *fltarr, fval = 0;
+  double selfval = 0, *fltarr;
   double *array = NULL;
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);

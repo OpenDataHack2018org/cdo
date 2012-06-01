@@ -126,7 +126,7 @@ void *Settime(void *argument)
   int taxis_has_bounds, copy_timestep = FALSE;
   int calendar;
   int newcalendar = CALENDAR_STANDARD;
-  int nargs;
+  // int nargs;
   const char *datestr, *timestr;
   char *rstr;
   juldate_t juldate;
