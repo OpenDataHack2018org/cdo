@@ -80,7 +80,7 @@ void faradd(field_t *field1, field_t field2)
   double missval2 = field2.missval;
   double *array2  = field2.ptr;
 
-  len    = gridInqSize(grid1);
+  len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
@@ -114,7 +114,7 @@ void farsum(field_t *field1, field_t field2)
   double missval2 = field2.missval;
   double *array2  = field2.ptr;
 
-  len    = gridInqSize(grid1);
+  len = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
@@ -136,11 +136,9 @@ void farsum(field_t *field1, field_t field2)
     }
   else
     {
-      for ( i = 0; i < len; i++ ) 
-	array1[i] += array2[i];
+      arradd(len, array1, array2);
     }
 }
-
 
 /* 
  * Compute the occurrence of values in field, if they do not equal refval.
