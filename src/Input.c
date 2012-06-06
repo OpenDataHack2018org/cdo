@@ -235,7 +235,7 @@ void *Input(void *argument)
 	  zaxisDefLevels(zaxisID, levels);
 
 	  vlistID = vlistCreate();
-	  varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+	  varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
 	  vlistDefVarCode(vlistID, varID, code);
 
 	  missval = vlistInqVarMissval(vlistID, varID);

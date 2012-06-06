@@ -278,7 +278,7 @@ void pipeDefTimestep(pstream_t *pstreamptr, int tsID)
       vlistID = pstreamptr->vlistID;
       nrecs = 0;
       for ( varID = 0; varID < vlistNvars(vlistID); varID++ )
-	if ( vlistInqVarTime(vlistID, varID) == TIME_VARIABLE )
+	if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT )
 	  nrecs += zaxisInqSize(vlistInqVarZaxis(vlistID, varID));
       // Message("nrecs = %d nvars = %d", nrecs, vlistNvars(vlistID));
     }

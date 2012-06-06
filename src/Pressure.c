@@ -354,7 +354,7 @@ void *Pressure(void *argument)
 
 
   vlistID2 = vlistCreate();
-  varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TIME_VARIABLE);
+  varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TSTEP_INSTANT);
   vlistDefVarCode(vlistID2, varID, 1);
   vlistDefVarName(vlistID2, varID, "pressure");
   vlistDefVarLongname(vlistID2, varID, "Air pressure");

@@ -213,16 +213,16 @@ void *Vargen(void *argument)
   vlistID = vlistCreate();
 
   if ( operatorID == FOR )
-    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+    varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
   else
-    varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+    varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_CONSTANT);
   /*
      For the standard atmosphere two output variables are generated: pressure and
      temperatur. The first (varID) is pressure, second (varID2) is temperatur.
      Add an additional variable for the standard atmosphere.
    */
   if ( operatorID == STDATM )
-    varID2 = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT);
+    varID2 = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_CONSTANT);
 
   if ( operatorID == MASK )
     vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);

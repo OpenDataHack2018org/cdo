@@ -282,7 +282,7 @@ void *Rhopot(void *argument)
 
 
   vlistID2 = vlistCreate();
-  varID = vlistDefVar(vlistID2, gridID, zaxisID, TIME_VARIABLE);
+  varID = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_INSTANT);
   vlistDefVarParam(vlistID2, varID, cdiEncodeParam(18, 255, 255));
   vlistDefVarName(vlistID2, varID, "rhopot");
   vlistDefVarLongname(vlistID2, varID, "Sea water potential density");

@@ -169,7 +169,7 @@ void *Ensstat3(void *argument)
   zaxisDefLevels(zaxisID2,levs);
   zaxisDefName(zaxisID2, "histogram_binID");
 
-  time_mode = datafunc == TIME? TIME_VARIABLE : TIME_CONSTANT;
+  time_mode = datafunc == TIME? TSTEP_INSTANT : TSTEP_CONSTANT;
 
   for ( varID=0; varID<nvars; varID++) {
 

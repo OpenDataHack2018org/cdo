@@ -267,7 +267,7 @@ void *Yseasstat(void *argument)
       if ( nsets[seas] == 0 && (operfunc == func_std || operfunc == func_var) )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
-	    if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
@@ -284,7 +284,7 @@ void *Yseasstat(void *argument)
 	if ( operfunc == func_mean || operfunc == func_avg )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
@@ -297,7 +297,7 @@ void *Yseasstat(void *argument)
 	else if ( operfunc == func_std || operfunc == func_var )
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
-	      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 	      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
@@ -328,7 +328,7 @@ void *Yseasstat(void *argument)
 	    varID    = recVarID[recID];
 	    levelID  = recLevelID[recID];
 
-	    if ( otsID && vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+	    if ( otsID && vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
 	    streamDefRecord(streamID2, varID, levelID);
 	    streamWriteRecord(streamID2, vars1[seas][varID][levelID].ptr,

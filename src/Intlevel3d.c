@@ -450,7 +450,7 @@ void *Intlevel3d(void *argument)
     if ( zaxisID1 == vlistZaxis(vlistID1, i) )
       vlistChangeZaxisIndex(vlistID3, i, zaxisID3);
   /* add the vertical output field to the output stream */
-  int oz3dvarID = vlistDefVar(vlistID3,0,zaxisID3,TIME_VARIABLE);
+  int oz3dvarID = vlistDefVar(vlistID3,0,zaxisID3,TSTEP_INSTANT);
   {
     char str[256];
     str[0] = 0;

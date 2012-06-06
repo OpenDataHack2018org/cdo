@@ -37,8 +37,6 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-void    vlistDefVarTime(int vlistID, int varID, int timeID);
-
 
 int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit)
 {
@@ -273,7 +271,7 @@ void *Settime(void *argument)
   if ( ntsteps == 1 )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	if ( vlistInqVarTime(vlistID1, varID) == TIME_VARIABLE ) break;
+	if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
 
       if ( varID == nvars ) ntsteps = 0;
     }
@@ -281,7 +279,7 @@ void *Settime(void *argument)
   if ( ntsteps == 0 )
     {
       for ( varID = 0; varID < nvars; ++varID )
-	vlistDefVarTime(vlistID2, varID, TIME_VARIABLE);
+	vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
     }
 
   calendar = taxisInqCalendar(taxisID1);

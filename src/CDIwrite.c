@@ -187,7 +187,7 @@ void *CDIwrite(void *argument)
 
   for ( i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
       vlistDefVarCode(vlistID, varID, varID+1);
       //    vlistDefVarName(vlistID, varID, );
     }

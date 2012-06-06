@@ -139,7 +139,7 @@ void *Timsort(void *argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      if ( vlistInqVarTime(vlistID1, varID) == TIME_CONSTANT ) continue;
+      if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 
       gridID   = vlistInqVarGrid(vlistID1, varID);
       gridsize = gridInqSize(gridID);

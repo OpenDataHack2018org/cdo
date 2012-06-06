@@ -53,7 +53,7 @@ void init_amsr_day(int vlistID, int gridID, int zaxisID, int nvars)
 
   for ( i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
       vlistDefVarDatatype(vlistID, varID, DATATYPE_INT16);
@@ -99,8 +99,8 @@ void init_amsr_averaged(int vlistID, int gridID, int zaxisID, int nvars)
 
   for ( i = 0; i < nvars; ++i )
     {
-      /* varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_CONSTANT); */
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+      /* varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_CONSTANT); */
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);
       vlistDefVarDatatype(vlistID, varID, DATATYPE_INT16);

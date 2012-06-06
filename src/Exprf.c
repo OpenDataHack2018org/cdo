@@ -138,7 +138,7 @@ void *Expr(void *argument)
   parse_arg.debug    = 0;
   parse_arg.gridID2  = -1;
   parse_arg.zaxisID2 = -1;
-  parse_arg.timeID2  = -1;
+  parse_arg.tsteptype2  = -1;
   for ( varID = 0; varID < nvars; varID++ )
     parse_arg.var_needed[varID] = FALSE;
 

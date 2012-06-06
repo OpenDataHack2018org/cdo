@@ -899,7 +899,7 @@ void *SSOpar(void *argument)
 
 
   vlistID2 = vlistCreate();
-  varID = vlistDefVar(vlistID2, gridID, zaxisIDh, TIME_VARIABLE);
+  varID = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
   vlistDefVarParam(vlistID2, varID, cdiEncodeParam(156, 128, 255));
   vlistDefVarName(vlistID2, varID, "geopotheight");
   vlistDefVarStdname(vlistID2, varID, "geopotental_height");

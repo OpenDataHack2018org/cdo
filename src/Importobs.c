@@ -37,7 +37,7 @@ void init_vars(int vlistID, int gridID, int zaxisID, int nvars)
 
   for ( i = 0; i < nvars; ++i )
     {
-      varID = vlistDefVar(vlistID, gridID, zaxisID, TIME_VARIABLE);
+      varID = vlistDefVar(vlistID, gridID, zaxisID, TSTEP_INSTANT);
       vlistDefVarCode(vlistID, varID, code[i]);
       vlistDefVarName(vlistID, varID, name[i]);
       vlistDefVarUnits(vlistID, varID, units[i]);

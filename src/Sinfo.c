@@ -42,7 +42,7 @@ void *Sinfo(void *argument)
   int nrecs, nvars, nzaxis, ntsteps;
   int levelID, levelsize;
   int tsID, ntimeout;
-  int timeID, taxisID;
+  int tsteptype, taxisID;
   int nbyte, nbyte0;
   int index;
   char varname[CDI_MAX_NAME];
@@ -122,9 +122,9 @@ void *Sinfo(void *argument)
 	  else
 	    fprintf(stdout, "%-11s ", paramstr);
 
-	  timeID = vlistInqVarTime(vlistID, varID);
+	  tsteptype = vlistInqVarTsteptype(vlistID, varID);
 
-	  if ( timeID == TIME_CONSTANT )
+	  if ( tsteptype == TSTEP_CONSTANT )
 	    fprintf(stdout, "con ");
 	  else
 	    fprintf(stdout, "var ");
