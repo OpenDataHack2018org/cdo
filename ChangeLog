@@ -1,5 +1,6 @@
 2012-06-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Sinfo: changed Time entry to Ttype
 	* changed timeID to tsteptype
 
 2012-05-31  Luis Kornblueh  <Luis.Kornblueh@zmaw.de>

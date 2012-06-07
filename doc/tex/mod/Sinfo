@@ -26,6 +26,7 @@ information:
 @BeginItemize
 @Item = institute and source
 @Item = parameter identifier
+@Item = timestep and data type
 @Item = horizontal grid size and number
 @Item = number of vertical levels and z-axis number
 @EndItemize
@@ -52,10 +53,10 @@ To print short information of a dataset use:
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
 @BeginListing
-    -1 : Institut Source  Name    Time  Typ  Grid Size Num  Levels Num
-     1 : MPIMET   ECHAM5  GEOSP    con   F32      2048   1       1   1
-     2 : MPIMET   ECHAM5  T        var   F32      2048   1       4   2
-     3 : MPIMET   ECHAM5  TSURF    var   F32      2048   1       1   1
+    -1 : Institut Source  Name    Ttype   Dtype  Gridsize Num  Levels Num
+     1 : MPIMET   ECHAM5  GEOSP   constant F32      2048   1       1   1
+     2 : MPIMET   ECHAM5  T       instant  F32      2048   1       4   2
+     3 : MPIMET   ECHAM5  TSURF   instant  F32      2048   1       1   1
    Horizontal grids :
      1 : gaussian     > size      : dim = 2048  nlon = 64  nlat = 32
                         longitude : first = 0  last = 354.375  inc = 5.625

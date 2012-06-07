@@ -52,6 +52,7 @@ static char *SinfoHelp[] = {
     "            information:",
     "            - institute and source",
     "            - parameter identifier",
+    "            - timestep and data type",
     "            - horizontal grid size and number",
     "            - number of vertical levels and z-axis number",
     "            Section 2 and 3 gives a short overview of all horizontal and vertical grids.",
