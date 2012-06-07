@@ -241,7 +241,7 @@ void *Pressure(void *argument)
     {
       tableNum = tableInqNum(vlistInqVarTable(vlistID1, varID));
 
-      if ( tableNum > 0 )
+      if ( tableNum > 0 && tableNum != 255 )
 	{
 	  useTable = TRUE;
 	  break;
