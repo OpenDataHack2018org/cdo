@@ -28,6 +28,7 @@
 
 #include "printinfo.h"
 
+#define MAXCHARS 82
 
 void *Sinfo(void *argument)
 {
@@ -187,7 +188,7 @@ void *Sinfo(void *argument)
 	  nbyte = nbyte0;
 	  for ( levelID = 0; levelID < levelsize; levelID++ )
 	    {
-	      if ( nbyte > 80 )
+	      if ( nbyte > MAXCHARS )
 		{
 		  fprintf(stdout, "\n");
 		  fprintf(stdout, "%*s", nbyte0, "");
@@ -204,7 +205,7 @@ void *Sinfo(void *argument)
 	      nbyte0 = fprintf(stdout, "%33s : ", "bounds");
 	      for ( levelID = 0; levelID < levelsize; levelID++ )
 		{
-		  if ( nbyte > 80 )
+		  if ( nbyte > MAXCHARS )
 		    {
 		      fprintf(stdout, "\n");
 		      fprintf(stdout, "%*s", nbyte0, "");
