@@ -514,6 +514,7 @@ showparam -showparam \
 showstdname -showstdname \
 showtime -showtime \
 showtimestamp -showtimestamp \
+showunit -showunit \
 showvar -showvar \
 showyear -showyear \
 sin -sin \

@@ -514,6 +514,7 @@ showparam \
 showstdname \
 showtime \
 showtimestamp \
+showunit \
 showvar \
 showyear \
 sin \
