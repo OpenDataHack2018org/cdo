@@ -66,7 +66,7 @@ module Cdo
       cmd << " 2>/dev/null"
       return IO.popen(cmd).readlines.map {|l| l.chomp.strip}
     when nil
-      ofile = Tempfile.new("Cdo.rb").path
+      ofile = MyTempfile.path
     end
     cmd << "#{ofile}"
     call(cmd)
