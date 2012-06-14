@@ -389,6 +389,7 @@ void *Remap(void *argument)
   char *envstr;
   char *remap_file = NULL;
   int lwrite_remap;
+  extern int timer_remap_sort;
 
   cdoInitialize(argument);
 
@@ -846,6 +847,7 @@ void *Remap(void *argument)
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 
+	      if ( cdoTimer ) timer_start(timer_remap_sort);
 	      if ( sort_mode == MERGE_SORT )
 		{ /* 
 		  ** use a combination of the old sort_add and a split and merge approach.
@@ -862,6 +864,7 @@ void *Remap(void *argument)
 			   remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
 			   remaps[r].vars.wts);
 		}
+	      if ( cdoTimer ) timer_stop(timer_remap_sort);
 	      	      
 	      if ( lwrite_remap ) goto WRITE_REMAP;
 
