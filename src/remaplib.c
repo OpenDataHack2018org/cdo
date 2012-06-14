@@ -112,7 +112,7 @@ static double south_thresh = -2.00;  /* threshold for coord transformation */
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-extern int timer_remap, timer_remap_sort, timer_remap_con, timer_remap_con2, timer_remap_con3;
+extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
 
 
 void remapGridFree(remapgrid_t *rg)
@@ -6083,8 +6083,6 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
   long i, n;
   double *wgt_tmp;
 
-  if ( cdoTimer ) timer_start(timer_remap_sort);
-
   if ( num_links <= 1 ) return;
 
   /*
@@ -6270,7 +6268,6 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
-  if ( cdoTimer ) timer_stop(timer_remap_sort);
 } /* sort_add_test */
 
 
@@ -6298,8 +6295,6 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
   long chk_lvl1, chk_lvl2, max_lvl;
   long i, n;
   double wgttmp[4];        /* temp for holding wts during swap   */
-
-  if ( cdoTimer ) timer_start(timer_remap_sort);
 
   if ( num_links <= 1 ) return;
 
@@ -6482,8 +6477,6 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
-  if ( cdoTimer ) timer_stop(timer_remap_sort);
-
 } /* sort_add */
 
 
@@ -7324,7 +7317,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 ********************************************************************************** */
 
 /* MERGE SORT DEFINES */
-#define MERGE_SORT_CHUNKS          64
+//#define MERGE_SORT_CHUNKS          64
 #define MERGE_SORT_LIMIT_SIZE      4096 //num_links/(MERGE_SORT_CHUNKS*omp_get_num_procs())
 
 
@@ -7389,7 +7382,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 
   const int nsplit = 2;                      /* (only 2 allowed) number of segments to split the data */
   int nl[nsplit];                            /* number of links in each sub-array              */
-  int who_am_i,depth,my_depth;               /* current depth, depth of children and index
+  int who_am_i,depth;                        /* current depth, depth of children and index
 						to be parent in next call to sort_par          */
   int add_srt[nsplit], add_end[nsplit];      /* arrays for start and end index of sub array    */
   int *add1s[nsplit], *add2s[nsplit];        /* pointers to sub arrays for sort and merge step */
@@ -7434,7 +7427,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
     {
       omp_set_nested(1);            
       if ( omp_get_nested() == 0 )
-	printf("Warning: openMP implementation seems to not support nested parallelism.\n"
+	printf("Warning: OpenMP implementation seems to not support nested parallelism.\n"
 	       "Maximum of CPUs used is 2 instead of %i.\n", ompNumThreads);
     }                                    
 #endif
@@ -7446,15 +7439,15 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   //	     nsplit,parent,depth,par_depth,add_srt[0],add_srt[1]);
 
 #if defined (_OPENMP)
-#pragma omp parallel for if(depth<par_depth) \
-        private(i,n,m,wgttmp,who_am_i,my_depth) \
+#pragma omp parallel for if ( depth < par_depth ) \
+        private(i,n,m,wgttmp,who_am_i)   \
         shared(weights) num_threads(2)
 #endif
   for ( i=0; i < nsplit; i++ )
     {
 
       who_am_i = nsplit*parent+i;
-      my_depth = (int) (log(parent)/log(2))+1;
+      //    my_depth = (int) (log(parent)/log(2))+1;
 
 #if defined (_OPENMP)
       //      if ( 1 )
@@ -7569,7 +7562,7 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
   if ( num_links > MERGE_SORT_LIMIT_SIZE )
     {
       sort_par(num_links, num_wts, add1, add2, weights, parent, par_depth);
-      if ( cdoVerbose ) cdoPrint("Finished iteration parent %i", parent);
+      if ( cdoVerbose ) fprintf(stderr, "sort_iter: Finished iteration parent %i\n", parent);
     }
   else
     {
