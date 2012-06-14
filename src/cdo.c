@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -868,14 +868,14 @@ int main(int argc, char *argv[])
       if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
       fprintf(stderr, "\n");
 
-#if defined (_OPENMP)
-      fprintf(stderr, "Predefined: _OPENMP\n");
-#endif 
 #if defined (__SSE2__)
       fprintf(stderr, "Predefined: __SSE2__\n");
 #endif 
-#if defined (__GNUC__)
-      fprintf(stderr, "Predefined: __GNUC__\n");
+#if defined (__SSE3__)
+      fprintf(stderr, "Predefined: __SSE3__\n");
+#endif 
+#if defined (__AVX__)
+      fprintf(stderr, "Predefined: __AVX__\n");
 #endif 
       fprintf(stderr, "\n");
 
@@ -887,6 +887,12 @@ int main(int argc, char *argv[])
 #endif
       fprintf(stderr, "\n");
 
+#if defined (_OPENMP)
+      fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
+#endif
+#if defined (__GNUC__)
+      fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
+#endif
 #if defined (__STDC__)
       fprintf(stderr, "STD ANSI C          = %d\n", __STDC__);
 #endif
@@ -964,11 +970,11 @@ int main(int argc, char *argv[])
 	      {
 		if ( status == 0 )
 		  {
-		    fprintf(stderr, "Set stack size to %ld\n", MIN_STACK_SIZE);
+		    fprintf(stderr, "Set stack size to %ld\n", (long) min_stack_size);
 		    PRINT_RLIMIT(RLIMIT_STACK);
 		  }
 		else
-		  fprintf(stderr, "Set stack size to %ld failed!\n", MIN_STACK_SIZE);
+		  fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
 	      }
 	  }
       }
@@ -987,9 +993,10 @@ int main(int argc, char *argv[])
   ompNumThreads = omp_get_max_threads();
   if ( omp_get_max_threads() > omp_get_num_procs() )
     fprintf(stderr, "Warning: Number of OMP threads is greater than number of CPUs=%d!\n", omp_get_num_procs());
+  if ( ompNumThreads < numThreads )
+    fprintf(stderr, "Warning: omp_get_max_threads() returns %d!\n", ompNumThreads);
   if ( cdoVerbose )
-    fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d\n",
-	    omp_get_num_procs(), omp_get_max_threads());
+    fprintf(stderr, " OpenMP:  num_procs = %d  max_threads = %d\n", omp_get_num_procs(), omp_get_max_threads());
 #else
   if ( numThreads > 0 )
     {
