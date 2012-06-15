@@ -97,6 +97,7 @@ void *Ydrunpctl(void *argument)
   /* TODO - check that time axes 2 and 3 are equal */
 
   taxisID4 = taxisDuplicate(taxisID1);
+  if ( taxisHasBounds(taxisID4) ) taxisDeleteBounds(taxisID4);
   vlistDefTaxis(vlistID4, taxisID4);
 
   calendar = taxisInqCalendar(taxisID1);
