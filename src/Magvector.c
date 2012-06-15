@@ -33,9 +33,9 @@ static
 void magvector( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *uarray, double *varray )
 
 {
+        long i;
+        double dlon = 0, dlat = 0;
 	char plotfilename[4096];
-  long i;
-  double dlon = 0, dlat = 0;
 
 	if( uarray == NULL && varray == NULL )
 	{
@@ -49,16 +49,18 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		return ;
 	}
 
-  if ( nlon > 1 )
-    {
-      for ( i = 1; i < nlon; ++i ) dlon += (grid_center_lon[i] - grid_center_lon[i-1]);
-      dlon /= (nlon-1);
-    }
-  if ( nlat > 1 )
-    {
-      for ( i = 1; i < nlat; ++i ) dlat += (grid_center_lat[nlon*i] - grid_center_lat[nlon*(i-1)]);
-      dlat /= (nlat-1);
-    }
+        if ( nlon > 1 )
+        {
+           for ( i = 1; i < nlon; ++i ) dlon += (grid_center_lon[i] - grid_center_lon[i-1]);
+               dlon /= (nlon-1);
+        }  
+
+        if ( nlat > 1 )
+        {
+           for ( i = 1; i < nlat; ++i ) dlat += (grid_center_lat[nlon*i] - grid_center_lat[nlon*(i-1)]);
+               dlat /= (nlat-1);
+        }
+
 
 #if  defined  (HAVE_LIBMAGICS)
         
@@ -71,18 +73,28 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
         mag_setc ("output_name",      plotfilename);
 	/* Set the input data */
 
+        mag_setr("input_field_initial_latitude", grid_center_lat[0]);
+        mag_setr("input_field_latitude_step", dlat);
+
+        mag_setr("input_field_initial_longitude", grid_center_lon[0]);
+        mag_setr("input_field_longitude_step", dlon);
+
 	mag_set2r("input_wind_u_component", uarray, nlon, nlat);
 	mag_set2r("input_wind_v_component", varray, nlon, nlat);
-
-  mag_setr("input_field_initial_latitude", grid_center_lat[0]);
-  mag_setr("input_field_latitude_step", dlat);
-
-  mag_setr("input_field_initial_longitude", grid_center_lon[0]);
-  mag_setr("input_field_longitude_step", dlon);
 
         if ( operatorID == VECTOR ) 
 	{
 		/* Magics functions for performing vector operation */
+		/*
+		
+		mag_setc("wind_legend_only", "on" );
+		mag_setc("wind_legend_text", "on" );
+		*/
+		mag_setc( "legend", "on" );
+		mag_setc( "wind_flag_cross_boundary", "on" );
+		mag_setr( "wind_arrow_unit_velocity", 0.0);
+		mag_setr( "wind_thinning_factor",0.5);
+		mag_seti( "wind_arrow_thickness",1 );
 		mag_coast();
 		mag_text();
 		mag_wind();
@@ -218,14 +230,14 @@ void *Magvector(void *argument)
 
           if ( operatorID == VECTOR )
 	  {
-	    if( !strcmp( varname, "var131" ) || !strcmp(varname, "u") ) /* U Velocity as per GRIB */
+	  	if( !strcmp( varname, "var131" ) || !strcmp( varname, "u" ) ) /* U Velocity as per GRIB is 'var131, as per NC 'u' */
 	  	{
           		fprintf( stderr,"Found U VEL in Varname %s\n",varname );
 			streamReadRecord(streamID, uarray, &nmiss);
 			found ++;
 	  	}
 
-	  	if( !strcmp( varname, "var132" ) || !strcmp(varname, "v") ) /* V Velocity as per GRIB */
+	  	if( !strcmp( varname, "var132" ) || !strcmp( varname, "v" ) ) /* V Velocity as per GRIB  is 'var132, as per NC 'v'*/
 	  	{
           		fprintf( stderr,"Found V VEL in Varname %s\n",varname );
 			streamReadRecord(streamID, varray, &nmiss);
