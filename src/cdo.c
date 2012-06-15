@@ -874,6 +874,12 @@ int main(int argc, char *argv[])
 #if defined (__SSE3__)
       fprintf(stderr, "Predefined: __SSE3__\n");
 #endif 
+#if defined (__SSE4_1__)
+      fprintf(stderr, "Predefined: __SSE4_1__\n");
+#endif 
+#if defined (__SSE4_2__)
+      fprintf(stderr, "Predefined: __SSE4_2__\n");
+#endif 
 #if defined (__AVX__)
       fprintf(stderr, "Predefined: __AVX__\n");
 #endif 
@@ -887,6 +893,9 @@ int main(int argc, char *argv[])
 #endif
       fprintf(stderr, "\n");
 
+#if defined (_OPENACC)
+      fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
+#endif
 #if defined (_OPENMP)
       fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif

@@ -1445,15 +1445,21 @@ void cdoFinish(void)
 		    (long) nvals, nvals > 1 ? "s" : "",
 		    nvars, nvars > 1 ? "s" : "");
 	}
+      else if ( nvars > 0 )
+	{
+	  fprintf(stderr, "%s: Processed %d variable%s",
+		  processInqPrompt(),
+		  nvars, nvars > 1 ? "s" : "");
+	}
       else
-	fprintf(stderr, "%s: Processed %d variable%s",
-		processInqPrompt(),
-		nvars, nvars > 1 ? "s" : "");
+	{
+	  fprintf(stderr, "%s: ", processInqPrompt());
+	}
 
       if ( ntimesteps > 0 )
 	fprintf(stderr, " over %d timestep%s", ntimesteps, ntimesteps > 1 ? "s" : "");
 
-      fprintf(stderr, ".");
+      //  fprintf(stderr, ".");
     }
   /*
     fprintf(stderr, "%s: Processed %d variable%s %d timestep%s.",
