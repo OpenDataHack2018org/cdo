@@ -157,8 +157,7 @@ void *Yhourarith(void *argument)
       houroy = hour_of_year(vdate, vtime);
       if ( vardata2[houroy] == NULL ) cdoAbort("Hour of year %d not found!", houroy);
 
-      taxisDefVdate(taxisID3, vdate);
-      taxisDefVtime(taxisID3, vtime);
+      taxisCopyTimestep(taxisID3, taxisID1);
 
       streamDefTimestep(streamID3, tsID);
 

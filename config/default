@@ -28,7 +28,7 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
                     --with-magics=/Users/m214003/local/magics-2.14.9 \
-	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -msse2 -O3 -fopenmp -DHAVE_LIBXML -I/usr/include/libxml2 -I/opt/include" \
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -fopenmp -DHAVE_LIBXML -I/usr/include/libxml2 -I/opt/include" \
                     LIBS="-L/usr/lib -lxml2 -L/opt/local/lib -lopenjpeg"
 	;;
     hama*)
@@ -39,7 +39,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=/opt/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
-	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -fopenmp"
 	;;
 # ia64-xxx-linux
     ds*)
