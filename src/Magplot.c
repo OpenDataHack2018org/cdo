@@ -37,6 +37,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   long i;
   double dlon = 0, dlat = 0;
   char plotfilename[4096];
+  char *titlename;
 
   if ( nlon > 1 )
     {
@@ -50,6 +51,8 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
     }
 
   sprintf(plotfilename, "%s_%s", plotfile, varname);
+
+  titlename = strdup( plotfilename );
 
 #if  defined  (HAVE_LIBMAGICS)
 
@@ -92,7 +95,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   if ( operatorID == SHADED )
     {
 
-      mag_setc ( "contour", "on" );
+      mag_setc ( "contour", "off" );
       mag_setc ( "contour_shade", "on" );
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
@@ -125,7 +128,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   else if ( operatorID == GRFILL )
     {
 
-      mag_setc ( "contour", "on" );
+      mag_setc ( "contour", "off" );
       mag_setc ( "contour_shade", "on" );
 
       mag_setc ( "contour_shade_technique", "cell_shading" );
@@ -152,8 +155,24 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 
   /* plot the title text and the coastlines */
   mag_cont ();
-  mag_text  ();
   mag_coast ();
+
+
+  mag_set1c("text_lines", (const char **) &titlename, 1);
+  mag_setc("text_colour", "black");
+
+/*
+  mag_setr("text_font_size", 0.6);
+  mag_setc("text_mode", "positional");
+  mag_setr("text_box_x_position", 1.5);
+  mag_setr("text_box_y_position", 16.5);
+  mag_setr("text_box_x_length", 20.);
+  mag_setr("text_box_y_length", 2.5);
+  mag_setc("text_border", "off");
+*/
+
+  mag_setc("text_justification", "left");
+  mag_text();
 
 #else
 
