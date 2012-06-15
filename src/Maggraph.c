@@ -46,10 +46,22 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
 {
   long tsID, fileID, i;
   char   *lines = "My Graph";
+  double *date_time;
+  char *date_time_str[nts];
+  char vdatestr[32], vtimestr[32];
 
+  date_time = (double *) malloc(nts*sizeof(double));
 
   for ( tsID = 0; tsID < nts; ++tsID )
     {
+      date_time[tsID] = tsID+1;
+      date2str(vdate[tsID], vdatestr, sizeof(vdatestr));
+      time2str(vtime[tsID], vtimestr, sizeof(vtimestr));
+      date_time_str[tsID] = (char *)malloc(256);
+      sprintf(date_time_str[tsID], "%s %s", vdatestr, vtimestr);
+
+      printf("%d: %s\n", tsID, date_time_str[tsID]);
+      
       printf("%6d %6d", vdate[tsID], vtime[tsID]);
       for ( fileID = 0; fileID < nfiles; ++fileID )
 	printf(" %6g", datatab[fileID][tsID]);
@@ -76,8 +88,10 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   mag_setc("axis_grid_colour", "grey");
   mag_seti("axis_grid_thickness", 1);
   mag_setc("axis_grid_line_style", "dot");
-  mag_setr("axis_min_value", -50.);
-  mag_setr("axis_max_value", 50.);
+  //mag_setc("axis_type", "date");
+  //mag_setc("axis_date_type", "automatic");
+  mag_setr("axis_min_value", 1);
+  mag_setr("axis_max_value", nts);
   mag_axis();
 
   /* Vertical Axis attributes */
@@ -86,14 +100,14 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   mag_setc("axis_grid_colour", "grey");
   mag_seti("axis_grid_thickness", 1);
   mag_setc("axis_grid_line_style", "dot");
-  mag_setr("axis_min_value", 0.);
-  mag_setr("axis_max_value", 100.);
+  mag_setr("axis_min_value", 285.);
+  mag_setr("axis_max_value", 291.);
   mag_axis();
 
-  /* To automatically set the min, max for the axes, based on the input data 
+  /* To automatically set the min, max for the axes, based on the input data */
 
-   mag_setc("graph_axis_control", "automatic");
-  */
+  // mag_setc("graph_axis_control", "automatic");
+  
 
   /* Legend */
   mag_setc("legend", "on");
@@ -104,11 +118,13 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   	  mag_setc("graph_line_colour", line_colours[ i%num_colours ]);
 	  mag_seti("graph_line_thickness", 8 );
 	  mag_setc("graph_symbol", "on");
-	  mag_setc("legend_user_text", "<font colour= line_colours[ i%num_colours ] > i  </font>");
+	  //  mag_setc("legend_user_text", "<font colour= line_colours[ i%num_colours ] > i  </font>");
 	  mag_seti("graph_symbol_marker_index", 1);
 	  mag_setr("graph_symbol_height", 0.5);
-	  mag_set1r("graph_curve_x_values", (double *)vdate, nts);
+	  mag_set1r("graph_curve_x_values", date_time, nts);
+	  //mag_set1c("graph_curve_x_values", (const char **) date_time_str, nts);
 	  mag_set1r("graph_curve_y_values", datatab[i], nts);
+	  //mag_setc("graph_axis_control", "automatic");
           mag_graph ();
     }
 
@@ -124,6 +140,8 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   mag_setc("text_border", "off");
   mag_setc("text_justification", "left");
   mag_text();
+
+  free(date_time);
 
 #endif
 
