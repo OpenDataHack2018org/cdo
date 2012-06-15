@@ -26,10 +26,27 @@
 
 #endif
 
+
+char *line_colours[] = {
+
+     "RGB(1.,0.,0.)",
+     "RGB(1.,1.,0.)",
+     "RGB(0.,1.,0.)",
+     "RGB(0.,0.,1.)",
+     "RGB(0.,1.,1.)",
+     "RGB(1.,1.,1.)",
+     "RGB(.5,.5,.5)",
+     "RGB(.5,.5,0.)"
+};
+
+int num_colours = sizeof( line_colours )/sizeof( char* );
+
 static
 void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, int *vdate, int *vtime, double **datatab)
 {
-  long tsID, fileID;
+  long tsID, fileID, i;
+  char   *lines = "My Graph";
+
 
   for ( tsID = 0; tsID < nts; ++tsID )
     {
@@ -39,7 +56,75 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
       printf("\n");
     }
 
+  /* 
+	1. Loop over the Files
+	2. Loop over the number of time steps 
+	3. Set the attributes for the magics data and plot
+  */  
+   
 #if  defined  (HAVE_LIBMAGICS)
+
+  mag_setc("output_name", plotfile);
+  mag_setc("subpage_map_projection", "cartesian"); 
+  mag_setr("subpage_y_length", 14.);
+  mag_setr("subpage_y_position", 1.5);
+
+
+  /* Horizontal Axis attributes */
+  mag_setc("axis_orientation","horizontal");
+  mag_setc("axis_grid", "on");
+  mag_setc("axis_grid_colour", "grey");
+  mag_seti("axis_grid_thickness", 1);
+  mag_setc("axis_grid_line_style", "dot");
+  mag_setr("axis_min_value", -50.);
+  mag_setr("axis_max_value", 50.);
+  mag_axis();
+
+  /* Vertical Axis attributes */
+  mag_setc("axis_orientation", "vertical");
+  mag_setc("axis_grid", "on");
+  mag_setc("axis_grid_colour", "grey");
+  mag_seti("axis_grid_thickness", 1);
+  mag_setc("axis_grid_line_style", "dot");
+  mag_setr("axis_min_value", 0.);
+  mag_setr("axis_max_value", 100.);
+  mag_axis();
+
+  /* To automatically set the min, max for the axes, based on the input data 
+
+   mag_setc("graph_axis_control", "automatic");
+  */
+
+  /* Legend */
+  mag_setc("legend", "on");
+  mag_setc("legend_text_colour", "black");
+
+  for ( i = 0; i < nfiles; ++i )
+    {
+  	  mag_setc("graph_line_colour", line_colours[ i%num_colours ]);
+	  mag_seti("graph_line_thickness", 8 );
+	  mag_setc("graph_symbol", "on");
+	  mag_setc("legend_user_text", "<font colour= line_colours[ i%num_colours ] > i  </font>");
+	  mag_seti("graph_symbol_marker_index", 1);
+	  mag_setr("graph_symbol_height", 0.5);
+	  mag_set1r("graph_curve_x_values", (double *)vdate, nts);
+	  mag_set1r("graph_curve_y_values", datatab[i], nts);
+          mag_graph ();
+    }
+
+  mag_set1c("text_lines", &lines, 1);
+  mag_setc("text_html", "true");
+  mag_setc("text_colour", "black");
+  mag_setr("text_font_size", 0.6);
+  mag_setc("text_mode", "positional");
+  mag_setr("text_box_x_position", 1.5);
+  mag_setr("text_box_y_position", 16.5);
+  mag_setr("text_box_x_length", 20.);
+  mag_setr("text_box_y_length", 2.5);
+  mag_setc("text_border", "off");
+  mag_setc("text_justification", "left");
+  mag_text();
+
 #endif
 
 }
