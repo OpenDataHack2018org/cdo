@@ -21,22 +21,20 @@
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 
-//xmlDoc *param_doc = NULL;
-//xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
+extern xmlNode  *magics_node;
 
 #endif
 
+#define DBG 0
 
 char *line_colours[] = {
 
      "RGB(1.,0.,0.)",
-     "RGB(1.,1.,0.)",
      "RGB(0.,1.,0.)",
      "RGB(0.,0.,1.)",
      "RGB(0.,1.,1.)",
-     "RGB(1.,1.,1.)",
-     "RGB(.5,.5,.5)",
-     "RGB(.5,.5,0.)"
+     "RGB(0.,0.,0.)",
+     "RGB(1.,1.,0.)",
 };
 
 int num_colours = sizeof( line_colours )/sizeof( char* );
@@ -48,9 +46,16 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   char   *lines = "My Graph";
   double *date_time;
   char *date_time_str[nts];
-  char vdatestr[32], vtimestr[32];
+  char vdatestr[32], vtimestr[32], legend_text_data[256];
+  double min_val = 1.0e+200, max_val = -1.0e+200;
 
   date_time = (double *) malloc(nts*sizeof(double));
+
+  if( DBG )
+  {
+  	printf(" %6d %6d\n", nfiles, nts );
+	printf("\n");
+  }
 
   for ( tsID = 0; tsID < nts; ++tsID )
     {
@@ -60,11 +65,32 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
       date_time_str[tsID] = (char *)malloc(256);
       sprintf(date_time_str[tsID], "%s %s", vdatestr, vtimestr);
 
-      printf("%d: %s\n", tsID, date_time_str[tsID]);
-      
-      printf("%6d %6d", vdate[tsID], vtime[tsID]);
+      if( DBG )
+      {
+      	printf("%d: %s\n", tsID, date_time_str[tsID]);
+      	printf("%6d %6d", vdate[tsID], vtime[tsID]);
+      }
       for ( fileID = 0; fileID < nfiles; ++fileID )
-	printf(" %6g", datatab[fileID][tsID]);
+      {
+        if( DBG )
+	  printf("%d\n", fileID );
+	if( datatab[fileID][tsID] < min_val )
+            min_val = datatab[ fileID ][ tsID ];	
+	if( datatab[fileID][tsID] > max_val )
+            max_val = datatab[ fileID ][ tsID ];	
+
+        if( DBG )
+        {
+	   printf(" %6g", datatab[fileID][tsID]);
+           printf("\n");
+        }
+      }
+    }
+
+    if( DBG )
+    {
+      printf(" %6g %6g\n", min_val, max_val );
+      printf(" %s %s\n", date_time_str[0], date_time_str[ nts-1 ] );
       printf("\n");
     }
 
@@ -76,6 +102,7 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
    
 #if  defined  (HAVE_LIBMAGICS)
 
+  magics_template_parser( magics_node );
   mag_setc("output_name", plotfile);
   mag_setc("subpage_map_projection", "cartesian"); 
   mag_setr("subpage_y_length", 14.);
@@ -88,25 +115,28 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   mag_setc("axis_grid_colour", "grey");
   mag_seti("axis_grid_thickness", 1);
   mag_setc("axis_grid_line_style", "dot");
-  //mag_setc("axis_type", "date");
+  mag_setc("axis_type", "date");
   //mag_setc("axis_date_type", "automatic");
-  mag_setr("axis_min_value", 1);
-  mag_setr("axis_max_value", nts);
+  mag_setc("axis_date_type", "months");
+  mag_setc("axis_date_min_value", date_time_str[0]);
+  mag_setc("axis_date_max_value", date_time_str[nts-1]);
   mag_axis();
 
   /* Vertical Axis attributes */
   mag_setc("axis_orientation", "vertical");
   mag_setc("axis_grid", "on");
+  mag_setc("axis_type", "regular");
   mag_setc("axis_grid_colour", "grey");
   mag_seti("axis_grid_thickness", 1);
   mag_setc("axis_grid_line_style", "dot");
-  mag_setr("axis_min_value", 285.);
-  mag_setr("axis_max_value", 291.);
+  //mag_setc("graph_axis_control", "automatic");
+  mag_setr("axis_min_value", min_val);
+  mag_setr("axis_max_value", max_val);
   mag_axis();
 
   /* To automatically set the min, max for the axes, based on the input data */
-
-  // mag_setc("graph_axis_control", "automatic");
+  //mag_setc("graph_axis_control", "automatic");
+  //mag_graph ();
   
 
   /* Legend */
@@ -115,16 +145,15 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
 
   for ( i = 0; i < nfiles; ++i )
     {
+          sprintf(legend_text_data, "data_%d", i+1);
   	  mag_setc("graph_line_colour", line_colours[ i%num_colours ]);
 	  mag_seti("graph_line_thickness", 8 );
 	  mag_setc("graph_symbol", "on");
-	  //  mag_setc("legend_user_text", "<font colour= line_colours[ i%num_colours ] > i  </font>");
+	  mag_setc("legend_user_text", legend_text_data);
 	  mag_seti("graph_symbol_marker_index", 1);
 	  mag_setr("graph_symbol_height", 0.5);
-	  mag_set1r("graph_curve_x_values", date_time, nts);
-	  //mag_set1c("graph_curve_x_values", (const char **) date_time_str, nts);
+	  mag_set1c("graph_curve_date_x_values", date_time_str, nts);
 	  mag_set1r("graph_curve_y_values", datatab[i], nts);
-	  //mag_setc("graph_axis_control", "automatic");
           mag_graph ();
     }
 
