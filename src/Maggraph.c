@@ -224,6 +224,8 @@ void *Maggraph(void *argument)
   int *vdate = NULL, *vtime = NULL;
   int fileID, nfiles;
   int nts = 0, nts_alloc = 0;
+  int nparam, i;
+  char **pnames = NULL;
   char varname[CDI_MAX_NAME];
   double missval;
   double **datatab = NULL;
@@ -234,6 +236,10 @@ void *Maggraph(void *argument)
   cdoInitialize(argument);
 
   // operatorID = cdoOperatorID();
+  nparam = operatorArgc();
+  pnames = operatorArgv();
+  for ( i = 0; i < nparam; ++i )
+    printf("param %d: %s\n", i, pnames[i]);
 
   nfiles = cdoStreamCnt() - 1;
   ofilename = cdoStreamName(nfiles);
