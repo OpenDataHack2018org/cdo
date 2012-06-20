@@ -35,6 +35,7 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 {
         long i;
         double dlon = 0, dlat = 0;
+        double thin_fac;
 	char plotfilename[4096];
 
 	if( uarray == NULL && varray == NULL )
@@ -92,11 +93,12 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		*/
 		mag_setc( "legend", "on" );
 		mag_setc( "wind_flag_cross_boundary", "on" );
-		mag_setr( "wind_arrow_unit_velocity", 0.0);
-		mag_setr( "wind_thinning_factor",0.5);
+		//mag_setr( "wind_arrow_unit_velocity", 1.0);
 		mag_seti( "wind_arrow_thickness",1 );
 		mag_coast();
 		mag_text();
+                mag_enqr("wind_thinning_factor",&thin_fac);
+                printf( " %g \n", thin_fac );
 		mag_wind();
 	}
 #else
