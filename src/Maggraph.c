@@ -48,6 +48,7 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   char *date_time_str[nts];
   char vdatestr[32], vtimestr[32], legend_text_data[256];
   double min_val = 1.0e+200, max_val = -1.0e+200;
+  double suppress_min_val = 1.0e+200, suppress_max_val = -1.0e+200;
 
   date_time = (double *) malloc(nts*sizeof(double));
 
@@ -130,13 +131,22 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
   mag_seti("axis_grid_thickness", 1);
   mag_setc("axis_grid_line_style", "dot");
   //mag_setc("graph_axis_control", "automatic");
+
+  /*  To redefine the y- axis scale based on user input in .xml file */
+
+  mag_enqr("graph_y_suppress_above",&suppress_max_val);
+  mag_enqr("graph_y_suppress_below",&suppress_min_val);
+  if( DBG )
+  printf(" %6g %6g\n", suppress_min_val, suppress_max_val );
+  if( min_val < suppress_min_val )
+      min_val = suppress_min_val;
+  if( max_val > suppress_max_val )
+      max_val = suppress_max_val;
   mag_setr("axis_min_value", min_val);
   mag_setr("axis_max_value", max_val);
+
   mag_axis();
 
-  /* To automatically set the min, max for the axes, based on the input data */
-  //mag_setc("graph_axis_control", "automatic");
-  //mag_graph ();
   
 
   /* Legend */
@@ -145,7 +155,7 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
 
   for ( i = 0; i < nfiles; ++i )
     {
-          sprintf(legend_text_data, "data_%d", i+1);
+          sprintf(legend_text_data, "ens_%d", i+1);
   	  mag_setc("graph_line_colour", line_colours[ i%num_colours ]);
 	  mag_seti("graph_line_thickness", 8 );
 	  mag_setc("graph_symbol", "on");
@@ -154,6 +164,7 @@ void maggraph(const char *plotfile, const char *varname, long nfiles, long nts, 
 	  mag_setr("graph_symbol_height", 0.5);
 	  mag_set1c("graph_curve_date_x_values", date_time_str, nts);
 	  mag_set1r("graph_curve_y_values", datatab[i], nts);
+          mag_setc("graph_symbol","off");
           mag_graph ();
     }
 
