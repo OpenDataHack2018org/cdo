@@ -1156,32 +1156,36 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
 	  if ( array[i] < arrmin ) arrmin = array[i];
 	  if ( array[i] > arrmax ) arrmax = array[i];
 	}
+      ivals = gridsize;
     }
 
-  smin = (arrmin - addoffset)/scalefactor;
-  smax = (arrmax - addoffset)/scalefactor;
-
-  if ( datatype == DATATYPE_INT8  || datatype == DATATYPE_UINT8 ||
-       datatype == DATATYPE_INT16 || datatype == DATATYPE_UINT16 )
+  if ( ivals > 0 )
     {
-      smin = NINT(smin);
-      smax = NINT(smax);
+      smin = (arrmin - addoffset)/scalefactor;
+      smax = (arrmax - addoffset)/scalefactor;
+
+      if ( datatype == DATATYPE_INT8  || datatype == DATATYPE_UINT8 ||
+	   datatype == DATATYPE_INT16 || datatype == DATATYPE_UINT16 )
+	{
+	  smin = NINT(smin);
+	  smax = NINT(smax);
+	}
+
+      if      ( datatype == DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
+      else if ( datatype == DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }
+      else if ( datatype == DATATYPE_INT16  ) { vmin =      -32768.; vmax =      32767.; }
+      else if ( datatype == DATATYPE_UINT16 ) { vmin =           0.; vmax =      65535.; }
+      else if ( datatype == DATATYPE_INT32  ) { vmin = -2147483648.; vmax = 2147483647.; }
+      else if ( datatype == DATATYPE_UINT32 ) { vmin =           0.; vmax = 4294967295.; }
+      else if ( datatype == DATATYPE_FLT32  ) { vmin = -3.40282e+38; vmax = 3.40282e+38; }
+      else                                    { vmin =     -1.e+300; vmax =     1.e+300; }
+
+      if ( smin < vmin || smax > vmax )
+	cdoWarning("Some data values (min=%g max=%g) are outside the\n"
+		   "    valid range (%g - %g) of the used output precision!\n"
+		   "    Use the CDO option%s -b 64 to increase the output precision.",
+		   smin, smax, vmin, vmax, (datatype == DATATYPE_FLT32) ? "" : " -b 32 or");
     }
-
-  if      ( datatype == DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }
-  else if ( datatype == DATATYPE_UINT8  ) { vmin =           0.; vmax =        255.; }
-  else if ( datatype == DATATYPE_INT16  ) { vmin =      -32768.; vmax =      32767.; }
-  else if ( datatype == DATATYPE_UINT16 ) { vmin =           0.; vmax =      65535.; }
-  else if ( datatype == DATATYPE_INT32  ) { vmin = -2147483648.; vmax = 2147483647.; }
-  else if ( datatype == DATATYPE_UINT32 ) { vmin =           0.; vmax = 4294967295.; }
-  else if ( datatype == DATATYPE_FLT32  ) { vmin = -3.40282e+38; vmax = 3.40282e+38; }
-  else                                    { vmin =     -1.e+300; vmax =     1.e+300; }
-
-  if ( smin < vmin || smax > vmax )
-    cdoWarning("Some data values (min=%g max=%g) are outside the\n"
-               "valid range (%g - %g) of the used output precision!\n"
-	       "Use the CDO option%s -b 64 to increase the output precision.",
-	       smin, smax, vmin, vmax, (datatype == DATATYPE_FLT32) ? "" : " -b 32 or");
 }
 
 
