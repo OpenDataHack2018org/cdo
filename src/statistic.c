@@ -1368,10 +1368,13 @@ int jacobi_1side(double **M, double *A, long n)
   long i_ann,j_ann;
   int n_iter = 0;
   int count=0;
-  int **annihilations, *annihilations_buff;
+  int **annihilations = NULL, *annihilations_buff = NULL;
 
-  annihilations_buff = malloc (n*n*2*sizeof(int));
-  annihilations = malloc((n*n)*sizeof(int*));
+  if ( n > 0 )
+    {
+      annihilations_buff = malloc (n*n*2*sizeof(int));
+      annihilations = malloc((n*n)*sizeof(int*));
+    }
 
   for(i=0;i<n*n;i++)
     annihilations[i] = & annihilations_buff[2*i];
@@ -1480,8 +1483,8 @@ int jacobi_1side(double **M, double *A, long n)
 
   heap_sort(A,M,n);
   
-  free(annihilations);
-  free(annihilations_buff);
+  if ( annihilations      ) free(annihilations);
+  if ( annihilations_buff ) free(annihilations_buff);
   
   return n_iter;
 }

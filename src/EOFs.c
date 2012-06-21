@@ -2,7 +2,7 @@
   This file is part of CDO. CDO is a collection of Operators to
   manipulate and analyse Climate model Data.
 
-  Copyright (C) 2003-2011 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
+  Copyright (C) 2003-2012 Uwe Schulzweida, Uwe.Schulzweida@zmaw.de
   See COPYING file for copying and redistribution conditions.
 
   This program is free software; you can redistribute it and/or modify
@@ -444,19 +444,13 @@ void *EOFs(void * argument)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      char vname[64];
-      vlistInqVarName(vlistID1,varID,&vname[0]);
+      char vname[256];
+      vlistInqVarName(vlistID1, varID, vname);
       gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-      if ( cdoVerbose )  {
-	char *vname;
-	vname = (char *) malloc ( 64*sizeof(char) );
-	vlistInqVarName(vlistID1,varID,vname);
-	cdoPrint("Calculating cov matrices for %i levels of var%i (%s)",nlevs,varID,vname);
-	free(vname);
-      }
-	
+      if ( cdoVerbose )
+	cdoPrint("Calculating cov matrices for %i levels of var%i (%s)", nlevs, varID, vname);
 
       for ( levelID = 0; levelID < nlevs; levelID++ )
         {
@@ -478,26 +472,28 @@ void *EOFs(void * argument)
 
           if ( grid_space )
             {
-	      pack = (int *) malloc ( gridsize * sizeof(int) );
-	      miss = (int *) malloc ( gridsize * sizeof(int) );
+	      pack = (int *) malloc(gridsize*sizeof(int));
+	      miss = (int *) malloc(gridsize*sizeof(int));
 
               for ( i1 = 0; i1 < gridsize; i1++ )
                 {
-		  if (datacountv[i1*gridsize + i1] > 1) 
+		  if ( datacountv[i1*gridsize + i1] > 1 ) 
 		    pack[npack++] = i1;
 		  else
 		    miss[i1] = 1;
                 }
 
-              for(i1 = 0;i1 < npack; i1++)
+              for ( i1 = 0; i1 < npack; i1++ )
                 sum_w += weight[pack[i1]];
 
-              cov = (double **) malloc(npack*sizeof(double *));
 	      n = npack;
-              for (i1 = 0; i1 < npack; i1++ )
-                cov[i1] = (double*) malloc(npack*sizeof(double));
-	      eigv = (double *) malloc ( npack * sizeof(double));
-
+	      if ( npack )
+		{
+		  cov = (double **) malloc(npack*sizeof(double *));
+		  for (i1 = 0; i1 < npack; i1++ )
+		    cov[i1] = (double*) malloc(npack*sizeof(double));
+		  eigv = (double *) malloc(npack*sizeof(double));
+		}
 
               for (i1 = 0; i1 < npack; i1++)
 		for (i2 = i1; i2 < npack; i2++ )
@@ -711,8 +707,6 @@ void *EOFs(void * argument)
   
   for ( varID = 0; varID < nvars; varID++)
     {
-      char vname[64];
-      vlistInqVarName(vlistID1,varID,&vname[0]);
       nlevs    = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       gridsize =  gridInqSize(vlistInqVarGrid(vlistID1, varID));
       
