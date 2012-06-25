@@ -13,7 +13,6 @@ int StringSplitWithSeperator( const char *source_string, const char seperator, c
 	  return 0;
 
 	duplicate_src = strdup( source_string );
-	printf("Sep Char is %c\n",seperator);
 
 	for( i = 0; i < str_len; i++ )
 	{
@@ -32,10 +31,42 @@ int StringSplitWithSeperator( const char *source_string, const char seperator, c
 		temp_str = NULL;
 		temp_str = strtok( NULL, &seperator );
 		if( temp_str )
-			temp_list[++n] = temp_str;
+		  temp_list[++n] = temp_str;
  	}
 
 	*ptr_split_string = temp_list;
 
 	return n+1;
+}
+
+
+
+int IsNumeric (const char *s)
+{
+    char *ptr;
+    if (s == NULL || *s == '\0' || isspace(*s))
+      return 0;
+    
+    strtod (s, &ptr);
+    return *ptr == '\0';
+}
+
+
+void StrToUpperCase ( char *sPtr )
+{
+    while ( *sPtr != '\0' )
+    {
+      *sPtr = toupper ( ( unsigned char ) *sPtr );
+      ++sPtr;
+    }
+}
+
+
+void StrToLowerCase ( char *sPtr )
+{
+    while ( *sPtr != '\0' )
+    {
+      *sPtr = tolower ( ( unsigned char ) *sPtr );
+      ++sPtr;
+    }
 }
