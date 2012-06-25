@@ -648,6 +648,10 @@ void *Select(void *argument)
 	  vlistCopyFlag(vlistID2, vlistID1);
 
 	  // if ( cdoVerbose ) vlistPrint(vlistID2);
+	  nvars = vlistNvars(vlistID2);
+	  for ( varID = 0; varID < nvars; ++varID )
+	    if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
+	  if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
 
 	  taxisID2 = taxisDuplicate(taxisID1);
 	  vlistDefTaxis(vlistID2, taxisID2);

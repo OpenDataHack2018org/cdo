@@ -1,5 +1,6 @@
 2012-06-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Selvar: added check for time constant fields (bug fix) [report: Ralf Müller]
 	* mastrfu: use grid coordinates from input file
 
 2012-06-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
