@@ -12,6 +12,10 @@
 	* ymonmean: removed time bounds if present (bug fix) [Bug #2474]
 	* ymonsub: added support for time bounds (bug fix) [Bug #2475]
 
+2012-06-08  Ralf Mueller     <ralf.mueller@zmaw.de>
+
+	* New operator: showunit (Showinfo)
+
 2012-06-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Sinfo: changed Time entry to Ttype
