@@ -1,3 +1,7 @@
+2012-06-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* mastrfu: use grid coordinates from input file
+
 2012-06-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* pstreamCheckDatarange: activate check only if ivals > 0

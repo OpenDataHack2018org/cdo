@@ -1,5 +1,11 @@
 CDO NEWS
 --------
+Version 1.5.6 (?? Jul 2012):
+
+   Changed operators:
+     * mastrfu: use grid coordinates from input file
+   Fixed bugs:
+     * Wrong netCDF output for unscaled uint8, int8, int16, int32 variables [Bug #2516]
 
 Version 1.5.5 (15 May 2012):
 

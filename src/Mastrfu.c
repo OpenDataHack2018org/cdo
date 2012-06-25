@@ -37,6 +37,7 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
   double *plevel, *phi, *cosphi, *dummy;
   double fact =  4*atan(1.0) * 6371000 / 9.81;
   double **field1, **field2;
+  char units[CDI_MAX_NAME];
 
   nlat = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
@@ -49,7 +50,15 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
 
   zaxisInqLevels(zaxisID, plevel);
 
-  gaussaw(phi, dummy, nlat);
+  // gaussaw(phi, dummy, nlat);
+  
+  gridInqYvals(gridID, phi);
+  gridInqYunits(gridID, units);
+
+  if ( memcmp(units, "degree", 6) == 0 )
+    for ( ilat = 0; ilat < nlat; ilat++ ) phi[ilat] *= DEG2RAD;
+
+  for ( ilat = 0; ilat < nlat; ilat++ ) phi[ilat] = sin(phi[ilat]);
 
   for ( ilat = 0; ilat < nlat; ilat++ )
     cosphi[ilat] = sqrt(1.0 - phi[ilat]*phi[ilat]);
@@ -102,12 +111,10 @@ void *Mastrfu(void *argument)
   vlistID1 = streamInqVlist(streamID1);
 
   nvars = vlistNvars(vlistID1);
-  if ( nvars != 1 )
-    cdoAbort("This operator works only with one variable!");
+  if ( nvars != 1 ) cdoAbort("This operator works only with one variable!");
 
   code = vlistInqVarCode(vlistID1, 0);
-  if ( code != 132 )
-    cdoWarning("Unexpected code %d!", code);
+  if ( code != 132 ) cdoWarning("Unexpected code %d!", code);
 
   zaxisID = vlistInqVarZaxis(vlistID1, 0);
   if ( zaxisInqType(zaxisID) != ZAXIS_PRESSURE &&
@@ -119,8 +126,7 @@ void *Mastrfu(void *argument)
     }
 
   gridID = vlistInqVarGrid(vlistID1, 0);
-  if ( gridInqXsize(gridID) > 1 )
-    cdoAbort("Grid must be a zonal mean!");
+  if ( gridInqXsize(gridID) > 1 ) cdoAbort("Grid must be a zonal mean!");
 
   gridsize = gridInqSize(gridID);
   nlev = zaxisInqSize(zaxisID);
