@@ -162,7 +162,9 @@ void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
   pthread_cond_signal(pipe->vlistDef);
 }
 
-#define TIMEOUT  30 // wait 30 seconds
+#define TIMEOUT  1 // wait 1 seconds
+#define MAX_WAIT_CYCLES 1000
+int processNumsActive(void);
 
 int pipeInqVlist(pstream_t *pstreamptr)
 {
@@ -171,6 +173,7 @@ int pipeInqVlist(pstream_t *pstreamptr)
   int vlistID = -1;
   struct timespec time_to_wait;
   int retcode = 0;
+  int nwaitcycles = 0;
 
   time_to_wait.tv_sec  = 0;
   time_to_wait.tv_nsec = 0;
@@ -185,6 +188,8 @@ int pipeInqVlist(pstream_t *pstreamptr)
       if ( PipeDebug ) Message("%s wait of vlistDef", pname);
       //      pthread_cond_wait(pipe->vlistDef, pipe->mutex);
       retcode = pthread_cond_timedwait(pipe->vlistDef, pipe->mutex, &time_to_wait);
+      // fprintf(stderr, "retcode %d %d\n", retcode, processNumsActive());
+      if ( retcode != 0 && processNumsActive() > 1 && nwaitcycles++ < MAX_WAIT_CYCLES ) retcode = 0;
     }
 
   if ( retcode == 0 )
