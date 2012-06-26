@@ -58,9 +58,10 @@ PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Arith.$(OBJEXT) \
 	cdo-Arithc.$(OBJEXT) cdo-Arithdays.$(OBJEXT) \
 	cdo-Arithlat.$(OBJEXT) cdo-CDItest.$(OBJEXT) \
-	cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) cdo-Change.$(OBJEXT) \
-	cdo-Change_e5slm.$(OBJEXT) cdo-Cloudlayer.$(OBJEXT) \
-	cdo-Command.$(OBJEXT) cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
+	cdo-CDIread.$(OBJEXT) cdo-CDIwrite.$(OBJEXT) cdo-Cat.$(OBJEXT) \
+	cdo-Change.$(OBJEXT) cdo-Change_e5slm.$(OBJEXT) \
+	cdo-Cloudlayer.$(OBJEXT) cdo-Command.$(OBJEXT) \
+	cdo-Comp.$(OBJEXT) cdo-Compc.$(OBJEXT) \
 	cdo-Complextorect.$(OBJEXT) cdo-Cond.$(OBJEXT) \
 	cdo-Cond2.$(OBJEXT) cdo-Condc.$(OBJEXT) \
 	cdo-Consecstat.$(OBJEXT) cdo-Copy.$(OBJEXT) \
@@ -352,31 +353,31 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 #
 cdo_SOURCES = cdo.c Arith.c Arithc.c Arithdays.c Arithlat.c CDItest.c \
-	CDIwrite.c Cat.c Change.c Change_e5slm.c Cloudlayer.c \
-	Command.c Comp.c Compc.c Complextorect.c Cond.c Cond2.c \
-	Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c Detrend.c \
-	Diff.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c Echam5ini.c \
-	Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c Ensval.c \
-	Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c Fillmiss.c \
-	Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c Gather.c \
-	Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c Harmonic.c Hi.c \
-	Histogram.c Importamsr.c Importbinary.c Importcmsaf.c \
-	Importobs.c Info.c Input.c Intgrid.c Intgridtraj.c Intlevel.c \
-	Intlevel3d.c Intntime.c Inttime.c Intyear.c Invert.c \
-	Invertlev.c Isosurface.c Log.c Magplot.c Magvector.c \
-	Maggraph.c Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c \
-	Mergetime.c Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c \
-	Nmltest.c Output.c Outputgmt.c Pinfo.c Pressure.c Regres.c \
-	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
-	Runpctl.c Runstat.c Scatter.c Seascount.c Seaspctl.c \
-	Seasstat.c Selbox.c Select.c Seloperator.c Selrec.c Seltime.c \
-	Selvar.c Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c \
-	Setmiss.c Setrcaname.c Settime.c Setzaxis.c Showinfo.c Sinfo.c \
-	Smooth9.c Sort.c Sorttimestamp.c Specinfo.c Spectral.c \
-	Spectrum.c Split.c Splitrec.c Splitsel.c Splittime.c \
-	Splityear.c SSOpar.c Subtrend.c Templates.c Test.c Tests.c \
-	Timcount.c Timpctl.c Timselpctl.c Timselstat.c Timsort.c \
-	Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
+	CDIread.c CDIwrite.c Cat.c Change.c Change_e5slm.c \
+	Cloudlayer.c Command.c Comp.c Compc.c Complextorect.c Cond.c \
+	Cond2.c Condc.c Consecstat.c Copy.c Deltime.c Derivepar.c \
+	Detrend.c Diff.c Duplicate.c EOFs.c Eof3d.c EcaIndices.c \
+	Echam5ini.c Enlarge.c Enlargegrid.c Ensstat.c Ensstat3.c \
+	Ensval.c Eofcoeff.c Eofcoeff3d.c Exprf.c FC.c Filedes.c \
+	Fillmiss.c Filter.c Fldrms.c Fldstat.c Fldstat2.c Fourier.c \
+	Gather.c Gengrid.c Gradsdes.c Gridboxstat.c Gridcell.c \
+	Harmonic.c Hi.c Histogram.c Importamsr.c Importbinary.c \
+	Importcmsaf.c Importobs.c Info.c Input.c Intgrid.c \
+	Intgridtraj.c Intlevel.c Intlevel3d.c Intntime.c Inttime.c \
+	Intyear.c Invert.c Invertlev.c Isosurface.c Log.c Magplot.c \
+	Magvector.c Maggraph.c Maskbox.c Mastrfu.c Math.c Merge.c \
+	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
+	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
+	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
+	Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
+	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
+	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
+	Setgatt.c Setgrid.c Sethalo.c Setmiss.c Setrcaname.c Settime.c \
+	Setzaxis.c Showinfo.c Sinfo.c Smooth9.c Sort.c Sorttimestamp.c \
+	Specinfo.c Spectral.c Spectrum.c Split.c Splitrec.c Splitsel.c \
+	Splittime.c Splityear.c SSOpar.c Subtrend.c Templates.c Test.c \
+	Tests.c Timcount.c Timpctl.c Timselpctl.c Timselstat.c \
+	Timsort.c Timstat.c Timstat2.c Timstat3.c Tinfo.c Tocomplex.c \
 	Transpose.c Trend.c Trms.c Tstepcount.c Vardup.c Vargen.c \
 	Varrms.c Vertint.c Vertstat.c Vertwind.c Wct.c Wind.c \
 	Writegrid.c Writerandom.c Ydayarith.c Ydaypctl.c Ydaystat.c \
@@ -536,6 +537,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithdays.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Arithlat.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDIread.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDItest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-CDIwrite.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Cat.Po@am__quote@
@@ -870,6 +872,20 @@ cdo-CDItest.obj: CDItest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDItest.c' object='cdo-CDItest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDItest.obj `if test -f 'CDItest.c'; then $(CYGPATH_W) 'CDItest.c'; else $(CYGPATH_W) '$(srcdir)/CDItest.c'; fi`
+
+cdo-CDIread.o: CDIread.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CDIread.o -MD -MP -MF $(DEPDIR)/cdo-CDIread.Tpo -c -o cdo-CDIread.o `test -f 'CDIread.c' || echo '$(srcdir)/'`CDIread.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CDIread.Tpo $(DEPDIR)/cdo-CDIread.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDIread.c' object='cdo-CDIread.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDIread.o `test -f 'CDIread.c' || echo '$(srcdir)/'`CDIread.c
+
+cdo-CDIread.obj: CDIread.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CDIread.obj -MD -MP -MF $(DEPDIR)/cdo-CDIread.Tpo -c -o cdo-CDIread.obj `if test -f 'CDIread.c'; then $(CYGPATH_W) 'CDIread.c'; else $(CYGPATH_W) '$(srcdir)/CDIread.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-CDIread.Tpo $(DEPDIR)/cdo-CDIread.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='CDIread.c' object='cdo-CDIread.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-CDIread.obj `if test -f 'CDIread.c'; then $(CYGPATH_W) 'CDIread.c'; else $(CYGPATH_W) '$(srcdir)/CDIread.c'; fi`
 
 cdo-CDIwrite.o: CDIwrite.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-CDIwrite.o -MD -MP -MF $(DEPDIR)/cdo-CDIwrite.Tpo -c -o cdo-CDIwrite.o `test -f 'CDIwrite.c' || echo '$(srcdir)/'`CDIwrite.c

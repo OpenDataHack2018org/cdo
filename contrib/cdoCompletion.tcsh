@@ -31,6 +31,7 @@ bandpass \
 beta \
 boxavg \
 cat \
+cdiread \
 cdiwrite \
 change_e5lsm \
 change_e5mask \

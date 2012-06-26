@@ -285,6 +285,7 @@ src/Arith.c -text
 src/Arithc.c -text
 src/Arithdays.c -text
 src/Arithlat.c -text
+src/CDIread.c -text
 src/CDItest.c -text
 src/CDIwrite.c -text
 src/Cat.c -text

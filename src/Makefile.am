@@ -8,6 +8,7 @@ cdo_SOURCES += Arith.c         \
                Arithdays.c     \
                Arithlat.c      \
                CDItest.c       \
+               CDIread.c       \
                CDIwrite.c      \
                Cat.c           \
                Change.c        \
