@@ -182,11 +182,13 @@ int pipeInqVlist(pstream_t *pstreamptr)
 
   // LOCK
   pthread_mutex_lock(pipe->mutex);
-  time_to_wait.tv_sec = time(NULL) + TIMEOUT;
+  time_to_wait.tv_sec = time(NULL);
   while ( pstreamptr->vlistID == -1 && retcode == 0 )
     {
+      time_to_wait.tv_sec += TIMEOUT;
+      // fprintf(stderr, "tvsec %g\n", (double) time_to_wait.tv_sec);
       if ( PipeDebug ) Message("%s wait of vlistDef", pname);
-      //      pthread_cond_wait(pipe->vlistDef, pipe->mutex);
+      // pthread_cond_wait(pipe->vlistDef, pipe->mutex);
       retcode = pthread_cond_timedwait(pipe->vlistDef, pipe->mutex, &time_to_wait);
       // fprintf(stderr, "retcode %d %d\n", retcode, processNumsActive());
       if ( retcode != 0 && processNumsActive() > 1 && nwaitcycles++ < MAX_WAIT_CYCLES ) retcode = 0;
