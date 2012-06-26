@@ -55,5 +55,6 @@ enum cmp_flag {
 };
 
 void    vlistCompare(int vlistID1, int vlistID2, int flag);
+int     vlistCompareX(int vlistID1, int vlistID2, int flag);
 
 #endif  /* _FUNCTS_H */

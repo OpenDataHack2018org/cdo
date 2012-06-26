@@ -164,6 +164,48 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 }
 
 
+int vlistCompareX(int vlistID1, int vlistID2, int flag)
+{
+  int varID, nvars, nvars2, nlevels2;
+
+  nvars = vlistNvars(vlistID1);
+  nvars2 = vlistNvars(vlistID2);
+  nlevels2 = zaxisInqSize(vlistInqVarZaxis(vlistID2, 0));
+
+  if ( nvars2 != 1 )
+    cdoAbort("Internal problem, vlistCompareX() called with unexpected vlistID2 argument!");
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      if ( flag & CMP_GRIDSIZE )
+	{
+	  if ( gridInqSize(vlistInqVarGrid(vlistID1, varID)) !=
+	       gridInqSize(vlistInqVarGrid(vlistID2, 0)) )
+	    cdoAbort("Grid size of the input parameters do not match!");
+	}
+      
+      if ( flag & CMP_NLEVEL )
+	{
+	  if ( (zaxisInqSize(vlistInqVarZaxis(vlistID1, varID)) !=
+                nlevels2) && nlevels2 > 1 )
+	    cdoAbort("Number of levels of the input parameters do not match!");
+	}
+    }
+
+  if ( flag & CMP_GRID )
+    {
+      int gridID1, gridID2;
+
+      gridID1 = vlistInqVarGrid(vlistID1, 0);
+      gridID2 = vlistInqVarGrid(vlistID2, 0);
+
+      compareGrids(gridID1, gridID2);
+    }
+
+  return (nlevels2);
+}
+
+
 int vlistIsSzipped(int vlistID)
 {
   int lszip = FALSE;

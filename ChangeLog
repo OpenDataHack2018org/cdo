@@ -1,3 +1,7 @@
+2012-06-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Arith: added support for 3D masks [request: Ralf Müller]
+
 2012-06-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Selvar: added check for time constant fields (bug fix) [report: Ralf Müller]
