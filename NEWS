@@ -3,6 +3,7 @@ CDO NEWS
 Version 1.5.6 (?? Jul 2012):
 
    Changed operators:
+     * Arith: added support for 3D masks
      * mastrfu: use grid coordinates from input file
    Fixed bugs:
      * Wrong netCDF output for unscaled uint8, int8, int16, int32 variables [Bug #2516]

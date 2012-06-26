@@ -10,7 +10,7 @@
 @BeginDescription
 This module performs simple arithmetic of two datasets.
 The number of fields in @file{ifile1} should be the same as in @file{ifile2}.
-One of the input files can contain only one timestep or one field.
+One of the input files can contain only one timestep or one variable.
 The fields in @file{ofile} inherit the meta data from @file{ifile1} or @file{ifile2}.
 @EndDescription
 @EndModule
@@ -112,8 +112,7 @@ o(t,x) = \mbox{atan2}(i_1(t,x), i_2(t,x))
 
 
 @BeginExample
-To sum all fields of the first input file with the corresponding
-fields of the second input file use:
+To sum all fields of the first input file with the corresponding fields of the second input file use:
 @BeginVerbatim
    cdo add ifile1 ifile2 ofile
 @EndVerbatim

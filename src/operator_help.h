@@ -1201,7 +1201,7 @@ static char *ArithHelp[] = {
     "DESCRIPTION",
     "    This module performs simple arithmetic of two datasets.",
     "    The number of fields in ifile1 should be the same as in ifile2.",
-    "    One of the input files can contain only one timestep or one field.",
+    "    One of the input files can contain only one timestep or one variable.",
     "    The fields in ofile inherit the meta data from ifile1 or ifile2.",
     "",
     "OPERATORS",
