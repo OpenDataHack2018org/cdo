@@ -27,7 +27,7 @@ extern xmlNode  *magics_node;
 
 #endif
 
-#define DBG 1
+#define DBG 0
 
 
 char *line_colours[] = {
@@ -140,6 +140,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	  if( DBG )
 	    fprintf(stderr,"SIGMA %d\n",num_sigma);
 	}   
+	free( split_str );
     }
     
 
@@ -152,7 +153,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
   if( DBG )
   {
-  	fprintf(stderr," %6ld %6ld\n", nfiles, nts );
+  	fprintf(stderr," %6d %6d\n", nfiles, nts );
 	fprintf(stderr,"\n");
   }
 
@@ -168,13 +169,13 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
       if( DBG )
       {
-      	fprintf(stderr,"%ld: %s\n", tsID, date_time_str[tsID]);
+      	fprintf(stderr,"%d: %s\n", tsID, date_time_str[tsID]);
       	fprintf(stderr,"%6d %6d", vdate[tsID], vtime[tsID]);
       }
       for ( fileID = 0; fileID < nfiles; ++fileID )
       {
         if( DBG )
-	  printf("%ld\n", fileID );
+	  printf("%d\n", fileID );
 	if( datatab[fileID][tsID] < min_val )
             min_val = datatab[ fileID ][ tsID ];	
 	if( datatab[fileID][tsID] > max_val )
@@ -240,6 +241,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     num_years = atoi( split_str[0] );
     num_months = atoi( split_str[1] );
     num_days   = atoi( split_str[2] );
+    free( split_str );
     split_str_count = StringSplitWithSeperator( date_time_str[0], sep_char, &split_str );
     num_years -= atoi( split_str[0] );
     //fprintf(stderr,"HERE 2\n");
@@ -255,7 +257,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	else if( num_months == 1 )
 	  num_days += ( 31- atoi( split_str[2] ) );
       }
-    
+    free( split_str );
     if( DBG )
       fprintf(stderr," %d %d\n", num_years, num_months );
     
@@ -304,10 +306,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	}
     }
   
-  char cdummy[256];
-  mag_enqc("axis_date_type",cdummy);
-  fprintf(stderr, "cdummy: %s\n", cdummy);
-
+  
   mag_setc("axis_date_min_value", date_time_str[0]);
   mag_setc("axis_date_max_value", date_time_str[nts-1]);
   mag_setc("axis_title_text","Time");
@@ -408,9 +407,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   lines[0] = (char *)malloc(1024);
   sprintf(lines[0],"%s","ExpID : ");/* To be obtained from Meta Data */
-  // sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
-  // sprintf( lines[0],"%s  Date : %s --%s",lines[0], date_time_str[0], date_time_str[ nts-1 ] );
-  //  mag_set1c("text_lines", (const char**)lines, 1);
+  sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
+  sprintf( lines[0],"%s  Date : %s --%s",lines[0], date_time_str[0], date_time_str[ nts-1 ] );
+  mag_set1c("text_lines", (const char**)lines, 1);
+  
+  if( DBG )
+    fprintf(stderr, "%s\n",lines[0]);
   
   mag_setc("text_html", "true");
   mag_setc("text_colour", "black");
@@ -429,9 +431,6 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   free( std_dev_val );
   free( spread_min );
   free( spread_max );
-
-  if( DBG )
-    fprintf(stderr, "%s\n",lines[0]);
 
 #endif
 
@@ -672,6 +671,8 @@ void VerifyGraphParameters( int num_param, char **param_names )
 	    halt_flag = TRUE;
 	    fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
 	  }
+	  
+	free( split_str );
       }
     
       
