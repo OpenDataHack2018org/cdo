@@ -9,7 +9,7 @@
 #include "magics_api.h"
 #endif
 
-#define DBG_MSG 0 
+#define DBG_MSG 1
 
 
 #if  defined  (HAVE_LIBMAGICS)
@@ -82,7 +82,7 @@ int magics_template_parser( xmlNode *a_node )
 		param_name = xmlGetProp( cur_node,"parameter");
 		param_type = xmlGetProp(cur_node,"type");
 		param_value = xmlGetProp(cur_node,"value");
-#if 0
+#if 1
     		printf( "\t\tAttr name: %s Type: %s Value: %s \n", param_name,param_type,param_value);
 #endif
 		

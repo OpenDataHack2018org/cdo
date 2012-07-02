@@ -27,7 +27,7 @@ extern xmlNode  *magics_node;
 
 #endif
 
-#define DBG 0
+#define DBG 1
 
 
 char *line_colours[] = {
@@ -304,7 +304,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	}
     }
   
-  
+  char cdummy[256];
+  mag_enqc("axis_date_type",cdummy);
+  fprintf(stderr, "cdummy: %s\n", cdummy);
+
   mag_setc("axis_date_min_value", date_time_str[0]);
   mag_setc("axis_date_max_value", date_time_str[nts-1]);
   mag_setc("axis_title_text","Time");
@@ -405,12 +408,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   lines[0] = (char *)malloc(1024);
   sprintf(lines[0],"%s","ExpID : ");/* To be obtained from Meta Data */
-  sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
-  sprintf( lines[0],"%s  Date : %s --%s",lines[0], date_time_str[0], date_time_str[ nts-1 ] );
-  mag_set1c("text_lines", (const char**)lines, 1);
-  
-  if( DBG )
-    fprintf(stderr, "%s\n",lines[0]);
+  // sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
+  // sprintf( lines[0],"%s  Date : %s --%s",lines[0], date_time_str[0], date_time_str[ nts-1 ] );
+  //  mag_set1c("text_lines", (const char**)lines, 1);
   
   mag_setc("text_html", "true");
   mag_setc("text_colour", "black");
@@ -429,6 +429,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   free( std_dev_val );
   free( spread_min );
   free( spread_max );
+
+  if( DBG )
+    fprintf(stderr, "%s\n",lines[0]);
 
 #endif
 
