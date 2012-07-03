@@ -79,7 +79,7 @@ void *EOFs(void * argument)
   double sum_w;
   double sum;
   double missval=0;
-  double *xvals, *yvals;
+  double xvals, yvals;
   double **cov, *eigv;
 
   double *df1p, *df2p;
@@ -161,12 +161,10 @@ void *EOFs(void * argument)
   gridID2     = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
-  xvals       = (double*) malloc(1*sizeof(double));
-  yvals       = (double*) malloc(1*sizeof(double));
-  xvals[0]    = 0;
-  yvals[0]    = 0;
-  gridDefXvals(gridID2, xvals);
-  gridDefYvals(gridID2, yvals);
+  xvals    = 0;
+  yvals    = 0;
+  gridDefXvals(gridID2, &xvals);
+  gridDefYvals(gridID2, &yvals);
   ngrids      = vlistNgrids(vlistID2);
   for ( i = 0; i < ngrids; i++ )
     vlistChangeGridIndex(vlistID2, i, gridID2);
@@ -298,7 +296,6 @@ void *EOFs(void * argument)
               datafields[varID][levelID][0].missval = missval;
               datafields[varID][levelID][0].ptr     = (double *) malloc(gridsize*gridsize*sizeof(double));
 
-              
               datacounts[varID][levelID]            = (int *) malloc(gridsize*gridsize*sizeof(int));
 	      for ( i = 0; i<gridsize*gridsize; i++ )
 		{
@@ -348,7 +345,7 @@ void *EOFs(void * argument)
     }
 
   if ( cdoVerbose )
-    cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%i gridsize=%i",nts,gridsize);
+    cdoPrint("Allocated eigenvalue/eigenvector structures with nts=%i gridsize=%i", nts, gridsize);
 
   if ( cdoTimer ) timer_stop(timer_alloc);
   if ( cdoTimer ) timer_start(timer_read);
@@ -426,6 +423,9 @@ void *EOFs(void * argument)
         }
       tsID++;
     }
+
+  if ( tsID == 1 )
+    cdoAbort("File consists of only one timestep!");
 
   if ( grid_space )
     for ( i1 = 0; i1 < gridsize; ++i1 )
@@ -744,8 +744,6 @@ void *EOFs(void * argument)
   free(datacounts);
   free(in.ptr);
   free(weight);
-  free(xvals);
-  free(yvals);
 
 
   streamClose(streamID3);

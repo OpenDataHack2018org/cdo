@@ -79,6 +79,7 @@ void eigen_solution_of_symmetric_matrix (double **a, double *eig_val,
   eigen_solution_of_triangular_matrix (eig_val, e, n, a, n_eig, prompt);
   
   free (e);
+
   for (i = 0; i < n; i++)
     for (j = i + 1; j < n; j++)
       {
@@ -406,6 +407,7 @@ int inverse_of_matrix (double **a, double **b, int n)
   
   free (index);
   free (col);
+
   return not_singular;
 }
 
@@ -473,7 +475,9 @@ int lu_decomposition (double **a, int n, int *index, int *sign)
             a[i][j] *= temp;
         }
     }
+
   free (v);
+
   return 1;
 }
 
@@ -1456,7 +1460,7 @@ int jacobi_1side(double **M, double *A, long n)
     {
       fprintf(stderr, 
 	      "statistics-module (Warning): Eigenvalue computation with one-sided jacobi scheme\n"
-	      "                             Did not converge properly. %i of %i pairs of columns did\n"
+	      "                             did not converge properly. %i of %i pairs of columns did\n"
 	      "                             not achieve requested orthogonality of %10.6g\n",
 	      count-n_finished,count, fnorm_precision);
 
