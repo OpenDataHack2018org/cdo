@@ -1,3 +1,7 @@
+2012-07-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* userFileOverwrite: accept also a simple 'y' as yes [request: Dirk Notz]
+
 2012-06-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Arith: added support for 3D masks [request: Ralf Müller]
