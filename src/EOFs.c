@@ -149,39 +149,6 @@ void *EOFs(void * argument)
     for(i=0;i<gridsize;i++) 
       weight[i]=1;
 
-
-  /* eigenvalues */
-  streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  vlistID2    = vlistDuplicate(vlistID1);
-  taxisID2    = taxisDuplicate(taxisID1);
-  taxisDefRdate(taxisID2, 0);
-  taxisDefRtime(taxisID2, 0);
-  vlistDefTaxis(vlistID2, taxisID2);
-  gridID2     = gridCreate(GRID_LONLAT, 1);
-  gridDefXsize(gridID2, 1);
-  gridDefYsize(gridID2, 1);
-  xvals    = 0;
-  yvals    = 0;
-  gridDefXvals(gridID2, &xvals);
-  gridDefYvals(gridID2, &yvals);
-  ngrids      = vlistNgrids(vlistID2);
-  for ( i = 0; i < ngrids; i++ )
-    vlistChangeGridIndex(vlistID2, i, gridID2);
-
-  /*  eigenvectors */
-  streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-
-  vlistID3    = vlistDuplicate(vlistID1);
-  taxisID3    = taxisDuplicate(taxisID1);
-  gridID3     = gridDuplicate(gridID1);
-  taxisDefRdate(taxisID3, 0);
-  taxisDefRtime(taxisID3, 0);
-  vlistDefTaxis(vlistID3, taxisID3);
-
-
-  if ( cdoVerbose )
-    cdoPrint("Initialized streams");
   /*  eigenvalues */
 
   reached_eof = 0;
@@ -645,7 +612,41 @@ void *EOFs(void * argument)
         } // for ( levelID = 0; levelID < nlevs; levelID++ )
     } // for ( varID = 0; varID < nvars; varID++ )
 
+
   /* write files with eigenvalues (ID3) and eigenvectors (ID2) */
+
+  /* eigenvalues */
+  streamID2   = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+
+  vlistID2    = vlistDuplicate(vlistID1);
+  taxisID2    = taxisDuplicate(taxisID1);
+  taxisDefRdate(taxisID2, 0);
+  taxisDefRtime(taxisID2, 0);
+  vlistDefTaxis(vlistID2, taxisID2);
+  gridID2     = gridCreate(GRID_LONLAT, 1);
+  gridDefXsize(gridID2, 1);
+  gridDefYsize(gridID2, 1);
+  xvals    = 0;
+  yvals    = 0;
+  gridDefXvals(gridID2, &xvals);
+  gridDefYvals(gridID2, &yvals);
+  ngrids   = vlistNgrids(vlistID2);
+  for ( i = 0; i < ngrids; i++ )
+    vlistChangeGridIndex(vlistID2, i, gridID2);
+
+  /*  eigenvectors */
+  streamID3   = streamOpenWrite(cdoStreamName(2), cdoFiletype());
+
+  vlistID3    = vlistDuplicate(vlistID1);
+  taxisID3    = taxisDuplicate(taxisID1);
+  gridID3     = gridDuplicate(gridID1);
+  taxisDefRdate(taxisID3, 0);
+  taxisDefRtime(taxisID3, 0);
+  vlistDefTaxis(vlistID3, taxisID3);
+
+
+  if ( cdoVerbose )
+    cdoPrint("Initialized streams");
 
   if ( cdoTimer ) timer_start(timer_write);
 
