@@ -6057,7 +6057,7 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
 
 /*****************************************************************************/
 
-void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
+void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -6162,8 +6162,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
 	    }
 	}
 
-      if ( i == num_links )
-	cdoAbort("Internal problem, link 1 not found!");
+      if ( i == num_links ) cdoAbort("Internal problem, link 1 not found!");
     }
 
   /*
@@ -6240,8 +6239,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
 	    }
 	}
 
-      if ( i == num_links )
-	cdoAbort("Internal problem, link 2 not found!");
+      if ( i == num_links ) cdoAbort("Internal problem, link 2 not found!");
     }
 
   /* Swap the last two entries */
@@ -6271,7 +6269,7 @@ void sort_add_test(long num_links, long num_wts, int *restrict add1, int *restri
 } /* sort_add_test */
 
 
-void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
+void sort_add_old(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
 {
   /*
     This routine sorts address and weight arrays based on the
@@ -6372,8 +6370,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	    }
 	}
 
-      if ( i == num_links )
-	cdoAbort("Internal problem, link 1 not found!");
+      if ( i == num_links ) cdoAbort("Internal problem, link 1 not found!");
     }
 
   /*
@@ -6456,8 +6453,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 	    }
 	}
 
-      if ( i == num_links )
-	cdoAbort("Internal problem, link 2 not found!");
+      if ( i == num_links ) cdoAbort("Internal problem, link 2 not found!");
     }
 
   /* Swap the last two entries */

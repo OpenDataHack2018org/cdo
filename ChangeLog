@@ -1,3 +1,12 @@
+2012-07-??  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.6
+	* Version 1.5.6 released
+
+2012-07-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remaplib::sort_add: use optimized version (speedup +20%)
+
 2012-07-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* userFileOverwrite: accept also a simple 'y' as yes [request: Dirk Notz]
