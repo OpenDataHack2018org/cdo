@@ -211,9 +211,8 @@ static char *ReplaceHelp[] = {
     "    replace  ifile1 ifile2 ofile",
     "",
     "DESCRIPTION",
-    "    Replaces all common fields of ifile2 and ifile1 with those of ifile1",
-    "    and write the result to ofile.",
-    "    Both input datasets need to have the same number of timesteps.",
+    "    The replace operator replaces variables of ifile1 with variables from ifile2 and write",
+    "    the result to ofile. Both input datasets need to have the same number of timesteps.",
     NULL
 };
 

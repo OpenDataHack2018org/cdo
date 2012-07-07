@@ -13,16 +13,14 @@
 @Title     = Replace variables
 
 @BeginDescription
-Replaces all common fields of @file{ifile2} and @file{ifile1} with those of @file{ifile1}
-and write the result to @file{ofile}.
-Both input datasets need to have the same number of timesteps.
+The replace operator replaces variables of @file{ifile1} with variables from @file{ifile2} and write
+the result to @file{ofile}. Both input datasets need to have the same number of timesteps.
 @EndDescription
 @EndOperator
 
 
 @BeginExample
-Assume the first input dataset @file{ifile1} has three variables with the names
-geosp, t and tslm1
+Assume the first input dataset @file{ifile1} has three variables with the names geosp, t and tslm1
 and the second input dataset @file{ifile2} has only the variable tslm1.
 To replace the variable tslm1 in @file{ifile1} with tslm1 from @file{ifile2} use:
 @BeginVerbatim
