@@ -6266,7 +6266,7 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
-} /* sort_add_test */
+} /* sort_add */
 
 
 void sort_add_old(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights)
@@ -6473,7 +6473,7 @@ void sort_add_old(long num_links, long num_wts, int *restrict add1, int *restric
   for ( n = 0; n < num_links; n++ )
     printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
   */
-} /* sort_add */
+} /* sort_add_old */
 
 
 /*****************************************************************************/
@@ -7388,7 +7388,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   long *idx;                                 /* index list to merge sub-arrays                 */
   long i,n,m;   
 
-
+  // printf("sort_par: parent = %d numlinks = %ld\n", parent, num_links);
   if ( nsplit != 2 )
     {
       fprintf(stderr,"Error: splitting into more than two subsegments not allowed\n"
