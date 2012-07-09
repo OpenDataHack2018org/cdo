@@ -62,9 +62,9 @@ void heapify(const long pos, const long size, int *restrict arr1, int *restrict 
  
       if ( maxIter != pos )
 	{
-	  swap(&arr1[maxIter],&arr1[pos]);
-	  swap(&arr2[maxIter],&arr2[pos]);
-	  swap(&arr3[maxIter],&arr3[pos]);
+	  swap(&arr1[maxIter], &arr1[pos]);
+	  swap(&arr2[maxIter], &arr2[pos]);
+	  swap(&arr3[maxIter], &arr3[pos]);
 	  heapify(maxIter, size, arr1, arr2, arr3);
 	}
     }
@@ -76,10 +76,6 @@ void remap_heapsort_recursiv(const long num_links, int *restrict arr1, int *rest
 {
   long lvl;     /* level indexes for heap sort levels */
 
-  /*
-    start at the lowest level (N/2) of the tree and shift lower 
-    values to the bottom of the tree, promoting the larger numbers
-  */
   for ( lvl = num_links/2-1; lvl >= 0; --lvl )
     {
       heapify(lvl, num_links, arr1, arr2, arr3);
@@ -100,7 +96,7 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
   int add1_tmp, add2_tmp;  /* temp for addresses during swap     */
   int idx_tmp;
   long lvl, final_lvl;     /* level indexes for heap sort levels */
-  long chk_lvl1, chk_lvl2, max_lvl;
+  long chk_lvl1, max_lvl;
   long i;
 
   /*
@@ -116,20 +112,20 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 
       /* Loop until proper level is found for this link, or reach bottom */
 
-      for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
+      for ( i = 0; i < num_links; ++i ) /* while ( TRUE ) */
 	{
 	  /* Find the largest of the two daughters */
 
           chk_lvl1 = 2*final_lvl+1;
-          chk_lvl2 = 2*final_lvl+2;
-          if ( chk_lvl1 == num_links-1 ) chk_lvl2 = chk_lvl1;
+          max_lvl  = 2*final_lvl+2;
+          if ( chk_lvl1 == num_links-1 ) max_lvl = chk_lvl1;
 
-          if ( (add1[chk_lvl1] >  add1[chk_lvl2]) ||
-	      ((add1[chk_lvl1] == add1[chk_lvl2]) &&
-               (add2[chk_lvl1] >  add2[chk_lvl2])) )
-            max_lvl = chk_lvl1;
-          else 
-            max_lvl = chk_lvl2;
+          if ( (add1[chk_lvl1] >  add1[max_lvl]) ||
+	      ((add1[chk_lvl1] == add1[max_lvl]) &&
+               (add2[chk_lvl1] >  add2[max_lvl])) )
+	    {
+	      max_lvl = chk_lvl1;
+	    }
 
           /*
 	    If the parent is greater than both daughters,
@@ -193,20 +189,20 @@ void remap_heapsort(const long num_links, int *restrict add1, int *restrict add2
 
       final_lvl = 0;
 
-      for ( i = 0; i < num_links; i++ ) /* while ( TRUE ) */
+      for ( i = 0; i < num_links; ++i ) /* while ( TRUE ) */
 	{
 	  /* Find the largest of the two daughters */
 
           chk_lvl1 = 2*final_lvl+1;
-          chk_lvl2 = 2*final_lvl+2;
-          if ( chk_lvl2 >= lvl ) chk_lvl2 = chk_lvl1;
+          max_lvl  = 2*final_lvl+2;
+          if ( max_lvl >= lvl ) max_lvl = chk_lvl1;
 
-          if ( (add1[chk_lvl1] >  add1[chk_lvl2]) ||
-              ((add1[chk_lvl1] == add1[chk_lvl2]) &&
-               (add2[chk_lvl1] >  add2[chk_lvl2])) )
-            max_lvl = chk_lvl1;
-          else 
-            max_lvl = chk_lvl2;
+          if ( (add1[chk_lvl1] >  add1[max_lvl]) ||
+              ((add1[chk_lvl1] == add1[max_lvl]) &&
+               (add2[chk_lvl1] >  add2[max_lvl])) )
+	    {
+	      max_lvl = chk_lvl1;
+	    }
 
           /*
 	    If the parent is greater than both daughters,
