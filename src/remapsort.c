@@ -29,13 +29,52 @@ int isSorted(int *restrict array1, int *restrict array2, const long size)
 }
 
 static
-void remap_heapsort_test(const long num_links, int *restrict add1, int *restrict add2, int *restrict idx)
+void swap(int *restrict v1, int *restrict v2)
 {
-  int add1_tmp, add2_tmp;  /* temp for addresses during swap     */
-  int idx_tmp;
-  long lvl, final_lvl;     /* level indexes for heap sort levels */
-  long chk_lvl1, chk_lvl2, max_lvl;
-  long i;
+  const int tmp = *v1;
+  *v1 = *v2;
+  *v2 = tmp;
+}
+
+static
+void heapify(const long pos, const long size, int *restrict arr1, int *restrict arr2, int *restrict arr3)
+{
+  const long leftChild = pos*2 + 1;
+  
+  if ( leftChild < size )
+    {
+      long maxIter = pos;
+      if (  (arr1[leftChild] >  arr1[maxIter]) ||
+	   ((arr1[leftChild] == arr1[maxIter]) &&
+	    (arr2[leftChild] >  arr2[maxIter])) )
+	{
+	  maxIter = leftChild;
+	}
+
+      const long rightChild = leftChild + 1;
+      if ( rightChild < size )
+	if (  (arr1[rightChild] >  arr1[maxIter]) ||
+	     ((arr1[rightChild] == arr1[maxIter]) &&
+	      (arr2[rightChild] >  arr2[maxIter])) )
+	  {
+	    maxIter = rightChild;
+	  }
+ 
+      if ( maxIter != pos )
+	{
+	  swap(&arr1[maxIter],&arr1[pos]);
+	  swap(&arr2[maxIter],&arr2[pos]);
+	  swap(&arr3[maxIter],&arr3[pos]);
+	  heapify(maxIter, size, arr1, arr2, arr3);
+	}
+    }
+}
+
+/* remap_heapsort is 30% faster than remap_heapsort_recursiv ! */
+static
+void remap_heapsort_recursiv(const long num_links, int *restrict arr1, int *restrict arr2, int *restrict arr3)
+{
+  long lvl;     /* level indexes for heap sort levels */
 
   /*
     start at the lowest level (N/2) of the tree and shift lower 
@@ -43,10 +82,15 @@ void remap_heapsort_test(const long num_links, int *restrict add1, int *restrict
   */
   for ( lvl = num_links/2-1; lvl >= 0; --lvl )
     {
+      heapify(lvl, num_links, arr1, arr2, arr3);
     }
 
   for ( lvl = num_links-1; lvl > 0; --lvl )
     {
+      swap(&arr1[0], &arr1[lvl]);
+      swap(&arr2[0], &arr2[lvl]);
+      swap(&arr3[0], &arr3[lvl]);
+      heapify(0, lvl, arr1, arr2, arr3);
     }
 }
 
@@ -245,11 +289,6 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 
   if ( num_links <= 1 ) return;
 
-  /*
-  for ( n = 0; n < num_links; n++ )
-    printf("in: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
-  */
-
   idx = (int *) malloc(num_links*sizeof(int));
   for ( i = 0; i < num_links; ++i ) idx[i] = i;
 
@@ -266,10 +305,6 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
   free(idx);
 
   if ( !isSorted(add1, add2, num_links) ) fprintf(stderr, ">>>> sort_add failed!!!\n");
-  /*
-  for ( n = 0; n < num_links; n++ )
-    printf("out: %5d %5d %5d # dst_add src_add n\n", add1[n]+1, add2[n]+1, n+1);
-  */
 } /* sort_add */
 
 /*****************************************************************************/
