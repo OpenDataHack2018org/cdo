@@ -179,7 +179,7 @@ cdo_SOURCES += Arith.c         \
                cdo_int.h       \
                cdo_pthread.c   \
                cdo_vlist.c     \
-               template_parser.h   \	
+               template_parser.h   \
                template_parser.c   \
                results_template_parser.h   \
                results_template_parser.c   \
@@ -269,6 +269,7 @@ cdo_SOURCES += Arith.c         \
                realtime.c      \
                remap.h         \
                remaplib.c      \
+               remapsort.c     \
                specspace.c     \
                specspace.h     \
                statistic.c     \
