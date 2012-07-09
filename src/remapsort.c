@@ -657,7 +657,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
 
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) \
-        private(i,n,m,wgttmp,who_am_i)   \
+        private(i, n, m, wgttmp, who_am_i)   \
         shared(weights) num_threads(2)
 #endif
   for ( i=0; i < nsplit; i++ )
@@ -672,7 +672,8 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
       //	       who_am_i,parent,my_depth,omp_get_thread_num()+1,omp_get_num_threads());
 #endif
             
-      wgttmp = malloc(num_wts*nl[i]*sizeof(double*));        
+      wgttmp = (double *) malloc(num_wts*nl[i]*sizeof(double));
+       
       for ( m = 0; m < nl[i]; m++ )
 	for ( n = 0; n < num_wts; n++ )                      
 	  wgttmp[num_wts*m+n] = weights[num_wts*(add_srt[i]+m)+n];
@@ -694,7 +695,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
                                                               /* ********************** */
   merge_lists(nl,add1s[0],add2s[0],add1s[1],add2s[1], idx);   /* MERGE THE SEGMENTS     */
                                                               /* ********************** */
-  tmp = malloc(num_links*sizeof(int));
+  tmp = (int *) malloc(num_links*sizeof(int));
   
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i) num_threads(2)
@@ -718,9 +719,9 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
     add2[i] = tmp[i];
   
   free(tmp);
-  tmp=NULL;
+  tmp = NULL;
   
-  tmp2 = (double *) malloc( num_links*num_wts*sizeof(double) );
+  tmp2 = (double *) malloc(num_links*num_wts*sizeof(double) );
   
 #if defined (_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)
