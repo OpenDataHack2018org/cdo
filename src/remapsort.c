@@ -15,7 +15,7 @@
 static
 int isSorted(int *restrict array1, int *restrict array2, const long size)
 {
-  for (int idx = 1; idx < size; ++idx )
+  for ( long idx = 1; idx < size; ++idx )
     {
       if (  (array1[idx-1] >  array1[idx]) ||
 	   ((array1[idx-1] == array1[idx]) &&
@@ -300,7 +300,8 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
   free(wgt_tmp);
   free(idx);
 
-  if ( !isSorted(add1, add2, num_links) ) fprintf(stderr, ">>>> sort_add failed!!!\n");
+  if ( cdoVerbose ) 
+    if ( !isSorted(add1, add2, num_links) ) fprintf(stderr, ">>>> sort_add failed!!!\n");
 } /* sort_add */
 
 /*****************************************************************************/
@@ -769,21 +770,26 @@ void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict a
   */
   static int first_sort_iter_call = 1;
   static int par_depth = 1;
+  static int nthreads = 1;
 
   if ( first_sort_iter_call )
     {
-      first_sort_iter_call = 0; 
+      first_sort_iter_call = 0;
+      nthreads = parent;
       par_depth = (int)(log(parent)/log(2));
       parent = 1;
     }
 
-  if ( num_links > MERGE_SORT_LIMIT_SIZE )
+  // fprintf(stdout, "parent %d par_depth %d num_links %ld\n", parent, par_depth, num_links);
+
+  if ( num_links > MERGE_SORT_LIMIT_SIZE && parent <= (nthreads-1) )
     {
       sort_par(num_links, num_wts, add1, add2, weights, parent, par_depth);
       if ( cdoVerbose ) fprintf(stderr, "sort_iter: Finished iteration parent %i\n", parent);
     }
   else
     {
+      // printf("sort_add: parent %d, par_depth %d num_links %ld\n", parent, par_depth, num_links);
       sort_add(num_links, num_wts, add1, add2, weights);
     }
 }

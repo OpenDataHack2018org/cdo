@@ -3,6 +3,11 @@
 	* using CDI library version 1.5.6
 	* Version 1.5.6 released
 
+2012-07-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* sort_iter: call to sort_par() only for parent <= (nthreads-1)
+	* added remapsort.c
+
 2012-07-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplib::sort_add: use optimized version (speedup +20%)
