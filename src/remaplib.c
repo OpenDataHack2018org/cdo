@@ -113,6 +113,7 @@ static double south_thresh = -2.00;  /* threshold for coord transformation */
 double intlin(double x, double y1, double x1, double y2, double x2);
 
 extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
+extern int timer_remap_bil, timer_remap_nn;
 
 
 void remapGridFree(remapgrid_t *rg)
@@ -2554,6 +2555,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #endif
 #endif
 
+  if ( cdoTimer ) timer_start(timer_remap_bil);
+
   if ( ompNumThreads == 1 ) progressInit();
 
   nbins = rg->num_srch_bins;
@@ -2725,6 +2728,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #endif
 #endif
 
+  if ( cdoTimer ) timer_stop(timer_remap_bil);
 } /* remap_bilin */
 
 
@@ -3393,6 +3397,8 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
   double wgtstmp;          /* hold the link weight                        */
 
+  if ( cdoTimer ) timer_start(timer_remap_nn);
+
   if ( ompNumThreads == 1 ) progressInit();
 
   /* Compute mappings from grid1 to grid2 */
@@ -3482,6 +3488,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   free(sinlat);
   free(sinlon);
 
+  if ( cdoTimer ) timer_stop(timer_remap_nn);
 }  /* remap_distwgt1 */
 
 
