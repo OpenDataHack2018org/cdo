@@ -112,7 +112,7 @@ static double south_thresh = -2.00;  /* threshold for coord transformation */
 
 double intlin(double x, double y1, double x1, double y2, double x2);
 
-extern int timer_remap, timer_remap_con, timer_remap_con2, timer_remap_con3;
+extern int timer_remap, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
 extern int timer_remap_bil, timer_remap_nn;
 
 
@@ -4974,7 +4974,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   srch_corner_lat = NULL;
   srch_corner_lon = NULL;
 
-  if ( cdoTimer ) timer_start(timer_remap_con2);
+  if ( cdoTimer ) timer_start(timer_remap_con_l1);
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
@@ -5161,7 +5161,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #endif
     }
 
-  if ( cdoTimer ) timer_stop(timer_remap_con2);
+  if ( cdoTimer ) timer_stop(timer_remap_con_l1);
 
   /* Finished with all cells: deallocate search arrays */
 
@@ -5194,7 +5194,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   srch_corner_lat = NULL;
   srch_corner_lon = NULL;
 
-  if ( cdoTimer ) timer_start(timer_remap_con3);
+  if ( cdoTimer ) timer_start(timer_remap_con_l2);
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
@@ -5382,7 +5382,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 #endif
     }
 
-  if ( cdoTimer ) timer_stop(timer_remap_con3);
+  if ( cdoTimer ) timer_stop(timer_remap_con_l2);
 
   /* Finished with all cells: deallocate search arrays */
 

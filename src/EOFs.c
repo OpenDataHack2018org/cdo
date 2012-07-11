@@ -90,21 +90,22 @@ void *EOFs(void * argument)
 
   enum T_EIGEN_MODE eigen_mode = JACOBI;
 
-  if ( cdoTimer ) {
-    timer_init = timer_new("Timeof init");
-    timer_alloc= timer_new("Timeof alloc");
-    timer_read = timer_new("Timeof read");
-    timer_cov  = timer_new("Timeof cov");
-    timer_eig  = timer_new("Timeof eig");
-    timer_post = timer_new("Timeof post");
-    timer_write= timer_new("Timeof write");
-    timer_finish=timer_new("Timeof finish");
+  if ( cdoTimer )
+    {
+      timer_init = timer_new("Timeof init");
+      timer_alloc= timer_new("Timeof alloc");
+      timer_read = timer_new("Timeof read");
+      timer_cov  = timer_new("Timeof cov");
+      timer_eig  = timer_new("Timeof eig");
+      timer_post = timer_new("Timeof post");
+      timer_write= timer_new("Timeof write");
+      timer_finish=timer_new("Timeof finish");
 
-    timer_start(timer_init);
-  }
-
-
+      timer_start(timer_init);
+    }
+  
   cdoInitialize(argument);
+
   cdoOperatorAdd("eof",       EOF_,       0, NULL);
   cdoOperatorAdd("eoftime",   EOF_TIME,   0, NULL);
   cdoOperatorAdd("eofspatial",EOF_SPATIAL,0, NULL);

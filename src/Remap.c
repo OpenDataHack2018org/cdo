@@ -355,6 +355,10 @@ void get_remap_env(void)
 }
 
 
+int timer_remap, timer_remap_init, timer_remap_sort;
+int timer_remap_bil, timer_remap_nn, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
+
+
 void *Remap(void *argument)
 {
   int operatorID;
@@ -389,7 +393,18 @@ void *Remap(void *argument)
   char *envstr;
   char *remap_file = NULL;
   int lwrite_remap;
-  extern int timer_remap_sort;
+
+  if ( cdoTimer )
+    {
+      timer_remap        = timer_new("remap");
+      timer_remap_init   = timer_new("remap init");
+      timer_remap_sort   = timer_new("remap sort");
+      timer_remap_bil    = timer_new("remap bil");
+      timer_remap_nn     = timer_new("remap nn");
+      timer_remap_con    = timer_new("remap con");
+      timer_remap_con_l1 = timer_new("remap con loop1");
+      timer_remap_con_l2 = timer_new("remap con loop2");
+    }
 
   cdoInitialize(argument);
 
@@ -811,7 +826,10 @@ void *Remap(void *argument)
 		    cdoAbort("Bilinear/bicubic interpolation doesn't support unstructured source grids!");
 
 		  /* initialize grid information for both grids */
+		  if ( cdoTimer ) timer_start(timer_remap_init);
 		  remapGridInit(map_type, remap_extrapolate, gridID1, gridID2, &remaps[r].grid);
+		  if ( cdoTimer ) timer_stop(timer_remap_init);
+
 		  remaps[r].grid.store_link_fast = remap_store_link_fast;
 		}
 
@@ -836,7 +854,9 @@ void *Remap(void *argument)
 	      memset(remaps[r].grid.grid2_frac, 0, remaps[r].grid.grid2_size*sizeof(double));
 
 	      /* initialize some remapping variables */
+	      if ( cdoTimer ) timer_start(timer_remap_init);
 	      remapVarsInit(map_type, &remaps[r].grid, &remaps[r].vars);
+	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
 	      if      ( map_type == MAP_TYPE_CONSERV  ) remap_conserv(&remaps[r].grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BILINEAR ) remap_bilin(&remaps[r].grid, &remaps[r].vars);
