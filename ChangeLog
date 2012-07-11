@@ -5,6 +5,7 @@
 
 2012-07-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* gradsdes: added support for 64-bit SERVICE, EXTRA and IEG format
 	* import_binary: added support for 64-bit floats via extra OPTION keyword flt64 [request: Tim Bruecher]
 
 2012-07-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
