@@ -106,10 +106,20 @@ void compareGrids(int gridID1, int gridID2)
     }
 }
 
+static
+int cmpnames(const void *s1, const void *s2)
+{
+  char *name1 = (char *) s1;
+  char *name2 = (char *) s2;
+
+  return (strcmp(name1, name2));
+}
+
 
 void vlistCompare(int vlistID1, int vlistID2, int flag)
 {
   int varID, nvars;
+  int lchecknames = FALSE;
 
   if ( vlistNvars(vlistID1) != vlistNvars(vlistID2) )
     cdoAbort("Input streams have different number of variables per timestep!");
@@ -133,7 +143,9 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
 	  if ( strcmp(name1, name2) != 0 )
 	    {
 	      cdoWarning("Input streams have different parameters!");
-	      break;
+	      lchecknames = TRUE;
+	      flag -= CMP_NAME;
+	      //    break;
 	    }
 	}
 
@@ -160,6 +172,23 @@ void vlistCompare(int vlistID1, int vlistID2, int flag)
       gridID2 = vlistInqVarGrid(vlistID2, 0);
 
       compareGrids(gridID1, gridID2);
+    }
+
+  if ( lchecknames )
+    {
+      char names1[nvars][CDI_MAX_NAME], names2[nvars][CDI_MAX_NAME];
+      for ( varID = 0; varID < nvars; varID++ )
+	vlistInqVarName(vlistID1, varID, names1[varID]);
+      for ( varID = 0; varID < nvars; varID++ )
+	vlistInqVarName(vlistID2, varID, names2[varID]);
+
+      qsort(names1[0], nvars, CDI_MAX_NAME, cmpnames);
+
+      for ( varID = 0; varID < nvars; varID++ )
+	if ( strcmp(names1[varID], names2[varID]) != 0 ) break;
+
+      if ( varID == nvars )
+	cdoPrint("Use the CDO option -Q to sort the parameter names, if you have netCDF input files!");
     }
 }
 

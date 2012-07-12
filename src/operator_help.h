@@ -1401,7 +1401,7 @@ static char *EnsstatHelp[] = {
     "DESCRIPTION",
     "    This module computes statistical values over an ensemble of input files.",
     "    Depending on the chosen operator the minimum, maximum, sum, average, variance,",
-    "    standard deviation, a certain percentile over all input files or a skill score is written",
+    "    standard deviation or a certain percentile over all input files is written",
     "    to ofile.",
     "    All input files need to have the same structure with the same variables.",
     "    The date information of a timestep in ofile is the date of the first input file.",

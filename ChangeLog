@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.6
 	* Version 1.5.6 released
 
+2012-07-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* vlistCompare(): added check to compare sorted parameter names
+
 2012-07-11  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: added support for 64-bit SERVICE, EXTRA and IEG format
