@@ -9,7 +9,7 @@
 #include "magics_api.h"
 #endif
 
-#define DBG_MSG 1
+#define DBG 0 
 
 
 #if  defined  (HAVE_LIBMAGICS)
@@ -41,7 +41,7 @@ int magics_template_parser( xmlNode *a_node )
 
         if( value )
         {
-	    	if( DBG_MSG )
+	    	if( DBG )
 			printf( "Version %s \n", value ); 
 
 		if( atof( value ) > 3.0f ) 
@@ -62,7 +62,7 @@ int magics_template_parser( xmlNode *a_node )
         if ( cur_node->type == XML_ELEMENT_NODE )
         {
 		
-	    if( DBG_MSG )
+	    if( DBG )
             	printf( "Node Name: %s \n", cur_node->name );
 
 #if 0
@@ -82,7 +82,7 @@ int magics_template_parser( xmlNode *a_node )
 		param_name = xmlGetProp( cur_node,"parameter");
 		param_type = xmlGetProp(cur_node,"type");
 		param_value = xmlGetProp(cur_node,"value");
-#if 1
+#if 0
     		printf( "\t\tAttr name: %s Type: %s Value: %s \n", param_name,param_type,param_value);
 #endif
 		
@@ -103,15 +103,16 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 	int i, ret_flag = 0;
 	int split_str_count = 0;
 	char **split_str = NULL;
-	char sep_char = ',';
+	char *sep_char = ",";
+	char *search_char = ";";
 	double *float_param_list = NULL;
 	int *int_param_list = NULL;
 
 	if( param_name == NULL )
-	{
+	  {
 		ret_flag = 1;
 		return ret_flag;
-	}
+	  }
 
 	if( param_value == NULL )
 		ret_flag = 2;
@@ -120,82 +121,86 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 	
    	/*   MAGICS++ ENV RELATED PARAMETERS   */
 	if( !strcmp( param_type,"environvar" ) )
-	{
+	  {
 		if( !strcmp( param_name,"quiet_option" ) )
-		{
+		  {
 			if( !strcmp( param_value, "off" ) || !strcmp( param_value, "OFF" ) )
-			{
+			  {
 #if 0
 				printf( "Quiet Option %s \n", param_value ); 
 #endif
 				if( !unsetenv( "MAGPLUS_QUIET" ) )
-					printf( "Quiet Option %s is un-set successfully!!! \n", param_value ); 
+				  {
+				      if( DBG )
+					  fprintf( stderr, "Quiet Option %s is un-set successfully!!! \n", param_value ); 
+				  }
 				else
-					printf( "Quiet Option %s COULDN'T be UNSET!!!\n", param_value ); 
-			}
+					fprintf( stderr, "Quiet Option %s COULDN'T be UNSET!!!\n", param_value ); 
+			  }
 
 			if( !strcmp( param_value, "on" ) || !strcmp( param_value, "ON" ) )
-			{
+			  {
 #if 0
 				printf( "Quiet Option %s \n", param_value ); 
 #endif
 				if( !setenv( "MAGPLUS_QUIET","1",1 ) )
-				{
-					printf( "Quiet Option %s is set successfully!!! \n", param_value ); 
-				}
+				  {
+					if( DBG )
+					  fprintf( stderr, "Quiet Option %s is set successfully!!! \n", param_value ); 
+				  }
 				else
-					printf( "Quiet Option %s COULDN'T be SET!!!\n", param_value ); 
-			}
-		}
-	}
+					fprintf( stderr, "Quiet Option %s COULDN'T be SET!!!\n", param_value ); 
+			  }
+		  }
+	  }
 
     	/*   MAGICS++ FLOAT TYPE PARAMETERS   */
 	else if( !strcmp( param_type,"float" ) )
-	{
+	  {
 		mag_setr( param_name, atof( param_value ) );		
-	}
+	  }
 
     	/*   MAGICS++ FLOAT ARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"floatarray" ) )
-	{
+	  {
 
 #if 0
 	        fprintf(stderr, "param_name : %s\tparam_value: %s\n", param_name, param_value);
 #endif
 		if( strchr( param_value,';') )
-		    sep_char = ';';
+		    sep_char = ";";
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
-		{
+		  {
 			float_param_list = ( double *) malloc ( sizeof( double ) * split_str_count );
 			for( i = 0; i < split_str_count; i++ )
-			{
+			  {
 #if 0
 			        fprintf(stderr, "%d %d %s\n", i, split_str_count, split_str[i]);
 #endif
 				float_param_list[i] = atof( split_str[i] );			
-			}
+			  }
 			mag_set1r( param_name, float_param_list, split_str_count );		
 			free( float_param_list );
 			free( split_str );
-		}
+		  }
 
-	}
+	  }
 
     	/*   MAGICS++ INT TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"int" ) )
-	{
+	  {
 		mag_seti( param_name, atoi( param_value ) );		
-	}
+	  }
 
     	/*   MAGICS++ INT ARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"intarray" ) )
-	{
+	  {
 	        if( strchr( param_value,';') )
-		    sep_char = ';';
+		    sep_char = ";";
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
 		if( split_str_count )
-		{
+		  {
 			int_param_list = ( int *) malloc ( sizeof( int ) * split_str_count );
 			for( i = 0; i < split_str_count; i++ )
 			{
@@ -204,30 +209,40 @@ int SetMagicsParameterValue( char *param_name, char *param_type, char *param_val
 			mag_set1i( param_name, int_param_list, split_str_count );		
 			free( int_param_list );
 			free( split_str );
-		}
-	}
+		  }
+	  }
 
     	/*   MAGICS++ STRING TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"string" ) )
-	{
+	  {
 		mag_setc( param_name, param_value );		
-	}
+	  }
 
     	/*   MAGICS++ STRINGARRAY  TYPE    PARAMETERS   */
 	else if( !strcmp( param_type,"stringarray" ) )
-	{
-		if( strchr( param_value,';') )
-		    sep_char = ';';
+	  {
+		if( DBG )
+		  fprintf(stderr, "Input strarr is %s  Sep char is %s Search char is %s\n",param_value , sep_char, search_char );
+		if( strstr( param_value,";") )
+		{
+		  sep_char = ";";
+		}
+		
+		if( DBG )
+		  fprintf( stderr, "Input strarr is %s  Sep char is %s\n",param_value , sep_char );
 		split_str_count = StringSplitWithSeperator( param_value, sep_char, &split_str );
-		printf( "Input strarr is %s split str count is %d Sep char is %c\n",param_value, split_str_count, sep_char );
+		
+		if( DBG )
+		  fprintf( stderr, "Input strarr is %s split str count is %d Sep char is %s\n",param_value, split_str_count, sep_char );
+		
 		mag_set1c( param_name, (const char**)split_str, split_str_count );		
 		free( split_str );
-	}
+	  }
 	else 
-	{
+	  {
 		ret_flag = 3;
-		printf( "Unknown Parameter Type\n" );
-	}
+		fprintf(stderr, "Unknown Parameter Type\n" );
+	  }
 
 	return ret_flag;
 }

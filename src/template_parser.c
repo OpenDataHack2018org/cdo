@@ -84,6 +84,7 @@ int init_XMLtemplate_parser( char *Filename )
         }
         else
         {
+		  fprintf( stderr, "XML file %s being parsed \n", Filename );
                   root_node = xmlDocGetRootElement( param_doc );
         }
         return 0;

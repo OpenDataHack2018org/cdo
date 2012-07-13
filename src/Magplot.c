@@ -26,6 +26,8 @@ xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
 #endif
 
+#define DBG 0
+
 
 int CONTOUR, SHADED, GRFILL;
 
@@ -198,7 +200,8 @@ void quit_MAGICS( )
 {
 
   mag_close ();
-  fprintf( stdout,"Exiting From MAGICS\n" );
+  if( DBG )
+    fprintf( stderr,"Exiting From MAGICS\n" );
 
 }
 
@@ -316,7 +319,7 @@ void *Magplot(void *argument)
 
           }
 	  else
-	  	printf("operator not implemented\n");
+	  	fprintf(stderr,"operator not implemented\n");
 
 	  //	  break;
 

@@ -42,7 +42,7 @@ char *line_colours[] = {
 
 };
 
-char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv"};
+char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","xml"};
 
 int graph_param_count = sizeof(graph_params)/sizeof(char*);
 int num_colours = sizeof( line_colours )/sizeof( char* );
@@ -61,7 +61,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   char *lines[1];
   char *temp_str;
   char **split_str = NULL;
-  char sep_char;
+  char *sep_char = "=";
   char *date_time_str[nts];
   char vdatestr[32], vtimestr[32], legend_text_data[256];
   int num_sigma = 2;
@@ -70,7 +70,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   int file_begin = 0;
   int count ;
   int num_years = 0, num_months = 0, num_days = 0;
-  long tsID, fileID, i, j;
+  long tsID, fileID, i, j, k;
   double *date_time;
   double min_val = 1.0e+200, max_val = -1.0e+200;
   double suppress_min_val = 1.0e+200, suppress_max_val = -1.0e+200;
@@ -81,17 +81,17 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   
   if( DBG )
-  {
-    fprintf(stderr, "Num params %d\n", nparam);
+    {
+      fprintf(stderr, "Num params %d\n", nparam);
   
-    for( i = 0; i< nparam; i++ )
-      fprintf(stderr, "Param %s\n", params[i]);
-  }
+      for( i = 0; i< nparam; i++ )
+	fprintf(stderr, "Param %s\n", params[i]);
+    }
   
   for( i = 0; i < nparam; ++i )
     {
       split_str_count = 0;
-      sep_char = '=';
+      sep_char = "=";
       split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
       
       if( !strcmp( split_str[0],"obsv" ) ) 
@@ -140,7 +140,13 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	  if( DBG )
 	    fprintf(stderr,"SIGMA %d\n",num_sigma);
 	}   
-	free( split_str );
+      
+      free( split_str );
+      /*for( k = 0; k < split_str_count; ++k )
+	{
+	  free( split_str[k] );
+	}
+      */	  
     }
     
 
@@ -152,10 +158,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
 
   if( DBG )
-  {
-  	fprintf(stderr," %6d %6d\n", nfiles, nts );
-	fprintf(stderr,"\n");
-  }
+    {
+      fprintf(stderr," %6d %6d\n", nfiles, nts );
+      fprintf(stderr,"\n");
+    }
 
   for ( tsID = 0; tsID < nts; ++tsID )
     {
@@ -168,29 +174,31 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       std_dev_val[tsID] = 0.;
 
       if( DBG )
-      {
-      	fprintf(stderr,"%d: %s\n", tsID, date_time_str[tsID]);
-      	fprintf(stderr,"%6d %6d", vdate[tsID], vtime[tsID]);
-      }
+	{
+	  fprintf(stderr,"%d: %s\n", tsID, date_time_str[tsID]);
+	  fprintf(stderr,"%6d %6d", vdate[tsID], vtime[tsID]);
+	}
+	
       for ( fileID = 0; fileID < nfiles; ++fileID )
-      {
-        if( DBG )
-	  printf("%d\n", fileID );
-	if( datatab[fileID][tsID] < min_val )
-            min_val = datatab[ fileID ][ tsID ];	
-	if( datatab[fileID][tsID] > max_val )
-            max_val = datatab[ fileID ][ tsID ];	
-        mean_val[tsID] += datatab[fileID][tsID];
-        std_dev_val[tsID] = 0.;
-        spread_min[tsID] = 0.;
-        spread_max[tsID] = 0.;
+	{
+	  if( DBG )
+	    printf("%d\n", fileID );
+	  if( datatab[fileID][tsID] < min_val )
+	    min_val = datatab[ fileID ][ tsID ];	
+	  if( datatab[fileID][tsID] > max_val )
+	    max_val = datatab[ fileID ][ tsID ];	
+	  
+	  mean_val[tsID] += datatab[fileID][tsID];
+	  std_dev_val[tsID] = 0.;
+	  spread_min[tsID] = 0.;
+	  spread_max[tsID] = 0.;
 
-        if( DBG )
-        {
-	   fprintf(stderr," %6g", datatab[fileID][tsID]);
-           fprintf(stderr,"\n");
-        }
-      }
+	  if( DBG )
+	    {
+	      fprintf(stderr," %6g", datatab[fileID][tsID]);
+	      fprintf(stderr,"\n");
+	    }
+	}
     }
 
   for ( tsID = 0; tsID < nts; ++tsID )
@@ -236,12 +244,20 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
     //fprintf(stderr,"HERE 1\n");
     split_str_count = 0;
-    sep_char = '-';
+    sep_char = "-";
     split_str_count = StringSplitWithSeperator( date_time_str[ nts - 1 ], sep_char, &split_str );
     num_years = atoi( split_str[0] );
     num_months = atoi( split_str[1] );
     num_days   = atoi( split_str[2] );
-    free( split_str );
+    free( split_str  );
+    /*
+    for( k = 0; k < split_str_count; ++k )
+      {
+	free( split_str[k] );
+      }
+   */	
+    
+    
     split_str_count = StringSplitWithSeperator( date_time_str[0], sep_char, &split_str );
     num_years -= atoi( split_str[0] );
     //fprintf(stderr,"HERE 2\n");
@@ -257,6 +273,13 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	else if( num_months == 1 )
 	  num_days += ( 31- atoi( split_str[2] ) );
       }
+      
+    /*  
+    for( k = 0; k < split_str_count; ++k )
+      {
+	free( split_str[k] );
+      }
+    */  
     free( split_str );
     if( DBG )
       fprintf(stderr," %d %d\n", num_years, num_months );
@@ -323,6 +346,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
   /*  To redefine the y- axis scale based on user input in .xml file */
 
+  /*
   mag_enqr("graph_y_suppress_above",&suppress_max_val);
   mag_enqr("graph_y_suppress_below",&suppress_min_val);
   
@@ -331,11 +355,20 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   if( min_val < suppress_min_val )
       min_val = suppress_min_val;
+  
   if( max_val > suppress_max_val )
       max_val = suppress_max_val;
+  */
+ 
+  mag_setr("axis_min_value", min_val);
+  mag_setr("axis_max_value", max_val);
   
-  mag_setr("axis_min_value", y_min_val);
-  mag_setr("axis_max_value", y_max_val);
+  if( y_min_val < 1.0e+200 )
+    mag_setr("axis_min_value", y_min_val);
+  
+  if( y_max_val > -1.0e+200)
+    mag_setr("axis_max_value", y_max_val);
+  
   mag_setc("axis_title_text",varname);
   
   mag_setc("axis_title_orientation","vertical");
@@ -465,6 +498,7 @@ void *Maggraph(void *argument)
   const char *ofilename;
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
   char  *Filename = "combined.xml";
+  /* char  *Filename = "combined.xml"; */
   char **split_str = NULL;
   char sep_char = '=';
   char *temp_str;
@@ -481,19 +515,20 @@ void *Maggraph(void *argument)
   int *vdate = NULL, *vtime = NULL;
   int fileID, nfiles;
   int nts = 0, nts_alloc = 0;
-  int nparam, i, j;
+  int nparam = 0;
   int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
   double missval;
   double **datatab = NULL;
   double val;
+  int i;
   
   cdoInitialize(argument);
 
   nparam = operatorArgc();
   pnames = operatorArgv();
   
-  
-  VerifyGraphParameters(nparam,pnames);
+  if( nparam )
+    VerifyGraphParameters(nparam,pnames);
   
   nfiles = cdoStreamCnt() - 1;
   ofilename = cdoStreamName(nfiles);
@@ -511,7 +546,8 @@ void *Maggraph(void *argument)
       taxisID = vlistInqTaxis(vlistID);
 
       vlistInqVarUnits(vlistID, 0, units);
-      fprintf(stderr," %s\n", units );
+      if( DBG )
+	fprintf(stderr," %s\n", units );
       if ( fileID == 0 )
 	{
 	  vlistInqVarName(vlistID, 0, varname);
@@ -581,6 +617,13 @@ void *Maggraph(void *argument)
 #endif
 
   cdoPrint(" Creating PLOT for %s", varname);
+  if( DBG )
+    {
+      fprintf(stderr, "Num params %d\n", nparam);
+  
+      for( i = 0; i< nparam; i++ )
+	fprintf(stderr, "Param %s\n", pnames[i]);
+    }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
 #if  defined  (HAVE_LIBXML)
@@ -613,72 +656,95 @@ void *Maggraph(void *argument)
 void VerifyGraphParameters( int num_param, char **param_names )
 
 {
-  int i, j;
-  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
+  int i, j, k;
+  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, file_found = TRUE, split_str_count;
   char **split_str = NULL;
-  char sep_char = '=';
+  char *sep_char = "=";
   char *temp_str;
+  FILE *fp;
   
   
   
   for ( i = 0; i < num_param; ++i )
-      {
-	split_str_count = 0;
-	found = FALSE;
-	syntax = TRUE;
-	split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
-	if( split_str_count > 1 ) 
-	  {
-	    for ( j = 0; j < graph_param_count; ++j )
-	      {
-		if( !strcmp( split_str[0], graph_params[j] ) )
-		  {
-		      found = TRUE;
-		      if( !strcmp( split_str[0],"obsv" ) ||  !strcmp( split_str[0],"stat" ) )
-			{  
-			  if( IsNumeric( split_str[1] ) )
-			    syntax = FALSE;
-			  else 
-			    {			
-				temp_str = strdup( split_str[1] );    
-				StrToUpperCase( temp_str );
-				if( strcmp( temp_str,"TRUE" ) && strcmp( temp_str,"FALSE" ) )
-				  syntax = FALSE;			      
-			    }
-			}	 
+    {
+      split_str_count = 0;
+      found = FALSE;
+      syntax = TRUE;
+      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
+      if( split_str_count > 1 ) 
+	{
+	  for ( j = 0; j < graph_param_count; ++j )
+	    {
+	      if( !strcmp( split_str[0], graph_params[j] ) )
+		{
+		  found = TRUE;
+		  if( !strcmp( split_str[0],"obsv" ) ||  !strcmp( split_str[0],"stat" ) )
+		    {  
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;
+		      else 
+			{			
+			  temp_str = strdup( split_str[1] );    
+			  StrToUpperCase( temp_str );
+			  if( strcmp( temp_str,"TRUE" ) && strcmp( temp_str,"FALSE" ) )
+			    syntax = FALSE;			      
+			}
+		    }	 
 		      
-		      if( !strcmp( split_str[0],"ymin" ) ||  !strcmp( split_str[0],"ymax" ) || !strcmp( split_str[0],"sigma" )  )
+		  if( !strcmp( split_str[0],"ymin" ) ||  !strcmp( split_str[0],"ymax" ) || !strcmp( split_str[0],"sigma" )  )
+		    {
+		      if( !IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		    }
+		    
+		  if( !strcmp( split_str[0],"xml" ) )
+		    {
+		      if( ( fp = fopen( split_str[1],"r") ) == NULL )
 			{
-			  if( !IsNumeric( split_str[1] ) )
-			    syntax = FALSE;       
-			}	
-		  }
-	      }
-	  }
-	else
-	  {
-	    syntax = FALSE;
-	  }
+			  fprintf( stderr,"Input XML File not found in specified path '%s'\n", split_str[1] );
+			  halt_flag = TRUE;
+			}
+		      else
+			{
+#if  defined  (HAVE_LIBXML)
+			  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+			  fclose(fp);
+			  init_XMLtemplate_parser( split_str[1] );
+			  updatemagics_and_results_nodes( );
+#endif			
+			}
+		    }
+		}
+	    }
+	}
+      else
+	{
+	  syntax = FALSE;
+	}
 	
-	if( found == FALSE )
-	  {
-	    halt_flag = TRUE;
-	    fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
-	  } 
-	  
-	if( found == TRUE && syntax == FALSE )
-	  {
-	    halt_flag = TRUE;
-	    fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
-	  }
-	  
+      if( found == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
+	} 
+      if( found == TRUE && syntax == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
+	}
 	free( split_str );
-      }
-    
       
-      if( halt_flag == TRUE )
-      {
-	exit(0);
-      }
+	/*  
+	  for ( k = 0; k < split_str_count; ++k )
+	    {  
+	      free( split_str[k] );
+	    }
+	*/    
+    }
+      
+    if( halt_flag == TRUE )
+    {
+      exit(0);
+    }
     
 }

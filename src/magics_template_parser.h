@@ -11,6 +11,7 @@
 #include<libxml/tree.h>
 #endif
 
+
 #if  defined  (HAVE_LIBXML)
 int magics_template_parser( xmlNode * a_node );
 #endif

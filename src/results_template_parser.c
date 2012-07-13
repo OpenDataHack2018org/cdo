@@ -9,7 +9,7 @@
 
 #if  defined  (HAVE_LIBXML)
 
-extern int GetMagicsParameterInfo( const char *user_name, xmlChar *param_value );
+extern int GetMagicsParameterInfo(  char *user_name, xmlChar *param_value );
 
 extern xmlNode *results_node;
 
@@ -89,7 +89,7 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 			  param_value = xmlNodeGetContent( attr->children );
 
 			  /* if( !GetMagicsParameterInfo( attr->name, &magics_param_name, &param_type ) ) */
-			  if( !GetMagicsParameterInfo( attr->name, param_value ) )
+			  if( !GetMagicsParameterInfo( (char *) attr->name, param_value ) )
 			  {
 
 #if 0
@@ -113,7 +113,7 @@ int results_template_parser( xmlNode * a_node, const char *varname )
 	      }
 	      else
 	      {
-	   	  printf("Var Name not matching resetting Magics Params!\n");
+	   	  fprintf(stderr,"Var Name not matching resetting Magics Params!\n");
 		  /* Call the Reset functions of all the features to Reset the magics params to default */
 	      }
 	    }
