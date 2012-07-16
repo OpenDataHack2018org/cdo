@@ -120,6 +120,7 @@ void *Invertlev(void *argument)
   int lcopy = FALSE;
   int nlev, nlevel;
   int gridID, zaxisID, zaxistype, offset;
+  int linvert = FALSE;
 
   cdoInitialize(argument);
 
@@ -172,10 +173,13 @@ void *Invertlev(void *argument)
 	}
       else
 	{
+	  linvert = TRUE;
 	  vardata[varID]  = (double *) malloc(gridsize*nlev*sizeof(double));
 	  varnmiss[varID] = (int *) malloc(nlev*sizeof(int));
 	}
     }
+
+  if ( linvert == FALSE ) cdoWarning("No variables with invertable levels found!");
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
