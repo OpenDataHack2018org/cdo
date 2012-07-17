@@ -7,12 +7,13 @@
 
 #define  func_min      10
 #define  func_max      11
-#define  func_sum      12
-#define  func_avg      13
-#define  func_mean     14
-#define  func_var      15
-#define  func_std      16
-#define  func_pctl     17
+#define  func_range    12
+#define  func_sum      13
+#define  func_avg      14
+#define  func_mean     15
+#define  func_var      16
+#define  func_std      17
+#define  func_pctl     18
 
 #define  func_cor      20
 #define  func_covar    21

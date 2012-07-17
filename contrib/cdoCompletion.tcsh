@@ -696,6 +696,7 @@ zonmax \
 zonmean \
 zonmin \
 zonpctl \
+zonrange \
 zonstd \
 zonsum \
 zonvar \

@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.6
 	* Version 1.5.6 released
 
+2012-07-17  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Added operator zonrange
+
 2012-07-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* vlistCompare(): added check to compare sorted parameter names

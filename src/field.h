@@ -93,6 +93,7 @@ double fldroc(field_t field);
 void zonfun(field_t field1, field_t *field2, int function);
 void zonmin(field_t field1, field_t *field2);
 void zonmax(field_t field1, field_t *field2);
+void zonrange(field_t field1, field_t *field2);
 void zonsum(field_t field1, field_t *field2);
 void zonavg(field_t field1, field_t *field2);
 void zonmean(field_t field1, field_t *field2);

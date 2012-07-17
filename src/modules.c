@@ -457,7 +457,7 @@ void *Wct(void *argument);
 #define  YmonstatOperators      {"ymonmin", "ymonmax", "ymonsum", "ymonmean", "ymonavg", "ymonvar", "ymonstd"}
 #define  YseaspctlOperators     {"yseaspctl"}
 #define  YseasstatOperators     {"yseasmin", "yseasmax", "yseassum", "yseasmean", "yseasavg", "yseasvar", "yseasstd"}
-#define  ZonstatOperators       {"zonmin", "zonmax", "zonsum", "zonmean", "zonavg", "zonvar", "zonstd", "zonpctl"}
+#define  ZonstatOperators       {"zonmin", "zonmax", "zonrange", "zonsum", "zonmean", "zonavg", "zonvar", "zonstd", "zonpctl"}
 
 #define  EcaCfdOperators        {"eca_cfd"}
 #define  EcaCsuOperators        {"eca_csu"}
