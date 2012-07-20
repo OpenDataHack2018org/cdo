@@ -244,7 +244,7 @@ static
 void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 {
   if ( phelp == NULL )
-    printf("No help available for this operator!\n");
+    fprintf(stderr, "No help available for this operator!\n");
   else
     {
       int lprint;
@@ -255,7 +255,7 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 	    if ( *(phelp+1) )
 	      if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
 	  
-	  if ( lprint ) printf("%s\n", *phelp);
+	  if ( lprint ) fprintf(stdout, "%s\n", *phelp);
 
 	  phelp++;
 	}
@@ -1040,7 +1040,7 @@ int main(int argc, char *argv[])
 
   if ( Help )
     {
-      cdoPrintHelp(operatorHelp(operatorName)/*, operatorName*/);
+      cdoPrintHelp(operatorHelp(operatorName));
     }
   else if ( cdoExpMode == CDO_EXP_LOCAL )
     {

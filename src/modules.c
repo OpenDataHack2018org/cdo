@@ -975,6 +975,7 @@ void operatorPrintAll(void)
 {
   int i, j, nbyte, nop = 0;
   char *opernames[4096];
+  FILE *pout = stderr;
 
   for ( i = 0; i < NumModules; i++ )
     {
@@ -994,15 +995,15 @@ void operatorPrintAll(void)
 
   qsort(opernames, nop, sizeof(char *), cmpname);
 
-  nbyte = fprintf(stderr, "   ");
+  nbyte = fprintf(pout, "   ");
   for ( i = 0; i < nop; i++ )
     {
       if ( nbyte > 85 )
 	{
-	  fprintf(stdout, "\n");
-	  nbyte = fprintf(stderr, "   ");
+	  fprintf(pout, "\n");
+	  nbyte = fprintf(pout, "   ");
 	}
-      nbyte += fprintf(stderr, " %s", opernames[i]);
+      nbyte += fprintf(pout, " %s", opernames[i]);
     }
-  fprintf(stderr, "\n");
+  fprintf(pout, "\n");
 }
