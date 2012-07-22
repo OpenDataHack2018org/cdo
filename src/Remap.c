@@ -611,7 +611,7 @@ void *Remap(void *argument)
 
       envstr = getenv("NORMALIZE_OPT");
 
-      if ( envstr )
+      if ( envstr && *envstr )
         {
 	  if      ( memcmp(envstr, "frac", 4) == 0 )
 	    norm_opt = NORM_OPT_FRACAREA;
