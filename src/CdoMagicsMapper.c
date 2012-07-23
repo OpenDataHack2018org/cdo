@@ -164,7 +164,7 @@ int GetMagicsParameterInfo( const char *user_name, char *param_value )
        int ret_flag = 0;
 #if  defined  (HAVE_LIBMAGICS)
        CdoMagicsMapper target, *result;
-       target.cdo_name = user_name; 
+       target.cdo_name = (char *) user_name; 
 
        if( once )
        {

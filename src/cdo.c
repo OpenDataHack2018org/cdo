@@ -901,6 +901,9 @@ int main(int argc, char *argv[])
 #if defined (__GNUC__)
       fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
 #endif
+#if defined (__ICC)
+      fprintf(stderr, "ICC VERSION         = %d\n", __ICC);
+#endif
 #if defined (__STDC__)
       fprintf(stderr, "STD ANSI C          = %d\n", __STDC__);
 #endif

@@ -1,11 +1,17 @@
 CDO NEWS
 --------
-Version 1.5.6 (?? Jul 2012):
+Version 1.5.6 (23 July 2012):
 
+   New features:
+     * Runstat: OpenMP parallelization over parameter nts
+     * import_binary: added support for 64-bit floats via extra OPTION keyword flt64 
+   New operators:
+     * showunit: show unit of a parameter
    Changed operators:
      * Arith: added support for 3D masks
      * mastrfu: use grid coordinates from input file
    Fixed bugs:
+     * ymonsub: added support for time bounds
      * Wrong netCDF output for unscaled uint8, int8, int16, int32 variables [Bug #2516]
 
 Version 1.5.5 (15 May 2012):

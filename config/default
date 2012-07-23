@@ -17,6 +17,19 @@ fi
 set -x
 #
 case "${HOSTNAME}" in
+    icc)
+	${CONFPATH}configure --prefix=$HOME/local \
+                    --enable-maintainer-mode \
+                    --with-jasper=$HOME/local \
+                    --with-grib_api=$HOME/local/gribapi-1.9.16cgribex \
+                    --with-netcdf=$HOME/local \
+                    --with-hdf5=$HOME/local \
+                    --with-szlib=$HOME/local \
+                    --with-proj=/opt/local \
+                    --with-magics=/Users/m214003/local/magics-2.14.9 \
+	            CC=icc CFLAGS="-g  -D_REENTRANT -Wall -W -O3 -openmp -DHAVE_LIBXML -I/usr/include/libxml2 -I/opt/include" \
+                    LIBS="-L/usr/lib -lxml2 -L/opt/local/lib -lopenjpeg"
+	;;
 # i386-apple-darwin10
     bailung*)
 	${CONFPATH}configure --prefix=$HOME/local \
@@ -63,24 +76,27 @@ case "${HOSTNAME}" in
 	            CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
 #	            CC=suncc CFLAGS="-g -fast -xopenmp"
 	;;
-# x86_64-etch-x64-linux
-#    squall*)
-#        ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-x64 \
-#                    --enable-all-static \
-#                    --with-netcdf=/sw/etch-x64/netcdf-4.0.1 \
-#                    --with-hdf5=/sw/etch-x64/hdf5-1.8.2 \
-#                    --with-szlib=/sw/etch-x64/szip-2.1-static \
-#                    --with-proj=/sw/etch-x64/proj-4.7.0 \
-#                    CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
-#	;;
+# x86_64-squeeze-x64-linux
+    thunder*)
+        ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/squeeze-x64 \
+                    --with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
+                    --with-grib_api=/sw/squeeze-x64/grib_api-1.9.9-static \
+                    --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
+                    --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
+                    --with-szlib=/sw/squeeze-x64/szip-2.1 \
+                    --with-proj=/sw/squeeze-x64/proj-4.7.0 \
+                    CC=gcc CFLAGS='-g -Wall -O3 -fopenmp'
+	;;
 # x86_64-lenny-linux-gnu
     squall*)
         ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/lenny-x64 \
+                    --with-jasper=/sw/lenny-x64/jasper-1.900.1-static \
+                    --with-grib_api=/sw/lenny-x64/grib_api-1.9.9-static \
                     --with-netcdf=/sw/lenny-x64/netcdf-4.2-static \
                     --with-hdf5=/sw/lenny-x64/hdf5-1.8.8-static \
                     --with-szlib=/sw/lenny-x64/szip-2.1 \
                     --with-proj=/sw/lenny-x64/proj-4.7.0 \
-                    CC=gcc CFLAGS='-g -Wall -O2 -fopenmp'
+                    CC=gcc CFLAGS='-g -Wall -O3 -fopenmp'
 	;;
 # x86_64-archlinux
     thingol*)
@@ -105,19 +121,6 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local \
 	            CC=colorgcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2 -fopenmp"
 	;;
-# i686-linux
-    etch-ia32 | gata)
- 	${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/etch-ia32 \
-                    --enable-maintainer-mode \
-                    --with-jasper=/sw/etch-ia32/jasper-1.900.1 \
-                    --with-grib_api=$HOME/local/etch-ia32/grib_api-1.9.9 \
-	            --with-netcdf=/sw/etch-ia32/netcdf-4.1.1-gcc \
-	            --with-hdf5=/sw/etch-ia32/hdf5-1.8.4-threadsafe \
-                    --with-zlib=/sw/etch-ia32/zlib-1.2.3 \
-                    --with-szlib=$HOME/local/etch-ia32 \
-                    --with-proj=/sw/etch-ia32/proj-4.6.0 \
-	            CC=gcc CFLAGS="-g -Wall -W -Wfloat-equal -pedantic -O2"
-        ;;
 # standard workstations at MPI-M x86_64-lenny
     mpipc* )
 	${CONFPATH}configure \
