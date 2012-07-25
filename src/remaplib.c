@@ -5540,29 +5540,44 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
         grid2_centroid_lon[n] /= rg->grid2_area[n];
       }
 
-  /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 1.e-9 */
-  /*
-  num_links = rv->num_links;
-  for ( n = 0; n < num_links; n++ )
-    {
-      if ( fabs(rv->wts[3*n]) < 1.e-9 )
-	{
-	  int i;
-	  num_links--;
-	  for ( i = n; i < num_links; i++ )
-	    {
-	      rv->wts[3*i] = rv->wts[3*(i+1)];
-	      rv->wts[3*i] = rv->wts[3*(i+1)];
-	      rv->wts[3*i] = rv->wts[3*(i+1)];
+  /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 0 */
 
-	      rv->grid1_add[i] = rv->grid1_add[i+1];
-	      rv->grid2_add[i] = rv->grid2_add[i+1];
+  /* 
+  if ( 1 )
+    {
+      num_links = rv->num_links;
+
+      if ( cdoVerbose )
+	for ( n = 0; n < num_links; n++ )
+	  printf("wts1: %d %g\n", n, rv->wts[3*n]);
+
+      for ( n = 0; n < num_links; n++ )
+	{
+	  if ( rv->wts[3*n] < 0 )
+	    {
+	      int i, n2, nd;
+     
+	      for ( n2 = n+1; n2 < num_links; n2++ )
+		if ( rv->wts[3*n2] >= 0 ) break;
+
+	      nd = n2-n;
+	      num_links -= nd;
+	      for ( i = n; i < num_links; i++ )
+		{
+		  rv->wts[3*i]   = rv->wts[3*(i+nd)];
+		  rv->wts[3*i+1] = rv->wts[3*(i+nd)+1];
+		  rv->wts[3*i+2] = rv->wts[3*(i+nd)+2];
+		  
+		  rv->grid1_add[i] = rv->grid1_add[i+nd];
+		  rv->grid2_add[i] = rv->grid2_add[i+nd];
+		}
 	    }
 	}
+
+     if ( cdoVerbose ) cdoPrint("Removed number of links = %ld", rv->num_links - num_links);
+
+      rv->num_links = num_links;
     }
-  if ( cdoVerbose )
-    cdoPrint("Removed number of links = %ld", rv->num_links - num_links);
-  rv->num_links = num_links;
   */
 
   /* Include centroids in weights and normalize using destination area if requested */
