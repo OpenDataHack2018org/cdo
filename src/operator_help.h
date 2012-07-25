@@ -1692,7 +1692,7 @@ static char *GridboxstatHelp[] = {
     "    gridboxstd - Statistical values over grid boxes",
     "",
     "SYNOPSIS",
-    "    <operator>,nx,,ny  ifile ofile",
+    "    <operator>,nx,ny  ifile ofile",
     "",
     "DESCRIPTION",
     "    This module computes statistical values over surrounding grid boxes.",

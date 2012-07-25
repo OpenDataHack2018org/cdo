@@ -18,7 +18,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxmin
 @Title     = Gridbox minimum
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
@@ -27,7 +27,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxmax
 @Title     = Gridbox maximum
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
@@ -36,7 +36,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxsum
 @Title     = Gridbox sum
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
@@ -45,7 +45,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxmean
 @Title     = Gridbox mean
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
@@ -54,7 +54,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxavg
 @Title     = Gridbox average
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
@@ -63,7 +63,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxvar
 @Title     = Gridbox variance
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
@@ -72,7 +72,7 @@ All gridbox operators only works on quadrilateral curvilinear grids.
 
 @BeginOperator_gridboxstd
 @Title     = Gridbox standard deviation
-@Parameter = nx, ny
+@Parameter = nx ny
 
 @BeginDescription
 @EndDescription
