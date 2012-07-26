@@ -1,3 +1,15 @@
+2012-07-26 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Version 1.5.6.1 released
+	* arradd: disable SSE2 optimazation (bug in residual loop)
+	    The following statistical functions are affected:
+	        *mean, *avg, *sum, *var, *std
+	    if all of the following conditions are  complied:
+	       - x86_64 machine (tornado, squall, thunder, lizard)
+	       - dataset has no missing values
+	       - the horizontal grid size is > 1 and not multiple of 8
+            This bug was introduced in CDO version 1.5.5.
+
 2012-07-23  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.6

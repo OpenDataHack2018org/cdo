@@ -1,5 +1,16 @@
 CDO NEWS
 --------
+Version 1.5.6.1 (26 July 2012):
+
+   Fixed bugs:
+     Wrong results with the following statistical functions:
+       *mean, *avg, *sum, *var, *std
+     only if all of the following conditions are complied:
+       - x86_64 machine (tornado, squall, thunder, lizard)
+       - dataset has no missing values
+       - the horizontal grid size is > 1 and not multiple of 8
+     This bug was introduced in CDO version 1.5.5.
+
 Version 1.5.6 (23 July 2012):
 
    New features:

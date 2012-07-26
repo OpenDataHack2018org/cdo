@@ -38,13 +38,14 @@ void farfun(field_t *field1, field_t field2, int function)
   else cdoAbort("function %d not implemented!", function);
 }
 
-
+static
 void arradd(const long n, double * const restrict a, const double * const restrict b)
 {
   long i;
-
+ 
   // SSE2 version is 15% faster than the original loop (tested with gcc47)
-#ifdef __SSE2__
+#if 0
+  //#ifdef __SSE2__ /*__SSE2__*/ // bug in this code!!!
   long residual =  n % 8;
   long ofs = n - residual;
 
@@ -57,7 +58,7 @@ void arradd(const long n, double * const restrict a, const double * const restri
       av[i+2] = _mm_add_pd(av[i+2], bv[i+2]);
       av[i+3] = _mm_add_pd(av[i+3], bv[i+3]);
     }
-
+  printf("residual, ofs, n %ld %ld %ld\n", residual, ofs, n);
   for ( i = 0; i < residual; i++ )  a[ofs+i] += b[ofs+i];
 
 #else
