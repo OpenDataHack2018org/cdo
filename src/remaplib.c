@@ -1560,25 +1560,25 @@ long get_max_add(long num_links, long size, const int *restrict add)
 }
 
 static 
-int binary_search_int(const int *array, int len, int value)
+long binary_search_int(const int *array, long len, int value)
 {       
-  int low = 0, high = len - 1, midpoint = 0;
+  long low = 0, high = len - 1, midpoint = 0;
  
   while ( low <= high )
     {
       midpoint = low + (high - low)/2;      
  
       // check to see if value is equal to item in array
-      if ( value == array[midpoint] )
-	return midpoint;
-      else if ( value < array[midpoint] )
-	high = midpoint - 1;
+      if ( value == array[midpoint] ) return midpoint;
+
+      if ( value < array[midpoint] )
+	high = midpoint--;
       else
-	low = midpoint + 1;
+	low  = midpoint++;
     }
  
   // item was not found
-  return -1;
+  return -1L;
 }
 
 /*
@@ -1679,7 +1679,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
       {
       long min_add = 1, max_add = 0;
 
-      n = binary_search_int(dst_add, num_links, i);
+      n = binary_search_int(dst_add, num_links, (int)i);
 
       if ( n >= 0 && n < num_links )
 	{
