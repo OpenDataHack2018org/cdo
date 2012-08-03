@@ -44,6 +44,9 @@ class TestCdo < Test::Unit::TestCase
     values = Cdo.outputkey("level",:in => "-stdatm,0,10000")
     assert_equal(["0", "10000","0", "10000"],values)
   end
+  def test_CDO_version
+    assert("1.4.3.1" < Cdo.version,"Version to low: #{Cdo.version}")
+  end
   def test_args
     #Cdo.Debug = true
     #MyTempfile.setPersist(true)

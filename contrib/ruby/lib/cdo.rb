@@ -15,7 +15,10 @@ require 'pp'
 # ==============================================================================
 # CDO calling mechnism
 module Cdo
-  State = {
+
+  VERSION = "1.0.10"
+
+  Stats = {
     :debug       => false,
     :returnArray => false,
     :operators   => []
@@ -126,7 +129,11 @@ module Cdo
     State[:debug]
   end
   def Cdo.version
-    "1.0.10rc1"
+    cmd     = @@CDO + ' 2>&1'
+    help    = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
+    regexp  = %r{CDO version (\d.*), Copyright}
+    line    = help.find {|v| v =~ regexp}
+    version = regexp.match(line)[1]
   end
   def Cdo.setReturnArray(value=true)
     if value
