@@ -26,7 +26,7 @@ class TestCdo < Test::Unit::TestCase
       if ["thicknessOfLevels"].include?(op)
         assert(Cdo.respond_to?(op),"Operator '#{op}' not found")
       else
-        assert(Cdo.getOperators.include?(op))
+        assert(Cdo.getOperators.include?(op),"Operator '#{op}' not found")
       end
     }
   end
@@ -156,17 +156,19 @@ class TestCdo < Test::Unit::TestCase
     assert_equal(targetThicknesses, Cdo.thicknessOfLevels(:in => "-selname,T -stdatm,#{levels.join(',')}"))
   end
 
+  def test_showlevels
+    sourceLevels = %W{25 100 250 500 875 1400 2100 3000 4000 5000}
+    assert_equal(sourceLevels,
+                 Cdo.showlevel(:in => "-selname,T #{Cdo.stdatm(*sourceLevels,:options => '-f nc')}")[0].split)
+  end
+
+  def test_verticalLevels
+    targetThicknesses = [50.0,  100.0,  200.0,  300.0,  450.0,  600.0,  800.0, 1000.0, 1000.0, 1000.0]
+    sourceLevels = %W{25 100 250 500 875 1400 2100 3000 4000 5000}
+    thicknesses = Cdo.thicknessOfLevels(:in => "-selname,T #{Cdo.stdatm(*sourceLevels,:options => '-f nc')}")
+    assert_equal(targetThicknesses,thicknesses)
+  end
   if 'thingol' == `hostname`.chomp  then
-    def test_verticalLevels
-      iconpath = "/home/ram/src/git/icon/grids"
-      # check, if a given input files has vertival layers of a given thickness array
-      targetThicknesses = [50.0,  100.0,  200.0,  300.0,  450.0,  600.0,  800.0, 1000.0, 1000.0, 1000.0]
-      ifile = [iconpath,"ts_phc_annual-iconR2B04-L10_50-1000m.nc"].join('/')
-      assert_equal(["25 100 250 500 875 1400 2100 3000 4000 5000",
-                   "25 100 250 500 875 1400 2100 3000 4000 5000"],Cdo.showlevel(:in => ifile))
-      thicknesses = Cdo.thicknessOfLevels(:in => ifile)
-      assert_equal(targetThicknesses,thicknesses)
-    end
     def test_readCdf
       input = "-settunits,days  -setyear,2000 -for,1,4"
       cdfFile = Cdo.copy(:options =>"-f nc",:in=>input)

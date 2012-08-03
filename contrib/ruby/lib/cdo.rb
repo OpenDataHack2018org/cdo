@@ -18,11 +18,13 @@ module Cdo
 
   VERSION = "1.0.10"
 
-  Stats = {
+  State = {
     :debug       => false,
     :returnArray => false,
     :operators   => []
   }
+  State[:debug] = true unless ENV['DEBUG'].nil?
+
   @@CDO = ENV['CDO'].nil? ? 'cdo' : ENV['CDO']
 
   # Since cdo-1.5.4 undocumented operators are given with the -h option. For
@@ -52,6 +54,26 @@ module Cdo
   @@outputOperatorsPattern = /(diff|info|output|griddes|zaxisdes|show)/
 
   private
+  def Cdo.getOperators(force=false)
+    # Do NOT compute anything, if it is not required
+    return State[:operators] unless (State[:operators].empty? or force)
+    cmd       = @@CDO + ' 2>&1'
+    help      = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
+    if 5 >= help.size
+      warn "Operators could not get listed by running the CDO binary (#{@@CDO})"
+      pp help if Cdo.debug
+      exit
+    end
+    # in version 1.5.6 the output of '-h' has changed
+    State[:operators] = case 
+                        when Cdo.version < "1.5.6"
+                          (help[help.index("Operators:")+1].split + @@undocumentedOperators).uniq
+                        else
+                          help[(help.index("Operators:")+1)..help.index(help.find {|v| v =~ /CDO version/}) - 2].join(' ').split
+                        end
+
+    
+  end
   def Cdo.call(cmd)
     if (State[:debug])
       puts '# DEBUG ====================================================================='
@@ -62,7 +84,7 @@ module Cdo
       system(cmd + ' 1>/dev/null 2>&1 ')
     end
   end
-  def Cdo.run(cmd,ofile=nil,options='',returnArray=false)
+  def Cdo.run(cmd,ofile='',options='',returnArray=false)
     cmd = "#{@@CDO} -O #{options} #{cmd} "
     case ofile
     when $stdout
@@ -79,19 +101,6 @@ module Cdo
       return ofile
     end
   end
-  def Cdo.getOperators(force=false)
-    # Do NOT compute anything, if it is not required
-    return State[:operators] unless (State[:operators].empty? or force)
-
-    cmd       = @@CDO + ' 2>&1'
-    help      = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
-    if 5 >= help.size
-      warn "Operators could not get listed by running the CDO binary (#{@@CDO})"
-      pp help if Cdo.debug
-      exit
-    end
-    State[:operators] = (help[help.index("Operators:")+1].split + @@undocumentedOperators).uniq
-  end
   def Cdo.method_missing(sym, *args, &block)
     # args is expected to look like [opt1,...,optN,:in => iStream,:out => oStream] where
     # iStream could be another CDO call (timmax(selname(Temp,U,V,ifile.nc))
@@ -100,6 +109,7 @@ module Cdo
       operatorArgs = args.reject {|a| a.class == Hash}
       opts = operatorArgs.empty? ? '' : ',' + operatorArgs.join(',')
       io   = args.find {|a| a.class == Hash}
+      io   = {} if io.nil?
       args.delete_if   {|a| a.class == Hash}
       if @@outputOperatorsPattern.match(sym)
         run(" -#{sym.to_s}#{opts} #{io[:in]} ",$stdout)
