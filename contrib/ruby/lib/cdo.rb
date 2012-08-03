@@ -36,7 +36,7 @@ module Cdo
     ensrkhistspace ensrkhisttime eof3d eof3dspatial eof3dtime export_e5ml
     export_e5res fc2gp fc2sp fillmiss fisher fldcovar fldrms fourier fpressure
     gather gengrid geopotheight ggstat ggstats globavg gp2fc gradsdes
-    gridverify harmonic hourcount hpressure ifs2icon import_e5ml import_e5res
+    gridverify harmonic hourcount hpressure import_e5ml import_e5res
     import_obs imtocomplex infos infov interpolate intgrid intgridbil
     intgridtraj intpoint isosurface lmavg lmean lmmean lmstd log lsmean
     meandiff2test mergegrid mod moncount monlogs mrotuv mrotuvb mulcoslat ncode
