@@ -3020,10 +3020,11 @@ void get_restrict_add(remapgrid_t *rg, double plat, double plon, const int *rest
 
   *minadd = min_add;
   *maxadd = max_add;
-
+  /*
   if ( cdoVerbose )
     printf("plon %g plat %g min_add %ld max_add %ld diff %ld\n",
 	   plon, plat, min_add, max_add, max_add-min_add);
+  */
 }
 
 /*
