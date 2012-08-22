@@ -7,11 +7,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
-
-#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
-#endif
-
 
 #if  defined  (HAVE_LIBXML)
 
@@ -33,7 +29,6 @@ int CONTOUR, SHADED, GRFILL;
 
 static
 void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
-
 {
   static int once = 1;
   long i;
@@ -55,8 +50,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   sprintf(plotfilename, "%s_%s", plotfile, varname);
 
   titlename = strdup( plotfilename );
-
-#if  defined  (HAVE_LIBMAGICS)
 
   mag_setc ("output_name",      plotfilename);
 
@@ -176,27 +169,17 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   mag_setc("text_justification", "left");
   mag_text();
 
-#else
-
-  cdoAbort("MAGICS support not compiled in!");
-
-#endif
-
 }
 
 
-#if  defined  (HAVE_LIBMAGICS)
-
 static
 void init_MAGICS( )
-
 {
 	mag_open();
 }
 
 static
 void quit_MAGICS( )
-
 {
 
   mag_close ();
@@ -204,9 +187,6 @@ void quit_MAGICS( )
     fprintf( stderr,"Exiting From MAGICS\n" );
 
 }
-
-#endif
-
 
 void *Magplot(void *argument)
 {
@@ -232,6 +212,11 @@ void *Magplot(void *argument)
   char vdatestr[32], vtimestr[32];
 
   char  *Filename = "combined.xml";
+
+#if defined (HAVE_LIBMAGICS)
+#else
+  cdoAbort("MAGICS support not compiled in!");
+#endif
 
   cdoInitialize(argument);
 
@@ -296,9 +281,8 @@ void *Magplot(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 
-#if  defined  (HAVE_LIBMAGICS)
 	  init_MAGICS( );
-#endif
+
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
 
@@ -323,9 +307,7 @@ void *Magplot(void *argument)
 
 	  //	  break;
 
-#if  defined  (HAVE_LIBMAGICS)
 	  quit_MAGICS( );
-#endif
 	}
 
       break;

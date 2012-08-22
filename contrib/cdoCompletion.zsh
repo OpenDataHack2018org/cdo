@@ -54,7 +54,6 @@ complextorect -complextorect \
 consecsum -consecsum \
 consects -consects \
 const -const \
-contour -contour \
 copy -copy \
 cos -cos \
 covar0 -covar0 \
@@ -207,8 +206,6 @@ gp2spl -gp2spl \
 gradsdes -gradsdes \
 gradsdes1 -gradsdes1 \
 gradsdes2 -gradsdes2 \
-graph -graph \
-grfill -grfill \
 gridarea -gridarea \
 gridboxavg -gridboxavg \
 gridboxmax -gridboxmax \
@@ -502,7 +499,6 @@ setvar -setvar \
 setvrange -setvrange \
 setyear -setyear \
 setzaxis -setzaxis \
-shaded -shaded \
 shifttime -shifttime \
 showcode -showcode \
 showdate -showdate \
@@ -563,7 +559,6 @@ ssopar -ssopar \
 stdatm -stdatm \
 stimelogo -stimelogo \
 strbre -strbre \
-stream -stream \
 strgal -strgal \
 strwin -strwin \
 studentt -studentt \
@@ -616,7 +611,6 @@ varquot2test -varquot2test \
 varrms -varrms \
 vct -vct \
 vct2 -vct2 \
-vector -vector \
 vertavg -vertavg \
 vertmax -vertmax \
 vertmean -vertmean \

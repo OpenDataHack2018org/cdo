@@ -371,6 +371,7 @@ AC_ARG_WITH([magics],
 AC_SUBST([MAGICS_ROOT])
 AC_SUBST([MAGICS_INCLUDE])
 AC_SUBST([MAGICS_LIBS])
+AM_CONDITIONAL([ENABLE_MAGICS],[test ! x$with_magics = 'x'])
 #  ----------------------------------------------------------------------
 #  How to build CDI into CDO? 
 INTERNAL_CDI_DIR=libcdi
