@@ -52,7 +52,7 @@ host_triplet = @host@
 @MAINTAINER_MODE_TRUE@am__append_1 = `ls cdoCompletion.*`
 subdir = contrib
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/config/mkinstalldirs COPYING
+	$(top_srcdir)/config/mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \

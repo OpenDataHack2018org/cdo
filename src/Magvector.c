@@ -8,10 +8,7 @@
 #include "grid.h"
 #include "pstream.h"
 
-#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
-#endif
-
 
 #if  defined  (HAVE_LIBXML)
 
@@ -62,9 +59,6 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
                dlat /= (nlat-1);
         }
 
-
-#if  defined  (HAVE_LIBMAGICS)
-        
         magics_template_parser( magics_node );
 
         /* results_template_parser(results_node, varname ); */
@@ -101,15 +95,8 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
                 printf( " %g \n", thin_fac );
 		mag_wind();
 	}
-#else
-        cdoAbort("MAGICS support not compiled in!");
-
-#endif
-
 }
 
-
-#if  defined  (HAVE_LIBMAGICS)
 
 static
 void init_MAGICS( )
@@ -127,9 +114,6 @@ void quit_MAGICS( )
   fprintf( stdout,"Exiting From MAGICS\n" );
 
 }
-
-#endif
-
 
 void *Magvector(void *argument)
 
@@ -212,9 +196,7 @@ void *Magvector(void *argument)
 #endif
 
 
-#if  defined  (HAVE_LIBMAGICS)
   init_MAGICS( );
-#endif
 
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
@@ -284,9 +266,7 @@ void *Magvector(void *argument)
   quit_XMLtemplate_parser( );
 #endif
 
-#if  defined  (HAVE_LIBMAGICS)
   quit_MAGICS( );
-#endif
 
   cdoFinish();
 

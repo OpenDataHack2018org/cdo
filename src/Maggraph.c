@@ -8,9 +8,7 @@
 #include "grid.h"
 #include "pstream.h"
 
-#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
-#endif
 
 
 #if  defined  (HAVE_LIBXML)
@@ -291,8 +289,6 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	3. Set the attributes for the magics data and plot
   */  
    
-#if  defined  (HAVE_LIBMAGICS)
-
   magics_template_parser( magics_node );
 
   mag_setc("output_name", plotfile);
@@ -465,11 +461,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   free( spread_min );
   free( spread_max );
 
-#endif
-
 }
-
-#if  defined  (HAVE_LIBMAGICS)
 
 static
 void init_MAGICS( )
@@ -488,8 +480,6 @@ void quit_MAGICS( )
     fprintf( stdout,"Exiting From MAGICS\n" );
 
 }
-
-#endif
 
 #define NINC_ALLOC 1024
 
@@ -612,9 +602,7 @@ void *Maggraph(void *argument)
 #endif
 
 
-#if  defined  (HAVE_LIBMAGICS)
   init_MAGICS( );
-#endif
 
   cdoPrint(" Creating PLOT for %s", varname);
   if( DBG )
@@ -630,9 +618,7 @@ void *Maggraph(void *argument)
   quit_XMLtemplate_parser( );
 #endif
 
-#if  defined  (HAVE_LIBMAGICS)
   quit_MAGICS( );
-#endif
 
   if ( vlistID0 != -1 ) vlistDestroy(vlistID0);
 

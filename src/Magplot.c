@@ -213,11 +213,6 @@ void *Magplot(void *argument)
 
   char  *Filename = "combined.xml";
 
-#if defined (HAVE_LIBMAGICS)
-#else
-  cdoAbort("MAGICS support not compiled in!");
-#endif
-
   cdoInitialize(argument);
 
   CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
