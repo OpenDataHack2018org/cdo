@@ -649,6 +649,7 @@ ENABLE_CDI_LIB_FALSE
 ENABLE_CDI_LIB_TRUE
 ENABLE_MAGICS_FALSE
 ENABLE_MAGICS_TRUE
+XML2_LIBS
 MAGICS_INCLUDE
 MAGICS_ROOT
 MAGICS_LIBS
@@ -825,6 +826,7 @@ enable_extra
 enable_ieg
 with_proj
 with_magics
+with_libxml2
 enable_cdi_lib
 enable_all_static
 '
@@ -1512,6 +1514,9 @@ Optional Packages:
                           projections.
   --with-magics=<yes|no|directory>
                           location of magics library (lib and include subdirs)
+  --with-libxml2=<yes|no|directory>
+                          location of libxml2 library (lib and include
+                          subdirs)
 
 Some influential environment variables:
   CC          C compiler command
@@ -18457,7 +18462,7 @@ $as_echo "suppressed" >&6; }
 fi
 
 #  ----------------------------------------------------------------------
-#  Compile application with MAGICS
+#  Compile application with MAGICS (xml required)
 MAGICS_ROOT=''
 MAGICS_INCLUDE=''
 MAGICS_LIBS=''
@@ -18641,7 +18646,197 @@ fi
 
 
 
- if test ! x$with_magics = 'x'; then
+
+# Check whether --with-libxml2 was given.
+if test "${with_libxml2+set}" = set; then :
+  withval=$with_libxml2; case "$with_libxml2" in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libxml2 library" >&5
+$as_echo_n "checking for libxml2 library... " >&6; }
+                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; } ;; #(
+  yes) :
+    CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
+                            for ac_header in libxml/parser.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml/parser.h" "ac_cv_header_libxml_parser_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_parser_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXML_PARSER_H 1
+_ACEOF
+
+fi
+
+done
+
+                            for ac_header in libxml/tree.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml/tree.h" "ac_cv_header_libxml_tree_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml_tree_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXML_TREE_H 1
+_ACEOF
+
+fi
+
+done
+
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing xmlInitMemory" >&5
+$as_echo_n "checking for library containing xmlInitMemory... " >&6; }
+if ${ac_cv_search_xmlInitMemory+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xmlInitMemory ();
+int
+main ()
+{
+return xmlInitMemory ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' xml2; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_xmlInitMemory=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_xmlInitMemory+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_xmlInitMemory+:} false; then :
+
+else
+  ac_cv_search_xmlInitMemory=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_xmlInitMemory" >&5
+$as_echo "$ac_cv_search_xmlInitMemory" >&6; }
+ac_res=$ac_cv_search_xmlInitMemory
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBXML2 1" >>confdefs.h
+
+else
+  as_fn_error $? "Could not link to libxml2 library" "$LINENO" 5
+fi
+
+                            XML2_LIBS=" -lxml2"
+ ;; #(
+  *) :
+    if test -d "$with_libxml2"; then :
+  XML2_ROOT=$with_libxml2
+                                 LDFLAGS="-L$XML2_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$XML2_ROOT/include/libxml2 $CPPFLAGS"
+                                 for ac_header in libxml2_api.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libxml2_api.h" "ac_cv_header_libxml2_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_libxml2_api_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXML2_API_H 1
+_ACEOF
+
+fi
+
+done
+
+                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing xmlInitMemory" >&5
+$as_echo_n "checking for library containing xmlInitMemory... " >&6; }
+if ${ac_cv_search_xmlInitMemory+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xmlInitMemory ();
+int
+main ()
+{
+return xmlInitMemory ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' xml2; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_xmlInitMemory=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_xmlInitMemory+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_xmlInitMemory+:} false; then :
+
+else
+  ac_cv_search_xmlInitMemory=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_xmlInitMemory" >&5
+$as_echo "$ac_cv_search_xmlInitMemory" >&6; }
+ac_res=$ac_cv_search_xmlInitMemory
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBXML2 1" >>confdefs.h
+
+else
+  as_fn_error $? "Could not link to libxml2 library" "$LINENO" 5
+fi
+
+                                 XML2_LIBS=" -L$XML2_ROOT/lib -lxml2"
+                                 XML2_INCLUDE=" -I$XML2_ROOT/include/libxml2"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: $with_libxml2 is not a directory! XML2 suppressed" >&5
+$as_echo "$as_me: $with_libxml2 is not a directory! XML2 suppressed" >&6;}
+fi ;; #(
+  *) :
+     ;;
+esac
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XML2 library" >&5
+$as_echo_n "checking for XML2 library... " >&6; }
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; }
+fi
+
+ if test ! x$with_magics = 'x' -a ! x$with_libxml2 = 'x'; then
   ENABLE_MAGICS_TRUE=
   ENABLE_MAGICS_FALSE='#'
 else

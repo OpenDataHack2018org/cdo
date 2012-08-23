@@ -9,8 +9,6 @@
 #include "pstream.h"
 #include "magics_api.h"
 
-#if  defined  (HAVE_LIBXML)
-
 #include<libxml/parser.h>
 #include<libxml/tree.h>
 #include "template_parser.h"
@@ -19,8 +17,6 @@
 
 xmlDoc *param_doc = NULL;
 xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
-
-#endif
 
 #define DBG 0
 
@@ -257,11 +253,9 @@ void *Magplot(void *argument)
 					
   tsID = 0;
 
-#if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
-#endif
 
 
 
@@ -316,9 +310,7 @@ void *Magplot(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
-#if  defined  (HAVE_LIBXML)
   quit_XMLtemplate_parser( );
-#endif
 
   cdoFinish();
 

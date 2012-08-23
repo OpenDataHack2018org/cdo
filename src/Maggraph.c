@@ -11,8 +11,6 @@
 #include "magics_api.h"
 
 
-#if  defined  (HAVE_LIBXML)
-
 #include<libxml/parser.h>
 #include<libxml/tree.h>
 #include "template_parser.h"
@@ -22,8 +20,6 @@
 
 
 extern xmlNode  *magics_node;
-
-#endif
 
 #define DBG 0
 
@@ -595,11 +591,9 @@ void *Maggraph(void *argument)
       streamClose(streamID);
     }
   
-#if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
-#endif
 
 
   init_MAGICS( );
@@ -614,9 +608,7 @@ void *Maggraph(void *argument)
     }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
-#if  defined  (HAVE_LIBXML)
   quit_XMLtemplate_parser( );
-#endif
 
   quit_MAGICS( );
 
@@ -692,12 +684,10 @@ void VerifyGraphParameters( int num_param, char **param_names )
 			}
 		      else
 			{
-#if  defined  (HAVE_LIBXML)
 			  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
 			  fclose(fp);
 			  init_XMLtemplate_parser( split_str[1] );
 			  updatemagics_and_results_nodes( );
-#endif			
 			}
 		    }
 		}

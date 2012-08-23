@@ -339,7 +339,7 @@ AC_ARG_WITH([proj],
             [AC_MSG_CHECKING([for the PROJ library])
              AC_MSG_RESULT([suppressed])])
 #  ----------------------------------------------------------------------
-#  Compile application with MAGICS
+#  Compile application with MAGICS (xml required)
 MAGICS_ROOT=''
 MAGICS_INCLUDE=''
 MAGICS_LIBS=''
@@ -371,7 +371,34 @@ AC_ARG_WITH([magics],
 AC_SUBST([MAGICS_ROOT])
 AC_SUBST([MAGICS_INCLUDE])
 AC_SUBST([MAGICS_LIBS])
-AM_CONDITIONAL([ENABLE_MAGICS],[test ! x$with_magics = 'x'])
+AC_ARG_WITH([libxml2],
+            [AS_HELP_STRING([--with-libxml2=<yes|no|directory>],[location of libxml2 library (lib and include subdirs)])],
+            [AS_CASE(["$with_libxml2"],
+                     [no],[AC_MSG_CHECKING([for libxml2 library])
+                           AC_MSG_RESULT([suppressed])],
+                     [yes],[CPPFLAGS="$CPPFLAGS -I/usr/include/libxml2"
+                            AC_CHECK_HEADERS([libxml/parser.h])
+                            AC_CHECK_HEADERS([libxml/tree.h])
+                            AC_SEARCH_LIBS([xmlInitMemory],
+                                           [xml2],
+                                           [AC_DEFINE([HAVE_LIBXML2],[1],[Define to 1 for XML2 support])],
+                                           [AC_MSG_ERROR([Could not link to libxml2 library])])
+                            AC_SUBST([XML2_LIBS],[" -lxml2"])],
+                     [*],[AS_IF([test -d "$with_libxml2"],
+                                [XML2_ROOT=$with_libxml2
+                                 LDFLAGS="-L$XML2_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$XML2_ROOT/include/libxml2 $CPPFLAGS"
+                                 AC_CHECK_HEADERS([libxml2_api.h])
+                                 AC_SEARCH_LIBS([xmlInitMemory],
+                                                [xml2],
+                                                [AC_DEFINE([HAVE_LIBXML2],[1],[Define to 1 for XML2 support])],
+                                                [AC_MSG_ERROR([Could not link to libxml2 library])])
+                                 XML2_LIBS=" -L$XML2_ROOT/lib -lxml2"
+                                 XML2_INCLUDE=" -I$XML2_ROOT/include/libxml2"],
+                                [AC_MSG_NOTICE([$with_libxml2 is not a directory! XML2 suppressed])])])],
+            [AC_MSG_CHECKING([for XML2 library])
+             AC_MSG_RESULT([suppressed])])
+AM_CONDITIONAL([ENABLE_MAGICS],[test ! x$with_magics = 'x' -a ! x$with_libxml2 = 'x'])
 #  ----------------------------------------------------------------------
 #  How to build CDI into CDO? 
 INTERNAL_CDI_DIR=libcdi

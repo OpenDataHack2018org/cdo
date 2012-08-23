@@ -10,8 +10,6 @@
 
 #include "magics_api.h"
 
-#if  defined  (HAVE_LIBXML)
-
 #include<libxml/parser.h>
 #include<libxml/tree.h>
 #include "template_parser.h"
@@ -21,8 +19,6 @@
 //xmlDoc *param_doc = NULL;
 //extern xmlNode *root_node, *magics_node, *results_node;
 extern xmlNode  *magics_node;
-
-#endif
 
 int VECTOR, STREAM;
 
@@ -189,11 +185,9 @@ void *Magvector(void *argument)
 					
   tsID = 0;
 
-#if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
-#endif
 
 
   init_MAGICS( );
@@ -262,9 +256,7 @@ void *Magvector(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
-#if  defined  (HAVE_LIBXML)
   quit_XMLtemplate_parser( );
-#endif
 
   quit_MAGICS( );
 

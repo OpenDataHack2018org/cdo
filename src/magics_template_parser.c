@@ -10,8 +10,6 @@
 #define DBG 0 
 
 
-#if  defined  (HAVE_LIBXML)
-
 extern xmlNode *magics_node;
 
 
@@ -92,7 +90,6 @@ int magics_template_parser( xmlNode *a_node )
     }
     return 0;
 }
-#endif
 
 int SetMagicsParameterValue( char *param_name, char *param_type, char *param_value )
 
