@@ -47,6 +47,7 @@ void *Arith(void *argument)
   int varID, levelID;
   int varID2, levelID2;
   int offset;
+  int lfill1, lfill2;
   int ntsteps1, ntsteps2;
   int vlistIDx1, vlistIDx2, vlistID1, vlistID2, vlistID3;
   int taxisIDx1, taxisID1, taxisID2, taxisID3;
@@ -94,7 +95,18 @@ void *Arith(void *argument)
   if ( ntsteps1 == 0 ) ntsteps1 = 1;
   if ( ntsteps2 == 0 ) ntsteps2 = 1;
 
-  if ( vlistNvars(vlistID1) != 1 && vlistNvars(vlistID2) == 1 )
+  if ( vlistNvars(vlistID1) == 1 && vlistNvars(vlistID2) == 1 )
+    {
+      lfill2 = vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1;
+      lfill1 = vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1;
+    }
+  else
+    {
+      lfill2 = vlistNvars(vlistID1) != 1 && vlistNvars(vlistID2) == 1;
+      lfill1 = vlistNvars(vlistID1) == 1 && vlistNvars(vlistID2) != 1;
+    }
+
+  if ( lfill2 )
     {
       nlevels2 = vlistCompareX(vlistID1, vlistID2, CMP_DIM);
 
@@ -109,7 +121,7 @@ void *Arith(void *argument)
 	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", cdoStreamName(1));
 	}
     }
-  else if ( vlistNvars(vlistID1) == 1 && vlistNvars(vlistID2) != 1 )
+  else if ( lfill1 )
     {
       nlevels2 = vlistCompareX(vlistID2, vlistID1, CMP_DIM);
 

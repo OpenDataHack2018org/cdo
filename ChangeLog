@@ -1,3 +1,8 @@
+2012-08-23 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Arith: bug fix for NVARS1 == NVARS2
+                    This bug was introduced in CDO version 1.5.6.
+
 2012-07-26 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Version 1.5.6.1 released
