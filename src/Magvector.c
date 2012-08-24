@@ -8,12 +8,7 @@
 #include "grid.h"
 #include "pstream.h"
 
-#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
-#endif
-
-
-#if  defined  (HAVE_LIBXML)
 
 #include<libxml/parser.h>
 #include<libxml/tree.h>
@@ -24,8 +19,6 @@
 //xmlDoc *param_doc = NULL;
 //extern xmlNode *root_node, *magics_node, *results_node;
 extern xmlNode  *magics_node;
-
-#endif
 
 int VECTOR, STREAM;
 
@@ -62,9 +55,6 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
                dlat /= (nlat-1);
         }
 
-
-#if  defined  (HAVE_LIBMAGICS)
-        
         magics_template_parser( magics_node );
 
         /* results_template_parser(results_node, varname ); */
@@ -101,15 +91,8 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
                 printf( " %g \n", thin_fac );
 		mag_wind();
 	}
-#else
-        cdoAbort("MAGICS support not compiled in!");
-
-#endif
-
 }
 
-
-#if  defined  (HAVE_LIBMAGICS)
 
 static
 void init_MAGICS( )
@@ -127,9 +110,6 @@ void quit_MAGICS( )
   fprintf( stdout,"Exiting From MAGICS\n" );
 
 }
-
-#endif
-
 
 void *Magvector(void *argument)
 
@@ -205,16 +185,12 @@ void *Magvector(void *argument)
 					
   tsID = 0;
 
-#if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
-#endif
 
 
-#if  defined  (HAVE_LIBMAGICS)
   init_MAGICS( );
-#endif
 
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
@@ -280,13 +256,9 @@ void *Magvector(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
-#if  defined  (HAVE_LIBXML)
   quit_XMLtemplate_parser( );
-#endif
 
-#if  defined  (HAVE_LIBMAGICS)
   quit_MAGICS( );
-#endif
 
   cdoFinish();
 

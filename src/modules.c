@@ -15,6 +15,10 @@
   GNU General Public License for more details.
 */
 
+#if defined (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -106,9 +110,6 @@ void *Invert(void *argument);
 void *Invertlev(void *argument);
 void *Isosurface(void *argument);
 void *Log(void *argument);
-void *Magplot(void *argument);
-void *Magvector(void *argument);
-void *Maggraph(void *argument);
 void *Maskbox(void *argument);
 void *Mastrfu(void *argument);
 void *Math(void *argument);
@@ -255,6 +256,12 @@ void *Hurr(void *argument);
 void *Hi(void *argument);
 void *Wct(void *argument);
 
+#if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
+void *Magplot(void *argument);
+void *Magvector(void *argument);
+void *Maggraph(void *argument);
+#endif
+
 
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
@@ -330,9 +337,6 @@ void *Wct(void *argument);
 #define  IsosurfaceOperators    {"isosurface"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", \
                                  "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
-#define  MagplotOperators       {"contour", "shaded", "grfill"}
-#define  MagvectorOperators     {"vector", "stream"}
-#define  MaggraphOperators      {"graph"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
 #define  MaskregionOperators    {"maskregion"}
 #define  MastrfuOperators       {"mastrfu"}
@@ -505,6 +509,11 @@ void *Wct(void *argument);
 #define  HiOperators            {"hi"}
 #define  WctOperators           {"wct"}
 
+#if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
+#define  MagplotOperators       {"contour", "shaded", "grfill"}
+#define  MagvectorOperators     {"vector", "stream"}
+#define  MaggraphOperators      {"graph"}
+#endif
 
 static modules_t Modules[] =
 {
@@ -582,9 +591,6 @@ static modules_t Modules[] =
   { Invertlev,      InvertlevHelp,     InvertlevOperators,     CDI_REAL,  1,  1 },
   { Isosurface,     NULL,              IsosurfaceOperators,    CDI_REAL,  1,  1 },
   { Log,            NULL,              LogOperators,           CDI_REAL,  1,  0 },
-  { Magplot,        NULL,              MagplotOperators,       CDI_REAL,  1,  1 },
-  { Magvector,      NULL,              MagvectorOperators,     CDI_REAL,  1,  1 },
-  { Maggraph,       NULL,              MaggraphOperators,      CDI_REAL, -1,  1 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       CDI_REAL,  1,  1 },
   { Maskbox,        MaskregionHelp,    MaskregionOperators,    CDI_REAL,  1,  1 },
   { Mastrfu,        MastrfuHelp,       MastrfuOperators,       CDI_REAL,  1,  1 },
@@ -743,6 +749,11 @@ static modules_t Modules[] =
   { Hurr,           HurrHelp,          HurrOperators,          CDI_REAL,  1,  1 },
   /*  { Hi,             NULL,              HiOperators,        CDI_REAL,  3,  1 }, */
   { Wct,            WctHelp,           WctOperators,           CDI_REAL,  2,  1 },
+#if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)
+  { Magplot,        NULL,              MagplotOperators,       CDI_REAL,  1,  1 },
+  { Magvector,      NULL,              MagvectorOperators,     CDI_REAL,  1,  1 },
+  { Maggraph,       NULL,              MaggraphOperators,      CDI_REAL, -1,  1 },
+#endif
 };							       
 							       
 static int NumModules = sizeof(Modules) / sizeof(Modules[0]);

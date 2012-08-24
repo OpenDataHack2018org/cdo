@@ -73,9 +73,6 @@ cdo_SOURCES += Arith.c         \
                Invertlev.c     \
                Isosurface.c    \
                Log.c           \
-               Magplot.c       \
-               Magvector.c     \
-               Maggraph.c      \
                Maskbox.c       \
                Mastrfu.c       \
                Math.c          \
@@ -179,16 +176,6 @@ cdo_SOURCES += Arith.c         \
                cdo_int.h       \
                cdo_pthread.c   \
                cdo_vlist.c     \
-               template_parser.h   \
-               template_parser.c   \
-               results_template_parser.h   \
-               results_template_parser.c   \
-               magics_template_parser.h   \
-               magics_template_parser.c   \
-               StringUtilities.h   \
-               StringUtilities.c   \
-               CdoMagicsMapper.h   \
-               CdoMagicsMapper.c   \
                color.c         \
                color.h         \
                commandline.c   \
@@ -283,6 +270,22 @@ cdo_SOURCES += Arith.c         \
                vinterp.c       \
                vinterp.h       \
                zaxis.c
+
+if ENABLE_MAGICS
+cdo_SOURCES += Magplot.c       \
+               Magvector.c     \
+               Maggraph.c      \
+               template_parser.h   \
+               template_parser.c   \
+               results_template_parser.h   \
+               results_template_parser.c   \
+               magics_template_parser.h   \
+               magics_template_parser.c   \
+               StringUtilities.h   \
+               StringUtilities.c   \
+               CdoMagicsMapper.h   \
+               CdoMagicsMapper.c
+endif
 
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD    = $(top_builddir)/libcdi/src/libcdi.la

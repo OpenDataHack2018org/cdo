@@ -108,8 +108,8 @@ case "${HOSTNAME}" in
                       --with-proj=$HOME/local/libs4cdo-0.0.9 \
                   --with-grib_api=$HOME/local/libs4cdo-0.0.9 \
                     --with-jasper=$HOME/local/libs4cdo-0.0.9 \
-                      --with-pic \
-	            CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -DWITH_DATA" LIBS=-lopenjpeg
+                      --with-pic --with-magics=/home/ram/local --with-libxml2 \
+	            CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -DWITH_DATA" LIBS='-lopenjpeg -lpng'
 	;;
 # i686-suse-linux
     linux | laptop)

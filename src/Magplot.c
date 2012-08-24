@@ -7,13 +7,7 @@
 #include "cdo_int.h"
 #include "grid.h"
 #include "pstream.h"
-
-#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
-#endif
-
-
-#if  defined  (HAVE_LIBXML)
 
 #include<libxml/parser.h>
 #include<libxml/tree.h>
@@ -24,8 +18,6 @@
 xmlDoc *param_doc = NULL;
 xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
-#endif
-
 #define DBG 0
 
 
@@ -33,7 +25,6 @@ int CONTOUR, SHADED, GRFILL;
 
 static
 void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
-
 {
   static int once = 1;
   long i;
@@ -55,8 +46,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   sprintf(plotfilename, "%s_%s", plotfile, varname);
 
   titlename = strdup( plotfilename );
-
-#if  defined  (HAVE_LIBMAGICS)
 
   mag_setc ("output_name",      plotfilename);
 
@@ -176,27 +165,17 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   mag_setc("text_justification", "left");
   mag_text();
 
-#else
-
-  cdoAbort("MAGICS support not compiled in!");
-
-#endif
-
 }
 
 
-#if  defined  (HAVE_LIBMAGICS)
-
 static
 void init_MAGICS( )
-
 {
 	mag_open();
 }
 
 static
 void quit_MAGICS( )
-
 {
 
   mag_close ();
@@ -204,9 +183,6 @@ void quit_MAGICS( )
     fprintf( stderr,"Exiting From MAGICS\n" );
 
 }
-
-#endif
-
 
 void *Magplot(void *argument)
 {
@@ -277,11 +253,9 @@ void *Magplot(void *argument)
 					
   tsID = 0;
 
-#if  defined  (HAVE_LIBXML)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
-#endif
 
 
 
@@ -296,9 +270,8 @@ void *Magplot(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 
-#if  defined  (HAVE_LIBMAGICS)
 	  init_MAGICS( );
-#endif
+
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
 
@@ -323,9 +296,7 @@ void *Magplot(void *argument)
 
 	  //	  break;
 
-#if  defined  (HAVE_LIBMAGICS)
 	  quit_MAGICS( );
-#endif
 	}
 
       break;
@@ -339,9 +310,7 @@ void *Magplot(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
-#if  defined  (HAVE_LIBXML)
   quit_XMLtemplate_parser( );
-#endif
 
   cdoFinish();
 
