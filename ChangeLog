@@ -1,3 +1,8 @@
+2012-08-27 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.5.7 (merged from cdi-pio)
+	* Version 1.5.7 released
+
 2012-08-23 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Arith: bug fix for NVARS1 == NVARS2
