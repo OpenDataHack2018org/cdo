@@ -383,8 +383,7 @@ void *Selvar(void *argument)
 	}
     }
   
-  if ( npar == 0 )
-    cdoAbort("No variables selected!");
+  if ( npar == 0 ) cdoAbort("No variables selected!");
 
   vlistID2 = vlistCreate();
   vlistCopyFlag(vlistID2, vlistID1);

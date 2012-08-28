@@ -1368,7 +1368,7 @@ void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
 
   pstreamptr_dest = pstream_to_pointer(pstreamIDdest);
   pstreamptr_src  = pstream_to_pointer(pstreamIDsrc);
-
+  /*
 #if  defined  (HAVE_LIBPTHREAD)
   if ( pstreamptr_dest->ispipe || pstreamptr_src->ispipe )
     {
@@ -1376,6 +1376,7 @@ void pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc)
     }
   else
 #endif
+  */
     {
       streamCopyRecord(pstreamptr_dest->fileID, pstreamptr_src->fileID);
     }

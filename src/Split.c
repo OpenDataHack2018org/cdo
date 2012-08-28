@@ -126,6 +126,7 @@ void *Split(void *argument)
 		    }
 		}
 	    }
+
 	  vlistID2 = vlistCreate();
 	  vlistCopyFlag(vlistID2, vlistID1);
 	  vlistIDs[index] = vlistID2;

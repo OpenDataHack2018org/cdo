@@ -37,9 +37,9 @@
 #define  streamWriteRecord        pstreamWriteRecord
 #define  streamWriteRecordF       pstreamWriteRecordF
 #define  streamReadRecord         pstreamReadRecord
-/*
-#define  streamCopyRecord    pstreamCopyRecord
-*/
+
+#define  streamCopyRecord         pstreamCopyRecord
+
 
 int     pstreamOpenWrite(const char *streamname, int filetype);
 int     pstreamOpenRead(const char *streamname);
