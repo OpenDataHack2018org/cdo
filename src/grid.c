@@ -614,6 +614,24 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	gridInqXunits(gridID1, xunits);
 	gridInqYunits(gridID1, yunits);
 
+	if ( gridtype == GRID_LAEA )
+	  {
+	    int lvalid_xunits = FALSE;
+	    int lvalid_yunits = FALSE;
+	    int len;
+	    len = (int) strlen(xunits);
+	    if ( len == 1 && memcmp(xunits, "m",  1) == 0 ) lvalid_xunits = TRUE;
+	    if ( len == 1 && memcmp(xunits, "km", 2) == 0 ) lvalid_xunits = TRUE;
+	    len = (int) strlen(yunits);
+	    if ( len == 1 && memcmp(yunits, "m",  1) == 0 ) lvalid_yunits = TRUE;
+	    if ( len == 1 && memcmp(yunits, "km", 2) == 0 ) lvalid_yunits = TRUE;
+
+	    if ( lvalid_xunits == FALSE )
+	      cdoWarning("Possibly wrong result! Invalid units for the x-coordinate: \"%s\" (expected \"m\" or \"km\")", xunits);
+	    if ( lvalid_yunits == FALSE )
+	      cdoWarning("Possibly wrong result! Invalid units for the y-coordinate: \"%s\" (expected \"m\" or \"km\")", yunits);
+	  }
+
 	if ( memcmp(xunits, "km", 2) == 0 ) xscale = 1000;
 	if ( memcmp(yunits, "km", 2) == 0 ) yscale = 1000;
 
@@ -676,9 +694,13 @@ int gridToCurvilinear(int gridID1, int lbounds)
 		    /* correct_sinxvals(nx, ny, xvals2D); */
 		  }
 		else if ( gridtype == GRID_LAEA )
-		  laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		  {
+		    laea_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		  }
 		else if ( gridtype == GRID_LCC2 )
-		  lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		  {
+		    lcc2_to_geo(gridID1, gridsize, xvals2D, yvals2D);
+		  }
 	      }
 	  }
 
