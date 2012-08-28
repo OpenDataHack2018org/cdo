@@ -627,9 +627,9 @@ int gridToCurvilinear(int gridID1, int lbounds)
 	    if ( len == 1 && memcmp(yunits, "km", 2) == 0 ) lvalid_yunits = TRUE;
 
 	    if ( lvalid_xunits == FALSE )
-	      cdoWarning("Possibly wrong result! Invalid units for the x-coordinate: \"%s\" (expected \"m\" or \"km\")", xunits);
+	      cdoWarning("Possibly wrong result! Invalid x-coordinate units: \"%s\" (expected \"m\" or \"km\")", xunits);
 	    if ( lvalid_yunits == FALSE )
-	      cdoWarning("Possibly wrong result! Invalid units for the y-coordinate: \"%s\" (expected \"m\" or \"km\")", yunits);
+	      cdoWarning("Possibly wrong result! Invalid y-coordinate units: \"%s\" (expected \"m\" or \"km\")", yunits);
 	  }
 
 	if ( memcmp(xunits, "km", 2) == 0 ) xscale = 1000;
