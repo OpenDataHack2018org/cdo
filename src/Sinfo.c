@@ -78,13 +78,13 @@ void *Sinfo(void *argument)
 
       if ( operatorID == SINFON )
 	fprintf(stdout,
-		"%6d : Institut Source   Ttype    Layers Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
+		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
       else if ( operatorID == SINFOC )
 	fprintf(stdout,
-		"%6d : Institut Source   Ttype    Layers Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
+		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
       else
 	fprintf(stdout,
-		"%6d : Institut Source   Ttype    Layers Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
+		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
 
       nvars = vlistNvars(vlistID);
 
@@ -171,11 +171,11 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, "\n");
 	}
 
-      fprintf(stdout, "   Horizontal grids :\n");
+      fprintf(stdout, "   Grid coordinates :\n");
       printGridInfo(vlistID);
 
       nzaxis = vlistNzaxis(vlistID);
-      fprintf(stdout, "   Vertical grids :\n");
+      fprintf(stdout, "   Vertical coordinates :\n");
       for ( index = 0; index < nzaxis; index++)
 	{
 	  zaxisID   = vlistZaxis(vlistID, index);
@@ -231,9 +231,9 @@ void *Sinfo(void *argument)
       if ( ntsteps != 0 )
 	{
 	  if ( ntsteps == CDI_UNDEFID )
-	    fprintf(stdout, "   Time axis :  unlimited steps\n");
+	    fprintf(stdout, "   Time coordinate :  unlimited steps\n");
 	  else
-	    fprintf(stdout, "   Time axis :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
+	    fprintf(stdout, "   Time coordinate :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
 
 	  if ( taxisID != CDI_UNDEFID )
 	    {

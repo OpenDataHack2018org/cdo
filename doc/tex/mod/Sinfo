@@ -26,13 +26,13 @@ information:
 @BeginItemize
 @Item = institute and source
 @Item = timestep type
-@Item = number of layers and z-axis number
+@Item = number of levels and z-axis number
 @Item = horizontal grid size and number
 @Item = data type
 @Item = parameter identifier
 @EndItemize
-Section 2 and 3 gives a short overview of all horizontal and vertical grids.
-And the last section contains short information of the time axis.
+Section 2 and 3 gives a short overview of all grid and vertical coordinates.
+And the last section contains short information of the time coordinate.
 @EndDescription
 @EndOperator
 
@@ -54,18 +54,18 @@ To print short information of a dataset use:
 @EndVerbatim
 This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
 @BeginListing
-    -1 : Institut Source  Ttype    Layers Num Gridsize Num Dtype : Name 
+    -1 : Institut Source  Ttype    Levels Num Gridsize Num Dtype : Name 
      1 : MPIMET   ECHAM5  constant      1   1     2048   1  F32  : GEOSP 
      2 : MPIMET   ECHAM5  instant       4   2     2048   1  F32  : T     
      3 : MPIMET   ECHAM5  instant       1   1     2048   1  F32  : TSURF 
-   Horizontal grids :
+   Grid coordinates :
      1 : gaussian     > size      : dim = 2048  nlon = 64  nlat = 32
                         longitude : first = 0  last = 354.375  inc = 5.625
                         latitude  : first = 85.7605871  last = -85.7605871
-   Vertical grids :
+   Vertical coordinates :
      1 : surface                 : 0
      2 : pressure             Pa : 92500 85000 50000 20000
-   Time axis :  12 steps
+   Time coordinate :  12 steps
 YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss
 1987-01-31 12:00:00 1987-02-28 12:00:00 1987-03-31 12:00:00 1987-04-30 12:00:00
 1987-05-31 12:00:00 1987-06-30 12:00:00 1987-07-31 12:00:00 1987-08-31 12:00:00
