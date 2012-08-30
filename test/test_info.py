@@ -27,5 +27,10 @@ class TestInfo(unittest.TestCase):
         levels = cdo.showlevel(input = "-stdatm,10,20,30")[0].split(' ')
         self.assertEqual([10,20,30],map(float,levels))
 
+        code = cdo.showcode(input="-topo,r1x1")
+        self.assertEqual("-1",code[0])
+        code = cdo.showcode(input="-setcode,111 -topo,r1x1")
+        self.assertEqual("111",code[0])
+
 if __name__ == '__main__':
     unittest.main()
