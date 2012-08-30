@@ -1,3 +1,7 @@
+2012-08-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Sinfo: changed output format
+
 2012-08-28 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.7 (merged from cdi-pio)

@@ -78,13 +78,13 @@ void *Sinfo(void *argument)
 
       if ( operatorID == SINFON )
 	fprintf(stdout,
-		"%6d : Institut Source   Name        Ttype   Dtype  Gridsize Num  Levels Num\n",  -(indf+1));
+		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Name\n",  -(indf+1));
       else if ( operatorID == SINFOC )
 	fprintf(stdout,
-		"%6d : Institut Source  Table Code   Ttype   Dtype  Gridsize Num  Levels Num\n",  -(indf+1));
+		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
       else
 	fprintf(stdout,
-		"%6d : Institut Source   Param       Ttype   Dtype  Gridsize Num  Levels Num\n",  -(indf+1));
+		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Param\n",  -(indf+1));
 
       nvars = vlistNvars(vlistID);
 
@@ -96,43 +96,43 @@ void *Sinfo(void *argument)
 	  gridID  = vlistInqVarGrid(vlistID, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
 
-	  cdiParamToString(param, paramstr, sizeof(paramstr));
-
-	  if ( operatorID == SINFON ) vlistInqVarName(vlistID, varID, varname);
-
-	  gridsize = gridInqSize(gridID);
-
 	  fprintf(stdout, "%6d : ", varID + 1);
 
+	  /* institute info */
 	  instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
 	  if ( instptr )
 	    fprintf(stdout, "%-8s ", instptr);
 	  else
 	    fprintf(stdout, "unknown  ");
 
+	  /* source info */
 	  modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
 	  if ( modelptr )
 	    fprintf(stdout, "%-8s ", modelptr);
 	  else
 	    fprintf(stdout, "unknown  ");
 
-	  if ( operatorID == SINFON )
-	    fprintf(stdout, "%-11s ", varname);
-	  else if ( operatorID == SINFOC )
-	    fprintf(stdout, "%4d %4d   ", tabnum, code);
-	  else
-	    fprintf(stdout, "%-11s ", paramstr);
-
+	  /* tsteptype */
 	  tsteptype = vlistInqVarTsteptype(vlistID, varID);
-	  if      ( tsteptype == TSTEP_CONSTANT ) fprintf(stdout, "%-8s", "constant");
-	  else if ( tsteptype == TSTEP_INSTANT  ) fprintf(stdout, "%-8s", "instant");
-	  else if ( tsteptype == TSTEP_MIN      ) fprintf(stdout, "%-8s", "min");
-	  else if ( tsteptype == TSTEP_MAX      ) fprintf(stdout, "%-8s", "max");
-	  else if ( tsteptype == TSTEP_ACCUM    ) fprintf(stdout, "%-8s", "accum");
-	  else                                    fprintf(stdout, "%-8s", "unknown");
+	  if      ( tsteptype == TSTEP_CONSTANT ) fprintf(stdout, "%-8s ", "constant");
+	  else if ( tsteptype == TSTEP_INSTANT  ) fprintf(stdout, "%-8s ", "instant");
+	  else if ( tsteptype == TSTEP_MIN      ) fprintf(stdout, "%-8s ", "min");
+	  else if ( tsteptype == TSTEP_MAX      ) fprintf(stdout, "%-8s ", "max");
+	  else if ( tsteptype == TSTEP_ACCUM    ) fprintf(stdout, "%-8s ", "accum");
+	  else                                    fprintf(stdout, "%-8s ", "unknown");
 
+	  /* layer info */
+	  levelsize = zaxisInqSize(zaxisID);
+	  fprintf(stdout, "%6d ", levelsize);
+	  fprintf(stdout, "%3d ", vlistZaxisIndex(vlistID, zaxisID) + 1);
+
+	  /* grid info */
+	  gridsize = gridInqSize(gridID);
+	  fprintf(stdout, "%9d ", gridsize);
+	  fprintf(stdout, "%3d ", vlistGridIndex(vlistID, gridID) + 1);
+
+	  /* datatype */
 	  datatype = vlistInqVarDatatype(vlistID, varID);
-
 	  if      ( datatype == DATATYPE_PACK   ) strcpy(pstr, "P0");
 	  else if ( datatype > 0 && datatype <= 32  ) sprintf(pstr, "P%d", datatype);
 	  else if ( datatype == DATATYPE_CPX32  ) strcpy(pstr, "C32");
@@ -150,17 +150,23 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, " %-3s", pstr);
 
 	  if ( vlistInqVarCompType(vlistID, varID) == COMPRESS_NONE )
-	    fprintf(stdout, " ");
+	    fprintf(stdout, "  ");
 	  else
-	    fprintf(stdout, "z");
+	    fprintf(stdout, "z ");
 
-	  fprintf(stdout, "%9d", gridsize);
+	  /* parameter info */
+	  fprintf(stdout, ": ");
 
-	  fprintf(stdout, " %3d ", vlistGridIndex(vlistID, gridID) + 1);
+	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  levelsize = zaxisInqSize(zaxisID);
-	  fprintf(stdout, " %6d", levelsize);
-	  fprintf(stdout, " %3d", vlistZaxisIndex(vlistID, zaxisID) + 1);
+	  if ( operatorID == SINFON ) vlistInqVarName(vlistID, varID, varname);
+
+	  if ( operatorID == SINFON )
+	    fprintf(stdout, "%-11s ", varname);
+	  else if ( operatorID == SINFOC )
+	    fprintf(stdout, "%4d %4d   ", tabnum, code);
+	  else
+	    fprintf(stdout, "%-11s ", paramstr);
 
 	  fprintf(stdout, "\n");
 	}
