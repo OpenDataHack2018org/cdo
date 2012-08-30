@@ -12,8 +12,8 @@ class TestInfo(unittest.TestCase):
         self.assertEqual("File format: GRIB",info[0])
 
         sinfov = cdo.sinfov(input = "-stdatm,0,10,20,50,100,500,1000",options = "-f nc")
-        self.assertEqual("P",sinfov[2].split(' ')[6])
-        self.assertEqual("T",sinfov[3].split(' ')[6])
+        self.assertEqual("P",sinfov[2].split(' ')[-1])
+        self.assertEqual("T",sinfov[3].split(' ')[-1])
 
         infov  = cdo.infov( input = "-stdatm,0,10,20,50,100,500,1000",options = "-f nc")
         self.assertEqual("1013.2", infov[1].split(' ')[-1])
