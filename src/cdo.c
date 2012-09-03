@@ -74,6 +74,7 @@ int cdoDefaultTimeType   = CDI_UNDEFID;
 int cdoDefaultByteorder  = CDI_UNDEFID;
 int cdoDefaultTableID    = CDI_UNDEFID;
 
+int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
 int cdoDiag              = FALSE;
@@ -91,6 +92,7 @@ int cdoCompress          = FALSE;
 int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
+
 
 char cdo_file_suffix[32];
 
@@ -204,6 +206,7 @@ void usage(void)
   fprintf(stderr, "\n");
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
+  fprintf(stderr, "    -L             Lock IO");
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
@@ -717,7 +720,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhMOQRrsSTuVvXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhLMOQRrsSTuVvXZ")) != -1 )
     {
       switch (c)
 	{
@@ -768,6 +771,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'i':
 	  defineInstitution(cdoOptarg);
+	  break;
+	case 'L':	
+	  cdoLockIO = TRUE;
 	  break;
 	case 'l':
 	  defineZaxis(cdoOptarg);

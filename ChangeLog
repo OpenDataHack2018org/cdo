@@ -1,3 +1,8 @@
+2012-09-03 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added CDO option -L to lock all I/O calls. This option is neccessary if external I/O libraries like 
+	  netCDF4 (HDF5) were installed without thread-safe support.
+
 2012-08-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Sinfo: changed output format
