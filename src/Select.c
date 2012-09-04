@@ -444,6 +444,8 @@ void *Select(void *argument)
   int recID, varID, levelID;
   int iparam;
   int nsel;
+  int vdate, vtime;
+  int copytimestep;
   char paramstr[32];
   char varname[CDI_MAX_NAME];
   char stdname[CDI_MAX_NAME];
@@ -458,15 +460,22 @@ void *Select(void *argument)
   double *array = NULL;
   int taxisID1, taxisID2 = CDI_UNDEFID;
   int ntsteps;
+  int ltimsel = FALSE;
   int npar;
   int *vars = NULL;
   pml_t *pml;
+  PML_DEF_INT(year,    1024, "Year");
+  PML_DEF_INT(month,     32, "Month");
+  PML_DEF_INT(day,       32, "Day");
   PML_DEF_INT(code,    1024, "Code number");
   PML_DEF_INT(ltype,   1024, "Level type");
   PML_DEF_FLT(level,   1024, "Level");
   PML_DEF_WORD(name,   1024, "Variable name");
   PML_DEF_WORD(param,  1024, "Parameter");
 
+  PML_INIT_INT(year);
+  PML_INIT_INT(month);
+  PML_INIT_INT(day);
   PML_INIT_INT(code);
   PML_INIT_INT(ltype);
   PML_INIT_FLT(level);
@@ -493,6 +502,9 @@ void *Select(void *argument)
   */
   pml = pmlNew("SELECT");
 
+  PML_ADD_INT(pml, year);
+  PML_ADD_INT(pml, month);
+  PML_ADD_INT(pml, day);
   PML_ADD_INT(pml, code);
   PML_ADD_INT(pml, ltype);
   PML_ADD_FLT(pml, level);
@@ -503,6 +515,9 @@ void *Select(void *argument)
 
   if ( cdoVerbose ) pmlPrint(pml);
 
+  PML_NUM(pml, year);
+  PML_NUM(pml, month);
+  PML_NUM(pml, day);
   PML_NUM(pml, code);
   PML_NUM(pml, ltype);
   PML_NUM(pml, level);
@@ -615,6 +630,8 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
+	  if ( npar_year || npar_month || npar_day ) ltimsel = TRUE;
+
 	  npar = 0;
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
@@ -628,8 +645,24 @@ void *Select(void *argument)
 	    }
 
 	  if ( npar == 0 )
-	    cdoAbort("No variable selected!");
+	    {
+	      if ( ltimsel == TRUE )
+		{
+		  for ( varID = 0; varID < nvars; varID++ )
+		    {
+		      vars[varID] = TRUE;
+		      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+		      nlevs   = zaxisInqSize(zaxisID);
 
+		      for ( levID = 0; levID < nlevs; levID++ )
+			vlistDefFlag(vlistID1, varID, levID, TRUE);
+		    }
+		}
+	      else
+		{
+		  cdoAbort("No variable selected!");
+		}
+	    }
 
 	  // if ( cdoVerbose ) vlistPrint(vlistID1);
 
@@ -691,37 +724,64 @@ void *Select(void *argument)
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
-	  taxisCopyTimestep(taxisID2, taxisID1);
-
-	  streamDefTimestep(streamID2, tsID2);
-     
-	  for ( recID = 0; recID < nrecs; recID++ )
+	  if ( ltimsel == TRUE )
 	    {
-	      streamInqRecord(streamID1, &varID, &levelID);
-	      if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
-		{
-		  varID2   = vlistFindVar(vlistID2, varID);
-		  levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+	      int lyear = 0, lmonth = 0, lday = 0;
+	      copytimestep = FALSE;
+	      vdate = taxisInqVdate(taxisID1);
+	      vtime = taxisInqVtime(taxisID1);
+	      cdiDecodeDate(vdate, &year, &month, &day);
+	      if ( npar_year  == 0 || (npar_year   && PAR_CHECK_INT(year))  ) lyear  = TRUE;
+	      if ( npar_month == 0 || (npar_month  && PAR_CHECK_INT(month)) ) lmonth = TRUE;
+	      if ( npar_day   == 0 || (npar_day    && PAR_CHECK_INT(day))   ) lday   = TRUE;
 
-		  streamDefRecord(streamID2, varID2, levelID2);
-		  if ( lcopy )
+	      if ( lyear && lmonth && lday ) copytimestep = TRUE;
+
+	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
+	    }
+	  else
+	    {
+	      copytimestep = TRUE;
+	    }
+
+	  if ( copytimestep == TRUE )
+	    {
+	      taxisCopyTimestep(taxisID2, taxisID1);
+
+	      streamDefTimestep(streamID2, tsID2);
+     
+	      for ( recID = 0; recID < nrecs; recID++ )
+		{
+		  streamInqRecord(streamID1, &varID, &levelID);
+		  if ( vlistInqFlag(vlistID0, varID, levelID) == TRUE )
 		    {
-		      streamCopyRecord(streamID2, streamID1);
-		    }
-		  else
-		    {
-		      streamReadRecord(streamID1, array, &nmiss);
-		      streamWriteRecord(streamID2, array, nmiss);
+		      varID2   = vlistFindVar(vlistID2, varID);
+		      levelID2 = vlistFindLevel(vlistID2, varID, levelID);
+		      
+		      streamDefRecord(streamID2, varID2, levelID2);
+		      if ( lcopy )
+			{
+			  streamCopyRecord(streamID2, streamID1);
+			}
+		      else
+			{
+			  streamReadRecord(streamID1, array, &nmiss);
+			  streamWriteRecord(streamID2, array, nmiss);
+			}
 		    }
 		}
-     	    }
+	      tsID2++;
+	    }
 
 	  tsID1++;
-	  tsID2++;
 	}
       
       streamClose(streamID1);
     }
+
+  PAR_CHECK_INT_FLAG(year);
+  PAR_CHECK_INT_FLAG(month);
+  PAR_CHECK_INT_FLAG(day);
 
   streamClose(streamID2);
  
