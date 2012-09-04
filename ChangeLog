@@ -1,3 +1,7 @@
+2012-09-04 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* processDelete: set Process[processID].threadID = 0 (bug fix)
+
 2012-09-03 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added CDO option -L to lock all I/O calls. This option is neccessary if external I/O libraries like 

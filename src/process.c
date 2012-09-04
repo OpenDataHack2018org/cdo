@@ -96,8 +96,10 @@ int processCreate(void)
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
+
   processID = NumProcess++;
   NumProcessActive++;
+
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
@@ -712,7 +714,10 @@ void processDelete(void)
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
+
+  Process[processID].threadID = 0;
   NumProcessActive--;
+
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif

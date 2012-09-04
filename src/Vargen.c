@@ -92,8 +92,8 @@ void *Vargen(void *argument)
   int RANDOM, CONST, FOR, TOPO, TEMP, MASK, STDATM;
   int operatorID;
   int streamID;
-  int nrecs,nvars, ntimesteps, nlevels = 1;
-  int tsID, recID, varID, varID2 = -1, levelID;
+  int nvars, ntimesteps, nlevels = 1;
+  int tsID, varID, varID2 = -1, levelID;
   int gridsize, i;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
@@ -263,7 +263,6 @@ void *Vargen(void *argument)
   julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
 
   nvars = vlistNvars(vlistID);
-  nrecs = vlistNrecs(vlistID);
 
   for ( tsID = 0; tsID < ntimesteps; tsID++ )
     {
