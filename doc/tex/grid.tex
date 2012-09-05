@@ -1,15 +1,13 @@
 \section{Horizontal grids}
 \label{HORIZONTAL_GRIDS}
 
-Physical quantities of climate models are typically stored on a
-horizonal grid. 
+Physical quantities of climate models are typically stored on a horizonal grid. 
 
 \subsection{Grid area weights}
 \label{GRID_AREA_WEIGHTS}
 
-One single point of a grid represents the mean of a grid cell.
-These grid cells are typically of different sizes, because the grid
-points are of varying distance.
+One single point of a horizintal grid represents the mean of a grid cell.
+These grid cells are typically of different sizes, because the grid points are of varying distance.
 
 Area weights are individual weights for each grid cell. 
 %They take into account the different grid cell sizes when needed by a {\CDO} operator. 
@@ -77,12 +75,9 @@ Predefined grids are available for global regular, gaussian or icosahedral-hexag
 \subsubsection{Grids from data files}
 
 You can use the grid description from an other datafile.
-The format of the datafile and the grid of the data field must
-be supported by this program.
-Use the operator '\htmlref{sinfo}{sinfo}' to get short informations about
-your variables and the grids.
-If there are more then one grid in the datafile the grid description of
-the first variable will be used.
+The format of the datafile and the grid of the data field must be supported by {\CDO} .
+Use the operator '\htmlref{sinfo}{sinfo}' to get short informations about your variables and the grids.
+If there are more then one grid in the datafile the grid description of the first variable will be used.
 
 \subsubsection{SCRIP grids}
 
@@ -90,7 +85,7 @@ SCRIP (Spherical Coordinate Remapping and Interpolation Package) uses
 a common grid description for curvilinear and unstructured grids.
 For more information about the convention see \cite{SCRIP}.
 This grid description is stored in netCDF. Therefor it is only
-available if {\CDO} was compiled with netCDF support.
+available if {\CDO} was compiled with netCDF support!
 
 \vspace{2mm}
 
@@ -164,27 +159,27 @@ The following keywords can be used to describe a grid:
 \vspace{3mm}
 \begin{tabular}[b]{lll}
 Keyword           & Datatype     & Description \\ \hline
-\bf{gridtype}     & STRING       & type of the grid (gaussian, lonlat, curvilinear, unstructured) \\
-\bf{gridsize}     & INTEGER      & size of the grid \\
-\bf{xsize}        & INTEGER      & size in x direction (number of longitudes) \\
-\bf{ysize}        & INTEGER      & size in y direction (number of latitudes) \\
-\bf{xvals}        & FLOAT ARRAY  & x values of the grid cell center \\
-\bf{yvals}        & FLOAT ARRAY  & y values of the grid cell center\\
-\bf{xnpole}       & FLOAT        & x value of the north pole (rotated grid) \\
-\bf{ynpole}       & FLOAT        & y value of the north pole (rotated grid) \\
-\bf{nvertex}      & INTEGER      & number of the vertices for all grid cells \\
-\bf{xbounds}      & FLOAT ARRAY  & x bounds of each gridbox \\
-\bf{ybounds}      & FLOAT ARRAY  & y bounds of each gridbox \\
+\bf{gridtype}     & STRING       & Type of the grid (gaussian, lonlat, curvilinear, unstructured). \\
+\bf{gridsize}     & INTEGER      & Size of the grid. \\
+\bf{xsize}        & INTEGER      & Size in x direction (number of longitudes). \\
+\bf{ysize}        & INTEGER      & Size in y direction (number of latitudes). \\
+\bf{xvals}        & FLOAT ARRAY  & X values of the grid cell center. \\
+\bf{yvals}        & FLOAT ARRAY  & Y values of the grid cell center.\\
+\bf{xnpole}       & FLOAT        & X value of the north pole (rotated grid). \\
+\bf{ynpole}       & FLOAT        & Y value of the north pole (rotated grid). \\
+\bf{nvertex}      & INTEGER      & Number of the vertices for all grid cells. \\
+\bf{xbounds}      & FLOAT ARRAY  & X bounds of each gridbox. \\
+\bf{ybounds}      & FLOAT ARRAY  & Y bounds of each gridbox. \\
 %xname        & STRING       & name of the x axis \\
 %xlongname    & STRING       & longname of the x axis \\
 %xunits       & STRING       & units of the x axis \\
 %yname        & STRING       & name of the y axis \\
 %ylongname    & STRING       & longname of the y axis \\
 %yunits       & STRING       & units of the y axis \\
-\bf{xfirst, xinc} & FLOAT, FLOAT & macros to define xvals with a constant increment \\
-                         &                         & xfirst is the x value of the first grid cell center \\
-\bf{yfirst, yinc} & FLOAT, FLOAT & macros to define yvals with a constant increment \\
-                         &                         & yfirst is the y value of the first grid cell center \\
+\bf{xfirst, xinc} & FLOAT, FLOAT & Macros to define xvals with a constant increment, \\
+                         &                         & xfirst is the x value of the first grid cell center. \\
+\bf{yfirst, yinc} & FLOAT, FLOAT & Macros to define yvals with a constant increment, \\
+                         &                         & yfirst is the y value of the first grid cell center. \\
 \end{tabular}
 
 \vspace{4mm}

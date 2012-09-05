@@ -134,9 +134,9 @@ instead of
 % {\bf \htmlref{mergetime}{mergetime}},
 % {\bf \htmlref{ens$<\!STAT\!>$}{ENSSTAT}}
 
-Combining of operators is implemented over POSIX Threads (pthread).
+Combining of operators is implemented over POSIX Threads (pthreads).
 Therefore this {\CDO} feature is not available on operating systems 
-without POSIX Threads support.
+without POSIX Threads support!
 
 \subsection{Operator parameter}
 
@@ -147,7 +147,7 @@ A list of parameter is indicated by the seperator ','.
 \item STRING
 
 Unquoted characters without blanks and tabs.
-The following command select the variables with the names {\tt pressure} and {\tt tsurf}:
+The following command select variables with the name {\tt pressure} and {\tt tsurf}:
 \begin{verbatim}
    cdo selvar,pressure,tsurf ifile ofile
 \end{verbatim}
