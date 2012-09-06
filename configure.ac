@@ -5,7 +5,6 @@ AC_INIT([cdo], [1.5.7], [http://code.zmaw.de/projects/cdo])
 CONFIG_ABORT=yes
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
-
 AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
@@ -16,6 +15,7 @@ AM_MAINTAINER_MODE([disable])
 # Set up libtool.
 AC_MSG_NOTICE([setting up libtool])
 LT_INIT
+
 # Check building environment
 AC_CHECK_TOOL([CC],[gcc],[:])
 AC_PROG_CC_C99
@@ -36,29 +36,30 @@ AC_PROG_CXX
 
 FC=no
 export FC
-
+#  ----------------------------------------------------------------------
 # Check large file support on 32 bit system
 AC_SYS_LARGEFILE
-
+#  ----------------------------------------------------------------------
 # Checks for library functions.
 AC_FUNC_MMAP
-
+#  ----------------------------------------------------------------------
 # Checks for library malloc.
 AC_CHECK_LIB(malloc, malloc)
-
+#  ----------------------------------------------------------------------
 # Checks for structures.
 AC_CHECK_MEMBERS([struct stat.st_blksize])
-
+#  ----------------------------------------------------------------------
 # Checks for header files
 AC_CHECK_HEADERS(sys/resource.h)
 AC_CHECK_HEADERS(sys/times.h)
 AC_CHECK_HEADERS(malloc.h)
-
+#  ----------------------------------------------------------------------
 # Checks for the availability of functions
 AC_CHECK_FUNCS(mallinfo)
-
+#  ----------------------------------------------------------------------
 # Checks for the availability of ANSI-C99 functions
-AC_CHECK_FUNCS(isnan)
+AC_CHECK_DECLS([isnan],,,[AC_INCLUDES_DEFAULT
+@%:@include <math.h>])
 AC_CHECK_FUNCS(getrlimit)
 AC_CHECK_FUNCS(gethostname)
 
