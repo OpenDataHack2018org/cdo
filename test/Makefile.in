@@ -49,9 +49,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
-	$(top_srcdir)/config/mkinstalldirs $(top_srcdir)/test/tests.mk
 subdir = test
+DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(top_srcdir)/config/mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/acx_options.m4 \
 	$(top_srcdir)/m4/ax_pthread.m4 $(top_srcdir)/m4/libtool.m4 \
@@ -234,13 +234,18 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-CLEANFILES = $(TESTS) `ls *.pyc`
-TESTFILES := $(wildcard $(top_srcdir)/test/*.py)
-TESTS := $(patsubst %.py,%,$(notdir $(TESTFILES)))
+CLEANFILES = `ls *.pyc`
+TESTS = $(top_srcdir)/test/test_info.py \
+	$(top_srcdir)/test/test_diff.py
+
+#	$(top_srcdir)/test/test_intgridbil.py
+EXTRA_DIST = $(TESTS)
+CDO = $(top_builddir)/src/cdo
+PYTHONPATH = $(top_srcdir)/contrib/python
 all: all-am
 
 .SUFFIXES:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir)/test/tests.mk $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -261,7 +266,6 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/test/tests.mk:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
@@ -526,11 +530,7 @@ uninstall-am:
 	uninstall uninstall-am
 
 
-define testTarget_template
-$(1): $(top_srcdir)/test/$(1).py
-	@echo CDO="$(top_builddir)/src/cdo" PYTHONPATH="$(top_srcdir)/contrib/python" python $(top_srcdir)/test/$(1).py > $(top_builddir)/test/$(1); chmod u+x $(top_builddir)/test/$(1); ./$(top_builddir)/test/$(1)
-endef
-$(foreach test,$(TESTS),$(eval $(call testTarget_template,$(test))))
+export
 
 listTests:
 	@echo $(TESTS)

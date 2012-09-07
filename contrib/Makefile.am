@@ -1,4 +1,4 @@
-EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zsh
+EXTRA_DIST = makecompl.rb cdoCompletion.bash cdoCompletion.tcsh cdoCompletion.zsh python/cdo.py
 CLEANFILES = 
 
 completions:
