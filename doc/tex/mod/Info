@@ -25,10 +25,10 @@ input datasets. For each field the operator prints one line with
 the following elements:
 @BeginItemize
 @Item = Date and Time
-@Item = Parameter identifier and Level
-@Item = Size of the grid and number of Missing values
+@Item = Level, Gridsize and number of Missing values
 @Item = Minimum, Mean and Maximum \\
 The mean value is computed without the use of area weights!
+@Item = Parameter identifier
 @EndItemize
 @EndDescription
 @EndOperator
@@ -61,18 +61,18 @@ To print information and simple statistics for each field of a dataset use:
 @EndVerbatim
 This is an example result of a dataset with one 2D parameter over 12 timesteps:
 @BeginListing
-   -1 :       Date  Time    Name  Level Size  Miss :  Minimum     Mean  Maximum
-    1 : 1987-01-31 12:00:00 SST      0  2048  1361 :   232.77   266.65   305.31
-    2 : 1987-02-28 12:00:00 SST      0  2048  1361 :   233.64   267.11   307.15
-    3 : 1987-03-31 12:00:00 SST      0  2048  1361 :   225.31   267.52   307.67
-    4 : 1987-04-30 12:00:00 SST      0  2048  1361 :   215.68   268.65   310.47
-    5 : 1987-05-31 12:00:00 SST      0  2048  1361 :   215.78   271.53   312.49
-    6 : 1987-06-30 12:00:00 SST      0  2048  1361 :   212.89   272.80   314.18
-    7 : 1987-07-31 12:00:00 SST      0  2048  1361 :   209.52   274.29   316.34
-    8 : 1987-08-31 12:00:00 SST      0  2048  1361 :   210.48   274.41   315.83
-    9 : 1987-09-30 12:00:00 SST      0  2048  1361 :   210.48   272.37   312.86
-   10 : 1987-10-31 12:00:00 SST      0  2048  1361 :   219.46   270.53   309.51
-   11 : 1987-11-30 12:00:00 SST      0  2048  1361 :   230.98   269.85   308.61
-   12 : 1987-12-31 12:00:00 SST      0  2048  1361 :   241.25   269.94   309.27
+   -1 :       Date     Time Level  Size  Miss : Minimum    Mean Maximum : Name 
+    1 : 1987-01-31 12:00:00     0  2048  1361 :  232.77  266.65  305.31 : SST  
+    2 : 1987-02-28 12:00:00     0  2048  1361 :  233.64  267.11  307.15 : SST  
+    3 : 1987-03-31 12:00:00     0  2048  1361 :  225.31  267.52  307.67 : SST  
+    4 : 1987-04-30 12:00:00     0  2048  1361 :  215.68  268.65  310.47 : SST  
+    5 : 1987-05-31 12:00:00     0  2048  1361 :  215.78  271.53  312.49 : SST  
+    6 : 1987-06-30 12:00:00     0  2048  1361 :  212.89  272.80  314.18 : SST  
+    7 : 1987-07-31 12:00:00     0  2048  1361 :  209.52  274.29  316.34 : SST  
+    8 : 1987-08-31 12:00:00     0  2048  1361 :  210.48  274.41  315.83 : SST  
+    9 : 1987-09-30 12:00:00     0  2048  1361 :  210.48  272.37  312.86 : SST  
+   10 : 1987-10-31 12:00:00     0  2048  1361 :  219.46  270.53  309.51 : SST  
+   11 : 1987-11-30 12:00:00     0  2048  1361 :  230.98  269.85  308.61 : SST  
+   12 : 1987-12-31 12:00:00     0  2048  1361 :  241.25  269.94  309.27 : SST  
 @EndListing
 @EndExample
