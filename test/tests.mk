@@ -1,9 +1,9 @@
-TESTFILES := $(wildcard *.py)
-TESTS     := $(patsubst %.py,%,$(TESTFILES))
+TESTFILES := $(wildcard $(top_srcdir)/test/*.py)
+TESTS     := $(patsubst %.py,%,$(notdir $(TESTFILES)))
 
 define testTarget_template
 $(1): $(top_srcdir)/test/$(1).py
-	echo CDO="$(top_builddir)/src/cdo" PYTHONPATH="$(top_srcdir)/contrib/python" python $(top_srcdir)/test/$(1).py > $(top_builddir)/test/$(1); chmod u+x $(top_builddir)/test/$(1); ./$(top_builddir)/test/$(1)
+	@echo CDO="$(top_builddir)/src/cdo" PYTHONPATH="$(top_srcdir)/contrib/python" python $(top_srcdir)/test/$(1).py > $(top_builddir)/test/$(1); chmod u+x $(top_builddir)/test/$(1); ./$(top_builddir)/test/$(1)
 endef
 $(foreach test,$(TESTS),$(eval $(call testTarget_template,$(test))))
 
