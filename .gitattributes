@@ -570,7 +570,6 @@ src/vinterp.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text
-test/Makefile -text
 test/Makefile.am -text
 test/Makefile.in -text
 test/README -text
