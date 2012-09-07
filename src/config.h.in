@@ -82,6 +82,9 @@
 /* Define to 1 for SZIP support */
 #undef HAVE_LIBSZ
 
+/* Define to 1 for UDUNITS2 support */
+#undef HAVE_LIBUDUNITS2
+
 /* Define to 1 for XML2 support */
 #undef HAVE_LIBXML2
 
@@ -162,6 +165,9 @@
 
 /* Define to 1 if you have the <szlib.h> header file. */
 #undef HAVE_SZLIB_H
+
+/* Define to 1 if you have the <udunits2.h> header file. */
+#undef HAVE_UDUNITS2_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

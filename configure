@@ -653,6 +653,8 @@ XML2_LIBS
 MAGICS_INCLUDE
 MAGICS_ROOT
 MAGICS_LIBS
+UDUNITS_INCLUDE
+UDUNITS_LDFLAGS
 PROJ_INCLUDE
 PROJ_LDFLAGS
 ENABLE_IEG
@@ -824,6 +826,7 @@ enable_service
 enable_extra
 enable_ieg
 with_proj
+with_udunits2
 with_magics
 with_libxml2
 enable_cdi_lib
@@ -1511,6 +1514,8 @@ Optional Packages:
                           --with-jasper-root
   --with-proj=<directory> Specify location of PROJ library for cartographic
                           projections.
+  --with-udunits2=<directory>
+                          Specify location of UDUNITS2 library.
   --with-magics=<yes|no|directory>
                           location of magics library (lib and include subdirs)
   --with-libxml2=<yes|no|directory>
@@ -18498,6 +18503,188 @@ esac
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the PROJ library" >&5
 $as_echo_n "checking for the PROJ library... " >&6; }
+             { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; }
+fi
+
+#  ----------------------------------------------------------------------
+#  Link application with UDUNITS2 library
+
+# Check whether --with-udunits2 was given.
+if test "${with_udunits2+set}" = set; then :
+  withval=$with_udunits2; case "$with_udunits2" in #(
+  no) :
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for udunits2 library" >&5
+$as_echo_n "checking for udunits2 library... " >&6; }
+                           { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
+$as_echo "suppressed" >&6; } ;; #(
+  yes) :
+    for ac_header in udunits2.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "udunits2.h" "ac_cv_header_udunits2_h" "$ac_includes_default"
+if test "x$ac_cv_header_udunits2_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_UDUNITS2_H 1
+_ACEOF
+
+fi
+
+done
+
+                            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing ut_parse" >&5
+$as_echo_n "checking for library containing ut_parse... " >&6; }
+if ${ac_cv_search_ut_parse+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ut_parse ();
+int
+main ()
+{
+return ut_parse ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' udunits2; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_ut_parse=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_ut_parse+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_ut_parse+:} false; then :
+
+else
+  ac_cv_search_ut_parse=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_ut_parse" >&5
+$as_echo "$ac_cv_search_ut_parse" >&6; }
+ac_res=$ac_cv_search_ut_parse
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBUDUNITS2 1" >>confdefs.h
+
+else
+  as_fn_error $? "Could not link to udunits2 library!" "$LINENO" 5
+fi
+
+                            UDUNITS_LDFLAGS=" -ludunits2"
+
+                            UDUNITS_INCLUDE=""
+ ;; #(
+  *) :
+    UDUNITS_ROOT=$with_udunits2
+                          if test -d "$UDUNITS_ROOT"; then :
+  LDFLAGS="$LDFLAGS -L$UDUNITS_ROOT/lib"
+                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include/udunits2"
+                                 for ac_header in udunits2.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "udunits2.h" "ac_cv_header_udunits2_h" "$ac_includes_default"
+if test "x$ac_cv_header_udunits2_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_UDUNITS2_H 1
+_ACEOF
+
+fi
+
+done
+
+                                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing ut_parse" >&5
+$as_echo_n "checking for library containing ut_parse... " >&6; }
+if ${ac_cv_search_ut_parse+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ut_parse ();
+int
+main ()
+{
+return ut_parse ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' udunits2; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_ut_parse=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_ut_parse+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_ut_parse+:} false; then :
+
+else
+  ac_cv_search_ut_parse=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_ut_parse" >&5
+$as_echo "$ac_cv_search_ut_parse" >&6; }
+ac_res=$ac_cv_search_ut_parse
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+$as_echo "#define HAVE_LIBUDUNITS2 1" >>confdefs.h
+
+else
+  as_fn_error $? "Could not link to udunits2 library!" "$LINENO" 5
+fi
+
+                                 UDUNITS_LDFLAGS=" -L$UDUNITS_ROOT/lib -ludunits2"
+
+                                 UDUNITS_INCLUDE=" -I$UDUNITS_ROOT/include/udunits2"
+
+else
+  as_fn_error $? "$UDUNITS_ROOT is not a directory! UDUNITS2 suppressed" "$LINENO" 5
+fi ;; #(
+  *) :
+     ;;
+esac
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for the UDUNITS2 library" >&5
+$as_echo_n "checking for the UDUNITS2 library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
