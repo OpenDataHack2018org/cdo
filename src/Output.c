@@ -43,6 +43,7 @@ void *Output(void *argument)
   int varID, recID;
   int gridsize = 0;
   int gridID, zaxisID, code, vdate, vtime;
+  int param;
   int gridtype;
   int ngrids;
   int nrecs;
@@ -56,6 +57,8 @@ void *Output(void *argument)
   int index;
   int ndiffgrids;
   const char *format = NULL;
+  char paramstr[32];
+  char vdatestr[32], vtimestr[32];
   double level;
   double *grid_center_lon = NULL, *grid_center_lat = NULL;
   double *array = NULL;
@@ -69,9 +72,9 @@ void *Output(void *argument)
   char **parnames = NULL;
   int *keys = NULL, nkeys = 0, k;
   int nKeys;
-  int Keylen[]           = {     8,      4,      8,     6,     6,     6,      4,      4,      8,      6,      5,       2,     2};
-  enum                     {kvalue,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  kdate,  ktime,  kyear,  kmonth,  kday};
-  const char *Keynames[] = {"value", "code", "name", "lon", "lat", "lev", "xind", "yind", "date", "time", "year", "month", "day"};
+  int Keylen[]           = {     8,      11,      4,      8,     6,     6,     6,      4,      4,     10,      8,      5,       2,     2 };
+  enum                     {kvalue,  kparam,  kcode,  kname,  klon,  klat,  klev,  kxind,  kyind,  kdate,  ktime,  kyear,  kmonth,  kday };
+  const char *Keynames[] = {"value", "param", "code", "name", "lon", "lat", "lev", "xind", "yind", "date", "time", "year", "month", "day"};
 
 
   cdoInitialize(argument);
@@ -183,6 +186,8 @@ void *Output(void *argument)
 	{
 	  vdate = taxisInqVdate(taxisID);
 	  vtime = taxisInqVtime(taxisID);
+	  date2str(vdate, vdatestr, sizeof(vdatestr));
+	  time2str(vtime, vtimestr, sizeof(vtimestr));
 
 	  cdiDecodeDate(vdate, &year, &month, &day);
 
@@ -191,6 +196,7 @@ void *Output(void *argument)
 	      streamInqRecord(streamID, &varID, &levelID);
 
 	      vlistInqVarName(vlistID, varID, name);
+	      param    = vlistInqVarParam(vlistID, varID);
 	      code     = vlistInqVarCode(vlistID, varID);
 	      gridID   = vlistInqVarGrid(vlistID, varID);
 	      zaxisID  = vlistInqVarZaxis(vlistID, varID);
@@ -200,6 +206,8 @@ void *Output(void *argument)
 	      nlat     = gridInqYsize(gridID);
 	      level    = zaxisInqLevel(zaxisID, levelID);
 	      
+	      cdiParamToString(param, paramstr, sizeof(paramstr));
+
 	      if ( nlon*nlat != gridsize ) { nlon = gridsize; nlat = 1; }
 
 	      streamReadRecord(streamID, array, &nmiss);
@@ -284,6 +292,7 @@ void *Output(void *argument)
 			{
 			  len = Keylen[keys[k]];
 			  if      ( keys[k] == kvalue ) fprintf(stdout, "%*g ", len, array[i]);
+			  else if ( keys[k] == kparam ) fprintf(stdout, "%*s ", len, paramstr);
 			  else if ( keys[k] == kcode  ) fprintf(stdout, "%*d ", len, code);
 			  else if ( keys[k] == kname  ) fprintf(stdout, "%*s ", len, name);
 			  else if ( keys[k] == klon   ) fprintf(stdout, "%*g ", len, lon);
@@ -291,8 +300,8 @@ void *Output(void *argument)
 			  else if ( keys[k] == klev   ) fprintf(stdout, "%*g ", len, level);
 			  else if ( keys[k] == kxind  ) fprintf(stdout, "%*d ", len, xind+1);
 			  else if ( keys[k] == kyind  ) fprintf(stdout, "%*d ", len, yind+1);
-			  else if ( keys[k] == kdate  ) fprintf(stdout, "%*d ", len, vdate);
-			  else if ( keys[k] == ktime  ) fprintf(stdout, "%*d ", len, vtime);
+			  else if ( keys[k] == kdate  ) fprintf(stdout, "%*s ", len, vdatestr);
+			  else if ( keys[k] == ktime  ) fprintf(stdout, "%*s ", len, vtimestr);
 			  else if ( keys[k] == kyear  ) fprintf(stdout, "%*d ", len, year);
 			  else if ( keys[k] == kmonth ) fprintf(stdout, "%*d ", len, month);
 			  else if ( keys[k] == kday   ) fprintf(stdout, "%*d ", len, day);
