@@ -236,9 +236,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 CLEANFILES = `ls *.pyc`
 TESTS = $(top_srcdir)/test/test_info.py \
-	$(top_srcdir)/test/test_diff.py
+	$(top_srcdir)/test/test_diff.py \
+	$(top_srcdir)/test/test_intgridbil.py
 
-#	$(top_srcdir)/test/test_intgridbil.py
 EXTRA_DIST = $(TESTS)
 CDO = $(top_builddir)/src/cdo
 PYTHONPATH = $(top_srcdir)/contrib/python
