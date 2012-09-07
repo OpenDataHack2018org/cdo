@@ -162,11 +162,11 @@ void *Sinfo(void *argument)
 	  if ( operatorID == SINFON ) vlistInqVarName(vlistID, varID, varname);
 
 	  if ( operatorID == SINFON )
-	    fprintf(stdout, "%-11s ", varname);
+	    fprintf(stdout, "%-11s", varname);
 	  else if ( operatorID == SINFOC )
-	    fprintf(stdout, "%4d %4d   ", tabnum, code);
+	    fprintf(stdout, "%4d %4d", tabnum, code);
 	  else
-	    fprintf(stdout, "%-11s ", paramstr);
+	    fprintf(stdout, "%-11s", paramstr);
 
 	  fprintf(stdout, "\n");
 	}

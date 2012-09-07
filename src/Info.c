@@ -284,14 +284,14 @@ void *Info(void *argument)
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
 		  if ( operatorID == INFON )
-		    fprintf(stdout, "%6d :       Date  Time    Name         Level    Size    Miss :"
-			    "     Minimum        Mean     Maximum\n",  -(indf+1));
+		    fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
+			    "     Minimum        Mean     Maximum : Parameter name\n",  -(indf+1));
 		  else if ( operatorID == INFOC )
-		    fprintf(stdout, "%6d :       Date  Time    Code  Level    Size    Miss :"
-			    "     Minimum        Mean     Maximum\n",  -(indf+1));
+		    fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
+			    "     Minimum        Mean     Maximum : Code number\n",  -(indf+1));
 		  else
-		    fprintf(stdout, "%6d :       Date  Time    Param        Level    Size    Miss :"
-			    "     Minimum        Mean     Maximum\n",  -(indf+1));
+		    fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
+			    "     Minimum        Mean     Maximum : Parameter ID\n",  -(indf+1));
 		}
 
 	      streamInqRecord(streamID, &varID, &levelID);
@@ -310,22 +310,17 @@ void *Info(void *argument)
 
 	      if ( operatorID == INFON ) vlistInqVarName(vlistID, varID, varname);
 
-	      if ( operatorID == INFON )
-		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, varname);
-	      else if ( operatorID == INFOC )
-		fprintf(stdout, "%6d :%s %s %3d ", indg, vdatestr, vtimestr, code);
-	      else
-		fprintf(stdout, "%6d :%s %s %-10s ", indg, vdatestr, vtimestr, paramstr);
+	      fprintf(stdout, "%6d :%s %s ", indg, vdatestr, vtimestr);
 
 	      level = zaxisInqLevel(zaxisID, levelID);
 	      fprintf(stdout, "%7g ", level);
 
-	      fprintf(stdout, "%7d %7d :", gridsize, nmiss);
+	      fprintf(stdout, "%8d %7d :", gridsize, nmiss);
 
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
 		{
-		  fprintf(stdout, "            %#12.5g\n", array[0]);
+		  fprintf(stdout, "            %#12.5g", array[0]);
 		}
 	      else
 		{
@@ -378,11 +373,11 @@ void *Info(void *argument)
 			{
 			  arrmean = arrmean/nvals;
 			  arrvar  = arrvar/nvals - arrmean*arrmean;
-			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g\n", arrmin, arrmean, arrmax);
+			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g", arrmin, arrmean, arrmax);
 			}
 		      else
 			{
-			  fprintf(stdout, "                     nan\n");
+			  fprintf(stdout, "                     nan");
 			}
 		    }
 		  else
@@ -408,27 +403,36 @@ void *Info(void *argument)
 
 		      if ( nvals_r > 0 ) arrmean_r = arrsum_r / nvals_r;
 		      if ( nvals_i > 0 ) arrmean_i = arrsum_i / nvals_i;
-		      fprintf(stdout, "  -  (%#12.5g,%#12.5g)  -\n", arrmean_r, arrmean_i);
+		      fprintf(stdout, "  -  (%#12.5g,%#12.5g)  -", arrmean_r, arrmean_i);
 		    }
+		}
 
-		  if ( imiss != nmiss && nmiss > 0 )
-		    fprintf(stdout, "Found %d of %d missing values!\n", imiss, nmiss);
+	      if ( operatorID == INFON )
+		fprintf(stdout, " : %-11s", varname);
+	      else if ( operatorID == INFOC )
+		fprintf(stdout, " : %4d", code);
+	      else
+		fprintf(stdout, " : %-11s", paramstr);
 
-		  if ( operatorID == MAP )
+	      fprintf(stdout, "\n");
+
+	      if ( imiss != nmiss && nmiss > 0 )
+		fprintf(stdout, "Found %d of %d missing values!\n", imiss, nmiss);
+
+	      if ( operatorID == MAP )
+		{
+		  int nlon, nlat;
+		  
+		  nlon = gridInqXsize(gridID);
+		  nlat = gridInqYsize(gridID);
+
+		  if ( gridInqType(gridID) == GRID_GAUSSIAN    ||
+		       gridInqType(gridID) == GRID_LONLAT      ||
+		       gridInqType(gridID) == GRID_CURVILINEAR ||
+		       (gridInqType(gridID) == GRID_GENERIC && 
+			nlon*nlat == gridInqSize(gridID) && nlon < 1024) )
 		    {
-		      int nlon, nlat;
-
-		      nlon = gridInqXsize(gridID);
-		      nlat = gridInqYsize(gridID);
-
-		      if ( gridInqType(gridID) == GRID_GAUSSIAN    ||
-			   gridInqType(gridID) == GRID_LONLAT      ||
-			   gridInqType(gridID) == GRID_CURVILINEAR ||
-			   (gridInqType(gridID) == GRID_GENERIC && 
-			    nlon*nlat == gridInqSize(gridID) && nlon < 1024) )
-			{
-			  printMap(nlon, nlat, array, missval, arrmin, arrmax);
-			}
+		      printMap(nlon, nlat, array, missval, arrmin, arrmax);
 		    }
 		}
 	    }

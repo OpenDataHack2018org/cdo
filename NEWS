@@ -3,6 +3,7 @@ CDO NEWS
 Version 1.5.8 (?? October 2012):
 
    Changed operators:
+     * Info: changed output format
      * Sinfo: changed output format
 
 
