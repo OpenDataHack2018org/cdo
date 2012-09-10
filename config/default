@@ -103,13 +103,12 @@ case "${HOSTNAME}" in
     thingol*)
  	${CONFPATH}configure --prefix=`pwd`/build \
                     --enable-maintainer-mode \
-	            --with-netcdf=$HOME/local/libs4cdo-0.0.9 \
-	              --with-hdf5=$HOME/local/libs4cdo-0.0.9 \
-                     --with-szlib=$HOME/local/libs4cdo-0.0.9 \
-                      --with-proj=$HOME/local/libs4cdo-0.0.9 \
-                  --with-grib_api=$HOME/local/libs4cdo-0.0.9 \
-                    --with-jasper=$HOME/local/libs4cdo-0.0.9 \
-                      --with-pic --with-magics=/home/ram/local --with-libxml2 \
+	            --with-netcdf=$HOME/builds/libs4cdo \
+	              --with-hdf5=$HOME/builds/libs4cdo \
+                     --with-szlib=$HOME/builds/libs4cdo \
+                  --with-grib_api=$HOME/builds/libs4cdo \
+                    --with-jasper=$HOME/builds/libs4cdo \
+                      --with-pic \
 	            CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -DWITH_DATA" LIBS='-lopenjpeg -lpng'
 	;;
 # i686-suse-linux

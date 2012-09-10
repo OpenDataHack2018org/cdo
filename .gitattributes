@@ -570,10 +570,11 @@ src/vinterp.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text
-test/Makefile -text
+test/Makefile.am -text
+test/Makefile.in -text
 test/README -text
-test/cdo.py -text
 test/test_diff.py -text
 test/test_info.py -text
 test/test_intgridbil.py -text
 test/test_operators -text
+test/tests.mk -text
