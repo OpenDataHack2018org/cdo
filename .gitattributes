@@ -577,4 +577,3 @@ test/test_diff.py -text
 test/test_info.py -text
 test/test_intgridbil.py -text
 test/test_operators -text
-test/tests.mk -text
