@@ -227,9 +227,7 @@ void *Vargen(void *argument)
   if ( operatorID == MASK )
     vlistDefVarDatatype(vlistID, varID, DATATYPE_INT8);
 
-  if ( operatorID != STDATM )
-    vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
-  else
+  if ( operatorID == STDATM )
     {
       vlistDefVarName(vlistID    , varID , "P");
       vlistDefVarStdname(vlistID , varID , "air_pressure");
@@ -239,6 +237,12 @@ void *Vargen(void *argument)
       vlistDefVarStdname(vlistID , varID2, "air_temperature");
       vlistDefVarLongname(vlistID, varID2, "temperature");
       vlistDefVarUnits(vlistID   , varID2, "K");
+    }
+  else
+    {
+      vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
+      if ( operatorID == TOPO )
+	vlistDefVarUnits(vlistID, varID , "m");	
     }
 
   taxisID = taxisCreate(TAXIS_RELATIVE);
