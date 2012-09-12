@@ -18,7 +18,7 @@
 /*
    This module contains the following operators:
 
-      Set        setpartab       Set parameter table
+      Setpartab  setpartab       Set parameter table
 */
 
 #include <cdi.h>
@@ -38,16 +38,25 @@ void *Setpartab(void *argument)
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
   int nmiss;
-  int gridsize;
+  long gridsize;
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int tableID = -1;
   int tableformat = 0;
   int zaxistype;
   int newparam = 0;
   char *newname = NULL, *partab = NULL;
+  double missval;
   double newlevel = 0;
   double *levels = NULL;
   double *array = NULL;
+  typedef struct
+  {
+    int changemissval;
+    double missval_old;
+    double missval;
+  } var_t;
+  var_t *vars = NULL;
+
 
   cdoInitialize(argument);
 
@@ -99,10 +108,12 @@ void *Setpartab(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  nvars = vlistNvars(vlistID2);
+  vars = (var_t *) malloc(nvars*sizeof(var_t));
+  memset(vars, 0, nvars*sizeof(var_t));
+
   if ( operatorID == SETPARTAB || operatorID == SETPARTABV )
     {
-      nvars = vlistNvars(vlistID2);
-
       if ( tableformat == 0 )
 	{
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -209,6 +220,29 @@ void *Setpartab(void *argument)
 		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
 		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
 		      if ( nml->entry[nml_units]->occ    ) vlistDefVarUnits(vlistID2, varID, units);
+		      if ( nml->entry[nml_datatype]->occ )
+			{
+			  int dtype = -1;
+			  if ( strlen(datatype) == 3 )
+			    {
+			      if      ( memcmp(datatype, "F32", 3) == 0 ) dtype = DATATYPE_FLT32;
+			      else if ( memcmp(datatype, "F64", 3) == 0 ) dtype = DATATYPE_FLT64;
+			    }
+			  if ( dtype != -1 ) vlistDefVarDatatype(vlistID2, varID, dtype);
+			}
+		      if ( nml->entry[nml_missval]->occ )
+			{
+			  double missval_old;
+			  missval_old = vlistInqVarMissval(vlistID2, varID);
+			  if ( ! DBL_IS_EQUAL(missval, missval_old) )
+			    {
+			      printf("change missval to %g\n", missval);
+			      vars[varID].changemissval = TRUE;
+			      vars[varID].missval_old = missval_old;
+			      vars[varID].missval = missval;
+			      vlistDefVarMissval(vlistID2, varID, missval);
+			    }
+			}
 		    }
 		  else
 		    {
@@ -256,8 +290,19 @@ void *Setpartab(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamDefRecord(streamID2,  varID,  levelID);
-	  
+
 	  streamReadRecord(streamID1, array, &nmiss);
+
+	  if ( nmiss > 0 && vars[varID].changemissval == TRUE )
+	    {
+	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	      if ( vlistInqVarNumber(vlistID2, varID) != CDI_REAL ) gridsize *= 2;
+	      for ( long i = 0; i < gridsize; ++i )
+		{
+		  if ( DBL_IS_EQUAL(array[i], vars[varID].missval_old) ) array[i] = vars[varID].missval;
+		}
+	    }
+	  
 	  streamWriteRecord(streamID2, array, nmiss);
 	}
       tsID1++;
@@ -267,6 +312,7 @@ void *Setpartab(void *argument)
   streamClose(streamID1);
 
   if ( array ) free(array);
+  if ( vars  ) free(vars);
 
   cdoFinish();
 

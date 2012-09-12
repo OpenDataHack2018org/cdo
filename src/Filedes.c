@@ -133,17 +133,17 @@ void partab(FILE *fp, int vlistID, int option)
       else if ( prec == DATATYPE_UINT32 ) strcpy(pstr, "U32");
       else                                strcpy(pstr, "-1");
       
-      if ( code   > 0 ) fprintf(fp, "  CODE=%d\n", code);
-      if ( tabnum > 0 ) fprintf(fp, "  TABLE=%d\n", tabnum);
-      fprintf(fp, "  NAME=%s\n", varname);
+      if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
+      if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
+      fprintf(fp, "  name=%s\n", varname);
       if ( strlen(varstdname) )
-	fprintf(fp, "  STANDARD_NAME=%s\n", varstdname);
+	fprintf(fp, "  standard_name=%s\n", varstdname);
       if ( strlen(varlongname) )
-	fprintf(fp, "  LONG_NAME=\"%s\"\n", varlongname);
+	fprintf(fp, "  long_name=\"%s\"\n", varlongname);
       if ( strlen(varunits) )
-	fprintf(fp, "  UNITS=\"%s\"\n", varunits);
+	fprintf(fp, "  units=\"%s\"\n", varunits);
       
-      fprintf(fp, "  DATATYPE=%s\n", pstr);
+      fprintf(fp, "  datatype=%s\n", pstr);
       
       if ( option == 2 ) printAtts(fp, vlistID, varID);
       
