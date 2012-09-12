@@ -1,7 +1,6 @@
 set cdoCmpl = (\
-M \
+L \
 O \
-P \
 Q \
 R \
 S \
@@ -54,7 +53,6 @@ complextorect \
 consecsum \
 consects \
 const \
-contour \
 copy \
 cos \
 covar0 \
@@ -207,8 +205,6 @@ gp2spl \
 gradsdes \
 gradsdes1 \
 gradsdes2 \
-graph \
-grfill \
 gridarea \
 gridboxavg \
 gridboxmax \
@@ -502,7 +498,6 @@ setvar \
 setvrange \
 setyear \
 setzaxis \
-shaded \
 shifttime \
 showcode \
 showdate \
@@ -563,7 +558,6 @@ ssopar \
 stdatm \
 stimelogo \
 strbre \
-stream \
 strgal \
 strwin \
 studentt \
@@ -616,7 +610,6 @@ varquot2test \
 varrms \
 vct \
 vct2 \
-vector \
 vertavg \
 vertmax \
 vertmean \
