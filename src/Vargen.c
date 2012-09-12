@@ -243,6 +243,8 @@ void *Vargen(void *argument)
       vlistDefVarName(vlistID, varID, cdoOperatorName(operatorID));
       if ( operatorID == TOPO )
 	vlistDefVarUnits(vlistID, varID , "m");	
+      if ( operatorID == TEMP )
+	vlistDefVarUnits(vlistID, varID , "K");	
     }
 
   taxisID = taxisCreate(TAXIS_RELATIVE);
