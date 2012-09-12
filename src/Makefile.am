@@ -114,6 +114,7 @@ cdo_SOURCES += Arith.c         \
                Setgrid.c       \
                Sethalo.c       \
                Setmiss.c       \
+               Setpartab.c     \
                Setrcaname.c    \
                Settime.c       \
                Setzaxis.c      \

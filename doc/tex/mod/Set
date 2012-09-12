@@ -81,7 +81,7 @@ STRING   Parameter table file or name
 @Item = code
 INTEGER  Code number
 @Item = param
-STRING  Parameter identifier (format: code[.tabnum] or num[.cat[.dis]])
+STRING   Parameter identifier (format: code[.tabnum] or num[.cat[.dis]])
 @Item = name
 STRING   Variable name
 @Item = level

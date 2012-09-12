@@ -150,6 +150,7 @@ void *Setgatt(void *argument);
 void *Setgrid(void *argument);
 void *Sethalo(void *argument);
 void *Setmiss(void *argument);
+void *Setpartab(void *argument);
 void *Setrcaname(void *argument);
 void *Settime(void *argument);
 void *Setzaxis(void *argument);
@@ -379,12 +380,13 @@ void *Maggraph(void *argument);
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
-#define  SetOperators           {"setpartab", "setpartabv", "setcode", "setparam", "setname", "setlevel", "setltype", "settabnum"}
+#define  SetOperators           {"setcode", "setparam", "setname", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
+#define  SetpartabOperators     {"setpartab", "setpartabv"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
@@ -633,8 +635,9 @@ static modules_t Modules[] =
   { Setgatt,        SetgattHelp,       SetgattOperators,       CDI_BOTH,  1,  1 },
   { Setgrid,        SetgridHelp,       SetgridOperators,       CDI_BOTH,  1,  1 },
   { Sethalo,        SethaloHelp,       SethaloOperators,       CDI_REAL,  1,  1 },
-  { Setrcaname,     NULL,              SetrcanameOperators,    CDI_REAL,  1,  1 },
   { Setmiss,        SetmissHelp,       SetmissOperators,       CDI_REAL,  1,  1 },
+  { Setpartab,      SetHelp,           SetpartabOperators,     CDI_REAL,  1,  1 },
+  { Setrcaname,     NULL,              SetrcanameOperators,    CDI_REAL,  1,  1 },
   { Settime,        SettimeHelp,       SettimeOperators,       CDI_BOTH,  1,  1 },
   { Setzaxis,       SetzaxisHelp,      SetzaxisOperators,      CDI_BOTH,  1,  1 },
   { Scatter,        NULL,              ScatterOperators,       CDI_REAL,  1,  1 },
