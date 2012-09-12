@@ -184,11 +184,12 @@ void *Set(void *argument)
 	  FILE *fp;
 	  namelist_t *nml;
 	  int nml_code, nml_new_code, nml_table, nml_datatype, nml_name, nml_new_name, nml_stdname;
-	  int nml_longname, nml_units, nml_ltype;
+	  int nml_longname, nml_units, nml_ltype, nml_missval;
 	  int locc, i;
 	  int code, new_code, table, ltype;
 	  int nml_index = 0;
 	  int codenum, tabnum, levtype;
+	  double missval;
 	  char *datatype = NULL;
 	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
 	  char varname[CDI_MAX_NAME];
@@ -204,6 +205,7 @@ void *Set(void *argument)
 	  nml_new_code = namelistAdd(nml, "new_code",      NML_INT,  0, &new_code, 1);
 	  nml_table    = namelistAdd(nml, "table",         NML_INT,  0, &table, 1);
 	  nml_ltype    = namelistAdd(nml, "ltype",         NML_INT,  0, &ltype, 1);
+	  nml_missval  = namelistAdd(nml, "missval",       NML_FLT,  0, &missval, 1);
 	  nml_datatype = namelistAdd(nml, "datatype",      NML_WORD, 0, &datatype, 1);
 	  nml_name     = namelistAdd(nml, "name",          NML_WORD, 0, &name, 1);
 	  nml_new_name = namelistAdd(nml, "new_name",      NML_WORD, 0, &new_name, 1);
