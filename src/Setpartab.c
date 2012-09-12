@@ -51,9 +51,13 @@ void *Setpartab(void *argument)
   double *array = NULL;
   typedef struct
   {
+
     int changemissval;
     double missval_old;
     double missval;
+    int changeunits;
+    char units_old[CDI_MAX_NAME];
+    char units[CDI_MAX_NAME];
   } var_t;
   var_t *vars = NULL;
 
@@ -219,7 +223,26 @@ void *Setpartab(void *argument)
 		      if ( nml->entry[nml_new_name]->occ ) vlistDefVarName(vlistID2, varID, new_name);
 		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
 		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
-		      if ( nml->entry[nml_units]->occ    ) vlistDefVarUnits(vlistID2, varID, units);
+		      if ( nml->entry[nml_units]->occ    )
+			{
+			  char units_old[CDI_MAX_NAME];
+			  size_t len1, len2;
+			  vlistInqVarUnits(vlistID2, varID, units_old);
+			  len1 = strlen(units_old);
+			  len2 = strlen(units);
+
+			  if ( memcmp(units, units_old, len2) != 0 )
+			    {
+			      if ( cdoVerbose ) cdoPrint("%s - change units from [%s] to [%s]", name, units_old, units);
+			      if ( len1 > 0 && len2 > 0 )
+				{
+				  vars[varID].changeunits = TRUE;
+				  strcpy(vars[varID].units_old, units_old);
+				  strcpy(vars[varID].units, units);
+				}
+			      vlistDefVarUnits(vlistID2, varID, units);
+			    }
+			}
 		      if ( nml->entry[nml_datatype]->occ )
 			{
 			  int dtype = -1;
@@ -236,7 +259,7 @@ void *Setpartab(void *argument)
 			  missval_old = vlistInqVarMissval(vlistID2, varID);
 			  if ( ! DBL_IS_EQUAL(missval, missval_old) )
 			    {
-			      printf("change missval to %g\n", missval);
+			      if ( cdoVerbose ) cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
 			      vars[varID].changemissval = TRUE;
 			      vars[varID].missval_old = missval_old;
 			      vars[varID].missval = missval;
@@ -256,7 +279,7 @@ void *Setpartab(void *argument)
 				cdoPrint("Code %d and table %d not found!", code, table);
 			    }
 			  else
-			    cdoPrint("Variable %s not found!", name);
+			    cdoPrint("%s - not found!", name);
 			}
 		    }
 		}
@@ -293,14 +316,24 @@ void *Setpartab(void *argument)
 
 	  streamReadRecord(streamID1, array, &nmiss);
 
+	  missval = vlistInqVarMissval(vlistID2, varID);
+	  gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
+	  if ( vlistInqVarNumber(vlistID2, varID) != CDI_REAL ) gridsize *= 2;
+
 	  if ( nmiss > 0 && vars[varID].changemissval == TRUE )
 	    {
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID2, varID));
-	      if ( vlistInqVarNumber(vlistID2, varID) != CDI_REAL ) gridsize *= 2;
 	      for ( long i = 0; i < gridsize; ++i )
 		{
 		  if ( DBL_IS_EQUAL(array[i], vars[varID].missval_old) ) array[i] = vars[varID].missval;
 		}
+	    }
+
+	  if ( vars[varID].changeunits == TRUE )
+	    {
+	      for ( long i = 0; i < gridsize; ++i )
+		{
+		  //  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] = cv_convert_double(ut_cdo_converter, array[i])v;
+		}	      
 	    }
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
