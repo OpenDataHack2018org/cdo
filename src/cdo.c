@@ -206,7 +206,7 @@ void usage(void)
   fprintf(stderr, "\n");
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
-  fprintf(stderr, "    -L             Lock IO");
+  fprintf(stderr, "    -L             Lock IO\n");
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");

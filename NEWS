@@ -2,11 +2,12 @@ CDO NEWS
 --------
 Version 1.5.8 (?? October 2012):
 
+   New features:
+     * Added support for netCDF4(HDF5) formatted SCRIP grids
    Changed operators:
      * Info:  changed output format
      * Sinfo: changed output format
      * Diff:  changed output format
-
 
 Version 1.5.6.1 (26 July 2012):
 
