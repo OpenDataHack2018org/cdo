@@ -215,16 +215,13 @@ void *Rhopot(void *argument)
       gridID  = vlistInqVarGrid(vlistID1, varID);
 
       code = vlistInqVarCode(vlistID1, varID);
-      /* code = -1; */
-      if ( code <= 0 )
-	{
-	  vlistInqVarName(vlistID1, varID, varname);
+      vlistInqVarName(vlistID1, varID, varname);
+      strtolower(varname);
 
-	  strtolower(varname);
-
-	  if      ( strcmp(varname, "tho")   == 0 ) code = 2;
-	  else if ( strcmp(varname, "sao")   == 0 ) code = 5;
-	}
+      if      ( strcmp(varname, "tho")   == 0 ) code = 2;
+      else if ( strcmp(varname, "sao")   == 0 ) code = 5;
+      else if ( strcmp(varname, "t")     == 0 ) code = 2;
+      else if ( strcmp(varname, "s")     == 0 ) code = 5;
 
       if      ( code == 2 ) thoID = varID;
       else if ( code == 5 ) saoID = varID;
