@@ -21,12 +21,80 @@
       Setpartab  setpartab       Set parameter table
 */
 
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h"
+#endif
+
+#if defined (HAVE_LIBUDUNITS2)
+#  include <udunits2/udunits2.h>
+#endif
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 #include "namelist.h"
 
+
+#if defined (HAVE_LIBUDUNITS2)
+ut_system *ut_read = NULL;
+
+static
+void *get_converter(char *src_unit_str, char *tgt_unit_str)
+{
+  ut_unit *src_unit, *tgt_unit;
+  cv_converter *ut_units_converter = NULL;
+
+  if ( ut_read == NULL )
+    {
+      ut_read = ut_read_xml(NULL);
+      if ( ut_get_status() != UT_SUCCESS )
+	{
+	  if ( cdoVerbose ) cdoWarning("Udunits: Error reading units system!");
+	  return NULL;
+	}
+    }
+
+  ut_trim(src_unit_str, UT_ASCII);
+  src_unit = ut_parse(ut_read, src_unit_str, UT_ASCII);
+  if ( ut_get_status() != UT_SUCCESS )
+    {
+      if ( cdoVerbose ) cdoWarning("Udunits: Error parsing units: %s", src_unit_str);
+      return NULL;
+    }
+
+  ut_trim(tgt_unit_str, UT_ASCII);
+  tgt_unit = ut_parse(ut_read, tgt_unit_str, UT_ASCII);
+  if ( ut_get_status() != UT_SUCCESS )
+    {
+      if ( cdoVerbose ) cdoWarning("Udunits: Error parsing units: %s", tgt_unit_str);
+      return NULL;
+    }
+
+  ut_units_converter = ut_get_converter(src_unit, tgt_unit);
+  if ( ut_get_status() != UT_SUCCESS )
+    {
+      if ( cdoVerbose ) cdoWarning("Udunits: Error getting converter from %s to %s", src_unit_str, tgt_unit_str);
+      return NULL;
+    }
+
+  ut_free(src_unit);
+  if ( ut_get_status() != UT_SUCCESS )
+    {
+      if ( cdoVerbose ) cdoWarning("Udunits: Error freeing units %s", src_unit_str);
+      return NULL;
+    }
+     
+  ut_free(tgt_unit);
+  if ( ut_get_status() != UT_SUCCESS )
+    {
+      if ( cdoVerbose ) cdoWarning("Udunits: Error freeing units %s", tgt_unit_str);
+      return NULL;
+    }
+
+  return ((void *) ut_units_converter);
+}
+#endif
 
 void *Setpartab(void *argument)
 {
@@ -44,6 +112,7 @@ void *Setpartab(void *argument)
   int tableformat = 0;
   int zaxistype;
   int newparam = 0;
+  int lwarn_udunits = TRUE;
   char *newname = NULL, *partab = NULL;
   double missval;
   double newlevel = 0;
@@ -56,8 +125,10 @@ void *Setpartab(void *argument)
     double missval_old;
     double missval;
     int changeunits;
+    char name[CDI_MAX_NAME];
     char units_old[CDI_MAX_NAME];
     char units[CDI_MAX_NAME];
+    void *ut_converter;
   } var_t;
   var_t *vars = NULL;
 
@@ -140,7 +211,7 @@ void *Setpartab(void *argument)
 
 	  partab = operatorArgv()[0];
 	  fp = fopen(partab, "r");
-	  if ( fp == NULL ) cdoAbort("Internal problem! Parameter table %s not available", partab);
+	  if ( fp == NULL ) cdoAbort("Open failed on parameter table %s!", partab);
 
 	  nml = namelistNew("parameter");
 	  nml->dis = 0;
@@ -219,6 +290,7 @@ void *Setpartab(void *argument)
 		    {
 		      if ( nml->entry[nml_code]->occ     ) vlistDefVarCode(vlistID2, varID, code);
 		      if ( nml->entry[nml_new_code]->occ ) vlistDefVarCode(vlistID2, varID, new_code);
+		      if ( nml->entry[nml_name]->occ     ) strcpy(vars[varID].name, name);
 		      if ( nml->entry[nml_name]->occ     ) vlistDefVarName(vlistID2, varID, name);
 		      if ( nml->entry[nml_new_name]->occ ) vlistDefVarName(vlistID2, varID, new_name);
 		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
@@ -239,6 +311,21 @@ void *Setpartab(void *argument)
 				  vars[varID].changeunits = TRUE;
 				  strcpy(vars[varID].units_old, units_old);
 				  strcpy(vars[varID].units, units);
+#if defined (HAVE_LIBUDUNITS2)
+				  vars[varID].ut_converter = get_converter(units_old, units);
+				  if ( vars[varID].ut_converter == NULL )
+				    {
+				      cdoWarning("%s - change units from [%s] to [%s] failed!", name, units_old, units);
+				      vars[varID].changeunits = FALSE;
+				    }
+#else
+				  if ( lwarn_udunits )
+				    {
+				      cdoWarning("Can not convert units, UDUNITS2 support not compiled in!");
+				      vars[varID].changeunits = FALSE;
+				      lwarn_udunits = FALSE;
+				    }
+#endif
 				}
 			      vlistDefVarUnits(vlistID2, varID, units);
 			    }
@@ -328,13 +415,26 @@ void *Setpartab(void *argument)
 		}
 	    }
 
+#if defined (HAVE_LIBUDUNITS2)
 	  if ( vars[varID].changeunits == TRUE )
 	    {
+	      int nerr = 0;
 	      for ( long i = 0; i < gridsize; ++i )
 		{
-		  //  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] = cv_convert_double(ut_cdo_converter, array[i])v;
-		}	      
+		  if ( !DBL_IS_EQUAL(array[i], missval) )
+		    {
+		      array[i] = cv_convert_double(vars[varID].ut_converter, array[i]);
+		      if ( ut_get_status() != UT_SUCCESS ) nerr++;
+		    }
+		}
+	      if ( nerr )
+		{
+		  cdoWarning("Udunits: Error with converter (from %s to %s), parameter: %s",
+			     vars[varID].units_old, vars[varID].units, vars[varID].name);
+		  vars[varID].changeunits = FALSE;
+		}
 	    }
+#endif
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
 	}
@@ -343,6 +443,12 @@ void *Setpartab(void *argument)
 
   streamClose(streamID2);
   streamClose(streamID1);
+
+#if defined (HAVE_LIBUDUNITS2)
+  for ( varID = 0; varID < nvars; varID++ )
+    if ( vars[varID].ut_converter ) cv_free(vars[varID].ut_converter);
+  if ( ut_read ) ut_free_system(ut_read);
+#endif
 
   if ( array ) free(array);
   if ( vars  ) free(vars);
