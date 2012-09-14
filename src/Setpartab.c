@@ -120,14 +120,17 @@ void *Setpartab(void *argument)
   double *array = NULL;
   typedef struct
   {
-
+    // missing value
     int changemissval;
     double missval_old;
     double missval;
+    // units
     int changeunits;
-    char name[CDI_MAX_NAME];
     char units_old[CDI_MAX_NAME];
     char units[CDI_MAX_NAME];
+    // varname
+    char name[CDI_MAX_NAME];
+    // converter
     void *ut_converter;
   } var_t;
   var_t *vars = NULL;
