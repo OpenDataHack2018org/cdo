@@ -118,7 +118,8 @@ double listGetFlt(LIST *list, int num)
 }
 
 
-static void split_intstring(const char *intstr, int *first, int *last, int *inc)
+static
+void split_intstring(const char *intstr, int *first, int *last, int *inc)
 {
   int i, start;
   int istrlen;

@@ -122,7 +122,7 @@ STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
 @Item = date1
 STRING   Start date (format YYYY-MM-DDThh:mm:ss)
 @Item = date2
-STRING   End date (format YYYY-MM-DDThh:mm:ss)
+STRING   End date (format YYYY-MM-DDThh:mm:ss) [default: date1]
 @Item = nts1
 INTEGER  Number of timesteps before the selected month [default: 0]
 @Item = nts2
