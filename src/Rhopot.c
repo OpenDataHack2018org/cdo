@@ -193,7 +193,7 @@ void *Rhopot(void *argument)
   int i;
   int nmiss;
   int thoID = -1, saoID = -1;
-  char varname[CDI_MAX_NAME];
+  char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   int taxisID1, taxisID2;
   double pin = -1;
   double *pressure;
@@ -216,12 +216,17 @@ void *Rhopot(void *argument)
 
       code = vlistInqVarCode(vlistID1, varID);
       vlistInqVarName(vlistID1, varID, varname);
+      vlistInqVarStdname(vlistID1,varID, stdname);
       strtolower(varname);
 
       if      ( strcmp(varname, "tho")   == 0 ) code = 2;
       else if ( strcmp(varname, "sao")   == 0 ) code = 5;
+
       else if ( strcmp(varname, "t")     == 0 ) code = 2;
       else if ( strcmp(varname, "s")     == 0 ) code = 5;
+
+      else if ( strcmp(stdname, "sea_water_potential_temperature") == 0 ) code = 2;
+      else if ( strcmp(stdname, "sea_water_salinity")              == 0 ) code = 5;
 
       if      ( code == 2 ) thoID = varID;
       else if ( code == 5 ) saoID = varID;
