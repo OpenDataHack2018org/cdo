@@ -346,8 +346,10 @@ int str2datatype(const char *datatypestr)
 
   if ( len > 1 )
     {
+      int ilen = atoi(datatypestr+1);
       if      ( memcmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
-      else if ( memcmp(datatypestr, "P",     1) == 0 ) datatype = atoi(datatypestr+1);
+      else if ( memcmp(datatypestr, "P",     1) == 0 &&
+		ilen > 0 && ilen <= 32 )               datatype = atoi(datatypestr+1);
       else if ( memcmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
       else if ( memcmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
       else if ( memcmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
