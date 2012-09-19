@@ -39,5 +39,6 @@ int userFileOverwrite(const char *filename);
 
 /* convert a CDI datatype to string */
 int datatype2str(int datatype, char *datatypestr);
+int str2datatype(const char *datatypestr);
 
 #endif  /* _UTIL_H */

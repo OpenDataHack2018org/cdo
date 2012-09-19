@@ -335,3 +335,30 @@ int datatype2str(int datatype, char *datatypestr)
 
   return (status);
 }
+
+
+int str2datatype(const char *datatypestr)
+{
+  int datatype = -1;
+  size_t len;
+
+  len = strlen(datatypestr);
+
+  if ( len > 1 )
+    {
+      if      ( memcmp(datatypestr, "P0",  len) == 0 ) datatype = DATATYPE_PACK;
+      else if ( memcmp(datatypestr, "P",     1) == 0 ) datatype = atoi(datatypestr+1);
+      else if ( memcmp(datatypestr, "C32", len) == 0 ) datatype = DATATYPE_CPX32;
+      else if ( memcmp(datatypestr, "C64", len) == 0 ) datatype = DATATYPE_CPX64;
+      else if ( memcmp(datatypestr, "F32", len) == 0 ) datatype = DATATYPE_FLT32;
+      else if ( memcmp(datatypestr, "F64", len) == 0 ) datatype = DATATYPE_FLT64;
+      else if ( memcmp(datatypestr, "I8",  len) == 0 ) datatype = DATATYPE_INT8;
+      else if ( memcmp(datatypestr, "I16", len) == 0 ) datatype = DATATYPE_INT16;
+      else if ( memcmp(datatypestr, "I32", len) == 0 ) datatype = DATATYPE_INT32;
+      else if ( memcmp(datatypestr, "U8",  len) == 0 ) datatype = DATATYPE_UINT8;
+      else if ( memcmp(datatypestr, "U16", len) == 0 ) datatype = DATATYPE_UINT16;
+      else if ( memcmp(datatypestr, "U32", len) == 0 ) datatype = DATATYPE_UINT32;
+    }
+
+  return (datatype);
+}

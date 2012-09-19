@@ -208,7 +208,7 @@ void *Setpartab(void *argument)
 	  int nml_index = 0;
 	  int codenum, tabnum, levtype;
 	  double missval;
-	  char *datatype = NULL;
+	  char *datatypestr = NULL;
 	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
 	  char varname[CDI_MAX_NAME];
 
@@ -224,7 +224,7 @@ void *Setpartab(void *argument)
 	  nml_table    = namelistAdd(nml, "table",         NML_INT,  0, &table, 1);
 	  nml_ltype    = namelistAdd(nml, "ltype",         NML_INT,  0, &ltype, 1);
 	  nml_missval  = namelistAdd(nml, "missval",       NML_FLT,  0, &missval, 1);
-	  nml_datatype = namelistAdd(nml, "datatype",      NML_WORD, 0, &datatype, 1);
+	  nml_datatype = namelistAdd(nml, "datatype",      NML_WORD, 0, &datatypestr, 1);
 	  nml_name     = namelistAdd(nml, "name",          NML_WORD, 0, &name, 1);
 	  nml_new_name = namelistAdd(nml, "new_name",      NML_WORD, 0, &new_name, 1);
 	  nml_stdname  = namelistAdd(nml, "standard_name", NML_WORD, 0, &stdname, 1);
@@ -335,13 +335,8 @@ void *Setpartab(void *argument)
 			}
 		      if ( nml->entry[nml_datatype]->occ )
 			{
-			  int dtype = -1;
-			  if ( strlen(datatype) == 3 )
-			    {
-			      if      ( memcmp(datatype, "F32", 3) == 0 ) dtype = DATATYPE_FLT32;
-			      else if ( memcmp(datatype, "F64", 3) == 0 ) dtype = DATATYPE_FLT64;
-			    }
-			  if ( dtype != -1 ) vlistDefVarDatatype(vlistID2, varID, dtype);
+			  int datatype = str2datatype(datatypestr);
+			  if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
 			}
 		      if ( nml->entry[nml_missval]->occ )
 			{
