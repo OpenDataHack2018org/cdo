@@ -37,4 +37,7 @@ void progressStatus(double offset, double refval, double curval);
 int fileExist(const char *filename);
 int userFileOverwrite(const char *filename);
 
+/* convert a CDI datatype to string */
+int datatype2str(int datatype, char *datatypestr);
+
 #endif  /* _UTIL_H */

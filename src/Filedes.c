@@ -27,6 +27,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 
 static
@@ -82,7 +83,7 @@ void printAtts(FILE *fp, int vlistID, int varID)
 static
 void partab(FILE *fp, int vlistID, int option)
 {
-  int varID, code, tabnum, tableID, prec;
+  int varID, code, tabnum, tableID, datatype = -1;
   char pstr[32];
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
   int natts;
@@ -98,6 +99,28 @@ void partab(FILE *fp, int vlistID, int option)
 	  fprintf(fp, "&PARAMETER\n");
 	  fprintf(fp, "  NAME=_GLOBAL_\n");
 	  printAtts(fp, vlistID, CDI_GLOBAL);
+	  fprintf(fp, "/\n");
+	}
+    }
+
+  if ( nvars > 1 )
+    {
+      datatype = vlistInqVarDatatype(vlistID, 0);
+      for ( varID = 1; varID < nvars; varID++ )
+	{
+	  if ( datatype != vlistInqVarDatatype(vlistID, varID) )
+	    {
+	      datatype = -1;
+	      break;
+	    }
+	}
+
+      if ( datatype != -1 )
+	{
+	  fprintf(fp, "&PARAMETER\n");
+	  fprintf(fp, "  name=_default_\n");
+	  if ( datatype2str(datatype, pstr) == 0 )
+	    fprintf(fp, "  datatype=%s\n", pstr);
 	  fprintf(fp, "/\n");
 	}
     }
@@ -119,20 +142,7 @@ void partab(FILE *fp, int vlistID, int option)
       vlistInqVarLongname(vlistID, varID, varlongname);
       /* printf("3>%s<\n", varname); */
       vlistInqVarUnits(vlistID, varID, varunits);
-      
-      prec = vlistInqVarDatatype(vlistID, varID);
-      if      ( prec == DATATYPE_PACK   ) strcpy(pstr, "P0");
-      else if ( prec > 0 && prec <= 32  ) sprintf(pstr, "P%d", prec);
-      else if ( prec == DATATYPE_FLT32  ) strcpy(pstr, "F32");
-      else if ( prec == DATATYPE_FLT64  ) strcpy(pstr, "F64");
-      else if ( prec == DATATYPE_INT8   ) strcpy(pstr, "I8");
-      else if ( prec == DATATYPE_INT16  ) strcpy(pstr, "I16");
-      else if ( prec == DATATYPE_INT32  ) strcpy(pstr, "I32");
-      else if ( prec == DATATYPE_UINT8  ) strcpy(pstr, "U8");
-      else if ( prec == DATATYPE_UINT16 ) strcpy(pstr, "U16");
-      else if ( prec == DATATYPE_UINT32 ) strcpy(pstr, "U32");
-      else                                strcpy(pstr, "-1");
-      
+            
       if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
       if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
       fprintf(fp, "  name=%s\n", varname);
@@ -143,7 +153,9 @@ void partab(FILE *fp, int vlistID, int option)
       if ( strlen(varunits) )
 	fprintf(fp, "  units=\"%s\"\n", varunits);
       
-      fprintf(fp, "  datatype=%s\n", pstr);
+      if ( datatype == -1 )
+	if ( datatype2str(vlistInqVarDatatype(vlistID, varID), pstr) == 0 )
+	  fprintf(fp, "  datatype=%s\n", pstr);
       
       if ( option == 2 ) printAtts(fp, vlistID, varID);
       

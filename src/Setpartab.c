@@ -335,13 +335,13 @@ void *Setpartab(void *argument)
 			}
 		      if ( nml->entry[nml_datatype]->occ )
 			{
-			  int dtype = -1;
+			  int datatype = -1;
 			  if ( strlen(datatype) == 3 )
 			    {
-			      if      ( memcmp(datatype, "F32", 3) == 0 ) dtype = DATATYPE_FLT32;
-			      else if ( memcmp(datatype, "F64", 3) == 0 ) dtype = DATATYPE_FLT64;
+			      if      ( memcmp(datatype, "F32", 3) == 0 ) datatype = DATATYPE_FLT32;
+			      else if ( memcmp(datatype, "F64", 3) == 0 ) datatype = DATATYPE_FLT64;
 			    }
-			  if ( dtype != -1 ) vlistDefVarDatatype(vlistID2, varID, dtype);
+			  if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
 			}
 		      if ( nml->entry[nml_missval]->occ )
 			{

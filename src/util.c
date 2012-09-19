@@ -19,10 +19,12 @@
 #include <string.h>
 #include <ctype.h>   /* tolower */
 
+#include "cdi.h"
 #include "cdo.h"
 #include "cdo_int.h"
 #include "modules.h"
 #include "util.h"
+
 
 char *getProgname(char *string)
 {
@@ -310,4 +312,26 @@ void progressStatus(double offset, double refval, double curval)
       while ( ps_nch-- ) fprintf(stdout, "\b \b");
       fflush(stdout);
     }
+}
+
+
+int datatype2str(int datatype, char *datatypestr)
+{
+  int status = 0;
+
+  if      ( datatype == DATATYPE_PACK   ) strcpy(datatypestr, "P0");
+  else if ( datatype > 0 && datatype <= 32  ) sprintf(datatypestr, "P%d", datatype);
+  else if ( datatype == DATATYPE_CPX32  ) strcpy(datatypestr, "C32");
+  else if ( datatype == DATATYPE_CPX64  ) strcpy(datatypestr, "C64");
+  else if ( datatype == DATATYPE_FLT32  ) strcpy(datatypestr, "F32");
+  else if ( datatype == DATATYPE_FLT64  ) strcpy(datatypestr, "F64");
+  else if ( datatype == DATATYPE_INT8   ) strcpy(datatypestr, "I8");
+  else if ( datatype == DATATYPE_INT16  ) strcpy(datatypestr, "I16");
+  else if ( datatype == DATATYPE_INT32  ) strcpy(datatypestr, "I32");
+  else if ( datatype == DATATYPE_UINT8  ) strcpy(datatypestr, "U8");
+  else if ( datatype == DATATYPE_UINT16 ) strcpy(datatypestr, "U16");
+  else if ( datatype == DATATYPE_UINT32 ) strcpy(datatypestr, "U32");
+  else                                  { strcpy(datatypestr, "-1"); status = -1;}
+
+  return (status);
 }

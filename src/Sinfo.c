@@ -25,6 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "util.h"
 
 #include "printinfo.h"
 
@@ -133,19 +134,7 @@ void *Sinfo(void *argument)
 
 	  /* datatype */
 	  datatype = vlistInqVarDatatype(vlistID, varID);
-	  if      ( datatype == DATATYPE_PACK   ) strcpy(pstr, "P0");
-	  else if ( datatype > 0 && datatype <= 32  ) sprintf(pstr, "P%d", datatype);
-	  else if ( datatype == DATATYPE_CPX32  ) strcpy(pstr, "C32");
-	  else if ( datatype == DATATYPE_CPX64  ) strcpy(pstr, "C64");
-	  else if ( datatype == DATATYPE_FLT32  ) strcpy(pstr, "F32");
-	  else if ( datatype == DATATYPE_FLT64  ) strcpy(pstr, "F64");
-	  else if ( datatype == DATATYPE_INT8   ) strcpy(pstr, "I8");
-	  else if ( datatype == DATATYPE_INT16  ) strcpy(pstr, "I16");
-	  else if ( datatype == DATATYPE_INT32  ) strcpy(pstr, "I32");
-	  else if ( datatype == DATATYPE_UINT8  ) strcpy(pstr, "U8");
-	  else if ( datatype == DATATYPE_UINT16 ) strcpy(pstr, "U16");
-	  else if ( datatype == DATATYPE_UINT32 ) strcpy(pstr, "U32");
-	  else                                    strcpy(pstr, "-1");
+	  datatype2str(datatype, pstr);
 
 	  fprintf(stdout, " %-3s", pstr);
 
