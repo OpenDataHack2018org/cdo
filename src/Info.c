@@ -320,7 +320,7 @@ void *Info(void *argument)
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
 		{
-		  fprintf(stdout, "            %#12.5g", array[0]);
+		  fprintf(stdout, "            %#12.5g            ", array[0]);
 		}
 	      else
 		{

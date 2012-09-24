@@ -125,6 +125,81 @@ void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
 }
 #endif
 
+typedef struct
+{
+  // missing value
+  int changemissval;
+  double missval_old;
+  double missval;
+  // units
+  int changeunits;
+  char units_old[CDI_MAX_NAME];
+  char units[CDI_MAX_NAME];
+  // varname
+  char name[CDI_MAX_NAME];
+  // converter
+  void *ut_converter;
+} var_t;
+
+int lwarn_udunits = TRUE;
+
+static
+void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *name)
+{
+  char units_old[CDI_MAX_NAME];
+  size_t len1, len2;
+  vlistInqVarUnits(vlistID2, varID, units_old);
+  len1 = strlen(units_old);
+  len2 = strlen(units);
+
+  if ( memcmp(units, units_old, len2) != 0 )
+    {
+      if ( len1 > 0 && len2 > 0 )
+	{
+	  int status;
+	  vars[varID].changeunits = TRUE;
+	  strcpy(vars[varID].units_old, units_old);
+	  strcpy(vars[varID].units, units);
+#if defined (HAVE_LIBUDUNITS2)
+	  vars[varID].ut_converter = get_converter(units_old, units, &status);
+	  if ( vars[varID].ut_converter == NULL )
+	    {
+	      if ( status == -2 )
+		{
+		  if ( cdoVerbose )
+		    cdoPrint("%s - not converted from [%s] to [%s], units are equal!", name, units_old, units);
+		}
+	      else if ( status == -3 )
+		{
+		  cdoWarning("%s - converting units from [%s] to [%s] failed, not convertible!", name, units_old, units);
+		}
+	      else
+		cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
+	      vars[varID].changeunits = FALSE;
+	    }
+	  else
+	    {
+	      if ( cdoVerbose )
+		{
+		  char buf[64];
+		  cv_get_expression(vars[varID].ut_converter, buf, 64, name);
+		  cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).", name, units_old, units, buf);
+		}
+	    }
+#else
+	  if ( lwarn_udunits )
+	    {
+	      cdoWarning("Can not convert units, UDUNITS2 support not compiled in!");
+	      vars[varID].changeunits = FALSE;
+	      lwarn_udunits = FALSE;
+	    }
+#endif
+	}
+      vlistDefVarUnits(vlistID2, varID, units);
+    }
+}
+
+
 void *Setpartab(void *argument)
 {
   int SETPARTAB, SETPARTABV;
@@ -141,27 +216,11 @@ void *Setpartab(void *argument)
   int tableformat = 0;
   int zaxistype;
   int newparam = 0;
-  int lwarn_udunits = TRUE;
   char *newname = NULL, *partab = NULL;
   double missval;
   double newlevel = 0;
   double *levels = NULL;
   double *array = NULL;
-  typedef struct
-  {
-    // missing value
-    int changemissval;
-    double missval_old;
-    double missval;
-    // units
-    int changeunits;
-    char units_old[CDI_MAX_NAME];
-    char units[CDI_MAX_NAME];
-    // varname
-    char name[CDI_MAX_NAME];
-    // converter
-    void *ut_converter;
-  } var_t;
   var_t *vars = NULL;
 
 
@@ -230,15 +289,15 @@ void *Setpartab(void *argument)
 	{
 	  FILE *fp;
 	  namelist_t *nml;
-	  int nml_code, nml_new_code, nml_table, nml_datatype, nml_name, nml_new_name, nml_stdname;
+	  int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
 	  int nml_longname, nml_units, nml_ltype, nml_missval;
 	  int locc, i;
-	  int code, new_code, table, ltype;
+	  int code, out_code, table, ltype;
 	  int nml_index = 0;
 	  int codenum, tabnum, levtype;
 	  double missval;
 	  char *datatypestr = NULL;
-	  char *name = NULL, *new_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
+	  char *name = NULL, *out_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
 	  char varname[CDI_MAX_NAME];
 
 	  partab = operatorArgv()[0];
@@ -248,17 +307,17 @@ void *Setpartab(void *argument)
 	  nml = namelistNew("parameter");
 	  nml->dis = 0;
 
-	  nml_code     = namelistAdd(nml, "code",          NML_INT,  0, &code, 1);
-	  nml_new_code = namelistAdd(nml, "new_code",      NML_INT,  0, &new_code, 1);
-	  nml_table    = namelistAdd(nml, "table",         NML_INT,  0, &table, 1);
-	  nml_ltype    = namelistAdd(nml, "ltype",         NML_INT,  0, &ltype, 1);
-	  nml_missval  = namelistAdd(nml, "missval",       NML_FLT,  0, &missval, 1);
-	  nml_datatype = namelistAdd(nml, "datatype",      NML_WORD, 0, &datatypestr, 1);
-	  nml_name     = namelistAdd(nml, "name",          NML_WORD, 0, &name, 1);
-	  nml_new_name = namelistAdd(nml, "new_name",      NML_WORD, 0, &new_name, 1);
-	  nml_stdname  = namelistAdd(nml, "standard_name", NML_WORD, 0, &stdname, 1);
-	  nml_longname = namelistAdd(nml, "long_name",     NML_TEXT, 0, longname, sizeof(longname));
-	  nml_units    = namelistAdd(nml, "units",         NML_TEXT, 0, units, sizeof(units));
+	  nml_code     = namelistAdd(nml, "code",            NML_INT,  0, &code, 1);
+	  nml_out_code = namelistAdd(nml, "out_code",        NML_INT,  0, &out_code, 1);
+	  nml_table    = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
+	  nml_ltype    = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
+	  nml_missval  = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
+	  nml_datatype = namelistAdd(nml, "datatype",        NML_WORD, 0, &datatypestr, 1);
+	  nml_name     = namelistAdd(nml, "name",            NML_WORD, 0, &name, 1);
+	  nml_out_name = namelistAdd(nml, "out_name",        NML_WORD, 0, &out_name, 1);
+	  nml_stdname  = namelistAdd(nml, "standard_name",   NML_WORD, 0, &stdname, 1);
+	  nml_longname = namelistAdd(nml, "long_name",       NML_TEXT, 0, longname, sizeof(longname));
+	  nml_units    = namelistAdd(nml, "units",           NML_TEXT, 0, units, sizeof(units));
 	      
 	  while ( ! feof(fp) )
 	    {
@@ -321,66 +380,13 @@ void *Setpartab(void *argument)
 		  if ( varID < nvars )
 		    {
 		      if ( nml->entry[nml_code]->occ     ) vlistDefVarCode(vlistID2, varID, code);
-		      if ( nml->entry[nml_new_code]->occ ) vlistDefVarCode(vlistID2, varID, new_code);
+		      if ( nml->entry[nml_out_code]->occ ) vlistDefVarCode(vlistID2, varID, out_code);
 		      if ( nml->entry[nml_name]->occ     ) strcpy(vars[varID].name, name);
 		      if ( nml->entry[nml_name]->occ     ) vlistDefVarName(vlistID2, varID, name);
-		      if ( nml->entry[nml_new_name]->occ ) vlistDefVarName(vlistID2, varID, new_name);
+		      if ( nml->entry[nml_out_name]->occ ) vlistDefVarName(vlistID2, varID, out_name);
 		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
 		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
-		      if ( nml->entry[nml_units]->occ    )
-			{
-			  char units_old[CDI_MAX_NAME];
-			  size_t len1, len2;
-			  vlistInqVarUnits(vlistID2, varID, units_old);
-			  len1 = strlen(units_old);
-			  len2 = strlen(units);
-
-			  if ( memcmp(units, units_old, len2) != 0 )
-			    {
-			      if ( len1 > 0 && len2 > 0 )
-				{
-				  int status;
-				  vars[varID].changeunits = TRUE;
-				  strcpy(vars[varID].units_old, units_old);
-				  strcpy(vars[varID].units, units);
-#if defined (HAVE_LIBUDUNITS2)
-				  vars[varID].ut_converter = get_converter(units_old, units, &status);
-				  if ( vars[varID].ut_converter == NULL )
-				    {
-				      if ( status == -2 )
-					{
-					  if ( cdoVerbose )
-					    cdoPrint("%s - not converted from [%s] to [%s], units are equal!", name, units_old, units);
-					}
-				      else if ( status == -3 )
-					{
-					  cdoWarning("%s - converting units from [%s] to [%s] failed, not convertible!", name, units_old, units);
-					}
-				      else
-					cdoWarning("%s - converting units from [%s] to [%s] failed!", name, units_old, units);
-				      vars[varID].changeunits = FALSE;
-				    }
-				  else
-				    {
-				      if ( cdoVerbose )
-					{
-					  char buf[64];
-					  cv_get_expression(vars[varID].ut_converter, buf, 64, name);
-					  cdoPrint("%s - convert units from [%s] to [%s] (expression: %s).", name, units_old, units, buf);
-					}
-				    }
-#else
-				  if ( lwarn_udunits )
-				    {
-				      cdoWarning("Can not convert units, UDUNITS2 support not compiled in!");
-				      vars[varID].changeunits = FALSE;
-				      lwarn_udunits = FALSE;
-				    }
-#endif
-				}
-			      vlistDefVarUnits(vlistID2, varID, units);
-			    }
-			}
+		      if ( nml->entry[nml_units]->occ    ) defineVarUnits(vars, vlistID2, varID, units, name);
 		      if ( nml->entry[nml_datatype]->occ )
 			{
 			  int datatype = str2datatype(datatypestr);
