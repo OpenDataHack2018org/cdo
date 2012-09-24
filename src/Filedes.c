@@ -143,9 +143,9 @@ void partab(FILE *fp, int vlistID, int option)
       /* printf("3>%s<\n", varname); */
       vlistInqVarUnits(vlistID, varID, varunits);
             
+      fprintf(fp, "  name=%s\n", varname);
       if ( code   > 0 ) fprintf(fp, "  code=%d\n", code);
       if ( tabnum > 0 ) fprintf(fp, "  table=%d\n", tabnum);
-      fprintf(fp, "  name=%s\n", varname);
       if ( strlen(varstdname) )
 	fprintf(fp, "  standard_name=%s\n", varstdname);
       if ( strlen(varlongname) )

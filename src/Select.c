@@ -469,6 +469,7 @@ void *Select(void *argument)
   PML_DEF_INT(day,       32, "Day");
   PML_DEF_INT(code,    1024, "Code number");
   PML_DEF_INT(ltype,   1024, "Level type");
+  PML_DEF_INT(levidx,  1024, "Level index");
   PML_DEF_FLT(level,   1024, "Level");
   PML_DEF_WORD(name,   1024, "Variable name");
   PML_DEF_WORD(param,  1024, "Parameter");
@@ -478,6 +479,7 @@ void *Select(void *argument)
   PML_INIT_INT(day);
   PML_INIT_INT(code);
   PML_INIT_INT(ltype);
+  PML_INIT_INT(levidx);
   PML_INIT_FLT(level);
   PML_INIT_WORD(name);
   PML_INIT_WORD(param);
@@ -507,6 +509,7 @@ void *Select(void *argument)
   PML_ADD_INT(pml, day);
   PML_ADD_INT(pml, code);
   PML_ADD_INT(pml, ltype);
+  PML_ADD_INT(pml, levidx);
   PML_ADD_FLT(pml, level);
   PML_ADD_WORD(pml, name);
   PML_ADD_WORD(pml, param);
@@ -520,6 +523,7 @@ void *Select(void *argument)
   PML_NUM(pml, day);
   PML_NUM(pml, code);
   PML_NUM(pml, ltype);
+  PML_NUM(pml, levidx);
   PML_NUM(pml, level);
   PML_NUM(pml, name);
   PML_NUM(pml, param);
@@ -575,21 +579,42 @@ void *Select(void *argument)
 	      param = paramstr;
 
 	      zaxisID = vlistInqVarZaxis(vlistID1, varID);
+	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
 
 	      vars[varID] = FALSE;
 	      
 	      if ( npar_ltype )
 		{
-		  if ( npar_code  && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
-		  if ( npar_name  && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
-		  if ( npar_param && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+		  if ( !vars[varID] && npar_code  && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
+		  if ( !vars[varID] && npar_name  && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
+		  if ( !vars[varID] && npar_param && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+		  if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
+		    {
+		      for ( levID = 0; levID < nlevs; levID++ )
+			{
+			  levidx = levID + 1;
+			  level = zaxisInqLevel(zaxisID, levID);
+			  if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
+			  if ( !vars[varID] && npar_level  && PAR_CHECK_INT(ltype) && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
+			}
+		    }
 		}
 	      else
 		{
-		  if ( npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
-		  if ( npar_name  && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
-		  if ( npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+		  if ( !vars[varID] && npar_code  && PAR_CHECK_INT(code) )   vars[varID] = TRUE;
+		  if ( !vars[varID] && npar_name  && PAR_CHECK_WORD(name) )  vars[varID] = TRUE;
+		  if ( !vars[varID] && npar_param && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
+		  if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
+		    {
+		      for ( levID = 0; levID < nlevs; levID++ )
+			{
+			  levidx = levID + 1;
+			  level = zaxisInqLevel(zaxisID, levID);
+			  if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
+			  if ( !vars[varID] && npar_level  && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
+			}
+		    }
 		}
 	    }
 
@@ -602,6 +627,7 @@ void *Select(void *argument)
 
 		  for ( levID = 0; levID < nlevs; levID++ )
 		    {
+		      levidx = levID + 1;
 		      level = zaxisInqLevel(zaxisID, levID);
 		      
 		      if ( nlevs == 1 && IS_EQUAL(level, 0) )
@@ -610,7 +636,12 @@ void *Select(void *argument)
 			}
 		      else
 			{
-			  if ( npar_level )
+			  if ( npar_levidx )
+			    {
+			      if ( PAR_CHECK_INT(levidx) )
+				vlistDefFlag(vlistID1, varID, levID, result);
+			    }
+			  else if ( npar_level )
 			    {
 			      if ( PAR_CHECK_FLT(level) )
 				vlistDefFlag(vlistID1, varID, levID, result);
@@ -626,6 +657,7 @@ void *Select(void *argument)
 
 	  PAR_CHECK_INT_FLAG(code);
 	  PAR_CHECK_INT_FLAG(ltype);
+	  PAR_CHECK_INT_FLAG(levidx);
 	  PAR_CHECK_FLT_FLAG(level);
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
