@@ -464,16 +464,18 @@ void *Select(void *argument)
   int npar;
   int *vars = NULL;
   pml_t *pml;
-  PML_DEF_INT(year,    1024, "Year");
-  PML_DEF_INT(month,     32, "Month");
-  PML_DEF_INT(day,       32, "Day");
-  PML_DEF_INT(code,    1024, "Code number");
-  PML_DEF_INT(ltype,   1024, "Level type");
-  PML_DEF_INT(levidx,  1024, "Level index");
-  PML_DEF_FLT(level,   1024, "Level");
-  PML_DEF_WORD(name,   1024, "Variable name");
-  PML_DEF_WORD(param,  1024, "Parameter");
+  PML_DEF_INT(timestep, 4096, "Timestep");
+  PML_DEF_INT(year,     1024, "Year");
+  PML_DEF_INT(month,      32, "Month");
+  PML_DEF_INT(day,        32, "Day");
+  PML_DEF_INT(code,     1024, "Code number");
+  PML_DEF_INT(ltype,    1024, "Level type");
+  PML_DEF_INT(levidx,   1024, "Level index");
+  PML_DEF_FLT(level,    1024, "Level");
+  PML_DEF_WORD(name,    1024, "Variable name");
+  PML_DEF_WORD(param,   1024, "Parameter");
 
+  PML_INIT_INT(timestep);
   PML_INIT_INT(year);
   PML_INIT_INT(month);
   PML_INIT_INT(day);
@@ -504,6 +506,7 @@ void *Select(void *argument)
   */
   pml = pmlNew("SELECT");
 
+  PML_ADD_INT(pml, timestep);
   PML_ADD_INT(pml, year);
   PML_ADD_INT(pml, month);
   PML_ADD_INT(pml, day);
@@ -518,6 +521,7 @@ void *Select(void *argument)
 
   if ( cdoVerbose ) pmlPrint(pml);
 
+  PML_NUM(pml, timestep);
   PML_NUM(pml, year);
   PML_NUM(pml, month);
   PML_NUM(pml, day);
@@ -662,7 +666,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
-	  if ( npar_year || npar_month || npar_day ) ltimsel = TRUE;
+	  if ( npar_timestep || npar_year || npar_month || npar_day ) ltimsel = TRUE;
 
 	  npar = 0;
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -753,21 +757,29 @@ void *Select(void *argument)
 	  vlistCompare(vlistID0, vlistID1, CMP_ALL);
 	}
 
+
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
 	{
 	  if ( ltimsel == TRUE )
 	    {
-	      int lyear = 0, lmonth = 0, lday = 0;
 	      copytimestep = FALSE;
-	      vdate = taxisInqVdate(taxisID1);
-	      vtime = taxisInqVtime(taxisID1);
-	      cdiDecodeDate(vdate, &year, &month, &day);
-	      if ( npar_year  == 0 || (npar_year   && PAR_CHECK_INT(year))  ) lyear  = TRUE;
-	      if ( npar_month == 0 || (npar_month  && PAR_CHECK_INT(month)) ) lmonth = TRUE;
-	      if ( npar_day   == 0 || (npar_day    && PAR_CHECK_INT(day))   ) lday   = TRUE;
+	      timestep = tsID1 + 1;
 
-	      if ( lyear && lmonth && lday ) copytimestep = TRUE;
+	      if ( npar_timestep && PAR_CHECK_INT(timestep) ) copytimestep = TRUE;
+
+	      if ( !copytimestep && npar_timestep == 0 )
+		{
+		  int lyear = 0, lmonth = 0, lday = 0;
+		  vdate = taxisInqVdate(taxisID1);
+		  vtime = taxisInqVtime(taxisID1);
+		  cdiDecodeDate(vdate, &year, &month, &day);
+		  if ( npar_year  == 0 || (npar_year   && PAR_CHECK_INT(year))  ) lyear  = TRUE;
+		  if ( npar_month == 0 || (npar_month  && PAR_CHECK_INT(month)) ) lmonth = TRUE;
+		  if ( npar_day   == 0 || (npar_day    && PAR_CHECK_INT(day))   ) lday   = TRUE;
+
+		  if ( lyear && lmonth && lday ) copytimestep = TRUE;
+		}
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
 	    }
@@ -811,6 +823,7 @@ void *Select(void *argument)
       streamClose(streamID1);
     }
 
+  PAR_CHECK_INT_FLAG(timestep);
   PAR_CHECK_INT_FLAG(year);
   PAR_CHECK_INT_FLAG(month);
   PAR_CHECK_INT_FLAG(day);
