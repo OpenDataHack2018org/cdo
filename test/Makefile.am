@@ -13,7 +13,7 @@ EXTRA_DIST = $(TESTS)
 
 CDO   = $(top_builddir)/src/cdo
 
-PYTHONPATH = $(top_srcdir)/contrib/python
+PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
 
 listTests:
 	@echo $(TESTS)

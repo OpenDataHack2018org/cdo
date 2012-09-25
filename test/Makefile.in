@@ -222,7 +222,7 @@ TESTS = $(top_srcdir)/test/test_info.py \
 
 EXTRA_DIST = $(TESTS)
 CDO = $(top_builddir)/src/cdo
-PYTHONPATH = $(top_srcdir)/contrib/python
+PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
 all: all-am
 
 .SUFFIXES:
