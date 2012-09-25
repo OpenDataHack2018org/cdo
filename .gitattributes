@@ -574,6 +574,7 @@ test/.checklib_pyunittest -text
 test/Makefile.am -text
 test/Makefile.in -text
 test/README -text
+test/testStreams.py -text
 test/test_Arith.py -text
 test/test_Arithc.py -text
 test/test_Selvar.py -text
