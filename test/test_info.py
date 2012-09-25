@@ -17,7 +17,7 @@ class TestInfo(unittest.TestCase):
         self.assertEqual("T",sinfov[3].split(' ')[-1])
 
         infov  = cdo.infov( input = "-stdatm,0,10,20,50,100,500,1000",options = "-f nc")
-        self.assertEqual("1013.2", infov[1].split(' ')[-3])
+        self.assertEqual("1013.2", infov[1].split(' ')[-15])
         self.assertEqual("T", infov[-1].split(' ')[-1])
 
         units  = cdo.showunit( input = "-stdatm,0", options = "-f nc")
