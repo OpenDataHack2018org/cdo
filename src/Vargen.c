@@ -230,10 +230,12 @@ void *Vargen(void *argument)
   if ( operatorID == STDATM )
     {
       vlistDefVarName(vlistID    , varID , "P");
+      vlistDefVarCode(vlistID    , varID , 1);
       vlistDefVarStdname(vlistID , varID , "air_pressure");
       vlistDefVarLongname(vlistID, varID , "pressure");
       vlistDefVarUnits(vlistID   , varID , "hPa");
       vlistDefVarName(vlistID    , varID2, "T");
+      vlistDefVarCode(vlistID    , varID2, 130);
       vlistDefVarStdname(vlistID , varID2, "air_temperature");
       vlistDefVarLongname(vlistID, varID2, "temperature");
       vlistDefVarUnits(vlistID   , varID2, "K");
