@@ -183,7 +183,7 @@ void *Replace(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   array = (double *) malloc(gridsize*sizeof(double));
 
-  nts2 = streamNtsteps(streamID2);
+  nts2 = vlistNtsteps(vlistID2);
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )

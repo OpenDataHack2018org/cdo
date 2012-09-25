@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.8
 	* Version 1.5.8 released
 
+2012-09-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* replace: change streamNtsteps() to vlistNtsteps() (bug fix for CDI 1.5.7)
+
 2012-09-13 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added support for netCDF4(HDF5) formatted SCRIP grids
