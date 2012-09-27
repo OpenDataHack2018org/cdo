@@ -398,7 +398,8 @@ void *Setpartab(void *argument)
 			  missval_old = vlistInqVarMissval(vlistID2, varID);
 			  if ( ! DBL_IS_EQUAL(missval, missval_old) )
 			    {
-			      if ( cdoVerbose ) cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
+			      if ( cdoVerbose ) 
+				cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
 			      vars[varID].changemissval = TRUE;
 			      vars[varID].missval_old = missval_old;
 			      vars[varID].missval = missval;
