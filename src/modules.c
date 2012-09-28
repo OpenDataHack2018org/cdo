@@ -337,7 +337,7 @@ void *Maggraph(void *argument);
                                  "invertlatdata", "invertlondata"}
 #define  InvertlevOperators     {"invertlev"}
 #define  IsosurfaceOperators    {"isosurface"}
-#define  KvlOperators           {"conv_cmor_table"}
+#define  KvlOperators           {"read_cmor_table", "conv_cmor_table"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", \
                                  "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
