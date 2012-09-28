@@ -244,7 +244,7 @@ void kvlParseBuffer(kvl_t *kvl)
 }
 
 
-kvl_t *kvlParseFile(const char *filename)
+void *kvlParseFile(const char *filename)
 {
   kvl_t *kvl = NULL;
   FILE *fp;
@@ -284,12 +284,14 @@ kvl_t *kvlParseFile(const char *filename)
 
   kvlParseBuffer(kvl);
   
-  return (kvl);
+  return ((void *) kvl);
 }
 
 
-void kvlDelete(kvl_t *kvl)
+void kvlDelete(kvl_t *kvlist)
 {
+  kvl_t *kvl = (kvl_t *) kvlist;
+
   assert(kvl != NULL);
 
   pfree(kvl->filename);
@@ -299,16 +301,19 @@ void kvlDelete(kvl_t *kvl)
 }
 
 
-int kvlGetNumLists(kvl_t *kvl)
+int kvlGetNumLists(void *kvlist)
 {
+  kvl_t *kvl = (kvl_t *) kvlist;
+
   assert(kvl != NULL);
 
   return(kvl->num_lists);
 }
 
 
-const char *kvlGetListName(kvl_t *kvl, int listID)
+const char *kvlGetListName(void *kvlist, int listID)
 {
+  kvl_t *kvl = (kvl_t *) kvlist;
   char *listname = NULL;
   
   assert(listID < kvl->num_lists);
@@ -318,8 +323,9 @@ const char *kvlGetListName(kvl_t *kvl, int listID)
   return (listname);
 }
 
-int kvlGetListNumElements(kvl_t *kvl, int listID)
+int kvlGetListNumElements(void *kvlist, int listID)
 {
+  kvl_t *kvl = (kvl_t *) kvlist;
   int nelements = 0;
 
   assert(listID < kvl->num_lists);
@@ -330,8 +336,9 @@ int kvlGetListNumElements(kvl_t *kvl, int listID)
 }
 
 
-const char *kvlGetListElementName(kvl_t *kvl, int listID, int elemID)
+const char *kvlGetListElementName(void *kvlist, int listID, int elemID)
 {
+  kvl_t *kvl = (kvl_t *) kvlist;
   char *ename = NULL;
 
   assert(listID < kvl->num_lists);
@@ -343,8 +350,9 @@ const char *kvlGetListElementName(kvl_t *kvl, int listID, int elemID)
 }
 
 
-const char *kvlGetListElementValue(kvl_t *kvl, int listID, int elemID)
+const char *kvlGetListElementValue(void *kvlist, int listID, int elemID)
 {
+  kvl_t *kvl = (kvl_t *) kvlist;
   char *evalue = NULL;
 
   assert(listID < kvl->num_lists);
@@ -359,7 +367,7 @@ const char *kvlGetListElementValue(kvl_t *kvl, int listID, int elemID)
 int main(int argc, char *argv[])
 {
   char *filename;
-  kvl_t *kvlist;
+  void *kvlist;
   int nlists, listID;
   int nelements, elemID;
   const char *listname;
