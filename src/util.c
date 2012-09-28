@@ -360,6 +360,8 @@ int str2datatype(const char *datatypestr)
       else if ( memcmp(datatypestr, "U8",  len) == 0 ) datatype = DATATYPE_UINT8;
       else if ( memcmp(datatypestr, "U16", len) == 0 ) datatype = DATATYPE_UINT16;
       else if ( memcmp(datatypestr, "U32", len) == 0 ) datatype = DATATYPE_UINT32;
+      else if ( memcmp(datatypestr, "real",   len) == 0 ) datatype = DATATYPE_FLT32;
+      else if ( memcmp(datatypestr, "double", len) == 0 ) datatype = DATATYPE_FLT64;
     }
 
   return (datatype);

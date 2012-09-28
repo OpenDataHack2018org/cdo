@@ -144,6 +144,11 @@ typedef struct
 int lwarn_udunits = TRUE;
 
 static
+void defineVarAttText(var_t *vars, int vlistID2, int varID, char *attname, char *atttext)
+{
+}
+
+static
 void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *name)
 {
   char units_old[CDI_MAX_NAME];
@@ -290,15 +295,20 @@ void *Setpartab(void *argument)
 	  FILE *fp;
 	  namelist_t *nml;
 	  int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
-	  int nml_longname, nml_units, nml_ltype, nml_missval;
+	  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval;
+	  int nml_cell_methods, nml_cell_measures;
+	  int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
 	  int locc, i;
 	  int code, out_code, table, ltype;
 	  int nml_index = 0;
 	  int codenum, tabnum, levtype;
 	  double missval;
+	  double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
 	  char *datatypestr = NULL;
 	  char *name = NULL, *out_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
+	  char cell_methods[CDI_MAX_NAME] = "", cell_measures[CDI_MAX_NAME] = "";
 	  char varname[CDI_MAX_NAME];
+	  char comment[1024] = "";
 
 	  partab = operatorArgv()[0];
 	  fp = fopen(partab, "r");
@@ -307,17 +317,24 @@ void *Setpartab(void *argument)
 	  nml = namelistNew("parameter");
 	  nml->dis = 0;
 
-	  nml_code     = namelistAdd(nml, "code",            NML_INT,  0, &code, 1);
-	  nml_out_code = namelistAdd(nml, "out_code",        NML_INT,  0, &out_code, 1);
-	  nml_table    = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
-	  nml_ltype    = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
-	  nml_missval  = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
-	  nml_datatype = namelistAdd(nml, "datatype",        NML_WORD, 0, &datatypestr, 1);
-	  nml_name     = namelistAdd(nml, "name",            NML_WORD, 0, &name, 1);
-	  nml_out_name = namelistAdd(nml, "out_name",        NML_WORD, 0, &out_name, 1);
-	  nml_stdname  = namelistAdd(nml, "standard_name",   NML_WORD, 0, &stdname, 1);
-	  nml_longname = namelistAdd(nml, "long_name",       NML_TEXT, 0, longname, sizeof(longname));
-	  nml_units    = namelistAdd(nml, "units",           NML_TEXT, 0, units, sizeof(units));
+	  nml_code            = namelistAdd(nml, "code",            NML_INT,  0, &code, 1);
+	  nml_out_code        = namelistAdd(nml, "out_code",        NML_INT,  0, &out_code, 1);
+	  nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
+	  nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
+	  nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
+	  nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
+	  nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
+	  nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
+	  nml_ok_max_mean_abs = namelistAdd(nml, "ok_max_mean_abs", NML_FLT,  0, &ok_max_mean_abs, 1);
+	  nml_datatype        = namelistAdd(nml, "type",            NML_WORD, 0, &datatypestr, 1);
+	  nml_name            = namelistAdd(nml, "name",            NML_WORD, 0, &name, 1);
+	  nml_out_name        = namelistAdd(nml, "out_name",        NML_WORD, 0, &out_name, 1);
+	  nml_stdname         = namelistAdd(nml, "standard_name",   NML_WORD, 0, &stdname, 1);
+	  nml_longname        = namelistAdd(nml, "long_name",       NML_TEXT, 0, longname, sizeof(longname));
+	  nml_units           = namelistAdd(nml, "units",           NML_TEXT, 0, units, sizeof(units));
+	  nml_comment         = namelistAdd(nml, "comment",         NML_TEXT, 0, comment, sizeof(comment));
+	  nml_cell_methods    = namelistAdd(nml, "cell_methods",    NML_TEXT, 0, cell_methods, sizeof(cell_methods));
+	  nml_cell_measures   = namelistAdd(nml, "cell_measures",   NML_TEXT, 0, cell_measures, sizeof(cell_measures));
 	      
 	  while ( ! feof(fp) )
 	    {
@@ -387,6 +404,7 @@ void *Setpartab(void *argument)
 		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
 		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
 		      if ( nml->entry[nml_units]->occ    ) defineVarUnits(vars, vlistID2, varID, units, name);
+		      if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vars, vlistID2, varID, "comment", comment);
 		      if ( nml->entry[nml_datatype]->occ )
 			{
 			  int datatype = str2datatype(datatypestr);
