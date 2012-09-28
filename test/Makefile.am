@@ -9,7 +9,7 @@ TESTS = $(top_srcdir)/test/test_info.py \
 	$(top_srcdir)/test/test_Selvar.py \
 	$(top_srcdir)/test/test_intgridbil.py
 
-EXTRA_DIST = $(TESTS)
+EXTRA_DIST = $(TESTS) $(top_srcdir)/test/testStreams.py
 
 CDO   = $(top_builddir)/src/cdo
 
