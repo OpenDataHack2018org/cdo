@@ -72,6 +72,7 @@ cdo_SOURCES += Arith.c         \
                Invert.c        \
                Invertlev.c     \
                Isosurface.c    \
+               Kvl.c           \
                Log.c           \
                Maskbox.c       \
                Mastrfu.c       \
@@ -226,6 +227,8 @@ cdo_SOURCES += Arith.c         \
                interpol.h      \
                job.c           \
                juldate.c       \
+               kvlist.c        \
+               kvlist.h        \
                legendre.c      \
                list.c          \
                list.h          \

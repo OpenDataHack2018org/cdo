@@ -109,6 +109,7 @@ void *Intyear(void *argument);
 void *Invert(void *argument);
 void *Invertlev(void *argument);
 void *Isosurface(void *argument);
+void *Kvl(void *argument);
 void *Log(void *argument);
 void *Maskbox(void *argument);
 void *Mastrfu(void *argument);
@@ -336,6 +337,7 @@ void *Maggraph(void *argument);
                                  "invertlatdata", "invertlondata"}
 #define  InvertlevOperators     {"invertlev"}
 #define  IsosurfaceOperators    {"isosurface"}
+#define  KvlOperators           {"conv_cmor_table"}
 #define  LogOperators           {"dumplogs", "daylogs", "monlogs", "dumplogo", \
                                  "snamelogo", "scalllogo", "smemlogo", "stimelogo", "sperclogo"}
 #define  MaskboxOperators       {"masklonlatbox", "maskindexbox"}
@@ -592,6 +594,7 @@ static modules_t Modules[] =
   { Invert,         InvertHelp,        InvertOperators,        CDI_REAL,  1,  1 },
   { Invertlev,      InvertlevHelp,     InvertlevOperators,     CDI_REAL,  1,  1 },
   { Isosurface,     NULL,              IsosurfaceOperators,    CDI_REAL,  1,  1 },
+  { Kvl,            NULL,              KvlOperators,           CDI_REAL,  0,  0 },
   { Log,            NULL,              LogOperators,           CDI_REAL,  1,  0 },
   { Maskbox,        MaskboxHelp,       MaskboxOperators,       CDI_REAL,  1,  1 },
   { Maskbox,        MaskregionHelp,    MaskregionOperators,    CDI_REAL,  1,  1 },
