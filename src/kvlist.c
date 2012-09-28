@@ -62,6 +62,47 @@ typedef struct {
 
 
 static
+int kvlNewList(kvl_t *kvl)
+{
+  assert(kvl != NULL);
+
+  kvl->num_lists++;
+  assert(kvl->num_lists < MAX_KVLISTS);
+
+  return (kvl->num_lists-1);
+}
+
+static
+int kvlNewListElement(kvl_t *kvl, int listID)
+{
+  assert(kvl != NULL);
+
+  kvl->lists[listID].num_elements++;
+  assert(kvl->lists[listID].num_elements < MAX_KVELEMENTS);
+
+  return (kvl->lists[listID].num_elements-1);
+}
+
+static
+int kvlAddList(kvl_t *kvl, const char *name)
+{
+  int listID = kvlNewList(kvl);
+
+  strcpy(kvl->lists[listID].name, name);
+
+  return (listID);
+}
+
+static
+void kvlAddListElement(kvl_t *kvl, int listID, const char *name, const char *value)
+{
+  int elemID = kvlNewListElement(kvl, listID);
+
+  strcpy(kvl->lists[listID].elements[elemID].name, name);
+  kvl->lists[listID].elements[elemID].value = strdup(value);
+}
+
+static
 char *readLineFromBuffer(char *buffer, size_t *buffersize, char *line, size_t len)
 {
   int ichar;
@@ -105,65 +146,99 @@ char *skipSeparator(char *pline)
 }
 
 static
+char *getElementName(char *pline, char *name)
+{
+  int pos = 0, len;
+
+  while ( isspace((int) *pline) ) pline++;
+  len = strlen(pline);
+  while ( pos < len && !isspace((int) *(pline+pos)) && *(pline+pos) != '=' && *(pline+pos) != ':' ) pos++;
+
+  strncpy(name, pline, pos);
+  name[pos] = 0;
+
+  pline += pos;
+  return (pline);
+}
+
+static
+char *getElementValue(char *pline)
+{
+  int len;
+
+  while ( isspace((int) *pline) ) pline++;
+  len = strlen(pline);
+  while ( isspace((int) *(pline+len-1)) && len ) { *(pline+len-1) = 0; len--;}
+
+  return (pline);
+}
+
+static
 void kvlParseBuffer(kvl_t *kvl)
 {
   char line[4096];
-  char *listname;
+  char name[256];
   char *pline;
   char *buffer = kvl->buffer;
   size_t buffersize = kvl->buffersize;
-  int len;
-  int liststart = 0;
   int linenumber = 0;
-  int newlist = 0;
+  char listkey1[] = "axis_entry:";
   char listkey2[] = "variable_entry:";
   int listtype = 0;
+  int listID = -1;
 
   while ( (buffer = readLineFromBuffer(buffer, &buffersize, line, sizeof(line))) )
     {
       linenumber++;
-      listname = NULL;
       pline = line;
       while ( isspace((int) *pline) ) pline++;
       if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
       //  len = (int) strlen(pline);
       if ( *pline == '&' )
 	{
-	  // if ( liststart == 1 ) endlist;
-	  //	  listname = *pline++;
 	}
       
-      if ( strncmp(pline, listkey2, strlen(listkey2)) == 0 )
+      if ( strncmp(pline, listkey1, strlen(listkey1)) == 0 )
+	{
+	  pline += strlen(listkey1);
+
+	  listtype = 2;
+
+	  listID = kvlAddList(kvl, "axis");
+
+	  pline = skipSeparator(pline);
+	  pline = getElementValue(pline);
+
+	  if ( *pline ) kvlAddListElement(kvl, listID, "name", pline);
+	}
+      else if ( strncmp(pline, listkey2, strlen(listkey2)) == 0 )
 	{
 	  pline += strlen(listkey2);
 
-	  if ( newlist == 1 )
-	    {
-	      //  newlist = 0;
-	    }
-	  newlist = 1;
 	  listtype = 2;
 
-	  kvl->num_lists++;
-	  {
-	    int nlist = kvl->num_lists-1;
-	    strcpy(kvl->lists[nlist].name, "parameter");
-	    pline = skipSeparator(pline);
-	    while ( isspace((int) *pline) ) pline++;
-	    len = strlen(pline);
-	    while ( isspace((int) *(pline+len-1)) ) { *(pline+len-1) = 0; len--;}
-	    printf(">>>%s< %d\n", pline, len);
-	  }
+	  listID = kvlAddList(kvl, "variable");
+
+	  pline = skipSeparator(pline);
+	  pline = getElementValue(pline);
+
+	  if ( *pline ) kvlAddListElement(kvl, listID, "name", pline);
 	}
       else
 	{
-	  if ( newlist == 0 )
+	  pline = getElementName(pline, name);
+	  pline = skipSeparator(pline);
+	  pline = getElementValue(pline);
+
+	  if ( listID == -1 ) listID = kvlAddList(kvl, "global");
+
+	  if ( *pline ) kvlAddListElement(kvl, listID, name, pline);
+
 	    {
 	      //fprintf(stderr, "%d skip line %3d: %s\n", newlist, linenumber, pline);
 	    }
 	}
 
-      liststart = 1;
       //   printf("%s\n", pline);
     }
 }
@@ -280,7 +355,7 @@ const char *kvlGetListElementValue(kvl_t *kvl, int listID, int elemID)
   return (evalue);
 }
 
-
+/*
 int main(int argc, char *argv[])
 {
   char *filename;
@@ -299,7 +374,7 @@ int main(int argc, char *argv[])
 
   filename = argv[1];
 
-  printf("Parse kvlist file: %s\n", filename);
+  printf("Parse file: %s\n", filename);
 
   kvlist = kvlParseFile(filename);
   nlists = kvlGetNumLists(kvlist);
@@ -323,3 +398,4 @@ int main(int argc, char *argv[])
 
   return (0);
 }
+*/
