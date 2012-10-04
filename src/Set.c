@@ -48,7 +48,7 @@ int stringToParam(const char *paramstr)
 
 void *Set(void *argument)
 {
-  int SETCODE, SETPARAM, SETNAME, SETLEVEL, SETLTYPE, SETTABNUM;
+  int SETCODE, SETPARAM, SETNAME, SETUNIT, SETLEVEL, SETLTYPE, SETTABNUM;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars, newval = -1, tabnum = 0;
@@ -59,17 +59,18 @@ void *Set(void *argument)
   int gridsize;
   int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int zaxistype;
-  int newparam = 0;
-  char *newname = NULL;
+  int newparam    = 0;
+  char *newname   = NULL, *newunit = NULL;
   double newlevel = 0;
-  double *levels = NULL;
-  double *array = NULL;
+  double *levels  = NULL;
+  double *array   = NULL;
 
   cdoInitialize(argument);
 
   SETCODE    = cdoOperatorAdd("setcode",    0, 0, "code number");
   SETPARAM   = cdoOperatorAdd("setparam",   0, 0, "parameter identifier (format: code[.tabnum] or num[.cat[.dis]])");
   SETNAME    = cdoOperatorAdd("setname",    0, 0, "variable name");
+  SETUNIT    = cdoOperatorAdd("setunit",    0, 0, "variable unit");
   SETLEVEL   = cdoOperatorAdd("setlevel",   0, 0, "level");
   SETLTYPE   = cdoOperatorAdd("setltype",   0, 0, "GRIB level type");
   SETTABNUM  = cdoOperatorAdd("settabnum",  0, 0, "GRIB table number");
@@ -88,6 +89,10 @@ void *Set(void *argument)
   else if ( operatorID == SETNAME )
     {
       newname = operatorArgv()[0];
+    }
+  else if ( operatorID == SETUNIT )
+    {
+      newunit = operatorArgv()[0];
     }
   else if ( operatorID == SETTABNUM )
     {
@@ -121,6 +126,10 @@ void *Set(void *argument)
   else if ( operatorID == SETNAME )
     {
       vlistDefVarName(vlistID2, 0, newname);
+    }
+  else if ( operatorID == SETUNIT )
+    {
+      vlistDefVarUnits(vlistID2, 0, newunit);
     }
   else if ( operatorID == SETTABNUM )
     {

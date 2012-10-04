@@ -273,7 +273,7 @@ void *Maggraph(void *argument);
 #define  CDItestOperators       {"ncopy"}
 #define  CDIreadOperators       {"cdiread"}
 #define  CDIwriteOperators      {"cdiwrite"}
-#define  ChangeOperators        {"chcode", "chtabnum", "chparam", "chname", "chlevel", "chlevelc", "chlevelv", "chltype"}
+#define  ChangeOperators        {"chcode", "chtabnum", "chparam", "chname", "chunit", "chlevel", "chlevelc", "chlevelv", "chltype"}
 #define  Change_e5slmOperators  {"change_e5slm", "change_e5lsm", "change_e5mask"}
 #define  CloudlayerOperators    {"cloudlayer"}
 #define  CommandOperators       {"command", "com", "cmd"}
@@ -382,7 +382,7 @@ void *Maggraph(void *argument);
 #define  SelrecOperators        {"selrec"}
 #define  SeltimeOperators       {"seltimestep", "selyear", "selseas", "selmon", "selday", "selhour", "seldate", \
                                  "seltime", "selsmon"}
-#define  SetOperators           {"setcode", "setparam", "setname", "setlevel", "setltype", "settabnum"}
+#define  SetOperators           {"setcode", "setparam", "setname", "setunit", "setlevel", "setltype", "settabnum"}
 #define  SetboxOperators        {"setclonlatbox", "setcindexbox"}
 #define  SetgattOperators       {"setgatt", "setgatts"}
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber"}
