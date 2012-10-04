@@ -101,15 +101,19 @@ case "${HOSTNAME}" in
 	;;
 # x86_64-archlinux
     thingol*)
- 	${CONFPATH}configure --prefix=`pwd`/build \
+ 	${CONFPATH}configure --prefix=$HOME/local \
+                    --program-suffix=-dev \
                     --enable-maintainer-mode \
-	            --with-netcdf=$HOME/builds/libs4cdo \
-	              --with-hdf5=$HOME/builds/libs4cdo \
-                     --with-szlib=$HOME/builds/libs4cdo \
-                  --with-grib_api=$HOME/builds/libs4cdo \
-                    --with-jasper=$HOME/builds/libs4cdo \
+	            --with-netcdf=$HOME/builds/libs4cdo-0.0.11 \
+	              --with-hdf5=$HOME/builds/libs4cdo-0.0.11 \
+                     --with-szlib=$HOME/builds/libs4cdo-0.0.11 \
+                  --with-grib_api=$HOME/builds/libs4cdo-0.0.11 \
+                    --with-jasper=$HOME/builds/libs4cdo-0.0.11 \
+                    --with-magics=$HOME/builds/libs4cdo-0.0.11 \
+                    --with-libxml2=/usr \
                       --with-pic \
-	            CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -DWITH_DATA" LIBS='-lopenjpeg -lpng'
+                      CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -DWITH_DATA" \
+                      LDFLAGS='-L/home/ram/local/netcdf-4.1.2/lib -L/usr/lib64 -L/usr/lib -lhdf5_hl -lhdf5  -lz -lm -lhdf5_hl -lhdf5 -lz  -lcurl -L/usr/local/lib64 -L/usr/X11R6/lib64 -lpangocairo-1.0 -lpango-1.0 -lgobject-2.0 -lglib-2.0 -lcairo   -lexpat -lpthread -lfontconfig -lz -lgd -lproj -lgrib_api -lpng -lxml2 -lm -ljasper -lopenjpeg   -L/home/ram/local/netcdf-4.1.2/lib -lnetcdf_c++ -lnetcdf  -lcurl  -lstdc++ -lgfortran'
 	;;
 # i686-suse-linux
     linux | laptop)
