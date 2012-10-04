@@ -5,7 +5,7 @@
 @Section   = Modification
 @Class     = Modification
 @Arguments = ifile ofile
-@Operators = setpartab setcode setparam setname setlevel setltype
+@Operators = setpartab setcode setparam setname setunit setlevel setltype
 
 @BeginDescription
 This module sets some field information. Depending on the chosen
@@ -51,6 +51,16 @@ Sets the parameter identifier of the first variable.
 
 @BeginDescription
 Sets the name of the first variable.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_setunit
+@Title     = Set variable unit
+@Parameter = unit
+
+@BeginDescription
+Sets the unit of the first variable.
 @EndDescription
 @EndOperator
 
