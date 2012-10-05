@@ -35,7 +35,7 @@ int get_tunits(const char *unit, int *incperiod, int *incunit, int *tunit);
 
 void *Inttime(void *argument)
 {
-  int streamID1, streamID2;
+  int streamID1, streamID2 = -1;
   int nrecs, nvars, nlevel;
   int i, nrecords;
   int tsID, tsIDo, recID, varID, levelID;
@@ -136,10 +136,6 @@ void *Inttime(void *argument)
   if ( taxisHasBounds(taxisID2) ) taxisDeleteBounds(taxisID2);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
-  streamDefVlist(streamID2, vlistID2);
-
   calendar = taxisInqCalendar(taxisID1);
 
   juldate = juldate_encode(calendar, vdate, vtime);
@@ -216,6 +212,13 @@ void *Inttime(void *argument)
 		  date2str(vdate, vdatestr, sizeof(vdatestr));
 		  time2str(vtime, vtimestr, sizeof(vtimestr));
 		  cdoPrint("%s %s  %f  %d", vdatestr, vtimestr, juldate_to_seconds(juldate), calendar);
+		}
+
+	      if ( streamID2 == -1 )
+		{
+		  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
+
+		  streamDefVlist(streamID2, vlistID2);
 		}
 
 	      taxisDefVdate(taxisID2, vdate);
@@ -319,8 +322,10 @@ void *Inttime(void *argument)
 
   if ( array )  free(array);
 
-  streamClose(streamID2);
+  if ( streamID2 != -1 ) streamClose(streamID2);
   streamClose(streamID1);
+
+  if ( tsIDo == 0 ) cdoWarning("date/time out of time axis, no time step interpolated!");
 
   cdoFinish();
 

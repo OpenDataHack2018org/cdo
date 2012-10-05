@@ -36,9 +36,13 @@
 
 static
 void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr,
-		       int code, int year, int month, int day, int hour, int minute, int second)
+		       int code, int vdate, int vtime)
 {
   static int showHeader = TRUE;
+  int year, month, day, hour, minute, second;
+
+  cdiDecodeDate(vdate, &year, &month, &day);
+  cdiDecodeTime(vtime, &hour, &minute, &second);
 
   if ( gridInqType(gridID) == GRID_GAUSSIAN ||
        gridInqType(gridID) == GRID_LONLAT )
@@ -171,15 +175,12 @@ void *Fldstat(void *argument)
 
       /* Precompute date + time for later representation in verbose mode */
       int vdate, vtime;
-      int year, month, day, hour, minute, second;
       if ( cdoVerbose )
         {
           if ( operfunc == func_min || operfunc == func_max )
             {
               vdate = taxisInqVdate(taxisID1);
               vtime = taxisInqVtime(taxisID1);
-              cdiDecodeDate(vdate, &year, &month, &day);
-              cdiDecodeTime(vtime, &hour, &minute, &second);
             }
         }
 
@@ -213,7 +214,7 @@ void *Fldstat(void *argument)
               if ( operfunc == func_min || operfunc == func_max )
                 {
 		  print_location_LL(operfunc, vlistID1, varID, levelID, field.grid, sglval, field.ptr,
-				    code, year, month, day, hour, minute, second);
+				    code, vdate, vtime);
                 }
             }
 
