@@ -113,6 +113,7 @@ Operator catalog:
    Set           setcode         Set code number
    Set           setparam        Set parameter identifier
    Set           setname         Set variable name
+   Set           setunit         Set variable unit
    Set           setlevel        Set level
    Set           setltype        Set GRIB level type
    Settime       setdate         Set date
@@ -128,6 +129,7 @@ Operator catalog:
    Change        chcode          Change code number
    Change        chparam         Change parameter identifier
    Change        chname          Change variable name
+   Change        chunit          Change variable unit
    Change        chlevel         Change level
    Change        chlevelc        Change level of one code
    Change        chlevelv        Change level of one variable
