@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.8
 	* Version 1.5.8 released
 
+2012-10-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* use read/write timer only for single threaded CDO version [Support #2854]
+
 2012-09-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* replace: change streamNtsteps() to vlistNtsteps() (bug fix for CDI 1.5.7)

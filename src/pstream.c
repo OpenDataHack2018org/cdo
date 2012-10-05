@@ -677,7 +677,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	  if ( rstatus != -1 ) query_user_exit(argument);
 	}
 
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_lock(&streamMutex);
@@ -691,7 +691,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
       else
 	pthread_mutex_unlock(&streamOpenWriteMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
       if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument);
 
       cdoDefHistory(fileID, commandLine());
@@ -768,7 +768,7 @@ int pstreamOpenAppend(const char *argument)
   
       if ( PSTREAM_Debug ) Message("file %s", argument);
 
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_lock(&streamMutex);
@@ -782,7 +782,7 @@ int pstreamOpenAppend(const char *argument)
       else
 	pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
       if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument);
       /*
       cdoInqHistory(fileID);
@@ -932,7 +932,7 @@ int pstreamInqVlist(int pstreamID)
     {
       extern int cdoDefaultTimeType;
 
-      if ( processNums() == 1 ) timer_start(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -940,7 +940,7 @@ int pstreamInqVlist(int pstreamID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
 
       if ( cdoDefaultTimeType != CDI_UNDEFID )
 	taxisDefType(vlistInqTaxis(vlistID), cdoDefaultTimeType);
@@ -1085,7 +1085,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
       pstreamDefVarlist(pstreamptr, vlistID);
 
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1093,7 +1093,7 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
     }
 }
 
@@ -1110,7 +1110,7 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
   else
 #endif
     {
-      if ( processNums() == 1 ) timer_start(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1118,7 +1118,7 @@ int pstreamInqRecord(int pstreamID, int *varID, int *levelID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
     }
 
   return (0);
@@ -1141,7 +1141,7 @@ void pstreamDefRecord(int pstreamID, int varID, int levelID)
   else
 #endif
     {
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1149,7 +1149,7 @@ void pstreamDefRecord(int pstreamID, int varID, int levelID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
     }
 }
 
@@ -1168,7 +1168,7 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
   else
 #endif
     {
-      if ( processNums() == 1 ) timer_start(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1176,7 +1176,7 @@ void pstreamReadRecord(int pstreamID, double *data, int *nmiss)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
     }
 }
 
@@ -1267,7 +1267,7 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
 #endif
     {
       int varID = pstreamptr->varID;
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
 
       if ( pstreamptr->varlist )
 	if ( pstreamptr->varlist[varID].check_datarange )
@@ -1281,7 +1281,7 @@ void pstreamWriteRecord(int pstreamID, double *data, int nmiss)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
 
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
     }
 }
 
@@ -1304,7 +1304,7 @@ void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
 #endif
     {
       // int varID = pstreamptr->varID;
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
       /*
       if ( pstreamptr->varlist )
 	if ( pstreamptr->varlist[varID].check_datarange )
@@ -1317,7 +1317,7 @@ void pstreamWriteRecordF(int pstreamID, float *data, int nmiss)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
     }
 }
 
@@ -1339,7 +1339,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 
       if ( pstreamptr->mfiles ) tsID -= pstreamptr->tsID0;
 
-      if ( processNums() == 1 ) timer_start(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1347,7 +1347,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_read);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
 
       if ( nrecs == 0 && pstreamptr->mfiles &&
 	   (pstreamptr->nfiles < pstreamptr->mfiles) )
@@ -1376,10 +1376,10 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 #endif
 	  if ( cdoVerbose ) cdoPrint("Continuation file: %s", filename);
 
-	  if ( processNums() == 1 ) timer_start(timer_read);
+	  if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 	  fileID = streamOpenRead(filename);
 	  vlistIDnew = streamInqVlist(fileID);
-	  if ( processNums() == 1 ) timer_stop(timer_read);
+	  if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
 
 	  vlistCompare(vlistIDold, vlistIDnew, CMP_HRD);
 	  vlistDestroy(vlistIDold);
@@ -1396,7 +1396,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  pstreamptr->name   = filename;
 	  pstreamptr->fileID = fileID;
 
-	  if ( processNums() == 1 ) timer_start(timer_read);
+	  if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_read);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_lock(&streamMutex);
 #endif
@@ -1404,7 +1404,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-	  if ( processNums() == 1 ) timer_stop(timer_read);
+	  if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_read);
 	}
 
       if ( tsID == 0 && cdoDefaultTimeType != CDI_UNDEFID )
@@ -1442,7 +1442,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
       	  taxisDefType(taxisID, cdoDefaultTimeType);
 	}
 
-      if ( processNums() == 1 ) timer_start(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
       /* don't use sync -> very slow on GPFS */
       //  if ( tsID > 0 ) streamSync(pstreamptr->fileID);
 #if  defined  (HAVE_LIBPTHREAD)
@@ -1452,7 +1452,7 @@ void pstreamDefTimestep(int pstreamID, int tsID)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO ) pthread_mutex_unlock(&streamMutex);
 #endif
-      if ( processNums() == 1 ) timer_stop(timer_write);
+      if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
     }
 }
 
@@ -1495,13 +1495,11 @@ void pstreamDebug(int debug)
 
 void cdoInitialize(void *argument)
 {
-  int processID;
-
 #if defined (_OPENMP)
   omp_set_num_threads(ompNumThreads); /* Have to be called for every module (pthread)! */
 #endif
 
-  processID = processCreate();
+  processCreate();
 
 #if  defined  (HAVE_LIBPTHREAD)
   if ( PSTREAM_Debug )
