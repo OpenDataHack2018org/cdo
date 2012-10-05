@@ -7,6 +7,10 @@
 
 	* use read/write timer only for single threaded CDO version [Support #2854]
 
+2012-10-05 Modali Kameswarrao  <modali.kameswarrao@zmaw.de>
+
+	* Maggraph update
+
 2012-09-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* replace: change streamNtsteps() to vlistNtsteps() (bug fix for CDI 1.5.7)
