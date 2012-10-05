@@ -49,30 +49,33 @@ extern int StringSplitWithSeperator();
 
 
 static
-void maggraph(const char *plotfile, const char *varname,const char *varunits, long nfiles, long nts, int *vdate, int *vtime, double **datatab, int nparam, char **params)
+void maggraph(const char *plotfile, const char *varname,const char *varunits, long nfiles, long *nts, int **vdate, int **vtime, double **datatab, int nparam, char **params)
 {
   
   char *lines[1];
   char *temp_str;
   char **split_str = NULL;
   char *sep_char = "=";
-  char *date_time_str[nts];
+  char **date_time_str[nfiles];
+  char min_date_time_str[1024], max_date_time_str[1024];
+  int  min_index, max_index;
   char vdatestr[32], vtimestr[32], legend_text_data[256];
+  char vdatestr1[32], vtimestr1[32];
+  char vdatestr2[32], vtimestr2[32];
   int num_sigma = 2;
   int stat = FALSE, obsv = FALSE;
   int split_str_count;
   int file_begin = 0;
   int count ;
   int num_years = 0, num_months = 0, num_days = 0;
-  long tsID, fileID, i, j, k;
+  int ret;
+  long tsID, fileID, i, j, k, ntime_steps;
   double *date_time;
   double min_val = 1.0e+200, max_val = -1.0e+200;
   double suppress_min_val = 1.0e+200, suppress_max_val = -1.0e+200;
   double *mean_val, *std_dev_val;
   double *spread_min, *spread_max;
   double y_min_val = 1.0e+200, y_max_val = -1.0e+200;
-
-  
   
   if( DBG )
     {
@@ -134,127 +137,299 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	  if( DBG )
 	    fprintf(stderr,"SIGMA %d\n",num_sigma);
 	}   
-      
       free( split_str );
-      /*for( k = 0; k < split_str_count; ++k )
-	{
-	  free( split_str[k] );
-	}
-      */	  
+    }
+
+  if ( DBG )
+    {
+      ntime_steps = nts[0];
+      fprintf(stderr," %6d %6d\n", nfiles, ntime_steps );
+      fprintf(stderr,"STAT  %d\n", stat );
     }
     
-
-  date_time = (double *) malloc( nts*sizeof(double) );
-  mean_val  = (double *) malloc( nts*sizeof(double) );
-  std_dev_val = (double *) malloc( nts*sizeof(double) );
-  spread_min = (double *) malloc( nts*sizeof(double) );
-  spread_max = (double *) malloc( nts*sizeof(double) );
-
-
-  if( DBG )
+  if ( stat == TRUE )
     {
-      fprintf(stderr," %6d %6d\n", nfiles, nts );
-      fprintf(stderr,"\n");
-    }
-
-  for ( tsID = 0; tsID < nts; ++tsID )
-    {
-      date_time[tsID] = tsID+1;
-      date2str(vdate[tsID], vdatestr, sizeof(vdatestr));
-      time2str(vtime[tsID], vtimestr, sizeof(vtimestr));
-      date_time_str[tsID] = (char *)malloc(256);
-      sprintf(date_time_str[tsID], "%s %s", vdatestr, vtimestr);
-      mean_val[tsID] = 0.;
-      std_dev_val[tsID] = 0.;
-
-      if( DBG )
-	{
-	  fprintf(stderr,"%d: %s\n", tsID, date_time_str[tsID]);
-	  fprintf(stderr,"%6d %6d", vdate[tsID], vtime[tsID]);
-	}
+        ntime_steps = nts[0];
+	/* First date & time of first file */
+	date2str( vdate[0][0],          vdatestr1, sizeof( vdatestr ) );
+	date2str( vdate[0][ nts[0]-1 ], vdatestr2, sizeof( vdatestr ) );	
 	
-      for ( fileID = 0; fileID < nfiles; ++fileID )
-	{
-	  if( DBG )
-	    printf("%d\n", fileID );
-	  if( datatab[fileID][tsID] < min_val )
-	    min_val = datatab[ fileID ][ tsID ];	
-	  if( datatab[fileID][tsID] > max_val )
-	    max_val = datatab[ fileID ][ tsID ];	
-	  
-	  mean_val[tsID] += datatab[fileID][tsID];
-	  std_dev_val[tsID] = 0.;
-	  spread_min[tsID] = 0.;
-	  spread_max[tsID] = 0.;
+	/* Last date & time of first file */
+	time2str( vtime[0][0],          vtimestr1, sizeof( vtimestr ) );
+	time2str( vtime[0][ nts[0]-1 ], vtimestr2, sizeof( vtimestr ) );
+	
+	
+	for ( fileID = 1; fileID < nfiles; fileID++ )
+	  {
+	    if ( nts[ fileID ] != ntime_steps )
+	      {
+		cdoWarning("  Unequal number of time steps! Statistics disabled.");
+		stat = FALSE;
+		break;
+	      }
+	    
+	    /* First date & time of the present file */
+	    date2str( vdate[ fileID ][0], vdatestr, sizeof( vdatestr ) );
+	    sep_char = "-";
+	    ret = compareDateOrTimeStr( vdatestr, vdatestr1, sep_char );
+	    if( ret )
+	      {
+		cdoWarning("  Incosistent start date! Statistics disabled.");
+		stat = FALSE;
+		break;
+	      }
+	      
+	    /* First time of the present file */	
+	    time2str( vtime[ fileID ][0], vtimestr, sizeof( vtimestr ) );  
+	    sep_char = ":";
+	    ret = compareDateOrTimeStr( vtimestr, vtimestr1, sep_char );
+	    if( ret )
+	      {
+		cdoWarning("  Incosistent start time! Statistics disabled.");
+		stat = FALSE;
+		break;
+	      }
+	      
+	     /* Last date of the present file */
+	    date2str( vdate[ fileID ][ nts[ fileID ]-1 ], vdatestr, sizeof( vdatestr ) );
+	    sep_char = "-";
+	    ret = compareDateOrTimeStr( vdatestr, vdatestr2, sep_char );
+	    if( ret )
+	      {
+		cdoWarning("  Incosistent end date! Statistics disabled.");
+		stat = FALSE;
+		break;
+	      }
+	      
+	    /* Last time of the present file */	
+	    time2str( vtime[ fileID ][ nts[ fileID ]-1 ], vtimestr, sizeof( vtimestr ) );  
+	    sep_char = ":";
+	    ret = compareDateOrTimeStr( vtimestr, vtimestr2, sep_char );
+	    if( ret )
+	      {
+		cdoWarning("  Incosistent end time! Statistics disabled.");
+		stat = FALSE;
+		break;
+	      } 
+	  }
+    }
+    
+  if ( DBG )
+    {
+      fprintf(stderr,"STAT  %d\n", stat );
+    }
+    
+  
+  if ( stat == TRUE )
+    {
+	/* if all files are of same number of steps, only one date_time_str array is being used */
+        date_time_str[0] = (char **)malloc( ntime_steps*sizeof(char *) ); 
+	
+	date_time   = (double *) malloc( ntime_steps*sizeof(double) );
+	mean_val    = (double *) malloc( ntime_steps*sizeof(double) );
+	std_dev_val = (double *) malloc( ntime_steps*sizeof(double) );
+	spread_min  = (double *) malloc( ntime_steps*sizeof(double) );
+	spread_max  = (double *) malloc( ntime_steps*sizeof(double) );
+	
+	for ( tsID = 0; tsID < ntime_steps; ++tsID )
+	  {
+	    date_time[tsID] = tsID+1;
+	    date2str(vdate[0][tsID], vdatestr, sizeof(vdatestr));
+	    time2str(vtime[0][tsID], vtimestr, sizeof(vtimestr));
+	    date_time_str[0][tsID] = (char *)malloc(256);
+	    sprintf(date_time_str[0][tsID], "%s %s", vdatestr, vtimestr);
+	    mean_val[tsID] = 0.;
+	    std_dev_val[tsID] = 0.;
 
-	  if( DBG )
+	    if( DBG )
+	      {
+		fprintf(stderr,"%d: %s\n", tsID, date_time_str[0][tsID]);
+		fprintf(stderr,"%6d %6d", vdate[0][tsID], vtime[0][tsID]);
+	      }
+	
+	    for ( fileID = 0; fileID < nfiles; ++fileID )
+	      {
+		if( DBG )
+		  fprintf( stderr,"%d\n", fileID );
+		
+		if( datatab[fileID][tsID] < min_val )
+		  min_val = datatab[ fileID ][ tsID ];	
+		if( datatab[fileID][tsID] > max_val )
+		  max_val = datatab[ fileID ][ tsID ];	
+	  
+		mean_val[tsID] += datatab[fileID][tsID];
+		std_dev_val[tsID] = 0.;
+		spread_min[tsID] = 0.;
+		spread_max[tsID] = 0.;
+
+		if( DBG )
+		  {
+		    fprintf(stderr," %6g", datatab[fileID][tsID]);
+		    fprintf(stderr,"\n");
+		  }
+	      }
+	  }
+	  
+	for ( tsID = 0; tsID < ntime_steps; ++tsID )
+	  {
+	    mean_val[tsID] /= ( double )nfiles;
+	    spread_min[tsID] = mean_val[tsID];
+	    spread_max[tsID] = mean_val[tsID];
+
+	    for ( fileID = 0; fileID < nfiles; ++fileID )
+	      {
+		std_dev_val[tsID] += ( datatab[fileID][tsID]-mean_val[tsID] ) * ( datatab[fileID][tsID]-mean_val[tsID] );
+	      }
+	    std_dev_val[tsID] /= ( double )nfiles;
+	    std_dev_val[tsID] = pow( std_dev_val[tsID], 0.5 ); 
+      
+	    if( DBG )
+	      fprintf(stderr," Mean : %g Std Dev: %g\n",mean_val[tsID],std_dev_val[tsID] ); 
+
+	    spread_min[tsID] = mean_val[tsID] - num_sigma * std_dev_val[tsID];
+	    spread_max[tsID] = mean_val[tsID] + num_sigma * std_dev_val[tsID];
+	
+	    if( DBG )
+	      fprintf(stderr," Min : %g Max: %g\n",spread_min[tsID],spread_max[tsID] ); 
+	  }
+
+	for ( tsID = 0; tsID < ntime_steps; ++tsID )
+	  {
+	      if( spread_min[tsID] < min_val )
+		  min_val = spread_min[ tsID ];	
+	      if( spread_max[tsID] > max_val )
+		  max_val = spread_max[ tsID ];	
+	  }
+	  
+	if( DBG )
+	  {
+	    fprintf(stderr," %6g %6g\n", min_val, max_val );
+	    fprintf(stderr," %s %s\n", date_time_str[0][0], date_time_str[0][ ntime_steps-1 ] );
+	    fprintf(stderr,"\n");
+	  }
+
+	strcpy( min_date_time_str,date_time_str[0][0] );
+	strcpy( max_date_time_str,date_time_str[0][ ntime_steps - 1 ] );
+    }
+    else
+    {
+      /* Find the min_date_time_str from the min's of nfiles
+         Find the max_date_time_str from the max's of nfiles
+         Construct the date_time_str array
+      */
+      
+      if ( DBG )
+	  fprintf(stderr,"STAT  %d\n", stat );
+	
+      for ( fileID = 0; fileID < nfiles; fileID++ )
+	{
+	  if ( DBG )
+	    fprintf(stderr,"FILE  %d\n", fileID );
+	  date_time             = (double *) malloc( nts[fileID]*sizeof(double) );
+	  date_time_str[fileID] = (char **)malloc( nts[fileID]*sizeof(char *) );
+	  
+	  for ( tsID = 0; tsID <  nts[fileID]; ++tsID )
 	    {
-	      fprintf(stderr," %6g", datatab[fileID][tsID]);
-	      fprintf(stderr,"\n");
+	      date_time[tsID] = tsID+1;
+	      date2str(vdate[fileID][tsID], vdatestr, sizeof(vdatestr));
+	      time2str(vtime[fileID][tsID], vtimestr, sizeof(vtimestr));
+	      
+	      date_time_str[fileID][tsID] = (char *)malloc(256);
+	      sprintf(date_time_str[fileID][tsID], "%s %s", vdatestr, vtimestr);
+	      if ( DBG )
+		fprintf( stderr,"%s %s %s\n", vdatestr, vtimestr, date_time_str[fileID][tsID] );
+	      
+	      if( datatab[fileID][tsID] < min_val )
+	        min_val = datatab[ fileID ][ tsID ];	
+	      if( datatab[fileID][tsID] > max_val )
+	        max_val = datatab[ fileID ][ tsID ];	
+	    }
+	  free( date_time );
+	  
+	  if( fileID == 0 )
+	    {
+	      if ( DBG )
+		fprintf( stderr,"\n %s %s\n", date_time_str[ fileID ][0], date_time_str[ fileID ][ nts[0]-1 ] );
+	      min_index = 0;
+	      max_index = 0;
+	    }
+	  else
+	    {
+	      if ( DBG )
+		fprintf( stderr,"compareDateOrTimeStr %s\n", date_time_str[ fileID ][0] );
+	      date2str( vdate[ min_index ][0], vdatestr1, sizeof( vdatestr ) );
+	      date2str( vdate[ fileID ][0]   , vdatestr2, sizeof( vdatestr ) );	
+	      sep_char = "-";
+	      ret = compareDateOrTimeStr( vdatestr1, vdatestr2, sep_char );
+	      if ( ret == -999 )
+		cdoAbort("Error in input Date Time");
+	      else if( ret > 1 )
+		min_index = fileID;
+	      else if( !ret )
+	      {
+		time2str( vtime[ min_index ][0], vtimestr1, sizeof( vtimestr ) );
+		time2str( vtime[ fileID ][0]   , vtimestr2, sizeof( vtimestr ) );
+		sep_char = ":";
+		ret = compareDateOrTimeStr( vtimestr1, vtimestr2, sep_char );
+					   
+		if ( ret == -999 )
+		  cdoAbort("Error in input Date Time");
+		else if( ret > 1 )
+		  min_index = fileID;			      
+					   
+	      }
+	      if ( DBG )
+		fprintf( stderr,"Min File ID %d\n",min_index);
+	      
+	      
+	      if ( DBG )
+		fprintf( stderr,"compareDateOrTimeStr  %s\n", date_time_str[ fileID ][ nts[ fileID ]-1 ] );
+	      
+	      date2str( vdate[ max_index ][ nts[ max_index ]-1 ], vdatestr1, sizeof( vdatestr ) );
+	      date2str( vdate[ fileID ][ nts[ fileID ]-1 ]   , vdatestr2, sizeof( vdatestr ) );
+	      sep_char = "-";
+	      ret = compareDateOrTimeStr( vdatestr1, vdatestr2, sep_char );
+					 
+	      if ( ret == -999 )
+		cdoAbort( "Error in input Date Time" );
+	      else if( ret < 1 )
+		max_index = fileID;
+	      else if( !ret )
+	      {
+		time2str( vtime[ max_index ][ nts[ max_index ]-1 ], vtimestr1, sizeof( vtimestr ) );
+		time2str( vtime[ fileID ][ nts[ fileID ]-1 ]   , vtimestr2, sizeof( vtimestr ) );
+		sep_char = ":";
+		ret = compareDateOrTimeStr( vtimestr1, vtimestr2, sep_char );
+					   
+		if ( ret == -999 )
+		  cdoAbort("Error in input Date Time");
+		else if( ret < 1 )
+		  max_index = fileID;			      
+	      }
+	      fprintf( stderr,"Max File ID %d\n",max_index);
 	    }
 	}
-    }
-
-  for ( tsID = 0; tsID < nts; ++tsID )
-    {
-    	mean_val[tsID] /= ( double )nfiles;
-        spread_min[tsID] = mean_val[tsID];
-        spread_max[tsID] = mean_val[tsID];
-
-        for ( fileID = 0; fileID < nfiles; ++fileID )
-          {
-             std_dev_val[tsID] += ( datatab[fileID][tsID]-mean_val[tsID] ) * ( datatab[fileID][tsID]-mean_val[tsID] );
-          }
-        std_dev_val[tsID] /= ( double )nfiles;
-        std_dev_val[tsID] = pow( std_dev_val[tsID], 0.5 ); 
 	
-	if( DBG )
-	  fprintf(stderr," Mean : %g Std Dev: %g\n",mean_val[tsID],std_dev_val[tsID] ); 
-
-        spread_min[tsID] = mean_val[tsID] - num_sigma * std_dev_val[tsID];
-        spread_max[tsID] = mean_val[tsID] + num_sigma * std_dev_val[tsID];
-	
-	if( DBG )
-	  fprintf(stderr," Min : %g Max: %g\n",spread_min[tsID],spread_max[tsID] ); 
-
+	strcpy( min_date_time_str, date_time_str[ min_index ][0] );
+	strcpy( max_date_time_str, date_time_str[ max_index ][ nts[ max_index ]-1 ] );
+	if ( DBG )
+	  fprintf( stderr,"%s %s\n",min_date_time_str, max_date_time_str );
     }
-  
-  for ( tsID = 0; tsID < nts; ++tsID )
-    {
-         if( spread_min[tsID] < min_val )
-            min_val = spread_min[ tsID ];	
-         if( spread_max[tsID] > max_val )
-            max_val = spread_max[ tsID ];	
-    }
-
-  
-    if( DBG )
-    {
-      fprintf(stderr," %6g %6g\n", min_val, max_val );
-      fprintf(stderr," %s %s\n", date_time_str[0], date_time_str[ nts-1 ] );
-      fprintf(stderr,"\n");
-    }
-
-
-    //fprintf(stderr,"HERE 1\n");
+    
+    if ( DBG )
+      fprintf( stderr,"%s %s\n",min_date_time_str,max_date_time_str );
+    
     split_str_count = 0;
     sep_char = "-";
-    split_str_count = StringSplitWithSeperator( date_time_str[ nts - 1 ], sep_char, &split_str );
-    num_years = atoi( split_str[0] );
+    split_str_count = StringSplitWithSeperator( max_date_time_str, sep_char, &split_str );
+    num_years  = atoi( split_str[0] );
     num_months = atoi( split_str[1] );
     num_days   = atoi( split_str[2] );
     free( split_str  );
-    /*
-    for( k = 0; k < split_str_count; ++k )
-      {
-	free( split_str[k] );
-      }
-   */	
     
-    
-    split_str_count = StringSplitWithSeperator( date_time_str[0], sep_char, &split_str );
+    split_str_count = StringSplitWithSeperator( min_date_time_str, sep_char, &split_str );
     num_years -= atoi( split_str[0] );
-    //fprintf(stderr,"HERE 2\n");
+
     if( num_years <= 1 )
       {
 	if( num_years == 1 )
@@ -267,17 +442,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	else if( num_months == 1 )
 	  num_days += ( 31- atoi( split_str[2] ) );
       }
-      
-    /*  
-    for( k = 0; k < split_str_count; ++k )
-      {
-	free( split_str[k] );
-      }
-    */  
     free( split_str );
+    
     if( DBG )
       fprintf(stderr," %d %d\n", num_years, num_months );
-    
 
   /* 
 	1. Loop over the Files
@@ -322,8 +490,8 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     }
   
   
-  mag_setc("axis_date_min_value", date_time_str[0]);
-  mag_setc("axis_date_max_value", date_time_str[nts-1]);
+  mag_setc("axis_date_min_value", min_date_time_str);
+  mag_setc("axis_date_max_value", max_date_time_str);
   mag_setc("axis_title_text","Time");
   mag_setc("axis_title_orientation","horizontal");
   mag_axis();
@@ -338,23 +506,11 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
   /*  To redefine the y- axis scale based on user input in .xml file */
 
-  /*
-  mag_enqr("graph_y_suppress_above",&suppress_max_val);
-  mag_enqr("graph_y_suppress_below",&suppress_min_val);
-  
-  if( DBG )
-    fprintf(stderr," %6g %6g\n", suppress_min_val, suppress_max_val );
-  
-  if( min_val < suppress_min_val )
-      min_val = suppress_min_val;
-  
-  if( max_val > suppress_max_val )
-      max_val = suppress_max_val;
-  */
- 
+  /* min & max values from the input data files */
   mag_setr("axis_min_value", min_val);
   mag_setr("axis_max_value", max_val);
   
+  /* min & max values specified by the user in the command line args */
   if( y_min_val < 1.0e+200 )
     mag_setr("axis_min_value", y_min_val);
   
@@ -365,8 +521,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   mag_setc("axis_title_orientation","vertical");
   mag_axis();
-
-  
+ 
 
   /* Legend */
   mag_setc("legend", "on");
@@ -375,41 +530,52 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   mag_setc("graph_symbol","off");
   mag_seti("graph_line_thickness", 8 );
   
+  if( DBG )
+    fprintf(stderr, "FILE BEGIN %d\n", file_begin );
+  
   for ( i = file_begin; i < nfiles; ++i )
     {
       count = i; 
       if( obsv == TRUE )
 	count = i -1;
-      
+      if( DBG )
+	fprintf(stderr, "Current File %d\n", i );
       sprintf(legend_text_data, "ens_%d", count + 1);
       mag_setc("graph_line_colour", line_colours[ count%num_colours ]);
       mag_setc("legend_user_text", legend_text_data);
-      mag_set1c("graph_curve_date_x_values",(const char**)date_time_str, nts);
-      mag_set1r("graph_curve_y_values", datatab[i], nts);
+      if( stat == TRUE )
+	mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[0], ntime_steps);
+      else
+	mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[i], nts[i]);
+      mag_set1r("graph_curve_y_values", datatab[i], nts[i]);
       mag_graph ();
     }
-  
-    
+      
   if( obsv == TRUE )
     {
       mag_setc("graph_line_colour", line_colours[ num_colours - 1 ]);
       sprintf(legend_text_data, "%s","Obsv" );
       mag_setc("legend_user_text", legend_text_data);
-      mag_set1c("graph_curve_date_x_values",(const char**)date_time_str, nts);
-      mag_set1r("graph_curve_y_values", datatab[0], nts);
+      mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[0], nts[0]);
+      mag_set1r("graph_curve_y_values", datatab[0], nts[0]);
       mag_setc("graph_line_style", "dot" );
       mag_seti("graph_line_thickness", 10 );
       mag_graph ();
     }
     
+  if( DBG )
+	fprintf(stderr, "NTIME STEPS %d\n", ntime_steps ); 
 
   if( stat == TRUE )
     {
+      if( DBG )
+	fprintf(stderr, "NTIME STEPS %d\n", ntime_steps );
+      
       mag_seti("graph_line_thickness", 8 );
       mag_setc("graph_line_colour", "grey" );
       mag_setc("graph_line_style", "dash" );
-      mag_set1c("graph_curve_date_x_values", (const char**)date_time_str, nts);
-      mag_set1r("graph_curve_y_values",mean_val, nts);
+      mag_set1c("graph_curve_date_x_values", (const char**)date_time_str[0], ntime_steps);
+      mag_set1r("graph_curve_y_values",mean_val, ntime_steps);
       sprintf(legend_text_data, "Mean");
       mag_setc("legend_user_text", legend_text_data);
       mag_graph ();
@@ -419,10 +585,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       mag_seti("graph_line_thickness", 1 );
       mag_setc("graph_shade_style", "dot");
       mag_setr("graph_shade_dot_size",1.);
-      mag_set1c("graph_curve2_date_x_values", (const char**)date_time_str, nts);
-      mag_set1r("graph_curve2_y_values",spread_max, nts);
-      mag_set1c("graph_curve_date_x_values", (const char**)date_time_str, nts);
-      mag_set1r("graph_curve_y_values",spread_min, nts);
+      mag_set1c("graph_curve2_date_x_values", (const char**)date_time_str[0], ntime_steps);
+      mag_set1r("graph_curve2_y_values",spread_max, ntime_steps);
+      mag_set1c("graph_curve_date_x_values", (const char**)date_time_str[0], ntime_steps);
+      mag_set1r("graph_curve_y_values",spread_min, ntime_steps);
       mag_setc("graph_shade_colour", "grey");
       sprintf(legend_text_data, "%dSigma", num_sigma);
       mag_setc("legend_user_text", legend_text_data);
@@ -431,13 +597,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   
   lines[0] = (char *)malloc(1024);
-  sprintf(lines[0],"%s","ExpID : ");/* To be obtained from Meta Data */
+  sprintf( lines[0],"%s","ExpID : " );/* To be obtained from Meta Data */
   sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
-  sprintf( lines[0],"%s  Date : %s --%s",lines[0], date_time_str[0], date_time_str[ nts-1 ] );
-  mag_set1c("text_lines", (const char**)lines, 1);
-  
-  if( DBG )
-    fprintf(stderr, "%s\n",lines[0]);
+  sprintf( lines[0],"%s  Date : %s --%s",lines[0], min_date_time_str, max_date_time_str );
+  mag_set1c( "text_lines", (const char**)lines, 1 );
   
   mag_setc("text_html", "true");
   mag_setc("text_colour", "black");
@@ -451,13 +614,71 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   mag_setc("text_justification", "left");
   mag_text();
 
-  free( date_time );
-  free( mean_val );
-  free( std_dev_val );
-  free( spread_min );
-  free( spread_max );
-
+  if ( stat == TRUE )
+    {
+      free( date_time );
+      free( mean_val );
+      free( std_dev_val );
+      free( spread_min );
+      free( spread_max );
+    }
+  
+  
+  if( DBG )
+    fprintf(stderr, "%s\n",lines[0]);
 }
+
+int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char )
+{
+  
+  int    split_str_count, split_str_count1, split_str_count2;
+  int    num_years,num_months, num_days;
+  int	 i,flag[3]; /*  '3' since, three fields are expected in the input strings */
+  char   **split_str = NULL;
+  char   **split_str1 = NULL;
+  char   **split_str2 = NULL;
+  char   datestr1[256], datestr2[256];
+  char   timestr1[256], timestr2[256];
+   
+  fprintf(stderr,"Inside compareDateOrTimeStr %s %s\n",datetimestr1,datetimestr2);
+  split_str_count1 = StringSplitWithSeperator( datetimestr1, sep_char, &split_str1 );
+  
+  if( split_str_count1 )
+    split_str_count2 = StringSplitWithSeperator( datetimestr2, sep_char, &split_str2 );
+  else
+    {
+      free( split_str1 );
+      return -999;
+    }
+  
+  if( split_str_count2 && !( split_str_count1 - split_str_count2 ) )
+    {
+      flag[0] = atoi( split_str1[0] ) - atoi( split_str2[0] ) ;
+      flag[1] = atoi( split_str1[1] ) - atoi( split_str2[1] ) ;
+      flag[2] = atoi( split_str1[2] ) - atoi( split_str2[2] ) ;
+    }
+  else
+    {
+      free( split_str1 );
+      free( split_str2 );
+      return -999;
+    }
+  
+  free( split_str1 );
+  free( split_str2 );
+  
+  for ( i = 0;i < 3 ; i++ )
+    {
+	if( flag[i] > 0 )
+	    return 1;
+	else if(  flag[i] < 0 )
+	  return -1;
+	else 
+	  continue;
+    }
+    return 0;
+}
+
 
 static
 void init_MAGICS( )
@@ -465,6 +686,7 @@ void init_MAGICS( )
 {
 	mag_open();
 }
+
 
 static
 void quit_MAGICS( )
@@ -484,7 +706,6 @@ void *Maggraph(void *argument)
   const char *ofilename;
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
   char  *Filename = "combined.xml";
-  /* char  *Filename = "combined.xml"; */
   char **split_str = NULL;
   char sep_char = '=';
   char *temp_str;
@@ -498,9 +719,9 @@ void *Maggraph(void *argument)
   int vlistID, vlistID0 = -1;
   int nmiss;
   int zaxisID, taxisID;
-  int *vdate = NULL, *vtime = NULL;
+  int **vdate = NULL, **vtime = NULL;
   int fileID, nfiles;
-  int nts = 0, nts_alloc = 0;
+  long *nts, nts_alloc;
   int nparam = 0;
   int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
   double missval;
@@ -520,12 +741,21 @@ void *Maggraph(void *argument)
   ofilename = cdoStreamName(nfiles);
 
   datatab = (double **) malloc(nfiles*sizeof(double *));
-
+  vdate   = (int **) malloc(nfiles*sizeof(int *));
+  vtime   = (int **) malloc(nfiles*sizeof(int *));
+  nts     = (long *) malloc(nfiles*sizeof(long));
+  
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    datatab[fileID] = NULL;
+    {
+      datatab[fileID] = NULL;
+      vdate[fileID]   = NULL;
+      vtime[fileID]   = NULL;
+      nts[fileID]     = 0;
+    }
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
+      
       streamID = streamOpenRead(cdoStreamName(fileID));
 
       vlistID = streamInqVlist(streamID);
@@ -551,43 +781,37 @@ void *Maggraph(void *argument)
 	}
 
       tsID = 0;
+      nts_alloc = 0;
       while ( (nrecs = streamInqTimestep(streamID, tsID)) )
 	{
 	  if ( nrecs != 1 ) cdoAbort("Input streams have more than one record!\n");
-	  if ( fileID == 0 )
+	  
+	  if ( tsID == 0 )
 	    {
-	      nts++;
-
-	      if ( nts > nts_alloc )
-		{
-		  nts_alloc += NINC_ALLOC;
-		  datatab[fileID] = (double *) realloc(datatab[fileID], nts_alloc*sizeof(double));
-		  vdate = (int *) realloc(vdate, nts_alloc*sizeof(int));
-		  vtime = (int *) realloc(vtime, nts_alloc*sizeof(int));
-		}
-	      vdate[tsID] = taxisInqVdate(taxisID);
-	      vtime[tsID] = taxisInqVtime(taxisID);
+	      nts_alloc += NINC_ALLOC;
+	      datatab[ fileID ] = (double *) malloc( nts_alloc*sizeof(double) );
+	      vdate[ fileID ]   = (int *) malloc(  nts_alloc*sizeof(int) );
+	      vtime[ fileID ]   = (int *) malloc(  nts_alloc*sizeof(int) );
 	    }
-	  else
-	    {
-	      if ( (tsID+1) > nts ) cdoAbort("Too many timesteps in stream %s", cdoStreamName(fileID));
+		
+	  nts[ fileID ]++;
 
-	      if ( tsID == 0 )
-		{
-		  datatab[fileID] = (double *) malloc(nts*sizeof(double));
-		}
+	  if ( nts[ fileID ] > nts_alloc )
+	    {
+	      nts_alloc += NINC_ALLOC;
+	      datatab[ fileID ] = (double *) realloc(datatab[fileID], nts_alloc*sizeof(double));
+	      vdate[ fileID ]   = (int *) realloc(vdate[fileID], nts_alloc*sizeof(int));
+	      vtime[ fileID ]   = (int *) realloc(vtime[fileID], nts_alloc*sizeof(int));
 	    }
 	  
-	  for ( recID = 0; recID < nrecs; recID++ )
-	    {
-	      streamInqRecord(streamID, &varID, &levelID);
-	      streamReadRecord(streamID, &val, &nmiss);	
-	      datatab[fileID][tsID] = val;
-	    }
-
+	  streamInqRecord( streamID, &varID, &levelID );
+	  streamReadRecord( streamID, &val, &nmiss );	
+	  datatab[ fileID ][ tsID ] = val;
+	  vdate[ fileID ][ tsID ] = taxisInqVdate(taxisID);
+	  vtime[ fileID ][ tsID ] = taxisInqVtime(taxisID);
+	  fprintf(stderr, "%f %f\n", datatab[ fileID ][ tsID ],val ); 
 	  tsID++;
 	}
-
       streamClose(streamID);
     }
   
@@ -640,8 +864,6 @@ void VerifyGraphParameters( int num_param, char **param_names )
   char *sep_char = "=";
   char *temp_str;
   FILE *fp;
-  
-  
   
   for ( i = 0; i < num_param; ++i )
     {
@@ -708,14 +930,7 @@ void VerifyGraphParameters( int num_param, char **param_names )
 	  halt_flag = TRUE;
 	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
 	}
-	free( split_str );
-      
-	/*  
-	  for ( k = 0; k < split_str_count; ++k )
-	    {  
-	      free( split_str[k] );
-	    }
-	*/    
+      free( split_str );
     }
       
     if( halt_flag == TRUE )
