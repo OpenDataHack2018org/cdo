@@ -415,7 +415,8 @@ AC_ARG_WITH([libxml2],
                                 [XML2_ROOT=$with_libxml2
                                  LDFLAGS="-L$XML2_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$XML2_ROOT/include/libxml2 $CPPFLAGS"
-                                 AC_CHECK_HEADERS([libxml2_api.h])
+                                 AC_CHECK_HEADERS([libxml/parser.h])
+                                 AC_CHECK_HEADERS([libxml/tree.h])
                                  AC_SEARCH_LIBS([xmlInitMemory],
                                                 [xml2],
                                                 [AC_DEFINE([HAVE_LIBXML2],[1],[Define to 1 for XML2 support])],
