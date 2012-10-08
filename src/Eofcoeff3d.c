@@ -34,7 +34,7 @@ void *Eofcoeff3d(void * argument)
 {
   char eof_name[6], oname[1024], filesuffix[32];
   double *w;
-  double missval1=-999, missval2=-999;
+  double missval1 = -999, missval2 = -999;
   double *xvals, *yvals, *zvals;  
   field_t ***eof;  
   field_t in;  
@@ -72,8 +72,8 @@ void *Eofcoeff3d(void * argument)
     gridsize = vlistGridsizeMax(vlistID1);  
   else 
     {
-      gridsize=-1;
-      cdoAbort ("Gridsize of input files does not match");
+      gridsize = -1;
+      cdoAbort("Gridsize of input files does not match");
     }
       
   

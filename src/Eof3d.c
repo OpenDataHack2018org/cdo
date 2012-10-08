@@ -68,7 +68,7 @@ void *EOF3d(void * argument)
   int timer_eig = 0, timer_post = 0, timer_write = 0, timer_finish = 0;
   int *varID2;
   int vdate=0, vtime=0;
-  int vlistID1, vlistID2=-1, vlistID3=-1;
+  int vlistID1, vlistID2 = -1, vlistID3 = -1;
   int zaxisID2;
 
   int calendar = CALENDAR_STANDARD;

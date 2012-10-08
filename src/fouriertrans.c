@@ -903,16 +903,16 @@ int rpassc(double *a, double *b, double *c, double *d, double *trigs,
 #endif
 		for (ijk = 0; ijk < lot; ++ijk)
 		  {
-		    c[ja + j] = a[ib + i] + (a[ia + i] + a[ic + i]);
-		    c[jd + j] = b[ib + i] - (b[ia + i] + b[ic + i]);
-		    c[jb + j] = (S60 * (a[ia + i] - a[ic + i])) -
-		                (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
-		    c[jf + j] =-(S60 * (a[ia + i] - a[ic + i])) -
-		                (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
-		    c[jc + j] =  S60 * (b[ic + i] - b[ia + i]) +
-		                (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
-		    c[je + j] =  S60 * (b[ic + i] - b[ia + i]) -
-		                (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
+		    c[ja + j] =  a[ib + i] + (a[ia + i] + a[ic + i]);
+		    c[jd + j] =  b[ib + i] - (b[ia + i] + b[ic + i]);
+		    c[jb + j] =  (S60 * (a[ia + i] - a[ic + i])) -
+		                 (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
+		    c[jf + j] = -(S60 * (a[ia + i] - a[ic + i])) -
+		                 (0.5 * (b[ia + i] + b[ic + i]) + b[ib + i]);
+		    c[jc + j] =   S60 * (b[ic + i] - b[ia + i]) +
+		                 (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
+		    c[je + j] =   S60 * (b[ic + i] - b[ia + i]) -
+		                 (0.5 * (a[ia + i] + a[ic + i]) - a[ib + i]);
 		    i += inc3;
 		    j += inc4;
 		  }

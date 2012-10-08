@@ -18,7 +18,7 @@
 #endif
 
 #ifdef __XT3__
-static double clock0=-1.0;
+static double clock0 = -1.0;
 #endif
 
 /* extern clock_t times (struct tms *buffer); */

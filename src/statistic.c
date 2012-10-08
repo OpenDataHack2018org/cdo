@@ -1349,8 +1349,8 @@ void annihilate_1side(double **M, long i, long j, long k, long n)
   
   // calculate a_i,j - tilde
   for ( r=0; r<n; r++ ) {
-    mi[r] = ck*M[i][r]  + sk*M[j][r];
-    mj[r] =-sk*M[i][r]  + ck*M[j][r];
+    mi[r] =  ck*M[i][r]  + sk*M[j][r];
+    mj[r] = -sk*M[i][r]  + ck*M[j][r];
   }
   
   for ( r=0; r<n; r++ ) {
