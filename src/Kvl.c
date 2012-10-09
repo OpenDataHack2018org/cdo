@@ -70,6 +70,7 @@ int conv_cmor_table(const char *filename)
   const char *listname;
   const char *ename;
   const char *evalue;
+  char *ovalue;
 
   kvlist = kvlParseFile(filename);
   nlists = kvlGetNumLists(kvlist);
@@ -96,12 +97,31 @@ int conv_cmor_table(const char *filename)
 	}
       else if ( strncmp("variable", listname, strlen(listname)) == 0 )
 	{
+	  int vlen;
 	  printf("&%s\n", "parameter");
 	  for ( elemID = 0; elemID < nelements; ++elemID )
 	    {
 	      ename  = kvlGetListElementName(kvlist, listID, elemID);
 	      evalue = kvlGetListElementValue(kvlist, listID, elemID);
 	      len = strlen(ename);
+	      vlen = strlen(evalue);
+
+	      if ( vlen > 1 && evalue[0] == '"' && evalue[vlen-1] == '"' ) 
+		{
+		  vlen -= 2;
+		  evalue++;
+		}
+
+	      ovalue = strdup(evalue);
+	      for ( int i = 1; i < vlen; ++i )
+		{
+		  if ( ovalue[i-1] == '"' && ovalue[i] == '"' )
+		    {
+		      ovalue [i-1] = '\'';
+		      for ( int j = i+1; j < vlen; ++j ) ovalue[j-1] = ovalue[j];
+		      vlen -= 1;
+		    }
+		}
 
 	      if ( strncmp("name", ename, len)            == 0 ||
 		   strncmp("standard_name", ename, len)   == 0 ||
@@ -111,13 +131,15 @@ int conv_cmor_table(const char *filename)
 		   strncmp("valid_max", ename, len)       == 0 ||
 		   strncmp("ok_min_mean_abs", ename, len) == 0 ||
 		   strncmp("ok_max_mean_abs", ename, len) == 0 )
-		printf("  %-15s = %s\n", ename, evalue);
+		printf("  %-15s = %s\n", ename, ovalue);
 	      else if ( strncmp("long_name", ename, len)  == 0 ||
 		   strncmp("units", ename, len)           == 0 ||
 		   strncmp("cell_methods", ename, len)    == 0 ||
 		   strncmp("cell_measures", ename, len)   == 0 ||
 		   strncmp("comment", ename, len)         == 0 )
-		printf("  %-15s = \"%s\"\n", ename, evalue);
+		printf("  %-15s = \"%.*s\"\n", ename, vlen, ovalue);
+
+	      free(ovalue);
 	    }
 	  if ( hasmissval ) printf("  %-15s = %g\n", "missing_value", missval);
 	  printf("/\n");
