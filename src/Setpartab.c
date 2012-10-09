@@ -130,7 +130,16 @@ typedef struct
   // missing value
   int changemissval;
   double missval_old;
-  double missval;
+  //
+  int checkvalid;
+  double valid_min;
+  double valid_max;
+  //
+  int check_min_mean_abs;
+  double ok_min_mean_abs;
+  //
+  int check_max_mean_abs;
+  double ok_max_mean_abs;
   // units
   int changeunits;
   char units_old[CDI_MAX_NAME];
@@ -144,8 +153,10 @@ typedef struct
 int lwarn_udunits = TRUE;
 
 static
-void defineVarAttText(var_t *vars, int vlistID2, int varID, char *attname, char *atttext)
+void defineVarAttText(int vlistID2, int varID, const char *attname, const char *atttext)
 {
+  int len = strlen(atttext);
+  vlistDefAttTxt(vlistID2, varID, attname, len, atttext);
 }
 
 static
@@ -194,7 +205,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 #else
 	  if ( lwarn_udunits )
 	    {
-	      cdoWarning("Can not convert units, UDUNITS2 support not compiled in!");
+	      cdoWarning("Can't convert units, UDUNITS2 support not compiled in!");
 	      vars[varID].changeunits = FALSE;
 	      lwarn_udunits = FALSE;
 	    }
@@ -210,21 +221,16 @@ void *Setpartab(void *argument)
   int SETPARTAB, SETPARTABV;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
-  int nrecs, nvars, newval = -1, tabnum = 0;
+  int nrecs, nvars;
   int tsID1, recID, varID, levelID;
   int vlistID1, vlistID2;
   int taxisID1, taxisID2;
   int nmiss;
   long gridsize;
-  int index, zaxisID1, zaxisID2, nzaxis, nlevs;
   int tableID = -1;
   int tableformat = 0;
-  int zaxistype;
-  int newparam = 0;
-  char *newname = NULL, *partab = NULL;
+  char *partab = NULL;
   double missval;
-  double newlevel = 0;
-  double *levels = NULL;
   double *array = NULL;
   var_t *vars = NULL;
 
@@ -404,7 +410,9 @@ void *Setpartab(void *argument)
 		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
 		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
 		      if ( nml->entry[nml_units]->occ    ) defineVarUnits(vars, vlistID2, varID, units, name);
-		      if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vars, vlistID2, varID, "comment", comment);
+		      if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vlistID2, varID, "comment", comment);
+		      if ( nml->entry[nml_cell_methods]->occ  )  defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
+		      if ( nml->entry[nml_cell_measures]->occ  ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
 		      if ( nml->entry[nml_datatype]->occ )
 			{
 			  int datatype = str2datatype(datatypestr);
@@ -420,9 +428,24 @@ void *Setpartab(void *argument)
 				cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
 			      vars[varID].changemissval = TRUE;
 			      vars[varID].missval_old = missval_old;
-			      vars[varID].missval = missval;
 			      vlistDefVarMissval(vlistID2, varID, missval);
 			    }
+			}
+		      if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
+			{
+			  vars[varID].checkvalid = TRUE;
+			  vars[varID].valid_min = valid_min;
+			  vars[varID].valid_max = valid_max;
+			}
+		      if ( nml->entry[nml_ok_min_mean_abs]->occ )
+			{
+			  vars[varID].check_min_mean_abs = TRUE;
+			  vars[varID].ok_min_mean_abs = ok_min_mean_abs;
+			}
+		      if ( nml->entry[nml_ok_max_mean_abs]->occ )
+			{
+			  vars[varID].check_max_mean_abs = TRUE;
+			  vars[varID].ok_max_mean_abs = ok_max_mean_abs;
 			}
 		    }
 		  else
@@ -482,7 +505,7 @@ void *Setpartab(void *argument)
 	    {
 	      for ( long i = 0; i < gridsize; ++i )
 		{
-		  if ( DBL_IS_EQUAL(array[i], vars[varID].missval_old) ) array[i] = vars[varID].missval;
+		  if ( DBL_IS_EQUAL(array[i], vars[varID].missval_old) ) array[i] = missval;
 		}
 	    }
 
@@ -508,6 +531,71 @@ void *Setpartab(void *argument)
 #endif
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
+
+	  if ( vars[varID].checkvalid )
+	    {
+	      char varname[CDI_MAX_NAME];
+	      int nvals = 0;
+	      double amean = 0, aval;
+	      double amin  =  1.e300;
+	      double amax  = -1.e300;
+	      for ( long i = 0; i < gridsize; ++i )
+		{
+		  aval = array[i];
+		  if ( !DBL_IS_EQUAL(aval, missval) )
+		    {
+		      if ( aval < amin ) amin = aval;
+		      if ( aval > amax ) amax = aval;
+		      amean += aval;
+		      nvals++;
+		    }
+		}
+
+	      if ( nvals > 0 ) amean /= nvals;
+
+	      int n_lower_min = 0;
+	      int n_greater_max = 0;
+	      for ( long i = 0; i < gridsize; ++i )
+		{
+		  aval = array[i];
+		  if ( !DBL_IS_EQUAL(aval, missval) )
+		    {
+		      if ( aval < vars[varID].valid_min ) n_lower_min++;
+		      if ( aval > vars[varID].valid_max ) n_greater_max++;
+		    }
+		}
+
+	      vlistInqVarName(vlistID2, varID, varname);
+
+	      if ( n_lower_min > 0 )
+		cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
+			   varname, n_lower_min, vars[varID].valid_min);
+	      if ( n_greater_max > 0 )
+		cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
+			   varname, n_greater_max, vars[varID].valid_max);
+
+	      if ( vars[varID].check_min_mean_abs )
+		{
+		  if ( amean < .1*vars[varID].ok_min_mean_abs )
+		    cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
+			     varname, amean, vars[varID].ok_min_mean_abs);
+
+		  if ( amean < vars[varID].ok_min_mean_abs)
+		    cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g",
+			       varname, amean, vars[varID].ok_min_mean_abs);
+		}
+
+	      if ( vars[varID].check_max_mean_abs )
+		{
+		  if ( amean > 10.*vars[varID].ok_max_mean_abs )
+		    cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
+			     varname, amean, vars[varID].ok_max_mean_abs);
+
+		  if ( amean > vars[varID].ok_max_mean_abs )
+		    cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g",
+			       varname, amean, vars[varID].ok_max_mean_abs);
+		}
+	    }
 	}
       tsID1++;
     }
