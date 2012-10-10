@@ -133,6 +133,9 @@ typedef struct
   int changemissval;
   double missval_old;
   //
+  int lscale;
+  double scale;
+  //
   int checkvalid;
   double valid_min;
   double valid_max;
@@ -224,7 +227,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   FILE *fp;
   namelist_t *nml;
   int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
-  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval;
+  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval, nml_scale;
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
   int locc, i;
@@ -233,7 +236,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   int codenum, tabnum, levtype;
   int varID, tableID;
   int num_pt_files;
-  double missval;
+  double missval, scale;
   double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
   char *partab = NULL;
   char *datatypestr = NULL;
@@ -259,6 +262,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
       nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
       nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
+      nml_scale           = namelistAdd(nml, "scale",           NML_FLT,  0, &scale, 1);
       nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
       nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
       nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
@@ -362,6 +366,13 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 			  vars[varID].missval_old = missval_old;
 			  vlistDefVarMissval(vlistID2, varID, missval);
 			}
+		    }
+		  if ( nml->entry[nml_scale]->occ )
+		    {
+		      vars[varID].lscale = TRUE;
+		      vars[varID].scale = scale;
+		      if ( cdoVerbose ) 
+			cdoPrint("%s - scale factor %g", name, scale);
 		    }
 		  if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
 		    {
@@ -596,6 +607,14 @@ void *Setpartab(void *argument)
 	      for ( long i = 0; i < gridsize; ++i )
 		{
 		  if ( DBL_IS_EQUAL(array[i], vars[varID].missval_old) ) array[i] = missval;
+		}
+	    }
+
+	  if ( vars[varID].lscale == TRUE )
+	    {
+	      for ( long i = 0; i < gridsize; ++i )
+		{
+		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= vars[varID].scale;
 		}
 	    }
 
