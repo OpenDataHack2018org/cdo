@@ -72,8 +72,6 @@ struct grid_layer
   struct grid_layer *next;
 };
 
-enum TPARMODE { parallel, serial };
-
 typedef struct grid_layer grid_layer_t;
 
 typedef struct

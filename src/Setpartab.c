@@ -38,6 +38,8 @@
 #include "namelist.h"
 
 
+typedef enum {CODE_NUMBER, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
+
 #if defined (HAVE_LIBUDUNITS2)
 ut_system *ut_read = NULL;
 
@@ -212,13 +214,269 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 #endif
 	}
       vlistDefVarUnits(vlistID2, varID, units);
+      defineVarAttText(vlistID2, varID, "original_units", units_old);
+    }
+}
+
+static
+void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
+{
+  FILE *fp;
+  namelist_t *nml;
+  int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
+  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval;
+  int nml_cell_methods, nml_cell_measures;
+  int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
+  int locc, i;
+  int code, out_code, table, ltype;
+  int nml_index = 0;
+  int codenum, tabnum, levtype;
+  int varID, tableID;
+  int num_pt_files;
+  double missval;
+  double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
+  char *partab = NULL;
+  char *datatypestr = NULL;
+  char *name = NULL, *out_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
+  char cell_methods[CDI_MAX_NAME] = "", cell_measures[CDI_MAX_NAME] = "";
+  char varname[CDI_MAX_NAME];
+  char comment[1024] = "";
+
+  num_pt_files = operatorArgc();
+
+  for ( int fileID = 0; fileID < num_pt_files; ++fileID )
+    {
+      partab = operatorArgv()[fileID];
+      fp = fopen(partab, "r");
+      if ( fp == NULL ) cdoAbort("Open failed on parameter table %d file name %s!", fileID+1, partab);
+
+      nml_index = 0;
+      nml = namelistNew("parameter");
+      nml->dis = 0;
+
+      nml_code            = namelistAdd(nml, "code",            NML_INT,  0, &code, 1);
+      nml_out_code        = namelistAdd(nml, "out_code",        NML_INT,  0, &out_code, 1);
+      nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
+      nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
+      nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
+      nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
+      nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
+      nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
+      nml_ok_max_mean_abs = namelistAdd(nml, "ok_max_mean_abs", NML_FLT,  0, &ok_max_mean_abs, 1);
+      nml_datatype        = namelistAdd(nml, "type",            NML_WORD, 0, &datatypestr, 1);
+      nml_name            = namelistAdd(nml, "name",            NML_WORD, 0, &name, 1);
+      nml_out_name        = namelistAdd(nml, "out_name",        NML_WORD, 0, &out_name, 1);
+      nml_stdname         = namelistAdd(nml, "standard_name",   NML_WORD, 0, &stdname, 1);
+      nml_longname        = namelistAdd(nml, "long_name",       NML_TEXT, 0, longname, sizeof(longname));
+      nml_units           = namelistAdd(nml, "units",           NML_TEXT, 0, units, sizeof(units));
+      nml_comment         = namelistAdd(nml, "comment",         NML_TEXT, 0, comment, sizeof(comment));
+      nml_cell_methods    = namelistAdd(nml, "cell_methods",    NML_TEXT, 0, cell_methods, sizeof(cell_methods));
+      nml_cell_measures   = namelistAdd(nml, "cell_measures",   NML_TEXT, 0, cell_measures, sizeof(cell_measures));
+	      
+      while ( ! feof(fp) )
+	{
+	  namelistReset(nml);
+
+	  namelistRead(fp, nml);
+
+	  locc = FALSE;
+	  for ( i = 0; i < nml->size; i++ )
+	    {
+	      if ( nml->entry[i]->occ ) { locc = TRUE; break; }
+	    }
+
+	  if ( locc )
+	    {
+	      // namelistPrint(nml);
+	  
+	      nml_index++;
+
+	      if ( ptmode == CODE_NUMBER )
+		{
+		  if ( nml->entry[nml_code]->occ == 0 )
+		    {
+		      cdoPrint("Parameter entry %d (table %d) skipped, code number not found!", nml_index, fileID+1);
+		      continue;
+		    }
+		}
+	      else
+		{
+		  if ( nml->entry[nml_name]->occ == 0 )
+		    {
+		      cdoWarning("Parameter entry %d (table %d) skipped, variable name not found!", nml_index, fileID+1);
+		      continue;
+		    }
+		}
+
+	      for ( varID = 0; varID < nvars; varID++ )
+		{
+		  if ( ptmode == CODE_NUMBER )
+		    {
+		      codenum = vlistInqVarCode(vlistID2, varID);
+		      tableID = vlistInqVarTable(vlistID2, varID);
+		      tabnum  = tableInqNum(tableID);
+		      levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
+		      
+		      //	printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
+		      
+		      if ( nml->entry[nml_table]->occ == 0 ) table = tabnum;
+		      if ( nml->entry[nml_ltype]->occ == 0 ) ltype = levtype;
+		  
+		      if ( codenum == code && tabnum == table && levtype == ltype ) break;
+		    }
+		  else
+		    {
+		      vlistInqVarName(vlistID2, varID, varname);
+		      if ( strcmp(varname, name) == 0 ) break;
+		    }
+		}
+
+	      if ( varID < nvars )
+		{
+		  if ( nml->entry[nml_code]->occ     ) vlistDefVarCode(vlistID2, varID, code);
+		  if ( nml->entry[nml_out_code]->occ ) vlistDefVarCode(vlistID2, varID, out_code);
+		  if ( nml->entry[nml_name]->occ     ) strcpy(vars[varID].name, name);
+		  if ( nml->entry[nml_name]->occ     ) vlistDefVarName(vlistID2, varID, name);
+		  if ( nml->entry[nml_out_name]->occ ) vlistDefVarName(vlistID2, varID, out_name);
+		  if ( nml->entry[nml_out_name]->occ ) defineVarAttText(vlistID2, varID, "original_name", vars[varID].name);
+		  if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
+		  if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
+		  if ( nml->entry[nml_units]->occ    ) defineVarUnits(vars, vlistID2, varID, units, name);
+		  if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vlistID2, varID, "comment", comment);
+		  if ( nml->entry[nml_cell_methods]->occ  )  defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
+		  if ( nml->entry[nml_cell_measures]->occ  ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
+		  if ( nml->entry[nml_datatype]->occ )
+		    {
+		      int datatype = str2datatype(datatypestr);
+		      if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
+		    }
+		  if ( nml->entry[nml_missval]->occ )
+		    {
+		      double missval_old;
+		      missval_old = vlistInqVarMissval(vlistID2, varID);
+		      if ( ! DBL_IS_EQUAL(missval, missval_old) )
+			{
+			  if ( cdoVerbose ) 
+			    cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
+			  vars[varID].changemissval = TRUE;
+			  vars[varID].missval_old = missval_old;
+			  vlistDefVarMissval(vlistID2, varID, missval);
+			}
+		    }
+		  if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
+		    {
+		      vars[varID].checkvalid = TRUE;
+		      vars[varID].valid_min = valid_min;
+		      vars[varID].valid_max = valid_max;
+		    }
+		  if ( nml->entry[nml_ok_min_mean_abs]->occ )
+		    {
+		      vars[varID].check_min_mean_abs = TRUE;
+		      vars[varID].ok_min_mean_abs = ok_min_mean_abs;
+		    }
+		  if ( nml->entry[nml_ok_max_mean_abs]->occ )
+		    {
+		      vars[varID].check_max_mean_abs = TRUE;
+		      vars[varID].ok_max_mean_abs = ok_max_mean_abs;
+		    }
+		}
+	      else
+		{
+		  if ( cdoVerbose )
+		    {
+		      if ( ptmode == CODE_NUMBER )
+			{
+			  if ( nml->entry[nml_table]->occ == 0 )
+			    cdoPrint("Code %d not found!", code);
+			  else
+			    cdoPrint("Code %d and table %d not found!", code, table);
+			}
+		      else
+			cdoPrint("%s - not found!", name);
+		    }
+		}
+	    }
+	  else
+	    break;
+	}
+  
+      namelistDelete(nml);
+
+      fclose(fp);
+    }
+}
+
+static
+void check_data(int vlistID2, int varID, var_t *vars, long gridsize, double missval, double *array)
+{
+  char varname[CDI_MAX_NAME];
+  int nvals = 0;
+  double amean = 0, aval;
+  double amin  =  1.e300;
+  double amax  = -1.e300;
+  
+  for ( long i = 0; i < gridsize; ++i )
+    {
+      aval = array[i];
+      if ( !DBL_IS_EQUAL(aval, missval) )
+	{
+	  if ( aval < amin ) amin = aval;
+	  if ( aval > amax ) amax = aval;
+	  amean += aval;
+	  nvals++;
+	}
+    }
+
+  if ( nvals > 0 ) amean /= nvals;
+
+  int n_lower_min = 0;
+  int n_greater_max = 0;
+  for ( long i = 0; i < gridsize; ++i )
+    {
+      aval = array[i];
+      if ( !DBL_IS_EQUAL(aval, missval) )
+	{
+	  if ( aval < vars[varID].valid_min ) n_lower_min++;
+	  if ( aval > vars[varID].valid_max ) n_greater_max++;
+	}
+    }
+
+  vlistInqVarName(vlistID2, varID, varname);
+
+  if ( n_lower_min > 0 )
+    cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
+	       varname, n_lower_min, vars[varID].valid_min);
+  if ( n_greater_max > 0 )
+    cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
+	       varname, n_greater_max, vars[varID].valid_max);
+
+  if ( vars[varID].check_min_mean_abs )
+    {
+      if ( amean < .1*vars[varID].ok_min_mean_abs )
+	cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
+		 varname, amean, vars[varID].ok_min_mean_abs);
+
+      if ( amean < vars[varID].ok_min_mean_abs)
+	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g",
+		   varname, amean, vars[varID].ok_min_mean_abs);
+    }
+
+  if ( vars[varID].check_max_mean_abs )
+    {
+      if ( amean > 10.*vars[varID].ok_max_mean_abs )
+	cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
+		 varname, amean, vars[varID].ok_max_mean_abs);
+      
+      if ( amean > vars[varID].ok_max_mean_abs )
+	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g",
+		   varname, amean, vars[varID].ok_max_mean_abs);
     }
 }
 
 
 void *Setpartab(void *argument)
 {
-  int SETPARTAB, SETPARTABV;
+  int SETPARTAB, SETPARTABN;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
@@ -233,17 +491,24 @@ void *Setpartab(void *argument)
   double missval;
   double *array = NULL;
   var_t *vars = NULL;
+  pt_mode_t ptmode = CODE_NUMBER;
 
 
   cdoInitialize(argument);
 
-  SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table");
-  SETPARTABV = cdoOperatorAdd("setpartabv", 0, 0, "parameter table");
+  SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table name");
+  SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
 
   operatorID = cdoOperatorID();
 
   operatorInputArg(cdoOperatorEnter(operatorID));
-  if ( operatorID == SETPARTAB )
+
+  if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
+
+  if      ( operatorID == SETPARTAB )  ptmode = CODE_NUMBER;
+  else if ( operatorID == SETPARTABN ) ptmode = VARIABLE_NAME;
+
+  if ( ptmode == CODE_NUMBER )
     {
       FILE *fp;
       size_t fsize;
@@ -270,7 +535,7 @@ void *Setpartab(void *argument)
 
       if ( tableformat == 0 ) tableID = defineTable(partab);
     }
-  else if ( operatorID == SETPARTABV )
+  else if (  ptmode == VARIABLE_NAME )
     {
       tableformat = 1;
     }
@@ -289,189 +554,14 @@ void *Setpartab(void *argument)
   vars = (var_t *) malloc(nvars*sizeof(var_t));
   memset(vars, 0, nvars*sizeof(var_t));
 
-  if ( operatorID == SETPARTAB || operatorID == SETPARTABV )
+  if ( tableformat == 0 )
     {
-      if ( tableformat == 0 )
-	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    vlistDefVarTable(vlistID2, varID, tableID);
-	}
-      else
-	{
-	  FILE *fp;
-	  namelist_t *nml;
-	  int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
-	  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval;
-	  int nml_cell_methods, nml_cell_measures;
-	  int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
-	  int locc, i;
-	  int code, out_code, table, ltype;
-	  int nml_index = 0;
-	  int codenum, tabnum, levtype;
-	  double missval;
-	  double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
-	  char *datatypestr = NULL;
-	  char *name = NULL, *out_name = NULL, *stdname = NULL, longname[CDI_MAX_NAME] = "", units[CDI_MAX_NAME] = "";
-	  char cell_methods[CDI_MAX_NAME] = "", cell_measures[CDI_MAX_NAME] = "";
-	  char varname[CDI_MAX_NAME];
-	  char comment[1024] = "";
-
-	  partab = operatorArgv()[0];
-	  fp = fopen(partab, "r");
-	  if ( fp == NULL ) cdoAbort("Open failed on parameter table %s!", partab);
-
-	  nml = namelistNew("parameter");
-	  nml->dis = 0;
-
-	  nml_code            = namelistAdd(nml, "code",            NML_INT,  0, &code, 1);
-	  nml_out_code        = namelistAdd(nml, "out_code",        NML_INT,  0, &out_code, 1);
-	  nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
-	  nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
-	  nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
-	  nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
-	  nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
-	  nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
-	  nml_ok_max_mean_abs = namelistAdd(nml, "ok_max_mean_abs", NML_FLT,  0, &ok_max_mean_abs, 1);
-	  nml_datatype        = namelistAdd(nml, "type",            NML_WORD, 0, &datatypestr, 1);
-	  nml_name            = namelistAdd(nml, "name",            NML_WORD, 0, &name, 1);
-	  nml_out_name        = namelistAdd(nml, "out_name",        NML_WORD, 0, &out_name, 1);
-	  nml_stdname         = namelistAdd(nml, "standard_name",   NML_WORD, 0, &stdname, 1);
-	  nml_longname        = namelistAdd(nml, "long_name",       NML_TEXT, 0, longname, sizeof(longname));
-	  nml_units           = namelistAdd(nml, "units",           NML_TEXT, 0, units, sizeof(units));
-	  nml_comment         = namelistAdd(nml, "comment",         NML_TEXT, 0, comment, sizeof(comment));
-	  nml_cell_methods    = namelistAdd(nml, "cell_methods",    NML_TEXT, 0, cell_methods, sizeof(cell_methods));
-	  nml_cell_measures   = namelistAdd(nml, "cell_measures",   NML_TEXT, 0, cell_measures, sizeof(cell_measures));
-	      
-	  while ( ! feof(fp) )
-	    {
-	      namelistReset(nml);
-
-	      namelistRead(fp, nml);
-
-	      locc = FALSE;
-	      for ( i = 0; i < nml->size; i++ )
-		{
-		  if ( nml->entry[i]->occ ) { locc = TRUE; break; }
-		}
-
-	      if ( locc )
-		{
-		  /* namelistPrint(nml); */
-
-		  nml_index++;
-
-		  if ( operatorID == SETPARTAB )
-		    {
-		      if ( nml->entry[nml_code]->occ == 0 )
-			{
-			  cdoPrint("Parameter %d skipped, code number not found!", nml_index);
-			  continue;
-			}
-		    }
-		  else
-		    {
-		      if ( nml->entry[nml_name]->occ == 0 )
-			{
-			  cdoWarning("Parameter %d skipped, variable name not found!", nml_index);
-			  continue;
-			}
-		    }
-
-		  for ( varID = 0; varID < nvars; varID++ )
-		    {
-		      if ( operatorID == SETPARTAB )
-			{
-			  codenum = vlistInqVarCode(vlistID2, varID);
-			  tableID = vlistInqVarTable(vlistID2, varID);
-			  tabnum  = tableInqNum(tableID);
-			  levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
-			  /*
-			  printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
-			  */
-			  if ( nml->entry[nml_table]->occ == 0 ) table = tabnum;
-			  if ( nml->entry[nml_ltype]->occ == 0 ) ltype = levtype;
-
-			  if ( codenum == code && tabnum == table && levtype == ltype ) break;
-			}
-		      else
-			{
-			  vlistInqVarName(vlistID2, varID, varname);
-			  if ( strcmp(varname, name) == 0 ) break;
-			}
-		    }
-
-		  if ( varID < nvars )
-		    {
-		      if ( nml->entry[nml_code]->occ     ) vlistDefVarCode(vlistID2, varID, code);
-		      if ( nml->entry[nml_out_code]->occ ) vlistDefVarCode(vlistID2, varID, out_code);
-		      if ( nml->entry[nml_name]->occ     ) strcpy(vars[varID].name, name);
-		      if ( nml->entry[nml_name]->occ     ) vlistDefVarName(vlistID2, varID, name);
-		      if ( nml->entry[nml_out_name]->occ ) vlistDefVarName(vlistID2, varID, out_name);
-		      if ( nml->entry[nml_stdname]->occ  ) vlistDefVarStdname(vlistID2, varID, stdname);
-		      if ( nml->entry[nml_longname]->occ ) vlistDefVarLongname(vlistID2, varID, longname);
-		      if ( nml->entry[nml_units]->occ    ) defineVarUnits(vars, vlistID2, varID, units, name);
-		      if ( nml->entry[nml_comment]->occ  ) defineVarAttText(vlistID2, varID, "comment", comment);
-		      if ( nml->entry[nml_cell_methods]->occ  )  defineVarAttText(vlistID2, varID, "cell_methods", cell_methods);
-		      if ( nml->entry[nml_cell_measures]->occ  ) defineVarAttText(vlistID2, varID, "cell_measures", cell_measures);
-		      if ( nml->entry[nml_datatype]->occ )
-			{
-			  int datatype = str2datatype(datatypestr);
-			  if ( datatype != -1 ) vlistDefVarDatatype(vlistID2, varID, datatype);
-			}
-		      if ( nml->entry[nml_missval]->occ )
-			{
-			  double missval_old;
-			  missval_old = vlistInqVarMissval(vlistID2, varID);
-			  if ( ! DBL_IS_EQUAL(missval, missval_old) )
-			    {
-			      if ( cdoVerbose ) 
-				cdoPrint("%s - change missval from %g to %g", name, missval_old, missval);
-			      vars[varID].changemissval = TRUE;
-			      vars[varID].missval_old = missval_old;
-			      vlistDefVarMissval(vlistID2, varID, missval);
-			    }
-			}
-		      if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
-			{
-			  vars[varID].checkvalid = TRUE;
-			  vars[varID].valid_min = valid_min;
-			  vars[varID].valid_max = valid_max;
-			}
-		      if ( nml->entry[nml_ok_min_mean_abs]->occ )
-			{
-			  vars[varID].check_min_mean_abs = TRUE;
-			  vars[varID].ok_min_mean_abs = ok_min_mean_abs;
-			}
-		      if ( nml->entry[nml_ok_max_mean_abs]->occ )
-			{
-			  vars[varID].check_max_mean_abs = TRUE;
-			  vars[varID].ok_max_mean_abs = ok_max_mean_abs;
-			}
-		    }
-		  else
-		    {
-		      if ( cdoVerbose )
-			{
-			  if ( operatorID == SETPARTAB )
-			    {
-			      if ( nml->entry[nml_table]->occ == 0 )
-				cdoPrint("Code %d not found!", code);
-			      else
-				cdoPrint("Code %d and table %d not found!", code, table);
-			    }
-			  else
-			    cdoPrint("%s - not found!", name);
-			}
-		    }
-		}
-	      else
-		break;
-	    }
-	  
-	  namelistDelete(nml);
-
-	  fclose(fp);
-	}
+      for ( varID = 0; varID < nvars; varID++ )
+	vlistDefVarTable(vlistID2, varID, tableID);
+    }
+  else
+    {
+      read_partab(ptmode, nvars, vlistID2, vars);
     }
 
   /* vlistPrint(vlistID2);*/
@@ -532,70 +622,8 @@ void *Setpartab(void *argument)
 	  
 	  streamWriteRecord(streamID2, array, nmiss);
 
-	  if ( vars[varID].checkvalid )
-	    {
-	      char varname[CDI_MAX_NAME];
-	      int nvals = 0;
-	      double amean = 0, aval;
-	      double amin  =  1.e300;
-	      double amax  = -1.e300;
-	      for ( long i = 0; i < gridsize; ++i )
-		{
-		  aval = array[i];
-		  if ( !DBL_IS_EQUAL(aval, missval) )
-		    {
-		      if ( aval < amin ) amin = aval;
-		      if ( aval > amax ) amax = aval;
-		      amean += aval;
-		      nvals++;
-		    }
-		}
-
-	      if ( nvals > 0 ) amean /= nvals;
-
-	      int n_lower_min = 0;
-	      int n_greater_max = 0;
-	      for ( long i = 0; i < gridsize; ++i )
-		{
-		  aval = array[i];
-		  if ( !DBL_IS_EQUAL(aval, missval) )
-		    {
-		      if ( aval < vars[varID].valid_min ) n_lower_min++;
-		      if ( aval > vars[varID].valid_max ) n_greater_max++;
-		    }
-		}
-
-	      vlistInqVarName(vlistID2, varID, varname);
-
-	      if ( n_lower_min > 0 )
-		cdoWarning("Invalid value(s) detected for variable '%s': %i values were lower than minimum valid value (%.4g).",
-			   varname, n_lower_min, vars[varID].valid_min);
-	      if ( n_greater_max > 0 )
-		cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
-			   varname, n_greater_max, vars[varID].valid_max);
-
-	      if ( vars[varID].check_min_mean_abs )
-		{
-		  if ( amean < .1*vars[varID].ok_min_mean_abs )
-		    cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
-			     varname, amean, vars[varID].ok_min_mean_abs);
-
-		  if ( amean < vars[varID].ok_min_mean_abs)
-		    cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower than minimum allowed: %.4g",
-			       varname, amean, vars[varID].ok_min_mean_abs);
-		}
-
-	      if ( vars[varID].check_max_mean_abs )
-		{
-		  if ( amean > 10.*vars[varID].ok_max_mean_abs )
-		    cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
-			     varname, amean, vars[varID].ok_max_mean_abs);
-
-		  if ( amean > vars[varID].ok_max_mean_abs )
-		    cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater than maximum allowed: %.4g",
-			       varname, amean, vars[varID].ok_max_mean_abs);
-		}
-	    }
+	  if ( vars[varID].checkvalid || vars[varID].check_min_mean_abs || vars[varID].check_max_mean_abs )
+	    check_data(vlistID2, varID, vars, gridsize, missval, array);
 	}
       tsID1++;
     }
