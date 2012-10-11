@@ -20,40 +20,89 @@
 //extern xmlNode *root_node, *magics_node, *results_node;
 extern xmlNode  *magics_node;
 
+#define DBG 0
+
 int VECTOR, STREAM;
+char  *vector_params[] = {"thin_fac","unit_vec"};
+int vector_param_count = sizeof(vector_params)/sizeof(char*);
+
+void VerifyVectorParameters( int num_param, char **param_names, int opID );
+
+/* Default Magics Values */
+double THIN_FAC = 2.0, UNIT_VEC = 25.0;
+
+extern int IsNumeric();
+extern int StringSplitWithSeperator();
+
 
 static
-void magvector( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *uarray, double *varray )
+void magvector( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *uarray, double *varray, int nparam, char **params )
 
 {
         long i;
         double dlon = 0, dlat = 0;
         double thin_fac;
 	char plotfilename[4096];
+	int split_str_count;
+	char *sep_char= "=";
+	char **split_str=NULL;
+	
 
 	if( uarray == NULL && varray == NULL )
-	{
-          	fprintf( stderr," No Velocity Components in input file, cannot creaate Vector PLOT!\n" );
-		return ;
-	}
+	  {
+	    fprintf( stderr," No Velocity Components in input file, cannot creaate Vector PLOT!\n" );
+	    return ;
+	  }
 
 	if( uarray == NULL || varray == NULL )
-	{
-          	fprintf( stderr," Found only one Velocity Component in input file, cannot create Vector PLOT!\n" );
-		return ;
-	}
-
+	  {
+	    fprintf( stderr," Found only one Velocity Component in input file, cannot create Vector PLOT!\n" );
+	    return ;
+	  }
+	
+	if( DBG )
+	  {
+	    fprintf(stderr, "Num params %d\n", nparam);
+      
+	    for( i = 0; i< nparam; i++ )
+	      fprintf(stderr, "Param %s\n", params[i]);
+	    fflush( stderr );
+	  }
+	  
+	for( i = 0; i < nparam; ++i )
+	  {
+	    split_str_count = 0;
+	    sep_char = "=";
+	    split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
+	    
+	    if( !strcmp( split_str[0],"thin_fac" ) )
+	      {
+		THIN_FAC = atof( split_str[1] );
+		if( DBG )
+		  fprintf(stderr,"THIN FACTOR %g\n",THIN_FAC );
+	      }
+	      
+	    if( !strcmp( split_str[0],"unit_vec" ) )
+	      {
+		UNIT_VEC = atof( split_str[1] );
+		if( DBG )
+		  fprintf(stderr,"UNIT VECTOR %g\n",UNIT_VEC );
+	      }
+	      
+	    free( split_str );  
+	  }
+	  
         if ( nlon > 1 )
-        {
-           for ( i = 1; i < nlon; ++i ) dlon += (grid_center_lon[i] - grid_center_lon[i-1]);
-               dlon /= (nlon-1);
-        }  
+	  {
+	    for ( i = 1; i < nlon; ++i ) dlon += (grid_center_lon[i] - grid_center_lon[i-1]);
+		dlon /= (nlon-1);
+	  }	  
 
         if ( nlat > 1 )
-        {
-           for ( i = 1; i < nlat; ++i ) dlat += (grid_center_lat[nlon*i] - grid_center_lat[nlon*(i-1)]);
-               dlat /= (nlat-1);
-        }
+	  {
+	    for ( i = 1; i < nlat; ++i ) dlat += (grid_center_lat[nlon*i] - grid_center_lat[nlon*(i-1)]);
+		dlat /= (nlat-1);
+	  }
 
         magics_template_parser( magics_node );
 
@@ -83,12 +132,16 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		*/
 		mag_setc( "legend", "on" );
 		mag_setc( "wind_flag_cross_boundary", "on" );
-		//mag_setr( "wind_arrow_unit_velocity", 1.0);
 		mag_seti( "wind_arrow_thickness",1 );
 		mag_coast();
-		mag_text();
-                mag_enqr("wind_thinning_factor",&thin_fac);
-                printf( " %g \n", thin_fac );
+		
+		if( THIN_FAC != 2.0f )
+		  mag_setr("wind_thinning_factor",THIN_FAC);
+		
+		//wind_arrow_unit_velocity
+		if( UNIT_VEC != 25.0f )
+		  mag_setr("wind_arrow_unit_velocity",UNIT_VEC);
+                
 		mag_wind();
 	}
 }
@@ -129,6 +182,9 @@ void *Magvector(void *argument)
   int zaxisID, taxisID;
   int vdate, vtime;
   int found;
+  int nparam = 0;
+  int i;
+  char **pnames = NULL;
   char varname[CDI_MAX_NAME];
   double missval;
   double *uarray = NULL;
@@ -141,11 +197,24 @@ void *Magvector(void *argument)
 
   cdoInitialize(argument);
 
-
+  nparam = operatorArgc();
+  pnames = operatorArgv();
+  
   VECTOR  = cdoOperatorAdd("vector", 0, 0, NULL);
   STREAM  = cdoOperatorAdd("stream", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
+  
+  if( nparam )
+    {
+      if( DBG )
+	{
+	  for( i = 0; i < nparam; i++ )
+	    fprintf( stderr,"Param %d is %s!\n",i+1, pnames[i] );
+	}
+      
+      VerifyVectorParameters( nparam, pnames, operatorID );
+    }
 
   streamID = streamOpenRead(cdoStreamName(0));
 
@@ -237,7 +306,7 @@ void *Magvector(void *argument)
 	  	if( found == 2 )
 	  	{
           		fprintf( stderr,"Found Both U & V VEL, Creating vector fields! \n" );
-			magvector(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, uarray, varray );
+			magvector(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, uarray, varray, nparam, pnames );
 	  	}
 	  	else if( found == 1 )
           		fprintf( stderr,"Found only one Velocity Component in input file, cannot creaate Vector PLOT!\n" );
@@ -265,3 +334,83 @@ void *Magvector(void *argument)
   return (0);
 
 }
+
+
+
+void VerifyVectorParameters( int num_param, char **param_names, int opID )
+
+{
+  
+  int i, j, k;
+  int found = FALSE, syntax = TRUE, halt_flag = FALSE, file_found = TRUE, split_str_count;
+  int param_count;
+  char **params;
+  char **split_str = NULL, **split_str1 = NULL;
+  char *sep_char = "=";
+  char *temp_str;
+  FILE *fp;
+
+  /* char  *vector_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"}; */
+
+  for ( i = 0; i < num_param; ++i )
+    {
+      split_str_count = 0;
+      found = FALSE;
+      syntax = TRUE;
+      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
+      
+      if( DBG )
+	fprintf( stderr, "Verifying params!\n");
+      
+      if( split_str_count > 1 ) 
+	{
+	  
+	  if( opID == VECTOR )
+	    {
+	      param_count = vector_param_count;
+	      params = vector_params;
+	    }
+	  
+	  for ( j = 0; j < param_count; ++j )
+	    {
+	      if( !strcmp( split_str[0], params[j] ) )
+		{
+		  found = TRUE;
+		      
+		  if( !strcmp( split_str[0],"thin_fac" )      ||  !strcmp( split_str[0],"unit_vec" ) )
+		    {
+		      if( !IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		    }
+		}
+	    }
+	}
+      else
+	{
+	  syntax = FALSE;
+	}
+	
+      if( found == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
+	} 
+      if( found == TRUE && syntax == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
+	}
+	
+      if( split_str ) 	  
+	free( split_str );
+    }
+      
+    if( halt_flag == TRUE )
+    {
+      exit(0);
+    }
+    
+}
+
+
+
