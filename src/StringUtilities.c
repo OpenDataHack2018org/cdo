@@ -79,3 +79,35 @@ void StrToLowerCase ( char *sPtr )
       ++sPtr;
     }
 }
+
+/* To replace a single char with another single char in a given string */
+
+void StrReplaceChar( char *str_in, char orig_char, char rep_char )
+
+{
+  
+  int n, i = 0;
+  char temp[256];
+  char *ret_str = NULL;
+  char *ref = NULL;
+  
+  ref = str_in; 
+  
+  if( strchr( str_in, orig_char) == NULL )
+    return;
+  
+  if( DBG )  
+    fprintf( stderr,"Before %s\n", ref );        
+  
+  while( *str_in != '\0' )
+    {
+      if( *str_in == orig_char )
+	  *str_in = rep_char;
+      str_in++;
+    } 
+  if( DBG )  
+    fprintf( stderr,"After %s\n", ref );      
+  
+  return  ;     
+}
+
