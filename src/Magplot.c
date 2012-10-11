@@ -23,14 +23,196 @@ xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
 int CONTOUR, SHADED, GRFILL;
 
+char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"};
+int contour_param_count = sizeof(contour_params)/sizeof(char*);
+
+char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB"};
+int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
+
+char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB"};
+int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
+
+char  *STD_COLOUR_TABLE[] = {"blue","green","yellow","orange","red"};
+char **USR_COLOUR_TABLE = NULL;
+
+int  STD_COLOUR_COUNT = sizeof( STD_COLOUR_TABLE )/sizeof( char* );
+int  USR_COLOUR_COUNT =0;
+
+
+char *STYLE_TABLE[] = { "SOLID","DASH","DOT","CHAIN_DASH","CHAIN_DOT"};
+int STYLE_COUNT = sizeof( STYLE_TABLE )/ sizeof( char *);
+
+int checkcolour( char *colour_in );
+int ReadColourTable ( char *filepath );
+int checkstyle( char *style_in );
+void VerifyPlotParameters( int num_param, char **param_names, int opID );
+
+extern int IsNumeric();
+extern void StrToUpperCase();
+extern void StrToLowerCase();
+extern int StringSplitWithSeperator();
+extern void StrReplaceChar( );
+
+ /* Magics default values */
+int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0;
+double YMIN = 1.0e+200, YMAX = -1.0e+200, INTERVAL = 8.0, RESOLUTION = 10.0f, *LEV_LIST = NULL ;
+char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL;
+
+
 static
-void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array )
+void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params )
+
 {
   static int once = 1;
   long i;
   double dlon = 0, dlat = 0;
   char plotfilename[4096];
   char *titlename;
+  int j, split_str_count, split_str_count1;
+  char *sep_char = "=";
+  char **split_str = NULL, **split_str1 = NULL;
+  char *temp_str = NULL;
+  char  orig_char = ';', rep_char = ',';
+  
+  
+  if( DBG )
+    {
+      fprintf(stderr, "Num params %d\n", nparam);
+  
+      for( i = 0; i< nparam; i++ )
+	fprintf(stderr, "Param %s\n", params[i]);
+      fflush( stderr );
+    }
+  
+  for( i = 0; i < nparam; ++i )
+    {
+      split_str_count = 0;
+      sep_char = "=";
+      split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
+	
+      if( !strcmp( split_str[0],"min" ) )
+	{
+	  YMIN = atof( split_str[1] );
+	  if( DBG )
+	    fprintf(stderr," Min Val %g\n",YMIN );
+	}
+	
+      if( !strcmp( split_str[0],"max" ) )
+	{
+	  YMAX = atof( split_str[1] );
+	  if( DBG )
+	    fprintf(stderr,"Max Val %g\n",YMAX );
+	}
+	
+      if( !strcmp( split_str[0],"resolution" ) )
+	{
+	  RESOLUTION = atoi( split_str[1] );
+	  if( DBG )
+	    fprintf( stderr,"RESOLUTION %g\n",RESOLUTION );
+	}	
+	
+      if( !strcmp( split_str[0],"colour" ) ) 
+	{  
+	  temp_str = strdup( split_str[1] );  
+	  if( !isRGB )
+	    StrToLowerCase( temp_str );
+	  else
+	    {
+	      StrToUpperCase( temp_str );
+	      StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+	    }
+          COLOUR = temp_str;
+	  if( DBG )
+	    fprintf(stderr,"COLOUR %s\n",COLOUR );
+	}
+	
+      if( !strcmp( split_str[0],"colour_min" ) ) 
+	{  
+	  temp_str = strdup( split_str[1] );    
+          if( !isRGB )
+	    StrToLowerCase( temp_str );
+	  else
+	    {
+	      StrToUpperCase( temp_str );
+	      StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+	    }
+	  COLOUR_MIN = temp_str;
+	  if( DBG )
+	    fprintf(stderr,"COLOUR %s\n",COLOUR_MIN );
+	}
+	
+      if( !strcmp( split_str[0],"colour_max" ) ) 
+	{  
+	  temp_str = strdup( split_str[1] );    
+          if( !isRGB )
+	    StrToLowerCase( temp_str );
+	  else
+	    {
+	      StrToUpperCase( temp_str );
+	      StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+	    }
+	  COLOUR_MAX = temp_str;
+	  if( DBG )
+	    fprintf(stderr,"COLOUR %s\n",COLOUR_MAX );
+	}			
+	
+      if( !strcmp( split_str[0],"interval" ) )
+	{
+	  INTERVAL = atof( split_str[1] );
+	  
+	  if( DBG )
+	    fprintf( stderr,"INTERVAL %f\n",INTERVAL );
+	}
+	
+      if( !strcmp( split_str[0],"count" ) )
+	{
+	  COUNT = atoi( split_str[1] );
+	  if( DBG )
+	    fprintf( stderr,"COUNT %d\n",COUNT );
+	}
+	
+      if( !strcmp( split_str[0],"list" ) ) /* To be Done */
+	{
+	  sep_char = ";";
+	  split_str_count1 = 0;
+	  split_str_count1 = StringSplitWithSeperator( split_str[1], sep_char, &split_str1 );
+	  if( split_str_count1 )
+	    {
+	      NUM_LEVELS = split_str_count1;
+	      LEV_LIST = ( double *) malloc( sizeof( double ) * split_str_count1 );
+	      for( j = 0; j < split_str_count1; j++ )
+		{
+		  LEV_LIST[j] = atof( split_str1[j] );
+		}
+	      free( split_str1 );
+	    }
+	  if( DBG )
+	    {
+	      for( j = 0; j < split_str_count1; j++ )
+		{
+		  fprintf( stderr,"LIST %f\n",LEV_LIST[j] ); 
+		}
+	    }
+	}   
+	
+      if( !strcmp( split_str[0],"thickness" ) )
+	{
+	  THICKNESS = atoi( split_str[1] );
+	  if( DBG )
+	    fprintf( stderr,"THICKNESS %d\n",THICKNESS );
+	}
+	
+      if( !strcmp( split_str[0],"style" ) ) 
+	{  
+	  temp_str = strdup( split_str[1] );    
+	  StrToUpperCase( temp_str );
+	  STYLE = temp_str;
+	  if( DBG )
+	    fprintf( stderr,"STYLE %s\n",STYLE );
+	}
+	
+      free( split_str );
+    }
 
   if ( nlon > 1 )
     {
@@ -90,7 +272,43 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       mag_setc ( "contour_shade", "on" );
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
+      
+      if( YMIN < 1.0e+200  )
+	mag_setr( "contour_shade_min_level", YMIN );
+      
+      if( YMAX > -1.0e+200 )
+	mag_setr( "contour_shade_max_level", YMAX );
+      
+      if( COLOUR_MIN )
+	mag_setc( "contour_shade_min_level_colour", COLOUR_MIN );
+      
+      if( COLOUR_MAX )
+	mag_setc( "contour_shade_max_level_colour", COLOUR_MAX );
 
+      if( INTERVAL != 8.0f )
+	{
+	  mag_setc( "contour_level_selection_type", "INTERVAL" );
+	  mag_setr( "contour_interval", INTERVAL );
+	}
+	
+      if( COUNT != 10 )
+	{
+	  mag_setc( "contour_level_selection_type", "COUNT" );
+	  mag_seti( "contour_level_count", COUNT );
+	}
+	
+      if( NUM_LEVELS  )
+	{
+	  mag_setc( "contour_level_selection_type", "LEVEL_LIST" );
+	  mag_set1r( "contour_level_list", LEV_LIST, NUM_LEVELS );
+	}
+	
+      if( USR_COLOUR_COUNT ) 
+	{
+	  mag_setc( "contour_shade_colour_method", "LIST" );
+	  mag_set1c( "contour_shade_colour_list",USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
+	}
+      
       /* Adjust Set The page slightly to fit the legend */
       mag_setr ( "subpage_x_length", 24. );
       mag_setr ( "subpage_y_length", 30. );
@@ -110,11 +328,47 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
     {
 
       mag_setc ("contour",                  "on");
-      // mag_setc ("contour_line_colour",      "sky");
-      // mag_setc ("CONTOUR_HIGHLIGHT_COLOUR", "GREEN");
       mag_setc ("contour_shade",            "off");
       mag_setc ("contour_label",            "on");
+      mag_setc ("contour_highlight",        "off");
+      
+    
+      if( YMIN < 1.0e+200  )
+	mag_setr( "contour_min_level", YMIN );
 
+      if( YMAX > -1.0e+200 )
+	mag_setr( "contour_max_level", YMAX );
+
+      
+      if( COLOUR )
+	mag_setc( "contour_line_colour", COLOUR );
+      
+      
+      if( INTERVAL != 8.0f )
+	{
+	  mag_setc( "contour_level_selection_type", "INTERVAL" );
+	  mag_setr( "contour_interval", INTERVAL );
+	}
+	
+      if( COUNT != 10 )
+	{
+	  mag_setc( "contour_level_selection_type", "COUNT" );
+	  mag_seti( "contour_level_count", COUNT );
+	}
+	
+      if( NUM_LEVELS  )
+	{
+	  mag_setc( "contour_level_selection_type", "LEVEL_LIST" );
+	  mag_set1r( "contour_level_list", LEV_LIST, NUM_LEVELS );
+	}
+	
+      if( THICKNESS != 1 )
+	mag_seti( "contour_line_thickness", THICKNESS );
+      
+      if( STYLE )
+      	  mag_setc( "contour_line_style", STYLE );
+      
+      fprintf( stderr, " CONTOUR Done!\n" );
     }
   else if ( operatorID == GRFILL )
     {
@@ -126,6 +380,46 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 
       mag_setc ( "contour_shade_method", "area_fill" );
       mag_setc ( "contour_label", "off" );
+      
+      if( YMIN < 1.0e+200  )
+	mag_setr( "contour_shade_min_level", YMIN );
+      
+      if( YMAX > -1.0e+200 )
+	mag_setr( "contour_shade_max_level", YMAX );
+      
+      if( COLOUR_MIN )
+	mag_setc( "contour_shade_min_level_colour", COLOUR_MIN );
+      
+      if( COLOUR_MAX )
+	mag_setc( "contour_shade_max_level_colour", COLOUR_MAX );
+      
+      if( INTERVAL != 8.0f )
+	{
+	  mag_setc( "contour_level_selection_type", "INTERVAL" );
+	  mag_setr( "contour_interval", INTERVAL );
+	}
+	
+      if( COUNT != 10 )
+	{
+	  mag_setc( "contour_level_selection_type", "COUNT" );
+	  mag_seti( "contour_level_count", COUNT );
+	}
+	
+      if( NUM_LEVELS  )
+	{
+	  mag_setc( "contour_level_selection_type", "LEVEL_LIST" );
+	  mag_set1r( "contour_level_list", LEV_LIST, NUM_LEVELS );
+	}
+	
+      if( USR_COLOUR_COUNT ) 
+	{
+	  mag_setc( "contour_shade_colour_method", "LIST" );
+	  mag_set1c( "contour_shade_colour_list",USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
+	}
+	
+      if( RESOLUTION != 10.0f)
+	mag_setr( "contour_shade_cell_resolution", RESOLUTION );
+      
 
       /* Adjust Set The page slightly to fit the legend */
       mag_setr ( "subpage_x_length", 24. );
@@ -165,6 +459,10 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   mag_setc("text_justification", "left");
   mag_text();
 
+  if( LEV_LIST ) 
+    free( LEV_LIST );
+
+
 }
 
 
@@ -200,6 +498,9 @@ void *Magplot(void *argument)
   int nlev;
   int zaxisID, taxisID;
   int vdate, vtime;
+  int nparam = 0;
+  int i;
+  char **pnames = NULL;
   char varname[CDI_MAX_NAME];
   double missval;
   double *array = NULL;
@@ -210,12 +511,27 @@ void *Magplot(void *argument)
   char  *Filename = "combined.xml";
 
   cdoInitialize(argument);
-
+  
+  
+  nparam = operatorArgc();
+  pnames = operatorArgv();
+  
   CONTOUR = cdoOperatorAdd("contour", 0, 0, NULL);
   SHADED  = cdoOperatorAdd("shaded", 0, 0, NULL);
   GRFILL  = cdoOperatorAdd("grfill", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
+  
+  if( nparam )
+    {
+      if( DBG )
+	{
+	  for( i = 0; i < nparam; i++ )
+	    fprintf( stderr,"Param %d is %s!\n",i+1, pnames[i] );
+	}
+      
+      VerifyPlotParameters( nparam, pnames, operatorID );
+    }
 
   streamID = streamOpenRead(cdoStreamName(0));
 
@@ -288,7 +604,7 @@ void *Magplot(void *argument)
                 else if( operatorID == GRFILL )
                    fprintf( stderr," Creating GRFILL PLOT for %s\n",varname );
 
-	  	magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array);
+	  	magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames);
 
           }
 	  else
@@ -317,3 +633,360 @@ void *Magplot(void *argument)
   return (0);
 
 }
+
+
+void VerifyPlotParameters( int num_param, char **param_names, int opID )
+
+{
+  int i, j, k;
+  int found = FALSE, syntax = TRUE, halt_flag = FALSE, file_found = TRUE, split_str_count;
+  int param_count;
+  char **params;
+  char **split_str = NULL, **split_str1 = NULL;
+  char *sep_char = "=";
+  char *temp_str;
+  FILE *fp;
+
+/*  
+  char  *contour_params[] = {"ymin","ymax","count","interval","list","colour","thickness","style"};
+  char  *shaded_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable"};
+  char  *grfill_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable","resolution"};
+*/
+
+
+  for ( i = 0; i < num_param; ++i )
+    {
+      split_str_count = 0;
+      found = FALSE;
+      syntax = TRUE;
+      split_str_count = StringSplitWithSeperator( param_names[i], sep_char, &split_str );
+      
+      if( DBG )
+	fprintf( stderr, "Verifying params!\n");
+      
+      if( split_str_count > 1 ) 
+	{
+	  
+	  if( opID == CONTOUR )
+	    {
+	      param_count = contour_param_count;
+	      params = contour_params;
+	    }
+	  else if( opID == SHADED )
+	    {
+	      param_count = shaded_param_count;
+	      params = shaded_params;
+	    }
+	  else if( opID == GRFILL )
+	    {
+	      param_count = grfill_param_count;
+	      params = grfill_params;
+	    }
+	  
+	  for ( j = 0; j < param_count; ++j )
+	    {
+	      if( !strcmp( split_str[0], params[j] ) )
+		{
+		  found = TRUE;
+		  if( !strcmp( split_str[0],"colour" )     ||  !strcmp( split_str[0],"style" )     ||
+		      !strcmp( split_str[0],"colour_min" ) ||  !strcmp( split_str[0],"colour_max" )||
+		      !strcmp( split_str[0],"RGB" )
+		    )
+		    {  
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;
+		      else
+			{
+			  if( !strcmp( split_str[0],"RGB" ) )
+			    { 
+			      temp_str = strdup( split_str[1] );    
+			      StrToUpperCase( temp_str );
+			      if( strcmp( temp_str,"TRUE" ) && strcmp( temp_str,"FALSE" ) )
+				syntax = FALSE;      
+			      else
+				{
+				  if( !strcmp( temp_str,"TRUE" ) )
+				      isRGB = TRUE;
+				  else
+				    isRGB = FALSE;
+				}
+			    }
+			  else if( !strcmp( split_str[0],"style" ) )
+			    {
+			      if( checkstyle( split_str[1] ) )
+				syntax = FALSE;
+			    }
+			  else if( !strcmp( split_str[0],"colour" ) || !strcmp( split_str[0],"colour_min" ) || !strcmp( split_str[0],"colour_max" ) )
+			    {
+			      
+			      if( checkcolour( split_str[1] ) )
+				syntax = FALSE;
+			    }
+			}
+		    } 
+		      
+		  if( !strcmp( split_str[0],"min" )      ||  !strcmp( split_str[0],"max" )     ||
+		      !strcmp( split_str[0],"count" )     ||  !strcmp( split_str[0],"interval" ) ||
+		      !strcmp( split_str[0],"thickness" ) ||  !strcmp( split_str[0],"resolution" )
+		    )
+		    {
+		      if( !IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		    }
+		    
+		  if( !strcmp( split_str[0],"colourtable" ) )
+		    {
+		      if( ( fp = fopen( split_str[1],"r") ) == NULL )
+			{
+			  fprintf( stderr,"Input Color Table File not found in specified path '%s'\n", split_str[1] );
+			  halt_flag = TRUE;
+			}
+		      else
+			{
+			  ReadColourTable ( split_str[1] );
+			}
+		    }
+		    
+		  if( !strcmp( split_str[0],"list" ) )
+		    {
+		      sep_char = ";";
+		      split_str_count = StringSplitWithSeperator( split_str[1], sep_char, &split_str1 );
+		      if( !split_str_count )
+			{
+			  syntax = FALSE; 
+			}
+		      else
+		      {
+			for( k = 0; k < split_str_count; k++ )
+			  {
+			    if( !IsNumeric( split_str1[k] ) )
+			      syntax = FALSE;
+			  }
+		      }
+		    }
+		}
+	    }
+	}
+      else
+	{
+	  syntax = FALSE;
+	}
+	
+      if( found == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
+	} 
+      if( found == TRUE && syntax == FALSE )
+	{
+	  halt_flag = TRUE;
+	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
+	}
+	
+      if( split_str ) 	  
+	free( split_str );
+    }
+      
+    if( halt_flag == TRUE )
+    {
+      exit(0);
+    }
+    
+}
+
+
+int checkcolour( char *colour_in )
+
+{
+
+    int i, n, found = FALSE;
+    int split_str_count;
+    char *sep_char =",";
+    char **split_str = NULL;
+    float  rgb_values[3];
+    char temp[256];
+    char *ref;
+   
+    ref = colour_in;
+    
+    if( isRGB )
+      {
+	if( strchr( colour_in,';') == NULL || strstr( colour_in,"RGB(") == NULL )
+	  {
+	    cdoWarning( "Found 'RGB=true',Specify Colour in 'RGB(r;g;b)' ( where r,g,b in [0.0,1.0] ) format!" );
+	    free( split_str );
+	    return 1;
+	  }
+	  
+	n = strlen( colour_in );
+    
+	if( DBG )
+	  fprintf( stdout,"  count %d  original colour %s RGB %d\n", n, colour_in, isRGB  );
+	
+	for( i=0 ; i< n-1; i++ )
+	  {
+	    if( i > 3 )
+	      { 
+		temp[i-4] = *colour_in;
+		/*
+		if( DBG )
+		  fprintf( stdout,"  cur %c  temp %c \n",*colour_in, temp[i-4] ); 
+		*/
+	      }
+	    colour_in++; 
+	  }
+	  
+	temp[i-4] = '\0';
+	
+	if( DBG )
+	  fprintf( stdout,"  count %d  modified color %s \n", strlen(temp), temp  );
+	
+	sep_char =";";
+	split_str_count = StringSplitWithSeperator( temp, sep_char, &split_str );
+    
+	if(  split_str_count != 3 ) 
+	  {
+	    cdoWarning( " Colour specified in Improper format!" );
+	    free( split_str );
+	    return 1;
+	  }
+    
+	rgb_values[0] = atof( split_str[0] );
+	rgb_values[1] = atof( split_str[1] );
+	rgb_values[2] = atof( split_str[2] );
+    
+	if( rgb_values[0] + rgb_values[1] + rgb_values[2] > 3.0f  || 
+	    rgb_values[0] + rgb_values[1] + rgb_values[2] < 0.0f 	   )
+	  {
+	    cdoWarning( " RGB Colour specified with Improper values!" );
+	    free( split_str );
+	    return 1;
+	  }
+	  
+	free( split_str );  
+      }
+    else
+      {
+	if( strchr( colour_in,';') != NULL || strstr( colour_in,"RGB(") != NULL )
+	  {
+	    cdoWarning( "Found Colour with 'RGB(r;g;b)' format, set parameter RGB='true' !" );
+	    free( split_str );
+	    return 1;
+	  }
+	  
+	StrToLowerCase( colour_in );
+	for( i = 0 ; i < STD_COLOUR_COUNT; i++ )
+	  {
+	    if( !strcmp( STD_COLOUR_TABLE[i], colour_in ) )
+	      {
+		found = TRUE;
+		return 0;
+	      }
+	  }
+	  cdoWarning( "Specified Colour not in Standard colour list, resetting to blue(default colour)!" );
+	  return 1;
+      }
+      
+    if( DBG )  
+      cdoWarning( "Colour %s verified!",ref );  
+    return 0;
+}
+
+
+int ReadColourTable ( char *filepath )
+
+{
+    
+    FILE *fp;
+    int  i, num_colors;
+    char **temp_table = NULL;
+    char  orig_char = ';', rep_char = ',';
+    
+    fp = fopen( filepath,"r" );
+    
+    if( !fp )
+      {
+	fprintf( stdout, "File Not available!" );
+	return 1;
+      }
+    
+    fscanf( fp, "%d", &num_colors );
+    
+    if( DBG )
+      fprintf( stderr, "Num Colours %d\n", num_colors );
+    
+    if( !num_colors )
+      {
+	cdoWarning("No colours found in File, proceeding with Standard Colour table!\n");
+	fclose(fp);
+	return 1;
+      }
+    
+    USR_COLOUR_COUNT = 0;
+    USR_COLOUR_TABLE = malloc ( num_colors * sizeof( char * ) );
+    temp_table  = malloc ( num_colors * sizeof( char * ) );
+    
+    for( i =0; i < num_colors; i++ )
+      {
+         temp_table[i] = malloc (  256 * sizeof( char ) );
+	 fscanf( fp, "%s", temp_table[i] );
+	 if( DBG )
+	   fprintf( stdout, "%s\n", temp_table[i] );
+      } 
+    
+    for( i = 0; i < num_colors; i++ )
+      {
+	  if( DBG )
+	    fprintf( stdout, "%s \n", temp_table[i] );
+	  
+	  if( !checkcolour( temp_table[i] ) )
+	    {
+	      if( isRGB )
+		StrReplaceChar( temp_table[i], orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+
+	      if( DBG )
+		fprintf( stdout, "Before appending %s\n", temp_table[i] );
+	      
+	      USR_COLOUR_TABLE[ USR_COLOUR_COUNT ] = strdup( temp_table[i] );
+	      
+	      //strcpy( USR_COLOUR_TABLE[ USR_COLOUR_COUNT ], temp_table[i] );
+	      USR_COLOUR_COUNT++;
+	      
+	      if( DBG )
+		fprintf( stdout, "After appending %s\n", temp_table[i] );
+	    }
+      }
+    
+    if( USR_COLOUR_COUNT < num_colors )
+      {
+	  cdoWarning( " Discarding improper format colours and continuing!\n" );
+      }
+      
+    fclose(fp);   
+    return 0;
+}
+
+int checkstyle( char *style_in )
+
+{
+    int i, found = FALSE;
+    StrToUpperCase( style_in );
+    for( i = 0 ; i < STYLE_COUNT; i++ )
+      {
+	if( DBG )
+	  fprintf( stderr, "Input %s ref %s\n",style_in, STYLE_TABLE[i] );
+	
+	if( !strcmp( STYLE_TABLE[i], style_in ) )
+	  {
+	    found = TRUE;
+	    return 0;
+	  }
+      }
+      
+    if( !found )
+	 cdoWarning( " Style specified with Improper value!\n" );
+    
+    return 1; 
+}
+
+
