@@ -190,7 +190,7 @@ void *Sorttimestamp(void *argument)
 		  char vdatestr[32], vtimestr[32];
 		  date2str(vdate[xtsID], vdatestr, sizeof(vdatestr));
 		  time2str(vtime[xtsID], vtimestr, sizeof(vtimestr));
-		  cdoPrint("Timestep %4d %s %s already exist, skipped!", xtsID, vdatestr, vtimestr);
+		  cdoPrint("Timestep %4d %s %s already exists, skipped!", xtsID, vdatestr, vtimestr);
 		}
 	      continue;
 	    }

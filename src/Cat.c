@@ -60,7 +60,7 @@ void *Cat(void *argument)
 
       if ( indf == 0 )
 	{
-	  if ( fileExist(cdoStreamName(nfiles)) )
+	  if ( fileExists(cdoStreamName(nfiles)) )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
 

@@ -34,7 +34,7 @@ void init_is_tty(void);
 void progressInit(void);
 void progressStatus(double offset, double refval, double curval);
 
-int fileExist(const char *filename);
+int fileExists(const char *filename);
 int userFileOverwrite(const char *filename);
 
 /* convert a CDI datatype to string */

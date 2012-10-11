@@ -38,10 +38,42 @@
 #include "namelist.h"
 
 
+static void udunitsInitialize(void);
+static int udunitsInit = 0;
+
+#if  defined  (HAVE_LIBPTHREAD)
+#  include <pthread.h>
+
+static pthread_once_t  udunitsInitThread = PTHREAD_ONCE_INIT;
+static pthread_mutex_t udunitsMutex;
+
+#  define UDUNITS_LOCK()         pthread_mutex_lock(&udunitsMutex)
+#  define UDUNITS_UNLOCK()       pthread_mutex_unlock(&udunitsMutex)
+#  define UDUNITS_INIT()         pthread_once(&udunitsInitThread, udunitsInitialize)
+
+#else
+
+#  define UDUNITS_LOCK()
+#  define UDUNITS_UNLOCK()
+#  define UDUNITS_INIT()         if ( !udunitsInit ) udunitsInitialize();
+
+#endif
+
 typedef enum {CODE_NUMBER, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
 
 #if defined (HAVE_LIBUDUNITS2)
 ut_system *ut_read = NULL;
+
+static
+void udunitsInitialize(void)
+{
+#if  defined  (HAVE_LIBPTHREAD)
+  /* initialize global API mutex lock */
+  pthread_mutex_init(&udunitsMutex, NULL);
+#endif
+
+  udunitsInit = 1;
+}
 
 static
 void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
@@ -54,6 +86,8 @@ void *get_converter(char *src_unit_str, char *tgt_unit_str, int *rstatus)
 
   if ( ut_read == NULL )
     {
+      ut_set_error_message_handler(ut_ignore);
+
       errno = 0;
       ut_read = ut_read_xml(NULL);
       status = ut_get_status();
@@ -133,8 +167,8 @@ typedef struct
   int changemissval;
   double missval_old;
   //
-  int lscale;
-  double scale;
+  int lfactor;
+  double factor;
   //
   int checkvalid;
   double valid_min;
@@ -169,6 +203,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 {
   char units_old[CDI_MAX_NAME];
   size_t len1, len2;
+
   vlistInqVarUnits(vlistID2, varID, units_old);
   len1 = strlen(units_old);
   len2 = strlen(units);
@@ -182,13 +217,16 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 	  strcpy(vars[varID].units_old, units_old);
 	  strcpy(vars[varID].units, units);
 #if defined (HAVE_LIBUDUNITS2)
+	  UDUNITS_INIT();
+	  UDUNITS_LOCK();
 	  vars[varID].ut_converter = get_converter(units_old, units, &status);
+	  UDUNITS_UNLOCK();
 	  if ( vars[varID].ut_converter == NULL )
 	    {
 	      if ( status == -2 )
 		{
 		  if ( cdoVerbose )
-		    cdoPrint("%s - not converted from [%s] to [%s], units are equal!", name, units_old, units);
+		    cdoPrint("%s - not converted from  [%s] to [%s], units are equal!", name, units_old, units);
 		}
 	      else if ( status == -3 )
 		{
@@ -227,7 +265,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   FILE *fp;
   namelist_t *nml;
   int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
-  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval, nml_scale;
+  int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval, nml_factor;
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
   int locc, i;
@@ -236,7 +274,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
   int codenum, tabnum, levtype;
   int varID, tableID;
   int num_pt_files;
-  double missval, scale;
+  double missval, factor;
   double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
   char *partab = NULL;
   char *datatypestr = NULL;
@@ -262,7 +300,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_table           = namelistAdd(nml, "table",           NML_INT,  0, &table, 1);
       nml_ltype           = namelistAdd(nml, "ltype",           NML_INT,  0, &ltype, 1);
       nml_missval         = namelistAdd(nml, "missing_value",   NML_FLT,  0, &missval, 1);
-      nml_scale           = namelistAdd(nml, "scale",           NML_FLT,  0, &scale, 1);
+      nml_factor          = namelistAdd(nml, "factor",          NML_FLT,  0, &factor, 1);
       nml_valid_min       = namelistAdd(nml, "valid_min",       NML_FLT,  0, &valid_min, 1);
       nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
       nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
@@ -367,12 +405,12 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 			  vlistDefVarMissval(vlistID2, varID, missval);
 			}
 		    }
-		  if ( nml->entry[nml_scale]->occ )
+		  if ( nml->entry[nml_factor]->occ )
 		    {
-		      vars[varID].lscale = TRUE;
-		      vars[varID].scale = scale;
+		      vars[varID].lfactor = TRUE;
+		      vars[varID].factor = factor;
 		      if ( cdoVerbose ) 
-			cdoPrint("%s - scale factor %g", name, scale);
+			cdoPrint("%s - scale factor %g", name, factor);
 		    }
 		  if ( nml->entry[nml_valid_min]->occ && nml->entry[nml_valid_max]->occ )
 		    {
@@ -391,6 +429,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		      vars[varID].ok_max_mean_abs = ok_max_mean_abs;
 		    }
 		}
+	      /*
 	      else
 		{
 		  if ( cdoVerbose )
@@ -406,6 +445,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 			cdoPrint("%s - not found!", name);
 		    }
 		}
+	      */
 	    }
 	  else
 	    break;
@@ -610,11 +650,11 @@ void *Setpartab(void *argument)
 		}
 	    }
 
-	  if ( vars[varID].lscale == TRUE )
+	  if ( vars[varID].lfactor == TRUE )
 	    {
 	      for ( long i = 0; i < gridsize; ++i )
 		{
-		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= vars[varID].scale;
+		  if ( !DBL_IS_EQUAL(array[i], missval) ) array[i] *= vars[varID].factor;
 		}
 	    }
 
@@ -651,9 +691,18 @@ void *Setpartab(void *argument)
   streamClose(streamID1);
 
 #if defined (HAVE_LIBUDUNITS2)
+  UDUNITS_LOCK();
+
   for ( varID = 0; varID < nvars; varID++ )
     if ( vars[varID].ut_converter ) cv_free(vars[varID].ut_converter);
-  if ( ut_read ) ut_free_system(ut_read);
+
+  if ( ut_read )
+    { 
+      ut_free_system(ut_read);
+      ut_read = NULL;
+    }
+
+  UDUNITS_UNLOCK();
 #endif
 
   if ( array ) free(array);

@@ -213,7 +213,7 @@ void get_season_name(const char *seas_name[4])
 #include <sys/stat.h>
 //#include <unistd.h>
 
-int fileExist(const char *filename)
+int fileExists(const char *filename)
 {
   int status = 0;
   struct stat buf;
@@ -232,7 +232,7 @@ int userFileOverwrite(const char *filename)
   int status = 0, len;
   char line[1024], *pline;
 
-  fprintf(stderr, "File %s already exist, overwrite? (yes/no): ", filename);
+  fprintf(stderr, "File %s already exists, overwrite? (yes/no): ", filename);
   readline(stdin, line, 1024);
   pline = line;
   while ( isspace((int) *pline) ) pline++;

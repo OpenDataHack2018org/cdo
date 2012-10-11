@@ -147,9 +147,9 @@ void *Merge(void *argument)
   ofilename = cdoStreamName(streamCnt-1);
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
-    if ( fileExist(ofilename) )
+    if ( fileExists(ofilename) )
       if ( !userFileOverwrite(ofilename) )
-	cdoAbort("Outputfile %s already exist!", ofilename);
+	cdoAbort("Outputfile %s already exists!", ofilename);
 
   streamIDs = (int *) malloc(nmerge*sizeof(int));
   vlistIDs  = (int *) malloc(nmerge*sizeof(int));
