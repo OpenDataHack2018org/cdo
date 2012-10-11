@@ -8,8 +8,12 @@
 #include "grid.h"
 #include "pstream.h"
 
+#if  defined  (HAVE_LIBMAGICS)
 #include "magics_api.h"
+#endif
 
+
+#if  defined  (HAVE_LIBXML2)
 
 #include<libxml/parser.h>
 #include<libxml/tree.h>
@@ -21,20 +25,30 @@
 
 extern xmlNode  *magics_node;
 
-#define DBG 0
+#endif
+
+#define DBG 1
 
 
-char *line_colours[] = {
-
-     "RGB(1.,0.,0.)",
-     "RGB(0.,1.,0.)",
-     "RGB(0.,0.,1.)",
-     "RGB(0.,1.,1.)",
-     "RGB(1.,1.,0.)",
-     "RGB(1.,0.,1.)",
-     "RGB(0.,0.,0.)",
-
-};
+char *line_colours[] = {     "red", "green", "blue", "yellow", "cyan", "magenta",
+			     "avocado","beige", "brick", "brown", "burgundy",
+			     "charcoal", "chestnut", "coral", "cream", 
+			     "evergreen", "gold", 
+			     "khaki", "kellygreen", "lavender",
+			     "mustard", "navy", "ochre", "olive",
+			     "peach", "pink", "rose", "rust", "sky",
+			     "tan", "tangerine","turquoise",
+			     "violet", "reddishpurple",
+			     "purplered", "purplishred",
+			     "orangishred", "redorange", "reddishorange",
+			     "orange", "yellowishorange",
+			     "orangeyellow", "orangishyellow", 
+			     "greenishyellow", "yellowgreen",
+			     "yellowishgreen", "bluishgreen",
+			     "bluegreen", "greenishblue",
+			     "purplishblue", "bluepurple",
+			     "bluishpurple", "purple",
+			};
 
 char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","xml"};
 
@@ -42,6 +56,7 @@ int graph_param_count = sizeof(graph_params)/sizeof(char*);
 int num_colours = sizeof( line_colours )/sizeof( char* );
 
 void VerifyGraphParameters( int num_param, char **param_names );
+int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char );
 
 extern int IsNumeric();
 extern void StrToUpperCase();
@@ -316,7 +331,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       /* Find the min_date_time_str from the min's of nfiles
          Find the max_date_time_str from the max's of nfiles
          Construct the date_time_str array
-      */
+	  */
       
       if ( DBG )
 	  fprintf(stderr,"STAT  %d\n", stat );
@@ -418,7 +433,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     
     if ( DBG )
       fprintf( stderr,"%s %s\n",min_date_time_str,max_date_time_str );
-    
+
     split_str_count = 0;
     sep_char = "-";
     split_str_count = StringSplitWithSeperator( max_date_time_str, sep_char, &split_str );
@@ -453,6 +468,8 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	3. Set the attributes for the magics data and plot
   */  
    
+#if  defined  (HAVE_LIBMAGICS)
+
   magics_template_parser( magics_node );
 
   mag_setc("output_name", plotfile);
@@ -540,7 +557,8 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	count = i -1;
       if( DBG )
 	fprintf(stderr, "Current File %d\n", i );
-      sprintf(legend_text_data, "ens_%d", count + 1);
+      //sprintf(legend_text_data, "ens_%d", count + 1);
+      sprintf(legend_text_data, "data_%d", count + 1);
       mag_setc("graph_line_colour", line_colours[ count%num_colours ]);
       mag_setc("legend_user_text", legend_text_data);
       if( stat == TRUE )
@@ -553,7 +571,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       
   if( obsv == TRUE )
     {
-      mag_setc("graph_line_colour", line_colours[ num_colours - 1 ]);
+      mag_setc("graph_line_colour", "black");
       sprintf(legend_text_data, "%s","Obsv" );
       mag_setc("legend_user_text", legend_text_data);
       mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[0], nts[0]);
@@ -597,8 +615,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   
   lines[0] = (char *)malloc(1024);
-  sprintf( lines[0],"%s","ExpID : " );/* To be obtained from Meta Data */
-  sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
+  //sprintf( lines[0],"%s","ExpID : " );/* To be obtained from Meta Data */
+  //sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
+  sprintf( lines[0],"Variable : %s[%s]",varname, varunits );
   sprintf( lines[0],"%s  Date : %s --%s",lines[0], min_date_time_str, max_date_time_str );
   mag_set1c( "text_lines", (const char**)lines, 1 );
   
@@ -626,6 +645,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   if( DBG )
     fprintf(stderr, "%s\n",lines[0]);
+
+#endif
+
 }
 
 int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char )
@@ -640,7 +662,8 @@ int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char
   char   datestr1[256], datestr2[256];
   char   timestr1[256], timestr2[256];
    
-  fprintf(stderr,"Inside compareDateOrTimeStr %s %s\n",datetimestr1,datetimestr2);
+  if( DBG )
+    fprintf(stderr,"Inside compareDateOrTimeStr %s %s\n",datetimestr1,datetimestr2);
   split_str_count1 = StringSplitWithSeperator( datetimestr1, sep_char, &split_str1 );
   
   if( split_str_count1 )
@@ -680,6 +703,8 @@ int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char
 }
 
 
+#if  defined  (HAVE_LIBMAGICS)
+
 static
 void init_MAGICS( )
 
@@ -698,6 +723,8 @@ void quit_MAGICS( )
     fprintf( stdout,"Exiting From MAGICS\n" );
 
 }
+
+#endif
 
 #define NINC_ALLOC 1024
 
@@ -815,12 +842,16 @@ void *Maggraph(void *argument)
       streamClose(streamID);
     }
   
+#if  defined  (HAVE_LIBXML2)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
+#endif
 
 
+#if  defined  (HAVE_LIBMAGICS)
   init_MAGICS( );
+#endif
 
   cdoPrint(" Creating PLOT for %s", varname);
   if( DBG )
@@ -832,9 +863,13 @@ void *Maggraph(void *argument)
     }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
+#if  defined  (HAVE_LIBXML2)
   quit_XMLtemplate_parser( );
+#endif
 
+#if  defined  (HAVE_LIBMAGICS)
   quit_MAGICS( );
+#endif
 
   if ( vlistID0 != -1 ) vlistDestroy(vlistID0);
 
@@ -906,10 +941,12 @@ void VerifyGraphParameters( int num_param, char **param_names )
 			}
 		      else
 			{
+#if  defined  (HAVE_LIBXML2)
 			  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
 			  fclose(fp);
 			  init_XMLtemplate_parser( split_str[1] );
 			  updatemagics_and_results_nodes( );
+#endif			
 			}
 		    }
 		}
@@ -923,12 +960,12 @@ void VerifyGraphParameters( int num_param, char **param_names )
       if( found == FALSE )
 	{
 	  halt_flag = TRUE;
-	  fprintf( stderr,"Invalid parameter  '%s'\n", param_names[i] );
+	  fprintf( stderr,"Unknown parameter  '%s'!\n", param_names[i] );
 	} 
       if( found == TRUE && syntax == FALSE )
 	{
 	  halt_flag = TRUE;
-	  fprintf( stderr,"Invalid parameter specification  '%s'\n", param_names[i] );
+	  fprintf( stderr,"Invalid parameter specification  '%s'!\n", param_names[i] );
 	}
       free( split_str );
     }
