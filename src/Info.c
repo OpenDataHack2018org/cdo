@@ -377,7 +377,7 @@ void *Info(void *argument)
 			}
 		      else
 			{
-			  fprintf(stdout, "                     nan");
+			  fprintf(stdout, "                     nan            ");
 			}
 		    }
 		  else
