@@ -1570,9 +1570,9 @@ long binary_search_int(const int *array, long len, int value)
       if ( value == array[midpoint] ) return midpoint;
 
       if ( value < array[midpoint] )
-	high = midpoint--;
+	high = midpoint - 1;
       else
-	low  = midpoint++;
+	low  = midpoint + 1;
     }
  
   // item was not found
@@ -1618,6 +1618,10 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   int ompthID;
 #endif
 
+  for ( i = 0; i < dst_size; ++i ) dst_array[i] = missval;
+
+  if ( num_links == 0 ) return;
+
   max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #if defined (_OPENMP)
@@ -1632,8 +1636,6 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   src_cls = (double *) malloc(max_cls*sizeof(double));
   src_wts = (double *) malloc(max_cls*sizeof(double));
 #endif
-
-  for ( i = 0; i < dst_size; ++i ) dst_array[i] = missval;
 
   for ( n = 0; n < num_links; ++n )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
@@ -1741,7 +1743,6 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   free(src_wts);
 #endif
 }
-
 
 /*
   -----------------------------------------------------------------------
