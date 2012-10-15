@@ -171,6 +171,7 @@ void *Splittime(void *argument);
 void *Splityear(void *argument);
 void *SSOpar(void *argument);
 void *Subtrend(void *argument);
+void *Tee(void *argument);
 void *Template1(void *argument);
 void *Template2(void *argument);
 void *Test(void *argument);
@@ -410,6 +411,7 @@ void *Maggraph(void *argument);
 #define  SplityearOperators     {"splityear"}
 #define  SSOparOperators        {"ssopar"}
 #define  SubtrendOperators      {"subtrend"}
+#define  TeeOperators           {"tee"}
 #define  Template1Operators     {"template1"}
 #define  Template2Operators     {"template2"}
 #define  TestOperators          {"test"}
@@ -660,6 +662,7 @@ static modules_t Modules[] =
   { SSOpar,         NULL,              SSOparOperators,        CDI_REAL,  1,  1 },
   { Subtrend,       SubtrendHelp,      SubtrendOperators,      CDI_REAL,  3,  1 },
   { Template1,      NULL,              Template1Operators,     CDI_REAL,  1,  1 },
+  { Tee,            NULL,              TeeOperators,           CDI_REAL,  2,  1 },
   { Template2,      NULL,              Template2Operators,     CDI_REAL,  1,  1 },
   { Test,           NULL,              TestOperators,          CDI_REAL,  1,  1 },
   { Test2,          NULL,              Test2Operators,         CDI_REAL,  2,  1 },

@@ -421,6 +421,7 @@ src/Splityear.c -text
 src/StringUtilities.c -text
 src/StringUtilities.h -text
 src/Subtrend.c -text
+src/Tee.c -text
 src/Templates.c -text
 src/Test.c -text
 src/Tests.c -text

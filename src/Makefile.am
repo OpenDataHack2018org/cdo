@@ -134,6 +134,7 @@ cdo_SOURCES += Arith.c         \
                Splityear.c     \
                SSOpar.c        \
                Subtrend.c      \
+               Tee.c           \
                Templates.c     \
                Test.c          \
                Tests.c         \

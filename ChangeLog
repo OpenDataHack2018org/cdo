@@ -5,7 +5,7 @@
 
 2012-10-13 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	remaplaf: fixed bug in binary_search_int()
+	* remaplaf: fixed bug in binary_search_int()
 
 2012-10-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
