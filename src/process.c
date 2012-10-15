@@ -754,20 +754,17 @@ void operatorCheckArgc(int numargs)
 
 void operatorInputArg(const char *enter)
 {
-  char line[1024];
-  char *pline = line;
   int processID = processSelf();
-  size_t pos, len, linelen;
   int oargc;
-  int lreadline;
 
   oargc = Process[processID].oargc;
 
-  if ( oargc ) return;
-
-  while ( oargc == 0 )
+  if ( oargc == 0 )
     {
-      lreadline = 1;
+      char line[1024];
+      char *pline = line;
+      size_t pos, len, linelen;
+      int lreadline = 1;
 
       if ( enter ) fprintf(stderr, "%-16s : Enter %s > ", processInqPrompt(), enter);
 
@@ -804,9 +801,9 @@ void operatorInputArg(const char *enter)
 		break;
 	    }
 	}
-    }
 
-  Process[processID].oargc = oargc;
+      Process[processID].oargc = oargc;
+    }
 }
 
 

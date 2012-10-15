@@ -499,11 +499,11 @@ void *Select(void *argument)
 
   nsel     = operatorArgc();
   argnames = operatorArgv();
-  /*
+
   if ( cdoVerbose )
     for ( i = 0; i < nsel; i++ )
       printf("name %d = %s\n", i+1, argnames[i]);
-  */
+
   pml = pmlNew("SELECT");
 
   PML_ADD_INT(pml, timestep);
