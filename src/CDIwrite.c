@@ -119,7 +119,6 @@ void *CDIwrite(void *argument)
   off_t nvalues = 0;
   double file_size = 0, data_size = 0;
   double tw, tw0, t0, twsum = 0;
-  double *levels = NULL;
   double ***vars = NULL;
   float *farray = NULL;
   extern int timer_write;
@@ -136,38 +135,47 @@ void *CDIwrite(void *argument)
       else if ( strcmp(envstr, "double") == 0 ) memtype = MEMTYPE_DOUBLE;
     }
 
-  if ( cdoVerbose ) cdoPrint("parameter: <grid, <nlevs, <ntimesteps, <nvars>>>>");
-  // operatorInputArg("<grid, <nlevs, <ntimesteps, <nvars>>>>");
+  if ( cdoVerbose ) cdoPrint("parameter: <nruns, <grid, <nlevs, <ntimesteps, <nvars>>>>>");
 
   if ( operatorArgc() > 5 ) cdoAbort("Too many arguments!");
 
   gridfile = defaultgrid;
   if ( operatorArgc() >= 1 ) nruns = atol(operatorArgv()[0]);
-  if ( operatorArgc() >= 2 ) gridfile = operatorArgv()[0];
-  if ( operatorArgc() >= 3 ) nlevs = atol(operatorArgv()[1]);
-  if ( operatorArgc() >= 4 ) ntimesteps = atol(operatorArgv()[2]);
-  if ( operatorArgc() >= 5 ) nvars = atol(operatorArgv()[3]);
+  if ( operatorArgc() >= 2 ) gridfile = operatorArgv()[1];
+  if ( operatorArgc() >= 3 ) nlevs = atol(operatorArgv()[2]);
+  if ( operatorArgc() >= 4 ) ntimesteps = atol(operatorArgv()[3]);
+  if ( operatorArgc() >= 5 ) nvars = atol(operatorArgv()[4]);
 
   if ( nruns <  0 ) nruns = 0;
   if ( nruns > 99 ) nruns = 99;
 
+
+  if ( nlevs <= 0  ) nlevs = 1;
+  if ( nlevs > 255 ) nlevs = 255;
+  if ( ntimesteps <= 0 ) ntimesteps = 1;
+  if ( nvars <= 0 ) nvars = 1;
+
   gridID   = cdoDefineGrid(gridfile);
   gridsize = gridInqSize(gridID);
 
-  zaxisID  = zaxisCreate(ZAXIS_SURFACE, 1);
+  if ( nlevs == 1 )
+    zaxisID  = zaxisCreate(ZAXIS_SURFACE, 1);
+  else
+    {
+      double levels[nlevs];
+      for ( i = 0; i < nlevs; ++i ) levels[i] = 100*i; 
+      zaxisID  = zaxisCreate(ZAXIS_HEIGHT, nlevs);
+      zaxisDefLevels(zaxisID, levels);
+    }
 
   if ( cdoVerbose )
     {
       cdoPrint("nruns      : %d", nruns);
-      cdoPrint("gridsize   : %d", gridInqSize);
+      cdoPrint("gridsize   : %d", gridsize);
       cdoPrint("nlevs      : %d", nlevs);
       cdoPrint("ntimesteps : %d", ntimesteps);
       cdoPrint("nvars      : %d", nvars);
     } 
-
-  if ( nlevs <= 0 ) nlevs = 1;
-  if ( ntimesteps <= 0 ) ntimesteps = 1;
-  if ( nvars <= 0 ) nvars = 1;
 
   vars = (double ***) malloc(nvars*sizeof(double **));
   for ( varID = 0; varID < nvars; varID++ )
