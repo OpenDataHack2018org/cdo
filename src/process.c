@@ -52,6 +52,7 @@ operator_t;
 typedef struct {
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_t threadID;
+  int       l_threadID;
 #endif
   short      nchild;
   short      nstream;
@@ -109,6 +110,7 @@ int processCreate(void)
 
 #if  defined  (HAVE_LIBPTHREAD)
   Process[processID].threadID     = pthread_self();
+  Process[processID].l_threadID   = 1;
 #endif
   Process[processID].nstream      = 0;
   Process[processID].nchild       = 0;
@@ -138,7 +140,8 @@ int processSelf(void)
   pthread_mutex_lock(&processMutex);
 
   for ( processID = 0; processID < NumProcess; processID++ )
-    if ( pthread_equal(Process[processID].threadID, thID) ) break;
+    if ( Process[processID].l_threadID )
+      if ( pthread_equal(Process[processID].threadID, thID) ) break;
 
   if ( processID == NumProcess )
     {
@@ -715,7 +718,7 @@ void processDelete(void)
   pthread_mutex_lock(&processMutex);
 #endif
 
-  Process[processID].threadID = 0;
+  Process[processID].l_threadID = 0;
   NumProcessActive--;
 
 #if  defined  (HAVE_LIBPTHREAD)
