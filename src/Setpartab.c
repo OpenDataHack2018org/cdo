@@ -208,7 +208,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
   len1 = strlen(units_old);
   len2 = strlen(units);
 
-  if ( memcmp(units, units_old, len2) != 0 )
+  if ( strcmp(units, units_old) != 0 )
     {
       if ( len1 > 0 && len2 > 0 )
 	{
@@ -254,6 +254,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 	    }
 #endif
 	}
+
       vlistDefVarUnits(vlistID2, varID, units);
       defineVarAttText(vlistID2, varID, "original_units", units_old);
     }
