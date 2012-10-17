@@ -6,6 +6,7 @@
 2012-10-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* eca_rr1: result has wrong long name attribute [Bug #2763]
+	* eca_pd: disabled, use eca_rr1  (same functionallity) [Bug #2763]
 
 2012-10-13 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

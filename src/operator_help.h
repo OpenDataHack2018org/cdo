@@ -4317,38 +4317,6 @@ static char *EcaIdHelp[] = {
     NULL
 };
 
-static char *EcaPdHelp[] = {
-    "NAME",
-    "    eca_pd, eca_r10mm, eca_r20mm - Precipitation days index per time period",
-    "",
-    "SYNOPSIS",
-    "    eca_pd,x  ifile ofile",
-    "    eca_r10mm  ifile ofile",
-    "    eca_r20mm  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of the daily precipitation amount RR in [mm]",
-    "    (or alternatively in [kg m-2]), then the number of days where RR is at least x mm is counted. ",
-    "    eca\\_r10mm and eca\\_r20mm are specific ECA operators with a daily precipitation amount of 10 ",
-    "    and 20 mm respectively.",
-    "    The date information of a timestep in ofile is the date of the last",
-    "    contributing timestep in ifile.",
-    "    The following variables are created: ",
-    "    - precipitation_days_index_per_time_period",
-    "",
-    "OPERATORS",
-    "    eca_pd     Precipitation days index per time period",
-    "               Generic ECA operator with daily precipitation sum exceeding x mm.",
-    "    eca_r10mm  Heavy precipitation days index per time period",
-    "               Specific ECA operator with daily precipitation sum exceeding 10 mm.",
-    "    eca_r20mm  Very heavy precipitation days index per time period",
-    "               Specific ECA operator with daily precipitation sum exceeding 20 mm.",
-    "",
-    "PARAMETER",
-    "    x  FLOAT   Daily precipitation amount threshold in [mm]",
-    NULL
-};
-
 static char *EcaR75pHelp[] = {
     "NAME",
     "    eca_r75p - Moderate wet days wrt 75th percentile of reference period",
@@ -4505,6 +4473,38 @@ static char *EcaR99ptotHelp[] = {
     NULL
 };
 
+static char *EcaR10mmHelp[] = {
+    "NAME",
+    "    eca_r10mm - Heavy precipitation days index per time period",
+    "",
+    "SYNOPSIS",
+    "    eca_r10mm  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),",
+    "    then the number of days where RR is at least 10 mm is counted. The date information of a timestep in ofile",
+    "    is the date of the last contributing timestep in ifile.",
+    "    The following variables are created: ",
+    "    - heavy_precipitation_days_index_per_time_period",
+    NULL
+};
+
+static char *EcaR20mmHelp[] = {
+    "NAME",
+    "    eca_r20mm - Very heavy precipitation days index per time period",
+    "",
+    "SYNOPSIS",
+    "    eca_r20mm  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),",
+    "    then the number of days where RR is at least 20 mm is counted. The date information of a timestep in ofile",
+    "    is the date of the last contributing timestep in ifile.",
+    "    The following variables are created: ",
+    "    - very_heavy_precipitation_days_index_per_time_period",
+    NULL
+};
+
 static char *EcaRr1Help[] = {
     "NAME",
     "    eca_rr1 - Wet days index per time period",
@@ -4513,8 +4513,8 @@ static char *EcaRr1Help[] = {
     "    eca_rr1[,R]  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Let ifile be a time series of the daily precipitation amount RR, then the number of ",
-    "    days where RR is at least R is counted. R is an optional parameter with ",
+    "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),",
+    "    then the number of days where RR is at least R is counted. R is an optional parameter with ",
     "    default R = 1 mm. The date information of a timestep in ofile is the date of",
     "    the last contributing timestep in ifile.",
     "    The following variables are created: ",

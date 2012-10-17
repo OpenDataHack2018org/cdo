@@ -485,9 +485,6 @@ Operator catalog:
    EcaHwdi       eca_hwdi        Heat wave duration index wrt mean of reference period
    EcaHwfi       eca_hwfi        Warm spell days index wrt 90th percentile of reference period
    EcaId         eca_id          Ice days index per time period
-   EcaPd         eca_pd          Precipitation days index per time period
-   EcaPd         eca_r10mm       Heavy precipitation days index per time period
-   EcaPd         eca_r20mm       Very heavy precipitation days index per time period
    EcaR75p       eca_r75p        Moderate wet days wrt 75th percentile of reference period
    EcaR75ptot    eca_r75ptot     Precipitation percent due to R75p days
    EcaR90p       eca_r90p        Wet days wrt 90th percentile of reference period
@@ -496,6 +493,8 @@ Operator catalog:
    EcaR95ptot    eca_r95ptot     Precipitation percent due to R95p days
    EcaR99p       eca_r99p        Extremely wet days wrt 99th percentile of reference period
    EcaR99ptot    eca_r99ptot     Precipitation percent due to R99p days
+   EcaR10mm      eca_r10mm       Heavy precipitation days index per time period
+   EcaR20mm      eca_r20mm       Very heavy precipitation days index per time period
    EcaRr1        eca_rr1         Wet days index per time period
    EcaRx1day     eca_rx1day      Highest one day precipitation amount per time period
    EcaRx5day     eca_rx5day      Highest five-day precipitation amount per time period
