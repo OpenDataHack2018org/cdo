@@ -1352,7 +1352,7 @@ void *EcaSdii(void *argument)
   if ( operatorArgc() == 1 ) threshold = atof(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
-  sprintf(lnamebuffer, CDD_LONGNAME, threshold);
+  sprintf(lnamebuffer, SDII_LONGNAME, threshold);
 
   request.var1.name     = SDII_NAME;
   request.var1.longname = lnamebuffer;
