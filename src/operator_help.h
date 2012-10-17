@@ -1355,13 +1355,13 @@ static char *ArithdaysHelp[] = {
     "",
     "OPERATORS",
     "    muldpm  Multiply with days per month",
-    "            o(t,x) = i(t,x) * days\\_per\\_month",
+    "            o(t,x) = i(t,x) * days_per_month",
     "    divdpm  Divide by days per month",
-    "            o(t,x) = i(t,x) / days\\_per\\_month",
+    "            o(t,x) = i(t,x) / days_per_month",
     "    muldpy  Multiply with days per year",
-    "            o(t,x) = i(t,x) * days\\_per\\_year",
+    "            o(t,x) = i(t,x) * days_per_year",
     "    divdpy  Divide by days per year",
-    "            o(t,x) = i(t,x) / days\\_per\\_year",
+    "            o(t,x) = i(t,x) / days_per_year",
     NULL
 };
 
@@ -3563,7 +3563,7 @@ static char *OutputHelp[] = {
     "               Each field with a header of 4 integers (EXTRA likely).",
     "",
     "PARAMETER",
-    "    format  STRING  C-style format for one element (e.g. \%13.6g)",
+    "    format  STRING  C-style format for one element (e.g. %13.6g)",
     "    nelem   INTEGER Number of elements for each row (nelem max = gridsize)",
     NULL
 };
@@ -4012,7 +4012,7 @@ static char *EcaCddHelp[] = {
     "    - number_of_cdd_periods_with_more_than_5days_per_time_period",
     "",
     "PARAMETER",
-    "    R  DOUBLE   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
     NULL
 };
 
@@ -4051,7 +4051,7 @@ static char *EcaCsuHelp[] = {
     "    - consecutive_summer_days_index_per_time_period",
     "",
     "PARAMETER",
-    "    T  DOUBLE   Temperature threshold (° Celsius, default: T = 25° Celsius)",
+    "    T  FLOAT   Temperature threshold (° Celsius, default: T = 25° Celsius)",
     NULL
 };
 
@@ -4073,7 +4073,7 @@ static char *EcaCwdHelp[] = {
     "    - number_of_cwd_periods_with_more_than_5days_per_time_period",
     "",
     "PARAMETER",
-    "    R  DOUBLE   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
     NULL
 };
 
@@ -4210,8 +4210,8 @@ static char *EcaGslHelp[] = {
     "",
     "PARAMETER",
     "    nday   INTEGER  Number of consecutive days (default: nday = 6)",
-    "    T      DOUBLE   Temperature threshold (degree Celsius, default: T = 5° Celsius)",
-    "    fland  DOUBLE   Land fraction threshold (default: fland = 0.5)",
+    "    T      FLOAT   Temperature threshold (degree Celsius, default: T = 5° Celsius)",
+    "    fland  FLOAT   Land fraction threshold (default: fland = 0.5)",
     NULL
 };
 
@@ -4235,8 +4235,8 @@ static char *EcaHdHelp[] = {
     "    - heating_degree_days_per_time_period",
     "",
     "PARAMETER",
-    "    T1  DOUBLE   Temperature limit (° Celsius, default: T1 = 17° Celsius)",
-    "    T2  DOUBLE   Temperature limit (° Celsius, default: T2 = T1)",
+    "    T1  FLOAT   Temperature limit (° Celsius, default: T1 = 17° Celsius)",
+    "    T2  FLOAT   Temperature limit (° Celsius, default: T2 = T1)",
     NULL
 };
 
@@ -4473,35 +4473,33 @@ static char *EcaR99ptotHelp[] = {
     NULL
 };
 
-static char *EcaR10mmHelp[] = {
+static char *EcaPdHelp[] = {
     "NAME",
-    "    eca_r10mm - Heavy precipitation days index per time period",
+    "    eca_pd, eca_r10mm, eca_r20mm - Precipitation days index per time period",
     "",
     "SYNOPSIS",
+    "    eca_pd,x  ifile ofile",
     "    eca_r10mm  ifile ofile",
-    "",
-    "DESCRIPTION",
-    "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),",
-    "    then the number of days where RR is at least 10 mm is counted. The date information of a timestep in ofile",
-    "    is the date of the last contributing timestep in ifile.",
-    "    The following variables are created: ",
-    "    - heavy_precipitation_days_index_per_time_period",
-    NULL
-};
-
-static char *EcaR20mmHelp[] = {
-    "NAME",
-    "    eca_r20mm - Very heavy precipitation days index per time period",
-    "",
-    "SYNOPSIS",
     "    eca_r20mm  ifile ofile",
     "",
     "DESCRIPTION",
     "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),",
-    "    then the number of days where RR is at least 20 mm is counted. The date information of a timestep in ofile",
-    "    is the date of the last contributing timestep in ifile.",
+    "    then the number of days where RR is at least x mm is counted. ",
+    "    eca_r10mm and eca_r20mm are specific ECA operators with a daily precipitation amount of 10 and 20 mm respectively.",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
-    "    - very_heavy_precipitation_days_index_per_time_period",
+    "    - precipitation_days_index_per_time_period",
+    "",
+    "OPERATORS",
+    "    eca_pd     Precipitation days index per time period",
+    "               Generic ECA operator with daily precipitation sum exceeding x mm.",
+    "    eca_r10mm  Heavy precipitation days index per time period",
+    "               Specific ECA operator with daily precipitation sum exceeding 10 mm.",
+    "    eca_r20mm  Very heavy precipitation days index per time period",
+    "               Specific ECA operator with daily precipitation sum exceeding 20 mm.",
+    "",
+    "PARAMETER",
+    "    x  FLOAT   Daily precipitation amount threshold in [mm]",
     NULL
 };
 
@@ -4521,7 +4519,7 @@ static char *EcaRr1Help[] = {
     "    - wet_days_index_per_time_period",
     "",
     "PARAMETER",
-    "    R  DOUBLE   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
     NULL
 };
 
@@ -4588,7 +4586,7 @@ static char *EcaSdiiHelp[] = {
     "    - simple_daily_intensitiy_index_per_time_period",
     "",
     "PARAMETER",
-    "    R  DOUBLE   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
     NULL
 };
 

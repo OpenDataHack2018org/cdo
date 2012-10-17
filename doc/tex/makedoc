@@ -782,10 +782,11 @@ while (<MOFILE>) {
 	  printf HELPFILE ("    \"    %-*s  ", $maxlen, $value);
 	  print TRFILE "\\item[{\\sl $value}\\ \\ \\hfill]\n";
 	} else {
-	  print HELPFILE "$line\",\n";
-#	    $line = /\sFLOAT/XXX
+	  $line =~ s/^DOUBLE/FLOAT/g;
+	  $hline = $line;
+	  $hline =~ s/\\%/%/g;
+	  print HELPFILE "$hline\",\n";
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
-	  $line =~ s/^DOUBLE/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
 	  print TRFILE "$line\n";
@@ -1176,6 +1177,7 @@ sub print_description {
 	$docline =~ s/\@cite\{([^}]*)\}/\1/og;
 	$docline =~ s/\@bold\{([^}]*)\}/\1/og;
 	$docline =~ s/\@celsius/°C/og;
+	$docline =~ s/\\_/_/g;
 	$docline =~ s/\\/\\\\/og;
 	$docline =~ s/\\cite//og;
 #	$docline =~ s/%/\\%/og;

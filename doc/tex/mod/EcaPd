@@ -49,14 +49,13 @@ FLOAT   Daily precipitation amount threshold in [mm]
 
 
 @BeginNote
-Please note, that precipitation rates in [mm/s] have to be converted to
-precipitation amounts (multiply with 86400 s).
+Precipitation rates in [mm/s] have to be converted to precipitation amounts (multiply with 86400 s).
+Apart from metadata information the result of eca\_pd,1 and eca\_rr1 is the same.
 @EndNote
 
 
 @BeginExample
-To get the number of days with precipitation greater than 25 mm for 
-a time series of daily precipitation amounts use:
+To get the number of days with precipitation greater than 25 mm for a time series of daily precipitation amounts use:
 @BeginVerbatim
    cdo eca_pd,25 ifile ofile
 @EndVerbatim
