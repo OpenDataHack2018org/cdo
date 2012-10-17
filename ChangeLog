@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.8
 	* Version 1.5.8 released
 
+2012-10-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* eca_rr1: result has wrong long name attribute [Bug #2763]
+
 2012-10-13 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplaf: fixed bug in binary_search_int()
@@ -1578,7 +1582,7 @@ w.de>
 	* Copy: changed from one to unlimited inputfiles
 	* Split: bug fix for splitcode
 	* Version 0.8.5 released
-	
+
 2003-12-14  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* changes for CDI library version 0.7.7
@@ -1598,12 +1602,12 @@ w.de>
 	* changes for CDI library version 0.7.2 (HDF test interface)
 	* New operator: intarea, setctomiss, setmisstoc, setrangetomiss
 	* Version 0.8.2 released
-	
+
 2003-09-22  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* New operator: interpolate (source from PINGO)
 	* Version 0.8.1 released
-	
+
 2003-09-10  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* renamed to CDO (Climate Data Operators)
@@ -1617,7 +1621,7 @@ w.de>
 	* changes for gdi library version 0.6.0
 	* Info.c: handle missing values
 	* Version 0.7.0 released
-	
+
 2003-06-25  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* gdi library version 0.5.11
@@ -1634,7 +1638,7 @@ w.de>
 	* gdi library version 0.5.9
 	* grib library version 0.4.5
 	* Version 0.6.2 released
-	
+
 2003-05-17  Uwe Schulzweida  <schulzweida@dkrz.de>
 
 	* add module Spectral with operator sp2gp, gp2sp and sp2sp

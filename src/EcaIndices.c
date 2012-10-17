@@ -1244,7 +1244,7 @@ void *EcaRr1(void *argument)
   if ( operatorArgc() == 1 ) threshold = atof(operatorArgv()[0]);
   if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
 
-  sprintf(lnamebuffer, CDD_LONGNAME, threshold);
+  sprintf(lnamebuffer, RR1_LONGNAME, threshold);
 
   request.var1.name     = RR1_NAME;
   request.var1.longname = lnamebuffer;

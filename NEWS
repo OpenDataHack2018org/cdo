@@ -3,7 +3,7 @@ CDO NEWS
 Version 1.5.8 (?? October 2012):
 
    New features:
-     * Added support for netCDF4(HDF5) formatted SCRIP grids
+     * Added support for netCDF4(HDF5) formatted SCRIP grid description files
    New operators:
      * setunit: Set variable unit
      * chunit:  Change variable unit
@@ -11,6 +11,8 @@ Version 1.5.8 (?? October 2012):
      * Info:  changed output format
      * Sinfo: changed output format
      * Diff:  changed output format
+   Fixed bugs:
+     * eca_rr1: result has wrong long name attribute
 
 Version 1.5.6.1 (26 July 2012):
 
