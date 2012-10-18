@@ -827,7 +827,7 @@ void *Select(void *argument)
   PAR_CHECK_INT_FLAG(day);
 
   streamClose(streamID2);
- 
+
   vlistDestroy(vlistID0);
   vlistDestroy(vlistID2);
 
