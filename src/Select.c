@@ -284,7 +284,6 @@ int pmlRead(pml_t *pml, int argc, char **argv)
   pml_entry_t *pentry[MAX_PML_ENTRY];
   int params[MAX_PML_ENTRY];
   int num_par[MAX_PML_ENTRY];
-  int len_par[MAX_PML_ENTRY];
   int nparams = 0;
   int i, istart;
   char *epos;
@@ -299,7 +298,6 @@ int pmlRead(pml_t *pml, int argc, char **argv)
   for ( i = 0; i < argc; ++i )
     {
       len = strlen(argv[i]);
-      len_par[i] = (int)len;
       bufsize += len+1;
     }
 
@@ -309,7 +307,6 @@ int pmlRead(pml_t *pml, int argc, char **argv)
   istart = 0;
   while ( istart < argc )
     {
-
       epos = strchr(argv[istart], '=');
       if ( epos == NULL )
 	{
@@ -341,6 +338,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
       istart++;
       for ( i = istart; i < argc; ++i )
 	{
+	  if ( *argv[i] == 0 ) { i++; break;}
 	  epos = strchr(argv[i], '=');
 	  if ( epos != NULL ) break;
 
@@ -408,7 +406,7 @@ void par_check_int_flag(int npar, int *parlist, int *flaglist, const char *txt)
 
   for ( i = 0; i < npar; ++i )
     if ( flaglist[i] == FALSE )
-      cdoWarning("%s %d not found!", txt, parlist[i]);
+      cdoWarning("%s >%d< not found!", txt, parlist[i]);
 }
 
 
@@ -418,7 +416,7 @@ void par_check_flt_flag(int npar, double *parlist, int *flaglist, const char *tx
 
   for ( i = 0; i < npar; ++i )
     if ( flaglist[i] == FALSE )
-      cdoWarning("%s %g not found!", txt, parlist[i]);
+      cdoWarning("%s >%g< not found!", txt, parlist[i]);
 }
 
 
@@ -428,7 +426,7 @@ void par_check_word_flag(int npar, char **parlist, int *flaglist, const char *tx
 
   for ( i = 0; i < npar; ++i )
     if ( flaglist[i] == FALSE )
-      cdoWarning("%s %s not found!", txt, parlist[i]);
+      cdoWarning("%s >%s< not found!", txt, parlist[i]);
 }
 
 
