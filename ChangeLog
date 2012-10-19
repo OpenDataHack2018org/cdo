@@ -3,10 +3,18 @@
 	* using CDI library version 1.5.8
 	* Version 1.5.8 released
 
+2012-10-19 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added operator seinfo
+
 2012-10-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* eca_rr1: result has wrong long name attribute [Bug #2763]
 	* eca_pd: disabled, use eca_rr1  (same functionallity) [Bug #2763]
+
+2012-10-14 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added operator tee
 
 2012-10-13 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

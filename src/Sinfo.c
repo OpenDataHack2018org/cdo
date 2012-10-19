@@ -33,8 +33,9 @@
 
 void *Sinfo(void *argument)
 {
-  int SINFO, SINFOP, SINFON, SINFOC;
+  enum {func_generic, func_param, func_name, func_code};
   int operatorID;
+  int operfunc, lensemble;
   int indf;
   int varID;
   int gridsize = 0;
@@ -61,12 +62,19 @@ void *Sinfo(void *argument)
 
   cdoInitialize(argument);
 
-  SINFO  = cdoOperatorAdd("sinfo",  0, 0, NULL);
-  SINFOP = cdoOperatorAdd("sinfop", 0, 0, NULL);
-  SINFON = cdoOperatorAdd("sinfon", 0, 0, NULL);
-  SINFOC = cdoOperatorAdd("sinfoc", 0, 0, NULL);
+  cdoOperatorAdd("sinfo",   func_generic, 0, NULL);
+  cdoOperatorAdd("sinfop",  func_param,   0, NULL);
+  cdoOperatorAdd("sinfon",  func_name,    0, NULL);
+  cdoOperatorAdd("sinfoc",  func_code,    0, NULL);
+  cdoOperatorAdd("seinfo",  func_generic, 1, NULL);
+  cdoOperatorAdd("seinfop", func_param,   1, NULL);
+  cdoOperatorAdd("seinfon", func_name,    1, NULL);
+  cdoOperatorAdd("seinfoc", func_code,    1, NULL);
 
   operatorID = cdoOperatorID();
+
+  operfunc  = cdoOperatorF1(operatorID);
+  lensemble = cdoOperatorF2(operatorID);
 
   for ( indf = 0; indf < cdoStreamCnt(); indf++ )
     {
@@ -77,15 +85,30 @@ void *Sinfo(void *argument)
       printf("   File format: ");
       printFiletype(streamID, vlistID);
 
-      if ( operatorID == SINFON )
-	fprintf(stdout,
-		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
-      else if ( operatorID == SINFOC )
-	fprintf(stdout,
-		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
+      if ( lensemble )
+	{
+	  if ( operfunc == func_name )
+	    fprintf(stdout,
+		    "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
+	  else if ( operfunc == func_code )
+	    fprintf(stdout,
+		    "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
+	  else
+	    fprintf(stdout,
+		    "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
+	}
       else
-	fprintf(stdout,
-		"%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
+	{
+	  if ( operfunc == func_name )
+	    fprintf(stdout,
+		    "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
+	  else if ( operfunc == func_code )
+	    fprintf(stdout,
+		    "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
+	  else
+	    fprintf(stdout,
+		    "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
+	}
 
       nvars = vlistNvars(vlistID);
 
@@ -122,6 +145,16 @@ void *Sinfo(void *argument)
 	  else if ( tsteptype == TSTEP_ACCUM    ) fprintf(stdout, "%-8s ", "accum");
 	  else                                    fprintf(stdout, "%-8s ", "unknown");
 
+	  /* ensemble information */
+	  if ( lensemble )
+	    {
+	      int ensID, ensCount, forecast_type;
+	      if ( vlistInqVarEnsemble(vlistID, varID, &ensID, &ensCount, &forecast_type) )
+		fprintf(stdout, "%2d/%-2d ", ensID, ensCount);
+	      else
+		fprintf(stdout, "--/-- ");
+	    }
+
 	  /* layer info */
 	  levelsize = zaxisInqSize(zaxisID);
 	  fprintf(stdout, "%6d ", levelsize);
@@ -148,11 +181,11 @@ void *Sinfo(void *argument)
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  if ( operatorID == SINFON ) vlistInqVarName(vlistID, varID, varname);
+	  if ( operfunc == func_name ) vlistInqVarName(vlistID, varID, varname);
 
-	  if ( operatorID == SINFON )
+	  if ( operfunc == func_name )
 	    fprintf(stdout, "%-11s", varname);
-	  else if ( operatorID == SINFOC )
+	  else if ( operfunc == func_code )
 	    fprintf(stdout, "%4d %4d", tabnum, code);
 	  else
 	    fprintf(stdout, "%-11s", paramstr);
