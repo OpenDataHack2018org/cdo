@@ -233,6 +233,8 @@ void *Fldstat(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
+  vlistDestroy(vlistID2);
+
   if ( field.ptr )    free(field.ptr);
   if ( field.weight ) free(field.weight);
 

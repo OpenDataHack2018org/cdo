@@ -54,7 +54,7 @@ void *Math(void *argument)
   int vlistID1, vlistID2;
   int nmiss, nmiss2;
   int i;
-  double missval1, missval2;
+  double missval1;
   double *array1, *array2;
   double rc = 0;
   int taxisID1, taxisID2;
@@ -118,7 +118,6 @@ void *Math(void *argument)
 	  streamReadRecord(streamID1, array1, &nmiss);
 
 	  missval1 = vlistInqVarMissval(vlistID1, varID);
-	  missval2 = missval1;
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
 
 	  switch ( operfunc )
@@ -205,6 +204,8 @@ void *Math(void *argument)
 
   streamClose(streamID2);
   streamClose(streamID1);
+
+  vlistDestroy(vlistID2);
 
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);

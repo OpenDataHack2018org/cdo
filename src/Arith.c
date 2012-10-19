@@ -320,6 +320,8 @@ void *Arith(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
+  vlistDestroy(vlistID3);
+
   if ( vardata )
     {
       for ( varID = 0; varID < nvars; varID++ )

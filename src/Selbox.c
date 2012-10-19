@@ -962,6 +962,8 @@ void *Selbox(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
+  vlistDestroy(vlistID2);
+
   if ( vars   ) free(vars);
   if ( array2 ) free(array2);
   if ( array1 ) free(array1);
