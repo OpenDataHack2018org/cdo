@@ -584,6 +584,7 @@ void *Select(void *argument)
 	      nlevs   = zaxisInqSize(zaxisID);
 	      ltype   = zaxis2ltype(zaxisID);
 
+
 	      vars[varID] = FALSE;
 	      
 	      if ( npar_ltype )
@@ -593,12 +594,16 @@ void *Select(void *argument)
 		  if ( !vars[varID] && npar_param && PAR_CHECK_INT(ltype) && PAR_CHECK_WORD(param) ) vars[varID] = TRUE;
 		  if ( !vars[varID] && !npar_code && !npar_name && !npar_param )
 		    {
-		      for ( levID = 0; levID < nlevs; levID++ )
+		      if ( PAR_CHECK_INT(ltype) ) vars[varID] = TRUE;
+		      else
 			{
-			  levidx = levID + 1;
-			  level = zaxisInqLevel(zaxisID, levID);
-			  if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
-			  if ( !vars[varID] && npar_level  && PAR_CHECK_INT(ltype) && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
+			  for ( levID = 0; levID < nlevs; levID++ )
+			    {
+			      levidx = levID + 1;
+			      level = zaxisInqLevel(zaxisID, levID);
+			      if ( !vars[varID] && npar_levidx && PAR_CHECK_INT(ltype) && PAR_CHECK_INT(levidx) )  vars[varID] = TRUE;
+			      if ( !vars[varID] && npar_level  && PAR_CHECK_INT(ltype) && PAR_CHECK_FLT(level)  )  vars[varID] = TRUE;
+			    }
 			}
 		    }
 		}
