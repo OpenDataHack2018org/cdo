@@ -502,10 +502,12 @@ void check_data(int vlistID2, int varID, var_t *vars, long gridsize, double miss
     cdoWarning("Invalid value(s) detected for variable '%s': %i values were greater than maximum valid value (%.4g).",
 	       varname, n_greater_max, vars[varID].valid_max);
 
+  amean = fabs(amean);
+
   if ( vars[varID].check_min_mean_abs )
     {
       if ( amean < .1*vars[varID].ok_min_mean_abs )
-	cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
+	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is lower by more than an order of magnitude than minimum allowed: %.4g",
 		 varname, amean, vars[varID].ok_min_mean_abs);
 
       if ( amean < vars[varID].ok_min_mean_abs)
@@ -516,7 +518,7 @@ void check_data(int vlistID2, int varID, var_t *vars, long gridsize, double miss
   if ( vars[varID].check_max_mean_abs )
     {
       if ( amean > 10.*vars[varID].ok_max_mean_abs )
-	cdoAbort("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
+	cdoWarning("Invalid Absolute Mean for variable '%s' (%.5g) is greater by more than an order of magnitude than maximum allowed: %.4g",
 		 varname, amean, vars[varID].ok_max_mean_abs);
       
       if ( amean > vars[varID].ok_max_mean_abs )
@@ -528,7 +530,7 @@ void check_data(int vlistID2, int varID, var_t *vars, long gridsize, double miss
 
 void *Setpartab(void *argument)
 {
-  int SETPARTAB, SETPARTABN;
+  int SETPARTAB, SETPARTABN, SETPARTABC;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
@@ -550,6 +552,7 @@ void *Setpartab(void *argument)
 
   SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table name");
   SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
+  SETPARTABC = cdoOperatorAdd("setpartabc", 0, 0, "parameter table name");
 
   operatorID = cdoOperatorID();
 
@@ -559,6 +562,7 @@ void *Setpartab(void *argument)
 
   if      ( operatorID == SETPARTAB )  ptmode = CODE_NUMBER;
   else if ( operatorID == SETPARTABN ) ptmode = VARIABLE_NAME;
+  else if ( operatorID == SETPARTABC ) ptmode = CODE_NUMBER;
 
   if ( ptmode == CODE_NUMBER )
     {

@@ -211,8 +211,9 @@ void kvlParseBuffer(kvl_t *kvl)
       while ( isspace((int) *pline) ) pline++;
       if ( *pline == '#' || *pline == '!' || *pline == '\0' ) continue;
       //  len = (int) strlen(pline);
-      if ( *pline == '&' )
+      if ( listtype == 0 && *pline == '&' )
 	{
+	  listtype = 1;
 	}
       
       if ( strncmp(pline, listkey1, strlen(listkey1)) == 0 )

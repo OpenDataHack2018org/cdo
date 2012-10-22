@@ -154,7 +154,7 @@ int conv_cmor_table(const char *filename)
 
 void *Kvl(void *argument)
 {
-  int READ_CMOR_TABLE, CONV_CMOR_TABLE;
+  int READ_CMOR_TABLE, CONV_CMOR_TABLE, CONV_PARTAB;
   int operatorID;
   const char *filename;
 
@@ -162,6 +162,7 @@ void *Kvl(void *argument)
 
   READ_CMOR_TABLE = cdoOperatorAdd("read_cmor_table",   0,   0, NULL);
   CONV_CMOR_TABLE = cdoOperatorAdd("conv_cmor_table",   0,   0, NULL);
+  CONV_PARTAB     = cdoOperatorAdd("conv_partab",   0,   0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -182,6 +183,15 @@ void *Kvl(void *argument)
       if ( cdoVerbose ) cdoPrint("Parse file: %s\n", filename);
 
       conv_cmor_table(filename);
+    }
+  else if ( operatorID == CONV_PARTAB )
+    {
+      if ( operatorArgc() != 1 ) cdoAbort("Too few arguments!");
+      filename = operatorArgv()[0];
+
+      if ( cdoVerbose ) cdoPrint("Parse file: %s\n", filename);
+
+      // conv_partab(filename);
     }
 
   cdoFinish();
