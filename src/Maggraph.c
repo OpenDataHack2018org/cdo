@@ -378,7 +378,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	      ret = compareDateOrTimeStr( vdatestr1, vdatestr2, sep_char );
 	      if ( ret == -999 )
 		cdoAbort("Error in input Date Time");
-	      else if( ret > 1 )
+	      else if( ret == 1 )
 		min_index = fileID;
 	      else if( !ret )
 	      {
@@ -389,7 +389,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 					   
 		if ( ret == -999 )
 		  cdoAbort("Error in input Date Time");
-		else if( ret > 1 )
+		else if( ret == 1 )
 		  min_index = fileID;			      
 					   
 	      }
@@ -407,7 +407,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 					 
 	      if ( ret == -999 )
 		cdoAbort( "Error in input Date Time" );
-	      else if( ret < 1 )
+	      else if( ret == -1 )
 		max_index = fileID;
 	      else if( !ret )
 	      {
@@ -418,7 +418,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 					   
 		if ( ret == -999 )
 		  cdoAbort("Error in input Date Time");
-		else if( ret < 1 )
+		else if( ret == -1 )
 		  max_index = fileID;			      
 	      }
 	      fprintf( stderr,"Max File ID %d\n",max_index);
