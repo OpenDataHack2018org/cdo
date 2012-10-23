@@ -59,7 +59,7 @@ static pthread_mutex_t udunitsMutex;
 
 #endif
 
-typedef enum {CODE_NUMBER, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
+typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
 
 #if defined (HAVE_LIBUDUNITS2)
 ut_system *ut_read = NULL;
@@ -265,16 +265,17 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 {
   FILE *fp;
   namelist_t *nml;
-  int nml_code, nml_out_code, nml_table, nml_datatype, nml_name, nml_out_name, nml_stdname;
+  int nml_code, nml_out_code, nml_table, nml_param, nml_datatype, nml_name, nml_out_name, nml_stdname;
   int nml_longname, nml_units, nml_comment, nml_ltype, nml_missval, nml_factor;
   int nml_cell_methods, nml_cell_measures;
   int nml_valid_min, nml_valid_max, nml_ok_min_mean_abs, nml_ok_max_mean_abs;
   int locc, i;
   int code, out_code, table, ltype;
   int nml_index = 0;
-  int codenum, tabnum, levtype;
+  int codenum, tabnum, levtype, param;
   int varID, tableID;
   int num_pt_files;
+  double param_dp;
   double missval, factor;
   double valid_min, valid_max, ok_min_mean_abs, ok_max_mean_abs;
   char *partab = NULL;
@@ -306,6 +307,7 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
       nml_valid_max       = namelistAdd(nml, "valid_max",       NML_FLT,  0, &valid_max, 1);
       nml_ok_min_mean_abs = namelistAdd(nml, "ok_min_mean_abs", NML_FLT,  0, &ok_min_mean_abs, 1);
       nml_ok_max_mean_abs = namelistAdd(nml, "ok_max_mean_abs", NML_FLT,  0, &ok_max_mean_abs, 1);
+      nml_param           = namelistAdd(nml, "param",           NML_FLT,  0, &param_dp, 1);
       nml_datatype        = namelistAdd(nml, "type",            NML_WORD, 0, &datatypestr, 1);
       nml_name            = namelistAdd(nml, "name",            NML_WORD, 0, &name, 1);
       nml_out_name        = namelistAdd(nml, "out_name",        NML_WORD, 0, &out_name, 1);
@@ -342,7 +344,15 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		      continue;
 		    }
 		}
-	      else
+	      else if ( ptmode == PARAMETER_ID )
+		{
+		  if ( nml->entry[nml_param]->occ == 0 )
+		    {
+		      cdoWarning("Parameter entry %d (table %d) skipped, parameter ID not found!", nml_index, fileID+1);
+		      continue;
+		    }
+		}
+	      else if ( ptmode == VARIABLE_NAME )
 		{
 		  if ( nml->entry[nml_name]->occ == 0 )
 		    {
@@ -367,7 +377,25 @@ void read_partab(pt_mode_t ptmode, int nvars, int vlistID2, var_t *vars)
 		  
 		      if ( codenum == code && tabnum == table && levtype == ltype ) break;
 		    }
-		  else
+		  else if ( ptmode == PARAMETER_ID )
+		    {
+		      param   = vlistInqVarParam(vlistID2, varID);
+		      codenum = vlistInqVarCode(vlistID2, varID);
+		      tableID = vlistInqVarTable(vlistID2, varID);
+		      tabnum  = tableInqNum(tableID);
+		      levtype = zaxisInqLtype(vlistInqVarZaxis(vlistID2, varID));
+		      
+		      //	printf("code = %d  tabnum = %d  ltype = %d\n", codenum, tabnum, levtype);
+		      code = (int) param_dp;
+		      table = (param_dp-code)*1000;
+		      printf("code = %d  tabnum = %d  ltype = %d\n", code, table, levtype);
+		      
+		      if ( nml->entry[nml_table]->occ == 0 ) table = tabnum;
+		      if ( nml->entry[nml_ltype]->occ == 0 ) ltype = levtype;
+		  
+		      if ( codenum == code && tabnum == table && levtype == ltype ) break;
+		    }
+		  else if ( ptmode == VARIABLE_NAME )
 		    {
 		      vlistInqVarName(vlistID2, varID, varname);
 		      if ( strcmp(varname, name) == 0 ) break;
@@ -530,7 +558,7 @@ void check_data(int vlistID2, int varID, var_t *vars, long gridsize, double miss
 
 void *Setpartab(void *argument)
 {
-  int SETPARTAB, SETPARTABN, SETPARTABC;
+  int SETPARTAB, SETPARTABN, SETPARTABC, SETPARTABP;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs, nvars;
@@ -551,8 +579,9 @@ void *Setpartab(void *argument)
   cdoInitialize(argument);
 
   SETPARTAB  = cdoOperatorAdd("setpartab",  0, 0, "parameter table name");
-  SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
   SETPARTABC = cdoOperatorAdd("setpartabc", 0, 0, "parameter table name");
+  SETPARTABP = cdoOperatorAdd("setpartabp", 0, 0, "parameter table name");
+  SETPARTABN = cdoOperatorAdd("setpartabn", 0, 0, "parameter table name");
 
   operatorID = cdoOperatorID();
 
@@ -561,8 +590,9 @@ void *Setpartab(void *argument)
   if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
 
   if      ( operatorID == SETPARTAB )  ptmode = CODE_NUMBER;
-  else if ( operatorID == SETPARTABN ) ptmode = VARIABLE_NAME;
   else if ( operatorID == SETPARTABC ) ptmode = CODE_NUMBER;
+  else if ( operatorID == SETPARTABP ) ptmode = PARAMETER_ID;
+  else if ( operatorID == SETPARTABN ) ptmode = VARIABLE_NAME;
 
   if ( ptmode == CODE_NUMBER )
     {
@@ -590,6 +620,10 @@ void *Setpartab(void *argument)
 	}
 
       if ( tableformat == 0 ) tableID = defineTable(partab);
+    }
+  else if (  ptmode == PARAMETER_ID )
+    {
+      tableformat = 1;
     }
   else if (  ptmode == VARIABLE_NAME )
     {

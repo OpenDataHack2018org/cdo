@@ -389,7 +389,7 @@ void *Maggraph(void *argument);
 #define  SetgridOperators       {"setgrid", "setgridtype", "setgridarea", "setgridmask", "unsetgridmask", "setgridnumber"}
 #define  SethaloOperators       {"sethalo", "tpnhalo"}
 #define  SetmissOperators       {"setmissval", "setctomiss", "setmisstoc", "setrtomiss", "setvrange"}
-#define  SetpartabOperators     {"setpartab", "setpartabn", "setpartabc"}
+#define  SetpartabOperators     {"setpartab", "setpartabc", "setpartabp", "setpartabn"}
 #define  SetrcanameOperators    {"setrcaname"}
 #define  SettimeOperators       {"setyear", "setmon", "setday", "setdate", "settime", "settunits", \
                                  "settaxis", "setreftime", "setcalendar", "shifttime"}
