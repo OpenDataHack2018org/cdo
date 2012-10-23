@@ -5,6 +5,10 @@
 
 2012-10-19 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Fldstat: set weight to 1 if gridsize is1
+
+2012-10-19 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* added operator seinfo
 
 2012-10-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

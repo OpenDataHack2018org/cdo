@@ -36,10 +36,13 @@
 
 static
 void print_location_LL(int operfunc, int vlistID, int varID, int levelID, int gridID, double sglval, double *fieldptr,
-		       int code, int vdate, int vtime)
+		       int vdate, int vtime)
 {
   static int showHeader = TRUE;
   int year, month, day, hour, minute, second;
+  int code;
+
+  code = vlistInqVarCode(vlistID, varID);
 
   cdiDecodeDate(vdate, &year, &month, &day);
   cdiDecodeTime(vtime, &hour, &minute, &second);
@@ -88,8 +91,6 @@ void *Fldstat(void *argument)
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridID2, lastgrid = -1;
-  int wstatus = FALSE;
-  int code = 0, oldcode = 0;
   int index, ngrids;
   int recID, nrecs;
   int tsID, varID, levelID;
@@ -174,7 +175,7 @@ void *Fldstat(void *argument)
       streamDefTimestep(streamID2, tsID);
 
       /* Precompute date + time for later representation in verbose mode */
-      int vdate, vtime;
+      int vdate = 0, vtime = 0;
       if ( cdoVerbose )
         {
           if ( operfunc == func_min || operfunc == func_max )
@@ -194,29 +195,28 @@ void *Fldstat(void *argument)
 	  if ( needWeights && field.grid != lastgrid )
 	    {
 	      lastgrid = field.grid;
-	      wstatus = gridWeights(field.grid, field.weight);
+	      field.weight[0] = 1;
+	      if ( field.size > 1 )
+		{
+		  int wstatus = gridWeights(field.grid, field.weight);
+		  if ( wstatus != 0 && tsID == 0 && levelID == 0 )
+		    {
+		      char varname[CDI_MAX_NAME];
+		      vlistInqVarName(vlistID1, varID, varname);
+		      cdoWarning("Using constant grid cell area weights for variable %s!", varname);
+		    }
+		}
 	    }
-	  code = vlistInqVarCode(vlistID1, varID);
-	  if ( wstatus != 0 && tsID == 0 && code != oldcode )
-	    cdoWarning("Using constant grid cell area weights for code %d!", oldcode=code);
 
 	  field.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  /* RQ */
 	  if ( operfunc == func_pctl )
 	    sglval = fldpctl(field, pn);
 	  else  
 	    sglval = fldfun(field, operfunc);
-	  /* QR */
 
-	  if ( cdoVerbose )
-            {
-              if ( operfunc == func_min || operfunc == func_max )
-                {
-		  print_location_LL(operfunc, vlistID1, varID, levelID, field.grid, sglval, field.ptr,
-				    code, vdate, vtime);
-                }
-            }
+	  if ( cdoVerbose && (operfunc == func_min || operfunc == func_max) )
+	    print_location_LL(operfunc, vlistID1, varID, levelID, field.grid, sglval, field.ptr, vdate, vtime);
 
 	  if ( DBL_IS_EQUAL(sglval, field.missval) )
 	    nmiss = 1;
