@@ -163,7 +163,7 @@ void pipeDefVlist(pstream_t *pstreamptr, int vlistID)
 }
 
 #define TIMEOUT  1 // wait 1 seconds
-#define MAX_WAIT_CYCLES 1000
+#define MAX_WAIT_CYCLES 3600
 int processNumsActive(void);
 
 int pipeInqVlist(pstream_t *pstreamptr)
