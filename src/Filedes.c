@@ -88,6 +88,7 @@ void partab(FILE *fp, int vlistID, int option)
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
   int natts;
   int nvars;
+  double missval;
       
   nvars  = vlistNvars(vlistID);
 
@@ -96,8 +97,8 @@ void partab(FILE *fp, int vlistID, int option)
       vlistInqNatts(vlistID, CDI_GLOBAL, &natts);
       if ( natts > 0 )
 	{
-	  fprintf(fp, "&PARAMETER\n");
-	  fprintf(fp, "  NAME=_GLOBAL_\n");
+	  fprintf(fp, "&parameter\n");
+	  fprintf(fp, "  name=_GLOBAL_\n");
 	  printAtts(fp, vlistID, CDI_GLOBAL);
 	  fprintf(fp, "/\n");
 	}
@@ -117,7 +118,7 @@ void partab(FILE *fp, int vlistID, int option)
 
       if ( datatype != -1 )
 	{
-	  fprintf(fp, "&PARAMETER\n");
+	  fprintf(fp, "&parameter\n");
 	  fprintf(fp, "  name=_default_\n");
 	  if ( datatype2str(datatype, pstr) == 0 )
 	    fprintf(fp, "  datatype=%s\n", pstr);
@@ -127,7 +128,7 @@ void partab(FILE *fp, int vlistID, int option)
 
   for ( varID = 0; varID < nvars; varID++ )
     {
-      fprintf(fp, "&PARAMETER\n");
+      fprintf(fp, "&parameter\n");
       
       varname[0]     = 0;
       varlongname[0] = 0;
@@ -135,6 +136,7 @@ void partab(FILE *fp, int vlistID, int option)
       code     = vlistInqVarCode(vlistID, varID);
       tableID  = vlistInqVarTable(vlistID, varID);
       tabnum   = tableInqNum(tableID);
+      missval  = vlistInqVarMissval(vlistID, varID);
       vlistInqVarName(vlistID, varID, varname);
       /* printf("1>%s<\n", varname); */
       vlistInqVarStdname(vlistID, varID, varstdname);
@@ -158,6 +160,8 @@ void partab(FILE *fp, int vlistID, int option)
 	  fprintf(fp, "  datatype=%s\n", pstr);
       
       if ( option == 2 ) printAtts(fp, vlistID, varID);
+      if ( option == 2 ) 
+	fprintf(fp, "  missing_value=%g\n", missval);
       
       fprintf(fp, "/\n");
     }   
