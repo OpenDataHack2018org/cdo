@@ -86,15 +86,25 @@ off_t filesize(const char *filename)
 static
 void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
 {
+  double rout;
+
   nvalues /= 1000000;
   data_size /= 1024.*1024.*1024.;
+
+  rout = 0;
+  if ( tw > 0 ) rout = nvalues/tw;
+
   if ( memtype == MEMTYPE_FLOAT )
-    cdoPrint("%s Wrote %.1f GB of 32 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), nvalues/tw);
+    cdoPrint("%s Wrote %.1f GB of 32 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), rout);
   else
-    cdoPrint("%s Wrote %.1f GB of 64 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), nvalues/tw);
+    cdoPrint("%s Wrote %.1f GB of 64 bit floats to %s %s, %.1f MVal/s", sinfo, data_size, datatypestr(datatype), filetypestr(filetype), rout);
 
   file_size /= 1024.*1024.*1024.;
-  cdoPrint("%s Wrote %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size, tw, 1024*file_size/tw);
+
+  rout = 0;
+  if ( tw > 0 ) rout = 1024*file_size/tw;
+
+  cdoPrint("%s Wrote %.1f GB in %.1f seconds, total %.1f MB/s", sinfo, file_size, tw, rout);
 }
 
 
