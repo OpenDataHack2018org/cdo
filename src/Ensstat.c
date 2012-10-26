@@ -171,8 +171,11 @@ void *Ensstat(void *argument)
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
 	    {
-	      cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-		       tsID+1, cdoStreamName(0), cdoStreamName(fileID));
+	      if ( nrecs == 0 )
+		cdoAbort("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(fileID));
+	      else
+		cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
+			 tsID+1, cdoStreamName(0), cdoStreamName(fileID));
 	    }
 	}
 

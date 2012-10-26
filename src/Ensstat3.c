@@ -258,14 +258,20 @@ void *Ensstat3(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
-		     tsID+1, cdoStreamName(0), cdoStreamName(fileID));
+	    {
+	      if ( nrecs == 0 )
+		cdoAbort("Inconsistent ensemble file, too few time steps in %s!", cdoStreamName(fileID));
+	      else
+		cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
+			   tsID+1, cdoStreamName(0), cdoStreamName(fileID));
+	    }
 	}
 
-      if ( operfunc == func_rank && ( datafunc == TIME || tsID == 0 ) ) {
-	taxisCopyTimestep(taxisID2, taxisID1);
-	if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
-      }
+      if ( operfunc == func_rank && ( datafunc == TIME || tsID == 0 ) )
+	{
+	  taxisCopyTimestep(taxisID2, taxisID1);
+	  if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
+	}
 
       //      fprintf(stderr,"TIMESTEP %i varID %i rec %i\n",tsID,varID,recID);
       
