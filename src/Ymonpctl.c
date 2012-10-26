@@ -109,13 +109,13 @@ void *Ymonpctl(void *argument)
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != streamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records in time step %d of %s and %s are different!", tsID+1, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1), cdoStreamName(2));
       
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
       if ( vdate != taxisInqVdate(taxisID3) || vtime != taxisInqVtime(taxisID3) )
-        cdoAbort("Verification dates for time step %d of %s and %s are different!", tsID+1, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1), cdoStreamName(2));
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 

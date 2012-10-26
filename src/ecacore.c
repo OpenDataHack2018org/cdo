@@ -882,12 +882,12 @@ void eca3(const ECA_REQUEST_3 *request)
           ivdate1 = taxisInqVdate(itaxisID1);
           ivdate2 = taxisInqVdate(itaxisID2);
           if ( ivdate1 != ivdate2 )
-            cdoAbort("Input streams have different verification dates for time step %d!", itsID+1);
+            cdoAbort("Input streams have different verification dates at time step %d!", itsID+1);
             
           ivtime1 = taxisInqVtime(itaxisID1);
           ivtime2 = taxisInqVtime(itaxisID2);
           if ( ivtime1 != ivtime2 )
-            cdoAbort("Input streams have different verification times for time step %d!", itsID+1);
+            cdoAbort("Input streams have different verification times at time step %d!", itsID+1);
    
 	  if ( nsets == 0 ) SET_DATE(indate2, ivdate1, ivtime1);
 	  SET_DATE(indate1, ivdate1, ivtime1);

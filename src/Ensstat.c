@@ -170,13 +170,18 @@ void *Ensstat(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records changed from %d to %d", nrecs0, nrecs);
+	    {
+	      cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
+		       tsID+1, cdoStreamName(0), cdoStreamName(fileID));
+	    }
 	}
 
-      taxisCopyTimestep(taxisID2, taxisID1);
+      if ( nrecs0 > 0 )
+	{
+	  taxisCopyTimestep(taxisID2, taxisID1);
+	  streamDefTimestep(streamID2, tsID);
+	}
 
-      if ( nrecs0 > 0 ) streamDefTimestep(streamID2, tsID);
-      
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
 #if defined (_OPENMP)

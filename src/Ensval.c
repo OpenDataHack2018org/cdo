@@ -250,7 +250,7 @@ void *Ensval(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records changed from %d to %d at time Step", nrecs0, nrecs, tsID);
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0), cdoStreamName(fileID));
 	}
       
       for ( stream = 0; stream < nostreams; stream++ ) {

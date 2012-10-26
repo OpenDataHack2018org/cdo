@@ -258,7 +258,8 @@ void *Ensstat3(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records changed from %d to %d", nrecs0, nrecs);
+	    cdoAbort("Inconsistent ensemble file, number of records at time step %d of %s and %s differ!",
+		     tsID+1, cdoStreamName(0), cdoStreamName(fileID));
 	}
 
       if ( operfunc == func_rank && ( datafunc == TIME || tsID == 0 ) ) {
