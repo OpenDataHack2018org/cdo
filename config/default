@@ -97,6 +97,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=/sw/lenny-x64/netcdf-4.2-static \
                     --with-hdf5=/sw/lenny-x64/hdf5-1.8.8-static \
                     --with-szlib=/sw/lenny-x64/szip-2.1 \
+                    --with-udunits2=/sw/lenny-x64/udunits-2.1.19 \
                     --with-proj=/sw/lenny-x64/proj-4.7.0 \
                     CC=gcc CFLAGS='-g -Wall -O3 -fopenmp'
 	;;
@@ -186,7 +187,8 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/rhel55-x64/hdf5-1.8.8-threadsafe \
                     --with-szlib=/sw/rhel55-x64/szip-2.1 \
                     --with-zlib=/usr \
- 	            CC=gcc44 CFLAGS="-g -Wall -O2 -fopenmp"
+                    --with-udunits2=/sw/rhel55-x64/udunits-2.1.14 \
+	            CC=gcc44 CFLAGS="-g -Wall -O2 -fopenmp"
 	;;
 # powerpc-ibm-aix5.2.0.0
     ecga*)
@@ -207,6 +209,7 @@ case "${HOSTNAME}" in
                     --with-netcdf=/sw/aix61/netcdf-4.2-threadsafe \
                     --with-hdf5=/sw/aix61/hdf5-1.8.8-threadsafe \
                     --with-szlib=/sw/aix61/szip-2.1-threadsafe \
+                    --with-udunits2=/sw/aix61/udunits-2.1.14 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
                     AR="ar -X 64"  LDFLAGS="-brtl" \
  	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
