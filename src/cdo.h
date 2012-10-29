@@ -32,6 +32,8 @@
 #define  MAX(a,b)  ((a) > (b) ? (a) : (b))
 #undef   NINT
 #define  NINT(x)   ((x) < 0 ? (int)((x)-0.5) : (int)((x)+0.5))
+#undef   NINTD
+#define  NINTD(x)   ((x) < 0 ? ((x)-0.5) : ((x)+0.5))
 
 #define  UNCHANGED_RECORD  (processSelf() == 0 && *cdoStreamName(0) != '-' && cdoRegulargrid == FALSE && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 

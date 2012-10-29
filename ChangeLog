@@ -1,7 +1,11 @@
-2012-10-?? Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2012-10-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.8
 	* Version 1.5.8 released
+
+2012-10-29 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* mastrfu: set datatype to 32-bit float
 
 2012-10-23 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

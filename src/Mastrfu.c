@@ -114,7 +114,7 @@ void *Mastrfu(void *argument)
   if ( nvars != 1 ) cdoAbort("This operator works only with one variable!");
 
   code = vlistInqVarCode(vlistID1, 0);
-  if ( code != 132 ) cdoWarning("Unexpected code %d!", code);
+  if ( code > 0 && code != 132 ) cdoWarning("Unexpected code %d!", code);
 
   zaxisID = vlistInqVarZaxis(vlistID1, 0);
   if ( zaxisInqType(zaxisID) != ZAXIS_PRESSURE &&
@@ -141,6 +141,7 @@ void *Mastrfu(void *argument)
   vlistDefVarName(vlistID2, 0, "mastrfu");
   vlistDefVarLongname(vlistID2, 0, "mass stream function");
   vlistDefVarUnits(vlistID2, 0, "kg/s");
+  vlistDefVarDatatype(vlistID2, 0, DATATYPE_FLT32);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
