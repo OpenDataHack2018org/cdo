@@ -26,7 +26,7 @@
 #endif
 
 #if defined (HAVE_LIBUDUNITS2)
-#  include <udunits2/udunits2.h>
+#  include <udunits2.h>
 #endif
 
 #include <errno.h>

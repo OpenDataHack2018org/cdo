@@ -354,14 +354,14 @@ AC_ARG_WITH([udunits2],
                      [*],[UDUNITS_ROOT=$with_udunits2
                           AS_IF([test -d "$UDUNITS_ROOT"],
                                 [LDFLAGS="$LDFLAGS -L$UDUNITS_ROOT/lib"
-                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include/udunits2"
+                                 CPPFLAGS="$CPPFLAGS -I$UDUNITS_ROOT/include"
                                  AC_CHECK_HEADERS([udunits2.h])
                                  AC_SEARCH_LIBS([ut_parse],
                                                 [udunits2],
                                                 [AC_DEFINE([HAVE_LIBUDUNITS2],[1],[Define to 1 for UDUNITS2 support])],
                                                 [AC_MSG_ERROR([Could not link to udunits2 library!])])
                                  AC_SUBST([UDUNITS_LDFLAGS],[" -L$UDUNITS_ROOT/lib -ludunits2"])
-                                 AC_SUBST([UDUNITS_INCLUDE],[" -I$UDUNITS_ROOT/include/udunits2"])],
+                                 AC_SUBST([UDUNITS_INCLUDE],[" -I$UDUNITS_ROOT/include"])],
                                 [AC_MSG_ERROR([$UDUNITS_ROOT is not a directory! UDUNITS2 suppressed])])])],
             [AC_MSG_CHECKING([for the UDUNITS2 library])
              AC_MSG_RESULT([suppressed])])

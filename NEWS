@@ -1,9 +1,11 @@
 CDO NEWS
 --------
-Version 1.5.8 (?? October 2012):
+Version 1.5.8 (30 October 2012):
 
    New features:
      * Added support for netCDF4(HDF5) formatted SCRIP grid description files
+     * added CDO option -L to lock all I/O calls. This option is neccessary if external I/O libraries like 
+       netCDF4 (HDF5) were installed without thread-safe support.
    New operators:
      * setunit: Set variable unit
      * chunit:  Change variable unit
@@ -12,6 +14,7 @@ Version 1.5.8 (?? October 2012):
      * Sinfo: changed output format
      * Diff:  changed output format
    Fixed bugs:
+     * remaplaf: fixed bug in binary_search_int()
      * eca_rr1: result has wrong long name attribute
 
 Version 1.5.6.1 (26 July 2012):
