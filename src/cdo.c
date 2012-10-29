@@ -157,6 +157,9 @@ void cdo_version(void)
 #if defined (HAVE_LIBJASPER)
   fprintf(stderr, " JASPER");
 #endif
+#if defined (HAVE_LIBUDUNITS2)
+  fprintf(stderr, " UDUNITS2");
+#endif
 #if defined (HAVE_LIBPROJ)
   fprintf(stderr, " PROJ.4");
 #endif
