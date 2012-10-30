@@ -190,7 +190,7 @@ int pipeInqVlist(pstream_t *pstreamptr)
       if ( PipeDebug ) Message("%s wait of vlistDef", pname);
       // pthread_cond_wait(pipe->vlistDef, pipe->mutex);
       retcode = pthread_cond_timedwait(pipe->vlistDef, pipe->mutex, &time_to_wait);
-      // fprintf(stderr, "retcode %d %d\n", retcode, processNumsActive());
+      // fprintf(stderr, "self %d retcode %d %d %d\n", pstreamptr->self, retcode, processNumsActive(), pstreamptr->vlistID);
       if ( retcode != 0 && processNumsActive() > 1 && nwaitcycles++ < MAX_WAIT_CYCLES ) retcode = 0;
     }
 
