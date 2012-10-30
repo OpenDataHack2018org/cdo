@@ -187,7 +187,6 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/rhel55-x64/hdf5-1.8.8-threadsafe \
                     --with-szlib=/sw/rhel55-x64/szip-2.1 \
                     --with-zlib=/usr \
-                    --with-udunits2=/sw/rhel55-x64/udunits-2.1.14 \
 	            CC=gcc44 CFLAGS="-g -Wall -O2 -fopenmp"
 	;;
 # powerpc-ibm-aix5.2.0.0
