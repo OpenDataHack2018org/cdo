@@ -89,7 +89,6 @@ static
 void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params )
 
 {
-  static int once = 1;
   long i;
   double dlon = 0, dlat = 0;
   char plotfilename[4096];
@@ -266,17 +265,20 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 
   titlename = strdup( plotfilename );
 
+/* #if  defined  (HAVE_LIBMAGICS) */
 
 
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+
   mag_setc ("page_id_line","off");
   setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
 
 
   mag_setc ("output_name",      plotfilename);
 
-  // Set the input data arrays to magics++
+  /* Set the input data arrays to magics++ */
    
   mag_set2r("input_field", array, nlon, nlat);
 
@@ -292,15 +294,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   mag_setr("input_field_initial_longitude", grid_center_lon[0]);
   mag_setr("input_field_longitude_step", dlon);
  
-
-#if 0
-  if( once )
-  {
-	  magics_template_parser( magics_node );
-	  once = 0;
-  }
-#endif
-
   magics_template_parser( magics_node );
   /* results_template_parser(results_node, varname ); */
 
@@ -351,7 +344,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       if( USR_COLOUR_COUNT ) 
 	{
 	  mag_setc( "contour_shade_colour_method", "LIST" );
-	  mag_set1c( "contour_shade_colour_list",USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
+	  mag_set1c( "contour_shade_colour_list",( const char **)USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
 	}
 	
       if( COLOUR_TRIAD )                                
@@ -465,7 +458,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       if( USR_COLOUR_COUNT ) 
 	{
 	  mag_setc( "contour_shade_colour_method", "LIST" );
-	  mag_set1c( "contour_shade_colour_list",USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
+	  mag_set1c( "contour_shade_colour_list",( const char ** ) USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
 	}
 	
       if( RESOLUTION != 10.0f)
@@ -562,7 +555,6 @@ void *Magplot(void *argument)
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];
 
-  char  *Filename = "combined.xml";
 
   cdoInitialize(argument);
   
@@ -623,10 +615,12 @@ void *Magplot(void *argument)
 					
   tsID = 0;
 
-  // HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR 
+  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */ 
   /*
+
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
+
   */
 
 
@@ -665,8 +659,6 @@ void *Magplot(void *argument)
 	  else
 	  	fprintf(stderr,"operator not implemented\n");
 
-	  //	  break;
-
 	  quit_MAGICS( );
 	}
 
@@ -694,7 +686,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 
 {
   int i, j, k;
-  int found = FALSE, syntax = TRUE, halt_flag = FALSE, file_found = TRUE, split_str_count;
+  int found = FALSE, syntax = TRUE, halt_flag = FALSE, /* file_found = TRUE, */ split_str_count;
   int param_count;
   char **params;
   char **split_str = NULL, **split_str1 = NULL;
@@ -905,10 +897,6 @@ int checkcolour( char *colour_in )
 	    if( i > 3 )
 	      { 
 		temp[i-4] = *colour_in;
-		/*
-		if( DBG )
-		  fprintf( stdout,"  cur %c  temp %c \n",*colour_in, temp[i-4] ); 
-		*/
 	      }
 	    colour_in++; 
 	  }
@@ -916,7 +904,7 @@ int checkcolour( char *colour_in )
 	temp[i-4] = '\0';
 	
 	if( DBG )
-	  fprintf( stdout,"  count %d  modified color %s \n", strlen(temp), temp  );
+	  fprintf( stdout,"  count %d  modified color %s \n", (int)strlen(temp), temp  );
 	
 	sep_char =";";
 	split_str_count = StringSplitWithSeperator( temp, sep_char, &split_str );
@@ -1026,7 +1014,7 @@ int ReadColourTable ( char *filepath )
 	      
 	      USR_COLOUR_TABLE[ USR_COLOUR_COUNT ] = strdup( temp_table[i] );
 	      
-	      //strcpy( USR_COLOUR_TABLE[ USR_COLOUR_COUNT ], temp_table[i] );
+	      /* strcpy( USR_COLOUR_TABLE[ USR_COLOUR_COUNT ], temp_table[i] ); */
 	      USR_COLOUR_COUNT++;
 	      
 	      if( DBG )
@@ -1074,7 +1062,7 @@ int checkdevice( char *device_in )
     StrToUpperCase( device_in );
     for( i = 0 ; i < DEVICE_COUNT; i++ )
       {
-	//if( DBG )
+	if( DBG )
 	  fprintf( stderr, "Input %s ref %s\n",device_in, DEVICE_TABLE[i] );
 	
 	if( !strcmp( DEVICE_TABLE[i], device_in ) )
@@ -1089,7 +1077,3 @@ int checkdevice( char *device_in )
     
     return 1; 
 }
-
-
-
-
