@@ -20,7 +20,7 @@ int results_template_parser( xmlNode * a_node, const char *varname )
     xmlNode *cur_node = NULL;
     xmlAttrPtr attr = NULL;
     xmlChar    *param_name,*param_value,*value;
-    char       *magics_param_name,*param_type;
+    char       *param_type;
 
 	
     if( a_node == NULL )
