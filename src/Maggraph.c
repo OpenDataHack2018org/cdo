@@ -89,10 +89,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   int count ;
   int num_years = 0, num_months = 0, num_days = 0;
   int ret;
-  long tsID, fileID, i, j, k, ntime_steps;
+  long tsID, fileID, i, ntime_steps;
   double *date_time;
   double min_val = 1.0e+200, max_val = -1.0e+200;
-  double suppress_min_val = 1.0e+200, suppress_max_val = -1.0e+200;
   double *mean_val, *std_dev_val;
   double *spread_min, *spread_max;
   double y_min_val = 1.0e+200, y_max_val = -1.0e+200;
@@ -175,7 +174,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   if ( DBG )
     {
       ntime_steps = nts[0];
-      fprintf(stderr," %6d %6d\n", nfiles, ntime_steps );
+      fprintf(stderr," %ld %ld\n", nfiles, ntime_steps );
       fprintf(stderr,"STAT  %d\n", stat );
     }
     
@@ -275,14 +274,14 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 
 	    if( DBG )
 	      {
-		fprintf(stderr,"%d: %s\n", tsID, date_time_str[0][tsID]);
+		fprintf(stderr,"%ld: %s\n", tsID, date_time_str[0][tsID]);
 		fprintf(stderr,"%6d %6d", vdate[0][tsID], vtime[0][tsID]);
 	      }
 	
 	    for ( fileID = 0; fileID < nfiles; ++fileID )
 	      {
 		if( DBG )
-		  fprintf( stderr,"%d\n", fileID );
+		  fprintf( stderr,"%ld\n", fileID );
 		
 		if( datatab[fileID][tsID] < min_val )
 		  min_val = datatab[ fileID ][ tsID ];	
@@ -348,7 +347,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       /* Find the min_date_time_str from the min's of nfiles
          Find the max_date_time_str from the max's of nfiles
          Construct the date_time_str array
-	  */
+      */
       
       if ( DBG )
 	  fprintf(stderr,"STAT  %d\n", stat );
@@ -356,7 +355,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       for ( fileID = 0; fileID < nfiles; fileID++ )
 	{
 	  if ( DBG )
-	    fprintf(stderr,"FILE  %d\n", fileID );
+	    fprintf(stderr,"FILE  %ld\n", fileID );
 	  date_time             = (double *) malloc( nts[fileID]*sizeof(double) );
 	  date_time_str[fileID] = (char **)malloc( nts[fileID]*sizeof(char *) );
 	  
@@ -488,8 +487,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 #if  defined  (HAVE_LIBMAGICS)
 
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+
   mag_setc ("page_id_line","off");
   setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
 
   /* magics_template_parser( magics_node ); */
@@ -578,8 +579,8 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       if( obsv == TRUE )
 	count = i -1;
       if( DBG )
-	fprintf(stderr, "Current File %d\n", i );
-      //sprintf(legend_text_data, "ens_%d", count + 1);
+	fprintf(stderr, "Current File %ld\n", i );
+      /*sprintf(legend_text_data, "ens_%d", count + 1);*/
       sprintf(legend_text_data, "data_%d", count + 1);
       mag_setc("graph_line_colour", line_colours[ count%num_colours ]);
       mag_setc("legend_user_text", legend_text_data);
@@ -604,12 +605,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
     }
     
   if( DBG )
-	fprintf(stderr, "NTIME STEPS %d\n", ntime_steps ); 
+	fprintf(stderr, "NTIME STEPS %ld\n", ntime_steps ); 
 
   if( stat == TRUE )
     {
       if( DBG )
-	fprintf(stderr, "NTIME STEPS %d\n", ntime_steps );
+	fprintf(stderr, "NTIME STEPS %ld\n", ntime_steps );
       
       mag_seti("graph_line_thickness", 8 );
       mag_setc("graph_line_colour", "grey" );
@@ -637,8 +638,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   
   
   lines[0] = (char *)malloc(1024);
-  //sprintf( lines[0],"%s","ExpID : " );/* To be obtained from Meta Data */
-  //sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );
+  /* To be obtained from Meta Data */
+  /*sprintf( lines[0],"%s","ExpID : " );*/ 
+  /*sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );*/
   sprintf( lines[0],"Variable : %s[%s]",varname, varunits );
   sprintf( lines[0],"%s  Date : %s --%s",lines[0], min_date_time_str, max_date_time_str );
   mag_set1c( "text_lines", (const char**)lines, 1 );
@@ -675,14 +677,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char )
 {
   
-  int    split_str_count, split_str_count1, split_str_count2;
-  int    num_years,num_months, num_days;
+  int    split_str_count1, split_str_count2;
   int	 i,flag[3]; /*  '3' since, three fields are expected in the input strings */
-  char   **split_str = NULL;
   char   **split_str1 = NULL;
   char   **split_str2 = NULL;
-  char   datestr1[256], datestr2[256];
-  char   timestr1[256], timestr2[256];
    
   if( DBG )
     fprintf(stderr,"Inside compareDateOrTimeStr %s %s\n",datetimestr1,datetimestr2);
@@ -754,26 +752,19 @@ void *Maggraph(void *argument)
 {
   const char *ofilename;
   char varname[CDI_MAX_NAME], units[CDI_MAX_NAME];
-  char  *Filename = "combined.xml";
-  char **split_str = NULL;
-  char sep_char = '=';
-  char *temp_str;
   char **pnames = NULL;
-  int operatorID;
-  int varID, levelID, recID;
+  int varID, levelID;
   int gridID;
   int nrecs;
   int tsID;
   int streamID;
   int vlistID, vlistID0 = -1;
   int nmiss;
-  int zaxisID, taxisID;
+  int taxisID;
   int **vdate = NULL, **vtime = NULL;
   int fileID, nfiles;
   long *nts, nts_alloc;
   int nparam = 0;
-  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
-  double missval;
   double **datatab = NULL;
   double val;
   int i;
@@ -917,12 +908,11 @@ void *Maggraph(void *argument)
 void VerifyGraphParameters( int num_param, char **param_names )
 
 {
-  int i, j, k;
-  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, file_found = TRUE, split_str_count;
+  int i, j;
+  int  found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
   char **split_str = NULL;
   char *sep_char = "=";
   char *temp_str;
-  FILE *fp;
   
   for ( i = 0; i < num_param; ++i )
     {
