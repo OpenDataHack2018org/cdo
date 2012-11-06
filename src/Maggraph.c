@@ -50,7 +50,7 @@ char *line_colours[] = {     "red", "green", "blue", "yellow", "cyan", "magenta"
 			     "bluishpurple", "purple",
 			};
 
-char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","xml"};
+char  *graph_params[] = {"ymin","ymax","sigma","stat","obsv","device"};
 
 int graph_param_count = sizeof(graph_params)/sizeof(char*);
 int num_colours = sizeof( line_colours )/sizeof( char* );
@@ -58,9 +58,14 @@ int num_colours = sizeof( line_colours )/sizeof( char* );
 void VerifyGraphParameters( int num_param, char **param_names );
 int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char );
 
+extern int checkdevice();
 extern int IsNumeric();
 extern void StrToUpperCase();
 extern int StringSplitWithSeperator();
+
+extern char *DEVICE;
+extern char *DEVICE_TABLE;
+extern int DEVICE_COUNT;
 
 
 static
@@ -152,6 +157,18 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	  if( DBG )
 	    fprintf(stderr,"SIGMA %d\n",num_sigma);
 	}   
+	
+      if( !strcmp( split_str[0],"device" ) ) 
+	{  
+	  temp_str = strdup( split_str[1] );    
+	  StrToUpperCase( temp_str );
+	  DEVICE = temp_str;
+	  if( DBG )
+	    fprintf( stderr,"DEVICE %s\n",DEVICE );
+	  
+	  mag_setc ("output_format", DEVICE );
+	}
+	
       free( split_str );
     }
 
@@ -470,7 +487,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
    
 #if  defined  (HAVE_LIBMAGICS)
 
-  magics_template_parser( magics_node );
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+  mag_setc ("page_id_line","off");
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
+
+  /* magics_template_parser( magics_node ); */
 
   mag_setc("output_name", plotfile);
   mag_setc("subpage_map_projection", "cartesian"); 
@@ -844,8 +866,10 @@ void *Maggraph(void *argument)
   
 #if  defined  (HAVE_LIBXML2)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+  /*
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
+  */
 #endif
 
 
@@ -864,7 +888,7 @@ void *Maggraph(void *argument)
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
 #if  defined  (HAVE_LIBXML2)
-  quit_XMLtemplate_parser( );
+  /* quit_XMLtemplate_parser( ); */
 #endif
 
 #if  defined  (HAVE_LIBMAGICS)
@@ -932,6 +956,24 @@ void VerifyGraphParameters( int num_param, char **param_names )
 			syntax = FALSE;       
 		    }
 		    
+		    
+      		  if( !strcmp( split_str[0],"device" ) )
+		    {
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		      else 
+			{
+			  if( !strcmp( split_str[0],"device" ) )
+			    {
+			      if( DBG )
+				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+			      if( checkdevice( split_str[1] ) )
+				syntax = FALSE;
+			    }
+			}
+		    }
+
+/*		    
 		  if( !strcmp( split_str[0],"xml" ) )
 		    {
 		      if( ( fp = fopen( split_str[1],"r") ) == NULL )
@@ -942,13 +984,14 @@ void VerifyGraphParameters( int num_param, char **param_names )
 		      else
 			{
 #if  defined  (HAVE_LIBXML2)
-			  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+			  // HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR 
 			  fclose(fp);
 			  init_XMLtemplate_parser( split_str[1] );
 			  updatemagics_and_results_nodes( );
 #endif			
 			}
 		    }
+*/
 		}
 	    }
 	}
