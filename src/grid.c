@@ -1324,59 +1324,36 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
   long k;
   double xa;
   double area;
-  double lim = 179*deg2rad;
   struct geo p1, p2, p3;
   struct cart c1, c2, c3;
 
   area = 0;
       
-  p3.lon = grid_center_lon[i]*deg2rad; 
-  p3.lat = grid_center_lat[i]*deg2rad;
+  p3.lon = grid_center_lon[i]; 
+  p3.lat = grid_center_lat[i];
   c3 = gc2cc(&p3);
       
   for ( k = 1; k < nv; ++k )
     {
-      p1.lon = grid_corner_lon[i*nv+k-1]*deg2rad; 
-      p1.lat = grid_corner_lat[i*nv+k-1]*deg2rad;
+      p1.lon = grid_corner_lon[i*nv+k-1]; 
+      p1.lat = grid_corner_lat[i*nv+k-1];
       c1 = gc2cc(&p1);
-      p2.lon = grid_corner_lon[i*nv+k]*deg2rad; 
-      p2.lat = grid_corner_lat[i*nv+k]*deg2rad;
+      p2.lon = grid_corner_lon[i*nv+k]; 
+      p2.lat = grid_corner_lat[i*nv+k];
       c2 = gc2cc(&p2);
 
       xa = areas(&c1, &c2, &c3);
-      /*
-      if ( xa > 0.001 )
-	if ( (fabs(p1.lon - p2.lon) > lim) ||
-	     (fabs(p2.lon - p3.lon) > lim) ||
-	     (fabs(p3.lon - p1.lon) > lim) )
-	  {
-	    printf("%ld %ld xa %g\n", i, k, xa);
-	    printf("  dlon %g %g %g %g\n", lim, fabs(p1.lon - p2.lon), fabs(p2.lon - p3.lon), fabs(p3.lon - p1.lon));
-	    *status = 2;
-	  }
-      */
       area += xa;
     }
 
-  p1.lon = grid_corner_lon[i*nv+0]*deg2rad; 
-  p1.lat = grid_corner_lat[i*nv+0]*deg2rad;
+  p1.lon = grid_corner_lon[i*nv+0]; 
+  p1.lat = grid_corner_lat[i*nv+0];
   c1 = gc2cc(&p1);
-  p2.lon = grid_corner_lon[i*nv+nv-1]*deg2rad; 
-  p2.lat = grid_corner_lat[i*nv+nv-1]*deg2rad;
+  p2.lon = grid_corner_lon[i*nv+nv-1]; 
+  p2.lat = grid_corner_lat[i*nv+nv-1];
   c2 = gc2cc(&p2);
 
   xa = areas(&c1, &c2, &c3);
-  /*
-  if ( xa > 0.001 )
-    if ( (fabs(p1.lon - p2.lon) > lim) ||
-	 (fabs(p2.lon - p3.lon) > lim) ||
-	 (fabs(p3.lon - p1.lon) > lim) )
-      {
-	printf("%ld %ld xa %g\n", i, k, xa);
-	printf("  dlon %g %g %g %g\n", lim, fabs(p1.lon - p2.lon), fabs(p2.lon - p3.lon), fabs(p3.lon - p1.lon));
-	*status = 2;
-      }
-  */
   area += xa;
 
   return (area);
@@ -1486,21 +1463,21 @@ int gridGenArea(int gridID, double *area)
 
     gridInqXunits(gridID, units);
 
-    if ( memcmp(units, "degree", 6) == 0 )
+    if ( memcmp(units, "radian", 6) == 0 )
       {
 	/* No conversion necessary */
       }
-    else if ( memcmp(units, "radian", 6) == 0 )
+    else if ( memcmp(units, "degree", 6) == 0 )
       {
 	for ( i = 0; i < gridsize; ++i )
 	  {
-	    grid_center_lon[i] *= rad2deg;
-	    grid_center_lat[i] *= rad2deg;
+	    grid_center_lon[i] *= deg2rad;
+	    grid_center_lat[i] *= deg2rad;
 	  }
 	for ( i = 0; i < gridsize*nv; ++i )
 	  {
-	    grid_corner_lon[i] *= rad2deg;
-	    grid_corner_lat[i] *= rad2deg;
+	    grid_corner_lon[i] *= deg2rad;
+	    grid_corner_lat[i] *= deg2rad;
 	  }
       }
     else
@@ -1520,6 +1497,13 @@ int gridGenArea(int gridID, double *area)
   for ( i = 0; i < gridsize; ++i )
     {
       area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, &status);
+      /*
+      if (  area[i] < 0.009 && fabs(grid_corner_lat[i*nv+1]) > 89)
+      printf("%d %g %g %g %g %g %g %g %g %g\n", i, area[i]*6371000*6371000, grid_center_lon[i], grid_center_lat[i],
+	     grid_corner_lon[i*nv], grid_corner_lat[i*nv],
+	     grid_corner_lon[i*nv+1], grid_corner_lat[i*nv+1],
+	     grid_corner_lon[i*nv+2], grid_corner_lat[i*nv+2]);
+      */
       //     total_area += area[i];
     }
 
