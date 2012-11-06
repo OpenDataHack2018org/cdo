@@ -23,16 +23,36 @@ xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
 int CONTOUR, SHADED, GRFILL;
 
-char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"};
+char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device"};
 int contour_param_count = sizeof(contour_params)/sizeof(char*);
 
-char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB"};
+char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device"};
 int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
 
-char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB"};
+char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device"};
 int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
 
-char  *STD_COLOUR_TABLE[] = {"blue","green","yellow","orange","red"};
+char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
+			     "beige", "brick", "brown", "burgundy",
+			     "charcoal", "chestnut", "coral", "cream", 
+			     "evergreen", "gold", "grey", 
+			     "khaki", "kellygreen", "lavender",
+			     "mustard", "navy", "ochre", "olive",
+			     "peach", "pink", "rose", "rust", "sky",
+			     "tan", "tangerine","turquoise",
+			     "violet", "reddishpurple",
+			     "purplered", "purplishred",
+			     "orangishred", "redorange", "reddishorange",
+			     "orange", "yellowishorange",
+			     "orangeyellow", "orangishyellow", 
+			     "greenishyellow", "yellowgreen",
+			     "yellowishgreen", "bluishgreen",
+			     "bluegreen", "greenishblue",
+			     "purplishblue", "bluepurple",
+			     "bluishpurple", "purple", "white"
+			    };
+
+
 char **USR_COLOUR_TABLE = NULL;
 
 int  STD_COLOUR_COUNT = sizeof( STD_COLOUR_TABLE )/sizeof( char* );
@@ -42,9 +62,15 @@ int  USR_COLOUR_COUNT =0;
 char *STYLE_TABLE[] = { "SOLID","DASH","DOT","CHAIN_DASH","CHAIN_DOT"};
 int STYLE_COUNT = sizeof( STYLE_TABLE )/ sizeof( char *);
 
+char *DEVICE_TABLE[] = { "PS","EPS","PDF","PNG","GIF","GIF_ANIMATION","JPEG","SVG","KML"};
+int DEVICE_COUNT = sizeof( DEVICE_TABLE )/ sizeof( char *);
+
+
+
 int checkcolour( char *colour_in );
 int ReadColourTable ( char *filepath );
 int checkstyle( char *style_in );
+int checkdevice( char *device_in );
 void VerifyPlotParameters( int num_param, char **param_names, int opID );
 
 extern int IsNumeric();
@@ -56,7 +82,7 @@ extern void StrReplaceChar( );
  /* Magics default values */
 int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0;
 double YMIN = 1.0e+200, YMAX = -1.0e+200, INTERVAL = 8.0, RESOLUTION = 10.0f, *LEV_LIST = NULL ;
-char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL;
+char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL;
 
 
 static
@@ -211,6 +237,17 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 	    fprintf( stderr,"STYLE %s\n",STYLE );
 	}
 	
+      if( !strcmp( split_str[0],"device" ) ) 
+	{  
+	  temp_str = strdup( split_str[1] );    
+	  StrToUpperCase( temp_str );
+	  DEVICE = temp_str;
+	  if( DBG )
+	    fprintf( stderr,"DEVICE %s\n",DEVICE );
+	  
+	  mag_setc ("output_format", DEVICE );
+	}
+	
       free( split_str );
     }
 
@@ -228,6 +265,14 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   sprintf(plotfilename, "%s_%s", plotfile, varname);
 
   titlename = strdup( plotfilename );
+
+
+
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+  mag_setc ("page_id_line","off");
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
+
 
   mag_setc ("output_name",      plotfilename);
 
@@ -257,7 +302,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 #endif
 
   magics_template_parser( magics_node );
-  results_template_parser(results_node, varname );
+  /* results_template_parser(results_node, varname ); */
 
 
   /* set up the coastline attributes */
@@ -308,6 +353,12 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 	  mag_setc( "contour_shade_colour_method", "LIST" );
 	  mag_set1c( "contour_shade_colour_list",USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
 	}
+	
+      if( COLOUR_TRIAD )                                
+	{
+	  mag_setc( "contour_shade_colour_direction", COLOUR_TRIAD );
+	}
+	
       
       /* Adjust Set The page slightly to fit the legend */
       mag_setr ( "subpage_x_length", 24. );
@@ -420,6 +471,9 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       if( RESOLUTION != 10.0f)
 	mag_setr( "contour_shade_cell_resolution", RESOLUTION );
       
+      if( COLOUR_TRIAD )                                
+	  mag_setc( "contour_shade_colour_direction", COLOUR_TRIAD );
+
 
       /* Adjust Set The page slightly to fit the legend */
       mag_setr ( "subpage_x_length", 24. );
@@ -569,10 +623,11 @@ void *Magplot(void *argument)
 					
   tsID = 0;
 
-  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+  // HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR 
+  /*
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
-
+  */
 
 
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -626,7 +681,7 @@ void *Magplot(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
-  quit_XMLtemplate_parser( );
+/*   quit_XMLtemplate_parser( ); */
 
   cdoFinish();
 
@@ -690,7 +745,8 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		  found = TRUE;
 		  if( !strcmp( split_str[0],"colour" )     ||  !strcmp( split_str[0],"style" )     ||
 		      !strcmp( split_str[0],"colour_min" ) ||  !strcmp( split_str[0],"colour_max" )||
-		      !strcmp( split_str[0],"RGB" )
+		      !strcmp( split_str[0],"RGB" )       || !strcmp( split_str[0],"colour_triad" )||
+		      !strcmp( split_str[0],"device" )
 		    )
 		    {  
 		      if( IsNumeric( split_str[1] ) )
@@ -721,6 +777,27 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			      
 			      if( checkcolour( split_str[1] ) )
 				syntax = FALSE;
+			    }
+			  else if( !strcmp( split_str[0],"device" ) )
+			    {
+			      if( checkdevice( split_str[1] ) )
+  				    syntax = FALSE;
+			    }
+			  else if( !strcmp( split_str[0],"colour_triad" ) )
+			    {
+			      temp_str = strdup( split_str[1] );    
+			      StrToUpperCase( temp_str );
+			      if( strcmp( temp_str,"CW" ) && strcmp( temp_str,"ACW" ) )
+				    syntax = FALSE;      
+			      else
+				    {
+				  		if( DBG )
+				    	  fprintf( stderr, "TRIAD check  %s!\n",temp_str);
+					    if( !strcmp( temp_str,"CW" ) )
+						  COLOUR_TRIAD = "clockwise";
+					    else
+						  COLOUR_TRIAD = "anti_clockwise";
+				    }
 			    }
 			}
 		    } 
@@ -988,5 +1065,31 @@ int checkstyle( char *style_in )
     
     return 1; 
 }
+
+
+int checkdevice( char *device_in )
+
+{
+    int i, found = FALSE;
+    StrToUpperCase( device_in );
+    for( i = 0 ; i < DEVICE_COUNT; i++ )
+      {
+	//if( DBG )
+	  fprintf( stderr, "Input %s ref %s\n",device_in, DEVICE_TABLE[i] );
+	
+	if( !strcmp( DEVICE_TABLE[i], device_in ) )
+	  {
+	    found = TRUE;
+	    return 0;
+	  }
+      }
+      
+    if( !found )
+	 cdoWarning( " Device specified with Improper value!\n" );
+    
+    return 1; 
+}
+
+
 
 
