@@ -163,6 +163,9 @@ void cdo_version(void)
 #if defined (HAVE_LIBPROJ)
   fprintf(stderr, " PROJ.4");
 #endif
+#if defined (HAVE_LIBXML2)
+  fprintf(stderr, " XML2");
+#endif
 #if defined (HAVE_LIBMAGICS)
   fprintf(stderr, " MAGICS");
 #endif
