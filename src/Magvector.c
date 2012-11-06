@@ -23,7 +23,7 @@ extern xmlNode  *magics_node;
 #define DBG 0
 
 int VECTOR, STREAM;
-char  *vector_params[] = {"thin_fac","unit_vec"};
+char  *vector_params[] = {"thin_fac","unit_vec","device"};
 int vector_param_count = sizeof(vector_params)/sizeof(char*);
 
 void VerifyVectorParameters( int num_param, char **param_names, int opID );
@@ -31,9 +31,15 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID );
 /* Default Magics Values */
 double THIN_FAC = 2.0, UNIT_VEC = 25.0;
 
+extern int checkdevice();
 extern int IsNumeric();
+extern void StrToUpperCase();
 extern int StringSplitWithSeperator();
 
+
+extern char *DEVICE;
+extern char *DEVICE_TABLE;
+extern int DEVICE_COUNT;
 
 static
 void magvector( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *uarray, double *varray, int nparam, char **params )
@@ -46,6 +52,7 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	int split_str_count;
 	char *sep_char= "=";
 	char **split_str=NULL;
+	char *temp_str = NULL;
 	
 
 	if( uarray == NULL && varray == NULL )
@@ -89,6 +96,18 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		  fprintf(stderr,"UNIT VECTOR %g\n",UNIT_VEC );
 	      }
 	      
+            if( !strcmp( split_str[0],"device" ) ) 
+	      {  
+		temp_str = strdup( split_str[1] );    
+		StrToUpperCase( temp_str );
+		DEVICE = temp_str;
+		if( DBG )
+		  fprintf( stderr,"DEVICE %s\n",DEVICE );
+		
+		mag_setc ("output_format", DEVICE );
+	      }
+
+	      
 	    free( split_str );  
 	  }
 	  
@@ -104,7 +123,14 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		dlat /= (nlat-1);
 	  }
 
-        magics_template_parser( magics_node );
+
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+  mag_setc ("page_id_line","off");
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
+
+
+        /* magics_template_parser( magics_node ); */
 
         /* results_template_parser(results_node, varname ); */
 
@@ -255,8 +281,10 @@ void *Magvector(void *argument)
   tsID = 0;
 
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
+  /*
   init_XMLtemplate_parser( Filename );
   updatemagics_and_results_nodes( );
+  */
 
 
   init_MAGICS( );
@@ -325,7 +353,7 @@ void *Magvector(void *argument)
   if ( grid_center_lon ) free(grid_center_lon);
   if ( grid_center_lat ) free(grid_center_lat);
 
-  quit_XMLtemplate_parser( );
+  /*   quit_XMLtemplate_parser( ); */
 
   quit_MAGICS( );
 
@@ -382,6 +410,22 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
 		      if( !IsNumeric( split_str[1] ) )
 			syntax = FALSE;       
 		    }
+		    
+   		  if( !strcmp( split_str[0],"device" ) )
+		    {
+		      if( IsNumeric( split_str[1] ) )
+			syntax = FALSE;       
+		      else 
+			{
+			  if( !strcmp( split_str[0],"device" ) )
+			    {
+			      if( DBG )
+				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+			      if( checkdevice( split_str[1] ) )
+				syntax = FALSE;
+			    }
+			}
+		    }
 		}
 	    }
 	}
@@ -411,6 +455,5 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
     }
     
 }
-
 
 
