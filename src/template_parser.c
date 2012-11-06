@@ -83,7 +83,6 @@ int init_XMLtemplate_parser( char *Filename )
 int updatemagics_and_results_nodes(  )
 
 {
-    int param_set_flag;
     xmlNode *cur_node = NULL;
 	
     if( root_node == NULL )
