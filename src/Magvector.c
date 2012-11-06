@@ -16,8 +16,6 @@
 #include "magics_template_parser.h"
 #include "results_template_parser.h"
 
-//xmlDoc *param_doc = NULL;
-//extern xmlNode *root_node, *magics_node, *results_node;
 extern xmlNode  *magics_node;
 
 #define DBG 0
@@ -47,7 +45,6 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 {
         long i;
         double dlon = 0, dlat = 0;
-        double thin_fac;
 	char plotfilename[4096];
 	int split_str_count;
 	char *sep_char= "=";
@@ -124,9 +121,12 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	  }
 
 
+/* #if  defined  (HAVE_LIBMAGICS) */
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+
   mag_setc ("page_id_line","off");
   setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
 
 
@@ -164,7 +164,7 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 		if( THIN_FAC != 2.0f )
 		  mag_setr("wind_thinning_factor",THIN_FAC);
 		
-		//wind_arrow_unit_velocity
+		/*wind_arrow_unit_velocity */
 		if( UNIT_VEC != 25.0f )
 		  mag_setr("wind_arrow_unit_velocity",UNIT_VEC);
                 
@@ -219,7 +219,6 @@ void *Magvector(void *argument)
   char units[CDI_MAX_NAME];
   char vdatestr[32], vtimestr[32];
 
-  char  *Filename = "combined.xml";
 
   cdoInitialize(argument);
 
@@ -369,14 +368,12 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
 
 {
   
-  int i, j, k;
-  int found = FALSE, syntax = TRUE, halt_flag = FALSE, file_found = TRUE, split_str_count;
+  int i, j;
+  int found = FALSE, syntax = TRUE, halt_flag = FALSE, split_str_count;
   int param_count;
   char **params;
-  char **split_str = NULL, **split_str1 = NULL;
+  char **split_str = NULL;
   char *sep_char = "=";
-  char *temp_str;
-  FILE *fp;
 
   /* char  *vector_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB"}; */
 
@@ -455,5 +452,3 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
     }
     
 }
-
-
