@@ -20,7 +20,6 @@ int magics_template_parser( xmlNode *a_node )
 {
     int param_set_flag;
     xmlNode *cur_node = NULL;
-    xmlAttrPtr attr = NULL;
     xmlChar    *param_name,*param_type,*param_value,*value;
 
     if( a_node == NULL )
