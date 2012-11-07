@@ -34,7 +34,7 @@ void gen_index(int gridID1, int gridID2, int *index)
   int nlat1, nlon1;
   int nlat2, nlon2;
   int gridtype1, gridtype2;
-  int gridsize1, gridsize2;
+  int gridsize2;
   int i, j, k, i1, i2;
   int *xindex = NULL, *yindex = NULL;
   double *xvals1 = NULL, *yvals1 = NULL;
@@ -43,7 +43,6 @@ void gen_index(int gridID1, int gridID2, int *index)
   gridtype1 = gridInqType(gridID1);
   gridtype2 = gridInqType(gridID2);
 
-  gridsize1 = gridInqSize(gridID1);
   gridsize2 = gridInqSize(gridID2);
 
   if ( gridtype1 != gridtype2 )
@@ -187,6 +186,9 @@ void *Enlargegrid(void *argument)
   cdoInitialize(argument);
 
   operatorInputArg("grid description file or name");
+  if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
+  if ( operatorArgc() > 2 ) cdoAbort("Too many arguments!");
+
   gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
   streamID1 = streamOpenRead(cdoStreamName(0));
