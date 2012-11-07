@@ -1,7 +1,12 @@
 2012-??-?? Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* using CDI library version 1.5.8
-	* Version 1.5.8 released
+	* using CDI library version 1.5.9
+	* Version 1.5.9 released
+
+2012-11-07 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* bug fix for user defined lon/lat grids
+             This bug was introduced in CDO version 1.5.8.
 
 2012-10-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
