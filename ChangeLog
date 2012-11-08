@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
 
+2012-11-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* pipeInqVlist: wait MIN_WAIT_CYCLES if processNumsActive() == 1 (bug fix) [report:  Jaison Ambadan]
+
 2012-11-07 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* bug fix for user defined lon/lat grids
