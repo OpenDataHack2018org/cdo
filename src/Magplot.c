@@ -245,6 +245,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 	  DEVICE = temp_str;
 	  if( DBG )
 	    fprintf( stderr,"DEVICE %s\n",DEVICE );
+          mag_setc ("output_format", DEVICE );
 	}
 
       if( !strcmp( split_str[0],"step_freq" ) ) 
@@ -274,9 +275,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 /* #if  defined  (HAVE_LIBMAGICS) */
 
 
-
-
-  mag_setc ("output_format", DEVICE );
   mag_setc ("output_name",      plotfilename);
   mag_new( "page");
 
@@ -1132,3 +1130,4 @@ int checkdevice( char *device_in )
     
     return 1; 
 }
+
