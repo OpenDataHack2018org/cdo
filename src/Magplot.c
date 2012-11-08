@@ -23,13 +23,13 @@ xmlNode *root_node = NULL, *magics_node = NULL, *results_node = NULL;
 
 int CONTOUR, SHADED, GRFILL;
 
-char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device"};
+char  *contour_params[] = {"min","max","count","interval","list","colour","thickness","style","RGB","device", "step_freq","file_split"};
 int contour_param_count = sizeof(contour_params)/sizeof(char*);
 
-char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device"};
+char  *shaded_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","RGB","colour_triad","device","step_freq","file_split"};
 int shaded_param_count = sizeof(shaded_params)/sizeof(char*);
 
-char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device"};
+char  *grfill_params[] = {"min","max","count","interval","list","colour_min","colour_max","colourtable","resolution","RGB","colour_triad","device","step_freq","file_split"};
 int grfill_param_count = sizeof(grfill_params)/sizeof(char*);
 
 char  *STD_COLOUR_TABLE[] = {"red", "green", "blue", "yellow", "cyan", "magenta", "black", "avocado",
@@ -65,6 +65,7 @@ int STYLE_COUNT = sizeof( STYLE_TABLE )/ sizeof( char *);
 char *DEVICE_TABLE[] = { "PS","EPS","PDF","PNG","GIF","GIF_ANIMATION","JPEG","SVG","KML"};
 int DEVICE_COUNT = sizeof( DEVICE_TABLE )/ sizeof( char *);
 
+int ANIM_FLAG = 0, STEP_FREQ = 1;
 
 
 int checkcolour( char *colour_in );
@@ -80,13 +81,13 @@ extern int StringSplitWithSeperator();
 extern void StrReplaceChar( );
 
  /* Magics default values */
-int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0;
+int COUNT = 10, isRGB = FALSE,   THICKNESS = 1, NUM_LEVELS = 0, FILE_SPLIT = FALSE;
 double YMIN = 1.0e+200, YMAX = -1.0e+200, INTERVAL = 8.0, RESOLUTION = 10.0f, *LEV_LIST = NULL ;
 char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEVICE = NULL, *COLOUR_TRIAD = NULL;
 
 
 static
-void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params )
+void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params, char *datetime )
 
 {
   long i;
@@ -98,6 +99,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   char **split_str = NULL, **split_str1 = NULL;
   char *temp_str = NULL;
   char  orig_char = ';', rep_char = ',';
+  char tempname[256];
   
   
   if( DBG )
@@ -243,10 +245,14 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 	  DEVICE = temp_str;
 	  if( DBG )
 	    fprintf( stderr,"DEVICE %s\n",DEVICE );
-	  
-	  mag_setc ("output_format", DEVICE );
 	}
-	
+
+      if( !strcmp( split_str[0],"step_freq" ) ) 
+	{  
+	  STEP_FREQ = atoi( split_str[1] );
+	  if( DBG )
+	    fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
+	}
       free( split_str );
     }
 
@@ -261,22 +267,18 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       dlat /= (nlat-1);
     }
 
-  sprintf(plotfilename, "%s_%s", plotfile, varname);
-
+  sprintf( plotfilename, "%s %s", varname, datetime );
   titlename = strdup( plotfilename );
+  sprintf( plotfilename, "%s_%s", plotfile, varname );
 
 /* #if  defined  (HAVE_LIBMAGICS) */
 
 
-/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
-
-  mag_setc ("page_id_line","off");
-  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
-
-/* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
 
 
+  mag_setc ("output_format", DEVICE );
   mag_setc ("output_name",      plotfilename);
+  mag_new( "page");
 
   /* Set the input data arrays to magics++ */
    
@@ -294,7 +296,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   mag_setr("input_field_initial_longitude", grid_center_lon[0]);
   mag_setr("input_field_longitude_step", dlon);
  
-  magics_template_parser( magics_node );
+  /* magics_template_parser( magics_node ); */
   /* results_template_parser(results_node, varname ); */
 
 
@@ -367,6 +369,12 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       mag_setr ( "legend_box_x_length", 2.0 );
       mag_setr ( "legend_box_y_length", 12.69 );
 
+      if( DBG )
+        {
+           mag_enqc ( "output_name", &tempname );
+           fprintf( stderr, " SHADED Done %s!\n",tempname );
+        }
+      fprintf( stderr, " SHADED Done!\n" );
     }
   else if ( operatorID == CONTOUR )
     {
@@ -467,7 +475,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       if( COLOUR_TRIAD )                                
 	  mag_setc( "contour_shade_colour_direction", COLOUR_TRIAD );
 
-
       /* Adjust Set The page slightly to fit the legend */
       mag_setr ( "subpage_x_length", 24. );
       mag_setr ( "subpage_y_length", 30. );
@@ -516,7 +523,14 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 static
 void init_MAGICS( )
 {
-	mag_open();
+  mag_open();
+
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+  mag_setc ("page_id_line","off");
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+  mag_setc(  "output_name_first_page_number", "off" );
+  if( FILE_SPLIT == TRUE )
+    mag_setc(  "output_ps_split" , "on" );
 }
 
 static
@@ -553,7 +567,7 @@ void *Magplot(void *argument)
   double *array = NULL;
   double *grid_center_lat = NULL, *grid_center_lon = NULL;
   char units[CDI_MAX_NAME];
-  char vdatestr[32], vtimestr[32];
+  char vdatestr[32], vtimestr[32], datetimestr[64];
 
 
   cdoInitialize(argument);
@@ -615,57 +629,85 @@ void *Magplot(void *argument)
 					
   tsID = 0;
 
-  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */ 
+  /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   /*
-
-  init_XMLtemplate_parser( Filename );
-  updatemagics_and_results_nodes( );
-
+     init_XMLtemplate_parser( Filename );
+     updatemagics_and_results_nodes( );
   */
 
 
+  init_MAGICS( );
+
   while ( (nrecs = streamInqTimestep(streamID, tsID)) )
     {
+      if( ANIM_FLAG )
+        {
+      	  if( nrecs > 1 )
+	    {
+	      cdoWarning("File has more than one variable! Animation creation not possible!!! \n");
+	      break;
+            }
+      	  if( tsID % STEP_FREQ )
+	    {
+                tsID++;
+		continue;
+            }
+	}
+      
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
 	      
       date2str(vdate, vdatestr, sizeof(vdatestr));
       time2str(vtime, vtimestr, sizeof(vtimestr));
+      sprintf( datetimestr, "%s %s", vdatestr, vtimestr );
+      if( DBG )
+        fprintf( stderr,"Date %s Time %s\n",vdatestr, vtimestr );
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
-
-	  init_MAGICS( );
-
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
-
 	  vlistInqVarName(vlistID, varID, varname);
-
 
 	  if ( operatorID == SHADED || operatorID == CONTOUR || operatorID == GRFILL )
           {
+                if( DBG )
+                  {
+                     if( operatorID == SHADED )
+                       fprintf( stderr," Creating SHADED PLOT for %s\n",varname );
+                     else if( operatorID == CONTOUR )
+                       fprintf( stderr," Creating CONTOUR PLOT for %s\n",varname );
+                     else if( operatorID == GRFILL )
+                       fprintf( stderr," Creating GRFILL PLOT for %s\n",varname );
+                  }
 
-                if( operatorID == SHADED )
-                   fprintf( stderr," Creating SHADED PLOT for %s\n",varname );
-                else if( operatorID == CONTOUR )
-                   fprintf( stderr," Creating CONTOUR PLOT for %s\n",varname );
-                else if( operatorID == GRFILL )
-                   fprintf( stderr," Creating GRFILL PLOT for %s\n",varname );
-
-	  	magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames);
-
+                if( DBG )
+                  fprintf( stderr,"Plot %d\n",varID );
+	  	magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
           }
 	  else
 	  	fprintf(stderr,"operator not implemented\n");
-
-	  quit_MAGICS( );
 	}
 
-      break;
+      fprintf( stderr,"TimeStep %d\n",tsID );
 
-      tsID++;
+      if( ANIM_FLAG )
+        tsID++;
+      else
+        {
+	   cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
+           if( STEP_FREQ > 1 ) 
+             cdoWarning("Step frequency parameter ignored!!!");
+       	   break;
+	}
     }
+
+  if( ANIM_FLAG )
+    {
+      if( FILE_SPLIT == TRUE  ) 
+        cdoWarning("File split parameter ignored!!!");
+    }
+  quit_MAGICS( );
 
   streamClose(streamID);
 
@@ -696,7 +738,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 
 /*  
   char  *contour_params[] = {"ymin","ymax","count","interval","list","colour","thickness","style"};
-  char  *shaded_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable"};
+  char  *shaded_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable","step_freq"};
   char  *grfill_params[]  = {"ymin","ymax","count","interval","list","colour_min","colour_max","colortable","resolution"};
 */
 
@@ -735,28 +777,38 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 	      if( !strcmp( split_str[0], params[j] ) )
 		{
 		  found = TRUE;
-		  if( !strcmp( split_str[0],"colour" )     ||  !strcmp( split_str[0],"style" )     ||
-		      !strcmp( split_str[0],"colour_min" ) ||  !strcmp( split_str[0],"colour_max" )||
-		      !strcmp( split_str[0],"RGB" )       || !strcmp( split_str[0],"colour_triad" )||
-		      !strcmp( split_str[0],"device" )
+		  if( !strcmp( split_str[0],"colour" )     || !strcmp( split_str[0],"style" )       ||
+		      !strcmp( split_str[0],"colour_min" ) || !strcmp( split_str[0],"colour_max" )  ||
+		      !strcmp( split_str[0],"RGB" )        || !strcmp( split_str[0],"colour_triad" )||
+		      !strcmp( split_str[0],"device")      || !strcmp( split_str[0],"file_split" )
 		    )
 		    {  
 		      if( IsNumeric( split_str[1] ) )
 			syntax = FALSE;
 		      else
 			{
-			  if( !strcmp( split_str[0],"RGB" ) )
-			    { 
+			  if( !strcmp( split_str[0],"RGB" ) || !strcmp( split_str[0],"file_split") )
+			    {
 			      temp_str = strdup( split_str[1] );    
 			      StrToUpperCase( temp_str );
 			      if( strcmp( temp_str,"TRUE" ) && strcmp( temp_str,"FALSE" ) )
 				syntax = FALSE;      
 			      else
 				{
-				  if( !strcmp( temp_str,"TRUE" ) )
-				      isRGB = TRUE;
-				  else
-				    isRGB = FALSE;
+                                  if( !strcmp( split_str[0],"RGB" ) )
+                                    {
+				      if( !strcmp( temp_str,"TRUE" ) )
+				        isRGB = TRUE;
+				      else
+				        isRGB = FALSE;
+				    }
+                                  else if( !strcmp( split_str[0],"file_split" ) )
+                                    {
+				      if( !strcmp( temp_str,"TRUE" ) )
+				        FILE_SPLIT = TRUE;
+				      else
+				        FILE_SPLIT = FALSE;
+				    }
 				}
 			    }
 			  else if( !strcmp( split_str[0],"style" ) )
@@ -796,8 +848,9 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		      
 		  if( !strcmp( split_str[0],"min" )      ||  !strcmp( split_str[0],"max" )     ||
 		      !strcmp( split_str[0],"count" )     ||  !strcmp( split_str[0],"interval" ) ||
-		      !strcmp( split_str[0],"thickness" ) ||  !strcmp( split_str[0],"resolution" )
-		    )
+		      !strcmp( split_str[0],"thickness" ) ||  !strcmp( split_str[0],"resolution" ) || 
+		      !strcmp( split_str[0],"step_freq" )
+                    )
 		    {
 		      if( !IsNumeric( split_str[1] ) )
 			syntax = FALSE;       
@@ -1068,6 +1121,8 @@ int checkdevice( char *device_in )
 	if( !strcmp( DEVICE_TABLE[i], device_in ) )
 	  {
 	    found = TRUE;
+	    if( !strcmp( "GIF_ANIMATION" , device_in ) )
+	      ANIM_FLAG = 1;
 	    return 0;
 	  }
       }
