@@ -103,7 +103,7 @@ void *Vargen(void *argument)
   double rconst = 0;
   double *array, *levels = NULL;
   LIST *flist = listNew(FLT_LIST);
-  sleep(3);
+
   cdoInitialize(argument);
 
   RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name, <seed>");
