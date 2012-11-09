@@ -371,8 +371,8 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
         {
            mag_enqc ( "output_name", &tempname );
            fprintf( stderr, " SHADED Done %s!\n",tempname );
+           fprintf( stderr, " SHADED Done!\n" );
         }
-      fprintf( stderr, " SHADED Done!\n" );
     }
   else if ( operatorID == CONTOUR )
     {
@@ -418,7 +418,8 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       if( STYLE )
       	  mag_setc( "contour_line_style", STYLE );
       
-      fprintf( stderr, " CONTOUR Done!\n" );
+      if( DBG )
+        fprintf( stderr, " CONTOUR Done!\n" );
     }
   else if ( operatorID == GRFILL )
     {
@@ -487,7 +488,8 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       mag_setr ( "legend_box_x_length", 2.0 );
       mag_setr ( "legend_box_y_length", 12.69 );
 
-      fprintf( stderr, " GrFILL Done!\n");
+      if( DBG )
+        fprintf( stderr, " GrFILL Done!\n");
     }
 
   /* plot the title text and the coastlines */
@@ -521,11 +523,11 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 static
 void init_MAGICS( )
 {
-  mag_open();
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
 
+  mag_open();
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
   mag_setc ("page_id_line","off");
-  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
   mag_setc(  "output_name_first_page_number", "off" );
   if( FILE_SPLIT == TRUE )
     mag_setc(  "output_ps_split" , "on" );
@@ -687,7 +689,8 @@ void *Magplot(void *argument)
 	  	fprintf(stderr,"operator not implemented\n");
 	}
 
-      fprintf( stderr,"TimeStep %d\n",tsID );
+      if( DBG )
+        fprintf( stderr,"TimeStep %d\n",tsID );
 
       if( ANIM_FLAG )
         tsID++;
@@ -1119,7 +1122,7 @@ int checkdevice( char *device_in )
 	if( !strcmp( DEVICE_TABLE[i], device_in ) )
 	  {
 	    found = TRUE;
-	    if( !strcmp( "GIF_ANIMATION" , device_in ) )
+	    if( !strcmp( "GIF_ANIMATION" , device_in ) || !strcmp( "KML", device_in )  )
 	      ANIM_FLAG = 1;
 	    return 0;
 	  }
@@ -1130,4 +1133,3 @@ int checkdevice( char *device_in )
     
     return 1; 
 }
-
