@@ -27,7 +27,7 @@ extern xmlNode  *magics_node;
 
 #endif
 
-#define DBG 1
+#define DBG 0
 
 
 char *line_colours[] = {     "red", "green", "blue", "yellow", "cyan", "magenta",
@@ -437,7 +437,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 		else if( ret == -1 )
 		  max_index = fileID;			      
 	      }
+
+            if( DBG )
 	      fprintf( stderr,"Max File ID %d\n",max_index);
+
 	    }
 	}
 	
@@ -486,12 +489,6 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
    
 #if  defined  (HAVE_LIBMAGICS)
 
-/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
-
-  mag_setc ("page_id_line","off");
-  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
-
-/* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
 
   /* magics_template_parser( magics_node ); */
 
@@ -729,7 +726,13 @@ static
 void init_MAGICS( )
 
 {
-	mag_open();
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
+  mag_open();
+
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
+  mag_setc ("page_id_line","off");
+/* Some standard parameters affectng the magics environment, moved from the xml file  ** end ** */
+
 }
 
 
@@ -779,7 +782,13 @@ void *Maggraph(void *argument)
   
   nfiles = cdoStreamCnt() - 1;
   ofilename = cdoStreamName(nfiles);
-
+  
+  if( DBG )
+    {
+       fprintf( stderr," Num of files %d\n",nfiles );
+       fprintf( stderr," files %s\n",ofilename );
+    }
+	
   datatab = (double **) malloc(nfiles*sizeof(double *));
   vdate   = (int **) malloc(nfiles*sizeof(int *));
   vtime   = (int **) malloc(nfiles*sizeof(int *));
@@ -796,6 +805,9 @@ void *Maggraph(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       
+     
+      if( DBG )
+        fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID) );
       streamID = streamOpenRead(cdoStreamName(fileID));
 
       vlistID = streamInqVlist(streamID);
@@ -849,7 +861,9 @@ void *Maggraph(void *argument)
 	  datatab[ fileID ][ tsID ] = val;
 	  vdate[ fileID ][ tsID ] = taxisInqVdate(taxisID);
 	  vtime[ fileID ][ tsID ] = taxisInqVtime(taxisID);
-	  fprintf(stderr, "%f %f\n", datatab[ fileID ][ tsID ],val ); 
+
+          if( DBG )
+	    fprintf(stderr, "%f %f\n", datatab[ fileID ][ tsID ],val ); 
 	  tsID++;
 	}
       streamClose(streamID);
@@ -959,6 +973,22 @@ void VerifyGraphParameters( int num_param, char **param_names )
 				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
 			      if( checkdevice( split_str[1] ) )
 				syntax = FALSE;
+
+                              /* Graph not supported in google earth format */
+                              if( !strcmp( split_str[1],"GIF_ANIMATION" ) || !strcmp( split_str[1],"gif_animation" ))
+                                {
+                                   syntax = FALSE;
+	                           fprintf( stderr,"Animation not supported for Graph!\n");
+                                   if( DBG )
+                                     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+                                }
+                              if( !strcmp( split_str[1],"KML" ) || !strcmp( split_str[1],"kml" ) )
+                                {
+                                   syntax = FALSE;
+	                           fprintf( stderr," 'kml' format not supported for  Graph!\n");
+                                   if( DBG )
+                                     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+                                }
 			    }
 			}
 		    }
