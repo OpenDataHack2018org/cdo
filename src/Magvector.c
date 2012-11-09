@@ -96,7 +96,7 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	      }
 	      
             if( !strcmp( split_str[0],"device" ) ) 
-	      {  
+	      {
 		temp_str = strdup( split_str[1] );    
 		StrToUpperCase( temp_str );
 		DEVICE = temp_str;
@@ -189,11 +189,12 @@ static
 void init_MAGICS( )
 
 {
+
+  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
   mag_open();
 
 /* Some standard parameters affectng the magics environment, moved from the xml file  ** begin ** */
   mag_setc ("page_id_line","off");
-  setenv( "MAGPLUS_QUIET","1",1 ); /* To suppress magics messages */
 
 }
 
@@ -463,6 +464,14 @@ void VerifyVectorParameters( int num_param, char **param_names, int opID )
 				fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
 			      if( checkdevice( split_str[1] ) )
 				syntax = FALSE;
+
+                              /* Vector not supported in google earth format */
+			      if( !strcmp( split_str[1],"KML" ) || !strcmp( split_str[1],"kml" ) )
+                                {
+				   syntax = FALSE;
+			           if( DBG )
+				     fprintf( stderr,"Parameter value '%s'\n",split_str[1] );
+                                }
 			    }
 			}
 		    }
