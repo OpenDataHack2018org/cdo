@@ -522,9 +522,7 @@ void *Remap(void *argument)
     }
 
   for ( index = 0; index < ngrids; index++ )
-    {
-      if ( remapgrids[index] == TRUE ) break;
-    }
+    if ( remapgrids[index] == TRUE ) break;
 
   if ( index == ngrids )
     cdoAbort("No remappable grid found!");
@@ -985,7 +983,7 @@ void *Remap(void *argument)
 	    double array2sum = 0;
    
 	    for ( i = 0; i < gridsize; i++ )
-	      printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].grid.grid1_frac[i],remaps[r].grid.grid1_area[i],remaps[r].grid.grid1_frac[i]);
+	      printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].grid.grid1_frac[i], remaps[r].grid.grid1_area[i],remaps[r].grid.grid1_frac[i]);
 	    for ( i = 0; i < gridsize; i++ )
 	      array1sum += remaps[r].grid.grid1_area[i];
 
@@ -1011,7 +1009,7 @@ void *Remap(void *argument)
 	  if ( gridInqType(gridID2) == GRID_GME )
 	    {
 	      int ni, nd;
-	      ni = gridInqGMEni(gridID2);
+ 	      ni = gridInqGMEni(gridID2);
 	      nd = gridInqGMEnd(gridID2);
 	      j = remaps[r].grid.grid2_size;
 
