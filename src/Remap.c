@@ -354,6 +354,30 @@ void get_remap_env(void)
     }
 }
 
+static
+void scale_gridbox_area(long gridsize, const double *restrict array1, long gridsize2, double *restrict array2, const double *restrict grid2_area)
+{
+  static int lgridboxinfo = TRUE;
+  long i;
+  double array1sum = 0;
+  double array2sum = 0;
+
+  for ( i = 0; i < gridsize; i++ )
+    array1sum += array1[i];
+
+  for ( i = 0; i < gridsize2; i++ )
+    array2sum += grid2_area[i];
+
+  for ( i = 0; i < gridsize2; i++ )
+    array2[i] = grid2_area[i]/array2sum*array1sum;
+
+  if ( lgridboxinfo )
+    {
+      cdoPrint("gridbox_area replaced and scaled to %g", array1sum);
+      lgridboxinfo = FALSE;
+    }
+}
+
 
 int timer_remap, timer_remap_init, timer_remap_sort;
 int timer_remap_bil, timer_remap_nn, timer_remap_con, timer_remap_con_l1, timer_remap_con_l2;
@@ -382,7 +406,6 @@ void *Remap(void *argument)
   int submap_type = SUBMAP_TYPE_NONE;
   int need_gradiants = FALSE;
   int non_global;
-  int lgridboxinfo = TRUE;
   int grid1sizemax;
   short *remapgrids = NULL;
   char varname[CDI_MAX_NAME];
@@ -978,23 +1001,7 @@ void *Remap(void *argument)
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
 	      {
-		double array1sum = 0;
-		double array2sum = 0;
-
-		for ( i = 0; i < gridsize; i++ )
-		  array1sum += array1[i];
-
-		for ( i = 0; i < gridsize2; i++ )
-		  array2sum += remaps[r].grid.grid2_area[i];
-
-		for ( i = 0; i < gridsize2; i++ )
-		  array2[i] = remaps[r].grid.grid2_area[i]/array2sum*array1sum;
-
-		if ( lgridboxinfo )
-		  {
-		    cdoPrint("%s replaced and scaled to %g", varname, array1sum);
-		    lgridboxinfo = FALSE;
-		  }
+		scale_gridbox_area(gridsize, array1, gridsize2, array2, remaps[r].grid.grid2_area);
 	      }
 
 	  /* calculate some statistics */
