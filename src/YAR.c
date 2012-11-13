@@ -15,8 +15,6 @@
   GNU General Public License for more details.
 */
 
-//#define HAVE_LIBYAC 1
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -24,10 +22,10 @@
 #include "interpol.h"
 
 #if defined (HAVE_LIBYAC)
-#include "couphamgrid.h"
-#include "coupham.h"
 #include "points.h"
-#include "interpolation.h"
+#include "grid_reg2d.h"
+#include "event.h"
+#include "search.h"
 #endif
 
 static
@@ -265,21 +263,22 @@ void testint(field_t *field1, field_t *field2)
 
   struct dep_list tgt_to_src_cell;
   unsigned search_id;
-  struct interpolation interpolation;
+  //struct interpolation interpolation;
 
-  search_id = search_init(*get_point_grid(&source_points));
+  search_id = search_init(get_point_grid(&source_points));
 
   do_point_search_p(*get_point_grid(&target_points), search_id, &tgt_to_src_cell);
-
+  /* xxxxxx1
   init_interpolation_g(&interpolation, *get_point_grid(&source_points), *get_point_grid(&target_points),
 		       *(struct const_dep_list*)&tgt_to_src_cell,
 		       AVERAGE);
-
+  */
   //--------------------------------------------
   // interpolate data
   //--------------------------------------------
-
+  /* xxxxx1
   do_interpolation(interpolation, &arrayIn, arrayOut);
+  */
   /*
   for ( int j = 0; j < 10; ++j )
     {
@@ -301,7 +300,6 @@ void testint(field_t *field1, field_t *field2)
 
 void *YAR(void *argument)
 {
-  int TESTINT;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, ngrids;
@@ -320,7 +318,7 @@ void *YAR(void *argument)
 
   cdoInitialize(argument);
 
-  TESTINT     = cdoOperatorAdd("testint",  0, 0, NULL);
+  cdoOperatorAdd("yarbil",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
