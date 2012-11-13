@@ -11,8 +11,7 @@
 Masks a box of the rectangular understood field. The elements inside 
 the box are untouched, the elements outside are set to missing value.
 All input fields need to have the same horizontal grid.
-Use @mod{sellonlatbox} or @mod{selindexbox} if only the data inside the
-box are needed.
+Use @mod{sellonlatbox} or @mod{selindexbox} if only the data inside the box are needed.
 @EndDescription
 @EndModule
 
@@ -24,6 +23,7 @@ box are needed.
 @BeginDescription
 Masks a longitude/latitude box. The user has to give the 
 longitudes and latitudes of the edges of the box.
+Considered are only those grid cells with the grid center inside the lon/lat box.
 @EndDescription
 @EndOperator
 
