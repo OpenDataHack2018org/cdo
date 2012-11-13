@@ -201,6 +201,7 @@ void *Vertwind(void *argument);
 void *Wind(void *argument);
 void *Writegrid(void *argument);
 void *Writerandom(void *argument);
+void *YAR(void *argument);
 void *Ydayarith(void *argument);
 void *Ydaypctl(void *argument);
 void *Ydaystat(void *argument);
@@ -214,6 +215,7 @@ void *Ymonstat(void *argument);
 void *Yseaspctl(void *argument);
 void *Yseasstat(void *argument);
 void *Zonstat(void *argument);
+
 void *EcaCfd(void *argument);
 void *EcaCsu(void *argument);
 void *EcaCwdi(void *argument);
@@ -455,6 +457,7 @@ void *Maggraph(void *argument);
 #define  WindOperators          {"uv2dv", "uv2dvl", "dv2uv", "dv2uvl", "dv2ps"}
 #define  WritegridOperators     {"writegrid"}
 #define  WriterandomOperators   {"writerandom"}
+#define  YAROperators           {"yarbil", "yarnn", "yarcon"}
 #define  YdayarithOperators     {"ydayadd", "ydaysub", "ydaymul", "ydaydiv"}
 #define  YdaypctlOperators      {"ydaypctl"}
 #define  YdaystatOperators      {"ydaymin", "ydaymax", "ydaysum", "ydaymean", "ydayavg", "ydayvar", "ydaystd"}
@@ -708,6 +711,7 @@ static modules_t Modules[] =
   { Wind,           WindHelp,          WindOperators,          CDI_REAL,  1,  1 },
   { Writegrid,      NULL,              WritegridOperators,     CDI_REAL,  1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,   CDI_REAL,  1,  1 },
+  { YAR,            NULL,              YAROperators,           CDI_REAL,  1,  1 },
   { Ydayarith,      YdayarithHelp,     YdayarithOperators,     CDI_REAL,  2,  1 },
   { Ydaypctl,       YdaypctlHelp,      YdaypctlOperators,      CDI_REAL,  3,  1 },
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,      CDI_REAL,  1,  1 },

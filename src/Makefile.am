@@ -162,6 +162,7 @@ cdo_SOURCES += Arith.c         \
                Wind.c          \
                Writegrid.c     \
                Writerandom.c   \
+               YAR.c           \
                Ydayarith.c     \
                Ydaypctl.c      \
                Ydaystat.c      \
