@@ -35,7 +35,7 @@ class TestCdo < Test::Unit::TestCase
   end
 
   def test_outputOperators
-    Cdo.debug = false
+    Cdo.debug = true
     levels = Cdo.showlevel(:in => "-stdatm,0")
     assert_equal([0,0].map(&:to_s),levels)
 
@@ -83,17 +83,17 @@ class TestCdo < Test::Unit::TestCase
   end
   def test_chain
     ofile     = MyTempfile.path
-    #Cdo.Debug = true
+    Cdo.Debug = true
     Cdo.setname('veloc',:in => " -copy -random,r1x1",:out => ofile,:options => "-f nc")
     assert_equal(["veloc"],Cdo.showname(:in => ofile))
   end
 
   def test_diff
     diffv = Cdo.diffn(:in => "-random,r1x1 -random,r1x1")
-    assert_equal(diffv[1].split(' ')[4],"random")
-    assert_equal(diffv[1].split(' ')[-1],"0.53060")
+    assert_equal(diffv[1].split(' ')[-1],"random")
+    assert_equal(diffv[1].split(' ')[-3],"0.53060")
     diff  = Cdo.diff(:in => "-random,r1x1 -random,r1x1")
-    assert_equal(diff[1].split(' ')[-1],"0.53060")
+    assert_equal(diff[1].split(' ')[-3],"0.53060")
   end
 
   def test_operators
@@ -114,12 +114,12 @@ class TestCdo < Test::Unit::TestCase
     ofile0, ofile1 = MyTempfile.path, MyTempfile.path
     Cdo.fldsum(:in => Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:options => "-f nc"),:out => ofile0)
     Cdo.fldsum(:in => "-stdatm,25,100,250,500,875,1400,2100,3000,4000,5000",:options => "-f nc",:out => ofile1)
-    Cdo.setReturnArray
+    Cdo.setReturnCdf
     MyTempfile.showFiles
     diff = Cdo.sub(:in => [ofile0,ofile1].join(' ')).var('T').get
     assert_equal(0.0,diff.min)
     assert_equal(0.0,diff.max)
-    Cdo.setReturnArray(false)
+    Cdo.setReturnCdf(false)
   end
 
   def test_tempfile
@@ -132,27 +132,67 @@ class TestCdo < Test::Unit::TestCase
     assert(File.exist?(ofile0))
   end
 
-  def test_returnArray
+  def test_returnCdf
     ofile = MyTempfile.path
-    vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
+    vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc",:force => true)
     assert_equal(ofile,vals)
-    Cdo.setReturnArray
+    Cdo.setReturnCdf
     vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
     assert_equal(["lon","lat","level","P","T"],vals.var_names)
     assert_equal(276,vals.var("T").get.flatten.mean.floor)
-    Cdo.unsetReturnArray
+    Cdo.unsetReturnCdf
     vals = Cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,:out => ofile,:options => "-f nc")
     assert_equal(ofile,vals)
   end
-  def test_simple_returnArray
+  def test_simple_returnCdf
     ofile0, ofile1 = MyTempfile.path, MyTempfile.path
     sum = Cdo.fldsum(:in => Cdo.stdatm(0,:options => "-f nc"),
-               :returnArray => true).var("P").get
+               :returnCdf => true).var("P").get
     assert_equal(1013.25,sum.min)
     sum = Cdo.fldsum(:in => Cdo.stdatm(0,:options => "-f nc"),:out => ofile0)
     assert_equal(ofile0,sum)
-    test_returnArray
+    test_returnCdf
+  end
+  def test_force
+    outs = []
+    # tempfiles
+    outs << Cdo.stdatm(0,10,20)
+    outs << Cdo.stdatm(0,10,20)
+    assert_not_equal(outs[0],outs[1])
 
+    # deticated output, force = true
+    outs.clear
+    outs << Cdo.stdatm(0,10,20,:out => 'test_force')
+    mtime0 = File.stat(outs[-1]).mtime
+    outs << Cdo.stdatm(0,10,20,:out => 'test_force')
+    mtime1 = File.stat(outs[-1]).mtime
+    assert_not_equal(mtime0,mtime1)
+    assert_equal(outs[0],outs[1])
+    FileUtils.rm('test_force')
+    outs.clear
+
+    # dedicated output, force = false
+    ofile = 'test_force_false'
+    outs << Cdo.stdatm(0,10,20,:out => ofile,:force => false)
+    mtime0 = File.stat(outs[-1]).mtime
+    outs << Cdo.stdatm(0,10,20,:out => ofile,:force => false)
+    mtime1 = File.stat(outs[-1]).mtime
+    assert_equal(mtime0,mtime1)
+    assert_equal(outs[0],outs[1])
+    FileUtils.rm(ofile)
+    outs.clear
+
+    # dedicated output, global force setting
+    ofile = 'test_force_global'
+    Cdo.forceOutput = false
+    outs << Cdo.stdatm(0,10,20,:out => ofile)
+    mtime0 = File.stat(outs[-1]).mtime
+    outs << Cdo.stdatm(0,10,20,:out => ofile)
+    mtime1 = File.stat(outs[-1]).mtime
+    assert_equal(mtime0,mtime1)
+    assert_equal(outs[0],outs[1])
+    FileUtils.rm(ofile)
+    outs.clear
   end
 
   def test_thickness
@@ -175,7 +215,13 @@ class TestCdo < Test::Unit::TestCase
   end
 
   def test_parseArgs
-  end
+    io,opts = Cdo.parseArgs([1,2,3,:in => '1',:out => '2',:force => true,:returnCdf => "T"])
+    assert_equal("1",io[:in])
+    assert_equal("2",io[:out])
+    assert_equal(true,io[:force])
+    assert_equal("T",io[:returnCdf])
+    pp [io,opts]
+  end 
 
   if 'thingol' == `hostname`.chomp  then
     def test_readCdf

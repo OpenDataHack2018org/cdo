@@ -16,12 +16,13 @@ require 'pp'
 # CDO calling mechnism
 module Cdo
 
-  VERSION = "1.0.11"
+  VERSION = "1.1.0"
 
   State = {
     :debug       => false,
-    :returnArray => false,
-    :operators   => []
+    :returnCdf => false,
+    :operators   => [],
+    :forceOutput => true
   }
   State[:debug] = true unless ENV['DEBUG'].nil?
 
@@ -84,34 +85,50 @@ module Cdo
       system(cmd + ' 1>/dev/null 2>&1 ')
     end
   end
-  def Cdo.run(cmd,ofile='',options='',returnArray=false)
+  def Cdo.run(cmd,ofile='',options='',returnCdf=false,force=nil,returnArray=nil)
     cmd = "#{@@CDO} -O #{options} #{cmd} "
     case ofile
     when $stdout
       cmd << " 2>/dev/null"
+      puts cmd if Cdo.debug
       return IO.popen(cmd).readlines.map {|l| l.chomp.strip}
-    when nil
-      ofile = MyTempfile.path
+    else
+      force = State[:forceOutput] if force.nil?
+      if force or not File.exists?(ofile.to_s)
+        ofile = MyTempfile.path if ofile.nil?
+        cmd << "#{ofile}"
+        call(cmd)
+      else
+        warn "Use existing file '#{ofile}'" if Cdo.debug
+      end
     end
-    cmd << "#{ofile}"
-    call(cmd)
-    if returnArray or State[:returnArray]
+    if returnCdf or State[:returnCdf]
       Cdo.readCdf(ofile)
     else
       return ofile
     end
+  end
+  def Cdo.parseArgs(args)
+    # splitinto hash-like args and the rest
+    operatorArgs = args.reject {|a| a.class == Hash}
+    opts = operatorArgs.empty? ? '' : ',' + operatorArgs.join(',')
+    io   = args.find {|a| a.class == Hash}
+    io   = {} if io.nil?
+    args.delete_if   {|a| a.class == Hash}
+    return [io,opts]
   end
   def Cdo.method_missing(sym, *args, &block)
     ## args is expected to look like [opt1,...,optN,:in => iStream,:out => oStream] where
     # iStream could be another CDO call (timmax(selname(Temp,U,V,ifile.nc))
     puts "Operator #{sym.to_s} is called" if State[:debug]
     if getOperators.include?(sym.to_s)
-      args,io,opts = Cdo.parseArgs(args)
+      io,opts = Cdo.parseArgs(args)
       if @@outputOperatorsPattern.match(sym)
         run(" -#{sym.to_s}#{opts} #{io[:in]} ",$stdout)
       else
-        opts = args.empty? ? '' : ',' + args.reject {|a| a.class == Hash}.join(',')
-        run(" -#{sym.to_s}#{opts} #{io[:in]} ",io[:out],io[:options],io[:returnArray])
+        #if opts[:force] or not File.exist?(opts[:out]) then
+          run(" -#{sym.to_s}#{opts} #{io[:in]} ",io[:out],io[:options],io[:returnCdf],io[:force])
+        #end
       end
     else
       warn "Operator #{sym.to_s} not found"
@@ -126,15 +143,6 @@ module Cdo
       raise
     end
   end
-  def Cdo.parseArgs(args)
-    # splitinto hash-like args and the rest
-    operatorArgs = args.reject {|a| a.class == Hash}
-    opts = operatorArgs.empty? ? '' : ',' + operatorArgs.join(',')
-    io   = args.find {|a| a.class == Hash}
-    io   = {} if io.nil?
-    args.delete_if   {|a| a.class == Hash}
-    return [args,io,opts]
-  end
 
   public
   def Cdo.debug=(value)
@@ -143,6 +151,12 @@ module Cdo
   def Cdo.debug
     State[:debug]
   end
+  def Cdo.forceOutput=(value)
+    State[:forceOutput] = value
+  end
+  def Cdo.forceOutput
+    State[:forceOutput]
+  end
   def Cdo.version
     cmd     = @@CDO + ' 2>&1'
     help    = IO.popen(cmd).readlines.map {|l| l.chomp.lstrip}
@@ -150,17 +164,17 @@ module Cdo
     line    = help.find {|v| v =~ regexp}
     version = regexp.match(line)[1]
   end
-  def Cdo.setReturnArray(value=true)
+  def Cdo.setReturnCdf(value=true)
     if value
       Cdo.loadCdf
     end
-    State[:returnArray] = value
+    State[:returnCdf] = value
   end
-  def Cdo.unsetReturnArray
-    setReturnArray(false)
+  def Cdo.unsetReturnCdf
+    setReturnCdf(false)
   end
-  def Cdo.returnArray
-    State[:returnArray]
+  def Cdo.returnCdf
+    State[:returnCdf]
   end
 
   def Cdo.hasCdo?(bin=@@CDO)
@@ -218,7 +232,7 @@ module Cdo
   end
 
   def Cdo.readCdf(iFile)
-    Cdo.loadCdf unless State[:returnArray] 
+    Cdo.loadCdf unless State[:returnCdf] 
     NetCDF.open(iFile)
   end
 
