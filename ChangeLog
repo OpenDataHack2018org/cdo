@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
 
+2012-11-14 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* cdo option -z zip: added optional compression level -z zip[_1-9] [request: Etienne Tourigny]
+
 2012-11-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* pipeInqVlist: wait MIN_WAIT_CYCLES if processNumsActive() == 1 (bug fix) [report:  Jaison Ambadan]

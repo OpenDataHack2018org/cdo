@@ -236,7 +236,7 @@ void usage(void)
   fprintf(stderr, "    -v             Print extra details for some operators\n");
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
-  fprintf(stderr, "        zip        Deflate compression of netCDF4 variables\n");
+  fprintf(stderr, "        zip[_1-9]  Deflate compression of netCDF4 variables\n");
   fprintf(stderr, "\n");
 
   fprintf(stderr, "  Operators:\n");
@@ -619,10 +619,13 @@ void defineCompress(const char *arg)
       cdoCompType  = COMPRESS_GZIP;
       cdoCompLevel = 6;
     }
-  else if ( memcmp(arg, "zip", len) == 0 )
+  else if ( memcmp(arg, "zip", 3) == 0 )
     {
       cdoCompType  = COMPRESS_ZIP;
-      cdoCompLevel = 1;
+      if ( len == 5 && arg[3] == '_' && isdigit(arg[4]) )
+	cdoCompLevel = atoi(&arg[4]);
+      else
+	cdoCompLevel = 1;
     }
   else
     fprintf(stderr, "%s compression unsupported!\n", arg);
