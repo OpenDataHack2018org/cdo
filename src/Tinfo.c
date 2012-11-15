@@ -28,8 +28,9 @@
 #include "dtypes.h"
 
 
-#define MAX_GAPS  64
-#define MAX_NTSM 128
+#define MAX_GAPS   64
+#define MAX_NTSM  128
+#define LIM_NTSM 1024
 
 enum {TU_SECONDS=0, TU_MINUTES, TU_HOURS, TU_DAYS, TU_MONTHS, TU_YEARS};
 char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
@@ -226,6 +227,9 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 		  vdatem[ngaps][its] = ndate;
 		  vtimem[ngaps][its] = ntime;
 		}
+	      else if ( its >= LIM_NTSM )
+		break;
+
 	      its++;
 	    }
 	}
@@ -242,6 +246,9 @@ int fill_gap(int ngaps, int ntsm[MAX_NTSM], int rangetsm[MAX_GAPS][2],
 		  vdatem[ngaps][its] = ndate;
 		  vtimem[ngaps][its] = ntime;
 		}
+	      else if ( its >= LIM_NTSM )
+		break;
+
 	      its++;
 	    }
 	}			
@@ -266,7 +273,6 @@ void *Tinfo(void *argument)
   int year, month, day;
   int calendar, unit;
   int incperiod0 = 0, incunit0 = 0;
-  int incperiod1 = 0, incunit1 = 0;
   int incperiod = 0, incunit = 0;
   int its = 0, igap;
   int ngaps = 0;
@@ -276,7 +282,7 @@ void *Tinfo(void *argument)
   int vtimem[MAX_GAPS][MAX_NTSM];
   juldate_t juldate, juldate0;
   double jdelta = 0, jdelta0 = 0;
-  int arrow;
+  int arrow = 0;
   int i, len;
   char vdatestr[32], vtimestr[32];	  
 
@@ -378,6 +384,7 @@ void *Tinfo(void *argument)
 				 1, incperiod0, incunit0, vdate_first, vdate, vtime,
 				 calendar, day, juldate0, 
 				 juldate_encode(calendar, vdate_first, vtime_first));
+
 		  arrow = '^';
 		}
 	      else
@@ -385,29 +392,36 @@ void *Tinfo(void *argument)
 		  its = fill_gap(ngaps, ntsm, rangetsm, vdatem, vtimem,
 				 tsID, incperiod0, incunit0, vdate, vdate0, vtime0,
 				 calendar, day0, juldate, juldate0);
+
 		  arrow = '<';
+
+		  if (  its == 0 && incperiod < 0 )
+		    {
+		      its = -1;
+		      vdate = vdate0;
+		      vtime = vtime0;
+		    }
 		}
 
 	      if ( its > 0 )
 		{
 		  ngaps++;
 		  if ( cdoVerbose )
-		    fprintf(stdout, "  %c--- Gap %d, missing %d timestep%s",
-			    arrow, ngaps, its, its>1?"s":"");
+		    fprintf(stdout, "  %c--- Gap %d, missing %s%d timestep%s",
+			    arrow, ngaps, its>=LIM_NTSM?"more than ":"", its, its>1?"s":"");
+		}
+	      else if ( its < 0 )
+		{
+		  if ( cdoVerbose )
+		    fprintf(stdout, "  %c--- Wrong date/time information, negative increment!", arrow);
 		}
 	    }
 
-	  if ( tsID )
+	  if ( tsID == 1 )
 	    {
-	      if ( tsID == 1 )
-		{
-		  jdelta0    = jdelta;
-		  incperiod0 = incperiod;
-		  incunit0   = incunit;
-		}
-
-	      incperiod1 = incperiod;
-	      incunit1   = incunit;
+	      jdelta0    = jdelta;
+	      incperiod0 = incperiod;
+	      incunit0   = incunit;
 	    }
 
 	  fprintf(stdout, "\n");
