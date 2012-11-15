@@ -1,6 +1,8 @@
 set cdoCmpl = (\
 L \
+M \
 O \
+P \
 Q \
 R \
 S \
@@ -44,6 +46,7 @@ chltype \
 chname \
 chparam \
 chtabnum \
+chunit \
 chvar \
 cloudlayer \
 cmd \
@@ -53,6 +56,8 @@ complextorect \
 consecsum \
 consects \
 const \
+contour \
+conv_cmor_table \
 copy \
 cos \
 covar0 \
@@ -205,6 +210,8 @@ gp2spl \
 gradsdes \
 gradsdes1 \
 gradsdes2 \
+graph \
+grfill \
 gridarea \
 gridboxavg \
 gridboxmax \
@@ -391,6 +398,7 @@ pow \
 pressure_fl \
 pressure_hl \
 random \
+read_cmor_table \
 read_e5ml \
 reci \
 regres \
@@ -432,6 +440,10 @@ seaspctl \
 seasstd \
 seassum \
 seasvar \
+seinfo \
+seinfoc \
+seinfon \
+seinfop \
 selall \
 selcode \
 seldate \
@@ -483,6 +495,9 @@ setmon \
 setname \
 setparam \
 setpartab \
+setpartabc \
+setpartabn \
+setpartabp \
 setpartabv \
 setrcaname \
 setreftime \
@@ -493,11 +508,13 @@ settabnum \
 settaxis \
 settime \
 settunits \
+setunit \
 setvals \
 setvar \
 setvrange \
 setyear \
 setzaxis \
+shaded \
 shifttime \
 showcode \
 showdate \
@@ -558,6 +575,7 @@ ssopar \
 stdatm \
 stimelogo \
 strbre \
+stream \
 strgal \
 strwin \
 studentt \
@@ -566,6 +584,7 @@ subc \
 subtrend \
 szip \
 tan \
+tee \
 temp \
 template1 \
 template2 \
@@ -610,6 +629,7 @@ varquot2test \
 varrms \
 vct \
 vct2 \
+vector \
 vertavg \
 vertmax \
 vertmean \
@@ -623,6 +643,9 @@ wct \
 write_e5ml \
 writegrid \
 writerandom \
+yarbil \
+yarcon \
+yarnn \
 ydayadd \
 ydayavg \
 ydaydiv \

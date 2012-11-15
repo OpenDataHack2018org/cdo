@@ -1,6 +1,8 @@
 compctl -k "(
 -L \
+-M \
 -O \
+-P \
 -Q \
 -R \
 -S \
@@ -44,6 +46,7 @@ chltype -chltype \
 chname -chname \
 chparam -chparam \
 chtabnum -chtabnum \
+chunit -chunit \
 chvar -chvar \
 cloudlayer -cloudlayer \
 cmd -cmd \
@@ -53,6 +56,8 @@ complextorect -complextorect \
 consecsum -consecsum \
 consects -consects \
 const -const \
+contour -contour \
+conv_cmor_table -conv_cmor_table \
 copy -copy \
 cos -cos \
 covar0 -covar0 \
@@ -205,6 +210,8 @@ gp2spl -gp2spl \
 gradsdes -gradsdes \
 gradsdes1 -gradsdes1 \
 gradsdes2 -gradsdes2 \
+graph -graph \
+grfill -grfill \
 gridarea -gridarea \
 gridboxavg -gridboxavg \
 gridboxmax -gridboxmax \
@@ -391,6 +398,7 @@ pow -pow \
 pressure_fl -pressure_fl \
 pressure_hl -pressure_hl \
 random -random \
+read_cmor_table -read_cmor_table \
 read_e5ml -read_e5ml \
 reci -reci \
 regres -regres \
@@ -432,6 +440,10 @@ seaspctl -seaspctl \
 seasstd -seasstd \
 seassum -seassum \
 seasvar -seasvar \
+seinfo -seinfo \
+seinfoc -seinfoc \
+seinfon -seinfon \
+seinfop -seinfop \
 selall -selall \
 selcode -selcode \
 seldate -seldate \
@@ -483,6 +495,9 @@ setmon -setmon \
 setname -setname \
 setparam -setparam \
 setpartab -setpartab \
+setpartabc -setpartabc \
+setpartabn -setpartabn \
+setpartabp -setpartabp \
 setpartabv -setpartabv \
 setrcaname -setrcaname \
 setreftime -setreftime \
@@ -493,11 +508,13 @@ settabnum -settabnum \
 settaxis -settaxis \
 settime -settime \
 settunits -settunits \
+setunit -setunit \
 setvals -setvals \
 setvar -setvar \
 setvrange -setvrange \
 setyear -setyear \
 setzaxis -setzaxis \
+shaded -shaded \
 shifttime -shifttime \
 showcode -showcode \
 showdate -showdate \
@@ -558,6 +575,7 @@ ssopar -ssopar \
 stdatm -stdatm \
 stimelogo -stimelogo \
 strbre -strbre \
+stream -stream \
 strgal -strgal \
 strwin -strwin \
 studentt -studentt \
@@ -566,6 +584,7 @@ subc -subc \
 subtrend -subtrend \
 szip -szip \
 tan -tan \
+tee -tee \
 temp -temp \
 template1 -template1 \
 template2 -template2 \
@@ -610,6 +629,7 @@ varquot2test -varquot2test \
 varrms -varrms \
 vct -vct \
 vct2 -vct2 \
+vector -vector \
 vertavg -vertavg \
 vertmax -vertmax \
 vertmean -vertmean \
@@ -623,6 +643,9 @@ wct -wct \
 write_e5ml -write_e5ml \
 writegrid -writegrid \
 writerandom -writerandom \
+yarbil -yarbil \
+yarcon -yarcon \
+yarnn -yarnn \
 ydayadd -ydayadd \
 ydayavg -ydayavg \
 ydaydiv -ydaydiv \
