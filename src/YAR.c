@@ -265,9 +265,22 @@ void testint(field_t *field1, field_t *field2)
   unsigned search_id;
   //struct interpolation interpolation;
 
-  search_id = search_init(get_point_grid(&source_points));
+  // seg fault:  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_grid)));
+  // seg fault:  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_grid)));
+  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_points)));
+  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_points)));
 
+  search_id = search_init(get_point_grid(&source_points));
+ 
   do_point_search_p(*get_point_grid(&target_points), search_id, &tgt_to_src_cell);
+
+  printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
+
+  for ( int i = 0; i < 10; ++i )
+    {
+      printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
+    }
+
   /* xxxxxx1
   init_interpolation_g(&interpolation, *get_point_grid(&source_points), *get_point_grid(&target_points),
 		       *(struct const_dep_list*)&tgt_to_src_cell,

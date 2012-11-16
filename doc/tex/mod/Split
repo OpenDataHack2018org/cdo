@@ -17,6 +17,7 @@ of the output files depends on the chosen operator.
 
 @BeginOperator_splitcode
 @Title     = Split code numbers
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different code number.
@@ -27,6 +28,7 @@ Splits a dataset into pieces, one for each different code number.
 
 @BeginOperator_splitparam
 @Title     = Split parammeter identifiers
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different parammeter identifier.
@@ -37,6 +39,7 @@ Splits a dataset into pieces, one for each different parammeter identifier.
 
 @BeginOperator_splitname
 @Title     = Split variable names
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each variable name.
@@ -47,6 +50,7 @@ Splits a dataset into pieces, one for each variable name.
 
 @BeginOperator_splitlevel
 @Title     = Split levels
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different level.
@@ -57,6 +61,7 @@ Splits a dataset into pieces, one for each different level.
 
 @BeginOperator_splitgrid
 @Title     = Split grids
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different grid.
@@ -67,6 +72,7 @@ Splits a dataset into pieces, one for each different grid.
 
 @BeginOperator_splitzaxis
 @Title     = Split z-axes
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each different z-axis.
@@ -77,6 +83,7 @@ Splits a dataset into pieces, one for each different z-axis.
 
 @BeginOperator_splittabnum
 @Title     = Split parameter table numbers
+@Parameter = [swap]
 
 @BeginDescription
 Splits a dataset into pieces, one for each GRIB1 parameter table number.
@@ -86,11 +93,18 @@ Splits a dataset into pieces, one for each GRIB1 parameter table number.
 
 @c @BeginOperator_splitrec
 @c @Title     = Split records
+@c Parameter = [swap]
 
 @c @BeginDescription
 @c Splits a dataset into pieces, one for each record.
 @c @file{xxx} will have six digits with the record number.
 @c @EndDescription
+
+
+@BeginParameter swap
+@Item = swap
+STRING  Swap the position of obase and xxx in the output filename
+@EndParameter
 
 
 @BeginEnvironment
