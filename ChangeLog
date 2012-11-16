@@ -5,6 +5,7 @@
 
 2012-11-15 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Split: added parameter swap to swap the position of <obase> and <xxx>  in the filename 
 	* splitgrid: bug fix for gridID output in filename <xxx>
 	* splitzaxis: bug fix for zaxisID output in filename <xxx>
 
