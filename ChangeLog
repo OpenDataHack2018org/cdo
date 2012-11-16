@@ -3,6 +3,11 @@
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
 
+2012-11-15 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* splitgrid: bug fix for gridID output in filename <xxx>
+	* splitzaxis: bug fix for zaxisID output in filename <xxx>
+
 2012-11-14 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* cdo option -z zip: added optional compression level -z zip[_1-9] [request: Etienne Tourigny]
