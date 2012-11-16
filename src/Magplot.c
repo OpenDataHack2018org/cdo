@@ -312,10 +312,19 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       mag_setc ( "contour_label", "off" );
       
       if( YMIN < 1.0e+200  )
-	mag_setr( "contour_shade_min_level", YMIN );
+        {
+	   mag_setr( "contour_shade_min_level", YMIN );
+	   mag_setr( "contour_min_level", YMIN );
+        }
+
+
+
       
       if( YMAX > -1.0e+200 )
-	mag_setr( "contour_shade_max_level", YMAX );
+        {
+	   mag_setr( "contour_shade_max_level", YMAX );
+	   mag_setr( "contour_max_level", YMAX );
+        }
       
       if( COLOUR_MIN )
 	mag_setc( "contour_shade_min_level_colour", COLOUR_MIN );
@@ -433,10 +442,24 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       mag_setc ( "contour_label", "off" );
       
       if( YMIN < 1.0e+200  )
+        {
+	   mag_setr( "contour_shade_min_level", YMIN );
+	   mag_setr( "contour_min_level", YMIN );
+        }
+
+      if( YMAX > -1.0e+200 )
+        {
+	   mag_setr( "contour_shade_max_level", YMAX );
+	   mag_setr( "contour_max_level", YMAX );
+        }
+
+      /*
+      if( YMIN < 1.0e+200  )
 	mag_setr( "contour_shade_min_level", YMIN );
       
       if( YMAX > -1.0e+200 )
 	mag_setr( "contour_shade_max_level", YMAX );
+      */
       
       if( COLOUR_MIN )
 	mag_setc( "contour_shade_min_level_colour", COLOUR_MIN );
@@ -886,6 +909,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			      syntax = FALSE;
 			  }
 		      }
+		      sep_char = "=";
 		    }
 		}
 	    }
