@@ -44,7 +44,6 @@
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
 
-//#define GRID_SEARCH_TEST
 
 #if  defined  (HAVE_CONFIG_H)
 #  include "config.h"
@@ -1811,359 +1810,6 @@ void remap_set_max_iter(long max_iter)
 /*                                                                         */
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
-#if defined (GRID_SEARCH_TEST)
-
-static
-void rsrch_cells(int is_cyclic, long gadd, long nx, long ny, long *num_srch_cells, int *srch_add, long *nwork, int *work,
-		restr_t rlat, restr_t rlon, const restr_t *restrict bound_box)
-{
-  long i, j;
-  long ip1 = -1, im1 = -1;
-  long jp1 = -1, jm1 = -1;
-  long gaddm4;
-
-  //fprintf(stdout, "%ld, %ld, %ld, %ld, %ld\n", gadd, nx, ny, *nwork, *num_srch_cells);
-  for ( i = 0; i < *nwork; ++i )
-    if ( work[i] == gadd ) return;
-
-  work[(*nwork)++] = gadd;
-
-  gaddm4 = gadd<<2;
-  /* Check bounding box */
-  if ( rlat >= bound_box[gaddm4  ] && rlat <= bound_box[gaddm4+1] &&
-       rlon >= bound_box[gaddm4+2] && rlon <= bound_box[gaddm4+3] )
-    {
-      srch_add[(*num_srch_cells)++] = gadd;
-
-      /* Determine neighbor addresses */
-      j = gadd/nx;
-      i = gadd - j*nx;
-
-      if      ( i < (nx-1) ) ip1 = i + 1;
-      else if ( is_cyclic )  ip1 = 0;
-
-      if      ( i > 0 )     im1 = i - 1;
-      else if ( is_cyclic ) im1 = nx-1;
-
-      if ( j < (ny-1) ) jp1 = j + 1;
-
-      if ( j > 0 ) jm1 = j - 1;
-
-      if ( ip1 != -1 ) rsrch_cells(is_cyclic, j*nx+ip1, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
-      if ( im1 != -1 ) rsrch_cells(is_cyclic, j*nx+im1, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
-      if ( jp1 != -1 ) rsrch_cells(is_cyclic, jp1*nx+i, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
-      if ( jm1 != -1 ) rsrch_cells(is_cyclic, jm1*nx+i, nx, ny, num_srch_cells, srch_add, nwork, work, rlat, rlon, bound_box);
-    }
-}
-
-static
-long get_srch_cells_2D(double plat, double plon, const int *restrict src_grid_dims, long nbins, 
-		       const restr_t *restrict bin_lats, const restr_t *restrict bin_lons,
-                       const int *restrict bin_addr1, const restr_t *restrict grid1_bound_box, 
-		       long grid1_size, int *restrict srch_add)
-{
-  /*
-    Input variables:
-
-    double plat                    ! latitude  of the search point
-    double plon                    ! longitude of the search point
-
-    int src_grid_dims[2]           ! size of each src grid dimension
-  */
-  long num_srch_cells;  /* num cells in restricted search arrays */
-  long min_add;         /* addresses for restricting search of   */
-  long max_add;         /* destination grid                      */
-  long nx, ny;          /* dimensions of src grid                */
-  long n, n2;           /* generic counters                      */
-  long grid1_add;       /* current linear address for grid1 cell */
-  long grid1_addm4;
-  restr_t rlat, rlon;
-
-  rlat = RESTR_SCALE(plat);
-  rlon = RESTR_SCALE(plon);
-
-  /* Restrict search first using bins */
-
-  min_add = grid1_size-1;
-  max_add = 0;
-
-  for ( n = 0; n < nbins; ++n )
-    {
-      n2 = n<<1;
-      if ( rlat >= bin_lats[n2] && rlat <= bin_lats[n2+1] &&
-	   rlon >= bin_lons[n2] && rlon <= bin_lons[n2+1] )
-	{
-	  if ( bin_addr1[n2  ] < min_add ) min_add = bin_addr1[n2  ];
-	  if ( bin_addr1[n2+1] > max_add ) max_add = bin_addr1[n2+1];
-	}
-    }
-
-  /* Now perform a more detailed search */
-
-  //srch_add[0] = -1;
-  num_srch_cells = 0;
-  for ( grid1_add = min_add; grid1_add <= max_add; ++grid1_add )
-    {
-      grid1_addm4 = grid1_add<<2;
-      /* Check bounding box */
-      if ( rlat >= grid1_bound_box[grid1_addm4  ] && 
-	   rlat <= grid1_bound_box[grid1_addm4+1] &&
-	   rlon >= grid1_bound_box[grid1_addm4+2] &&
-	   rlon <= grid1_bound_box[grid1_addm4+3] )
-      	{
-	  //	  srch_add[num_srch_cells] = grid1_add;
-	  //	  num_srch_cells++;
-	  break;
-	}
-    }
-
-  nx = src_grid_dims[0];
-  ny = src_grid_dims[1];
-
-  {
-    long nwork = 0;
-    int *work;
-
-    work = (int *) malloc(grid1_size*sizeof(int));
-
-    rsrch_cells(1, grid1_add, nx, ny, &num_srch_cells, srch_add, &nwork, work, rlat, rlon, grid1_bound_box);
-    //printf("%g %g %ld %d %ld\n", plat, plon, num_srch_cells, *srch_add, nwork);
-    //memcpy(srch_add, work, nwork*sizeof(int));
-    //num_srch_cells = nwork;
-  
-    free(work);
-  }
-
-  return (num_srch_cells);
-}
-
-/*
-   This routine finds the location of the search point plat, plon in the 
-   source grid and returns the corners needed for a bilinear interpolation.
-*/
-static
-int grid_search_new(long num_srch_cells, int *srch_add, remapgrid_t *rg, int *restrict src_add, double *restrict src_lats, 
-		double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
-		const double *restrict src_center_lat, const double *restrict src_center_lon)
-{
-  /*
-    Output variables:
-
-    int    src_add[4]              ! address of each corner point enclosing P
-    double src_lats[4]             ! latitudes  of the four corner points
-    double src_lons[4]             ! longitudes of the four corner points
-
-    Input variables:
-
-    double plat                    ! latitude  of the search point
-    double plon                    ! longitude of the search point
-
-    int src_grid_dims[2]           ! size of each src grid dimension
-
-    double src_center_lat[]        ! latitude  of each src grid center 
-    double src_center_lon[]        ! longitude of each src grid center
-
-    restr_t src_grid_bound_box[][4] ! bound box for source grid
-
-    int src_bin_add[][2]           ! latitude bins for restricting
-  */
-  /*  Local variables */
-  long grid1_add;
-  long nc, n, next_n;                             /* dummy indices                    */
-  long nx, ny;                                /* dimensions of src grid           */
-  long i, j, jp1, ip1, n_add, e_add, ne_add;  /* addresses                        */
-  /* Vectors for cross-product check */
-  double vec1_lat, vec1_lon;
-  double vec2_lat, vec2_lon, cross_product;
-  double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
-  double dist_min, distance; /* For computing dist-weighted avg */
-  int scross[4], scross_last = 0;
-  int search_result = 0;
-
-  for ( n = 0; n < 4; ++n ) src_add[n] = 0;
- 
-  /* Now perform a more detailed search */
-
-  nx = src_grid_dims[0];
-  ny = src_grid_dims[1];
-
-  /* srch_loop */
-  for ( nc = 0; nc < num_srch_cells; ++nc )
-    {
-      grid1_add = srch_add[nc];
-
-      /* We are within bounding box so get really serious */
-
-      /* Determine neighbor addresses */
-      j = grid1_add/nx;
-      i = grid1_add - j*nx;
-
-      if ( i < (nx-1) )
-	ip1 = i + 1;
-      else
-	{
-	  /* 2009-01-09 Uwe Schulzweida: bug fix */
-	  if ( rg->grid1_is_cyclic )
-	    ip1 = 0;
-	  else
-	    ip1 = i;
-	}
-
-      if ( j < (ny-1) )
-	jp1 = j + 1;
-      else
-	{
-	  /* 2008-12-17 Uwe Schulzweida: latitute cyclic ??? (bug fix) */
-	  jp1 = j;
-	}
-
-      n_add  = jp1*nx + i;
-      e_add  = j  *nx + ip1;
-      ne_add = jp1*nx + ip1;
-
-      src_lats[0] = src_center_lat[grid1_add];
-      src_lats[1] = src_center_lat[e_add];
-      src_lats[2] = src_center_lat[ne_add];
-      src_lats[3] = src_center_lat[n_add];
-
-      src_lons[0] = src_center_lon[grid1_add];
-      src_lons[1] = src_center_lon[e_add];
-      src_lons[2] = src_center_lon[ne_add];
-      src_lons[3] = src_center_lon[n_add];
-
-      /* For consistency, we must make sure all lons are in same 2pi interval */
-
-      vec1_lon = src_lons[0] - plon;
-      if      ( vec1_lon >  PI ) src_lons[0] -= PI2;
-      else if ( vec1_lon < -PI ) src_lons[0] += PI2;
-
-      for ( n = 1; n < 4; ++n )
-	{
-	  vec1_lon = src_lons[n] - src_lons[0];
-	  if      ( vec1_lon >  PI ) src_lons[n] -= PI2;
-	  else if ( vec1_lon < -PI ) src_lons[n] += PI2;
-	}
-
-      /* corner_loop */
-      for ( n = 0; n < 4; ++n )
-	{
-	  next_n = (n+1)%4;
-
-	  /*
-	    Here we take the cross product of the vector making 
-	    up each box side with the vector formed by the vertex
-	    and search point.  If all the cross products are 
-	    positive, the point is contained in the box.
-	  */
-	  vec1_lat = src_lats[next_n] - src_lats[n];
-	  vec1_lon = src_lons[next_n] - src_lons[n];
-	  vec2_lat = plat - src_lats[n];
-	  vec2_lon = plon - src_lons[n];
-
-	  /* Check for 0,2pi crossings */
-	  
-	  if      ( vec1_lon >  THREE*PIH ) vec1_lon -= PI2;
-	  else if ( vec1_lon < -THREE*PIH ) vec1_lon += PI2;
-
-	  if      ( vec2_lon >  THREE*PIH ) vec2_lon -= PI2;
-	  else if ( vec2_lon < -THREE*PIH ) vec2_lon += PI2;
-
-	  cross_product = vec1_lon*vec2_lat - vec2_lon*vec1_lat;
-
-	  /* If cross product is less than ZERO, this cell doesn't work    */
-	  /* 2008-10-16 Uwe Schulzweida: bug fix for cross_product eq zero */
-
-	  scross[n] = cross_product < 0 ? -1 : cross_product > 0 ? 1 : 0;
-
-	  if ( n == 0 ) scross_last = scross[n];
-
-	  if ( (scross[n] < 0 && scross_last > 0) || (scross[n] > 0 && scross_last < 0) ) break;
-
-	  scross_last = scross[n];
-	} /* corner_loop */
-
-      if ( n >= 4 )
-	{
-	  n = 0;
-	  if      ( scross[0]>=0 && scross[1]>=0 && scross[2]>=0 && scross[3]>=0 ) n = 4;
-	  else if ( scross[0]<=0 && scross[1]<=0 && scross[2]<=0 && scross[3]<=0 ) n = 4;
-	}
-
-      /* If cross products all same sign, we found the location */
-      if ( n >= 4 )
-	{
-	  src_add[0] = grid1_add;
-	  src_add[1] = e_add;
-	  src_add[2] = ne_add;
-	  src_add[3] = n_add;
-
-	  search_result = 1;
-
-	  return (search_result);
-	}
-      
-      /* Otherwise move on to next cell */
-
-    } /* srch_loop */
-
-  /*
-    If no cell found, point is likely either in a box that straddles either pole or is outside 
-    the grid. Fall back to a distance-weighted average of the four closest points.
-    Go ahead and compute weights here, but store in src_lats and return -add to prevent the 
-    parent routine from computing bilinear weights.
-  */
-  if ( ! rg->lextrapolate ) return (search_result);
-
-  /*
-    printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
-    printf("Using nearest-neighbor average for this point\n");
-  */
-  coslat_dst = cos(plat);
-  sinlat_dst = sin(plat);
-  coslon_dst = cos(plon);
-  sinlon_dst = sin(plon);
-
-  dist_min = BIGNUM;
-  for ( n = 0; n < 4; ++n ) src_lats[n] = BIGNUM;
-  for ( nc = 0; nc < num_srch_cells; ++nc )
-    {
-      grid1_add = srch_add[nc];
-
-      distance = acos(coslat_dst*cos(src_center_lat[grid1_add])*
-		     (coslon_dst*cos(src_center_lon[grid1_add]) +
-                      sinlon_dst*sin(src_center_lon[grid1_add]))+
-		      sinlat_dst*sin(src_center_lat[grid1_add]));
-
-      if ( distance < dist_min )
-	{
-          for ( n = 0; n < 4; ++n )
-	    {
-	      if ( distance < src_lats[n] )
-		{
-		  for ( i = 3; i > n; --i )
-		    {
-		      src_add [i] = src_add [i-1];
-		      src_lats[i] = src_lats[i-1];
-		    }
-		  search_result = -1;
-		  src_add [n] = grid1_add;
-		  src_lats[n] = distance;
-		  dist_min = src_lats[3];
-		  break;
-		}
-	    }
-        }
-    }
-
-  for ( n = 0; n < 4; ++n ) src_lons[n] = ONE/(src_lats[n] + TINY);
-  distance = 0.0;
-  for ( n = 0; n < 4; ++n ) distance += src_lons[n];
-  for ( n = 0; n < 4; ++n ) src_lats[n] = src_lons[n]/distance;
-
-  return (search_result);
-}  /* grid_search_new */
-#endif // GRID_SEARCH_TEST
-
 static
 int grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
@@ -2529,10 +2175,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   /*   Local variables */
   int  lwarn = TRUE;
   int  search_result;
-  long num_srch_cells;   /* num cells in restricted search arrays  */
-  long grid1_size;
   long grid2_size;
-  long nbins;
   long dst_add;                  /*  destination addresss */
   long n, icount;
   long iter;                     /*  iteration counters   */
@@ -2546,20 +2189,11 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   double plat, plon;             /*  lat/lon coords of destination point    */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
   double sum_wgts;               /*  sum of weights for normalization       */
-#if defined (GRID_SEARCH_TEST)
-  int    *srch_add;         /* global address of cells in srch arrays */
-#if defined (_OPENMP)
-  int **srch_add2;
-  int ompthID, i;
-#endif
-#endif
 
   if ( cdoTimer ) timer_start(timer_remap_bil);
 
   if ( ompNumThreads == 1 ) progressInit();
 
-  nbins = rg->num_srch_bins;
-  grid1_size = rg->grid1_size;
   grid2_size = rg->grid2_size;
 
   /* Compute mappings from grid1 to grid2 */
@@ -2567,43 +2201,18 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   if ( rg->grid1_rank != 2 )
     cdoAbort("Can not do bilinear interpolation when grid1_rank != 2"); 
 
-#if defined (GRID_SEARCH_TEST)
-#if defined (_OPENMP)
-  srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
-  for ( i = 0; i < ompNumThreads; i++ )
-    srch_add2[i] = (int *) malloc(grid1_size*sizeof(int));
-#else
-  srch_add = (int *) malloc(grid1_size*sizeof(int));
-#endif
-#endif
-
   /* Loop over destination grid */
 
 #if defined (_OPENMP)
-#if defined (GRID_SEARCH_TEST)
-#pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, nbins, grid1_size, cdoVerbose, grid2_size, rg, rv, Max_Iter, converge, lwarn, srch_add2) \
-  private(ompthID, srch_add, num_srch_cells, dst_add, n, icount, iter, src_add, src_lats, src_lons, \
-	  wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
-  schedule(dynamic,1)
-#else
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, grid2_size, rg, rv, Max_Iter, converge, lwarn) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, \
 	  wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
   schedule(dynamic,1)
 #endif
-#endif
   /* grid_loop1 */
   for ( dst_add = 0; dst_add < grid2_size; ++dst_add )
     {
-#if defined (GRID_SEARCH_TEST)
-#if defined (_OPENMP)
-      ompthID = omp_get_thread_num();
-      srch_add = srch_add2[ompthID];
-#endif
-#endif
-
       if ( ompNumThreads == 1 ) progressStatus(0, 1, (dst_add+1.)/grid2_size);
 
       if ( ! rg->grid2_mask[dst_add] ) continue;
@@ -2613,19 +2222,10 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
       /* Find nearest square of grid points on source grid  */
 
-#if defined (GRID_SEARCH_TEST)
-      num_srch_cells = get_srch_cells_2D(plat, plon, rg->grid1_dims, nbins, rg->bin_lats, rg->bin_lons,
-     					 rg->bin_addr1, rg->grid1_bound_box, grid1_size, srch_add);
-
-      search_result = grid_search_new(num_srch_cells, srch_add, rg, src_add, src_lats, src_lons, 
-				      plat, plon, rg->grid1_dims,
-				      rg->grid1_center_lat, rg->grid1_center_lon);
-#else
       search_result = grid_search(rg, src_add, src_lats, src_lons, 
 				  plat, plon, rg->grid1_dims,
 				  rg->grid1_center_lat, rg->grid1_center_lon,
 				  rg->grid1_bound_box, rg->bin_addr1);
-#endif
      
 
       /* Check to see if points are land points */
@@ -2715,17 +2315,6 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	    }
         }
     } /* grid_loop1 */
-
-#if defined (GRID_SEARCH_TEST)
-#if defined (_OPENMP)
-  for ( i = 0; i < ompNumThreads; ++i )
-    free(srch_add2[i]);
-
-  free(srch_add2);
-#else
-  free(srch_add);
-#endif
-#endif
 
   if ( cdoTimer ) timer_stop(timer_remap_bil);
 } /* remap_bilin */
