@@ -77,6 +77,11 @@ void set_source_data(double * source_data, double init_value,
 }
 
 
+int grid_search( int *restrict src_add, double *restrict src_lats, 
+		double *restrict src_lons, double plat, double plon, const int *restrict src_grid_dims)
+{
+}
+
 void testint_p(field_t *field1, field_t *field2)
 {
   int nlonIn, nlatIn;
@@ -84,6 +89,7 @@ void testint_p(field_t *field1, field_t *field2)
   int ilat, ilon;
   int gridIDin, gridIDout;
   int i, nmiss;
+  int gridsize2;
   double *lonIn, *latIn;
   double *lonOut, *latOut;
   double **fieldIn;
@@ -91,6 +97,7 @@ void testint_p(field_t *field1, field_t *field2)
   double *array = NULL;
   double *arrayIn, *arrayOut;
   double missval;
+  int testit = 1;
   /* static int index = 0; */
 
   gridIDin  = field1->grid;
@@ -114,6 +121,7 @@ void testint_p(field_t *field1, field_t *field2)
 
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
+  gridsize2 = gridInqSize(gridIDout);
   lonOut = (double *) malloc(nlonOut*sizeof(double));
   latOut = (double *) malloc(nlatOut*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
@@ -164,22 +172,25 @@ void testint_p(field_t *field1, field_t *field2)
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
 
-  for ( int i = 0; i < 100; ++i )
+  unsigned const * curr_src_corners;
+  for ( int i = 0; i < 10; ++i )
     {
       printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
+      curr_src_corners = get_dependencies_of_element(tgt_to_src_cell,i);
+      for ( int k = 0; k < tgt_to_src_cell.num_deps_per_element[i]; ++k )
+	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
     }
 
-  /* xxxxxx1
-  init_interpolation_g(&interpolation, *get_point_grid(&source_points), *get_point_grid(&target_points),
-		       *(struct const_dep_list*)&tgt_to_src_cell,
-		       AVERAGE);
-  */
-  //--------------------------------------------
-  // interpolate data
-  //--------------------------------------------
-  /* xxxxx1
-  do_interpolation(interpolation, &arrayIn, arrayOut);
-  */
+  for ( int i = 0; i < 10; ++i )
+    {
+      double lon = lonOut[i];
+      double lat = latOut[i];
+      printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
+      curr_src_corners = get_dependencies_of_element(tgt_to_src_cell,i);
+      for ( int k = 0; k < tgt_to_src_cell.num_deps_per_element[i]; ++k )
+	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
+    }
+
   /*
   for ( int j = 0; j < 10; ++j )
     {
@@ -405,7 +416,7 @@ void *YAR(void *argument)
 	  field2.nmiss   = 0;
 
 	  //  testint_p(&field1, &field2);
-	  testint_c(&field1, &field2);
+	  testint_p(&field1, &field2);
 
 	  nmiss = field2.nmiss;
 
