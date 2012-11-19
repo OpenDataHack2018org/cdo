@@ -55,7 +55,8 @@ case "${HOSTNAME}" in
                     --with-netcdf=/opt/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
-	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -fopenmp"
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -fopenmp -DHAVE_LIBYAC -I/Users/m214003/cdt/work/YAC/src" \
+                    LIBS="-L/Users/m214003/cdt/work/YAC/src -lyac"
 	;;
 # ia64-xxx-linux
     ds*)
