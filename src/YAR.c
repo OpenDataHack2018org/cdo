@@ -80,6 +80,7 @@ void set_source_data(double * source_data, double init_value,
 int grid_search( int *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons, double plat, double plon, const int *restrict src_grid_dims)
 {
+  return 0;
 }
 
 void testint_p(field_t *field1, field_t *field2)
@@ -89,7 +90,7 @@ void testint_p(field_t *field1, field_t *field2)
   int ilat, ilon;
   int gridIDin, gridIDout;
   int i, nmiss;
-  int gridsize2;
+  int gridsize1, gridsize2;
   double *lonIn, *latIn;
   double *lonOut, *latOut;
   double **fieldIn;
@@ -111,6 +112,7 @@ void testint_p(field_t *field1, field_t *field2)
 
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
+  gridsize1 = gridInqSize(gridIDin);
   lonIn = (double *) malloc(nlonIn*sizeof(double));
   latIn = (double *) malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
@@ -191,6 +193,16 @@ void testint_p(field_t *field1, field_t *field2)
 	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
     }
 
+  for ( int i = 0; i < gridsize2; ++i )
+    {
+      double lon = lonOut[i];
+      double lat = latOut[i];
+      curr_src_corners = get_dependencies_of_element(tgt_to_src_cell,i);
+      for ( int k = 0; k < tgt_to_src_cell.num_deps_per_element[i]; ++k )
+	{
+	}
+    }
+
   /*
   for ( int j = 0; j < 10; ++j )
     {
@@ -217,6 +229,7 @@ void testint_c(field_t *field1, field_t *field2)
   int ilat, ilon;
   int gridIDin, gridIDout;
   int i, nmiss;
+  int gridsize1, gridsize2;
   double *lonIn, *latIn;
   double *lonOut, *latOut;
   double **fieldIn;
@@ -224,6 +237,7 @@ void testint_c(field_t *field1, field_t *field2)
   double *array = NULL;
   double *arrayIn, *arrayOut;
   double missval;
+  double dxIn, dxOut;
   /* static int index = 0; */
 
   gridIDin  = field1->grid;
@@ -237,21 +251,26 @@ void testint_c(field_t *field1, field_t *field2)
 
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
+  gridsize1 = gridInqSize(gridIDin);
   lonIn = (double *) malloc(nlonIn*sizeof(double));
   latIn = (double *) malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
+  dxIn = lonIn[1] - lonIn[0];
 
   if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
     cdoAbort("Target grid has no values");
 
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
+  gridsize2 = gridInqSize(gridIDout);
   lonOut = (double *) malloc(nlonOut*sizeof(double));
   latOut = (double *) malloc(nlatOut*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
+  dxOut = lonOut[1] - lonOut[0];
 
+  printf("dxIn: %g   dxOut: %g\n", dxIn, dxOut);
 #if defined (HAVE_LIBYAC)
 
   //--------------------------------------------
@@ -297,9 +316,79 @@ void testint_c(field_t *field1, field_t *field2)
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
 
-  for ( int i = 0; i < 100; ++i )
+
+  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+
+  double *weight;
+  weight = (double *) malloc(gridsize1*sizeof(double));
+
+  struct grid_cell *SourceCell;
+  SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
+
+  for ( int n = 0; n <  gridsize1; n++ ) {
+    SourceCell[n].num_corners   = 4;
+    SourceCell[n].edge_type     = quad_type;
+    SourceCell[n].coordinates_x = malloc ( 4 * sizeof(SourceCell[n].coordinates_x[0]) );
+    SourceCell[n].coordinates_y = malloc ( 4 * sizeof(SourceCell[n].coordinates_y[0]) );
+  }
+
+  struct grid_cell  TargetCell;
+
+  TargetCell.num_corners   = 4;
+  TargetCell.edge_type     = quad_type;
+
+  TargetCell.coordinates_x = malloc ( 4 * sizeof(*TargetCell.coordinates_x) );
+  TargetCell.coordinates_y = malloc ( 4 * sizeof(*TargetCell.coordinates_y) );
+
+  unsigned const * curr_deps;
+
+  for ( int i = 0; i < gridsize2; ++i )
     {
-      printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
+      int index2 = i;
+      int ilat2 = index2/nlonOut;
+      int ilon2 = index2 - ilat2*nlonOut;
+
+      TargetCell.coordinates_x[0] =  lonOut[ilon2]-dxOut/2;
+      TargetCell.coordinates_y[0] =  latOut[ilat2]-dxOut/2;
+      TargetCell.coordinates_x[1] =  lonOut[ilon2]+dxOut/2;
+      TargetCell.coordinates_y[1] =  latOut[ilat2]-dxOut/2;
+      TargetCell.coordinates_x[2] =  lonOut[ilon2]+dxOut/2;
+      TargetCell.coordinates_y[2] =  latOut[ilat2]+dxOut/2;
+      TargetCell.coordinates_x[3] =  lonOut[ilon2]-dxOut/2;
+      TargetCell.coordinates_y[3] =  latOut[ilat2]-dxOut/2;
+
+      if ( i < 10 )
+	printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
+      int num_deps = tgt_to_src_cell.num_deps_per_element[i];
+      if ( num_deps > 0 ) curr_deps = get_dependencies_of_element(tgt_to_src_cell, i);
+      for ( int k = 0; k < num_deps; ++k )
+	{
+	  int index1 = curr_deps[k];
+	  int ilat1 = index1/nlonIn;
+	  int ilon1 = index1 - ilat1*nlonIn;
+	  if ( i < 10 )
+	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
+	
+	  SourceCell[k].coordinates_x[0] =  lonIn[ilon1]-dxIn/2;
+	  SourceCell[k].coordinates_y[0] =  latIn[ilat1]-dxIn/2;
+	  SourceCell[k].coordinates_x[1] =  lonIn[ilon1]+dxIn/2;
+	  SourceCell[k].coordinates_y[1] =  latIn[ilat1]-dxIn/2;
+	  SourceCell[k].coordinates_x[2] =  lonIn[ilon1]+dxIn/2;
+	  SourceCell[k].coordinates_y[2] =  latIn[ilat1]+dxIn/2;
+	  SourceCell[k].coordinates_x[3] =  lonIn[ilon1]-dxIn/2;
+	  SourceCell[k].coordinates_y[3] =  latIn[ilat1]-dxIn/2;
+	}
+      
+      polygon_partial_weights (num_deps, SourceCell, TargetCell, weight );
+      for ( int k = 0; k < num_deps; ++k )
+	{
+	  int index1 = curr_deps[k];
+	  int ilat1 = index1/nlonIn;
+	  int ilon1 = index1 - ilat1*nlonIn;
+	  // if ( i < 10 )
+	    printf("  dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
+	}
+      // correct_weights ( nSourceCells, weight );
     }
 
   /* xxxxxx1
@@ -334,6 +423,7 @@ void testint_c(field_t *field1, field_t *field2)
 
 void *YAR(void *argument)
 {
+  int YARBIL, YARCON;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, ngrids;
@@ -352,7 +442,8 @@ void *YAR(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("yarbil",  0, 0, NULL);
+  YARBIL = cdoOperatorAdd("yarbil",  0, 0, NULL);
+  YARCON = cdoOperatorAdd("yarcon",  0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -415,8 +506,12 @@ void *YAR(void *argument)
 	  field2.ptr     = array2;
 	  field2.nmiss   = 0;
 
-	  //  testint_p(&field1, &field2);
-	  testint_p(&field1, &field2);
+	  if ( operatorID == YARBIL )
+	    testint_p(&field1, &field2);
+	  else if ( operatorID == YARCON )
+	    testint_c(&field1, &field2);
+	  else
+	    cdoAbort("Not implemented!");
 
 	  nmiss = field2.nmiss;
 
