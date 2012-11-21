@@ -824,8 +824,7 @@ void pstreamClose(int pstreamID)
 	  pipe = pstreamptr->pipe;
 	  pthread_mutex_lock(pipe->mutex);
 	  pipe->EOP = TRUE;
-	  if ( PSTREAM_Debug )
-	    Message("%s read closed", pstreamptr->name);
+	  if ( PSTREAM_Debug ) Message("%s read closed", pstreamptr->name);
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
 	  pthread_cond_signal(pipe->tsInq);
@@ -848,8 +847,7 @@ void pstreamClose(int pstreamID)
 	  pipe = pstreamptr->pipe;
 	  pthread_mutex_lock(pipe->mutex);
 	  pipe->EOP = TRUE;
-	  if ( PSTREAM_Debug )
-	    Message("%s write closed", pstreamptr->name);
+	  if ( PSTREAM_Debug ) Message("%s write closed", pstreamptr->name);
 	  pthread_mutex_unlock(pipe->mutex);     
 	  pthread_cond_signal(pipe->tsDef);
 	  pthread_cond_signal(pipe->tsInq);
@@ -857,8 +855,7 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_lock(pipe->mutex);
 	  while ( pstreamptr->isopen )
 	    {
-	      if ( PSTREAM_Debug )
-		Message("wait of read close");
+	      if ( PSTREAM_Debug ) Message("wait of read close");
 	      pthread_cond_wait(pipe->isclosed, pipe->mutex);
 	    }
 	  pthread_mutex_unlock(pipe->mutex);

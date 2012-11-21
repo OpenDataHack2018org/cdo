@@ -314,8 +314,10 @@ void testint_c(field_t *field1, field_t *field2)
  
   do_cell_search(*get_point_grid(&target_points), search_id, &tgt_to_src_cell);
 
-  printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
 
+  printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
+  int num_elements = tgt_to_src_cell.num_elements;
+  printf("dep num elements: %d\n", tgt_to_src_cell.num_elements);
 
   enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
 
@@ -342,7 +344,7 @@ void testint_c(field_t *field1, field_t *field2)
 
   unsigned const * curr_deps;
 
-  for ( int i = 0; i < gridsize2; ++i )
+  for ( int i = 0; i < num_elements; ++i )
     {
       int index2 = i;
       int ilat2 = index2/nlonOut;
@@ -357,7 +359,7 @@ void testint_c(field_t *field1, field_t *field2)
       TargetCell.coordinates_x[3] =  lonOut[ilon2]-dxOut/2;
       TargetCell.coordinates_y[3] =  latOut[ilat2]-dxOut/2;
 
-      if ( i < 10 )
+      //if ( i < 10 )
 	printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
       int num_deps = tgt_to_src_cell.num_deps_per_element[i];
       if ( num_deps > 0 ) curr_deps = get_dependencies_of_element(tgt_to_src_cell, i);
@@ -386,7 +388,7 @@ void testint_c(field_t *field1, field_t *field2)
 	  int ilat1 = index1/nlonIn;
 	  int ilon1 = index1 - ilat1*nlonIn;
 	  // if ( i < 10 )
-	    printf("  dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
+	  //printf("  dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
 	}
       // correct_weights ( nSourceCells, weight );
     }
