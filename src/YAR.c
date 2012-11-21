@@ -28,6 +28,8 @@
 #include "search.h"
 #endif
 
+int lout = 0;
+
 static
 void gen_xbounds(int nx, double *xvals, double *xbounds)
 {
@@ -357,9 +359,17 @@ void testint_c(field_t *field1, field_t *field2)
       TargetCell.coordinates_x[2] =  lonOut[ilon2]+dxOut/2;
       TargetCell.coordinates_y[2] =  latOut[ilat2]+dxOut/2;
       TargetCell.coordinates_x[3] =  lonOut[ilon2]-dxOut/2;
-      TargetCell.coordinates_y[3] =  latOut[ilat2]-dxOut/2;
+      TargetCell.coordinates_y[3] =  latOut[ilat2]+dxOut/2;
 
-      //if ( i < 10 )
+      if ( lout )
+	{
+	  printf("target:\n");
+	  for ( int n = 0; n < 4; ++n )
+	    printf(" %g %g", TargetCell.coordinates_x[n], TargetCell.coordinates_y[n]);
+	  printf("\n");
+	}
+
+      if ( lout )
 	printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
       int num_deps = tgt_to_src_cell.num_deps_per_element[i];
       if ( num_deps > 0 ) curr_deps = get_dependencies_of_element(tgt_to_src_cell, i);
@@ -368,7 +378,7 @@ void testint_c(field_t *field1, field_t *field2)
 	  int index1 = curr_deps[k];
 	  int ilat1 = index1/nlonIn;
 	  int ilon1 = index1 - ilat1*nlonIn;
-	  if ( i < 10 )
+	  if ( lout )
 	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
 	
 	  SourceCell[k].coordinates_x[0] =  lonIn[ilon1]-dxIn/2;
@@ -378,7 +388,14 @@ void testint_c(field_t *field1, field_t *field2)
 	  SourceCell[k].coordinates_x[2] =  lonIn[ilon1]+dxIn/2;
 	  SourceCell[k].coordinates_y[2] =  latIn[ilat1]+dxIn/2;
 	  SourceCell[k].coordinates_x[3] =  lonIn[ilon1]-dxIn/2;
-	  SourceCell[k].coordinates_y[3] =  latIn[ilat1]-dxIn/2;
+	  SourceCell[k].coordinates_y[3] =  latIn[ilat1]+dxIn/2;
+	  if ( lout )
+	    {
+	      printf("source: %d\n", k);
+	      for ( int n = 0; n < 4; ++n )
+		printf(" %g %g", SourceCell[k].coordinates_x[n], SourceCell[k].coordinates_y[n]);
+	      printf("\n");
+	    }
 	}
       
       polygon_partial_weights (num_deps, SourceCell, TargetCell, weight );
@@ -387,8 +404,8 @@ void testint_c(field_t *field1, field_t *field2)
 	  int index1 = curr_deps[k];
 	  int ilat1 = index1/nlonIn;
 	  int ilon1 = index1 - ilat1*nlonIn;
-	  // if ( i < 10 )
-	  //printf("  dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
+	  if ( lout )
+	    printf("  dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
 	}
       // correct_weights ( nSourceCells, weight );
     }
