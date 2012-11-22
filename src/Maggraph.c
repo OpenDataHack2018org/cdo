@@ -638,8 +638,9 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   /* To be obtained from Meta Data */
   /*sprintf( lines[0],"%s","ExpID : " );*/ 
   /*sprintf( lines[0],"%sxxxx  Variable : %s[%s]",lines[0], varname, varunits );*/
-  sprintf( lines[0],"Variable : %s[%s]",varname, varunits );
-  sprintf( lines[0],"%s  Date : %s --%s",lines[0], min_date_time_str, max_date_time_str );
+  // sprintf( lines[0],"Variable : %s[%s]",varname, varunits );
+  // sprintf( lines[0],"%s  Date : %s --%s",lines[0], min_date_time_str, max_date_time_str );
+  sprintf( lines[0],"Variable : %s[%s]  Date : %s --%s",varname, varunits, min_date_time_str, max_date_time_str );
   mag_set1c( "text_lines", (const char**)lines, 1 );
   
   mag_setc("text_html", "true");
