@@ -81,6 +81,8 @@ void *Mergetime(void *argument)
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
+      if ( cdoVerbose ) cdoPrint("process: %s", cdoStreamName(fileID));
+
       streamID1 = streamOpenRead(cdoStreamName(fileID));
 
       vlistID1 = streamInqVlist(streamID1);
