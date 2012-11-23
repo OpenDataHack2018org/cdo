@@ -26,9 +26,10 @@
 #include "grid_reg2d.h"
 #include "event.h"
 #include "search.h"
+#include "clipping.h"
 #endif
 
-int lout = 0;
+int lout = 1;
 
 static
 void gen_xbounds(int nx, double *xvals, double *xbounds)
@@ -234,6 +235,8 @@ void testint_c(field_t *field1, field_t *field2)
   int gridsize1, gridsize2;
   double *lonIn, *latIn;
   double *lonOut, *latOut;
+  double *xlonIn, *xlatIn;
+  double *xlonOut, *xlatOut;
   double **fieldIn;
   double **field;
   double *array = NULL;
@@ -254,11 +257,19 @@ void testint_c(field_t *field1, field_t *field2)
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   gridsize1 = gridInqSize(gridIDin);
-  lonIn = (double *) malloc(nlonIn*sizeof(double));
-  latIn = (double *) malloc(nlatIn*sizeof(double));
+  lonIn = (double *) malloc((nlonIn+1)*sizeof(double));
+  latIn = (double *) malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
+  xlonIn = (double *) malloc((nlonIn)*sizeof(double));
+  xlatIn = (double *) malloc((nlatIn)*sizeof(double));
+  gridInqXvals(gridIDin, xlonIn);
+  gridInqYvals(gridIDin, xlatIn);
   dxIn = lonIn[1] - lonIn[0];
+  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] -= dxIn/2;
+  for ( int i = 0; i < nlatIn; ++i ) latIn[i] -= dxIn/2;
+  //  latIn[nlatIn] = latIn[nlatIn-1] + dxIn;
+  latIn[nlatIn] = 90;
 
   if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
     cdoAbort("Target grid has no values");
@@ -266,12 +277,19 @@ void testint_c(field_t *field1, field_t *field2)
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
   gridsize2 = gridInqSize(gridIDout);
-  lonOut = (double *) malloc(nlonOut*sizeof(double));
-  latOut = (double *) malloc(nlatOut*sizeof(double));
+  lonOut = (double *) malloc((nlonOut+1)*sizeof(double));
+  latOut = (double *) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
+  xlonOut = (double *) malloc((nlonOut+1)*sizeof(double));
+  xlatOut = (double *) malloc((nlatOut+1)*sizeof(double));
+  gridInqXvals(gridIDout, xlonOut);
+  gridInqYvals(gridIDout, xlatOut);
   dxOut = lonOut[1] - lonOut[0];
-
+  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] -= dxOut/2;
+  for ( int i = 0; i < nlatOut; ++i ) latOut[i] -= dxOut/2;
+  //latOut[nlatOut] = latIn[nlatOut-1] + dxIn;
+  latOut[nlatOut] = 90;
   printf("dxIn: %g   dxOut: %g\n", dxIn, dxOut);
 #if defined (HAVE_LIBYAC)
 
@@ -285,19 +303,19 @@ void testint_c(field_t *field1, field_t *field2)
   num_target_cells[0] = nlonOut;
   num_target_cells[1] = nlatOut;
 
-  unsigned cyclic[2] = {0,0};
+  unsigned cyclic[2] = {1,0};
   struct grid source_grid, target_grid;
 
-  init_reg2d_grid(&source_grid, NULL, NULL, num_source_cells, cyclic);
-  init_reg2d_grid(&target_grid, NULL, NULL, num_target_cells, cyclic);
+  init_reg2d_grid(&source_grid, lonIn, latIn, num_source_cells, cyclic);
+  init_reg2d_grid(&target_grid, lonOut, latOut, num_target_cells, cyclic);
 
   struct points source_points, target_points;
 
   //--------------------------------------------
   // define points
   //--------------------------------------------
-  init_points(&source_points, &source_grid, CELL, lonIn, latIn);
-  init_points(&target_points, &target_grid, CELL, lonOut, latOut);
+  // init_points(&source_points, &source_grid, CELL, lonIn, latIn);
+  // init_points(&target_points, &target_grid, CELL, lonOut, latOut);
 
   //--------------------------------------------
   // initialise interpolation
@@ -307,14 +325,12 @@ void testint_c(field_t *field1, field_t *field2)
   unsigned search_id;
   //struct interpolation interpolation;
 
-  // seg fault:  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_grid)));
-  // seg fault:  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_grid)));
-  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_points)));
-  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_points)));
+  // printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_points)));
+  //printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_points)));
 
-  search_id = search_init(get_point_grid(&source_points));
+  search_id = search_init(&source_grid);
  
-  do_cell_search(*get_point_grid(&target_points), search_id, &tgt_to_src_cell);
+  do_cell_search(target_grid, search_id, &tgt_to_src_cell);
 
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
@@ -352,14 +368,14 @@ void testint_c(field_t *field1, field_t *field2)
       int ilat2 = index2/nlonOut;
       int ilon2 = index2 - ilat2*nlonOut;
 
-      TargetCell.coordinates_x[0] =  lonOut[ilon2]-dxOut/2;
-      TargetCell.coordinates_y[0] =  latOut[ilat2]-dxOut/2;
-      TargetCell.coordinates_x[1] =  lonOut[ilon2]+dxOut/2;
-      TargetCell.coordinates_y[1] =  latOut[ilat2]-dxOut/2;
-      TargetCell.coordinates_x[2] =  lonOut[ilon2]+dxOut/2;
-      TargetCell.coordinates_y[2] =  latOut[ilat2]+dxOut/2;
-      TargetCell.coordinates_x[3] =  lonOut[ilon2]-dxOut/2;
-      TargetCell.coordinates_y[3] =  latOut[ilat2]+dxOut/2;
+      TargetCell.coordinates_x[0] =  xlonOut[ilon2]-dxOut/2;
+      TargetCell.coordinates_y[0] =  xlatOut[ilat2]-dxOut/2;
+      TargetCell.coordinates_x[1] =  xlonOut[ilon2]+dxOut/2;
+      TargetCell.coordinates_y[1] =  xlatOut[ilat2]-dxOut/2;
+      TargetCell.coordinates_x[2] =  xlonOut[ilon2]+dxOut/2;
+      TargetCell.coordinates_y[2] =  xlatOut[ilat2]+dxOut/2;
+      TargetCell.coordinates_x[3] =  xlonOut[ilon2]-dxOut/2;
+      TargetCell.coordinates_y[3] =  xlatOut[ilat2]+dxOut/2;
 
       if ( lout )
 	{
@@ -381,14 +397,14 @@ void testint_c(field_t *field1, field_t *field2)
 	  if ( lout )
 	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
 	
-	  SourceCell[k].coordinates_x[0] =  lonIn[ilon1]-dxIn/2;
-	  SourceCell[k].coordinates_y[0] =  latIn[ilat1]-dxIn/2;
-	  SourceCell[k].coordinates_x[1] =  lonIn[ilon1]+dxIn/2;
-	  SourceCell[k].coordinates_y[1] =  latIn[ilat1]-dxIn/2;
-	  SourceCell[k].coordinates_x[2] =  lonIn[ilon1]+dxIn/2;
-	  SourceCell[k].coordinates_y[2] =  latIn[ilat1]+dxIn/2;
-	  SourceCell[k].coordinates_x[3] =  lonIn[ilon1]-dxIn/2;
-	  SourceCell[k].coordinates_y[3] =  latIn[ilat1]+dxIn/2;
+	  SourceCell[k].coordinates_x[0] =  xlonIn[ilon1]-dxIn/2;
+	  SourceCell[k].coordinates_y[0] =  xlatIn[ilat1]-dxIn/2;
+	  SourceCell[k].coordinates_x[1] =  xlonIn[ilon1]+dxIn/2;
+	  SourceCell[k].coordinates_y[1] =  xlatIn[ilat1]-dxIn/2;
+	  SourceCell[k].coordinates_x[2] =  xlonIn[ilon1]+dxIn/2;
+	  SourceCell[k].coordinates_y[2] =  xlatIn[ilat1]+dxIn/2;
+	  SourceCell[k].coordinates_x[3] =  xlonIn[ilon1]-dxIn/2;
+	  SourceCell[k].coordinates_y[3] =  xlatIn[ilat1]+dxIn/2;
 	  if ( lout )
 	    {
 	      printf("source: %d\n", k);
@@ -405,7 +421,7 @@ void testint_c(field_t *field1, field_t *field2)
 	  int ilat1 = index1/nlonIn;
 	  int ilon1 = index1 - ilat1*nlonIn;
 	  if ( lout )
-	    printf("  dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
+	    printf("  result dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
 	}
       // correct_weights ( nSourceCells, weight );
     }
