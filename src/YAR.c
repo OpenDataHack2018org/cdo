@@ -29,7 +29,7 @@
 #include "clipping.h"
 #endif
 
-int lout = 1;
+int lout = 0;
 
 static
 void gen_xbounds(int nx, double *xvals, double *xbounds)
@@ -426,17 +426,6 @@ void testint_c(field_t *field1, field_t *field2)
       // correct_weights ( nSourceCells, weight );
     }
 
-  /* xxxxxx1
-  init_interpolation_g(&interpolation, *get_point_grid(&source_points), *get_point_grid(&target_points),
-		       *(struct const_dep_list*)&tgt_to_src_cell,
-		       AVERAGE);
-  */
-  //--------------------------------------------
-  // interpolate data
-  //--------------------------------------------
-  /* xxxxx1
-  do_interpolation(interpolation, &arrayIn, arrayOut);
-  */
   /*
   for ( int j = 0; j < 10; ++j )
     {
