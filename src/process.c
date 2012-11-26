@@ -36,10 +36,11 @@
 #include "dmemory.h"
 
 
-#define  MAX_PROCESS   128
-#define  MAX_STREAM     64
-#define  MAX_OPERATOR  128
-#define  MAX_ARGC     4096
+#define  MAX_PROCESS    128
+#define  MAX_STREAM      64
+#define  MAX_OPERATOR   128
+#define  MAX_OARGC     4096
+#define  MAX_FILES    65536
 
 
 typedef struct {
@@ -73,7 +74,7 @@ typedef struct {
   char      *operatorName;
   char      *operatorArg;
   int        oargc;
-  char      *oargv[MAX_ARGC];
+  char      *oargv[MAX_OARGC];
   char       prompt[64];
   short      noper;
   operator_t operator[MAX_OPERATOR];
@@ -511,7 +512,7 @@ void setStreamNames(int argc, char *argv[])
   int globArgc = 1;
   int globArgcStart;
   char *streamname;
-  size_t len;
+  int len;
 
   while ( globArgc < argc )
     {
@@ -526,9 +527,9 @@ void setStreamNames(int argc, char *argv[])
 	  for ( i = globArgcStart; i < globArgc; i++ ) len += strlen(argv[i]) + 1;
 	  streamname = (char *) malloc(len);
 	  memcpy(streamname, argv[globArgcStart], len);
-	  for ( i = 1; i < (int) len-1; i++ ) if ( streamname[i] == '\0' ) streamname[i] = ' ';
+	  for ( i = 1; i < len-1; i++ ) if ( streamname[i] == '\0' ) streamname[i] = ' ';
 	  Process[processID].streamNames[Process[processID].streamCnt++] = streamname;
-	  //	  printf("streamname1: %s\n", streamname);
+	  // printf("streamname1: %s\n", streamname);
 	}
       else
 	{
@@ -536,24 +537,94 @@ void setStreamNames(int argc, char *argv[])
 	  streamname = (char *) malloc(len);
 	  strcpy(streamname, argv[globArgc]);
 	  Process[processID].streamNames[Process[processID].streamCnt++] = streamname;
-	  //	  printf("streamname2: %s\n", streamname);
+	  // printf("streamname2: %s\n", streamname);
 	  globArgc++;
 	}
     }
 }
 
 static
-void checkStreamCnt(void)
+int expand_wildcards(int processID, int streamCnt)
+{
+  int i;
+  const char *streamname0 = Process[processID].streamNames[0];
+  int len = strlen(streamname0);
+
+  for ( i = 0; i < len; ++i ) if ( streamname0[i] == '?' || streamname0[i] == '*' ) break;
+  if ( i < len )
+    {
+      char *pattern = glob_pattern(streamname0);
+      if ( strcmp(streamname0, pattern) != 0 )
+	{
+	  int gargc = 0;
+	  char *gargv[MAX_FILES];
+	  int len;
+	  gargv[gargc++] = pattern;
+	  len = strlen(pattern);
+	  for ( i = 1; i < len; ++i )
+	    if ( pattern[i] == ' ' )
+	      {
+		pattern[i] = 0;
+		i++;
+		gargv[gargc++] = &pattern[i];
+		if ( gargc >= MAX_FILES )
+		  Error("Internal problem! More than %d arguments.", MAX_FILES);
+	      }
+
+	  // for ( i = 0; i < gargc; ++i ) printf("pattern %d >%s<\n", i+1, gargv[i]);
+
+	  streamCnt = streamCnt - 1 + gargc;
+	  
+	  /*
+	  for ( i = 0; i < Process[processID].streamCnt; ++i )
+	    printf("stream %d <%s>\n", i+1, Process[processID].streamNames[i]);
+	  */
+	  Process[processID].streamNames = (char **) realloc(Process[processID].streamNames, streamCnt*sizeof(char *));
+	      
+	  // move output streams to the end
+	  for ( i = 1; i < Process[processID].streamCnt; ++i )
+	    Process[processID].streamNames[i+gargc-1] = Process[processID].streamNames[i];
+
+	  free(Process[processID].streamNames[0]);
+
+	  for ( i = 0; i < gargc; ++i )
+	    {
+	      char *streamname;
+	      len = strlen(gargv[i]) + 1;
+	      streamname = (char *) malloc(len);
+	      strcpy(streamname, gargv[i]);
+	      Process[processID].streamNames[i] = streamname;
+	    }
+	  
+	  Process[processID].streamCnt = streamCnt;
+	  /*
+	  for ( i = 0; i < Process[processID].streamCnt; ++i )
+	    printf("stream %d <%s>\n", i+1, Process[processID].streamNames[i]);
+	  */
+	}
+      
+      free(pattern);
+    }
+
+  return 1;
+}
+
+static
+int checkStreamCnt(void)
 {
   int processID = processSelf();
   int streamInCnt, streamOutCnt;
+  int streamInCnt0;
   int streamCnt = 0;
   int i, j;
   int obase = FALSE;
+  int status = 0;
   const char *caller = processInqPrompt();
 
   streamInCnt  = operatorStreamInCnt(Process[processID].operatorName);
   streamOutCnt = operatorStreamOutCnt(Process[processID].operatorName);
+
+  streamInCnt0 = streamInCnt;
 
   if ( streamOutCnt == -1 )
     {
@@ -564,6 +635,7 @@ void checkStreamCnt(void)
   if ( streamInCnt == -1 && streamOutCnt == -1 )
     Errorc("I/O stream counts unlimited no allowed!");
     
+  // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
   if ( streamInCnt == -1 )
     {
       streamInCnt = Process[processID].streamCnt - streamOutCnt;
@@ -575,8 +647,10 @@ void checkStreamCnt(void)
       streamOutCnt = Process[processID].streamCnt - streamInCnt;
       if ( streamInCnt < 1 ) Errorc("Output streams missing!");
     }
+  // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
 
   streamCnt = streamInCnt + streamOutCnt;
+  // printf(" streamCnt %d %d\n", Process[processID].streamCnt, streamCnt);
 
   if ( Process[processID].streamCnt > streamCnt )
     Errorc("Too many streams!"
@@ -601,10 +675,13 @@ void checkStreamCnt(void)
 	      Errorc("Output file name %s is equal to input file name"
 		     " on position %d!\n", Process[processID].streamNames[i], j+1);
 	}
-    }  
-}
+    }
 
-#define  MAX_ARGV  8192
+  if ( streamInCnt == 1 && streamInCnt0 == -1 )
+    status = expand_wildcards(processID, streamCnt);
+
+  return (status);
+}
 
 static
 void setStreams(const char *argument)
@@ -612,8 +689,9 @@ void setStreams(const char *argument)
   int processID = processSelf();
   int streamCnt;
   int i;
+  int status;
   int argc = 0;
-  char *argv[MAX_ARGV];
+  char *argv[MAX_FILES];
   char *string;
   size_t arglen;
 
@@ -628,8 +706,8 @@ void setStreams(const char *argument)
 	{
 	  string[i] = '\0';
 	  argv[argc++] = &string[i+1];
-	  if ( argc >= MAX_ARGV )
-	    Error("Internal problem! More than %d arguments.", argc);
+	  if ( argc >= MAX_FILES )
+	    Error("Internal problem! More than %d arguments.", MAX_FILES);
 	}
     }
 
@@ -646,10 +724,11 @@ void setStreams(const char *argument)
 
   setStreamNames(argc, argv);
 
-  checkStreamCnt();
+  status = checkStreamCnt();
 
-  if ( Process[processID].streamCnt != streamCnt )
+  if ( status == 0 && Process[processID].streamCnt != streamCnt )
     Error("Internal problem with stream count %d %d", Process[processID].streamCnt, streamCnt);
+
   /*
   for ( i = 0; i < streamCnt; i++ )
     fprintf(stderr, "stream %d %s\n", i+1, Process[processID].streamNames[i]);
@@ -684,8 +763,8 @@ void processDefArgument(const char *argument)
 	  *commapos++ = '\0';
 	  if ( strlen(commapos) )
 	    {
-	      if ( oargc >= MAX_ARGC )
-		cdoAbort("Too many parameter (limit=%d)!", MAX_ARGC);
+	      if ( oargc >= MAX_OARGC )
+		cdoAbort("Too many parameter (limit=%d)!", MAX_OARGC);
 
 	      oargv[oargc++] = commapos;
 	    }
