@@ -5785,8 +5785,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   int nc_file_id;           /* id for netCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
   int nc_dstgrdsize_id;     /* id for destination grid size             */
-  int nc_srcgrdcorn_id;     /* id for number of source grid corners     */
-  int nc_dstgrdcorn_id;     /* id for number of dest grid corners       */
+  int nc_srcgrdcorn_id = 0; /* id for number of source grid corners     */
+  int nc_dstgrdcorn_id = 0; /* id for number of dest grid corners       */
   int nc_srcgrdrank_id;     /* id for source grid rank                  */
   int nc_dstgrdrank_id;     /* id for dest grid rank                    */
   int nc_numlinks_id;       /* id for number of links in mapping        */
