@@ -692,6 +692,16 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
     }
   if ( *lat2 > nlat1 )
     {
+      cdoWarning("First latitude index out of range, set to %d!", nlat1);
+      *lat1 = nlat1;
+    }
+  if ( *lat2 < 1 )
+    {
+      cdoWarning("First latitude index out of range, set to 1!");
+      *lat2 = 1;
+    }
+  if ( *lat2 > nlat1 )
+    {
       cdoWarning("Last latitude index out of range, set to %d!", nlat1);
       *lat2 = nlat1;
     }

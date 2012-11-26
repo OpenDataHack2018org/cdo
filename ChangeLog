@@ -5,7 +5,8 @@
 
 2012-11-26 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* added workaround to combine CDO operators with the result of mergetime, merge, copy, cat, ens<STAT>
+	* added workaround to combine CDO operators with the result of	mergetime, merge, copy, cat, ens<STAT>
+	* Selbox: extend check for latitude indices
 
 2012-11-21 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
