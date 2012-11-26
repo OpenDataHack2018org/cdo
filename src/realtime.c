@@ -32,7 +32,7 @@ int util_cputime(double *user_time, double *system_time)
 #else
 #if defined (HAVE_SYS_TIMES_H)
   struct tms tbuf;
-  if (times(&tbuf) == -1) return ((int) (-1)); 
+  if (times(&tbuf) == ((clock_t)-1)) return ((int) (-1)); 
 
   *user_time   = ((double) tbuf.tms_utime) / clock_ticks; 
   *system_time = ((double) tbuf.tms_stime) / clock_ticks;
