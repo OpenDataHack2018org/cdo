@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
 
+2012-11-26 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added workaround to combine CDO operators with the result of mergetime, merge, copy, cat, ens<STAT>
+
 2012-11-21 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* enlarge: added missing value support [request: Chris Fletcher]
