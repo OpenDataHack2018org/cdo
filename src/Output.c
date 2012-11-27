@@ -340,7 +340,7 @@ void *Output(void *argument)
 			  fprintf(fp, "%g %g %g\n", x, y, z);
 			  x = x0+dx;  y = y0;
 			  fprintf(fp, "%g %g %g\n", x, y, z);
-			  x0 = x; y0 = y0; z0 = z;
+			  x0 = x; /*y0 = y0;*/ z0 = z;
 			}
 		      x = x0;  y = y0; z = fmin;
 		      fprintf(fp, "%g %g %g\n", x, y, z);
@@ -360,7 +360,7 @@ void *Output(void *argument)
 			  fprintf(fp, "%g %g %g\n", x, y, z);
 			  x = x0;  y = y0+dx;
 			  fprintf(fp, "%g %g %g\n", x, y, z);
-			  x0 = x0; y0 = y; z0 = z;
+			  /*x0 = x0;*/ y0 = y; z0 = z;
 			}
 		      x = x0;  y = y0; z = fmin;
 		      fprintf(fp, "%g %g %g\n", x, y, z);

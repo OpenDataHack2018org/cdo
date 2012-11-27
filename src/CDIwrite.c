@@ -122,7 +122,6 @@ void *CDIwrite(void *argument)
   int streamID;
   int tsID, varID, levelID;
   int gridsize, i;
-  int rval, rstart, rinc;
   int vlistID;
   int gridID = -1, zaxisID, taxisID;
   int vdate, vtime, julday;
@@ -240,7 +239,6 @@ void *CDIwrite(void *argument)
 
       for ( tsID = 0; tsID < ntimesteps; tsID++ )
 	{
-	  rval  = rstart + rinc*tsID;
 	  vdate = julday_to_date(CALENDAR_PROLEPTIC, julday + tsID);
 	  vtime = 0;
 	  taxisDefVdate(taxisID, vdate);

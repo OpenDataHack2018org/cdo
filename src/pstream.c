@@ -1538,7 +1538,7 @@ void cdoFinish(void)
 #if defined (_WIN32)
 	    fprintf(stderr, "%s: Processed %I64d value%s from %d variable%s",
 #else
-	    fprintf(stderr, "%s: Processed %lld value%s from %d variable%s",
+	    fprintf(stderr, "%s: Processed %jd value%s from %d variable%s",
 #endif
 		    processInqPrompt(),
 		    nvals, nvals > 1 ? "s" : "",
