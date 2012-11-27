@@ -6,6 +6,7 @@
 2012-11-27 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: use pstreamInqByteorder() [Bug #3041]
+	* zonSTAT: check whether a zonal grid already exists (bug fix)
 
 2012-11-26 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

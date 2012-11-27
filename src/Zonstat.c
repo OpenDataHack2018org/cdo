@@ -43,7 +43,8 @@ void *Zonstat(void *argument)
   int operfunc;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
-  int gridID1, gridID2 = -1;
+  int gridID1 = -1, gridID2 = -1;
+  int zongridID = -1;
   int nlatmax;
   int index, ngrids;
   int recID, nrecs;
@@ -94,21 +95,34 @@ void *Zonstat(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
+  for ( index = 0; index < ngrids; index++ )
+    {
+      if ( gridInqXsize(vlistGrid(vlistID1, index)) > 1 ) 
+	{
+	  if ( gridID1 == -1 ) gridID1 = vlistGrid(vlistID1, index);
+	}
+      else
+	{
+	  if ( zongridID == -1 ) zongridID = vlistGrid(vlistID1, index);
+	}
+    }
+
   ndiffgrids = 0;
-  for ( index = 1; index < ngrids; index++ )
-    if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index))
-      ndiffgrids++;
-
+  for ( index = 0; index < ngrids; index++ )
+    {
+      if ( zongridID != -1 && zongridID == vlistGrid(vlistID1, index) ) continue;
+      if ( gridID1 != vlistGrid(vlistID1, index) ) ndiffgrids++;
+    }
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
-
-  index = 0;
-  gridID1 = vlistGrid(vlistID1, index);
 
   if ( gridInqType(gridID1) == GRID_LONLAT   ||
        gridInqType(gridID1) == GRID_GAUSSIAN ||
        gridInqType(gridID1) == GRID_GENERIC )
     {
-      gridID2 = gridToZonal(gridID1);
+      if ( zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1) )
+	gridID2 = zongridID;
+      else
+	gridID2 = gridToZonal(gridID1);
     }
   else
     {
@@ -146,12 +160,18 @@ void *Zonstat(void *argument)
 	  field1.missval = vlistInqVarMissval(vlistID1, varID);
 	  field2.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  /* RQ */
-	  if ( operfunc == func_pctl )
-	    zonpctl(field1, & field2, pn);
-	  else  
-	    zonfun(field1, &field2, operfunc);
-	  /* QR */  
+	  if ( zongridID != -1 && zongridID == field1.grid )
+	    {
+	      memcpy(field2.ptr, field1.ptr, nlatmax*sizeof(double));
+	      field2.nmiss = field1.nmiss;
+	    }
+	  else
+	    {
+	      if ( operfunc == func_pctl )
+		zonpctl(field1, & field2, pn);
+	      else  
+		zonfun(field1, &field2, operfunc);
+	    }
 
 	  streamDefRecord(streamID2, varID,  levelID);
 	  streamWriteRecord(streamID2, field2.ptr, field2.nmiss);
