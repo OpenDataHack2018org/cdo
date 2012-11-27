@@ -8,6 +8,7 @@ Version 1.5.9 (?? December 2012):
    Changed operators:
      * enlarge: added missing value support
    Fixed bugs:
+     * gradsdes: failed
      * wrong result for user defined lonlat grids with xfirst < 0
        (This bug was introduced in CDO version 1.5.8)
 

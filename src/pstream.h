@@ -24,6 +24,7 @@
 #define  streamClose              pstreamClose
 
 #define  streamInqFiletype        pstreamInqFiletype
+#define  streamInqByteorder       pstreamInqByteorder
 
 #define  streamInqVlist           pstreamInqVlist
 #define  streamDefVlist           pstreamDefVlist
@@ -47,6 +48,7 @@ int     pstreamOpenAppend(const char *streamname);
 void    pstreamClose(int pstreamID);
 
 int     pstreamInqFiletype(int pstreamID);
+int     pstreamInqByteorder(int pstreamID);
 
 void    pstreamDefVlist(int pstreamID, int vlistID);
 int     pstreamInqVlist(int pstreamID);

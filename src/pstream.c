@@ -1667,6 +1667,24 @@ int pstreamInqFiletype(int pstreamID)
 }
 
 
+int pstreamInqByteorder(int pstreamID)
+{
+  int byteorder;
+  pstream_t *pstreamptr;
+
+  pstreamptr = pstream_to_pointer(pstreamID);
+
+#if  defined  (HAVE_LIBPTHREAD)
+  if ( pstreamptr->ispipe )
+    byteorder = pstreamptr->filetype;
+  else
+#endif
+    byteorder = streamInqByteorder(pstreamptr->fileID);
+
+  return (byteorder);
+}
+
+
 void openLock(void)
 {
 #if  defined  (HAVE_LIBPTHREAD)

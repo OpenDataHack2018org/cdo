@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
 
+2012-11-27 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gradsdes: use pstreamInqByteorder() [Bug #3041]
+
 2012-11-26 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added workaround to combine CDO operators with the result of	mergetime, merge, copy, cat, ens<STAT>
