@@ -586,6 +586,44 @@ void setDefaultFileType(char *filetypestr, int labort)
     }
 }
 
+#if defined (malloc)
+#undef malloc
+#undef free
+#endif
+
+#define NTESTS 11
+static
+int getMemAlignment(void)
+{
+  int ma = -1;
+  int i, k;
+  double *ptr[NTESTS];
+  int64_t iptr;
+  size_t tsize[NTESTS] = {1, 3, 5, 9, 17, 33, 69, 121, 251, 510, 1025};
+  size_t ma_check[4] = {8, 16, 32, 64};
+  int ma_result[4] = {1, 1, 1, 1};
+
+  for ( i = 0; i < NTESTS; ++i )
+    {
+      ptr[i] = malloc(tsize[i]);
+      iptr = (int64_t) ptr[i];
+      for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
+    }
+  for ( i = 0; i < NTESTS; ++i ) free(ptr[i]);
+
+  for ( i = NTESTS-1; i >= 0; i-- )
+    {
+      ptr[i] = malloc(tsize[i]+5);
+      iptr = (int64_t) ptr[i];
+      for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
+    }
+  for ( i = 0; i < NTESTS; ++i ) free(ptr[i]);
+
+  for ( k = 0; k < 4; ++k ) if ( ma_result[k] ) ma = ma_check[k];
+
+  return (ma);
+}
+
 
 int cdoFiletype(void)
 {
@@ -898,6 +936,8 @@ int main(int argc, char *argv[])
       fprintf(stderr, "Predefined: __AVX__\n");
 #endif 
       fprintf(stderr, "\n");
+
+      fprintf(stderr, "mem alignment       = %d\n\n", getMemAlignment());
 
 #if defined (HAVE_MMAP)
       fprintf(stderr, "HAVE_MMAP\n");
