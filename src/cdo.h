@@ -74,6 +74,9 @@ extern int cdoExpMode;
 
 extern int cdoDiag;
 
+extern int cdoNumVarnames;
+extern char **cdoVarnames;
+
 void    cdiError(int cdiErrno, const char *fmt, ...);
 void    cdoAbort(const char *fmt, ...);
 void    cdoWarning(const char *fmt, ...);

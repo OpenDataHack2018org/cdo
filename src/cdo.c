@@ -93,6 +93,9 @@ int cdoInteractive       = FALSE;
 int cdoParIO             = FALSE;
 int cdoRegulargrid       = FALSE;
 
+#define MAX_NUM_VARNAMES 256
+int cdoNumVarnames       = 0;
+char **cdoVarnames       = NULL;
 
 char cdo_file_suffix[32];
 
@@ -670,6 +673,45 @@ void defineCompress(const char *arg)
 }
 
 static
+void defineVarnames(const char *arg)
+{
+  size_t len = strlen(arg);
+  size_t istart = 0;
+  char *pbuf;
+
+  while ( istart < len && (arg[istart] == ' ' || arg[istart] == ',') ) istart++;
+
+  len -= istart;
+
+  if ( len )
+    {
+      char *commapos;
+      
+      cdoVarnames = (char **) malloc(MAX_NUM_VARNAMES*sizeof(char *));
+
+      pbuf = strdup(arg+istart);
+      cdoVarnames[cdoNumVarnames++] = pbuf;    
+
+      commapos = pbuf;
+      while ( (commapos = strchr(commapos, ',')) != NULL )
+	{
+	  *commapos++ = '\0';
+	  if ( strlen(commapos) )
+	    {
+	      if ( cdoNumVarnames >= MAX_NUM_VARNAMES )
+		cdoAbort("Too many variable names (limit=%d)!", MAX_NUM_VARNAMES);
+
+	      cdoVarnames[cdoNumVarnames++] = commapos;
+	    }
+	}
+      /*
+      for ( int i = 0; i < cdoNumVarnames; ++i )
+	printf("varname %d: %s\n", i+1, cdoVarnames[i]);
+      */
+    }
+}
+
+static
 void get_env_vars(void)
 {
   char *envstr;
@@ -767,7 +809,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:t:D:z:aBcdhLMOQRrsSTuVvXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:n:t:D:z:aBcdhLMOQRrsSTuVvXZ")) != -1 )
     {
       switch (c)
 	{
@@ -830,6 +872,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'M':
 	  cdiDefGlobal("HAVE_MISSVAL", TRUE);
+	  break;
+	case 'n':
+	  defineVarnames(cdoOptarg);
 	  break;
 	case 'O':
 	  cdoOverwriteMode = TRUE;
@@ -1120,6 +1165,12 @@ int main(int argc, char *argv[])
     }
 
   if ( argument ) free(argument);
+
+  if ( cdoVarnames )
+    {
+      if ( cdoNumVarnames ) free(cdoVarnames[0]);
+      free(cdoVarnames);
+    }
   /* problems with alias!!! if ( operatorName ) free(operatorName); */ 
 
   /* malloc_stats(); */
