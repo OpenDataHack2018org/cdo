@@ -44,7 +44,7 @@ case "${HOSTNAME}" in
                     --with-proj=/opt/local \
                     --with-libxml2=/usr \
                     --with-magics=/Users/m214003/local/magics-2.14.9 \
-	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -fopenmp -DHAVE_LIBYAC -I/Users/m214003/cdt/work/YAC/src" \
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fopenmp -DHAVE_LIBYAC -I/Users/m214003/cdt/work/YAC/src" \
                     LIBS="-L/opt/local/lib -lopenjpeg -L/Users/m214003/cdt/work/YAC/src -lyac"
 	;;
     hama*)
@@ -89,7 +89,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=/sw/squeeze-x64/hdf5-1.8.8-static \
                     --with-szlib=/sw/squeeze-x64/szip-2.1 \
                     --with-proj=/sw/squeeze-x64/proj-4.7.0 \
-                    CC=gcc CFLAGS='-g -Wall -O3 -fopenmp'
+                    CC=gcc CFLAGS='-g -Wall -O3 -march=native -fopenmp'
 	;;
 # x86_64-lenny-linux-gnu
     squall*)

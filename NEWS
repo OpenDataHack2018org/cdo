@@ -9,6 +9,7 @@ Version 1.5.9 (?? December 2012):
      * enlarge: added missing value support
    Fixed bugs:
      * gradsdes: failed
+     * sellevel: loosing level bounds
      * wrong result for user defined lonlat grids with xfirst < 0
        (This bug was introduced in CDO version 1.5.8)
 
