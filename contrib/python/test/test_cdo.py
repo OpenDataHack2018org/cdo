@@ -1,4 +1,5 @@
-import unittest,os
+import unittest,os,tempfile
+from stat import *
 from cdo import *
 
 class CdoTest(unittest.TestCase):
@@ -37,10 +38,11 @@ class CdoTest(unittest.TestCase):
         cdo = Cdo()
         operators = cdo.operators
         operators.sort()
-        print "\n".join(operators)
+        #print "\n".join(operators)
 
     def test_simple(self):
         cdo = Cdo()
+        cdo.debug = True
         s   = cdo.sinfov(input="-topo",options="-f nc")
         s   = cdo.sinfov(input="-remapnn,r36x18 -topo",options="-f nc")
         f   = 'ofile.nc'
@@ -64,8 +66,7 @@ class CdoTest(unittest.TestCase):
 
     def test_bndLevels(self):
         cdo = Cdo()
-        ofile = MyTempfile().path()
-        cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,output = ofile,options = "-f nc")
+        ofile = cdo.stdatm(25,100,250,500,875,1400,2100,3000,4000,5000,options = "-f nc")
         self.assertEqual([0, 50.0, 150.0, 350.0, 650.0, 1100.0, 1700.0, 2500.0, 3500.0, 4500.0, 5500.0],
                     cdo.boundaryLevels(input = "-selname,T " + ofile))
         self.assertEqual([50.0, 100.0, 200.0, 300.0, 450.0, 600.0, 800.0, 1000.0, 1000.0, 1000.0],
@@ -75,19 +76,19 @@ class CdoTest(unittest.TestCase):
         cdo = Cdo()
         names = cdo.showname(input = "-stdatm,0",options = "-f nc")
         self.assertEqual(["P T"],names)
-        ofile = MyTempfile().path()
-        cdo.topo(output = ofile,options = "-z szip")
+        ofile = cdo.topo(options = "-z szip")
         self.assertEqual(["GRIB SZIP"],cdo.showformat(input = ofile))
 
     def test_chain(self):
         cdo = Cdo()
-        ofile     = MyTempfile().path()
-        cdo.setname("veloc", input=" -copy -random,r1x1",output = ofile,options = "-f nc")
+        ofile = cdo.setname("veloc", input=" -copy -random,r1x1",options = "-f nc")
         self.assertEqual(["veloc"],cdo.showname(input = ofile))
 
     def test_diff(self):
         cdo = Cdo()
+        cdo.debug = True
         diffv = cdo.diffn(input = "-random,r1x1 -random,r1x1")
+        print diffv
         self.assertEqual(diffv[1].split(' ')[-1],"random")
         self.assertEqual(diffv[1].split(' ')[-3],"0.53060")
         diff  = cdo.diff(input = "-random,r1x1 -random,r1x1")
@@ -95,11 +96,12 @@ class CdoTest(unittest.TestCase):
 
     def test_returnCdf(self):
         cdo = Cdo()
-        ofile = MyTempfile().path()
+        ofile = tempfile.NamedTemporaryFile(delete=True,prefix='cdoPy').name
         press = cdo.stdatm("0",output=ofile,options="-f nc")
         self.assertEqual(ofile,press)
         a = cdo.readCdf(press)
         variables = cdo.stdatm("0",options="-f nc",returnCdf=True).variables
+        print(variables)
         press = cdo.stdatm("0",options="-f nc",returnCdf=True).variables['P'][:]
         self.assertEqual(1013.25,press.min())
         press = cdo.stdatm("0",output=ofile,options="-f nc")
@@ -119,16 +121,57 @@ class CdoTest(unittest.TestCase):
         self.assertEqual(ofile,press)
 
 
+    def test_forceOutput(self):
+        cdo =Cdo()
+        cdo.debug = True
+        outs = []
+        # tempfiles
+        outs.append(cdo.stdatm("0,10,20"))
+        outs.append(cdo.stdatm("0,10,20"))
+        self.assertNotEqual(outs[0],outs[1])
+        outs = []
+
+        # deticated output, force = true (=defaut setting)
+        ofile = 'test_force'
+        outs.append(cdo.stdatm("0,10,20",output = ofile))
+        mtime0 = os.stat(ofile).st_mtime
+        outs.append(cdo.stdatm("0,10,20",output = ofile))
+        mtime1 = os.stat(ofile).st_mtime
+        self.assertNotEqual(mtime0,mtime1)
+        self.assertEqual(outs[0],outs[1])
+        os.remove(ofile)
+        outs = []
+ 
+        # dedicated output, force = false
+        ofile = 'test_force_false'
+        outs.append(cdo.stdatm("0,10,20",output = ofile,force=False))
+        mtime0 = os.stat(outs[0]).st_mtime
+        outs.append(cdo.stdatm("0,10,20",output = ofile,force=False))
+        mtime1 = os.stat(outs[1]).st_mtime
+        self.assertEqual(mtime0,mtime1)
+        self.assertEqual(outs[0],outs[1])
+        os.remove(ofile)
+        outs = []
+
+        # dedicated output, global force setting
+        ofile = 'test_force_global'
+        cdo.forceOutput = False
+        outs.append(cdo.stdatm("0,10,20",output = ofile))
+        mtime0 = os.stat(outs[0]).st_mtime
+        outs.append(cdo.stdatm("0,10,20",output = ofile))
+        mtime1 = os.stat(outs[1]).st_mtime
+        self.assertEqual(mtime0,mtime1)
+        self.assertEqual(outs[0],outs[1])
+        os.remove(ofile)
+        outs = []
+
     def test_combine(self):
         cdo = Cdo()
-        o   = MyTempfile().path()
-        stdatm = cdo.stdatm("0",options = "-f nc",output=o)
-        self.assertEqual(o,stdatm)
-        o   = MyTempfile().path()
-        o_  = MyTempfile().path()
-        sum = cdo.fldsum(input = stdatm,output = o)
+        cdo.debug = True
+        stdatm  = cdo.stdatm("0",options = "-f nc")
+        stdatm_ = cdo.stdatm("0",options = "-f nc")
+        print(cdo.diff(input=stdatm + " " + stdatm_))
         sum = cdo.fldsum(input = stdatm)
-        sum = cdo.fldsum(input = cdo.stdatm("0",options="-f nc"))
         sum = cdo.fldsum(input = cdo.stdatm("0",options="-f nc"),returnCdf=True)
         self.assertEqual(288.0,sum.variables["T"][:])
 
@@ -167,6 +210,31 @@ class CdoTest(unittest.TestCase):
         thicknesses = cdo.thicknessOfLevels(input = "-selname,T " + cdo.stdatm(','.join(sourceLevels),options = "-f nc")) 
         self.assertEqual(targetThicknesses,thicknesses)
 
+
+    def test_returnArray(self):
+        cdo = Cdo()
+        temperature = cdo.stdatm(0,options = '-f nc', returnCdf = True).variables['T'][:]
+        self.assertEqual(False, cdo.stdatm(0,options = '-f nc',returnArray = 'TT'))
+        temperature = cdo.stdatm(0,options = '-f nc',returnArray = 'T')
+        self.assertEqual(288.0,temperature.flatten()[0])
+        pressure = cdo.stdatm("0,1000",options = '-f nc -b F64',returnArray = 'P')
+        self.assertEqual("[ 1013.25         898.54345604]",pressure.flatten().__str__())
+
+    def test_returnMaArray(self):
+        cdo = Cdo()
+        cdo.debug = True
+        bathy = cdo.remapnn('r2x2',input = cdo.topo(options = '-f nc'), returnMaArray = 'topo')
+        self.assertEqual(-4298.0,bathy[0,0])
+        self.assertEqual(-2669.0,bathy[0,1])
+        ta = cdo.remapnn('r2x2',input = cdo.topo(options = '-f nc'))
+        tb = cdo.subc(-2669.0,input = ta)
+        withMask = cdo.div(input=ta+" "+tb,returnMaArray='topo')
+        self.assertEqual('--',withMask[0,1].__str__())
+        self.assertEqual(False,withMask.mask[0,0])
+        self.assertEqual(False,withMask.mask[1,0])
+        self.assertEqual(False,withMask.mask[1,1])
+        self.assertEqual(True,withMask.mask[0,1])
+
     if 'thingol' == os.popen('hostname').read().strip():
         def testCall(self):
             cdo = Cdo()
@@ -191,7 +259,36 @@ class CdoTest(unittest.TestCase):
             tempfilesEnd = glob.glob('/tmp/cdoPy**')
             tempfilesEnd.sort()
             self.assertEqual(tempfilesStart,tempfilesEnd)
+        def test_readArray(self):
+            cdo = Cdo()
+            ifile = '/home/ram/data/examples/EH5_AMIP_1_TSURF_1991-1995.nc'
+            self.assertEqual((10, 96, 192),
+                cdo.readArray(cdo.seltimestep('1/10',
+                  input=ifile),
+                  'tsurf').shape)
 
+        def test_showMaArray(self):
+            cdo = Cdo()
+            cdo.debug = True
+            import pylab as pl
+            bathy = cdo.setrtomiss(0,10000,
+                input = cdo.topo(options='-f nc'),returnMaArray='topo')
+            pl.imshow(bathy,origin='lower')
+            pl.show()
+            oro = cdo.setrtomiss(-10000,0,
+                input = cdo.topo(options='-f nc'),returnMaArray='topo')
+            pl.imshow(oro,origin='lower')
+            pl.show()
+            random = cdo.setname('test_maArray',
+                                 input = "-setrtomiss,0.4,0.8 -random,r180x90 ",
+                                 returnMaArray='test_maArray',
+                                 options = "-f nc")
+            pl.imshow(random,origin='lower')
+            pl.show()
+
+        def test_error(self):
+            cdo = Cdo()
+            print cdo.stdatm(0,10,input="",output="")
 
 if __name__ == '__main__':
     unittest.main()

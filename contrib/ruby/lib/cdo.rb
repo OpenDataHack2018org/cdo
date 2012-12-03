@@ -1,4 +1,5 @@
 require 'pp'
+require 'open3'
 
 # Copyright (C) 2011-2012 Ralf Mueller, ralf.mueller@zmaw.de
 # See COPYING file for copying and redistribution conditions.
@@ -16,7 +17,7 @@ require 'pp'
 # CDO calling mechnism
 module Cdo
 
-  VERSION = "1.1.0"
+  VERSION = "1.2.0"
 
   State = {
     :debug       => false,
@@ -89,9 +90,10 @@ module Cdo
     cmd = "#{@@CDO} -O #{options} #{cmd} "
     case ofile
     when $stdout
-      cmd << " 2>/dev/null"
-      puts cmd if Cdo.debug
-      return IO.popen(cmd).readlines.map {|l| l.chomp.strip}
+      stdin, stdout, stderr, status =  Open3.popen3(cmd)
+      retval = stdout.read.split($/).map {|l| l.chomp.strip}
+      pp stderr.read
+      return retval
     else
       force = State[:forceOutput] if force.nil?
       if force or not File.exists?(ofile.to_s)
@@ -102,7 +104,9 @@ module Cdo
         warn "Use existing file '#{ofile}'" if Cdo.debug
       end
     end
-    if returnCdf or State[:returnCdf]
+    if not returnArray.nil?
+      Cdo.readArray(ofile,returnArray)
+    elsif returnCdf or State[:returnCdf]
       Cdo.readCdf(ofile)
     else
       return ofile
@@ -118,17 +122,15 @@ module Cdo
     return [io,opts]
   end
   def Cdo.method_missing(sym, *args, &block)
-    ## args is expected to look like [opt1,...,optN,:in => iStream,:out => oStream] where
+    ## args is expected to look like [opt1,...,optN,:input => iStream,:output => oStream] where
     # iStream could be another CDO call (timmax(selname(Temp,U,V,ifile.nc))
     puts "Operator #{sym.to_s} is called" if State[:debug]
     if getOperators.include?(sym.to_s)
       io,opts = Cdo.parseArgs(args)
       if @@outputOperatorsPattern.match(sym)
-        run(" -#{sym.to_s}#{opts} #{io[:in]} ",$stdout)
+        run(" -#{sym.to_s}#{opts} #{io[:input]} ",$stdout)
       else
-        #if opts[:force] or not File.exist?(opts[:out]) then
-          run(" -#{sym.to_s}#{opts} #{io[:in]} ",io[:out],io[:options],io[:returnCdf],io[:force])
-        #end
+        run(" -#{sym.to_s}#{opts} #{io[:input]} ",io[:output],io[:options],io[:returnCdf],io[:force],io[:returnArray])
       end
     else
       warn "Operator #{sym.to_s} not found"
@@ -212,7 +214,7 @@ module Cdo
   # Addional operotors:
   #------------------------------------------------------------------
   def Cdo.boundaryLevels(args)
-    ilevels         = Cdo.showlevel(:in => args[:in])[0].split.map(&:to_f)
+    ilevels         = Cdo.showlevel(:input => args[:input])[0].split.map(&:to_f)
     bound_levels    = Array.new(ilevels.size+1)
     bound_levels[0] = 0
     (1..ilevels.size).each {|i| 
@@ -234,6 +236,17 @@ module Cdo
   def Cdo.readCdf(iFile)
     Cdo.loadCdf unless State[:returnCdf] 
     NetCDF.open(iFile)
+  end
+
+  def Cdo.readArray(iFile,varname)
+    filehandle = Cdo.readCdf(iFile)
+    if filehandle.var_names.include?(varname)
+      # return the data array
+      filehandle.var(varname).get
+    else
+      warn "Cannot find variable '#{varname}'"
+      raise ArgumentError
+    end
   end
 
   def Cdo.selindexlist(args)
