@@ -15,7 +15,7 @@ def createInputFiles(nfiles,resolution,cdo,cdoOptions):
 
     elif '2d' == key:
       for j in xrange(0,nfiles):
-	fileList[key].append(cdo.random(resolution, options = cdoOptions))
+	fileList[key].append(cdo.setcode(130,input = "-setname,'T' -random,"+resolution, options = cdoOptions))
 
     elif '3d' == key:
       for j in xrange(0,nfiles):
@@ -24,11 +24,11 @@ def createInputFiles(nfiles,resolution,cdo,cdoOptions):
     elif '1d_withTime' == key:
       # temporal axis only
       for j in xrange(0,nfiles):
-	fileList[key].append(cdo.copy(input = timeDefaults+' -for,1,400', options = cdoOptions))
+	fileList[key].append(cdo.setcode(130,input = cdo.setname('T',input = timeDefaults+' -for,1,400', options = cdoOptions)))
 
     elif '2d_withTime' == key:
       for j in xrange(0,nfiles):
-	fileList[key].append(cdo.copy(input = randomEnlarge(resolution) +' ' +timeDefaults+ ' -for,1,400', options = cdoOptions))
+	fileList[key].append(cdo.setcode(130,input = cdo.setname('T',input = randomEnlarge(resolution) +' ' +timeDefaults+ ' -for,1,400', options = cdoOptions)))
 
     elif '3d_withTime' == key:
       for j in xrange(0,nfiles):

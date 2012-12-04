@@ -3,14 +3,11 @@ import unittest
 from cdo import *
 import testStreams
 
-cdo = Cdo()
-testFiles = testStreams.createInputFiles(4,'r36x18',cdo,'-f nc')
-
-
 class TestArithc(unittest.TestCase):
 
   def test_addc(self):
     cdo = Cdo()
+    testFiles = testStreams.createInputFiles(4,'r2x2',cdo,'-f nc')
     for i,value in enumerate(testFiles):
       files = testFiles[value]
       result = cdo.addc('2.718281828459045',input = ' '.join(files[0:1]))
@@ -19,6 +16,7 @@ class TestArithc(unittest.TestCase):
 
   def test_subc(self):
     cdo = Cdo()
+    testFiles = testStreams.createInputFiles(4,'r2x2',cdo,'-f nc')
     for i,value in enumerate(testFiles):
       files = testFiles[value]
       result = cdo.subc('2.718281828459045',input = ' '.join(files[0:1]))
@@ -27,6 +25,7 @@ class TestArithc(unittest.TestCase):
 
   def test_mulc(self):
     cdo = Cdo()
+    testFiles = testStreams.createInputFiles(4,'r2x2',cdo,'-f nc')
     for i,value in enumerate(testFiles):
       files = testFiles[value]
       result = cdo.mulc('2.718281828459045',input = ' '.join(files[0:1]))
@@ -35,6 +34,7 @@ class TestArithc(unittest.TestCase):
 
   def test_divc(self):
     cdo = Cdo()
+    testFiles = testStreams.createInputFiles(4,'r2x2',cdo,'-f nc')
     for i,value in enumerate(testFiles):
       files = testFiles[value]
       result = cdo.divc('2.718281828459045',input = ' '.join(files[0:1]))
