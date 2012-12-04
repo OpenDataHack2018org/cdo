@@ -73,39 +73,63 @@ module Cdo
                         else
                           help[(help.index("Operators:")+1)..help.index(help.find {|v| v =~ /CDO version/}) - 2].join(' ').split
                         end
-
-    
   end
+
+  def Cdo.hasError(cmd,retvals)
+    if (State[:debug])
+      puts("RETURNCODE: #{retvals[:returncode]}")
+    end
+    if ( 0 != retvals[:returncode] )
+      puts("Error in calling:")
+      puts(">>> "+cmd+"<<<")
+      puts(retvals[:stderr])
+      return true
+    else
+      return false
+    end
+  end
+
   def Cdo.call(cmd)
     if (State[:debug])
       puts '# DEBUG ====================================================================='
       puts cmd
       puts '# DEBUG ====================================================================='
-      puts IO.popen(cmd).read
-    else
-      system(cmd + ' 1>/dev/null 2>&1 ')
     end
+    stdin, stdout, stderr, wait_thr = Open3.popen3(cmd)
+
+    {
+      :stdout => stdout.read,
+      :stderr => stderr.read,
+      :returncode => wait_thr.value.exitstatus
+    }
   end
-  def Cdo.run(cmd,ofile='',options='',returnCdf=false,force=nil,returnArray=nil)
+  def Cdo.run(cmd,ofile='',options='',returnCdf=false,force=nil,returnArray=nil,returnMaArray=nil)
     cmd = "#{@@CDO} -O #{options} #{cmd} "
     case ofile
     when $stdout
-      stdin, stdout, stderr, status =  Open3.popen3(cmd)
-      retval = stdout.read.split($/).map {|l| l.chomp.strip}
-      pp stderr.read
-      return retval
+      retvals = Cdo.call(cmd)
+      unless hasError(cmd,retvals)
+        return retvals[:stdout].split($/).map {|l| l.chomp.strip}
+      else
+        raise ArgumentError,"CDO did NOT run successfully!"
+      end
     else
       force = State[:forceOutput] if force.nil?
       if force or not File.exists?(ofile.to_s)
         ofile = MyTempfile.path if ofile.nil?
         cmd << "#{ofile}"
-        call(cmd)
+        retvals = call(cmd)
+        if hasError(cmd,retvals)
+          raise ArgumentError,"CDO did NOT run successfully!"
+        end
       else
         warn "Use existing file '#{ofile}'" if Cdo.debug
       end
     end
     if not returnArray.nil?
       Cdo.readArray(ofile,returnArray)
+    elsif not returnMaArray.nil?
+      Cdo.readMaArray(ofile,returnMaArray)
     elsif returnCdf or State[:returnCdf]
       Cdo.readCdf(ofile)
     else
@@ -130,15 +154,15 @@ module Cdo
       if @@outputOperatorsPattern.match(sym)
         run(" -#{sym.to_s}#{opts} #{io[:input]} ",$stdout)
       else
-        run(" -#{sym.to_s}#{opts} #{io[:input]} ",io[:output],io[:options],io[:returnCdf],io[:force],io[:returnArray])
+        run(" -#{sym.to_s}#{opts} #{io[:input]} ",io[:output],io[:options],io[:returnCdf],io[:force],io[:returnArray],io[:returnMaArray])
       end
     else
-      warn "Operator #{sym.to_s} not found"
+      raise ArgumentError,"Operator #{sym.to_s} not found"
     end
   end
   def Cdo.loadCdf
     begin
-      require "numru/netcdf"
+      require "numru/netcdf_miss"
       include NumRu
     rescue LoadError
       warn "Could not load ruby's netcdf bindings. Please install it."
@@ -244,16 +268,30 @@ module Cdo
       # return the data array
       filehandle.var(varname).get
     else
-      warn "Cannot find variable '#{varname}'"
-      raise ArgumentError
+      raise ArgumentError, "Cannot find variable '#{varname}'"
     end
   end
 
-  def Cdo.selindexlist(args)
-    
+  def Cdo.readMaArray(iFile,varname)
+    filehandle = Cdo.readCdf(iFile)
+    if filehandle.var_names.include?(varname)
+      # return the data array
+      filehandle.var(varname).get_with_miss
+    else
+      raise ArgumentError,"Cannot find variable '#{varname}'"
+    end
   end
-
-  def Cdo.plot(args)
+  def Cdo.help(operator=nil)
+    if operator.nil?
+      puts Cdo.call([@@CDO,'-h'].join(' '))[:stderr]
+    else
+      operator = operator.to_s unless String == operator.class
+      if Cdo.operators.include?(operator)
+        puts Cdo.call([@@CDO,'-h',operator].join(' '))[:stdout]
+      else
+        puts "Unknown operator #{operator}"
+      end
+    end
   end
 end
 

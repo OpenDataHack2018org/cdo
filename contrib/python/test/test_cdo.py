@@ -21,18 +21,18 @@ class CdoTest(unittest.TestCase):
 
     def testOps(self):
         cdo = Cdo()
-        self.assertIn("sinfov",cdo.operators)
-        self.assertIn("for",cdo.operators)
-        self.assertIn("mask",cdo.operators)
-        self.assertIn("studentt",cdo.operators)
+        self.assertTrue("sinfov" in cdo.operators)
+        self.assertTrue("for" in cdo.operators)
+        self.assertTrue("mask" in cdo.operators)
+        self.assertTrue("studentt" in cdo.operators)
 
     def test_getOperators(self):
         cdo = Cdo()
         for op in ['random','stdatm','for','cdiwrite','info','showlevel','sinfo','remap','geopotheight','mask','topo','thicknessOfLevels']:
             if 'thicknessOfLevels' != op:
-                self.assertIn(op,cdo.operators)
+                self.assertTrue(op in cdo.operators)
             else:
-                self.assertIn(op,dir(cdo))
+                self.assertTrue(op in dir(cdo))
 
     def test_listAllOperators(self):
         cdo = Cdo()
@@ -135,6 +135,9 @@ class CdoTest(unittest.TestCase):
         ofile = 'test_force'
         outs.append(cdo.stdatm("0,10,20",output = ofile))
         mtime0 = os.stat(ofile).st_mtime
+        #to make it compatible with systems providing no nanos.
+        import time
+        time.sleep(1)
         outs.append(cdo.stdatm("0,10,20",output = ofile))
         mtime1 = os.stat(ofile).st_mtime
         self.assertNotEqual(mtime0,mtime1)
@@ -177,9 +180,9 @@ class CdoTest(unittest.TestCase):
 
     def test_cdf(self):
         cdo = Cdo()
-        self.assertNotIn("cdf",cdo.__dict__)
+        self.assertTrue("cdf" not in cdo.__dict__)
         cdo.setReturnArray()
-        self.assertIn("cdf",cdo.__dict__)
+        self.assertTrue("cdf" in cdo.__dict__)
         cdo.setReturnArray(False)
         sum = cdo.fldsum(input = cdo.stdatm("0",options="-f nc"),returnCdf=True)
         self.assertEqual(1013.25,sum.variables["P"][:])
@@ -223,6 +226,14 @@ class CdoTest(unittest.TestCase):
     def test_returnMaArray(self):
         cdo = Cdo()
         cdo.debug = True
+        topo = cdo.topo(options='-f nc',returnMaArray='topo')
+        self.assertEqual(-1890.0,round(topo.mean()))
+        bathy = cdo.setrtomiss(0,10000,
+            input = cdo.topo(options='-f nc'),returnMaArray='topo')
+        self.assertEqual(-3386.0,round(bathy.mean()))
+        oro = cdo.setrtomiss(-10000,0,
+            input = cdo.topo(options='-f nc'),returnMaArray='topo')
+        self.assertEqual(1142.0,round(oro.mean()))
         bathy = cdo.remapnn('r2x2',input = cdo.topo(options = '-f nc'), returnMaArray = 'topo')
         self.assertEqual(-4298.0,bathy[0,0])
         self.assertEqual(-2669.0,bathy[0,1])
@@ -234,6 +245,24 @@ class CdoTest(unittest.TestCase):
         self.assertEqual(False,withMask.mask[1,0])
         self.assertEqual(False,withMask.mask[1,1])
         self.assertEqual(True,withMask.mask[0,1])
+
+    def test_errorException(self):
+        cdo = Cdo()
+        self.assertFalse(hasattr(cdo, 'nonExistingMethod'))
+        self.failUnlessRaises(CDOException, cdo.max)
+        try:
+            cdo.max()
+        except CDOException as e:
+            self.assertTrue(e.returncode != 0)
+            self.assertTrue(len(e.stderr) > 1)
+            self.assertTrue(hasattr(e, 'stdout'))
+
+        try:
+            cdo.stdatm(0,10,input="",output="")
+        except CDOException as a:
+            self.assertTrue(e.returncode != 0)
+            self.assertTrue(len(e.stderr) > 1)
+            self.assertTrue(hasattr(e, 'stdout'))
 
     if 'thingol' == os.popen('hostname').read().strip():
         def testCall(self):
@@ -286,9 +315,6 @@ class CdoTest(unittest.TestCase):
             pl.imshow(random,origin='lower')
             pl.show()
 
-        def test_error(self):
-            cdo = Cdo()
-            print cdo.stdatm(0,10,input="",output="")
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,7 +16,7 @@ import numpy as np
 def auto_doc(tool, cdo_self):
     """Generate the __doc__ string of the decorated function by calling the cdo help command"""
     def desc(func):
-        func.__doc__ = cdo_self.run([cdo_self.CDO, '-h', tool]).get('stdout')
+        func.__doc__ = cdo_self.call([cdo_self.CDO, '-h', tool]).get('stdout')
         return func
     return desc
 
@@ -26,6 +26,7 @@ class CDOException(Exception):
         self.stdout = stdout
         self.stderr = stderr
         self.returncode = returncode
+        self.msg = '(returncode:%s) %s' % (returncode, stderr)
     def __str__(self):
         return self.msg
 
@@ -75,8 +76,13 @@ class Cdo(object):
     res.extend(self.operators)
     return res
 
-  def run(self,call):
-    proc = subprocess.Popen(' '.join(call),
+  def call(self,cmd):
+    if self.debug:
+      print '# DEBUG ====================================================================='
+      print 'CALL:'+' '.join(cmd)
+      print '# DEBUG ====================================================================='
+
+    proc = subprocess.Popen(' '.join(cmd),
         shell  = True,
         stderr = subprocess.PIPE,
         stdout = subprocess.PIPE)
@@ -119,7 +125,7 @@ class Cdo(object):
 
       if operatorPrintsOut:
         cmd     = [self.CDO,kwargs["options"],','.join(operator),' '.join(io)]
-        retvals = self.run(cmd)
+        retvals = self.call(cmd)
         if ( not self.hasError(method_name,cmd,retvals) ):
           r = map(string.strip,retvals["stdout"].split(os.linesep))
           return r[:len(r)-1]
@@ -134,15 +140,12 @@ class Cdo(object):
           io.append(kwargs["output"])
 
           cmd     = [self.CDO,kwargs["options"],','.join(operator),' '.join(io)]
-          retvals = self.run(cmd)
-          self.hasError(method_name,cmd,retvals)
+          retvals = self.call(cmd)
+          if self.hasError(method_name,cmd,retvals):
+              raise CDOException(**retvals)
         else:
           if self.debug:
             print("Use existing file'"+kwargs["output"]+"'")
-
-
-      if self.debug:
-        print 'CALL:'+' '.join(cmd)
 
       if not kwargs.__contains__("returnCdf"):
         kwargs["returnCdf"] = False
@@ -170,6 +173,7 @@ class Cdo(object):
       raise AttributeError, method_name
 
   def getOperators(self):
+    import os
     proc = subprocess.Popen([self.CDO,'-h'],stderr = subprocess.PIPE,stdout = subprocess.PIPE)
     ret  = proc.communicate()
     l    = ret[1].find("Operators:")
@@ -268,7 +272,8 @@ class Cdo(object):
       self.loadCdf()
 
     if ( "scipy" == self.cdfMod):
-      fileObj =  self.cdf.netcdf_file(iFile)
+      #making it compatible to older scipy versions
+      fileObj =  self.cdf.netcdf_file(iFile, mode='r')
     elif ( "netcdf4" == self.cdfMod ):
       fileObj = self.cdf.Dataset(iFile)
     else:
@@ -292,7 +297,8 @@ class Cdo(object):
     """Create a masked array based on cdf's FillValue"""
     fileObj =  self.readCdf(iFile)
 
-    data = fileObj.variables[varname].data
+    #.data is not backwards compatible to old scipy versions, [:] is
+    data = fileObj.variables[varname][:]
 
     if hasattr(fileObj.variables[varname],'_FillValue'):
       #return masked array
