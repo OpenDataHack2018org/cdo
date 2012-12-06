@@ -22,7 +22,7 @@
 #include <stdarg.h> /* va_list */
 
 #if defined (HAVE_LIBPROJ)
-#  include "projects.h"
+#  include "proj_api.h"
 #endif
 
 #include <cdi.h>
@@ -354,7 +354,7 @@ static
 void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  PJ   *libProj;
+  projPJ   *libProj;
   char *params[20];
   int nbpar=0;
   projUV data, res;
@@ -391,7 +391,7 @@ static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  PJ   *libProj;
+  projPJ   *libProj;
   char *params[20];
   int nbpar=0;
   projUV data, res;
@@ -435,7 +435,7 @@ static
 void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
 #if defined (HAVE_LIBPROJ)
-  PJ   *libProj;
+  projPJ   *libProj;
   char *params[20];
   int nbpar=0;
   projUV data, res;

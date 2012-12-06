@@ -121,8 +121,8 @@
 /* Define to 1 if you have the <netcdf.h> header file. */
 #undef HAVE_NETCDF_H
 
-/* Define to 1 if you have the <projects.h> header file. */
-#undef HAVE_PROJECTS_H
+/* Define to 1 if you have the <proj_api.h> header file. */
+#undef HAVE_PROJ_API_H
 
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD

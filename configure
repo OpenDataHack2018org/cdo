@@ -18307,12 +18307,12 @@ $as_echo_n "checking for proj library... " >&6; }
                            { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; } ;; #(
   yes) :
-    for ac_header in projects.h
+    for ac_header in proj_api.h
 do :
-  ac_fn_c_check_header_mongrel "$LINENO" "projects.h" "ac_cv_header_projects_h" "$ac_includes_default"
-if test "x$ac_cv_header_projects_h" = xyes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "proj_api.h" "ac_cv_header_proj_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_proj_api_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_PROJECTS_H 1
+#define HAVE_PROJ_API_H 1
 _ACEOF
 
 fi
@@ -18388,12 +18388,12 @@ fi
                           if test -d "$PROJ_ROOT"; then :
   LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$PROJ_ROOT/include $CPPFLAGS"
-                                 for ac_header in projects.h
+                                 for ac_header in proj_api.h
 do :
-  ac_fn_c_check_header_mongrel "$LINENO" "projects.h" "ac_cv_header_projects_h" "$ac_includes_default"
-if test "x$ac_cv_header_projects_h" = xyes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "proj_api.h" "ac_cv_header_proj_api_h" "$ac_includes_default"
+if test "x$ac_cv_header_proj_api_h" = xyes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_PROJECTS_H 1
+#define HAVE_PROJ_API_H 1
 _ACEOF
 
 fi

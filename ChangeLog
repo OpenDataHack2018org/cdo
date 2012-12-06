@@ -3,6 +3,10 @@
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
 
+2012-12-06 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* PROJ.4: use proj_api.h instead of projects.h
+
 2012-11-27 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: use pstreamInqByteorder() [Bug #3041]

@@ -319,7 +319,7 @@ AC_ARG_WITH([proj],
             [AS_CASE(["$with_proj"],
                      [no],[AC_MSG_CHECKING([for proj library])
                            AC_MSG_RESULT([suppressed])],
-                     [yes],[AC_CHECK_HEADERS([projects.h])
+                     [yes],[AC_CHECK_HEADERS([proj_api.h])
                             AC_SEARCH_LIBS([pj_init],[proj],[AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
                                            [AC_MSG_ERROR([Could not link to PROJ library!])])
                             AC_SUBST([PROJ_LDFLAGS],[" -lproj"])
@@ -328,7 +328,7 @@ AC_ARG_WITH([proj],
                           AS_IF([test -d "$PROJ_ROOT"],
                                 [LDFLAGS="-L$PROJ_ROOT/lib $LDFLAGS"
                                  CPPFLAGS="-I$PROJ_ROOT/include $CPPFLAGS"
-                                 AC_CHECK_HEADERS([projects.h])
+                                 AC_CHECK_HEADERS([proj_api.h])
                                  AC_SEARCH_LIBS([pj_init],
                                                 [proj],
                                                 [AC_DEFINE([HAVE_LIBPROJ],[1],[Define to 1 for PROJ support])],
