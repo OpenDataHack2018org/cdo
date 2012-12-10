@@ -5,9 +5,10 @@ export
 TESTS = $(top_srcdir)/test/test_info.py \
 	$(top_srcdir)/test/test_diff.py \
 	$(top_srcdir)/test/test_Arith.py \
-	$(top_srcdir)/test/test_Arithc.py \
-	$(top_srcdir)/test/test_Selvar.py \
 	$(top_srcdir)/test/test_intgridbil.py
+
+#	$(top_srcdir)/test/test_Arithc.py
+#	$(top_srcdir)/test/test_Selvar.py
 
 EXTRA_DIST = $(TESTS) $(top_srcdir)/test/testStreams.py
 
