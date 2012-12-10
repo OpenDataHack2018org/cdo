@@ -32,6 +32,44 @@
 #include "pstream.h"
 
 
+int *fill_vars(int vlistID)
+{
+  int varID;
+  int nvars = vlistNvars(vlistID);
+  int *vars = (int *) malloc(nvars*sizeof(int));
+
+  if ( cdoNumVarnames )
+    {
+      int nfound = 0;
+      char varname[CDI_MAX_NAME];
+
+      for ( varID = 0; varID < nvars; ++varID )
+	{
+	  vars[varID] = 0;
+
+	  vlistInqVarName(vlistID, varID, varname);
+
+	  for ( int i = 0; i < cdoNumVarnames; ++i )
+	    if ( strcmp(varname, cdoVarnames[i]) == 0 )
+	      {
+		vars[varID] = 1;
+		nfound++;
+		break;
+	      }
+	}
+
+      if ( nfound == 0 )
+	cdoAbort("Variable -n %s%s not found!", cdoVarnames[0], cdoNumVarnames > 1 ? ",..." : "");
+    }
+  else
+    {
+      for ( varID = 0; varID < nvars; ++varID ) vars[varID] = 1;
+    }
+
+  return (vars);
+}
+
+
 void *Arithc(void *argument)
 {
   int operatorID;
@@ -45,6 +83,7 @@ void *Arithc(void *argument)
   double rconst;
   field_t field;
   int taxisID1, taxisID2;
+  int *vars = NULL;
 
   cdoInitialize(argument);
 
@@ -64,6 +103,8 @@ void *Arithc(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
+
+  vars = fill_vars(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
@@ -90,16 +131,19 @@ void *Arithc(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  streamReadRecord(streamID1, field.ptr, &field.nmiss);
 
-	  field.grid    = vlistInqVarGrid(vlistID1, varID);
-	  field.missval = vlistInqVarMissval(vlistID1, varID);
+	  if ( vars[varID] )
+	    {
+	      field.grid    = vlistInqVarGrid(vlistID1, varID);
+	      field.missval = vlistInqVarMissval(vlistID1, varID);
 
-	  farcfun(&field, rconst, operfunc);
+	      farcfun(&field, rconst, operfunc);
 
-	  /* recalculate number of missing values */
-	  gridsize = gridInqSize(field.grid);
-	  field.nmiss = 0;
-	  for ( i = 0; i < gridsize; ++i )
-	    if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
+	      /* recalculate number of missing values */
+	      gridsize = gridInqSize(field.grid);
+	      field.nmiss = 0;
+	      for ( i = 0; i < gridsize; ++i )
+		if ( DBL_IS_EQUAL(field.ptr[i], field.missval) ) field.nmiss++;
+	    }
 
 	  streamDefRecord(streamID2, varID, levelID);
 	  streamWriteRecord(streamID2, field.ptr, field.nmiss);
@@ -111,6 +155,7 @@ void *Arithc(void *argument)
   streamClose(streamID1);
 
   if ( field.ptr ) free(field.ptr);
+  if ( vars ) free(vars);
 
   cdoFinish();
 
