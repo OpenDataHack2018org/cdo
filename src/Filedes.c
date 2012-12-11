@@ -88,6 +88,7 @@ void partab(FILE *fp, int vlistID, int option)
   char varname[CDI_MAX_NAME], varlongname[CDI_MAX_NAME], varstdname[CDI_MAX_NAME], varunits[CDI_MAX_NAME];
   int natts;
   int nvars;
+  int chunktype;
   double missval;
       
   nvars  = vlistNvars(vlistID);
@@ -158,6 +159,15 @@ void partab(FILE *fp, int vlistID, int option)
       if ( datatype == -1 )
 	if ( datatype2str(vlistInqVarDatatype(vlistID, varID), pstr) == 0 )
 	  fprintf(fp, "  datatype=%s\n", pstr);
+
+      chunktype = vlistInqVarChunkType(vlistID, varID);
+      if ( chunktype == CHUNK_AUTO )
+	fprintf(fp, "  chunktype=auto\n");
+      else if ( chunktype == CHUNK_GRID )
+	fprintf(fp, "  chunktype=grid\n");
+      if ( chunktype == CHUNK_LINES )
+	fprintf(fp, "  chunktype=lines\n");
+	
       
       if ( option == 2 ) printAtts(fp, vlistID, varID);
       if ( option == 2 ) 
