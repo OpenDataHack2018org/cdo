@@ -81,6 +81,7 @@ int cdoDiag              = FALSE;
 int cdoDisableHistory    = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
+int cdoChunkType         = CDI_UNDEFID;
 int cdoLogOff            = FALSE;
 int cdoSilentMode        = FALSE;
 int cdoOverwriteMode     = FALSE;
@@ -215,6 +216,7 @@ void usage(void)
   fprintf(stderr, "\n");
   */
   /* fprintf(stderr, "    -l <level>     Level file\n"); */
+  fprintf(stderr, "    -k <chunktype> Chunk type: auto, grid or lines\n");
   fprintf(stderr, "    -L             Lock IO\n");
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
@@ -669,7 +671,23 @@ void defineCompress(const char *arg)
 	cdoCompLevel = 1;
     }
   else
-    fprintf(stderr, "%s compression unsupported!\n", arg);
+    {
+      fprintf(stderr, "Compression type '%s' unsupported!\n", arg);
+      exit(EXIT_FAILURE);
+    }
+}
+
+static
+void defineChunktype(const char *arg)
+{
+  if      ( strcmp("auto",  arg)   == 0 ) cdoChunkType = CHUNK_AUTO;
+  else if ( strcmp("grid",  arg)   == 0 ) cdoChunkType = CHUNK_GRID;
+  else if ( strcmp("lines", arg)   == 0 ) cdoChunkType = CHUNK_LINES;
+  else
+    {
+      fprintf(stderr, "Chunk type '%s' unsupported!\n", arg);
+      exit(EXIT_FAILURE);
+    }
 }
 
 static
@@ -809,7 +827,7 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:l:m:n:t:D:z:aBcdhLMOQRrsSTuVvXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBcdhLMOQRrsSTuVvXZ")) != -1 )
     {
       switch (c)
 	{
@@ -860,6 +878,9 @@ int main(int argc, char *argv[])
 	  break;
 	case 'i':
 	  defineInstitution(cdoOptarg);
+	  break;
+	case 'k':
+	  defineChunktype(cdoOptarg);
 	  break;
 	case 'L':	
 	  cdoLockIO = TRUE;

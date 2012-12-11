@@ -70,6 +70,8 @@ extern int cdoParIO;
 extern int cdoCompType;
 extern int cdoCompLevel;
 
+extern int cdoChunkType;
+
 extern int cdoExpMode;
 
 extern int cdoDiag;

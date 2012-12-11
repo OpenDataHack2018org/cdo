@@ -1060,7 +1060,6 @@ void pstreamDefVlist(int pstreamID, int vlistID)
   else
 #endif
     {
-      extern int cdoDefaultDataType;
       if ( cdoDefaultDataType != CDI_UNDEFID )
 	{
 	  int varID, nvars = vlistNvars(vlistID);
@@ -1076,6 +1075,14 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 		  vlistDefVarScalefactor(vlistID, varID, 1.0);
 		}
 	    }
+	}
+
+      if ( cdoChunkType != CDI_UNDEFID )
+	{
+	  int varID, nvars = vlistNvars(vlistID);
+
+	  for ( varID = 0; varID < nvars; ++varID )
+	    vlistDefVarChunkType(vlistID, varID, cdoChunkType);
 	}
 
       vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
