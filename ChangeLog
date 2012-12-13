@@ -1,4 +1,4 @@
-2012-??-?? Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2012-12-14 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.5.9
 	* Version 1.5.9 released
@@ -29,6 +29,7 @@
 
 2012-11-14 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* cdo: added option -k <chunktype> to set the chunk type to auto, grid or lines
 	* cdo option -z zip: added optional compression level -z zip[_1-9] [request: Etienne Tourigny]
 
 2012-11-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
