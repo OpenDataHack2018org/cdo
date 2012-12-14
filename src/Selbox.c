@@ -932,22 +932,24 @@ void *Selbox(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
+	  streamReadRecord(streamID1, array1, &nmiss);
+
+	  streamDefRecord(streamID2, varID, levelID);
 
 	  if ( vars[varID] )
 	    {
-	      streamReadRecord(streamID1, array1, &nmiss);
-
-	      gridID1 = vlistInqVarGrid(vlistID1, varID);
-	      for ( index = 0; index < ngrids; index++ )
-		if ( gridID1 == sbox[index].gridID1 ) break;
-
-	      if ( index == ngrids ) cdoAbort("Internal problem, grid not found!");
-
 	      if ( vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX32 || 
 		   vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX64 )
 		nwpv = 2;
 	      else
 		nwpv = 1;
+	      
+	      gridID1 = vlistInqVarGrid(vlistID1, varID);
+
+	      for ( index = 0; index < ngrids; index++ )
+		if ( gridID1 == sbox[index].gridID1 ) break;
+
+	      if ( index == ngrids ) cdoAbort("Internal problem, grid not found!");
 
 	      gridsize2 = gridInqSize(sbox[index].gridID2);
 
@@ -965,8 +967,11 @@ void *Selbox(void *argument)
 		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 		}
 
-	      streamDefRecord(streamID2, varID, levelID);
 	      streamWriteRecord(streamID2, array2, nmiss);
+	    }
+	  else
+	    {
+	      streamWriteRecord(streamID2, array1, nmiss);
 	    }
 	}
       tsID++;
