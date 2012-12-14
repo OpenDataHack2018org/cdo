@@ -818,7 +818,7 @@ void *Selbox(void *argument)
   int gridID1 = -1, gridID2;
   int index, ngrids, gridtype = -1;
   int nmiss;
-  int *vars;
+  int *vars = NULL;
   int i;
   int nwpv; // number of words per value; real:1  complex:2
   double missval;

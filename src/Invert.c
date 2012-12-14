@@ -288,20 +288,27 @@ void invertLatData(double *array1, double *array2, int gridID1)
   nlon = gridInqXsize(gridID1);
   nlat = gridInqYsize(gridID1);
 
-  field1 = (double **) malloc(nlat*sizeof(double *));
-  field2 = (double **) malloc(nlat*sizeof(double *));
-  
-  for ( ilat = 0; ilat < nlat; ilat++ )
+  if ( nlat > 0 )
     {
-      field1[ilat] = array1 + ilat*nlon;
-      field2[ilat] = array2 + ilat*nlon;
-    }
-
-  for ( ilat = 0; ilat < nlat; ilat++ )
-    memcpy(field2[nlat-ilat-1], field1[ilat], nlon*sizeof(double));
+      field1 = (double **) malloc(nlat*sizeof(double *));
+      field2 = (double **) malloc(nlat*sizeof(double *));
   
-  if ( field1 ) free(field1);
-  if ( field2 ) free(field2);
+      for ( ilat = 0; ilat < nlat; ilat++ )
+	{
+	  field1[ilat] = array1 + ilat*nlon;
+	  field2[ilat] = array2 + ilat*nlon;
+	}
+
+      for ( ilat = 0; ilat < nlat; ilat++ )
+	memcpy(field2[nlat-ilat-1], field1[ilat], nlon*sizeof(double));
+      
+      if ( field1 ) free(field1);
+      if ( field2 ) free(field2);
+    }
+  else
+    {
+      array2[0] = array1[0];
+    }
 }
 
 

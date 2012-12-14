@@ -94,6 +94,11 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   double *xvals2, *yvals2;
   xyinfo_t *xyinfo;
 
+  gridID   = vlistGrid(ef[0].vlistID, igrid);
+  gridtype = gridInqType(gridID);
+  if ( gridtype == GRID_GENERIC && gridInqXsize(gridID) == 0 && gridInqYsize(gridID) == 0 )
+    return (gridID2);
+
   xsize = (int *) malloc(nfiles*sizeof(int));
   ysize = (int *) malloc(nfiles*sizeof(int));
   xyinfo = (xyinfo_t *) malloc(nfiles*sizeof(xyinfo_t));
@@ -189,7 +194,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       yoff[j+1] = yoff[j] + ysize[idx];
     }
 
-  if ( igrid == 0 )
+  if ( gridindex != NULL )
     {
       for ( fileID = 0; fileID < nfiles; fileID++ )
 	{
@@ -264,8 +269,8 @@ void *Gather(void *argument)
   int gridsize = 0;
   int gridsizemax = 0;
   int gridsize2;
-  int gridID2;
   int *gridIDs = NULL;
+  int *vars = NULL;
   int nrecs, nrecs0;
   int ngrids;
   int levelID;
@@ -304,8 +309,11 @@ void *Gather(void *argument)
       ef[fileID].vlistID  = vlistID;
     }
 
-  /* check that the contents is always the same */
   nvars = vlistNvars(ef[0].vlistID);
+  vars  = (int *) malloc(nvars*sizeof(int));
+  for ( varID = 0; varID < nvars; varID++ ) vars[varID] = FALSE;
+
+  /* check that the contents is always the same */
   if ( nvars == 1 ) 
     cmpfunc = CMP_NAME | CMP_NLEVEL;
   else
@@ -328,30 +336,47 @@ void *Gather(void *argument)
 
   ngrids = vlistNgrids(ef[0].vlistID);
   gridIDs = (int *) malloc(ngrids*sizeof(int));
-  gridindex = (int **) malloc(nfiles*sizeof(int*));
+  gridindex = (int **) malloc(nfiles*sizeof(int *));
   for ( fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int *) malloc(gridsizemax*sizeof(int));
 
   for ( i = 0; i < ngrids; ++i )
-    gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
-
+    {
+      if ( i == 0 )
+	gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
+      else
+	gridIDs[i] = genGrid(nfiles, ef, NULL, i);
+    }
 
   vlistID2 = vlistDuplicate(vlistID1);
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  gridID2 = gridIDs[0];
-  gridsize2 = gridInqSize(gridID2);
-  // printf("gridsize2 %d\n", gridsize2);
-  for ( i = 1; i < ngrids; ++i )
-    {
-      if ( gridsize2 != gridInqSize(gridIDs[i]) )
-	cdoAbort("gridsize differ!");
-    }
+  gridsize2 = 0;
   for ( i = 0; i < ngrids; ++i )
     {
-      vlistChangeGridIndex(vlistID2, i, gridIDs[i]);
+      if ( gridIDs[i] != -1 ) 
+	{
+	  if ( gridsize2 == 0 ) gridsize2 = gridInqSize(gridIDs[i]);
+	  if ( gridsize2 != gridInqSize(gridIDs[i]) ) cdoAbort("gridsize differ!");
+	  vlistChangeGridIndex(vlistID2, i, gridIDs[i]);
+	}
+    }
+
+  for ( varID = 0; varID < nvars; varID++ )
+    {
+      int gridID = vlistInqVarGrid(ef[0].vlistID, varID);
+
+      for ( i = 0; i < ngrids; ++i )
+	{
+	  if ( gridIDs[i] != -1 ) 
+	    {
+	      if ( gridID == vlistGrid(ef[0].vlistID, i) )
+	      vars[varID] = TRUE;
+	      break;
+	    }
+	}
     }
 
   streamID2 = streamOpenWrite(ofilename, cdoFiletype());
@@ -391,17 +416,26 @@ void *Gather(void *argument)
 	      streamInqRecord(streamID, &varID, &levelID);
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
 
-	      gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
-	      for ( i = 0; i < gridsize; ++i )
-		array2[gridindex[fileID][i]] = ef[fileID].array[i];
+	      if ( vars[varID] )
+		{
+		  gridsize = gridInqSize(vlistInqVarGrid(ef[fileID].vlistID, varID));
+		  for ( i = 0; i < gridsize; ++i )
+		    array2[gridindex[fileID][i]] = ef[fileID].array[i];
+		}
 	    }
 
-	  nmiss = 0;
-	  for ( i = 0; i < gridsize2; i++ )
-	    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
-
 	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, array2, nmiss);
+
+	  if ( vars[varID] )
+	    {
+	      nmiss = 0;
+	      for ( i = 0; i < gridsize2; i++ )
+		if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+	      
+	      streamWriteRecord(streamID2, array2, nmiss);
+	    }
+	  else
+	    streamWriteRecord(streamID2, ef[0].array, 0);
 	}
 
       tsID++;
@@ -423,6 +457,7 @@ void *Gather(void *argument)
   if ( array2 ) free(array2);
 
   free(gridIDs);
+  if ( vars   ) free(vars);
 
   cdoFinish();
 
