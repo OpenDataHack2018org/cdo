@@ -861,11 +861,6 @@ void *Selbox(void *argument)
       gridID1  = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
 
-      printf("%d %d %d %d %d %d\n", operatorID, SELINDEXBOX, gridtype, GRID_GENERIC, gridInqXsize(gridID1),  gridInqYsize(gridID1) );
-      if ( (operatorID == SELINDEXBOX && (gridtype == GRID_GENERIC || gridtype == GRID_SINUSOIDAL) && 
-	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) )
-	printf("ok\n");
-
       if ( gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_CURVILINEAR ||
 	   (operatorID == SELINDEXBOX && (gridtype == GRID_GENERIC || gridtype == GRID_SINUSOIDAL) && 
 	    gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) ||
