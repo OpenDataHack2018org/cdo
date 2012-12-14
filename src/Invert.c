@@ -365,8 +365,9 @@ void *Invert(void *argument)
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
-
 	  streamReadRecord(streamID1, array1, &nmiss);
+
+	  streamDefRecord(streamID2, varID, levelID);
 
 	  if ( operfunc1 == func_all || operfunc1 == func_fld )
 	    {
@@ -376,15 +377,14 @@ void *Invert(void *argument)
 		invertLatData(array1, array2, gridID1);
 	      else
 		invertLonData(array1, array2, gridID1);
+
+	      streamWriteRecord(streamID2, array2, nmiss);     
 	    }
 	  else
 	    {
-	      memcpy(array2, array1, gridsize*sizeof(double));
+	      streamWriteRecord(streamID2, array1, nmiss);     
 	    }
 
-	  streamDefRecord(streamID2, varID, levelID);
-
-	  streamWriteRecord(streamID2, array2, nmiss);     
 	}
       tsID++;
     }
