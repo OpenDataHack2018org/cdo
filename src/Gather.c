@@ -340,10 +340,14 @@ void *Gather(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     gridindex[fileID] = (int *) malloc(gridsizemax*sizeof(int));
 
+  int ginit = FALSE;
   for ( i = 0; i < ngrids; ++i )
     {
-      if ( i == 0 )
-	gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
+      if ( ginit == FALSE )
+	{
+	  gridIDs[i] = genGrid(nfiles, ef, gridindex, i);
+	  if ( gridIDs[i] != -1 ) ginit = TRUE;
+	}
       else
 	gridIDs[i] = genGrid(nfiles, ef, NULL, i);
     }
@@ -403,17 +407,20 @@ void *Gather(void *argument)
       
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
-	  missval = vlistInqVarMissval(vlistID1, 0);
+	  streamID = ef[0].streamID;
+	  streamInqRecord(streamID, &varID, &levelID);
+
+	  missval = vlistInqVarMissval(vlistID1, varID);
 	  for ( i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) private(fileID, streamID, nmiss, i) \
-                                     lastprivate(varID, levelID)
+#pragma omp parallel for default(shared) private(fileID, streamID, nmiss, i)
 #endif
 	  for ( fileID = 0; fileID < nfiles; fileID++ )
 	    {
+	      int varIDx, levelIDx;
 	      streamID = ef[fileID].streamID;
-	      streamInqRecord(streamID, &varID, &levelID);
+	      if ( fileID > 0 ) streamInqRecord(streamID, &varIDx, &levelIDx);
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);
 
 	      if ( vars[varID] )
