@@ -1,6 +1,6 @@
 CDO NEWS
 --------
-Version 1.5.9 (14 December 2012):
+Version 1.5.9 (17 December 2012):
 
    New features:
      * cdo option -z zip: added optional compression level -z zip[_1-9]
