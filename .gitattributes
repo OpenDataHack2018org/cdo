@@ -39,6 +39,7 @@ contrib/ruby/README.rdoc -text
 contrib/ruby/gemspec -text
 contrib/ruby/lib/cdo.rb -text
 contrib/ruby/test/test_cdo.rb -text
+doc/Doxyfile -text
 doc/cdo-poster.pdf -text
 doc/cdo.pdf -text
 doc/cdoBrochureWeb.pdf -text svneol=unset#unset
