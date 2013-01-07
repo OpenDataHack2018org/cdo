@@ -25,7 +25,10 @@
 
 #include <stdio.h>
 #include <string.h>
+
+#if  defined  (HAVE_GLOB_H)
 #include <glob.h>
+#endif
 
 #include "cdo.h"
 #include "cdo_int.h"
@@ -553,6 +556,7 @@ int expand_wildcards(int processID, int streamCnt)
   for ( i = 0; i < len; ++i ) if ( streamname0[i] == '?' || streamname0[i] == '*' ) break;
   if ( i < len )
     {
+#if  defined  (HAVE_GLOB_H)
       char *pattern = glob_pattern(streamname0);
       if ( strcmp(streamname0, pattern) != 0 )
 	{
@@ -604,6 +608,9 @@ int expand_wildcards(int processID, int streamCnt)
 	}
       
       free(pattern);
+#else
+      cdoAbort("Wildcards support not compiled in!");
+#endif
     }
 
   return 1;

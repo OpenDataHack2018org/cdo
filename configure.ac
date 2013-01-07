@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([cdo], [1.5.9], [http://code.zmaw.de/projects/cdo])
+AC_INIT([cdo], [1.6.0rc1], [http://code.zmaw.de/projects/cdo])
 
 CONFIG_ABORT=yes
 AC_CONFIG_AUX_DIR(config)
@@ -53,6 +53,7 @@ AC_CHECK_MEMBERS([struct stat.st_blksize])
 AC_CHECK_HEADERS(sys/resource.h)
 AC_CHECK_HEADERS(sys/times.h)
 AC_CHECK_HEADERS(malloc.h)
+AC_CHECK_HEADERS(glob.h)
 #  ----------------------------------------------------------------------
 # Checks for the availability of functions
 AC_CHECK_FUNCS(mallinfo)
