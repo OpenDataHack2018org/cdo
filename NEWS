@@ -1,5 +1,10 @@
 CDO NEWS
 --------
+Version 1.6.0 (?? March 2013):
+
+   New operators:
+     * mergegrid: merge horizontal grids
+
 Version 1.5.9 (17 December 2012):
 
    New features:
