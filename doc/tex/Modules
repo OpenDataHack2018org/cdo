@@ -6,6 +6,7 @@ Showinfo      Information
 Filedes       Information
 Copy	      File operations
 Replace	      File operations
+Mergegrid     File operations
 Merge	      File operations
 Split	      File operations
 Splittime     File operations

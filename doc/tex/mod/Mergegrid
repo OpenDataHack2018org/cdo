@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Merge grid
 @Title     = Merge grid
 @Section   = File operations
@@ -13,10 +12,10 @@
 @Title     = Merge grid
 
 @BeginDescription
-Merges all variables from @file{ifile2} to @file{ifile1} and write the result to @file{ofile}.
-Only the non missing values of @file{ifile2} will be used. The grid of @file{ifile2} should 
-be smaller or equal to the grid of @file{ifile1}. All grid points of @file{ifile2} have to fit
-into the grid of @file{ifile1}. Both input files need to have the same variables and the 
-same number of timesteps.
+Merges grid points of all variables from @file{ifile2} to @file{ifile1} and write the result to @file{ofile}.
+Only the non missing values of @file{ifile2} will be used. The horizontal grid of @file{ifile2} should 
+be smaller or equal to the grid of @file{ifile1} and the resolution must be the same.
+Only regular rectangular grids are supported. Both input files need to have the same variables 
+and the same number of timesteps.
 @EndDescription
 @EndOperator

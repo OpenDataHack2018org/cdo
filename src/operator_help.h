@@ -217,6 +217,22 @@ static char *ReplaceHelp[] = {
     NULL
 };
 
+static char *Merge gridHelp[] = {
+    "NAME",
+    "    mergegrid - Merge grid",
+    "",
+    "SYNOPSIS",
+    "    mergegrid  ifile1 ifile2 ofile",
+    "",
+    "DESCRIPTION",
+    "    Merges grid points of all variables from ifile2 to ifile1 and write the result to ofile.",
+    "    Only the non missing values of ifile2 will be used. The horizontal grid of ifile2 should ",
+    "    be smaller or equal to the grid of ifile1 and the resolution must be the same.",
+    "    Only regular rectangular grids are supported. Both input files need to have the same variables ",
+    "    and the same number of timesteps.",
+    NULL
+};
+
 static char *MergeHelp[] = {
     "NAME",
     "    merge, mergetime - Merge datasets",
@@ -1629,7 +1645,7 @@ static char *ZonstatHelp[] = {
     "    According to the chosen operator the zonal minimum, maximum, ",
     "    sum, average, variance, standard deviation or a certain percentile",
     "    is written to ofile. All input fields need to have the same",
-    "    regular lonlat grid. ",
+    "    regular lon/lat grid. ",
     "",
     "OPERATORS",
     "    zonmin   Zonal minimum",

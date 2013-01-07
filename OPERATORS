@@ -41,6 +41,7 @@ Operator catalog:
    Copy          copy            Copy datasets
    Copy          cat             Concatenate datasets
    Replace       replace         Replace variables
+   Mergegrid     mergegrid       Merge grid
    Merge         merge           Merge datasets with different fields
    Merge         mergetime       Merge datasets sorted by date and time
    Split         splitcode       Split code numbers
