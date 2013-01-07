@@ -217,7 +217,7 @@ static char *ReplaceHelp[] = {
     NULL
 };
 
-static char *Merge gridHelp[] = {
+static char *MergegridHelp[] = {
     "NAME",
     "    mergegrid - Merge grid",
     "",

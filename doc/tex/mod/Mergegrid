@@ -1,5 +1,5 @@
 @BeginModule
-@Name      = Merge grid
+@Name      = Mergegrid
 @Title     = Merge grid
 @Section   = File operations
 @Class     = File operation
