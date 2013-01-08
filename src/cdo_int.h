@@ -139,6 +139,10 @@ void param2str(int param, char *paramstr, int maxlen);
 void date2str(int date, char *datestr, int maxlen);
 void time2str(int time, char *timestr, int maxlen);
 
+const char * tunit2str(int tunits);
+const char * calendar2str(int calendar);
+
+
 typedef struct {
   int   date;
   int   time;

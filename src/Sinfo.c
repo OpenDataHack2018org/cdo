@@ -31,6 +31,32 @@
 
 #define MAXCHARS 82
 
+const char * tunit2str(int tunits)
+{
+  if      ( tunits == TUNIT_YEAR )    return ("years");
+  else if ( tunits == TUNIT_MONTH )   return ("months");
+  else if ( tunits == TUNIT_DAY )     return ("days");
+  else if ( tunits == TUNIT_12HOURS ) return ("12hours");
+  else if ( tunits == TUNIT_6HOURS )  return ("6hours");
+  else if ( tunits == TUNIT_3HOURS )  return ("3hours");
+  else if ( tunits == TUNIT_HOUR )    return ("hours");
+  else if ( tunits == TUNIT_MINUTE )  return ("minutes");
+  else if ( tunits == TUNIT_SECOND )  return ("seconds");
+  else                                return ("unknown");
+}
+
+
+const char * calendar2str(int calendar)
+{
+  if      ( calendar == CALENDAR_STANDARD )  return ("standard");
+  else if ( calendar == CALENDAR_PROLEPTIC ) return ("proleptic_gregorian");
+  else if ( calendar == CALENDAR_360DAYS )   return ("360_day");
+  else if ( calendar == CALENDAR_365DAYS )   return ("365_day");
+  else if ( calendar == CALENDAR_366DAYS )   return ("366_day");
+  else                                       return ("unknown");
+}
+
+
 void *Sinfo(void *argument)
 {
   enum {func_generic, func_param, func_name, func_code};
@@ -274,46 +300,10 @@ void *Sinfo(void *argument)
 		  fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 		      
 		  tunits = taxisInqTunit(taxisID);
-		  if ( tunits != CDI_UNDEFID )
-		    {
-		      if ( tunits == TUNIT_YEAR )
-			fprintf(stdout, "  Units = years");
-		      else if ( tunits == TUNIT_MONTH )
-			fprintf(stdout, "  Units = months");
-		      else if ( tunits == TUNIT_DAY )
-			fprintf(stdout, "  Units = days");
-		      else if ( tunits == TUNIT_12HOURS )
-			fprintf(stdout, "  Units = 12hours");
-		      else if ( tunits == TUNIT_6HOURS )
-			fprintf(stdout, "  Units = 6hours");
-		      else if ( tunits == TUNIT_3HOURS )
-			fprintf(stdout, "  Units = 3hours");
-		      else if ( tunits == TUNIT_HOUR )
-			fprintf(stdout, "  Units = hours");
-		      else if ( tunits == TUNIT_MINUTE )
-			fprintf(stdout, "  Units = minutes");
-		      else if ( tunits == TUNIT_SECOND )
-			fprintf(stdout, "  Units = seconds");
-		      else
-			fprintf(stdout, "  Units = unknown");
-		    }
+		  if ( tunits != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(tunits));
 	      
 		  calendar = taxisInqCalendar(taxisID);
-		  if ( calendar != CDI_UNDEFID )
-		    {
-		      if      ( calendar == CALENDAR_STANDARD )
-			fprintf(stdout, "  Calendar = STANDARD");
-		      else if ( calendar == CALENDAR_PROLEPTIC )
-			fprintf(stdout, "  Calendar = PROLEPTIC");
-		      else if ( calendar == CALENDAR_360DAYS )
-			fprintf(stdout, "  Calendar = 360DAYS");
-		      else if ( calendar == CALENDAR_365DAYS )
-			fprintf(stdout, "  Calendar = 365DAYS");
-		      else if ( calendar == CALENDAR_366DAYS )
-			fprintf(stdout, "  Calendar = 366DAYS");
-		      else
-			fprintf(stdout, "  Calendar = unknown");
-		    }
+		  if ( calendar != CDI_UNDEFID )  fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
 		  if ( taxisHasBounds(taxisID) )
 		    fprintf(stdout, "  Bounds = true");

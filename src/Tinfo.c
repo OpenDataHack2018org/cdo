@@ -36,48 +36,6 @@ enum {TU_SECONDS=0, TU_MINUTES, TU_HOURS, TU_DAYS, TU_MONTHS, TU_YEARS};
 char *tunits[] = {"second", "minute", "hour", "day", "month", "year"};
 int   iunits[] = {1, 60, 3600, 86400, 1, 12};
 
-static
-void printTunit(int unit)
-{
-  if ( unit == TUNIT_YEAR )
-    fprintf(stdout, "  Units = years");
-  else if ( unit == TUNIT_MONTH )
-    fprintf(stdout, "  Units = months");
-  else if ( unit == TUNIT_DAY )
-    fprintf(stdout, "  Units = days");
-  else if ( unit == TUNIT_12HOURS )
-    fprintf(stdout, "  Units = 12hours");
-  else if ( unit == TUNIT_6HOURS )
-    fprintf(stdout, "  Units = 6hours");
-  else if ( unit == TUNIT_3HOURS )
-    fprintf(stdout, "  Units = 3hours");
-  else if ( unit == TUNIT_HOUR )
-    fprintf(stdout, "  Units = hours");
-  else if ( unit == TUNIT_MINUTE )
-    fprintf(stdout, "  Units = minutes");
-  else if ( unit == TUNIT_SECOND )
-    fprintf(stdout, "  Units = seconds");
-  else
-    fprintf(stdout, "  Units = unknown");
-}
-
-static
-void printCalendar(int calendar)
-{
-  if      ( calendar == CALENDAR_STANDARD )
-    fprintf(stdout, "  Calendar = STANDARD");
-  else if ( calendar == CALENDAR_PROLEPTIC )
-    fprintf(stdout, "  Calendar = PROLEPTIC");
-  else if ( calendar == CALENDAR_360DAYS )
-    fprintf(stdout, "  Calendar = 360DAYS");
-  else if ( calendar == CALENDAR_365DAYS )
-    fprintf(stdout, "  Calendar = 365DAYS");
-  else if ( calendar == CALENDAR_366DAYS )
-    fprintf(stdout, "  Calendar = 366DAYS");
-  else
-    fprintf(stdout, "  Calendar = unknown");
-}
-
 
 void getTimeInc(double jdelta, int vdate0, int vdate1, int *incperiod, int *incunit)
 {
@@ -317,10 +275,10 @@ void *Tinfo(void *argument)
 	      fprintf(stdout, "     RefTime = %s %s", vdatestr, vtimestr);
 		      
 	      unit = taxisInqTunit(taxisID);
-	      if ( unit != CDI_UNDEFID ) printTunit(unit);
+	      if ( unit != CDI_UNDEFID )  fprintf(stdout, "  Units = %s", tunit2str(unit));
 	      
 	      calendar = taxisInqCalendar(taxisID);
-	      if ( calendar != CDI_UNDEFID ) printCalendar(calendar);
+	      if ( calendar != CDI_UNDEFID )  fprintf(stdout, "  Calendar = %s", calendar2str(calendar));
 
 	      if ( taxisHasBounds(taxisID) )
 		fprintf(stdout, "  Bounds = true");
