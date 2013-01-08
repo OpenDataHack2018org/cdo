@@ -5,6 +5,8 @@
 
 2013-03-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Runstat: added support for time bounds (Bug #3127)
+        * runpctl: added support for time bounds
 	* setcalendar: changed CDO calendar names to CF calendar names
                     (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
 
