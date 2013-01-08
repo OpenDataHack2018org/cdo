@@ -789,6 +789,7 @@ while (<MOFILE>) {
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
+	  $line =~ s/_/\\_/g;
 	  print TRFILE "$line\n";
 	}
       }
