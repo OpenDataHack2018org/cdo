@@ -46,9 +46,9 @@ void *Runpctl(void *argument)
   int *recVarID, *recLevelID;
   double missval, val;
   field_t ***vars1 = NULL;
-  datetime_t *datetime;
+  dtinfo_t *dtinfo;
   int taxisID1, taxisID2;
-  int calendar, dpy;
+  int calendar;
   int pn;
   double *array;
 
@@ -74,7 +74,6 @@ void *Runpctl(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   calendar = taxisInqCalendar(taxisID1);
-  dpy      = calendar_dpy(calendar);
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -86,7 +85,7 @@ void *Runpctl(void *argument)
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
-  datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
+  dtinfo = (dtinfo_t *) malloc((ndates+1)*sizeof(dtinfo_t));
   vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   array = (double *) malloc(ndates*sizeof(double));
   
@@ -119,8 +118,7 @@ void *Runpctl(void *argument)
       if ( nrecs == 0 )
         cdoAbort("File has less than %d timesteps!", ndates);
 
-      datetime[tsID].date = taxisInqVdate(taxisID1);
-      datetime[tsID].time = taxisInqVtime(taxisID1);
+      taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
         
       for ( recID = 0; recID < nrecs; recID++ )
         {
@@ -174,10 +172,15 @@ void *Runpctl(void *argument)
             }
         }
      
-      datetime_avg(dpy, ndates, datetime);
+      datetime_avg_dtinfo(calendar, ndates, dtinfo);
 
-      taxisDefVdate(taxisID2, datetime[ndates].date);
-      taxisDefVtime(taxisID2, datetime[ndates].time);
+      if ( taxisHasBounds(taxisID2) )
+	{
+	  dtinfo[ndates].b[0] = dtinfo[0].b[0];
+	  dtinfo[ndates].b[1] = dtinfo[ndates-1].b[1];
+	}
+
+      taxisDefDTinfo(taxisID2, dtinfo[ndates]);
       streamDefTimestep(streamID2, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
@@ -193,20 +196,19 @@ void *Runpctl(void *argument)
 
       otsID++;
 
-      datetime[ndates] = datetime[0];
+      dtinfo[ndates] = dtinfo[0];
       vars1[ndates] = vars1[0];
 
       for ( inp = 0; inp < ndates; inp++ )
         {
-          datetime[inp] = datetime[inp+1];
+          dtinfo[inp] = dtinfo[inp+1];
           vars1[inp] = vars1[inp+1];
         }
 
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      datetime[ndates-1].date = taxisInqVdate(taxisID1);
-      datetime[ndates-1].time = taxisInqVtime(taxisID1);
+      taxisInqDTinfo(taxisID1, &dtinfo[ndates-1]);
 
       for ( recID = 0; recID < nrecs; recID++ )
         {
