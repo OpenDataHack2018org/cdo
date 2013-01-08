@@ -242,14 +242,18 @@ void *Settime(void *argument)
     }
   else if ( operatorID == SETCALENDAR )
     {
-      size_t len;
       char *cname = operatorArgv()[0];
-      len = strlen(cname);      
-      if      ( memcmp(cname, "standard" , len) == 0 ) { newcalendar = CALENDAR_STANDARD;}
-      else if ( memcmp(cname, "proleptic", len) == 0 ) { newcalendar = CALENDAR_PROLEPTIC;}
-      else if ( memcmp(cname, "360days",   len) == 0 ) { newcalendar = CALENDAR_360DAYS;}
-      else if ( memcmp(cname, "365days",   len) == 0 ) { newcalendar = CALENDAR_365DAYS;}
-      else if ( memcmp(cname, "366days",   len) == 0 ) { newcalendar = CALENDAR_366DAYS;}
+      strtolower(cname);
+      if      ( strcmp(cname, "standard")  == 0 ) newcalendar = CALENDAR_STANDARD;
+      else if ( strcmp(cname, "gregorian") == 0 ) newcalendar = CALENDAR_STANDARD;
+      else if ( strcmp(cname, "proleptic") == 0 ) newcalendar = CALENDAR_PROLEPTIC;
+      else if ( strcmp(cname, "proleptic_gregorian") == 0 ) newcalendar = CALENDAR_PROLEPTIC;
+      else if ( strcmp(cname, "360days")   == 0 ) newcalendar = CALENDAR_360DAYS;
+      else if ( strcmp(cname, "360_day")   == 0 ) newcalendar = CALENDAR_360DAYS;
+      else if ( strcmp(cname, "365days")   == 0 ) newcalendar = CALENDAR_365DAYS;
+      else if ( strcmp(cname, "365_day")   == 0 ) newcalendar = CALENDAR_365DAYS;
+      else if ( strcmp(cname, "366days")   == 0 ) newcalendar = CALENDAR_366DAYS;
+      else if ( strcmp(cname, "366_day")   == 0 ) newcalendar = CALENDAR_366DAYS;
       else cdoAbort("Calendar >%s< unsupported!", cname);
     }
   else

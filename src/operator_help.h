@@ -791,7 +791,7 @@ static char *SettimeHelp[] = {
     "    date      STRING   Date (format: YYYY-MM-DD)",
     "    time      STRING   Time (format: hh:mm:ss)",
     "    inc       STRING   Optional increment (seconds, minutes, hours, days, months, years) [default: 0hour]",
-    "    calendar  STRING   Calendar (standard, proleptic, 360days, 365days, 366days)",
+    "    calendar  STRING   Calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)",
     "    sval      STRING   Shift value (e.g. -3hour)",
     NULL
 };

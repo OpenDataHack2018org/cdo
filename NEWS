@@ -2,6 +2,9 @@ CDO NEWS
 --------
 Version 1.6.0 (?? March 2013):
 
+   Changed operators:
+     * setcalendar: changed CDO calendar names to CF calendar names
+                    (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
    New operators:
      * mergegrid: merge horizontal grids
 
