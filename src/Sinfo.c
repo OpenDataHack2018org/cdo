@@ -287,10 +287,10 @@ void *Sinfo(void *argument)
 
 	  if ( taxisID != CDI_UNDEFID )
 	    {
-	      int calendar, tunits;
-
 	      if ( taxisInqType(taxisID) == TAXIS_RELATIVE )
 		{
+		  int calendar, tunits;
+
 		  vdate = taxisInqRdate(taxisID);
 		  vtime = taxisInqRtime(taxisID);
 

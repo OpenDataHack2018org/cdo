@@ -33,6 +33,47 @@
 #include "pstream.h"
 
 
+void datetime_avg_dtinfo(int calendar, int ndates, dtinfo_t *dtinfo)
+{
+  int vdate, vtime;
+  juldate_t juldate1, juldate2, juldatem;
+  double seconds;
+  /*
+  for ( i = 0; i < ndates; i++ )
+    fprintf(stdout, "%4d %d %d\n", i+1, dtinfo[i].v.date, dtinfo[i].v.time);
+  */
+  if ( ndates%2 == 0 )
+    {
+      /*
+      vdate = dtinfo[ndates-1].v.date;
+      vtime = dtinfo[ndates-1].v.time;
+      */
+      vdate = dtinfo[ndates/2-1].v.date;
+      vtime = dtinfo[ndates/2-1].v.time;
+      juldate1 = juldate_encode(calendar, vdate, vtime);
+
+      vdate = dtinfo[ndates/2].v.date;
+      vtime = dtinfo[ndates/2].v.time;
+      juldate2 = juldate_encode(calendar, vdate, vtime);
+
+      seconds = juldate_to_seconds(juldate_sub(juldate2, juldate1)) / 2;
+      juldatem = juldate_add_seconds(NINT(seconds), juldate1);
+      juldate_decode(calendar, juldatem, &vdate, &vtime);
+    }
+  else
+    {
+      vdate = dtinfo[ndates/2].v.date;
+      vtime = dtinfo[ndates/2].v.time;
+    }
+
+  dtinfo[ndates].v.date = vdate;
+  dtinfo[ndates].v.time = vtime;
+  /*
+  fprintf(stdout, "res: %d %d\n\n", dtinfo[ndates].v.date, dtinfo[ndates].v.time);
+  */
+}
+
+
 void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 {
   int vdate, vtime;
@@ -96,7 +137,7 @@ void *Runstat(void *argument)
   int *imask;
   double missval;
   field_t ***vars1 = NULL, ***vars2 = NULL, ***samp1 = NULL;
-  datetime_t *datetime;
+  dtinfo_t *dtinfo;
   int taxisID1, taxisID2;
   int calendar;
   int runstat_nomiss = 0;
@@ -117,23 +158,21 @@ void *Runstat(void *argument)
   if ( envstr )
     {
       int env_date = -1;
+      char envstrl[8];
 
-      if      ( memcmp(envstr, "first", 5) == 0 ||
-		memcmp(envstr, "FIRST", 5) == 0 ||
-		memcmp(envstr, "First", 5) == 0 )  env_date = DATE_FIRST;
-      else if ( memcmp(envstr, "last", 4) == 0 ||
-		memcmp(envstr, "LAST", 4) == 0 ||
-		memcmp(envstr, "Last", 4) == 0 )   env_date = DATE_LAST;
-      else if ( memcmp(envstr, "middle", 6) == 0 ||
-		memcmp(envstr, "MIDDLE", 6) == 0 ||
-		memcmp(envstr, "Middle", 6) == 0 ) env_date = DATE_MIDDLE;
+      memcpy(envstrl, envstr, 8);
+      envstrl[7] = 0;
+      strtolower(envstrl);
+
+      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = DATE_FIRST;
+      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = DATE_LAST;
+      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = DATE_MIDDLE;
 
       if ( env_date >= 0 )
 	{
 	  runstat_date = env_date;
 
-	  if ( cdoVerbose )
-	    cdoPrint("Set RUNSTAT_DATE to %s", envstr);
+	  if ( cdoVerbose ) cdoPrint("Set RUNSTAT_DATE to %s", envstr);
 	}
     }
 
@@ -172,7 +211,7 @@ void *Runstat(void *argument)
   recVarID   = (int *) malloc(nrecords*sizeof(int));
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
-  datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
+  dtinfo = (dtinfo_t *) malloc((ndates+1)*sizeof(dtinfo_t));
   vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   if ( !runstat_nomiss )
     samp1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
@@ -231,11 +270,9 @@ void *Runstat(void *argument)
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
       nrecs = streamInqTimestep(streamID1, tsID);
-      if ( nrecs == 0 )
-	cdoAbort("File has less then %d timesteps!", ndates);
+      if ( nrecs == 0 ) cdoAbort("File has less then %d timesteps!", ndates);
 
-      datetime[tsID].date = taxisInqVdate(taxisID1);
-      datetime[tsID].time = taxisInqVtime(taxisID1);
+      taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
 	
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -343,23 +380,17 @@ void *Runstat(void *argument)
 	      }
 	  }
 
-      if ( runstat_date == DATE_MIDDLE )
+      if      ( runstat_date == DATE_MIDDLE ) datetime_avg_dtinfo(calendar, ndates, dtinfo);
+      else if ( runstat_date == DATE_FIRST  ) dtinfo[ndates].v = dtinfo[0].v;
+      else if ( runstat_date == DATE_LAST   ) dtinfo[ndates].v = dtinfo[ndates-1].v;
+
+      if ( taxisHasBounds(taxisID2) )
 	{
-	  datetime_avg(calendar, ndates, datetime);
-	}
-      else if ( runstat_date == DATE_FIRST )
-	{
-	  datetime[ndates].date = datetime[0].date;
-	  datetime[ndates].time = datetime[0].time;
-	}
-      else if ( runstat_date == DATE_LAST )
-	{
-	  datetime[ndates].date = datetime[ndates-1].date;
-	  datetime[ndates].time = datetime[ndates-1].time;
+	  dtinfo[ndates].b[0] = dtinfo[0].b[0];
+	  dtinfo[ndates].b[1] = dtinfo[ndates-1].b[1];
 	}
 
-      taxisDefVdate(taxisID2, datetime[ndates].date);
-      taxisDefVtime(taxisID2, datetime[ndates].time);
+      taxisDefDTinfo(taxisID2, dtinfo[ndates]);
       streamDefTimestep(streamID2, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )
@@ -375,7 +406,7 @@ void *Runstat(void *argument)
 
       otsID++;
 
-      datetime[ndates] = datetime[0];
+      dtinfo[ndates] = dtinfo[0];
       vars1[ndates] = vars1[0];
       if ( !runstat_nomiss )
 	samp1[ndates] = samp1[0];
@@ -384,7 +415,7 @@ void *Runstat(void *argument)
 
       for ( inp = 0; inp < ndates; inp++ )
 	{
-	  datetime[inp] = datetime[inp+1];
+	  dtinfo[inp] = dtinfo[inp+1];
 	  vars1[inp] = vars1[inp+1];
 	  if ( !runstat_nomiss )
 	    samp1[inp] = samp1[inp+1];
@@ -395,8 +426,7 @@ void *Runstat(void *argument)
       nrecs = streamInqTimestep(streamID1, tsID);
       if ( nrecs == 0 ) break;
 
-      datetime[ndates-1].date = taxisInqVdate(taxisID1);
-      datetime[ndates-1].time = taxisInqVtime(taxisID1);
+      taxisInqDTinfo(taxisID1, &dtinfo[ndates-1]);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -481,7 +511,7 @@ void *Runstat(void *argument)
       if ( operfunc == func_std || operfunc == func_var ) free(vars2[its]);
     }
 
-  free(datetime);
+  free(dtinfo);
   free(vars1);
   if ( !runstat_nomiss ) free(samp1);
   if ( operfunc == func_std || operfunc == func_var ) free(vars2);
