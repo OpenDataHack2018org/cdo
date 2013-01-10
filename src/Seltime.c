@@ -319,7 +319,9 @@ void *Seltime(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
   vlistID2 = vlistDuplicate(vlistID1);
-  if ( nsel == 1 && operfunc == func_step )  vlistDefNtsteps(vlistID2, 1);
+
+  if ( nsel == 1 && operfunc == func_step )  vlistDefNtsteps(vlistID2,  1);
+  else                                       vlistDefNtsteps(vlistID2, -1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
