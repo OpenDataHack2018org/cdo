@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([cdo], [1.6.0rc1], [http://code.zmaw.de/projects/cdo])
+AC_INIT([cdo], [1.6.0rc2], [http://code.zmaw.de/projects/cdo])
 
 CONFIG_ABORT=yes
 AC_CONFIG_AUX_DIR(config)
@@ -98,6 +98,18 @@ AC_SUBST([SYSTEM_TYPE],["$ac_cv_build"])
 #  ----------------------------------------------------------------------
 #  Check for math library
 AC_CHECK_LIB([m],[floor])
+#  ----------------------------------------------------------------------
+#  Enable GRIB support
+AC_MSG_CHECKING([for DATA support])
+AC_ARG_ENABLE([data],
+              [AS_HELP_STRING([--enable-data],[DATA support [default=yes]])],
+              [AS_IF([test "x$enable_data" != 'xno'],
+                     [AC_DEFINE(ENABLE_DATA, [1], [Define to 1 for DATA support])
+                      enable_grib=yes])],
+              [AC_DEFINE(ENABLE_DATA, [1], [Define to 1 for DATA support])
+               enable_data=yes])
+AC_MSG_RESULT([$enable_data])
+AC_SUBST([ENABLE_DATA],[$enable_data])
 #  ----------------------------------------------------------------------
 # Add configure options
 ACX_OPTIONS

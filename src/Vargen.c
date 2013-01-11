@@ -24,6 +24,11 @@
                                  the standard atmosphere
 */
 
+
+#if  defined  (HAVE_CONFIG_H)
+#  include "config.h" // ENABLE_DATA
+#endif
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -31,14 +36,7 @@
 #include "list.h"
 
 
-#if defined (__GNUC__)
-#if __GNUC__ > 2
-#  define WITH_DATA 1
-#endif
-#endif
-
-
-#if defined(WITH_DATA)
+#if defined(ENABLE_DATA)
   static double etopo_scale  = 3;
   static double etopo_offset = 11000;
   static const unsigned short etopo[] = {
@@ -300,7 +298,7 @@ void *Vargen(void *argument)
                 }
               else if ( operatorID == TOPO )
                 {
-#if defined(WITH_DATA)
+#if defined(ENABLE_DATA)
                   for ( i = 0; i < gridsize; i++ )
                     array[i] = etopo[i]/etopo_scale - etopo_offset;
 #else
@@ -309,7 +307,7 @@ void *Vargen(void *argument)
                 }
               else if ( operatorID == TEMP )
                 {
-#if defined(WITH_DATA)
+#if defined(ENABLE_DATA)
                   for ( i = 0; i < gridsize; i++ )
                     array[i] = temp[i]/temp_scale - temp_offset;
 #else
@@ -318,7 +316,7 @@ void *Vargen(void *argument)
                 }
               else if ( operatorID == MASK )
                 {
-#if defined(WITH_DATA)
+#if defined(ENABLE_DATA)
                   for ( i = 0; i < gridsize; i++ )
                     array[i] = mask[i]/mask_scale - mask_offset;
 #else

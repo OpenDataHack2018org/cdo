@@ -6,6 +6,9 @@
 /* Compiler version */
 #undef COMP_VERSION
 
+/* Define to 1 for DATA support */
+#undef ENABLE_DATA
+
 /* Define to 1 if you have the declaration of `isnan', and to 0 if you don't.
    */
 #undef HAVE_DECL_ISNAN
