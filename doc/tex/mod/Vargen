@@ -6,10 +6,8 @@
 @Operators = const random stdatm
 
 @BeginDescription
-Generates a dataset with one or more fields. The field size
-is specified by the user given grid description.
-According to the chosen operator all field elements
-are constant or filled with random numbers.
+Generates a dataset with one or more fields. The field size is specified by the user given grid description.
+According to the chosen operator all field elements are constant or filled with random numbers.
 @EndDescription
 @EndModule
 
@@ -19,8 +17,7 @@ are constant or filled with random numbers.
 @Parameter = const grid
 
 @BeginDescription
-Creates a constant field. All field elements of the grid
-have the same value.
+Creates a constant field. All field elements of the grid have the same value.
 @EndDescription
 @EndOperator
 
