@@ -398,7 +398,12 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 	  else
 	    {
 	      for ( i = 0; i < ngp; i++ )
-		p->data[i+k*ngp] = p1->data[i+loff1] / p2->data[i+loff2];
+		{
+		  if ( IS_EQUAL(p2->data[i+loff2], 0.) )
+		    p->data[i+k*ngp] = missval1;
+		  else
+		    p->data[i+k*ngp] = p1->data[i+loff1] / p2->data[i+loff2];
+		}
 	    }
 	  break;
 	case '^':
@@ -441,6 +446,9 @@ void ex_copy(nodeType *p2, nodeType *p1)
 
   ngp1 = gridInqSize(p1->gridID);
   ngp2 = gridInqSize(p2->gridID);
+
+  if ( ngp1 != ngp2 )
+    cdoAbort("number of grid points differ. ngp1 = %d, ngp2 = %d", ngp1, ngp2);
 
   ngp = ngp2;
   nlev = zaxisInqSize(p2->zaxisID);
