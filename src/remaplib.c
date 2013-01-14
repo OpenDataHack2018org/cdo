@@ -2904,6 +2904,40 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
   nbr_dist[0] = BIGNUM;
 
   // printf("%g %g  min %d  max %d  range %d\n", plon, plat, min_add, max_add, max_add-min_add);
+  //#define TESTVECTOR
+
+#ifdef  TESTVECTOR
+  long i = 0;
+  long ni = max_add - min_add + 1;
+  double *distvect = malloc(ni*sizeof(double));
+
+  for ( nadd = min_add; nadd <= max_add; ++nadd )
+    {
+      /* Find distance to this point */
+      distvect[i] =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
+	            (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
+      /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
+                                     otherwise the result of acos(distance) is NaN */
+      if ( distvect[i] >  1 ) distvect[i] =  1;
+      if ( distvect[i] < -1 ) distvect[i] = -1;
+
+      i++;
+    }
+
+  for ( i = 0; i < ni; ++i )
+    distvect[i] = acos(distvect[i]);
+
+  /* Store the address and distance if this is the smallest so far */
+  for ( i = 0; i < ni; ++i )
+    if ( distvect[i] < nbr_dist[0] )
+      {
+	nbr_add[0]  = nadd + 1;
+	nbr_dist[0] = distvect[i];
+      }
+
+  free(distvect);
+
+#else
   for ( nadd = min_add; nadd <= max_add; ++nadd )
     {
       /* Find distance to this point */
@@ -2922,6 +2956,7 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
 	  nbr_dist[0] = distance;
         }
     }
+#endif
 
 }  /*  grid_search_nbr1  */
 
