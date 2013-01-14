@@ -26,10 +26,10 @@ case "${HOSTNAME}" in
                     --with-hdf5=$HOME/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
-                    --with-libxml2=/usr \
-                    --with-magics=/Users/m214003/local/magics-2.14.9 \
 	            CC=icc CFLAGS="-g  -D_REENTRANT -Wall -W -O3 -openmp" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
+#                    --with-libxml2=/usr \
+#                    --with-magics=/Users/m214003/local/magics-2.14.9 \
 	;;
 # i386-apple-darwin10
     bailung*)

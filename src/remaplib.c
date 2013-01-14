@@ -2926,40 +2926,6 @@ void grid_search_nbr1(remapgrid_t *rg, int *restrict nbr_add, double *restrict n
 }  /*  grid_search_nbr1  */
 
 /*
-  This routine stores the address and weight for this link in
-  the appropriate address and weight arrays and resizes those
-  arrays if necessary.
-*/
-static
-void store_link_nbr1(remapvars_t *rv, int add1, int add2, double weights)
-{
-  /*
-    Input variables:
-    int  add1         ! address on grid1
-    int  add2         ! address on grid2
-    double weights    ! remapping weight for this link
-  */
-  long nlink;
-
-  /*
-     Increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  Then store the link.
-  */
-  nlink = rv->num_links;
-
-  rv->num_links++;
-  if ( rv->num_links >= rv->max_links ) 
-    resize_remap_vars(rv, rv->resize_increment);
-
-  rv->grid1_add[nlink] = add1;
-  rv->grid2_add[nlink] = add2;
-
-  rv->wts[nlink] = weights;
-
-} /* store_link_nbr1 */
-
-
-/*
   -----------------------------------------------------------------------
 
    This routine computes the inverse-distance weights for a
@@ -3067,7 +3033,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 #if defined (_OPENMP)
 #pragma omp critical
 #endif
-	  store_link_nbr1(rv, nbr_add-1, dst_add, wgtstmp);
+	  store_link_nbr(rv, nbr_add-1, dst_add, wgtstmp);
 	}
 
     } /* grid_loop1 */
