@@ -158,7 +158,17 @@ void *Sinfo(void *argument)
 	  /* source info */
 	  modelptr = modelInqNamePtr(vlistInqVarModel(vlistID, varID));
 	  if ( modelptr )
-	    fprintf(stdout, "%-8s ", modelptr);
+	    {
+	      size_t len = strlen(modelptr);
+	      if ( len > 10 )
+		for ( size_t i = 3; i < len; ++i )
+		  if ( modelptr[i] == ' ' )
+		    {
+		      modelptr[i] = 0;
+		      break;
+		    }
+	      fprintf(stdout, "%-8s ", modelptr);
+	    }
 	  else
 	    fprintf(stdout, "unknown  ");
 
