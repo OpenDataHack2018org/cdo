@@ -311,6 +311,11 @@ void *Vertint(void *argument)
     {
       phlev = (double *) malloc(nplev*sizeof(double));
       h2p(phlev, plev, nplev);
+
+      if ( cdoVerbose )
+	for ( i = 0; i < nplev; ++i )
+	  cdoPrint("level = %d   height = %g   pressure = %g", i+1, plev[i], phlev[i]);
+
       memcpy(plev, phlev, nplev*sizeof(double));
       free(phlev);
     }
