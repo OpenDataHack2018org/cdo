@@ -30,8 +30,9 @@
 
 void *Diff(void *argument)
 {
-  int DIFF, DIFF2, DIFFP, DIFFN, DIFFC, SDIFF;
+  int DIFF, DIFF2, DIFFP, DIFFN, DIFFC;
   int operatorID;
+  int lhead = TRUE;
   int i;
   int indg;
   int varID1, varID2, recID;
@@ -50,7 +51,7 @@ void *Diff(void *argument)
   int ndrec = 0, nd2rec = 0, ngrec = 0;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
-  char vdatestr[32], vtimestr[32];	  
+  char vdatestr[32], vtimestr[32];
   double *array1, *array2;
   double absm, relm;
   double missval1, missval2;
@@ -62,7 +63,6 @@ void *Diff(void *argument)
   DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
   DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
   DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
-  SDIFF = cdoOperatorAdd("sdiff", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -78,27 +78,6 @@ void *Diff(void *argument)
 
   array1 = (double *) malloc(gridsize*sizeof(double));
   array2 = (double *) malloc(gridsize*sizeof(double));
-
-  if ( ! cdoSilentMode )
-    {
-      if ( operatorID != SDIFF )
-	{
-	  fprintf(stdout, "               Date     Time   Level Gridsize    Miss ");
-
-	  if ( operatorID == DIFF2 ) fprintf(stdout, "   Diff ");
-
-	  fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff");
-
-	  if ( operatorID == DIFFN )
-	    fprintf(stdout, " : Parameter name");
-	  else if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP )
-	    fprintf(stdout, " : Parameter ID");
-	  else if ( operatorID == DIFFC )
-	    fprintf(stdout, " : Code number");
-
-	  fprintf(stdout, "\n");
-	}
-    }
 
   indg = 0;
   tsID = 0;
@@ -136,16 +115,6 @@ void *Diff(void *argument)
 
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
-	  if ( ! cdoSilentMode )
-	    if ( operatorID != SDIFF )
-	      {
-		if ( operatorID == DIFFN ) vlistInqVarName(vlistID1, varID1, varname);
-		
-		fprintf(stdout, "%6d :%s %s ", indg, vdatestr, vtimestr);
-
-		fprintf(stdout, "%7g ", zaxisInqLevel(zaxisID, levelID));
-	      }
-
 	  streamReadRecord(streamID1, array1, &nmiss1);
 	  streamReadRecord(streamID2, array2, &nmiss2);
 
@@ -180,8 +149,34 @@ void *Diff(void *argument)
 
 	  if ( ! cdoSilentMode )
 	    {
-	      if ( operatorID != SDIFF )
+	      if ( absm > 0 || relm > 0 )
 		{
+		  if ( lhead )
+		    {
+		      lhead = FALSE;
+
+		      fprintf(stdout, "               Date     Time   Level Gridsize    Miss ");
+			
+		      if ( operatorID == DIFF2 ) fprintf(stdout, "   Diff ");
+
+		      fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff");
+
+		      if ( operatorID == DIFFN )
+			fprintf(stdout, " : Parameter name");
+		      else if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP )
+			fprintf(stdout, " : Parameter ID");
+		      else if ( operatorID == DIFFC )
+			fprintf(stdout, " : Code number");
+
+		      fprintf(stdout, "\n");
+		    }
+
+		  if ( operatorID == DIFFN ) vlistInqVarName(vlistID1, varID1, varname);
+		
+		  fprintf(stdout, "%6d :%s %s ", indg, vdatestr, vtimestr);
+
+		  fprintf(stdout, "%7g ", zaxisInqLevel(zaxisID, levelID));
+
 		  fprintf(stdout, "%8d %7d ", gridsize, MAX(nmiss1, nmiss2));
 
 		  if ( operatorID == DIFF2 )  fprintf(stdout, "%7d ", ndiff);
@@ -195,7 +190,7 @@ void *Diff(void *argument)
 		    fprintf(stdout, " : %-11s", paramstr);
 		  else if ( operatorID == DIFFC )
 		    fprintf(stdout, " : %4d", code);
-
+		      
 		  fprintf(stdout, "\n");
 		}
 	    }

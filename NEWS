@@ -7,6 +7,8 @@ Version 1.6.0 (?? March 2013):
                     (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
    New operators:
      * mergegrid: merge horizontal grids
+   Changed operators:
+     * diff: print only records that differ
    Fixed bugs:
      * expr: wrong result for operation var1/var2 where var2 = 0
      * Runstat: added support for time bounds (Bug #3127)
