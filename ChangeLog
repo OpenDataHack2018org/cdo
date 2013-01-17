@@ -3,15 +3,19 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
-2013-03-11 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2013-01-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* setpartab: added namelist entry 'delete'
+
+2013-01-11 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: wrong result for operation var1/var2 where var2 = 0
 
-2013-03-10 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2013-01-10 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Settime: set number of output timesteps to unlimited
 
-2013-03-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2013-01-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Runstat: added support for time bounds (Bug #3127)
         * runpctl: added support for time bounds
