@@ -6,6 +6,7 @@ Version 1.6.0 (?? March 2013):
      * setcalendar: changed CDO calendar names to CF calendar names (Feature #3123)
                     (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
    New operators:
+     * select: select fields from an unlimited number of input files
      * mergegrid: merge horizontal grids
    Changed operators:
      * diff: print only records that differ

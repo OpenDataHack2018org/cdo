@@ -60,6 +60,8 @@ Operator catalog:
 -------------------------------------------------------------
    Selection
 -------------------------------------------------------------
+   Select        select          Select fields
+   Select        delete          Delete fields
    Selvar        selparam        Select parameters by identifier
    Selvar        delparam        Delete parameters by identifier
    Selvar        selcode         Select parameters by code number

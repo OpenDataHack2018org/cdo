@@ -185,7 +185,7 @@ STRING   Comma separated list of variable names
 @Item = stdnames
 STRING   Comma separated list of standard names
 @Item = levels
-FLOAT    Comma separated list of levels
+FLOAT    Comma separated list of vertical levels
 @Item = levidx
 INTEGER  Comma separated list of index of levels
 @Item = ltypes

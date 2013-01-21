@@ -11,31 +11,60 @@
 This module selects some fields from @file{ifiles} and writes them to @file{ofile}.
 @file{ifiles} is an unlimited number of input files. All input files need to have 
 the same structure with the same variables on different timesteps.
-The fields selected depends on the chosen operator and the parameters.
+The fields selected depends on the chosen parameters. Parameter is a comma
+separated list of key-value pairs.
 @EndDescription
 @EndModule
 
 
 @BeginOperator_select
 @Title     = Select fields
-@Parameter = keys
+@Parameter = params
 
 @BeginDescription
-Selects all fields with keys in a user given list.
+Selects all fields with parameters in a user given list.
 @EndDescription
 @EndOperator
 
 
 @BeginOperator_delete
 @Title     = Delete fields
-@Parameter = keys
+@Parameter = params
 
 @BeginDescription
-Deletes all fields with keys in a user given list.
+Deletes all fields with parameters in a user given list.
 @EndDescription
 @EndOperator
 
+
 @BeginParameter
-@Item = keys
-STRING  Comma separated list of keys
+@Item = name
+STRING  Comma separated list of variable names
+@Item = param
+STRING  Comma separated list of parameter identifiers
+@Item = code
+INTEGER Comma separated list of code numbers
+@Item = ltype
+INTEGER Comma separated list of GRIB level types
+@Item = levidx
+INTEGER Comma separated list of index of levels
+@Item = level
+FLOAT   Comma separated list of vertical levels
+@Item = day
+INTEGER Comma separated list of days
+@Item = month
+INTEGER Comma separated list of months
+@Item = year
+INTEGER Comma separated list of years
+@Item = timestep
+INTEGER Comma separated list of timesteps
 @EndParameter
+
+
+@BeginExample
+Assume you have 3 inputfiles. Each inputfile contains the same variables for a different time period.
+To select the variable T,U and V on the levels 200,500 and 850 from all 3 input files, use:
+@BeginVerbatim
+   cdo select,name=T,U,V,level=200,500,850 ifile1 ifile2 ifile3 ofile
+@EndVerbatim
+@EndExample
