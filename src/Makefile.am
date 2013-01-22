@@ -3,7 +3,8 @@
 bin_PROGRAMS = cdo
 #
 cdo_SOURCES  = cdo.c
-cdo_SOURCES += Arith.c         \
+cdo_SOURCES += Adisit.c        \
+               Arith.c         \
                Arithc.c        \
                Arithdays.c     \
                Arithlat.c      \

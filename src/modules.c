@@ -42,6 +42,7 @@ typedef struct {
 modules_t;
 
 
+void *Adisit(void *argument);
 void *Arith(void *argument);
 void *Arithc(void *argument);
 void *Arithdays(void *argument);
@@ -268,6 +269,7 @@ void *Maggraph(void *argument);
 #endif
 
 
+#define  AdisitOperators        {"adisit"}
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy", "muldoy"}
@@ -535,6 +537,7 @@ static modules_t Modules[] =
     function        help function      operator names          number     num streams
                                                                type       in  out
   */
+  { Adisit,         NULL,              AdisitOperators,        CDI_REAL,  1,  1 },
   { Arith,          ArithHelp,         ArithOperators,         CDI_REAL,  2,  1 },
   { Arithc,         ArithcHelp,        ArithcOperators,        CDI_REAL,  1,  1 },
   { Arithdays,      ArithdaysHelp,     ArithdaysOperators,     CDI_REAL,  1,  1 },
