@@ -1,0 +1,28 @@
+@BeginModule
+@NewPage
+@Name      = Adisit
+@Title     = Potential temperature to in-situ temperature
+@Section   = Miscellaneous
+@Arguments = ifile ofile
+@Operators = adisit
+@EndModule
+
+
+@BeginOperator_adisit
+@Title     = Potential temperature to in-situ temperature
+@Parameter = [pressure]
+
+@BeginDescription
+This is a special operator for the post processing of the ocean and sea ice model @ref{MPIOM}.
+It converts potential temperature adiabatically to in-situ temperature to(tho, sao, p).
+Required input fields are sea water potential temperature (name=tho; code=2) and sea water salinity (name=sao; code=5).
+Pressure is calculated from the level information or can be specified by the optional parameter.
+Output fields are sea water temperature (name=to; code=20) and sea water salinity (name=sao; code=5).
+@EndDescription
+@EndOperator
+
+
+@BeginParameter
+@Item = pressure
+FLOAT   Pressure in mbar (constant value assigned to all levels)
+@EndParameter

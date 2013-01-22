@@ -76,6 +76,7 @@ doc/tex/makehtml -text
 doc/tex/makepdf -text
 doc/tex/makerefcard -text
 doc/tex/missval.tex -text
+doc/tex/mod/Adisit -text
 doc/tex/mod/Arith -text
 doc/tex/mod/Arithc -text
 doc/tex/mod/Arithdays -text
@@ -181,6 +182,7 @@ doc/tex/mod/Remapeta -text
 doc/tex/mod/Remapgrid -text
 doc/tex/mod/Replace -text
 doc/tex/mod/Replacevalues -text
+doc/tex/mod/Rhopot -text
 doc/tex/mod/Rotuv -text
 doc/tex/mod/Runpctl -text
 doc/tex/mod/Runstat -text

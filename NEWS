@@ -8,6 +8,8 @@ Version 1.6.0 (?? March 2013):
    New operators:
      * select: select fields from an unlimited number of input files
      * mergegrid: merge horizontal grids
+     * adisit: Potential temperature to in-situ temperature
+     * rhopot: Calculates potential density
    Changed operators:
      * diff: print only records that differ
    Fixed bugs:

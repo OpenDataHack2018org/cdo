@@ -3870,10 +3870,46 @@ static char *MastrfuHelp[] = {
     "    mastrfu  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This is a special operator for the post processing of the atmospheric ",
-    "    general circulation model ECHAM. It computes the mass stream function ",
-    "    (code number 272). The input dataset have to be a zonal mean of v-velocity [m/s]",
-    "    (code number 132) on pressure levels.",
+    "    This is a special operator for the post processing of the atmospheric general circulation",
+    "    model ECHAM. It computes the mass stream function (code=272). The input dataset have ",
+    "    to be a zonal mean of v-velocity [m/s] (code=132) on pressure levels.",
+    NULL
+};
+
+static char *AdisitHelp[] = {
+    "NAME",
+    "    adisit - Potential temperature to in-situ temperature",
+    "",
+    "SYNOPSIS",
+    "    adisit[,pressure]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This is a special operator for the post processing of the ocean and sea ice model MPIOM.",
+    "    It converts potential temperature adiabatically to in-situ temperature to(tho, sao, p).",
+    "    Required input fields are sea water potential temperature (name=tho; code=2) and sea water salinity (name=sao; code=5).",
+    "    Pressure is calculated from the level information or can be specified by the optional parameter.",
+    "    Output fields are sea water temperature (name=to; code=20) and sea water salinity (name=sao; code=5).",
+    "",
+    "PARAMETER",
+    "    pressure  FLOAT   Pressure in mbar (constant value assigned to all levels)",
+    NULL
+};
+
+static char *RhopotHelp[] = {
+    "NAME",
+    "    rhopot - Calculates potential density",
+    "",
+    "SYNOPSIS",
+    "    rhopot[,pressure]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This is a special operator for the post processing of the ocean and sea ice model MPIOM.",
+    "    It calculates the sea water potential density (name=rhopoto; code=18).",
+    "    Required input fields are sea water in-situ temperature (name=to; code=20) and sea water salinity (name=sao; code=5).",
+    "    Pressure is calculated from the level information or can be specified by the optional parameter.",
+    "",
+    "PARAMETER",
+    "    pressure  FLOAT   Pressure in mbar (constant value assigned to all levels)",
     NULL
 };
 

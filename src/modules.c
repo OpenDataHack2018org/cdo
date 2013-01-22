@@ -537,7 +537,7 @@ static modules_t Modules[] =
     function        help function      operator names          number     num streams
                                                                type       in  out
   */
-  { Adisit,         NULL,              AdisitOperators,        CDI_REAL,  1,  1 },
+  { Adisit,         AdisitHelp,        AdisitOperators,        CDI_REAL,  1,  1 },
   { Arith,          ArithHelp,         ArithOperators,         CDI_REAL,  2,  1 },
   { Arithc,         ArithcHelp,        ArithcOperators,        CDI_REAL,  1,  1 },
   { Arithdays,      ArithdaysHelp,     ArithdaysOperators,     CDI_REAL,  1,  1 },
@@ -632,7 +632,7 @@ static modules_t Modules[] =
   { Remapeta,       RemapetaHelp,      RemapetaOperators,      CDI_REAL,  1,  1 },
   { Replace,        ReplaceHelp,       ReplaceOperators,       CDI_REAL,  2,  1 },
   { Replacevalues,  ReplacevaluesHelp, ReplacevaluesOperators, CDI_REAL,  1,  1 },
-  { Rhopot,         NULL,              RhopotOperators,        CDI_REAL,  1,  1 },
+  { Rhopot,         RhopotHelp,        RhopotOperators,        CDI_REAL,  1,  1 },
   { Rotuv,          RotuvHelp,         RotuvOperators,         CDI_REAL,  1,  1 },
   { Runpctl,        RunpctlHelp,       RunpctlOperators,       CDI_REAL,  1,  1 },
   { Runstat,        RunstatHelp,       RunstatOperators,       CDI_REAL,  1,  1 },
