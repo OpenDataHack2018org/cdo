@@ -76,8 +76,9 @@ class CdoTest(unittest.TestCase):
         cdo = Cdo()
         names = cdo.showname(input = "-stdatm,0",options = "-f nc")
         self.assertEqual(["P T"],names)
-        ofile = cdo.topo(options = "-z szip")
-        self.assertEqual(["GRIB SZIP"],cdo.showformat(input = ofile))
+        if cdo.hasLib("sz"):
+          ofile = cdo.topo(options = "-z szip")
+          self.assertEqual(["GRIB SZIP"],cdo.showformat(input = ofile))
 
     def test_chain(self):
         cdo = Cdo()
@@ -276,6 +277,16 @@ class CdoTest(unittest.TestCase):
         self.assertEqual("0 of 2 records differ",cdo.diffv(input = ["-stdatm,0","-stdatm,0"])[-1])
         # check for operator input and files
         self.assertEqual("0 of 2 records differ",cdo.diffv(input = ["-stdatm,0",fileB])[-1])
+
+    def test_libs(self):
+        cdo = Cdo()
+        self.assertTrue(cdo.hasLib("cdi"),"CDI support missing")
+        self.assertTrue(cdo.hasLib("nc4"),"netcdf4 support missing")
+        self.assertTrue(cdo.hasLib("netcdf"),"netcdf support missing")
+        self.assertFalse(cdo.hasLib("boost"),'boost is not a CDO dependency')
+        if 'thingol' == os.popen('hostname').read().strip():
+          self.assertEqual('1.9.18',cdo.libsVersion("grib_api"))
+        self.assertRaises(AttributeError, cdo.libsVersion,"foo")
 
     if 'thingol' == os.popen('hostname').read().strip():
         def testCall(self):
