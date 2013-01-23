@@ -44,6 +44,7 @@ doc/cdo-poster.pdf -text
 doc/cdo.pdf -text
 doc/cdoBrochureWeb.pdf -text svneol=unset#unset
 doc/cdo_refcard.pdf -text
+doc/cdo_spectralnudgingdata.pdf -text
 doc/eca_operator.pdf -text
 doc/tex/Modules -text
 doc/tex/appendix.tex -text
