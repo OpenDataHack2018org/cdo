@@ -24,7 +24,9 @@
       Ensstat    ensmean         Ensemble mean
       Ensstat    ensavg          Ensemble average
       Ensstat    ensstd          Ensemble standard deviation
+      Ensstat    ensstd1         Ensemble standard deviation
       Ensstat    ensvar          Ensemble variance
+      Ensstat    ensvar1         Ensemble variance
       Ensstat    enspctl         Ensemble percentiles
 
       Ensstat    enscrps         Ensemble cumulative ranked probability score
@@ -70,9 +72,7 @@ void *Ensstat(void *argument)
     double *array;
   } ens_file_t;
   ens_file_t *ef = NULL;
-  /* RQ */
   int pn = 0;
-  /* QR */
 
   cdoInitialize(argument);
 
@@ -81,21 +81,17 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("enssum",  func_sum,  0, NULL);
   cdoOperatorAdd("ensmean", func_mean, 0, NULL);
   cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("ensvar",  func_var,  0, NULL);
   cdoOperatorAdd("ensstd",  func_std,  0, NULL);
-  /* RQ */
+  cdoOperatorAdd("ensstd",  func_std1, 0, NULL);
+  cdoOperatorAdd("ensvar",  func_var,  0, NULL);
+  cdoOperatorAdd("ensvar1", func_var1, 0, NULL);
   cdoOperatorAdd("enspctl", func_pctl, 0, NULL);
-  /* QR */
-
-  /* >>> Cedrick Ansorge 18.10.2010 */
   cdoOperatorAdd("enscrps", func_crps, 0, NULL);
   cdoOperatorAdd("ensbrs",  func_brs,  0, NULL);
-  /* <<< Cedrick Ansorge 18.10.2010 */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
 
-  /* RQ */
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
@@ -104,7 +100,6 @@ void *Ensstat(void *argument)
       if ( pn < 1 || pn > 99 )
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
     }
-  /* QR */
     
   nfiles = cdoStreamCnt() - 1;
 
@@ -222,12 +217,10 @@ void *Ensstat(void *argument)
 		    field[ompthID].nmiss++;
 		}
 
-	      /* RQ */
 	      if ( operfunc == func_pctl )
 	        array2[i] = fldpctl(field[ompthID], pn);
 	      else  
 	        array2[i] = fldfun(field[ompthID], operfunc);
-	      /* QR */
 
 	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) )
 		{

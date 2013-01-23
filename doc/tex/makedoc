@@ -288,8 +288,8 @@ while (<MOFILE>) {
 	print TRCARD "sum      & {\\bf sum}  \\\\ \n";
 	print TRCARD "mean     & {\\bf mean}  \\\\ \n";
 	print TRCARD "average            & {\\bf avg}  \\\\ \n";
-	print TRCARD "variance           & {\\bf var}  \\\\ \n";
-	print TRCARD "standard deviation & {\\bf std}  \\\\ \n";
+	print TRCARD "variance           & {\\bf var, var1}  \\\\ \n";
+	print TRCARD "standard deviation & {\\bf std, std1}  \\\\ \n";
 	print TRCARD "\\hline\n";
 	print TRCARD "\\end{tabular*}\n";
 	print TRCARD "\\vspace{2mm}\n\n";

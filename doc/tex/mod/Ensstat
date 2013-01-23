@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifiles ofile
-@Operators = ensmin ensmax enssum ensmean ensavg ensvar ensstd enspctl
+@Operators = ensmin ensmax enssum ensmean ensavg ensstd ensstd1 ensvar ensvar1 enspctl
 
 @BeginDescription
 This module computes statistical values over an ensemble of input files.
@@ -97,10 +97,48 @@ o(t,x) = \mbox{\bf avg}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndOperator
 
 
+@BeginOperator_ensstd
+@Title     = Ensemble standard deviation
+
+@BeginDescription
+Divisor is n.
+
+@IfMan
+o(t,x) = std{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf std}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ensstd1
+@Title     = Ensemble standard deviation
+
+@BeginDescription
+Divisor is (n-1).
+
+@IfMan
+o(t,x) = std1{i1(t,x), i2(t,x), ..., in(t,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t,x) = \mbox{\bf std1}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_ensvar
 @Title     = Ensemble variance
 
 @BeginDescription
+Divisor is n.
+
 @IfMan
 o(t,x) = var{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
@@ -113,16 +151,18 @@ o(t,x) = \mbox{\bf var}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndOperator
 
 
-@BeginOperator_ensstd
-@Title     = Ensemble standard deviation
+@BeginOperator_ensvar1
+@Title     = Ensemble variance
 
 @BeginDescription
+Divisor is (n-1).
+
 @IfMan
-o(t,x) = std{i1(t,x), i2(t,x), ..., in(t,x)}
+o(t,x) = var1{i1(t,x), i2(t,x), ..., in(t,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t,x) = \mbox{\bf std}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
+o(t,x) = \mbox{\bf var1}\{i_1(t,x), i_2(t,x), \cdots, i_n(t,x)\}
 @EndMath
 @EndifDoc
 @EndDescription

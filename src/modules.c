@@ -299,7 +299,7 @@ void *Maggraph(void *argument);
                                  "export_e5ml", "export_e5res"}
 #define  EnlargeOperators       {"enlarge"}
 #define  EnlargegridOperators   {"enlargegrid"}
-#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensstd", "enspctl"}
+#define  EnsstatOperators       {"ensmin", "ensmax", "enssum", "ensmean", "ensavg", "ensvar", "ensvar1", "ensstd", "ensstd1", "enspctl"}
 #define  Ensstat3Operators      {"ensrkhist_space","ensrkhist_time","ensroc"}
 #define  EnsvalOperators        {"enscrps","ensbrs"}
 #define  EofcoeffOperators      {"eofcoeff"}

@@ -75,7 +75,9 @@ double fldsum(field_t field);
 double fldavg(field_t field);
 double fldmean(field_t field);
 double fldstd(field_t field);
+double fldstd1(field_t field);
 double fldvar(field_t field);
+double fldvar1(field_t field);
 /* RQ */
 double fldpctl(field_t field, int k);
 /* QR */

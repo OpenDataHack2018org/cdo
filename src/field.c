@@ -67,7 +67,9 @@ double fldfun(field_t field, int function)
   else if ( function == func_mean )  rval = fldmean(field);
   else if ( function == func_avg  )  rval = fldavg(field);
   else if ( function == func_std  )  rval = fldstd(field);
+  else if ( function == func_std1 )  rval = fldstd1(field);
   else if ( function == func_var  )  rval = fldvar(field);
+  else if ( function == func_var1 )  rval = fldvar1(field);
   
   else if ( function == func_crps )  rval = fldcrps(field);
   else if ( function == func_brs )   rval = fldbrs(field);
@@ -326,41 +328,70 @@ double fldavg(field_t field)
   return (ravg);
 }
 
-
-double fldvar(field_t field)
-{
-  long   i;
-  long   len     = field.size;
-  int    nmiss   = field.nmiss;
-  double missval = field.missval;
-  double *array  = field.ptr;
-  double *w      = field.weight;
-  double rsum = 0, rsumw = 0, rvar = 0;
-  double rsumq = 0, rsumwq = 0;
+static
+void prevarsum(const double *restrict array, const double *restrict w, long len, int nmiss, 
+	       double missval, double *rsum, double *rsumw, double *rsumq, double *rsumwq)
+{ 
+  long i;
+  *rsum = *rsumw = 0;
+  *rsumq = *rsumwq = 0;
 
   if ( nmiss > 0 )
     {
       for ( i = 0; i < len; i++ ) 
         if ( !DBL_IS_EQUAL(array[i], missval) && !DBL_IS_EQUAL(w[i], missval) )
           {
-            rsum   += w[i] * array[i];
-            rsumq  += w[i] * array[i] * array[i];
-            rsumw  += w[i];
-            rsumwq += w[i] * w[i];
+            *rsum   += w[i] * array[i];
+            *rsumq  += w[i] * array[i] * array[i];
+            *rsumw  += w[i];
+            *rsumwq += w[i] * w[i];
           }
     }
   else
     {
       for ( i = 0; i < len; i++ ) 
         {
-          rsum   += w[i] * array[i];
-          rsumq  += w[i] * array[i] * array[i];
-          rsumw  += w[i];
-          rsumwq += w[i] * w[i];
+          *rsum   += w[i] * array[i];
+          *rsumq  += w[i] * array[i] * array[i];
+          *rsumw  += w[i];
+          *rsumwq += w[i] * w[i];
         }
     }
+}
+
+
+double fldvar(field_t field)
+{
+  long   len     = field.size;
+  int    nmiss   = field.nmiss;
+  double missval = field.missval;
+  double *array  = field.ptr;
+  double *w      = field.weight;
+  double rsum, rsumw, rvar;
+  double rsumq, rsumwq;
+
+  prevarsum(array, w, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
 
   rvar = IS_NOT_EQUAL(rsumw, 0) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw) : missval;
+  if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
+
+  return (rvar);
+}
+
+
+double fldvar1(field_t field)
+{
+  long   len     = field.size;
+  int    nmiss   = field.nmiss;
+  double missval = field.missval;
+  double *array  = field.ptr;
+  double *w      = field.weight;
+  double rsum, rsumw, rvar;
+  double rsumq, rsumwq;
+
+  prevarsum(array, w, len, nmiss, missval, &rsum, &rsumw, &rsumq, &rsumwq);
+
+  rvar = (rsumw*rsumw > rsumwq) ? (rsumq*rsumw - rsum*rsum) / (rsumw*rsumw - rsumwq) : missval;
   if ( rvar < 0 && rvar > -1.e-5 ) rvar = 0;
 
   return (rvar);
@@ -373,6 +404,26 @@ double fldstd(field_t field)
   double rvar, rstd;
 
   rvar = fldvar(field);
+
+  if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
+    {
+      rstd = missval;
+    }
+  else
+    {
+      rstd = IS_NOT_EQUAL(rvar, 0) ? sqrt(rvar) : 0;
+    }
+
+  return (rstd);
+}
+
+
+double fldstd1(field_t field)
+{
+  double missval = field.missval;
+  double rvar, rstd;
+
+  rvar = fldvar1(field);
 
   if ( DBL_IS_EQUAL(rvar, missval) || rvar < 0 )
     {

@@ -216,8 +216,10 @@ Operator catalog:
    Ensstat       enssum          Ensemble sum
    Ensstat       ensmean         Ensemble mean
    Ensstat       ensavg          Ensemble average
-   Ensstat       ensvar          Ensemble variance
    Ensstat       ensstd          Ensemble standard deviation
+   Ensstat       ensstd1         Ensemble standard deviation
+   Ensstat       ensvar          Ensemble variance
+   Ensstat       ensvar1         Ensemble variance
    Ensstat       enspctl         Ensemble percentiles
    Ensstat2      ensrkhistspace  Ranked Histogram averaged over time
    Ensstat2      ensrkhisttime   Ranked Histogram averaged over space
