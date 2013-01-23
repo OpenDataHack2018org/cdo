@@ -3891,7 +3891,7 @@ static char *AdisitHelp[] = {
     "    Output fields are sea water temperature (name=to; code=20) and sea water salinity (name=sao; code=5).",
     "",
     "PARAMETER",
-    "    pressure  FLOAT   Pressure in mbar (constant value assigned to all levels)",
+    "    pressure  FLOAT   Pressure in bar (constant value assigned to all levels)",
     NULL
 };
 
@@ -3904,12 +3904,12 @@ static char *RhopotHelp[] = {
     "",
     "DESCRIPTION",
     "    This is a special operator for the post processing of the ocean and sea ice model MPIOM.",
-    "    It calculates the sea water potential density (name=rhopoto; code=18).",
-    "    Required input fields are sea water in-situ temperature (name=to; code=20) and sea water salinity (name=sao; code=5).",
+    "    It calculates the sea water potential density (name=rhopoto; code=18). Required input fields ",
+    "    are sea water in-situ temperature (name=to; code=20) and sea water salinity (name=sao; code=5).",
     "    Pressure is calculated from the level information or can be specified by the optional parameter.",
     "",
     "PARAMETER",
-    "    pressure  FLOAT   Pressure in mbar (constant value assigned to all levels)",
+    "    pressure  FLOAT   Pressure in bar (constant value assigned to all levels)",
     NULL
 };
 

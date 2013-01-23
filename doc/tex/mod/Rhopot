@@ -22,7 +22,7 @@ Pressure is calculated from the level information or can be specified by the opt
 
 @BeginParameter
 @Item = pressure
-FLOAT   Pressure in mbar (constant value assigned to all levels)
+FLOAT   Pressure in bar (constant value assigned to all levels)
 @EndParameter
 
 
