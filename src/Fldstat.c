@@ -24,7 +24,9 @@
       Fldstat    fldmean         Field mean
       Fldstat    fldavg          Field average
       Fldstat    fldstd          Field standard deviation
+      Fldstat    fldstd1         Field standard deviation
       Fldstat    fldvar          Field variance
+      Fldstat    fldvar1         Field variance
       Fldstat    fldpctl         Field percentiles
 */
 
@@ -101,9 +103,7 @@ void *Fldstat(void *argument)
   double sglval;
   field_t field;
   int taxisID1, taxisID2;
-  /* RQ */
   int pn = 0;
-  /* QR */
 
   cdoInitialize(argument);
 
@@ -112,16 +112,15 @@ void *Fldstat(void *argument)
   cdoOperatorAdd("fldsum",  func_sum,  0, NULL);
   cdoOperatorAdd("fldmean", func_mean, 0, NULL);
   cdoOperatorAdd("fldavg",  func_avg,  0, NULL);
-  cdoOperatorAdd("fldvar",  func_var,  0, NULL);
   cdoOperatorAdd("fldstd",  func_std,  0, NULL);
-  /* RQ */
+  cdoOperatorAdd("fldstd1", func_std1, 0, NULL);
+  cdoOperatorAdd("fldvar",  func_var,  0, NULL);
+  cdoOperatorAdd("fldvar1", func_var1, 0, NULL);
   cdoOperatorAdd("fldpctl", func_pctl, 0, NULL);
-  /* QR */
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
 
-  /* RQ */
   if ( operfunc == func_pctl )
     {
       operatorInputArg("percentile number");
@@ -130,7 +129,6 @@ void *Fldstat(void *argument)
       if ( pn < 1 || pn > 99 )
         cdoAbort("Illegal argument: percentile number %d is not in the range 1..99!", pn);
     }
-  /* QR */
 
   if ( operfunc == func_mean || operfunc == func_avg ||
        operfunc == func_var  || operfunc == func_std )

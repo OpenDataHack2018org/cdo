@@ -231,8 +231,10 @@ Operator catalog:
    Fldstat       fldsum          Field sum
    Fldstat       fldmean         Field mean
    Fldstat       fldavg          Field average
-   Fldstat       fldvar          Field variance
    Fldstat       fldstd          Field standard deviation
+   Fldstat       fldstd1         Field standard deviation
+   Fldstat       fldvar          Field variance
+   Fldstat       fldvar1         Field variance
    Fldstat       fldpctl         Field percentiles
    Zonstat       zonmin          Zonal minimum
    Zonstat       zonmax          Zonal maximum

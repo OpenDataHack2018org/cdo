@@ -7,6 +7,8 @@
 
 	* New operator: ensstd1 - Ensemble standard deviation [Divisor is (n-1)]
 	* New operator: ensvar1 - Ensemble variance [Divisor is (n-1)]
+	* New operator: fldstd1 - Field standard deviation [Divisor is (n-1)]
+	* New operator: fldvar1 - Field variance [Divisor is (n-1)]
 
 2013-01-22 Helmut Haak <Helmut.Haak@zmaw.de>
 

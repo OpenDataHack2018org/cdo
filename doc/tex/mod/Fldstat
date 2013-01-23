@@ -5,13 +5,12 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = fldmin fldmax fldsum fldmean fldavg fldvar fldstd fldpctl
+@Operators = fldmin fldmax fldsum fldmean fldavg fldstd fldstd1 fldvar fldvar1 fldpctl
 
 @BeginDescription
-This module computes statistical values of the input fields.
-According to the chosen operator the field minimum, maximum,
-sum, average, variance, standard deviation or a certain percentile
-is written to @file{ofile}.
+This module computes statistical values of the input fields. According to the chosen 
+operator the field minimum, maximum, sum, average, variance, standard deviation or 
+a certain percentile is written to @file{ofile}.
 @EndDescription
 @EndModule
 
@@ -118,14 +117,34 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field it is:
+Divisor is n. For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = var{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+Divisor is n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf var}\{i(t,x'), x_1 < x' \leq x_n\}
+@EndMath
+@EndifDoc
+weighted by area weights obtained by the input field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_fldvar1
+@Title     = Field variance
+
+@BeginDescription
+@IfMan
+Divisor is (n-1). For every gridpoint x_1, ..., x_n of the same field it is:
+
+o(t,1) = var1{i(t,x'), x_1<x'<=x_n}
+@EndifMan
+@IfDoc
+Divisor is (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+@BeginMath
+o(t,1) = \mbox{\bf var1}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
@@ -138,14 +157,34 @@ weighted by area weights obtained by the input field.
 
 @BeginDescription
 @IfMan
-For every gridpoint x_1, ..., x_n of the same field it is:
+Divisor is n. For every gridpoint x_1, ..., x_n of the same field it is:
 
 o(t,1) = std{i(t,x'), x_1<x'<=x_n}
 @EndifMan
 @IfDoc
-For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+Divisor is n. For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
 @BeginMath
 o(t,1) = \mbox{\bf std}\{i(t,x'), x_1 < x' \leq x_n\}
+@EndMath
+@EndifDoc
+weighted by area weights obtained by the input field.
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_fldstd1
+@Title     = Field standard deviation
+
+@BeginDescription
+@IfMan
+Divisor is (n-1). For every gridpoint x_1, ..., x_n of the same field it is:
+
+o(t,1) = std1{i(t,x'), x_1<x'<=x_n}
+@EndifMan
+@IfDoc
+Divisor is (n-1). For every gridpoint \begin{math}x_1, ..., x_n\end{math} of the same field it is: \\
+@BeginMath
+o(t,1) = \mbox{\bf std1}\{i(t,x'), x_1 < x' \leq x_n\}
 @EndMath
 @EndifDoc
 weighted by area weights obtained by the input field.
