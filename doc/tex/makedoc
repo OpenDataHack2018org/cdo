@@ -673,7 +673,7 @@ while (<MOFILE>) {
 	$operfunc =~ s/$modulname//;
 	$statfunc = 0;
 	if ( $trskip == 1 ) {
-	  if ( $operfunc eq "min" || $operfunc eq "max" || $operfunc eq "sum" || $operfunc eq "mean" || $operfunc eq "avg" || $operfunc eq "var" || $operfunc eq "std" ) { $statfunc = 1; }
+	  if ( $operfunc eq "min" || $operfunc eq "max" || $operfunc eq "sum" || $operfunc eq "mean" || $operfunc eq "avg" || $operfunc eq "var" || $operfunc eq "var1" || $operfunc eq "std" || $operfunc eq "std1" ) { $statfunc = 1; }
 	}
 	if ( $refskip == 0 && $norefoper == 0 ) {
 	  if ( $statfunc == 0 ) {
