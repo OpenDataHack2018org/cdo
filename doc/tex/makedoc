@@ -493,39 +493,38 @@ while (<MOFILE>) {
 #    print "@hkeys\n";
 #    print "@oper_title\n";
 
-    $differ = 0;
+    $istart = 0;
     if ( $#hkeys > 0 ) {
+      $istart = $#hkeys + 1;
       for ( $i = 1; $i <= $#hkeys; $i++ ) {
 #	printf ("%d: %s\n",$i, @hkeys[$i]);
 	if ( "@oper_parameter[$i]" ne "@oper_parameter[0]" )
 	  {
-	    $differ = 1;
+	    $istart = $i;
 	    last;
 	  }
       }
-    } else {
-      $differ = 1;
-    }
 
-#    print "differ: $differ\n";
+      if ( $istart == 1 ) { $istart = 0; }
+    }
 
     print HELPFILE "    \"\",\n";
     print HELPFILE "    \"SYNOPSIS\",\n";
     print TRFILE "\n\\subsection*{Synopsis}\n\n";
-    if ( $differ > 0 ) {
-      for ( $i = 0; $i <= $#hkeys; $i++ ) {
-	$operator = @hkeys[$i];
-	$parameter = @oper_parameter[$i];
-	printf HELPFILE ("    \"    %s%s  %s\",\n",
-			 $operator, $parameter, $marguments);
-	$operatorx = $operator;
-	$operatorx =~ s/_/\\_/g;
-	print TRFILE "\\hspace*{8mm}{\\bf $operatorx}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
-      }
-    } else {
+
+    if ( $istart > 0 )  {
       $parameter = @oper_parameter[0];
-      print HELPFILE "    \"    <operator>${oparameter}  ${marguments}\",\n";
-      print TRFILE "\\hspace*{8mm}{\$<\\!operator\\!>\$}{\\sl $oparameter} \\ {\\tt $marguments}\n\n";
+      print HELPFILE "    \"    <operator>${parameter}  ${marguments}\",\n";
+      print TRFILE "\\hspace*{8mm}{\$<\\!operator\\!>\$}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
+    }
+
+   for ( $i = $istart; $i <= $#hkeys; $i++ ) {
+      $operator = @hkeys[$i];
+      $parameter = @oper_parameter[$i];
+      printf HELPFILE ("    \"    %s%s  %s\",\n", $operator, $parameter, $marguments);
+      $operatorx = $operator;
+      $operatorx =~ s/_/\\_/g;
+      print TRFILE "\\hspace*{8mm}{\\bf $operatorx}{\\sl $parameter} \\ {\\tt $marguments}\n\n";
     }
 
     print HELPFILE "    \"\",\n";
@@ -620,8 +619,7 @@ while (<MOFILE>) {
       $operatorx = $operator;
       $operatorx =~ s/_/\\_/g;
       if ( $#hkeys > 0 ) {
-	printf HELPFILE ("    \"    %-*s%s\",\n",
-			$maxlen, $operator, $otitle);
+	printf HELPFILE ("    \"    %-*s%s\",\n", $maxlen, $operator, $otitle);
 	if ( $xopercnt == 1 ) {
 	  print TRFILE "\\begin{defalist}{\\bf $maxitem \\ }\n";
 	}
