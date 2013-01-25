@@ -82,7 +82,7 @@ void *Ensstat(void *argument)
   cdoOperatorAdd("ensmean", func_mean, 0, NULL);
   cdoOperatorAdd("ensavg",  func_avg,  0, NULL);
   cdoOperatorAdd("ensstd",  func_std,  0, NULL);
-  cdoOperatorAdd("ensstd",  func_std1, 0, NULL);
+  cdoOperatorAdd("ensstd1", func_std1, 0, NULL);
   cdoOperatorAdd("ensvar",  func_var,  0, NULL);
   cdoOperatorAdd("ensvar1", func_var1, 0, NULL);
   cdoOperatorAdd("enspctl", func_pctl, 0, NULL);

@@ -76,7 +76,7 @@ double fldfun(field_t field, int function)
 
   else if ( function == func_rank )  rval = fldrank(field);
   else if ( function == func_roc )   rval = fldroc(field);
-  else cdoAbort("function %d not implemented!", function);
+  else cdoAbort("%s: function %d not implemented!", __func__, function);
 
   return rval;
 }

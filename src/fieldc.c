@@ -27,7 +27,7 @@ void farcfun(field_t *field, double rconst, int function)
   else if ( function == func_mul ) farcmul(field, rconst);
   else if ( function == func_div ) farcdiv(field, rconst);
   else if ( function == func_mod ) farmod(field, rconst);
-  else    cdoAbort("function %d not implemented!", function);
+  else    cdoAbort("%s: function %d not implemented!", __func__, function);
 }
 
 void farcmul(field_t *field, double rconst)

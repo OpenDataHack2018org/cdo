@@ -131,7 +131,8 @@ void *Fldstat(void *argument)
     }
 
   if ( operfunc == func_mean || operfunc == func_avg ||
-       operfunc == func_var  || operfunc == func_std )
+       operfunc == func_var  || operfunc == func_std ||
+       operfunc == func_var1 || operfunc == func_std1 )
     needWeights = TRUE;
 
   streamID1 = streamOpenRead(cdoStreamName(0));

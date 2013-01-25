@@ -35,7 +35,7 @@ void farfun(field_t *field1, field_t field2, int function)
   else if ( function == func_mul   ) farmul(field1, field2);
   else if ( function == func_div   ) fardiv(field1, field2);
   else if ( function == func_atan2 ) faratan2(field1, field2);
-  else cdoAbort("function %d not implemented!", function);
+  else cdoAbort("%s: function %d not implemented!", __func__, function);
 }
 
 static
@@ -439,6 +439,8 @@ void farvar(field_t *field1, field_t field2, field_t field3)
   int    nmiss2   = field2.nmiss;
   double missval2 = field2.missval;
   double *array2  = field2.ptr;
+  int    nmiss3   = field3.nmiss;
+  double missval3 = field3.missval;
   double *array3  = field3.ptr;
 
   len    = gridInqSize(grid1);
@@ -446,16 +448,23 @@ void farvar(field_t *field1, field_t field2, field_t field3)
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  if ( nmiss1 > 0 || nmiss2 > 0 )
+  if ( nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0 )
     {
       for ( i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
-	  {
-	    array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
-	    if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
-	  }
-	else
-	  array1[i] = missval1;
+	{
+	  // array3[i] = 0.111111;
+	  if ( i < 10 )
+	    printf("array123 %g %g %g", array1[i], array2[i], array3[i]);
+	  if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) && !DBL_IS_EQUAL(array3[i], missval3) )
+	    {
+	      array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
+	      if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
+	    }
+	  else
+	    array1[i] = missval1;
+	  if ( i < 10 )
+	    printf(" %g\n", array1[i]);
+	}
     }
   else
     {
@@ -464,6 +473,40 @@ void farvar(field_t *field1, field_t field2, field_t field3)
 	  array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
 	  if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
 	}
+    }
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
+      {
+	array1[i] = missval1;
+	field1->nmiss++;
+      }
+}
+
+
+void farvarx(field_t *field1, field_t field2, field_t field3, double divisor)
+{
+  long   i, len;
+  int    grid1    = field1->grid;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+  double *array3  = field3.ptr;
+  double temp;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  for ( i = 0; i < len; i++ )
+    {
+      temp      = DIV( MUL(array1[i], array1[i]), array3[i]);
+      array1[i] = DIV( SUB(array2[i], temp), array3[i]-divisor);
+      if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
     }
 
   field1->nmiss = 0;
@@ -505,6 +548,35 @@ void farstd(field_t *field1, field_t field2, field_t field3)
 }
 
 
+void farstdx(field_t *field1, field_t field2, field_t field3, double divisor)
+{
+  long   i, len;
+  int    grid1    = field1->grid;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  farvarx(field1, field2, field3, divisor);
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
+      {
+	array1[i] = missval1;
+	field1->nmiss++;
+      }
+    else
+      {
+	array1[i] = IS_NOT_EQUAL(array1[i], 0) ? sqrt(array1[i]) : 0;
+      }
+}
+
+
 void farcvar(field_t *field1, field_t field2, double rconst1)
 {
   long   i, len;
@@ -516,22 +588,27 @@ void farcvar(field_t *field1, field_t field2, double rconst1)
   int    nmiss2   = field2.nmiss;
   double missval2 = field2.missval;
   double *array2  = field2.ptr;
+  int    nmiss3   = 0;
 
   len    = gridInqSize(grid1);
 
   if ( len != gridInqSize(grid2) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
-  if ( nmiss1 > 0 || nmiss2 > 0 )
+  if ( DBL_IS_EQUAL(rconst1, missval1) ) nmiss3 = 1;
+
+  if ( nmiss1 > 0 || nmiss2 > 0 || nmiss3 > 0 )
     {
       for ( i = 0; i < len; i++ )
-	if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
-	  {
-	    array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
-	    if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
-	  }
-	else
-	  array1[i] = missval1;
+	{
+	  if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) && nmiss3 == 0 )
+	    {
+	      array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
+	      if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
+	    }
+	  else
+	    array1[i] = missval1;
+	}
     }
   else
     {
@@ -540,6 +617,39 @@ void farcvar(field_t *field1, field_t field2, double rconst1)
 	  array1[i] = array2[i]*rconst1 - (array1[i]*rconst1)*(array1[i]*rconst1);
 	  if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
 	}
+    }
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
+      {
+	array1[i] = missval1;
+	field1->nmiss++;
+      }
+}
+
+
+void farcvarx(field_t *field1, field_t field2, double rconst1, double divisor)
+{
+  long   i, len;
+  int    grid1    = field1->grid;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+  double missval2 = field2.missval;
+  double *array2  = field2.ptr;
+  double temp;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  for ( i = 0; i < len; i++ )
+    {
+      temp      = DIV( MUL(array1[i], array1[i]), rconst1);
+      array1[i] = DIV( SUB(array2[i], temp), rconst1-divisor);
+      if ( array1[i] < 0 && array1[i] > -1.e-5 ) array1[i] = 0;
     }
 
   field1->nmiss = 0;
@@ -566,6 +676,35 @@ void farcstd(field_t *field1, field_t field2, double rconst1)
     cdoAbort("Fields have different gridsize (%s)", __func__);
 
   farcvar(field1, field2, rconst1);
+
+  field1->nmiss = 0;
+  for ( i = 0; i < len; i++ )
+    if ( DBL_IS_EQUAL(array1[i], missval1) || array1[i] < 0 )
+      {
+	array1[i] = missval1;
+	field1->nmiss++;
+      }
+    else
+      {
+	array1[i] = IS_NOT_EQUAL(array1[i], 0) ? sqrt(array1[i]) : 0;
+      }
+}
+
+
+void farcstdx(field_t *field1, field_t field2, double rconst1, double divisor)
+{
+  long   i, len;
+  int    grid1    = field1->grid;
+  double missval1 = field1->missval;
+  double *array1  = field1->ptr;
+  int    grid2    = field2.grid;
+
+  len    = gridInqSize(grid1);
+
+  if ( len != gridInqSize(grid2) )
+    cdoAbort("Fields have different gridsize (%s)", __func__);
+
+  farcvarx(field1, field2, rconst1, divisor);
 
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
