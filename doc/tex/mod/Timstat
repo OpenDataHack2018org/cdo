@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = timmin timmax timsum timmean timavg timvar timstd
+@Operators = timmin timmax timsum timmean timavg timstd timstd1 timvar timvar1
 
 @BeginDescription
 This module computes statistical  values over all timesteps in @file{ifile}.
@@ -101,6 +101,8 @@ o(1,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 @Title     = Time variance
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(1,x) = var{i(t',x), t_1<t'<=t_n}
 @EndifMan
@@ -113,16 +115,54 @@ o(1,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 @EndOperator
 
 
+@BeginOperator_timvar1
+@Title     = Time variance
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(1,x) = var1{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+@BeginMath
+o(1,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_timstd
 @Title     = Time standard deviation
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(1,x) = std{i(t',x), t_1<t'<=t_n}
 @EndifMan
 @IfDoc
 @BeginMath
 o(1,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_timstd1
+@Title     = Time standard deviation
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(1,x) = std1{i(t',x), t_1<t'<=t_n}
+@EndifMan
+@IfDoc
+@BeginMath
+o(1,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription

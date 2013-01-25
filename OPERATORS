@@ -287,8 +287,10 @@ Operator catalog:
    Timstat       timsum          Time sum
    Timstat       timmean         Time mean
    Timstat       timavg          Time average
-   Timstat       timvar          Time variance
    Timstat       timstd          Time standard deviation
+   Timstat       timstd1         Time standard deviation
+   Timstat       timvar          Time variance
+   Timstat       timvar1         Time variance
    Timpctl       timpctl         Time percentiles
    Hourstat      hourmin         Hourly minimum
    Hourstat      hourmax         Hourly maximum

@@ -1963,7 +1963,7 @@ static char *RunpctlHelp[] = {
 
 static char *TimstatHelp[] = {
     "NAME",
-    "    timmin, timmax, timsum, timmean, timavg, timvar, timstd - ",
+    "    timmin, timmax, timsum, timmean, timavg, timstd, timstd1, timvar, timvar1 - ",
     "    Statistical values over all timesteps",
     "",
     "SYNOPSIS",
@@ -1987,10 +1987,22 @@ static char *TimstatHelp[] = {
     "             o(1,x) = mean{i(t',x), t_1<t'<=t_n}",
     "    timavg   Time average",
     "             o(1,x) = avg{i(t',x), t_1<t'<=t_n}",
-    "    timvar   Time variance",
-    "             o(1,x) = var{i(t',x), t_1<t'<=t_n}",
     "    timstd   Time standard deviation",
+    "             Divisor is n. ",
+    "             ",
     "             o(1,x) = std{i(t',x), t_1<t'<=t_n}",
+    "    timstd1  Time standard deviation",
+    "             Divisor is (n-1). ",
+    "             ",
+    "             o(1,x) = std1{i(t',x), t_1<t'<=t_n}",
+    "    timvar   Time variance",
+    "             Divisor is n. ",
+    "             ",
+    "             o(1,x) = var{i(t',x), t_1<t'<=t_n}",
+    "    timvar1  Time variance",
+    "             Divisor is (n-1). ",
+    "             ",
+    "             o(1,x) = var1{i(t',x), t_1<t'<=t_n}",
     NULL
 };
 
