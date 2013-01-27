@@ -297,32 +297,40 @@ Operator catalog:
    Hourstat      hoursum         Hourly sum
    Hourstat      hourmean        Hourly mean
    Hourstat      houravg         Hourly average
-   Hourstat      hourvar         Hourly variance
    Hourstat      hourstd         Hourly standard deviation
+   Hourstat      hourstd1        Hourly standard deviation
+   Hourstat      hourvar         Hourly variance
+   Hourstat      hourvar1        Hourly variance
    Hourpctl      hourpctl        Hourly percentiles
    Daystat       daymin          Daily minimum
    Daystat       daymax          Daily maximum
    Daystat       daysum          Daily sum
    Daystat       daymean         Daily mean
    Daystat       dayavg          Daily average
-   Daystat       dayvar          Daily variance
    Daystat       daystd          Daily standard deviation
+   Daystat       daystd1         Daily standard deviation
+   Daystat       dayvar          Daily variance
+   Daystat       dayvar1         Daily variance
    Daypctl       daypctl         Daily percentiles
    Monstat       monmin          Monthly minimum
    Monstat       monmax          Monthly maximum
    Monstat       monsum          Monthly sum
    Monstat       monmean         Monthly mean
    Monstat       monavg          Monthly average
-   Monstat       monvar          Monthly variance
    Monstat       monstd          Monthly standard deviation
+   Monstat       monstd1         Monthly standard deviation
+   Monstat       monvar          Monthly variance
+   Monstat       monvar1         Monthly variance
    Monpctl       monpctl         Monthly percentiles
    Yearstat      yearmin         Yearly minimum
    Yearstat      yearmax         Yearly maximum
    Yearstat      yearsum         Yearly sum
    Yearstat      yearmean        Yearly mean
    Yearstat      yearavg         Yearly average
-   Yearstat      yearvar         Yearly variance
    Yearstat      yearstd         Yearly standard deviation
+   Yearstat      yearstd1        Yearly standard deviation
+   Yearstat      yearvar         Yearly variance
+   Yearstat      yearvar1        Yearly variance
    Yearpctl      yearpctl        Yearly percentiles
    Seasstat      seasmin         Seasonal minimum
    Seasstat      seasmax         Seasonal maximum

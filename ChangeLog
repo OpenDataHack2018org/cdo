@@ -9,12 +9,12 @@
 	* New operator: timstd1    - Time standard deviation [Divisor is (n-1)]
         * New operator: hourvar1   - Hourly variance [Divisor is (n-1)]
 	* New operator: hourstd1   - Hourly standard deviation [Divisor is (n-1)]
-	* New operator: dayvar1      - Daily variance [Divisor is (n-1)]
-	* New operator: daystd1      - Daily standard deviation [Divisor is (n-1)]
+	* New operator: dayvar1    - Daily variance [Divisor is (n-1)]
+	* New operator: daystd1    - Daily standard deviation [Divisor is (n-1)]
 	* New operator: monvar1    - Monthly variance [Divisor is (n-1)]
 	* New operator: monstd1    - Monthly standard deviation [Divisor is (n-1)]
-	* New operator: yearvar1     - Yearly variance [Divisor is (n-1)]
-	* New operator: yearstd1     - Yearly standard deviation [Divisor is (n-1)]
+	* New operator: yearvar1   - Yearly variance [Divisor is (n-1)]
+	* New operator: yearstd1   - Yearly standard deviation [Divisor is (n-1)]
 
 2013-01-23 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

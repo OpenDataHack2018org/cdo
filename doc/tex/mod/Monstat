@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = monmin monmax monsum monmean monavg monvar monstd
+@Operators = monmin monmax monsum monmean monavg monstd monstd1 monvar monvar1
 
 @BeginDescription
 This module computes statistical values over timesteps of the same month.
@@ -117,14 +117,33 @@ o(t,x) = \mbox{\bf avg}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is
+Divisor is n. For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is
 
 o(t,x) = var{i(t',x), t_1 < t' <= t_n}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same month it is: \\
+Divisor is n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same month it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_monvar1
+@Title     = Monthly variance
+
+@BeginDescription
+@IfMan
+Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is
+
+o(t,x) = var1{i(t',x), t_1 < t' <= t_n}
+@EndifMan
+@IfDoc
+Divisor is (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same month it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf var1}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -136,14 +155,33 @@ o(t,x) = \mbox{\bf var}\{i(t',x), t_1 < t' \leq t_n\}
 
 @BeginDescription
 @IfMan
-For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is
+Divisor is n. For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is
 
 o(t,x) = std{i(t',x), t_1 < t' <= t_n}
 @EndifMan
 @IfDoc
-For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same month it is: \\
+Divisor is n. For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same month it is: \\
 @BeginMath
 o(t,x) = \mbox{\bf std}\{i(t',x), t_1 < t' \leq t_n\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_monstd1
+@Title     = Monthly standard deviation
+
+@BeginDescription
+@IfMan
+Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same month it is
+
+o(t,x) = std1{i(t',x), t_1 < t' <= t_n}
+@EndifMan
+@IfDoc
+Divisor is (n-1). For every adjacent sequence \begin{math}t_1, ...,t_n\end{math} of timesteps of the same month it is: \\
+@BeginMath
+o(t,x) = \mbox{\bf std1}\{i(t',x), t_1 < t' \leq t_n\}
 @EndMath
 @EndifDoc
 @EndDescription
