@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonvar ymonstd
+@Operators = ymonmin ymonmax ymonsum ymonmean ymonavg ymonstd ymonstd1 ymonvar ymonvar1
 
 @BeginDescription
 This module computes statistical values of each month of year.
@@ -130,6 +130,8 @@ o(\mbox{12},x) = \mbox{\bf avg}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 @Title     = Multi-year monthly variance
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(01,x) = var{i(t,x), month(i(t)) = 01}
                  ...
@@ -148,10 +150,36 @@ o(\mbox{12},x) = \mbox{\bf var}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 @EndOperator
 
 
+@BeginOperator_ymonvar1
+@Title     = Multi-year monthly variance
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(01,x) = var1{i(t,x), month(i(t)) = 01}
+                 ...
+o(12,x) = var1{i(t,x), month(i(t)) = 12}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{01},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+\vdots \\
+o(\mbox{12},x) = \mbox{\bf var1}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_ymonstd
 @Title     = Multi-year monthly standard deviation
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(01,x) = std{i(t,x), month(i(t)) = 01}
                  ...
@@ -163,6 +191,30 @@ o(12,x) = std{i(t,x), month(i(t)) = 12}
 o(\mbox{01},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
 \vdots \\
 o(\mbox{12},x) = \mbox{\bf std}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ymonstd1
+@Title     = Multi-year monthly standard deviation
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(01,x) = std1{i(t,x), month(i(t)) = 01}
+                 ...
+o(12,x) = std1{i(t,x), month(i(t)) = 12}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{01},x) = \mbox{\bf std1}\{i(t,x), \mbox{month}(i(t)) = \mbox{01}\} \\
+\vdots \\
+o(\mbox{12},x) = \mbox{\bf std1}\{i(t,x), \mbox{month}(i(t)) = \mbox{12}\} \\
 \end{array}
 @EndMath
 @EndifDoc

@@ -360,8 +360,10 @@ Operator catalog:
    Ymonstat      ymonsum         Multi-year monthly sum
    Ymonstat      ymonmean        Multi-year monthly mean
    Ymonstat      ymonavg         Multi-year monthly average
-   Ymonstat      ymonvar         Multi-year monthly variance
    Ymonstat      ymonstd         Multi-year monthly standard deviation
+   Ymonstat      ymonstd1        Multi-year monthly standard deviation
+   Ymonstat      ymonvar         Multi-year monthly variance
+   Ymonstat      ymonvar1        Multi-year monthly variance
    Ymonpctl      ymonpctl        Multi-year monthly percentiles
    Yseasstat     yseasmin        Multi-year seasonal minimum
    Yseasstat     yseasmax        Multi-year seasonal maximum
