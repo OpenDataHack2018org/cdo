@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ydrunmin ydrunmax ydrunsum ydrunmean ydrunavg ydrunvar ydrunstd
+@Operators = ydrunmin ydrunmax ydrunsum ydrunmean ydrunavg ydrunstd ydrunstd1 ydrunvar ydrunvar1
 
 @BeginDescription
 This module writes running statistical values for each day of year
@@ -145,6 +145,8 @@ o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 @Parameter = nts
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(001,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
                  ...
@@ -163,11 +165,38 @@ o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day
 @EndOperator
 
 
+@BeginOperator_ydrunvar1
+@Title     = Multi-year daily running variance
+@Parameter = nts
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(001,x) = var1{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 001}
+                 ...
+o(366,x) = var1{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[(i(t+(nts-1)/2)] = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf var1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf var1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_ydrunstd
 @Title     = Multi-year daily running standard deviation
 @Parameter = nts
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(001,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[i(t+(nts-1)/2)] = 001}
                  ...
@@ -179,6 +208,31 @@ o(366,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[i(t+(nts-1)/2)] = 366}
 o(\mbox{001},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
 \vdots \\
 o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydrunstd1
+@Title     = Multi-year daily running standard deviation
+@Parameter = nts
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(001,x) = std1{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[i(t+(nts-1)/2)] = 001}
+                 ...
+o(366,x) = std1{i(t,x), i(t+1,x), ..., i(t+nts-1,x); day[i(t+(nts-1)/2)] = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf std1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf std1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x); \mbox{day}[(i(t+(nts-1)/2)] = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc

@@ -382,8 +382,10 @@ Operator catalog:
    Ydrunstat     ydrunsum        Multi-year daily running sum
    Ydrunstat     ydrunmean       Multi-year daily running mean
    Ydrunstat     ydrunavg        Multi-year daily running average
-   Ydrunstat     ydrunvar        Multi-year daily running variance
    Ydrunstat     ydrunstd        Multi-year daily running standard deviation
+   Ydrunstat     ydrunstd1       Multi-year daily running standard deviation
+   Ydrunstat     ydrunvar        Multi-year daily running variance
+   Ydrunstat     ydrunvar1       Multi-year daily running variance
    Ydrunpctl     ydrunpctl       Multi-year daily running percentiles
 -------------------------------------------------------------
    Correlation and co.
