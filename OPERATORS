@@ -345,8 +345,10 @@ Operator catalog:
    Yhourstat     yhoursum        Multi-year hourly sum
    Yhourstat     yhourmean       Multi-year hourly mean
    Yhourstat     yhouravg        Multi-year hourly average
-   Yhourstat     yhourvar        Multi-year hourly variance
    Yhourstat     yhourstd        Multi-year hourly standard deviation
+   Yhourstat     yhourstd1       Multi-year hourly standard deviation
+   Yhourstat     yhourvar        Multi-year hourly variance
+   Yhourstat     yhourvar1       Multi-year hourly variance
    Ydaystat      ydaymin         Multi-year daily minimum
    Ydaystat      ydaymax         Multi-year daily maximum
    Ydaystat      ydaysum         Multi-year daily sum

@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = yhourmin yhourmax yhoursum yhourmean yhouravg yhourvar yhourstd
+@Operators = yhourmin yhourmax yhoursum yhourmean yhouravg yhourstd yhourstd1 yhourvar yhourvar1
 
 @BeginDescription
 This module computes statistical values of each hour and day of year.
@@ -129,6 +129,8 @@ o(\mbox{8784},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @Title     = Multi-year hourly variance
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(0001,x) = var{i(t,x), day(i(t)) = 0001}
                  ...
@@ -147,10 +149,36 @@ o(\mbox{8784},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @EndOperator
 
 
+@BeginOperator_yhourvar1
+@Title     = Multi-year hourly variance
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(0001,x) = var1{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = var1{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_yhourstd
 @Title     = Multi-year hourly standard deviation
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(0001,x) = std{i(t,x), day(i(t)) = 0001}
                  ...
@@ -169,9 +197,33 @@ o(\mbox{8784},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
 @EndOperator
 
 
-@BeginExample
-To compute the hourly mean for all days over all input years use:
-@BeginVerbatim
-   cdo yhourmean ifile ofile
-@EndVerbatim
-@EndExample
+@BeginOperator_yhourstd1
+@Title     = Multi-year hourly standard deviation
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(0001,x) = std1{i(t,x), day(i(t)) = 0001}
+                 ...
+o(8784,x) = std1{i(t,x), day(i(t)) = 8784}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{0001},x) = \mbox{\bf std1}\{i(t,x), \mbox{day}(i(t)) = \mbox{0001}\} \\
+\vdots \\
+o(\mbox{8784},x) = \mbox{\bf std1}\{i(t,x), \mbox{day}(i(t)) = \mbox{8784}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@C @BeginExample
+@C To compute the hourly mean for all days over all input years use:
+@C @BeginVerbatim
+@C    cdo yhourmean ifile ofile
+@C @EndVerbatim
+@C @EndExample
