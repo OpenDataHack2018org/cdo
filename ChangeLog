@@ -3,6 +3,11 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-01-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* New operator: ymonvar1    - Multi-year monthly variance [Divisor is (n-1)]
+	* New operator: ymonstd1    - Multi-year monthly standard deviation [Divisor is(n-1)]
+
 2013-01-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * New operator: timvar1    - Time variance [Divisor is (n-1)]

@@ -96,8 +96,10 @@ void *Timstat(void *argument)
   int *recVarID, *recLevelID;
   int taxis_has_bounds = FALSE;
   int lvfrac = FALSE;
+  int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
   char vdatestr[32], vtimestr[32];
   double vfrac = 1;
+  double divisor;
   double missval;
   field_t **vars1 = NULL, **vars2 = NULL, **samp1 = NULL;
   field_t field;
@@ -152,6 +154,11 @@ void *Timstat(void *argument)
 
   operatorID = cdoOperatorID();
   operfunc = cdoOperatorF1(operatorID);
+
+  lmean   = operfunc == func_mean || operfunc == func_avg;
+  lstd    = operfunc == func_std || operfunc == func_std1;
+  lvarstd = operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1;
+  divisor = operfunc == func_std1 || operfunc == func_var1;
 
   if ( operfunc == func_mean )
     {
@@ -224,7 +231,7 @@ void *Timstat(void *argument)
 
   vars1 = field_malloc(vlistID1, FIELD_PTR);
   samp1 = field_malloc(vlistID1, FIELD_NONE);
-  if ( operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1 )
+  if ( lvarstd )
     vars2 = field_malloc(vlistID1, FIELD_PTR);
 
   tsID    = 0;
@@ -308,7 +315,7 @@ void *Timstat(void *argument)
 			  samp1[varID][levelID].ptr[i]++;
 		    }
 
-		  if ( operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1 )
+		  if ( lvarstd )
 		    {
 		      farsumq(&vars2[varID][levelID], field);
 		      farsum(&vars1[varID][levelID], field);
@@ -320,7 +327,7 @@ void *Timstat(void *argument)
 		}
 	    }
 
-	  if ( nsets == 0 && (operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1) )
+	  if ( nsets == 0 && lvarstd )
 	    for ( varID = 0; varID < nvars; varID++ )
 	      {
 		if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -337,7 +344,7 @@ void *Timstat(void *argument)
 
       if ( nrecs == 0 && nsets == 0 ) break;
 
-      if ( operfunc == func_mean || operfunc == func_avg )
+      if ( lmean )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
@@ -350,26 +357,23 @@ void *Timstat(void *argument)
 		  fardiv(&vars1[varID][levelID], samp1[varID][levelID]);
 	      }
 	  }
-      else if ( operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1 )
+      else if ( lvarstd )
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
-		double divisor = 0;
-		if ( operfunc == func_std1 || operfunc == func_var1 ) divisor = 1;
-
 		if ( samp1[varID][levelID].ptr == NULL )
 		  {
-		    if ( operfunc == func_std || operfunc == func_std1 )
+		    if ( lstd )
 		      farcstdx(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
 		    else
 		      farcvarx(&vars1[varID][levelID], vars2[varID][levelID], nsets, divisor);
 		  }
 		else
 		  {
-		    if ( operfunc == func_std || operfunc == func_std1 )
+		    if ( lstd )
 		      farstdx(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
 		    else
 		      farvarx(&vars1[varID][levelID], vars2[varID][levelID], samp1[varID][levelID], divisor);
@@ -463,7 +467,7 @@ void *Timstat(void *argument)
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if ( operfunc == func_std || operfunc == func_var || operfunc == func_std1 || operfunc == func_var1 )
+  if ( lvarstd )
     field_free(vars2, vlistID1);
 
   if ( cdoDiag ) streamClose(streamID3);
