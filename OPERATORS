@@ -352,8 +352,10 @@ Operator catalog:
    Ydaystat      ydaysum         Multi-year daily sum
    Ydaystat      ydaymean        Multi-year daily mean
    Ydaystat      ydayavg         Multi-year daily average
-   Ydaystat      ydayvar         Multi-year daily variance
    Ydaystat      ydaystd         Multi-year daily standard deviation
+   Ydaystat      ydaystd1        Multi-year daily standard deviation
+   Ydaystat      ydayvar         Multi-year daily variance
+   Ydaystat      ydayvar1        Multi-year daily variance
    Ydaypctl      ydaypctl        Multi-year daily percentiles
    Ymonstat      ymonmin         Multi-year monthly minimum
    Ymonstat      ymonmax         Multi-year monthly maximum

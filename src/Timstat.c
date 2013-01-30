@@ -467,8 +467,7 @@ void *Timstat(void *argument)
 
   field_free(vars1, vlistID1);
   field_free(samp1, vlistID1);
-  if ( lvarstd )
-    field_free(vars2, vlistID1);
+  if ( lvarstd ) field_free(vars2, vlistID1);
 
   if ( cdoDiag ) streamClose(streamID3);
   streamClose(streamID2);

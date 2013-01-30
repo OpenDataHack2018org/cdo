@@ -7,6 +7,9 @@
 
 	* New operator: ymonvar1    - Multi-year monthly variance [Divisor is (n-1)]
 	* New operator: ymonstd1    - Multi-year monthly standard deviation [Divisor is(n-1)]
+	* New operator: ydayvar1   - Multi-year daily variance [Divisor is (n-1)]
+	* New operator: ydaystd1   - Multi-year daily standard deviation [Divisor is (n-1)]
+
 
 2013-01-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

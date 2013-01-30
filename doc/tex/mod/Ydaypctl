@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Ydaypctl
 @Title     = Multi-year daily percentile values
 @Section   = Statistical values

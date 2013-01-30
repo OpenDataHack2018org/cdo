@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = ydaymin ydaymax ydaysum ydaymean ydayavg ydayvar ydaystd
+@Operators = ydaymin ydaymax ydaysum ydaymean ydayavg ydaystd ydaystd1 ydayvar ydayvar1
 
 @BeginDescription
 This module computes statistical values of each day of year.
@@ -129,6 +129,8 @@ o(\mbox{366},x) = \mbox{\bf avg}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 @Title     = Multi-year daily variance
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(001,x) = var{i(t,x), day(i(t)) = 001}
                  ...
@@ -147,10 +149,36 @@ o(\mbox{366},x) = \mbox{\bf var}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 @EndOperator
 
 
+@BeginOperator_ydayvar1
+@Title     = Multi-year daily variance
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(001,x) = var1{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = var1{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf var1}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
 @BeginOperator_ydaystd
 @Title     = Multi-year daily standard deviation
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(001,x) = std{i(t,x), day(i(t)) = 001}
                  ...
@@ -162,6 +190,30 @@ o(366,x) = std{i(t,x), day(i(t)) = 366}
 o(\mbox{001},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
 \vdots \\
 o(\mbox{366},x) = \mbox{\bf std}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
+\end{array}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_ydaystd1
+@Title     = Multi-year daily standard deviation
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(001,x) = std1{i(t,x), day(i(t)) = 001}
+                 ...
+o(366,x) = std1{i(t,x), day(i(t)) = 366}
+@EndifMan
+@IfDoc
+@BeginMath
+\begin{array}{c}
+o(\mbox{001},x) = \mbox{\bf std1}\{i(t,x), \mbox{day}(i(t)) = \mbox{001}\} \\
+\vdots \\
+o(\mbox{366},x) = \mbox{\bf std1}\{i(t,x), \mbox{day}(i(t)) = \mbox{366}\} \\
 \end{array}
 @EndMath
 @EndifDoc
