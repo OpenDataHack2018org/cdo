@@ -60,14 +60,14 @@ void *Ensstat3(void *argument)
   int nvars,nbins, nrecs = 0, nrecs0, nmiss, nens, nfiles;;
   int cum;
   int chksum;                  // for check of histogram population 
-  int levelID, varID, recID, tsID, binID = 0, ensID;
+  int levelID, varID, recID, tsID, binID = 0;
   int gridsize = 0;
   int gridID, gridID2;
   int have_miss = 0;
   int streamID = 0, streamID2 = 0;
   int vlistID, vlistID1, vlistID2;
   int taxisID1, taxisID2;
-  int zaxisID,zaxisID2;
+  int zaxisID2;
   int ompthID;
   int *varID2;
   int time_mode;
@@ -279,7 +279,7 @@ void *Ensstat3(void *argument)
 	{
 #if defined (_OPENMP)
 #pragma omp parallel for default(shared) private(fileID, streamID, nmiss) \
-  lastprivate(binID, varID, levelID)
+                                     lastprivate(varID, levelID)
 #endif
 	  for ( fileID = 0; fileID < nfiles; fileID++ )
 	    {
@@ -335,9 +335,9 @@ void *Ensstat3(void *argument)
 		      //		      fprintf(stderr,"-->%i\n",binID);
 		      
 		      if ( datafunc == SPACE && ! have_miss) 
-			array2[binID][i]++;
+			for ( binID=0; binID<nfiles; binID++ ) array2[binID][i]++;
 		      else if ( ! have_miss ) 
-			array2[binID][0]++;
+			for ( binID=0; binID<nfiles; binID++ ) array2[binID][0]++;
 		      break;
 
 		    case ( func_roc ):
@@ -405,7 +405,7 @@ void *Ensstat3(void *argument)
 		streamDefRecord(streamID2, varID2[varID], binID);
 		streamWriteRecord(streamID2,&val, nmiss);
 	      }
-	      fprintf(stderr,"\n");
+	      //fprintf(stderr,"\n");
 	    }
 	  else if ( operfunc == func_roc ) 
 	    {

@@ -5,6 +5,10 @@
 
 2013-01-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* ensrkhisttime: fixed memory fault [https://code.zmaw.de/boards/1/topics/1657]
+
+2013-01-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* New operator: ymonvar1    - Multi-year monthly variance [Divisor is (n-1)]
 	* New operator: ymonstd1    - Multi-year monthly standard deviation [Divisor is(n-1)]
 	* New operator: ydayvar1   - Multi-year daily variance [Divisor is (n-1)]
