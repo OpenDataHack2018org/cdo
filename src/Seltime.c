@@ -606,9 +606,30 @@ void *Seltime(void *argument)
     {
       if ( selfound[isel] == FALSE )
 	{
+	 
+	  int isel2;
+	  int lcont = FALSE;
+	  for ( isel2 = isel+1; isel2 < nsel; isel2++ )
+	    if ( selfound[isel2] == TRUE ) break;
+	  if ( isel2 == nsel && (nsel-isel) > 1 ) lcont = TRUE;
+
 	  if ( operatorID == SELTIMESTEP )
 	    {
-	      cdoWarning("Time step %d not found!", intarr[isel]);
+	      int lcont2 = FALSE;
+	      if ( lcont )
+		{    
+		  for ( isel2 = isel+1; isel2 < nsel; isel2++ )
+		    if ( intarr[isel2-1] != intarr[isel2]-1 ) break;
+		  if ( isel2 == nsel ) lcont2 = TRUE;
+		}
+
+	      if ( lcont2 )
+		{
+		  cdoWarning("Time steps %d-%d not found!", intarr[isel], intarr[nsel-1]);
+		  break;
+		}
+	      else
+		cdoWarning("Time step %d not found!", intarr[isel]);
 	    }
 	  else if ( operatorID == SELDATE )
 	    {
