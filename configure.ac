@@ -9,7 +9,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER(src/config.h)
+AC_CONFIG_HEADER(src/config.h)
 AM_MAINTAINER_MODE([disable])
 
 # Set up libtool.

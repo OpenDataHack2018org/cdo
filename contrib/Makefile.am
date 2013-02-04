@@ -9,10 +9,10 @@ completions:
 test:
 	if (hash ruby &> /dev/null) ; then \
 	    (cd ruby;ruby test/test_cdo.rb) \
-    fi
-	if (hash ruby &> /dev/null) ; then \
+	fi
+	if (hash python &> /dev/null) ; then \
 	    (cd python; python test/test_cdo.py) \
-    fi
+	fi
 
 if MAINTAINER_MODE
 all-local: completions

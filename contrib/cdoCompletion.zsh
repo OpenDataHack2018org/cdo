@@ -7,11 +7,13 @@ compctl -k "(
 -R \
 -S \
 -V \
+-W \
 -a \
 -b \
 -f \
 -g \
 -h \
+-k \
 -m \
 -r \
 -s \
@@ -22,6 +24,7 @@ abs -abs \
 acos -acos \
 add -add \
 addc -addc \
+adisit -adisit \
 aexpr -aexpr \
 aexprf -aexprf \
 anomaly -anomaly \
@@ -70,8 +73,10 @@ daymean -daymean \
 daymin -daymin \
 daypctl -daypctl \
 daystd -daystd \
+daystd1 -daystd1 \
 daysum -daysum \
 dayvar -dayvar \
+dayvar1 -dayvar1 \
 del29feb -del29feb \
 delcode -delcode \
 delday -delday \
@@ -152,8 +157,10 @@ ensrkhistspace -ensrkhistspace \
 ensrkhisttime -ensrkhisttime \
 ensroc -ensroc \
 ensstd -ensstd \
+ensstd1 -ensstd1 \
 enssum -enssum \
 ensvar -ensvar \
+ensvar1 -ensvar1 \
 eof -eof \
 eof3d -eof3d \
 eof3dspatial -eof3dspatial \
@@ -184,8 +191,10 @@ fldmin -fldmin \
 fldpctl -fldpctl \
 fldrms -fldrms \
 fldstd -fldstd \
+fldstd1 -fldstd1 \
 fldsum -fldsum \
 fldvar -fldvar \
+fldvar1 -fldvar1 \
 for -for \
 fourier -fourier \
 fpressure -fpressure \
@@ -242,8 +251,10 @@ hourmean -hourmean \
 hourmin -hourmin \
 hourpctl -hourpctl \
 hourstd -hourstd \
+hourstd1 -hourstd1 \
 hoursum -hoursum \
 hourvar -hourvar \
+hourvar1 -hourvar1 \
 hpressure -hpressure \
 hurr -hurr \
 ifnotthen -ifnotthen \
@@ -342,9 +353,11 @@ monmin -monmin \
 monmul -monmul \
 monpctl -monpctl \
 monstd -monstd \
+monstd1 -monstd1 \
 monsub -monsub \
 monsum -monsum \
 monvar -monvar \
+monvar1 -monvar1 \
 mrotuv -mrotuv \
 mrotuvb -mrotuvb \
 mul -mul \
@@ -430,7 +443,6 @@ runsum -runsum \
 runvar -runvar \
 scalllogo -scalllogo \
 scatter -scatter \
-sdiff -sdiff \
 seasavg -seasavg \
 seascount -seascount \
 seasmax -seasmax \
@@ -610,8 +622,10 @@ timselsum -timselsum \
 timselvar -timselvar \
 timsort -timsort \
 timstd -timstd \
+timstd1 -timstd1 \
 timsum -timsum \
 timvar -timvar \
+timvar1 -timvar1 \
 tinfo -tinfo \
 topo -topo \
 tpnhalo -tpnhalo \
@@ -655,17 +669,21 @@ ydaymin -ydaymin \
 ydaymul -ydaymul \
 ydaypctl -ydaypctl \
 ydaystd -ydaystd \
+ydaystd1 -ydaystd1 \
 ydaysub -ydaysub \
 ydaysum -ydaysum \
 ydayvar -ydayvar \
+ydayvar1 -ydayvar1 \
 ydrunavg -ydrunavg \
 ydrunmax -ydrunmax \
 ydrunmean -ydrunmean \
 ydrunmin -ydrunmin \
 ydrunpctl -ydrunpctl \
 ydrunstd -ydrunstd \
+ydrunstd1 -ydrunstd1 \
 ydrunsum -ydrunsum \
 ydrunvar -ydrunvar \
+ydrunvar1 -ydrunvar1 \
 yearavg -yearavg \
 yearcount -yearcount \
 yearmax -yearmax \
@@ -673,8 +691,10 @@ yearmean -yearmean \
 yearmin -yearmin \
 yearpctl -yearpctl \
 yearstd -yearstd \
+yearstd1 -yearstd1 \
 yearsum -yearsum \
 yearvar -yearvar \
+yearvar1 -yearvar1 \
 yhouradd -yhouradd \
 yhouravg -yhouravg \
 yhourdiv -yhourdiv \
@@ -683,9 +703,11 @@ yhourmean -yhourmean \
 yhourmin -yhourmin \
 yhourmul -yhourmul \
 yhourstd -yhourstd \
+yhourstd1 -yhourstd1 \
 yhoursub -yhoursub \
 yhoursum -yhoursum \
 yhourvar -yhourvar \
+yhourvar1 -yhourvar1 \
 ymonadd -ymonadd \
 ymonavg -ymonavg \
 ymondiv -ymondiv \
@@ -695,9 +717,11 @@ ymonmin -ymonmin \
 ymonmul -ymonmul \
 ymonpctl -ymonpctl \
 ymonstd -ymonstd \
+ymonstd1 -ymonstd1 \
 ymonsub -ymonsub \
 ymonsum -ymonsum \
 ymonvar -ymonvar \
+ymonvar1 -ymonvar1 \
 yseasavg -yseasavg \
 yseasmax -yseasmax \
 yseasmean -yseasmean \
