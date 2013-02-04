@@ -24,6 +24,7 @@ config/missing -text
 config/mkinstalldirs -text
 /configure -text
 /configure.ac -text
+contrib/COPYING -text
 contrib/Makefile.am -text
 contrib/Makefile.in -text
 contrib/cdoCompletion.bash -text
