@@ -52,6 +52,7 @@
 
 #include "modules.h"
 #include "util.h"
+#include "error.h"
 
 #if defined (_OPENMP)
 #  include <omp.h>
@@ -99,6 +100,14 @@ int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
 
 char cdo_file_suffix[32];
+
+
+static int Debug = 0;
+static int Version = 0;
+static int Help = 0;
+static int DebugLevel = 0;
+static int numThreads = 0;
+
 
 int cdoExpMode           = -1;
 char *cdoExpName         = NULL;
@@ -239,6 +248,7 @@ void usage(void)
 
   fprintf(stderr, "    -V             Print the version number\n");
   fprintf(stderr, "    -v             Print extra details for some operators\n");
+  fprintf(stderr, "    -W             Print extra warning messages\n");
   fprintf(stderr, "    -z szip        SZIP compression of GRIB1 records\n");
   fprintf(stderr, "       jpeg        JPEG compression of GRIB2 records\n");
   fprintf(stderr, "        zip[_1-9]  Deflate compression of netCDF4 variables\n");
@@ -792,42 +802,168 @@ void get_env_vars(void)
     }
 }
 
+static
+void print_system_info()
+{
+  char *envstr;
 
-int main(int argc, char *argv[])
+  if ( DebugLevel == 0 ) DebugLevel = 1;
+  cdoSetDebug(DebugLevel);
+  fprintf(stderr, "\n");
+  fprintf(stderr, "cdoDefaultFileType  = %d\n", cdoDefaultFileType);
+  fprintf(stderr, "cdoDefaultDataType  = %d\n", cdoDefaultDataType);
+  fprintf(stderr, "cdoDefaultByteorder = %d\n", cdoDefaultByteorder);
+  fprintf(stderr, "cdoDefaultTableID   = %d\n", cdoDefaultTableID);
+  fprintf(stderr, "\n");
+
+  envstr = getenv("HOSTTYPE");
+  if ( envstr ) fprintf(stderr, "HOSTTYPE            = %s\n", envstr);
+  envstr = getenv("VENDOR");
+  if ( envstr ) fprintf(stderr, "VENDOR              = %s\n", envstr);
+  envstr = getenv("OSTYPE");
+  if ( envstr ) fprintf(stderr, "OSTYPE              = %s\n", envstr);
+  envstr = getenv("MACHTYPE");
+  if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
+  fprintf(stderr, "\n");
+
+#if defined (__SSE2__)
+  fprintf(stderr, "Predefined: __SSE2__\n");
+#endif 
+#if defined (__SSE3__)
+  fprintf(stderr, "Predefined: __SSE3__\n");
+#endif 
+#if defined (__SSE4_1__)
+  fprintf(stderr, "Predefined: __SSE4_1__\n");
+#endif 
+#if defined (__SSE4_2__)
+  fprintf(stderr, "Predefined: __SSE4_2__\n");
+#endif 
+#if defined (__AVX__)
+  fprintf(stderr, "Predefined: __AVX__\n");
+#endif 
+  fprintf(stderr, "\n");
+
+  fprintf(stderr, "mem alignment       = %d\n\n", getMemAlignment());
+
+#if defined (HAVE_MMAP)
+  fprintf(stderr, "HAVE_MMAP\n");
+#endif
+#if defined (HAVE_MEMORY_H)
+  fprintf(stderr, "HAVE_MEMORY_H\n");
+#endif
+  fprintf(stderr, "\n");
+      
+#if defined (_OPENACC)
+  fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
+#endif
+#if defined (_OPENMP)
+  fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
+#endif
+#if defined (__GNUC__)
+  fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
+#endif
+#if defined (__ICC)
+  fprintf(stderr, "ICC VERSION         = %d\n", __ICC);
+#endif
+#if defined (__STDC__)
+  fprintf(stderr, "STD ANSI C          = %d\n", __STDC__);
+#endif
+#if defined (__STD_VERSION__)
+  fprintf(stderr, "STD VERSION         = %ld\n", __STD_VERSION__);
+#endif
+#if defined (__STDC_VERSION__)
+  fprintf(stderr, "STDC VERSION        = %ld\n", __STDC_VERSION__);
+#endif
+#if defined (__STD_HOSTED__)
+  fprintf(stderr, "STD HOSTED          = %d\n", __STD_HOSTED__);
+#endif
+#if defined (FLT_EVAL_METHOD)
+  fprintf(stderr, "FLT_EVAL_METHOD     = %d\n", FLT_EVAL_METHOD);
+#endif
+#if defined (FP_FAST_FMA)
+  fprintf(stderr, "FP_FAST_FMA         = defined\n");
+#endif
+  fprintf(stderr, "\n");
+
+#if defined (_SC_VERSION)
+  fprintf(stderr, "POSIX.1 VERSION     = %ld\n", sysconf(_SC_VERSION));
+#endif
+#if defined (_SC_ARG_MAX)
+  fprintf(stderr, "POSIX.1 ARG_MAX     = %ld\n", sysconf(_SC_ARG_MAX));
+#endif
+#if defined (_SC_CHILD_MAX)
+  fprintf(stderr, "POSIX.1 CHILD_MAX   = %ld\n", sysconf(_SC_CHILD_MAX));
+#endif
+#if defined (_SC_STREAM_MAX)
+  fprintf(stderr, "POSIX.1 STREAM_MAX  = %ld\n", sysconf(_SC_STREAM_MAX));
+#endif
+#if defined (_SC_OPEN_MAX)
+  fprintf(stderr, "POSIX.1 OPEN_MAX    = %ld\n", sysconf(_SC_OPEN_MAX));
+#endif
+#if defined (_SC_PAGESIZE)
+  fprintf(stderr, "POSIX.1 PAGESIZE    = %ld\n", sysconf(_SC_PAGESIZE));
+#endif
+
+  fprintf(stderr, "\n");
+
+#if defined (HAVE_GETRLIMIT)
+#if defined (RLIMIT_FSIZE)
+  PRINT_RLIMIT(RLIMIT_FSIZE);
+#endif
+#if defined (RLIMIT_NOFILE)
+  PRINT_RLIMIT(RLIMIT_NOFILE);
+#endif
+#if defined (RLIMIT_STACK)
+  PRINT_RLIMIT(RLIMIT_STACK);
+#endif
+#endif
+  fprintf(stderr, "\n");
+}
+
+static
+void check_stacksize()
+{
+#if defined (HAVE_GETRLIMIT)
+#if defined (RLIMIT_STACK)
+  {
+#define  MIN_STACK_SIZE  67108864L  /* 64MB */
+    int status;
+    struct rlimit rlim;
+    RLIM_T min_stack_size = MIN_STACK_SIZE;
+
+    status = getrlimit(RLIMIT_STACK, &rlim);
+
+    if ( status == 0 )
+      {
+	if ( min_stack_size > rlim.rlim_max ) min_stack_size = rlim.rlim_max;
+	if ( rlim.rlim_cur < min_stack_size )
+	  {
+	    rlim.rlim_cur = min_stack_size;
+
+	    status = setrlimit(RLIMIT_STACK, &rlim);
+	    if ( Debug )
+	      {
+		if ( status == 0 )
+		  {
+		    fprintf(stderr, "Set stack size to %ld\n", (long) min_stack_size);
+		    PRINT_RLIMIT(RLIMIT_STACK);
+		  }
+		else
+		  fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
+	      }
+	  }
+      }
+  }
+#endif
+#endif
+}
+
+static
+void parse_options(int argc, char *argv[])
 {
   int c;
-  int Debug = 0;
-  int Version = 0;
-  int Help = 0;
-  int DebugLevel = 0;
-  int lstop = FALSE;
-  int noff = 0;
-  int status = 0;
-  int numThreads = 0;
-  char *operatorName = NULL;
-  char *operatorArg = NULL;
-  char *argument = NULL;
-  extern int dmemory_ExitOnError;
 
-  init_is_tty();
-
-  dmemory_ExitOnError = 1;
-
-  /* mallopt(M_MMAP_MAX, 0); */
- 
-  setCommandLine(argc, argv);
-
-  Progname = getProgname(argv[0]);
-
-  if ( memcmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
-
-  /* old versions !!!! */
-  if ( memcmp(Progname, "gdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
-  if ( memcmp(Progname, "gm",  2) == 0 && strlen(Progname) > 2 ) noff = 2;
-
-  if ( noff ) setDefaultFileType(Progname+noff, 0);
-
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBcdhLMOQRrsSTuVvXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBcdhLMOQRrsSTuVvWXZ")) != -1 )
     {
       switch (c)
 	{
@@ -943,6 +1079,9 @@ int main(int argc, char *argv[])
 	case 'v':
 	  cdoVerbose = TRUE;
 	  break;
+	case 'W': /* Warning messages */
+	  _Verbose = 1;
+	  break;
 	case 'X': /* multi threaded I/O */
 	  cdoParIO = TRUE;
 	  break;
@@ -958,166 +1097,46 @@ int main(int argc, char *argv[])
 	  break;
 	}
     }
+}
+
+
+int main(int argc, char *argv[])
+{
+  int lstop = FALSE;
+  int noff = 0;
+  int status = 0;
+  char *operatorName = NULL;
+  char *operatorArg = NULL;
+  char *argument = NULL;
+  extern int dmemory_ExitOnError;
+
+  init_is_tty();
+
+  dmemory_ExitOnError = 1;
+
+  _Verbose = 0;
+
+  /* mallopt(M_MMAP_MAX, 0); */
+ 
+  setCommandLine(argc, argv);
+
+  Progname = getProgname(argv[0]);
+
+  if ( memcmp(Progname, "cdo", 3) == 0 && strlen(Progname) > 3 ) noff = 3;
+
+  if ( noff ) setDefaultFileType(Progname+noff, 0);
+
+  parse_options(argc, argv);
 
   get_env_vars();
 
   if ( Debug || Version ) cdo_version();
 
-  if ( Debug )
-    {
-      char *envstr;
+  if ( Debug ) print_system_info();
 
-      if ( DebugLevel == 0 ) DebugLevel = 1;
-      cdoSetDebug(DebugLevel);
-      fprintf(stderr, "\n");
-      fprintf(stderr, "cdoDefaultFileType  = %d\n", cdoDefaultFileType);
-      fprintf(stderr, "cdoDefaultDataType  = %d\n", cdoDefaultDataType);
-      fprintf(stderr, "cdoDefaultByteorder = %d\n", cdoDefaultByteorder);
-      fprintf(stderr, "cdoDefaultTableID   = %d\n", cdoDefaultTableID);
-      fprintf(stderr, "\n");
+  check_stacksize();
 
-      envstr = getenv("HOSTTYPE");
-      if ( envstr ) fprintf(stderr, "HOSTTYPE            = %s\n", envstr);
-      envstr = getenv("VENDOR");
-      if ( envstr ) fprintf(stderr, "VENDOR              = %s\n", envstr);
-      envstr = getenv("OSTYPE");
-      if ( envstr ) fprintf(stderr, "OSTYPE              = %s\n", envstr);
-      envstr = getenv("MACHTYPE");
-      if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
-      fprintf(stderr, "\n");
-
-#if defined (__SSE2__)
-      fprintf(stderr, "Predefined: __SSE2__\n");
-#endif 
-#if defined (__SSE3__)
-      fprintf(stderr, "Predefined: __SSE3__\n");
-#endif 
-#if defined (__SSE4_1__)
-      fprintf(stderr, "Predefined: __SSE4_1__\n");
-#endif 
-#if defined (__SSE4_2__)
-      fprintf(stderr, "Predefined: __SSE4_2__\n");
-#endif 
-#if defined (__AVX__)
-      fprintf(stderr, "Predefined: __AVX__\n");
-#endif 
-      fprintf(stderr, "\n");
-
-      fprintf(stderr, "mem alignment       = %d\n\n", getMemAlignment());
-
-#if defined (HAVE_MMAP)
-      fprintf(stderr, "HAVE_MMAP\n");
-#endif
-#if defined (HAVE_MEMORY_H)
-      fprintf(stderr, "HAVE_MEMORY_H\n");
-#endif
-      fprintf(stderr, "\n");
-
-#if defined (_OPENACC)
-      fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
-#endif
-#if defined (_OPENMP)
-      fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
-#endif
-#if defined (__GNUC__)
-      fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
-#endif
-#if defined (__ICC)
-      fprintf(stderr, "ICC VERSION         = %d\n", __ICC);
-#endif
-#if defined (__STDC__)
-      fprintf(stderr, "STD ANSI C          = %d\n", __STDC__);
-#endif
-#if defined (__STD_VERSION__)
-      fprintf(stderr, "STD VERSION         = %ld\n", __STD_VERSION__);
-#endif
-#if defined (__STDC_VERSION__)
-      fprintf(stderr, "STDC VERSION        = %ld\n", __STDC_VERSION__);
-#endif
-#if defined (__STD_HOSTED__)
-      fprintf(stderr, "STD HOSTED          = %d\n", __STD_HOSTED__);
-#endif
-#if defined (FLT_EVAL_METHOD)
-      fprintf(stderr, "FLT_EVAL_METHOD     = %d\n", FLT_EVAL_METHOD);
-#endif
-#if defined (FP_FAST_FMA)
-      fprintf(stderr, "FP_FAST_FMA         = defined\n");
-#endif
-      fprintf(stderr, "\n");
-
-#if defined (_SC_VERSION)
-      fprintf(stderr, "POSIX.1 VERSION     = %ld\n", sysconf(_SC_VERSION));
-#endif
-#if defined (_SC_ARG_MAX)
-      fprintf(stderr, "POSIX.1 ARG_MAX     = %ld\n", sysconf(_SC_ARG_MAX));
-#endif
-#if defined (_SC_CHILD_MAX)
-      fprintf(stderr, "POSIX.1 CHILD_MAX   = %ld\n", sysconf(_SC_CHILD_MAX));
-#endif
-#if defined (_SC_STREAM_MAX)
-      fprintf(stderr, "POSIX.1 STREAM_MAX  = %ld\n", sysconf(_SC_STREAM_MAX));
-#endif
-#if defined (_SC_OPEN_MAX)
-      fprintf(stderr, "POSIX.1 OPEN_MAX    = %ld\n", sysconf(_SC_OPEN_MAX));
-#endif
-#if defined (_SC_PAGESIZE)
-      fprintf(stderr, "POSIX.1 PAGESIZE    = %ld\n", sysconf(_SC_PAGESIZE));
-#endif
-
-      fprintf(stderr, "\n");
-
-#if defined (HAVE_GETRLIMIT)
-#if defined (RLIMIT_FSIZE)
-      PRINT_RLIMIT(RLIMIT_FSIZE);
-#endif
-#if defined (RLIMIT_NOFILE)
-      PRINT_RLIMIT(RLIMIT_NOFILE);
-#endif
-#if defined (RLIMIT_STACK)
-      PRINT_RLIMIT(RLIMIT_STACK);
-#endif
-#endif
-      fprintf(stderr, "\n");
-    }
-
-#if defined (HAVE_GETRLIMIT)
-#if defined (RLIMIT_STACK)
-  {
-#define  MIN_STACK_SIZE  67108864L  /* 64MB */
-    int status;
-    struct rlimit rlim;
-    RLIM_T min_stack_size = MIN_STACK_SIZE;
-
-    status = getrlimit(RLIMIT_STACK, &rlim);
-
-    if ( status == 0 )
-      {
-	if ( min_stack_size > rlim.rlim_max ) min_stack_size = rlim.rlim_max;
-	if ( rlim.rlim_cur < min_stack_size )
-	  {
-	    rlim.rlim_cur = min_stack_size;
-
-	    status = setrlimit(RLIMIT_STACK, &rlim);
-	    if ( Debug )
-	      {
-		if ( status == 0 )
-		  {
-		    fprintf(stderr, "Set stack size to %ld\n", (long) min_stack_size);
-		    PRINT_RLIMIT(RLIMIT_STACK);
-		  }
-		else
-		  fprintf(stderr, "Set stack size to %ld failed!\n", (long) min_stack_size);
-	      }
-	  }
-      }
-  }
-#endif
-#endif
-
-  if ( Debug )
-    {
-      print_pthread_info();
-    }
+  if ( Debug ) print_pthread_info();
 
 #if defined (_OPENMP)
   if ( numThreads <= 0 ) numThreads = 1;
