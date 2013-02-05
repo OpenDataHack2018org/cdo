@@ -3,13 +3,13 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-02-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* ensrkhisttime: fixed memory fault [https://code.zmaw.de/boards/1/topics/1657]
+
 2013-02-04 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added CDO option -W to print extra warning messages
-
-2013-01-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
-
-	* ensrkhisttime: fixed memory fault [https://code.zmaw.de/boards/1/topics/1657]
 
 2013-01-30 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

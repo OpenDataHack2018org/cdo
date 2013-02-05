@@ -160,9 +160,9 @@ void *Ensstat3(void *argument)
   vlistID1 = ef[0].vlistID;
   vlistID2 = vlistCreate();
   nvars = vlistNvars(vlistID1);
-  varID2 = (int *) malloc( nvars*sizeof(int));
+  varID2 = (int *) malloc(nvars*sizeof(int));
 
-  levs = (double*) calloc ( nfiles, sizeof(double) );
+  levs = (double*) calloc (nfiles, sizeof(double) );
   zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
   for ( i=0; i<nfiles; i++ )
     levs[i] = i;
@@ -329,15 +329,15 @@ void *Ensstat3(void *argument)
 		      /* ****************/
 		      /* RANK HISTOGRAM */
 		      /* ************** */
-		      //		      for ( j=0; j<nfiles; j++ )
-		      //			fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
-		      //		      binID = (int) fldfun(field[ompthID], operfunc);
-		      //		      fprintf(stderr,"-->%i\n",binID);
+		      // for ( j=0; j<nfiles; j++ )
+		      //   fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
+		      binID = (int) fldfun(field[ompthID], operfunc);
+		      // fprintf(stderr,"-->%i\n",binID);
 		      
 		      if ( datafunc == SPACE && ! have_miss) 
-			for ( binID=0; binID<nfiles; binID++ ) array2[binID][i]++;
+			array2[binID][i]++;
 		      else if ( ! have_miss ) 
-			for ( binID=0; binID<nfiles; binID++ ) array2[binID][0]++;
+			array2[binID][0]++;
 		      break;
 
 		    case ( func_roc ):
@@ -440,12 +440,23 @@ void *Ensstat3(void *argument)
 
 
   if ( operfunc == func_rank )
-    for ( binID=0; binID<nfiles; binID++ ) {
-      double *tmpdoub = (double *)malloc (gridsize*sizeof(double));
-      for(i=0; i<gridsize; i++ )
-	tmpdoub[i] = (double) array2[binID][i];
-      streamDefRecord(streamID2,varID2[varID],binID);
-      streamWriteRecord(streamID2,tmpdoub,nmiss);
+    {
+      double *tmpdoub;
+      int osize = gridsize;
+
+      if ( datafunc == TIME ) osize = 1;
+      tmpdoub = (double *) malloc(osize*sizeof(double));
+
+      for ( binID = 0; binID < nfiles; binID++ )
+	{
+	  for ( i = 0; i < osize; i++ )
+	    tmpdoub[i] = (double) array2[binID][i];
+
+	  streamDefRecord(streamID2, varID2[varID], binID);
+	  streamWriteRecord(streamID2, tmpdoub, nmiss);
+	}
+
+      free(tmpdoub);
     }
   else if ( operfunc == func_roc ) {
     fprintf(stdout, "#             :     TP     FP     FN     TN         TPR        FPR\n");
