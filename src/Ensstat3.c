@@ -296,8 +296,9 @@ void *Ensstat3(void *argument)
 	  if ( datafunc == TIME && operfunc == func_rank) 
 	    for ( binID=0;binID<nfiles;binID++ )
 	      array2[binID][0] = 0;
+
 #if defined (_OPENMP)
-#pragma omp parallel for default(shared) private(i, ompthID, fileID)
+#pragma omp parallel for default(shared) private(i, binID, ompthID, fileID)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
@@ -331,6 +332,9 @@ void *Ensstat3(void *argument)
 		      /* ************** */
 		      // for ( j=0; j<nfiles; j++ )
 		      //   fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
+#if defined (_OPENMP)
+#pragma omp critical
+#endif
 		      binID = (int) fldfun(field[ompthID], operfunc);
 		      // fprintf(stderr,"-->%i\n",binID);
 		      
