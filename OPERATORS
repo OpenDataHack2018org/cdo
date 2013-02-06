@@ -271,8 +271,10 @@ Operator catalog:
    Timselstat    timselsum       Time range sum
    Timselstat    timselmean      Time range mean
    Timselstat    timselavg       Time range average
-   Timselstat    timselvar       Time range variance
    Timselstat    timselstd       Time range standard deviation
+   Timselstat    timselstd1      Time range standard deviation
+   Timselstat    timselvar       Time range variance
+   Timselstat    timselvar1      Time range variance
    Timselpctl    timselpctl      Time range percentiles
    Runstat       runmin          Running minimum
    Runstat       runmax          Running maximum

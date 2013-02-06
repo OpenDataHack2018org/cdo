@@ -8,11 +8,10 @@
 @Operators = timmin timmax timsum timmean timavg timstd timstd1 timvar timvar1
 
 @BeginDescription
-This module computes statistical  values over all timesteps in @file{ifile}.
-Depending on the chosen operator the minimum, maximum, sum, average, variance
-or standard deviation of all timesteps read from @file{ifile} is written to @file{ofile}.
-The date information of a timestep in @file{ofile} is the date of the last 
-contributing timestep in @file{ifile}.
+This module computes statistical  values over all timesteps in @file{ifile}. Depending on 
+the chosen operator the minimum, maximum, sum, average, variance or standard deviation of 
+all timesteps read from @file{ifile} is written to @file{ofile}.
+The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 

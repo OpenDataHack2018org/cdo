@@ -7,10 +7,8 @@
 @Operators = runpctl
 
 @BeginDescription
-This module computes running percentiles over a selected number of time
-steps in @file{ifile1}.
-The date information in @file{ofile} is the date of the medium contributing
-timestep in @file{ifile1}.
+This module computes running percentiles over a selected number of time steps in @file{ifile1}.
+The date information in @file{ofile} is the date of the medium contributing timestep in @file{ifile1}.
 @EndDescription
 @EndModule
 
