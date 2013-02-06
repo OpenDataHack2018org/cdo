@@ -832,9 +832,9 @@ void processDelete(void)
   //fprintf(stderr, "delete processID %d\n", processID);
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
-#endif
 
   Process[processID].l_threadID = 0;
+#endif
   NumProcessActive--;
 
 #if  defined  (HAVE_LIBPTHREAD)
