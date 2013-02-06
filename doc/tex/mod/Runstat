@@ -5,7 +5,7 @@
 @Section   = Statistical values
 @Class     = Statistic
 @Arguments = ifile ofile
-@Operators = runmin runmax runsum runmean runavg runvar runstd
+@Operators = runmin runmax runsum runmean runavg runstd runstd1 runvar runvar1
 
 @BeginDescription
 This module computes running statistical values over a selected number
@@ -107,12 +107,33 @@ o(t+(nts-1)/2,x) = \mbox{\bf avg}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @Parameter = nts
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(t+(nts-1)/2,x) = var{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
-o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+o(t+(nts-1)/2,x) = \mbox{\bf var}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runvar1
+@Title     = Running variance
+@Parameter = nts
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(t+(nts-1)/2,x) = var1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf var1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription
@@ -124,12 +145,33 @@ o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @Parameter = nts
 
 @BeginDescription
+Divisor is n. 
+
 @IfMan
 o(t+(nts-1)/2,x) = std{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
 @EndifMan
 @IfDoc
 @BeginMath
 o(t+(nts-1)/2,x) = \mbox{\bf std}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
+@EndMath
+@EndifDoc
+@EndDescription
+@EndOperator
+
+
+@BeginOperator_runstd1
+@Title     = Running standard deviation
+@Parameter = nts
+
+@BeginDescription
+Divisor is (n-1). 
+
+@IfMan
+o(t+(nts-1)/2,x) = std1{i(t,x), i(t+1,x), ..., i(t+nts-1,x)}
+@EndifMan
+@IfDoc
+@BeginMath
+o(t+(nts-1)/2,x) = \mbox{\bf std1}\{i(t,x), i(t+1,x), ..., i(t+nts-1,x)\}
 @EndMath
 @EndifDoc
 @EndDescription

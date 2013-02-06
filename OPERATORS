@@ -279,8 +279,10 @@ Operator catalog:
    Runstat       runsum          Running sum
    Runstat       runmean         Running mean
    Runstat       runavg          Running average
-   Runstat       runvar          Running variance
    Runstat       runstd          Running standard deviation
+   Runstat       runstd1         Running standard deviation
+   Runstat       runvar          Running variance
+   Runstat       runvar1         Running variance
    Runpctl       runpctl         Running percentiles
    Timstat       timmin          Time minimum
    Timstat       timmax          Time maximum

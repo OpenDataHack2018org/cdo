@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Runpctl
 @Title     = Running percentile values
 @Section   = Statistical values
