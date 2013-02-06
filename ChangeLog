@@ -5,6 +5,8 @@
 
 2013-02-06 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* New operator: timselvar1  - Time range variance [Divisor is (n-1)]
+	* New operator: timselstd1  - Time range standard deviation [Divisor is (n-1)]
 	* New operator: runvar1  -  Running variance [Divisor is (n-1)]
 	* New operator: runstd1  -  Running standard deviation [Divisor is (n-1)]
 
