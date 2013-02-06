@@ -3,6 +3,11 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-02-06 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* New operator: runvar1  -  Running variance [Divisor is (n-1)]
+	* New operator: runstd1  -  Running standard deviation [Divisor is (n-1)]
+
 2013-02-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* ensrkhisttime: fixed memory fault [https://code.zmaw.de/boards/1/topics/1657]

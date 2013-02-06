@@ -452,9 +452,6 @@ void farvar(field_t *field1, field_t field2, field_t field3)
     {
       for ( i = 0; i < len; i++ )
 	{
-	  // array3[i] = 0.111111;
-	  if ( i < 10 )
-	    printf("array123 %g %g %g", array1[i], array2[i], array3[i]);
 	  if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) && !DBL_IS_EQUAL(array3[i], missval3) )
 	    {
 	      array1[i] = array2[i]*array3[i] - (array1[i]*array3[i])*(array1[i]*array3[i]);
@@ -462,8 +459,6 @@ void farvar(field_t *field1, field_t field2, field_t field3)
 	    }
 	  else
 	    array1[i] = missval1;
-	  if ( i < 10 )
-	    printf(" %g\n", array1[i]);
 	}
     }
   else
