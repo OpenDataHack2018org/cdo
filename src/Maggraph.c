@@ -2,6 +2,8 @@
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
+#include<limits.h>  /* TEMPORARY FIX, UNTIL NEXT MAGICS LIBRARY RELEASE */ 
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -585,6 +587,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[0], ntime_steps);
       else
 	mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[i], nts[i]);
+
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
+      mag_setr("graph_x_suppress_below",LLONG_MIN);
+      mag_setr("graph_x_suppress_above",LLONG_MAX);
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  end  **/
+
       mag_set1r("graph_curve_y_values", datatab[i], nts[i]);
       mag_graph ();
     }
@@ -595,6 +603,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       sprintf(legend_text_data, "%s","Obsv" );
       mag_setc("legend_user_text", legend_text_data);
       mag_set1c("graph_curve_date_x_values",(const char**)date_time_str[0], nts[0]);
+
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
+      mag_setr("graph_x_suppress_below",LLONG_MIN);
+      mag_setr("graph_x_suppress_above",LLONG_MAX);
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  end  **/
+
       mag_set1r("graph_curve_y_values", datatab[0], nts[0]);
       mag_setc("graph_line_style", "dot" );
       mag_seti("graph_line_thickness", 10 );
@@ -613,6 +627,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       mag_setc("graph_line_colour", "grey" );
       mag_setc("graph_line_style", "dash" );
       mag_set1c("graph_curve_date_x_values", (const char**)date_time_str[0], ntime_steps);
+
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
+      mag_setr("graph_x_suppress_below",LLONG_MIN);
+      mag_setr("graph_x_suppress_above",LLONG_MAX);
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  end  **/
+
       mag_set1r("graph_curve_y_values",mean_val, ntime_steps);
       sprintf(legend_text_data, "Mean");
       mag_setc("legend_user_text", legend_text_data);
@@ -630,6 +650,12 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
       mag_setc("graph_shade_colour", "grey");
       sprintf(legend_text_data, "%dSigma", num_sigma);
       mag_setc("legend_user_text", legend_text_data);
+
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  begin**/
+      mag_setr("graph_x_suppress_below",LLONG_MIN);
+      mag_setr("graph_x_suppress_above",LLONG_MAX);
+      /* TEMPORARY FIX, UNITL NEW MAGICS LIBRARY RELEASE *  end  **/
+
       mag_graph ();
     }
   

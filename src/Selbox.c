@@ -464,7 +464,6 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   if ( gridtype == GRID_CURVILINEAR )
     {
       double xval, yval, xlast, ylast;
-      int ixmin, ixmax, iymin, iymax;
       int lp2 = FALSE;
 
       if ( xlon1 > xlon2 ) 
@@ -484,17 +483,12 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       *lon21 = nlon1-1;
       *lon22 = 0;
 
-      ixmin = nlon1-1;
-      ixmax = 0;
-      iymin = nlat1-1;
-      iymax = 0;
-
       for ( ilat = 0; ilat < nlat1; ilat++ )
 	{
 	  xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
 	  ylast = yfact * yvals1[ilat*nlon1 + nlon1-1];
 	  if ( ylast >= xlat1 && ylast <= xlat2 )
-	    if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360)
+	    if ( grid_is_circular && xlon1 <= xlast && xlon2 > xlast && (xlon2-xlon1) < 360 )
 	      {
 		*lon11 = nlon1-1;
 		*lon12 = 0;
@@ -517,6 +511,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
 	      if ( yval >= xlat1 && yval <= xlat2 )
 		{
+		  /*
 		  if ( lp2 )
 		    {
 		      if ( xval >= xlon1 && xval <= xlast )
@@ -525,6 +520,8 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 			  if ( ilon > *lon22 ) *lon22 = ilon;
 			  if ( ilat < *lat1 ) *lat1 = ilat;
 			  if ( ilat > *lat2 ) *lat2 = ilat;
+			  printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d xval, xlon1, xlast %g %g %g\n",
+				 *lon11, *lon12, *lon21, *lon22, *lat1, *lat2, xval, xlon1, xlast);
 			}
 		      else if ( xval > xlast && xval <= xlon2 )
 			{
@@ -532,31 +529,29 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 			  if ( ilon > *lon12 ) *lon12 = ilon;
 			  if ( ilat < *lat1 ) *lat1 = ilat;
 			  if ( ilat > *lat2 ) *lat2 = ilat;
+			  printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d xval, xlast, xlon2 %g %g %g\n",
+				 *lon11, *lon12, *lon21, *lon22, *lat1, *lat2, xval, xlast, xlon2);
 			}
 		    }
 		  else
+		  */
 		    {
-		      if ( ((xval >= xlon1 && xval <= xlon2) ||
+		      if ( ((xval     >= xlon1 && xval     <= xlon2) ||
 			    (xval-360 >= xlon1 && xval-360 <= xlon2) ||
 			    (xval+360 >= xlon1 && xval+360 <= xlon2)) )
 			{
-			  if ( ilon < ixmin ) ixmin = ilon;
-			  if ( ilon > ixmax ) ixmax = ilon;
-			  if ( ilat < iymin ) iymin = ilat;
-			  if ( ilat > iymax ) iymax = ilat;
+			  if ( ilon < *lon21 ) *lon21 = ilon;
+			  if ( ilon > *lon22 ) *lon22 = ilon;
+			  if ( ilat < *lat1 ) *lat1 = ilat;
+			  if ( ilat > *lat2 ) *lat2 = ilat;
 			}
 		    }
 		}
 	    }
 	}
 
-      if ( ! lp2 )
-	{
-	  *lat1 = iymin;
-	  *lat2 = iymax;
-	  *lon21 = ixmin;
-	  *lon22 = ixmax;
-	}      
+      printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d\n", *lon11, *lon12, *lon21, *lon22, *lat1, *lat2);
+      if ( *lon12 == 0 && *lon11 > 0 ) *lon11 = -1;
 
       if ( *lat2 - *lat1 + 1 <= 0 )
 	cdoAbort("Latitudinal dimension is too small!");
