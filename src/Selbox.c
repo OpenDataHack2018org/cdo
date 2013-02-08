@@ -463,7 +463,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
   if ( gridtype == GRID_CURVILINEAR )
     {
-      double xval, yval, xlast, ylast;
+      double xval, yval, xfirst, xlast, ylast;
       int lp2 = FALSE;
 
       if ( xlon1 > xlon2 ) 
@@ -498,8 +498,6 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 
       for ( ilat = 0; ilat < nlat1; ilat++ )
 	{
-	  xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
-
 	  for ( ilon = 0; ilon < nlon1; ilon++ )
 	    {
 	      xval = xvals1[ilat*nlon1 + ilon];
@@ -508,33 +506,32 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	      xval *= xfact;
 	      yval *= yfact;
 
-
 	      if ( yval >= xlat1 && yval <= xlat2 )
 		{
-		  /*
 		  if ( lp2 )
 		    {
+		      xfirst = xfact * xvals1[ilat*nlon1];
+		      if ( xfirst < xlon1 ) xfirst = xlon1;
+
+		      xlast = xfact * xvals1[ilat*nlon1 + nlon1-1];
+		      if ( xlast > xlon2 ) xlast = xlon2;
+
 		      if ( xval >= xlon1 && xval <= xlast )
 			{
 			  if ( ilon < *lon21 ) *lon21 = ilon;
 			  if ( ilon > *lon22 ) *lon22 = ilon;
 			  if ( ilat < *lat1 ) *lat1 = ilat;
 			  if ( ilat > *lat2 ) *lat2 = ilat;
-			  printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d xval, xlon1, xlast %g %g %g\n",
-				 *lon11, *lon12, *lon21, *lon22, *lat1, *lat2, xval, xlon1, xlast);
 			}
-		      else if ( xval > xlast && xval <= xlon2 )
+		      else if ( xval >= xfirst && xval <= xlon2 )
 			{
 			  if ( ilon < *lon11 ) *lon11 = ilon;
 			  if ( ilon > *lon12 ) *lon12 = ilon;
 			  if ( ilat < *lat1 ) *lat1 = ilat;
 			  if ( ilat > *lat2 ) *lat2 = ilat;
-			  printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d xval, xlast, xlon2 %g %g %g\n",
-				 *lon11, *lon12, *lon21, *lon22, *lat1, *lat2, xval, xlast, xlon2);
 			}
 		    }
 		  else
-		  */
 		    {
 		      if ( ((xval     >= xlon1 && xval     <= xlon2) ||
 			    (xval-360 >= xlon1 && xval-360 <= xlon2) ||
@@ -550,7 +547,7 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
 	    }
 	}
 
-      printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d\n", *lon11, *lon12, *lon21, *lon22, *lat1, *lat2);
+      // printf("lon11, lon12, lon21, lon22, lat1, lat2 %d %d %d %d %d %d\n", *lon11, *lon12, *lon21, *lon22, *lat1, *lat2);
       if ( *lon12 == 0 && *lon11 > 0 ) *lon11 = -1;
 
       if ( *lat2 - *lat1 + 1 <= 0 )
