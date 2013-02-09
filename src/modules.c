@@ -562,7 +562,7 @@ static modules_t Modules[] =
   { Derivepar,      NULL,              DeriveparOperators,     CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
   { Diff,           DiffHelp,          DiffOperators,          CDI_REAL,  2,  0 },
-  { Duplicate,      NULL,              DuplicateOperators,     CDI_REAL,  1,  1 },
+  { Duplicate,      DuplicateHelp,     DuplicateOperators,     CDI_REAL,  1,  1 },
   { Echam5ini,      NULL,              Echam5iniOperators,     CDI_REAL,  1,  1 },
   { Enlarge,        EnlargeHelp,       EnlargeOperators,       CDI_REAL,  1,  1 },
   { Enlargegrid,    NULL,              EnlargegridOperators,   CDI_REAL,  1,  1 },

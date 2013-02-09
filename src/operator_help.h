@@ -217,6 +217,22 @@ static char *ReplaceHelp[] = {
     NULL
 };
 
+static char *DuplicateHelp[] = {
+    "NAME",
+    "    duplicate - Duplicates a dataset",
+    "",
+    "SYNOPSIS",
+    "    duplicate[,ndup]  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator duplicates the contents of ifile and writes the result to ofile.",
+    "    The optional parameter sets the number of duplicates, the default is 1.",
+    "",
+    "PARAMETER",
+    "    ndup  INTEGER  Number of duplicates, default is 1.",
+    NULL
+};
+
 static char *MergegridHelp[] = {
     "NAME",
     "    mergegrid - Merge grid",
@@ -1881,16 +1897,12 @@ static char *TimselpctlHelp[] = {
     "    timselpctl,p,nsets[,noffset[,nskip]]  ifile1 ifile2 ifile3 ofile",
     "",
     "DESCRIPTION",
-    "    This operator computes percentile values over a selected number of time",
-    "    steps in ifile1.",
-    "    The algorithm uses histograms with minimum and maximum bounds given in",
-    "    ifile2 and ifile3, respectively. The default number of",
-    "    histogram bins is 101. The default can be overridden by setting the",
-    "    environment variable CDO_PCTL_NBINS to a different value. The files",
-    "    ifile2 and ifile3 should be the result of corresponding",
-    "    timselmin and timselmax operations, respectively.",
-    "    The date information of a timestep in ofile is the date of the last ",
-    "    contributing timestep in ifile.",
+    "    This operator computes percentile values over a selected number of time steps in ifile1.",
+    "    The algorithm uses histograms with minimum and maximum bounds given in ifile2 and ifile3,",
+    "    respectively. The default number of histogram bins is 101. The default can be overridden by setting the",
+    "    environment variable CDO_PCTL_NBINS to a different value. The files ifile2 and ifile3 ",
+    "    should be the result of corresponding timselmin and timselmax operations, respectively.",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    For every adjacent sequence t1, ...., tn of timesteps of the same ",
     "    selected time range it is",
     "    ",
