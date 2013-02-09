@@ -7,7 +7,8 @@ Version 1.6.0 (?? March 2013):
                     (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
    New operators:
      * select: select fields from an unlimited number of input files
-     * mergegrid: merge horizontal grids
+     * mergegrid: Merge horizontal grids
+     * duplicate: Duplicates a dataset
      * adisit: Potential temperature to in-situ temperature
      * rhopot: Calculates potential density
    Changed operators:

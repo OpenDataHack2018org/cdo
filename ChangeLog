@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-02-09 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* New operator: duplicate  - Duplicates a dataset
+
 2013-02-08 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sellonlatbox: wrong result with overlapped lonlatbox on curvilinear grids (bug fix) [report: Dirk Notz]
