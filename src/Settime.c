@@ -140,7 +140,7 @@ void *Settime(void *argument)
   SETTUNITS   = cdoOperatorAdd("settunits",   0,  1, "time units (seconds, minutes, hours, days, months, years)");
   SETTAXIS    = cdoOperatorAdd("settaxis",    0, -2, "date,time<,increment> (format YYYY-MM-DD,hh:mm:ss)");
   SETREFTIME  = cdoOperatorAdd("setreftime",  0, -2, "date,time<,units> (format YYYY-MM-DD,hh:mm:ss)");
-  SETCALENDAR = cdoOperatorAdd("setcalendar", 0,  1, "calendar (standard, proleptic, 360days, 365days, 366days)");
+  SETCALENDAR = cdoOperatorAdd("setcalendar", 0,  1, "calendar (standard, proleptic_gregorian, 360_day, 365_day, 366_day)");
   SHIFTTIME   = cdoOperatorAdd("shifttime",   0,  1, "shift value");
 
   operatorID = cdoOperatorID();
