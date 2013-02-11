@@ -154,10 +154,10 @@ void *Derivepar(void *argument)
   int vlistID1, vlistID2;
   int gridsize, ngp = 0;
   int recID, nrecs;
-  int i, offset, iv;
+  int i, offset;
   int tsID, varID, levelID;
   int nvars;
-  int zaxisID2, zaxisIDh = -1, nzaxis, surfaceID;
+  int zaxisIDh = -1, nzaxis;
   int ngrids, gridID = -1, zaxisID;
   int nlevel;
   int nvct;
@@ -170,7 +170,6 @@ void *Derivepar(void *argument)
   int taxisID1, taxisID2;
   int lhavevct;
   int nhlevf = 0;
-  double *lev2;
   double *vct = NULL;
   double *geop = NULL, *ps = NULL, *temp = NULL, *hum = NULL;
   // double *lwater = NULL, *iwater = NULL;
@@ -180,9 +179,6 @@ void *Derivepar(void *argument)
   double *array = NULL;
   double *half_press = NULL;
   double minval, maxval;
-  double missval = 0;
-  double cconst = 1.E-6;
-  const char *fname;
   int instNum, tableNum;
   int useTable;
 
