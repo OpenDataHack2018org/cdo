@@ -213,11 +213,11 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
     {
       if ( len1 > 0 && len2 > 0 )
 	{
-	  int status;
 	  vars[varID].changeunits = TRUE;
 	  strcpy(vars[varID].units_old, units_old);
 	  strcpy(vars[varID].units, units);
 #if defined (HAVE_LIBUDUNITS2)
+	  int status;
 	  UDUNITS_INIT();
 	  UDUNITS_LOCK();
 	  vars[varID].ut_converter = get_converter(units_old, units, &status);
