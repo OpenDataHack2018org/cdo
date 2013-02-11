@@ -46,7 +46,7 @@ void fft2(double *real, double *imag, int n, int isign)
   int nn, mmax, m, j, istep, i;
   double wtemp, wr, wpr, wpi, wi, theta, tempr, tempi, tmp;   
   
-  if ( n < 2 || n&(n-1) ) printf("n must be power of 2\n");
+  if ( n < 2 || (n&(n-1)) ) printf("n must be power of 2\n");
   nn = n << 1;
   j = 1;
   

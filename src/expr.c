@@ -71,7 +71,7 @@ nodeType *expr_con_con(int oper, nodeType *p1, nodeType *p2)
     case '*':  p->u.con.value = p1->u.con.value * p2->u.con.value; break;
     case '/':  p->u.con.value = p1->u.con.value / p2->u.con.value; break;
     case '^':  p->u.con.value = pow(p1->u.con.value, p2->u.con.value); break;
-    default:   cdoAbort("%s: operator %c unsupported!", __func__, oper);
+    default:   cdoAbort("%s: operator %c unsupported!", __func__, oper); break;
     }
 
   return (p);
@@ -165,6 +165,7 @@ nodeType *expr_con_var(int oper, nodeType *p1, nodeType *p2)
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
+      break;
     }
 
   nmiss = 0;
@@ -272,6 +273,7 @@ nodeType *expr_var_con(int oper, nodeType *p1, nodeType *p2)
       break;
     default:
       cdoAbort("%s: operator %c unsupported!", __func__, oper);
+      break;
     }
 
   nmiss = 0;
@@ -420,6 +422,7 @@ nodeType *expr_var_var(int oper, nodeType *p1, nodeType *p2)
 	  break;
 	default:
 	  cdoAbort("%s: operator %c unsupported!", __func__, oper);
+          break;
 	}
     }
 
@@ -921,7 +924,9 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	      rnode = expr(p->u.opr.oper, expr_run(p->u.opr.op[0], parse_arg),
 			                  expr_run(p->u.opr.op[1], parse_arg));
 	    }
+          break;
         }
+      break;
     }
 
   return (rnode);

@@ -223,6 +223,7 @@ void *Consecstat (void *argument)
         break;
       default:
         printf (SWITCHWARN,__func__);
+        break;
     }
 
     for ( recID = 0; recID < nrecs; recID++ )
@@ -257,6 +258,7 @@ void *Consecstat (void *argument)
           break;
         default:
           printf (SWITCHWARN,__func__);
+          break;
       }
     }
     histvdate = vdate;

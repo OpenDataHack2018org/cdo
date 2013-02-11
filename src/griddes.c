@@ -498,6 +498,8 @@ int gridDefine(grid_t grid)
 	  Error("Undefined grid type!");
 	else
 	  Error("Unsupported grid type: %s", gridNamePtr(grid.type));
+
+	break;
       }
     }
 

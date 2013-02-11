@@ -90,6 +90,7 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_orde
       break;
     default:
       cdoAbort("Unknown mapping method");
+      break;
     }
 }
 

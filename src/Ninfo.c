@@ -147,6 +147,7 @@ void *Ninfo(void *argument)
       break;
     default:
       cdoAbort("operator not implemented!");
+      break;
     }
 
   streamClose(streamID);

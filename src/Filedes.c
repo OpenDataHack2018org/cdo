@@ -239,6 +239,7 @@ void filedes(int streamID)
       break;
     default:
       printf("  unsupported filetype %d\n" , filetype);
+      break;
     }
   
   printf("\n");

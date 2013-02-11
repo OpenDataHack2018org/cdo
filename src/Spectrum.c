@@ -323,6 +323,7 @@ void *Spectrum(void *argument)
       break;
     default:
       cdoAbort("Invalid window type %d!", which_window);
+      break;
     }
   
   wssum = 0;
