@@ -325,8 +325,8 @@ void cdoSetDebug(int level)
   if ( level == 1 || (level &  32) ) cdoDebug = 1;
   if ( level == 1 || (level &  64) ) pstreamDebug(1);
 #if  defined  (HAVE_LIBPTHREAD)
-  if ( level == 1 || level & 128 ) pipeDebug(1);
-  if ( level == 1 || level & 256 ) Pthread_debug(1);
+  if ( level == 1 || (level & 128) ) pipeDebug(1);
+  if ( level == 1 || (level & 256) ) Pthread_debug(1);
 #endif
 }
 

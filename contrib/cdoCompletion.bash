@@ -59,7 +59,6 @@ complextorect -complextorect \
 consecsum -consecsum \
 consects -consects \
 const -const \
-contour -contour \
 conv_cmor_table -conv_cmor_table \
 copy -copy \
 cos -cos \
@@ -219,8 +218,6 @@ gp2spl -gp2spl \
 gradsdes -gradsdes \
 gradsdes1 -gradsdes1 \
 gradsdes2 -gradsdes2 \
-graph -graph \
-grfill -grfill \
 gridarea -gridarea \
 gridboxavg -gridboxavg \
 gridboxmax -gridboxmax \
@@ -439,8 +436,10 @@ runmean -runmean \
 runmin -runmin \
 runpctl -runpctl \
 runstd -runstd \
+runstd1 -runstd1 \
 runsum -runsum \
 runvar -runvar \
+runvar1 -runvar1 \
 scalllogo -scalllogo \
 scatter -scatter \
 seasavg -seasavg \
@@ -526,7 +525,6 @@ setvar -setvar \
 setvrange -setvrange \
 setyear -setyear \
 setzaxis -setzaxis \
-shaded -shaded \
 shifttime -shifttime \
 showcode -showcode \
 showdate -showdate \
@@ -587,7 +585,6 @@ ssopar -ssopar \
 stdatm -stdatm \
 stimelogo -stimelogo \
 strbre -strbre \
-stream -stream \
 strgal -strgal \
 strwin -strwin \
 studentt -studentt \
@@ -618,8 +615,10 @@ timselmean -timselmean \
 timselmin -timselmin \
 timselpctl -timselpctl \
 timselstd -timselstd \
+timselstd1 -timselstd1 \
 timselsum -timselsum \
 timselvar -timselvar \
+timselvar1 -timselvar1 \
 timsort -timsort \
 timstd -timstd \
 timstd1 -timstd1 \
@@ -643,7 +642,6 @@ varquot2test -varquot2test \
 varrms -varrms \
 vct -vct \
 vct2 -vct2 \
-vector -vector \
 vertavg -vertavg \
 vertmax -vertmax \
 vertmean -vertmean \
