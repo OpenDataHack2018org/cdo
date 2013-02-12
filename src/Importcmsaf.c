@@ -1235,10 +1235,6 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
   H5G_obj_t obj_type;
   H5G_stat_t statbuf;
 
-  /* avoid compiler warnings */
-  loc_id = loc_id;
-  opdata = opdata;
-
   H5Gget_objinfo(loc_id, name, FALSE, &statbuf);
 
   obj_type = statbuf.type;
@@ -1286,6 +1282,7 @@ obj_info(hid_t loc_id, const char *name, void *opdata)
     break;
   default:
     cdoAbort(" Unable to identify an object %s", name);
+    break;
   }
 
   return 0;

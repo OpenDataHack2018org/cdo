@@ -16,20 +16,6 @@
 
 
 #if  defined  (HAVE_LIBHDF5)
-static
-void nce(int istat)
-{
-  /*
-    This routine provides a simple interface to netCDF error message routine.
-  */
-  /*
-  if ( istat != NC_NOERR ) cdoAbort(nc_strerror(istat));
-  */
-}
-#endif
-
-
-#if  defined  (HAVE_LIBHDF5)
 static herr_t
 obj_info(hid_t loc_id, const char *name, void *objname)
 {
