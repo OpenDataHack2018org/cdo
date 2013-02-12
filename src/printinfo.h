@@ -66,6 +66,7 @@ void printFiletype(int streamID, int vlistID)
       break;
     default:
       printf("  File format: unsupported filetype %d" , filetype);
+      break;
     }
 
   if ( filetype == FILETYPE_SRV || filetype == FILETYPE_EXT || filetype == FILETYPE_IEG )

@@ -38,6 +38,10 @@
 #include "namelist.h"
 
 
+typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
+
+#if defined (HAVE_LIBUDUNITS2)
+
 static void udunitsInitialize(void);
 static int udunitsInit = 0;
 
@@ -59,9 +63,7 @@ static pthread_mutex_t udunitsMutex;
 
 #endif
 
-typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
 
-#if defined (HAVE_LIBUDUNITS2)
 ut_system *ut_read = NULL;
 
 static

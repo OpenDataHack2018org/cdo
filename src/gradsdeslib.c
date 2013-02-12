@@ -7,7 +7,6 @@
 #include <cdi.h>
 #include "gradsdeslib.h"
 
-extern int cdoDefaultDataType;
 
 static char pout[512];
 FILE *descr;             /* File descriptor pointer */

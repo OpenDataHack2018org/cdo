@@ -259,7 +259,7 @@ void *Strbre(void *argument);
 void *Strgal(void *argument);
 void *Hurr(void *argument);
 
-void *Hi(void *argument);
+//void *Hi(void *argument);
 void *Wct(void *argument);
 
 #if defined(HAVE_LIBMAGICS) && defined(HAVE_LIBXML2)

@@ -190,6 +190,7 @@ void *Math(void *argument)
 	      break;
 	    default:
 	      cdoAbort("operator not implemented!");
+	      break;
 	    }
 
 	  nmiss2 = 0;

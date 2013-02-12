@@ -184,6 +184,7 @@ void Pthread_mutex_lock(const char *caller, pthread_mutex_t *mutex)
 	  break;
 	default:
 	  Error("Status %d unknown!", status, (void *) mutex);
+	  break;
 	}
     }
 
@@ -210,6 +211,7 @@ void Pthread_mutex_unlock(const char *caller, pthread_mutex_t *mutex)
 	  break;
 	default:
 	  Error("Status %d unknown!", status);
+	  break;
 	}
     }
 

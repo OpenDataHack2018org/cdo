@@ -73,7 +73,7 @@ long find_element(double x, long nelem, const double *array)
 
   return (mid);
 }
-
+/*
 static
 long find_element_old(double x, long nelem, const double *array)
 {
@@ -92,7 +92,7 @@ long find_element_old(double x, long nelem, const double *array)
 
   return (ii);
 }
-
+*/
 
 double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym,
 		   double x, double y)
@@ -325,7 +325,8 @@ void interpolate(field_t *field1, field_t *field2)
   int i;
   double *lono_array, *lato_array, *lono, *lato;
   double *lon_array, *lat_array, *lon, *lat;
-  int gridsize_i, gridsize_o;
+  //int gridsize_i
+  int gridsize_o;
   int gridIDi;
   double *arrayIn;
   int gridIDo;
@@ -358,7 +359,7 @@ void interpolate(field_t *field1, field_t *field2)
   arrayOut = field2->ptr;
   missval  = field1->missval;
 
-  gridsize_i = gridInqSize(gridIDi);
+  //gridsize_i = gridInqSize(gridIDi);
   gridsize_o = gridInqSize(gridIDo);
 
   nlon  = gridInqXsize(gridIDi);
