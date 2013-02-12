@@ -61,10 +61,10 @@ typedef struct {
   char    ylongname[CDI_MAX_NAME];
   char    yunits[CDI_MAX_NAME];
 }
-grid_t;
+griddes_t;
 
-void gridInit(grid_t *grid);
-int gridDefine(grid_t grid);
+void gridInit(griddes_t *grid);
+int gridDefine(griddes_t grid);
 
 int gridFromNCfile(const char *gridfile);
 int gridFromH5file(const char *gridfile);

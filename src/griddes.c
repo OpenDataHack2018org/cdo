@@ -58,7 +58,7 @@ void extClose(int fileID);
 #define MAX_LINE_LEN 65536
 
 
-void gridInit(grid_t *grid)
+void gridInit(griddes_t *grid)
 {
   grid->mask          = NULL;
   grid->xvals         = NULL;
@@ -168,7 +168,7 @@ int getoptname(char *optname, const char *optstring, int nopt)
 }
 
 
-int gridDefine(grid_t grid)
+int gridDefine(griddes_t grid)
 {
   int gridID = UNDEFID;
   int i;
@@ -581,7 +581,7 @@ void fnmexp2(char *out, char *in1, const char *in2)
 }
 
 /*
-double *readfield(grid_t *grid, int record, char *format, char *filename)
+double *readfield(griddes_t *grid, int record, char *format, char *filename)
 {
   int fileID, rxysize, ierr, irec;
   double *vals;
@@ -616,7 +616,7 @@ double *readfield(grid_t *grid, int record, char *format, char *filename)
 }
 */
 /*
-double *readfield4(grid_t *grid, int record, char *format, char *filename)
+double *readfield4(griddes_t *grid, int record, char *format, char *filename)
 {
   int fileID, rxysize, ierr, irec;
   double *vals;
@@ -671,7 +671,7 @@ int gridFromFile(FILE *gfp, const char *dname)
   int gridID = -1;
   int size;
   size_t len;
-  grid_t grid;
+  griddes_t grid;
 
   gridInit(&grid);
 
@@ -1262,7 +1262,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
   int i;
   int nlon, nlat;
   int lgauss = FALSE;
-  grid_t grid;
+  griddes_t grid;
 
   gridInit(&grid);
 
@@ -1472,7 +1472,7 @@ int compNlon(int nlat)
 }
 
 static
-void gen_grid_lonlat(grid_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
+void gen_grid_lonlat(griddes_t *grid, const char *pline, double inc, double lon1, double lon2, double lat1, double lat2)
 {
   int nlon, nlat, i;
   int gridtype = GRID_LONLAT;
@@ -1513,7 +1513,7 @@ int gridFromName(const char *gridname)
 {
   const char *pline;
   int gridID = UNDEFID;
-  grid_t grid;
+  griddes_t grid;
   size_t len;
   char *endptr;
 

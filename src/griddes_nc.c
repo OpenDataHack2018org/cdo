@@ -64,7 +64,7 @@ int gridFromNCfile(const char *gridfile)
   size_t attlen;
   size_t grid_rank, grid_size, grid_nvertex;
   int grid_dims[2];
-  grid_t grid;
+  griddes_t grid;
 
 
   gridInit(&grid);
