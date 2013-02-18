@@ -616,10 +616,10 @@ void trans_uv2dv(SPTRANS *sptrans, int nlev,
   double *fpwork1, *fpwork2;
 
   if ( gridInqType(gridID1) != GRID_GAUSSIAN )
-    Warning("unexpected grid1 type: %s", gridNamePtr(gridInqType(gridID1)));
+    Error("unexpected grid1 type: %s instead of Gaussian", gridNamePtr(gridInqType(gridID1)));
 
   if ( gridInqType(gridID2) != GRID_SPECTRAL )
-    Warning("unexpected grid2 type: %s", gridNamePtr(gridInqType(gridID2)));
+    Error("unexpected grid2 type: %s instead of spectral", gridNamePtr(gridInqType(gridID2)));
     
   ntr  = gridInqTrunc(gridID2);
   nlon = gridInqXsize(gridID1);

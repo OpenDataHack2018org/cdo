@@ -689,7 +689,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    lerror = TRUE;
 	    line[i] = '#';
 	  }
-      
       if ( lerror ) cdoAbort("Grid description file >%s< contains illegal characters (line: %s)!", dname, line);
 
       pline = line;
@@ -976,10 +975,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 	  for ( i = 0; i < (int) grid.size; i++ )
 	    {
 	      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-		{
-		  cdoAbort("Incomplete command: >gridlatlon< (grid description file: %s)", dname);
-		  break;
-		}
+		cdoAbort("Incomplete command: >gridlatlon< (grid description file: %s)", dname);
+
 	      sscanf(line, "%lg %lg", &flat, &flon);
 	      grid.yvals[i] = flat;
 	      grid.xvals[i] = flon;
@@ -1006,10 +1003,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  if ( pline == endptr )
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			{
-			  cdoAbort("Incomplete command: >mask< (grid description file: %s)", dname);
-			  break;
-			}
+			cdoAbort("Incomplete command: >mask< (grid description file: %s)", dname);
+
 		      pline = line;
 		      lval = strtol(pline, &endptr, 10);
 		    }
@@ -1050,10 +1045,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  if ( pline == endptr )
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			{
-			  cdoAbort("Incomplete command: >xvals< (grid description file: %s)", dname);
-			  break;
-			}
+			cdoAbort("Incomplete command: >xvals< (grid description file: %s)", dname);
+
 		      pline = line;
 		      fval = strtod(pline, &endptr);
 		    }
@@ -1087,10 +1080,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  if ( pline == endptr )
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			{
-			  cdoAbort("Incomplete command: >yvals< (grid description file: %s)", dname);
-			  break;
-			}
+			cdoAbort("Incomplete command: >yvals< (grid description file: %s)", dname);
+
 		      pline = line;
 		      fval = strtod(pline, &endptr);
 		    }
@@ -1129,10 +1120,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  if ( pline == endptr )
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			{
-			  cdoAbort("Incomplete command: >xbounds< (grid description file: %s)", dname);
-			  break;
-			}
+			cdoAbort("Incomplete command: >xbounds< (grid description file: %s)", dname);
+
 		      pline = line;
 		      fval = strtod(pline, &endptr);
 		    }
@@ -1174,10 +1163,8 @@ int gridFromFile(FILE *gfp, const char *dname)
 		  if ( pline == endptr )
 		    {
 		      if ( ! readline(gfp, line, MAX_LINE_LEN) )
-			{
-			  cdoAbort("Incomplete command: >ybounds< (grid description file: %s)", dname);
-			  break;
-			}
+			cdoAbort("Incomplete command: >ybounds< (grid description file: %s)", dname);
+
 		      pline = line;
 		      fval = strtod(pline, &endptr);
 		    }

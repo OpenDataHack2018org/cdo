@@ -171,7 +171,7 @@ int pstream_from_pointer(pstream_t *ptr)
 	    Message("Pointer %p has idx %d from pstream list", ptr, idx);
 	}
       else
-	Warning("Too many open pstreams (limit is %d)!", _pstream_max);
+	Error("Too many open pstreams (limit is %d)!", _pstream_max);
 
       PSTREAM_UNLOCK();
     }
