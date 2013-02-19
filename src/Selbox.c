@@ -345,9 +345,9 @@ int gengridcell(int gridID1, int gridsize2, int *cellidx)
 }
 
 
-void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
-		  int nlon1, int nlat1, double *xvals1, double *yvals1,
-		  int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+void genlonlatbox_reg(double xlon1, double xlon2, double xlat1, double xlat2,
+		      int nlon1, int nlat1, double *xvals1, double *yvals1,
+		      int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   if ( IS_NOT_EQUAL(xlon1, xlon2) )
     {
@@ -414,12 +414,12 @@ void genlonlatbox(double xlon1, double xlon2, double xlat1, double xlat2,
     cdoAbort("Latitudinal dimension is too small!");
 }
 
-static
-int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+
+void genlonlatbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
   int ilon, ilat;
   int nlon1, nlat1;
-  int gridtype, gridID2;
+  int gridtype;
   double *xvals1, *yvals1;
   double xlon1, xlon2, xlat1, xlat2;
   int grid_is_circular;
@@ -427,12 +427,12 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
   char yunits[CDI_MAX_NAME];
   double xfact = 1, yfact = 1;
 
-  operatorCheckArgc(4);
+  operatorCheckArgc(argc_offset+4);
 
-  xlon1 = atof(operatorArgv()[0]);
-  xlon2 = atof(operatorArgv()[1]);
-  xlat1 = atof(operatorArgv()[2]);
-  xlat2 = atof(operatorArgv()[3]);
+  xlon1 = atof(operatorArgv()[argc_offset+0]);
+  xlon2 = atof(operatorArgv()[argc_offset+1]);
+  xlat1 = atof(operatorArgv()[argc_offset+2]);
+  xlat2 = atof(operatorArgv()[argc_offset+3]);
 
   gridtype = gridInqType(gridID1);
 
@@ -558,13 +558,21 @@ int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int
       for ( ilat = 0; ilat < nlat1; ilat++ ) yvals1[ilat] *= yfact;
       for ( ilon = 0; ilon < nlon1; ilon++ ) xvals1[ilon] *= xfact;
 
-      genlonlatbox(xlon1, xlon2, xlat1, xlat2,
-		   nlon1, nlat1, xvals1, yvals1,
-		   lat1, lat2, lon11, lon12, lon21, lon22);
+      genlonlatbox_reg(xlon1, xlon2, xlat1, xlat2,
+		       nlon1, nlat1, xvals1, yvals1,
+		       lat1, lat2, lon11, lon12, lon21, lon22);
     }
 
   free(xvals1);
   free(yvals1);
+}
+
+static
+int genlonlatgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+{
+  int gridID2;
+
+  genlonlatbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
   gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 
@@ -584,13 +592,14 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   char xunits[CDI_MAX_NAME];
   char yunits[CDI_MAX_NAME];
   double xfact, yfact;
+  int argc_offset = 0;
 
-  operatorCheckArgc(4);
+  operatorCheckArgc(argc_offset+4);
 
-  xlon1 = atof(operatorArgv()[0]);
-  xlon2 = atof(operatorArgv()[1]);
-  xlat1 = atof(operatorArgv()[2]);
-  xlat2 = atof(operatorArgv()[3]);
+  xlon1 = atof(operatorArgv()[argc_offset+0]);
+  xlon2 = atof(operatorArgv()[argc_offset+1]);
+  xlat1 = atof(operatorArgv()[argc_offset+2]);
+  xlat2 = atof(operatorArgv()[argc_offset+3]);
 
   if ( xlon1 >= xlon2 ) { x = xlon1; xlon1 = xlon2; xlon2 = x; }
   if ( xlat1 >= xlat2 ) { x = xlat1; xlat1 = xlat2; xlat2 = x; }
@@ -653,19 +662,18 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
   return (gridID2);
 }
 
-static
-int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+
+void genindexbox(int argc_offset, int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
 {
-  int gridID2;
   int nlon1, nlat1;
   int temp;
 
-  operatorCheckArgc(4);
+  operatorCheckArgc(argc_offset+4);
 
-  *lon11 = atoi(operatorArgv()[0]);
-  *lon12 = atoi(operatorArgv()[1]);
-  *lat1  = atoi(operatorArgv()[2]);
-  *lat2  = atoi(operatorArgv()[3]);
+  *lon11 = atoi(operatorArgv()[argc_offset+0]);
+  *lon12 = atoi(operatorArgv()[argc_offset+1]);
+  *lat1  = atoi(operatorArgv()[argc_offset+2]);
+  *lat2  = atoi(operatorArgv()[argc_offset+3]);
 
   if ( *lat1 > *lat2 )
     {
@@ -734,6 +742,14 @@ int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int 
 	  *lon22 = -1;
 	}
     }
+}
+
+static
+int genindexgrid(int gridID1, int *lat1, int *lat2, int *lon11, int *lon12, int *lon21, int *lon22)
+{
+  int gridID2;
+
+  genindexbox(0, gridID1, lat1, lat2, lon11, lon12, lon21, lon22);
 
   gridID2 = gengrid(gridID1, *lat1, *lat2, *lon11, *lon12, *lon21, *lon22);
 
@@ -945,7 +961,7 @@ void *Selbox(void *argument)
 
 	      gridsize2 = gridInqSize(sbox[index].gridID2);
 
-	      if ( operatorID == SELLONLATBOX  && gridtype == GRID_UNSTRUCTURED )
+	      if ( operatorID == SELLONLATBOX && gridtype == GRID_UNSTRUCTURED )
 		window_cell(nwpv, array1, gridID1, array2, gridsize2, sbox[index].cellidx);
  	      else
 		window(nwpv, array1, gridID1, array2, sbox[index].lat1, sbox[index].lat2, sbox[index].lon11, 

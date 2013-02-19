@@ -5,8 +5,9 @@ Version 1.6.0 (?? March 2013):
    Changed operators:
      * setcalendar: changed CDO calendar names to CF calendar names (Feature #3123)
                     (standard, proleptic_gregorian, 360_day, 365_day, 366_day)
+   	 * masklonlatbox: added support for curvilinear grids
    New operators:
-     * select: select fields from an unlimited number of input files
+     * select: Select fields from an unlimited number of input files
      * mergegrid: Merge horizontal grids
      * duplicate: Duplicates a dataset
      * adisit: Potential temperature to in-situ temperature

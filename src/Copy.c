@@ -30,7 +30,7 @@
 
 void *Copy(void *argument)
 {
-  int COPY, SELALL, SZIP;
+  int SELALL, SZIP;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
@@ -47,7 +47,7 @@ void *Copy(void *argument)
 
   cdoInitialize(argument);
 
-  COPY    = cdoOperatorAdd("copy",   0, 0, NULL);
+            cdoOperatorAdd("copy",   0, 0, NULL);
   SELALL  = cdoOperatorAdd("selall", 0, 0, NULL);
   SZIP    = cdoOperatorAdd("szip",   0, 0, NULL);
 
