@@ -87,7 +87,7 @@ std_atm_pressure(double height)
 
 void *Vargen(void *argument)
 {
-  int RANDOM, CONST, FOR, TOPO, TEMP, MASK, STDATM;
+  int RANDOM, SINCOS, CONST, FOR, TOPO, TEMP, MASK, STDATM;
   int operatorID;
   int streamID;
   int nvars, ntimesteps, nlevels = 1;
@@ -105,6 +105,7 @@ void *Vargen(void *argument)
   cdoInitialize(argument);
 
   RANDOM = cdoOperatorAdd("random", 0, 0, "grid description file or name, <seed>");
+  SINCOS = cdoOperatorAdd("sincos", 0, 0, "grid description file or name");
   CONST  = cdoOperatorAdd("const",  0, 0, "constant value, grid description file or name");
   FOR    = cdoOperatorAdd("for",    0, 0, "start, end, <increment>");
   TOPO   = cdoOperatorAdd("topo",   0, 0, NULL);
@@ -130,6 +131,13 @@ void *Vargen(void *argument)
             seed = idum;
         }
       srand(seed);
+    }
+  else if ( operatorID == SINCOS )
+    {
+      operatorInputArg(cdoOperatorEnter(operatorID));
+      operatorCheckArgc(1);
+      gridfile = operatorArgv()[0];
+      gridID   = cdoDefineGrid(gridfile);
     }
   else if ( operatorID == CONST )
     {
@@ -250,7 +258,7 @@ void *Vargen(void *argument)
   taxisID = taxisCreate(TAXIS_RELATIVE);
   vlistDefTaxis(vlistID, taxisID);
 
-  if ( operatorID == RANDOM || operatorID == CONST || operatorID == TOPO ||
+  if ( operatorID == RANDOM || operatorID == SINCOS || operatorID == CONST || operatorID == TOPO ||
        operatorID == TEMP || operatorID == MASK || operatorID == STDATM )
     vlistDefNtsteps(vlistID, 1);
 
@@ -291,6 +299,23 @@ void *Vargen(void *argument)
                   for ( i = 0; i < gridsize; i++ )
                     array[i] = rand()/(RAND_MAX+1.0);
                 }
+              else if ( operatorID == SINCOS )
+                {
+		  int nlon = gridInqXsize(gridID);
+		  int nlat = gridInqYsize(gridID);
+		  double dlon = 360./nlon;
+		  double dlat = 180./nlat;
+		  double lon0 = 0;
+		  double lat0 = -90 + dlat/2;
+
+                  for ( i = 0; i < gridsize; i++ )
+		    {
+		      int ilat = (i%gridsize)/ nlon;
+		      int ilon = i%nlon;
+		      array[i] = cos(2.0 * M_PI * (lon0 + ilon*dlon)/360)
+		   	       * sin(2.0 * M_PI * (lat0 + ilat*dlat)/180);
+		    }
+		}
               else if ( operatorID == CONST )
                 {
                   for ( i = 0; i < gridsize; i++ )
