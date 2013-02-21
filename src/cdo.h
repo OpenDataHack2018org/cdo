@@ -35,7 +35,7 @@
 #undef   NINTD
 #define  NINTD(x)   ((x) < 0 ? ((x)-0.5) : ((x)+0.5))
 
-#define  UNCHANGED_RECORD  (processSelf() == 0 && *cdoStreamName(0) != '-' && cdoRegulargrid == FALSE && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
+#define  UNCHANGED_RECORD  (processSelf() == 0 && *cdoStreamName(0) != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
 typedef struct {

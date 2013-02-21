@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-02-21 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* added cdoDefaultFileType to UNCHANGED_RECORD (bug fix)
+
 2013-02-19 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* masklonlatbox: added support for curvilinear grids
