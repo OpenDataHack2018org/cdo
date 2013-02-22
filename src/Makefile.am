@@ -164,6 +164,7 @@ cdo_SOURCES += Adisit.c        \
                Writegrid.c     \
                Writerandom.c   \
                YAR.c           \
+               Yearmonstat.c   \
                Ydayarith.c     \
                Ydaypctl.c      \
                Ydaystat.c      \

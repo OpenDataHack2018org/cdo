@@ -143,8 +143,7 @@ void *Arithdays(void *argument)
 	}
 
       if ( cdoVerbose )
-	cdoPrint("calendar %d  year %d  month %d  result %g",
-		 calendar, year, month, rconst);
+	cdoPrint("calendar %d  year %d  month %d  result %g", calendar, year, month, rconst);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{

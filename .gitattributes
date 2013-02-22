@@ -462,6 +462,7 @@ src/Ydaypctl.c -text
 src/Ydaystat.c -text
 src/Ydrunpctl.c -text
 src/Ydrunstat.c -text
+src/Yearmonstat.c -text
 src/Yhourarith.c -text
 src/Yhourstat.c -text
 src/Ymonarith.c -text
