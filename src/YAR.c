@@ -414,7 +414,7 @@ void testint_c(field_t *field1, field_t *field2)
 	    }
 	}
       
-      polygon_partial_weights (num_deps, SourceCell, TargetCell, weight );
+      //XXX      polygon_partial_weights (num_deps, SourceCell, TargetCell, weight );
       for ( int k = 0; k < num_deps; ++k )
 	{
 	  int index1 = curr_deps[k];
