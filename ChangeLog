@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-02-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* merge: uses size of the first input file for the output buffer [Bug #3290]
+
 2013-02-22 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* New operator: yearmonmean - yearly mean from monthly data (status: experimental)

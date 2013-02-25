@@ -190,7 +190,7 @@ void *Merge(void *argument)
 
   if ( ! lcopy )
     {
-      gridsize = vlistGridsizeMax(vlistID1);
+      gridsize = vlistGridsizeMax(vlistID2);
       array = (double *) malloc(gridsize*sizeof(double));
     }
 
