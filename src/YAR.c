@@ -29,7 +29,7 @@
 #include "clipping.h"
 #endif
 
-int lout = 0;
+int lout = 1;
 
 static
 void gen_xbounds(int nx, double *xvals, double *xbounds)
@@ -361,6 +361,9 @@ void testint_c(field_t *field1, field_t *field2)
   TargetCell.coordinates_y = malloc ( 4 * sizeof(*TargetCell.coordinates_y) );
 
   unsigned const * curr_deps;
+  struct polygons polygons;
+
+  polygon_create ( &polygons );
 
   for ( int i = 0; i < num_elements; ++i )
     {
@@ -414,7 +417,8 @@ void testint_c(field_t *field1, field_t *field2)
 	    }
 	}
       
-      //XXX      polygon_partial_weights (num_deps, SourceCell, TargetCell, weight );
+      polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
+
       for ( int k = 0; k < num_deps; ++k )
 	{
 	  int index1 = curr_deps[k];
@@ -426,6 +430,7 @@ void testint_c(field_t *field1, field_t *field2)
       // correct_weights ( nSourceCells, weight );
     }
 
+  polygon_destroy ( &polygons );
   /*
   for ( int j = 0; j < 10; ++j )
     {
