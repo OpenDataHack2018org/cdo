@@ -65,7 +65,7 @@ int STYLE_COUNT = sizeof( STYLE_TABLE )/ sizeof( char *);
 char *DEVICE_TABLE[] = { "PS","EPS","PDF","PNG","GIF","GIF_ANIMATION","JPEG","SVG","KML"};
 int DEVICE_COUNT = sizeof( DEVICE_TABLE )/ sizeof( char *);
 
-int ANIM_FLAG = 0, STEP_FREQ = 1;
+int ANIM_FLAG = 0, STEP_FREQ = 0; /* '0' for static images like jpeg,ps, etc.. , '1' for animation formats */
 
 
 int checkcolour( char *colour_in );
@@ -109,152 +109,57 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       for( i = 0; i< nparam; i++ )
 	fprintf(stderr, "Param %s\n", params[i]);
       fflush( stderr );
-    }
   
-  for( i = 0; i < nparam; ++i )
-    {
-      split_str_count = 0;
-      sep_char = "=";
-      split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
+      for( i = 0; i < nparam; ++i )
+        {
+           split_str_count = 0;
+           sep_char = "=";
+           split_str_count = StringSplitWithSeperator( params[i], sep_char, &split_str );
 	
-      if( !strcmp( split_str[0],"min" ) )
-	{
-	  YMIN = atof( split_str[1] );
-	  if( DBG )
-	    fprintf(stderr," Min Val %g\n",YMIN );
-	}
+           if( !strcmp( split_str[0],"min" ) )
+	     fprintf(stderr," Min Val %g\n",YMIN );
 	
-      if( !strcmp( split_str[0],"max" ) )
-	{
-	  YMAX = atof( split_str[1] );
-	  if( DBG )
-	    fprintf(stderr,"Max Val %g\n",YMAX );
-	}
+           if( !strcmp( split_str[0],"max" ) )
+	     fprintf(stderr,"Max Val %g\n",YMAX );
 	
-      if( !strcmp( split_str[0],"resolution" ) )
-	{
-	  RESOLUTION = atoi( split_str[1] );
-	  if( DBG )
-	    fprintf( stderr,"RESOLUTION %g\n",RESOLUTION );
-	}	
+           if( !strcmp( split_str[0],"resolution" ) )
+	     fprintf( stderr,"RESOLUTION %g\n",RESOLUTION );
 	
-      if( !strcmp( split_str[0],"colour" ) ) 
-	{  
-	  temp_str = strdup( split_str[1] );  
-	  if( !isRGB )
-	    StrToLowerCase( temp_str );
-	  else
-	    {
-	      StrToUpperCase( temp_str );
-	      StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
-	    }
-          COLOUR = temp_str;
-	  if( DBG )
-	    fprintf(stderr,"COLOUR %s\n",COLOUR );
-	}
+           if( !strcmp( split_str[0],"colour" ) ) 
+	     fprintf(stderr,"COLOUR %s\n",COLOUR );
 	
-      if( !strcmp( split_str[0],"colour_min" ) ) 
-	{  
-	  temp_str = strdup( split_str[1] );    
-          if( !isRGB )
-	    StrToLowerCase( temp_str );
-	  else
-	    {
-	      StrToUpperCase( temp_str );
-	      StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
-	    }
-	  COLOUR_MIN = temp_str;
-	  if( DBG )
-	    fprintf(stderr,"COLOUR %s\n",COLOUR_MIN );
-	}
+           if( !strcmp( split_str[0],"colour_min" ) ) 
+	     fprintf(stderr,"COLOUR %s\n",COLOUR_MIN );
 	
-      if( !strcmp( split_str[0],"colour_max" ) ) 
-	{  
-	  temp_str = strdup( split_str[1] );    
-          if( !isRGB )
-	    StrToLowerCase( temp_str );
-	  else
-	    {
-	      StrToUpperCase( temp_str );
-	      StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
-	    }
-	  COLOUR_MAX = temp_str;
-	  if( DBG )
-	    fprintf(stderr,"COLOUR %s\n",COLOUR_MAX );
-	}			
+           if( !strcmp( split_str[0],"colour_max" ) ) 
+	     fprintf(stderr,"COLOUR %s\n",COLOUR_MAX );
 	
-      if( !strcmp( split_str[0],"interval" ) )
-	{
-	  INTERVAL = atof( split_str[1] );
-	  
-	  if( DBG )
-	    fprintf( stderr,"INTERVAL %f\n",INTERVAL );
-	}
+           if( !strcmp( split_str[0],"interval" ) )
+	     fprintf( stderr,"INTERVAL %f\n",INTERVAL );
 	
-      if( !strcmp( split_str[0],"count" ) )
-	{
-	  COUNT = atoi( split_str[1] );
-	  if( DBG )
-	    fprintf( stderr,"COUNT %d\n",COUNT );
-	}
+           if( !strcmp( split_str[0],"count" ) )
+	     fprintf( stderr,"COUNT %d\n",COUNT );
 	
-      if( !strcmp( split_str[0],"list" ) ) /* To be Done */
-	{
-	  sep_char = ";";
-	  split_str_count1 = 0;
-	  split_str_count1 = StringSplitWithSeperator( split_str[1], sep_char, &split_str1 );
-	  if( split_str_count1 )
-	    {
-	      NUM_LEVELS = split_str_count1;
-	      LEV_LIST = ( double *) malloc( sizeof( double ) * split_str_count1 );
-	      for( j = 0; j < split_str_count1; j++ )
-		{
-		  LEV_LIST[j] = atof( split_str1[j] );
-		}
-	      free( split_str1 );
-	    }
-	  if( DBG )
-	    {
-	      for( j = 0; j < split_str_count1; j++ )
-		{
-		  fprintf( stderr,"LIST %f\n",LEV_LIST[j] ); 
-		}
-	    }
-	}   
+           if( !strcmp( split_str[0],"list" ) ) 
+	     {
+	        for( j = 0; j < split_str_count1; j++ )
+	           fprintf( stderr,"LIST %f\n",LEV_LIST[j] ); 
+	     }
 	
-      if( !strcmp( split_str[0],"thickness" ) )
-	{
-	  THICKNESS = atoi( split_str[1] );
-	  if( DBG )
-	    fprintf( stderr,"THICKNESS %d\n",THICKNESS );
-	}
+           if( !strcmp( split_str[0],"thickness" ) )
+	     fprintf( stderr,"THICKNESS %d\n",THICKNESS );
 	
-      if( !strcmp( split_str[0],"style" ) ) 
-	{  
-	  temp_str = strdup( split_str[1] );    
-	  StrToUpperCase( temp_str );
-	  STYLE = temp_str;
-	  if( DBG )
-	    fprintf( stderr,"STYLE %s\n",STYLE );
-	}
+           if( !strcmp( split_str[0],"style" ) )
+	     fprintf( stderr,"STYLE %s\n",STYLE );
 	
-      if( !strcmp( split_str[0],"device" ) ) 
-	{  
-	  temp_str = strdup( split_str[1] );    
-	  StrToUpperCase( temp_str );
-	  DEVICE = temp_str;
-	  if( DBG )
-	    fprintf( stderr,"DEVICE %s\n",DEVICE );
-          mag_setc ("output_format", DEVICE );
-	}
+           if( !strcmp( split_str[0],"device" ) )
+	     fprintf( stderr,"DEVICE %s\n",DEVICE );
 
-      if( !strcmp( split_str[0],"step_freq" ) ) 
-	{  
-	  STEP_FREQ = atoi( split_str[1] );
-	  if( DBG )
-	    fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
-	}
-      free( split_str );
+           if( !strcmp( split_str[0],"step_freq" ) )
+	     fprintf( stderr,"STEP_FREQ %d\n",STEP_FREQ );
+
+           free( split_str );
+        }
     }
 
   if ( nlon > 1 )
@@ -271,9 +176,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   sprintf( plotfilename, "%s %s", varname, datetime );
   titlename = strdup( plotfilename );
   sprintf( plotfilename, "%s_%s", plotfile, varname );
-
-/* #if  defined  (HAVE_LIBMAGICS) */
-
 
   mag_setc ("output_name",      plotfilename);
   mag_new( "page");
@@ -302,6 +204,15 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
   /* mag_setc ("map_coastline_colour", "khaki"); */
   /* mag_setc ("map_grid_colour",      "grey");  */ 
 
+
+  /* Parameters common to all operators */
+  if( DEVICE )                                
+    {
+      mag_setc ("output_format", DEVICE );
+    }
+
+
+
   /* define the contouring parameters */
   if ( operatorID == SHADED )
     {
@@ -316,9 +227,6 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 	   mag_setr( "contour_shade_min_level", YMIN );
 	   mag_setr( "contour_min_level", YMIN );
         }
-
-
-
       
       if( YMAX > -1.0e+200 )
         {
@@ -485,7 +393,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
 	  mag_set1r( "contour_level_list", LEV_LIST, NUM_LEVELS );
 	}
 	
-      if( USR_COLOUR_COUNT ) 
+      if( USR_COLOUR_COUNT )
 	{
 	  mag_setc( "contour_shade_colour_method", "LIST" );
 	  mag_set1c( "contour_shade_colour_list",( const char ** ) USR_COLOUR_TABLE, USR_COLOUR_COUNT ); 
@@ -676,6 +584,18 @@ void *Magplot(void *argument)
 		continue;
             }
 	}
+      else 	
+        {
+          if( STEP_FREQ )
+	    {
+          	if( tsID % STEP_FREQ )
+	    	  {
+                     tsID++;
+	             cdoWarning("NOT PLOTTING STEP %d!!!\n",tsID);
+	             continue;
+	    	  }
+            }
+        }
       
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
@@ -715,14 +635,19 @@ void *Magplot(void *argument)
       if( DBG )
         fprintf( stderr,"TimeStep %d\n",tsID );
 
-      if( ANIM_FLAG )
-        tsID++;
-      else
+       
+      if( !STEP_FREQ )
         {
 	   cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
-           if( STEP_FREQ > 1 ) 
-             cdoWarning("Step frequency parameter ignored!!!");
+           cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
+           cdoWarning("To plot steps at random interval, set 'step_freq' to '1' and select the steps using the selection operators!!!");
        	   break;
+	}
+      else
+        {
+      	   tsID++;
+           if( DBG )
+             fprintf( stderr,"TimeStep %d\n",tsID );
 	}
     }
 
@@ -758,6 +683,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
   char **split_str = NULL, **split_str1 = NULL;
   char *sep_char = "=";
   char *temp_str;
+  char  orig_char = ';', rep_char = ',';
   FILE *fp;
 
 /*  
@@ -806,7 +732,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		      !strcmp( split_str[0],"RGB" )        || !strcmp( split_str[0],"colour_triad" )||
 		      !strcmp( split_str[0],"device")      || !strcmp( split_str[0],"file_split" )
 		    )
-		    {  
+		    {
 		      if( IsNumeric( split_str[1] ) )
 			syntax = FALSE;
 		      else
@@ -845,6 +771,51 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			      
 			      if( checkcolour( split_str[1] ) )
 				syntax = FALSE;
+                              else
+                                {
+      				   if( !strcmp( split_str[0],"colour" ) ) 
+	                             {  
+	                               temp_str = strdup( split_str[1] );  
+	                               if( !isRGB )
+	                                 StrToLowerCase( temp_str );
+	                               else
+	                                 {
+	                                    StrToUpperCase( temp_str );
+	                                    StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+	                                 }
+                                       COLOUR = temp_str;
+	                               if( DBG )
+	                                 fprintf(stderr,"COLOUR %s\n",COLOUR );
+	                             }
+                                   if( !strcmp( split_str[0],"colour_min" ) ) 
+	                             {  
+	                               temp_str = strdup( split_str[1] );    
+                                       if( !isRGB )
+	                                 StrToLowerCase( temp_str );
+	                               else
+	                                 {
+	                                   StrToUpperCase( temp_str );
+	                                   StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+	                                 }
+	                               COLOUR_MIN = temp_str;
+	                               if( DBG )
+	                                 fprintf(stderr,"COLOUR %s\n",COLOUR_MIN );
+	                             }
+                                   if( !strcmp( split_str[0],"colour_max" ) ) 
+	                             {
+	                               temp_str = strdup( split_str[1] );    
+                                       if( !isRGB )
+	                                 StrToLowerCase( temp_str );
+	                               else
+	                                 {
+	                                   StrToUpperCase( temp_str );
+	                                   StrReplaceChar( temp_str, orig_char, rep_char ); /* replace ';' in RGB format to ',' */
+	                                 }
+	                               COLOUR_MAX = temp_str;
+	                               if( DBG )
+	                                 fprintf(stderr,"COLOUR %s\n",COLOUR_MAX );
+	                             }
+			        }
 			    }
 			  else if( !strcmp( split_str[0],"device" ) )
 			    {
@@ -856,19 +827,19 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			      temp_str = strdup( split_str[1] );    
 			      StrToUpperCase( temp_str );
 			      if( strcmp( temp_str,"CW" ) && strcmp( temp_str,"ACW" ) )
-				    syntax = FALSE;      
+				syntax = FALSE;      
 			      else
-				    {
-				  		if( DBG )
-				    	  fprintf( stderr, "TRIAD check  %s!\n",temp_str);
-					    if( !strcmp( temp_str,"CW" ) )
-						  COLOUR_TRIAD = "clockwise";
-					    else
-						  COLOUR_TRIAD = "anti_clockwise";
-				    }
+				{
+				   if( DBG )
+				     fprintf( stderr, "TRIAD check  %s!\n",temp_str);
+				   if( !strcmp( temp_str,"CW" ) )
+				     COLOUR_TRIAD = "clockwise";
+				   else
+				     COLOUR_TRIAD = "anti_clockwise";
+				}
 			    }
 			}
-		    } 
+		    }
 		      
 		  if( !strcmp( split_str[0],"min" )      ||  !strcmp( split_str[0],"max" )     ||
 		      !strcmp( split_str[0],"count" )     ||  !strcmp( split_str[0],"interval" ) ||
@@ -877,7 +848,38 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
                     )
 		    {
 		      if( !IsNumeric( split_str[1] ) )
-			syntax = FALSE;       
+			syntax = FALSE;
+		      else
+			{
+                           if( !strcmp( split_str[0],"min" ) )
+	                     {
+	                        YMIN = atof( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"max" ) )
+	                     {
+	  		        YMAX = atof( split_str[1] );
+			     }
+		           if( !strcmp( split_str[0],"count" ) )
+			     {
+	                        COUNT = atoi( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"interval" ) )
+	                     {
+	  		        INTERVAL = atof( split_str[1] );
+	                     }
+		           if( !strcmp( split_str[0],"thickness" ) )
+			     {
+	  		        THICKNESS = atoi( split_str[1] );
+			     }
+                           if( !strcmp( split_str[0],"resolution" ) )
+	                     {
+	                        RESOLUTION = atoi( split_str[1] );
+	                     }	
+		           if( !strcmp( split_str[0],"step_freq" ) )
+			     {
+	  	                STEP_FREQ = atoi( split_str[1] );
+			     }
+	                }
 		    }
 		    
 		  if( !strcmp( split_str[0],"colourtable" ) )
@@ -899,21 +901,31 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 		      split_str_count = StringSplitWithSeperator( split_str[1], sep_char, &split_str1 );
 		      if( !split_str_count )
 			{
-			  syntax = FALSE; 
+			  syntax = FALSE;
 			}
 		      else
-		      {
-			for( k = 0; k < split_str_count; k++ )
-			  {
-			    if( !IsNumeric( split_str1[k] ) )
-			      syntax = FALSE;
+		        {
+			  for( k = 0; k < split_str_count; k++ )
+			    {
+			      if( !IsNumeric( split_str1[k] ) )
+			        syntax = FALSE;
+			    }
+			  if( syntax == TRUE )
+			    {
+	                       NUM_LEVELS = split_str_count;
+	                       LEV_LIST = ( double *) malloc( sizeof( double ) * split_str_count );
+			       for( k = 0; k < split_str_count; k++ )
+		                 {
+		                    LEV_LIST[k] = atof( split_str1[k] );
+		                 }
+	                       free( split_str1 );
+	                    }
 			  }
 		      }
-		      sep_char = "=";
-		    }
-		}
-	    }
-	}
+		  sep_char = "=";
+		} /*** if( !strcmp( split_str[0], params[j] ) )  ***/
+	    } /*** Loop over param count ***/
+	} /*** ( split_str_count > 1 ) ***/
       else
 	{
 	  syntax = FALSE;
@@ -932,12 +944,12 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 	
       if( split_str ) 	  
 	free( split_str );
-    }
+    } /*** Loop over params ****/
       
     if( halt_flag == TRUE )
-    {
-      exit(0);
-    }
+      {
+        exit(0);
+      }
     
 }
 
@@ -1122,6 +1134,7 @@ int checkstyle( char *style_in )
 	if( !strcmp( STYLE_TABLE[i], style_in ) )
 	  {
 	    found = TRUE;
+	    STYLE = style_in;
 	    return 0;
 	  }
       }
@@ -1146,8 +1159,16 @@ int checkdevice( char *device_in )
 	if( !strcmp( DEVICE_TABLE[i], device_in ) )
 	  {
 	    found = TRUE;
+
+	    DEVICE = device_in;
+	    if( DBG )
+	      fprintf( stderr,"DEVICE %s\n",DEVICE );
+
 	    if( !strcmp( "GIF_ANIMATION" , device_in ) || !strcmp( "KML", device_in )  )
-	      ANIM_FLAG = 1;
+              {
+	         ANIM_FLAG = 1;
+		 STEP_FREQ = 1;
+	      }
 	    return 0;
 	  }
       }
