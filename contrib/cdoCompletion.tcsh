@@ -545,6 +545,7 @@ showunit \
 showvar \
 showyear \
 sin \
+sincos \
 sinfo \
 sinfoc \
 sinfon \
@@ -693,6 +694,8 @@ yearcount \
 yearmax \
 yearmean \
 yearmin \
+yearmonavg \
+yearmonmean \
 yearpctl \
 yearstd \
 yearstd1 \
