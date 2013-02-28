@@ -147,9 +147,9 @@ void *Diff(void *argument)
 		}
 	    }
 
-	  if ( ! cdoSilentMode )
+	  if ( ! cdoSilentMode || cdoVerbose )
 	    {
-	      if ( absm > 0 || relm > 0 )
+	      if ( absm > 0 || relm > 0 || cdoVerbose )
 		{
 		  if ( lhead )
 		    {
