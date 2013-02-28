@@ -9,7 +9,7 @@ AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
 AM_INIT_AUTOMAKE
-AC_CONFIG_HEADER(src/config.h)
+AC_CONFIG_HEADERS([src/config.h])
 AM_MAINTAINER_MODE([disable])
 
 # Set up libtool.
@@ -20,7 +20,6 @@ LT_INIT
 AC_CHECK_TOOL([CC],[gcc],[:])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
-#AC_PROG_RANLIB
 AC_CHECK_TOOL([AR],[ar],[:])
 AC_CHECK_TOOL([CPP],[cpp],[:])
 AC_CHECK_TOOL([LD],[ld],[:])
