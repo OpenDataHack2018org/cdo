@@ -643,8 +643,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 #if  defined  (HAVE_LIBPTHREAD)
       if ( PSTREAM_Debug ) Message("pipe %s", argument);
       pstreamID = pstreamFindID(argument);
-      if ( pstreamID == -1 )
-	Error("%s not open", argument);
+      if ( pstreamID == -1 ) Error("%s is not open!", argument);
 
       pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -860,6 +859,8 @@ void pstreamClose(int pstreamID)
 	    }
 	  pthread_mutex_unlock(pipe->mutex);
 	}
+
+      processDelStream(pstreamID);
 #else
       cdoAbort("Cannot use pipes, pthread support not compiled in!");
 #endif
@@ -1647,8 +1648,8 @@ void cdoFinish(void)
       pstreamID = processInqStreamID(sindex);
       pstreamptr = pstream_to_pointer(pstreamID);
       if ( PSTREAM_Debug )
-	Message("process %d  stream %d  close streamID %d",
-		processID, sindex, pstreamID);
+	Message("process %d  stream %d  close streamID %d", processID, sindex, pstreamID);
+
       if ( pstreamptr ) pstreamClose(pstreamID);
     }
 

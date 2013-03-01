@@ -224,13 +224,17 @@ void processAddStream(int streamID)
   int sindex;
 
   if ( pstreamIsPipe(streamID) ) Process[processID].nchild++;
-
   sindex = Process[processID].nstream++;
 
   if ( sindex >= MAX_STREAM )
-    Error("limit of %d streams per process reached!", MAX_STREAM);
+    Error("limit of %d streams per process reached (processID = %d)!", MAX_STREAM, processID);
 
   Process[processID].streams[sindex] = streamID;
+}
+
+
+void processDelStream(int streamID)
+{
 }
 
 
@@ -836,6 +840,10 @@ void processDelete(void)
   Process[processID].l_threadID = 0;
 #endif
   NumProcessActive--;
+
+  if ( Process[processID].xoperator    ) free(Process[processID].xoperator);
+  if ( Process[processID].operatorName ) free(Process[processID].operatorName);
+  if ( Process[processID].operatorArg  ) free(Process[processID].operatorArg);
 
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  

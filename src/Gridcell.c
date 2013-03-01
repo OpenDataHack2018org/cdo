@@ -315,9 +315,7 @@ void *Gridcell(void *argument)
   varID   = 0;
   levelID = 0;
   streamDefRecord(streamID2, varID, levelID);
-
   streamWriteRecord(streamID2, array, 0);
-
 
   streamClose(streamID2);
   streamClose(streamID1);
