@@ -272,7 +272,10 @@ void *Vargen(void *argument)
   if ( operatorID == FOR )
     ntimesteps = 1.001 + ((rstop-rstart)/rinc);
   else
-    ntimesteps = 1;
+    {
+      vlistDefNtsteps(vlistID, 0);
+      ntimesteps = 1;
+    }
 
   julday = date_to_julday(CALENDAR_PROLEPTIC, 10101);
 

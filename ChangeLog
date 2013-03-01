@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.0
 	* Version 1.6.0 released
 
+2013-03-01 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gridarea: set number of timesteps to 0 (bug fix for operator chaining) [report: Dirk Notz]
+
 2013-02-25 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* merge: uses size of the first input file for the output buffer [Bug #3290]

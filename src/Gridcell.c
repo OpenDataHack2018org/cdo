@@ -99,6 +99,7 @@ void *Gridcell(void *argument)
 
   vlistID2 = vlistCreate();
   varID    = vlistDefVar(vlistID2, gridID, zaxisID, TSTEP_CONSTANT);
+  vlistDefNtsteps(vlistID2, 0);
 
   if ( operatorID == GRIDAREA )
     {
@@ -106,10 +107,12 @@ void *Gridcell(void *argument)
       vlistDefVarStdname(vlistID2, varID, "area");
       vlistDefVarLongname(vlistID2, varID, "area of grid cell");
       vlistDefVarUnits(vlistID2, varID, "m2");
+      vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
     }
   else if ( operatorID == GRIDWGTS )
     {
       vlistDefVarName(vlistID2, varID, "cell_weights");
+      vlistDefVarDatatype(vlistID2, varID, DATATYPE_FLT64);
     }
   else if ( operatorID == GRIDMASK )
     {
