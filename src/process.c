@@ -841,10 +841,6 @@ void processDelete(void)
 #endif
   NumProcessActive--;
 
-  if ( Process[processID].xoperator    ) free(Process[processID].xoperator);
-  if ( Process[processID].operatorName ) free(Process[processID].operatorName);
-  if ( Process[processID].operatorArg  ) free(Process[processID].operatorArg);
-
 #if  defined  (HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
