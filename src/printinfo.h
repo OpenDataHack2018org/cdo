@@ -1,6 +1,8 @@
 #define DATE_FORMAT "%5.4d-%2.2d-%2.2d"
 #define TIME_FORMAT "%2.2d:%2.2d:%2.2d"
 
+void uuid2str(const char *uuid, char *uuidstr);
+
 void date2str(int date, char *datestr, int maxlen)
 {
   int year, month, day;
@@ -134,6 +136,7 @@ void printGridInfo(int vlistID)
   int gridID, gridtype, trunc, gridsize, xsize, ysize;
   int nbyte0;
   char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
+  char uuidOfHGrid[17];
 
   ngrids = vlistNgrids(vlistID);
   for ( index = 0; index < ngrids; index++ )
@@ -357,9 +360,7 @@ void printGridInfo(int vlistID)
 	  if ( ysize == 0 )
 	    fprintf(stdout, "size      : dim = %d\n", gridsize);
 	  else
-	    {
-	      fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
-	    }
+            fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
 	}
 
       if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED || gridtype == GRID_LCC )
@@ -378,6 +379,18 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "\n");
 	    }
 	}
+
+      gridInqUUID(gridID, uuidOfHGrid);
+      if ( uuidOfHGrid[0] != 0 )
+        {
+          char uuidOfHGridStr[37];
+          uuid2str(uuidOfHGrid, uuidOfHGridStr);
+          if ( uuidOfHGridStr[0] != 0  && strlen(uuidOfHGridStr) == 36 )
+            {
+	      fprintf(stdout, "%*s", nbyte0, "");
+	      fprintf(stdout, "uuid      : %s\n", uuidOfHGridStr);
+            }
+        }
     }
 }
 /*
