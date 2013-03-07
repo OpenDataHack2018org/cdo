@@ -53,6 +53,7 @@ typedef struct {
   int     def_yinc;
   int     nd, ni, ni2, ni3;
   int     number, position;
+  char    uuid[17];
   char    path[16384];
   char    xname[CDI_MAX_NAME];
   char    xlongname[CDI_MAX_NAME];

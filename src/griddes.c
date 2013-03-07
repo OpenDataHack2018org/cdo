@@ -121,6 +121,7 @@ void gridInit(griddes_t *grid)
   grid->ni3           = 0;
   grid->number        = 0;
   grid->position      = 0;
+  grid->uuid[0]       = 0;
   grid->path[0]       = 0;
   grid->xname[0]      = 0;
   grid->xlongname[0]  = 0;
@@ -503,6 +504,8 @@ int gridDefine(griddes_t grid)
       }
     }
 
+  if ( *grid.uuid ) gridDefUUID(gridID, grid.uuid);
+
   if ( grid.xname[0]     ) gridDefXname(gridID, grid.xname);
   if ( grid.xlongname[0] ) gridDefXlongname(gridID, grid.xlongname);
   if ( grid.xunits[0]    ) gridDefXunits(gridID, grid.xunits);
@@ -802,6 +805,12 @@ int gridFromFile(FILE *gfp, const char *dname)
       else if ( cmpstr(pline, "path", len)  == 0 )
 	{
 	  strcpy(grid.path, skipSeparator(pline + len));
+	}
+      else if ( cmpstr(pline, "uuid", len)  == 0 )
+	{
+	  char uuidOfHGridStr[256];
+	  strcpy(uuidOfHGridStr, skipSeparator(pline + len));
+	  str2uuid(uuidOfHGridStr, grid.uuid);
 	}
       else if ( cmpstr(pline, "xsize", len)  == 0 )
 	{
