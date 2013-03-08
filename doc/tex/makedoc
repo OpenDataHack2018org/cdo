@@ -561,9 +561,11 @@ while (<MOFILE>) {
       print HELPFILE "    \"OPERATORS\",\n";
       print TRFILE "\n\\subsection*{Operators}\n\n";
     }
-    print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
-    print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
-    print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+    else {
+      print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
+      print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
+      print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
+    }
 
     $opercnt = 0;
     $xopercnt = 0;
@@ -621,7 +623,7 @@ while (<MOFILE>) {
       if ( $#hkeys > 0 ) {
 	printf HELPFILE ("    \"    %-*s%s\",\n", $maxlen, $operator, $otitle);
 	if ( $xopercnt == 1 ) {
-	  print TRFILE "\\begin{defalist}{\\bf $maxitem \\ }\n";
+	  print TRFILE "\\begin{defalist2}{\\bf $maxitem \\ }\n";
 	}
 	print TRFILE "\\item[{\\bf $operatorx}\\ \\ \\hfill]\n";
 	print TRFILE "$otitle \\\\\n";
@@ -718,10 +720,12 @@ while (<MOFILE>) {
     }
 
     if ( $#hkeys > 0 ) {
-      print TRFILE "\\end{defalist}\n";
+      print TRFILE "\\end{defalist2}\n";
     }
-    print TRFILE "\\end{minipage}\n";
-    print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+    else {
+      print TRFILE "\\end{minipage}\n";
+      print TRFILE "\\addtolength{\\miniwidth}{8mm}\n";
+    }
 
 #   Parameter
 

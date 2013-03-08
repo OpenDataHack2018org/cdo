@@ -129,7 +129,6 @@
 
 \renewcommand{\indexname}{Operator index}
 
-%\newcommand{\defalabel}[1]{\bf #1\ \ \hfill}
 \newenvironment{defalist}[1]
 {\begin{list}{}
 {\settowidth{\labelwidth}{#1\ \ }
@@ -140,9 +139,23 @@
 %\setlength{\leftmargin}{25mm}
 \setlength{\labelsep}{2mm}
 \addtolength{\leftmargin}{\labelsep}
+%\addtolength{\leftmargin}{8mm}
 }}
 {\end{list}}
-%\renewcommand{\makelabel}{\defalabel}
+
+\newenvironment{defalist2}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1\ \ }
+\setlength{\itemsep}{0mm}
+\setlength{\itemindent}{0mm}
+%\setlength{\listparindent}{25mm}
+\setlength{\leftmargin}{\labelwidth}
+%\setlength{\leftmargin}{25mm}
+\setlength{\labelsep}{2mm}
+\addtolength{\leftmargin}{\labelsep}
+\addtolength{\leftmargin}{8mm}
+}}
+{\end{list}}
 
 \newcommand{\miniwidth}{\textwidth}
 
