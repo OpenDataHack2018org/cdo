@@ -8,6 +8,7 @@
 /NEWS -text
 /OPERATORS -text
 /README -text
+/README_MAGICS -text
 /acinclude.m4 -text
 /aclocal.m4 -text
 /cdo.settings.in -text
