@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Ensstat2
 @Title     = Statistical values over an ensemble
 @Section   = Statistical values

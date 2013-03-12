@@ -1,4 +1,5 @@
 @BeginModule
+@NewPage
 @Name      = Ymonpctl
 @Title     = Multi-year monthly percentile values
 @Section   = Statistical values

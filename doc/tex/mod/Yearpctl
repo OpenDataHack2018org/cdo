@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Yearpctl
 @Title     = Yearly percentile values
 @Section   = Statistical values
