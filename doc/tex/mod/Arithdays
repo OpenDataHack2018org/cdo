@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Arithdays
 @Title     = Arithmetic with days
 @Section   = Arithmetic
@@ -59,16 +58,16 @@ o(t,x) = i(t,x) / days\_per\_year
 @EndOperator
 
 
-@BeginExample
-Assume an input dataset is a monthly mean time series.
-To compute the yearly mean from the correct weighted monthly mean use:
-@BeginVerbatim
-   cdo muldpm ifile tmpfile1
-   cdo yearsum tmpfile1 tmpfile2
-   cdo divdpy tmpfile2 ofile
-@EndVerbatim
-Or all in one command line:
-@BeginVerbatim
-   cdo divdpy -yearsum -muldpm ifile ofile
-@EndVerbatim
-@EndExample
+@C @BeginExample
+@C Assume an input dataset is a monthly mean time series.
+@C To compute the yearly mean from the correct weighted monthly mean use:
+@C @BeginVerbatim
+@C    cdo muldpm ifile tmpfile1
+@C    cdo yearsum tmpfile1 tmpfile2
+@C    cdo divdpy tmpfile2 ofile
+@C @EndVerbatim
+@C Or all in one command line:
+@C @BeginVerbatim
+@C    cdo divdpy -yearsum -muldpm ifile ofile
+@C @EndVerbatim
+@C @EndExample

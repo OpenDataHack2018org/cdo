@@ -716,7 +716,7 @@ static modules_t Modules[] =
   { Writegrid,      NULL,              WritegridOperators,     CDI_REAL,  1,  1 },  /* no cdi output */
   { Writerandom,    NULL,              WriterandomOperators,   CDI_REAL,  1,  1 },
   { YAR,            NULL,              YAROperators,           CDI_REAL,  1,  1 },
-  { Yearmonstat,    NULL,              YearmonstatOperators,   CDI_REAL,  1,  1 },
+  { Yearmonstat,    YearmonmeanHelp,   YearmonstatOperators,   CDI_REAL,  1,  1 },
   { Ydayarith,      YdayarithHelp,     YdayarithOperators,     CDI_REAL,  2,  1 },
   { Ydaypctl,       YdaypctlHelp,      YdaypctlOperators,      CDI_REAL,  3,  1 },
   { Ydaystat,       YdaystatHelp,      YdaystatOperators,      CDI_REAL,  1,  1 },

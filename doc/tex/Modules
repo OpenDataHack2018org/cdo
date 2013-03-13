@@ -64,6 +64,7 @@ Daystat       Statistical values
 Daypctl       Statistical values
 Monstat       Statistical values
 Monpctl       Statistical values
+Yearmonstat   Statistical values
 Yearstat      Statistical values
 Yearpctl      Statistical values
 Seasstat      Statistical values

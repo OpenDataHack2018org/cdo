@@ -1966,9 +1966,8 @@ static char *RunstatHelp[] = {
     "    nts  INTEGER  Number of timesteps",
     "",
     "ENVIRONMENT",
-    "    RUNSTAT_DATE",
-    "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing",
-    "        timestep in ifile.",
+    "    TIMESTAT_DATE",
+    "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing timestep in ifile.",
     NULL
 };
 
@@ -2316,6 +2315,28 @@ static char *MonpctlHelp[] = {
     "ENVIRONMENT",
     "    CDO_PCTL_NBINS",
     "        Sets the number of histogram bins. The default number is 101.",
+    NULL
+};
+
+static char *YearmonmeanHelp[] = {
+    "NAME",
+    "    yearmonmean - Yearly mean from monthly data",
+    "",
+    "SYNOPSIS",
+    "    yearmonmean  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator computes the yearly mean of a monthly time series.",
+    "    Each month is weighted with the number of days per month. ",
+    "    The date information in ofile is the date of the middle contributing timestep in ifile.",
+    "    ",
+    "    For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is",
+    "    ",
+    "    o(t,x) = mean{i(t',x), t_1<t'<=t_n}",
+    "",
+    "ENVIRONMENT",
+    "    TIMESTAT_DATE",
+    "        Sets the date information in ofile to the \"first\", \"last\" or \"middle\" contributing timestep in ifile.",
     NULL
 };
 

@@ -36,8 +36,6 @@ void *Yearmonstat(void *argument)
   int gridsize;
   int vdate = 0, vtime = 0;
   int vdate0 = 0, vtime0 = 0;
-  int vdate_lb = 0, vdate_ub = 0, date_lb = 0, date_ub = 0;
-  int vtime_lb = 0, vtime_ub = 0, time_lb = 0, time_ub = 0;
   int nrecs, nrecords;
   int varID, levelID, recID;
   int tsID;
@@ -54,12 +52,15 @@ void *Yearmonstat(void *argument)
   int nmiss;
   int nvars, nlevel;
   int *recVarID, *recLevelID;
-  int taxis_has_bounds = FALSE;
   char vdatestr[32], vtimestr[32];
   field_t **vars1 = NULL, **samp1 = NULL;
   field_t field;
+  int timestat_date = DATE_MIDDLE;
+  dtinfo_t dtinfo[13];
 
   cdoInitialize(argument);
+
+  get_timestat_date(&timestat_date);
 
   cdoOperatorAdd("yearmonmean",  func_mean, 0, NULL);
   cdoOperatorAdd("yearmonavg",   func_avg,  0, NULL);
@@ -73,7 +74,6 @@ void *Yearmonstat(void *argument)
   vlistID2 = vlistDuplicate(vlistID1);
 
   taxisID1 = vlistInqTaxis(vlistID1);
-  taxis_has_bounds = taxisHasBounds(taxisID1);
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
@@ -104,8 +104,9 @@ void *Yearmonstat(void *argument)
       dsets = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
 	{
-	  vdate = taxisInqVdate(taxisID1);
-	  vtime = taxisInqVtime(taxisID1);
+	  taxisInqDTinfo(taxisID1, &dtinfo[nsets]);
+	  vdate = dtinfo[nsets].v.date;
+	  vtime = dtinfo[nsets].v.time;
 	  cdiDecodeDate(vdate, &year, &month, &day);
 
 	  if ( nsets == 0 ) year0 = year;
@@ -124,20 +125,6 @@ void *Yearmonstat(void *argument)
 	    }
 
 	  dpm = days_per_month(calendar, year, month);
-
-	  if ( taxis_has_bounds )
-	    {
-	      taxisInqVdateBounds(taxisID1, &date_lb, &date_ub);
-	      taxisInqVtimeBounds(taxisID1, &time_lb, &time_ub);
-	      if ( nsets == 0 )
-		{
-		  vdate_lb = date_lb;
-		  vtime_lb = time_lb;
-		}
-
-	      vdate_ub = date_ub;
-	      vtime_ub = time_ub;
-	    }
 
 	  for ( recID = 0; recID < nrecs; recID++ )
 	    {
@@ -226,13 +213,17 @@ void *Yearmonstat(void *argument)
 	  cdoPrint("%s %s  nsets = %d", vdatestr, vtimestr, nsets);
 	}
 
-      taxisDefVdate(taxisID2, vdate0);
-      taxisDefVtime(taxisID2, vtime0);
-      if ( taxis_has_bounds )
+      if      ( timestat_date == DATE_MIDDLE ) datetime_avg_dtinfo(calendar, nsets, dtinfo);
+      else if ( timestat_date == DATE_FIRST  ) dtinfo[nsets].v = dtinfo[0].v;
+      else if ( timestat_date == DATE_LAST   ) dtinfo[nsets].v = dtinfo[nsets-1].v;
+
+      if ( taxisHasBounds(taxisID2) )
 	{
-	  taxisDefVdateBounds(taxisID2, vdate_lb, vdate_ub);
-	  taxisDefVtimeBounds(taxisID2, vtime_lb, vtime_ub);
+	  dtinfo[nsets].b[0] = dtinfo[0].b[0];
+	  dtinfo[nsets].b[1] = dtinfo[nsets-1].b[1];
 	}
+
+      taxisDefDTinfo(taxisID2, dtinfo[nsets]);
       streamDefTimestep(streamID2, otsID);
 
       for ( recID = 0; recID < nrecords; recID++ )

@@ -327,6 +327,7 @@ Operator catalog:
    Monstat       monvar          Monthly variance
    Monstat       monvar1         Monthly variance
    Monpctl       monpctl         Monthly percentiles
+   Yearmonstat   yearmonmean     Yearly mean from monthly data
    Yearstat      yearmin         Yearly minimum
    Yearstat      yearmax         Yearly maximum
    Yearstat      yearsum         Yearly sum
