@@ -166,6 +166,7 @@ juldate_t juldate_sub(juldate_t juldate2, juldate_t juldate1);
 juldate_t juldate_add_seconds(int seconds, juldate_t juldate);
 double    juldate_to_seconds(juldate_t juldate);
 
+void    get_timestat_date(int *tstat_date);
 void    datetime_avg(int dpy, int ndates, datetime_t *datetime);
 void    datetime_avg_dtinfo(int dpy, int ndates, dtinfo_t *dtinfo);
 void    taxisInqDTinfo(int taxisID, dtinfo_t *dtinfo);

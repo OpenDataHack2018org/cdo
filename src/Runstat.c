@@ -117,6 +117,35 @@ void datetime_avg(int calendar, int ndates, datetime_t *datetime)
 }
 
 
+void get_timestat_date(int *tstat_date)
+{
+  char *envstr;
+
+  envstr = getenv("TIMESTAT_DATE");
+  if ( envstr == NULL ) envstr = getenv("RUNSTAT_DATE");
+  if ( envstr )
+    {
+      int env_date = -1;
+      char envstrl[8];
+
+      memcpy(envstrl, envstr, 8);
+      envstrl[7] = 0;
+      strtolower(envstrl);
+
+      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = DATE_FIRST;
+      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = DATE_LAST;
+      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = DATE_MIDDLE;
+
+      if ( env_date >= 0 )
+	{
+	  *tstat_date = env_date;
+
+	  if ( cdoVerbose ) cdoPrint("Set TIMESTAT_DATE to %s", envstr);
+	}
+    }
+}
+
+
 void *Runstat(void *argument)
 {
   int operatorID;
@@ -144,7 +173,7 @@ void *Runstat(void *argument)
   int taxisID1, taxisID2;
   int calendar;
   int runstat_nomiss = 0;
-  int runstat_date = DATE_MIDDLE;
+  int timestat_date = DATE_MIDDLE;
   char *envstr;
 
   cdoInitialize(argument);
@@ -157,27 +186,7 @@ void *Runstat(void *argument)
       if ( envval == 1 ) runstat_nomiss = 1;
     }
 
-  envstr = getenv("RUNSTAT_DATE");
-  if ( envstr )
-    {
-      int env_date = -1;
-      char envstrl[8];
-
-      memcpy(envstrl, envstr, 8);
-      envstrl[7] = 0;
-      strtolower(envstrl);
-
-      if      ( memcmp(envstrl, "first", 5)  == 0 )  env_date = DATE_FIRST;
-      else if ( memcmp(envstrl, "last", 4)   == 0 )  env_date = DATE_LAST;
-      else if ( memcmp(envstrl, "middle", 6) == 0 )  env_date = DATE_MIDDLE;
-
-      if ( env_date >= 0 )
-	{
-	  runstat_date = env_date;
-
-	  if ( cdoVerbose ) cdoPrint("Set RUNSTAT_DATE to %s", envstr);
-	}
-    }
+  get_timestat_date(&timestat_date);
 
   cdoOperatorAdd("runmin",  func_min,  0, NULL);
   cdoOperatorAdd("runmax",  func_max,  0, NULL);
@@ -352,9 +361,9 @@ void *Runstat(void *argument)
 	      }
 	  }
 
-      if      ( runstat_date == DATE_MIDDLE ) datetime_avg_dtinfo(calendar, ndates, dtinfo);
-      else if ( runstat_date == DATE_FIRST  ) dtinfo[ndates].v = dtinfo[0].v;
-      else if ( runstat_date == DATE_LAST   ) dtinfo[ndates].v = dtinfo[ndates-1].v;
+      if      ( timestat_date == DATE_MIDDLE ) datetime_avg_dtinfo(calendar, ndates, dtinfo);
+      else if ( timestat_date == DATE_FIRST  ) dtinfo[ndates].v = dtinfo[0].v;
+      else if ( timestat_date == DATE_LAST   ) dtinfo[ndates].v = dtinfo[ndates-1].v;
 
       if ( taxisHasBounds(taxisID2) )
 	{
