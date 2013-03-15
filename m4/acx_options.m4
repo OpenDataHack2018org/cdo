@@ -312,6 +312,21 @@ AC_ARG_ENABLE([ieg],
 AC_MSG_RESULT([$enable_ieg])
 AC_SUBST([ENABLE_IEG],[$enable_ieg])
 #  ----------------------------------------------------------------------
+#  Compile with fftw support
+AC_MSG_CHECKING([for FFTW3 support])
+AC_ARG_WITH([fftw3],
+    [AS_HELP_STRING([--without-fftw3],
+      [disable support for fftw3])],
+    [],
+    [with_fftw3=yes])
+
+  AS_IF([test "x$with_fftw3" != xno],
+      [AC_CHECK_HEADERS([fftw3.h])
+    AC_SEARCH_LIBS([fftw_cleanup],[fftw3],
+      [AC_DEFINE([HAVE_LIBFFTW3],[1],[FFTW3 library is present if defined to 1])],
+      [AC_MSG_RESULT([Could not link to fftw3 library])])])
+
+#  ----------------------------------------------------------------------
 #  Checks for PROJ.4 library
 AC_ARG_WITH([proj],
             [AS_HELP_STRING([--with-proj=<directory>],

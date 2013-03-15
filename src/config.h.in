@@ -16,6 +16,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
+/* Define to 1 if you have the <fftw3.h> header file. */
+#undef HAVE_FFTW3_H
+
 /* Define to 1 if you have the `gethostname' function. */
 #undef HAVE_GETHOSTNAME
 
@@ -45,6 +48,9 @@
 
 /* Define to 1 for EXTRA interface */
 #undef HAVE_LIBEXTRA
+
+/* FFTW3 library is present if defined to 1 */
+#undef HAVE_LIBFFTW3
 
 /* Define to 1 for GRIB support */
 #undef HAVE_LIBGRIB
