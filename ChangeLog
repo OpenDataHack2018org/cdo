@@ -1,3 +1,7 @@
+2013-03-19 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* fldcor: check missing value of 2. input file (bug fix) [report: Hans-Jürgen Panitz]
+
 2013-03-14 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.6.0
