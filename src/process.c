@@ -330,6 +330,7 @@ const char *processInqPrompt(void)
   return (Process[processID].prompt);
 }
 
+#if  defined  (HAVE_GLOB_H)
 /* Convert a wildcard pattern into a list of blank-separated
    filenames which match the wildcard.  */
 char *glob_pattern(const char *restrict wildcard)
@@ -357,6 +358,7 @@ char *glob_pattern(const char *restrict wildcard)
 
   return gfilename;
 }
+#endif
 
 
 int cdoStreamCnt(void)
