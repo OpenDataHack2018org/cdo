@@ -607,6 +607,7 @@ void setDefaultFileType(char *filetypestr, int labort)
 #endif
 
 #define NTESTS 11
+#include <inttypes.h>
 static
 int getMemAlignment(void)
 {
