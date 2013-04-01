@@ -57,6 +57,8 @@ case "${HOSTNAME}" in
                     --with-netcdf=/opt/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
+                    --with-libxml2=/usr \
+                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fopenmp -DHAVE_LIBYAC -I/Users/m214003/cdt/work/YAC/src" \
                     LIBS="-L/Users/m214003/cdt/work/YAC/src -lyac"
 	;;
