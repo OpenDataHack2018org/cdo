@@ -5,6 +5,7 @@ Version 1.6.1 (?? June 2013):
 
    Fixed bugs:
      * fldcor: check missing value of 2. input file
+     * enscrps: wrong result since CDO version 1.5.8 [Bug #3403]
 
 Version 1.6.0 (14 March 2013):
 
