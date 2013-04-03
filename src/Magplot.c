@@ -87,7 +87,7 @@ char *COLOUR = NULL, *COLOUR_MIN = NULL, *COLOUR_MAX = NULL, *STYLE = NULL, *DEV
 
 
 static
-void magplot( const char *plotfile, int operatorID, const char *varname, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params, char *datetime )
+void magplot( const char *plotfile, int operatorID, const char *varname, const char *units, long nlon, long nlat, double *grid_center_lon, double *grid_center_lat, double *array,  int nparam, char **params, char *datetime )
 
 {
   long i;
@@ -173,7 +173,7 @@ void magplot( const char *plotfile, int operatorID, const char *varname, long nl
       dlat /= (nlat-1);
     }
 
-  sprintf( plotfilename, "%s %s", varname, datetime );
+  sprintf( plotfilename, "%s [%s] %s", varname, units, datetime );
   titlename = strdup( plotfilename );
   sprintf( plotfilename, "%s_%s", plotfile, varname );
 
@@ -611,6 +611,7 @@ void *Magplot(void *argument)
 	  streamInqRecord(streamID, &varID, &levelID);
 	  streamReadRecord(streamID, array, &nmiss);
 	  vlistInqVarName(vlistID, varID, varname);
+	  vlistInqVarUnits(vlistID, varID, units);
 
 	  if ( operatorID == SHADED || operatorID == CONTOUR || operatorID == GRFILL )
           {
@@ -626,7 +627,7 @@ void *Magplot(void *argument)
 
                 if( DBG )
                   fprintf( stderr,"Plot %d\n",varID );
-	  	magplot(cdoStreamName(1), operatorID, varname, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
+	  	magplot(cdoStreamName(1), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
           }
 	  else
 	  	fprintf(stderr,"operator not implemented\n");
