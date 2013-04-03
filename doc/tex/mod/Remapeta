@@ -8,12 +8,11 @@
 @Operators = remapeta
 
 @BeginDescription
-This operator interpolates between different vertical hybrid levels. 
-This include the preparation of consistent data for the free atmosphere.
-The procedure for the vertical interpolation is based on the HIRLAM scheme
-and was adapted from @cite{INTERA}.
-The vertical interpolation is based on the vertical integration of the
-hydrostatic equation with few adjustments. The basic tasks are the following one:
+This operator interpolates between different vertical hybrid levels. This include the preparation 
+of consistent data for the free atmosphere. The procedure for the vertical interpolation is based 
+on the HIRLAM scheme and was adapted from @cite{INTERA}.
+The vertical interpolation is based on the vertical integration of the hydrostatic equation with 
+few adjustments. The basic tasks are the following one:
 @BeginItemize
 @Item = at first integration of hydrostatic equation
 @Item = extrapolation of surface pressure
@@ -23,20 +22,16 @@ hydrostatic equation with few adjustments. The basic tasks are the following one
 @Item = final surface pressure correction
 @EndItemize
 
-The vertical interpolation corrects the surface pressure. This is simply
-a cut-off or an addition of air mass. This mass correction should not
-influence the geostrophic velocity field in the middle troposhere. Therefore
-the total mass above a given reference level is conserved. As reference level
-the geopotential height of the 400 hPa level is used. Near the surface the
-correction can affect the vertical structure of the PBL. Therefore the
-interpolation is done using the potential temperature. But in the free
-atmosphere above a certain n (n=0.8 defining the top of the PBL) the
-interpolation is done linearly. After the interpolation both profiles
-are merged. With the resulting temperature/pressure correction the hydrostatic
-equation is integrated again and adjusted to the reference level finding
-the final surface pressure correction. A more detailed description of
-the interpolation can be found in @cite{INTERA}.
-All input fields have to be on the same horizontal grid.
+The vertical interpolation corrects the surface pressure. This is simply a cut-off or an addition 
+of air mass. This mass correction should not influence the geostrophic velocity field in the middle 
+troposhere. Therefore the total mass above a given reference level is conserved. As reference level
+the geopotential height of the 400 hPa level is used. Near the surface the correction can affect 
+the vertical structure of the PBL. Therefore the interpolation is done using the potential temperature. 
+But in the free atmosphere above a certain n (n=0.8 defining the top of the PBL) the interpolation 
+is done linearly. After the interpolation both profiles are merged. With the resulting 
+temperature/pressure correction the hydrostatic equation is integrated again and adjusted to the 
+reference level finding the final surface pressure correction. A more detailed description of
+the interpolation can be found in @cite{INTERA}. All input fields have to be on the same horizontal grid.
 @EndDescription
 @EndModule
 
@@ -67,11 +62,10 @@ The default value is 0 Pa.
 
 
 @BeginNote
-The code numbers or the variable names of the required parameter have to
-follow the \cite{ECHAM} convention.
+The code numbers or the variable names of the required parameter have to follow the @cite{ECHAM} convention.
 @C The netCDF CF convention for vertical hybrid coordinates is not supported, yet!
-Presently, the vertical coordinate definition of a netCDF file has also to follow the 
-ECHAM convention. This means:
+Presently, the vertical coordinate definition of a netCDF file has also to follow the ECHAM convention.
+This means:
 @BeginItemize
 @Item = the dimension of the full level coordinate and the corresponding variable is called mlev,
 @Item = the dimension of the half level coordinate and the corresponding variable is called ilev (ilev must have one element more than mlev)
@@ -79,6 +73,7 @@ ECHAM convention. This means:
 @Item = the hybrid vertical coefficient b is given in units of 1 and called hybi (hybm for level midpoints)
 @Item = the mlev variable has a borders attribute containing the character string 'ilev'
 @EndItemize
+
 Use the @mod{sinfo} command to test if your vertical coordinate system is recognized as hybrid system.
 
 In case @mod{remapeta} complains about not finding any data on hybrid model levels you may wish

@@ -903,13 +903,16 @@ while (<MOFILE>) {
     }
 
     if ( $lblock == 1 ) {
+      print HELPFILE "    \"\",\n";
+      print HELPFILE "    \"NOTE\",\n";
+
       print TRFILE "\n\\subsection*{Note}\n\n";
       print TRFILE "\\setlength{\\miniwidth}{\\textwidth}\n";
       print TRFILE "\\addtolength{\\miniwidth}{-8mm}\n";
       print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
 
       $help_spaces = 0;
-      $help_print = 0;
+      $help_print = 1;
       print_description(@parlines);
       $help_print = 1;
 

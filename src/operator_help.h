@@ -967,6 +967,9 @@ static char *SetgattHelp[] = {
     "PARAMETER",
     "    attname,attstring  STRING  Name and text of the global attribute (without spaces!)",
     "    attfile            STRING  File name which contains global text attributes",
+    "",
+    "NOTE",
+    "    Besides netCDF none of the supported data formats supports global attributes.",
     NULL
 };
 
@@ -2392,6 +2395,9 @@ static char *YearstatHelp[] = {
     "              Divisor is (n-1). For every adjacent sequence t_1, ...,t_n of timesteps of the same year it is",
     "              ",
     "              o(t,x) = var1{i(t',x), t_1 < t' <= t_n}",
+    "",
+    "NOTE",
+    "    The operators yearmean and yearavg compute only arithmetical means!",
     NULL
 };
 
@@ -3066,6 +3072,10 @@ static char *DetrendHelp[] = {
     "DESCRIPTION",
     "    Every time series in ifile is linearly detrended. For every field element x ",
     "    only those timesteps t belong to the sample S(x), which have i(t,x) NE miss.",
+    "",
+    "NOTE",
+    "    This operator has to keep the fields of all timesteps concurrently in the memory.",
+    "    If not enough memory is available use the operators trend and subtrend.",
     NULL
 };
 
@@ -3232,6 +3242,11 @@ static char *RemapgridHelp[] = {
     "    REMAP_AREA_MIN   ",
     "        This variable is used to set the minimum destination area fraction. The default",
     "        of this variable is 0.0.",
+    "",
+    "NOTE",
+    "    For this module the author has converted the original Fortran 90 SCRIP ",
+    "    software to ANSI C99. If there are any problems send a bug report to CDO and",
+    "    not to SCRIP!",
     NULL
 };
 
@@ -3288,6 +3303,11 @@ static char *GenweightsHelp[] = {
     "    REMAP_AREA_MIN   ",
     "        This variable is used to set the minimum destination area fraction. The default",
     "        of this variable is 0.0.",
+    "",
+    "NOTE",
+    "    For this module the author has converted the original Fortran 90 SCRIP ",
+    "    software to ANSI C99. If there are any problems send a bug report to CDO and",
+    "    not to SCRIP!",
     NULL
 };
 
@@ -3317,6 +3337,11 @@ static char *RemapHelp[] = {
     "    REMAP_AREA_MIN   ",
     "        This variable is used to set the minimum destination area fraction. The default",
     "        of this variable is 0.0.",
+    "",
+    "NOTE",
+    "    For this module the author has converted the original Fortran 90 SCRIP ",
+    "    software to ANSI C99. If there are any problems send a bug report to CDO and",
+    "    not to SCRIP!",
     NULL
 };
 
@@ -3328,12 +3353,11 @@ static char *RemapetaHelp[] = {
     "    remapeta,vct[,oro]  ifile ofile",
     "",
     "DESCRIPTION",
-    "    This operator interpolates between different vertical hybrid levels. ",
-    "    This include the preparation of consistent data for the free atmosphere.",
-    "    The procedure for the vertical interpolation is based on the HIRLAM scheme",
-    "    and was adapted from INTERA.",
-    "    The vertical interpolation is based on the vertical integration of the",
-    "    hydrostatic equation with few adjustments. The basic tasks are the following one:",
+    "    This operator interpolates between different vertical hybrid levels. This include the preparation ",
+    "    of consistent data for the free atmosphere. The procedure for the vertical interpolation is based ",
+    "    on the HIRLAM scheme and was adapted from INTERA.",
+    "    The vertical interpolation is based on the vertical integration of the hydrostatic equation with ",
+    "    few adjustments. The basic tasks are the following one:",
     "    - at first integration of hydrostatic equation",
     "    - extrapolation of surface pressure",
     "    - Planetary Boundary-Layer (PBL) profile interpolation",
@@ -3341,20 +3365,16 @@ static char *RemapetaHelp[] = {
     "    - merging of both profiles",
     "    - final surface pressure correction",
     "    ",
-    "    The vertical interpolation corrects the surface pressure. This is simply",
-    "    a cut-off or an addition of air mass. This mass correction should not",
-    "    influence the geostrophic velocity field in the middle troposhere. Therefore",
-    "    the total mass above a given reference level is conserved. As reference level",
-    "    the geopotential height of the 400 hPa level is used. Near the surface the",
-    "    correction can affect the vertical structure of the PBL. Therefore the",
-    "    interpolation is done using the potential temperature. But in the free",
-    "    atmosphere above a certain n (n=0.8 defining the top of the PBL) the",
-    "    interpolation is done linearly. After the interpolation both profiles",
-    "    are merged. With the resulting temperature/pressure correction the hydrostatic",
-    "    equation is integrated again and adjusted to the reference level finding",
-    "    the final surface pressure correction. A more detailed description of",
-    "    the interpolation can be found in INTERA.",
-    "    All input fields have to be on the same horizontal grid.",
+    "    The vertical interpolation corrects the surface pressure. This is simply a cut-off or an addition ",
+    "    of air mass. This mass correction should not influence the geostrophic velocity field in the middle ",
+    "    troposhere. Therefore the total mass above a given reference level is conserved. As reference level",
+    "    the geopotential height of the 400 hPa level is used. Near the surface the correction can affect ",
+    "    the vertical structure of the PBL. Therefore the interpolation is done using the potential temperature. ",
+    "    But in the free atmosphere above a certain n (n=0.8 defining the top of the PBL) the interpolation ",
+    "    is done linearly. After the interpolation both profiles are merged. With the resulting ",
+    "    temperature/pressure correction the hydrostatic equation is integrated again and adjusted to the ",
+    "    reference level finding the final surface pressure correction. A more detailed description of",
+    "    the interpolation can be found in INTERA. All input fields have to be on the same horizontal grid.",
     "",
     "PARAMETER",
     "    vct  STRING  File name of an ASCII dataset with the vertical coordinate table",
@@ -3365,6 +3385,22 @@ static char *RemapetaHelp[] = {
     "        Sets the minimum pressure level for condensation.",
     "        Above this level the humidity is set to the constant 1.E-6.",
     "        The default value is 0 Pa.",
+    "",
+    "NOTE",
+    "    The code numbers or the variable names of the required parameter have to follow the ECHAM convention.",
+    "    Presently, the vertical coordinate definition of a netCDF file has also to follow the ECHAM convention.",
+    "    This means:",
+    "    - the dimension of the full level coordinate and the corresponding variable is called mlev,",
+    "    - the dimension of the half level coordinate and the corresponding variable is called ilev (ilev must have one element more than mlev)",
+    "    - the hybrid vertical coefficient a is given in units of Pa and called hyai (hyam for level midpoints)",
+    "    - the hybrid vertical coefficient b is given in units of 1 and called hybi (hybm for level midpoints)",
+    "    - the mlev variable has a borders attribute containing the character string 'ilev'",
+    "    ",
+    "    Use the sinfo command to test if your vertical coordinate system is recognized as hybrid system.",
+    "    ",
+    "    In case remapeta complains about not finding any data on hybrid model levels you may wish",
+    "    to use the setzaxis command to generate a zaxis description which conforms to the ECHAM convention.",
+    "    See section \"1.4 Z-axis description\" for an example how to define a hybrid Z-axis.",
     NULL
 };
 
@@ -3401,6 +3437,10 @@ static char *IntvertHelp[] = {
     "ENVIRONMENT",
     "    EXTRAPOLATE",
     "        If set to 1 extrapolate missing values.",
+    "",
+    "NOTE",
+    "    The netCDF CF convention for vertical hybrid coordinates is ",
+    "    not supported, yet!",
     NULL
 };
 
@@ -3631,6 +3671,9 @@ static char *ImportbinaryHelp[] = {
     "    Here is a list of the supported components:",
     "    BYTESWAPPED, CHSUB, DSET, ENDVARS, FILEHEADER, HEADERBYTES, OPTIONS, TDEF, TITLE, ",
     "    TRAILERBYTES, UNDEF, VARS, XDEF, XYHEADER, YDEF, ZDEF",
+    "",
+    "NOTE",
+    "    Only 32-bit IEEE floats are supported for standard binary files!",
     NULL
 };
 
@@ -3675,6 +3718,11 @@ static char *ImportcmsafHelp[] = {
     "    satellite projection, additional files with arrays of latitudes and longitudes are needed.",
     "    These can be obtained from CM-SAF together with the data.",
     "    ",
+    "",
+    "NOTE",
+    "    To use this operator, it is necessary to build CDO with HDF5 support (version 1.6 or higher).",
+    "    The PROJ.4 library (version 4.6 or higher) is needed for full support of the remapping",
+    "    functionality. ",
     NULL
 };
 
@@ -4736,6 +4784,10 @@ static char *EcaPdHelp[] = {
     "",
     "PARAMETER",
     "    x  FLOAT   Daily precipitation amount threshold in [mm]",
+    "",
+    "NOTE",
+    "    Precipitation rates in [mm/s] have to be converted to precipitation amounts (multiply with 86400 s).",
+    "    Apart from metadata information the result of eca_pd,1 and eca_rr1 is the same.",
     NULL
 };
 

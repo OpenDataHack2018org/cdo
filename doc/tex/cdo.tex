@@ -9,14 +9,14 @@
 \gdef\pdfoutput{0}
 \fi
 
-\newif\ifpdf
+\newif\ifpdfx
 \ifnum\pdfoutput=0
 % latex is called for dvi output
-   \pdffalse
+   \pdfxfalse
    \usepackage{graphicx}
 \else
 % pdflatex is called for pdf output
-   \pdftrue
+   \pdfxtrue
    \usepackage[pdftex]{graphicx}
    \usepackage[pdftex]{hyperref}
 \fi
@@ -208,7 +208,7 @@
 \input{appendix}
 
 \clearpage
-\ifpdf
+\ifpdfx
 \phantomsection
 \addcontentsline{toc}{chapter}{\indexname}
 \printindex
