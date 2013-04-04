@@ -382,6 +382,7 @@ src/Ninfo.c -text
 src/Nmltest.c -text
 src/Output.c -text
 src/Outputgmt.c -text
+src/Pack.c -text
 src/Pinfo.c -text
 src/Pressure.c -text
 src/Regres.c -text

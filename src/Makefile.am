@@ -89,6 +89,7 @@ cdo_SOURCES += Adisit.c        \
                Nmltest.c       \
                Output.c        \
                Outputgmt.c     \
+               Pack.c          \
                Pinfo.c         \
                Pressure.c      \
                Regres.c        \

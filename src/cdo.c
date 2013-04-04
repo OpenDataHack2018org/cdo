@@ -452,17 +452,17 @@ void setDefaultDataType(char *datatypestr)
 		  exit(EXIT_FAILURE);
 		}
 	    }
-	  /*
 	  else if ( dtype == D_UINT )
 	    {
 	      if      ( nbits ==  8 ) cdoDefaultDataType = DATATYPE_UINT8;
+	      else if ( nbits == 16 ) cdoDefaultDataType = DATATYPE_UINT16;
+	      else if ( nbits == 32 ) cdoDefaultDataType = DATATYPE_UINT32;
 	      else
 		{
 		  fprintf(stderr, "Unsupported number of bits = %d for datatype UINT!\n", nbits);
 		  exit(EXIT_FAILURE);
 		}
 	    }
-	  */
 	  else if ( dtype == D_FLT )
 	    {
 	      if      ( nbits == 32 ) cdoDefaultDataType = DATATYPE_FLT32;

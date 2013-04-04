@@ -126,8 +126,9 @@ void *Ninfo(void *argument);
 void *Nmltest(void *argument);
 void *Output(void *argument);
 void *Outputgmt(void *argument);
-void *Pressure(void *argument);
+void *Pack(void *argument);
 void *Pinfo(void *argument);
+void *Pressure(void *argument);
 void *Regres(void *argument);
 void *Remap(void *argument);
 void *Remapeta(void *argument);
@@ -363,8 +364,9 @@ void *Maggraph(void *argument);
                                  "outputfld", "outputarr", "outputxyz", "outputtab"}
 #define  OutputgmtOperators     {"gridverify", "outputcenter", "outputcenter2", "outputcentercpt", "outputbounds", \
                                  "outputboundscpt", "outputvector", "outputtri", "outputvrml"}
-#define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
+#define  PackOperators          {"pack"}
 #define  PinfoOperators         {"pinfo", "pinfov"}
+#define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
 #define    RemapgridOperators   {"remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
@@ -624,8 +626,9 @@ static modules_t Modules[] =
   { Nmltest,        NULL,              NmltestOperators,       CDI_REAL,  0,  0 },
   { Output,         OutputHelp,        OutputOperators,        CDI_REAL, -1,  0 },
   { Outputgmt,      NULL,              OutputgmtOperators,     CDI_REAL,  1,  0 },
-  { Pressure,       NULL,              PressureOperators,      CDI_REAL,  1,  1 },
+  { Pack,           NULL,              PackOperators,          CDI_REAL,  1,  1 },
   { Pinfo,          NULL,              PinfoOperators,         CDI_REAL,  1,  1 },
+  { Pressure,       NULL,              PressureOperators,      CDI_REAL,  1,  1 },
   { Regres,         RegresHelp,        RegresOperators,        CDI_REAL,  1,  1 },
   { Remap,          RemapHelp,         RemapOperators,         CDI_REAL,  1,  1 },
   { Remap,          RemapgridHelp,     RemapgridOperators,     CDI_REAL,  1,  1 },

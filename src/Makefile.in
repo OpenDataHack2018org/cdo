@@ -101,8 +101,8 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	Intntime.c Inttime.c Intyear.c Invert.c Invertlev.c \
 	Isosurface.c Kvl.c Log.c Maskbox.c Mastrfu.c Math.c Merge.c \
 	Mergegrid.c Mergetime.c Merstat.c Monarith.c Mrotuv.c \
-	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pinfo.c \
-	Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
+	Mrotuvb.c Ninfo.c Nmltest.c Output.c Outputgmt.c Pack.c \
+	Pinfo.c Pressure.c Regres.c Remap.c Remapeta.c Replace.c \
 	Replacevalues.c Rhopot.c Rotuv.c Runpctl.c Runstat.c Scatter.c \
 	Seascount.c Seaspctl.c Seasstat.c Selbox.c Select.c \
 	Seloperator.c Selrec.c Seltime.c Selvar.c Set.c Setbox.c \
@@ -187,7 +187,7 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-Merstat.$(OBJEXT) cdo-Monarith.$(OBJEXT) \
 	cdo-Mrotuv.$(OBJEXT) cdo-Mrotuvb.$(OBJEXT) cdo-Ninfo.$(OBJEXT) \
 	cdo-Nmltest.$(OBJEXT) cdo-Output.$(OBJEXT) \
-	cdo-Outputgmt.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
+	cdo-Outputgmt.$(OBJEXT) cdo-Pack.$(OBJEXT) cdo-Pinfo.$(OBJEXT) \
 	cdo-Pressure.$(OBJEXT) cdo-Regres.$(OBJEXT) \
 	cdo-Remap.$(OBJEXT) cdo-Remapeta.$(OBJEXT) \
 	cdo-Replace.$(OBJEXT) cdo-Replacevalues.$(OBJEXT) \
@@ -468,8 +468,8 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	Intyear.c Invert.c Invertlev.c Isosurface.c Kvl.c Log.c \
 	Maskbox.c Mastrfu.c Math.c Merge.c Mergegrid.c Mergetime.c \
 	Merstat.c Monarith.c Mrotuv.c Mrotuvb.c Ninfo.c Nmltest.c \
-	Output.c Outputgmt.c Pinfo.c Pressure.c Regres.c Remap.c \
-	Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
+	Output.c Outputgmt.c Pack.c Pinfo.c Pressure.c Regres.c \
+	Remap.c Remapeta.c Replace.c Replacevalues.c Rhopot.c Rotuv.c \
 	Runpctl.c Runstat.c Scatter.c Seascount.c Seaspctl.c \
 	Seasstat.c Selbox.c Select.c Seloperator.c Selrec.c Seltime.c \
 	Selvar.c Set.c Setbox.c Setgatt.c Setgrid.c Sethalo.c \
@@ -722,6 +722,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Nmltest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Output.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Outputgmt.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Pressure.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-Regres.Po@am__quote@
@@ -2113,6 +2114,20 @@ cdo-Outputgmt.obj: Outputgmt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Outputgmt.c' object='cdo-Outputgmt.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Outputgmt.obj `if test -f 'Outputgmt.c'; then $(CYGPATH_W) 'Outputgmt.c'; else $(CYGPATH_W) '$(srcdir)/Outputgmt.c'; fi`
+
+cdo-Pack.o: Pack.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Pack.o -MD -MP -MF $(DEPDIR)/cdo-Pack.Tpo -c -o cdo-Pack.o `test -f 'Pack.c' || echo '$(srcdir)/'`Pack.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Pack.Tpo $(DEPDIR)/cdo-Pack.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Pack.c' object='cdo-Pack.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Pack.o `test -f 'Pack.c' || echo '$(srcdir)/'`Pack.c
+
+cdo-Pack.obj: Pack.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Pack.obj -MD -MP -MF $(DEPDIR)/cdo-Pack.Tpo -c -o cdo-Pack.obj `if test -f 'Pack.c'; then $(CYGPATH_W) 'Pack.c'; else $(CYGPATH_W) '$(srcdir)/Pack.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-Pack.Tpo $(DEPDIR)/cdo-Pack.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='Pack.c' object='cdo-Pack.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-Pack.obj `if test -f 'Pack.c'; then $(CYGPATH_W) 'Pack.c'; else $(CYGPATH_W) '$(srcdir)/Pack.c'; fi`
 
 cdo-Pinfo.o: Pinfo.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-Pinfo.o -MD -MP -MF $(DEPDIR)/cdo-Pinfo.Tpo -c -o cdo-Pinfo.o `test -f 'Pinfo.c' || echo '$(srcdir)/'`Pinfo.c
