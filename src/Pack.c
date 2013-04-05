@@ -223,14 +223,8 @@ void *Pack(void *argument)
 	  double tmin, tmax;
 	  if ( !get_type_values(datatype, &tmin, &tmax) )
 	    {
-	      if ( fmin < tmin || fmax > tmax )
-		{
-		  // printf("XXX\n");
-		}
 	      if ( !(missval2 < tmin || missval2 > tmax) )
-		{
-		  cdoWarning("Internal problem: new missing value is inside data range!"); 
-		}
+		cdoWarning("new missing value %g is inside data range (%g - %g)!", missval2, tmin, tmax); 
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
