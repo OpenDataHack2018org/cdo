@@ -17,7 +17,7 @@
 
 #include <string.h>
 
-static int gargc = 0;
+static int    gargc = 0;
 static char **gargv;
 
 static char CommandLine[1024];

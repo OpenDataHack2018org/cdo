@@ -104,6 +104,7 @@ char *makeArgument(int argc, char *argv[])
   size_t len, pos = 0, off = 0;
 
   if ( argv[0][0] == '-' ) off = 1;
+
   for ( iarg = 0; iarg < argc; iarg++ )
     {
       len = strlen(argv[iarg]) + 1 - off;
@@ -114,8 +115,7 @@ char *makeArgument(int argc, char *argv[])
       off = 0;
     }
 
-  if ( argc )
-    argument[pos-1] = '\0';
+  if ( argc ) argument[pos-1] = '\0';
 
   return (argument);
 }
