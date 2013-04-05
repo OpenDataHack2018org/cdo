@@ -1,3 +1,7 @@
+2013-04-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* expr: wrong results if left operand has one level and right operand has more than one level (bug fix) [report: Walter Sauf]
+
 2013-04-02 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* enscrps: wrong result since CDO version 1.5.6 [Bug #3403]
