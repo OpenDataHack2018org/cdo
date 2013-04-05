@@ -211,6 +211,10 @@ void magplot( const char *plotfile, int operatorID, const char *varname, const c
       mag_setc ("output_format", DEVICE );
     }
 
+  mag_seti ("map_label_latitude_frequency",2);
+  mag_seti ("map_label_longitude_frequency",2);
+  /*mag_setr ("map_label_height",0.5);*/
+  mag_setr ("map_label_height",0.4);
 
 
   /* define the contouring parameters */
@@ -595,6 +599,16 @@ void *Magplot(void *argument)
 	             continue;
 	    	  }
             }
+         else 
+            {
+		if( tsID )
+		  {
+	   		cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
+           		cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
+           		cdoWarning("To plot steps at random interval, set 'step_freq' to '1' and select the steps using the selection operators!!!");
+       	   		break;
+		  }
+	    }
         }
       
       vdate = taxisInqVdate(taxisID);
@@ -637,7 +651,9 @@ void *Magplot(void *argument)
         fprintf( stderr,"TimeStep %d\n",tsID );
 
        
-      if( !STEP_FREQ )
+      tsID++;
+      /*
+      if( !STEP_FREQ  && tsID )
         {
 	   cdoWarning("File variables have values at more than one time step! Images created for first time step!!!");
            cdoWarning("To plot steps at a particular interval, set 'step_freq' to the frequency of the steps to be plotted!!!");
@@ -650,6 +666,7 @@ void *Magplot(void *argument)
            if( DBG )
              fprintf( stderr,"TimeStep %d\n",tsID );
 	}
+      */
     }
 
   if( ANIM_FLAG )

@@ -154,6 +154,15 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	mag_set2r("input_wind_u_component", uarray, nlon, nlat);
 	mag_set2r("input_wind_v_component", varray, nlon, nlat);
 
+
+	mag_seti ("map_label_latitude_frequency",2);
+	mag_seti ("map_label_longitude_frequency",2);
+	/*mag_setr ("map_label_height",0.5);*/
+	mag_setr ("map_label_height",0.4);
+	
+
+
+
         if( operatorID == VECTOR ) 
 	  {
 		/* Magics functions for performing vector operation */
@@ -317,6 +326,14 @@ void *Magvector(void *argument)
                 continue;
             }
         }
+      else
+        {
+          if( !STEP_FREQ  && tsID )
+            {
+          	 cdoWarning("File has values at more than one time step! Image created for first time step!!!");
+           	 break;
+            }
+        }
 
       vdate = taxisInqVdate(taxisID);
       vtime = taxisInqVtime(taxisID);
@@ -376,6 +393,9 @@ void *Magvector(void *argument)
              }
 	}
     
+      tsID++;
+
+      /*
       if( ANIM_FLAG )
         tsID++;
       else
@@ -385,6 +405,7 @@ void *Magvector(void *argument)
              cdoWarning("Step frequency parameter ignored!!!");
            break;
         }
+      */
     }
 
   streamClose(streamID);

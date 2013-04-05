@@ -533,6 +533,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   mag_setc("axis_date_max_value", max_date_time_str);
   mag_setc("axis_title_text","Time");
   mag_setc("axis_title_orientation","horizontal");
+
+  mag_seti("axis_tick_label_frequency", 2);
+  mag_setr("axis_years_label_height", 0.4);
+
   mag_axis();
 
   /* Vertical Axis attributes */
@@ -559,6 +563,10 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
   mag_setc("axis_title_text",varname);
   
   mag_setc("axis_title_orientation","vertical");
+
+  mag_seti("axis_tick_label_frequency", 2);
+  mag_setr("axis_tick_label_height", 0.5);
+
   mag_axis();
  
 
