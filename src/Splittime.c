@@ -140,6 +140,7 @@ void *Splittime(void *argument)
       if ( operfunc == func_date )
 	{
 	  index = (vdate/operintval)%100;
+	  if ( index < 0 ) index = -index;
 
 	  if ( operatorID == SPLITSEAS )
 	    {

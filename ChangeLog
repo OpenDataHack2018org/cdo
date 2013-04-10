@@ -1,6 +1,7 @@
 2013-04-10 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* selmon: month not found for negative years [Bug #3439]
+	* splitmon: month not found for negative years
 
 2013-04-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
