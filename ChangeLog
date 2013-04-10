@@ -1,3 +1,7 @@
+2013-04-10 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* selmon: month not found for negative years [Bug #3439]
+
 2013-04-05 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: wrong results if left operand has one level and right operand has more than one level (bug fix) [report: Walter Sauf]
