@@ -7,6 +7,7 @@ Version 1.6.1 (?? June 2013):
      * fldcor: check missing value of 2. input file
      * enscrps: wrong result since CDO version 1.5.6 [Bug #3403]
      * selmon: month not found for negative years [Bug #3439]
+     * shifttime: wrong result for negative hours and days [Bug #3440]
 
 Version 1.6.0 (14 March 2013):
 
