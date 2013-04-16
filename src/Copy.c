@@ -37,7 +37,7 @@ void *Copy(void *argument)
   int tsID1, tsID2, recID, varID, levelID;
   int lcopy = FALSE;
   int gridsize;
-  int vlistID1, vlistID2 = -1;
+  int vlistID1, vlistID2 = CDI_UNDEFID;
   int nmiss;
   int streamCnt, nfiles, indf;
   int taxisID1, taxisID2 = CDI_UNDEFID;
@@ -166,6 +166,7 @@ void *Copy(void *argument)
   streamClose(streamID2);
 
   if ( array ) free(array);
+  if ( vlistID2 != CDI_UNDEFID ) vlistDestroy(vlistID2);
 
   cdoFinish();
 
