@@ -1507,7 +1507,7 @@ int gridGenArea(int gridID, double *area)
       //     total_area += area[i];
     }
 
-  //  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
+  //  if ( cdoVerbose ) cdoPrint("Total area = %g steradians", total_area);
 
   free(grid_center_lon);
   free(grid_center_lat);
@@ -1546,7 +1546,7 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
       nvals++;
     }
 
-  if ( cdoVerbose ) cdoPrint("Total area = %g", total_area);
+  if ( cdoVerbose ) cdoPrint("Total area = %g steradians", total_area);
 
   for ( i = 0; i < gridsize; i++ )
     {

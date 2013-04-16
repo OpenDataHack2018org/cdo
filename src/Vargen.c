@@ -100,7 +100,6 @@ void *Vargen(void *argument)
   double rval, rstart = 0, rstop = 0, rinc = 0;
   double rconst = 0;
   double *array, *levels = NULL;
-  LIST *flist = listNew(FLT_LIST);
 
   cdoInitialize(argument);
 
@@ -188,10 +187,12 @@ void *Vargen(void *argument)
   else if ( operatorID == STDATM )
     {
       double lon = 0, lat = 0;
+      LIST *flist = listNew(FLT_LIST);
 
       operatorInputArg("levels");
       nlevels = args2fltlist(operatorArgc(), operatorArgv(), flist);
       levels  = (double *) listArrayPtr(flist);
+      listDelete(flist);
 
       if ( cdoVerbose ) for ( i = 0; i < nlevels; ++i ) printf("levels %d: %g\n", i, levels[i]);
 
