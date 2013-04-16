@@ -157,6 +157,8 @@ void *Arithc(void *argument)
   if ( field.ptr ) free(field.ptr);
   if ( vars ) free(vars);
 
+  vlistDestroy(vlistID2);
+
   cdoFinish();
 
   return (0);
