@@ -421,6 +421,7 @@ static char *SelectHelp[] = {
     "    ltype     INTEGER Comma separated list of GRIB level types",
     "    levidx    INTEGER Comma separated list of index of levels",
     "    level     FLOAT   Comma separated list of vertical levels",
+    "    hour      INTEGER Comma separated list of hours",
     "    day       INTEGER Comma separated list of days",
     "    month     INTEGER Comma separated list of months",
     "    year      INTEGER Comma separated list of years",

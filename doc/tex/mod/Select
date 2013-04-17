@@ -50,6 +50,8 @@ INTEGER Comma separated list of GRIB level types
 INTEGER Comma separated list of index of levels
 @Item = level
 FLOAT   Comma separated list of vertical levels
+@Item = hour
+INTEGER Comma separated list of hours
 @Item = day
 INTEGER Comma separated list of days
 @Item = month
