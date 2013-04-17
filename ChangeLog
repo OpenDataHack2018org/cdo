@@ -1,5 +1,6 @@
 2013-04-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* select: added support to expand integer parameter
 	* select: added support for key >hour<
 
 2013-04-10 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

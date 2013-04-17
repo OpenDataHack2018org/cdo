@@ -27,8 +27,7 @@
 #include "pstream.h"
 #include "error.h"
 #include "util.h"
-#include "list.h"
-#include "namelist.h"
+//#include "list.h"
 
 
 #define  PML_INT         1
@@ -224,6 +223,7 @@ int pmlNum(pml_t *pml, const char *name)
   return (nocc);
 }
 
+void split_intstring(const char *intstr, int *first, int *last, int *inc);
 
 int pml_add_entry(pml_entry_t *entry, char *arg)
 {
@@ -231,8 +231,22 @@ int pml_add_entry(pml_entry_t *entry, char *arg)
 
   if ( entry->type == PML_INT )
     {
-      if ( entry->occ < (int) entry->size )
-	((int *) entry->ptr)[entry->occ++] = atoi(arg);
+      int ival, first, last, inc;
+
+      split_intstring(arg, &first, &last, &inc);
+
+      if ( inc >= 0 )
+	{
+	  for ( ival = first; ival <= last; ival += inc )
+	    if ( entry->occ < (int) entry->size )
+	      ((int *) entry->ptr)[entry->occ++] = ival;
+	}
+      else
+	{
+	  for ( ival = first; ival >= last; ival += inc )
+	    if ( entry->occ < (int) entry->size )
+	      ((int *) entry->ptr)[entry->occ++] = ival;
+	}
     }
   else if ( entry->type == PML_FLT )
     {
