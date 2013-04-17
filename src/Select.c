@@ -466,6 +466,7 @@ void *Select(void *argument)
   PML_DEF_INT(year,     1024, "Year");
   PML_DEF_INT(month,      32, "Month");
   PML_DEF_INT(day,        32, "Day");
+  PML_DEF_INT(hour,       24, "Hour");
   PML_DEF_INT(code,     1024, "Code number");
   PML_DEF_INT(ltype,    1024, "Level type");
   PML_DEF_INT(levidx,   1024, "Level index");
@@ -477,6 +478,7 @@ void *Select(void *argument)
   PML_INIT_INT(year);
   PML_INIT_INT(month);
   PML_INIT_INT(day);
+  PML_INIT_INT(hour);
   PML_INIT_INT(code);
   PML_INIT_INT(ltype);
   PML_INIT_INT(levidx);
@@ -508,6 +510,7 @@ void *Select(void *argument)
   PML_ADD_INT(pml, year);
   PML_ADD_INT(pml, month);
   PML_ADD_INT(pml, day);
+  PML_ADD_INT(pml, hour);
   PML_ADD_INT(pml, code);
   PML_ADD_INT(pml, ltype);
   PML_ADD_INT(pml, levidx);
@@ -523,6 +526,7 @@ void *Select(void *argument)
   PML_NUM(pml, year);
   PML_NUM(pml, month);
   PML_NUM(pml, day);
+  PML_NUM(pml, hour);
   PML_NUM(pml, code);
   PML_NUM(pml, ltype);
   PML_NUM(pml, levidx);
@@ -669,7 +673,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
-	  if ( npar_timestep || npar_year || npar_month || npar_day ) ltimsel = TRUE;
+	  if ( npar_timestep || npar_year || npar_month || npar_day || npar_hour ) ltimsel = TRUE;
 
 	  npar = 0;
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -773,15 +777,20 @@ void *Select(void *argument)
 
 	      if ( !copytimestep && npar_timestep == 0 )
 		{
-		  int lyear = 0, lmonth = 0, lday = 0;
+		  int lyear = 0, lmonth = 0, lday = 0, lhour = 0;
+		  int minute, second;
+
 		  vdate = taxisInqVdate(taxisID1);
 		  vtime = taxisInqVtime(taxisID1);
 		  cdiDecodeDate(vdate, &year, &month, &day);
+		  cdiDecodeTime(vtime, &hour, &minute, &second);
+
 		  if ( npar_year  == 0 || (npar_year   && PAR_CHECK_INT(year))  ) lyear  = TRUE;
 		  if ( npar_month == 0 || (npar_month  && PAR_CHECK_INT(month)) ) lmonth = TRUE;
 		  if ( npar_day   == 0 || (npar_day    && PAR_CHECK_INT(day))   ) lday   = TRUE;
+		  if ( npar_hour  == 0 || (npar_hour   && PAR_CHECK_INT(hour))  ) lhour  = TRUE;
 
-		  if ( lyear && lmonth && lday ) copytimestep = TRUE;
+		  if ( lyear && lmonth && lday && lhour ) copytimestep = TRUE;
 		}
 
 	      if ( operatorID == DELETE ) copytimestep = !copytimestep;
@@ -830,6 +839,7 @@ void *Select(void *argument)
   PAR_CHECK_INT_FLAG(year);
   PAR_CHECK_INT_FLAG(month);
   PAR_CHECK_INT_FLAG(day);
+  PAR_CHECK_INT_FLAG(hour);
 
   streamClose(streamID2);
 

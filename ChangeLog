@@ -1,3 +1,7 @@
+2013-04-17 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* select: added support for key >hour<
+
 2013-04-10 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* shifttime: wrong result for negative hours and days [Bug #3440]

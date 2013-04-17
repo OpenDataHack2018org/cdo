@@ -3,6 +3,8 @@ CDO NEWS
 
 Version 1.6.1 (?? June 2013):
 
+   Changed operators:
+     * select: added support for key >hour<
    Fixed bugs:
      * fldcor: check missing value of 2. input file
      * enscrps: wrong result since CDO version 1.5.6 [Bug #3403]
