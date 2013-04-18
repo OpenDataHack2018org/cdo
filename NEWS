@@ -4,6 +4,7 @@ CDO NEWS
 Version 1.6.1 (?? June 2013):
 
    Changed operators:
+     * Info: add chunking information of netcdf files (only with verbose output) [Feature #3489]
      * select: added support for key >hour<
    Fixed bugs:
      * fldcor: check missing value of 2. input file

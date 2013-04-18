@@ -108,33 +108,20 @@ void *Sinfo(void *argument)
 
       vlistID = streamInqVlist(streamID);
 
-      printf("   File format: ");
+      fprintf(stdout, "   File format: ");
       printFiletype(streamID, vlistID);
 
       if ( lensemble )
-	{
-	  if ( operfunc == func_name )
-	    fprintf(stdout,
-		    "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
-	  else if ( operfunc == func_code )
-	    fprintf(stdout,
-		    "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
-	  else
-	    fprintf(stdout,
-		    "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
-	}
+	fprintf(stdout, "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : ",  -(indf+1));
       else
-	{
-	  if ( operfunc == func_name )
-	    fprintf(stdout,
-		    "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter name\n",  -(indf+1));
-	  else if ( operfunc == func_code )
-	    fprintf(stdout,
-		    "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Table Code\n",  -(indf+1));
-	  else
-	    fprintf(stdout,
-		    "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : Parameter ID\n",  -(indf+1));
-	}
+	fprintf(stdout, "%6d : Institut Source   Ttype    Levels Num  Gridsize Num Dtype : ",  -(indf+1));
+
+      if      ( operfunc == func_name ) fprintf(stdout, "Parameter name");
+      else if ( operfunc == func_code ) fprintf(stdout, "Table Code");
+      else                              fprintf(stdout, "Parameter ID");
+
+      if ( cdoVerbose ) fprintf(stdout, " : Extra" );              
+      fprintf(stdout, "\n" );              
 
       nvars = vlistNvars(vlistID);
 
@@ -222,11 +209,18 @@ void *Sinfo(void *argument)
 	  if ( operfunc == func_name ) vlistInqVarName(vlistID, varID, varname);
 
 	  if ( operfunc == func_name )
-	    fprintf(stdout, "%-11s", varname);
+	    fprintf(stdout, "%-14s", varname);
 	  else if ( operfunc == func_code )
-	    fprintf(stdout, "%4d %4d", tabnum, code);
+	    fprintf(stdout, "%4d %4d   ", tabnum, code);
 	  else
-	    fprintf(stdout, "%-11s", paramstr);
+	    fprintf(stdout, "%-14s", paramstr);
+
+	  if ( cdoVerbose )
+	    {
+	      char varextra[CDI_MAX_NAME];
+	      vlistInqVarExtra(vlistID, varID, varextra);
+	      fprintf(stdout, " : %s", varextra );              
+	    }
 
 	  fprintf(stdout, "\n");
 	}

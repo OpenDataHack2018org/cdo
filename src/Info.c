@@ -283,15 +283,15 @@ void *Info(void *argument)
 	    {
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
-		  if ( operatorID == INFON )
-		    fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
-			    "     Minimum        Mean     Maximum : Parameter name\n",  -(indf+1));
-		  else if ( operatorID == INFOC )
-		    fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
-			    "     Minimum        Mean     Maximum : Code number\n",  -(indf+1));
-		  else
-		    fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
-			    "     Minimum        Mean     Maximum : Parameter ID\n",  -(indf+1));
+		  fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
+			  "     Minimum        Mean     Maximum : ",  -(indf+1));
+
+		  if      ( operatorID == INFON ) fprintf(stdout, "Parameter name");
+		  else if ( operatorID == INFOC ) fprintf(stdout, "Code number");
+		  else                            fprintf(stdout, "Parameter ID");
+
+		  if ( cdoVerbose ) fprintf(stdout, " : Extra" );              
+		  fprintf(stdout, "\n" );              
 		}
 
 	      streamInqRecord(streamID, &varID, &levelID);
@@ -408,11 +408,18 @@ void *Info(void *argument)
 		}
 
 	      if ( operatorID == INFON )
-		fprintf(stdout, " : %-11s", varname);
+		fprintf(stdout, " : %-14s", varname);
 	      else if ( operatorID == INFOC )
-		fprintf(stdout, " : %4d", code);
+		fprintf(stdout, " : %4d   ", code);
 	      else
-		fprintf(stdout, " : %-11s", paramstr);
+		fprintf(stdout, " : %-14s", paramstr);
+
+	      if ( cdoVerbose )
+		{
+		  char varextra[CDI_MAX_NAME];
+		  vlistInqVarExtra(vlistID, varID, varextra);
+		  fprintf(stdout, " : %s", varextra );              
+		}
 
 	      fprintf(stdout, "\n");
 
