@@ -694,6 +694,41 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
 	      */
 	      fprintf(gdp, "  %d,%d", code, ltype);
 	    }
+	  else if ( filetype == FILETYPE_NC )
+	    {
+	      int xyz = vlistInqVarXYZ(vlistID, varID);
+
+	      fprintf(gdp, "  ");
+	      if ( vlistInqVarTsteptype(vlistID, varID) != TSTEP_CONSTANT )
+		fprintf(gdp, "t,");
+	      if ( xyz == 321 )
+		{
+		  if ( nlev > 0 ) fprintf(gdp, "z,");
+		  fprintf(gdp, "y,x");
+		}
+	      else if ( xyz == 312 )
+		{
+		  if ( nlev > 0 ) fprintf(gdp, "z,");
+		  fprintf(gdp, "x,y");
+		}
+	      else if ( xyz == 231 )
+		{
+		  fprintf(gdp, "y,");
+		  if ( nlev > 0 ) fprintf(gdp, "z,");
+		  fprintf(gdp, "x");
+		}
+	      else if ( xyz == 132 )
+		{
+		  fprintf(gdp, "x,");
+		  if ( nlev > 0 ) fprintf(gdp, "z,");
+		  fprintf(gdp, "y");
+		}
+	      else
+		{
+		  if ( nlev > 0 ) fprintf(gdp, "z,");
+		  fprintf(gdp, "y,x");
+		}
+	    }
 	  else
 	    fprintf(gdp, "  99");
 
@@ -823,7 +858,7 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
 
 void *Gradsdes(void *argument)
 {
-  int GRADSDES1, GRADSDES2, DUMPMAP;
+  int GRADSDES2, DUMPMAP;
   int operatorID;
   int streamID = 0;
   int gridID = -1;
@@ -874,7 +909,7 @@ void *Gradsdes(void *argument)
       
   cdoInitialize(argument);
 
-  GRADSDES1 = cdoOperatorAdd("gradsdes1", 0, 0, NULL);
+              cdoOperatorAdd("gradsdes1", 0, 0, NULL);
   GRADSDES2 = cdoOperatorAdd("gradsdes2", 0, 0, NULL);
   DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 
@@ -903,13 +938,16 @@ void *Gradsdes(void *argument)
   filetype  = streamInqFiletype(streamID);
   byteorder = streamInqByteorder(streamID);
 
+  if ( filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 ) filetype = FILETYPE_NC;
+
   if ( filetype != FILETYPE_SRV &&
        filetype != FILETYPE_EXT &&
        filetype != FILETYPE_IEG &&
        filetype != FILETYPE_GRB )
     {
-      if ( filetype == FILETYPE_NC || filetype == FILETYPE_NC2 || filetype == FILETYPE_NC4 )
-	cdoAbort("Unsupported file format: netCDF");
+      if ( filetype == FILETYPE_NC )
+	//	cdoAbort("Unsupported file format: netCDF");
+	;
       else if ( filetype == FILETYPE_GRB2 )
 	cdoAbort("Unsupported file format: GRIB2");
       else
@@ -1005,6 +1043,8 @@ void *Gradsdes(void *argument)
 	if ( strcmp(&ctlfile[len-4], ".ieg") == 0 ) ctlfile[len-4] = 0;
       if ( filetype == FILETYPE_GRB )
 	if ( strcmp(&ctlfile[len-4], ".grb") == 0 ) ctlfile[len-4] = 0;
+      if ( filetype == FILETYPE_NC )
+	if ( strcmp(&ctlfile[len-3], ".nc") == 0 ) ctlfile[len-3] = 0;
     }
 
   strcat(ctlfile, ".ctl");
@@ -1050,6 +1090,10 @@ void *Gradsdes(void *argument)
 
       gridsize = vlistGridsizeMax(vlistID);
       array = (double *) malloc(gridsize*sizeof(double));
+    }
+  else if ( filetype == FILETYPE_NC )
+    {
+      fprintf(gdp, "DTYPE  netCDF\n");
     }
 
   /* XYHEADER */
