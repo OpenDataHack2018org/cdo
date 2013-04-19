@@ -192,7 +192,7 @@ void *Vargen(void *argument)
       operatorInputArg("levels");
       nlevels = args2fltlist(operatorArgc(), operatorArgv(), flist);
       levels  = (double *) listArrayPtr(flist);
-      listDelete(flist);
+      //listDelete(flist);
 
       if ( cdoVerbose ) for ( i = 0; i < nlevels; ++i ) printf("levels %d: %g\n", i, levels[i]);
 
