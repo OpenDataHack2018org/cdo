@@ -182,8 +182,16 @@ void *Scatter(void *argument)
 	cdoAbort("Gridsize must not change!");
     }
 
-  if ( nxblocks > nx ) cdoAbort("nxblocks greater than nx!");
-  if ( nyblocks > ny ) cdoAbort("nyblocks greater than ny!");
+  if ( nxblocks > nx )
+    {
+      cdoPrint("nxblocks (%d) greater than nx (%d), set to %d!", nxblocks, nx, nx);
+      nxblocks = nx;
+    }
+  if ( nyblocks > ny )
+    {
+      cdoPrint("nyblocks (%d) greater than ny (%d), set to %d!", nyblocks, ny, ny);
+      nyblocks = ny;
+    }
 
   xinc = nx/nxblocks;
   yinc = ny/nyblocks;
@@ -216,6 +224,8 @@ void *Scatter(void *argument)
 
   for ( index = 0; index < nsplit; index++ )
     vlistIDs[index] = vlistDuplicate(vlistID1);
+
+  if ( cdoVerbose ) cdoPrint("ngrids=%d  nsplit=%d", ngrids, nsplit);
 
   for ( i = 0; i < ngrids; i++ )
     {
