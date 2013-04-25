@@ -87,6 +87,7 @@ case "${HOSTNAME}" in
 # x86_64-squeeze-x64-linux
     thunder*)
         ${CONFPATH}configure --prefix=$HOME/local --exec_prefix=$HOME/local/squeeze-x64 \
+                    --enable-all-static \
                     --with-jasper=/sw/squeeze-x64/jasper-1.900.1-static \
                     --with-grib_api=/sw/squeeze-x64/grib_api-1.9.9-static \
                     --with-netcdf=/sw/squeeze-x64/netcdf-4.2-static \
