@@ -46,7 +46,7 @@ For every gridpoint the sum over all levels is computed.
 @Title     = Vertical mean
 
 @BeginDescription
-For every gridpoint the mean over all levels is computed.
+For every gridpoint the arithmetical mean over all levels is computed.
 @EndDescription
 @EndOperator
 
@@ -55,7 +55,7 @@ For every gridpoint the mean over all levels is computed.
 @Title     = Vertical average
 
 @BeginDescription
-For every gridpoint the average over all levels is computed.
+For every gridpoint the arithmetical average over all levels is computed.
 @EndDescription
 @EndOperator
 
