@@ -132,7 +132,7 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
       xyinfo[fileID].y  = yvals[fileID][0];
       xyinfo[fileID].id = fileID;
 
-      if ( fileID == 0 && ysize[fileID] > 1 )
+      if ( ysize[fileID] > 1 )
 	{
 	  if ( yvals[fileID][0] > yvals[fileID][ysize[fileID]-1] ) lsouthnorth = FALSE;
 	}
