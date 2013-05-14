@@ -28,7 +28,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 {
   int gridID2;
   int gridtype;
-  int gridsize, nx, ny;
+  int nx, ny;
   int gridsize2;
   int index, i, j, ix, iy, offset;
   int *xlsize = NULL, *ylsize = NULL;
@@ -38,7 +38,6 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
   if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN || gridtype == GRID_GENERIC) )
     cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
-  gridsize = gridInqSize(gridID1);
   nx = gridInqXsize(gridID1);
   ny = gridInqYsize(gridID1);
 
@@ -64,16 +63,21 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
     for ( ix = 0; ix < nxblocks; ++ix )
       {
 	offset = iy*nyvals*nx + ix*nxvals;
+
+	gridsize2 = xlsize[ix]*ylsize[iy];
+	gridindex[index] = (int *) malloc(gridsize2*sizeof(int));
+
 	gridsize2 = 0;
-	// printf("iy %d, ix %d offset %d\n", iy, ix,  offset);
+        // printf("iy %d, ix %d offset %d\n", iy, ix,  offset);
 	for ( j = 0; j < ylsize[iy]; ++j )
 	  {
 	    for ( i = 0; i < xlsize[ix]; ++i )
 	      {
-		//	printf(">> %d %d %d\n", j, i, offset + j*nx + i);
+	       	// printf(">> %d %d %d\n", j, i, offset + j*nx + i);
 		gridindex[index][gridsize2++] = offset + j*nx + i;
 	      }
 	  }
+	// printf("gridsize2 %d\n", gridsize2);
 
 	gridID2 = gridCreate(gridtype, gridsize2);
 	gridDefXsize(gridID2, xlsize[ix]);
@@ -96,7 +100,7 @@ void genGrids(int gridID1, int *gridIDs, int nxvals, int nyvals, int nxblocks, i
 }
 
 static
-void window_cell(double *array1, int gridID1, double *array2, long gridsize2, int *cellidx)
+void window_cell(double *array1, double *array2, long gridsize2, int *cellidx)
 {
   long i;
 
@@ -164,7 +168,7 @@ void *Scatter(void *argument)
       gridID1 = vlistGrid(vlistID1, index);
       gridtype = gridInqType(gridID1);
       if ( gridtype == GRID_LONLAT   || gridtype == GRID_GAUSSIAN ||
-	   (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) )
+	  (gridtype == GRID_GENERIC && gridInqXsize(gridID1) > 0 && gridInqYsize(gridID1) > 0) )
 	   break;
     }
 
@@ -202,10 +206,7 @@ void *Scatter(void *argument)
   nsplit = nxblocks*nyblocks;
   if ( nsplit > MAX_BLOCKS ) cdoAbort("Too many blocks (max = %d)!", MAX_BLOCKS);
 
-  gridsize2max = xinc*yinc;
-
   array1 = (double *) malloc(gridsize*sizeof(double));
-  array2 = (double *) malloc(gridsize2max*sizeof(double));
 
   vlistIDs  = (int *) malloc(nsplit*sizeof(int));
   streamIDs = (int *) malloc(nsplit*sizeof(int));
@@ -214,12 +215,12 @@ void *Scatter(void *argument)
   for ( i = 0; i < ngrids; i++ )
     {  
       gridID1 = vlistGrid(vlistID1, i);
-      grids[i].gridID = vlistGrid(vlistID1, i);
-      grids[i].gridIDs = (int *) malloc(nsplit*sizeof(int));
-      grids[i].gridsize = (int *) malloc(nsplit*sizeof(int));
+      grids[i].gridID    = vlistGrid(vlistID1, i);
+      grids[i].gridIDs   = (int *) malloc(nsplit*sizeof(int));
+      grids[i].gridsize  = (int *) malloc(nsplit*sizeof(int));
       grids[i].gridindex = (int **) malloc(nsplit*sizeof(int*));
-      for ( index = 0; index < nsplit; index++ )
-	grids[i].gridindex[index] = (int *) malloc(gridsize2max*sizeof(int));
+
+      for ( index = 0; index < nsplit; index++ ) grids[i].gridindex[index] = NULL;
     }
 
   for ( index = 0; index < nsplit; index++ )
@@ -231,10 +232,20 @@ void *Scatter(void *argument)
     {
       gridID1 = vlistGrid(vlistID1, i);
       genGrids(gridID1, grids[i].gridIDs, xinc, yinc, nxblocks, nyblocks, grids[i].gridindex, grids[i].gridsize, nsplit);
-
+      /*
+      if ( cdoVerbose )
+	for ( index = 0; index < nsplit; index++ )
+	  cdoPrint("Block %d,  gridID %d,  gridsize %d", index+1, grids[i].gridIDs[index], gridInqSize(grids[i].gridIDs[index]));
+      */
       for ( index = 0; index < nsplit; index++ )
 	vlistChangeGridIndex(vlistIDs[index], i, grids[i].gridIDs[index]);
     }
+
+  gridsize2max = 0;
+  for ( index = 0; index < nsplit; index++ )
+    if ( grids[0].gridsize[index] > gridsize2max ) gridsize2max = grids[0].gridsize[index];
+
+  array2 = (double *) malloc(gridsize2max*sizeof(double));
 
   strcpy(filename, cdoStreamName(1));
   nchars = strlen(filename);
@@ -252,7 +263,7 @@ void *Scatter(void *argument)
       streamDefVlist(streamIDs[index], vlistIDs[index]);
     }
 
-  printf("Bausstelle: i=0!\n");
+  if ( ngrids > 1 ) cdoPrint("Bausstelle: number of different grids > 1!");
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
     {
@@ -269,7 +280,7 @@ void *Scatter(void *argument)
 	  for ( index = 0; index < nsplit; index++ )
 	    {
 	      i = 0;
-	      window_cell(array1, gridID1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
+	      window_cell(array1, array2, grids[i].gridsize[index], grids[i].gridindex[index]);
 	      streamDefRecord(streamIDs[index], varID, levelID);
 	      if ( nmiss > 0 )
 		{

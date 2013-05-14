@@ -1,13 +1,13 @@
-2010-06-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2013-06-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.6.1
 	* Version 1.6.1 released
 
-2010-04-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2013-04-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: added support for netCDF files
 
-2010-04-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+2013-04-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Info: add chunking information of netcdf files (only with verbose output) [Feature #3489]
 
