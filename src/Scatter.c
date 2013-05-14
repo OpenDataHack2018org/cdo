@@ -285,8 +285,8 @@ void *Scatter(void *argument)
 	      if ( nmiss > 0 )
 		{
 		  nmiss = 0;
-		  for ( i = 0; i < grids[i].gridsize[index]; ++i )
-		    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+		  for ( int k = 0; k < grids[i].gridsize[index]; ++k )
+		    if ( DBL_IS_EQUAL(array2[k], missval) ) nmiss++;
 		}
 	      streamWriteRecord(streamIDs[index], array2, nmiss);
 	    }

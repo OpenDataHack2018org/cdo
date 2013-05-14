@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.1
 	* Version 1.6.1 released
 
+2013-05-14  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* scatter: fails with missing values [Bug #3492]
+
 2013-04-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: added support for netCDF files
