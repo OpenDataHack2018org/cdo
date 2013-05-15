@@ -860,6 +860,10 @@ void pstreamClose(int pstreamID)
 	  pthread_mutex_unlock(pipe->mutex);
 	}
 
+      pthread_mutex_lock(pipe->mutex);
+      vlistDestroy(pstreamptr->vlistID);
+      pthread_mutex_unlock(pipe->mutex);
+
       processDelStream(pstreamID);
 #else
       cdoAbort("Cannot use pipes, pthread support not compiled in!");
