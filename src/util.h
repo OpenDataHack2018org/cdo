@@ -18,11 +18,22 @@
 #ifndef _UTIL_H
 #define _UTIL_H
 
+typedef struct {
+  int    argc;
+  int    argl;
+  char **argv;
+  char  *args;
+} argument_t;
+
+argument_t *argument_new(size_t argc, size_t len);
+void        argument_free(argument_t *argument);
+void        argument_fill(argument_t *argument, int argc, char *argv[]);
+
 char *getProgname(char *string);
 char *getOperator(const char *argument);
 char *getOperatorName(const char *xoperator);
 
-char *makeArgument(int argc, char *argv[]);
+argument_t makeArgument(int argc, char *argv[]);
 char *getFileArg(char *argument);
 
 enum {START_DEC, START_JAN};

@@ -222,7 +222,7 @@ void *Rhopot(void *argument)
     {   
       cdoPrint("Use the CDO operator 'adisit' to convert potential temperature to In-situ temperature.");
       cdoPrint("Here is an example:");
-      cdoPrint("   cdo rhopot -adisit %s %s", cdoStreamName(0), cdoStreamName(1));
+      cdoPrint("   cdo rhopot -adisit %s %s", cdoStreamName(0)->args, cdoStreamName(1)->args);
     }
   if ( toID  == -1 ) cdoAbort("In-situ temperature not found!");
 

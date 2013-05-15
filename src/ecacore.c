@@ -59,7 +59,6 @@ void eca1(const ECA_REQUEST_1 *request)
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID = streamOpenRead(cdoStreamName(0));
-  if ( istreamID < 0 ) cdiError(istreamID, "Open failed on %s", cdoStreamName(0));
 
   ivlistID = streamInqVlist(istreamID);
   ovlistID = vlistCreate();
@@ -105,7 +104,6 @@ void eca1(const ECA_REQUEST_1 *request)
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(1));
 
   streamDefVlist(ostreamID, ovlistID);
 
@@ -417,9 +415,7 @@ void eca2(const ECA_REQUEST_2 *request)
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
-  if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
   istreamID2 = streamOpenRead(cdoStreamName(1));
-  if ( istreamID2 < 0 ) cdiError(istreamID2, "Open failed on %s", cdoStreamName(1));
 
   ivlistID1 = streamInqVlist(istreamID1);
   ivlistID2 = streamInqVlist(istreamID2);
@@ -470,7 +466,6 @@ void eca2(const ECA_REQUEST_2 *request)
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(ostreamID, ovlistID);
 
@@ -800,9 +795,7 @@ void eca3(const ECA_REQUEST_3 *request)
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
-  if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
   istreamID2 = streamOpenRead(cdoStreamName(1));
-  if ( istreamID2 < 0 ) cdiError(istreamID2, "Open failed on %s", cdoStreamName(1));
 
   ivlistID1 = streamInqVlist(istreamID1);
   ivlistID2 = streamInqVlist(istreamID2);
@@ -838,7 +831,6 @@ void eca3(const ECA_REQUEST_3 *request)
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(ostreamID, ovlistID);
 
@@ -1009,9 +1001,7 @@ void eca4(const ECA_REQUEST_4 *request)
   cmplen = DATE_LEN - cdoOperatorF2(operatorID);
 
   istreamID1 = streamOpenRead(cdoStreamName(0));
-  if ( istreamID1 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(0));
   istreamID2 = streamOpenRead(cdoStreamName(1));
-  if ( istreamID2 < 0 ) cdiError(istreamID1, "Open failed on %s", cdoStreamName(1));
 
   ivlistID1 = streamInqVlist(istreamID1);
   ivlistID2 = streamInqVlist(istreamID2);
@@ -1057,7 +1047,6 @@ void eca4(const ECA_REQUEST_4 *request)
   vlistDefTaxis(ovlistID, otaxisID);
 
   ostreamID = streamOpenWrite(cdoStreamName(2), cdoFiletype());
-  if ( ostreamID < 0 ) cdiError(ostreamID, "Open failed on %s", cdoStreamName(2));
 
   streamDefVlist(ostreamID, ovlistID);
 

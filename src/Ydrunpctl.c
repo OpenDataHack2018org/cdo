@@ -147,13 +147,13 @@ void *Ydrunpctl(void *argument)
   while ( (nrecs = streamInqTimestep(streamID2, tsID)) )
     {
       if ( nrecs != streamInqTimestep(streamID3, tsID) )
-        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
       
       vdate = taxisInqVdate(taxisID2);
       vtime = taxisInqVtime(taxisID2);
       
       if ( vdate != taxisInqVdate(taxisID3) || vtime != taxisInqVtime(taxisID3) )
-        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("Verification dates at time step %d of %s and %s differ!", tsID+1, cdoStreamName(1)->args, cdoStreamName(2)->args);
         
       if ( cdoVerbose ) cdoPrint("process timestep: %d %d %d", tsID+1, vdate, vtime);
 
@@ -260,7 +260,7 @@ void *Ydrunpctl(void *argument)
       vtimes1[dayoy] = vtime;
       
       if ( vars2[dayoy] == NULL )
-        cdoAbort("No data for day %d in %s and %s", dayoy, cdoStreamName(1), cdoStreamName(2));
+        cdoAbort("No data for day %d in %s and %s", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args);
 
       for ( varID = 0; varID < nvars; varID++ )
 	{
@@ -304,9 +304,9 @@ void *Ydrunpctl(void *argument)
     if ( nsets[dayoy] )
       {
         if ( vdates1[dayoy] != vdates2[dayoy] )
-          cdoAbort("Verification dates for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1), cdoStreamName(2), cdoStreamName(3));
+          cdoAbort("Verification dates for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
         if ( vtimes1[dayoy] != vtimes2[dayoy] )
-          cdoAbort("Verification times for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1), cdoStreamName(2), cdoStreamName(3));
+          cdoAbort("Verification times for day %d of %s, %s and %s are different!", dayoy, cdoStreamName(1)->args, cdoStreamName(2)->args, cdoStreamName(3)->args);
 
 	for ( varID = 0; varID < nvars; varID++ )
 	  {

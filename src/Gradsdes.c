@@ -235,8 +235,8 @@ void dumpmap()
   indx.intpnt = NULL;
   indx.fltpnt = NULL;
 
-  mapfp = fopen(cdoStreamName(0), "r");
-  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0));
+  mapfp = fopen(cdoStreamName(0)->args, "r");
+  if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0)->args);
 
   /* check the version number */
 
@@ -917,7 +917,7 @@ void *Gradsdes(void *argument)
 
   if ( operatorID == GRADSDES2 ) map_version = 2;
 
-  if ( cdoStreamName(0)[0] == '-' )
+  if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
 
   if ( operatorID == DUMPMAP )
@@ -1031,7 +1031,7 @@ void *Gradsdes(void *argument)
       if ( byteorder == CDI_LITTLEENDIAN ) littleendian = TRUE;
     }
 
-  strcpy(ctlfile, cdoStreamName(0));
+  strcpy(ctlfile, cdoStreamName(0)->args);
   len = (int) strlen(ctlfile);
   if ( len > 4 )
     {
@@ -1058,13 +1058,13 @@ void *Gradsdes(void *argument)
 
   /* DSET */
 
-  datfile = cdoStreamName(0);
+  datfile = cdoStreamName(0)->args;
   if ( datfile[0] == '/' )
     fprintf(gdp, "DSET  %s\n", datfile);
   else
     {
       datfile = strrchr(datfile, '/');
-      if ( datfile == 0 ) datfile = cdoStreamName(0);
+      if ( datfile == 0 ) datfile = cdoStreamName(0)->args;
       else                datfile++;	  
       fprintf(gdp, "DSET  ^%s\n", datfile);
     }

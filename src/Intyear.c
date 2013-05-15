@@ -81,7 +81,7 @@ void *Intyear(void *argument)
   if ( taxisHasBounds(taxisID3) ) taxisDeleteBounds(taxisID3);
   vlistDefTaxis(vlistID3, taxisID3);
 
-  strcpy(filename, cdoStreamName(2));
+  strcpy(filename, cdoStreamName(2)->args);
   nchars = strlen(filename);
 
   filesuffix[0] = 0;

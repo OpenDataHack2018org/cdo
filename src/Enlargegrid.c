@@ -202,7 +202,7 @@ void *Enlargegrid(void *argument)
     if ( vlistGrid(vlistID1, 0) != vlistGrid(vlistID1, index) )
       ndiffgrids++;
 
-  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0));
+  if ( ndiffgrids > 0 ) cdoAbort("Too many different grids in %s!", cdoStreamName(0)->args);
 
   gridID1 = vlistGrid(vlistID1, 0);
 

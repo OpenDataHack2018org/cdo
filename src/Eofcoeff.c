@@ -90,10 +90,10 @@ void *Eofcoeff(void * argument)
   
   if (vlistGridsizeMax(vlistID2)   != gridsize ||
       vlistInqVarGrid(vlistID2, 0) != gridID1 )
-    cdoAbort("EOFs (%s) and data (%s) defined on different grids", cdoStreamName(0), cdoStreamName(1));    
+    cdoAbort("EOFs (%s) and data (%s) defined on different grids", cdoStreamName(0)->args, cdoStreamName(1)->args);    
  
   
-  strcpy(oname, cdoStreamName(2));
+  strcpy(oname, cdoStreamName(2)->args);
   nchars = strlen(oname);
   
   filesuffix[0] = 0;
@@ -137,7 +137,7 @@ void *Eofcoeff(void * argument)
    }
   neof = eofID;  
   
-  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0), neof);
+  if ( cdoVerbose ) cdoPrint("%s contains %i eof's", cdoStreamName(0)->args, neof);
   // Create 1x1 Grid for output
   gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);

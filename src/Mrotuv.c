@@ -236,7 +236,7 @@ void *Mrotuv(void *argument)
 	  vid = 1;
 	}
       else
-	cdoAbort("U and V not found in %s",  cdoStreamName(0));
+	cdoAbort("U and V not found in %s",  cdoStreamName(0)->args);
     }
 
   nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, uid));

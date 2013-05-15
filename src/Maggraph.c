@@ -816,7 +816,7 @@ void *Maggraph(void *argument)
     VerifyGraphParameters(nparam,pnames);
   
   nfiles = cdoStreamCnt() - 1;
-  ofilename = cdoStreamName(nfiles);
+  ofilename = cdoStreamName(nfiles)->args;
   
   if( DBG )
     {
@@ -842,7 +842,7 @@ void *Maggraph(void *argument)
       
      
       if( DBG )
-        fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID) );
+        fprintf( stderr," file %d is %s\n", fileID, cdoStreamName(fileID)->args );
       streamID = streamOpenRead(cdoStreamName(fileID));
 
       vlistID = streamInqVlist(streamID);

@@ -290,7 +290,7 @@ void *Gather(void *argument)
     
   nfiles = cdoStreamCnt() - 1;
 
-  ofilename = cdoStreamName(nfiles);
+  ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExists(ofilename) )
@@ -398,7 +398,7 @@ void *Gather(void *argument)
 	  streamID = ef[fileID].streamID;
 	  nrecs = streamInqTimestep(streamID, tsID);
 	  if ( nrecs != nrecs0 )
-	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0), cdoStreamName(fileID));
+	    cdoAbort("Number of records at time step %d of %s and %s differ!", tsID+1, cdoStreamName(0)->args, cdoStreamName(fileID)->args);
 	}
 
       taxisCopyTimestep(taxisID2, taxisID1);

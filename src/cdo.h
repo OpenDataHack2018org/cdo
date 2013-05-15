@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "dmemory.h"
+#include "util.h"
 
 #undef   TRUE
 #define  TRUE   1
@@ -35,14 +36,7 @@
 #undef   NINTD
 #define  NINTD(x)   ((x) < 0 ? ((x)-0.5) : ((x)+0.5))
 
-#define  UNCHANGED_RECORD  (processSelf() == 0 && *cdoStreamName(0) != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
-
-
-typedef struct {
-  int      argc;
-  char   **argv;
-}
-ARGUMENT;
+#define  UNCHANGED_RECORD  (processSelf() == 0 && cdoStreamName(0)->argv[0][0] != '-' && cdoRegulargrid == FALSE && cdoDefaultFileType == -1 && cdoDefaultDataType == -1 && cdoDefaultByteorder == -1 )
 
 
 extern int ompNumThreads;
@@ -95,7 +89,7 @@ int     operatorArgc(void);
 char  **operatorArgv(void);
 void    operatorCheckArgc(int numargs);
 
-const char *cdoStreamName(int cnt);
+const argument_t *cdoStreamName(int cnt);
 
 void    cdoInitialize(void *argument);
 void    cdoFinish(void);

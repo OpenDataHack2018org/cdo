@@ -201,6 +201,7 @@ void pstream_init_entry(pstream_t *pstreamptr)
   pstreamptr->mfnames    = NULL;
   pstreamptr->varlist    = NULL;
 #if  defined  (HAVE_LIBPTHREAD)
+  pstreamptr->argument   = NULL;
   pstreamptr->pipe       = NULL;
   //  pstreamptr->rthreadID  = 0;
   //  pstreamptr->wthreadID  = 0;
@@ -298,10 +299,8 @@ int pstreamIsPipe(int pstreamID)
 }
 
 
-int pstreamOpenRead(const char *argument)
+int pstreamOpenRead(const argument_t *argument)
 {
-  char *operatorArg = NULL;
-  char *operatorName = NULL;
   int ispipe = FALSE;
   int fileID;
   int pstreamID;
@@ -314,11 +313,17 @@ int pstreamOpenRead(const char *argument)
 
   pstreamID = pstreamptr->self;
 
-  ispipe = argument[0] == '-';
-
+  ispipe = argument->args[0] == '-';
+  /*
+  printf("pstreamOpenRead: args >%s<\n", argument->args);
+  for ( int i = 0; i < argument->argc; ++i )
+    printf("pstreamOpenRead: arg %d >%s<\n", i, argument->argv[i]);
+  */
   if ( ispipe )
     {
 #if  defined  (HAVE_LIBPTHREAD)
+      char *operatorArg;
+      char *operatorName;
       char *newarg;
       char *pipename = (char *) malloc(16);
       int rval;
@@ -328,22 +333,34 @@ int pstreamOpenRead(const char *argument)
       size_t len;
       size_t stacksize;
       int status;
+      argument_t *newargument = (argument_t *) malloc(sizeof(argument_t));
 
-      operatorArg = getOperator(argument);
+      newargument->argc = argument->argc + 1;
+      newargument->argv = (char **) malloc(newargument->argc*sizeof(char *));
+      memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
+
+      operatorArg  = argument->argv[0];
       operatorName = getOperatorName(operatorArg);
-      free(operatorArg);
 
-      len = strlen(argument);
+      len = strlen(argument->args);
       newarg = (char *) malloc(len+16);
-      strcpy(newarg, argument);
+      strcpy(newarg, argument->args);
       sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
       newarg[len] = ' ';
       strcpy(&newarg[len+1], pipename);
 
-      pstreamptr->ispipe = TRUE;
-      pstreamptr->name   = pipename;
+      newargument->argv[argument->argc] = pipename;
+      newargument->args = newarg;
+      /*
+      printf("pstreamOpenRead: new args >%s<\n", newargument->args);
+      for ( int i = 0; i < newargument->argc; ++i )
+	printf("pstreamOpenRead: new arg %d >%s<\n", i, newargument->argv[i]);
+      */
+      pstreamptr->ispipe    = TRUE;
+      pstreamptr->name      = pipename;
       pstreamptr->rthreadID = pthread_self();
-      pstreamptr->pipe   = pipeNew();
+      pstreamptr->pipe      = pipeNew();
+      pstreamptr->argument  = (void *) newargument;
  
       if ( ! cdoSilentMode )
 	fprintf(stderr, "%s: Started child process \"%s\".\n", processInqPrompt(), newarg+1);
@@ -373,7 +390,8 @@ int pstreamOpenRead(const char *argument)
 	  stacksize = 2097152;
 	  pthread_attr_setstacksize(&attr, stacksize);
 	}
-      rval = pthread_create(&thrID, &attr, operatorModule(operatorName), newarg);
+
+      rval = pthread_create(&thrID, &attr, operatorModule(operatorName), newargument);
       if ( rval != 0 )
 	{
 	  errno = rval;
@@ -396,17 +414,17 @@ int pstreamOpenRead(const char *argument)
       char *filename = NULL;
       const char *pch;
 
-      len = strlen(argument);
+      len = strlen(argument->args);
 
       for ( i = 0; i < len; i++ )
-	if ( argument[i] == ':' ) break;
+	if ( argument->args[i] == ':' ) break;
 
       if ( i < len )
 	{
-	  pch = &argument[i+1];
+	  pch = &argument->args[i+1];
 	  len -= (i+1);
-	  if ( len && ( memcmp(argument, "filelist:", 9) == 0 || 
-			memcmp(argument, "flist:", 6) == 0 ) )
+	  if ( len && ( memcmp(argument->args, "filelist:", 9) == 0 || 
+			memcmp(argument->args, "flist:", 6) == 0 ) )
 	    {
 	      for ( i = 0; i < len; i++ ) if ( pch[i] == ',' ) nfiles++;
 
@@ -424,8 +442,7 @@ int pstreamOpenRead(const char *argument)
 		  nfiles = 0;
 		  while ( readline(fp, line, 4096) )
 		    {
-		      if ( line[0] == '#' || line[0] == '\0' ||
-			   line[0] == ' ' ) continue;
+		      if ( line[0] == '#' || line[0] == '\0' || line[0] == ' ' ) continue;
 
 		      fp2 = fopen(line, "r" );
 		      if ( fp2 == NULL ) cdoAbort("Open failed on %s", line);
@@ -472,7 +489,7 @@ int pstreamOpenRead(const char *argument)
 		    }
 		}
 	    }
-	  else if ( len && memcmp(argument, "ls:", 3) == 0 )
+	  else if ( len && memcmp(argument->args, "ls:", 3) == 0 )
 	    {
 	      char line[4096];
 	      char command[4096];
@@ -512,25 +529,9 @@ int pstreamOpenRead(const char *argument)
 	}
       else
 	{
-	  len = strlen(argument);
-	  /*
-	  if ( cdoExpMode == CDO_EXP_REMOTE )
-	    {
-	      char datapath[] = "/scratch/localA/m214003/data/";
-	      len += strlen(datapath);
-
-	      filename = (char *) malloc(len+1);
-
-	      strcpy(filename, datapath);
-	      strcat(filename, argument);
-	    }
-	  else
-	  */
-	    {
-	      filename = (char *) malloc(len+1);
-
-	      strcpy(filename, argument);
-	    }
+	  len = strlen(argument->args);
+	  filename = (char *) malloc(len+1);
+	  strcpy(filename, argument->args);
 	}
 
       if ( PSTREAM_Debug ) Message("file %s", filename);
@@ -563,7 +564,7 @@ int pstreamOpenRead(const char *argument)
       pstreamptr->fileID = fileID;
     }
 
-  if ( pstreamID < 0 ) cdiError(pstreamID, "Open failed on %s", argument);
+  if ( pstreamID < 0 ) cdiError(pstreamID, "Open failed on %s", argument->args);
   
   return (pstreamID);
 }
@@ -627,7 +628,7 @@ void query_user_exit(const char *argument)
 }
 
 
-int pstreamOpenWrite(const char *argument, int filetype)
+int pstreamOpenWrite(const argument_t *argument, int filetype)
 {
   int fileID;
   int pstreamID = -1;
@@ -636,14 +637,14 @@ int pstreamOpenWrite(const char *argument, int filetype)
 
   PSTREAM_INIT();
 
-  ispipe = memcmp(argument, "(pipe", 5) == 0;
+  ispipe = memcmp(argument->args, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
 #if  defined  (HAVE_LIBPTHREAD)
-      if ( PSTREAM_Debug ) Message("pipe %s", argument);
-      pstreamID = pstreamFindID(argument);
-      if ( pstreamID == -1 ) Error("%s is not open!", argument);
+      if ( PSTREAM_Debug ) Message("pipe %s", argument->args);
+      pstreamID = pstreamFindID(argument->args);
+      if ( pstreamID == -1 ) Error("%s is not open!", argument->args);
 
       pstreamptr = pstream_to_pointer(pstreamID);
 
@@ -655,14 +656,14 @@ int pstreamOpenWrite(const char *argument, int filetype)
   else
     {
       /* extern int cdoDefaultInstID; */
-      char *filename = (char *) malloc(strlen(argument)+1);
+      char *filename = (char *) malloc(strlen(argument->args)+1);
 
       pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
 
       pstreamID = pstreamptr->self;
   
-      if ( PSTREAM_Debug ) Message("file %s", argument);
+      if ( PSTREAM_Debug ) Message("file %s", argument->args);
 
       if ( filetype == CDI_UNDEFID ) filetype = FILETYPE_GRB;
 
@@ -671,9 +672,9 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	  int rstatus;
 	  struct stat stbuf;
 
-	  rstatus = stat(argument, &stbuf);
+	  rstatus = stat(argument->args, &stbuf);
 	  /* If permanent file already exists, query user whether to overwrite or exit */
-	  if ( rstatus != -1 ) query_user_exit(argument);
+	  if ( rstatus != -1 ) query_user_exit(argument->args);
 	}
 
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
@@ -683,7 +684,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
       else
 	pthread_mutex_lock(&streamOpenWriteMutex);
 #endif
-      fileID = streamOpenWrite(argument, filetype);
+      fileID = streamOpenWrite(argument->args, filetype);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_unlock(&streamMutex);
@@ -691,7 +692,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
 	pthread_mutex_unlock(&streamOpenWriteMutex);
 #endif
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
-      if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument);
+      if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument->args);
 
       cdoDefHistory(fileID, commandLine());
 
@@ -730,7 +731,7 @@ int pstreamOpenWrite(const char *argument, int filetype)
       if ( cdoDefaultInstID != CDI_UNDEFID )
 	streamDefInstID(fileID, cdoDefaultInstID);
       */
-      strcpy(filename, argument);
+      strcpy(filename, argument->args);
 
       pstreamptr->mode     = 'w';
       pstreamptr->name     = filename;
@@ -742,30 +743,30 @@ int pstreamOpenWrite(const char *argument, int filetype)
 }
 
 
-int pstreamOpenAppend(const char *argument)
+int pstreamOpenAppend(const argument_t *argument)
 {
   int fileID;
   int pstreamID = -1;
   int ispipe;
   pstream_t *pstreamptr;
 
-  ispipe = memcmp(argument, "(pipe", 5) == 0;
+  ispipe = memcmp(argument->args, "(pipe", 5) == 0;
 
   if ( ispipe )
     {
-      if ( PSTREAM_Debug ) Message("pipe %s", argument);
+      if ( PSTREAM_Debug ) Message("pipe %s", argument->args);
       cdoAbort("this operator doesn't work with pipes!");
     }
   else
     {
-      char *filename = (char *) malloc(strlen(argument)+1);
+      char *filename = (char *) malloc(strlen(argument->args)+1);
 
       pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
 
       pstreamID = pstreamptr->self;
   
-      if ( PSTREAM_Debug ) Message("file %s", argument);
+      if ( PSTREAM_Debug ) Message("file %s", argument->args);
 
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
 #if  defined  (HAVE_LIBPTHREAD)
@@ -774,7 +775,7 @@ int pstreamOpenAppend(const char *argument)
       else
 	pthread_mutex_lock(&streamOpenReadMutex);
 #endif
-      fileID = streamOpenAppend(argument);
+      fileID = streamOpenAppend(argument->args);
 #if  defined  (HAVE_LIBPTHREAD)
       if ( cdoLockIO )
 	pthread_mutex_unlock(&streamMutex);
@@ -782,12 +783,12 @@ int pstreamOpenAppend(const char *argument)
 	pthread_mutex_unlock(&streamOpenReadMutex);
 #endif
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_stop(timer_write);
-      if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument);
+      if ( fileID < 0 ) cdiError(fileID, "Open failed on %s", argument->args);
       /*
       cdoInqHistory(fileID);
       cdoDefHistory(fileID, commandLine());
       */
-      strcpy(filename, argument);
+      strcpy(filename, argument->args);
 
       pstreamptr->mode   = 'a';
       pstreamptr->name   = filename;
@@ -838,6 +839,14 @@ void pstreamClose(int pstreamID)
 	  pthread_join(pstreamptr->wthreadID, NULL);
 
 	  pthread_mutex_lock(pipe->mutex);
+	  if ( pstreamptr->name ) free(pstreamptr->name);
+	  if ( pstreamptr->argument )
+	    {
+	      argument_t *argument = (argument_t *) (pstreamptr->argument);
+	      if ( argument->argv ) free(argument->argv);
+	      if ( argument->args ) free(argument->args);
+	      free(argument);
+	    }
 	  vlistDestroy(pstreamptr->vlistID);
 	  pthread_mutex_unlock(pipe->mutex);
 
@@ -1516,7 +1525,7 @@ void cdoInitialize(void *argument)
      Message("process %d  thread %ld", processSelf(), pthread_self());
 #endif
 
-  processDefArgument((const char*) argument);
+  processDefArgument(argument);
 }
 
 

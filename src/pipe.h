@@ -58,6 +58,7 @@ typedef struct {
   char         **mfnames;
   varlist_t     *varlist;
 #if  defined  (HAVE_LIBPTHREAD)
+  void          *argument;
   struct pipe_s *pipe;
   pthread_t     rthreadID; /* read  thread ID */
   pthread_t     wthreadID; /* write thread ID */

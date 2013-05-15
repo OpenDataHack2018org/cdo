@@ -137,14 +137,16 @@ void *Merge(void *argument)
   const char *ofilename;
   double *array = NULL;
 
+  printf("Merge: argument %s\n", argument);
   cdoInitialize(argument);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
+  printf("Merge: cdoStreamCnt() %d\n", cdoStreamCnt());
   streamCnt = cdoStreamCnt();
   nmerge    = streamCnt - 1;
 
-  ofilename = cdoStreamName(streamCnt-1);
+  ofilename = cdoStreamName(streamCnt-1)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExists(ofilename) )
@@ -172,7 +174,7 @@ void *Merge(void *argument)
   vlistCopy(vlistID2, vlistIDs[0]);
   for ( index = 1; index < nmerge; index++ )
     {
-      checkDupEntry(vlistID2, vlistIDs[index], cdoStreamName(index));
+      checkDupEntry(vlistID2, vlistIDs[index], cdoStreamName(index)->args);
       /* vlistCat(vlistID2, vlistIDs[index]); */
       vlistMerge(vlistID2, vlistIDs[index]);
     }

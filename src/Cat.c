@@ -51,7 +51,7 @@ void *Cat(void *argument)
 
   for ( indf = 0; indf < nfiles; indf++ )
     {
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf));
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
       streamID1 = streamOpenRead(cdoStreamName(indf));
 
@@ -60,7 +60,7 @@ void *Cat(void *argument)
 
       if ( indf == 0 )
 	{
-	  if ( fileExists(cdoStreamName(nfiles)) )
+	  if ( fileExists(cdoStreamName(nfiles)->args) )
 	    {
 	      streamID2 = streamOpenAppend(cdoStreamName(nfiles));
 
@@ -75,7 +75,7 @@ void *Cat(void *argument)
 	  else
 	    {
 	      if ( cdoVerbose )
-		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles));
+		cdoPrint("Output file doesn't exist, creating: %s", cdoStreamName(nfiles)->args);
 
 	      streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 

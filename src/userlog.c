@@ -94,7 +94,7 @@ void cdolog(const char *prompt, double cputime)
 
   for ( streamID = 0; streamID < cdoStreamCnt(); streamID++ )
     {
-      streamName = cdoStreamName(streamID);
+      streamName = cdoStreamName(streamID)->args;
       pos = 0;
       while ( pos < (int) strlen(streamName) )
 	{

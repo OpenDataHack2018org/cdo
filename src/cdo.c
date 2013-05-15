@@ -1108,8 +1108,8 @@ int main(int argc, char *argv[])
   int status = 0;
   char *operatorName = NULL;
   char *operatorArg = NULL;
-  char *argument = NULL;
   extern int dmemory_ExitOnError;
+  argument_t *argument = NULL;
 
   init_is_tty();
 
@@ -1161,13 +1161,14 @@ int main(int argc, char *argv[])
   if ( cdoOptind < argc )
     {
       operatorArg = argv[cdoOptind];
-      argument = makeArgument(argc-cdoOptind, &argv[cdoOptind]);
+      argument = argument_new(argc-cdoOptind, 0);
+      argument_fill(argument, argc-cdoOptind, &argv[cdoOptind]);
     }
   else
     {
       if ( ! Version && ! Help )
 	{
-	  fprintf(stderr, "\nno operator given\n\n");
+	  fprintf(stderr, "\nNo operator given!\n\n");
 	  usage();
 	  status = 1;
 	}
@@ -1205,13 +1206,14 @@ int main(int argc, char *argv[])
       if ( cdoTimer ) timer_report();
     }
 
-  if ( argument ) free(argument);
+  if ( argument ) argument_free(argument);
 
   if ( cdoVarnames )
     {
       if ( cdoNumVarnames ) free(cdoVarnames[0]);
       free(cdoVarnames);
     }
+
   /* problems with alias!!! if ( operatorName ) free(operatorName); */ 
 
   /* malloc_stats(); */

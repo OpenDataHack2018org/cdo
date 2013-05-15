@@ -66,7 +66,7 @@ void *Writegrid(void *argument)
       for ( i = 0; i < gridsize; i++ ) mask[i] = 1;
     }
       
-  writeNCgrid(cdoStreamName(1), gridID, mask);
+  writeNCgrid(cdoStreamName(1)->args, gridID, mask);
 
   streamClose(streamID);
 

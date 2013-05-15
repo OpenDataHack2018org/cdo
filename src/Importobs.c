@@ -162,10 +162,10 @@ void *Importobs(void *argument)
     gridToDegree(units, "grid center lat", gridsize, yvals);
   }
 
-  fp = fopen(cdoStreamName(0), "r");
-  if ( fp == NULL ) { perror(cdoStreamName(0)); exit(EXIT_FAILURE); }
+  fp = fopen(cdoStreamName(0)->args, "r");
+  if ( fp == NULL ) { perror(cdoStreamName(0)->args); exit(EXIT_FAILURE); }
 
-  vdate = getDate(cdoStreamName(0));
+  vdate = getDate(cdoStreamName(0)->args);
   if ( vdate <= 999999 ) vdate = vdate*100 + 1;
 
   streamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());

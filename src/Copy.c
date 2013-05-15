@@ -67,7 +67,7 @@ void *Copy(void *argument)
   tsID2 = 0;
   for ( indf = 0; indf < nfiles; indf++ )
     {
-      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf));
+      if ( cdoVerbose ) cdoPrint("Process file: %s", cdoStreamName(indf)->args);
 
       streamID1 = streamOpenRead(cdoStreamName(indf));
 

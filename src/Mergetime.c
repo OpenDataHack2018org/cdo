@@ -81,7 +81,7 @@ void *Mergetime(void *argument)
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
-      if ( cdoVerbose ) cdoPrint("process: %s", cdoStreamName(fileID));
+      if ( cdoVerbose ) cdoPrint("process: %s", cdoStreamName(fileID)->args);
 
       streamID1 = streamOpenRead(cdoStreamName(fileID));
 
@@ -115,7 +115,7 @@ void *Mergetime(void *argument)
 	}
     }
 
-  ofilename = cdoStreamName(nfiles);
+  ofilename = cdoStreamName(nfiles)->args;
 
   if ( !cdoSilentMode && !cdoOverwriteMode )
     if ( fileExists(ofilename) )

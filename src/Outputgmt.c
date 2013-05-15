@@ -853,7 +853,7 @@ void *Outputgmt(void *argument)
 	  if ( operatorID == OUTPUTVECTOR )
 	    fprintf(stdout, "# Increment = %d\n", ninc);
 	  fprintf(stdout, "#\n");
-	  fprintf(stdout, "# File  = %s\n", cdoStreamName(0));
+	  fprintf(stdout, "# File  = %s\n", cdoStreamName(0)->args);
 	  fprintf(stdout, "# Date  = %s\n", vdatestr);
 	  fprintf(stdout, "# Time  = %s\n", vtimestr);
 	  fprintf(stdout, "# Name  = %s\n", varname);

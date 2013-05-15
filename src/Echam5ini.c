@@ -1456,9 +1456,9 @@ void *Echam5ini(void *argument)
       iniatts(&atts);
 
       if ( operatorID == IMPORT_E5ML )
-	nvars = import_e5ml(cdoStreamName(0), &vars);
+	nvars = import_e5ml(cdoStreamName(0)->args, &vars);
       else if ( operatorID == IMPORT_E5RES )
-	nvars = import_e5res(cdoStreamName(0), &vars, &atts);
+	nvars = import_e5res(cdoStreamName(0)->args, &vars, &atts);
       else
 	cdoAbort("Operator not implemented!");
 
@@ -1607,9 +1607,9 @@ void *Echam5ini(void *argument)
       streamClose(streamID1);
 
       if ( operatorID == EXPORT_E5ML )
-	export_e5ml(cdoStreamName(1), vars, nvars, vdate, vtime, ntr);
+	export_e5ml(cdoStreamName(1)->args, vars, nvars, vdate, vtime, ntr);
       else if ( operatorID == EXPORT_E5RES )
-	export_e5res(cdoStreamName(1), vars, nvars);
+	export_e5res(cdoStreamName(1)->args, vars, nvars);
       else
 	cdoAbort("Operator not implemented!");
     }

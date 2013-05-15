@@ -46,22 +46,15 @@ char *getProgname(char *string)
 char *getOperator(const char *argument)
 {
   char *operatorArg = NULL;
-  char *blankpos;
   size_t len;
 
   if ( argument )
     {
-      blankpos = strchr(argument, ' ');
+      len = 1 + strlen(argument);
 
-      if ( blankpos )
-	len = blankpos - argument;
-      else
-	len = strlen(argument);
-
-      operatorArg = (char *) malloc(len+1);
+      operatorArg = (char *) malloc(len);
 
       memcpy(operatorArg, argument, len);
-      operatorArg[len] = '\0';
     }
 
   return (operatorArg);
@@ -97,27 +90,64 @@ char *getOperatorName(const char *operatorArg)
 }
 
 
-char *makeArgument(int argc, char *argv[])
+argument_t *argument_new(size_t argc, size_t len)
 {
-  char *argument = NULL;
-  int iarg;
-  size_t len, pos = 0, off = 0;
+  argument_t *argument;
 
-  if ( argv[0][0] == '-' ) off = 1;
+  argument = (argument_t *) calloc(1, sizeof(argument_t));
 
-  for ( iarg = 0; iarg < argc; iarg++ )
+  if ( argc > 0 )
     {
-      len = strlen(argv[iarg]) + 1 - off;
-      argument = (char *) realloc(argument, pos+len);
-      strcpy(&argument[pos], argv[iarg]+off);
-      pos += len;
-      argument[pos-1] = ' ';
-      off = 0;
+      argument->argc = argc;
+      argument->argv = (char **) calloc(argc, sizeof(char *));
     }
 
-  if ( argc ) argument[pos-1] = '\0';
+  if ( len > 0 )
+    argument->args = (char *) calloc(len, sizeof(char));
 
   return (argument);
+}
+
+
+void argument_free(argument_t *argument)
+{
+  if ( argument )
+    {
+      if ( argument->argc )
+	{
+	  for ( int i = 0; i < argument->argc; ++i )
+	    {
+	      if ( argument->argv[i] )
+		{
+		  free(argument->argv[i]);
+		  argument->argv[i] = NULL;
+		}
+	    }
+
+	  free(argument->argv);
+	  argument->argv = NULL;
+	  argument->argc = 0;
+	}
+
+      if ( argument->args )
+	{
+	  free(argument->args);
+	  argument->args = NULL;
+	}
+
+      free(argument);
+    }
+}
+
+
+void argument_fill(argument_t *argument, int argc, char *argv[])
+{
+  int iarg;
+
+  assert(argument->argc == argc);
+
+  for ( iarg = 0; iarg < argc; ++iarg )
+    argument->argv[iarg] = strdup(argv[iarg]);
 }
 
 

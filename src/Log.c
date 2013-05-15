@@ -47,24 +47,24 @@ void *Log(void *argument)
   operfunc   = cdoOperatorF1(operatorID);
   dumptype   = cdoOperatorF2(operatorID);
 
-  if ( cdoStreamName(0)[0] == '-' )
+  if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
 
   if ( operatorID == DUMPLOGS )
     {
-      dumplogs(cdoStreamName(0));
+      dumplogs(cdoStreamName(0)->args);
     }
   else if ( operatorID == DAYLOGS )
     {
-      daylogs(cdoStreamName(0));
+      daylogs(cdoStreamName(0)->args);
     }
   else if ( operatorID == MONLOGS )
     {
-      monlogs(cdoStreamName(0));
+      monlogs(cdoStreamName(0)->args);
     }
   else if ( operfunc == 1 )
     {
-      dumplogo(cdoStreamName(0), dumptype);
+      dumplogo(cdoStreamName(0)->args, dumptype);
     }
 
   cdoFinish();

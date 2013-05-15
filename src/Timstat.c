@@ -203,7 +203,7 @@ void *Timstat(void *argument)
 
       strcpy(filename, cdoOperatorName(operatorID));
       strcat(filename, "_");
-      strcat(filename, cdoStreamName(1));
+      strcat(filename, cdoStreamName(1)->args);
       streamID3 = streamOpenWrite(filename, cdoFiletype());
 
       vlistID3 = vlistDuplicate(vlistID1);

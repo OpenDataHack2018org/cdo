@@ -400,6 +400,7 @@ outputts -outputts \
 outputvector -outputvector \
 outputvrml -outputvrml \
 outputxyz -outputxyz \
+pack -pack \
 pardes -pardes \
 pardup -pardup \
 parmul -parmul \

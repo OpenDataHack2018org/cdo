@@ -641,7 +641,7 @@ void *Magplot(void *argument)
 
                 if( DBG )
                   fprintf( stderr,"Plot %d\n",varID );
-	  	magplot(cdoStreamName(1), operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
+	  	magplot(cdoStreamName(1)->args, operatorID, varname, units, nlon, nlat, grid_center_lon, grid_center_lat, array, nparam, pnames, datetimestr );
           }
 	  else
 	  	fprintf(stderr,"operator not implemented\n");

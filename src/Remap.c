@@ -1037,7 +1037,7 @@ void *Remap(void *argument)
   WRITE_REMAP:
  
   if ( lwrite_remap ) 
-    write_remap_scrip(cdoStreamName(1), map_type, submap_type, remap_order, remaps[r].grid, remaps[r].vars);
+    write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, remap_order, remaps[r].grid, remaps[r].vars);
 
   streamClose(streamID1);
 

@@ -54,7 +54,7 @@ void *Splitrec(void *argument)
 
   nrecs  = vlistNrecs(vlistID1);
 
-  strcpy(filename, cdoStreamName(1));
+  strcpy(filename, cdoStreamName(1)->args);
   nchars = strlen(filename);
 
   filesuffix[0] = 0;

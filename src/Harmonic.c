@@ -80,7 +80,7 @@ void *Harmonic(void *argument)
 
   streamIDs = (int*) malloc(n_out*sizeof(int));
 
-  strcpy(filename, cdoStreamName(1));
+  strcpy(filename, cdoStreamName(1)->args);
   nchars = strlen(filename);
 
   for ( j = 0; j < n_out; ++j )

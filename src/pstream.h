@@ -42,9 +42,9 @@
 #define  streamCopyRecord         pstreamCopyRecord
 
 
-int     pstreamOpenWrite(const char *streamname, int filetype);
-int     pstreamOpenRead(const char *streamname);
-int     pstreamOpenAppend(const char *streamname);
+int     pstreamOpenWrite(const argument_t *argument, int filetype);
+int     pstreamOpenRead(const argument_t *argument);
+int     pstreamOpenAppend(const argument_t *argument);
 void    pstreamClose(int pstreamID);
 
 int     pstreamInqFiletype(int pstreamID);

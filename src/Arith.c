@@ -113,12 +113,12 @@ void *Arith(void *argument)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_VAR;
-	  cdoPrint("Filling up stream2 >%s< by copying the first variable.", cdoStreamName(1));
+	  cdoPrint("Filling up stream2 >%s< by copying the first variable.", cdoStreamName(1)->args);
 	}
       else
 	{
 	  filltype = FILL_VARTS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", cdoStreamName(1));
+	  cdoPrint("Filling up stream2 >%s< by copying the first variable of each timestep.", cdoStreamName(1)->args);
 	}
     }
   else if ( lfill1 )
@@ -128,12 +128,12 @@ void *Arith(void *argument)
       if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_VAR;
-	  cdoPrint("Filling up stream1 >%s< by copying the first variable.", cdoStreamName(0));
+	  cdoPrint("Filling up stream1 >%s< by copying the first variable.", cdoStreamName(0)->args);
 	}
       else
 	{
 	  filltype = FILL_VARTS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", cdoStreamName(0));
+	  cdoPrint("Filling up stream1 >%s< by copying the first variable of each timestep.", cdoStreamName(0)->args);
 	}
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
@@ -163,12 +163,12 @@ void *Arith(void *argument)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
+	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1)->args);
 	}
       else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
 	  vlistIDx1 = vlistID2;
@@ -220,7 +220,7 @@ void *Arith(void *argument)
 	      if ( filltype == FILL_NONE && streamIDx2 == streamID2 )
 		{
 		  filltype = FILL_FILE;
-		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", cdoStreamName(1));
+		  cdoPrint("Filling up stream2 >%s< by copying all timesteps.", cdoStreamName(1)->args);
 		}
 
 	      if ( filltype == FILL_FILE )
@@ -237,7 +237,7 @@ void *Arith(void *argument)
 
 		  nrecs2 = streamInqTimestep(streamIDx2, tsID2);
 		  if ( nrecs2 == 0 )
-		    cdoAbort("Empty input stream %s!", cdoStreamName(1));
+		    cdoAbort("Empty input stream %s!", cdoStreamName(1)->args);
 		}
 	      else
 		cdoAbort("Input streams have different number of timesteps!");

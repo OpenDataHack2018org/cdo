@@ -91,12 +91,12 @@ void *Comp(void *argument)
   if ( vlistNrecs(vlistID1) != 1 && vlistNrecs(vlistID2) == 1 )
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1));
+      cdoPrint("Filling up stream2 >%s< by copying the first record.", cdoStreamName(1)->args);
     }
   else if ( vlistNrecs(vlistID1) == 1 && vlistNrecs(vlistID2) != 1 )
     {
       filltype = FILL_REC;
-      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0));
+      cdoPrint("Filling up stream1 >%s< by copying the first record.", cdoStreamName(0)->args);
       streamIDx1 = streamID2;
       streamIDx2 = streamID1;
       vlistIDx1 = vlistID2;
@@ -127,12 +127,12 @@ void *Comp(void *argument)
       if ( ntsteps1 != 1 && ntsteps2 == 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1));
+	  cdoPrint("Filling up stream2 >%s< by copying the first timestep.", cdoStreamName(1)->args);
 	}
       else if ( ntsteps1 == 1 && ntsteps2 != 1 )
 	{
 	  filltype = FILL_TS;
-	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0));
+	  cdoPrint("Filling up stream1 >%s< by copying the first timestep.", cdoStreamName(0)->args);
 	  streamIDx1 = streamID2;
           streamIDx2 = streamID1;
 	  vlistIDx1 = vlistID2;
