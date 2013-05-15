@@ -90,6 +90,35 @@ char *getOperatorName(const char *operatorArg)
 }
 
 
+argument_t *file_argument_new(const char *filename)
+{
+  argument_t *argument;
+
+  argument = (argument_t *) calloc(1, sizeof(argument_t));
+
+  argument->argc = 1;
+  argument->argv = (char **) calloc(1, sizeof(char *));
+  argument->argv[0] = filename;
+  argument->args = filename;
+
+  return (argument);
+}
+
+
+void file_argument_free(argument_t *argument)
+{
+  if ( argument )
+    {
+      if ( argument->argc )
+	{
+	  assert(argument->argc == 1);
+	  free(argument->argv);
+	}
+      free(argument);
+    }
+}
+
+
 argument_t *argument_new(size_t argc, size_t len)
 {
   argument_t *argument;

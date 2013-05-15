@@ -247,7 +247,7 @@ void *Scatter(void *argument)
 
   array2 = (double *) malloc(gridsize2max*sizeof(double));
 
-  strcpy(filename, cdoStreamName(1));
+  strcpy(filename, cdoStreamName(1)->args);
   nchars = strlen(filename);
 
   filesuffix[0] = 0;
@@ -258,7 +258,10 @@ void *Scatter(void *argument)
       sprintf(filename+nchars, "%05d", index);
       if ( filesuffix[0] )
 	sprintf(filename+nchars+5, "%s", filesuffix);
-      streamIDs[index] = streamOpenWrite(filename, cdoFiletype());
+
+      argument_t *fileargument = file_argument_new(filename);
+      streamIDs[index] = streamOpenWrite(fileargument, cdoFiletype());
+      file_argument_free(fileargument);
 
       streamDefVlist(streamIDs[index], vlistIDs[index]);
     }
