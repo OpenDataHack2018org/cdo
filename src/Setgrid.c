@@ -99,7 +99,9 @@ void *Setgrid(void *argument)
       operatorCheckArgc(1);
       areafile = operatorArgv()[0];
 
-      streamID = streamOpenRead(areafile);
+      argument_t *fileargument = file_argument_new(areafile);
+      streamID = streamOpenRead(fileargument);
+      file_argument_free(fileargument);
 
       vlistID = streamInqVlist(streamID);
 
@@ -140,7 +142,9 @@ void *Setgrid(void *argument)
 
       operatorCheckArgc(1);
       maskfile = operatorArgv()[0];
-      streamID = streamOpenRead(maskfile);
+      argument_t *fileargument = file_argument_new(maskfile);
+      streamID = streamOpenRead(fileargument);
+      file_argument_free(fileargument);
 
       vlistID = streamInqVlist(streamID);
 

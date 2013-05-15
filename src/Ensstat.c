@@ -140,7 +140,7 @@ void *Ensstat(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   streamDefVlist(streamID2, vlistID2);
 	  

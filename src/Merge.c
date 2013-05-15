@@ -137,12 +137,10 @@ void *Merge(void *argument)
   const char *ofilename;
   double *array = NULL;
 
-  printf("Merge: argument %s\n", argument);
   cdoInitialize(argument);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
-  printf("Merge: cdoStreamCnt() %d\n", cdoStreamCnt());
   streamCnt = cdoStreamCnt();
   nmerge    = streamCnt - 1;
 
@@ -185,7 +183,7 @@ void *Merge(void *argument)
       vlistPrint(vlistID2);
     }
        
-  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+  streamID2 = streamOpenWrite(cdoStreamName(streamCnt-1), cdoFiletype());
 
   vlistDefTaxis(vlistID2, taxisID2);
   streamDefVlist(streamID2, vlistID2);

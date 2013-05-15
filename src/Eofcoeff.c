@@ -172,7 +172,10 @@ void *Eofcoeff(void * argument)
       if ( filesuffix[0] )
         strcat(oname, filesuffix);
       
-      streamIDs[eofID] = streamOpenWrite(oname, cdoFiletype());
+      argument_t *fileargument = file_argument_new(oname);
+      streamIDs[eofID] = streamOpenWrite(fileargument, cdoFiletype());
+      file_argument_free(fileargument);
+
       if (cdoVerbose) 
         cdoPrint("opened %s ('w')  as stream%i for %i. eof", oname, streamIDs[eofID], eofID+1);
       

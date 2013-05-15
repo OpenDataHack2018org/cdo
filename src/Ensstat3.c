@@ -206,11 +206,12 @@ void *Ensstat3(void *argument)
     }
   } 
 
-  if ( operfunc != func_roc ) {
-    streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+  if ( operfunc != func_roc )
+    {
+      streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
-    streamDefVlist(streamID2, vlistID2);
-  }
+      streamDefVlist(streamID2, vlistID2);
+    }
 
   gridsize = vlistGridsizeMax(vlistID1);
 

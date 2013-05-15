@@ -383,8 +383,8 @@ void *Gather(void *argument)
 	}
     }
 
-  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
-
+  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
+      
   streamDefVlist(streamID2, vlistID2);
 	  
   array2 = (double *) malloc(gridsize2*sizeof(double));

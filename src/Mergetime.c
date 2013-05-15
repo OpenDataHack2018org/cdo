@@ -122,7 +122,7 @@ void *Mergetime(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  streamID2 = streamOpenWrite(ofilename, cdoFiletype());
+  streamID2 = streamOpenWrite(cdoStreamName(nfiles), cdoFiletype());
 
   if ( ! lcopy )
     {

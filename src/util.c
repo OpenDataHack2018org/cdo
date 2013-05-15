@@ -98,8 +98,8 @@ argument_t *file_argument_new(const char *filename)
 
   argument->argc = 1;
   argument->argv = (char **) calloc(1, sizeof(char *));
-  argument->argv[0] = filename;
-  argument->args = filename;
+  argument->argv[0] = (char *) filename;
+  argument->args = (char *) filename;
 
   return (argument);
 }

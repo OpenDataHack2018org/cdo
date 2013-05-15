@@ -67,7 +67,9 @@ void *Change_e5slm(void *argument)
   fn_slm = operatorArgv()[0];
 
   /* read SLM */
-  streamIDslm = streamOpenRead(fn_slm);
+  argument_t *fileargument = file_argument_new(fn_slm);
+  streamIDslm = streamOpenRead(fileargument);
+  file_argument_free(fileargument);
 
   vlistIDslm = streamInqVlist(streamIDslm);
 

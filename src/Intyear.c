@@ -92,8 +92,10 @@ void *Intyear(void *argument)
       sprintf(filename+nchars, "%04d", iyears[iy]);
       if ( filesuffix[0] )
 	sprintf(filename+nchars+4, "%s", filesuffix);
-      /*	  printf("filename %s\n", filename); */
-      streamIDs[iy] = streamOpenWrite(filename, cdoFiletype());
+
+      argument_t *fileargument = file_argument_new(filename);
+      streamIDs[iy] = streamOpenWrite(fileargument, cdoFiletype());
+      file_argument_free(fileargument);
 
       streamDefVlist(streamIDs[iy], vlistID3);
     }

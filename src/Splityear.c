@@ -112,7 +112,9 @@ void *Splityear(void *argument)
 	  
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
 
-	  streamID2 = streamOpenWrite(filename, cdoFiletype());
+	  argument_t *fileargument = file_argument_new(filename);
+	  streamID2 = streamOpenWrite(fileargument, cdoFiletype());
+	  file_argument_free(fileargument);
 
 	  streamDefVlist(streamID2, vlistID2);
 	}

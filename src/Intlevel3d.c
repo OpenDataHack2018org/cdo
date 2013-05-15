@@ -238,7 +238,9 @@ void *Intlevel3d(void *argument)
   /*  Read filename from Parameter */
   operatorInputArg("grid description file or name, remap file (SCRIP netCDF)");
   operatorCheckArgc(1);
-  streamID0 = streamOpenRead(operatorArgv()[0]);                /*  3d vertical input coordinate */
+  argument_t *fileargument = file_argument_new(operatorArgv()[0]);
+  streamID0 = streamOpenRead(fileargument);                /*  3d vertical input coordinate */
+  file_argument_free(fileargument);
   streamID1 = streamOpenRead(cdoStreamName(0));                 /*  input data */
   streamID2 = streamOpenRead(cdoStreamName(1));                 /*  3d target vertical coordinate */
   streamID3 = streamOpenWrite(cdoStreamName(2),cdoFiletype());  /*  output stream */

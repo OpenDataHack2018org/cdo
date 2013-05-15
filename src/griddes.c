@@ -667,6 +667,7 @@ double readflt(const char *filename, const char *name, const char *pline)
   return (val);
 }
 
+void str2uuid(const char *uuidstr, char *uuid);
 
 int gridFromFile(FILE *gfp, const char *dname)
 {
