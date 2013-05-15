@@ -837,8 +837,13 @@ void pstreamClose(int pstreamID)
 
 	  pthread_join(pstreamptr->wthreadID, NULL);
 
+	  pthread_mutex_lock(pipe->mutex);
+	  vlistDestroy(pstreamptr->vlistID);
+	  pthread_mutex_unlock(pipe->mutex);
+
 	  processAddNvals(pipe->nvals);
 	  pipeDelete(pipe);
+
 	  pstream_delete_entry(pstreamptr);
 	}
       else
@@ -859,10 +864,6 @@ void pstreamClose(int pstreamID)
 	    }
 	  pthread_mutex_unlock(pipe->mutex);
 	}
-
-      pthread_mutex_lock(pipe->mutex);
-      vlistDestroy(pstreamptr->vlistID);
-      pthread_mutex_unlock(pipe->mutex);
 
       processDelStream(pstreamID);
 #else
