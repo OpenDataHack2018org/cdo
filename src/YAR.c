@@ -24,6 +24,8 @@
 #if defined (HAVE_LIBYAC)
 #include "points.h"
 #include "grid_reg2d.h"
+#include "grid_search.h"
+#include "bucket_search.h"
 #include "event.h"
 #include "search.h"
 #include "clipping.h"
@@ -79,12 +81,6 @@ void set_source_data(double * source_data, double init_value,
          source_data[i + j * size_x] = init_value;
 }
 
-
-int grid_search( int *restrict src_add, double *restrict src_lats, 
-		double *restrict src_lons, double plat, double plon, const int *restrict src_grid_dims)
-{
-  return 0;
-}
 
 void testint_p(field_t *field1, field_t *field2)
 {
@@ -145,18 +141,18 @@ void testint_p(field_t *field1, field_t *field2)
   num_target_cells[1] = nlatOut;
 
   unsigned cyclic[2] = {0,0};
-  struct grid source_grid, target_grid;
+  struct grid *source_grid, *target_grid;
 
-  init_reg2d_grid(&source_grid, NULL, NULL, num_source_cells, cyclic);
-  init_reg2d_grid(&target_grid, NULL, NULL, num_target_cells, cyclic);
+  source_grid = reg2d_grid_new(NULL, NULL, num_source_cells, cyclic);
+  target_grid = reg2d_grid_new(NULL, NULL, num_target_cells, cyclic);
 
   struct points source_points, target_points;
 
   //--------------------------------------------
   // define points
   //--------------------------------------------
-  init_points(&source_points, &source_grid, CELL, lonIn, latIn);
-  init_points(&target_points, &target_grid, CELL, lonOut, latOut);
+  init_points(&source_points, source_grid, CELL, lonIn, latIn);
+  init_points(&target_points, target_grid, CELL, lonOut, latOut);
 
   //--------------------------------------------
   // initialise interpolation
@@ -168,12 +164,15 @@ void testint_p(field_t *field1, field_t *field2)
 
   // seg fault:  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_grid)));
   // seg fault:  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_grid)));
-  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_points)));
-  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_points)));
+  printf("src num_grid_corners %d\n", get_num_grid_corners(get_point_grid(&source_points)));
+  printf("tgt num_grid_corners %d\n", get_num_grid_corners(get_point_grid(&target_points)));
 
-  search_id = search_init(get_point_grid(&source_points));
+  // search_id = search_init(get_point_grid(&source_points));
+  struct grid_search *search;
+
+  search = bucket_search_new(source_grid);
  
-  do_point_search_p(*get_point_grid(&target_points), search_id, &tgt_to_src_cell);
+  //  do_point_search_p(*get_point_grid(&target_points), search, &tgt_to_src_cell);
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
 
@@ -265,11 +264,13 @@ void testint_c(field_t *field1, field_t *field2)
   xlatIn = (double *) malloc((nlatIn)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
+  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= rad;
+  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= rad;
   dxIn = lonIn[1] - lonIn[0];
   for ( int i = 0; i < nlonIn; ++i ) lonIn[i] -= dxIn/2;
   for ( int i = 0; i < nlatIn; ++i ) latIn[i] -= dxIn/2;
   //  latIn[nlatIn] = latIn[nlatIn-1] + dxIn;
-  latIn[nlatIn] = 90;
+  latIn[nlatIn] = 90*rad;
 
   if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
     cdoAbort("Target grid has no values");
@@ -285,11 +286,13 @@ void testint_c(field_t *field1, field_t *field2)
   xlatOut = (double *) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
+  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= rad;
+  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= rad;
   dxOut = lonOut[1] - lonOut[0];
   for ( int i = 0; i < nlonOut; ++i ) lonOut[i] -= dxOut/2;
   for ( int i = 0; i < nlatOut; ++i ) latOut[i] -= dxOut/2;
   //latOut[nlatOut] = latIn[nlatOut-1] + dxIn;
-  latOut[nlatOut] = 90;
+  latOut[nlatOut] = 90*rad;
   printf("dxIn: %g   dxOut: %g\n", dxIn, dxOut);
 #if defined (HAVE_LIBYAC)
 
@@ -304,10 +307,10 @@ void testint_c(field_t *field1, field_t *field2)
   num_target_cells[1] = nlatOut;
 
   unsigned cyclic[2] = {1,0};
-  struct grid source_grid, target_grid;
+  struct grid *source_grid, *target_grid;
 
-  init_reg2d_grid(&source_grid, lonIn, latIn, num_source_cells, cyclic);
-  init_reg2d_grid(&target_grid, lonOut, latOut, num_target_cells, cyclic);
+  source_grid = reg2d_grid_new(lonIn, latIn, num_source_cells, cyclic);
+  target_grid = reg2d_grid_new(lonOut, latOut, num_target_cells, cyclic);
 
   struct points source_points, target_points;
 
@@ -328,9 +331,12 @@ void testint_c(field_t *field1, field_t *field2)
   // printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_points)));
   //printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_points)));
 
-  search_id = search_init(&source_grid);
+  struct grid_search *search;
+
+  search = bucket_search_new(source_grid);
+  // search_id = search_init(&source_grid);
  
-  do_cell_search(target_grid, search_id, &tgt_to_src_cell);
+  do_cell_search(search, target_grid, &tgt_to_src_cell);
 
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(tgt_to_src_cell));
