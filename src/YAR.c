@@ -264,13 +264,13 @@ void testint_c(field_t *field1, field_t *field2)
   xlatIn = (double *) malloc((nlatIn)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
-  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= rad;
-  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= rad;
+  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
+  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
   dxIn = lonIn[1] - lonIn[0];
   for ( int i = 0; i < nlonIn; ++i ) lonIn[i] -= dxIn/2;
   for ( int i = 0; i < nlatIn; ++i ) latIn[i] -= dxIn/2;
   //  latIn[nlatIn] = latIn[nlatIn-1] + dxIn;
-  latIn[nlatIn] = 90*rad;
+  latIn[nlatIn] = 90*DEG2RAD;
 
   if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
     cdoAbort("Target grid has no values");
@@ -286,13 +286,13 @@ void testint_c(field_t *field1, field_t *field2)
   xlatOut = (double *) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
-  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= rad;
-  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= rad;
+  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
+  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
   dxOut = lonOut[1] - lonOut[0];
   for ( int i = 0; i < nlonOut; ++i ) lonOut[i] -= dxOut/2;
   for ( int i = 0; i < nlatOut; ++i ) latOut[i] -= dxOut/2;
   //latOut[nlatOut] = latIn[nlatOut-1] + dxIn;
-  latOut[nlatOut] = 90*rad;
+  latOut[nlatOut] = 90*DEG2RAD;
   printf("dxIn: %g   dxOut: %g\n", dxIn, dxOut);
 #if defined (HAVE_LIBYAC)
 

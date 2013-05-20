@@ -8,8 +8,7 @@
 @Operators = sellonlatbox selindexbox
 
 @BeginDescription
-Selects a box of the rectangular understood field.
-All input fields need to have the same horizontal grid.
+Selects a box of the rectangularly understood field. All input fields need to have the same horizontal grid.
 @EndDescription
 @EndModule
 
@@ -19,9 +18,8 @@ All input fields need to have the same horizontal grid.
 @Parameter = lon1 lon2 lat1 lat2
 
 @BeginDescription
-Selects a longitude/latitude box. The user has to give the 
-longitudes and latitudes of the edges of the box. 
-Considered are only those grid cells with the grid center inside the lon/lat box.
+Selects a regular longitude/latitude box. The user has to give the longitudes and latitudes of the 
+edges of the box. Considered are only those grid cells with the grid center inside the lon/lat box.
 @EndDescription
 @EndOperator
 
@@ -31,9 +29,8 @@ Considered are only those grid cells with the grid center inside the lon/lat box
 @Parameter = idx1 idx2 idy1 idy2
 
 @BeginDescription
-Selects an index box. The user has to give the indexes of the 
-edges of the box. The index of the left edge may be greater 
-then that of the right edge.
+Selects an index box. The user has to give the indexes of the edges of the box. The index of the 
+left edge may be greater then that of the right edge.
 @EndDescription
 @EndOperator
 
@@ -59,13 +56,11 @@ INTEGER  Index of last latitude
 
 
 @BeginExample
-To select the region with the longitudes from 120E to 90W and
-latitudes from 20N to 20S from all input fields use:
+To select the region with the longitudes from 120E to 90W and latitudes from 20N to 20S from all input fields use:
 @BeginVerbatim
    cdo sellonlatbox,120,-90,20,-20 ifile ofile
 @EndVerbatim
-If the input dataset has fields on a Gaussian N16 grid, the same box can
-be selected with @oper{selindexbox} by:
+If the input dataset has fields on a Gaussian N16 grid, the same box can be selected with @oper{selindexbox} by:
 @BeginVerbatim
    cdo selindexbox,23,48,13,20 ifile ofile
 @EndVerbatim

@@ -6,12 +6,11 @@
 @Operators = sethalo
 
 @BeginDescription
-This operator sets the left and right bounds of the rectangularly
-understood fields. Positive numbers of the parameter @math{lhalo} enlarges 
-the left bound by the given number of columns from the right bound. The
-parameter @math{rhalo} does the similar for the right bound.
-Negative numbers of the parameter @math{lhalo}/@math{rhalo} can be used to remove
-the given number of columns of the left and right bounds.
+This operator sets the left and right bounds of the rectangularly understood fields.
+Positive numbers of the parameter @math{lhalo} enlarges the left bound by the given 
+number of columns from the right bound. The parameter @math{rhalo} does the similar 
+for the right bound. Negative numbers of the parameter @math{lhalo}/@math{rhalo} can 
+be used to remove the given number of columns of the left and right bounds.
 @EndDescription
 @EndModule
 

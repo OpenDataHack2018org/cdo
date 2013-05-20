@@ -15,7 +15,7 @@
 Merges grid points of all variables from @file{ifile2} to @file{ifile1} and write the result to @file{ofile}.
 Only the non missing values of @file{ifile2} will be used. The horizontal grid of @file{ifile2} should 
 be smaller or equal to the grid of @file{ifile1} and the resolution must be the same.
-Only regular rectangular grids are supported. Both input files need to have the same variables 
+Only rectilinear grids are supported. Both input files need to have the same variables 
 and the same number of timesteps.
 @EndDescription
 @EndOperator
