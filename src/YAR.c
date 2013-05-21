@@ -31,7 +31,7 @@
 #include "clipping.h"
 #endif
 
-int lout = 1;
+int lout = 0;
 
 static
 void gen_xbounds(int nx, double *xvals, double *xbounds)
@@ -264,12 +264,13 @@ void testint_c(field_t *field1, field_t *field2)
   xlatIn = (double *) malloc((nlatIn)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
-  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
   dxIn = lonIn[1] - lonIn[0];
   for ( int i = 0; i < nlonIn; ++i ) lonIn[i] -= dxIn/2;
   for ( int i = 0; i < nlatIn; ++i ) latIn[i] -= dxIn/2;
+  for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
+  for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
   //  latIn[nlatIn] = latIn[nlatIn-1] + dxIn;
+  lonIn[nlonIn] = lonIn[nlonIn-1]+dxIn*DEG2RAD;
   latIn[nlatIn] = 90*DEG2RAD;
 
   if ( ! (gridInqXvals(gridIDout, NULL) && gridInqYvals(gridIDout, NULL)) )
@@ -286,14 +287,24 @@ void testint_c(field_t *field1, field_t *field2)
   xlatOut = (double *) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
-  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
-  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
   dxOut = lonOut[1] - lonOut[0];
   for ( int i = 0; i < nlonOut; ++i ) lonOut[i] -= dxOut/2;
   for ( int i = 0; i < nlatOut; ++i ) latOut[i] -= dxOut/2;
+  for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
+  for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
   //latOut[nlatOut] = latIn[nlatOut-1] + dxIn;
+  lonOut[nlonOut] = lonOut[nlonOut-1]+dxOut*DEG2RAD;
   latOut[nlatOut] = 90*DEG2RAD;
-  printf("dxIn: %g   dxOut: %g\n", dxIn, dxOut);
+
+  printf("source grid: inc = %g  nlon = %d  nlat = %d\n", dxIn, nlonIn, nlatIn);
+  printf("target grid: inc = %g  nlon = %d  nlat = %d\n", dxOut, nlonOut, nlatOut);
+
+  printf("lonIn: %g %g %g ... %g %g %g\n", lonIn[0]/DEG2RAD, lonIn[1]/DEG2RAD, lonIn[2]/DEG2RAD, lonIn[nlonIn-2]/DEG2RAD, lonIn[nlonIn-1]/DEG2RAD, lonIn[nlonIn]/DEG2RAD);
+  printf("latIn: %g %g %g ... %g %g %g\n", latIn[0]/DEG2RAD, latIn[1]/DEG2RAD, latIn[2]/DEG2RAD, latIn[nlatIn-2]/DEG2RAD, latIn[nlatIn-1]/DEG2RAD, latIn[nlatIn]/DEG2RAD);
+
+  printf("lonOut: %g %g %g ... %g %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD, lonOut[nlonOut]/DEG2RAD);
+  printf("latOut: %g %g %g ... %g %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD, latOut[nlatOut]/DEG2RAD);
+
 #if defined (HAVE_LIBYAC)
 
   //--------------------------------------------
@@ -345,6 +356,10 @@ void testint_c(field_t *field1, field_t *field2)
 
   enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
 
+  int n;
+  double weight_sum;
+  double const epsilon = 1.0e-10; // relative precision 
+
   double *weight;
   weight = (double *) malloc(gridsize1*sizeof(double));
 
@@ -377,26 +392,28 @@ void testint_c(field_t *field1, field_t *field2)
       int ilat2 = index2/nlonOut;
       int ilon2 = index2 - ilat2*nlonOut;
 
-      TargetCell.coordinates_x[0] =  xlonOut[ilon2]-dxOut/2;
-      TargetCell.coordinates_y[0] =  xlatOut[ilat2]-dxOut/2;
-      TargetCell.coordinates_x[1] =  xlonOut[ilon2]+dxOut/2;
-      TargetCell.coordinates_y[1] =  xlatOut[ilat2]-dxOut/2;
-      TargetCell.coordinates_x[2] =  xlonOut[ilon2]+dxOut/2;
-      TargetCell.coordinates_y[2] =  xlatOut[ilat2]+dxOut/2;
-      TargetCell.coordinates_x[3] =  xlonOut[ilon2]-dxOut/2;
-      TargetCell.coordinates_y[3] =  xlatOut[ilat2]+dxOut/2;
+      TargetCell.coordinates_x[0] =  lonOut[ilon2];
+      TargetCell.coordinates_y[0] =  latOut[ilat2];
+      TargetCell.coordinates_x[1] =  lonOut[ilon2+1];
+      TargetCell.coordinates_y[1] =  latOut[ilat2];
+      TargetCell.coordinates_x[2] =  lonOut[ilon2+1];
+      TargetCell.coordinates_y[2] =  latOut[ilat2+1];
+      TargetCell.coordinates_x[3] =  lonOut[ilon2];
+      TargetCell.coordinates_y[3] =  latOut[ilat2+1];
 
       if ( lout )
 	{
 	  printf("target:\n");
 	  for ( int n = 0; n < 4; ++n )
-	    printf(" %g %g", TargetCell.coordinates_x[n], TargetCell.coordinates_y[n]);
+	    printf(" %g %g", TargetCell.coordinates_x[n]/DEG2RAD, TargetCell.coordinates_y[n]/DEG2RAD);
 	  printf("\n");
 	}
 
       if ( lout )
 	printf("num_deps_per_element %d %d\n", i, tgt_to_src_cell.num_deps_per_element[i]);
       int num_deps = tgt_to_src_cell.num_deps_per_element[i];
+      int nSourceCells = num_deps;
+
       if ( num_deps > 0 ) curr_deps = get_dependencies_of_element(tgt_to_src_cell, i);
       for ( int k = 0; k < num_deps; ++k )
 	{
@@ -406,24 +423,26 @@ void testint_c(field_t *field1, field_t *field2)
 	  if ( lout )
 	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
 	
-	  SourceCell[k].coordinates_x[0] =  xlonIn[ilon1]-dxIn/2;
-	  SourceCell[k].coordinates_y[0] =  xlatIn[ilat1]-dxIn/2;
-	  SourceCell[k].coordinates_x[1] =  xlonIn[ilon1]+dxIn/2;
-	  SourceCell[k].coordinates_y[1] =  xlatIn[ilat1]-dxIn/2;
-	  SourceCell[k].coordinates_x[2] =  xlonIn[ilon1]+dxIn/2;
-	  SourceCell[k].coordinates_y[2] =  xlatIn[ilat1]+dxIn/2;
-	  SourceCell[k].coordinates_x[3] =  xlonIn[ilon1]-dxIn/2;
-	  SourceCell[k].coordinates_y[3] =  xlatIn[ilat1]+dxIn/2;
+	  SourceCell[k].coordinates_x[0] =  lonIn[ilon1];
+	  SourceCell[k].coordinates_y[0] =  latIn[ilat1];
+	  SourceCell[k].coordinates_x[1] =  lonIn[ilon1+1];
+	  SourceCell[k].coordinates_y[1] =  latIn[ilat1];
+	  SourceCell[k].coordinates_x[2] =  lonIn[ilon1+1];
+	  SourceCell[k].coordinates_y[2] =  latIn[ilat1+1];
+	  SourceCell[k].coordinates_x[3] =  lonIn[ilon1];
+	  SourceCell[k].coordinates_y[3] =  latIn[ilat1+1];
 	  if ( lout )
 	    {
 	      printf("source: %d\n", k);
 	      for ( int n = 0; n < 4; ++n )
-		printf(" %g %g", SourceCell[k].coordinates_x[n], SourceCell[k].coordinates_y[n]);
+		printf(" %g %g", SourceCell[k].coordinates_x[n]/DEG2RAD, SourceCell[k].coordinates_y[n]/DEG2RAD);
 	      printf("\n");
 	    }
 	}
       
       polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
+
+      correct_weights ( nSourceCells, weight );
 
       for ( int k = 0; k < num_deps; ++k )
 	{
