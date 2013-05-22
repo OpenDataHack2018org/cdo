@@ -764,8 +764,12 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
   if ( cdoVerbose )
     cdoPrint("Using %d latitude bins to restrict search.", nbins);
 
-  rg->bin_lats  = (restr_t *) realloc(rg->bin_lats, 2*nbins*sizeof(restr_t));
-  rg->bin_lons  = (restr_t *) realloc(rg->bin_lons, 2*nbins*sizeof(restr_t));
+  if ( nbins > 0 )
+    {
+      rg->bin_lats  = (restr_t *) realloc(rg->bin_lats, 2*nbins*sizeof(restr_t));
+      rg->bin_lons  = (restr_t *) realloc(rg->bin_lons, 2*nbins*sizeof(restr_t));
+    }
+
   for ( n = 0; n < nbins; ++n )
     {
       n2 = n<<1;
@@ -775,7 +779,7 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
       rg->bin_lons[n2+1] = RESTR_SCALE(PI2);
     }
 
-  rg->bin_addr1 = (int *) realloc(rg->bin_addr1, 2*nbins*sizeof(int));
+  if ( nbins > 0 ) rg->bin_addr1 = (int *) realloc(rg->bin_addr1, 2*nbins*sizeof(int));
   for ( n = 0; n < nbins; ++n )
     {
       n2 = n<<1;
@@ -810,7 +814,7 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
 
   if ( map_type == MAP_TYPE_CONSERV )
     {
-      rg->bin_addr2 = (int *) realloc(rg->bin_addr2, 2*nbins*sizeof(int));
+      if ( nbins > 0 ) rg->bin_addr2 = (int *) realloc(rg->bin_addr2, 2*nbins*sizeof(int));
       for ( n = 0; n < nbins; ++n )
 	{
 	  n2 = n<<1;
@@ -1333,7 +1337,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     Set up and assign address ranges to search bins in order to 
     further restrict later searches
   */
-  if ( rg->restrict_type == RESTRICT_LATITUDE )
+  if ( rg->restrict_type == RESTRICT_LATITUDE || rg->restrict_type == 0 )
     {
       calc_lat_bins(rg, map_type);
     }
