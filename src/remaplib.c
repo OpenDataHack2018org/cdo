@@ -2069,7 +2069,6 @@ int grid_search(remapgrid_t *rg, int *restrict src_add, double *restrict src_lat
   This routine stores the address and weight for four links associated with one destination
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
-static
 void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add, const double *restrict weights)
 {
   /*

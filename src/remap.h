@@ -184,3 +184,5 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
 		       int remap_order, remapgrid_t rg, remapvars_t rv);
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
 		      int *remap_order, remapgrid_t *rg, remapvars_t *rv);
+
+void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add, const double *restrict weights);
