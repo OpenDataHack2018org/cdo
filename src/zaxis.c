@@ -463,7 +463,6 @@ int ztype2ltype(int zaxistype)
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_LAND  )  ltype = 111;
   else if ( zaxistype == ZAXIS_ISENTROPIC        )  ltype = 113;
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_SEA   )  ltype = 160;
-  else cdoWarning("zaxis type %d not supported", zaxistype);
 
   return (ltype);
 }
