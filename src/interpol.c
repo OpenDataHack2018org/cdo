@@ -4,6 +4,9 @@
 #include "grid.h"
 #include "util.h"  /* progressStatus */
 
+#if defined (_OPENMP)
+#include <omp.h>  // omp_get_thread_num()
+#endif
 
 /**
 * Find the interval i-1 .. i in which an element x fits
@@ -133,18 +136,23 @@ void intlinarr2(double missval,
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, findex, gridsize2, missval) \
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex) \
   private(i, jj, ii)
 #endif
   for ( i = 0; i < gridsize2; ++i )
     {
+      int lprogress = 1;
+#if defined (_OPENMP)
+      if ( omp_get_thread_num() != 0 ) lprogress = 0;
+#endif
+
       field[i] = missval;
 
 #if defined (_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
-      if ( ompNumThreads == 1 ) progressStatus(0, 1, findex/gridsize2);
+      if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 
       jj = find_element(y[i], nym, ym);
 	  
