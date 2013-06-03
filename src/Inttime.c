@@ -194,10 +194,10 @@ void *Inttime(void *argument)
 	  streamReadRecord(streamID1, single2, &nmiss2[varID][levelID]);
 	}
 
-      while ( juldate_to_seconds(juldate) < juldate_to_seconds(juldate2) )
+      while ( juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2) )
 	{
 	  if ( juldate_to_seconds(juldate) >= juldate_to_seconds(juldate1) &&
-	       juldate_to_seconds(juldate) <  juldate_to_seconds(juldate2) )
+	       juldate_to_seconds(juldate) <= juldate_to_seconds(juldate2) )
 	    {
 	      juldate_decode(calendar, juldate, &vdate, &vtime);
 
@@ -217,7 +217,6 @@ void *Inttime(void *argument)
 	      if ( streamID2 == -1 )
 		{
 		  streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
-
 		  streamDefVlist(streamID2, vlistID2);
 		}
 
