@@ -36,10 +36,10 @@ long find_element(double x, long nelem, const double *array)
 
       /* search for the interval in which x fits */
       // implementation: binary search algorithm
-      for ( ii = 1; ii < nelem; ii++ )
+      for ( ii = 1; ii < nelem; ++ii )
 	{
 	  // binary search: divide search room in the middle
-	  mid = first + ((last - first) / 2);
+	  mid = first + ((last - first) >> 1);
       
 	  /* return the bigger interval border of the interval in which x fits */
 	  if ( x >= array[mid-1] && x <= array[mid] ) break;
@@ -58,10 +58,10 @@ long find_element(double x, long nelem, const double *array)
 
       /* search for the interval in which x fits */
       // implementation: binary search algorithm
-      for ( ii = 1; ii < nelem; ii++ )
+      for ( ii = 1; ii < nelem; ++ii )
 	{
 	  // binary search: divide search room in the middle
-	  mid = first + ((last - first) / 2);
+	  mid = first + ((last - first) >> 1);
       
 	  /* return the bigger interval border of the interval in which x fits */
 	  if ( x >= array[mid] && x <= array[mid-1] ) break;
