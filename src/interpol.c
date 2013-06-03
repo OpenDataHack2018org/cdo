@@ -97,6 +97,23 @@ long find_element_old(double x, long nelem, const double *array)
 }
 */
 
+static
+int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym)
+{
+  int lfound = 0;
+
+  *jj = find_element(y, nym, ym);
+	  
+  if ( *jj < nym )
+    {
+      *ii = find_element(x, nxm, xm);
+	  
+      if ( *ii < nxm ) lfound = 1;
+    }
+
+  return (lfound);
+}
+
 double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym,
 		   double x, double y)
 {
@@ -141,6 +158,7 @@ void intlinarr2(double missval,
 #endif
   for ( i = 0; i < gridsize2; ++i )
     {
+      int lfound;
       int lprogress = 1;
 #if defined (_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
@@ -154,23 +172,18 @@ void intlinarr2(double missval,
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 
-      jj = find_element(y[i], nym, ym);
-	  
-      if ( jj < nym )
+      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
+
+      if ( lfound )
 	{
-	  ii = find_element(x[i], nxm, xm);
-	  
-	  if ( ii < nxm )
-	    {
-	      field[i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj])
-		                   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
-		       + fieldm[jj-1][ii] * (x[i]-xm[ii-1]) * (y[i]-ym[jj])
+	  field[i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj])
+	                           / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
+	           + fieldm[jj-1][ii] * (x[i]-xm[ii-1]) * (y[i]-ym[jj])
 		                   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]))
-		       + fieldm[jj][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj-1])
-		                  / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
-		       + fieldm[jj][ii] * (x[i]-xm[ii-1]) * (y[i]-ym[jj-1])
-		                   / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
-	    }
+		   + fieldm[jj][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj-1])
+		                 / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
+		   + fieldm[jj][ii] * (x[i]-xm[ii-1]) * (y[i]-ym[jj-1])
+		                 / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
 	}
     }
  
