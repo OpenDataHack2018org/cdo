@@ -114,6 +114,7 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
   return (lfound);
 }
 
+
 double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym,
 		   double x, double y)
 {
@@ -150,8 +151,6 @@ void intlinarr2(double missval,
   double findex = 0;
 
   progressInit();
-
-  for ( ii = 0; ii < nxm; ++ii ) printf("x: %d %g\n", ii+1, xm[ii]);
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
@@ -237,6 +236,7 @@ void intgrid(field_t *field1, field_t *field2)
   double *array = NULL;
   double *array1, *array2;
   double missval;
+  char units[CDI_MAX_NAME];
   /* static int index = 0; */
 
   gridID1 = field1->grid;
@@ -255,6 +255,11 @@ void intgrid(field_t *field1, field_t *field2)
   gridInqXvals(gridID1, lon1);
   gridInqYvals(gridID1, lat1);
 
+  gridInqXunits(gridID1, units);
+
+  grid_to_radian(units, nlon1, lon1, "grid1 center lon"); 
+  grid_to_radian(units, nlat1, lat1, "grid1 center lat"); 
+
   nlon2 = gridInqXsize(gridID2);
   nlat2 = gridInqYsize(gridID2);
 
@@ -269,7 +274,12 @@ void intgrid(field_t *field1, field_t *field2)
       gridInqXvals(gridID2, &lon2);
       gridInqYvals(gridID2, &lat2);
 
-      if ( lon2 < lon1[0] ) lon2 += 360;
+      gridInqXunits(gridID2, units);
+
+      grid_to_radian(units, nlon2, &lon2, "grid2 center lon"); 
+      grid_to_radian(units, nlat2, &lat2, "grid2 center lat"); 
+
+      if ( lon2 < lon1[0] ) lon2 += 2*M_PI;
 
       if ( lon2 > lon1[nlon1-1] )
 	{
@@ -320,6 +330,11 @@ void intgrid(field_t *field1, field_t *field2)
       lat2 = (double *) malloc(gridsize2*sizeof(double));
       gridInqXvals(gridID2, lon2);
       gridInqYvals(gridID2, lat2);
+
+      gridInqXunits(gridID2, units);
+
+      grid_to_radian(units, gridsize2, lon2, "grid2 center lon"); 
+      grid_to_radian(units, gridsize2, lat2, "grid2 center lat"); 
 
       intlinarr2(missval,
 		 nlon1, nlat1, array1_2D, lon1, lat1,
