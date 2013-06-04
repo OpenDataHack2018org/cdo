@@ -20,6 +20,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "interpol.h"
+#include "grid.h"
 #include "remap.h"
 
 #if defined (HAVE_LIBYAC)

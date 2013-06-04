@@ -232,7 +232,7 @@ int gengrid(int gridID1, int lhalo, int rhalo)
   gridDefYlongname(gridID2, ylongname);
   gridDefYunits(gridID2, yunits);
 
-  if ( memcmp(xunits, "degree", 6) == 0 ) cpi2 *= rad2deg;
+  if ( memcmp(xunits, "degree", 6) == 0 ) cpi2 *= RAD2DEG;
 
   if ( gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL) )
     {

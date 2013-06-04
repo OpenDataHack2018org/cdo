@@ -85,22 +85,14 @@ char *strdup(const char *s);
 #endif
 
 
-#ifndef  M_PI
-#define  M_PI        3.14159265358979323846  /* pi */
-#endif
-
 #ifndef  M_LN10
 #define  M_LN10      2.30258509299404568402  /* log_e 10 */
 #endif
 
-
-#ifndef  RAD2DEG
-#define  RAD2DEG  (180./M_PI)   /* conversion for rad to deg */
+#ifndef  M_PI
+#define  M_PI        3.14159265358979323846  /* pi */
 #endif
 
-#ifndef  DEG2RAD
-#define  DEG2RAD  (M_PI/180.)   /* conversion for deg to rad */
-#endif
 
 #define  IX2D(y,x,nx)  ((y)*(nx)+(x))
 

@@ -38,7 +38,7 @@ void gridToDegree(const char *units, const char *string, int gridsize, double *a
 
   if ( memcmp(units, "radian", 6) == 0 )
     {
-      for ( i = 0; i < gridsize; i++ ) array[i] *= rad2deg;
+      for ( i = 0; i < gridsize; i++ ) array[i] *= RAD2DEG;
     }
   else if ( memcmp(units, "degree", 6) == 0 )
     {
@@ -379,8 +379,8 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
       data.u = xvals[i];
       data.v = yvals[i];
       res = pj_inv(data, libProj);
-      xvals[i] = res.u*rad2deg;
-      yvals[i] = res.v*rad2deg;
+      xvals[i] = res.u*RAD2DEG;
+      yvals[i] = res.v*RAD2DEG;
     }
 #else
   cdoAbort("proj4 support not compiled in!");
@@ -423,8 +423,8 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
       data.u = xvals[i];
       data.v = yvals[i];
       res = pj_inv(data, libProj);
-      xvals[i] = res.u*rad2deg;
-      yvals[i] = res.v*rad2deg;
+      xvals[i] = res.u*RAD2DEG;
+      yvals[i] = res.v*RAD2DEG;
     }
 #else
   cdoAbort("proj4 support not compiled in!");
@@ -469,8 +469,8 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
       data.u = xvals[i];
       data.v = yvals[i];
       res = pj_inv(data, libProj);
-      xvals[i] = res.u*rad2deg;
-      yvals[i] = res.v*rad2deg;
+      xvals[i] = res.u*RAD2DEG;
+      yvals[i] = res.v*RAD2DEG;
     }
 #else
   cdoAbort("proj4 support not compiled in!");
@@ -1471,13 +1471,13 @@ int gridGenArea(int gridID, double *area)
       {
 	for ( i = 0; i < gridsize; ++i )
 	  {
-	    grid_center_lon[i] *= deg2rad;
-	    grid_center_lat[i] *= deg2rad;
+	    grid_center_lon[i] *= DEG2RAD;
+	    grid_center_lat[i] *= DEG2RAD;
 	  }
 	for ( i = 0; i < gridsize*nv; ++i )
 	  {
-	    grid_corner_lon[i] *= deg2rad;
-	    grid_corner_lat[i] *= deg2rad;
+	    grid_corner_lon[i] *= DEG2RAD;
+	    grid_corner_lat[i] *= DEG2RAD;
 	  }
       }
     else
@@ -1613,8 +1613,8 @@ int gridWeightsOld(int gridID, double *weights)
 	  sumw = 0;
 	  for ( j = 0; j < nlat; j++ )
 	    {
-	      phi1 = (lats[j-1]+lats[j])/2*deg2rad;
-	      phi2 = (lats[j+1]+lats[j])/2*deg2rad;
+	      phi1 = (lats[j-1]+lats[j])/2*DEG2RAD;
+	      phi2 = (lats[j+1]+lats[j])/2*DEG2RAD;
 	      if ( phi1 < (-1*M_PI/2) ) phi1 = -1*M_PI/2;
 	      if ( phi1 > (   M_PI/2) ) phi1 =    M_PI/2;
 	      if ( phi2 > (   M_PI/2) ) phi2 =    M_PI/2;
@@ -1626,8 +1626,8 @@ int gridWeightsOld(int gridID, double *weights)
 		    weights[datapoint] = 0;
 		  else
 		    {
-		      theta1 = (lons[i-1]+lons[i])/2*deg2rad;
-		      theta2 = (lons[i+1]+lons[i])/2*deg2rad;
+		      theta1 = (lons[i-1]+lons[i])/2*DEG2RAD;
+		      theta2 = (lons[i+1]+lons[i])/2*DEG2RAD;
 		      weights[datapoint] = fabs((theta2-theta1)*sindphi);
 		      sumw += weights[datapoint];
 		    }

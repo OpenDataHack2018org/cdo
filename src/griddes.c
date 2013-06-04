@@ -38,9 +38,6 @@
 #include "griddes.h"
 #include "error.h"
 
-#define  deg2rad  (M_PI/180.)   /* conversion for deg to rad */
-#define  rad2deg  (180./M_PI)   /* conversion for rad to deg */
-
 #define  cmpstr(s1, s2, len)  (memcmp(s1, s2, len = strlen(s2)))
 
 /*
@@ -1358,7 +1355,7 @@ int gridFromPingo(FILE *gfp, const char *dname)
 	  gaussaw(yvals, yw, grid.ysize);
 	  free(yw);
 	  for ( i = 0; i < (int) grid.ysize; i++ )
-	    yvals[i] = asin(yvals[i])*rad2deg;
+	    yvals[i] = asin(yvals[i])*RAD2DEG;
 
 	  for ( i = 0; i < (int) grid.ysize; i++ )
 	    if ( fabs(yvals[i] - grid.yvals[i]) > ((yvals[0] - yvals[1])/500) ) break;

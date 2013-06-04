@@ -22,7 +22,7 @@
 * @param x      the element to find a position for 
 */
 static
-long find_element(double x, long nelem, const double *array)
+long find_element(double x, long nelem, const double *restrict array)
 {
   long ii;
   long mid = 0;
@@ -150,6 +150,8 @@ void intlinarr2(double missval,
   double findex = 0;
 
   progressInit();
+
+  for ( ii = 0; ii < nxm; ++ii ) printf("x: %d %g\n", ii+1, xm[ii]);
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
