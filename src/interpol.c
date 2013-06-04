@@ -336,6 +336,12 @@ void intgrid(field_t *field1, field_t *field2)
       grid_to_radian(units, gridsize2, lon2, "grid2 center lon"); 
       grid_to_radian(units, gridsize2, lat2, "grid2 center lat"); 
 
+      for ( int i = 0; i < gridsize2; ++i )
+	{
+	  if ( lon2[i] < lon1[0]       ) lon2[i] += 2*M_PI;
+	  if ( lon2[i] > lon1[nlon1-1] ) lon2[i] -= 2*M_PI;
+	}
+
       intlinarr2(missval,
 		 nlon1, nlat1, array1_2D, lon1, lat1,
 		 gridsize2, array2, lon2, lat2);
