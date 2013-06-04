@@ -50,6 +50,38 @@ void gridToDegree(const char *units, const char *string, int gridsize, double *a
     }
 }
 
+static
+void scale_vec2(double scalefactor, long nvals, double *restrict vec1, double *restrict vec2)
+{
+  long n;
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) shared(nvals, scalefactor, vec1, vec2)
+#endif
+  for ( n = 0; n < nvals; ++n )
+    {
+      vec1[n] *= scalefactor;
+      vec2[n] *= scalefactor;
+    }
+}
+
+
+void grid_to_radian(const char *units, long nvals, double *restrict vec1, double *restrict vec2, const char *description)
+{
+  if ( memcmp(units, "degree", 6) == 0 )
+    {
+      scale_vec2(DEG2RAD, nvals, vec1, vec2);
+    }
+  else if ( memcmp(units, "radian", 6) == 0 )
+    {
+      /* No conversion necessary */
+    }
+  else
+    {
+      cdoWarning("Unknown units [%s] supplied for %s; proceeding assuming radians!", units, description);
+    }
+}
+
 
 int gridToZonal(int gridID1)
 {
