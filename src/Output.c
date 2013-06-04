@@ -174,9 +174,9 @@ void *Output(void *argument)
 	  {
 	    char units[CDI_MAX_NAME];
 	    gridInqXunits(gridID, units);
-	    gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+	    grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
 	    gridInqYunits(gridID, units);
-	    gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
+	    grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
 	  }
 	}
 

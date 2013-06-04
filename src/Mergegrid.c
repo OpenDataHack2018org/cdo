@@ -86,9 +86,9 @@ void gen_index(int gridID1, int gridID2, int *index)
       {
 	char units[CDI_MAX_NAME];
 	gridInqXunits(gridID1, units);
-	gridToDegree(units, "grid1 center lon", nlon1, xvals1);
+	grid_to_degree(units, nlon1, xvals1, "grid1 center lon");
 	gridInqYunits(gridID1, units);
-	gridToDegree(units, "grid1 center lat", nlat1, yvals1);
+	grid_to_degree(units, nlat1, yvals1, "grid1 center lat");
       }
 
       gridInqXvals(gridID2, xvals2);
@@ -98,9 +98,9 @@ void gen_index(int gridID1, int gridID2, int *index)
       {
 	char units[CDI_MAX_NAME];
 	gridInqXunits(gridID2, units);
-	gridToDegree(units, "grid2 center lon", nlon2, xvals2);
+	grid_to_degree(units, nlon2, xvals2, "grid2 center lon");
 	gridInqYunits(gridID2, units);
-	gridToDegree(units, "grid2 center lat", nlat2, yvals2);
+	grid_to_degree(units, nlat2, yvals2, "grid2 center lat");
       }
 
       for ( i2 = 0; i2 < nlat2; i2++ )

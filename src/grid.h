@@ -15,10 +15,10 @@
 #endif
 
 
-void grid_to_radian(const char *units, long nvals, double *restrict vec1, double *restrict vec2, const char *description);
+void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description);
+void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description);
 
 int referenceToGrid(int gridID);
-void gridToDegree(const char *units, const char *string, int gridsize, double *array);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);
 int gridToUnstructured(int gridID, int lbounds);

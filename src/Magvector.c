@@ -291,8 +291,8 @@ void *Magvector(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  uarray           = (double *) malloc(gridsize*sizeof(double));
-  varray           = (double *) malloc(gridsize*sizeof(double));
+  uarray          = (double *) malloc(gridsize*sizeof(double));
+  varray          = (double *) malloc(gridsize*sizeof(double));
   grid_center_lat = (double *) malloc(gridsize*sizeof(double));
   grid_center_lon = (double *) malloc(gridsize*sizeof(double));
 
@@ -301,9 +301,9 @@ void *Magvector(void *argument)
 
   /* Convert lat/lon units if required */
   gridInqXunits(gridID, units);
-  gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+  grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
   gridInqYunits(gridID, units);
-  gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
+  grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
 					
   tsID = 0;
 

@@ -717,9 +717,9 @@ void *Outputgmt(void *argument)
 
   /* Convert lat/lon units if required */
   gridInqXunits(gridID, units);
-  gridToDegree(units, "grid center lon", gridsize, grid_center_lon);
+  grid_to_degree(units, gridsize, grid_center_lon, "grid center lon");
   gridInqYunits(gridID, units);
-  gridToDegree(units, "grid center lat", gridsize, grid_center_lat);
+  grid_to_degree(units, gridsize, grid_center_lat, "grid center lat");
 
   nvals = gridsize;
   plon = grid_center_lon;
@@ -779,8 +779,8 @@ void *Outputgmt(void *argument)
 
 
       /* Note: using units from latitude instead from bounds */
-      gridToDegree(units, "grid corner lon", gridcorners*gridsize, grid_corner_lon);
-      gridToDegree(units, "grid corner lat", gridcorners*gridsize, grid_corner_lat);
+      grid_to_degree(units, gridcorners*gridsize, grid_corner_lon, "grid corner lon");
+      grid_to_degree(units, gridcorners*gridsize, grid_corner_lat, "grid corner lat");
 
       if ( zaxisInqLbounds(zaxisID, NULL) && zaxisInqUbounds(zaxisID, NULL) )
 	{

@@ -32,45 +32,26 @@
 #include "grid.h"
 
 
-void gridToDegree(const char *units, const char *string, int gridsize, double *array)
-{
-  long i;
-
-  if ( memcmp(units, "radian", 6) == 0 )
-    {
-      for ( i = 0; i < gridsize; i++ ) array[i] *= RAD2DEG;
-    }
-  else if ( memcmp(units, "degree", 6) == 0 )
-    {
-      /* No conversion necessary */
-    }
-  else
-    {
-      cdoWarning("Unknown units supplied for %s: %s", string, "proceeding assuming degrees!");
-    }
-}
-
 static
-void scale_vec2(double scalefactor, long nvals, double *restrict vec1, double *restrict vec2)
+void scale_vec(double scalefactor, long nvals, double *restrict values)
 {
   long n;
 
 #if defined (_OPENMP)
-#pragma omp parallel for default(none) shared(nvals, scalefactor, vec1, vec2)
+#pragma omp parallel for default(none) shared(nvals, scalefactor, values)
 #endif
   for ( n = 0; n < nvals; ++n )
     {
-      vec1[n] *= scalefactor;
-      vec2[n] *= scalefactor;
+      values[n] *= scalefactor;
     }
 }
 
 
-void grid_to_radian(const char *units, long nvals, double *restrict vec1, double *restrict vec2, const char *description)
+void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description)
 {
   if ( memcmp(units, "degree", 6) == 0 )
     {
-      scale_vec2(DEG2RAD, nvals, vec1, vec2);
+      scale_vec(DEG2RAD, nvals, values);
     }
   else if ( memcmp(units, "radian", 6) == 0 )
     {
@@ -79,6 +60,23 @@ void grid_to_radian(const char *units, long nvals, double *restrict vec1, double
   else
     {
       cdoWarning("Unknown units [%s] supplied for %s; proceeding assuming radians!", units, description);
+    }
+}
+
+
+void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description)
+{
+  if ( memcmp(units, "radian", 6) == 0 )
+    {
+      for ( long n = 0; n < nvals; ++n ) values[n] *= RAD2DEG;
+    }
+  else if ( memcmp(units, "degree", 6) == 0 )
+    {
+      /* No conversion necessary */
+    }
+  else
+    {
+      cdoWarning("Unknown units [%s] supplied for %s; proceeding assuming degress!", units, description);
     }
 }
 
@@ -1198,8 +1196,8 @@ int gridCurvilinearToRegular(int gridID1)
       gridInqXunits(gridID1, xunits);
       gridInqYunits(gridID1, yunits);
 
-      gridToDegree(xunits, "grid1 center lon", nx, xvals);
-      gridToDegree(yunits, "grid1 center lat", ny, yvals);
+      grid_to_degree(xunits, "grid1 center lon", nx, xvals);
+      grid_to_degree(yunits, "grid1 center lat", ny, yvals);
 
       gridDefXvals(gridID2, xvals);
       gridDefYvals(gridID2, yvals);

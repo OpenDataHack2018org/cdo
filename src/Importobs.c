@@ -157,9 +157,9 @@ void *Importobs(void *argument)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
-    gridToDegree(units, "grid center lon", gridsize, xvals);
+    grid_to_degree(units, gridsize, xvals, "grid center lon");
     gridInqYunits(gridID, units);
-    gridToDegree(units, "grid center lat", gridsize, yvals);
+    grid_to_degree(units, gridsize, yvals, "grid center lat");
   }
 
   fp = fopen(cdoStreamName(0)->args, "r");

@@ -277,9 +277,9 @@ void *Mrotuv(void *argument)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
-    gridToDegree(units, "grid center lon", gridsize, grid1x);
+    grid_to_degree(units, gridsize, grid1x, "grid center lon");
     gridInqYunits(gridID1, units);
-    gridToDegree(units, "grid center lat", gridsize, grid1y);
+    grid_to_degree(units, gridsize, grid1y, "grid center lat");
   }
 
   p_to_uv_grid(nlon, nlat, grid1x, grid1y, gridux, griduy, gridvx, gridvy);

@@ -56,11 +56,11 @@ void rot_uv_back(int gridID, double *us, double *vs)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
-    gridToDegree(units, "xpole", 1, &xpole);
-    gridToDegree(units, "grid center lon", nlon, xvals);
+    grid_to_degree(units, 1, &xpole, "xpole");
+    grid_to_degree(units, nlon, xvals, "grid center lon");
     gridInqYunits(gridID, units);
-    gridToDegree(units, "ypole", 1, &ypole);
-    gridToDegree(units, "grid center lat", nlat, yvals);
+    grid_to_degree(units, 1, &ypole, "ypole");
+    grid_to_degree(units, nlat, yvals, "grid center lat");
   }
 
   for ( ilat = 0; ilat < nlat; ilat++ )

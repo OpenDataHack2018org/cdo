@@ -1129,10 +1129,14 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   gridInqYunits(gridID1, units);
 
-  grid_to_radian(units, rg->grid1_size, rg->grid1_center_lat, rg->grid1_center_lon, "grid1 center lat/lon"); 
+  grid_to_radian(units, rg->grid1_size, rg->grid1_center_lon, "grid1 center lon"); 
+  grid_to_radian(units, rg->grid1_size, rg->grid1_center_lat, "grid1 center lat"); 
   /* Note: using units from latitude instead from bounds */
   if ( rg->grid1_corners && rg->lneed_grid1_corners )
-    grid_to_radian(units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lat, rg->grid1_corner_lon, "grid1 corner lat/lon"); 
+    {
+      grid_to_radian(units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lon, "grid1 corner lon"); 
+      grid_to_radian(units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lat, "grid1 corner lat"); 
+    }
 
   if ( lgrid1_destroy ) gridDestroy(gridID1);
 
@@ -1189,10 +1193,14 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   gridInqYunits(gridID2, units);
 
-  grid_to_radian(units, rg->grid2_size, rg->grid2_center_lat, rg->grid2_center_lon, "grid2 center lat/lon"); 
+  grid_to_radian(units, rg->grid2_size, rg->grid2_center_lon, "grid2 center lon"); 
+  grid_to_radian(units, rg->grid2_size, rg->grid2_center_lat, "grid2 center lat"); 
   /* Note: using units from latitude instead from bounds */
   if ( rg->grid2_corners && rg->lneed_grid2_corners )
-    grid_to_radian(units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lat, rg->grid2_corner_lon, "grid2 corner lat/lon"); 
+    {
+      grid_to_radian(units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lon, "grid2 corner lon"); 
+      grid_to_radian(units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lat, "grid2 corner lat"); 
+    }
 
   if ( lgrid2_destroy ) gridDestroy(gridID2);
 
@@ -6409,7 +6417,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, nc_srcgrdcntrlat_id, "units", &attlen));
   grid1_units[attlen] = 0;
 
-  grid_to_radian(grid1_units, rg->grid1_size, rg->grid1_center_lat, rg->grid1_center_lon, "grid1 center lat/lon"); 
+  grid_to_radian(grid1_units, rg->grid1_size, rg->grid1_center_lon, "grid1 center lon"); 
+  grid_to_radian(grid1_units, rg->grid1_size, rg->grid1_center_lat, "grid1 center lat"); 
 
   if ( rg->grid1_corners )
     {
@@ -6420,7 +6429,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_attlen(nc_file_id, nc_srcgrdcrnrlat_id, "units", &attlen));
       grid1_units[attlen] = 0;
 
-      grid_to_radian(grid1_units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lat, rg->grid1_corner_lon, "grid1 corner lat/lon"); 
+      grid_to_radian(grid1_units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lon, "grid1 corner lon"); 
+      grid_to_radian(grid1_units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lat, "grid1 corner lat"); 
     }
 
   if ( rv->map_type == MAP_TYPE_CONSERV )
@@ -6439,7 +6449,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_attlen(nc_file_id, nc_dstgrdcntrlat_id, "units", &attlen));
   grid2_units[attlen] = 0;
 
-  grid_to_radian(grid2_units, rg->grid2_size, rg->grid2_center_lat, rg->grid2_center_lon, "grid2 center lat/lon"); 
+  grid_to_radian(grid2_units, rg->grid2_size, rg->grid2_center_lon, "grid2 center lon"); 
+  grid_to_radian(grid2_units, rg->grid2_size, rg->grid2_center_lat, "grid2 center lat"); 
 
   if ( rg->grid2_corners )
     {
@@ -6450,7 +6461,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_attlen(nc_file_id, nc_dstgrdcrnrlat_id, "units", &attlen));
       grid2_units[attlen] = 0;
       
-      grid_to_radian(grid2_units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lat, rg->grid2_corner_lon, "grid2 corner lat/lon"); 
+      grid_to_radian(grid2_units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lon, "grid2 corner lon"); 
+      grid_to_radian(grid2_units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lat, "grid2 corner lat"); 
     }
 
   if ( rv->map_type == MAP_TYPE_CONSERV )

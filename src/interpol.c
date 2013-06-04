@@ -408,9 +408,9 @@ void interpolate(field_t *field1, field_t *field2)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridIDi, units);
-    gridToDegree(units, "grid1 center lon", nlon, lon);
+    grid_to_degree(units, nlon, lon, "grid1 center lon");
     gridInqYunits(gridIDi, units);
-    gridToDegree(units, "grid1 center lat", nlat, lat);
+    grid_to_degree(units, nlat, lat, "grid1 center lat");
   }
 
   if ( nlon > 1 )
@@ -454,9 +454,9 @@ void interpolate(field_t *field1, field_t *field2)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridIDo, units);
-    gridToDegree(units, "grid2 center lon", out_nlon, lono);
+    grid_to_degree(units, out_nlon, lono, "grid2 center lon");
     gridInqYunits(gridIDo, units);
-    gridToDegree(units, "grid2 center lat", out_nlat, lato);
+    grid_to_degree(units, out_nlat, lato, "grid2 center lat");
   }
 
   for ( i = 0; i < out_nlon - 1; i++ )

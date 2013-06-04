@@ -337,9 +337,9 @@ void *Mrotuvb(void *argument)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID1, units);
-    gridToDegree(units, "grid1 center lon", gridsize, grid1x);
+    grid_to_degree(units, gridsize, grid1x, "grid1 center lon");
     gridInqYunits(gridID1, units);
-    gridToDegree(units, "grid1 center lat", gridsize, grid1y);
+    grid_to_degree(units, gridsize, grid1y, "grid1 center lat");
   }
 
   gridInqXvals(gridID2, grid2x);
@@ -349,9 +349,9 @@ void *Mrotuvb(void *argument)
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID2, units);
-    gridToDegree(units, "grid2 center lon", gridsize, grid2x);
+    grid_to_degree(units, gridsize, grid2x, "grid2 center lon");
     gridInqYunits(gridID2, units);
-    gridToDegree(units, "grid2 center lat", gridsize, grid2y);
+    grid_to_degree(units, gridsize, grid2y, "grid2 center lat");
   }
 
   if ( gpint )

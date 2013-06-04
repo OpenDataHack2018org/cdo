@@ -155,9 +155,9 @@ void maskregion(int *mask, int gridID, double *xcoords, double *ycoords, int nof
   {
     char units[CDI_MAX_NAME];
     gridInqXunits(gridID, units);
-    gridToDegree(units, "grid center lon", nlon, xvals);
+    grid_to_degree(units, nlon, xvals, "grid center lon");
     gridInqYunits(gridID, units);
-    gridToDegree(units, "grid center lat", nlat, yvals);
+    grid_to_degree(units, nlat, yvals, "grid center lat");
   }
 
   xmin = xvals[0];

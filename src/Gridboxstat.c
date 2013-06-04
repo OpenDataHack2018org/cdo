@@ -188,9 +188,9 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
       {
 	char units[CDI_MAX_NAME];
 	gridInqXunits(gridID1, units);
-	gridToDegree(units, "grid center lon", nlon1*nlat1, xvals1);
+	grid_to_degree(units, nlon1*nlat1, xvals1, "grid center lon");
 	gridInqYunits(gridID1, units);
-	gridToDegree(units, "grid center lat", nlon1*nlat1, yvals1);
+	grid_to_degree(units, nlon1*nlat1, yvals1, "grid center lat");
       }
       
       if ( gridHasBounds )
@@ -206,9 +206,9 @@ int genBoxGrid(int gridID1, int xinc, int yinc)
 	  {
 	    char units[CDI_MAX_NAME];
 	    gridInqXunits(gridID1, units);
-	    gridToDegree(units, "grid corner lon", 4*nlon1*nlat1, grid1_corner_lon);
+	    grid_to_degree(units, 4*nlon1*nlat1, grid1_corner_lon, "grid corner lon");
 	    gridInqYunits(gridID1, units);
-	    gridToDegree(units, "grid corner lat", 4*nlon1*nlat1, grid1_corner_lat);
+	    grid_to_degree(units, 4*nlon1*nlat1, grid1_corner_lat, "grid corner lat");
 	  }
         }
       
