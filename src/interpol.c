@@ -39,10 +39,14 @@ long find_element(double x, long nelem, const double *restrict array)
       for ( ii = 1; ii < nelem; ++ii )
 	{
 	  // binary search: divide search room in the middle
-	  mid = first + ((last - first) >> 1);
+	  // mid = first + ((last - first) >> 1);
+	  // faster!
+	  mid = (first + last) >> 1;
       
 	  /* return the bigger interval border of the interval in which x fits */
-	  if ( x >= array[mid-1] && x <= array[mid] ) break;
+	  // if ( x >= array[mid-1] && x <= array[mid] ) break;
+	  // faster!
+	  if ( !(x < array[mid-1] || x > array[mid]) ) break;
 
 	  // binary search: ignore half of the search room
 	  if ( x > array[mid] )
@@ -61,10 +65,14 @@ long find_element(double x, long nelem, const double *restrict array)
       for ( ii = 1; ii < nelem; ++ii )
 	{
 	  // binary search: divide search room in the middle
-	  mid = first + ((last - first) >> 1);
+	  // mid = first + ((last - first) >> 1);
+	  // faster!
+	  mid = (first + last) >> 1;
       
 	  /* return the bigger interval border of the interval in which x fits */
-	  if ( x >= array[mid] && x <= array[mid-1] ) break;
+	  // if ( x >= array[mid] && x <= array[mid-1] ) break;
+	  // faster!
+	  if ( !(x < array[mid] || x > array[mid-1]) ) break;
 
 	  // binary search: ignore half of the search room
 	  if ( x < array[mid] )
@@ -143,7 +151,7 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
 }
 
 static
-void intlinarr2(double missval, int lon_is_circular,
+void intlinarr2old(double missval, int lon_is_circular,
 		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
 		long gridsize2, double *field, const double *x, const double *y)
 {
@@ -195,8 +203,8 @@ void intlinarr2(double missval, int lon_is_circular,
 }
 
 static
-void intlinarr2test(double missval, int lon_is_circular,
-		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
+void intlinarr2(double missval, int lon_is_circular,
+		long nxm, long nym,  double *fieldm, const double *xm, const double *ym,
 		long gridsize2, double *field, const double *x, const double *y)
 {
   long i, ii, jj;
@@ -212,7 +220,7 @@ void intlinarr2test(double missval, int lon_is_circular,
   for ( jj = 0; jj < nym; ++jj )
     for ( ii = 0; ii < nlon1; ++ii )
       {
-	if ( !DBL_IS_EQUAL(fieldm[jj][ii], missval) ) grid1_mask[jj*nlon1+ii] = 1;
+	if ( !DBL_IS_EQUAL(fieldm[jj*nlon1+ii], missval) ) grid1_mask[jj*nlon1+ii] = 1;
       }
 
   progressInit();
@@ -243,7 +251,6 @@ void intlinarr2test(double missval, int lon_is_circular,
 
       lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
 
-      /* Check to see if points are land points */
       if ( lfound )
 	{
 	  iix = ii;
@@ -253,6 +260,7 @@ void intlinarr2test(double missval, int lon_is_circular,
 	  src_add[2] = (jj)*nlon1+(ii-1);
 	  src_add[3] = (jj)*nlon1+(iix);
 
+	  /* Check to see if points are missing values */
 	  for ( n = 0; n < 4; ++n )
 	    if ( ! grid1_mask[src_add[n]] ) lfound = 0;
 	}
@@ -266,10 +274,9 @@ void intlinarr2test(double missval, int lon_is_circular,
 	  wgts[2] = (x[i]-xm[ii])   * (y[i]-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
 	  wgts[3] = (x[i]-xm[ii-1]) * (y[i]-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
 	  
-	  field[i] = fieldm[jj-1][ii-1] * wgts[0]
-	           + fieldm[jj-1][iix] * wgts[1]
-		   + fieldm[jj][ii-1] * wgts[2]
-		   + fieldm[jj][iix] * wgts[3];
+	  field[i] = 0;
+	  for ( n = 0; n < 4; ++n )
+	    field[i] += fieldm[src_add[n]] * wgts[n];
 	}
     }
  
@@ -437,8 +444,8 @@ void intgrid(field_t *field1, field_t *field2)
 	  if ( lon2[i] > lon1[nlon1-1] ) lon2[i] -= 2*M_PI;
 	}
 
-      intlinarr2test(missval, lon_is_circular, 
-		 nlon1, nlat1, array1_2D, lon1, lat1,
+      intlinarr2(missval, lon_is_circular, 
+		 nlon1, nlat1, array1, lon1, lat1,
 		 gridsize2, array2, lon2, lat2);
 
       nmiss = 0;
