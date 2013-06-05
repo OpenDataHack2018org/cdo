@@ -9,15 +9,12 @@
 #endif
 
 /**
-* Find the interval i-1 .. i in which an element x fits
-* and return i, the bigger one of the interval borders
-* or x itself if it is an interval border.
-* If the index of x is 0, return 1, thus the bigger border. (strange?)
+* Find the interval i-1 .. i in which an element x fits and return i, the 
+* bigger one of the interval borders or x itself if it is an interval border.
 *
 * If no interval can be found return the length of the array.
-* TODO: Check whether the as strange marked behavior is intended.
 
-* @param *array ascending sorted list        TODO: check whether descending also needed
+* @param *array ascending or descending sorted list
 * @param nelem  length of the sorted list
 * @param x      the element to find a position for 
 */
@@ -151,61 +148,9 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
 }
 
 static
-void intlinarr2old(double missval, int lon_is_circular,
-		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
-		long gridsize2, double *field, const double *x, const double *y)
-{
-  long i, ii, jj;
-  double findex = 0;
-
-  progressInit();
-
-#if defined (_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, lon_is_circular) \
-  private(i, jj, ii)
-#endif
-  for ( i = 0; i < gridsize2; ++i )
-    {
-      int iix;
-      int lfound;
-      int lprogress = 1;
-#if defined (_OPENMP)
-      if ( omp_get_thread_num() != 0 ) lprogress = 0;
-#endif
-
-      field[i] = missval;
-
-#if defined (_OPENMP)
-#pragma omp atomic
-#endif
-      findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
-
-      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
-
-      if ( lfound )
-	{
-	  iix = ii;
-	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
-	  field[i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj])
-	                           / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
-	           + fieldm[jj-1][iix] * (x[i]-xm[ii-1]) * (y[i]-ym[jj])
-		                   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]))
-		   + fieldm[jj][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj-1])
-		                 / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
-		   + fieldm[jj][iix] * (x[i]-xm[ii-1]) * (y[i]-ym[jj-1])
-		                 / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
-	}
-    }
- 
-  if ( findex < gridsize2 ) progressStatus(0, 1, 1);
-}
-
-static
 void intlinarr2(double missval, int lon_is_circular,
-		long nxm, long nym,  double *fieldm, const double *xm, const double *ym,
-		long gridsize2, double *field, const double *x, const double *y)
+		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
+		long gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
   long i, ii, jj;
   long gridsize1;
