@@ -327,20 +327,18 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   num_target_cells[1] = nlatOut;
 
   unsigned cyclic[2] = {0,0};
-  struct grid *source_grid, *target_grid;
+  struct grid *source_grid;
 
   source_grid = reg2d_grid_new(xlonIn, xlatIn, num_source_cells, cyclic);
-  target_grid = reg2d_grid_new(xlonOut, xlatOut, num_target_cells, cyclic);
 
   if ( cdoTimer ) timer_stop(timer_yar_remap_init);
 
-  struct points source_points, target_points;
+  struct points source_points;
 
   //--------------------------------------------
   // define points
   //--------------------------------------------
   init_points(&source_points, source_grid, CELL, lonIn, latIn);
-  init_points(&target_points, target_grid, CELL, lonOut, latOut);
 
   //--------------------------------------------
   // initialise interpolation
@@ -350,23 +348,19 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   unsigned search_id;
   //struct interpolation interpolation;
 
-  // seg fault:  printf("src num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&source_grid)));
-  // seg fault:  printf("tgt num_grid_corners %d\n", get_num_grid_corners(*get_point_grid(&target_grid)));
   printf("src num_grid_corners %d\n", get_num_grid_corners(get_point_grid(&source_points)));
-  printf("tgt num_grid_corners %d\n", get_num_grid_corners(get_point_grid(&target_points)));
 
   // search_id = search_init(get_point_grid(&source_points));
   struct grid_search *search;
+  unsigned const * curr_src_corners;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_bil);
 
   search = bucket_search_new(source_grid);
- 
-  do_point_search_p(search, target_grid, &deps);
+  /*
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(deps));
 
-  unsigned const * curr_src_corners;
   for ( int i = 0; i < 10; ++i )
     {
       printf("num_deps_per_element %d %d\n", i, deps.num_deps_per_element[i]);
@@ -384,7 +378,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
       for ( int k = 0; k < deps.num_deps_per_element[i]; ++k )
 	printf("  curr_src_corners: %d %d\n", k, curr_src_corners[k]);
     }
-
+  */
   for ( int i = 0; i < gridsize2; ++i )
     {
       double wgts[4];
@@ -400,19 +394,23 @@ void yar_remap_bil(field_t *field1, field_t *field2)
       plon = lonOut[ix];
       plat = latOut[iy];
 
+      // do search
+      do_point_search_p3(search, &plon, &plat, 1, &deps, &source_points);
+
+      if ( i < 10 ) printf("total_num_dependencies: %d\n", get_total_num_dependencies(deps));
       //printf("i, ix, iy %d %d %d\n", i, ix, iy);
-      curr_src_corners = get_dependencies_of_element(deps,i);
+      curr_src_corners = get_dependencies_of_element(deps,0);
       for ( int k = 0; k < deps.num_deps_per_element[i]; ++k )
 	{
 	}
 
-      if ( deps.num_deps_per_element[i] == 4 )
+      if ( deps.num_deps_per_element[0] == 4 )
 	{
 	  int sa, src_add[4];                /*  address for the four source points     */
 	  double src_lats[4];            /* latitudes  of the four corner points   */
 	  double src_lons[4];            /* longitudes of the four corner points   */
 
-	  for ( int k = 0; k < deps.num_deps_per_element[i]; ++k )
+	  for ( int k = 0; k < deps.num_deps_per_element[0]; ++k )
 	    {
 	      sa = curr_src_corners[k];
 	      src_add[k] = sa;
@@ -424,7 +422,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 	    }
 
 	  // try it with do_point_search_p3
-	  //  if ( find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess) < 100 )
+	  if ( find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess) < 100 )
 	    {
 
 	      wgts[0] = (1.-iguess)*(1.-jguess);
