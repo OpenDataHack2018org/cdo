@@ -194,6 +194,90 @@ void intlinarr2(double missval, int lon_is_circular,
   if ( findex < gridsize2 ) progressStatus(0, 1, 1);
 }
 
+static
+void intlinarr2test(double missval, int lon_is_circular,
+		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
+		long gridsize2, double *field, const double *x, const double *y)
+{
+  long i, ii, jj;
+  long gridsize1;
+  long nlon1 = nxm;
+  double findex = 0;
+  int *grid1_mask = NULL;
+
+  if ( lon_is_circular ) nlon1--;
+  gridsize1 = nlon1*nym;
+
+  grid1_mask = (int *) calloc(1, gridsize1*sizeof(int));
+  for ( jj = 0; jj < nym; ++jj )
+    for ( ii = 0; ii < nlon1; ++ii )
+      {
+	if ( !DBL_IS_EQUAL(fieldm[jj][ii], missval) ) grid1_mask[jj*nlon1+ii] = 1;
+      }
+
+  progressInit();
+
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask) \
+  private(i, jj, ii)
+#endif
+  for ( i = 0; i < gridsize2; ++i )
+    {
+      int src_add[4];                /*  address for the four source points    */
+      long n;
+      long iix;
+      int lfound;
+      int lprogress = 1;
+#if defined (_OPENMP)
+      if ( omp_get_thread_num() != 0 ) lprogress = 0;
+#endif
+
+      field[i] = missval;
+
+#if defined (_OPENMP)
+#pragma omp atomic
+#endif
+      findex++;
+      if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
+
+      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
+
+      /* Check to see if points are land points */
+      if ( lfound )
+	{
+	  iix = ii;
+	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
+	  src_add[0] = (jj-1)*nlon1+(ii-1);
+	  src_add[1] = (jj-1)*nlon1+(iix);
+	  src_add[2] = (jj)*nlon1+(ii-1);
+	  src_add[3] = (jj)*nlon1+(iix);
+
+	  for ( n = 0; n < 4; ++n )
+	    if ( ! grid1_mask[src_add[n]] ) lfound = 0;
+	}
+
+      if ( lfound )
+	{
+	  double wgts[4];
+
+	  wgts[0] = (x[i]-xm[ii])   * (y[i]-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
+	  wgts[1] = (x[i]-xm[ii-1]) * (y[i]-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
+	  wgts[2] = (x[i]-xm[ii])   * (y[i]-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
+	  wgts[3] = (x[i]-xm[ii-1]) * (y[i]-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
+	  
+	  field[i] = fieldm[jj-1][ii-1] * wgts[0]
+	           + fieldm[jj-1][iix] * wgts[1]
+		   + fieldm[jj][ii-1] * wgts[2]
+		   + fieldm[jj][iix] * wgts[3];
+	}
+    }
+ 
+  if ( findex < gridsize2 ) progressStatus(0, 1, 1);
+
+  if ( grid1_mask ) free(grid1_mask);
+}
+
 
 double intlin(double x, double y1, double x1, double y2, double x2)
 {
@@ -304,7 +388,7 @@ void intgrid(field_t *field1, field_t *field2)
 	      array1_2D[ilat] = array + ilat*(nlon1+1);  
 	      memcpy(array1_2D[ilat], field[ilat], nlon1*sizeof(double));
 	      array1_2D[ilat][nlon1] = array1_2D[ilat][0];
-	      lon1[nlon1] = lon1[0] + 360;
+	      lon1[nlon1] = lon1[0] + 2*M_PI;
 	    }
 	  nlon1++;
 	  free(field);
@@ -353,7 +437,7 @@ void intgrid(field_t *field1, field_t *field2)
 	  if ( lon2[i] > lon1[nlon1-1] ) lon2[i] -= 2*M_PI;
 	}
 
-      intlinarr2(missval, lon_is_circular, 
+      intlinarr2test(missval, lon_is_circular, 
 		 nlon1, nlat1, array1_2D, lon1, lat1,
 		 gridsize2, array2, lon2, lat2);
 
