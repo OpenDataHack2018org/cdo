@@ -143,7 +143,7 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
 }
 
 static
-void intlinarr2(double missval,
+void intlinarr2(double missval, int lon_is_circular,
 		long nxm, long nym,  double **fieldm, const double *xm, const double *ym,
 		long gridsize2, double *field, const double *x, const double *y)
 {
@@ -154,11 +154,12 @@ void intlinarr2(double missval,
 
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex) \
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, lon_is_circular) \
   private(i, jj, ii)
 #endif
   for ( i = 0; i < gridsize2; ++i )
     {
+      int iix;
       int lfound;
       int lprogress = 1;
 #if defined (_OPENMP)
@@ -177,13 +178,15 @@ void intlinarr2(double missval,
 
       if ( lfound )
 	{
+	  iix = ii;
+	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
 	  field[i] = fieldm[jj-1][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj])
 	                           / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]))
-	           + fieldm[jj-1][ii] * (x[i]-xm[ii-1]) * (y[i]-ym[jj])
+	           + fieldm[jj-1][iix] * (x[i]-xm[ii-1]) * (y[i]-ym[jj])
 		                   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]))
 		   + fieldm[jj][ii-1] * (x[i]-xm[ii]) * (y[i]-ym[jj-1])
 		                 / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]))
-		   + fieldm[jj][ii] * (x[i]-xm[ii-1]) * (y[i]-ym[jj-1])
+		   + fieldm[jj][iix] * (x[i]-xm[ii-1]) * (y[i]-ym[jj-1])
 		                 / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
 	}
     }
@@ -230,6 +233,7 @@ void intgrid(field_t *field1, field_t *field2)
   int ilat;
   int gridID1, gridID2;
   int i, nmiss;
+  int lon_is_circular;
   double *lon1, *lat1;
   double **array1_2D = NULL;
   double **field;
@@ -248,24 +252,31 @@ void intgrid(field_t *field1, field_t *field2)
   if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
     cdoAbort("Source grid has no values");
 
+  lon_is_circular = gridIsCircular(gridID1);
+
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
+
+  array1_2D = (double **) malloc(nlat1*sizeof(double *));
+  for ( ilat = 0; ilat < nlat1; ilat++ )
+    array1_2D[ilat] = array1 + ilat*nlon1;
+
+  if ( lon_is_circular ) nlon1 += 1;
   lon1 = (double *) malloc(nlon1*sizeof(double));
   lat1 = (double *) malloc(nlat1*sizeof(double));
   gridInqXvals(gridID1, lon1);
   gridInqYvals(gridID1, lat1);
+  if ( lon_is_circular ) lon1[nlon1-1] = 0;
 
   gridInqXunits(gridID1, units);
 
   grid_to_radian(units, nlon1, lon1, "grid1 center lon"); 
   grid_to_radian(units, nlat1, lat1, "grid1 center lat"); 
 
+  if ( lon_is_circular ) lon1[nlon1-1] = lon1[0] + 2*M_PI;
+
   nlon2 = gridInqXsize(gridID2);
   nlat2 = gridInqYsize(gridID2);
-
-  array1_2D = (double **) malloc(nlat1*sizeof(double *));
-  for ( ilat = 0; ilat < nlat1; ilat++ )
-    array1_2D[ilat] = array1 + ilat*nlon1;
 
   if ( nlon2 == 1 && nlat2 == 1 )
     {
@@ -342,7 +353,7 @@ void intgrid(field_t *field1, field_t *field2)
 	  if ( lon2[i] > lon1[nlon1-1] ) lon2[i] -= 2*M_PI;
 	}
 
-      intlinarr2(missval,
+      intlinarr2(missval, lon_is_circular, 
 		 nlon1, nlat1, array1_2D, lon1, lat1,
 		 gridsize2, array2, lon2, lat2);
 
