@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.1
 	* Version 1.6.1 released
 
+2013-06-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* select: added support for key >minute< [request: Beate Gayer]
+
 2013-06-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* inttime: removes last time step [Bug #3611]
