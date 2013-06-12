@@ -230,6 +230,125 @@ void intlinarr2(double missval, int lon_is_circular,
   if ( grid1_mask ) free(grid1_mask);
 }
 
+static
+void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
+			   const double *restrict corner_lat, double *restrict bound_box)
+{
+  long inc, j;
+  double clon, clat;
+
+    {
+      inc = ic*nc;
+      clat = corner_lat[inc];
+      clon = corner_lon[inc];
+      bound_box[0] = clat;
+      bound_box[1] = clat;
+      bound_box[2] = clon;
+      bound_box[3] = clon;
+      for ( j = 1; j < nc; ++j )
+	{
+	  clat = corner_lat[inc+j];
+	  clon = corner_lon[inc+j];
+	  if ( clat < bound_box[0] ) bound_box[0] = clat;
+	  if ( clat > bound_box[1] ) bound_box[1] = clat;
+	  if ( clon < bound_box[2] ) bound_box[2] = clon;
+	  if ( clon > bound_box[3] ) bound_box[3] = clon;
+	}
+    }
+}
+
+static
+void intconarr2(double missval, int lon_is_circular,
+		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
+		long nc2, long gridsize2, double *field, const double *restrict x, const double *restrict y)
+{
+  long i, ii, jj;
+  long gridsize1;
+  long nlon1 = nxm;
+  double findex = 0;
+  int *grid1_mask = NULL;
+
+  //if ( lon_is_circular ) nlon1--;
+  gridsize1 = nlon1*nym;
+
+  grid1_mask = (int *) calloc(1, gridsize1*sizeof(int));
+  for ( jj = 0; jj < nym; ++jj )
+    for ( ii = 0; ii < nlon1; ++ii )
+      {
+	if ( !DBL_IS_EQUAL(fieldm[jj*nlon1+ii], missval) ) grid1_mask[jj*nlon1+ii] = 1;
+      }
+
+  progressInit();
+  /*
+#if defined (_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask, nc2) \
+  private(i, jj, ii)
+#endif
+  */
+  for ( i = 0; i < gridsize2; ++i )
+    {
+      int src_add[4];                /*  address for the four source points    */
+      long n;
+      long iix;
+      int lfound;
+      int lprogress = 1;
+      /*
+#if defined (_OPENMP)
+      if ( omp_get_thread_num() != 0 ) lprogress = 0;
+#endif
+      */
+      field[i] = missval;
+      
+      printf("%ld lonb: %g %g %g %g latb: %g %g %g %g\n", i+1, x[i*nc2], x[i*nc2+1], x[i*nc2+2], x[i*nc2+3], y[i*nc2], y[i*nc2+1], y[i*nc2+2], y[i*nc2+3]);
+
+      double bound_box[4];
+      boundbox_from_corners(i, nc2, x, y, bound_box);
+      printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2], bound_box[3], bound_box[0], bound_box[1]);
+      /*
+#if defined (_OPENMP)
+#pragma omp atomic
+#endif
+      */
+      findex++;
+      if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
+
+      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
+
+      if ( lfound )
+	{
+	  iix = ii;
+	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
+	  src_add[0] = (jj-1)*nlon1+(ii-1);
+	  src_add[1] = (jj-1)*nlon1+(iix);
+	  src_add[2] = (jj)*nlon1+(ii-1);
+	  src_add[3] = (jj)*nlon1+(iix);
+
+	  /* Check to see if points are missing values */
+	  for ( n = 0; n < 4; ++n )
+	    if ( ! grid1_mask[src_add[n]] ) lfound = 0;
+	}
+
+      if ( lfound )
+	{
+	  double wgts[4];
+
+	  wgts[0] = (x[i]-xm[ii])   * (y[i]-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
+	  wgts[1] = (x[i]-xm[ii-1]) * (y[i]-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
+	  wgts[2] = (x[i]-xm[ii])   * (y[i]-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
+	  wgts[3] = (x[i]-xm[ii-1]) * (y[i]-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
+	  
+	  field[i] = 0;
+	  for ( n = 0; n < 4; ++n )
+	    field[i] += fieldm[src_add[n]] * wgts[n];
+	}
+    }
+ 
+  if ( findex < gridsize2 ) progressStatus(0, 1, 1);
+
+  if ( grid1_mask ) free(grid1_mask);
+}
+
 
 double intlin(double x, double y1, double x1, double y2, double x2)
 {
@@ -483,7 +602,6 @@ void intgridcon(field_t *field1, field_t *field2)
   nlat2 = gridInqYsize(gridID2);
 
   int gridsize2;
-  double *lon2, *lat2;
 
   if ( gridInqType(gridID2) == GRID_GME ) gridID2 = gridToUnstructured(gridID2, 0);
 
@@ -495,36 +613,54 @@ void intgridcon(field_t *field1, field_t *field2)
 
   gridsize2 = gridInqSize(gridID2);
 
-  lon2 = (double *) malloc(gridsize2*sizeof(double));
-  lat2 = (double *) malloc(gridsize2*sizeof(double));
-  gridInqXvals(gridID2, lon2);
-  gridInqYvals(gridID2, lat2);
+  int nc2;
 
+  if ( gridInqType(gridID2) == GRID_UNSTRUCTURED )
+    nc2 = gridInqNvertex(gridID2);
+  else
+    nc2 = 4;
+
+  printf("nc2: %d\n", nc2);
+
+  double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
+
+  if ( gridInqYbounds(gridID2, NULL) && gridInqXbounds(gridID2, NULL) )
+    {
+      grid2_corner_lon = (double *) malloc(nc2*gridsize2*sizeof(double));
+      grid2_corner_lat = (double *) malloc(nc2*gridsize2*sizeof(double));
+      gridInqXbounds(gridID2, grid2_corner_lon);
+      gridInqYbounds(gridID2, grid2_corner_lat);
+    }
+  else
+    {
+      cdoAbort("grid2 corner missing!");
+    }
+ 
   gridInqXunits(gridID2, units);
 
-  grid_to_radian(units, gridsize2, lon2, "grid2 center lon"); 
-  grid_to_radian(units, gridsize2, lat2, "grid2 center lat"); 
-
+  grid_to_radian(units, nc2*gridsize2, grid2_corner_lon, "grid2 corner lon"); 
+  grid_to_radian(units, nc2*gridsize2, grid2_corner_lat, "grid2 corner lat"); 
+  /*
   for ( int i = 0; i < gridsize2; ++i )
     {
       if ( lon2[i] < lon1[0]       ) lon2[i] += 2*M_PI;
       if ( lon2[i] > lon1[nlon1-1] ) lon2[i] -= 2*M_PI;
     }
-
-  for ( i = 0; i < gridsize2; ++i ) array2[i] = missval;
-  /*
-  intlinarr2(missval, lon_is_circular, 
-	     nlon1, nlat1, array1, lon1, lat1,
-	     gridsize2, array2, lon2, lat2);
   */
+  for ( i = 0; i < gridsize2; ++i ) array2[i] = missval;
+
+  intconarr2(missval, lon_is_circular, 
+	     nlon1b, nlat1b, array1, lon1bounds, lat1bounds,
+	     nc2, gridsize2, array2, grid2_corner_lon, grid2_corner_lat);
+
   nmiss = 0;
   for ( i = 0; i < gridsize2; ++i )
     if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
 
   field2->nmiss = nmiss;
 
-  free(lon2);
-  free(lat2);
+  if (grid2_corner_lon) free(grid2_corner_lon);
+  if (grid2_corner_lat) free(grid2_corner_lat);
 
   if (array) free(array);
   free(lon1);
