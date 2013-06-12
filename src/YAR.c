@@ -35,7 +35,7 @@
 
 int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
 
-static
+
 void yar_remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
 	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array)
 {
@@ -57,7 +57,7 @@ void yar_remap(double *restrict dst_array, double missval, long dst_size, long n
   //for ( n = 0; n < 10; ++n ) printf("array2 %d %g\n", n, dst_array[n]);
 }
 
-static
+
 void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
 {
   /*

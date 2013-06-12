@@ -310,7 +310,7 @@ void thinout(field_t *field1, field_t *field2, int xinc, int yinc)
 
 void *Intgrid(void *argument)
 {
-  int INTGRIDBIL, INTPOINT, INTERPOLATE, BOXAVG, THINOUT;
+  int INTGRIDBIL, INTGRIDCON, INTPOINT, INTERPOLATE, BOXAVG, THINOUT;
   int operatorID;
   int streamID1, streamID2;
   int nrecs, ngrids;
@@ -330,6 +330,7 @@ void *Intgrid(void *argument)
   cdoInitialize(argument);
 
   INTGRIDBIL  = cdoOperatorAdd("intgridbil",  0, 0, NULL);
+  INTGRIDCON  = cdoOperatorAdd("intgridcon",  0, 0, NULL);
   INTPOINT    = cdoOperatorAdd("intpoint",    0, 0, NULL);
   INTERPOLATE = cdoOperatorAdd("interpolate", 0, 0, NULL);
   BOXAVG      = cdoOperatorAdd("boxavg",      0, 0, NULL);
@@ -337,7 +338,7 @@ void *Intgrid(void *argument)
 
   operatorID = cdoOperatorID();
 
-  if ( operatorID == INTGRIDBIL || operatorID == INTERPOLATE )
+  if ( operatorID == INTGRIDBIL || operatorID == INTGRIDCON || operatorID == INTERPOLATE )
     {
       operatorInputArg("grid description file or name");
       gridID2 = cdoDefineGrid(operatorArgv()[0]);
@@ -439,6 +440,8 @@ void *Intgrid(void *argument)
 
 	  if ( operatorID == INTGRIDBIL || operatorID == INTPOINT )
 	    intgridbil(&field1, &field2);
+	  if ( operatorID == INTGRIDCON )
+	    intgridcon(&field1, &field2);
 	  else if ( operatorID == INTERPOLATE )
 	    interpolate(&field1, &field2);
 	  else if ( operatorID == BOXAVG )

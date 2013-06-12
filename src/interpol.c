@@ -410,6 +410,128 @@ void intgridbil(field_t *field1, field_t *field2)
 }
 
 
+void gridGenBounds1(int ny, double *yvals, double *ybounds)
+{
+  int i;
+
+  for ( i = 0; i < ny-1; i++ )
+    {
+      ybounds[i+1] = 0.5*(yvals[i] + yvals[i+1]);
+    }
+
+  ybounds[0]  = 2*yvals[0] - ybounds[1];
+  ybounds[ny] = 2*yvals[ny-1] - ybounds[ny-1];
+}
+
+
+void intgridcon(field_t *field1, field_t *field2)
+{
+  int nlon1, nlat1;
+  int nlon1b, nlat1b;
+  int nlon2, nlat2;
+  int ilat;
+  int gridID1, gridID2;
+  int i, nmiss;
+  int lon_is_circular;
+  double *lon1, *lat1;
+  double *lon1bounds, *lat1bounds;
+  double **field;
+  double *array = NULL;
+  double *array1, *array2;
+  double missval;
+  char units[CDI_MAX_NAME];
+  /* static int index = 0; */
+
+  gridID1 = field1->grid;
+  gridID2 = field2->grid;
+  array1  = field1->ptr;
+  array2  = field2->ptr;
+  missval = field1->missval;
+
+  if ( ! (gridInqXvals(gridID1, NULL) && gridInqYvals(gridID1, NULL)) )
+    cdoAbort("Source grid has no values");
+
+  lon_is_circular = gridIsCircular(gridID1);
+
+  nlon1 = gridInqXsize(gridID1);
+  nlat1 = gridInqYsize(gridID1);
+
+  lon1 = (double *) malloc(nlon1*sizeof(double));
+  lat1 = (double *) malloc(nlat1*sizeof(double));
+  gridInqXvals(gridID1, lon1);
+  gridInqYvals(gridID1, lat1);
+
+  gridInqXunits(gridID1, units);
+
+  grid_to_radian(units, nlon1, lon1, "grid1 center lon"); 
+  grid_to_radian(units, nlat1, lat1, "grid1 center lat"); 
+
+  nlon1b = nlon1 + 1;
+  nlat1b = nlat1 + 1;
+  lon1bounds = (double *) malloc(nlon1b*sizeof(double));
+  lat1bounds = (double *) malloc(nlat1b*sizeof(double));
+
+  gridGenBounds1(nlon1, lon1, lon1bounds);
+  gridGenBounds1(nlat1, lat1, lat1bounds);
+
+  for ( int i = 0; i < nlat1; ++i )
+    printf("lat1 %d %g\n", i+1, lat1[i]*RAD2DEG);
+  printf("lat1bounds: %g %g %g ... %g %g %g\n", lat1bounds[0]*RAD2DEG, lat1bounds[1]*RAD2DEG, lat1bounds[2]*RAD2DEG, lat1bounds[nlat1b-3]*RAD2DEG, lat1bounds[nlat1b-2]*RAD2DEG, lat1bounds[nlat1b-1]*RAD2DEG);
+  printf("lon1bounds: %g %g %g ... %g %g %g\n", lon1bounds[0]*RAD2DEG, lon1bounds[1]*RAD2DEG, lon1bounds[2]*RAD2DEG, lon1bounds[nlon1b-3]*RAD2DEG, lon1bounds[nlon1b-2]*RAD2DEG, lon1bounds[nlon1b-1]*RAD2DEG);
+
+  nlon2 = gridInqXsize(gridID2);
+  nlat2 = gridInqYsize(gridID2);
+
+  int gridsize2;
+  double *lon2, *lat2;
+
+  if ( gridInqType(gridID2) == GRID_GME ) gridID2 = gridToUnstructured(gridID2, 0);
+
+  if ( gridInqType(gridID2) != GRID_UNSTRUCTURED && gridInqType(gridID2) != GRID_CURVILINEAR )
+    gridID2 = gridToCurvilinear(gridID2, 0);
+
+  if ( ! (gridInqXvals(gridID2, NULL) && gridInqYvals(gridID2, NULL)) )
+    cdoAbort("Target grid has no values");
+
+  gridsize2 = gridInqSize(gridID2);
+
+  lon2 = (double *) malloc(gridsize2*sizeof(double));
+  lat2 = (double *) malloc(gridsize2*sizeof(double));
+  gridInqXvals(gridID2, lon2);
+  gridInqYvals(gridID2, lat2);
+
+  gridInqXunits(gridID2, units);
+
+  grid_to_radian(units, gridsize2, lon2, "grid2 center lon"); 
+  grid_to_radian(units, gridsize2, lat2, "grid2 center lat"); 
+
+  for ( int i = 0; i < gridsize2; ++i )
+    {
+      if ( lon2[i] < lon1[0]       ) lon2[i] += 2*M_PI;
+      if ( lon2[i] > lon1[nlon1-1] ) lon2[i] -= 2*M_PI;
+    }
+
+  for ( i = 0; i < gridsize2; ++i ) array2[i] = missval;
+  /*
+  intlinarr2(missval, lon_is_circular, 
+	     nlon1, nlat1, array1, lon1, lat1,
+	     gridsize2, array2, lon2, lat2);
+  */
+  nmiss = 0;
+  for ( i = 0; i < gridsize2; ++i )
+    if ( DBL_IS_EQUAL(array2[i], missval) ) nmiss++;
+
+  field2->nmiss = nmiss;
+
+  free(lon2);
+  free(lat2);
+
+  if (array) free(array);
+  free(lon1);
+  free(lat1);
+}
+
+
 /* source code from pingo */
 void interpolate(field_t *field1, field_t *field2)
 {
