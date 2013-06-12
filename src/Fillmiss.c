@@ -24,7 +24,6 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
-#include "interpol.h"
 
 
 void fillmiss(field_t *field1, field_t *field2, int nfill)

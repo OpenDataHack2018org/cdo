@@ -217,7 +217,7 @@ void *Intgridtraj(void *argument)
 		  field2.ptr     = &point;
 		  field2.nmiss   = 0;
 
-		  intgrid(&field1, &field2);
+		  intgridbil(&field1, &field2);
 
 		  streamDefRecord(streamID2, varID, levelID);
 		  streamWriteRecord(streamID2, &point, nmiss);

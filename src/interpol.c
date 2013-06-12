@@ -262,7 +262,7 @@ void intlinarr(long nxm, double *ym, double *xm, int nx, double *y, double *x)
 }
 
 
-void intgrid(field_t *field1, field_t *field2)
+void intgridbil(field_t *field1, field_t *field2)
 {
   int nlon1, nlat1;
   int nlon2, nlat2;
