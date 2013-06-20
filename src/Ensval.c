@@ -55,7 +55,7 @@ void *Ensval(void *argument)
   int taxisID1, *taxisID2;
   int zaxisID1, *zaxisID2;
   //int xsize,ysize;
-  double missval;
+  double missval = 0;
   double *alpha, *beta, *alpha_weights, *beta_weights;
   double *brs_g, *brs_o, *brs_g_weights, *brs_o_weights;
   double *r;                      // Pointer to hold results for single time step

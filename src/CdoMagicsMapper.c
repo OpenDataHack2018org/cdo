@@ -3,6 +3,7 @@
 #endif
 
 #include "CdoMagicsMapper.h"
+#include "magics_template_parser.h"
 
 #define PARAM_COUNT  sizeof( mapper ) / sizeof ( CdoMagicsMapper )
 

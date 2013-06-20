@@ -52,13 +52,13 @@ double util_walltime(void)
   static double time_init = 0.;
 
   struct timeval tbuf;
-  if (gettimeofday(&tbuf,NULL) == -1) perror("UTIL_WALLTIME");
+  if ( gettimeofday(&tbuf,NULL) == -1 ) perror("UTIL_WALLTIME");
 
-  if (time_init == 0.) time_init =
-    (double) tbuf.tv_sec + (tbuf.tv_usec / 1000000.0);
+  // if ( time_init == 0. )
+  if ( !(time_init < 0. || 0. < time_init) )
+    time_init = (double) tbuf.tv_sec + (tbuf.tv_usec * 1.0e-6);
 
-  time_in_secs =
-  (double) tbuf.tv_sec + (tbuf.tv_usec / 1000000.0) - time_init;
+  time_in_secs = (double) tbuf.tv_sec + (tbuf.tv_usec * 1.0e-6) - time_init;
 #endif
 
   return (time_in_secs);
@@ -227,16 +227,14 @@ void util_get_real_time_size(int *rt_size)
 
 void util_read_real_time(void *it)
 { 
-  double *t;
-  t = (double *) it;
+  double *t = (double *) it;
   *t=util_walltime();
 }
 
 void util_diff_real_time(void *it1, void *it2, double *t)
 {
-  double *t1, *t2;
-  t1 = (double*) it1;
-  t2 = (double*) it2;
+  double *t1 = (double*) it1;
+  double *t2 = (double*) it2;
   *t = *t2 - *t1;
 } 
 

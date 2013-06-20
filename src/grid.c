@@ -1196,8 +1196,8 @@ int gridCurvilinearToRegular(int gridID1)
       gridInqXunits(gridID1, xunits);
       gridInqYunits(gridID1, yunits);
 
-      grid_to_degree(xunits, "grid1 center lon", nx, xvals);
-      grid_to_degree(yunits, "grid1 center lat", ny, yvals);
+      grid_to_degree(xunits, nx, xvals, "grid1 center lon");
+      grid_to_degree(yunits, ny, yvals, "grid1 center lat");
 
       gridDefXvals(gridID2, xvals);
       gridDefYvals(gridID2, yvals);

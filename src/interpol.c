@@ -300,11 +300,11 @@ void intconarr2(double missval, int lon_is_circular,
       */
       field[i] = missval;
       
-      printf("%ld lonb: %g %g %g %g latb: %g %g %g %g\n", i+1, x[i*nc2], x[i*nc2+1], x[i*nc2+2], x[i*nc2+3], y[i*nc2], y[i*nc2+1], y[i*nc2+2], y[i*nc2+3]);
+      printf("%ld lonb: %g %g %g %g latb: %g %g %g %g\n", i+1, x[i*nc2]*RAD2DEG, x[i*nc2+1]*RAD2DEG, x[i*nc2+2]*RAD2DEG, x[i*nc2+3]*RAD2DEG, y[i*nc2]*RAD2DEG, y[i*nc2+1]*RAD2DEG, y[i*nc2+2]*RAD2DEG, y[i*nc2+3]*RAD2DEG);
 
       double bound_box[4];
       boundbox_from_corners(i, nc2, x, y, bound_box);
-      printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2], bound_box[3], bound_box[0], bound_box[1]);
+      printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2]*RAD2DEG, bound_box[3]*RAD2DEG, bound_box[0]*RAD2DEG, bound_box[1]*RAD2DEG);
       /*
 #if defined (_OPENMP)
 #pragma omp atomic
@@ -313,7 +313,11 @@ void intconarr2(double missval, int lon_is_circular,
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 
-      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym); 
+      //      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym);
+      lfound = rect_grid_search(&ii, &jj, bound_box[2], bound_box[0], nxm, nym, xm, ym);
+      printf("p1 %d %ld %ld", lfound, ii, jj);
+      lfound = rect_grid_search(&ii, &jj, bound_box[3], bound_box[1], nxm, nym, xm, ym);
+      printf("  p2 %d  %ld %ld\n", lfound, ii, jj);
 
       if ( lfound )
 	{

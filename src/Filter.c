@@ -199,7 +199,7 @@ void *Filter(void *argument)
   int incperiod0, incunit0, incunit, dpy, calendar;
   int year0, month0, day0;
   double missval;
-  double *array1, *array2;
+  double *array1 = NULL, *array2 = NULL;
   double fdata = 0;
   field_t ***vars = NULL;
   double fmin = 0, fmax = 0;
