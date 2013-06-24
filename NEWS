@@ -1,8 +1,10 @@
 CDO NEWS
 --------
 
-Version 1.6.1 (18 June 2013):
+Version 1.6.1 (27 June 2013):
 
+   New features:
+     * support of blanks in filenames and parameter
    Changed operators:
      * gradsdes: added support for netCDF files
      * Info: add chunking information of netcdf files (only with verbose output) [Feature #3489]
