@@ -119,6 +119,55 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
   return (lfound);
 }
 
+static
+int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm)
+{
+  int lascend = 0;
+  long i;
+  *imin = nxm;
+  *imax = -1;
+  
+  if ( xm[0] < xm[nxm-1] ) lascend = 1;
+
+  int lfound = 0;
+
+  i = find_element(xmin, nxm, xm);
+
+  if ( i > 0 && i < nxm )
+    {
+      if ( lascend )
+	{
+	  if ( i > 1 && xmin <= xm[i-1] ) i--;
+	  *imin = i-1;
+	  *imax = i-1;
+	}
+      else
+	{
+	  if ( i > 1 && i < nxm-2 && xmin <= xm[i+1] ) i++;   
+	  *imin = i-1;
+	  *imax = i-1;
+	}
+    
+      i = find_element(xmax, nxm, xm);
+
+      if ( i > 0 && i < nxm )
+	{
+	  if ( lascend )
+	    {
+	      if ( i > 1 && i < nxm-2 && xmax >= xm[i+1] ) i++;   
+	      *imax = i-1;
+	    }
+	  else
+	    {
+	      if ( i > 1 && xmax >= xm[i-1] ) i--;
+	      *imin = i-1;
+	    }
+	}
+    }
+  
+  return (0);
+}
+
 
 double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const double *ym,
 		   double x, double y)
@@ -231,6 +280,15 @@ void intlinarr2(double missval, int lon_is_circular,
 }
 
 static
+void restrict_boundbox(const double *restrict grid_bound_box, double *restrict bound_box)
+{
+  if ( bound_box[0] < grid_bound_box[0] && bound_box[1] > grid_bound_box[0] ) bound_box[0] = grid_bound_box[0];
+  if ( bound_box[1] > grid_bound_box[1] && bound_box[0] < grid_bound_box[1] ) bound_box[1] = grid_bound_box[1];
+  //  if ( bound_box[2] < grid_bound_box[2] && bound_box[3] > grid_bound_box[2] ) bound_box[2] = grid_bound_box[2];
+  //  if ( bound_box[3] > grid_bound_box[3] && bound_box[2] < grid_bound_box[3] ) bound_box[3] = grid_bound_box[3];
+}
+
+static
 void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
 			   const double *restrict corner_lat, double *restrict bound_box)
 {
@@ -257,28 +315,87 @@ void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
     }
 }
 
+#if defined (HAVE_LIBYAC)
+#include "points.h"
+#include "grid_reg2d.h"
+#include "grid_search.h"
+#include "bucket_search.h"
+#include "event.h"
+#include "search.h"
+#include "clipping.h"
+#endif
+
 static
 void intconarr2(double missval, int lon_is_circular,
 		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
 		long nc2, long gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
-  long i, ii, jj;
+  long ndeps;
+  int deps[128];
+  long i, ii = -1, jj = -1;
   long gridsize1;
   long nlon1 = nxm;
   double findex = 0;
   int *grid1_mask = NULL;
 
+  printf(" nxm, nym %ld %ld\n", nxm, nym);
   //if ( lon_is_circular ) nlon1--;
-  gridsize1 = nlon1*nym;
+  gridsize1 = (nxm-1)*(nym-1);
 
   grid1_mask = (int *) calloc(1, gridsize1*sizeof(int));
-  for ( jj = 0; jj < nym; ++jj )
-    for ( ii = 0; ii < nlon1; ++ii )
+  for ( jj = 0; jj < nym-1; ++jj )
+    for ( ii = 0; ii < nxm-1; ++ii )
       {
-	if ( !DBL_IS_EQUAL(fieldm[jj*nlon1+ii], missval) ) grid1_mask[jj*nlon1+ii] = 1;
+	if ( !DBL_IS_EQUAL(fieldm[jj*(nxm-1)+ii], missval) ) grid1_mask[jj*(nxm-1)+ii] = 1;
       }
 
+  double grid1_bound_box[4];
+  grid1_bound_box[0] = ym[0];
+  grid1_bound_box[1] = ym[nym-1];
+  if ( ym[0] > ym[nym-1] )
+    {
+      grid1_bound_box[0] = ym[nym-1];
+      grid1_bound_box[1] = ym[0];
+    }
+  grid1_bound_box[2] = xm[0];
+  grid1_bound_box[3] = xm[nxm-1];
+ 
   progressInit();
+
+#if defined (HAVE_LIBYAC)
+  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+
+  int n;
+  double weight_sum;
+  double const epsilon = 1.0e-10; // relative precision 
+
+  double *weight;
+  weight = (double *) malloc(gridsize1*sizeof(double));
+
+  struct grid_cell *SourceCell;
+  SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
+
+  for ( int n = 0; n <  gridsize1; n++ ) {
+    SourceCell[n].num_corners   = 4;
+    SourceCell[n].edge_type     = quad_type;
+    SourceCell[n].coordinates_x = malloc (4 * sizeof(SourceCell[n].coordinates_x[0]) );
+    SourceCell[n].coordinates_y = malloc (4 * sizeof(SourceCell[n].coordinates_y[0]) );
+  }
+
+  struct grid_cell  TargetCell;
+
+  TargetCell.num_corners   = nc2;
+  TargetCell.edge_type     = quad_type;
+
+  TargetCell.coordinates_x = malloc (nc2 * sizeof(*TargetCell.coordinates_x) );
+  TargetCell.coordinates_y = malloc (nc2 * sizeof(*TargetCell.coordinates_y) );
+
+  unsigned const * curr_deps;
+  struct polygons polygons;
+
+  polygon_create ( &polygons );
+#endif
+
   /*
 #if defined (_OPENMP)
 #pragma omp parallel for default(none) \
@@ -293,6 +410,7 @@ void intconarr2(double missval, int lon_is_circular,
       long iix;
       int lfound;
       int lprogress = 1;
+      ndeps = 0;
       /*
 #if defined (_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
@@ -300,11 +418,16 @@ void intconarr2(double missval, int lon_is_circular,
       */
       field[i] = missval;
       
-      printf("%ld lonb: %g %g %g %g latb: %g %g %g %g\n", i+1, x[i*nc2]*RAD2DEG, x[i*nc2+1]*RAD2DEG, x[i*nc2+2]*RAD2DEG, x[i*nc2+3]*RAD2DEG, y[i*nc2]*RAD2DEG, y[i*nc2+1]*RAD2DEG, y[i*nc2+2]*RAD2DEG, y[i*nc2+3]*RAD2DEG);
+      // printf("%ld lonb: %g %g %g %g latb: %g %g %g %g\n", i+1, x[i*nc2]*RAD2DEG, x[i*nc2+1]*RAD2DEG, x[i*nc2+2]*RAD2DEG, x[i*nc2+3]*RAD2DEG, y[i*nc2]*RAD2DEG, y[i*nc2+1]*RAD2DEG, y[i*nc2+2]*RAD2DEG, y[i*nc2+3]*RAD2DEG);
 
+
+      double bound_lon1, bound_lon2;
       double bound_box[4];
       boundbox_from_corners(i, nc2, x, y, bound_box);
-      printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2]*RAD2DEG, bound_box[3]*RAD2DEG, bound_box[0]*RAD2DEG, bound_box[1]*RAD2DEG);
+      restrict_boundbox(grid1_bound_box, bound_box);
+      bound_lon1 = bound_box[2];
+      bound_lon2 = bound_box[3];
+      //  printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2]*RAD2DEG, bound_box[3]*RAD2DEG, bound_box[0]*RAD2DEG, bound_box[1]*RAD2DEG);
       /*
 #if defined (_OPENMP)
 #pragma omp atomic
@@ -314,44 +437,166 @@ void intconarr2(double missval, int lon_is_circular,
       if ( lprogress ) progressStatus(0, 1, findex/gridsize2);
 
       //      lfound = rect_grid_search(&ii, &jj, x[i], y[i], nxm, nym, xm, ym);
-      lfound = rect_grid_search(&ii, &jj, bound_box[2], bound_box[0], nxm, nym, xm, ym);
-      printf("p1 %d %ld %ld", lfound, ii, jj);
-      lfound = rect_grid_search(&ii, &jj, bound_box[3], bound_box[1], nxm, nym, xm, ym);
-      printf("  p2 %d  %ld %ld\n", lfound, ii, jj);
+      //     for ( int k = 0; k < nxm; ++k ) printf("x: %d %g\n", k+1, xm[k]);
+      //    for ( int k = 0; k < nym; ++k ) printf("y: %d %g\n", k+1, ym[k]*RAD2DEG);
+      long imin = nxm, imax = -1, jmin = nym, jmax = -1;
 
-      if ( lfound )
+      lfound = rect_grid_search2(&jmin, &jmax, bound_box[0], bound_box[1], nym, ym);
+      bound_lon1 = bound_box[2];
+      bound_lon2 = bound_box[3];
+      if ( bound_lon1 <= grid1_bound_box[3] && bound_lon2 >= grid1_bound_box[2] )
 	{
-	  iix = ii;
-	  if ( lon_is_circular && iix == (nxm-1) ) iix = 0;
-	  src_add[0] = (jj-1)*nlon1+(ii-1);
-	  src_add[1] = (jj-1)*nlon1+(iix);
-	  src_add[2] = (jj)*nlon1+(ii-1);
-	  src_add[3] = (jj)*nlon1+(iix);
-
-	  /* Check to see if points are missing values */
-	  for ( n = 0; n < 4; ++n )
-	    if ( ! grid1_mask[src_add[n]] ) lfound = 0;
+	  //printf("b1 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
+	  if ( bound_lon1 < grid1_bound_box[2] && bound_lon2 > grid1_bound_box[2] ) bound_lon1 = grid1_bound_box[2];
+	  if ( bound_lon2 > grid1_bound_box[3] && bound_lon1 < grid1_bound_box[3] ) bound_lon2 = grid1_bound_box[3];
+	  lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
+	  //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
+	  for ( long jm = jmin; jm <= jmax; ++jm )
+	    for ( long im = imin; im <= imax; ++im )
+	      deps[ndeps++] = jm*(nxm-1) + im;
 	}
 
-      if ( lfound )
-	{
-	  double wgts[4];
 
-	  wgts[0] = (x[i]-xm[ii])   * (y[i]-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
-	  wgts[1] = (x[i]-xm[ii-1]) * (y[i]-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
-	  wgts[2] = (x[i]-xm[ii])   * (y[i]-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
-	  wgts[3] = (x[i]-xm[ii-1]) * (y[i]-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
-	  
-	  field[i] = 0;
-	  for ( n = 0; n < 4; ++n )
-	    field[i] += fieldm[src_add[n]] * wgts[n];
+      bound_lon1 = bound_box[2];
+      bound_lon2 = bound_box[3];
+      if ( bound_lon1 <= grid1_bound_box[2] && bound_lon2 > grid1_bound_box[2] )
+	{
+	  bound_lon1 += 2*M_PI;
+	  bound_lon2 += 2*M_PI;
+	  //printf("b2 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
+	  if ( bound_lon1 < grid1_bound_box[2] && bound_lon2 > grid1_bound_box[2] ) bound_lon1 = grid1_bound_box[2];
+	  if ( bound_lon2 > grid1_bound_box[3] && bound_lon1 < grid1_bound_box[3] ) bound_lon2 = grid1_bound_box[3];
+	  lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
+	  //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
+	  for ( long jm = jmin; jm <= jmax; ++jm )
+	    for ( long im = imin; im <= imax; ++im )
+	      deps[ndeps++] = jm*(nxm-1) + im;
 	}
+
+      bound_lon1 = bound_box[2];
+      bound_lon2 = bound_box[3];
+      if ( bound_lon1 < grid1_bound_box[3] && bound_lon2 >= grid1_bound_box[3] )
+	{
+	  bound_lon1 -= 2*M_PI;
+	  bound_lon2 -= 2*M_PI;
+	  //printf("b3 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
+	  if ( bound_lon1 < grid1_bound_box[2] && bound_lon2 > grid1_bound_box[2] ) bound_lon1 = grid1_bound_box[2];
+	  if ( bound_lon2 > grid1_bound_box[3] && bound_lon1 < grid1_bound_box[3] ) bound_lon2 = grid1_bound_box[3];
+	  lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
+	  //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
+	  for ( long jm = jmin; jm <= jmax; ++jm )
+	    for ( long im = imin; im <= imax; ++im )
+	      deps[ndeps++] = jm*(nxm-1) + im;
+	}
+
+      //for ( long id = 0; id < ndeps; ++id )
+	//	printf("dep %ld %d\n", id+1, deps[id]);
+      /*
+      if ( bound_lon1 < grid1_bound_box[2] && bound_box[3] >= grid1_bound_box[2] )
+	lfound = rect_grid_search2(&imin, &imax, bound_box[2], bound_box[3], nxm, xm);
+      */
+
+#if defined (HAVE_LIBYAC)
+      int index2 = i;
+      /*
+      int ilat2 = index2/nlonOut;
+      int ilon2 = index2 - ilat2*nlonOut;
+      */
+      for ( int ic = 0; ic < nc2; ++ic )
+	{
+	  TargetCell.coordinates_x[ic] =  x[index2*nc2+ic];
+	  TargetCell.coordinates_y[ic] =  y[index2*nc2+ic];
+	}
+
+      if ( cdoVerbose )
+	{
+	  printf("target:\n");
+	  for ( int n = 0; n < nc2; ++n )
+	    printf(" %g %g", TargetCell.coordinates_x[n]/DEG2RAD, TargetCell.coordinates_y[n]/DEG2RAD);
+	  printf("\n");
+	}
+      /*
+      if ( cdoVerbose )
+	printf("num_deps_per_element %d %d\n", i, ndeps);
+      */
+      int num_deps = ndeps;
+      int nSourceCells = num_deps;
+
+      for ( int k = 0; k < num_deps; ++k )
+	{
+	  int index1 = deps[k];
+	  int ilat1 = index1/(nxm-1);
+	  int ilon1 = index1 - ilat1*(nxm-1);
+	  /*
+	  if ( cdoVerbose )
+	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
+	  */
+	  if ( ym[ilat1] < ym[ilat1+1] )
+	    {
+	      SourceCell[k].coordinates_x[0] =  xm[ilon1];
+	      SourceCell[k].coordinates_y[0] =  ym[ilat1];
+	      SourceCell[k].coordinates_x[1] =  xm[ilon1+1];
+	      SourceCell[k].coordinates_y[1] =  ym[ilat1];
+	      SourceCell[k].coordinates_x[2] =  xm[ilon1+1];
+	      SourceCell[k].coordinates_y[2] =  ym[ilat1+1];
+	      SourceCell[k].coordinates_x[3] =  xm[ilon1];
+	      SourceCell[k].coordinates_y[3] =  ym[ilat1+1];
+	    }
+	  else
+	    {
+	      SourceCell[k].coordinates_x[0] =  xm[ilon1];
+	      SourceCell[k].coordinates_y[0] =  ym[ilat1+1];
+	      SourceCell[k].coordinates_x[1] =  xm[ilon1+1];
+	      SourceCell[k].coordinates_y[1] =  ym[ilat1+1];
+	      SourceCell[k].coordinates_x[2] =  xm[ilon1+1];
+	      SourceCell[k].coordinates_y[2] =  ym[ilat1];
+	      SourceCell[k].coordinates_x[3] =  xm[ilon1];
+	      SourceCell[k].coordinates_y[3] =  ym[ilat1];
+	    }
+	  if ( cdoVerbose )
+	    {
+	      printf("source: %d\n", k);
+	      for ( int n = 0; n < 4; ++n )
+		printf(" %g %g", SourceCell[k].coordinates_x[n]/DEG2RAD, SourceCell[k].coordinates_y[n]/DEG2RAD);
+	      printf("\n");
+	    }
+	}
+      
+      polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
+
+      correct_weights ( nSourceCells, weight );
+
+      field[i] = missval;
+      if ( num_deps ) field[i] = 0;
+      for ( int k = 0; k < num_deps; ++k )
+	{
+	  int index1 = deps[k];
+	  /*
+	  int ilat1 = index1/(nxm-1);
+	  int ilon1 = index1 - ilat1*(nxm-1);
+	  long add1, add2;
+
+	  add1 = index1;
+	  add2 = index2;
+
+	  yar_store_link_cnsrv(&remap.vars, add1, add2, weight[k]);
+	  */
+	  field[i] += fieldm[index1] * weight[k];
+	  /*
+	  if ( cdoVerbose )
+	    printf("  result dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
+	  */
+	}
+#endif
     }
  
+  polygon_destroy ( &polygons );
+
   if ( findex < gridsize2 ) progressStatus(0, 1, 1);
 
   if ( grid1_mask ) free(grid1_mask);
 }
+
 
 
 double intlin(double x, double y1, double x1, double y2, double x2)
