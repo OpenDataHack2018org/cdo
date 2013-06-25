@@ -590,7 +590,9 @@ void intconarr2(double missval, int lon_is_circular,
 #endif
     }
  
+#if defined (HAVE_LIBYAC)
   polygon_destroy ( &polygons );
+#endif
 
   if ( findex < gridsize2 ) progressStatus(0, 1, 1);
 
