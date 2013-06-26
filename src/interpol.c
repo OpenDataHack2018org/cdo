@@ -122,6 +122,7 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
 static
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm)
 {
+  int lfound = 0;
   int lascend = 0;
   long i;
   *imin = nxm;
@@ -129,12 +130,12 @@ int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm
   
   if ( xm[0] < xm[nxm-1] ) lascend = 1;
 
-  int lfound = 0;
-
   i = find_element(xmin, nxm, xm);
 
   if ( i > 0 && i < nxm )
     {
+      lfound = 1;
+
       if ( lascend )
 	{
 	  if ( i > 1 && xmin <= xm[i-1] ) i--;
@@ -147,7 +148,7 @@ int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm
 	  *imin = i-1;
 	  *imax = i-1;
 	}
-    
+
       i = find_element(xmax, nxm, xm);
 
       if ( i > 0 && i < nxm )
@@ -165,7 +166,7 @@ int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm
 	}
     }
   
-  return (0);
+  return (lfound);
 }
 
 
@@ -331,7 +332,7 @@ void intconarr2(double missval, int lon_is_circular,
 		long nc2, long gridsize2, double *field, const double *restrict x, const double *restrict y)
 {
   long ndeps;
-  int deps[128];
+  int *deps;
   long i, ii = -1, jj = -1;
   long gridsize1;
   long nlon1 = nxm;
@@ -341,6 +342,8 @@ void intconarr2(double missval, int lon_is_circular,
   printf(" nxm, nym %ld %ld\n", nxm, nym);
   //if ( lon_is_circular ) nlon1--;
   gridsize1 = (nxm-1)*(nym-1);
+
+  deps = (int *) malloc(gridsize1*sizeof(int));
 
   grid1_mask = (int *) calloc(1, gridsize1*sizeof(int));
   for ( jj = 0; jj < nym-1; ++jj )
@@ -363,11 +366,11 @@ void intconarr2(double missval, int lon_is_circular,
   progressInit();
 
 #if defined (HAVE_LIBYAC)
-  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE}; // not used !
+  // enum edge_type quad_type[] = {LON_CIRCLE, LON_CIRCLE, LON_CIRCLE, LON_CIRCLE};
 
   int n;
   double weight_sum;
-  double const epsilon = 1.0e-10; // relative precision 
 
   double *weight;
   weight = (double *) malloc(gridsize1*sizeof(double));
@@ -386,7 +389,6 @@ void intconarr2(double missval, int lon_is_circular,
 
   TargetCell.num_corners   = nc2;
   TargetCell.edge_type     = quad_type;
-
   TargetCell.coordinates_x = malloc (nc2 * sizeof(*TargetCell.coordinates_x) );
   TargetCell.coordinates_y = malloc (nc2 * sizeof(*TargetCell.coordinates_y) );
 
@@ -584,7 +586,7 @@ void intconarr2(double missval, int lon_is_circular,
 	  field[i] += fieldm[index1] * weight[k];
 	  /*
 	  if ( cdoVerbose )
-	    printf("  result dep: %d %d %d %d %d %d  %g\n", k, nlonOut, nlatOut, index1, ilon1, ilat1, weight[k]);
+	    printf("  result dep: %ld %d %d  %g\n", i, k, index1, weight[k]);
 	  */
 	}
 #endif
@@ -596,9 +598,9 @@ void intconarr2(double missval, int lon_is_circular,
 
   if ( findex < gridsize2 ) progressStatus(0, 1, 1);
 
+  if ( deps ) free(deps);
   if ( grid1_mask ) free(grid1_mask);
 }
-
 
 
 double intlin(double x, double y1, double x1, double y2, double x2)
