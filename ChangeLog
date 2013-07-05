@@ -1,5 +1,9 @@
 2013-06-28  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* gridCurvilinearToRegular: set tolerance to 1.e-6
+
+2013-06-28  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
 	* using CDI library version 1.6.1
 	* Version 1.6.1 released
 

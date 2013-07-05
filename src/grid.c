@@ -1161,7 +1161,7 @@ int gridCurvilinearToRegular(int gridID1)
   for ( j = 1; j < ny; j++ )
     for ( i = 0; i < nx; i++ )
       {
-	if ( IS_NOT_EQUAL(xvals[i], xvals2D[j*nx+i]) )
+	if ( fabs(xvals[i] - xvals2D[j*nx+i]) > 1.e-6 )
 	  {
 	    lx = FALSE;
 	    j = ny;
@@ -1172,7 +1172,7 @@ int gridCurvilinearToRegular(int gridID1)
   for ( i = 1; i < nx; i++ )
     for ( j = 0; j < ny; j++ )
       {
-	if ( IS_NOT_EQUAL(yvals[j], yvals2D[j*nx+i]) )
+	if ( fabs(yvals[j] - yvals2D[j*nx+i]) > 1.e-6 )
 	  {
 	    ly = FALSE;
 	    i = nx;

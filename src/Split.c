@@ -103,7 +103,10 @@ void *Split(void *argument)
 
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
-
+  /*
+  printf("ifile >%s<\n", cdoStreamName(0)->argv[cdoStreamName(0)->argc-1]);
+  printf("ofile >%s< suffix >%s<\n", filename, filesuffix);
+  */
   if ( operatorID == SPLITCODE )
     {
       int *codes = NULL;
