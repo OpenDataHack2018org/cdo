@@ -327,8 +327,6 @@ void get_remap_env(void)
   envstr = getenv("REMAP_EXTRAPOLATE");
   if ( envstr )
     {
-      int ival;
-      ival = atoi(envstr);
       if ( *envstr )
 	{
 	  if ( memcmp(envstr, "ON", 2) == 0 || memcmp(envstr, "on", 2) == 0 )
