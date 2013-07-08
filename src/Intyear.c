@@ -46,6 +46,7 @@ void *Intyear(void *argument)
   int nchars;
   char filesuffix[32];
   char filename[8192];
+  const char *refname;
   double fac1, fac2;
   double missval1, missval2;
   double *array1, *array2, *array3;
@@ -84,8 +85,9 @@ void *Intyear(void *argument)
   strcpy(filename, cdoStreamName(2)->args);
   nchars = strlen(filename);
 
+  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
   for ( iy = 0; iy < nyears; iy++ )
     {

@@ -112,7 +112,7 @@ int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
 
 int     vlistIsSzipped(int vlistID);
-void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID);
+void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname);
 
 int  gridWeights(int gridID, double *weights);
 int  gridGenArea(int gridID, double *area);

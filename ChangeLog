@@ -1,3 +1,12 @@
+2013-09-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.6.2
+	* Version 1.6.2 released
+
+2013-07-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* split*: use filename extension from input file
+
 2013-06-28  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridCurvilinearToRegular: set tolerance to 1.e-6

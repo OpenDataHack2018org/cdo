@@ -59,6 +59,7 @@ void *Split(void *argument)
   double ftmp[999];
   char filesuffix[32];
   char filename[8192];
+  const char *refname;
   int nsplit = 0;
   int index;
   int i;
@@ -101,12 +102,10 @@ void *Split(void *argument)
       nchars = strlen(filename);
     }
 
+  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
-  /*
-  printf("ifile >%s<\n", cdoStreamName(0)->argv[cdoStreamName(0)->argc-1]);
-  printf("ofile >%s< suffix >%s<\n", filename, filesuffix);
-  */
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
+  
   if ( operatorID == SPLITCODE )
     {
       int *codes = NULL;

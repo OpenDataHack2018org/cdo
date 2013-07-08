@@ -33,6 +33,7 @@
 void *Eofcoeff3d(void * argument)
 {
   char eof_name[6], oname[1024], filesuffix[32];
+  const char *refname;
   double *w;
   double missval1 = -999, missval2 = -999;
   double *xvals, *yvals, *zvals;  
@@ -94,8 +95,9 @@ void *Eofcoeff3d(void * argument)
   strcpy(oname, cdoStreamName(2)->args);
   nchars = strlen(oname);
   
+  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
  
   eof = (field_t ***) malloc (nvars * sizeof(field_t**) );
   for ( varID=0; varID<nvars; varID++)

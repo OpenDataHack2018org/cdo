@@ -46,6 +46,7 @@ void *Harmonic(void *argument)
   int n_out, nout, n;
   char filesuffix[32];
   char filename[8192];
+  const char *refname;
   double missval;
   double sine, cosine;
   double *array;
@@ -75,8 +76,9 @@ void *Harmonic(void *argument)
   taxisID2 = taxisCreate(TAXIS_ABSOLUTE);
   vlistDefTaxis(vlistID2, taxisID2);
 
+  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
   streamIDs = (int*) malloc(n_out*sizeof(int));
 

@@ -47,6 +47,7 @@ void *Splittime(void *argument)
   int  streamIDs[MAX_STREAMS], tsIDs[MAX_STREAMS];
   char filesuffix[32];
   char filename[8192];
+  const char *refname;
   int index = 0;
   int i;
   int taxisID1, taxisID2;
@@ -93,8 +94,9 @@ void *Splittime(void *argument)
   strcpy(filename, cdoStreamName(1)->args);
   nchars = strlen(filename);
 
+  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   filesuffix[0] = 0;
-  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), cdoDefaultFileType, vlistID1);
+  cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
 
   //  if ( ! lcopy )
     {

@@ -50,7 +50,7 @@ void *Ensval(void *argument)
   int gridsize = 0;
   int gridID = -1, gridID2;
   int have_miss = 0;
-  int stream, streamID = 0, *streamID2;
+  int stream, streamID1, streamID = 0, *streamID2;
   int vlistID, vlistID1, *vlistID2;
   int taxisID1, *taxisID2;
   int zaxisID1, *zaxisID2;
@@ -73,6 +73,7 @@ void *Ensval(void *argument)
   char *ofilename;
   char file_suffix[32];
   char type_suffix[10];
+  const char *refname;
 
   typedef struct
   {
@@ -146,6 +147,7 @@ void *Ensval(void *argument)
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
       streamID = streamOpenRead(cdoStreamName(fileID));
+      if ( fileID == 0 ) streamID1 = streamID;
 
       vlistID = streamInqVlist(streamID);
       
@@ -177,9 +179,9 @@ void *Ensval(void *argument)
 
   ofilebase = cdoStreamName(nfiles)->args;
 
+  refname = cdoStreamName(0)->argv[cdoStreamName(0)->argc-1];
   memset(file_suffix, 0, sizeof(file_suffix) );
-  cdoGenFileSuffix(&file_suffix[0], sizeof(file_suffix), 
-		   cdoDefaultFileType, vlistID1);
+  cdoGenFileSuffix(file_suffix, sizeof(file_suffix), streamInqFiletype(streamID1), vlistID1, refname);
 
   for ( stream = 0; stream < nostreams; stream++ ) {
     int namelen = strlen(ofilebase) 
