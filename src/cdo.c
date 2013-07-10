@@ -915,6 +915,9 @@ void print_system_info()
 #if defined (__GNUC__)
   fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
 #endif
+#if defined (__GNUC_MINOR__)
+  fprintf(stderr, "GNUC MINOR          = %d\n", __GNUC_MINOR__);
+#endif
 #if defined (__ICC)
   fprintf(stderr, "ICC VERSION         = %d\n", __ICC);
 #endif
