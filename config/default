@@ -26,7 +26,7 @@ case "${HOSTNAME}" in
                     --with-hdf5=$HOME/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
-	            CC=icc CFLAGS="-g  -D_REENTRANT -Wall -W -O3 -openmp" \
+	            CC=icc CFLAGS="-g  -D_REENTRANT -Wall -W -O3 -march=native -openmp" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
 #                    --with-libxml2=/usr \
 #                    --with-magics=/Users/m214003/local/magics-2.14.9 \

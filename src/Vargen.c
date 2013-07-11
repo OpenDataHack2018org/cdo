@@ -39,19 +39,19 @@
 #if defined(ENABLE_DATA)
   static double etopo_scale  = 3;
   static double etopo_offset = 11000;
-  static const unsigned short const etopo[] = {
+  static const unsigned short etopo[] = {
 #include "etopo.h"
   };
 
   static double temp_scale  =  500;
   static double temp_offset = -220;
-  static const unsigned short const temp[] = {
+  static const unsigned short temp[] = {
 #include "temp.h"
   };
 
   static double mask_scale  =  1;
   static double mask_offset =  0;
-  static const unsigned short const mask[] = {
+  static const unsigned short mask[] = {
 #include "mask.h"
   };
 #endif
