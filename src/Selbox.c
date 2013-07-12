@@ -896,7 +896,7 @@ void *Selbox(void *argument)
 	    if ( gridID1 == vlistInqVarGrid(vlistID1, varID) )
 	      vars[varID] = TRUE;
 	}
-      else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID1) == 0 && gridInqYsize(gridID1) == 0 )
+      else if ( gridtype == GRID_GENERIC && gridInqXsize(gridID1) <= 1 && gridInqYsize(gridID1) <=1 )
 	{
 	}
       else
