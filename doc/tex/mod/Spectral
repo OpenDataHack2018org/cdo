@@ -8,8 +8,7 @@
 @Operators = sp2gp sp2gpl gp2sp gp2spl sp2sp
 
 @BeginDescription
-This module transforms fields on Gaussian grids to spectral coefficients 
-and vice versa.
+This module transforms fields on Gaussian grids to spectral coefficients and vice versa.
 @EndDescription
 @EndModule
 
@@ -18,9 +17,8 @@ and vice versa.
 @Title     = Spectral to gridpoint
 
 @BeginDescription
-Convert all fields with spectral coefficients to a regular Gaussian
-grid. The number of latitudes of the resulting Gaussian grid is 
-calculated from the triangular truncation by:
+Convert all fields with spectral coefficients to a regular Gaussian grid. The number of 
+latitudes of the resulting Gaussian grid is calculated from the triangular truncation by:
 @IfMan
 
    nlat = NINT((trunc*3 + 1.)/2.)
@@ -39,9 +37,8 @@ calculated from the triangular truncation by:
 @Title     = Spectral to gridpoint (linear)
 
 @BeginDescription
-Convert all fields with spectral coefficients to a regular Gaussian
-grid. The number of latitudes of the resulting Gaussian grid
-is calculated from the triangular truncation by:
+Convert all fields with spectral coefficients to a regular Gaussian grid. The number of 
+latitudes of the resulting Gaussian grid is calculated from the triangular truncation by:
 @IfMan
 
    nlat = NINT((trunc*2 + 1.)/2.)
@@ -62,9 +59,8 @@ Use this operator to convert ERA40 data e.g. from TL159 to N80.
 @Title     = Gridpoint to spectral
 
 @BeginDescription
-Convert all Gaussian gridpoint fields to spectral coefficients.
-The triangular truncation of the resulting spherical harmonics
-is calculated from the number of latitudes by:
+Convert all Gaussian gridpoint fields to spectral coefficients. The triangular truncation 
+of the resulting spherical harmonics is calculated from the number of latitudes by:
 @IfMan
 
    trunc = (nlat*2 - 1) / 3
@@ -83,9 +79,8 @@ is calculated from the number of latitudes by:
 @Title     = Gridpoint to spectral (linear)
 
 @BeginDescription
-Convert all Gaussian gridpoint fields to spectral coefficients.
-The triangular truncation of the resulting spherical harmonics
-is calculated from the number of latitudes by:
+Convert all Gaussian gridpoint fields to spectral coefficients. The triangular truncation 
+of the resulting spherical harmonics is calculated from the number of latitudes by:
 @IfMan
 
    trunc = (nlat*2 - 1) / 2
@@ -97,8 +92,7 @@ is calculated from the number of latitudes by:
 @EndMath
 @EndifDoc
 
-Use this operator to convert ERA40 data e.g. from N80 to TL159
-instead of T106.
+Use this operator to convert ERA40 data e.g. from N80 to TL159 instead of T106.
 @EndDescription
 @EndOperator
 
@@ -108,9 +102,8 @@ instead of T106.
 @Parameter = trunc
 
 @BeginDescription
-Change the triangular truncation of all spectral fields.
-The operator performs downward conversion by cutting the resolution.
-Upward conversions are achieved by filling in zeros.
+Change the triangular truncation of all spectral fields. The operator performs downward 
+conversion by cutting the resolution. Upward conversions are achieved by filling in zeros.
 @EndDescription
 @EndOperator
 
@@ -120,7 +113,7 @@ Upward conversions are achieved by filling in zeros.
 @Parameter = wnums
 
 @BeginDescription
-Set the user defined wave numbers to zero.
+Sets the user defined wave numbers to zero.
 @EndDescription
 @EndOperator
 
