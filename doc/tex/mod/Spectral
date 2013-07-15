@@ -128,8 +128,8 @@ Set the user defined wave numbers to zero.
 @BeginParameter wnums
 @Item = trunc
 INTEGER  New spectral resolution
-@Item = wnums
-INTEGER  Comma separated list of wave numbers
+@C @Item = wnums
+@C INTEGER  Comma separated list of wave numbers
 @EndParameter
 
 

@@ -3588,7 +3588,6 @@ static char *SpectralHelp[] = {
     "",
     "PARAMETER",
     "    trunc  INTEGER  New spectral resolution",
-    "    wnums  INTEGER  Comma separated list of wave numbers",
     NULL
 };
 
