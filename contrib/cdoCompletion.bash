@@ -283,6 +283,7 @@ int -int \
 interpolate -interpolate \
 intgrid -intgrid \
 intgridbil -intgridbil \
+intgridcon -intgridcon \
 intgridtraj -intgridtraj \
 intlevel -intlevel \
 intlevel3d -intlevel3d \

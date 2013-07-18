@@ -283,6 +283,7 @@ int \
 interpolate \
 intgrid \
 intgridbil \
+intgridcon \
 intgridtraj \
 intlevel \
 intlevel3d \
