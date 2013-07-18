@@ -189,14 +189,13 @@ case "${HOSTNAME}" in
     lizard*)
         LDFLAGS="-lpng"
         export LDFLAGS
-	${CONFPATH}configure --prefix=$HOME/local/rhel55-x64 \
-                    --with-jasper=/sw/rhel55-x64/jasper-1.900.1 \
-                    --with-grib_api=/sw/rhel55-x64/grib_api-1.9.0 \
-                    --with-netcdf=/sw/rhel55-x64/netcdf-4.2 \
-                    --with-hdf5=/sw/rhel55-x64/hdf5-1.8.8-threadsafe \
-                    --with-szlib=/sw/rhel55-x64/szip-2.1 \
+	${CONFPATH}configure --prefix=$HOME/local/centos58-x64 \
+                    --with-jasper=/sw/centos58-x64/jasper-1.900.1 \
+                    --with-grib_api=/sw/centos58-x64/grib_api-1.9.0-static \
+                    --with-netcdf=/sw/centos58-x64/netcdf-4.2.1.1 \
+                    --with-szlib=/sw/centos58-x64/szip-2.1 \
                     --with-zlib=/usr \
-	            CC=gcc44 CFLAGS="-g -Wall -O2 -fopenmp"
+	            CC=gcc44 CFLAGS="-g -Wall -O3 -fopenmp"
 	;;
 # powerpc-ibm-aix5.2.0.0
     ecga*)
