@@ -502,6 +502,7 @@ void *EcaGsl(void *argument)
   eca4(&request);
   
   free(longname);
+
   cdoFinish();
   
   return (0);
@@ -539,6 +540,7 @@ void *EcaHd(void *argument)
   request.var2.h3       = NULL; 
    
   eca1(&request);
+
   cdoFinish();
   
   return (0);

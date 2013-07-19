@@ -322,12 +322,13 @@ void eca1(const ECA_REQUEST_1 *request)
 	    var = &var13[levelID];
 	  else 
 	    var = &var12[levelID];
-              
+
 	  farsel(var, samp1[levelID]);
 
 	  streamDefRecord(ostreamID, varID, levelID);
 	  streamWriteRecord(ostreamID, var->ptr, var->nmiss);
 	}
+
       if ( IS_SET(request->var2.h2) || IS_SET(request->var2.h3) )
 	{
 	  varID = 1;

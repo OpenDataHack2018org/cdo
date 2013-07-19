@@ -395,7 +395,7 @@ void farsel(field_t *field1, field_t field2)
       for ( i = 0; i < len; i++ )
         if ( IS_EQUAL(array2[i], 0.0) ) array1[i] = missval1;
     }
-      
+
   field1->nmiss = 0;
   for ( i = 0; i < len; i++ )
     if ( DBL_IS_EQUAL(array1[i], missval1) ) field1->nmiss++;
