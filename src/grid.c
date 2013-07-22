@@ -512,49 +512,135 @@ int    qu2reg3(double *pfield, int *kpoint, int klat, int klon,
 
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss)
 {
-  int nlon, nlat;
+  int nx, ny, np;
   int gridtype;
   int lmiss, lperio, lveggy;
   int iret;
-  int *rowlonptr;
+  int *rowlon;
+  double xfirstandlast[2];
+  double xfirst, xlast;
 
   gridtype = gridInqType(gridID1);
 
   if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced gaussian grid!");
 
-  nlat = gridInqYsize(gridID1);
-  nlon = 2*nlat;
-
-  rowlonptr = (int *) malloc(nlat*sizeof(int));
-
-  if ( gridInqSize(gridID2) != nlon*nlat ) Error("Gridsize differ!");
-
-  gridInqRowlon(gridID1, rowlonptr);
-
   lmiss = nmiss > 0;
   lperio = 1;
   lveggy = 0;
 
-  (void) qu2reg3(array, rowlonptr, nlat, nlon, missval, &iret, lmiss, lperio, lveggy);
+  ny = gridInqYsize(gridID1);
+  np   = gridInqNP(gridID1);
+  nx = 2*ny;
 
-  free(rowlonptr);
+  rowlon = (int *) malloc(ny*sizeof(int));
+  gridInqRowlon(gridID1, rowlon);
+
+  xfirstandlast[0] = 0.;
+  xfirstandlast[1] = 0.;
+  gridInqXvals(gridID1, xfirstandlast);
+  xfirst = xfirstandlast[0];
+  xlast  = xfirstandlast[1];
+
+  if ( xfirst != 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
+    {
+    }
+  else
+    {
+      (void) qu2reg3(array, rowlon, ny, nx, missval, &iret, lmiss, lperio, lveggy);
+    }
+
+  if ( gridInqSize(gridID2) != nx*ny ) Error("Gridsize differ!");
+
+  free(rowlon);
 }
 
+//#define TEST_SUBGRID
+#ifdef  TEST_SUBGRID
+void grib_get_reduced_row(long pl,double lon_xfirst,double lon_last,long* npoints,long* ilon_first, long* ilon_last );
+#endif
 
 int gridToRegular(int gridID1)
 {
   int gridID2;
   int gridtype, gridsize;
-  int nx, ny;
+  int nx, ny, np;
   long i;
   double *xvals = NULL, *yvals = NULL;
+  double xfirstandlast[2];
+  double xfirst, xlast;
 
   gridtype = gridInqType(gridID1);
 
   if ( gridtype != GRID_GAUSSIAN_REDUCED ) Error("Not a reduced gaussian grid!");
 
   ny = gridInqYsize(gridID1);
-  nx = 2*ny;
+  np = gridInqNP(gridID1);
+
+  yvals = (double *) malloc(ny*sizeof(double));
+  gridInqYvals(gridID1, yvals);
+
+  xfirstandlast[0] = 0.;
+  xfirstandlast[1] = 0.;
+  gridInqXvals(gridID1, xfirstandlast);
+  xfirst = xfirstandlast[0];
+  xlast  = xfirstandlast[1];
+
+  if ( xfirst != 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
+    {
+#ifdef TEST_SUBGRID
+      /* sub area (longitudes) */
+      long ilon_first, ilon_last, j, l;
+      long row_count;
+      double range;
+      int np4 = np*4;
+      int size = 0;
+      int *rowlon = NULL;
+
+      if ( np <= 0 ) cdoAbort("Number of values between pole and equator missing!");
+
+      grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
+      //printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, np4, row_count, ilon_first, ilon_last, (ilon_first*360.)/np4, (ilon_last*360.)/np4);
+
+      nx = row_count;
+      xvals = (double *) malloc(nx*sizeof(double));
+      for ( i = 0; i < nx; ++i )
+	{
+	  xvals[i] = ((ilon_first+i)*360.)/np4;
+	  if ( xfirst > xlast ) xvals[i] -= 360.;
+	}
+      //for ( i = 0; i < nx; ++i ) printf("%d %8g\n", i, xvals[i]);
+      /*
+      rowlon = (int *) malloc(ny*sizeof(int));
+      gridInqRowlon(gridID1, rowlon);
+
+      for ( j = 0; j < ny; ++j )
+	{
+	  row_count = 0;
+	  grib_get_reduced_row(rowlon, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
+	  printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, rowlon[j], row_count, ilon_first, ilon_last, (ilon_first*360.)/rowlon[j], (ilon_last*360.)/rowlon[j]);
+	  size += row_count;
+	  if ( ilon_first > ilon_last ) ilon_first -= rowlon[j];
+	  l = 0;
+
+	  self->lons[j] = grib_context_malloc_clear(c, sizeof(double)*row_count);
+	  for ( i = ilon_first; i <= ilon_last; i++ ) 
+	    self->lons[j][l++] = ((i)*360.0)/rowlon[j];
+	  rowlon[j] = row_count;
+	}
+      */
+
+      free(rowlon);
+#else
+      cdoAbort("reduced Gaussian grid on sub area unsupported!");
+#endif
+    }
+  else
+    {
+      nx = 2*ny;
+      xvals = (double *) malloc(nx*sizeof(double));
+      for ( i = 0; i < nx; ++i ) xvals[i] = i * 360./nx;
+    }
+
   gridsize = nx*ny;
 
   gridID2  = gridCreate(GRID_GAUSSIAN, gridsize);
@@ -562,14 +648,9 @@ int gridToRegular(int gridID1)
   gridDefXsize(gridID2, nx);
   gridDefYsize(gridID2, ny);
   
-  xvals = (double *) malloc(nx*sizeof(double));
-  yvals = (double *) malloc(ny*sizeof(double));
-
-  for ( i = 0; i < nx; ++i ) xvals[i] = i * 360./nx;
-  gridInqYvals(gridID1, yvals);
-
   gridDefXvals(gridID2, xvals);
   gridDefYvals(gridID2, yvals);
+  gridDefNP(gridID2, np);
 
   free(xvals);
   free(yvals);
