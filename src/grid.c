@@ -1643,9 +1643,16 @@ int gridGenArea(int gridID, double *area)
   else
     nv = 4;
 
+  if ( gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0 )
+    {
+      cdoWarning("Computation of grid cell area weights failed, grid cell center coordinates missing!");
+      status = 1;
+      return (status);
+    }
+
   if ( nv == 0 )
     {
-      cdoWarning("Computation of grid cell area weights failed, grid cell corner missing!");
+      cdoWarning("Computation of grid cell area weights failed, grid cell corner coordinates missing!");
       status = 1;
       return (status);
     }
