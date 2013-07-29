@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.2
 	* Version 1.6.2 released
 
+2013-07-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gp2sp: added warning message if gp data not found
+
 2013-07-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* split*: use filename extension from input file
