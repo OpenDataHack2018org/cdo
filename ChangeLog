@@ -5,6 +5,7 @@
 
 2013-07-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* gridGenArea: added warning message if grid cell corner not available
 	* gp2sp: added warning message if gp data not found
 
 2013-07-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

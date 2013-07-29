@@ -1642,7 +1642,14 @@ int gridGenArea(int gridID, double *area)
     nv = gridInqNvertex(gridID);
   else
     nv = 4;
-  
+
+  if ( nv == 0 )
+    {
+      cdoWarning("Computation of grid cell area weights failed, grid cell corner missing!");
+      status = 1;
+      return (status);
+    }
+
   grid_center_lon = (double *) malloc(gridsize*sizeof(double));
   grid_center_lat = (double *) malloc(gridsize*sizeof(double));
 
