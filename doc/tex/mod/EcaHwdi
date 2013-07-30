@@ -7,18 +7,14 @@
 @Operators = eca_hwdi
 
 @BeginDescription
-Let @file{ifile1} be a time series of the daily maximum temperature TX,
-and let @file{ifile2} be the mean TXnorm of daily maximum temperatures
-for any period used as reference. Then counted is the number of days
+Let @file{ifile1} be a time series of the daily maximum temperature TX, and let @file{ifile2} be the mean 
+TXnorm of daily maximum temperatures for any period used as reference. Then counted is the number of days
 where, in intervals of at least @math{nday} consecutive days, TX > TXnorm + @math{T}.
-The numbers @math{nday} and @math{T} are optional parameters with default @math{nday} = 6
-and @math{T} = 5 @celsius. A further output variable is the number of heat
-waves longer than or equal to @math{nday} days. 
-TXnorm is calculated as the mean of maximum temperatures of a five day 
-window centred on each calendar day of a given climate reference period.
-Note that both TX and TXnorm have to be given in the same units.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile1}.
+The numbers @math{nday} and @math{T} are optional parameters with default @math{nday} = 6 and @math{T} = 5@celsius. 
+A further output variable is the number of heat waves longer than or equal to @math{nday} days. 
+TXnorm is calculated as the mean of maximum temperatures of a five day window centred on each calendar day
+of a given climate reference period. Note that both TX and TXnorm have to be given in the same units.
+The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile1}.
 @EndDescription
 @EndModule
 
@@ -33,13 +29,12 @@ the last contributing timestep in @file{ifile1}.
 @Item = nday
 INTEGER  Number of consecutive days (default: nday = 6)
 @Item = T
-FLOAT    Temperature offset (° Celsius, default: T = 5° Celsius)
+FLOAT    Temperature offset (unit: @celsius; default: T = 5@celsius)
 @EndParameter
 
 
 @C @BeginExample
-@C To compute the heat wave duration index of a time series of daily
-@C maximum temperatures use:
+@C To compute the heat wave duration index of a time series of daily maximum temperatures use:
 @C @BeginVerbatim
 @C    cdo eca_hwdi txfile txnormfile ofile
 @C @EndVerbatim

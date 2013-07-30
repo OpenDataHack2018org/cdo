@@ -10,7 +10,7 @@
 @BeginDescription
 Let @file{ifile} be a time series of the daily mean temperature TG, then the heating degree days 
 are defined as the sum of @math{T1} - TG, where only values TG < @math{T2} are considered. 
-If @math{T1} and @math{T2} are omitted, a temperature of 17 @celsius is used for both parameters. 
+If @math{T1} and @math{T2} are omitted, a temperature of 17@celsius is used for both parameters. 
 If only @math{T1} is given, @math{T2} is set to @math{T1}. Note that TG have to be given in units 
 of kelvin, whereas @math{T1} and @math{T2} have to be given in degrees Celsius.
 The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
@@ -26,9 +26,9 @@ The date information of a timestep in @file{ofile} is the date of the last contr
 
 @BeginParameter
 @Item = T1
-DOUBLE   Temperature limit (° Celsius, default: T1 = 17° Celsius)
+DOUBLE   Temperature limit (unit: @celsius; default: T1 = 17@celsius)
 @Item = T2
-DOUBLE   Temperature limit (° Celsius, default: T2 = T1)
+DOUBLE   Temperature limit (unit: @celsius; default: T2 = T1)
 @EndParameter
 
 

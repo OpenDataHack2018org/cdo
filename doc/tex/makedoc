@@ -537,8 +537,7 @@ while (<MOFILE>) {
       print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
     }
 
-    # Add list of variables created by this operator. This can only be done for
-    # eca_* operators
+    # Add list of variables created by this operator. This can only be done for eca_* operators
     if (exists $ecaVars{$hkeys[0]}) {
       push(@moddeslines, "The following variables are created: ");
       push(@moddeslines, '@BEGINITEMIZE');
@@ -787,11 +786,13 @@ while (<MOFILE>) {
 	  $line =~ s/^DOUBLE/FLOAT/g;
 	  $hline = $line;
 	  $hline =~ s/\\%/%/g;
+	  $hline =~ s/\@celsius/°C/og;
 	  print HELPFILE "$hline\",\n";
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
 	  $line =~ s/_/\\_/g;
+	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  print TRFILE "$line\n";
 	}
       }
