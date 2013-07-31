@@ -24,13 +24,12 @@ The date information of a timestep in @file{ofile} is the date of the last contr
 
 @BeginParameter
 @Item = R
-DOUBLE   Precipitation threshold (mm, default: R = 1 mm)
+FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)
 @EndParameter
 
 
 @BeginExample
-To get the largest number of consecutive dry days of a time series of daily precipitation 
-amounts use:
+To get the largest number of consecutive dry days of a time series of daily precipitation amounts use:
 @BeginVerbatim
    cdo eca_cdd rrfile ofile
 @EndVerbatim

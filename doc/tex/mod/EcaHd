@@ -26,15 +26,14 @@ The date information of a timestep in @file{ofile} is the date of the last contr
 
 @BeginParameter
 @Item = T1
-DOUBLE   Temperature limit (unit: @celsius; default: T1 = 17@celsius)
+FLOAT   Temperature limit (unit: @celsius; default: T1 = 17@celsius)
 @Item = T2
-DOUBLE   Temperature limit (unit: @celsius; default: T2 = T1)
+FLOAT   Temperature limit (unit: @celsius; default: T2 = T1)
 @EndParameter
 
 
 @BeginExample
-To compute the heating degree days of a time series of daily
-mean temperatures use:
+To compute the heating degree days of a time series of daily mean temperatures use:
 @BeginVerbatim
    cdo eca_hd tgfile ofile
 @EndVerbatim

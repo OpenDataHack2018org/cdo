@@ -8,13 +8,10 @@
 @Operators = eca_rx5day
 
 @BeginDescription
-Let @file{ifile} be a time series of 5-day precipitation totals RR,
-then the maximum of RR is written to @file{ofile}. A further output
-variable is the number of 5 day period with precipitation totals
-greater than @math{x} mm, where @math{x} is an optional parameter with default
-@math{x} = 50 mm.
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile}.
+Let @file{ifile} be a time series of 5-day precipitation totals RR, then the maximum of RR is written to @file{ofile}. 
+A further output variable is the number of 5 day period with precipitation totals greater than @math{x} mm, where @math{x} 
+is an optional parameter with default @math{x} = 50 mm.
+The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 
@@ -27,7 +24,7 @@ the last contributing timestep in @file{ifile}.
 
 @BeginParameter
 @Item = x
-FLOAT   Precipitation threshold (mm, default: x = 50 mm)
+FLOAT   Precipitation threshold (unit: mm; default: x = 50 mm)
 @EndParameter
 
 

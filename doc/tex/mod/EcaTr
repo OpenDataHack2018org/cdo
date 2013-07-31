@@ -24,7 +24,7 @@ The date information of a timestep in @file{ofile} is the date of the last contr
 
 @BeginParameter
 @Item = T
-FLOAT   Temperature threshold (unit: @celsius, default: T = 20@celsius)
+FLOAT   Temperature threshold (unit: @celsius; default: T = 20@celsius)
 @EndParameter
 
 

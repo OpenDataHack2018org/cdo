@@ -8,31 +8,24 @@
 @Operators = eca_gsl
 
 @BeginDescription
-Let @file{ifile1} be a time series of the daily mean temperature TG,
-and @file{ifile2} be a land-water mask.
-Within a period of 12 months, the thermal growing season length is officially
-defined as the number of days between:
+Let @file{ifile1} be a time series of the daily mean temperature TG, and @file{ifile2} be a land-water mask.
+Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:
 @BeginItemize
 @Item = frist occurrence of at least nday consecutive days with TG $>$ @math{T}
 @Item = first occurrence of at least nday consecutive days with TG $<$ @math{T} within the last 6 months
 @EndItemize
-On northern hemispere, this period corresponds with the regular year, whereas
-on southern hemispere, it starts at july $1^{st}$. Please note, that this
-definition may lead to weird results concerning values TG = @math{T}: In the first
-half of the period, these days do not contribute to the gsl, but they do within
-the second half. Moreover this definition could lead to discontinuous values in
-equatorial regions.
+On northern hemispere, this period corresponds with the regular year, whereas on southern hemispere, it starts 
+at july $1^{st}$. Please note, that this definition may lead to weird results concerning values TG = @math{T}: 
+In the first half of the period, these days do not contribute to the gsl, but they do within the second half.
+Moreover this definition could lead to discontinuous values in equatorial regions.
 
-The numbers @math{nday} and @math{T} are optional parameter with default @math{nday} = 6
-and @math{T} = 5@celsius. The number @math{fland} is an optional parameter with
-default value @math{fland} = 0.5 and denotes the fraction of a grid point that
-have to be covered by land in order to be included in the calculation. A
-further output variable is the start day of year of the growing season.
-Note that TG have to be given in units of Kelvin, whereas @math{T} have to be given
-in degrees Celsius.
+The numbers @math{nday} and @math{T} are optional parameter with default @math{nday} = 6 and @math{T} = 5@celsius. 
+The number @math{fland} is an optional parameter with default value @math{fland} = 0.5 and denotes the fraction of 
+a grid point that have to be covered by land in order to be included in the calculation. A further output variable 
+is the start day of year of the growing season. Note that TG have to be given in units of Kelvin, whereas @math{T} 
+have to be given in degrees Celsius.
 
-The date information of a timestep in @file{ofile} is the date of
-the last contributing timestep in @file{ifile}.
+The date information of a timestep in @file{ofile} is the date of the last contributing timestep in @file{ifile}.
 @EndDescription
 @EndModule
 
@@ -47,15 +40,14 @@ the last contributing timestep in @file{ifile}.
 @Item = nday
 INTEGER  Number of consecutive days (default: nday = 6)
 @Item = T
-DOUBLE   Temperature threshold (unit: @celsius; default: T = 5@celsius)
+FLOAT    Temperature threshold (unit: @celsius; default: T = 5@celsius)
 @Item = fland
-DOUBLE   Land fraction threshold (default: fland = 0.5)
+FLOAT    Land fraction threshold (default: fland = 0.5)
 @EndParameter
 
 
 @BeginExample
-To get the growing season length of a time series of daily
-mean temperatures use:
+To get the growing season length of a time series of daily mean temperatures use:
 @BeginVerbatim
    cdo eca_gsl tgfile maskfile ofile
 @EndVerbatim

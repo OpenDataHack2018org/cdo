@@ -4281,7 +4281,7 @@ static char *EcaCddHelp[] = {
     "    - number_of_cdd_periods_with_more_than_5days_per_time_period",
     "",
     "PARAMETER",
-    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
     NULL
 };
 
@@ -4332,14 +4332,13 @@ static char *EcaCwdHelp[] = {
     "    Let ifile be a time series of the daily precipitation amount RR, then the largest number ",
     "    of consecutive days where RR is at least R is counted. R is an optional parameter with ",
     "    default R = 1 mm. A further output variable is the number of wet periods of more than 5 days.",
-    "    The date information of a timestep in ofile is the date of the last contributing ",
-    "    timestep in ifile.",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - consecutive_wet_days_index_per_time_period",
     "    - number_of_cwd_periods_with_more_than_5days_per_time_period",
     "",
     "PARAMETER",
-    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
     NULL
 };
 
@@ -4443,37 +4442,30 @@ static char *EcaGslHelp[] = {
     "    eca_gsl[,nday[,T[,fland]]]  ifile1 ifile2 ofile",
     "",
     "DESCRIPTION",
-    "    Let ifile1 be a time series of the daily mean temperature TG,",
-    "    and ifile2 be a land-water mask.",
-    "    Within a period of 12 months, the thermal growing season length is officially",
-    "    defined as the number of days between:",
+    "    Let ifile1 be a time series of the daily mean temperature TG, and ifile2 be a land-water mask.",
+    "    Within a period of 12 months, the thermal growing season length is officially defined as the number of days between:",
     "    - frist occurrence of at least nday consecutive days with TG $>$ @math{T}",
     "    - first occurrence of at least nday consecutive days with TG $<$ @math{T} within the last 6 months",
-    "    On northern hemispere, this period corresponds with the regular year, whereas",
-    "    on southern hemispere, it starts at july $1^{st}$. Please note, that this",
-    "    definition may lead to weird results concerning values TG = T: In the first",
-    "    half of the period, these days do not contribute to the gsl, but they do within",
-    "    the second half. Moreover this definition could lead to discontinuous values in",
-    "    equatorial regions.",
+    "    On northern hemispere, this period corresponds with the regular year, whereas on southern hemispere, it starts ",
+    "    at july $1^{st}$. Please note, that this definition may lead to weird results concerning values TG = T: ",
+    "    In the first half of the period, these days do not contribute to the gsl, but they do within the second half.",
+    "    Moreover this definition could lead to discontinuous values in equatorial regions.",
     "    ",
-    "    The numbers nday and T are optional parameter with default nday = 6",
-    "    and T = 5°C. The number fland is an optional parameter with",
-    "    default value fland = 0.5 and denotes the fraction of a grid point that",
-    "    have to be covered by land in order to be included in the calculation. A",
-    "    further output variable is the start day of year of the growing season.",
-    "    Note that TG have to be given in units of Kelvin, whereas T have to be given",
-    "    in degrees Celsius.",
+    "    The numbers nday and T are optional parameter with default nday = 6 and T = 5°C. ",
+    "    The number fland is an optional parameter with default value fland = 0.5 and denotes the fraction of ",
+    "    a grid point that have to be covered by land in order to be included in the calculation. A further output variable ",
+    "    is the start day of year of the growing season. Note that TG have to be given in units of Kelvin, whereas T ",
+    "    have to be given in degrees Celsius.",
     "    ",
-    "    The date information of a timestep in ofile is the date of",
-    "    the last contributing timestep in ifile.",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - thermal_growing_season_length",
     "    - day_of_year_of_growing_season_start",
     "",
     "PARAMETER",
     "    nday   INTEGER  Number of consecutive days (default: nday = 6)",
-    "    T      FLOAT   Temperature threshold (unit: °C; default: T = 5°C)",
-    "    fland  FLOAT   Land fraction threshold (default: fland = 0.5)",
+    "    T      FLOAT    Temperature threshold (unit: °C; default: T = 5°C)",
+    "    fland  FLOAT    Land fraction threshold (default: fland = 0.5)",
     NULL
 };
 
@@ -4771,15 +4763,14 @@ static char *EcaRr1Help[] = {
     "    eca_rr1[,R]  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]),",
-    "    then the number of days where RR is at least R is counted. R is an optional parameter with ",
-    "    default R = 1 mm. The date information of a timestep in ofile is the date of",
-    "    the last contributing timestep in ifile.",
+    "    Let ifile be a time series of the daily precipitation amount RR in [mm] (or alternatively in [kg m-2]), then",
+    "    the number of days where RR is at least R is counted. R is an optional parameter with default R = 1 mm. ",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - wet_days_index_per_time_period",
     "",
     "PARAMETER",
-    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
     NULL
 };
 
@@ -4813,19 +4804,16 @@ static char *EcaRx5dayHelp[] = {
     "    eca_rx5day[,x]  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Let ifile be a time series of 5-day precipitation totals RR,",
-    "    then the maximum of RR is written to ofile. A further output",
-    "    variable is the number of 5 day period with precipitation totals",
-    "    greater than x mm, where x is an optional parameter with default",
-    "    x = 50 mm.",
-    "    The date information of a timestep in ofile is the date of",
-    "    the last contributing timestep in ifile.",
+    "    Let ifile be a time series of 5-day precipitation totals RR, then the maximum of RR is written to ofile. ",
+    "    A further output variable is the number of 5 day period with precipitation totals greater than x mm, where x ",
+    "    is an optional parameter with default x = 50 mm.",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - highest_five_day_precipitation_amount_per_time_period",
     "    - number_of_5day_heavy_precipitation_periods_per_time_period",
     "",
     "PARAMETER",
-    "    x  FLOAT   Precipitation threshold (mm, default: x = 50 mm)",
+    "    x  FLOAT   Precipitation threshold (unit: mm; default: x = 50 mm)",
     NULL
 };
 
@@ -4837,16 +4825,14 @@ static char *EcaSdiiHelp[] = {
     "    eca_sdii[,R]  ifile ofile",
     "",
     "DESCRIPTION",
-    "    Let ifile be a time series of the daily precipitation amount RR, then the mean ",
-    "    precipitation amount at wet days (RR > R) is written to ofile. ",
-    "    R is an optional parameter with default R = 1 mm.",
-    "    The date information of a timestep in ofile is the date of",
-    "    the last contributing timestep in ifile.",
+    "    Let ifile be a time series of the daily precipitation amount RR, then the mean precipitation amount at ",
+    "    wet days (RR > R) is written to ofile. R is an optional parameter with default R = 1 mm.",
+    "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - simple_daily_intensitiy_index_per_time_period",
     "",
     "PARAMETER",
-    "    R  FLOAT   Precipitation threshold (mm, default: R = 1 mm)",
+    "    R  FLOAT   Precipitation threshold (unit: mm; default: R = 1 mm)",
     NULL
 };
 
@@ -4866,7 +4852,7 @@ static char *EcaSuHelp[] = {
     "    - summer_days_index_per_time_period",
     "",
     "PARAMETER",
-    "    T  FLOAT   Temperature threshold (unit: °C, default: T = 25°C)",
+    "    T  FLOAT   Temperature threshold (unit: °C; default: T = 25°C)",
     NULL
 };
 
@@ -4974,7 +4960,7 @@ static char *EcaTrHelp[] = {
     "    - tropical_nights_index_per_time_period",
     "",
     "PARAMETER",
-    "    T  FLOAT   Temperature threshold (unit: °C, default: T = 20°C)",
+    "    T  FLOAT   Temperature threshold (unit: °C; default: T = 20°C)",
     NULL
 };
 
