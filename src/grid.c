@@ -562,10 +562,13 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
       long ii;
       double *parray;
 
+      //lmiss = 1;
+
       if ( np <= 0 ) cdoAbort("Number of values between pole and equator missing!");
 
       grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_firstx, &ilon_last);
       nx = row_count;
+      printf("nx %d  %d %d lon1 %g lon2 %g\n", nx, ilon_firstx, ilon_last, (ilon_firstx*360.)/np4, (ilon_last*360.)/np4);
 
       rowlon = (int *) malloc(ny*sizeof(int));
       gridInqRowlon(gridID1, rowlon);
@@ -581,28 +584,19 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 	  wlen += rowlon[j-1];
 	  pwork[j] = work + wlen;
 	} 
+      printf(" ny, np4, nwork %d %d %d wlen %d\n", ny, np4, nwork, wlen);
       for ( j = 0; j < ny; ++j )
 	{
 	  rlon = rowlon[j];
 	  for ( i = 0; i < rlon; ++i ) pwork[j][i] = missval;
+	  //	  for ( i = 0; i < rlon; ++i ) pwork[j][i] = 88;
 	} 
-      /*
-      grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
-      //printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, np4, row_count, ilon_first, ilon_last, (ilon_first*360.)/np4, (ilon_last*360.)/np4);
-
-      nx = row_count;
-      xvals = (double *) malloc(nx*sizeof(double));
-      for ( i = 0; i < nx; ++i )
-	{
-	  xvals[i] = ((ilon_first+i)*360.)/np4;
-	  if ( xfirst > xlast ) xvals[i] -= 360.;
-	}
-      */
       //for ( i = 0; i < nx; ++i ) printf("%d %8g\n", i, xvals[i]);
 
+      int kk = 0;
+      parray = array;
       for ( j = 0; j < ny; ++j )
 	{
-	  parray = array;
 	  rlon = rowlon[j];
 	  row_count = 0;
 	  grib_get_reduced_row(rlon, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
@@ -611,23 +605,23 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 	    {
 	      ii = i;
 	      if ( ii > rlon ) ii -= rlon; 
-	      pwork[j][ii] = *parray;
+	      pwork[j][ii-1] = *parray;
 	      parray++;
+	      kk++;
 	    }
 	  size += row_count;
-	  /*
-	  if ( ilon_first > ilon_last ) ilon_first -= rowlon[j];
-	  l = 0;
-
-	  self->lons[j] = grib_context_malloc_clear(c, sizeof(double)*row_count);
-	  for ( i = ilon_first; i <= ilon_last; i++ ) 
-	    self->lons[j][l++] = ((i)*360.0)/rowlon[j];
-	  rowlon[j] = row_count;
-	  */
 	}
-
+      printf("size %d %d\n", size, kk);
       if ( gridInqSize(gridID1) != size ) cdoAbort("gridsize1 inconsistent!");
-
+      /*
+      kk = 0;
+      parray = work;
+      for ( j = 0; j < ny; ++j )
+	{
+	  rlon = rowlon[j];
+	  for ( i = 0; i < rlon; ++i ) printf("j, i, k, pwork %d %d %d %g\n", j, i, kk++, *parray++);
+	} 
+      */
       (void) qu2reg3(work, rowlon, ny, np4, missval, &iret, lmiss, lperio, lveggy);
 
       wlen = 0;
@@ -637,18 +631,30 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
 	  wlen += np4;
 	  pwork[j] = work + wlen;
 	} 
-
+      /*
+      kk = 0;
+      parray = work;
       for ( j = 0; j < ny; ++j )
 	{
-	  parray = array;
+	  for ( i = 0; i < np4; ++i ) printf(" %g\n", *parray++);
+	  //for ( i = 0; i < np4; ++i ) printf("j, i, k, pwork %d %d %d %g\n", j, i, kk++, *parray++);
+	} 
+      */
+      printf("nx, ilon_firstx %d %d\n", nx, ilon_firstx);
+      kk = 0;
+      parray = array;
+      for ( j = 0; j < ny; ++j )
+	{
 	  for ( i = ilon_firstx; i < (ilon_firstx+nx); ++i )
 	    {
 	      ii = i;
-	      if ( ii > rlon ) ii -= rlon; 
-	      *parray = pwork[j][ii];
+	      if ( ii > np4 ) ii -= np4; 
+	      *parray = pwork[j][ii-1];
 	      parray++;
+	      kk++;
 	    }
 	}
+      printf("nx, ny, nx*ny, kk %d %d %d %d\n", nx, ny, nx*ny, kk);
 
       free(rowlon);
       free(work);
@@ -718,26 +724,6 @@ int gridToRegular(int gridID1)
 	  xvals[i] = ((ilon_first+i)*360.)/np4;
 	  if ( xfirst > xlast ) xvals[i] -= 360.;
 	}
-      //for ( i = 0; i < nx; ++i ) printf("%d %8g\n", i, xvals[i]);
-      /*
-      rowlon = (int *) malloc(ny*sizeof(int));
-      gridInqRowlon(gridID1, rowlon);
-
-      for ( j = 0; j < ny; ++j )
-	{
-	  row_count = 0;
-	  grib_get_reduced_row(rowlon, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
-	  printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, rowlon[j], row_count, ilon_first, ilon_last, (ilon_first*360.)/rowlon[j], (ilon_last*360.)/rowlon[j]);
-	  size += row_count;
-	  if ( ilon_first > ilon_last ) ilon_first -= rowlon[j];
-	  l = 0;
-
-	  self->lons[j] = grib_context_malloc_clear(c, sizeof(double)*row_count);
-	  for ( i = ilon_first; i <= ilon_last; i++ ) 
-	    self->lons[j][l++] = ((i)*360.0)/rowlon[j];
-	  rowlon[j] = row_count;
-	}
-      */
 
       free(rowlon);
 #else
