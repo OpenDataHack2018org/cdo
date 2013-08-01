@@ -177,6 +177,7 @@ int gridDefine(griddes_t grid)
     case GRID_LONLAT:
     case GRID_GAUSSIAN:
     case GRID_SINUSOIDAL:
+    case GRID_LAEA:
       {
 	if ( grid.size != 1 )
 	  {
@@ -283,6 +284,11 @@ int gridDefine(griddes_t grid)
 	  {
 	    gridDefMask(gridID, grid.mask);
 	    free(grid.mask);
+	  }
+
+	if ( grid.type == GRID_LAEA )
+	  {
+	    if ( grid.a > 0 ) gridDefLaea(gridID, grid.a, grid.lon_0, grid.lat_0);
 	  }
 
 	break;
