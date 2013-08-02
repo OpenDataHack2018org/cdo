@@ -399,7 +399,6 @@ void *Seltime(void *argument)
       else if ( operfunc == func_date )
 	{
 	  selival = (vdate/intval)%moddat[operatorID];
-	  if ( selival < 0 ) selival = -selival;
 	}
       else if ( operfunc == func_time )
 	{

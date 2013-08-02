@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.6.2 (27 September 2013):
+
+   Fixed bugs:
+     * selyear: wrong result for negative years [Bug #3836]
+
 Version 1.6.1 (27 June 2013):
 
    New features:

@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.2
 	* Version 1.6.2 released
 
+2013-08-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* selyear: fixed wrong result for negative years [Bug #3836]
+
 2013-08-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added support of ASCII grid description for GRID_LAEA
