@@ -3,9 +3,13 @@
 	* using CDI library version 1.6.2
 	* Version 1.6.2 released
 
+2013-08-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* mastrfu: added missing value support
+
 2013-08-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
-	* select: added support for key >step_of_year< 
+	* select: added support for key >timestep_of_year< 
 
 2013-08-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

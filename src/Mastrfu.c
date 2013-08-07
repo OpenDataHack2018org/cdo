@@ -30,7 +30,7 @@
 
 
 static
-void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
+void mastrfu(int gridID, int zaxisID, double *array1, double *array2, int nmiss, double missval)
 {
   int nlev;
   int nlat;
@@ -74,14 +74,30 @@ void mastrfu(int gridID, int zaxisID, double *array1, double *array2)
     for ( ilat = 0; ilat < nlat; ilat++ )
       field2[ilev][ilat] = 0.0;
 
-  for ( ilev = nlev-1; ilev >= 0; ilev-- )
-    for ( n = ilev; n < nlev-1; n++ )
+  if ( nmiss == 0 )
+    {
+      for ( ilev = nlev-1; ilev >= 0; ilev-- )
+	for ( n = ilev; n < nlev-1; n++ )
+	  for ( ilat = 0; ilat < nlat; ilat++ )
+	    {
+	      field2[ilev][ilat] += fact*(field1[n][ilat]+field1[n+1][ilat])*cosphi[ilat]*(plevel[n]-plevel[n+1]);
+	    }
+    }
+  else
+    {
       for ( ilat = 0; ilat < nlat; ilat++ )
-	{
-	  field2[ilev][ilat] = field2[ilev][ilat] +
-	                       fact*(field1[n][ilat]+field1[n+1][ilat])*
-	                       cosphi[ilat]*(plevel[n]-plevel[n+1]);
-	}
+	for ( ilev = nlev-1; ilev >= 0; ilev-- )
+	  for ( n = ilev; n < nlev-1; n++ )
+	    {
+	      if ( DBL_IS_EQUAL(field1[n][ilat], missval) )
+		{
+		  field2[ilev][ilat] = missval;
+		  break;
+		}
+	      else
+		field2[ilev][ilat] += fact*(field1[n][ilat]+field1[n+1][ilat])*cosphi[ilat]*(plevel[n]-plevel[n+1]);
+	    }
+    }
 
   free(field2);
   free(field1);
@@ -101,7 +117,8 @@ void *Mastrfu(void *argument)
   int nvars, code, gridID, zaxisID, nlev;
   int vlistID1, vlistID2;
   int offset;
-  int nmiss;
+  int nmiss, nmiss1;
+  double missval;
   double *array1, *array2;
   int taxisID1, taxisID2;
 
@@ -116,6 +133,8 @@ void *Mastrfu(void *argument)
 
   code = vlistInqVarCode(vlistID1, 0);
   if ( code > 0 && code != 132 ) cdoWarning("Unexpected code %d!", code);
+
+  missval = vlistInqVarMissval(vlistID1, 0);
 
   zaxisID = vlistInqVarZaxis(vlistID1, 0);
   if ( zaxisInqType(zaxisID) != ZAXIS_PRESSURE &&
@@ -157,16 +176,17 @@ void *Mastrfu(void *argument)
       taxisCopyTimestep(taxisID2, taxisID1);
 
       streamDefTimestep(streamID2, tsID);
-	       
+
+      nmiss = 0;
       for ( recID = 0; recID < nrecs; recID++ )
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  offset  = gridsize*levelID;
-	  streamReadRecord(streamID1, array1+offset, &nmiss);
-	  if ( nmiss ) cdoAbort("Missing values unsupported for this operator!");
+	  streamReadRecord(streamID1, array1+offset, &nmiss1);
+	  nmiss += nmiss1;
 	}
 
-      mastrfu(gridID, zaxisID, array1, array2);
+      mastrfu(gridID, zaxisID, array1, array2, nmiss, missval);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{

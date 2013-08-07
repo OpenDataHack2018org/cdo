@@ -3,6 +3,9 @@ CDO NEWS
 
 Version 1.6.2 (27 September 2013):
 
+   New features:
+     * select: added support for key >timestep_of_year<
+     * mastrfu: added missing value support
    Fixed bugs:
      * selyear: wrong result for negative years [Bug #3836]
 
