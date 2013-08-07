@@ -213,9 +213,7 @@ void printGridInfo(int vlistID)
 	      fprintf(stdout, "%*s", nbyte0, "");
 	      fprintf(stdout, "%-9s : first = %.9g", yname, yfirst);
 	      if ( ysize > 1 ) fprintf(stdout, "  last = %.9g", ylast);
-	      if ( IS_NOT_EQUAL(yinc, 0) &&
-		   (gridtype == GRID_LONLAT || gridtype == GRID_SINUSOIDAL ||
-		    gridtype == GRID_LCC2 || gridtype == GRID_LAEA) )
+	      if ( IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED )
 		fprintf(stdout, "  inc = %.9g", yinc);
 	      fprintf(stdout, "  %s", yunits);
 	      fprintf(stdout, "\n");
