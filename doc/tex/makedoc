@@ -781,6 +781,7 @@ while (<MOFILE>) {
 	if ( "$kword" eq "\@ITEM" ) {
 	  ($kopt, $value) = split(/\s*=\s*/, $line, 2);
 	  printf HELPFILE ("    \"    %-*s  ", $maxlen, $value);
+	  $value =~ s/_/\\_/g;
 	  print TRFILE "\\item[{\\sl $value}\\ \\ \\hfill]\n";
 	} else {
 	  $line =~ s/^DOUBLE/FLOAT/g;

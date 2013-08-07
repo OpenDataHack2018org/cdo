@@ -491,21 +491,21 @@ void *Select(void *argument)
   int npar;
   int *vars = NULL;
   pml_t *pml;
-  PML_DEF_INT(step_of_year, 4096, "Timestep of year");
-  PML_DEF_INT(timestep,     4096, "Timestep");
-  PML_DEF_INT(year,         1024, "Year");
-  PML_DEF_INT(month,          32, "Month");
-  PML_DEF_INT(day,            32, "Day");
-  PML_DEF_INT(hour,           24, "Hour");
-  PML_DEF_INT(minute,         60, "Minute");
-  PML_DEF_INT(code,         1024, "Code number");
-  PML_DEF_INT(ltype,        1024, "Level type");
-  PML_DEF_INT(levidx,       1024, "Level index");
-  PML_DEF_FLT(level,        1024, "Level");
-  PML_DEF_WORD(name,        1024, "Variable name");
-  PML_DEF_WORD(param,       1024, "Parameter");
+  PML_DEF_INT(timestep_of_year, 4096, "Timestep of year");
+  PML_DEF_INT(timestep,         4096, "Timestep");
+  PML_DEF_INT(year,             1024, "Year");
+  PML_DEF_INT(month,              32, "Month");
+  PML_DEF_INT(day,                32, "Day");
+  PML_DEF_INT(hour,               24, "Hour");
+  PML_DEF_INT(minute,             60, "Minute");
+  PML_DEF_INT(code,             1024, "Code number");
+  PML_DEF_INT(ltype,            1024, "Level type");
+  PML_DEF_INT(levidx,           1024, "Level index");
+  PML_DEF_FLT(level,            1024, "Level");
+  PML_DEF_WORD(name,            1024, "Variable name");
+  PML_DEF_WORD(param,           1024, "Parameter");
 
-  PML_INIT_INT(step_of_year);
+  PML_INIT_INT(timestep_of_year);
   PML_INIT_INT(timestep);
   PML_INIT_INT(year);
   PML_INIT_INT(month);
@@ -539,7 +539,7 @@ void *Select(void *argument)
 
   pml = pmlNew("SELECT");
 
-  PML_ADD_INT(pml, step_of_year);
+  PML_ADD_INT(pml, timestep_of_year);
   PML_ADD_INT(pml, timestep);
   PML_ADD_INT(pml, year);
   PML_ADD_INT(pml, month);
@@ -557,7 +557,7 @@ void *Select(void *argument)
 
   if ( cdoVerbose ) pmlPrint(pml);
 
-  PML_NUM(pml, step_of_year);
+  PML_NUM(pml, timestep_of_year);
   PML_NUM(pml, timestep);
   PML_NUM(pml, year);
   PML_NUM(pml, month);
@@ -710,7 +710,7 @@ void *Select(void *argument)
 	  PAR_CHECK_WORD_FLAG(name);
 	  PAR_CHECK_WORD_FLAG(param);
 
-	  if ( npar_step_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
+	  if ( npar_timestep_of_year || npar_timestep || npar_year || npar_month || npar_day || npar_hour || npar_minute ) ltimsel = TRUE;
 
 	  npar = 0;
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -813,16 +813,16 @@ void *Select(void *argument)
 
 	      if ( year != last_year )
 		{
-		  step_of_year = 0;
+		  timestep_of_year = 0;
 		  last_year = year;
 		}
 
-	      step_of_year++;
+	      timestep_of_year++;
 
 	      if ( npar_timestep && PAR_CHECK_INT(timestep) ) copytimestep = TRUE;
-	      if ( npar_step_of_year && PAR_CHECK_INT(step_of_year) ) copytimestep = TRUE;
+	      if ( npar_timestep_of_year && PAR_CHECK_INT(timestep_of_year) ) copytimestep = TRUE;
 
-	      if ( !copytimestep && npar_timestep == 0 && npar_step_of_year == 0 )
+	      if ( !copytimestep && npar_timestep == 0 && npar_timestep_of_year == 0 )
 		{
 		  int lyear = 0, lmonth = 0, lday = 0, lhour = 0, lminute = 0;
 
@@ -884,7 +884,7 @@ void *Select(void *argument)
       streamClose(streamID1);
     }
 
-  PAR_CHECK_INT_FLAG(step_of_year);
+  PAR_CHECK_INT_FLAG(timestep_of_year);
   PAR_CHECK_INT_FLAG(timestep);
   PAR_CHECK_INT_FLAG(year);
   PAR_CHECK_INT_FLAG(month);

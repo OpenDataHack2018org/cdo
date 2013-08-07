@@ -349,8 +349,12 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, int nt)
 {
   int lev, jmm, jfc, lat, nsp2;
-  double sar, sai, *far, *fai, *pol;
-  double *sal, *fal;
+  double sar, sai;
+  const double * restrict far;
+  const double * restrict fai;
+  const double * restrict pol;
+  double *sal;
+  double *fal;
 
   nsp2 = (nt+1)*(nt+2);
 

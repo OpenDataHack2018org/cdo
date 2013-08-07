@@ -62,6 +62,8 @@ INTEGER Comma separated list of months
 INTEGER Comma separated list of years
 @Item = timestep
 INTEGER Comma separated list of timesteps
+@Item = timestep_of_year
+INTEGER Comma separated list of timesteps of year
 @EndParameter
 
 
