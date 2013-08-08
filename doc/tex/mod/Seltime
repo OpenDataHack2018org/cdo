@@ -99,7 +99,7 @@ Selects all timesteps with a date in a user given range.
 @Parameter = month [nts1] [nts2]
 
 @BeginDescription
-Selects a month and optional an unlimited number of timesteps before and after this month.
+Selects a month and optional an arbitrary number of timesteps before and after this month.
 @EndDescription
 @EndOperator
 

@@ -103,7 +103,7 @@ A detailed description of all operators can be found in the
 {\bf \htmlref{Reference Manual}{refman}} section.
 
 
-\subsection{Combining operators}
+\subsection{Operator chaining}
 
 All operators with a fixed number of input streams and one output stream
 can pipe the result directly to an other operator.
@@ -125,23 +125,30 @@ instead of
    rm tmp1 tmp2
 \end{verbatim}
 
-% All operators with an unlimited number of input streams ({\tt ifiles})
-% can't be combined with other operators. Here is an incomplete list
-% of those operators:
-% {\bf \htmlref{copy}{copy}},
-% {\bf \htmlref{cat}{cat}},
-% {\bf \htmlref{merge}{merge}},
-% {\bf \htmlref{mergetime}{mergetime}},
-% {\bf \htmlref{ens$<\!STAT\!>$}{ENSSTAT}}
+All operators with an arbitrary number of input streams ({\tt ifiles})
+can't be combined with other operators if these operators are used
+with more than one input stream. Here is an incomplete list of
+these operators:
+{\bf \htmlref{copy}{copy}},
+{\bf \htmlref{cat}{cat}},
+{\bf \htmlref{merge}{merge}},
+{\bf \htmlref{mergetime}{mergetime}},
+{\bf \htmlref{select}{select}},
+{\bf \htmlref{ens$<\!STAT\!>$}{ENSSTAT}} \\
+Use single quotes if the input stream names are generated with
+wildcards. In this case CDO will do the pattern matching and the
+output can be combined with other operators. Here is an example for
+this feature:
+\begin{verbatim}
+   cdo timavg -select,name=temperature 'ifile?' ofile
+\end{verbatim}
 
-Combining of operators is implemented over POSIX Threads (pthreads).
-Therefore this {\CDO} feature is not available on operating systems 
-without POSIX Threads support!
+Operator chaining is implemented over POSIX Threads (pthreads).
+Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
 
 \subsection{Operator parameter}
 
-Some operators need one or more parameter.
-A list of parameter is indicated by the seperator ','.
+Some operators need one or more parameter. A list of parameter is indicated by the seperator ','.
 
 \begin{itemize}
 \item STRING
