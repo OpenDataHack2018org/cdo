@@ -507,14 +507,168 @@ void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 #endif
 }
 
+/*
+ * grib_get_reduced_row: code from GRIB_API 1.10.4
+ *
+ * Description:
+ *   computes the number of points within the range lon_first->lon_last and the zero based indexes
+ *   ilon_first,ilon_last of the first and last point given the number of points along a parallel (pl)
+ *
+ */
+static
+void grib_get_reduced_row(long pl,double lon_first,double lon_last,long* npoints,long* ilon_first, long* ilon_last )
+{
+  double range=0,dlon_first=0,dlon_last=0;
+  long irange;
 
-//#define TEST_SUBGRID
-#ifdef  TEST_SUBGRID
-void grib_get_reduced_row(long pl,double lon_xfirst,double lon_last,long* npoints,long* ilon_first, long* ilon_last );
-#endif
+  range=lon_last-lon_first;
+  if (range<0) {range+=360;lon_first-=360;}
+
+  /* computing integer number of points and coordinates without using floating point resolution*/
+  *npoints=(range*pl)/360.0+1;
+  *ilon_first=(lon_first*pl)/360.0;
+  *ilon_last=(lon_last*pl)/360.0;
+
+  irange=*ilon_last-*ilon_first+1;
+
+  if (irange != *npoints) {
+    if (irange > *npoints) {
+      /* checking if the first point is out of range*/
+      dlon_first=((*ilon_first)*360.0)/pl;
+      if (dlon_first < lon_first) {(*ilon_first)++;irange--;
+      }
+
+      /* checking if the last point is out of range*/
+      dlon_last=((*ilon_last)*360.0)/pl;
+      if (dlon_last > lon_last) {(*ilon_last)--;irange--;
+      }
+    } else {
+      int ok=0;
+      /* checking if the point before the first is in the range*/
+      dlon_first=((*ilon_first-1)*360.0)/pl;
+      if (dlon_first > lon_first) {(*ilon_first)--;irange++;ok=1;
+      }
+
+      /* checking if the point after the last is in the range*/
+      dlon_last=((*ilon_last+1)*360.0)/pl;
+      if (dlon_last < lon_last) {(*ilon_last)++;irange++;ok=1;
+      }
+
+      /* if neither of the two are triggered then npoints is too large */
+      if (!ok) {(*npoints)--;
+      }
+    }
+
+    //   assert(*npoints==irange);
+  } else {
+	  /* checking if the first point is out of range*/
+	  dlon_first=((*ilon_first)*360.0)/pl;
+	  if (dlon_first < lon_first) {
+		  (*ilon_first)++;(*ilon_last)++;
+	  }
+  }
+
+  if (*ilon_first<0) *ilon_first+=pl;
+
+  return;
+}
+
 
 int    qu2reg3(double *pfield, int *kpoint, int klat, int klon,
 	       double msval, int *kret, int omisng, int operio, int oveggy);
+
+static
+int qu2reg_subarea(int gridsize, int np, double xfirst, double xlast, 
+		   double *array, int *rowlon, int ny, double missval, int *iret, int lmiss, int lperio, int lveggy)
+{
+  int nx = 0;
+  /* sub area (longitudes) */
+  long ilon_firstx;
+  long ilon_first, ilon_last;
+  int i, j;
+  long row_count;
+  int rlon, nwork = 0;
+  int np4 = np*4;
+  int size = 0;
+  int wlen;
+  double *work, **pwork;
+  int ii;
+  double *parray;
+
+  if ( np <= 0 ) cdoAbort("Number of values between pole and equator missing!");
+
+  grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_firstx, &ilon_last);
+  nx = row_count;
+  // printf("nx %d  %ld %ld lon1 %g lon2 %g\n", nx, ilon_firstx, ilon_last, (ilon_firstx*360.)/np4, (ilon_last*360.)/np4);
+
+  for ( j = 0; j < ny; ++j ) nwork += rowlon[j];
+
+  pwork = (double **) malloc(ny*sizeof(double *));
+  work  = (double *) malloc(ny*np4*sizeof(double));
+  wlen = 0;
+  pwork[0] = work;
+  for ( j = 1; j < ny; ++j )
+    {
+      wlen += rowlon[j-1];
+      pwork[j] = work + wlen;
+    } 
+  // printf(" ny, np4, nwork %d %d %d wlen %d\n", ny, np4, nwork, wlen);
+
+  for ( j = 0; j < ny; ++j )
+    {
+      rlon = rowlon[j];
+      for ( i = 0; i < rlon; ++i ) pwork[j][i] = missval;
+    } 
+
+  parray = array;
+  for ( j = 0; j < ny; ++j )
+    {
+      rlon = rowlon[j];
+      row_count = 0;
+      grib_get_reduced_row(rlon, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
+      // printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, rlon, row_count, ilon_first, ilon_last, (ilon_first*360.)/rlon, (ilon_last*360.)/rlon);
+
+      for ( i = ilon_first; i < (ilon_first+row_count); ++i )
+	{
+	  ii = i;
+	  if ( ii >= rlon ) ii -= rlon; 
+	  pwork[j][ii] = *parray;
+	  parray++;
+	}
+      size += row_count;
+    }
+
+  if ( gridsize != size ) cdoAbort("gridsize1 inconsistent!");
+
+  (void) qu2reg3(work, rowlon, ny, np4, missval, iret, lmiss, lperio, lveggy);
+
+  wlen = 0;
+  pwork[0] = work;
+  for ( j = 1; j < ny; ++j )
+    {
+      wlen += np4;
+      pwork[j] = work + wlen;
+    } 
+
+  // printf("nx, ilon_firstx %d %ld\n", nx, ilon_firstx);
+  parray = array;
+  for ( j = 0; j < ny; ++j )
+    {
+      for ( i = ilon_firstx; i < (ilon_firstx+nx); ++i )
+	{
+	  ii = i;
+	  if ( ii >= np4 ) ii -= np4; 
+	  *parray = pwork[j][ii];
+	  parray++;
+	}
+    }
+
+  free(work);
+  free(pwork);
+
+  return (nx);
+}
+
 
 void field2regular(int gridID1, int gridID2, double missval, double *array, int nmiss)
 {
@@ -546,122 +700,9 @@ void field2regular(int gridID1, int gridID2, double missval, double *array, int 
   xfirst = xfirstandlast[0];
   xlast  = xfirstandlast[1];
 
-  if ( xfirst != 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
+  if ( fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
     {
-#ifdef TEST_SUBGRID
-      /* sub area (longitudes) */
-      long ilon_firstx;
-      long ilon_first, ilon_last, j, i, l;
-      long row_count, rlon, nwork = 0;
-      double range;
-      int np4 = np*4;
-      int size = 0;
-      int *rowlon = NULL;
-      size_t wlen;
-      double *work, **pwork;
-      long ii;
-      double *parray;
-
-      //lmiss = 1;
-
-      if ( np <= 0 ) cdoAbort("Number of values between pole and equator missing!");
-
-      grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_firstx, &ilon_last);
-      nx = row_count;
-      printf("nx %d  %d %d lon1 %g lon2 %g\n", nx, ilon_firstx, ilon_last, (ilon_firstx*360.)/np4, (ilon_last*360.)/np4);
-
-      rowlon = (int *) malloc(ny*sizeof(int));
-      gridInqRowlon(gridID1, rowlon);
-
-      for ( j = 0; j < ny; ++j ) nwork += rowlon[j];
-
-      pwork = (double **) malloc(ny*sizeof(double *));
-      work = (double *) malloc(ny*np4*sizeof(double));
-      wlen = 0;
-      pwork[0] = work;
-      for ( j = 1; j < ny; ++j )
-	{
-	  wlen += rowlon[j-1];
-	  pwork[j] = work + wlen;
-	} 
-      printf(" ny, np4, nwork %d %d %d wlen %d\n", ny, np4, nwork, wlen);
-      for ( j = 0; j < ny; ++j )
-	{
-	  rlon = rowlon[j];
-	  for ( i = 0; i < rlon; ++i ) pwork[j][i] = missval;
-	  //	  for ( i = 0; i < rlon; ++i ) pwork[j][i] = 88;
-	} 
-      //for ( i = 0; i < nx; ++i ) printf("%d %8g\n", i, xvals[i]);
-
-      int kk = 0;
-      parray = array;
-      for ( j = 0; j < ny; ++j )
-	{
-	  rlon = rowlon[j];
-	  row_count = 0;
-	  grib_get_reduced_row(rlon, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
-	  printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, rlon, row_count, ilon_first, ilon_last, (ilon_first*360.)/rlon, (ilon_last*360.)/rlon);
-	  for ( i = ilon_first; i < (ilon_first+row_count); ++i )
-	    {
-	      ii = i;
-	      if ( ii > rlon ) ii -= rlon; 
-	      pwork[j][ii-1] = *parray;
-	      parray++;
-	      kk++;
-	    }
-	  size += row_count;
-	}
-      printf("size %d %d\n", size, kk);
-      if ( gridInqSize(gridID1) != size ) cdoAbort("gridsize1 inconsistent!");
-      /*
-      kk = 0;
-      parray = work;
-      for ( j = 0; j < ny; ++j )
-	{
-	  rlon = rowlon[j];
-	  for ( i = 0; i < rlon; ++i ) printf("j, i, k, pwork %d %d %d %g\n", j, i, kk++, *parray++);
-	} 
-      */
-      (void) qu2reg3(work, rowlon, ny, np4, missval, &iret, lmiss, lperio, lveggy);
-
-      wlen = 0;
-      pwork[0] = work;
-      for ( j = 1; j < ny; ++j )
-	{
-	  wlen += np4;
-	  pwork[j] = work + wlen;
-	} 
-      /*
-      kk = 0;
-      parray = work;
-      for ( j = 0; j < ny; ++j )
-	{
-	  for ( i = 0; i < np4; ++i ) printf(" %g\n", *parray++);
-	  //for ( i = 0; i < np4; ++i ) printf("j, i, k, pwork %d %d %d %g\n", j, i, kk++, *parray++);
-	} 
-      */
-      printf("nx, ilon_firstx %d %d\n", nx, ilon_firstx);
-      kk = 0;
-      parray = array;
-      for ( j = 0; j < ny; ++j )
-	{
-	  for ( i = ilon_firstx; i < (ilon_firstx+nx); ++i )
-	    {
-	      ii = i;
-	      if ( ii > np4 ) ii -= np4; 
-	      *parray = pwork[j][ii-1];
-	      parray++;
-	      kk++;
-	    }
-	}
-      printf("nx, ny, nx*ny, kk %d %d %d %d\n", nx, ny, nx*ny, kk);
-
-      free(rowlon);
-      free(work);
-      free(pwork);
-#else
-      cdoAbort("reduced Gaussian grid on sub area unsupported!");
-#endif
+      nx = qu2reg_subarea(gridInqSize(gridID1), np, xfirst, xlast, array, rowlon, ny, missval, &iret, lmiss, lperio, lveggy);
     }
   else
     {
@@ -701,21 +742,17 @@ int gridToRegular(int gridID1)
   xfirst = xfirstandlast[0];
   xlast  = xfirstandlast[1];
 
-  if ( xfirst != 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
+  if ( fabs(xfirst) > 0 || (np > 0 && fabs(xlast - (360.0-90.0/np)) > 90.0/np) )
     {
-#ifdef TEST_SUBGRID
       /* sub area (longitudes) */
-      long ilon_first, ilon_last, j, l;
+      long ilon_first, ilon_last;
       long row_count;
-      double range;
       int np4 = np*4;
-      int size = 0;
       int *rowlon = NULL;
 
       if ( np <= 0 ) cdoAbort("Number of values between pole and equator missing!");
 
       grib_get_reduced_row(np4, xfirst, xlast, &row_count, &ilon_first, &ilon_last);
-      //printf("j %d xfirst %g xlast %g rowlon %d %ld %ld %ld %g %g\n", j, xfirst, xlast, np4, row_count, ilon_first, ilon_last, (ilon_first*360.)/np4, (ilon_last*360.)/np4);
 
       nx = row_count;
       xvals = (double *) malloc(nx*sizeof(double));
@@ -726,9 +763,6 @@ int gridToRegular(int gridID1)
 	}
 
       free(rowlon);
-#else
-      cdoAbort("reduced Gaussian grid on sub area unsupported!");
-#endif
     }
   else
     {
