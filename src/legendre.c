@@ -56,7 +56,8 @@ void jspleg1(double *pleg, double plat, int ktrunc, double *work)
 
   */
   int itout1, i1m, ilm, jm, jcn, im2;
-  double zsin, zcos, zf1m, zre1, zf2m, zn, ze1, ze2;
+  double zsin, zcos, zf1m, zre1, zf2m, znsqr, ze1, ze2;
+  double zjmsqr;
   double *zhlp1, *zhlp2, *zhlp3;
 
 
@@ -115,12 +116,13 @@ void jspleg1(double *pleg, double plat, int ktrunc, double *work)
 
       /*  Step 5.       Sum for N = M+2 to T+1 */
 
+      zjmsqr = jm*jm;
       im2 = i1m+2;
 
       for ( jcn = im2; jcn < itout1; jcn++ )
 	{
-          zn         = jcn + 1;
-	  zhlp3[jcn] = sqrt((4.*zn*zn-1.)/(zn*zn-jm*jm));
+          znsqr      = (jcn + 1)*(jcn + 1);
+	  zhlp3[jcn] = sqrt((4.*znsqr-1.)/(znsqr-zjmsqr));
 	}
 
       for ( jcn = im2; jcn < itout1; jcn++ )
