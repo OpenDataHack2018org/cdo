@@ -287,7 +287,7 @@ void printGridInfo(int vlistID)
 	    fprintf(stdout, "size      : dim = %d", gridsize);
 
           if ( gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0 )
-	    fprintf(stdout, "  nvertex = %d\n", gridInqNvertex(gridID));
+	    fprintf(stdout, "  nvertex = %d", gridInqNvertex(gridID));
 
           fprintf(stdout, "\n");
 
