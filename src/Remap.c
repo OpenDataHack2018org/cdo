@@ -503,7 +503,6 @@ void *Remap(void *argument)
 	   gridtype != GRID_LAEA        &&
 	   gridtype != GRID_SINUSOIDAL  &&
 	   gridtype != GRID_GME         &&
-	   gridtype != GRID_REFERENCE   &&
 	   gridtype != GRID_CURVILINEAR &&
 	   gridtype != GRID_UNSTRUCTURED )
 	{

@@ -1626,7 +1626,6 @@ int gridGenArea(int gridID, double *area)
        gridtype != GRID_LAEA        &&
        gridtype != GRID_SINUSOIDAL  &&
        gridtype != GRID_GME         &&
-       gridtype != GRID_REFERENCE   &&
        gridtype != GRID_CURVILINEAR &&
        gridtype != GRID_UNSTRUCTURED )
     {
@@ -1642,17 +1641,24 @@ int gridGenArea(int gridID, double *area)
 	  grid_mask = (int *) malloc(gridsize*sizeof(int));
 	  gridInqMaskGME(gridID, grid_mask);
 	}
-      else if ( gridtype == GRID_REFERENCE )
-	{
-	  lgriddestroy = TRUE;
-	  gridID = referenceToGrid(gridID);
-	  if ( gridID == -1 ) return (1);
-	}
       else
 	{
 	  lgriddestroy = TRUE;
 	  gridID = gridToCurvilinear(gridID, 1);
 	  lgrid_gen_bounds = TRUE;
+	}
+    }
+
+  if ( gridtype == GRID_UNSTRUCTURED )
+    {
+      if ( gridInqYvals(gridID, NULL) == 0 || gridInqXvals(gridID, NULL) == 0 )
+	{
+	  if ( gridInqNumber(gridID) > 0 )
+	    {
+	      lgriddestroy = TRUE;
+	      gridID = referenceToGrid(gridID);
+	      if ( gridID == -1 ) return (1);
+	    }
 	}
     }
 
@@ -1936,7 +1942,6 @@ int gridWeights(int gridID, double *grid_wgts)
 	   gridtype == GRID_LAEA        ||
 	   gridtype == GRID_SINUSOIDAL  ||
 	   gridtype == GRID_GME         ||
-	   gridtype == GRID_REFERENCE   ||
 	   gridtype == GRID_CURVILINEAR ||
 	   gridtype == GRID_UNSTRUCTURED )
 	{

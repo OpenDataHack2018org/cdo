@@ -276,28 +276,37 @@ void printGridInfo(int vlistID)
 	  nd = gridInqGMEnd(gridID);
 	  fprintf(stdout, "size      : dim = %d  nd = %d  ni = %d\n", gridsize, nd, ni);
 	}
-      else if ( gridtype == GRID_REFERENCE )
-	{
-	  int number, position;
-	  number   = gridInqNumber(gridID);
-	  position = gridInqPosition(gridID);
-	  fprintf(stdout, "size      : dim = %d\n", gridsize);
-	  fprintf(stdout, "%*s", nbyte0, "");
-	  fprintf(stdout, "grid      : number = %d  position = %d\n", number, position);
-	  if ( gridInqReference(gridID, NULL) )
-	    {
-	      char reference_link[8192];
-	      gridInqReference(gridID, reference_link);
-	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "path      : %s\n", reference_link);
-	    }
-	}
       else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
 	{
+	  int number   = gridInqNumber(gridID);
+	  int position = gridInqPosition(gridID);
+
 	  if ( gridtype == GRID_CURVILINEAR )
-	    fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d\n", gridsize, xsize, ysize);
+	    fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d", gridsize, xsize, ysize);
 	  else
-	    fprintf(stdout, "size      : dim = %d  nvertex = %d\n", gridsize, gridInqNvertex(gridID));
+	    fprintf(stdout, "size      : dim = %d", gridsize);
+
+          if ( gridtype == GRID_UNSTRUCTURED && gridInqNvertex(gridID) > 0 )
+	    fprintf(stdout, "  nvertex = %d\n", gridInqNvertex(gridID));
+
+          fprintf(stdout, "\n");
+
+          if ( gridtype == GRID_UNSTRUCTURED )
+            {
+              if ( number > 0 )
+                {
+                  fprintf(stdout, "%*s", nbyte0, "");
+                  fprintf(stdout, "grid      : number = %d  position = %d\n", number, position);
+                }
+
+              if ( gridInqReference(gridID, NULL) )
+                {
+                  char reference_link[8192];
+                  gridInqReference(gridID, reference_link);
+                  fprintf(stdout, "%*s", nbyte0, "");
+                  fprintf(stdout, "path      : %s\n", reference_link);
+                }
+            }
 
 	  if ( gridInqXvals(gridID, NULL) && gridInqYvals(gridID, NULL) )
 	    {

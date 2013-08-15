@@ -987,16 +987,28 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
       rg->gridID1 = gridID1 = expand_lonlat_grid(gridID1);
     }
 
-  if ( gridInqType(rg->gridID1) == GRID_REFERENCE )
+  if ( gridInqType(gridID1) == GRID_UNSTRUCTURED )
     {
-      rg->gridID1 = gridID1 = referenceToGrid(gridID1);
-      if ( gridID1 == -1 ) cdoAbort("grid1 reference not found!");
+      if ( gridInqYvals(gridID1, NULL) == 0 || gridInqXvals(gridID1, NULL) == 0 )
+	{
+	  if ( gridInqNumber(gridID1) > 0 )
+	    {
+	      rg->gridID1 = gridID1 = referenceToGrid(gridID1);
+	      if ( gridID1 == -1 ) cdoAbort("grid1 reference not found!");
+	    }
+	}
     }
 
-  if ( gridInqType(rg->gridID2) == GRID_REFERENCE )
+  if ( gridInqType(gridID2) == GRID_UNSTRUCTURED )
     {
-      rg->gridID2 = gridID2 = referenceToGrid(gridID2);
-      if ( gridID2 == -1 ) cdoAbort("grid2 reference not found!");
+      if ( gridInqYvals(gridID2, NULL) == 0 || gridInqXvals(gridID2, NULL) == 0 )
+	{
+	  if ( gridInqNumber(gridID2) > 0 )
+	    {
+	      rg->gridID2 = gridID2 = referenceToGrid(gridID2);
+	      if ( gridID2 == -1 ) cdoAbort("grid2 reference not found!");
+	    }
+	}
     }
 
   if ( gridInqSize(rg->gridID1) > 1 && 

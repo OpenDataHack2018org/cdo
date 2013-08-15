@@ -49,6 +49,7 @@ void *Setgrid(void *argument)
   long areasize = 0;
   long masksize = 0;
   int lregular = 0;
+  int ldereference = 0;
   int ligme = 0;
   int number = 0, position = 0;
   int grid2_nvgp;
@@ -85,7 +86,7 @@ void *Setgrid(void *argument)
       if      ( strcmp(gridname, "curvilinear") == 0 )   gridtype = GRID_CURVILINEAR;
       else if ( strcmp(gridname, "cell") == 0 )          gridtype = GRID_UNSTRUCTURED;
       else if ( strcmp(gridname, "unstructured") == 0 )  gridtype = GRID_UNSTRUCTURED;
-      else if ( strcmp(gridname, "dereference") == 0 )   gridtype = GRID_REFERENCE;
+      else if ( strcmp(gridname, "dereference") == 0 )   ldereference = 1;
       else if ( strcmp(gridname, "lonlat") == 0 )        gridtype = GRID_LONLAT;
       else if ( strcmp(gridname, "gaussian") == 0 )      gridtype = GRID_GAUSSIAN;
       else if ( strcmp(gridname, "regular") == 0 )      {gridtype = GRID_GAUSSIAN; lregular = 1;}
@@ -206,7 +207,7 @@ void *Setgrid(void *argument)
   else if ( operatorID == SETGRIDNUMBER )
     {
       gridID1 = vlistGrid(vlistID1, 0);
-      gridID2 = gridCreate(GRID_REFERENCE, gridInqSize(gridID1));
+      gridID2 = gridCreate(GRID_UNSTRUCTURED, gridInqSize(gridID1));
       gridDefNumber(gridID2, number);
       gridDefPosition(gridID2, position);
 
@@ -239,6 +240,11 @@ void *Setgrid(void *argument)
 		  gridID2 = gridToRegular(gridID1);
 		}
 	    }
+	  else if ( ldereference    )
+	    {
+	      gridID2 = referenceToGrid(gridID1);
+	      if ( gridID2 == -1 ) cdoAbort("Grid reference not found!");
+	    }
 	  else
 	    {
 	      if      ( gridtype == GRID_CURVILINEAR  )
@@ -258,11 +264,6 @@ void *Setgrid(void *argument)
 		      gridCompress(gridID2);
 		    }
 		}
-	      else if ( gridtype == GRID_REFERENCE    )
-		{
-		  gridID2 = referenceToGrid(gridID1);
-		  if ( gridID2 == -1 ) cdoAbort("Grid reference not found!");
- 		}
 	      else if ( gridtype == GRID_LONLAT && gridInqType(gridID1) == GRID_CURVILINEAR )
 		{
 		  gridID2 = gridCurvilinearToRegular(gridID1);

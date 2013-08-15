@@ -317,7 +317,13 @@ int gridDefine(griddes_t grid)
 	  }
 	else
 	  {
-	    gridDefNvertex(gridID, grid.nvertex);
+	    if ( grid.nvertex > 0 ) gridDefNvertex(gridID, grid.nvertex);
+	    if ( grid.number > 0 )
+	      {
+		gridDefNumber(gridID, grid.number);
+		if ( grid.position >= 0 ) gridDefPosition(gridID, grid.position);
+	      }
+	    if ( *grid.path ) gridDefReference(gridID, grid.path);
 	  }
 
 	if ( grid.xvals )
@@ -483,16 +489,6 @@ int gridDefine(griddes_t grid)
 	    gridDefMask(gridID, grid.mask);
 	    free(grid.mask);
 	  }
-
-	break;
-      }
-    case GRID_REFERENCE:
-      {
-	gridID = gridCreate(grid.type, grid.size);
-
-	gridDefNumber(gridID, grid.number);
-	gridDefPosition(gridID, grid.position);
-	if ( *grid.path ) gridDefReference(gridID, grid.path);
 
 	break;
       }
@@ -728,8 +724,6 @@ int gridFromFile(FILE *gfp, const char *dname)
 	    grid.type = GRID_UNSTRUCTURED;
 	  else if ( cmpstr(pline, "gme", len)  == 0 )
 	    grid.type = GRID_GME;
-	  else if ( cmpstr(pline, "reference", len)  == 0 )
-	    grid.type = GRID_REFERENCE;
 	  else if ( cmpstr(pline, "lcc2", len)  == 0 )
 	    grid.type = GRID_LCC2;
 	  else if ( cmpstr(pline, "lcc", len)  == 0 )
