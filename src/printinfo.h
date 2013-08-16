@@ -304,7 +304,7 @@ void printGridInfo(int vlistID)
                   char reference_link[8192];
                   gridInqReference(gridID, reference_link);
                   fprintf(stdout, "%*s", nbyte0, "");
-                  fprintf(stdout, "path      : %s\n", reference_link);
+                  fprintf(stdout, "uri       : %s\n", reference_link);
                 }
             }
 
