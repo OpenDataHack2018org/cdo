@@ -1454,6 +1454,7 @@ int search_file(const char *restrict directory, const char *restrict filename)
 /*
  * callback function for curl for writing the network retrieved grid file
  */
+static
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
   size_t written;
   written = fwrite(ptr, size, nmemb, stream);
@@ -1485,7 +1486,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
     }
 
   hd = curl_easy_init();
-  if (hd == NULL) 
+  if (hd == NULL)
     {
       fprintf(stderr, "ERROR: could not get curl handler.\n");
       return -1;
@@ -1500,6 +1501,8 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
 	  return -1;
 	}
 
+      // curl_easy_setopt(hd, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+      // curl_easy_setopt(hd, CURLOPT_VERBOSE, 1);
       curl_easy_setopt(hd, CURLOPT_URL, uri);
       curl_easy_setopt(hd, CURLOPT_WRITEFUNCTION, write_data);
       curl_easy_setopt(hd, CURLOPT_WRITEDATA, fp);
@@ -1574,8 +1577,8 @@ int referenceToGrid(int gridID1)
 
 	  if ( status != 0 )
 	    {
-	      //strcpy(griduri, "http://icon-downloads.mpimet.mpg.de:/grids/public/edzw/icon_grid_0001_R02B05_R.nc");
-	      //char *basename = strrchr(griduri, '/') + 1;
+	      strcpy(griduri, "http://icon-downloads.mpimet.mpg.de:/grids/public/edzw/icon_grid_0001_R02B05_R.nc");
+	      char *basename = strrchr(griduri, '/') + 1;
 	      if ( cdoVerbose ) cdoPrint("Download horizontal grid file %s to %s", griduri, basename);
 	      status = download_gridfile(griduri, basename);
 	    }
