@@ -69,6 +69,7 @@ char *Progname;
 
 int ompNumThreads = 1;
 
+char *cdoGridSearchDir   = NULL;
 int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
@@ -797,6 +798,23 @@ void get_env_vars(void)
 {
   char *envstr;
 
+  envstr = getenv("CDO_GRID_SEARCH_DIR");
+  if ( envstr )
+    {
+      size_t len = strlen(envstr);
+      if ( len > 0 )
+	{
+	  len += 2;
+	  cdoGridSearchDir = (char *) malloc(len);
+	  memcpy(cdoGridSearchDir, envstr, len-1);
+	  if ( cdoGridSearchDir[len-3] != '/' )
+	    {
+	      cdoGridSearchDir[len-2] = '/';
+	      cdoGridSearchDir[len-1] = 0;
+	    }
+	}
+    }
+
   envstr = getenv("CDO_LOG_OFF");
   if ( envstr )
     {
@@ -1272,6 +1290,8 @@ int main(int argc, char *argv[])
   /* problems with alias!!! if ( operatorName ) free(operatorName); */ 
 
   /* malloc_stats(); */
+
+  if ( cdoGridSearchDir ) free(cdoGridSearchDir);
 
   return (status);
 }

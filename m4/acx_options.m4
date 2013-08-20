@@ -354,6 +354,33 @@ AC_ARG_WITH([proj],
             [AC_MSG_CHECKING([for the PROJ library])
              AC_MSG_RESULT([suppressed])])
 #  ----------------------------------------------------------------------
+#  Checks for CURL library
+AC_ARG_WITH([curl],
+            [AS_HELP_STRING([--with-curl=<directory>],
+                            [Specify location of CURL library.])],
+            [AS_CASE(["$with_curl"],
+                     [no],[AC_MSG_CHECKING([for curl library])
+                           AC_MSG_RESULT([suppressed])],
+                     [yes],[AC_CHECK_HEADERS([curl/curl.h])
+                            AC_SEARCH_LIBS([curl_global_init],[curl],[AC_DEFINE([HAVE_LIBCURL],[1],[Define to 1 for CURL support])],
+                                           [AC_MSG_ERROR([Could not link to CURL library!])])
+                            AC_SUBST([CURL_LDFLAGS],[" -lcurl"])
+                            AC_SUBST([CURL_INCLUDE],[""])],
+                     [*],[CURL_ROOT=$with_curl
+                          AS_IF([test -d "$CURL_ROOT"],
+                                [LDFLAGS="-L$CURL_ROOT/lib $LDFLAGS"
+                                 CPPFLAGS="-I$CURL_ROOT/include $CPPFLAGS"
+                                 AC_CHECK_HEADERS([curl/curl.h])
+                                 AC_SEARCH_LIBS([curl_global_init],
+                                                [curl],
+                                                [AC_DEFINE([HAVE_LIBCURL],[1],[Define to 1 for CURL support])],
+                                                [AC_MSG_ERROR([Could not link to CURL library!])])
+                                 AC_SUBST([CURL_LDFLAGS],[" -L$CURL_ROOT/lib -lcurl"])
+                                 AC_SUBST([CURL_INCLUDE],[" -I$CURL_ROOT/include"])],
+                                [AC_MSG_ERROR([$CURL_ROOT is not a directory! CURL suppressed])])])],
+            [AC_MSG_CHECKING([for the CURL library])
+             AC_MSG_RESULT([suppressed])])
+#  ----------------------------------------------------------------------
 #  Link application with UDUNITS2 library
 AC_ARG_WITH([udunits2],
             [AS_HELP_STRING([--with-udunits2=<directory>],
