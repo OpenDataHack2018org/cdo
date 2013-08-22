@@ -243,7 +243,7 @@ void *Setgrid(void *argument)
 	  else if ( ldereference    )
 	    {
 	      gridID2 = referenceToGrid(gridID1);
-	      if ( gridID2 == -1 ) cdoAbort("Grid reference not found!");
+	      if ( gridID2 == -1 ) cdoAbort("Reference to horizontal grid not found!");
 	    }
 	  else
 	    {

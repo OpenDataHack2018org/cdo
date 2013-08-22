@@ -522,6 +522,7 @@ src/griddes.c -text
 src/griddes.h -text
 src/griddes_h5.c -text
 src/griddes_nc.c -text
+src/gridreference.c -text
 src/hetaeta.c -text
 src/hetaeta.h -text
 src/history.c -text

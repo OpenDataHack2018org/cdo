@@ -220,6 +220,7 @@ cdo_SOURCES += Adisit.c        \
                grid_gme.c      \
                grid_lcc.c      \
                grid_rot.c      \
+               gridreference.c \
                griddes.c       \
                griddes.h       \
                griddes_h5.c    \
