@@ -143,6 +143,10 @@ this feature:
    cdo timavg -select,name=temperature 'ifile?' ofile
 \end{verbatim}
 
+The CDO internal wildcard expansion is using the {\it glob()} function. 
+Therefore internal wildcard expansion is not available on operating systems without the {\it glob()} function!
+
+{\bf Note:}
 Operator chaining is implemented over POSIX Threads (pthreads).
 Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
 
