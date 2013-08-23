@@ -33,7 +33,7 @@
 
 void *Setgrid(void *argument)
 {
-  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK, SETGRIDNUMBER;
+  int SETGRID, SETGRIDTYPE, SETGRIDAREA, SETGRIDMASK, UNSETGRIDMASK, SETGRIDNUMBER, SETGRIDURI;
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int nrecs;
@@ -55,6 +55,7 @@ void *Setgrid(void *argument)
   int grid2_nvgp;
   int *grid2_vgpm = NULL;
   char *gridname = NULL;
+  char *griduri = NULL;
   double *gridmask = NULL;
   double *areaweight = NULL;
   double *array = NULL;
@@ -67,6 +68,7 @@ void *Setgrid(void *argument)
   SETGRIDMASK   = cdoOperatorAdd("setgridmask",   0, 0, "filename with grid mask");
   UNSETGRIDMASK = cdoOperatorAdd("unsetgridmask", 0, 0, NULL);
   SETGRIDNUMBER = cdoOperatorAdd("setgridnumber", 0, 0, "grid number and optionally grid position");
+  SETGRIDURI    = cdoOperatorAdd("setgriduri",    0, 0, "reference URI of the horizontal grid");
 
   operatorID = cdoOperatorID();
 
@@ -176,6 +178,11 @@ void *Setgrid(void *argument)
 	  operatorCheckArgc(1);
 	}
     }
+  else if ( operatorID == SETGRIDURI )
+    {
+      operatorCheckArgc(1);
+      griduri = operatorArgv()[0];
+    }
 
   streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -204,12 +211,21 @@ void *Setgrid(void *argument)
 	}
       if ( ! found ) cdoWarning("No grid with %d points found!", gridInqSize(gridID2));
     }
-  else if ( operatorID == SETGRIDNUMBER )
+  else if ( operatorID == SETGRIDNUMBER || operatorID == SETGRIDURI )
     {
       gridID1 = vlistGrid(vlistID1, 0);
-      gridID2 = gridCreate(GRID_UNSTRUCTURED, gridInqSize(gridID1));
-      gridDefNumber(gridID2, number);
-      gridDefPosition(gridID2, position);
+
+      if ( operatorID == SETGRIDNUMBER )
+	{
+	  gridID2 = gridCreate(GRID_UNSTRUCTURED, gridInqSize(gridID1));
+	  gridDefNumber(gridID2, number);
+	  gridDefPosition(gridID2, position);
+	}
+      else
+	{
+	  gridID2 = gridDuplicate(gridID1);
+	  gridDefReference(gridID2, griduri);
+	}
 
       found = 0;
       ngrids = vlistNgrids(vlistID1);
@@ -223,7 +239,7 @@ void *Setgrid(void *argument)
 	      found++;
 	    }
 	}
-      if ( ! found ) cdoWarning("No grid with %d points found!", gridInqSize(gridID2));
+      if ( ! found ) cdoWarning("No horizontal grid with %d cells found!", gridInqSize(gridID2));
     }
   else if ( operatorID == SETGRIDTYPE )
     {

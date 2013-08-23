@@ -42,6 +42,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 /* code from grid_tools.2 */
 int download_gridfile(const char *restrict uri, const char *restrict basename)
 {
+  int rval = 1;
 #if  defined  (HAVE_LIBCURL)
   // As curl_easy_init calls non-thread safe curl_global_init the libcurl developer advice
   // to call curl_global_init first and before potential thread spawning.
@@ -49,7 +50,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   CURLcode ret;  
   CURL *hd;
   double length;
-  int status, rval = 1;
+  int status;
   int curlflags = CURL_GLOBAL_DEFAULT;
 
 #if defined (CURL_GLOBAL_ACK_EINTR)
@@ -157,8 +158,7 @@ int search_file(const char *restrict directory, const char *restrict filename)
 int referenceToGrid(int gridID1)
 {
   int gridID2 = -1;
-  int gridtype, gridsize;
-  int offset = 7;
+  int gridsize;
   char griduri[8912];
   char gridpath[8912];
 
@@ -173,11 +173,22 @@ int referenceToGrid(int gridID1)
     }
   else
     {
+      int lgriduri = TRUE;
       int status;
       int streamID;
       int number, position;
 
-      char *basename = strrchr(griduri, '/') + 1;
+      char *basename = strrchr(griduri, '/');
+      if ( basename == NULL )
+	{
+	  basename = griduri;
+	  lgriduri = FALSE;
+	}
+      else
+	{
+	  basename++;
+	}
+
       strcpy(gridpath, "./");
       strcat(gridpath, basename);
       if ( cdoVerbose ) cdoPrint("Search for horizontal grid file \"%s\"", gridpath);
@@ -197,7 +208,7 @@ int referenceToGrid(int gridID1)
 	      status = search_file(cdoGridSearchDir, gridpath);
 	    }
 
-	  if ( status != 0 )
+	  if ( status != 0 && lgriduri )
 	    {
 	      /*
 	      strcpy(griduri, "http://icon-downloads.mpimet.mpg.de/grids/public/edzw/icon_grid_0001x_R02B05_R.nc");
@@ -245,7 +256,7 @@ int referenceToGrid(int gridID1)
 		    }
 		}
 	      else
-		cdoWarning("Grid position %d not available! Reference=%s", position, gridpath);
+		cdoWarning("Number of grid in reference %d not available! Reference=%s", position, gridpath);
 	      
 	      streamClose(streamID);
 	    }
