@@ -33,6 +33,10 @@
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 
+#if defined (HAVE_ZLIB_H)
+#include <zlib.h>
+#endif
+
 #if defined (SX)
 #define RLIM_T  long long
 #else
@@ -140,24 +144,9 @@ int timer_total, timer_read, timer_write;
 
 
 static
-void cdo_version(void)
+void printFeatures(void)
 {
-  int   filetypes[] = {FILETYPE_SRV, FILETYPE_EXT, FILETYPE_IEG, FILETYPE_GRB, FILETYPE_GRB2, FILETYPE_NC, FILETYPE_NC2, FILETYPE_NC4, FILETYPE_NC4C};
-  char *typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
-
-  fprintf(stderr, "%s\n", CDO_Version);
-#if defined (COMPILER)
-  fprintf(stderr, "Compiler: %s\n", COMPILER);
-#endif
-#if defined (COMP_VERSION)
-  fprintf(stderr, " version: %s\n", COMP_VERSION);
-#endif
-#if defined (USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
-	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
-#endif
-
-  fprintf(stderr, "    with:");
+  fprintf(stderr, "Features:");
 #if defined (HAVE_LIBPTHREAD)
   fprintf(stderr, " PTHREADS");
 #endif
@@ -198,8 +187,84 @@ void cdo_version(void)
   fprintf(stderr, " CURL");
 #endif
   fprintf(stderr, "\n");
+}
 
-  fprintf(stderr, "filetype: ");
+static
+void printLibraries(void)
+{
+  fprintf(stderr, "Libraries:");
+#if defined (HAVE_LIBPTHREAD)
+  fprintf(stderr, " PTHREADS");
+#endif
+#if defined (_OPENMP)
+  fprintf(stderr, " OpenMP");
+#endif
+#if  defined  (HAVE_NETCDF4)
+  fprintf(stderr, " NC4");
+#endif
+#if  defined  (HAVE_LIBNC_DAP)
+  fprintf(stderr, " OPeNDAP");
+#endif
+#if defined (HAVE_LIBSZ)
+  fprintf(stderr, " SZ");
+#endif
+
+#if defined (HAVE_LIBZ)
+  fprintf(stderr, " zlib/%s", zlibVersion());
+#if defined (ZLIB_VERSION)
+  if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
+    fprintf(stderr, "(h%s)", ZLIB_VERSION);
+#else
+  fprintf(stderr, "(header not found)");
+#endif
+#endif
+
+#if defined (HAVE_LIBJASPER)
+  fprintf(stderr, " JASPER");
+#endif
+#if defined (HAVE_LIBUDUNITS2)
+  fprintf(stderr, " UDUNITS2");
+#endif
+#if defined (HAVE_LIBPROJ)
+  fprintf(stderr, " PROJ.4");
+#endif
+#if defined (HAVE_LIBXML2)
+  fprintf(stderr, " XML2");
+#endif
+#if defined (HAVE_LIBMAGICS)
+  fprintf(stderr, " MAGICS");
+#endif
+#if defined (HAVE_LIBDRMAA)
+  fprintf(stderr, " DRMAA");
+#endif
+#if defined (HAVE_LIBCURL)
+  fprintf(stderr, " CURL");
+#endif
+  fprintf(stderr, "\n");
+}
+
+static
+void cdo_version(void)
+{
+  int   filetypes[] = {FILETYPE_SRV, FILETYPE_EXT, FILETYPE_IEG, FILETYPE_GRB, FILETYPE_GRB2, FILETYPE_NC, FILETYPE_NC2, FILETYPE_NC4, FILETYPE_NC4C};
+  char *typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
+
+  fprintf(stderr, "%s\n", CDO_Version);
+#if defined (COMPILER)
+  fprintf(stderr, "Compiler: %s\n", COMPILER);
+#endif
+#if defined (COMP_VERSION)
+  fprintf(stderr, " version: %s\n", COMP_VERSION);
+#endif
+#if defined (USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
+  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
+	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+#endif
+
+  printFeatures();
+  printLibraries();
+
+  fprintf(stderr, "Filetypes: ");
   for ( size_t i = 0; i < sizeof(filetypes)/sizeof(int); ++i )
     if ( cdiHaveFiletype(filetypes[i]) ) fprintf(stderr, "%s ", typenames[i]);
   fprintf(stderr, "\n");
