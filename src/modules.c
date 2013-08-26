@@ -695,7 +695,7 @@ static modules_t Modules[] =
   { Timselpctl,     TimselpctlHelp,    TimselpctlOperators,    CDI_REAL,  3,  1 },
   { Timsort,        TimsortHelp,       TimsortOperators,       CDI_REAL,  1,  1 },
   { Timselstat,     TimselstatHelp,    TimselstatOperators,    CDI_REAL,  1,  1 },
-  { Timstat,        TimstatHelp,       TimstatOperators,       CDI_REAL,  1,  1 },
+  { Timstat,        TimstatHelp,       TimstatOperators,       CDI_BOTH,  1,  1 },
   { Timstat,        YearstatHelp,      YearstatOperators,      CDI_REAL,  1,  1 },
   { Timstat,        MonstatHelp,       MonstatOperators,       CDI_REAL,  1,  1 },
   { Timstat,        DaystatHelp,       DaystatOperators,       CDI_REAL,  1,  1 },

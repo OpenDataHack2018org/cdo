@@ -228,6 +228,7 @@ void *Timstat(void *argument)
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
+  if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 

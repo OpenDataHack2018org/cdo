@@ -11,6 +11,7 @@ field_t **field_allocate(int vlistID, int ptype, int init)
   int nvars, nlevel;
   int varID, zaxisID, levelID;
   int gridID, gridsize;
+  int nwpv; // number of words per value; real:1  complex:2
   double missval;
   field_t **field;
 
@@ -26,9 +27,16 @@ field_t **field_allocate(int vlistID, int ptype, int init)
       nlevel   = zaxisInqSize(zaxisID);
       missval  = vlistInqVarMissval(vlistID, varID);
 
+      if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX32 || 
+	   vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX64 )
+	nwpv = 2;
+      else
+	nwpv = 1;
+
       field[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
+	  field[varID][levelID].nwpv    = nwpv;
 	  field[varID][levelID].grid    = gridID;
 	  field[varID][levelID].nsamp   = 0;
 	  field[varID][levelID].nmiss   = 0;
@@ -38,14 +46,14 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 
 	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
 	    {
-	      field[varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].ptr, 0, gridsize*sizeof(double));
+	      field[varID][levelID].ptr = (double *) malloc(nwpv*gridsize*sizeof(double));
+	      if ( init ) memset(field[varID][levelID].ptr, 0, nwpv*gridsize*sizeof(double));
 	    }
 
 	  if ( ptype == FIELD_ALL || ptype == FIELD_PTR )
 	    {
-	      field[varID][levelID].weight = (double *) malloc(gridsize*sizeof(double));
-	      if ( init ) memset(field[varID][levelID].weight, 0, gridsize*sizeof(double));
+	      field[varID][levelID].weight = (double *) malloc(nwpv*gridsize*sizeof(double));
+	      if ( init ) memset(field[varID][levelID].weight, 0, nwpv*gridsize*sizeof(double));
 	    }    
 	}
     }

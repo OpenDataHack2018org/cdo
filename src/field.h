@@ -49,6 +49,7 @@ double _FSQRT_(const double x, const double missval1);
 
 
 typedef struct {
+  int      nwpv; // number of words per value; real:1  complex:2
   int      grid;
   int      zaxis;
   size_t   size;

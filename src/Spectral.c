@@ -26,6 +26,8 @@
       Spectral   spcut           Cut spectral wave number
 */
 
+#include <ctype.h>
+
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
@@ -185,6 +187,7 @@ void *Spectral(void *argument)
       operatorInputArg("truncation");
       if ( gridID1 != -1 )
 	{
+	  if ( !isdigit(operatorArgv()[0][0]) ) cdoAbort("parameter truncation must comprise only digits [0-9]!");
 	  int ntr = atoi(operatorArgv()[0]);
 	  int nsp = (ntr+1)*(ntr+2);
 	  gridIDsp = gridCreate(GRID_SPECTRAL, nsp);
