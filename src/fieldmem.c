@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <cdi.h>
+#include <cdo.h>
 #include "dmemory.h"
 #include "field.h"
 
@@ -21,17 +22,12 @@ field_t **field_allocate(int vlistID, int ptype, int init)
 
   for ( varID = 0; varID < nvars; ++varID )
     {
+      nwpv     = vlistInqNWPV(vlistID, varID);
       gridID   = vlistInqVarGrid(vlistID, varID);
       gridsize = gridInqSize(gridID);
       zaxisID  = vlistInqVarZaxis(vlistID, varID);
       nlevel   = zaxisInqSize(zaxisID);
       missval  = vlistInqVarMissval(vlistID, varID);
-
-      if ( vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX32 || 
-	   vlistInqVarDatatype(vlistID, varID) == DATATYPE_CPX64 )
-	nwpv = 2;
-      else
-	nwpv = 1;
 
       field[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
       for ( levelID = 0; levelID < nlevel; ++levelID )

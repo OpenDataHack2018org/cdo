@@ -111,7 +111,9 @@ void    cdoDefHistory(int fileID, char *histstring);
 int     cdoDefineGrid(const char *gridfile);
 int     cdoDefineZaxis(const char *zaxisfile);
 
+int     vlistInqNWPV(int vlistID, int varID);
 int     vlistIsSzipped(int vlistID);
+
 void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname);
 
 int  gridWeights(int gridID, double *weights);

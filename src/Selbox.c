@@ -947,11 +947,7 @@ void *Selbox(void *argument)
 
 	  if ( vars[varID] )
 	    {
-	      if ( vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX32 || 
-		   vlistInqVarDatatype(vlistID1, varID) == DATATYPE_CPX64 )
-		nwpv = 2;
-	      else
-		nwpv = 1;
+	      nwpv    = vlistInqNWPV(vlistID1, varID);
 	      
 	      gridID1 = vlistInqVarGrid(vlistID1, varID);
 
