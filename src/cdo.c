@@ -33,10 +33,6 @@
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 
-#if defined (HAVE_ZLIB_H)
-#include <zlib.h>
-#endif
-
 #if defined (SX)
 #define RLIM_T  long long
 #else
@@ -143,105 +139,8 @@ int timer_total, timer_read, timer_write;
       }
 
 
-static
-void printFeatures(void)
-{
-  fprintf(stderr, "Features:");
-#if defined (HAVE_LIBPTHREAD)
-  fprintf(stderr, " PTHREADS");
-#endif
-#if defined (_OPENMP)
-  fprintf(stderr, " OpenMP");
-#endif
-#if  defined  (HAVE_NETCDF4)
-  fprintf(stderr, " NC4");
-#endif
-#if  defined  (HAVE_LIBNC_DAP)
-  fprintf(stderr, " OPeNDAP");
-#endif
-#if defined (HAVE_LIBSZ)
-  fprintf(stderr, " SZ");
-#endif
-#if defined (HAVE_LIBZ)
-  fprintf(stderr, " Z");
-#endif
-#if defined (HAVE_LIBJASPER)
-  fprintf(stderr, " JASPER");
-#endif
-#if defined (HAVE_LIBUDUNITS2)
-  fprintf(stderr, " UDUNITS2");
-#endif
-#if defined (HAVE_LIBPROJ)
-  fprintf(stderr, " PROJ.4");
-#endif
-#if defined (HAVE_LIBXML2)
-  fprintf(stderr, " XML2");
-#endif
-#if defined (HAVE_LIBMAGICS)
-  fprintf(stderr, " MAGICS");
-#endif
-#if defined (HAVE_LIBDRMAA)
-  fprintf(stderr, " DRMAA");
-#endif
-#if defined (HAVE_LIBCURL)
-  fprintf(stderr, " CURL");
-#endif
-  fprintf(stderr, "\n");
-}
-
-static
-void printLibraries(void)
-{
-  fprintf(stderr, "Libraries:");
-#if defined (HAVE_LIBPTHREAD)
-  fprintf(stderr, " PTHREADS");
-#endif
-#if defined (_OPENMP)
-  fprintf(stderr, " OpenMP");
-#endif
-#if  defined  (HAVE_NETCDF4)
-  fprintf(stderr, " NC4");
-#endif
-#if  defined  (HAVE_LIBNC_DAP)
-  fprintf(stderr, " OPeNDAP");
-#endif
-#if defined (HAVE_LIBSZ)
-  fprintf(stderr, " SZ");
-#endif
-
-#if defined (HAVE_LIBZ)
-  fprintf(stderr, " zlib/%s", zlibVersion());
-#if defined (ZLIB_VERSION)
-  if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
-    fprintf(stderr, "(h%s)", ZLIB_VERSION);
-#else
-  fprintf(stderr, "(header not found)");
-#endif
-#endif
-
-#if defined (HAVE_LIBJASPER)
-  fprintf(stderr, " JASPER");
-#endif
-#if defined (HAVE_LIBUDUNITS2)
-  fprintf(stderr, " UDUNITS2");
-#endif
-#if defined (HAVE_LIBPROJ)
-  fprintf(stderr, " PROJ.4");
-#endif
-#if defined (HAVE_LIBXML2)
-  fprintf(stderr, " XML2");
-#endif
-#if defined (HAVE_LIBMAGICS)
-  fprintf(stderr, " MAGICS");
-#endif
-#if defined (HAVE_LIBDRMAA)
-  fprintf(stderr, " DRMAA");
-#endif
-#if defined (HAVE_LIBCURL)
-  fprintf(stderr, " CURL");
-#endif
-  fprintf(stderr, "\n");
-}
+void printFeatures(void);
+void printLibraries(void);
 
 static
 void cdo_version(void)

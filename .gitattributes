@@ -502,6 +502,7 @@ src/expr_lex.l -text
 src/expr_yacc.c -text
 src/expr_yacc.h -text
 src/expr_yacc.y -text
+src/features.c -text
 src/field.c -text
 src/field.h -text
 src/field2.c -text

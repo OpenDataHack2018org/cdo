@@ -204,6 +204,7 @@ cdo_SOURCES += Adisit.c        \
                expr_lex.c      \
                expr_yacc.c     \
                expr_yacc.h     \
+               features.c      \
                field.c         \
                field.h         \
                field2.c        \

@@ -122,14 +122,14 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	commandline.c const.h counter.h dmemory.h dtypes.h ecacore.c \
 	ecacore.h ecautil.c ecautil.h error.h etopo.h temp.h mask.h \
 	exception.c expr.c expr.h expr_lex.c expr_yacc.c expr_yacc.h \
-	field.c field.h field2.c fieldc.c fieldmem.c fieldmer.c \
-	fieldzon.c fouriertrans.c functs.h gradsdeslib.c gradsdeslib.h \
-	grid.c grid.h grid_gme.c grid_lcc.c grid_rot.c gridreference.c \
-	griddes.c griddes.h griddes_h5.c griddes_nc.c hetaeta.c \
-	hetaeta.h history.c institution.c interpol.c interpol.h job.c \
-	juldate.c kvlist.c kvlist.h legendre.c list.c list.h \
-	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
-	namelist.h normal.c nth_element.c nth_element.h \
+	features.c field.c field.h field2.c fieldc.c fieldmem.c \
+	fieldmer.c fieldzon.c fouriertrans.c functs.h gradsdeslib.c \
+	gradsdeslib.h grid.c grid.h grid_gme.c grid_lcc.c grid_rot.c \
+	gridreference.c griddes.c griddes.h griddes_h5.c griddes_nc.c \
+	hetaeta.c hetaeta.h history.c institution.c interpol.c \
+	interpol.h job.c juldate.c kvlist.c kvlist.h legendre.c list.c \
+	list.h merge_sort2.c merge_sort2.h modules.c modules.h \
+	namelist.c namelist.h normal.c nth_element.c nth_element.h \
 	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
 	pipe.c pipe.h printinfo.h process.c process.h pstream.c \
 	pstream.h pstream_int.h pthread_debug.c pthread_debug.h \
@@ -235,8 +235,8 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-commandline.$(OBJEXT) cdo-ecacore.$(OBJEXT) \
 	cdo-ecautil.$(OBJEXT) cdo-exception.$(OBJEXT) \
 	cdo-expr.$(OBJEXT) cdo-expr_lex.$(OBJEXT) \
-	cdo-expr_yacc.$(OBJEXT) cdo-field.$(OBJEXT) \
-	cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
+	cdo-expr_yacc.$(OBJEXT) cdo-features.$(OBJEXT) \
+	cdo-field.$(OBJEXT) cdo-field2.$(OBJEXT) cdo-fieldc.$(OBJEXT) \
 	cdo-fieldmem.$(OBJEXT) cdo-fieldmer.$(OBJEXT) \
 	cdo-fieldzon.$(OBJEXT) cdo-fouriertrans.$(OBJEXT) \
 	cdo-gradsdeslib.$(OBJEXT) cdo-grid.$(OBJEXT) \
@@ -491,21 +491,22 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	cdo_vlist.c color.c color.h commandline.c const.h counter.h \
 	dmemory.h dtypes.h ecacore.c ecacore.h ecautil.c ecautil.h \
 	error.h etopo.h temp.h mask.h exception.c expr.c expr.h \
-	expr_lex.c expr_yacc.c expr_yacc.h field.c field.h field2.c \
-	fieldc.c fieldmem.c fieldmer.c fieldzon.c fouriertrans.c \
-	functs.h gradsdeslib.c gradsdeslib.h grid.c grid.h grid_gme.c \
-	grid_lcc.c grid_rot.c gridreference.c griddes.c griddes.h \
-	griddes_h5.c griddes_nc.c hetaeta.c hetaeta.h history.c \
-	institution.c interpol.c interpol.h job.c juldate.c kvlist.c \
-	kvlist.h legendre.c list.c list.h merge_sort2.c merge_sort2.h \
-	modules.c modules.h namelist.c namelist.h normal.c \
-	nth_element.c nth_element.h operator_help.h par_io.c par_io.h \
-	percentiles.c percentiles.h pipe.c pipe.h printinfo.h \
-	process.c process.h pstream.c pstream.h pstream_int.h \
-	pthread_debug.c pthread_debug.h readline.c realtime.c remap.h \
-	remaplib.c remapsort.c specspace.c specspace.h statistic.c \
-	statistic.h table.c timebase.h timer.c userlog.c util.c util.h \
-	vinterp.c vinterp.h zaxis.c $(am__append_1)
+	expr_lex.c expr_yacc.c expr_yacc.h features.c field.c field.h \
+	field2.c fieldc.c fieldmem.c fieldmer.c fieldzon.c \
+	fouriertrans.c functs.h gradsdeslib.c gradsdeslib.h grid.c \
+	grid.h grid_gme.c grid_lcc.c grid_rot.c gridreference.c \
+	griddes.c griddes.h griddes_h5.c griddes_nc.c hetaeta.c \
+	hetaeta.h history.c institution.c interpol.c interpol.h job.c \
+	juldate.c kvlist.c kvlist.h legendre.c list.c list.h \
+	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
+	namelist.h normal.c nth_element.c nth_element.h \
+	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
+	pipe.c pipe.h printinfo.h process.c process.h pstream.c \
+	pstream.h pstream_int.h pthread_debug.c pthread_debug.h \
+	readline.c realtime.c remap.h remaplib.c remapsort.c \
+	specspace.c specspace.h statistic.c statistic.h table.c \
+	timebase.h timer.c userlog.c util.c util.h vinterp.c vinterp.h \
+	zaxis.c $(am__append_1)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = $(top_builddir)/libcdi/src/libcdi.la
 cdo_LDFLAGS = $(am__append_2)
@@ -827,6 +828,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-expr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-expr_lex.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-expr_yacc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-features.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-field.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-field2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-fieldc.Po@am__quote@
@@ -3518,6 +3520,20 @@ cdo-expr_yacc.obj: expr_yacc.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='expr_yacc.c' object='cdo-expr_yacc.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-expr_yacc.obj `if test -f 'expr_yacc.c'; then $(CYGPATH_W) 'expr_yacc.c'; else $(CYGPATH_W) '$(srcdir)/expr_yacc.c'; fi`
+
+cdo-features.o: features.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-features.o -MD -MP -MF $(DEPDIR)/cdo-features.Tpo -c -o cdo-features.o `test -f 'features.c' || echo '$(srcdir)/'`features.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-features.Tpo $(DEPDIR)/cdo-features.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='features.c' object='cdo-features.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-features.o `test -f 'features.c' || echo '$(srcdir)/'`features.c
+
+cdo-features.obj: features.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-features.obj -MD -MP -MF $(DEPDIR)/cdo-features.Tpo -c -o cdo-features.obj `if test -f 'features.c'; then $(CYGPATH_W) 'features.c'; else $(CYGPATH_W) '$(srcdir)/features.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-features.Tpo $(DEPDIR)/cdo-features.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='features.c' object='cdo-features.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-features.obj `if test -f 'features.c'; then $(CYGPATH_W) 'features.c'; else $(CYGPATH_W) '$(srcdir)/features.c'; fi`
 
 cdo-field.o: field.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-field.o -MD -MP -MF $(DEPDIR)/cdo-field.Tpo -c -o cdo-field.o `test -f 'field.c' || echo '$(srcdir)/'`field.c
