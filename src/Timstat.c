@@ -97,6 +97,7 @@ void *Timstat(void *argument)
   int taxis_has_bounds = FALSE;
   int lvfrac = FALSE;
   int lmean = FALSE, lvarstd = FALSE, lstd = FALSE;
+  int nwpv; // number of words per value; real:1  complex:2
   char vdatestr[32], vtimestr[32];
   double vfrac = 1;
   double divisor;
@@ -279,7 +280,8 @@ void *Timstat(void *argument)
 		  recLevelID[recID] = levelID;
 		}
 
-	      gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	      nwpv     = vars1[varID][levelID].nwpv;
+	      gridsize = gridInqSize(vars1[varID][levelID].grid);
 
 	      if ( nsets == 0 )
 		{
@@ -289,9 +291,9 @@ void *Timstat(void *argument)
 		  if ( nmiss > 0 || samp1[varID][levelID].ptr )
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
-			samp1[varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+			samp1[varID][levelID].ptr = (double *) malloc(nwpv*gridsize*sizeof(double));
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( i = 0; i < nwpv*gridsize; i++ )
 			if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i] = 0;
 			else
@@ -308,12 +310,12 @@ void *Timstat(void *argument)
 		    {
 		      if ( samp1[varID][levelID].ptr == NULL )
 			{
-			  samp1[varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
-			  for ( i = 0; i < gridsize; i++ )
+			  samp1[varID][levelID].ptr = (double *) malloc(nwpv*gridsize*sizeof(double));
+			  for ( i = 0; i < nwpv*gridsize; i++ )
 			    samp1[varID][levelID].ptr[i] = nsets;
 			}
 
-		      for ( i = 0; i < gridsize; i++ )
+		      for ( i = 0; i < nwpv*gridsize; i++ )
 			if ( !DBL_IS_EQUAL(field.ptr[i], vars1[varID][levelID].missval) )
 			  samp1[varID][levelID].ptr[i]++;
 		    }
@@ -395,7 +397,8 @@ void *Timstat(void *argument)
 	for ( varID = 0; varID < nvars; varID++ )
 	  {
 	    if ( vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT ) continue;
-	    gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
+	    nwpv     = vars1[varID][levelID].nwpv;
+	    gridsize = gridInqSize(vars1[varID][levelID].grid);
 	    nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 	    for ( levelID = 0; levelID < nlevel; levelID++ )
 	      {
@@ -403,7 +406,7 @@ void *Timstat(void *argument)
 		if ( samp1[varID][levelID].ptr )
 		  {
 		    int irun = 0;
-		    for ( i = 0; i < gridsize; ++i )
+		    for ( i = 0; i < nwpv*gridsize; ++i )
 		      {
 			if ( (samp1[varID][levelID].ptr[i] / nsets) < vfrac )
 			  {
@@ -415,7 +418,7 @@ void *Timstat(void *argument)
 		    if ( irun )
 		      {
 			nmiss = 0;
-			for ( i = 0; i < gridsize; ++i )
+			for ( i = 0; i < nwpv*gridsize; ++i )
 			  if ( DBL_IS_EQUAL(vars1[varID][levelID].ptr[i], missval) ) nmiss++;
 			vars1[varID][levelID].nmiss = nmiss;
 		      }

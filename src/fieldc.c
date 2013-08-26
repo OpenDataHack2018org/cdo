@@ -33,13 +33,14 @@ void farcfun(field_t *field, double rconst, int function)
 void farcmul(field_t *field, double rconst)
 {
   int i, len;
+  int    nwpv     = field->nwpv;
   int    grid     = field->grid;
   int    nmiss    = field->nmiss;
   double missval1 = field->missval;
   double missval2 = field->missval;
   double *array   = field->ptr;
 
-  len    = gridInqSize(grid);
+  len    = nwpv*gridInqSize(grid);
 
   if ( nmiss > 0 )
     {
