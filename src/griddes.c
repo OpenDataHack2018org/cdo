@@ -37,6 +37,7 @@
 #include "grid.h"
 #include "griddes.h"
 #include "error.h"
+#include "dtypes.h"
 
 #define  cmpstr(s1, s2, len)  (memcmp(s1, s2, len = strlen(s2)))
 
@@ -185,11 +186,13 @@ int gridDefine(griddes_t grid)
 	    if ( grid.ysize == 0 ) Error("ysize undefined!");
 	  }
 
-	if ( grid.size == 0 ) grid.size = grid.xsize*grid.ysize;
+	if ( grid.size == 0 ) grid.size = (long)grid.xsize*grid.ysize;
 
-	if ( grid.size != grid.xsize*grid.ysize )
-	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize! (xsize=%d ysize=%d gridsize=%d)",
+	if ( grid.size != (long)grid.xsize*grid.ysize )
+	  Error("Inconsistent grid declaration: xsize*ysize!=gridsize (xsize=%d ysize=%d gridsize=%d)",
 		grid.xsize, grid.ysize, grid.size);
+
+	if ( grid.size < 0 || grid.size > INT_MAX ) Error("grid size (%ld) out of bounds (0 - %d)!", grid.size, INT_MAX);
 
 	gridID = gridCreate(grid.type, grid.size);
 

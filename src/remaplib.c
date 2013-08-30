@@ -2271,7 +2271,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 		{
 		  lwarn = FALSE;
 		  //  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
-		  cdoWarning("Bilinear interpolation failed for some grid points - use a distance-weighted average instead!");
+		  cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
 		}
 
 	      search_result = -1;
@@ -2486,7 +2486,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 		{
 		  lwarn = FALSE;
 		  // cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
-		  cdoWarning("Bicubic interpolation failed for some grid points - use a distance-weighted average instead!");
+		  cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
 		}
 
 	      search_result = -1;

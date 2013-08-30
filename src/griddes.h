@@ -40,7 +40,7 @@ typedef struct {
   int    *rowlon;
   int     genBounds;
   int     nvertex;
-  int     size;
+  long    size;
   int     xsize;
   int     ysize;
   int     np;
