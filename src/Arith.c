@@ -148,6 +148,8 @@ void *Arith(void *argument)
 
   gridsize = vlistGridsizeMax(vlistIDx1);
 
+  field_init(&field1);
+  field_init(&field2);
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
   if ( filltype == FILL_VAR || filltype == FILL_VARTS )

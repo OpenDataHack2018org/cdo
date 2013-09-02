@@ -206,6 +206,9 @@ void *Adisit(void *argument)
 	cdoPrint("%5d  %g", i+1, pressure[i]);
     }
 
+  field_init(&tho);
+  field_init(&sao);
+  field_init(&tis);
   tho.ptr = (double *) malloc(gridsize*nlevel*sizeof(double));
   sao.ptr = (double *) malloc(gridsize*nlevel*sizeof(double));
   tis.ptr = (double *) malloc(gridsize*nlevel*sizeof(double));

@@ -145,23 +145,7 @@ void *Detrend(void *argument)
 
       taxisInqDTinfo(taxisID1, &dtinfo[tsID]);
 
-      vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-
-	  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
-
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      vars[tsID][varID][levelID].grid    = gridID;
-	      vars[tsID][varID][levelID].missval = missval;
-	      vars[tsID][varID][levelID].ptr     = NULL;
-	    }
-	}
+      vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -237,11 +221,12 @@ void *Detrend(void *argument)
 		  streamDefRecord(streamID2, varID, levelID);
 		  streamWriteRecord(streamID2, vars[tsID][varID][levelID].ptr, nmiss);
 		  free(vars[tsID][varID][levelID].ptr);
+		  vars[tsID][varID][levelID].ptr = NULL;
 		}
 	    }
-	  free(vars[tsID][varID]);
 	}
-      free(vars[tsID]);
+
+      field_free(vars[tsID], vlistID1);
     }
 
   if ( vars  ) free(vars);
