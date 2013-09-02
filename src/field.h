@@ -61,8 +61,10 @@ typedef struct {
 }
 field_t;
 
+
 /* fieldmem.c */
 
+void      field_init(field_t *field);
 field_t **field_malloc(const int vlistID, const int ptype);
 field_t **field_calloc(const int vlistID, const int ptype);
 void      field_free(field_t **field, const int vlistID);

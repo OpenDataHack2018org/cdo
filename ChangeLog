@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.2
 	* Version 1.6.2 released
 
+2013-09-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Timcount: added support for complex numbers
+
 2013-08-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Timstat: added support for complex numbers

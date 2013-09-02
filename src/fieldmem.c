@@ -7,6 +7,12 @@
 #include "field.h"
 
 
+void field_init(field_t *field)
+{
+  memset(field, 0, sizeof(field_t));
+}
+
+
 field_t **field_allocate(int vlistID, int ptype, int init)
 {
   int nvars, nlevel;
@@ -32,6 +38,8 @@ field_t **field_allocate(int vlistID, int ptype, int init)
       field[varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
       for ( levelID = 0; levelID < nlevel; ++levelID )
 	{
+	  field_init(&field[varID][levelID]);
+
 	  field[varID][levelID].nwpv    = nwpv;
 	  field[varID][levelID].grid    = gridID;
 	  field[varID][levelID].nsamp   = 0;

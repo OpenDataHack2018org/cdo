@@ -72,7 +72,7 @@ void arradd(const size_t n, double * const restrict a, const double * const rest
 void faradd(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -82,6 +82,8 @@ void faradd(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -107,7 +109,7 @@ void faradd(field_t *field1, field_t field2)
 void farsum(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -117,6 +119,8 @@ void farsum(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -201,7 +205,7 @@ void farsumtr(field_t *occur, field_t field, const double refval)
 void farsumq(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -211,6 +215,8 @@ void farsumq(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -243,7 +249,7 @@ void farsumq(field_t *field1, field_t field2)
 void farsub(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -252,6 +258,8 @@ void farsub(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -278,7 +286,7 @@ void farsub(field_t *field1, field_t field2)
 void farmul(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -287,6 +295,8 @@ void farmul(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -313,13 +323,15 @@ void farmul(field_t *field1, field_t field2)
 void fardiv(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
   const int    grid2    = field2.grid;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -338,13 +350,15 @@ void fardiv(field_t *field1, field_t field2)
 void faratan2(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
   const int    grid2    = field2.grid;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -363,7 +377,7 @@ void faratan2(field_t *field1, field_t field2)
 void farmin(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -372,6 +386,8 @@ void farmin(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -402,7 +418,7 @@ void farmin(field_t *field1, field_t field2)
 void farmax(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -411,6 +427,8 @@ void farmax(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -441,7 +459,7 @@ void farmax(field_t *field1, field_t field2)
 void farvar(field_t *field1, field_t field2, field_t field3)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -453,6 +471,8 @@ void farvar(field_t *field1, field_t field2, field_t field3)
   const int    nmiss3   = field3.nmiss;
   const double missval3 = field3.missval;
   double *array3  = field3.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -494,7 +514,7 @@ void farvar(field_t *field1, field_t field2, field_t field3)
 void farvarx(field_t *field1, field_t field2, field_t field3, const double divisor)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -503,6 +523,8 @@ void farvarx(field_t *field1, field_t field2, field_t field3, const double divis
   double *array2  = field2.ptr;
   double *array3  = field3.ptr;
   double temp;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -529,11 +551,13 @@ void farvarx(field_t *field1, field_t field2, field_t field3, const double divis
 void farstd(field_t *field1, field_t field2, field_t field3)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
   int    grid2    = field2.grid;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -559,11 +583,13 @@ void farstd(field_t *field1, field_t field2, field_t field3)
 void farstdx(field_t *field1, field_t field2, field_t field3, const double divisor)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
   const int    grid2    = field2.grid;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -589,7 +615,7 @@ void farstdx(field_t *field1, field_t field2, field_t field3, const double divis
 void farcvar(field_t *field1, field_t field2, const double rconst1)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -599,6 +625,8 @@ void farcvar(field_t *field1, field_t field2, const double rconst1)
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
   int    nmiss3   = 0;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -642,7 +670,7 @@ void farcvar(field_t *field1, field_t field2, const double rconst1)
 void farcvarx(field_t *field1, field_t field2, const double rconst1, const double divisor)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -650,6 +678,8 @@ void farcvarx(field_t *field1, field_t field2, const double rconst1, const doubl
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
   double temp;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -676,11 +706,13 @@ void farcvarx(field_t *field1, field_t field2, const double rconst1, const doubl
 void farcstd(field_t *field1, field_t field2, const double rconst1)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
   const int    grid2    = field2.grid;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -706,11 +738,13 @@ void farcstd(field_t *field1, field_t field2, const double rconst1)
 void farcstdx(field_t *field1, field_t field2, const double rconst1, const double divisor)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
   const int    grid2    = field2.grid;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -736,7 +770,7 @@ void farcstdx(field_t *field1, field_t field2, const double rconst1, const doubl
 void farmoq(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const double missval1 = field1->missval;
   double *array1  = field1->ptr;
@@ -744,6 +778,8 @@ void farmoq(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
@@ -787,7 +823,7 @@ void farmoq(field_t *field1, field_t field2)
 void farcount(field_t *field1, field_t field2)
 {
   size_t   i, len;
-  const int    nwpv     = field1->nwpv;
+  int          nwpv     = field1->nwpv;
   const int    grid1    = field1->grid;
   const int    nmiss1   = field1->nmiss;
   const double missval1 = field1->missval;
@@ -797,6 +833,8 @@ void farcount(field_t *field1, field_t field2)
   const int    nmiss2   = field2.nmiss;
   const double missval2 = field2.missval;
   double *array2  = field2.ptr;
+
+  if ( nwpv != 2 ) nwpv = 1;
 
   len = (size_t) (nwpv*gridInqSize(grid1));
 
