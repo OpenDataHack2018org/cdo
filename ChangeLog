@@ -5,6 +5,7 @@
 
 2013-09-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Seascount: added support for complex numbers
 	* Timcount: added support for complex numbers
 
 2013-08-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
