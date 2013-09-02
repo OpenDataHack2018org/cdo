@@ -113,6 +113,7 @@ void *Ensstat(void *argument)
   field = (field_t *) malloc(ompNumThreads*sizeof(field_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
+      field_init(&field[i]);
       field[i].size   = nfiles;
       field[i].ptr    = (double *) malloc(nfiles*sizeof(double));
       field[i].weight = (double *) malloc(nfiles*sizeof(double));
