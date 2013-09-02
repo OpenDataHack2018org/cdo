@@ -165,6 +165,7 @@ void farsumtr(field_t *occur, field_t field, const double refval)
   double  *farray = field.ptr;
 
   len    = (size_t) gridInqSize(occur->grid);
+
   if ( len != (size_t) gridInqSize(field.grid) )
     cdoAbort("Fields have different gridsize (%s)", __func__);
 

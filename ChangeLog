@@ -5,6 +5,7 @@
 
 2013-09-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* Consecstat: init vars with 0 (bug fix)
 	* Seascount: added support for complex numbers
 	* Timcount: added support for complex numbers
 

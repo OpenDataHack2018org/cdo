@@ -130,8 +130,6 @@ void *Consecstat (void *argument)
   int recID, nrecs;
   int varID, nvars;
   int levelID, nlevels; 
-  int gridID, gridsize;
-  double missval;
   double refval = 0.0;
 
   field_t **vars = NULL, **hist = NULL, **periods = NULL;
@@ -153,48 +151,21 @@ void *Consecstat (void *argument)
   otaxisID = taxisDuplicate(itaxisID);
   vlistDefTaxis(ovlistID, otaxisID);
 
+  field_init(&field);
   field.ptr = (double *) malloc(vlistGridsizeMax(ovlistID)*sizeof(double));
+
   nvars     = vlistNvars(ivlistID);
-  vars      = (field_t **) malloc(nvars*sizeof(field_t *));
-  hist      = (field_t **) malloc(nvars*sizeof(field_t *));
+  vars      = field_calloc(ivlistID, FIELD_PTR);
   if ( operatorID == CONSECTS )
-    periods   = (field_t **) malloc(nvars*sizeof(field_t *));
+    {
+      hist      = field_malloc(ivlistID, FIELD_PTR);
+      periods   = field_malloc(ivlistID, FIELD_PTR);
+    }
 
   for ( varID = 0; varID < nvars; varID++ )
-  {
-    gridID      = vlistInqVarGrid(ovlistID, varID);
-    gridsize    = gridInqSize(gridID);
-    missval     = vlistInqVarMissval(ovlistID, varID);
-    nlevels     = zaxisInqSize(vlistInqVarZaxis(ovlistID, varID));
-
-    vars[varID] = (field_t *) malloc(nlevels*sizeof(field_t));
-    if ( operatorID == CONSECTS )
     {
-      periods[varID] = (field_t *) malloc(nlevels*sizeof(field_t));
-      hist[varID]    = (field_t *) malloc(nlevels*sizeof(field_t));
+      vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
     }
-
-
-    for ( levelID = 0; levelID < nlevels; levelID++ )
-    {
-      vars[varID][levelID].grid    = gridID;
-      vars[varID][levelID].missval = missval;
-      vars[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-      vars[varID][levelID].nmiss   = 0;
-      if ( operatorID == CONSECTS )
-      {
-        hist[varID][levelID].grid       = gridID;
-        hist[varID][levelID].missval    = missval;
-        hist[varID][levelID].ptr        = (double *) malloc(gridsize*sizeof(double));
-        hist[varID][levelID].nmiss      = 0;
-        periods[varID][levelID].grid    = gridID;
-        periods[varID][levelID].missval = missval;
-        periods[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-        periods[varID][levelID].nmiss   = 0;
-      }
-    }
-    vlistDefVarUnits(ovlistID, varID, "steps"); /* TODO */
-  }
 
   ostreamID = streamOpenWrite(cdoStreamName(1), cdoFiletype());
 
@@ -232,7 +203,9 @@ void *Consecstat (void *argument)
       streamReadRecord(istreamID, field.ptr, &field.nmiss);
       field.grid    = vlistInqVarGrid(ovlistID, varID);
       field.missval = vlistInqVarMissval(ovlistID, varID);
+
       farsumtr(&vars[varID][levelID], field, refval);
+
       switch (operatorID)
       {
         case CONSECSUM:
@@ -284,28 +257,9 @@ void *Consecstat (void *argument)
     }
   }
   
-  for ( varID = 0; varID < nvars; varID++ )
-  {
-    nlevels = zaxisInqSize(vlistInqVarZaxis(ovlistID, varID));
-    for ( levelID = 0; levelID < nlevels; levelID++ )
-    {
-      if ( vars[varID][levelID].ptr ) free(vars[varID][levelID].ptr);
-      if ( operatorID == CONSECTS )
-      {
-        if ( hist[varID][levelID].ptr ) free(hist[varID][levelID].ptr);
-        if ( periods[varID][levelID].ptr ) free(periods[varID][levelID].ptr);
-      }
-    }
-    free(vars[varID]);
-    if ( operatorID == CONSECTS )
-    {
-      free(hist[varID]);
-      free(periods[varID]);
-    }
-  }
-  if ( vars )    free(vars);
-  if ( hist )    free(hist);
-  if ( periods ) free(periods);
+  if ( vars )    field_free(vars, ivlistID);
+  if ( hist )    field_free(hist, ivlistID);
+  if ( periods ) field_free(periods, ivlistID);
 
   streamClose(istreamID);
   streamClose(ostreamID);
