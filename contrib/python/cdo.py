@@ -214,7 +214,7 @@ class Cdo(object):
         stdout = subprocess.PIPE)
     retvals = proc.communicate()
 
-    withs     = re.findall('with: (.*)',retvals[1])[0].split(' ')
+    withs     = re.findall('Features: (.*)',retvals[1])[0].split(' ')
     libs      = re.findall('(\w+) library version : (\d+\.\d+\.\d+)',retvals[1])
     libraries = dict({})
     for w in withs:
