@@ -39,7 +39,6 @@ void *Duplicate(void *argument)
   int ntsteps;
   int *vdate = NULL, *vtime = NULL;
   int idup, ndup = 1;
-  double missval;
   field_t ***vars = NULL;
 
   cdoInitialize(argument);
@@ -95,23 +94,7 @@ void *Duplicate(void *argument)
       vdate[tsID] = taxisInqVdate(taxisID1);
       vtime[tsID] = taxisInqVtime(taxisID1);
 
-      vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-
-	  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
-
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    {
-	      vars[tsID][varID][levelID].grid    = gridID;
-	      vars[tsID][varID][levelID].missval = missval;
-	      vars[tsID][varID][levelID].ptr     = NULL;
-	    }
-	}
+      vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
       for ( recID = 0; recID < nrecs; recID++ )
 	{
@@ -152,19 +135,7 @@ void *Duplicate(void *argument)
 	}
     }
 
-  for ( tsID = 0; tsID < nts; tsID++ )
-    {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevel; levelID++ )
-	    if ( vars[tsID][varID][levelID].ptr )
-	      free(vars[tsID][varID][levelID].ptr);
-
-	  free(vars[tsID][varID]);
-	}
-      free(vars[tsID]);
-    }
+  for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
 
   if ( vars  ) free(vars);
   if ( vdate ) free(vdate);
