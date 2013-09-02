@@ -136,6 +136,7 @@ void *Ensstat3(void *argument)
   for ( i = 0; i < 1; i++ )
 #endif
     {
+      field_init(&field[i]);
       field[i].size   = nfiles;
       field[i].ptr    = (double *) malloc(nfiles*sizeof(double));
       field[i].weight = (double *) malloc(nfiles*sizeof(double));
