@@ -51,8 +51,6 @@ YDAY_STATS;
 
 static YDAY_STATS *ydstatCreate(int vlistID);
 static void ydstatDestroy(YDAY_STATS *stats);
-static void ydstatCreateVars1(YDAY_STATS *stats, int dayoy);
-static void ydstatCreateVars2(YDAY_STATS *stats, int dayoy);
 static void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
   field_t **vars1, field_t **vars2, int nsets, int operfunc);
 static void ydstatFinalize(YDAY_STATS *stats, int operfunc);
@@ -142,36 +140,9 @@ void *Ydrunstat(void *argument)
   
   for ( its = 0; its < ndates; its++ )
     {
-      vars1[its] = (field_t **) malloc(nvars*sizeof(field_t *));
+      vars1[its] = field_malloc(vlistID1, FIELD_PTR);
       if ( lvarstd )
-	vars2[its] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
-	  nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-
-	  vars1[its][varID] = (field_t *) malloc(nlevels*sizeof(field_t));
-	  if ( lvarstd )
-	    vars2[its][varID] = (field_t *) malloc(nlevels*sizeof(field_t));
-
-	  for ( levelID = 0; levelID < nlevels; levelID++ )
-	    {
-	      vars1[its][varID][levelID].grid    = gridID;
-	      vars1[its][varID][levelID].nmiss   = 0;
-	      vars1[its][varID][levelID].missval = missval;
-	      vars1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	      if ( lvarstd )
-		{
-		  vars2[its][varID][levelID].grid    = gridID;
-		  vars2[its][varID][levelID].nmiss   = 0;
-		  vars2[its][varID][levelID].missval = missval;
-		  vars2[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		}
-	    }
-	}
+	vars2[its] = field_malloc(vlistID1, FIELD_PTR);
     }
   
   for ( tsID = 0; tsID < ndates; tsID++ )
@@ -301,20 +272,8 @@ void *Ydrunstat(void *argument)
   
   for ( its = 0; its < ndates; its++ )
     {
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  for ( levelID = 0; levelID < nlevels; levelID++ )
-	    {
-	      free(vars1[its][varID][levelID].ptr);
-	      if ( lvarstd ) free(vars2[its][varID][levelID].ptr);
-	    }
-
-	  free(vars1[its][varID]);
-	  if ( lvarstd ) free(vars2[its][varID]);
-	}
-	free(vars1[its]);
-	if ( lvarstd ) free(vars2[its]);
+      field_free(vars1[its], vlistID1);
+      if ( lvarstd ) field_free(vars2[its], vlistID1);
     }
   
   ydstatDestroy(stats);
@@ -393,66 +352,6 @@ void ydstatDestroy(YDAY_STATS *stats)
 }
 
 static
-void ydstatCreateVars1(YDAY_STATS *stats, int dayoy)
-{
-  int varID, levelID, nvars, nlevels;
-  int gridID, gridsize;
-  double missval;
-
-  nvars = vlistNvars(stats->vlist);
-  
-  stats->vars1[dayoy] = (field_t **) malloc(nvars * sizeof(field_t *));
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      gridID   = vlistInqVarGrid(stats->vlist, varID);
-      gridsize = gridInqSize(gridID);
-      nlevels  = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
-      missval  = vlistInqVarMissval(stats->vlist, varID);
-
-      stats->vars1[dayoy][varID] = (field_t *) malloc(nlevels * sizeof(field_t));
-	      
-      for ( levelID = 0; levelID < nlevels; levelID++ )
-        {
-	  stats->vars1[dayoy][varID][levelID].grid    = gridID;
-	  stats->vars1[dayoy][varID][levelID].nmiss   = 0;
-	  stats->vars1[dayoy][varID][levelID].missval = missval;
-	  stats->vars1[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize * sizeof(double));
-        }
-    }
-}
-
-static
-void ydstatCreateVars2(YDAY_STATS *stats, int dayoy)
-{
-  int varID, levelID, nvars, nlevels;
-  int gridID, gridsize;
-  double missval;
-
-  nvars = vlistNvars(stats->vlist);
-  
-  stats->vars2[dayoy] = (field_t **) malloc(nvars * sizeof(field_t *));
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      gridID   = vlistInqVarGrid(stats->vlist, varID);
-      gridsize = gridInqSize(gridID);
-      nlevels  = zaxisInqSize(vlistInqVarZaxis(stats->vlist, varID));
-      missval  = vlistInqVarMissval(stats->vlist, varID);
-
-      stats->vars2[dayoy][varID] = (field_t *) malloc(nlevels * sizeof(field_t));
-	      
-      for ( levelID = 0; levelID < nlevels; levelID++ )
-        {
-	  stats->vars2[dayoy][varID][levelID].grid    = gridID;
-	  stats->vars2[dayoy][varID][levelID].nmiss   = 0;
-	  stats->vars2[dayoy][varID][levelID].missval = missval;
-	  stats->vars2[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize * sizeof(double));
-        }
-    }
-}
-
-static
 void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime, 
 		  field_t **vars1, field_t **vars2, int nsets, int operfunc)
 {
@@ -482,9 +381,9 @@ void ydstatUpdate(YDAY_STATS *stats, int vdate, int vtime,
 
   if ( stats->vars1[dayoy] == NULL )
     {
-      ydstatCreateVars1(stats, dayoy);
+      stats->vars1[dayoy] = field_malloc(stats->vlist, FIELD_PTR);
       if ( lvarstd )
-	ydstatCreateVars2(stats, dayoy);
+	stats->vars2[dayoy] = field_malloc(stats->vlist, FIELD_PTR);
     }
 
   for ( varID = 0; varID  < nvars; varID++ )
