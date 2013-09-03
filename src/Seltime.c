@@ -215,7 +215,6 @@ void *Seltime(void *argument)
   int nconst, lconstout = FALSE;
   int process_nts1 = FALSE, process_nts2 = FALSE;
   int *vdate_list = NULL, *vtime_list = NULL;
-  double missval;
   double *single;
   field_t ***vars = NULL;
 
@@ -357,24 +356,19 @@ void *Seltime(void *argument)
 
       for ( tsID = 0; tsID < nts1; tsID++ )
 	{
-	  vars[tsID] = (field_t **) malloc(nvars*sizeof(field_t *));
+	  vars[tsID] = field_malloc(vlistID1, FIELD_NONE);
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      if ( lnts1 || (vlistInqVarTsteptype(vlistID1, varID) == TSTEP_CONSTANT) )
 		{
 		  gridID  = vlistInqVarGrid(vlistID1, varID);
-		  missval = vlistInqVarMissval(vlistID1, varID);
 		  nlevel  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 		  gridsize = gridInqSize(gridID);
 		  
-		  vars[tsID][varID] = (field_t *) malloc(nlevel*sizeof(field_t));
-
 		  for ( levelID = 0; levelID < nlevel; levelID++ )
 		    {
-		      vars[tsID][varID][levelID].grid    = gridID;
-		      vars[tsID][varID][levelID].missval = missval;
-		      vars[tsID][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
+		      vars[tsID][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
 		    }
 		}
 	    }
@@ -670,22 +664,7 @@ void *Seltime(void *argument)
 
   if ( lnts1 || nconst )
     {
-      for ( tsID = 0; tsID < nts1; tsID++ )
-	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      if ( lnts1 || (vlistInqVarTsteptype(vlistID2, varID) == TSTEP_CONSTANT) )
-		{
-		  nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-		  for ( levelID = 0; levelID < nlevel; levelID++ )
-		    if ( vars[tsID][varID][levelID].ptr )
-		      free(vars[tsID][varID][levelID].ptr);
-
-		  free(vars[tsID][varID]);
-		}
-	    }
-	  free(vars[tsID]);
-	}
+      for ( tsID = 0; tsID < nts1; tsID++ ) field_free(vars[tsID], vlistID2);
 
       if ( vars  ) free(vars);
       if ( vdate_list ) free(vdate_list);
