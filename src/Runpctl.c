@@ -91,25 +91,7 @@ void *Runpctl(void *argument)
   
   for ( its = 0; its < ndates; its++ )
     {
-      vars1[its] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-        {
-          gridID   = vlistInqVarGrid(vlistID1, varID);
-          gridsize = gridInqSize(gridID);
-          nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          missval  = vlistInqVarMissval(vlistID1, varID);
-
-          vars1[its][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
-
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            {
-              vars1[its][varID][levelID].grid    = gridID;
-              vars1[its][varID][levelID].nmiss   = 0;
-              vars1[its][varID][levelID].missval = missval;
-              vars1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-            }
-        }
+      vars1[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
   for ( tsID = 0; tsID < ndates; tsID++ )
@@ -223,14 +205,7 @@ void *Runpctl(void *argument)
 
   for ( its = 0; its < ndates; its++ )
     {
-      for ( varID = 0; varID < nvars; varID++ )
-        {
-          nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-          for ( levelID = 0; levelID < nlevels; levelID++ )
-            free(vars1[its][varID][levelID].ptr);
-          free(vars1[its][varID]);
-        }
-      free(vars1[its]);
+      field_free(vars1[its], vlistID1);
     }
 
   free(vars1);
