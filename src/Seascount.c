@@ -77,6 +77,7 @@ void *Seascount(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
 
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   vars1 = field_malloc(vlistID1, FIELD_PTR);

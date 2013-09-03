@@ -129,6 +129,9 @@ void *Merstat(void *argument)
   gridID1 = vlistInqVarGrid(vlistID1, 0);
   nlonmax = gridInqXsize(gridID1); /* max nlon ? */
 
+  field_init(&field1);
+  field_init(&field2);
+
   lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double *) malloc(lim*sizeof(double));
   field1.weight = NULL;

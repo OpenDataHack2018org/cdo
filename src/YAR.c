@@ -782,6 +782,9 @@ void *YAR(void *argument)
   operatorInputArg("grid description file or name");
   gridID2 = cdoDefineGrid(operatorArgv()[0]);
 
+  field_init(&field1);
+  field_init(&field2);
+
   streamID1 = streamOpenRead(cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);

@@ -48,7 +48,6 @@ void *Timselpctl(void *argument)
   int nvars, nlevels;
   int ndates = 0, noffset = 0, nskip = 0, nargc;
   int *recVarID, *recLevelID;
-  double missval;
   field_t **vars1 = NULL;
   field_t field;
   double pn;
@@ -106,28 +105,18 @@ void *Timselpctl(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize * sizeof(double));
 
-  vars1 = (field_t **) malloc(nvars * sizeof(field_t *));
+  vars1 = field_malloc(vlistID1, FIELD_PTR);
   hset = hsetCreate(nvars);
 
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
       nlevels   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      missval  = vlistInqVarMissval(vlistID1, varID);
 
-      vars1[varID] = (field_t *)  malloc(nlevels * sizeof(field_t));
       hsetCreateVarLevels(hset, varID, nlevels, gridID);
-
-      for ( levelID = 0; levelID < nlevels; levelID++ )
-	{
-	  vars1[varID][levelID].grid    = gridID;
-	  vars1[varID][levelID].nmiss   = 0;
-	  vars1[varID][levelID].missval = missval;
-	  vars1[varID][levelID].ptr     = (double *) malloc(gridsize * sizeof(double));
-	}
     }
 
   for ( tsID = 0; tsID < noffset; tsID++ )
@@ -262,15 +251,7 @@ void *Timselpctl(void *argument)
 
  LABEL_END:
 
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevels; levelID++ )
-	free(vars1[varID][levelID].ptr);
-      free(vars1[varID]);
-    }
-
-  free(vars1);
+  field_free(vars1, vlistID1);
   hsetDestroy(hset);
 
   if ( field.ptr ) free(field.ptr);

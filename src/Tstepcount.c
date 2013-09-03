@@ -197,8 +197,7 @@ void *Tstepcount(void *argument)
 	}
     }
 
-  for ( tsID = 0; tsID < nts; tsID++ )
-    field_free(vars[tsID], vlistID1);
+  for ( tsID = 0; tsID < nts; tsID++ ) field_free(vars[tsID], vlistID1);
 
   if ( vars  ) free(vars);
 

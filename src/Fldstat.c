@@ -161,6 +161,8 @@ void *Fldstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  field_init(&field);
+
   lim = vlistGridsizeMax(vlistID1);
   field.ptr    = (double *) malloc(lim*sizeof(double));
   field.weight = NULL;

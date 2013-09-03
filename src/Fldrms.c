@@ -95,6 +95,10 @@ void *Fldrms(void *argument)
 
   streamDefVlist(streamID3, vlistID3);
 
+  field_init(&field1);
+  field_init(&field2);
+  field_init(&field3);
+
   lim = vlistGridsizeMax(vlistID1);
   field1.ptr    = (double *) malloc(lim*sizeof(double));
   field1.weight = NULL;

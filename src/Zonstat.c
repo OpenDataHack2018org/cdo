@@ -140,6 +140,8 @@ void *Zonstat(void *argument)
   nlatmax = gridInqYsize(gridID1); /* max nlat ? */
 
   lim = vlistGridsizeMax(vlistID1);
+  field_init(&field2);
+  field_init(&field2);
   field1.ptr  = (double *) malloc(lim*sizeof(double));
   field2.ptr  = (double *) malloc(nlatmax*sizeof(double));
   field2.grid = gridID2;

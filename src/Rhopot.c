@@ -261,6 +261,9 @@ void *Rhopot(void *argument)
 	cdoPrint("%5d  %g", i+1, pressure[i]);
     }
 
+  field_init(&to);
+  field_init(&sao);
+  field_init(&rho);
   to.ptr = (double *) malloc(gridsize*nlevel*sizeof(double));
   sao.ptr = (double *) malloc(gridsize*nlevel*sizeof(double));
   rho.ptr = (double *) malloc(gridsize*nlevel*sizeof(double));

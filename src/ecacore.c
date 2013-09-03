@@ -113,6 +113,9 @@ void eca1(const ECA_REQUEST_1 *request)
 
   gridsize = gridInqSize(gridID);
 
+  field_init(&field1);
+  field_init(&field2);
+
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
   if ( IS_SET(request->var2.h2) || IS_SET(request->var2.h3) ) 
     field2.ptr = (double *) malloc(gridsize*sizeof(double));
@@ -134,16 +137,19 @@ void eca1(const ECA_REQUEST_1 *request)
       
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
+      field_init(&var12[levelID]);
       var12[levelID].grid    = gridID;
       var12[levelID].nmiss   = 0;
       var12[levelID].missval = missval;
       var12[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 
+      field_init(&samp1[levelID]);
       samp1[levelID].grid    = gridID;
       samp1[levelID].nmiss   = 0;
       samp1[levelID].missval = missval;
       samp1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 
+      field_init(&samp2[levelID]);
       samp2[levelID].grid    = gridID;
       samp2[levelID].nmiss   = 0;
       samp2[levelID].missval = missval;
@@ -151,6 +157,7 @@ void eca1(const ECA_REQUEST_1 *request)
 
       if ( IS_SET(request->var1.f3) )
         {
+	  field_init(&var13[levelID]);
           var13[levelID].grid    = gridID;
           var13[levelID].nmiss   = 0;
           var13[levelID].missval = missval;
@@ -158,6 +165,7 @@ void eca1(const ECA_REQUEST_1 *request)
         }
       if ( IS_SET(request->var2.h2) )
         {
+	  field_init(&var21[levelID]);
           var21[levelID].grid    = gridID;
           var21[levelID].nmiss   = 0;
           var21[levelID].missval = missval;
@@ -165,6 +173,7 @@ void eca1(const ECA_REQUEST_1 *request)
         }
       if ( IS_SET(request->var2.h3) )
         {
+	  field_init(&var23[levelID]);
           var23[levelID].grid    = gridID;
           var23[levelID].nmiss   = 0;
           var23[levelID].missval = missval;
@@ -476,6 +485,8 @@ void eca2(const ECA_REQUEST_2 *request)
 
   gridsize = gridInqSize(gridID);
 
+  field_init(&field1);
+  field_init(&field2);
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
 
@@ -495,21 +506,25 @@ void eca2(const ECA_REQUEST_2 *request)
       
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
+      field_init(&var14[levelID]);
       var14[levelID].grid    = gridID;
       var14[levelID].nmiss   = 0;
       var14[levelID].missval = missval1;
       var14[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
       
+      field_init(&samp1[levelID]);
       samp1[levelID].grid    = gridID;
       samp1[levelID].nmiss   = 0;
       samp1[levelID].missval = missval1;
       samp1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 
+      field_init(&samp2[levelID]);
       samp2[levelID].grid    = gridID;
       samp2[levelID].nmiss   = 0;
       samp2[levelID].missval = missval1;
       samp2[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 
+      field_init(&samp3[levelID]);
       samp3[levelID].grid    = gridID;
       samp3[levelID].nmiss   = 0;
       samp3[levelID].missval = missval1;
@@ -517,6 +532,7 @@ void eca2(const ECA_REQUEST_2 *request)
       
       if ( request->var1.epilog == PERCENT_OF_TOTAL_AMOUNT )
         {
+	  field_init(&total[levelID]);
           total[levelID].grid    = gridID;
           total[levelID].nmiss   = 0;
           total[levelID].missval = missval1;
@@ -524,6 +540,7 @@ void eca2(const ECA_REQUEST_2 *request)
         }
       if ( IS_SET(request->var1.f5) )
         {
+	  field_init(&var15[levelID]);
           var15[levelID].grid    = gridID;
           var15[levelID].nmiss   = 0;
           var15[levelID].missval = missval1;
@@ -531,6 +548,7 @@ void eca2(const ECA_REQUEST_2 *request)
         }
       if ( IS_SET(request->var2.h2) )
         {
+	  field_init(&var22[levelID]);
           var22[levelID].grid    = gridID;
           var22[levelID].nmiss   = 0;
           var22[levelID].missval = missval1;
@@ -841,6 +859,8 @@ void eca3(const ECA_REQUEST_3 *request)
 
   gridsize = gridInqSize(gridID);
 
+  field_init(&field1);
+  field_init(&field2);
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
 
@@ -851,11 +871,13 @@ void eca3(const ECA_REQUEST_3 *request)
         
   for ( levelID = 0; levelID < nlevels; levelID++ )
     {
+      field_init(&var1[levelID]);
       var1[levelID].grid    = gridID;
       var1[levelID].nmiss   = 0;
       var1[levelID].missval = missval;
       var1[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
             
+      field_init(&var2[levelID]);
       var2[levelID].grid    = gridID;
       var2[levelID].nmiss   = 0;
       var2[levelID].missval = missval;
@@ -1070,10 +1092,13 @@ void eca4(const ECA_REQUEST_4 *request)
 
   /* Two fields are needed because of the definition of gsl for northern and
   * southern hemisphere                                                      */
+  field_init(&fieldGt);
+  field_init(&fieldLt);
   fieldGt.ptr = (double *) malloc(gridsize*sizeof(double));
   fieldLt.ptr = (double *) malloc(gridsize*sizeof(double));
 
   /* field for the land-water-distribution */
+  field_init(&mask);
   mask.ptr    = (double *) malloc(gridsize*sizeof(double));
 
   nlevels     = zaxisInqSize(zaxisID);
@@ -1094,24 +1119,28 @@ void eca4(const ECA_REQUEST_4 *request)
 
   for ( levelID = 0; levelID < nlevels; levelID++ )
   {
+    field_init(&startCount[levelID]);
     startCount[levelID].grid     = gridID;
     startCount[levelID].size     = gridsize;
     startCount[levelID].nmiss    = 0;
     startCount[levelID].missval  = missval;
     startCount[levelID].ptr      = (double *) malloc(gridsize*sizeof(double));
 
+    field_init(&endCount[levelID]);
     endCount[levelID].grid       = gridID;
     endCount[levelID].size       = gridsize;
     endCount[levelID].nmiss      = 0;
     endCount[levelID].missval    = missval;
     endCount[levelID].ptr        = (double *) malloc(gridsize*sizeof(double));
 
+    field_init(&gslDuration[levelID]);
     gslDuration[levelID].grid    = gridID;
     gslDuration[levelID].size    = gridsize;
     gslDuration[levelID].nmiss   = 0;
     gslDuration[levelID].missval = missval;
     gslDuration[levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 
+    field_init(&gslFirstDay[levelID]);
     gslFirstDay[levelID].grid    = gridID;
     gslFirstDay[levelID].size    = gridsize;
     gslFirstDay[levelID].nmiss   = 0;
@@ -1120,12 +1149,14 @@ void eca4(const ECA_REQUEST_4 *request)
 
     for ( int h = 0; h < 2; h++ )
     {
+      field_init(&startDateWithHist[h][levelID]);
       startDateWithHist[h][levelID].grid    = gridID;
       startDateWithHist[h][levelID].size    = gridsize;
       startDateWithHist[h][levelID].nmiss   = 0;
       startDateWithHist[h][levelID].missval = missval;
       startDateWithHist[h][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 
+      field_init(&endDateWithHist[h][levelID]);
       endDateWithHist[h][levelID].grid      = gridID;
       endDateWithHist[h][levelID].size      = gridsize;
       endDateWithHist[h][levelID].nmiss     = 0;

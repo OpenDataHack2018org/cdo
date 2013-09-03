@@ -50,7 +50,6 @@ void *Yseaspctl(void *argument)
   int *recVarID, *recLevelID;
   int vdates1[NSEAS], vtimes1[NSEAS];
   int vdates2[NSEAS], vtimes2[NSEAS];
-  double missval;
   field_t **vars1[NSEAS];
   field_t field;
   double pn;
@@ -106,6 +105,7 @@ void *Yseaspctl(void *argument)
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
@@ -149,26 +149,15 @@ void *Yseaspctl(void *argument)
 
       if ( vars1[seas] == NULL )
 	{
-	  vars1[seas] = (field_t **) malloc(nvars*sizeof(field_t *));
+	  vars1[seas] = field_malloc(vlistID1, FIELD_PTR);
           hsets[seas] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[seas][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[seas], varID, nlevels, gridID);
-	      
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		{
-		  vars1[seas][varID][levelID].grid    = gridID;
-		  vars1[seas][varID][levelID].nmiss   = 0;
-		  vars1[seas][varID][levelID].missval = missval;
-		  vars1[seas][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		}
 	    }
 	}
       
@@ -275,14 +264,7 @@ void *Yseaspctl(void *argument)
     {
       if ( vars1[seas] != NULL )
 	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		free(vars1[seas][varID][levelID].ptr);
-	      free(vars1[seas][varID]);
-	    }
-	  free(vars1[seas]); 
+	  field_free(vars1[seas], vlistID1); 
 	  hsetDestroy(hsets[seas]);
 	}
     }

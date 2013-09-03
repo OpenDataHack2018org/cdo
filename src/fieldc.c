@@ -40,6 +40,8 @@ void farcmul(field_t *field, double rconst)
   double missval2 = field->missval;
   double *array   = field->ptr;
 
+  if ( nwpv != 2 ) nwpv = 1;
+
   len    = nwpv*gridInqSize(grid);
 
   if ( nmiss > 0 )

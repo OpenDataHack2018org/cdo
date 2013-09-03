@@ -33,12 +33,11 @@ int genThinoutGrid(int gridID1, int xinc, int yinc)
 {
   int ilon, ilat, olon, olat;
   int gridID2, gridtype;
-  int gridsize1, nlon1, nlat1;
+  int nlon1, nlat1;
   int gridsize2, nlon2, nlat2;
   double *xvals1, *yvals1, *xvals2, *yvals2;
 
   gridtype = gridInqType(gridID1);
-  gridsize1 = gridInqSize(gridID1);
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
 
@@ -91,14 +90,13 @@ int genBoxavgGrid(int gridID1, int xinc, int yinc)
 {
   int i, j, i1;
   int gridID2, gridtype;
-  int gridsize1, nlon1, nlat1;
+  int nlon1, nlat1;
   int gridsize2, nlon2, nlat2;
   double *xvals1, *yvals1, *xvals2, *yvals2;
   double *grid1_corner_lon = NULL, *grid1_corner_lat = NULL;
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
 
   gridtype = gridInqType(gridID1);
-  gridsize1 = gridInqSize(gridID1);
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
 
@@ -414,6 +412,9 @@ void *Intgrid(void *argument)
 
   gridsize = gridInqSize(gridID2);
   array2   = (double *) malloc(gridsize*sizeof(double));
+
+  field_init(&field1);
+  field_init(&field2);
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )

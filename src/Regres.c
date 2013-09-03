@@ -40,7 +40,6 @@ void *Regres(void *argument)
   int streamID1,/* streamID2, */streamID3;
   int vlistID1, vlistID2, taxisID1, taxisID2;
   int nmiss;
-  int nvars, nlevel;
   int *recVarID, *recLevelID;
   int nwork = 5;
   double temp1, temp2;
@@ -69,7 +68,6 @@ void *Regres(void *argument)
 
   streamDefVlist(streamID3, vlistID2);
 
-  nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 
   recVarID   = (int *) malloc(nrecords*sizeof(int));

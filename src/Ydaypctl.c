@@ -51,7 +51,6 @@ void *Ydaypctl(void *argument)
   int *recVarID, *recLevelID;
   int vdates1[NDAY], vtimes1[NDAY];
   int vdates2[NDAY], vtimes2[NDAY];
-  double missval;
   field_t **vars1[NDAY];
   field_t field;
   double pn;
@@ -105,6 +104,7 @@ void *Ydaypctl(void *argument)
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
@@ -136,26 +136,15 @@ void *Ydaypctl(void *argument)
 
       if ( vars1[dayoy] == NULL )
 	{
-	  vars1[dayoy] = (field_t **) malloc(nvars*sizeof(field_t *));
+	  vars1[dayoy] = field_malloc(vlistID1, FIELD_PTR);
           hsets[dayoy] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[dayoy][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[dayoy], varID, nlevels, gridID);
-	      
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		{
-		  vars1[dayoy][varID][levelID].grid    = gridID;
-		  vars1[dayoy][varID][levelID].nmiss   = 0;
-		  vars1[dayoy][varID][levelID].missval = missval;
-		  vars1[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		}
 	    }
 	}
       
@@ -263,14 +252,7 @@ void *Ydaypctl(void *argument)
     {
       if ( vars1[dayoy] != NULL )
 	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		free(vars1[dayoy][varID][levelID].ptr);
-	      free(vars1[dayoy][varID]);
-	    }
-	  free(vars1[dayoy]); 
+	  field_free(vars1[dayoy], vlistID1); 
 	  hsetDestroy(hsets[dayoy]);
 	}
     }

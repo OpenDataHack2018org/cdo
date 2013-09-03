@@ -126,6 +126,7 @@ void *Splittime(void *argument)
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
+		  field_init(&vars[varID][levelID]);
 		  vars[varID][levelID].grid    = gridID;
 		  vars[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 		}

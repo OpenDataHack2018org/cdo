@@ -115,6 +115,7 @@ void *Timselstat(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   vars1 = field_malloc(vlistID1, FIELD_PTR);

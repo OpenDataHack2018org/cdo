@@ -94,6 +94,9 @@ void *Intgridtraj(void *argument)
 
   vlistID1 = streamInqVlist(streamID1);
 
+  field_init(&field1);
+  field_init(&field2);
+
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 

@@ -184,6 +184,10 @@ void *Trms(void *argument)
       vardata2[varID] = (double *) malloc(gridsize*nlevel*sizeof(double));
     }
 
+  field_init(&field1);
+  field_init(&field2);
+  field_init(&field3);
+
   lim = vlistGridsizeMax(vlistID1);
   field1.weight = NULL;
   if ( needWeights )

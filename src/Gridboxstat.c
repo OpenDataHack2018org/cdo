@@ -682,6 +682,9 @@ void *Gridboxstat(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
+  field_init(&field1);
+  field_init(&field2);
+
   gridsize1 = gridInqSize(gridID1);
   field1.ptr    = (double *) malloc(gridsize1*sizeof(double));
   field1.weight = NULL;

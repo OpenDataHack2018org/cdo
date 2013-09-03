@@ -49,7 +49,6 @@ void *Ymonpctl(void *argument)
   int *recVarID, *recLevelID;
   int vdates1[NMONTH], vtimes1[NMONTH];
   int vdates2[NMONTH], vtimes2[NMONTH];
-  double missval;
   field_t **vars1[NMONTH];
   field_t field;
   double pn;
@@ -103,6 +102,7 @@ void *Ymonpctl(void *argument)
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   tsID = 0;
@@ -128,26 +128,15 @@ void *Ymonpctl(void *argument)
 
       if ( vars1[month] == NULL )
 	{
-	  vars1[month] = (field_t **) malloc(nvars*sizeof(field_t *));
+	  vars1[month] = field_malloc(vlistID1, FIELD_PTR);
           hsets[month] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
-	      gridsize = gridInqSize(gridID);
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      missval  = vlistInqVarMissval(vlistID1, varID);
 
-	      vars1[month][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[month], varID, nlevels, gridID);
-	      
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		{
-		  vars1[month][varID][levelID].grid    = gridID;
-		  vars1[month][varID][levelID].nmiss   = 0;
-		  vars1[month][varID][levelID].missval = missval;
-		  vars1[month][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		}
 	    }
 	}
       
@@ -249,14 +238,7 @@ void *Ymonpctl(void *argument)
     {
       if ( vars1[month] != NULL )
 	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		free(vars1[month][varID][levelID].ptr);
-	      free(vars1[month][varID]);
-	    }
-	  free(vars1[month]); 
+	  field_free(vars1[month], vlistID1); 
 	  hsetDestroy(hsets[month]);
 	}
     }

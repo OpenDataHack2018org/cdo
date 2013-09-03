@@ -29,10 +29,8 @@
 
 void *Splitsel(void *argument)
 {
-  int operatorID;
-  int operfunc;
   int gridsize;
-  int vdate = 0, vtime = 0;
+  //int vdate = 0, vtime = 0;
   int nrecs = 0;
   int varID, levelID, recID;
   int tsID, tsID2;
@@ -61,9 +59,6 @@ void *Splitsel(void *argument)
   cdoInitialize(argument);
 
   cdoOperatorAdd("splitsel",  0,  0, NULL);
-
-  operatorID = cdoOperatorID();
-  operfunc = cdoOperatorF1(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
@@ -130,6 +125,7 @@ void *Splitsel(void *argument)
 
 	      for ( levelID = 0; levelID < nlevel; levelID++ )
 		{
+		  field_init(&vars[varID][levelID]);
 		  vars[varID][levelID].grid    = gridID;
 		  vars[varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
 		}
@@ -178,9 +174,11 @@ void *Splitsel(void *argument)
 	  nrecs = streamInqTimestep(streamID1, tsID);
 	  if ( nrecs == 0 ) break;
 
+	  /*
 	  vdate = taxisInqVdate(taxisID1);
 	  vtime = taxisInqVtime(taxisID1);
-	  /* printf("vdate: %d vtime: %d\n", vdate, vtime); */
+	  printf("vdate: %d vtime: %d\n", vdate, vtime);
+	   */
 
 	  taxisCopyTimestep(taxisID2, taxisID1);
 	  streamDefTimestep(streamID2, tsID2);

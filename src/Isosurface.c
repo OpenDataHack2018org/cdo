@@ -149,6 +149,7 @@ void *Isosurface(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   nvars = vlistNvars(vlistID1);
@@ -170,6 +171,7 @@ void *Isosurface(void *argument)
       else 
 	liso[varID] = FALSE;
 
+      field_init(&vars1[varID]);
       vars1[varID].grid    = gridID;
       vars1[varID].zaxis   = zaxisID;
       vars1[varID].nmiss   = 0;
