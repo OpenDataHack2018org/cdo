@@ -47,7 +47,6 @@ void *Ydrunpctl(void *argument)
   int nmiss;
   int nvars, nlevels;
   int *recVarID, *recLevelID;
-  double missval;
   field_t ***vars1 = NULL, **vars2[NDAY];
   datetime_t *datetime;
   int taxisID1, taxisID2, taxisID3, taxisID4;
@@ -114,6 +113,7 @@ void *Ydrunpctl(void *argument)
   recLevelID = (int *) malloc(nrecords*sizeof(int));
 
   gridsize = vlistGridsizeMax(vlistID1);
+  field_init(&field);
   field.ptr = (double *) malloc(gridsize*sizeof(double));
 
   datetime = (datetime_t *) malloc((ndates+1)*sizeof(datetime_t));
@@ -122,25 +122,7 @@ void *Ydrunpctl(void *argument)
   
   for ( its = 0; its < ndates; its++ )
     {
-      vars1[its] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-      for ( varID = 0; varID < nvars; varID++ )
-	{
-	  gridID   = vlistInqVarGrid(vlistID1, varID);
-	  gridsize = gridInqSize(gridID);
-	  nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-	  missval  = vlistInqVarMissval(vlistID1, varID);
-
-	  vars1[its][varID] = (field_t *) malloc(nlevels*sizeof(field_t));
-
-	  for ( levelID = 0; levelID < nlevels; levelID++ )
-	    {
-	      vars1[its][varID][levelID].grid    = gridID;
-	      vars1[its][varID][levelID].nmiss   = 0;
-	      vars1[its][varID][levelID].missval = missval;
-	      vars1[its][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-	    }
-	}
+      vars1[its] = field_malloc(vlistID1, FIELD_PTR);
     }
 
   tsID = 0;
@@ -172,26 +154,15 @@ void *Ydrunpctl(void *argument)
 
       if ( vars2[dayoy] == NULL )
 	{
-	  vars2[dayoy] = (field_t **) malloc(nvars*sizeof(field_t *));
+	  vars2[dayoy] = field_malloc(vlistID2, FIELD_PTR);
           hsets[dayoy] = hsetCreate(nvars);
 
 	  for ( varID = 0; varID < nvars; varID++ )
 	    {
 	      gridID   = vlistInqVarGrid(vlistID2, varID);
-	      gridsize = gridInqSize(gridID);
 	      nlevels  = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      missval  = vlistInqVarMissval(vlistID2, varID);
 
-	      vars2[dayoy][varID] = (field_t *)  malloc(nlevels*sizeof(field_t));
               hsetCreateVarLevels(hsets[dayoy], varID, nlevels, gridID);
-	      
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		{
-		  vars2[dayoy][varID][levelID].grid    = gridID;
-		  vars2[dayoy][varID][levelID].nmiss   = 0;
-		  vars2[dayoy][varID][levelID].missval = missval;
-		  vars2[dayoy][varID][levelID].ptr     = (double *) malloc(gridsize*sizeof(double));
-		}
 	    }
 	}
       
@@ -353,14 +324,7 @@ void *Ydrunpctl(void *argument)
     {
       if ( vars2[dayoy] != NULL )
 	{
-	  for ( varID = 0; varID < nvars; varID++ )
-	    {
-	      nlevels = zaxisInqSize(vlistInqVarZaxis(vlistID2, varID));
-	      for ( levelID = 0; levelID < nlevels; levelID++ )
-		free(vars2[dayoy][varID][levelID].ptr);
-	      free(vars2[dayoy][varID]);
-	    }
-	  free(vars2[dayoy]); 
+	  field_free(vars2[dayoy], vlistID2); 
 	  hsetDestroy(hsets[dayoy]);
 	}
     }
