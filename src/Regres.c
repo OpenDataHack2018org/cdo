@@ -77,31 +77,13 @@ void *Regres(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
 
+  field_init(&field1);
+  field_init(&field2);
   field1.ptr = (double *) malloc(gridsize*sizeof(double));
   field2.ptr = (double *) malloc(gridsize*sizeof(double));
 
   for ( w = 0; w < nwork; w++ )
-    work[w] = (field_t **) malloc(nvars*sizeof(field_t *));
-
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      gridID   = vlistInqVarGrid(vlistID1, varID);
-      gridsize = gridInqSize(gridID);
-      nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      missval  = vlistInqVarMissval(vlistID1, varID);
-
-      for ( w = 0; w < nwork; w++ )
-	work[w][varID] = (field_t *)  malloc(nlevel*sizeof(field_t));
-
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-	  for ( w = 0; w < nwork; w++ )
-	    {
-	      work[w][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
-	      for ( i = 0; i < gridsize; i++ ) work[w][varID][levelID].ptr[i] = 0;
-	    }
-	}
-    }
+    work[w] = field_calloc(vlistID1, FIELD_PTR);
 
   tsID    = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )
@@ -185,20 +167,8 @@ void *Regres(void *argument)
       streamWriteRecord(streamID3, field2.ptr, nmiss);
     }
 
-  for ( varID = 0; varID < nvars; varID++ )
-    {
-      nlevel = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-      for ( levelID = 0; levelID < nlevel; levelID++ )
-	{
-	  for ( w = 0; w < nwork; w++ )
-	    free(work[w][varID][levelID].ptr);
-	}
 
-      for ( w = 0; w < nwork; w++ )
-	free(work[w][varID]);
-    }
-
-  for ( w = 0; w < nwork; w++ ) free(work[w]);
+  for ( w = 0; w < nwork; w++ ) field_free(work[w], vlistID1);
 
   if ( field1.ptr ) free(field1.ptr);
   if ( field2.ptr ) free(field2.ptr);
