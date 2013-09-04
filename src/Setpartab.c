@@ -21,12 +21,20 @@
       Setpartab  setpartab       Set parameter table
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if  defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if defined (HAVE_LIBUDUNITS2)
+#if defined(HAVE_LIBUDUNITS2) && (defined(HAVE_UDUNITS2_H) || defined(HAVE_UDUNITS2_UDUNITS2_H))
+#define HAVE_UDUNITS2
+#endif
+
+#if defined(HAVE_UDUNITS2)
+#if defined(HAVE_UDUNITS2_UDUNITS2_H)
+#  include <udunits2/udunits2.h>
+#else
 #  include <udunits2.h>
+#endif
 #endif
 
 #include <errno.h>
@@ -40,7 +48,7 @@
 
 typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t;
 
-#if defined (HAVE_LIBUDUNITS2)
+#if defined(HAVE_UDUNITS2)
 
 static void udunitsInitialize(void);
 static int udunitsInit = 0;
@@ -218,7 +226,7 @@ void defineVarUnits(var_t *vars, int vlistID2, int varID, char *units, char *nam
 	  vars[varID].changeunits = TRUE;
 	  strcpy(vars[varID].units_old, units_old);
 	  strcpy(vars[varID].units, units);
-#if defined (HAVE_LIBUDUNITS2)
+#if defined(HAVE_UDUNITS2)
 	  int status;
 	  UDUNITS_INIT();
 	  UDUNITS_LOCK();
@@ -764,7 +772,7 @@ void *Setpartab(void *argument)
 		}
 	    }
 
-#if defined (HAVE_LIBUDUNITS2)
+#if defined(HAVE_UDUNITS2)
 	  if ( vars[varID].changeunits == TRUE )
 	    {
 	      int nerr = 0;
@@ -796,7 +804,7 @@ void *Setpartab(void *argument)
   streamClose(streamID2);
   streamClose(streamID1);
 
-#if defined (HAVE_LIBUDUNITS2)
+#if defined(HAVE_UDUNITS2)
   UDUNITS_LOCK();
 
   for ( varID = 0; varID < nvars; varID++ )
