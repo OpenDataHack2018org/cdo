@@ -71,8 +71,21 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+# If stdout is a non-dumb tty, use colors.  If test -t is not supported,
+# then this fails; a conservative approach.  Of course do not redirect
+# stdout here, just stderr.
 am__tty_colors = \
-red=; grn=; lgn=; blu=; std=
+red=; grn=; lgn=; blu=; std=; \
+test "X$(AM_COLOR_TESTS)" != Xno \
+&& test "X$$TERM" != Xdumb \
+&& { test "X$(AM_COLOR_TESTS)" = Xalways || test -t 1 2>/dev/null; } \
+&& { \
+  red='[0;31m'; \
+  grn='[0;32m'; \
+  lgn='[1;32m'; \
+  blu='[1;34m'; \
+  std='[m'; \
+}
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -238,7 +251,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 CLEANFILES = `ls *.pyc`
-TESTS = $(top_srcdir)/test/test_info.py
+TESTS = $(top_srcdir)/test/test_info.py \
+        $(top_srcdir)/test/test_Timstat.sh
+
 
 #	$(top_srcdir)/test/test_diff.py
 #	$(top_srcdir)/test/test_Arith.py
@@ -248,6 +263,7 @@ TESTS = $(top_srcdir)/test/test_info.py
 EXTRA_DIST = $(TESTS) $(top_srcdir)/test/testStreams.py
 CDO = $(top_builddir)/src/cdo
 PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
+AUTOMAKE_OPTIONS = color-tests
 all: all-am
 
 .SUFFIXES:
