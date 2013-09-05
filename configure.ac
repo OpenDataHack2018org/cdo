@@ -124,7 +124,7 @@ AC_SUBST([AR])
 COMPILER="$CC $CFLAGS"
 AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
 
-AC_OUTPUT(Makefile src/Makefile contrib/Makefile test/Makefile cdo.spec cdo.settings)
+AC_OUTPUT(Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings)
 
 #  ----------------------------------------------------------------------
 #  Show configuration

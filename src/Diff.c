@@ -202,9 +202,9 @@ void *Diff(void *argument)
       tsID++;
     }
 
-  fprintf(stdout, "  %d of %d records differ\n", ndrec, ngrec);
+  fprintf(stderr, "  %d of %d records differ\n", ndrec, ngrec);
   if ( ndrec != nd2rec )
-    fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
+    fprintf(stderr, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
   /*  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec); */
   if ( nrecs == 0 && nrecs2 > 0 )
     cdoWarning("stream2 has more time steps than stream1!");

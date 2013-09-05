@@ -15,6 +15,8 @@ EXTRA_DIST = $(TESTS) $(top_srcdir)/test/testStreams.py
 
 CDO   = $(top_builddir)/src/cdo
 
+DATAPATH   = $(top_srcdir)/test/data
+
 PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
 
 listTests:

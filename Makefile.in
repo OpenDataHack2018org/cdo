@@ -298,7 +298,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 
 # Process this file with automake to produce Makefile.in
-SUBDIRS = libcdi src contrib test
+SUBDIRS = libcdi src contrib test/data test
 #
 EXTRA_DIST = config/default OPERATORS doc/cdo.pdf doc/cdo_refcard.pdf cdo.spec README
 #

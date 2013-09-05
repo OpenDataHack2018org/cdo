@@ -19468,7 +19468,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile cdo.spec cdo.settings"
+ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20586,6 +20586,7 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
     "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
+    "test/data/Makefile") CONFIG_FILES="$CONFIG_FILES test/data/Makefile" ;;
     "cdo.spec") CONFIG_FILES="$CONFIG_FILES cdo.spec" ;;
     "cdo.settings") CONFIG_FILES="$CONFIG_FILES cdo.settings" ;;
 
