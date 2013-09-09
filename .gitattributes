@@ -594,6 +594,8 @@ test/Makefile.in -text
 test/README -text
 test/data/Makefile.am -text
 test/data/gen_refdata.sh -text
+test/data/hl_l19.grb -text
+test/data/ml2pl_ref -text
 test/data/timavg_ref -text
 test/data/timmax_ref -text
 test/data/timmean_ref -text
@@ -609,6 +611,7 @@ test/test_Arith.py -text
 test/test_Arithc.py -text
 test/test_Selvar.py -text
 test/test_Timstat.sh -text
+test/test_Vertint.sh -text
 test/test_area.c -text
 test/test_diff.py -text
 test/test_info.py -text

@@ -21,3 +21,10 @@ IFILE=$OFILE
 for STAT in $STATS; do
   $CDO $FORMAT tim$STAT $IFILE tim${STAT}_ref
 done
+#
+IFILE=ECHAM5_T21L19monavg.grb
+OFILE=hl_l19.grb
+$CDO fldmean -sp2gp -selcode,129,130,152 $IFILE $OFILE
+IFILE=$OFILE
+OFILE=ml2pl_ref
+$CDO $FORMAT ml2pl,92500,85000,50000,20000 $IFILE $OFILE

@@ -3,7 +3,8 @@ CLEANFILES =
 export
 
 TESTS = $(top_srcdir)/test/test_info.py \
-        $(top_srcdir)/test/test_Timstat.sh
+        $(top_srcdir)/test/test_Timstat.sh \
+        $(top_srcdir)/test/test_Vertint.sh
 
 #	$(top_srcdir)/test/test_diff.py
 #	$(top_srcdir)/test/test_Arith.py
