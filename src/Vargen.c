@@ -25,7 +25,7 @@
 */
 
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h" // ENABLE_DATA
 #endif
 

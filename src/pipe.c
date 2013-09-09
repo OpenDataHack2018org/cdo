@@ -16,7 +16,7 @@
 */
 
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
@@ -30,7 +30,7 @@
 #include "error.h"
 #include "dmemory.h"
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
 
 static int PipeDebug = 0;
 
@@ -43,7 +43,7 @@ void pipe_init(pipe_t *pipe)
   pthread_mutexattr_init(&m_attr);
   pthread_condattr_init(&c_attr);
   /*
-#if defined (_POSIX_THREAD_PROCESS_SHARED)
+#if defined(_POSIX_THREAD_PROCESS_SHARED)
   if ( PipeDebug )
     {
       Message("setpshared mutexattr to PTHREAD_PROCESS_SHARED");

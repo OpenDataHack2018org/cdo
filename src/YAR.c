@@ -23,7 +23,7 @@
 #include "grid.h"
 #include "remap.h"
 
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
 #include "points.h"
 #include "grid_reg2d.h"
 #include "grid_search.h"
@@ -314,7 +314,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   printf("lonOut: %g %g %g ... %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD);
   printf("latOut: %g %g %g ... %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD);
 
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
 
   //--------------------------------------------
   // define a grid
@@ -430,7 +430,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 	      wgts[2] = iguess*jguess;
 	      wgts[3] = (1.-iguess)*jguess;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      store_link_bilin(&remap.vars, dst_add, src_add, wgts);
@@ -552,7 +552,7 @@ void yar_remap_con(field_t *field1, field_t *field2)
   printf("lonOut: %g %g %g ... %g %g\n", lonOut[0]/DEG2RAD, lonOut[1]/DEG2RAD, lonOut[2]/DEG2RAD, lonOut[nlonOut-2]/DEG2RAD, lonOut[nlonOut-1]/DEG2RAD);
   printf("latOut: %g %g %g ... %g %g\n", latOut[0]/DEG2RAD, latOut[1]/DEG2RAD, latOut[2]/DEG2RAD, latOut[nlatOut-2]/DEG2RAD, latOut[nlatOut-1]/DEG2RAD);
 
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
 
   //--------------------------------------------
   // define a grid

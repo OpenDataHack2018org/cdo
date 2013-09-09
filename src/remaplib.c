@@ -45,7 +45,7 @@
  */
 
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
@@ -430,7 +430,7 @@ void boundbox_from_corners(long size, long nc, const double *restrict corner_lon
   long i4, inc, i, j;
   restr_t clon, clat;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(bound_box, corner_lat, corner_lon, nc, size)	\
   private(i4, inc, i, j, clon, clat)
@@ -465,7 +465,7 @@ void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, const do
   long n_add, e_add, ne_add;
   restr_t tmp_lats[4], tmp_lons[4];  /* temps for computing bounding boxes */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(lonIsCyclic, size, nx, ny, center_lon, center_lat, bound_box)	\
   private(n4, i, j, k, n, ip1, jp1, n_add, e_add, ne_add, tmp_lats, tmp_lons)
@@ -535,7 +535,7 @@ void check_lon_range(long nlons, double *lons)
 {
   long n;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlons, lons)
 #endif
   for ( n = 0; n < nlons; ++n )
@@ -550,7 +550,7 @@ void check_lat_range(long nlats, double *lats)
 {
   long n;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlats, lats)
 #endif
   for ( n = 0; n < nlats; ++n )
@@ -565,7 +565,7 @@ void check_lon_boundbox_range(long nlons, restr_t *bound_box)
 {
   long n, n4;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlons, bound_box) private(n4)
 #endif
   for ( n = 0; n < nlons; ++n )
@@ -584,7 +584,7 @@ void check_lat_boundbox_range(long nlats, restr_t *restrict bound_box, double *r
 {
   long n, n4;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nlats, bound_box, lats) private(n4)
 #endif
   for ( n = 0; n < nlats; ++n )
@@ -773,7 +773,7 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
       rg->bin_addr1[n2+1] = 0;
     }
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   private(n, n2, nele4)		       \
   shared(grid1_size, nbins, rg)
@@ -787,7 +787,7 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
 	  if ( rg->grid1_bound_box[nele4  ] <= rg->bin_lats[n2+1] &&
 	       rg->grid1_bound_box[nele4+1] >= rg->bin_lats[n2  ] )
 	    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      {
@@ -808,7 +808,7 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
 	  rg->bin_addr2[n2+1] = 0;
 	}
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   private(n, n2, nele4)		       \
   shared(grid2_size, nbins, rg)
@@ -822,7 +822,7 @@ void calc_lat_bins(remapgrid_t *rg, int map_type)
 	      if ( rg->grid2_bound_box[nele4  ] <= rg->bin_lats[n2+1] &&
 		   rg->grid2_bound_box[nele4+1] >= rg->bin_lats[n2  ] )
 		{
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 		  {
@@ -1130,7 +1130,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 
   /* Initialize logical mask */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(grid1_size, rg)
 #endif
   for ( i = 0; i < grid1_size; ++i ) rg->grid1_mask[i] = TRUE;
@@ -1193,7 +1193,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
     }
   else
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(grid2_size, rg)
 #endif
       for ( i = 0; i < grid2_size; ++i ) rg->grid2_mask[i] = TRUE;
@@ -1597,7 +1597,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   double wts;
   double *src_cls;
   double *src_wts;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   double **src_cls2;
   double **src_wts2;
   int ompthID;
@@ -1609,7 +1609,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 
   max_cls = get_max_add(num_links, dst_size, dst_add);
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   src_cls2 = (double **) malloc(ompNumThreads*sizeof(double *));
   src_wts2 = (double **) malloc(ompNumThreads*sizeof(double *));
   for ( i = 0; i < ompNumThreads; ++i )
@@ -1625,7 +1625,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   for ( n = 0; n < num_links; ++n )
     if ( DBL_IS_EQUAL(dst_array[dst_add[n]], missval) ) dst_array[dst_add[n]] = ZERO;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(dst_size, src_cls2, src_wts2, num_links, dst_add, src_add, src_array, map_wts, \
 	 num_wts, dst_array, max_cls)					\
@@ -1634,7 +1634,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 #endif
   for ( i = 0; i < dst_size; ++i )
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       ompthID = omp_get_thread_num();
       src_cls = src_cls2[ompthID];
       src_wts = src_wts2[ompthID];
@@ -1714,7 +1714,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 	}
     }
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   for ( i = 0; i < ompNumThreads; ++i )
     {
       free(src_cls2[i]);
@@ -2189,7 +2189,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
   /* Loop over destination grid */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, grid2_size, rg, rv, Max_Iter, converge, lwarn, findex) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, \
@@ -2200,10 +2200,10 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   for ( dst_add = 0; dst_add < grid2_size; ++dst_add )
     {
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -2245,7 +2245,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	      wgts[2] = iguess*jguess;
 	      wgts[3] = (ONE-iguess)*jguess;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      store_link_bilin(rv, dst_add, src_add, wgts);
@@ -2302,7 +2302,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 
 	      rg->grid2_frac[dst_add] = ONE;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      store_link_bilin(rv, dst_add, src_add, wgts);
@@ -2394,7 +2394,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
   /* Loop over destination grid */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge, lwarn, findex) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
@@ -2404,10 +2404,10 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
   for ( dst_add = 0; dst_add < rg->grid2_size; ++dst_add )
     {
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -2475,7 +2475,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	      wgts[3][3] =        iguess*(iguess-ONE)*(iguess-ONE)*
                                   jguess*jguess*(jguess-ONE);
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      store_link_bicub(rv, dst_add, src_add, wgts);
@@ -2520,7 +2520,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 
 	      rg->grid2_frac[dst_add] = ONE;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      store_link_bicub(rv, dst_add, src_add, wgts);
@@ -2772,7 +2772,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   sinlat = (double *) malloc(grid1_size*sizeof(double));
   sinlon = (double *) malloc(grid1_size*sizeof(double));
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)
 #endif
@@ -2786,7 +2786,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 
   /* Loop over destination grid  */
   /* grid_loop1 */
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, rg, rv, grid2_size, coslat, coslon, sinlat, sinlon, findex) \
   private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, dist_tot, \
@@ -2796,10 +2796,10 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
   for ( dst_add = 0; dst_add < grid2_size; ++dst_add )
     {
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -2850,7 +2850,7 @@ void remap_distwgt(remapgrid_t *rg, remapvars_t *rv)
 	      wgtstmp = nbr_dist[n]/dist_tot;
 
 	      rg->grid2_frac[dst_add] = ONE;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	      store_link_nbr(rv, nbr_add[n]-1, dst_add, wgtstmp);
@@ -3014,7 +3014,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   sinlat = (double *) malloc(grid1_size*sizeof(double));
   sinlon = (double *) malloc(grid1_size*sizeof(double));
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(rg, grid1_size, coslat, coslon, sinlat, sinlon)
 #endif
@@ -3028,7 +3028,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 
   /* Loop over destination grid  */
   /* grid_loop1 */
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, rg, rv, grid2_size, coslat, coslon, sinlat, sinlon, findex) \
   private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, nbr_add, nbr_dist, nbr_mask, wgtstmp)	\
@@ -3037,10 +3037,10 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
   for ( dst_add = 0; dst_add < grid2_size; ++dst_add )
     {
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -3083,7 +3083,7 @@ void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv)
 	  wgtstmp = ONE;
 
 	  rg->grid2_frac[dst_add] = ONE;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 	  store_link_nbr(rv, nbr_add-1, dst_add, wgtstmp);
@@ -4281,7 +4281,7 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 
   /* If the link already exists, add the weight to the current weight arrays */
 
-#if  defined (SX)
+#if defined(SX)
 #define STRIPED 1
 #if STRIPED
 #define STRIPLENGTH 4096
@@ -4411,7 +4411,7 @@ long get_srch_cells(long grid1_add, long nbins, int *bin_addr1, int *bin_addr2,
   return (num_srch_cells);
 }
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 static
 void *alloc_srch_corner(size_t n)
 {
@@ -4474,7 +4474,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   long    srch_corners;     /* num of corners of srch cells           */
   long    nsrch_corners;
   int    *srch_add;         /* global address of cells in srch arrays */
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   int **srch_add2;
   int ompthID, i;
 #endif
@@ -4530,7 +4530,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
       link_add2[0] = (int *) malloc(grid2_size*sizeof(int));
       link_add2[1] = (int *) malloc(grid2_size*sizeof(int));
 
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
       for ( n = 0; n < grid1_size; ++n )
@@ -4539,7 +4539,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	  link_add1[1][n] = -1;
 	}
 
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
       for ( n = 0; n < grid2_size; ++n )
@@ -4570,7 +4570,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   /*  Integrate around each cell on grid1 */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
   for ( i = 0; i < ompNumThreads; ++i )
     srch_add2[i] = (int *) malloc(grid2_size*sizeof(int));
@@ -4585,7 +4585,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( cdoTimer ) timer_start(timer_remap_con_l1);
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, nbins, grid1_centroid_lon, grid1_centroid_lat, \
          grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
@@ -4599,12 +4599,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   for ( grid1_add = 0; grid1_add < grid1_size; ++grid1_add )
     {
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       ompthID = omp_get_thread_num();
       srch_add = srch_add2[ompthID];
       if ( ompthID != 0 ) lprogress = 0;
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -4623,7 +4623,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
       /* Create search arrays */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 	  srch_corner_lat = (double *) alloc_srch_corner(srch_corners*num_srch_cells);
 	  srch_corner_lon = (double *) alloc_srch_corner(srch_corners*num_srch_cells);
 #else
@@ -4743,7 +4743,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  if ( grid2_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 			{
@@ -4768,7 +4768,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	    }
           /* End of segment */
         }
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       free_srch_corner(srch_corner_lat);
       free_srch_corner(srch_corner_lon);
 #endif
@@ -4778,12 +4778,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   /* Finished with all cells: deallocate search arrays */
 
-#if ! defined (_OPENMP)
+#if ! defined(_OPENMP)
   if ( srch_corner_lon ) free(srch_corner_lon);
   if ( srch_corner_lat ) free(srch_corner_lat);
 #endif
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   for ( i = 0; i < ompNumThreads; ++i )
     free(srch_add2[i]);
 
@@ -4794,7 +4794,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   /* Integrate around each cell on grid2 */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
   for ( i = 0; i < ompNumThreads; ++i )
     srch_add2[i] = (int *) malloc(grid1_size*sizeof(int));
@@ -4811,7 +4811,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   findex = 0;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, nbins, grid2_centroid_lon, grid2_centroid_lat, \
          grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
@@ -4825,12 +4825,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
   for ( grid2_add = 0; grid2_add < grid2_size; ++grid2_add )
     {
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       ompthID = omp_get_thread_num();
       srch_add = srch_add2[ompthID];
       if ( ompthID != 0 ) lprogress = 0;
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -4849,7 +4849,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
       /* Create search arrays */
       
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 	  srch_corner_lat = (double *) alloc_srch_corner(srch_corners*num_srch_cells);
 	  srch_corner_lon = (double *) alloc_srch_corner(srch_corners*num_srch_cells);
 #else
@@ -4970,7 +4970,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 		  if ( ! lcoinc && grid1_add != -1 )
 		    if ( rg->grid1_mask[grid1_add] )
 		      {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 			{
@@ -4995,7 +4995,7 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 	    }
           /* End of segment */
 	}
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       free_srch_corner(srch_corner_lat);
       free_srch_corner(srch_corner_lon);
 #endif
@@ -5005,12 +5005,12 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   /* Finished with all cells: deallocate search arrays */
 
-#if ! defined (_OPENMP)
+#if ! defined(_OPENMP)
   if ( srch_corner_lon ) free(srch_corner_lon);
   if ( srch_corner_lat ) free(srch_corner_lat);
 #endif
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   for ( i = 0; i < ompNumThreads; ++i )
     free(srch_add2[i]);
 
@@ -5205,10 +5205,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
 
   if ( rv->norm_opt == NORM_OPT_DESTAREA )
     {
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
   private(n, n3, grid1_add, grid2_add, weights, norm_factor)
@@ -5231,10 +5231,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
     }
   else if ( rv->norm_opt == NORM_OPT_FRACAREA )
     {
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, rg, grid1_centroid_lat, grid1_centroid_lon)		\
   private(n, n3, grid1_add, grid2_add, weights, norm_factor)
@@ -5257,10 +5257,10 @@ void remap_conserv(remapgrid_t *rg, remapvars_t *rv)
     }
   else if ( rv->norm_opt == NORM_OPT_NONE )
     {
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(num_links, rv, rg, grid1_centroid_lat, grid1_centroid_lon)	\
   private(n, n3, grid1_add, grid2_add, weights, norm_factor)
@@ -5448,7 +5448,7 @@ void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *r
 
   for ( n = 0; n < rg.grid2_size; ++n ) grid2_count[n] = 0;
 
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
   for ( n = 0; n < rv.num_links; ++n ) grid2_count[rv.grid2_add[n]]++;
@@ -5510,7 +5510,7 @@ void remap_gradients(remapgrid_t rg, const double *restrict array, double *restr
   nx = rg.grid1_dims[0];
   ny = rg.grid1_dims[1];
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(grid1_size, grad1_lat, grad1_lon, grad1_latlon, rg, nx, ny, array) \
   private(n, i, j, ip1, im1, jp1, jm1, in, is, ie, iw, ine, inw, ise, isw, delew, delns, grad1_lat_zero, grad1_lon_zero)
@@ -5778,12 +5778,12 @@ void reorder_links(remapvars_t *rv)
 
 /*****************************************************************************/
 
-#if  defined  (HAVE_LIBNETCDF)
+#if defined(HAVE_LIBNETCDF)
 #  include "netcdf.h"
 #endif
 
 
-#if  defined  (HAVE_LIBNETCDF)
+#if defined(HAVE_LIBNETCDF)
 static
 void nce(int istat)
 {
@@ -5808,7 +5808,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
     interp_file  ! filename for remap data
   */
 
-#if  defined  (HAVE_LIBNETCDF)
+#if defined(HAVE_LIBNETCDF)
 
   /* Local variables */
 
@@ -5914,7 +5914,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
     
     if ( filesize > 0x7FFFFC00 ) /* 2**31 - 1024 (<2GB) */
       {
-#if  defined  (NC_64BIT_OFFSET)
+#if defined(NC_64BIT_OFFSET)
 	writemode = NC_CLOBBER | NC_64BIT_OFFSET;
 #else
 	cdoAbort("Filesize for remap weights maybe too large!");
@@ -6148,7 +6148,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
     interp_file        ! filename for remap data
   */
-#if  defined  (HAVE_LIBNETCDF)
+#if defined(HAVE_LIBNETCDF)
 
   /* Local variables */
 

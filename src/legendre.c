@@ -228,10 +228,10 @@ void phcs(double *pnm, double *hnm, int waves, double pmu,
     {
       pnm[0] = sqrt(1.0 + 1.0 / (jm+jm)) * zcos2 * ztemp2[0];
       hnm[0] = jm * pmu * pnm[0];
-#if defined (CRAY)
+#if defined(CRAY)
 #pragma _CRI novector
 #endif
-#if defined (__uxp__)
+#if defined(__uxp__)
 #pragma loop scalar
 #endif
       for (jn = 1; jn < twowaves-jm; jn++)
@@ -286,7 +286,7 @@ void sp2fctest(double *sa, double *fa, double *poli, int nlev, int nlat, int nfc
 	      sai = *sal++;
 	      far = fal;
 	      fai = fal + nlat;
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
 	      for ( latn = 0; latn < nlat/2; latn++ )
@@ -317,7 +317,7 @@ void sp2fc(const double *sa, double *fa, const double *poli, long nlev, long nla
 
   nsp2 = (nt+1)*(nt+2);
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(jmm, jfc, lat, pol, sar, sai, sal, far, fai, fal)
 #endif
   for ( lev = 0; lev < nlev; lev++ )
@@ -360,7 +360,7 @@ void fc2sp(double *fa, double *sa, double *poli, int nlev, int nlat, int nfc, in
 
   nsp2 = (nt+1)*(nt+2);
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(jmm, jfc, lat, pol, sar, sai, sal, far, fai, fal)
 #endif
   for ( lev = 0; lev < nlev; lev++ )

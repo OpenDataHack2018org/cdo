@@ -413,7 +413,7 @@ void *Gather(void *argument)
 	  missval = vlistInqVarMissval(vlistID1, varID);
 	  for ( i = 0; i < gridsize2; i++ ) array2[i] = missval;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(fileID, streamID, nmiss, i)
 #endif
 	  for ( fileID = 0; fileID < nfiles; fileID++ )

@@ -15,18 +15,18 @@
   GNU General Public License for more details.
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if  defined  (HAVE_PTHREAD_H)
+#if defined(HAVE_PTHREAD_H)
 #  include <pthread.h>
 #endif
 
 #include <stdio.h>
 #include <string.h>
 
-#if  defined  (HAVE_GLOB_H)
+#if defined(HAVE_GLOB_H)
 #include <glob.h>
 #endif
 
@@ -55,7 +55,7 @@ typedef struct {
 operator_t;
 
 typedef struct {
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_t   threadID;
   int         l_threadID;
 #endif
@@ -90,7 +90,7 @@ static process_t Process[MAX_PROCESS];
 static int NumProcess = 0;
 static int NumProcessActive = 0;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
 pthread_mutex_t processMutex = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -99,21 +99,21 @@ int processCreate(void)
 {
   int processID;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
   processID = NumProcess++;
   NumProcessActive++;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
 
   if ( processID >= MAX_PROCESS )
     Error("Limit of %d processes reached!", MAX_PROCESS);
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   Process[processID].threadID     = pthread_self();
   Process[processID].l_threadID   = 1;
 #endif
@@ -139,7 +139,7 @@ int processCreate(void)
 int processSelf(void)
 {
   int processID = 0;
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_t thID = pthread_self();
 
   pthread_mutex_lock(&processMutex);
@@ -168,13 +168,13 @@ int processNums(void)
 {
   int pnums = 0;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
   pnums = NumProcess;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
 
@@ -186,13 +186,13 @@ int processNumsActive(void)
 {
   int pnums = 0;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 #endif
 
   pnums = NumProcessActive;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
 
@@ -330,7 +330,7 @@ const char *processInqPrompt(void)
   return (Process[processID].prompt);
 }
 
-#if  defined  (HAVE_GLOB_H)
+#if defined(HAVE_GLOB_H)
 /* Convert a wildcard pattern into a list of blank-separated filenames which match the wildcard. */
 argument_t *glob_pattern(const char *restrict wildcard)
 {
@@ -557,7 +557,7 @@ int expand_wildcards(int processID, int streamCnt)
   for ( i = 0; i < len; ++i ) if ( streamname0[i] == '?' || streamname0[i] == '*' || streamname0[i] == '[' ) break;
   if ( i < len )
     {
-#if  defined  (HAVE_GLOB_H)
+#if defined(HAVE_GLOB_H)
       argument_t *glob_arg = glob_pattern(streamname0);
 
       if ( strcmp(streamname0, glob_arg->args) != 0 )
@@ -795,14 +795,14 @@ void processDelete(void)
   int processID = processSelf();
 
   //fprintf(stderr, "delete processID %d\n", processID);
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_lock(&processMutex);
 
   Process[processID].l_threadID = 0;
 #endif
   NumProcessActive--;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   pthread_mutex_unlock(&processMutex);  
 #endif
 }

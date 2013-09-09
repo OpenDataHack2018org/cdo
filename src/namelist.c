@@ -23,7 +23,7 @@
 
 #include "namelist.h"
 
-#if ! defined (strdup)
+#if ! defined(strdup)
 char *strdup(const char *s);
 #endif
 int readline(FILE *fp, char *line, int len);

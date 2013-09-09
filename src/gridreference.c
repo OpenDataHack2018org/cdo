@@ -14,11 +14,11 @@
   GNU General Public License for more details.
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if defined (HAVE_LIBCURL)
+#if defined(HAVE_LIBCURL)
 #include <curl/curl.h>
 #include <curl/types.h>
 #include <curl/easy.h>
@@ -43,7 +43,7 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 int download_gridfile(const char *restrict uri, const char *restrict basename)
 {
   int rval = 1;
-#if  defined  (HAVE_LIBCURL)
+#if defined(HAVE_LIBCURL)
   // As curl_easy_init calls non-thread safe curl_global_init the libcurl developer advice
   // to call curl_global_init first and before potential thread spawning.
 
@@ -53,7 +53,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   int status;
   int curlflags = CURL_GLOBAL_DEFAULT;
 
-#if defined (CURL_GLOBAL_ACK_EINTR)
+#if defined(CURL_GLOBAL_ACK_EINTR)
   curlflags |= CURL_GLOBAL_ACK_EINTR;
 #endif
 
@@ -125,7 +125,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
   return rval;
 }
 
-#if defined (HAVE_SYS_STAT_H)
+#if defined(HAVE_SYS_STAT_H)
 #include <sys/stat.h>
 #endif
 
@@ -134,7 +134,7 @@ int download_gridfile(const char *restrict uri, const char *restrict basename)
  */
 int search_file(const char *restrict directory, const char *restrict filename)
 {
-#if defined (HAVE_SYS_STAT_H)
+#if defined(HAVE_SYS_STAT_H)
   struct stat buf;
   int status;
 

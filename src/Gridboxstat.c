@@ -27,7 +27,7 @@
       Gridboxstat    gridboxvar          Gridbox variance
 */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #  include <omp.h>
 #endif
 
@@ -566,12 +566,12 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   nlat2 = gridInqYsize(gridID2);
 
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(ig, ilat, ilon, j, jj, i, ii, index, isize, ompthID)
 #endif
   for ( ig = 0; ig < nlat2*nlon2; ++ig )
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       ompthID = omp_get_thread_num();
 #else
       ompthID = 0;

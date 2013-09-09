@@ -15,13 +15,13 @@
   GNU General Public License for more details.
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
 #define H5_USE_16_API
 
-#if  defined  (HAVE_LIBHDF5)
+#if defined(HAVE_LIBHDF5)
 #  include "hdf5.h"
 #endif
 
@@ -70,7 +70,7 @@ datasets_t;
 
 #define  NINT(x)   ((x) < 0 ? (int)((x)-0.5) : (int)((x)+0.5))
 
-#if  defined  (HAVE_LIBHDF5)
+#if defined(HAVE_LIBHDF5)
 static
 void print_filter(hid_t dset_id, char *varname)
 {
@@ -1407,7 +1407,7 @@ void dsets_init(datasets_t *dsets)
 
 void *Importcmsaf(void *argument)
 {
-#if  defined  (HAVE_LIBHDF5)
+#if defined(HAVE_LIBHDF5)
   int streamID;
   int gridID = -1, zaxisID, taxisID, vlistID;
   int i, offset;
@@ -1429,7 +1429,7 @@ void *Importcmsaf(void *argument)
   if ( cdoDefaultFileType == CDI_UNDEFID )
     cdoDefaultFileType = FILETYPE_NC;
 
-#if  defined  (HAVE_LIBHDF5)
+#if defined(HAVE_LIBHDF5)
   dsets_init(&dsets);
 
   /* Open an existing file. */

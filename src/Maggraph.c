@@ -1,4 +1,4 @@
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
@@ -10,12 +10,12 @@
 #include "grid.h"
 #include "pstream.h"
 
-#if  defined  (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
 #include "magics_api.h"
 #endif
 
 
-#if  defined  (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
 
 #include<libxml/parser.h>
 #include<libxml/tree.h>
@@ -489,7 +489,7 @@ void maggraph(const char *plotfile, const char *varname,const char *varunits, lo
 	3. Set the attributes for the magics data and plot
   */  
    
-#if  defined  (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
 
 
   /* magics_template_parser( magics_node ); */
@@ -755,7 +755,7 @@ int compareDateOrTimeStr( char *datetimestr1, char *datetimestr2, char *sep_char
 }
 
 
-#if  defined  (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
 
 static
 void init_MAGICS( )
@@ -904,7 +904,7 @@ void *Maggraph(void *argument)
       streamClose(streamID);
     }
   
-#if  defined  (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
   /* HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR */
   /*
   init_XMLtemplate_parser( Filename );
@@ -913,7 +913,7 @@ void *Maggraph(void *argument)
 #endif
 
 
-#if  defined  (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
   init_MAGICS( );
 #endif
 
@@ -927,11 +927,11 @@ void *Maggraph(void *argument)
     }
   maggraph(ofilename, varname, units, nfiles, nts, vdate, vtime, datatab, nparam, pnames);
 
-#if  defined  (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
   /* quit_XMLtemplate_parser( ); */
 #endif
 
-#if  defined  (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
   quit_MAGICS( );
 #endif
 
@@ -1038,7 +1038,7 @@ void VerifyGraphParameters( int num_param, char **param_names )
 			}
 		      else
 			{
-#if  defined  (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
 			  // HARDCODED THE FILE NAME .. TO BE SENT AS COMMAND LINE ARGUMENT FOR THE MAGICS OPERATOR 
 			  fclose(fp);
 			  init_XMLtemplate_parser( split_str[1] );

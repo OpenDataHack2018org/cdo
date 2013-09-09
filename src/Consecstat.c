@@ -56,7 +56,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
   {
     if ( current.nmiss > 0 || history.nmiss > 0 )
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -80,7 +80,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     }
     else
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -91,7 +91,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
   {
     if ( current.nmiss > 0 )
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -106,7 +106,7 @@ static void selEndOfPeriod(field_t *periods, field_t history, field_t current, i
     }
     else
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ )
@@ -219,7 +219,7 @@ void *Consecstat (void *argument)
             streamDefRecord(ostreamID, varID, levelID);
             streamWriteRecord(ostreamID, periods[varID][levelID].ptr, periods[varID][levelID].nmiss);
           }
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) schedule(static)
           for ( i = 0; i < gridInqSize(vars[varID][levelID].grid); i++ )
             hist[varID][levelID].ptr[i] = vars[varID][levelID].ptr[i];

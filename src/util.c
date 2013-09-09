@@ -30,7 +30,7 @@ char *getProgname(char *string)
 {
   char *progname;
 
-#if defined (_WIN32)
+#if defined(_WIN32)
   /*  progname = strrchr(string, '\\'); */
   progname = " cdo";
 #else

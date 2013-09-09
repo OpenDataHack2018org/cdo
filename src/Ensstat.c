@@ -30,7 +30,7 @@
       Ensstat    enspctl         Ensemble percentiles
 */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #  include <omp.h>
 #endif
 
@@ -178,7 +178,7 @@ void *Ensstat(void *argument)
 
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(fileID, streamID, nmiss) \
                                      lastprivate(varID, levelID)
 #endif
@@ -194,12 +194,12 @@ void *Ensstat(void *argument)
 	  missval  = vlistInqVarMissval(vlistID1, varID);
 
 	  nmiss = 0;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, ompthID, fileID)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 	      ompthID = omp_get_thread_num();
 #else
 	      ompthID = 0;
@@ -220,7 +220,7 @@ void *Ensstat(void *argument)
 
 	      if ( DBL_IS_EQUAL(array2[i], field[ompthID].missval) )
 		{
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
 		  nmiss++;

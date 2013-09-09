@@ -625,7 +625,7 @@ double crps_det_integrate(double *a, const double d, const size_t n)
   double area = 0; 
   //  double tmp;
   size_t i;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for if ( n>10000 ) shared(a) private(i) \
   reduction(+:area) schedule(static,10000) 
 #endif                                                     /* **************************** */

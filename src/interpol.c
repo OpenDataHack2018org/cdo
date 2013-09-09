@@ -4,7 +4,7 @@
 #include "grid.h"
 #include "util.h"  /* progressStatus */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #include <omp.h>  // omp_get_thread_num()
 #endif
 
@@ -220,7 +220,7 @@ void intlinarr2(double missval, int lon_is_circular,
 
   progressInit();
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask) \
   private(i, jj, ii)
@@ -232,13 +232,13 @@ void intlinarr2(double missval, int lon_is_circular,
       long iix;
       int lfound;
       int lprogress = 1;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
 
       field[i] = missval;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       findex++;
@@ -316,7 +316,7 @@ void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
     }
 }
 
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
 #include "points.h"
 #include "grid_reg2d.h"
 #include "grid_search.h"
@@ -365,7 +365,7 @@ void intconarr2(double missval, int lon_is_circular,
  
   progressInit();
 
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
   enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE}; // not used !
   // enum edge_type quad_type[] = {LON_CIRCLE, LON_CIRCLE, LON_CIRCLE, LON_CIRCLE};
 
@@ -399,7 +399,7 @@ void intconarr2(double missval, int lon_is_circular,
 #endif
 
   /*
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, field, fieldm, x, y, xm, ym, nxm, nym, gridsize2, missval, findex, nlon1, lon_is_circular, grid1_mask, nc2) \
   private(i, jj, ii)
@@ -414,7 +414,7 @@ void intconarr2(double missval, int lon_is_circular,
       int lprogress = 1;
       ndeps = 0;
       /*
-#if defined (_OPENMP)
+#if defined(_OPENMP)
       if ( omp_get_thread_num() != 0 ) lprogress = 0;
 #endif
       */
@@ -431,7 +431,7 @@ void intconarr2(double missval, int lon_is_circular,
       bound_lon2 = bound_box[3];
       //  printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2]*RAD2DEG, bound_box[3]*RAD2DEG, bound_box[0]*RAD2DEG, bound_box[1]*RAD2DEG);
       /*
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp atomic
 #endif
       */
@@ -498,7 +498,7 @@ void intconarr2(double missval, int lon_is_circular,
 	lfound = rect_grid_search2(&imin, &imax, bound_box[2], bound_box[3], nxm, xm);
       */
 
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
       int index2 = i;
       /*
       int ilat2 = index2/nlonOut;
@@ -592,7 +592,7 @@ void intconarr2(double missval, int lon_is_circular,
 #endif
     }
  
-#if defined (HAVE_LIBYAC)
+#if defined(HAVE_LIBYAC)
   polygon_destroy ( &polygons );
 #endif
 
@@ -1200,14 +1200,14 @@ void interpolate(field_t *field1, field_t *field2)
 			      || lon[nlon] >= lon[ 0] + 360 - 0.001);
 
   for (ilat = 0; ilat < nlat; ilat++)
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
     for (ilon = 0; ilon < nlon; ilon++)
       xin[2 * ilat + 1][2 * ilon + 1] = in0[ilat][ilon];
 
   for (ilat = 0; ilat < nxlat; ilat += 2)
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
     for (ilon = 1; ilon < nxlon; ilon += 2)
@@ -1228,7 +1228,7 @@ void interpolate(field_t *field1, field_t *field2)
       }
 
   for ( ilat = 1; ilat < nxlat; ilat += 2 )
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
     for ( ilon = 0; ilon < nxlon; ilon += 2 )
@@ -1259,7 +1259,7 @@ void interpolate(field_t *field1, field_t *field2)
       }
 
   for ( ilat = 0; ilat < nxlat; ilat += 2 )
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
     for ( ilon = 0; ilon < nxlon; ilon += 2 )

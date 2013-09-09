@@ -18,7 +18,7 @@
 #ifndef _CDO_INT_H
 #define _CDO_INT_H
 
-#if defined (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
@@ -58,15 +58,15 @@ char *strdup(const char *s);
 #define  DATE_IS_NEQ(dtstr1, dtstr2, len) (memcmp(dtstr1, dtstr2, len) != 0)
 
 
-#if defined (__xlC__) /* performance problems on IBM */
+#if defined(__xlC__) /* performance problems on IBM */
 #ifndef DBL_IS_NAN
 #  define DBL_IS_NAN(x)     ((x) != (x))
 #endif
 #else
 #ifndef DBL_IS_NAN
-#if  defined  (HAVE_DECL_ISNAN)
+#if defined(HAVE_DECL_ISNAN)
 #  define DBL_IS_NAN(x)     (isnan(x))
-#elif  defined  (FP_NAN)
+#elif defined(FP_NAN)
 #  define DBL_IS_NAN(x)     (fpclassify(x) == FP_NAN)
 #else
 #  define DBL_IS_NAN(x)     ((x) != (x))

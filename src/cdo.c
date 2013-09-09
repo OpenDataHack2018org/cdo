@@ -15,7 +15,7 @@
   GNU General Public License for more details.
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
@@ -25,15 +25,15 @@
 #include <stdlib.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
-#if  defined (HAVE_GETRLIMIT)
-#if  defined (HAVE_SYS_RESOURCE_H)
+#if defined(HAVE_GETRLIMIT)
+#if defined(HAVE_SYS_RESOURCE_H)
 #include <sys/time.h>       /* getrlimit */
 #include <sys/resource.h>   /* getrlimit */
 #endif
 #endif
 #include <unistd.h>         /* sysconf, gethostname */
 
-#if defined (SX)
+#if defined(SX)
 #define RLIM_T  long long
 #else
 #define RLIM_T  rlim_t
@@ -45,7 +45,7 @@
 #include "cdo_int.h"
 
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
 #include "pstream_int.h"
 #include "pthread_debug.h"
 #endif
@@ -54,11 +54,11 @@
 #include "util.h"
 #include "error.h"
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #  include <omp.h>
 #endif
 
-#if ! defined (VERSION)
+#if ! defined(VERSION)
 #  define  VERSION  "0.0.1"
 #endif
 
@@ -149,13 +149,13 @@ void cdo_version(void)
   char *typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
 
   fprintf(stderr, "%s\n", CDO_Version);
-#if defined (COMPILER)
+#if defined(COMPILER)
   fprintf(stderr, "Compiler: %s\n", COMPILER);
 #endif
-#if defined (COMP_VERSION)
+#if defined(COMP_VERSION)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
 #endif
-#if defined (USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
+#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
   fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
 	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
@@ -205,7 +205,7 @@ void usage(void)
   fprintf(stderr, "    -M             Switch to indicate that the I/O streams have missing values\n");
   fprintf(stderr, "    -m <missval>   Set the default missing value (default: %g)\n", cdiInqMissval());
   fprintf(stderr, "    -O             Overwrite existing output file, if checked\n");
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   fprintf(stderr, "    -P <nthreads>  Set number of OpenMP threads\n");
 #endif
   fprintf(stderr, "    -Q             Alphanumeric sorting of netCDF parameter names\n");
@@ -341,7 +341,7 @@ void cdoSetDebug(int level)
 
   if ( level == 1 || (level &  32) ) cdoDebug = 1;
   if ( level == 1 || (level &  64) ) pstreamDebug(1);
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   if ( level == 1 || (level & 128) ) pipeDebug(1);
   if ( level == 1 || (level & 256) ) Pthread_debug(1);
 #endif
@@ -618,7 +618,7 @@ void setDefaultFileType(char *filetypestr, int labort)
     }
 }
 
-#if defined (malloc)
+#if defined(malloc)
 #undef malloc
 #undef free
 #endif
@@ -861,97 +861,97 @@ void print_system_info()
   if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
   fprintf(stderr, "\n");
 
-#if defined (__SSE2__)
+#if defined(__SSE2__)
   fprintf(stderr, "Predefined: __SSE2__\n");
 #endif 
-#if defined (__SSE3__)
+#if defined(__SSE3__)
   fprintf(stderr, "Predefined: __SSE3__\n");
 #endif 
-#if defined (__SSE4_1__)
+#if defined(__SSE4_1__)
   fprintf(stderr, "Predefined: __SSE4_1__\n");
 #endif 
-#if defined (__SSE4_2__)
+#if defined(__SSE4_2__)
   fprintf(stderr, "Predefined: __SSE4_2__\n");
 #endif 
-#if defined (__AVX__)
+#if defined(__AVX__)
   fprintf(stderr, "Predefined: __AVX__\n");
 #endif 
   fprintf(stderr, "\n");
 
   fprintf(stderr, "mem alignment       = %d\n\n", getMemAlignment());
 
-#if defined (HAVE_MMAP)
+#if defined(HAVE_MMAP)
   fprintf(stderr, "HAVE_MMAP\n");
 #endif
-#if defined (HAVE_MEMORY_H)
+#if defined(HAVE_MEMORY_H)
   fprintf(stderr, "HAVE_MEMORY_H\n");
 #endif
   fprintf(stderr, "\n");
       
-#if defined (_OPENACC)
+#if defined(_OPENACC)
   fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif
-#if defined (__GNUC__)
+#if defined(__GNUC__)
   fprintf(stderr, "GNUC VERSION        = %d\n", __GNUC__);
 #endif
-#if defined (__GNUC_MINOR__)
+#if defined(__GNUC_MINOR__)
   fprintf(stderr, "GNUC MINOR          = %d\n", __GNUC_MINOR__);
 #endif
-#if defined (__ICC)
+#if defined(__ICC)
   fprintf(stderr, "ICC VERSION         = %d\n", __ICC);
 #endif
-#if defined (__STDC__)
+#if defined(__STDC__)
   fprintf(stderr, "STD ANSI C          = %d\n", __STDC__);
 #endif
-#if defined (__STD_VERSION__)
+#if defined(__STD_VERSION__)
   fprintf(stderr, "STD VERSION         = %ld\n", __STD_VERSION__);
 #endif
-#if defined (__STDC_VERSION__)
+#if defined(__STDC_VERSION__)
   fprintf(stderr, "STDC VERSION        = %ld\n", __STDC_VERSION__);
 #endif
-#if defined (__STD_HOSTED__)
+#if defined(__STD_HOSTED__)
   fprintf(stderr, "STD HOSTED          = %d\n", __STD_HOSTED__);
 #endif
-#if defined (FLT_EVAL_METHOD)
+#if defined(FLT_EVAL_METHOD)
   fprintf(stderr, "FLT_EVAL_METHOD     = %d\n", FLT_EVAL_METHOD);
 #endif
-#if defined (FP_FAST_FMA)
+#if defined(FP_FAST_FMA)
   fprintf(stderr, "FP_FAST_FMA         = defined\n");
 #endif
   fprintf(stderr, "\n");
 
-#if defined (_SC_VERSION)
+#if defined(_SC_VERSION)
   fprintf(stderr, "POSIX.1 VERSION     = %ld\n", sysconf(_SC_VERSION));
 #endif
-#if defined (_SC_ARG_MAX)
+#if defined(_SC_ARG_MAX)
   fprintf(stderr, "POSIX.1 ARG_MAX     = %ld\n", sysconf(_SC_ARG_MAX));
 #endif
-#if defined (_SC_CHILD_MAX)
+#if defined(_SC_CHILD_MAX)
   fprintf(stderr, "POSIX.1 CHILD_MAX   = %ld\n", sysconf(_SC_CHILD_MAX));
 #endif
-#if defined (_SC_STREAM_MAX)
+#if defined(_SC_STREAM_MAX)
   fprintf(stderr, "POSIX.1 STREAM_MAX  = %ld\n", sysconf(_SC_STREAM_MAX));
 #endif
-#if defined (_SC_OPEN_MAX)
+#if defined(_SC_OPEN_MAX)
   fprintf(stderr, "POSIX.1 OPEN_MAX    = %ld\n", sysconf(_SC_OPEN_MAX));
 #endif
-#if defined (_SC_PAGESIZE)
+#if defined(_SC_PAGESIZE)
   fprintf(stderr, "POSIX.1 PAGESIZE    = %ld\n", sysconf(_SC_PAGESIZE));
 #endif
 
   fprintf(stderr, "\n");
 
-#if defined (HAVE_GETRLIMIT)
-#if defined (RLIMIT_FSIZE)
+#if defined(HAVE_GETRLIMIT)
+#if defined(RLIMIT_FSIZE)
   PRINT_RLIMIT(RLIMIT_FSIZE);
 #endif
-#if defined (RLIMIT_NOFILE)
+#if defined(RLIMIT_NOFILE)
   PRINT_RLIMIT(RLIMIT_NOFILE);
 #endif
-#if defined (RLIMIT_STACK)
+#if defined(RLIMIT_STACK)
   PRINT_RLIMIT(RLIMIT_STACK);
 #endif
 #endif
@@ -961,8 +961,8 @@ void print_system_info()
 static
 void check_stacksize()
 {
-#if defined (HAVE_GETRLIMIT)
-#if defined (RLIMIT_STACK)
+#if defined(HAVE_GETRLIMIT)
+#if defined(RLIMIT_STACK)
   {
 #define  MIN_STACK_SIZE  67108864L  /* 64MB */
     int status;
@@ -1026,7 +1026,7 @@ void parse_options(int argc, char *argv[])
 	  break;
 	case 'e':
 	  {
-#if defined (HAVE_GETHOSTNAME)
+#if defined(HAVE_GETHOSTNAME)
 	  char host[1024];
 	  gethostname(host, sizeof(host));
 	  cdoExpName = cdoOptarg;
@@ -1176,7 +1176,7 @@ int main(int argc, char *argv[])
 
   if ( Debug ) print_pthread_info();
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   if ( numThreads <= 0 ) numThreads = 1;
   omp_set_num_threads(numThreads);
   ompNumThreads = omp_get_max_threads();

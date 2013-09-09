@@ -26,11 +26,11 @@
 */
 
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if  defined  (HAVE_ISNAN) && ! defined(__cplusplus)
+#if defined(HAVE_ISNAN) && ! defined(__cplusplus)
 int isnan(const double x);
 #endif
 
@@ -80,7 +80,7 @@ void *Setmiss(void *argument)
       /*
       if ( operatorArgv()[0][0] == 'n' || operatorArgv()[0][0] == 'N' )
 	{
-#if ! defined  (HAVE_ISNAN)
+#if ! defined(HAVE_ISNAN)
 	  cdoWarning("Function >isnan< not available!");
 #endif
 	  rconst = 0.0/0.0;
@@ -162,7 +162,7 @@ void *Setmiss(void *argument)
 	    }
 	  else if ( operatorID == SETCTOMISS )
 	    {
-#if  defined  (HAVE_ISNAN)
+#if defined(HAVE_ISNAN)
 	      if ( isnan(rconst) )
 		{
 		  for ( i = 0; i < gridsize; i++ )

@@ -1,4 +1,4 @@
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
@@ -114,7 +114,7 @@ int Set_magics_param_CTABLE( char *user_name, char *param_value )
 		return 1;
 	printf("Setting the CTABLE magics params \n"); 
 #if 0
-#if  defined  (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
         SetMagicsParameterValue( "contour_level_list", "floatarray", param_value );
 #endif
 #endif

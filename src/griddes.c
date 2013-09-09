@@ -15,11 +15,11 @@
   GNU General Public License for more details.
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if  defined  (HAVE_LIBNETCDF)
+#if defined(HAVE_LIBNETCDF)
 #  include "netcdf.h"
 #endif
 

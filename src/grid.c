@@ -14,14 +14,14 @@
   GNU General Public License for more details.
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
 #include <stdio.h>
 #include <stdarg.h> /* va_list */
 
-#if defined (HAVE_LIBPROJ)
+#if defined(HAVE_LIBPROJ)
 #  include "proj_api.h"
 #endif
 
@@ -39,7 +39,7 @@ void scale_vec(double scalefactor, long nvals, double *restrict values)
 {
   long n;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none) shared(nvals, scalefactor, values)
 #endif
   for ( n = 0; n < nvals; ++n )
@@ -267,7 +267,7 @@ void gridGenXbounds2D(int nx, int ny, const double * restrict xbounds, double * 
   long i, j, index;
   double minlon, maxlon;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(nx, ny, xbounds, xbounds2D)	      \
   private(i, j, minlon, maxlon, index)
@@ -294,7 +294,7 @@ void gridGenYbounds2D(int nx, int ny, const double * restrict ybounds, double * 
   long i, j, index;
   double minlat, maxlat;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(nx, ny, ybounds, ybounds2D)	      \
   private(i, j, minlat, maxlat, index)
@@ -385,7 +385,7 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 static
 void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 {
-#if defined (HAVE_LIBPROJ)
+#if defined(HAVE_LIBPROJ)
   projPJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -422,7 +422,7 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
 static
 void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
-#if defined (HAVE_LIBPROJ)
+#if defined(HAVE_LIBPROJ)
   projPJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -466,7 +466,7 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 static
 void lcc2_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
 {
-#if defined (HAVE_LIBPROJ)
+#if defined(HAVE_LIBPROJ)
   projPJ   *libProj;
   char *params[20];
   int nbpar=0;
@@ -1479,10 +1479,10 @@ double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3)
   ca2 = -( u23.x[0]*u12.x[0]+u23.x[1]*u12.x[1]+u23.x[2]*u12.x[2] );
   ca3 = -( u31.x[0]*u23.x[0]+u31.x[1]*u23.x[1]+u31.x[2]*u23.x[2] );
 
-#if ! defined (FMAX)
+#if ! defined(FMAX)
 #define  FMAX(a,b)  ((a) > (b) ? (a) : (b))
 #endif
-#if ! defined (FMIN)
+#if ! defined(FMIN)
 #define  FMIN(a,b)  ((a) < (b) ? (a) : (b))
 #endif
 
@@ -1700,7 +1700,7 @@ int gridGenArea(int gridID, double *area)
   if ( lgriddestroy ) gridDestroy(gridID);
 
   total_area = 0;
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
   shared(gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, status) \
   private(i)

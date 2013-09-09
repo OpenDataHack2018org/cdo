@@ -285,7 +285,7 @@ void *Runstat(void *argument)
 	      for ( i = 0; i < gridsize; i++ )
 		samp1[tsID][varID][levelID].ptr[i] = (double) imask[i];
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, inp)
 #endif
 	      for ( inp = 0; inp < tsID; inp++ )
@@ -299,7 +299,7 @@ void *Runstat(void *argument)
 	  if ( lvarstd )
 	    {
 	      farmoq(&vars2[tsID][varID][levelID], vars1[tsID][varID][levelID]);
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
 	      for ( inp = 0; inp < tsID; inp++ )
@@ -310,7 +310,7 @@ void *Runstat(void *argument)
 	    }
 	  else
 	    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
 	      for ( inp = 0; inp < tsID; inp++ )
@@ -432,7 +432,7 @@ void *Runstat(void *argument)
 	      for ( i = 0; i < gridsize; i++ )
 		samp1[ndates-1][varID][levelID].ptr[i] = (double) imask[i];
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, inp)
 #endif
 	      for ( inp = 0; inp < ndates-1; inp++ )
@@ -446,7 +446,7 @@ void *Runstat(void *argument)
 	  if ( lvarstd )
 	    {
 	      farmoq(&vars2[ndates-1][varID][levelID], vars1[ndates-1][varID][levelID]);
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
 	      for ( inp = 0; inp < ndates-1; inp++ )
@@ -457,7 +457,7 @@ void *Runstat(void *argument)
 	    }
 	  else
 	    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
 	      for ( inp = 0; inp < ndates-1; inp++ )

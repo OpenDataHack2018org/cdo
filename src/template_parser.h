@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#if  defined  (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
 #include<libxml/parser.h>
 #include<libxml/tree.h>
 

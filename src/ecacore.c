@@ -1275,11 +1275,11 @@ void eca4(const ECA_REQUEST_4 *request)
               }
               if ( 7 == month && !resetAtJul )
               {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp sections
 #endif
                 {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp section
 #endif
                   {
@@ -1296,7 +1296,7 @@ void eca4(const ECA_REQUEST_4 *request)
                           }
                       }
                   }
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp section
 #endif
                   {
@@ -1318,11 +1318,11 @@ void eca4(const ECA_REQUEST_4 *request)
               }
 
               /* count the day with temperature larger/smaller than the given limit */
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp sections
 #endif
               {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp section
 #endif
                 {
@@ -1330,7 +1330,7 @@ void eca4(const ECA_REQUEST_4 *request)
                   request->s1(&fieldGt        , request->s1arg);
                   farnum2(&startCount[levelID], fieldGt);
                 }
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp section
 #endif
                 {
@@ -1471,12 +1471,12 @@ void eca4(const ECA_REQUEST_4 *request)
               }
             isFirstYear = FALSE;
           }
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp sections
 #endif
           {
             updateHist(startDateWithHist, nlevels, gridsize, yvals, FALSE);
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp section
 #endif
             updateHist(endDateWithHist,   nlevels, gridsize, yvals, TRUE);

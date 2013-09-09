@@ -21,7 +21,7 @@
       Tstepcount  tstepcount  Count number of timesteps
 */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #  include <omp.h>
 #endif
 
@@ -148,13 +148,13 @@ void *Tstepcount(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       for ( levelID = 0; levelID < nlevel; levelID++ )
 	{
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, ompthID, tsID) \
   schedule(dynamic,1)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
               ompthID = omp_get_thread_num();
 #else
               ompthID = 0;

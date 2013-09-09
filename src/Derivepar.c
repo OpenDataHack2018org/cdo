@@ -66,10 +66,10 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
           gtl   = gt   + nhor*(j-1);
           gql   = gq   + nhor*(j-1);
           phl   = ph   + nhor*(j-1);
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for
 #endif
           for ( i = 0; i < nhor; i++ )
@@ -77,10 +77,10 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
                      * log(phl[i+nhor] / phl[i]);
         }
 
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for
 #endif
       for ( i = 0; i < nhor; i++ )
@@ -89,23 +89,23 @@ void MakeGeopotHeight(double *geop, double* gt, double *gq, double *ph, int nhor
   else    /* No humidity */
     {
       for ( j = nlev ; j > 1 ; j-- )
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
         for ( i = nhor * (j-1) ; i < nhor * j ; i++ )
           geop[i] = geop[i+nhor] + RD * gt[i] * log(ph[i+nhor] / ph[i]);
 
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
       for ( i = 0; i < nhor; i++ )
         geop[i] = geop[i+nhor] + RD * gt[i] * z2log2;
     }
 
-#if defined (SX)
+#if defined(SX)
 #pragma vdir nodep
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for
 #endif
   for ( i = 0; i < nhor * (nlev+1); i++ ) geop[i] *= zrg;

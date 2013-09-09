@@ -171,7 +171,7 @@ void farsumtr(field_t *occur, field_t field, const double refval)
 
   if ( occur->nmiss > 0 || field.nmiss > 0 )
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) schedule(static)
 #endif
       for ( i = 0; i < len; i++ )
@@ -194,7 +194,7 @@ void farsumtr(field_t *occur, field_t field, const double refval)
     }
   else
     {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared)
 #endif
       for ( i = 0; i < len; i++ ) 

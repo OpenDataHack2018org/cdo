@@ -22,7 +22,7 @@
    Ensstat3       ensroccurve      Ensamble Receiver Operating Characteristics
 */
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #  include <omp.h>
 #endif
 
@@ -128,7 +128,7 @@ void *Ensstat3(void *argument)
   /* ("first touch strategy")                            */
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   field = (field_t *) malloc(omp_get_max_threads()*sizeof(field_t));
   for ( i = 0; i < omp_get_max_threads(); i++ )
 #else
@@ -279,7 +279,7 @@ void *Ensstat3(void *argument)
       
       for ( recID = 0; recID < nrecs0; recID++ )
 	{
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(fileID, streamID, nmiss) \
                                      lastprivate(varID, levelID)
 #endif
@@ -299,12 +299,12 @@ void *Ensstat3(void *argument)
 	    for ( binID=0;binID<nfiles;binID++ )
 	      array2[binID][0] = 0;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i, binID, ompthID, fileID)
 #endif
 	  for ( i = 0; i < gridsize; i++ )
 	    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 	      ompthID = omp_get_thread_num();
 #else
 	      ompthID = 0;
@@ -334,7 +334,7 @@ void *Ensstat3(void *argument)
 		      /* ************** */
 		      // for ( j=0; j<nfiles; j++ )
 		      //   fprintf(stderr,"%5.2g ",field[ompthID].ptr[j]);
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp critical
 #endif
 		      binID = (int) fldfun(field[ompthID], operfunc);

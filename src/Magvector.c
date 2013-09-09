@@ -1,4 +1,4 @@
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h" /* HAVE_LIBMAGICS */
 #endif
 
@@ -129,7 +129,7 @@ void magvector( const char *plotfile, int operatorID, const char *varname, long 
 	  }
 
 
-/* #if  defined  (HAVE_LIBMAGICS) */
+/* #if defined(HAVE_LIBMAGICS) */
 
 
         /* magics_template_parser( magics_node ); */

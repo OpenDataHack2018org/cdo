@@ -52,7 +52,7 @@ void farcmul(field_t *field, double rconst)
   else
     {
       /*
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(i)
 #endif
       */

@@ -340,7 +340,7 @@ void *EOFs(void * argument)
           if ( grid_space )
             {
 	      // This could be done in parallel to save lots of time
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for private(i1,i2) default(shared)
 #endif
               for ( i1 = 0; i1 < gridsize; i1++ )
@@ -491,7 +491,7 @@ void *EOFs(void * argument)
                 cov[j1] = (double*) malloc(nts*sizeof(double));
 	      eigv = (double *) malloc (nts*sizeof(double));
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)
 #endif
               for ( j1 = 0; j1 < nts; j1++ )
@@ -543,7 +543,7 @@ void *EOFs(void * argument)
 		}
               else if ( time_space )
                 {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for private(i2,j,sum) shared(datafieldv,eigenvectors)
 #endif
                   for ( i2 = 0; i2 < npack; i2++ )
@@ -557,7 +557,7 @@ void *EOFs(void * argument)
                   // NORMALIZING
                   sum = 0;
 
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) reduction(+:sum)	\
   shared(eigenvectors,weight,pack,varID,levelID,i,npack)
 #endif
@@ -578,7 +578,7 @@ void *EOFs(void * argument)
                   if ( sum > 0 )
                     {
                       sum = sqrt(sum);
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) \
   shared(npack,varID,levelID,i,pack,sum,eigenvectors)
 #endif
@@ -587,7 +587,7 @@ void *EOFs(void * argument)
                     }
                   else
 		    {
-#if defined (_OPENMP)
+#if defined(_OPENMP)
 #pragma omp parallel for private(i2) default(none) \
   shared(npack,varID,levelID,i,pack,sum,eigenvectors,missval)
 #endif

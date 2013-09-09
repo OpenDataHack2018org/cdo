@@ -23,11 +23,11 @@
       Filter    bandpass
 */
 
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if defined ( HAVE_LIBFFTW3 ) 
+#if defined( HAVE_LIBFFTW3 ) 
 #include <fftw3.h>
 #endif
 
@@ -137,7 +137,7 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
 }
 
 
-#if defined ( HAVE_LIBFFTW3 ) 
+#if defined( HAVE_LIBFFTW3 ) 
 static
 void filter_fftw(int nts, const int *fmasc, 
                  fftw_complex *fft_in, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
@@ -203,7 +203,7 @@ void *Filter(void *argument)
   field_t ***vars = NULL;
   double fmin = 0, fmax = 0;
   int *fmasc;
-#if defined ( HAVE_LIBFFTW3 ) 
+#if defined( HAVE_LIBFFTW3 ) 
   fftw_plan p_T2S, p_S2T;
   fftw_complex *out_fft;
   fftw_complex *in_fft;
@@ -309,7 +309,7 @@ void *Filter(void *argument)
   nts = tsID;
   /*  round up nts to next power of two for (better) performance 
    ** of fast fourier transformation */
-#if defined ( HAVE_LIBFFTW3 ) 
+#if defined( HAVE_LIBFFTW3 ) 
   nts2 = nts;
 
   out_fft = (fftw_complex *) malloc ( nts * sizeof(fftw_complex) );
@@ -369,13 +369,13 @@ void *Filter(void *argument)
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
 
-#if defined ( HAVE_LIBFFTW3 ) 
+#if defined( HAVE_LIBFFTW3 ) 
       fprintf(stderr," using fftw lib\n");
 #endif
       
       for ( levelID = 0; levelID < nlevel; levelID++ )
         { 
-#if defined ( HAVE_LIBFFTW3 ) 
+#if defined( HAVE_LIBFFTW3 ) 
           for ( i = 0; i < gridsize-1; i++ )
             {
               for ( tsID = 0; tsID < nts; tsID++ )                              

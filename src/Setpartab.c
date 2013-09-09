@@ -53,7 +53,7 @@ typedef enum {CODE_NUMBER, PARAMETER_ID, VARIABLE_NAME, STANDARD_NAME} pt_mode_t
 static void udunitsInitialize(void);
 static int udunitsInit = 0;
 
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
 #  include <pthread.h>
 
 static pthread_once_t  udunitsInitThread = PTHREAD_ONCE_INIT;
@@ -77,7 +77,7 @@ ut_system *ut_read = NULL;
 static
 void udunitsInitialize(void)
 {
-#if  defined  (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   /* initialize global API mutex lock */
   pthread_mutex_init(&udunitsMutex, NULL);
 #endif
