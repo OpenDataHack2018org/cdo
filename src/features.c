@@ -1,17 +1,21 @@
-#if  defined  (HAVE_CONFIG_H)
+#if defined(HAVE_CONFIG_H)
 #  include "config.h"
 #endif
 
-#if defined (HAVE_ZLIB_H)
+#if defined(HAVE_ZLIB_H)
 #include <zlib.h>
 #endif
 
-#if  defined  (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
 #include <libxml/xmlversion.h>
 #endif
 
-#if defined (HAVE_CURL_CURL_H)
+#if defined(HAVE_CURL_CURL_H)
 #include <curl/curl.h>
+#endif
+
+#if defined(HAVE_PROJ_API_H)
+#include <proj_api.h>
 #endif
 
 #include <stdio.h>
@@ -20,43 +24,43 @@
 void printFeatures(void)
 {
   fprintf(stderr, "Features:");
-#if defined (HAVE_LIBPTHREAD)
+#if defined(HAVE_LIBPTHREAD)
   fprintf(stderr, " PTHREADS");
 #endif
-#if defined (_OPENMP)
+#if defined(_OPENMP)
   fprintf(stderr, " OpenMP");
 #endif
-#if  defined  (HAVE_NETCDF4)
+#if  defined(HAVE_NETCDF4)
   fprintf(stderr, " NC4");
 #endif
-#if  defined  (HAVE_LIBNC_DAP)
+#if  defined(HAVE_LIBNC_DAP)
   fprintf(stderr, " OPeNDAP");
 #endif
-#if defined (HAVE_LIBSZ)
+#if defined(HAVE_LIBSZ)
   fprintf(stderr, " SZ");
 #endif
-#if defined (HAVE_LIBZ)
+#if defined(HAVE_LIBZ)
   fprintf(stderr, " Z");
 #endif
-#if defined (HAVE_LIBJASPER)
+#if defined(HAVE_LIBJASPER)
   fprintf(stderr, " JASPER");
 #endif
-#if defined (HAVE_LIBUDUNITS2)
+#if defined(HAVE_LIBUDUNITS2)
   fprintf(stderr, " UDUNITS2");
 #endif
-#if defined (HAVE_LIBPROJ)
+#if defined(HAVE_LIBPROJ)
   fprintf(stderr, " PROJ.4");
 #endif
-#if defined (HAVE_LIBXML2)
+#if defined(HAVE_LIBXML2)
   fprintf(stderr, " XML2");
 #endif
-#if defined (HAVE_LIBMAGICS)
+#if defined(HAVE_LIBMAGICS)
   fprintf(stderr, " MAGICS");
 #endif
-#if defined (HAVE_LIBDRMAA)
+#if defined(HAVE_LIBDRMAA)
   fprintf(stderr, " DRMAA");
 #endif
-#if defined (HAVE_LIBCURL)
+#if defined(HAVE_LIBCURL)
   fprintf(stderr, " CURL");
 #endif
   fprintf(stderr, "\n");
@@ -66,26 +70,11 @@ void printFeatures(void)
 void printLibraries(void)
 {
   fprintf(stderr, "Libraries:");
-#if defined (HAVE_LIBPTHREAD)
-  fprintf(stderr, " PTHREADS");
-#endif
-#if defined (_OPENMP)
-  fprintf(stderr, " OpenMP/%d", _OPENMP);
-#endif
-#if  defined  (HAVE_NETCDF4)
-  fprintf(stderr, " NC4");
-#endif
-#if  defined  (HAVE_LIBNC_DAP)
-  fprintf(stderr, " OPeNDAP");
-#endif
-#if defined (HAVE_LIBSZ)
-  fprintf(stderr, " SZ");
-#endif
-
-#if defined (HAVE_LIBZ)
+  /*
+#if defined(HAVE_LIBZ)
   {
     fprintf(stderr, " zlib/%s", zlibVersion());
-#if defined (ZLIB_VERSION)
+#if defined(ZLIB_VERSION)
     if ( strcmp(ZLIB_VERSION, zlibVersion()) != 0 )
       fprintf(stderr, "(h%s)", ZLIB_VERSION);
 #else
@@ -93,38 +82,26 @@ void printLibraries(void)
 #endif
   }
 #endif
-
-#if defined (HAVE_LIBJASPER)
-  fprintf(stderr, " JASPER");
+  */
+#if defined(HAVE_LIBPROJ)
+  fprintf(stderr, " proj");
+#if defined(PJ_VERSION)
+  fprintf(stderr, "/%g", PJ_VERSION*0.01);
 #endif
-#if defined (HAVE_LIBUDUNITS2)
-  fprintf(stderr, " UDUNITS2");
-#endif
-#if defined (HAVE_LIBPROJ)
-  fprintf(stderr, " PROJ.4");
 #endif
 
-#if defined (HAVE_LIBXML2)
-  {
-    fprintf(stderr, " xml2");
-#if defined (LIBXML_DOTTED_VERSION)
-    fprintf(stderr, "/%s", LIBXML_DOTTED_VERSION);
+#if defined(HAVE_LIBXML2)
+  fprintf(stderr, " xml2");
+#if defined(LIBXML_DOTTED_VERSION)
+  fprintf(stderr, "/%s", LIBXML_DOTTED_VERSION);
 #endif
-  }
 #endif
 
-#if defined (HAVE_LIBMAGICS)
-  fprintf(stderr, " MAGICS");
-#endif
-#if defined (HAVE_LIBDRMAA)
-  fprintf(stderr, " DRMAA");
-#endif
-
-#if defined (HAVE_LIBCURL)
+#if defined(HAVE_LIBCURL)
   {
     curl_version_info_data *version_data = curl_version_info(CURLVERSION_NOW);
     fprintf(stderr, " curl/%s", version_data->version);
-#if defined (LIBCURL_VERSION)
+#if defined(LIBCURL_VERSION)
     if ( strcmp(LIBCURL_VERSION, version_data->version) != 0 )
       fprintf(stderr, "(h%s)", LIBCURL_VERSION);
 #else
