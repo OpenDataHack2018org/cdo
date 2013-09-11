@@ -1125,6 +1125,7 @@ void eca4(const ECA_REQUEST_4 *request)
     startCount[levelID].nmiss    = 0;
     startCount[levelID].missval  = missval;
     startCount[levelID].ptr      = (double *) malloc(gridsize*sizeof(double));
+    memset(startCount[levelID].ptr, 0, gridsize*sizeof(double));
 
     field_init(&endCount[levelID]);
     endCount[levelID].grid       = gridID;
@@ -1132,6 +1133,7 @@ void eca4(const ECA_REQUEST_4 *request)
     endCount[levelID].nmiss      = 0;
     endCount[levelID].missval    = missval;
     endCount[levelID].ptr        = (double *) malloc(gridsize*sizeof(double));
+    memset(endCount[levelID].ptr, 0, gridsize*sizeof(double));
 
     field_init(&gslDuration[levelID]);
     gslDuration[levelID].grid    = gridID;
