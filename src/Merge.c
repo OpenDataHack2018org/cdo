@@ -134,10 +134,27 @@ void *Merge(void *argument)
   int gridsize;
   int nmiss;
   int taxisID1, taxisID2;
+  int skip_same_var = FALSE;
   const char *ofilename;
   double *array = NULL;
 
   cdoInitialize(argument);
+
+  {
+    char *envstr;
+    envstr = getenv("SKIP_SAME_VAR");
+    if ( envstr )
+      {
+	int ival;
+	ival = atoi(envstr);
+	if ( ival == 1 )
+	  {
+	    skip_same_var = TRUE;
+	    if ( cdoVerbose )
+	      cdoPrint("Set SKIP_SAME_VAR to %d", ival);
+	  }
+      }
+  }
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
 
