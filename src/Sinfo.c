@@ -238,13 +238,13 @@ void *Sinfo(void *argument)
 	  levelsize = zaxisInqSize(zaxisID);
 	  /* zaxisInqLongname(zaxisID, longname); */
 	  zaxisName(zaxistype, longname);
-	  longname[17] = 0;
+	  longname[18] = 0;
 	  zaxisInqUnits(zaxisID, units);
 	  units[12] = 0;
 	  if ( zaxistype == ZAXIS_GENERIC && ltype != 0 )
 	    nbyte0    = fprintf(stdout, "  %4d : %-11s  (ltype=%3d) : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, ltype);
 	  else
-	    nbyte0    = fprintf(stdout, "  %4d : %-17s  %5s : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, units);
+	    nbyte0    = fprintf(stdout, "  %4d : %-18s %5s : ", vlistZaxisIndex(vlistID, zaxisID)+1, longname, units);
 	  nbyte = nbyte0;
 	  for ( levelID = 0; levelID < levelsize; levelID++ )
 	    {
@@ -262,7 +262,7 @@ void *Sinfo(void *argument)
 	    {
 	      double level1, level2;
 	      nbyte = nbyte0;
-	      nbyte0 = fprintf(stdout, "%33s : ", "bounds");
+	      fprintf(stdout, "%33s : ", "bounds");
 	      for ( levelID = 0; levelID < levelsize; levelID++ )
 		{
 		  if ( nbyte > MAXCHARS )
@@ -277,6 +277,30 @@ void *Sinfo(void *argument)
 		}
 	      fprintf(stdout, "\n");
 	    }
+
+          if ( zaxistype == ZAXIS_REFERENCE )
+            {
+              int number   = zaxisInqNumber(zaxisID);
+
+              if ( number > 0 )
+                {
+                  fprintf(stdout, "%33s : ", "zaxis");
+                  fprintf(stdout, "number = %d\n", number);
+                }
+
+              char uuidOfVGrid[17];
+              zaxisInqUUID(zaxisID, uuidOfVGrid);
+              if ( uuidOfVGrid[0] != 0 )
+                {
+                  char uuidOfVGridStr[37];
+                  uuid2str(uuidOfVGrid, uuidOfVGridStr);
+                  if ( uuidOfVGridStr[0] != 0  && strlen(uuidOfVGridStr) == 36 )
+                    {
+                      fprintf(stdout, "%33s : ", "uuid");
+                      fprintf(stdout, "%s\n", uuidOfVGridStr);
+                    }
+                }
+            }
 	}
 
       taxisID = vlistInqTaxis(vlistID);
