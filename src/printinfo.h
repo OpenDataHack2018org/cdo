@@ -278,9 +278,6 @@ void printGridInfo(int vlistID)
 	}
       else if ( gridtype == GRID_CURVILINEAR || gridtype == GRID_UNSTRUCTURED )
 	{
-	  int number   = gridInqNumber(gridID);
-	  int position = gridInqPosition(gridID);
-
 	  if ( gridtype == GRID_CURVILINEAR )
 	    fprintf(stdout, "size      : dim = %d  nx = %d  ny = %d", gridsize, xsize, ysize);
 	  else
@@ -293,6 +290,9 @@ void printGridInfo(int vlistID)
 
           if ( gridtype == GRID_UNSTRUCTURED )
             {
+              int number   = gridInqNumber(gridID);
+              int position = gridInqPosition(gridID);
+
               if ( number > 0 )
                 {
                   fprintf(stdout, "%*s", nbyte0, "");
