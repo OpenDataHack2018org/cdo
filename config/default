@@ -117,12 +117,12 @@ case "${HOSTNAME}" in
  	${CONFPATH}configure --prefix=$HOME/local \
                     --program-suffix=-dev \
                     --enable-maintainer-mode \
-	            --with-netcdf=$HOME/builds/libs4cdo-0.0.11 \
-	              --with-hdf5=$HOME/builds/libs4cdo-0.0.11 \
-                     --with-szlib=$HOME/builds/libs4cdo-0.0.11 \
-                  --with-grib_api=$HOME/builds/libs4cdo-0.0.11 \
-                    --with-jasper=$HOME/builds/libs4cdo-0.0.11 \
-                    --with-magics=$HOME/builds/libs4cdo-0.0.11 \
+	            --with-netcdf=$HOME/src/cdo/branches/libs4cdo/build-dev \
+	              --with-hdf5=$HOME/src/cdo/branches/libs4cdo/build-dev \
+                     --with-szlib=$HOME/src/cdo/branches/libs4cdo/build-dev \
+                  --with-grib_api=$HOME/src/cdo/branches/libs4cdo/build-dev \
+                    --with-jasper=$HOME/src/cdo/branches/libs4cdo/build-dev \
+                    --with-magics=$HOME/src/cdo/branches/libs4cdo/build-dev \
                     --with-libxml2=/usr \
                       --with-pic \
                       CC=gcc CFLAGS="-g -Wall -O2 -fopenmp -DWITH_DATA" \
