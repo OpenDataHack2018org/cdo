@@ -490,6 +490,7 @@ Operator catalog:
    Rotuv         rotuvb          Backward rotation
    Mastrfu       mastrfu         Mass stream function
    Adisit        adisit          Potential temperature to in-situ temperature
+   Adisit        adipot          In-situ temperature to potential temperature
    Rhopot        rhopot          Calculates potential density
    Histogram     histcount       Histogram count
    Histogram     histsum         Histogram sum

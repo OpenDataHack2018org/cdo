@@ -271,7 +271,7 @@ void *Maggraph(void *argument);
 #endif
 
 
-#define  AdisitOperators        {"adisit"}
+#define  AdisitOperators        {"adisit","adipot"}
 #define  ArithOperators         {"add",  "sub",  "mul",  "div", "min", "max", "atan2"}
 #define  ArithcOperators        {"addc", "subc", "mulc", "divc", "mod"}
 #define  ArithdaysOperators     {"muldpm", "divdpm", "muldpy", "divdpy", "muldoy"}

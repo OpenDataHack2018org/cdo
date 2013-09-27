@@ -24,6 +24,7 @@ abs \
 acos \
 add \
 addc \
+adipot \
 adisit \
 aexpr \
 aexprf \
@@ -59,6 +60,7 @@ complextorect \
 consecsum \
 consects \
 const \
+contour \
 conv_cmor_table \
 copy \
 cos \
@@ -218,6 +220,8 @@ gp2spl \
 gradsdes \
 gradsdes1 \
 gradsdes2 \
+graph \
+grfill \
 gridarea \
 gridboxavg \
 gridboxmax \
@@ -528,6 +532,7 @@ setvar \
 setvrange \
 setyear \
 setzaxis \
+shaded \
 shifttime \
 showcode \
 showdate \
@@ -589,6 +594,7 @@ ssopar \
 stdatm \
 stimelogo \
 strbre \
+stream \
 strgal \
 strwin \
 studentt \
@@ -646,6 +652,7 @@ varquot2test \
 varrms \
 vct \
 vct2 \
+vector \
 vertavg \
 vertmax \
 vertmean \
