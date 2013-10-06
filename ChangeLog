@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.2
 	* Version 1.6.2 released
 
+2013-10-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gridarea: numeric inaccuracy for triangles located directly on the pole (bug fix)
+
 2013-09-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Consecstat: init vars with 0 (bug fix)

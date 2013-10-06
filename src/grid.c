@@ -1423,89 +1423,77 @@ int gridCurvilinearToRegular(int gridID1)
 }
 
 static
-double areas(struct cart *dv1, struct cart *dv2, struct cart *dv3)
+void cross_product(const double *restrict a, const double *restrict b, double *restrict c)
+{
+  c[0] = a[1]*b[2] - a[2]*b[1];
+  c[1] = a[2]*b[0] - a[0]*b[2];
+  c[2] = a[0]*b[1] - a[1]*b[0];
+}
+
+static
+double scalar_product(const double *restrict a)
+{
+  return (a[0]*a[0] + a[1]*a[1] + a[2]*a[2]);
+}
+
+static
+double triangle_area(struct cart *dv1, struct cart *dv2, struct cart *dv3)
 {
   double a1, a2, a3;
   double ca1, ca2, ca3;
   double s12, s23, s31;
+  double u12[3], u23[3], u31[3];
+  double area;
 
-  struct cart u12, u23, u31;
+  /* Compute cross products Uij = Vi x Vj */
+  cross_product(dv1->x, dv2->x, u12);
+  cross_product(dv2->x, dv3->x, u23);
+  cross_product(dv3->x, dv1->x, u31);
+  
+  /* Normalize Uij to unit vectors */
+  s12 = scalar_product(u12);
+  s23 = scalar_product(u23);
+  s31 = scalar_product(u31);
 
-  double areas;
-
-  /* compute cross products Uij = Vi X Vj */
-
-  u12.x[0] = dv1->x[1]*dv2->x[2] - dv1->x[2]*dv2->x[1];
-  u12.x[1] = dv1->x[2]*dv2->x[0] - dv1->x[0]*dv2->x[2];
-  u12.x[2] = dv1->x[0]*dv2->x[1] - dv1->x[1]*dv2->x[0];
-  
-  u23.x[0] = dv2->x[1]*dv3->x[2] - dv2->x[2]*dv3->x[1];
-  u23.x[1] = dv2->x[2]*dv3->x[0] - dv2->x[0]*dv3->x[2];
-  u23.x[2] = dv2->x[0]*dv3->x[1] - dv2->x[1]*dv3->x[0];
-  
-  u31.x[0] = dv3->x[1]*dv1->x[2] - dv3->x[2]*dv1->x[1];
-  u31.x[1] = dv3->x[2]*dv1->x[0] - dv3->x[0]*dv1->x[2];
-  u31.x[2] = dv3->x[0]*dv1->x[1] - dv3->x[1]*dv1->x[0];
-  
-  /* normalize Uij to unit vectors */
-  
-  s12 = u12.x[0]*u12.x[0]+u12.x[1]*u12.x[1]+u12.x[2]*u12.x[2];
-  s23 = u23.x[0]*u23.x[0]+u23.x[1]*u23.x[1]+u23.x[2]*u23.x[2];
-  s31 = u31.x[0]*u31.x[0]+u31.x[1]*u31.x[1]+u31.x[2]*u31.x[2];
-
-  /* test for a degenerate triangle associated with collinear vertices */
-  
-  if ( !(fabs(s12) > 0.0) || !(fabs(s23) > 0.0) || !(fabs(s31) > 0.0) ) {
-    areas = 0.0;
-    return areas;
-  }
+  /* Test for a degenerate triangle associated with collinear vertices */
+  if ( !(fabs(s12) > 0.0) || !(fabs(s23) > 0.0) || !(fabs(s31) > 0.0) ) return 0.0;
 
   s12 = sqrt(s12);
   s23 = sqrt(s23);
   s31 = sqrt(s31);
   
-  u12.x[0] = u12.x[0]/s12; u12.x[1] = u12.x[1]/s12; u12.x[2] = u12.x[2]/s12;
-  u23.x[0] = u23.x[0]/s23; u23.x[1] = u23.x[1]/s23; u23.x[2] = u23.x[2]/s23;
-  u31.x[0] = u31.x[0]/s31; u31.x[1] = u31.x[1]/s31; u31.x[2] = u31.x[2]/s31;
+  u12[0] = u12[0]/s12; u12[1] = u12[1]/s12; u12[2] = u12[2]/s12;
+  u23[0] = u23[0]/s23; u23[1] = u23[1]/s23; u23[2] = u23[2]/s23;
+  u31[0] = u31[0]/s31; u31[1] = u31[1]/s31; u31[2] = u31[2]/s31;
   
-  /*
-   *  Compute interior angles Ai as the dihedral angles between planes:
-   *  CA1 = cos(A1) = -<U12,U31>
-   *  CA2 = cos(A2) = -<U23,U12>
-   *  CA3 = cos(A3) = -<U31,U23>
-   */
+  /*  Compute interior angles Ai as the dihedral angles between planes:
 
-  ca1 = -( u12.x[0]*u31.x[0]+u12.x[1]*u31.x[1]+u12.x[2]*u31.x[2] );
-  ca2 = -( u23.x[0]*u12.x[0]+u23.x[1]*u12.x[1]+u23.x[2]*u12.x[2] );
-  ca3 = -( u31.x[0]*u23.x[0]+u31.x[1]*u23.x[1]+u31.x[2]*u23.x[2] );
+        CA1 = cos(A1) = -<U12,U31>
+        CA2 = cos(A2) = -<U23,U12>
+        CA3 = cos(A3) = -<U31,U23>
+  */
+  ca1 = -u12[0]*u31[0] - u12[1]*u31[1] - u12[2]*u31[2];
+  ca2 = -u23[0]*u12[0] - u23[1]*u12[1] - u23[2]*u12[2];
+  ca3 = -u31[0]*u23[0] - u31[1]*u23[1] - u31[2]*u23[2];
 
-#if ! defined(FMAX)
-#define  FMAX(a,b)  ((a) > (b) ? (a) : (b))
-#endif
-#if ! defined(FMIN)
-#define  FMIN(a,b)  ((a) < (b) ? (a) : (b))
-#endif
+  if ( ca1 < -1.0 ) ca1 = -1.0;
+  if ( ca1 >  1.0 ) ca1 =  1.0;
+  if ( ca2 < -1.0 ) ca2 = -1.0;
+  if ( ca2 >  1.0 ) ca2 =  1.0;
+  if ( ca3 < -1.0 ) ca3 = -1.0;
+  if ( ca3 >  1.0 ) ca3 =  1.0;
 
-  ca1 = FMAX(ca1, -1.0);
-  ca1 = FMIN(ca1, +1.0);
-  ca2 = FMAX(ca2, -1.0);
-  ca2 = FMIN(ca2, +1.0);
-  ca3 = FMAX(ca3, -1.0);
-  ca3 = FMIN(ca3, +1.0);
-  
   a1 = acos(ca1);
   a2 = acos(ca2);
   a3 = acos(ca3);
   
-  /* compute AREAS = A1 + A2 + A3 - PI */
-  
-  areas = a1 + a2 + a3 - M_PI;
+  /* Compute area = A1 + A2 + A3 - PI */
+  /* here for a unit sphere:          */
+  area = a1 + a2 + a3 - M_PI;
 
-  if ( areas < 0.0 ) {
-    areas = 0.0;
-  }
+  if ( area < 0.0 ) area = 0.0;
 
-  return areas;
+  return area;
 }
 
 static
@@ -1515,6 +1503,7 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
   long k;
   double xa;
   double area;
+  double pih = M_PI/2.;
   struct geo p1, p2, p3;
   struct cart c1, c2, c3;
 
@@ -1528,24 +1517,34 @@ double cell_area(long i, long nv, double *grid_center_lon, double *grid_center_l
     {
       p1.lon = grid_corner_lon[i*nv+k-1]; 
       p1.lat = grid_corner_lat[i*nv+k-1];
-      c1 = gc2cc(&p1);
       p2.lon = grid_corner_lon[i*nv+k]; 
       p2.lat = grid_corner_lat[i*nv+k];
-      c2 = gc2cc(&p2);
 
-      xa = areas(&c1, &c2, &c3);
-      area += xa;
+      if ( !(fabs(p1.lat) >= pih && fabs(p2.lat) >= pih) )
+	{
+	  c1 = gc2cc(&p1);
+	  c2 = gc2cc(&p2);
+
+	  xa = triangle_area(&c1, &c2, &c3);
+	  area += xa;
+	}
+      // printf("   %g %g --- %g %g   %g %g   %g %g\n", xa, area, p1.lon*RAD2DEG, p1.lat*RAD2DEG, p2.lon*RAD2DEG, p2.lat*RAD2DEG, p3.lon*RAD2DEG, p3.lat*RAD2DEG);
     }
 
   p1.lon = grid_corner_lon[i*nv+0]; 
   p1.lat = grid_corner_lat[i*nv+0];
-  c1 = gc2cc(&p1);
   p2.lon = grid_corner_lon[i*nv+nv-1]; 
   p2.lat = grid_corner_lat[i*nv+nv-1];
-  c2 = gc2cc(&p2);
 
-  xa = areas(&c1, &c2, &c3);
-  area += xa;
+  if ( !(fabs(p1.lat) >= pih && fabs(p2.lat) >= pih) )
+    {
+      c1 = gc2cc(&p1);
+      c2 = gc2cc(&p2);
+
+      xa = triangle_area(&c1, &c2, &c3);
+      area += xa;
+    }
+  //  printf("   %g %g --- %g %g   %g %g   %g %g\n", xa, area, p1.lon*RAD2DEG, p1.lat*RAD2DEG, p2.lon*RAD2DEG, p2.lat*RAD2DEG, p3.lon*RAD2DEG, p3.lat*RAD2DEG);
 
   return (area);
 }
@@ -1715,6 +1714,12 @@ int gridGenArea(int gridID, double *area)
 	     grid_corner_lon[i*nv+1], grid_corner_lat[i*nv+1],
 	     grid_corner_lon[i*nv+2], grid_corner_lat[i*nv+2]);
       */
+      /*
+      printf("%d %g %g %g %g %g %g %g %g %g\n", i, area[i]*6371000*6371000, grid_center_lon[i]*RAD2DEG, grid_center_lat[i]*RAD2DEG,
+	     grid_corner_lon[i*nv]*RAD2DEG, grid_corner_lat[i*nv]*RAD2DEG,
+	     grid_corner_lon[i*nv+1]*RAD2DEG, grid_corner_lat[i*nv+1]*RAD2DEG,
+	     grid_corner_lon[i*nv+2]*RAD2DEG, grid_corner_lat[i*nv+2]*RAD2DEG);
+      */
       //     total_area += area[i];
     }
 
@@ -1777,7 +1782,6 @@ int gridGenWeights(int gridID, double *grid_area, double *grid_wgts)
 }
 
 
-static
 int gridWeightsOld(int gridID, double *weights)
 {
   int status = FALSE;
