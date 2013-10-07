@@ -169,7 +169,7 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int nfill)
       matrix2[j] = array2 + j*nx;
     }
 
-  printf("j i kr kl ku ko xr xl xu xo s1 s2 m2\n");
+  //printf("j i kr kl ku ko xr xl xu xo s1 s2 m2\n");
   for ( j = 0; j < ny; j++ )
     for ( i = 0; i < nx; i++ )
       {
@@ -216,34 +216,34 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int nfill)
             kh = kl + kr;
             kv = ko + ku;
             if      ( kh == 0 ) { s1 = 0.; k1 = 0; }
-            else if ( kl == 0 ) { s1 = xr; k1 = 1; }
-            else if ( kr == 0 ) { s1 = xl; k1 = 1; }
+            else if ( kl == 0 ) { s1 = xr; k1 = kr; }
+            else if ( kr == 0 ) { s1 = xl; k1 = kl; }
             else
               {
                 if ( kl < kr )
                 {
                   s1 = xl;
-                  k1 = 2;
+                  k1 = kl;
                 }
               else
                 {
                   s1 = xr;
-                  k1 = 2;
+                  k1 = kr;
                 }
               }
 
             if      ( kv == 0 ) { s2 = 0.; k2 = 0; }
-            else if ( ku == 0 ) { s2 = xo; k2 = 1; }
-            else if ( ko == 0 ) { s2 = xu; k2 = 1; }
+            else if ( ku == 0 ) { s2 = xo; k2 = ko; }
+            else if ( ko == 0 ) { s2 = xu; k2 = ku; }
             else
               {
                 if ( ku < ko )
                   {
-                    s2 = xu; k2 = 2;
+                    s2 = xu; k2 = ku;
                   }
                 else
                   {
-                    s2 = xo; k2 = 2;
+                    s2 = xo; k2 = ko;
                   }
               }
 
@@ -265,7 +265,7 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int nfill)
 
               }
 
-            printf("%d %d %2d %2d %2d %2d %2g %2g %2g %2g %2g %2g %2g\n", j,i,kr,kl,ku,ko,xr,xl,xu,xo,s1,s2,matrix2[j][i]);
+            //printf("%d %d %2d %2d %2d %2d %2g %2g %2g %2g %2g %2g %2g\n", j,i,kr,kl,ku,ko,xr,xl,xu,xo,s1,s2,matrix2[j][i]);
             /* matrix1[j][i] = matrix2[j][i]; */
           }
         else
