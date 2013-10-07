@@ -51,10 +51,15 @@ Predefined grids are available for global regular, gaussian or icosahedral-hexag
 % They have the following predefined grid names: 
 %{\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>} and {\tt gme<NI>}
 
+\subsubsection*{Global regular grid: {\tt global\_<DXY>}}
+    {\tt global\_<DXY>} defines a global regular lon/lat grid.
+    The grid increment {\tt <DXY>} can be selected at will.
+    The longitudes start at {\tt  <DXY>}/2 - 180$^\circ$ and the
+    latitudes start at {\tt <DXY>}/2 - 90$^\circ$.
+
 \subsubsection*{Global regular grid: {\tt r<NX>x<NY>}}
     {\tt r<NX>x<NY>} defines a global regular lon/lat grid.
-    The number of the longitudes {\tt <NX>} and the latitudes {\tt <NY>}
-    can be selected at will.
+    The number of the longitudes {\tt <NX>} and the latitudes {\tt <NY>} can be selected at will.
     The longitudes start at 0$^\circ$ with an increment of (360/{\tt <NX>})$^\circ$.
     The latitudes go from south to north with an increment of (180/{\tt <NY>})$^\circ$.
 
