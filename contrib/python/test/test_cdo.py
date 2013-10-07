@@ -337,6 +337,38 @@ class CdoTest(unittest.TestCase):
         self.assertTrue(cdo.returnNoneOnError)
 
 
+    def test_fillmiss(self):
+        cdo = Cdo(cdfMod='netcdf4')
+        cdo.setCdo('../../build/gcc/src/cdo')
+        cdo.debug = True
+        rand = cdo.setname('v',input = '-random,r50x50 ', options = ' -f nc',output = '/tmp/rand.nc')
+        cdf  = cdo.openCdf(rand)
+        var = cdf.variables['v']
+        vals = var[:]
+        #plot(vals)
+        ni,nj = np.shape(vals)
+        for i in range(0,ni):
+          for j in range(0,nj):
+            vals[i,j] = np.abs((ni/2-i) - (nj/2-j))
+
+        vals = vals/np.abs(vals).max()
+        var[:] = vals
+        cdf.close()
+        # recheck:
+        #plot(cdo.readArray(rand,'v'))
+
+        missRange = '0.25,0.85'
+        arOrg = cdo.setrtomiss(missRange,input = rand,returnMaArray = 'v',output='myrand.nc')
+        arFm  = cdo.fillmiss(input = "-setrtomiss,%s %s"%(missRange,rand),returnMaArray = 'v')
+        arFm1s= cdo.fillmiss1s(input = "-setrtomiss,%s %s"%(missRange,rand),returnMaArray = 'v')
+        vOrg  = arOrg[:,:]
+        vFm   = arFm[:,:]
+        vFm1s = arFm1s[:,:]
+        plot(vOrg,'vOrg')
+        plot(vFm,'vFm')
+        plot(vFm1s,'vFm1s')
+        os.system("convert +append %s %s %s test_fm1s.png "%('vOrg.png','vFm.png','vFm1s.png'))
+
     if 'thingol' == os.popen('hostname').read().strip():
         def testCall(self):
             cdo = Cdo()
@@ -386,37 +418,6 @@ class CdoTest(unittest.TestCase):
                                  options = "-f nc")
             pl.imshow(random,origin='lower')
             pl.show()
-        def test_fillmiss(self):
-            cdo = Cdo(cdfMod='netcdf4')
-            cdo.setCdo('../../src/cdo')
-            cdo.debug = True
-            rand = cdo.setname('v',input = '-random,r5x5 ', options = ' -f nc',output = '/tmp/rand.nc')
-            cdf  = cdo.openCdf(rand)
-            var = cdf.variables['v']
-            vals = var[:]
-            #plot(vals)
-            ni,nj = np.shape(vals)
-            for i in range(0,ni):
-              for j in range(0,nj):
-                vals[i,j] = np.abs((ni/2-i) - (nj/2-j))
-
-            vals = vals/np.abs(vals).max()
-            var[:] = vals
-            cdf.close()
-            # recheck:
-            #plot(cdo.readArray(rand,'v'))
-
-            missRange = '0.25,0.85'
-            arOrg = cdo.setrtomiss(missRange,input = rand,returnMaArray = 'v',output='myrand.nc')
-            arFm  = cdo.fillmiss(input = "-setrtomiss,%s %s"%(missRange,rand),returnMaArray = 'v')
-            arFm1s= cdo.fillmiss1s(input = "-setrtomiss,%s %s"%(missRange,rand),returnMaArray = 'v')
-            vOrg  = arOrg[:,:]
-            vFm   = arFm[:,:]
-            vFm1s = arFm1s[:,:]
-            plot(vOrg,'vOrg')
-            plot(vFm,'vFm')
-            plot(vFm1s,'vFm1s')
-            os.system("convert +append %s %s %s test_fm1s.png "%('vOrg.png','vFm.png','vFm1s.png'))
 
         def test_phc(self):
             ifile = '/home/ram/data/icon/input/phc3.0/phc.nc'
