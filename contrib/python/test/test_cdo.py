@@ -1,8 +1,10 @@
-import unittest,os,tempfile
+import unittest,os,tempfile,sys,glob
 from stat import *
 from cdo import *
 import numpy as np
 import pylab as pl
+
+# add local dir to search path
 
 def plot(ary,ofile=False):
     pl.grid(True)
@@ -336,10 +338,38 @@ class CdoTest(unittest.TestCase):
         self.assertTrue(not cdo.returnCdf)
         self.assertTrue(cdo.returnNoneOnError)
 
+    def test_env(self):
+        tag = '__env_test'
+        files = glob.glob(tag+'*')
+        for f in files:
+          os.system("rm "+f)
+        files = glob.glob(tag+'*')
+        self.assertEqual([],files)
+
+        cdo = Cdo()
+        cdo.debug = True
+        cdo.setCdo('../../src/cdo')
+        ifile = cdo.stdatm(10,20,50,100,options='-f nc')
+        tag = '__env_test'
+        cdo.splitname(input=ifile,output=tag)
+        files = glob.glob(tag+'*')
+        self.assertEqual(['__env_testP.nc', '__env_testT.nc'],files)
+        for f in files:
+          os.system("rm "+f)
+
+        cdo.splitname(input=ifile,output=tag,env={"CDO_FILE_SUFFIX": ".nc2"})
+        files = glob.glob(tag+'*')
+        files.sort()
+        self.assertEqual(['__env_testP.nc2', '__env_testT.nc2'],files)
+        for f in files:
+          os.system("rm "+f)
+
 
     def test_fillmiss(self):
         cdo = Cdo(cdfMod='netcdf4')
-        cdo.setCdo('../../build/gcc/src/cdo')
+        if 'thingol' == os.popen('hostname').read().strip():
+          cdo.setCdo('../../src/cdo')
+
         cdo.debug = True
         rand = cdo.setname('v',input = '-random,r50x50 ', options = ' -f nc',output = '/tmp/rand.nc')
         cdf  = cdo.openCdf(rand)
@@ -418,6 +448,11 @@ class CdoTest(unittest.TestCase):
                                  options = "-f nc")
             pl.imshow(random,origin='lower')
             pl.show()
+            rand = cdo.setname('v',input = '-random,r5x5 ', options = ' -f nc',output = '/tmp/rand.nc')
+            arFm1s= cdo.remapnn('r50x50',
+                input = "-setrtomiss,%s %s"%(missRange,rand),
+                returnMaArray = 'v',
+                env={"REMAP_EXTRAPOLATE": "on"})
 
         def test_phc(self):
             ifile = '/home/ram/data/icon/input/phc3.0/phc.nc'
