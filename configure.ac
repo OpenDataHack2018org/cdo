@@ -1,6 +1,6 @@
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT([cdo], [1.6.2rc4], [http://code.zmaw.de/projects/cdo])
+AC_INIT([cdo], [1.6.2rc5], [http://code.zmaw.de/projects/cdo])
 
 CONFIG_ABORT=yes
 AC_CONFIG_AUX_DIR(config)

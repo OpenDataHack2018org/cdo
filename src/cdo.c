@@ -861,6 +861,12 @@ void print_system_info()
   if ( envstr ) fprintf(stderr, "MACHTYPE            = %s\n", envstr);
   fprintf(stderr, "\n");
 
+#if defined(_ARCH_PWR6)
+  fprintf(stderr, "Predefined: _ARCH_PWR6\n");
+#endif 
+#if defined(_ARCH_PWR7)
+  fprintf(stderr, "Predefined: _ARCH_PWR7\n");
+#endif 
 #if defined(__SSE2__)
   fprintf(stderr, "Predefined: __SSE2__\n");
 #endif 
