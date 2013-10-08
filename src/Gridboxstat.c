@@ -537,7 +537,11 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   field_t *field;
   int isize;
   int useWeight = FALSE;
+  /*
+  double findex = 0;
 
+  progressInit();
+  */
   if ( field1->weight ) useWeight = TRUE;
 
   gridsize      = xinc*yinc;
@@ -565,7 +569,6 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
   nlon2 = gridInqXsize(gridID2);
   nlat2 = gridInqYsize(gridID2);
 
-
 #if defined(_OPENMP)
 #pragma omp parallel for default(shared) private(ig, ilat, ilon, j, jj, i, ii, index, isize, ompthID)
 #endif
@@ -576,6 +579,17 @@ void gridboxstat(field_t *field1, field_t *field2, int xinc, int yinc, int statf
 #else
       ompthID = 0;
 #endif
+      /*
+      int lprogress = 1;
+#if defined(_OPENMP)
+      if ( ompthID != 0 ) lprogress = 0;
+#endif
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+      findex++;
+      if ( lprogress ) progressStatus(0, 1, findex/nlat2*nlon2);
+      */
       ilat = ig/nlon2;
       ilon = ig - ilat*nlon2;
 

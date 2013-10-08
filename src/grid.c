@@ -1698,14 +1698,28 @@ int gridGenArea(int gridID, double *area)
 
   if ( lgriddestroy ) gridDestroy(gridID);
 
+  double findex = 0;
+
+  progressInit();
+
   total_area = 0;
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, status) \
+  shared(findex, gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, status) \
   private(i)
 #endif
   for ( i = 0; i < gridsize; ++i )
     {
+      int lprogress = 1;
+#if defined(_OPENMP)
+      if ( omp_get_thread_num() != 0 ) lprogress = 0;
+#endif
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+      findex++;
+      if ( lprogress ) progressStatus(0, 1, findex/gridsize);
+
       area[i] = cell_area(i, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat, &status);
       /*
       if (  area[i] < 0.009 && fabs(grid_corner_lat[i*nv+1]) > 89)
