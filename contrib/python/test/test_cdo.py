@@ -6,8 +6,11 @@ import pylab as pl
 
 # add local dir to search path
 
-def plot(ary,ofile=False):
+def plot(ary,ofile=False,title=None):
     pl.grid(True)
+
+    if not None == title:
+      pl.title(title)
 
     if 1 == ary.ndim:
       pl.plot(ary)
@@ -364,6 +367,24 @@ class CdoTest(unittest.TestCase):
         for f in files:
           os.system("rm "+f)
 
+    def test_showMaArray(self):
+        cdo = Cdo(cdfMod='netcdf4')
+        cdo.debug = True
+        bathy = cdo.setrtomiss(0,10000,
+            input = cdo.topo(options='-f nc'),returnMaArray='topo')
+        pl.imshow(bathy,origin='lower')
+        pl.show()
+        oro = cdo.setrtomiss(-10000,0,
+            input = cdo.topo(options='-f nc'),returnMaArray='topo')
+        pl.imshow(oro,origin='lower')
+        pl.show()
+        random = cdo.setname('test_maArray',
+                             input = "-setrtomiss,0.4,0.8 -random,r180x90 ",
+                             returnMaArray='test_maArray',
+                             options = "-f nc")
+        pl.imshow(random,origin='lower')
+        pl.show()
+        rand = cdo.setname('v',input = '-random,r5x5 ', options = ' -f nc',output = '/tmp/rand.nc')
 
     def test_fillmiss(self):
         cdo = Cdo(cdfMod='netcdf4')
@@ -371,7 +392,7 @@ class CdoTest(unittest.TestCase):
           cdo.setCdo('../../src/cdo')
 
         cdo.debug = True
-        rand = cdo.setname('v',input = '-random,r50x50 ', options = ' -f nc',output = '/tmp/rand.nc')
+        rand = cdo.setname('v',input = '-random,r25x25 ', options = ' -f nc',output = '/tmp/rand.nc')
         cdf  = cdo.openCdf(rand)
         var = cdf.variables['v']
         vals = var[:]
@@ -388,16 +409,18 @@ class CdoTest(unittest.TestCase):
         #plot(cdo.readArray(rand,'v'))
 
         missRange = '0.25,0.85'
-        arOrg = cdo.setrtomiss(missRange,input = rand,returnMaArray = 'v',output='myrand.nc')
-        arFm  = cdo.fillmiss(input = "-setrtomiss,%s %s"%(missRange,rand),returnMaArray = 'v')
-        arFm1s= cdo.fillmiss1s(input = "-setrtomiss,%s %s"%(missRange,rand),returnMaArray = 'v')
-        vOrg  = arOrg[:,:]
-        vFm   = arFm[:,:]
-        vFm1s = arFm1s[:,:]
-        plot(vOrg,'vOrg')
-        plot(vFm,'vFm')
-        plot(vFm1s,'vFm1s')
-        os.system("convert +append %s %s %s test_fm1s.png "%('vOrg.png','vFm.png','vFm1s.png'))
+        withMissRange = 'withMissRange.nc'
+        arWmr = cdo.setrtomiss(missRange,input = rand,output = 'withMissRange.nc',returnMaArray='v')
+        arOrg = cdo.copy(input = rand,returnMaArray = 'v')
+        arFm  = cdo.fillmiss(    input = withMissRange,returnMaArray = 'v')
+        arFm1s= cdo.fillmiss1s(1,  input = withMissRange,returnMaArray = 'v',output='foo.nc')
+
+        os.system("rm fm_*.png")
+#       plot(arOrg,title='org'        )
+        plot(arWmr,title='missing'    )
+#       plot(arFm,title='fillmiss'    )
+        plot(arFm1s,title='fillmiss1s')
+#        os.system("convert +append %s %s %s %s fm_all.png "%('fm_org.png','fm_wmr.png','fm_fm.png','fm_fm1s.png'))
 
     if 'thingol' == os.popen('hostname').read().strip():
         def testCall(self):
@@ -430,29 +453,6 @@ class CdoTest(unittest.TestCase):
                 cdo.readArray(cdo.seltimestep('1/10',
                   input=ifile),
                   'tsurf').shape)
-
-        def test_showMaArray(self):
-            cdo = Cdo(cdfMod='netcdf4')
-            cdo.debug = True
-            bathy = cdo.setrtomiss(0,10000,
-                input = cdo.topo(options='-f nc'),returnMaArray='topo')
-            pl.imshow(bathy,origin='lower')
-            pl.show()
-            oro = cdo.setrtomiss(-10000,0,
-                input = cdo.topo(options='-f nc'),returnMaArray='topo')
-            pl.imshow(oro,origin='lower')
-            pl.show()
-            random = cdo.setname('test_maArray',
-                                 input = "-setrtomiss,0.4,0.8 -random,r180x90 ",
-                                 returnMaArray='test_maArray',
-                                 options = "-f nc")
-            pl.imshow(random,origin='lower')
-            pl.show()
-            rand = cdo.setname('v',input = '-random,r5x5 ', options = ' -f nc',output = '/tmp/rand.nc')
-            arFm1s= cdo.remapnn('r50x50',
-                input = "-setrtomiss,%s %s"%(missRange,rand),
-                returnMaArray = 'v',
-                env={"REMAP_EXTRAPOLATE": "on"})
 
         def test_phc(self):
             ifile = '/home/ram/data/icon/input/phc3.0/phc.nc'
