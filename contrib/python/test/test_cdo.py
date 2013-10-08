@@ -413,8 +413,8 @@ class CdoTest(unittest.TestCase):
         arFm1s= cdo.fillmiss1s(1,  input = withMissRange,returnMaArray = 'v',output='foo.nc')
 
         os.system("rm fm_*.png")
-#       plot(arOrg,title='org'        )
-#       plot(arWmr,title='missing'    )
+        plot(arOrg,title='org'        )
+        plot(arWmr,title='missing'    )
         plot(arFm,title='fillmiss'    )
         plot(arFm1s,title='fillmiss1s')
 #        os.system("convert +append %s %s %s %s fm_all.png "%('fm_org.png','fm_wmr.png','fm_fm.png','fm_fm1s.png'))

@@ -140,11 +140,10 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
 void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
 {
   int gridID, nx, ny, i, j;
-  int nmiss1, nmiss2 = 0;
+  int nmiss2 = 0;
   int kr, ku, kl, ko;
   int ir, iu, il, io;
   int kh, kv, k1, k2, kk;
-  int globgrid = 1;
   double s1, s2;
   double xr, xu, xl, xo;
   double missval;
@@ -152,7 +151,6 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
   double **matrix1, **matrix2;
 
   gridID  = field1->grid;
-  nmiss1  = field1->nmiss;
   missval = field1->missval;
   array1  = field1->ptr;
   array2  = field2->ptr;
@@ -165,7 +163,6 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
 
   for ( j = 0; j < ny; j++ ) { matrix1[j] = array1 + j*nx; matrix2[j] = array2 + j*nx; }
 
-  printf("j i kr kl ku ko xr xl xu xo s1 s2 m2\n");
   for (int fill_iterations=0; fill_iterations < maxfill; fill_iterations++) {
   for ( j = 0; j < ny; j++ )
     for ( i = 0; i < nx; i++ )
@@ -181,26 +178,9 @@ void fillmiss_one_step(field_t *field1, field_t *field2, int maxfill)
               if ( !DBL_IS_EQUAL(matrix1[j][ir], missval) )
                 { kr = ir - i; xr = matrix1[j][ir]; break; }
 
-/*             if ( globgrid && ir == nx )
- *               {
- *                 for ( ir = 0; ir < i; ir++ )
- *                   if ( !DBL_IS_EQUAL(matrix1[j][ir], missval) )
- *                     { kr = nx + ir - i; xr = matrix1[j][ir]; break; }
- *               }
- */
-
-
             for ( il = i-1; il >= 0; il-- )
               if ( !DBL_IS_EQUAL(matrix1[j][il], missval) )
                 { kl = i - il; xl = matrix1[j][il]; break; }
-
-/*            if ( globgrid && il == -1 )
- *              {
- *                for ( il = nx-1; il > i; il-- )
- *                  if ( !DBL_IS_EQUAL(matrix1[j][il], missval) )
- *                    { kl = nx + i - il; xl = matrix1[j][il]; break; }
- *              }
- */
 
 
             for ( iu = j + 1; iu < ny; iu++ )
