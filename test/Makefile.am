@@ -2,8 +2,9 @@ CLEANFILES =
 
 export
 
-TESTS = $(top_srcdir)/test/test_Timstat.sh \
+TESTS = $(top_srcdir)/test/test_Gridarea.sh \
         $(top_srcdir)/test/test_Spectral.sh \
+        $(top_srcdir)/test/test_Timstat.sh \
         $(top_srcdir)/test/test_Vertint.sh
 
 #       $(top_srcdir)/test/test_info.py
