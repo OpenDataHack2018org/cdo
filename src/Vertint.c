@@ -60,6 +60,7 @@ void *Vertint(void *argument)
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
   int code, param;
   int pnum, pcat, pdis;
+  int sortlevels = TRUE;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
   char paramstr[32];
@@ -297,6 +298,24 @@ void *Vertint(void *argument)
   if ( Extrapolate == 0 )
     pnmiss   = (int *) malloc(nplev*sizeof(int));
 
+  // check levels
+  if ( zaxisIDh != -1 )
+    {
+      int nlev = zaxisInqSize(zaxisIDh);
+      if ( nlev != nhlev ) cdoAbort("Internal error, wrong numner of hybrid level!");
+      double levels[nlev];
+      zaxisInqLevels(zaxisIDh, levels);
+
+      for ( int ilev = 0; ilev < nlev; ++ilev )
+	{
+	  if ( (ilev+1) != (int)levels[ilev] )
+	    {
+	      sortlevels = FALSE;
+	      break;
+	    }
+	}
+    }
+
   if ( zaxisIDh != -1 && ngp > 0 )
     {
       vert_index = (int *) malloc(ngp*nplev*sizeof(int));
@@ -495,10 +514,18 @@ void *Vertint(void *argument)
 	{
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));
-	  nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
+	  zaxisID  = vlistInqVarZaxis(vlistID1, varID);
+	  nlevel   = zaxisInqSize(zaxisID);
+	  /*
+	  if ( sortlevels && zaxisIDh != -1 && zaxisID == zaxisIDh && nlevel == nhlev )
+	    {
+	      levelID = (int) (zaxisInqLevel(zaxisIDh, levelID)-1);
+	      printf("levelID %d\n", levelID);
+	    }
+	  */
 	  offset   = gridsize*levelID;
 	  single1  = vardata1[varID] + offset;
-	  
+
 	  streamReadRecord(streamID1, single1, &varnmiss[varID][levelID]);
 	  vars[varID] = TRUE;
 	}
