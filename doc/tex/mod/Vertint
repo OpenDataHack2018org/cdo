@@ -10,8 +10,9 @@
 @BeginDescription
 Interpolate 3D variables on hybrid model levels to pressure or height levels.
 The input file should contain the log. surface pressure or the surface pressure.
-To interpolate the temperature, the orography (surface geopotential) is also needed.
-The pressure, temperature, and orography are identified by their code numbers.
+To interpolate the temperature, the surface geopotential is also needed.
+The pressure, temperature, and surface geopotential are identified by their GRIB1 code number
+or netCDF CF standard name.
 Supported parameter tables are: WMO standard table number 2 and ECMWF local table number 128.
 Use the alias  @bold{ml2plx}/@bold{ml2hlx} or the environment variable @env{EXTRAPOLATE}
 to extrapolate missing values. All input fields have to be on the same horizontal grid.

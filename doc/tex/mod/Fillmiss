@@ -2,26 +2,33 @@
 @NewPage
 @Name      = Fillmiss
 @Title     = Fill missing values
-@Section   = Interpolation
-@Class     = Interpolation
+@Section   = Miscellaneous
+@Class     = Miscellaneous
 @Arguments = ifile ofile
 @Operators = fillmiss fillmiss2
 @EndModule
 
 
 @BeginOperator_fillmiss
+@Title     = Fill missing values
 
 @BeginDescription
 Fill missing values by bilinear interpolation of the neightbours.
 @EndDescription
 @EndOperator
 
+
 @BeginOperator_fillmiss2
-@Parameter = maxiter
+@Title     = Fill missing values
+@Parameter = [maxiter]
 
 @BeginDescription
-Fill missing values by using the neares value from up/down/left/right
-neightbours. maxiter is the number of iterations to perform this nearest
-neightbours replacement.
+Fill missing values by using the neares value from up/down/left/right neightbours. 
 @EndDescription
 @EndOperator
+
+
+@BeginParameter
+@Item = maxiter
+INTEGER  Number of iterations to perform this nearest neightbours replacement
+@EndParameter

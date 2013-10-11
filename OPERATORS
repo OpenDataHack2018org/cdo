@@ -503,9 +503,8 @@ Operator catalog:
    Strbre        strbre          Strong breeze days index per time period
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
--------------------------------------------------------------
-   Interpolation
--------------------------------------------------------------
+   Fillmiss      fillmiss        Fill missing values
+   Fillmiss      fillmiss2       Fill missing values
 -------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
