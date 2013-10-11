@@ -411,7 +411,9 @@ void *Vertint(void *argument)
 	  vlistInqVarStdname(vlistID1, varID, stdname);
 	  strtolower(stdname);
 
-	  if ( strcmp(stdname, "surface_air_pressure") == 0 ) code = 134;
+	  if      ( strcmp(stdname, "surface_air_pressure") == 0 ) code = 134;
+	  else if ( strcmp(stdname, "air_temperature")      == 0 ) code = 130;
+	  else if ( strcmp(stdname, "surface_geopotential") == 0 ) code = 129;
 	  else
 	    {
 	      /*                        ECHAM                            ECMWF       */
@@ -540,7 +542,7 @@ void *Vertint(void *argument)
 	      minmaxval(ngp, geop, NULL, &minval, &maxval);
 	      if ( minval < MIN_FIS || maxval > MAX_FIS )
 		cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
-	      if ( minval >= 0 && maxval <= 1000 )
+	      if ( minval >= 0 && maxval <= 9000 )
 		cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
 	    }
 
