@@ -5,14 +5,23 @@
 @Section   = Interpolation
 @Class     = Interpolation
 @Arguments = ifile ofile
-@Operators = fillmiss
+@Operators = fillmiss fillmiss2
 @EndModule
 
 
 @BeginOperator_fillmiss
-@Title     = Fill missing values
 
 @BeginDescription
-Fill missing values by interpolation of the neightbours.
+Fill missing values by bilinear interpolation of the neightbours.
+@EndDescription
+@EndOperator
+
+@BeginOperator_fillmiss2
+@Parameter = maxiter
+
+@BeginDescription
+Fill missing values by using the neares value from up/down/left/right
+neightbours. maxiter is the number of iterations to perform this nearest
+neightbours replacement.
 @EndDescription
 @EndOperator

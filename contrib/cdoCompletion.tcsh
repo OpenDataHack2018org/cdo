@@ -182,7 +182,7 @@ fc2sp \
 fdns \
 filedes \
 fillmiss \
-fillmiss1s \
+fillmiss2 \
 fisher \
 fldavg \
 fldcor \

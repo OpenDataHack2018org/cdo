@@ -504,6 +504,9 @@ Operator catalog:
    Strgal        strgal          Strong gale days index per time period
    Hurr          hurr            Hurricane days index per time period
 -------------------------------------------------------------
+   Interpolation
+-------------------------------------------------------------
+-------------------------------------------------------------
    Climate indices
 -------------------------------------------------------------
    EcaCdd        eca_cdd         Consecutive dry days index per time period

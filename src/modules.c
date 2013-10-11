@@ -312,7 +312,7 @@ void *Maggraph(void *argument);
 #define  FCOperators            {"fc2sp", "sp2fc", "fc2gp", "gp2fc"}
 #define  FiledesOperators       {"filedes", "griddes", "griddes2", "zaxisdes", "vct", "vct2", "pardes", \
                                  "vlist", "partab", "partab2"}
-#define  FillmissOperators      {"fillmiss","fillmiss1s"}
+#define  FillmissOperators      {"fillmiss","fillmiss2"}
 #define  FilterOperators        {"bandpass", "highpass", "lowpass"}
 #define  FldrmsOperators        {"fldrms"}
 #define  FldstatOperators       {"fldmin", "fldmax", "fldsum", "fldmean", "fldavg", "fldstd", "fldstd1", "fldvar", "fldvar1", "fldpctl"}
@@ -579,7 +579,7 @@ static modules_t Modules[] =
   { Expr,           ExprHelp,          ExprOperators,          CDI_REAL,  1,  1 },
   { FC,             NULL,              FCOperators,            CDI_REAL,  1,  1 },
   { Filedes,        FiledesHelp,       FiledesOperators,       CDI_BOTH,  1,  0 },
-  { Fillmiss,       NULL,              FillmissOperators,      CDI_REAL,  1,  1 },
+  { Fillmiss,       FillmissHelp,      FillmissOperators,      CDI_REAL,  1,  1 },
   { Filter,         FilterHelp,        FilterOperators,        CDI_REAL,  1,  1 },
   { Fldrms,         NULL,              FldrmsOperators,        CDI_REAL,  2,  1 },
   { Fldstat,        FldstatHelp,       FldstatOperators,       CDI_REAL,  1,  1 },

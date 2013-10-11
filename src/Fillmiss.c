@@ -21,9 +21,11 @@
 */
 
 #include <cdi.h>
+#include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 void fillmiss(field_t *field1, field_t *field2, int nfill)
@@ -33,21 +35,26 @@ void fillmiss(field_t *field1, field_t *field2, int nfill)
   int kr, ku, kl, ko;
   int ir, iu, il, io;
   int kh, kv, k1, k2, kk;
-  int globgrid = 1;
+  int globgrid = FALSE,gridtype;
   double s1, s2;
   double xr, xu, xl, xo;
   double missval;
   double *array1, *array2;
   double **matrix1, **matrix2;
 
-  gridID  = field1->grid;
-  nmiss1  = field1->nmiss;
-  missval = field1->missval;
-  array1  = field1->ptr;
-  array2  = field2->ptr;
+  gridID   = field1->grid;
+  nmiss1   = field1->nmiss;
+  missval  = field1->missval;
+  array1   = field1->ptr;
+  array2   = field2->ptr;
 
-  nx  = gridInqXsize(gridID);
-  ny  = gridInqYsize(gridID);
+  nx       = gridInqXsize(gridID);
+  ny       = gridInqYsize(gridID);
+  globgrid = gridIsCircular(gridID);
+
+  gridtype = gridInqType(gridID);
+  if ( !(gridtype == GRID_LONLAT || gridtype == GRID_GAUSSIAN ) )
+    cdoAbort("Unsupported grid type: %s!", gridNamePtr(gridtype));
 
   matrix1 = (double **) malloc(ny * sizeof(double *));
   matrix2 = (double **) malloc(ny * sizeof(double *));
@@ -280,7 +287,7 @@ void *Fillmiss(void *argument)
   cdoInitialize(argument);
 
   FILLMISS        = cdoOperatorAdd("fillmiss"  ,  0, 0, "nfill");
-  FILLMISSONESTEP = cdoOperatorAdd("fillmiss1s",  0, 0, "nfill");
+  FILLMISSONESTEP = cdoOperatorAdd("fillmiss2" ,  0, 0, "nfill");
   operatorID      = cdoOperatorID();
   if ( operatorID == FILLMISS )
      {

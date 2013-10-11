@@ -4273,6 +4273,26 @@ static char *HurrHelp[] = {
     NULL
 };
 
+static char *FillmissHelp[] = {
+    "NAME",
+    "    fillmiss, fillmiss2 - Fill missing values",
+    "",
+    "SYNOPSIS",
+    "    fillmiss  ifile ofile",
+    "    fillmiss2,maxiter  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "",
+    "OPERATORS",
+    "    fillmiss   ",
+    "               Fill missing values by bilinear interpolation of the neightbours.",
+    "    fillmiss2  ",
+    "               Fill missing values by using the neares value from up/down/left/right",
+    "               neightbours. maxiter is the number of iterations to perform this nearest",
+    "               neightbours replacement.",
+    NULL
+};
+
 static char *EcaCddHelp[] = {
     "NAME",
     "    eca_cdd - Consecutive dry days index per time period",

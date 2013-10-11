@@ -410,7 +410,7 @@ class CdoTest(unittest.TestCase):
         arOrg = cdo.copy(input = rand,returnMaArray = 'v')
         arWmr = cdo.setrtomiss(missRange,input = rand,output = withMissRange,returnMaArray='v')
         arFm  = cdo.fillmiss(            input = withMissRange,returnMaArray = 'v')
-        arFm1s= cdo.fillmiss1s(2,        input = withMissRange,returnMaArray = 'v',output='foo.nc')
+        arFm1s= cdo.fillmiss2(2,        input = withMissRange,returnMaArray = 'v',output='foo.nc')
 
         os.system("rm fm_*.png")
         plot(arOrg,title='org'        )
