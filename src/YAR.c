@@ -31,6 +31,7 @@
 #include "event.h"
 #include "search.h"
 #include "clipping.h"
+#include "area.h"
 #endif
 
 int timer_yar_remap, timer_yar_remap_init, timer_yar_remap_sort, timer_yar_remap_con, timer_yar_remap_bil;
@@ -614,6 +615,10 @@ void yar_remap_con(field_t *field1, field_t *field2)
   double *weight;
   weight = (double *) malloc(gridsize1*sizeof(double));
 
+  double tgt_area;
+  double *area;
+  area = (double *) malloc(gridsize1*sizeof(double));
+
   struct grid_cell *SourceCell;
   SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
 
@@ -633,9 +638,9 @@ void yar_remap_con(field_t *field1, field_t *field2)
   TargetCell.coordinates_y = malloc ( 4 * sizeof(*TargetCell.coordinates_y) );
 
   unsigned const * curr_deps;
-  struct polygons polygons;
+  //struct polygons polygons;
 
-  polygon_create ( &polygons );
+  //polygon_create ( &polygons );
 
   for ( int i = 0; i < num_elements; ++i )
     {
@@ -690,11 +695,36 @@ void yar_remap_con(field_t *field1, field_t *field2)
 	      printf("\n");
 	    }
 	}
-      
-      polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
+      /*
+      polygon_partial_weights(nSourceCells, SourceCell, TargetCell, weight, &polygons);
 
       correct_weights ( nSourceCells, weight );
+      */
+      compute_overlap_areas ( nSourceCells, SourceCell, TargetCell, area);
 
+      // tgt_area = huiliers_area(TargetCell);
+      tgt_area = cell_area(TargetCell);
+      for (n = 0; n < nSourceCells; ++n)
+	weight[n] = area[n] / tgt_area;
+      /*
+      weight_sum = 0.0;
+      for ( n = 0; n < nSourceCells; ++n ) weight_sum += weight[n];
+      
+      if ( fabs(weight_sum-1.0) > epsilon ) {
+	printf ("test 2.) weight %lf\n", weight_sum );
+	PUT_ERR("test 2.) weight deviates from expected value of 1.0!\n");
+      }
+      */
+      correct_weights ( nSourceCells, weight );
+      /*
+      weight_sum = 0.0;
+      for ( n = 0; n < nSourceCells; ++n ) weight_sum += weight[n];
+      
+      if ( fabs(weight_sum-1.0) > epsilon ) {
+	printf ("test 2.) weight %lf\n", weight_sum );
+	PUT_ERR("test 2.) weight deviates from expected value of 1.0!\n");
+      }
+      */
       for ( int k = 0; k < num_deps; ++k )
 	{
 	  int index1 = curr_deps[k];
@@ -713,7 +743,7 @@ void yar_remap_con(field_t *field1, field_t *field2)
       // correct_weights ( nSourceCells, weight );
     }
 
-  polygon_destroy ( &polygons );
+  //polygon_destroy ( &polygons );
   if ( cdoTimer ) timer_stop(timer_yar_remap_con);
 
   if ( cdoTimer ) timer_start(timer_yar_remap);
@@ -734,6 +764,9 @@ void yar_remap_con(field_t *field1, field_t *field2)
   free_dep_list(&deps);
   delete_grid(source_grid);
   delete_grid(target_grid);
+
+  free(weight);
+  free(area);
 
   //free(lonIn);
   //free(latIn);

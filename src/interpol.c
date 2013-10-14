@@ -324,6 +324,7 @@ void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
 #include "event.h"
 #include "search.h"
 #include "clipping.h"
+#include "area.h"
 #endif
 
 static
@@ -375,6 +376,10 @@ void intconarr2(double missval, int lon_is_circular,
   double *weight;
   weight = (double *) malloc(gridsize1*sizeof(double));
 
+  double tgt_area;
+  double *area;
+  area = (double *) malloc(gridsize1*sizeof(double));
+
   struct grid_cell *SourceCell;
   SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
 
@@ -393,9 +398,9 @@ void intconarr2(double missval, int lon_is_circular,
   TargetCell.coordinates_y = malloc (nc2 * sizeof(*TargetCell.coordinates_y) );
 
   unsigned const * curr_deps;
-  struct polygons polygons;
+  //struct polygons polygons;
 
-  polygon_create ( &polygons );
+  //polygon_create ( &polygons );
 #endif
 
   /*
@@ -564,7 +569,13 @@ void intconarr2(double missval, int lon_is_circular,
 	    }
 	}
       
-      polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
+      //polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
+      compute_overlap_areas ( nSourceCells, SourceCell, TargetCell, area);
+
+      tgt_area = huiliers_area(TargetCell);
+      // tgt_area = cell_area(TargetCell);
+      for (n = 0; n < nSourceCells; ++n)
+	weight[n] = area[n] / tgt_area;
 
       correct_weights ( nSourceCells, weight );
 
@@ -593,7 +604,9 @@ void intconarr2(double missval, int lon_is_circular,
     }
  
 #if defined(HAVE_LIBYAC)
-  polygon_destroy ( &polygons );
+  free(weight);
+  free(area);
+  //polygon_destroy ( &polygons );
 #endif
 
   if ( findex < gridsize2 ) progressStatus(0, 1, 1);
