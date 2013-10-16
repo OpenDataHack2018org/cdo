@@ -45,7 +45,7 @@ case "${HOSTNAME}" in
                     --with-curl=/opt/local \
                     --with-libxml2=/usr \
                     --with-magics=/Users/m214003/local/magics-2.14.9 \
-	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fopenmp -DHAVE_LIBYAC -I/Users/m214003/cdt/work/YAC/src -I/Users/m214003/cdt/work/YAC/src/mtime/include" \
+	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fopenmp -DHAVE_LIBYAC -I/Users/m214003/cdt/work/YAC/src" \
                     LIBS="-L/opt/local/lib -lopenjpeg -L/Users/m214003/cdt/work/YAC/src -lyac"
 #                    --with-libxml2=/usr
 #                    --with-magics=/Users/m214003/local/magics-2.14.9

@@ -321,7 +321,6 @@ void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
 #include "grid_reg2d.h"
 #include "grid_search.h"
 #include "bucket_search.h"
-#include "event.h"
 #include "search.h"
 #include "clipping.h"
 #include "area.h"
