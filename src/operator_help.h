@@ -212,7 +212,7 @@ static char *ReplaceHelp[] = {
     "    replace  ifile1 ifile2 ofile",
     "",
     "DESCRIPTION",
-    "    The replace operator replaces variables of ifile1 by variables from ifile2 and write",
+    "    The replace operator replaces variables in ifile1 by variables from ifile2 and write",
     "    the result to ofile. Both input datasets need to have the same number of timesteps.",
     NULL
 };
