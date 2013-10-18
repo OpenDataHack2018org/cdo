@@ -54,106 +54,6 @@ double norm(const double *restrict a)
 }
 
 static
-double triangle_area(double *dv1, double *dv2, double *dv3)
-{
-  double a1, a2, a3;
-  double ca1, ca2, ca3;
-  double s12, s23, s31;
-  double u12[3], u23[3], u31[3];
-  double area;
-
-  /* Compute cross products Uij = Vi x Vj */
-  cross_product(dv1, dv2, u12);
-  cross_product(dv2, dv3, u23);
-  cross_product(dv3, dv1, u31);
-  
-  /* Normalize Uij to unit vectors */
-  s12 = norm(u12);
-  s23 = norm(u23);
-  s31 = norm(u31);
-
-  /* Test for a degenerate triangle associated with collinear vertices */
-  if ( !(fabs(s12) > 0.0) || !(fabs(s23) > 0.0) || !(fabs(s31) > 0.0) ) return 0.0;
-
-  s12 = sqrt(s12);
-  s23 = sqrt(s23);
-  s31 = sqrt(s31);
-  
-  u12[0] = u12[0]/s12; u12[1] = u12[1]/s12; u12[2] = u12[2]/s12;
-  u23[0] = u23[0]/s23; u23[1] = u23[1]/s23; u23[2] = u23[2]/s23;
-  u31[0] = u31[0]/s31; u31[1] = u31[1]/s31; u31[2] = u31[2]/s31;
-  
-  /*  Compute interior angles Ai as the dihedral angles between planes:
-
-        CA1 = cos(A1) = -<U12,U31>
-        CA2 = cos(A2) = -<U23,U12>
-        CA3 = cos(A3) = -<U31,U23>
-  */
-  ca1 = -u12[0]*u31[0] - u12[1]*u31[1] - u12[2]*u31[2];
-  ca2 = -u23[0]*u12[0] - u23[1]*u12[1] - u23[2]*u12[2];
-  ca3 = -u31[0]*u23[0] - u31[1]*u23[1] - u31[2]*u23[2];
-
-  if ( ca1 < -1.0 ) ca1 = -1.0;
-  if ( ca1 >  1.0 ) ca1 =  1.0;
-  if ( ca2 < -1.0 ) ca2 = -1.0;
-  if ( ca2 >  1.0 ) ca2 =  1.0;
-  if ( ca3 < -1.0 ) ca3 = -1.0;
-  if ( ca3 >  1.0 ) ca3 =  1.0;
-
-  a1 = acos(ca1);
-  a2 = acos(ca2);
-  a3 = acos(ca3);
-  
-  /* Compute area = A1 + A2 + A3 - PI */
-  /* here for a unit sphere:          */
-  area = a1 + a2 + a3 - M_PI;
-
-  if ( area < 0.0 ) area = 0.0;
-
-  return (area);
-}
-
-static
-double cell_area_tri(long num_corners, double *cell_center_lon, double *cell_center_lat,
-		     double *cell_corner_lon, double *cell_corner_lat)
-{
-  long k;
-  double xa;
-  double area;
-  double pih = M_PI/2.;
-  double pnt1[3], pnt2[3], pnt3[3];
-
-  if ( num_corners < 3 ) return 0;
-
-  area = 0;
-      
-  lonlat_to_xyz(cell_center_lon[0], cell_center_lat[0], pnt3);
-      
-  for ( k = 1; k < num_corners; ++k )
-    {
-      if ( !(fabs(cell_corner_lat[k-1]) >= pih && fabs(cell_corner_lat[k]) >= pih) )
-	{
-	  lonlat_to_xyz(cell_corner_lon[k-1], cell_corner_lat[k-1], pnt1);
-	  lonlat_to_xyz(cell_corner_lon[k],   cell_corner_lat[k],   pnt2);
-
-	  xa = triangle_area(pnt1, pnt2, pnt3);
-	  area += xa;
-	}
-    }
-
-  if ( !(fabs(cell_corner_lat[0]) >= pih && fabs(cell_corner_lat[num_corners-1]) >= pih) )
-    {
-      lonlat_to_xyz(cell_corner_lon[0],    cell_corner_lat[0],    pnt1);
-      lonlat_to_xyz(cell_corner_lon[num_corners-1], cell_corner_lat[num_corners-1], pnt2);
-
-      xa = triangle_area(pnt1, pnt2, pnt3);
-      area += xa;
-    }
-
-  return (area);
-}
-
-static
 double cell_area(int num_corners, double *cell_corner_lon, double *cell_corner_lat)
 {
   if ( num_corners < 3 ) return 0;
@@ -331,8 +231,6 @@ int gridGenArea(int gridID, double *area)
   int lgriddestroy = FALSE;
   long i;
   long nv, gridsize;
-  double *grid_center_lon = NULL;
-  double *grid_center_lat = NULL;
   double *grid_corner_lon = NULL;
   double *grid_corner_lat = NULL;
   int *grid_mask = NULL;
@@ -404,12 +302,6 @@ int gridGenArea(int gridID, double *area)
       return (status);
     }
 
-  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
-  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
-
-  gridInqXvals(gridID, grid_center_lon);
-  gridInqYvals(gridID, grid_center_lat);
-
   grid_corner_lon = (double *) malloc(nv*gridsize*sizeof(double));
   grid_corner_lat = (double *) malloc(nv*gridsize*sizeof(double));
 
@@ -429,8 +321,21 @@ int gridGenArea(int gridID, double *area)
 	    {
 	      dlon = 1;
 	    }
+
+	  double *grid_center_lon = NULL;
+	  double *grid_center_lat = NULL;
+
+	  grid_center_lon = (double *) malloc(gridsize*sizeof(double));
+	  grid_center_lat = (double *) malloc(gridsize*sizeof(double));
+
+	  gridInqXvals(gridID, grid_center_lon);
+	  gridInqYvals(gridID, grid_center_lat);
+
 	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
 	  genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
+
+	  free(grid_center_lon);
+	  free(grid_center_lat);
 	}
       else
 	{
@@ -451,11 +356,6 @@ int gridGenArea(int gridID, double *area)
       }
     else if ( memcmp(units, "degree", 6) == 0 )
       {
-	for ( i = 0; i < gridsize; ++i )
-	  {
-	    grid_center_lon[i] *= DEG2RAD;
-	    grid_center_lat[i] *= DEG2RAD;
-	  }
 	for ( i = 0; i < gridsize*nv; ++i )
 	  {
 	    grid_corner_lon[i] *= DEG2RAD;
@@ -476,7 +376,7 @@ int gridGenArea(int gridID, double *area)
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none)        \
-  shared(findex, gridsize, area, nv, grid_center_lon, grid_center_lat, grid_corner_lon, grid_corner_lat) \
+  shared(findex, gridsize, area, nv, grid_corner_lon, grid_corner_lat) \
   private(i)
 #endif
   for ( i = 0; i < gridsize; ++i )
@@ -491,9 +391,8 @@ int gridGenArea(int gridID, double *area)
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/gridsize);
 
-      area[i] = cell_area_tri(nv, grid_center_lon+i, grid_center_lat+i, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
       //area[i] = cell_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
-      //area[i] = huiliers_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
+      area[i] = huiliers_area(nv, grid_corner_lon+i*nv, grid_corner_lat+i*nv);
     }
 
   if ( cdoVerbose )
@@ -503,8 +402,6 @@ int gridGenArea(int gridID, double *area)
       cdoPrint("Total area = %g steradians", total_area);
     }
 
-  free(grid_center_lon);
-  free(grid_center_lat);
   free(grid_corner_lon);
   free(grid_corner_lat);
   if ( grid_mask ) free(grid_mask);
