@@ -3770,7 +3770,7 @@ static char *OutputHelp[] = {
     "",
     "SYNOPSIS",
     "    output  ifiles",
-    "    outputf,format,nelem  ifiles",
+    "    outputf,format[,nelem]  ifiles",
     "    outputint  ifiles",
     "    outputsrv  ifiles",
     "    outputext  ifiles",
@@ -3788,7 +3788,7 @@ static char *OutputHelp[] = {
     "    outputf    Formatted output",
     "               Prints all values to standard output.",
     "               The format and number of elements for each row have to be specified by the parameters",
-    "               format and nelem.",
+    "               format and nelem. The default for nelem is 1.",
     "    outputint  Integer output",
     "               Prints all values rounded to the nearest integer to standard output.",
     "    outputsrv  SERVICE ASCII output",
@@ -3800,7 +3800,7 @@ static char *OutputHelp[] = {
     "",
     "PARAMETER",
     "    format  STRING  C-style format for one element (e.g. %13.6g)",
-    "    nelem   INTEGER Number of elements for each row (nelem max = gridsize)",
+    "    nelem   INTEGER Number of elements for each row (default: nelem = 1)",
     NULL
 };
 

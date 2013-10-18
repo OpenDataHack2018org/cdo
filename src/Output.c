@@ -53,7 +53,7 @@ void *Output(void *argument)
   int vlistID;
   int nmiss, nout;
   int nlon, nlat;
-  int nelem = 0;
+  int nelem = 1;
   int index;
   int ndiffgrids;
   const char *format = NULL;
@@ -94,10 +94,12 @@ void *Output(void *argument)
 
   if ( operatorID == OUTPUTF )
     {
-      operatorInputArg("format and number of elements");
-      operatorCheckArgc(2);
+      operatorInputArg("format and number of elements [optional]");
+
+      if ( operatorArgc() < 1 ) cdoAbort("Too few arguments!");
+
       format = operatorArgv()[0];
-      nelem  = atoi(operatorArgv()[1]);
+      if ( operatorArgc() == 2 ) nelem  = atoi(operatorArgv()[1]);
     }
   else if ( operatorID == OUTPUTTAB )
     {

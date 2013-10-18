@@ -6,6 +6,7 @@
 2013-10-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridarea: replace cell_area_tri() by huiliers_area()
+	* outputf: make second parameter (nelem) optional
 
 2013-10-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

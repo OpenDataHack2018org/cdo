@@ -12,7 +12,7 @@ PLANET_RADIUS=1
 export PLANET_RADIUS
 #
 for GRID in $GRIDS; do
-  GLOBAREA=`$CDO outputf,%10.7f,1 -fldsum -gridarea -random,$GRID`
+  GLOBAREA=`$CDO outputf,%10.7f -fldsum -gridarea -random,$GRID`
 #  echo "$GRID: >$GLOBAREA< >$REFVAL<"
   if [ "$GLOBAREA" != "$REFVAL" ]; then RSTAT=`expr $RSTAT + 1`; fi
 done
