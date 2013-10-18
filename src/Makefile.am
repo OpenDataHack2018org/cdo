@@ -218,6 +218,7 @@ cdo_SOURCES += Adisit.c        \
                gradsdeslib.h   \
                grid.c          \
                grid.h          \
+               grid_area.c     \
                grid_gme.c      \
                grid_lcc.c      \
                grid_rot.c      \

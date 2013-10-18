@@ -124,20 +124,20 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	exception.c expr.c expr.h expr_lex.c expr_yacc.c expr_yacc.h \
 	features.c field.c field.h field2.c fieldc.c fieldmem.c \
 	fieldmer.c fieldzon.c fouriertrans.c functs.h gradsdeslib.c \
-	gradsdeslib.h grid.c grid.h grid_gme.c grid_lcc.c grid_rot.c \
-	gridreference.c griddes.c griddes.h griddes_h5.c griddes_nc.c \
-	hetaeta.c hetaeta.h history.c institution.c interpol.c \
-	interpol.h job.c juldate.c kvlist.c kvlist.h legendre.c list.c \
-	list.h merge_sort2.c merge_sort2.h modules.c modules.h \
-	namelist.c namelist.h normal.c nth_element.c nth_element.h \
-	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
-	pipe.c pipe.h printinfo.h process.c process.h pstream.c \
-	pstream.h pstream_int.h pthread_debug.c pthread_debug.h \
-	readline.c realtime.c remap.h remaplib.c remapsort.c \
-	specspace.c specspace.h statistic.c statistic.h table.c \
-	timebase.h timer.c userlog.c util.c util.h vinterp.c vinterp.h \
-	zaxis.c Magplot.c Magvector.c Maggraph.c template_parser.h \
-	template_parser.c results_template_parser.h \
+	gradsdeslib.h grid.c grid.h grid_area.c grid_gme.c grid_lcc.c \
+	grid_rot.c gridreference.c griddes.c griddes.h griddes_h5.c \
+	griddes_nc.c hetaeta.c hetaeta.h history.c institution.c \
+	interpol.c interpol.h job.c juldate.c kvlist.c kvlist.h \
+	legendre.c list.c list.h merge_sort2.c merge_sort2.h modules.c \
+	modules.h namelist.c namelist.h normal.c nth_element.c \
+	nth_element.h operator_help.h par_io.c par_io.h percentiles.c \
+	percentiles.h pipe.c pipe.h printinfo.h process.c process.h \
+	pstream.c pstream.h pstream_int.h pthread_debug.c \
+	pthread_debug.h readline.c realtime.c remap.h remaplib.c \
+	remapsort.c specspace.c specspace.h statistic.c statistic.h \
+	table.c timebase.h timer.c userlog.c util.c util.h vinterp.c \
+	vinterp.h zaxis.c Magplot.c Magvector.c Maggraph.c \
+	template_parser.h template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
 	CdoMagicsMapper.h CdoMagicsMapper.c
@@ -240,13 +240,14 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-fieldmem.$(OBJEXT) cdo-fieldmer.$(OBJEXT) \
 	cdo-fieldzon.$(OBJEXT) cdo-fouriertrans.$(OBJEXT) \
 	cdo-gradsdeslib.$(OBJEXT) cdo-grid.$(OBJEXT) \
-	cdo-grid_gme.$(OBJEXT) cdo-grid_lcc.$(OBJEXT) \
-	cdo-grid_rot.$(OBJEXT) cdo-gridreference.$(OBJEXT) \
-	cdo-griddes.$(OBJEXT) cdo-griddes_h5.$(OBJEXT) \
-	cdo-griddes_nc.$(OBJEXT) cdo-hetaeta.$(OBJEXT) \
-	cdo-history.$(OBJEXT) cdo-institution.$(OBJEXT) \
-	cdo-interpol.$(OBJEXT) cdo-job.$(OBJEXT) cdo-juldate.$(OBJEXT) \
-	cdo-kvlist.$(OBJEXT) cdo-legendre.$(OBJEXT) cdo-list.$(OBJEXT) \
+	cdo-grid_area.$(OBJEXT) cdo-grid_gme.$(OBJEXT) \
+	cdo-grid_lcc.$(OBJEXT) cdo-grid_rot.$(OBJEXT) \
+	cdo-gridreference.$(OBJEXT) cdo-griddes.$(OBJEXT) \
+	cdo-griddes_h5.$(OBJEXT) cdo-griddes_nc.$(OBJEXT) \
+	cdo-hetaeta.$(OBJEXT) cdo-history.$(OBJEXT) \
+	cdo-institution.$(OBJEXT) cdo-interpol.$(OBJEXT) \
+	cdo-job.$(OBJEXT) cdo-juldate.$(OBJEXT) cdo-kvlist.$(OBJEXT) \
+	cdo-legendre.$(OBJEXT) cdo-list.$(OBJEXT) \
 	cdo-merge_sort2.$(OBJEXT) cdo-modules.$(OBJEXT) \
 	cdo-namelist.$(OBJEXT) cdo-normal.$(OBJEXT) \
 	cdo-nth_element.$(OBJEXT) cdo-par_io.$(OBJEXT) \
@@ -494,12 +495,12 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	expr_lex.c expr_yacc.c expr_yacc.h features.c field.c field.h \
 	field2.c fieldc.c fieldmem.c fieldmer.c fieldzon.c \
 	fouriertrans.c functs.h gradsdeslib.c gradsdeslib.h grid.c \
-	grid.h grid_gme.c grid_lcc.c grid_rot.c gridreference.c \
-	griddes.c griddes.h griddes_h5.c griddes_nc.c hetaeta.c \
-	hetaeta.h history.c institution.c interpol.c interpol.h job.c \
-	juldate.c kvlist.c kvlist.h legendre.c list.c list.h \
-	merge_sort2.c merge_sort2.h modules.c modules.h namelist.c \
-	namelist.h normal.c nth_element.c nth_element.h \
+	grid.h grid_area.c grid_gme.c grid_lcc.c grid_rot.c \
+	gridreference.c griddes.c griddes.h griddes_h5.c griddes_nc.c \
+	hetaeta.c hetaeta.h history.c institution.c interpol.c \
+	interpol.h job.c juldate.c kvlist.c kvlist.h legendre.c list.c \
+	list.h merge_sort2.c merge_sort2.h modules.c modules.h \
+	namelist.c namelist.h normal.c nth_element.c nth_element.h \
 	operator_help.h par_io.c par_io.h percentiles.c percentiles.h \
 	pipe.c pipe.h printinfo.h process.c process.h pstream.c \
 	pstream.h pstream_int.h pthread_debug.c pthread_debug.h \
@@ -838,6 +839,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-fouriertrans.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-gradsdeslib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-grid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-grid_area.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-grid_gme.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-grid_lcc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-grid_rot.Po@am__quote@
@@ -3660,6 +3662,20 @@ cdo-grid.obj: grid.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='grid.c' object='cdo-grid.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-grid.obj `if test -f 'grid.c'; then $(CYGPATH_W) 'grid.c'; else $(CYGPATH_W) '$(srcdir)/grid.c'; fi`
+
+cdo-grid_area.o: grid_area.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-grid_area.o -MD -MP -MF $(DEPDIR)/cdo-grid_area.Tpo -c -o cdo-grid_area.o `test -f 'grid_area.c' || echo '$(srcdir)/'`grid_area.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-grid_area.Tpo $(DEPDIR)/cdo-grid_area.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='grid_area.c' object='cdo-grid_area.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-grid_area.o `test -f 'grid_area.c' || echo '$(srcdir)/'`grid_area.c
+
+cdo-grid_area.obj: grid_area.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-grid_area.obj -MD -MP -MF $(DEPDIR)/cdo-grid_area.Tpo -c -o cdo-grid_area.obj `if test -f 'grid_area.c'; then $(CYGPATH_W) 'grid_area.c'; else $(CYGPATH_W) '$(srcdir)/grid_area.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/cdo-grid_area.Tpo $(DEPDIR)/cdo-grid_area.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='grid_area.c' object='cdo-grid_area.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-grid_area.obj `if test -f 'grid_area.c'; then $(CYGPATH_W) 'grid_area.c'; else $(CYGPATH_W) '$(srcdir)/grid_area.c'; fi`
 
 cdo-grid_gme.o: grid_gme.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-grid_gme.o -MD -MP -MF $(DEPDIR)/cdo-grid_gme.Tpo -c -o cdo-grid_gme.o `test -f 'grid_gme.c' || echo '$(srcdir)/'`grid_gme.c

@@ -516,6 +516,7 @@ src/gradsdeslib.c -text
 src/gradsdeslib.h -text
 src/grid.c -text
 src/grid.h -text
+src/grid_area.c -text
 src/grid_gme.c -text
 src/grid_lcc.c -text
 src/grid_rot.c -text
