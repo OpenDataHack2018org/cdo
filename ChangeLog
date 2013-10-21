@@ -5,6 +5,7 @@
 
 2013-10-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
+	* splitmon: added optional parameter to set the format string for the month [Feature #4131]
 	* Sort: added support for multi level variables (bug fix) [report: Irina Fast]
 
 2013-10-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>

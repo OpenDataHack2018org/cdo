@@ -30,8 +30,28 @@
 #include "pstream.h"
 #include "util.h"
 
+#include <time.h>
 
 #define  MAX_STREAMS 32
+
+struct tm datetime_to_tm(int date, int time)
+{
+  int year, month, day, hour, minute, second;
+  cdiDecodeDate(date, &year, &month, &day);
+  cdiDecodeTime(time, &hour, &minute, &second);
+
+  struct tm stime;
+  memset(&stime, 0, sizeof(struct tm));
+
+  stime.tm_sec  = second;
+  stime.tm_min  = minute;
+  stime.tm_hour = hour;
+  stime.tm_mday = day;
+  stime.tm_mon  = month-1;
+  stime.tm_year = year-1900;
+
+  return stime;
+}
 
 void *Splittime(void *argument)
 {
@@ -62,6 +82,7 @@ void *Splittime(void *argument)
   field_t **vars = NULL;
   int season_start;
   const char *seas_name[4];
+  const char *format = NULL;
 
   cdoInitialize(argument);
 
@@ -75,6 +96,11 @@ void *Splittime(void *argument)
   operintval = cdoOperatorF2(operatorID);
 
   if ( UNCHANGED_RECORD ) lcopy = TRUE;
+
+  if ( operatorID == SPLITMON )
+    {
+      if ( operatorArgc() == 1 ) format = operatorArgv()[0];
+    }
 
   season_start = get_season_start();
   get_season_name(seas_name);
@@ -188,9 +214,22 @@ void *Splittime(void *argument)
 	    }
 	  else
 	    {
-	      sprintf(filename+nchars, "%02d", index);
+	      char oformat[32];
+	      strcpy(oformat, "%02d");
+
+	      if ( operatorID == SPLITMON && format )
+		{
+		  size_t slen;
+		  char sbuf[32];
+		  struct tm stime = datetime_to_tm(vdate, vtime);
+		  slen = strftime(sbuf, 32, format, &stime);
+
+		  if ( slen ) strcpy(oformat, sbuf);
+		}
+
+	      sprintf(filename+nchars, oformat, index);
 	      if ( filesuffix[0] )
-		sprintf(filename+nchars+2, "%s", filesuffix);
+		sprintf(filename+nchars+strlen(oformat), "%s", filesuffix);
 	    }
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);

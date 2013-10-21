@@ -5,7 +5,7 @@
 @Section   = File operations
 @Class     = File operation
 @Arguments = ifile obase
-@Operators = splithour splitday splitmon splitseas splityear
+@Operators = splithour splitday splitseas splityear splitmon
 
 @BeginDescription
 This module splits @file{ifile} into  timesteps pieces. The output files will be named
@@ -37,6 +37,7 @@ Splits a file into pieces, one for each different day.
 
 @BeginOperator_splitmon
 @Title     = Split months
+@Parameter = [format]
 
 @BeginDescription
 Splits a file into pieces, one for each different month.
@@ -63,6 +64,12 @@ Splits a file into pieces, one for each different year.
 @file{xxx} will have four digits with the year.
 @EndDescription
 @EndOperator
+
+
+@BeginParameter
+@Item = format
+STRING  C-style format for strftime() (e.g. \%B for the full month name)
+@EndParameter
 
 
 @BeginEnvironment

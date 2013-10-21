@@ -54,9 +54,9 @@ Operator catalog:
    Split         splittabnum     Split parameter table numbers
    Splittime     splithour       Split hours
    Splittime     splitday        Split days
-   Splittime     splitmon        Split months
    Splittime     splitseas       Split seasons
    Splittime     splityear       Split years
+   Splittime     splitmon        Split months
    Splitsel      splitsel        Split time selection
 -------------------------------------------------------------
    Selection
