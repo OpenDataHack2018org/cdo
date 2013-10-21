@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.2
 	* Version 1.6.2 released
 
+2013-10-21  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Sort: added support for multi level variables (bug fix) [report: Irina Fast]
+
 2013-10-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridarea: replace cell_area_tri() by huiliers_area()
