@@ -1,7 +1,7 @@
 CDO NEWS
 --------
 
-Version 1.6.2 (27 September 2013):
+Version 1.6.2 (12 November 2013):
 
    New features:
      * select: added support for key >timestep_of_year<
