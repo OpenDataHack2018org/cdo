@@ -340,6 +340,8 @@ void progressStatus(double offset, double refval, double curval)
 {
   int ival;
 
+  if ( cdoSilentMode ) return;
+
   if ( !stdout_is_tty ) return;
 
   offset = offset < 0 ? 0: offset;
