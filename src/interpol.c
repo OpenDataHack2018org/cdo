@@ -8,6 +8,11 @@
 #include <omp.h>  // omp_get_thread_num()
 #endif
 
+#define  ZERO     0.0
+#define  ONE      1.0
+#define  TWO      2.0
+#define  THREE    3.0
+
 /**
 * Find the interval i-1 .. i in which an element x fits and return i, the 
 * bigger one of the interval borders or x itself if it is an interval border.
@@ -198,6 +203,26 @@ double intlinarr2p(long nxm, long nym, double **fieldm, const double *xm, const 
 }
 
 static
+void rect_find_ij_weights(double plon, double plat, long ii, long jj, const double *restrict xm, const double *restrict ym, double *ig, double *jg)
+{
+  /*
+    wgts[0] = (plon-xm[ii])   * (plat-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
+    wgts[1] = (plon-xm[ii-1]) * (plat-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
+    wgts[2] = (plon-xm[ii-1]) * (plat-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
+    wgts[3] = (plon-xm[ii])   * (plat-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
+  */
+  double iw, jw;
+  double wgts0 = (plon-xm[ii])   * (plat-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
+  double wgts1 = (plon-xm[ii-1]) * (plat-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
+
+  iw = 1./(wgts0/wgts1 + 1.);
+  jw = 1. - wgts1/iw;
+
+  *ig = iw;
+  *jg = jw;
+}
+
+static
 void intlinarr2(double missval, int lon_is_circular,
 		long nxm, long nym,  const double *restrict fieldm, const double *restrict xm, const double *restrict ym,
 		long gridsize2, double *field, const double *restrict x, const double *restrict y)
@@ -266,8 +291,24 @@ void intlinarr2(double missval, int lon_is_circular,
 
 	  wgts[0] = (x[i]-xm[ii])   * (y[i]-ym[jj])   / ((xm[ii-1]-xm[ii]) * (ym[jj-1]-ym[jj]));
 	  wgts[1] = (x[i]-xm[ii-1]) * (y[i]-ym[jj])   / ((xm[ii]-xm[ii-1]) * (ym[jj-1]-ym[jj]));
-	  wgts[2] = (x[i]-xm[ii])   * (y[i]-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
 	  wgts[3] = (x[i]-xm[ii-1]) * (y[i]-ym[jj-1]) / ((xm[ii]-xm[ii-1]) * (ym[jj]-ym[jj-1]));
+	  wgts[2] = (x[i]-xm[ii])   * (y[i]-ym[jj-1]) / ((xm[ii-1]-xm[ii]) * (ym[jj]-ym[jj-1]));
+	  /*
+	  double wgts0, wgts1, wgts2, wgts3, iw, jw;
+	  rect_find_ij_weights(x[i], y[i], ii, jj, xm, ym, &iw, &jw);
+
+	  wgts0 = (ONE-iw) * (ONE-jw);
+	  wgts1 =      iw  * (ONE-jw);
+	  wgts2 =      iw  *      jw;
+	  wgts3 = (ONE-iw) *      jw;
+
+	  if ( fabs(wgts[0] - wgts0) > 1.e-12 ) printf("wd0: %g\n", wgts[0] - wgts0);
+	  if ( fabs(wgts[1] - wgts1) > 1.e-12 ) printf("wd1: %g\n", wgts[1] - wgts1);
+	  if ( fabs(wgts[2] - wgts2) > 1.e-12 ) printf("wd2: %g\n", wgts[2] - wgts2);
+	  if ( fabs(wgts[3] - wgts3) > 1.e-12 ) printf("wd3: %g\n", wgts[3] - wgts3);
+	  */
+	  //printf("%2ld %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f %6.4f\n", dst_add, plon, plat, wgts[0], wgts[1], wgts[2], wgts[3], iw, jw);
+
 	  
 	  field[i] = 0;
 	  for ( n = 0; n < 4; ++n )

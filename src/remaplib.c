@@ -654,7 +654,7 @@ int expand_curvilinear_grid(int gridID)
   int gridIDnew;
   long gridsize, gridsize_new;
   long nx, ny, nxp4, nyp4;
-  long i,j;
+  long i, j;
   double *xvals, *yvals;
 
   gridsize = gridInqSize(gridID);
@@ -1390,8 +1390,7 @@ void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv)
 /*****************************************************************************/
 
 /*
-   This routine resizes remapping arrays by increasing(decreasing)
-   the max_links by increment
+   This routine resizes remapping arrays by increasing(decreasing) the max_links by increment
 */
 void resize_remap_vars(remapvars_t *rv, int increment)
 {
@@ -1781,7 +1780,7 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
 
 #define  DEFAULT_MAX_ITER  100
 
-static long    Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i,j iteration */
+static long    Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i, j iteration */
 static double  converge = 1.e-10;            /* Convergence criterion */
 
 void remap_set_max_iter(long max_iter)
@@ -2064,7 +2063,7 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 
   /*
      Increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  Then store the link.
+     to be increased to accomodate the new link. Then store the link.
   */
   num_links_old = rv->num_links;
   rv->num_links = num_links_old + 4;
@@ -2082,19 +2081,18 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
 } /* store_link_bilin */
 
 static
-long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons,
-		     double *ig, double *jg)
+long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
 {
   long iter;                     /*  iteration counters   */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
-  double deli, delj;             /*  corrections to i,j                     */
+  double deli, delj;             /*  corrections to iw,jw                   */
   double dth1, dth2, dth3;       /*  some latitude  differences             */
   double dph1, dph2, dph3;       /*  some longitude differences             */
   double dthp, dphp;             /*  difference between point and sw corner */
   double mat1, mat2, mat3, mat4; /*  matrix elements                        */
   double determinant;            /*  matrix determinant                     */
 
-  /* Iterate to find i,j for bilinear approximation  */
+  /* Iterate to find iw,jw for bilinear approximation  */
 
   dth1 = src_lats[1] - src_lats[0];
   dth2 = src_lats[3] - src_lats[0];
@@ -2172,8 +2170,6 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
   double wgts[4];                /*  bilinear weights for four corners      */
 
   double plat, plon;             /*  lat/lon coords of destination point    */
-  double iguess, jguess;         /*  current guess for bilinear coordinate  */
-  double sum_wgts;               /*  sum of weights for normalization       */
   double findex = 0;
 
   if ( cdoTimer ) timer_start(timer_remap_bil);
@@ -2192,8 +2188,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, grid2_size, rg, rv, Max_Iter, converge, lwarn, findex) \
-  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, \
-	  wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
+  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -2229,21 +2224,23 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 	    if ( ! rg->grid1_mask[src_add[n]] ) search_result = 0;
 	}
 
-      /* If point found, find local i,j coordinates for weights  */
+      /* If point found, find local iw,jw coordinates for weights  */
       if ( search_result > 0 )
 	{
+	  double iw, jw;  /*  current guess for bilinear coordinate  */
+
           rg->grid2_frac[dst_add] = ONE;
 
-	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess);
+	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
 
           if ( iter < Max_Iter )
 	    {
-	      /* Successfully found i,j - compute weights */
+	      /* Successfully found iw,jw - compute weights */
 
-	      wgts[0] = (ONE-iguess)*(ONE-jguess);
-	      wgts[1] = iguess*(ONE-jguess);
-	      wgts[2] = iguess*jguess;
-	      wgts[3] = (ONE-iguess)*jguess;
+	      wgts[0] = (ONE-iw) * (ONE-jw);
+	      wgts[1] =      iw  * (ONE-jw);
+	      wgts[2] =      iw  *      jw;
+	      wgts[3] = (ONE-iw) *      jw;
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -2264,13 +2261,13 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 		  cdoPrint("Src grid lons: %g %g %g %g",
 			   rg->grid1_center_lon[src_add[0]], rg->grid1_center_lon[src_add[1]],
 			   rg->grid1_center_lon[src_add[2]], rg->grid1_center_lon[src_add[3]]);
-		  cdoPrint("Current i,j : %g %g", iguess, jguess);
+		  cdoPrint("Current iw,jw : %g %g", iw, jw);
 		}
 
 	      if ( cdoVerbose || lwarn )
 		{
 		  lwarn = FALSE;
-		  //  cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		  //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", Max_Iter);
 		  cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
 		}
 
@@ -2295,7 +2292,7 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
           if ( icount > 0 )
 	    {
 	      /* Renormalize weights */
-	      sum_wgts = 0.0;
+	      double sum_wgts = 0.0; /* sum of weights for normalization */
 	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
 	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
 	      for ( n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
@@ -2339,7 +2336,7 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
 
   /*
      Increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  then store the link.
+     to be increased to accomodate the new link. Then store the link.
   */
   num_links_old = rv->num_links;
   rv->num_links = num_links_old + 4;
@@ -2381,8 +2378,6 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
   double wgts[4][4];  /*  bicubic weights for four corners    */
 
   double plat, plon;             /*  lat/lon coords of destination point    */
-  double iguess, jguess;         /*  current guess for bilinear coordinate  */
-  double sum_wgts;               /*  sum of weights for normalization       */
   double findex = 0;
 
   progressInit();
@@ -2397,7 +2392,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, cdoVerbose, rg, rv, Max_Iter, converge, lwarn, findex) \
-  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, iguess, jguess, sum_wgts, search_result)					\
+  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -2431,49 +2426,35 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	    if ( ! rg->grid1_mask[src_add[n]] ) search_result = 0;
 	}
 
-      /* If point found, find local i,j coordinates for weights  */
+      /* If point found, find local iw,jw coordinates for weights  */
       if ( search_result > 0 )
 	{
+	  double iw, jw;  /*  current guess for bilinear coordinate  */
+
           rg->grid2_frac[dst_add] = ONE;
 
-	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iguess, &jguess);
+	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
 
           if ( iter < Max_Iter )
 	    {
-	      /* Successfully found i,j - compute weights */
+	      /* Successfully found iw,jw - compute weights */
 
-	      wgts[0][0] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
-		           (ONE - iguess*iguess*(THREE-TWO*iguess));
-	      wgts[0][1] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
-                                  iguess*iguess*(THREE-TWO*iguess);
-	      wgts[0][2] =        jguess*jguess*(THREE-TWO*jguess)*
-                                  iguess*iguess*(THREE-TWO*iguess);
-	      wgts[0][3] =        jguess*jguess*(THREE-TWO*jguess)*
-                           (ONE - iguess*iguess*(THREE-TWO*iguess));
-	      wgts[1][0] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
-                                  iguess*(iguess-ONE)*(iguess-ONE);
-	      wgts[1][1] = (ONE - jguess*jguess*(THREE-TWO*jguess))*
-                                  iguess*iguess*(iguess-ONE);
-	      wgts[1][2] =        jguess*jguess*(THREE-TWO*jguess)*
-                                  iguess*iguess*(iguess-ONE);
-	      wgts[1][3] =        jguess*jguess*(THREE-TWO*jguess)*
-                                  iguess*(iguess-ONE)*(iguess-ONE);
-	      wgts[2][0] =        jguess*(jguess-ONE)*(jguess-ONE)*
-                           (ONE - iguess*iguess*(THREE-TWO*iguess));
-	      wgts[2][1] =        jguess*(jguess-ONE)*(jguess-ONE)*
-                                  iguess*iguess*(THREE-TWO*iguess);
-	      wgts[2][2] =        jguess*jguess*(jguess-ONE)*
-                                  iguess*iguess*(THREE-TWO*iguess);
-	      wgts[2][3] =        jguess*jguess*(jguess-ONE)*
-                           (ONE - iguess*iguess*(THREE-TWO*iguess));
-	      wgts[3][0] =        iguess*(iguess-ONE)*(iguess-ONE)*
-                                  jguess*(jguess-ONE)*(jguess-ONE);
-              wgts[3][1] =        iguess*iguess*(iguess-ONE)*
-                                  jguess*(jguess-ONE)*(jguess-ONE);
-	      wgts[3][2] =        iguess*iguess*(iguess-ONE)*
-                                  jguess*jguess*(jguess-ONE);
-	      wgts[3][3] =        iguess*(iguess-ONE)*(iguess-ONE)*
-                                  jguess*jguess*(jguess-ONE);
+	      wgts[0][0] = (ONE-jw*jw*(THREE-TWO*jw)) * (ONE-iw*iw*(THREE-TWO*iw));
+	      wgts[0][1] = (ONE-jw*jw*(THREE-TWO*jw)) *      iw*iw*(THREE-TWO*iw);
+	      wgts[0][2] =      jw*jw*(THREE-TWO*jw)  *      iw*iw*(THREE-TWO*iw);
+	      wgts[0][3] =      jw*jw*(THREE-TWO*jw)  * (ONE-iw*iw*(THREE-TWO*iw));
+	      wgts[1][0] = (ONE-jw*jw*(THREE-TWO*jw)) *      iw*(iw-ONE)*(iw-ONE);
+	      wgts[1][1] = (ONE-jw*jw*(THREE-TWO*jw)) *      iw*iw*(iw-ONE);
+	      wgts[1][2] =      jw*jw*(THREE-TWO*jw)  *      iw*iw*(iw-ONE);
+	      wgts[1][3] =      jw*jw*(THREE-TWO*jw)  *      iw*(iw-ONE)*(iw-ONE);
+	      wgts[2][0] =      jw*(jw-ONE)*(jw-ONE)  * (ONE-iw*iw*(THREE-TWO*iw));
+	      wgts[2][1] =      jw*(jw-ONE)*(jw-ONE)  *      iw*iw*(THREE-TWO*iw);
+	      wgts[2][2] =      jw*jw*(jw-ONE)        *      iw*iw*(THREE-TWO*iw);
+	      wgts[2][3] =      jw*jw*(jw-ONE)        * (ONE-iw*iw*(THREE-TWO*iw));
+	      wgts[3][0] =      iw*(iw-ONE)*(iw-ONE)  *      jw*(jw-ONE)*(jw-ONE);
+              wgts[3][1] =      iw*iw*(iw-ONE)        *      jw*(jw-ONE)*(jw-ONE);
+	      wgts[3][2] =      iw*iw*(iw-ONE)        *      jw*jw*(jw-ONE);
+	      wgts[3][3] =      iw*(iw-ONE)*(iw-ONE)  *      jw*jw*(jw-ONE);
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -2485,7 +2466,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
 	      if ( cdoVerbose || lwarn )
 		{
 		  lwarn = FALSE;
-		  // cdoWarning("Iteration for i,j exceed max iteration count of %d!", Max_Iter);
+		  // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", Max_Iter);
 		  cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
 		}
 
@@ -2510,7 +2491,7 @@ void remap_bicub(remapgrid_t *rg, remapvars_t *rv)
           if ( icount > 0 )
 	    {
 	      /* Renormalize weights */
-	      sum_wgts = 0.0;
+	      double sum_wgts = 0.0; /* sum of weights for normalization */
 	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
 	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
 	      for ( n = 0; n < 4; ++n ) wgts[0][n] = fabs(src_lats[n])/sum_wgts;

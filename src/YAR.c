@@ -140,8 +140,7 @@ void set_source_data(double * source_data, double init_value,
 
 
 static
-long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons,
-		     double *ig, double *jg)
+long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
 {
 #define  TWO      2.0
 #define  THREE    3.0
