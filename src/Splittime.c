@@ -214,12 +214,12 @@ void *Splittime(void *argument)
 	    }
 	  else
 	    {
+	      size_t slen;
 	      char oformat[32];
 	      strcpy(oformat, "%02d");
 
 	      if ( operatorID == SPLITMON && format )
 		{
-		  size_t slen;
 		  char sbuf[32];
 		  struct tm stime = datetime_to_tm(vdate, vtime);
 		  slen = strftime(sbuf, 32, format, &stime);
@@ -227,9 +227,9 @@ void *Splittime(void *argument)
 		  if ( slen ) strcpy(oformat, sbuf);
 		}
 
-	      sprintf(filename+nchars, oformat, index);
+	      slen = sprintf(filename+nchars, oformat, index);
 	      if ( filesuffix[0] )
-		sprintf(filename+nchars+strlen(oformat), "%s", filesuffix);
+		sprintf(filename+nchars+slen, "%s", filesuffix);
 	    }
 
 	  if ( cdoVerbose ) cdoPrint("create file %s", filename);
