@@ -544,14 +544,18 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
                 {
                   duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int)   endDateWithHist[0][levelID].ptr[i]) -
                                        date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
-                  firstDay = (double) day_of_year((int) startDateWithHist[1][levelID].ptr[i]);
                 }
               else
                 {
                   duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int)   endDateWithHist[1][levelID].ptr[i]) -
                                        date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[1][levelID].ptr[i]));
-                  firstDay = (double) day_of_year((int) startDateWithHist[1][levelID].ptr[i]);
                 }
+
+	      if ( DBL_IS_EQUAL(startDateWithHist[1][levelID].ptr[i], missval) )
+		firstDay = missval;
+	      else
+		firstDay = (double) day_of_year((int) startDateWithHist[1][levelID].ptr[i]);
+
               gslDuration[levelID].ptr[i] = duration;
               gslFirstDay[levelID].ptr[i] = firstDay;
             }
@@ -574,7 +578,11 @@ void computeGsl(int nlevels, int gridsize, double *yvals, double missval,
                 {
                   duration = (double) (date_to_julday(CALENDAR_PROLEPTIC, (int)   endDateWithHist[0][levelID].ptr[i]) -
                                        date_to_julday(CALENDAR_PROLEPTIC, (int) startDateWithHist[0][levelID].ptr[i]));
-                  firstDay = (double) day_of_year((int) startDateWithHist[0][levelID].ptr[i]);
+
+		  if ( DBL_IS_EQUAL(startDateWithHist[0][levelID].ptr[i], missval) )
+		    firstDay = missval;
+		  else
+		    firstDay = (double) day_of_year((int) startDateWithHist[0][levelID].ptr[i]);
 
                   gslDuration[levelID].ptr[i] = duration;
                   gslFirstDay[levelID].ptr[i] = firstDay;

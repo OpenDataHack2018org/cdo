@@ -9,6 +9,7 @@ Version 1.6.2 (12 November 2013):
      * splitmon: added optional parameter to set the format string for the month
    Fixed bugs:
      * selyear: wrong result for negative years [Bug #3836]
+     * eca_gsl: start date of growing season is wrong if the length of growing season is zero
 
 Version 1.6.1 (27 June 2013):
 

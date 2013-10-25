@@ -1222,8 +1222,8 @@ void eca4(const ECA_REQUEST_4 *request)
                       startDateWithHist[0][levelID].ptr[i] = missval;
                       endDateWithHist[0][levelID].ptr[i]   = missval;
                     }
-                  gslDuration[levelID].nmiss          = missval;
-                  gslFirstDay[levelID].nmiss          = missval;
+                  gslDuration[levelID].nmiss          = 0;
+                  gslFirstDay[levelID].nmiss          = 0;
                   /* reinitialize the current year */
                   startDateWithHist[0][levelID].nmiss = gridsize;
                   endDateWithHist[0][levelID].nmiss   = gridsize;
