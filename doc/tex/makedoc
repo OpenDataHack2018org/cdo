@@ -1083,11 +1083,16 @@ sub print_description {
       $list = 0;
     } elsif ( $itemize == 1 && "$kword" eq "\@ITEM" ) {
       ($kopt, $value) = split(/\s*=\s*/, $line, 2);
+      $hvalue = $value;
+      $hvalue =~ s/\@math\{([^}]*)\}/\1/og;
+      $value =~ s/\@math\{([^}]*)\}/\\begin{math}\1\\end{math}/og;
+      $value =~ s/</\$<\$/og;
+      $value =~ s/>/\$>\$/og;
       if ( $help_print == 1 ) {
-	printf HELPFILE ("    \"    %*s%s- ${value}\",\n", $nspace, "");
+	printf HELPFILE ("    \"    %*s%s- ${hvalue}\",\n", $nspace, "");
       }
       $value =~ s/_/\\_/g;
-      print TRFILE "\\item  $value\n";
+      print TRFILE "\\item $value\n";
     } elsif ( $list == 1 && "$kword" eq "\@ITEM" ) {
       ($kopt, $value) = split(/\s*=\s*/, $line, 2);
       if ( $help_print == 1 ) {
