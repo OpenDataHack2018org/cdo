@@ -403,7 +403,7 @@ void *Vertint(void *argument)
       if ( cdoVerbose )
 	cdoPrint("Mode = %d  Center = %d  Code = %d  Param = %s", mode, instNum, code, paramstr);
 
-      if ( code <= 0 )
+      if ( code <= 0 || code == 255 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
 	  strtolower(varname);
@@ -414,6 +414,8 @@ void *Vertint(void *argument)
 	  if      ( strcmp(stdname, "surface_air_pressure") == 0 ) code = 134;
 	  else if ( strcmp(stdname, "air_temperature")      == 0 ) code = 130;
 	  else if ( strcmp(stdname, "surface_geopotential") == 0 ) code = 129;
+	  else if ( strcmp(stdname, "geopotential")         == 0 ) code = 129;
+	  else if ( strcmp(stdname, "geopotential_height")  == 0 ) code = 156;
 	  else
 	    {
 	      /*                        ECHAM                            ECMWF       */
@@ -469,6 +471,15 @@ void *Vertint(void *argument)
 	  vardata2[varID]  = vardata1[varID];
 	  varnmiss[varID]  = (int *) malloc(nlevel*sizeof(int));
 	}
+    }
+
+  if ( cdoVerbose )
+    {
+      cdoPrint("Found:");
+      if ( tempID != -1 ) cdoPrint("  air temperature");
+      if ( psID   != -1 ) cdoPrint("  surface pressure");
+      if ( geopID != -1 ) cdoPrint("  surface geopotential");
+      if ( gheightID != -1 ) cdoPrint("  geopotential height");
     }
 
   if ( tempID != -1 || gheightID != -1 ) geop_needed = TRUE;
