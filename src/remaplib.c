@@ -2058,24 +2058,24 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
     int src_add[4]    ! addresses on source grid
     double weights[4] ! array of remapping weights for these links
   */
-  long n;             /* dummy index */
-  long num_links_old; /* placeholder for old link number */
+  long n;
+  long nlink;
 
   /*
      Increment number of links and check to see if remap arrays need
      to be increased to accomodate the new link. Then store the link.
   */
-  num_links_old = rv->num_links;
-  rv->num_links = num_links_old + 4;
+  nlink = rv->num_links;
+  rv->num_links += 4;
 
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
   for ( n = 0; n < 4; ++n )
     {
-      rv->grid1_add[num_links_old+n] = src_add[n];
-      rv->grid2_add[num_links_old+n] = dst_add;
-      rv->wts      [num_links_old+n] = weights[n];
+      rv->grid1_add[nlink+n] = src_add[n];
+      rv->grid2_add[nlink+n] = dst_add;
+      rv->wts      [nlink+n] = weights[n];
     }
 
 } /* store_link_bilin */
@@ -2318,9 +2318,8 @@ void remap_bilin(remapgrid_t *rg, remapvars_t *rv)
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 /*
-  This routine stores the address and weight for four links 
-  associated with one destination point in the appropriate address 
-  and weight arrays and resizes those arrays if necessary.
+  This routine stores the address and weight for four links associated with one destination 
+  point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
 static
 void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add, double weights[4][4])
@@ -2331,25 +2330,25 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
     int src_add[4]       ! addresses on source grid
     double weights[4][4] ! array of remapping weights for these links
   */
-  long n, k;          /* dummy index */
-  long num_links_old; /* placeholder for old link number */
+  long n, k;
+  long nlink;
 
   /*
      Increment number of links and check to see if remap arrays need
      to be increased to accomodate the new link. Then store the link.
   */
-  num_links_old = rv->num_links;
-  rv->num_links = num_links_old + 4;
+  nlink = rv->num_links;
+  rv->num_links += 4;
 
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
   for ( n = 0; n < 4; ++n )
     {
-      rv->grid1_add[num_links_old+n] = src_add[n];
-      rv->grid2_add[num_links_old+n] = dst_add;
+      rv->grid1_add[nlink+n] = src_add[n];
+      rv->grid2_add[nlink+n] = dst_add;
       for ( k = 0; k < 4; ++k )
-	rv->wts[4*(num_links_old+n)+k] = weights[k][n];
+	rv->wts[4*(nlink+n)+k] = weights[k][n];
     }
 
 } /* store_link_bicub */
@@ -2677,9 +2676,8 @@ void grid_search_nbr(remapgrid_t *rg, int *restrict nbr_add, double *restrict nb
 }  /*  grid_search_nbr  */
 
 /*
-  This routine stores the address and weight for this link in
-  the appropriate address and weight arrays and resizes those
-  arrays if necessary.
+  This routine stores the address and weight for this link in the appropriate 
+  address and weight arrays and resizes those arrays if necessary.
 */
 static
 void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
@@ -2694,18 +2692,17 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 
   /*
      Increment number of links and check to see if remap arrays need
-     to be increased to accomodate the new link.  Then store the link.
+     to be increased to accomodate the new link. Then store the link.
   */
   nlink = rv->num_links;
-
   rv->num_links++;
+
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
   rv->grid1_add[nlink] = add1;
   rv->grid2_add[nlink] = add2;
-
-  rv->wts[nlink] = weights;
+  rv->wts[nlink]       = weights;
 
 } /* store_link_nbr */
 
