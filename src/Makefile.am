@@ -269,6 +269,7 @@ cdo_SOURCES += Adisit.c        \
                remap.h         \
                remaplib.c      \
                remapsort.c     \
+               remap_scrip_io.c \
                specspace.c     \
                specspace.h     \
                statistic.c     \
