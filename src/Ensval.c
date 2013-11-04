@@ -50,7 +50,7 @@ void *Ensval(void *argument)
   int gridsize = 0;
   int gridID = -1, gridID2;
   int have_miss = 0;
-  int stream, streamID1, streamID = 0, *streamID2;
+  int stream, streamID1 = -1, streamID = 0, *streamID2;
   int vlistID, vlistID1, *vlistID2;
   int taxisID1, *taxisID2;
   int zaxisID1, *zaxisID2;
