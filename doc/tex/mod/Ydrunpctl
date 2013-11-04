@@ -8,26 +8,23 @@
 @Operators = ydrunpctl
 
 @BeginDescription
-This operator writes running percentile values for each day of year 
-in @file{ifile1} to @file{ofile}. A certain percentile is computed for all
-timesteps in running windows of which the medium timestep corresponds
-to a certain day of year. 
-The algorithm uses histograms with minimum and maximum bounds given in
-@file{ifile2} and @file{ifile3}, respectively. The default number of
-histogram bins is 101. The default can be overridden by setting the
-environment variable @env{CDO_PCTL_NBINS} to a different value. The files
-@file{ifile2} and @file{ifile3} should be the result of corresponding
-@mod{ydrunmin} and @mod{ydrunmax} operations, respectively.
-The date information in an output field is the date of the medium time
-step in the last contributing running window.
-Note that the operator have to be applied to a continuous time series of daily
-measurements in order to yield physically meaningful results. Also note that
-the output time series begins (nts-1)/2 timesteps after the first timestep 
-of the input time series and ends (nts-1)/2 timesteps before the last.
-For input data which are complete but not continuous, such as time series of
-daily measurements for the same month or season within different years, the
-operator only yields physically meaningful results if the input time series
-does include the (nts-1)/2 days before and after each period of interest.
+This operator writes running percentile values for each day of year in @file{ifile1} to @file{ofile}. 
+A certain percentile is computed for all timesteps in running windows of which the medium 
+timestep corresponds to a certain day of year. 
+The algorithm uses histograms with minimum and maximum bounds given in @file{ifile2} and @file{ifile3},
+respectively. The default number of histogram bins is 101. The default can be overridden
+by setting the environment variable @env{CDO_PCTL_NBINS} to a different value. The files @file{ifile2} 
+and @file{ifile3} should be the result of corresponding @mod{ydrunmin} and @mod{ydrunmax} operations, respectively.
+The date information in an output field is the date of the medium time step in the last 
+contributing running window.
+Note that the operator have to be applied to a continuous time series of daily measurements 
+in order to yield physically meaningful results. Also note that the output time series begins
+(nts-1)/2 timesteps after the first timestep of the input time series and ends (nts-1)/2 
+timesteps before the last.
+For input data which are complete but not continuous, such as time series of daily measurements 
+for the same month or season within different years, the operator only yields physically meaningful 
+results if the input time series does include the (nts-1)/2 days before and after each period 
+of interest.
 @EndModule
 
 
