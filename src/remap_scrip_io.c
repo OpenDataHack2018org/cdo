@@ -79,18 +79,19 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
 
   int nc_dims2_id[2];       /* netCDF ids for 2d array dims             */
 
-  char map_name[] = "SCRIP remapping with CDO";
+  char *map_name = "SCRIP remapping with CDO";
   char normalize_opt[64] = "unknown";
   char map_method[64] = "unknown";
   char tmp_string[64] = "unknown";
   char history[1024] = "date and time";
   char grid1_name[64] = "source grid";
   char grid2_name[64] = "dest grid";
-  char grid1_units[] = "radians";
-  char grid2_units[] = "radians";
+  char *grid1_units = "radians";
+  char *grid2_units = "radians";
   time_t date_and_time_in_sec;
   struct tm *date_and_time;
   long i;
+  int lgridarea = FALSE;
   int writemode = NC_CLOBBER;
 
   switch ( rv.norm_opt )
@@ -109,6 +110,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
   switch ( map_type )
     {
     case MAP_TYPE_CONSERV:
+      lgridarea = TRUE;
       if ( submap_type == SUBMAP_TYPE_LAF )
 	{
 	  strcpy(map_method, "Largest area fraction");
@@ -122,14 +124,14 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
     case MAP_TYPE_BILINEAR:
       strcpy(map_method, "Bilinear remapping");
       break;
+    case MAP_TYPE_BICUBIC:
+      strcpy(map_method, "Bicubic remapping");
+      break;
     case MAP_TYPE_DISTWGT:
       strcpy(map_method, "Distance weighted avg of nearest neighbors");
       break;
     case MAP_TYPE_DISTWGT1:
       strcpy(map_method, "Nearest neighbor");
-      break;
-    case MAP_TYPE_BICUBIC:
-      strcpy(map_method, "Bicubic remapping");
       break;
     }
 
@@ -252,19 +254,19 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
     }
 
   /* Define units for all coordinate arrays */
-  nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlat_id, "units", 7, grid1_units));
-  nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlat_id, "units", 7, grid2_units));
-  nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlon_id, "units", 7, grid1_units));
-  nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlon_id, "units", 7, grid2_units));
+  nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlat_id, "units", strlen(grid1_units), grid1_units));
+  nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlat_id, "units", strlen(grid2_units), grid2_units));
+  nce(nc_put_att_text(nc_file_id, nc_srcgrdcntrlon_id, "units", strlen(grid1_units), grid1_units));
+  nce(nc_put_att_text(nc_file_id, nc_dstgrdcntrlon_id, "units", strlen(grid2_units), grid2_units));
   if ( rg.lneed_grid1_corners )
     {
-      nce(nc_put_att_text(nc_file_id, nc_srcgrdcrnrlat_id, "units", 7, grid1_units));
-      nce(nc_put_att_text(nc_file_id, nc_srcgrdcrnrlon_id, "units", 7, grid1_units));
+      nce(nc_put_att_text(nc_file_id, nc_srcgrdcrnrlat_id, "units", strlen(grid1_units), grid1_units));
+      nce(nc_put_att_text(nc_file_id, nc_srcgrdcrnrlon_id, "units", strlen(grid1_units), grid1_units));
     }
   if ( rg.lneed_grid2_corners )
     {
-      nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlat_id, "units", 7, grid2_units));
-      nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlon_id, "units", 7, grid2_units));
+      nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlat_id, "units", strlen(grid2_units), grid2_units));
+      nce(nc_put_att_text(nc_file_id, nc_dstgrdcrnrlon_id, "units", strlen(grid2_units), grid2_units));
     }
 
   /* Define grid mask */
@@ -277,11 +279,14 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
 
   /* Define grid area arrays */
 
-  nce(nc_def_var(nc_file_id, "src_grid_area", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdarea_id));
-  nce(nc_put_att_text(nc_file_id, nc_srcgrdarea_id, "units", 14, "square radians"));
+  if ( lgridarea )
+    {
+      nce(nc_def_var(nc_file_id, "src_grid_area", NC_DOUBLE, 1, &nc_srcgrdsize_id, &nc_srcgrdarea_id));
+      nce(nc_put_att_text(nc_file_id, nc_srcgrdarea_id, "units", 14, "square radians"));
 
-  nce(nc_def_var(nc_file_id, "dst_grid_area", NC_DOUBLE, 1, &nc_dstgrdsize_id, &nc_dstgrdarea_id));   
-  nce(nc_put_att_text(nc_file_id, nc_dstgrdarea_id, "units", 14, "square radians"));
+      nce(nc_def_var(nc_file_id, "dst_grid_area", NC_DOUBLE, 1, &nc_dstgrdsize_id, &nc_dstgrdarea_id));   
+      nce(nc_put_att_text(nc_file_id, nc_dstgrdarea_id, "units", 14, "square radians"));
+    }
 
   /* Define grid fraction arrays */
 
@@ -336,7 +341,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
     nce(nc_put_var_double(nc_file_id, nc_srcgrdarea_id, rg.grid1_area_in));
   else
   */
-  if ( map_type == MAP_TYPE_CONSERV )
+  if ( lgridarea )
     nce(nc_put_var_double(nc_file_id, nc_srcgrdarea_id, rg.grid1_area));
 
   nce(nc_put_var_double(nc_file_id, nc_srcgrdfrac_id, rg.grid1_frac));
@@ -346,7 +351,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
     nce(nc_put_var_double(nc_file_id, nc_dstgrdarea_id, rg.grid2_area_in));
   else
   */
-  if ( map_type == MAP_TYPE_CONSERV )
+  if ( lgridarea )
     nce(nc_put_var_double(nc_file_id, nc_dstgrdarea_id, rg.grid2_area));
 
   nce(nc_put_var_double(nc_file_id, nc_dstgrdfrac_id, rg.grid2_frac));
@@ -387,6 +392,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   /* Local variables */
 
+  int lgridarea = FALSE;
   int status;
   int nc_file_id;           /* id for netCDF file                       */
   int nc_srcgrdsize_id;     /* id for source grid size                  */
@@ -487,10 +493,10 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       if ( status == NC_NOERR ) *remap_order = iatt;
     }
   else if ( memcmp(map_method, "Bilinear", 8) == 0 ) rv->map_type = MAP_TYPE_BILINEAR;
+  else if ( memcmp(map_method, "Bicubic",  7) == 0 ) rv->map_type = MAP_TYPE_BICUBIC;
   else if ( memcmp(map_method, "Distance", 8) == 0 ) rv->map_type = MAP_TYPE_DISTWGT;
-  else if ( memcmp(map_method, "Nearest", 7) == 0 )  rv->map_type = MAP_TYPE_DISTWGT1;
-  else if ( memcmp(map_method, "Bicubic", 7) == 0 )  rv->map_type = MAP_TYPE_BICUBIC;
-  else if ( memcmp(map_method, "Largest", 7) == 0 )
+  else if ( memcmp(map_method, "Nearest",  7) == 0 ) rv->map_type = MAP_TYPE_DISTWGT1;
+  else if ( memcmp(map_method, "Largest",  7) == 0 )
     {
       rv->map_type = MAP_TYPE_CONSERV;
       *submap_type = SUBMAP_TYPE_LAF;
@@ -503,6 +509,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   if ( cdoVerbose )
     cdoPrint("map_type = %s", map_method);
+
+  if ( rv->map_type == MAP_TYPE_CONSERV ) lgridarea = TRUE;
 
   *map_type = rv->map_type;
 
@@ -634,8 +642,12 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_varid(nc_file_id, "src_grid_corner_lat", &nc_srcgrdcrnrlat_id));
       nce(nc_inq_varid(nc_file_id, "src_grid_corner_lon", &nc_srcgrdcrnrlon_id));
     }
-  nce(nc_inq_varid(nc_file_id, "src_grid_area", &nc_srcgrdarea_id));
+  if ( lgridarea )
+    {
+      nce(nc_inq_varid(nc_file_id, "src_grid_area", &nc_srcgrdarea_id));
+    }
   nce(nc_inq_varid(nc_file_id, "src_grid_frac", &nc_srcgrdfrac_id));
+
   nce(nc_inq_varid(nc_file_id, "dst_grid_dims", &nc_dstgrddims_id));
   nce(nc_inq_varid(nc_file_id, "dst_grid_imask", &nc_dstgrdimask_id));
   nce(nc_inq_varid(nc_file_id, "dst_grid_center_lat", &nc_dstgrdcntrlat_id));
@@ -645,8 +657,12 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       nce(nc_inq_varid(nc_file_id, "dst_grid_corner_lat", &nc_dstgrdcrnrlat_id));
       nce(nc_inq_varid(nc_file_id, "dst_grid_corner_lon", &nc_dstgrdcrnrlon_id));
     }
-  nce(nc_inq_varid(nc_file_id, "dst_grid_area", &nc_dstgrdarea_id));
-  nce(nc_inq_varid(nc_file_id, "dst_grid_frac", &nc_dstgrdfrac_id));    
+  if ( lgridarea )
+    {
+      nce(nc_inq_varid(nc_file_id, "dst_grid_area", &nc_dstgrdarea_id));
+    }
+  nce(nc_inq_varid(nc_file_id, "dst_grid_frac", &nc_dstgrdfrac_id));
+
   nce(nc_inq_varid(nc_file_id, "src_address", &nc_srcadd_id));
   nce(nc_inq_varid(nc_file_id, "dst_address", &nc_dstadd_id));
   nce(nc_inq_varid(nc_file_id, "remap_matrix", &nc_rmpmatrix_id));
@@ -680,7 +696,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       grid_to_radian(grid1_units, rg->grid1_corners*rg->grid1_size, rg->grid1_corner_lat, "grid1 corner lat"); 
     }
 
-  if ( rv->map_type == MAP_TYPE_CONSERV )
+  if ( lgridarea )
     nce(nc_get_var_double(nc_file_id, nc_srcgrdarea_id, rg->grid1_area));
 
   nce(nc_get_var_double(nc_file_id, nc_srcgrdfrac_id, rg->grid1_frac));
@@ -712,7 +728,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       grid_to_radian(grid2_units, rg->grid2_corners*rg->grid2_size, rg->grid2_corner_lat, "grid2 corner lat"); 
     }
 
-  if ( rv->map_type == MAP_TYPE_CONSERV )
+  if ( lgridarea )
     nce(nc_get_var_double(nc_file_id, nc_dstgrdarea_id, rg->grid2_area));
 
   nce(nc_get_var_double(nc_file_id, nc_dstgrdfrac_id, rg->grid2_frac));
