@@ -994,7 +994,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	  if ( gridInqNumber(gridID1) > 0 )
 	    {
 	      rg->gridID1 = gridID1 = referenceToGrid(gridID1);
-	      if ( gridID1 == -1 ) cdoAbort("grid1 reference not found!");
+	      if ( gridID1 == -1 ) cdoAbort("Reference to source grid not found!");
 	    }
 	}
     }
@@ -1006,7 +1006,7 @@ void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, rem
 	  if ( gridInqNumber(gridID2) > 0 )
 	    {
 	      rg->gridID2 = gridID2 = referenceToGrid(gridID2);
-	      if ( gridID2 == -1 ) cdoAbort("grid2 reference not found!");
+	      if ( gridID2 == -1 ) cdoAbort("Reference to target grid not found!");
 	    }
 	}
     }
