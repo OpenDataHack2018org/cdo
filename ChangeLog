@@ -837,7 +837,7 @@ w.de>
 2010-09-27  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Fldstat2: replaced macros FDIV and FSQRT by function calls DIV and SQRT
-	
+
 2010-09-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* New module: Ydayarith (ydayadd, ydaysub, ydaymul, ydaydiv)
@@ -852,12 +852,12 @@ w.de>
 	* using libtool for linking (rpath)
 	* include libcdi as subproject
 	* eca_gsl: adjust implementation to fit definition by ECA [report: Stefan Fronzek]
-	* eca_gsl: make useable in pipes (bug fix) [report: Stefan Fronzek]
+	* eca_gsl: make usable in pipes (bug fix) [report: Stefan Fronzek]
 
 2010-08-26  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sellevel: copy zaxis meta data name and units (bug fix) [report: Don Murray]
-	
+
 2010-08-20  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
         * pstreamDefTimestep: removed call to streamSync (very slow on GPFS)
@@ -865,19 +865,19 @@ w.de>
 2010-08-05  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* changed percentile parameter type from integer to float [request: Nikolaus Groll]
-	
+
 2010-08-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* changed predefined gaussian grid names from t<RES>grid to n<N>
-	
+
 2010-08-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added grid mask support
-	
+
 2010-07-30  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* sellonlatbox: fix rounding error of the last lon index [report: Flore Mounier]
-	
+
 2010-07-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Module Expr: added missing value support [request: Marco van Hulten]
@@ -941,7 +941,7 @@ w.de>
 2010-04-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added support for time units 3hours and 6hours [request: Jaison-Thomas Ambadan]
-	
+
 2010-04-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Remap: bypass variables with gridtype generic and only one gridpoint
@@ -954,7 +954,7 @@ w.de>
 2010-04-01  Martin Claus  <mclaus@ifm-geomar.de>
 
 	* vertwind: added missing value support
-	
+
 2010-03-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* standard deviation (bug fix): change the result from missval to zero, if variance is zero [report: Jaison-Thomas Ambadan]
@@ -976,7 +976,7 @@ w.de>
 
 	* pstreamWriteRecord: check pstreamptr->varlist (bug fix) [report: Kevin Sieck]
 	* added operator fldcor to correlate two fields
-	
+
 2010-03-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added predefined grid t<RES>zon
@@ -1009,15 +1009,15 @@ w.de>
 	* using CDI library version 1.4.2
 	* Added new module Gridboxstat (testversion)
 	* Version 1.4.2 released
-	
+
 2010-02-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* netCDF+packed data: check that all values are inside the valid range
-	
+
 2010-02-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remove netCDF offset/scalefactor if option -b 32 is set
-	
+
 2010-01-28  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Ensstat: don't overwrite existing files
@@ -1034,11 +1034,11 @@ w.de>
 2010-01-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* replace: added support for time constant fields [request: Wei Wei]
-	
+
 2010-01-10  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Genweights: use netCDF2 (64bit) for large remap weights files [request: Daniel Goll]
-	
+
 2010-01-01  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* added module Fourier
@@ -1111,7 +1111,7 @@ w.de>
 	* IEG format: bug fix for identification of lonlat grids
 	* GRIB format: bug fix for decoding of missing values (scalar version only)
 	* Version 1.4.0.1 released
-	
+
 2009-10-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* cdotest:eca_gsl: bug fix [report: Harald Anlauf]
@@ -1206,7 +1206,7 @@ w.de>
 	* Settime: added "seconds" support to "settunits", "settaxis" and "shifttime"
 
 2009-01-15  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
-	
+
 	* using CDI library version 1.3.0
 	* New operator: remapcon2 - Second order conservative remapping
 	* New operator: remaplaf - Largest area fraction remapping
@@ -1235,7 +1235,7 @@ w.de>
 	* Version 1.3.0 released
 
 2008-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
-	
+
 	* using CDI library version 1.2.1
 	* New operator: import_cmsaf - import CM-SAF files
 	* New operator: gengrid - generate grid [request: Michael Boettinger]
@@ -1285,7 +1285,7 @@ w.de>
 	* ntime: bug fix for datasets with time constant parameter only [report: David Wang]
 	  (also affected: ndate, nmon, nyear, showdate, showtime, showmon, showyear)
 	* Version 1.2.0 released
-	
+
 2008-04-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.1.1
@@ -1332,7 +1332,7 @@ w.de>
 	* gradsdes: bug fix for monthly mean data with start day > 28 [report: Renate Brokopf]
 	* expr: change exponent precedence from left to right (bug fix)[report: Claas Teichmann]
 	* Version 1.0.9.1 released
-	
+
 2007-10-22  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.8
@@ -1397,13 +1397,13 @@ w.de>
 2007-05-30  Ralf Quast  <ralf.quast@brockmann-consult.de>
 
 	* New operator: timcount, hourcount, daycount, moncount, yearcount, seascount
-	* Renamed eca_fdns, eca_strwin, eca_strbre, eca_strgal, eca_hurr   
+	* Renamed eca_fdns, eca_strwin, eca_strbre, eca_strgal, eca_hurr
 	       to fdns, strwin, strbre, strgal, hurr
-	
+
 2007-04-18  Cedrick Ansorge  <Cedrick.Ansorge@zmaw.de>
 
 	* New operator: maskregion
-	
+
 2007-03-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.6
@@ -1458,14 +1458,14 @@ w.de>
 	* New module: Tchill (tchill)
 	* New module: Hi (hi)
 	* New module: ECA Indices of Daily Temperature and Precipitation Extremes
-	              (eca_cfd, eca_csu, eca_cwdi, eca_cwfi, eca_etr, eca_fd, 
-	               eca_gsl, eca_hd, eca_hwdi, eca_hwfi, eca_id, eca_su,       
-                       eca_tg10p, eca_tg90p, eca_tn10p, eca_tn90p,    
-                       eca_tr, eca_tx10p, eca_tx90p,    
-                       eca_cdd, eca_cwd, eca_r10mm, eca_r20mm,    
-                       eca_r75p, eca_r75ptot, eca_r90p, eca_r90ptot,  
-                       eca_r95p, eca_r95ptot, eca_r99p, eca_r99ptot,  
-                       eca_rr1, eca_sdii, eca_fdns, eca_strwind)  
+	              (eca_cfd, eca_csu, eca_cwdi, eca_cwfi, eca_etr, eca_fd,
+	               eca_gsl, eca_hd, eca_hwdi, eca_hwfi, eca_id, eca_su,
+                       eca_tg10p, eca_tg90p, eca_tn10p, eca_tn90p,
+                       eca_tr, eca_tx10p, eca_tx90p,
+                       eca_cdd, eca_cwd, eca_r10mm, eca_r20mm,
+                       eca_r75p, eca_r75ptot, eca_r90p, eca_r90ptot,
+                       eca_r95p, eca_r95ptot, eca_r99p, eca_r99ptot,
+                       eca_rr1, eca_sdii, eca_fdns, eca_strwind)
 
 2006-11-06  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
@@ -1487,8 +1487,8 @@ w.de>
 	* New operator: enspctl (Ensstat)
 	* New operator: fldpctl (Fldstat)
 	* New operator: zonpctl (Zonstat)
-	* New operator: merpctl (Merstat)	
-	
+	* New operator: merpctl (Merstat)
+
 2006-11-02  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.0.3
