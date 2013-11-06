@@ -61,6 +61,10 @@ The following options are available for all operators:
          \> Available grid names are: {\tt r<NX>x<NY>}, {\tt lon=<LON>/lat=<LAT>}, {\tt n<N>}, {\tt gme<NI>} \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -h}
          \> Help information for the operators. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -k}
+         \> NetCDF4 chunk type: auto, grid or lines. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -L}
+         \> Lock I/O (sequential access). \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -M}
          \> Switch to indicate that the I/O streams have missing values. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -m $<$missval$>$}
@@ -69,13 +73,16 @@ The following options are available for all operators:
          \> Overwrite existing output file, if checked. \\
          \> Existing output file is checked only for: {\tt ens<STAT>}, {\tt merge}, {\tt mergetime} \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -P $<$nthreads$>$}
-         \> Set number of OpenMP threads. \\
+         \> Set number of OpenMP threads (Only available if OpenMP support was compiled in). \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -Q}
          \> Alphanumeric sorting of netCDF parameter names. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -R}
          \> Convert GRIB1 data from reduced to regular grid (only with cgribex lib). \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -r}
          \> Generate a relative time axis. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -S}
+         \> Create an extra output stream for the module TIMSTAT. This stream contains  \\
+         \> the number of non missing values for each output period. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -s}
          \> Silent mode. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -t $<$partab$>$}
@@ -85,6 +92,8 @@ The following options are available for all operators:
          \> Print the version number. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -v}
          \> Print extra details for some operators. \\
+\makebox[1.5in][l]{\hspace*{1cm}\sl -W}
+         \> Print extra warning messages. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl -z szip}
          \> SZIP compression of GRIB1 records. \\
 \makebox[1.5in][l]{\hspace*{1cm}\sl \ \ jpeg}
