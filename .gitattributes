@@ -601,6 +601,16 @@ test/data/gp2sp_ref -text
 test/data/gp2spl_ref -text
 test/data/hl_l19.grb -text
 test/data/ml2pl_ref -text
+test/data/n16_bic_ref -text
+test/data/n16_bil_ref -text
+test/data/n16_con_ref -text
+test/data/n16_laf_ref -text
+test/data/n16_nn_ref -text
+test/data/n32_bic_ref -text
+test/data/n32_bil_ref -text
+test/data/n32_con_ref -text
+test/data/n32_laf_ref -text
+test/data/n32_nn_ref -text
 test/data/sp2gp_ref -text
 test/data/sp2gpl_ref -text
 test/data/t21_geosp_tsurf.grb -text
@@ -618,6 +628,7 @@ test/testStreams.py -text
 test/test_Arith.py -text
 test/test_Arithc.py -text
 test/test_Gridarea.sh -text
+test/test_Remap.sh -text
 test/test_Selvar.py -text
 test/test_Spectral.sh -text
 test/test_Timstat.sh -text

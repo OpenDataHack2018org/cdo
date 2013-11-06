@@ -4,6 +4,8 @@ CDO=cdo
 #
 FORMAT="-f srv -b 32"
 #
+########################################################################
+#
 # Timstat
 #
 IFILE=EH5_AMIP_1_TSURF_6H_1991-1995.grb
@@ -23,6 +25,7 @@ IFILE=$OFILE
 for STAT in $STATS; do
   $CDO $FORMAT tim$STAT $IFILE tim${STAT}_ref
 done
+########################################################################
 #
 # Vertint
 #
@@ -32,6 +35,7 @@ $CDO fldmean -sp2gp -selcode,129,130,152 $IFILE $OFILE
 IFILE=$OFILE
 OFILE=ml2pl_ref
 $CDO $FORMAT ml2pl,92500,85000,50000,20000 $IFILE $OFILE
+########################################################################
 #
 # Spectral
 #
@@ -50,3 +54,19 @@ $CDO sp2gp $IFILE $OFILE
 IFILE=gp2spl_ref
 OFILE=sp2gpl_ref
 $CDO sp2gpl $IFILE $OFILE
+########################################################################
+#
+# Remap
+#
+cdo -f grb setrtomiss,0,10000  -gridboxmean,8,8 -topo bathy4.grb
+#
+GRIDS="n16 n32"
+RMODS="bil bic nn con laf"
+IFILE=bathy4.grb
+for GRID in $GRIDS; do
+  for RMOD in $RMODS; do
+    OFILE=${GRID}_${RMOD}
+    $CDO $FORMAT remap${RMOD},$GRID $IFILE ${OFILE}_ref
+  done
+done
+########################################################################
