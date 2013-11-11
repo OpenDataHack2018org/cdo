@@ -2,7 +2,7 @@
 #
 CDODEBUG=0
 #
-if [ "$CDODEBUG" == 0 ]; then CDO="$CDO -s"; fi
+if [ "$CDODEBUG" = 0 ]; then CDO="$CDO -s"; fi
 CDOOUT=cout
 CDOERR=cerr
 REFVAL="12.5663706"
@@ -20,7 +20,7 @@ done
 rm -f $CDOOUT $CDOERR
 unset PLANET_RADIUS
 #
-if [ "$CDODEBUG" == 1 ]; then
+if [ "$CDODEBUG" = 1 ]; then
   echo "rstat: $RSTAT"
 fi
 #
