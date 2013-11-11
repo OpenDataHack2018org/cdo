@@ -16,6 +16,7 @@ IFILE=$DATAPATH/bathy4.grb
 #
 for GRIDTYPE in " " "-setgridtype,curvilinear" "-setgridtype,unstructured"; do
   for GRID in $GRIDS; do
+# remaplaf: sort could give different results"
     RMODS="bil bic nn con"
     if [ "$GRIDTYPE" == "-setgridtype,unstructured" ]; then RMODS="nn con laf"; fi
     for RMOD in $RMODS; do
