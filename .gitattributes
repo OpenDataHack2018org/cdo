@@ -597,6 +597,7 @@ test/Makefile.in -text
 test/README -text
 test/data/Makefile.am -text
 test/data/Makefile.in -text
+test/data/bathy4.grb -text
 test/data/gen_refdata.sh -text
 test/data/gp2sp_ref -text
 test/data/gp2spl_ref -text
