@@ -44,7 +44,7 @@ void *Yearmonstat(void *argument)
   double dsets;
   int i;
   int dpm;
-  int year0, month0;
+  int year0 = 0, month0 = 0;
   int year, month, day;
   int calendar;
   int streamID1, streamID2;

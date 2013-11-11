@@ -35,7 +35,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
   int ilon, ilat, i;
   double x, a, b;
   double step;
-  double level[9];
+  double level[10];
   int min_n, max_n;
   char c;
 
