@@ -18,7 +18,7 @@ for GRIDTYPE in " " "-setgridtype,curvilinear" "-setgridtype,unstructured"; do
   for GRID in $GRIDS; do
 # remaplaf: sort could give different results"
     RMODS="bil bic nn con"
-    if [ "$GRIDTYPE" == "-setgridtype,unstructured" ]; then RMODS="nn con laf"; fi
+    if [ "$GRIDTYPE" == "-setgridtype,unstructured" ]; then RMODS="nn con"; fi
     for RMOD in $RMODS; do
       OFILE=${GRID}_${RMOD}
       RFILE=$DATAPATH/${OFILE}_ref
