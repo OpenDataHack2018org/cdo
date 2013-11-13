@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.6.3 (18 February 2014):
+   New features:
+   Fixed bugs:
+     * delete: parameter level does not work [Bug #4216]
+
 Version 1.6.2 (12 November 2013):
 
    New features:

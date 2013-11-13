@@ -1,3 +1,7 @@
+2013-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* delete: parameter level does not work [Bug #4216]
+
 2013-11-12  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.6.2

@@ -463,7 +463,7 @@ void *Select(void *argument)
   int operatorID;
   int streamID1, streamID2 = CDI_UNDEFID;
   int tsID1, tsID2, nrecs;
-  int nvars, nlevs;
+  int nvars, nvars2, nlevs;
   int zaxisID, levID;
   int varID2, levelID2;
   int recID, varID, levelID;
@@ -589,6 +589,8 @@ void *Select(void *argument)
 
       if ( indf == 0 )
 	{
+	  // vlistID0 = vlistDuplicate(vlistID1);
+
 	  vlistClearFlag(vlistID1);
 	  nvars = vlistNvars(vlistID1);
 	  vars  = (int *) malloc(nvars*sizeof(int));
@@ -744,7 +746,7 @@ void *Select(void *argument)
 		}
 	    }
 
-	  // if ( cdoVerbose ) vlistPrint(vlistID1);
+	  //if ( cdoVerbose ) vlistPrint(vlistID1);
 
 	  vlistID0 = vlistDuplicate(vlistID1);
 	  for ( varID = 0; varID < nvars; varID++ )
@@ -755,16 +757,18 @@ void *Select(void *argument)
 		vlistDefFlag(vlistID0, varID, levID, vlistInqFlag(vlistID1, varID, levID));
 	    }
 
-	  // if ( cdoVerbose ) vlistPrint(vlistID0);
+	  //if ( cdoVerbose ) vlistPrint(vlistID0);
 
 	  vlistID2 = vlistCreate();
-	  vlistCopyFlag(vlistID2, vlistID1);
+	  vlistCopyFlag(vlistID2, vlistID0);
 
-	  // if ( cdoVerbose ) vlistPrint(vlistID2);
-	  nvars = vlistNvars(vlistID2);
-	  for ( varID = 0; varID < nvars; ++varID )
+	  //if ( cdoVerbose ) vlistPrint(vlistID2);
+
+	  nvars2 = vlistNvars(vlistID2);
+
+	  for ( varID = 0; varID < nvars2; ++varID )
 	    if ( vlistInqVarTsteptype(vlistID2, varID) != TSTEP_CONSTANT ) break;
-	  if ( varID == nvars ) vlistDefNtsteps(vlistID2, 0);
+	  if ( varID == nvars2 ) vlistDefNtsteps(vlistID2, 0);
 
 	  taxisID2 = taxisDuplicate(taxisID1);
 	  vlistDefTaxis(vlistID2, taxisID2);
@@ -773,15 +777,15 @@ void *Select(void *argument)
 
 	  if ( ntsteps == 1 )
 	    {
-	      for ( varID = 0; varID < nvars; ++varID )
+	      for ( varID = 0; varID < nvars2; ++varID )
 		if ( vlistInqVarTsteptype(vlistID1, varID) != TSTEP_CONSTANT ) break;
 	      
-	      if ( varID == nvars ) ntsteps = 0;
+	      if ( varID == nvars2 ) ntsteps = 0;
 	    }
 
 	  if ( ntsteps == 0 && nfiles > 1 )
 	    {	      
-	      for ( varID = 0; varID < nvars; ++varID )
+	      for ( varID = 0; varID < nvars2; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
 	    }
 
@@ -797,6 +801,12 @@ void *Select(void *argument)
 	  vlistCompare(vlistID0, vlistID1, CMP_ALL);
 	}
 
+
+      if ( nvars2 == 0 )
+	{
+	  cdoWarning("No resulting variables available!");
+	  goto END_LABEL;
+	}
 
       tsID1 = 0;
       while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )
@@ -883,6 +893,8 @@ void *Select(void *argument)
       
       streamClose(streamID1);
     }
+
+ END_LABEL:
 
   PAR_CHECK_INT_FLAG(timestep_of_year);
   PAR_CHECK_INT_FLAG(timestep);
