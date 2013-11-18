@@ -44,7 +44,7 @@
 
 
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
-      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX};
+      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX, REMAPCONTEST, GENCONTEST};
 
 enum {HEAP_SORT, MERGE_SORT};
 
@@ -53,6 +53,11 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_orde
 {
   switch ( operfunc )
     {
+    case REMAPCONTEST:
+    case GENCONTEST:
+      *map_type = MAP_TYPE_CONTEST;
+      *remap_order = 1;
+      break;
     case REMAPCON:
     case GENCON:
       *map_type = MAP_TYPE_CONSERV;
@@ -119,6 +124,11 @@ int maptype2operfunc(int map_type, int submap_type, int remap_order)
 	      cdoPrint("Using remapcon");
 	    }
 	}
+    }
+  else if ( map_type == MAP_TYPE_CONTEST )
+    {
+      operfunc = REMAPCONTEST;
+      cdoPrint("Using remaptest");
     }
   else if ( map_type == MAP_TYPE_BILINEAR )
     {
@@ -418,22 +428,24 @@ void *Remap(void *argument)
 
   cdoInitialize(argument);
 
-  cdoOperatorAdd("remapcon",    REMAPCON,    0, NULL);
-  cdoOperatorAdd("remapcon2",   REMAPCON2,   0, NULL);
-  cdoOperatorAdd("remapbil",    REMAPBIL,    0, NULL);
-  cdoOperatorAdd("remapbic",    REMAPBIC,    0, NULL);
-  cdoOperatorAdd("remapdis",    REMAPDIS,    0, NULL);
-  cdoOperatorAdd("remapnn",     REMAPNN,     0, NULL);
-  cdoOperatorAdd("remaplaf",    REMAPLAF,    0, NULL);
-  cdoOperatorAdd("remapsum",    REMAPSUM,    0, NULL);
-  cdoOperatorAdd("gencon",      GENCON,      1, NULL);
-  cdoOperatorAdd("gencon2",     GENCON2,     1, NULL);
-  cdoOperatorAdd("genbil",      GENBIL,      1, NULL);
-  cdoOperatorAdd("genbic",      GENBIC,      1, NULL);
-  cdoOperatorAdd("gendis",      GENDIS,      1, NULL);
-  cdoOperatorAdd("gennn",       GENNN,       1, NULL);
-  cdoOperatorAdd("genlaf",      GENLAF,      1, NULL);
-  cdoOperatorAdd("remap",       REMAPXXX,    0, NULL);
+  cdoOperatorAdd("remapcon",     REMAPCON,     0, NULL);
+  cdoOperatorAdd("remapcon2",    REMAPCON2,    0, NULL);
+  cdoOperatorAdd("remapbil",     REMAPBIL,     0, NULL);
+  cdoOperatorAdd("remapbic",     REMAPBIC,     0, NULL);
+  cdoOperatorAdd("remapdis",     REMAPDIS,     0, NULL);
+  cdoOperatorAdd("remapnn",      REMAPNN,      0, NULL);
+  cdoOperatorAdd("remaplaf",     REMAPLAF,     0, NULL);
+  cdoOperatorAdd("remapsum",     REMAPSUM,     0, NULL);
+  cdoOperatorAdd("gencon",       GENCON,       1, NULL);
+  cdoOperatorAdd("gencon2",      GENCON2,      1, NULL);
+  cdoOperatorAdd("genbil",       GENBIL,       1, NULL);
+  cdoOperatorAdd("genbic",       GENBIC,       1, NULL);
+  cdoOperatorAdd("gendis",       GENDIS,       1, NULL);
+  cdoOperatorAdd("gennn",        GENNN,        1, NULL);
+  cdoOperatorAdd("genlaf",       GENLAF,       1, NULL);
+  cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
+  cdoOperatorAdd("remapcontest", REMAPCONTEST, 0, NULL);
+  cdoOperatorAdd("gencontest",   GENCONTEST,   1, NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
@@ -611,7 +623,7 @@ void *Remap(void *argument)
 
   get_map_type(operfunc, &map_type, &submap_type, &remap_order);
 
-  if ( map_type == MAP_TYPE_CONSERV )
+  if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONTEST )
     {
       norm_opt = NORM_OPT_FRACAREA;
 
@@ -697,7 +709,7 @@ void *Remap(void *argument)
 		}
 	    }
 
-	  if ( map_type != MAP_TYPE_CONSERV && 
+	  if ( map_type != MAP_TYPE_CONSERV && map_type != MAP_TYPE_CONTEST && 
 	       gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
 	    cdoAbort("Only conservative remapping is available to remap between GME grids!");
 	  /*
@@ -848,7 +860,7 @@ void *Remap(void *argument)
 
 	      memcpy(remaps[r].src_grid.mask, imask, remaps[r].src_grid.size*sizeof(int));
 
-	      if ( map_type == MAP_TYPE_CONSERV )
+	      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
 		{
 		  memset(remaps[r].src_grid.cell_area, 0, remaps[r].src_grid.size*sizeof(double));
 		  memset(remaps[r].src_grid.cell_frac, 0, remaps[r].src_grid.size*sizeof(double));
@@ -866,6 +878,7 @@ void *Remap(void *argument)
 	      else if ( map_type == MAP_TYPE_BICUBIC  ) remap_bicub(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_DISTWGT  ) remap_distwgt(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_DISTWGT1 ) remap_distwgt1(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_CONTEST  ) remap_contest(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
@@ -923,7 +936,7 @@ void *Remap(void *argument)
 	  gridsize2 = gridInqSize(gridID2);
 
 	  /* used only to check the result of remapcon */
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2|| operfunc == REMAPCONTEST )
 	    {
 	      double grid2_err;
 
@@ -960,25 +973,25 @@ void *Remap(void *argument)
 	    }
 
 	  if ( operfunc == REMAPSUM )
-	  {
-	    double array1sum = 0;
-	    double array2sum = 0;
+	    {
+	      double array1sum = 0;
+	      double array2sum = 0;
    
-	    for ( i = 0; i < gridsize; i++ )
-	      printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].src_grid.cell_frac[i], remaps[r].src_grid.cell_area[i],remaps[r].src_grid.cell_frac[i]);
-	    for ( i = 0; i < gridsize; i++ )
-	      array1sum += remaps[r].src_grid.cell_area[i];
+	      for ( i = 0; i < gridsize; i++ )
+		printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].src_grid.cell_frac[i], remaps[r].src_grid.cell_area[i],remaps[r].src_grid.cell_frac[i]);
+	      for ( i = 0; i < gridsize; i++ )
+		array1sum += remaps[r].src_grid.cell_area[i];
 
-	    for ( i = 0; i < gridsize2; i++ )
-	      printf("2 %d %g %g %g %g\n", i, array2[i], remaps[r].tgt_grid.cell_frac[i],remaps[r].tgt_grid.cell_area[i],remaps[r].tgt_grid.cell_frac[i]);
-	    for ( i = 0; i < gridsize2; i++ )
-	      array2sum += remaps[r].tgt_grid.cell_area[i];
+	      for ( i = 0; i < gridsize2; i++ )
+		printf("2 %d %g %g %g %g\n", i, array2[i], remaps[r].tgt_grid.cell_frac[i],remaps[r].tgt_grid.cell_area[i],remaps[r].tgt_grid.cell_frac[i]);
+	      for ( i = 0; i < gridsize2; i++ )
+		array2sum += remaps[r].tgt_grid.cell_area[i];
 
-	    printf("array1sum %g, array2sum %g\n", array1sum, array2sum);
-	  }
+	      printf("array1sum %g, array2sum %g\n", array1sum, array2sum);
+	    }
 
 	  vlistInqVarName(vlistID1, varID, varname);
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPCONTEST )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
 	      {
 		scale_gridbox_area(gridsize, array1, gridsize2, array2, remaps[r].tgt_grid.cell_area);

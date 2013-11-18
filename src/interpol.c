@@ -357,11 +357,6 @@ void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
 }
 
 #if defined(HAVE_LIBYAC)
-#include "points.h"
-#include "grid_reg2d.h"
-#include "grid_search.h"
-#include "bucket_search.h"
-#include "search.h"
 #include "clipping.h"
 #include "area.h"
 #endif
@@ -437,9 +432,6 @@ void intconarr2(double missval, int lon_is_circular,
   TargetCell.coordinates_y = malloc (nc2 * sizeof(*TargetCell.coordinates_y) );
 
   unsigned const * curr_deps;
-  //struct polygons polygons;
-
-  //polygon_create ( &polygons );
 #endif
 
   /*
@@ -608,7 +600,6 @@ void intconarr2(double missval, int lon_is_circular,
 	    }
 	}
       
-      //polygon_partial_weights(num_deps, SourceCell, TargetCell, weight, &polygons);
       compute_overlap_areas ( nSourceCells, SourceCell, TargetCell, area);
 
       tgt_area = huiliers_area(TargetCell);
@@ -645,7 +636,6 @@ void intconarr2(double missval, int lon_is_circular,
 #if defined(HAVE_LIBYAC)
   free(weight);
   free(area);
-  //polygon_destroy ( &polygons );
 #endif
 
   if ( findex < gridsize2 ) progressStatus(0, 1, 1);

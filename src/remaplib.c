@@ -357,7 +357,7 @@ void remapGridRealloc(int map_type, remapgrid_t *grid, int remap_grid_basis)
   grid->cell_center_lon = (double *) realloc(grid->cell_center_lon, grid->size*sizeof(double));
   grid->cell_center_lat = (double *) realloc(grid->cell_center_lat, grid->size*sizeof(double));
 
-  if ( map_type == MAP_TYPE_CONSERV )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
     {
       grid->cell_area = (double *) realloc(grid->cell_area, grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
@@ -761,7 +761,7 @@ void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
 
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
-      if ( map_type == MAP_TYPE_CONSERV )
+      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
 	{
 	  tgt_grid->bin_addr = (int *) realloc(tgt_grid->bin_addr, 2*nbins*sizeof(int));
 
@@ -996,7 +996,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   else
     src_grid->lextrapolate = FALSE;
 
-  if ( map_type == MAP_TYPE_CONSERV )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
     {
       src_grid->luse_cell_corners  = TRUE;
       src_grid->lneed_cell_corners = TRUE;
@@ -1119,6 +1119,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   /* Determine the number of weights */
 
   if      ( map_type == MAP_TYPE_CONSERV  ) rv->num_wts = 3;
+  else if ( map_type == MAP_TYPE_CONTEST  ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_BILINEAR ) rv->num_wts = 1;
   else if ( map_type == MAP_TYPE_BICUBIC  ) rv->num_wts = 4;
   else if ( map_type == MAP_TYPE_DISTWGT  ) rv->num_wts = 1;
@@ -5291,6 +5292,489 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
 } /* remap_conserv */
+
+/*
+  -----------------------------------------------------------------------
+
+  -----------------------------------------------------------------------
+*/
+#if defined(HAVE_LIBYAC)
+#include "clipping.h"
+#include "area.h"
+#endif
+
+void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+{
+  /* local variables */
+
+  int lcheck = TRUE;
+
+  long ioffset;
+  long grid1_size;
+  long grid2_size;
+  long grid1_corners;
+  long grid2_corners;
+  long src_grid_add;       /* current linear address for grid1 cell   */
+  long tgt_grid_add;       /* current linear address for grid2 cell   */
+  long n, n3, k;        /* generic counters                        */
+  long corner;          /* corner of cell that segment starts from */
+  long nbins, num_links;
+
+
+  double norm_factor = 0;                  /* factor for normalizing wts */
+
+  double weights[6];        /* local wgt array */
+
+  long    max_srch_cells;   /* num cells in restricted search arrays  */
+  long    num_srch_cells;   /* num cells in restricted search arrays  */
+  long    srch_corners;     /* num of corners of srch cells           */
+  long    nsrch_corners;
+  int    *srch_add;         /* global address of cells in srch arrays */
+  /*
+#if defined(_OPENMP)
+  int **srch_add2;
+  int ompthID, i;
+#endif
+  */
+  double *srch_corner_lat;  /* lat of each corner of srch cells */
+  double *srch_corner_lon;  /* lon of each corner of srch cells */
+
+  int *link_add1[2];        /* min,max link add to restrict search */
+  int *link_add2[2];        /* min,max link add to restrict search */
+
+  /* Variables necessary if segment manages to hit pole */
+  grid_store_t *grid_store = NULL;
+  double findex = 0;
+
+  progressInit();
+
+  nbins = src_grid->num_srch_bins;
+
+  if ( remap_store_link_fast )
+    {
+      grid_store = (grid_store_t *) malloc(sizeof(grid_store_t));
+      grid_store_init(grid_store, tgt_grid->size);
+    }
+
+  if ( cdoTimer ) timer_start(timer_remap_con);
+
+  grid1_size = src_grid->size;
+  grid2_size = tgt_grid->size;
+
+  grid1_corners = src_grid->num_cell_corners;
+  grid2_corners = tgt_grid->num_cell_corners;
+
+  if ( ! remap_store_link_fast )
+    {
+      link_add1[0] = (int *) malloc(grid1_size*sizeof(int));
+      link_add1[1] = (int *) malloc(grid1_size*sizeof(int));
+      link_add2[0] = (int *) malloc(grid2_size*sizeof(int));
+      link_add2[1] = (int *) malloc(grid2_size*sizeof(int));
+
+#if defined(SX)
+#pragma vdir nodep
+#endif
+      for ( n = 0; n < grid1_size; ++n )
+	{
+	  link_add1[0][n] = -1;
+	  link_add1[1][n] = -1;
+	}
+
+#if defined(SX)
+#pragma vdir nodep
+#endif
+      for ( n = 0; n < grid2_size; ++n )
+	{
+	  link_add2[0][n] = -1;
+	  link_add2[1][n] = -1;
+	}
+    }
+
+#if defined(HAVE_LIBYAC)
+  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE}; // not used !
+  // enum edge_type quad_type[] = {LON_CIRCLE, LON_CIRCLE, LON_CIRCLE, LON_CIRCLE};
+
+  double weight_sum;
+
+  double *weight;
+  weight = (double *) malloc(grid1_size*sizeof(double));
+
+  double tgt_area;
+  double *area;
+  area = (double *) malloc(grid1_size*sizeof(double));
+
+  struct grid_cell *SourceCell;
+  SourceCell = malloc (grid1_size  * sizeof(*SourceCell) );
+
+  for ( n = 0; n <  grid1_size; n++ ) {
+    SourceCell[n].num_corners   = grid1_corners;
+    SourceCell[n].edge_type     = quad_type;
+    SourceCell[n].coordinates_x = malloc (grid1_corners * sizeof(SourceCell[n].coordinates_x[0]) );
+    SourceCell[n].coordinates_y = malloc (grid1_corners * sizeof(SourceCell[n].coordinates_y[0]) );
+  }
+
+  struct grid_cell  TargetCell;
+
+  TargetCell.num_corners   = grid2_corners;
+  TargetCell.edge_type     = quad_type;
+  TargetCell.coordinates_x = malloc (grid2_corners * sizeof(*TargetCell.coordinates_x) );
+  TargetCell.coordinates_y = malloc (grid2_corners * sizeof(*TargetCell.coordinates_y) );
+
+  unsigned const * curr_deps;
+#endif
+
+  /* Integrate around each cell on grid2 */
+  /*
+#if defined(_OPENMP)
+  srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
+  for ( i = 0; i < ompNumThreads; ++i )
+    srch_add2[i] = (int *) malloc(grid1_size*sizeof(int));
+#else
+  */
+  srch_add = (int *) malloc(grid1_size*sizeof(int));
+  //#endif
+
+  srch_corners    = grid1_corners;
+  max_srch_cells  = 0;
+  srch_corner_lat = NULL;
+  srch_corner_lon = NULL;
+
+  if ( cdoTimer ) timer_start(timer_remap_con_l2);
+
+  findex = 0;
+  /*
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(ompNumThreads, cdoTimer, nbins, \
+         remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, \
+	 grid2_corners, srch_corners, src_grid, tgt_grid, grid2_size, grid1_size, srch_add2, findex) \
+  private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
+	  src_grid_add, tgt_grid_add, ioffset, nsrch_corners, corner, \
+	  srch_corner_lat, srch_corner_lon, \
+	  weights)
+#endif
+  */
+  for ( tgt_grid_add = 0; tgt_grid_add < grid2_size; ++tgt_grid_add )
+    {
+      int lprogress = 1;
+      /*
+#if defined(_OPENMP)
+      ompthID = omp_get_thread_num();
+      srch_add = srch_add2[ompthID];
+      if ( ompthID != 0 ) lprogress = 0;
+#endif
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+  */
+      findex++;
+      if ( lprogress ) progressStatus(0.5, 0.5, findex/grid2_size);
+
+
+      /* Get search cells */
+      num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
+				      tgt_grid->cell_bound_box, src_grid->cell_bound_box , grid1_size, srch_add);
+
+      if ( num_srch_cells == 0 ) continue;
+
+      /* Create search arrays */
+      /*
+#if defined(_OPENMP)
+	  srch_corner_lat = (double *) alloc_srch_corner(srch_corners*num_srch_cells);
+	  srch_corner_lon = (double *) alloc_srch_corner(srch_corners*num_srch_cells);
+#else
+      */
+      if ( num_srch_cells > max_srch_cells )
+	{
+	  max_srch_cells = num_srch_cells;
+	  srch_corner_lon = (double *) realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lat = (double *) realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
+	}
+      //#endif
+
+      /* gather2 */
+      for ( n = 0; n < num_srch_cells; ++n )
+	{
+	  src_grid_add = srch_add[n];
+	  ioffset = src_grid_add*srch_corners;
+
+	  nsrch_corners = n*srch_corners;
+	  for ( k = 0; k < srch_corners; ++k )
+	    {
+	      srch_corner_lon[nsrch_corners+k] = src_grid->cell_corner_lon[ioffset+k];
+	      srch_corner_lat[nsrch_corners+k] = src_grid->cell_corner_lat[ioffset+k];
+	    }
+	}
+
+
+#if defined(HAVE_LIBYAC)
+      int index2 = tgt_grid_add;
+
+      for ( int ic = 0; ic < grid2_corners; ++ic )
+	{
+	  TargetCell.coordinates_x[ic] =  tgt_grid->cell_corner_lon[index2*grid2_corners+ic];
+	  TargetCell.coordinates_y[ic] =  tgt_grid->cell_corner_lat[index2*grid2_corners+ic];
+	}
+
+      if ( cdoVerbose )
+	{
+	  printf("target:\n");
+	  for ( int n = 0; n < grid2_corners; ++n )
+	    printf(" %g %g", TargetCell.coordinates_x[n]/DEG2RAD, TargetCell.coordinates_y[n]/DEG2RAD);
+	  printf("\n");
+	}
+      /*
+      if ( cdoVerbose )
+	printf("num_deps_per_element %d %d\n", i, ndeps);
+      */
+      int nSourceCells = num_srch_cells;
+
+      for ( n = 0; n < num_srch_cells; ++n )
+	{
+	  src_grid_add = srch_add[n];
+
+	  ioffset = src_grid_add*srch_corners;
+
+	  nsrch_corners = n*srch_corners;
+	  for ( k = 0; k < srch_corners; ++k )
+	    {
+	      SourceCell[n].coordinates_x[k] = src_grid->cell_corner_lon[ioffset+k];
+	      SourceCell[n].coordinates_y[k] = src_grid->cell_corner_lat[ioffset+k];
+	    }
+
+	  if ( cdoVerbose )
+	    {
+	      printf("source: %d\n", n);
+	      for ( k = 0; k < srch_corners; ++k )
+		printf(" %g %g", SourceCell[n].coordinates_x[k]/DEG2RAD, SourceCell[n].coordinates_y[k]/DEG2RAD);
+	      printf("\n");
+	    }
+	}
+      
+      compute_overlap_areas ( nSourceCells, SourceCell, TargetCell, area);
+
+      tgt_area = huiliers_area(TargetCell);
+      // tgt_area = cell_area(TargetCell);
+      for (n = 0; n < nSourceCells; ++n)
+	weight[n] = area[n] / tgt_area;
+
+      correct_weights ( nSourceCells, weight );
+#endif
+
+      for (n = 0; n < nSourceCells; ++n)
+	{
+	  src_grid_add = srch_add[n];  //????????????????????????????????????????????????????????
+
+	  printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add,  weight[n], tgt_area);
+	  // src_grid_add = n;
+	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
+	  weights[0] = weight[n];
+		  /*
+		    Store the appropriate addresses and weights. 
+		    Also add contributions to cell areas.
+		    The grid1 mask is the master mask
+		  */
+		  if ( src_grid_add != -1 )
+		    if ( src_grid->mask[src_grid_add] )
+		      {
+/*
+#if defined(_OPENMP)
+#pragma omp critical
+#endif
+*/
+			{
+			  if ( remap_store_link_fast )
+			    store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, weights, grid_store);
+			  else
+			    store_link_cnsrv(rv, src_grid_add, tgt_grid_add, weights, link_add1, link_add2);
+
+			  src_grid->cell_frac[src_grid_add] += weights[0];
+			}
+			tgt_grid->cell_frac[tgt_grid_add] += weights[3];
+		      }
+
+		  tgt_grid->cell_area[tgt_grid_add]     += weights[3];
+	}
+      /*
+#if defined(_OPENMP)
+
+      free_srch_corner(srch_corner_lat);
+      free_srch_corner(srch_corner_lon);
+#endif
+      */
+    }
+
+  if ( cdoTimer ) timer_stop(timer_remap_con_l2);
+
+  /* Finished with all cells: deallocate search arrays */
+
+  //#if ! defined(_OPENMP)
+  if ( srch_corner_lon ) free(srch_corner_lon);
+  if ( srch_corner_lat ) free(srch_corner_lat);
+  //#endif
+  /*
+#if defined(_OPENMP)
+  for ( i = 0; i < ompNumThreads; ++i )
+    free(srch_add2[i]);
+
+  free(srch_add2);
+#else
+  */
+  free(srch_add);
+  //#endif
+
+
+  if ( remap_store_link_fast )
+    {
+      grid_store_delete(grid_store);
+      free(grid_store);
+    }
+
+
+  /* Normalize using destination area if requested */
+
+  num_links = rv->num_links;
+
+  if ( rv->norm_opt == NORM_OPT_DESTAREA )
+    {
+#if defined(SX)
+#pragma vdir nodep
+#endif
+      /*
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(num_links, rv, tgt_grid)		\
+  private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
+#endif
+      */
+      /*
+      for ( n = 0; n < num_links; ++n )
+	{
+	  n3 = n*3;
+	  src_grid_add = rv->src_grid_add[n]; tgt_grid_add = rv->tgt_grid_add[n];
+	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
+
+          if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_grid_add], 0) )
+	    norm_factor = ONE/tgt_grid->cell_area[tgt_grid_add];
+          else
+            norm_factor = ZERO;
+
+	  rv->wts[n3  ] =  weights[0]*norm_factor;
+	}
+      */
+    }
+  else if ( rv->norm_opt == NORM_OPT_FRACAREA )
+    {
+#if defined(SX)
+#pragma vdir nodep
+#endif
+      /*
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(num_links, rv, tgt_grid)		\
+  private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
+#endif
+      */
+      /*
+      for ( n = 0; n < num_links; ++n )
+	{
+	  n3 = n*3;
+	  src_grid_add = rv->src_grid_add[n]; tgt_grid_add = rv->tgt_grid_add[n];
+	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
+
+          if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_grid_add], 0) )
+	    norm_factor = ONE/tgt_grid->cell_frac[tgt_grid_add];
+          else
+            norm_factor = ZERO;
+
+	  rv->wts[n3  ] =  weights[0]*norm_factor;
+	}
+      */
+    }
+  else if ( rv->norm_opt == NORM_OPT_NONE )
+    {
+#if defined(SX)
+#pragma vdir nodep
+#endif
+      /*
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(num_links, rv, tgt_grid)	\
+  private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
+#endif
+      */
+      /*
+      for ( n = 0; n < num_links; ++n )
+	{
+	  n3 = n*3;
+	  src_grid_add = rv->src_grid_add[n]; tgt_grid_add = rv->tgt_grid_add[n];
+	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
+
+          norm_factor = ONE;
+
+	  rv->wts[n3  ] =  weights[0]*norm_factor;
+	}
+      */
+    }
+
+  if ( cdoVerbose )
+    cdoPrint("Total number of links = %ld", rv->num_links);
+
+  for ( n = 0; n < grid1_size; ++n )
+    if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) ) src_grid->cell_frac[n] /= src_grid->cell_area[n];
+
+  for ( n = 0; n < grid2_size; ++n )
+    if ( IS_NOT_EQUAL(tgt_grid->cell_area[n], 0) ) tgt_grid->cell_frac[n] /= tgt_grid->cell_area[n];
+
+  /* Perform some error checking on final weights  */
+
+  if ( lcheck )
+    {
+      for ( n = 0; n < grid1_size; ++n )
+	{
+	  if ( src_grid->cell_area[n] < -.01 )
+	    cdoPrint("Grid 1 area error: %d %g", n, src_grid->cell_area[n]);
+	}
+
+      for ( n = 0; n < grid2_size; ++n )
+	{
+	  if ( tgt_grid->cell_area[n] < -.01 )
+	    cdoPrint("Grid 2 area error: %d %g", n, tgt_grid->cell_area[n]);
+	}
+
+      for ( n = 0; n < num_links; ++n )
+	{
+	  src_grid_add = rv->src_grid_add[n];
+	  tgt_grid_add = rv->tgt_grid_add[n];
+
+	  if ( rv->wts[3*n] < -0.01 )
+	    cdoPrint("Map 1 weight < 0! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+		     src_grid_add, tgt_grid_add, n, rv->wts[3*n]);
+
+	  if ( rv->norm_opt != NORM_OPT_NONE && rv->wts[3*n] > 1.01 )
+	    cdoPrint("Map 1 weight > 1! grid1idx=%d grid2idx=%d nlink=%d wts=%g",
+		     src_grid_add, tgt_grid_add, n, rv->wts[3*n]);
+	}
+
+
+    } // lcheck
+
+  if ( ! remap_store_link_fast )
+    {
+      free(link_add1[0]);
+      free(link_add1[1]);
+      free(link_add2[0]);
+      free(link_add2[1]);
+    }
+
+#if defined(HAVE_LIBYAC)
+  free(weight);
+  free(area);
+#endif
+
+  if ( cdoTimer ) timer_stop(timer_remap_con);
+
+} /* remap_contest */
 
 /*****************************************************************************/
 

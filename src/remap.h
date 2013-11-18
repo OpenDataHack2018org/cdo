@@ -38,6 +38,7 @@ typedef RESTR_TYPE restr_t;
 #define  MAP_TYPE_BICUBIC   3
 #define  MAP_TYPE_DISTWGT   4
 #define  MAP_TYPE_DISTWGT1  5
+#define  MAP_TYPE_CONTEST   6
 
 #define  SUBMAP_TYPE_NONE   0
 #define  SUBMAP_TYPE_LAF    1
@@ -150,6 +151,7 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
 void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_distwgt(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_distwgt1(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
