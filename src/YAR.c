@@ -84,8 +84,8 @@ void yar_store_link_cnsrv(remapvars_t *rv, long add1, long add2, double weight)
   if ( rv->num_links >= rv->max_links )
     resize_remap_vars(rv, rv->resize_increment);
 
-  rv->grid1_add[nlink] = add1;
-  rv->grid2_add[nlink] = add2;
+  rv->src_grid_add[nlink] = add1;
+  rv->tgt_grid_add[nlink] = add2;
 
   rv->wts[nlink] = weight;
 }
@@ -245,14 +245,15 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
     cdoAbort("Source grid has no values");
 
-  remap.grid.restrict_type = 0;
-  remap.grid.num_srch_bins = 0;
-  remap.grid.pinit = FALSE;
+  remap.src_grid.num_srch_bins = 0;
+  remap.src_grid.pinit = FALSE;
+  remap.tgt_grid.num_srch_bins = 0;
+  remap.tgt_grid.pinit = FALSE;
   remap.vars.pinit = FALSE;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  remapGridInit(MAP_TYPE_BILINEAR, 0, gridIDin, gridIDout, &remap.grid);
-  remapVarsInit(MAP_TYPE_BILINEAR, &remap.grid, &remap.vars);
+  remap_grids_init(MAP_TYPE_BILINEAR, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
+  remap_vars_init(MAP_TYPE_BILINEAR, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
   if ( cdoTimer ) timer_stop(timer_yar_remap_init);
 
 
@@ -441,7 +442,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 
   if ( cdoTimer ) timer_start(timer_yar_remap);
   yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
-	    remap.vars.num_wts, remap.vars.grid2_add, remap.vars.grid1_add, array1);
+	    remap.vars.num_wts, remap.vars.tgt_grid_add, remap.vars.src_grid_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
   nmiss = 0;
@@ -489,14 +490,15 @@ void yar_remap_con(field_t *field1, field_t *field2)
   if ( ! (gridInqXvals(gridIDin, NULL) && gridInqYvals(gridIDin, NULL)) )
     cdoAbort("Source grid has no values");
 
-  remap.grid.restrict_type = 0;
-  remap.grid.num_srch_bins = 0;
-  remap.grid.pinit = FALSE;
+  remap.src_grid.num_srch_bins = 0;
+  remap.src_grid.pinit = FALSE;
+  remap.tgt_grid.num_srch_bins = 0;
+  remap.tgt_grid.pinit = FALSE;
   remap.vars.pinit = FALSE;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
-  remapGridInit(MAP_TYPE_CONSERV, 0, gridIDin, gridIDout, &remap.grid);
-  remapVarsInit(MAP_TYPE_CONSERV, &remap.grid, &remap.vars);
+  remap_grids_init(MAP_TYPE_CONSERV, 0, gridIDin, &remap.src_grid, gridIDout, &remap.tgt_grid);
+  remap_vars_init(MAP_TYPE_CONSERV, remap.src_grid.size, remap.tgt_grid.size, &remap.vars);
   if ( cdoTimer ) timer_stop(timer_yar_remap_init);
 
 
@@ -746,7 +748,7 @@ void yar_remap_con(field_t *field1, field_t *field2)
 
   if ( cdoTimer ) timer_start(timer_yar_remap);
   yar_remap(array2, missval, gridInqSize(gridIDout), remap.vars.num_links, remap.vars.wts,
-	    remap.vars.num_wts, remap.vars.grid2_add, remap.vars.grid1_add, array1);
+	    remap.vars.num_wts, remap.vars.tgt_grid_add, remap.vars.src_grid_add, array1);
   if ( cdoTimer ) timer_stop(timer_yar_remap);
 
   nmiss = 0;

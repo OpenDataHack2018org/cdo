@@ -1,3 +1,7 @@
+2013-11-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remaplib: cleanup and preparation for opt. reg2d grids
+
 2013-11-13  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* delete: parameter level does not work [Bug #4216]

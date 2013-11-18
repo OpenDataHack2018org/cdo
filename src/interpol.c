@@ -23,7 +23,6 @@
 * @param nelem  length of the sorted list
 * @param x      the element to find a position for 
 */
-static
 long find_element(double x, long nelem, const double *restrict array)
 {
   long ii;
@@ -107,7 +106,7 @@ long find_element_old(double x, long nelem, const double *array)
 }
 */
 
-static
+
 int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym)
 {
   int lfound = 0;

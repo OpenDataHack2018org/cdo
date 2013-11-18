@@ -149,7 +149,6 @@ int maptype2operfunc(int map_type, int submap_type, int remap_order)
 double remap_threshhold = 2;
 int remap_test = 0;
 int remap_order = 1;
-int remap_restrict_type = RESTRICT_LATITUDE;
 int remap_store_link_fast = TRUE;
 int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
@@ -243,21 +242,6 @@ void get_remap_env(void)
 	}
     }
 
-  envstr = getenv("REMAP_RESTRICT_TYPE");
-  if ( envstr )
-    {
-      if      ( strcmp(envstr, "latitude") == 0 ) remap_restrict_type = RESTRICT_LATITUDE;
-      else if ( strcmp(envstr, "latlon")   == 0 ) remap_restrict_type = RESTRICT_LATLON;
-
-      if ( cdoVerbose )
-	{
-	  if      ( remap_restrict_type == RESTRICT_LATITUDE )
-	    cdoPrint("Set REMAP_RESTRICT_TYPE to latitude");
-	  else if ( remap_restrict_type == RESTRICT_LATLON )
-	    cdoPrint("Set REMAP_RESTRICT_TYPE to latlon");
-	}
-    }
-
   envstr = getenv("REMAP_THRESHHOLD");
   if ( envstr )
     {
@@ -270,6 +254,8 @@ void get_remap_env(void)
 	    cdoPrint("Set REMAP_THRESHHOLD to %g", remap_threshhold);
 	}
     }
+
+  remap_set_threshhold(remap_threshhold);
 
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )
@@ -323,6 +309,8 @@ void get_remap_env(void)
 	    cdoPrint("Set REMAP_STORE_LINK_FAST to %d", remap_store_link_fast);
 	}
     }
+
+  remap_set_store_link_fast(remap_store_link_fast);
 
   envstr = getenv("REMAP_EXTRAPOLATE");
   if ( envstr )
@@ -559,9 +547,9 @@ void *Remap(void *argument)
       int gridsize2;
 
       read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &submap_type, 
-		       &remap_order, &remaps[0].grid, &remaps[0].vars);
+		       &remap_order, &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
       nremaps = 1;
-      gridsize = remaps[0].grid.grid1_size;
+      gridsize = remaps[0].src_grid.size;
       remaps[0].gridID = gridID1;
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
@@ -583,18 +571,18 @@ void *Remap(void *argument)
 	    (gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
 	{
 	  remaps[0].gridsize += 4*(gridInqXsize(gridID1)+2) + 4*(gridInqYsize(gridID1)+2);
-	  remaps[0].grid.non_global = TRUE;
+	  remaps[0].src_grid.non_global = TRUE;
 	}
 
-      if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_nvgp;
+      if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].src_grid.nvgp;
 
       if ( gridsize != remaps[0].gridsize )
 	cdoAbort("Size of source grid and weights from %s differ!", remap_file);
 
-      if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].grid.grid1_size;
+      if ( gridInqType(gridID1) == GRID_GME ) gridsize = remaps[0].src_grid.size;
 
       for ( i = 0; i < gridsize; i++ )
-        if ( remaps[0].grid.grid1_mask[i] == FALSE )
+        if ( remaps[0].src_grid.mask[i] == FALSE )
           remaps[0].nmiss++;
 
       gridsize2 = gridInqSize(gridID2);
@@ -602,19 +590,18 @@ void *Remap(void *argument)
 	{
 	  int gridID2_gme;
 	  int isize = 0;
-	  remaps[0].grid.grid2_nvgp = gridInqSize(gridID2);
-	  remaps[0].grid.grid2_vgpm = (int *) realloc(remaps[0].grid.grid2_vgpm,
-						      gridInqSize(gridID2)*sizeof(int));
+	  remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
+	  remaps[0].tgt_grid.vgpm = (int *) realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2)*sizeof(int));
 	  gridID2_gme = gridToUnstructured(gridID2, 1);
-	  gridInqMaskGME(gridID2_gme, remaps[0].grid.grid2_vgpm);
+	  gridInqMaskGME(gridID2_gme, remaps[0].tgt_grid.vgpm);
 	  for ( i = 0; i < gridsize2; ++i )
-	    if ( remaps[0].grid.grid2_vgpm[i] ) isize++;
+	    if ( remaps[0].tgt_grid.vgpm[i] ) isize++;
 	  gridsize2 = isize;
 	}
       /*
-      printf("grid2 %d %d %d\n", gridsize2, remaps[0].grid.grid2_nvgp, remaps[0].grid.grid2_size);
+      printf("grid2 %d %d %d\n", gridsize2, remaps[0].tgt_grid.nvgp, remaps[0].tgt_grid.size);
       */
-      if ( remaps[0].grid.grid2_size != gridsize2 )
+      if ( remaps[0].tgt_grid.size != gridsize2 )
 	cdoAbort("Size of target grid and weights from %s differ!", remap_file);
 
       operfunc = maptype2operfunc(map_type, submap_type, remap_order);
@@ -777,7 +764,7 @@ void *Remap(void *argument)
 	    {
 	      if ( gridID1 == remaps[r].gridID && nmiss1 == remaps[r].nmiss )
 		{
-		  if ( memcmp(imask, remaps[r].grid.grid1_mask, remaps[r].grid.grid1_size*sizeof(int)) == 0 )
+		  if ( memcmp(imask, remaps[r].src_grid.mask, remaps[r].src_grid.size*sizeof(int)) == 0 )
 		    break;
 		}	      
 	    }
@@ -799,7 +786,7 @@ void *Remap(void *argument)
 	      if ( remaps[r].gridID != gridID1 )
 		{
 		  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
-		  remaps[r].grid.non_global = FALSE;
+		  remaps[r].src_grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
 		  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
 		       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
@@ -810,11 +797,11 @@ void *Remap(void *argument)
 			(gridInqType(gridID1) == GRID_SINUSOIDAL) ||
 			(gridInqType(gridID1) == GRID_CURVILINEAR && non_global)) )
 		    {
-		      remaps[r].grid.non_global = TRUE;
+		      remaps[r].src_grid.non_global = TRUE;
 		    }
 		  /*
-		    remaps[r].grid.luse_grid1_area = FALSE;
-		    remaps[r].grid.luse_grid2_area = FALSE;
+		    remaps[r].src_grid.luse_cell_area = FALSE;
+		    remaps[r].tgt_grid.luse_cell_area = FALSE;
 		  */
 		  if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == FALSE )
 		    {
@@ -832,10 +819,9 @@ void *Remap(void *argument)
 			}
 		    }
 
-		  remaps[r].grid.threshhold    = remap_threshhold;
-		  remaps[r].grid.restrict_type = remap_restrict_type;
-		  remaps[r].grid.num_srch_bins = remap_num_srch_bins;
-		  remaps[r].grid.pinit = FALSE;
+		  remaps[r].src_grid.num_srch_bins = remap_num_srch_bins;
+		  remaps[r].src_grid.pinit = FALSE;
+		  remaps[r].tgt_grid.pinit = FALSE;
 
 		  remaps[r].vars.norm_opt = norm_opt;
 		  remaps[r].vars.pinit = FALSE;
@@ -846,10 +832,8 @@ void *Remap(void *argument)
 
 		  /* initialize grid information for both grids */
 		  if ( cdoTimer ) timer_start(timer_remap_init);
-		  remapGridInit(map_type, remap_extrapolate, gridID1, gridID2, &remaps[r].grid);
+		  remap_grids_init(map_type, remap_extrapolate, gridID1, &remaps[r].src_grid, gridID2, &remaps[r].tgt_grid);
 		  if ( cdoTimer ) timer_stop(timer_remap_init);
-
-		  remaps[r].grid.store_link_fast = remap_store_link_fast;
 		}
 
 	      remaps[r].gridID = gridID1;
@@ -859,29 +843,29 @@ void *Remap(void *argument)
 		{
 		  j = 0;
 		  for ( i = 0; i < gridsize; i++ )
-		    if ( remaps[r].grid.grid1_vgpm[i] ) imask[j++] = imask[i];
+		    if ( remaps[r].src_grid.vgpm[i] ) imask[j++] = imask[i];
 		}
 
-	      memcpy(remaps[r].grid.grid1_mask, imask, remaps[r].grid.grid1_size*sizeof(int));
+	      memcpy(remaps[r].src_grid.mask, imask, remaps[r].src_grid.size*sizeof(int));
 
 	      if ( map_type == MAP_TYPE_CONSERV )
 		{
-		  memset(remaps[r].grid.grid1_area, 0, remaps[r].grid.grid1_size*sizeof(double));
-		  memset(remaps[r].grid.grid1_frac, 0, remaps[r].grid.grid1_size*sizeof(double));
-		  memset(remaps[r].grid.grid2_area, 0, remaps[r].grid.grid2_size*sizeof(double));
+		  memset(remaps[r].src_grid.cell_area, 0, remaps[r].src_grid.size*sizeof(double));
+		  memset(remaps[r].src_grid.cell_frac, 0, remaps[r].src_grid.size*sizeof(double));
+		  memset(remaps[r].tgt_grid.cell_area, 0, remaps[r].tgt_grid.size*sizeof(double));
 		}
-	      memset(remaps[r].grid.grid2_frac, 0, remaps[r].grid.grid2_size*sizeof(double));
+	      memset(remaps[r].tgt_grid.cell_frac, 0, remaps[r].tgt_grid.size*sizeof(double));
 
 	      /* initialize some remapping variables */
 	      if ( cdoTimer ) timer_start(timer_remap_init);
-	      remapVarsInit(map_type, &remaps[r].grid, &remaps[r].vars);
+	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
-	      if      ( map_type == MAP_TYPE_CONSERV  ) remap_conserv(&remaps[r].grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BILINEAR ) remap_bilin(&remaps[r].grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BICUBIC  ) remap_bicub(&remaps[r].grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_DISTWGT  ) remap_distwgt(&remaps[r].grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_DISTWGT1 ) remap_distwgt1(&remaps[r].grid, &remaps[r].vars);
+	      if      ( map_type == MAP_TYPE_CONSERV  ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_BILINEAR ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_BICUBIC  ) remap_bicub(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_DISTWGT  ) remap_distwgt(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_DISTWGT1 ) remap_distwgt1(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
@@ -894,13 +878,13 @@ void *Remap(void *argument)
 		  ** OpenMP parallelism is supported
 		  */   
 		  sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-			    remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
+			    remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
 			    remaps[r].vars.wts, ompNumThreads);
 		}
 	      else
 		{ /* use a pure heap sort without any support of parallelism */
 		  sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-			   remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
+			   remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
 			   remaps[r].vars.wts);
 		}
 	      if ( cdoTimer ) timer_stop(timer_remap_sort);
@@ -914,26 +898,26 @@ void *Remap(void *argument)
 	    {
 	      j = 0;
 	      for ( i = 0; i < gridsize; i++ )
-		if ( remaps[r].grid.grid1_vgpm[i] ) array1[j++] = array1[i];
+		if ( remaps[r].src_grid.vgpm[i] ) array1[j++] = array1[i];
 	    }
 	  
 	  if ( need_gradiants )
 	    {
-	      if ( remaps[r].grid.grid1_rank != 2 && remap_order == 2 )
+	      if ( remaps[r].src_grid.rank != 2 && remap_order == 2 )
 		cdoAbort("Second order remapping is only available for 2D grids!");
 
-	      remap_gradients(remaps[r].grid, array1, grad1_lat, grad1_lon, grad1_latlon);
+	      remap_gradients(remaps[r].src_grid, array1, grad1_lat, grad1_lon, grad1_latlon);
 	    }
 
 	  if ( operfunc == REMAPLAF )
 	    remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
+		  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
 	  else if ( operfunc == REMAPSUM )
 	    remap_sum(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add, array1);
+		  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
 	  else
 	    remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.num_wts, remaps[r].vars.grid2_add, remaps[r].vars.grid1_add,
+		  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
 		  array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links);
 
 	  gridsize2 = gridInqSize(gridID2);
@@ -947,7 +931,7 @@ void *Remap(void *argument)
 		{
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
-		      grid2_err = remaps[r].grid.grid2_frac[i]*remaps[r].grid.grid2_area[i];
+		      grid2_err = remaps[r].tgt_grid.cell_frac[i]*remaps[r].tgt_grid.cell_area[i];
 		      if ( fabs(grid2_err) > 0 )
 			array2[i] = array2[i]/grid2_err;
 		      else
@@ -958,8 +942,8 @@ void *Remap(void *argument)
 		{
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
-		      if ( fabs(remaps[r].grid.grid2_frac[i]) > 0 )
-			array2[i] = array2[i]/remaps[r].grid.grid2_frac[i];
+		      if ( fabs(remaps[r].tgt_grid.cell_frac[i]) > 0 )
+			array2[i] = array2[i]/remaps[r].tgt_grid.cell_frac[i];
 		      else
 			array2[i] = missval;
 		    }
@@ -969,8 +953,8 @@ void *Remap(void *argument)
 		{
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
-		      //printf("%d %g %g\n", i, remaps[r].grid.grid2_frac[i], remaps[r].grid.grid2_area[i]);
-		      if ( remaps[r].grid.grid2_frac[i] < remap_area_min ) array2[i] = missval;
+		      //printf("%d %g %g\n", i, remaps[r].tgt_grid.cell_frac[i], remaps[r].tgt_grid.cell_area[i]);
+		      if ( remaps[r].tgt_grid.cell_frac[i] < remap_area_min ) array2[i] = missval;
 		    }
 		}
 	    }
@@ -981,14 +965,14 @@ void *Remap(void *argument)
 	    double array2sum = 0;
    
 	    for ( i = 0; i < gridsize; i++ )
-	      printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].grid.grid1_frac[i], remaps[r].grid.grid1_area[i],remaps[r].grid.grid1_frac[i]);
+	      printf("1 %d %g %g %g %g\n", i, array1[i], remaps[r].src_grid.cell_frac[i], remaps[r].src_grid.cell_area[i],remaps[r].src_grid.cell_frac[i]);
 	    for ( i = 0; i < gridsize; i++ )
-	      array1sum += remaps[r].grid.grid1_area[i];
+	      array1sum += remaps[r].src_grid.cell_area[i];
 
 	    for ( i = 0; i < gridsize2; i++ )
-	      printf("2 %d %g %g %g %g\n", i, array2[i], remaps[r].grid.grid2_frac[i],remaps[r].grid.grid2_area[i],remaps[r].grid.grid2_frac[i]);
+	      printf("2 %d %g %g %g %g\n", i, array2[i], remaps[r].tgt_grid.cell_frac[i],remaps[r].tgt_grid.cell_area[i],remaps[r].tgt_grid.cell_frac[i]);
 	    for ( i = 0; i < gridsize2; i++ )
-	      array2sum += remaps[r].grid.grid2_area[i];
+	      array2sum += remaps[r].tgt_grid.cell_area[i];
 
 	    printf("array1sum %g, array2sum %g\n", array1sum, array2sum);
 	  }
@@ -997,22 +981,22 @@ void *Remap(void *argument)
 	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
 	      {
-		scale_gridbox_area(gridsize, array1, gridsize2, array2, remaps[r].grid.grid2_area);
+		scale_gridbox_area(gridsize, array1, gridsize2, array2, remaps[r].tgt_grid.cell_area);
 	      }
 
 	  /* calculate some statistics */
 	  if ( cdoVerbose )
-	    remap_stat(remap_order, remaps[r].grid, remaps[r].vars, array1, array2, missval);
+	    remap_stat(remap_order, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars, array1, array2, missval);
 
 	  if ( gridInqType(gridID2) == GRID_GME )
 	    {
 	      int ni, nd;
  	      ni = gridInqGMEni(gridID2);
 	      nd = gridInqGMEnd(gridID2);
-	      j = remaps[r].grid.grid2_size;
+	      j = remaps[r].tgt_grid.size;
 
 	      for ( i = gridsize2-1; i >=0 ; i-- )
-		if ( remaps[r].grid.grid2_vgpm[i] ) array2[i] = array2[--j];
+		if ( remaps[r].tgt_grid.vgpm[i] ) array2[i] = array2[--j];
 
 	      gme_grid_restore(array2, ni, nd);
 	    }
@@ -1034,7 +1018,7 @@ void *Remap(void *argument)
   WRITE_REMAP:
  
   if ( lwrite_remap ) 
-    write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, remap_order, remaps[r].grid, remaps[r].vars);
+    write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, remap_order, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars);
 
   streamClose(streamID1);
 
@@ -1050,7 +1034,8 @@ void *Remap(void *argument)
   for ( r = 0; r < nremaps; r++ )
     {
       remapVarsFree(&remaps[r].vars);
-      remapGridFree(&remaps[r].grid);
+      remapGridFree(&remaps[r].src_grid);
+      remapGridFree(&remaps[r].tgt_grid);
     }
 
   if ( remaps ) free(remaps);

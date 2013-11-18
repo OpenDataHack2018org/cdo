@@ -2,6 +2,9 @@
 #include <omp.h>
 #endif
 
+#define  REMAP_GRID_BASIS_SRC  1
+#define  REMAP_GRID_BASIS_TGT  2
+
 #define  RESTR_TYPE  int  /* restrict data types: 0 -> double, float; 1 -> int */
 
 typedef RESTR_TYPE restr_t;
@@ -40,68 +43,46 @@ typedef RESTR_TYPE restr_t;
 #define  SUBMAP_TYPE_LAF    1
 #define  SUBMAP_TYPE_SUM    2
 
-#define  RESTRICT_LATITUDE  1
-#define  RESTRICT_LATLON    2
-
 
 typedef struct {
-  int      pinit;            /* TRUE if the pointers are initialized     */
-  int      gridID1;
-  int      gridID2;
+  int      pinit;                 /* TRUE if the pointers are initialized     */
+  int      gridID;
   int      store_link_fast;
+  int      remap_grid_type;
   int      lextrapolate;
   int      non_global;
-  int      grid1_is_cyclic, grid2_is_cyclic;
-  long     grid1_size, grid2_size; /* total points on each grid */
-  int      grid1_rank, grid2_rank; /* rank of each grid */
-  long     grid1_corners, grid2_corners; /* number of corners for each grid cell */
+  int      is_cyclic;
+  int      rank;                  /* rank of the grid */
+  long     size;                  /* total points on the grid */
+  long     num_cell_corners;      /* number of corners for each grid cell */
 
-  int      grid1_dims[2], grid2_dims[2]; /* size of each grid dimension */
+  int      dims[2];               /* size of grid dimension */
 
-  int      grid1_nvgp;         /* size of grid1_vgpm           */
-  int     *grid1_vgpm;         /* flag which cells are valid   */
+  int      nvgp;                  /* size of vgpm           */
+  int     *vgpm;                  /* flag which cells are valid   */
 
-  int      grid2_nvgp;         /* size of grid2_vgpm           */
-  int     *grid2_vgpm;         /* flag which cells are valid   */
+  int     *mask;                  /* flag which cells participate */
 
-  int     *grid1_mask;         /* flag which cells participate */
-  int     *grid2_mask;         /* flag which cells participate */
+  double  *reg2d_center_lon;      /* reg2d lon/lat coordinates for */
+  double  *reg2d_center_lat;      /* each grid center in radians   */
+  double  *cell_center_lon;       /* lon/lat coordinates for       */
+  double  *cell_center_lat;       /* each grid center in radians   */
+  double  *cell_area;             /* tot area of each grid cell     */
+  double  *cell_frac;             /* fractional area of grid cells participating in remapping  */
 
-  double  *grid1_center_lat;   /* lat/lon coordinates for      */
-  double  *grid1_center_lon;   /* each grid center in radians  */
-  double  *grid2_center_lat; 
-  double  *grid2_center_lon;
-  double  *grid1_area;         /* tot area of each grid1 cell     */
-  double  *grid2_area;         /* tot area of each grid2 cell     */
-  /* double  *grid1_area_in; */     /* area of grid1 cell from file    */
-  /* double  *grid2_area_in; */     /* area of grid2 cell from file    */
-  double  *grid1_frac;         /* fractional area of grid cells   */
-  double  *grid2_frac;         /* participating in remapping      */
+  double  *cell_corner_lon;       /* lon/lat coordinates for         */
+  double  *cell_corner_lat;       /* each grid corner in radians     */
 
-  double  *grid1_corner_lat;   /* lat/lon coordinates for         */
-  double  *grid1_corner_lon;   /* each grid corner in radians     */
-  double  *grid2_corner_lat; 
-  double  *grid2_corner_lon;
+  int      lneed_cell_corners;
+  int      luse_cell_corners;     /* use corners for bounding boxes  */
 
-  int      lneed_grid1_corners;
-  int      lneed_grid2_corners;
-  int      luse_grid1_corners;  /* use corners for bounding boxes  */
-  int      luse_grid2_corners;  /* use corners for bounding boxes  */
-  /* int      luse_grid1_area;   */ /* use area from grid file         */
-  /* int      luse_grid2_area;   */ /* use area from grid file         */
+  restr_t *cell_bound_box;        /* lon/lat bounding box for use    */
 
-  restr_t *grid1_bound_box;    /* lat/lon bounding box for use    */
-  restr_t *grid2_bound_box;    /* in restricting grid searches    */
+  int      num_srch_bins;         /* num of bins for restricted srch */
 
-  double   threshhold;         /* threshold for coord transformation */
-  int      restrict_type;
-  int      num_srch_bins;      /* num of bins for restricted srch */
+  int     *bin_addr;              /* min,max adds for grid cells in this lat bin  */
 
-  int     *bin_addr1;       /* min,max adds for grid1 cells in this lat bin  */
-  int     *bin_addr2;       /* min,max adds for grid2 cells in this lat bin  */
-
-  restr_t *bin_lats;        /* min,max latitude for each search bin   */
-  restr_t *bin_lons;        /* min,max longitude for each search bin  */
+  restr_t *bin_lats;              /* min,max latitude for each search bin   */
 }
 remapgrid_t;
 
@@ -125,8 +106,8 @@ typedef struct {
   int   norm_opt;         /* option for normalization (conserv only)  */
   int   resize_increment; /* default amount to increase array size    */
 
-  int  *grid1_add;        /* grid1 address for each link              */
-  int  *grid2_add;        /* grid2 address for each link              */
+  int  *src_grid_add;     /* source grid address for each link        */
+  int  *tgt_grid_add;     /* target grid address for each link        */
 
   double *wts;            /* map weights for each link [max_links*num_wts] */
 
@@ -138,18 +119,22 @@ typedef struct {
   int gridID;
   int gridsize;
   int nmiss;
-  remapgrid_t grid;
+  remapgrid_t src_grid;
+  remapgrid_t tgt_grid;
   remapvars_t vars;
 }
 remap_t;
 
+void remap_set_threshhold(double threshhold);
 void remap_set_max_iter(long max_iter);
+void remap_set_store_link_fast(int store_link_fast);
 
-void remapGridInit(int map_type, int lextrapolate, int gridID1, int gridID2, remapgrid_t *rg);
-void remapVarsInit(int map_type, remapgrid_t *rg, remapvars_t *rv);
+
+void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid);
+void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remapvars_t *rv);
 
 void remapVarsFree(remapvars_t *rv);
-void remapGridFree(remapgrid_t *rg);
+void remapGridFree(remapgrid_t *grid);
 
 void remap(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts, 
 	   long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array, 
@@ -162,18 +147,18 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 void remap_sum(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
 	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);
 
-void remap_bilin(remapgrid_t *rg, remapvars_t *rv);
-void remap_bicub(remapgrid_t *rg, remapvars_t *rv);
-void remap_conserv(remapgrid_t *rg, remapvars_t *rv);
-void remap_distwgt(remapgrid_t *rg, remapvars_t *rv);
-void remap_distwgt1(remapgrid_t *rg, remapvars_t *rv);
+void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_distwgt(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_distwgt1(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
 void resize_remap_vars(remapvars_t *rv, int increment);
 
-void remap_stat(int remap_order, remapgrid_t rg, remapvars_t rv, const double *restrict array1, 
+void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv, const double *restrict array1, 
 		const double *restrict array2, double missval);
-void remap_gradients(remapgrid_t rg, const double *restrict array, double *restrict grad1_lat,
-		     double *restrict grad1_lon, double *restrict grad1_latlon);
+void remap_gradients(remapgrid_t grid, const double *restrict array, double *restrict grad_lat,
+		     double *restrict grad_lon, double *restrict grad_latlon);
 
 void reorder_links(remapvars_t *rv);
 
@@ -181,8 +166,8 @@ void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict ad
 void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights, int parent);
 
 void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
-		       int remap_order, remapgrid_t rg, remapvars_t rv);
+		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv);
 void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
-		      int *remap_order, remapgrid_t *rg, remapvars_t *rv);
+		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
 void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add, const double *restrict weights);
