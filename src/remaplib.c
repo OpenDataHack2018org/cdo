@@ -5561,14 +5561,19 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       correct_weights ( nSourceCells, weight );
 #endif
 
-      for (n = 0; n < nSourceCells; ++n)
+      for (n = 0; n < num_srch_cells; ++n)
 	{
 	  src_grid_add = srch_add[n];  //????????????????????????????????????????????????????????
 
+	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
+#if defined(HAVE_LIBYAC)
 	  printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add,  weight[n], tgt_area);
 	  // src_grid_add = n;
-	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
-	  weights[0] = weight[n];
+	  if ( weight[n] > 0 )
+	    weights[0] = weight[n];
+	  else 
+	    src_grid_add = -1;
+#endif
 		  /*
 		    Store the appropriate addresses and weights. 
 		    Also add contributions to cell areas.
