@@ -540,10 +540,12 @@ void intconarr2(double missval, int lon_is_circular,
       int ilat2 = index2/nlonOut;
       int ilon2 = index2 - ilat2*nlonOut;
       */
+      double addtest = 0;
+      //if ( i == 296 ) addtest = 360*DEG2RAD;
       for ( int ic = 0; ic < nc2; ++ic )
 	{
-	  TargetCell.coordinates_x[ic] =  x[index2*nc2+ic];
-	  TargetCell.coordinates_y[ic] =  y[index2*nc2+ic];
+	  TargetCell.coordinates_x[ic] =  addtest+x[index2*nc2+ic];
+	  TargetCell.coordinates_y[ic] =          y[index2*nc2+ic];
 	}
 
       if ( cdoVerbose )
@@ -571,29 +573,29 @@ void intconarr2(double missval, int lon_is_circular,
 	  */
 	  if ( ym[ilat1] < ym[ilat1+1] )
 	    {
-	      SourceCell[k].coordinates_x[0] =  xm[ilon1];
-	      SourceCell[k].coordinates_y[0] =  ym[ilat1];
-	      SourceCell[k].coordinates_x[1] =  xm[ilon1+1];
-	      SourceCell[k].coordinates_y[1] =  ym[ilat1];
-	      SourceCell[k].coordinates_x[2] =  xm[ilon1+1];
-	      SourceCell[k].coordinates_y[2] =  ym[ilat1+1];
-	      SourceCell[k].coordinates_x[3] =  xm[ilon1];
-	      SourceCell[k].coordinates_y[3] =  ym[ilat1+1];
+	      SourceCell[k].coordinates_x[0] =  addtest+xm[ilon1];
+	      SourceCell[k].coordinates_y[0] =          ym[ilat1];
+	      SourceCell[k].coordinates_x[1] =  addtest+xm[ilon1+1];
+	      SourceCell[k].coordinates_y[1] =          ym[ilat1];
+	      SourceCell[k].coordinates_x[2] =  addtest+xm[ilon1+1];
+	      SourceCell[k].coordinates_y[2] =          ym[ilat1+1];
+	      SourceCell[k].coordinates_x[3] =  addtest+xm[ilon1];
+	      SourceCell[k].coordinates_y[3] =          ym[ilat1+1];
 	    }
 	  else
 	    {
-	      SourceCell[k].coordinates_x[0] =  xm[ilon1];
-	      SourceCell[k].coordinates_y[0] =  ym[ilat1+1];
-	      SourceCell[k].coordinates_x[1] =  xm[ilon1+1];
-	      SourceCell[k].coordinates_y[1] =  ym[ilat1+1];
-	      SourceCell[k].coordinates_x[2] =  xm[ilon1+1];
-	      SourceCell[k].coordinates_y[2] =  ym[ilat1];
-	      SourceCell[k].coordinates_x[3] =  xm[ilon1];
-	      SourceCell[k].coordinates_y[3] =  ym[ilat1];
+	      SourceCell[k].coordinates_x[0] =  addtest+xm[ilon1];
+	      SourceCell[k].coordinates_y[0] =          ym[ilat1+1];
+	      SourceCell[k].coordinates_x[1] =  addtest+xm[ilon1+1];
+	      SourceCell[k].coordinates_y[1] =          ym[ilat1+1];
+	      SourceCell[k].coordinates_x[2] =  addtest+xm[ilon1+1];
+	      SourceCell[k].coordinates_y[2] =          ym[ilat1];
+	      SourceCell[k].coordinates_x[3] =  addtest+xm[ilon1];
+	      SourceCell[k].coordinates_y[3] =          ym[ilat1];
 	    }
 	  if ( cdoVerbose )
 	    {
-	      printf("source: %d\n", k);
+	      printf("source: %d %d", num_deps, k);
 	      for ( int n = 0; n < 4; ++n )
 		printf(" %g %g", SourceCell[k].coordinates_x[n]/DEG2RAD, SourceCell[k].coordinates_y[n]/DEG2RAD);
 	      printf("\n");
@@ -624,6 +626,8 @@ void intconarr2(double missval, int lon_is_circular,
 
 	  yar_store_link_cnsrv(&remap.vars, add1, add2, weight[k]);
 	  */
+	  if ( cdoVerbose )
+	    printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", i, k, index1,  weight[k], tgt_area);
 	  field[i] += fieldm[index1] * weight[k];
 	  /*
 	  if ( cdoVerbose )

@@ -4283,15 +4283,15 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 }  /* store_link_cnsrv */
 
 static
-long get_srch_cells(long src_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
-		    restr_t *grid1_bound_box, restr_t *grid2_bound_box, long grid2_size, int *srch_add)
+long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
+		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long grid2_size, int *srch_add)
 {
   long num_srch_cells;  /* num cells in restricted search arrays   */
   long min_add;         /* addresses for restricting search of     */
   long max_add;         /* destination grid                        */
   long n, n2;           /* generic counters                        */
-  long tgt_grid_add;       /* current linear address for grid2 cell   */
-  long src_grid_addm4, tgt_grid_addm4;
+  long src_grid_add;    /* current linear address for src cell     */
+  long tgt_grid_addm4, src_grid_addm4;
   int  lmask;
   restr_t bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
 
@@ -4303,7 +4303,7 @@ long get_srch_cells(long src_grid_add, long nbins, int *bin_addr1, int *bin_addr
   for ( n = 0; n < nbins; ++n )
     {
       n2 = n<<1;
-      if ( src_grid_add >= bin_addr1[n2] && src_grid_add <= bin_addr1[n2+1] )
+      if ( tgt_grid_add >= bin_addr1[n2] && tgt_grid_add <= bin_addr1[n2+1] )
 	{
 	  if ( bin_addr2[n2  ] < min_add ) min_add = bin_addr2[n2  ];
 	  if ( bin_addr2[n2+1] > max_add ) max_add = bin_addr2[n2+1];
@@ -4312,24 +4312,24 @@ long get_srch_cells(long src_grid_add, long nbins, int *bin_addr1, int *bin_addr
 
   /* Further restrict searches using bounding boxes */
 
-  src_grid_addm4 = src_grid_add<<2;
-  bound_box_lat1 = grid1_bound_box[src_grid_addm4  ];
-  bound_box_lat2 = grid1_bound_box[src_grid_addm4+1];
-  bound_box_lon1 = grid1_bound_box[src_grid_addm4+2];
-  bound_box_lon2 = grid1_bound_box[src_grid_addm4+3];
+  tgt_grid_addm4 = tgt_grid_add<<2;
+  bound_box_lat1 = tgt_cell_bound_box[tgt_grid_addm4  ];
+  bound_box_lat2 = tgt_cell_bound_box[tgt_grid_addm4+1];
+  bound_box_lon1 = tgt_cell_bound_box[tgt_grid_addm4+2];
+  bound_box_lon2 = tgt_cell_bound_box[tgt_grid_addm4+3];
 
   num_srch_cells = 0;
-  for ( tgt_grid_add = min_add; tgt_grid_add <= max_add; ++tgt_grid_add )
+  for ( src_grid_add = min_add; src_grid_add <= max_add; ++src_grid_add )
     {
-      tgt_grid_addm4 = tgt_grid_add<<2;
-      lmask = (grid2_bound_box[tgt_grid_addm4  ] <= bound_box_lat2)  &&
-	      (grid2_bound_box[tgt_grid_addm4+1] >= bound_box_lat1)  &&
-	      (grid2_bound_box[tgt_grid_addm4+2] <= bound_box_lon2)  &&
-	      (grid2_bound_box[tgt_grid_addm4+3] >= bound_box_lon1);
+      src_grid_addm4 = src_grid_add<<2;
+      lmask = (src_cell_bound_box[src_grid_addm4  ] <= bound_box_lat2)  &&
+	      (src_cell_bound_box[src_grid_addm4+1] >= bound_box_lat1)  &&
+	      (src_cell_bound_box[src_grid_addm4+2] <= bound_box_lon2)  &&
+	      (src_cell_bound_box[src_grid_addm4+3] >= bound_box_lon1);
 
       if ( lmask )
 	{
-	  srch_add[num_srch_cells] = tgt_grid_add;
+	  srch_add[num_srch_cells] = src_grid_add;
 	  num_srch_cells++;
 	}
     }
@@ -5518,7 +5518,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
       if ( cdoVerbose )
 	{
-	  printf("target:\n");
+	  printf("target:       ");
 	  for ( int n = 0; n < grid2_corners; ++n )
 	    printf(" %g %g", TargetCell.coordinates_x[n]/DEG2RAD, TargetCell.coordinates_y[n]/DEG2RAD);
 	  printf("\n");
@@ -5544,30 +5544,46 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
 	  if ( cdoVerbose )
 	    {
-	      printf("source: %d\n", n);
+	      printf("source: %ld %ld", num_srch_cells, n);
 	      for ( k = 0; k < srch_corners; ++k )
 		printf(" %g %g", SourceCell[n].coordinates_x[k]/DEG2RAD, SourceCell[n].coordinates_y[k]/DEG2RAD);
 	      printf("\n");
 	    }
 	}
       
-      compute_overlap_areas ( nSourceCells, SourceCell, TargetCell, area);
+      compute_overlap_areas(nSourceCells, SourceCell, TargetCell, area);
 
       tgt_area = huiliers_area(TargetCell);
       // tgt_area = cell_area(TargetCell);
-      for (n = 0; n < nSourceCells; ++n)
-	weight[n] = area[n] / tgt_area;
+      long num_weights = 0;
+      for ( n = 0; n < nSourceCells; ++n )
+	{
+	  if ( area[n] > tgt_area )
+	    {
+	      if ( cdoVerbose )
+		printf("Source grid area to large, skipped! (tgt_add: %ld  tgt_area: %g  src_add: %d  src_area: %g)\n",
+		       tgt_grid_add, tgt_area, srch_add[n], area[n]);
+	      continue;
+	    }
+	  if ( area[n] > 0 )
+	    {
+	      weight[num_weights] = area[n] / tgt_area;
+	      srch_add[num_weights] = srch_add[n];
+	      num_weights++;
+	    }
+	}
 
-      correct_weights ( nSourceCells, weight );
+      correct_weights(num_weights, weight);
 #endif
 
-      for (n = 0; n < num_srch_cells; ++n)
+      for (n = 0; n < num_weights; ++n)
 	{
 	  src_grid_add = srch_add[n];  //????????????????????????????????????????????????????????
 
 	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
 #if defined(HAVE_LIBYAC)
-	  printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add,  weight[n], tgt_area);
+	  if ( cdoVerbose )
+	    printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add, weight[n], tgt_area);
 	  // src_grid_add = n;
 	  if ( weight[n] > 0 )
 	    weights[0] = weight[n];
