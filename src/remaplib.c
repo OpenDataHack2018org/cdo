@@ -983,8 +983,8 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   src_grid->remap_grid_type = -1;
   tgt_grid->remap_grid_type = -1;
 
-  if ( map_type == MAP_TYPE_BILINEAR &&
-       gridInqType(gridID1) == GRID_LONLAT && !gridIsRotated(gridID1) )
+  if ( map_type == MAP_TYPE_BILINEAR && !gridIsRotated(gridID1) &&
+       (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
   src_grid->remap_grid_type = 0;
 
@@ -1764,7 +1764,7 @@ int grid_search_reg2d(remapgrid_t *src_grid, int *restrict src_add, double *rest
 		}
 	    }
 	}
-  }
+    }
 
   for ( n = 0; n < 4; ++n ) src_lons[n] = ONE/(src_lats[n] + TINY);
   distance = 0.0;
