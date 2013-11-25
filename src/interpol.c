@@ -550,7 +550,7 @@ void intconarr2(double missval, int lon_is_circular,
 
       if ( cdoVerbose )
 	{
-	  printf("target:\n");
+	  printf("target:       ");
 	  for ( int n = 0; n < nc2; ++n )
 	    printf(" %g %g", TargetCell.coordinates_x[n]/DEG2RAD, TargetCell.coordinates_y[n]/DEG2RAD);
 	  printf("\n");
@@ -626,9 +626,13 @@ void intconarr2(double missval, int lon_is_circular,
 
 	  yar_store_link_cnsrv(&remap.vars, add1, add2, weight[k]);
 	  */
-	  if ( cdoVerbose )
-	    printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", i, k, index1,  weight[k], tgt_area);
-	  field[i] += fieldm[index1] * weight[k];
+	  if ( weight[k] > 0 )
+	    {
+	      if ( cdoVerbose )
+		printf("tgt_grid_add %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", i, index1,  weight[k], tgt_area);
+	      //printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", i, k, index1,  weight[k], tgt_area);
+	      field[i] += fieldm[index1] * weight[k];
+	    }
 	  /*
 	  if ( cdoVerbose )
 	    printf("  result dep: %ld %d %d  %g\n", i, k, index1, weight[k]);
@@ -892,10 +896,13 @@ void intgridcon(field_t *field1, field_t *field2)
   gridGenBounds1(nlon1, lon1, lon1bounds);
   gridGenBounds1(nlat1, lat1, lat1bounds);
 
-  for ( int i = 0; i < nlat1; ++i )
-    printf("lat1 %d %g\n", i+1, lat1[i]*RAD2DEG);
-  printf("lat1bounds: %g %g %g ... %g %g %g\n", lat1bounds[0]*RAD2DEG, lat1bounds[1]*RAD2DEG, lat1bounds[2]*RAD2DEG, lat1bounds[nlat1b-3]*RAD2DEG, lat1bounds[nlat1b-2]*RAD2DEG, lat1bounds[nlat1b-1]*RAD2DEG);
-  printf("lon1bounds: %g %g %g ... %g %g %g\n", lon1bounds[0]*RAD2DEG, lon1bounds[1]*RAD2DEG, lon1bounds[2]*RAD2DEG, lon1bounds[nlon1b-3]*RAD2DEG, lon1bounds[nlon1b-2]*RAD2DEG, lon1bounds[nlon1b-1]*RAD2DEG);
+  if ( cdoVerbose )
+    {
+      for ( int i = 0; i < nlat1; ++i )
+	printf("lat1 %d %g\n", i+1, lat1[i]*RAD2DEG);
+      printf("lat1bounds: %g %g %g ... %g %g %g\n", lat1bounds[0]*RAD2DEG, lat1bounds[1]*RAD2DEG, lat1bounds[2]*RAD2DEG, lat1bounds[nlat1b-3]*RAD2DEG, lat1bounds[nlat1b-2]*RAD2DEG, lat1bounds[nlat1b-1]*RAD2DEG);
+      printf("lon1bounds: %g %g %g ... %g %g %g\n", lon1bounds[0]*RAD2DEG, lon1bounds[1]*RAD2DEG, lon1bounds[2]*RAD2DEG, lon1bounds[nlon1b-3]*RAD2DEG, lon1bounds[nlon1b-2]*RAD2DEG, lon1bounds[nlon1b-1]*RAD2DEG);
+    }
 
   nlon2 = gridInqXsize(gridID2);
   nlat2 = gridInqYsize(gridID2);
@@ -918,8 +925,6 @@ void intgridcon(field_t *field1, field_t *field2)
     nc2 = gridInqNvertex(gridID2);
   else
     nc2 = 4;
-
-  printf("nc2: %d\n", nc2);
 
   double *grid2_corner_lon = NULL, *grid2_corner_lat = NULL;
 

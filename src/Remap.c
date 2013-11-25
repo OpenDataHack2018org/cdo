@@ -883,25 +883,28 @@ void *Remap(void *argument)
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
 
-	      if ( cdoTimer ) timer_start(timer_remap_sort);
-	      if ( sort_mode == MERGE_SORT )
-		{ /* 
-		  ** use a combination of the old sort_add and a split and merge approach.
-                  ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c. 
-		  ** OpenMP parallelism is supported
-		  */   
-		  sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-			    remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-			    remaps[r].vars.wts, ompNumThreads);
+	      if ( remaps[r].vars.sort_add )
+		{
+		  if ( cdoTimer ) timer_start(timer_remap_sort);
+		  if ( sort_mode == MERGE_SORT )
+		    { /* 
+		      ** use a combination of the old sort_add and a split and merge approach.
+		      ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c. 
+		      ** OpenMP parallelism is supported
+		      */   
+		      sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+				remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
+				remaps[r].vars.wts, ompNumThreads);
+		    }
+		  else
+		    { /* use a pure heap sort without any support of parallelism */
+		      sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+			       remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
+			       remaps[r].vars.wts);
+		    }
+		  if ( cdoTimer ) timer_stop(timer_remap_sort);
 		}
-	      else
-		{ /* use a pure heap sort without any support of parallelism */
-		  sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-			   remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-			   remaps[r].vars.wts);
-		}
-	      if ( cdoTimer ) timer_stop(timer_remap_sort);
-	      	      
+
 	      if ( lwrite_remap ) goto WRITE_REMAP;
 
 	      if ( remap_test ) reorder_links(&remaps[r].vars);

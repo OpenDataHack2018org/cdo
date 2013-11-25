@@ -164,6 +164,8 @@ void remapVarsFree(remapvars_t *rv)
     {
       rv->pinit = FALSE;
 
+      rv->sort_add = FALSE;
+
       free(rv->src_grid_add);
       free(rv->tgt_grid_add);
       free(rv->wts);
@@ -1118,6 +1120,14 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 
   /* Determine the number of weights */
 
+  if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
+  else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
+  else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = TRUE;
+  else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
+  else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
+  else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->sort_add = TRUE;
+  else cdoAbort("Unknown mapping method!");
+
   if      ( map_type == MAP_TYPE_CONSERV  ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_CONTEST  ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_BILINEAR ) rv->num_wts = 1;
@@ -1126,7 +1136,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->num_wts = 1;
   else cdoAbort("Unknown mapping method!");
 
-  /*
+   /*
     Initialize num_links and set max_links to four times the largest 
     of the destination grid sizes initially (can be changed later).
     Set a default resize increment to increase the size of link
@@ -2050,6 +2060,9 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
+  printf("%d: ", dst_add);
+  for ( n = 0; n < 4; ++n ) printf(" %d", src_add[n]);
+  printf("\n");
   for ( n = 0; n < 4; ++n )
     {
       rv->src_grid_add[nlink+n] = src_add[n];
@@ -5561,8 +5574,8 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	  if ( area[n] > tgt_area )
 	    {
 	      if ( cdoVerbose )
-		printf("Source grid area to large, skipped! (tgt_add: %ld  tgt_area: %g  src_add: %d  src_area: %g)\n",
-		       tgt_grid_add, tgt_area, srch_add[n], area[n]);
+		cdoWarning("Source grid cell area larger than target cell, skipped! (tgt_add: %ld  tgt_area: %g  src_add: %d  src_area: %g)",
+			   tgt_grid_add, tgt_area, srch_add[n], area[n]);
 	      continue;
 	    }
 	  if ( area[n] > 0 )
@@ -5576,14 +5589,15 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       correct_weights(num_weights, weight);
 #endif
 
-      for (n = 0; n < num_weights; ++n)
+      for ( n = 0; n < num_weights; ++n )
 	{
 	  src_grid_add = srch_add[n];  //????????????????????????????????????????????????????????
 
 	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
 #if defined(HAVE_LIBYAC)
 	  if ( cdoVerbose )
-	    printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add, weight[n], tgt_area);
+	    printf("tgt_grid_add %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, src_grid_add, weight[n], tgt_area);
+	  //   printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add, weight[n], tgt_area);
 	  // src_grid_add = n;
 	  if ( weight[n] > 0 )
 	    weights[0] = weight[n];

@@ -99,6 +99,7 @@ typedef struct {
 remaplink_t;
 
 typedef struct {
+  int   sort_add;
   int   pinit;            /* TRUE if the pointers are initialized     */
   long  max_links;        /* current size of link arrays              */
   long  num_links;        /* actual number of links for remapping     */
