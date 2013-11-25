@@ -1120,13 +1120,28 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 
   /* Determine the number of weights */
 
-  if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
-  else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
-  else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = TRUE;
-  else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
-  else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
-  else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->sort_add = TRUE;
-  else cdoAbort("Unknown mapping method!");
+#if defined(_OPENMP)
+  if ( ompNumThreads > 1 )
+    {
+      if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->sort_add = TRUE;
+      else cdoAbort("Unknown mapping method!");
+    }
+  else
+#endif
+    {
+      if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = FALSE;
+      else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->sort_add = TRUE;
+      else cdoAbort("Unknown mapping method!");
+    }
 
   if      ( map_type == MAP_TYPE_CONSERV  ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_CONTEST  ) rv->num_wts = 3;
@@ -2039,7 +2054,7 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
   This routine stores the address and weight for four links associated with one destination
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
-void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add, const double *restrict weights)
+void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, double *restrict weights)
 {
   /*
     Input variables:
@@ -2060,9 +2075,29 @@ void store_link_bilin(remapvars_t *rv, int dst_add, const int *restrict src_add,
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
 
-  printf("%d: ", dst_add);
-  for ( n = 0; n < 4; ++n ) printf(" %d", src_add[n]);
-  printf("\n");
+  if ( rv->sort_add == FALSE )
+    {
+      for ( n = 0; n < 3; ++n )
+	if ( src_add[n] > src_add[n+1] ) break;
+
+      if ( n < 2 ) rv->sort_add = TRUE;
+      else if ( n == 2 ) // swap 3rd and 4th elements
+	{
+	  {
+	    int itmp;
+	    itmp = src_add[2];
+	    src_add[2] = src_add[3];
+	    src_add[3] = itmp;
+	  }
+	  {
+	    double dtmp;
+	    dtmp = weights[2];
+	    weights[2] = weights[3];
+	    weights[3] = dtmp;
+	  }
+	}
+    }
+
   for ( n = 0; n < 4; ++n )
     {
       rv->src_grid_add[nlink+n] = src_add[n];
@@ -5934,6 +5969,9 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
     }
 
   free(grid2_count);
+
+  if ( rv.sort_add )
+    cdoPrint("Sparse matrix entries are explicitly sorted.");
 
 } /* remap_stat */
 
