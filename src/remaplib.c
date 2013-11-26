@@ -708,13 +708,12 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, 
       bin_addr[n2  ] = gridsize;
       bin_addr[n2+1] = 0;
     }
-  /*
+
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  private(n, n2, nele4)		       \
+  private(n, n2, nele4, cell_bound_box_lat1, cell_bound_box_lat2)  \
   shared(gridsize, nbins, bin_lats, cell_bound_box, bin_addr)
 #endif
-  */
   for ( nele = 0; nele < gridsize; ++nele )
     {
       nele4 = nele<<2;
@@ -728,13 +727,14 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, 
 	    {
 	      /*
 #if defined(_OPENMP)
+	      if ( nele < bin_addr[n2  ] || nele > bin_addr[n2+1] )
 #pragma omp critical
 #endif
 	      */
-	      {
-		bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
-		bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
-	      }
+		{
+		  bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
+		  bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
+		}
 	    }
 	}
     }
@@ -5399,6 +5399,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   /* Variables necessary if segment manages to hit pole */
   grid_store_t *grid_store = NULL;
   double findex = 0;
+  long num_weights = 0;
 
   progressInit();
 
@@ -5609,7 +5610,6 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
       tgt_area = huiliers_area(TargetCell);
       // tgt_area = cell_area(TargetCell);
-      long num_weights = 0;
       for ( n = 0; n < nSourceCells; ++n )
 	{
 	  if ( area[n] > tgt_area )
