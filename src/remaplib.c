@@ -699,7 +699,7 @@ int expand_curvilinear_grid(int gridID)
 static
 void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, const restr_t *restrict cell_bound_box, int *restrict bin_addr)
 {
-  long n, n2, n2p1, nele, nele4;
+  long n, n2, nele, nele4;
   restr_t cell_bound_box_lat1, cell_bound_box_lat2;
 
   for ( n = 0; n < nbins; ++n )
@@ -722,9 +722,8 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, 
       cell_bound_box_lat2 = cell_bound_box[nele4+1];
       for ( n = 0; n < nbins; ++n )
 	{
-	  n2   = n<<1;
-	  n2p1 = n2 + 1;
-	  if ( cell_bound_box_lat1 <= bin_lats[n2p1] &&
+	  n2 = n<<1;
+	  if ( cell_bound_box_lat1 <= bin_lats[n2+1] &&
 	       cell_bound_box_lat2 >= bin_lats[n2  ] )
 	    {
 	      /*
@@ -734,7 +733,7 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, 
 	      */
 	      {
 		bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
-		bin_addr[n2p1] = MAX(nele, bin_addr[n2p1]);
+		bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
 	      }
 	    }
 	}
