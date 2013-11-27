@@ -83,11 +83,13 @@ long find_element(double x, long nelem, const double *restrict array)
 	}
     }
 
+  if ( mid > 1 && IS_EQUAL(x,array[mid-1]) ) mid--;
+
   return (mid);
 }
+
 /*
-static
-long find_element_old(double x, long nelem, const double *array)
+long find_element(double x, long nelem, const double *array)
 {
   long ii;
 
@@ -105,7 +107,6 @@ long find_element_old(double x, long nelem, const double *array)
   return (ii);
 }
 */
-
 
 int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym)
 {
