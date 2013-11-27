@@ -1789,6 +1789,61 @@ int grid_search_reg2d(remapgrid_t *src_grid, int *restrict src_add, double *rest
   return (search_result);
 }  /* grid_search_reg2d */
 
+
+static
+int grid_search_nn(long min_add, long max_add, int *restrict src_add, double *restrict src_lats, 
+		   double *restrict src_lons,  double plat, double plon,
+		   const double *restrict src_center_lat, const double *restrict src_center_lon)
+{
+  int search_result = 0;
+  long n, srch_add;
+  long i;
+  double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
+  double dist_min, distance; /* For computing dist-weighted avg */
+
+  coslat_dst = cos(plat);
+  sinlat_dst = sin(plat);
+  coslon_dst = cos(plon);
+  sinlon_dst = sin(plon);
+
+  dist_min = BIGNUM;
+  for ( n = 0; n < 4; ++n ) src_lats[n] = BIGNUM;
+  for ( srch_add = min_add; srch_add <= max_add; ++srch_add )
+    {
+      distance = acos(coslat_dst*cos(src_center_lat[srch_add])*
+		     (coslon_dst*cos(src_center_lon[srch_add]) +
+                      sinlon_dst*sin(src_center_lon[srch_add]))+
+		      sinlat_dst*sin(src_center_lat[srch_add]));
+
+      if ( distance < dist_min )
+	{
+          for ( n = 0; n < 4; ++n )
+	    {
+	      if ( distance < src_lats[n] )
+		{
+		  for ( i = 3; i > n; --i )
+		    {
+		      src_add [i] = src_add [i-1];
+		      src_lats[i] = src_lats[i-1];
+		    }
+		  search_result = -1;
+		  src_add [n] = srch_add;
+		  src_lats[n] = distance;
+		  dist_min = src_lats[3];
+		  break;
+		}
+	    }
+        }
+    }
+
+  for ( n = 0; n < 4; ++n ) src_lons[n] = ONE/(src_lats[n] + TINY);
+  distance = 0.0;
+  for ( n = 0; n < 4; ++n ) distance += src_lons[n];
+  for ( n = 0; n < 4; ++n ) src_lats[n] = src_lons[n]/distance;
+
+  return (search_result);
+}
+
 static
 int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict src_lats, 
 		double *restrict src_lons,  double plat, double plon, const int *restrict src_grid_dims,
@@ -1825,8 +1880,6 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
   /* Vectors for cross-product check */
   double vec1_lat, vec1_lon;
   double vec2_lat, vec2_lon, cross_product;
-  double coslat_dst, sinlat_dst, coslon_dst, sinlon_dst;
-  double dist_min, distance; /* For computing dist-weighted avg */
   int scross[4], scross_last = 0;
   int search_result = 0;
   restr_t rlat, rlon;
@@ -1996,49 +2049,10 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  coslat_dst = cos(plat);
-  sinlat_dst = sin(plat);
-  coslon_dst = cos(plon);
-  sinlon_dst = sin(plon);
-
-  dist_min = BIGNUM;
-  for ( n = 0; n < 4; ++n ) src_lats[n] = BIGNUM;
-  for ( srch_add = min_add; srch_add <= max_add; ++srch_add )
-    {
-      distance = acos(coslat_dst*cos(src_center_lat[srch_add])*
-		     (coslon_dst*cos(src_center_lon[srch_add]) +
-                      sinlon_dst*sin(src_center_lon[srch_add]))+
-		      sinlat_dst*sin(src_center_lat[srch_add]));
-
-      if ( distance < dist_min )
-	{
-          for ( n = 0; n < 4; ++n )
-	    {
-	      if ( distance < src_lats[n] )
-		{
-		  for ( i = 3; i > n; --i )
-		    {
-		      src_add [i] = src_add [i-1];
-		      src_lats[i] = src_lats[i-1];
-		    }
-		  search_result = -1;
-		  src_add [n] = srch_add;
-		  src_lats[n] = distance;
-		  dist_min = src_lats[3];
-		  break;
-		}
-	    }
-        }
-    }
-
-  for ( n = 0; n < 4; ++n ) src_lons[n] = ONE/(src_lats[n] + TINY);
-  distance = 0.0;
-  for ( n = 0; n < 4; ++n ) distance += src_lons[n];
-  for ( n = 0; n < 4; ++n ) src_lats[n] = src_lons[n]/distance;
+  search_result = grid_search_nn(min_add, max_add, src_add, src_lats, src_lons,  plat, plon, src_center_lat, src_center_lon);
 
   return (search_result);
 }  /* grid_search */
-
 
 /*
   This routine stores the address and weight for four links associated with one destination
@@ -2238,13 +2252,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 				    plat, plon, src_grid->dims,
 				    src_grid->cell_center_lat, src_grid->cell_center_lon,
 				    src_grid->cell_bound_box, src_grid->bin_addr);
-      /*
-      if ( search_result > 0 )
-	printf("%ld  %g %g  %d %d %d %d  %g %g %g %g  %g %g %g %g\n", dst_add, plon, plat,
-	       src_add[0], src_add[1], src_add[2], src_add[3],
-	       src_lons[0], src_lons[1], src_lons[2], src_lons[3],
-	       src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-      */
+
       /* Check to see if points are land points */
       if ( search_result > 0 )
 	{
@@ -2380,7 +2388,6 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
     }
 
 } /* store_link_bicub */
-
 
 /*
   -----------------------------------------------------------------------
@@ -2692,10 +2699,9 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 
   rv->src_grid_add[nlink] = add1;
   rv->tgt_grid_add[nlink] = add2;
-  rv->wts[nlink]       = weights;
+  rv->wts[nlink]          = weights;
 
 } /* store_link_nbr */
-
 
 /*
   -----------------------------------------------------------------------
