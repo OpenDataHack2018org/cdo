@@ -2,6 +2,10 @@
 
 	* remapbil: optimization for regular 2D source grids
 
+2013-11-25  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remapbil: skip explicitly call to sort_add() (weights are sorted implicitly)
+
 2013-11-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remaplib: cleanup and preparation for opt. reg2d grids
