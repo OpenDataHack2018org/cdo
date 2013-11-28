@@ -1,3 +1,7 @@
+2013-11-28 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* remapbic: optimization for regular 2D source grids
+
 2013-11-27 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remapbil: optimization for regular 2D source grids

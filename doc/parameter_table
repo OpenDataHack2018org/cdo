@@ -1,0 +1,49 @@
+Data and Metadata transformation
+
+Since CDO version 1.5.9 the operator *setpartabn* can be used to transform data and metadata via a parameter table.
+The syntax is:
+
+cdo setpartabn,mypartab ifile ofile
+
+mypartab is an ASCII formatted file with a namelist for each to be changed parameter.
+
+The current implemented namelist entries are:
+
+Entries         type     description
+name            word     original name of the variable
+out_name        word     new name of the variable
+type            word     data type (real or double)
+standard_name   word     as defined in the CF standard name table
+long_name       string   describing the variable
+units           string   specifying the units for the variable
+comment         string   providing clarifying information concerning the variable
+cell_methods    string   typically providing information concerning calculation of means or climatologies
+cell_measures   string   indicates the names of the variables containing cell areas and volumes.
+missing_value   float    specifying how missing data will be identified
+valid_min       float
+valid_max       float
+ok_min_mean_abs float
+ok_max_mean_abs float
+
+Here is an example of a parameter table for one variable:
+
+&parameter
+  name            = t
+  out_name        = ta
+  standard_name   = air_temperature
+  units           = "K"
+  missing_value   = 1e+20
+  valid_min       = 157.1
+  valid_max       = 336.3
+/
+
+The name of the variable is t, this will be renamed to ta. The standard name will be set to air_temperature and the units will be set to "K" (converts the units if necessary). The missing value will be set to 1e+20. In addition it will be checked whether the values of the variable are in the range of 157.1 to 336.3.
+
+The original CMOR parameter tables can be converted to the CDO parameter table with the undocumented CDO operator conv_cmor_table.
+Here is an example to convert the CMOR CMIP5 table CMIP5_day to a CDO parameter table:
+
+cdo conv_cmor_table,CMIP5_day > CMIP5_day.partab
+
+To apply this table to a dataset use:
+
+cdo setpartabn,CMIP5_day.partab  ifile  ofile

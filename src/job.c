@@ -348,9 +348,7 @@ int job_submit(const char *expname, const char *jobfilename, const char *jobname
 
 
 #if defined(HAVE_LIBCURL)
-#  include <curl/curl.h>
-#  include <curl/types.h>
-#  include <curl/easy.h>
+#include <curl/curl.h>
 #endif
 
 struct FtpFile {

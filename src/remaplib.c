@@ -991,7 +991,8 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   src_grid->remap_grid_type = -1;
   tgt_grid->remap_grid_type = -1;
 
-  if ( map_type == MAP_TYPE_BILINEAR && !gridIsRotated(gridID1) &&
+  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC) &&
+       !gridIsRotated(gridID1) &&
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
   //src_grid->remap_grid_type = 0;
@@ -1087,7 +1088,9 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 	}
     }
 
+  // if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
   remap_grid_init(map_type, gridID1, src_grid, REMAP_GRID_BASIS_SRC);
+
   remap_grid_init(map_type, gridID2, tgt_grid, REMAP_GRID_BASIS_TGT);
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -1143,7 +1146,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
       if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = FALSE;
       else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_DISTWGT1 ) rv->sort_add = TRUE;
       else cdoAbort("Unknown mapping method!");
@@ -2189,7 +2192,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
   /*   Local variables */
   int  lwarn = TRUE;
   int  search_result;
-  long grid2_size;
+  long tgt_grid_size;
   long dst_add;                  /*  destination addresss */
   long n, icount;
   long iter;                     /*  iteration counters   */
@@ -2208,7 +2211,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
   progressInit();
 
-  grid2_size = tgt_grid->size;
+  tgt_grid_size = tgt_grid->size;
 
   /* Compute mappings from grid1 to grid2 */
 
@@ -2219,12 +2222,12 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, grid2_size, src_grid, tgt_grid, rv, Max_Iter, converge, lwarn, findex) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, Max_Iter, converge, lwarn, findex) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
-  for ( dst_add = 0; dst_add < grid2_size; ++dst_add )
+  for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
     {
       int lprogress = 1;
 #if defined(_OPENMP)
@@ -2234,7 +2237,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 #pragma omp atomic
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/grid2_size);
+      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
       if ( ! tgt_grid->mask[dst_add] ) continue;
 
@@ -2242,7 +2245,6 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
       plon = tgt_grid->cell_center_lon[dst_add];
 
       /* Find nearest square of grid points on source grid  */
-
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
 					  plat, plon, src_grid->dims,
@@ -2358,7 +2360,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add, double weights[4][4])
+void store_link_bicub(remapvars_t *rv, int dst_add, int *restrict src_add, double weights[4][4])
 {
   /*
     Input variables:
@@ -2378,6 +2380,29 @@ void store_link_bicub(remapvars_t *rv, int dst_add, const int *restrict src_add,
 
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
+
+  if ( rv->sort_add == FALSE )
+    {
+      for ( n = 0; n < 3; ++n )
+	if ( src_add[n] > src_add[n+1] ) break;
+
+      if ( n < 2 ) rv->sort_add = TRUE;
+      else if ( n == 2 ) // swap 3rd and 4th elements
+	{
+	  {
+	    int itmp;
+	    itmp = src_add[2];
+	    src_add[2] = src_add[3];
+	    src_add[3] = itmp;
+	  }
+	  {
+	    double dtmp[4];
+	    for ( k = 0; k < 4; ++k ) dtmp[k] = weights[k][2];
+	    for ( k = 0; k < 4; ++k ) weights[k][2] = weights[k][3];
+	    for ( k = 0; k < 4; ++k ) weights[k][3] = dtmp[k];
+	  }
+	}
+    }
 
   for ( n = 0; n < 4; ++n )
     {
@@ -2401,6 +2426,7 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
   /*   Local variables */
   int  lwarn = TRUE;
   int  search_result;
+  long tgt_grid_size;
   long n, icount;
   long dst_add;        /*  destination addresss */
   long iter;           /*  iteration counters   */
@@ -2413,8 +2439,11 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
   double plat, plon;             /*  lat/lon coords of destination point    */
   double findex = 0;
+  int remap_grid_type = src_grid->remap_grid_type;
 
   progressInit();
+
+  tgt_grid_size = tgt_grid->size;
 
   /* Compute mappings from grid1 to grid2 */
 
@@ -2425,12 +2454,12 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, src_grid, tgt_grid, rv, Max_Iter, converge, lwarn, findex) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, Max_Iter, converge, lwarn, findex) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
-  for ( dst_add = 0; dst_add < tgt_grid->size; ++dst_add )
+  for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
     {
       int lprogress = 1;
 #if defined(_OPENMP)
@@ -2440,7 +2469,7 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 #pragma omp atomic
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid->size);
+      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
       if ( ! tgt_grid->mask[dst_add] ) continue;
 
@@ -2448,6 +2477,11 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
       plon = tgt_grid->cell_center_lon[dst_add];
 
       /* Find nearest square of grid points on source grid  */
+      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
+					  plat, plon, src_grid->dims,
+					  src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+      else
       search_result = grid_search(src_grid, src_add, src_lats, src_lons, 
 				  plat, plon, src_grid->dims,
 				  src_grid->cell_center_lat, src_grid->cell_center_lon,
