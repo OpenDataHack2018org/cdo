@@ -4327,9 +4327,11 @@ static char *EcaCfdHelp[] = {
     "DESCRIPTION",
     "    Let ifile be a time series of the daily minimum temperature TN, then the largest number of",
     "    consecutive days where TN < 0 °C is counted. Note that TN have to be given in units of Kelvin.",
+    "    A further output variable is the number of frost periods of more than 5 days.",
     "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - consecutive_frost_days_index_per_time_period",
+    "    - number_of_cfd_periods_with_more_than_5days_per_time_period",
     NULL
 };
 
@@ -4344,9 +4346,11 @@ static char *EcaCsuHelp[] = {
     "    Let ifile be a time series of the daily maximum temperature TX, then the largest number of consecutive",
     "    days where TX > T is counted. The number T is an optional parameter with default T = 25°C.",
     "    Note that TN have to be given in units of Kelvin, whereas T have to be given in degrees Celsius.",
+    "    A further output variable is the number of summer periods of more than 5 days.",
     "    The date information of a timestep in ofile is the date of the last contributing timestep in ifile.",
     "    The following variables are created: ",
     "    - consecutive_summer_days_index_per_time_period",
+    "    - number_of_csu_periods_with_more_than_5days_per_time_period",
     "",
     "PARAMETER",
     "    T  FLOAT   Temperature threshold (unit: °C; default: T = 25°C)",
