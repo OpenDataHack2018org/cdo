@@ -1,3 +1,8 @@
+2013-11-29 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* eca_csu: added number of csu periods with more than 5days per time period [request: Moritz Maneke]
+	* eca_cfd: added number of cfd periods with more than 5days per time period  [request: Moritz Maneke]
+
 2013-11-28 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* remapbic: optimization for regular 2D source grids

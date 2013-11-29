@@ -74,10 +74,16 @@
 static const char CFD_NAME[]         = "consecutive_frost_days_index_per_time_period";
 static const char CFD_LONGNAME[]     = "Consecutive frost days index is the greatest number of consecutive frost days in a given time period. Frost days is the number of days where minimum of temperature is below 0 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
 static const char CFD_UNITS[]        = "No.";
+static const char CFD_NAME2[]        = "number_of_cfd_periods_with_more_than_5days_per_time_period";
+static const char CFD_LONGNAME2[]    = "Number of cfd periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CFD_UNITS2[]       = "No.";
 
 static const char CSU_NAME[]         = "consecutive_summer_days_index_per_time_period";
 static const char CSU_LONGNAME[]     = "Consecutive summer days index is the greatest number of consecutive summer days in a given time period. Summer days is the number of days where maximum of temperature is above 25 degree Celsius. The time period should be defined by the bounds of the time coordinate.";
 static const char CSU_UNITS[]        = "No.";
+static const char CSU_NAME2[]        = "number_of_csu_periods_with_more_than_5days_per_time_period";
+static const char CSU_LONGNAME2[]    = "Number of csu periods in given time period with more than 5 days. The time period should be defined by the bounds of the time coordinate.";
+static const char CSU_UNITS2[]       = "No.";
 
 static const char CWDI_NAME[]        = "cold_wave_duration_index_wrt_mean_of_reference_period";
 static const char CWDI_LONGNAME[]    = "This is the number of days per time period where in intervals of at least %d consecutive days the daily minimum temperature is more than %1.0f degrees below a reference value. The reference value is calculated  as the mean of minimum temperatures of a five day window centred on each calendar day of a given 30 year climate reference period. The time period should be defined by the bounds of the time coordinate.";
@@ -286,8 +292,13 @@ void *EcaCfd(void *argument)
   request.var1.mulc     = 0.0;
   request.var1.addc     = 0.0;
   request.var1.epilog   = NONE;
+  request.var2.name     = CFD_NAME2;
+  request.var2.longname = CFD_LONGNAME2;
+  request.var2.units    = CFD_UNITS2;
+  request.var2.h1       = farseleqc;
+  request.var2.h1arg    = 6;
   request.var2.h2       = NULL;
-  request.var2.h3       = NULL;
+  request.var2.h3       = farnum;
    
   eca1(&request);
   cdoFinish();
@@ -316,8 +327,13 @@ void *EcaCsu(void *argument)
   request.var1.mulc     = 0.0;
   request.var1.addc     = 0.0;
   request.var1.epilog   = NONE;
+  request.var2.name     = CSU_NAME2;
+  request.var2.longname = CSU_LONGNAME2;
+  request.var2.units    = CSU_UNITS2;
+  request.var2.h1       = farseleqc;
+  request.var2.h1arg    = 6;
   request.var2.h2       = NULL;
-  request.var2.h3       = NULL;
+  request.var2.h3       = farnum;
   
   eca1(&request);
   cdoFinish();
