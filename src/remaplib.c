@@ -991,11 +991,11 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   src_grid->remap_grid_type = -1;
   tgt_grid->remap_grid_type = -1;
 
-  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC) &&
+  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT ) &&
        !gridIsRotated(gridID1) &&
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
-  //src_grid->remap_grid_type = 0;
+  src_grid->remap_grid_type = 0;
 
   src_grid->store_link_fast = FALSE;
   tgt_grid->store_link_fast = FALSE;
@@ -2634,7 +2634,7 @@ void get_restrict_add(remapgrid_t *src_grid, double plat, const int *restrict sr
 static
 void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double *restrict nbr_dist, 
 			   double plat, double plon, const int *restrict src_grid_dims, double coslat_dst, double coslon_dst, 
-			   double sinlat_dst, double sinlon_dst, const int *restrict src_bin_add,
+			   double sinlat_dst, double sinlon_dst,
 			   const double *restrict sinlat, const double *restrict coslat,
 			   const double *restrict sinlon, const double *restrict coslon,
 			   const double *restrict src_center_lat, const double *restrict src_center_lon)
@@ -2647,8 +2647,6 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 
     Input variables:
 
-    int src_bin_add[][2]  ! search bins for restricting search
-
     double plat,         ! latitude  of the search point
     double coslat_dst,   ! cos(lat)  of the search point
     double coslon_dst,   ! cos(lon)  of the search point
@@ -2658,9 +2656,11 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
   /*  Local variables */
   int lfound;
   long n, nadd, nchk;
-  long min_add, max_add;
   long nx, nxm, ny;
   long ii, iix, jj;
+  long i, j, im;
+  int    src_add[9];
+  long num_add;
   double distance;     /* Angular distance */
 
   nx = src_grid_dims[0];
@@ -2674,10 +2674,42 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 
   lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
 
+  if ( lfound )
+    {
+      num_add = 0;
+
+      for ( j = (jj-1); j <= (jj+1); ++j )
+	for ( i = (ii-1); i <= (ii+1); ++i )
+	  {
+	    im = i;
+	    
+	    if ( src_grid->is_cyclic )
+	      {
+		if ( im <  1 ) im += nx;
+		if ( im > nx ) im -= nx;
+	      }
+
+	    if ( im >= 1 && im <= nx && j >= 1 && j <= ny )
+	      src_add[num_add++] = (j-1)*nx+im;
+	  }
+
+      num_add = 0;
+
+      for ( j = (jj-1); j <= jj; ++j )
+	for ( i = (ii-1); i <= ii; ++i )
+	  {
+	    im = i;
+	    if ( src_grid->is_cyclic && im == (nxm-1) ) im = 0;
+
+	    if ( im >= 0 && im < nxm && j >= 0 && j < ny )
+	      src_add[num_add++] = j*nx+im;
+	  }
+    }
+
   /* Loop over source grid and find nearest neighbors                         */
   /* restrict the search using search bins expand the bins to catch neighbors */
 
-  get_restrict_add(src_grid, plat, src_bin_add, &min_add, &max_add);
+  //get_restrict_add(src_grid, plat, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; ++n )
@@ -2686,35 +2718,42 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
       nbr_dist[n] = BIGNUM;
     }
 
-  for ( nadd = min_add; nadd <= max_add; ++nadd )
+  if ( lfound )
     {
-      /* Find distance to this point */
-      distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
-	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
-      /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
-                                     otherwise the result of acos(distance) is NaN */
-      if ( distance >  1 ) distance =  1;
-      if ( distance < -1 ) distance = -1;
-      distance = acos(distance);
-
-      /* Uwe Schulzweida: if distance is zero, set to small number */
-      if ( IS_EQUAL(distance, 0) ) distance = TINY;
-
-      /* Store the address and distance if this is one of the smallest four so far */
-      for ( nchk = 0; nchk < num_neighbors; ++nchk )
+      for ( long na = 0; na < num_add; ++na )
 	{
-          if ( distance < nbr_dist[nchk] )
+	  nadd = src_add[na];
+
+	  /* Find distance to this point */
+	  distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
+	             (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
+
+	  /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
+	                                 otherwise the result of acos(distance) is NaN */
+	  if ( distance >  1 ) distance =  1;
+	  if ( distance < -1 ) distance = -1;
+	  distance = acos(distance);
+	  printf("%ld %ld nadd, distance %ld %g\n", ii, jj, nadd, distance);
+
+	  /* Uwe Schulzweida: if distance is zero, set to small number */
+	  if ( IS_EQUAL(distance, 0) ) distance = TINY;
+
+	  /* Store the address and distance if this is one of the smallest four so far */
+	  for ( nchk = 0; nchk < num_neighbors; ++nchk )
 	    {
-	      for ( n = num_neighbors-1; n > nchk; --n )
+	      if ( distance < nbr_dist[nchk] )
 		{
-		  nbr_add[n]  = nbr_add[n-1];
-		  nbr_dist[n] = nbr_dist[n-1];
+		  for ( n = num_neighbors-1; n > nchk; --n )
+		    {
+		      nbr_add[n]  = nbr_add[n-1];
+		      nbr_dist[n] = nbr_dist[n-1];
+		    }
+		  nbr_add[nchk]  = nadd + 1;
+		  nbr_dist[nchk] = distance;
+		  break;
 		}
-	      nbr_add[nchk]  = nadd + 1;
-	      nbr_dist[nchk] = distance;
-	      break;
 	    }
-        }
+	}
     }
 
 }  /*  grid_search_nbr_reg2d  */
@@ -2917,7 +2956,6 @@ void remap_distwgt(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 			      plat, plon, src_grid->dims,
 			      coslat_dst, coslon_dst, 
 			      sinlat_dst, sinlon_dst,
-			      src_grid->bin_addr,
 			      sinlat, coslat, sinlon, coslon,
 			      src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
       else
@@ -2933,6 +2971,7 @@ void remap_distwgt(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       dist_tot = ZERO;
       for ( n = 0; n < num_neighbors; ++n )
 	{
+	  // printf("dst_add %ld %ld %d %g\n", dst_add, n, nbr_add[n], nbr_dist[n]);
 	  nbr_mask[n] = FALSE;
 
 	  /* Uwe Schulzweida: check if nbr_add is valid */
