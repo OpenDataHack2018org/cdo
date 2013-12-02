@@ -2659,7 +2659,7 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
   long nx, nxm, ny;
   long ii, iix, jj;
   long i, j, im;
-  int src_add[9];
+  int src_add[25];
   long num_add;
   double distance;     /* Angular distance */
 
@@ -2676,11 +2676,11 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 
   if ( lfound )
     {
-      /*
+      
       num_add = 0;
 
-      for ( j = (jj-1); j <= (jj+1); ++j )
-	for ( i = (ii-1); i <= (ii+1); ++i )
+      for ( j = (jj-2); j <= (jj+2); ++j )
+	for ( i = (ii-2); i <= (ii+2); ++i )
 	  {
 	    im = i;
 	    
@@ -2693,7 +2693,7 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 	    if ( im >= 0 && im < nxm && j >= 0 && j < ny )
 	      src_add[num_add++] = j*nx+im;
 	  }
-      */
+      /*
       num_add = 0;
 
       for ( j = (jj-1); j <= jj; ++j )
@@ -2704,6 +2704,7 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 
 	    src_add[num_add++] = j*nx+im;
 	  }
+      */
     }
 
   /* Initialize distance and address arrays */
@@ -2749,11 +2750,14 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 	    }
 	}
     }
-
-  if ( !src_grid->lextrapolate ) return;
-
-  // (void) grid_search_reg2d_nn(nx, ny, src_add, src_lats, src_lons,  plat, plon, src_center_lat, src_center_lon);
-
+  else if ( src_grid->lextrapolate )
+    {
+      int search_result;
+      search_result = grid_search_reg2d_nn(nx, ny, nbr_add, nbr_dist, plat, plon, src_center_lat, src_center_lon);
+      
+      if ( search_result < 0 )
+	for ( n = 0; n < 4; ++n ) nbr_add[n] += 1;
+    }
 }  /*  grid_search_nbr_reg2d  */
 
 static
