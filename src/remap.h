@@ -37,8 +37,7 @@ typedef RESTR_TYPE restr_t;
 #define  MAP_TYPE_BILINEAR  2
 #define  MAP_TYPE_BICUBIC   3
 #define  MAP_TYPE_DISTWGT   4
-#define  MAP_TYPE_DISTWGT1  5
-#define  MAP_TYPE_CONTEST   6
+#define  MAP_TYPE_CONTEST   5
 
 #define  SUBMAP_TYPE_NONE   0
 #define  SUBMAP_TYPE_LAF    1
@@ -153,8 +152,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
-void remap_distwgt(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
-void remap_distwgt1(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
 void resize_remap_vars(remapvars_t *rv, int increment);
 
@@ -168,9 +166,9 @@ void reorder_links(remapvars_t *rv);
 void sort_add(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights);
 void sort_iter(long num_links, long num_wts, int *restrict add1, int *restrict add2, double *restrict weights, int parent);
 
-void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
+void write_remap_scrip(const char *interp_file, int map_type, int submap_type, int num_neighbors,
 		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv);
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type, int *num_neighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
 void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, double *restrict weights);

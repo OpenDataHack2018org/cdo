@@ -49,7 +49,7 @@ enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMA
 enum {HEAP_SORT, MERGE_SORT};
 
 static
-void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_order)
+void get_map_type(int operfunc, int *map_type, int *submap_type, int *num_neighbors, int *remap_order)
 {
   switch ( operfunc )
     {
@@ -88,10 +88,12 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_orde
     case REMAPDIS:
     case GENDIS:
       *map_type = MAP_TYPE_DISTWGT;
+      *num_neighbors = 4;
       break;
     case REMAPNN:
     case GENNN:
-      *map_type = MAP_TYPE_DISTWGT1;
+      *map_type = MAP_TYPE_DISTWGT;
+      *num_neighbors = 1;
       break;
     default:
       cdoAbort("Unknown mapping method");
@@ -100,7 +102,7 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *remap_orde
 }
 
 static
-int maptype2operfunc(int map_type, int submap_type, int remap_order)
+int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap_order)
 {
   int operfunc = -1;
 
@@ -142,13 +144,16 @@ int maptype2operfunc(int map_type, int submap_type, int remap_order)
     }
   else if ( map_type == MAP_TYPE_DISTWGT )
     {
-      operfunc = REMAPDIS;
-      cdoPrint("Using remapdis");
-    }
-  else if ( map_type == MAP_TYPE_DISTWGT1 )
-    {
-      operfunc = REMAPNN;
-      cdoPrint("Using remapnn");
+      if ( num_neighbors == 1 )
+	{
+	  operfunc = REMAPNN;
+	  cdoPrint("Using remapnn");
+	}
+      else
+	{
+	  operfunc = REMAPDIS;
+	  cdoPrint("Using remapdis");
+	}
     }
   else
     cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
@@ -401,6 +406,7 @@ void *Remap(void *argument)
   int norm_opt = NORM_OPT_NONE;
   int map_type = -1;
   int submap_type = SUBMAP_TYPE_NONE;
+  int num_neighbors = 4;
   int need_gradiants = FALSE;
   int non_global;
   int grid1sizemax;
@@ -558,7 +564,7 @@ void *Remap(void *argument)
     {
       int gridsize2;
 
-      read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &submap_type, 
+      read_remap_scrip(remap_file, gridID1, gridID2, &map_type, &submap_type, &num_neighbors,
 		       &remap_order, &remaps[0].src_grid, &remaps[0].tgt_grid, &remaps[0].vars);
       nremaps = 1;
       gridsize = remaps[0].src_grid.size;
@@ -566,15 +572,12 @@ void *Remap(void *argument)
       remaps[0].gridsize = gridInqSize(gridID1);
       remaps[0].nmiss = 0;
 
-      if ( map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1 )
-	{
-	  if ( !lextrapolate ) remap_extrapolate = TRUE;
-	}
+      if ( map_type == MAP_TYPE_DISTWGT && !lextrapolate ) remap_extrapolate = TRUE;
+      if ( gridIsCircular(gridID1)      && !lextrapolate ) remap_extrapolate = TRUE;
 
-      if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
       non_global = remap_non_global || !gridIsCircular(gridID1);
       if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-	   (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
+	   map_type == MAP_TYPE_DISTWGT &&
 	   ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 	    (gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 	    (gridInqType(gridID1) == GRID_LCC) ||
@@ -616,12 +619,12 @@ void *Remap(void *argument)
       if ( remaps[0].tgt_grid.size != gridsize2 )
 	cdoAbort("Size of target grid and weights from %s differ!", remap_file);
 
-      operfunc = maptype2operfunc(map_type, submap_type, remap_order);
+      operfunc = maptype2operfunc(map_type, submap_type, num_neighbors, remap_order);
 
       if ( remap_test ) reorder_links(&remaps[0].vars);
     }
 
-  get_map_type(operfunc, &map_type, &submap_type, &remap_order);
+  get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
 
   if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONTEST )
     {
@@ -722,7 +725,7 @@ void *Remap(void *argument)
 	  if ( gridIsCircular(gridID1) && !lextrapolate ) remap_extrapolate = TRUE;
 	  non_global = remap_non_global || !gridIsCircular(gridID1);
 	  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-	       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
+	       map_type == MAP_TYPE_DISTWGT  &&
 	       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 		(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 		(gridInqType(gridID1) == GRID_LCC) ||
@@ -801,7 +804,7 @@ void *Remap(void *argument)
 		  remaps[r].src_grid.non_global = FALSE;
 		  non_global = remap_non_global || !gridIsCircular(gridID1);
 		  if ( !remap_extrapolate && gridInqSize(gridID1) > 1 &&
-		       (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) &&
+		       map_type == MAP_TYPE_DISTWGT &&
 		       ((gridInqType(gridID1) == GRID_LONLAT && gridIsRotated(gridID1)) ||
 			(gridInqType(gridID1) == GRID_LONLAT && non_global) ||
 			(gridInqType(gridID1) == GRID_LCC) ||
@@ -817,7 +820,7 @@ void *Remap(void *argument)
 		  */
 		  if ( gridInqType(gridID1) != GRID_UNSTRUCTURED && lremap_num_srch_bins == FALSE )
 		    {
-		      if ( !remap_extrapolate && (map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_DISTWGT1) )
+		      if ( !remap_extrapolate && map_type == MAP_TYPE_DISTWGT )
 			{
 			  remap_num_srch_bins = 1;
 			}
@@ -876,8 +879,7 @@ void *Remap(void *argument)
 	      if      ( map_type == MAP_TYPE_CONSERV  ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BILINEAR ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BICUBIC  ) remap_bicub(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_DISTWGT  ) remap_distwgt(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_DISTWGT1 ) remap_distwgt1(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_DISTWGT  ) remap_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_CONTEST  ) remap_contest(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
@@ -1034,7 +1036,8 @@ void *Remap(void *argument)
   WRITE_REMAP:
  
   if ( lwrite_remap ) 
-    write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, remap_order, remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars);
+    write_remap_scrip(cdoStreamName(1)->args, map_type, submap_type, num_neighbors, remap_order,
+		      remaps[r].src_grid, remaps[r].tgt_grid, remaps[r].vars);
 
   streamClose(streamID1);
 

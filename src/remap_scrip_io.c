@@ -32,7 +32,7 @@ void nce(int istat)
 #endif
 
 
-void write_remap_scrip(const char *interp_file, int map_type, int submap_type, 
+void write_remap_scrip(const char *interp_file, int map_type, int submap_type, int num_neighbors,
 		       int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, remapvars_t rv)
 {
   /*
@@ -128,10 +128,10 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
       strcpy(map_method, "Bicubic remapping");
       break;
     case MAP_TYPE_DISTWGT:
-      strcpy(map_method, "Distance weighted avg of nearest neighbors");
-      break;
-    case MAP_TYPE_DISTWGT1:
-      strcpy(map_method, "Nearest neighbor");
+      if ( num_neighbors == 1 )
+	strcpy(map_method, "Nearest neighbor");
+      else
+	strcpy(map_method, "Distance weighted avg of nearest neighbors");
       break;
     }
 
@@ -373,7 +373,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type,
 
 /*****************************************************************************/
 
-void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type,
+void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *map_type, int *submap_type, int *num_neighbors,
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*
@@ -490,8 +490,16 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
     }
   else if ( memcmp(map_method, "Bilinear", 8) == 0 ) rv->map_type = MAP_TYPE_BILINEAR;
   else if ( memcmp(map_method, "Bicubic",  7) == 0 ) rv->map_type = MAP_TYPE_BICUBIC;
-  else if ( memcmp(map_method, "Distance", 8) == 0 ) rv->map_type = MAP_TYPE_DISTWGT;
-  else if ( memcmp(map_method, "Nearest",  7) == 0 ) rv->map_type = MAP_TYPE_DISTWGT1;
+  else if ( memcmp(map_method, "Distance", 8) == 0 )
+    {
+      rv->map_type = MAP_TYPE_DISTWGT;
+      *num_neighbors = 4;
+    }
+  else if ( memcmp(map_method, "Nearest",  7) == 0 )
+    {
+      rv->map_type = MAP_TYPE_DISTWGT;
+      *num_neighbors = 1;
+    }
   else if ( memcmp(map_method, "Largest",  7) == 0 )
     {
       rv->map_type = MAP_TYPE_CONSERV;
