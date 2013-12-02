@@ -2677,11 +2677,12 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 	    
 	    if ( src_grid->is_cyclic )
 	      {
+		if ( im == (nxm-1) ) im = 0;
 		if ( im <   0 ) im += nx;
 		if ( im >= nx ) im -= nx;
 	      }
 
-	    if ( im >= 0 && im < nxm && j >= 0 && j < ny )
+	    if ( im >= 0 && im < nx && j >= 0 && j < ny )
 	      src_add[num_add++] = j*nx+im;
 	  }
       /*
@@ -2701,7 +2702,7 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; ++n )
     {
-      nbr_add[n]  = 0;
+      nbr_add[n]  = -1;
       nbr_dist[n] = BIGNUM;
     }
 
@@ -2734,7 +2735,7 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 		      nbr_add[n]  = nbr_add[n-1];
 		      nbr_dist[n] = nbr_dist[n-1];
 		    }
-		  nbr_add[nchk]  = nadd + 1;
+		  nbr_add[nchk]  = nadd;
 		  nbr_dist[nchk] = distance;
 		  break;
 		}
@@ -2746,8 +2747,8 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
       int search_result;
       search_result = grid_search_reg2d_nn(nx, ny, nbr_add, nbr_dist, plat, plon, src_center_lat, src_center_lon);
       
-      if ( search_result < 0 )
-	for ( n = 0; n < 4; ++n ) nbr_add[n] += 1;
+      if ( search_result >= 0 )
+	for ( n = 0; n < 4; ++n ) nbr_add[n] = -1;
     }
 }  /*  grid_search_nbr_reg2d  */
 
@@ -2787,7 +2788,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; ++n )
     {
-      nbr_add[n]  = 0;
+      nbr_add[n]  = -1;
       nbr_dist[n] = BIGNUM;
     }
 
@@ -2815,7 +2816,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
 		  nbr_add[n]  = nbr_add[n-1];
 		  nbr_dist[n] = nbr_dist[n-1];
 		}
-	      nbr_add[nchk]  = nadd + 1;
+	      nbr_add[nchk]  = nadd;
 	      nbr_dist[nchk] = distance;
 	      break;
 	    }
@@ -2968,8 +2969,8 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
 	  nbr_mask[n] = FALSE;
 
 	  /* Uwe Schulzweida: check if nbr_add is valid */
-	  if ( nbr_add[n] > 0 )
-	    if ( src_grid->mask[nbr_add[n]-1] )
+	  if ( nbr_add[n] >= 0 )
+	    if ( src_grid->mask[nbr_add[n]] )
 	      {
 		nbr_dist[n] = ONE/nbr_dist[n];
 		dist_tot = dist_tot + nbr_dist[n];
@@ -2989,7 +2990,7 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-	      store_link_nbr(rv, nbr_add[n]-1, dst_add, wgtstmp);
+	      store_link_nbr(rv, nbr_add[n], dst_add, wgtstmp);
 	    }
 	}
 
