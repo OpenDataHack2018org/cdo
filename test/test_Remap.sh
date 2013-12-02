@@ -5,6 +5,8 @@
 #
 CDODEBUG=0
 #
+if [ "$CDO_TEST_DEBUG" = 1 ]; then CDODEBUG=1; fi
+#
 if [ "$CDODEBUG" = 0 ]; then CDO="$CDO -s"; fi
 CDOOUT=cout
 CDOERR=cerr
@@ -22,6 +24,9 @@ for GRIDTYPE in " " "-setgridtype,curvilinear" "-setgridtype,unstructured"; do
     for RMOD in $RMODS; do
       OFILE=${GRID}_${RMOD}
       RFILE=$DATAPATH/${OFILE}_ref
+      if [ "$CDODEBUG" = 1 ]; then
+	echo "$CDO $FORMAT remap${RMOD},$GRID $GRIDTYPE $IFILE ${OFILE}"
+      fi
       $CDO $FORMAT remap${RMOD},$GRID $GRIDTYPE $IFILE ${OFILE} > $CDOOUT 2> $CDOERR
       if [ $? != 0 ]    ; then RSTAT=`expr $RSTAT + 1`; fi
       if [ "$CDODEBUG" = 1 ]; then cat $CDOOUT $CDOERR; fi
