@@ -1609,8 +1609,7 @@ long find_element(double x, long nelem, const double *restrict array);
 int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
 
 static
-int grid_search_reg2d_nn(long nx, long ny, int *restrict src_add, double *restrict src_lats, 
-			 double *restrict src_lons,  double plat, double plon,
+int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
 			 const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
@@ -1629,7 +1628,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict src_add, double *restri
   sinlon_dst = sin(plon);
 
   dist_min = BIGNUM;
-  for ( n = 0; n < 4; ++n ) src_lats[n] = BIGNUM;  
+  for ( n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;  
 
   long jjf = 0, jjl = ny-1;
   if ( plon >= src_center_lon[0] && plon <= src_center_lon[nx-1] )
@@ -1674,17 +1673,17 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict src_add, double *restri
 	    {
 	      for ( n = 0; n < 4; ++n )
 		{
-		  if ( distance < src_lats[n] )
+		  if ( distance < nbr_dist[n] )
 		    {
 		      for ( i = 3; i > n; --i )
 			{
-			  src_add [i] = src_add [i-1];
-			  src_lats[i] = src_lats[i-1];
+			  nbr_add [i] = nbr_add [i-1];
+			  nbr_dist[i] = nbr_dist[i-1];
 			}
 		      search_result = -1;
-		      src_add [n] = srch_add;
-		      src_lats[n] = distance;
-		      dist_min = src_lats[3];
+		      nbr_add [n] = srch_add;
+		      nbr_dist[n] = distance;
+		      dist_min = nbr_dist[3];
 		      break;
 		    }
 		}
@@ -1694,10 +1693,10 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict src_add, double *restri
 
   free(sincoslon);
 
-  for ( n = 0; n < 4; ++n ) src_lons[n] = ONE/(src_lats[n] + TINY);
+  for ( n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
   distance = 0.0;
-  for ( n = 0; n < 4; ++n ) distance += src_lons[n];
-  for ( n = 0; n < 4; ++n ) src_lats[n] = src_lons[n]/distance;
+  for ( n = 0; n < 4; ++n ) distance += nbr_dist[n];
+  for ( n = 0; n < 4; ++n ) nbr_dist[n] /= distance;
 
   return (search_result);
 }
@@ -1785,15 +1784,15 @@ int grid_search_reg2d(remapgrid_t *src_grid, int *restrict src_add, double *rest
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result = grid_search_reg2d_nn(nx, ny, src_add, src_lats, src_lons,  plat, plon, src_center_lat, src_center_lon);
+  search_result = grid_search_reg2d_nn(nx, ny, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
   return (search_result);
 }  /* grid_search_reg2d */
 
 
 static
-int grid_search_nn(long min_add, long max_add, int *restrict src_add, double *restrict src_lats, 
-		   double *restrict src_lons,  double plat, double plon,
+int grid_search_nn(long min_add, long max_add, int *restrict nbr_add, double *restrict nbr_dist, 
+		   double plat, double plon,
 		   const double *restrict src_center_lat, const double *restrict src_center_lon)
 {
   int search_result = 0;
@@ -1808,7 +1807,7 @@ int grid_search_nn(long min_add, long max_add, int *restrict src_add, double *re
   sinlon_dst = sin(plon);
 
   dist_min = BIGNUM;
-  for ( n = 0; n < 4; ++n ) src_lats[n] = BIGNUM;
+  for ( n = 0; n < 4; ++n ) nbr_dist[n] = BIGNUM;
   for ( srch_add = min_add; srch_add <= max_add; ++srch_add )
     {
       distance = acos(coslat_dst*cos(src_center_lat[srch_add])*
@@ -1820,27 +1819,27 @@ int grid_search_nn(long min_add, long max_add, int *restrict src_add, double *re
 	{
           for ( n = 0; n < 4; ++n )
 	    {
-	      if ( distance < src_lats[n] )
+	      if ( distance < nbr_dist[n] )
 		{
 		  for ( i = 3; i > n; --i )
 		    {
-		      src_add [i] = src_add [i-1];
-		      src_lats[i] = src_lats[i-1];
+		      nbr_add [i] = nbr_add [i-1];
+		      nbr_dist[i] = nbr_dist[i-1];
 		    }
 		  search_result = -1;
-		  src_add [n] = srch_add;
-		  src_lats[n] = distance;
-		  dist_min = src_lats[3];
+		  nbr_add [n] = srch_add;
+		  nbr_dist[n] = distance;
+		  dist_min = nbr_dist[3];
 		  break;
 		}
 	    }
         }
     }
 
-  for ( n = 0; n < 4; ++n ) src_lons[n] = ONE/(src_lats[n] + TINY);
+  for ( n = 0; n < 4; ++n ) nbr_dist[n] = ONE/(nbr_dist[n] + TINY);
   distance = 0.0;
-  for ( n = 0; n < 4; ++n ) distance += src_lons[n];
-  for ( n = 0; n < 4; ++n ) src_lats[n] = src_lons[n]/distance;
+  for ( n = 0; n < 4; ++n ) distance += nbr_dist[n];
+  for ( n = 0; n < 4; ++n ) nbr_dist[n] /= distance;
 
   return (search_result);
 }
@@ -2050,7 +2049,7 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
     printf("Could not find location for %g %g\n", plat*RAD2DEG, plon*RAD2DEG);
     printf("Using nearest-neighbor average for this point\n");
   */
-  search_result = grid_search_nn(min_add, max_add, src_add, src_lats, src_lons,  plat, plon, src_center_lat, src_center_lon);
+  search_result = grid_search_nn(min_add, max_add, src_add, src_lats, plat, plon, src_center_lat, src_center_lon);
 
   return (search_result);
 }  /* grid_search */
@@ -2313,6 +2312,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
       /*
 	Search for bilinear failed - use a distance-weighted average instead (this is typically near the pole)
+	Distance was stored in src_lats!
       */
       if ( search_result < 0 )
 	{
@@ -2749,6 +2749,10 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 	    }
 	}
     }
+
+  if ( !src_grid->lextrapolate ) return;
+
+  // (void) grid_search_reg2d_nn(nx, ny, src_add, src_lats, src_lons,  plat, plon, src_center_lat, src_center_lon);
 
 }  /*  grid_search_nbr_reg2d  */
 
