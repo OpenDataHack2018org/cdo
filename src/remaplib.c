@@ -2651,8 +2651,8 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   int lfound;
   long n, nadd, nchk;
   long nx, nxm, ny;
-  long ii, iix, jj;
-  long i, j, im;
+  long ii, jj;
+  long i, j, ix;
   int src_add[25];
   long num_add = 0;
   double distance;     /* Angular distance */
@@ -2670,20 +2670,21 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 
   if ( lfound )
     {
+      if ( src_grid->is_cyclic && ii == (nxm-1) ) ii = 0;
+
       for ( j = (jj-2); j <= (jj+2); ++j )
 	for ( i = (ii-2); i <= (ii+2); ++i )
 	  {
-	    im = i;
+	    ix = i;
 	    
 	    if ( src_grid->is_cyclic )
 	      {
-		if ( im == (nxm-1) ) im = 0;
-		if ( im <   0 ) im += nx;
-		if ( im >= nx ) im -= nx;
+		if ( ix <   0 ) ix += nx;
+		if ( ix >= nx ) ix -= nx;
 	      }
 
-	    if ( im >= 0 && im < nx && j >= 0 && j < ny )
-	      src_add[num_add++] = j*nx+im;
+	    if ( ix >= 0 && ix < nx && j >= 0 && j < ny )
+	      src_add[num_add++] = j*nx+ix;
 	  }
       /*
       num_add = 0;
@@ -2691,10 +2692,10 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
       for ( j = (jj-1); j <= jj; ++j )
 	for ( i = (ii-1); i <= ii; ++i )
 	  {
-	    im = i;
-	    if ( src_grid->is_cyclic && im == (nxm-1) ) im = 0;
+	    ix = i;
+	    if ( src_grid->is_cyclic && ix == (nxm-1) ) ix = 0;
 
-	    src_add[num_add++] = j*nx+im;
+	    src_add[num_add++] = j*nx+ix;
 	  }
       */
     }
@@ -2738,6 +2739,11 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 		  nbr_add[nchk]  = nadd;
 		  nbr_dist[nchk] = distance;
 		  break;
+		}
+	      else if ( num_neighbors == 1 && distance <= nbr_dist[0] && nadd < nbr_add[0] )
+		{
+		  nbr_add[0]  = nadd;
+		  nbr_dist[0] = distance;
 		}
 	    }
 	}
