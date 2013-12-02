@@ -995,7 +995,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
        !gridIsRotated(gridID1) &&
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
-  src_grid->remap_grid_type = 0;
+  // src_grid->remap_grid_type = 0;
 
   src_grid->store_link_fast = FALSE;
   tgt_grid->store_link_fast = FALSE;
@@ -2659,7 +2659,7 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
   long nx, nxm, ny;
   long ii, iix, jj;
   long i, j, im;
-  int    src_add[9];
+  int src_add[9];
   long num_add;
   double distance;     /* Angular distance */
 
@@ -2669,13 +2669,14 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
   nxm = nx;
   if ( src_grid->is_cyclic ) nxm++;
 
-  if ( /*plon < 0   &&*/ plon < src_center_lon[0]     ) plon += PI2;
-  if ( /*plon > PI2 &&*/ plon > src_center_lon[nxm-1] ) plon -= PI2;
+  if ( plon < src_center_lon[0]     ) plon += PI2;
+  if ( plon > src_center_lon[nxm-1] ) plon -= PI2;
 
   lfound = rect_grid_search(&ii, &jj, plon, plat, nxm, ny, src_center_lon, src_center_lat);
 
   if ( lfound )
     {
+      /*
       num_add = 0;
 
       for ( j = (jj-1); j <= (jj+1); ++j )
@@ -2685,14 +2686,14 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 	    
 	    if ( src_grid->is_cyclic )
 	      {
-		if ( im <  1 ) im += nx;
-		if ( im > nx ) im -= nx;
+		if ( im <   0 ) im += nx;
+		if ( im >= nx ) im -= nx;
 	      }
 
-	    if ( im >= 1 && im <= nx && j >= 1 && j <= ny )
-	      src_add[num_add++] = (j-1)*nx+im;
+	    if ( im >= 0 && im < nxm && j >= 0 && j < ny )
+	      src_add[num_add++] = j*nx+im;
 	  }
-
+      */
       num_add = 0;
 
       for ( j = (jj-1); j <= jj; ++j )
@@ -2701,15 +2702,9 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 	    im = i;
 	    if ( src_grid->is_cyclic && im == (nxm-1) ) im = 0;
 
-	    if ( im >= 0 && im < nxm && j >= 0 && j < ny )
-	      src_add[num_add++] = j*nx+im;
+	    src_add[num_add++] = j*nx+im;
 	  }
     }
-
-  /* Loop over source grid and find nearest neighbors                         */
-  /* restrict the search using search bins expand the bins to catch neighbors */
-
-  //get_restrict_add(src_grid, plat, src_bin_add, &min_add, &max_add);
 
   /* Initialize distance and address arrays */
   for ( n = 0; n < num_neighbors; ++n )
@@ -2733,7 +2728,6 @@ void grid_search_nbr_reg2d(remapgrid_t *src_grid, int *restrict nbr_add, double 
 	  if ( distance >  1 ) distance =  1;
 	  if ( distance < -1 ) distance = -1;
 	  distance = acos(distance);
-	  printf("%ld %ld nadd, distance %ld %g\n", ii, jj, nadd, distance);
 
 	  /* Uwe Schulzweida: if distance is zero, set to small number */
 	  if ( IS_EQUAL(distance, 0) ) distance = TINY;
