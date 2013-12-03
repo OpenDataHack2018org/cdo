@@ -359,8 +359,7 @@ void lcc_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
   long i;
   proj_info_t proj;
 
-  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
-	     &projflag, &scanflag);
+  gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm, &projflag, &scanflag);
   /*
     while ( originLon < 0 ) originLon += 360;
     while ( lonParY   < 0 ) lonParY   += 360;
@@ -417,6 +416,8 @@ void sinusoidal_to_geo(int gridsize, double *xvals, double *yvals)
       res = pj_inv(data, libProj);
       xvals[i] = res.u*RAD2DEG;
       yvals[i] = res.v*RAD2DEG;
+      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
+      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
     }
 #else
   cdoAbort("proj4 support not compiled in!");
@@ -461,6 +462,8 @@ void laea_to_geo(int gridID, int gridsize, double *xvals, double *yvals)
       res = pj_inv(data, libProj);
       xvals[i] = res.u*RAD2DEG;
       yvals[i] = res.v*RAD2DEG;
+      if ( xvals[i] < -9000. || xvals[i] > 9000. ) xvals[i] = -9999.;
+      if ( yvals[i] < -9000. || yvals[i] > 9000. ) yvals[i] = -9999.;
     }
 #else
   cdoAbort("proj4 support not compiled in!");
