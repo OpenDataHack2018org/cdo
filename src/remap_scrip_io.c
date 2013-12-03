@@ -600,6 +600,9 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   nce(nc_inq_dimlen(nc_file_id, nc_numlinks_id, &dimlen));
   rv->num_links = dimlen;
 
+  if ( rv->num_links == 0 )
+    cdoAbort("Number of remap links is 0, no remap weights found!");
+
   nce(nc_inq_dimid(nc_file_id, "num_wgts", &nc_numwgts_id));
   nce(nc_inq_dimlen(nc_file_id, nc_numwgts_id, &dimlen));
   rv->num_wts = dimlen;
