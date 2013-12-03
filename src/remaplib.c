@@ -2874,8 +2874,8 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
 {
   /*  Local variables */
 
-  long grid1_size;
-  long grid2_size;
+  long src_grid_size;
+  long tgt_grid_size;
   long n;
   long dst_add;                   /* destination address                     */
   int nbr_mask[num_neighbors];    /* mask at nearest neighbors               */
@@ -2897,21 +2897,21 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
 
   /* Compute mappings from grid1 to grid2 */
 
-  grid1_size = src_grid->size;
-  grid2_size = tgt_grid->size;
+  src_grid_size = src_grid->size;
+  tgt_grid_size = tgt_grid->size;
 
   /* Compute cos, sin of lat/lon on source grid for distance calculations */
 
-  coslat = (double *) malloc(grid1_size*sizeof(double));
-  coslon = (double *) malloc(grid1_size*sizeof(double));
-  sinlat = (double *) malloc(grid1_size*sizeof(double));
-  sinlon = (double *) malloc(grid1_size*sizeof(double));
+  coslat = (double *) malloc(src_grid_size*sizeof(double));
+  coslon = (double *) malloc(src_grid_size*sizeof(double));
+  sinlat = (double *) malloc(src_grid_size*sizeof(double));
+  sinlon = (double *) malloc(src_grid_size*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(src_grid, grid1_size, coslat, coslon, sinlat, sinlon)
+  shared(src_grid, src_grid_size, coslat, coslon, sinlat, sinlon)
 #endif
-  for ( n = 0; n < grid1_size; ++n )
+  for ( n = 0; n < src_grid_size; ++n )
     {
       coslat[n] = cos(src_grid->cell_center_lat[n]);
       coslon[n] = cos(src_grid->cell_center_lon[n]);
@@ -2920,15 +2920,14 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
     }
 
   /* Loop over destination grid  */
-  /* grid_loop1 */
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, grid2_size, coslat, coslon, sinlat, sinlon, findex) \
+  shared(ompNumThreads, cdoTimer, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
   private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, dist_tot, \
 	  nbr_add, nbr_dist, nbr_mask, wgtstmp, plat, plon)		\
   schedule(dynamic,1)
 #endif
-  for ( dst_add = 0; dst_add < grid2_size; ++dst_add )
+  for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
     {
       int lprogress = 1;
 #if defined(_OPENMP)
@@ -2938,17 +2937,17 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
 #pragma omp atomic
 #endif
       findex++;
-      if ( lprogress ) progressStatus(0, 1, findex/grid2_size);
+      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
       if ( ! tgt_grid->mask[dst_add] ) continue;
-
-      coslat_dst = cos(tgt_grid->cell_center_lat[dst_add]);
-      coslon_dst = cos(tgt_grid->cell_center_lon[dst_add]);
-      sinlat_dst = sin(tgt_grid->cell_center_lat[dst_add]);
-      sinlon_dst = sin(tgt_grid->cell_center_lon[dst_add]);
 	
       plat = tgt_grid->cell_center_lat[dst_add];
       plon = tgt_grid->cell_center_lon[dst_add];
+
+      coslat_dst = cos(plat);
+      coslon_dst = cos(plon);
+      sinlat_dst = sin(plat);
+      sinlon_dst = sin(plon);
 
       /* Find nearest grid points on source grid and distances to each point */
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -2999,8 +2998,7 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
 	      store_link_nbr(rv, nbr_add[n], dst_add, wgtstmp);
 	    }
 	}
-
-    } /* grid_loop1 */
+    } /* for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add ) */
 
   free(coslat);
   free(coslon);
