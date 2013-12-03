@@ -135,6 +135,9 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
       break;
     }
 
+  if ( rv.num_links == 0 )
+    cdoAbort("Number of remap links is 0, no remap weights found!");
+
   {
     size_t filesize;
     size_t nele1, nele2;
