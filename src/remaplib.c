@@ -136,6 +136,8 @@ void remapGridFree(remapgrid_t *grid)
       free(grid->mask);
       if ( grid->reg2d_center_lat ) free(grid->reg2d_center_lat);
       if ( grid->reg2d_center_lon ) free(grid->reg2d_center_lon);
+      if ( grid->reg2d_corner_lat ) free(grid->reg2d_corner_lat);
+      if ( grid->reg2d_corner_lon ) free(grid->reg2d_corner_lon);
       free(grid->cell_center_lat);
       free(grid->cell_center_lon);
       if ( grid->cell_area ) free(grid->cell_area);
@@ -330,6 +332,8 @@ void remapGridInitPointer(remapgrid_t *grid)
   grid->mask             = NULL;
   grid->reg2d_center_lon = NULL;
   grid->reg2d_center_lat = NULL;
+  grid->reg2d_corner_lon = NULL;
+  grid->reg2d_corner_lat = NULL;
   grid->cell_center_lon  = NULL;
   grid->cell_center_lat  = NULL;
   grid->cell_area        = NULL;
@@ -792,17 +796,21 @@ void remap_reg2d_init(int gridID, remapgrid_t *grid)
 {
   char units[CDI_MAX_NAME];
   long nx, nxm, ny;
+  long nxp1, nyp1;
 
   nx = grid->dims[0];
   ny = grid->dims[1];
+
+  nxp1 = nx+1;
+  nyp1 = ny+1;
 
   nxm = nx;
   if ( grid->is_cyclic ) nxm++;
 
   if ( grid->size != nx*ny ) cdoAbort("Internal error, wrong dimensions!");
 
-  grid->reg2d_center_lon = (double *) realloc(grid->reg2d_center_lon, (nx+1)*sizeof(double));
-  grid->reg2d_center_lat = (double *) realloc(grid->reg2d_center_lat,     ny*sizeof(double));
+  grid->reg2d_center_lon = (double *) realloc(grid->reg2d_center_lon, nxm*sizeof(double));
+  grid->reg2d_center_lat = (double *) realloc(grid->reg2d_center_lat,  ny*sizeof(double));
  
   gridInqXvals(gridID, grid->reg2d_center_lon);
   gridInqYvals(gridID, grid->reg2d_center_lat);
@@ -991,7 +999,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   src_grid->remap_grid_type = -1;
   tgt_grid->remap_grid_type = -1;
 
-  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT ) &&
+  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONTEST ) &&
        !gridIsRotated(gridID1) &&
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
@@ -4265,8 +4273,106 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 }  /* store_link_cnsrv */
 
 static
+long get_srch_cells_reg2d(const int *restrict src_grid_dims, 
+			  const double *restrict src_corner_lat, const double *restrict src_corner_lon,
+			  const restr_t *tgt_cell_bound_box, int *srch_add)
+{
+  long num_srch_cells;  /* num cells in restricted search arrays   */
+  long min_add;         /* addresses for restricting search of     */
+  long max_add;         /* destination grid                        */
+  long n, n2;           /* generic counters                        */
+  long src_grid_add;    /* current linear address for src cell     */
+  long tgt_grid_addm4, src_grid_addm4;
+  int  lmask;
+  long nx, ny;
+  long nxp1, nyp1;
+  double grid1_bound_box[4];
+  double src_lon_min, src_lon_max;
+
+  nx = src_grid_dims[0];
+  ny = src_grid_dims[1];
+
+  nxp1 = nx+1;
+  nyp1 = ny+1;
+  /*
+  grid1_bound_box[0] = src_corner_lat[0];
+  grid1_bound_box[1] = src_corner_lat[ny];
+  if ( ym[0] > ym[ny] )
+    {
+      grid1_bound_box[0] = src_corner_lat[ny];
+      grid1_bound_box[1] = src_corner_lat[0];
+    }
+  grid1_bound_box[2] = src_corner_lon[0];
+  grid1_bound_box[3] = src_corner_lon[nx];
+
+  src_lon_min = src_corner_lon[0];
+  src_lon_max = src_corner_lon[nx];
+
+  double bound_lon1, bound_lon2;
+  double bound_box[4];
+  boundbox_from_corners(i, nc2, x, y, bound_box);
+  restrict_boundbox(grid1_bound_box, bound_box);
+  bound_lon1 = bound_box[2];
+  bound_lon2 = bound_box[3];
+  */
+  num_srch_cells = 0;
+  /*
+  long imin = nxm, imax = -1, jmin = nym, jmax = -1;
+  long im, jm;
+
+  lfound = rect_grid_search2(&jmin, &jmax, bound_box[0], bound_box[1], nym, ym);
+  bound_lon1 = bound_box[2];
+  bound_lon2 = bound_box[3];
+  if ( bound_lon1 <= src_lon_max && bound_lon2 >= src_lon_min )
+    {
+      //printf("b1 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
+      if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
+      if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
+      lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
+      //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
+      for ( jm = jmin; jm <= jmax; ++jm )
+	for ( im = imin; im <= imax; ++im )
+	  srch_add[num_srch_cells++] = jm*nx + im;
+    }
+
+  bound_lon1 = bound_box[2];
+  bound_lon2 = bound_box[3];
+  if ( bound_lon1 <= src_lon_min && bound_lon2 > src_lon_min )
+    {
+      bound_lon1 += 2*M_PI;
+      bound_lon2 += 2*M_PI;
+      //printf("b2 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
+      if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
+      if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
+      lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
+      //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
+      for ( jm = jmin; jm <= jmax; ++jm )
+	for ( im = imin; im <= imax; ++im )
+	  srch_add[num_srch_cells++] = jm*nx + im;
+    }
+
+  bound_lon1 = bound_box[2];
+  bound_lon2 = bound_box[3];
+  if ( bound_lon1 < src_lon_max && bound_lon2 >= src_lon_max )
+    {
+      bound_lon1 -= 2*M_PI;
+      bound_lon2 -= 2*M_PI;
+      //printf("b3 %g %g\n", bound_lon1*RAD2DEG, bound_lon2*RAD2DEG);
+      if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
+      if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
+      lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
+      //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
+      for ( jm = jmin; jm <= jmax; ++jm )
+	for ( im = imin; im <= imax; ++im )
+	  srch_add[num_srch_cells++] = jm*nx + im;
+    }
+  */
+  return (num_srch_cells);
+}
+
+static
 long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
-		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long grid2_size, int *srch_add)
+		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long src_grid_size, int *srch_add)
 {
   long num_srch_cells;  /* num cells in restricted search arrays   */
   long min_add;         /* addresses for restricting search of     */
@@ -4279,7 +4385,7 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
 
   /* Restrict searches first using search bins */
 
-  min_add = grid2_size - 1;
+  min_add = src_grid_size - 1;
   max_add = 0;
 
   for ( n = 0; n < nbins; ++n )
@@ -4525,7 +4631,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
       /* Get search cells */
       num_srch_cells = get_srch_cells(src_grid_add, nbins, src_grid->bin_addr, tgt_grid->bin_addr,
-				      src_grid->cell_bound_box, tgt_grid->cell_bound_box , grid2_size, srch_add);
+				      src_grid->cell_bound_box, tgt_grid->cell_bound_box, grid2_size, srch_add);
 
       if ( num_srch_cells == 0 ) continue;
 
@@ -4751,7 +4857,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
       /* Get search cells */
       num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
-				      tgt_grid->cell_bound_box, src_grid->cell_bound_box , grid1_size, srch_add);
+				      tgt_grid->cell_bound_box, src_grid->cell_bound_box, grid1_size, srch_add);
 
       if ( num_srch_cells == 0 ) continue;
 
@@ -5328,6 +5434,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   grid_store_t *grid_store = NULL;
   double findex = 0;
   long num_weights = 0;
+  int remap_grid_type = src_grid->remap_grid_type;
 
   progressInit();
 
@@ -5455,8 +5562,16 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
 
       /* Get search cells */
-      num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
-				      tgt_grid->cell_bound_box, src_grid->cell_bound_box , grid1_size, srch_add);
+      /*
+     if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
+					      tgt_cell_bound_box, srch_add);
+      else
+      */
+	num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
+					tgt_grid->cell_bound_box, src_grid->cell_bound_box, grid1_size, srch_add);
+
+      printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
 
       if ( num_srch_cells == 0 ) continue;
 
@@ -5549,7 +5664,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	    }
 	}
 
-      //correct_weights(num_weights, weight);
+      correct_weights(num_weights, weight);
 #endif
 
       for ( n = 0; n < num_weights; ++n )

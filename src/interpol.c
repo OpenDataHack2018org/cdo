@@ -372,32 +372,35 @@ void intconarr2(double missval, int lon_is_circular,
   long i, ii = -1, jj = -1;
   long gridsize1;
   long nlon1 = nxm;
+  long nx, ny;
   double findex = 0;
   int *grid1_mask = NULL;
 
-  printf(" nxm, nym %ld %ld\n", nxm, nym);
+  nx = nxm - 1;
+  ny = nym - 1;
+  printf(" nx, ny %ld %ld\n", nx, ny);
   //if ( lon_is_circular ) nlon1--;
-  gridsize1 = (nxm-1)*(nym-1);
+  gridsize1 = nx*ny;
 
   deps = (int *) malloc(gridsize1*sizeof(int));
 
   grid1_mask = (int *) calloc(1, gridsize1*sizeof(int));
-  for ( jj = 0; jj < nym-1; ++jj )
-    for ( ii = 0; ii < nxm-1; ++ii )
+  for ( jj = 0; jj < ny; ++jj )
+    for ( ii = 0; ii < nx; ++ii )
       {
-	if ( !DBL_IS_EQUAL(fieldm[jj*(nxm-1)+ii], missval) ) grid1_mask[jj*(nxm-1)+ii] = 1;
+	if ( !DBL_IS_EQUAL(fieldm[jj*nx+ii], missval) ) grid1_mask[jj*nx+ii] = 1;
       }
 
   double grid1_bound_box[4];
   grid1_bound_box[0] = ym[0];
-  grid1_bound_box[1] = ym[nym-1];
-  if ( ym[0] > ym[nym-1] )
+  grid1_bound_box[1] = ym[ny];
+  if ( ym[0] > ym[ny] )
     {
-      grid1_bound_box[0] = ym[nym-1];
+      grid1_bound_box[0] = ym[ny];
       grid1_bound_box[1] = ym[0];
     }
   grid1_bound_box[2] = xm[0];
-  grid1_bound_box[3] = xm[nxm-1];
+  grid1_bound_box[3] = xm[nx];
  
   progressInit();
 
@@ -479,6 +482,7 @@ void intconarr2(double missval, int lon_is_circular,
       //     for ( int k = 0; k < nxm; ++k ) printf("x: %d %g\n", k+1, xm[k]);
       //    for ( int k = 0; k < nym; ++k ) printf("y: %d %g\n", k+1, ym[k]*RAD2DEG);
       long imin = nxm, imax = -1, jmin = nym, jmax = -1;
+      long im, jm;
 
       lfound = rect_grid_search2(&jmin, &jmax, bound_box[0], bound_box[1], nym, ym);
       bound_lon1 = bound_box[2];
@@ -490,9 +494,9 @@ void intconarr2(double missval, int lon_is_circular,
 	  if ( bound_lon2 > grid1_bound_box[3] && bound_lon1 < grid1_bound_box[3] ) bound_lon2 = grid1_bound_box[3];
 	  lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
 	  //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
-	  for ( long jm = jmin; jm <= jmax; ++jm )
-	    for ( long im = imin; im <= imax; ++im )
-	      deps[ndeps++] = jm*(nxm-1) + im;
+	  for ( jm = jmin; jm <= jmax; ++jm )
+	    for ( im = imin; im <= imax; ++im )
+	      deps[ndeps++] = jm*nx + im;
 	}
 
 
@@ -507,9 +511,9 @@ void intconarr2(double missval, int lon_is_circular,
 	  if ( bound_lon2 > grid1_bound_box[3] && bound_lon1 < grid1_bound_box[3] ) bound_lon2 = grid1_bound_box[3];
 	  lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
 	  //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
-	  for ( long jm = jmin; jm <= jmax; ++jm )
-	    for ( long im = imin; im <= imax; ++im )
-	      deps[ndeps++] = jm*(nxm-1) + im;
+	  for ( jm = jmin; jm <= jmax; ++jm )
+	    for ( im = imin; im <= imax; ++im )
+	      deps[ndeps++] = jm*nx + im;
 	}
 
       bound_lon1 = bound_box[2];
@@ -523,9 +527,9 @@ void intconarr2(double missval, int lon_is_circular,
 	  if ( bound_lon2 > grid1_bound_box[3] && bound_lon1 < grid1_bound_box[3] ) bound_lon2 = grid1_bound_box[3];
 	  lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxm, xm);
 	  //printf("imin %ld  imax %ld  jmin %ld jmax %ld\n", imin, imax, jmin, jmax);
-	  for ( long jm = jmin; jm <= jmax; ++jm )
-	    for ( long im = imin; im <= imax; ++im )
-	      deps[ndeps++] = jm*(nxm-1) + im;
+	  for ( jm = jmin; jm <= jmax; ++jm )
+	    for ( im = imin; im <= imax; ++im )
+	      deps[ndeps++] = jm*nx + im;
 	}
 
       //for ( long id = 0; id < ndeps; ++id )
@@ -566,8 +570,8 @@ void intconarr2(double missval, int lon_is_circular,
       for ( int k = 0; k < num_deps; ++k )
 	{
 	  int index1 = deps[k];
-	  int ilat1 = index1/(nxm-1);
-	  int ilon1 = index1 - ilat1*(nxm-1);
+	  int ilat1 = index1/nx;
+	  int ilon1 = index1 - ilat1*nx;
 	  /*
 	  if ( cdoVerbose )
 	    printf("  dep: %d %d %d %d %d %d\n", k, nlonOut, nlatOut, index1, ilon1, ilat1);
@@ -618,8 +622,8 @@ void intconarr2(double missval, int lon_is_circular,
 	{
 	  int index1 = deps[k];
 	  /*
-	  int ilat1 = index1/(nxm-1);
-	  int ilon1 = index1 - ilat1*(nxm-1);
+	  int ilat1 = index1/nx;
+	  int ilon1 = index1 - ilat1*nx;
 	  long add1, add2;
 
 	  add1 = index1;

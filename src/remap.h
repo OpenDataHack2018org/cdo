@@ -65,6 +65,9 @@ typedef struct {
 
   double  *reg2d_center_lon;      /* reg2d lon/lat coordinates for */
   double  *reg2d_center_lat;      /* each grid center in radians   */
+  double  *reg2d_corner_lon;      /* reg2d lon/lat coordinates for */
+  double  *reg2d_corner_lat;      /* each grid corner in radians   */
+
   double  *cell_center_lon;       /* lon/lat coordinates for       */
   double  *cell_center_lat;       /* each grid center in radians   */
   double  *cell_area;             /* tot area of each grid cell     */
