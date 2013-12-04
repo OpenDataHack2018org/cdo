@@ -290,22 +290,29 @@ void correct_sinxvals(int xsize, int ysize, double *xvals)
 
 int gridFromH5file(const char *gridfile)
 {
-  int gridID = -1;
+  int       gridID = -1;
 #if defined(HAVE_LIBHDF5)
-  hid_t	  file_id;	/* HDF5 File ID	        	*/
-  hid_t	  lon_id = -1;	/* Dataset ID	        	*/
-  hid_t	  lat_id = -1;	/* Dataset ID	        	*/
-  hid_t   dataspace;   
-  hsize_t dims_out[9];  /* dataset dimensions           */
-  herr_t  status;	/* Generic return value		*/
-  int     rank;
-  griddes_t    grid;
+  hid_t     fapl_id = H5P_DEFAULT;
+  hid_t	    file_id;	    /* HDF5 File ID	        	*/
+  hid_t	    lon_id = -1;    /* Dataset ID	        	*/
+  hid_t	    lat_id = -1;    /* Dataset ID	        	*/
+  hid_t     dataspace;   
+  hsize_t   dims_out[9];    /* dataset dimensions               */
+  herr_t    status;	    /* Generic return value		*/
+  int       rank;
+  griddes_t grid;
 
 
   gridInit(&grid);
 
+  fapl_id = H5Pcreate(H5P_FILE_ACCESS);
+  H5Pset_fclose_degree(fapl_id, H5F_CLOSE_STRONG);
+
   /* Open an existing file. */
-  file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, H5P_DEFAULT);
+  file_id = H5Fopen(gridfile, H5F_ACC_RDONLY, fapl_id);
+
+  H5Pclose(fapl_id);
+
   if ( file_id < 0 ) return(gridID);
 
   if ( h5find_object(file_id, "lon") > 0 && 
