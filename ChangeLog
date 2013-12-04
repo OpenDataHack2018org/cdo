@@ -1,6 +1,7 @@
 2013-12-04 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridFromH5file: set fclose degree to H5F_CLOSE_STRONG [Bug #4272]
+	* cdoDefineGrid: first call gridFromH5file() for HDF tags
 
 2013-11-29 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 

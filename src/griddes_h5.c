@@ -340,7 +340,7 @@ int gridFromH5file(const char *gridfile)
 
       if ( rank != 2 )
 	{
-	  if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
+	  //if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
 	  goto RETURN;
 	}
       /*
@@ -467,7 +467,7 @@ int gridFromH5file(const char *gridfile)
 
 	  if ( rank != 2 )
 	    {
-	      if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
+	      //if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
 	      goto RETURN;
 	    }
 	  /*

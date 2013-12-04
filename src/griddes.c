@@ -1798,8 +1798,8 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstr(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from netCDF4 file");
-	      gridID = gridFromNCfile(gridfile);
+	      if ( cdoDebug ) cdoPrint("Grid from HDF5 file");
+	      gridID = gridFromH5file(gridfile);
 	    }
 	}
 
@@ -1807,8 +1807,8 @@ int cdoDefineGrid(const char *gridfile)
 	{
 	  if ( cmpstr(buffer+1, "HDF", len) == 0 )
 	    {
-	      if ( cdoDebug ) cdoPrint("Grid from HDF5 file");
-	      gridID = gridFromH5file(gridfile);
+	      if ( cdoDebug ) cdoPrint("Grid from netCDF4 file");
+	      gridID = gridFromNCfile(gridfile);
 	    }
 	}
 
