@@ -5538,15 +5538,9 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
       tgt_area = huiliers_area(TargetCell);
       // tgt_area = cell_area(TargetCell);
-      for ( n = 0; n < nSourceCells; ++n )
+
+      for ( num_weights = 0, n = 0; n < nSourceCells; ++n )
 	{
-	  if ( area[n] > tgt_area )
-	    {
-	      if ( cdoVerbose )
-		cdoWarning("Source grid cell area larger than target cell, skipped! (tgt_add: %ld  tgt_area: %g  src_add: %d  src_area: %g)",
-			   tgt_grid_add, tgt_area, srch_add[n], area[n]);
-	      continue;
-	    }
 	  if ( area[n] > 0 )
 	    {
 	      weight[num_weights] = area[n] / tgt_area;
@@ -5555,7 +5549,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	    }
 	}
 
-      correct_weights(num_weights, weight);
+      //correct_weights(num_weights, weight);
 #endif
 
       for ( n = 0; n < num_weights; ++n )
