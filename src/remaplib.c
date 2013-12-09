@@ -363,7 +363,7 @@ void remapGridRealloc(int map_type, remapgrid_t *grid, int remap_grid_basis)
   grid->cell_center_lon = (double *) realloc(grid->cell_center_lon, grid->size*sizeof(double));
   grid->cell_center_lat = (double *) realloc(grid->cell_center_lat, grid->size*sizeof(double));
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
     {
       grid->cell_area = (double *) realloc(grid->cell_area, grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
@@ -773,7 +773,7 @@ void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
 
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
-      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
+      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
 	{
 	  tgt_grid->bin_addr = (int *) realloc(tgt_grid->bin_addr, 2*nbins*sizeof(int));
 
@@ -830,8 +830,8 @@ void remap_reg2d_init(int gridID, remapgrid_t *grid)
   gridGenBounds1(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
   gridGenBounds1(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
 
-  for ( long i = 0; i < nxp1; ++i ) printf("lon %ld %g\n", i, grid->reg2d_corner_lon[i]);
-  for ( long i = 0; i < nyp1; ++i ) printf("lat %ld %g\n", i, grid->reg2d_corner_lat[i]);
+  //for ( long i = 0; i < nxp1; ++i ) printf("lon %ld %g\n", i, grid->reg2d_corner_lon[i]);
+  //for ( long i = 0; i < nyp1; ++i ) printf("lat %ld %g\n", i, grid->reg2d_corner_lat[i]);
 
 }
 
@@ -1009,7 +1009,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   src_grid->remap_grid_type = -1;
   tgt_grid->remap_grid_type = -1;
 
-  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONTEST ) &&
+  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONCLIP ) &&
        !gridIsRotated(gridID1) &&
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
@@ -1023,7 +1023,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   else
     src_grid->lextrapolate = FALSE;
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONTEST )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
     {
       src_grid->luse_cell_corners  = TRUE;
       src_grid->lneed_cell_corners = TRUE;
@@ -1151,7 +1151,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   if ( ompNumThreads > 1 )
     {
       if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONCLIP  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
@@ -1161,7 +1161,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 #endif
     {
       if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONTEST  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONCLIP  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = FALSE;
       else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = FALSE;
       else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
@@ -1169,7 +1169,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
     }
 
   if      ( map_type == MAP_TYPE_CONSERV  ) rv->num_wts = 3;
-  else if ( map_type == MAP_TYPE_CONTEST  ) rv->num_wts = 3;
+  else if ( map_type == MAP_TYPE_CONCLIP  ) rv->num_wts = 3;
   else if ( map_type == MAP_TYPE_BILINEAR ) rv->num_wts = 1;
   else if ( map_type == MAP_TYPE_BICUBIC  ) rv->num_wts = 4;
   else if ( map_type == MAP_TYPE_DISTWGT  ) rv->num_wts = 1;
@@ -4333,7 +4333,7 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 
   bound_lon1 = tgt_cell_bound_box[2];
   bound_lon2 = tgt_cell_bound_box[3];
-  if ( bound_lon1 <= src_lon_min && bound_lon2 > src_lon_min )
+  if ( bound_lon1 <= src_lon_min && bound_lon2 >= src_lon_min )
     {
       bound_lon1 += 2*M_PI;
       bound_lon2 += 2*M_PI;
@@ -4349,7 +4349,7 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 
   bound_lon1 = tgt_cell_bound_box[2];
   bound_lon2 = tgt_cell_bound_box[3];
-  if ( bound_lon1 < src_lon_max && bound_lon2 >= src_lon_max )
+  if ( bound_lon1 <= src_lon_max && bound_lon2 >= src_lon_max )
     {
       bound_lon1 -= 2*M_PI;
       bound_lon2 -= 2*M_PI;
@@ -5388,8 +5388,8 @@ void restrict_boundbox(const double *restrict grid_bound_box, double *restrict b
   if ( bound_box[0] < grid_bound_box[0] && bound_box[1] > grid_bound_box[0] ) bound_box[0] = grid_bound_box[0];
   if ( bound_box[1] > grid_bound_box[1] && bound_box[0] < grid_bound_box[1] ) bound_box[1] = grid_bound_box[1];
 
-  if ( bound_box[2] >= grid_bound_box[3] ) { bound_box[2] -= 2*M_PI; bound_box[3] -= 2*M_PI; }
-  if ( bound_box[3] <= grid_bound_box[2] ) { bound_box[2] += 2*M_PI; bound_box[3] += 2*M_PI; }
+  if ( bound_box[2] > grid_bound_box[3] ) { bound_box[2] -= 2*M_PI; bound_box[3] -= 2*M_PI; }
+  if ( bound_box[3] < grid_bound_box[2] ) { bound_box[2] += 2*M_PI; bound_box[3] += 2*M_PI; }
   //  if ( bound_box[2] < grid_bound_box[2] && bound_box[3] > grid_bound_box[2] ) bound_box[2] = grid_bound_box[2];
   //  if ( bound_box[3] > grid_bound_box[3] && bound_box[2] < grid_bound_box[3] ) bound_box[3] = grid_bound_box[3];
 }
@@ -5426,7 +5426,7 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 #include "area.h"
 #endif
 
-void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
 
@@ -5614,7 +5614,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 #endif
   */
       findex++;
-      if ( lprogress ) progressStatus(0.5, 0.5, findex/grid2_size);
+      if ( lprogress ) progressStatus(0, 1, findex/grid2_size);
 
 
       /* Get search cells */
@@ -5622,7 +5622,8 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	{
 	  boundbox_from_corners1(tgt_grid_add, grid2_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box);
 	  restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
-	  printf("bound_box %ld  lon: %g %g lat: %g %g\n", tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
+	  if ( cdoVerbose )
+	    printf("bound_box %ld  lon: %g %g lat: %g %g\n", tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
 	}
 
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
@@ -5632,7 +5633,8 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
 					tgt_grid->cell_bound_box, src_grid->cell_bound_box, grid1_size, srch_add);
 
-      printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
+      if ( cdoVerbose )
+	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
 
       if ( num_srch_cells == 0 ) continue;
 
@@ -5767,7 +5769,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 			tgt_grid->cell_frac[tgt_grid_add] += weights[3];
 		      }
 
-		  tgt_grid->cell_area[tgt_grid_add]     += weights[3];
+		  tgt_grid->cell_area[tgt_grid_add] += weights[3];
 	}
       /*
 #if defined(_OPENMP)
@@ -5948,7 +5950,7 @@ void remap_contest(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
-} /* remap_contest */
+} /* remap_conclip */
 
 /*****************************************************************************/
 

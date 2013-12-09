@@ -369,8 +369,8 @@ void *Maggraph(void *argument);
 #define  PressureOperators      {"pressure_fl", "pressure_hl", "deltap"}
 #define  RegresOperators        {"regres"}
 #define  RemapOperators         {"remap"}
-#define    RemapgridOperators   {"remapcontest", "remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
-#define    GenweightsOperators  {"gencontest", "gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
+#define    RemapgridOperators   {"remapconclip", "remapcon", "remapbil", "remapbic", "remapdis", "remapnn", "remaplaf", "remapcon2", "remapsum"}
+#define    GenweightsOperators  {"genconclip", "gencon", "genbil", "genbic", "gendis", "gennn", "genlaf", "gencon2"}
 #define  RemapetaOperators      {"remapeta", "remapeta_s", "remapeta_z"}
 #define  ReplaceOperators       {"replace"}
 #define  ReplacevaluesOperators {"setvals", "setrtoc", "setrtoc2"}
