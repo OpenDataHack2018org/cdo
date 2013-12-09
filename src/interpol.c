@@ -124,7 +124,7 @@ int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym,
   return (lfound);
 }
 
-static
+
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm)
 {
   int lfound = 0;
@@ -337,23 +337,23 @@ void boundbox_from_corners(long ic, long nc, const double *restrict corner_lon,
   long inc, j;
   double clon, clat;
 
+  inc = ic*nc;
+  clat = corner_lat[inc];
+  clon = corner_lon[inc];
+
+  bound_box[0] = clat;
+  bound_box[1] = clat;
+  bound_box[2] = clon;
+  bound_box[3] = clon;
+
+  for ( j = 1; j < nc; ++j )
     {
-      inc = ic*nc;
-      clat = corner_lat[inc];
-      clon = corner_lon[inc];
-      bound_box[0] = clat;
-      bound_box[1] = clat;
-      bound_box[2] = clon;
-      bound_box[3] = clon;
-      for ( j = 1; j < nc; ++j )
-	{
-	  clat = corner_lat[inc+j];
-	  clon = corner_lon[inc+j];
-	  if ( clat < bound_box[0] ) bound_box[0] = clat;
-	  if ( clat > bound_box[1] ) bound_box[1] = clat;
-	  if ( clon < bound_box[2] ) bound_box[2] = clon;
-	  if ( clon > bound_box[3] ) bound_box[3] = clon;
-	}
+      clat = corner_lat[inc+j];
+      clon = corner_lon[inc+j];
+      if ( clat < bound_box[0] ) bound_box[0] = clat;
+      if ( clat > bound_box[1] ) bound_box[1] = clat;
+      if ( clon < bound_box[2] ) bound_box[2] = clon;
+      if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
 }
 
@@ -469,7 +469,7 @@ void intconarr2(double missval, int lon_is_circular,
       restrict_boundbox(grid1_bound_box, bound_box);
       bound_lon1 = bound_box[2];
       bound_lon2 = bound_box[3];
-      //  printf("bound_box %ld  lon: %g %g lat: %g %g\n", i+1, bound_box[2]*RAD2DEG, bound_box[3]*RAD2DEG, bound_box[0]*RAD2DEG, bound_box[1]*RAD2DEG);
+      //printf("bound_box %ld  lon: %g %g lat: %g %g\n", i, bound_box[2]*RAD2DEG, bound_box[3]*RAD2DEG, bound_box[0]*RAD2DEG, bound_box[1]*RAD2DEG);
       /*
 #if defined(_OPENMP)
 #pragma omp atomic
