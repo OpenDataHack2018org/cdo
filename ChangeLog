@@ -1,3 +1,7 @@
+2013-12-09 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* cat: "Segmentation fault" if the output file already exist [Bug #4291]
+
 2013-12-04 Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gridFromH5file: set fclose degree to H5F_CLOSE_STRONG [Bug #4272]
