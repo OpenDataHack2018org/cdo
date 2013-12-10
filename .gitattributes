@@ -596,6 +596,7 @@ test/.checklib_pyunittest -text
 test/Makefile.am -text
 test/Makefile.in -text
 test/README -text
+test/bm_Remap.sh -text
 test/data/Makefile.am -text
 test/data/Makefile.in -text
 test/data/bathy4.grb -text
