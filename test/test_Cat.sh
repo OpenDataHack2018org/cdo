@@ -28,6 +28,7 @@ $CDO cat $IFILE ${OFILE}
 $CDO diff $OFILE $RFILE > $CDOOUT 2> $CDOERR
 if [ $? != 0 ]    ; then RSTAT=`expr $RSTAT + 1`; fi
 if [ -s $CDOOUT ] ; then RSTAT=`expr $RSTAT + 1`; fi
+if [ -s $CDOERR ] ; then RSTAT=`expr $RSTAT + 1`; fi
 if [ "$CDODEBUG" = 1 ]; then cat $CDOOUT $CDOERR; fi
 rm -f $OFILE $RFILE
 #
