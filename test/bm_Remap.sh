@@ -29,8 +29,6 @@ done
 # result on blizzard:
 # ==================
 #         bil    bic    nn   con
-# reg2d    15     19    18   
-# curv    101    104         
-#
-#
+# reg2d    15     19    18   528
+# curv    101    104  1936   528
 #
