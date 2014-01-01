@@ -20,6 +20,12 @@ for RMOD in $RMODS; do
   cdo diff ${IFILE}_${RMOD}_?
 done
 #
+# result on hama:
+# =================
+#         bil    bic    nn   con
+# reg2d   5.5    6.8     9   256
+# curv   43.8   45.0   982   300
+#
 # result on bailung:
 # =================
 #         bil    bic    nn   con
