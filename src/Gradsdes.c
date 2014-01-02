@@ -392,7 +392,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
 
       gridInqLCC(gridID, &originLon, &originLat, &lonParY, &lat1, &lat2, &xincm, &yincm,
 		 &projflag, &scanflag);
-      fprintf(gdp, "PDEF %d %d lcc %g %g 1 1 %g %g %g %g %g\n", 
+      fprintf(gdp, "PDEF %d %d LCCR %g %g 1 1 %g %g %g %g %g\n", 
 	      xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
 
       gridID = gridToCurvilinear(gridID, 0);

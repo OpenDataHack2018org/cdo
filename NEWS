@@ -7,6 +7,7 @@ Version 1.6.3 (18 February 2014):
      * eca_csu: added number of csu periods with more than 5days per time period
      * eca_cfd: added number of cfd periods with more than 5days per time period
    Fixed bugs:
+     * gradsdes: changed LCC to LCCR in PDEF definition [Bug #4344]
      * cat: "Segmentation fault" if the output file already exist [Bug #4291]
      * delete: parameter level does not work [Bug #4216]
 
