@@ -70,3 +70,17 @@ for GRID in $GRIDS; do
   done
 done
 ########################################################################
+#
+# Select
+#
+IFILE=ECHAM5_T21L19.grb
+OFILE=pl_data.grb
+$CDO -ml2pl,90000,9000,900,90 -remapbil,global_30 -sp2gp -seltimestep,1/5 -dayavg -selcode,129,130,152 $IFILE $OFILE
+IFILE=$OFILE
+OFILE=select1_ref
+$CDO $FORMAT select,code=130,152 $IFILE $OFILE
+OFILE=select2_ref
+$CDO $FORMAT select,code=130,152,level=9000,90 $IFILE $OFILE
+OFILE=select3_ref
+$CDO $FORMAT select,code=130,152,level=9000,90,timestep=2,3,5 $IFILE $OFILE
+########################################################################
