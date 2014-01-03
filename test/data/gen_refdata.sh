@@ -83,4 +83,8 @@ OFILE=select2_ref
 $CDO select,code=130,152,level=9000,90 $IFILE $OFILE
 OFILE=select3_ref
 $CDO select,code=130,152,level=9000,90,timestep=2,3,5 $IFILE $OFILE
+OFILE=select4_ref
+$CDO select,code=130 $IFILE $OFILE
+OFILE=select5_ref
+$CDO select,level=90000 $IFILE $OFILE
 ########################################################################

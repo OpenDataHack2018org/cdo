@@ -619,6 +619,8 @@ test/data/pl_data.grb -text
 test/data/select1_ref -text
 test/data/select2_ref -text
 test/data/select3_ref -text
+test/data/select4_ref -text
+test/data/select5_ref -text
 test/data/sp2gp_ref -text
 test/data/sp2gpl_ref -text
 test/data/t21_geosp_tsurf.grb -text
