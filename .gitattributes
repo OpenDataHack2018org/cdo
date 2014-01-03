@@ -640,6 +640,7 @@ test/test_Arithc.py -text
 test/test_Cat.sh -text
 test/test_Gridarea.sh -text
 test/test_Remap.sh -text
+test/test_Select.sh -text
 test/test_Selvar.py -text
 test/test_Spectral.sh -text
 test/test_Timstat.sh -text

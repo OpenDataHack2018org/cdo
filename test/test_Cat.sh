@@ -19,6 +19,7 @@ RFILE=catdata_ref
 OFILE=catdata
 #
 cp $IFILE ${RFILE}
+chmod u+w ${RFILE}
 cat $IFILE >> ${RFILE}
 #
 rm -f ${OFILE}
