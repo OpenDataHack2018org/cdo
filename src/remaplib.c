@@ -5409,6 +5409,7 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
   double clonx[nc], clatx[nc];
 
   inc = ic*nc;
+  /*
   for ( j = 0; j < nc; ++j )
     {
       clonx[j] = corner_lon[inc+j];
@@ -5445,7 +5446,7 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
       if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
 
-  /*
+  */
   clat = corner_lat[inc];
   clon = corner_lon[inc];
 
@@ -5469,7 +5470,7 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
       bound_box[2] = 0;
       bound_box[3] = PI2;
     }
-  */
+  
 }
 
 #if defined(HAVE_LIBYAC)
