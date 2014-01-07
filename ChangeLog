@@ -1,3 +1,7 @@
+2014-01-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* settaxis: added support for negativ time increment
+
 2014-01-03  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* Added test/test_Select.sh

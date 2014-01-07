@@ -331,7 +331,7 @@ int ps_cval  = -1;
 void progressInit(void)
 {
   ps_lhead = FALSE;
-  ps_nch   = 0;;
+  ps_nch   = 0;
   ps_cval  = -1;
 }
 

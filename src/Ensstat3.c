@@ -57,7 +57,7 @@ void *Ensstat3(void *argument)
   int operatorID;
   int operfunc, datafunc;
   int i,j;
-  int nvars,nbins, nrecs = 0, nrecs0, nmiss, nens, nfiles;;
+  int nvars,nbins, nrecs = 0, nrecs0, nmiss, nens, nfiles;
   int cum;
   int chksum;                  // for check of histogram population 
   int levelID, varID, recID, tsID, binID = 0;
