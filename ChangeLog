@@ -1,3 +1,7 @@
+2014-01-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gradsdes: added overloading of streamInqGinfo() (bug fix for GRIB1)
+
 2014-01-07  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* settaxis: added support for negativ time increment

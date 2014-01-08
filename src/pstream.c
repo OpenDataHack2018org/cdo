@@ -1706,6 +1706,15 @@ int pstreamInqByteorder(int pstreamID)
   return (byteorder);
 }
 
+void pstreamInqGinfo(int pstreamID, int *intnum, float *fltnum)
+{
+  pstream_t *pstreamptr;
+
+  pstreamptr = pstream_to_pointer(pstreamID);
+
+  streamInqGinfo(pstreamptr->fileID, intnum, fltnum);
+}
+
 
 void openLock(void)
 {

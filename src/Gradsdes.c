@@ -965,8 +965,7 @@ void *Gradsdes(void *argument)
     }
 
   if ( index == ngrids )
-    cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!",
-	     gridNamePtr(gridtype));
+    cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   /* select all variables with used gridID */
   vars = (int *) malloc(nvars*sizeof(int));
