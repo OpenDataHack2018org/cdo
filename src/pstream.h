@@ -66,7 +66,7 @@ void    pstreamWriteRecordF(int pstreamID, float *data, int nmiss);
 void    pstreamReadRecord(int pstreamID, double *data, int *nmiss);
 void    pstreamCopyRecord(int pstreamIDdest, int pstreamIDsrc);
 
-void    pstreamInqGinfo(int pstreamID, int *intnum, float *fltnum);
+void    pstreamInqGinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum);
 
 
 #endif  /* _PSTREAM_H */

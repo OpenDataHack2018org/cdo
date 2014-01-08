@@ -75,6 +75,10 @@ struct gaindx {
   int   *intpnt;    /* Pointer to int index values    */
   float *fltpnt;    /* Pointer to float index values  */
 };
+struct gaindxb {
+  int    bignum;    /* Number of off_t values */	       
+  off_t *bigpnt;    /* Pointer to off_t values */
+};
 
 
 /* Byte swap requested number of 4 byte elements */
@@ -243,9 +247,12 @@ void dumpmap()
   fseek(mapfp, 1, 0);
   nbytes = fread(&vermap, sizeof(unsigned char), 1, mapfp);
 
+  if ( vermap == 0 ) vermap = 1;
+
+  printf("gribmap version = %d\n", vermap);
+
   if ( vermap == 2 )
     {
-      printf("gribmap version = %d\n", vermap);
       fseek(mapfp, 2, 0);
 
       nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
@@ -748,30 +755,44 @@ void ctl_vars(FILE *gdp, int filetype, int vlistID, int nvarsout, int *vars)
 }
 
 static
-void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum, float *fltnum)
+void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *intnum, float *fltnum, off_t *bignum)
 {
   int i;
   struct gaindx indx;
+  struct gaindxb indxb;
   FILE *mapfp;
-  int hinum[4];
+  int hinum[5];
 
   mapfp = fopen(ctlfile, "w");
   if ( mapfp == NULL ) cdoAbort("Open failed on %s", ctlfile);
 
-  indx.type   = 1;  /* GRIB type */
-  indx.hinum  = 4;
+  indx.type   = map_version;
   indx.hfnum  = 0;
-  indx.intnum = 3 * nrecords;
+  if ( map_version == 4 )
+    {
+      indx.hinum  = 5;
+      indx.intnum = nrecords;
+      indxb.bignum = 2 * nrecords;
+    }
+  else
+    {
+      indx.hinum  = 4;
+      indx.intnum = 3 * nrecords;
+      indxb.bignum = 0;
+    }
   indx.fltnum = 3 * nrecords;
+
   indx.hipnt  = NULL;
   indx.hfpnt  = NULL;
   indx.intpnt = NULL;
   indx.fltpnt = NULL;
+  indxb.bigpnt = NULL;
 
-  hinum[0] = 1;
+  hinum[0] = map_version;
   hinum[1] = 1;
   hinum[2] = nrecords;
   hinum[3] = 255;
+  hinum[4] = indxb.bignum;
 
   if ( map_version == 2 )
     {
@@ -782,11 +803,11 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
       
       /* calculate the size of the ver==1 index file */
       
-      nb = 2 + (4*4) +  /* version in byte 2, then 4 ints with number of each data type */
-	indx.hinum*sizeof(int)+
-	indx.hfnum*sizeof(int)+
-	indx.intnum*sizeof(int)+
-	indx.fltnum*sizeof(float) ;
+      nb = 2 + (indx.hinum*4) +  /* version in byte 2, then 4 ints with number of each data type */
+	indx.hinum*sizeof(int) +
+	indx.hfnum*sizeof(int) +
+	indx.intnum*sizeof(int) +
+	indx.fltnum*sizeof(float);
       
       /* add additional info */
       
@@ -797,7 +818,7 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
       
       bcnt = 0;
       Put1Byte(map, bcnt, 0);
-      Put1Byte(map, bcnt, 2); /* version 2 */
+      Put1Byte(map, bcnt, map_version);
       
       Put4Byte(map, bcnt, indx.hinum);
       Put4Byte(map, bcnt, indx.hfnum);
@@ -841,15 +862,25 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
 	}
       
       fwrite(map, 1, bcnt, mapfp);
-	  
+
       free(map);
     }
   else
     {
       fwrite(&indx, sizeof(struct gaindx), 1, mapfp);
-      fwrite(hinum, sizeof(int), 4, mapfp);
-      fwrite(intnum, sizeof(int), 3*nrecords, mapfp);
-      fwrite(fltnum, sizeof(float), 3*nrecords, mapfp);
+      if ( indx.hinum > 0 )  fwrite(hinum, sizeof(int), 4, mapfp);
+      if ( map_version == 1 )
+	{
+	  if ( indx.intnum > 0 ) fwrite(intnum, sizeof(int), indx.intnum, mapfp);
+	  printf("baustelle!!!");
+	  if ( indx.fltnum > 0 ) fwrite(fltnum, sizeof(float), indx.fltnum, mapfp);
+	}
+      else
+	{
+	  if ( indx.intnum  > 0 ) fwrite(intnum, sizeof(int), indx.intnum, mapfp);
+	  if ( indx.fltnum  > 0 ) fwrite(fltnum, sizeof(float), indx.fltnum, mapfp);
+	  if ( indxb.bignum > 0 ) fwrite(bignum, sizeof(off_t), indxb.bignum, mapfp);
+	}
     }
   
   fclose(mapfp);
@@ -858,7 +889,7 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
 
 void *Gradsdes(void *argument)
 {
-  int GRADSDES2, DUMPMAP;
+  int GRADSDES2, GRADSDES4, DUMPMAP;
   int operatorID;
   int streamID = 0;
   int gridID = -1;
@@ -904,6 +935,7 @@ void *Gradsdes(void *argument)
   int *recoffset = NULL;
   int *intnum = NULL;
   float *fltnum = NULL;
+  off_t *bignum = NULL;
   double *array = NULL;
   const char *cmons[]={"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"};
       
@@ -911,11 +943,13 @@ void *Gradsdes(void *argument)
 
               cdoOperatorAdd("gradsdes1", 0, 0, NULL);
   GRADSDES2 = cdoOperatorAdd("gradsdes2", 0, 0, NULL);
+  GRADSDES4 = cdoOperatorAdd("gradsdes4", 0, 0, NULL);
   DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
-  if ( operatorID == GRADSDES2 ) map_version = 2;
+  if      ( operatorID == GRADSDES2 ) map_version = 2;
+  else if ( operatorID == GRADSDES4 ) map_version = 4;
 
   if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
@@ -1202,8 +1236,9 @@ void *Gradsdes(void *argument)
 	  if ( nrecords >= maxrecs )
 	    {
 	      maxrecs = nrecords;
-	      intnum = (int *) realloc(intnum, 3*maxrecs*sizeof(int));
+	      intnum = (int *)   realloc(intnum, 1*maxrecs*sizeof(int));
 	      fltnum = (float *) realloc(fltnum, 3*maxrecs*sizeof(float));
+	      bignum = (off_t *) realloc(bignum, 2*maxrecs*sizeof(off_t));
 	    }
 
 	  for ( recID = 0; recID < nrecs; recID++ )
@@ -1213,11 +1248,11 @@ void *Gradsdes(void *argument)
 		{
 		  streamReadRecord(streamID, array, &nmiss);
 
-		  index = 3*(tsID*nrecsout + recoffset[varID] + levelID);
+		  index = (tsID*nrecsout + recoffset[varID] + levelID);
 	      
-		  streamInqGinfo(streamID, &intnum[index], &fltnum[index]);
+		  streamInqGinfo(streamID, &intnum[index], &fltnum[index*3], &bignum[index*2]);
 
-		  checksize = (long)intnum[index] + (long)gridsize*intnum[index+2]/8;
+		  checksize = (long)bignum[index] + (long)gridsize*intnum[index]/8;
 		  if ( checksize < 0L || checksize > 2147483647L )
 		    {
 		      nrecords -= nrecsout;
@@ -1285,7 +1320,7 @@ void *Gradsdes(void *argument)
   /* INDEX file */
   if ( filetype == FILETYPE_GRB )
     {
-      write_map_grib1(ctlfile, map_version, nrecords, intnum, fltnum);
+      write_map_grib1(ctlfile, map_version, nrecords, intnum, fltnum, bignum);
     }
 
 

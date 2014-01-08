@@ -321,7 +321,7 @@ void *Maggraph(void *argument);
 #define  FourierOperators       {"fourier"}
 #define  GatherOperators        {"gather"}
 #define  GengridOperators       {"gengrid"}
-#define  GradsdesOperators      {"gradsdes1", "gradsdes2", "dumpmap"}
+#define  GradsdesOperators      {"gradsdes1", "gradsdes2", "gradsdes4", "dumpmap"}
 #define  GridboxstatOperators   {"gridboxmin", "gridboxmax", "gridboxsum", "gridboxmean", "gridboxavg", "gridboxvar", "gridboxstd"}
 #define  GridcellOperators      {"gridarea", "gridweights", "gridmask", "griddx", "griddy"}
 #define  HarmonicOperators      {"harmonic"}

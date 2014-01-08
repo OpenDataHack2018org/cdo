@@ -1706,13 +1706,13 @@ int pstreamInqByteorder(int pstreamID)
   return (byteorder);
 }
 
-void pstreamInqGinfo(int pstreamID, int *intnum, float *fltnum)
+void pstreamInqGinfo(int pstreamID, int *intnum, float *fltnum, off_t *bignum)
 {
   pstream_t *pstreamptr;
 
   pstreamptr = pstream_to_pointer(pstreamID);
 
-  streamInqGinfo(pstreamptr->fileID, intnum, fltnum);
+  streamInqGinfo(pstreamptr->fileID, intnum, fltnum, bignum);
 }
 
 
