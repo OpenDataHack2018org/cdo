@@ -64,26 +64,6 @@ const char *datatypestr(int datatype)
 }
 
 static
-off_t filesize(const char *filename)
-{
-  FILE *fp;
-  off_t pos = 0;
-
-  fp = fopen(filename, "r");
-  if ( fp == NULL )
-    {
-      fprintf(stderr, "Open failed on %s\n", filename);
-    }
-  else
-    {
-      fseek(fp, 0L, SEEK_END);
-      pos = ftello(fp);
-    }
-  
-  return pos;
-}
-
-static
 void print_stat(const char *sinfo, int memtype, int datatype, int filetype, off_t nvalues, double data_size, double file_size, double tw)
 {
   nvalues /= 1000000;

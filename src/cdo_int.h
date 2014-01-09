@@ -189,5 +189,7 @@ void job_submit(const char *expname, const char *jobfilename, const char *jobnam
 
 void minmaxval(long nvals, double *array, int *imiss, double *minval, double *maxval);
 
+off_t filesize(const char *filename);
+
 
 #endif  /* _CDO_INT_H */

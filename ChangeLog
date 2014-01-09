@@ -1,3 +1,7 @@
+2014-01-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gradsdes: added support for GRIB files >2GB [request: Ingo Kirchner]
+
 2014-01-08  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: added overloading of streamInqGinfo() (bug fix for GRIB1)

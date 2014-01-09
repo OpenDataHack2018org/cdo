@@ -18,8 +18,7 @@
 /*
    This module contains the following operators:
 
-      Gradsdes   gradsdes1       GrADS data descriptor file (version 1 map)
-      Gradsdes   gradsdes2       GrADS data descriptor file (version 2 map)
+      Gradsdes   gradsdes       GrADS data descriptor file
 */
 
 
@@ -230,7 +229,9 @@ void dumpmap()
   unsigned char mrec[512];
   int swpflg = 0;
   int i;
+  int nrecords = 0;
   struct gaindx indx;
+  struct gaindxb indxb;
   size_t nbytes;
   FILE *mapfp;
 
@@ -238,6 +239,8 @@ void dumpmap()
   indx.hfpnt = NULL;
   indx.intpnt = NULL;
   indx.fltpnt = NULL;
+  indxb.bigpnt = NULL;
+  indxb.bignum = 0;
 
   mapfp = fopen(cdoStreamName(0)->args, "r");
   if ( mapfp == NULL ) cdoAbort("Open failed on %s", cdoStreamName(0)->args);
@@ -307,6 +310,7 @@ void dumpmap()
     {
       fseek(mapfp, 0, 0);
       nbytes = fread (&indx, sizeof(struct gaindx), 1, mapfp);
+
       if ( indx.type>>24 > 0 ) swpflg = 1;
       if ( swpflg ) printf("swap endian!\n");
       if ( swpflg ) gabswp((float *)&indx.type, 5);
@@ -323,6 +327,7 @@ void dumpmap()
 	  nbytes = fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
 	  if ( swpflg ) gabswp(indx.hfpnt,indx.hfnum);
 	}
+
       if ( indx.intnum > 0 )
 	{
 	  indx.intpnt = (int *) malloc(sizeof(int)*indx.intnum);
@@ -334,6 +339,17 @@ void dumpmap()
 	  indx.fltpnt = (float *) malloc(sizeof(float)*indx.fltnum);
 	  nbytes = fread (indx.fltpnt,sizeof(float),indx.fltnum,mapfp);
 	  if ( swpflg ) gabswp(indx.fltpnt,indx.fltnum);
+	}
+
+      if ( indx.hipnt[0] == 4 )
+	{
+	  indxb.bignum = indx.hipnt[4];
+	  if ( indxb.bignum > 0 )
+	    {
+	      indxb.bigpnt = (off_t *) malloc(sizeof(off_t)*indxb.bignum);
+	      nbytes = fread (indxb.bigpnt,sizeof(off_t),indxb.bignum,mapfp);
+	      if ( swpflg ) gabswp(indxb.bigpnt,indxb.bignum);
+	    }
 	}
     }
 
@@ -349,12 +365,23 @@ void dumpmap()
     printf("%3d %g\n", i+1, indx.hfpnt[i]);
   
   printf("\n");
+
+  nrecords = indx.hipnt[1]*indx.hipnt[2];
+
   if ( indx.intnum == indx.fltnum )
     {
       printf("num: %d\n", indx.intnum);
       for ( i = 0; i < indx.intnum/3; i++ )
 	printf("%3d %8d %6d %4d %8g %10g %8g\n", i+1,
 	       indx.intpnt[i*3], indx.intpnt[i*3+1], indx.intpnt[i*3+2],
+	       indx.fltpnt[i*3], indx.fltpnt[i*3+1], indx.fltpnt[i*3+2]);
+    }
+  else if ( indx.intnum == nrecords && indx.fltnum == nrecords*3 && indxb.bignum == nrecords*2 )
+    {
+      printf("nrecords: %d\n", nrecords);
+      for ( i = 0; i < nrecords; i++ )
+	printf("%3d %8zd %6zd %4d %8g %10g %8g\n", i+1,
+	       (size_t)indxb.bigpnt[i*2], (size_t)indxb.bigpnt[i*2+1], indx.intpnt[i],
 	       indx.fltpnt[i*3], indx.fltpnt[i*3+1], indx.fltpnt[i*3+2]);
     }
   else
@@ -367,6 +394,11 @@ void dumpmap()
       printf("fltnum: %d\n", indx.fltnum);
       for ( i = 0; i < indx.fltnum; i++ )
 	printf("%3d %g\n", i+1, indx.fltpnt[i]);
+
+      printf("\n");
+      printf("bignum: %d\n", indxb.bignum);
+      for ( i = 0; i < indxb.bignum; i++ )
+	printf("%3d %zd\n", i+1, (size_t)indxb.bigpnt[i]);
     }
 }
 
@@ -763,6 +795,8 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
   FILE *mapfp;
   int hinum[5];
 
+  memset(&indx, 0, sizeof(struct gaindx));
+
   mapfp = fopen(ctlfile, "w");
   if ( mapfp == NULL ) cdoAbort("Open failed on %s", ctlfile);
 
@@ -840,9 +874,13 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
 	/* blank for now */
       }
       
-      for ( i = 0; i < indx.intnum; i++ )
-	PutInt(map, bcnt, intnum[i]);
-      
+      for ( i = 0; i < nrecords; i++ )
+	{
+	  PutInt(map, bcnt, (int) bignum[i*2]);
+	  PutInt(map, bcnt, (int) bignum[i*2+1]);
+	  PutInt(map, bcnt, intnum[i]);
+	}
+
       for ( i = 0; i < indx.fltnum; i++)
 	{
 	  fdum= fltnum[i];
@@ -868,11 +906,19 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
   else
     {
       fwrite(&indx, sizeof(struct gaindx), 1, mapfp);
-      if ( indx.hinum > 0 )  fwrite(hinum, sizeof(int), 4, mapfp);
+      if ( indx.hinum > 0 )  fwrite(hinum, sizeof(int), indx.hinum, mapfp);
       if ( map_version == 1 )
 	{
-	  if ( indx.intnum > 0 ) fwrite(intnum, sizeof(int), indx.intnum, mapfp);
-	  printf("baustelle!!!");
+	  int *intnumbuf;
+	  intnumbuf = (int *) malloc(indx.intnum*sizeof(int));
+	  for ( i = 0; i < nrecords; i++ )
+	    {
+	      intnumbuf[i*3+0] = (int) bignum[i*2];
+	      intnumbuf[i*3+1] = (int) bignum[i*2+1];
+	      intnumbuf[i*3+2] = intnum[i];
+	    }
+	  if ( indx.intnum > 0 ) fwrite(intnumbuf, sizeof(int), indx.intnum, mapfp);
+	  free(intnumbuf);
 	  if ( indx.fltnum > 0 ) fwrite(fltnum, sizeof(float), indx.fltnum, mapfp);
 	}
       else
@@ -889,7 +935,7 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
 
 void *Gradsdes(void *argument)
 {
-  int GRADSDES2, GRADSDES4, DUMPMAP;
+  int GRADSDES, DUMPMAP;
   int operatorID;
   int streamID = 0;
   int gridID = -1;
@@ -927,7 +973,7 @@ void *Gradsdes(void *argument)
   long checksize = 0;
   int nmiss;
   int prec;
-  int map_version = 1;
+  int map_version = 2;
   int nrecsout = 0;
   int maxrecs = 0;
   int monavg = -1;
@@ -941,15 +987,10 @@ void *Gradsdes(void *argument)
       
   cdoInitialize(argument);
 
-              cdoOperatorAdd("gradsdes1", 0, 0, NULL);
-  GRADSDES2 = cdoOperatorAdd("gradsdes2", 0, 0, NULL);
-  GRADSDES4 = cdoOperatorAdd("gradsdes4", 0, 0, NULL);
+  GRADSDES  = cdoOperatorAdd("gradsdes",  0, 0, NULL);
   DUMPMAP   = cdoOperatorAdd("dumpmap",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
-
-  if      ( operatorID == GRADSDES2 ) map_version = 2;
-  else if ( operatorID == GRADSDES4 ) map_version = 4;
 
   if ( cdoStreamName(0)->args[0] == '-' )
     cdoAbort("This operator does not work with pipes!");
@@ -960,6 +1001,26 @@ void *Gradsdes(void *argument)
 
       goto END_LABEL;
     }
+
+  if ( operatorArgc() > 1 ) cdoAbort("Too many arguments!");
+
+  if ( operatorArgc() == 1 )
+    {
+      map_version = atoi(operatorArgv()[0]);
+      if ( map_version != 1 && map_version != 2 && map_version != 4 )
+	cdoAbort("map_version=%d unsupported!", map_version);
+    }
+  else
+    {
+      if ( filesize(cdoStreamName(0)->args) > 2147483647L ) map_version = 4;
+    }
+
+  if ( cdoVerbose ) cdoPrint("GrADS GRIB map version: %d", map_version);
+
+  if ( map_version == 4 && sizeof(off_t) != 8 )
+    cdoAbort("GrADS GRIB map version %d requires size of off_t to be 8! The size of off_t is %ld.",
+	     map_version, sizeof(off_t));
+ 
 
   streamID = streamOpenRead(cdoStreamName(0));
 
@@ -1252,12 +1313,15 @@ void *Gradsdes(void *argument)
 	      
 		  streamInqGinfo(streamID, &intnum[index], &fltnum[index*3], &bignum[index*2]);
 
-		  checksize = (long)bignum[index] + (long)gridsize*intnum[index]/8;
-		  if ( checksize < 0L || checksize > 2147483647L )
+		  if ( map_version != 4 )
 		    {
-		      nrecords -= nrecsout;
-		      cdoWarning("GRIB file too large for GrADS! Only the first %d time steps (2GB) are processed.", tsID);
-		      goto LABEL_STOP;
+		      checksize = (long)bignum[index*2] + (long)gridsize*intnum[index]/8;
+		      if ( checksize < 0L || checksize > 2147483647L )
+			{
+			  nrecords -= nrecsout;
+			  cdoWarning("File size limit reached for GrADS GRIB map_version=%d! Only the first %d time steps (2GB) are processed.", map_version, tsID);
+			  goto LABEL_STOP;
+			}
 		    }
 		}
 	    }
