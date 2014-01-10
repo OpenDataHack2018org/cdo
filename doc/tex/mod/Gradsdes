@@ -4,45 +4,50 @@
 @Title     = GrADS data descriptor file
 @Section   = Miscellaneous
 @Arguments = ifile
-@Operators = gradsdes1 gradsdes2
+@Operators = gradsdes
+@EndModule
+
+
+@BeginOperator_gradsdes
+@Title     = GrADS data descriptor file
+@Parameter = [mapversion]
 
 @BeginDescription
 Creates a @ref{GrADS} data descriptor file. Supported file formats are GRIB1, netCDF, SERVICE, 
 EXTRA and IEG. For GRIB1 files the GrADS map file is also generated. For SERVICE and EXTRA
 files the grid have to be specified with the CDO option '-g <grid>'. This module takes @file{ifile}
 in order to create filenames for the descriptor (@file{ifile.ctl}) and the map (@file{ifile.gmp}) file.
-"gradsdes" is an alias for @oper{gradsdes2}.
-@EndDescription
-@EndModule
-
-
-@BeginOperator_gradsdes1
-@Title     = GrADS data descriptor file (version 1 GRIB map)
-
-@BeginDescription
-Creates a GrADS data descriptor file. Generated a machine
-specific version 1 GrADS map file for GRIB1 datasets.
 @EndDescription
 @EndOperator
 
-@BeginOperator_gradsdes2
-@Title     = GrADS data descriptor file (version 2 GRIB map)
+@c @BeginOperator_gradsdes
+@c @Title     = GrADS data descriptor file (version 2 GRIB map)
+@c 
+@c @BeginDescription
+@c Creates a GrADS data descriptor file. Generated a machine 
+@c independent version 2 GrADS map file for GRIB1 datasets.
+@c This map file can be used only with GrADS version 1.8 or newer. 
+@c @EndDescription
+@c @EndOperator
 
-@BeginDescription
-Creates a GrADS data descriptor file. Generated a machine 
-independent version 2 GrADS map file for GRIB1 datasets.
-This map file can be used only with GrADS version 1.8 or newer. 
-@EndDescription
-@EndOperator
+
+@BeginParameter
+@Item = mapversion
+INTEGER  Format version of the GrADS map file for GRIB1 datasets. Use 1 for a machine
+specific version 1 GrADS map file, 2 for a machine independent version 2 GrADS map file
+and 4 to support GRIB files >2GB. 
+A version 2 map file can be used only with GrADS version 1.8 or newer.
+A version 4 map file can be used only with GrADS version 2.0 or newer.
+The default is 4 for files >2GB, otherwise 2.
+@EndParameter
 
 
 @BeginExample
 To create a GrADS data descriptor file from a GRIB1 dataset use:
 @BeginVerbatim
-   cdo gradsdes2 ifile.grb
+   cdo gradsdes ifile.grb
 @EndVerbatim
-This will create a descriptor file with the name @file{ifile.ctl}
-and the map file @file{ifile.gmp}.
+This will create a descriptor file with the name @file{ifile.ctl} and the map file @file{ifile.gmp}.
 
 Assumed the input GRIB1 dataset has 3 variables over 12 timesteps on a Gaussian N16 grid.
 The contents of the resulting GrADS data description file is approximately:

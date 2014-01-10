@@ -773,6 +773,7 @@ while (<MOFILE>) {
       print TRFILE "\\hspace*{8mm}\\begin{minipage}{\\miniwidth}\n";
       print TRFILE "\\begin{defalist}{\\sl $maxitem \\ }\n";
 
+      $lines = 0;
       foreach $tag (@parlines) {
 	$line = $tag;
 	($kword,$kopt) = split(" ", $line);
@@ -783,18 +784,24 @@ while (<MOFILE>) {
 	  printf HELPFILE ("    \"    %-*s  ", $maxlen, $value);
 	  $value =~ s/_/\\_/g;
 	  print TRFILE "\\item[{\\sl $value}\\ \\ \\hfill]\n";
+	  $lines = 1;
 	} else {
 	  $line =~ s/^DOUBLE/FLOAT/g;
 	  $hline = $line;
 	  $hline =~ s/\\%/%/g;
 	  $hline =~ s/\@celsius/°C/og;
+	  if ( $lines > 1 )  {
+	    printf HELPFILE ("    \"    %-*s  ", $maxlen, " ");
+	  }
 	  print HELPFILE "$hline\",\n";
 	  $line =~ s/^FLOAT/\\makebox[20mm][l]{\\sf \\small FLOAT}/;
 	  $line =~ s/^INTEGER/\\makebox[20mm][l]{\\sf \\small INTEGER}/;
 	  $line =~ s/^STRING/\\makebox[20mm][l]{\\sf \\small STRING}/;
 	  $line =~ s/_/\\_/g;
+          $line =~ s/>/\$>\$/og;
 	  $line =~ s/\@celsius/{\\textcelsius}/og;
 	  print TRFILE "$line\n";
+	  $lines = $lines + 1;
 	}
       }
       print TRFILE "\\end{defalist}\n";
