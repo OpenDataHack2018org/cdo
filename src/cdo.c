@@ -429,6 +429,10 @@ void setDefaultDataType(char *datatypestr)
       dtype = D_CPX;
       datatypestr++;
     }
+  else if ( *datatypestr == 'p' || *datatypestr == 'P' )
+    {
+      datatypestr++;
+    }
 
   if ( isdigit((int) *datatypestr) )
     {
