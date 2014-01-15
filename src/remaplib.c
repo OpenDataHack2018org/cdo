@@ -5695,10 +5695,19 @@ void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       printf("target: %ld\n", tgt_grid_add);
       if ( cdoVerbose || tgt_grid_add == 1440)
 	{
-	  printf("target:       ");
+	  /*
+	  for ( int n = 0; n < tgt_num_cell_corners; ++n )
+	    {
+	      printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_x[n]/DEG2RAD);
+	      printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_y[n]/DEG2RAD);
+	    }
+	  */
+	  /*
+	  //printf("target:       ");
 	  for ( int n = 0; n < tgt_num_cell_corners; ++n )
 	    printf(" %g %g", tgt_grid_cell.coordinates_x[n]/DEG2RAD, tgt_grid_cell.coordinates_y[n]/DEG2RAD);
 	  printf("\n");
+	  */
 	}
       /*
       if ( cdoVerbose )
@@ -5729,6 +5738,7 @@ void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	  max_srch_cells = num_srch_cells;
 	}
 
+      // printf("  int ii = 0;\n");
       for ( n = 0; n < num_srch_cells; ++n )
 	{
 	  src_grid_add = srch_add[n];
@@ -5742,13 +5752,23 @@ void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
 	  if ( cdoVerbose || tgt_grid_add == 1440 )
 	    {
+	      /*
+	      for ( k = 0; k < srch_corners; ++k )
+		{
+		  printf("  SourceCell[ii].coordinates_x[%d] = %g*rad;\n", k, src_grid_cells[n].coordinates_x[k]/DEG2RAD);
+		  printf("  SourceCell[ii].coordinates_y[%d] = %g*rad;\n", k, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
+		}
+	      printf("  ii++;\n");
+	      */
+	      /*
 	      printf("source: %ld %ld", num_srch_cells, n);
 	      for ( k = 0; k < srch_corners; ++k )
 		printf(" %g %g", src_grid_cells[n].coordinates_x[k]/DEG2RAD, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
 	      printf("\n");
+	      */
 	    }
 	}
-      
+
       cdo_compute_overlap_areas(num_srch_cells, overlap_buffer, src_grid_cells, tgt_grid_cell, area);
       //compute_overlap_areas(num_srch_cells, src_grid_cells, tgt_grid_cell, area);
 
