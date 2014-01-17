@@ -363,7 +363,7 @@ void remapGridRealloc(int map_type, remapgrid_t *grid, int remap_grid_basis)
   grid->cell_center_lon = (double *) realloc(grid->cell_center_lon, grid->size*sizeof(double));
   grid->cell_center_lat = (double *) realloc(grid->cell_center_lat, grid->size*sizeof(double));
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
     {
       grid->cell_area = (double *) realloc(grid->cell_area, grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
@@ -773,7 +773,7 @@ void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
 
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
-      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
+      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
 	{
 	  tgt_grid->bin_addr = (int *) realloc(tgt_grid->bin_addr, 2*nbins*sizeof(int));
 
@@ -1009,7 +1009,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   src_grid->remap_grid_type = -1;
   tgt_grid->remap_grid_type = -1;
 
-  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONCLIP ) &&
+  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONSPHERE ) &&
        !gridIsRotated(gridID1) &&
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
@@ -1023,7 +1023,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   else
     src_grid->lextrapolate = FALSE;
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
     {
       src_grid->luse_cell_corners  = TRUE;
       src_grid->lneed_cell_corners = TRUE;
@@ -1150,29 +1150,29 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 #if defined(_OPENMP)
   if ( ompNumThreads > 1 )
     {
-      if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONCLIP  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
+      if      ( map_type == MAP_TYPE_CONSERV   ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONSPHERE ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BILINEAR  ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BICUBIC   ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_DISTWGT   ) rv->sort_add = TRUE;
       else cdoAbort("Unknown mapping method!");
     }
   else
 #endif
     {
-      if      ( map_type == MAP_TYPE_CONSERV  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONCLIP  ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_BILINEAR ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_BICUBIC  ) rv->sort_add = FALSE;
-      else if ( map_type == MAP_TYPE_DISTWGT  ) rv->sort_add = TRUE;
+      if      ( map_type == MAP_TYPE_CONSERV   ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONSPHERE ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_BILINEAR  ) rv->sort_add = FALSE;
+      else if ( map_type == MAP_TYPE_BICUBIC   ) rv->sort_add = FALSE;
+      else if ( map_type == MAP_TYPE_DISTWGT   ) rv->sort_add = TRUE;
       else cdoAbort("Unknown mapping method!");
     }
 
-  if      ( map_type == MAP_TYPE_CONSERV  ) rv->num_wts = 3;
-  else if ( map_type == MAP_TYPE_CONCLIP  ) rv->num_wts = 3;
-  else if ( map_type == MAP_TYPE_BILINEAR ) rv->num_wts = 1;
-  else if ( map_type == MAP_TYPE_BICUBIC  ) rv->num_wts = 4;
-  else if ( map_type == MAP_TYPE_DISTWGT  ) rv->num_wts = 1;
+  if      ( map_type == MAP_TYPE_CONSERV   ) rv->num_wts = 3;
+  else if ( map_type == MAP_TYPE_CONSPHERE ) rv->num_wts = 3;
+  else if ( map_type == MAP_TYPE_BILINEAR  ) rv->num_wts = 1;
+  else if ( map_type == MAP_TYPE_BICUBIC   ) rv->num_wts = 4;
+  else if ( map_type == MAP_TYPE_DISTWGT   ) rv->num_wts = 1;
   else cdoAbort("Unknown mapping method!");
 
    /*
@@ -5514,7 +5514,7 @@ void cdo_compute_overlap_areas(unsigned N,
 }
 #endif
 
-void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
 
@@ -5692,7 +5692,7 @@ void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	  tgt_grid_cell.coordinates_y[ic] = tgt_grid->cell_corner_lat[tgt_grid_add*tgt_num_cell_corners+ic];
 	}
 
-      printf("target: %ld\n", tgt_grid_add);
+      // printf("target: %ld\n", tgt_grid_add);
       if ( cdoVerbose || tgt_grid_add == 1440)
 	{
 	  /*
@@ -6001,7 +6001,7 @@ void remap_conclip(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
-} /* remap_conclip */
+} /* remap_consphere */
 
 /*****************************************************************************/
 

@@ -44,7 +44,7 @@
 
 
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
-      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX, REMAPCONCLIP, GENCONCLIP};
+      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX, REMAPCONS, GENCONS};
 
 enum {HEAP_SORT, MERGE_SORT};
 
@@ -53,9 +53,9 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *num_neighb
 {
   switch ( operfunc )
     {
-    case REMAPCONCLIP:
-    case GENCONCLIP:
-      *map_type = MAP_TYPE_CONCLIP;
+    case REMAPCONS:
+    case GENCONS:
+      *map_type = MAP_TYPE_CONSPHERE;
       *remap_order = 1;
       break;
     case REMAPCON:
@@ -127,10 +127,10 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 	    }
 	}
     }
-  else if ( map_type == MAP_TYPE_CONCLIP )
+  else if ( map_type == MAP_TYPE_CONSPHERE )
     {
-      operfunc = REMAPCONCLIP;
-      cdoPrint("Using remaptest");
+      operfunc = REMAPCONS;
+      cdoPrint("Using remapcons");
     }
   else if ( map_type == MAP_TYPE_BILINEAR )
     {
@@ -450,8 +450,8 @@ void *Remap(void *argument)
   cdoOperatorAdd("gennn",        GENNN,        1, NULL);
   cdoOperatorAdd("genlaf",       GENLAF,       1, NULL);
   cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
-  cdoOperatorAdd("remapconclip", REMAPCONCLIP, 0, NULL);
-  cdoOperatorAdd("genconclip",   GENCONCLIP,   1, NULL);
+  cdoOperatorAdd("remapcons",    REMAPCONS,    0, NULL);
+  cdoOperatorAdd("gencons",      GENCONS,      1, NULL);
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
@@ -626,7 +626,7 @@ void *Remap(void *argument)
 
   get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
 
-  if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONCLIP )
+  if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONSPHERE )
     {
       norm_opt = NORM_OPT_FRACAREA;
 
@@ -712,7 +712,7 @@ void *Remap(void *argument)
 		}
 	    }
 
-	  if ( map_type != MAP_TYPE_CONSERV && map_type != MAP_TYPE_CONCLIP && 
+	  if ( map_type != MAP_TYPE_CONSERV && map_type != MAP_TYPE_CONSPHERE && 
 	       gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
 	    cdoAbort("Only conservative remapping is available to remap between GME grids!");
 	  /*
@@ -863,7 +863,7 @@ void *Remap(void *argument)
 
 	      memcpy(remaps[r].src_grid.mask, imask, remaps[r].src_grid.size*sizeof(int));
 
-	      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONCLIP )
+	      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
 		{
 		  memset(remaps[r].src_grid.cell_area, 0, remaps[r].src_grid.size*sizeof(double));
 		  memset(remaps[r].src_grid.cell_frac, 0, remaps[r].src_grid.size*sizeof(double));
@@ -876,11 +876,11 @@ void *Remap(void *argument)
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
-	      if      ( map_type == MAP_TYPE_CONSERV  ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BILINEAR ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BICUBIC  ) remap_bicub(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_DISTWGT  ) remap_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_CONCLIP  ) remap_conclip(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      if      ( map_type == MAP_TYPE_CONSERV   ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_BILINEAR  ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_BICUBIC   ) remap_bicub(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_DISTWGT   ) remap_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_CONSPHERE ) remap_consphere(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
 	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
@@ -941,7 +941,7 @@ void *Remap(void *argument)
 	  gridsize2 = gridInqSize(gridID2);
 
 	  /* used only to check the result of remapcon */
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2|| operfunc == REMAPCONCLIP )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2|| operfunc == REMAPCONS )
 	    {
 	      double grid2_err;
 
@@ -996,7 +996,7 @@ void *Remap(void *argument)
 	    }
 
 	  vlistInqVarName(vlistID1, varID, varname);
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPCONCLIP )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPCONS )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
 	      {
 		scale_gridbox_area(gridsize, array1, gridsize2, array2, remaps[r].tgt_grid.cell_area);
