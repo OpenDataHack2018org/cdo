@@ -4086,7 +4086,7 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
     Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
-    double weights[6] ! array of remapping weights for this link
+    double weights[3] ! array of remapping weights for this link
   */
   /* Local variables */
   long nlink; /* link index */
@@ -4097,8 +4097,7 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, double *weight
 
   /*  If all weights are ZERO, do not bother storing the link */
 
-  if ( IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0) &&
-       IS_EQUAL(weights[3], 0) && IS_EQUAL(weights[4], 0) && IS_EQUAL(weights[5], 0) ) return;
+  if ( IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0) ) return;
 
   /* If the link already exists, add the weight to the current weight arrays */
 
@@ -4185,15 +4184,14 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
     Input variables:
     int  add1         ! address on grid1
     int  add2         ! address on grid2
-    double weights[6] ! array of remapping weights for this link
+    double weights[3] ! array of remapping weights for this link
   */
   /* Local variables */
   long nlink, min_link, max_link; /* link index */
 
   /*  If all weights are ZERO, do not bother storing the link */
 
-  if ( IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0) &&
-       IS_EQUAL(weights[3], 0) && IS_EQUAL(weights[4], 0) && IS_EQUAL(weights[5], 0) ) return;
+  if ( IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0) ) return;
 
   /*  Restrict the range of links to search for existing links */
 
