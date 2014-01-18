@@ -5875,25 +5875,21 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      /*
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_links, rv, tgt_grid)		\
-  private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
+  shared(num_links, rv, tgt_grid)      \
+  private(n, tgt_grid_add, norm_factor)
 #endif
-      */
       for ( n = 0; n < num_links; ++n )
 	{
-	  n3 = n*3;
-	  src_grid_add = rv->src_grid_add[n]; tgt_grid_add = rv->tgt_grid_add[n];
-	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
+	  tgt_grid_add = rv->tgt_grid_add[n];
 
           if ( IS_NOT_EQUAL(tgt_grid->cell_area[tgt_grid_add], 0) )
 	    norm_factor = ONE/tgt_grid->cell_area[tgt_grid_add];
           else
             norm_factor = ZERO;
 
-	  rv->wts[n3  ] =  weights[0]*norm_factor;
+	  rv->wts[n*3] *= norm_factor;
 	}
     }
   else if ( rv->norm_opt == NORM_OPT_FRACAREA )
@@ -5901,49 +5897,25 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 #if defined(SX)
 #pragma vdir nodep
 #endif
-      /*
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_links, rv, tgt_grid)		\
-  private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
+  shared(num_links, rv, tgt_grid)      \
+  private(n, tgt_grid_add, norm_factor)
 #endif
-      */
       for ( n = 0; n < num_links; ++n )
 	{
-	  n3 = n*3;
-	  src_grid_add = rv->src_grid_add[n]; tgt_grid_add = rv->tgt_grid_add[n];
-	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
+	  tgt_grid_add = rv->tgt_grid_add[n];
 
           if ( IS_NOT_EQUAL(tgt_grid->cell_frac[tgt_grid_add], 0) )
 	    norm_factor = ONE/tgt_grid->cell_frac[tgt_grid_add];
           else
             norm_factor = ZERO;
 
-	  rv->wts[n3  ] =  weights[0]*norm_factor;
+	  rv->wts[n*3] *= norm_factor;
 	}
     }
   else if ( rv->norm_opt == NORM_OPT_NONE )
     {
-#if defined(SX)
-#pragma vdir nodep
-#endif
-      /*
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  shared(num_links, rv, tgt_grid)	\
-  private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
-#endif
-      */
-      for ( n = 0; n < num_links; ++n )
-	{
-	  n3 = n*3;
-	  src_grid_add = rv->src_grid_add[n]; tgt_grid_add = rv->tgt_grid_add[n];
-	  weights[0] = rv->wts[n3]; weights[1] = rv->wts[n3+1]; weights[2] = rv->wts[n3+2];
-
-          norm_factor = ONE;
-
-	  rv->wts[n3  ] =  weights[0]*norm_factor;
-	}
     }
 
   if ( cdoVerbose )
