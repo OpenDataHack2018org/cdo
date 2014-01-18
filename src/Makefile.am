@@ -284,6 +284,23 @@ cdo_SOURCES += Adisit.c        \
                vinterp.h       \
                zaxis.c
 
+cdo_SOURCES += clipping/clipping.c           \
+               clipping/clipping.h           \
+               clipping/area.c               \
+               clipping/area.h               \
+               clipping/ensure_array_size.c  \
+               clipping/ensure_array_size.h  \
+               clipping/geometry_tools.c     \
+               clipping/geometry.h           \
+               clipping/grid.h               \
+               clipping/points.h             \
+               clipping/dep_list.h           \
+               clipping/grid_cell.c          \
+               clipping/grid_cell.h          \
+               clipping/intersection.c       \
+               clipping/utils.c              \
+               clipping/utils.h 
+
 if ENABLE_MAGICS
 cdo_SOURCES += Magplot.c       \
                Magvector.c     \

@@ -5473,9 +5473,9 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
   
 }
 
-#if defined(HAVE_LIBYAC)
-#include "clipping.h"
-#include "area.h"
+//#if defined(HAVE_LIBYAC)
+#include "clipping/clipping.h"
+#include "clipping/area.h"
 
 static
 void cdo_compute_overlap_areas(unsigned N,
@@ -5512,7 +5512,7 @@ void cdo_compute_overlap_areas(unsigned N,
     printf("overlap area : %lf\n", partial_areas[n]);
 #endif
 }
-#endif
+//#endif
 
 void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
@@ -5572,9 +5572,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
 
-#if defined(HAVE_LIBYAC)
-  enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE}; // not used !
-  // enum edge_type quad_type[] = {LON_CIRCLE, LON_CIRCLE, LON_CIRCLE, LON_CIRCLE};
+  //#if defined(HAVE_LIBYAC)
+  // enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE}; // not used !
+  enum edge_type quad_type[] = {LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
   double weight_sum;
 
@@ -5594,7 +5594,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   struct grid_cell *overlap_buffer = NULL;
   struct grid_cell *src_grid_cells = NULL;
-#endif
+  //#endif
 
   /* Integrate around each cell on grid2 */
   /*
@@ -5685,7 +5685,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       if ( num_srch_cells == 0 ) continue;
 
-#if defined(HAVE_LIBYAC)
+      //#if defined(HAVE_LIBYAC)
       for ( int ic = 0; ic < tgt_num_cell_corners; ++ic )
 	{
 	  tgt_grid_cell.coordinates_x[ic] = tgt_grid->cell_corner_lon[tgt_grid_add*tgt_num_cell_corners+ic];
@@ -5787,23 +5787,26 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	}
 
       correct_weights(num_weights, weight);
-#endif
+      //#endif
 
       for ( n = 0; n < num_weights; ++n )
 	{
 	  src_grid_add = srch_add[n];
 
 	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
-#if defined(HAVE_LIBYAC)
+	  //#if defined(HAVE_LIBYAC)
 	  if ( cdoVerbose )
 	    printf("tgt_grid_add %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, src_grid_add, weight[n], tgt_area);
 	  //   printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add, weight[n], tgt_area);
 	  // src_grid_add = n;
 	  if ( weight[n] > 0 )
-	    weights[0] = weight[n];
+	    {
+	      weights[0] = weight[n];
+	      weights[3] = weight[n];
+	    }
 	  else 
 	    src_grid_add = -1;
-#endif
+	  //#endif
 	  /*
 	    Store the appropriate addresses and weights. 
 	    Also add contributions to cell areas.
@@ -5833,7 +5836,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   /* Finished with all cells: deallocate search arrays */
 
-#if defined(HAVE_LIBYAC)
+  //#if defined(HAVE_LIBYAC)
   for ( n = 0; n < num_srch_cells; n++ )
     {
       free(src_grid_cells[n].coordinates_x);
@@ -5844,7 +5847,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   free(tgt_grid_cell.coordinates_x);
   free(tgt_grid_cell.coordinates_y);
-#endif
+  //#endif
 
   /*
 #if defined(_OPENMP)
@@ -5881,7 +5884,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
 #endif
       */
-      /*
       for ( n = 0; n < num_links; ++n )
 	{
 	  n3 = n*3;
@@ -5895,7 +5897,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  rv->wts[n3  ] =  weights[0]*norm_factor;
 	}
-      */
     }
   else if ( rv->norm_opt == NORM_OPT_FRACAREA )
     {
@@ -5909,7 +5910,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
 #endif
       */
-      /*
       for ( n = 0; n < num_links; ++n )
 	{
 	  n3 = n*3;
@@ -5923,7 +5923,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  rv->wts[n3  ] =  weights[0]*norm_factor;
 	}
-      */
     }
   else if ( rv->norm_opt == NORM_OPT_NONE )
     {
@@ -5937,7 +5936,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
 #endif
       */
-      /*
       for ( n = 0; n < num_links; ++n )
 	{
 	  n3 = n*3;
@@ -5948,7 +5946,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  rv->wts[n3  ] =  weights[0]*norm_factor;
 	}
-      */
     }
 
   if ( cdoVerbose )
@@ -5994,10 +5991,10 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
     } // lcheck
 
 
-#if defined(HAVE_LIBYAC)
+  //#if defined(HAVE_LIBYAC)
   free(weight);
   free(area);
-#endif
+  //#endif
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
