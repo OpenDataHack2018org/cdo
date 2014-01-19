@@ -4771,7 +4771,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 			src_grid->cell_frac[src_grid_add] += weights[0];
 		      }
 
-		  src_grid->cell_area[src_grid_add]     += weights[0];
+		  src_grid->cell_area[src_grid_add] += weights[0];
 		  grid1_centroid_lat[src_grid_add] += weights[1];
 		  grid1_centroid_lon[src_grid_add] += weights[2];
 
@@ -4998,7 +4998,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 			tgt_grid->cell_frac[tgt_grid_add] += weights[3];
 		      }
 
-		  tgt_grid->cell_area[tgt_grid_add]     += weights[3];
+		  tgt_grid->cell_area[tgt_grid_add] += weights[3];
 		  grid2_centroid_lat[tgt_grid_add] += weights[4];
 		  grid2_centroid_lon[tgt_grid_add] += weights[5];
 
@@ -5512,6 +5512,34 @@ void cdo_compute_overlap_areas(unsigned N,
 }
 //#endif
 
+static
+int get_lonlat_circle_index(remapgrid_t *remap_grid)
+{
+  int lonlat_circle_index = -1;
+
+  if ( remap_grid->num_cell_corners == 4 )
+    {
+      int gridsize = remap_grid->size;
+      /*
+      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	{
+	}
+      else
+      */
+	{
+	  int iadd = gridsize/3-1;
+	  if ( iadd == 0 ) iadd++;
+	  for ( int i = 0; i < gridsize; i += iadd )
+	    {
+	      //printf("get_lonlat_circle_index: %d %d\n", gridsize, i);
+	    }
+	}
+    }
+
+  return(lonlat_circle_index);
+}
+
+
 void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
@@ -5571,8 +5599,23 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 
   //#if defined(HAVE_LIBYAC)
-  // enum edge_type quad_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE}; // not used !
-  enum edge_type quad_type[] = {LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
+  enum edge_type great_circle_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
+  enum edge_type lonlat_circle_type[] = {LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE};
+
+  enum edge_type *src_edge_type = great_circle_type;
+  enum edge_type *tgt_edge_type = great_circle_type;
+
+  if ( src_num_cell_corners == 4 )
+    {
+      int lonlat_circle_index = get_lonlat_circle_index(src_grid);
+      if ( lonlat_circle_index >= 0 ) src_edge_type = &lonlat_circle_type[lonlat_circle_index];
+    }
+
+  if ( tgt_num_cell_corners == 4 )
+    {
+      int lonlat_circle_index = get_lonlat_circle_index(tgt_grid);
+      if ( lonlat_circle_index >= 0 ) tgt_edge_type = &lonlat_circle_type[lonlat_circle_index];
+    }
 
   double weight_sum;
 
@@ -5586,7 +5629,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   struct grid_cell tgt_grid_cell;
 
   tgt_grid_cell.num_corners   = tgt_num_cell_corners;
-  tgt_grid_cell.edge_type     = quad_type;
+  tgt_grid_cell.edge_type     = tgt_edge_type;
   tgt_grid_cell.coordinates_x = malloc(tgt_num_cell_corners*sizeof(*tgt_grid_cell.coordinates_x));
   tgt_grid_cell.coordinates_y = malloc(tgt_num_cell_corners*sizeof(*tgt_grid_cell.coordinates_y));
 
@@ -5728,7 +5771,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
 	      src_grid_cells[n].num_corners   = srch_corners;
-	      src_grid_cells[n].edge_type     = quad_type;
+	      src_grid_cells[n].edge_type     = src_edge_type;
 	      src_grid_cells[n].coordinates_x = malloc(srch_corners*sizeof(src_grid_cells[n].coordinates_x[0]));
 	      src_grid_cells[n].coordinates_y = malloc(srch_corners*sizeof(src_grid_cells[n].coordinates_y[0]));
 	    }
@@ -5800,7 +5843,8 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	  if ( weight[n] > 0 )
 	    {
 	      weights[0] = weight[n];
-	      weights[3] = weight[n];
+	      weights[1] = 0;
+	      weights[2] = 0;
 	    }
 	  else 
 	    src_grid_add = -1;
@@ -5823,10 +5867,10 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 		  src_grid->cell_frac[src_grid_add] += weights[0];
 		}
-		tgt_grid->cell_frac[tgt_grid_add] += weights[3];
+		tgt_grid->cell_frac[tgt_grid_add] += weights[0];
 	      }
 
-	  tgt_grid->cell_area[tgt_grid_add] += weights[3];
+	  tgt_grid->cell_area[tgt_grid_add] += weights[0];
 	}
     }
 
