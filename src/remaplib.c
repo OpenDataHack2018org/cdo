@@ -855,7 +855,7 @@ void remap_grid_init(int map_type, int gridID, remapgrid_t *grid, int remap_grid
 	  gridCompress(gridID);
 	  grid->luse_cell_corners = TRUE;
 	}
-      else
+      else if ( grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
 	  lgrid_destroy = TRUE;
 	  gridID = gridToCurvilinear(grid->gridID, 1);
@@ -1025,8 +1025,16 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
     {
-      src_grid->luse_cell_corners  = TRUE;
-      src_grid->lneed_cell_corners = TRUE;
+      if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	{
+	  src_grid->luse_cell_corners  = FALSE;
+	  src_grid->lneed_cell_corners = FALSE;
+	}
+      else
+	{
+	  src_grid->luse_cell_corners  = TRUE;
+	  src_grid->lneed_cell_corners = TRUE;
+	}
       tgt_grid->luse_cell_corners  = TRUE;
       tgt_grid->lneed_cell_corners = TRUE;
     }
@@ -5757,7 +5765,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	}
 
       // printf("target: %ld\n", tgt_grid_add);
-      if ( cdoVerbose || tgt_grid_add == 1440)
+      if ( cdoVerbose )
 	{
 	  /*
 	  for ( int n = 0; n < tgt_num_cell_corners; ++n )
@@ -5806,15 +5814,49 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
       for ( n = 0; n < num_srch_cells; ++n )
 	{
 	  src_grid_add = srch_add[n];
-	  ioffset = src_grid_add*srch_corners;
 
-	  for ( k = 0; k < srch_corners; ++k )
+	  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	    {
-	      src_grid_cells[n].coordinates_x[k] = src_grid->cell_corner_lon[ioffset+k];
-	      src_grid_cells[n].coordinates_y[k] = src_grid->cell_corner_lat[ioffset+k];
+	      int nx = src_grid->dims[0];
+	      int ny = src_grid->dims[1];
+	      int ix, iy;
+
+	      iy = src_grid_add/nx;
+	      ix = src_grid_add - iy*nx;
+
+	      src_grid_cells[n].coordinates_x[0] = src_grid->reg2d_corner_lon[ix  ];
+	      src_grid_cells[n].coordinates_y[0] = src_grid->reg2d_corner_lat[iy  ];
+	      src_grid_cells[n].coordinates_x[1] = src_grid->reg2d_corner_lon[ix+1];
+	      src_grid_cells[n].coordinates_y[1] = src_grid->reg2d_corner_lat[iy  ];
+	      src_grid_cells[n].coordinates_x[2] = src_grid->reg2d_corner_lon[ix+1];
+	      src_grid_cells[n].coordinates_y[2] = src_grid->reg2d_corner_lat[iy+1];
+	      src_grid_cells[n].coordinates_x[3] = src_grid->reg2d_corner_lon[ix  ];
+	      src_grid_cells[n].coordinates_y[3] = src_grid->reg2d_corner_lat[iy+1];
+	      /*
+	      printf("source1: %ld %ld", num_srch_cells, n);
+	      for ( k = 0; k < srch_corners; ++k )
+		printf(" %g %g", src_grid_cells[n].coordinates_x[k]/DEG2RAD, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
+	      printf("\n");
+	      */
+	    }
+	  else
+	    {
+	      ioffset = src_grid_add*srch_corners;
+
+	      for ( k = 0; k < srch_corners; ++k )
+		{
+		  src_grid_cells[n].coordinates_x[k] = src_grid->cell_corner_lon[ioffset+k];
+		  src_grid_cells[n].coordinates_y[k] = src_grid->cell_corner_lat[ioffset+k];
+		}
+	      /*
+	      printf("source2: %ld %ld", num_srch_cells, n);
+	      for ( k = 0; k < srch_corners; ++k )
+		printf(" %g %g", src_grid_cells[n].coordinates_x[k]/DEG2RAD, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
+	      printf("\n");
+	      */
 	    }
 
-	  if ( cdoVerbose || tgt_grid_add == 1440 )
+	  if ( cdoVerbose )
 	    {
 	      /*
 	      for ( k = 0; k < srch_corners; ++k )
