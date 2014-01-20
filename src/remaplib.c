@@ -855,9 +855,8 @@ void remap_grid_init(int map_type, int gridID, remapgrid_t *grid, int remap_grid
 	  gridCompress(gridID);
 	  grid->luse_cell_corners = TRUE;
 	}
-      else //if ( grid->luse_cell_corners == TRUE /*&& grid->remap_grid_type != REMAP_GRID_TYPE_REG2D*/ )
+      else if ( grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
-	  // printf("grid->luse_cell_corners  %d\n", grid->luse_cell_corners );
 	  lgrid_destroy = TRUE;
 	  gridID = gridToCurvilinear(grid->gridID, 1);
 	  lgrid_gen_bounds = TRUE;
@@ -1026,14 +1025,12 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
     {
-      /*
       if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
 	  src_grid->luse_cell_corners  = FALSE;
 	  src_grid->lneed_cell_corners = FALSE;
 	}
       else
-      */
 	{
 	  src_grid->luse_cell_corners  = TRUE;
 	  src_grid->lneed_cell_corners = TRUE;
