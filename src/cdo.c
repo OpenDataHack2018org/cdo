@@ -149,15 +149,15 @@ void cdo_version(void)
   char *typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
 
   fprintf(stderr, "%s\n", CDO_Version);
+#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
+  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
+	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+#endif
 #if defined(COMPILER)
   fprintf(stderr, "Compiler: %s\n", COMPILER);
 #endif
 #if defined(COMP_VERSION)
   fprintf(stderr, " version: %s\n", COMP_VERSION);
-#endif
-#if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
-	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
 
   printFeatures();
