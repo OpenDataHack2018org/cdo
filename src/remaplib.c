@@ -4979,7 +4979,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 		    Also add contributions to cell areas and centroids.
 		    If there is a coincidence, do not store weights
 		    because they have been captured in the previous loop.
-		    The grid1 mask is the master mask
+		    The source grid mask is the master mask
 		  */
 		  if ( ! lcoinc && src_grid_add != -1 )
 		    if ( src_grid->mask[src_grid_add] )
@@ -5519,22 +5519,46 @@ int get_lonlat_circle_index(remapgrid_t *remap_grid)
 
   if ( remap_grid->num_cell_corners == 4 )
     {
-      int gridsize = remap_grid->size;
-      /*
-      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+      if ( remap_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
-	}
+	  lonlat_circle_index = 1;
+ 	}
       else
-      */
 	{
+	  const double* cell_corner_lon = remap_grid->cell_corner_lon;
+	  const double* cell_corner_lat = remap_grid->cell_corner_lat;
+	  int gridsize = remap_grid->size;
+	  int num_i = 0, num_eq0 = 0, num_eq1 = 0;
 	  int iadd = gridsize/3-1;
+
 	  if ( iadd == 0 ) iadd++;
+
 	  for ( int i = 0; i < gridsize; i += iadd )
 	    {
-	      //printf("get_lonlat_circle_index: %d %d\n", gridsize, i);
+	      num_i++;
+
+	      if ( IS_EQUAL(cell_corner_lon[i*4+1], cell_corner_lon[i*4+2]) &&
+		   IS_EQUAL(cell_corner_lon[i*4+3], cell_corner_lon[i*4+0]) &&
+		   IS_EQUAL(cell_corner_lat[i*4+0], cell_corner_lat[i*4+1]) &&
+		   IS_EQUAL(cell_corner_lat[i*4+2], cell_corner_lat[i*4+3]) )
+		{  
+		  num_eq1++;
+		}
+	      else if ( IS_EQUAL(cell_corner_lon[i*4+0], cell_corner_lon[i*4+1]) &&
+			IS_EQUAL(cell_corner_lon[i*4+2], cell_corner_lon[i*4+3]) &&
+			IS_EQUAL(cell_corner_lat[i*4+1], cell_corner_lat[i*4+2]) &&
+			IS_EQUAL(cell_corner_lat[i*4+3], cell_corner_lat[i*4+0]) )
+		{
+		  num_eq0++;
+		}
 	    }
+
+	  if ( num_i == num_eq1 ) lonlat_circle_index = 1;
+	  if ( num_i == num_eq0 ) lonlat_circle_index = 0;	      
 	}
     }
+
+  //printf("lonlat_circle_index %d\n", lonlat_circle_index);
 
   return(lonlat_circle_index);
 }
@@ -5600,7 +5624,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   //#if defined(HAVE_LIBYAC)
   enum edge_type great_circle_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
-  enum edge_type lonlat_circle_type[] = {LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE};
+  enum edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
   enum edge_type *src_edge_type = great_circle_type;
   enum edge_type *tgt_edge_type = great_circle_type;
@@ -5654,10 +5678,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
-      long nx, ny;
-      nx = src_grid->dims[0];
-      ny = src_grid->dims[1];
-      
+      int nx = src_grid->dims[0];
+      int ny = src_grid->dims[1];
+     
       src_grid_bound_box[0] = src_grid->reg2d_corner_lat[0];
       src_grid_bound_box[1] = src_grid->reg2d_corner_lat[ny];
       if ( src_grid_bound_box[0] > src_grid_bound_box[1] )
@@ -5852,7 +5875,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	  /*
 	    Store the appropriate addresses and weights. 
 	    Also add contributions to cell areas.
-	    The grid1 mask is the master mask
+	    The source grid mask is the master mask
 	  */
 	  if ( src_grid_add != -1 )
 	    if ( src_grid->mask[src_grid_add] )
