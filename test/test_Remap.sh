@@ -1,7 +1,7 @@
 #!/bin/sh
 #
-#CDO=cdo
-#DATAPATH=data
+#CDO=src/cdo
+#DATAPATH=../../test/data
 #
 CDODEBUG=0
 #
