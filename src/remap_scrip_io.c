@@ -121,6 +121,20 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 	  strcpy(map_method, "Conservative remapping");
 	  break;
 	}
+    case MAP_TYPE_CONSPHERE:
+      lgridarea = TRUE;
+      /*
+      if ( submap_type == SUBMAP_TYPE_LAF )
+	{
+	  strcpy(map_method, "Largest area fraction");
+	  break;
+	}
+      else
+      */
+	{
+	  strcpy(map_method, "Conservative remapping using clipping on sphere");
+	  break;
+	}
     case MAP_TYPE_BILINEAR:
       strcpy(map_method, "Bilinear remapping");
       break;
@@ -487,7 +501,11 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( memcmp(map_method, "Conservative", 12) == 0 )
     {
       int iatt;
-      rv->map_type = MAP_TYPE_CONSERV;
+      if ( memcmp(map_method, "Conservative remapping using clipping on sphere", 47) == 0 )
+	rv->map_type = MAP_TYPE_CONSPHERE;
+      else
+	rv->map_type = MAP_TYPE_CONSERV;
+
       status = nc_get_att_int(nc_file_id, NC_GLOBAL, "remap_order", &iatt);
       if ( status == NC_NOERR ) *remap_order = iatt;
     }
