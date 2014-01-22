@@ -5562,7 +5562,7 @@ void cdo_compute_overlap_areas(unsigned N,
     }
 
 #ifdef VERBOSE
-  for (unsigned n = 0; n < N; n++)
+  for ( unsigned n = 0; n < N; n++ )
     printf("overlap area : %lf\n", partial_areas[n]);
 #endif
 }
@@ -5639,7 +5639,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   double norm_factor = 0;                  /* factor for normalizing wts */
 
-  double weights[6];        /* local wgt array */
   long    num_wts;
 
   long    max_srch_cells;   /* num cells in restricted search arrays  */
@@ -5762,7 +5761,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
   private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
 	  src_grid_add, tgt_grid_add, ioffset, \
-	  weights)
+	  )
 #endif
   */
   for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
@@ -5936,11 +5935,14 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	  if ( area[n] > 0 )
 	    {
 	      //printf(">>>>   %d %d %g %g\n", n, srch_add[n], tgt_area, area[n]);
-	      weight[num_weights] = area[n] / tgt_area;
+	      area[num_weights] = area[n];
 	      srch_add[num_weights] = srch_add[n];
 	      num_weights++;
 	    }
 	}
+
+      for ( n = 0; n < num_weights; ++n )
+	weight[n] = area[n] / tgt_area;
 
       correct_weights(num_weights, weight);
       //#endif
@@ -5949,20 +5951,13 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	{
 	  src_grid_add = srch_add[n];
 
-	  for ( int iw=0; iw < 6; iw++)  weights[iw] = 0;
 	  //#if defined(HAVE_LIBYAC)
 	  if ( cdoVerbose )
 	    printf("tgt_grid_add %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, src_grid_add, weight[n], tgt_area);
 	  //   printf("tgt_grid_add %ld, n %ld, src_grid_add %ld,  weight[n] %g, tgt_area  %g\n", tgt_grid_add, n, src_grid_add, weight[n], tgt_area);
 	  // src_grid_add = n;
-	  if ( weight[n] > 0 )
-	    {
-	      weights[0] = weight[n];
-	      weights[1] = 0;
-	      weights[2] = 0;
-	    }
-	  else 
-	    src_grid_add = -1;
+	  if ( weight[n] <= 0. ) src_grid_add = -1;
+
 	  //#endif
 	  /*
 	    Store the appropriate addresses and weights. 
@@ -5970,22 +5965,32 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    The source grid mask is the master mask
 	  */
 	  if ( src_grid_add != -1 )
-	    if ( src_grid->mask[src_grid_add] )
-	      {
+	    {
+	      if ( src_grid->mask[src_grid_add] )
+		{
 /*
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
 */
-		{
-		  store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, weights, grid_store);
+		  {
+		    store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, &weight[n], grid_store);
 
-		  src_grid->cell_frac[src_grid_add] += weights[0];
+		    src_grid->cell_frac[src_grid_add] += weight[n];
+		  }
+		  tgt_grid->cell_frac[tgt_grid_add] += weight[n];
 		}
-		tgt_grid->cell_frac[tgt_grid_add] += weights[0];
+/*
+#if defined(_OPENMP)
+#pragma omp critical
+#endif
+*/
+	      {
+		src_grid->cell_area[src_grid_add] += weight[n];
 	      }
+	    }
 
-	  tgt_grid->cell_area[tgt_grid_add] += weights[0];
+	  tgt_grid->cell_area[tgt_grid_add] += weight[n];
 	}
     }
 
