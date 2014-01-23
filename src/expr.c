@@ -853,7 +853,7 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
 	  if ( parse_arg->init )
 	    {
 	      if ( parse_arg->debug )
-		printf("\tpop var\t%s\n", p->u.opr.op[0]->u.var.nm);
+		printf("\tpop  var \t%s\n", p->u.opr.op[0]->u.var.nm);
 	      /*
 	      if ( p->u.opr.op[1]->type != typeVar )
 		cdoAbort("Operand not variable!");

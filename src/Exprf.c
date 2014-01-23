@@ -135,7 +135,7 @@ void *Expr(void *argument)
   parse_arg.vlistID1 = vlistID1;
   parse_arg.vlistID2 = vlistID2;
   parse_arg.nvars1   = 0;
-  parse_arg.debug    = 0;
+  parse_arg.debug    = 1;
   parse_arg.gridID2  = -1;
   parse_arg.zaxisID2 = -1;
   parse_arg.tsteptype2  = -1;
