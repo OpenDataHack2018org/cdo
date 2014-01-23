@@ -50,7 +50,7 @@ static func_t fun_sym_tbl[] =
   {0, "asinh", asinh},
   {0, "acosh", acosh},
   {0, "atanh", atanh},
-  {0, "gamma", gamma},
+  {0, "gamma", tgamma},
 
   /* array functions
   {1, "min",   min},

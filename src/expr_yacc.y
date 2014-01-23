@@ -184,35 +184,39 @@ void yyerror(void *parse_arg, void *scanner, char *s)
 {
   fprintf(stdout, "%s\n", s);
 }
-
 /*
 int main(void)
 {
   int i;
   static char fexpr[] = "nvar = q*(geosp+234.56); xx = geosp+999-log(aps);";
+  void *scanner;
+  int yy_scan_string(const char *str, void *scanner);
 
   parse_parm_t parse_arg;
 
   printf("%s\n", fexpr);
 
-  yy_scan_string(fexpr);
+  yylex_init(&scanner);
+  yyset_extra(&parse_arg, scanner);
 
-  parse_arg.nvar = 0;
-  parse_arg.init = 1;
+  yy_scan_string(fexpr, scanner);
+
+  parse_arg.nvars1 = 0;
+  parse_arg.init  = 1;
   parse_arg.debug = 1;
 
-  yyparse((void *)&parse_arg);
+  yyparse((void *)&parse_arg, scanner);
 
-  for ( i = 0; i < parse_arg.nvar; i++ )
+  for ( i = 0; i < parse_arg.nvars1; i++ )
     printf("vars %d %s\n", i, parse_arg.var[i]);
 
-  yy_scan_string(fexpr);
+  yy_scan_string(fexpr, scanner);
 
   parse_arg.init = 0;
 
-  yyparse((void *)&parse_arg);
+  yyparse((void *)&parse_arg, scanner);
 
-  for ( i = 0; i < parse_arg.nvar; i++ )
+  for ( i = 0; i < parse_arg.nvars1; i++ )
     printf("vars %d %s\n", i, parse_arg.var[i]);
 
   return 0;
