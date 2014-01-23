@@ -3,7 +3,7 @@ CDO NEWS
 
 Version 1.6.3 (18 February 2014):
    New features:
-     * remapbil, remapbic: optimization for regular 2D source grids
+     * remapbil, remapbic, remapdis: performance optimization for regular 2D source grids
      * gradsdes: added support for GRIB files >2GB
      * eca_csu: added number of csu periods with more than 5days per time period
      * eca_cfd: added number of cfd periods with more than 5days per time period
