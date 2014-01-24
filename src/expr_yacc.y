@@ -58,6 +58,7 @@ stmt:
           ';'                     { $$ = expr_opr(';', 2, NULL, NULL); }
         | expr ';'                { $$ = $1; }
         | VARIABLE '=' expr ';'   { $$ = expr_opr('=', 2, expr_var($1), $3); }
+        | VARIABLE ';'            { $$ = expr_opr('=', 2, expr_var($1), expr_var($1)); } /* conflicts: 1 shift/reduce */
         | '{' stmt_list '}'       { $$ = $2; }
         ;
 

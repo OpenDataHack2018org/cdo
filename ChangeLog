@@ -1,3 +1,12 @@
+2014-02-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* using CDI library version 1.6.3
+	* Version 1.6.3 released
+
+2014-01-24  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* expr: select variables by name
+
 2014-01-09  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* gradsdes: added support for GRIB files >2GB [request: Ingo Kirchner]

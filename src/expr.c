@@ -844,9 +844,9 @@ nodeType *expr_run(nodeType *p, parse_parm_t *parse_arg)
       switch( p->u.opr.oper )
 	{
         case '=':
-	  parse_arg->gridID2  = -1;
-	  parse_arg->zaxisID2 = -1;
-          parse_arg->tsteptype2  = -1;
+	  parse_arg->gridID2    = -1;
+	  parse_arg->zaxisID2   = -1;
+          parse_arg->tsteptype2 = -1;
 
 	  rnode = expr_run(p->u.opr.op[1], parse_arg);
 
