@@ -961,7 +961,7 @@ void remap_grid_init(int map_type, int gridID, remapgrid_t *grid, int remap_grid
 static
 void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 {
-  if ( remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->lneed_cell_corners )
+  if ( remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->luse_cell_corners )
     grid->cell_bound_box = realloc(grid->cell_bound_box, 4*grid->size*sizeof(restr_t));
 
   if ( grid->luse_cell_corners )
