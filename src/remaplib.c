@@ -1122,11 +1122,13 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 	  src_grid->luse_cell_corners  = TRUE;
 	  src_grid->lneed_cell_corners = FALSE; /* full grid search */
 	}
+      /* not used !
       if ( gridInqType(tgt_grid->gridID) == GRID_UNSTRUCTURED )
 	{
 	  tgt_grid->luse_cell_corners  = TRUE;
-	  tgt_grid->lneed_cell_corners = FALSE; /* full grid search */
+	  tgt_grid->lneed_cell_corners = FALSE;
 	}
+      */
     }
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
