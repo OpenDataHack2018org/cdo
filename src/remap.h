@@ -46,6 +46,7 @@ typedef RESTR_TYPE restr_t;
 
 typedef struct {
   int      pinit;                 /* TRUE if the pointers are initialized     */
+  int      lwrite_remap;
   int      gridID;
   int      store_link_fast;
   int      remap_grid_type;
@@ -59,22 +60,22 @@ typedef struct {
   int      dims[2];               /* size of grid dimension */
 
   int      nvgp;                  /* size of vgpm           */
-  int     *vgpm;                  /* flag which cells are valid   */
+  int*     vgpm;                  /* flag which cells are valid   */
 
-  int     *mask;                  /* flag which cells participate */
+  int*     mask;                  /* flag which cells participate */
 
-  double  *reg2d_center_lon;      /* reg2d lon/lat coordinates for */
-  double  *reg2d_center_lat;      /* each grid center in radians   */
-  double  *reg2d_corner_lon;      /* reg2d lon/lat coordinates for */
-  double  *reg2d_corner_lat;      /* each grid corner in radians   */
+  double*  reg2d_center_lon;      /* reg2d lon/lat coordinates for */
+  double*  reg2d_center_lat;      /* each grid center in radians   */
+  double*  reg2d_corner_lon;      /* reg2d lon/lat coordinates for */
+  double*  reg2d_corner_lat;      /* each grid corner in radians   */
 
-  double  *cell_center_lon;       /* lon/lat coordinates for       */
-  double  *cell_center_lat;       /* each grid center in radians   */
-  double  *cell_area;             /* tot area of each grid cell     */
-  double  *cell_frac;             /* fractional area of grid cells participating in remapping  */
+  double*  cell_center_lon;       /* lon/lat coordinates for       */
+  double*  cell_center_lat;       /* each grid center in radians   */
+  double*  cell_corner_lon;       /* lon/lat coordinates for         */
+  double*  cell_corner_lat;       /* each grid corner in radians     */
 
-  double  *cell_corner_lon;       /* lon/lat coordinates for         */
-  double  *cell_corner_lat;       /* each grid corner in radians     */
+  double*  cell_area;             /* tot area of each grid cell     */
+  double*  cell_frac;             /* fractional area of grid cells participating in remapping  */
 
   int      lneed_cell_corners;
   int      luse_cell_corners;     /* use corners for bounding boxes  */
@@ -83,55 +84,58 @@ typedef struct {
 
   int      num_srch_bins;         /* num of bins for restricted srch */
 
-  int     *bin_addr;              /* min,max adds for grid cells in this lat bin  */
+  int*     bin_addr;              /* min,max adds for grid cells in this lat bin  */
 
-  restr_t *bin_lats;              /* min,max latitude for each search bin   */
+  restr_t* bin_lats;              /* min,max latitude for each search bin   */
 }
 remapgrid_t;
 
 typedef struct {
-  int   option;
-  int   max_links;
-  int   num_blks;
-  int  *num_links;
-  int **src_add;
-  int **dst_add;
-  int **w_index;
+  int      option;
+  int      max_links;
+  int      num_blks;
+  int*     num_links;
+  int**    src_add;
+  int**    dst_add;
+  int**    w_index;
 }
 remaplink_t;
 
 typedef struct {
-  int   sort_add;
-  int   pinit;            /* TRUE if the pointers are initialized     */
-  long  max_links;        /* current size of link arrays              */
-  long  num_links;        /* actual number of links for remapping     */
-  long  num_wts;          /* num of weights used in remapping         */
-  int   map_type;         /* identifier for remapping method          */
-  int   norm_opt;         /* option for normalization (conserv only)  */
-  int   resize_increment; /* default amount to increase array size    */
+  int      sort_add;
+  int      pinit;            /* TRUE if the pointers are initialized     */
+  long     max_links;        /* current size of link arrays              */
+  long     num_links;        /* actual number of links for remapping     */
+  long     num_wts;          /* num of weights used in remapping         */
+  int      map_type;         /* identifier for remapping method          */
+  int      norm_opt;         /* option for normalization (conserv only)  */
+  int      resize_increment; /* default amount to increase array size    */
 
-  int  *src_grid_add;     /* source grid address for each link        */
-  int  *tgt_grid_add;     /* target grid address for each link        */
+  int*     src_grid_add;     /* source grid address for each link        */
+  int*     tgt_grid_add;     /* target grid address for each link        */
 
-  double *wts;            /* map weights for each link [max_links*num_wts] */
+  double*  wts;              /* map weights for each link [max_links*num_wts] */
 
-  remaplink_t  links;
+  remaplink_t links;
 }
 remapvars_t;
 
 typedef struct {
-  int gridID;
-  int gridsize;
-  int nmiss;
+  int      gridID;
+  int      gridsize;
+  int      nmiss;
   remapgrid_t src_grid;
   remapgrid_t tgt_grid;
   remapvars_t vars;
 }
 remap_t;
 
+#define  REMAP_STORE_LINK_FAST  1
+#define  REMAP_WRITE_REMAP      2
+#define  REMAP_MAX_ITER         3
+
 void remap_set_threshhold(double threshhold);
-void remap_set_max_iter(long max_iter);
-void remap_set_store_link_fast(int store_link_fast);
+void remap_set_int(int remapvar, int value);
 
 
 void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid);

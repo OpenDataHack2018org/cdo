@@ -200,7 +200,7 @@ void get_remap_env(void)
       ival = atoi(envstr);
       if ( ival > 0 )
 	{
-	  remap_set_max_iter(ival);
+	  remap_set_int(REMAP_MAX_ITER, ival);
 	  if ( cdoVerbose )
 	    cdoPrint("Set REMAP_MAX_ITER to %d", ival);
 	}
@@ -325,7 +325,7 @@ void get_remap_env(void)
 	}
     }
 
-  remap_set_store_link_fast(remap_store_link_fast);
+  remap_set_int(REMAP_STORE_LINK_FAST, remap_store_link_fast);
 
   envstr = getenv("REMAP_EXTRAPOLATE");
   if ( envstr )
@@ -456,6 +456,8 @@ void *Remap(void *argument)
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
   lwrite_remap = cdoOperatorF2(operatorID);
+
+  // remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
 
   if ( operfunc == REMAPDIS || operfunc == GENDIS ||
        operfunc == REMAPNN  || operfunc == GENNN )

@@ -108,11 +108,17 @@ typedef struct
 #define  REMAP_GRID_TYPE_UNSTRUCT  3
 
 
-static int remap_store_link_fast = TRUE;
+static int  remap_store_link_fast = TRUE;
+static int  remap_write_remap     = FALSE;
+#define  DEFAULT_MAX_ITER  100
+static long remap_max_iter = DEFAULT_MAX_ITER;  /* Max iteration count for i, j iteration */
 
-void remap_set_store_link_fast(int store_link_fast)
+void remap_set_int(int remapvar, int value)
 {
-  remap_store_link_fast = store_link_fast;
+  if      ( remapvar == REMAP_STORE_LINK_FAST ) remap_store_link_fast = value;
+  else if ( remapvar == REMAP_WRITE_REMAP     ) remap_write_remap     = value;
+  else if ( remapvar == REMAP_MAX_ITER        ) remap_max_iter        = value;
+  else      cdoAbort("Unsupported remap variable (%d)!", remapvar);
 }
 
 /* static double north_thresh =  1.45;  */ /* threshold for coord transformation */
@@ -360,7 +366,7 @@ void remapGridRealloc(int map_type, remapgrid_t *grid, int remap_grid_basis)
 
   grid->mask     = realloc(grid->mask, grid->size*sizeof(int));
 
-  if ( grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
+  if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
       grid->cell_center_lon = realloc(grid->cell_center_lon, grid->size*sizeof(double));
       grid->cell_center_lat = realloc(grid->cell_center_lat, grid->size*sizeof(double));
@@ -894,7 +900,7 @@ void remap_grid_init(int map_type, int gridID, remapgrid_t *grid, int remap_grid
   remapGridRealloc(map_type, grid, remap_grid_basis);
 
 
-  if ( grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
+  if ( remap_write_remap == FALSE && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
 
 
   gridInqXvals(gridID, grid->cell_center_lon);
@@ -914,7 +920,7 @@ void remap_grid_init(int map_type, int gridID, remapgrid_t *grid, int remap_grid
 	}
       else
 	{
-	  cdoAbort("grid corner missing!");
+	  cdoAbort("Grid corner missing!");
 	}
     }
 
@@ -1029,9 +1035,6 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
        (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
   // src_grid->remap_grid_type = 0;
-
-  src_grid->store_link_fast = FALSE;
-  tgt_grid->store_link_fast = FALSE;
 
   if ( lextrapolate > 0 )
     src_grid->lextrapolate = TRUE;
@@ -1619,9 +1622,6 @@ void remap_sum(double *restrict dst_array, double missval, long dst_size, long n
 }
 
 
-#define  DEFAULT_MAX_ITER  100
-
-static long    Max_Iter = DEFAULT_MAX_ITER;  /* Max iteration count for i, j iteration */
 static double  converge = 1.e-10;            /* Convergence criterion */
 
 /* threshold for coord transformation */
@@ -1631,11 +1631,6 @@ void remap_set_threshhold(double threshhold)
   south_thresh = -threshhold;  
 
   if ( cdoVerbose ) cdoPrint("threshhold: north=%g  south=%g", north_thresh, south_thresh);
-}
-
-void remap_set_max_iter(long max_iter)
-{
-  if ( max_iter > 0 ) Max_Iter = max_iter;
 }
 
 
@@ -2181,7 +2176,7 @@ long find_ij_weights(double plon, double plat, double *restrict src_lats, double
   iguess = HALF;
   jguess = HALF;
 
-  for ( iter = 0; iter < Max_Iter; ++iter )
+  for ( iter = 0; iter < remap_max_iter; ++iter )
     {
       dthp = plat - src_lats[0] - dth1*iguess - dth2*jguess - dth3*iguess*jguess;
       dphp = plon - src_lons[0];
@@ -2255,7 +2250,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, Max_Iter, converge, lwarn, findex) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, remap_max_iter, converge, lwarn, findex) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(dynamic,1)
 #endif
@@ -2304,7 +2299,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
 	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
 
-          if ( iter < Max_Iter )
+          if ( iter < remap_max_iter )
 	    {
 	      /* Successfully found iw,jw - compute weights */
 
@@ -2338,7 +2333,7 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 	      if ( cdoVerbose || lwarn )
 		{
 		  lwarn = FALSE;
-		  //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", Max_Iter);
+		  //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
 		  cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
 		}
 
@@ -2488,7 +2483,7 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, Max_Iter, converge, lwarn, findex) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, remap_max_iter, converge, lwarn, findex) \
   private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
   schedule(dynamic,1)
 #endif
@@ -2537,7 +2532,7 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 
 	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
 
-          if ( iter < Max_Iter )
+          if ( iter < remap_max_iter )
 	    {
 	      /* Successfully found iw,jw - compute weights */
 
@@ -2568,7 +2563,7 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 	      if ( cdoVerbose || lwarn )
 		{
 		  lwarn = FALSE;
-		  // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", Max_Iter);
+		  // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
 		  cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
 		}
 

@@ -336,8 +336,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
   nce(nc_put_var_int(nc_file_id, nc_srcgrdimask_id, src_grid.mask));
   nce(nc_put_var_int(nc_file_id, nc_dstgrdimask_id, tgt_grid.mask));
 
-  nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlat_id, src_grid.cell_center_lat)); 
-  nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlon_id, src_grid.cell_center_lon));
+  if ( src_grid.cell_center_lat ) nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlat_id, src_grid.cell_center_lat)); 
+  if ( src_grid.cell_center_lon ) nce(nc_put_var_double(nc_file_id, nc_srcgrdcntrlon_id, src_grid.cell_center_lon));
 
   if ( src_grid.lneed_cell_corners )
     {
@@ -345,8 +345,8 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
       nce(nc_put_var_double(nc_file_id, nc_srcgrdcrnrlon_id, src_grid.cell_corner_lon));
     }
 
-  nce(nc_put_var_double(nc_file_id, nc_dstgrdcntrlat_id, tgt_grid.cell_center_lat));
-  nce(nc_put_var_double(nc_file_id, nc_dstgrdcntrlon_id, tgt_grid.cell_center_lon));
+  if ( tgt_grid.cell_center_lat ) nce(nc_put_var_double(nc_file_id, nc_dstgrdcntrlat_id, tgt_grid.cell_center_lat));
+  if ( tgt_grid.cell_center_lon ) nce(nc_put_var_double(nc_file_id, nc_dstgrdcntrlon_id, tgt_grid.cell_center_lon));
 
   if ( tgt_grid.lneed_cell_corners )
     {
