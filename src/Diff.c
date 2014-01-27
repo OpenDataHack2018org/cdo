@@ -161,9 +161,9 @@ void *Diff(void *argument)
 
 		      fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff");
 
-		      if ( operatorID == DIFFN )
+		      if ( operatorID == DIFFN || operatorID == DIFF2 )
 			fprintf(stdout, " : Parameter name");
-		      else if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP )
+		      else if ( operatorID == DIFF || operatorID == DIFFP )
 			fprintf(stdout, " : Parameter ID");
 		      else if ( operatorID == DIFFC )
 			fprintf(stdout, " : Code number");
