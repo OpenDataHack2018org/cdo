@@ -453,8 +453,8 @@ void *Remap(void *argument)
   cdoOperatorAdd("remapcons",    REMAPCONS,    0, NULL);
   cdoOperatorAdd("gencons",      GENCONS,      1, NULL);
 
-  operatorID = cdoOperatorID();
-  operfunc   = cdoOperatorF1(operatorID);
+  operatorID   = cdoOperatorID();
+  operfunc     = cdoOperatorF1(operatorID);
   lwrite_remap = cdoOperatorF2(operatorID);
 
   // remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
@@ -836,9 +836,7 @@ void *Remap(void *argument)
 			}
 		    }
 
-		  remaps[r].src_grid.num_srch_bins = remap_num_srch_bins;
-		  remaps[r].src_grid.pinit = FALSE;
-		  remaps[r].tgt_grid.pinit = FALSE;
+		  remap_set_int(REMAP_NUM_SRCH_BINS, remap_num_srch_bins);
 
 		  remaps[r].vars.norm_opt = norm_opt;
 		  remaps[r].vars.pinit = FALSE;

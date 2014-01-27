@@ -45,7 +45,6 @@ typedef RESTR_TYPE restr_t;
 
 
 typedef struct {
-  int      pinit;                 /* TRUE if the pointers are initialized     */
   int      lwrite_remap;
   int      gridID;
   int      store_link_fast;
@@ -133,6 +132,7 @@ remap_t;
 #define  REMAP_STORE_LINK_FAST  1
 #define  REMAP_WRITE_REMAP      2
 #define  REMAP_MAX_ITER         3
+#define  REMAP_NUM_SRCH_BINS    4
 
 void remap_set_threshhold(double threshhold);
 void remap_set_int(int remapvar, int value);

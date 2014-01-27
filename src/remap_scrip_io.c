@@ -15,7 +15,7 @@
 #include "remap.h"
 
 
-void remapGridInitPointer(remapgrid_t *grid);
+void remapgrid_init(remapgrid_t *grid);
 void remapGridRealloc(int map_type, remapgrid_t *grid, int remap_grid_basis);
 
 
@@ -569,6 +569,10 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( cdoVerbose )
     cdoPrint("Remapping between: %s and %s", src_grid_name, tgt_grid_name);
 
+  /* Initialize remapgrid structure */
+  remapgrid_init(src_grid);
+  remapgrid_init(tgt_grid);
+
   /* Read dimension information */
 
   nce(nc_inq_dimid(nc_file_id, "src_grid_size", &nc_srcgrdsize_id));
@@ -585,9 +589,6 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
   if ( tgt_grid->size != gridInqSize(gridID2) )
     cdoAbort("Target grids have different size!");
   */
-  src_grid->num_cell_corners = 0;
-  src_grid->luse_cell_corners = FALSE;
-  src_grid->lneed_cell_corners = FALSE;
   status = nc_inq_dimid(nc_file_id, "src_grid_corners", &nc_srcgrdcorn_id);
   if ( status == NC_NOERR )
     {
@@ -597,9 +598,6 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       src_grid->lneed_cell_corners = TRUE;
     }
 
-  tgt_grid->num_cell_corners = 0;
-  tgt_grid->luse_cell_corners = FALSE;
-  tgt_grid->lneed_cell_corners = FALSE;
   status = nc_inq_dimid(nc_file_id, "dst_grid_corners", &nc_dstgrdcorn_id);
   if ( status == NC_NOERR )
     {
@@ -630,12 +628,6 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 
   src_grid->gridID = gridID1;
   tgt_grid->gridID = gridID2;
-
-  /* Initialize all pointer */
-  src_grid->pinit = FALSE;
-  tgt_grid->pinit = FALSE;
-  remapGridInitPointer(src_grid);
-  remapGridInitPointer(tgt_grid);
 
   if ( gridInqType(gridID1) == GRID_GME )
     {

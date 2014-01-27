@@ -246,9 +246,7 @@ void yar_remap_bil(field_t *field1, field_t *field2)
     cdoAbort("Source grid has no values");
 
   remap.src_grid.num_srch_bins = 0;
-  remap.src_grid.pinit = FALSE;
   remap.tgt_grid.num_srch_bins = 0;
-  remap.tgt_grid.pinit = FALSE;
   remap.vars.pinit = FALSE;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);
@@ -491,9 +489,7 @@ void yar_remap_con(field_t *field1, field_t *field2)
     cdoAbort("Source grid has no values");
 
   remap.src_grid.num_srch_bins = 0;
-  remap.src_grid.pinit = FALSE;
   remap.tgt_grid.num_srch_bins = 0;
-  remap.tgt_grid.pinit = FALSE;
   remap.vars.pinit = FALSE;
 
   if ( cdoTimer ) timer_start(timer_yar_remap_init);

@@ -110,14 +110,16 @@ typedef struct
 
 static int  remap_store_link_fast = TRUE;
 static int  remap_write_remap     = FALSE;
+static int  remap_num_srch_bins   = 180;
 #define  DEFAULT_MAX_ITER  100
-static long remap_max_iter = DEFAULT_MAX_ITER;  /* Max iteration count for i, j iteration */
+static long remap_max_iter        = DEFAULT_MAX_ITER;  /* Max iteration count for i, j iteration */
 
 void remap_set_int(int remapvar, int value)
 {
   if      ( remapvar == REMAP_STORE_LINK_FAST ) remap_store_link_fast = value;
   else if ( remapvar == REMAP_WRITE_REMAP     ) remap_write_remap     = value;
   else if ( remapvar == REMAP_MAX_ITER        ) remap_max_iter        = value;
+  else if ( remapvar == REMAP_NUM_SRCH_BINS   ) remap_num_srch_bins   = value;
   else      cdoAbort("Unsupported remap variable (%d)!", remapvar);
 }
 
@@ -134,31 +136,26 @@ extern int timer_remap_bil, timer_remap_nn;
 
 void remapGridFree(remapgrid_t *grid)
 {
-  if ( grid->pinit == TRUE )
-    {
-      grid->pinit = FALSE;
+  if ( grid->vgpm ) free(grid->vgpm);
+  if ( grid->mask ) free(grid->mask);
 
-      if ( grid->vgpm ) free(grid->vgpm);
-      free(grid->mask);
-      if ( grid->reg2d_center_lat ) free(grid->reg2d_center_lat);
-      if ( grid->reg2d_center_lon ) free(grid->reg2d_center_lon);
-      if ( grid->reg2d_corner_lat ) free(grid->reg2d_corner_lat);
-      if ( grid->reg2d_corner_lon ) free(grid->reg2d_corner_lon);
-      free(grid->cell_center_lat);
-      free(grid->cell_center_lon);
-      if ( grid->cell_area ) free(grid->cell_area);
-      if ( grid->cell_frac ) free(grid->cell_frac);
+  if ( grid->reg2d_center_lat ) free(grid->reg2d_center_lat);
+  if ( grid->reg2d_center_lon ) free(grid->reg2d_center_lon);
+  if ( grid->reg2d_corner_lat ) free(grid->reg2d_corner_lat);
+  if ( grid->reg2d_corner_lon ) free(grid->reg2d_corner_lon);
 
-      if ( grid->cell_corner_lat ) free(grid->cell_corner_lat);
-      if ( grid->cell_corner_lon ) free(grid->cell_corner_lon);
+  if ( grid->cell_center_lat ) free(grid->cell_center_lat);
+  if ( grid->cell_center_lon ) free(grid->cell_center_lon);
+  if ( grid->cell_corner_lat ) free(grid->cell_corner_lat);
+  if ( grid->cell_corner_lon ) free(grid->cell_corner_lon);
 
-      if ( grid->cell_bound_box ) free(grid->cell_bound_box);
+  if ( grid->cell_area ) free(grid->cell_area);
+  if ( grid->cell_frac ) free(grid->cell_frac);
 
-      free(grid->bin_addr);
-      if ( grid->bin_lats ) free(grid->bin_lats);
-    }
-  else
-    fprintf(stderr, "%s Warning: grid not initialized!\n", __func__);
+  if ( grid->cell_bound_box ) free(grid->cell_bound_box);
+
+  if ( grid->bin_addr ) free(grid->bin_addr);
+  if ( grid->bin_lats ) free(grid->bin_lats);
 
 } /* remapGridFree */
 
@@ -328,30 +325,36 @@ void genYbounds(long xsize, long ysize, const double *restrict grid_center_lat,
 
 /*****************************************************************************/
 
-void remapGridInitPointer(remapgrid_t *grid)
+void remapgrid_init(remapgrid_t *grid)
 {
-  grid->pinit = TRUE;
+  grid->remap_grid_type  = -1;
+  grid->num_srch_bins    = remap_num_srch_bins; // only for source grid ?
+
+  grid->num_cell_corners = 0;
+  grid->luse_cell_corners  = FALSE;
+  grid->lneed_cell_corners = FALSE;
 
   grid->nvgp             = 0;
   grid->vgpm             = NULL;
 
   grid->mask             = NULL;
+
   grid->reg2d_center_lon = NULL;
   grid->reg2d_center_lat = NULL;
   grid->reg2d_corner_lon = NULL;
   grid->reg2d_corner_lat = NULL;
+
   grid->cell_center_lon  = NULL;
   grid->cell_center_lat  = NULL;
-  grid->cell_area        = NULL;
-  grid->cell_frac        = NULL;
-
   grid->cell_corner_lon  = NULL;
   grid->cell_corner_lat  = NULL;
+
+  grid->cell_area        = NULL;
+  grid->cell_frac        = NULL;
 
   grid->cell_bound_box   = NULL;
 
   grid->bin_addr         = NULL;
-
   grid->bin_lats         = NULL;
 }
 
@@ -809,7 +812,7 @@ void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
 /*****************************************************************************/
 
 static
-void remap_reg2d_init(int gridID, remapgrid_t *grid)
+void remap_define_reg2d(int gridID, remapgrid_t *grid)
 {
   char units[CDI_MAX_NAME];
   long nx, nxm, ny;
@@ -853,7 +856,7 @@ void remap_reg2d_init(int gridID, remapgrid_t *grid)
 }
 
 static
-void remap_grid_init(int map_type, int gridID, remapgrid_t *grid, int remap_grid_basis)
+void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, int remap_grid_basis)
 {
   char units[CDI_MAX_NAME];
   long gridsize;
@@ -1027,12 +1030,12 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 {
   int reg2d_src_gridID = gridID1;
 
-  src_grid->remap_grid_type = -1;
-  tgt_grid->remap_grid_type = -1;
+  /* Initialize remapgrid structure */
+  remapgrid_init(src_grid);
+  remapgrid_init(tgt_grid);
 
   if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONSPHERE ) &&
-       !gridIsRotated(gridID1) &&
-       (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
+       !gridIsRotated(gridID1) && (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
     src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
   // src_grid->remap_grid_type = 0;
 
@@ -1043,12 +1046,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
     {
-      if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	{
-	  src_grid->luse_cell_corners  = FALSE;
-	  src_grid->lneed_cell_corners = FALSE;
-	}
-      else
+      if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
 	  src_grid->luse_cell_corners  = TRUE;
 	  src_grid->lneed_cell_corners = TRUE;
@@ -1056,17 +1054,6 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
       tgt_grid->luse_cell_corners  = TRUE;
       tgt_grid->lneed_cell_corners = TRUE;
     }
-  else
-    {
-      src_grid->luse_cell_corners  = FALSE;
-      src_grid->lneed_cell_corners = FALSE;
-      tgt_grid->luse_cell_corners  = FALSE;
-      tgt_grid->lneed_cell_corners = FALSE;
-    }
-
-  /* Initialize all pointer */
-  if ( src_grid->pinit == FALSE ) remapGridInitPointer(src_grid);
-  if ( tgt_grid->pinit == FALSE ) remapGridInitPointer(tgt_grid);
 
   src_grid->gridID = gridID1;
   tgt_grid->gridID = gridID2;
@@ -1135,13 +1122,13 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
     }
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
-    remap_grid_init(map_type, gridID1, src_grid, REMAP_GRID_BASIS_SRC);
+    remap_define_grid(map_type, gridID1, src_grid, REMAP_GRID_BASIS_SRC);
 
-  remap_grid_init(map_type, gridID2, tgt_grid, REMAP_GRID_BASIS_TGT);
+  remap_define_grid(map_type, gridID2, tgt_grid, REMAP_GRID_BASIS_TGT);
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
-      remap_reg2d_init(reg2d_src_gridID, src_grid);
+      remap_define_reg2d(reg2d_src_gridID, src_grid);
     }
   else
     {
