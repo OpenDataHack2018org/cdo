@@ -875,7 +875,7 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, int remap_gr
 	  gridCompress(gridID);
 	  grid->luse_cell_corners = TRUE;
 	}
-      else if ( grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
+      else if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
 	  lgrid_destroy = TRUE;
 	  gridID = gridToCurvilinear(grid->gridID, 1);

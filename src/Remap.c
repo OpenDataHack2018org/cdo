@@ -457,7 +457,7 @@ void *Remap(void *argument)
   operfunc     = cdoOperatorF1(operatorID);
   lwrite_remap = cdoOperatorF2(operatorID);
 
-  // remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
+  remap_set_int(REMAP_WRITE_REMAP, lwrite_remap);
 
   if ( operfunc == REMAPDIS || operfunc == GENDIS ||
        operfunc == REMAPNN  || operfunc == GENNN )
