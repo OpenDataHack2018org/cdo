@@ -5642,6 +5642,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long num_weights = 0;
   int remap_grid_type = src_grid->remap_grid_type;
   double src_grid_bound_box[4];
+  int lyac = FALSE;
 
   progressInit();
 
@@ -5786,7 +5787,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       if ( cdoVerbose )
 	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
-      //	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
 
       if ( num_srch_cells == 0 ) continue;
 
@@ -5798,15 +5798,15 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	}
 
       // printf("target: %ld\n", tgt_grid_add);
+      if ( lyac )
+	for ( int n = 0; n < tgt_num_cell_corners; ++n )
+	  {
+	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_x[n]/DEG2RAD);
+	    printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_y[n]/DEG2RAD);
+	  }
+      
       if ( cdoVerbose )
 	{
-	  /*
-	  for ( int n = 0; n < tgt_num_cell_corners; ++n )
-	    {
-	      printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_x[n]/DEG2RAD);
-	      printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_y[n]/DEG2RAD);
-	    }
-	  */
 	  /*
 	  //printf("target:       ");
 	  for ( int n = 0; n < tgt_num_cell_corners; ++n )
@@ -5889,16 +5889,18 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	      */
 	    }
 
-	  if ( cdoVerbose )
+	  if ( lyac )
 	    {
-	      /*
 	      for ( k = 0; k < srch_corners; ++k )
 		{
-		  printf("  SourceCell[ii].coordinates_x[%d] = %g*rad;\n", k, src_grid_cells[n].coordinates_x[k]/DEG2RAD);
-		  printf("  SourceCell[ii].coordinates_y[%d] = %g*rad;\n", k, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
+		  printf("  SourceCell[ii].coordinates_x[%ld] = %g*rad;\n", k, src_grid_cells[n].coordinates_x[k]/DEG2RAD);
+		  printf("  SourceCell[ii].coordinates_y[%ld] = %g*rad;\n", k, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
 		}
 	      printf("  ii++;\n");
-	      */
+	    }
+
+	  if ( cdoVerbose )
+	    {
 	      /*
 	      printf("source: %ld %ld", num_srch_cells, n);
 	      for ( k = 0; k < srch_corners; ++k )
