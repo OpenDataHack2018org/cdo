@@ -34,6 +34,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "list.h"
+#include "stdnametable.h"
 
 
 #if defined(ENABLE_DATA)
@@ -243,7 +244,7 @@ void *Vargen(void *argument)
       vlistDefVarUnits(vlistID   , varID , "hPa");
       vlistDefVarName(vlistID    , varID2, "T");
       vlistDefVarCode(vlistID    , varID2, 130);
-      vlistDefVarStdname(vlistID , varID2, "air_temperature");
+      vlistDefVarStdname(vlistID , varID2, var_stdname(air_temperature));
       vlistDefVarLongname(vlistID, varID2, "temperature");
       vlistDefVarUnits(vlistID   , varID2, "K");
     }

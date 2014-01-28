@@ -530,7 +530,7 @@ nodeType *ex_fun_con(char *fun, nodeType *p1)
 	}
 
   if ( funcID == -1 )
-    cdoAbort("Function %s not available!", fun);
+    cdoAbort("Function >%s< not available!", fun);
 
   p->u.con.value = fun_sym_tbl[funcID].func(p1->u.con.value);
 
@@ -575,7 +575,7 @@ nodeType *ex_fun_var(char *fun, nodeType *p1)
       }
 
   if ( funcID == -1 )
-    cdoAbort("Function %s not available!", fun);
+    cdoAbort("Function >%s< not available!", fun);
 
   if ( nmiss > 0 )
     {

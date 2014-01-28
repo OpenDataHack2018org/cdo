@@ -270,6 +270,8 @@ cdo_SOURCES += Adisit.c        \
                remaplib.c      \
                remapsort.c     \
                remap_scrip_io.c \
+               stdnametable.c  \
+               stdnametable.h  \
                specspace.c     \
                specspace.h     \
                statistic.c     \

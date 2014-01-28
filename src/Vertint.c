@@ -31,6 +31,7 @@
 #include "pstream.h"
 #include "vinterp.h"
 #include "list.h"
+#include "stdnametable.h"
 
 #define  C_EARTH_GRAV    (9.80665)
 
@@ -411,11 +412,11 @@ void *Vertint(void *argument)
 	  vlistInqVarStdname(vlistID1, varID, stdname);
 	  strtolower(stdname);
 
-	  if      ( strcmp(stdname, "surface_air_pressure") == 0 ) code = 134;
-	  else if ( strcmp(stdname, "air_temperature")      == 0 ) code = 130;
-	  else if ( strcmp(stdname, "surface_geopotential") == 0 ) code = 129;
-	  else if ( strcmp(stdname, "geopotential")         == 0 ) code = 129;
-	  else if ( strcmp(stdname, "geopotential_height")  == 0 ) code = 156;
+	  if      ( strcmp(stdname, var_stdname(surface_air_pressure)) == 0 ) code = 134;
+	  else if ( strcmp(stdname, var_stdname(air_temperature))      == 0 ) code = 130;
+	  else if ( strcmp(stdname, var_stdname(surface_geopotential)) == 0 ) code = 129;
+	  else if ( strcmp(stdname, "geopotential")                    == 0 ) code = 129;
+	  else if ( strcmp(stdname, var_stdname(geopotential_height))  == 0 ) code = 156;
 	  else
 	    {
 	      /*                        ECHAM                            ECMWF       */

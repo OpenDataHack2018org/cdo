@@ -27,6 +27,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "vinterp.h"
+#include "stdnametable.h"
 
 #define  C_RKBOL         (1.380658e-23)     /* Boltzmann constant in J/K   */
 #define  C_RNAVO         (6.0221367e+23)    /* Avogadro constant in 1/mol  */
@@ -145,7 +146,7 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
 
 void *Derivepar(void *argument)
 {
-  int GEOPOTHEIGHT;
+  int GEOPOTHEIGHT, SEALEVELPRESSURE;
   int operatorID;
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
@@ -184,7 +185,8 @@ void *Derivepar(void *argument)
 
   cdoInitialize(argument);
 
-  GEOPOTHEIGHT = cdoOperatorAdd("geopotheight",   0, 0, NULL);
+  GEOPOTHEIGHT     = cdoOperatorAdd("geopotheight",   0, 0, NULL);
+  SEALEVELPRESSURE = cdoOperatorAdd("sealevelpressure",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
 
@@ -411,11 +413,26 @@ void *Derivepar(void *argument)
 
 
   vlistID2 = vlistCreate();
-  varID = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
-  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(156, 128, 255));
-  vlistDefVarName(vlistID2, varID, "geopotheight");
-  vlistDefVarStdname(vlistID2, varID, "geopotental_height");
-  vlistDefVarUnits(vlistID2, varID, "m");
+
+  int var_id = -1;
+
+  if ( operatorID == GEOPOTHEIGHT )
+    {
+      var_id = geopotential_height;
+      varID  = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
+    }
+  else if ( operatorID == SEALEVELPRESSURE )
+    {
+      var_id = air_pressure_at_sea_level;
+      varID  = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
+    }
+  else
+    cdoAbort("Internal problem, invalid operatorID: %d!", operatorID);
+  
+  vlistDefVarParam(vlistID2, varID, cdiEncodeParam(var_echamcode(var_id), 128, 255));
+  vlistDefVarName(vlistID2, varID, var_name(var_id));
+  vlistDefVarStdname(vlistID2, varID, var_stdname(var_id));
+  vlistDefVarUnits(vlistID2, varID, var_units(var_id));
 
   taxisID1 = vlistInqTaxis(vlistID1);
   taxisID2 = taxisDuplicate(taxisID1);
