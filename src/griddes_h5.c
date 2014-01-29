@@ -296,6 +296,7 @@ int gridFromH5file(const char *gridfile)
   hid_t	    file_id;	    /* HDF5 File ID	        	*/
   hid_t	    lon_id = -1;    /* Dataset ID	        	*/
   hid_t	    lat_id = -1;    /* Dataset ID	        	*/
+  hid_t     att_id;
   hid_t     dataspace;   
   hsize_t   dims_out[9];    /* dataset dimensions               */
   herr_t    status;	    /* Generic return value		*/
@@ -343,6 +344,21 @@ int gridFromH5file(const char *gridfile)
 	  //if ( cdoVerbose ) cdoWarning("Unexpected rank = %d!", rank);
 	  goto RETURN;
 	}
+
+      att_id = H5Aopen_name(lon_id, "bounds");
+      if ( att_id >= 0 )
+	{
+	  H5Aclose(att_id);
+	  goto RETURN;
+	}
+
+      att_id = H5Aopen_name(lat_id, "bounds");
+      if ( att_id >= 0 )
+	{
+	  H5Aclose(att_id);
+	  goto RETURN;
+	}
+
       /*
       printf("\nRank: %d\nDimensions: %lu x %lu \n", rank,
 	     (unsigned long)(dims_out[1]), (unsigned long)(dims_out[0]));
@@ -370,8 +386,8 @@ int gridFromH5file(const char *gridfile)
       grid.ysize = (int)dims_out[0];
       grid.size  = grid.xsize*grid.ysize;
 
-      grid.xvals = (double *) malloc(grid.size*sizeof(double));
-      grid.yvals = (double *) malloc(grid.size*sizeof(double));
+      grid.xvals = malloc(grid.size*sizeof(double));
+      grid.yvals = malloc(grid.size*sizeof(double));
 
       if ( ftype )
 	{
@@ -407,7 +423,6 @@ int gridFromH5file(const char *gridfile)
       double xscale = 1, yscale = 1;
       double xoffset = 0, yoffset = 0;
       hid_t grp_id;
-      hid_t att_id;
       int i;
 
       grp_id = H5Gopen(file_id, "/where/lon/what");
@@ -497,8 +512,8 @@ int gridFromH5file(const char *gridfile)
 	  grid.ysize = (int)dims_out[0];
 	  grid.size  = grid.xsize*grid.ysize;
 
-	  grid.xvals = (double *) malloc(grid.size*sizeof(double));
-	  grid.yvals = (double *) malloc(grid.size*sizeof(double));
+	  grid.xvals = malloc(grid.size*sizeof(double));
+	  grid.yvals = malloc(grid.size*sizeof(double));
 
 	  if ( ftype )
 	    {
@@ -532,10 +547,10 @@ int gridFromH5file(const char *gridfile)
 	}
     }
 
-  /* Close file */
-  status = H5Fclose(file_id);
-
  RETURN:
+
+  /* Close file */
+  if ( file_id >= 0 )  status = H5Fclose(file_id);
 
 #else
   cdoWarning("HDF5 support not compiled in!");

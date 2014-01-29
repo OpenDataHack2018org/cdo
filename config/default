@@ -56,6 +56,7 @@ case "${HOSTNAME}" in
                     --with-jasper=/opt/local \
                     --with-grib_api=$HOME/local/gribapi-1.9.16 \
                     --with-netcdf=/opt/local \
+                    --with-hdf5=/opt/local \
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
                     --with-curl=/opt/local \

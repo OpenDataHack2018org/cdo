@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.3
 	* Version 1.6.3 released
 
+2014-01-29  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* gridFromH5file: skipped if attribute >bounds< is defined [Bug #4411]
+
 2014-01-24  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* expr: select variables by name
