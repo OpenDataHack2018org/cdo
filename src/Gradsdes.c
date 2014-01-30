@@ -1297,9 +1297,9 @@ void *Gradsdes(void *argument)
 	  if ( nrecords >= maxrecs )
 	    {
 	      maxrecs = nrecords;
-	      intnum = (int *)   realloc(intnum, 1*maxrecs*sizeof(int));
-	      fltnum = (float *) realloc(fltnum, 3*maxrecs*sizeof(float));
-	      bignum = (off_t *) realloc(bignum, 2*maxrecs*sizeof(off_t));
+	      intnum = realloc(intnum, 1*maxrecs*sizeof(int));
+	      fltnum = realloc(fltnum, 3*maxrecs*sizeof(float));
+	      bignum = realloc(bignum, 2*maxrecs*sizeof(off_t));
 	    }
 
 	  for ( recID = 0; recID < nrecs; recID++ )

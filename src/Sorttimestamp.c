@@ -105,9 +105,9 @@ void *Sorttimestamp(void *argument)
 	  if ( xtsID >= nalloc )
 	    {
 	      nalloc += NALLOC_INC;
-	      vdate = (int *) realloc(vdate, nalloc*sizeof(int));
-	      vtime = (int *) realloc(vtime, nalloc*sizeof(int));
-	      vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
+	      vdate = realloc(vdate, nalloc*sizeof(int));
+	      vtime = realloc(vtime, nalloc*sizeof(int));
+	      vars  = realloc(vars, nalloc*sizeof(field_t **));
 	    }
 
 	  vdate[xtsID] = taxisInqVdate(taxisID1);

@@ -118,7 +118,7 @@ void *Arithlat(void *argument)
 
 	      gridsize = gridInqSize(gridID);
 
-	      scale = (double *) realloc(scale, gridsize*sizeof(double));
+	      scale = realloc(scale, gridsize*sizeof(double));
 	      gridInqYvals(gridID, scale);
 
 	      /* Convert lat/lon units if required */

@@ -62,7 +62,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
       if ( nlev1 > mlev1 )
 	{
 	  mlev1 = nlev1;
-	  lev1 = (double *) realloc(lev1, mlev1*sizeof(double));
+	  lev1 = realloc(lev1, mlev1*sizeof(double));
 	}
       zaxisInqLevels(zaxisID1, lev1);
 
@@ -81,7 +81,7 @@ void checkDupEntry(int vlistID1, int vlistID2, const char *filename)
 	      if ( nlev2 > mlev2 )
 		{
 		  mlev2 = nlev2;
-		  lev2 = (double *) realloc(lev2, mlev2*sizeof(double));
+		  lev2 = realloc(lev2, mlev2*sizeof(double));
 		}
 	      zaxisInqLevels(zaxisID2, lev2);
 

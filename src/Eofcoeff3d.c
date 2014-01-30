@@ -119,7 +119,7 @@ void *Eofcoeff3d(void * argument)
          if ( eofID == 0 )
            eof[varID][levelID] = malloc (1*sizeof(field_t));
          else
-           eof[varID][levelID] = (field_t*) realloc (eof[varID][levelID], (eofID+1)*sizeof(field_t));
+           eof[varID][levelID] = realloc (eof[varID][levelID], (eofID+1)*sizeof(field_t));
          eof[varID][levelID][eofID].grid   = gridID1;
          eof[varID][levelID][eofID].nmiss  = 0;
          eof[varID][levelID][eofID].missval= missval1;

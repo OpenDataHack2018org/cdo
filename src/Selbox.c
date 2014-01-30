@@ -645,7 +645,7 @@ int gencellgrid(int gridID1, int *gridsize2, int **cellidx)
 	    if ( nvals > maxcell )
 	      {
 		maxcell += cellinc;
-		*cellidx = (int *) realloc(*cellidx, maxcell*sizeof(int));
+		*cellidx = realloc(*cellidx, maxcell*sizeof(int));
 	      }
 	    (*cellidx)[nvals-1] = i;
 	  }

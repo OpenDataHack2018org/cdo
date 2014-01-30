@@ -758,8 +758,8 @@ void *Outputgmt(void *argument)
     {
       if ( gridcorners == 0 ) cdoAbort("grid corner missing!");
       nalloc = gridcorners*gridsize;
-      grid_corner_lat = (double *) realloc(grid_corner_lat, nalloc*sizeof(double));
-      grid_corner_lon = (double *) realloc(grid_corner_lon, nalloc*sizeof(double));
+      grid_corner_lat = realloc(grid_corner_lat, nalloc*sizeof(double));
+      grid_corner_lon = realloc(grid_corner_lon, nalloc*sizeof(double));
 
       if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
 	{
