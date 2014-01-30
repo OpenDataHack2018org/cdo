@@ -162,6 +162,7 @@ void *Derivepar(void *argument)
   int ngrids, gridID = -1, zaxisID;
   int nlevel;
   int nvct;
+  int surfaceID = -1;
   int geopID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1;
   // int clwcID = -1, ciwcID = -1;
   int code, param;
@@ -175,10 +176,12 @@ void *Derivepar(void *argument)
   double *geop = NULL, *ps = NULL, *temp = NULL, *hum = NULL;
   // double *lwater = NULL, *iwater = NULL;
   double *geopotheight = NULL;
+  double *sealevelpressure = NULL;
   int nmiss, nmissout = 0;
   int ltq = FALSE;
   double *array = NULL;
   double *half_press = NULL;
+  double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;
   int useTable;
@@ -366,6 +369,8 @@ void *Derivepar(void *argument)
       // else if ( code == 246 ) clwcID    = varID;
       // else if ( code == 247 ) ciwcID    = varID;
 
+      if ( operatorID == SEALEVELPRESSURE ) humID = -1;
+
       if ( gridInqType(gridID) == GRID_SPECTRAL && zaxisInqType(zaxisID) == ZAXIS_HYBRID )
 	cdoAbort("Spectral data on model level unsupported!");
 
@@ -382,16 +387,28 @@ void *Derivepar(void *argument)
 
   temp   = malloc(ngp*nhlevf*sizeof(double));
 
-  if ( humID == -1 )
-    cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
-  else
-    hum    = malloc(ngp*nhlevf*sizeof(double));
-
   // lwater = malloc(ngp*nhlevf*sizeof(double));
   // iwater = malloc(ngp*nhlevf*sizeof(double));
 
   half_press   = malloc(ngp*(nhlevf+1)*sizeof(double));
-  geopotheight = malloc(ngp*(nhlevf+1)*sizeof(double));
+
+  if ( operatorID == GEOPOTHEIGHT )
+    {
+      if ( humID == -1 )
+	cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
+      else
+	hum    = malloc(ngp*nhlevf*sizeof(double));
+
+      geopotheight = malloc(ngp*(nhlevf+1)*sizeof(double));
+    }
+  
+  if ( operatorID == SEALEVELPRESSURE )
+    {
+      full_press   = malloc(ngp*nhlevf*sizeof(double));
+
+      surfaceID = zaxisFromName("surface");
+      sealevelpressure = malloc(ngp*sizeof(double));
+    }
 
   if ( zaxisIDh != -1 && geopID == -1 )
     {
@@ -424,7 +441,7 @@ void *Derivepar(void *argument)
   else if ( operatorID == SEALEVELPRESSURE )
     {
       var_id = air_pressure_at_sea_level;
-      varID  = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
+      varID  = vlistDefVar(vlistID2, gridID, surfaceID, TSTEP_INSTANT);
     }
   else
     cdoAbort("Internal problem, invalid operatorID: %d!", operatorID);
@@ -530,19 +547,33 @@ void *Derivepar(void *argument)
 	    }
 	}
 
-      presh(NULL, half_press, vct, ps, nhlevf, ngp);
-
-      memcpy(geopotheight+ngp*nhlevf, geop, ngp*sizeof(double));
-      MakeGeopotHeight(geopotheight, temp, hum, half_press, ngp, nhlevf);
-
-      nmissout = 0;
-      varID = 0;
-      nlevel = nhlevf;
-      for ( levelID = 0; levelID < nlevel; levelID++ )
+      if ( operatorID == GEOPOTHEIGHT )
 	{
-	  streamDefRecord(streamID2, varID, levelID);
-	  streamWriteRecord(streamID2, geopotheight+levelID*ngp, nmissout);
+	  presh(NULL, half_press, vct, ps, nhlevf, ngp);
+	  
+	  memcpy(geopotheight+ngp*nhlevf, geop, ngp*sizeof(double));
+	  MakeGeopotHeight(geopotheight, temp, hum, half_press, ngp, nhlevf);
+
+	  nmissout = 0;
+	  varID = 0;
+	  nlevel = nhlevf;
+	  for ( levelID = 0; levelID < nlevel; levelID++ )
+	    {
+	      streamDefRecord(streamID2, varID, levelID);
+	      streamWriteRecord(streamID2, geopotheight+levelID*ngp, nmissout);
+	    }
 	}
+      else if ( operatorID == SEALEVELPRESSURE )
+	{
+	  presh(full_press, half_press, vct, ps, nhlevf, ngp);
+
+	  extra_P(sealevelpressure, half_press+ngp*(nhlevf), full_press+ngp*(nhlevf-1), geop, temp+ngp*(nhlevf-1), ngp);
+
+	  streamDefRecord(streamID2, 0, 0);
+	  streamWriteRecord(streamID2, sealevelpressure, 0);
+	}
+      else
+	cdoAbort("Internal error");
 
       tsID++;
     }
@@ -555,9 +586,11 @@ void *Derivepar(void *argument)
   free(ps);
   free(geop);
   free(temp);
-  free(geopotheight);
+  if ( geopotheight ) free(geopotheight);
+  if ( sealevelpressure ) free(sealevelpressure);
   if ( hum ) free(hum);
 
+  if ( full_press ) free(full_press);
   if ( half_press ) free(half_press);
 
   free(array);
