@@ -171,7 +171,7 @@ int cptRead(FILE *fp, CPT *cpt)
 	
   cptInit(cpt);
 
-  cpt->lut = (LUT *) calloc(1, n_alloc*sizeof(LUT));
+  cpt->lut = calloc(1, n_alloc*sizeof(LUT));
 	
   /* Save the original setting since it may be modified by settings in the CPT file */
   color_model = RGB; 

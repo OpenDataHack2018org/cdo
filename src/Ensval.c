@@ -127,17 +127,17 @@ void *Ensval(void *argument)
   taxisID2 = malloc ( nostreams*sizeof(int) );
   zaxisID2 = malloc ( nostreams*sizeof(int) );
 
-  val = (double *) calloc ( nfiles,sizeof(double) );
+  val = calloc ( nfiles,sizeof(double) );
   
   if ( operfunc == CRPS ) {
-    alpha=(double *) calloc ( nens+1,sizeof(double) );
-    beta =(double *) calloc ( nens+1,sizeof(double) );
-    alpha_weights=(double *) calloc ( nens+1,sizeof(double) );
-    beta_weights =(double *) calloc ( nens+1,sizeof(double) );
+    alpha=calloc ( nens+1,sizeof(double) );
+    beta =calloc ( nens+1,sizeof(double) );
+    alpha_weights=calloc ( nens+1,sizeof(double) );
+    beta_weights =calloc ( nens+1,sizeof(double) );
   }
   else if ( operfunc == BRS ) {
-    brs_g = (double *) calloc ( nens+1,sizeof(double) );
-    brs_o = (double *) calloc ( nens+1,sizeof(double) );
+    brs_g = calloc ( nens+1,sizeof(double) );
+    brs_o = calloc ( nens+1,sizeof(double) );
   }
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
@@ -203,7 +203,7 @@ void *Ensval(void *argument)
       break;
     }
 
-    ofilename = (char *) calloc(namelen, sizeof(char));
+    ofilename = calloc(namelen, sizeof(char));
 
     sprintf(ofilename, "%s.%s%s", ofilebase, type_suffix, file_suffix);
     // fprintf(stderr, "StreamID %i: %s\n", stream, ofilename);

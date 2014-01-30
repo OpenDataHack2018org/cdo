@@ -330,7 +330,7 @@ void *Filter(void *argument)
   array2 = malloc(nts2*sizeof(double));
 #endif
 
-  fmasc  = (int *) calloc(nts2, sizeof(int));
+  fmasc  = calloc(nts2, sizeof(int));
    
   for ( tsID = 0; tsID < nts; tsID++ ) array2[tsID] = 0;
 

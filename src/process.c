@@ -512,7 +512,7 @@ void setStreamNames(int argc, char *argv[])
 	  globArgc = getGlobArgc(argc, argv, globArgc);
 	  len = 0;
 	  for ( i = globArgcStart; i < globArgc; i++ ) len += strlen(argv[i]) + 1;
-	  streamname = (char *) calloc(1, len);
+	  streamname = calloc(1, len);
 	  for ( i = globArgcStart; i < globArgc; i++ )
 	    {
 	      strcat(streamname, argv[i]);
