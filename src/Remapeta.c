@@ -28,6 +28,7 @@
 #include "pstream.h"
 #include "vinterp.h"
 #include "list.h"
+#include "stdnametable.h"
 #include "hetaeta.h"
 
 
@@ -293,13 +294,13 @@ void *Remapeta(void *argument)
 	  nmissout = nmiss;
 	}
 
-      /* check range of geop */
+      /* check range of surface_geopotential */
       minmaxval(nfis2gp, fis2, imiss, &minval, &maxval);
       if ( minval < MIN_FIS || maxval > MAX_FIS )
-	cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
+	cdoWarning("%s out of range (min=%g max=%g)!", var_stdname(surface_geopotential), minval, maxval);
 
       if ( minval < -1.e10 || maxval > 1.e10 )
-	cdoAbort("Orography out of range!");
+	cdoAbort("%s out of range!", var_stdname(surface_geopotential));
 
       streamClose(streamID1); 
     }
@@ -546,7 +547,7 @@ void *Remapeta(void *argument)
   if ( zaxisIDh != -1 && geopID == -1 )
     {
       if ( ltq )
-	cdoWarning("Orography (surf. geopotential) not found - using zero orography!");
+	cdoWarning("%s not found - using zero %s!", var_stdname(surface_geopotential), var_stdname(surface_geopotential));
 
       memset(fis1, 0, ngp*sizeof(double));
     }
@@ -556,9 +557,9 @@ void *Remapeta(void *argument)
     {
       presID = psID;
       if ( psID != -1 )
-	cdoWarning("LOG surface pressure (lsp) not found - using surface pressure (asp)!");
+	cdoWarning("LOG(%s) not found - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
       else
-	cdoAbort("Surface pressure not found!");
+	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
   if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, ltq);

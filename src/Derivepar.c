@@ -373,7 +373,7 @@ void *Derivepar(void *argument)
 	cdoAbort("Spectral data unsupported!");
     }
 
-  if ( tempID == -1 ) cdoAbort("Temperature not found!");
+  if ( tempID == -1 ) cdoAbort("Air temperature not found!");
 
   array  = malloc(ngp*sizeof(double));
 
@@ -383,7 +383,7 @@ void *Derivepar(void *argument)
   temp   = malloc(ngp*nhlevf*sizeof(double));
 
   if ( humID == -1 )
-    cdoWarning("Humidity not found - using algorithm without humidity!");
+    cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
   else
     hum    = malloc(ngp*nhlevf*sizeof(double));
 
@@ -396,7 +396,7 @@ void *Derivepar(void *argument)
   if ( zaxisIDh != -1 && geopID == -1 )
     {
       if ( ltq )
-	cdoWarning("Orography (surf. geopotential) not found - using zero orography!");
+	cdoWarning("%s not found - using zero %s!", var_stdname(surface_geopotential), var_stdname(surface_geopotential));
 
       memset(geop, 0, ngp*sizeof(double));
     }
@@ -406,9 +406,9 @@ void *Derivepar(void *argument)
     {
       presID = psID;
       if ( psID != -1 )
-	cdoWarning("LOG surface pressure (lsp) not found - using surface pressure (asp)!");
+	cdoWarning("LOG(%s) not found - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
       else
-	cdoAbort("Surface pressure not found!");
+	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
 

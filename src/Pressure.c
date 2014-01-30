@@ -31,6 +31,7 @@
 #include "pstream.h"
 #include "vinterp.h"
 #include "list.h"
+#include "stdnametable.h"
 
 
 void *Pressure(void *argument)
@@ -334,7 +335,7 @@ void *Pressure(void *argument)
       if ( gridInqType(gridID) == GRID_SPECTRAL )
 	{
 	  lnpsID = -1;
-	  cdoWarning("Spectral LOG surface pressure not supported - using surface pressure!");
+	  cdoWarning("Spectral LOG(%s) not supported - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
 	}
     }
 
@@ -342,12 +343,12 @@ void *Pressure(void *argument)
     {
       pvarID = psID;
       if ( psID == -1 )
-	cdoAbort("Surface pressure not found!");
+	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
   gridID = vlistInqVarGrid(vlistID1, pvarID);
   if ( gridInqType(gridID) == GRID_SPECTRAL )
-    cdoAbort("Surface pressure on spectral representation not supported!");
+    cdoAbort("%s on spectral representation not supported!", var_stdname(surface_air_pressure));
 
   gridsize = gridInqSize(gridID);
   pdata = malloc(gridsize*sizeof(double));
@@ -357,7 +358,6 @@ void *Pressure(void *argument)
   varID = vlistDefVar(vlistID2, gridID, zaxisIDp, TSTEP_INSTANT);
   vlistDefVarCode(vlistID2, varID, 1);
   vlistDefVarName(vlistID2, varID, "pressure");
-  vlistDefVarLongname(vlistID2, varID, "Air pressure");
   vlistDefVarStdname(vlistID2, varID, "air_pressure");
   vlistDefVarUnits(vlistID2, varID, "Pa");
 

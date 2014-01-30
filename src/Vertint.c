@@ -487,7 +487,7 @@ void *Vertint(void *argument)
       geop = malloc(ngp*sizeof(double));
       if ( geopID == -1 )
 	{
-	  cdoWarning("Orography (surf. geopotential) not found - using zero orography!");
+	  cdoWarning("%s not found - using zero %s!", var_stdname(surface_geopotential), var_stdname(surface_geopotential));
 	  memset(geop, 0, ngp*sizeof(double));
 	}
     }
@@ -502,10 +502,10 @@ void *Vertint(void *argument)
 	  param = vlistInqVarParam(vlistID1, psID);
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 	  if ( cdoVerbose )
-	    cdoPrint("LOG surface pressure not found - using surface pressure (param=%s)!", paramstr);
+	    cdoWarning("LOG(%s) not found - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
 	}
       else
-	cdoAbort("Surface pressure not found!");
+	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
     }
 
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());

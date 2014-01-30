@@ -3,6 +3,7 @@
 
 enum stdnameid {surface_geopotential,
 		air_temperature,
+                specific_humidity,
 		surface_air_pressure,
 		air_pressure_at_sea_level,
 		geopotential_height};
