@@ -12,4 +12,6 @@ const char* var_name(int varid);
 const char* var_stdname(int varid);
 const char* var_units(int varid);
 
+int echamcode_from_stdname(const char* stdname);
+
 #endif

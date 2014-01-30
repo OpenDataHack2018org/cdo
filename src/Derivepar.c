@@ -166,7 +166,7 @@ void *Derivepar(void *argument)
   // int clwcID = -1, ciwcID = -1;
   int code, param;
   char paramstr[32];
-  char varname[CDI_MAX_NAME];
+  char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
   int taxisID1, taxisID2;
   int lhavevct;
@@ -335,24 +335,24 @@ void *Derivepar(void *argument)
       if ( cdoVerbose )
 	cdoPrint("Mode = %d  Center = %d  Param = %s", mode, instNum, paramstr);
 
-      if ( code <= 0 )
+      if ( code <= 0 || code == 255 )
 	{
 	  vlistInqVarName(vlistID1, varID, varname);
-
 	  strtolower(varname);
 
-	  if ( nlevel == 1 )
-	    {
-	      if      ( strcmp(varname, "geosp")   == 0 ) code = 129;
-	      else if ( strcmp(varname, "aps")     == 0 ) code = 134;
-	      else if ( strcmp(varname, "ps")      == 0 ) code = 134;
-	      else if ( strcmp(varname, "lsp")     == 0 ) code = 152;
-	    }
+	  vlistInqVarStdname(vlistID1, varID, stdname);
+	  strtolower(stdname);
 
-	  if ( nlevel == nhlevf )
+	  code = echamcode_from_stdname(stdname);
+
+	  if ( code < 0 )
 	    {
-	      if      ( strcmp(varname, "t")       == 0 ) code = 130;
-	      else if ( strcmp(varname, "q")       == 0 ) code = 133;
+	      if      ( geopID == -1  && strcmp(varname, "geosp")   == 0 ) code = 129;
+	      else if ( psID   == -1  && strcmp(varname, "aps")     == 0 ) code = 134;
+	      else if ( psID   == -1  && strcmp(varname, "ps")      == 0 ) code = 134;
+	      else if ( lnpsID == -1  && strcmp(varname, "lsp")     == 0 ) code = 152;
+	      else if ( tempID == -1  && strcmp(varname, "t")       == 0 ) code = 130;
+	      else if ( humID  == -1  && strcmp(varname, "q")       == 0 ) code = 133;
 	      // else if ( strcmp(varname, "clwc")    == 0 ) code = 246;
 	      // else if ( strcmp(varname, "ciwc")    == 0 ) code = 247;
 	    }

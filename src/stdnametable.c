@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 #include "stdnametable.h"
 
@@ -56,4 +57,18 @@ const char* var_stdname(int varid)
 const char* var_units(int varid)
 {
   return (stdnametable[stdnametable_idx(varid)].units);
+}
+
+int echamcode_from_stdname(const char* stdname)
+{
+  int code = -1;
+
+  if      ( strcmp(stdname, var_stdname(surface_geopotential))      == 0 ) code = 129;
+  else if ( strcmp(stdname, "geopotential")                         == 0 ) code = 129;
+  else if ( strcmp(stdname, var_stdname(air_temperature))           == 0 ) code = 130;
+  else if ( strcmp(stdname, var_stdname(surface_air_pressure))      == 0 ) code = 134;
+  else if ( strcmp(stdname, var_stdname(air_pressure_at_sea_level)) == 0 ) code = 151;
+  else if ( strcmp(stdname, var_stdname(geopotential_height))       == 0 ) code = 156;
+
+  return (code);
 }

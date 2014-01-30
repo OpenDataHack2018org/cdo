@@ -412,18 +412,15 @@ void *Vertint(void *argument)
 	  vlistInqVarStdname(vlistID1, varID, stdname);
 	  strtolower(stdname);
 
-	  if      ( strcmp(stdname, var_stdname(surface_air_pressure)) == 0 ) code = 134;
-	  else if ( strcmp(stdname, var_stdname(air_temperature))      == 0 ) code = 130;
-	  else if ( strcmp(stdname, var_stdname(surface_geopotential)) == 0 ) code = 129;
-	  else if ( strcmp(stdname, "geopotential")                    == 0 ) code = 129;
-	  else if ( strcmp(stdname, var_stdname(geopotential_height))  == 0 ) code = 156;
-	  else
+	  code = echamcode_from_stdname(stdname);
+
+	  if ( code < 0 )
 	    {
-	      /*                        ECHAM                            ECMWF       */
-	      if      ( strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0 ) code = 129;
-	      else if ( strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0 ) code = 130;
-	      else if ( strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0 ) code = 134;
-	      else if ( strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0 ) code = 152;
+	      /*                                  ECHAM                            ECMWF       */
+	      if      ( geopID == -1  && (strcmp(varname, "geosp") == 0 || strcmp(varname, "z")    == 0) ) code = 129;
+	      else if ( tempID == -1  && (strcmp(varname, "st")    == 0 || strcmp(varname, "t")    == 0) ) code = 130;
+	      else if ( psID   == -1  && (strcmp(varname, "aps")   == 0 || strcmp(varname, "sp"  ) == 0) ) code = 134;
+	      else if ( lnpsID == -1  && (strcmp(varname, "lsp")   == 0 || strcmp(varname, "lnsp") == 0) ) code = 152;
 	      /* else if ( strcmp(varname, "geopoth") == 0 ) code = 156; */
 	    }
 	}
@@ -477,10 +474,10 @@ void *Vertint(void *argument)
   if ( cdoVerbose )
     {
       cdoPrint("Found:");
-      if ( tempID != -1 ) cdoPrint("  air temperature");
-      if ( psID   != -1 ) cdoPrint("  surface pressure");
-      if ( geopID != -1 ) cdoPrint("  surface geopotential");
-      if ( gheightID != -1 ) cdoPrint("  geopotential height");
+      if ( tempID != -1 )    cdoPrint("  %s", var_stdname(air_temperature));
+      if ( psID   != -1 )    cdoPrint("  %s", var_stdname(surface_air_pressure));
+      if ( geopID != -1 )    cdoPrint("  %s", var_stdname(surface_geopotential));
+      if ( gheightID != -1 ) cdoPrint("  %s", var_stdname(geopotential_height));
     }
 
   if ( tempID != -1 || gheightID != -1 ) geop_needed = TRUE;

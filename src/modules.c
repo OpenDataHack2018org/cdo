@@ -293,7 +293,7 @@ void *Maggraph(void *argument);
 #define  ConsecstatOperators    {"consects", "consecsum"}
 #define  CopyOperators          {"copy", "selall", "szip"}
 #define  DeltimeOperators       {"delday", "del29feb"}
-#define  DeriveparOperators     {"geopotheight"}
+#define  DeriveparOperators     {"geopotheight", "sealevelpressure"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diff2", "diffp", "diffn", "diffc"}
 #define  DuplicateOperators     {"duplicate"}
