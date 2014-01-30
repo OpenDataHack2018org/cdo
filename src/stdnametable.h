@@ -1,0 +1,15 @@
+#ifndef _STDNAMETABLE_H
+#define _STDNAMETABLE_H
+
+enum stdnameid {surface_geopotential,
+		air_temperature,
+		surface_air_pressure,
+		air_pressure_at_sea_level,
+		geopotential_height};
+
+int         var_echamcode(int varid);
+const char* var_name(int varid);
+const char* var_stdname(int varid);
+const char* var_units(int varid);
+
+#endif

@@ -595,6 +595,8 @@ src/specspace.c -text
 src/specspace.h -text
 src/statistic.c -text
 src/statistic.h -text
+src/stdnametable.c -text
+src/stdnametable.h -text
 src/table.c -text
 src/temp.h -text
 src/template_parser.c -text
