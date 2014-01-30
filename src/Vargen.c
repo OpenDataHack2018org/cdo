@@ -269,7 +269,7 @@ void *Vargen(void *argument)
   streamDefVlist(streamID, vlistID);
 
   gridsize = gridInqSize(gridID);
-  array = (double *) malloc(gridsize*sizeof(double));
+  array = malloc(gridsize*sizeof(double));
 
   if ( operatorID == FOR )
     ntimesteps = 1.001 + ((rstop-rstart)/rinc);

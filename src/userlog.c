@@ -495,7 +495,7 @@ void dumplogs(const char *logfilename)
 
   if ( bufsize > 0 )
     {
-      buffer = (unsigned char *) malloc(bufsize);
+      buffer = malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
@@ -568,7 +568,7 @@ void daylogs(const char *logfilename)
 
   if ( bufsize > 0 )
     {
-      buffer = (unsigned char *) malloc(bufsize);
+      buffer = malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
@@ -640,7 +640,7 @@ void monlogs(const char *logfilename)
 
   if ( bufsize > 0 )
     {
-      buffer = (unsigned char *) malloc(bufsize);
+      buffer = malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
@@ -769,7 +769,7 @@ void cdologo(int noper)
   bufsize = (size_t) filestat.st_size;
 
   newbufsize = bufsize + noper*logsize;
-  buffer = (unsigned char *) malloc(newbufsize);
+  buffer = malloc(newbufsize);
   if ( bufsize > 0 )
     status = (int) read(logfileno, buffer, bufsize);
 
@@ -957,14 +957,14 @@ void dumplogo(const char *logfilename, int dumptype)
   if ( bufsize > 0 )
     {
       fprintf(stdout, "# num name                     call        mem [GB]    time [h]     perc [s]\n");
-      buffer = (unsigned char *) malloc(bufsize);
+      buffer = malloc(bufsize);
 
       status = (int) read(logfileno, buffer, bufsize);
 
       nlogs = bufsize / logsize;
 
-      logInfo    = (LogInfo **) malloc(nlogs*sizeof(LogInfo *));
-      logInfo[0] = (LogInfo *) malloc(nlogs*sizeof(LogInfo));
+      logInfo    = malloc(nlogs*sizeof(LogInfo *));
+      logInfo[0] = malloc(nlogs*sizeof(LogInfo));
       for ( i = 1; i < nlogs; i++ ) logInfo[i] = logInfo[0] + i;
 
       for ( i = 0; i < nlogs; i++ )

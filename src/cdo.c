@@ -737,7 +737,7 @@ void defineVarnames(const char *arg)
     {
       char *commapos;
       
-      cdoVarnames = (char **) malloc(MAX_NUM_VARNAMES*sizeof(char *));
+      cdoVarnames = malloc(MAX_NUM_VARNAMES*sizeof(char *));
 
       pbuf = strdup(arg+istart);
       cdoVarnames[cdoNumVarnames++] = pbuf;    
@@ -773,7 +773,7 @@ void get_env_vars(void)
       if ( len > 0 )
 	{
 	  len += 2;
-	  cdoGridSearchDir = (char *) malloc(len);
+	  cdoGridSearchDir = malloc(len);
 	  memcpy(cdoGridSearchDir, envstr, len-1);
 	  if ( cdoGridSearchDir[len-3] != '/' )
 	    {

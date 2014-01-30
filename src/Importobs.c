@@ -147,8 +147,8 @@ void *Importobs(void *argument)
 
   // printf("gridsize=%d, xsize=%d, ysize=%d\n", gridsize, xsize, ysize);
 
-  xvals = (double *) malloc(gridsize*sizeof(double));
-  yvals = (double *) malloc(gridsize*sizeof(double));
+  xvals = malloc(gridsize*sizeof(double));
+  yvals = malloc(gridsize*sizeof(double));
 
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
@@ -178,7 +178,7 @@ void *Importobs(void *argument)
   vlistDefTaxis(vlistID, taxisID);
 
     {
-      for ( i = 0; i < nvars; ++i ) data[i] = (double *) malloc(gridsize*sizeof(double));
+      for ( i = 0; i < nvars; ++i ) data[i] = malloc(gridsize*sizeof(double));
 
       init_vars(vlistID, gridID, zaxisID, nvars);
 

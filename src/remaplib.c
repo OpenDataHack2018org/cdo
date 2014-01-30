@@ -597,8 +597,8 @@ int expand_lonlat_grid(int gridID)
   nxp4 = nx+4;
   nyp4 = ny+4;
 
-  xvals = (double *) malloc(nxp4*sizeof(double));
-  yvals = (double *) malloc(nyp4*sizeof(double));
+  xvals = malloc(nxp4*sizeof(double));
+  yvals = malloc(nyp4*sizeof(double));
   gridInqXvals(gridID, xvals+2);
   gridInqYvals(gridID, yvals+2);
 
@@ -653,8 +653,8 @@ int expand_curvilinear_grid(int gridID)
   nyp4 = ny+4;
   gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
 
-  xvals = (double *) malloc(gridsize_new*sizeof(double));
-  yvals = (double *) malloc(gridsize_new*sizeof(double));
+  xvals = malloc(gridsize_new*sizeof(double));
+  yvals = malloc(gridsize_new*sizeof(double));
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
@@ -844,8 +844,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   if ( grid->is_cyclic ) grid->reg2d_center_lon[nx] = grid->reg2d_center_lon[0] + PI2;
 
-  grid->reg2d_corner_lon = (double *) malloc(nxp1*sizeof(double));
-  grid->reg2d_corner_lat = (double *) malloc(nyp1*sizeof(double));
+  grid->reg2d_corner_lon = malloc(nxp1*sizeof(double));
+  grid->reg2d_corner_lat = malloc(nyp1*sizeof(double));
 
   gridGenBounds1(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
   gridGenBounds1(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
@@ -1360,7 +1360,7 @@ long get_max_add(long num_links, long size, const int *restrict add)
   long max_add;
   int *isum;
 
-  isum = (int *) malloc(size*sizeof(int));
+  isum = malloc(size*sizeof(int));
   memset(isum, 0, size*sizeof(int));
 
   for ( n = 0; n < num_links; ++n ) isum[add[n]]++;
@@ -1440,16 +1440,16 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #if defined(_OPENMP)
-  src_cls2 = (double **) malloc(ompNumThreads*sizeof(double *));
-  src_wts2 = (double **) malloc(ompNumThreads*sizeof(double *));
+  src_cls2 = malloc(ompNumThreads*sizeof(double *));
+  src_wts2 = malloc(ompNumThreads*sizeof(double *));
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      src_cls2[i] = (double *) malloc(max_cls*sizeof(double));
-      src_wts2[i] = (double *) malloc(max_cls*sizeof(double));
+      src_cls2[i] = malloc(max_cls*sizeof(double));
+      src_wts2[i] = malloc(max_cls*sizeof(double));
     }
 #else
-  src_cls = (double *) malloc(max_cls*sizeof(double));
-  src_wts = (double *) malloc(max_cls*sizeof(double));
+  src_cls = malloc(max_cls*sizeof(double));
+  src_wts = malloc(max_cls*sizeof(double));
 #endif
 
   for ( n = 0; n < num_links; ++n )
@@ -1669,7 +1669,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
 	}
     }
 
-  sincoslon = (double *) malloc(nx*sizeof(double));
+  sincoslon = malloc(nx*sizeof(double));
 
   for ( ii = 0; ii < nx; ++ii )
     sincoslon[ii] = coslon_dst*cos(src_center_lon[ii]) + sinlon_dst*sin(src_center_lon[ii]);
@@ -3137,8 +3137,8 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
   /* Convert coordinates */
 
-  srch_corner_x = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
-  srch_corner_y = (double *) malloc(srch_corners*num_srch_cells*sizeof(double));
+  srch_corner_x = malloc(srch_corners*num_srch_cells*sizeof(double));
+  srch_corner_y = malloc(srch_corners*num_srch_cells*sizeof(double));
 
   if ( beglat > ZERO )
     {
@@ -4059,9 +4059,9 @@ void grid_store_init(grid_store_t *grid_store, long gridsize)
 	    grid_store->blk_size, grid_store->max_size%grid_store->blk_size, 
 	    grid_store->max_size, grid_store->nblocks);
 
-  grid_store->blksize = (int *) malloc(grid_store->nblocks*sizeof(int));
-  grid_store->nlayers = (int *) malloc(grid_store->nblocks*sizeof(int));
-  grid_store->layers  = (grid_layer_t **) malloc(grid_store->nblocks*sizeof(grid_layer_t *));
+  grid_store->blksize = malloc(grid_store->nblocks*sizeof(int));
+  grid_store->nlayers = malloc(grid_store->nblocks*sizeof(int));
+  grid_store->layers  = malloc(grid_store->nblocks*sizeof(grid_layer_t *));
 
   nblocks = grid_store->nblocks;
   for ( iblk = 0; iblk < nblocks; ++iblk )
@@ -4187,9 +4187,9 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, 
     }
   else
     {
-      grid_layer = (grid_layer_t *) malloc(sizeof(grid_layer_t));
+      grid_layer = malloc(sizeof(grid_layer_t));
       grid_layer->next = NULL;
-      grid_layer->grid2_link = (int *) malloc(grid_store->blksize[iblk]*sizeof(int));
+      grid_layer->grid2_link = malloc(grid_store->blksize[iblk]*sizeof(int));
 
       blksize = grid_store->blksize[iblk];
       for ( i = 0; i < blksize; ++i )
@@ -4559,7 +4559,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
   if ( remap_store_link_fast )
     {
-      grid_store = (grid_store_t *) malloc(sizeof(grid_store_t));
+      grid_store = malloc(sizeof(grid_store_t));
       grid_store_init(grid_store, tgt_grid->size);
     }
 
@@ -4579,10 +4579,10 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
   if ( ! remap_store_link_fast )
     {
-      link_add1[0] = (int *) malloc(src_grid_size*sizeof(int));
-      link_add1[1] = (int *) malloc(src_grid_size*sizeof(int));
-      link_add2[0] = (int *) malloc(tgt_grid_size*sizeof(int));
-      link_add2[1] = (int *) malloc(tgt_grid_size*sizeof(int));
+      link_add1[0] = malloc(src_grid_size*sizeof(int));
+      link_add1[1] = malloc(src_grid_size*sizeof(int));
+      link_add2[0] = malloc(tgt_grid_size*sizeof(int));
+      link_add2[1] = malloc(tgt_grid_size*sizeof(int));
 
 #if defined(SX)
 #pragma vdir nodep
@@ -4605,10 +4605,10 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
   /* Initialize centroid arrays */
 
-  grid1_centroid_lat = (double *) malloc(src_grid_size*sizeof(double));
-  grid1_centroid_lon = (double *) malloc(src_grid_size*sizeof(double));
-  grid2_centroid_lat = (double *) malloc(tgt_grid_size*sizeof(double));
-  grid2_centroid_lon = (double *) malloc(tgt_grid_size*sizeof(double));
+  grid1_centroid_lat = malloc(src_grid_size*sizeof(double));
+  grid1_centroid_lon = malloc(src_grid_size*sizeof(double));
+  grid2_centroid_lat = malloc(tgt_grid_size*sizeof(double));
+  grid2_centroid_lon = malloc(tgt_grid_size*sizeof(double));
 
   for ( n = 0; n < src_grid_size; ++n )
     {
@@ -4625,11 +4625,11 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   /*  Integrate around each cell on grid1 */
 
 #if defined(_OPENMP)
-  srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
+  srch_add2 = malloc(ompNumThreads*sizeof(int *));
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int *) malloc(tgt_grid_size*sizeof(int));
+    srch_add2[i] = malloc(tgt_grid_size*sizeof(int));
 #else
-  srch_add = (int *) malloc(tgt_grid_size*sizeof(int));
+  srch_add = malloc(tgt_grid_size*sizeof(int));
 #endif
 
   srch_corners    = tgt_num_cell_corners;
@@ -4849,11 +4849,11 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   /* Integrate around each cell on grid2 */
 
 #if defined(_OPENMP)
-  srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
+  srch_add2 = malloc(ompNumThreads*sizeof(int *));
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int *) malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = malloc(src_grid_size*sizeof(int));
 #else
-  srch_add = (int *) malloc(src_grid_size*sizeof(int));
+  srch_add = malloc(src_grid_size*sizeof(int));
 #endif
 
   srch_corners    = src_num_cell_corners;
@@ -5651,7 +5651,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   if ( remap_store_link_fast )
     {
-      grid_store = (grid_store_t *) malloc(sizeof(grid_store_t));
+      grid_store = malloc(sizeof(grid_store_t));
       grid_store_init(grid_store, tgt_grid->size);
     }
 
@@ -5686,11 +5686,11 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   double weight_sum;
 
   double *weight;
-  weight = (double *) malloc(src_grid_size*sizeof(double));
+  weight = malloc(src_grid_size*sizeof(double));
 
   double tgt_area;
   double *area;
-  area = (double *) malloc(src_grid_size*sizeof(double));
+  area = malloc(src_grid_size*sizeof(double));
 
   struct grid_cell tgt_grid_cell;
 
@@ -5706,12 +5706,12 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   /* Integrate around each cell on grid2 */
   /*
 #if defined(_OPENMP)
-  srch_add2 = (int **) malloc(ompNumThreads*sizeof(int *));
+  srch_add2 = malloc(ompNumThreads*sizeof(int *));
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = (int *) malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = malloc(src_grid_size*sizeof(int));
 #else
   */
-  srch_add = (int *) malloc(src_grid_size*sizeof(int));
+  srch_add = malloc(src_grid_size*sizeof(int));
   //#endif
 
   srch_corners    = src_num_cell_corners;
@@ -6197,7 +6197,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   cdoPrint("number of sparse matrix entries %d", rv.num_links);
   cdoPrint("total number of dest cells %d", tgt_grid.size);
 
-  grid2_count = (int *) malloc(tgt_grid.size*sizeof(int));
+  grid2_count = malloc(tgt_grid.size*sizeof(int));
 
   for ( n = 0; n < tgt_grid.size; ++n ) grid2_count[n] = 0;
 
@@ -6489,17 +6489,17 @@ void reorder_links(remapvars_t *rv)
 
       printf("num_links %ld  max_links %ld  num_blks %ld\n", rv->num_links, max_links, num_blks);
 
-      rv->links.num_links = (int *)  malloc(num_blks*sizeof(int));
-      rv->links.dst_add   = (int **) malloc(num_blks*sizeof(int *));
-      rv->links.src_add   = (int **) malloc(num_blks*sizeof(int *));
-      rv->links.w_index   = (int **) malloc(num_blks*sizeof(int *));
+      rv->links.num_links = malloc(num_blks*sizeof(int));
+      rv->links.dst_add   = malloc(num_blks*sizeof(int *));
+      rv->links.src_add   = malloc(num_blks*sizeof(int *));
+      rv->links.w_index   = malloc(num_blks*sizeof(int *));
     }
 
   for ( j = 0; j < num_blks; j++ )
     {
-      rv->links.dst_add[j] = (int *) malloc(max_links*sizeof(int));
-      rv->links.src_add[j] = (int *) malloc(max_links*sizeof(int));
-      rv->links.w_index[j] = (int *) malloc(max_links*sizeof(int));
+      rv->links.dst_add[j] = malloc(max_links*sizeof(int));
+      rv->links.src_add[j] = malloc(max_links*sizeof(int));
+      rv->links.w_index[j] = malloc(max_links*sizeof(int));
     }
 
   for ( j = 0; j < num_blks; j++ )

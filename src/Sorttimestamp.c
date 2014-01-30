@@ -120,7 +120,7 @@ void *Sorttimestamp(void *argument)
 	      streamInqRecord(streamID1, &varID, &levelID);
 	      gridID   = vlistInqVarGrid(vlistID1, varID);
 	      gridsize = gridInqSize(gridID);
-	      vars[xtsID][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+	      vars[xtsID][varID][levelID].ptr = malloc(gridsize*sizeof(double));
 	      streamReadRecord(streamID1, vars[xtsID][varID][levelID].ptr, &nmiss);
 	      vars[xtsID][varID][levelID].nmiss = nmiss;
 	    }
@@ -134,7 +134,7 @@ void *Sorttimestamp(void *argument)
 
   nts = xtsID;
 
-  timeinfo= (timeinfo_t *) malloc(nts*sizeof(timeinfo_t));
+  timeinfo= malloc(nts*sizeof(timeinfo_t));
 
   for ( tsID = 0; tsID < nts; tsID++ )
     {

@@ -98,7 +98,7 @@ void *Fourier(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double *) malloc(2*gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = malloc(2*gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -110,15 +110,15 @@ void *Fourier(void *argument)
 
   for ( bit = nts; !(bit & 1); bit >>= 1 );
 
-  mem = (memory_t *) malloc(ompNumThreads*sizeof(memory_t));
+  mem = malloc(ompNumThreads*sizeof(memory_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      mem[i].real = (double *) malloc(nts*sizeof(double));
-      mem[i].imag = (double *) malloc(nts*sizeof(double));
+      mem[i].real = malloc(nts*sizeof(double));
+      mem[i].imag = malloc(nts*sizeof(double));
       if ( bit != 1 )
 	{
-	  mem[i].work_r = (double *) malloc(nts*sizeof(double));
-	  mem[i].work_i = (double *) malloc(nts*sizeof(double));
+	  mem[i].work_r = malloc(nts*sizeof(double));
+	  mem[i].work_i = malloc(nts*sizeof(double));
 	}
     }
 

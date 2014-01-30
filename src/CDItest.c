@@ -75,7 +75,7 @@ void *CDItest(void *argument)
       streamDefVlist(streamID2, vlistID2);
 
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double *) malloc(gridsize*sizeof(double));
+      array = malloc(gridsize*sizeof(double));
 
       tsID1 = 0;
       tsID2 = 0;

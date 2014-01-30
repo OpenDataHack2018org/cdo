@@ -100,7 +100,7 @@ void *Deltime(void *argument)
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID1);
-      array = (double *) malloc(gridsize*sizeof(double));
+      array = malloc(gridsize*sizeof(double));
     }
       
   nfound = 0;

@@ -118,14 +118,14 @@ void *Ensval(void *argument)
   }
 
   // allocate array to hold results 
-  r = (double *) malloc ( nostreams*sizeof(double) );
+  r = malloc ( nostreams*sizeof(double) );
   
 
   // one stream for each value of the decomposition
-  streamID2 = (int *) malloc ( nostreams*sizeof(int) );
-  vlistID2 = (int *) malloc ( nostreams*sizeof(int) );
-  taxisID2 = (int *) malloc ( nostreams*sizeof(int) );
-  zaxisID2 = (int *) malloc ( nostreams*sizeof(int) );
+  streamID2 = malloc ( nostreams*sizeof(int) );
+  vlistID2 = malloc ( nostreams*sizeof(int) );
+  taxisID2 = malloc ( nostreams*sizeof(int) );
+  zaxisID2 = malloc ( nostreams*sizeof(int) );
 
   val = (double *) calloc ( nfiles,sizeof(double) );
   
@@ -142,7 +142,7 @@ void *Ensval(void *argument)
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
 
-  ef = (ens_file_t *) malloc(nfiles*sizeof(ens_file_t));
+  ef = malloc(nfiles*sizeof(ens_file_t));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -270,11 +270,11 @@ void *Ensval(void *argument)
 		  missval  = vlistInqVarMissval(vlistID1, varID);
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));//vlistGridsizeMax(vlistID1);
 		  if ( weights ) free(weights); 
-		  weights=(double*) malloc (gridsize*sizeof(double));
+		  weights=malloc (gridsize*sizeof(double));
 		}
 
 	      if (ef[fileID].array ) free(ef[fileID].array);
-	      ef[fileID].array = (double *) malloc(gridsize*sizeof(double));
+	      ef[fileID].array = malloc(gridsize*sizeof(double));
 
 	      streamID = ef[fileID].streamID;
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);

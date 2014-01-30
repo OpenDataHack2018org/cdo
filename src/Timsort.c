@@ -106,7 +106,7 @@ void *Timsort(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = (double *) malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -116,9 +116,9 @@ void *Timsort(void *argument)
 
   nts = tsID;
 
-  sarray = (double **) malloc(ompNumThreads*sizeof(double *));
+  sarray = malloc(ompNumThreads*sizeof(double *));
   for ( i = 0; i < ompNumThreads; i++ )
-    sarray[i] = (double *) malloc(nts*sizeof(double));
+    sarray[i] = malloc(nts*sizeof(double));
 
   for ( varID = 0; varID < nvars; varID++ )
     {

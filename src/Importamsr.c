@@ -228,7 +228,7 @@ void *Importamsr(void *argument)
   if ( fsize == 12441600 )
     {
       nvars = 6;
-      for ( i = 0; i < nvars; ++i ) data[i] = (double *) malloc(gridsize*sizeof(double));
+      for ( i = 0; i < nvars; ++i ) data[i] = malloc(gridsize*sizeof(double));
 
       init_amsr_day(vlistID, gridID, zaxisID, nvars);
 
@@ -253,7 +253,7 @@ void *Importamsr(void *argument)
   else if ( fsize == 5184000 )
     {
       nvars = 5;
-      for ( i = 0; i < nvars; ++i ) data[i] = (double *) malloc(gridsize*sizeof(double));
+      for ( i = 0; i < nvars; ++i ) data[i] = malloc(gridsize*sizeof(double));
 
       init_amsr_averaged(vlistID, gridID, zaxisID, nvars);
 

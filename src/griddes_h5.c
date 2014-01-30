@@ -397,7 +397,7 @@ int gridFromH5file(const char *gridfile)
       else
 	{
 	  int *iarray, i;
-	  iarray = (int *) malloc(grid.size*sizeof(int));
+	  iarray = malloc(grid.size*sizeof(int));
 	  status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
 	  for ( i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
 	  status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
@@ -523,7 +523,7 @@ int gridFromH5file(const char *gridfile)
 	  else
 	    {
 	      int *iarray, i;
-	      iarray = (int *) malloc(grid.size*sizeof(int));
+	      iarray = malloc(grid.size*sizeof(int));
 	      status = H5Dread(lon_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
 	      for ( i = 0; i < grid.size; ++i ) grid.xvals[i] = iarray[i];
 	      status = H5Dread(lat_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);

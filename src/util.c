@@ -52,7 +52,7 @@ char *getOperator(const char *argument)
     {
       len = 1 + strlen(argument);
 
-      operatorArg = (char *) malloc(len);
+      operatorArg = malloc(len);
 
       memcpy(operatorArg, argument, len);
     }
@@ -79,7 +79,7 @@ char *getOperatorName(const char *operatorArg)
       else
 	len = strlen(operatorArg);
 
-      operatorName = (char *) malloc(len+1);
+      operatorName = malloc(len+1);
 
       memcpy(operatorName, operatorArg, len);
       operatorName[len] = '\0';
@@ -195,7 +195,7 @@ char *getFileArg(char *argument)
 	{
 	  parg = blankpos + 1;
 	  len = strlen(parg);
-	  fileArg = (char *) malloc(len+1);
+	  fileArg = malloc(len+1);
 	  strcpy(fileArg, parg);
 	}
     }

@@ -116,7 +116,7 @@ void *Arithdays(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
 
   field_init(&field);
-  field.ptr    = (double *) malloc(gridsize*sizeof(double));
+  field.ptr    = malloc(gridsize*sizeof(double));
   field.weight = NULL;
 
   tsID = 0;

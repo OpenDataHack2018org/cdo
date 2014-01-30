@@ -382,7 +382,7 @@ void intconarr2(double missval, int lon_is_circular,
   //if ( lon_is_circular ) nlon1--;
   gridsize1 = nx*ny;
 
-  deps = (int *) malloc(gridsize1*sizeof(int));
+  deps = malloc(gridsize1*sizeof(int));
 
   grid1_mask = (int *) calloc(1, gridsize1*sizeof(int));
   for ( jj = 0; jj < ny; ++jj )
@@ -412,11 +412,11 @@ void intconarr2(double missval, int lon_is_circular,
   double weight_sum;
 
   double *weight;
-  weight = (double *) malloc(gridsize1*sizeof(double));
+  weight = malloc(gridsize1*sizeof(double));
 
   double tgt_area;
   double *area;
-  area = (double *) malloc(gridsize1*sizeof(double));
+  area = malloc(gridsize1*sizeof(double));
 
   struct grid_cell *SourceCell;
   SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
@@ -720,13 +720,13 @@ void intgridbil(field_t *field1, field_t *field2)
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
 
-  array1_2D = (double **) malloc(nlat1*sizeof(double *));
+  array1_2D = malloc(nlat1*sizeof(double *));
   for ( ilat = 0; ilat < nlat1; ilat++ )
     array1_2D[ilat] = array1 + ilat*nlon1;
 
   if ( lon_is_circular ) nlon1 += 1;
-  lon1 = (double *) malloc(nlon1*sizeof(double));
-  lat1 = (double *) malloc(nlat1*sizeof(double));
+  lon1 = malloc(nlon1*sizeof(double));
+  lat1 = malloc(nlat1*sizeof(double));
   gridInqXvals(gridID1, lon1);
   gridInqYvals(gridID1, lat1);
   if ( lon_is_circular ) lon1[nlon1-1] = 0;
@@ -758,9 +758,9 @@ void intgridbil(field_t *field1, field_t *field2)
       if ( lon2 > lon1[nlon1-1] )
 	{
 	  field  = array1_2D;
-	  array1_2D = (double **) malloc(nlat1*sizeof(double *));
+	  array1_2D = malloc(nlat1*sizeof(double *));
 	  lon1 = (double *) realloc(lon1, (nlon1+1)*sizeof(double));
-	  array = (double *) malloc(nlat1*(nlon1+1)*sizeof(double));
+	  array = malloc(nlat1*(nlon1+1)*sizeof(double));
 
 	  for ( ilat = 0; ilat < nlat1; ilat++ )
 	    {
@@ -800,8 +800,8 @@ void intgridbil(field_t *field1, field_t *field2)
 
       gridsize2 = gridInqSize(gridID2);
 
-      lon2 = (double *) malloc(gridsize2*sizeof(double));
-      lat2 = (double *) malloc(gridsize2*sizeof(double));
+      lon2 = malloc(gridsize2*sizeof(double));
+      lat2 = malloc(gridsize2*sizeof(double));
       gridInqXvals(gridID2, lon2);
       gridInqYvals(gridID2, lat2);
 
@@ -883,8 +883,8 @@ void intgridcon(field_t *field1, field_t *field2)
   nlon1 = gridInqXsize(gridID1);
   nlat1 = gridInqYsize(gridID1);
 
-  lon1 = (double *) malloc(nlon1*sizeof(double));
-  lat1 = (double *) malloc(nlat1*sizeof(double));
+  lon1 = malloc(nlon1*sizeof(double));
+  lat1 = malloc(nlat1*sizeof(double));
   gridInqXvals(gridID1, lon1);
   gridInqYvals(gridID1, lat1);
 
@@ -895,8 +895,8 @@ void intgridcon(field_t *field1, field_t *field2)
 
   nlon1b = nlon1 + 1;
   nlat1b = nlat1 + 1;
-  lon1bounds = (double *) malloc(nlon1b*sizeof(double));
-  lat1bounds = (double *) malloc(nlat1b*sizeof(double));
+  lon1bounds = malloc(nlon1b*sizeof(double));
+  lat1bounds = malloc(nlat1b*sizeof(double));
 
   gridGenBounds1(nlon1, lon1, lon1bounds);
   gridGenBounds1(nlat1, lat1, lat1bounds);
@@ -935,8 +935,8 @@ void intgridcon(field_t *field1, field_t *field2)
 
   if ( gridInqYbounds(gridID2, NULL) && gridInqXbounds(gridID2, NULL) )
     {
-      grid2_corner_lon = (double *) malloc(nc2*gridsize2*sizeof(double));
-      grid2_corner_lat = (double *) malloc(nc2*gridsize2*sizeof(double));
+      grid2_corner_lon = malloc(nc2*gridsize2*sizeof(double));
+      grid2_corner_lat = malloc(nc2*gridsize2*sizeof(double));
       gridInqXbounds(gridID2, grid2_corner_lon);
       gridInqYbounds(gridID2, grid2_corner_lat);
     }
@@ -1025,8 +1025,8 @@ void interpolate(field_t *field1, field_t *field2)
   out_nlon = gridInqXsize(gridIDo);
   out_nlat = gridInqYsize(gridIDo);
 
-  lon_array = (double *) malloc((nlon + 2) * sizeof(double));
-  lat_array = (double *) malloc((nlat + 2) * sizeof(double));
+  lon_array = malloc((nlon + 2) * sizeof(double));
+  lat_array = malloc((nlat + 2) * sizeof(double));
   lon = lon_array + 1;
   lat = lat_array + 1;
 
@@ -1077,9 +1077,9 @@ void interpolate(field_t *field1, field_t *field2)
   if ( lat[nlat] < -90 ) lat[nlat] = -99;
   if ( lat[nlat] >  90 ) lat[nlat] =  99;
 
-  lono_array = (double *) malloc((out_nlon < 2 ? 4 : out_nlon + 2) * sizeof(double));
+  lono_array = malloc((out_nlon < 2 ? 4 : out_nlon + 2) * sizeof(double));
   lono = lono_array + 1;
-  lato_array = (double *) malloc((out_nlat < 2 ? 4 : out_nlat + 2) * sizeof(double));
+  lato_array = malloc((out_nlat < 2 ? 4 : out_nlat + 2) * sizeof(double));
   lato = lato_array + 1;
 
   gridInqXvals(gridIDo, lono);
@@ -1151,13 +1151,13 @@ void interpolate(field_t *field1, field_t *field2)
 
   nxlon = 2*nlon + 1;
   nxlat = 2*nlat + 1;
-  xin_array = (double *) malloc(nxlon * nxlat * sizeof(double));
-  xin = (double **) malloc(nxlat * sizeof(double *));
+  xin_array = malloc(nxlon * nxlat * sizeof(double));
+  xin = malloc(nxlat * sizeof(double *));
 
   for (ilat = 0; ilat < nxlat; ilat++)
     xin[ilat] = xin_array + ilat * nxlon;
 
-  xlon = (double *) malloc(nxlon * sizeof (double));
+  xlon = malloc(nxlon * sizeof (double));
   for ( ilon = 0; ilon < nlon; ilon++ )
     {
       xlon[2*ilon + 1] = lon[ilon];
@@ -1165,7 +1165,7 @@ void interpolate(field_t *field1, field_t *field2)
     }
   xlon[2 * nlon] = (lon[nlon - 1] + lon[nlon]) / 2;
 
-  xlat = (double *) malloc((2 * nlat + 1) * sizeof (double));
+  xlat = malloc((2 * nlat + 1) * sizeof (double));
   for ( ilat = 0; ilat < nlat; ilat++ )
     {
       xlat[2*ilat + 1] = lat[ilat];
@@ -1173,18 +1173,18 @@ void interpolate(field_t *field1, field_t *field2)
     }
   xlat[2 * nlat] = (lat[nlat - 1] + lat[nlat]) / 2;
 
-  in0 = (double **) malloc(nlat * sizeof (double *));
+  in0 = malloc(nlat * sizeof (double *));
   for (ilat = 0; ilat < nlat; ilat++)
     in0[ilat] = arrayIn + ilat * nlon;
 
-  ilon11 = (long *) malloc(out_nlon * sizeof(long));
-  ilon12 = (long *) malloc(out_nlon * sizeof(long));
-  ilon21 = (long *) malloc(out_nlon * sizeof(long));
-  ilon22 = (long *) malloc(out_nlon * sizeof(long));
-  volon11 = (double *) malloc(out_nlon * sizeof(double));
-  volon12 = (double *) malloc(out_nlon * sizeof(double));
-  volon21 = (double *) malloc(out_nlon * sizeof(double));
-  volon22 = (double *) malloc(out_nlon * sizeof(double));
+  ilon11 = malloc(out_nlon * sizeof(long));
+  ilon12 = malloc(out_nlon * sizeof(long));
+  ilon21 = malloc(out_nlon * sizeof(long));
+  ilon22 = malloc(out_nlon * sizeof(long));
+  volon11 = malloc(out_nlon * sizeof(double));
+  volon12 = malloc(out_nlon * sizeof(double));
+  volon21 = malloc(out_nlon * sizeof(double));
+  volon22 = malloc(out_nlon * sizeof(double));
 
   for (olon = 0; olon < out_nlon; olon++)
     {
@@ -1209,8 +1209,8 @@ void interpolate(field_t *field1, field_t *field2)
       ilon22[olon] = l22;
     }
 
-  ilat1 = (long *) malloc(out_nlat * sizeof(long));
-  ilat2 = (long *) malloc(out_nlat * sizeof(long));
+  ilat1 = malloc(out_nlat * sizeof(long));
+  ilat2 = malloc(out_nlat * sizeof(long));
 
   xlat_is_ascending = xlat[0] <= xlat[nxlat - 1];
   for ( olat = 0; olat < out_nlat; olat++ )
@@ -1248,7 +1248,7 @@ void interpolate(field_t *field1, field_t *field2)
       ilat2[olat] = l2;
     }
 
-  xout = (double **) malloc(out_nlat * sizeof (double *));
+  xout = malloc(out_nlat * sizeof (double *));
   for (olat = 0; olat < out_nlat; olat++)
     xout[olat] = arrayOut + olat * out_nlon;
 
@@ -1553,17 +1553,17 @@ void contrast(void)
 
   if (rec == 1)
     {
-      xin_array = (double *) malloc((nlat + 2) * (nlon + 2) * sizeof(double));
-      xin = (double **) malloc((nlat + 2) * sizeof(double *));
+      xin_array = malloc((nlat + 2) * (nlon + 2) * sizeof(double));
+      xin = malloc((nlat + 2) * sizeof(double *));
       *xin = *(xin + 1);
       for (ilat = -1; ilat <= nlat; ilat++)
 	xin[ilat] = xin_array + (ilat + 1) * (nlon + 2) + 1;
-      xout = (double **) malloc(nlat * sizeof(double *));
+      xout = malloc(nlat * sizeof(double *));
       for (ilat = 0; ilat < nlat; ilat++)
 	xout[ilat] = out[0] + ilat * nlon;
       for (j = 0; j < 17; j++)
 	{
-	  xwork[j] = (double **) malloc(nlat * sizeof(double *));
+	  xwork[j] = malloc(nlat * sizeof(double *));
 	  for (ilat = 0; ilat < nlat; ilat++)
 	    xwork[j][ilat] = work[j] + ilat * nlon;
 	}
