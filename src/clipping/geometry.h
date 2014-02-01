@@ -85,6 +85,20 @@ struct bounding_circle {
 int check_overlap_cells (struct grid_cell const cell_a, 
                          struct grid_cell const cell_b);
 
+/**
+ * checks whether two cells overlap \n
+ * @param[in] cell_a
+ * @param[in] circle_a bounding circle of cell a
+ * @param[in] cell_b
+ * @param[in] circle_b bounding circle of cell b
+ * @return 0 if both cells do not overlap
+ * @see check_overlap_cells
+ */
+int check_overlap_cells2 (struct grid_cell const cell_a,
+                          struct bounding_circle circle_a,
+                          struct grid_cell const cell_b,
+                          struct bounding_circle circle_b);
+
 /** \example test_point_in_cell.c
  * This contains examples on how to use point_in_cell.
  */
@@ -96,6 +110,20 @@ int check_overlap_cells (struct grid_cell const cell_a,
  * @return 0 if the point is not in the cell
  */
 int point_in_cell (struct point point, struct grid_cell cell);
+
+/** \example test_point_in_cell.c
+ * This contains examples on how to use point_in_cell.
+ */
+
+/**
+ * checks whether a given point is within a given cell \n
+ * @param[in] point
+ * @param[in] cell
+ * @param[in] bnd_circle
+ * @return 0 if the point is not in the cell
+ */
+int point_in_cell2 (struct point point, struct grid_cell cell,
+                    struct bounding_circle bnd_circle);
 
 /**
  * computes the angle between two longitude coordinates (in rad) \n
@@ -128,6 +156,7 @@ void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
  * the user needs to provide initial search results that are used as a starting
  * point, which is then refined
  * @param[in]     src_cell             cell for which the search is to conducted
+ * @param[in]     src_bnd_circle       bounding circle of source cell
  * @param[in]     tgt_grid             grid on which overlapping cells are to
  *                                     be searched
  * @param[in]     initial_dep          initial search results
@@ -150,6 +179,7 @@ void find_overlapping_cells (struct grid * src_grid, struct grid * tgt_grid,
  *          and stack
  */
 void find_overlapping_cells_s (struct grid_cell src_cell,
+                               struct bounding_circle src_bnd_circle,
                                struct grid * tgt_grid,
                                unsigned const * initial_dep,
                                unsigned num_initial_deps, unsigned ** deps,
@@ -159,7 +189,7 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
                                unsigned ** stack, unsigned * stack_size);
 
 /** \example test_gcxgc.c
- * This contains examples on how to use gcxgc.
+ * This contains examples on how to use gcxgc and gcxgc_vec
  */
 
 /**
@@ -180,10 +210,6 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
  */
 int gcxgc (struct edge edge_a, struct edge edge_b,
            struct point * p, struct point * q);
-
-/** \example test_gcxgc_vec.c
- * This contains examples on gcxgc_vec
- */
 
 /**
  * computes the intersection points of two great circles \n
@@ -206,8 +232,8 @@ int gcxgc (struct edge edge_a, struct edge edge_b,
  int gcxgc_vec (double a[3], double b[3], double c[3], double d[3],
                 double p[3], double q[3]);
 
-/** \example test_loncxlatc_vec.c
- * This contains examples on loncxlatc_vec
+/** \example test_loncxlatc.c
+ * This contains examples on loncxlatc and loncxlatc_vec
  */
 
 /** \brief compute the intersection point of a meridian and a parallel
@@ -226,8 +252,24 @@ int gcxgc (struct edge edge_a, struct edge edge_b,
 int loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
                    double p[3], double q[3]);
 
-/** \example test_latcxlatc_vec.c
- * This contains examples on latcxlatc_vec
+/** \brief compute the intersection point of a meridian and a parallel
+ *
+ * compute the intersection points of a circle of longitude (defined by a and b)
+ * and a circle of latitude (defined by c and d)
+ * if p and q are != NULL they contain the intersection points
+ * the return value is:
+ *      - 0 if the intersection points are neither between (a and b) or (c and d)
+ *      - -1 if an error occurred
+ *      - 1st bit will be set if p is between a and b
+ *      - 2nd bit will be set if q is between a and b
+ *      - 3rd bit will be set if p is between c and d
+ *      - 4th bit will be set if q is between c and d
+ **/
+int loncxlatc (struct edge edge_a, struct edge edge_b,
+               struct point * p, struct point * q);
+
+/** \example test_latcxlatc.c
+ * This contains examples on latcxlatc and latcxlatc_vec
  */
 
 /** \brief compute the intersection point two circles of latitude
@@ -246,8 +288,24 @@ int loncxlatc_vec (double a[3], double b[3], double c[3], double d[3],
 int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
                    double p[3], double q[3]);
 
-/** \example test_loncxlonc_vec.c
- * This contains examples on loncxlonc_vec
+/** \brief compute the intersection point two circles of latitude
+ *
+ * compute the intersection points of two circle of latitude
+ * if p and q are != NULL they contain the intersection points
+ * the return value is:
+ *      - 0 if the intersection points are neither between (a and b) or (c and d)
+ *      - -1 if an error occurred
+ *      - 1st bit will be set if p is between a and b
+ *      - 2nd bit will be set if q is between a and b
+ *      - 3rd bit will be set if p is between c and d
+ *      - 4th bit will be set if q is between c and d
+ *      - 5th bit will be set if both edges are on the same circle of latitude
+ **/
+int latcxlatc (struct edge edge_a, struct edge edge_b,
+               struct point * p, struct point * q);
+
+/** \example test_loncxlonc.c
+ * This contains examples on loncxlonc loncxlonc_vec
  */
 
 /** \brief compute the intersection point two circles of longitude
@@ -266,8 +324,24 @@ int latcxlatc_vec (double a[3], double b[3], double c[3], double d[3],
 int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
                    double p[3], double q[3]);
 
+/** \brief compute the intersection point two circles of longitude
+ *
+ * compute the intersection points of two circle of longitude
+ * if p and q are != NULL they contain the intersection points
+ * the return value is:
+ *      - 0 if the intersection points are neither between (a and b) or (c and d)
+ *      - -1 if an error occurred
+ *      - 1st bit will be set if p is between a and b
+ *      - 2nd bit will be set if q is between a and b
+ *      - 3rd bit will be set if p is between c and d
+ *      - 4th bit will be set if q is between c and d
+ *      - 5th bit will be set if both edges are on the same circle of longitude
+ **/
+int loncxlonc (struct edge edge_a, struct edge edge_b,
+               struct point * p, struct point * q);
+
 /** \example test_gcxlatc.c
- * This contains examples on 
+ * This contains examples on gcxlatc and gcxlatc_vec.
  */
 
 /**
@@ -291,10 +365,6 @@ int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
  */
 int gcxlatc (struct edge edge_a, struct edge edge_b,
              struct point * p, struct point * q);
-
-/** \example test_gcxlatc_vec.c
- * This contains examples on gcxlatc_vec
- */
 
 /**
  * compute the intersection points of a great circles
@@ -359,6 +429,10 @@ int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
                    enum edge_type edge_type_b, double c[3], double d[3],
                    double p[3], double q[3]);
 
+/** \example test_cell_bnd_circle.c
+ * These are some examples on how to use \ref get_cell_bounding_circle.
+ */
+
 /**
  * gets the bounding circle for a grid cell
  * @param[in] cell grid cell (coordinates have to be in radian)
@@ -367,7 +441,57 @@ int intersect_vec (enum edge_type edge_type_a, double a[3], double b[3],
 void get_cell_bounding_circle(struct grid_cell cell,
                               struct bounding_circle * bnd_circle);
 
-/** \example test_bnd_circle.c
+/**
+ * computes the circumscribe circle for a triangle on the sphere
+ * @param[in]  a          coordinates of first point (xyz)
+ * @param[in]  b          coordinates of second point (xyz)
+ * @param[in]  c          coordinates of thrid point (xyz)
+ * @param[out] bnd_circle circumscribe circle
+ * @remark it is assumed that all three edges of the triangle are great circles
+ */
+void get_cell_circumscribe_circle_unstruct_triangle(
+   double a[3], double b[3], double c[3], struct bounding_circle * bnd_circle);
+
+/**
+ * computes the smallest bounding circle for a triangle on the sphere
+ * @param[in]  a          coordinates of first point (xyz)
+ * @param[in]  b          coordinates of second point (xyz)
+ * @param[in]  c          coordinates of thrid point (xyz)
+ * @param[out] bnd_circle bounding circle
+ * @remark it is assumed that all three edges of the triangle are great circles
+ */
+void get_cell_bounding_circle_unstruct_triangle(
+   double a[3], double b[3], double c[3], struct bounding_circle * bnd_circle);
+
+/**
+ * computes the circumscribe circle for a quad on the sphere
+ * @param[in]  a          coordinates of first point (xyz)
+ * @param[in]  b          coordinates of second point (xyz)
+ * @param[in]  c          coordinates of thrid point (xyz)
+ * @param[in]  d          coordinates of fourth point (xyz)
+ * @param[out] bnd_circle circumscribe circle
+ * @remark it is assumed that all edges of the quad are either circles of
+ *         longitude or latitude
+ */
+void get_cell_circumscribe_circle_reg_quad(
+   double a[3], double b[3], double c[3], double d[3],
+   struct bounding_circle * bnd_circle);
+
+/**
+ * computes the smallest bounding circle for a triangle on the sphere
+ * @param[in]  a          coordinates of first point (xyz)
+ * @param[in]  b          coordinates of second point (xyz)
+ * @param[in]  c          coordinates of thrid point (xyz)
+ * @param[in]  d          coordinates of fourth point (xyz)
+ * @param[out] bnd_circle bounding circle
+ * @remark it is assumed that all edges of the quad are either circles of
+ *         longitude or latitude
+ */
+void get_cell_bounding_circle_reg_quad(
+   double a[3], double b[3], double c[3], double d[3],
+   struct bounding_circle * bnd_circle);
+
+/** \example test_grid_bnd_circle.c
  * These are some examples on how to use \ref get_grid_bounding_circle.
  */
 

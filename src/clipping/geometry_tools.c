@@ -45,7 +45,7 @@ double get_vector_angle(double a_vector[3], double b_vector[3]) {
    double angle;
 
    // the acos most accurate in the range [-0.5;0.5]
-   if (fabs(dot_product) < M_SQRT1_2) // the range in which the acos is most accurate
+   if (fabs(dot_product) <= 0.5) // the range in which the acos is most accurate
       angle = acos(dot_product);
    else {
 
@@ -82,8 +82,9 @@ double get_vector_angle(double a_vector[3], double b_vector[3]) {
 
 void LLtoXYZ(double lon, double lat, double p_out[]) {
 
-   p_out[0] = cos(lat) * cos(lon);
-   p_out[1] = cos(lat) * sin(lon);
+   double cos_lat = cos(lat);
+   p_out[0] = cos_lat * cos(lon);
+   p_out[1] = cos_lat * sin(lon);
    p_out[2] = sin(lat);
 }
 

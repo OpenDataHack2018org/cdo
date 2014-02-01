@@ -43,15 +43,7 @@
 
 //#define VERBOSE
 
-static int const p_intersection = 1 + 4;
-static int const q_intersection = 2 + 8;
-
 static double const tol = 1.0e-12;
-
-static int const SOURCE = 1;
-static int const TARGET = 0;
-
-static int const edgeVertex = 1;
 
 enum cell_type {
   LON_LAT_CELL,
@@ -281,8 +273,6 @@ void cell_clipping(unsigned N,
 
   nct = target_cell.num_corners;
 
-  norm_vec = malloc(3 * nct * sizeof(*norm_vec));
-
   enum cell_type tgt_cell_type = get_cell_type(target_cell);
 
   if (tgt_cell_type == MIXED_CELL)
@@ -294,8 +284,17 @@ void cell_clipping(unsigned N,
   init_point_list(&target_list);
   generate_point_list(&target_list, target_cell);
 
+  // if there is no target cell (e.g. if all edges of target cell have a length
+  // of zero)
+  if (target_list.first == NULL) {
+    free_point_list(&target_list);
+    return;
+  }
+
   struct point_list_element * prev_tgt_point = target_list.first;
   struct point_list_element * curr_tgt_point = target_list.first->next;
+
+  norm_vec = malloc(3 * nct * sizeof(*norm_vec));
 
   // compute norm vectors for all edges
   // or for lat circle edges a special z value

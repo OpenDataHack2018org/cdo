@@ -57,12 +57,15 @@ static double const EarthRadius2 = EARTH_RADIUS * EARTH_RADIUS / 2.0 ;
 
 // forward declaration required by grid_vtable
 struct grid;
+struct bounding_circle;
 
 struct grid_vtable {
 
    struct grid * (*copy)(struct grid *);
    void (*get_2d_extent)(struct grid *, double (* extent)[2]);
    void (*get_grid_cell) (struct grid *, unsigned, struct grid_cell *);
+   void (*get_grid_cell2) (struct grid *, unsigned, struct grid_cell *,
+                           struct bounding_circle * bnd_circle);
    unsigned (*get_size_x_coords)(struct grid *);
    unsigned (*get_size_y_coords)(struct grid *);
    double const * (*get_x_coords)(struct grid *);
@@ -122,6 +125,18 @@ void get_2d_grid_extent(struct grid * grid, double (* extent)[2]);
  */
 void get_grid_cell (struct grid * grid, unsigned cell_index, 
                     struct grid_cell * cell);
+
+/**
+ * gets a %grid cell from a grid object\n
+ * in addition the bounding circle for this grid cell is also returned
+ * @param[in] grid
+ * @param[in] cell_index local cell index of the requested cell
+ * @param[out] cell requested cell (grid_cell object has be initialised once before)
+ * @see init_grid_cell
+ */
+void get_grid_cell2 (struct grid * grid, unsigned cell_index, 
+                     struct grid_cell * cell,
+                     struct bounding_circle * bnd_circle);
 
 /**
  * @param[in] grid
