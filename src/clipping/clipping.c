@@ -995,7 +995,15 @@ static void generate_overlap_cell(struct point_list * list,
     reset_point_list(list);
     return;
   }
-
+  /*
+  if ( num_edges > cell->num_corners )
+    {
+      cell->coordinates_x = realloc(cell->coordinates_x, num_edges * sizeof(*cell->coordinates_x));
+      cell->coordinates_y = realloc(cell->coordinates_y, num_edges * sizeof(*cell->coordinates_y));
+      cell->edge_type = realloc(cell->edge_type, num_edges * sizeof(*cell->edge_type));
+      cell->num_corners = num_edges;
+    }
+  */
   cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
   cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
   cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
