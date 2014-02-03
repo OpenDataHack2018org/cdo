@@ -560,7 +560,7 @@ void check_lon_boundbox_range(long nlons, restr_t *bound_box)
       n4 = n<<2;
       if ( RESTR_ABS(bound_box[n4+3] - bound_box[n4+2]) > RESTR_SCALE(PI) )
 	{
-	  bound_box[n4+2] = 0;
+	  bound_box[n4+2] = RESTR_SCALE(0.);
 	  bound_box[n4+3] = RESTR_SCALE(PI2);
 	}
     }
@@ -4453,15 +4453,15 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
   for ( src_grid_add = min_add; src_grid_add <= max_add; ++src_grid_add )
     {
       src_grid_addm4 = src_grid_add<<2;
-      lmask = (src_cell_bound_box[src_grid_addm4  ] <= bound_box_lat2)  &&
-	      (src_cell_bound_box[src_grid_addm4+1] >= bound_box_lat1)  &&
-	      (src_cell_bound_box[src_grid_addm4+2] <= bound_box_lon2)  &&
-	      (src_cell_bound_box[src_grid_addm4+3] >= bound_box_lon1);
-
-      if ( lmask )
+      if ( (bound_box_lon2 > src_cell_bound_box[src_grid_addm4+2]/* <= bound_box_lon2*/)  &&
+	   (bound_box_lon1 < src_cell_bound_box[src_grid_addm4+3]/* >= bound_box_lon1*/) )
 	{
-	  srch_add[num_srch_cells] = src_grid_add;
-	  num_srch_cells++;
+	  if ( (src_cell_bound_box[src_grid_addm4  ] <= bound_box_lat2)  &&
+	       (src_cell_bound_box[src_grid_addm4+1] >= bound_box_lat1) )
+	    {
+	      srch_add[num_srch_cells] = src_grid_add;
+	      num_srch_cells++;
+	    }
 	}
     }
 
@@ -5637,7 +5637,7 @@ void boundbox_from_corners_r1(long ic, long nc, const double *restrict corner_lo
 
   if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
-      bound_box[2] = 0;
+      bound_box[2] = RESTR_SCALE(0.);
       bound_box[3] = RESTR_SCALE(PI2);
     }
 }
@@ -5677,7 +5677,7 @@ void boundbox_from_corners_r2(long ic, long nc, const double *restrict corner_lo
   */
   if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
-      if ( bound_box[3] > bound_box[2] && (bound_box[3]-RESTR_SCALE(PI2)) < 0. )
+      if ( bound_box[3] > bound_box[2] && (bound_box[3]-RESTR_SCALE(PI2)) < RESTR_SCALE(0.) )
 	{
 	  restr_t tmp = bound_box[2];
 	  bound_box[2] = bound_box[3] - RESTR_SCALE(PI2);
