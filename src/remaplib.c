@@ -4468,6 +4468,88 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
   return (num_srch_cells);
 }
 
+static
+long get_srch_cells2(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
+		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long src_grid_size, int *srch_add)
+{
+  long num_srch_cells;  /* num cells in restricted search arrays   */
+  long min_add;         /* addresses for restricting search of     */
+  long max_add;         /* destination grid                        */
+  long n, n2;           /* generic counters                        */
+  long src_grid_add;    /* current linear address for src cell     */
+  long src_grid_addm4;
+  int  lmask;
+  restr_t bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
+
+  /* Restrict searches first using search bins */
+
+  min_add = src_grid_size - 1;
+  max_add = 0;
+
+  for ( n = 0; n < nbins; ++n )
+    {
+      n2 = n<<1;
+      if ( tgt_grid_add >= bin_addr1[n2] && tgt_grid_add <= bin_addr1[n2+1] )
+	{
+	  if ( bin_addr2[n2  ] < min_add ) min_add = bin_addr2[n2  ];
+	  if ( bin_addr2[n2+1] > max_add ) max_add = bin_addr2[n2+1];
+	}
+    }
+
+  /* Further restrict searches using bounding boxes */
+
+  bound_box_lat1 = tgt_cell_bound_box[0];
+  bound_box_lat2 = tgt_cell_bound_box[1];
+  bound_box_lon1 = tgt_cell_bound_box[2];
+  bound_box_lon2 = tgt_cell_bound_box[3];
+
+  num_srch_cells = 0;
+  for ( src_grid_add = min_add; src_grid_add <= max_add; ++src_grid_add )
+    {
+      src_grid_addm4 = src_grid_add<<2;
+      lmask = (src_cell_bound_box[src_grid_addm4  ] <= bound_box_lat2)  &&
+	      (src_cell_bound_box[src_grid_addm4+1] >= bound_box_lat1)  &&
+	      (src_cell_bound_box[src_grid_addm4+2] <= bound_box_lon2)  &&
+	      (src_cell_bound_box[src_grid_addm4+3] >= bound_box_lon1);
+
+      if ( lmask )
+	{
+	  srch_add[num_srch_cells] = src_grid_add;
+	  num_srch_cells++;
+	}
+    }
+
+  if ( bound_box_lon1 < 0 )
+    {
+      bound_box_lon1 += RESTR_SCALE(PI2);
+      bound_box_lon2 += RESTR_SCALE(PI2);
+
+  for ( src_grid_add = min_add; src_grid_add <= max_add; ++src_grid_add )
+    {
+      src_grid_addm4 = src_grid_add<<2;
+      lmask = (src_cell_bound_box[src_grid_addm4  ] <= bound_box_lat2)  &&
+	      (src_cell_bound_box[src_grid_addm4+1] >= bound_box_lat1)  &&
+	      (src_cell_bound_box[src_grid_addm4+2] <= bound_box_lon2)  &&
+	      (src_cell_bound_box[src_grid_addm4+3] >= bound_box_lon1);
+
+      if ( lmask )
+	{
+	  long ii;
+	  for ( ii = 0; ii < num_srch_cells; ++ii )
+	    if ( srch_add[ii] == src_grid_add ) break;
+
+	  if ( ii == num_srch_cells )
+	    {
+	      srch_add[num_srch_cells] = src_grid_add;
+	      num_srch_cells++;
+	    }
+	}
+    }
+    }
+
+  return (num_srch_cells);
+}
+
 #if defined(_OPENMP)
 static
 void *alloc_srch_corner(size_t n)
@@ -5553,7 +5635,7 @@ void boundbox_from_corners_r1(long ic, long nc, const double *restrict corner_lo
       if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
 
-  if ( fabs(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
+  if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
       bound_box[2] = 0;
       bound_box[3] = RESTR_SCALE(PI2);
@@ -5586,11 +5668,21 @@ void boundbox_from_corners_r2(long ic, long nc, const double *restrict corner_lo
       if ( clon < bound_box[2] ) bound_box[2] = clon;
       if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
-
+  /*
   if ( fabs(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
       bound_box[2] = 0;
       bound_box[3] = RESTR_SCALE(PI2);
+    }
+  */
+  if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
+    {
+      if ( bound_box[3] > bound_box[2] && (bound_box[3]-RESTR_SCALE(PI2)) < 0. )
+	{
+	  restr_t tmp = bound_box[2];
+	  bound_box[2] = bound_box[3] - RESTR_SCALE(PI2);
+	  bound_box[3] = tmp;
+	}
     }
 }
 
@@ -5872,9 +5964,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
       else
 	{
 	  restr_t tgt_cell_bound_box_r[4];
-	  boundbox_from_corners_r1(tgt_grid_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
+	  boundbox_from_corners_r2(tgt_grid_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 
-	  num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
+	  num_srch_cells = get_srch_cells2(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
 					  tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size, srch_add);
 	}
 
