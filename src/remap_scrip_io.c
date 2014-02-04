@@ -16,7 +16,7 @@
 
 
 void remapgrid_init(remapgrid_t *grid);
-void remapGridRealloc(int map_type, remapgrid_t *grid, int remap_grid_basis);
+void remapGridRealloc(int map_type, remapgrid_t *grid);
 
 
 #if defined(HAVE_LIBNETCDF)
@@ -635,8 +635,8 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
       gridID1_gme_c = gridToUnstructured(gridID1, 1);
     }
 
-  remapGridRealloc(rv->map_type, src_grid, REMAP_GRID_BASIS_SRC);
-  remapGridRealloc(rv->map_type, tgt_grid, REMAP_GRID_BASIS_TGT);
+  remapGridRealloc(rv->map_type, src_grid);
+  remapGridRealloc(rv->map_type, tgt_grid);
 
   if ( gridInqType(gridID1) == GRID_GME ) gridInqMaskGME(gridID1_gme_c, src_grid->vgpm);    
 
