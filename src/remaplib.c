@@ -5662,9 +5662,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long    num_srch_cells;   /* num cells in restricted search arrays  */
   long    srch_corners;     /* num of corners of srch cells           */
   int*    srch_add;         /* global address of cells in srch arrays */
-#if defined(_OPENMP)
   int     ompthID, i;
-#endif
 
   /* Variables necessary if segment manages to hit pole */
   grid_store_t *grid_store = NULL;
