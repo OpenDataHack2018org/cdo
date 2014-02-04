@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 CDO=src/cdo
-CDO=cdo-1.6.2
+#CDO=cdo-1.6.2
 #
 RMODS="bil bic nn con cons"
 #
@@ -33,8 +33,8 @@ done
 # result on bailung:
 # =================
 #         bil    bic    nn   con   cons
-# reg2d   0.7    1.6     1   223    227
-# curv   36.9   37.9   843   227    305
+# reg2d   0.7    1.6     1   204    160
+# curv   36.9   37.9   843   210    237
 #
 # result on blizzard:
 # ==================
@@ -49,15 +49,15 @@ done
 # result on hama:
 # =================
 #         bil    bic    nn   con
-# curv     51     52
+# curv   
 #
 # result on bailung:
 # =================
 #         bil    bic    nn   con
-# curv   
+# curv     51     52   754   235
 #
 # result on blizzard:
 # ==================
 #         bil    bic    nn   con
-# curv   
+# curv    101    104  1936   528
 #

@@ -4494,20 +4494,6 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
 }
 
 
-#if defined(_OPENMP)
-static
-void *alloc_srch_corner(size_t n)
-{
-  return (malloc(n*sizeof(double)));
-}
-
-static
-void free_srch_corner(void *p)
-{
-  free(p);
-}
-#endif
-
 /*
   -----------------------------------------------------------------------
 
@@ -4557,10 +4543,10 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   long    num_srch_cells;   /* num cells in restricted search arrays  */
   long    srch_corners;     /* num of corners of srch cells           */
   long    nsrch_corners;
-  int    *srch_add;         /* global address of cells in srch arrays */
+  int*    srch_add;         /* global address of cells in srch arrays */
 #if defined(_OPENMP)
-  int **srch_add2;
-  int ompthID, i;
+  int**   srch_add2;
+  int     ompthID, i;
 #endif
   double *srch_corner_lat;  /* lat of each corner of srch cells */
   double *srch_corner_lon;  /* lon of each corner of srch cells */
@@ -4675,7 +4661,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   shared(ompNumThreads, cdoTimer, nbins, num_wts, grid1_centroid_lon, grid1_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
-  private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
+  private(ompthID, srch_add, n, k, num_srch_cells, \
 	  src_grid_add, tgt_grid_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
@@ -4709,12 +4695,12 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       /* Create search arrays */
 
 #if defined(_OPENMP)
-	  srch_corner_lat = alloc_srch_corner(srch_corners*num_srch_cells);
-	  srch_corner_lon = alloc_srch_corner(srch_corners*num_srch_cells);
+	  srch_corner_lat = malloc(srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = malloc(srch_corners*num_srch_cells*sizeof(double));
 #else
       if ( num_srch_cells > max_srch_cells )
 	{
-	  max_srch_cells = num_srch_cells;
+	  max_srch_cells  = num_srch_cells;
 	  srch_corner_lat = realloc(srch_corner_lat, srch_corners*num_srch_cells*sizeof(double));
 	  srch_corner_lon = realloc(srch_corner_lon, srch_corners*num_srch_cells*sizeof(double));
 	}
@@ -4854,8 +4840,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
           /* End of segment */
         }
 #if defined(_OPENMP)
-      free_srch_corner(srch_corner_lat);
-      free_srch_corner(srch_corner_lon);
+      free(srch_corner_lat);
+      free(srch_corner_lon);
 #endif
     }
 
@@ -4901,7 +4887,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   shared(ompNumThreads, cdoTimer, nbins, num_wts, grid2_centroid_lon, grid2_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
-  private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
+  private(ompthID, srch_add, n, k, num_srch_cells, \
 	  src_grid_add, tgt_grid_add, ioffset, nsrch_corners, corner, next_corn, beglat, beglon, \
 	  endlat, endlon, lrevers, begseg, lbegin, num_subseg, srch_corner_lat, srch_corner_lon, \
 	  weights, intrsct_lat, intrsct_lon, intrsct_lat_off, intrsct_lon_off, intrsct_x, intrsct_y, \
@@ -4935,8 +4921,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       /* Create search arrays */
       
 #if defined(_OPENMP)
-	  srch_corner_lat = alloc_srch_corner(srch_corners*num_srch_cells);
-	  srch_corner_lon = alloc_srch_corner(srch_corners*num_srch_cells);
+	  srch_corner_lat = malloc(srch_corners*num_srch_cells*sizeof(double));
+	  srch_corner_lon = malloc(srch_corners*num_srch_cells*sizeof(double));
 #else
       if ( num_srch_cells > max_srch_cells )
 	{
@@ -5081,8 +5067,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
           /* End of segment */
 	}
 #if defined(_OPENMP)
-      free_srch_corner(srch_corner_lat);
-      free_srch_corner(srch_corner_lon);
+      free(srch_corner_lat);
+      free(srch_corner_lon);
 #endif
     }
 
@@ -5675,18 +5661,16 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long    max_srch_cells;   /* num cells in restricted search arrays  */
   long    num_srch_cells;   /* num cells in restricted search arrays  */
   long    srch_corners;     /* num of corners of srch cells           */
-  int    *srch_add;         /* global address of cells in srch arrays */
-  /*
+  int*    srch_add;         /* global address of cells in srch arrays */
 #if defined(_OPENMP)
-  int **srch_add2;
-  int ompthID, i;
+  int     ompthID, i;
 #endif
-  */
 
   /* Variables necessary if segment manages to hit pole */
   grid_store_t *grid_store = NULL;
   double findex = 0;
   long num_weights = 0;
+  long nx = 0, ny = 0;
   int remap_grid_type = src_grid->remap_grid_type;
   double src_grid_bound_box[4];
   int lyac = FALSE;
@@ -5739,36 +5723,52 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   double *area;
   area = malloc(src_grid_size*sizeof(double));
 
-  struct grid_cell tgt_grid_cell;
+  struct grid_cell*  tgt_grid_cell;
+  struct grid_cell** tgt_grid_cell2;  
+  tgt_grid_cell2 = malloc(sizeof(struct grid_cell*));
+  for ( i = 0; i < ompNumThreads; ++i )
+    {
+      tgt_grid_cell2[i] = malloc(sizeof(struct grid_cell));
+      tgt_grid_cell2[i]->num_corners   = tgt_num_cell_corners;
+      tgt_grid_cell2[i]->edge_type     = tgt_edge_type;
+      tgt_grid_cell2[i]->coordinates_x = malloc(tgt_num_cell_corners*sizeof(*tgt_grid_cell->coordinates_x));
+      tgt_grid_cell2[i]->coordinates_y = malloc(tgt_num_cell_corners*sizeof(*tgt_grid_cell->coordinates_y));
+    }
 
-  tgt_grid_cell.num_corners   = tgt_num_cell_corners;
-  tgt_grid_cell.edge_type     = tgt_edge_type;
-  tgt_grid_cell.coordinates_x = malloc(tgt_num_cell_corners*sizeof(*tgt_grid_cell.coordinates_x));
-  tgt_grid_cell.coordinates_y = malloc(tgt_num_cell_corners*sizeof(*tgt_grid_cell.coordinates_y));
+  struct grid_cell*  src_grid_cells;
+  struct grid_cell** src_grid_cells2;
+  struct grid_cell*  overlap_buffer;
+  struct grid_cell** overlap_buffer2;
+  src_grid_cells2 = malloc(sizeof(struct grid_cell*));
+  overlap_buffer2 = malloc(sizeof(struct grid_cell*));
+  for ( i = 0; i < ompNumThreads; ++i )
+    {
+      src_grid_cells2[i] = NULL;
+      overlap_buffer2[i] = NULL;
+    }
 
-  struct grid_cell *overlap_buffer = NULL;
-  struct grid_cell *src_grid_cells = NULL;
   //#endif
 
   /* Integrate around each cell on grid2 */
-  /*
-#if defined(_OPENMP)
-  srch_add2 = malloc(ompNumThreads*sizeof(int *));
+
+  int** srch_add2;
+  srch_add2 = malloc(ompNumThreads*sizeof(int*));
   for ( i = 0; i < ompNumThreads; ++i )
     srch_add2[i] = malloc(src_grid_size*sizeof(int));
-#else
-  */
-  srch_add = malloc(src_grid_size*sizeof(int));
-  //#endif
+
+  long* max_srch_cells2;
+  max_srch_cells2 = malloc(ompNumThreads*sizeof(long));
+  for ( i = 0; i < ompNumThreads; ++i )
+    max_srch_cells2[i] = 0;
+
+  num_srch_cells  = 0;
 
   srch_corners    = src_num_cell_corners;
-  max_srch_cells  = 0;
-  num_srch_cells  = 0;
 
   if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
-      int nx = src_grid->dims[0];
-      int ny = src_grid->dims[1];
+      nx = src_grid->dims[0];
+      ny = src_grid->dims[1];
      
       src_grid_bound_box[0] = src_grid->reg2d_corner_lat[0];
       src_grid_bound_box[1] = src_grid->reg2d_corner_lat[ny];
@@ -5785,32 +5785,38 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   if ( cdoTimer ) timer_start(timer_remap_con_l2);
 
   findex = 0;
+
+#if ! defined(_OPENMP)
   int sum_srch_cells = 0;
   int sum_srch_cells2 = 0;
-  /*
+#endif
+
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, nbins, num_wts, \
-         remap_store_link_fast, grid_store, rv, cdoVerbose, \
-	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
-  private(ompthID, srch_add, n, k, num_srch_cells, max_srch_cells, \
-	  src_grid_add, tgt_grid_add, ioffset, \
-	  )
+  shared(ompNumThreads, cdoTimer, nbins, num_wts, nx, remap_grid_type, src_grid_bound_box,  \
+	 src_edge_type, tgt_edge_type, area, tgt_area, num_weights, weight,  \
+         remap_store_link_fast, grid_store, rv, cdoVerbose, max_srch_cells2, \
+	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
+	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex) \
+  private(ompthID, srch_add, tgt_grid_cell, n, k, num_srch_cells, max_srch_cells,  \
+	  overlap_buffer, src_grid_cells, src_grid_add, tgt_grid_add, ioffset)
 #endif
-  */
   for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
     {
       int lprogress = 1;
-      /*
 #if defined(_OPENMP)
       ompthID = omp_get_thread_num();
-      srch_add = srch_add2[ompthID];
-      if ( ompthID != 0 ) lprogress = 0;
+#else
+      ompthID = 0;
 #endif
+
+      srch_add = srch_add2[ompthID];
+      tgt_grid_cell = tgt_grid_cell2[ompthID];
+      if ( ompthID != 0 ) lprogress = 0;
+
 #if defined(_OPENMP)
 #pragma omp atomic
 #endif
-  */
       findex++;
       if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
 
@@ -5837,8 +5843,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 					  tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size, srch_add);
 	}
 
+#if ! defined(_OPENMP)
       sum_srch_cells += num_srch_cells;
-
+#endif
       if ( cdoVerbose )
 	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
 
@@ -5847,24 +5854,26 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
       //#if defined(HAVE_LIBYAC)
       for ( int ic = 0; ic < tgt_num_cell_corners; ++ic )
 	{
-	  tgt_grid_cell.coordinates_x[ic] = tgt_grid->cell_corner_lon[tgt_grid_add*tgt_num_cell_corners+ic];
-	  tgt_grid_cell.coordinates_y[ic] = tgt_grid->cell_corner_lat[tgt_grid_add*tgt_num_cell_corners+ic];
+	  tgt_grid_cell->coordinates_x[ic] = tgt_grid->cell_corner_lon[tgt_grid_add*tgt_num_cell_corners+ic];
+	  tgt_grid_cell->coordinates_y[ic] = tgt_grid->cell_corner_lat[tgt_grid_add*tgt_num_cell_corners+ic];
 	}
 
       // printf("target: %ld\n", tgt_grid_add);
+#if ! defined(_OPENMP)
       if ( lyac )
 	for ( int n = 0; n < tgt_num_cell_corners; ++n )
 	  {
-	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_x[n]/DEG2RAD);
-	    printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell.coordinates_y[n]/DEG2RAD);
+	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_x[n]/DEG2RAD);
+	    printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_y[n]/DEG2RAD);
 	  }
+#endif
       
       if ( cdoVerbose )
 	{
 	  /*
 	  //printf("target:       ");
 	  for ( int n = 0; n < tgt_num_cell_corners; ++n )
-	    printf(" %g %g", tgt_grid_cell.coordinates_x[n]/DEG2RAD, tgt_grid_cell.coordinates_y[n]/DEG2RAD);
+	    printf(" %g %g", tgt_grid_cell->coordinates_x[n]/DEG2RAD, tgt_grid_cell->coordinates_y[n]/DEG2RAD);
 	  printf("\n");
 	  */
 	}
@@ -5873,6 +5882,10 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	printf("num_deps_per_element %d %d\n", i, ndeps);
       */
       /* Create search arrays */
+      max_srch_cells = max_srch_cells2[ompthID];
+      overlap_buffer = overlap_buffer2[ompthID];
+      src_grid_cells = src_grid_cells2[ompthID];
+
       if ( num_srch_cells > max_srch_cells )
 	{
 	  overlap_buffer = realloc(overlap_buffer, num_srch_cells*sizeof(*overlap_buffer));
@@ -5895,6 +5908,10 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    }
 
 	  max_srch_cells = num_srch_cells;
+
+	  max_srch_cells2[ompthID] = max_srch_cells;
+	  overlap_buffer2[ompthID] = overlap_buffer;
+	  src_grid_cells2[ompthID] = src_grid_cells;
 	}
 
       // printf("  int ii = 0;\n");
@@ -5904,8 +5921,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	    {
-	      int nx = src_grid->dims[0];
-	      int ny = src_grid->dims[1];
 	      int ix, iy;
 
 	      iy = src_grid_add/nx;
@@ -5943,6 +5958,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	      */
 	    }
 
+#if ! defined(_OPENMP)
 	  if ( lyac )
 	    {
 	      for ( k = 0; k < srch_corners; ++k )
@@ -5952,22 +5968,13 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 		}
 	      printf("  ii++;\n");
 	    }
-
-	  if ( cdoVerbose )
-	    {
-	      /*
-	      printf("source: %ld %ld", num_srch_cells, n);
-	      for ( k = 0; k < srch_corners; ++k )
-		printf(" %g %g", src_grid_cells[n].coordinates_x[k]/DEG2RAD, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
-	      printf("\n");
-	      */
-	    }
+#endif
 	}
 
-      cdo_compute_overlap_areas(num_srch_cells, overlap_buffer, src_grid_cells, tgt_grid_cell, area);
+      cdo_compute_overlap_areas(num_srch_cells, overlap_buffer, src_grid_cells, *tgt_grid_cell, area);
       //compute_overlap_areas(num_srch_cells, src_grid_cells, tgt_grid_cell, area);
 
-      tgt_area = huiliers_area(tgt_grid_cell);
+      tgt_area = huiliers_area(*tgt_grid_cell);
       // tgt_area = cell_area(tgt_grid_cell);
 
       for ( num_weights = 0, n = 0; n < num_srch_cells; ++n )
@@ -5981,7 +5988,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    }
 	}
 
+#if ! defined(_OPENMP)
       sum_srch_cells2 += num_weights;
+#endif
 
       for ( n = 0; n < num_weights; ++n )
 	weight[n] = area[n] / tgt_area;
@@ -6010,11 +6019,10 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    {
 	      if ( src_grid->mask[src_grid_add] )
 		{
-/*
+
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-*/
 		  {
 		    store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, &weight[n], grid_store);
 
@@ -6022,11 +6030,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 		  }
 		  tgt_grid->cell_frac[tgt_grid_add] += weight[n];
 		}
-/*
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-*/
 	      {
 		src_grid->cell_area[src_grid_add] += weight[n];
 	      }
@@ -6036,37 +6042,41 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	}
     }
 
+#if ! defined(_OPENMP)
   printf("sum_srch_cells : %d\n", sum_srch_cells);
   printf("sum_srch_cells2: %d\n", sum_srch_cells2);
+#endif
 
   if ( cdoTimer ) timer_stop(timer_remap_con_l2);
 
   /* Finished with all cells: deallocate search arrays */
 
   //#if defined(HAVE_LIBYAC)
-  for ( n = 0; n < num_srch_cells; n++ )
+  for ( i = 0; i < ompNumThreads; ++i )
     {
-      free(src_grid_cells[n].coordinates_x);
-      free(src_grid_cells[n].coordinates_y);
+      for ( n = 0; n < max_srch_cells2[i]; n++ )
+	{
+	  free(src_grid_cells2[i][n].coordinates_x);
+	  free(src_grid_cells2[i][n].coordinates_y);
+	}
+      free(src_grid_cells2[i]);
+      free(overlap_buffer2[i]);
     }
-  free(src_grid_cells);
-  free(overlap_buffer);
+  free(src_grid_cells2);
+  free(overlap_buffer2);
 
-  free(tgt_grid_cell.coordinates_x);
-  free(tgt_grid_cell.coordinates_y);
+  for ( i = 0; i < ompNumThreads; ++i )
+    {
+      free(tgt_grid_cell2[i]->coordinates_x);
+      free(tgt_grid_cell2[i]->coordinates_y);
+      free(tgt_grid_cell2[i]);
+    }
+  free(tgt_grid_cell2);
   //#endif
 
-  /*
-#if defined(_OPENMP)
   for ( i = 0; i < ompNumThreads; ++i )
     free(srch_add2[i]);
-
   free(srch_add2);
-#else
-  */
-  free(srch_add);
-  //#endif
-
 
   if ( remap_store_link_fast )
     {
