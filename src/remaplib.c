@@ -862,7 +862,7 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 }
 
 static
-void remap_define_grid(int map_type, int gridID, remapgrid_t *grid, int remap_grid_basis)
+void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 {
   char units[CDI_MAX_NAME];
   long gridsize;
@@ -1128,9 +1128,9 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
     }
 
   //if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
-    remap_define_grid(map_type, gridID1, src_grid, REMAP_GRID_BASIS_SRC);
+    remap_define_grid(map_type, gridID1, src_grid);
 
-  remap_define_grid(map_type, gridID2, tgt_grid, REMAP_GRID_BASIS_TGT);
+  remap_define_grid(map_type, gridID2, tgt_grid);
 
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
@@ -4334,9 +4334,6 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 			  const double *restrict tgt_cell_bound_box, int *srch_add)
 {
   long num_srch_cells;  /* num cells in restricted search arrays   */
-  long n, n2;           /* generic counters                        */
-  long src_grid_add;    /* current linear address for src cell     */
-  int  lmask;
   int lfound;
   long nxp1, nyp1;
   double src_lon_min, src_lon_max;
@@ -5478,47 +5475,9 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 {
   long inc, j;
   double clon, clat;
-  double clonx[nc], clatx[nc];
 
   inc = ic*nc;
-  /*
-  for ( j = 0; j < nc; ++j )
-    {
-      clonx[j] = corner_lon[inc+j];
-      clatx[j] = corner_lat[inc+j];
-      //     if ( ic == 14 ) printf("  clon: %d %g\n", j ,clonx[j]);
-    }
 
-  for ( j = 1; j < nc; ++j )
-    {
-      if ( fabs(clonx[j] - clonx[j-1]) > PI )
-	{
-	  if ( clonx[j] > clonx[j-1] )
-	    clonx[j] -= PI2;
-	  else
-	    clonx[j-1] -= PI2;
-	}
-    }
-
-  clat = clatx[0];
-  clon = clonx[0];
-
-  bound_box[0] = clat;
-  bound_box[1] = clat;
-  bound_box[2] = clon;
-  bound_box[3] = clon;
-
-  for ( j = 1; j < nc; ++j )
-    {
-      clat = clatx[j];
-      clon = clonx[j];
-      if ( clat < bound_box[0] ) bound_box[0] = clat;
-      if ( clat > bound_box[1] ) bound_box[1] = clat;
-      if ( clon < bound_box[2] ) bound_box[2] = clon;
-      if ( clon > bound_box[3] ) bound_box[3] = clon;
-    }
-
-  */
   clat = corner_lat[inc];
   clon = corner_lon[inc];
 
@@ -5556,42 +5515,8 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 }
 
 static
-void boundbox_from_corners_r1(long ic, long nc, const double *restrict corner_lon,
-			      const double *restrict corner_lat, restr_t *restrict bound_box)
-{
-  long inc, j;
-  restr_t clon, clat;
-
-  inc = ic*nc;
-
-  clat = RESTR_SCALE(corner_lat[inc]);
-  clon = RESTR_SCALE(corner_lon[inc]);
-
-  bound_box[0] = clat;
-  bound_box[1] = clat;
-  bound_box[2] = clon;
-  bound_box[3] = clon;
-
-  for ( j = 1; j < nc; ++j )
-    {
-      clat = RESTR_SCALE(corner_lat[inc+j]);
-      clon = RESTR_SCALE(corner_lon[inc+j]);
-      if ( clat < bound_box[0] ) bound_box[0] = clat;
-      if ( clat > bound_box[1] ) bound_box[1] = clat;
-      if ( clon < bound_box[2] ) bound_box[2] = clon;
-      if ( clon > bound_box[3] ) bound_box[3] = clon;
-    }
-
-  if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
-    {
-      bound_box[2] = RESTR_SCALE(0.);
-      bound_box[3] = RESTR_SCALE(PI2);
-    }
-}
-
-static
-void boundbox_from_corners_r2(long ic, long nc, const double *restrict corner_lon,
-			      const double *restrict corner_lat, restr_t *restrict bound_box)
+void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon,
+			     const double *restrict corner_lat, restr_t *restrict bound_box)
 {
   long inc, j;
   restr_t clon, clat;
@@ -5739,7 +5664,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long tgt_num_cell_corners;
   long src_grid_add;       /* current linear address for grid1 cell   */
   long tgt_grid_add;       /* current linear address for grid2 cell   */
-  long n, n3, k;           /* generic counters                        */
+  long n, k;           /* generic counters                        */
   long nbins, num_links;
 
 
@@ -5891,11 +5816,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 
       /* Get search cells */
-      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
-	{
-	}
-
-
 
       if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
@@ -5911,7 +5831,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
       else
 	{
 	  restr_t tgt_cell_bound_box_r[4];
-	  boundbox_from_corners_r2(tgt_grid_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
+	  boundbox_from_corners1r(tgt_grid_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box_r);
 
 	  num_srch_cells = get_srch_cells(tgt_grid_add, nbins, tgt_grid->bin_addr, src_grid->bin_addr,
 					  tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size, srch_add);

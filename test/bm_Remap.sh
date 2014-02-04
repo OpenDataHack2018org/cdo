@@ -1,6 +1,7 @@
 #!/bin/sh
 #
 CDO=src/cdo
+CDO=cdo-1.6.2
 #
 RMODS="bil bic nn con cons"
 #
@@ -19,6 +20,9 @@ for RMOD in $RMODS; do
   done
   cdo diff2 ${IFILE}_${RMOD}_?
 done
+####################################################
+#
+# CDO 1.6.3
 #
 # result on hama:
 # =================
@@ -37,4 +41,23 @@ done
 #         bil    bic    nn   con   cons
 # reg2d    15     19    18   528
 # curv    101    104  1936   528
+#
+####################################################
+#
+# CDO 1.6.2
+#
+# result on hama:
+# =================
+#         bil    bic    nn   con
+# curv     51     52
+#
+# result on bailung:
+# =================
+#         bil    bic    nn   con
+# curv   
+#
+# result on blizzard:
+# ==================
+#         bil    bic    nn   con
+# curv   
 #
