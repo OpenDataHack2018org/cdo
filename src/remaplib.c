@@ -1001,7 +1001,7 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 	      i4 = i<<2;
 	      grid->cell_bound_box[i4  ] = RESTR_SCALE(-PIH);
 	      grid->cell_bound_box[i4+1] = RESTR_SCALE( PIH);
-	      grid->cell_bound_box[i4+2] = 0;
+	      grid->cell_bound_box[i4+2] = RESTR_SCALE(0.);
 	      grid->cell_bound_box[i4+3] = RESTR_SCALE(PI2);
 	    }
 	}
@@ -4424,7 +4424,6 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
   long n, n2;           /* generic counters                        */
   long src_grid_add;    /* current linear address for src cell     */
   long src_grid_addm4;
-  int  lmask;
   restr_t bound_box_lat1, bound_box_lat2, bound_box_lon1, bound_box_lon2;
 
   /* Restrict searches first using search bins */
@@ -4453,8 +4452,8 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
   for ( src_grid_add = min_add; src_grid_add <= max_add; ++src_grid_add )
     {
       src_grid_addm4 = src_grid_add<<2;
-      if ( (bound_box_lon2 > src_cell_bound_box[src_grid_addm4+2]/* <= bound_box_lon2*/)  &&
-	   (bound_box_lon1 < src_cell_bound_box[src_grid_addm4+3]/* >= bound_box_lon1*/) )
+      if ( (src_cell_bound_box[src_grid_addm4+2] <= bound_box_lon2)  &&
+	   (src_cell_bound_box[src_grid_addm4+3] >= bound_box_lon1) )
 	{
 	  if ( (src_cell_bound_box[src_grid_addm4  ] <= bound_box_lat2)  &&
 	       (src_cell_bound_box[src_grid_addm4+1] >= bound_box_lat1) )
