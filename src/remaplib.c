@@ -720,6 +720,51 @@ int expand_curvilinear_grid(int gridID)
   return(gridIDnew);
 }
 
+
+static
+void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, const restr_t *restrict cell_bound_box, int *restrict bin_addr)
+{
+  long n, n2, nele, nele4;
+  restr_t cell_bound_box_lat1, cell_bound_box_lat2;
+
+  for ( n = 0; n < nbins; ++n )
+    {
+      n2 = n<<1;
+      bin_addr[n2  ] = gridsize;
+      bin_addr[n2+1] = 0;
+    }
+
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  private(n, n2, nele4, cell_bound_box_lat1, cell_bound_box_lat2)  \
+  shared(gridsize, nbins, bin_lats, cell_bound_box, bin_addr)
+#endif
+  for ( nele = 0; nele < gridsize; ++nele )
+    {
+      nele4 = nele<<2;
+      cell_bound_box_lat1 = cell_bound_box[nele4  ];
+      cell_bound_box_lat2 = cell_bound_box[nele4+1];
+      for ( n = 0; n < nbins; ++n )
+	{
+	  n2 = n<<1;
+	  if ( cell_bound_box_lat1 <= bin_lats[n2+1] &&
+	       cell_bound_box_lat2 >= bin_lats[n2  ] )
+	    {
+	      /*
+#if defined(_OPENMP)
+	      if ( nele < bin_addr[n2  ] || nele > bin_addr[n2+1] )
+#pragma omp critical
+#endif
+	      */
+		{
+		  bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
+		  bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
+		}
+	    }
+	}
+    }
+}
+/*
 static
 void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, const restr_t *restrict cell_bound_box, int *restrict bin_addr)
 {
@@ -749,7 +794,7 @@ void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, 
 	}
     }
 }
-
+*/
 static
 void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
 {
@@ -1927,10 +1972,10 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
     {
       srch_add4 = srch_add<<2;
       /* First check bounding box */
-      if ( rlat >= src_grid_bound_box[srch_add4  ] && 
-           rlat <= src_grid_bound_box[srch_add4+1] &&
-           rlon >= src_grid_bound_box[srch_add4+2] &&
-	   rlon <= src_grid_bound_box[srch_add4+3] )
+      if ( rlon >= src_grid_bound_box[srch_add4+2] &&
+	   rlon <= src_grid_bound_box[srch_add4+3] &&
+	   rlat >= src_grid_bound_box[srch_add4  ] &&
+	   rlat <= src_grid_bound_box[srch_add4+1])
 	{
 	  /* We are within bounding box so get really serious */
 
