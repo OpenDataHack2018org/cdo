@@ -5697,7 +5697,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   src_num_cell_corners = src_grid->num_cell_corners;
   tgt_num_cell_corners = tgt_grid->num_cell_corners;
 
-
   enum edge_type great_circle_type[] = {GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE, GREAT_CIRCLE};
   enum edge_type lonlat_circle_type[] = {LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE, LAT_CIRCLE, LON_CIRCLE};
 
@@ -5788,11 +5787,11 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, nbins, num_wts, nx, remap_grid_type, src_grid_bound_box,  \
-	 src_edge_type, tgt_edge_type, partial_areas2, tgt_area, num_weights, partial_weights2,  \
+	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          remap_store_link_fast, grid_store, rv, cdoVerbose, max_srch_cells2, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex) \
-  private(ompthID, srch_add, tgt_grid_cell, n, k, num_srch_cells, max_srch_cells,  \
+  private(ompthID, srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
 	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_grid_add, tgt_grid_add, ioffset)
 #endif
   for ( tgt_grid_add = 0; tgt_grid_add < tgt_grid_size; ++tgt_grid_add )
