@@ -36,11 +36,11 @@ done
 # reg2d   0.7    1.6     1   204    160
 # curv   36.9   37.9   843   210    237
 #
-# result on blizzard:
+# result on blizzard: (interactiv)
 # ==================
 #         bil    bic    nn   con   cons
-# reg2d    15     19    18   528
-# curv    101    104  1936   528
+# reg2d   2.2    5.5     3   499    342
+# curv     88     93  1936   500    553
 #
 ####################################################
 #
