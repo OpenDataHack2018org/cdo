@@ -2879,8 +2879,8 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 {
   /*
     Input variables:
-    int  add1         ! address on grid1
-    int  add2         ! address on grid2
+    int  add1         ! address on source grid
+    int  add2         ! address on target grid
     double weights    ! remapping weight for this link
   */
   long nlink;
@@ -4128,8 +4128,8 @@ void store_link_cnsrv_fast(remapvars_t *rv, long add1, long add2, long num_wts, 
 {
   /*
     Input variables:
-    int  add1         ! address on grid1
-    int  add2         ! address on grid2
+    int  add1         ! address on source grid
+    int  add2         ! address on target grid
     double weights[]  ! array of remapping weights for this link
   */
   /* Local variables */
@@ -4228,8 +4228,8 @@ void store_link_cnsrv(remapvars_t *rv, long add1, long add2, double *restrict we
 {
   /*
     Input variables:
-    int  add1         ! address on grid1
-    int  add2         ! address on grid2
+    int  add1         ! address on source grid
+    int  add2         ! address on target grid
     double weights[3] ! array of remapping weights for this link
   */
   /* Local variables */
@@ -4516,8 +4516,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   long tgt_grid_size;
   long src_num_cell_corners;
   long tgt_num_cell_corners;
-  long src_grid_add;       /* current linear address for grid1 cell   */
-  long tgt_grid_add;       /* current linear address for grid2 cell   */
+  long src_grid_add;       /* current linear address for source grid cell   */
+  long tgt_grid_add;       /* current linear address for target grid cell   */
   long n, n3, k;        /* generic counters                        */
   long corner;          /* corner of cell that segment starts from */
   long next_corn;       /* corner of cell that segment ends on     */
@@ -4532,8 +4532,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   double beglat, endlat, beglon, endlon;   /* endpoints of current seg.  */
   double norm_factor = 0;                  /* factor for normalizing wts */
 
-  double *grid2_centroid_lat, *grid2_centroid_lon;   /* centroid coords  */
-  double *grid1_centroid_lat, *grid1_centroid_lon;   /* on each grid     */
+  double *tgt_centroid_lat, *tgt_centroid_lon;   /* centroid coords  */
+  double *src_centroid_lat, *src_centroid_lon;   /* on each grid     */
 
   double begseg[2];         /* begin lat/lon for full segment */
   double weights[6];        /* local wgt array */
@@ -4622,24 +4622,24 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
   /* Initialize centroid arrays */
 
-  grid1_centroid_lat = malloc(src_grid_size*sizeof(double));
-  grid1_centroid_lon = malloc(src_grid_size*sizeof(double));
-  grid2_centroid_lat = malloc(tgt_grid_size*sizeof(double));
-  grid2_centroid_lon = malloc(tgt_grid_size*sizeof(double));
+  src_centroid_lat = malloc(src_grid_size*sizeof(double));
+  src_centroid_lon = malloc(src_grid_size*sizeof(double));
+  tgt_centroid_lat = malloc(tgt_grid_size*sizeof(double));
+  tgt_centroid_lon = malloc(tgt_grid_size*sizeof(double));
 
   for ( n = 0; n < src_grid_size; ++n )
     {
-      grid1_centroid_lat[n] = 0;
-      grid1_centroid_lon[n] = 0;
+      src_centroid_lat[n] = 0;
+      src_centroid_lon[n] = 0;
     }
 
   for ( n = 0; n < tgt_grid_size; ++n )
     {
-      grid2_centroid_lat[n] = 0;
-      grid2_centroid_lon[n] = 0;
+      tgt_centroid_lat[n] = 0;
+      tgt_centroid_lon[n] = 0;
     }
 
-  /*  Integrate around each cell on grid1 */
+  /*  Integrate around each cell on source grid */
 
 #if defined(_OPENMP)
   srch_add2 = malloc(ompNumThreads*sizeof(int *));
@@ -4658,7 +4658,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, nbins, num_wts, grid1_centroid_lon, grid1_centroid_lat, \
+  shared(ompNumThreads, cdoTimer, nbins, num_wts, src_centroid_lon, src_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 src_num_cell_corners,	srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
   private(ompthID, srch_add, n, k, num_srch_cells, \
@@ -4829,8 +4829,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 		      }
 
 		  src_grid->cell_area[src_grid_add] += weights[0];
-		  grid1_centroid_lat[src_grid_add] += weights[1];
-		  grid1_centroid_lon[src_grid_add] += weights[2];
+		  src_centroid_lat[src_grid_add] += weights[1];
+		  src_centroid_lon[src_grid_add] += weights[2];
 
 		  /* Reset beglat and beglon for next subsegment. */
 		  beglat = intrsct_lat;
@@ -4863,7 +4863,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   free(srch_add);
 #endif
 
-  /* Integrate around each cell on grid2 */
+  /* Integrate around each cell on target grid */
 
 #if defined(_OPENMP)
   srch_add2 = malloc(ompNumThreads*sizeof(int *));
@@ -4884,7 +4884,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, nbins, num_wts, grid2_centroid_lon, grid2_centroid_lat, \
+  shared(ompNumThreads, cdoTimer, nbins, num_wts, tgt_centroid_lon, tgt_centroid_lat, \
          remap_store_link_fast, grid_store, link_add1, link_add2, rv, cdoVerbose, max_subseg, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, srch_add2, findex) \
   private(ompthID, srch_add, n, k, num_srch_cells, \
@@ -5056,8 +5056,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 		      }
 
 		  tgt_grid->cell_area[tgt_grid_add] += weights[3];
-		  grid2_centroid_lat[tgt_grid_add] += weights[4];
-		  grid2_centroid_lon[tgt_grid_add] += weights[5];
+		  tgt_centroid_lat[tgt_grid_add] += weights[4];
+		  tgt_centroid_lon[tgt_grid_add] += weights[5];
 
 		  /* Reset beglat and beglon for next subsegment. */
 		  beglat = intrsct_lat;
@@ -5130,15 +5130,15 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   if ( src_grid_add != -1 )
     {
       src_grid->cell_area[src_grid_add]     += weights[0];
-      grid1_centroid_lat[src_grid_add] += weights[1];
-      grid1_centroid_lon[src_grid_add] += weights[2];
+      src_centroid_lat[src_grid_add] += weights[1];
+      src_centroid_lon[src_grid_add] += weights[2];
     }
 
   if ( tgt_grid_add != -1 )
     {
       tgt_grid->cell_area[tgt_grid_add]     += weights[3];
-      grid2_centroid_lat[tgt_grid_add] += weights[4];
-      grid2_centroid_lon[tgt_grid_add] += weights[5];
+      tgt_centroid_lat[tgt_grid_add] += weights[4];
+      tgt_centroid_lon[tgt_grid_add] += weights[5];
     }
 
   if ( src_grid_add != -1 && tgt_grid_add != -1 )
@@ -5185,15 +5185,15 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   if ( src_grid_add != -1 )
     {
       src_grid->cell_area[src_grid_add]     += weights[0];
-      grid1_centroid_lat[src_grid_add] += weights[1];
-      grid1_centroid_lon[src_grid_add] += weights[2];
+      src_centroid_lat[src_grid_add] += weights[1];
+      src_centroid_lon[src_grid_add] += weights[2];
     }
 
   if ( tgt_grid_add != -1 )
     {
       tgt_grid->cell_area[tgt_grid_add]     += weights[3];
-      grid2_centroid_lat[tgt_grid_add] += weights[4];
-      grid2_centroid_lon[tgt_grid_add] += weights[5];
+      tgt_centroid_lat[tgt_grid_add] += weights[4];
+      tgt_centroid_lon[tgt_grid_add] += weights[5];
     }
 
   if ( src_grid_add != -1 && tgt_grid_add != -1 )
@@ -5219,15 +5219,15 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   for ( n = 0; n < src_grid_size; ++n )
     if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) )
       {
-        grid1_centroid_lat[n] /= src_grid->cell_area[n];
-        grid1_centroid_lon[n] /= src_grid->cell_area[n];
+        src_centroid_lat[n] /= src_grid->cell_area[n];
+        src_centroid_lon[n] /= src_grid->cell_area[n];
       }
 
   for ( n = 0; n < tgt_grid_size; ++n )
     if ( IS_NOT_EQUAL(tgt_grid->cell_area[n], 0) )
       {
-        grid2_centroid_lat[n] /= tgt_grid->cell_area[n];
-        grid2_centroid_lon[n] /= tgt_grid->cell_area[n];
+        tgt_centroid_lat[n] /= tgt_grid->cell_area[n];
+        tgt_centroid_lon[n] /= tgt_grid->cell_area[n];
       }
 
   /* 2010-10-08 Uwe Schulzweida: remove all links with weights < 0 */
@@ -5281,7 +5281,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 #endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_links, rv, tgt_grid, grid1_centroid_lat, grid1_centroid_lon)		\
+  shared(num_links, rv, tgt_grid, src_centroid_lat, src_centroid_lon)		\
   private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
 #endif
       for ( n = 0; n < num_links; ++n )
@@ -5296,8 +5296,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
             norm_factor = ZERO;
 
 	  rv->wts[n3  ] =  weights[0]*norm_factor;
-	  rv->wts[n3+1] = (weights[1] - weights[0]*grid1_centroid_lat[src_grid_add])*norm_factor;
-	  rv->wts[n3+2] = (weights[2] - weights[0]*grid1_centroid_lon[src_grid_add])*norm_factor;
+	  rv->wts[n3+1] = (weights[1] - weights[0]*src_centroid_lat[src_grid_add])*norm_factor;
+	  rv->wts[n3+2] = (weights[2] - weights[0]*src_centroid_lon[src_grid_add])*norm_factor;
 	}
     }
   else if ( rv->norm_opt == NORM_OPT_FRACAREA )
@@ -5307,7 +5307,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 #endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_links, rv, tgt_grid, grid1_centroid_lat, grid1_centroid_lon)		\
+  shared(num_links, rv, tgt_grid, src_centroid_lat, src_centroid_lon)		\
   private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
 #endif
       for ( n = 0; n < num_links; ++n )
@@ -5322,8 +5322,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
             norm_factor = ZERO;
 
 	  rv->wts[n3  ] =  weights[0]*norm_factor;
-	  rv->wts[n3+1] = (weights[1] - weights[0]*grid1_centroid_lat[src_grid_add])*norm_factor;
-	  rv->wts[n3+2] = (weights[2] - weights[0]*grid1_centroid_lon[src_grid_add])*norm_factor;
+	  rv->wts[n3+1] = (weights[1] - weights[0]*src_centroid_lat[src_grid_add])*norm_factor;
+	  rv->wts[n3+2] = (weights[2] - weights[0]*src_centroid_lon[src_grid_add])*norm_factor;
 	}
     }
   else if ( rv->norm_opt == NORM_OPT_NONE )
@@ -5333,7 +5333,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 #endif
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(num_links, rv, tgt_grid, grid1_centroid_lat, grid1_centroid_lon)	\
+  shared(num_links, rv, tgt_grid, src_centroid_lat, src_centroid_lon)	\
   private(n, n3, src_grid_add, tgt_grid_add, weights, norm_factor)
 #endif
       for ( n = 0; n < num_links; ++n )
@@ -5345,8 +5345,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
           norm_factor = ONE;
 
 	  rv->wts[n3  ] =  weights[0]*norm_factor;
-	  rv->wts[n3+1] = (weights[1] - weights[0]*grid1_centroid_lat[src_grid_add])*norm_factor;
-	  rv->wts[n3+2] = (weights[2] - weights[0]*grid1_centroid_lon[src_grid_add])*norm_factor;
+	  rv->wts[n3+1] = (weights[1] - weights[0]*src_centroid_lat[src_grid_add])*norm_factor;
+	  rv->wts[n3+2] = (weights[2] - weights[0]*src_centroid_lon[src_grid_add])*norm_factor;
 	}
     }
 
@@ -5368,22 +5368,22 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	  if ( src_grid->cell_area[n] < -.01 )
 	    cdoPrint("Source grid area error: %d %g", n, src_grid->cell_area[n]);
 
-	  if ( grid1_centroid_lat[n] < -PIH-.01 || grid1_centroid_lat[n] > PIH+.01 )
-	    cdoPrint("Source grid centroid lat error: %d %g", n, grid1_centroid_lat[n]);
+	  if ( src_centroid_lat[n] < -PIH-.01 || src_centroid_lat[n] > PIH+.01 )
+	    cdoPrint("Source grid centroid lat error: %d %g", n, src_centroid_lat[n]);
 
-	  grid1_centroid_lat[n] = 0;
-	  grid1_centroid_lon[n] = 0;
+	  src_centroid_lat[n] = 0;
+	  src_centroid_lon[n] = 0;
 	}
 
       for ( n = 0; n < tgt_grid_size; ++n )
 	{
 	  if ( tgt_grid->cell_area[n] < -.01 )
 	    cdoPrint("Target grid area error: %d %g", n, tgt_grid->cell_area[n]);
-	  if ( grid2_centroid_lat[n] < -PIH-.01 || grid2_centroid_lat[n] > PIH+.01 )
-	    cdoPrint("Target grid centroid lat error: %d %g", n, grid2_centroid_lat[n]);
+	  if ( tgt_centroid_lat[n] < -PIH-.01 || tgt_centroid_lat[n] > PIH+.01 )
+	    cdoPrint("Target grid centroid lat error: %d %g", n, tgt_centroid_lat[n]);
 
-	  grid2_centroid_lat[n] = 0;
-	  grid2_centroid_lon[n] = 0;
+	  tgt_centroid_lat[n] = 0;
+	  tgt_centroid_lon[n] = 0;
 	}
 
       for ( n = 0; n < num_links; ++n )
@@ -5403,7 +5403,7 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
       for ( n = 0; n < num_links; ++n )
 	{
 	  tgt_grid_add = rv->tgt_grid_add[n];
-	  grid2_centroid_lat[tgt_grid_add] += rv->wts[3*n];
+	  tgt_centroid_lat[tgt_grid_add] += rv->wts[3*n];
 	}
 
       /* 2012-01-24 Uwe Schulzweida: changed [tgt_grid_add] to [n] (bug fix) */
@@ -5416,15 +5416,15 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
 	  else if ( rv->norm_opt == NORM_OPT_NONE )
 	    norm_factor = tgt_grid->cell_area[n];
 	    
-	  if ( grid2_centroid_lat[n] > 0 && fabs(grid2_centroid_lat[n] - norm_factor) > .01 )
-	    cdoPrint("Error: sum of wts for map1 %d %g %g", n, grid2_centroid_lat[n], norm_factor);
+	  if ( tgt_centroid_lat[n] > 0 && fabs(tgt_centroid_lat[n] - norm_factor) > .01 )
+	    cdoPrint("Error: sum of wts for map1 %d %g %g", n, tgt_centroid_lat[n], norm_factor);
 	}
     } // lcheck
 
-  free(grid1_centroid_lat);
-  free(grid1_centroid_lon);
-  free(grid2_centroid_lat);
-  free(grid2_centroid_lon);
+  free(src_centroid_lat);
+  free(src_centroid_lon);
+  free(tgt_centroid_lat);
+  free(tgt_centroid_lon);
 
   if ( ! remap_store_link_fast )
     {
@@ -5648,8 +5648,8 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long   tgt_grid_size;
   long   src_num_cell_corners;
   long   tgt_num_cell_corners;
-  long   src_grid_add;       /* current linear address for grid1 cell   */
-  long   tgt_grid_add;       /* current linear address for grid2 cell   */
+  long   src_grid_add;       /* current linear address for source grid cell   */
+  long   tgt_grid_add;       /* current linear address for target grid cell   */
   long   n, k;               /* generic counters                        */
   long   nbins, num_links;
   double norm_factor = 0;    /* factor for normalizing wts */
@@ -6176,7 +6176,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 {
   long n, ns, i;
   long idiff, imax, imin, icount;
-  int *grid2_count;
+  int *tgt_count;
   double minval, maxval, sum;
 	  
   if ( remap_order == 2 )
@@ -6246,28 +6246,28 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   cdoPrint("number of sparse matrix entries %d", rv.num_links);
   cdoPrint("total number of dest cells %d", tgt_grid.size);
 
-  grid2_count = malloc(tgt_grid.size*sizeof(int));
+  tgt_count = malloc(tgt_grid.size*sizeof(int));
 
-  for ( n = 0; n < tgt_grid.size; ++n ) grid2_count[n] = 0;
+  for ( n = 0; n < tgt_grid.size; ++n ) tgt_count[n] = 0;
 
 #if defined(SX)
 #pragma vdir nodep
 #endif
-  for ( n = 0; n < rv.num_links; ++n ) grid2_count[rv.tgt_grid_add[n]]++;
+  for ( n = 0; n < rv.num_links; ++n ) tgt_count[rv.tgt_grid_add[n]]++;
 
   imin = INT_MAX;
   imax = INT_MIN;
   for ( n = 0; n < tgt_grid.size; ++n )
     {
-      if ( grid2_count[n] > 0 )
-	if ( grid2_count[n] < imin ) imin = grid2_count[n];
-      if ( grid2_count[n] > imax ) imax = grid2_count[n];
+      if ( tgt_count[n] > 0 )
+	if ( tgt_count[n] < imin ) imin = tgt_count[n];
+      if ( tgt_count[n] > imax ) imax = tgt_count[n];
     }
 
   idiff =  (imax - imin)/10 + 1;
   icount = 0;
   for ( i = 0; i < tgt_grid.size; ++i )
-    if ( grid2_count[i] > 0 ) icount++;
+    if ( tgt_count[i] > 0 ) icount++;
 
   cdoPrint("number of cells participating in remap %d", icount);
 
@@ -6281,7 +6281,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 	{
 	  icount = 0;
 	  for ( i = 0; i < tgt_grid.size; ++i )
-	    if ( grid2_count[i] >= imin && grid2_count[i] < imax ) icount++;
+	    if ( tgt_count[i] >= imin && tgt_count[i] < imax ) icount++;
 
 	  if ( icount )
 	    cdoPrint("num of rows with entries between %d - %d  %d", imin, imax-1, icount);
@@ -6291,7 +6291,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
 	}
     }
 
-  free(grid2_count);
+  free(tgt_count);
 
   if ( rv.sort_add )
     cdoPrint("Sparse matrix entries are explicitly sorted.");
