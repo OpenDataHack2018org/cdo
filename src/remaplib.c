@@ -510,6 +510,42 @@ void boundbox_from_center(int lonIsCyclic, long size, long nx, long ny, const do
     }
 }
 
+static
+void check_lon_range2(long nc, long nlons, double *corners, double *centers)
+{
+  long n, k;
+
+  assert(corners != NULL);
+  /*
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(nlons, lons)
+#endif
+  */
+  for ( n = 0; n < nlons; ++n )
+    {
+      bool lneg = false, lpos = false;
+
+      for ( k = 0; k < nc; ++k )
+	{
+ 	  if      ( !lneg && corners[n*nc+k] > -PI && corners[n*nc+k] < 0. ) lneg = true;
+	  else if ( !lpos && corners[n*nc+k] <  PI && corners[n*nc+k] > 0. ) lpos = true;
+	}
+
+      if ( lneg && lpos )
+	{
+	  if ( centers[n] > PI )
+	    for ( k = 0; k < nc; ++k ) corners[n*nc+k] += PI2;
+	}
+      else
+	{
+	  for ( k = 0; k < nc; ++k )
+	    {
+	      if ( corners[n*nc+k] > PI2  ) corners[n*nc+k] -= PI2;
+	      if ( corners[n*nc+k] < ZERO ) corners[n*nc+k] += PI2;
+	    }
+	}
+    }
+}
 
 static
 void check_lon_range(long nlons, double *lons)
@@ -993,8 +1029,10 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
   check_lon_range(grid->size, grid->cell_center_lon);
 
   if ( grid->num_cell_corners && grid->lneed_cell_corners )
-    check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
-
+    {
+      //check_lon_range2(grid->num_cell_corners, grid->size, grid->cell_corner_lon, grid->cell_center_lon);
+	check_lon_range(grid->num_cell_corners*grid->size, grid->cell_corner_lon);
+    }
   /*  Make sure input latitude range is within the machine values for +/- pi/2 */
 
   check_lat_range(grid->size, grid->cell_center_lat);
@@ -4493,10 +4531,18 @@ long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr
 	}
     }
 
-  if ( bound_box_lon1 < 0 )
+  if ( bound_box_lon1 < RESTR_SCALE(0.) || bound_box_lon2 > RESTR_SCALE(PI2) )
     {
-      bound_box_lon1 += RESTR_SCALE(PI2);
-      bound_box_lon2 += RESTR_SCALE(PI2);
+      if ( bound_box_lon1 < RESTR_SCALE(0.) )
+	{
+	  bound_box_lon1 += RESTR_SCALE(PI2);
+	  bound_box_lon2 += RESTR_SCALE(PI2);
+	}
+      else
+	{
+	  bound_box_lon1 -= RESTR_SCALE(PI2);
+	  bound_box_lon2 -= RESTR_SCALE(PI2);
+	}
 
       for ( src_grid_add = min_add; src_grid_add <= max_add; ++src_grid_add )
 	{
@@ -5516,20 +5562,22 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
     {
       clat = corner_lat[inc+j];
       clon = corner_lon[inc+j];
+
       if ( clat < bound_box[0] ) bound_box[0] = clat;
       if ( clat > bound_box[1] ) bound_box[1] = clat;
       if ( clon < bound_box[2] ) bound_box[2] = clon;
       if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
-  /*
+
   if ( fabs(bound_box[3] - bound_box[2]) > PI )
     {
       bound_box[2] = 0;
       bound_box[3] = PI2;
     }
-  */
+  /*
+  double dlon = fabs(bound_box[3] - bound_box[2]);
 
-  if ( fabs(bound_box[3] - bound_box[2]) > PI )
+  if ( dlon > PI )
     {
       if ( bound_box[3] > bound_box[2] && (bound_box[3]-PI2) < 0. )
 	{
@@ -5538,6 +5586,7 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 	  bound_box[3] = tmp;
 	}
     }
+  */
 }
 
 static
@@ -5561,18 +5610,19 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
     {
       clat = RESTR_SCALE(corner_lat[inc+j]);
       clon = RESTR_SCALE(corner_lon[inc+j]);
+
       if ( clat < bound_box[0] ) bound_box[0] = clat;
       if ( clat > bound_box[1] ) bound_box[1] = clat;
       if ( clon < bound_box[2] ) bound_box[2] = clon;
       if ( clon > bound_box[3] ) bound_box[3] = clon;
     }
-  /*
+
   if ( fabs(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
       bound_box[2] = 0;
       bound_box[3] = RESTR_SCALE(PI2);
     }
-  */
+  /*
   if ( RESTR_ABS(bound_box[3] - bound_box[2]) > RESTR_SCALE(PI) )
     {
       if ( bound_box[3] > bound_box[2] && (bound_box[3]-RESTR_SCALE(PI2)) < RESTR_SCALE(0.) )
@@ -5582,6 +5632,7 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
 	  bound_box[3] = tmp;
 	}
     }
+  */
 }
 
 //#if defined(HAVE_LIBYAC)
@@ -5817,7 +5868,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, nbins, num_wts, nx, remap_grid_type, src_grid_bound_box,  \
+  shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, nx, remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          remap_store_link_fast, grid_store, rv, cdoVerbose, max_srch_cells2, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
@@ -5881,15 +5932,14 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	  tgt_grid_cell->coordinates_y[ic] = tgt_grid->cell_corner_lat[tgt_grid_add*tgt_num_cell_corners+ic];
 	}
 
-      // printf("target: %ld\n", tgt_grid_add);
-#if ! defined(_OPENMP)
+      //printf("target: %ld\n", tgt_grid_add);
       if ( lyac )
+      if ( tgt_grid_add == 4410 )
 	for ( int n = 0; n < tgt_num_cell_corners; ++n )
 	  {
 	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_x[n]/DEG2RAD);
 	    printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_y[n]/DEG2RAD);
 	  }
-#endif
       
       /* Create search arrays */
 
@@ -5976,9 +6026,10 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	      */
 	    }
 
-#if ! defined(_OPENMP)
 	  if ( lyac )
+	  if ( tgt_grid_add == 4410 )
 	    {
+	      printf("n %d\n", (int)n);
 	      for ( k = 0; k < srch_corners; ++k )
 		{
 		  printf("  SourceCell[ii].coordinates_x[%ld] = %g*rad;\n", k, src_grid_cells[n].coordinates_x[k]/DEG2RAD);
@@ -5986,7 +6037,6 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 		}
 	      printf("  ii++;\n");
 	    }
-#endif
 	}
 
       cdo_compute_overlap_areas(num_srch_cells, overlap_buffer, src_grid_cells, *tgt_grid_cell, partial_areas);
@@ -5998,7 +6048,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	{
 	  if ( partial_areas[n] > 0 )
 	    {
-	      //printf(">>>>   %d %d %g %g\n", n, srch_add[n], tgt_area, partial_areas[n]);
+	      // printf(">>>>   %d %d %g %g\n", (int)tgt_grid_add, srch_add[n], tgt_area, partial_areas[n]);
 	      partial_areas[num_weights] = partial_areas[n];
 	      srch_add[num_weights] = srch_add[n];
 	      num_weights++;

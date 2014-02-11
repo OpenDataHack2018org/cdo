@@ -19,6 +19,7 @@
 #define _CDO_H
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "dmemory.h"
 #include "util.h"
 
