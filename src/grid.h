@@ -18,6 +18,8 @@
 void grid_to_radian(const char *units, long nvals, double *restrict values, const char *description);
 void grid_to_degree(const char *units, long nvals, double *restrict values, const char *description);
 
+void grid_gen_corners(long n, const double* restrict vals, double* restrict corners);
+
 int referenceToGrid(int gridID);
 int gridToZonal(int gridID);
 int gridToMeridional(int gridID);

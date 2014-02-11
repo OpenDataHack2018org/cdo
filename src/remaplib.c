@@ -882,7 +882,21 @@ void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
 }
 
 /*****************************************************************************/
-void gridGenBounds1(int ny, double *yvals, double *ybounds);
+
+static
+void grid_check_lat_borders_rad(int n, double *ybounds)
+{
+  if ( ybounds[0] > ybounds[n-1] )
+    {
+      if ( RAD2DEG*ybounds[0]   >  88 ) ybounds[0]   =  PIH;
+      if ( RAD2DEG*ybounds[n-1] < -88 ) ybounds[n-1] = -PIH;
+    }
+  else
+    {
+      if ( RAD2DEG*ybounds[0]   < -88 ) ybounds[0]   = -PIH;
+      if ( RAD2DEG*ybounds[n-1] >  88 ) ybounds[n-1] =  PIH;
+    }
+}
 
 static
 void remap_define_reg2d(int gridID, remapgrid_t *grid)
@@ -920,8 +934,9 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
   grid->reg2d_corner_lon = malloc(nxp1*sizeof(double));
   grid->reg2d_corner_lat = malloc(nyp1*sizeof(double));
 
-  gridGenBounds1(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
-  gridGenBounds1(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
+  grid_gen_corners(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
+  grid_gen_corners(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
+  grid_check_lat_borders_rad(ny+1, grid->reg2d_corner_lat);
 
   //for ( long i = 0; i < nxp1; ++i ) printf("lon %ld %g\n", i, grid->reg2d_corner_lon[i]);
   //for ( long i = 0; i < nyp1; ++i ) printf("lat %ld %g\n", i, grid->reg2d_corner_lat[i]);
@@ -5574,6 +5589,7 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
       bound_box[2] = 0;
       bound_box[3] = PI2;
     }
+
   /*
   double dlon = fabs(bound_box[3] - bound_box[2]);
 
@@ -5584,6 +5600,11 @@ void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 	  double tmp = bound_box[2];
 	  bound_box[2] = bound_box[3] - PI2;
 	  bound_box[3] = tmp;
+	}
+      else
+	{
+	  bound_box[2] = 0;
+	  bound_box[3] = PI2;
 	}
     }
   */
@@ -5758,7 +5779,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long nx = 0, ny = 0;
   int remap_grid_type = src_grid->remap_grid_type;
   double src_grid_bound_box[4];
-  int lyac = FALSE;
+  int lyac = TRUE;
 
   progressInit();
 
@@ -5934,7 +5955,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       //printf("target: %ld\n", tgt_grid_add);
       if ( lyac )
-      if ( tgt_grid_add == 4410 )
+      if ( tgt_grid_add == 682 )
 	for ( int n = 0; n < tgt_num_cell_corners; ++n )
 	  {
 	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_x[n]/DEG2RAD);
@@ -6027,7 +6048,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    }
 
 	  if ( lyac )
-	  if ( tgt_grid_add == 4410 )
+	  if ( tgt_grid_add == 682 )
 	    {
 	      printf("n %d\n", (int)n);
 	      for ( k = 0; k < srch_corners; ++k )

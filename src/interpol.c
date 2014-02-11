@@ -837,20 +837,6 @@ void intgridbil(field_t *field1, field_t *field2)
 }
 
 
-void gridGenBounds1(int ny, double *yvals, double *ybounds)
-{
-  int i;
-
-  for ( i = 0; i < ny-1; i++ )
-    {
-      ybounds[i+1] = 0.5*(yvals[i] + yvals[i+1]);
-    }
-
-  ybounds[0]  = 2*yvals[0] - ybounds[1];
-  ybounds[ny] = 2*yvals[ny-1] - ybounds[ny-1];
-}
-
-
 void intgridcon(field_t *field1, field_t *field2)
 {
   int nlon1, nlat1;
@@ -898,8 +884,8 @@ void intgridcon(field_t *field1, field_t *field2)
   lon1bounds = malloc(nlon1b*sizeof(double));
   lat1bounds = malloc(nlat1b*sizeof(double));
 
-  gridGenBounds1(nlon1, lon1, lon1bounds);
-  gridGenBounds1(nlat1, lat1, lat1bounds);
+  grid_gen_corners(nlon1, lon1, lon1bounds);
+  grid_gen_corners(nlat1, lat1, lat1bounds);
 
   if ( cdoVerbose )
     {
