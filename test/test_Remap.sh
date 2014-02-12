@@ -2,6 +2,7 @@
 #
 #CDO=src/cdo
 #DATAPATH=../../test/data
+#set -x
 #
 CDODEBUG=0
 #

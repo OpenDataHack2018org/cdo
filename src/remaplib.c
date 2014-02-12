@@ -650,7 +650,7 @@ void grid_check_lat_borders_rad(int n, double *ybounds)
 static
 void remap_define_reg2d(int gridID, remapgrid_t *grid)
 {
-  char units[CDI_MAX_NAME];
+  char unitstr[CDI_MAX_NAME];
   long nx, nxm, ny;
   long nxp1, nyp1;
 
@@ -673,10 +673,10 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   /* Convert lat/lon units if required */
 
-  gridInqYunits(gridID, units);
+  gridInqYunits(gridID, unitstr);
 
-  grid_to_radian(units, nx, grid->reg2d_center_lon, "grid reg2d center lon"); 
-  grid_to_radian(units, ny, grid->reg2d_center_lat, "grid reg2d center lat"); 
+  grid_to_radian(unitstr, nx, grid->reg2d_center_lon, "grid reg2d center lon"); 
+  grid_to_radian(unitstr, ny, grid->reg2d_center_lat, "grid reg2d center lat"); 
 
   if ( grid->is_cyclic ) grid->reg2d_center_lon[nx] = grid->reg2d_center_lon[0] + PI2;
 
@@ -740,6 +740,13 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 
   remapGridRealloc(map_type, grid);
 
+  /* Initialize logical mask */
+
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) shared(gridsize, grid)
+#endif
+  for ( i = 0; i < gridsize; ++i ) grid->mask[i] = TRUE;
+
 
   if ( remap_write_remap == FALSE && grid->remap_grid_type == REMAP_GRID_TYPE_REG2D ) return;
 
@@ -769,12 +776,6 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 	}
     }
 
-  /* Initialize logical mask */
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) shared(gridsize, grid)
-#endif
-  for ( i = 0; i < gridsize; ++i ) grid->mask[i] = TRUE;
 
   if ( gridInqType(grid->gridID) == GRID_GME ) gridInqMaskGME(gridID_gme, grid->vgpm);
 
@@ -876,10 +877,15 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   remapgrid_init(src_grid);
   remapgrid_init(tgt_grid);
 
-  if ( (map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC || map_type == MAP_TYPE_DISTWGT || map_type == MAP_TYPE_CONSPHERE ) &&
-       !gridIsRotated(gridID1) && (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
-    src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
-  // src_grid->remap_grid_type = 0;
+  if ( map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC ||
+       map_type == MAP_TYPE_DISTWGT  || map_type == MAP_TYPE_CONSPHERE )
+    {
+      if ( !gridIsRotated(gridID1) && (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
+	src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      // src_grid->remap_grid_type = 0;
+      //if ( !gridIsRotated(gridID2) && (gridInqType(gridID2) == GRID_LONLAT || gridInqType(gridID2) == GRID_GAUSSIAN) )
+      //	tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+    }
 
   if ( lextrapolate > 0 )
     src_grid->lextrapolate = TRUE;
