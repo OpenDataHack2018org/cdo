@@ -117,18 +117,9 @@ int     vlistIsSzipped(int vlistID);
 
 void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname);
 
-int  gridWeights(int gridID, double *weights);
-int  gridGenArea(int gridID, double *area);
-void gaussaw(double pa[], double pw[], int nlat);
-void genXbounds(long xsize, long ysize, const double * restrict grid_center_lon, 
-		double * restrict grid_corner_lon, double dlon);
-void genYbounds(long xsize, long ysize, const double * restrict grid_center_lat,
-		double * restrict grid_corner_lat);
 void writeNCgrid(const char *gridfile, int gridID, int *imask);
 void defineZaxis(const char *zaxisarg);
 void cdiDefTableID(int tableID);
-void gridGenXvals(int xsize, double xfirst, double xlast, double xinc, double *xvals);
-void gridGenYvals(int gridtype, int ysize, double yfirst, double ylast, double yinc, double *yvals);
 
 int gridFromName(const char *gridname);
 int zaxisFromName(const char *zaxisname);

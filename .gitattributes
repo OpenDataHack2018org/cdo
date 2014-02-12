@@ -587,6 +587,7 @@ src/readline.c -text
 src/realtime.c -text
 src/remap.h -text
 src/remap_scrip_io.c -text
+src/remap_search_latbins.c -text
 src/remaplib.c -text
 src/remapsort.c -text
 src/results_template_parser.c -text

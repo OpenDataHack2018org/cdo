@@ -25,6 +25,7 @@
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
+#include "grid.h"
 
 
 void trms(field_t field1, field_t field2, double *dp, field_t *field3)

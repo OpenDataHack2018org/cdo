@@ -223,7 +223,7 @@ double huiliers_area(int num_corners, double *cell_corner_lon, double *cell_corn
 }
 
 
-int gridGenArea(int gridID, double *area)
+int gridGenArea(int gridID, double* area)
 {
   int status = 0;
   int gridtype;
@@ -231,9 +231,9 @@ int gridGenArea(int gridID, double *area)
   int lgriddestroy = FALSE;
   long i;
   long nv, gridsize;
-  double *grid_corner_lon = NULL;
-  double *grid_corner_lat = NULL;
-  int *grid_mask = NULL;
+  int* grid_mask = NULL;
+  double* grid_corner_lon = NULL;
+  double* grid_corner_lat = NULL;
 
   gridsize = gridInqSize(gridID);
   gridtype = gridInqType(gridID);
@@ -314,13 +314,12 @@ int gridGenArea(int gridID, double *area)
     {
       if ( lgrid_gen_bounds )
 	{
+	  char xunitstr[CDI_MAX_NAME];
+	  char yunitstr[CDI_MAX_NAME];
 	  int nlon = gridInqXsize(gridID);
 	  int nlat = gridInqYsize(gridID);
 	  double dlon = 0;
-	  if ( nlon == 1 )
-	    {
-	      dlon = 1;
-	    }
+	  if ( nlon == 1 ) dlon = 1;
 
 	  double *grid_center_lon = NULL;
 	  double *grid_center_lat = NULL;
@@ -331,8 +330,11 @@ int gridGenArea(int gridID, double *area)
 	  gridInqXvals(gridID, grid_center_lon);
 	  gridInqYvals(gridID, grid_center_lat);
 
-	  genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
-	  genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
+	  gridInqXunits(gridID, xunitstr);
+	  gridInqYunits(gridID, yunitstr);
+
+	  grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, dlon);
+	  grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
 
 	  free(grid_center_lon);
 	  free(grid_center_lat);

@@ -770,8 +770,12 @@ void *Outputgmt(void *argument)
 	{
 	  if ( lgrid_gen_bounds )
 	    {
-	      if ( ! lzon ) genXbounds(nlon, nlat, grid_center_lon, grid_corner_lon, 0);
-	      if ( ! lmer ) genYbounds(nlon, nlat, grid_center_lat, grid_corner_lat);
+	      char xunitstr[CDI_MAX_NAME];
+	      char yunitstr[CDI_MAX_NAME];
+	      gridInqXunits(gridID, xunitstr);
+	      gridInqYunits(gridID, yunitstr);
+	      if ( ! lzon ) grid_cell_center_to_bounds_X2D(xunitstr, nlon, nlat, grid_center_lon, grid_corner_lon, 0);
+	      if ( ! lmer ) grid_cell_center_to_bounds_Y2D(yunitstr, nlon, nlat, grid_center_lat, grid_corner_lat);
 	    }
 	  else
 	    cdoAbort("Grid corner missing!");

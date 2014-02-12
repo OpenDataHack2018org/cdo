@@ -209,6 +209,127 @@ void grid_check_lat_borders(int n, double *ybounds)
 }
 
 
+void grid_cell_center_to_bounds_X2D(const char* xunitstr, long xsize, long ysize, const double* restrict grid_center_lon, 
+				    double* restrict grid_corner_lon, double dlon)
+{
+  long i, j, index;
+  double minlon, maxlon;
+
+  if ( ! (dlon > 0) ) dlon = 360./xsize;
+  /*
+  if ( xsize == 1 || (grid_center_lon[xsize-1]-grid_center_lon[0]+dlon) < 359 )
+    cdoAbort("Cannot calculate Xbounds for %d vals with dlon = %g", xsize, dlon);
+  */
+  for ( i = 0; i < xsize; ++i )
+    {
+      minlon = grid_center_lon[i] - 0.5*dlon;
+      maxlon = grid_center_lon[i] + 0.5*dlon;
+      for ( j = 0; j < ysize; ++j )
+	{
+	  index = (j<<2)*xsize + (i<<2);
+	  grid_corner_lon[index  ] = minlon;
+	  grid_corner_lon[index+1] = maxlon;
+	  grid_corner_lon[index+2] = maxlon;
+	  grid_corner_lon[index+3] = minlon;
+	}
+    }
+}
+
+static
+double genYmin(double y1, double y2)
+{
+  double ymin, dy;
+
+  dy = y2 - y1;
+  ymin = y1 - dy/2;
+
+  if ( y1 < -85 && ymin < -87.5 ) ymin = -90;
+
+  if ( cdoVerbose )
+    cdoPrint("genYmin: y1 = %g  y2 = %g  dy = %g  ymin = %g", y1, y2, dy, ymin);
+
+  return (ymin);
+}
+
+static
+double genYmax(double y1, double y2)
+{
+  double ymax, dy;
+
+  dy = y1 - y2;
+  ymax = y1 + dy/2;
+
+  if ( y1 > 85 && ymax > 87.5 ) ymax = 90;
+
+  if ( cdoVerbose )
+    cdoPrint("genYmax: y1 = %g  y2 = %g  dy = %g  ymax = %g", y1, y2, dy, ymax);
+
+  return (ymax);
+}
+
+
+
+/*****************************************************************************/
+
+void grid_cell_center_to_bounds_Y2D(const char* yunitstr, long xsize, long ysize, const double* restrict grid_center_lat, double* restrict grid_corner_lat)
+{
+  long i, j, index;
+  double minlat, maxlat;
+  double firstlat, lastlat;
+
+  firstlat = grid_center_lat[0];
+  lastlat  = grid_center_lat[xsize*ysize-1];
+
+  // if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value!");
+
+  for ( j = 0; j < ysize; ++j )
+    {
+      if ( ysize == 1 )
+	{
+	  minlat = grid_center_lat[0] - 360./ysize;
+	  maxlat = grid_center_lat[0] + 360./ysize;
+	}
+      else
+	{
+	  index = j*xsize;
+	  if ( firstlat > lastlat )
+	    {
+	      if ( j == 0 )
+		maxlat = genYmax(grid_center_lat[index], grid_center_lat[index+xsize]);
+	      else
+		maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
+
+	      if ( j == (ysize-1) )
+		minlat = genYmin(grid_center_lat[index], grid_center_lat[index-xsize]);
+	      else
+		minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
+	    }
+	  else
+	    {
+	      if ( j == 0 )
+		minlat = genYmin(grid_center_lat[index], grid_center_lat[index+xsize]);
+	      else
+		minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
+
+	      if ( j == (ysize-1) )
+		maxlat = genYmax(grid_center_lat[index], grid_center_lat[index-xsize]);
+	      else
+		maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
+	    }
+	}
+
+      for ( i = 0; i < xsize; ++i )
+	{
+	  index = (j<<2)*xsize + (i<<2);
+	  grid_corner_lat[index  ] = minlat;
+	  grid_corner_lat[index+1] = minlat;
+	  grid_corner_lat[index+2] = maxlat;
+	  grid_corner_lat[index+3] = maxlat;
+	}
+    }
+}
+
+
 void gridGenRotBounds(int gridID, int nx, int ny,
 		      double *xbounds, double *ybounds, double *xbounds2D, double *ybounds2D)
 {
@@ -254,7 +375,7 @@ void gridGenRotBounds(int gridID, int nx, int ny,
 }
 
 static
-void gridGenXbounds2D(int nx, int ny, const double * restrict xbounds, double * restrict xbounds2D)
+void gridGenXbounds2D(long nx, long ny, const double* restrict xbounds, double* restrict xbounds2D)
 {
   long i, j, index;
   double minlon, maxlon;
@@ -281,7 +402,7 @@ void gridGenXbounds2D(int nx, int ny, const double * restrict xbounds, double * 
 }
 
 static
-void gridGenYbounds2D(int nx, int ny, const double * restrict ybounds, double * restrict ybounds2D)
+void gridGenYbounds2D(long nx, long ny, const double* restrict ybounds, double* restrict ybounds2D)
 {
   long i, j, index;
   double minlat, maxlat;

@@ -5,14 +5,9 @@
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
-#ifndef _DMEMORY_H
-#  include "dmemory.h"
-#endif
-
-#ifndef _ERROR_H
-#  include "error.h"
-#endif
 #include "specspace.h"
+#include "error.h"
+#include "grid.h"
 
 
 #define  SQUARE_RADIUS   (-PlanetRadius * PlanetRadius)

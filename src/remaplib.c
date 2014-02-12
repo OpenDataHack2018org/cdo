@@ -98,9 +98,6 @@ typedef struct
 #define  QUART    0.25
 #define  BIGNUM   1.e+20
 #define  TINY     1.e-14
-#define  PI       M_PI
-#define  PI2      TWO*PI
-#define  PIH      HALF*PI
 
 
 #define  REMAP_GRID_TYPE_REG2D     1
@@ -199,129 +196,6 @@ void remapVarsFree(remapvars_t *rv)
     fprintf(stderr, "%s Warning: vars not initialized!\n", __func__);
 
 } /* remapVarsFree */
-
-/*****************************************************************************/
-
-void genXbounds(long xsize, long ysize, const double *restrict grid_center_lon, 
-		double *restrict grid_corner_lon, double dlon)
-{
-  long i, j, index;
-  double minlon, maxlon;
-
-  if ( ! (dlon > 0) ) dlon = 360./xsize;
-  /*
-  if ( xsize == 1 || (grid_center_lon[xsize-1]-grid_center_lon[0]+dlon) < 359 )
-    cdoAbort("Cannot calculate Xbounds for %d vals with dlon = %g", xsize, dlon);
-  */
-  for ( i = 0; i < xsize; ++i )
-    {
-      minlon = grid_center_lon[i] - HALF*dlon;
-      maxlon = grid_center_lon[i] + HALF*dlon;
-      for ( j = 0; j < ysize; ++j )
-	{
-	  index = (j<<2)*xsize + (i<<2);
-	  grid_corner_lon[index  ] = minlon;
-	  grid_corner_lon[index+1] = maxlon;
-	  grid_corner_lon[index+2] = maxlon;
-	  grid_corner_lon[index+3] = minlon;
-	}
-    }
-}
-
-
-double genYmin(double y1, double y2)
-{
-  double ymin, dy;
-
-  dy = y2 - y1;
-  ymin = y1 - dy/2;
-
-  if ( y1 < -85 && ymin < -87.5 ) ymin = -90;
-
-  if ( cdoVerbose )
-    cdoPrint("genYmin: y1 = %g  y2 = %g  dy = %g  ymin = %g", y1, y2, dy, ymin);
-
-  return (ymin);
-}
-
-
-double genYmax(double y1, double y2)
-{
-  double ymax, dy;
-
-  dy = y1 - y2;
-  ymax = y1 + dy/2;
-
-  if ( y1 > 85 && ymax > 87.5 ) ymax = 90;
-
-  if ( cdoVerbose )
-    cdoPrint("genYmax: y1 = %g  y2 = %g  dy = %g  ymax = %g", y1, y2, dy, ymax);
-
-  return (ymax);
-}
-
-
-
-/*****************************************************************************/
-
-void genYbounds(long xsize, long ysize, const double *restrict grid_center_lat,
-		double *restrict grid_corner_lat)
-{
-  long i, j, index;
-  double minlat, maxlat;
-  double firstlat, lastlat;
-
-  firstlat = grid_center_lat[0];
-  lastlat  = grid_center_lat[xsize*ysize-1];
-
-  // if ( ysize == 1 ) cdoAbort("Cannot calculate Ybounds for 1 value!");
-
-  for ( j = 0; j < ysize; ++j )
-    {
-      if ( ysize == 1 )
-	{
-	  minlat = grid_center_lat[0] - 360./ysize;
-	  maxlat = grid_center_lat[0] + 360./ysize;
-	}
-      else
-	{
-	  index = j*xsize;
-	  if ( firstlat > lastlat )
-	    {
-	      if ( j == 0 )
-		maxlat = genYmax(grid_center_lat[index], grid_center_lat[index+xsize]);
-	      else
-		maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
-
-	      if ( j == (ysize-1) )
-		minlat = genYmin(grid_center_lat[index], grid_center_lat[index-xsize]);
-	      else
-		minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
-	    }
-	  else
-	    {
-	      if ( j == 0 )
-		minlat = genYmin(grid_center_lat[index], grid_center_lat[index+xsize]);
-	      else
-		minlat = 0.5*(grid_center_lat[index]+grid_center_lat[index-xsize]);
-
-	      if ( j == (ysize-1) )
-		maxlat = genYmax(grid_center_lat[index], grid_center_lat[index-xsize]);
-	      else
-		maxlat = 0.5*(grid_center_lat[index]+grid_center_lat[index+xsize]);
-	    }
-	}
-
-      for ( i = 0; i < xsize; ++i )
-	{
-	  index = (j<<2)*xsize + (i<<2);
-	  grid_corner_lat[index  ] = minlat;
-	  grid_corner_lat[index+1] = minlat;
-	  grid_corner_lat[index+2] = maxlat;
-	  grid_corner_lat[index+3] = maxlat;
-	}
-    }
-}
 
 /*****************************************************************************/
 
@@ -756,131 +630,6 @@ int expand_curvilinear_grid(int gridID)
   return(gridIDnew);
 }
 
-
-static
-void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, const restr_t *restrict cell_bound_box, int *restrict bin_addr)
-{
-  long n, n2, nele, nele4;
-  restr_t cell_bound_box_lat1, cell_bound_box_lat2;
-
-  for ( n = 0; n < nbins; ++n )
-    {
-      n2 = n<<1;
-      bin_addr[n2  ] = gridsize;
-      bin_addr[n2+1] = 0;
-    }
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  private(n, n2, nele4, cell_bound_box_lat1, cell_bound_box_lat2)  \
-  shared(gridsize, nbins, bin_lats, cell_bound_box, bin_addr)
-#endif
-  for ( nele = 0; nele < gridsize; ++nele )
-    {
-      nele4 = nele<<2;
-      cell_bound_box_lat1 = cell_bound_box[nele4  ];
-      cell_bound_box_lat2 = cell_bound_box[nele4+1];
-      for ( n = 0; n < nbins; ++n )
-	{
-	  n2 = n<<1;
-	  if ( cell_bound_box_lat1 <= bin_lats[n2+1] &&
-	       cell_bound_box_lat2 >= bin_lats[n2  ] )
-	    {
-	      /*
-#if defined(_OPENMP)
-	      if ( nele < bin_addr[n2  ] || nele > bin_addr[n2+1] )
-#pragma omp critical
-#endif
-	      */
-		{
-		  bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
-		  bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
-		}
-	    }
-	}
-    }
-}
-/*
-static
-void calc_bin_addr(long gridsize, long nbins, const restr_t *restrict bin_lats, const restr_t *restrict cell_bound_box, int *restrict bin_addr)
-{
-  long n, n2, nele, nele4;
-
-  for ( n = 0; n < nbins; ++n )
-    {
-      n2 = n<<1;
-      bin_addr[n2  ] = gridsize;
-      bin_addr[n2+1] = 0;
-
-#if defined(_OPENMP)
-#pragma omp parallel for default(none) \
-  private(nele4)	\
-  shared(n2, gridsize, bin_lats, cell_bound_box, bin_addr)
-#endif
-      for ( nele = 0; nele < gridsize; ++nele )
-	{
-	  nele4 = nele<<2;
-
-	  if ( cell_bound_box[nele4  ] <= bin_lats[n2+1] &&
-	       cell_bound_box[nele4+1] >= bin_lats[n2  ] )
-	    {
-	      bin_addr[n2  ] = MIN(nele, bin_addr[n2  ]);
-	      bin_addr[n2+1] = MAX(nele, bin_addr[n2+1]);
-	    }
-	}
-    }
-}
-*/
-static
-void calc_lat_bins(remapgrid_t *src_grid, remapgrid_t *tgt_grid, int map_type)
-{
-  long nbins;
-  long n;      /* Loop counter                  */
-  long n2;
-  double dlat;                /* lat/lon intervals for search bins  */
-  restr_t *bin_lats = NULL;
-
-  nbins = src_grid->num_srch_bins;
-  dlat = PI/nbins;
-
-  if ( cdoVerbose ) cdoPrint("Using %d latitude bins to restrict search.", nbins);
-
-  if ( nbins > 0 )
-    {
-      bin_lats = src_grid->bin_lats = realloc(src_grid->bin_lats, 2*nbins*sizeof(restr_t));
-
-      for ( n = 0; n < nbins; ++n )
-	{
-	  n2 = n<<1;
-	  bin_lats[n2  ] = RESTR_SCALE((n  )*dlat - PIH);
-	  bin_lats[n2+1] = RESTR_SCALE((n+1)*dlat - PIH);
-	}
-
-      src_grid->bin_addr = realloc(src_grid->bin_addr, 2*nbins*sizeof(int));
-
-      calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
-
-      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
-	{
-	  tgt_grid->bin_addr = realloc(tgt_grid->bin_addr, 2*nbins*sizeof(int));
-
-	  calc_bin_addr(tgt_grid->size, nbins, bin_lats, tgt_grid->cell_bound_box, tgt_grid->bin_addr);
-
-	  free(src_grid->bin_lats); src_grid->bin_lats = NULL;
-	}
-   }
-
-  if ( map_type == MAP_TYPE_CONSPHERE )
-    {
-      free(tgt_grid->cell_bound_box); tgt_grid->cell_bound_box = NULL;
-    }
- 
-  if ( map_type == MAP_TYPE_DISTWGT )
-    {
-      free(src_grid->cell_bound_box); src_grid->cell_bound_box = NULL;
-    }
-}
-
 /*****************************************************************************/
 
 static
@@ -946,7 +695,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 static
 void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 {
-  char units[CDI_MAX_NAME];
+  char xunitstr[CDI_MAX_NAME];
+  char yunitstr[CDI_MAX_NAME];
   long gridsize;
   long i;
   int lgrid_destroy = FALSE;
@@ -997,6 +747,10 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
   gridInqXvals(gridID, grid->cell_center_lon);
   gridInqYvals(gridID, grid->cell_center_lat);
 
+  gridInqXunits(gridID, xunitstr);
+  gridInqYunits(gridID, yunitstr);
+
+
   if ( grid->lneed_cell_corners )
     {
       if ( gridInqYbounds(gridID, NULL) && gridInqXbounds(gridID, NULL) )
@@ -1006,8 +760,8 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 	}
       else if ( lgrid_gen_bounds )
 	{
-	  genXbounds(grid->dims[0], grid->dims[1], grid->cell_center_lon, grid->cell_corner_lon, 0);
-	  genYbounds(grid->dims[0], grid->dims[1], grid->cell_center_lat, grid->cell_corner_lat);
+	  grid_cell_center_to_bounds_X2D(xunitstr, grid->dims[0], grid->dims[1], grid->cell_center_lon, grid->cell_corner_lon, 0);
+	  grid_cell_center_to_bounds_Y2D(yunitstr, grid->dims[0], grid->dims[1], grid->cell_center_lat, grid->cell_corner_lat);
 	}
       else
 	{
@@ -1026,15 +780,13 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 
   /* Convert lat/lon units if required */
 
-  gridInqYunits(gridID, units);
-
-  grid_to_radian(units, grid->size, grid->cell_center_lon, "grid center lon"); 
-  grid_to_radian(units, grid->size, grid->cell_center_lat, "grid center lat"); 
-  /* Note: using units from latitude instead from bounds */
+  grid_to_radian(xunitstr, grid->size, grid->cell_center_lon, "grid center lon"); 
+  grid_to_radian(yunitstr, grid->size, grid->cell_center_lat, "grid center lat"); 
+  /* Note: using units from cell center instead from bounds */
   if ( grid->num_cell_corners && grid->lneed_cell_corners )
     {
-      grid_to_radian(units, grid->num_cell_corners*grid->size, grid->cell_corner_lon, "grid corner lon"); 
-      grid_to_radian(units, grid->num_cell_corners*grid->size, grid->cell_corner_lat, "grid corner lat"); 
+      grid_to_radian(xunitstr, grid->num_cell_corners*grid->size, grid->cell_corner_lon, "grid corner lon"); 
+      grid_to_radian(yunitstr, grid->num_cell_corners*grid->size, grid->cell_corner_lat, "grid corner lat"); 
     }
 
   if ( lgrid_destroy ) gridDestroy(gridID);

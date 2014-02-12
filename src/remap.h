@@ -2,6 +2,12 @@
 #include <omp.h>
 #endif
 
+#include <math.h>
+
+#define  PI       M_PI
+#define  PI2      2.0*PI
+#define  PIH      0.5*PI
+
 #define  REMAP_GRID_BASIS_SRC  1
 #define  REMAP_GRID_BASIS_TGT  2
 
@@ -184,3 +190,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
 		      int *remap_order, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 
 void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, double *restrict weights);
+
+
+void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, const restr_t* restrict cell_bound_box, int* restrict bin_addr);
+void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type);
