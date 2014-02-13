@@ -5,8 +5,8 @@ CDO=src/cdo
 #
 RMODS="bil bic nn con cons"
 #
-cdo -setrtomiss,0,10000 -topo topo05
-cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
+#cdo -setrtomiss,0,10000 -topo topo05
+#cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
 #
 IFILE=topo005
 #
@@ -24,6 +24,15 @@ done
 #
 # CDO 1.6.3
 #
+#       con/curv  cons/curv  cons/reg2d
+#   1   195s       243s       161s
+#   2   129s       130s        90s 
+#   4   185s        93s        74s
+#      4024MB     5836MB     1024MB
+####################################################
+#
+# CDO 1.6.3
+#
 # result on hama:
 # =================
 #         bil    bic    nn   con   cons
@@ -33,8 +42,8 @@ done
 # result on bailung:
 # =================
 #         bil    bic    nn   con   cons
-# reg2d   0.7    1.6     1   204    160
-# curv   36.9   37.9   843   210    237
+# reg2d   0.7    1.6     1   194    160
+# curv   36.9   37.9   843   200    237
 #
 # result on blizzard: (interactiv)
 # ==================

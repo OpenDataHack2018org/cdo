@@ -5713,7 +5713,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       //printf("target: %ld\n", tgt_grid_add);
       if ( lyac )
-      if ( tgt_grid_add == 682 )
+	// if ( tgt_grid_add == 682 )
 	for ( int n = 0; n < tgt_num_cell_corners; ++n )
 	  {
 	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_x[n]/DEG2RAD);
@@ -5806,7 +5806,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    }
 
 	  if ( lyac )
-	  if ( tgt_grid_add == 682 )
+	    //  if ( tgt_grid_add == 682 )
 	    {
 	      printf("n %d\n", (int)n);
 	      for ( k = 0; k < srch_corners; ++k )
