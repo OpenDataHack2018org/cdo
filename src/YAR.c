@@ -142,12 +142,8 @@ void set_source_data(double * source_data, double init_value,
 static
 long find_ij_weights(double plon, double plat, double *restrict src_lats, double *restrict src_lons, double *ig, double *jg)
 {
-#define  TWO      2.0
 #define  THREE    3.0
 #define  HALF     0.5
-#define  PI       M_PI
-#define  PI2      TWO*PI
-#define  PIH      HALF*PI
   long    Max_Iter = 100;
   double  converge = 1.e-10;            /* Convergence criterion */
   long iter;                     /*  iteration counters   */

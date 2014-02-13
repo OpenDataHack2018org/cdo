@@ -357,7 +357,7 @@ struct FtpFile {
 };
 
 
-int my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
+size_t my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 {
   struct FtpFile *out=(struct FtpFile *)stream;
   if(out && !out->stream) {
@@ -369,13 +369,13 @@ int my_fwrite(void *buffer, size_t size, size_t nmemb, void *stream)
 }
 
 
-int my_progress_func(int *stdout_is_tty,
-                     double t, /* dltotal */
-                     double d, /* dlnow */
-                     double ultotal,
-                     double ulnow)
+int my_progress_func(void *stdout_is_tty,
+			double t, /* dltotal */
+			double d, /* dlnow */
+			double ultotal,
+			double ulnow)
 {
-  if ( *stdout_is_tty )
+  if ( *(char*)stdout_is_tty )
     {
       fprintf(stdout, "\b\b\b\b\b%4d%%", (int) (d*100/t));
       fflush(stdout);

@@ -31,7 +31,8 @@
  * callback function for curl for writing the network retrieved grid file
  */
 static
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
   size_t written;
   written = fwrite(ptr, size, nmemb, stream);
   return written;
