@@ -4207,10 +4207,14 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
       if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
       if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
       lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxp1, src_corner_lon);
-      if ( debug ) printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin], RAD2DEG*src_corner_lon[imax+1], imin, imax, jmin, jmax);
-      for ( jm = jmin; jm <= jmax; ++jm )
-	for ( im = imin; im <= imax; ++im )
-	  srch_add[num_srch_cells++] = jm*nx + im;
+      if ( imin != -1 )
+	{
+	  if ( debug )
+	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin], RAD2DEG*src_corner_lon[imax+1], imin, imax, jmin, jmax);
+	  for ( jm = jmin; jm <= jmax; ++jm )
+	    for ( im = imin; im <= imax; ++im )
+	      srch_add[num_srch_cells++] = jm*nx + im;
+	}
     }
 
   bound_lon1 = tgt_cell_bound_box[2];
@@ -4226,10 +4230,14 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
       lfound = rect_grid_search2(&imin2, &imax2, bound_lon1, bound_lon2, nxp1, src_corner_lon);
       if ( imin2 != -1 && imin2 == imax ) imin2 += 1;
       if ( imax2 != -1 && imax2 == imax ) imax2 += 1;
-      if ( debug ) printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin2], RAD2DEG*src_corner_lon[imax2+1], imin2, imax2, jmin, jmax);
-      for ( jm = jmin; jm <= jmax; ++jm )
-	for ( im = imin2; im <= imax2; ++im )
-	  srch_add[num_srch_cells++] = jm*nx + im;
+      if ( imin2 != -1 )
+	{
+	  if ( debug )
+	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin2], RAD2DEG*src_corner_lon[imax2+1], imin2, imax2, jmin, jmax);
+	  for ( jm = jmin; jm <= jmax; ++jm )
+	    for ( im = imin2; im <= imax2; ++im )
+	      srch_add[num_srch_cells++] = jm*nx + im;
+	}
     }
 
   bound_lon1 = tgt_cell_bound_box[2];
@@ -4245,10 +4253,14 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
       lfound = rect_grid_search2(&imin3, &imax3, bound_lon1, bound_lon2, nxp1, src_corner_lon);
       if ( imin3 != -1 && imin3 == imin ) imin3 -= 1;
       if ( imax3 != -1 && imax3 == imin ) imax3 -= 1;
-      if ( debug) printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin3], RAD2DEG*src_corner_lon[imax3+1], imin3, imax3, jmin, jmax);
-      for ( jm = jmin; jm <= jmax; ++jm )
-	for ( im = imin3; im <= imax3; ++im )
-	  srch_add[num_srch_cells++] = jm*nx + im;
+      if ( imin3 != -1 )
+	{
+	  if ( debug )
+	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin3], RAD2DEG*src_corner_lon[imax3+1], imin3, imax3, jmin, jmax);
+	  for ( jm = jmin; jm <= jmax; ++jm )
+	    for ( im = imin3; im <= imax3; ++im )
+	      srch_add[num_srch_cells++] = jm*nx + im;
+	}
     }
 
   return (num_srch_cells);
@@ -5537,7 +5549,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   long nx = 0, ny = 0;
   int remap_grid_type = src_grid->remap_grid_type;
   double src_grid_bound_box[4];
-  int lyac = TRUE;
+  int lyac = FALSE;
 
   progressInit();
 
@@ -5827,7 +5839,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	{
 	  if ( partial_areas[n] > 0 )
 	    {
-	      // printf(">>>>   %d %d %g %g\n", (int)tgt_grid_add, srch_add[n], tgt_area, partial_areas[n]);
+	      //printf(">>>>   %d %d %g %g\n", (int)tgt_grid_add, srch_add[n], tgt_area, partial_areas[n]);
 	      partial_areas[num_weights] = partial_areas[n];
 	      srch_add[num_weights] = srch_add[n];
 	      num_weights++;
