@@ -259,6 +259,8 @@ static void getnite(FILE *nmlfp, namelist_t *nml)
 		{
 		  if ( !(islower((int) nml->line.linelc[j]) ||
 			 (((int) nml->line.linelc[j]) == '_') ||
+			 (((int) nml->line.linelc[j]) == '-') ||
+			 (((int) nml->line.linelc[j]) == '+') ||
 			 isdigit((int) nml->line.linelc[j])) )
 		    {
 		      nml->line.namitl = j - 1;
