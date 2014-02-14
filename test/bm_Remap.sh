@@ -42,8 +42,8 @@ done
 # result on bailung:
 # =================
 #         bil    bic    nn   con   cons
-# reg2d   0.7    1.6     1   194    160
-# curv   36.9   37.9   843   200    237
+# reg2d   0.7    1.6     1   194    230/160
+# curv   36.9   37.9   843   200    305/237
 #
 # result on blizzard: (interactiv)
 # ==================
