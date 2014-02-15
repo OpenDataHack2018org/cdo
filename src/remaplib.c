@@ -44,7 +44,7 @@
   2009-05-25 Uwe Schulzweida: Changed restrict data type from double to int
   2009-01-11 Uwe Schulzweida: OpenMP parallelization
  */
-
+#define TEST_REG2D 1
 
 #if defined(HAVE_CONFIG_H)
 #  include "config.h"
@@ -60,6 +60,8 @@
 #include "remap.h"
 #include "util.h"  /* progressStatus */
 
+
+#define IS_REG2D_GRID(gridID)  (!gridIsRotated(gridID) && (gridInqType(gridID) == GRID_LONLAT || gridInqType(gridID) == GRID_GAUSSIAN))
 
 /* used for store_link_fast */
 
@@ -872,6 +874,7 @@ void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *src_grid, int gridID2, remapgrid_t *tgt_grid)
 {
   int reg2d_src_gridID = gridID1;
+  int reg2d_tgt_gridID = gridID2;
 
   /* Initialize remapgrid structure */
   remapgrid_init(src_grid);
@@ -880,12 +883,16 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   if ( map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC ||
        map_type == MAP_TYPE_DISTWGT  || map_type == MAP_TYPE_CONSPHERE )
     {
-      if ( !gridIsRotated(gridID1) && (gridInqType(gridID1) == GRID_LONLAT || gridInqType(gridID1) == GRID_GAUSSIAN) )
-	src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+      if ( IS_REG2D_GRID(gridID1) ) src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // src_grid->remap_grid_type = 0;
-      //if ( !gridIsRotated(gridID2) && (gridInqType(gridID2) == GRID_LONLAT || gridInqType(gridID2) == GRID_GAUSSIAN) )
-      //	tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
     }
+
+#if defined(TEST_REG2D)
+  if ( map_type == MAP_TYPE_CONSPHERE && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    {
+      if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
+    }
+#endif
 
   if ( lextrapolate > 0 )
     src_grid->lextrapolate = TRUE;
@@ -899,8 +906,12 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 	  src_grid->luse_cell_corners  = TRUE;
 	  src_grid->lneed_cell_corners = TRUE;
 	}
-      tgt_grid->luse_cell_corners  = TRUE;
-      tgt_grid->lneed_cell_corners = TRUE;
+
+      if ( tgt_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
+	{
+	  tgt_grid->luse_cell_corners  = TRUE;
+	  tgt_grid->lneed_cell_corners = TRUE;
+	}
     }
 
   src_grid->gridID = gridID1;
@@ -974,6 +985,14 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
 
   remap_define_grid(map_type, gridID2, tgt_grid);
 
+#if defined(TEST_REG2D)
+  if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+    {
+      remap_define_reg2d(reg2d_src_gridID, src_grid);
+      remap_define_reg2d(reg2d_tgt_gridID, tgt_grid);
+    }
+  else
+#endif
   if ( src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
       remap_define_reg2d(reg2d_src_gridID, src_grid);
@@ -4175,12 +4194,12 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 			  const double *restrict src_corner_lat, const double *restrict src_corner_lon,
 			  const double *restrict tgt_cell_bound_box, int *srch_add)
 {
+  long nx = src_grid_dims[0];
+  long ny = src_grid_dims[1];
   long num_srch_cells;  /* num cells in restricted search arrays   */
   int lfound;
   long nxp1, nyp1;
   double src_lon_min, src_lon_max;
-  long nx = src_grid_dims[0];
-  long ny = src_grid_dims[1];
   int debug = 0;
 
   nxp1 = nx+1;
@@ -5327,6 +5346,35 @@ void restrict_boundbox(const double *restrict grid_bound_box, double *restrict b
 }
 
 static
+void boundbox_from_corners_reg2d(long grid_add, const int *restrict grid_dims, const double *restrict corner_lon,
+				 const double *restrict corner_lat, double *restrict bound_box)
+{
+  long nx = grid_dims[0];
+  long ix, iy;
+  double clat1, clat2;
+
+  iy = grid_add/nx;
+  ix = grid_add - iy*nx;
+
+  clat1 = corner_lat[iy  ];
+  clat2 = corner_lat[iy+1];
+
+  if ( clat2 > clat1 )
+    {
+      bound_box[0] = clat1;
+      bound_box[1] = clat2;
+    }
+  else
+    {
+      bound_box[0] = clat2;
+      bound_box[1] = clat1;
+    }
+
+  bound_box[2] = corner_lon[ix  ];
+  bound_box[3] = corner_lon[ix+1];
+}
+
+static
 void boundbox_from_corners1(long ic, long nc, const double *restrict corner_lon,
 			    const double *restrict corner_lat, double *restrict bound_box)
 {
@@ -5547,7 +5595,8 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   double findex = 0;
   long num_weights = 0;
   long nx = 0, ny = 0;
-  int remap_grid_type = src_grid->remap_grid_type;
+  int src_remap_grid_type = src_grid->remap_grid_type;
+  int tgt_remap_grid_type = tgt_grid->remap_grid_type;
   double src_grid_bound_box[4];
   int lyac = FALSE;
 
@@ -5631,7 +5680,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   srch_corners = src_num_cell_corners;
 
-  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+  if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
       nx = src_grid->dims[0];
       ny = src_grid->dims[1];
@@ -5652,18 +5701,16 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   findex = 0;
 
-#if ! defined(_OPENMP)
   int sum_srch_cells = 0;
   int sum_srch_cells2 = 0;
-#endif
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, nx, remap_grid_type, src_grid_bound_box,	\
+  shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, nx, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
          remap_store_link_fast, grid_store, rv, cdoVerbose, max_srch_cells2, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
-	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex) \
+	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
   private(ompthID, srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
 	  partial_areas, partial_weights, overlap_buffer, src_grid_cells, src_grid_add, tgt_grid_add, ioffset)
 #endif
@@ -5689,7 +5736,21 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       /* Get search cells */
 
-      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+#if defined(TEST_REG2D)
+      if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D && tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	{
+	  double tgt_cell_bound_box[4];
+	  boundbox_from_corners_reg2d(tgt_grid_add, tgt_grid->dims, tgt_grid->reg2d_corner_lon, tgt_grid->reg2d_corner_lat, tgt_cell_bound_box);
+	  restrict_boundbox(src_grid_bound_box, tgt_cell_bound_box);
+	  if ( cdoVerbose )
+	    printf("bound_box %ld  lon: %g %g lat: %g %g\n",
+		   tgt_grid_add, RAD2DEG*tgt_cell_bound_box[2],RAD2DEG*tgt_cell_bound_box[3],RAD2DEG*tgt_cell_bound_box[0],RAD2DEG*tgt_cell_bound_box[1] );
+	  num_srch_cells = get_srch_cells_reg2d(src_grid->dims, src_grid->reg2d_corner_lat, src_grid->reg2d_corner_lon,
+						tgt_cell_bound_box, srch_add);
+	}
+      else
+#endif
+      if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	{
 	  double tgt_cell_bound_box[4];
 	  boundbox_from_corners1(tgt_grid_add, tgt_num_cell_corners, tgt_grid->cell_corner_lon, tgt_grid->cell_corner_lat, tgt_cell_bound_box);
@@ -5709,14 +5770,33 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 					  tgt_cell_bound_box_r, src_grid->cell_bound_box, src_grid_size, srch_add);
 	}
 
-#if ! defined(_OPENMP)
       sum_srch_cells += num_srch_cells;
-#endif
+
       if ( cdoVerbose )
 	printf("tgt_grid_add %ld  num_srch_cells %ld\n", tgt_grid_add, num_srch_cells);
 
       if ( num_srch_cells == 0 ) continue;
 
+#if defined(TEST_REG2D)
+      if ( tgt_remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	{
+	  long nx = tgt_grid->dims[0];
+	  long ix, iy;
+
+	  iy = tgt_grid_add/nx;
+	  ix = tgt_grid_add - iy*nx;
+
+	  tgt_grid_cell->coordinates_x[0] = tgt_grid->reg2d_corner_lon[ix  ];
+	  tgt_grid_cell->coordinates_y[0] = tgt_grid->reg2d_corner_lat[iy  ];
+	  tgt_grid_cell->coordinates_x[1] = tgt_grid->reg2d_corner_lon[ix+1];
+	  tgt_grid_cell->coordinates_y[1] = tgt_grid->reg2d_corner_lat[iy  ];
+	  tgt_grid_cell->coordinates_x[2] = tgt_grid->reg2d_corner_lon[ix+1];
+	  tgt_grid_cell->coordinates_y[2] = tgt_grid->reg2d_corner_lat[iy+1];
+	  tgt_grid_cell->coordinates_x[3] = tgt_grid->reg2d_corner_lon[ix  ];
+	  tgt_grid_cell->coordinates_y[3] = tgt_grid->reg2d_corner_lat[iy+1];
+	}
+      else
+#endif
       for ( int ic = 0; ic < tgt_num_cell_corners; ++ic )
 	{
 	  tgt_grid_cell->coordinates_x[ic] = tgt_grid->cell_corner_lon[tgt_grid_add*tgt_num_cell_corners+ic];
@@ -5778,7 +5858,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	{
 	  src_grid_add = srch_add[n];
 
-	  if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	  if ( src_remap_grid_type == REMAP_GRID_TYPE_REG2D )
 	    {
 	      int ix, iy;
 
@@ -5846,9 +5926,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    }
 	}
 
-#if ! defined(_OPENMP)
       sum_srch_cells2 += num_weights;
-#endif
 
       for ( n = 0; n < num_weights; ++n )
 	partial_weights[n] = partial_areas[n] / tgt_area;
@@ -5898,10 +5976,11 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	}
     }
 
-#if ! defined(_OPENMP)
-  printf("sum_srch_cells : %d\n", sum_srch_cells);
-  printf("sum_srch_cells2: %d\n", sum_srch_cells2);
-#endif
+  if ( cdoVerbose )
+    {
+      printf("sum_srch_cells : %d\n", sum_srch_cells);
+      printf("sum_srch_cells2: %d\n", sum_srch_cells2);
+    }
 
   if ( cdoTimer ) timer_stop(timer_remap_con_l2);
 
