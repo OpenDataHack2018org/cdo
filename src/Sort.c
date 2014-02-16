@@ -49,8 +49,8 @@ static
 int cmpvarcode(const void *s1, const void *s2)
 {
   int cmp = 0;
-  varinfo_t *x = (varinfo_t *) s1;
-  varinfo_t *y = (varinfo_t *) s2;
+  const varinfo_t *x = s1;
+  const varinfo_t *y = s2;
   /*
   printf("%d %d  %d %d\n", x->code, y->code, x, y);
   */
@@ -63,8 +63,8 @@ int cmpvarcode(const void *s1, const void *s2)
 static
 int cmpvarname(const void *s1, const void *s2)
 {
-  varinfo_t *x = (varinfo_t *) s1;
-  varinfo_t *y = (varinfo_t *) s2;
+  const varinfo_t *x = s1;
+  const varinfo_t *y = s2;
 
   return (strcmp(x->name, y->name));
 }
@@ -73,8 +73,8 @@ static
 int cmpvarlevel(const void *s1, const void *s2)
 {
   int cmp = 0;
-  levinfo_t *x = (levinfo_t *) s1;
-  levinfo_t *y = (levinfo_t *) s2;
+  const levinfo_t *x = s1;
+  const levinfo_t *y = s2;
 
   if      ( x->level < y->level ) cmp = -1;
   else if ( x->level > y->level ) cmp =  1;
@@ -86,8 +86,8 @@ static
 int cmpvarlevelrev(const void *s1, const void *s2)
 {
   int cmp = 0;
-  levinfo_t *x = (levinfo_t *) s1;
-  levinfo_t *y = (levinfo_t *) s2;
+  const levinfo_t *x = s1;
+  const levinfo_t *y = s2;
 
   if      ( x->level > y->level ) cmp = -1;
   else if ( x->level < y->level ) cmp =  1;

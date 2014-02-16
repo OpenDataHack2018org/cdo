@@ -43,8 +43,8 @@ static
 int cmpint(const void *s1, const void *s2)
 {
   int cmp = 0;
-  int *x = (int *) s1;
-  int *y = (int *) s2;
+  const int *x = s1;
+  const int *y = s2;
 
   if      ( *x < *y ) cmp = -1;
   else if ( *x > *y ) cmp =  1;

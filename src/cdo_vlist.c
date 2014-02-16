@@ -109,8 +109,8 @@ void compareGrids(int gridID1, int gridID2)
 static
 int cmpnames(const void *s1, const void *s2)
 {
-  char *name1 = (char *) s1;
-  char *name2 = (char *) s2;
+  const char *name1 = s1;
+  const char *name2 = s2;
 
   return (strcmp(name1, name2));
 }

@@ -41,8 +41,8 @@ static
 int cmpdatetime(const void *s1, const void *s2)
 {
   int cmp = 0;
-  timeinfo_t *x = (timeinfo_t *) s1;
-  timeinfo_t *y = (timeinfo_t *) s2;
+  const timeinfo_t *x = s1;
+  const timeinfo_t *y = s2;
   /*
   printf("%g %g  %d %d\n", x->datetime, y->datetime, x, y);
   */
