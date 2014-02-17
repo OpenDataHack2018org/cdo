@@ -3,6 +3,7 @@
 /COPYING -text
 /ChangeLog -text
 /INSTALL -text
+/KnownProblems -text
 /Makefile.am -text
 /Makefile.in -text
 /NEWS -text
