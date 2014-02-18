@@ -6,7 +6,7 @@ CDO=src/cdo
 RMODS="bil bic nn con cons"
 #
 #cdo -setrtomiss,0,10000 -topo topo05
-#cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
+cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
 #
 IFILE=topo005
 #
@@ -48,8 +48,8 @@ done
 # result on blizzard: (interactiv)
 # ==================
 #         bil    bic    nn   con   cons
-# reg2d   2.2    5.5     3   499    342
-# curv     88     93  1936   500    553
+# reg2d   2.2    5.5     3   470    342
+# curv     88     93  1936   480    695
 #
 ####################################################
 #
