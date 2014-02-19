@@ -211,7 +211,7 @@ case "${HOSTNAME}" in
                     --with-udunits2=/sw/aix61/udunits-2.1.14 \
                     --with-proj=/sw/aix53/proj-4.6.1 \
                     --with-curl=/sw/aix61/curl-7.21.3 \
-                    AR="ar -X 64"  LDFLAGS="-brtl -Wl,-bsvr4 -Wl,-R/sw/aix61/openssl-1.0.0d/lib:/sw/aix61/zlib-1.2.6/lib:/sw/aix61/curl-7.21.3/lib:/sw/aix53/proj-4.6.1/lib" \
+                    AR="ar -X 64"  LDFLAGS="-brtl -R/sw/aix61/openssl-1.0.0d/lib:/sw/aix61/zlib-1.2.6/lib" \
  	            CC=xlc_r CFLAGS="-g -O3 -q64 -qhot -qstrict -qarch=auto -qtune=auto -qsmp=omp -DHAVE_MMAP -qthreaded"
 	;;
     vip*)

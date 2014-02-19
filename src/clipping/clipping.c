@@ -1004,9 +1004,9 @@ static void generate_overlap_cell(struct point_list * list,
       cell->num_corners = num_edges;
     }
   */
-  cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
-  cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
-  cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
+  if ( cell->coordinates_x == NULL ) cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
+  if ( cell->coordinates_y == NULL ) cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
+  if ( cell->edge_type     == NULL ) cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
   cell->num_corners = num_edges;
 
   struct point_list_element * curr = list->first;
