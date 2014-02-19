@@ -30,7 +30,7 @@
 
 void *Diff(void *argument)
 {
-  int DIFF, DIFF2, DIFFP, DIFFN, DIFFC;
+  int DIFF, DIFFP, DIFFN, DIFFC;
   int operatorID;
   int lhead = TRUE;
   int i;
@@ -52,19 +52,22 @@ void *Diff(void *argument)
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double *array1, *array2;
+  double abslim = 0.;
   double absm, relm;
   double missval1, missval2;
+  double *array1, *array2;
 
   cdoInitialize(argument);
 
   DIFF  = cdoOperatorAdd("diff",  0, 0, NULL);
-  DIFF2 = cdoOperatorAdd("diff2", 0, 0, NULL);
   DIFFP = cdoOperatorAdd("diffp", 0, 0, NULL);
   DIFFN = cdoOperatorAdd("diffn", 0, 0, NULL);
   DIFFC = cdoOperatorAdd("diffc", 0, 0, NULL);
 
   operatorID = cdoOperatorID();
+
+  if ( operatorArgc() == 1 ) abslim = atof(operatorArgv()[0]);
+  if ( abslim < -1.e33 || abslim > 1.e+33 ) cdoAbort("Abs. limit out of range\n");
 
   streamID1 = streamOpenRead(cdoStreamName(0));
   streamID2 = streamOpenRead(cdoStreamName(1));
@@ -149,7 +152,7 @@ void *Diff(void *argument)
 
 	  if ( ! cdoSilentMode || cdoVerbose )
 	    {
-	      if ( absm > 0 || relm > 0 || cdoVerbose )
+	      if ( absm > abslim /*|| relm > 0.*/ || cdoVerbose )
 		{
 		  if ( lhead )
 		    {
@@ -157,11 +160,11 @@ void *Diff(void *argument)
 
 		      fprintf(stdout, "               Date     Time   Level Gridsize    Miss ");
 			
-		      if ( operatorID == DIFF2 ) fprintf(stdout, "   Diff ");
+		      fprintf(stdout, "   Diff ");
 
 		      fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff");
 
-		      if ( operatorID == DIFFN || operatorID == DIFF2 )
+		      if ( operatorID == DIFFN )
 			fprintf(stdout, " : Parameter name");
 		      else if ( operatorID == DIFF || operatorID == DIFFP )
 			fprintf(stdout, " : Parameter ID");
@@ -179,14 +182,14 @@ void *Diff(void *argument)
 
 		  fprintf(stdout, "%8d %7d ", gridsize, MAX(nmiss1, nmiss2));
 
-		  if ( operatorID == DIFF2 )  fprintf(stdout, "%7d ", ndiff);
+		  fprintf(stdout, "%7d ", ndiff);
 		
 		  fprintf(stdout, ": %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
 		  fprintf(stdout, "%#12.5g%#12.5g", absm, relm);
 
 		  if ( operatorID == DIFFN )
 		    fprintf(stdout, " : %-11s", varname);
-		  else if ( operatorID == DIFF || operatorID == DIFF2 || operatorID == DIFFP )
+		  else if ( operatorID == DIFF || operatorID == DIFFP )
 		    fprintf(stdout, " : %-11s", paramstr);
 		  else if ( operatorID == DIFFC )
 		    fprintf(stdout, " : %4d", code);
@@ -196,8 +199,8 @@ void *Diff(void *argument)
 	    }
 
 	  ngrec++;
-	  if ( absm > 0     || relm > 0     ) ndrec++;
-	  if ( absm > 1.e-3 || relm > 1.e-3 ) nd2rec++;
+	  if ( absm > abslim /*|| relm > 0  */   ) ndrec++;
+	  if ( absm > 1.e-3  /*|| relm > 1.e-3 */) nd2rec++;
 	}
       tsID++;
     }
@@ -205,7 +208,7 @@ void *Diff(void *argument)
   if ( ndrec > 0 )
     {
       fprintf(stdout, "  %d of %d records differ\n", ndrec, ngrec);
-      if ( ndrec != nd2rec )
+      if ( ndrec != nd2rec && abslim < 1.e-3 )
 	fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
       /*  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec); */
     }
