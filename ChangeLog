@@ -1,3 +1,7 @@
+2014-02-19  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
+
+	* Diff: added number of different values to output
+
 2014-02-18  Uwe Schulzweida  <Uwe.Schulzweida@zmaw.de>
 
 	* using CDI library version 1.6.3

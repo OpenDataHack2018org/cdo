@@ -82,6 +82,7 @@ static char *DiffHelp[] = {
     "           For each pair of fields the operator prints one line with the following information:",
     "           - Date and Time",
     "           - Level, Gridsize and number of Missing values",
+    "           - Number of different values",
     "           - Occurrence of coefficient pairs with different signs (S)",
     "           - Occurrence of zero values (Z)",
     "           - Maxima of absolute difference of coefficient pairs",
