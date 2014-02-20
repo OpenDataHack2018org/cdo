@@ -52,7 +52,8 @@ void *Diff(void *argument)
   char varname[CDI_MAX_NAME];
   char paramstr[32];
   char vdatestr[32], vtimestr[32];
-  double abslim = 0.;
+  double absdiff;
+  double abslim = 0., abslim2 = 1.e-3, rellim = 0.5;
   double absm, relm;
   double missval1, missval2;
   double *array1, *array2;
@@ -131,19 +132,20 @@ void *Diff(void *argument)
 	    {
 	      if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
-		  if ( fabs(array1[i] - array2[i]) > 0 ) ndiff++;
+		  absdiff = fabs(array1[i] - array2[i]);
+		  if ( absdiff > 0. ) ndiff++;
 
-		  absm = MAX(absm, fabs(array1[i]-array2[i]));
-		  if ( array1[i]*array2[i] < 0 )
+		  absm = MAX(absm, absdiff);
+
+		  if ( array1[i]*array2[i] < 0. )
 		    dsgn = TRUE;
-		  else if ( IS_EQUAL(array1[i]*array2[i], 0) )
+		  else if ( IS_EQUAL(array1[i]*array2[i], 0.) )
 		    zero = TRUE;
 		  else
-		    relm = MAX(relm, fabs(array1[i]-array2[i]) /
-			   MAX(fabs(array1[i]), fabs(array2[i])));
+		    relm = MAX(relm, absdiff / MAX(fabs(array1[i]), fabs(array2[i])));
 		}
 	      else if ( (DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2)) || 
-			(!DBL_IS_EQUAL(array1[i], missval1) && DBL_IS_EQUAL(array2[i], missval2)) )
+		       (!DBL_IS_EQUAL(array1[i], missval1) &&  DBL_IS_EQUAL(array2[i], missval2)) )
 		{
 		  ndiff++;
 		  relm = 1.0;
@@ -152,7 +154,7 @@ void *Diff(void *argument)
 
 	  if ( ! cdoSilentMode || cdoVerbose )
 	    {
-	      if ( absm > abslim /*|| relm > 0.*/ || cdoVerbose )
+	      if ( absm > abslim || relm > rellim || cdoVerbose )
 		{
 		  if ( lhead )
 		    {
@@ -199,8 +201,8 @@ void *Diff(void *argument)
 	    }
 
 	  ngrec++;
-	  if ( absm > abslim /*|| relm > 0  */   ) ndrec++;
-	  if ( absm > 1.e-3  /*|| relm > 1.e-3 */) nd2rec++;
+	  if ( absm > abslim  || relm > rellim ) ndrec++;
+	  if ( absm > abslim2 || relm > rellim ) nd2rec++;
 	}
       tsID++;
     }
@@ -208,7 +210,7 @@ void *Diff(void *argument)
   if ( ndrec > 0 )
     {
       fprintf(stdout, "  %d of %d records differ\n", ndrec, ngrec);
-      if ( ndrec != nd2rec && abslim < 1.e-3 )
+      if ( ndrec != nd2rec && abslim < abslim2 )
 	fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
       /*  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec); */
     }
