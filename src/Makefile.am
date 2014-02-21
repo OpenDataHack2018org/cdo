@@ -338,9 +338,9 @@ if ENABLE_ALL_STATIC
 cdotest_LDFLAGS  += -all-static
 endif
 
-cdo-userlog.o: userlog.c config.h
-	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
-cdo_static-userlog.o: userlog.c config.h
-	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
+#cdo-userlog.o: userlog.c config.h
+#	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
+#cdo_static-userlog.o: userlog.c config.h
+#	$(COMPILE) -DLOGPATH=${exec_prefix}/log -c -o cdo_static-userlog.o `test -f 'userlog.c' || echo '$(srcdir)/'`userlog.c
 #
 CLEANFILES  = `ls *~ 2> /dev/null`

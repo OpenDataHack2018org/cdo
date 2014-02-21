@@ -2,12 +2,17 @@ CLEANFILES =
 
 export
 
-TESTS = $(top_srcdir)/test/test_Gridarea.sh \
-        $(top_srcdir)/test/test_Cat.sh \
-        $(top_srcdir)/test/test_Spectral.sh \
-        $(top_srcdir)/test/test_Timstat.sh \
-        $(top_srcdir)/test/test_Select.sh \
-        $(top_srcdir)/test/test_Vertint.sh
+TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
+                  $(top_srcdir)/config/tap-driver.sh
+
+TESTS = Cat.test Gridarea.test Remap.test Select.test Spectral.test Timstat.test Vertint.test
+
+#TESTS = $(top_srcdir)/test/test_Gridarea.sh \
+#        $(top_srcdir)/test/test_Cat.sh \
+#        $(top_srcdir)/test/test_Spectral.sh \
+#        $(top_srcdir)/test/test_Timstat.sh \
+#        $(top_srcdir)/test/test_Select.sh \
+#        $(top_srcdir)/test/test_Vertint.sh
 
 #        $(top_srcdir)/test/test_Remap.sh \
 #       $(top_srcdir)/test/test_info.py
@@ -34,4 +39,4 @@ test: $(TESTS)
 
 CLEANFILES += `ls *.pyc`
 
-AUTOMAKE_OPTIONS = color-tests
+#AUTOMAKE_OPTIONS = color-tests

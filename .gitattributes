@@ -24,6 +24,7 @@ config/install-sh -text
 config/ltmain.sh -text
 config/missing -text
 config/mkinstalldirs -text
+config/tap-driver.sh -text
 /configure -text
 /configure.ac -text
 contrib/COPYING -text
@@ -613,9 +614,16 @@ src/vinterp.h -text
 src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text
+test/Cat.test.in -text
+test/Gridarea.test.in -text
 test/Makefile.am -text
 test/Makefile.in -text
 test/README -text
+test/Remap.test.in -text
+test/Select.test.in -text
+test/Spectral.test.in -text
+test/Timstat.test.in -text
+test/Vertint.test.in -text
 test/bm_Remap.sh -text
 test/data/Makefile.am -text
 test/data/Makefile.in -text
