@@ -89,7 +89,6 @@ deltap_fl \
 delvar \
 detrend \
 diff \
-diff2 \
 diffc \
 diffn \
 diffp \
@@ -207,6 +206,7 @@ genbic \
 genbil \
 gencon \
 gencon2 \
+gencons \
 gendis \
 gengrid \
 genlaf \
@@ -219,8 +219,6 @@ gp2fc \
 gp2sp \
 gp2spl \
 gradsdes \
-gradsdes1 \
-gradsdes2 \
 graph \
 grfill \
 gridarea \
@@ -425,6 +423,7 @@ remapbil \
 remapcon \
 remapcon1 \
 remapcon2 \
+remapcons \
 remapdis \
 remapdis1 \
 remapeta \
@@ -449,6 +448,7 @@ runvar \
 runvar1 \
 scalllogo \
 scatter \
+sealevelpressure \
 seasavg \
 seascount \
 seasmax \
