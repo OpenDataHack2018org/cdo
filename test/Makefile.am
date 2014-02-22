@@ -7,6 +7,7 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 
 TESTS = Cat.test Gridarea.test Remap.test Select.test Spectral.test Timstat.test Vertint.test
 
+
 #TESTS = $(top_srcdir)/test/test_Gridarea.sh \
 #        $(top_srcdir)/test/test_Cat.sh \
 #        $(top_srcdir)/test/test_Spectral.sh \
@@ -22,9 +23,9 @@ TESTS = Cat.test Gridarea.test Remap.test Select.test Spectral.test Timstat.test
 #	$(top_srcdir)/test/test_Selvar.py
 #	$(top_srcdir)/test/test_intgridbil.py
 
-EXTRA_DIST = $(TESTS) $(top_srcdir)/test/testStreams.py
+#EXTRA_DIST = $(TESTS) $(top_srcdir)/test/testStreams.py
 
-CDO   = $(top_builddir)/src/cdo
+CDO        = $(top_builddir)/src/cdo
 
 DATAPATH   = $(top_srcdir)/test/data
 

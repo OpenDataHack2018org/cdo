@@ -1,4 +1,8 @@
 # Process this file with autoconf to produce a configure script.
+#
+#  automake 1.14
+#  autoconf 2.68
+#  libtool  2.4.2
 
 AC_INIT([cdo], [1.6.4rc1], [http://code.zmaw.de/projects/cdo])
 
@@ -8,7 +12,8 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 AC_CANONICAL_BUILD
 
-AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+# AM_INIT_AUTOMAKE([foreign -Wall -Werror])
+AM_INIT_AUTOMAKE([foreign -Wall])
 AC_CONFIG_HEADERS([src/config.h])
 AM_MAINTAINER_MODE([disable])
 
