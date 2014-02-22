@@ -551,7 +551,7 @@ void *Vertint(void *argument)
 	      minmaxval(ngp, geop, NULL, &minval, &maxval);
 	      if ( minval < MIN_FIS || maxval > MAX_FIS )
 		cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
-	      if ( minval >= 0 && maxval <= 9000 )
+	      if ( ngp > 1 && minval >= 0 && maxval <= 9000 )
 		cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
 	    }
 
