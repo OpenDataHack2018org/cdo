@@ -121,7 +121,7 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
 
   if ( imiss )
     {
-      for ( i = 0; i < nvals; i++ )
+      for ( i = 0; i < nvals; ++i )
 	{
 	  if ( ! imiss[i] )
 	    {
@@ -132,7 +132,9 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
     }
   else
     {
-      for ( i = 0; i < nvals; i++ )
+      xmin = array[0];
+      xmax = array[0];
+      for ( i = 1; i < nvals; ++i )
 	{
 	  if      ( array[i] > xmax ) xmax = array[i];
 	  else if ( array[i] < xmin ) xmin = array[i];
