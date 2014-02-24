@@ -68,7 +68,6 @@ typedef struct {
 }
 datasets_t;
 
-#define  NINT(x)   ((x) < 0 ? (int)((x)-0.5) : (int)((x)+0.5))
 
 #if defined(HAVE_LIBHDF5)
 static
@@ -109,7 +108,7 @@ void get_grid_info(double c0, double re, int *nrxp, int *nryp,
 
   git=2.*pi*re*cos(pi/6.)/c0;
   /* number of longitude pixels */
-  nrx=2*NINT(0.5*git);
+  nrx=2*lround(0.5*git);
 
   /* central index in longitude */
   r0=nrx/2+0.5;
@@ -476,8 +475,8 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
   H5Gclose(grp_id);
 
   /* check region */
-  xsize = NINT((region.xmax-region.xmin)/region.dx);
-  ysize = NINT((region.ymax-region.ymin)/region.dy);
+  xsize = lround((region.xmax-region.xmin)/region.dx);
+  ysize = lround((region.ymax-region.ymin)/region.dy);
 
   if ( cdoVerbose ) cdoPrint("  Size: xsize=%d  ysize=%d", xsize, ysize);
 
@@ -496,8 +495,8 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
          cdoPrint("  Corrected region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
                 region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy);
 
-       xsize = NINT((region.xmax-region.xmin)/region.dx);
-       ysize = NINT((region.ymax-region.ymin)/region.dy);
+       xsize = lround((region.xmax-region.xmin)/region.dx);
+       ysize = lround((region.ymax-region.ymin)/region.dy);
        if ( cdoVerbose ) cdoPrint("  Corrected size: xsize=%d  ysize=%d", xsize, ysize);
     }
 
@@ -513,8 +512,8 @@ int read_geolocation(hid_t loc_id, int nx, int ny, int lprojtype)
         cdoPrint("  Corrected region: xmin=%g xmax=%g ymin=%g ymax=%g dx=%g dy=%g",
                region.xmin, region.xmax, region.ymin, region.ymax, region.dx, region.dy);
 
-        xsize = NINT((region.xmax-region.xmin)/region.dx);
-        ysize = NINT((region.ymax-region.ymin)/region.dy);
+        xsize = lround((region.xmax-region.xmin)/region.dx);
+        ysize = lround((region.ymax-region.ymin)/region.dy);
         if ( cdoVerbose ) cdoPrint("  Corrected size: xsize=%d  ysize=%d", xsize, ysize);
     }
 
@@ -737,8 +736,8 @@ int read_region(hid_t loc_id, int nx, int ny)
   dx = (xmax-xmin) / nx;
   dy = (ymax-ymin) / ny;
   /*
-  xsize = NINT((region.xmax-region.xmin)/region.dx);
-  ysize = NINT((region.ymax-region.ymin)/region.dy);
+  xsize = lround((region.xmax-region.xmin)/region.dx);
+  ysize = lround((region.ymax-region.ymin)/region.dy);
 
   if ( cdoVerbose ) cdoPrint("  Size: xsize=%d  ysize=%d", xsize, ysize);
   */

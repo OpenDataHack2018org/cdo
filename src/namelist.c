@@ -51,8 +51,6 @@ int readline(FILE *fp, char *line, int len);
 #define  MIN(a,b)  ((a) < (b) ? (a) : (b))
 #undef   MAX
 #define  MAX(a,b)  ((a) > (b) ? (a) : (b))
-#undef   NINT
-#define  NINT(x)   ((x) < 0 ? (int)((x)-0.5) : (int)((x)+0.5))
 
 struct PGMSTAT
 {

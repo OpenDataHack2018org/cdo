@@ -1247,8 +1247,8 @@ void pstreamCheckDatarange(pstream_t *pstreamptr, int varID, double *array, int 
       if ( datatype == DATATYPE_INT8  || datatype == DATATYPE_UINT8 ||
 	   datatype == DATATYPE_INT16 || datatype == DATATYPE_UINT16 )
 	{
-	  smin = (int) NINTD(smin);
-	  smax = (int) NINTD(smax);
+	  smin = (int) round(smin);
+	  smax = (int) round(smax);
 	}
 
       if      ( datatype == DATATYPE_INT8   ) { vmin =        -128.; vmax =        127.; }

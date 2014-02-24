@@ -328,7 +328,7 @@ void *Setgrid(void *argument)
 		  if ( gridmask[i] < 0 || gridmask[i] > 255 )
 		    mask[i] = 0;
 		  else
-		    mask[i] = NINT(gridmask[i]);
+		    mask[i] = lround(gridmask[i]);
 		}
 	      gridID2 = gridDuplicate(gridID1);
 	      gridDefMask(gridID2, mask);

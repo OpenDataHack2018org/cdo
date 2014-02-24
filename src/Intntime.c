@@ -144,7 +144,7 @@ void *Intntime(void *argument)
 	{
 	  double seconds;
 	  seconds = it * juldate_to_seconds(juldate_sub(juldate2, juldate1)) / numts;
-	  juldate = juldate_add_seconds(NINT(seconds), juldate1);
+	  juldate = juldate_add_seconds(lround(seconds), juldate1);
 
 	  juldate_decode(calendar, juldate, &vdate, &vtime);
 

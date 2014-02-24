@@ -14,7 +14,7 @@
 
 static double f_abs(double x)  { return (fabs(x));  }
 static double f_int(double x)  { return ((int)(x)); }
-static double f_nint(double x) { return (NINT(x));  }
+static double f_nint(double x) { return (round(x));  }
 static double f_sqr(double x)  { return (x*x);      }
 
 typedef struct {

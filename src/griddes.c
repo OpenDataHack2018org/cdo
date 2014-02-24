@@ -1415,11 +1415,11 @@ int ntr2nlat(int ntr)
 {
   int nlat, nlat2;
 
-  nlat = NINT((ntr*3.+1.)/2.);
+  nlat = lround((ntr*3.+1.)/2.);
   if ( (nlat % 2) > 0 )
     {
       nlat  = nlat + 1;
-      nlat2 = NINT(((ntr+1)*3.+1.)/2.);
+      nlat2 = lround(((ntr+1)*3.+1.)/2.);
       /*
       if ( nlat == nlat2 )
 	Error("Computation of latitudes failed for truncation %d", ntr);
@@ -1434,11 +1434,11 @@ int ntr2nlat_linear(int ntr)
 {
   int nlat, nlat2;
 
-  nlat = NINT((ntr*2.+1.)/2.);
+  nlat = lround((ntr*2.+1.)/2.);
   if ( (nlat % 2) > 0 )
     {
       nlat  = nlat + 1;
-      nlat2 = NINT(((ntr+1)*2.+1.)/2.);
+      nlat2 = lround(((ntr+1)*2.+1.)/2.);
       /*
       if ( nlat == nlat2 )
 	Error("Computation of latitudes failed for truncation %d", ntr);
