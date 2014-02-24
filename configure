@@ -650,6 +650,7 @@ JASPER_LIBS
 NETCDF_LIBS
 NETCDF_INCLUDE
 NETCDF_ROOT
+ENABLE_NETCDF
 NC_CONFIG
 HDF5_LIBS
 HDF5_INCLUDE
@@ -18477,6 +18478,7 @@ fi
 
 #  ----------------------------------------------------------------------
 #  Compile application with netcdf
+ENABLE_NETCDF=no
 NETCDF_ROOT=''
 NETCDF_INCLUDE=''
 NETCDF_LIBS=''
@@ -18558,6 +18560,7 @@ if test "$ac_res" != no; then :
 
 $as_echo "#define HAVE_LIBNETCDF 1" >>confdefs.h
 
+                                            ENABLE_NETCDF=yes
 else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
@@ -18701,6 +18704,7 @@ if test "$ac_res" != no; then :
 
 $as_echo "#define HAVE_LIBNETCDF 1" >>confdefs.h
 
+                                                 ENABLE_NETCDF=yes
 else
   as_fn_error $? "Could not link to netcdf library" "$LINENO" 5
 fi
@@ -18801,6 +18805,7 @@ $as_echo_n "checking for NETCDF library... " >&6; }
              { $as_echo "$as_me:${as_lineno-$LINENO}: result: suppressed" >&5
 $as_echo "suppressed" >&6; }
 fi
+
 
 
 
