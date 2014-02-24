@@ -44,6 +44,8 @@ struct grid_cell {
    double * coordinates_x, * coordinates_y;
    enum edge_type * edge_type;
    unsigned num_corners;
+   unsigned array_size; //!< size in elements of the arrays: coordinates_x,
+                        //!< coordinates_y, edge_type
 };
 
 /**

@@ -78,6 +78,7 @@ static struct point_list_element *
 get_free_point_list_element(struct point_list * list);
 
 static void remove_points(struct point_list * list);
+static unsigned remove_zero_length_edges(struct point_list * list);
 
 static void free_point_list(struct point_list * list);
 
@@ -117,7 +118,9 @@ void compute_overlap_areas(unsigned N,
 
   for (unsigned n = 0; n < N; n++) {
     partial_areas[n] = huiliers_area (overlap_buffer[n]);
-    free_grid_cell(overlap_buffer + n);
+    // we cannot use pole_area because it is rather inaccurate for great circle
+    // edges that are nearly circles of longitude
+    //partial_areas[n] = pole_area (overlap_buffer[n]);
   }
 
 #ifdef VERBOSE
@@ -187,6 +190,7 @@ static void compute_lat_circle_z_value(double a[], double b[], double z[]) {
 static unsigned is_inside_gc(double point[], double norm_vec[]) {
 
   double dot;
+  double const tol = 1e-12;
 
   // the product is defined as follows
   // a * b = |a| * |b| * cos(alpha)
@@ -288,6 +292,8 @@ void cell_clipping(unsigned N,
   // of zero)
   if (target_list.first == NULL) {
     free_point_list(&target_list);
+    for (unsigned i = 0; i < N; ++i)
+      overlap_buffer[i].num_corners = 0;
     return;
   }
 
@@ -325,6 +331,8 @@ void cell_clipping(unsigned N,
 
   // for all source cells
   for (unsigned n = 0; n < N; n++ ) {
+
+    overlap_buffer[n].num_corners = 0;
 
     if (get_cell_type(source_cell[n]) == MIXED_CELL)
       abort_message("invalid source cell type (cell contains edges consisting "
@@ -581,13 +589,6 @@ void cell_clipping(unsigned N,
               // if the previous point has been reused for an intersection
               if (intersect_points[0] == prev_src_point)
                 prev_is_inside = 1;
-
-            // if there is only one intersection point
-            } else if (((intersect & ((1 << 0) || (1 << 1))) != 0) &&
-                       (curr_is_inside != 2) && (prev_is_inside != 2)) {
-            
-                abort_message("ERROR: one intersection with source edge. this should"
-                              " not have happened\n", __FILE__, __LINE__);
             }
           }
 
@@ -801,12 +802,8 @@ static void remove_points(struct point_list * list) {
 //! returns number of edges/corners
 static unsigned remove_zero_length_edges(struct point_list * list) {
 
-#define DOT_PRODUCT(a,b) (a->vec_coords[0] * b->vec_coords[0] + \
-                          a->vec_coords[1] * b->vec_coords[1] + \
-                          a->vec_coords[2] * b->vec_coords[2])
-
   struct point_list_element * curr = list->first;
-  double const tol = 1e-8;
+  double const tol = 1e-10;
 
   if (curr == NULL) return 0;
 
@@ -824,8 +821,13 @@ static unsigned remove_zero_length_edges(struct point_list * list) {
   for (unsigned i = 0; i < num_edges; ++i) {
 
     // if both points are nearly identical (angle between them is very small)
-    if (get_vector_angle(curr->vec_coords, curr->next->vec_coords) < tol) {
+    if (!curr->to_be_removed &&
+        (get_vector_angle(curr->vec_coords, curr->next->vec_coords) < tol)) {
       curr->to_be_removed = 1;
+      temp_num_edges--;
+    } else if (curr->edge_type == LAT_CIRCLE &&
+               curr->next->edge_type == LAT_CIRCLE) {
+      curr->next->to_be_removed = 1;
       temp_num_edges--;
     }
 
@@ -993,20 +995,19 @@ static void generate_overlap_cell(struct point_list * list,
       is_empty_gc_cell(list, num_edges)){
 
     reset_point_list(list);
+    cell->num_corners = 0;
     return;
   }
-  /*
-  if ( num_edges > cell->num_corners )
-    {
-      cell->coordinates_x = realloc(cell->coordinates_x, num_edges * sizeof(*cell->coordinates_x));
-      cell->coordinates_y = realloc(cell->coordinates_y, num_edges * sizeof(*cell->coordinates_y));
-      cell->edge_type = realloc(cell->edge_type, num_edges * sizeof(*cell->edge_type));
-      cell->num_corners = num_edges;
-    }
-  */
-  if ( cell->coordinates_x == NULL ) cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
-  if ( cell->coordinates_y == NULL ) cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
-  if ( cell->edge_type     == NULL ) cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
+
+  if (num_edges > cell->array_size) {
+    free(cell->coordinates_x);
+    free(cell->coordinates_y);
+    free(cell->edge_type);
+    cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
+    cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
+    cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
+    cell->array_size = num_edges;
+  }
   cell->num_corners = num_edges;
 
   struct point_list_element * curr = list->first;

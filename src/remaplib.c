@@ -5473,8 +5473,6 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
 #include "clipping/clipping.h"
 #include "clipping/area.h"
 
-//#define MEM_OVERLAP_BUFFER 1
-
 static
 void cdo_compute_overlap_areas(unsigned N,
 			       struct grid_cell *overlap_buffer,
@@ -5482,16 +5480,6 @@ void cdo_compute_overlap_areas(unsigned N,
 			       struct grid_cell  target_cell,
 			       double *partial_areas)
 {
-  for ( unsigned n = 0; n < N; n++ )
-    {
-      overlap_buffer[n].num_corners   = 0;
-#if ! defined(MEM_OVERLAP_BUFFER)
-      overlap_buffer[n].edge_type     = NULL;
-      overlap_buffer[n].coordinates_x = NULL;
-      overlap_buffer[n].coordinates_y = NULL;
-#endif
-    }
-
   /* Do the clipping and get the cell for the overlapping area */
 
   cell_clipping(N, source_cells, target_cell, overlap_buffer);
@@ -5501,11 +5489,6 @@ void cdo_compute_overlap_areas(unsigned N,
   for ( unsigned n = 0; n < N; n++ )
     {
       partial_areas[n] = huiliers_area(overlap_buffer[n]);
-#if ! defined(MEM_OVERLAP_BUFFER)
-      if ( overlap_buffer[n].coordinates_x != NULL ) free(overlap_buffer[n].coordinates_x);
-      if ( overlap_buffer[n].coordinates_y != NULL ) free(overlap_buffer[n].coordinates_y);
-      if ( overlap_buffer[n].edge_type     != NULL ) free(overlap_buffer[n].edge_type);
-#endif
     }
 
 #ifdef VERBOSE
@@ -5644,6 +5627,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   for ( i = 0; i < ompNumThreads; ++i )
     {
       tgt_grid_cell2[i] = malloc(sizeof(struct grid_cell));
+      tgt_grid_cell2[i]->array_size    = tgt_num_cell_corners;
       tgt_grid_cell2[i]->num_corners   = tgt_num_cell_corners;
       tgt_grid_cell2[i]->edge_type     = tgt_edge_type;
       tgt_grid_cell2[i]->coordinates_x = malloc(tgt_num_cell_corners*sizeof(double));
@@ -5827,19 +5811,16 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
+	      overlap_buffer[n].array_size    = 0;
 	      overlap_buffer[n].num_corners   = 0;
 	      overlap_buffer[n].edge_type     = NULL;
 	      overlap_buffer[n].coordinates_x = NULL;
 	      overlap_buffer[n].coordinates_y = NULL;
-#if defined(MEM_OVERLAP_BUFFER)
-	      overlap_buffer[n].edge_type     = malloc(9*sizeof(enum edge_type));
-	      overlap_buffer[n].coordinates_x = malloc(9*sizeof(double));
-	      overlap_buffer[n].coordinates_y = malloc(9*sizeof(double));
-#endif
 	    }
 
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
+	      src_grid_cells[n].array_size    = srch_corners;
 	      src_grid_cells[n].num_corners   = srch_corners;
 	      src_grid_cells[n].edge_type     = src_edge_type;
 	      src_grid_cells[n].coordinates_x = malloc(srch_corners*sizeof(double));
@@ -5990,6 +5971,14 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   for ( i = 0; i < ompNumThreads; ++i )
     {
+      for ( n = 0; n < max_srch_cells2[i]; n++ )
+	{
+	  if ( overlap_buffer2[i][n].array_size > 0 )
+	    {
+	      free(overlap_buffer2[i][n].coordinates_x);
+	      free(overlap_buffer2[i][n].coordinates_y);
+	    }
+	}
       for ( n = 0; n < max_srch_cells2[i]; n++ )
 	{
 	  free(src_grid_cells2[i][n].coordinates_x);

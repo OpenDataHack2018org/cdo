@@ -46,22 +46,12 @@ void init_grid_cell(struct grid_cell * cell) {
    cell->coordinates_y = NULL;
    cell->edge_type = NULL;
    cell->num_corners = 0;
+   cell->array_size = 0;
 }
 
 void copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell) {
 
-   int flag;
-
-   flag = ((out_cell->coordinates_x == NULL) << 0) +
-          ((out_cell->coordinates_y == NULL) << 1) +
-          ((out_cell->edge_type == NULL)     << 2);
-
-   if (flag != 0 && flag != 7)
-      abort_message("ERROR: inconsistent grid_cell data structure\n",
-                    __FILE__, __LINE__);
-
-   if ((out_cell->coordinates_x == NULL) ||
-       (in_cell.num_corners > out_cell->num_corners)) {
+   if (in_cell.num_corners > out_cell->array_size) {
 
       free(out_cell->coordinates_x);
       free(out_cell->coordinates_y);
@@ -72,6 +62,7 @@ void copy_grid_cell(struct grid_cell in_cell, struct grid_cell * out_cell) {
                                        sizeof(*(out_cell->coordinates_y)));
       out_cell->edge_type = malloc(in_cell.num_corners *
                                    sizeof(*(out_cell->edge_type)));
+      out_cell->array_size = in_cell.num_corners;
    }
 
    memcpy(out_cell->coordinates_x, in_cell.coordinates_x,
@@ -132,10 +123,11 @@ void unpack_grid_cell(struct grid_cell * cell, double * dble_buf,
    *dble_buf_data_size = 2 * num_corners;
    *uint_buf_data_size = num_corners + 1;
 
-   if (num_corners != cell->num_corners) {
+   if (num_corners > cell->array_size) {
       cell->coordinates_x = realloc (cell->coordinates_x, num_corners * sizeof(cell->coordinates_x[0]));
       cell->coordinates_y = realloc (cell->coordinates_y, num_corners * sizeof(cell->coordinates_y[0]));
       cell->edge_type = realloc (cell->edge_type, num_corners * sizeof(cell->edge_type[0]));
+      cell->array_size = num_corners;
    }
 
    cell->num_corners = num_corners;

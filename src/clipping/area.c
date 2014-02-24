@@ -41,8 +41,8 @@
 #include "utils.h"
 #include "ensure_array_size.h"
 
-// area tolerance (100 m*m = 0.0001 km*km)
-const double area_tol = 1e-4;
+// area tolerance (10 m^2 = 0.0001 km^2)
+const double area_tol = 0.02*0.02; // 20m*20m
 
 static double scalar_product(double a[], double b[]);
 
@@ -405,6 +405,8 @@ double cell3d_area( struct grid_cell cell ) {
   * Prediction, Los Alamos National Laboratory, Argonne National Laboratory,
   * NASA Goddard Space Flight Center.
   * Licensed under the University of Illinois-NCSA License.
+  *
+  * \remark all edges are on great circle
   */
 static double
 tri_area(double u[3], double v[3], double w[3]) {
@@ -419,6 +421,53 @@ tri_area(double u[3], double v[3], double w[3]) {
              tan ( ( s - b ) / 2.0 ) * tan ( ( s - c ) / 2.0 );
 
   return fabs ( 4.0 * atan ( sqrt (fabs ( t ) ) ) );;
+}
+
+static double
+lat_edge_correction(double a[3], double b[3], double lon_a, double lon_b) {
+
+  double const tol = 1e-8;
+
+  if (fabs(a[2] - b[2]) > tol)
+    abort_message("ERROR: latitude of both corners is not identical\n",
+                  __FILE__, __LINE__);
+
+  double h = fabs(a[2]);
+
+  // if we are at the equator or at a pole
+  if (h < tol || fabs(1.0 - h) < tol)
+    return 0.0;
+
+  double lat_area = fabs((1.0 - h) * get_angle(lon_a, lon_b));
+
+  double pole[3] = {0, 0, (a[2] >= 0.0)?1:-1};
+  double gc_area = tri_area(a, b, pole);
+
+  double correction = lat_area - gc_area;
+
+  if (correction < 0) return 0;
+  else return correction;
+}
+
+/** computes the area of a triangle
+ *
+ * the edges uv and uw are great circle edges and vw is a latitude circle edge
+ *
+ * \remark edges of the cell are not allowed to intersect with each other
+ */
+static double tri_area_lat(double u[3], double v[3], double w[3],
+                           double lon_v, double lon_w) {
+
+  double correction = lat_edge_correction(v, w, lon_v, lon_w);
+
+  double area = tri_area(u, v, w);
+
+  double z_diff = v[2] - u[2];
+
+  if ((z_diff == 0) || ((z_diff > 0) ^ (v[2] > 0)))
+    return area + correction;
+  else
+    return area - correction;
 }
 
 double pole_area ( struct grid_cell cell ) {
@@ -495,30 +544,21 @@ double pole_area ( struct grid_cell cell ) {
   return fabs(area * EarthRadius * EarthRadius);
 }
 
-static double
-lat_edge_correction(double a[3], double b[3], double lon_a, double lon_b) {
+static int compute_norm_vector(double a[], double b[], double norm[]) {
 
-  double const tol = 1e-8;
+  cross_product(a, b, norm);
 
-  if (fabs(a[2] - b[2]) > tol)
-    abort_message("ERROR: latitude of both corners is not identical\n",
-                  __FILE__, __LINE__);
+  double scale = sqrt(norm[0] * norm[0] + norm[1] * norm[1] + norm[2] * norm[2]);
 
-  double h = fabs(a[2]);
+  if (scale == 0) return 1;
 
-  // if we are at the equator or at a pole
-  if (h < tol || fabs(1.0 - h) < tol)
-    return 0.0;
+  scale = 1.0 / scale;
 
-  double lat_area = fabs((1.0 - h) * get_angle(lon_a, lon_b));
+  norm[0] *= scale;
+  norm[1] *= scale;
+  norm[2] *= scale;
 
-  double pole[3] = {0, 0, (a[2] >= 0.0)?1:-1};
-  double gc_area = tri_area(a, b, pole);
-
-  double correction = lat_area - gc_area;
-
-  if (correction < 0) return 0;
-  else return correction;
+  return 0;
 }
 
  /*
@@ -527,77 +567,210 @@ lat_edge_correction(double a[3], double b[3], double lon_a, double lon_b) {
   *
   * it has be extended to support YAC data structures and two types of
   * grid cell edges (great circle and circle of latitude)
+  *
   */
 double huiliers_area(struct grid_cell cell) {
 
   double tmp_points[cell.num_corners][3];
-  double const tol = 1e-8;
+  enum edge_type edge_type[cell.num_corners];
+  double coordinates_x[cell.num_corners];
+  unsigned num_corners = 1;
 
   if (cell.num_corners < 2) return 0;
 
+  // find the first non-latitude circle edge
+  int offset;
+  for (offset = 0; offset < cell.num_corners; ++offset)
+    if (cell.edge_type[offset] != LAT_CIRCLE) break;
+
+  // special case: latitude circle around a pole
+  if (offset == cell.num_corners)
+    return (2.0 * M_PI * fabs(sin(cell.coordinates_y[0]))) *
+           EarthRadius * EarthRadius;
+
   // convert lon-lat to xyz
-  for (int i = 0; i < cell.num_corners; i++)
-    LLtoXYZ(cell.coordinates_x[i], cell.coordinates_y[i], tmp_points[i]);
+  LLtoXYZ(cell.coordinates_x[offset], cell.coordinates_y[offset], tmp_points[0]);
+  edge_type[0] = cell.edge_type[offset];
+  coordinates_x[0] = cell.coordinates_x[offset];
+
+  for (int i = 1; i < cell.num_corners; i++) {
+
+    int i_ = (i + offset)%cell.num_corners;
+
+    // merge latitude circle edges that are directly after each other
+    if (cell.edge_type[((i-1) + offset)%cell.num_corners] == LAT_CIRCLE &&
+        cell.edge_type[i_] == LAT_CIRCLE) continue;
+
+    // convert lon-lat to xyz
+    LLtoXYZ(cell.coordinates_x[i_], cell.coordinates_y[i_],
+            tmp_points[num_corners]);
+
+    edge_type[num_corners] = cell.edge_type[i_];
+    coordinates_x[num_corners] = cell.coordinates_x[i_];
+
+    ++num_corners;
+  }
+
+  if (num_corners < 2) return 0;
 
   // sum areas around cell
   double sum = 0.0;
 
-  for (int i = 2; i < cell.num_corners; i++)
-    sum += tri_area(tmp_points[0], tmp_points[i-1], tmp_points[i]);
+  // special case cell with two edges
+  // if one edge is a circle of latitude and the other is not
+  if (num_corners == 2) {
 
-  // check for edges of latitude
-  unsigned num_lat_circle_edges = 0;
-  for (unsigned i = 0; i < cell.num_corners; ++i)
-    if (cell.edge_type[i] == LAT_CIRCLE)
-      num_lat_circle_edges++;
+    if ((edge_type[0] == LAT_CIRCLE) ^ (edge_type[1] == LAT_CIRCLE))
+      sum = lat_edge_correction(tmp_points[0], tmp_points[1],
+                                coordinates_x[0], coordinates_x[1]);
 
-  if (num_lat_circle_edges > 2)
-    abort_message("ERROR: invalid cell (has more than two edges that are "
-                  "latitude circles)\n", __FILE__, __LINE__);
+  } else if (num_corners == 3) {
 
-  if (num_lat_circle_edges > 0) {
+    if (edge_type[0] == LAT_CIRCLE)
+      sum = tri_area_lat(tmp_points[2], tmp_points[0], tmp_points[1],
+                         coordinates_x[0], coordinates_x[1]);
+    else if (edge_type[1] == LAT_CIRCLE)
+      sum = tri_area_lat(tmp_points[0], tmp_points[1], tmp_points[2],
+                         coordinates_x[1], coordinates_x[2]);
+    else if (edge_type[2] == LAT_CIRCLE)
+      sum = tri_area_lat(tmp_points[1], tmp_points[2], tmp_points[0],
+                         coordinates_x[2], coordinates_x[0]);
+    else
+      sum = tri_area(tmp_points[0], tmp_points[1], tmp_points[2]);
 
-    // compute minimum and maximum height of cell
-    double min = cell.coordinates_y[0], max = cell.coordinates_y[0];
+  } else if (num_corners == 4) {
 
-    for (int i = 1; i < cell.num_corners; ++i)
-      if (cell.coordinates_y[i] < min) min = cell.coordinates_y[i];
-      else if (cell.coordinates_y[i] > max) max = cell.coordinates_y[i];
+    double tmp_area[2];
 
-    double min_factor = 1.0;
+    if (edge_type[0] == LAT_CIRCLE)
+      tmp_area[0] = tri_area_lat(tmp_points[2], tmp_points[0], tmp_points[1],
+                                 coordinates_x[0], coordinates_x[1]);
+    else if (edge_type[1] == LAT_CIRCLE)
+      tmp_area[0] = tri_area_lat(tmp_points[0], tmp_points[1], tmp_points[2],
+                                 coordinates_x[1], coordinates_x[2]);
+    else
+      tmp_area[0] = tri_area(tmp_points[0], tmp_points[1], tmp_points[2]);
 
-    if (max <= 0.0) {
+    if (edge_type[2] == LAT_CIRCLE)
+      tmp_area[1] = tri_area_lat(tmp_points[0], tmp_points[2], tmp_points[3],
+                                 coordinates_x[2], coordinates_x[3]);
+    else if (edge_type[3] == LAT_CIRCLE)
+      tmp_area[1] = tri_area_lat(tmp_points[2], tmp_points[3], tmp_points[0],
+                                 coordinates_x[3], coordinates_x[0]);
+    else
+      tmp_area[1] = tri_area(tmp_points[0], tmp_points[2], tmp_points[3]);
 
-      double tmp = max;
-      max = min;
-      min = tmp;
+    double p[3][3] = {{tmp_points[1][0] - tmp_points[0][0],
+                       tmp_points[1][1] - tmp_points[0][1],
+                       tmp_points[1][2] - tmp_points[0][2]},
+                      {tmp_points[2][0] - tmp_points[0][0],
+                       tmp_points[2][1] - tmp_points[0][1],
+                       tmp_points[2][2] - tmp_points[0][2]},
+                      {tmp_points[3][0] - tmp_points[0][0],
+                       tmp_points[3][1] - tmp_points[0][1],
+                       tmp_points[3][2] - tmp_points[0][2]}};
+    double norm[2][3];
 
-    } else if (signbit(min) != signbit(max))
-      min_factor = -1.0;
+    if (!compute_norm_vector(p[0], p[1], norm[0]) &&
+        !compute_norm_vector(p[1], p[2], norm[1])) {
+      if (scalar_product(norm[0], norm[1]) > 0)
+        sum = fabs(tmp_area[0] + tmp_area[1]);
+      else
+        sum = fabs(tmp_area[0] - tmp_area[1]);
+    } else {
+       sum = fabs(tmp_area[0] + tmp_area[1]);
+    }
 
-    for (int i = 0; i < cell.num_corners; ++i) {
+  } else {
 
-      if (cell.edge_type[i] == LAT_CIRCLE) {
+    double tmp_area;
 
-        double correction =
-          lat_edge_correction(tmp_points[i],
-                              tmp_points[(i+1)%cell.num_corners],
-                              cell.coordinates_x[i],
-                              cell.coordinates_x[(i+1)%cell.num_corners]);
+    // special handling for first triangle, because the first edge can be a
+    // circle of latitude
+    {
+      if (edge_type[0] == LAT_CIRCLE)
+        tmp_area = tri_area_lat(tmp_points[2], tmp_points[0], tmp_points[1],
+                                coordinates_x[0], coordinates_x[1]);
+      else if (edge_type[1] == LAT_CIRCLE)
+        tmp_area = tri_area_lat(tmp_points[0], tmp_points[1], tmp_points[2],
+                                coordinates_x[1], coordinates_x[2]);
+      else
+        tmp_area = tri_area(tmp_points[0], tmp_points[1], tmp_points[2]);
 
-        if (fabs(cell.coordinates_y[i] - min) < tol)
-          sum += min_factor * correction;
-        else if (fabs(cell.coordinates_y[i] - max) < tol)
-          sum -= correction;
+      double a[3] = {tmp_points[1][0] - tmp_points[0][0],
+                     tmp_points[1][1] - tmp_points[0][1],
+                     tmp_points[1][2] - tmp_points[0][2]};
+      double b[3] = {tmp_points[2][0] - tmp_points[0][0],
+                     tmp_points[2][1] - tmp_points[0][1],
+                     tmp_points[2][2] - tmp_points[0][2]};
+      double norm[3];
+
+      if (!compute_norm_vector(a, b, norm)) {
+
+        if (scalar_product(norm, tmp_points[0]) > 0)
+          sum += tmp_area;
         else
-          abort_message("ERROR: internal error...should have not occured\n",
-                        __FILE__, __LINE__);
+          sum -= tmp_area;
+      }
+    }
+
+    int i;
+
+    for (i = 3; i < num_corners - 1; i++) {
+
+      if (edge_type[i-1] != LAT_CIRCLE)
+        tmp_area = tri_area(tmp_points[0], tmp_points[i-1], tmp_points[i]);
+      else
+        tmp_area = tri_area_lat(tmp_points[0], tmp_points[i-1], tmp_points[i],
+                                coordinates_x[i-1], coordinates_x[i]);
+
+      double a[3] = {tmp_points[i-1][0] - tmp_points[0][0],
+                     tmp_points[i-1][1] - tmp_points[0][1],
+                     tmp_points[i-1][2] - tmp_points[0][2]};
+      double b[3] = {tmp_points[i][0] - tmp_points[0][0],
+                     tmp_points[i][1] - tmp_points[0][1],
+                     tmp_points[i][2] - tmp_points[0][2]};
+      double norm[3];
+
+      if (compute_norm_vector(a, b, norm)) continue;
+
+      if (scalar_product(norm, tmp_points[0]) > 0)
+        sum += tmp_area;
+      else
+        sum -= tmp_area;
+    }
+
+    // special handling for last triangle, because the last edge can be a
+    // circle of latitude
+    {
+      if (edge_type[i-1] == LAT_CIRCLE)
+        tmp_area = tri_area_lat(tmp_points[0], tmp_points[i-1], tmp_points[i],
+                                coordinates_x[i-1], coordinates_x[i]);
+      else if (edge_type[i] == LAT_CIRCLE)
+        tmp_area = tri_area_lat(tmp_points[i-1], tmp_points[i], tmp_points[0],
+                                coordinates_x[i], coordinates_x[0]);
+      else
+        tmp_area = tri_area(tmp_points[0], tmp_points[i-1], tmp_points[i]);
+
+      double a[3] = {tmp_points[i-1][0] - tmp_points[0][0],
+                     tmp_points[i-1][1] - tmp_points[0][1],
+                     tmp_points[i-1][2] - tmp_points[0][2]};
+      double b[3] = {tmp_points[i][0] - tmp_points[0][0],
+                     tmp_points[i][1] - tmp_points[0][1],
+                     tmp_points[i][2] - tmp_points[0][2]};
+      double norm[3];
+
+      if (!compute_norm_vector(a, b, norm)) {
+        if (scalar_product(norm, tmp_points[0]) > 0)
+          sum += tmp_area;
+        else
+          sum -= tmp_area;
       }
     }
   }
 
   // return area
-  return sum * EarthRadius * EarthRadius;
+  return fabs(sum * EarthRadius * EarthRadius);
 }
 
 /* ----------------------------------- */

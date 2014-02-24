@@ -200,6 +200,7 @@ void find_overlapping_cells_s (struct grid_cell src_cell,
  * @param[out] p intersection point
  * @param[out] q intersection point
  * @return  0 if the intersection points are neither on edge a or b \n
+ *          -1 if an error occurred \n
  *          1st bit will be set if p is on edge a \n
  *          2nd bit will be set if q is on edge a \n
  *          3rd bit will be set if p is on edge b \n
@@ -221,6 +222,7 @@ int gcxgc (struct edge edge_a, struct edge edge_b,
  * @param[out] p intersection point
  * @param[out] q intersection point
  * @return  0 if the intersection points are neither on edge a or b \n
+ *          -1 if an error occurred \n
  *          1st bit will be set if p is on edge a \n
  *          2nd bit will be set if q is on edge a \n
  *          3rd bit will be set if p is on edge b \n
