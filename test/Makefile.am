@@ -5,7 +5,8 @@ export
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
                   $(top_srcdir)/config/tap-driver.sh
 
-TESTS = Cat.test Gridarea.test Remap.test Select.test Spectral.test Timstat.test Vertint.test
+TESTS = Cat.test Gridarea.test Genweights.test Remap.test \
+        Select.test Spectral.test Timstat.test Vertint.test
 
 #        $(top_srcdir)/test/test_Remap.sh \
 #       $(top_srcdir)/test/test_info.py

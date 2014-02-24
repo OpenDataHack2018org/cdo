@@ -615,6 +615,7 @@ src/yacc_lex -text
 src/zaxis.c -text
 test/.checklib_pyunittest -text
 test/Cat.test.in -text
+test/Genweights.test.in -text
 test/Gridarea.test.in -text
 test/Makefile.am -text
 test/Makefile.in -text

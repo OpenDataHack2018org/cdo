@@ -20442,7 +20442,9 @@ fi
 done
 
 
-ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Remap.test test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test"
+ac_config_files="$ac_config_files test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test"
+
+ac_config_files="$ac_config_files test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test"
 
 ac_config_files="$ac_config_files Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings"
 
@@ -21583,6 +21585,7 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "test/Cat.test") CONFIG_FILES="$CONFIG_FILES test/Cat.test" ;;
     "test/Gridarea.test") CONFIG_FILES="$CONFIG_FILES test/Gridarea.test" ;;
+    "test/Genweights.test") CONFIG_FILES="$CONFIG_FILES test/Genweights.test" ;;
     "test/Remap.test") CONFIG_FILES="$CONFIG_FILES test/Remap.test" ;;
     "test/Select.test") CONFIG_FILES="$CONFIG_FILES test/Select.test" ;;
     "test/Spectral.test") CONFIG_FILES="$CONFIG_FILES test/Spectral.test" ;;
@@ -23082,6 +23085,7 @@ _LT_EOF
  ;;
     "test/Cat.test":F) chmod a+x "$ac_file" ;;
     "test/Gridarea.test":F) chmod a+x "$ac_file" ;;
+    "test/Genweights.test":F) chmod a+x "$ac_file" ;;
     "test/Remap.test":F) chmod a+x "$ac_file" ;;
     "test/Select.test":F) chmod a+x "$ac_file" ;;
     "test/Spectral.test":F) chmod a+x "$ac_file" ;;

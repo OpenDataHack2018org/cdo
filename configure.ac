@@ -134,7 +134,8 @@ AC_DEFINE_UNQUOTED(COMPILER, ["$COMPILER"], [Compiler])
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 AC_PROG_AWK
 
-AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Remap.test test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Cat.test test/Gridarea.test test/Genweights.test test/Remap.test],[chmod a+x "$ac_file"])
+AC_CONFIG_FILES([test/Select.test test/Spectral.test test/Timstat.test test/Vertint.test],[chmod a+x "$ac_file"])
 AC_CONFIG_FILES([Makefile src/Makefile contrib/Makefile test/Makefile test/data/Makefile cdo.spec cdo.settings])
 AC_OUTPUT
 
