@@ -7,14 +7,6 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
 
 TESTS = Cat.test Gridarea.test Remap.test Select.test Spectral.test Timstat.test Vertint.test
 
-
-#TESTS = $(top_srcdir)/test/test_Gridarea.sh \
-#        $(top_srcdir)/test/test_Cat.sh \
-#        $(top_srcdir)/test/test_Spectral.sh \
-#        $(top_srcdir)/test/test_Timstat.sh \
-#        $(top_srcdir)/test/test_Select.sh \
-#        $(top_srcdir)/test/test_Vertint.sh
-
 #        $(top_srcdir)/test/test_Remap.sh \
 #       $(top_srcdir)/test/test_info.py
 #	$(top_srcdir)/test/test_diff.py
@@ -31,12 +23,7 @@ DATAPATH   = $(top_srcdir)/test/data
 
 PYTHONPATH = $(top_srcdir)/contrib/python:$(top_srcdir)/test
 
-listTests:
-	@echo $(TESTS)
-
-test: $(TESTS)
-
-.PHONY: $(TESTS)
+#.PHONY: $(TESTS)
 
 CLEANFILES += `ls *.pyc`
 

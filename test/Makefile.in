@@ -484,18 +484,13 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+
+#.PHONY: $(TESTS)
 CLEANFILES = `ls *.pyc`
 TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) \
                   $(top_srcdir)/config/tap-driver.sh
 
 TESTS = Cat.test Gridarea.test Remap.test Select.test Spectral.test Timstat.test Vertint.test
-
-#TESTS = $(top_srcdir)/test/test_Gridarea.sh \
-#        $(top_srcdir)/test/test_Cat.sh \
-#        $(top_srcdir)/test/test_Spectral.sh \
-#        $(top_srcdir)/test/test_Timstat.sh \
-#        $(top_srcdir)/test/test_Select.sh \
-#        $(top_srcdir)/test/test_Vertint.sh
 
 #        $(top_srcdir)/test/test_Remap.sh \
 #       $(top_srcdir)/test/test_info.py
@@ -878,13 +873,6 @@ uninstall-am:
 
 
 export
-
-listTests:
-	@echo $(TESTS)
-
-test: $(TESTS)
-
-.PHONY: $(TESTS)
 
 #AUTOMAKE_OPTIONS = color-tests
 
