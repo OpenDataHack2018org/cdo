@@ -28,7 +28,7 @@ for GRID in $GRIDS; do
   test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
   test $RSTAT -eq 0 || echo "not ok $NTEST - $CDOTEST"
 
-  let NTEST++
+  let NTEST+=1
 done
 #
 rm -f $CDOOUT $CDOERR

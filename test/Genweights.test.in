@@ -33,14 +33,14 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
         echo "$CDOCOMMAND"
 
         $CDOCOMMAND
-        test $? -eq 0 || let RSTAT++
+        test $? -eq 0 || let RSTAT+=1
 
         $CDO $FORMAT remap,$GRID,remapweights $SETGRID $IFILE ${OFILE}
-        test $? -eq 0 || let RSTAT++
+        test $? -eq 0 || let RSTAT+=1
 
         $CDO diff,$ABSLIM $OFILE $RFILE > $CDOOUT 2> $CDOERR
-        test $? -eq 0 || let RSTAT++
-        test -s $CDOOUT && let RSTAT++
+        test $? -eq 0 || let RSTAT+=1
+        test -s $CDOOUT && let RSTAT+=1
         cat $CDOOUT $CDOERR
 
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST"
@@ -49,7 +49,7 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
         test $RSTAT -eq 0 && echo "ok $NTEST - $CDOTEST # SKIP netCDF not enabled"
       fi
 
-      let NTEST++
+      let NTEST+=1
       rm -f $OFILE
     done
   done
