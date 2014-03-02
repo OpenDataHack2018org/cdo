@@ -62,9 +62,9 @@ case "${HOSTNAME}" in
                     --with-szlib=$HOME/local \
                     --with-proj=/opt/local \
                     --with-curl=/opt/local \
-                    --with-libxml2=/usr \
-                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native -fopenmp"
+#                    --with-libxml2=/usr \
+#                    --with-magics=/Users/m214003/local/Magics-2.18.14nio \
 	;;
 # ia64-xxx-linux
     ds*)
