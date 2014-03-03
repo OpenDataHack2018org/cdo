@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-03-03  Uwe Schulzweida
+
+	* Zonstat: bug fix if input stream contains only zonal data
+
 2014-02-19  Uwe Schulzweida
 
 	* Diff: added number of different values to output

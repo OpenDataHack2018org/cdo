@@ -115,18 +115,26 @@ void *Zonstat(void *argument)
     }
   if ( ndiffgrids > 0 ) cdoAbort("Too many different grids!");
 
-  if ( gridInqType(gridID1) == GRID_LONLAT   ||
-       gridInqType(gridID1) == GRID_GAUSSIAN ||
-       gridInqType(gridID1) == GRID_GENERIC )
+  if ( gridID1 != -1 )
     {
-      if ( zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1) )
-	gridID2 = zongridID;
+      if ( gridInqType(gridID1) == GRID_LONLAT   ||
+	   gridInqType(gridID1) == GRID_GAUSSIAN ||
+	   gridInqType(gridID1) == GRID_GENERIC )
+	{
+	  if ( zongridID != -1 && gridInqYsize(zongridID) == gridInqYsize(gridID1) )
+	    gridID2 = zongridID;
+	  else
+	    gridID2 = gridToZonal(gridID1);
+	}
       else
-	gridID2 = gridToZonal(gridID1);
+	{
+	  cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
+	}
     }
   else
     {
-      cdoAbort("Unsupported gridtype: %s", gridNamePtr(gridInqType(gridID1)));
+      gridID2 = zongridID;
+      cdoWarning("Input stream contains only zonal data!");
     }
 
   for ( index = 0; index < ngrids; index++ )
