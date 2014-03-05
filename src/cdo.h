@@ -38,6 +38,10 @@
 
 extern int ompNumThreads;
 
+extern int stdin_is_tty;
+extern int stdout_is_tty;
+extern int stderr_is_tty;
+
 extern int cdoDefaultFileType;
 extern int cdoDefaultDataType;
 extern int cdoDefaultByteorder;
@@ -65,6 +69,7 @@ extern int cdoChunkType;
 
 extern int cdoExpMode;
 
+extern int cdoColor;
 extern int cdoDiag;
 
 extern int cdoNumVarnames;

@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 /*#include <malloc.h>*/ /* mallopt and malloc_stats */
+#include <sys/stat.h>
 #if defined(HAVE_GETRLIMIT)
 #if defined(HAVE_SYS_RESOURCE_H)
 #include <sys/time.h>       /* getrlimit */
@@ -62,6 +63,9 @@
 #  define  VERSION  "0.0.1"
 #endif
 
+#define COLOR_STDOUT (stdout_is_tty && cdoColor)
+#define COLOR_STDERR (stderr_is_tty && cdoColor)
+
 char CDO_Version[] = "Climate Data Operators version "VERSION" (http://code.zmaw.de/projects/cdo)";
 
 
@@ -69,7 +73,11 @@ char *Progname;
 
 int ompNumThreads = 1;
 
-char *cdoGridSearchDir   = NULL;
+int stdin_is_tty  = 0;
+int stdout_is_tty = 0;
+int stderr_is_tty = 0;
+
+char* cdoGridSearchDir   = NULL;
 int cdoDefaultFileType   = CDI_UNDEFID;
 int cdoDefaultDataType   = CDI_UNDEFID;
 int cdoDefaultTimeType   = CDI_UNDEFID;
@@ -79,6 +87,7 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
+int cdoColor             = FALSE;
 int cdoDiag              = FALSE;
 int cdoDisableHistory    = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type
@@ -142,6 +151,34 @@ int timer_total, timer_read, timer_write;
 void printFeatures(void);
 void printLibraries(void);
 
+#define RESET		0
+#define BRIGHT 		1
+#define DIM		2
+#define UNDERLINE 	3
+#define BLINK		4
+#define REVERSE		7
+#define HIDDEN		8
+
+#define BLACK 		0
+#define RED		1
+#define GREEN		2
+#define YELLOW		3
+#define BLUE		4
+#define MAGENTA		5
+#define CYAN		6
+#define	WHITE		7
+
+void text_color(FILE *fp, int attr, int fg, int bg)
+{
+  fprintf(fp, "%c[%d", 0x1B, attr);
+  if ( fg >= 0 )
+    {
+      fprintf(fp, ";%d", fg+30);
+      if ( bg >= 0 ) fprintf(fp, ";%d", bg+40);
+    }
+  fprintf(fp, "m");
+}
+
 static
 void cdo_version(void)
 {
@@ -164,8 +201,10 @@ void cdo_version(void)
   printLibraries();
 
   fprintf(stderr, "Filetypes: ");
+  if ( COLOR_STDERR ) text_color(stderr, BRIGHT, GREEN, -1);
   for ( size_t i = 0; i < sizeof(filetypes)/sizeof(int); ++i )
     if ( cdiHaveFiletype(filetypes[i]) ) fprintf(stderr, "%s ", typenames[i]);
+  if ( COLOR_STDERR ) text_color(stderr, RESET, -1, -1);
   fprintf(stderr, "\n");
 
   cdiPrintVersion();
@@ -173,7 +212,7 @@ void cdo_version(void)
 }
 
 static
-void usage(void)
+void cdo_usage(void)
 {
   int id = 0;
   char *name;
@@ -240,6 +279,18 @@ void usage(void)
 }
 
 static
+void cdo_init_is_tty(void)
+{
+  struct stat statbuf;
+  fstat(0, &statbuf);
+  if ( S_ISCHR(statbuf.st_mode) ) stdin_is_tty = 1;  
+  fstat(1, &statbuf);
+  if ( S_ISCHR(statbuf.st_mode) ) stdout_is_tty = 1;  
+  fstat(2, &statbuf);
+  if ( S_ISCHR(statbuf.st_mode) ) stderr_is_tty = 1;  
+}
+
+static
 void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 {
   if ( phelp == NULL )
@@ -254,7 +305,30 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 	    if ( *(phelp+1) )
 	      if ( *(phelp+1)[0] == ' ' ) lprint = FALSE;
 	  
-	  if ( lprint ) fprintf(stdout, "%s\n", *phelp);
+	  if ( lprint )
+	    {
+	      if ( COLOR_STDOUT )
+		{
+		  size_t len = strlen(*phelp);
+		  if ( (len ==  4 && memcmp(*phelp, "NAME", len) == 0) ||
+		       (len ==  8 && memcmp(*phelp, "SYNOPSIS", len) == 0) ||
+		       (len == 11 && memcmp(*phelp, "DESCRIPTION", len) == 0) ||
+		       (len ==  9 && memcmp(*phelp, "OPERATORS", len) == 0) ||
+		       (len ==  9 && memcmp(*phelp, "PARAMETER", len) == 0) )
+		    {
+		      text_color(stdout, BRIGHT, BLACK, -1);
+		      fprintf(stdout, "%s", *phelp);
+		      text_color(stdout, RESET, -1, -1);
+		      fprintf(stdout, "\n");
+		    }
+		  else
+		    fprintf(stdout, "%s\n", *phelp);
+		}
+	      else
+		{
+		  fprintf(stdout, "%s\n", *phelp);
+		}
+	    }
 
 	  phelp++;
 	}
@@ -839,6 +913,31 @@ void get_env_vars(void)
 	    fprintf(stderr, "CDO_DIAG = %s\n", envstr);
 	}
     }
+
+  envstr = getenv("CDO_COLOR");
+  if ( envstr )
+    {
+      if ( atoi(envstr) == 1 )
+	{
+	  cdoColor = TRUE;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_COLOR = %s\n", envstr);
+	}
+    }
+  else
+    {
+      if ( cdoColor == FALSE )
+	{
+	  char *username;
+	  username = getenv("LOGNAME");
+	  if ( username == NULL )
+	    {
+	      username = getenv("USER");
+	      if ( username == NULL ) username = "unknown";
+	    }
+	  if ( strcmp(username, "m214003") == 0 ) cdoColor = TRUE;
+	}
+    }
 }
 
 static
@@ -849,6 +948,7 @@ void print_system_info()
   if ( DebugLevel == 0 ) DebugLevel = 1;
   cdoSetDebug(DebugLevel);
   fprintf(stderr, "\n");
+  fprintf(stderr, "cdoColor            = %d\n", cdoColor);
   fprintf(stderr, "cdoDefaultFileType  = %d\n", cdoDefaultFileType);
   fprintf(stderr, "cdoDefaultDataType  = %d\n", cdoDefaultDataType);
   fprintf(stderr, "cdoDefaultByteorder = %d\n", cdoDefaultByteorder);
@@ -1158,7 +1258,7 @@ int main(int argc, char *argv[])
   extern int dmemory_ExitOnError;
   argument_t *argument = NULL;
 
-  init_is_tty();
+  cdo_init_is_tty();
 
   dmemory_ExitOnError = 1;
 
@@ -1216,11 +1316,11 @@ int main(int argc, char *argv[])
       if ( ! Version && ! Help )
 	{
 	  fprintf(stderr, "\nNo operator given!\n\n");
-	  usage();
+	  cdo_usage();
 	  status = 1;
 	}
 
-      if ( Help ) usage();
+      if ( Help ) cdo_usage();
       lstop = TRUE;
     }
 

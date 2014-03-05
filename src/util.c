@@ -311,18 +311,6 @@ int userFileOverwrite(const char *filename)
   return (status);
 }
 
-int stdin_is_tty  = 0;
-int stdout_is_tty = 0;
-
-void init_is_tty(void)
-{
-  struct stat statbuf;
-  fstat(0, &statbuf);
-  if ( S_ISCHR(statbuf.st_mode) ) stdin_is_tty = 1;  
-  fstat(1, &statbuf);
-  if ( S_ISCHR(statbuf.st_mode) ) stdout_is_tty = 1;  
-}
-
 
 int ps_lhead = FALSE;
 int ps_nch   = 0;
