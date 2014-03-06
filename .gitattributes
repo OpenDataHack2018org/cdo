@@ -604,6 +604,8 @@ src/table.c -text
 src/temp.h -text
 src/template_parser.c -text
 src/template_parser.h -text
+src/text.c -text
+src/text.h -text
 src/timebase.h -text
 src/timer.c -text
 src/userlog.c -text

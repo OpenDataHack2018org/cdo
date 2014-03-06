@@ -63,8 +63,6 @@
 #  define  VERSION  "0.0.1"
 #endif
 
-#define COLOR_STDOUT (stdout_is_tty && cdoColor)
-#define COLOR_STDERR (stderr_is_tty && cdoColor)
 
 char CDO_Version[] = "Climate Data Operators version "VERSION" (http://code.zmaw.de/projects/cdo)";
 
@@ -151,44 +149,16 @@ int timer_total, timer_read, timer_write;
 void printFeatures(void);
 void printLibraries(void);
 
-#define RESET		0
-#define BRIGHT 		1
-#define DIM		2
-#define UNDERLINE 	3
-#define BLINK		4
-#define REVERSE		7
-#define HIDDEN		8
-
-#define BLACK 		0
-#define RED		1
-#define GREEN		2
-#define YELLOW		3
-#define BLUE		4
-#define MAGENTA		5
-#define CYAN		6
-#define	WHITE		7
-
-void text_color(FILE *fp, int attr, int fg, int bg)
-{
-  fprintf(fp, "%c[%d", 0x1B, attr);
-  if ( fg >= 0 )
-    {
-      fprintf(fp, ";%d", fg+30);
-      if ( bg >= 0 ) fprintf(fp, ";%d", bg+40);
-    }
-  fprintf(fp, "m");
-}
 
 static
 void cdo_version(void)
 {
-  int   filetypes[] = {FILETYPE_SRV, FILETYPE_EXT, FILETYPE_IEG, FILETYPE_GRB, FILETYPE_GRB2, FILETYPE_NC, FILETYPE_NC2, FILETYPE_NC4, FILETYPE_NC4C};
-  char *typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
+  const int   filetypes[] = {FILETYPE_SRV, FILETYPE_EXT, FILETYPE_IEG, FILETYPE_GRB, FILETYPE_GRB2, FILETYPE_NC, FILETYPE_NC2, FILETYPE_NC4, FILETYPE_NC4C};
+  const char* typenames[] = {        "srv",        "ext",        "ieg",        "grb",        "grb2",        "nc",        "nc2",        "nc4",        "nc4c"};
 
   fprintf(stderr, "%s\n", CDO_Version);
 #if defined(USER_NAME) && defined(HOST_NAME) && defined(SYSTEM_TYPE)
-  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n",
-	  USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
+  fprintf(stderr, "Compiled: by %s on %s (%s) %s %s\n", USER_NAME, HOST_NAME, SYSTEM_TYPE, __DATE__, __TIME__);
 #endif
 #if defined(COMPILER)
   fprintf(stderr, "Compiler: %s\n", COMPILER);
@@ -201,10 +171,10 @@ void cdo_version(void)
   printLibraries();
 
   fprintf(stderr, "Filetypes: ");
-  if ( COLOR_STDERR ) text_color(stderr, BRIGHT, GREEN, -1);
+  set_text_color(stderr, BRIGHT, GREEN);
   for ( size_t i = 0; i < sizeof(filetypes)/sizeof(int); ++i )
     if ( cdiHaveFiletype(filetypes[i]) ) fprintf(stderr, "%s ", typenames[i]);
-  if ( COLOR_STDERR ) text_color(stderr, RESET, -1, -1);
+  reset_text_color(stderr);
   fprintf(stderr, "\n");
 
   cdiPrintVersion();
@@ -316,9 +286,9 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 		       (len ==  9 && memcmp(*phelp, "OPERATORS", len) == 0) ||
 		       (len ==  9 && memcmp(*phelp, "PARAMETER", len) == 0) )
 		    {
-		      text_color(stdout, BRIGHT, BLACK, -1);
+		      set_text_color(stdout, BRIGHT, BLACK);
 		      fprintf(stdout, "%s", *phelp);
-		      text_color(stdout, RESET, -1, -1);
+		      reset_text_color(stdout);
 		      fprintf(stdout, "\n");
 		    }
 		  else
@@ -935,7 +905,7 @@ void get_env_vars(void)
 	      username = getenv("USER");
 	      if ( username == NULL ) username = "unknown";
 	    }
-	  if ( strcmp(username, "m214003") == 0 ) cdoColor = TRUE;
+	  if ( strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0 ) cdoColor = TRUE;
 	}
     }
 }

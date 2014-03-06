@@ -164,15 +164,16 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	pthread_debug.h readline.c realtime.c remap.h remaplib.c \
 	remapsort.c remap_scrip_io.c remap_search_latbins.c \
 	stdnametable.c stdnametable.h specspace.c specspace.h \
-	statistic.c statistic.h table.c timebase.h timer.c userlog.c \
-	util.c util.h vinterp.c vinterp.h zaxis.c clipping/clipping.c \
-	clipping/clipping.h clipping/area.c clipping/area.h \
-	clipping/ensure_array_size.c clipping/ensure_array_size.h \
-	clipping/geometry_tools.c clipping/geometry.h clipping/grid.h \
-	clipping/points.h clipping/dep_list.h clipping/grid_cell.c \
-	clipping/grid_cell.h clipping/intersection.c clipping/utils.c \
-	clipping/utils.h Magplot.c Magvector.c Maggraph.c \
-	template_parser.h template_parser.c results_template_parser.h \
+	statistic.c statistic.h table.c text.c text.h timebase.h \
+	timer.c userlog.c util.c util.h vinterp.c vinterp.h zaxis.c \
+	clipping/clipping.c clipping/clipping.h clipping/area.c \
+	clipping/area.h clipping/ensure_array_size.c \
+	clipping/ensure_array_size.h clipping/geometry_tools.c \
+	clipping/geometry.h clipping/grid.h clipping/points.h \
+	clipping/dep_list.h clipping/grid_cell.c clipping/grid_cell.h \
+	clipping/intersection.c clipping/utils.c clipping/utils.h \
+	Magplot.c Magvector.c Maggraph.c template_parser.h \
+	template_parser.c results_template_parser.h \
 	results_template_parser.c magics_template_parser.h \
 	magics_template_parser.c StringUtilities.h StringUtilities.c \
 	CdoMagicsMapper.h CdoMagicsMapper.c
@@ -293,9 +294,9 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-remapsort.$(OBJEXT) cdo-remap_scrip_io.$(OBJEXT) \
 	cdo-remap_search_latbins.$(OBJEXT) cdo-stdnametable.$(OBJEXT) \
 	cdo-specspace.$(OBJEXT) cdo-statistic.$(OBJEXT) \
-	cdo-table.$(OBJEXT) cdo-timer.$(OBJEXT) cdo-userlog.$(OBJEXT) \
-	cdo-util.$(OBJEXT) cdo-vinterp.$(OBJEXT) cdo-zaxis.$(OBJEXT) \
-	cdo-clipping.$(OBJEXT) cdo-area.$(OBJEXT) \
+	cdo-table.$(OBJEXT) cdo-text.$(OBJEXT) cdo-timer.$(OBJEXT) \
+	cdo-userlog.$(OBJEXT) cdo-util.$(OBJEXT) cdo-vinterp.$(OBJEXT) \
+	cdo-zaxis.$(OBJEXT) cdo-clipping.$(OBJEXT) cdo-area.$(OBJEXT) \
 	cdo-ensure_array_size.$(OBJEXT) cdo-geometry_tools.$(OBJEXT) \
 	cdo-grid_cell.$(OBJEXT) cdo-intersection.$(OBJEXT) \
 	cdo-utils.$(OBJEXT) $(am__objects_1)
@@ -594,14 +595,14 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	readline.c realtime.c remap.h remaplib.c remapsort.c \
 	remap_scrip_io.c remap_search_latbins.c stdnametable.c \
 	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
-	table.c timebase.h timer.c userlog.c util.c util.h vinterp.c \
-	vinterp.h zaxis.c clipping/clipping.c clipping/clipping.h \
-	clipping/area.c clipping/area.h clipping/ensure_array_size.c \
-	clipping/ensure_array_size.h clipping/geometry_tools.c \
-	clipping/geometry.h clipping/grid.h clipping/points.h \
-	clipping/dep_list.h clipping/grid_cell.c clipping/grid_cell.h \
-	clipping/intersection.c clipping/utils.c clipping/utils.h \
-	$(am__append_1)
+	table.c text.c text.h timebase.h timer.c userlog.c util.c \
+	util.h vinterp.c vinterp.h zaxis.c clipping/clipping.c \
+	clipping/clipping.h clipping/area.c clipping/area.h \
+	clipping/ensure_array_size.c clipping/ensure_array_size.h \
+	clipping/geometry_tools.c clipping/geometry.h clipping/grid.h \
+	clipping/points.h clipping/dep_list.h clipping/grid_cell.c \
+	clipping/grid_cell.h clipping/intersection.c clipping/utils.c \
+	clipping/utils.h $(am__append_1)
 cdo_CPPFLAGS = -I$(top_srcdir)/libcdi/src
 cdo_LDADD = $(top_builddir)/libcdi/src/libcdi.la
 cdo_LDFLAGS = $(am__append_2)
@@ -990,6 +991,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-stdnametable.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-table.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-template_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-text.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-userlog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-util.Po@am__quote@
@@ -4308,6 +4310,20 @@ cdo-table.obj: table.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='table.c' object='cdo-table.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-table.obj `if test -f 'table.c'; then $(CYGPATH_W) 'table.c'; else $(CYGPATH_W) '$(srcdir)/table.c'; fi`
+
+cdo-text.o: text.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-text.o -MD -MP -MF $(DEPDIR)/cdo-text.Tpo -c -o cdo-text.o `test -f 'text.c' || echo '$(srcdir)/'`text.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-text.Tpo $(DEPDIR)/cdo-text.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='text.c' object='cdo-text.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-text.o `test -f 'text.c' || echo '$(srcdir)/'`text.c
+
+cdo-text.obj: text.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-text.obj -MD -MP -MF $(DEPDIR)/cdo-text.Tpo -c -o cdo-text.obj `if test -f 'text.c'; then $(CYGPATH_W) 'text.c'; else $(CYGPATH_W) '$(srcdir)/text.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-text.Tpo $(DEPDIR)/cdo-text.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='text.c' object='cdo-text.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-text.obj `if test -f 'text.c'; then $(CYGPATH_W) 'text.c'; else $(CYGPATH_W) '$(srcdir)/text.c'; fi`
 
 cdo-timer.o: timer.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-timer.o -MD -MP -MF $(DEPDIR)/cdo-timer.Tpo -c -o cdo-timer.o `test -f 'timer.c' || echo '$(srcdir)/'`timer.c

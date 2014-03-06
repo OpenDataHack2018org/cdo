@@ -283,6 +283,7 @@ void *Info(void *argument)
 	    {
 	      if ( (tsID == 0 && recID == 0) || operatorID == MAP )
 		{
+		  set_text_color(stdout, BRIGHT, BLACK);
 		  fprintf(stdout, "%6d :       Date     Time   Level Gridsize    Miss :"
 			  "     Minimum        Mean     Maximum : ",  -(indf+1));
 
@@ -290,8 +291,9 @@ void *Info(void *argument)
 		  else if ( operatorID == INFOC ) fprintf(stdout, "Code number");
 		  else                            fprintf(stdout, "Parameter ID");
 
-		  if ( cdoVerbose ) fprintf(stdout, " : Extra" );              
-		  fprintf(stdout, "\n" );              
+		  if ( cdoVerbose ) fprintf(stdout, " : Extra" );
+		  reset_text_color(stdout);
+		  fprintf(stdout, "\n" );
 		}
 
 	      streamInqRecord(streamID, &varID, &levelID);
@@ -310,12 +312,23 @@ void *Info(void *argument)
 
 	      if ( operatorID == INFON ) vlistInqVarName(vlistID, varID, varname);
 
-	      fprintf(stdout, "%6d :%s %s ", indg, vdatestr, vtimestr);
-
+	      set_text_color(stdout, BRIGHT, BLACK);
+	      fprintf(stdout, "%6d ", indg);
+	      reset_text_color(stdout);
+	      set_text_color(stdout, RESET, BLACK);
+	      fprintf(stdout, ":");
+	      reset_text_color(stdout);
+	      
+	      set_text_color(stdout, RESET, BLUE);
+	      fprintf(stdout, "%s %s ", vdatestr, vtimestr);
 	      level = zaxisInqLevel(zaxisID, levelID);
 	      fprintf(stdout, "%7g ", level);
-
-	      fprintf(stdout, "%8d %7d :", gridsize, nmiss);
+	      fprintf(stdout, "%8d %7d ", gridsize, nmiss);
+	      reset_text_color(stdout);
+		
+	      set_text_color(stdout, RESET, BLACK);
+	      fprintf(stdout, ":");
+	      reset_text_color(stdout);
 
 	      if ( /* gridInqType(gridID) == GRID_SPECTRAL || */
 		   (gridsize == 1 && nmiss == 0 && number == CDI_REAL) )
@@ -407,12 +420,18 @@ void *Info(void *argument)
 		    }
 		}
 
+	      set_text_color(stdout, RESET, BLACK);
+	      fprintf(stdout, " : ");
+	      reset_text_color(stdout);
+
+	      set_text_color(stdout, BRIGHT, GREEN);
 	      if ( operatorID == INFON )
-		fprintf(stdout, " : %-14s", varname);
+		fprintf(stdout, "%-14s", varname);
 	      else if ( operatorID == INFOC )
-		fprintf(stdout, " : %4d   ", code);
+		fprintf(stdout, "%4d   ", code);
 	      else
-		fprintf(stdout, " : %-14s", paramstr);
+		fprintf(stdout, "%-14s", paramstr);
+	      reset_text_color(stdout);
 
 	      if ( cdoVerbose )
 		{

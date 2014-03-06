@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include "dmemory.h"
 #include "util.h"
+#include "text.h"
 
 #undef   TRUE
 #define  TRUE   1

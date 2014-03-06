@@ -160,10 +160,9 @@ void *Diff(void *argument)
 		    {
 		      lhead = FALSE;
 
+		      set_text_color(stdout, BRIGHT, BLACK);
 		      fprintf(stdout, "               Date     Time   Level Gridsize    Miss ");
-			
 		      fprintf(stdout, "   Diff ");
-
 		      fprintf(stdout, ": S Z  Max_Absdiff Max_Reldiff");
 
 		      if ( operatorID == DIFFN )
@@ -172,29 +171,44 @@ void *Diff(void *argument)
 			fprintf(stdout, " : Parameter ID");
 		      else if ( operatorID == DIFFC )
 			fprintf(stdout, " : Code number");
+		      reset_text_color(stdout);
 
 		      fprintf(stdout, "\n");
 		    }
 
 		  if ( operatorID == DIFFN ) vlistInqVarName(vlistID1, varID1, varname);
+		  
+		  set_text_color(stdout, BRIGHT, BLACK);
+		  fprintf(stdout, "%6d ", indg);
+		  reset_text_color(stdout);
+		  set_text_color(stdout, RESET, BLACK);
+		  fprintf(stdout, ":");
+		  reset_text_color(stdout);
 		
-		  fprintf(stdout, "%6d :%s %s ", indg, vdatestr, vtimestr);
-
+		  set_text_color(stdout, RESET, BLUE);
+		  fprintf(stdout, "%s %s ", vdatestr, vtimestr);
 		  fprintf(stdout, "%7g ", zaxisInqLevel(zaxisID, levelID));
-
 		  fprintf(stdout, "%8d %7d ", gridsize, MAX(nmiss1, nmiss2));
-
 		  fprintf(stdout, "%7d ", ndiff);
+		  reset_text_color(stdout);
 		
-		  fprintf(stdout, ": %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
+		  set_text_color(stdout, RESET, BLACK);
+		  fprintf(stdout, ":");
+		  reset_text_color(stdout);
+		  fprintf(stdout, " %c %c ", dsgn ? 'T' : 'F', zero ? 'T' : 'F');
 		  fprintf(stdout, "%#12.5g%#12.5g", absm, relm);
+		  set_text_color(stdout, RESET, BLACK);
+		  fprintf(stdout, " : ");
+		  reset_text_color(stdout);
 
+		  set_text_color(stdout, BRIGHT, GREEN);
 		  if ( operatorID == DIFFN )
-		    fprintf(stdout, " : %-11s", varname);
+		    fprintf(stdout, "%-11s", varname);
 		  else if ( operatorID == DIFF || operatorID == DIFFP )
-		    fprintf(stdout, " : %-11s", paramstr);
+		    fprintf(stdout, "%-11s", paramstr);
 		  else if ( operatorID == DIFFC )
-		    fprintf(stdout, " : %4d", code);
+		    fprintf(stdout, "%4d", code);
+		  reset_text_color(stdout);
 		      
 		  fprintf(stdout, "\n");
 		}
@@ -209,7 +223,11 @@ void *Diff(void *argument)
 
   if ( ndrec > 0 )
     {
-      fprintf(stdout, "  %d of %d records differ\n", ndrec, ngrec);
+      set_text_color(stdout, BRIGHT, RED);
+      fprintf(stdout, "  %d of %d records differ", ndrec, ngrec);
+      reset_text_color(stdout);
+      fprintf(stdout, "\n");
+
       if ( ndrec != nd2rec && abslim < abslim2 )
 	fprintf(stdout, "  %d of %d records differ more than 0.001\n", nd2rec, ngrec);
       /*  fprintf(stdout, "  %d of %d records differ more then one thousandth\n", nprec, ngrec); */

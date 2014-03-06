@@ -278,6 +278,8 @@ cdo_SOURCES += Adisit.c        \
                statistic.c     \
                statistic.h     \
                table.c         \
+               text.c          \
+               text.h          \
                timebase.h      \
                timer.c         \
                userlog.c       \
