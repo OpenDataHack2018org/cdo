@@ -4,8 +4,8 @@
 #define RESET		0
 #define BRIGHT 		1
 #define DIM		2
-#define UNDERLINE 	3
-#define BLINK		4
+#define UNDERLINE 	4
+#define BLINK		5
 #define REVERSE		7
 #define HIDDEN		8
 

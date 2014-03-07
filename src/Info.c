@@ -28,7 +28,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-
+static
 void printMap(int nlon, int nlat, double *array, double missval, double min, double max)
 {
   /* source code from PINGO */
@@ -37,6 +37,7 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
   double step;
   double level[10];
   int min_n, max_n;
+  int bmin = 1, bmax = 1;
   char c;
 
   step = (max - min) / 10;
@@ -151,7 +152,29 @@ void printMap(int nlon, int nlat, double *array, double missval, double min, dou
 		    break;
 		  }
 	    }
+
+	  if      ( c == '0' ) set_text_color(stdout, BRIGHT, BLUE);
+	  else if ( c == '1' ) set_text_color(stdout, RESET, BLUE);
+	  else if ( c == '2' ) set_text_color(stdout, BRIGHT, CYAN);
+	  else if ( c == '3' ) set_text_color(stdout, RESET, CYAN);
+	  else if ( c == '4' ) set_text_color(stdout, RESET, GREEN);
+	  else if ( c == '5' ) set_text_color(stdout, RESET, YELLOW);
+	  else if ( c == '6' ) set_text_color(stdout, RESET, RED);
+	  else if ( c == '7' ) set_text_color(stdout, BRIGHT, RED);
+	  else if ( c == '8' ) set_text_color(stdout, RESET, MAGENTA);
+	  else if ( c == '9' ) set_text_color(stdout, BRIGHT, MAGENTA);
+	  else if ( c == 'M' )
+	    {
+	      if ( bmax ) { bmax = 0; set_text_color(stdout, BLINK, BLACK); }
+	      else        {           set_text_color(stdout, RESET, BLACK); }
+	    }
+	  else if ( c == 'm' )
+	    {
+	      if ( bmin ) { bmin = 0; set_text_color(stdout, BLINK, BLACK); }
+	      else        {           set_text_color(stdout, RESET, BLACK); }
+	    }
 	  putchar (c);
+	  reset_text_color(stdout);
 	}
       printf (" %0*d\n", nlat < 10 ? 1 : nlat < 100 ? 2 : nlat < 1000 ? 3 : 4, ilat + 1);
       fflush (stdout);

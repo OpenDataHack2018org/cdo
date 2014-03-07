@@ -1085,7 +1085,7 @@ void parse_options(int argc, char *argv[])
 {
   int c;
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBcdhLMOQRrsSTuVvWXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhLMOQRrsSTuVvWXZ")) != -1 )
     {
       switch (c)
 	{
@@ -1097,6 +1097,9 @@ void parse_options(int argc, char *argv[])
 	  break;
 	case 'B':
 	  cdoBenchmark = TRUE;
+	  break;
+	case 'C':
+	  cdoColor = !cdoColor;
 	  break;
 	case 'c':
 	  cdoCheckDatarange = TRUE;
@@ -1248,9 +1251,9 @@ int main(int argc, char *argv[])
 
   if ( noff ) setDefaultFileType(Progname+noff, 0);
 
-  parse_options(argc, argv);
-
   get_env_vars();
+
+  parse_options(argc, argv);
 
   if ( Debug || Version ) cdo_version();
 
