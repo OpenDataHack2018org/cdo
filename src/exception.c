@@ -15,7 +15,7 @@ void cdiError(int cdiErrno, const char *fmt, ...)
   va_start(args, fmt);
 
   printf("\n");
-  set_text_color(stderr, BRIGHT, RED);
+  set_text_color(stderr, RESET, RED);
    fprintf(stderr, "%s: ", processInqPrompt());
   reset_text_color(stderr);
   set_text_color(stderr, RESET, BLACK);
@@ -38,7 +38,7 @@ void cdoAbort(const char *fmt, ...)
   va_start(args, fmt);
 
   printf("\n");
-  set_text_color(stderr, BRIGHT, RED);
+  set_text_color(stderr, RESET, RED);
    fprintf(stderr, "%s (Abort): ", processInqPrompt());
   reset_text_color(stderr);
   set_text_color(stderr, RESET, BLACK);
@@ -78,7 +78,7 @@ void cdoPrint(const char *fmt, ...)
     {
       va_start(args, fmt);
 
-      set_text_color(stderr, BRIGHT, YELLOW);
+      set_text_color(stderr, RESET, GREEN);
       fprintf(stderr, "%s: ", processInqPrompt());
       reset_text_color(stderr);
       set_text_color(stderr, RESET, BLACK);

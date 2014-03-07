@@ -363,7 +363,7 @@ int pstreamOpenRead(const argument_t *argument)
       pstreamptr->argument  = (void *) newargument;
  
       if ( ! cdoSilentMode )
-	fprintf(stderr, "%s: Started child process \"%s\".\n", processInqPrompt(), newarg+1);
+	cdoPrint("Started child process \"%s\".", newarg+1);
 
       status = pthread_attr_init(&attr);
       if ( status ) SysError("pthread_attr_init failed for '%s'\n", newarg+1);
@@ -1554,36 +1554,29 @@ void cdoFinish(void)
 
   if ( !cdoSilentMode )
     {
+      set_text_color(stderr, RESET, GREEN);
+      fprintf(stderr, "%s: ", processInqPrompt());
+      reset_text_color(stderr);
       if ( nvals > 0 )
 	{
 	  if ( sizeof(INT64) > sizeof(long) )
 #if defined(_WIN32)
-	    fprintf(stderr, "%s: Processed %I64d value%s from %d variable%s",
+	    fprintf(stderr, "Processed %I64d value%s from %d variable%s",
 #else
-	    fprintf(stderr, "%s: Processed %jd value%s from %d variable%s",
+	    fprintf(stderr, "Processed %jd value%s from %d variable%s",
 #endif
-		    processInqPrompt(),
-		    nvals, nvals > 1 ? "s" : "",
-		    nvars, nvars > 1 ? "s" : "");
+		    nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
 	  else
-	    fprintf(stderr, "%s: Processed %ld value%s from %d variable%s",
-		    processInqPrompt(),
-		    (long) nvals, nvals > 1 ? "s" : "",
-		    nvars, nvars > 1 ? "s" : "");
+	    fprintf(stderr, "Processed %ld value%s from %d variable%s",
+		    (long) nvals, ADD_PLURAL(nvals), nvars, ADD_PLURAL(nvars));
 	}
       else if ( nvars > 0 )
 	{
-	  fprintf(stderr, "%s: Processed %d variable%s",
-		  processInqPrompt(),
-		  nvars, nvars > 1 ? "s" : "");
-	}
-      else
-	{
-	  fprintf(stderr, "%s: ", processInqPrompt());
+	  fprintf(stderr, "Processed %d variable%s", nvars,  ADD_PLURAL(nvars));
 	}
 
       if ( ntimesteps > 0 )
-	fprintf(stderr, " over %d timestep%s", ntimesteps, ntimesteps > 1 ? "s" : "");
+	fprintf(stderr, " over %d timestep%s", ntimesteps,  ADD_PLURAL(ntimesteps));
 
       //  fprintf(stderr, ".");
     }
