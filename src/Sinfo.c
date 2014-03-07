@@ -108,9 +108,13 @@ void *Sinfo(void *argument)
 
       vlistID = streamInqVlist(streamID);
 
-      fprintf(stdout, "   File format: ");
+      set_text_color(stdout, BRIGHT, BLACK);
+      fprintf(stdout, "   File format");
+      reset_text_color(stdout);
+      fprintf(stdout, " : ");
       printFiletype(streamID, vlistID);
 
+      set_text_color(stdout, BRIGHT, BLACK);
       if ( lensemble )
 	fprintf(stdout, "%6d : Institut Source   Ttype    Einfo Levels Num  Gridsize Num Dtype : ",  -(indf+1));
       else
@@ -121,6 +125,7 @@ void *Sinfo(void *argument)
       else                              fprintf(stdout, "Parameter ID");
 
       if ( cdoVerbose ) fprintf(stdout, " : Extra" );              
+      reset_text_color(stdout);
       fprintf(stdout, "\n" );              
 
       nvars = vlistNvars(vlistID);
@@ -133,8 +138,14 @@ void *Sinfo(void *argument)
 	  gridID  = vlistInqVarGrid(vlistID, varID);
 	  zaxisID = vlistInqVarZaxis(vlistID, varID);
 
-	  fprintf(stdout, "%6d : ", varID + 1);
-
+	  set_text_color(stdout, BRIGHT, BLACK);
+	  fprintf(stdout, "%6d", varID+1);
+	  reset_text_color(stdout);
+	  set_text_color(stdout, RESET, BLACK);
+	  fprintf(stdout, " : ");
+	  reset_text_color(stdout);
+	      
+	  set_text_color(stdout, RESET, BLUE);
 	  /* institute info */
 	  instptr = institutInqNamePtr(vlistInqVarInstitut(vlistID, varID));
 	  if ( instptr )
@@ -201,19 +212,25 @@ void *Sinfo(void *argument)
 	  else
 	    fprintf(stdout, "z ");
 
-	  /* parameter info */
+	  reset_text_color(stdout);
+	      
+	  set_text_color(stdout, RESET, BLACK);
 	  fprintf(stdout, ": ");
+	  reset_text_color(stdout);
 
+	  /* parameter info */
 	  cdiParamToString(param, paramstr, sizeof(paramstr));
 
 	  if ( operfunc == func_name ) vlistInqVarName(vlistID, varID, varname);
 
+	  set_text_color(stdout, BRIGHT, GREEN);
 	  if ( operfunc == func_name )
 	    fprintf(stdout, "%-14s", varname);
 	  else if ( operfunc == func_code )
 	    fprintf(stdout, "%4d %4d   ", tabnum, code);
 	  else
 	    fprintf(stdout, "%-14s", paramstr);
+	  reset_text_color(stdout);
 
 	  if ( cdoVerbose )
 	    {
@@ -225,11 +242,17 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, "\n");
 	}
 
-      fprintf(stdout, "   Grid coordinates :\n");
+      set_text_color(stdout, BRIGHT, BLACK);
+      fprintf(stdout, "   Grid coordinates");
+      reset_text_color(stdout);
+      fprintf(stdout, " :\n");
       printGridInfo(vlistID);
 
       nzaxis = vlistNzaxis(vlistID);
-      fprintf(stdout, "   Vertical coordinates :\n");
+      set_text_color(stdout, BRIGHT, BLACK);
+      fprintf(stdout, "   Vertical coordinates");
+      reset_text_color(stdout);
+      fprintf(stdout, " :\n");
       for ( index = 0; index < nzaxis; index++)
 	{
 	  zaxisID   = vlistZaxis(vlistID, index);
@@ -308,10 +331,13 @@ void *Sinfo(void *argument)
 
       if ( ntsteps != 0 )
 	{
+	  set_text_color(stdout, BRIGHT, BLACK);
+	  fprintf(stdout, "   Time coordinate");
+	  reset_text_color(stdout);
 	  if ( ntsteps == CDI_UNDEFID )
-	    fprintf(stdout, "   Time coordinate :  unlimited steps\n");
+	    fprintf(stdout, " :  unlimited steps\n");
 	  else
-	    fprintf(stdout, "   Time coordinate :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
+	    fprintf(stdout, " :  %d step%s\n", ntsteps, ntsteps == 1 ? "" : "s");
 
 	  if ( taxisID != CDI_UNDEFID )
 	    {
@@ -342,6 +368,7 @@ void *Sinfo(void *argument)
 
 	  fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
 
+	  set_text_color(stdout, RESET, MAGENTA);
 	  ntimeout = 0;
 	  tsID = 0;
 	  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
@@ -363,6 +390,7 @@ void *Sinfo(void *argument)
 	      ntimeout++;
 	      tsID++;
 	    }
+	  reset_text_color(stdout);
 	  fprintf(stdout, "\n");
 	}
 
