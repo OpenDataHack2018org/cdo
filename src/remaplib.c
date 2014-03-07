@@ -669,6 +669,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
   grid->reg2d_center_lon = realloc(grid->reg2d_center_lon, nxm*sizeof(double));
   grid->reg2d_center_lat = realloc(grid->reg2d_center_lat,  ny*sizeof(double));
  
+  grid->reg2d_center_lon[0] = 0;
+  grid->reg2d_center_lat[0] = 0;
   gridInqXvals(gridID, grid->reg2d_center_lon);
   gridInqYvals(gridID, grid->reg2d_center_lat);
 
@@ -726,6 +728,8 @@ void remap_define_grid(int map_type, int gridID, remapgrid_t *grid)
 
   grid->dims[0] = gridInqXsize(gridID);
   grid->dims[1] = gridInqYsize(gridID);
+  if ( grid->dims[0] == 0 ) cdoAbort("%s grid without longitude coordinates!", gridNamePtr(gridInqType(grid->gridID)));
+  if ( grid->dims[1] == 0 ) cdoAbort("%s grid without latitude coordinates!", gridNamePtr(gridInqType(grid->gridID)));
 
   grid->is_cyclic = gridIsCircular(gridID);
 
