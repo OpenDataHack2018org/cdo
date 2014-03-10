@@ -236,7 +236,8 @@ void *Eofcoeff3d(void * argument)
                   if (! DBL_IS_EQUAL(in.ptr[i],missval2) && 
                       ! DBL_IS_EQUAL(eof[varID][levelID][eofID].ptr[i],missval1 ) )
                     {
-                      double tmp = w[i]*in.ptr[i]*eof[varID][levelID][eofID].ptr[i];
+                      // double tmp = w[i]*in.ptr[i]*eof[varID][levelID][eofID].ptr[i];
+                      double tmp = in.ptr[i]*eof[varID][levelID][eofID].ptr[i];
                       out[varID][eofID].ptr[0] += tmp;                   
                     }
 		  else
