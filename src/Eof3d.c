@@ -378,14 +378,15 @@ void *EOF3d(void * argument)
 
       if ( cdoTimer ) timer_start(timer_cov);
       
-      sum_w = 0;
+      // sum_w = 0;
+      sum_w = 1;
       for ( i = 0; i < temp_size ; i++ )
 	{
 	  if ( datacounts[varID][i] > 1)
 	    {
 	      pack[npack] = i;
 	      npack++;
-	      sum_w += weight[i%gridsize];
+	      //  sum_w += weight[i%gridsize];
 	    }
 	}
 
@@ -418,7 +419,8 @@ void *EOF3d(void * argument)
 	    df1p = datafields[varID][j1].ptr;
 	    df2p = datafields[varID][j2].ptr;
 	    for ( i = 0; i < npack; i++ )
-	      sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
+	      sum += df1p[pack[i]]*df2p[pack[i]];
+	    //  sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
 	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 	  }
       if ( cdoVerbose ) 
@@ -468,7 +470,8 @@ void *EOF3d(void * argument)
   shared(eigenvectors,weight,pack,varID,eofID,npack,gridsize)
 #endif 
 	  for ( i = 0; i < npack; i++ )
-	    sum +=  weight[pack[i]%gridsize] *
+	    // sum +=  weight[pack[i]%gridsize] *
+	    sum +=
 	      eigenvectors[varID][eofID].ptr[pack[i]] *
 	      eigenvectors[varID][eofID].ptr[pack[i]];
 
