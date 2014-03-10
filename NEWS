@@ -1,6 +1,11 @@
 CDO NEWS
 --------
 
+Version 1.6.4 (20 May 2014):
+
+   New features:
+     * Option -H: Do not append to netCDF "history" global attribute
+
 Version 1.6.3 (18 February 2014):
 
    New features:

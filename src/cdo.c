@@ -87,6 +87,7 @@ int cdoCheckDatarange    = FALSE;
 
 int cdoColor             = FALSE;
 int cdoDiag              = FALSE;
+int cdoAppendHistory     = TRUE;
 int cdoDisableHistory    = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
@@ -201,6 +202,7 @@ void cdo_usage(void)
   fprintf(stderr, "    -g <grid>      Set default grid name or file. Available grids: \n");
   fprintf(stderr, "                   n<N>, t<RES>, tl<RES>, global_<DXY>, r<NX>x<NY>, g<NX>x<NY>, gme<NI>, lon=<LON>/lat=<LAT>\n");
   fprintf(stderr, "    -h             Help information for the operators\n");
+  fprintf(stderr, "    -H             Do not append to netCDF \"history\" global attribute\n");
   /*
   fprintf(stderr, "    -i <inst>      Institution name/file\n");
   fprintf(stderr, "                   Predefined instituts: ");
@@ -1085,7 +1087,7 @@ void parse_options(int argc, char *argv[])
 {
   int c;
 
-  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhLMOQRrsSTuVvWXZ")) != -1 )
+  while ( (c = cdoGetopt(argc, argv, "f:b:e:P:p:g:i:k:l:m:n:t:D:z:aBCcdhHLMOQRrsSTuVvWXZ")) != -1 )
     {
       switch (c)
 	{
@@ -1136,6 +1138,9 @@ void parse_options(int argc, char *argv[])
 	  break;
 	case 'h':	
 	  Help = 1;
+	  break;
+	case 'H':	
+	  cdoAppendHistory = FALSE;
 	  break;
 	case 'i':
 	  defineInstitution(cdoOptarg);
