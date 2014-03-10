@@ -1198,8 +1198,9 @@ sub print_description {
 	$docline =~ s/\@bold\{([^}]*)\}/\1/og;
 	$docline =~ s/\@celsius/°C/og;
 	$docline =~ s/\\_/_/g;
-	$docline =~ s/\\/\\\\/og;
 	$docline =~ s/\\cite//og;
+	$docline =~ s/\\neq/!=/og;
+	$docline =~ s/\\/\\\\/og;
 #	$docline =~ s/%/\\%/og;
 	$docline =~ s/"/\\"/og;
 	if ( $help_print == 1 ) {

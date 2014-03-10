@@ -2974,7 +2974,7 @@ static char *FldcorHelp[] = {
     "    o(t,1) = Cor{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}",
     "    where w(x) are the area weights obtained by the input streams.",
     "    For every timestep t only those field elements x belong to the sample,",
-    "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
+    "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
     NULL
 };
 
@@ -2995,7 +2995,7 @@ static char *TimcorHelp[] = {
     "    ",
     "    o(1,x) = Cor{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}",
     "    For every gridpoint x only those timesteps t belong to the sample,",
-    "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
+    "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
     NULL
 };
 
@@ -3016,7 +3016,7 @@ static char *FldcovarHelp[] = {
     "    o(t,1) = Covar{(i_1(t,x), i_2(t,x)), x_1 < x <= x_n}",
     "    where w(x) are the area weights obtained by the input streams.",
     "    For every timestep t only those field elements x belong to the sample,",
-    "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
+    "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
     NULL
 };
 
@@ -3036,7 +3036,7 @@ static char *TimcovarHelp[] = {
     "    ",
     "    o(1,x) = Covar{(i_1(t,x), i_2(t,x)), t_1 < t <= t_n}",
     "    For every gridpoint x only those timesteps t belong to the sample,",
-    "    which have i_1(t,x) \\neq missval and i_2(t,x) \\neq missval.",
+    "    which have i_1(t,x) != missval and i_2(t,x) != missval.",
     NULL
 };
 
