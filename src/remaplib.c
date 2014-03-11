@@ -2088,6 +2088,8 @@ void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
   double findex = 0;
   int remap_grid_type = src_grid->remap_grid_type;
 
+  if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
+
   if ( cdoTimer ) timer_start(timer_remap_bil);
 
   progressInit();
@@ -2322,6 +2324,8 @@ void remap_bicub(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
   double plat, plon;             /*  lat/lon coords of destination point    */
   double findex = 0;
   int remap_grid_type = src_grid->remap_grid_type;
+
+  if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
 
   progressInit();
 
@@ -2791,6 +2795,8 @@ void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_gr
   double plat, plon;             /*  lat/lon coords of destination point    */
   double findex = 0;
   int remap_grid_type = src_grid->remap_grid_type;
+
+  if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
 
   progressInit();
 
@@ -4447,6 +4453,8 @@ void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
   grid_store_t *grid_store = NULL;
   double findex = 0;
 
+  if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
+
   progressInit();
 
   nbins = src_grid->num_srch_bins;
@@ -5586,6 +5594,8 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   int tgt_remap_grid_type = tgt_grid->remap_grid_type;
   double src_grid_bound_box[4];
   int lyac = FALSE;
+
+  if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
 
   progressInit();
 

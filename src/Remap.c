@@ -111,48 +111,48 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
       if ( submap_type == SUBMAP_TYPE_LAF )
 	{
 	  operfunc = REMAPLAF;
-	  cdoPrint("Using remaplaf");
+	  // cdoPrint("Using remaplaf");
 	}
       else
 	{
 	  if ( remap_order == 2 )
 	    {
 	      operfunc = REMAPCON2;
-	      cdoPrint("Using remapcon2");
+	      // cdoPrint("Using remapcon2");
 	    }
 	  else
 	    {
 	      operfunc = REMAPCON;
-	      cdoPrint("Using remapcon");
+	      // cdoPrint("Using remapcon");
 	    }
 	}
     }
   else if ( map_type == MAP_TYPE_CONSPHERE )
     {
       operfunc = REMAPCONS;
-      cdoPrint("Using remapcons");
+      // cdoPrint("Using remapcons");
     }
   else if ( map_type == MAP_TYPE_BILINEAR )
     {
       operfunc = REMAPBIL;
-      cdoPrint("Using remapbil");
+      // cdoPrint("Using remapbil");
     }
   else if ( map_type == MAP_TYPE_BICUBIC )
     {
       operfunc = REMAPBIC;
-      cdoPrint("Using remapbic");
+      // cdoPrint("Using remapbic");
     }
   else if ( map_type == MAP_TYPE_DISTWGT )
     {
       if ( num_neighbors == 1 )
 	{
 	  operfunc = REMAPNN;
-	  cdoPrint("Using remapnn");
+	  // cdoPrint("Using remapnn");
 	}
       else
 	{
 	  operfunc = REMAPDIS;
-	  cdoPrint("Using remapdis");
+	  // cdoPrint("Using remapdis");
 	}
     }
   else
@@ -160,6 +160,19 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 
   return (operfunc);
 }
+
+static
+void print_remap_info(int map_type, remapgrid_t *src_grid, remapgrid_t *tgt_grid)
+{
+  char line[256];
+
+  if ( src_grid->rank == 2 )
+    {
+      sprintf(line, "(%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+    }
+  cdoPrint("Using remapnn");
+}
+
 
 double remap_threshhold = 2;
 int remap_test = 0;
@@ -625,8 +638,10 @@ void *Remap(void *argument)
 
       if ( remap_test ) reorder_links(&remaps[0].vars);
     }
-
-  get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
+  else
+    {
+      get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
+    }
 
   if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONSPHERE )
     {
@@ -875,6 +890,8 @@ void *Remap(void *argument)
 	      if ( cdoTimer ) timer_start(timer_remap_init);
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
+
+	      // print_remap_info(map_type, &remaps[r].src_grid, &remaps[r].tgt_grid);
 
 	      if      ( map_type == MAP_TYPE_CONSERV   ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BILINEAR  ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
