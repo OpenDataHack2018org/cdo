@@ -159,18 +159,44 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
     cdoAbort("Unsupported mapping method (map_type = %d)", map_type);
 
   return (operfunc);
-}
+} 
 
 static
-void print_remap_info(int map_type, remapgrid_t *src_grid, remapgrid_t *tgt_grid)
+void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgrid_t *tgt_grid)
 {
   char line[256];
+  char tmpstr[256];
 
+  line[0] = 0;
+
+  if      ( operfunc == REMAPBIL  || operfunc == GENBIL  )  strcpy(line, "Bilinear");
+  else if ( operfunc == REMAPBIC  || operfunc == GENBIC  )  strcpy(line, "Bicubic");
+  else if ( operfunc == REMAPNN   || operfunc == GENNN   )  strcpy(line, "Nearest neighbor");
+  else if ( operfunc == REMAPDIS  || operfunc == GENDIS  )  strcpy(line, "Distance-weighted average");
+  else if ( operfunc == REMAPCON  || operfunc == GENCON  )  strcpy(line, "First order conservative");
+  else if ( operfunc == REMAPCON2 || operfunc == GENCON2 )  strcpy(line, "Second order conservative");
+  else if ( operfunc == REMAPLAF  || operfunc == GENLAF  )  strcpy(line, "Largest area fraction");
+  else if ( operfunc == REMAPCONS || operfunc == GENCONS )  strcpy(line, "First order conservative (sphere)");
+  else                                                      strcpy(line, "Unknown");
+
+  strcat(line, " remapping from ");
+  strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
+  strcat(line, " grid");
   if ( src_grid->rank == 2 )
-    {
-      sprintf(line, "(%dx%d)", src_grid->dims[0], src_grid->dims[1]);
-    }
-  cdoPrint("Using remapnn");
+    sprintf(tmpstr, " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
+  else
+    sprintf(tmpstr, " (%d)", src_grid->dims[0]);
+  strcat(line, tmpstr);
+  strcat(line, " to ");
+  strcat(line, gridNamePtr(gridInqType(tgt_grid->gridID)));
+  strcat(line, " grid");
+  if ( tgt_grid->rank == 2 )
+    sprintf(tmpstr, " (%dx%d)", tgt_grid->dims[0], tgt_grid->dims[1]);
+  else
+    sprintf(tmpstr, " (%d)", tgt_grid->dims[0]);
+  strcat(line, tmpstr);
+
+  cdoPrint(line);
 }
 
 
@@ -891,7 +917,7 @@ void *Remap(void *argument)
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
-	      // print_remap_info(map_type, &remaps[r].src_grid, &remaps[r].tgt_grid);
+	      print_remap_info(operfunc, map_type, &remaps[r].src_grid, &remaps[r].tgt_grid);
 
 	      if      ( map_type == MAP_TYPE_CONSERV   ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BILINEAR  ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
