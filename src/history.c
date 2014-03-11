@@ -82,29 +82,33 @@ void cdoDefHistory(int fileID, char* histstring)
   char* strtimeptr = NULL;
   char* history = NULL;
   size_t historysize = 0;
-  extern int cdoAppendHistory;
-  extern int cdoDisableHistory;
+  extern int CDO_Append_History;
+  extern int CDO_Reset_History;
 
-  if ( !cdoDisableHistory ) historysize += ghistorysize;
+  if ( !CDO_Reset_History ) historysize += ghistorysize+1;
 
-  if ( cdoAppendHistory )
+  if ( CDO_Append_History )
     {
       strtimeptr = get_strtimeptr();
-      historysize += strlen(strtimeptr)+strlen(histstring)+2;
+      historysize += strlen(strtimeptr)+strlen(histstring)+1;
     }
 
-  if ( historysize ) history = malloc(historysize);
+  if ( historysize )
+    {
+      history = malloc(historysize);
+      history[0] = 0;
+    }
 
-  if ( cdoAppendHistory )
+  if ( CDO_Append_History )
     {
       strcpy(history, strtimeptr);
       strcat(history, histstring);
     }
 
-  if ( !cdoDisableHistory )
+  if ( !CDO_Reset_History )
     if ( ghistory )
       {
-	if ( cdoAppendHistory ) strcat(history, "\n");
+	if ( CDO_Append_History ) strcat(history, "\n");
 	strcat(history, ghistory);
       }
   

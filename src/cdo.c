@@ -85,10 +85,10 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
-int cdoColor             = FALSE;
+int CDO_Color             = FALSE;
 int cdoDiag              = FALSE;
-int cdoAppendHistory     = TRUE;
-int cdoDisableHistory    = FALSE;
+int CDO_Append_History     = TRUE;
+int CDO_Reset_History      = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
 int cdoChunkType         = CDI_UNDEFID;
@@ -108,7 +108,7 @@ int cdoRegulargrid       = FALSE;
 int cdoNumVarnames       = 0;
 char **cdoVarnames       = NULL;
 
-char cdo_file_suffix[32];
+char CDO_File_Suffix[32];
 
 
 static int Debug = 0;
@@ -314,11 +314,11 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 
 void cdoGenFileSuffix(char *filesuffix, size_t maxlen, int filetype, int vlistID, const char *refname)
 {
-  if ( strncmp(cdo_file_suffix, "NULL", 4) != 0 )
+  if ( strncmp(CDO_File_Suffix, "NULL", 4) != 0 )
     {
-      if ( cdo_file_suffix[0] != 0 )
+      if ( CDO_File_Suffix[0] != 0 )
 	{
-	  strncat(filesuffix, cdo_file_suffix, maxlen-1);
+	  strncat(filesuffix, CDO_File_Suffix, maxlen-1);
 	}
       else
 	{
@@ -849,20 +849,31 @@ void get_env_vars(void)
     {
       if ( atoi(envstr) == 1 )
 	{
-	  cdoDisableHistory = TRUE;
+	  CDO_Reset_History = TRUE;
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_DISABLE_HISTORY = %s\n", envstr);
 	}
     }
 
-  cdo_file_suffix[0] = 0;
+  envstr = getenv("CDO_RESET_HISTORY");
+  if ( envstr )
+    {
+      if ( atoi(envstr) == 1 )
+	{
+	  CDO_Reset_History = TRUE;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_RESET_HISTORY = %s\n", envstr);
+	}
+    }
+
+  CDO_File_Suffix[0] = 0;
 
   envstr = getenv("CDO_FILE_SUFFIX");
   if ( envstr )
     {
       if ( envstr[0] )
 	{
-	  strncat(cdo_file_suffix, envstr, sizeof(cdo_file_suffix)-1);
+	  strncat(CDO_File_Suffix, envstr, sizeof(CDO_File_Suffix)-1);
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_FILE_SUFFIX = %s\n", envstr);
 	}
@@ -873,7 +884,7 @@ void get_env_vars(void)
     {
       if ( atoi(envstr) == 1 )
 	{
-	  strcat(cdo_file_suffix, "NULL");
+	  strcat(CDO_File_Suffix, "NULL");
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_DISABLE_FILESUFFIX = %s\n", envstr);
 	}
@@ -895,14 +906,14 @@ void get_env_vars(void)
     {
       if ( atoi(envstr) == 1 )
 	{
-	  cdoColor = TRUE;
+	  CDO_Color = TRUE;
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_COLOR = %s\n", envstr);
 	}
     }
   else
     {
-      if ( cdoColor == FALSE )
+      if ( CDO_Color == FALSE )
 	{
 	  char *username;
 	  username = getenv("LOGNAME");
@@ -911,7 +922,7 @@ void get_env_vars(void)
 	      username = getenv("USER");
 	      if ( username == NULL ) username = "unknown";
 	    }
-	  if ( strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0 ) cdoColor = TRUE;
+	  if ( strcmp(username, "\x6d\x32\x31\x34\x30\x30\x33") == 0 ) CDO_Color = TRUE;
 	}
     }
 }
@@ -924,7 +935,9 @@ void print_system_info()
   if ( DebugLevel == 0 ) DebugLevel = 1;
   cdoSetDebug(DebugLevel);
   fprintf(stderr, "\n");
-  fprintf(stderr, "cdoColor            = %d\n", cdoColor);
+  fprintf(stderr, "CDO_Color           = %d\n", CDO_Color);
+  fprintf(stderr, "CDO_Reset_History   = %d\n", CDO_Reset_History);
+  fprintf(stderr, "CDO_File_Suffix     = %s\n", CDO_File_Suffix);
   fprintf(stderr, "cdoDefaultFileType  = %d\n", cdoDefaultFileType);
   fprintf(stderr, "cdoDefaultDataType  = %d\n", cdoDefaultDataType);
   fprintf(stderr, "cdoDefaultByteorder = %d\n", cdoDefaultByteorder);
@@ -1101,7 +1114,7 @@ void parse_options(int argc, char *argv[])
 	  cdoBenchmark = TRUE;
 	  break;
 	case 'C':
-	  cdoColor = !cdoColor;
+	  CDO_Color = !CDO_Color;
 	  break;
 	case 'c':
 	  cdoCheckDatarange = TRUE;
@@ -1140,7 +1153,7 @@ void parse_options(int argc, char *argv[])
 	  Help = 1;
 	  break;
 	case 'H':	
-	  cdoAppendHistory = FALSE;
+	  CDO_Append_History = FALSE;
 	  break;
 	case 'i':
 	  defineInstitution(cdoOptarg);

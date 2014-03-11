@@ -18,7 +18,7 @@ for RMOD in $RMODS; do
     OFILE=${IFILE}_${RMOD}_${OTYPE}
     $CDO remap${RMOD},global_0.5 ${GRIDTYPE} $IFILE ${OFILE}
   done
-  cdo diff2 ${IFILE}_${RMOD}_?
+  cdo diff ${IFILE}_${RMOD}_?
 done
 ####################################################
 #

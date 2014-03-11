@@ -72,7 +72,7 @@ extern int cdoChunkType;
 
 extern int cdoExpMode;
 
-extern int cdoColor;
+extern int CDO_Color;
 extern int cdoDiag;
 
 extern int cdoNumVarnames;

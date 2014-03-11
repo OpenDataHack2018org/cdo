@@ -19,8 +19,8 @@
 #define	WHITE		7
 
 
-#define COLOR_STDOUT (stdout_is_tty && cdoColor)
-#define COLOR_STDERR (stderr_is_tty && cdoColor)
+#define COLOR_STDOUT (stdout_is_tty && CDO_Color)
+#define COLOR_STDERR (stderr_is_tty && CDO_Color)
 
 void set_text_color(FILE *fp, int attr, int fg);
 void reset_text_color(FILE *fp);
