@@ -74,8 +74,8 @@ STRING  C-style format for strftime() (e.g. \%B for the full month name)
 
 @BeginEnvironment
 @Item = CDO_FILE_SUFFIX
-This environment variable can be used to set the default file suffix. This suffix will be
-added to the output file names instead of the filename extension derived from the file format. 
+Set the default file suffix. This suffix will be added to the output file 
+names instead of the filename extension derived from the file format. 
 Set this variable to NULL to disable the adding of a file suffix.
 @EndEnvironment
 

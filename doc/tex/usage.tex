@@ -106,6 +106,20 @@ The following options are available for all operators:
 %\footnotemark
 %\footnotetext{Needs szip support compiled in}
 
+\subsection{Environment variables}
+
+There are some environment variables which influence the behavior of {\CDO}. 
+An incomplete list can be found in \htmlref{Appendix A}{environment}.
+
+Here is an example to set the envrionment variable CDO\_RESET\_HISTORY for different shells:
+
+\begin{tabular}[b]{ll}
+Bourne shell (sh): & CDO\_RESET\_HISTORY=1 ; export CDO\_RESET\_HISTORY \\
+Korn shell (ksh):   & export CDO\_RESET\_HISTORY=1 \\
+C shell (csh):        & setenv CDO\_RESET\_HISTORY 1 \\
+\end{tabular}
+
+
 \subsection{Operators}
 
 There are more than 400 operators available.
