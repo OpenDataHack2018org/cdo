@@ -162,7 +162,7 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 } 
 
 static
-void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgrid_t *tgt_grid)
+void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgrid_t *tgt_grid, int nmiss)
 {
   char line[256];
   char tmpstr[256];
@@ -181,7 +181,6 @@ void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgr
 
   strcat(line, " remapping from ");
   strcat(line, gridNamePtr(gridInqType(src_grid->gridID)));
-  strcat(line, " grid");
   if ( src_grid->rank == 2 )
     sprintf(tmpstr, " (%dx%d)", src_grid->dims[0], src_grid->dims[1]);
   else
@@ -189,12 +188,18 @@ void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgr
   strcat(line, tmpstr);
   strcat(line, " to ");
   strcat(line, gridNamePtr(gridInqType(tgt_grid->gridID)));
-  strcat(line, " grid");
   if ( tgt_grid->rank == 2 )
     sprintf(tmpstr, " (%dx%d)", tgt_grid->dims[0], tgt_grid->dims[1]);
   else
     sprintf(tmpstr, " (%d)", tgt_grid->dims[0]);
   strcat(line, tmpstr);
+  strcat(line, " grid");
+
+  if ( nmiss > 0 )
+    {
+      sprintf(tmpstr, ", with source mask (%d)", gridInqSize(src_grid->gridID)-nmiss);
+      strcat(line, tmpstr);
+    }
 
   cdoPrint(line);
 }
@@ -917,7 +922,7 @@ void *Remap(void *argument)
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
-	      print_remap_info(operfunc, map_type, &remaps[r].src_grid, &remaps[r].tgt_grid);
+	      print_remap_info(operfunc, map_type, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
 
 	      if      ( map_type == MAP_TYPE_CONSERV   ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BILINEAR  ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);

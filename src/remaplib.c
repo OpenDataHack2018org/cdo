@@ -4221,8 +4221,9 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
   long im, jm;
 
   lfound = rect_grid_search2(&jmin, &jmax, tgt_cell_bound_box[0], tgt_cell_bound_box[1], nyp1, src_corner_lat);
-  if ( jmin > 0 ) jmin--;
-  if ( jmax < (ny-2) ) jmax++;
+  if ( debug ) printf("jmin %d jmax %d\n", jmin, jmax);
+  // if ( jmin > 0 ) jmin--;
+  // if ( jmax < (ny-2) ) jmax++;
   bound_lon1 = tgt_cell_bound_box[2];
   bound_lon2 = tgt_cell_bound_box[3];
   if ( bound_lon1 <= src_lon_max && bound_lon2 >= src_lon_min )
@@ -4286,6 +4287,8 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
 	      srch_add[num_srch_cells++] = jm*nx + im;
 	}
     }
+
+  if ( debug ) printf(" -> num_srch_cells: %d\n", num_srch_cells);
 
   return (num_srch_cells);
 }

@@ -129,48 +129,51 @@ int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm
 {
   int lfound = 0;
   int lascend = 0;
-  long i;
+  long i1, i2;
   *imin = nxm;
   *imax = -1;
   
   if ( xm[0] < xm[nxm-1] ) lascend = 1;
 
-  i = find_element(xmin, nxm, xm);
-
-  if ( i > 0 && i < nxm )
+  i1 = find_element(xmin, nxm, xm);
+  i2 = find_element(xmax, nxm, xm);
+      
+  if ( i1 > 0 && i1 < nxm )
     {
       lfound = 1;
 
       if ( lascend )
 	{
-	  if ( i > 1 && xmin <= xm[i-1] ) i--;
-	  *imin = i-1;
-	  *imax = i-1;
+	  if ( i1 > 1 && xmin <= xm[i1-1] ) i1--;
+	  *imin = i1-1;
+	  *imax = i1-1;
 	}
       else
 	{
-	  if ( i > 1 && i < nxm-2 && xmin <= xm[i+1] ) i++;   
-	  *imin = i-1;
-	  *imax = i-1;
-	}
-
-      i = find_element(xmax, nxm, xm);
-
-      if ( i > 0 && i < nxm )
-	{
-	  if ( lascend )
-	    {
-	      if ( i > 1 && i < nxm-2 && xmax >= xm[i+1] ) i++;   
-	      *imax = i-1;
-	    }
-	  else
-	    {
-	      if ( i > 1 && xmax >= xm[i-1] ) i--;
-	      *imin = i-1;
-	    }
+	  if ( i1 < nxm-1 && xmin <= xm[i1] ) i1++;   
+	  *imin = i1-1;
+	  *imax = i1-1;
 	}
     }
   
+  if ( i2 > 0 && i2 < nxm )
+    {
+      lfound = 1;
+
+      if ( lascend )
+	{
+	  if ( i2 < nxm-1 && xmax >= xm[i2] ) i2++;   
+	  *imax = i2-1;
+	  if ( *imin == nxm ) *imin = *imax;
+	}
+      else
+	{
+	  if ( i2 > 1 && xmax >= xm[i2-1] ) i2--;
+	  *imin = i2-1;
+	  if ( *imax == -1 ) *imax = *imin;
+	}
+    }
+
   return (lfound);
 }
 
