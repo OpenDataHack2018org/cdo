@@ -458,7 +458,9 @@ struct grid * unpack_grid(double * dble_buf, unsigned * dble_buf_data_size,
 /**
  * generates a grid search object for the given grid
  * @param[in] grid
- * @return 
+ * @return grid_search object for the provided grid
+ * @remark the grid_search object returned by this routine is deleted by
+ *         \ref delete_grid
  */
 struct grid_search * get_grid_search(struct grid * grid);
 
