@@ -554,6 +554,7 @@ void cell_clipping(unsigned N,
                                                norm_vec);
                     break;
                   default:
+                    norm_vec[0] = 0.0, norm_vec[1] = 0.0, norm_vec[2] = 0.0;
                     abort_message("invalid edge type\n", __FILE__, __LINE__);
                 };
 
@@ -849,21 +850,19 @@ static void generate_point_list(struct point_list * list,
   struct point_list_element * curr = get_free_point_list_element(list);
 
   list->first = curr;
-  LLtoXYZ(cell.coordinates_x[0], cell.coordinates_y[0], curr->vec_coords);
+  curr->vec_coords[0] = cell.coordinates_xyz[0+0*3];
+  curr->vec_coords[1] = cell.coordinates_xyz[1+0*3];
+  curr->vec_coords[2] = cell.coordinates_xyz[2+0*3];
 
   for (unsigned i = 1; i < cell.num_corners; ++i) {
-
-    double vec_coords[3];
-
-    LLtoXYZ(cell.coordinates_x[i], cell.coordinates_y[i], vec_coords);
 
     curr->next = get_free_point_list_element(list);
     curr->edge_type = cell.edge_type[i - 1];
     curr = curr->next;
 
-    curr->vec_coords[0] = vec_coords[0];
-    curr->vec_coords[1] = vec_coords[1];
-    curr->vec_coords[2] = vec_coords[2];
+    curr->vec_coords[0] = cell.coordinates_xyz[0+i*3];
+    curr->vec_coords[1] = cell.coordinates_xyz[1+i*3];
+    curr->vec_coords[2] = cell.coordinates_xyz[2+i*3];
     curr->edge_type = cell.edge_type[i];
   }
 
@@ -1002,9 +1001,11 @@ static void generate_overlap_cell(struct point_list * list,
   if (num_edges > cell->array_size) {
     free(cell->coordinates_x);
     free(cell->coordinates_y);
+    free(cell->coordinates_xyz);
     free(cell->edge_type);
     cell->coordinates_x = malloc(num_edges * sizeof(*cell->coordinates_x));
     cell->coordinates_y = malloc(num_edges * sizeof(*cell->coordinates_y));
+    cell->coordinates_xyz = malloc(3 * num_edges * sizeof(*cell->coordinates_xyz));
     cell->edge_type = malloc(num_edges * sizeof(*cell->edge_type));
     cell->array_size = num_edges;
   }
@@ -1014,12 +1015,11 @@ static void generate_overlap_cell(struct point_list * list,
 
   for (unsigned i = 0; i < num_edges; ++i) {
 
-    struct point p;
 
-    XYZtoLL(curr->vec_coords, &p.lon, &p.lat);
-
-    cell->coordinates_x[i] = p.lon;
-    cell->coordinates_y[i] = p.lat;
+    XYZtoLL(curr->vec_coords, cell->coordinates_x+i, cell->coordinates_y+i);
+    cell->coordinates_xyz[0+i*3] = curr->vec_coords[0];
+    cell->coordinates_xyz[1+i*3] = curr->vec_coords[1];
+    cell->coordinates_xyz[2+i*3] = curr->vec_coords[2];
     cell->edge_type[i] = curr->edge_type;
 
     curr = curr->next;

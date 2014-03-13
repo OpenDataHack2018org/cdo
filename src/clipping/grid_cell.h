@@ -42,10 +42,11 @@ enum edge_type {
 
 struct grid_cell {
    double * coordinates_x, * coordinates_y;
+   double * coordinates_xyz;
    enum edge_type * edge_type;
    unsigned num_corners;
    unsigned array_size; //!< size in elements of the arrays: coordinates_x,
-                        //!< coordinates_y, edge_type
+                        //!< coordinates_y, edge_type and 1/3 of coordinates_xyz
 };
 
 /**

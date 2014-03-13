@@ -5492,6 +5492,7 @@ void boundbox_from_corners1r(long ic, long nc, const double *restrict corner_lon
 //#if defined(HAVE_LIBYAC)
 #include "clipping/clipping.h"
 #include "clipping/area.h"
+#include "clipping/geometry.h"
 
 static
 void cdo_compute_overlap_areas(unsigned N,
@@ -5649,11 +5650,12 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
   for ( i = 0; i < ompNumThreads; ++i )
     {
       tgt_grid_cell2[i] = malloc(sizeof(struct grid_cell));
-      tgt_grid_cell2[i]->array_size    = tgt_num_cell_corners;
-      tgt_grid_cell2[i]->num_corners   = tgt_num_cell_corners;
-      tgt_grid_cell2[i]->edge_type     = tgt_edge_type;
-      tgt_grid_cell2[i]->coordinates_x = malloc(tgt_num_cell_corners*sizeof(double));
-      tgt_grid_cell2[i]->coordinates_y = malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->array_size      = tgt_num_cell_corners;
+      tgt_grid_cell2[i]->num_corners     = tgt_num_cell_corners;
+      tgt_grid_cell2[i]->edge_type       = tgt_edge_type;
+      tgt_grid_cell2[i]->coordinates_x   = malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_y   = malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_xyz = malloc(3*tgt_num_cell_corners*sizeof(double));
     }
 
   struct grid_cell* src_grid_cells;
@@ -5805,6 +5807,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	      tgt_grid_cell->coordinates_y[ic] = tgt_grid->cell_corner_lat[tgt_grid_add*tgt_num_cell_corners+ic];
 	    }
 	}
+      
+      for ( int ic = 0; ic < tgt_num_cell_corners; ++ic )
+	LLtoXYZ(tgt_grid_cell->coordinates_x[ic], tgt_grid_cell->coordinates_y[ic], tgt_grid_cell->coordinates_xyz+ic*3);
 
       //printf("target: %ld\n", tgt_grid_add);
       if ( lyac )
@@ -5833,20 +5838,22 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
-	      overlap_buffer[n].array_size    = 0;
-	      overlap_buffer[n].num_corners   = 0;
-	      overlap_buffer[n].edge_type     = NULL;
-	      overlap_buffer[n].coordinates_x = NULL;
-	      overlap_buffer[n].coordinates_y = NULL;
+	      overlap_buffer[n].array_size      = 0;
+	      overlap_buffer[n].num_corners     = 0;
+	      overlap_buffer[n].edge_type       = NULL;
+	      overlap_buffer[n].coordinates_x   = NULL;
+	      overlap_buffer[n].coordinates_y   = NULL;
+	      overlap_buffer[n].coordinates_xyz = NULL;
 	    }
 
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {
-	      src_grid_cells[n].array_size    = srch_corners;
-	      src_grid_cells[n].num_corners   = srch_corners;
-	      src_grid_cells[n].edge_type     = src_edge_type;
-	      src_grid_cells[n].coordinates_x = malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_y = malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].array_size      = srch_corners;
+	      src_grid_cells[n].num_corners     = srch_corners;
+	      src_grid_cells[n].edge_type       = src_edge_type;
+	      src_grid_cells[n].coordinates_x   = malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_y   = malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_xyz = malloc(3*srch_corners*sizeof(double));
 	    }
 
 	  max_srch_cells = num_srch_cells;
@@ -5901,6 +5908,9 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	      printf("\n");
 	      */
 	    }
+
+	  for ( int ic = 0; ic < srch_corners; ++ic )
+	    LLtoXYZ(src_grid_cells[n].coordinates_x[ic], src_grid_cells[n].coordinates_y[ic], src_grid_cells[n].coordinates_xyz+ic*3);
 
 	  if ( lyac )
 	    //  if ( tgt_grid_add == 682 )
@@ -5999,12 +6009,14 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    {
 	      free(overlap_buffer2[i][n].coordinates_x);
 	      free(overlap_buffer2[i][n].coordinates_y);
+	      if ( overlap_buffer2[i][n].coordinates_xyz ) free(overlap_buffer2[i][n].coordinates_xyz);
 	    }
 	}
       for ( n = 0; n < max_srch_cells2[i]; n++ )
 	{
 	  free(src_grid_cells2[i][n].coordinates_x);
 	  free(src_grid_cells2[i][n].coordinates_y);
+	  free(src_grid_cells2[i][n].coordinates_xyz);
 	}
       free(src_grid_cells2[i]);
       free(overlap_buffer2[i]);
@@ -6014,6 +6026,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       free(tgt_grid_cell2[i]->coordinates_x);
       free(tgt_grid_cell2[i]->coordinates_y);
+      free(tgt_grid_cell2[i]->coordinates_xyz);
       free(tgt_grid_cell2[i]);
 
       free(srch_add2[i]);
