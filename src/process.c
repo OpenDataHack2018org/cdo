@@ -424,7 +424,6 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
   int streamOutCnt;
   char *opername;
   char *comma_position;
-  const char *caller = processInqPrompt();
 
   opername = &argv[globArgc][1];
   comma_position = strchr(opername, ',');
@@ -436,7 +435,7 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
   if ( streamInCnt == -1 ) streamInCnt = 1;
 
   if ( streamOutCnt > 1 )
-    Errorc("More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
+    cdoAbort("More than one output stream not allowed in CDO pipes (Operator %s)!", opername);
 
   globArgc++;
 
@@ -450,13 +449,11 @@ int getGlobArgc(int argc, char *argv[], int globArgc)
 static
 int skipInputStreams(int argc, char *argv[], int globArgc, int nstreams)
 {
-  const char *caller = processInqPrompt();
-
   while ( nstreams > 0 )
     {
       if ( globArgc >= argc )
 	{
-	  Errorc("Too few arguments. Check command line!");
+	  cdoAbort("Too few arguments. Check command line!");
 	  break;
 	}
       if ( argv[globArgc][0] == '-' )
@@ -608,7 +605,6 @@ int checkStreamCnt(void)
   int i, j;
   int obase = FALSE;
   int status = 0;
-  const char *caller = processInqPrompt();
 
   streamInCnt  = operatorStreamInCnt(Process[processID].operatorName);
   streamOutCnt = operatorStreamOutCnt(Process[processID].operatorName);
@@ -622,19 +618,19 @@ int checkStreamCnt(void)
     }
 
   if ( streamInCnt == -1 && streamOutCnt == -1 )
-    Errorc("I/O stream counts unlimited no allowed!");
+    cdoAbort("I/O stream counts unlimited no allowed!");
     
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
   if ( streamInCnt == -1 )
     {
       streamInCnt = Process[processID].streamCnt - streamOutCnt;
-      if ( streamInCnt < 1 ) Errorc("Input streams missing!");
+      if ( streamInCnt < 1 ) cdoAbort("Input streams missing!");
     }
 
   if ( streamOutCnt == -1 )
     {
       streamOutCnt = Process[processID].streamCnt - streamInCnt;
-      if ( streamInCnt < 1 ) Errorc("Output streams missing!");
+      if ( streamInCnt < 1 ) cdoAbort("Output streams missing!");
     }
   // printf(" streamInCnt, streamOutCnt %d %d\n", streamInCnt, streamOutCnt);
 
@@ -642,27 +638,27 @@ int checkStreamCnt(void)
   // printf(" streamCnt %d %d\n", Process[processID].streamCnt, streamCnt);
 
   if ( Process[processID].streamCnt > streamCnt )
-    Errorc("Too many streams!"
-	   " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
+    cdoAbort("Too many streams!"
+	     " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
   if ( Process[processID].streamCnt < streamCnt )
-    Errorc("Too few streams specified!"
-	   " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
+    cdoAbort("Too few streams specified!"
+	     " Operator needs %d input and %d output streams.", streamInCnt, streamOutCnt);
 
 
   for ( i = streamInCnt; i < streamCnt; i++ )
     {
       if ( Process[processID].streamNames[i].args[0] == '-' )
 	{
-	  Errorc("Output file name %s must not begin with \"-\"!\n",
-		 Process[processID].streamNames[i].args);
+	  cdoAbort("Output file name %s must not begin with \"-\"!\n",
+		   Process[processID].streamNames[i].args);
 	}
       else if ( !obase )
 	{
 	  for ( j = 0; j < streamInCnt; j++ ) /* does not work with files in pipes */
 	    if ( strcmp(Process[processID].streamNames[i].args, Process[processID].streamNames[j].args) == 0 )
-	      Errorc("Output file name %s is equal to input file name"
-		     " on position %d!\n", Process[processID].streamNames[i].args, j+1);
+	      cdoAbort("Output file name %s is equal to input file name"
+		       " on position %d!\n", Process[processID].streamNames[i].args, j+1);
 	}
     }
 
@@ -850,7 +846,15 @@ void operatorInputArg(const char *enter)
       size_t pos, len, linelen;
       int lreadline = 1;
 
-      if ( enter ) fprintf(stderr, "%-16s : Enter %s > ", processInqPrompt(), enter);
+      if ( enter )
+	{
+	  set_text_color(stderr, BRIGHT, MAGENTA);
+	  fprintf(stderr, "%-16s : ", processInqPrompt());
+	  reset_text_color(stderr);
+	  // set_text_color(stderr, BLINK, BLACK);
+	  fprintf(stderr, "Enter %s > ", enter);
+	  // reset_text_color(stderr);
+	}
 
       while ( lreadline )
 	{
