@@ -893,7 +893,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   if ( map_type == MAP_TYPE_CONSPHERE && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
       if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
-      else src_grid->remap_grid_type = -1;
+      // else src_grid->remap_grid_type = -1;
     }
 
   if ( lextrapolate > 0 )
@@ -4221,7 +4221,6 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
   long im, jm;
 
   lfound = rect_grid_search2(&jmin, &jmax, tgt_cell_bound_box[0], tgt_cell_bound_box[1], nyp1, src_corner_lat);
-  if ( debug ) printf("jmin %d jmax %d\n", jmin, jmax);
   // if ( jmin > 0 ) jmin--;
   // if ( jmax < (ny-2) ) jmax++;
   bound_lon1 = tgt_cell_bound_box[2];
@@ -4232,7 +4231,7 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
       if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
       if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
       lfound = rect_grid_search2(&imin, &imax, bound_lon1, bound_lon2, nxp1, src_corner_lon);
-      if ( imin != -1 )
+      if ( lfound )
 	{
 	  if ( debug )
 	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin], RAD2DEG*src_corner_lon[imax+1], imin, imax, jmin, jmax);
@@ -4253,15 +4252,18 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
       if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
       if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
       lfound = rect_grid_search2(&imin2, &imax2, bound_lon1, bound_lon2, nxp1, src_corner_lon);
-      if ( imin2 != -1 && imin2 == imax ) imin2 += 1;
-      if ( imax2 != -1 && imax2 == imax ) imax2 += 1;
-      if ( imin2 != -1 )
+      if ( lfound )
 	{
-	  if ( debug )
-	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin2], RAD2DEG*src_corner_lon[imax2+1], imin2, imax2, jmin, jmax);
-	  for ( jm = jmin; jm <= jmax; ++jm )
-	    for ( im = imin2; im <= imax2; ++im )
-	      srch_add[num_srch_cells++] = jm*nx + im;
+	  if ( imax != -1 && imin2 <= imax ) imin2 = imax+1;
+	  if ( imax != -1 && imax2 <= imax ) imax2 = imax+1;
+	  if ( imin2 >= 0 && imax2 < nxp1 )
+	    {
+	      if ( debug )
+		printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin2], RAD2DEG*src_corner_lon[imax2+1], imin2, imax2, jmin, jmax);
+	      for ( jm = jmin; jm <= jmax; ++jm )
+		for ( im = imin2; im <= imax2; ++im )
+		  srch_add[num_srch_cells++] = jm*nx + im;
+	    }
 	}
     }
 
@@ -4276,19 +4278,22 @@ long get_srch_cells_reg2d(const int *restrict src_grid_dims,
       if ( bound_lon1 < src_lon_min && bound_lon2 > src_lon_min ) bound_lon1 = src_lon_min;
       if ( bound_lon2 > src_lon_max && bound_lon1 < src_lon_max ) bound_lon2 = src_lon_max;
       lfound = rect_grid_search2(&imin3, &imax3, bound_lon1, bound_lon2, nxp1, src_corner_lon);
-      if ( imin3 != -1 && imin3 == imin ) imin3 -= 1;
-      if ( imax3 != -1 && imax3 == imin ) imax3 -= 1;
-      if ( imin3 != -1 )
+      if ( lfound )
 	{
-	  if ( debug )
-	    printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin3], RAD2DEG*src_corner_lon[imax3+1], imin3, imax3, jmin, jmax);
-	  for ( jm = jmin; jm <= jmax; ++jm )
-	    for ( im = imin3; im <= imax3; ++im )
-	      srch_add[num_srch_cells++] = jm*nx + im;
+	  if ( imin != nxp1 && imin3 >= imin ) imin3 = imin-1;
+	  if ( imax != nxp1 && imax3 >= imin ) imax3 = imin-1;
+	  if ( imin3 >= 0 && imin3 < nxp1 )
+	    {
+	      if ( debug )
+		printf("   %g %g imin %ld  imax %ld  jmin %ld jmax %ld\n", RAD2DEG*src_corner_lon[imin3], RAD2DEG*src_corner_lon[imax3+1], imin3, imax3, jmin, jmax);
+	      for ( jm = jmin; jm <= jmax; ++jm )
+		for ( im = imin3; im <= imax3; ++im )
+		  srch_add[num_srch_cells++] = jm*nx + im;
+	    }
 	}
     }
 
-  if ( debug ) printf(" -> num_srch_cells: %d\n", num_srch_cells);
+  if ( debug ) printf(" -> num_srch_cells: %ld\n", num_srch_cells);
 
   return (num_srch_cells);
 }
