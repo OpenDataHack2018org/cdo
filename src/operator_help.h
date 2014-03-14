@@ -322,8 +322,8 @@ static char *SplitHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_FILE_SUFFIX",
-    "        This environment variable can be used to set the default file suffix. This suffix will be",
-    "        added to the output file names instead of the filename extension derived from the file format. ",
+    "        Set the default file suffix. This suffix will be added to the output file ",
+    "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
     NULL
 };
@@ -364,8 +364,8 @@ static char *SplittimeHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_FILE_SUFFIX",
-    "        This environment variable can be used to set the default file suffix. This suffix will be",
-    "        added to the output file names instead of the filename extension derived from the file format. ",
+    "        Set the default file suffix. This suffix will be added to the output file ",
+    "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
     NULL
 };
@@ -390,8 +390,8 @@ static char *SplitselHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_FILE_SUFFIX",
-    "        This environment variable can be used to set the default file suffix. This suffix will be",
-    "        added to the output file names instead of the filename extension derived from the file format. ",
+    "        Set the default file suffix. This suffix will be added to the output file ",
+    "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
     NULL
 };
@@ -3186,8 +3186,8 @@ static char *EofcoeffHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_FILE_SUFFIX",
-    "        This environment variable can be used to set the default file suffix. This suffix will be",
-    "        added to the output file names instead of the filename extension derived from the file format. ",
+    "        Set the default file suffix. This suffix will be added to the output file ",
+    "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
     NULL
 };
@@ -3205,6 +3205,7 @@ static char *RemapgridHelp[] = {
     "    Each operator uses a different remapping method. The interpolation is based",
     "    on an adapted SCRIP library version. For a detailed description of the remapping ",
     "    methods see SCRIP.",
+    "    The search algorithm for the conservative remapping requires that no grid cell occurs more than once. ",
     "",
     "OPERATORS",
     "    remapbil   Bilinear interpolation",
@@ -3531,8 +3532,8 @@ static char *IntyearHelp[] = {
     "",
     "ENVIRONMENT",
     "    CDO_FILE_SUFFIX",
-    "        This environment variable can be used to set the default file suffix. This suffix will be",
-    "        added to the output file names instead of the filename extension derived from the file format. ",
+    "        Set the default file suffix. This suffix will be added to the output file ",
+    "        names instead of the filename extension derived from the file format. ",
     "        Set this variable to NULL to disable the adding of a file suffix.",
     NULL
 };

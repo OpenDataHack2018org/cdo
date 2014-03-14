@@ -12,6 +12,7 @@ This module contains operators to remap all input fields to a new horizontal gri
 Each operator uses a different remapping method. The interpolation is based
 on an adapted SCRIP library version. For a detailed description of the remapping 
 methods see @cite{SCRIP}.
+The search algorithm for the conservative remapping requires that no grid cell occurs more than once. 
 @EndDescription
 @EndModule
 
