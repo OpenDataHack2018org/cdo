@@ -5813,11 +5813,19 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
       //printf("target: %ld\n", tgt_grid_add);
       if ( lyac )
-	// if ( tgt_grid_add == 682 )
-	for ( int n = 0; n < tgt_num_cell_corners; ++n )
+        if ( tgt_grid_add == 174752 )
 	  {
-	    printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_x[n]/DEG2RAD);
-	    printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_y[n]/DEG2RAD);
+	    for ( int n = 0; n < tgt_num_cell_corners; ++n )
+	      {
+		printf("  TargetCell.coordinates_x[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_x[n]/DEG2RAD);
+		printf("  TargetCell.coordinates_y[%d] = %g*rad;\n", n, tgt_grid_cell->coordinates_y[n]/DEG2RAD);
+	      }
+	    /*
+	    printf("> -Z1\n");
+	    for ( int n = 0; n < tgt_num_cell_corners; ++n )
+		printf("  %g %g\n", tgt_grid_cell->coordinates_x[n]/DEG2RAD, tgt_grid_cell->coordinates_y[n]/DEG2RAD);
+	      printf("  %g %g\n", tgt_grid_cell->coordinates_x[0]/DEG2RAD, tgt_grid_cell->coordinates_y[0]/DEG2RAD);
+	    */
 	  }
       
       /* Create search arrays */
@@ -5913,15 +5921,21 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 	    LLtoXYZ(src_grid_cells[n].coordinates_x[ic], src_grid_cells[n].coordinates_y[ic], src_grid_cells[n].coordinates_xyz+ic*3);
 
 	  if ( lyac )
-	    //  if ( tgt_grid_add == 682 )
+	    if ( tgt_grid_add == 174752 )
 	    {
-	      printf("n %d\n", (int)n);
+	      // printf("n %d\n", (int)n);
 	      for ( k = 0; k < srch_corners; ++k )
 		{
 		  printf("  SourceCell[ii].coordinates_x[%ld] = %g*rad;\n", k, src_grid_cells[n].coordinates_x[k]/DEG2RAD);
 		  printf("  SourceCell[ii].coordinates_y[%ld] = %g*rad;\n", k, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
 		}
 	      printf("  ii++;\n");
+	      /*
+	      printf("> -Z1\n");
+	      for ( k = 0; k < srch_corners; ++k )
+		printf("  %g %g\n", src_grid_cells[n].coordinates_x[k]/DEG2RAD, src_grid_cells[n].coordinates_y[k]/DEG2RAD);
+	      printf("  %g %g\n", src_grid_cells[n].coordinates_x[0]/DEG2RAD, src_grid_cells[n].coordinates_y[0]/DEG2RAD);
+	      */
 	    }
 	}
 

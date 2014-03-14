@@ -989,7 +989,7 @@ void *Remap(void *argument)
 	  gridsize2 = gridInqSize(gridID2);
 
 	  /* used only to check the result of remapcon */
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2|| operfunc == REMAPCONS )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPCONS )
 	    {
 	      double grid2_err;
 
@@ -997,21 +997,27 @@ void *Remap(void *argument)
 		{
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
-		      grid2_err = remaps[r].tgt_grid.cell_frac[i]*remaps[r].tgt_grid.cell_area[i];
-		      if ( fabs(grid2_err) > 0 )
-			array2[i] = array2[i]/grid2_err;
-		      else
-			array2[i] = missval;
+		      if ( !DBL_IS_EQUAL(array2[i], missval) )
+			{
+			  grid2_err = remaps[r].tgt_grid.cell_frac[i]*remaps[r].tgt_grid.cell_area[i];
+			  if ( fabs(grid2_err) > 0 )
+			    array2[i] = array2[i]/grid2_err;
+			  else
+			    array2[i] = missval;
+			}
 		    }
 		}
 	      else if ( remaps[r].vars.norm_opt == NORM_OPT_DESTAREA )
 		{
 		  for ( i = 0; i < gridsize2; i++ )
 		    {
-		      if ( fabs(remaps[r].tgt_grid.cell_frac[i]) > 0 )
-			array2[i] = array2[i]/remaps[r].tgt_grid.cell_frac[i];
-		      else
-			array2[i] = missval;
+		      if ( !DBL_IS_EQUAL(array2[i], missval) )
+			{
+			  if ( fabs(remaps[r].tgt_grid.cell_frac[i]) > 0 )
+			    array2[i] = array2[i]/remaps[r].tgt_grid.cell_frac[i];
+			  else
+			    array2[i] = missval;
+			}
 		    }
 		}
 

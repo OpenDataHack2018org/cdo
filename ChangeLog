@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-03-14  Uwe Schulzweida
+
+	* remapcon: check for missing values in normalisation
+
 2014-03-10  Uwe Schulzweida
 
 	* added Option -H to do not append to netCDF "history" global attribute

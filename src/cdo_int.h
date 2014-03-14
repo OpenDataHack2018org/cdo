@@ -51,6 +51,8 @@ char *strdup(const char *s);
 */
 #endif
 
+#define strcompare(s1, s2)  (strncmp(s1, s2, strlen(s2)))
+
 
 /* sxxxYYYYMMDDhhmm0 */
 #define  DATE_LEN  31        /* YYYYMMDDhhmmss allocate DTLEN+1 !!!! */
