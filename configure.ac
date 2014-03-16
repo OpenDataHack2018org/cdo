@@ -25,6 +25,7 @@ LT_INIT
 AC_CHECK_TOOL([CC],[gcc],[:])
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
+AC_OPENMP
 AC_CHECK_TOOL([AR],[ar],[:])
 AC_CHECK_TOOL([CPP],[cpp],[:])
 AC_CHECK_TOOL([LD],[ld],[:])
@@ -116,6 +117,9 @@ AC_ARG_ENABLE([data],
 AC_MSG_RESULT([$enable_data])
 AC_SUBST([ENABLE_DATA],[$enable_data])
 #  ----------------------------------------------------------------------
+CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
+#  ----------------------------------------------------------------------
+
 # Add configure options
 ACX_OPTIONS
 #  ----------------------------------------------------------------------

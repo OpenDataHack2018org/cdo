@@ -677,6 +677,7 @@ ac_ct_CXX
 CXXFLAGS
 CXX
 AS
+OPENMP_CFLAGS
 CPP
 OTOOL64
 OTOOL
@@ -805,6 +806,7 @@ enable_dependency_tracking
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_openmp
 enable_largefile
 enable_data
 with_threads
@@ -1475,6 +1477,7 @@ Optional Features:
   --disable-dependency-tracking
                           speeds up one-time build
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --disable-openmp        do not use OpenMP
   --disable-largefile     omit support for large files
   --enable-data           DATA support [default=yes]
   --enable-grib           GRIB support [default=yes]
@@ -12086,6 +12089,71 @@ fi
 
 
 
+
+  OPENMP_CFLAGS=
+  # Check whether --enable-openmp was given.
+if test "${enable_openmp+set}" = set; then :
+  enableval=$enable_openmp;
+fi
+
+  if test "$enable_openmp" != no; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $CC option to support OpenMP" >&5
+$as_echo_n "checking for $CC option to support OpenMP... " >&6; }
+if ${ac_cv_prog_c_openmp+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENMP
+ choke me
+#endif
+#include <omp.h>
+int main () { return omp_get_num_threads (); }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_prog_c_openmp='none needed'
+else
+  ac_cv_prog_c_openmp='unsupported'
+	  	  	  	  	  	  	  	  	  	  	  	  	  for ac_option in -fopenmp -xopenmp -openmp -mp -omp -qsmp=omp; do
+	    ac_save_CFLAGS=$CFLAGS
+	    CFLAGS="$CFLAGS $ac_option"
+	    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#ifndef _OPENMP
+ choke me
+#endif
+#include <omp.h>
+int main () { return omp_get_num_threads (); }
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_prog_c_openmp=$ac_option
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+	    CFLAGS=$ac_save_CFLAGS
+	    if test "$ac_cv_prog_c_openmp" != unsupported; then
+	      break
+	    fi
+	  done
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_prog_c_openmp" >&5
+$as_echo "$ac_cv_prog_c_openmp" >&6; }
+    case $ac_cv_prog_c_openmp in #(
+      "none needed" | unsupported)
+	;; #(
+      *)
+	OPENMP_CFLAGS=$ac_cv_prog_c_openmp ;;
+    esac
+  fi
+
+
 if test -n "$ac_tool_prefix"; then
   # Extract the first word of "${ac_tool_prefix}ar", so it can be a program name with args.
 set dummy ${ac_tool_prefix}ar; ac_word=$2
@@ -17284,6 +17352,9 @@ $as_echo "$enable_data" >&6; }
 ENABLE_DATA=$enable_data
 
 #  ----------------------------------------------------------------------
+CFLAGS="$CFLAGS ${OPENMP_CFLAGS}"
+#  ----------------------------------------------------------------------
+
 # Add configure options
 
 

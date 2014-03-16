@@ -1102,6 +1102,10 @@ void pstreamDefVlist(int pstreamID, int vlistID)
 
       vlistDefAttTxt(vlistID, CDI_GLOBAL, "CDO", (int)strlen(cdoComment())+1, cdoComment());
 
+#if defined(_OPENMP)
+      if ( ompNumThreads > 1 )
+	vlistDefAttInt(vlistID, CDI_GLOBAL, "cdo_openmp_thread_number", DATATYPE_INT32, 1, &ompNumThreads);
+#endif
       pstreamDefVarlist(pstreamptr, vlistID);
 
       if ( processNums() == 1 && ompNumThreads == 1 ) timer_start(timer_write);
