@@ -59,12 +59,12 @@ This is the result of an ECHAM5 dataset with 3 parameter over 12 timesteps:
      2 : MPIMET   ECHAM5  instant       4   2     2048   1  F32  : T     
      3 : MPIMET   ECHAM5  instant       1   1     2048   1  F32  : TSURF 
    Grid coordinates :
-     1 : gaussian     > size      : dim = 2048  nlon = 64  nlat = 32
-                        longitude : first = 0  last = 354.375  inc = 5.625
-                        latitude  : first = 85.7605871  last = -85.7605871
+     1 : gaussian              : points=2048 (64x32)  np=16
+                     longitude : 0 to 354.375 by 5.625 degrees_east  circular
+                     latitude  : 85.7605871 to -85.7605871 degrees_north
    Vertical coordinates :
-     1 : surface                 : 0
-     2 : pressure             Pa : 92500 85000 50000 20000
+     1 : surface               : 0
+     2 : pressure           Pa : 92500 85000 50000 20000
    Time coordinate :  12 steps
 YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss YYYY-MM-DD hh:mm:ss
 1987-01-31 12:00:00 1987-02-28 12:00:00 1987-03-31 12:00:00 1987-04-30 12:00:00
