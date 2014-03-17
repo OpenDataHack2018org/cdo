@@ -285,12 +285,12 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 	    {
 	      if ( COLOR_STDOUT )
 		{
-		  size_t len = strlen(*phelp);
-		  if ( (len ==  4 && memcmp(*phelp, "NAME", len) == 0) ||
-		       (len ==  8 && memcmp(*phelp, "SYNOPSIS", len) == 0) ||
-		       (len == 11 && memcmp(*phelp, "DESCRIPTION", len) == 0) ||
-		       (len ==  9 && memcmp(*phelp, "OPERATORS", len) == 0) ||
-		       (len ==  9 && memcmp(*phelp, "PARAMETER", len) == 0) )
+		  if ( (strcmp(*phelp, "NAME") == 0) ||
+		       (strcmp(*phelp, "SYNOPSIS") == 0) ||
+		       (strcmp(*phelp, "DESCRIPTION") == 0) ||
+		       (strcmp(*phelp, "OPERATORS") == 0) ||
+		       (strcmp(*phelp, "ENVIRONMENT") == 0) ||
+		       (strcmp(*phelp, "PARAMETER") == 0) )
 		    {
 		      set_text_color(stdout, BRIGHT, BLACK);
 		      fprintf(stdout, "%s", *phelp);
@@ -904,9 +904,10 @@ void get_env_vars(void)
   envstr = getenv("CDO_COLOR");
   if ( envstr )
     {
-      if ( atoi(envstr) == 1 )
+      int ival = atoi(envstr);
+      if ( ival == 0 || ival == 1 )
 	{
-	  CDO_Color = TRUE;
+	  CDO_Color = ival;
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_COLOR = %s\n", envstr);
 	}
@@ -1114,7 +1115,7 @@ void parse_options(int argc, char *argv[])
 	  cdoBenchmark = TRUE;
 	  break;
 	case 'C':
-	  CDO_Color = !CDO_Color;
+	  CDO_Color = TRUE;
 	  break;
 	case 'c':
 	  cdoCheckDatarange = TRUE;
