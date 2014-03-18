@@ -291,6 +291,7 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 		       (strcmp(*phelp, "OPERATORS") == 0) ||
 		       (strcmp(*phelp, "ENVIRONMENT") == 0) ||
 		       (strcmp(*phelp, "PARAMETER") == 0) )
+		       (strcmp(*phelp, "EXAMPLES") == 0) )
 		    {
 		      set_text_color(stdout, BRIGHT, BLACK);
 		      fprintf(stdout, "%s", *phelp);

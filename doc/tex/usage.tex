@@ -175,6 +175,22 @@ Therefore internal wildcard expansion is not available on operating systems with
 Operator chaining is implemented over POSIX Threads (pthreads).
 Therefore this {\CDO} feature is not available on operating systems without POSIX Threads support!
 
+
+\subsection{Parallelized operators}
+
+Some of the {\CDO} operators are shared memory parallelized with OpenMP.
+An OpenMP-enabled C compiler is needed to use this feature.
+Users may request a specific number of OpenMP threads {\tt nthreads} with the '{\tt -P}' switch.
+
+Here is an example to distribute the bilinear interpolation on 8 OpenMP threads:
+\begin{lstlisting}[frame=single, backgroundcolor=\color{pcolor2}, basicstyle=\ttfamily, columns=flexible]
+   cdo -P 8  remapbil,targetgrid  ifile  ofile
+\end{lstlisting}
+
+Many {\CDO} operators are I/O-bound. This means most of the time is spend in reading and writing the data. 
+Only compute intensive {\CDO} operators are parallelized. 
+An incomplete list of OpenMP parallelized operators can be found in \htmlref{Appendix B}{openmp}.
+
 \subsection{Operator parameter}
 
 Some operators need one or more parameter. A list of parameter is indicated by the seperator ','.
@@ -209,5 +225,3 @@ The result is the same as:
    cdo selday,5,6,7,8,9 ifile ofile
 \end{verbatim}
 \end{itemize}
-
-% \subsection{OpenMP Threading}
