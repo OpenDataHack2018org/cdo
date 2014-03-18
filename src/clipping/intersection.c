@@ -77,7 +77,8 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
    double cross_ap = fabs(a[0]*p[1]-a[1]*p[0]);
    double cross_bp = fabs(b[0]*p[1]-b[1]*p[0]);
 
-   return (cross_bp*cross_bp + cross_ap*cross_ap - cross_ab*cross_ab) < tol;
+   // maybe this should be the cross_** should be scaled by z at some point
+   return (cross_ap < cross_ab + tol) && (cross_bp < cross_ab + tol);
 }
 
 /** \brief compute the intersection points of two great circles
