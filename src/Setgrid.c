@@ -249,6 +249,8 @@ void *Setgrid(void *argument)
 	  gridID1 = vlistGrid(vlistID1, index);
 	  gridID2 = -1;
 
+	  if ( gridInqType(gridID1) == GRID_GENERIC && gridInqSize(gridID1) == 1 ) continue;
+	  
 	  if ( lregular )
 	    {
 	      if ( gridInqType(gridID1) == GRID_GAUSSIAN_REDUCED )
@@ -256,7 +258,7 @@ void *Setgrid(void *argument)
 		  gridID2 = gridToRegular(gridID1);
 		}
 	    }
-	  else if ( ldereference    )
+	  else if ( ldereference )
 	    {
 	      gridID2 = referenceToGrid(gridID1);
 	      if ( gridID2 == -1 ) cdoAbort("Reference to horizontal grid not found!");

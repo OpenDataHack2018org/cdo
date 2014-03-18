@@ -133,7 +133,7 @@ static
 void printGridInfo(int vlistID)
 {
   int ngrids, index;
-  int gridID, gridtype, trunc, gridsize, xsize, ysize;
+  int gridID, gridtype, trunc, gridsize, xsize, ysize, xysize;
   int nbyte0;
   char xname[CDI_MAX_NAME], yname[CDI_MAX_NAME], xunits[CDI_MAX_NAME], yunits[CDI_MAX_NAME];
   char uuidOfHGrid[17];
@@ -147,6 +147,7 @@ void printGridInfo(int vlistID)
       gridsize = gridInqSize(gridID);
       xsize    = gridInqXsize(gridID);
       ysize    = gridInqYsize(gridID);
+      xysize   = xsize*ysize;
       gridInqXname(gridID, xname);
       gridInqYname(gridID, yname);
       gridInqXunits(gridID, xunits);
@@ -171,10 +172,11 @@ void printGridInfo(int vlistID)
 	  ylast  = gridInqYval(gridID, ysize-1);
 	  yinc   = gridInqYinc(gridID);
 
+          fprintf(stdout, "          : points=%d", gridsize);
 	  if ( gridtype == GRID_GAUSSIAN_REDUCED )
-	    fprintf(stdout, "          : points=%d  nlat=%d", gridsize, ysize);
-	  else
-	    fprintf(stdout, "          : points=%d (%dx%d)", gridsize, xsize, ysize);
+	    fprintf(stdout, "  nlat=%d", ysize);
+	  else if ( xysize )
+	    fprintf(stdout, " (%dx%d)", xsize, ysize);
 
 	  if ( gridtype == GRID_GAUSSIAN || gridtype == GRID_GAUSSIAN_REDUCED )
 	    fprintf(stdout, "  np=%d", gridInqNP(gridID));
