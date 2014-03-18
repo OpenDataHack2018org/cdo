@@ -285,13 +285,13 @@ void cdoPrintHelp(char *phelp[]/*, char *xoperator*/)
 	    {
 	      if ( COLOR_STDOUT )
 		{
-		  if ( (strcmp(*phelp, "NAME") == 0) ||
-		       (strcmp(*phelp, "SYNOPSIS") == 0) ||
+		  if ( (strcmp(*phelp, "NAME")        == 0) ||
+		       (strcmp(*phelp, "SYNOPSIS")    == 0) ||
 		       (strcmp(*phelp, "DESCRIPTION") == 0) ||
-		       (strcmp(*phelp, "OPERATORS") == 0) ||
+		       (strcmp(*phelp, "OPERATORS")   == 0) ||
 		       (strcmp(*phelp, "ENVIRONMENT") == 0) ||
-		       (strcmp(*phelp, "PARAMETER") == 0) )
-		       (strcmp(*phelp, "EXAMPLES") == 0) )
+		       (strcmp(*phelp, "PARAMETER")   == 0) ||
+		       (strcmp(*phelp, "EXAMPLES")    == 0) )
 		    {
 		      set_text_color(stdout, BRIGHT, BLACK);
 		      fprintf(stdout, "%s", *phelp);
