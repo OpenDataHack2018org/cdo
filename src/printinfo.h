@@ -200,12 +200,12 @@ void printGridInfo(int vlistID)
 		  xlast  = gridInqXval(gridID, xsize-1);
 		  xinc   = gridInqXinc(gridID);
 		  fprintf(stdout, "%*s", nbyte0, "");
-		  fprintf(stdout, "%-9s : %.9g", xname, xfirst);
+		  fprintf(stdout, "%-9s : %g", xname, xfirst);
 		  if ( xsize > 1 )
                     {
-                      fprintf(stdout, " to %.9g", xlast);
+                      fprintf(stdout, " to %g", xlast);
                       if ( IS_NOT_EQUAL(xinc, 0) )
-                        fprintf(stdout, " by %.9g", xinc);
+                        fprintf(stdout, " by %g", xinc);
                     }
 		  fprintf(stdout, " %s", xunits);
 		  if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
@@ -216,12 +216,12 @@ void printGridInfo(int vlistID)
 	  if ( ysize > 0 && lycoord )
 	    {
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "%-9s : %.9g", yname, yfirst);
+	      fprintf(stdout, "%-9s : %g", yname, yfirst);
 	      if ( ysize > 1 )
                 {
-                  fprintf(stdout, " to %.9g", ylast);
+                  fprintf(stdout, " to %g", ylast);
                   if ( IS_NOT_EQUAL(yinc, 0) && gridtype != GRID_GAUSSIAN && gridtype != GRID_GAUSSIAN_REDUCED )
-                    fprintf(stdout, " by %.9g", yinc);
+                    fprintf(stdout, " by %g", yinc);
                 }
               fprintf(stdout, " %s", yunits);
 	      fprintf(stdout, "\n");
@@ -234,8 +234,8 @@ void printGridInfo(int vlistID)
 	      latpole = gridInqYpole(gridID);
 	      angle   = gridInqAngle(gridID);
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "northpole : lon=%.9g  lat=%.9g", lonpole, latpole);
-	      if ( angle > 0 ) fprintf(stdout, "  angle=%.9g", angle);
+	      fprintf(stdout, "northpole : lon=%g  lat=%g", lonpole, latpole);
+	      if ( angle > 0 ) fprintf(stdout, "  angle=%g", angle);
 	      fprintf(stdout, "\n");
 	    }
 
@@ -340,11 +340,11 @@ void printGridInfo(int vlistID)
 		}
 
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "%-9s : %.9g to %.9g %s", xname, xfirst, xlast, xunits);
+	      fprintf(stdout, "%-9s : %g to %g %s", xname, xfirst, xlast, xunits);
 	      if ( gridIsCircular(gridID) ) fprintf(stdout, "  circular");
 	      fprintf(stdout, "\n");
 	      fprintf(stdout, "%*s", nbyte0, "");
-	      fprintf(stdout, "%-9s : %.9g to %.9g %s\n", yname, yfirst, ylast, yunits);
+	      fprintf(stdout, "%-9s : %g to %g %s\n", yname, yfirst, ylast, yunits);
 
 	      free(xvals);
 	      free(yvals);
