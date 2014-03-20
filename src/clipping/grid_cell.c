@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "grid_cell.h"
 #include "utils.h"
@@ -156,4 +157,42 @@ void unpack_grid_cell(struct grid_cell * cell, double * dble_buf,
      LLtoXYZ(cell->coordinates_x[i], cell->coordinates_y[i],
              cell->coordinates_xyz + 3*i);
    }
+}
+
+void print_grid_cell(FILE * stream, struct grid_cell cell, char * name) {
+
+  char * out = NULL;
+  unsigned out_array_size = 0;
+  unsigned out_size = 0;
+
+  if (name != NULL) {
+
+    out_size = strlen(name) + 1 + 1 + 1;
+    ENSURE_ARRAY_SIZE(out, out_array_size, out_size);
+
+    strcpy(out, name);
+    strcat(out, ":\n");
+  }
+
+  for (unsigned i = 0; i < cell.num_corners; ++i) {
+
+    char buffer[1024];
+
+    sprintf(buffer, "%d x %.16f y %.16f %s\n", i, cell.coordinates_x[i],
+           cell.coordinates_y[i],
+           (cell.edge_type[i] == LAT_CIRCLE)?("LAT_CIRCLE"):
+           ((cell.edge_type[i] == LON_CIRCLE)?("LON_CIRCLE"):
+                                              ("GREAT_CIRCLE")));
+
+    out_size += strlen(buffer);
+
+    ENSURE_ARRAY_SIZE(out, out_array_size, out_size);
+
+    strcat(out, buffer);
+  }
+
+  if (out != NULL)
+    fputs(out, stream);
+
+  free(out);
 }

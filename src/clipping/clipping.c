@@ -405,12 +405,20 @@ void cell_clipping(unsigned N,
           if (intersect != -1) {
 
             // if both edges are on an identical great circle
-            if (intersect & (1 << 4))
+            if (intersect & (1 << 4)) {
+
+              print_grid_cell(stderr, target_cell, "target cell");
+              print_grid_cell(stderr, source_cell[n], "source cell");
+
               abort_message("ERROR: edges on identical circle, this case should"
                             " have been handled somewhere else\n", __FILE__, __LINE__);
+            }
 
             // if there are two intersection points with the source edge
             if ((intersect & ((1 << 0) | (1 << 1))) == ((1 << 0) | (1 << 1))) {
+
+              print_grid_cell(stderr, target_cell, "target cell");
+              print_grid_cell(stderr, source_cell[n], "source cell");
 
               abort_message("ERROR: more than one intersections with the "
                             "source edges", __FILE__, __LINE__);
@@ -438,17 +446,8 @@ void cell_clipping(unsigned N,
 
               } else {
 
-              for (int i = 0; i < source_cell[n].num_corners; ++i) {
-                fprintf(stderr, "src: %d, %lf, %lf\n", i,
-                        source_cell[n].coordinates_x[i],
-                        source_cell[n].coordinates_y[i]);
-              }
-
-              for (int i = 0; i < target_cell.num_corners; ++i) {
-                fprintf(stderr, "tgt: %d, %lf, %lf\n", i,
-                        target_cell.coordinates_x[i],
-                        target_cell.coordinates_y[i]);
-              }
+                print_grid_cell(stderr, target_cell, "target cell");
+                print_grid_cell(stderr, source_cell[n], "source cell");
 
                 abort_message("ERROR: no intersection with source edge was found\n",
                               __FILE__, __LINE__);
@@ -481,9 +480,14 @@ void cell_clipping(unsigned N,
           if (intersect != -1) {
 
             // if both edges are on an identical great circle
-            if (intersect & (1 << 4))
+            if (intersect & (1 << 4)) {
+
+              print_grid_cell(stderr, target_cell, "target cell");
+              print_grid_cell(stderr, source_cell[n], "source cell");
+
               abort_message("ERROR: edges on identical circle, this case should"
                             " have been handled somewhere else\n", __FILE__, __LINE__);
+            }
 
             // if there are two intersection points with the source edge
             if ((intersect & ((1 << 0) | (1 << 1))) == ((1 << 0) | (1 << 1))) {

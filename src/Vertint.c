@@ -325,7 +325,7 @@ void *Vertint(void *argument)
       half_press = malloc(ngp*nhlevh*sizeof(double));
     }
   else
-    cdoWarning("No data on hybrid model level found!");
+    cdoWarning("No data on hybrid sigma pressure levels found!");
 
   if ( operfunc == func_hl )
     {

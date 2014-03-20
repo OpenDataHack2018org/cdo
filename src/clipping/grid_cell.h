@@ -31,6 +31,8 @@
  * along with YAC.  If not, see <http://www.gnu.org/licenses/gpl.txt>.
  */
 
+#include <stdio.h>
+
 #ifndef GRID_CELL_H
 #define GRID_CELL_H
 
@@ -83,5 +85,7 @@ void pack_grid_cell(struct grid_cell cell, double ** dble_buf,
 void unpack_grid_cell(struct grid_cell * cell, double * dble_buf,
                       unsigned * dble_buf_data_size, unsigned * uint_buf,
                       unsigned * uint_buf_data_size);
+
+void print_grid_cell(FILE * stream, struct grid_cell cell, char * name);
 
 #endif // GRID_CELL_H
