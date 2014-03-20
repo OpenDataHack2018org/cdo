@@ -36,8 +36,8 @@ done
 # result on hama:
 # =================
 #         bil    bic    nn   con   cons
-# reg2d   0.9    2.1     2   224    184
-# curv   43.3   44.3   982   255    350
+# reg2d   0.9    2.1     2   247    160
+# curv   43.3   44.3   982   255    348
 #
 # result on bailung:
 # =================
