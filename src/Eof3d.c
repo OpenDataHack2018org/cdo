@@ -56,7 +56,6 @@ void *EOF3d(void * argument)
   int gridsize, temp_size = 0;
   int gridID1, gridID2, gridID3;
   int i, i2, j, j1, j2, eofID, varID, recID, levelID, tsID;
-  int *miss;
   int missval_warning=0;
   int nmiss,ngrids,n_eig,nrecs,nvars,n=0,nlevs=0,npack=0,nts=0;
   int offset;
@@ -356,7 +355,6 @@ void *EOF3d(void * argument)
     cdoPrint("Read data for %i variables",nvars);
   
   pack = malloc(temp_size*sizeof(int)); //TODO
-  miss = malloc(temp_size*sizeof(int));
 
   if ( cdoTimer ) timer_stop(timer_read);
 
@@ -419,8 +417,8 @@ void *EOF3d(void * argument)
 	    df1p = datafields[varID][j1].ptr;
 	    df2p = datafields[varID][j2].ptr;
 	    for ( i = 0; i < npack; i++ )
-	      sum += df1p[pack[i]]*df2p[pack[i]];
-	    //  sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
+	      //  sum += df1p[pack[i]]*df2p[pack[i]];
+	      sum += weight[pack[i]%gridsize]*df1p[pack[i]]*df2p[pack[i]];
 	    cov[j2][j1] = cov[j1][j2] = sum / sum_w / nts;
 	  }
       if ( cdoVerbose ) 
