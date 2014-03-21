@@ -34,6 +34,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 #include "list.h"
+#include "grid.h"
 #include "stdnametable.h"
 
 
@@ -306,20 +307,31 @@ void *Vargen(void *argument)
                 }
               else if ( operatorID == SINCOS )
                 {
-		  int nlon = gridInqXsize(gridID);
-		  int nlat = gridInqYsize(gridID);
-		  double dlon = 360./nlon;
-		  double dlat = 180./nlat;
-		  double lon0 = 0;
-		  double lat0 = -90 + dlat/2;
+		  double *xvals = malloc(gridsize*sizeof(double));
+		  double *yvals = malloc(gridsize*sizeof(double));
+
+		  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
+
+		  if ( gridInqType(gridID) != GRID_UNSTRUCTURED && gridInqType(gridID) != GRID_CURVILINEAR )
+		    gridID = gridToCurvilinear(gridID, 0);
+
+		  gridInqXvals(gridID, xvals);
+		  gridInqYvals(gridID, yvals);
+
+		  /* Convert lat/lon units if required */
+		  char units[CDI_MAX_NAME];
+		  gridInqXunits(gridID, units);
+		  grid_to_radian(units, gridsize, xvals, "grid center lon");
+		  gridInqYunits(gridID, units);
+		  grid_to_radian(units, gridsize, yvals, "grid center lat");
 
                   for ( i = 0; i < gridsize; i++ )
 		    {
-		      int ilat = (i%gridsize)/ nlon;
-		      int ilon = i%nlon;
-		      array[i] = cos(2.0 * M_PI * (lon0 + ilon*dlon)/360)
-		   	       * sin(2.0 * M_PI * (lat0 + ilat*dlat)/180);
+		      array[i] = cos(1.0 * xvals[i]) * sin(2.0 * yvals[i]);
 		    }
+
+		  free(xvals);
+		  free(yvals);
 		}
               else if ( operatorID == CONST )
                 {
