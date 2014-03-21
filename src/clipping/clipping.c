@@ -257,6 +257,75 @@ static enum cell_type get_cell_type(struct grid_cell target_cell) {
    return GREAT_CIRCLE_CELL;
 }
 
+static void get_edge_middle_point_lat(double a[3], double b[3],
+                                      double middle[3]) {
+
+  middle[0] = a[0] + b[0];
+  middle[1] = a[1] + b[1];
+  middle[2] = a[2];
+
+  double length = sqrt(middle[0] * middle[0] + middle[1] * middle[1]);
+
+  if (length < tol) {
+
+    length = 1;
+    middle[0] = 1;
+    middle[1] = 0;
+  }
+
+  double scale = sqrt(1.0 - middle[2] * middle[2]) / length;
+
+  middle[0] *= scale;
+  middle[1] *= scale;
+}
+
+static void get_edge_middle_point_gc(double a[3], double b[3],
+                                     double middle[3]) {
+
+  middle[0] = a[0] + b[0];
+  middle[1] = a[1] + b[1];
+  middle[2] = a[2] + b[2];
+
+  double length = sqrt(middle[0] * middle[0] +
+                       middle[1] * middle[1] +
+                       middle[2] * middle[2]);
+
+  if (length < tol) {
+
+    middle[0] = 1;
+    middle[1] = 0;
+    middle[2] = 0;
+    return;
+  }
+
+  double scale = 1.0 / length;
+
+  middle[0] *= scale;
+  middle[1] *= scale;
+  middle[2] *= scale;
+}
+
+static void get_edge_middle_point(double a[3], double b[3],
+                                  enum edge_type edge_type, double middle[3]) {
+
+  switch (edge_type) {
+
+    case (LAT_CIRCLE):
+
+      get_edge_middle_point_lat(a, b, middle);
+      break;
+
+    case (LON_CIRCLE):
+    case (GREAT_CIRCLE):
+
+      get_edge_middle_point_gc(a, b, middle);
+      break;
+
+    default:
+      abort_message("ERROR: invalid edge type\n", __FILE__, __LINE__);
+  };
+}
+
 /**
  * cell clipping using Sutherland–Hodgman algorithm;
  */
@@ -537,58 +606,62 @@ void cell_clipping(unsigned N,
                                (curr_is_inside == 0)]->edge_type =
                 prev_tgt_point->edge_type;
 
-              int tgt_edge_inside_src;
+              if (prev_is_inside == 2 || curr_is_inside == 2) {
 
-              if ((prev_is_inside + curr_is_inside == 3) ||
-                  (prev_is_inside == 0 && curr_is_inside == 2)) {
+                int tgt_edge_inside_src;
 
-                double norm_vec[3];
+                {
+                  double edge_middle[3];
 
-                switch (prev_src_point_edge_type) {
+                  get_edge_middle_point(p, q, prev_tgt_point->edge_type,
+                                        edge_middle);
 
-                  case (LON_CIRCLE) :
-                  case (GREAT_CIRCLE) :
-                    compute_norm_vector(prev_src_point->vec_coords,
-                                        curr_src_point->vec_coords,
-                                        norm_vec);
-                    break;
-                  case (LAT_CIRCLE):
-                    compute_lat_circle_z_value(prev_src_point->vec_coords,
-                                               curr_src_point->vec_coords,
-                                               norm_vec);
-                    break;
-                  default:
-                    norm_vec[0] = 0.0, norm_vec[1] = 0.0, norm_vec[2] = 0.0;
-                    abort_message("invalid edge type\n", __FILE__, __LINE__);
-                };
+                  double norm_vec[3];
 
-                tgt_edge_inside_src =
-                  (is_inside(prev_tgt_point->vec_coords, norm_vec,
-                             prev_src_point_edge_type, source_ordering) == 1) ||
-                  (is_inside(curr_tgt_point->vec_coords, norm_vec,
-                             prev_src_point_edge_type, source_ordering) == 1);
-              }
+                  switch (prev_src_point_edge_type) {
 
-              // if one source point is on the target edge and the other is inside
-              if (prev_is_inside + curr_is_inside == 3) {
+                    case (LON_CIRCLE) :
+                    case (GREAT_CIRCLE) :
+                      compute_norm_vector(prev_src_point->vec_coords,
+                                          curr_src_point->vec_coords,
+                                          norm_vec);
+                      break;
+                    case (LAT_CIRCLE):
+                      compute_lat_circle_z_value(prev_src_point->vec_coords,
+                                                 curr_src_point->vec_coords,
+                                                 norm_vec);
+                      break;
+                    default:
+                      norm_vec[0] = 0.0, norm_vec[1] = 0.0, norm_vec[2] = 0.0;
+                      abort_message("invalid edge type\n", __FILE__, __LINE__);
+                  };
 
-                // if the current source point is on the target edge, then the
-                // second intersection point is just a dummy that is identical
-                // to the current source point but might have the wrong edge
-                // type
-                if (curr_is_inside == 2)
-                  intersect_points[1]->to_be_removed = 1;
+                  tgt_edge_inside_src = is_inside(edge_middle, norm_vec,
+                                                  prev_src_point_edge_type,
+                                                  source_ordering) != 1;
+                }
 
-                if (curr_is_inside == 2 && tgt_edge_inside_src)
-                  curr_src_point->to_be_removed = 1;
-                if (prev_is_inside == 2 && tgt_edge_inside_src)
-                  prev_src_point->to_be_removed = 1;
-              }
-              if (prev_is_inside == 0 && curr_is_inside == 2) {
-                if (tgt_edge_inside_src)
-                  intersect_points[1]->to_be_removed = 1;
-                else
-                  curr_src_point->to_be_removed = 1;
+                // if one source point is on the target edge and the other is inside
+                if (prev_is_inside + curr_is_inside == 3) {
+
+                  // if the current source point is on the target edge, then the
+                  // second intersection point is just a dummy that is identical
+                  // to the current source point but might have the wrong edge
+                  // type
+                  if (curr_is_inside == 2)
+                    intersect_points[1]->to_be_removed = 1;
+
+                  if (curr_is_inside == 2)
+                    curr_src_point->to_be_removed = tgt_edge_inside_src;
+                  if (prev_is_inside == 2)
+                    prev_src_point->to_be_removed = tgt_edge_inside_src;
+                }
+                if (prev_is_inside == 0 && curr_is_inside == 2) {
+                  if (tgt_edge_inside_src)
+                    intersect_points[1]->to_be_removed = 1;
+                  else
+                    curr_src_point->to_be_removed = 1;
+                }
               }
 
               // if the previous point has been reused for an intersection
