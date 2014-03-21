@@ -3812,6 +3812,37 @@ void intersection(long *location, double *intrsct_lat, double *intrsct_lon, int 
    by the input lat/lon of the endpoints.
 */
 static
+double phi_gradient(double in_phi1, double in_phi2, double dphi, double f1, double f2, double grid_lon)
+{
+  double fint, fac;
+  double weight;
+  double phi1, phi2;
+
+  phi1 = in_phi1 - grid_lon;
+  if      ( phi1 >  PI ) phi1 -= PI2;
+  else if ( phi1 < -PI ) phi1 += PI2;
+
+  phi2 = in_phi2 - grid_lon;
+  if      ( phi2 >  PI ) phi2 -= PI2;
+  else if ( phi2 < -PI ) phi2 += PI2;
+
+  if ( (phi2-phi1) <  PI && (phi2-phi1) > -PI )
+    weight = dphi*(phi1*f1 + phi2*f2);
+  else
+    {
+      if ( phi1 > ZERO ) fac =  PI;
+      else      	 fac = -PI;
+
+      fint = f1 + (f2-f1)*(fac-phi1)/fabs(dphi);
+      weight = HALF*phi1*(phi1-fac)*f1 -
+	       HALF*phi2*(phi2+fac)*f2 +
+	       HALF*fac*(phi1+phi2)*fint;
+    }
+
+  return weight;
+}
+
+static
 void line_integral(double *weights, double in_phi1, double in_phi2, 
 		   double theta1, double theta2, double grid1_lon, double grid2_lon)
 {
@@ -3827,9 +3858,8 @@ void line_integral(double *weights, double in_phi1, double in_phi2,
   */
 
   /*  Local variables  */
-  double dphi, sinth1, sinth2, costh1, costh2, fac;
-  double phi1, phi2;
-  double f1, f2, fint;
+  double dphi, sinth1, sinth2, costh1, costh2;
+  double f1, f2;
 
   /*  Weights for the general case based on a trapezoidal approx to the integrals. */
 
@@ -3860,49 +3890,8 @@ void line_integral(double *weights, double in_phi1, double in_phi2,
   f1 = HALF*(costh1*sinth1 + theta1);
   f2 = HALF*(costh2*sinth2 + theta2);
 
-  phi1 = in_phi1 - grid1_lon;
-  if      ( phi1 >  PI ) phi1 -= PI2;
-  else if ( phi1 < -PI ) phi1 += PI2;
-
-  phi2 = in_phi2 - grid1_lon;
-  if      ( phi2 >  PI ) phi2 -= PI2;
-  else if ( phi2 < -PI ) phi2 += PI2;
-
-  if ( (phi2-phi1) <  PI && (phi2-phi1) > -PI )
-    weights[2] = dphi*(phi1*f1 + phi2*f2);
-  else
-    {
-      if ( phi1 > ZERO )
-	fac = PI;
-      else
-	fac = -PI;
-
-      fint = f1 + (f2-f1)*(fac-phi1)/fabs(dphi);
-      weights[2] = HALF*phi1*(phi1-fac)*f1 -
-	           HALF*phi2*(phi2+fac)*f2 +
-	           HALF*fac*(phi1+phi2)*fint;
-    }
-
-  phi1 = in_phi1 - grid2_lon;
-  if      ( phi1 >  PI ) phi1 -= PI2;
-  else if ( phi1 < -PI ) phi1 += PI2;
-
-  phi2 = in_phi2 - grid2_lon;
-  if      ( phi2 >  PI ) phi2 -= PI2;
-  else if ( phi2 < -PI ) phi2 += PI2;
-
-  if ( (phi2-phi1) <  PI  && (phi2-phi1) > -PI )
-    weights[5] = dphi*(phi1*f1 + phi2*f2);
-  else
-    {
-      if ( phi1 > ZERO ) fac =  PI;
-      else               fac = -PI;
-
-      fint = f1 + (f2-f1)*(fac-phi1)/fabs(dphi);
-      weights[5] = HALF*phi1*(phi1-fac)*f1 -
-     	           HALF*phi2*(phi2+fac)*f2 +
-	           HALF*fac*(phi1+phi2)*fint;
-    }
+  weights[2] = phi_gradient(in_phi1, in_phi2, dphi, f1, f2, grid1_lon);
+  weights[5] = phi_gradient(in_phi1, in_phi2, dphi, f1, f2, grid2_lon);
 
 }  /* line_integral */
 
@@ -6003,6 +5992,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
 	  tgt_grid->cell_area[tgt_grid_add] += partial_weights[n];
 	}
+      // printf("area %d %g %g\n", tgt_grid_add, tgt_grid->cell_area[tgt_grid_add], tgt_area);
     }
 
   if ( cdoVerbose )
@@ -6107,7 +6097,7 @@ void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *
 
   if ( cdoVerbose )
     cdoPrint("Total number of links = %ld", rv->num_links);
-
+  
   for ( n = 0; n < src_grid_size; ++n )
     if ( IS_NOT_EQUAL(src_grid->cell_area[n], 0) ) src_grid->cell_frac[n] /= src_grid->cell_area[n];
 
