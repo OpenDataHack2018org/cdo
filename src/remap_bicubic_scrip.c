@@ -235,4 +235,4 @@ void remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv
         }
     } /* grid_loop1 */
 
-} /* remap_bicub */
+} /* remap_bicubic */

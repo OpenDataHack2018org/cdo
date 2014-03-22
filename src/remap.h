@@ -183,7 +183,7 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
 void remap_sum(double *restrict dst_array, double missval, long dst_size, long num_links, double *restrict map_wts,
 	       long num_wts, const int *restrict dst_add, const int *restrict src_add, const double *restrict src_array);
 
-void remap_bilin(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
+void remap_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);
 void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv);

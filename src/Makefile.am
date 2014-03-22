@@ -277,6 +277,7 @@ cdo_SOURCES += Adisit.c        \
                remap_conserv_scrip.c \
                remap_distwgt_scrip.c \
                remap_bicubic_scrip.c \
+               remap_bilinear_scrip.c \
                stdnametable.c  \
                stdnametable.h  \
                specspace.c     \
