@@ -596,6 +596,7 @@ src/remap_conserv_scrip.c -text
 src/remap_distwgt_scrip.c -text
 src/remap_scrip_io.c -text
 src/remap_search_latbins.c -text
+src/remap_search_reg2d.c -text
 src/remap_store_link.c -text
 src/remap_store_link.h -text
 src/remaplib.c -text
