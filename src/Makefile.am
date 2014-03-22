@@ -273,7 +273,8 @@ cdo_SOURCES += Adisit.c        \
                remap_search_latbins.c \
                remap_store_link.c \
                remap_store_link.h \
-               scrip_remap_conserv.c \
+               remap_conserv.c \
+               remap_conserv_scrip.c \
                stdnametable.c  \
                stdnametable.h  \
                specspace.c     \
