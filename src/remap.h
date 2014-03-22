@@ -1,3 +1,6 @@
+#ifndef _REMAP_H
+#define _REMAP_H
+
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
@@ -7,6 +10,20 @@
 #define  PI       M_PI
 #define  PI2      2.0*PI
 #define  PIH      0.5*PI
+
+#define  ZERO     0.0
+#define  ONE      1.0
+#define  TWO      2.0
+#define  THREE    3.0
+#define  HALF     0.5
+#define  QUART    0.25
+#define  BIGNUM   1.e+20
+#define  TINY     1.e-14
+
+
+#define  REMAP_GRID_TYPE_REG2D     1
+#define  REMAP_GRID_TYPE_CURVE2D   2
+#define  REMAP_GRID_TYPE_UNSTRUCT  3
 
 #define  REMAP_GRID_BASIS_SRC  1
 #define  REMAP_GRID_BASIS_TGT  2
@@ -194,3 +211,8 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 
 void calc_bin_addr(long gridsize, long nbins, const restr_t* restrict bin_lats, const restr_t* restrict cell_bound_box, int* restrict bin_addr);
 void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type);
+long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
+		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long src_grid_size, int *srch_add);
+
+
+#endif  /* _REMAP_H */

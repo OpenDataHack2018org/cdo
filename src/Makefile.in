@@ -163,6 +163,7 @@ am__cdo_SOURCES_DIST = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c \
 	pstream.c pstream.h pstream_int.h pthread_debug.c \
 	pthread_debug.h readline.c realtime.c remap.h remaplib.c \
 	remapsort.c remap_scrip_io.c remap_search_latbins.c \
+	remap_store_link.c remap_store_link.h scrip_remap_conserv.c \
 	stdnametable.c stdnametable.h specspace.c specspace.h \
 	statistic.c statistic.h table.c text.c text.h timebase.h \
 	timer.c userlog.c util.c util.h vinterp.c vinterp.h zaxis.c \
@@ -292,7 +293,9 @@ am_cdo_OBJECTS = cdo-cdo.$(OBJEXT) cdo-Adisit.$(OBJEXT) \
 	cdo-pthread_debug.$(OBJEXT) cdo-readline.$(OBJEXT) \
 	cdo-realtime.$(OBJEXT) cdo-remaplib.$(OBJEXT) \
 	cdo-remapsort.$(OBJEXT) cdo-remap_scrip_io.$(OBJEXT) \
-	cdo-remap_search_latbins.$(OBJEXT) cdo-stdnametable.$(OBJEXT) \
+	cdo-remap_search_latbins.$(OBJEXT) \
+	cdo-remap_store_link.$(OBJEXT) \
+	cdo-scrip_remap_conserv.$(OBJEXT) cdo-stdnametable.$(OBJEXT) \
 	cdo-specspace.$(OBJEXT) cdo-statistic.$(OBJEXT) \
 	cdo-table.$(OBJEXT) cdo-text.$(OBJEXT) cdo-timer.$(OBJEXT) \
 	cdo-userlog.$(OBJEXT) cdo-util.$(OBJEXT) cdo-vinterp.$(OBJEXT) \
@@ -594,7 +597,8 @@ cdo_SOURCES = cdo.c Adisit.c Arith.c Arithc.c Arithdays.c Arithlat.c \
 	pipe.c pipe.h printinfo.h process.c process.h pstream.c \
 	pstream.h pstream_int.h pthread_debug.c pthread_debug.h \
 	readline.c realtime.c remap.h remaplib.c remapsort.c \
-	remap_scrip_io.c remap_search_latbins.c stdnametable.c \
+	remap_scrip_io.c remap_search_latbins.c remap_store_link.c \
+	remap_store_link.h scrip_remap_conserv.c stdnametable.c \
 	stdnametable.h specspace.c specspace.h statistic.c statistic.h \
 	table.c text.c text.h timebase.h timer.c userlog.c util.c \
 	util.h vinterp.c vinterp.h zaxis.c clipping/clipping.c \
@@ -984,9 +988,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-realtime.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-remap_scrip_io.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-remap_search_latbins.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-remap_store_link.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-remaplib.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-remapsort.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-results_template_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-scrip_remap_conserv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-specspace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-statistic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdo-stdnametable.Po@am__quote@
@@ -4255,6 +4261,34 @@ cdo-remap_search_latbins.obj: remap_search_latbins.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_search_latbins.c' object='cdo-remap_search_latbins.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remap_search_latbins.obj `if test -f 'remap_search_latbins.c'; then $(CYGPATH_W) 'remap_search_latbins.c'; else $(CYGPATH_W) '$(srcdir)/remap_search_latbins.c'; fi`
+
+cdo-remap_store_link.o: remap_store_link.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-remap_store_link.o -MD -MP -MF $(DEPDIR)/cdo-remap_store_link.Tpo -c -o cdo-remap_store_link.o `test -f 'remap_store_link.c' || echo '$(srcdir)/'`remap_store_link.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-remap_store_link.Tpo $(DEPDIR)/cdo-remap_store_link.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_store_link.c' object='cdo-remap_store_link.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remap_store_link.o `test -f 'remap_store_link.c' || echo '$(srcdir)/'`remap_store_link.c
+
+cdo-remap_store_link.obj: remap_store_link.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-remap_store_link.obj -MD -MP -MF $(DEPDIR)/cdo-remap_store_link.Tpo -c -o cdo-remap_store_link.obj `if test -f 'remap_store_link.c'; then $(CYGPATH_W) 'remap_store_link.c'; else $(CYGPATH_W) '$(srcdir)/remap_store_link.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-remap_store_link.Tpo $(DEPDIR)/cdo-remap_store_link.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='remap_store_link.c' object='cdo-remap_store_link.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-remap_store_link.obj `if test -f 'remap_store_link.c'; then $(CYGPATH_W) 'remap_store_link.c'; else $(CYGPATH_W) '$(srcdir)/remap_store_link.c'; fi`
+
+cdo-scrip_remap_conserv.o: scrip_remap_conserv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-scrip_remap_conserv.o -MD -MP -MF $(DEPDIR)/cdo-scrip_remap_conserv.Tpo -c -o cdo-scrip_remap_conserv.o `test -f 'scrip_remap_conserv.c' || echo '$(srcdir)/'`scrip_remap_conserv.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-scrip_remap_conserv.Tpo $(DEPDIR)/cdo-scrip_remap_conserv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='scrip_remap_conserv.c' object='cdo-scrip_remap_conserv.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-scrip_remap_conserv.o `test -f 'scrip_remap_conserv.c' || echo '$(srcdir)/'`scrip_remap_conserv.c
+
+cdo-scrip_remap_conserv.obj: scrip_remap_conserv.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-scrip_remap_conserv.obj -MD -MP -MF $(DEPDIR)/cdo-scrip_remap_conserv.Tpo -c -o cdo-scrip_remap_conserv.obj `if test -f 'scrip_remap_conserv.c'; then $(CYGPATH_W) 'scrip_remap_conserv.c'; else $(CYGPATH_W) '$(srcdir)/scrip_remap_conserv.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/cdo-scrip_remap_conserv.Tpo $(DEPDIR)/cdo-scrip_remap_conserv.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='scrip_remap_conserv.c' object='cdo-scrip_remap_conserv.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o cdo-scrip_remap_conserv.obj `if test -f 'scrip_remap_conserv.c'; then $(CYGPATH_W) 'scrip_remap_conserv.c'; else $(CYGPATH_W) '$(srcdir)/scrip_remap_conserv.c'; fi`
 
 cdo-stdnametable.o: stdnametable.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(cdo_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT cdo-stdnametable.o -MD -MP -MF $(DEPDIR)/cdo-stdnametable.Tpo -c -o cdo-stdnametable.o `test -f 'stdnametable.c' || echo '$(srcdir)/'`stdnametable.c

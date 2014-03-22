@@ -208,7 +208,6 @@ void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgr
 double remap_threshhold = 2;
 int remap_test = 0;
 int remap_order = 1;
-int remap_store_link_fast = TRUE;
 int remap_non_global = FALSE;
 int remap_num_srch_bins = 180;
 int lremap_num_srch_bins = FALSE;
@@ -355,6 +354,8 @@ void get_remap_env(void)
 	    cdoPrint("Set REMAP_NON_GLOBAL to %d", remap_non_global);
 	}
     }
+
+  int remap_store_link_fast = TRUE;
 
   envstr = getenv("REMAP_STORE_LINK_FAST");
   if ( envstr )
