@@ -214,5 +214,8 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type);
 long get_srch_cells(long tgt_grid_add, long nbins, int *bin_addr1, int *bin_addr2,
 		    restr_t *tgt_cell_bound_box, restr_t *src_cell_bound_box, long src_grid_size, int *srch_add);
 
+int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restrict nbr_dist, double plat, double plon,
+			 const double *restrict src_center_lat, const double *restrict src_center_lon);
+
 
 #endif  /* _REMAP_H */
