@@ -270,6 +270,7 @@ cdo_SOURCES += Adisit.c        \
                remaplib.c      \
                remapsort.c     \
                remap_scrip_io.c \
+               remap_search_reg2d.c \
                remap_search_latbins.c \
                remap_store_link.c \
                remap_store_link.h \
