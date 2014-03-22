@@ -589,6 +589,7 @@ src/pthread_debug.h -text
 src/readline.c -text
 src/realtime.c -text
 src/remap.h -text
+src/remap_bicubic_scrip.c -text
 src/remap_conserv.c -text
 src/remap_conserv_scrip.c -text
 src/remap_distwgt_scrip.c -text

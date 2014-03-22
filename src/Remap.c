@@ -927,7 +927,7 @@ void *Remap(void *argument)
 
 	      if      ( map_type == MAP_TYPE_CONSERV   ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_BILINEAR  ) remap_bilin(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BICUBIC   ) remap_bicub(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+	      else if ( map_type == MAP_TYPE_BICUBIC   ) remap_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_DISTWGT   ) remap_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 	      else if ( map_type == MAP_TYPE_CONSPHERE ) remap_consphere(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
