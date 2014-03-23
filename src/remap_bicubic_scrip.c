@@ -76,7 +76,7 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 
   -----------------------------------------------------------------------
 */
-void remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*   Local variables */
   int  lwarn = TRUE;

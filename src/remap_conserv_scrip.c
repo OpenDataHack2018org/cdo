@@ -997,7 +997,7 @@ void line_integral(double *weights, double in_phi1, double in_phi2,
 
   -----------------------------------------------------------------------
 */
-void remap_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
 

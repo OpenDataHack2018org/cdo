@@ -335,7 +335,7 @@ int get_lonlat_circle_index(remapgrid_t *remap_grid)
 }
 
 
-void remap_consphere(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /* local variables */
 

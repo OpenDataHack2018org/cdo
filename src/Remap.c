@@ -162,21 +162,21 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 } 
 
 static
-void print_remap_info(int operfunc, int map_type, remapgrid_t *src_grid, remapgrid_t *tgt_grid, int nmiss)
+void print_remap_info(int operfunc, remapgrid_t *src_grid, remapgrid_t *tgt_grid, int nmiss)
 {
   char line[256];
   char tmpstr[256];
 
   line[0] = 0;
 
-  if      ( operfunc == REMAPBIL  || operfunc == GENBIL  )  strcpy(line, "Bilinear");
-  else if ( operfunc == REMAPBIC  || operfunc == GENBIC  )  strcpy(line, "Bicubic");
-  else if ( operfunc == REMAPNN   || operfunc == GENNN   )  strcpy(line, "Nearest neighbor");
-  else if ( operfunc == REMAPDIS  || operfunc == GENDIS  )  strcpy(line, "Distance-weighted average");
-  else if ( operfunc == REMAPCON  || operfunc == GENCON  )  strcpy(line, "First order conservative");
-  else if ( operfunc == REMAPCON2 || operfunc == GENCON2 )  strcpy(line, "Second order conservative");
-  else if ( operfunc == REMAPLAF  || operfunc == GENLAF  )  strcpy(line, "Largest area fraction");
-  else if ( operfunc == REMAPCONS || operfunc == GENCONS )  strcpy(line, "First order conservative (sphere)");
+  if      ( operfunc == REMAPBIL  || operfunc == GENBIL  )  strcpy(line, "SCRIP bilinear");
+  else if ( operfunc == REMAPBIC  || operfunc == GENBIC  )  strcpy(line, "SCRIP bicubic");
+  else if ( operfunc == REMAPNN   || operfunc == GENNN   )  strcpy(line, "SCRIP nearest neighbor");
+  else if ( operfunc == REMAPDIS  || operfunc == GENDIS  )  strcpy(line, "SCRIP distance-weighted average");
+  else if ( operfunc == REMAPCON  || operfunc == GENCON  )  strcpy(line, "SCRIP first order conservative");
+  else if ( operfunc == REMAPCON2 || operfunc == GENCON2 )  strcpy(line, "SCRIP second order conservative");
+  else if ( operfunc == REMAPLAF  || operfunc == GENLAF  )  strcpy(line, "SCRIP largest area fraction");
+  else if ( operfunc == REMAPCONS || operfunc == GENCONS )  strcpy(line, "First order conservative");
   else                                                      strcpy(line, "Unknown");
 
   strcat(line, " remapping from ");
@@ -213,7 +213,7 @@ int remap_num_srch_bins = 180;
 int lremap_num_srch_bins = FALSE;
 int remap_extrapolate = FALSE;
 int lextrapolate = FALSE;
-int max_remaps = 0;
+int max_remaps = -1;
 int sort_mode = HEAP_SORT;
 double remap_area_min = 0;
 
@@ -445,7 +445,7 @@ void *Remap(void *argument)
   int taxisID1, taxisID2;
   int gridID1 = -1, gridID2;
   int gridtype;
-  int nmiss1, nmiss2, i, j, r;
+  int nmiss1, nmiss2, i, j, r = -1;
   int *imask = NULL;
   int nremaps = 0;
   int norm_opt = NORM_OPT_NONE;
@@ -460,9 +460,10 @@ void *Remap(void *argument)
   double missval;
   double *array1 = NULL, *array2 = NULL;
   double *grad1_lat = NULL, *grad1_lon = NULL, *grad1_latlon = NULL;
-  remap_t *remaps;
+  remap_t *remaps = NULL;
   char *envstr;
   char *remap_file = NULL;
+  int remap_weights = 1;
   int lwrite_remap;
 
   if ( cdoTimer )
@@ -580,7 +581,7 @@ void *Remap(void *argument)
 
   gridID1 = vlistGrid(vlistID1, index);
 
-  if ( max_remaps == 0 )
+  if ( max_remaps == -1 )
     {
       nzaxis = vlistNzaxis(vlistID1);
       for ( index = 0; index < nzaxis; index++ )
@@ -599,12 +600,15 @@ void *Remap(void *argument)
         cdoPrint("Set max_remaps to %d", max_remaps);
     }
 
-  remaps = malloc(max_remaps*sizeof(remap_t));
-  for ( r = 0; r < max_remaps; r++ )
+  if ( max_remaps > 0 )
     {
-      remaps[r].gridID   = -1;
-      remaps[r].gridsize = 0;
-      remaps[r].nmiss    = 0;
+      remaps = malloc(max_remaps*sizeof(remap_t));
+      for ( r = 0; r < max_remaps; r++ )
+	{
+	  remaps[r].gridID   = -1;
+	  remaps[r].gridsize = 0;
+	  remaps[r].nmiss    = 0;
+	}
     }
 
   if ( operfunc == REMAPXXX )
@@ -923,42 +927,45 @@ void *Remap(void *argument)
 	      remap_vars_init(map_type, remaps[r].src_grid.size, remaps[r].tgt_grid.size, &remaps[r].vars);
 	      if ( cdoTimer ) timer_stop(timer_remap_init);
 
-	      print_remap_info(operfunc, map_type, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
-
-	      if      ( map_type == MAP_TYPE_CONSERV   ) remap_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BILINEAR  ) remap_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_BICUBIC   ) remap_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_DISTWGT   ) remap_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-	      else if ( map_type == MAP_TYPE_CONSPHERE ) remap_consphere(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-
-	      if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
-		resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
-
-	      if ( remaps[r].vars.sort_add )
+	      if ( remap_weights )
 		{
-		  if ( cdoTimer ) timer_start(timer_remap_sort);
-		  if ( sort_mode == MERGE_SORT )
-		    { /* 
-		      ** use a combination of the old sort_add and a split and merge approach.
-		      ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c. 
-		      ** OpenMP parallelism is supported
-		      */   
-		      sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-				remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-				remaps[r].vars.wts, ompNumThreads);
+		  print_remap_info(operfunc, &remaps[r].src_grid, &remaps[r].tgt_grid, nmiss1);
+
+		  if      ( map_type == MAP_TYPE_CONSERV   ) scrip_remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_BILINEAR  ) scrip_remap_weights_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_BICUBIC   ) scrip_remap_weights_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_DISTWGT   ) scrip_remap_weights_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_CONSPHERE ) remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+
+		  if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
+		    resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
+		  
+		  if ( remaps[r].vars.sort_add )
+		    {
+		      if ( cdoTimer ) timer_start(timer_remap_sort);
+		      if ( sort_mode == MERGE_SORT )
+			{ /* 
+			  ** use a combination of the old sort_add and a split and merge approach.
+			  ** The chunk size is determined by MERGE_SORT_LIMIT_SIZE in remaplib.c. 
+			  ** OpenMP parallelism is supported
+			  */   
+			  sort_iter(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+				    remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
+				    remaps[r].vars.wts, ompNumThreads);
+			}
+		      else
+			{ /* use a pure heap sort without any support of parallelism */
+			  sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
+				   remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
+				   remaps[r].vars.wts);
+			}
+		      if ( cdoTimer ) timer_stop(timer_remap_sort);
 		    }
-		  else
-		    { /* use a pure heap sort without any support of parallelism */
-		      sort_add(remaps[r].vars.num_links, remaps[r].vars.num_wts,
-			       remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-			       remaps[r].vars.wts);
-		    }
-		  if ( cdoTimer ) timer_stop(timer_remap_sort);
+
+		  if ( lwrite_remap ) goto WRITE_REMAP;
+
+		  if ( remap_test ) reorder_links(&remaps[r].vars);
 		}
-
-	      if ( lwrite_remap ) goto WRITE_REMAP;
-
-	      if ( remap_test ) reorder_links(&remaps[r].vars);
 	    }
 
 	  if ( gridInqType(gridID1) == GRID_GME )
@@ -976,16 +983,23 @@ void *Remap(void *argument)
 	      remap_gradients(remaps[r].src_grid, array1, grad1_lat, grad1_lon, grad1_latlon);
 	    }
 
-	  if ( operfunc == REMAPLAF )
-	    remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
-	  else if ( operfunc == REMAPSUM )
-	    remap_sum(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
+	  if ( remap_weights )
+	    {
+	      if ( operfunc == REMAPLAF )
+		remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
+			  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
+	      else if ( operfunc == REMAPSUM )
+		remap_sum(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
+			  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
+	      else
+		remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
+		      remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
+		      array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links);
+	    }
 	  else
-	    remap(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
-		  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add,
-		  array1, grad1_lat, grad1_lon, grad1_latlon, remaps[r].vars.links);
+	    {
+	      if ( map_type == MAP_TYPE_BILINEAR  ) scrip_remap_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
+	    }
 
 	  gridsize2 = gridInqSize(gridID2);
 
@@ -1105,14 +1119,17 @@ void *Remap(void *argument)
   if ( grad1_lon ) free(grad1_lon);
   if ( grad1_lat ) free(grad1_lat);
 
-  for ( r = 0; r < nremaps; r++ )
+  if ( max_remaps > 0 )
     {
-      remapVarsFree(&remaps[r].vars);
-      remapGridFree(&remaps[r].src_grid);
-      remapGridFree(&remaps[r].tgt_grid);
+      for ( r = 0; r < nremaps; r++ )
+	{
+	  remapVarsFree(&remaps[r].vars);
+	  remapGridFree(&remaps[r].src_grid);
+	  remapGridFree(&remaps[r].tgt_grid);
+	}
+      
+      if ( remaps ) free(remaps);
     }
-
-  if ( remaps ) free(remaps);
 
   cdoFinish();
 

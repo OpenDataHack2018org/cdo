@@ -310,7 +310,7 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 
   -----------------------------------------------------------------------
 */
-void remap_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*  Local variables */
 
