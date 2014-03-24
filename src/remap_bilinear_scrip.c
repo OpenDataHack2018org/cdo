@@ -68,8 +68,9 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 } /* store_link_bilin */
 
 
-long find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg)
+int find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg)
 {
+  int lfound = 0;
   long iter;                     /*  iteration counters   */
   double iguess, jguess;         /*  current guess for bilinear coordinate  */
   double deli, delj;             /*  corrections to iw,jw                   */
@@ -132,7 +133,80 @@ long find_ij_weights(double plon, double plat, double* restrict src_lats, double
   *ig = iguess;
   *jg = jguess;
 
-  return (iter);
+  if ( iter < remap_max_iter ) lfound = 1;
+
+  return (lfound);
+}
+
+static
+void set_bilinear_weights(double iw, double jw, double* restrict wgts)
+{
+  wgts[0] = (1.-iw) * (1.-jw);
+  wgts[1] =     iw  * (1.-jw);
+  wgts[2] =     iw  *     jw;
+  wgts[3] = (1.-iw) *     jw;
+}
+
+static
+int num_src_points(const int* restrict mask, const int* restrict src_add, double* restrict src_lats)
+{
+  int icount = 0;
+
+  for ( int n = 0; n < 4; ++n )
+    {
+      if ( mask[src_add[n]] )
+	icount++;
+      else
+	src_lats[n] = 0.;
+    }
+
+  return (icount);
+}
+
+static
+void renormalize_weights(const double* restrict src_lats, double* restrict wgts)
+{
+  int n;
+  double sum_wgts = 0.0; /* sum of weights for normalization */
+  /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
+  for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
+  for ( n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
+}
+
+static
+void bilinear_warning(double plon, double plat, double iw, double jw, int* src_add, double* src_lons, double* src_lats, remapgrid_t* src_grid)
+{
+  static int lwarn = TRUE;
+
+  if ( cdoVerbose )
+    {
+      cdoPrint("Point coords: %g %g", plat, plon);
+      cdoPrint("Src grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
+      cdoPrint("Src grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
+      cdoPrint("Src grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
+      cdoPrint("Src grid lats: %g %g %g %g",
+	       src_grid->cell_center_lat[src_add[0]], src_grid->cell_center_lat[src_add[1]],
+	       src_grid->cell_center_lat[src_add[2]], src_grid->cell_center_lat[src_add[3]]);
+      cdoPrint("Src grid lons: %g %g %g %g",
+	       src_grid->cell_center_lon[src_add[0]], src_grid->cell_center_lon[src_add[1]],
+	       src_grid->cell_center_lon[src_add[2]], src_grid->cell_center_lon[src_add[3]]);
+      cdoPrint("Current iw,jw : %g %g", iw, jw);
+    }
+
+  if ( cdoVerbose || lwarn )
+    {
+      lwarn = FALSE;
+      //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
+      cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
+    }
+}
+
+static
+void bilinear_remap(double* restrict tgt_point, const double* restrict src_array, const double* restrict wgts, const int* src_add)
+{
+  // *tgt_point = 0.;
+  // for ( int n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
+  *tgt_point = src_array[src_add[0]]*wgts[0] + src_array[src_add[1]]*wgts[1] + src_array[src_add[2]]*wgts[2] + src_array[src_add[3]]*wgts[3];
 }
 
 /*
@@ -142,26 +216,19 @@ long find_ij_weights(double plon, double plat, double* restrict src_lats, double
 
   -----------------------------------------------------------------------
 */
-void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
+void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, remapvars_t* rv)
 {
   /*   Local variables */
-  int  lwarn = TRUE;
   int  search_result;
   long tgt_grid_size;
   long dst_add;                  /*  destination addresss */
-  long n, icount;
-  long iter;                     /*  iteration counters   */
-
   int src_add[4];                /*  address for the four source points     */
-
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */
-
   double plat, plon;             /*  lat/lon coords of destination point    */
   double findex = 0;
   extern int timer_remap_bil;
-  extern long remap_max_iter;
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -181,8 +248,8 @@ void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, remap_max_iter, lwarn, findex) \
-  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
+  private(dst_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
   /* grid_loop1 */
@@ -217,7 +284,7 @@ void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
       /* Check to see if points are land points */
       if ( search_result > 0 )
 	{
-	  for ( n = 0; n < 4; ++n )
+	  for ( int n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
@@ -228,16 +295,10 @@ void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 
           tgt_grid->cell_frac[dst_add] = 1.;
 
-	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
-
-          if ( iter < remap_max_iter )
+          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
-
-	      wgts[0] = (ONE-iw) * (ONE-jw);
-	      wgts[1] =      iw  * (ONE-jw);
-	      wgts[2] =      iw  *      jw;
-	      wgts[3] = (ONE-iw) *      jw;
+	      set_bilinear_weights(iw, jw, wgts);
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -246,27 +307,7 @@ void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
 	    }
           else
 	    {
-	      if ( cdoVerbose )
-		{
-		  cdoPrint("Point coords: %g %g", plat, plon);
-		  cdoPrint("Src grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-		  cdoPrint("Src grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
-		  cdoPrint("Src grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
-		  cdoPrint("Src grid lats: %g %g %g %g",
-			   src_grid->cell_center_lat[src_add[0]], src_grid->cell_center_lat[src_add[1]],
-			   src_grid->cell_center_lat[src_add[2]], src_grid->cell_center_lat[src_add[3]]);
-		  cdoPrint("Src grid lons: %g %g %g %g",
-			   src_grid->cell_center_lon[src_add[0]], src_grid->cell_center_lon[src_add[1]],
-			   src_grid->cell_center_lon[src_add[2]], src_grid->cell_center_lon[src_add[3]]);
-		  cdoPrint("Current iw,jw : %g %g", iw, jw);
-		}
-
-	      if ( cdoVerbose || lwarn )
-		{
-		  lwarn = FALSE;
-		  //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
-		  cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
-		}
+	      bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
 
 	      search_result = -1;
 	    }
@@ -278,22 +319,9 @@ void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
       */
       if ( search_result < 0 )
 	{
-          icount = 0;
-          for ( n = 0; n < 4; ++n )
+          if ( num_src_points(src_grid->mask, src_add, src_lats) > 0 )
 	    {
-	      if ( src_grid->mask[src_add[n]] )
-		icount++;
-	      else
-		src_lats[n] = 0.;
-	    }
-
-          if ( icount > 0 )
-	    {
-	      /* Renormalize weights */
-	      double sum_wgts = 0.0; /* sum of weights for normalization */
-	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
-	      for ( n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
+	      renormalize_weights(src_lats, wgts);
 
 	      tgt_grid->cell_frac[dst_add] = 1.;
 
@@ -308,27 +336,26 @@ void scrip_remap_weights_bilinear(remapgrid_t *src_grid, remapgrid_t *tgt_grid, 
   if ( cdoTimer ) timer_stop(timer_remap_bil);
 } /* scrip_remap_weights_bilinear */
 
+/*
+  -----------------------------------------------------------------------
 
+  This routine computes and apply the weights for a bilinear interpolation.
+
+  -----------------------------------------------------------------------
+*/
 void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
 {
   /*   Local variables */
-  int  lwarn = TRUE;
   int  search_result;
   long tgt_grid_size;
   long dst_add;                  /*  destination addresss */
-  long n, icount;
-  long iter;                     /*  iteration counters   */
-
   int src_add[4];                /*  address for the four source points     */
-
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
   double wgts[4];                /*  bilinear weights for four corners      */
-
   double plat, plon;             /*  lat/lon coords of destination point    */
   double findex = 0;
   extern int timer_remap_bil;
-  extern long remap_max_iter;
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -348,8 +375,8 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, remap_max_iter, lwarn, findex) \
-  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, findex) \
+  private(dst_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result)    \
   schedule(static)
 #endif
   /* grid_loop1 */
@@ -386,7 +413,7 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
       /* Check to see if points are land points */
       if ( search_result > 0 )
 	{
-	  for ( n = 0; n < 4; ++n )
+	  for ( int n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
@@ -397,43 +424,16 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 
           tgt_grid->cell_frac[dst_add] = 1.;
 
-	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
-
-          if ( iter < remap_max_iter )
+          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
+	      set_bilinear_weights(iw, jw, wgts);
 
-	      wgts[0] = (ONE-iw) * (ONE-jw);
-	      wgts[1] =      iw  * (ONE-jw);
-	      wgts[2] =      iw  *      jw;
-	      wgts[3] = (ONE-iw) *      jw;
-
-	      tgt_array[dst_add] = 0.;
-	      for ( n = 0; n < 4; ++n ) tgt_array[dst_add] += src_array[src_add[n]]*wgts[n];
+	      bilinear_remap(&tgt_array[dst_add], src_array, wgts, src_add);
 	    }
           else
 	    {
-	      if ( cdoVerbose )
-		{
-		  cdoPrint("Point coords: %g %g", plat, plon);
-		  cdoPrint("Src grid lats: %g %g %g %g", src_lats[0], src_lats[1], src_lats[2], src_lats[3]);
-		  cdoPrint("Src grid lons: %g %g %g %g", src_lons[0], src_lons[1], src_lons[2], src_lons[3]);
-		  cdoPrint("Src grid addresses: %d %d %d %d", src_add[0], src_add[1], src_add[2], src_add[3]);
-		  cdoPrint("Src grid lats: %g %g %g %g",
-			   src_grid->cell_center_lat[src_add[0]], src_grid->cell_center_lat[src_add[1]],
-			   src_grid->cell_center_lat[src_add[2]], src_grid->cell_center_lat[src_add[3]]);
-		  cdoPrint("Src grid lons: %g %g %g %g",
-			   src_grid->cell_center_lon[src_add[0]], src_grid->cell_center_lon[src_add[1]],
-			   src_grid->cell_center_lon[src_add[2]], src_grid->cell_center_lon[src_add[3]]);
-		  cdoPrint("Current iw,jw : %g %g", iw, jw);
-		}
-
-	      if ( cdoVerbose || lwarn )
-		{
-		  lwarn = FALSE;
-		  //  cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
-		  cdoWarning("Bilinear interpolation failed for some grid points - used a distance-weighted average instead!");
-		}
+	      bilinear_warning(plon, plat, iw, jw, src_add, src_lons, src_lats, src_grid);
 
 	      search_result = -1;
 	    }
@@ -445,27 +445,13 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
       */
       if ( search_result < 0 )
 	{
-          icount = 0;
-          for ( n = 0; n < 4; ++n )
+          if ( num_src_points(src_grid->mask, src_add, src_lats) > 0 )
 	    {
-	      if ( src_grid->mask[src_add[n]] )
-		icount++;
-	      else
-		src_lats[n] = 0.;
-	    }
-
-          if ( icount > 0 )
-	    {
-	      /* Renormalize weights */
-	      double sum_wgts = 0.0; /* sum of weights for normalization */
-	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
-	      for ( n = 0; n < 4; ++n ) wgts[n] = fabs(src_lats[n])/sum_wgts;
+	      renormalize_weights(src_lats, wgts);
 
 	      tgt_grid->cell_frac[dst_add] = 1.;
 
-	      tgt_array[dst_add] = 0.;
-	      for ( n = 0; n < 4; ++n ) tgt_array[dst_add] += src_array[src_add[n]]*wgts[n];
+	      bilinear_remap(&tgt_array[dst_add], src_array, wgts, src_add);
 	    }
         }
     } /* grid_loop1 */

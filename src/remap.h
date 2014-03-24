@@ -228,7 +228,7 @@ int grid_search(remapgrid_t *src_grid, int *restrict src_add, double *restrict s
 		const double *restrict src_center_lat, const double *restrict src_center_lon,
 		const restr_t *restrict src_grid_bound_box, const int *restrict src_bin_add);
 
-long find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg);
+int find_ij_weights(double plon, double plat, double* restrict src_lats, double* restrict src_lons, double *ig, double *jg);
 int rect_grid_search(long *ii, long *jj, double x, double y, long nxm, long nym, const double *restrict xm, const double *restrict ym);
 
 

@@ -159,9 +159,7 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
           tgt_grid->cell_frac[dst_add] = ONE;
 
-	  iter = find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw);
-
-          if ( iter < remap_max_iter )
+          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
 
