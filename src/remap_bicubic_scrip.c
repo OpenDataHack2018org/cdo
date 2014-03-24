@@ -69,6 +69,68 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 
 } /* store_link_bicub */
 
+static
+void set_bicubic_weights(double iw, double jw, double wgts[4][4])
+{
+  wgts[0][0] = (1.-jw*jw*(3.-2.*jw))  * (1.-iw*iw*(3.-2.*iw));
+  wgts[0][1] = (1.-jw*jw*(3.-2.*jw))  *     iw*iw*(3.-2.*iw);
+  wgts[0][2] =     jw*jw*(3.-2.*jw)   *     iw*iw*(3.-2.*iw);
+  wgts[0][3] =     jw*jw*(3.-2.*jw)   * (1.-iw*iw*(3.-2.*iw));
+  wgts[1][0] = (1.-jw*jw*(3.-2.*jw))  *     iw*(iw-1.)*(iw-1.);
+  wgts[1][1] = (1.-jw*jw*(3.-2.*jw))  *     iw*iw*(iw-1.);
+  wgts[1][2] =     jw*jw*(3.-2.*jw)   *     iw*iw*(iw-1.);
+  wgts[1][3] =     jw*jw*(3.-2.*jw)   *     iw*(iw-1.)*(iw-1.);
+  wgts[2][0] =     jw*(jw-1.)*(jw-1.) * (1.-iw*iw*(3.-2.*iw));
+  wgts[2][1] =     jw*(jw-1.)*(jw-1.) *     iw*iw*(3.-2.*iw);
+  wgts[2][2] =     jw*jw*(jw-1.)      *     iw*iw*(3.-2.*iw);
+  wgts[2][3] =     jw*jw*(jw-1.)      * (1.-iw*iw*(3.-2.*iw));
+  wgts[3][0] =     iw*(iw-1.)*(iw-1.) *     jw*(jw-1.)*(jw-1.);
+  wgts[3][1] =     iw*iw*(iw-1.)      *     jw*(jw-1.)*(jw-1.);
+  wgts[3][2] =     iw*iw*(iw-1.)      *     jw*jw*(jw-1.);
+  wgts[3][3] =     iw*(iw-1.)*(iw-1.) *     jw*jw*(jw-1.);
+}
+
+int num_src_points(const int* restrict mask, const int* restrict src_add, double* restrict src_lats);
+
+static
+void renormalize_weights(const double* restrict src_lats, double wgts[4][4])
+{
+  int n;
+  double sum_wgts = 0.0; /* sum of weights for normalization */
+  /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
+  for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
+  for ( n = 0; n < 4; ++n ) wgts[0][n] = fabs(src_lats[n])/sum_wgts;
+  for ( n = 0; n < 4; ++n ) wgts[1][n] = 0.;
+  for ( n = 0; n < 4; ++n ) wgts[2][n] = 0.;
+  for ( n = 0; n < 4; ++n ) wgts[3][n] = 0.;
+}
+
+static
+void bicubic_warning(void)
+{
+  static int lwarn = TRUE;
+
+  if ( cdoVerbose || lwarn )
+    {
+      lwarn = FALSE;
+      // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
+      cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
+    }
+}
+
+static
+void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, const double wgts[4][4], const int* src_add,
+		   const double* restrict grad1, const double* restrict grad2, const double* restrict grad3)
+{
+  *tgt_point = 0.;
+  for ( int n = 0; n < 4; ++n )
+    for ( int k = 0; k < 4; ++k )
+      *tgt_point += src_array[src_add[n]]*wgts[n  ][k] +
+                        grad1[src_add[n]]*wgts[n+1][k] +
+                        grad2[src_add[n]]*wgts[n+2][k] +
+                        grad3[src_add[n]]*wgts[n+3][k];
+}
+
 /*
   -----------------------------------------------------------------------
 
@@ -79,22 +141,15 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
   /*   Local variables */
-  int  lwarn = TRUE;
   int  search_result;
   long tgt_grid_size;
-  long n, icount;
   long dst_add;        /*  destination addresss */
-  long iter;           /*  iteration counters   */
-
   int src_add[4];     /* address for the four source points */
-
   double src_lats[4]; /*  latitudes  of four bilinear corners */
   double src_lons[4]; /*  longitudes of four bilinear corners */
   double wgts[4][4];  /*  bicubic weights for four corners    */
-
   double plat, plon;             /*  lat/lon coords of destination point    */
   double findex = 0;
-  extern long remap_max_iter;
   int remap_grid_type = src_grid->remap_grid_type;
 
   if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
@@ -112,8 +167,8 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
-  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, remap_max_iter, lwarn, findex) \
-  private(dst_add, n, icount, iter, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, rv, findex) \
+  private(dst_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
   schedule(dynamic,1)
 #endif
   /* grid_loop1 */
@@ -148,7 +203,7 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
       /* Check to see if points are land points */
       if ( search_result > 0 )
 	{
-	  for ( n = 0; n < 4; ++n )
+	  for ( int n = 0; n < 4; ++n )
 	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
 	}
 
@@ -157,28 +212,12 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	{
 	  double iw, jw;  /*  current guess for bilinear coordinate  */
 
-          tgt_grid->cell_frac[dst_add] = ONE;
+          tgt_grid->cell_frac[dst_add] = 1.;
 
           if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
 	    {
 	      /* Successfully found iw,jw - compute weights */
-
-	      wgts[0][0] = (ONE-jw*jw*(THREE-TWO*jw)) * (ONE-iw*iw*(THREE-TWO*iw));
-	      wgts[0][1] = (ONE-jw*jw*(THREE-TWO*jw)) *      iw*iw*(THREE-TWO*iw);
-	      wgts[0][2] =      jw*jw*(THREE-TWO*jw)  *      iw*iw*(THREE-TWO*iw);
-	      wgts[0][3] =      jw*jw*(THREE-TWO*jw)  * (ONE-iw*iw*(THREE-TWO*iw));
-	      wgts[1][0] = (ONE-jw*jw*(THREE-TWO*jw)) *      iw*(iw-ONE)*(iw-ONE);
-	      wgts[1][1] = (ONE-jw*jw*(THREE-TWO*jw)) *      iw*iw*(iw-ONE);
-	      wgts[1][2] =      jw*jw*(THREE-TWO*jw)  *      iw*iw*(iw-ONE);
-	      wgts[1][3] =      jw*jw*(THREE-TWO*jw)  *      iw*(iw-ONE)*(iw-ONE);
-	      wgts[2][0] =      jw*(jw-ONE)*(jw-ONE)  * (ONE-iw*iw*(THREE-TWO*iw));
-	      wgts[2][1] =      jw*(jw-ONE)*(jw-ONE)  *      iw*iw*(THREE-TWO*iw);
-	      wgts[2][2] =      jw*jw*(jw-ONE)        *      iw*iw*(THREE-TWO*iw);
-	      wgts[2][3] =      jw*jw*(jw-ONE)        * (ONE-iw*iw*(THREE-TWO*iw));
-	      wgts[3][0] =      iw*(iw-ONE)*(iw-ONE)  *      jw*(jw-ONE)*(jw-ONE);
-              wgts[3][1] =      iw*iw*(iw-ONE)        *      jw*(jw-ONE)*(jw-ONE);
-	      wgts[3][2] =      iw*iw*(iw-ONE)        *      jw*jw*(jw-ONE);
-	      wgts[3][3] =      iw*(iw-ONE)*(iw-ONE)  *      jw*jw*(jw-ONE);
+	      set_bicubic_weights(iw, jw, wgts);
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -187,12 +226,7 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	    }
           else
 	    {
-	      if ( cdoVerbose || lwarn )
-		{
-		  lwarn = FALSE;
-		  // cdoWarning("Iteration for iw,jw exceed max iteration count of %d!", remap_max_iter);
-		  cdoWarning("Bicubic interpolation failed for some grid points - used a distance-weighted average instead!");
-		}
+	      bicubic_warning();
 
 	      search_result = -1;
 	    }
@@ -200,30 +234,15 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	  
       /*
 	Search for bicubic failed - use a distance-weighted average instead (this is typically near the pole)
+	Distance was stored in src_lats!
       */
       if ( search_result < 0 )
 	{
-          icount = 0;
-          for ( n = 0; n < 4; ++n )
+	  if ( num_src_points(src_grid->mask, src_add, src_lats) > 0 )
 	    {
-	      if ( src_grid->mask[src_add[n]] )
-		icount++;
-	      else
-		src_lats[n] = ZERO;
-	    }
+	      renormalize_weights(src_lats, wgts);
 
-          if ( icount > 0 )
-	    {
-	      /* Renormalize weights */
-	      double sum_wgts = 0.0; /* sum of weights for normalization */
-	      /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-	      for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
-	      for ( n = 0; n < 4; ++n ) wgts[0][n] = fabs(src_lats[n])/sum_wgts;
-	      for ( n = 0; n < 4; ++n ) wgts[1][n] = ZERO;
-	      for ( n = 0; n < 4; ++n ) wgts[2][n] = ZERO;
-	      for ( n = 0; n < 4; ++n ) wgts[3][n] = ZERO;
-
-	      tgt_grid->cell_frac[dst_add] = ONE;
+	      tgt_grid->cell_frac[dst_add] = 1.;
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -233,4 +252,134 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
         }
     } /* grid_loop1 */
 
-} /* remap_bicubic */
+} /* scrip_remap_weights_bicubic */
+
+/*
+  -----------------------------------------------------------------------
+
+  This routine computes the weights for a bicubic interpolation.
+
+  -----------------------------------------------------------------------
+*/
+void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const double* restrict src_array, double* restrict tgt_array, double missval)
+{
+  /*   Local variables */
+  int  search_result;
+  long tgt_grid_size;
+  long dst_add;        /*  destination addresss */
+  int src_add[4];     /* address for the four source points */
+  double src_lats[4]; /*  latitudes  of four bilinear corners */
+  double src_lons[4]; /*  longitudes of four bilinear corners */
+  double wgts[4][4];  /*  bicubic weights for four corners    */
+  double plat, plon;             /*  lat/lon coords of destination point    */
+  double findex = 0;
+  double *grad1_lat, *grad1_lon, *grad1_latlon;
+  int remap_grid_type = src_grid->remap_grid_type;
+
+  if ( cdoVerbose ) cdoPrint("Called %s()", __func__);
+
+  progressInit();
+
+  grad1_lat    = malloc(src_grid->size*sizeof(double));
+  grad1_lon    = malloc(src_grid->size*sizeof(double));
+  grad1_latlon = malloc(src_grid->size*sizeof(double));
+
+  remap_gradients(*src_grid, src_array, grad1_lat, grad1_lon, grad1_latlon);
+
+  tgt_grid_size = tgt_grid->size;
+
+  /* Compute mappings from source to target grid */
+
+  if ( src_grid->rank != 2 )
+    cdoAbort("Can not do bicubic interpolation when source grid rank != 2"); 
+
+  /* Loop over destination grid */
+
+#if defined(_OPENMP)
+#pragma omp parallel for default(none) \
+  shared(ompNumThreads, cdoTimer, cdoVerbose, remap_grid_type, tgt_grid_size, src_grid, tgt_grid, src_array, tgt_array, missval, grad1_lat, grad1_lon, grad1_latlon, findex) \
+  private(dst_add, src_add, src_lats, src_lons, wgts, plat, plon, search_result) \
+  schedule(dynamic,1)
+#endif
+  /* grid_loop1 */
+  for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
+    {
+      int lprogress = 1;
+#if defined(_OPENMP)
+      if ( omp_get_thread_num() != 0 ) lprogress = 0;
+#endif
+#if defined(_OPENMP)
+#pragma omp atomic
+#endif
+      findex++;
+      if ( lprogress ) progressStatus(0, 1, findex/tgt_grid_size);
+
+      tgt_array[dst_add] = missval;
+
+      if ( ! tgt_grid->mask[dst_add] ) continue;
+
+      plat = tgt_grid->cell_center_lat[dst_add];
+      plon = tgt_grid->cell_center_lon[dst_add];
+
+      /* Find nearest square of grid points on source grid  */
+      if ( remap_grid_type == REMAP_GRID_TYPE_REG2D )
+	search_result = grid_search_reg2d(src_grid, src_add, src_lats, src_lons, 
+					  plat, plon, src_grid->dims,
+					  src_grid->reg2d_center_lat, src_grid->reg2d_center_lon);
+      else
+	search_result = grid_search(src_grid, src_add, src_lats, src_lons, 
+				    plat, plon, src_grid->dims,
+				    src_grid->cell_center_lat, src_grid->cell_center_lon,
+				    src_grid->cell_bound_box, src_grid->bin_addr);
+
+      /* Check to see if points are land points */
+      if ( search_result > 0 )
+	{
+	  for ( int n = 0; n < 4; ++n )
+	    if ( ! src_grid->mask[src_add[n]] ) search_result = 0;
+	}
+
+      /* If point found, find local iw,jw coordinates for weights  */
+      if ( search_result > 0 )
+	{
+	  double iw, jw;  /*  current guess for bilinear coordinate  */
+
+          tgt_grid->cell_frac[dst_add] = 1.;
+
+          if ( find_ij_weights(plon, plat, src_lats, src_lons, &iw, &jw) )
+	    {
+	      /* Successfully found iw,jw - compute weights */
+	      set_bicubic_weights(iw, jw, wgts);
+
+	      bicubic_remap(&tgt_array[dst_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
+	    }
+          else
+	    {
+	      bicubic_warning();
+
+	      search_result = -1;
+	    }
+	}
+	  
+      /*
+	Search for bicubic failed - use a distance-weighted average instead (this is typically near the pole)
+	Distance was stored in src_lats!
+      */
+      if ( search_result < 0 )
+	{
+	  if ( num_src_points(src_grid->mask, src_add, src_lats) > 0 )
+	    {
+	      renormalize_weights(src_lats, wgts);
+
+	      tgt_grid->cell_frac[dst_add] = 1.;
+
+	      bicubic_remap(&tgt_array[dst_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
+	    }
+        }
+    } /* grid_loop1 */
+
+  free(grad1_lat);
+  free(grad1_lon);
+  free(grad1_latlon);
+
+} /* scrip_remap_bicubic */

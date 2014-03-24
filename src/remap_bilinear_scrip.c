@@ -147,7 +147,7 @@ void set_bilinear_weights(double iw, double jw, double* restrict wgts)
   wgts[3] = (1.-iw) *     jw;
 }
 
-static
+
 int num_src_points(const int* restrict mask, const int* restrict src_add, double* restrict src_lats)
 {
   int icount = 0;

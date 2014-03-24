@@ -975,16 +975,16 @@ void *Remap(void *argument)
 		if ( remaps[r].src_grid.vgpm[i] ) array1[j++] = array1[i];
 	    }
 	  
-	  if ( need_gradiants )
-	    {
-	      if ( remaps[r].src_grid.rank != 2 && remap_order == 2 )
-		cdoAbort("Second order remapping is only available for 2D grids!");
-
-	      remap_gradients(remaps[r].src_grid, array1, grad1_lat, grad1_lon, grad1_latlon);
-	    }
-
 	  if ( remap_weights )
 	    {
+	      if ( need_gradiants )
+		{
+		  if ( remaps[r].src_grid.rank != 2 && remap_order == 2 )
+		    cdoAbort("Second order remapping is not only available for unstructured grids!");
+
+		  remap_gradients(remaps[r].src_grid, array1, grad1_lat, grad1_lon, grad1_latlon);
+		}
+
 	      if ( operfunc == REMAPLAF )
 		remap_laf(array2, missval, gridInqSize(gridID2), remaps[r].vars.num_links, remaps[r].vars.wts,
 			  remaps[r].vars.num_wts, remaps[r].vars.tgt_grid_add, remaps[r].vars.src_grid_add, array1);
@@ -998,7 +998,8 @@ void *Remap(void *argument)
 	    }
 	  else
 	    {
-	      if ( map_type == MAP_TYPE_BILINEAR  ) scrip_remap_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
+	      if      ( map_type == MAP_TYPE_BILINEAR  ) scrip_remap_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
+	      else if ( map_type == MAP_TYPE_BICUBIC   ) scrip_remap_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, array1, array2, missval);
 	    }
 
 	  gridsize2 = gridInqSize(gridID2);
