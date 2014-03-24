@@ -119,16 +119,16 @@ void bicubic_warning(void)
 }
 
 static
-void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, const double wgts[4][4], const int* src_add,
+void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, double wgts[4][4], const int* src_add,
 		   const double* restrict grad1, const double* restrict grad2, const double* restrict grad3)
 {
   *tgt_point = 0.;
-  for ( int n = 0; n < 4; ++n )
-    for ( int k = 0; k < 4; ++k )
-      *tgt_point += src_array[src_add[n]]*wgts[n  ][k] +
-                        grad1[src_add[n]]*wgts[n+1][k] +
-                        grad2[src_add[n]]*wgts[n+2][k] +
-                        grad3[src_add[n]]*wgts[n+3][k];
+  for ( int k = 0; k < 4; ++k )
+    for ( int n = 0; n < 4; ++n )
+      *tgt_point += src_array[src_add[n]]*wgts[k][n] +
+                        grad1[src_add[n]]*wgts[k][n] +
+                        grad2[src_add[n]]*wgts[k][n] +
+                        grad3[src_add[n]]*wgts[k][n];
 }
 
 /*
@@ -143,12 +143,12 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
   /*   Local variables */
   int  search_result;
   long tgt_grid_size;
-  long dst_add;        /*  destination addresss */
-  int src_add[4];     /* address for the four source points */
-  double src_lats[4]; /*  latitudes  of four bilinear corners */
-  double src_lons[4]; /*  longitudes of four bilinear corners */
-  double wgts[4][4];  /*  bicubic weights for four corners    */
-  double plat, plon;             /*  lat/lon coords of destination point    */
+  long dst_add;        /*  destination addresss                   */
+  int src_add[4];      /*  address for the four source points     */
+  double src_lats[4];  /*  latitudes  of four bilinear corners    */
+  double src_lons[4];  /*  longitudes of four bilinear corners    */
+  double wgts[4][4];   /*  bicubic weights for four corners       */
+  double plat, plon;   /*  lat/lon coords of destination point    */
   double findex = 0;
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -266,12 +266,12 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
   /*   Local variables */
   int  search_result;
   long tgt_grid_size;
-  long dst_add;        /*  destination addresss */
-  int src_add[4];     /* address for the four source points */
-  double src_lats[4]; /*  latitudes  of four bilinear corners */
-  double src_lons[4]; /*  longitudes of four bilinear corners */
-  double wgts[4][4];  /*  bicubic weights for four corners    */
-  double plat, plon;             /*  lat/lon coords of destination point    */
+  long dst_add;        /*  destination addresss                 */
+  int src_add[4];      /*  address for the four source points   */
+  double src_lats[4];  /*  latitudes  of four bilinear corners  */
+  double src_lons[4];  /*  longitudes of four bilinear corners  */
+  double wgts[4][4];   /*  bicubic weights for four corners     */
+  double plat, plon;   /*  lat/lon coords of destination point  */
   double findex = 0;
   double *grad1_lat, *grad1_lon, *grad1_latlon;
   int remap_grid_type = src_grid->remap_grid_type;
@@ -280,18 +280,18 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 
   progressInit();
 
-  grad1_lat    = malloc(src_grid->size*sizeof(double));
-  grad1_lon    = malloc(src_grid->size*sizeof(double));
-  grad1_latlon = malloc(src_grid->size*sizeof(double));
-
-  remap_gradients(*src_grid, src_array, grad1_lat, grad1_lon, grad1_latlon);
-
   tgt_grid_size = tgt_grid->size;
 
   /* Compute mappings from source to target grid */
 
   if ( src_grid->rank != 2 )
     cdoAbort("Can not do bicubic interpolation when source grid rank != 2"); 
+
+  grad1_lat    = malloc(src_grid->size*sizeof(double));
+  grad1_lon    = malloc(src_grid->size*sizeof(double));
+  grad1_latlon = malloc(src_grid->size*sizeof(double));
+
+  remap_gradients(*src_grid, src_array, grad1_lat, grad1_lon, grad1_latlon);
 
   /* Loop over destination grid */
 
