@@ -24,11 +24,12 @@ done
 #
 # CDO 1.6.3
 #
-#       con/curv  cons/curv  cons/reg2d
-#   1   195s       243s       161s
-#   2   129s       130s        90s 
-#   4   185s        93s        74s
-#      4024MB     5836MB     1024MB
+#       con/curv  cons/curv  cons/reg2d  cons/reg2d/ICC
+#   1   195s       243s       140s        134s
+#   2   129s       130s        79s         70s
+#   4   185s        93s        73s         39s
+#   8                                      24s
+#      4024MB     5836MB     1240MB
 ####################################################
 #
 # CDO 1.6.4
@@ -43,7 +44,7 @@ done
 # =================
 #         bil    bic    nn   con   cons
 # reg2d   0.7    1.6     1   194    140
-# curv   36.9   37.9   843   197    296
+# curv   36.9   37.9   843   197    288
 #
 # result on blizzard: (interactiv)
 # ==================
