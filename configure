@@ -1509,7 +1509,7 @@ Optional Packages:
   --with-hdf5=<yes|no|directory> (default=no)
                           location of hdf5 library, NETCDF4 requires hdf5 high
                           level interface
-  --with-netcdf=<yes|no|directory> (default=yes)
+  --with-netcdf=<yes|no|directory> (default=no)
                           location of netcdf library (lib and include subdirs)
   --with-jasper=<directory>
                           Specify location of JASPER library. You must specify
