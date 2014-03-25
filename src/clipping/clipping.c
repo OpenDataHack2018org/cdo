@@ -47,6 +47,7 @@ static double const tol = 1.0e-12;
 
 enum cell_type {
   LON_LAT_CELL,
+  LAT_CELL,
   GREAT_CIRCLE_CELL,
   MIXED_CELL
 };
@@ -238,6 +239,8 @@ static unsigned is_inside(double point[], double help_vec[],
 
 static enum cell_type get_cell_type(struct grid_cell target_cell) {
 
+  int count_lat_edges = 0, count_great_circle_edges = 0;
+
    if ((target_cell.num_corners == 4) &&
        ((target_cell.edge_type[0] == LAT_CIRCLE &&
          target_cell.edge_type[1] == LON_CIRCLE &&
@@ -250,11 +253,18 @@ static enum cell_type get_cell_type(struct grid_cell target_cell) {
       return LON_LAT_CELL;
    else
       for (unsigned i = 0; i < target_cell.num_corners; ++i)
-         if (target_cell.edge_type[i] != LON_CIRCLE &&
-             target_cell.edge_type[i] != GREAT_CIRCLE)
-            return MIXED_CELL;
+         if (target_cell.edge_type[i] == LON_CIRCLE ||
+             target_cell.edge_type[i] == GREAT_CIRCLE)
+            count_great_circle_edges++;
+         else
+            count_lat_edges++;
 
-   return GREAT_CIRCLE_CELL;
+   if (count_lat_edges && count_great_circle_edges)
+      return MIXED_CELL;
+   else if (count_lat_edges)
+      return LAT_CELL;
+   else
+      return GREAT_CIRCLE_CELL;
 }
 
 static void get_edge_middle_point_lat(double a[3], double b[3],
@@ -326,9 +336,358 @@ static void get_edge_middle_point(double a[3], double b[3],
   };
 }
 
+static struct grid_cell curr_target_cell;
+static struct grid_cell curr_source_cell;
+
 /**
  * cell clipping using Sutherland–Hodgman algorithm;
  */
+void point_list_clipping(struct point_list * source_list, int source_ordering,
+                         struct point_list target_list, int target_ordering,
+                         unsigned nct, double * tgt_edge_norm_vec) {
+
+  struct point_list_element * prev_tgt_point = target_list.first;
+  struct point_list_element * curr_tgt_point = target_list.first->next;
+
+  for (int i = 0; i < nct; ++i) {
+
+    struct point_list_element * curr_src_point = source_list->first;
+    struct point_list_element * prev_src_point = source_list->last;
+
+    unsigned prev_is_inside, curr_is_inside;
+
+    prev_is_inside = is_inside(prev_src_point->vec_coords,
+                               tgt_edge_norm_vec + 3 * i,
+                               prev_tgt_point->edge_type, target_ordering);
+
+    // for all edges of the target cell
+    do {
+
+      curr_is_inside = is_inside(curr_src_point->vec_coords,
+                                 tgt_edge_norm_vec + 3 * i,
+                                 prev_tgt_point->edge_type, target_ordering);
+
+      // if the current edges change from inside/outside to outside/inside
+      if (((curr_is_inside == 0) ^ (prev_is_inside == 0)) &&
+          ((curr_is_inside != 2) && (prev_is_inside != 2))) {
+
+        double p[3], q[3];
+        int intersect;
+
+        struct point_list_element * intersect_point;
+
+        // if the previous point was inside or current edge is the last one
+        if (prev_is_inside ||
+            (curr_is_inside && (prev_src_point == source_list->last))) {
+
+          intersect_point = get_free_point_list_element(source_list);
+          prev_src_point->next = intersect_point;
+          intersect_point->next = curr_src_point;
+
+          if (prev_src_point == source_list->last)
+            source_list->last = intersect_point;
+
+        } else
+          intersect_point = prev_src_point;
+
+        // get intersection points
+        intersect = intersect_vec(prev_src_point->edge_type,
+                                  prev_src_point->vec_coords,
+                                  curr_src_point->vec_coords,
+                                  prev_tgt_point->edge_type,
+                                  prev_tgt_point->vec_coords,
+                                  curr_tgt_point->vec_coords,
+                                  p, q);
+
+        // if there is an intersection
+        if (intersect != -1) {
+
+          // if both edges are on an identical great circle
+          if (intersect & (1 << 4)) {
+
+            print_grid_cell(stderr, curr_target_cell, "target cell");
+            print_grid_cell(stderr, curr_source_cell, "source cell");
+
+            abort_message("ERROR: edges on identical circle, this case should"
+                          " have been handled somewhere else\n", __FILE__, __LINE__);
+          }
+
+          // if there are two intersection points with the source edge
+          if ((intersect & ((1 << 0) | (1 << 1))) == ((1 << 0) | (1 << 1))) {
+
+            print_grid_cell(stderr, curr_target_cell, "target cell");
+            print_grid_cell(stderr, curr_source_cell, "source cell");
+
+            abort_message("ERROR: more than one intersections with the "
+                          "source edges", __FILE__, __LINE__);
+
+          // if p or q is on the source edge
+          } else {
+
+            if (prev_is_inside)
+              intersect_point->edge_type = prev_tgt_point->edge_type;
+            else
+              intersect_point->edge_type = prev_src_point->edge_type;
+
+            if (intersect & (1 << 0)) {
+
+              intersect_point->vec_coords[0] = p[0];
+              intersect_point->vec_coords[1] = p[1];
+              intersect_point->vec_coords[2] = p[2];
+
+            // if q is on the source edge
+            } else if (intersect & (1 << 1)) {
+
+              intersect_point->vec_coords[0] = q[0];
+              intersect_point->vec_coords[1] = q[1];
+              intersect_point->vec_coords[2] = q[2];
+
+            } else {
+
+              print_grid_cell(stderr, curr_target_cell, "target cell");
+              print_grid_cell(stderr, curr_source_cell, "source cell");
+
+              abort_message("ERROR: no intersection with source edge was found\n",
+                            __FILE__, __LINE__);
+            }
+          }
+        }
+
+        if (intersect_point == prev_src_point)
+          prev_is_inside = 1;
+
+      // if the one edge is a circle of latitude while the other is not
+      // and both corners are not directly on the edge
+      } else if (((prev_src_point->edge_type == LAT_CIRCLE) ^
+                  (prev_tgt_point->edge_type == LAT_CIRCLE)) && 
+                 !((prev_is_inside == 2) && (curr_is_inside == 2))) {
+
+        double p[3], q[3];
+        int intersect;
+
+        // get intersection points
+        intersect = intersect_vec(prev_src_point->edge_type,
+                                  prev_src_point->vec_coords,
+                                  curr_src_point->vec_coords,
+                                  prev_tgt_point->edge_type,
+                                  prev_tgt_point->vec_coords,
+                                  curr_tgt_point->vec_coords,
+                                  p, q);
+
+        // if there is an intersection possible
+        if (intersect != -1) {
+
+          // if both edges are on an identical great circle
+          if (intersect & (1 << 4)) {
+
+            print_grid_cell(stderr, curr_target_cell, "target cell");
+            print_grid_cell(stderr, curr_source_cell, "source cell");
+
+            abort_message("ERROR: edges on identical circle, this case should"
+                          " have been handled somewhere else\n", __FILE__, __LINE__);
+          }
+
+          // if there are two intersection points with the source edge
+          if ((intersect & ((1 << 0) | (1 << 1))) == ((1 << 0) | (1 << 1))) {
+
+            struct point_list_element * intersect_points[2];
+
+            // if the previous point was inside or current edge is the last one
+            if ((prev_is_inside || prev_src_point == source_list->last) &&
+                (prev_is_inside != 2)) {
+
+              intersect_points[0] = get_free_point_list_element(source_list);
+              prev_src_point->next = intersect_points[0];
+              intersect_points[0]->next = curr_src_point;
+
+              if (prev_src_point == source_list->last)
+                source_list->last = intersect_points[0];
+
+            } else {
+              intersect_points[0] = prev_src_point;
+              intersect_points[0]->to_be_removed = 0;
+            }
+
+            // second intersection point
+            intersect_points[1] = get_free_point_list_element(source_list);
+
+            if (intersect_points[0] == source_list->last)
+              source_list->first = intersect_points[1];
+
+            intersect_points[1]->next = intersect_points[0]->next;
+            intersect_points[0]->next = intersect_points[1];
+
+            int p_is_first = get_vector_angle(prev_src_point->vec_coords, p) <
+                             get_vector_angle(prev_src_point->vec_coords, q);
+            enum edge_type prev_src_point_edge_type =
+              prev_src_point->edge_type;
+
+            intersect_points[!p_is_first]->vec_coords[0] = p[0];
+            intersect_points[!p_is_first]->vec_coords[1] = p[1];
+            intersect_points[!p_is_first]->vec_coords[2] = p[2];
+            intersect_points[p_is_first]->vec_coords[0] = q[0];
+            intersect_points[p_is_first]->vec_coords[1] = q[1];
+            intersect_points[p_is_first]->vec_coords[2] = q[2];
+            intersect_points[(prev_is_inside != 0) &&
+                             (curr_is_inside != 0)]->edge_type =
+              prev_src_point->edge_type;
+            intersect_points[(prev_is_inside == 0) ||
+                             (curr_is_inside == 0)]->edge_type =
+              prev_tgt_point->edge_type;
+
+            if (prev_is_inside == 2 || curr_is_inside == 2) {
+
+              int tgt_edge_inside_src;
+
+              {
+                double edge_middle[3];
+
+                get_edge_middle_point(p, q, prev_tgt_point->edge_type,
+                                      edge_middle);
+
+                double norm_vec[3];
+
+                switch (prev_src_point_edge_type) {
+
+                  case (LON_CIRCLE) :
+                  case (GREAT_CIRCLE) :
+                    compute_norm_vector(prev_src_point->vec_coords,
+                                        curr_src_point->vec_coords,
+                                        norm_vec);
+                    break;
+                  case (LAT_CIRCLE):
+                    compute_lat_circle_z_value(prev_src_point->vec_coords,
+                                               curr_src_point->vec_coords,
+                                               norm_vec);
+                    break;
+                  default:
+                    norm_vec[0] = 0.0, norm_vec[1] = 0.0, norm_vec[2] = 0.0;
+                    abort_message("invalid edge type\n", __FILE__, __LINE__);
+                };
+
+                tgt_edge_inside_src = is_inside(edge_middle, norm_vec,
+                                                prev_src_point_edge_type,
+                                                source_ordering) != 1;
+              }
+
+              // if one source point is on the target edge and the other is inside
+              if (prev_is_inside + curr_is_inside == 3) {
+
+                // if the current source point is on the target edge, then the
+                // second intersection point is just a dummy that is identical
+                // to the current source point but might have the wrong edge
+                // type
+                if (curr_is_inside == 2)
+                  intersect_points[1]->to_be_removed = 1;
+
+                if (curr_is_inside == 2)
+                  curr_src_point->to_be_removed = tgt_edge_inside_src;
+                if (prev_is_inside == 2)
+                  prev_src_point->to_be_removed = tgt_edge_inside_src;
+              }
+              if (prev_is_inside == 0 && curr_is_inside == 2) {
+                if (tgt_edge_inside_src)
+                  intersect_points[1]->to_be_removed = 1;
+                else
+                  curr_src_point->to_be_removed = 1;
+              }
+            }
+
+            // if the previous point has been reused for an intersection
+            if (intersect_points[0] == prev_src_point)
+              prev_is_inside = 1;
+          }
+        }
+
+      // if the one edge is a circle of latitude while the other is not
+      // and both corners are directly on the edge
+      } else if (((prev_src_point->edge_type == LAT_CIRCLE) ^
+                  (prev_tgt_point->edge_type == LAT_CIRCLE)) && 
+                 (prev_is_inside == 2) && (curr_is_inside == 2)) {
+
+        double cross_src_z, cross_tgt_z;
+
+        cross_src_z = prev_src_point->vec_coords[0] *
+                      curr_src_point->vec_coords[1] -
+                      prev_src_point->vec_coords[1] *
+                      curr_src_point->vec_coords[0];
+        cross_tgt_z = prev_tgt_point->vec_coords[0] *
+                      curr_tgt_point->vec_coords[1] -
+                      prev_tgt_point->vec_coords[1] *
+                      curr_tgt_point->vec_coords[0];
+
+        int same_ordering = source_ordering == target_ordering;
+        int same_direction = (cross_src_z > 0) == (cross_tgt_z > 0);
+
+        // if source and target cell have the same ordering and both
+        // edges have the same direction or if both cells have different
+        // ordering and the edges have different directions, then we might
+        // have to change the edge type of the source edge
+        if (same_ordering == same_direction) {
+
+          // well...it works...do not ask  ;-)
+          // ((edge is on south hemisphere) XOR (direction of source edge) XOR
+          //  (ordering of source cell))
+          if ((curr_src_point->vec_coords[2] > 0) ^
+              (cross_src_z < 0) ^ source_ordering)
+            prev_src_point->edge_type = LAT_CIRCLE;
+          else
+            prev_src_point->edge_type = GREAT_CIRCLE;
+        }
+      }
+
+      // if the previous points was on the target edge and the current
+      // one is outside
+      if (prev_is_inside == 2 && curr_is_inside == 0)
+        prev_src_point->edge_type = prev_tgt_point->edge_type;
+
+      if (!prev_is_inside)
+        prev_src_point->to_be_removed = 1;
+
+      prev_src_point = curr_src_point;
+      curr_src_point = curr_src_point->next;
+      prev_is_inside = curr_is_inside;
+
+    } while ((prev_src_point != source_list->last) &&
+             (source_list->first != NULL));
+
+    // remove all points that are to be deleted
+    remove_points(source_list);
+
+    // if there are no more corners in the source cell
+    if (source_list->first == NULL) break;
+
+    prev_tgt_point = curr_tgt_point;
+    curr_tgt_point = curr_tgt_point->next;
+  }
+}
+
+static void copy_point_list(struct point_list in, struct point_list * out) {
+
+  reset_point_list(out);
+
+  struct point_list_element * curr = in.first;
+
+  if (curr == NULL) return;
+
+  struct point_list_element * new = get_free_point_list_element(out);
+  out->first = new;
+  *new = *curr;
+  curr = curr->next;
+
+  do {
+
+    new->next = get_free_point_list_element(out);
+    new = new->next;    
+    *new = *curr;
+    curr = curr->next;
+    
+  } while (curr != in.first);
+
+  new->next = out->first;
+  out->last = new;
+}
+
 void cell_clipping(unsigned N,
                    struct grid_cell * source_cell,
                    struct grid_cell target_cell,
@@ -337,7 +696,7 @@ void cell_clipping(unsigned N,
   unsigned ncs;               /* number of vertices of source cell */
   unsigned nct;               /* number of vertices of target cell */
 
-  struct point_list target_list, source_list;
+  struct point_list target_list, source_list, temp_list;
 
   unsigned target_ordering; /* ordering of target cell corners */
   unsigned source_ordering; /* ordering of source cell corners */
@@ -352,6 +711,8 @@ void cell_clipping(unsigned N,
     abort_message("invalid target cell type (cell contains edges consisting "
                   "of great circles and circles of latitude)\n", __FILE__,
                   __LINE__);
+
+  init_point_list(&temp_list);
 
   // generate point list for target cell (clip cell)
   init_point_list(&target_list);
@@ -403,7 +764,9 @@ void cell_clipping(unsigned N,
 
     overlap_buffer[n].num_corners = 0;
 
-    if (get_cell_type(source_cell[n]) == MIXED_CELL)
+    enum cell_type src_cell_type = get_cell_type(source_cell[n]);
+
+    if (src_cell_type == MIXED_CELL)
       abort_message("invalid source cell type (cell contains edges consisting "
                     "of great circles and circles of latitude)\n", __FILE__,
                     __LINE__);
@@ -419,326 +782,69 @@ void cell_clipping(unsigned N,
     // compute source direction
     source_ordering = get_cell_points_ordering(&source_list);
 
-    prev_tgt_point = target_list.first;
-    curr_tgt_point = target_list.first->next;
-
-    for (int i = 0; i < nct; ++i) {
-
-      struct point_list_element * curr_src_point = source_list.first;
-      struct point_list_element * prev_src_point = source_list.last;
-
-      unsigned prev_is_inside, curr_is_inside;
-
-      prev_is_inside = is_inside(prev_src_point->vec_coords, norm_vec + 3 * i,
-                                 prev_tgt_point->edge_type, target_ordering);
-
-      // for all edges of the target cell
-      do {
-
-        curr_is_inside = is_inside(curr_src_point->vec_coords, norm_vec + 3 * i,
-                                   prev_tgt_point->edge_type, target_ordering);
-
-        // if the current edges change from inside/outside to outside/inside
-        if (((curr_is_inside == 0) ^ (prev_is_inside == 0)) &&
-            ((curr_is_inside != 2) && (prev_is_inside != 2))) {
-
-          double p[3], q[3];
-          int intersect;
-
-          struct point_list_element * intersect_point;
-
-          // if the previous point was inside or current edge is the last one
-          if (prev_is_inside ||
-              (curr_is_inside && (prev_src_point == source_list.last))) {
-
-            intersect_point = get_free_point_list_element(&source_list);
-            prev_src_point->next = intersect_point;
-            intersect_point->next = curr_src_point;
-
-            if (prev_src_point == source_list.last)
-              source_list.last = intersect_point;
-
-          } else
-            intersect_point = prev_src_point;
-
-          // get intersection points
-          intersect = intersect_vec(prev_src_point->edge_type,
-                                    prev_src_point->vec_coords,
-                                    curr_src_point->vec_coords,
-                                    prev_tgt_point->edge_type,
-                                    prev_tgt_point->vec_coords,
-                                    curr_tgt_point->vec_coords,
-                                    p, q);
-
-          // if there is an intersection
-          if (intersect != -1) {
-
-            // if both edges are on an identical great circle
-            if (intersect & (1 << 4)) {
-
-              print_grid_cell(stderr, target_cell, "target cell");
-              print_grid_cell(stderr, source_cell[n], "source cell");
-
-              abort_message("ERROR: edges on identical circle, this case should"
-                            " have been handled somewhere else\n", __FILE__, __LINE__);
-            }
-
-            // if there are two intersection points with the source edge
-            if ((intersect & ((1 << 0) | (1 << 1))) == ((1 << 0) | (1 << 1))) {
-
-              print_grid_cell(stderr, target_cell, "target cell");
-              print_grid_cell(stderr, source_cell[n], "source cell");
-
-              abort_message("ERROR: more than one intersections with the "
-                            "source edges", __FILE__, __LINE__);
-
-            // if p or q is on the source edge
-            } else {
-
-              if (prev_is_inside)
-                intersect_point->edge_type = prev_tgt_point->edge_type;
-              else
-                intersect_point->edge_type = prev_src_point->edge_type;
-
-              if (intersect & (1 << 0)) {
-
-                intersect_point->vec_coords[0] = p[0];
-                intersect_point->vec_coords[1] = p[1];
-                intersect_point->vec_coords[2] = p[2];
-
-              // if q is on the source edge
-              } else if (intersect & (1 << 1)) {
-
-                intersect_point->vec_coords[0] = q[0];
-                intersect_point->vec_coords[1] = q[1];
-                intersect_point->vec_coords[2] = q[2];
-
-              } else {
-
-                print_grid_cell(stderr, target_cell, "target cell");
-                print_grid_cell(stderr, source_cell[n], "source cell");
-
-                abort_message("ERROR: no intersection with source edge was found\n",
-                              __FILE__, __LINE__);
-              }
-            }
-          }
-
-          if (intersect_point == prev_src_point)
-            prev_is_inside = 1;
-
-        // if the one edge is a circle of latitude while the other is not
-        // and both corners are not directly on the edge
-        } else if (((prev_src_point->edge_type == LAT_CIRCLE) ^
-                    (prev_tgt_point->edge_type == LAT_CIRCLE)) && 
-                   !((prev_is_inside == 2) && (curr_is_inside == 2))) {
-
-          double p[3], q[3];
-          int intersect;
-
-          // get intersection points
-          intersect = intersect_vec(prev_src_point->edge_type,
-                                    prev_src_point->vec_coords,
-                                    curr_src_point->vec_coords,
-                                    prev_tgt_point->edge_type,
-                                    prev_tgt_point->vec_coords,
-                                    curr_tgt_point->vec_coords,
-                                    p, q);
-
-          // if there is an intersection possible
-          if (intersect != -1) {
-
-            // if both edges are on an identical great circle
-            if (intersect & (1 << 4)) {
-
-              print_grid_cell(stderr, target_cell, "target cell");
-              print_grid_cell(stderr, source_cell[n], "source cell");
-
-              abort_message("ERROR: edges on identical circle, this case should"
-                            " have been handled somewhere else\n", __FILE__, __LINE__);
-            }
-
-            // if there are two intersection points with the source edge
-            if ((intersect & ((1 << 0) | (1 << 1))) == ((1 << 0) | (1 << 1))) {
-
-              struct point_list_element * intersect_points[2];
-
-              // if the previous point was inside or current edge is the last one
-              if ((prev_is_inside || prev_src_point == source_list.last) &&
-                  (prev_is_inside != 2)) {
-
-                intersect_points[0] = get_free_point_list_element(&source_list);
-                prev_src_point->next = intersect_points[0];
-                intersect_points[0]->next = curr_src_point;
-
-                if (prev_src_point == source_list.last)
-                  source_list.last = intersect_points[0];
-
-              } else {
-                intersect_points[0] = prev_src_point;
-                intersect_points[0]->to_be_removed = 0;
-              }
-
-              // second intersection point
-              intersect_points[1] = get_free_point_list_element(&source_list);
-
-              if (intersect_points[0] == source_list.last)
-                source_list.first = intersect_points[1];
-
-              intersect_points[1]->next = intersect_points[0]->next;
-              intersect_points[0]->next = intersect_points[1];
-
-              int p_is_first = get_vector_angle(prev_src_point->vec_coords, p) <
-                               get_vector_angle(prev_src_point->vec_coords, q);
-              enum edge_type prev_src_point_edge_type =
-                prev_src_point->edge_type;
-
-              intersect_points[!p_is_first]->vec_coords[0] = p[0];
-              intersect_points[!p_is_first]->vec_coords[1] = p[1];
-              intersect_points[!p_is_first]->vec_coords[2] = p[2];
-              intersect_points[p_is_first]->vec_coords[0] = q[0];
-              intersect_points[p_is_first]->vec_coords[1] = q[1];
-              intersect_points[p_is_first]->vec_coords[2] = q[2];
-              intersect_points[(prev_is_inside != 0) &&
-                               (curr_is_inside != 0)]->edge_type =
-                prev_src_point->edge_type;
-              intersect_points[(prev_is_inside == 0) ||
-                               (curr_is_inside == 0)]->edge_type =
-                prev_tgt_point->edge_type;
-
-              if (prev_is_inside == 2 || curr_is_inside == 2) {
-
-                int tgt_edge_inside_src;
-
-                {
-                  double edge_middle[3];
-
-                  get_edge_middle_point(p, q, prev_tgt_point->edge_type,
-                                        edge_middle);
-
-                  double norm_vec[3];
-
-                  switch (prev_src_point_edge_type) {
-
-                    case (LON_CIRCLE) :
-                    case (GREAT_CIRCLE) :
-                      compute_norm_vector(prev_src_point->vec_coords,
-                                          curr_src_point->vec_coords,
-                                          norm_vec);
-                      break;
-                    case (LAT_CIRCLE):
-                      compute_lat_circle_z_value(prev_src_point->vec_coords,
-                                                 curr_src_point->vec_coords,
-                                                 norm_vec);
-                      break;
-                    default:
-                      norm_vec[0] = 0.0, norm_vec[1] = 0.0, norm_vec[2] = 0.0;
-                      abort_message("invalid edge type\n", __FILE__, __LINE__);
-                  };
-
-                  tgt_edge_inside_src = is_inside(edge_middle, norm_vec,
-                                                  prev_src_point_edge_type,
-                                                  source_ordering) != 1;
-                }
-
-                // if one source point is on the target edge and the other is inside
-                if (prev_is_inside + curr_is_inside == 3) {
-
-                  // if the current source point is on the target edge, then the
-                  // second intersection point is just a dummy that is identical
-                  // to the current source point but might have the wrong edge
-                  // type
-                  if (curr_is_inside == 2)
-                    intersect_points[1]->to_be_removed = 1;
-
-                  if (curr_is_inside == 2)
-                    curr_src_point->to_be_removed = tgt_edge_inside_src;
-                  if (prev_is_inside == 2)
-                    prev_src_point->to_be_removed = tgt_edge_inside_src;
-                }
-                if (prev_is_inside == 0 && curr_is_inside == 2) {
-                  if (tgt_edge_inside_src)
-                    intersect_points[1]->to_be_removed = 1;
-                  else
-                    curr_src_point->to_be_removed = 1;
-                }
-              }
-
-              // if the previous point has been reused for an intersection
-              if (intersect_points[0] == prev_src_point)
-                prev_is_inside = 1;
-            }
-          }
-
-        // if the one edge is a circle of latitude while the other is not
-        // and both corners are directly on the edge
-        } else if (((prev_src_point->edge_type == LAT_CIRCLE) ^
-                    (prev_tgt_point->edge_type == LAT_CIRCLE)) && 
-                   (prev_is_inside == 2) && (curr_is_inside == 2)) {
-
-          double cross_src_z, cross_tgt_z;
-
-          cross_src_z = prev_src_point->vec_coords[0] *
-                        curr_src_point->vec_coords[1] -
-                        prev_src_point->vec_coords[1] *
-                        curr_src_point->vec_coords[0];
-          cross_tgt_z = prev_tgt_point->vec_coords[0] *
-                        curr_tgt_point->vec_coords[1] -
-                        prev_tgt_point->vec_coords[1] *
-                        curr_tgt_point->vec_coords[0];
-
-          int same_ordering = source_ordering == target_ordering;
-          int same_direction = (cross_src_z > 0) == (cross_tgt_z > 0);
-
-          // if source and target cell have the same ordering and both
-          // edges have the same direction or if both cells have different
-          // ordering and the edges have different directions, then we might
-          // have to change the edge type of the source edge
-          if (same_ordering == same_direction) {
-
-            // well...it works...do not ask  ;-)
-            // ((edge is on south hemisphere) XOR (direction of source edge) XOR
-            //  (ordering of source cell))
-            if ((curr_src_point->vec_coords[2] > 0) ^
-                (cross_src_z < 0) ^ source_ordering)
-              prev_src_point->edge_type = LAT_CIRCLE;
-            else
-              prev_src_point->edge_type = GREAT_CIRCLE;
-          }
-        }
-
-        // if the previous points was on the target edge and the current
-        // one is outside
-        if (prev_is_inside == 2 && curr_is_inside == 0)
-          prev_src_point->edge_type = prev_tgt_point->edge_type;
-
-        if (!prev_is_inside)
-          prev_src_point->to_be_removed = 1;
-
-        prev_src_point = curr_src_point;
-        curr_src_point = curr_src_point->next;
-        prev_is_inside = curr_is_inside;
-
-      } while ((prev_src_point != source_list.last) &&
-               (source_list.first != NULL));
-
-      // remove all points that are to be deleted
-      remove_points(&source_list);
-
-      // if there are no more corners in the source cell
-      if (source_list.first == NULL) break;
-
-      prev_tgt_point = curr_tgt_point;
-      curr_tgt_point = curr_tgt_point->next;
+    struct point_list * overlap;
+
+    // in this case there can be some problems if the great circle cell includes
+    // a pole, but this only occurs if the lon-lat cell is the target cell
+    if ((((tgt_cell_type == LON_LAT_CELL) || (tgt_cell_type == LAT_CELL)) &&
+         src_cell_type == GREAT_CIRCLE_CELL) ||
+        ((tgt_cell_type == LAT_CELL) && (src_cell_type == LAT_CELL) &&
+         (fabs(target_cell.coordinates_y[0]) >
+          fabs(source_cell[n].coordinates_y[0])))) {
+
+      curr_target_cell = source_cell[n];
+      curr_source_cell = target_cell;
+
+      copy_point_list(target_list, &temp_list);
+
+      double temp_norm_vec[3*ncs];
+      struct point_list_element * src_point = source_list.first;
+
+
+      for (unsigned i = 0; i < ncs; ++i) {
+        switch (src_point->edge_type) {
+
+          case (LON_CIRCLE) :
+          case (GREAT_CIRCLE) :
+            compute_norm_vector(src_point->vec_coords,
+                                src_point->next->vec_coords,
+                                temp_norm_vec + 3 * i);
+            break;
+          case (LAT_CIRCLE):
+            compute_lat_circle_z_value(src_point->vec_coords,
+                                       src_point->next->vec_coords,
+                                       temp_norm_vec + 3 * i);
+            break;
+          default:
+            abort_message("invalid edge type\n", __FILE__, __LINE__);
+        };
+        src_point = src_point->next;
+      }
+
+      point_list_clipping(&temp_list, target_ordering,
+                          source_list, source_ordering, ncs, temp_norm_vec);
+
+      overlap = &temp_list;
+
+    } else {
+
+      curr_target_cell = target_cell;
+      curr_source_cell = source_cell[n];
+
+      point_list_clipping(&source_list, source_ordering,
+                          target_list, target_ordering, nct, norm_vec);
+
+      overlap = &source_list;
     }
 
-    if (source_list.first != NULL)
-      generate_overlap_cell(&source_list, overlap_buffer + n);
+    if (overlap->first != NULL)
+      generate_overlap_cell(overlap, overlap_buffer + n);
   }
 
   free(norm_vec);
   free_point_list(&source_list);
   free_point_list(&target_list);
+  free_point_list(&temp_list);
 }
 
 /* ---------------------------------------------------- */
@@ -904,7 +1010,12 @@ static unsigned remove_zero_length_edges(struct point_list * list) {
       curr->to_be_removed = 1;
       temp_num_edges--;
     } else if (curr->edge_type == LAT_CIRCLE &&
-               curr->next->edge_type == LAT_CIRCLE) {
+               curr->next->edge_type == LAT_CIRCLE &&
+               (fabs(get_angle(atan2(curr->vec_coords[1] ,
+                                     curr->vec_coords[0]),
+                               atan2(curr->next->next->vec_coords[1] ,
+                                     curr->next->next->vec_coords[0]))) <
+                M_PI_2)) {
       curr->next->to_be_removed = 1;
       temp_num_edges--;
     }
@@ -1006,17 +1117,6 @@ static void free_point_list(struct point_list * list) {
   list->free_elements = NULL;
 }
 
-static int is_lat_cell(struct point_list * list, unsigned num_edges) {
-
-  struct point_list_element * curr = list->first;
-  int lat_cell = 1;
-
-  for (unsigned i = 0; i < num_edges; ++i, curr = curr->next)
-    lat_cell &= curr->edge_type == LAT_CIRCLE;
-
-  return lat_cell;
-}
-
 static int is_empty_gc_cell(struct point_list * list, unsigned num_edges) {
 
   double const tol = 1e-6;
@@ -1067,7 +1167,6 @@ static void generate_overlap_cell(struct point_list * list,
   unsigned num_edges = remove_zero_length_edges(list);
 
   if ((num_edges < 2) ||
-      is_lat_cell(list, num_edges) ||
       is_empty_gc_cell(list, num_edges)){
 
     reset_point_list(list);
