@@ -15,7 +15,7 @@
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
 static
-void store_link_bicub(remapvars_t *rv, int dst_add, int *restrict src_add, double weights[4][4])
+void store_link_bicub(remapvars_t *rv, int dst_add, int src_add[4], double weights[4][4])
 {
   /*
     Input variables:
@@ -35,29 +35,6 @@ void store_link_bicub(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
-
-  if ( rv->sort_add == FALSE )
-    {
-      for ( n = 0; n < 3; ++n )
-	if ( src_add[n] > src_add[n+1] ) break;
-
-      if ( n < 2 ) rv->sort_add = TRUE;
-      else if ( n == 2 ) // swap 3rd and 4th elements
-	{
-	  {
-	    int itmp;
-	    itmp = src_add[2];
-	    src_add[2] = src_add[3];
-	    src_add[3] = itmp;
-	  }
-	  {
-	    double dtmp[4];
-	    for ( k = 0; k < 4; ++k ) dtmp[k] = weights[k][2];
-	    for ( k = 0; k < 4; ++k ) weights[k][2] = weights[k][3];
-	    for ( k = 0; k < 4; ++k ) weights[k][3] = dtmp[k];
-	  }
-	}
-    }
 
   for ( n = 0; n < 4; ++n )
     {
@@ -93,12 +70,12 @@ void set_bicubic_weights(double iw, double jw, double wgts[4][4])
 int num_src_points(const int* restrict mask, const int* restrict src_add, double* restrict src_lats);
 
 static
-void renormalize_weights(const double* restrict src_lats, double wgts[4][4])
+void renormalize_weights(const double src_lats[4], double wgts[4][4])
 {
   int n;
   double sum_wgts = 0.0; /* sum of weights for normalization */
   /* 2012-05-08 Uwe Schulzweida: using absolute value of src_lats (bug fix) */
-  for ( n = 0; n < 4; ++n ) sum_wgts += fabs(src_lats[n]);
+  for ( n = 0; n < 4; ++n ) sum_wgts  += fabs(src_lats[n]);
   for ( n = 0; n < 4; ++n ) wgts[0][n] = fabs(src_lats[n])/sum_wgts;
   for ( n = 0; n < 4; ++n ) wgts[1][n] = 0.;
   for ( n = 0; n < 4; ++n ) wgts[2][n] = 0.;
@@ -118,17 +95,67 @@ void bicubic_warning(void)
     }
 }
 
+typedef struct
+{
+  int add;
+  double wgts[4];
+}
+addwgts_t;
+
 static
-void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, double wgts[4][4], const int* src_add,
+int cmpwgts(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  const addwgts_t *c1 = s1;
+  const addwgts_t *c2 = s2;
+
+  if      ( c1->add < c2->add ) cmp = -1;
+  else if ( c1->add > c2->add ) cmp =  1;
+
+  return (cmp);
+}
+
+static
+void sort_bicubic_adds(int src_add[4], double wgts[4][4])
+{
+  int n;
+  addwgts_t addwgts[4];
+
+  for ( n = 1; n < 4; ++n )
+    if ( src_add[n] < src_add[n-1] ) break;
+  if ( n == 4 ) return;
+
+  for ( n = 0; n < 4; ++n )
+    {
+      addwgts[n].add     = src_add[n];
+      addwgts[n].wgts[0] = wgts[0][n];
+      addwgts[n].wgts[1] = wgts[1][n];
+      addwgts[n].wgts[2] = wgts[2][n];
+      addwgts[n].wgts[3] = wgts[3][n];
+    }
+
+  qsort(addwgts, 4, sizeof(addwgts_t), cmpwgts);
+
+  for ( n = 0; n < 4; ++n )
+    {
+      src_add[n] = addwgts[n].add;
+      wgts[0][n] = addwgts[n].wgts[0];
+      wgts[1][n] = addwgts[n].wgts[1];
+      wgts[2][n] = addwgts[n].wgts[2];
+      wgts[3][n] = addwgts[n].wgts[3];
+    }  
+}
+
+static
+void bicubic_remap(double* restrict tgt_point, const double* restrict src_array, double wgts[4][4], const int src_add[4],
 		   const double* restrict grad1, const double* restrict grad2, const double* restrict grad3)
 {
   *tgt_point = 0.;
-  for ( int k = 0; k < 4; ++k )
-    for ( int n = 0; n < 4; ++n )
-      *tgt_point += src_array[src_add[n]]*wgts[k][n] +
-                        grad1[src_add[n]]*wgts[k][n] +
-                        grad2[src_add[n]]*wgts[k][n] +
-                        grad3[src_add[n]]*wgts[k][n];
+  for ( int n = 0; n < 4; ++n )
+    *tgt_point += src_array[src_add[n]]*wgts[0][n] +
+                      grad1[src_add[n]]*wgts[1][n] +
+                      grad2[src_add[n]]*wgts[2][n] +
+                      grad3[src_add[n]]*wgts[3][n];  
 }
 
 /*
@@ -219,6 +246,8 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      /* Successfully found iw,jw - compute weights */
 	      set_bicubic_weights(iw, jw, wgts);
 
+	      sort_bicubic_adds(src_add, wgts);
+
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
@@ -243,6 +272,8 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 	      renormalize_weights(src_lats, wgts);
 
 	      tgt_grid->cell_frac[dst_add] = 1.;
+
+	      sort_bicubic_adds(src_add, wgts);
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -351,6 +382,8 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 	      /* Successfully found iw,jw - compute weights */
 	      set_bicubic_weights(iw, jw, wgts);
 
+	      sort_bicubic_adds(src_add, wgts);
+
 	      bicubic_remap(&tgt_array[dst_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
 	    }
           else
@@ -372,6 +405,8 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
 	      renormalize_weights(src_lats, wgts);
 
 	      tgt_grid->cell_frac[dst_add] = 1.;
+
+	      sort_bicubic_adds(src_add, wgts);
 
 	      bicubic_remap(&tgt_array[dst_add], src_array, wgts, src_add, grad1_lat, grad1_lon, grad1_latlon);
 	    }
