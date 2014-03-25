@@ -14,7 +14,7 @@
   This routine stores the address and weight for four links associated with one destination
   point in the appropriate address and weight arrays and resizes those arrays if necessary.
 */
-void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, double *restrict weights)
+void store_link_bilin(remapvars_t *rv, int dst_add, int src_add[4], double weights[4])
 {
   /*
     Input variables:
@@ -34,29 +34,6 @@ void store_link_bilin(remapvars_t *rv, int dst_add, int *restrict src_add, doubl
 
   if ( rv->num_links >= rv->max_links ) 
     resize_remap_vars(rv, rv->resize_increment);
-
-  if ( rv->sort_add == FALSE )
-    {
-      for ( n = 0; n < 3; ++n )
-	if ( src_add[n] > src_add[n+1] ) break;
-
-      if ( n < 2 ) rv->sort_add = TRUE;
-      else if ( n == 2 ) // swap 3rd and 4th elements
-	{
-	  {
-	    int itmp;
-	    itmp = src_add[2];
-	    src_add[2] = src_add[3];
-	    src_add[3] = itmp;
-	  }
-	  {
-	    double dtmp;
-	    dtmp = weights[2];
-	    weights[2] = weights[3];
-	    weights[3] = dtmp;
-	  }
-	}
-    }
 
   for ( n = 0; n < 4; ++n )
     {
@@ -139,7 +116,7 @@ int find_ij_weights(double plon, double plat, double* restrict src_lats, double*
 }
 
 static
-void set_bilinear_weights(double iw, double jw, double* restrict wgts)
+void set_bilinear_weights(double iw, double jw, double wgts[4])
 {
   wgts[0] = (1.-iw) * (1.-jw);
   wgts[1] =     iw  * (1.-jw);
@@ -148,7 +125,7 @@ void set_bilinear_weights(double iw, double jw, double* restrict wgts)
 }
 
 
-int num_src_points(const int* restrict mask, const int* restrict src_add, double* restrict src_lats)
+int num_src_points(const int* restrict mask, const int src_add[4], double src_lats[4])
 {
   int icount = 0;
 
@@ -164,7 +141,7 @@ int num_src_points(const int* restrict mask, const int* restrict src_add, double
 }
 
 static
-void renormalize_weights(const double* restrict src_lats, double* restrict wgts)
+void renormalize_weights(const double src_lats[4], double wgts[4])
 {
   int n;
   double sum_wgts = 0.0; /* sum of weights for normalization */
@@ -201,8 +178,53 @@ void bilinear_warning(double plon, double plat, double iw, double jw, int* src_a
     }
 }
 
+typedef struct
+{
+  int add;
+  double wgts;
+}
+addwgts_t;
+
 static
-void bilinear_remap(double* restrict tgt_point, const double* restrict src_array, const double* restrict wgts, const int* src_add)
+int cmpwgts(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  const addwgts_t *c1 = s1;
+  const addwgts_t *c2 = s2;
+
+  if      ( c1->add < c2->add ) cmp = -1;
+  else if ( c1->add > c2->add ) cmp =  1;
+
+  return (cmp);
+}
+
+static
+void sort_bilinear_adds(int src_add[4], double wgts[4])
+{
+  int n;
+  addwgts_t addwgts[4];
+
+  for ( n = 1; n < 4; ++n )
+    if ( src_add[n] < src_add[n-1] ) break;
+  if ( n == 4 ) return;
+
+  for ( n = 0; n < 4; ++n )
+    {
+      addwgts[n].add  = src_add[n];
+      addwgts[n].wgts = wgts[n];
+    }
+
+  qsort(addwgts, 4, sizeof(addwgts_t), cmpwgts);
+
+  for ( n = 0; n < 4; ++n )
+    {
+      src_add[n] = addwgts[n].add;
+      wgts[n]    = addwgts[n].wgts;
+    }  
+}
+
+static
+void bilinear_remap(double* restrict tgt_point, const double* restrict src_array, const double wgts[4], const int src_add[4])
 {
   // *tgt_point = 0.;
   // for ( int n = 0; n < 4; ++n ) *tgt_point += src_array[src_add[n]]*wgts[n];
@@ -221,7 +243,7 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
   /*   Local variables */
   int  search_result;
   long tgt_grid_size;
-  long dst_add;                  /*  destination addresss */
+  long dst_add;                  /*  destination addresss                   */
   int src_add[4];                /*  address for the four source points     */
   double src_lats[4];            /*  latitudes  of four bilinear corners    */
   double src_lons[4];            /*  longitudes of four bilinear corners    */
@@ -300,6 +322,8 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 	      /* Successfully found iw,jw - compute weights */
 	      set_bilinear_weights(iw, jw, wgts);
 
+	      sort_bilinear_adds(src_add, wgts);
+
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
@@ -324,6 +348,8 @@ void scrip_remap_weights_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, 
 	      renormalize_weights(src_lats, wgts);
 
 	      tgt_grid->cell_frac[dst_add] = 1.;
+
+	      sort_bilinear_adds(src_add, wgts);
 
 #if defined(_OPENMP)
 #pragma omp critical
@@ -429,6 +455,8 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 	      /* Successfully found iw,jw - compute weights */
 	      set_bilinear_weights(iw, jw, wgts);
 
+	      sort_bilinear_adds(src_add, wgts);
+
 	      bilinear_remap(&tgt_array[dst_add], src_array, wgts, src_add);
 	    }
           else
@@ -450,6 +478,8 @@ void scrip_remap_bilinear(remapgrid_t* src_grid, remapgrid_t* tgt_grid, const do
 	      renormalize_weights(src_lats, wgts);
 
 	      tgt_grid->cell_frac[dst_add] = 1.;
+
+	      sort_bilinear_adds(src_add, wgts);
 
 	      bilinear_remap(&tgt_array[dst_add], src_array, wgts, src_add);
 	    }

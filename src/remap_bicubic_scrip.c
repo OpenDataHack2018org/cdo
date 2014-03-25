@@ -67,7 +67,7 @@ void set_bicubic_weights(double iw, double jw, double wgts[4][4])
   wgts[3][3] =     iw*(iw-1.)*(iw-1.) *     jw*jw*(jw-1.);
 }
 
-int num_src_points(const int* restrict mask, const int* restrict src_add, double* restrict src_lats);
+int num_src_points(const int* restrict mask, const int src_add[4], double src_lats[4]);
 
 static
 void renormalize_weights(const double src_lats[4], double wgts[4][4])
@@ -288,7 +288,7 @@ void scrip_remap_weights_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 /*
   -----------------------------------------------------------------------
 
-  This routine computes the weights for a bicubic interpolation.
+  This routine computes ans apply the weights for a bicubic interpolation.
 
   -----------------------------------------------------------------------
 */
