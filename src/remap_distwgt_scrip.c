@@ -157,12 +157,12 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 	  */
 	  /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
 	                                 otherwise the result of acos(distance) is NaN */
-	  if ( distance >  1 ) distance =  1;
-	  if ( distance < -1 ) distance = -1;
+	  if ( distance >  1. ) distance =  1.;
+	  if ( distance < -1. ) distance = -1.;
 	  distance = acos(distance);
 
 	  /* Uwe Schulzweida: if distance is zero, set to small number */
-	  if ( IS_EQUAL(distance, 0) ) distance = TINY;
+	  if ( IS_EQUAL(distance, 0.) ) distance = TINY;
 
 	  /* Store the address and distance if this is one of the smallest four so far */
 	  for ( nchk = 0; nchk < num_neighbors; ++nchk )
@@ -302,13 +302,59 @@ void store_link_nbr(remapvars_t *rv, int add1, int add2, double weights)
 
 } /* store_link_nbr */
 
+typedef struct
+{
+  int add;
+  double wgts;
+}
+addwgts_t;
+
+static
+int cmpwgts(const void *s1, const void *s2)
+{
+  int cmp = 0;
+  const addwgts_t *c1 = s1;
+  const addwgts_t *c2 = s2;
+
+  if      ( c1->add < c2->add ) cmp = -1;
+  else if ( c1->add > c2->add ) cmp =  1;
+
+  return (cmp);
+}
+
+static
+void sort_dist_adds(int nadds, int src_add[nadds], double wgts[nadds])
+{
+  int n;
+  addwgts_t addwgts[nadds];
+
+  if ( nadds <= 1 ) return;
+
+  for ( n = 1; n < nadds; ++n )
+    if ( src_add[n] < src_add[n-1] ) break;
+  if ( n == nadds ) return;
+
+  for ( n = 0; n < nadds; ++n )
+    {
+      addwgts[n].add  = src_add[n];
+      addwgts[n].wgts = wgts[n];
+    }
+
+  qsort(addwgts, nadds, sizeof(addwgts_t), cmpwgts);
+
+  for ( n = 0; n < nadds; ++n )
+    {
+      src_add[n] = addwgts[n].add;
+      wgts[n]    = addwgts[n].wgts;
+    }  
+}
+
 /*
-  -----------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------
 
-   This routine computes the inverse-distance weights for a
-   nearest-neighbor interpolation.
+   This routine computes the inverse-distance weights for a nearest-neighbor interpolation.
 
-  -----------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------
 */
 void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapvars_t *rv)
 {
@@ -316,20 +362,19 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
   long src_grid_size;
   long tgt_grid_size;
-  long n;
-  long dst_add;                   /* destination address                     */
-  int nbr_mask[num_neighbors];    /* mask at nearest neighbors               */
-  int nbr_add[num_neighbors];     /* source address at nearest neighbors     */
-  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors */
-  double dist_tot;         /* sum of neighbor distances (for normalizing) */
-  double coslat_dst;       /* cos(lat) of destination grid point */
-  double coslon_dst;       /* cos(lon) of destination grid point */
-  double sinlat_dst;       /* sin(lat) of destination grid point */
-  double sinlon_dst;       /* sin(lon) of destination grid point */
-  double *coslat, *sinlat; /* cosine, sine of grid lats (for distance)    */
-  double *coslon, *sinlon; /* cosine, sine of grid lons (for distance)    */
-  double wgtstmp;          /* hold the link weight                        */
-  double plat, plon;             /*  lat/lon coords of destination point    */
+  long n, nadds;
+  long dst_add;                   /* destination address                         */
+  int nbr_mask[num_neighbors];    /* mask at nearest neighbors                   */
+  int nbr_add[num_neighbors];     /* source address at nearest neighbors         */
+  double nbr_dist[num_neighbors]; /* angular distance four nearest neighbors     */
+  double dist_tot;                /* sum of neighbor distances (for normalizing) */
+  double coslat_dst;              /* cos(lat) of destination grid point          */
+  double coslon_dst;              /* cos(lon) of destination grid point          */
+  double sinlat_dst;              /* sin(lat) of destination grid point          */
+  double sinlon_dst;              /* sin(lon) of destination grid point          */
+  double *coslat, *sinlat;        /* cosine, sine of grid lats (for distance)    */
+  double *coslon, *sinlon;        /* cosine, sine of grid lons (for distance)    */
+  double plat, plon;              /* lat/lon coords of destination point         */
   double findex = 0;
   int remap_grid_type = src_grid->remap_grid_type;
 
@@ -381,10 +426,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 #endif
       for ( n = 0; n < src_grid_size; ++n )
 	{
-	  coslat[n] = cos(src_grid->cell_center_lat[n]);
 	  coslon[n] = cos(src_grid->cell_center_lon[n]);
-	  sinlat[n] = sin(src_grid->cell_center_lat[n]);
 	  sinlon[n] = sin(src_grid->cell_center_lon[n]);
+	  coslat[n] = cos(src_grid->cell_center_lat[n]);
+	  sinlat[n] = sin(src_grid->cell_center_lat[n]);
 	}
     }
 
@@ -392,7 +437,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, num_neighbors, remap_grid_type, src_grid, tgt_grid, rv, tgt_grid_size, coslat, coslon, sinlat, sinlon, findex) \
-  private(dst_add, n, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, dist_tot, nbr_add, nbr_dist, nbr_mask, wgtstmp, plat, plon) \
+  private(dst_add, n, nadds, coslat_dst, coslon_dst, sinlat_dst, sinlon_dst, dist_tot, nbr_add, nbr_dist, nbr_mask, plat, plon) \
   schedule(dynamic,1)
 #endif
   for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add )
@@ -432,7 +477,7 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
       /* Compute weights based on inverse distance if mask is false, eliminate those points */
 
-      dist_tot = ZERO;
+      dist_tot = 0.;
       for ( n = 0; n < num_neighbors; ++n )
 	{
 	  // printf("dst_add %ld %ld %d %g\n", dst_add, n, nbr_add[n], nbr_dist[n]);
@@ -450,19 +495,29 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
 
       /* Normalize weights and store the link */
 
+      nadds = 0;
       for ( n = 0; n < num_neighbors; ++n )
 	{
           if ( nbr_mask[n] )
 	    {
-	      wgtstmp = nbr_dist[n]/dist_tot;
+	      nbr_dist[nadds] = nbr_dist[n]/dist_tot;
+	      nbr_add[nadds]  = nbr_add[n];
+	      nadds++;
 
 	      tgt_grid->cell_frac[dst_add] = ONE;
+	    }
+	}
+
+      sort_dist_adds(nadds, nbr_add, nbr_dist);
+
+      for ( n = 0; n < nadds; ++n )
+	{
 #if defined(_OPENMP)
 #pragma omp critical
 #endif
-	      store_link_nbr(rv, nbr_add[n], dst_add, wgtstmp);
-	    }
+	      store_link_nbr(rv, nbr_add[n], dst_add, nbr_dist[n]);
 	}
+
     } /* for ( dst_add = 0; dst_add < tgt_grid_size; ++dst_add ) */
 
   free(coslat);
@@ -470,4 +525,4 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
   free(sinlat);
   free(sinlon);
 
-}  /* remap_distwgt */
+}  /* scrip_remap_weights_distwgt */
