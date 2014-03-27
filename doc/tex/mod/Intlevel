@@ -1,5 +1,4 @@
 @BeginModule
-@NewPage
 @Name      = Intlevel
 @Title     = Linear level interpolation
 @Section   = Interpolation
@@ -8,8 +7,7 @@
 @Operators = intlevel
 
 @BeginDescription
-This operator performs a linear vertical interpolation of non hybrid 
-3D variables.
+This operator performs a linear vertical interpolation of non hybrid 3D variables.
 @EndDescription
 @EndModule
 
@@ -27,8 +25,7 @@ FLOAT  Target levels
 
 
 @BeginExample
-To interpolate 3D variables on height levels to a new set of
-height levels use:
+To interpolate 3D variables on height levels to a new set of height levels use:
 @BeginVerbatim
    cdo intlevel,10,50,100,500,1000 ifile ofile
 @EndVerbatim
