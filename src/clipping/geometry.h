@@ -43,6 +43,8 @@
 #include "grid.h"
 #include "utils.h"
 
+extern const double angle_tol;
+
 struct line {
    struct {
       double x;

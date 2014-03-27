@@ -191,7 +191,6 @@ static void compute_lat_circle_z_value(double a[], double b[], double z[]) {
 static unsigned is_inside_gc(double point[], double norm_vec[]) {
 
   double dot;
-  double const tol = 1e-12;
 
   // the product is defined as follows
   // a * b = |a| * |b| * cos(alpha)
@@ -200,7 +199,7 @@ static unsigned is_inside_gc(double point[], double norm_vec[]) {
   dot = dotproduct(point, norm_vec);
 
   // if the point is on the line
-  if (fabs(dot) < tol)
+  if (fabs(dot) < cos(M_PI_2 - angle_tol))
     return 2;
 
   return dot < 0;

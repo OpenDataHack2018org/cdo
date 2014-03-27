@@ -41,6 +41,8 @@
 #include "utils.h"
 #include "geometry.h"
 
+// angle tolerance
+const double angle_tol = 1e-10;
 static double const tol = 1.0e-10;
 
 static void crossproduct (double a[], double b[], double cross[]) {
