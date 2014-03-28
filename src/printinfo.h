@@ -269,13 +269,13 @@ void printGridInfo(int vlistID)
 	}
       else if ( gridtype == GRID_SPECTRAL )
 	{
-	  fprintf(stdout, "           : points=%d  nsp=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
+	  fprintf(stdout, "          : points=%d  nsp=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
 	  fprintf(stdout, "%*s", nbyte0, "");
 	  fprintf(stdout, "            complexPacking=%d\n", gridInqComplexPacking(gridID));
 	}
       else if ( gridtype == GRID_FOURIER )
 	{
-	  fprintf(stdout, "          : points=%d  nfc=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
+	  fprintf(stdout, "         : points=%d  nfc=%d  truncation=%d\n", gridsize, gridsize/2, trunc);
 	}
       else if ( gridtype == GRID_GME )
 	{
