@@ -281,6 +281,12 @@ void yar_remap_bil(field_t *field1, field_t *field2)
 
   search = bucket_search_new(source_grid);
   /*
+  search = sphere_part_search_new(source_grid);
+  printf("search %p\n", search);
+  printf("search->vtable %p\n", search->vtable);
+  printf("search->vtable->do_point_search_p3 %d\n", search->vtable->do_point_search_p3);
+  */
+  /*
 
   printf("total_num_dependencies: %d\n", get_total_num_dependencies(deps));
 
