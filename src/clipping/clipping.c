@@ -199,7 +199,7 @@ static unsigned is_inside_gc(double point[], double norm_vec[]) {
   dot = dotproduct(point, norm_vec);
 
   // if the point is on the line
-  if (fabs(dot) < cos(M_PI_2 - angle_tol))
+  if (fabs(dot) < angle_tol)
     return 2;
 
   return dot < 0;

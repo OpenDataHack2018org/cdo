@@ -42,7 +42,7 @@
 #include "geometry.h"
 
 // angle tolerance
-const double angle_tol = 1e-10;
+const double angle_tol = 1e-9;
 static double const tol = 1.0e-10;
 
 static void crossproduct (double a[], double b[], double cross[]) {
@@ -62,7 +62,7 @@ static int vector_is_between (double a[], double b[], double p[], double angle_a
 
    return fabs(get_vector_angle(a, p) +
                get_vector_angle(b, p) -
-               angle_ab) < tol;
+               angle_ab) < angle_tol;
 }
 
 static int vector_is_between_lat (double a[], double b[], double p[]) {
@@ -229,14 +229,16 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
       return -1;
    }
 
-   double f1, f2;
+   double temp_cross[3];
 
-   // compute cos between e and c_/d_ times length of e
-   f1 = e_ab[0] * c[0] + e_ab[1] * c[1] + e_ab[2] * c[2];
-   f2 = e_ab[0] * d[0] + e_ab[1] * d[1] + e_ab[2] * d[2];
+   // compute unit vector of ab plane
+   crossproduct(e_ab, e_cd, temp_cross);
+   n = sqrt(temp_cross[0] * temp_cross[0] +
+            temp_cross[1] * temp_cross[1] +
+            temp_cross[2] * temp_cross[2]);
 
    // if both great circles are nearly identically
-   if ((fabs(f1) < tol) && (fabs(f2) < tol)) {
+   if (n < tol) {
 
       int ret_value = 1 << 4;
 
@@ -297,67 +299,41 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
       return ret_value;
    }
 
-   double g[3];
+    n = 1.0 / n;
+    // determine p and q
+    double p_[3], q_[3];
 
-   // compute line intersection of both planes defined by the two great circles
-   if (fabs(f1) > fabs(f2)) {
+    p_[0]= temp_cross[0] * n;
+    p_[1]= temp_cross[1] * n;
+    p_[2]= temp_cross[2] * n;
 
-      n = - (f2 / f1);
+    q_[0]=-p_[0];
+    q_[1]=-p_[1];
+    q_[2]=-p_[2];
 
-      g[0] = n * c[0] + d[0];
-      g[1] = n * c[1] + d[1];
-      g[2] = n * c[2] + d[2];
+    // set p and q
+    if (p != 0) {
+       p[0] = p_[0];
+       p[1] = p_[1];
+       p[2] = p_[2];
+    }
+    if (q != 0) {
+       q[0] = q_[0];
+       q[1] = q_[1];
+       q[2] = q_[2];
+    }
 
-   } else {
+    int result;
+    double angle_ab = get_vector_angle(a, b);
+    double angle_cd = get_vector_angle(c, d);
 
-      n = - (f1 / f2);
+    result = 0;
+    if (vector_is_between(a, b, p_, angle_ab)) result |= 1 << 0;
+    if (vector_is_between(a, b, q_, angle_ab)) result |= 1 << 1;
+    if (vector_is_between(c, d, p_, angle_cd)) result |= 1 << 2;
+    if (vector_is_between(c, d, q_, angle_cd)) result |= 1 << 3;
 
-      g[0] = c[0] + n * d[0];
-      g[1] = c[1] + n * d[1];
-      g[2] = c[2] + n * d[2];
-   }
-
-   // normalise g
-   n = 1.0 / sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2]);
-
-   g[0]=g[0]*n;
-   g[1]=g[1]*n;
-   g[2]=g[2]*n;
-
-   // determine p and q
-   double p_[3], q_[3];
-
-   p_[0]= g[0];
-   p_[1]= g[1];
-   p_[2]= g[2];
-
-   q_[0]=-p_[0];
-   q_[1]=-p_[1];
-   q_[2]=-p_[2];
-
-   // set p and q
-   if (p != 0) {
-      p[0] = p_[0];
-      p[1] = p_[1];
-      p[2] = p_[2];
-   }
-   if (q != 0) {
-      q[0] = q_[0];
-      q[1] = q_[1];
-      q[2] = q_[2];
-   }
-
-   int result;
-   double angle_ab = get_vector_angle(a, b);
-   double angle_cd = get_vector_angle(c, d);
-
-   result = 0;
-   if (vector_is_between(a, b, p_, angle_ab)) result |= 1 << 0;
-   if (vector_is_between(a, b, q_, angle_ab)) result |= 1 << 1;
-   if (vector_is_between(c, d, p_, angle_cd)) result |= 1 << 2;
-   if (vector_is_between(c, d, q_, angle_cd)) result |= 1 << 3;
-
-   return result;
+    return result;
 }
 
 int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
@@ -420,14 +396,16 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
       return vector_is_between(a, b, c, angle_ab);
    }
 
-   double f1, f2;
+   double temp_cross[3];
 
-   // compute cos between e and c_/d_ times length of e
-   f1 = e_ab[0] * c[0] + e_ab[1] * c[1] + e_ab[2] * c[2];
-   f2 = e_ab[0] * d[0] + e_ab[1] * d[1] + e_ab[2] * d[2];
+   // compute unit vector of ab plane
+   crossproduct(e_ab, e_cd, temp_cross);
+   n = sqrt(temp_cross[0] * temp_cross[0] +
+            temp_cross[1] * temp_cross[1] +
+            temp_cross[2] * temp_cross[2]);
 
    // if both great circles are nearly identically
-   if ((fabs(f1) < tol) && (fabs(f2) < tol)) {
+   if (n < tol) {
 
       double angle_ab = get_vector_angle(a, b);
       double angle_cd = get_vector_angle(c, d);
@@ -438,53 +416,26 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
              vector_is_between(a, b, d, angle_ab);
    }
 
-   double g[3];
+    n = 1.0 / n;
+    double p_[3];
+    p_[0] = temp_cross[0] * n;
+    p_[1] = temp_cross[1] * n;
+    p_[2] = temp_cross[2] * n;
 
-   // compute line intersection of both planes defined by the two great circles
-   if (fabs(f1) > fabs(f2)) {
+    double angle_ab = get_vector_angle(a, b);
+    double angle_cd = get_vector_angle(c, d);
 
-      n = - (f2 / f1);
+    if (vector_is_between(a, b, p_, angle_ab) &&
+        vector_is_between(c, d, p_, angle_cd))
+       return 1;
 
-      g[0] = n * c[0] + d[0];
-      g[1] = n * c[1] + d[1];
-      g[2] = n * c[2] + d[2];
+    double q_[3];
+    q_[0]=-p_[0];
+    q_[1]=-p_[1];
+    q_[2]=-p_[2];
 
-   } else {
-
-      n = - (f1 / f2);
-
-      g[0] = c[0] + n * d[0];
-      g[1] = c[1] + n * d[1];
-      g[2] = c[2] + n * d[2];
-   }
-
-   // normalise g
-   n = 1.0 / sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2]);
-
-   g[0]=g[0]*n;
-   g[1]=g[1]*n;
-   g[2]=g[2]*n;
-
-   // determine p and q
-   double p_[3], q_[3];
-
-   p_[0]= g[0];
-   p_[1]= g[1];
-   p_[2]= g[2];
-
-   double angle_ab = get_vector_angle(a, b);
-   double angle_cd = get_vector_angle(c, d);
-
-   if (vector_is_between(a, b, p_, angle_ab) &&
-       vector_is_between(c, d, p_, angle_cd))
-      return 1;
-
-   q_[0]=-p_[0];
-   q_[1]=-p_[1];
-   q_[2]=-p_[2];
-
-   return vector_is_between(a, b, q_, angle_ab) &&
-          vector_is_between(c, d, q_, angle_cd);
+    return vector_is_between(a, b, q_, angle_ab) &&
+           vector_is_between(c, d, q_, angle_cd);
 }
 
 /** \brief compute the intersection point two circles of latitude
