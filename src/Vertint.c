@@ -474,9 +474,9 @@ void *Vertint(void *argument)
   if ( cdoVerbose )
     {
       cdoPrint("Found:");
-      if ( tempID != -1 )    cdoPrint("  %s", var_stdname(air_temperature));
-      if ( psID   != -1 )    cdoPrint("  %s", var_stdname(surface_air_pressure));
-      if ( geopID != -1 )    cdoPrint("  %s", var_stdname(surface_geopotential));
+      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
+      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
+      if ( geopID    != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
       if ( gheightID != -1 ) cdoPrint("  %s", var_stdname(geopotential_height));
     }
 
