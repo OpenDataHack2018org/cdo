@@ -256,7 +256,7 @@ void *Derivepar(void *argument)
                       if ( cdoVerbose )
                         cdoPrint("lhavevct=TRUE  zaxisIDh = %d, nhlevf   = %d", zaxisIDh, nlevel);
  
-		      vct = malloc(nvct*sizeof(double));
+		      vct = (double*) malloc(nvct*sizeof(double));
 		      zaxisInqVct(zaxisID, vct);
 
 		      if ( cdoVerbose )
@@ -267,14 +267,14 @@ void *Derivepar(void *argument)
               else 
                 {
 		  if ( cdoVerbose )
-		    cdoPrint("nlevel /= (nvct/2 - 1): nlevel = %d", nlevel);
+		    cdoPrint("nlevel = (nvct/2 - 1): nlevel = %d", nlevel);
                 }
 	    }
 	}
     }
 
   if ( zaxisIDh == -1 )
-    cdoAbort("No data on hybrid model level found!");
+    cdoAbort("No 3D variable with hybrid sigma pressure coordinate found!");
 
   nvars = vlistNvars(vlistID1);
 
@@ -382,34 +382,32 @@ void *Derivepar(void *argument)
 
   if ( tempID == -1 ) cdoAbort("Air temperature not found!");
 
-  array  = malloc(ngp*sizeof(double));
+  array  = (double*) malloc(ngp*sizeof(double));
+  geop   = (double*) malloc(ngp*sizeof(double));
+  ps     = (double*) malloc(ngp*sizeof(double));
+  temp   = (double*) malloc(ngp*nhlevf*sizeof(double));
 
-  geop   = malloc(ngp*sizeof(double));
-  ps     = malloc(ngp*sizeof(double));
+  // lwater = (double*) malloc(ngp*nhlevf*sizeof(double));
+  // iwater = (double*) malloc(ngp*nhlevf*sizeof(double));
 
-  temp   = malloc(ngp*nhlevf*sizeof(double));
-
-  // lwater = malloc(ngp*nhlevf*sizeof(double));
-  // iwater = malloc(ngp*nhlevf*sizeof(double));
-
-  half_press   = malloc(ngp*(nhlevf+1)*sizeof(double));
+  half_press = (double*) malloc(ngp*(nhlevf+1)*sizeof(double));
 
   if ( operatorID == GEOPOTHEIGHT )
     {
       if ( humID == -1 )
 	cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
       else
-	hum    = malloc(ngp*nhlevf*sizeof(double));
+	hum    = (double*) malloc(ngp*nhlevf*sizeof(double));
 
-      geopotheight = malloc(ngp*(nhlevf+1)*sizeof(double));
+      geopotheight = (double*) malloc(ngp*(nhlevf+1)*sizeof(double));
     }
   
   if ( operatorID == SEALEVELPRESSURE )
     {
-      full_press   = malloc(ngp*nhlevf*sizeof(double));
+      full_press   = (double*) malloc(ngp*nhlevf*sizeof(double));
 
       surfaceID = zaxisFromName("surface");
-      sealevelpressure = malloc(ngp*sizeof(double));
+      sealevelpressure = (double*) malloc(ngp*sizeof(double));
     }
 
   if ( zaxisIDh != -1 && geopID == -1 )

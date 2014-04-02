@@ -61,7 +61,7 @@ void *Vertint(void *argument)
   int geopID = -1, tempID = -1, psID = -1, lnpsID = -1, gheightID = -1;
   int code, param;
   int pnum, pcat, pdis;
-  int sortlevels = TRUE;
+  //int sortlevels = TRUE;
   int **varnmiss = NULL, *pnmiss = NULL;
   int *varinterp = NULL;
   char paramstr[32];
@@ -114,7 +114,7 @@ void *Vertint(void *argument)
 	    }
 	}
     }
-  else
+  else if ( operatorID == ML2PLX || operatorID == ML2HLX || operatorID == ML2PLX_LP || operatorID == ML2HLX_LP )
     {
       Extrapolate = 1;
     }
@@ -175,7 +175,7 @@ void *Vertint(void *argument)
 	{
 	  double *level;
 	  int l;
-	  level = malloc(nlevel*sizeof(double));
+	  level = (double*) malloc(nlevel*sizeof(double));
 	  zaxisInqLevels(zaxisID, level);
 	  for ( l = 0; l < nlevel; l++ )
 	    {
@@ -199,7 +199,7 @@ void *Vertint(void *argument)
 		  nhlevf   = nhlev;
 		  nhlevh   = nhlevf + 1;
 	      
-		  vct = malloc(nvct*sizeof(double));
+		  vct = (double*) malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
@@ -220,7 +220,7 @@ void *Vertint(void *argument)
 		  nhlevf   = nhlev - 1;
 		  nhlevh   = nhlev;
 	      
-		  vct = malloc(nvct*sizeof(double));
+		  vct = (double*) malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, vct);
 
 		  vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
@@ -238,7 +238,7 @@ void *Vertint(void *argument)
 		  int vctsize;
 		  int voff = 4;
 		  
-		  rvct = malloc(nvct*sizeof(double));
+		  rvct = (double*) malloc(nvct*sizeof(double));
 		  zaxisInqVct(zaxisID, rvct);
 
 		  if ( (int)(rvct[0]+0.5) == 100000 && rvct[voff] < rvct[voff+1] )
@@ -250,7 +250,7 @@ void *Vertint(void *argument)
 		      nhlevh   = nhlev + 1;
 
 		      vctsize = 2*nhlevh;
-		      vct = malloc(vctsize*sizeof(double));
+		      vct = (double*) malloc(vctsize*sizeof(double));
 
 		      vlistChangeZaxisIndex(vlistID2, i, zaxisIDp);
 
@@ -288,16 +288,16 @@ void *Vertint(void *argument)
 
   nvars = vlistNvars(vlistID1);
 
-  vars      = malloc(nvars*sizeof(int));
-  vardata1  = malloc(nvars*sizeof(double*));
-  vardata2  = malloc(nvars*sizeof(double*));
-  varnmiss  = malloc(nvars*sizeof(int*));
-  varinterp = malloc(nvars*sizeof(int));
+  vars      = (int*) malloc(nvars*sizeof(int));
+  vardata1  = (double**) malloc(nvars*sizeof(double*));
+  vardata2  = (double**) malloc(nvars*sizeof(double*));
+  varnmiss  = (int**) malloc(nvars*sizeof(int*));
+  varinterp = (int*) malloc(nvars*sizeof(int));
 
   maxlev   = nhlevh > nplev ? nhlevh : nplev;
 
   if ( Extrapolate == 0 )
-    pnmiss   = malloc(nplev*sizeof(int));
+    pnmiss = (int*) malloc(nplev*sizeof(int));
 
   // check levels
   if ( zaxisIDh != -1 )
@@ -311,7 +311,7 @@ void *Vertint(void *argument)
 	{
 	  if ( (ilev+1) != (int)levels[ilev] )
 	    {
-	      sortlevels = FALSE;
+	      //sortlevels = FALSE;
 	      break;
 	    }
 	}
@@ -319,17 +319,17 @@ void *Vertint(void *argument)
 
   if ( zaxisIDh != -1 && ngp > 0 )
     {
-      vert_index = malloc(ngp*nplev*sizeof(int));
-      ps_prog    = malloc(ngp*sizeof(double));
-      full_press = malloc(ngp*nhlevf*sizeof(double));
-      half_press = malloc(ngp*nhlevh*sizeof(double));
+      vert_index = (int*) malloc(ngp*nplev*sizeof(int));
+      ps_prog    = (double*) malloc(ngp*sizeof(double));
+      full_press = (double*) malloc(ngp*nhlevf*sizeof(double));
+      half_press = (double*) malloc(ngp*nhlevh*sizeof(double));
     }
   else
-    cdoWarning("No data on hybrid sigma pressure levels found!");
+    cdoWarning("No 3D variable with hybrid sigma pressure coordinate found!");
 
   if ( operfunc == func_hl )
     {
-      phlev = malloc(nplev*sizeof(double));
+      phlev = (double*) malloc(nplev*sizeof(double));
       h2p(phlev, plev, nplev);
 
       if ( cdoVerbose )
@@ -447,17 +447,17 @@ void *Vertint(void *argument)
 	cdoAbort("Spectral data unsupported!");
 
       if ( varID == gheightID )
-	vardata1[varID] = malloc(gridsize*(nlevel+1)*sizeof(double));
+	vardata1[varID] = (double*) malloc(gridsize*(nlevel+1)*sizeof(double));
       else
-	vardata1[varID] = malloc(gridsize*nlevel*sizeof(double));
+	vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
 
       /* if ( zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && nlevel == nhlev ) */
       if ( zaxisID == zaxisIDh ||
 	   (zaxisInqType(zaxisID) == ZAXIS_HYBRID && zaxisIDh != -1 && (nlevel == nhlevh || nlevel == nhlevf)) )
 	{
 	  varinterp[varID] = TRUE;
-	  vardata2[varID]  = malloc(gridsize*nplev*sizeof(double));
-	  varnmiss[varID]  = malloc(maxlev*sizeof(int));
+	  vardata2[varID]  = (double*) malloc(gridsize*nplev*sizeof(double));
+	  varnmiss[varID]  = (int*) malloc(maxlev*sizeof(int));
 	  memset(varnmiss[varID], 0, maxlev*sizeof(int));
 	}
       else
@@ -467,7 +467,7 @@ void *Vertint(void *argument)
 		       varID+1, paramstr, nlevel);
 	  varinterp[varID] = FALSE;
 	  vardata2[varID]  = vardata1[varID];
-	  varnmiss[varID]  = malloc(nlevel*sizeof(int));
+	  varnmiss[varID]  = (int*) malloc(nlevel*sizeof(int));
 	}
     }
 
@@ -484,7 +484,7 @@ void *Vertint(void *argument)
 
   if ( zaxisIDh != -1 && geop_needed )
     {
-      geop = malloc(ngp*sizeof(double));
+      geop = (double*) malloc(ngp*sizeof(double));
       if ( geopID == -1 )
 	{
 	  cdoWarning("%s not found - using zero %s!", var_stdname(surface_geopotential), var_stdname(surface_geopotential));
