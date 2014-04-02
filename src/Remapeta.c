@@ -482,6 +482,15 @@ void *Remapeta(void *argument)
 	}
     }
 
+  if ( cdoVerbose )
+    {
+      cdoPrint("Found:");
+      if ( tempID  != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
+      if ( psID    != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
+      if ( geopID  != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
+      if ( sqID    != -1 ) cdoPrint("  %s", var_stdname(specific_humidity));
+    }
+
   if ( tempID != -1 && sqID != -1 )
     {
       ltq = TRUE;
@@ -689,7 +698,7 @@ void *Remapeta(void *argument)
       if ( cptop > 0 )
 	nctop = ncctop(cptop, (long) nhlevf2, (long) nhlevf2+1, a2, b2);
 
-      if ( geopID != -1 )
+      if ( zaxisIDh != -1 && geopID != -1 )
 	{
 	  varID   = geopID;
 	  levelID = 0;
@@ -698,10 +707,10 @@ void *Remapeta(void *argument)
 	  streamWriteRecord(streamID2, fis2, nmissout);
 	}
 
-      if ( lnpsID != -1 )
+      if ( zaxisIDh != -1 && lnpsID != -1 )
 	for ( i = 0; i < ngp; ++i ) ps2[i] = log(ps2[i]);
 
-      if ( presID != -1 )
+      if ( zaxisIDh != -1 && presID != -1 )
 	{
 	  varID   = presID;
 	  levelID = 0;
