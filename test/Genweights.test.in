@@ -1,5 +1,5 @@
 #! @SHELL@
-echo 1..20 # Number of tests to be executed.
+echo 1..26 # Number of tests to be executed.
 #
 test -n "$CDO"      || CDO=cdo
 test -n "$DATAPATH" || DATAPATH=./data
@@ -18,8 +18,8 @@ for GRIDTYPE in "regular" "curvilinear" "unstructured"; do
   if [ "$GRIDTYPE" != "regular" ]; then SETGRID="-setgridtype,$GRIDTYPE"; fi
   for GRID in $GRIDS; do
 # remaplaf: sort could give different results"
-    RMODS="bil bic nn con"
-    if [ "$GRIDTYPE" = "unstructured" ]; then RMODS="nn con"; fi
+    RMODS="bil bic nn con ycon"
+    if [ "$GRIDTYPE" = "unstructured" ]; then RMODS="nn con ycon"; fi
     for RMOD in $RMODS; do
       RSTAT=0
       OFILE=${GRID}_${RMOD}
