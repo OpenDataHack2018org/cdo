@@ -28,7 +28,7 @@ case "${HOSTNAME}" in
                     --with-udunits2=$HOME/local/udunits-2.1.24 \
                     --with-proj=/opt/local \
                     --with-curl=/opt/local \
-	            CC=icc CFLAGS="-g -Wall -O3 -march=native -openmp -fp-model precise" \
+	            CC=icc CFLAGS="-g -Wall -O3 -vec-report -march=native -openmp -fp-model precise" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
 	;;
 # i386-apple-darwin10

@@ -206,6 +206,7 @@ void print_remap_info(int operfunc, remapgrid_t *src_grid, remapgrid_t *tgt_grid
 
 
 double remap_threshhold = 2;
+//double remap_search_radius = acos(0.01);
 int remap_test = 0;
 int remap_order = 1;
 int remap_non_global = FALSE;
@@ -314,6 +315,25 @@ void get_remap_env(void)
     }
 
   remap_set_threshhold(remap_threshhold);
+  /*
+  envstr = getenv("CDO_REMAP_SERACH_RADIUS");
+  if ( envstr )
+    {
+      double fval;
+      fval = atof(envstr);
+      if ( fval < 0 || fval > M_PI )
+	{
+	  cdoAbort("CDO_REMAP_SERACH_RADIUS=%g out of bounds (0-%g)", fval, M_PI);
+	}
+      else
+	{
+	  remap_search_radius = fval;
+	  if ( cdoVerbose )
+	    cdoPrint("Set CDO_REMAP_SEARCH_RADIUS to %g", remap_search_radius);
+	}
+    }
+  cdoPrint("Set CDO_REMAP_SEARCH_RADIUS to %g", remap_search_radius);
+  */
 
   envstr = getenv("REMAP_AREA_MIN");
   if ( envstr )

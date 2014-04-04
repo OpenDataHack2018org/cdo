@@ -10,11 +10,11 @@
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 
 static
-void get_restrict_add(remapgrid_t *src_grid, double plat, const int *restrict src_bin_add, long *minadd, long *maxadd)
+void get_restrict_add(remapgrid_t *src_grid, double plat, const int *restrict src_bin_add, int *minadd, int *maxadd)
 {
-  long n, n2;
-  long min_add = 0, max_add = 0, nm1, np1;
-  long nbins;
+  int n, n2;
+  int min_add = 0, max_add = 0, nm1, np1;
+  int nbins;
   restr_t rlat;
   restr_t *bin_lats = src_grid->bin_lats;
 
@@ -49,6 +49,55 @@ void get_restrict_add(remapgrid_t *src_grid, double plat, const int *restrict sr
   */
 }
 
+static
+void nbr_store_distance(int nadd, double distance, int num_neighbors, int *restrict nbr_add, double *restrict nbr_dist)
+{
+  if ( num_neighbors == 1 )
+    {
+      if ( distance < nbr_dist[0] || (distance <= nbr_dist[0] && nadd < nbr_add[0]) )
+	{
+	  nbr_add[0]  = nadd;
+	  nbr_dist[0] = distance;
+	}
+    }
+  else
+    {
+      int n, nchk;
+      for ( nchk = 0; nchk < num_neighbors; ++nchk )
+	{
+	  if ( distance < nbr_dist[nchk] )
+	    {
+	      for ( n = num_neighbors-1; n > nchk; --n )
+		{
+		  nbr_add[n]  = nbr_add[n-1];
+		  nbr_dist[n] = nbr_dist[n-1];
+		}
+	      nbr_add[nchk]  = nadd;
+	      nbr_dist[nchk] = distance;
+	      break;
+	    }
+	}
+    }
+}
+
+static
+void nbr_check_distance(int num_neighbors, const int *restrict nbr_add, double *restrict nbr_dist)
+{
+  int nchk;
+  double distance;
+
+  /* Uwe Schulzweida: if distance is zero, set to small number */
+  for ( nchk = 0; nchk < num_neighbors; ++nchk )
+    {
+      if ( nbr_add[nchk] >= 0 )
+	{
+	  distance = nbr_dist[nchk];
+	  if ( IS_EQUAL(distance, 0.) ) distance = TINY;
+	  nbr_dist[nchk] = distance;
+	}
+    }
+}
+
 /*
    This routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
@@ -74,12 +123,12 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   */
   /*  Local variables */
   int lfound;
-  long n, nadd, nchk;
-  long nx, nxm, ny;
+  int n, nadd;
+  int nx, nxm, ny;
   long ii, jj;
-  long i, j, ix;
+  int i, j, ix;
   int src_add[25];
-  long num_add = 0;
+  int num_add = 0;
   double distance;   //  Angular distance
   /*
   double coslat_dst = cos(plat);  // cos(lat)  of the search point
@@ -139,9 +188,9 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 
   if ( lfound )
     {
-      long ix, iy;
+      int ix, iy;
 
-      for ( long na = 0; na < num_add; ++na )
+      for ( int na = 0; na < num_add; ++na )
 	{
 	  nadd = src_add[na];
 
@@ -161,30 +210,11 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 	  if ( distance < -1. ) distance = -1.;
 	  distance = acos(distance);
 
-	  /* Uwe Schulzweida: if distance is zero, set to small number */
-	  if ( IS_EQUAL(distance, 0.) ) distance = TINY;
-
 	  /* Store the address and distance if this is one of the smallest four so far */
-	  for ( nchk = 0; nchk < num_neighbors; ++nchk )
-	    {
-	      if ( distance < nbr_dist[nchk] )
-		{
-		  for ( n = num_neighbors-1; n > nchk; --n )
-		    {
-		      nbr_add[n]  = nbr_add[n-1];
-		      nbr_dist[n] = nbr_dist[n-1];
-		    }
-		  nbr_add[nchk]  = nadd;
-		  nbr_dist[nchk] = distance;
-		  break;
-		}
-	      else if ( num_neighbors == 1 && distance <= nbr_dist[0] && nadd < nbr_add[0] )
-		{
-		  nbr_add[0]  = nadd;
-		  nbr_dist[0] = distance;
-		}
-	    }
+	  nbr_store_distance(nadd, distance, num_neighbors, nbr_add, nbr_dist);
 	}
+
+      nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
     }
   else if ( src_grid->lextrapolate )
     {
@@ -217,8 +247,8 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
     double plon,         ! longitude of the search point
   */
   /*  Local variables */
-  long n, nadd, nchk;
-  long min_add, max_add;
+  int n, nadd;
+  int min_add, max_add;
   double distance;     /* Angular distance */
   /* result changed a little on a few points with high resolution grid
   double xcoslat_dst = cos(plat);  // cos(lat)  of the search point
@@ -245,29 +275,16 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
 	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
       /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
                                      otherwise the result of acos(distance) is NaN */
-      if ( distance >  1 ) distance =  1;
-      if ( distance < -1 ) distance = -1;
+      //if ( distance < 0.99  ) continue;
+      //if ( distance < 0. ) continue;
+      if ( distance < -1. ) distance = -1.;
+      if ( distance >  1. ) distance =  1.;
       distance = acos(distance);
 
-      /* Uwe Schulzweida: if distance is zero, set to small number */
-      if ( IS_EQUAL(distance, 0) ) distance = TINY;
-
-      /* Store the address and distance if this is one of the smallest four so far */
-      for ( nchk = 0; nchk < num_neighbors; ++nchk )
-	{
-          if ( distance < nbr_dist[nchk] )
-	    {
-	      for ( n = num_neighbors-1; n > nchk; --n )
-		{
-		  nbr_add[n]  = nbr_add[n-1];
-		  nbr_dist[n] = nbr_dist[n-1];
-		}
-	      nbr_add[nchk]  = nadd;
-	      nbr_dist[nchk] = distance;
-	      break;
-	    }
-        }
+      nbr_store_distance(nadd, distance, num_neighbors, nbr_add, nbr_dist);
     }
+
+  nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
 }  /*  grid_search_nbr  */
 
