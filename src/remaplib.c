@@ -199,7 +199,7 @@ void remapGridRealloc(int map_type, remapgrid_t *grid)
       grid->cell_center_lat = realloc(grid->cell_center_lat, grid->size*sizeof(double));
     }
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
       grid->cell_area = realloc(grid->cell_area, grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
@@ -833,13 +833,13 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   remapgrid_init(tgt_grid);
 
   if ( map_type == MAP_TYPE_BILINEAR || map_type == MAP_TYPE_BICUBIC ||
-       map_type == MAP_TYPE_DISTWGT  || map_type == MAP_TYPE_CONSPHERE )
+       map_type == MAP_TYPE_DISTWGT  || map_type == MAP_TYPE_CONSERV_YAC )
     {
       if ( IS_REG2D_GRID(gridID1) ) src_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // src_grid->remap_grid_type = 0;
     }
 
-  if ( map_type == MAP_TYPE_CONSPHERE && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
+  if ( map_type == MAP_TYPE_CONSERV_YAC && src_grid->remap_grid_type == REMAP_GRID_TYPE_REG2D )
     {
       if ( IS_REG2D_GRID(gridID2) ) tgt_grid->remap_grid_type = REMAP_GRID_TYPE_REG2D;
       // else src_grid->remap_grid_type = -1;
@@ -850,7 +850,7 @@ void remap_grids_init(int map_type, int lextrapolate, int gridID1, remapgrid_t *
   else
     src_grid->lextrapolate = FALSE;
 
-  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
+  if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
       if ( src_grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
 	{
@@ -981,7 +981,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
   if ( ompNumThreads > 1 )
     {
       if      ( map_type == MAP_TYPE_CONSERV   ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONSPHERE ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BILINEAR  ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BICUBIC   ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_DISTWGT   ) rv->sort_add = TRUE;
@@ -991,7 +991,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 #endif
     {
       if      ( map_type == MAP_TYPE_CONSERV   ) rv->sort_add = TRUE;
-      else if ( map_type == MAP_TYPE_CONSPHERE ) rv->sort_add = TRUE;
+      else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->sort_add = TRUE;
       else if ( map_type == MAP_TYPE_BILINEAR  ) rv->sort_add = FALSE;
       else if ( map_type == MAP_TYPE_BICUBIC   ) rv->sort_add = FALSE;
       else if ( map_type == MAP_TYPE_DISTWGT   ) rv->sort_add = FALSE;
@@ -999,7 +999,7 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
     }
 
   if      ( map_type == MAP_TYPE_CONSERV   ) rv->num_wts = 3;
-  else if ( map_type == MAP_TYPE_CONSPHERE ) rv->num_wts = 1;
+  else if ( map_type == MAP_TYPE_CONSERV_YAC ) rv->num_wts = 1;
   else if ( map_type == MAP_TYPE_BILINEAR  ) rv->num_wts = 1;
   else if ( map_type == MAP_TYPE_BICUBIC   ) rv->num_wts = 4;
   else if ( map_type == MAP_TYPE_DISTWGT   ) rv->num_wts = 1;

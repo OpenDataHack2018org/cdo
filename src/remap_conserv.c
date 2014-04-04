@@ -909,4 +909,4 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   if ( cdoTimer ) timer_stop(timer_remap_con);
 
-} /* remap_consphere */
+} /* remap_weights_conserv */

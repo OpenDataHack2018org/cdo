@@ -44,7 +44,7 @@
 
 
 enum {REMAPCON, REMAPCON2, REMAPBIL, REMAPBIC, REMAPDIS, REMAPNN, REMAPLAF, REMAPSUM,
-      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX, REMAPCONS, GENCONS};
+      GENCON, GENCON2, GENBIL, GENBIC, GENDIS, GENNN, GENLAF, REMAPXXX, REMAPYCON, GENYCON};
 
 enum {HEAP_SORT, MERGE_SORT};
 
@@ -53,9 +53,9 @@ void get_map_type(int operfunc, int *map_type, int *submap_type, int *num_neighb
 {
   switch ( operfunc )
     {
-    case REMAPCONS:
-    case GENCONS:
-      *map_type = MAP_TYPE_CONSPHERE;
+    case REMAPYCON:
+    case GENYCON:
+      *map_type = MAP_TYPE_CONSERV_YAC;
       *remap_order = 1;
       break;
     case REMAPCON:
@@ -127,10 +127,10 @@ int maptype2operfunc(int map_type, int submap_type, int num_neighbors, int remap
 	    }
 	}
     }
-  else if ( map_type == MAP_TYPE_CONSPHERE )
+  else if ( map_type == MAP_TYPE_CONSERV_YAC )
     {
-      operfunc = REMAPCONS;
-      // cdoPrint("Using remapcons");
+      operfunc = REMAPYCON;
+      // cdoPrint("Using remapycon");
     }
   else if ( map_type == MAP_TYPE_BILINEAR )
     {
@@ -176,7 +176,7 @@ void print_remap_info(int operfunc, remapgrid_t *src_grid, remapgrid_t *tgt_grid
   else if ( operfunc == REMAPCON  || operfunc == GENCON  )  strcpy(line, "SCRIP first order conservative");
   else if ( operfunc == REMAPCON2 || operfunc == GENCON2 )  strcpy(line, "SCRIP second order conservative");
   else if ( operfunc == REMAPLAF  || operfunc == GENLAF  )  strcpy(line, "SCRIP largest area fraction");
-  else if ( operfunc == REMAPCONS || operfunc == GENCONS )  strcpy(line, "First order conservative");
+  else if ( operfunc == REMAPYCON || operfunc == GENYCON )  strcpy(line, "YAC first order conservative");
   else                                                      strcpy(line, "Unknown");
 
   strcat(line, " remapping from ");
@@ -516,8 +516,8 @@ void *Remap(void *argument)
   cdoOperatorAdd("gennn",        GENNN,        1, NULL);
   cdoOperatorAdd("genlaf",       GENLAF,       1, NULL);
   cdoOperatorAdd("remap",        REMAPXXX,     0, NULL);
-  cdoOperatorAdd("remapcons",    REMAPCONS,    0, NULL);
-  cdoOperatorAdd("gencons",      GENCONS,      1, NULL);
+  cdoOperatorAdd("remapycon",    REMAPYCON,    0, NULL);
+  cdoOperatorAdd("genycon",      GENYCON,      1, NULL);
 
   operatorID   = cdoOperatorID();
   operfunc     = cdoOperatorF1(operatorID);
@@ -699,7 +699,7 @@ void *Remap(void *argument)
       get_map_type(operfunc, &map_type, &submap_type, &num_neighbors, &remap_order);
     }
 
-  if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONSPHERE )
+  if ( map_type == MAP_TYPE_CONSERV ||map_type == MAP_TYPE_CONSERV_YAC )
     {
       norm_opt = NORM_OPT_FRACAREA;
 
@@ -785,7 +785,7 @@ void *Remap(void *argument)
 		}
 	    }
 
-	  if ( map_type != MAP_TYPE_CONSERV && map_type != MAP_TYPE_CONSPHERE && 
+	  if ( map_type != MAP_TYPE_CONSERV && map_type != MAP_TYPE_CONSERV_YAC && 
 	       gridInqType(gridID1) == GRID_GME && gridInqType(gridID2) == GRID_GME )
 	    cdoAbort("Only conservative remapping is available to remap between GME grids!");
 	  /*
@@ -934,7 +934,7 @@ void *Remap(void *argument)
 
 	      memcpy(remaps[r].src_grid.mask, imask, remaps[r].src_grid.size*sizeof(int));
 
-	      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSPHERE )
+	      if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
 		{
 		  memset(remaps[r].src_grid.cell_area, 0, remaps[r].src_grid.size*sizeof(double));
 		  memset(remaps[r].src_grid.cell_frac, 0, remaps[r].src_grid.size*sizeof(double));
@@ -955,7 +955,7 @@ void *Remap(void *argument)
 		  else if ( map_type == MAP_TYPE_BILINEAR  ) scrip_remap_weights_bilinear(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 		  else if ( map_type == MAP_TYPE_BICUBIC   ) scrip_remap_weights_bicubic(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 		  else if ( map_type == MAP_TYPE_DISTWGT   ) scrip_remap_weights_distwgt(num_neighbors, &remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
-		  else if ( map_type == MAP_TYPE_CONSPHERE ) remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
+		  else if ( map_type == MAP_TYPE_CONSERV_YAC ) remap_weights_conserv(&remaps[r].src_grid, &remaps[r].tgt_grid, &remaps[r].vars);
 
 		  if ( remaps[r].vars.num_links != remaps[r].vars.max_links )
 		    resize_remap_vars(&remaps[r].vars, remaps[r].vars.num_links-remaps[r].vars.max_links);
@@ -1025,7 +1025,7 @@ void *Remap(void *argument)
 	  gridsize2 = gridInqSize(gridID2);
 
 	  /* used only to check the result of remapcon */
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPCONS )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
 	    {
 	      double grid2_err;
 
@@ -1086,7 +1086,7 @@ void *Remap(void *argument)
 	    }
 
 	  vlistInqVarName(vlistID1, varID, varname);
-	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPCONS )
+	  if ( operfunc == REMAPCON || operfunc == REMAPCON2 || operfunc == REMAPYCON )
 	    if ( strcmp(varname, "gridbox_area") == 0 )
 	      {
 		scale_gridbox_area(gridsize, array1, gridsize2, array2, remaps[r].tgt_grid.cell_area);

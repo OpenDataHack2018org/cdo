@@ -57,19 +57,19 @@ typedef RESTR_TYPE restr_t;
 
 #define  TINY_FRAC     1.e-10
 
-#define  NORM_OPT_NONE      1
-#define  NORM_OPT_DESTAREA  2
-#define  NORM_OPT_FRACAREA  3
+#define  NORM_OPT_NONE        1
+#define  NORM_OPT_DESTAREA    2
+#define  NORM_OPT_FRACAREA    3
 
-#define  MAP_TYPE_CONSERV   1
-#define  MAP_TYPE_BILINEAR  2
-#define  MAP_TYPE_BICUBIC   3
-#define  MAP_TYPE_DISTWGT   4
-#define  MAP_TYPE_CONSPHERE 5
+#define  MAP_TYPE_CONSERV     1
+#define  MAP_TYPE_BILINEAR    2
+#define  MAP_TYPE_BICUBIC     3
+#define  MAP_TYPE_DISTWGT     4
+#define  MAP_TYPE_CONSERV_YAC 5
 
-#define  SUBMAP_TYPE_NONE   0
-#define  SUBMAP_TYPE_LAF    1
-#define  SUBMAP_TYPE_SUM    2
+#define  SUBMAP_TYPE_NONE     0
+#define  SUBMAP_TYPE_LAF      1
+#define  SUBMAP_TYPE_SUM      2
 
 
 typedef struct {

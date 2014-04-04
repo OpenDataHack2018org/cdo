@@ -121,7 +121,7 @@ void write_remap_scrip(const char *interp_file, int map_type, int submap_type, i
 	  strcpy(map_method, "Conservative remapping");
 	  break;
 	}
-    case MAP_TYPE_CONSPHERE:
+    case MAP_TYPE_CONSERV_YAC:
       lgridarea = TRUE;
       /*
       if ( submap_type == SUBMAP_TYPE_LAF )
@@ -504,7 +504,7 @@ void read_remap_scrip(const char *interp_file, int gridID1, int gridID2, int *ma
     {
       int iatt;
       if ( strcompare(map_method, "Conservative remapping using clipping on sphere") == 0 )
-	rv->map_type = MAP_TYPE_CONSPHERE;
+	rv->map_type = MAP_TYPE_CONSERV_YAC;
       else
 	rv->map_type = MAP_TYPE_CONSERV;
 
