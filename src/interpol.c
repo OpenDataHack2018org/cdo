@@ -1146,7 +1146,7 @@ void interpolate(field_t *field1, field_t *field2)
   for (ilat = 0; ilat < nxlat; ilat++)
     xin[ilat] = xin_array + ilat * nxlon;
 
-  xlon = malloc(nxlon * sizeof (double));
+  xlon = (double *) malloc(nxlon * sizeof(double));
   for ( ilon = 0; ilon < nlon; ilon++ )
     {
       xlon[2*ilon + 1] = lon[ilon];
@@ -1154,7 +1154,7 @@ void interpolate(field_t *field1, field_t *field2)
     }
   xlon[2 * nlon] = (lon[nlon - 1] + lon[nlon]) / 2;
 
-  xlat = malloc((2 * nlat + 1) * sizeof (double));
+  xlat = (double*) malloc((2 * nlat + 1) * sizeof(double));
   for ( ilat = 0; ilat < nlat; ilat++ )
     {
       xlat[2*ilat + 1] = lat[ilat];
@@ -1162,7 +1162,7 @@ void interpolate(field_t *field1, field_t *field2)
     }
   xlat[2 * nlat] = (lat[nlat - 1] + lat[nlat]) / 2;
 
-  in0 = malloc(nlat * sizeof (double *));
+  in0 = (double**) malloc(nlat * sizeof(double*));
   for (ilat = 0; ilat < nlat; ilat++)
     in0[ilat] = arrayIn + ilat * nlon;
 
@@ -1237,7 +1237,7 @@ void interpolate(field_t *field1, field_t *field2)
       ilat2[olat] = l2;
     }
 
-  xout = malloc(out_nlat * sizeof (double *));
+  xout = (double**) malloc(out_nlat * sizeof(double*));
   for (olat = 0; olat < out_nlat; olat++)
     xout[olat] = arrayOut + olat * out_nlon;
 

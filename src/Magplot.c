@@ -931,7 +931,7 @@ void VerifyPlotParameters( int num_param, char **param_names, int opID )
 			  if( syntax == TRUE )
 			    {
 	                       NUM_LEVELS = split_str_count;
-	                       LEV_LIST = malloc( sizeof( double ) * split_str_count );
+	                       LEV_LIST = (double*) malloc( sizeof( double ) * split_str_count );
 			       for( k = 0; k < split_str_count; k++ )
 		                 {
 		                    LEV_LIST[k] = atof( split_str1[k] );
@@ -1096,8 +1096,8 @@ int ReadColourTable ( char *filepath )
       }
     
     USR_COLOUR_COUNT = 0;
-    USR_COLOUR_TABLE = ( char * *) malloc( num_colors * sizeof( char * ));
-    temp_table  = ( char * *) malloc( num_colors * sizeof( char * ));
+    USR_COLOUR_TABLE = ( char **) malloc( num_colors * sizeof( char* ));
+    temp_table  = ( char **) malloc( num_colors * sizeof( char* ));
     
     for( i =0; i < num_colors; i++ )
       {

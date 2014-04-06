@@ -274,7 +274,7 @@ void dumpmap()
 
       if ( indx.hinum > 0 )
 	{
-	  indx.hipnt = malloc(sizeof(int)*indx.hinum);
+	  indx.hipnt = (int*) malloc(sizeof(int)*indx.hinum);
 	  for ( i = 0; i < indx.hinum; i++ )
 	    {
 	      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
@@ -283,12 +283,12 @@ void dumpmap()
 	}
       if ( indx.hfnum > 0 )
 	{
-	  indx.hfpnt = malloc(sizeof(float)*indx.hfnum);
+	  indx.hfpnt = (float*) malloc(sizeof(float)*indx.hfnum);
 	  nbytes = fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
 	}
       if ( indx.intnum > 0 )
 	{
-	  indx.intpnt = malloc(sizeof(int)*indx.intnum);
+	  indx.intpnt = (int*) malloc(sizeof(int)*indx.intnum);
 	  for ( i = 0; i < indx.intnum; i++ )
 	    {
 	      nbytes = fread(mrec, sizeof(unsigned char), 4, mapfp);
@@ -298,7 +298,7 @@ void dumpmap()
 	}
       if ( indx.fltnum > 0 )
 	{
-	  indx.fltpnt = malloc(sizeof(float)*indx.fltnum);
+	  indx.fltpnt = (float*) malloc(sizeof(float)*indx.fltnum);
 	  for ( i = 0; i < indx.fltnum; i++ )
 	    {
 	      nbytes = fread(urec, sizeof(unsigned char), 4, mapfp);
@@ -317,26 +317,26 @@ void dumpmap()
       
       if ( indx.hinum > 0 )
 	{
-	  indx.hipnt = malloc(sizeof(int)*indx.hinum);
+	  indx.hipnt = (int*) malloc(sizeof(int)*indx.hinum);
 	  nbytes = fread (indx.hipnt, sizeof(int), indx.hinum, mapfp);
 	  if ( swpflg ) gabswp((float *)(indx.hipnt),indx.hinum);
 	}
       if ( indx.hfnum > 0 )
 	{
-	  indx.hfpnt = malloc(sizeof(float)*indx.hfnum);
+	  indx.hfpnt = (float*) malloc(sizeof(float)*indx.hfnum);
 	  nbytes = fread (indx.hfpnt,sizeof(float),indx.hfnum,mapfp);
 	  if ( swpflg ) gabswp(indx.hfpnt,indx.hfnum);
 	}
 
       if ( indx.intnum > 0 )
 	{
-	  indx.intpnt = malloc(sizeof(int)*indx.intnum);
+	  indx.intpnt = (int*) malloc(sizeof(int)*indx.intnum);
 	  nbytes = fread (indx.intpnt,sizeof(int),indx.intnum,mapfp);
 	  if ( swpflg ) gabswp((float *)(indx.intpnt),indx.intnum);
 	}
       if ( indx.fltnum > 0 )
 	{
-	  indx.fltpnt = malloc(sizeof(float)*indx.fltnum);
+	  indx.fltpnt = (float*) malloc(sizeof(float)*indx.fltnum);
 	  nbytes = fread (indx.fltpnt,sizeof(float),indx.fltnum,mapfp);
 	  if ( swpflg ) gabswp(indx.fltpnt,indx.fltnum);
 	}
@@ -346,7 +346,7 @@ void dumpmap()
 	  indxb.bignum = indx.hipnt[4];
 	  if ( indxb.bignum > 0 )
 	    {
-	      indxb.bigpnt = malloc(sizeof(off_t)*indxb.bignum);
+	      indxb.bigpnt = (off_t*) malloc(sizeof(off_t)*indxb.bignum);
 	      nbytes = fread (indxb.bigpnt,sizeof(off_t),indxb.bignum,mapfp);
 	      if ( swpflg ) gabswp(indxb.bigpnt,indxb.bignum);
 	    }
@@ -848,7 +848,7 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
       nb += 7;      /* base time (+ sec)  for compatibility with earlier version 2 maps */
       nb += 8*4;    /* grvals for time <-> grid conversion */
       
-      map = malloc(nb);
+      map = (unsigned char*) malloc(nb);
       
       bcnt = 0;
       Put1Byte(map, bcnt, 0);

@@ -127,17 +127,17 @@ void *Ensval(void *argument)
   taxisID2 = (int*) malloc( nostreams*sizeof(int));
   zaxisID2 = (int*) malloc( nostreams*sizeof(int));
 
-  val = calloc( nfiles,sizeof(double) );
+  val = (double*) calloc( nfiles,sizeof(double));
   
   if ( operfunc == CRPS ) {
-    alpha=calloc( nens+1,sizeof(double) );
-    beta =calloc( nens+1,sizeof(double) );
-    alpha_weights=calloc( nens+1,sizeof(double) );
-    beta_weights =calloc( nens+1,sizeof(double) );
+    alpha= (double*) calloc( nens+1,sizeof(double));
+    beta = (double*) calloc( nens+1,sizeof(double));
+    alpha_weights= (double*) calloc( nens+1,sizeof(double));
+    beta_weights = (double*) calloc( nens+1,sizeof(double));
   }
   else if ( operfunc == BRS ) {
-    brs_g = calloc( nens+1,sizeof(double) );
-    brs_o = calloc( nens+1,sizeof(double) );
+    brs_g = (double*) calloc( nens+1,sizeof(double));
+    brs_o = (double*) calloc( nens+1,sizeof(double));
   }
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
@@ -270,7 +270,7 @@ void *Ensval(void *argument)
 		  missval  = vlistInqVarMissval(vlistID1, varID);
 		  gridsize = gridInqSize(vlistInqVarGrid(vlistID1, varID));//vlistGridsizeMax(vlistID1);
 		  if ( weights ) free(weights); 
-		  weights=malloc (gridsize*sizeof(double));
+		  weights= (double*) malloc(gridsize*sizeof(double));
 		}
 
 	      if (ef[fileID].array ) free(ef[fileID].array);

@@ -55,7 +55,7 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   /* determine current path */
 
   size = pathconf(".", _PC_PATH_MAX);
-  if ( (dir = malloc((size_t)size)) != NULL )
+  if ( (dir = (char*) malloc((size_t)size)) != NULL )
     {
       ptr = getcwd(dir, (size_t)size);
     }

@@ -693,7 +693,7 @@ int getMemAlignment(void)
 
   for ( i = 0; i < NTESTS; ++i )
     {
-      ptr[i] = malloc(tsize[i]);
+      ptr[i] = (double*) malloc(tsize[i]);
       iptr = (int64_t) ptr[i];
       for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
     }
@@ -701,7 +701,7 @@ int getMemAlignment(void)
 
   for ( i = NTESTS-1; i >= 0; i-- )
     {
-      ptr[i] = malloc(tsize[i]+5);
+      ptr[i] = (double*)malloc(tsize[i]+5);
       iptr = (int64_t) ptr[i];
       for ( k = 0; k < 4; ++k ) if ( iptr%ma_check[k] ) ma_result[k] = 0; 
     }
@@ -824,7 +824,7 @@ void get_env_vars(void)
       if ( len > 0 )
 	{
 	  len += 2;
-	  cdoGridSearchDir = malloc(len);
+	  cdoGridSearchDir = (char*) malloc(len);
 	  memcpy(cdoGridSearchDir, envstr, len-1);
 	  if ( cdoGridSearchDir[len-3] != '/' )
 	    {

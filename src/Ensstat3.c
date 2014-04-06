@@ -163,7 +163,7 @@ void *Ensstat3(void *argument)
   nvars = vlistNvars(vlistID1);
   varID2 = (int*) malloc(nvars*sizeof(int));
 
-  levs = calloc(nfiles, sizeof(double) );
+  levs = (double*) calloc(nfiles, sizeof(double));
   zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
   for ( i=0; i<nfiles; i++ )
     levs[i] = i;
@@ -223,25 +223,25 @@ void *Ensstat3(void *argument)
     { /*need to memorize data for entire grid before writing          */
       array2 = (int**) malloc((nfiles+1)*sizeof(int*));
       for ( binID=0; binID<nfiles; binID++ ) 
-	array2[binID] = calloc( gridsize, sizeof(int) );
+	array2[binID] = (int*) calloc( gridsize, sizeof(int));
     }
   else if ( operfunc == func_rank )
     {  /* can process data separately for each timestep and only need */
        /* to cumulate values over the grid                            */
       array2    = (int **) malloc( (nfiles+1)*sizeof(int *));
       for ( binID=0; binID<nfiles; binID++ )
-	array2[binID] = calloc( 1, sizeof(int) );
+	array2[binID] = (int*) calloc( 1, sizeof(int));
     }
 
   if ( operfunc == func_roc ) {
     ctg_tab = (int**) malloc((nbins+1)*sizeof(int*));
-    hist =    malloc ( nbins*sizeof(int) );
+    hist =    (int*) malloc ( nbins*sizeof(int));
     uThresh = (double*) malloc( nbins*sizeof(double));
     lThresh = (double*) malloc( nbins*sizeof(double));
     roc     = (double**) malloc((nbins+1)*sizeof(double*));
     
     for  ( i=0; i<nbins; i++ ) {
-      ctg_tab[i] = calloc( 4,sizeof(int) );
+      ctg_tab[i] = (int*) calloc( 4,sizeof(int));
       roc[i]     = (double*) calloc( 2,sizeof(double));
       uThresh[i] = ((double)i+1)/nbins;
       lThresh[i] = (double)i/nbins;

@@ -366,7 +366,7 @@ void *Importbinary(void *argument)
 
   //recsize = pfi.gsiz*4;
   recsize = pfi.gsiz*8;
-  rec = malloc(recsize);
+  rec = (char*) malloc(recsize);
 
   array = (double*) malloc(gridsize*sizeof(double));
 

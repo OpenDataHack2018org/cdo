@@ -284,7 +284,7 @@ void *kvlParseFile(const char *filename)
   filesize = (size_t) ftell(fp);
   fseek(fp, 0L, SEEK_SET);
 
-  buffer = malloc(filesize);
+  buffer = (char*) malloc(filesize);
   nitems = fread(buffer, 1, filesize, fp);
 
   fclose(fp);

@@ -334,8 +334,8 @@ void *Maskbox(void *argument)
     }
   if ( operatorID == MASKREGION )
     {
-      xcoords = malloc( MAX_VALS*sizeof(double) );
-      ycoords = malloc( MAX_VALS*sizeof(double) );
+      xcoords = (double*) malloc( MAX_VALS*sizeof(double));
+      ycoords = (double*) malloc( MAX_VALS*sizeof(double));
       nfiles = operatorArgc();
      
       for ( i2 = 0; i2 < nfiles; i2++ )

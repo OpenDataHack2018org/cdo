@@ -154,8 +154,8 @@ void *Isosurface(void *argument)
 
   nvars = vlistNvars(vlistID1);
 
-  liso  =     malloc(nvars*sizeof(int));
-  vars  =     malloc(nvars*sizeof(int));
+  liso  = (int*)     malloc(nvars*sizeof(int));
+  vars  = (int*)     malloc(nvars*sizeof(int));
   vars1 = (field_t*) malloc(nvars*sizeof(field_t));
 
   for ( varID = 0; varID < nvars; varID++ )

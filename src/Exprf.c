@@ -83,7 +83,7 @@ void *Expr(void *argument)
       size_t slen;
 
       slen = strlen(operatorArgv()[0]);
-      exprs = malloc(slen+2);
+      exprs = (char*) malloc(slen+2);
       strcpy(exprs, operatorArgv()[0]);
       if ( exprs[slen-1] != ';' )
 	{
@@ -106,7 +106,7 @@ void *Expr(void *argument)
       if ( stat(exprf, &filestat) != 0 ) cdoAbort("Stat failed on %s", exprf);
 
       fsize = (size_t) filestat.st_size;
-      exprs = malloc(fsize+1);
+      exprs = (char*) malloc(fsize+1);
 
       while ( (ichar = fgetc(fp)) != EOF ) exprs[ipos++] = ichar;
 

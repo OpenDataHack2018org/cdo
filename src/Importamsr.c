@@ -121,7 +121,7 @@ void read_amsr(FILE *fp, int vlistID, int nvars, double *data[], int *nmiss)
   for ( varID = 0; varID < nvars; ++varID )
     {
       gridsize = gridInqSize(vlistInqVarGrid(vlistID, varID));
-      amsr_data = realloc(amsr_data, gridsize);
+      amsr_data = (unsigned char *) realloc(amsr_data, gridsize);
       size = fread(amsr_data, 1, gridsize, fp);
       if ( (int)size != gridsize ) cdoAbort("Read error!");
 

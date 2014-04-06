@@ -406,7 +406,7 @@ char *getOperatorArg(const char *xoperator)
 	  len = strlen(commapos+1);
 	  if ( len )
 	    {
-	      operatorArg = malloc(len+1);
+	      operatorArg = (char*) malloc(len+1);
 	      strcpy(operatorArg, commapos+1);
 	    }
 	}
@@ -509,7 +509,7 @@ void setStreamNames(int argc, char *argv[])
 	  globArgc = getGlobArgc(argc, argv, globArgc);
 	  len = 0;
 	  for ( i = globArgcStart; i < globArgc; i++ ) len += strlen(argv[i]) + 1;
-	  streamname = calloc(1, len);
+	  streamname = (char*) calloc(1, len);
 	  for ( i = globArgcStart; i < globArgc; i++ )
 	    {
 	      strcat(streamname, argv[i]);
@@ -529,7 +529,7 @@ void setStreamNames(int argc, char *argv[])
       else
 	{
 	  len = strlen(argv[globArgc]) + 1;
-	  streamname = malloc(len);
+	  streamname = (char*) malloc(len);
 	  strcpy(streamname, argv[globArgc]);
 	  Process[processID].streamNames[Process[processID].streamCnt].args = streamname;
 	  ac = 1;
@@ -878,7 +878,7 @@ void operatorInputArg(const char *enter)
 		  while ( pline[len] != ' '  && pline[len] != ',' &&
 			  pline[len] != '\\' && len < linelen ) len++;
 
-		  Process[processID].oargv[oargc] = malloc(len+1);
+		  Process[processID].oargv[oargc] = (char*) malloc(len+1);
 		  memcpy(Process[processID].oargv[oargc], pline, len);
 		  Process[processID].oargv[oargc][len] = '\0';
 		  oargc++;

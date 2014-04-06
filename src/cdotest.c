@@ -204,7 +204,7 @@ static
 int submitCdoCommand(const char *argument)
 {  
   const char *cdoPath = getCdoPath();
-  char *cdoCommand = malloc(strlen(cdoPath) + strlen(argument) + 8);
+  char *cdoCommand = (char*) malloc(strlen(cdoPath) + strlen(argument) + 8);
   
   int status;
   

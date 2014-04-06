@@ -64,7 +64,7 @@ void cdoInqHistory(int fileID)
   if ( ghistorysize > 0 )
     {
       size_t len;
-      ghistory = malloc(ghistorysize+1);
+      ghistory = (char*) malloc(ghistorysize+1);
       ghistory[ghistorysize] = 0;
       streamInqHistoryString(fileID, ghistory);
       len = strlen(ghistory);
@@ -95,7 +95,7 @@ void cdoDefHistory(int fileID, char* histstring)
 
   if ( historysize )
     {
-      history = malloc(historysize);
+      history = (char*) malloc(historysize);
       history[0] = 0;
     }
 

@@ -325,7 +325,7 @@ int pstreamOpenRead(const argument_t *argument)
       char *operatorArg;
       char *operatorName;
       char *newarg;
-      char *pipename = malloc(16);
+      char *pipename = (char*) malloc(16);
       int rval;
       pthread_t thrID;
       pthread_attr_t attr;
@@ -343,7 +343,7 @@ int pstreamOpenRead(const argument_t *argument)
       operatorName = getOperatorName(operatorArg);
 
       len = strlen(argument->args);
-      newarg = malloc(len+16);
+      newarg = (char*) malloc(len+16);
       strcpy(newarg, argument->args);
       sprintf(pipename, "(pipe%d.%d)", processSelf() + 1, processInqChildNum() + 1);
       newarg[len] = ' ';
@@ -523,14 +523,14 @@ int pstreamOpenRead(const argument_t *argument)
       if ( pstreamptr->mfiles )
 	{
 	  len = strlen(pstreamptr->mfnames[0]);
-	  filename = malloc(len+1);
+	  filename = (char*) malloc(len+1);
 	  strcpy(filename, pstreamptr->mfnames[0]);
 	  pstreamptr->nfiles = 1;
 	}
       else
 	{
 	  len = strlen(argument->args);
-	  filename = malloc(len+1);
+	  filename = (char*) malloc(len+1);
 	  strcpy(filename, argument->args);
 	}
 
@@ -656,7 +656,7 @@ int pstreamOpenWrite(const argument_t *argument, int filetype)
   else
     {
       /* extern int cdoDefaultInstID; */
-      char *filename = malloc(strlen(argument->args)+1);
+      char *filename = (char*) malloc(strlen(argument->args)+1);
 
       pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
@@ -759,7 +759,7 @@ int pstreamOpenAppend(const argument_t *argument)
     }
   else
     {
-      char *filename = malloc(strlen(argument->args)+1);
+      char *filename = (char*) malloc(strlen(argument->args)+1);
 
       pstreamptr = pstream_new_entry();
       if ( ! pstreamptr ) Error("No memory");
@@ -1387,7 +1387,7 @@ int pstreamInqTimestep(int pstreamID, int tsID)
 	  streamClose(pstreamptr->fileID);
 
 	  len = strlen(pstreamptr->mfnames[nfile]);
-	  filename = malloc(len+1);
+	  filename = (char*) malloc(len+1);
 	  strcpy(filename, pstreamptr->mfnames[nfile]);
 	  pstreamptr->nfiles++;
 

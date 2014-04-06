@@ -631,7 +631,7 @@ void *Setpartab(void *argument)
 	{
 	  fseek(fp, 0L, SEEK_END);
 	  fsize = (size_t) ftell(fp);
-	  parbuf = malloc(fsize+1);
+	  parbuf = (char*) malloc(fsize+1);
 	  fseek(fp, 0L, SEEK_SET);
 	  nbytes = fread(parbuf, fsize, 1, fp);
 	  parbuf[fsize] = 0;

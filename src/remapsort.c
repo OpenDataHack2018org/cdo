@@ -724,7 +724,7 @@ void sort_par(long num_links, long num_wts, int *restrict add1, int *restrict ad
   free(tmp);
   tmp = NULL;
   
-  tmp2 = malloc(num_links*num_wts*sizeof(double) );
+  tmp2 = (double*) malloc(num_links*num_wts*sizeof(double));
   
 #if defined(_OPENMP)
 #pragma omp parallel for if ( depth < par_depth ) private(i,n) num_threads(2)

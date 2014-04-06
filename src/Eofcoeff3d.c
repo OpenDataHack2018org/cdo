@@ -120,7 +120,7 @@ void *Eofcoeff3d(void * argument)
          if ( eofID == 0 )
            eof[varID][levelID] = (field_t*) malloc(1*sizeof(field_t));
          else
-           eof[varID][levelID] = realloc (eof[varID][levelID], (eofID+1)*sizeof(field_t));
+           eof[varID][levelID] = (field_t*) realloc(eof[varID][levelID], (eofID+1)*sizeof(field_t));
          eof[varID][levelID][eofID].grid   = gridID1;
          eof[varID][levelID][eofID].nmiss  = 0;
          eof[varID][levelID][eofID].missval= missval1;
@@ -144,8 +144,8 @@ void *Eofcoeff3d(void * argument)
   gridID3 = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID3, 1);
   gridDefYsize(gridID3, 1);
-  xvals=malloc(1*sizeof(double));
-  yvals=malloc(1*sizeof(double));
+  xvals= (double*) malloc(1*sizeof(double));
+  yvals= (double*) malloc(1*sizeof(double));
   xvals[0]=0;
   yvals[0]=0;
   gridDefXvals(gridID3, xvals);
