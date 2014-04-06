@@ -5,6 +5,48 @@
 #include "remap_store_link.h"
 
 
+/*
+    This routine stores the address and weight for this link in the appropriate 
+    address and weight arrays and resizes those arrays if necessary.
+*/
+static
+void store_link_conserv(remapvars_t* rv, long add1, long add2, long num_wts, double* weights)
+{
+  /*
+    Input variables:
+    int  add1         ! address on source grid
+    int  add2         ! address on target grid
+    double weights[]  ! array of remapping weights for this link
+  */
+  /* Local variables */
+  long nlink; /* link index */
+  long i;
+
+  /*  If all weights are ZERO, do not bother storing the link */
+
+  if ( num_wts == 3 )
+    {
+      if ( IS_EQUAL(weights[0], 0) && IS_EQUAL(weights[1], 0) && IS_EQUAL(weights[2], 0) ) return;
+    }
+  else
+    {
+      if ( IS_EQUAL(weights[0], 0) ) return;
+    }
+    
+  nlink = rv->num_links;
+
+  rv->num_links++;
+  if ( rv->num_links >= rv->max_links )
+    resize_remap_vars(rv, rv->resize_increment);
+
+  rv->src_grid_add[nlink] = add1;
+  rv->tgt_grid_add[nlink] = add2;
+
+  for ( i = 0; i < num_wts; ++i ) rv->wts[num_wts*nlink+i] = weights[i];	      
+
+}  /* store_link_conserv */
+
+
 
 int rect_grid_search2(long *imin, long *imax, double xmin, double xmax, long nxm, const double *restrict xm);
 
@@ -359,7 +401,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   int    ompthID, i;
 
   /* Variables necessary if segment manages to hit pole */
-  grid_store_t *grid_store = NULL;
   double findex = 0;
   long num_weights = 0;
   long nx = 0, ny = 0;
@@ -375,12 +416,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   nbins = src_grid->num_srch_bins;
   num_wts = rv->num_wts;
-
-  if ( remap_store_link_fast )
-    {
-      grid_store = (grid_store_t*) malloc(sizeof(grid_store_t));
-      grid_store_init(grid_store, tgt_grid->size);
-    }
 
   if ( cdoTimer ) timer_start(timer_remap_con);
 
@@ -479,7 +514,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #pragma omp parallel for default(none) \
   shared(ompNumThreads, cdoTimer, lyac, nbins, num_wts, nx, src_remap_grid_type, tgt_remap_grid_type, src_grid_bound_box,	\
 	 src_edge_type, tgt_edge_type, partial_areas2, partial_weights2,  \
-         remap_store_link_fast, grid_store, rv, cdoVerbose, max_srch_cells2, \
+         rv, cdoVerbose, max_srch_cells2, \
 	 tgt_num_cell_corners, srch_corners, src_grid, tgt_grid, tgt_grid_size, src_grid_size, \
 	 overlap_buffer2, src_grid_cells2, srch_add2, tgt_grid_cell2, findex, sum_srch_cells, sum_srch_cells2) \
   private(ompthID, srch_add, tgt_grid_cell, tgt_area, n, k, num_weights, num_srch_cells, max_srch_cells,  \
@@ -750,7 +785,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 #pragma omp critical
 #endif
 		  {
-		    store_link_cnsrv_fast(rv, src_grid_add, tgt_grid_add, num_wts, &partial_weights[n], grid_store);
+		    store_link_conserv(rv, src_grid_add, tgt_grid_add, num_wts, &partial_weights[n]);
 
 		    src_grid->cell_frac[src_grid_add] += partial_weights[n];
 		  }
@@ -807,13 +842,6 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       free(srch_add2[i]);
     }
-
-  if ( remap_store_link_fast )
-    {
-      grid_store_delete(grid_store);
-      free(grid_store);
-    }
-
 
   /* Normalize using destination area if requested */
 
