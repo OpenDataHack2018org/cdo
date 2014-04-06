@@ -144,7 +144,7 @@ void *EOF3d(void * argument)
   nvars       = vlistNvars(vlistID1);
   nrecs       = vlistNrecs(vlistID1);
   taxisID1    = vlistInqTaxis(vlistID1);
-  weight      = malloc(gridsize*sizeof(double));
+  weight      = (double*) malloc(gridsize*sizeof(double));
   if ( WEIGHTS )
       gridWeights(gridID1, &weight[0]);
   else
@@ -160,9 +160,9 @@ void *EOF3d(void * argument)
   gridID2     = gridCreate(GRID_LONLAT, 1);
   gridDefXsize(gridID2, 1);
   gridDefYsize(gridID2, 1);
-  xvals       = malloc(1*sizeof(double));
-  yvals       = malloc(1*sizeof(double));
-  zvals       = malloc(1*sizeof(double));
+  xvals       = (double*) malloc(1*sizeof(double));
+  yvals       = (double*) malloc(1*sizeof(double));
+  zvals       = (double*) malloc(1*sizeof(double));
   xvals[0]    = 0;
   yvals[0]    = 0;
   zvals[0]    = 0;
@@ -242,11 +242,11 @@ void *EOF3d(void * argument)
   if ( cdoTimer ) timer_start(timer_alloc);
 
   /* allocation of temporary fields and output structures */
-  in.ptr       = malloc(gridsize*sizeof(double));
-  datafields   = malloc(nvars*sizeof(field_t*));
-  datacounts   = malloc(nvars*sizeof(int *));
-  eigenvectors = malloc(nvars*sizeof(field_t*));
-  eigenvalues  = malloc(nvars*sizeof(field_t*));
+  in.ptr       = (double*) malloc(gridsize*sizeof(double));
+  datafields   = (field_t**) malloc(nvars*sizeof(field_t*));
+  datacounts   = (int **) malloc(nvars*sizeof(int *));
+  eigenvectors = (field_t**) malloc(nvars*sizeof(field_t*));
+  eigenvalues  = (field_t**) malloc(nvars*sizeof(field_t*));
 
   for ( varID = 0; varID < nvars; ++varID )
     {
@@ -256,26 +256,26 @@ void *EOF3d(void * argument)
       temp_size           = gridsize * nlevs;
       missval             = vlistInqVarMissval(vlistID1, varID);
 
-      datafields[varID]   = malloc(nlevs*sizeof(field_t*));
-      datacounts[varID]   = malloc(nlevs*sizeof(int* ));
-      eigenvectors[varID] = malloc(nlevs*sizeof(field_t*));
+      datafields[varID]   = (field_t**) malloc(nlevs*sizeof(field_t*));
+      datacounts[varID]   = (int* *) malloc(nlevs*sizeof(int* ));
+      eigenvectors[varID] = (field_t**) malloc(nlevs*sizeof(field_t*));
 
-      datafields[varID] = malloc(nts*sizeof(field_t));
+      datafields[varID] = (field_t*) malloc(nts*sizeof(field_t));
       for ( tsID = 0; tsID < nts; tsID++ )
 	{
 	  datafields[varID][tsID].grid    = gridID1;
 	  datafields[varID][tsID].nmiss   = 0;
 	  datafields[varID][tsID].missval = missval;
-	  datafields[varID][tsID].ptr     = malloc(temp_size*sizeof(double));
+	  datafields[varID][tsID].ptr     = (double*) malloc(temp_size*sizeof(double));
 	  for ( i = 0; i < temp_size; ++i )
 	    datafields[varID][tsID].ptr[i] = 0;
 	}
-      datacounts[varID] = malloc(temp_size*sizeof(int));	      
+      datacounts[varID] = (int*) malloc(temp_size*sizeof(int));	      
       for(i=0;i<temp_size;i++)
 	datacounts[varID][i] = 0;
       
-      eigenvectors[varID] = malloc(n_eig*sizeof(field_t));
-      eigenvalues[varID]  = malloc(nts*sizeof(field_t));
+      eigenvectors[varID] = (field_t*) malloc(n_eig*sizeof(field_t));
+      eigenvalues[varID]  = (field_t*) malloc(nts*sizeof(field_t));
 
       for ( i = 0; i < n; i++ )
 	{
@@ -284,7 +284,7 @@ void *EOF3d(void * argument)
 	      eigenvectors[varID][i].grid    = gridID2;
 	      eigenvectors[varID][i].nmiss   = 0;
 	      eigenvectors[varID][i].missval = missval;
-	      eigenvectors[varID][i].ptr     = malloc(temp_size*sizeof(double));
+	      eigenvectors[varID][i].ptr     = (double*) malloc(temp_size*sizeof(double));
 	      for ( i2 = 0; i2 < temp_size; ++i2 )
 		eigenvectors[varID][i].ptr[i2] = missval;
 	    }
@@ -292,7 +292,7 @@ void *EOF3d(void * argument)
 	  eigenvalues[varID][i].grid    = gridID3;
 	  eigenvalues[varID][i].nmiss   = 0;
 	  eigenvalues[varID][i].missval = missval;
-	  eigenvalues[varID][i].ptr     = malloc(1*sizeof(double));
+	  eigenvalues[varID][i].ptr     = (double*) malloc(1*sizeof(double));
 	  eigenvalues[varID][i].ptr[0]  = missval;
 	}
     }
@@ -354,7 +354,7 @@ void *EOF3d(void * argument)
   if ( cdoVerbose ) 
     cdoPrint("Read data for %i variables",nvars);
   
-  pack = malloc(temp_size*sizeof(int)); //TODO
+  pack = (int*) malloc(temp_size*sizeof(int)); //TODO
 
   if ( cdoTimer ) timer_stop(timer_read);
 
@@ -398,8 +398,8 @@ void *EOF3d(void * argument)
 	  
       cov = malloc (nts*sizeof(double*));
       for ( j1 = 0; j1 < nts; j1++)
-	cov[j1] = malloc(nts*sizeof(double));
-      eigv = malloc(n*sizeof(double));
+	cov[j1] = (double*) malloc(nts*sizeof(double));
+      eigv = (double*) malloc(n*sizeof(double));
 
       if ( cdoVerbose )  {
 	cdoPrint("varID %i allocated eigv and cov with nts=%i and n=%i",varID,nts,n);

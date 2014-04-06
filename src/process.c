@@ -519,7 +519,7 @@ void setStreamNames(int argc, char *argv[])
 	  Process[processID].streamNames[Process[processID].streamCnt].args = streamname;
 	  ac = globArgc - globArgcStart;
 	  //printf("setStreamNames:  ac %d  streamname1: %s\n", ac, streamname);
-	  Process[processID].streamNames[Process[processID].streamCnt].argv = malloc(ac*sizeof(char *));
+	  Process[processID].streamNames[Process[processID].streamCnt].argv = (char **) malloc(ac*sizeof(char *));
 	  for ( i = 0; i < ac; ++i )
 	    Process[processID].streamNames[Process[processID].streamCnt].argv[i] = argv[i+globArgcStart];
 	  Process[processID].streamNames[Process[processID].streamCnt].argc = ac;
@@ -533,7 +533,7 @@ void setStreamNames(int argc, char *argv[])
 	  strcpy(streamname, argv[globArgc]);
 	  Process[processID].streamNames[Process[processID].streamCnt].args = streamname;
 	  ac = 1;
-	  Process[processID].streamNames[Process[processID].streamCnt].argv = malloc(ac*sizeof(char *));
+	  Process[processID].streamNames[Process[processID].streamCnt].argv = (char **) malloc(ac*sizeof(char *));
 	  Process[processID].streamNames[Process[processID].streamCnt].argv[0] = argv[globArgc];
 	  Process[processID].streamNames[Process[processID].streamCnt].argc = ac;
 	  Process[processID].streamNames[Process[processID].streamCnt].args = streamname;
@@ -573,7 +573,7 @@ int expand_wildcards(int processID, int streamCnt)
 	  for ( i = 0; i < glob_arg->argc; ++i )
 	    {
 	      // printf("add %d %s\n", i, glob_arg->argv[i]);
-	      Process[processID].streamNames[i].argv    = malloc(sizeof(char *));
+	      Process[processID].streamNames[i].argv    = (char **) malloc(sizeof(char *));
 	      Process[processID].streamNames[i].argc    = 1;
 	      Process[processID].streamNames[i].argv[0] = strdupx(glob_arg->argv[i]);
 	      Process[processID].streamNames[i].args    = strdupx(glob_arg->argv[i]);
@@ -684,7 +684,7 @@ void setStreams(int argc, char *argv[])
 
   Process[processID].streamCnt  = 0; /* filled in setStreamNames */
   if ( streamCnt )
-    Process[processID].streamNames = malloc(streamCnt*sizeof(argument_t));
+    Process[processID].streamNames = (argument_t*) malloc(streamCnt*sizeof(argument_t));
   for ( i = 0; i < streamCnt; i++ )
     {
       Process[processID].streamNames[i].argc = 0;

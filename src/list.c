@@ -45,7 +45,7 @@ LIST *listNew(int type)
     }
   else
     {
-      list = malloc(sizeof(LIST));
+      list = (LIST*) malloc(sizeof(LIST));
       listInit(list, type);
     }
 

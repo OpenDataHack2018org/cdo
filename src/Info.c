@@ -289,7 +289,7 @@ void *Info(void *argument)
       gridsize = vlistGridsizeMax(vlistID);
       if ( vlistNumber(vlistID) != CDI_REAL ) gridsize *= 2;
 
-      array = malloc(gridsize*sizeof(double));
+      array = (double*) malloc(gridsize*sizeof(double));
 
       indg = 0;
       tsID = 0;

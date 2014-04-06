@@ -435,8 +435,8 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
 	      xsize, ysize, originLat, originLon, lat1, lat2, lonParY, xincm, yincm);
 
       gridID = gridToCurvilinear(gridID, 0);
-      xvals = malloc(xsize*ysize*sizeof(double));
-      yvals = malloc(xsize*ysize*sizeof(double));
+      xvals = (double*) malloc(xsize*ysize*sizeof(double));
+      yvals = (double*) malloc(xsize*ysize*sizeof(double));
       gridInqXvals(gridID, xvals);
       gridInqYvals(gridID, yvals);
       for ( i = 0; i < xsize*ysize; ++i )
@@ -477,7 +477,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
       xinc   = gridInqXinc(gridID);
       if ( IS_EQUAL(xinc, 0) && gridInqXvals(gridID, NULL) )
 	{
-	  xvals = malloc(xsize*sizeof(double));
+	  xvals = (double*) malloc(xsize*sizeof(double));
 	  gridInqXvals(gridID, xvals);
 	  fprintf(gdp ,"XDEF %d LEVELS ", xsize);
 	  j = 0;
@@ -513,7 +513,7 @@ void ctl_xydef(FILE *gdp, int gridID, int *yrev)
 
       if ( IS_EQUAL(yinc, 0) && gridInqYvals(gridID, NULL) )
 	{
-	  yvals = malloc(ysize*sizeof(double));
+	  yvals = (double*) malloc(ysize*sizeof(double));
 	  gridInqYvals(gridID, yvals);
 	  fprintf(gdp ,"YDEF %d LEVELS ", ysize);
 	  j = 0;
@@ -589,7 +589,7 @@ void ctl_zdef(FILE *gdp, int vlistID, int *zrev)
 	}
     }
 
-  levels = malloc(nlevmax*sizeof(double));
+  levels = (double*) malloc(nlevmax*sizeof(double));
   zaxisInqLevels(zaxisIDmax, levels);
   if ( zaxisInqType(zaxisIDmax) == ZAXIS_PRESSURE ) lplev = TRUE;
   level0 = levels[0];
@@ -910,7 +910,7 @@ void write_map_grib1(const char *ctlfile, int map_version, int nrecords, int *in
       if ( map_version == 1 )
 	{
 	  int *intnumbuf;
-	  intnumbuf = malloc(indx.intnum*sizeof(int));
+	  intnumbuf = (int*) malloc(indx.intnum*sizeof(int));
 	  for ( i = 0; i < nrecords; i++ )
 	    {
 	      intnumbuf[i*3+0] = (int) bignum[i*2];
@@ -1063,8 +1063,8 @@ void *Gradsdes(void *argument)
     cdoAbort("No Lon/Lat, Gaussian or Lambert grid found (%s data unsupported)!", gridNamePtr(gridtype));
 
   /* select all variables with used gridID */
-  vars = malloc(nvars*sizeof(int));
-  recoffset = malloc(nvars*sizeof(int));
+  vars = (int*) malloc(nvars*sizeof(int));
+  recoffset = (int*) malloc(nvars*sizeof(int));
   nvarsout = 0;
   nrecsout = 0;
   for ( varID = 0; varID < nvars; varID++ )
@@ -1183,7 +1183,7 @@ void *Gradsdes(void *argument)
 	}
 
       gridsize = vlistGridsizeMax(vlistID);
-      array = malloc(gridsize*sizeof(double));
+      array = (double*) malloc(gridsize*sizeof(double));
     }
   else if ( filetype == FILETYPE_NC )
     {

@@ -72,7 +72,7 @@ namelist_t *namelistNew(const char *name)
 {
   namelist_t *namelist;
 
-  namelist = malloc(sizeof(namelist_t));
+  namelist = (namelist_t*) malloc(sizeof(namelist_t));
 
   namelist_init(namelist, name);
 
@@ -188,7 +188,7 @@ int namelistAdd(namelist_t *nml, const char *name, int type, int dis, void *ptr,
       return (-1);
     }
 
-  nml_entry = malloc(sizeof(nml_entry_t));
+  nml_entry = (nml_entry_t*) malloc(sizeof(nml_entry_t));
 
   nml_entry->name = strdup(name);
   nml_entry->type = type;

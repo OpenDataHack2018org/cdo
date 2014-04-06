@@ -302,10 +302,10 @@ void command_init()
   taxisID = vlistInqTaxis(gl_vlistID);
 
   gridsize = vlistGridsizeMax(gl_vlistID);
-  gl_data = malloc(gridsize*sizeof(double));
+  gl_data = (double*) malloc(gridsize*sizeof(double));
 
   gl_nvars = vlistNvars(gl_vlistID);
-  all_vars = malloc(gl_nvars*sizeof(vars_t));
+  all_vars = (vars_t*) malloc(gl_nvars*sizeof(vars_t));
 
   for ( varID = 0; varID < gl_nvars; ++varID )
     {

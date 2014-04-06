@@ -44,7 +44,7 @@ int grid_search_reg2d_nn(long nx, long ny, int *restrict nbr_add, double *restri
 	}
     }
 
-  sincoslon = malloc(nx*sizeof(double));
+  sincoslon = (double*) malloc(nx*sizeof(double));
 
   for ( ii = 0; ii < nx; ++ii )
     sincoslon[ii] = coslon_dst*cos(src_center_lon[ii]) + sinlon_dst*sin(src_center_lon[ii]);

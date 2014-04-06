@@ -121,7 +121,7 @@ void *Ensstat3(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  ef = malloc(nfiles*sizeof(ens_file_t));
+  ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
 
   /* *************************************************** */
   /* should each thread be allocating memory locally???? */
@@ -129,17 +129,17 @@ void *Ensstat3(void *argument)
   /* --> #pragma omp parallel for ...                    */
   /* *************************************************** */
 #if defined(_OPENMP)
-  field = malloc(omp_get_max_threads()*sizeof(field_t));
+  field = (field_t*) malloc(omp_get_max_threads()*sizeof(field_t));
   for ( i = 0; i < omp_get_max_threads(); i++ )
 #else
-  field = malloc(1*sizeof(field_t));
+  field = (field_t*) malloc(1*sizeof(field_t));
   for ( i = 0; i < 1; i++ )
 #endif
     {
       field_init(&field[i]);
       field[i].size   = nfiles;
-      field[i].ptr    = malloc(nfiles*sizeof(double));
-      field[i].weight = malloc(nfiles*sizeof(double));
+      field[i].ptr    = (double*) malloc(nfiles*sizeof(double));
+      field[i].weight = (double*) malloc(nfiles*sizeof(double));
       for ( fileID = 0; fileID < nfiles; fileID++ )
 	field[i].weight[fileID] = 1;
     }
@@ -161,7 +161,7 @@ void *Ensstat3(void *argument)
   vlistID1 = ef[0].vlistID;
   vlistID2 = vlistCreate();
   nvars = vlistNvars(vlistID1);
-  varID2 = malloc(nvars*sizeof(int));
+  varID2 = (int*) malloc(nvars*sizeof(int));
 
   levs = calloc (nfiles, sizeof(double) );
   zaxisID2 = zaxisCreate(ZAXIS_GENERIC, nfiles);
@@ -217,11 +217,11 @@ void *Ensstat3(void *argument)
   gridsize = vlistGridsizeMax(vlistID1);
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
-    ef[fileID].array = malloc(gridsize*sizeof(double));
+    ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
 
   if ( operfunc == func_rank && datafunc == SPACE ) 
     { /*need to memorize data for entire grid before writing          */
-      array2 = malloc((nfiles+1)*sizeof(int*));
+      array2 = (int**) malloc((nfiles+1)*sizeof(int*));
       for ( binID=0; binID<nfiles; binID++ ) 
 	array2[binID] = calloc ( gridsize, sizeof(int) );
     }
@@ -451,7 +451,7 @@ void *Ensstat3(void *argument)
       int osize = gridsize;
 
       if ( datafunc == TIME ) osize = 1;
-      tmpdoub = malloc(osize*sizeof(double));
+      tmpdoub = (double*) malloc(osize*sizeof(double));
 
       for ( binID = 0; binID < nfiles; binID++ )
 	{

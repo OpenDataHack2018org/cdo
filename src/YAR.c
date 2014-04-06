@@ -184,15 +184,15 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   gridsize1 = gridInqSize(gridIDin);
-  lonIn = malloc(nlonIn*sizeof(double));
-  latIn = malloc(nlatIn*sizeof(double));
+  lonIn = (double*) malloc(nlonIn*sizeof(double));
+  latIn = (double*) malloc(nlatIn*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
   for ( int i = 0; i < nlonIn; ++i ) lonIn[i] *= DEG2RAD;
   for ( int i = 0; i < nlatIn; ++i ) latIn[i] *= DEG2RAD;
 
-  xlonIn = malloc((nlonIn+1)*sizeof(double));
-  xlatIn = malloc((nlatIn+1)*sizeof(double));
+  xlonIn = (double*) malloc((nlonIn+1)*sizeof(double));
+  xlatIn = (double*) malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = xlonIn[1] - xlonIn[0];
@@ -209,15 +209,15 @@ void yar_remap_bil(field_t *field1, field_t *field2)
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
   gridsize2 = gridInqSize(gridIDout);
-  lonOut = malloc(nlonOut*sizeof(double));
-  latOut = malloc(nlatOut*sizeof(double));
+  lonOut = (double*) malloc(nlonOut*sizeof(double));
+  latOut = (double*) malloc(nlatOut*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
   for ( int i = 0; i < nlonOut; ++i ) lonOut[i] *= DEG2RAD;
   for ( int i = 0; i < nlatOut; ++i ) latOut[i] *= DEG2RAD;
 
-  xlonOut = malloc((nlonOut+1)*sizeof(double));
-  xlatOut = malloc((nlatOut+1)*sizeof(double));
+  xlonOut = (double*) malloc((nlonOut+1)*sizeof(double));
+  xlatOut = (double*) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = xlonOut[1] - xlonOut[0];
@@ -433,12 +433,12 @@ void yar_remap_con(field_t *field1, field_t *field2)
   nlonIn = gridInqXsize(gridIDin);
   nlatIn = gridInqYsize(gridIDin);
   gridsize1 = gridInqSize(gridIDin);
-  lonIn = malloc((nlonIn+1)*sizeof(double));
-  latIn = malloc((nlatIn+1)*sizeof(double));
+  lonIn = (double*) malloc((nlonIn+1)*sizeof(double));
+  latIn = (double*) malloc((nlatIn+1)*sizeof(double));
   gridInqXvals(gridIDin, lonIn);
   gridInqYvals(gridIDin, latIn);
-  xlonIn = malloc((nlonIn)*sizeof(double));
-  xlatIn = malloc((nlatIn)*sizeof(double));
+  xlonIn = (double*) malloc((nlonIn)*sizeof(double));
+  xlatIn = (double*) malloc((nlatIn)*sizeof(double));
   gridInqXvals(gridIDin, xlonIn);
   gridInqYvals(gridIDin, xlatIn);
   dxIn = lonIn[1] - lonIn[0];
@@ -455,12 +455,12 @@ void yar_remap_con(field_t *field1, field_t *field2)
   nlonOut = gridInqXsize(gridIDout);
   nlatOut = gridInqYsize(gridIDout);
   gridsize2 = gridInqSize(gridIDout);
-  lonOut = malloc((nlonOut+1)*sizeof(double));
-  latOut = malloc((nlatOut+1)*sizeof(double));
+  lonOut = (double*) malloc((nlonOut+1)*sizeof(double));
+  latOut = (double*) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, lonOut);
   gridInqYvals(gridIDout, latOut);
-  xlonOut = malloc((nlonOut+1)*sizeof(double));
-  xlatOut = malloc((nlatOut+1)*sizeof(double));
+  xlonOut = (double*) malloc((nlonOut+1)*sizeof(double));
+  xlatOut = (double*) malloc((nlatOut+1)*sizeof(double));
   gridInqXvals(gridIDout, xlonOut);
   gridInqYvals(gridIDout, xlatOut);
   dxOut = lonOut[1] - lonOut[0];
@@ -540,11 +540,11 @@ void yar_remap_con(field_t *field1, field_t *field2)
   double const epsilon = 1.0e-10; // relative precision 
 
   double *weight;
-  weight = malloc(gridsize1*sizeof(double));
+  weight = (double*) malloc(gridsize1*sizeof(double));
 
   double tgt_area;
   double *area;
-  area = malloc(gridsize1*sizeof(double));
+  area = (double*) malloc(gridsize1*sizeof(double));
 
   struct grid_cell *SourceCell;
   SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
@@ -773,10 +773,10 @@ void *YAR(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array1   = malloc(gridsize*sizeof(double));
+  array1   = (double*) malloc(gridsize*sizeof(double));
 
   gridsize = gridInqSize(gridID2);
-  array2   = malloc(gridsize*sizeof(double));
+  array2   = (double*) malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )

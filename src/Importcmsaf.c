@@ -176,10 +176,10 @@ int defLonLatGrid(int nx, int ny, double c0, double lts, double re)
       return(-1);
     }
 
-  xvals = malloc(nx*sizeof(double));
-  yvals = malloc(ny*sizeof(double));
-  xbounds = malloc(nx*2*sizeof(double));
-  ybounds = malloc(nx*2*sizeof(double));
+  xvals = (double*) malloc(nx*sizeof(double));
+  yvals = (double*) malloc(ny*sizeof(double));
+  xbounds = (double*) malloc(nx*2*sizeof(double));
+  ybounds = (double*) malloc(nx*2*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -230,8 +230,8 @@ int defSinusoidalGrid(int nx, int ny, double xmin, double xmax, double ymin, dou
   int i;
   double *xvals, *yvals;
 
-  xvals = malloc(nx*sizeof(double));
-  yvals = malloc(ny*sizeof(double));
+  xvals = (double*) malloc(nx*sizeof(double));
+  yvals = (double*) malloc(ny*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -265,8 +265,8 @@ int defLaeaGrid(int nx, int ny, double xmin, double xmax, double ymin, double ym
   int i;
   double *xvals, *yvals;
 
-  xvals = malloc(nx*sizeof(double));
-  yvals = malloc(ny*sizeof(double));
+  xvals = (double*) malloc(nx*sizeof(double));
+  yvals = (double*) malloc(ny*sizeof(double));
 
   for ( i = 0; i < nx; ++i )
     {
@@ -1070,7 +1070,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 	    {
 	      float *farray;
 	      int i;
-	      farray = malloc(gridsize*nt*sizeof(float));
+	      farray = (float*) malloc(gridsize*nt*sizeof(float));
 	      status = H5Dread(dset_id, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, farray);
 	      if ( status < 0 )
 		cdoAbort("Reading of NATIVE_FLOAT variable %s failed!", varname);
@@ -1087,7 +1087,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       else
 	{
 	  int *iarray, i;
-	  iarray = malloc(gridsize*nt*sizeof(int));
+	  iarray = (int*) malloc(gridsize*nt*sizeof(int));
 	  status = H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, iarray);
 	  if ( status < 0 )
 	    cdoAbort("Reading of NATIVE_INT variable %s failed!", varname);
@@ -1119,7 +1119,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
 
       if ( nz == 1 ) ((datasets_t *) opdata)->nsets++;
 
-      mask = malloc(gridsize*nt*sizeof(short));
+      mask = (short*) malloc(gridsize*nt*sizeof(short));
       memset(mask, 0, gridsize*nt*sizeof(short));
 
       nmiss  = 0;
@@ -1456,7 +1456,7 @@ void *Importcmsaf(void *argument)
 
   if ( nt > 1 )
     {
-      vtimes = malloc(nt*sizeof(int));
+      vtimes = (int*) malloc(nt*sizeof(int));
       
       for ( i = 0; i < nt; ++i ) vtimes[i] = i*10000 + 45*100;
 
@@ -1512,7 +1512,7 @@ void *Importcmsaf(void *argument)
   else
     {
       double *levels;
-      levels = malloc(nz*sizeof(double));
+      levels = (double*) malloc(nz*sizeof(double));
       for ( i = 0; i < nz; ++i ) levels[i] = i+1;
       zaxisID = zaxisCreate(ZAXIS_GENERIC, nz);
       zaxisDefLevels(zaxisID, levels);

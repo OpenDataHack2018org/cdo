@@ -85,7 +85,7 @@ void *Eofcoeff3d(void * argument)
   nvars = vlistNvars(vlistID1)==vlistNvars(vlistID2) ? vlistNvars(vlistID1) : -1;
   nrecs = vlistNrecs(vlistID1); 
   nlevs = zaxisInqSize(vlistInqVarZaxis(vlistID1, 0));
-  w = malloc(gridsize*sizeof(double));
+  w = (double*) malloc(gridsize*sizeof(double));
   gridWeights(gridID2, &w[0]);
   
   
@@ -102,7 +102,7 @@ void *Eofcoeff3d(void * argument)
  
   eof = malloc (nvars * sizeof(field_t**) );
   for ( varID=0; varID<nvars; varID++)
-    eof[varID] = malloc(nlevs*sizeof(field_t*));
+    eof[varID] = (field_t**) malloc(nlevs*sizeof(field_t*));
   reached_eof=0;
   eofID = 0;
   while ( 1 )       
@@ -124,7 +124,7 @@ void *Eofcoeff3d(void * argument)
          eof[varID][levelID][eofID].grid   = gridID1;
          eof[varID][levelID][eofID].nmiss  = 0;
          eof[varID][levelID][eofID].missval= missval1;
-         eof[varID][levelID][eofID].ptr    = malloc(gridsize*sizeof(double));
+         eof[varID][levelID][eofID].ptr    = (double*) malloc(gridsize*sizeof(double));
          memset(&eof[varID][levelID][eofID].ptr[0], missval1, gridsize*sizeof(double));
 
          if ( varID >= nvars )
@@ -187,7 +187,7 @@ void *Eofcoeff3d(void * argument)
     }
   
   // ALLOCATE temporary fields for data read and write
-  in.ptr = malloc(gridsize*sizeof(double));
+  in.ptr = (double*) malloc(gridsize*sizeof(double));
   in.grid = gridID1;  
   out = malloc (nvars*sizeof(field_t*));
   for ( varID = 0; varID < nvars; varID++ ) {

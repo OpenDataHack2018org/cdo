@@ -104,8 +104,8 @@ void pole_intersection(long *location, double *intrsct_lat, double *intrsct_lon,
 
   /* Convert coordinates */
 
-  srch_corner_x = malloc(srch_corners*num_srch_cells*sizeof(double));
-  srch_corner_y = malloc(srch_corners*num_srch_cells*sizeof(double));
+  srch_corner_x = (double*) malloc(srch_corners*num_srch_cells*sizeof(double));
+  srch_corner_y = (double*) malloc(srch_corners*num_srch_cells*sizeof(double));
 
   if ( beglat > ZERO )
     {
@@ -1071,7 +1071,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( remap_store_link_fast )
     {
-      grid_store = malloc(sizeof(grid_store_t));
+      grid_store = (grid_store_t*) malloc(sizeof(grid_store_t));
       grid_store_init(grid_store, tgt_grid->size);
     }
 
@@ -1091,10 +1091,10 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   if ( ! remap_store_link_fast )
     {
-      link_add1[0] = malloc(src_grid_size*sizeof(int));
-      link_add1[1] = malloc(src_grid_size*sizeof(int));
-      link_add2[0] = malloc(tgt_grid_size*sizeof(int));
-      link_add2[1] = malloc(tgt_grid_size*sizeof(int));
+      link_add1[0] = (int*) malloc(src_grid_size*sizeof(int));
+      link_add1[1] = (int*) malloc(src_grid_size*sizeof(int));
+      link_add2[0] = (int*) malloc(tgt_grid_size*sizeof(int));
+      link_add2[1] = (int*) malloc(tgt_grid_size*sizeof(int));
 
 #if defined(SX)
 #pragma vdir nodep
@@ -1117,10 +1117,10 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
 
   /* Initialize centroid arrays */
 
-  src_centroid_lat = malloc(src_grid_size*sizeof(double));
-  src_centroid_lon = malloc(src_grid_size*sizeof(double));
-  tgt_centroid_lat = malloc(tgt_grid_size*sizeof(double));
-  tgt_centroid_lon = malloc(tgt_grid_size*sizeof(double));
+  src_centroid_lat = (double*) malloc(src_grid_size*sizeof(double));
+  src_centroid_lon = (double*) malloc(src_grid_size*sizeof(double));
+  tgt_centroid_lat = (double*) malloc(tgt_grid_size*sizeof(double));
+  tgt_centroid_lon = (double*) malloc(tgt_grid_size*sizeof(double));
 
   for ( n = 0; n < src_grid_size; ++n )
     {
@@ -1150,7 +1150,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
     max_srch_cells2[i] = 0;
 
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = malloc(tgt_grid_size*sizeof(int));
+    srch_add2[i] = (int*) malloc(tgt_grid_size*sizeof(int));
 
   srch_corners    = tgt_num_cell_corners;
 
@@ -1376,7 +1376,7 @@ void scrip_remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, r
     max_srch_cells2[i] = 0;
 
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = (int*) malloc(src_grid_size*sizeof(int));
 
   srch_corners    = src_num_cell_corners;
   max_srch_cells  = 0;

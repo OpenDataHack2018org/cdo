@@ -31,9 +31,9 @@ void grid_store_init(grid_store_t* grid_store, long gridsize)
 	    grid_store->blk_size, grid_store->max_size%grid_store->blk_size, 
 	    grid_store->max_size, grid_store->nblocks);
 
-  grid_store->blksize = malloc(grid_store->nblocks*sizeof(int));
-  grid_store->nlayers = malloc(grid_store->nblocks*sizeof(int));
-  grid_store->layers  = malloc(grid_store->nblocks*sizeof(grid_layer_t *));
+  grid_store->blksize = (int*) malloc(grid_store->nblocks*sizeof(int));
+  grid_store->nlayers = (int*) malloc(grid_store->nblocks*sizeof(int));
+  grid_store->layers  = (grid_layer_t **) malloc(grid_store->nblocks*sizeof(grid_layer_t *));
 
   nblocks = grid_store->nblocks;
   for ( iblk = 0; iblk < nblocks; ++iblk )
@@ -158,9 +158,9 @@ void store_link_cnsrv_fast(remapvars_t* rv, long add1, long add2, long num_wts, 
     }
   else
     {
-      grid_layer = malloc(sizeof(grid_layer_t));
+      grid_layer = (grid_layer_t*) malloc(sizeof(grid_layer_t));
       grid_layer->next = NULL;
-      grid_layer->grid2_link = malloc(grid_store->blksize[iblk]*sizeof(int));
+      grid_layer->grid2_link = (int*) malloc(grid_store->blksize[iblk]*sizeof(int));
 
       blksize = grid_store->blksize[iblk];
       for ( i = 0; i < blksize; ++i )

@@ -101,7 +101,7 @@ void pstream_list_new(void)
 {
   assert(_pstreamList == NULL);
 
-  _pstreamList = malloc(_pstream_max*sizeof(pstreamPtrToIdx));
+  _pstreamList = (pstreamPtrToIdx*) malloc(_pstream_max*sizeof(pstreamPtrToIdx));
 }
 
 static
@@ -213,7 +213,7 @@ pstream_t *pstream_new_entry(void)
 {
   pstream_t *pstreamptr;
 
-  pstreamptr = malloc(sizeof(pstream_t));
+  pstreamptr = (pstream_t*) malloc(sizeof(pstream_t));
 
   if ( pstreamptr ) pstream_init_entry(pstreamptr);
 
@@ -333,10 +333,10 @@ int pstreamOpenRead(const argument_t *argument)
       size_t len;
       size_t stacksize;
       int status;
-      argument_t *newargument = malloc(sizeof(argument_t));
+      argument_t *newargument = (argument_t*) malloc(sizeof(argument_t));
 
       newargument->argc = argument->argc + 1;
-      newargument->argv = malloc(newargument->argc*sizeof(char *));
+      newargument->argv = (char **) malloc(newargument->argc*sizeof(char *));
       memcpy(newargument->argv, argument->argv, argument->argc*sizeof(char *));
 
       operatorArg  = argument->argv[0];
@@ -455,7 +455,7 @@ int pstreamOpenRead(const argument_t *argument)
 		  if ( nfiles == 0 ) cdoAbort("No imput file found in %s", pch);
 
 		  pstreamptr->mfiles = nfiles;
-		  pstreamptr->mfnames = malloc(nfiles*sizeof(char *));
+		  pstreamptr->mfnames = (char **) malloc(nfiles*sizeof(char *));
 		  
 		  rewind(fp);
 
@@ -476,7 +476,7 @@ int pstreamOpenRead(const argument_t *argument)
 		  char line[65536];
 
 		  pstreamptr->mfiles = nfiles;
-		  pstreamptr->mfnames = malloc(nfiles*sizeof(char *));
+		  pstreamptr->mfnames = (char **) malloc(nfiles*sizeof(char *));
 		  
 		  strcpy(line, pch);
 		  for ( i = 0; i < len; i++ ) if ( line[i] == ',' ) line[i] = 0;
@@ -513,7 +513,7 @@ int pstreamOpenRead(const argument_t *argument)
 	      pclose(pfp);
 
 	      pstreamptr->mfiles = nfiles;
-	      pstreamptr->mfnames = malloc(nfiles*sizeof(char *));
+	      pstreamptr->mfnames = (char **) malloc(nfiles*sizeof(char *));
 
 	      for ( j = 0; j < nfiles; j++ )
 		pstreamptr->mfnames[j] = fnames[j];
@@ -1008,7 +1008,7 @@ void pstreamDefVarlist(pstream_t *pstreamptr, int vlistID)
     cdoAbort("Internal problem, varlist already allocated!");
 
   nvars = vlistNvars(vlistID);
-  varlist = malloc(nvars*sizeof(varlist_t));
+  varlist = (varlist_t*) malloc(nvars*sizeof(varlist_t));
 
   for ( varID = 0; varID < nvars; ++varID )
     {

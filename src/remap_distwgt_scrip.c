@@ -411,10 +411,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
       long nx = src_grid->dims[0];
       long ny = src_grid->dims[1];
 
-      coslat = malloc(ny*sizeof(double));
-      coslon = malloc(nx*sizeof(double));
-      sinlat = malloc(ny*sizeof(double));
-      sinlon = malloc(nx*sizeof(double));
+      coslat = (double*) malloc(ny*sizeof(double));
+      coslon = (double*) malloc(nx*sizeof(double));
+      sinlat = (double*) malloc(ny*sizeof(double));
+      sinlon = (double*) malloc(nx*sizeof(double));
 
       for ( n = 0; n < nx; ++n )
 	{
@@ -432,10 +432,10 @@ void scrip_remap_weights_distwgt(int num_neighbors, remapgrid_t *src_grid, remap
     }
   else
     {
-      coslat = malloc(src_grid_size*sizeof(double));
-      coslon = malloc(src_grid_size*sizeof(double));
-      sinlat = malloc(src_grid_size*sizeof(double));
-      sinlon = malloc(src_grid_size*sizeof(double));
+      coslat = (double*) malloc(src_grid_size*sizeof(double));
+      coslon = (double*) malloc(src_grid_size*sizeof(double));
+      sinlat = (double*) malloc(src_grid_size*sizeof(double));
+      sinlon = (double*) malloc(src_grid_size*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for default(none) \

@@ -457,8 +457,8 @@ int expand_lonlat_grid(int gridID)
   nxp4 = nx+4;
   nyp4 = ny+4;
 
-  xvals = malloc(nxp4*sizeof(double));
-  yvals = malloc(nyp4*sizeof(double));
+  xvals = (double*) malloc(nxp4*sizeof(double));
+  yvals = (double*) malloc(nyp4*sizeof(double));
   gridInqXvals(gridID, xvals+2);
   gridInqYvals(gridID, yvals+2);
 
@@ -513,8 +513,8 @@ int expand_curvilinear_grid(int gridID)
   nyp4 = ny+4;
   gridsize_new = gridsize + 4*(nx+2) + 4*(ny+2);
 
-  xvals = malloc(gridsize_new*sizeof(double));
-  yvals = malloc(gridsize_new*sizeof(double));
+  xvals = (double*) malloc(gridsize_new*sizeof(double));
+  yvals = (double*) malloc(gridsize_new*sizeof(double));
   gridInqXvals(gridID, xvals);
   gridInqYvals(gridID, yvals);
 
@@ -632,8 +632,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   if ( grid->is_cyclic ) grid->reg2d_center_lon[nx] = grid->reg2d_center_lon[0] + PI2;
 
-  grid->reg2d_corner_lon = malloc(nxp1*sizeof(double));
-  grid->reg2d_corner_lat = malloc(nyp1*sizeof(double));
+  grid->reg2d_corner_lon = (double*) malloc(nxp1*sizeof(double));
+  grid->reg2d_corner_lat = (double*) malloc(nyp1*sizeof(double));
 
   grid_gen_corners(nx, grid->reg2d_center_lon, grid->reg2d_corner_lon);
   grid_gen_corners(ny, grid->reg2d_center_lat, grid->reg2d_corner_lat);
@@ -1176,7 +1176,7 @@ long get_max_add(long num_links, long size, const int *restrict add)
   long max_add;
   int *isum;
 
-  isum = malloc(size*sizeof(int));
+  isum = (int*) malloc(size*sizeof(int));
   memset(isum, 0, size*sizeof(int));
 
   for ( n = 0; n < num_links; ++n ) isum[add[n]]++;
@@ -1256,16 +1256,16 @@ void remap_laf(double *restrict dst_array, double missval, long dst_size, long n
   max_cls = get_max_add(num_links, dst_size, dst_add);
 
 #if defined(_OPENMP)
-  src_cls2 = malloc(ompNumThreads*sizeof(double *));
-  src_wts2 = malloc(ompNumThreads*sizeof(double *));
+  src_cls2 = (double **) malloc(ompNumThreads*sizeof(double *));
+  src_wts2 = (double **) malloc(ompNumThreads*sizeof(double *));
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      src_cls2[i] = malloc(max_cls*sizeof(double));
-      src_wts2[i] = malloc(max_cls*sizeof(double));
+      src_cls2[i] = (double*) malloc(max_cls*sizeof(double));
+      src_wts2[i] = (double*) malloc(max_cls*sizeof(double));
     }
 #else
-  src_cls = malloc(max_cls*sizeof(double));
-  src_wts = malloc(max_cls*sizeof(double));
+  src_cls = (double*) malloc(max_cls*sizeof(double));
+  src_wts = (double*) malloc(max_cls*sizeof(double));
 #endif
 
   for ( n = 0; n < num_links; ++n )
@@ -1501,7 +1501,7 @@ void remap_stat(int remap_order, remapgrid_t src_grid, remapgrid_t tgt_grid, rem
   cdoPrint("number of sparse matrix entries %d", rv.num_links);
   cdoPrint("total number of dest cells %d", tgt_grid.size);
 
-  tgt_count = malloc(tgt_grid.size*sizeof(int));
+  tgt_count = (int*) malloc(tgt_grid.size*sizeof(int));
 
   for ( n = 0; n < tgt_grid.size; ++n ) tgt_count[n] = 0;
 
@@ -1793,17 +1793,17 @@ void reorder_links(remapvars_t *rv)
 
       printf("num_links %ld  max_links %ld  num_blks %ld\n", rv->num_links, max_links, num_blks);
 
-      rv->links.num_links = malloc(num_blks*sizeof(int));
-      rv->links.dst_add   = malloc(num_blks*sizeof(int *));
-      rv->links.src_add   = malloc(num_blks*sizeof(int *));
-      rv->links.w_index   = malloc(num_blks*sizeof(int *));
+      rv->links.num_links = (int*) malloc(num_blks*sizeof(int));
+      rv->links.dst_add   = (int **) malloc(num_blks*sizeof(int *));
+      rv->links.src_add   = (int **) malloc(num_blks*sizeof(int *));
+      rv->links.w_index   = (int **) malloc(num_blks*sizeof(int *));
     }
 
   for ( j = 0; j < num_blks; j++ )
     {
-      rv->links.dst_add[j] = malloc(max_links*sizeof(int));
-      rv->links.src_add[j] = malloc(max_links*sizeof(int));
-      rv->links.w_index[j] = malloc(max_links*sizeof(int));
+      rv->links.dst_add[j] = (int*) malloc(max_links*sizeof(int));
+      rv->links.src_add[j] = (int*) malloc(max_links*sizeof(int));
+      rv->links.w_index[j] = (int*) malloc(max_links*sizeof(int));
     }
 
   for ( j = 0; j < num_blks; j++ )

@@ -129,7 +129,7 @@ void *Pack(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}

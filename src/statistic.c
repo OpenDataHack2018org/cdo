@@ -1309,8 +1309,8 @@ void annihilate_1side(double **M, long i, long j, long k, long n)
 
   i--; j--;
 
-  mi = malloc(n*sizeof(double));
-  mj = malloc(n*sizeof(double));
+  mi = (double*) malloc(n*sizeof(double));
+  mj = (double*) malloc(n*sizeof(double));
 
   if ( ! mj || ! mi) 
     fprintf(stderr, 
@@ -1377,7 +1377,7 @@ int jacobi_1side(double **M, double *A, long n)
   if ( n > 0 )
     {
       annihilations_buff = malloc (n*n*2*sizeof(int));
-      annihilations = malloc((n*n)*sizeof(int*));
+      annihilations = (int**) malloc((n*n)*sizeof(int*));
     }
 
   for(i=0;i<n*n;i++)

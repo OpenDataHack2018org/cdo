@@ -166,8 +166,8 @@ void *Expr(void *argument)
 
   streamDefVlist(streamID2, vlistID2);
 
-  parse_arg.vardata1 = malloc(nvars*sizeof(double*));
-  parse_arg.vardata2 = malloc(nvars2*sizeof(double*));
+  parse_arg.vardata1 = (double**) malloc(nvars*sizeof(double*));
+  parse_arg.vardata2 = (double**) malloc(nvars2*sizeof(double*));
 
   for ( varID = 0; varID < nvars; varID++ )
     {
@@ -178,7 +178,7 @@ void *Expr(void *argument)
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
       if ( parse_arg.var_needed[varID] )
-	parse_arg.vardata1[varID] = malloc(gridsize*nlevel*sizeof(double));
+	parse_arg.vardata1[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
       else
 	parse_arg.vardata1[varID] = NULL;
     }
@@ -190,11 +190,11 @@ void *Expr(void *argument)
 
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(zaxisID);
-      parse_arg.vardata2[varID] = malloc(gridsize*nlevel*sizeof(double));
+      parse_arg.vardata2[varID] = (double*) malloc(gridsize*nlevel*sizeof(double));
     }
 
   gridsize = vlistGridsizeMax(vlistID1);
-  array = malloc(gridsize*sizeof(double));
+  array = (double*) malloc(gridsize*sizeof(double));
 
   tsID = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID)) )

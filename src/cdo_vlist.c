@@ -40,8 +40,8 @@ void compareGrids(int gridID1, int gridID2)
 		{
 		  double *yvals1, *yvals2;
 
-		  yvals1 = malloc(ysize*sizeof(double));
-		  yvals2 = malloc(ysize*sizeof(double));
+		  yvals1 = (double*) malloc(ysize*sizeof(double));
+		  yvals2 = (double*) malloc(ysize*sizeof(double));
 
 		  gridInqYvals(gridID1, yvals1);
 		  gridInqYvals(gridID2, yvals2);
@@ -78,8 +78,8 @@ void compareGrids(int gridID1, int gridID2)
 		{
 		  double *xvals1, *xvals2;
 
-		  xvals1 = malloc(xsize*sizeof(double));
-		  xvals2 = malloc(xsize*sizeof(double));
+		  xvals1 = (double*) malloc(xsize*sizeof(double));
+		  xvals2 = (double*) malloc(xsize*sizeof(double));
 
 		  gridInqXvals(gridID1, xvals1);
 		  gridInqXvals(gridID2, xvals2);

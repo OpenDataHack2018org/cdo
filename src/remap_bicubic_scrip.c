@@ -318,9 +318,9 @@ void scrip_remap_bicubic(remapgrid_t *src_grid, remapgrid_t *tgt_grid, const dou
   if ( src_grid->rank != 2 )
     cdoAbort("Can not do bicubic interpolation when source grid rank != 2"); 
 
-  grad1_lat    = malloc(src_grid->size*sizeof(double));
-  grad1_lon    = malloc(src_grid->size*sizeof(double));
-  grad1_latlon = malloc(src_grid->size*sizeof(double));
+  grad1_lat    = (double*) malloc(src_grid->size*sizeof(double));
+  grad1_lon    = (double*) malloc(src_grid->size*sizeof(double));
+  grad1_latlon = (double*) malloc(src_grid->size*sizeof(double));
 
   remap_gradients(*src_grid, src_array, grad1_lat, grad1_lon, grad1_latlon);
 

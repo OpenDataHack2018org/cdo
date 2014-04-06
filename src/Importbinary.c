@@ -86,8 +86,8 @@ int y_is_gauss(double *gridyvals, int ysize)
   if ( ysize > 2 )
     {
       double *yvals, *yw;
-      yvals = malloc(ysize*sizeof(double));
-      yw    = malloc(ysize*sizeof(double));
+      yvals = (double*) malloc(ysize*sizeof(double));
+      yw    = (double*) malloc(ysize*sizeof(double));
       gaussaw(yvals, yw, ysize);
       free(yw);
       for ( i = 0; i < (int) ysize; i++ )
@@ -126,8 +126,8 @@ int define_grid(dsets_t *pfi)
   nx = pfi->dnum[0];
   ny = pfi->dnum[1];
 
-  xvals = malloc(nx*sizeof(double));
-  yvals = malloc(ny*sizeof(double));
+  xvals = (double*) malloc(nx*sizeof(double));
+  yvals = (double*) malloc(ny*sizeof(double));
 
   get_dim_vals(pfi, xvals, nx, 0);
   get_dim_vals(pfi, yvals, ny, 1);
@@ -164,7 +164,7 @@ int define_level(dsets_t *pfi, int nlev)
     {
       double *zvals = NULL;
 
-      zvals = malloc(nz*sizeof(double));
+      zvals = (double*) malloc(nz*sizeof(double));
 
       get_dim_vals(pfi, zvals, nz, 2);
 
@@ -252,10 +252,10 @@ void *Importbinary(void *argument)
 
   vlistID = vlistCreate();
 
-  var_zaxisID = malloc(nvars*sizeof(int));
-  recVarID    = malloc(nrecs*sizeof(int));
-  recLevelID  = malloc(nrecs*sizeof(int));
-  var_dfrm    = malloc(nrecs*sizeof(int));
+  var_zaxisID = (int*) malloc(nvars*sizeof(int));
+  recVarID    = (int*) malloc(nrecs*sizeof(int));
+  recLevelID  = (int*) malloc(nrecs*sizeof(int));
+  var_dfrm    = (int*) malloc(nrecs*sizeof(int));
 
   recID = 0;
   for ( ivar = 0; ivar < nvars; ++ivar )
@@ -368,7 +368,7 @@ void *Importbinary(void *argument)
   recsize = pfi.gsiz*8;
   rec = malloc(recsize);
 
-  array = malloc(gridsize*sizeof(double));
+  array = (double*) malloc(gridsize*sizeof(double));
 
   /*
   if (pfi.tmplat)

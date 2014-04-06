@@ -204,8 +204,8 @@ void *Change(void *argument)
 	{
 	  zaxisID1 = vlistZaxis(vlistID2, index);
 	  nlevs = zaxisInqSize(zaxisID1);
-	  levels = malloc(nlevs*sizeof(double));
-	  newlevels = malloc(nlevs*sizeof(double));
+	  levels = (double*) malloc(nlevs*sizeof(double));
+	  newlevels = (double*) malloc(nlevs*sizeof(double));
 	  zaxisInqLevels(zaxisID1, levels);
 
 	  for ( k = 0; k < nlevs; k++ ) newlevels[k] = levels[k];
@@ -255,7 +255,7 @@ void *Change(void *argument)
 
       zaxisID1 = vlistInqVarZaxis(vlistID2, varID);
       nlevs = zaxisInqSize(zaxisID1);
-      levels = malloc(nlevs*sizeof(double));
+      levels = (double*) malloc(nlevs*sizeof(double));
       zaxisInqLevels(zaxisID1, levels);
       nfound = 0;
       for ( k = 0; k < nlevs; k++ )
@@ -317,7 +317,7 @@ void *Change(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = vlistGridsizeMax(vlistID2);
-  array = malloc(gridsize*sizeof(double));
+  array = (double*) malloc(gridsize*sizeof(double));
 
   tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )

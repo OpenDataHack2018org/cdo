@@ -824,10 +824,10 @@ void *Maggraph(void *argument)
        fprintf( stderr," files %s\n",ofilename );
     }
 	
-  datatab = malloc(nfiles*sizeof(double *));
-  vdate   = malloc(nfiles*sizeof(int *));
-  vtime   = malloc(nfiles*sizeof(int *));
-  nts     = malloc(nfiles*sizeof(long));
+  datatab = (double **) malloc(nfiles*sizeof(double *));
+  vdate   = (int **) malloc(nfiles*sizeof(int *));
+  vtime   = (int **) malloc(nfiles*sizeof(int *));
+  nts     = (long*) malloc(nfiles*sizeof(long));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {

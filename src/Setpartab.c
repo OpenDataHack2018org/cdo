@@ -661,7 +661,7 @@ void *Setpartab(void *argument)
   /* vlistPrint(vlistID2);*/
 
   nvars = vlistNvars(vlistID2);
-  vars = malloc(nvars*sizeof(var_t));
+  vars = (var_t*) malloc(nvars*sizeof(var_t));
   memset(vars, 0, nvars*sizeof(var_t));
 
   if ( tableformat == 0 )
@@ -721,7 +721,7 @@ void *Setpartab(void *argument)
 
   gridsize = vlistGridsizeMax(vlistID1);
   if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-  array = malloc(gridsize*sizeof(double));
+  array = (double*) malloc(gridsize*sizeof(double));
 
   tsID1 = 0;
   while ( (nrecs = streamInqTimestep(streamID1, tsID1)) )

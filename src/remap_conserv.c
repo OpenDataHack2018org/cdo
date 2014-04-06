@@ -378,7 +378,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   if ( remap_store_link_fast )
     {
-      grid_store = malloc(sizeof(grid_store_t));
+      grid_store = (grid_store_t*) malloc(sizeof(grid_store_t));
       grid_store_init(grid_store, tgt_grid->size);
     }
 
@@ -414,13 +414,13 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
   struct grid_cell* tgt_grid_cell2[ompNumThreads];  
   for ( i = 0; i < ompNumThreads; ++i )
     {
-      tgt_grid_cell2[i] = malloc(sizeof(struct grid_cell));
+      tgt_grid_cell2[i] = (struct grid_cell*) malloc(sizeof(struct grid_cell));
       tgt_grid_cell2[i]->array_size      = tgt_num_cell_corners;
       tgt_grid_cell2[i]->num_corners     = tgt_num_cell_corners;
       tgt_grid_cell2[i]->edge_type       = tgt_edge_type;
-      tgt_grid_cell2[i]->coordinates_x   = malloc(tgt_num_cell_corners*sizeof(double));
-      tgt_grid_cell2[i]->coordinates_y   = malloc(tgt_num_cell_corners*sizeof(double));
-      tgt_grid_cell2[i]->coordinates_xyz = malloc(3*tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_x   = (double*) malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_y   = (double*) malloc(tgt_num_cell_corners*sizeof(double));
+      tgt_grid_cell2[i]->coordinates_xyz = (double*) malloc(3*tgt_num_cell_corners*sizeof(double));
     }
 
   struct grid_cell* src_grid_cells;
@@ -449,7 +449,7 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
   int* srch_add2[ompNumThreads];
   for ( i = 0; i < ompNumThreads; ++i )
-    srch_add2[i] = malloc(src_grid_size*sizeof(int));
+    srch_add2[i] = (int*) malloc(src_grid_size*sizeof(int));
 
   srch_corners = src_num_cell_corners;
 
@@ -622,9 +622,9 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 	      src_grid_cells[n].array_size      = srch_corners;
 	      src_grid_cells[n].num_corners     = srch_corners;
 	      src_grid_cells[n].edge_type       = src_edge_type;
-	      src_grid_cells[n].coordinates_x   = malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_y   = malloc(srch_corners*sizeof(double));
-	      src_grid_cells[n].coordinates_xyz = malloc(3*srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_x   = (double*) malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_y   = (double*) malloc(srch_corners*sizeof(double));
+	      src_grid_cells[n].coordinates_xyz = (double*) malloc(3*srch_corners*sizeof(double));
 	    }
 
 	  max_srch_cells = num_srch_cells;

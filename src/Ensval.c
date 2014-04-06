@@ -142,7 +142,7 @@ void *Ensval(void *argument)
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);
 
-  ef = malloc(nfiles*sizeof(ens_file_t));
+  ef = (ens_file_t*) malloc(nfiles*sizeof(ens_file_t));
   
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
@@ -274,7 +274,7 @@ void *Ensval(void *argument)
 		}
 
 	      if (ef[fileID].array ) free(ef[fileID].array);
-	      ef[fileID].array = malloc(gridsize*sizeof(double));
+	      ef[fileID].array = (double*) malloc(gridsize*sizeof(double));
 
 	      streamID = ef[fileID].streamID;
 	      streamReadRecord(streamID, ef[fileID].array, &nmiss);

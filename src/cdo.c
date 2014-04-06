@@ -788,7 +788,7 @@ void defineVarnames(const char *arg)
     {
       char *commapos;
       
-      cdoVarnames = malloc(MAX_NUM_VARNAMES*sizeof(char *));
+      cdoVarnames = (char **) malloc(MAX_NUM_VARNAMES*sizeof(char *));
 
       pbuf = strdup(arg+istart);
       cdoVarnames[cdoNumVarnames++] = pbuf;    

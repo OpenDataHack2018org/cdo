@@ -563,7 +563,7 @@ void *Remap(void *argument)
   vlistDefTaxis(vlistID2, taxisID2);
 
   ngrids = vlistNgrids(vlistID1);
-  remapgrids = malloc(ngrids*sizeof(short));
+  remapgrids = (short*) malloc(ngrids*sizeof(short));
   for ( index = 0; index < ngrids; index++ )
     {
       remapgrids[index] = TRUE;
@@ -622,7 +622,7 @@ void *Remap(void *argument)
 
   if ( max_remaps > 0 )
     {
-      remaps = malloc(max_remaps*sizeof(remap_t));
+      remaps = (remap_t*) malloc(max_remaps*sizeof(remap_t));
       for ( r = 0; r < max_remaps; r++ )
 	{
 	  remaps[r].gridID   = -1;
@@ -741,16 +741,16 @@ void *Remap(void *argument)
 
   if ( need_gradiants )
     {
-      grad1_lat    = malloc(grid1sizemax*sizeof(double));
-      grad1_lon    = malloc(grid1sizemax*sizeof(double));
-      grad1_latlon = malloc(grid1sizemax*sizeof(double));
+      grad1_lat    = (double*) malloc(grid1sizemax*sizeof(double));
+      grad1_lon    = (double*) malloc(grid1sizemax*sizeof(double));
+      grad1_latlon = (double*) malloc(grid1sizemax*sizeof(double));
     }
 
-  array1 = malloc(grid1sizemax*sizeof(double));
-  imask  = malloc(grid1sizemax*sizeof(int));
+  array1 = (double*) malloc(grid1sizemax*sizeof(double));
+  imask  = (int*) malloc(grid1sizemax*sizeof(int));
 
   gridsize = gridInqSize(gridID2);
-  array2   = malloc(gridsize*sizeof(double));
+  array2   = (double*) malloc(gridsize*sizeof(double));
 
   if ( ! lwrite_remap )
     {

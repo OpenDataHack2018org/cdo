@@ -152,7 +152,7 @@ void *Detrend(void *argument)
 	  streamInqRecord(streamID1, &varID, &levelID);
 	  gridID   = vlistInqVarGrid(vlistID1, varID);
 	  gridsize = gridInqSize(gridID);
-	  vars[tsID][varID][levelID].ptr = malloc(gridsize*sizeof(double));
+	  vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
 	  streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
 	  vars[tsID][varID][levelID].nmiss = nmiss;
 	}
@@ -162,11 +162,11 @@ void *Detrend(void *argument)
 
   nts = tsID;
 
-  mem = malloc(ompNumThreads*sizeof(memory_t));
+  mem = (memory_t*) malloc(ompNumThreads*sizeof(memory_t));
   for ( i = 0; i < ompNumThreads; i++ )
     {
-      mem[i].array1 = malloc(nts*sizeof(double));
-      mem[i].array2 = malloc(nts*sizeof(double));
+      mem[i].array1 = (double*) malloc(nts*sizeof(double));
+      mem[i].array2 = (double*) malloc(nts*sizeof(double));
     }
 
   for ( varID = 0; varID < nvars; varID++ )

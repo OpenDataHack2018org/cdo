@@ -130,7 +130,7 @@ pml_t *pmlNew(const char *name)
 {
   pml_t *pml;
 
-  pml = malloc(sizeof(pml_t));
+  pml = (pml_t*) malloc(sizeof(pml_t));
 
   pml_init(pml, name);
 
@@ -196,7 +196,7 @@ int pmlAdd(pml_t *pml, const char *name, int type, int dis, void *ptr, size_t si
       return (-1);
     }
 
-  pml_entry = malloc(sizeof(pml_entry_t));
+  pml_entry = (pml_entry_t*) malloc(sizeof(pml_entry_t));
 
   pml_entry->name = strdup(name);
   pml_entry->len  = strlen(name);
@@ -328,7 +328,7 @@ int pmlRead(pml_t *pml, int argc, char **argv)
       bufsize += len+1;
     }
 
-  parbuf = malloc(bufsize*sizeof(char));
+  parbuf = (char*) malloc(bufsize*sizeof(char));
   memset(parbuf, 0, bufsize*sizeof(char));
 
   istart = 0;
@@ -593,7 +593,7 @@ void *Select(void *argument)
 
 	  vlistClearFlag(vlistID1);
 	  nvars = vlistNvars(vlistID1);
-	  vars  = malloc(nvars*sizeof(int));
+	  vars  = (int*) malloc(nvars*sizeof(int));
 
 	  if ( operatorID == DELETE )
 	    {
@@ -793,7 +793,7 @@ void *Select(void *argument)
 	    {
 	      gridsize = vlistGridsizeMax(vlistID1);
 	      if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
-	      array = malloc(gridsize*sizeof(double));
+	      array = (double*) malloc(gridsize*sizeof(double));
 	    }
 	}
       else

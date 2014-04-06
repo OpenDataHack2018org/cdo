@@ -549,9 +549,9 @@ void *Magplot(void *argument)
   nlat     = gridInqYsize(gridID);
   nlev     = zaxisInqSize(zaxisID);
 
-  array           = malloc(gridsize*sizeof(double));
-  grid_center_lat = malloc(gridsize*sizeof(double));
-  grid_center_lon = malloc(gridsize*sizeof(double));
+  array           = (double*) malloc(gridsize*sizeof(double));
+  grid_center_lat = (double*) malloc(gridsize*sizeof(double));
+  grid_center_lon = (double*) malloc(gridsize*sizeof(double));
 
   gridInqYvals(gridID, grid_center_lat);
   gridInqXvals(gridID, grid_center_lon);

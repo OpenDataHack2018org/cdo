@@ -270,7 +270,7 @@ void *Vargen(void *argument)
   streamDefVlist(streamID, vlistID);
 
   gridsize = gridInqSize(gridID);
-  array = malloc(gridsize*sizeof(double));
+  array = (double*) malloc(gridsize*sizeof(double));
 
   if ( operatorID == FOR )
     ntimesteps = 1.001 + ((rstop-rstart)/rinc);
@@ -307,8 +307,8 @@ void *Vargen(void *argument)
                 }
               else if ( operatorID == SINCOS )
                 {
-		  double *xvals = malloc(gridsize*sizeof(double));
-		  double *yvals = malloc(gridsize*sizeof(double));
+		  double *xvals = (double*) malloc(gridsize*sizeof(double));
+		  double *yvals = (double*) malloc(gridsize*sizeof(double));
 
 		  if ( gridInqType(gridID) == GRID_GME ) gridID = gridToUnstructured(gridID, 0);
 

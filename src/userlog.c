@@ -963,8 +963,8 @@ void dumplogo(const char *logfilename, int dumptype)
 
       nlogs = bufsize / logsize;
 
-      logInfo    = malloc(nlogs*sizeof(loginfo_t *));
-      logInfo[0] = malloc(nlogs*sizeof(loginfo_t));
+      logInfo    = (loginfo_t **) malloc(nlogs*sizeof(loginfo_t *));
+      logInfo[0] = (loginfo_t*) malloc(nlogs*sizeof(loginfo_t));
       for ( i = 1; i < nlogs; i++ ) logInfo[i] = logInfo[0] + i;
 
       for ( i = 0; i < nlogs; i++ )

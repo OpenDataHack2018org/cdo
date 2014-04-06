@@ -154,8 +154,8 @@ void writeNcFile(const char path[], const double array[], int length)
 static
 double **createVars(int nvars, int nts)
 {  
-  double *array = malloc(nvars*nts*sizeof(double));
-  double **vars = malloc(nvars*sizeof(double));
+  double *array = (double*) malloc(nvars*nts*sizeof(double));
+  double **vars = (double*) malloc(nvars*sizeof(double));
   
   int i;
   

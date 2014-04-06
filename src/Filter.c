@@ -256,7 +256,7 @@ void *Filter(void *argument)
           streamInqRecord(streamID1, &varID, &levelID);
           gridID   = vlistInqVarGrid(vlistID1, varID);
           gridsize = gridInqSize(gridID);
-          vars[tsID][varID][levelID].ptr = malloc(gridsize*sizeof(double));
+          vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
           streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
           if ( nmiss ) cdoAbort("Missing value support for operators in module Filter not added yet");
@@ -326,8 +326,8 @@ void *Filter(void *argument)
   nts2 |= nts2 >> 16; /* handle 32 bit numbers */
   nts2++;
 
-  array1 = malloc(nts2*sizeof(double));
-  array2 = malloc(nts2*sizeof(double));
+  array1 = (double*) malloc(nts2*sizeof(double));
+  array2 = (double*) malloc(nts2*sizeof(double));
 #endif
 
   fmasc  = calloc(nts2, sizeof(int));

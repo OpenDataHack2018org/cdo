@@ -152,7 +152,7 @@ void *Consecstat (void *argument)
   vlistDefTaxis(ovlistID, otaxisID);
 
   field_init(&field);
-  field.ptr = malloc(vlistGridsizeMax(ovlistID)*sizeof(double));
+  field.ptr = (double*) malloc(vlistGridsizeMax(ovlistID)*sizeof(double));
 
   nvars     = vlistNvars(ivlistID);
   vars      = field_calloc(ivlistID, FIELD_PTR);

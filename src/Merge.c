@@ -168,8 +168,8 @@ void *Merge(void *argument)
       if ( !userFileOverwrite(ofilename) )
 	cdoAbort("Outputfile %s already exists!", ofilename);
 
-  streamIDs = malloc(nmerge*sizeof(int));
-  vlistIDs  = malloc(nmerge*sizeof(int));
+  streamIDs = (int*) malloc(nmerge*sizeof(int));
+  vlistIDs  = (int*) malloc(nmerge*sizeof(int));
 
   for ( index = 0; index < nmerge; index++ )
     {
@@ -208,7 +208,7 @@ void *Merge(void *argument)
   if ( ! lcopy )
     {
       gridsize = vlistGridsizeMax(vlistID2);
-      array = malloc(gridsize*sizeof(double));
+      array = (double*) malloc(gridsize*sizeof(double));
     }
 
   tsID = 0;

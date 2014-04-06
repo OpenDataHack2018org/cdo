@@ -67,7 +67,7 @@ static drmaa_job_template_t *create_job_template(const char *expname, const char
   len2 = strlen(GRID_TMPDIR);
   len = len1+len2+2;
 
-  output_path = malloc(len*sizeof(char));
+  output_path = (char*) malloc(len*sizeof(char));
   /*
   strcpy(output_path, host);
   strcat(output_path, ":");

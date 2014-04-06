@@ -227,15 +227,15 @@ void *Runstat(void *argument)
   nvars    = vlistNvars(vlistID1);
   nrecords = vlistNrecs(vlistID1);
 
-  recVarID   = malloc(nrecords*sizeof(int));
-  recLevelID = malloc(nrecords*sizeof(int));
+  recVarID   = (int*) malloc(nrecords*sizeof(int));
+  recLevelID = (int*) malloc(nrecords*sizeof(int));
 
-  dtinfo = malloc((ndates+1)*sizeof(dtinfo_t));
-  vars1 = malloc((ndates+1)*sizeof(field_t **));
+  dtinfo = (dtinfo_t*) malloc((ndates+1)*sizeof(dtinfo_t));
+  vars1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   if ( !runstat_nomiss )
-    samp1 = malloc((ndates+1)*sizeof(field_t **));
+    samp1 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
   if ( lvarstd )
-    vars2 = malloc((ndates+1)*sizeof(field_t **));
+    vars2 = (field_t ***) malloc((ndates+1)*sizeof(field_t **));
 
   for ( its = 0; its < ndates; its++ )
     {
@@ -247,7 +247,7 @@ void *Runstat(void *argument)
     }
 
   gridsizemax = vlistGridsizeMax(vlistID1);
-  imask = malloc(gridsizemax*sizeof(int));
+  imask = (int*) malloc(gridsizemax*sizeof(int));
 
   for ( tsID = 0; tsID < ndates; tsID++ )
     {
