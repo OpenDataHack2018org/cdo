@@ -318,8 +318,8 @@ void *Maskbox(void *argument)
   streamDefVlist(streamID2, vlistID2);
 
   gridsize = gridInqSize(gridID);
-  array = malloc ( gridsize*sizeof(double) );
-  mask  = malloc ( gridsize*sizeof(int) );
+  array = (double*) malloc( gridsize*sizeof(double));
+  mask  = (int*) malloc( gridsize*sizeof(int));
   for( i=0;  i < gridsize; i++) mask[i] = 1;
  
   if ( operatorID == MASKLONLATBOX )

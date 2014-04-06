@@ -547,13 +547,13 @@ void yar_remap_con(field_t *field1, field_t *field2)
   area = (double*) malloc(gridsize1*sizeof(double));
 
   struct grid_cell *SourceCell;
-  SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
+  SourceCell = (struct grid_cell*) malloc(gridsize1  * sizeof(struct grid_cell));
 
   for ( int n = 0; n <  gridsize1; n++ ) {
     SourceCell[n].num_corners   = 4;
     SourceCell[n].edge_type     = quad_type;
-    SourceCell[n].coordinates_x = malloc ( 4 * sizeof(SourceCell[n].coordinates_x[0]) );
-    SourceCell[n].coordinates_y = malloc ( 4 * sizeof(SourceCell[n].coordinates_y[0]) );
+    SourceCell[n].coordinates_x = (double*) malloc( 4 * sizeof(double));
+    SourceCell[n].coordinates_y = (double*) malloc( 4 * sizeof(double));
   }
 
   struct grid_cell  TargetCell;
@@ -561,8 +561,8 @@ void yar_remap_con(field_t *field1, field_t *field2)
   TargetCell.num_corners   = 4;
   TargetCell.edge_type     = quad_type;
 
-  TargetCell.coordinates_x = malloc ( 4 * sizeof(*TargetCell.coordinates_x) );
-  TargetCell.coordinates_y = malloc ( 4 * sizeof(*TargetCell.coordinates_y) );
+  TargetCell.coordinates_x = (double*) malloc( 4 * sizeof(double));
+  TargetCell.coordinates_y = (double*) malloc( 4 * sizeof(double));
 
   unsigned const * curr_deps;
   //struct polygons polygons;

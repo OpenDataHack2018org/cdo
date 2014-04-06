@@ -471,8 +471,8 @@ void *EOFs(void * argument)
             {
               sum_w = 0;
 
-	      pack = malloc ( gridsize * sizeof(int) );
-	      miss = malloc ( gridsize * sizeof(int) );
+	      pack = (int*) malloc( gridsize * sizeof(int));
+	      miss = (int*) malloc( gridsize * sizeof(int));
 
               for ( i = 0; i < gridsize ; i++ )
                 {

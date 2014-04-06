@@ -102,7 +102,7 @@ void *Eofcoeff(void * argument)
   filesuffix[0] = 0;
   cdoGenFileSuffix(filesuffix, sizeof(filesuffix), streamInqFiletype(streamID1), vlistID1, refname);
   
-  eof = malloc (nvars * sizeof(field_t**) );
+  eof = (field_t***) malloc(nvars * sizeof(field_t**));
   for ( varID=0; varID<nvars; varID++)
     eof[varID] = (field_t**) malloc(nlevs*sizeof(field_t*));
   reached_eof=0;

@@ -422,21 +422,21 @@ void intconarr2(double missval, int lon_is_circular,
   area = (double*) malloc(gridsize1*sizeof(double));
 
   struct grid_cell *SourceCell;
-  SourceCell = malloc (gridsize1  * sizeof(*SourceCell) );
+  SourceCell = (struct grid_cell*) malloc(gridsize1  * sizeof(struct grid_cell));
 
   for ( int n = 0; n <  gridsize1; n++ ) {
     SourceCell[n].num_corners   = 4;
     SourceCell[n].edge_type     = quad_type;
-    SourceCell[n].coordinates_x = malloc (4 * sizeof(SourceCell[n].coordinates_x[0]) );
-    SourceCell[n].coordinates_y = malloc (4 * sizeof(SourceCell[n].coordinates_y[0]) );
+    SourceCell[n].coordinates_x = (double*) malloc(4 * sizeof(double));
+    SourceCell[n].coordinates_y = (double*) malloc(4 * sizeof(double));
   }
 
   struct grid_cell  TargetCell;
 
   TargetCell.num_corners   = nc2;
   TargetCell.edge_type     = quad_type;
-  TargetCell.coordinates_x = malloc (nc2 * sizeof(*TargetCell.coordinates_x) );
-  TargetCell.coordinates_y = malloc (nc2 * sizeof(*TargetCell.coordinates_y) );
+  TargetCell.coordinates_x = (double*) malloc(nc2 * sizeof(double));
+  TargetCell.coordinates_y = (double*) malloc(nc2 * sizeof(double));
 
   unsigned const * curr_deps;
 #endif

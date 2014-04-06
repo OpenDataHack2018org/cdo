@@ -118,14 +118,14 @@ void *Ensval(void *argument)
   }
 
   // allocate array to hold results 
-  r = malloc ( nostreams*sizeof(double) );
+  r = (double*) malloc( nostreams*sizeof(double));
   
 
   // one stream for each value of the decomposition
-  streamID2 = malloc ( nostreams*sizeof(int) );
-  vlistID2 = malloc ( nostreams*sizeof(int) );
-  taxisID2 = malloc ( nostreams*sizeof(int) );
-  zaxisID2 = malloc ( nostreams*sizeof(int) );
+  streamID2 = (int*) malloc( nostreams*sizeof(int));
+  vlistID2 = (int*) malloc( nostreams*sizeof(int));
+  taxisID2 = (int*) malloc( nostreams*sizeof(int));
+  zaxisID2 = (int*) malloc( nostreams*sizeof(int));
 
   val = calloc( nfiles,sizeof(double) );
   

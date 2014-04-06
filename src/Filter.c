@@ -312,8 +312,8 @@ void *Filter(void *argument)
 #if defined( HAVE_LIBFFTW3 ) 
   nts2 = nts;
 
-  out_fft = malloc ( nts * sizeof(fftw_complex) );
-  in_fft  = malloc ( nts * sizeof(fftw_complex) );
+  out_fft = (fftw_complex*) malloc( nts * sizeof(fftw_complex));
+  in_fft  = (fftw_complex*) malloc( nts * sizeof(fftw_complex));
 
   p_T2S = fftw_plan_dft_1d(nts,in_fft,out_fft,  1, FFTW_ESTIMATE);
   p_S2T = fftw_plan_dft_1d(nts,out_fft,in_fft, -1, FFTW_ESTIMATE);

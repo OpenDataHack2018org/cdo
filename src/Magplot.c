@@ -1096,12 +1096,12 @@ int ReadColourTable ( char *filepath )
       }
     
     USR_COLOUR_COUNT = 0;
-    USR_COLOUR_TABLE = malloc ( num_colors * sizeof( char * ) );
-    temp_table  = malloc ( num_colors * sizeof( char * ) );
+    USR_COLOUR_TABLE = ( char * *) malloc( num_colors * sizeof( char * ));
+    temp_table  = ( char * *) malloc( num_colors * sizeof( char * ));
     
     for( i =0; i < num_colors; i++ )
       {
-         temp_table[i] = malloc (  256 * sizeof( char ) );
+         temp_table[i] = ( char *) malloc(  256 * sizeof( char ));
 	 fscanf( fp, "%s", temp_table[i] );
 	 if( DBG )
 	   fprintf( stdout, "%s\n", temp_table[i] );
