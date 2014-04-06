@@ -127,17 +127,17 @@ void *Ensval(void *argument)
   taxisID2 = malloc ( nostreams*sizeof(int) );
   zaxisID2 = malloc ( nostreams*sizeof(int) );
 
-  val = calloc ( nfiles,sizeof(double) );
+  val = calloc( nfiles,sizeof(double) );
   
   if ( operfunc == CRPS ) {
-    alpha=calloc ( nens+1,sizeof(double) );
-    beta =calloc ( nens+1,sizeof(double) );
-    alpha_weights=calloc ( nens+1,sizeof(double) );
-    beta_weights =calloc ( nens+1,sizeof(double) );
+    alpha=calloc( nens+1,sizeof(double) );
+    beta =calloc( nens+1,sizeof(double) );
+    alpha_weights=calloc( nens+1,sizeof(double) );
+    beta_weights =calloc( nens+1,sizeof(double) );
   }
   else if ( operfunc == BRS ) {
-    brs_g = calloc ( nens+1,sizeof(double) );
-    brs_o = calloc ( nens+1,sizeof(double) );
+    brs_g = calloc( nens+1,sizeof(double) );
+    brs_o = calloc( nens+1,sizeof(double) );
   }
   if ( cdoVerbose )
     cdoPrint("Ensemble over %d files (Ensstat5).", nfiles-1);

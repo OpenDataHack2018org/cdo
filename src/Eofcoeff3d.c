@@ -118,7 +118,7 @@ void *Eofcoeff3d(void * argument)
          streamInqRecord(streamID1, &varID, &levelID);
          missval1 = vlistInqVarMissval(vlistID1, varID);
          if ( eofID == 0 )
-           eof[varID][levelID] = malloc (1*sizeof(field_t));
+           eof[varID][levelID] = (field_t*) malloc(1*sizeof(field_t));
          else
            eof[varID][levelID] = realloc (eof[varID][levelID], (eofID+1)*sizeof(field_t));
          eof[varID][levelID][eofID].grid   = gridID1;
@@ -165,7 +165,7 @@ void *Eofcoeff3d(void * argument)
     varID3[varID] = vlistDefVar(vlistID3, gridID3, zaxisID3, TSTEP_INSTANT);
   
   // open streams for eofcoeff output
-  streamIDs = malloc (neof*sizeof(int)); 
+  streamIDs = (int*) malloc(neof*sizeof(int)); 
   eofID = 0;
   for ( eofID = 0; eofID < neof; eofID++)
     {
@@ -189,13 +189,13 @@ void *Eofcoeff3d(void * argument)
   // ALLOCATE temporary fields for data read and write
   in.ptr = (double*) malloc(gridsize*sizeof(double));
   in.grid = gridID1;  
-  out = malloc (nvars*sizeof(field_t*));
+  out = (field_t**) malloc(nvars*sizeof(field_t*));
   for ( varID = 0; varID < nvars; varID++ ) {
     out[varID] = malloc ( neof * sizeof(field_t) );
     for ( eofID=0; eofID<neof; eofID++ ) {
       out[varID][eofID].missval = missval1;
       out[varID][eofID].nmiss = 0;
-      out[varID][eofID].ptr = malloc (1*sizeof(double));
+      out[varID][eofID].ptr = (double*) malloc(1*sizeof(double));
     }
   }
 

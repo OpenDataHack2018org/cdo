@@ -487,10 +487,10 @@ void *EOFs(void * argument)
 	      if ( cdoVerbose )
 		cdoPrint("allocating cov with %i x %i elements | npack=%i",nts,nts,npack);
 
-              cov = malloc (nts*sizeof(double*));
+              cov = (double**) malloc(nts*sizeof(double*));
               for ( j1 = 0; j1 < nts; j1++)
                 cov[j1] = (double*) malloc(nts*sizeof(double));
-	      eigv = malloc (nts*sizeof(double));
+	      eigv = (double*) malloc(nts*sizeof(double));
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(j1,j2,i,sum, df1p, df2p) default(shared) schedule(dynamic)

@@ -179,7 +179,7 @@ void *EOF3d(void * argument)
   taxisDefRtime(taxisID2, 0);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  varID2 = malloc (nvars*sizeof(int));
+  varID2 = (int*) malloc(nvars*sizeof(int));
   for ( varID=0; varID<nvars; varID++ )
     varID2[varID] = vlistDefVar(vlistID2, gridID2, zaxisID2, TSTEP_INSTANT);
   ngrids      = vlistNgrids(vlistID2);
@@ -396,7 +396,7 @@ void *EOF3d(void * argument)
       }
 
 	  
-      cov = malloc (nts*sizeof(double*));
+      cov = (double**) malloc(nts*sizeof(double*));
       for ( j1 = 0; j1 < nts; j1++)
 	cov[j1] = (double*) malloc(nts*sizeof(double));
       eigv = (double*) malloc(n*sizeof(double));

@@ -758,7 +758,7 @@ void glo_coor(double *pxn, double *prlon, double *prlat,
    * icosahedral triangles into mni equal parts.                 
    */  
 
-  if ((mcosv = malloc (knd*sizeof(int))) == NULL ) 
+  if ((mcosv = (int)*) malloc(knd*sizeof(int))) == NULL ) 
     {
       perror("malloc mcosv");
       exit (-1);

@@ -120,7 +120,7 @@ void *Eofcoeff(void * argument)
          streamInqRecord(streamID1, &varID, &levelID);
          missval1 = vlistInqVarMissval(vlistID1, varID);
          if ( eofID == 0 )
-           eof[varID][levelID] = malloc (1*sizeof(field_t));
+           eof[varID][levelID] = (field_t*) malloc(1*sizeof(field_t));
          else
            eof[varID][levelID] = realloc (eof[varID][levelID], (eofID+1)*sizeof(field_t));
          eof[varID][levelID][eofID].grid   = gridID1;
@@ -164,7 +164,7 @@ void *Eofcoeff(void * argument)
     vlistDefVarTsteptype(vlistID3, varID, TSTEP_INSTANT);
   
   // open streams for eofcoeff output
-  streamIDs = malloc (neof*sizeof(int)); 
+  streamIDs = (int*) malloc(neof*sizeof(int)); 
   eofID = 0;
   for ( eofID = 0; eofID < neof; eofID++)
     {
@@ -191,7 +191,7 @@ void *Eofcoeff(void * argument)
   in.grid = gridID1;  
   out.missval = missval1;
   out.nmiss = 0;
-  out.ptr = malloc (1*sizeof(double));
+  out.ptr = (double*) malloc(1*sizeof(double));
  
   // 
   reached_eof=0;

@@ -1376,7 +1376,7 @@ int jacobi_1side(double **M, double *A, long n)
 
   if ( n > 0 )
     {
-      annihilations_buff = malloc (n*n*2*sizeof(int));
+      annihilations_buff = (int*) malloc(n*n*2*sizeof(int));
       annihilations = (int**) malloc((n*n)*sizeof(int*));
     }
 
