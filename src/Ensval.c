@@ -203,7 +203,7 @@ void *Ensval(void *argument)
       break;
     }
 
-    ofilename = calloc(namelen, sizeof(char));
+    ofilename = (char*) calloc(namelen, sizeof(char));
 
     sprintf(ofilename, "%s.%s%s", ofilebase, type_suffix, file_suffix);
     // fprintf(stderr, "StreamID %i: %s\n", stream, ofilename);

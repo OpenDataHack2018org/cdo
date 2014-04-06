@@ -242,12 +242,12 @@ void *Ensstat3(void *argument)
     
     for  ( i=0; i<nbins; i++ ) {
       ctg_tab[i] = calloc( 4,sizeof(int) );
-      roc[i]     = calloc( 2,sizeof(double));
+      roc[i]     = (double*) calloc( 2,sizeof(double));
       uThresh[i] = ((double)i+1)/nbins;
       lThresh[i] = (double)i/nbins;
     }
-    ctg_tab[nbins] = calloc(4,sizeof(int));
-    roc[nbins]     = calloc(2,sizeof(double));
+    ctg_tab[nbins] = (int*) calloc(4,sizeof(int));
+    roc[nbins]     = (double*) calloc(2,sizeof(double));
   }
   
   

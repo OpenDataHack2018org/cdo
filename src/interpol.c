@@ -239,7 +239,7 @@ void intlinarr2(double missval, int lon_is_circular,
   if ( lon_is_circular ) nlon1--;
   gridsize1 = nlon1*nym;
 
-  grid1_mask = calloc(1, gridsize1*sizeof(int));
+  grid1_mask = (int*) calloc(1, gridsize1*sizeof(int));
   for ( jj = 0; jj < nym; ++jj )
     for ( ii = 0; ii < nlon1; ++ii )
       {
@@ -387,7 +387,7 @@ void intconarr2(double missval, int lon_is_circular,
 
   deps = (int*) malloc(gridsize1*sizeof(int));
 
-  grid1_mask = calloc(1, gridsize1*sizeof(int));
+  grid1_mask = (int*) calloc(1, gridsize1*sizeof(int));
   for ( jj = 0; jj < ny; ++jj )
     for ( ii = 0; ii < nx; ++ii )
       {

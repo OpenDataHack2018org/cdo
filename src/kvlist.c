@@ -295,7 +295,7 @@ void *kvlParseFile(const char *filename)
       return (kvl);
     }
  
-  kvl = calloc(1, sizeof(kvl_t));
+  kvl = (kvl_t*) calloc(1, sizeof(kvl_t));
   kvl->buffer = buffer;
   kvl->buffersize = filesize;
   kvl->filename = strdup(filename);

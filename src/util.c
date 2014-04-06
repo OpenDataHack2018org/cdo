@@ -94,10 +94,10 @@ argument_t *file_argument_new(const char *filename)
 {
   argument_t *argument;
 
-  argument = calloc(1, sizeof(argument_t));
+  argument = (argument_t*) calloc(1, sizeof(argument_t));
 
   argument->argc = 1;
-  argument->argv = calloc(1, sizeof(char *));
+  argument->argv = (char **) calloc(1, sizeof(char *));
   argument->argv[0] = (char *) filename;
   argument->args = (char *) filename;
 
@@ -123,16 +123,16 @@ argument_t *argument_new(size_t argc, size_t len)
 {
   argument_t *argument;
 
-  argument = calloc(1, sizeof(argument_t));
+  argument = (argument_t*) calloc(1, sizeof(argument_t));
 
   if ( argc > 0 )
     {
       argument->argc = argc;
-      argument->argv = calloc(argc, sizeof(char *));
+      argument->argv = (char **) calloc(argc, sizeof(char *));
     }
 
   if ( len > 0 )
-    argument->args = calloc(len, sizeof(char));
+    argument->args = (char*) calloc(len, sizeof(char));
 
   return (argument);
 }
