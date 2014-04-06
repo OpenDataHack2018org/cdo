@@ -141,7 +141,7 @@ double *vctFromFile(const char *filename, int *nvct)
   for ( i = 0; i < nlevh2+1; ++i )
     vct2[i+nvct2/2] = vct2[i+maxvct/2];
   
-  vct2 = realloc(vct2, nvct2*sizeof(double));
+  vct2 = (double*) realloc(vct2, nvct2*sizeof(double));
 
   *nvct = nvct2;
 

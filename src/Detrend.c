@@ -139,8 +139,8 @@ void *Detrend(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  dtinfo = realloc(dtinfo, nalloc*sizeof(dtinfo_t));
-	  vars   = realloc(vars, nalloc*sizeof(field_t **));
+	  dtinfo = (dtinfo_t*) realloc(dtinfo, nalloc*sizeof(dtinfo_t));
+	  vars   = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       taxisInqDTinfo(taxisID1, &dtinfo[tsID]);

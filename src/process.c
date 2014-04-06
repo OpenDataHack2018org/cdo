@@ -564,7 +564,7 @@ int expand_wildcards(int processID, int streamCnt)
 	  free(Process[processID].streamNames[0].argv);
 	  free(Process[processID].streamNames[0].args);
 
-	  Process[processID].streamNames = realloc(Process[processID].streamNames, streamCnt*sizeof(argument_t));
+	  Process[processID].streamNames = (argument_t*) realloc(Process[processID].streamNames, streamCnt*sizeof(argument_t));
 	      
 	  // move output streams to the end
 	  for ( i = 1; i < Process[processID].streamCnt; ++i )

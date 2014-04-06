@@ -886,9 +886,9 @@ void *Maggraph(void *argument)
 	  if ( nts[ fileID ] > nts_alloc )
 	    {
 	      nts_alloc += NINC_ALLOC;
-	      datatab[ fileID ] = realloc(datatab[fileID], nts_alloc*sizeof(double));
-	      vdate[ fileID ]   = realloc(vdate[fileID], nts_alloc*sizeof(int));
-	      vtime[ fileID ]   = realloc(vtime[fileID], nts_alloc*sizeof(int));
+	      datatab[ fileID ] = (double*) realloc(datatab[fileID], nts_alloc*sizeof(double));
+	      vdate[ fileID ]   = (int*) realloc(vdate[fileID], nts_alloc*sizeof(int));
+	      vtime[ fileID ]   = (int*) realloc(vtime[fileID], nts_alloc*sizeof(int));
 	    }
 	  
 	  streamInqRecord( streamID, &varID, &levelID );

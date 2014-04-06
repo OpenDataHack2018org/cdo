@@ -189,23 +189,23 @@ void remapGridRealloc(int map_type, remapgrid_t *grid)
   long nalloc;
 
   if ( grid->nvgp )
-    grid->vgpm   = realloc(grid->vgpm, grid->nvgp*sizeof(int));
+    grid->vgpm   = (int*) realloc(grid->vgpm, grid->nvgp*sizeof(int));
 
-  grid->mask     = realloc(grid->mask, grid->size*sizeof(int));
+  grid->mask     = (int*) realloc(grid->mask, grid->size*sizeof(int));
 
   if ( remap_write_remap == TRUE || grid->remap_grid_type != REMAP_GRID_TYPE_REG2D )
     {
-      grid->cell_center_lon = realloc(grid->cell_center_lon, grid->size*sizeof(double));
-      grid->cell_center_lat = realloc(grid->cell_center_lat, grid->size*sizeof(double));
+      grid->cell_center_lon = (double*) realloc(grid->cell_center_lon, grid->size*sizeof(double));
+      grid->cell_center_lat = (double*) realloc(grid->cell_center_lat, grid->size*sizeof(double));
     }
 
   if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
     {
-      grid->cell_area = realloc(grid->cell_area, grid->size*sizeof(double));
+      grid->cell_area = (double*) realloc(grid->cell_area, grid->size*sizeof(double));
       memset(grid->cell_area, 0, grid->size*sizeof(double));
     }
 
-  grid->cell_frac = realloc(grid->cell_frac, grid->size*sizeof(double));
+  grid->cell_frac = (double*) realloc(grid->cell_frac, grid->size*sizeof(double));
   memset(grid->cell_frac, 0, grid->size*sizeof(double));
 
   if ( grid->lneed_cell_corners )
@@ -218,10 +218,10 @@ void remapGridRealloc(int map_type, remapgrid_t *grid)
 	{
 	  nalloc = grid->num_cell_corners*grid->size;
 
-	  grid->cell_corner_lon = realloc(grid->cell_corner_lon, nalloc*sizeof(double));
+	  grid->cell_corner_lon = (double*) realloc(grid->cell_corner_lon, nalloc*sizeof(double));
 	  memset(grid->cell_corner_lon, 0, nalloc*sizeof(double));
 
-	  grid->cell_corner_lat = realloc(grid->cell_corner_lat, nalloc*sizeof(double));  
+	  grid->cell_corner_lat = (double*) realloc(grid->cell_corner_lat, nalloc*sizeof(double));  
 	  memset(grid->cell_corner_lat, 0, nalloc*sizeof(double));
 	}
     }
@@ -615,8 +615,8 @@ void remap_define_reg2d(int gridID, remapgrid_t *grid)
 
   if ( grid->size != nx*ny ) cdoAbort("Internal error, wrong dimensions!");
 
-  grid->reg2d_center_lon = realloc(grid->reg2d_center_lon, nxm*sizeof(double));
-  grid->reg2d_center_lat = realloc(grid->reg2d_center_lat,  ny*sizeof(double));
+  grid->reg2d_center_lon = (double*) realloc(grid->reg2d_center_lon, nxm*sizeof(double));
+  grid->reg2d_center_lat = (double*) realloc(grid->reg2d_center_lat,  ny*sizeof(double));
  
   grid->reg2d_center_lon[0] = 0;
   grid->reg2d_center_lat[0] = 0;
@@ -768,7 +768,7 @@ static
 void cell_bounding_boxes(remapgrid_t *grid, int remap_grid_basis)
 {
   if ( remap_grid_basis == REMAP_GRID_BASIS_SRC || grid->luse_cell_corners )
-    grid->cell_bound_box = realloc(grid->cell_bound_box, 4*grid->size*sizeof(restr_t));
+    grid->cell_bound_box = (restr_t*) realloc(grid->cell_bound_box, 4*grid->size*sizeof(restr_t));
 
   if ( grid->luse_cell_corners )
     {
@@ -1018,10 +1018,10 @@ void remap_vars_init(int map_type, long src_grid_size, long tgt_grid_size, remap
 
   /*  Allocate address and weight arrays for mapping 1 */
 
-  rv->src_grid_add = realloc(rv->src_grid_add, rv->max_links*sizeof(int));
-  rv->tgt_grid_add = realloc(rv->tgt_grid_add, rv->max_links*sizeof(int));
+  rv->src_grid_add = (int*) realloc(rv->src_grid_add, rv->max_links*sizeof(int));
+  rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, rv->max_links*sizeof(int));
 
-  rv->wts = realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+  rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
 
   rv->links.option    = FALSE;
   rv->links.max_links = 0;
@@ -1051,10 +1051,10 @@ void resize_remap_vars(remapvars_t *rv, int increment)
 
   if ( rv->max_links )
     {
-      rv->src_grid_add = realloc(rv->src_grid_add, rv->max_links*sizeof(int));
-      rv->tgt_grid_add = realloc(rv->tgt_grid_add, rv->max_links*sizeof(int));
+      rv->src_grid_add = (int*) realloc(rv->src_grid_add, rv->max_links*sizeof(int));
+      rv->tgt_grid_add = (int*) realloc(rv->tgt_grid_add, rv->max_links*sizeof(int));
 
-      rv->wts = realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
+      rv->wts = (double*) realloc(rv->wts, rv->num_wts*rv->max_links*sizeof(double));
     }
 
 } /* resize_remap_vars */

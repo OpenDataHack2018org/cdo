@@ -1060,7 +1060,7 @@ void read_dataset(hid_t loc_id, const char *name, void *opdata)
       
       offset = gridsize*(nz-1);
       array  = ((datasets_t *) opdata)->obj[nset].array;
-      array  = realloc(array, gridsize*nz*nt*sizeof(double));
+      array  = (double*) realloc(array, gridsize*nz*nt*sizeof(double));
       ((datasets_t *) opdata)->obj[nset].array    = array;
       array  = array+offset;
 

@@ -762,7 +762,7 @@ void intgridbil(field_t *field1, field_t *field2)
 	{
 	  field  = array1_2D;
 	  array1_2D = (double **) malloc(nlat1*sizeof(double *));
-	  lon1 = realloc(lon1, (nlon1+1)*sizeof(double));
+	  lon1 = (double*) realloc(lon1, (nlon1+1)*sizeof(double));
 	  array = (double*) malloc(nlat1*(nlon1+1)*sizeof(double));
 
 	  for ( ilat = 0; ilat < nlat1; ilat++ )

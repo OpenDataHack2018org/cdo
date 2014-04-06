@@ -111,7 +111,7 @@ void *Tstepcount(void *argument)
       if ( tsID >= nalloc )
 	{
 	  nalloc += NALLOC_INC;
-	  vars  = realloc(vars, nalloc*sizeof(field_t **));
+	  vars  = (field_t ***) realloc(vars, nalloc*sizeof(field_t **));
 	}
 
       vdate = taxisInqVdate(taxisID1);

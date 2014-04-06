@@ -91,7 +91,7 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 
   if ( nbins > 0 )
     {
-      bin_lats = src_grid->bin_lats = realloc(src_grid->bin_lats, 2*nbins*sizeof(restr_t));
+      bin_lats = src_grid->bin_lats = (restr_t*) realloc(src_grid->bin_lats, 2*nbins*sizeof(restr_t));
 
       for ( n = 0; n < nbins; ++n )
 	{
@@ -100,13 +100,13 @@ void calc_lat_bins(remapgrid_t* src_grid, remapgrid_t* tgt_grid, int map_type)
 	  bin_lats[n2+1] = RESTR_SCALE((n+1)*dlat - PIH);
 	}
 
-      src_grid->bin_addr = realloc(src_grid->bin_addr, 2*nbins*sizeof(int));
+      src_grid->bin_addr = (int*) realloc(src_grid->bin_addr, 2*nbins*sizeof(int));
 
       calc_bin_addr(src_grid->size, nbins, bin_lats, src_grid->cell_bound_box, src_grid->bin_addr);
 
       if ( map_type == MAP_TYPE_CONSERV || map_type == MAP_TYPE_CONSERV_YAC )
 	{
-	  tgt_grid->bin_addr = realloc(tgt_grid->bin_addr, 2*nbins*sizeof(int));
+	  tgt_grid->bin_addr = (int*) realloc(tgt_grid->bin_addr, 2*nbins*sizeof(int));
 
 	  calc_bin_addr(tgt_grid->size, nbins, bin_lats, tgt_grid->cell_bound_box, tgt_grid->bin_addr);
 

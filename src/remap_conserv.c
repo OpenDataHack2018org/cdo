@@ -601,11 +601,11 @@ void remap_weights_conserv(remapgrid_t *src_grid, remapgrid_t *tgt_grid, remapva
 
       if ( num_srch_cells > max_srch_cells )
 	{
-	  partial_areas   = realloc(partial_areas,   num_srch_cells*sizeof(double));
-	  partial_weights = realloc(partial_weights, num_srch_cells*sizeof(double));
+	  partial_areas   = (double*) realloc(partial_areas,   num_srch_cells*sizeof(double));
+	  partial_weights = (double*) realloc(partial_weights, num_srch_cells*sizeof(double));
 
-	  overlap_buffer = realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
-	  src_grid_cells = realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
+	  overlap_buffer = (struct grid_cell*) realloc(overlap_buffer, num_srch_cells*sizeof(struct grid_cell));
+	  src_grid_cells = (struct grid_cell*) realloc(src_grid_cells, num_srch_cells*sizeof(struct grid_cell));
 
 	  for ( n = max_srch_cells; n < num_srch_cells; ++n )
 	    {

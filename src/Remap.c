@@ -677,7 +677,7 @@ void *Remap(void *argument)
 	  int gridID2_gme;
 	  int isize = 0;
 	  remaps[0].tgt_grid.nvgp = gridInqSize(gridID2);
-	  remaps[0].tgt_grid.vgpm = realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2)*sizeof(int));
+	  remaps[0].tgt_grid.vgpm = (int*) realloc(remaps[0].tgt_grid.vgpm, gridInqSize(gridID2)*sizeof(int));
 	  gridID2_gme = gridToUnstructured(gridID2, 1);
 	  gridInqMaskGME(gridID2_gme, remaps[0].tgt_grid.vgpm);
 	  for ( i = 0; i < gridsize2; ++i )
@@ -814,14 +814,14 @@ void *Remap(void *argument)
 	      if ( gridsize_new > grid1sizemax )
 		{
 		  grid1sizemax = gridsize_new;
-		  array1 = realloc(array1, grid1sizemax*sizeof(double));
-		  imask  = realloc(imask, grid1sizemax*sizeof(int));
+		  array1 = (double*) realloc(array1, grid1sizemax*sizeof(double));
+		  imask  = (int*) realloc(imask, grid1sizemax*sizeof(int));
 
 		  if ( need_gradiants )
 		    {
-		      grad1_lat    = realloc(grad1_lat, grid1sizemax*sizeof(double));
-		      grad1_lon    = realloc(grad1_lon, grid1sizemax*sizeof(double));
-		      grad1_latlon = realloc(grad1_latlon, grid1sizemax*sizeof(double));
+		      grad1_lat    = (double*) realloc(grad1_lat, grid1sizemax*sizeof(double));
+		      grad1_lon    = (double*) realloc(grad1_lon, grid1sizemax*sizeof(double));
+		      grad1_latlon = (double*) realloc(grad1_latlon, grid1sizemax*sizeof(double));
 		    }
 		}
 	      
