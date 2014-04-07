@@ -155,7 +155,7 @@ static
 double **createVars(int nvars, int nts)
 {  
   double *array = (double*) malloc(nvars*nts*sizeof(double));
-  double **vars = (double*) malloc(nvars*sizeof(double));
+  double **vars = (double**) malloc(nvars*sizeof(double*));
   
   int i;
   

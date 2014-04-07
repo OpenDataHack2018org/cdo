@@ -244,7 +244,7 @@ void *EOF3d(void * argument)
   /* allocation of temporary fields and output structures */
   in.ptr       = (double*) malloc(gridsize*sizeof(double));
   datafields   = (field_t**) malloc(nvars*sizeof(field_t*));
-  datacounts   = (int **) malloc(nvars*sizeof(int *));
+  datacounts   = (int**) malloc(nvars*sizeof(int*));
   eigenvectors = (field_t**) malloc(nvars*sizeof(field_t*));
   eigenvalues  = (field_t**) malloc(nvars*sizeof(field_t*));
 
@@ -256,11 +256,10 @@ void *EOF3d(void * argument)
       temp_size           = gridsize * nlevs;
       missval             = vlistInqVarMissval(vlistID1, varID);
 
-      datafields[varID]   = (field_t**) malloc(nlevs*sizeof(field_t*));
-      datacounts[varID]   = (int* *) malloc(nlevs*sizeof(int* ));
-      eigenvectors[varID] = (field_t**) malloc(nlevs*sizeof(field_t*));
+      datacounts[varID]   = (int*) malloc(nlevs*sizeof(int));
+      eigenvectors[varID] = (field_t*) malloc(nlevs*sizeof(field_t));
+      datafields[varID]   = (field_t*) malloc(nts*sizeof(field_t));
 
-      datafields[varID] = (field_t*) malloc(nts*sizeof(field_t));
       for ( tsID = 0; tsID < nts; tsID++ )
 	{
 	  datafields[varID][tsID].grid    = gridID1;

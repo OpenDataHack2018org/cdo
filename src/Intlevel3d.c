@@ -271,7 +271,7 @@ void *Intlevel3d(void *argument)
     gridInqXvals(gridID, lonIn);
     gridInqYvals(gridID, latIn);
 
-    zlevels_in = (double**) malloc(gridsize*(nlevel+2)*sizeof(double*));
+    zlevels_in = (double*) malloc(gridsize*(nlevel+2)*sizeof(double));
     nlevi      = nlevel;   /* number of input levels for later use */
     gridsizei  = gridsize; /* horizontal gridsize of input z coordinate */
     nrecs      = streamInqTimestep(streamID0, 0);

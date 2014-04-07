@@ -102,8 +102,8 @@ int genGrid(int nfiles, ens_file_t *ef, int **gridindex, int igrid)
   xsize = (int*) malloc(nfiles*sizeof(int));
   ysize = (int*) malloc(nfiles*sizeof(int));
   xyinfo = (xyinfo_t*) malloc(nfiles*sizeof(xyinfo_t));
-  xvals = (double*) malloc(nfiles*sizeof(double));
-  yvals = (double*) malloc(nfiles*sizeof(double));
+  xvals = (double**) malloc(nfiles*sizeof(double*));
+  yvals = (double**) malloc(nfiles*sizeof(double*));
 
   for ( fileID = 0; fileID < nfiles; fileID++ )
     {
