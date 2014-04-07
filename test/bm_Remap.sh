@@ -3,7 +3,7 @@
 CDO=src/cdo
 #CDO=cdo-1.6.2
 #
-RMODS="bil bic nn con cons"
+RMODS="bil bic nn con ycon"
 #
 #cdo -setrtomiss,0,10000 -topo topo05
 cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
@@ -24,7 +24,7 @@ done
 #
 # CDO 1.6.3
 #
-#       con/curv  cons/curv  cons/reg2d  cons/reg2d/ICC
+#       con/curv  ycon/curv  ycon/reg2d  ycon/reg2d/ICC
 #   1   195s       243s       140s        134s
 #   2   129s       130s        79s         70s
 #   4   185s        93s        73s         39s
@@ -36,21 +36,27 @@ done
 #
 # result on hama:
 # =================
-#         bil    bic    nn   con   cons
+#         bil    bic    nn   con   ycon
 # reg2d   0.9    2.1     2   247    160
-# curv   43.3   44.3   982   255    348
+# curv     44     44   982   255    348
 #
-# result on bailung:
+# result on bailung: gcc
 # =================
-#         bil    bic    nn   con   cons
-# reg2d   0.7    1.6     1   194    140
-# curv   36.9   37.9   843   197    288
+#         bil    bic    nn   con   ycon
+# reg2d   0.7    1.6     1   205    137
+# curv     39     40   703   210    293
+#
+# result on bailung: icc
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   0.8    1.7     1   217    131
+# curv     45     45   361   204    277
 #
 # result on blizzard: (interactiv)
 # ==================
-#         bil    bic    nn   con   cons
-# reg2d   2.2    5.5     3   470    342
-# curv     88     93  1936   480    695
+#         bil    bic    nn   con   ycon
+# reg2d   2.2    5.5     3   470    326
+# curv     88     93  1682   480    692
 #
 ####################################################
 #

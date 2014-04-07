@@ -249,7 +249,6 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   /*  Local variables */
   int n, nadd;
   int min_add, max_add;
-  double distance;     /* Angular distance */
   /* result changed a little on a few points with high resolution grid
   double xcoslat_dst = cos(plat);  // cos(lat)  of the search point
   double xcoslon_dst = cos(plon);  // cos(lon)  of the search point
@@ -268,8 +267,13 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
       nbr_dist[n] = BIGNUM;
     }
 
-  for ( nadd = min_add; nadd <= max_add; ++nadd )
+  int i, ndist = max_add - min_add + 1;
+  double distance;     /* Angular distance */
+  double *dist = (double*) malloc(ndist*sizeof(double));
+
+  for ( i = 0; i < ndist; ++i )
     {
+      nadd = min_add+i;
       /* Find distance to this point */
       distance =  sinlat_dst*sinlat[nadd] + coslat_dst*coslat[nadd]*
 	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
@@ -279,10 +283,20 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
       //if ( distance < 0. ) continue;
       if ( distance < -1. ) distance = -1.;
       if ( distance >  1. ) distance =  1.;
-      distance = acos(distance);
 
-      nbr_store_distance(nadd, distance, num_neighbors, nbr_add, nbr_dist);
+      dist[i] = distance;
     }
+
+  for ( i = 0; i < ndist; ++i )
+    dist[i] = acos(dist[i]);
+
+  for ( i = 0; i < ndist; ++i )
+    {
+      nadd = min_add+i;
+      nbr_store_distance(nadd, dist[i], num_neighbors, nbr_add, nbr_dist);
+    }
+
+  free(dist);
 
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
 
