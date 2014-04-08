@@ -45,20 +45,11 @@
 const double angle_tol = 1e-9;
 static double const tol = 1.0e-10;
 
-static void crossproduct (double a[], double b[], double cross[]) {
-
-/* crossproduct in cartesian coordinates */
-
-   cross[0] = a[1] * b[2] - a[2] * b[1];
-   cross[1] = a[2] * b[0] - a[0] * b[2];
-   cross[2] = a[0] * b[1] - a[1] * b[0];
-}
-
 static int vector_is_between (double a[], double b[], double p[], double angle_ab) {
 
 /* determines whether p is between a and b
    (a, b, p are in the same plane AB)
-   angle_ab is the angle betwenn a and b */
+   angle_ab is the angle between a and b */
 
    return fabs(get_vector_angle(a, p) +
                get_vector_angle(b, p) -
@@ -72,12 +63,16 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
 
    if (fabs(fabs(a[2]) - 1.0) < tol) return 1;
 
-   if (((a[0]*p[0]+a[1]*p[1]) < 0) || ((b[0]*p[0]+b[1]*p[1]) < 0))
+   long double a_0 = a[0], a_1 = a[1];
+   long double b_0 = b[0], b_1 = b[1];
+   long double p_0 = p[0], p_1 = p[1];
+
+   if (((a_0*p_0+a_1*p_1) < 0) || ((b_0*p_0+b_1*p_1) < 0))
     return 0;
 
-   double cross_ab = fabs(a[0]*b[1]-a[1]*b[0]);
-   double cross_ap = fabs(a[0]*p[1]-a[1]*p[0]);
-   double cross_bp = fabs(b[0]*p[1]-b[1]*p[0]);
+   double cross_ab = fabs(a_0*b_1-a_1*b_0);
+   double cross_ap = fabs(a_0*p_1-a_1*p_0);
+   double cross_bp = fabs(b_0*p_1-b_1*p_0);
 
    // maybe this should be the cross_** should be scaled by z at some point
    return (cross_ap < cross_ab + tol) && (cross_bp < cross_ab + tol);
@@ -142,7 +137,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
    int ab_is_point, cd_is_point;
 
    // compute unit vector of ab plane
-   crossproduct(a, b, cross_ab);
+   crossproduct_ld(a, b, cross_ab);
    n = sqrt(cross_ab[0] * cross_ab[0] +
             cross_ab[1] * cross_ab[1] +
             cross_ab[2] * cross_ab[2]);
@@ -158,7 +153,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
    }
 
    // compute unit vector of cd plane
-   crossproduct(c, d, cross_cd);
+   crossproduct_ld(c, d, cross_cd);
    n = sqrt(cross_cd[0] * cross_cd[0] +
             cross_cd[1] * cross_cd[1] +
             cross_cd[2] * cross_cd[2]);
@@ -232,7 +227,7 @@ static int vector_is_between_lat (double a[], double b[], double p[]) {
    double temp_cross[3];
 
    // compute unit vector of ab plane
-   crossproduct(e_ab, e_cd, temp_cross);
+   crossproduct_ld(e_ab, e_cd, temp_cross);
    n = sqrt(temp_cross[0] * temp_cross[0] +
             temp_cross[1] * temp_cross[1] +
             temp_cross[2] * temp_cross[2]);
@@ -343,7 +338,7 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
    int ab_is_point, cd_is_point;
 
    // compute unit vector of ab plane
-   crossproduct(a, b, cross_ab);
+   crossproduct_ld(a, b, cross_ab);
    n = sqrt(cross_ab[0] * cross_ab[0] +
             cross_ab[1] * cross_ab[1] +
             cross_ab[2] * cross_ab[2]);
@@ -359,7 +354,7 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
    }
 
    // compute unit vector of cd plane
-   crossproduct(c, d, cross_cd);
+   crossproduct_ld(c, d, cross_cd);
    n = sqrt(cross_cd[0] * cross_cd[0] +
             cross_cd[1] * cross_cd[1] +
             cross_cd[2] * cross_cd[2]);
@@ -399,7 +394,7 @@ int gcxgc_vec_ (double a[3], double b[3], double c[3], double d[3]) {
    double temp_cross[3];
 
    // compute unit vector of ab plane
-   crossproduct(e_ab, e_cd, temp_cross);
+   crossproduct_ld(e_ab, e_cd, temp_cross);
    n = sqrt(temp_cross[0] * temp_cross[0] +
             temp_cross[1] * temp_cross[1] +
             temp_cross[2] * temp_cross[2]);
@@ -816,8 +811,8 @@ int loncxlonc_vec (double a[3], double b[3], double c[3], double d[3],
 
    double cross_ab[3], cross_cd[3];
 
-   crossproduct(a, b, cross_ab);
-   crossproduct(c, d, cross_cd);
+   crossproduct_ld(a, b, cross_ab);
+   crossproduct_ld(c, d, cross_cd);
 
    double abs_norm_cross_ab[2], abs_norm_cross_cd[2];
 
@@ -1403,7 +1398,7 @@ int gcxlatc_vec(double a[3], double b[3], double c[3], double d[3],
 
    double cross_ab[3], scale;
    
-   crossproduct(a, b, cross_ab);
+   crossproduct_ld(a, b, cross_ab);
    scale = sqrt(cross_ab[0]*cross_ab[0]+
                 cross_ab[1]*cross_ab[1]+
                 cross_ab[2]*cross_ab[2]);
@@ -1523,7 +1518,7 @@ static int gcxlatc_vec_(double a[3], double b[3], double c[3], double d[3]) {
 
       double cross_ab[3];
 
-      crossproduct(a, b, cross_ab);
+      crossproduct_ld(a, b, cross_ab);
 
       double n = 1.0 / sqrt(cross_ab[0] * cross_ab[0] +
                             cross_ab[1] * cross_ab[1] +

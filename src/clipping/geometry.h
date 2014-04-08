@@ -606,38 +606,46 @@ static inline void XYZtoLL (double p_in[], double * lon, double * lat) {
    *lat = M_PI_2 - acos(p_in[2]);
 }
 
+static inline void crossproduct_ld (double a[], double b[], double cross[]) {
+
+/* crossproduct in Cartesian coordinates */
+
+   long double a_[3] = {a[0], a[1], a[2]};
+   long double b_[3] = {b[0], b[1], b[2]};
+
+   cross[0] = a_[1] * b_[2] - a_[2] * b_[1];
+   cross[1] = a_[2] * b_[0] - a_[0] * b_[2];
+   cross[2] = a_[0] * b_[1] - a_[1] * b_[0];
+}
+
+/**
+ * for small angles <= 1e-?8? the crossproduct is inaccurate\n
+ * use \ref crossproduct_ld for these cases
+ */
+static inline void crossproduct_d (double a[], double b[], double cross[]) {
+
+/* crossproduct in Cartesian coordinates */
+
+   cross[0] = a[1] * b[2] - a[2] * b[1];
+   cross[1] = a[2] * b[0] - a[0] * b[2];
+   cross[2] = a[0] * b[1] - a[1] * b[0];
+}
+
 /**
  * computes the great circle distance in rad for two points given in xyz coordinates
+ * taken from http://johnblackburne.blogspot.de/2012/05/angle-between-two-3d-vectors.html
  * @param[in] a point coordinates of point a
  * @param[in] b point coordinates of point b
  * @return great circle distance in rad between both points
  */
 static inline double get_vector_angle(double a[3], double b[3]) {
+   double cross[3], dot, cross_abs;
 
-   double dot_product = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+   crossproduct_ld(a, b, cross);
+   dot = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+   cross_abs = sqrt(cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2]);
 
-   double angle;
-
-   // the acos most accurate in the range [-0.5;0.5]
-   if (fabs(dot_product) <= 0.5) // the range in which the acos is most accurate
-      angle = acos(dot_product);
-   else {
-
-      double temp[3] = {a[1]*b[2]-a[2]*b[1],
-                        a[2]*b[0]-a[0]*b[2],
-                        a[0]*b[1]-a[1]*b[0]};
-
-      double asin_tmp = asin(sqrt(temp[0]*temp[0]+
-                                  temp[1]*temp[1]+
-                                  temp[2]*temp[2]));
-
-      if (dot_product < 0.0) // if the angle is bigger than (PI / 2)
-         angle = MIN(M_PI - asin_tmp, M_PI);
-      else
-         angle = MAX(asin_tmp,0.0);
-   }
-
-   return angle;
+   return fabs(atan2(cross_abs, dot));
 }
 
 /**

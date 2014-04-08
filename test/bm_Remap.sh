@@ -34,11 +34,17 @@ done
 #
 # CDO 1.6.4
 #
-# result on hama:
+# result on hama: gcc 4.8.2
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.9    2.1     2   247    160
-# curv     44     44   982   255    348
+# reg2d   0.9    2.1   1.3   247    160
+# curv     44     46   889   255    348
+#
+# result on hama: icc 12.1.5
+# =================
+#         bil    bic    nn   con   ycon
+# reg2d   1.0    2.2   1.4   295    131
+# curv     51     52   513   305    389
 #
 # result on bailung: gcc
 # =================

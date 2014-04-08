@@ -44,11 +44,10 @@
 // area tolerance (10 m^2 = 0.0001 km^2)
 const double area_tol = 0.02*0.02; // 20m*20m
 
-static double scalar_product(double a[], double b[]);
+static inline double scalar_product(double a[], double b[]);
 
-static void cross_product(double a[], double b[], double cross[]);
-
-static double inner_angle ( double plat, double plon, double qlon, double qlat );
+static inline double inner_angle ( double plat, double plon,
+                                   double qlon, double qlat );
 
 static double partial_area ( double a_lon, double a_lat,
                              double b_lon, double b_lat,
@@ -100,9 +99,9 @@ double triangle_area ( struct grid_cell cell ) {
 
   /* First, compute cross products Uij = Vi x Vj. */
 
-  cross_product(triangle[0], triangle[1], u01);
-  cross_product(triangle[1], triangle[2], u12);
-  cross_product(triangle[2], triangle[0], u20);
+  crossproduct_ld(triangle[0], triangle[1], u01);
+  crossproduct_ld(triangle[1], triangle[2], u12);
+  crossproduct_ld(triangle[2], triangle[0], u20);
 
   /*  Normalize Uij to unit vectors. */
 
@@ -180,7 +179,7 @@ double cell_area ( struct grid_cell cell ) {
   /* First, compute cross products Uij = Vi x Vj. */
 
   for (int m = 0; m < M; m++ )
-    cross_product (p[m], p[(m+1)%M], u[m]);
+    crossproduct_ld (p[m], p[(m+1)%M], u[m]);
 
   /*  Normalize Uij to unit vectors. */
 
@@ -316,7 +315,7 @@ double cell3d_area( struct grid_cell cell ) {
    edge[1][1] = V[0][1] - V[2][1];
    edge[1][2] = V[0][2] - V[2][2];
 
-   cross_product(edge[0], edge[1], Norm);
+   crossproduct_ld(edge[0], edge[1], Norm);
 
    /* select largest abs coordinate to ignore for projection */
    ax = (Norm[0]>0 ? Norm[0] : -Norm[0]);    // abs x-coord
@@ -429,9 +428,9 @@ tri_area(double u[3], double v[3], double w[3]) {
   return fabs ( 4.0 * atan ( sqrt (fabs ( t ) ) ) );
 }
 
-static int compute_norm_vector(double a[], double b[], double norm[]) {
+static inline int compute_norm_vector(double a[], double b[], double norm[]) {
 
-  cross_product(a, b, norm);
+  crossproduct_ld(a, b, norm);
 
   double scale = sqrt(norm[0] * norm[0] + norm[1] * norm[1] + norm[2] * norm[2]);
 
@@ -674,7 +673,8 @@ double partial_area ( double a_lon, double a_lat,
 
 /* ----------------------------------- */
 
-double inner_angle ( double plat, double plon, double qlat, double qlon ) {
+static double inline inner_angle ( double plat, double plon,
+                                   double qlat, double qlon ) {
 
   double t = sin((qlon-plon))*cos(qlat);
 
@@ -686,14 +686,8 @@ double inner_angle ( double plat, double plon, double qlat, double qlon ) {
 
 /* ----------------------------------- */
 
-static double scalar_product(double a[], double b[]) {
+static inline double scalar_product(double a[], double b[]) {
   return (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]);
 }
 
 /* ----------------------------------- */
-
-static void cross_product(double a[], double b[], double cross[]) {
-  cross[0] = a[1]*b[2] - a[2]*b[1];
-  cross[1] = a[2]*b[0] - a[0]*b[2];
-  cross[2] = a[0]*b[1] - a[1]*b[0];
-}
