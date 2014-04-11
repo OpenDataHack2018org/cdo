@@ -400,7 +400,7 @@ void *Info(void *argument)
 			      /* #pragma omp critical */
 			      if ( array[i] > arrmax ) arrmax = array[i];
 			      arrmean += array[i];
-			      arrvar  += array[i]*array[i];
+			      // arrvar  += array[i]*array[i];
 			    }
 			  nvals = gridsize;
 			}
@@ -408,7 +408,7 @@ void *Info(void *argument)
 		      if ( nvals )
 			{
 			  arrmean = arrmean/nvals;
-			  arrvar  = arrvar/nvals - arrmean*arrmean;
+			  // arrvar  = arrvar/nvals - arrmean*arrmean;
 			  fprintf(stdout, "%#12.5g%#12.5g%#12.5g", arrmin, arrmean, arrmax);
 			}
 		      else
