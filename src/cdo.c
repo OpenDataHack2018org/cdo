@@ -992,6 +992,8 @@ void print_system_info()
 #if defined(_OPENACC)
   fprintf(stderr, "OPENACC VERSION     = %d\n", _OPENACC);
 #endif
+  /* OPENMP 3:  201107 */
+  /* OPENMP 4:  201307 gcc 4.9 */
 #if defined(_OPENMP)
   fprintf(stderr, "OPENMP VERSION      = %d\n", _OPENMP);
 #endif

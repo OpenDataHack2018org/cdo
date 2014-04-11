@@ -271,7 +271,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   double distance;     /* Angular distance */
   double *dist = (double*) malloc(ndist*sizeof(double));
 
-#if defined(_OPENMP_SIMD)
+#if defined(_OPENMP) && _OPENMP >= 201307
 #pragma omp simd
 #endif
   for ( i = 0; i < ndist; ++i )
@@ -290,7 +290,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
       dist[i] = distance;
     }
 
-#if defined(_OPENMP_SIMD)
+#if defined(_OPENMP) && _OPENMP >= 201307
 #pragma omp simd
 #endif
   for ( i = 0; i < ndist; ++i )
