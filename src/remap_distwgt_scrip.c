@@ -98,6 +98,23 @@ void nbr_check_distance(int num_neighbors, const int *restrict nbr_add, double *
     }
 }
 
+
+static
+double get_search_radius(void)
+{
+  double search_radius;
+  extern double remap_search_radius;
+
+  search_radius = remap_search_radius;
+
+  if ( search_radius <    0. ) search_radius = 0.;
+  if ( search_radius >  180. ) search_radius = 180.;
+
+  search_radius = cos(search_radius*DEG2RAD);
+
+  return (search_radius);
+}
+
 /*
    This routine finds the closest num_neighbor points to a search 
    point and computes a distance to each of the neighbors.
@@ -130,6 +147,7 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
   int src_add[25];
   int num_add = 0;
   double distance;   //  Angular distance
+  double search_radius = get_search_radius();
   /*
   double coslat_dst = cos(plat);  // cos(lat)  of the search point
   double coslon_dst = cos(plon);  // cos(lon)  of the search point
@@ -207,11 +225,14 @@ void grid_search_nbr_reg2d(int num_neighbors, remapgrid_t *src_grid, int *restri
 	  /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
 	                                 otherwise the result of acos(distance) is NaN */
 	  if ( distance >  1. ) distance =  1.;
-	  if ( distance < -1. ) distance = -1.;
-	  distance = acos(distance);
 
-	  /* Store the address and distance if this is one of the smallest four so far */
-	  nbr_store_distance(nadd, distance, num_neighbors, nbr_add, nbr_dist);
+	  if ( distance >= search_radius )
+	    {
+	      distance = acos(distance);
+
+	      /* Store the address and distance if this is one of the smallest four so far */
+	      nbr_store_distance(nadd, distance, num_neighbors, nbr_add, nbr_dist);
+	    }
 	}
 
       nbr_check_distance(num_neighbors, nbr_add, nbr_dist);
@@ -249,6 +270,7 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
   /*  Local variables */
   int n, nadd;
   int min_add, max_add;
+  double search_radius = get_search_radius();
   /* result changed a little on a few points with high resolution grid
   double xcoslat_dst = cos(plat);  // cos(lat)  of the search point
   double xcoslon_dst = cos(plon);  // cos(lon)  of the search point
@@ -267,14 +289,15 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
       nbr_dist[n] = BIGNUM;
     }
 
-  int i, ndist = max_add - min_add + 1;
+  int i, j, ndist = max_add - min_add + 1;
   double distance;     /* Angular distance */
   double *dist = (double*) malloc(ndist*sizeof(double));
+  int    *adds = (int*) malloc(ndist*sizeof(int));
 
 #if defined(_OPENMP) && _OPENMP >= 201307
 #pragma omp simd
 #endif
-  for ( i = 0; i < ndist; ++i )
+  for ( j = 0, i = 0; i < ndist; ++i )
     {
       nadd = min_add+i;
       /* Find distance to this point */
@@ -282,26 +305,27 @@ void grid_search_nbr(int num_neighbors, remapgrid_t *src_grid, int *restrict nbr
 	         (coslon_dst*coslon[nadd] + sinlon_dst*sinlon[nadd]);
       /* 2008-07-30 Uwe Schulzweida: check that distance is inside the range of -1 to 1,
                                      otherwise the result of acos(distance) is NaN */
-      //if ( distance < 0.99  ) continue;
-      //if ( distance < 0. ) continue;
-      if ( distance < -1. ) distance = -1.;
       if ( distance >  1. ) distance =  1.;
 
-      dist[i] = distance;
+      if ( distance >= search_radius )
+	{
+	  dist[j] = distance;
+	  adds[j] = nadd;
+	  j++;
+	}
     }
+  ndist = j;
 
-#if defined(_OPENMP) && _OPENMP >= 201307
+#if defined(_OPENMP) && _OPENMP >= 2013072
 #pragma omp simd
 #endif
-  for ( i = 0; i < ndist; ++i )
-    dist[i] = acos(dist[i]);
+  for ( j = 0; j < ndist; ++j )
+    dist[j] = acos(dist[j]);
 
-  for ( i = 0; i < ndist; ++i )
-    {
-      nadd = min_add+i;
-      nbr_store_distance(nadd, dist[i], num_neighbors, nbr_add, nbr_dist);
-    }
+  for ( j = 0; j < ndist; ++j )
+    nbr_store_distance(adds[j], dist[j], num_neighbors, nbr_add, nbr_dist);
 
+  free(adds);
   free(dist);
 
   nbr_check_distance(num_neighbors, nbr_add, nbr_dist);

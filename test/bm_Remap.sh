@@ -10,6 +10,7 @@ cdo -setrtomiss,0,10000 -remapbil,global_0.05 -topo topo005
 #
 IFILE=topo005
 #
+export CDO_REMAP_SEARCH_RADIUS=.1
 for RMOD in $RMODS; do
   echo "remap $RMOD:"
   OTYPE=0
@@ -37,14 +38,14 @@ done
 # result on hama: gcc 4.8.2
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.9    2.1   1.3   247    160
-# curv     44     46   889   255    348
+# reg2d   0.9    2.1   1.3   247    160/247
+# curv     44     46   167   255    348/503
 #
 # result on hama: icc 12.1.5
 # =================
 #         bil    bic    nn   con   ycon
 # reg2d   1.0    2.2   1.4   295    131
-# curv     51     52   513   305    389
+# curv     51     52   184   305    389
 #
 # result on bailung: gcc
 # =================
