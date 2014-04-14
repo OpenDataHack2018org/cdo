@@ -50,14 +50,14 @@ done
 # result on bailung: gcc
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.7    1.6     1   205    137
-# curv     39     40   703   210    293
+# reg2d   0.7    1.5   0.9   205    137/221
+# curv     38     39   105   210    293/442
 #
 # result on bailung: icc
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.8    1.7     1   217    131
-# curv     45     45   361   204    277
+# reg2d   0.8    1.7     1   217    131/217
+# curv     44     45   117   204    277/425
 #
 # result on blizzard: (interactiv)
 # ==================
