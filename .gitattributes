@@ -98,6 +98,7 @@ doc/tex/mod/Consecstat -text
 doc/tex/mod/Copy -text
 doc/tex/mod/Daypctl -text
 doc/tex/mod/Daystat -text
+doc/tex/mod/Derivepar -text
 doc/tex/mod/Detrend -text
 doc/tex/mod/Diff -text
 doc/tex/mod/Duplicate -text
@@ -195,7 +196,6 @@ doc/tex/mod/Rhopot -text
 doc/tex/mod/Rotuv -text
 doc/tex/mod/Runpctl -text
 doc/tex/mod/Runstat -text
-doc/tex/mod/Sealevelpressure -text
 doc/tex/mod/Seaspctl -text
 doc/tex/mod/Seasstat -text
 doc/tex/mod/Selbox -text

@@ -4070,6 +4070,35 @@ static char *MastrfuHelp[] = {
     NULL
 };
 
+static char *DeriveparHelp[] = {
+    "NAME",
+    "    sealevelpressure - Sea level pressure",
+    "",
+    "SYNOPSIS",
+    "    sealevelpressure  ifile ofile",
+    "",
+    "DESCRIPTION",
+    "    This operator computes the sea level pressure (air_pressure_at_sea_level). Required input fields",
+    "    are surface_air_pressure and air_temperature on hybrid sigma pressure levels.",
+    "",
+    "NOTE",
+    "    The netCDF CF convention for vertical hybrid coordinates is not supported, yet!",
+    "    The vertical coordinate definition of a netCDF file has to follow the ECHAM convention.",
+    "    This means:",
+    "    - the dimension of the full level coordinate and the corresponding variable is called mlev,",
+    "    - the dimension of the half level coordinate and the corresponding variable is called ilev (ilev must have one element more than mlev)",
+    "    - the hybrid vertical coefficient a is given in units of Pa and called hyai (hyam for level midpoints)",
+    "    - the hybrid vertical coefficient b is given in units of 1 and called hybi (hybm for level midpoints)",
+    "    - the mlev variable has a borders attribute containing the character string 'ilev'",
+    "    ",
+    "    Use the sinfo command to test if your vertical coordinate system is recognized as hybrid system.",
+    "    ",
+    "    In case this operator complains about not finding any data on hybrid model levels you may wish",
+    "    to use the setzaxis command to generate a zaxis description which conforms to the ECHAM convention.",
+    "    See section \"1.4 Z-axis description\" for an example how to define a hybrid Z-axis.",
+    NULL
+};
+
 static char *AdisitHelp[] = {
     "NAME",
     "    adisit, adipot - Potential temperature to in-situ temperature and vice versa",

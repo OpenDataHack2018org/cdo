@@ -1,6 +1,6 @@
 @BeginModule
 @NewPage
-@Name      = Sealevelpressure
+@Name      = Derivepar
 @Title     = Sea level pressure
 @Section   = Miscellaneous
 @Arguments = ifile ofile

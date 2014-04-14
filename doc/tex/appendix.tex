@@ -88,12 +88,28 @@ CDO\_PCTL\_NBINS            &     101    & Number of histogram bins. \\ \hline
 CDO\_RESET\_HISTORY       &         0  & Set to 1 to reset the netCDF {\it history} global attribute.\\ \hline
 CDO\_REMAP\_SEARCH\_RADIUS &  180 & Remap search radius in degree. Used by the operators \\
                                                      &        & remapdis and remapnn. \\ \hline
-
-
 \end{tabular}
 
 
 \input{cdo_openmp}
+
+
+\chapter{\label{stdnametable}Standard name table}
+
+The following CF standard names are supported by {\CDO}.
+
+\begin{tabular}[t]{|>{\columncolor{pcolor1}}l|r|r|l|}
+\hline
+\rowcolor{pcolor2}
+%\cellcolor{pcolor2}
+{\bf CF standard name}       &  Units & {\bf GRIB 1 code} & {\bf variable name} \\ \hline
+surface\_geopotential           &  m2 s-2 &  129   &  geosp \\ \hline
+air\_temperature                    & K           & 130  &  ta \\ \hline
+specific\_humidity                 & 1           & 133  & hus  \\ \hline
+surface\_air\_pressure           & Pa          & 134  & aps  \\ \hline
+air\_pressure\_at\_sea\_level & Pa         & 151  & psl  \\ \hline
+geopotential\_height              & m         & 156  &  zg \\ \hline
+\end{tabular}
 
 
 \chapter{\label{appendixgrid}Grid description examples}

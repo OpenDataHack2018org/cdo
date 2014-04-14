@@ -380,7 +380,7 @@ void *Derivepar(void *argument)
 	cdoAbort("Spectral data unsupported!");
     }
 
-  if ( tempID == -1 ) cdoAbort("Air temperature not found!");
+  if ( tempID == -1 ) cdoAbort("%s not found!", var_stdname(air_temperature));
 
   array  = (double*) malloc(ngp*sizeof(double));
   geop   = (double*) malloc(ngp*sizeof(double));

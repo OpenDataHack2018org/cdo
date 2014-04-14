@@ -562,7 +562,7 @@ static modules_t Modules[] =
   { Consecstat,     ConsecstatHelp,    ConsecstatOperators,    CDI_REAL,  1,  1 },
   { Copy,           CopyHelp,          CopyOperators,          CDI_REAL, -1,  1 },
   { Deltime,        NULL,              DeltimeOperators,       CDI_REAL,  1,  1 },
-  { Derivepar,      NULL,              DeriveparOperators,     CDI_REAL,  1,  1 },
+  { Derivepar,      DeriveparHelp,     DeriveparOperators,     CDI_REAL,  1,  1 },
   { Detrend,        DetrendHelp,       DetrendOperators,       CDI_REAL,  1,  1 },
   { Diff,           DiffHelp,          DiffOperators,          CDI_REAL,  2,  0 },
   { Duplicate,      DuplicateHelp,     DuplicateOperators,     CDI_REAL,  1,  1 },
