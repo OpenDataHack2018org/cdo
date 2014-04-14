@@ -38,14 +38,14 @@ done
 # result on hama: gcc 4.8.2
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   0.9    2.1   1.3   247    160/247
-# curv     44     46   167   255    348/503
+# reg2d   0.9    2.1   1.3   247    160/224
+# curv     44     46   167   255    348/489
 #
 # result on hama: icc 12.1.5
 # =================
 #         bil    bic    nn   con   ycon
-# reg2d   1.0    2.2   1.4   295    131
-# curv     51     52   184   305    389
+# reg2d   1.0    2.2   1.4   295    131/148
+# curv     51     52   184   305    389/322
 #
 # result on bailung: gcc
 # =================

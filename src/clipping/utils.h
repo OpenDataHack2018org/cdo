@@ -41,6 +41,10 @@
 
 #include <stdlib.h>
 
+#ifdef __WITHOUT_ISO_C_BINDING
+#include "cfortran.h"
+#endif
+
 /**
  * gives a unique index for a given pointer
  * @param[in] pointer
@@ -70,6 +74,10 @@ void free_pointer_unique_lookup();
  * followed by an exit. 
  */
 void abort_message ( char * text, char * file, int line );
+
+#ifdef __WITHOUT_ISO_C_BINDING
+     FCALLSCSUB3 ( yac_abort_message, YAC_ABORT_MESSAGE, yac_abort_message, STRING, STRING, PINT )
+#endif
 
 /** \example test_quicksort.c
  * This contains an example of how to use quicksort_index.

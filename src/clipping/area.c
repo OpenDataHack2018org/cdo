@@ -405,27 +405,44 @@ double cell3d_area( struct grid_cell cell ) {
 static double
 tri_area(double u[3], double v[3], double w[3]) {
 
-  double const tol = 1e-14;
+  double a_ = get_vector_angle(u,v);
+  double b_ = get_vector_angle(u,w);
+  double c_ = get_vector_angle(w,v);
 
-  double a = get_vector_angle(u,v) * 0.5;
-  double b = get_vector_angle(u,w) * 0.5;
-  double c = get_vector_angle(w,v) * 0.5;
+  double a, b, c;
 
-  //! \todo check when it is possible to use Heron's formula to approximate area
-  //!       see: http://en.wikipedia.org/wiki/Heron%27s_formula#Numerical_stability
-  //!       see also: http://www.eecs.berkeley.edu/~wkahan/Triangle.pdf
-  //!       apply bracket also to "tan"-formula
+  if (a_ < b_) {
+    if (a_ < c_) {
+      if (b_ < c_) {
+        a = a_, b = b_, c = c_;
+      } else {
+        a = a_, b = c_, c = b_;
+      }
+    } else {
+      a = c_, b = a_, c = b_;
+    }
+  } else {
+    if (b_ < c_) {
+      if (a_ < c_) {
+        a = b_, b = a_, c = c_;
+      } else {
+        a = b_, b = c_, c = a_;
+      }
+    } else {
+      a = c_, b = b_, c = a_;
+    }
+  }
 
-  double s = 0.5 * ( a + b + c );
+  // see: http://en.wikipedia.org/wiki/Heron%27s_formula#Numerical_stability
+  // see also: http://www.eecs.berkeley.edu/~wkahan/Triangle.pdf
 
-  // if all points are on the same great circle
-  if (s < tol || s - a < tol || s - b < tol || s - c < tol)
-    return 0.0;
+  // the tolerance value is determined empirically
+  if ((a + (b - c)) < c * 1e-14) return 0.0;
 
-  double t = tan ( s ) * tan ( s - a ) *
-             tan ( s - b ) * tan ( s - c );
+  double t = tan(0.25 * (a + (b + c))) * tan(0.25 * (c - (a - b))) *
+             tan(0.25 * (c + (a - b))) * tan(0.25 * (a + (b - c)));
 
-  return fabs ( 4.0 * atan ( sqrt (fabs ( t ) ) ) );
+  return fabs(4.0 * atan(sqrt(fabs(t))));
 }
 
 static inline int compute_norm_vector(double a[], double b[], double norm[]) {
