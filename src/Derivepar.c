@@ -341,7 +341,7 @@ void *Derivepar(void *argument)
 
 	  code = echamcode_from_stdname(stdname);
 
-	  if ( code < 0 || code == 255 )
+	  if ( code < 0 )
 	    {
 	      if      ( sgeopotID == -1 && strcmp(varname, "geosp")   == 0 ) code = gribcodes.geopot;
 	      else if ( psID      == -1 && strcmp(varname, "aps")     == 0 ) code = gribcodes.ps;

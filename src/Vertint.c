@@ -421,6 +421,7 @@ void *Vertint(void *argument)
       if ( mode == ECHAM_MODE )
 	{
 	  if      ( code == gribcodes.geopot  && nlevel == 1      ) sgeopotID = varID;
+	  else if ( code == gribcodes.geopot  && nlevel == nhlevf ) geopotID  = varID;
 	  else if ( code == gribcodes.temp    && nlevel == nhlevf ) tempID    = varID;
 	  else if ( code == gribcodes.ps      && nlevel == 1      ) psID      = varID;
 	  else if ( code == gribcodes.lsp     && nlevel == 1      ) lnpsID    = varID;
@@ -429,6 +430,7 @@ void *Vertint(void *argument)
       else if ( mode == WMO_MODE )
 	{
 	  if      ( code == gribcodes.geopot  && nlevel == 1      ) sgeopotID = varID;
+	  else if ( code == gribcodes.geopot  && nlevel == nhlevf ) geopotID  = varID;
 	  else if ( code == gribcodes.temp    && nlevel == nhlevf ) tempID    = varID;
 	  else if ( code == gribcodes.ps      && nlevel == 1      ) psID      = varID;
 	}
@@ -482,7 +484,11 @@ void *Vertint(void *argument)
       sgeopot = (double*) malloc(ngp*sizeof(double));
       if ( sgeopotID == -1 )
 	{
-	  cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
+	  if ( geopotID == -1 )
+	    cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
+	  else
+	    cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
+
 	  memset(sgeopot, 0, ngp*sizeof(double));
 	}
     }
@@ -542,16 +548,22 @@ void *Vertint(void *argument)
 
       if ( zaxisIDh != -1 )
 	{
-	  if ( sgeopot_needed && sgeopotID != -1 )
+	  if ( sgeopot_needed )
 	    {
-	      memcpy(sgeopot, vardata1[sgeopotID], ngp*sizeof(double));
+	      if ( sgeopotID != -1 )
+		memcpy(sgeopot, vardata1[sgeopotID], ngp*sizeof(double));
+	      else if ( geopotID != -1 )
+		memcpy(sgeopot, vardata1[geopotID]+ngp*(nhlevf-1), ngp*sizeof(double));
 
 	      /* check range of surface geopot */
-	      minmaxval(ngp, sgeopot, NULL, &minval, &maxval);
-	      if ( minval < MIN_FIS || maxval > MAX_FIS )
-		cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
-	      if ( ngp > 1 && minval >= 0 && maxval <= 9000 )
-		cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
+	      if ( sgeopotID != -1 || geopotID != -1 )
+		{
+		  minmaxval(ngp, sgeopot, NULL, &minval, &maxval);
+		  if ( minval < MIN_FIS || maxval > MAX_FIS )
+		    cdoWarning("Surface geopotential out of range (min=%g max=%g)!", minval, maxval);
+		  if ( ngp > 1 && minval >= 0 && maxval <= 9000 )
+		    cdoWarning("Surface geopotential has an unexpected range (min=%g max=%g)!", minval, maxval);
+		}
 	    }
 
 	  if ( lnpsID != -1 )
