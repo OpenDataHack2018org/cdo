@@ -645,7 +645,13 @@ static inline double get_vector_angle(double a[3], double b[3]) {
    dot = a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
    cross_abs = sqrt(cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2]);
 
-   return fabs(atan2(cross_abs, dot));
+   //   return fabs(atan2(cross_abs, dot));
+   double asin_tmp = asin(cross_abs);
+
+   if (dot < 0.0) // if the angle is bigger than (PI / 2)
+     return M_PI - asin_tmp;
+   else
+     return asin_tmp;
 }
 
 /**
