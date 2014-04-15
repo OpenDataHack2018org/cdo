@@ -882,7 +882,7 @@ void *SSOpar(void *argument)
   if ( zaxisIDh != -1 && geopID == -1 )
     {
       if ( ltq )
-	cdoWarning("Orography (surf. geopotential) not found - using zero orography!");
+	cdoWarning("Orography (surf. geopotential) not found - set to zero!");
 
       memset(geop, 0, ngp*sizeof(double));
     }

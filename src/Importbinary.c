@@ -438,7 +438,7 @@ void *Importbinary(void *argument)
       pfi.infile = fopen(ch,"rb");
       if (pfi.infile==NULL) {
 	if (pfi.tmplat) {
-	  if ( cdoVerbose ) cdoPrint("Could not open file: %s",ch);
+	  cdoWarning("Could not open file: %s",ch);
 	  break;
 	} else {
 	  cdoAbort("Could not open file: %s",ch);
@@ -551,9 +551,10 @@ void *Importbinary(void *argument)
 		      if ( array[i] > fmax ) fmax = array[i];
 		    }
 		}
+	      /*
 	      if ( cdoVerbose )
 		printf("%3d %4d %3d %6d %6d %12.5g %12.5g\n", tsID, recID, recoffset, nmiss, n_nan, fmin, fmax);
-
+	      */
 	      varID   = recVarID[recID];
 	      levelID = recLevelID[recID];
 	      streamDefRecord(streamID,  varID,  levelID);

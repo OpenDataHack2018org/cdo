@@ -293,7 +293,7 @@ void *Maggraph(void *argument);
 #define  ConsecstatOperators    {"consects", "consecsum"}
 #define  CopyOperators          {"copy", "selall", "szip"}
 #define  DeltimeOperators       {"delday", "del29feb"}
-#define  DeriveparOperators     {"geopotheight", "sealevelpressure"}
+#define  DeriveparOperators     {"gheight", "sealevelpressure"}
 #define  DetrendOperators       {"detrend"}
 #define  DiffOperators          {"diff", "diffp", "diffn", "diffc"}
 #define  DuplicateOperators     {"duplicate"}
@@ -790,6 +790,7 @@ static char *opalias[][2] =
   {"diffv",               "diffn"      },
   {"covar0",              "timcovar"   },
   {"covar0r",             "fldcovar"   },
+  {"geopotheight",        "gheight"    },
   {"ggstat",              "info"       },
   {"ggstats",             "sinfo"      },
   {"globavg",             "fldavg"     },

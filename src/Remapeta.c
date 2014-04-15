@@ -560,7 +560,7 @@ void *Remapeta(void *argument)
   if ( zaxisIDh != -1 && geopID == -1 )
     {
       if ( ltq )
-	cdoWarning("%s not found - using zero %s!", var_stdname(surface_geopotential), var_stdname(surface_geopotential));
+	cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
 
       memset(fis1, 0, ngp*sizeof(double));
     }
@@ -568,11 +568,18 @@ void *Remapeta(void *argument)
   presID = lnpsID;
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
-      presID = psID;
-      if ( psID != -1 )
-	cdoWarning("LOG(%s) not found - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
-      else
+      if ( psID == -1 )
 	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
+      else
+	presID = psID;
+    }
+
+  if ( cdoVerbose )
+    {
+      if ( presID == lnpsID )
+	cdoPrint("using LOG(%s)", var_stdname(surface_air_pressure));      
+      else
+	cdoPrint("using %s", var_stdname(surface_air_pressure));
     }
 
   if ( cdoVerbose ) cdoPrint("nvars3D = %d   ltq = %d", nvars3D, ltq);

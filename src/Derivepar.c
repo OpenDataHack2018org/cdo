@@ -17,7 +17,7 @@
 /*
    This module contains the following operators:
 
-      Derivepar     geopotheight          geopotential height
+      Derivepar     gheight          geopotential height
 */
 
 #include <ctype.h>
@@ -148,11 +148,10 @@ void minmaxval(long nvals, double *array, int *imiss, double *minval, double *ma
 
 void *Derivepar(void *argument)
 {
-  int GEOPOTHEIGHT, SEALEVELPRESSURE;
+  int GHEIGHT, SEALEVELPRESSURE;
   int operatorID;
   int mode;
   enum {ECHAM_MODE, WMO_MODE};
-  int geop_code = 0, temp_code = 0, ps_code = 0, lsp_code = 0, hum_code = 0;
   int streamID1, streamID2;
   int vlistID1, vlistID2;
   int gridsize, ngp = 0;
@@ -165,9 +164,10 @@ void *Derivepar(void *argument)
   int nlevel;
   int nvct;
   int surfaceID = -1;
-  int geopID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1;
+  int sgeopotID = -1, geopotID = -1, tempID = -1, humID = -1, psID = -1, lnpsID = -1, presID = -1, gheightID = -1;
   // int clwcID = -1, ciwcID = -1;
   int code, param;
+  int pnum, pcat, pdis;
   char paramstr[32];
   char varname[CDI_MAX_NAME], stdname[CDI_MAX_NAME];
   double *single2;
@@ -175,22 +175,22 @@ void *Derivepar(void *argument)
   int lhavevct;
   int nhlevf = 0;
   double *vct = NULL;
-  double *geop = NULL, *ps = NULL, *temp = NULL, *hum = NULL;
+  double *sgeopot = NULL, *ps = NULL, *temp = NULL, *hum = NULL;
   // double *lwater = NULL, *iwater = NULL;
-  double *geopotheight = NULL;
+  double *gheight = NULL;
   double *sealevelpressure = NULL;
   int nmiss, nmissout = 0;
-  int ltq = FALSE;
   double *array = NULL;
   double *half_press = NULL;
   double *full_press = NULL;
   double minval, maxval;
   int instNum, tableNum;
   int useTable;
+  gribcode_t gribcodes = {0};
 
   cdoInitialize(argument);
 
-  GEOPOTHEIGHT     = cdoOperatorAdd("geopotheight",   0, 0, NULL);
+  GHEIGHT          = cdoOperatorAdd("gheight",   0, 0, NULL);
   SEALEVELPRESSURE = cdoOperatorAdd("sealevelpressure",   0, 0, NULL);
 
   operatorID = cdoOperatorID();
@@ -304,25 +304,20 @@ void *Derivepar(void *argument)
       param    = vlistInqVarParam(vlistID1, varID);
 
       cdiParamToString(param, paramstr, sizeof(paramstr));
+      cdiDecodeParam(param, &pnum, &pcat, &pdis);
+      if ( pdis >= 0 && pdis < 255 ) code = -1;
 
       if ( useTable )
 	{
 	  if ( tableNum == 2 )
 	    {
 	      mode = WMO_MODE;
-	      geop_code  =   6;
-	      temp_code  =  11;
-	      hum_code   =  51;
-	      ps_code    =   1;
+	      wmo_gribcodes(&gribcodes);
 	    }
 	  else if ( tableNum == 128 || tableNum == 0 )
 	    {
 	      mode = ECHAM_MODE;
-	      geop_code  = 129;
-	      temp_code  = 130;
-	      hum_code   = 133;
-	      ps_code    = 134;
-	      lsp_code   = 152;
+	      echam_gribcodes(&gribcodes);
 	    }
 	  else
 	    mode = -1;
@@ -330,11 +325,7 @@ void *Derivepar(void *argument)
       else
 	{
 	  mode = ECHAM_MODE;
-	  geop_code  = 129;
-	  temp_code  = 130;
-	  hum_code   = 133;
-	  ps_code    = 134;
-	  lsp_code   = 152;
+	  echam_gribcodes(&gribcodes);
 	}
 
       if ( cdoVerbose )
@@ -350,24 +341,27 @@ void *Derivepar(void *argument)
 
 	  code = echamcode_from_stdname(stdname);
 
-	  if ( code < 0 )
+	  if ( code < 0 || code == 255 )
 	    {
-	      if      ( geopID == -1  && strcmp(varname, "geosp")   == 0 ) code = 129;
-	      else if ( psID   == -1  && strcmp(varname, "aps")     == 0 ) code = 134;
-	      else if ( psID   == -1  && strcmp(varname, "ps")      == 0 ) code = 134;
-	      else if ( lnpsID == -1  && strcmp(varname, "lsp")     == 0 ) code = 152;
-	      else if ( tempID == -1  && strcmp(varname, "t")       == 0 ) code = 130;
-	      else if ( humID  == -1  && strcmp(varname, "q")       == 0 ) code = 133;
+	      if      ( sgeopotID == -1 && strcmp(varname, "geosp")   == 0 ) code = gribcodes.geopot;
+	      else if ( psID      == -1 && strcmp(varname, "aps")     == 0 ) code = gribcodes.ps;
+	      else if ( psID      == -1 && strcmp(varname, "ps")      == 0 ) code = gribcodes.ps;
+	      else if ( lnpsID    == -1 && strcmp(varname, "lsp")     == 0 ) code = gribcodes.lsp;
+	      else if ( tempID    == -1 && strcmp(varname, "t")       == 0 ) code = gribcodes.temp;
+	      else if ( humID     == -1 && strcmp(varname, "q")       == 0 ) code = gribcodes.hum;
+	      else if ( geopotID  == -1 && strcmp(stdname, "geopotential_full") == 0 ) code = gribcodes.geopot;
 	      // else if ( strcmp(varname, "clwc")    == 0 ) code = 246;
 	      // else if ( strcmp(varname, "ciwc")    == 0 ) code = 247;
 	    }
 	}
 
-      if      ( code == geop_code && nlevel == 1      ) geopID    = varID;
-      else if ( code == temp_code && nlevel == nhlevf ) tempID    = varID;
-      else if ( code == hum_code  && nlevel == nhlevf ) humID     = varID;
-      else if ( code == ps_code   && nlevel == 1      ) psID      = varID;
-      else if ( code == lsp_code  && nlevel == 1      ) lnpsID    = varID;
+      if      ( code == gribcodes.geopot  && nlevel == 1      ) sgeopotID = varID;
+      else if ( code == gribcodes.geopot  && nlevel == nhlevf ) geopotID  = varID;
+      else if ( code == gribcodes.temp    && nlevel == nhlevf ) tempID    = varID;
+      else if ( code == gribcodes.hum     && nlevel == nhlevf ) humID     = varID;
+      else if ( code == gribcodes.ps      && nlevel == 1      ) psID      = varID;
+      else if ( code == gribcodes.lsp     && nlevel == 1      ) lnpsID    = varID;
+      else if ( code == gribcodes.gheight && nlevel == nhlevf ) gheightID = varID;
       // else if ( code == 246 ) clwcID    = varID;
       // else if ( code == 247 ) ciwcID    = varID;
 
@@ -380,26 +374,37 @@ void *Derivepar(void *argument)
 	cdoAbort("Spectral data unsupported!");
     }
 
+  if ( cdoVerbose )
+    {
+      cdoPrint("Found:");
+      if ( tempID    != -1 ) cdoPrint("  %s", var_stdname(air_temperature));
+      if ( psID      != -1 ) cdoPrint("  %s", var_stdname(surface_air_pressure));
+      if ( lnpsID    != -1 ) cdoPrint("  LOG(%s)", var_stdname(surface_air_pressure));
+      if ( sgeopotID != -1 ) cdoPrint("  %s", var_stdname(surface_geopotential));
+      if ( geopotID  != -1 ) cdoPrint("  %s", var_stdname(geopotential));
+      if ( gheightID != -1 ) cdoPrint("  %s", var_stdname(geopotential_height));
+    }
+
   if ( tempID == -1 ) cdoAbort("%s not found!", var_stdname(air_temperature));
 
-  array  = (double*) malloc(ngp*sizeof(double));
-  geop   = (double*) malloc(ngp*sizeof(double));
-  ps     = (double*) malloc(ngp*sizeof(double));
-  temp   = (double*) malloc(ngp*nhlevf*sizeof(double));
+  array   = (double*) malloc(ngp*sizeof(double));
+  sgeopot = (double*) malloc(ngp*sizeof(double));
+  ps      = (double*) malloc(ngp*sizeof(double));
+  temp    = (double*) malloc(ngp*nhlevf*sizeof(double));
 
   // lwater = (double*) malloc(ngp*nhlevf*sizeof(double));
   // iwater = (double*) malloc(ngp*nhlevf*sizeof(double));
 
   half_press = (double*) malloc(ngp*(nhlevf+1)*sizeof(double));
 
-  if ( operatorID == GEOPOTHEIGHT )
+  if ( operatorID == GHEIGHT )
     {
       if ( humID == -1 )
 	cdoWarning("%s not found - using algorithm without %s!", var_stdname(specific_humidity), var_stdname(specific_humidity));
       else
 	hum    = (double*) malloc(ngp*nhlevf*sizeof(double));
 
-      geopotheight = (double*) malloc(ngp*(nhlevf+1)*sizeof(double));
+      gheight = (double*) malloc(ngp*(nhlevf+1)*sizeof(double));
     }
   
   if ( operatorID == SEALEVELPRESSURE )
@@ -410,30 +415,38 @@ void *Derivepar(void *argument)
       sealevelpressure = (double*) malloc(ngp*sizeof(double));
     }
 
-  if ( zaxisIDh != -1 && geopID == -1 )
+  if ( zaxisIDh != -1 && sgeopotID == -1 )
     {
-      if ( ltq )
-	cdoWarning("%s not found - using zero %s!", var_stdname(surface_geopotential), var_stdname(surface_geopotential));
+      if ( geopotID == -1 )
+	cdoWarning("%s not found - set to zero!", var_stdname(surface_geopotential));
+      else
+	cdoPrint("%s not found - using bottom layer of %s!", var_stdname(surface_geopotential), var_stdname(geopotential));
 
-      memset(geop, 0, ngp*sizeof(double));
+      memset(sgeopot, 0, ngp*sizeof(double));
     }
 
   presID = lnpsID;
   if ( zaxisIDh != -1 && lnpsID == -1 )
     {
-      presID = psID;
-      if ( psID != -1 )
-	cdoWarning("LOG(%s) not found - using %s!", var_stdname(surface_air_pressure), var_stdname(surface_air_pressure));
-      else
+      if ( psID == -1 )
 	cdoAbort("%s not found!", var_stdname(surface_air_pressure));
+      else
+	presID = psID;
     }
 
+  if ( cdoVerbose )
+    {
+      if ( presID == lnpsID )
+	cdoPrint("using LOG(%s)", var_stdname(surface_air_pressure));      
+      else
+	cdoPrint("using %s", var_stdname(surface_air_pressure));
+    }
 
   vlistID2 = vlistCreate();
 
   int var_id = -1;
 
-  if ( operatorID == GEOPOTHEIGHT )
+  if ( operatorID == GHEIGHT )
     {
       var_id = geopotential_height;
       varID  = vlistDefVar(vlistID2, gridID, zaxisIDh, TSTEP_INSTANT);
@@ -477,9 +490,13 @@ void *Derivepar(void *argument)
 
 	  if ( zaxisIDh != -1 )
 	    {
-	      if ( varID == geopID )
+	      if ( varID == sgeopotID )
 		{
-		  memcpy(geop, array, ngp*sizeof(double));
+		  memcpy(sgeopot, array, ngp*sizeof(double));
+		}
+	      else if ( varID == geopotID && sgeopotID == -1 && (levelID+1) == nhlevf )
+		{
+		  memcpy(sgeopot, array, ngp*sizeof(double));
 		}
 	      else if ( varID == presID )
 		{
@@ -508,8 +525,8 @@ void *Derivepar(void *argument)
 	  if ( minval < MIN_PS || maxval > MAX_PS )
 	    cdoWarning("Surface pressure out of range (min=%g max=%g)!", minval, maxval);
 
-	  /* check range of geop */
-	  minmaxval(ngp, geop, NULL, &minval, &maxval);
+	  /* check range of surface geopot */
+	  minmaxval(ngp, sgeopot, NULL, &minval, &maxval);
 	  if ( minval < MIN_FIS || maxval > MAX_FIS )
 	    cdoWarning("Orography out of range (min=%g max=%g)!", minval, maxval);
 	}
@@ -547,12 +564,12 @@ void *Derivepar(void *argument)
 	    }
 	}
 
-      if ( operatorID == GEOPOTHEIGHT )
+      if ( operatorID == GHEIGHT )
 	{
 	  presh(NULL, half_press, vct, ps, nhlevf, ngp);
 	  
-	  memcpy(geopotheight+ngp*nhlevf, geop, ngp*sizeof(double));
-	  MakeGeopotHeight(geopotheight, temp, hum, half_press, ngp, nhlevf);
+	  memcpy(gheight+ngp*nhlevf, sgeopot, ngp*sizeof(double));
+	  MakeGeopotHeight(gheight, temp, hum, half_press, ngp, nhlevf);
 
 	  nmissout = 0;
 	  varID = 0;
@@ -560,14 +577,14 @@ void *Derivepar(void *argument)
 	  for ( levelID = 0; levelID < nlevel; levelID++ )
 	    {
 	      streamDefRecord(streamID2, varID, levelID);
-	      streamWriteRecord(streamID2, geopotheight+levelID*ngp, nmissout);
+	      streamWriteRecord(streamID2, gheight+levelID*ngp, nmissout);
 	    }
 	}
       else if ( operatorID == SEALEVELPRESSURE )
 	{
 	  presh(full_press, half_press, vct, ps, nhlevf, ngp);
 
-	  extra_P(sealevelpressure, half_press+ngp*(nhlevf), full_press+ngp*(nhlevf-1), geop, temp+ngp*(nhlevf-1), ngp);
+	  extra_P(sealevelpressure, half_press+ngp*(nhlevf), full_press+ngp*(nhlevf-1), sgeopot, temp+ngp*(nhlevf-1), ngp);
 
 	  streamDefRecord(streamID2, 0, 0);
 	  streamWriteRecord(streamID2, sealevelpressure, 0);
@@ -584,9 +601,9 @@ void *Derivepar(void *argument)
   vlistDestroy(vlistID2);
 
   free(ps);
-  free(geop);
+  free(sgeopot);
   free(temp);
-  if ( geopotheight ) free(geopotheight);
+  if ( gheight ) free(gheight);
   if ( sealevelpressure ) free(sealevelpressure);
   if ( hum ) free(hum);
 
