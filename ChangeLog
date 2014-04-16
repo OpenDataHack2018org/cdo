@@ -3,6 +3,10 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
+2014-04-15  Uwe Schulzweida
+
+	* seltimestep: add support for negative timesteps [patch from: Etienne Tourigny]
+
 2014-04-14  Uwe Schulzweida
 
 	* New operator: sealevelpressure - sea level pressure

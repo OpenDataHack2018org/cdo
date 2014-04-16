@@ -211,7 +211,7 @@ void *Seltime(void *argument)
   LIST *ilist = listNew(INT_LIST);
   LIST *flist = listNew(FLT_LIST);
   int gridID;
-  int nvars, nlevel;
+  int nvars, nlevel, ntsteps;
   int nconst, lconstout = FALSE;
   int process_nts1 = FALSE, process_nts2 = FALSE;
   int *vdate_list = NULL, *vtime_list = NULL;
@@ -305,15 +305,6 @@ void *Seltime(void *argument)
       for ( i = 0; i < nsel; i++ ) selfound[i] = FALSE;
     }
 
-  if ( cdoVerbose )
-    {
-      for ( i = 0; i < nsel; i++ )
-	if ( operatorID == SELDATE )
-	  cdoPrint("fltarr entry: %d %14.4f", i+1, fltarr[i]);
-	else
-	  cdoPrint("intarr entry: %d %d", i+1, intarr[i]);
-    }
-
   streamID1 = streamOpenRead(cdoStreamName(0));
 
   vlistID1 = streamInqVlist(streamID1);
@@ -331,6 +322,31 @@ void *Seltime(void *argument)
       gridsize = vlistGridsizeMax(vlistID1);
       if ( vlistNumber(vlistID1) != CDI_REAL ) gridsize *= 2;
       array = (double*) malloc(gridsize*sizeof(double));
+    }
+
+  ntsteps = vlistNtsteps(vlistID1);
+
+  /* add support for negative timestep values */
+  if ( operatorID == SELTIMESTEP && ntsteps > 0 )
+    {
+      for ( i = 0; i < nsel; i++ )
+	{
+	  if ( intarr[i] < 0 )
+	    {
+	      if ( cdoVerbose )
+		cdoPrint("timestep %d changed to %d", intarr[i], ntsteps + 1 + intarr[i]);
+	      intarr[i] = ntsteps + 1 + intarr[i];
+	    }
+	}
+    }
+
+  if ( cdoVerbose )
+    {
+      for ( i = 0; i < nsel; i++ )
+	if ( operatorID == SELDATE )
+	  cdoPrint("fltarr entry: %d %14.4f", i+1, fltarr[i]);
+	else
+	  cdoPrint("intarr entry: %d %d", i+1, intarr[i]);
     }
 
   nvars = vlistNvars(vlistID1);
