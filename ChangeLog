@@ -5,6 +5,7 @@
 
 2014-04-15  Uwe Schulzweida
 
+	* select/delete: add support for negative timesteps
 	* seltimestep: add support for negative timesteps [patch from: Etienne Tourigny]
 
 2014-04-14  Uwe Schulzweida

@@ -283,7 +283,6 @@ int pml_add_entry(pml_entry_t *entry, char *arg)
 void pmlProcess(pml_entry_t *entry, int argc, char **argv)
 {
   int i;
-  int len;
   char *parg;
   char *epos;
 
@@ -606,7 +605,7 @@ void *Select(void *argument)
 		    vlistDefFlag(vlistID1, varID, levID, TRUE);
 		}
 	    }
-	  else
+	  else if ( operatorID == SELECT )
 	    {
 	      result = TRUE;
 	    }
@@ -787,6 +786,20 @@ void *Select(void *argument)
 	    {	      
 	      for ( varID = 0; varID < nvars2; ++varID )
 		vlistDefVarTsteptype(vlistID2, varID, TSTEP_INSTANT);
+	    }
+
+	  /* add support for negative timestep values */
+	  if ( npar_timestep > 0 && ntsteps > 0 && nfiles == 1 )
+	    {
+	      for ( i = 0; i < npar_timestep; i++ )
+		{
+		  if ( par_timestep[i] < 0 )
+		    {
+		      if ( cdoVerbose )
+			cdoPrint("timestep %d changed to %d", par_timestep[i], ntsteps + 1 + par_timestep[i]);
+		      par_timestep[i] = ntsteps + 1 + par_timestep[i];
+		    }
+		}
 	    }
 
 	  if ( ! lcopy )
