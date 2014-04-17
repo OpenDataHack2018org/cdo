@@ -39,31 +39,31 @@ Deletes all fields with parameters in a user given list.
 
 @BeginParameter
 @Item = name
-STRING  Comma separated list of variable names
+STRING  Comma separated list of variable names.
 @Item = param
-STRING  Comma separated list of parameter identifiers
+STRING  Comma separated list of parameter identifiers.
 @Item = code
-INTEGER Comma separated list of code numbers
+INTEGER Comma separated list of code numbers.
 @Item = ltype
-INTEGER Comma separated list of GRIB level types
+INTEGER Comma separated list of GRIB level types.
 @Item = levidx
-INTEGER Comma separated list of index of levels
+INTEGER Comma separated list of index of levels.
 @Item = level
-FLOAT   Comma separated list of vertical levels
+FLOAT   Comma separated list of vertical levels.
 @Item = minute
-INTEGER Comma separated list of minutes
+INTEGER Comma separated list of minutes.
 @Item = hour
-INTEGER Comma separated list of hours
+INTEGER Comma separated list of hours.
 @Item = day
-INTEGER Comma separated list of days
+INTEGER Comma separated list of days.
 @Item = month
-INTEGER Comma separated list of months
+INTEGER Comma separated list of months.
 @Item = year
-INTEGER Comma separated list of years
+INTEGER Comma separated list of years.
 @Item = timestep
-INTEGER Comma separated list of timesteps
+INTEGER Comma separated list of timesteps. Negative values selects timesteps from the end (netCDF only).
 @Item = timestep_of_year
-INTEGER Comma separated list of timesteps of year
+INTEGER Comma separated list of timesteps of year.
 @EndParameter
 
 

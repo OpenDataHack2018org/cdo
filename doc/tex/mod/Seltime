@@ -106,27 +106,27 @@ Selects a month and optional an arbitrary number of timesteps before and after t
 
 @BeginParameter
 @Item = timesteps
-INTEGER  Comma separated list of timesteps
+INTEGER  Comma separated list of timesteps. Negative values selects timesteps from the end (netCDF only).
 @Item = times
-STRING   Comma separated list of times (format hh:mm:ss)
+STRING   Comma separated list of times (format hh:mm:ss).
 @Item = hours
-INTEGER  Comma separated list of hours
+INTEGER  Comma separated list of hours.
 @Item = days
-INTEGER  Comma separated list of days
+INTEGER  Comma separated list of days.
 @Item = months
-INTEGER  Comma separated list of months
+INTEGER  Comma separated list of months.
 @Item = years
-INTEGER  Comma separated list of years
+INTEGER  Comma separated list of years.
 @Item = seasons
-STRING   Comma separated list of seasons (DJF, MAM, JJA, SON)
+STRING   Comma separated list of seasons (DJF, MAM, JJA, SON).
 @Item = date1
-STRING   Start date (format YYYY-MM-DDThh:mm:ss)
+STRING   Start date (format YYYY-MM-DDThh:mm:ss).
 @Item = date2
-STRING   End date (format YYYY-MM-DDThh:mm:ss) [default: date1]
+STRING   End date (format YYYY-MM-DDThh:mm:ss) [default: date1].
 @Item = nts1
-INTEGER  Number of timesteps before the selected month [default: 0]
+INTEGER  Number of timesteps before the selected month [default: 0].
 @Item = nts2
-INTEGER  Number of timesteps after the selected month [default: nts1]
+INTEGER  Number of timesteps after the selected month [default: nts1].
 @EndParameter
 
 
