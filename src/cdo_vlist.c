@@ -38,9 +38,9 @@ void compare_lat_reg2d(int ysize, int gridID1, int gridID2)
 	   IS_EQUAL(yvals1[ysize-1], yvals2[0]) )
 	{
 	  if ( yvals1[0] > yvals2[0] )
-	    cdoWarning("Grid orientation differ! First grid: N->S; second grid: S->N");
+	    cdoWarning("Latitude orientation differ! First grid: N->S; second grid: S->N");
 	  else
-	    cdoWarning("Grid orientation differ! First grid: S->N; second grid: N->S");
+	    cdoWarning("Latitude orientation differ! First grid: S->N; second grid: N->S");
 	}
       else
 	{
