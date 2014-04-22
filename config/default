@@ -45,8 +45,8 @@ case "${HOSTNAME}" in
                     --with-curl=/opt/local \
 	            CC=gcc CFLAGS="-g -pipe -D_REENTRANT -Wall -W -Wfloat-equal -pedantic -O3 -march=native" \
                     LIBS="-L/opt/local/lib -lopenjpeg"
-#                    --with-libxml2=/usr
-#                    --with-magics=/Users/m214003/local/magics-2.14.9
+#                    --with-libxml2=/usr 
+#                    --with-magics=/Users/m214003/local/magics-2.14.9 
 	;;
     hama*)
 	${CONFPATH}configure --prefix=$HOME/local \
