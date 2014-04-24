@@ -163,10 +163,9 @@ void *Set(void *argument)
 	  zaxisID1 = vlistZaxis(vlistID2, index);
 	  zaxisID2 = zaxisDuplicate(zaxisID1);
 
-	  zaxistype = ltype2ztype(newval);
-
+	  zaxistype = ZAXIS_GENERIC;
 	  zaxisChangeType(zaxisID2, zaxistype);
-	  if ( zaxistype == ZAXIS_GENERIC ) zaxisDefLtype(zaxisID2, newval);
+	  zaxisDefLtype(zaxisID2, newval);
 	  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 	}
     }

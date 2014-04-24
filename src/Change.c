@@ -278,7 +278,7 @@ void *Change(void *argument)
     }
   else if ( operatorID == CHLTYPE )                
     {
-      int zaxistype, zaxistype1, zaxistype2, ltype, ltype1, ltype2, sameltype;
+      int ltype, ltype1, ltype2;
 
       nzaxis = vlistNzaxis(vlistID2);
       for ( index = 0; index < nzaxis; index++ )
@@ -286,26 +286,17 @@ void *Change(void *argument)
 	  zaxisID1 = vlistZaxis(vlistID2, index);
 	  zaxisID2 = zaxisDuplicate(zaxisID1);
 
-	  zaxistype = zaxisInqType(zaxisID1);
 	  ltype = zaxisInqLtype(zaxisID1);
 
 	  for ( i = 0; i < nch; i += 2 )
 	    {
-	      sameltype = FALSE;
 	      ltype1 = chltypes[i];
 	      ltype2 = chltypes[i+1];
 
-	      zaxistype1 = ltype2ztype(ltype1);
-	      zaxistype2 = ltype2ztype(ltype2);
-
-	      if ( zaxistype1 == zaxistype ) sameltype = TRUE;
-
-	      if ( !(zaxistype1 == ZAXIS_GENERIC && ltype1 == ltype) ) sameltype = FALSE;
-
-	      if ( sameltype)
+	      if ( ltype1 == ltype )
 		{
-		  zaxisChangeType(zaxisID2, zaxistype2);
-		  if ( zaxistype == ZAXIS_GENERIC ) zaxisDefLtype(zaxisID2, ltype2);
+		  zaxisChangeType(zaxisID2, ZAXIS_GENERIC);
+		  zaxisDefLtype(zaxisID2, ltype2);
 		  vlistChangeZaxis(vlistID2, zaxisID1, zaxisID2);
 		}
 	    }
