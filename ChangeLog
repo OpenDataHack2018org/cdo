@@ -5,6 +5,7 @@
 
 2014-04-24  Uwe Schulzweida
 
+	* Filter: segmentation fault (bug fix)
 	* setltype, chltype: added support for GRIB2
 
 2014-04-15  Uwe Schulzweida

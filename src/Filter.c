@@ -27,16 +27,14 @@
 #  include "config.h"
 #endif
 
-#if defined( HAVE_LIBFFTW3 ) 
-#include <fftw3.h>
-#endif
-
 #include <cdi.h>
 #include "cdo.h"
 #include "cdo_int.h"
 #include "pstream.h"
 
-#include "stdlib.h"
+#if defined( HAVE_LIBFFTW3 ) 
+#include <fftw3.h>
+#endif
 
 
 #define  NALLOC_INC  1000
@@ -133,17 +131,13 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
   fmasc[imin] = 1;
   for ( i = imin+1; i <= imax; i++ )  
     fmasc[i] = fmasc[nts-i] = 1; 
-  
 }
 
 
 #if defined( HAVE_LIBFFTW3 ) 
 static
-void filter_fftw(int nts, const int *fmasc, 
-                 fftw_complex *fft_in, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
+void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_in, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
 {  
-  //  fprintf(stderr,"using fftw filter\n");
-
   int i;
 
   fftw_execute(*p_T2S);
@@ -195,8 +189,7 @@ void *Filter(void *argument)
   int nmiss;
   int nvars, nlevel;
   dtinfo_t *dtinfo = NULL;
-  int tunit;
-  int incperiod0, incunit0, incunit, dpy, calendar;
+  int incperiod0, incunit0, incunit, calendar;
   int year0, month0, day0;
   double *array1 = NULL, *array2 = NULL;
   double fdata = 0;
@@ -227,9 +220,7 @@ void *Filter(void *argument)
   taxisID2 = taxisDuplicate(taxisID1);
   vlistDefTaxis(vlistID2, taxisID2);
 
-  tunit = taxisInqTunit(taxisID1); 
   calendar = taxisInqCalendar(taxisID1);  
-  dpy = calendar_dpy(calendar); /* should be 365 !!! */
   
   streamID2 = streamOpenWrite(cdoStreamName(1), cdoFiletype());
   
@@ -263,7 +254,7 @@ void *Filter(void *argument)
         }
 
       /* get and check time increment */                   
-      if ( tsID > 0)
+      if ( tsID > 0 )
         {    
 	  juldate_t juldate0, juldate;
 	  double jdelta;
@@ -285,7 +276,7 @@ void *Filter(void *argument)
               incperiod = incperiod0; 
               if ( incperiod == 0 ) cdoAbort("Time step must be different from zero\n");
               incunit = incunit0;
-              if ( cdoVerbose ) fprintf(stdout, "time step %i %s\n", incperiod, tunits[incunit]);
+              if ( cdoVerbose ) cdoPrint("Time step %i %s", incperiod, tunits[incunit]);
               fdata = 1.*iunits[incunit]/incperiod;
             }
           else 
@@ -328,11 +319,11 @@ void *Filter(void *argument)
 
   array1 = (double*) malloc(nts2*sizeof(double));
   array2 = (double*) malloc(nts2*sizeof(double));
+
+  for ( tsID = 0; tsID < nts2; tsID++ ) array2[tsID] = 0;
 #endif
 
   fmasc  = (int*) calloc(nts2, sizeof(int));
-   
-  for ( tsID = 0; tsID < nts; tsID++ ) array2[tsID] = 0;
 
   switch(operfunc)
   {
@@ -363,15 +354,15 @@ void *Filter(void *argument)
   
   create_fmasc(nts, fdata, fmin, fmax, fmasc); 
 
+#if defined( HAVE_LIBFFTW3 ) 
+  if ( cdoVerbose ) cdoPrint("Using fftw lib");
+#endif
+
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
       gridsize = gridInqSize(gridID);
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
-
-#if defined( HAVE_LIBFFTW3 ) 
-      fprintf(stderr," using fftw lib\n");
-#endif
       
       for ( levelID = 0; levelID < nlevel; levelID++ )
         { 
@@ -385,7 +376,7 @@ void *Filter(void *argument)
 		  in_fft[tsID][1] = 0;
 		}
 
-	      filter_fftw(nts,fmasc,in_fft,out_fft,&p_T2S,&p_S2T);
+	      filter_fftw(nts, fmasc, in_fft, out_fft, &p_T2S, &p_S2T);
 
               for ( tsID = 0; tsID < nts; tsID++ )
 		{
@@ -400,7 +391,7 @@ void *Filter(void *argument)
 	      // real one in order to transform two time series at the same time does not work
 	      // properly here. 
 
-	      memset( array2,0,nts2*sizeof(double) );
+	      memset(array2, 0, nts2*sizeof(double));
 	      for ( tsID = 0; tsID < nts; tsID++ )
 		array1[tsID] = vars[tsID][varID][levelID].ptr[i];                                         
 	      /* zero padding up to next power of to */
@@ -408,6 +399,7 @@ void *Filter(void *argument)
 		array1[tsID] = 0;       
 
 	      filter_intrinsic(nts2,fmasc,array1,array2);
+
               for ( tsID = 0; tsID < nts; tsID++ )
 		vars[tsID][varID][levelID].ptr[i]   = array1[tsID];  
 	    }
