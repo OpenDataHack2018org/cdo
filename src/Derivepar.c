@@ -349,7 +349,7 @@ void *Derivepar(void *argument)
 	      else if ( lnpsID    == -1 && strcmp(varname, "lsp")     == 0 ) code = gribcodes.lsp;
 	      else if ( tempID    == -1 && strcmp(varname, "t")       == 0 ) code = gribcodes.temp;
 	      else if ( humID     == -1 && strcmp(varname, "q")       == 0 ) code = gribcodes.hum;
-	      else if ( geopotID  == -1 && strcmp(stdname, "geopotential_full") == 0 ) code = gribcodes.geopot;
+	      // else if ( geopotID  == -1 && strcmp(stdname, "geopotential_full") == 0 ) code = gribcodes.geopot;
 	      // else if ( strcmp(varname, "clwc")    == 0 ) code = 246;
 	      // else if ( strcmp(varname, "ciwc")    == 0 ) code = 247;
 	    }
