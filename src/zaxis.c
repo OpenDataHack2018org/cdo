@@ -432,22 +432,7 @@ void defineZaxis(const char *zaxisarg)
     }
 }
 
-
-int zaxis2ltype(int zaxisID)
-{
-  int ltype;
-  int zaxistype;
-
-  zaxistype = zaxisInqType(zaxisID);
-
-  ltype = zaxisInqLtype(zaxisID);
-
-  if ( ltype <= 0 ) ltype = ztype2ltype(zaxistype);
-
-  return (ltype);
-}
-
-
+static
 int ztype2ltype(int zaxistype)
 {
   int ltype = -1;
@@ -462,6 +447,21 @@ int ztype2ltype(int zaxistype)
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_LAND  )  ltype = 111;
   else if ( zaxistype == ZAXIS_ISENTROPIC        )  ltype = 113;
   else if ( zaxistype == ZAXIS_DEPTH_BELOW_SEA   )  ltype = 160;
+
+  return (ltype);
+}
+
+
+int zaxis2ltype(int zaxisID)
+{
+  int ltype;
+  int zaxistype;
+
+  zaxistype = zaxisInqType(zaxisID);
+
+  ltype = zaxisInqLtype(zaxisID);
+
+  if ( ltype <= 0 ) ltype = ztype2ltype(zaxistype);
 
   return (ltype);
 }

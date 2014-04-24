@@ -118,7 +118,6 @@ char   *commandLine(void);
 int     readline(FILE *fp, char *line, int len);
 
 int zaxis2ltype(int zaxisID);
-int ztype2ltype(int zaxistype);
 
 
 int nfc2nlat(int nfc, int ntr);
