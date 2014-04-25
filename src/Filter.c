@@ -133,6 +133,7 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
     fmasc[i] = fmasc[nts-i] = 1; 
 }
 
+#if defined(HAVE_LIBFFTW3) 
 static
 void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
 {  
@@ -151,6 +152,7 @@ void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_
   
   return;
 }
+#endif
 
 static
 void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
