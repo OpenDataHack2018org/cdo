@@ -1,3 +1,3 @@
 32-bit integer:
 date     YYYYMMDD -> -214748 < year < 214748
-gridsize          -> max: 2147483647,  65455x32727
+gridsize          -> max: 2147483647,  65455x32727, res: 612m

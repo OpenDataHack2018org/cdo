@@ -32,7 +32,7 @@
 #include "cdo_int.h"
 #include "pstream.h"
 
-#if defined( HAVE_LIBFFTW3 ) 
+#if defined(HAVE_LIBFFTW3) 
 #include <fftw3.h>
 #endif
 
@@ -133,42 +133,41 @@ void create_fmasc(int nts, double fdata, double fmin, double fmax, int *fmasc)
     fmasc[i] = fmasc[nts-i] = 1; 
 }
 
-
-#if defined( HAVE_LIBFFTW3 ) 
 static
-void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_in, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
+void filter_fftw(int nts, const int *fmasc, fftw_complex *fft_out, fftw_plan *p_T2S, fftw_plan *p_S2T)
 {  
   int i;
 
   fftw_execute(*p_T2S);
 
   for ( i = 0; i < nts; i++ )
-    if ( ! fmasc[i] )   {
-      fft_out[i][0] = 0;
-      fft_out[i][1] = 0;
-    }
+    if ( ! fmasc[i] )
+      {
+	fft_out[i][0] = 0;
+	fft_out[i][1] = 0;
+      }
   
   fftw_execute(*p_S2T);
   
   return;
 }
 
-#else 
-
 static
 void filter_intrinsic(int nts, const int *fmasc, double *array1, double *array2)
 {  
   int i;
-  
+
   fft2(array1, array2, nts, 1);
+
   for ( i = 0; i < nts; i++ )
-    if ( ! fmasc[i] )  array1[i] = array2[i] = 0;
+    if ( ! fmasc[i] )
+      array1[i] = array2[i] = 0;
+
   fft2(array1, array2, nts, -1);
   
   return;
 }
 
-#endif
 
 void *Filter(void *argument)
 {
@@ -196,7 +195,8 @@ void *Filter(void *argument)
   field_t ***vars = NULL;
   double fmin = 0, fmax = 0;
   int *fmasc;
-#if defined( HAVE_LIBFFTW3 ) 
+  int use_fftw = FALSE;
+#if defined(HAVE_LIBFFTW3) 
   fftw_plan p_T2S, p_S2T;
   fftw_complex *out_fft;
   fftw_complex *in_fft;
@@ -210,6 +210,16 @@ void *Filter(void *argument)
 
   operatorID = cdoOperatorID();
   operfunc   = cdoOperatorF1(operatorID);
+
+  if ( CDO_Use_FFTW )
+    {
+#if defined(HAVE_LIBFFTW3) 
+      if ( cdoVerbose ) cdoPrint("Using fftw lib");
+      use_fftw = TRUE;
+#else
+      //   cdoAbort("LIBFFTW3 support not compiled in!");
+#endif
+    }
   
   streamID1 = streamOpenRead(cdoStreamName(0));
 
@@ -250,7 +260,7 @@ void *Filter(void *argument)
           vars[tsID][varID][levelID].ptr = (double*) malloc(gridsize*sizeof(double));
           streamReadRecord(streamID1, vars[tsID][varID][levelID].ptr, &nmiss);
           vars[tsID][varID][levelID].nmiss = nmiss;
-          if ( nmiss ) cdoAbort("Missing value support for operators in module Filter not added yet");
+          if ( nmiss ) cdoAbort("Missing value support for operators in module Filter not added yet!");
         }
 
       /* get and check time increment */                   
@@ -298,30 +308,36 @@ void *Filter(void *argument)
     }
   
   nts = tsID;
-  /*  round up nts to next power of two for (better) performance 
-   ** of fast fourier transformation */
-#if defined( HAVE_LIBFFTW3 ) 
-  nts2 = nts;
 
-  out_fft = (fftw_complex*) malloc( nts * sizeof(fftw_complex));
-  in_fft  = (fftw_complex*) malloc( nts * sizeof(fftw_complex));
+  /*  round up nts to next power of two for (better) performance of fast fourier transformation */
 
-  p_T2S = fftw_plan_dft_1d(nts,in_fft,out_fft,  1, FFTW_ESTIMATE);
-  p_S2T = fftw_plan_dft_1d(nts,out_fft,in_fft, -1, FFTW_ESTIMATE);
-#else 
-  nts2 = nts-1;
-  nts2 |= nts2 >> 1;  /* handle  2 bit numbers */
-  nts2 |= nts2 >> 2;  /* handle  4 bit numbers */
-  nts2 |= nts2 >> 4;  /* handle  8 bit numbers */
-  nts2 |= nts2 >> 8;  /* handle 16 bit numbers */
-  nts2 |= nts2 >> 16; /* handle 32 bit numbers */
-  nts2++;
+  if ( use_fftw )
+    {
+#if defined(HAVE_LIBFFTW3) 
+      nts2 = nts;
 
-  array1 = (double*) malloc(nts2*sizeof(double));
-  array2 = (double*) malloc(nts2*sizeof(double));
+      out_fft = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
+      in_fft  = (fftw_complex*) malloc(nts*sizeof(fftw_complex));
 
-  for ( tsID = 0; tsID < nts2; tsID++ ) array2[tsID] = 0;
+      p_T2S = fftw_plan_dft_1d(nts, in_fft, out_fft,  1, FFTW_ESTIMATE);
+      p_S2T = fftw_plan_dft_1d(nts, out_fft, in_fft, -1, FFTW_ESTIMATE);
 #endif
+    }
+  else
+    {
+      nts2 = nts-1;
+      nts2 |= nts2 >> 1;  /* handle  2 bit numbers */
+      nts2 |= nts2 >> 2;  /* handle  4 bit numbers */
+      nts2 |= nts2 >> 4;  /* handle  8 bit numbers */
+      nts2 |= nts2 >> 8;  /* handle 16 bit numbers */
+      nts2 |= nts2 >> 16; /* handle 32 bit numbers */
+      nts2++;
+
+      array1 = (double*) malloc(nts2*sizeof(double));
+      array2 = (double*) malloc(nts2*sizeof(double));
+      
+      for ( tsID = 0; tsID < nts2; tsID++ ) array2[tsID] = 0;
+    }
 
   fmasc  = (int*) calloc(nts2, sizeof(int));
 
@@ -354,10 +370,6 @@ void *Filter(void *argument)
   
   create_fmasc(nts, fdata, fmin, fmax, fmasc); 
 
-#if defined( HAVE_LIBFFTW3 ) 
-  if ( cdoVerbose ) cdoPrint("Using fftw lib");
-#endif
-
   for ( varID = 0; varID < nvars; varID++ )
     {
       gridID   = vlistInqVarGrid(vlistID1, varID);
@@ -365,45 +377,48 @@ void *Filter(void *argument)
       nlevel   = zaxisInqSize(vlistInqVarZaxis(vlistID1, varID));
       
       for ( levelID = 0; levelID < nlevel; levelID++ )
-        { 
-#if defined( HAVE_LIBFFTW3 ) 
-          for ( i = 0; i < gridsize-1; i++ )
-            {
-              for ( tsID = 0; tsID < nts; tsID++ )                              
-                {
-		  in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
-		  // in_fft[tsID][1] = vars[tsID][varID][levelID].ptr[i+1];
-		  in_fft[tsID][1] = 0;
-		}
-
-	      filter_fftw(nts, fmasc, in_fft, out_fft, &p_T2S, &p_S2T);
-
-              for ( tsID = 0; tsID < nts; tsID++ )
-		{
-		  vars[tsID][varID][levelID].ptr[i]   = in_fft[tsID][0] / nts;  
-		  //		  vars[tsID][varID][levelID].ptr[i+1] = in_fft[tsID][1] / nts;  
-		}
-	    }
-#else 
-	  for ( i = 0; i < gridsize; i++ )  
+        {
+	  if ( use_fftw )
 	    {
-	      // for some reason, the optimization using the complex transform independent of the 
-	      // real one in order to transform two time series at the same time does not work
-	      // properly here. 
+#if defined(HAVE_LIBFFTW3) 
+	      for ( i = 0; i < gridsize; i++ )
+		{
+		  for ( tsID = 0; tsID < nts; tsID++ )                              
+		    {
+		      in_fft[tsID][0] = vars[tsID][varID][levelID].ptr[i];
+		      in_fft[tsID][1] = 0;
+		    }
 
-	      memset(array2, 0, nts2*sizeof(double));
-	      for ( tsID = 0; tsID < nts; tsID++ )
-		array1[tsID] = vars[tsID][varID][levelID].ptr[i];                                         
-	      /* zero padding up to next power of to */
-              for ( ; tsID < nts2; tsID++ )                
-		array1[tsID] = 0;       
-
-	      filter_intrinsic(nts2,fmasc,array1,array2);
-
-              for ( tsID = 0; tsID < nts; tsID++ )
-		vars[tsID][varID][levelID].ptr[i]   = array1[tsID];  
-	    }
+		  filter_fftw(nts, fmasc, out_fft, &p_T2S, &p_S2T);
+		  
+		  for ( tsID = 0; tsID < nts; tsID++ )
+		    {
+		      vars[tsID][varID][levelID].ptr[i] = in_fft[tsID][0] / nts;  
+		    }
+		}
 #endif
+	    }
+	  else
+	    {
+	      for ( i = 0; i < gridsize; i++ )  
+		{
+		  // for some reason, the optimization using the complex transform independent of the 
+		  // real one in order to transform two time series at the same time does not work
+		  // properly here. 
+
+		  memset(array2, 0, nts2*sizeof(double));
+		  for ( tsID = 0; tsID < nts; tsID++ )
+		    array1[tsID] = vars[tsID][varID][levelID].ptr[i];                                         
+		  /* zero padding up to next power of to */
+		  for ( ; tsID < nts2; tsID++ )                
+		    array1[tsID] = 0;       
+
+		  filter_intrinsic(nts2, fmasc, array1, array2);
+
+		  for ( tsID = 0; tsID < nts; tsID++ )
+		    vars[tsID][varID][levelID].ptr[i] = array1[tsID];  
+		}
+	    }
 	}
     }
   

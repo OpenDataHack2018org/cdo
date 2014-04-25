@@ -85,10 +85,11 @@ int cdoDefaultTableID    = CDI_UNDEFID;
 int cdoLockIO            = FALSE;
 int cdoCheckDatarange    = FALSE;
 
-int CDO_Color             = FALSE;
+int CDO_Color            = FALSE;
+int CDO_Use_FFTW         = TRUE;
 int cdoDiag              = FALSE;
-int CDO_Append_History     = TRUE;
-int CDO_Reset_History      = FALSE;
+int CDO_Append_History   = TRUE;
+int CDO_Reset_History    = FALSE;
 int cdoCompType          = COMPRESS_NONE;  // compression type
 int cdoCompLevel         = 0;              // compression level
 int cdoChunkType         = CDI_UNDEFID;
@@ -899,6 +900,18 @@ void get_env_vars(void)
 	  cdoDiag = TRUE;
 	  if ( cdoVerbose )
 	    fprintf(stderr, "CDO_DIAG = %s\n", envstr);
+	}
+    }
+
+  envstr = getenv("CDO_USE_FFTW");
+  if ( envstr )
+    {
+      int ival = atoi(envstr);
+      if ( ival == 0 || ival == 1 )
+	{
+	  CDO_Use_FFTW = ival;
+	  if ( cdoVerbose )
+	    fprintf(stderr, "CDO_Use_FFTW = %s\n", envstr);
 	}
     }
 
