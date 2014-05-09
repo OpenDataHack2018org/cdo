@@ -1274,7 +1274,7 @@ int main(int argc, char *argv[])
 
   dmemory_ExitOnError = 1;
 
-  _Verbose = 0;
+  _Verbose = 1;
 
   /* mallopt(M_MMAP_MAX, 0); */
  
