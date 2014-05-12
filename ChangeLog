@@ -3,7 +3,11 @@
 	* using CDI library version 1.6.4
 	* Version 1.6.4 released
 
-2014-04-09  Uwe Schulzweida
+2014-05-12  Uwe Schulzweida
+
+	* diff: check NaNs
+
+2014-05-09  Uwe Schulzweida
 
 	* make option -W default
 

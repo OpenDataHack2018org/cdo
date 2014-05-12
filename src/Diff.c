@@ -130,7 +130,13 @@ void *Diff(void *argument)
 
 	  for ( i = 0; i < gridsize; i++ )
 	    {
-	      if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
+	      if ( (DBL_IS_NAN(array1[i]) && !DBL_IS_NAN(array2[i])) ||
+		  (!DBL_IS_NAN(array1[i]) &&  DBL_IS_NAN(array2[i])) )
+		{
+		  ndiff++;
+		  relm = 1.0;
+		}
+	      else if ( !DBL_IS_EQUAL(array1[i], missval1) && !DBL_IS_EQUAL(array2[i], missval2) )
 		{
 		  absdiff = fabs(array1[i] - array2[i]);
 		  if ( absdiff > 0. ) ndiff++;
