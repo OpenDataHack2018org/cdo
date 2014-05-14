@@ -489,6 +489,125 @@ void printZaxisInfo(int vlistID)
     }
 }
 
+
+static
+int printDateTime(int ntimeout, int vdate, int vtime)
+{
+  char vdatestr[32], vtimestr[32];
+
+  if ( ntimeout == 4 )
+    {
+      ntimeout = 0;
+      fprintf(stdout, "\n");
+    }
+
+  date2str(vdate, vdatestr, sizeof(vdatestr));
+  time2str(vtime, vtimestr, sizeof(vtimestr));
+
+  fprintf(stdout, " %s %s", vdatestr, vtimestr);
+
+  return (++ntimeout);
+}
+
+#define NUM_TIMESTEP 60
+#define MAX_DOTS     80
+
+static
+int printDot(int ndotout, int *nfact, int *ncout)
+{
+
+  //printf("ncout %d %d %d\n",*ncout, (*ncout)%(*nfact), *nfact);
+  if ( (*ncout)%(*nfact) == 0 )
+    {
+      if ( ndotout == MAX_DOTS )
+	{
+	  *ncout = 0;
+	  ndotout = 0;
+	  fprintf(stdout, "\n   ");
+	  (*nfact) *= 10;
+	}
+
+      fprintf(stdout, ".");
+      fflush(stdout);
+      ndotout++;
+    }
+
+  (*ncout)++;
+
+  return (ndotout);
+}
+
+static
+void printTimesteps(int streamID, int taxisID)
+{
+  int nrecs;
+  int vdate, vtime;
+  struct datetime {
+    int vdate;
+    int vtime;
+    struct datetime *next;
+  };
+  struct datetime vdatetime[NUM_TIMESTEP];
+  struct datetime *next_vdatetime = vdatetime;
+
+  for ( int i = 0; i < NUM_TIMESTEP-1; ++i ) vdatetime[i].next = &vdatetime[i+1];
+  vdatetime[NUM_TIMESTEP-1].next = &vdatetime[0];
+
+  int ntimeout = 0;
+  int ndotout = 0;
+  int nvdatetime = 0;
+  int ncout = 0;
+  int nfact = 1;
+  int tsID = 0;
+  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
+    {
+      vdate = taxisInqVdate(taxisID);
+      vtime = taxisInqVtime(taxisID);
+
+      if ( tsID < NUM_TIMESTEP )
+	{
+	  ntimeout = printDateTime(ntimeout, vdate, vtime);
+	}
+      else
+	{
+	  if ( tsID == 2*NUM_TIMESTEP ) fprintf(stdout, "\n   ");
+	  if ( tsID >= 2*NUM_TIMESTEP ) ndotout = printDot(ndotout, &nfact, &ncout);
+
+	  if ( nvdatetime < NUM_TIMESTEP )
+	    {
+	      vdatetime[nvdatetime].vdate = vdate;
+	      vdatetime[nvdatetime].vtime = vtime;
+	      nvdatetime++;
+	    }
+	  else
+	    {
+	      next_vdatetime->vdate = vdate;
+	      next_vdatetime->vtime = vtime;
+	      next_vdatetime = next_vdatetime->next;
+	    }
+	}
+
+      tsID++;
+    }
+
+  if ( nvdatetime )
+    {
+      fprintf(stdout, "\n");
+
+      ntimeout = 0;
+      int toff = tsID%4;
+      if ( toff > 0 ) toff = 4 - toff;
+      for ( int i = 0; i < toff; ++i ) next_vdatetime = next_vdatetime->next;
+
+      for ( int i = toff; i < nvdatetime; ++i )
+	{
+	  vdate = next_vdatetime->vdate;
+	  vtime = next_vdatetime->vtime;
+	  ntimeout = printDateTime(ntimeout, vdate, vtime);
+	  next_vdatetime = next_vdatetime->next;
+	}
+    }
+}
 /*
  * Local Variables:
  * c-file-style: "Java"

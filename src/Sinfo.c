@@ -65,9 +65,8 @@ void *Sinfo(void *argument)
   int gridsize = 0;
   int gridID, zaxisID, code, tabnum, param;
   int vdate, vtime;
-  int nrecs, nvars, ntsteps;
+  int nvars, ntsteps;
   int levelsize;
-  int tsID, ntimeout;
   int tsteptype, taxisID;
   char varname[CDI_MAX_NAME];
   char paramstr[32];
@@ -291,27 +290,9 @@ void *Sinfo(void *argument)
 	  fprintf(stdout, "  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss  YYYY-MM-DD hh:mm:ss\n");
 
 	  set_text_color(stdout, RESET, MAGENTA);
-	  ntimeout = 0;
-	  tsID = 0;
-	  while ( (nrecs = streamInqTimestep(streamID, tsID)) )
-	    {
-	      if ( ntimeout == 4 )
-		{
-		  ntimeout = 0;
-		  fprintf(stdout, "\n");
-		}
 
-	      vdate = taxisInqVdate(taxisID);
-	      vtime = taxisInqVtime(taxisID);
+	  printTimesteps(streamID, taxisID);
 
-	      date2str(vdate, vdatestr, sizeof(vdatestr));
-	      time2str(vtime, vtimestr, sizeof(vtimestr));
-
-	      fprintf(stdout, " %s %s", vdatestr, vtimestr);
-
-	      ntimeout++;
-	      tsID++;
-	    }
 	  reset_text_color(stdout);
 	  fprintf(stdout, "\n");
 	}
